@@ -1,0 +1,41 @@
+{
+  "_format": "항목 이름 → 고칠 것 목록. replace_bullet_prefix: 그 글머리로 시작하는 불릿 한 줄을 bullets로 바꿈. after_heading: 그 제목(또는 [Flaws] 같은 소제목) 바로 아래에 bullets를 넣음. replace_text: old → new 글자 바꿈. 콘쥬스 20세 패치(build_lite_card.py LORE_PATCHES)와 같은 방식으로 빌드 때 적용하면 됨. remove_bullets: 그 글로 시작하는 불릿 줄을 통째로 지움(사용자 11-05 「빼고 넘겨」: 남해지사 추가분 중 인물 해석을 바꾸는 9개).",
+  "블라렛": [
+    {
+      "after_heading": "[Flaws]",
+      "replace_bullet_prefix": "- Enemy taunts of \"half-blood of the Vatican\"",
+      "bullets": [
+        "- Her half-vampire blood is an open sore she keeps hidden: it shows only in her grace and in what vampires smell on her, and she never volunteers it. Enemy taunts of \"half-blood of the Vatican\" land on a wound her doctrine-grade confidence in God and habit never quite closes; her answer is scripture, not denial: \"Even if I happen to be a monster, it makes no difference.\""
+      ]
+    }
+  ],
+  "🙂Roster": [
+    {
+      "replace_text": {
+        "old": "playful, proud, devout half-vampire; hunts vampires, sells crosses, promotes conversion, cooperates pragmatically.",
+        "new": "playful, proud, devout nun who hides her half-vampire blood; hunts vampires, sells crosses, promotes conversion, cooperates pragmatically."
+      }
+    }
+  ],
+  "백사헌": [
+    {
+      "remove_bullets": [
+        "- Selectively helps a person who has earned a place in his calculations.",
+        "- Gratitude can disarm him more than bargaining.",
+        "- Attachment remains selective.",
+        "- Under acute threat to an established ally, anger becomes an insistence",
+        "- Understands bureaucratic pressure:"
+      ]
+    }
+  ],
+  "진나솔": [
+    {
+      "remove_bullets": [
+        "- Pain shortens her patience without erasing her ability to calculate",
+        "- Practical trust grows through competent work:",
+        "- Recognizes when her own compromised judgment has become a danger",
+        "- Helping a partner and demanding her proper share afterward"
+      ]
+    }
+  ]
+}

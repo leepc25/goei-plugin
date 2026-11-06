@@ -1,0 +1,16 @@
+pc facs: A00:관리국, B00:가짜 관리국, C00:백일몽 주식회사, D00:민간인, E00:프리랜서, F00:중립
+pc neutral code: F00
+pc neutral who: *차여진, 서윤지, 고연지, 윤지아, 마덕희, 문혜란, 신유리, 블라렛, 살라딘, 아벤샤, 세크리엠, 탐미주의, 브라우니
+pc neutral scs: 1:직접 입력, 2:커스텀 임무
+pc A00 scs: 1:01면접, 2:02코드네임, 3:03근무 수칙, 4:04격리 실습, 5:05격리팀, 6:06교전, 7:07한설인육공장, 8:08직접 입력, 9:09커스텀 임무
+pc after start: msgs=1 role=char mark=true len=3367 fmIndex=0 st_faction=A00 st_fm=1
+pc slots: A00,B00,C00,D00,E00,F00
+pc errors: 
+phone facs: A00:관리국, B00:가짜 관리국, C00:백일몽 주식회사, D00:민간인, E00:프리랜서, F00:중립
+phone neutral code: F00
+phone neutral who: *차여진, 서윤지, 고연지, 윤지아, 마덕희, 문혜란, 신유리, 블라렛, 살라딘, 아벤샤, 세크리엠, 탐미주의, 브라우니
+phone neutral scs: 1:직접 입력, 2:커스텀 임무
+phone A00 scs: 1:01면접, 2:02코드네임, 3:03근무 수칙, 4:04격리 실습, 5:05격리팀, 6:06교전, 7:07한설인육공장, 8:08직접 입력, 9:09커스텀 임무
+phone after start: msgs=1 role=char mark=true len=3367 fmIndex=0 st_faction=A00 st_fm=1
+phone slots: A00,B00,C00,D00,E00,F00
+phone errors: 

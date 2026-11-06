@@ -1,0 +1,9794 @@
+{
+ "pc": {
+  "picker": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    }
+   }
+  },
+  "picker-picked": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    }
+   }
+  },
+  "board": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 15,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-aim": {
+     "n": 1,
+     "h": [
+      210
+     ],
+     "w": [],
+     "radius": [
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 2,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 2
+    },
+    "(없음)": {
+     "n": 5,
+     "h": [
+      28,
+      31
+     ],
+     "w": [],
+     "radius": [
+      "7px",
+      "8px"
+     ],
+     "font": [
+      "12.5px",
+      "14px"
+     ],
+     "small": 5
+    }
+   }
+  },
+  "map": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-mswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-pin": {
+     "n": 17,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-zbtn": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-acard-tool": {
+     "n": 24,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 24
+    },
+    "gx-step": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "mission": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 4,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-mswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-mx-art": {
+     "n": 51,
+     "h": [
+      68
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 51,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 51
+    },
+    "gx-acard-tool": {
+     "n": 24,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 24
+    },
+    "gx-step": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 28,
+     "h": [
+      32,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-room": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back",
+    "ph-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 34,
+     "h": [
+      32,
+      36,
+      42,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px",
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-send": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "15px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-notice": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "gnet": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 2,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-grab": {
+     "n": 1,
+     "h": [
+      743
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-card": {
+     "n": 2,
+     "h": [
+      66
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki-doc": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-grab": {
+     "n": 1,
+     "h": [
+      743
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-reports": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-people": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      42
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-main": {
+     "n": 1,
+     "h": [
+      64
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wallet": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard-open": {
+   "title": "괴이ːANOMALY",
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {}
+  },
+  "settings": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 17,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 17
+    }
+   }
+  },
+  "ed-set_image": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 2,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 2
+    },
+    "gx-seg": {
+     "n": 8,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 8
+    },
+    "gx-mini": {
+     "n": 7,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_board": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 7,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 7
+    },
+    "gx-step": {
+     "n": 34,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_phone": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 10,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 10
+    },
+    "gx-switch": {
+     "n": 10,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 10
+    },
+    "gx-chip": {
+     "n": 9,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-step": {
+     "n": 42,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_people": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 20,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 20
+    },
+    "gx-seg": {
+     "n": 42,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 42
+    },
+    "gx-mini": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_journal": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 3,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "gx-switch": {
+     "n": 1,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "gx-step": {
+     "n": 4,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_adv": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 9,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 9
+    },
+    "gx-step": {
+     "n": 6,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_update": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-agent": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-mini": {
+     "n": 3,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 7,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-row": {
+     "n": 55,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-guide_RP": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 8,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-manage_diag": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "errors": []
+ },
+ "phone": {
+  "picker": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "picker-picked": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "board": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 26,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-aim": {
+     "n": 1,
+     "h": [
+      210
+     ],
+     "w": [],
+     "radius": [
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 2,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 2
+    },
+    "(없음)": {
+     "n": 5,
+     "h": [
+      28,
+      31
+     ],
+     "w": [],
+     "radius": [
+      "7px",
+      "8px"
+     ],
+     "font": [
+      "12.5px",
+      "14px"
+     ],
+     "small": 5
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 5,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "board-drawer": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": true,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 26,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-aim": {
+     "n": 1,
+     "h": [
+      210
+     ],
+     "w": [],
+     "radius": [
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 2,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 2
+    },
+    "(없음)": {
+     "n": 5,
+     "h": [
+      28,
+      31
+     ],
+     "w": [],
+     "radius": [
+      "7px",
+      "8px"
+     ],
+     "font": [
+      "12.5px",
+      "14px"
+     ],
+     "small": 5
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 5,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "map": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-stepb": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-stepswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-pin": {
+     "n": 17,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-zbtn": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    }
+   }
+  },
+  "mission": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-stepb": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-stepswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 4,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-mx-art": {
+     "n": 51,
+     "h": [
+      68
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 51,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 51
+    }
+   }
+  },
+  "mission-swapped": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-stepb": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-stepswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-pin": {
+     "n": 17,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-zbtn": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    }
+   }
+  },
+  "phone": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 28,
+     "h": [
+      32,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    }
+   }
+  },
+  "phone-room": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "ph-back",
+    "ph-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 7,
+     "h": [
+      36,
+      40,
+      42,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "15px",
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-send": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "15px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-room-drawer": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "ph-back",
+    "ph-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 7,
+     "h": [
+      36,
+      40,
+      42,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "15px",
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-send": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "15px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-notice": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "gnet": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 2,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "nw-edge": {
+     "n": 1,
+     "h": [
+      116
+     ],
+     "w": [],
+     "radius": [
+      "14px 0px 0px 14px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "nw-card": {
+     "n": 2,
+     "h": [
+      66
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 3,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki-doc": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "nw-edge": {
+     "n": 1,
+     "h": [
+      116
+     ],
+     "w": [],
+     "radius": [
+      "14px 0px 0px 14px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 3,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-reports": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-people": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:wallet",
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-hwallet": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "11px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 5,
+     "h": [
+      40,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-main": {
+     "n": 1,
+     "h": [
+      64
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    }
+   }
+  },
+  "wallet": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard": {
+   "title": "괴이ːANOMALY",
+   "headH": 57,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "tab:records",
+    "id-card",
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard-open": {
+   "title": "괴이ːANOMALY",
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {}
+  },
+  "settings": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 17,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 17
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_image": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 2,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 2
+    },
+    "gx-seg": {
+     "n": 8,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 8
+    },
+    "gx-mini": {
+     "n": 7,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_board": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 7,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 7
+    },
+    "gx-step": {
+     "n": 34,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 32
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_phone": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 10,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 10
+    },
+    "gx-switch": {
+     "n": 10,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 10
+    },
+    "gx-chip": {
+     "n": 9,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-step": {
+     "n": 42,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_people": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 20,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 20
+    },
+    "gx-seg": {
+     "n": 42,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 42
+    },
+    "gx-mini": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_journal": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 3,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "gx-switch": {
+     "n": 1,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "gx-step": {
+     "n": 4,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_adv": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "set-bar:save",
+    "set-bar:load",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "st-act": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 9,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 9
+    },
+    "gx-step": {
+     "n": 6,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_update": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-agent": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-save",
+    "ed-revert",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 3,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-guide_RP": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-manage_diag": {
+   "title": "설정",
+   "headH": 61,
+   "navW": 390,
+   "mbarH": 60,
+   "nav": true,
+   "mbar": true,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-drawer",
+    "ed-close"
+   ],
+   "backs": [],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mtrack 468>390"
+   ],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 2,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-grip": {
+     "n": 1,
+     "h": [
+      18
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-nb": {
+     "n": 5,
+     "h": [
+      60
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "12.5px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "errors": []
+ },
+ "land": {
+  "picker": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    }
+   }
+  },
+  "picker-picked": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 2,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 2
+    }
+   }
+  },
+  "board": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 15,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-aim": {
+     "n": 1,
+     "h": [
+      210
+     ],
+     "w": [],
+     "radius": [
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 2,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 2
+    },
+    "(없음)": {
+     "n": 5,
+     "h": [
+      28,
+      31
+     ],
+     "w": [],
+     "radius": [
+      "7px",
+      "8px"
+     ],
+     "font": [
+      "12.5px",
+      "14px"
+     ],
+     "small": 5
+    }
+   }
+  },
+  "map": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mapbar 251>188"
+   ],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-mswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-pin": {
+     "n": 17,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-zbtn": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-acard-tool": {
+     "n": 24,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 24
+    },
+    "gx-step": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "mission": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mfilter 350>188"
+   ],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 4,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-mswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-mx-art": {
+     "n": 51,
+     "h": [
+      68
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-evbtn": {
+     "n": 51,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 51
+    },
+    "gx-acard-tool": {
+     "n": 24,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 24
+    },
+    "gx-step": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "mission-swapped": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.gx-mapbar 251>188"
+   ],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-mswap": {
+     "n": 1,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-pin": {
+     "n": 17,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-zbtn": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-acard-tool": {
+     "n": 24,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 24
+    },
+    "gx-step": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "9px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 28,
+     "h": [
+      32,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-room": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back",
+    "ph-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.ph-room 292>278",
+    "header.ph-room-head 292>278"
+   ],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 34,
+     "h": [
+      32,
+      36,
+      42,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px",
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-send": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "15px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-room-drawer": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": true,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back",
+    "ph-back"
+   ],
+   "pageOver": 0,
+   "over": [
+    "div.ph-room 292>278",
+    "header.ph-room-head 292>278"
+   ],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tab": {
+     "n": 3,
+     "h": [
+      30
+     ],
+     "w": [],
+     "radius": [
+      "999px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "ph-main": {
+     "n": 12,
+     "h": [
+      74
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 34,
+     "h": [
+      32,
+      36,
+      42,
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px",
+      "12px",
+      "50%"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "ph-send": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "15px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "phone-notice": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 3,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "gnet": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": true,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 2,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 4,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-grab": {
+     "n": 1,
+     "h": [
+      233
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-card": {
+     "n": 2,
+     "h": [
+      66
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wiki-doc": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "nw-grab": {
+     "n": 1,
+     "h": [
+      233
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-start": {
+     "n": 1,
+     "h": [
+      44
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 5,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-reports": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 2,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "records-people": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "ph-sub": {
+     "n": 4,
+     "h": [
+      38
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "14.5px"
+     ],
+     "small": 0
+    },
+    "ph-tool": {
+     "n": 1,
+     "h": [
+      42
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "ph-main": {
+     "n": 1,
+     "h": [
+      64
+     ],
+     "w": [],
+     "radius": [
+      "14px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "wallet": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard": {
+   "title": "괴이ːANOMALY",
+   "headH": 53,
+   "navW": 236,
+   "mbarH": 0,
+   "nav": true,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [
+    "ed-open:set:screen",
+    "close"
+   ],
+   "backs": [
+    "nav-back"
+   ],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 3,
+   "buttons": {
+    "gx-op-ln": {
+     "n": 1,
+     "h": [
+      25
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 1
+    },
+    "gx-nb": {
+     "n": 7,
+     "h": [
+      48
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-nh": {
+     "n": 3,
+     "h": [
+      40
+     ],
+     "w": [],
+     "radius": [
+      "10px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 2,
+     "h": [
+      36
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "18px"
+     ],
+     "small": 0
+    },
+    "gx-chip": {
+     "n": 3,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "idcard-open": {
+   "title": "괴이ːANOMALY",
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {}
+  },
+  "settings": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 17,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 17
+    }
+   }
+  },
+  "ed-set_image": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 2,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 2
+    },
+    "gx-seg": {
+     "n": 8,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 8
+    },
+    "gx-mini": {
+     "n": 7,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_board": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 7,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 7
+    },
+    "gx-step": {
+     "n": 34,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 32
+    }
+   }
+  },
+  "ed-set_phone": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 10,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 10
+    },
+    "gx-switch": {
+     "n": 10,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 10
+    },
+    "gx-chip": {
+     "n": 9,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-step": {
+     "n": 42,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_people": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-switch": {
+     "n": 20,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 20
+    },
+    "gx-seg": {
+     "n": 42,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 42
+    },
+    "gx-mini": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_journal": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 3,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 3
+    },
+    "gx-switch": {
+     "n": 1,
+     "h": [
+      20
+     ],
+     "w": [],
+     "radius": [
+      "12px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 1
+    },
+    "gx-step": {
+     "n": 4,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_adv": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "st-act": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 10,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-seg": {
+     "n": 9,
+     "h": [
+      28
+     ],
+     "w": [],
+     "radius": [
+      "5px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 9
+    },
+    "gx-step": {
+     "n": 6,
+     "h": [
+      32
+     ],
+     "w": [],
+     "radius": [
+      "0px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-set_update": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-agent": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-mini": {
+     "n": 3,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    },
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 7,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-guide_RP": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 8,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gx-mini": {
+     "n": 2,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "13px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "ed-manage_diag": {
+   "headH": 0,
+   "navW": 0,
+   "mbarH": 0,
+   "nav": false,
+   "mbar": false,
+   "drawer": false,
+   "drawerOpen": false,
+   "headActs": [],
+   "backs": [],
+   "pageOver": 0,
+   "over": [],
+   "tiny": 0,
+   "buttons": {
+    "gx-x": {
+     "n": 1,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "16px"
+     ],
+     "small": 0
+    },
+    "gw-tab": {
+     "n": 4,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    },
+    "gw-tree-item": {
+     "n": 5,
+     "h": [
+      34
+     ],
+     "w": [],
+     "radius": [
+      "8px"
+     ],
+     "font": [
+      "14px"
+     ],
+     "small": 0
+    }
+   }
+  },
+  "errors": []
+ }
+}

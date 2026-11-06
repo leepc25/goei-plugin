@@ -1,0 +1,539 @@
+src/ui/cctvfx.ts: fireFx
+src/ui/people.ts: peopleUi
+src/ui/people.ts: peopleHomeTile
+src/ui/editor/guides.ts: GUIDE_MAX
+src/ui/editor/relations.ts: relUi
+src/ui/editor/rules.ts: ruleUi
+src/ui/editor/rules.ts: RULE_MAX
+src/ui/editor/rules.ts: RULE_TITLE_MAX
+src/ui/editor/rules.ts: RULE_TEXT_MAX
+src/ui/editor/rules.ts: ruleId  (시험만 씀)
+src/ui/settings.ts: THEME_KEY
+src/ui/settings.ts: SettingsScope
+src/ui/brand.ts: CARD_FILE
+src/ui/phone.ts: phoneBusy
+src/ui/phone.ts: refreshInbox
+src/ui/phone.ts: phKinds
+src/ui/imgprompt.ts: imgUi
+src/ui/imgprompt.ts: ImgEnv
+src/ui/update.ts: updateUi
+src/ui/update.ts: newVersions
+src/ui/frame.ts: FrameKind
+src/ui/frame.ts: FrameState
+src/ui/directory.ts: DirectoryEnv
+src/ui/advanced.ts: advUi
+src/ui/advanced.ts: AdvEnv
+src/ui/advanced.ts: defaultsState
+src/ui/status.ts: linkTerms
+src/ui/defaults.ts: DefaultsPane
+src/ui/defaults.ts: MAIN_PREFIXES
+src/ui/defaults.ts: defaultsAsk
+src/ui/field.ts: depart  (시험만 씀)
+src/ui/field.ts: sendMission
+src/ui/controls.ts: isOnOff
+src/ui/wiki.ts: openWikiSettings
+src/ui/visitgame.ts: gameUiOf
+src/ui/gnet.ts: GN_KINDS
+src/ui/visitset.ts: visitUi
+src/ui/visitset.ts: visitSettings
+src/ui/visitset.ts: handleVisitSettings
+src/ui/records.ts: RecSub
+src/ui/records.ts: RecView
+src/ui/records.ts: JournalFilter
+src/ui/records.ts: ReportFilter
+src/ui/records.ts: durText
+src/ui/records.ts: monitor
+src/ui/records.ts: TOAST_MS  (시험만 씀)
+src/ui/records.ts: closeToast
+src/ui/marks.ts: isMarked
+src/ui/reportpng.ts: paintColors
+src/ui/reportpng.ts: ReportPng
+src/ui/game.ts: gameStats
+src/ui/game.ts: gameOpen
+src/ui/game.ts: hideGame
+src/ui/game.ts: openGame  (시험만 씀)
+src/ui/game.ts: closeGame  (시험만 씀)
+src/ui/game.ts: reattachGame
+src/ui/images.ts: showAgentInfo
+src/ui/wallet.ts: walletOf  (시험만 씀)
+src/ui/wallet.ts: balanceText
+src/ui/agents.ts: AgentView
+src/ui/agents.ts: AgentSide
+src/ui/evcard.ts: targetMark
+src/host/people.ts: PeopleStatus
+src/host/people.ts: seedAppearing
+src/host/people.ts: dropExcluded
+src/host/people.ts: statusIdentity
+src/host/people.ts: RunResult
+src/host/people.ts: RunScope
+src/host/people.ts: directorPaused
+src/host/people.ts: describeSettings
+src/host/statusview.ts: reportCardKeys
+src/host/statusview.ts: refreshReportCards
+src/host/datapack.ts: INSTALL_KEY
+src/host/datapack.ts: DataPackError
+src/host/datapack.ts: fetchPack
+src/host/datapack.ts: dropWorldData
+src/host/datapack.ts: dataReady
+src/host/asset.ts: AssetTarget
+src/host/assets.ts: AGENT_CROPS
+src/host/openinghint.ts: greetingMarker
+src/host/openinghint.ts: openingStaged
+src/host/risu.ts: onLoreSaved
+src/host/risu.ts: notifyLoreSaved
+src/host/photo.ts: PhotoError
+src/host/photo.ts: sniffMime
+src/host/datapanel.ts: closeWorldDataPanel
+src/host/overlay.ts: INTRO_MS
+src/host/user.ts: UserInfo
+src/host/user.ts: assetPathOf
+src/host/picpack.ts: PicError
+src/host/send.ts: SEND_FALLBACK
+src/host/install.ts: InstallStep
+src/host/journal.ts: DebriefResult
+src/host/joint.ts: JointKind
+src/host/joint.ts: combinedPrompts  (시험만 씀)
+src/host/joint.ts: splitCombined  (시험만 씀)
+src/core/phonePrompt.ts: PhonePrompt
+src/core/phonePrompt.ts: roomPacket
+src/core/phonePrompt.ts: RefreshPlan
+src/core/settings.ts: AssetModel
+src/core/settings.ts: ST  (시험만 씀)
+src/core/settings.ts: BASIC_DEFAULTS  (시험만 씀)
+src/core/settings.ts: DEFAULT_MARKS
+src/core/settings.ts: DIM_STEPS
+src/core/settings.ts: readSettingsBook
+src/core/guides.ts: GuidePart
+src/core/guides.ts: rulesFor
+src/core/fieldsched.ts: Schedule
+src/core/fieldsched.ts: stateOverride
+src/core/fieldsched.ts: whereAt  (시험만 씀)
+src/core/fieldsched.ts: Graph
+src/core/fieldsched.ts: routeScenes  (시험만 씀)
+src/core/fieldsched.ts: stuckStep  (시험만 씀)
+src/core/focus.ts: FOCUS_TURNS
+src/core/journal/settings.ts: JR_DEFAULTS  (시험만 씀)
+src/core/journal/settings.ts: ChatCardMode
+src/core/journal/mine.ts: MineSubject
+src/core/journal/mine.ts: MineReason
+src/core/journal/mine.ts: mineReasons  (시험만 씀)
+src/core/journal/notify.ts: ReportNotice
+src/core/journal/notify.ts: onReport
+src/core/journal/notify.ts: emitReport
+src/core/journal/notify.ts: lastReportNotice
+src/core/journal/store.ts: emptyJournal
+src/core/journal/store.ts: emptyReports  (시험만 씀)
+src/core/journal/store.ts: journalVars
+src/core/journal/store.ts: unlinkReports
+src/core/journal/store.ts: reportOf
+src/core/journal/field.ts: FieldBuildInput
+src/core/journal/field.ts: FieldBuildResult
+src/core/journal/field.ts: fieldLabel
+src/core/journal/field.ts: buildFieldReport
+src/core/journal/field.ts: fieldSummary
+src/core/journal/debrief.ts: DEBRIEF_TEXT_MAX
+src/core/journal/debrief.ts: ENDED_NOW_MAX
+src/core/journal/line.ts: journalLine  (시험만 씀)
+src/core/journal/png.ts: PaintCtx
+src/core/journal/png.ts: PaintOpts
+src/core/journal/png.ts: PaintResult
+src/core/journal/png.ts: TRAIL_LINES
+src/core/journal/png.ts: durShort
+src/core/journal/png.ts: wrapText  (시험만 씀)
+src/core/journal/build.ts: BuildInput
+src/core/journal/build.ts: BuildResult
+src/core/journal/build.ts: parseAgents  (시험만 씀)
+src/core/journal/types.ts: ReportHead
+src/core/gamelink.ts: SnapshotPics
+src/core/gamelink.ts: cardSnapshot
+src/core/gamelink.ts: normReport
+src/core/gamelink.ts: reportText
+src/core/gamelink.ts: withRecord
+src/core/gamelink.ts: withoutRecord
+src/core/gamelink.ts: recordLines
+src/core/interlude.ts: INTERLUDE_HEAD  (시험만 씀)
+src/core/interlude.ts: Interlude
+src/core/interlude.ts: withFieldFacts  (시험만 씀)
+src/core/interlude.ts: withInterludes  (시험만 씀)
+src/core/fieldgate.ts: PresenceInput
+src/core/fieldgate.ts: EntryDecision
+src/core/fieldgate.ts: entryDecision  (시험만 씀)
+src/core/phone.ts: PH_UNREAD
+src/core/phone.ts: PH_DEFAULTS
+src/core/phone.ts: STORAGE  (시험만 씀)
+src/core/phone.ts: StorageKind
+src/core/phone.ts: PhoneSettings
+src/core/phone.ts: cooldownLeft
+src/core/phone.ts: PhoneTab
+src/core/phone.ts: CustomContacts
+src/core/phone.ts: MsgKind
+src/core/phone.ts: ActionType
+src/core/phone.ts: blankState  (시험만 씀)
+src/core/phone.ts: emptyPause
+src/core/phone.ts: roomUnread
+src/core/phone.ts: SenderRow
+src/core/phone.ts: ConversationState
+src/core/phone.ts: trimRooms  (시험만 씀)
+src/core/phone.ts: decodeJson
+src/core/phone.ts: PEvent
+src/core/phone.ts: eventsFromPatch  (시험만 씀)
+src/core/phone.ts: Bulletin
+src/core/phone.ts: Bulletins
+src/core/phone.ts: trimBulletins
+src/core/phone.ts: noticeChannel
+src/core/phone.ts: NoticeRow
+src/core/phone.ts: validateAnnouncements
+src/core/phone.ts: validateInvitations
+src/core/phone.ts: RefreshResult
+src/core/imgprompt.ts: ImgPromptConfig
+src/core/imgprompt.ts: ImgPlayerOpts
+src/core/imgprompt.ts: applyImgConfig  (시험만 씀)
+src/core/datapack.ts: PackExpect
+src/core/asset.ts: IMAGE_BOOK
+src/core/asset.ts: stripImageTags
+src/core/asset.ts: splitNarrative
+src/core/asset.ts: paragraphs  (시험만 씀)
+src/core/asset.ts: activeCharacters  (시험만 씀)
+src/core/asset.ts: assetPrompt
+src/core/asset.ts: parsePatches
+src/core/asset.ts: applyPatches
+src/core/asset.ts: AssetJob
+src/core/update.ts: UPDATE_SCHEMA
+src/core/update.ts: CARD_FIELDS
+src/core/update.ts: PROTECTED_LORE
+src/core/update.ts: MergeCount
+src/core/update.ts: mergeByName  (시험만 씀)
+src/core/update.ts: RETIRED_SCRIPTS
+src/core/update.ts: keyPrint  (시험만 씀)
+src/core/gnetPrompt.ts: GnetOp
+src/core/gnetPrompt.ts: GnetBooks
+src/core/gnetPrompt.ts: gnetBooks
+src/core/gnetPrompt.ts: systemText
+src/core/gnetPrompt.ts: GnetPrompt
+src/core/gnetPrompt.ts: commentTimeRule
+src/core/gnetPrompt.ts: boardJson
+src/core/gnetPrompt.ts: PublicPrompt
+src/core/gnetPrompt.ts: CommentPrompt
+src/core/visitPrompt.ts: VisitError
+src/core/visitPrompt.ts: VisitAgent
+src/core/visitPrompt.ts: FieldTag
+src/core/visitPrompt.ts: fieldTagRules  (시험만 씀)
+src/core/visitPrompt.ts: takeFieldTags  (시험만 씀)
+src/core/visitPrompt.ts: fieldTagName
+src/core/visitPrompt.ts: TALK_CUES
+src/core/visitPrompt.ts: cueTagRules  (시험만 씀)
+src/core/visitPrompt.ts: takeCueTag  (시험만 씀)
+src/core/visitPrompt.ts: VisitLine
+src/core/visitPrompt.ts: VisitPromptInput
+src/core/visitPrompt.ts: VisitPrompt
+src/core/visitPrompt.ts: hasVisitGuide
+src/core/visitPrompt.ts: canInterject
+src/core/visitPrompt.ts: agentLore
+src/core/visitPrompt.ts: cleanLine
+src/core/visitPrompt.ts: clipLine  (시험만 씀)
+src/core/visitPrompt.ts: parseVisitLine  (시험만 씀)
+src/core/visitPrompt.ts: VisitReply
+src/core/visitPrompt.ts: parseVisitGroup  (시험만 씀)
+src/core/world/assemble.ts: APPENDIX_DEFS
+src/core/world/virtual.ts: ROSTER_BOOK
+src/core/world/virtual.ts: VIRTUAL_FOLDER_KEY
+src/core/world/virtual.ts: worldOverrides
+src/core/world/catalog.ts: WorldItem
+src/core/world/catalog.ts: Landmark
+src/core/world/catalog.ts: CatalogError
+src/core/world/directory.ts: DIRECTORY_SCHEMA
+src/core/world/directory.ts: PlaceKind
+src/core/world/directory.ts: PhoneTabData
+src/core/world/directory.ts: PhoneTabsData
+src/core/world/directory.ts: PlaceData
+src/core/world/directory.ts: AgentData
+src/core/world/directory.ts: BaseData
+src/core/world/directory.ts: AppendixData
+src/core/world/directory.ts: DEFAULT_PHONE_TABS
+src/core/world/directory.ts: folderMembers
+src/core/world/directory.ts: appendixFolder
+src/core/world/directory.ts: appendixMembers
+src/core/world/directory.ts: guessParent
+src/core/world/directory.ts: APPENDIX_DEFAULT
+src/core/world/directory.ts: appendixData
+src/core/world/directory.ts: TabInfo
+src/core/world/directory.ts: FACTIONS
+src/core/world/directory.ts: groupFaction
+src/core/world/directory.ts: OrgData
+src/core/world/directory.ts: buildOrgs
+src/core/world/directory.ts: orgHint
+src/core/world/directory.ts: stableAgentId  (시험만 씀)
+src/core/world/directory.ts: worldRowsOf
+src/core/world/directory.ts: directoryContent
+src/core/world/directory.ts: sameData
+src/core/world/directory.ts: OLD_OUTSIDE_PLACES  (시험만 씀)
+src/core/world/geo.ts: SIDO_NAME
+src/core/world/status.ts: statusClockMinute  (시험만 씀)
+src/core/world/registry.ts: RegistryEntry
+src/core/world/registry.ts: junkAliases
+src/core/world/registry.ts: searchRegistry
+src/core/world/registry.ts: AliasDrop
+src/core/world/statuscols.ts: ColDef
+src/core/world/statuscols.ts: COL_IDS  (시험만 씀)
+src/core/world/statuscols.ts: COL_VAR_RE
+src/core/world/statuscols.ts: ColLogEntry
+src/core/world/statuscols.ts: colLog  (시험만 씀)
+src/core/world/statuscols.ts: KNOWN_SHAPES
+src/core/world/statuscols.ts: activeShapes
+src/core/world/statuscols.ts: statusSection  (시험만 씀)
+src/core/world/statuscols.ts: STATUS_SECTION_MARK
+src/core/world/schema.ts: WORLD_KINDS  (시험만 씀)
+src/core/world/schema.ts: fieldDef
+src/core/world/draft.ts: minimalOverride  (시험만 씀)
+src/core/world/draft.ts: recordTokens
+src/core/world/calendar.ts: DayInfo
+src/core/world/engine.ts: Origin
+src/core/world/engine.ts: TRAIL_CAP  (시험만 씀)
+src/core/world/engine.ts: TRAIL_TEXT_MAX
+src/core/world/engine.ts: AgentRecord
+src/core/world/engine.ts: emptyWorld  (시험만 씀)
+src/core/world/engine.ts: validName
+src/core/world/engine.ts: OutputResult
+src/core/world/engine.ts: Reports
+src/core/world/engine.ts: LOCKED_STATES  (시험만 씀)
+src/core/world/records.ts: WorldData
+src/core/world/records.ts: mergeRecord  (시험만 씀)
+src/core/world/records.ts: BUILTIN_ORG_CODES
+src/core/world/records.ts: activeRelations
+src/core/world/records.ts: activeOrgName
+src/core/world/tags.ts: AnState
+src/core/world/tags.ts: AnTag
+src/core/world/tags.ts: InTag
+src/core/world/tags.ts: MsTag
+src/core/world/tags.ts: AgTag
+src/core/world/tags.ts: AG_STATES
+src/core/world/tags.ts: stripLabel
+src/core/world/tags.ts: normGrade
+src/core/world/tags.ts: normAnState
+src/core/world/tags.ts: normAgState
+src/core/world/tags.ts: StatusLine
+src/core/world/tags.ts: StatusFields
+src/core/world/faction.ts: FACTION_INTRO
+src/core/world/faction.ts: ROSTER_INTRO
+src/core/world/faction.ts: orgTitle
+src/core/request.ts: userTurns  (시험만 씀)
+src/core/seed.ts: SeedResult
+src/core/fieldstanding.ts: Standing
+src/core/statusctx.ts: STATUS_HEAD  (시험만 씀)
+src/core/statusctx.ts: lastStatusLine  (시험만 씀)
+src/core/statusctx.ts: stripStatusLines  (시험만 씀)
+src/core/statusctx.ts: statusBlock
+src/core/statusctx.ts: rebuildStatusLine  (시험만 씀)
+src/core/statusctx.ts: withIdentity  (시험만 씀)
+src/core/dispatch.ts: DirectiveFormat
+src/core/dispatch.ts: SceneSummary
+src/core/dispatch.ts: setSceneUnsent
+src/core/dispatch.ts: isSceneUnsent
+src/core/advanced.ts: AdvGroup
+src/core/advanced.ts: advItems
+src/core/advanced.ts: advCheck
+src/core/advanced.ts: RefToggles
+src/core/advanced.ts: GenSettings
+src/core/refs.ts: RefKind
+src/core/refs.ts: RefRow
+src/core/refs.ts: ACTIVE_BOOKS
+src/core/refs.ts: allowedBook
+src/core/refs.ts: stripModules  (시험만 씀)
+src/core/refs.ts: CollectOptions
+src/core/refs.ts: Turn
+src/core/imgtag.ts: EMOTIONS
+src/core/visit.ts: VISIT_LORE  (시험만 씀)
+src/core/visit.ts: VisitRecord
+src/core/visit.ts: VisitRoom
+src/core/visit.ts: visitRoom  (시험만 씀)
+src/core/visit.ts: withVisitTurn  (시험만 씀)
+src/core/visit.ts: withoutOldLore
+src/core/fieldfollow.ts: classify  (시험만 씀)
+src/core/fieldfollow.ts: MAX_FOLLOWERS
+src/core/fieldfollow.ts: Companion
+src/core/fieldfollow.ts: fieldCompanions  (시험만 씀)
+src/core/fieldfollow.ts: canJoin  (시험만 씀)
+src/core/fieldfollow.ts: Foot
+src/core/fieldfollow.ts: followPoint  (시험만 씀)
+src/core/fieldfollow.ts: pushFoot  (시험만 씀)
+src/core/player.ts: PLAYER_KEY
+src/core/player.ts: PLAYER_HEAD  (시험만 씀)
+src/core/field.ts: FIELD_KEY
+src/core/field.ts: FieldRecord
+src/core/field.ts: trimEvents
+src/core/field.ts: withFieldEvent  (시험만 씀)
+src/core/fieldphone.ts: Link
+src/core/fieldphone.ts: CallInput
+src/core/fieldphone.ts: canCall  (시험만 씀)
+src/core/fieldclock.ts: PX_PER_M
+src/core/fieldclock.ts: WALK_MPS
+src/core/fieldclock.ts: DOOR_S
+src/core/fieldclock.ts: STAIR_S
+src/core/fieldclock.ts: ELEVATOR_S
+src/core/fieldclock.ts: TALK_S
+src/core/fieldclock.ts: walkSeconds  (시험만 씀)
+src/core/fieldclock.ts: mergeClock  (시험만 씀)
+src/core/lore.ts: DONT_ACTIVATE
+src/core/lore.ts: CONFIRM_KEYS
+src/core/lore.ts: KeyRule
+src/core/lore.ts: LoreKey
+src/core/lore.ts: ManagedEntry
+src/core/lore.ts: AppendixInfo
+src/core/lore.ts: hasDontActivate
+src/core/lore.ts: managedEntries  (시험만 씀)
+src/core/lore.ts: KeyHit
+src/core/lore.ts: findHits
+src/core/lore.ts: LoreMessage
+src/core/lore.ts: LoreState
+src/core/lore.ts: LoreOptions
+src/core/lore.ts: DEFAULT_DEPTH
+src/core/lore.ts: DEFAULT_BUDGET
+src/core/lore.ts: loreState
+src/core/lore.ts: pickLore  (시험만 씀)
+src/core/lore.ts: lockedAppendices
+src/core/lore.ts: unlockHint
+src/core/lore.ts: pickLoreRisu  (시험만 씀)
+src/core/lore.ts: loreMessages
+src/core/lore.ts: LoreResult
+src/core/lore.ts: LORE_MARK  (시험만 씀)
+src/core/wiki.ts: WIKI_PREFIX
+src/core/wiki.ts: WikiMode
+src/core/wiki.ts: WikiLength
+src/core/wiki.ts: WIKI_DEFAULTS  (시험만 씀)
+src/core/wiki.ts: parseDocContent
+src/core/wiki.ts: docContent
+src/core/wiki.ts: WikiRequest
+src/core/wiki.ts: WikiPrompt
+src/core/wiki.ts: innerBody
+src/core/wiki.ts: reviewLinks
+src/core/wiki.ts: RenderOptions
+src/core/wiki.ts: SPOILER_HEADING
+src/core/wiki.ts: NW_CONTEXT
+src/core/start.ts: ChatPhase
+src/core/start.ts: unsentOpening
+src/core/start.ts: StartPlan
+src/core/fieldtravel.ts: Mode
+src/core/fieldtravel.ts: TravelRoute
+src/core/fieldtravel.ts: ROUTES  (시험만 씀)
+src/core/fieldtravel.ts: routesFrom  (시험만 씀)
+src/core/fieldtravel.ts: contactAlong  (시험만 씀)
+src/core/fieldtravel.ts: contactText  (시험만 씀)
+src/core/gnet.ts: G_POST_BASE  (시험만 씀)
+src/core/gnet.ts: GComment
+src/core/gnet.ts: GDm
+src/core/gnet.ts: GnetStyle
+src/core/gnet.ts: GN_STYLE_NAME
+src/core/gnet.ts: gnetStyle
+src/core/gnet.ts: validDate
+src/core/gnet.ts: snapshotKey
+src/core/gnet.ts: trimDms
+src/core/gnet.ts: replyForUser
+src/core/gnet.ts: reconcileUnread  (시험만 씀)
+src/core/gnet.ts: DmThread
+src/core/gnet.ts: findPublicSource
+src/core/gnet.ts: BoardResult
+src/core/gnet.ts: BoardOptions
+src/core/gnet.ts: CommentTarget
+src/core/gnet.ts: NewComment
+src/core/gnet.ts: stampMinutes
+src/core/gnet.ts: minutesStamp
+src/core/gnet.ts: commentWhen  (시험만 씀)
+src/core/budget.ts: BudgetError  (시험만 씀)
+src/core/budget.ts: promptTokens  (시험만 씀)
+src/core/fieldsites.ts: SiteDef
+src/core/fieldsites.ts: SITES
+src/core/fieldsites.ts: FALLBACK_SITE
+src/core/fieldsites.ts: siteFor  (시험만 씀)
+src/core/install.ts: InstallData
+src/core/install.ts: SETTINGS_FOLDER_NAME
+src/core/install.ts: WIKI_FOLDER_NAME
+src/core/install.ts: WIKI_FOLDER_KEY  (시험만 씀)
+src/core/install.ts: CheckInput
+src/core/install.ts: buildManifest
+src/core/install.ts: fillDirectory
+src/core/attach.ts: AttachKind
+src/core/attach.ts: ATTACH_KINDS
+src/core/attach.ts: IMAGE_MAX
+src/core/attach.ts: validAsset
+src/core/attach.ts: attachRecord
+src/core/fieldrel.ts: Mood
+src/core/fieldrel.ts: Rel
+src/core/fieldrel.ts: newRel  (시험만 씀)
+src/core/fieldrel.ts: applyCue  (시험만 씀)
+src/core/fieldrel.ts: decay  (시험만 씀)
+src/core/fieldrel.ts: affinityLabel  (시험만 씀)
+src/core/fieldrel.ts: Stance
+src/core/fieldrel.ts: Attitude
+src/core/fieldrel.ts: Nerve
+src/core/fieldrel.ts: DEFAULT_NERVE
+src/core/fieldrel.ts: stanceOf
+src/core/fieldrel.ts: cool  (시험만 씀)
+src/core/fieldrel.ts: lethal  (시험만 씀)
+src/core/fab.ts: FAB_MARGIN
+src/core/wallet.ts: WALLET_VAR  (시험만 씀)
+src/core/wallet.ts: Wallet
+src/core/wallet.ts: walletEntryId
+src/core/wallet.ts: withFieldTrade  (시험만 씀)
+src/core/sanitize.ts: PLUGIN_MARKERS  (시험만 씀)
+src/core/sanitize.ts: hasPluginMarkers  (시험만 씀)
+src/core/sanitize.ts: stripMarkerText  (시험만 씀)
+src/core/sanitize.ts: StripOptions
+src/core/types.ts: ScenarioKind
+src/core/people/director.ts: DirectorInput
+src/core/people/director.ts: DIRECTOR_HEAD
+src/core/people/base.ts: RELATIONS  (시험만 씀)
+src/core/people/base.ts: ALIASES
+src/core/people/base.ts: ADDRESS  (시험만 씀)
+src/core/people/base.ts: seedAddress  (시험만 씀)
+src/core/people/base.ts: basePerson
+src/core/people/base.ts: userAffinityBase  (시험만 씀)
+src/core/people/base.ts: pairBase
+src/core/people/settings.ts: parseBounds  (시험만 씀)
+src/core/people/consolidate.ts: ConsolidateInput
+src/core/people/consolidate.ts: CONSOLIDATE_PROMPT  (시험만 씀)
+src/core/people/consolidate.ts: ConsolidateResult
+src/core/people/request.ts: RequestOpts
+src/core/people/request.ts: stripSheets  (시험만 씀)
+src/core/people/seed.ts: SEED_SECTIONS
+src/core/people/seed.ts: FIXED_SECTIONS
+src/core/people/seed.ts: Sheet
+src/core/people/seed.ts: parseSheet
+src/core/people/seed.ts: bullets
+src/core/people/updater.ts: SpanItem
+src/core/people/updater.ts: Signal
+src/core/people/updater.ts: UpdateInput
+src/core/people/updater.ts: personPayload
+src/core/people/updater.ts: BuildOpts
+src/core/people/updater.ts: suspicionCases
+src/core/people/updater.ts: LANG_EN_RULE
+src/core/people/updater.ts: UpdateResult
+src/core/people/updater.ts: Dropped
+src/core/people/updater.ts: ApplyCtx
+src/core/people/updater.ts: rhythmTextOk
+src/core/people/select.ts: SceneOpts
+src/core/people/store.ts: LOG_CAP
+src/core/people/store.ts: foldLog
+src/core/people/field.ts: applyFieldEvent  (시험만 씀)
+src/core/people/prompt/detailed.ts: UPDATER_SECTIONS
+src/core/people/prompt/detailed.ts: UpdaterSection
+src/core/people/affinity.ts: factionOf
+src/core/people/inject.ts: BlockOpts
+src/core/people/inject.ts: PEOPLE_HEAD  (시험만 씀)
+src/core/people/inject.ts: PEOPLE_RULE
+src/core/people/identity.ts: rankLevel
+src/core/people/types.ts: ChangeKind
+src/core/people/types.ts: FactionRecord
+src/core/people/types.ts: OpennessStage
+src/core/people/types.ts: OPENNESS_STAGES
+src/core/people/types.ts: FACTION_PREFIX
+src/core/people/types.ts: FACTION_BOUNDS_DEFAULT
+src/core/people/types.ts: FactionStageId
+src/core/people/faction.ts: FactionNow
+src/core/people/faction.ts: stageLabel  (시험만 씀)
+src/core/factions.ts: EXTRA_SCENARIOS
+src/core/factions.ts: SPEC_KEYS
+src/core/factions.ts: FACTION_VAR_KEYS
+src/core/factions.ts: PlaceholderResult
+src/loader/body.ts: bodyHash  (시험만 씀)
+src/loader/body.ts: BodyStart
+total 538
