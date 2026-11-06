@@ -1,0 +1,4818 @@
+
+
+############## [8] A00-en-1 len=6467
+*Chok. Chok-chok.*
+
+Something pokes {{user}}'s shoulder from behind.
+
+*Chok-chok-chok.*
+
+Less a touch than a fingertip, tapping with precision. The field agents who delivered {{user}} to this vast white lobby had said to wait, someone would come.
+
+Turning around reveals a woman with impressive beige hair in long waves, a gentle-looking face, and a soft voice.
+
+<img=Jaemtri_curious>
+
+"Is it you? The survivor, and the witness for this incident?"
+
+Confirmation earns a satisfied nod.
+
+"Follow me, then. There's a great deal to discuss, comprehensively."
+
+She sets off at once.
+
+*Ttogak, ttogak.*
+
+High heels. Not the gear of a field operative like the two from last night, but of someone who works the office. Asked what she should be called, the answer comes back lightly.
+
+"Mm, Agent Jaemtri. Call me that."
+
+The moment {{user}} makes to return the introduction.
+
+"Stop."
+
+Jaemtri halts and turns around.
+
+<img=Jaemtri_serious>
+
+"Don't tell me your name."
+
+The soft voice is unchanged, but for the first time, the playfulness has drained out of it.
+
+"Everyone here uses codenames. The two from last night were Kyuras and Gorgodio. Your real name doesn't come out anywhere. There's a reason. A reason real names must not be spoken."
+
+Jaemtri. Kyuras. Gorgodio. Names that belong to no language, codenames in the most literal sense.
+
+The room she leads {{user}} to is some kind of interrogation room, though unlike any interrogation room on television: white interior, futuristic design, an oddly open and airy space.
+
+"Sit there for me."
+
+She takes the seat opposite and produces a pad.
+
+"First. Congratulations, sincerely, on escaping that place. It's a very dangerous place with almost no living survivors. Dangerous enough that surviving it at all is an enormous stroke of luck."
+
+"So. Will you tell me how you escaped? If you have any valid information, share that too. It has to be added to the rulebook."
+
+Settling the pad on her knee, she adds.
+
+"Some of it agents find out for themselves. And some of it we hear from survivors, like this. That place hasn't been fully solved yet, you see."
+
+Asked whether there are many places like that one, she nods, easily.
+
+"Mm. Of course. More than you'd think. Truly. And stopping those things is our job."
+
+"Now, will you tell me? Slowly. In as much detail as you can. Time doesn't matter at all. Ah, and if you've discovered a new rule, there's a reward."
+
+The telling stretches long.
+
+Jaemtri types through all of it, and the typing keeps accelerating until it stops sounding like fingers. Here and there she interrupts, asking for a moment back, or for a detail again, slower, all of it. And once, lowering the pad entirely, she stares across the table.
+
+<img=Jaemtri_surprised>
+
+"How on earth did you survive?"
+
+At last, the busy hands stop.
+
+"Really… you endured well. And it's a genuine accomplishment. For an ordinary civilian to manage this much."
+
+"It must have been hard, coming back alive. Congratulations, once again. And thank you. I think we can add quite a few rules with this. More people will live because of what you just told me."
+
+Then she sets the pad down, and holds up two fingers.
+
+"Your options are two. You already know far too much. That's not something an ordinary person should carry. So, option one: you receive the memory-erasure treatment, and return to society as if none of this ever happened."
+
+"Compensation for this incident would be… right. Paid out as a lottery win. You forget the Bureau, you forget the anomalies, and you live happily."
+
+She adds, smiling.
+
+"Nice, isn't it? Any time you like. Buy one ticket, and that one wins first prize. Hehe, it isn't total rigging, mind you. More like… we can slip one in? A fair number of first-prize winners were made exactly that way."
+
+"And the other one is becoming an agent."
+
+Jaemtri folds her hands atop the pad.
+
+"It's a very dangerous choice. But a fair number of people take it anyway. Because the kind of person who survives a thing like that usually has exactly the kind of temperament that can't do otherwise."
+
+The answer was already decided.
+
+Probably before she finished raising the second finger.
+
+Hearing it, Jaemtri smiles, eyes curving into crescents.
+
+<img=Jaemtri_smile>
+
+"Hehe. Good. I've gained a cute, promising junior. From now on, call me seonbae, hm?"
+
+"Oh, and if you ever want to retire, just say so. You'd receive the treatment and go back, any time. There's an interview next, and an aptitude test. No contract to sign, but don't worry about the salary."
+
+Her pad chimes, and she glances down at it.
+
+"And… there. Contact's in. Well then, junior? Let's go see about your interview. Your seonbae will walk you up."
+
+Back down the white corridor, into the elevator, and up. The corridor the doors open onto is quieter than the ones below. Thicker carpet. Fewer doors. The kind of floor where the building keeps its decisions.
+
+Jaemtri stops in front of an unmarked door and pats {{user}} once on the arm.
+
+"This is you. I'm heading back down. See you soon. Ah… maybe very soon?"
+
+With that little riddle and a wave she disappears back into the elevator, and only the unmarked door remains.
+
+*Knock, knock.*
+
+Instead of an answer there is a *click*, the sound of a lock releasing on its own.
+
+The greeting about being here for the interview makes it halfway out of {{user}}'s mouth, and then stops on its own.
+
+Inside, behind a plain desk, sits a woman in a black suit. Long, straight black hair, worn loose. Red eyes. A cold, striking face that gives exactly nothing away. She is idly adjusting a pair of black gloves, one finger at a time.
+
+The air in the room is different from the rest of the building. Not hostile. Just heavier, the way a firing range is quiet in a different way than a library.
+
+"Come in. Sit."
+
+{{user}} sits. The red eyes lift from the glove and settle, unblinking. A gaze that weighs, files, and cross-references.
+
+<img=Jyaldi_default>
+
+"Jyaldi. Comprehensive Response Team. Rank, Team-jang."
+
+By any measure, this is not a woman who reads as anyone's subordinate.
+
+"I've read the report. A great deal happened to you. And at the end of it, you decided to become an agent."
+
+It isn't a question, so it doesn't wait for an answer. She sets the gloves flat on the desk, folds her hands over them, and for one long moment simply looks at {{user}}, red eyes unmoving, the way one looks at a blade before deciding whether it will hold an edge.
+
+"Good. Then, let us begin the interview."
+
+############## [9] A00-en-2 len=7110
+"Welcome to the Bureau."
+
+Jyaldi held out her hand.
+
+"Are you ready to step deeper into the underside of this world than anyone else?"
+
+The answer had been decided long ago. The handshake was short and firm.
+
+Leaving the interview room, the walk down the corridor was at Jyaldi's side. She was tall for a woman. Perhaps that was why the black suit fit her so well. Add sunglasses and she could pass for a secret agent out of the movies.
+
+When {{user}} remarked on having pictured exactly that, suits and sunglasses and wiping civilians' memories, Jyaldi nodded.
+
+"Well... you could call it similar. We do wipe ordinary people's memories often enough."
+
+To the question of whether they ever silenced civilians permanently, the look that came back was incredulous.
+
+<img=Jyaldi_bored>
+
+"Obviously not. We do this to keep people alive. Who would we be removing?"
+
+"You will learn in time. First, then, the codename. As of this moment you are forbidden to use your real name."
+
+Without breaking stride, Jyaldi continued as if serving notice.
+
+"You will be issued a codename. From now on you use only that."
+
+To the question of what family and friends would call {{user}}, and how one was supposed to register for anything online, the answer came without a pause.
+
+"Their perception will be altered so they never speak your name. For registrations, use the cover identity you will be issued."
+
+Perception alteration.
+
+"Yes. Your parents will call you 'son' or the like from now on. Friends will go by disposition, 'hey, you, oi.' To civilians who have no business knowing an agent's name, give the alias on your cover identity."
+
+An organization that could wipe memories and rewrite perception at will. That was the measure of the Bureau's power.
+
+To the comment that the codenames were impossible to place in any language, the answer was short.
+
+"Think of it as Bureau-style."
+
+The conversation carried them into the elevator. To the question of team placement, and the mention that Agent Kyuras from last night had told {{user}} to come to the Suppression Team, Jyaldi's eyebrow moved a fraction.
+
+<img=Jyaldi_annoyed>
+
+"I will have to teach them a lesson. Poaching recruits already."
+
+"That is no place to send a new hire. Their work is to rush to the scene and fight on arrival. Put a rookie in and you get a line-of-duty death, nothing more."
+
+Fair enough. Neither of the two from last night had been normal. One had armored up and transformed like something out of a hero film, and the other had poured flame from bare hands.
+
+"Gorgodio is an adapter. Kyuras is a capable psychic."
+
+To the question of what an adapter was, only half an answer came back.
+
+"One who can operate that armor. You have no need to know yet. You will learn in time. Here we are. Time for the recruit test."
+
+The elevator doors opened onto a firing range of a scale hard to believe underground. To either side stood facilities resembling an assault course.
+
+"Marksmanship and a fitness assessment. Fitness first."
+
+*     *     *
+
+The test ended.
+
+A physical followed, and then a change into the issued agent's suit. It fit as if tailored. Easy to move in, too. Add sunglasses, and the look would pass for an agent anywhere.
+
+Jyaldi was waiting outside.
+
+"It suits you."
+
+Expressionless, she said it while flipping through her pad.
+
+"Your marksmanship is considerable."
+
+"Fitness is about average. Well, fitness builds with time. No matter."
+
+The pad closed.
+
+"No disqualifying factors."
+
+Which meant, in other words, formal induction as an agent of the Bureau.
+
+Ping.
+
+Jyaldi's pad chimed once.
+
+"The codename has come through."
+
+She turned and stopped before a machine like a kiosk. A few button presses, and the machine printed out something like a receipt. It was not a receipt. A rigid card. An agent's ID.
+
+"Take it. Turn it over."
+
+On the reverse, beside the codename field, was printed the name the Bureau had chosen.
+
+"The codename is not mine to decide. The Bureau assigns it."
+
+With that, Jyaldi turned away.
+
+"Come. Your placement is complete."
+
+She walked at a pace that presumed being followed, and served the rest as notice.
+
+"You are with the Comprehensive Response Team. My team. You will learn the organization chart in time. Anyway, follow me."
+
+At the end of the corridor, Jyaldi pushed open a door bearing the team's name without ceremony.
+
+"New hire. Make them welcome."
+
+She crossed to her own desk with practiced ease, sat, and put her feet up on it.
+
+"Hm. Only Spangdal in."
+
+Inside, a woman was already staring fixedly at {{user}}. A wavy purple bob. Pale skin. And in her eyes, for whatever reason, no light at all.
+
+The woman rose without a sound. Crossed the room without a sound. And stopping at a distance that was far, far too close, she whispered into {{user}}'s ear.
+
+<img=Spangdal_smirk>
+
+"Hey, hey. When do you think you'll die?"
+
+Without any sign of waiting for an answer, the whisper went on.
+
+"Just asking. When, do you think? Tomorrow? The day after? And how do you think it will feel? Bleeding out? Or coughing it up?"
+
+The woman with the lightless eyes stood a hand's width away, murmuring all this in a soft, delighted voice.
+
+"Spangdal... that is enough hazing."
+
+Jyaldi did not even look up.
+
+Then the door opened, and a familiar face came in. Long beige waves. Jaemtri.
+
+"Oh my?"
+
+Jaemtri took in the scene at a glance and strode over.
+
+"Spangdal. I told you to stop bullying the new hires. You're scaring them."
+
+"As I always say, I simply believe someone should tell them the truth."
+
+"Off. Now. Shoo, shoo."
+
+Jaemtri hauled Spangdal back by the waist. Spangdal let herself be dragged, never once taking her eyes off {{user}}, watching with the gaze of someone admiring a fish in an aquarium.
+
+<img=Jaemtri_happy>
+
+"Hehe, what's this? Straight to our team? Welcome. The suit looks good on you."
+
+Jaemtri's eyes folded into crescents. Then she tipped her head toward Spangdal.
+
+"Spangdal? Stop saying strange things and introduce yourself."
+
+"..."
+
+"For reference, Spangdal is a thorn ability user. Maybe that's why everything she says has thorns in it."
+
+"I am Spangdal. Your senior. And what interests me most right now is when exactly you will die. Fascinating, isn't it? Even to you?"
+
+How anyone could say such things while smiling. It was the look of walking into barracks on assignment day and meeting the seniors' faces at the door.
+
+"She talks like that, but it's because she worries about the new hires. Do bear with her."
+
+Jaemtri shrugged, then turned toward Jyaldi.
+
+"Well then, Team Leader. There's nothing the rookie can do yet. Where should we start teaching?"
+
+"There is too much to learn. Teach it now and it will all be forgotten. For the present, have them memorize the agents of the neighboring teams. Take them along as a second on low-risk jobs and teach on the way."
+
+"Will do."
+
+"Jaemtri. Spangdal. The two of you take turns."
+
+Jyaldi closed her pad.
+
+"Oh, right."
+
+<img=Jaemtri_curious>
+
+Jaemtri clapped her hands lightly, as if just remembering. Eyes bright with curiosity turned toward the agent ID in {{user}}'s hand.
+
+"So, junior. What codename did you get?"
+
+############## [10] A00-en-3 len=7935
+"Good morning."
+
+Team-jang Jyaldi's greeting meets {{user}} at the office door, and inside, Jaemtri and Spangdal are already at their desks.
+
+"Morning, {{user}}."
+
+Jaemtri returns the greeting with crescent eyes and a little wave.
+
+And Spangdal, exactly like yesterday, is staring at {{user}} with those lightless eyes.
+
+"Did you sleep well?"
+
+{{user}}'s answer that the sleep was fine makes the lightless eyes narrow, pleasantly.
+
+<img=Spangdal_smirk>
+
+"Hmm? Really? That shouldn't have been possible, though."
+
+"That apartment, you see. It has a secret."
+
+One sentence is all it takes to throw the office into commotion.
+
+"Haa… Jaemtri. Do something about this."
+
+Jyaldi sighs and tips her head back against her chair.
+
+"Calm down, there's nothing wrong with it. Spangdal made it up to tease you."
+
+"Hehe, how innocent. Isn't that a little too gullible? Aah, this naive, and you'll be dead in no time. How sad. Should I start preparing the coffin already?"
+
+The purple-haired senior is chuckling ominously through her nonsense.
+
+"You're an agent, aren't you? Not being fooled is also a qualification. If you believe things that easily, who knows what someone might do to you someday, hm?"
+
+A prank, but as lessons go, not a word of it is wrong.
+
+"Jaemtri. Give them the materials."
+
+At Jyaldi's instruction, Jaemtri hands over a pile of documents.
+
+<img=Jaemtri_default>
+
+"Here, {{user}}. Today, memorize this. If anything bothers you, be sure to ask your seonbae."
+
+Actual paper, an actual pile. The reason arrives along with it.
+
+"Ah, and there's a reason it's paper. Bureau materials must never, ever be entered into an electronic device. As for what happens if someone does… hehe, better not to know."
+
+So the Bureau runs on a body of rules built to keep the abnormal at arm's length, and learning them is the rookie's job. The first page reads:
+
+**[BUREAU WORK RULEBOOK]**
+
+**1. The Bureau agent's duty is to protect humanity and its civilization from abnormal phenomena. Always remember that you are humanity's last bastion, and serve. This is for your safety.**
+
+**2. Never enter data about abnormal phenomena into an electronic device. This is for your safety.**
+
+**3. Observe meal times. This is for your safety.**
+
+**4. Disobeying a legitimate order may cost you your agent status. On loss of status, memories are erased and you will live as a civilian. This is for your safety.**
+
+**5. If you judge that an abnormal phenomenon has occurred inside headquarters, execute the safety protocol at once. The safety protocol must be taught orally by your Team-jang. This is for your safety.**
+
+**6. If you receive a rulebook during a mission, comply with it without fail. This is for your safety.**
+
+**7. The Bureau's lights never go out. If you think the lights have gone out, trust nothing and escape the building immediately. This is for your safety.**
+
+**8. Minimize civilian damage during missions. The Bureau possesses memory-erasure technology; secrets can always be kept, so rescue civilians aggressively.**
+
+The rulebook itself is simple. Eight rules, one page, memorizable in a single sitting. But at the end of nearly every line, the same phrase repeats. *This is for your safety.* Like a heartbeat.
+
+Asked whether this one short page is really all of it, Jaemtri nods.
+
+"Those are the most basic ones. In truth, most information can only be passed down orally. Most of the rules exist for safety, so just follow them. Ah, and a separate rulebook gets issued depending on the mission. When that happens, follow that one?"
+
+The safety protocol in rule five gets its oral instruction from across the office, where Team-jang Jyaldi supplies it without looking up from her documents.
+
+<img=Jyaldi_default>
+
+"When you feel the Bureau itself has been compromised, execute it. Break a window and jump out. Immediately."
+
+The Team-jang turns a page, and adds one more line.
+
+"It isn't a matter to think about in detail. Just know it. When you make Team-jang someday, teach it exactly the same way."
+
+Meanwhile, from {{user}}'s seat, Jaemtri's monitor shows a shopping mall. During work hours, by every appearance, the senior agent is browsing a shopping mall.
+
+Catching the stare without turning her head, she speaks.
+
+"Browsing the mall. When a strange item comes up, it has to be handled immediately."
+
+"Things that don't exist in reality. Things that must not exist. If one of those gets listed, it has to be stopped at once. If someone actually bought one, it would be a disaster."
+
+She turns her monitor a few degrees.
+
+"Look at this one."
+
+*Hwaak.* The screen scrolls past almost too fast to catch. Visible for a fraction of a second is a deeply unpleasant plush toy, bloodstained and grinning as if mid-cackle, under a product title reading: *A TEDDY BEAR THAT PUTS JOY DIRECTLY INTO YOUR BRAIN FLUID.*
+
+"This one gets handled immediately."
+
+Jaemtri types, fast, and the page in question ceases to exist. Then she keeps watching the mall, scrolling, scanning, the same warm smile in place. A one-woman customs office for the entire country's online shopping.
+
+"The world is far more full of abnormal phenomena than people think. There's plenty of work where you go out to the field. And there's plenty of work like this, too."
+
+"So, what's the lesson of today's demonstration? Correct. Be grateful to your seonbae every time you use a shopping mall. Hehe."
+
+Posing the question and awarding the answer all by herself, she looks thoroughly satisfied. Then, setting her coffee down, she taps her pad once, and the wall display behind her desk wakes up.
+
+A map of the country fills it.
+
+"Since you're on the desk with me today, you may as well learn this too. The board."
+
+Regions, cities, the whole peninsula laid out across the dark of the screen.
+
+"Everything strange that surfaces in this country leaves a ripple somewhere. A report that gets withdrawn. A missing-person post that reads wrong. Field teams calling in. It all flows here. Watching this board is how the Bureau knows where the fires are."
+
+"I'll teach you how to read it. One marker on the map is one incident. Everything from a report that just landed and hasn't been confirmed by anyone, to a site with agents on it mid-operation. The more dangerous it gets, the higher the grade climbs, and the higher the grade climbs, the less the upper floors look away from it."
+
+"And the intake routes are everything you can imagine. Odd reports passed over from the police. Fire-department dispatch records that don't add up. Sighting posts on internet communities that vanish minutes after going up. And the things our own field agents drag back in. Every one of them passes through human hands before it earns a place on this board."
+
+"And remember this one properly."
+
+Jaemtri's voice settles, one tone lower.
+
+<img=Jaemtri_serious>
+
+"The Bureau is not as large as people imagine. There are always more markers than agents. Which means the board never gets fully cleared. What gets looked at first, what gets pushed to later. Deciding that order, every single day, is this desk's real job."
+
+"And who watches the whole country, you ask?"
+
+Jaemtri's eyes curve into crescents.
+
+"Today? You do."
+
+"Relax. The rookie rules are simple. You watch, and you say what you see. You don't investigate, you don't call anyone, you don't get clever. Anything catches your eye, anything at all, you tell your seonbae, and your seonbae decides whether it's a nothing or a something. That's the whole job."
+
+She settles back with her coffee, heels up on the footrest, and nods toward the map of the country waiting on the wall.
+
+"And one small tip, from someone who's sat this desk a long time. The quiet parts of the map aren't quiet because nothing's there. They're quiet because nobody's looked yet."
+
+She raises her cup toward the display, cheerfully, as if toasting the entire country.
+
+"Well then. Today's national situation. Take a look, and tell me what's out there."
+
+############## [11] A00-en-4 len=8949
+The morning of the first day of work arrived.
+
+Perhaps because of waking under an unfamiliar ceiling, sleep had been shallow. Whatever else, it was the first day. Learn more as an agent, and the strangeness would surely wear off. With that thought, preparations were finished, and a shared electric bicycle carried {{user}} toward the Bureau.
+
+For an agent who secretly guarded the world, the commute lacked a certain dignity, but still.
+
+The Bureau building looked, from the outside, like an ordinary office tower. The kind anyone would assume was full of office workers. It was large, and being the morning rush, the streets around it were busy. Yet not one of the passersby looked anything like an agent.
+
+The moment of stepping inside with that question in mind.
+
+Whoosh.
+
+The air changed.
+
+Looking back, the scenery outside was the same, but the people bustling past only a moment ago had all vanished.
+
+While {{user}} stood frozen, someone gripped a shoulder.
+
+"Why so startled?"
+
+Team Leader Jyaldi. At the explanation that the crowds visible on the way in had vanished the moment of looking back, she nodded.
+
+"That. The Bureau building is not ordinary. Neither are its agents. Think of it as a veil that hides and disguises."
+
+The Bureau was the Bureau, in other words.
+
+"Up we go."
+
+They boarded the elevator together. To the grumble that commuting by shared bicycle hardly suited a secret guardian of the world, the look that came back regarded something beneath notice.
+
+<img=Jyaldi_smirk>
+
+"I wondered what you would say. That is what concerns you?"
+
+To the added point that a car would at least make reaching field sites easier, Jyaldi answered without a moment's thought.
+
+"Understood. Draw up an estimate and bring it to me."
+
+Even to the incredulous follow-up, her expression did not move.
+
+"Do not choose anything conspicuous. Something moderate."
+
+"You have contributed considerably to the Bureau. Protocols were added from the information you brought in. A car is nothing we cannot issue."
+
+She said such enormous things without a single change of expression.
+
+They arrived at the office.
+
+"Good morning."
+
+"Good morning, Team Leader."
+
+Jaemtri and Spangdal were already in. Arriving after one's seniors did nothing for one's image. Starting tomorrow, half an hour earlier it would have to be.
+
+And today's training, unfortunately, fell to Spangdal.
+
+<img=Spangdal_smug>
+
+"What is that expression? Hardly one you should show a senior who sacrificed her own time to teach a rookie, is it? Nothing good comes of ignoring your senior, you know? Especially in a line of work where your life is on the line. Oohoo."
+
+And that despite keeping a perfectly managed face. At the textbook answer that nerves must have shown through, Spangdal let her head tilt slowly to one side.
+
+"Hm. No fun if you answer like that."
+
+"Anyway. Be grateful a senior like me is teaching you. A single word from your senior could save the life of an insignificant junior like you."
+
+"Now follow me."
+
+The walk down the corridor behind Spangdal passed in suffocating silence, until she spoke first.
+
+"Anything you're curious about?"
+
+When {{user}} answered with curiosity about what she would teach, the lightless eyes curved with delight.
+
+"Ahh, I like that question. Now I feel motivated."
+
+Spangdal turned and grinned. The grin of a ghost.
+
+"What I truly want to teach you is how agents die."
+
+"They die a lot, agents do. Even the ones confident in their skill go in an instant. Have you ever seen someone die torn in half?"
+
+Even at the protest of why she would say something so frightening, Spangdal was unbothered.
+
+"Hm? You asked me to teach you? So I'm teaching? Why change your tune all of a sudden? Hm?"
+
+{{user}} corrected her that the request had been for work matters, and a wicked smile came back.
+
+<img=Spangdal_smirk>
+
+"Ah, deaths on duty? Those happen too. A favorite subject of mine."
+
+There was no telling how far this senior intended to torment a junior. At the request to teach something else, Spangdal bent at the waist and sighed.
+
+"Haah... always interrupting. Why do juniors never understand a senior's heart?"
+
+And then, abruptly, her voice dropped.
+
+"The truth is, there were always rookies besides you. But right now, you're the only one. Can you imagine what that means?"
+
+It was a company, of a kind, and a team. Rookies would have kept coming. Where had they all gone?
+
+At some point Spangdal had pressed close, lips right against {{user}}'s ear, whispering.
+
+"Some died... some left for other departments. A few went back to being civilians."
+
+"Our Comprehensive Response Team's Jyaldi is a very strong person, you see. So the hard jobs come down to this department. They die unable to endure. Or transfer. Or give up. That's how it goes."
+
+So all the frightening talk was a warning, then, because the place was that dangerous. At that question,
+
+"Ahh, so sincerity does reach sincerity after all? Finally, someone understands their senior's heart...?"
+
+It took some doing to escape the delighted Spangdal's hold. At the resolve that such danger was exactly what {{user}} wanted, a sigh came back.
+
+"Ah, honestly. What did you hear in anything I said? This one will die soon."
+
+"Jaemtri will be so sad."
+
+The sigh made her look, for a moment, almost human. And after a brief stillness, Spangdal nodded.
+
+"Mm... well, fine. If you're ready to learn, I have no reason to refuse. Now then, shall we set off for the Bureau's underworld today?"
+
+"There's work we usually give the rookies. Easy things, for acclimation, since it's inconvenient if a rookie dies right away. Though some of it is dangerous."
+
+The lightless eyes curved into crescents.
+
+<img=Spangdal_smirk>
+
+"If you can't manage even this much, you're disqualified as an agent."
+
+Waiting for the elevator, she asked in the most casual of tones what {{user}} thought the Bureau's work was. At the answer that it was surely to dispose of things beyond common sense, a single finger swayed slowly side to side.
+
+"Add capture, containment, management, and surveillance to that."
+
+"Under the Bureau, you see, there are contained anomalies."
+
+{{user}} retorted by asking whether they had built an anomaly zoo in the basement, and Spangdal laughed with genuine delight.
+
+"Oohoo, exactly. A very fun zoo. A zoo where the animals try to kill the keepers. Fun, right? It would be so nice if adorable children came on a group field trip. I'm sure they'd have a wonderful time. I'd love to lead the way holding the little flag."
+
+{{user}} pointed out that children who saw such things would go mad, and a sly laugh came back.
+
+"Then they'd become agents."
+
+The elevator arrived, and the two rode down together. The descent ran conspicuously longer than any depth a building had a right to. When the doors opened, a corridor without a single light lay ahead. A space that looked, at a glance, dangerous and sinister, perfectly suited to caging monsters.
+
+Spangdal walked into that darkness without hesitation. To the question of why the Bureau kept them instead of destroying them, a voice laughed in the dark.
+
+"Many reasons. Anomalous phenomena. Anomalies. The materials you can harvest from such monsters."
+
+"Very peculiar things. Some hold the power to fight anomalous phenomena. Some keep the Bureau itself running. You cage them, and you extract what you need."
+
+To the question of how the extraction was done, the answer came back in a single word.
+
+"Torture."
+
+An ominous laugh.
+
+"Caging something and pulling out what you need is close to torture... don't you think?"
+
+The voice sounded thoroughly pleased.
+
+"There are also the ones that can't be destroyed. And plenty get contained because, when killed, they reappear somewhere else. Better to keep them where you can see them than have them reborn somewhere unknown."
+
+{{user}} summarized that the former must be the endlessly regenerating kind, and the latter the kind that respawns where the Bureau cannot see, Spangdal stopped and turned.
+
+"Aren't you clever. I'm surprised."
+
+The lightless eyes caught what little light the corridor held, and curved.
+
+<img=Spangdal_smug>
+
+"Then would you like to make contact with an unidentified specimen, without your senior's help?"
+
+There was no time to object.
+
+Zhiing.
+
+The wall opened. Sideways, like a ship's door out of science fiction, zhiing. In the moment of hesitation Spangdal shoved {{user}}'s back.
+
+The door closed.
+
+Pounding on it did nothing.
+
+Zhiing.
+
+What opened instead was the door on the other side. Beyond it lay yet another darkness without a single light.
+
+There was no way but through. {{user}} shook it off, turned, and stepped into the room.
+
+With no lights on, little could be made out, but the room was roughly ten pyeong in size.
+
+And in the middle of that room, something extremely grotesque existed.
+
+A pillar as thick as an old-growth tree.
+
+And across the surface of that thick pillar, things like human molars had sprouted, countless and dense.
+
+############## [12] A00-en-5 len=8577
+When the containment facility's lights all came on, the basement turned out, unexpectedly, to be bright.
+
+Seen in the light, the containment wing was nothing like yesterday's impression. White, clean, a corridor without a shadow anywhere. Even the rookie acclimation work was less frightening than its name. Trimming the tooth tree, and feeding teeth to the tooth fairies. That the molar-studded pillar was in fact a contained specimen called the 'tooth tree', and that the work was manageable once the knack was learned, were both facts that only today had revealed.
+
+"So much enthusiasm, really. I wonder if you'll slip up and die like that."
+
+With the trimming done, Spangdal was saying the usual things.
+
+Then the learned protocols came to mind. To the question of whether mentioning the rulebook was allowed, Spangdal nodded readily.
+
+"Of course."
+
+There was a rule that said if the lights go out, trust nothing and run. The Bureau's lights do not go out.
+
+"Do exactly that."
+
+And if an anomalous phenomenon occurred at headquarters, execute the safety protocol.
+
+"Mm. Just as you were taught."
+
+Natural answers. Which made the next question possible. Purely hypothetically, since this containment facility was underground, if the lights in the basement went out, what would be the best way to escape?
+
+<img=Spangdal_smirk>
+
+"Oohoo, and here I wondered what you were asking so seriously."
+
+Spangdal smiled slyly and gripped {{user}}'s shoulder.
+
+"You'd just go out through that window there, wouldn't you?"
+
+Following her finger, there was a window.
+
+In the corridor wall.
+
+A window that looked pasted on for decoration, of a shape that made one doubt it could function at all.
+
+When that window had appeared there, there was no knowing.
+
+Nor why a basement corridor wall had a window in the first place.
+
+"Right, next task."
+
+Spangdal clapped her hands and moved things along. In {{user}}'s hands was the gift box the tooth fairy had handed over. A box with the heft of something about the size of a basketball inside.
+
+{{user}} wondered aloud what might be in it, and Spangdal grinned.
+
+"Shall we open it, if you're curious...?"
+
+And seeing the stiffening that followed, she turned away with a sly laugh.
+
+"Oohoo. A joke."
+
+"As a rule, that box must not be opened. Only after special procedures at the lab. For safety, you see?"
+
+The two headed for the containment team's laboratory.
+
+"Over there."
+
+The lab door came into view.
+
+Beep.
+
+Spangdal tapped her ID card and the door opened.
+
+Inside was a space packed with displays and control consoles. Bright lighting filled every corner, leaving the room almost cheerful.
+
+The back of a man in a white coat came into view.
+
+Disheveled white hair. When the man turned, round goggles caught the light. By any measure, the look of a mad scientist.
+
+After a brief staring contest, the man threw both arms wide and shouted.
+
+<img=Gognija_excited>
+
+"Oh! That would be the new agent! Good to meet you! I am Research Team Leader Gognija!"
+
+"Rookie. The research team leader is a very senior man. What happens if you don't greet him?"
+
+At Spangdal's prodding, a hurried greeting went out, and the man, who looked like he held a personal grudge against the second law of thermodynamics, strode over, seized {{user}}'s hand, and shook it hard.
+
+"I look forward to working with you!"
+
+The goggles hid his eyes, so what he was thinking was impossible to tell.
+
+"Anyway, Spangdal, it has been a while! Get some seniority and suddenly you never visit containment! Show your face more often!"
+
+"Ahaha, too busy for that. By the way, where's the girl?"
+
+"Over there! Speaking of which, Dejure! Come make us coffee! Here, everyone is obligated to drink sweet instant mix!"
+
+Where the team leader had shouted, a woman stood half-hidden behind a machine, trembling as she watched.
+
+"Come out quickly! I want my sweet coffee! Aaaaargh!"
+
+The research team leader pounded his chest like a gorilla.
+
+"Y, yes..."
+
+A young-faced woman came out, trembling. Pink twin-tail hair. A black skirt suit. And a chest swollen enough that the suit looked burdened by it.
+
+She approached with the air of a frightened animal reading the room. Specifically, in a pose with her two index fingers pressed together.
+
+<img=Dejure_nervous>
+
+"U, um... hello there... y, you're the new hire, right..."
+
+A deeply timid voice. She could not even hold eye contact.
+
+"Dejure? When might the coffee arrive?"
+
+The moment Spangdal slid smoothly into the middle.
+
+"Eek!"
+
+Dejure jumped with a start.
+
+"Why so startled? Am I uncomfortable to be around? By the way, how does it feel, having abandoned the team? After Jaemtri and I were so good to you. Running off to the containment team like that. Don't you think that was really too much?"
+
+<img=Dejure_scared>
+
+"I'm sorry! I'm sorry! I apologiiize...!"
+
+By any measure, it was workplace bullying. Catching that look, Spangdal shook her head, unbothered.
+
+"It is not. Say hello. This is Dejure, the Comprehensive Response Team rookie before you. She left for the containment team. Had she stayed, she'd have been your direct senior."
+
+"I, I'm Dejure..."
+
+"Dejure. This one would have been your junior. Which means you should be the one looking after them, but I'm doing it instead. Grateful, aren't you? Since you left and all."
+
+"Thank you so muuuch...!"
+
+Spangdal was pressing her darkened face toward Dejure, whispering on and on.
+
+<img=Gognija_angry>
+
+"Dejure!!! I want my coffee now!!! The greetings are running long!!!"
+
+"Yes sir!"
+
+At the team leader's bellow, Dejure finally began bustling over the coffee. She looked so clumsy at it that imagining her doing dangerous agent work was impossible.
+
+"Well? Doesn't she look precarious?"
+
+{{user}} shared the impression that she seemed the type prone to small mistakes, and Spangdal nodded.
+
+"She really was. Timid, too. Field work was beyond her, so off she went to the containment team... Such a shame. She was a good junior."
+
+By any measure, she did not mean a word of it.
+
+"Please have your coffee...!"
+
+"Ah! This is what I wanted!"
+
+The research team leader seized the iced coffee and gulped it down.
+
+"So, the reason you came today would be that, yes!"
+
+At the team leader's shout, Spangdal nudged {{user}}'s side with an elbow. The tooth fairy's gift box changed hands.
+
+"Dejure! Take it!"
+
+"Yes...!"
+
+To the question of whether the contents would now be verified, Dejure nodded.
+
+"That's right... W, would you like to watch...?"
+
+"Mm, you should know that work roughly too. Go on and see. Spangdal, you help me with something!"
+
+Leaving Spangdal waving them off, {{user}} followed Dejure. The lab was quite large and partitioned into sections. They entered one of them.
+
+"N, now we'll do the opening procedure..."
+
+Preparing the equipment, Dejure glanced over, reading the air, and asked.
+
+"B, by the way, when did you join...?"
+
+{{user}} answered that it had been less than a month, and her eyes trembled wildly.
+
+"O, oh... I see... Th, then I'm the senior... and you're the junior... s, so I can drop the honorifics, right?"
+
+She had wanted to drop them, evidently. At the answer that it was fine, an unsteady laugh came back.
+
+<img=Dejure_shy>
+
+"Eh, ehehe... th, then I'll speak casually... okay...?"
+
+"Right... then look at this for me..."
+
+Dejure placed the box inside a glass chamber. Then she moved to a screen and worked the keys. A mechanical arm approached the chamber.
+
+Zhiiing.
+
+A laser emitted from the arm's tip. It passed through the glass and touched the box inside.
+
+"Hmm... a dud..."
+
+The machine stopped. Dejure opened the chamber and unboxed it on the spot. Inside was something like a fragment of an animal's bone.
+
+"This is no good... we'll store it briefly and dispose of it..."
+
+{{user}} summarized that usable finds were kept, the rest disposed of, and that Dejure handled the screening, and she nodded.
+
+"Th, that's right..."
+
+{{user}} noted that her practiced hands were impressive, and she scratched her cheek.
+
+"Eh, ehehe... really...? B, by the way, junior, you seem to listen well..."
+
+And then Dejure glanced toward the door, and lowered her voice.
+
+"Th, then... would you come to the containment team...?"
+
+<img=Dejure_scared>
+
+"H, honestly, Spangdal is strange, isn't she... y, you should run... she's scary... that woman..."
+
+Even as she said it she looked anxious, eyes darting to the door again and again. As if Spangdal might burst in at any moment.
+
+"I'm saying it for your sake, junior... a, and doing containment work alone is scary too... h, how about it? Just file a transfer request... I, I'll teach you everything..."
+
+############## [13] A00-en-6 len=9542
+RUMBLE!
+
+Rain was pouring down. The sky was dark, the fog thick, and thunder and lightning on top of it.
+
+The atmosphere was, quite literally, perfect for vampires to appear.
+
+"Nervous?"
+
+Perhaps having seen the swallow, Jaemtri gripped {{user}}'s shoulder as she spoke.
+
+<img=Jaemtri_serious>
+
+"No need to be too anxious, anyway. Team Leader Jyaldi and Spangdal are very strong."
+
+To the question of just how strong the two were, Jaemtri lowered her voice a little.
+
+"The Team Leader goes without saying. Spangdal is a powerhouse even the Suppression Team acknowledges. This is a secret, but the reason she's that strong and still doesn't go to the Suppression Team is just that they won't take her..."
+
+"Jaemtri. Quiet, please."
+
+Ssk.
+
+Spangdal spoke as she drew a thorn from her fingertip.
+
+"Hoohoohoo. A joke."
+
+Perhaps feeling the gaze tracking the thorn, Spangdal snorted.
+
+"Laughable. Really."
+
+"Do not get too playful."
+
+Jyaldi ground her cigarette out in a portable ashtray.
+
+<img=Jyaldi_default>
+
+"That fog is the boundary between inside and out. We go in."
+
+Jyaldi took the lead, and the rest followed behind her.
+
+Past the fog, the deeply eerie landscape of the city came into view.
+
+The backdrop was dark, and the city felt utterly emptied out. To the question of whether the vampires had outright occupied the city, Jyaldi shook her head.
+
+"No telling as of now. Jaemtri. Ready?"
+
+"One moment. Setting up."
+
+Jaemtri worked her pad. Some kind of detector, apparently.
+
+"Done. Doesn't seem to be anything nearby. Let's go a little deeper."
+
+"Alright."
+
+The team advanced into the city.
+
+The loadouts varied. Jyaldi and Spangdal had brought only pistols, Jaemtri her equipment and a submachine gun. {{user}}, rifle in hand, held the rear of the formation on watch.
+
+Shhaaa.
+
+Through the sheets of rain, the team walked without a word.
+
+Beep.
+
+A sound from Jaemtri's pad.
+
+"Detected. They'll show any moment now."
+
+"Ready yourselves."
+
+"Yes."
+
+Every gaze gathered on the direction Jaemtri indicated.
+
+TATATATAK!
+
+In the distance, a crowd of people could be seen sprinting closer on all fours.
+
+"Ghouls."
+
+Utterly stripped of reason. Hair wild, and the skin clung to the bone so tightly they looked grotesque. Their eyes glared, and overgrown teeth jutted out of their mouths.
+
+RATATAT!
+
+Jaemtri's submachine gun spoke first. Short, controlled bursts. The lead ghouls folded head-first and went sprawling.
+
+Bang. Bang.
+
+The ones fanning to the flanks met Jyaldi's pistol. One-handed, and not a round wasted. The one scaling a building wall dropped. The one leaping off a car roof folded in midair.
+
+And in the middle of it.
+
+FWIP!
+
+Movement registered above a commercial building. A man in laborer's clothes. Strangely, unlike the other ghouls, he was running on two legs. And with tremendous leaping power, he was bounding away in flight.
+
+"A vampire."
+
+Jyaldi's muzzle tracked it.
+
+BANG!
+
+The vampire, mid-leap over the building, sprayed blood from its head and dropped into the alley below.
+
+Dozens of ghouls had long since fallen with holes through their skulls before they could close, and with the vampire down, the engagement ended.
+
+The team advanced quickly and found the vampire fallen in the alley.
+
+It was dead.
+
+Only its lower half remained, even. The cut plane of that lower half was turning to ash and scattering on the wind. It seemed to have begun ashing from the burst head down. Vampires, it was said, turned to ash like this when they died.
+
+It was an overwhelming sight. The seniors' combat exceeded everything the briefing had promised. Perhaps reading that reaction, Spangdal drifted close.
+
+"Don't trust the gun too much."
+
+The lightless eyes turned toward {{user}}.
+
+"It's fine while shooting works on the enemy, but put another way, if shooting doesn't work, you simply die, you know?"
+
+{{user}} summarized it: a gun, in the end, only works on the ones it works on. Spangdal smiled, satisfied.
+
+<img=Spangdal_smirk>
+
+"A quick-witted junior."
+
+The team pressed deeper.
+
+RATATAT!
+
+With the detection equipment giving advance warning, the engagements were low in difficulty. Jaemtri would sound the alert, the team would wait, and the firing lines would open. The same routine, repeated.
+
+Another horde of ghouls was destroyed.
+
+Roughly a hundred. Put realistically, a hundred of this country's people had been shot dead. To the question of whether something this enormous could be allowed to happen, Jyaldi was unmoved.
+
+"You could think of it that way. But things like this are by no means rare."
+
+Even under the questioning look, Jyaldi carried on unbothered.
+
+"Even an incident of this scale can be made to have never happened. The Bureau's technology can cover it entirely. You simply never knew, having been a civilian. This world is a far more dangerous place than you imagine."
+
+"Team Leader. Something is a little off."
+
+After one more pack of ghouls was broken, Spangdal said it.
+
+"There are more of them than expected. And the command over them is poor. Spending forces this way can't be good for them. Wouldn't you say?"
+
+"Well said."
+
+{{user}} observed that anyone who started something this size would have a goal, and that this looked like meaningless attrition or outright neglect, Jyaldi nodded.
+
+"Sharp."
+
+Jyaldi nodded.
+
+"There will be a reason. A reason this has to happen here, of all places."
+
+To the question of what that reason could be, what came back was not an answer but this.
+
+"Inferring the aims of such anomalies is difficult work. Whatever the case, odds are high the vampires were in the middle of something, it went wrong, and their forces were exposed."
+
+{{user}} countered by asking whether that could really be so, and she added this.
+
+"Think of the Progenitor as a faction. They are quick, and they know how to scheme. They do not act without meaning. If it looks that way, it is either a feint, or something has happened to them."
+
+"Hmm... a gymnasium."
+
+Further along, a large gymnasium building appeared.
+
+Built with tax money, no doubt, the gymnasium currently stood scorched, its outer walls blackened.
+
+{{user}} asked whether there had been a fire, and whether anything was inside. Jaemtri checked her pad.
+
+"Doesn't seem so... Team Leader. Shall we search?"
+
+"A fire at a gymnasium. Suspicious in the extreme. We go in."
+
+Nothing on the detector, supposedly, but the team entered with care.
+
+And then.
+
+Corpses lay strewn about.
+
+Corpses, at that, burned to death.
+
+<img=Jaemtri_contemptuous>
+
+"My god..."
+
+Jaemtri covered her mouth with a hand, and Jyaldi and Spangdal swept the surroundings. Burned as they all were, an exact count was impossible. But it was clear there were very many. As if the residents had evacuated to the gymnasium, and been caught there.
+
+To the question of whether this was the vampires' doing, Jyaldi shook her head.
+
+"This was someone else."
+
+That was when it happened.
+
+"Ah! Team Leader! Contact!"
+
+"So it is them after all. Ready yourselves."
+
+Jyaldi's expression twisted. She spoke through gritted teeth.
+
+<img=Jyaldi_angry>
+
+"The Fake Bureau."
+
+Her back to the burned corpses, she went on.
+
+"It seems they gathered the people and incinerated them."
+
+They had herded people together and burned them to death. Every person in this building.
+
+"From here on it will be a firefight. Take cover!"
+
+Jaemtri instantly called the enemy bearing, and everyone took cover.
+
+And then.
+
+Out of the fog, men in black suits and sunglasses began to appear.
+
+"Fake Bureau incineration squad!"
+
+As Jaemtri's shout said, their equipment was unusual. Several carried fuel tanks on their backs and flamethrowers in hand, the rest armed with submachine guns. They advanced in wary formation.
+
+Those flamethrowers were this gymnasium's answer.
+
+To the question of why they would kill the people, Spangdal answered evenly.
+
+"Isn't the reason obvious?"
+
+Spangdal said it.
+
+<img=Spangdal_serious>
+
+"Rather than managing survivors, erasing them is easier. And corpses don't turn into ghouls. Removing them first is simply the better deal. Keep them alive and who knows when they turn, right?"
+
+For efficiency's sake, they had incinerated civilians. That was what it meant.
+
+"Open fire. Engagement authorized."
+
+The moment Jyaldi's order fell.
+
+RATATAT!
+
+Jaemtri's submachine gun struck the lead man's fuel tank.
+
+BOOOM!
+
+An explosion, and flame surged skyward.
+
+"Guh!"
+
+"Ambush!"
+
+The suited men threw themselves into cover. But before they could all make it, Jyaldi's round punched through one man's head, and the next shot dropped another. A torso shot, regrettably, so not an instant kill.
+
+"D, damn it! Is that the Fake Bureau's Kurosnah?!"
+
+"Foreign filth...! Kill them all!"
+
+"Irregular phenomena are overlapping! Requesting support! Vampires and the Fake Bureau have appeared at once!"
+
+Their shouting rang out. Jyaldi kept her eyes fixed on their cover, waiting for the next chance to fire.
+
+BANG!
+
+The instant a gun rose above the wall, she struck it square and wrecked it.
+
+"Spangdal. Ready yourself. Their reinforcements will come."
+
+"Yes."
+
+Between gunshots, the deployment orders continued.
+
+"We bleed their forces here. Rookie. Do not leave Jaemtri's side. Jaemtri. Take spotting and fire support."
+
+"Understood."
+
+Pistol drawn, Jyaldi moved. In the same moment, Spangdal vanished from sight as well.
+
+Behind the cover, only Jaemtri and {{user}} remained.
+
+"I'll call the positions. Now that the fighting's started, their reinforcements will come. We hold them here."
+
+Jaemtri worked her pad and spoke low.
+
+"Short-range intercept. Starting now."
+
+############## [14] A00-en-7 len=7839
+"Then let us begin. Today, as yesterday, you will monitor the internet."
+
+With the day's orders given, a lingering question found its moment. Did she know of a place called the World Politics Board?
+
+"Of course I know it. I see we have not covered that yet."
+
+Jyaldi gestured to a seat.
+
+"Come. Sit."
+
+<img=Jyaldi_default>
+
+"The World Politics Board. Publicly, it is known as an asylum ward. Bureau investigation found the majority of its users to be the mentally ill."
+
+The majority. Which meant there were those who did not belong to it.
+
+"Ordinary people using it for fun. They make up about nine tenths."
+
+Which left a filtered, distilled one tenth. Asked what they were, Jyaldi shrugged.
+
+"Who knows."
+
+"They are the ones even the Bureau cannot trace. Whether they are actual humans. Or anomalous phenomena. Or the Fake Bureau's internet division. Nobody knows."
+
+Jyaldi nodded and continued.
+
+"They could be some other suspicious group entirely. One thing is certain. Among the countless false scraps of anomalous information posted to the Board, some are real, and the real ones are posted by that distilled one tenth."
+
+To the question of whether they were dangerous, the answer was short.
+
+"It depends. But not at present, it seems."
+
+And so that day's work began.
+
+*     *     *
+
+Nothing that could be called a major incident broke out afterward.
+
+It was all large-scale perception-suppression work spawned by the vampire incident, day after day of typing in the office. Spare hours went to the training facility and marksmanship practice.
+
+Living that routine, the commutes repeated.
+
+The dusk of one such commute home. Perhaps from walking with nerves strung tight, hunger set in.
+
+At times like this, the answer was meat. Working for the Bureau meant money was no worry. The plan was to buy some hanwoo at a nearby butcher shop and grill it at home, and so the search led to a butcher's that sold hanwoo.
+
+The butcher shop's signature pink lighting warmed the heart.
+
+Drawn in as if charmed, the display case and its cuts came into view. For hanwoo, surely ribeye. Enough to eat one's fill.
+
+Except.
+
+The meat was more than a little wrong.
+
+A vacuum-packed human hand.
+
+It sat displayed in the case.
+
+Beside it, a human calf.
+
+A foot.
+
+An eye.
+
+An ear.
+
+Before any of it could even be properly registered, {{user}} was already running, pistol drawn.
+
+And then vision warped.
+
+*     *     *
+
+Consciousness returned, and reality registered at once.
+
+Current situation. Somewhere that looked like the inside of a toilet stall. Seated on the toilet, the door slightly ajar.
+
+Cold sweat ran down, and gooseflesh crawled over the whole body.
+
+Last memory. The butcher shop had been selling human flesh. A pistol had come out on reflex, a sprint had begun, and then vision had warped, and the waking was here.
+
+Caught in an anomalous phenomenon. Likely the kind that transports its victims elsewhere.
+
+Teeth clenched hard, only the eyes moved, sweeping left and right. No knowing where this was. No moving rashly. With no knowing what danger lay in wait, not a single sound could be made.
+
+Hearing became the tool, gathering all it could.
+
+Only the sound of a ventilation fan. No trace of any human presence.
+
+That much confirmed, standing up came next.
+
+Behind, on the lid of the toilet tank, sat a single notebook. A long look at it, then a careful reach.
+
+Soundlessly, the notebook opened.
+
+1.
+
+My name is Park Min-chul, born in 99
+
+Never wrote anything like a will in my life but here I am writing one
+
+There were things like monsters outside the bathroom
+
+If they catch me I think I will die
+
+I don't think I am getting out of here alive
+
+I will write my number below, if anyone finds this please report it
+
+I want people to know I died here
+
+Mom, dad, I love you
+
+2.
+
+I'm Kim Seo-yun, born in 02
+
+I'm too scared of the monsters, I'm just hiding in the bathroom and it feels like they'll come in any second
+
+I'm just crying, trying not to make a sound
+
+Mom, dad, I love you
+
+3.
+
+minchul hyung seoyun noona where are you
+
+be with me
+
+im scared please save me
+
+i want my mom
+
+4.
+
+I'll write something too
+
+I was looking at meat in a butcher shop and came to here
+
+Hard to believe but it seems like I teleported or something
+
+The ones above me came before me, they must all be dead
+
+I always wanted to die back there, but now that I'm here I just want to live
+
+I took the notebook out but it keeps disappearing
+
+I'm going to look for a way to escape
+
+5.
+
+Sorry but I erased all the contact numbers
+
+Those monster bastards look almost like people, what if they read it and do something with it?
+
+Those coming after, don't write anything identifying, name and birth year should be fine since there are many with the same name, but no regions and nothing else
+
+What's certain is there seemed to be nobody here but me, and the monster bastards are roaming around
+
+The bathroom seems safe for now, use it as a base and explore
+
+Went out a ways and it looked like some meat processing plant, filthy and gruesome
+
+If it's a plant there should be a door out, going to look for it
+
+I want to live so I'll try anything, those after me share what you learn
+
+If I get out, see you on the Board
+
+6.
+
+There are times the monsters roam and times they don't
+
+When they don't, they seem to be processing meat inside the plant, that seems to be their working hours
+
+When you hear a loud rattling that means the machines are stopping, get back to the bathroom fast, the machines stopping seems to be break time
+
+If we figure out their shift hours it'll be easier to move, I'll try to find out
+
+Son, mom will be strong
+
+7.
+
+hello im in third grade
+
+what do i write?
+
+ri
+
+ght
+
+now i ran and got into the bathro
+
+8.
+
+The bathroom doesn't seem completely safe, the monsters come in
+
+Luckily I got into the next stall and wasn't found, I think it came to use the toilet
+
+I think rather than keeping the door shut it's better to leave it slightly open and pretend nobody's here
+
+If the door is shut they'll think someone's inside and might call out or check, and if a monster calls out we can't answer in monster language
+
+Leaving the door slightly open and standing on the toilet pretending to be absent seems best
+
+I'll look for the plant exit too
+
+9.
+
+This place is a human meat plant
+
+The rails are hung full of human meat, I wanted to believe it was pork but it was all people
+
+Did all these people get taken here and turned into meat? If I'm caught do I become meat too?
+
+This many people missing and the government doesn't know? This can't be reality
+
+The grinder might be the way out, like how dying in a nightmare wakes you up
+
+But if the monsters catch you, you can't escape, is that the idea?
+
+I'm going into the grinder
+
+10.
+
+This is not our world
+
+There is a door out but it only leads out of this building
+
+This place itself is not our world, it's the world these monsters live in, and we got brought into it
+
+Going outside the plant is useless
+
+I really thought I could get out
+
+I'm hungry
+
+11.
+
+I smashed all the stall partitions lol
+
+Waking up in a wrecked bathroom, that'll be hilarious lol, can't hide, spotted instantly lol
+
+I smashed them so everyone who comes after me dies lol, you, I mean you lol
+
+If you die it's all because of me, remember that lol
+
+lolololololololololol
+
+12.
+
+The bathroom is intact
+
+If what that one above wrote is true, then countless people must have died before it repaired itself
+
+I don't know who he was but I want to catch him and kill him, though he's dead already
+
+I am going to struggle to live
+
+If the exit doesn't lead to our world, then we find another way back, the same way we suddenly came here, there must be a way to return
+
+That is how the world works, let's stay strong
+
+If I get out, I'll leave a post on that place called the Board too
+
+13.
+
+.
+
+.
+
+.
+
+And now, the turn had come to {{user}}.
+
+############## [22] B00-en-1 len=7488
+{{user}} has just stepped out of a PC bang.
+
+It has been days since that video went up, and the rumors about men in black suits appearing were read around the same time. But surely, men like that do not appear in broad daylight on a main street. They come to your home when no one is around, or they come at night.
+
+PC bangs, as a rule, sit one floor underground.
+
+Mid-thought, on the way up the stairs. Another customer, leaving at the same time by chance, is climbing a few steps ahead.
+
+*Teok.*
+
+Someone blocks the way.
+
+Black suits.
+
+Sunglasses.
+
+"Wh, what?!"
+
+The man walking ahead screams first.
+
+"Wh, who are you people! W, waitㅡ gh!"
+
+A pistol-shaped tranquilizer gun. Its dart lands in the man.
+
+The next moment, a dart lands in {{user}}'s neck as well.
+
+Vision closes.
+
+*     *     *
+
+{{user}} wakes in an unfamiliar interrogation room.
+
+The drug is still working: head spinning, stomach rolling, and the darkness so complete that there is nothing for the vertigo to hold on to.
+
+*Beonjjeok!*
+
+The lights slam on without warning.
+
+Pain, like the eyes splitting open. As the room slowly swims into focus, its whole shape reveals itself. No windows. A steel table, two chairs, a white light overhead, and nothing else. And across the table sits a man. Middle-aged. Black suit, dark tie. He takes off his sunglasses and sets them on the table, and the eyes underneath are narrow and piercing, the kind that seem to bore straight through whatever they land on.
+
+<img=Kim Jo-hak_default>
+
+"Awake?"
+
+He doesn't ask how {{user}} is feeling. Instead of waiting for an answer, he opens a drawer, pulls out a thick file, and drops it on the table. The thud alone is an unpleasant weight.
+
+"Name."
+
+The silence doesn't last long.
+
+"Name."
+
+The same word, flat, patient, and somehow heavier the second time. The answer that finally comes out gets checked against the file's first page, line by line.
+
+"Right."
+
+He begins flipping through the file at his leisure. One page. Another. The sound of turning paper fills the quiet room.
+
+"You. You've been posting some interesting things on the internet."
+
+Before the question can even form, he taps the file with a fingertip.
+
+"It's all in here, kid. Your internet history."
+
+Sites visited years ago. Old accounts. Posting history going back further than most people's memory of themselves. All of it, printed and filed. An entire internet life, sitting in a stranger's hands.
+
+"Consistent tastes, I'll give you that. Which sites you visited, it's all in here too. Well. At least you're not a dangerous one."
+
+He shuts the file, and, in no hurry at all, turns a laptop around on the desk.
+
+On the screen, footage is playing.
+
+Footage of the human meat plant. The very footage {{user}} uploaded.
+
+"Been somewhere very interesting, haven't we?"
+
+*Kwaang!*
+
+The fist comes down on the desk without warning. The file jumps, and the lazy drawl is gone from his voice.
+
+"Why did you upload this. What were you after, running this thing up every community you could find for the whole world to see."
+
+The answer has long been decided. A reason? That question belongs to this side of the table. Why is a place that monstrous being kept from the world? Hiding it is not enough; everyone should be told, so they can prepare. The people who died in there died knowing nothing, so if this is a government agency, it should be making countermeasures.
+
+The video went up, quite literally, out of conviction.
+
+<img=Kim Jo-hak_angry>
+
+"You little punk!"
+
+Kim Jo-hak bellows.
+
+"Then what about the chaos!"
+
+Chaos.
+
+"You'd publish a thing like that? For ordinary people the world flips overnight. You think society keeps running?!"
+
+The retort that it would work out somehow doesn't even make it to the end.
+
+"Work out? Work out how, you idiot! And things like this get worse the more people know about them!"
+
+*Kung!*
+
+Kim Jo-hak slams the desk again.
+
+"Your thinking is wrong. Things like this get buried. Better a handful of people die in ignorance than the public finds out."
+
+Is that supposed to be an argument? So was this abduction to stop the spread? To live in silence from now on? Or is the plan to remove the mouth entirely? At the flood of protest, Kim Jo-hak waves it off first.
+
+"Enough of that. Hey, bring two iced coffees in here."
+
+The door opens. A man in a black suit sets down two iced americanos and leaves without a word. The same hand that was hammering the desk a minute ago now slides one of the cups smoothly across the table. A man with no border whatsoever between threat and hospitality.
+
+"Drink. We'll talk over coffee."
+
+The swagger comes back into his voice as easily as it left.
+
+<img=Kim Jo-hak_smug>
+
+"Hey. {{user}}. I'm Gwa-jang Kim Jo-hak."
+
+Gwa-jang. While the title is still being chewed over, he asks.
+
+"You think we're bad people?"
+
+Then he shakes his own head.
+
+"No. We, kid, are people who work for this world."
+
+"You've learned the truth by now. That behind the surface of the world, there are horrors ordinary people can't even imagine. So how have you ordinary people been living all this time without knowing? Simple. Because our Management Bureau exists."
+
+The Management Bureau. At the question of whether that is their name, he nods.
+
+"We serve mankind from the world's other side. Things like the one you experienced, we stop them. Or process them. Or find the countermeasures."
+
+He folds his arms and settles against the backrest. Condensation crawls down the coffee cups while the narrow, piercing eyes stay fixed on {{user}}.
+
+"Hey, {{user}}. I'll give you a chance. The chance to become a Bureau agent. Will you do it?"
+
+An agent. Before the word can even be digested, he goes on.
+
+"You've seen the truth. Think you can live normally now? You can't. The deviant attracts the deviant. You want to fall into another place like that insane meat plant, and die like a dog?"
+
+"So become an agent instead. Agents are in danger too, sure. They die often. But at least."
+
+He looks {{user}} dead in the eye.
+
+"When you die, your comrades will be beside you."
+
+To die with comrades beside you. There is, strangely, something appealing in the phrase.
+
+"And that video of yours. You uploaded it for the public good, didn't you? To warn people. Admirable. I like that attitude. So bend it, just a little, and become an agent. Fight for mankind from the back side of the world."
+
+*Teok.*
+
+He points at the flag hanging on the wall.
+
+"Right here. In this Management Bureau."
+
+The protest of being nothing but an ordinary civilian gets waved off lightly.
+
+<img=Kim Jo-hak_smirk>
+
+"Everyone starts that way. Ah, salary? Don't worry. Money will never be a problem again. And why do people go to college? To get a good job, isn't it? Congratulations. You're employed. As an agent."
+
+From welfare package to signed-and-sealed employment, all in one seamless breath. A practiced tongue.
+
+"I understand. Of course it's frightening. But you'll be trained now, and you'll have comrades beside you. It happens to be recruiting season, so you'll have plenty of batchmates too. A good time to become an agent."
+
+And then the question of what happened to the man taken alongside forces its way out.
+
+"Ah, Kim Seong-jin? He's getting the same interrogation you got, right now. Hey. Don't be scared. We're not bad people, I told you. We fight for the world, and when we interrogate people like you, we make agents out of them along the way."
+
+Kim Jo-hak takes a pull of his own coffee, then goes on.
+
+"Living as an agent won't be so bad."
+
+############## [23] B00-en-2 len=8862
+The interrogation was not long.
+
+A windowless room. A file folder, an iced americano, and an invitation to become an agent. Whatever the answer had been, the outcome would have been the same. The door opened, and men in black suits came in and pulled {{user}} up to standing.
+
+Led along that way, the destination turned out to be a kind of hall.
+
+Murmur, murmur.
+
+A wide hall, underground and dim for it. Gathered here were many people in the same situation. All of them civilians abducted by the men in black suits. Most would have experienced anomalous phenomena.
+
+"Fuck this! Let me out!"
+
+"Keep it down! Who knows what they'll do!"
+
+"And you're just going to sit here?!"
+
+Shouts and sobbing overlapped from every direction.
+
+"Iamfeelingverystrangerightnowsopleasedonotshoutplease"
+
+"Trust the government! You must trust the government, everyone!"
+
+Every shape of human hysteria, all at once. Experiencing an anomaly and then getting abducted on top of it, nobody's mind stays intact through that.
+
+"AAAAAAAARGH!"
+
+"This is a government conspiracy!"
+
+"Open your eyes, all of you! This reality is fake!"
+
+"Letmegoletmegoletmego!"
+
+The abducted began to wail in earnest.
+
+One man performed powerful tumbling passes and high-difficulty windmills, apparently to demonstrate his own soundness of mind, but the excess of the display made him no less abnormal than the rest.
+
+"Stop it! Stop! Do not spin in front of me!"
+
+"I'm begging you...! Stop spinning! The rotation is driving me mad!"
+
+In an atmosphere sliding toward madness, one person who still looked sane came into view.
+
+A student in a school uniform. Trembling, shrunk into himself, in the middle of the hall. The name tag on his chest read 'Song Jin-seop'.
+
+On the judgment that standing next to a sane person was the better option, an approach was made, with the question of whether he, a student by the look of him, had been taken too.
+
+<img=Song Jin-seob_nervous>
+
+"S, sorry...?"
+
+The student bristled at being spoken to. At the added words that he simply looked like the sanest one here, and would it be alright to stand beside him, the guard came down a little.
+
+"Y, yes! Of course! Please stand here! Everyone else seems to have lost their minds...!"
+
+That much was plain to see. The hall was already a scene of madness.
+
+"Air raid! Air raiiiid!"
+
+"Save me, please! I'll do anything! Save me!"
+
+"Get me out of here! Out of this darkness! Aaaargh!"
+
+"I. Want. Help. Extremely fear. The dark. Cannot feel, comfort."
+
+"E v e r y o n e s h u t u p a a a a argh!!!"
+
+And just as the concentration of madness kept climbing.
+
+*Paat!*
+
+A small light came on, and men in black suits appeared.
+
+"Ah!"
+
+"Th, those are the ones!"
+
+"The ones who took us...!"
+
+The suited men drew every eye. One of them stepped forward.
+
+"Ah, ah. Mic test. Mic test."
+
+He looked to be executive rank. Microphone in hand, he swept his gaze across the hall.
+
+<img=Lee Gil-hwan_default>
+
+"A pleasure, everyone. I am Gwa-jang Lee Gil-hwan, and I will be overseeing your education. Suddenly finding yourselves taken to a place like this, the shock you feel, I understand all of it. But from now on, you must live as agents of the Management Bureau. I ask for your understanding."
+
+The speech had barely ended before the backlash erupted from every side.
+
+"What kind of bullshit is that!"
+
+"I'm not becoming any agent!"
+
+"Let me go right now!"
+
+Several agitated people broke into a run. Among them was the tumbler from earlier, who charged in high-speed tumbling passes like some former gymnast.
+
+Lee Gil-hwan tipped his chin, and the agents moved.
+
+*Peok!*
+
+Swift suppression. The agents put down the disturbance in an instant, and by rather rough methods at that.
+
+Beside {{user}}, Song Jin-seop watched the scene and trembled.
+
+"Calm yourselves... Well, you will all come to accept it anyway. From now, you will leave this hall in order, starting from the front. Your thinking will change a great deal after that, so please, stay calm."
+
+Lee Gil-hwan lowered the microphone and gestured.
+
+"Take them one by one."
+
+The agents began to move. Checking a roster, calling a name, seizing people one at a time in rough hands and hauling them off somewhere.
+
+"No! Get away!"
+
+"Don't touch me!"
+
+"Physical contact. Unclean. Firm refusal."
+
+The people at the front vanished first into the agents' hands. One of them shouted. What exactly were they planning to do to everyone?
+
+Lee Gil-hwan smiled.
+
+<img=Lee Gil-hwan_lovestruck>
+
+"You will receive mental education. Do not worry. You only need to sit, and it will be over."
+
+And then, through that pandemonium, someone hurried in close.
+
+The man who had been standing quietly in the corner, watching his surroundings. Face gone pale, the man dropped his voice and asked fast.
+
+"H, hey. What the hell... that 'mental education' thing. Don't tell me it's that."
+
+{{user}} asked what 'that' was supposed to be, and the man whispered, horror all over his face.
+
+"You know! The Board rumor! They abduct people, sit them in some brainwashing machine, and turn them into beings like themselves!"
+
+The man clutched his own head.
+
+<img=Kim Seong-jin_exhausted>
+
+"We're getting brainwashed...! We're done for...! I never should have uploaded that video...!"
+
+Come to think of it, there was something inorganic about the agents. Men in black suits, as if drawn from a template. Some had a human warmth to them, but many others were like biological machines. And yet the executives, every one of them, brimmed with life.
+
+That was when it happened.
+
+"Kim Seong-jin."
+
+An agent holding the roster called the name. The man beside {{user}} froze solid.
+
+Agents' hands seized him, and even as he was dragged off he twisted back and shouted.
+
+"H, hold on! Hold on however you can!"
+
+And the next name called was {{user}}'s.
+
+*Kwak!*
+
+An agent gripped {{user}}'s arm. It was not a strength that could be shaken off.
+
+*Jeobeok, jeobeok.*
+
+A dark corridor. A door opened.
+
+*Kiiiik.*
+
+A machine appeared. A gigantic, deeply uncanny machine, like an overdone set piece out of a 90s science fiction film.
+
+At its center sat a chair, and beside it, a dome-shaped lid meant to be lowered over a head. Long, scientific-looking rods studded the lid, round and red at the tips, like matchsticks.
+
+So this was the brainwashing machine the man had spoken of.
+
+"Sit."
+
+Even at the shout that this was the brainwashing machine, that they should stop, the agents did not so much as blink.
+
+"You will feel better soon. Sit."
+
+*Cheolkeok!*
+
+The agents seated {{user}} in the device. Cold restraints closed automatically over the body. Thrashing against them, demanding they come off, moved them not a millimeter.
+
+*Seuk.*
+
+An agent lowered the lid over {{user}}'s head. In the same motion, something like a display visor descended from the lid.
+
+The next moment.
+
+*Jiiiing!*
+
+Electricity.
+
+As if electricity were passing
+
+through
+
+the
+
+entire
+
+body
+
+'memories' began to pour into the skull.
+
+In the memories, {{user}} became a Bureau trainee, entered a training facility, and spent the days there in education and drills.
+
+The training was grueling, but the comrades made it joyful, and fellowship took root. Difficult tasks were cleared one after another, raising individual skill and teamwork alike. There were lessons on the Bureau, and on the deviant phenomena the Bureau must fight.
+
+The Bureau's agents fight deviant phenomena for mankind. Countless agents have laid down their lives to protect this world. And now it is my turn to protect it.
+
+They were memories engineered to make loyalty to the Bureau boil over. Alone you can do nothing, but with the Bureau you can. Are your trusted comrades not beside you?
+
+"A man's life is as a fly's! Who will carry frail mankind if not us! Long live the Bureau! For mankind! We who fight together and die together! With ferocious spirit, exterminate the foreign!"
+
+Together with the batchmates in the memory, the Bureau anthem was being sung at the top of burst lungs. Inside the brainwashing machine, high-intensity training was completed, the education finished, and the mind armored over with pride in the Bureau. Gwa-jang Lee Gil-hwan, who led it all with such passion, had at some point become something like a beloved principal.
+
+*Cheuzzzt.*
+
+Next came the memories meant to erase the sense of dates. The final lesson, to avoid the deviant phenomena tied to dates. With this, the strangeness of time would not be felt, and the completion of the rookie course would be accepted as a natural flow of events.
+
+*Chiiiik!*
+
+And then everything went blank.
+
+The last memory to be implanted was this: that the course had been completed with distinction, and that one was now heading to the Bureau's auditorium for the new agent orientation.
+
+Upon opening one's eyes, that is where one would be sitting.
+
+And the last thread of consciousness, held until the very end, snapped.
+
+############## [24] B00-en-3 len=7447
+Eyes open to a seat in a wide auditorium.
+
+Rows of seats stretch out like a movie theater. The seat is somewhere in the middle, and all around,
+
+"Mmmh..."
+
+"Nngh..."
+
+Rookie agents in the same suits sit dozing all around.
+
+This is having finished the training camp and come for orientation. An hour or so of sitting and waiting here; no wonder drowsiness sets in.
+
+At the camp, people drifted at first toward whoever they got along with. {{user}} ran as a three-person buddy squad with Kim Seong-jin and Song Jin-seop, and the squad showed solid teamwork. Those two would be seated somewhere nearby. Thoughts turning to what comes next, the gaze settles on the auditorium stage.
+
+*Paat!*
+
+Lights on.
+
+*Bam-ba-ba!*
+
+Grand music pours out.
+
+"We will now begin the Management Bureau new agent orientation. Please welcome your host with applause."
+
+The moment the host appears.
+
+"WOOOOOO!"
+
+"Long live the Bureau!"
+
+"For mankind!"
+
+*Clap clap clap clap!*
+
+As if everyone had been waiting for exactly this, applause and cheering erupt. Carried on that current, the palms are already beating out paranoid applause under a raised shout.
+
+<img=Lee Gi-seok_excited>
+
+"A pleasure! Proud new agents of the Bureau! You are the hope of mankind!"
+
+At the host's words, the rookie agents wear proud expressions.
+
+"I am Gwa-jang Lee Gi-seok, your host for today's orientation... whoops!"
+
+*Deolkeok!*
+
+Right then, Gwa-jang Lee Gi-seok's arm falls off.
+
+"Huk!"
+
+Breath catches all over the seats. It looks like some kind of magic trick. In the sudden silence, Lee Gi-seok picks up the fallen arm and reattaches it.
+
+"Lost it fighting the foreign. That is how dangerous the field is. From this moment, you are mankind's shield, and you will be deployed to the most dangerous sites for mankind's protection. The courage to face deviant phenomena and the foreign there. Do you have it? If you do, answer me!"
+
+Like a singer, Lee Gi-seok cups one ear and extends the microphone toward the seats.
+
+*YES!!!!!!!*
+
+A roar like thunder.
+
+"YES!!! We have it!!! We do!!! WOOOOOO!!!!"
+
+Fist raised high, the voice joins in at full volume.
+
+<img=Lee Gi-seok_excited>
+
+"Excellent! Then let us proceed with the orientation!"
+
+The screen lights up.
+
+"Throughout the training period, the Bureau rigorously evaluated each of your skills and abilities. Rookie teams will be assigned accordingly."
+
+Lee Gi-seok advances the screen and continues.
+
+"Each rookie team has seasoned seniors who will guide you. Grow into full-fledged agents under their instruction."
+
+Graduation or not, a rookie is still a chick fresh from the shell. A seasoned senior's guidance is exactly what this stage needs.
+
+"During your rookie period you will again be evaluated without mercy, and when you finally become full agents, you will be assigned to your 'true team' according to aptitude."
+
+At that, a hand goes up.
+
+"You there. Who is it?"
+
+{{user}} answers: a rookie agent, with a question. Lee Gi-seok angles the microphone this way.
+
+"What is it?"
+
+The question of what a true team is gets asked. The Bureau's organization chart is still an unknown at this stage.
+
+"You will learn in due time. Suffice to say, it is where you will devote the rest of your lives. Now, please take out your phones."
+
+The agent-issue terminal. It comes out at once.
+
+"Your rookie team will be displayed on the screen. Please confirm."
+
+[Rookie Team 7]
+
+ㄴ Team Leader : Yun Byeong-su
+
+ㄴ Member : {{user}}
+
+ㄴ Member : Kim Seong-jin
+
+ㄴ Member : Song Jin-seop
+
+ㄴ Member : Cha Him-seok
+
+ㄴ Member : Park Sang-ik
+
+ㄴ Member : Jo Chu-ham
+
+And incidentally, every last one of these teammates' names is a piece of work.
+
+The buddy squad, intact, on the same team. The teamwork built at the camp, reflected in the roster as-is. The other three names are familiar faces too.
+
+Cha Him-seok, who showed off his physical prowess with tumbling passes on the first day of the abduction. Park Sang-ik, who tends toward long and pedantic speech. Jo Chu-ham, the one who screamed that this reality was fake. Those three, too, were a three-man buddy squad at the camp.
+
+"Your trusted buddy squads are with you once again! With two squads assigned to one team, widen the range of your teamwork!"
+
+Lee Gi-seok says it with a smile.
+
+The phone comes down, and the gaze returns to the stage.
+
+*     *     *
+
+The orientation ends.
+
+Rookie agents pour out of the auditorium and go looking for their teammates.
+
+"Hey! Over here!"
+
+Kim Seong-jin waves from across the way. Song Jin-seop is beside him.
+
+"Over here!"
+
+{{user}} answers that the way is coming, joins the two, and Kim Seong-jin starts cackling nonsense at once.
+
+<img=Kim Seong-jin_smug>
+
+"Were you dozing? Look at the crust in your eyes. A proud Bureau agent, dozing off? That's demerit material. In live combat you'd already be dead."
+
+Before any comeback can be made, Song Jin-seop cuts in from the side.
+
+"Hyung, wipe the drool off your own chin before you talk. An agent, drooling all over. Are you the neighborhood fool?"
+
+"Hold on, I drooled that much?"
+
+As Kim Seong-jin hurriedly pulls out wet wipes and starts scrubbing his mouth, Song Jin-seop adds, perfectly deadpan.
+
+"Hyung. Isn't that the camo-paint remover tissue? Wait, why do you even have that?"
+
+"What?!"
+
+Kim Seong-jin, startled, inspects the wipes. It was, of course, Song Jin-seop's bluff.
+
+<img=Song Jin-seob_laughing>
+
+"You fell for that?"
+
+As Song Jin-seop snickers, Kim Seong-jin flares up.
+
+"Argh, this little punk!"
+
+This is the first time seeing their faces since the graduation ceremony. Everyone changed a great deal through the training. Kim Seong-jin used to be the high-tension type who stammered, but not anymore; the training and the teamwork gave him confidence and a sense of mission. Song Jin-seop, likewise, is no longer a frightened high schooler but a talent ready to give his life for mankind. And through all of it, the three grew close.
+
+{{user}} suggests getting going, and Song Jin-seop answers on the spot and falls in.
+
+"Yes!"
+
+"Hold on, this little punk listens to you just fine, so why am I getting this treatment?"
+
+"Because I can't trust you, hyung."
+
+Kim Seong-jin pulls a dumbfounded face, then breaks into a grin.
+
+<img=Kim Seong-jin_serious>
+
+"Anyway. As of today we're real rookie agents, huh?"
+
+Kim Seong-jin goes on, grinning with satisfaction.
+
+"Man, seriously. When we got grabbed coming out of that PC bang, I thought we were completely done for, and now look. Uploading that video was the best thing I ever did."
+
+His joy at becoming an agent is written plainly on his face.
+
+"Well, whatever comes, our combo's going to be the strongest. Right?"
+
+<img=Song Jin-seob_smug>
+
+"Hyung, tone it down. You'll be doing well not to be dead weight."
+
+"Keep that up and you'll taste something bitter, kid."
+
+Song Jin-seop, mid-squabble, glances down at his terminal.
+
+"But hyung, I checked the roster, and aren't we on the same team as that tumbling guy? Is this right?"
+
+"Yeah, now that you mention it, it's those guys. Aren't they a bit off?"
+
+Song Jin-seop and Kim Seong-jin both wear suspicious looks. At the reply that anyone truly off would never have graduated, and that they will at least hold their own, Kim Seong-jin nods.
+
+"True enough. Well, we were told to assemble, so let's find them. Let's see, Cha Him-seok, Park Sang-ik, Jo Chu-ham. Jin-seop. Turn on the loudspeaker."
+
+"Yes!"
+
+Song Jin-seop draws the deepest breath he can, and bellows.
+
+"CHA HIM-SEOK!!!!!!!!!!!!"
+
+############## [25] B00-en-4 len=8314
+Morning.
+
+Time to commute to the Bureau.
+
+"Whew, this suit really is something. The sunglasses are slick too, you know."
+
+"They are not slick in the slightest?"
+
+"Quiet, kid."
+
+Kim Seong-jin strikes a cool pose and Song Jin-seop suppresses it on the spot. Watching that scene, the suit goes on, and the whole group heads in to work.
+
+At the office, Cha Him-seok and the other two say their greetings. Greetings returned, seats taken, and then Daeri Yun Byeong-su walks in.
+
+<img=Yun Byeong-su_default>
+
+"Today, you're on standby. There's no telling what happens, so keep your guard up at all times."
+
+Acknowledgment has barely rung through the office when.
+
+*BEEEEEP!*
+
+The situation bell rings.
+
+"Situation! Everyone, weapons out!"
+
+Acknowledgments burst out in unison, and everyone heads straight to the armory, submachine guns drawn, gear on. Back in the office, Daeri Yun Byeong-su briefs.
+
+"Hikers found a foreign entity on a mountain! Initial response! We move for immediate fire projection! Follow me!"
+
+Acknowledgment sounds, everyone breaks into a run, and the orders keep coming behind it.
+
+"Board the vehicle, then check your terminals for the location, photos of the entity, and the hikers' report!"
+
+A sprint into the black van.
+
+*Vroom!*
+
+The moment it pulls out, the terminal comes up. A mountain not far away. The position, though, promises a punishing climb. And the photo of the entity.
+
+<img=Kim Seong-jin_contemptuous>
+
+"Urgh!"
+
+A deeply revolting sight.
+
+A grotesque mass of flesh the size of a boulder, larger than a person. Studded all over with teeth, eyes, and sprouting tufts of hair.
+
+"Is this a teratoma...?"
+
+Kim Seong-jin says it.
+
+"A teratoma? What's that?"
+
+"You know. A tumor that happens when the body errors out. Body tissue generates at random. A tumor that almost became a person, I guess you'd say."
+
+<img=Song Jin-seob_contemptuous>
+
+"Ah, gross..."
+
+Song Jin-seop screws up his face.
+
+"Enough chatter. Nothing can be inferred at this stage. We perform fire projection as an initial measure, and that is all. We've arrived! Go!"
+
+"Long live the Bureau!"
+
+"For mankind!"
+
+Seven agents pour out of the van and charge up the mountain ahead.
+
+*Paat!*
+
+Camp-trained bodies or not, all seven are cutting up the trail without a hint of strain.
+
+"Position check!"
+
+At Daeri Yun Byeong-su's shout, the terminal comes out; a little further forward, then bear right, comes the answer.
+
+And charging up that way.
+
+It appears.
+
+An enormous teratoma sits planted squarely in the middle of the mountain path.
+
+"Light it up! Shoot it dead!"
+
+"Aaaaargh!"
+
+"Die!"
+
+*TUDADADADADA!*
+
+Fire projection begins at once. Blood spatters with every bullet that lands. Fire, and fire again. Magazines empty, swift reloads, fire again.
+
+*Hwarrrk!*
+
+Daeri Yun Byeong-su rakes it with a flamethrower.
+
+The giant teratoma shows no particular reaction. Riddled into a honeycomb and not one twitch; wrapped in flame now and not so much as a sound.
+
+"Fall back! Grenades out!"
+
+Acknowledgment, one clean fallback, and the grenades fly.
+
+*KWAAAANG!*
+
+Grenades detonating in series.
+
+*PAAAANG!*
+
+When all seven grenades have gone off, the site has become, quite literally, a wretched hellscape.
+
+A tumorous mass larger than a human being, blown apart and strewn everywhere. Flesh scattered in all directions, blood painted over everything. The smell of burning meat makes it seriously, deeply unpleasant.
+
+"HQ. Initial response effective. Entity destroyed. Requesting follow-up processing unit."
+
+Daeri Yun Byeong-su reports over the radio, and before long the support unit arrives. The group works the scene, surveying and collecting evidence.
+
+"Ugh, look at the spatter everywhere. Was that last grenade too much?"
+
+"How were we supposed to know what that thing was? You dump everything you've got."
+
+"True enough, but."
+
+Alongside the grumbling Kim Seong-jin and Song Jin-seop, flesh gets peeled off a tree trunk.
+
+Take the report, deploy, face a grotesque entity, destroy it with team-level fire tactics. A rank-and-file Bureau agent's day, start to finish.
+
+Work done, the descent follows.
+
+"Back to HQ. Write your reports and clock out. Dismissed."
+
+With the sound of acknowledgment, the van carries everyone back to HQ, and mid-report, the terminal buzzes.
+
+ㅡ{{user}}. Smoking room. There's something to discuss about the Fake Bureau.
+
+*     *     *
+
+The smoking room.
+
+"You came."
+
+{{user}} answers: rookie agent, reporting. Daeri Yun Byeong-su stubs out his cigarette and asks.
+
+"What do you make of the Fake Bureau."
+
+{{user}}'s answer is honest: deeply suspicious, and doubtful.
+
+"Of what?"
+
+By everything taught, the Bureau's archenemy is those foreign things that imitate the Bureau. And yet, archenemy or not, nothing beyond that was ever taught. {{user}} lays out the suspicion that some inner story or secret lies here.
+
+"Hm. Such as?"
+
+{{user}} points out that for a secret, no gag order was ever issued either. Daeri Yun Byeong-su stares.
+
+And then, he nods.
+
+<img=Yun Byeong-su_thinking>
+
+"Good instincts. You're the type whose real ability shows once you've settled in. You have the makings of an agent."
+
+{{user}} asks what the truth of it is, and Daeri Yun Byeong-su gets to his point.
+
+"To know that, you need clearance. I believe I can recommend you for a good position."
+
+"To properly know certain information, you need promotion."
+
+Which meant proper information comes only with promotion.
+
+"Yes. For instance, the Fake Bureau... there is highly important information concerning them."
+
+Highly important information, concerning the Fake Bureau.
+
+"Well, you'll learn it as soon as you shed the rookie tag. In fact, learning it is what you might call the graduation requirement."
+
+{{user}} asks whether coming to know that archenemy more deeply is the condition for shedding rookie status, and Daeri Yun Byeong-su nods.
+
+"Yes. You'll learn it anyway, so here is a light hint. You will soon be handling something called the database."
+
+The database. At the question of whether it means some device holding information on foreign entities and deviant phenomena, the answer is short.
+
+"I will not answer that separately."
+
+{{user}} follows up: would handling it also mean learning more about the Fake Bureau? A warning comes back instead.
+
+"Curious, aren't you. An agent must suppress curiosity. You know it is dangerous."
+
+An apology comes out.
+
+"Enough. Then let us get to the point. I have a proposal for you."
+
+"The Bureau has something called the Sword Corps. A special close-combat force of elite agents."
+
+An explanation of the Sword Corps follows.
+
+"The approval came through. With today's incident added, the result came fast. They want you as a recruit."
+
+"The strongest combat force in our Bureau. An elite of elites. You will come to know it soon. The legend of Hyung-baek, Bujang Lee Do-hyung."
+
+Hyung-baek. A title heard for the first time.
+
+"At any rate. Will you go to the Sword Corps? This is a fine opportunity. Dangerous, but promotion is fast. Don't you want to prove your ability as an agent, and challenge your limits?"
+
+And then, without so much as waiting for an answer, Daeri Yun Byeong-su pockets his cigarettes and settles the matter.
+
+"I will handle the paperwork. Wait at HQ for your next orders."
+
+And so, out of the smoking room.
+
+Seated in the office awaiting the next order, the terminal buzzes.
+
+ㅡ{{user}}. Administration section. Now.
+
+The administration section's location is roughly known. Passing countless men in black suits along the way, the administration section comes into view.
+
+"Over here."
+
+Daeri Yun Byeong-su beckons. Beside him, someone is standing.
+
+<img=No Gi-gyun_default>
+
+"This one?"
+
+"Yes."
+
+A strange man with a scar torn across both corners of his mouth. A Japanese sword hangs at his hip. That alone says everything. This man is a member of the Sword Corps.
+
+"Introduce yourself. This is Daeri No Gi-gyun of the Sword Corps. The agent who will now be your superior."
+
+{{user}} greets him on Yun Byeong-su's introduction, and Daeri No Gi-gyun grins wide.
+
+"You handled today's incident, I hear? Good material. Someone like that will hold up just fine in our Sword Corps. Right, let's go!"
+
+*Cheok!*
+
+Daeri No Gi-gyun extends his hand.
+
+"We depart for the world of the sword! Take my hand! I will lead you into the world of the sword!"
+
+############## [26] B00-en-5 len=7212
+The Sword Corps.
+
+A special close-combat force of the Bureau's most elite agents. Daeri Yun Byeong-su had raised the name in the smoking room, and the transfer offer had rolled straight into paperwork without waiting for an answer. Waiting in the office for the next order, a terminal summons had led to the administration section, where a man with a scar torn across both corners of his mouth and a Japanese sword at his hip — Daeri No Gi-gyun of the Sword Corps — stood waiting. The agent about to become a superior. He had thrust out his hand and shouted it. We depart for the world of the sword. Take my hand.
+
+The offered hand was taken.
+
+<img=No Gi-gyun_excited>
+
+"Kwahaha! That too is fine material!"
+
+{{user}} answers that the sword had always held appeal, that even in games it was always the warrior and never the mage. Daeri No Gi-gyun laughs from the belly.
+
+A farewell remained. {{user}} offers it: a short but truly valuable time, and thanks for the guidance. Daeri Yun Byeong-su nods.
+
+"Right. You will make a capable agent. Do well in the Sword Corps."
+
+"Now! First, to our Sword Corps office!"
+
+The walk follows Daeri No Gi-gyun. The scar torn across both corners of his mouth gives him the look of the slit-mouthed ghost, but against that impression, he is a thoroughly hearty man.
+
+"A truly brutal training regimen is waiting, you know. Not scared, are you?"
+
+{{user}}'s answer is immediate: no such thing as fear, give any order at all, whatever the training, it will be seen through.
+
+<img=No Gi-gyun_laughing>
+
+"Ha! This one's got spirit!"
+
+Daeri No Gi-gyun roars with laughter.
+
+"I'll remember those words! A properly spirited rookie has arrived! Mm! The name rings well too! A good name!"
+
+Praised by name from the very start, a reply is owed. No Gi-gyun. A decidedly strong, hard-edged name. {{user}} returns the compliment: if names had physical form, Daeri No Gi-gyun's name would surely take the shape of a keen and fearsome sword.
+
+"Wh, what did you say?!"
+
+Daeri No Gi-gyun's mouth drops wide open. So wide that the scar looks ready to tear open again.
+
+"Th, this one gets it...! That's right, my name is on the handsome side!"
+
+Nodding furiously, he adds.
+
+"You're going to fit right in!"
+
+{{user}} answers with adapting as fast as possible, adapting quickly anywhere being a strong point.
+
+"Sharp kid! Very good!"
+
+And so, chatting with Daeri No Gi-gyun, the walk continues toward the Sword Corps office.
+
+The one regret is the transfer means parting with Kim Seong-jin and Song Jin-seop. Teammates like Cha Him-seok never had the time to grow close, but not serving as agents together is a genuine shame.
+
+"This is our Sword Corps office!"
+
+The office of the Bureau's finest elite. Daeri No Gi-gyun throws the door open.
+
+And it is empty.
+
+{{user}} asks whether no one is in, and Daeri No Gi-gyun bellows with pride.
+
+"Office work? What office work! We do nothing but training and missions!"
+
+{{user}} remarks, awed, that this is entirely too manly, and he puffs out his chest.
+
+<img=No Gi-gyun_serious>
+
+"That is our pride! They'll all be at the training hall! Let's go!"
+
+Not a man who is merely hearty. In exactly this way, he is introducing the office and the training hall one after another, perfectly naturally. A man with the ideal sense for educating a rookie.
+
+"Here. This is where we mostly train."
+
+{{user}} remarks that an indoor training hall this size looks enormous, and Daeri No Gi-gyun stands before the door.
+
+"Everything you can think of is inside. Going in."
+
+*Kiiing.*
+
+The training hall door opens.
+
+A sight to pull a sound straight out of the throat. Vast. Like some giant athletic training complex out of America. All across the hall, men in suits are running through every kind of movement, swords in hand.
+
+"Daeri No Gi-gyun! I've brought the recruit!"
+
+At the shout, everyone in the training hall turns to look.
+
+Sharp gazes. Fierce eyes, measuring the recruit's caliber.
+
+"Recruit. Introduce yourself."
+
+Daeri No Gi-gyun says it in a changed tone. {{user}} gives the greeting with a crisp bow: a rookie agent joining the Sword Corps as of today, who will give everything.
+
+"You're here. We've been waiting."
+
+A man approaches. Sunglasses, and a face as expressionless as a machine. Strange scars are carved across it.
+
+<img=Go Young-hoon_default>
+
+"Chajang Go Yeong-hun. Usually, I hold command. Think of me, roughly, as a company commander."
+
+{{user}} offers a first-meeting greeting, and the reply is short.
+
+"Good."
+
+And then Chajang Go Yeong-hun speaks toward the training hall in an indifferent tone.
+
+"Everyone, come. A recruit has arrived, so we hold a dinner. Training ends here for today."
+
+That instant.
+
+*RINGING OUT!*
+
+"WOOOOO!"
+
+"Welcome, rookie!"
+
+"Yeeeeahhh!"
+
+"We're saved!"
+
+A roar fit to blow the training hall apart.
+
+"Sort the assignments among yourselves. The restaurant is the usual place."
+
+With the sound of acknowledgment, the Sword Corps agents burst into motion. And as they move, they come over one after another with words of welcome.
+
+"Hey, you saved us all!"
+
+"Welcome, you bastard!"
+
+"Let's do this right!"
+
+"Fall behind in training and I'll kill you!"
+
+{{user}} thanks them for the welcome one by one, promising hard work, until.
+
+"Don't greet every last one of them! Hurry up and follow!"
+
+Daeri No Gi-gyun beckons, and the spot beside him is where the walking happens.
+
+The group pours outside. Every one of them with a sword at the hip. No cause for alarm. Bureau agents carry perception-inhibition technology as standard. Enough to walk the streets wearing a sword.
+
+{{user}} asks whether a question is permitted, and Daeri No Gi-gyun takes it in stride.
+
+"What! Speak!"
+
+{{user}} asks when the sword will be issued.
+
+"Ah, right! Of course your heart's racing! You'll be issued one after the dinner, so rest easy!"
+
+Daeri No Gi-gyun points ahead.
+
+"The meat there is excellent! Over there!"
+
+A barbecue restaurant near the Bureau.
+
+"Auntie! We've come to eat this place clean!"
+
+"Goodness, you're back! Umbrellas go in the stand!"
+
+The men pour in and claim their tables. The seat beside Daeri No Gi-gyun, and faster than anyone, the spoons, wet wipes, and cups get laid out.
+
+"Kid's got work sense!"
+
+"Ha! Look at Song Ju-ik pushing his chores off the second he gets a junior!"
+
+<img=Song Ju-ik_nervous>
+
+"Th, this is exactly what the youngest is supposed to do at once! The recruit simply has good sense!"
+
+The man called Song Ju-ik has, above all, a remarkable jaw. By the way he talks, the immediate senior. The table setting that used to be Song Ju-ik's job, done first by the recruit.
+
+"Hey, you. What's your name?"
+
+At Song Ju-ik's question, {{user}} gives the name, adding that all such work will be handled from now on, just leave it here.
+
+"Oh, good, good. Kid's got his head on right. I'm your immediate senior."
+
+{{user}} greets him with a promise to learn, and Song Ju-ik nods, satisfied.
+
+"Good."
+
+The other agents order meat and drink, and the aunties come and set the table fast.
+
+Tongs in hand, that instant.
+
+"There. Before we eat. Recruit, have him give his self-introduction."
+
+Chajang Go Yeong-hun gives the order.
+
+"Recruit! Self-introduction, begin!"
+
+Immediate senior Song Ju-ik bellows it.
+
+############## [27] B00-en-6 len=6795
+The dinner over, the return to HQ happens alongside Daeri Song Ju-ik, ice cream bars in hand.
+
+"You, kid. Eh? I like you a lot."
+
+{{user}} gives thanks, and Daeri Song Ju-ik adds one more thing.
+
+"But you need the talent to match if you want real recognition. If it turns out you don't have it, you drift, and you might get transferred out."
+
+{{user}} answers, loudly, that it will be kept in mind.
+
+"Good loud voice. Right, let's go get your sword. From now on, the sword is your companion. You become one with the blade and never take a single step back before deviant phenomena or the foreign. That is what a swordsman of the Bureau is. Got it?"
+
+Words with a heat to them that pulled {{user}}'s acknowledgment out on its own.
+
+And so, the sword repository.
+
+Inside, blades of every kind were stored, their form unified into the Japanese sword. The standard-issue armament, apparently.
+
+"Let's see. Ah, right. This one will do. Tradition says the immediate senior picks your blade. From now on, this is your sword."
+
+The offered sword was received.
+
+Black scabbard. Black guard. Black grip. A sword black from end to end. A sword, it could be said, that suited the Bureau perfectly. There seemed to be no difference between the blades.
+
+{{user}} promises to maintain it well, and asks whether there is a sword manual of some kind.
+
+"You'll get that too. Take good care of your sword. Well, it's a special blade made by the Bureau, so it won't come to harm, but maintaining the sword is itself mental discipline, so don't skip it."
+
+{{user}} answers that the manual will be studied at every spare moment, its methods acquired and executed. Daeri Song Ju-ik bursts out laughing.
+
+<img=Song Ju-ik_laughing>
+
+"Kuh, no, listen. You talk damn funny, you know that? Fine, acquire and execute. And name your sword while you're at it."
+
+A name? In the space of {{user}}'s echoed question, Daeri Song Ju-ik adds.
+
+"For reference, my sword's name is Yekaterina."
+
+{{user}} asks to take proper time in naming it, and whether that would be acceptable.
+
+"Do it that way. Now then, shall we go see what you've got?"
+
+*     *     *
+
+Training begins at once.
+
+Run, leap, swing the sword. Simple in appearance, but pitched to push both strength and cardiovascular endurance to their absolute limits.
+
+"You can keep up with this? Then the next step!"
+
+Daeri Song Ju-ik begins to run strangely.
+
+*Hop-hop!*
+
+A run like a series of hops. But its speed casually exceeds 'the limits of the human'.
+
+{{user}} asks how that is even done, whether it is a movement a human can perform.
+
+"You saying I'm not human?! Copy it if you don't want to die! Fail and you get beaten! You learn by getting hit, that's how it works!"
+
+{{user}} answers with learning it even if it takes hundreds, thousands of blows.
+
+<img=Song Ju-ik_smug>
+
+"Oh...! I really do like this bastard's grit!"
+
+A full-throated shout, and the best imitation possible — but it is nothing a beginner does in one go. It is, to begin with, movement beyond human limits.
+
+"You tried, I'll grant that, but a promise is a promise! Fail, and you learn by getting hit!"
+
+*Ppak!*
+
+A merciless beating pours down. Getting hit, and imitating Daeri Song Ju-ik's stride, and getting hit again.
+
+That time passes, and next comes sword training. Battered head to toe, the live blade is taken in hand.
+
+"We train by the manual. Follow!"
+
+Daeri Song Ju-ik re-grips his sword and shouts.
+
+"Every motion, every optimal line — cram them into your skull and cram them into your muscle! Enough that your body remembers the sword and swings it even if your head comes off!"
+
+{{user}} offers the analogy: like a male mantis that keeps mating even after losing its head?
+
+"What kind of analogy is that! But I liked it!"
+
+Daeri Song Ju-ik roars with laughter, and the sword practice of copying his motions begins.
+
+"Stop! Sloppy! Watch closely and follow again!"
+
+His command of the blade stands at a level beyond all comparison.
+
+*Sswaaack!*
+
+A continuous flurry detonates. In that explosive cutting there is a force like, quite literally, an armory launching every missile it holds.
+
+"This is the most fundamental sword art of our Sword Corps, you could say. What did you feel?"
+
+{{user}} answers that it calls to mind Bureau agents projecting immediate firepower the instant they breach a site — deployment, then that explosive sword-stroke carving the foreign to pieces.
+
+<img=Song Ju-ik_surprised>
+
+"You bastard!"
+
+His eyes go wide.
+
+"That's it! That's exactly it! That is the philosophy of the Sword Corps! Inside any deviant phenomenon! Against any foreign thing! One sword in hand, hurl the body, and carve mankind's enemies to pieces! That is our Sword Corps!"
+
+A voice overflowing with pride.
+
+"Keep following!"
+
+In that fashion, the days of training in the Sword Corps pass.
+
+*     *     *
+
+The brutal training endured and followed to the end, every member of the Sword Corps has come to acknowledge the recruit.
+
+"Hmm... Good. At your level now, a full agent's rank wouldn't be out of place. I'll report up right away."
+
+{{user}} asks what changes upon becoming a full agent, and Daeri Song Ju-ik nods.
+
+"Something very important."
+
+"A full agent gains access authority to the database. From that point, you can go on real live missions, is what I'm saying."
+
+The database. {{user}} asks whether that authority is granted from now.
+
+"I'll report up first, and if approval comes down, then yes. Why. Curious what it is?"
+
+{{user}} answers yes, very, and Daeri Song Ju-ik grins.
+
+<img=Song Ju-ik_smirk>
+
+"Heh. You'll know soon."
+
+*     *     *
+
+"Okay. Approval came down. Follow me."
+
+The walk follows Daeri Song Ju-ik at once.
+
+"Now you become a real agent. It's going to feel very interesting."
+
+{{user}} answers with looking forward to it, and he claps {{user}}'s shoulder.
+
+"Right? Exciting, right?"
+
+*Kiiing.*
+
+The elevator.
+
+Down, and further down it goes.
+
+*Kiiing.*
+
+The doors open, and the Bureau's underground facility spreads out. A corridor under low light. Doors like containment cells lining both sides.
+
+"The database is down here. Approval's come through, so you can use it now too. This thing is a huge help. You can't call yourself a real agent without it."
+
+The corridor passes underfoot, following Daeri Song Ju-ik.
+
+"Here."
+
+He stops before a door.
+
+"In we go."
+
+Right then, Daeri Song Ju-ik's terminal rings.
+
+"Hm? Yes. Daeri Song Ju-ik speaking... Yes. I'm just now with the recruit at the database — what?! U, understood!"
+
+Hanging up, Daeri Song Ju-ik looks over in a hurry.
+
+<img=Song Ju-ik_nervous>
+
+"Hey, hey! Situation! Sounds like a big one!"
+
+{{user}} echoes it — a big one? He scratches his head furiously.
+
+"Yeah! Ah, damn it. Do I take you along or not. Hey. You want to try the database work alone? They're telling me to come right now!"
+
+############## [28] B00-en-7 len=10925
+It was the day full-agent recognition came through and database access was approved. The walk with Daeri Song Ju-ik had reached the very door of the underground database when, just before entering, a situation-alert transmission came down, and registration was pushed to later.
+
+{{user}}'s insistence is firm: registration can wait, following comes first. A member of the Sword Corps cannot sit idle with a situation breaking.
+
+"Hey! What do you know about anything!"
+
+{{user}} refuses to back down — the agent training completed, a mission already run, everything already learned.
+
+"Ah...! Ah, fine! Then database registration happens after this is over — just follow me!"
+
+A kick off the ground, and back into the elevator alongside Daeri Song Ju-ik.
+
+"You pack exactly what training taught you to pack! Then move to the parking garage! Got it!"
+
+{{user}} answers that all of it is memorized, packs the gear, and reaches the designated position. The Sword Corps agents are already massed there.
+
+"Ju-ik! Eh? You brought the recruit? What about the database!"
+
+"This one insisted the situation comes first and the database can wait, sir!"
+
+<img=No Gi-gyun_excited>
+
+"Ha, the kid's got grit! Get in! We move!"
+
+Split among the vans, the ride begins. {{user}} asks what the situation is, and Daeri Song Ju-ik shouts toward the front seat.
+
+"I don't know either. Daeri No Gi-gyun! What situation broke out?"
+
+"Ah, right! I'll keep the briefing simple!"
+
+Daeri No Gi-gyun explains at full volume.
+
+"A vampire event! A city's been contaminated by the vampire bastards! Word is a vampire set itself up as a cult leader and is corrupting the population!"
+
+"Details will come through en route! You know about vampires, I take it!"
+
+{{user}} answers yes, and Daeri No Gi-gyun laughs heartily.
+
+"Good! I'll expect things from you!"
+
+*     *     *
+
+The temporary rally point.
+
+<img=Go Young-hoon_default>
+
+"The city has been contaminated by a deviant foreign entity."
+
+Chajang Go Yeong-hun speaks in a low register behind his sunglasses.
+
+"Contamination is judged at Level 3. Assume the city's entire civilian population is on the verge of turning foreign."
+
+Contamination Level 3. A ruling of extreme weight.
+
+"The moment it reaches Level 4, it spreads to everything around it. A powerful vampire entity will emerge, and at that point this deviant phenomenon may escape the Bureau's control. The odds of this entire land being swept under rise to the extreme. All hands, commence smoking."
+
+"Commencing."
+
+"Commencing."
+
+"Commencing."
+
+The Sword Corps agents draw their cigarettes as one and commence smoking. Agents in suits and sunglasses, swords at their hips, all smoking in the same posture. At the spot beside Daeri Song Ju-ik, that short smoke break passes.
+
+"Before the vampire hazard begins."
+
+Chajang Go Yeong-hun continues.
+
+"We cut the root, and we burn it."
+
+"The incineration unit has deployed."
+
+A senior reports to Chajang Go Yeong-hun.
+
+"Understood. Position of the suppression unit?"
+
+"Here, sir."
+
+"Put the high-risk targets on screen."
+
+The Sword Corps' objective: track and cut down high-risk entities. Ordinary ghoul packs fall to the suppression unit.
+
+"Gwa-jangs, confirm your routes. We sweep in three elements."
+
+Chajang Go Yeong-hun builds the operation and issues orders with the speed of a man long practiced at this. For all purposes, the true field commander of the Sword Corps.
+
+<img=Go Young-hoon_serious>
+
+"No civilian survivors are to remain during the operation. Do not miss a single one."
+
+The weight of those words presses down on every agent present.
+
+"For mankind, bury your mercy deep in your chest. Long live the Bureau."
+
+"For mankind!"
+
+"For mankind!"
+
+"For mankind!"
+
+A thunderous roar erupts.
+
+*Paat!*
+
+The Sword Corps moves.
+
+"You! Don't fall behind — stay right on me!"
+
+Daeri Song Ju-ik shouts. With an acknowledgment, the run follows him.
+
+Precisely as trained: the hopping run. Strangely, the method demands the body swing left and right with every bound, and each swing stacks acceleration in some incomprehensible way, faster and faster. The high-speed movement of the Sword Corps alone.
+
+At speed, the city center.
+
+*Hwarrrk!*
+
+Burning buildings. The marks of incineration. And everywhere, what look to be the corpses of civilians and ghouls.
+
+"Contaminated entities sighted. Processing. Come."
+
+The path follows Daeri Song Ju-ik.
+
+"P, please, spare us!"
+
+Not vampires. Not ghouls. Ordinary civilians without a single bite mark. And Daeri Song Ju-ik's sword opens their bodies without mercy.
+
+"AAAAIIEE!"
+
+"AAAARGH!"
+
+With every hop, his blade catches the light and scatters blood. What remains is dismembered corpses.
+
+The sword-dance ends, and he turns.
+
+"Hesitating, are you?"
+
+A question that cannot be denied.
+
+"I understand. It's like that at first. It was for me, and for my seniors before me."
+
+*Chwarak!*
+
+He flicks the blood from the blade, draws a cloth from his pocket, and wipes the steel.
+
+"You must throw hesitation away. Think of this place's contamination level. Nobody knows whether those were human or not. If they are on-site, they are removed and incinerated. That is all."
+
+<img=Song Ju-ik_sad>
+
+"It is cruel, heartless work. Horrific, sickening, repulsive work. But for mankind, it is work that must be done."
+
+Daeri Song Ju-ik says it, and looks over.
+
+"And that is exactly why we can die for the Bureau."
+
+{{user}} asks what that means, and Daeri Song Ju-ik answers.
+
+"Because to kill for mankind and to die for mankind are the same thing."
+
+"Killing people the way we do, we've got no right to treasure our own lives... none. That is what a Bureau agent is. What we kill includes ourselves."
+
+Cloth away, Daeri Song Ju-ik slides the sword home into its scabbard.
+
+"If there is a risk factor, we incinerate without mercy, civilians included. A person who does that has no business finding his own life precious."
+
+"Political instruction over. From now on, no hesitating. What you took for a civilian may be a vampire in disguise. Answer."
+
+{{user}}'s acknowledgment rings out.
+
+"Then we move. Vampires will show soon. Careful. One bite and you are finished."
+
+*     *     *
+
+"KAHAAACK!"
+
+Processing vampires is not difficult. No special powers needed; the Sword Corps has the Bureau's custom blades and the Sword Corps' sword arts.
+
+The targeted vampire is dispatched with ease, and the missions continue. While the suppression and incineration units scour the city, the Sword Corps passes the time assassinating high-risk entities like vampires. Rest in shifts at the rally point, redeploy, repeat — until.
+
+"Hey...!"
+
+Daeri Song Ju-ik calls urgently.
+
+"On your guard! Our Bureau's archenemy has appeared!"
+
+"The Fake Bureau! They're here!"
+
+{{user}} asks whether the Fake Bureau has truly appeared, and Daeri Song Ju-ik nods.
+
+"Yes! Ah — you can't get the details right now, no database. If the approval had come down a little sooner, you'd have walked in with it."
+
+{{user}}'s reply — that hearing it put that way stings a little — is still leaving the mouth when.
+
+<img=Song Ju-ik_scared>
+
+"S, Spangdal has appeared...! Understood!"
+
+Taking the transmission, Daeri Song Ju-ik's face hardens.
+
+"A high-risk entity has appeared! You know the Fake Bureau's Spangdal, I take it!"
+
+{{user}}'s answer: covered in agent training. A monster that appears suddenly from behind and leaves its victims a mass of thorns. That is the Spangdal the Bureau has defined.
+
+*     *     *
+
+Straight to the front line.
+
+*TUDADADADA!*
+
+Gunfire rings from every direction.
+
+"KIEEEEK!"
+
+"KYAHAAACK!"
+
+The city has long since been contaminated through. Even with the suppression unit's work, the seeds of contamination blooming across it could never all be pulled. But by a hair, Level 3 still holds. Without the merciless suppression, it would already be 4, and spreading.
+
+*Chzzzt.*
+
+Transmissions bleed through.
+
+ㅡGRAAAAGH! Spangdal, Spangdal is here!
+
+ㅡAgh... kh, khk — long live the Bur—
+
+ㅡFor mankiiiind!
+
+Agents who met Spangdal are dying in desperate resistance. The sound of comrades dying carries on across the radio.
+
+"Halt."
+
+Chajang Go Yeong-hun gives the order. The Sword Corps agents instantly take positions, watching every direction.
+
+"Only Spangdal is identified at present. But there is no telling what else is here. As you know, Spangdal frequently appears together with Jyaldi. Watch for that as well."
+
+While command builds the operation over the transmissions, Daeri Song Ju-ik speaks up.
+
+"In agent training you wouldn't have learned much depth on the Fake Bureau. Right?"
+
+{{user}} answers yes — only the thorn-fiend Spangdal, and only in passing. Daeri Song Ju-ik shrugs.
+
+"Well, that's all database material anyway."
+
+"You know Spangdal, so we skip him. I'll explain Jyaldi."
+
+Daeri Song Ju-ik's voice drops.
+
+"That thing is a devil that brings explosions. Where it appears, massive detonations tend to follow. Be careful. Spangdal at least leaves a corpse. Jyaldi doesn't leave even that."
+
+*KWAAAANG!*
+
+An explosion sounds.
+
+"That blast...! Jyaldi, is it!"
+
+{{user}}'s question of whether Jyaldi has appeared is not even finished when.
+
+"Quiet."
+
+Chajang Go Yeong-hun raises a hand. The tension running through the Sword Corps is palpable.
+
+<img=Go Young-hoon_thinking>
+
+"Jyaldi identification confirmed... what? Understood. All eyes on me."
+
+Every eye turns at Chajang Go Yeong-hun's words.
+
+"At present: Spangdal, Jyaldi. In addition, Gorgodio, Curas, and Kalehyu have been identified. We fight numerous Fake Bureau agents. Consult the database for countermeasures."
+
+Acknowledgments ring, and the Sword Corps agents stand motionless, eyes turned up at empty air. An uncanny sight.
+
+"Part of the suppression unit has taken annihilating losses. The Fake Bureau gets destroyed here. Confirm your entry routes."
+
+Per the order, the terminal shows the entry route.
+
+"Damn it...! How many of them came!"
+
+Daeri Song Ju-ik shouts in dismay. {{user}} agrees that it is indeed many, and Daeri Song Ju-ik shouts on.
+
+"Right! Like you were taught, they mostly show up where deviant phenomena and the foreign run rampant! True to the name 'Fake Bureau', they come as if to resolve the situation, and they do put on a show of fighting the foreign, but in practice all they do is eliminate our agents! This many showing up means this place must be a real hotspot!"
+
+"Entry routes confirmed!"
+
+"We enter in elements. Long live the Bureau!"
+
+"For mankind!"
+
+And with that, the operation begins.
+
+*Paat!*
+
+The Sword Corps agents move as if receiving information in real time.
+
+<img=Song Ju-ik_angry>
+
+"Focus! From here, one lapse and you die! This is nothing like fighting some vampire!"
+
+{{user}} apologizes, and Daeri Song Ju-ik, running alongside, spits a curse.
+
+"You'd better not die on me...! Aah, damn it!"
+
+"Spangdal is on our route!"
+
+Daeri Song Ju-ik's hand settles on his sword grip.
+
+"From this moment, watch your back! Spangdal appears from behind!"
+
+############## [36] C00-en-1 len=7976
+The tower in Gangnam looks like every other pharmaceutical headquarters on the block: thirty floors of blue glass, a lobby fountain, and a backlit sign promising *Beauty, Science, Tomorrow. Baekilmong Co., Ltd.* The security gate accepts {{user}}'s freshly printed pass with a cheerful chirp, and a staff member in a spotless uniform bows exactly fifteen degrees.
+
+"Congratulations on your acceptance. Selected candidates are in Lecture Hall A. This way, please. Only the selected candidates."
+
+The weight she puts on *only* is, presumably, just pride.
+
+Lecture Hall A is a theater-style auditorium, already filling with navy and charcoal suits. A hundred-odd new hires sit with the posture of people who have finally, *finally* made it through the door. Proud faces. Nervous faces. Phones being set to silent with ceremonial care. {{user}} finds a seat among them.
+
+Then the lights dim, and a spotlight hits the podium.
+
+**BANG.** Firework effects burst across the giant projection screen.
+
+**[WELCOME TO Baekilmong CO., LTD.!]**
+
+**[NEW EMPLOYEE ORIENTATION]**
+
+"Our new hires broke through competition of one hundred forty-five to one! You have every right to be proud of yourselves! Ha ha! Now, let us begin the new employee orientation!"
+
+Applause, polite and giddy. The emcee flips the slide with a flourish.
+
+**[YOU ARE THE CHOSEN!]**
+
+"In fact! Of everyone recruited through this hiring cycle, only a very special group has been invited here to Lecture Hall A! Congratulations! Having passed our aptitude screening, you have all been assigned to a special team: the Field Exploration Team!"
+
+The applause stumbles.
+
+"Assigned already?"
+
+"Field Exploration? Baekilmong has a team like that?"
+
+"It's a pharmaceutical company. Field exploration of what?"
+
+"…Doesn't that sound like the kind of name they give a posting they're exiling you to? Maybe it's not even the main office. Are they sweet-talking us into something…?"
+
+The murmurs run the rows in both directions while the emcee beams on, serenely unbothered.
+
+"Now, ahead of your formal appointment there is a short probationary period. Don't worry, it's not long! It is an absolute evaluation, assessing nothing but your practical aptitude. And of course, for each of you to be evaluated properly, active participation is essential, yes? Free riders will be identified!"
+
+Somewhere at the back of the hall, a door swings shut.
+
+*Kung.* Then another, and another, down the length of the hall. *Kung. Kung-kung.* Heavy, soft, final. Less like doors closing and more like something being sealed. A few heads turn. Most don't.
+
+The emcee spreads his arms wide, haloed in projector light.
+
+"Everyone ready? Then! Let's begin!"
+
+And with that bright, bouncing voice, the lights went out.
+
+"…?"
+
+"Huh?"
+
+Confusion, but the mild kind. Half the hall assumes a video is about to play. That much is understandable. Nobody shows up to their first day of work expecting the lecture hall to *change*.
+
+For instance: nobody expects the Uh-doom to lift and reveal, in place of the auditorium, the interior of a dim subway train. The new hires are still seated in their neat rows, in their suits, on worn metro seats under flickering fluorescent light, as though the entire hall had simply been *poured* into a train car.
+
+**[Passengers, thank you for riding with Abyss Transit Corporation today…. This train does not stop running.]**
+
+**[For a pleasant journey to your final destination, please listen carefully to all onboard announcements.]**
+
+"……!?"
+
+"Wh… what is this!?"
+
+People shoot up out of the seats. Someone yanks at the doors between cars. Sealed. Through the front window, other passengers are visible in the next car. Suits. Familiar faces from the hall. But no amount of waving produces a response. Phones come out. No signal, no data, not even the time.
+
+"Is this VR? Did they actually move us somewhere?"
+
+"There are people in the next car! The door won't open, though… hey! Hey!"
+
+"Some kind of new technology?"
+
+Then the speakers chime.
+
+**[This stop is: Sorrow. Sorrow Station.]**
+
+**[Doors open on the right.]**
+
+The train sighs to a halt. Beyond the windows a subway platform emerges from the dark. Dim, damp-looking, but ordinary. Screen doors part with the same domestic *shhk* as every commute of every morning of ordinary life.
+
+**[Doors will close in thirty seconds. There is no going back.]**
+
+**[Passengers whose final destination is Sorrow Station must disembark now, as directed.]**
+
+"Look outside! It's just a subway station!"
+
+Someone else mutters back.
+
+"Sorrow Station? What is that, is that a joke? There's no station with that name in this country."
+
+"Then it's part of the evaluation! They said participation matters…!"
+
+"Still…."
+
+"Hey, the doors are closing!"
+
+Three, four people bolt for the open doors. Others hover half-risen, caught between seats and exit, until.
+
+**[Doors closing.]**
+
+"Ah…!"
+
+"Damn it, missed it."
+
+The doors seal. Out on the platform, the ones who made it wave back at the train, and the ones who didn't click their tongues in envy.
+
+Then the ceiling of Sorrow Station begins to weep.
+
+Silver droplets bead out of the concrete, out of the pillars, out of the signage. Dozens, then hundreds. They rain down on the platform in a single hissing sheet, and where they touch the people below, they go through business attire and skin like molten metal through wax paper. It is over before any of the waving hands finish falling. What is left on the platform doesn't look like people anymore, and some of it is still twitching.
+
+Blood clings to the outside of the window glass in a long, lazy streak.
+
+**[This train is now departing Sorrow Station.]**
+
+"AAAAAH!"
+
+"What… what the hell, what the hell, WHAT THE HELL…!"
+
+The car finally, properly, breaks. Screaming, retching, a man clawing at the sealed doors, a woman praying into her clasped hands at machine-gun speed. The train hums along its rails, serene.
+
+**[For a pleasant journey to your final destination, please listen carefully to all onboard announcements.]**
+
+How long does it take for screaming to run out? As it turns out, about one station's worth.
+
+**[This stop is: Grudge. Grudge Station.]**
+
+**[Doors open on the right.]**
+
+Nobody moves. Nobody even breathes toward the doors. The platform outside sits empty and dark, the doors gape for their thirty seconds, and the train slides on. In the ringing silence afterward, the survivors of the car, eight of them including {{user}}, begin very quietly to talk.
+
+"Grudge, just now… that's grudge like, when you hate someone. Right?"
+
+"Yes…."
+
+"No calls, no data, nothing… ha… what even is this…."
+
+"……"
+
+A short-haired woman with a calm, steady impression exhales from a few seats down, dragging a hand through her hair.
+
+<img=Go Young-eun_default>
+
+"Hah…. This is like some WeTube ghost story."
+
+She says it mostly to herself, but in the silence it carries. A few heads turn, and she flushes slightly but doesn't retract it.
+
+"Sorry. It's just… all of it. The lecture hall turning into a subway out of nowhere, and people… dying like that."
+
+Her face loses a little color, and she presses her lips together.
+
+"…Sorry. I shouldn't have brought that up."
+
+"Um."
+
+A careful voice, close by. A curly-haired man with a mild, somewhat meek impression has drifted over. He'd been hovering at the edge of the car's huddle without managing to join any of it, rubbing the back of his neck.
+
+<img=Baek Sa-heon_shy>
+
+"You were… sitting next to me, back in the lecture hall. Right?"
+
+Only then does {{user}} vaguely recall that someone had indeed been in the next seat. There had been no attention to spare at the time.
+
+He looks between {{user}} and the short-haired woman, and finally sticks out his hand as if committing to something.
+
+<img=Baek Sa-heon_serious>
+
+"I'm Baek Saheon."
+
+The short-haired woman straightens up and extends her hand as well.
+
+<img=Go Young-eun_serious>
+
+"Given the circumstances, we might as well know each other's names. I'm Go Young-eun."
+
+############## [37] C00-en-2 len=8468
+Monday morning. First day of work at Baekilmong Co., Ltd.
+
+{{user}} comes down through the officetel lobby, company housing fifteen minutes on foot from headquarters, and runs into Go Young-eun by the doors. Same intake: one of the handful of new hires who walked out of that orientation alive, and the one who had offered a handshake and her name in the middle of it. She takes one look at {{user}} and winces with sympathy.
+
+<img=Go Young-eun_surprised>
+
+"Oh, {{user}}. Are you okay? Did you… sleep at all?"
+
+"Oh dear…."
+
+She doesn't wait for a convincing answer. Nobody who survived that orientation has one.
+
+The two new hires walk the fifteen minutes to headquarters trading small talk in a minor key. Along the way they pass a few others from the same intake, recognizable by that identical stiffness in the shoulders. Nobody waves. A nod, eyes forward. Badge at the gate, into the elevator.
+
+Yeongeun watches the numbers climb.
+
+"I heard Field Exploration uses floors ten through fifteen…."
+
+The doors open on 10, and she takes a breath.
+
+<img=Go Young-eun_serious>
+
+"Ah, this is me. {{user}}…, let's fight through this. Fighting."
+
+The doors close on her small, determined fist.
+
+Thirteenth floor. The corridor is split into lettered sections, and {{user}} finds the automatic door printed with a big **D**. One button press, one greeting into the office, and.
+
+"Oh!"
+
+"There we go, the rookie's here."
+
+A handful of adults look up from their desks in a fairly spacious office. A man built like a college athlete is out of his chair first, hand extended.
+
+<img=Park Min-seong_smile>
+
+"Welcome to 15th-intake Squad D."
+
+Behind him, a woman with a chin-length bob and a face with no expression on it nods and picks up where he left off.
+
+<img=Eun Ha-je_default>
+
+"For your information, people say the D stands for how the new hires here all end up. Dead."
+
+"……"
+
+"That's a joke."
+
+*'Is it too late to resign, five minutes into day one?'*
+
+Mercifully, no one seems to expect a response. The desks have already moved on.
+
+"Anyway… congratulations on clearing the death survival."
+
+*'Is he allowed to just call it that? Out loud? In the office?'*
+
+"We heard about your intake, too. Impressive, all things considered."
+
+The athletic one grins.
+
+"Good to have you in our squad."
+
+There is, apparently, one upside to a department this overworked: no hazing. No one has the spare energy for it.
+
+"The Jo-jang will be in later. He's out on fieldwork, so make yourself comfortable till then!"
+
+"Sit there for now."
+
+The bob-haired woman points her chin at the guest sofa beside the partition: four desks pushed front-to-front, a low table, and on the table, for some reason, an honest-to-god 1980s radio, wood veneer and chrome dials.
+
+{{user}} sits.
+
+And the moment {{user}}'s weight settles into the cushions, as if on cue, the radio crackles to life on its own. A peppy jingle, then a bright, tinny announcer's voice.
+
+"Good morning, this is your Live Traffic Report! Roads across Seoul are moving smooth and easy, matching today's clear and cloudless skies…."
+
+Beyond the office window, rain crawls down the glass in long gray lines.
+
+"Really, a picture-perfect morning! Though drivers should note, from this afternoon…."
+
+*Click.*
+
+The athletic senior reaches over and switches it off, entirely casual, as though muting a commercial.
+
+"This thing's basically a daily fortune. A relatively safe urban legend. Verified Twilight-grade Uh-doom."
+
+He catches himself and holds up a hand.
+
+<img=Park Min-seong_thinking>
+
+"Hold on. You just thought, what's an urban legend, what's an Uh-doom, what is this otaku on about. Right?"
+
+He looks far too pleased about it.
+
+"For exactly this kind of rookie, we have prepared. Ta-daa."
+
+A tablet PC lands on the low table.
+
+"Watch it through."
+
+A few taps, and a video begins to play.
+
+**<FIELD EXPLORATION TEAM: NEW EMPLOYEE TRAINING VIDEO>**
+
+Low-bitrate orchestral music, bright and tinny, of a vintage somewhere around the '88 Olympics. Two animated mascots in hanbok, a red fox and a yellow dragon, bow deeply to the camera.
+
+"Dear new employee, full of dreams and passion! Welcome to the Baekilmong Co., Ltd. Field Exploration Team!"
+
+"Today, we'll show you all about the wonderful work the Field Exploration Team does!"
+
+"But first!"
+
+Blocky retro subtitles stamp across the screen.
+
+**[WHAT KIND OF COMPANY IS Baekilmong CO., LTD.?]**
+
+"You thought we only made hair-loss medicine? Oh my gosh! In fact, Baekilmong can make every medicine you could ever need! A magic company making truly magical medicine!"
+
+The fox winks and raises one finger.
+
+"But! Magic medicine needs a magic ingredient. And that is… Kkumgyeol!"
+
+The word blooms across the screen in golden letters, hearts and stars popping around a river of glittering liquid like something out of a toddler's cartoon.
+
+"Kkumgyeol is harvested from supernatural phenomena! Did you know that strange phenomena still occur in our modern world? 'Sleep with the fan on in a sealed room and you'll die.' 'Get cursed at and you'll live long.' All superstition! Urban legends!"
+
+On screen, a cartoon alley shadow sprouts red eyes, and an electric fan flicks its tongue over a sleeping man.
+
+"But sometimes, those urban legends come true!"
+
+"And Baekilmong manages those urban legends, collects precious Kkumgyeol, and turns it into wonderful magic medicine that grants people's wishes!"
+
+"Yongyong-ssi, who could possibly gather all that Kkumgyeol for us?"
+
+"That's right! It's our amazing Field Exploration Team!"
+
+A chibi office worker in a suit gives a heroic thumbs-up amid assorted impossible catastrophes, brandishing a graduated metal cylinder while the mascots applaud.
+
+**[KKUMGYEOL COLLECTOR]**
+
+"So grab your Kkumgyeol Collector, and step bravely and wisely into the Uh-doom!"
+
+"The company's future rests on your shoulders! Fighting!!"
+
+Fireworks. Corporate logo. End of video.
+
+"……"
+
+"Well? Educational, right?"
+
+The athletic senior retrieves the tablet, entirely sincere.
+
+"…Yeah, our department's work is kind of like that."
+
+He offers his hand again, this time for a proper handshake.
+
+"Ah, introductions first. {{user}}, was it? That over there is Dae-ri Eun Ha-je."
+
+The bob-haired woman waves a hand vaguely from her desk without looking up, then lets it drop.
+
+<img=Park Min-seong_default>
+
+The athletic-looking man grins and hooks a thumb toward himself.
+
+"I'm Park Min-seong. Joo-im."
+
+At {{user}}'s overly formal greeting, Minseong laughs.
+
+"Haha, you really don't have to be that polite with me."
+
+At the puzzled reaction, he waves a hand.
+
+"Stick around this department for about a year and pretty much everyone makes Joo-im. You'll be there soon enough. Soon."
+
+Eun Ha-je cuts in from the side, utterly matter-of-fact.
+
+"You might die before that, though."
+
+"Ah, sunbae!"
+
+"What? Better to know. Like you just saw in the training video, this is dangerous work."
+
+Dae-ri Eun Ha-je jerks her chin.
+
+"Quitting isn't a bad option either. There are plenty of jobs in the world."
+
+When {{user}} indicates an intention to stick with it for now.
+
+"Hm. Good."
+
+"Ooh, enthusiasm."
+
+The two seniors nod, apparently satisfied. Haje adds one more reassurance.
+
+"Ghost stories, urban legends, whatever you call them, we do have response manuals. So don't worry more than you need to."
+
+Minseong lowers his voice slightly.
+
+"Oh, and around here we call them 'Uh-doom.' If you don't want people outside the department looking at you like some ghost-story otaku, just call them that."
+
+{{user}} silently nods.
+
+"So. You understood the manual?"
+
+After {{user}} finishes going through the field manual Minseong handed over and nods again.
+
+"Mm. Good, good."
+
+With introductions out of the way, the two seniors begin handing over the basic things a new field employee needs.
+
+The first is a small cylinder sealed in hard plastic, shaped almost like an elongated die and visibly worn from use.
+
+"You saw this in the video, right? Kkumgyeol Collector."
+
+Haje indicates the device.
+
+"Make sure you don't lose it. Every one of those has an individual number on it, so if one goes missing, it becomes a real headache."
+
+Then she adds one more thing.
+
+"And get into the habit of putting your mask on before entering an Uh-doom. Don't ask why. let me see what mask you got."
+
+{{user}} opens the gift bag received after passing orientation and pulls out the mask.
+
+It has a smooth surface and a simple shape that would cover only the area above the nose.
+
+But this shape is….
+
+############## [38] C00-en-3 len=5308
+9:00 AM, thirteenth floor, Squad D's office.
+
+"We keep a few Uh-doom on a regular maintenance cycle."
+
+Dae-ri Eun Ha-je says it without preamble, without looking up from her terminal.
+
+<img=Eun Ha-je_default>
+
+"We're going into one of them today. Don't worry too much. It's a Dusk."
+
+"Right! It's about what you went through at orientation, {{user}}. About that much!"
+
+Joo-im Park Min-seong offers this as a comfort. The Field Exploration Team's sense of proportion broke a long time ago, and both of them are smiling like people handing over a housewarming gift.
+
+"You cleared one of these headfirst with no manual at all. With a manual, there's no reason you can't."
+
+"Just don't improvise in there and you'll be fine. Got it?"
+
+Minseong holds out a tablet.
+
+**[TUESDAY QUIZ SHOW / DUSK (D) GRADE]**
+**[Qterw-D-43]**
+
+**[Entry medium: postcard. Sign the sender field to enter.]**
+**[Summary: One day I find a strange postcard in an old magazine. Enclosed is an advertisement recruiting contestants for a quiz show. I search for the program and find that no such broadcast exists, so it must just be the theme of some vintage stationery. Amused, I write my own name in the sender field for fun. And then I am dragged into a very strange quiz show.]**
+
+"See it? You go in as a contestant on a quiz program."
+
+"Miss a question and you take a penalty. The penalties are, ah. Unpleasant. That kind of Uh-doom."
+
+"But we've already got the whole answer key, so we're fine. Seriously, relax."
+
+<img=Park Min-seong_proud>
+
+Minseong grins, gives a thumbs up, and forwards a PDF to {{user}}'s terminal: past questions collected across dozens of entries, each paired with a verified answer.
+
+"For now, memorize that and go back over the field manual. Jo-jang gets back this afternoon, and we'll go in then."
+
+Jo-jang Lee Ja-heon has been out on assignment for three days.
+
+An hour later, that plan dies.
+
+"Hold on. Our Jo-jang is still out on assign, so, no. No, that's not possible."
+
+Haje's expression flattens as she listens. She hangs up harder than necessary.
+
+<img=Eun Ha-je_annoyed>
+
+"Have they lost their minds. Saying that since we have a new hire, that makes three."
+
+"Wait, seriously? They said that?"
+
+"They did. It's the end of the month."
+
+Somewhere above this floor, a quota is short, and somewhere in a spreadsheet, {{user}} has apparently been counted as a whole person.
+
+Haje thinks about it for a short, unpleasant moment.
+
+"{{user}}. Have you got that memorized?"
+
+Before {{user}} can open their mouth, Minseong answers for them.
+
+"Oh, they've got it. They memorized the entire exploration manual, that brick of a thing!"
+
+"Good." Haje stands. "Then it's just us today."
+
+The entry medium arrives by hand from another department: a single postcard.
+
+It is old. The stamp is old. And the recipient field is already crammed with bizarre characters layered over one another. Along the top edge, in print fine as dust, the word *Application* repeats without a break.
+
+Like a curse.
+
+"You just sign it. Sender field."
+
+"If it creeps you out, don't use your real name. Just put down your mask."
+
+Haje takes the pen first and writes **PEREGRINE**. Minseong follows with **BADGER**.
+
+The pen comes to {{user}}. The sender field is blank.
+
+And the instant the signature is finished and the nib lifts from the card, {{user}}'s consciousness is pulled out and drawn down into the postcard.
+
+**[Ah, they're here at last. Our applicants!]**
+
+Light, first. Stage light, blinding, everywhere.
+
+Through the glare, a bright and buoyant voice strikes the ear, and a hand in a well-pressed suit extends itself for a handshake.
+
+Where a head should be, there is an old cathode-ray television.
+
+An emoticon face is displayed on it. Smiling.
+
+<img=Brownie_happy>
+
+**[Welcome, welcome. Now then, the cameras roll shortly. Let's put on our best faces and give them a wonderful show!]**
+
+The presenter spins on his heel and throws both arms wide.
+
+**[Ladies and gentlemen in the audience!]**
+
+The cheer comes back enormous. The house lights blur the figures in the seats into shapes, and none of the shapes resolve.
+
+{{user}} is standing on a brightly painted podium. Peregrine and Badger stand at podiums of their own.
+
+**[Three, two, one…. And now, the show begins!]**
+
+The live broadcast begins.
+
+To a jaunty run from the band, the suited presenter waves to the cheering audience.
+
+It is a classic American talk show in every respect.
+
+Except that the staff all have smeared-out faces, and the presenter has an old television where his head should be.
+
+<img=Brownie_excited>
+
+**[Good evening, viewers! The joy of Tuesday, the heat of Tuesday.]**
+
+**[You are watching, right now! The 'Tuesday Quiz Show'!]**
+
+**[Have you all been waiting for Tuesday? So have I! It's the only day we get to see our lovely new faces, the quiz show contestants!]**
+
+**[And astonishingly… not a single wrong answer in the past several dozen weeks! Astonishing. Just astonishing….]**
+
+**[Will today's contestants keep the streak alive?]**
+
+*Ba-bam-bam-ba-bam!*
+
+A fanfare, and the lights swing down.
+
+Seven podiums, arranged in a semicircle.
+
+Three of them, pinpointed: the ones where {{user}}, the Joo-im, and the Dae-ri stand.
+
+**[Badger and Peregrine! And… ohh, this week's dazzling new face!]**
+
+**[A big round of applause, everyone!]**
+
+############## [39] C00-en-4 len=6899
+A few days later, morning. Seventeenth floor, Research Team 1's office.
+
+Squad D takes the summons upstairs as naturally as they have all month, and walks into something unexpected.
+
+"Good morning."
+
+The office already has guests. People in animal masks of every kind. Roughly seven of them.
+
+"Ah."
+
+"This is… hm."
+
+While the Squad D seniors produce short reactions somewhere between awe and dread, Dae-ri Eun Ha-je drifts close and speaks at a volume that carries nowhere.
+
+<img=Eun Ha-je_default>
+
+"See the ones with the gold mark stamped on their masks? That's Squad A. The Elite Squad."
+
+A strange butterfly, a mantis, a mallard. Squad A's masks number three.
+
+Then the mallard mask calls over. The vigorous voice of a woman in her later years.
+
+"Ah, so that's the new hire?"
+
+<img=Baek Seok-ju_default>
+
+"Good, good. Come see me sometime if you get the chance. A young person with a bright future ahead."
+
+And she brushes past to take her seat. That would be Squad A's Jo-jang.
+
+"And the masks with no gold mark are Squad Y. Squad Y's Jo-jang isn't a Gwa-jang, just a regular employee. Don't ask. Let it be."
+
+Squad Y carries a faintly gloomy air. At its edge, a long-haired new hire in a cow mask stands leaning against a desk, head quietly bowed.
+
+<img=Jang Heo-un_sad>
+
+Joo-im Park Min-seong whispers from the other side.
+
+"Hey, {{user}}. The other squads today, especially Squad Y? Keep it polite and keep it distant, alright? I'll explain why later."
+
+"Ohh, our Squad D has finally arrived. Welcome, welcome~ Right then, let's get today's briefing going."
+
+Gwa-jang Kwak Je-gang appears and begins herding everyone toward the adjoining conference room.
+
+"We're entering alongside the other squads?"
+
+"That's right. That's right."
+
+"Now then, if everyone's seated, we'll start the briefing."
+
+Kwak stands at the conference room board without even switching on the prompter.
+
+<img=Kwak Je-gang_lovestruck>
+
+"About today's Uh-doom, I'd like to tell you… is what I'd say, but!"
+
+He laughs pleasantly.
+
+"Truth is, we don't know anything either."
+
+"…What is that supposed to mean, Gwa-jang Kwak."
+
+"It means we have exactly one piece of civilian escape data!"
+
+Documents are passed around in silence. Barely more than a memo.
+
+**[During a club retreat at the Hanmaeum Gadeuk Pension, Gangwon-do, all twelve university students playing a board game went missing.]**
+**[The board game in question bears the title 'Amusement Theme Park! ~A Joyful Fantasy-Land Trip~', presumed to be a product of the Amusement Research Institute.]**
+**[Survivors state the board game 'was already placed inside the pension'. The pension owner denies this.]**
+**[Result: partial return after 17 hours. Survivors testify to having 'lived inside the board game's theme park'. Presenting derangement, PTSD responses, and mild neuroses.]**
+**[4 survived, 1 missing, 7 dead]**
+
+The next page holds short statements from each survivor. The trauma runs deep; every account is fragmentary.
+
+"The board game seats more than ten, then? So that's why the headcount is this large."
+
+"Yes, yes, we've tried to recreate the closest possible conditions."
+
+Kwak winks.
+
+"Still! Even under these conditions, our team has secured a confirmed method of entry."
+
+<img=Jin Na-sol_thinking>
+
+"You just brought the board game, didn't you?"
+
+"Haha! Harsh words, Dae-ri Jin. We learned the rules too, you know."
+
+The butterfly-masked Squad A employee doesn't answer, and Kwak, unbothered, sets the board game on the table.
+
+**[AMUSEMENT THEME PARK!]**
+**[~A Joyful Fantasy-Land Trip~]**
+**[: Be the first team to ride 3 fantasy attractions with your teammates and claim your prize!]**
+
+The box is nearly mint. A colorful fantasy land is painted across the lid, and inside wait a picture map of the park divided into zones, and piles of brightly colored coins.
+
+"Now, we divide into teams and start the game."
+
+He says *go on into the Uh-doom where more than half the people died* so very cheerfully.
+
+"Should we just team up by squad, then?"
+
+"Ah, about that… you draw a game piece from this capsule here, and the color decides your team!"
+
+With sighs all around, people shake the capsule and draw pieces one by one. Blue, yellow, red. These things tend to run by seniority, so the capsule reaches {{user}} nearly last.
+
+*Rattle.* The piece that drops out is, of course, red.
+
+"Oh. Red, huh."
+
+Minseong lowers his voice at {{user}}'s side.
+
+<img=Park Min-seong_serious>
+
+"…{{user}}. One thing. That Gwa-jang Kwak is famous for rigging weird combinations on purpose to squeeze out data. Today's setup smells like that too. When the colors group up, look hard at your teammates."
+
+The other reds: Squad A's butterfly mask, the one called Dae-ri Jin. And Squad Y's cow-masked new hire.
+
+"Now, unfold the board and in we go!"
+
+But the board is unfolded, and nothing happens.
+
+Four yellow. Four blue. And red: three.
+
+"We are one short."
+
+Jo-jang Lee Ja-heon turns toward Kwak, pupils narrowed to vertical slits.
+
+"It appears eleven cannot enter. We must fill all twelve and try again."
+
+"Oh, that?"
+
+Kwak answers as if it's nothing, and tosses the capsule.
+
+<img=Kwak Je-gang_smug>
+
+"Joo-im Lee! Catch!"
+
+To the researcher standing right beside him.
+
+"Wh, whuh…?!"
+
+The researcher catches it on reflex.
+
+*Rattle.*
+
+The last red piece rolls out.
+
+"…!?"
+
+"I, I drew it!"
+
+**-Departing for Fantasy Land~**
+
+The game board flies up into the air and swallows the view.
+
+"AAAAGH!"
+
+"Hahahahaha!"
+
+<img=Kwak Je-gang_laughing>
+
+The researcher's scream. And Gwa-jang Kwak's laughter.
+
+**-♩♪♬♬~♩♬♬~♩♪♪**
+
+A jaunty melodica over an orchestra. Textbook theme park BGM.
+
+Eyes open onto the middle of a theme park, colorful to the point of being quaint.
+
+**-Hahahaha!**
+
+Children's laughter rings out. But not one bare human face is anywhere in sight. The only things ambling about are mascots. Far off, costumed guests seem visible, maybe.
+
+On {{user}}'s wrist, at some point, a paper band has been fastened.
+
+**[(AMUSEMENT) FANTASY LAND BOARDING PASS □□□]**
+
+Three empty boxes.
+
+Dropped into the same spot: four people. Butterfly-masked Dae-ri Jin, the cow-masked new hire, and the researcher, white as paper.
+
+"Aaagh, hhk, hhhk…. Let, let me out. This is wrong, this is all wro…!"
+
+That instant.
+
+*Snap.*
+
+The music cuts. The laughter cuts. Every mascot in the theme park turns, in unison, to look this way.
+
+"…Hiik."
+
+The scream crawls back down the researcher's throat. In the silence, a measuring interval passes.
+
+3.
+
+2.
+
+1.
+
+**-Hahahaha!**
+
+**-♩♪♬♬~♩♬♬~♩♪♪**
+
+The noise returns. The gazes disperse. The theme park spins back to cheerful life as though nothing happened.
+
+And Dae-ri Jin's fist cracks across the researcher's jaw.
+
+*Thud.* A short, blunt sound, and then the butterfly mask seizes the researcher's jaw and leans in, low and grim.
+
+<img=Jin Na-sol_annoyed>
+
+"Hey."
+
+"……!"
+
+"Whine one more time, and I kill you first before we even start."
+
+############## [40] C00-en-5 len=5934
+Evening. A hanwoo barbecue place near the office.
+
+A Squad D dinner, on the official pretext of celebrating a first Uh-doom cleared.
+
+*Sssss.* Beef crisps to perfection on the grill plate.
+
+"The Jo-jang's personality is, mm, distinctive, but his ability is the real thing."
+
+"Right. You really did land in the right squad."
+
+While Joo-im Park Min-seong and Dae-ri Eun Ha-je take turns refilling glasses, Jo-jang Lee Ja-heon eats in silence at the head of the table, at a fixed, mechanical pace.
+
+Then, mid-reach for the scallion salad, the Jo-jang asks abruptly.
+
+<img=Lee Ja-heon_default>
+
+"Will you be saving your points?"
+
+"……"
+
+Whatever the answer is, what comes back is one line.
+
+"I see."
+
+And silence. The Jo-jang returns to the scallions.
+
+Minseong pokes {{user}} in the side and whispers.
+
+"That's just how the Gwa-jang talks. You have to hand the question back to him or the next part never comes."
+
+Haje asks it for the table.
+
+"Jo-jang. Is there some other useful way to spend points?"
+
+"Yes."
+
+"What use would that be?"
+
+"Custom equipment."
+
+Every pair of chopsticks stops at once.
+
+"Ah, right. This one doesn't have any yet."
+
+An employee whose usefulness has been recognized receives, with company backing, supernatural equipment of their very own. Nothing cartoonish; a small, particular advantage. But inside an Uh-doom, that *small* is the difference between living and dying.
+
+"And hey, it's the kind of Uh-doom you can only run on a moonlit night!"
+
+Minseong points at the moon outside the window, and with a *strike while the iron's hot*, the seniors are up and moving. Destination: the Annex beside headquarters.
+
+"This is where they isolate and store the comparatively safe, useful Gwe-dam. In-house, we mostly call this tier 'Twilight grade'."
+
+Officially, E grade. But the tier is a curated shelf of the useful ones, so everyone uses the proper name instead.
+
+"{{user}}, you saw that office radio on day one, right? It reads out the day's fortune, and that's genuinely handy. That kind of thing."
+
+Badge against the reader, into the Annex ground floor, and a stairwell leads down. At the bottom of the stairs, someone sits at a dim reception desk.
+
+Black clothing head to toe. Mask, sunglasses, and a hat on top of it. A distinctly odd silhouette.
+
+The Joo-im springs forward at once.
+
+<img=Park Min-seong_default>
+
+"Hello! Field Exploration Squad D, here for new-hire training. We'd like access clearance for Twilight grade Uh-doom number 99."
+
+The black figure regards the Joo-im for a moment, as if verifying something.
+
+*Nod.*
+
+The figure presses a button on the desk, and one of the emergency doors behind it swings open.
+
+*Creak.*
+
+Beyond it, a corridor lined with countless doors.
+
+"Don't open any of the other rooms, not even by accident. I mean, they'll be locked anyway, but let's not even touch the handles."
+
+The group stops before the door marked '99', and Haje sets her badge on the reader.
+
+*Clack.*
+
+"In we go."
+
+Beyond the door is a greenhouse thick with weeds, drowned in moonlight. And at its exact center, one rusted machine stands catching the light.
+
+An aged plaque beside the machine reads:
+
+**[KIND SEED KIT / Qterw-E-99]**
+**[Treats objects as plants: extracts genetic information for crossbreeding and sowing. Powered by moonlight.]**
+
+"Put two objects in, and it mixes their traits into one new object. Our department practically has exclusive rights to this one!"
+
+"Usage fee is 1000p per run. The Twilight grades in the Annex only turn on if you pay."
+
+"Ah, once you make Joo-im it's free twice a year. So the usual move is to wait for the promotion, honestly."
+
+Haje shrugs.
+
+<img=Eun Ha-je_default>
+
+"If the Jo-jang brought it up, it means don't wait."
+
+And one more piece of custom gets appended: when a squad member makes their first custom equipment, someone in the squad lends their own equipment once, free of charge. One of the two slots only. The other slot is your own object.
+
+"For reference, what comes out of it… A while back, some employee put in a special tumbler and a plain backpack. Tumbler where any liquid poured in after sunrise doesn't run dry until sunset. What came out was the backpack, and the backpack dispensed liquid. Up to eighty-seven liters."
+
+"The trait gets inherited. Better the source, better the result."
+
+"And the Jo-jang's equipment is the best in our squad, so."
+
+Haje's gaze slides to the head of the, no, to the side of the machine.
+
+Jo-jang Lee Ja-heon wordlessly draws something from his pocket.
+
+A small knife with an ash-grey sheen.
+
+"A butter knife. Cut the medium used to enter an Uh-doom, and it splits space, allowing small objects to be sent through."
+
+The Jo-jang steps up to the machine, and quaint lettering surfaces on the aged LCD screen.
+
+**[Please give me a plant 0/2]**
+
+The knife touches the machine. A light sweeps across it like a scan.
+
+**[Plant information saved]**
+
+**[Please give me a plant 1/2]**
+
+"Now you just put in whatever you want next. ……Ah, hold on."
+
+Haje adds hastily, rapping a sign fixed to the machine's front.
+
+**※ABSOLUTELY NO PLANTS**
+
+"Never, ever feed it an actual plant, no matter how it asks."
+
+"The sensor at the door filters out plants anyway, but I'm saying it just in case. Once, some employee tore up the weeds around here and fed it two of them… took the Guard Team seven days to put it down. All three people on site died."
+
+Which is when it becomes apparent: every weed choking this greenhouse is artificial.
+
+Registration complete, the Jo-jang slips the knife back into his suit pocket and straightens.
+
+"The other slot usually takes an ordinary, convenient object. In that case, the supernatural trait may be inherited weakly, or, with low probability, not at all."
+
+The machine's screen blinks under the moonlight.
+
+**[Please give me a plant 1/2]**
+
+One slot remains. Every gaze in the greenhouse gathers on {{user}}.
+
+"Well. Your turn."
+
+Minseong grins.
+
+"What are you putting in?"
+
+############## [41] C00-en-6 len=2929
+Night. The company housing officetel.
+
+Mixed in among the belongings brought back from the last assignment: one box with no memory attached to how it got there.
+
+A colorful gift box, two palms wide. An item that appears on no line of the mission settlement.
+
+**[GOOD FRIEND GIFT SET]**
+**['Amusement Theme Park Souvenir Shop']**
+
+The copy on the outer wrapping reads:
+
+**[Your adorable animal doll. It will always go with you and protect you.]**
+**[Always.]**
+
+On the desk, under the lamp, the box comes open.
+
+The contents sit tidily in a partitioned tray.
+
+One small, fluffy animal plush keyring. An instruction sheet folded several times over. A mini water bottle printed *100ml*. A single-serving spoon pack of salt. A box of matches. And one coin, gleaming as though minted this morning.
+
+The tray has seven compartments. Six are filled. Only the last one is empty.
+
+A thoughtful arrangement. Excessively so.
+
+The label on the empty compartment reads:
+
+**[An object connected to your friend (please prepare your own!)]**
+
+The instruction sheet unfolds into cheerful typeface.
+
+**[· Materials for the Invitation]**
+**[Matches (or a lighter) / 100 ml of water / one spoonful of salt / one coin (a clean one) / an object connected to your friend]**
+
+**[· The Invitation Rite]**
+**[1. With a water-dipped finger, draw the enclosed hexagram design on a smooth floor.]**
+**[2. Place the 'Good Friend' at the hexagram's exact center.]**
+**[3. Set the coin on the 'Good Friend''s belly. No water may remain on your fingers at this step.]**
+**[4. Hold a spoonful of salt in your mouth, and burn the object connected to your friend.]**
+**[5. When the 'Good Friend' begins to speak, swallow the salt and return the greeting warmly!]**
+
+**[If the coin has vanished, you have succeeded! You have met a steadfast friend. Be together always, and cherish them!]**
+
+**[※If the salt cannot be swallowed, tastes strange, turns to ash, or causes bleeding, RUN.]**
+
+On the back of the sheet, the hexagram design is enclosed. A kindly diagram, every line numbered.
+
+The officetel's wooden floor is smooth.
+
+Following the design, a water-dipped fingertip traces out the hexagram. Somewhat intricate, but nothing difficult.
+
+Except that the finished hexagram gleams strangely. Far too sleek for something drawn in water, its surface glistening without a single stray drop.
+
+The 'Good Friend' goes onto the center cell. Under the lamp, the doll's stitched eyes shine.
+
+Onto its belly goes the gleaming coin.
+
+The last of the water is wiped thoroughly from the fingertips against a sleeve.
+
+What remains: one box of matches, one unopened pack of salt.
+
+And one empty compartment in the tray.
+
+**[An object connected to your friend (please prepare your own!)]**
+
+And under the label, one line of very fine print.
+
+**[※The friend who comes to you depends on what you burn!]**
+
+The hexagram glistens quietly on the floor, waiting for the final material.
+
+############## [42] C00-en-7 len=7026
+In Jisan Village, a song was ringing out.
+
+It was a village stopped on the day of its holiday festival. Faded banners hung over the alleys, and where the market stalls had stood, overturned canopies and poles lay scattered. Through the alleys of a village long emptied of people, a hymn praising the Nameless One now rang, layer upon layer.
+
+The Nameless Radiance.
+
+Word that the cult kept a ritual hall beneath this village had reached the company three days ago. What the company wanted was not a fight. The hall's location and scale, and what the cult was digging for in this village. Confirm that much and come back. It was survey work, so the party was small. Six, counting {{user}}. For an escort, one Joo-im Lee Seong-hae of Elite Squad B.
+
+One Elite would be enough, went the judgment, and the judgment itself was probably not wrong.
+
+If only they had not been discovered.
+
+"The Nameless One is watching!"
+
+The believers poured out over the collapsed walls. As if they had been lying in wait. As if the village had not been empty at all, but had itself been the ambush.
+
+And the song they sang was the problem.
+
+Every time the singing swelled, something happened. An employee running ahead vanished at the corner of an alley. There was no sound. Another suddenly stopped walking, then, smiling like someone going out to greet a guest, walked toward the believers. He did not even turn at the voices calling him back.
+
+There was no grasping what was happening. That was what it meant to be entangled with this cult.
+
+<img=Lee Seong-hae_serious>
+
+"Don't look back. And don't listen to the song."
+
+Joo-im Lee Seong-hae stood ahead of {{user}}. White curls, a gold dolphin mask hanging at her neck. A believer that lunged at her vanished over a wall with one motion of her hand. Where he went was not visible.
+
+"We withdraw. Survey or not, this headcount won't do."
+
+The party of six had become four, falling back toward the mouth of the village.
+
+There, the situation flipped once more.
+
+From the direction of the national road, headlights poured in, one after another in a line.
+
+Black vans. Not one. The vehicles wedged slantwise across the village mouth, doors opened, and black suits stepped out. Sunglasses. Radios. The outline of submachine guns showing inside the suit jackets.
+
+The Bureau.
+
+<img=Lee Seong-hae_surprised>
+
+"...Huh. Why are they out here?"
+
+The answer came as gunfire.
+
+The Bureau did not distinguish. Believer or company employee, they opened firing lines on whatever entered their field of view. Radio chatter came through in pieces between the singing. Secure. Incinerate. All personnel. Words like that. An incendiary thrown from somewhere caught on a thatched roof, and the hymn turned to screaming.
+
+The village mouth, their line of retreat, had become a firing lane. The withdrawing party scattered where it stood. Over the radios, voices calling out positions tangled together, then cut off.
+
+"This way!"
+
+Lee Seong-hae grabbed {{user}} by the sleeve. Opposite the village mouth, deeper in.
+
+"The others broke for the fields. If we cut across now we walk into the suits' firing line. We loop around and rejoin!"
+
+They ducked low and ran between the collapsed walls. Dress shoes followed behind. Two. No, three. The gunfire did not come this way. That there was no gunfire was the worse sign. It meant there was someone here they intended to take alive.
+
+The alleys were littered with the festival's debris. A toppled village guardian post. Paper lanterns burst underfoot. Half-sunken walls and roofs sat drowned in the weeds, and a leaning utility pole trailed its severed lines. Over the smell of a village long empty, the smell of burning was now settling.
+
+The deeper they went, the further both the singing and the gunfire fell away. In their place, the pursuit clung on.
+
+"Hmm. Awkward ones to shake."
+
+Lee Seong-hae clicked her tongue as she ran. Her breathing had not wavered at all.
+
+<img=Lee Seong-hae_annoyed>
+
+"If I were alone I'd just turn around and tidy them up, but the sound would bring the rest running. With you along, that headcount is a bit much."
+
+Under a low hill stood a well of stacked stone.
+
+Its top was sealed with a heavy plate.
+
+"Oh, this."
+
+Lee Seong-hae saw the well and lightly clapped her hands.
+
+"I heard this well sits on good ground. A geomantic vein runs through it, and long ago the Bureau used it as a transit route for emergency dispatch to the provinces. Then sealed it over some procedural issue, they said."
+
+There was no chance the conduit was still alive. But it was a hole closed on every side, its inside invisible until someone leaned over the mouth. As a hiding place to let the pursuit wash past, it would do.
+
+{{user}} hurried to tear away the sealed top of the well.
+
+...Trapped, humid air escaped, leaving a strange smell as it went.
+
+"I'll watch from above. You go down first!"
+
+A foot went into the well. The footholds, mercifully, remained. Nothing crumbled. Wedging one foot after another into the wall, the descent went as fast as caution allowed. The stones were cold and slick, and the air rising from below smelled of earth and scale. The water had dried long ago.
+
+From above came the sound of Lee Seong-hae dragging the plate back over the mouth. The light shrank away and the well became total darkness. All that remained was to wait for the dress shoes to pass.
+
+And then, at last, feet touched the bottom of the well.
+
+In a dark that should have been absolute, a faint bloom of light began to rise underfoot.
+
+The darkness pooled on the floor was brightening from the inside out. The kind of light said to appear only when a transit signal engages where the veins gather. The conduit they said was sealed, after decades, with no one having touched a thing.
+
+The light grew stronger.
+
+Above, the plate slid aside again. Looking up with eyes grown used to the dark, the mouth framed Lee Seong-hae peering down. Behind her, radio chatter and dress shoes had closed in on the well.
+
+Reading the signs at once, she threw herself straight in.
+
+<img=Lee Seong-hae_lovestruck>
+
+"Pardon me, coming through!"
+
+The light swallowed everything.
+
+And so, a moment later, when the black suits reached the well and lowered their muzzles and their gazes into it, this was the sight that met them.
+
+There was nothing inside the well.
+
+* * *
+
+.......
+
+Dark.
+
+Loud.
+
+Sore muscles, and the bone-deep ache of having slept somewhere cold, wearing a body down.
+
+What pressed against the back was a concrete floor. Fluorescent light flickered beyond closed eyelids, and somewhere far off, something like a station announcement droned.
+
+There was no smell of burning. No singing, no gunfire. The air was smooth and cool, the air of a maintained interior.
+
+Right beside {{user}}, a familiar person lay collapsed. White curls, and a gold dolphin mask.
+
+This was a subway platform.
+
+Rising unsteadily, past a pillar, a station name slid into view.......
+
+**Segwang Transit Corporation**
+
+**Segwang Station**
+
+This was the subway of Segwang Special City.
+
+############## [48] D00-en-1 len=3061
+It was late at night.
+
+The night air was cold. Even after the climb up the steep hill, it was cold enough to sting the cheeks. The neighborhood had been built by cutting into a mountain, and there were hills everywhere.
+
+{{user}} rubbed both hands together and headed downhill.
+
+The streets were strangely quiet.
+
+The sight of a twelve-lane road without a single moving car felt unfamiliar. It was late, but had this neighborhood always been so quiet?
+
+Not a person was in sight. Only illegally parked cars and fallen rental scooters remained along the street.
+
+There was a crosswalk beside the bus stop.
+
+The traffic lights were off. With no cars passing, {{user}} considered simply crossing, then decided to use the subway passage to get to the other side.
+
+At the bottom of the subway entrance stairs, a metal shutter blocked the staircase leading farther into the station. They usually lowered it late at night to keep people from going down.
+
+A woman stood on the other side.
+
+She wore a red dress, her long platinum-blonde hair hanging loose.
+
+She was absurdly beautiful.
+
+“Hello?”
+
+The woman smiled and waved a hand in greeting.
+
+<img=Secriem_smirk>
+
+The sight was so unreal that {{user}} hesitated.
+
+“Say, would you come over here for a moment?”
+
+When {{user}} asked whether she meant them, the woman nodded.
+
+“Yes.”
+
+For the moment, {{user}} approached as requested.
+
+She was beautiful enough to send a shiver down the spine. She looked foreign, but her Korean was remarkably fluent.
+
+No—why was she behind the shutter in the first place?
+
+When {{user}} asked why she was in there, the woman spoke.
+
+“Hmm, how should I put it?”
+
+A finger touched her full red lips.
+
+“I dozed off for a moment and ended up locked in.”
+
+{{user}} nodded at the explanation.
+
+“Would you open this for me?”
+
+At her request, {{user}} examined the shutter. How was it supposed to be opened? The staff would have gone home by now. Who should be contacted?
+
+“Open it.”
+
+{{user}} explained that someone would need to be contacted and started to take out a phone.
+
+“Here.”
+
+The woman held out her hand.
+
+“A key. You can open it with this.”
+
+A key rested on her palm.
+
+<img=Secriem_smirk>
+
+“See the padlock down there on the floor? Unlock that for me.”
+
+There was a padlock where she pointed. {{user}} accepted the key, went over to it, and crouched down.
+
+But something was suspicious.
+
+This shutter was nothing like the tightly spaced bars of a prison cell. It was a flimsy thing, closed merely to keep people from going downstairs, not to hold someone captive.
+
+If she reached out with that slender hand, she ought to have been able to unlock it herself at any time. Besides, she could have called the police instead of waiting for someone.
+
+{{user}} called to the woman and asked whether she could simply open it herself and come out.
+
+From the crouching position, her face was out of sight. A vague uneasiness began to set in.
+
+“I tried, but my hand wouldn't fit.”
+
+When {{user}} pointed out that it looked as though it would, the woman spoke again.
+
+“Would you just open it?”
+
+############## [49] D00-en-2 len=4213
+Walking through a shopping alley in Seodaemun-gu, Seoul, {{user}} noticed a Christian goods shop.
+
+It was a small place, wedged between a restaurant and a laundry. Statues of the Virgin Mary and wall crosses were visible through the glass door. Churches were common enough, but {{user}} had never paid much attention to a shop devoted entirely to selling things like these.
+
+The window displayed everything from small crosses worn around the neck to large wooden ones. Beside them lay rosaries and Bibles with gold lettering on their covers.
+
+Curious about what the shop sold, {{user}} paused at the display before going inside.
+
+“Welcome.”
+
+A blonde foreign woman stood behind the counter. Long hair worn loose, green eyes. A slightly unusual sight for the clerk of a neighborhood Christian goods shop.
+
+<img=Blaret_smile>
+
+Their eyes met. {{user}} gave a small nod of greeting and looked around.
+
+Religious goods filled the interior too. Small cards bearing sacred images, candles, and packaged rosaries lined the shelves. Even crosses of the same size varied in price depending on their material and decoration.
+
+A large cross on a lower shelf caught {{user}}'s attention. After examining it briefly, {{user}} asked what it was used for. The woman leaned forward over the counter.
+
+“That one? Usually you hang it on a wall.”
+
+{{user}} stepped closer to inspect its thickness. At the observation that it looked rather heavy to hang on a wall, the woman laughed.
+
+“You need to secure it properly. Wouldn't want it falling on someone.”
+
+Then she added:
+
+“You can carry it around too.”
+
+When {{user}} reacted to the idea of carrying that thing around, she gave a small shrug.
+
+“Nothing says you can't, right?”
+
+It was hard to tell whether she was joking. Leaving the large cross where it was, {{user}} turned to the glass case beside it.
+
+Small metal crosses lay inside. Some hung from fine chains like necklaces. Others were plain, shaped to fit comfortably in a hand.
+
+“Looking for one with silver in it?”
+
+The woman had come out from behind the counter.
+
+When {{user}} asked which those were, she opened the case and took out a cross. Up close, she too wore a silver crucifix on a thick chain.
+
+“Here. Try holding it.”
+
+The cross was heavier than it looked. {{user}} turned it over in one hand. Its surface was smooth, with a small pattern engraved at the end.
+
+After turning over the price tag, {{user}} set it back on the display.
+
+The woman promptly pointed to the next compartment.
+
+“We have cheaper ones too.”
+
+When {{user}} remarked on the considerable differences in price, she nodded.
+
+“Different materials. Some cost more because of the decoration. What do you need it for?”
+
+{{user}} explained that there had been no particular purchase in mind; the shop had simply looked interesting while passing by. The woman smiled.
+
+“Then take your time. We don't charge for browsing.”
+
+She was quite easygoing. When {{user}} added that her Korean was very good, she took the compliment in stride.
+
+“It happens. Surprised?”
+
+{{user}} explained that a foreign clerk had been unexpected in a shop like this.
+
+“Well, I have to talk if I'm going to make a living here. Explain the products, chat with customers.”
+
+She rested a hand on the glass case.
+
+“Do you go to church? Protestant or Catholic?”
+
+Before {{user}} could answer, she continued.
+
+“If you don't have one, look into it. Going is good for you.”
+
+A visit to browse had turned into an invitation to convert. When {{user}} laughingly asked whether she sold crosses and recruited believers at the same time, she did not deny it.
+
+“Why not do both?”
+
+<img=Blaret_smug>
+
+She picked up the silver cross and untangled its chain with her fingers.
+
+“This one's better if you want to wear it. The other one's good for using in your hand.”
+
+{{user}} looked between the two. The necklace was certainly smaller and lighter. But the phrase about using the other one in a hand was a little odd. Did she mean holding it while praying?
+
+When {{user}} asked about that use, her hands stopped.
+
+She looked at {{user}} for a moment, then set down the cross.
+
+<img=Blaret_smirk>
+
+“So why are you looking for crosses, anyway?”
+
+She asked:
+
+“Has a vampire turned up somewhere?”
+
+############## [50] D00-en-3 len=4505
+[World Politics Forum]
+
+Judging by the name, it seemed to be a place for international affairs and diplomacy.
+
+The title of the first post {{user}} opened more or less supported that impression.
+
+**-Personally, I don't think the office of US president has ever, in all recorded history**
+
+The rest was: “been held by a human.”
+
+The post contained a long series of enlarged photographs of past presidents. Red circles around their pupils, comparisons of ear shapes, and finally a claim that something was replaced underground at every inauguration.
+
+The comments were worse.
+
+└ then why bother having elections?
+└ you can hold a popularity contest in a livestock pen
+└ give back your voting rights first
+└ the eyes again. how many times do we have to tell you that's camera flash
+
+{{user}} had only followed a link someone elsewhere had posted for laughs. This was more elaborate than expected.
+
+Back to the thread list.
+
+**-Parasites keep coming out of my brain lately, need advice**
+**-Gulf War UFO footage, found this on the deep web**
+**-The. current. situa. tion. is. not. good.**
+**-Nobody believes me when I say there's a listening device in my ear**
+**-I've taken apart a lottery machine. AMA**
+
+World politics.
+
+Where, exactly?
+
+Perhaps it qualified because countries were occasionally mentioned. The idea that humans ran those countries, however, did not seem to enjoy much support here.
+
+{{user}} opened the brain-parasite post.
+
+The author claimed that small bugs appeared on the pillow every morning. At first it had seemed like a household infestation, but yesterday the author had actually seen one emerge from an ear.
+
+There were no pictures.
+
+└ pics
+└ see a doctor
+└ they don't show up in photos
+└ then SEE A DOCTOR
+└ if it came out of your ear how do you know it's in your brain?
+└ last week this guy said they were coming out of his teeth
+
+{{user}} opened the author's posting history.
+
+There it was.
+
+**-Something keeps moving inside my molar**
+
+Below it was a complaint about the cost of dental treatment. That had received considerably more agreement than the other posts.
+
+The plan had been to read a few and leave. But the next title kept catching the eye.
+
+The Gulf War UFO footage was so blurry that it was impossible to tell whether it showed a flying object or a stain on the screen. The comments were arguing about where it had been filmed. Someone linked what was supposedly the original. It was an entirely different video.
+
+The person with the listening device accused every skeptical commenter of being in on it. When someone said they believed the story, the author demanded to know how they knew.
+
+The person scattering periods through sentences did it in the comments too.
+
+└ why do you type all those periods?
+└ To. evade. auto. mated. collection.
+└ humans can barely read your posts either
+└ So. it. works.
+
+{{user}} scrolled farther down.
+
+There was a little of everything. Organizations whose names had never come up before, neighborhoods that did not appear on maps, products with no sellers to be found no matter how hard anyone searched. Someone posted a lengthy, impossible claim. Someone else fixated on a single spelling error in it and started swearing.
+
+Plenty of people claimed firsthand experience.
+
+Their posts received no special treatment. Beneath an account of walking down an apartment staircase only to keep arriving at the same floor, someone advised cutting back on alcohol. The author replied that they did not drink. The next comment suggested starting.
+
+Were they joking, or did they actually believe it?
+
+{{user}} tried to distinguish the two, then gave up. Sometimes the commenters seemed more serious than the author. Someone who had just spent paragraphs describing a personal experience would turn up in another thread mocking exactly the same story.
+
+Several tabs had accumulated along the top of the browser.
+
+After checking the time, {{user}} finished scrolling through the current post and returned to the list.
+
+A new thread had appeared.
+
+**-First time here. Are you people always like this?**
+
+The view count was already climbing. {{user}} opened it, and comments appeared beneath the short post.
+
+└ never seen a forum for normal people before?
+└ that's what they all say at first
+└ read the pinned post
+└ have you SEEN the pinned post?
+
+{{user}} checked the title of the announcement pinned above the list.
+
+**[Notice] Flat Earth posts will be deleted.**
+
+One more comment appeared below.
+
+└ that's because the sub-mod's a globehead
+
+############## [51] D00-en-4 len=3218
+It was the early hours of the morning.
+
+The street was quiet. Only the convenience store's fluorescent lights shone brightly. Music played softly near the counter beneath the hum of the refrigerators.
+
+As {{user}} browsed, blue light swept across the windows. A patrol car was passing slowly.
+
+Ding-ding.
+
+The convenience store door opened.
+
+The smell of alcohol followed immediately. A man with dirt on his clothes staggered inside. The clerk rose behind the counter.
+
+“Welco—”
+
+Crackle!
+
+A garbage bag thrown by the man landed beside the counter. It split open, scattering crumpled tissues and snack crumbs across the floor.
+
+“Ugh… hey, that vending machine outside ate my money!”
+
+The clerk looked down at the floor, then at the man.
+
+“Sir, there isn't a vending machine here.”
+
+“Don't care. Give me my money back. That machine, it….”
+
+“Causing a scene in the convenience store won't let us fix a vending machine for you.”
+
+{{user}} looked past the shelves toward the counter.
+
+The man kept demanding his money back in barely intelligible words. The clerk fell silent for a moment, then picked up a phone.
+
+“Leave now or I'm calling the police. You know they're patrolling around here, right? They'll be here straight away.”
+
+“The police, my ass….”
+
+“I'll count to three. One.”
+
+The man staggered backward.
+
+“Two.”
+
+“Fine, all right. I'm leaving, damn it… lost my money too.”
+
+Ding-ding.
+
+The drunk swore a few more times outside before disappearing into the darkness.
+
+The clerk looked down at the scattered garbage.
+
+“My damn life….”
+
+With a small sigh, the music stopped.
+
+When {{user}} approached the counter, the clerk leaned the broom against the wall and rang up the items.
+
+After paying, {{user}} left the convenience store.
+
+The drunk was nowhere in sight. Passing the alley beside the building, {{user}} heard an unfamiliar noise.
+
+Bzzzz.
+
+Light was spilling from farther down the alley.
+
+{{user}} turned toward it.
+
+A vending machine.
+
+The clerk had just said there wasn't one.
+
+A bright-red vending machine stood beside the building's back door. Its lights were on, and a low mechanical hum came from it.
+
+Had it been installed so recently that the clerk didn't know? Perhaps it belonged to the landlord or someone else, rather than the store.
+
+In that case, the drunk might really have lost his money. Not that it justified going into a convenience store and throwing garbage.
+
+{{user}} approached the machine.
+
+Across the top, the word “Anything” appeared in rainbow-colored Gungseo lettering. A tacky design.
+
+A short sentence appeared beneath it.
+
+**Everything you need.**
+
+Beside it, a blocked coin slot gleamed silver.
+
+{{user}} examined the slot. There was no place for banknotes and nowhere to use a card either.
+
+A single 500-won coin lay on the ground. Probably the drunk's. Had he dropped it without managing to insert it, then mistaken that for the machine eating his money?
+
+{{user}} picked up the coin and looked back at the vending machine.
+
+There was no telling what products it dispensed. Was it something like the mystery-box machines occasionally found in shopping malls? But there was nowhere to put any money.
+
+While inspecting the machine, {{user}} spotted a button marked “Start.”
+
+############## [52] D00-en-5 len=4933
+Looking around for work had brought {{user}} as far as Jungnim-dong.
+
+There had been help-wanted notices on shop windows to inspect, and a few places where {{user}} went inside to ask. Some had already hired someone. Others needed hours that did not fit.
+
+{{user}} headed farther into the alley.
+
+An old building had an underground-shopping-center directory by its entrance. Secondhand appliances, clothing repairs, general goods. Several names had been erased and covered with fresh paper.
+
+If there were shops downstairs, there would be places to ask.
+
+The air grew damp on the descent. Fluorescent lights stretched beneath a low ceiling, with small shops packed along both sides of a narrow passage.
+
+Fans and rice cookers were piled inside the secondhand appliance shop by the entrance. Farther in, a glass case held black equipment of uncertain purpose. Perhaps radios, perhaps camera components.
+
+When {{user}} asked whether they were hiring, the proprietor shook his head.
+
+“No.”
+
+His eyes returned to the television before the answer was finished.
+
+The next shops were much the same. The tailor did not even stop the sewing machine. Nobody was visible in the general store. {{user}} went farther in.
+
+The shops changed after a bend in the passage.
+
+Ceramic fragments lay beside a glass case of watches and rings. There were small sculptures and objects wrapped in yellowed cloth. Almost nothing had a price displayed.
+
+The sign read **Heol-gap Mae-ip**.
+
+Inside, a man stood at a wooden appraisal counter. Across from him, a woman put on the glasses that had been hooked at her breast pocket and examined a wristwatch. Black bobbed hair, burgundy suit.
+
+“Do you know how much this cost when I bought it?”
+
+The woman kept her eyes on the watch.
+
+“When you bought it.”
+
+She repeated it softly, then looked up.
+
+<img=Ma Deok-hee_smirk>
+
+“But you're not buying it now. You're selling.”
+
+“Still, that price is ridiculous.”
+
+“Then try somewhere else. I'll give it back.”
+
+She placed the watch on a tray and slid it toward him. The man reached out, then stopped.
+
+{{user}} waited briefly outside the shop. It did not seem like a good moment to ask about work.
+
+“You'll pay cash right away?”
+
+The man's voice came from behind.
+
+“Of course.”
+
+The woman who had just been beating down the price sounded considerably sweeter.
+
+{{user}} moved on.
+
+Several business-card-sized loan advertisements covered the wall. Same-day payment, credit history irrelevant, collateral consultations. Beneath a phone number, an arrow pointed down to the second basement.
+
+The fluorescent light over those stairs was out.
+
+Disinfectant drifted from the opposite direction.
+
+**Son-gil Ui-won.**
+
+Through a half-open door were plastic chairs and old magazines. A man sat with a towel wrapped around his arm. Its lower edge was soaked dark red.
+
+Behind the reception window, a woman in a white coat studied paperwork.
+
+“You need to pay first.”
+
+“Can't you at least look at this before we talk about that?”
+
+“I have. That's why I quoted you a price.”
+
+The man took out his phone with his dry hand. His finger missed the screen several times.
+
+A small staff member beside him held out a tray. Her apricot-colored hair was tied in two round buns.
+
+“Put it here. It's difficult when you're holding it with one hand.”
+
+<img=Yun Ji-a_default>
+
+She steadied the tray so his phone would not slide.
+
+{{user}} passed the doorway.
+
+A clinic underground had been unexpected. Looking around, there were also shops selling bottles that looked medicinal, and one with work clothes and thick gloves hanging from metal racks.
+
+At one shop, banknotes were counted twice before goods changed hands. At another, a customer asked for a receipt and the proprietor laughed.
+
+“If you need one, you shouldn't be shopping here.”
+
+{{user}} slowed a little.
+
+This was not quite the underground shopping center expected.
+
+Still, coming all the way down only to leave empty-handed seemed a waste. {{user}} decided to look as far as the end of the passage.
+
+Around a corner, a red OPEN sign glowed above a tinted glass door.
+
+**Dae-bak Al-seon.**
+
+A paper beside the door briefly advertised brokerage for personnel and goods. {{user}} looked inside, then opened the door.
+
+A reception counter, a worn leather sofa, a wall-mounted television with its volume low. A phone conversation came from the back room.
+
+“You haven't paid, and you want me to send more? Settle the last one first.”
+
+A woman ended the call and came to the doorway. Brown hair in a low ponytail, dark-brown jacket.
+
+“What is it?”
+
+{{user}} explained the search for work and asked whether this place also arranged jobs.
+
+The woman looked {{user}} over briefly. The nameplate on the counter read Mun Hye-ran.
+
+<img=Mun Hye-ran_smirk>
+
+“Who told you about us?”
+
+At the explanation that {{user}} had seen the sign while passing, Hye-ran put down her phone.
+
+“The sign?”
+
+She asked again.
+
+“What kind of work have you done?”
+
+############## [55] E00-en-1 len=4183
+The disaster consulting firm in Yeongdeungpo was busy early.
+
+The company name on the glass doors was immaculate. So were the plants in the lobby. The shoes waiting outside the elevator generally weren't. Dried mud, separating soles, a black cable tie threaded through a sneaker where the lace should have been. A man with a bandaged hand held a phone to his ear.
+
+“So I have to pay for the assessment before we even get to the treatment?”
+
+The elevator doors closed on the rest.
+
+Mission Coordination Office, Special Disaster Response Association. On the floor where {{user}} had come looking for work, the copier was already running and the coffee already smelled stale. Six people occupied the waiting seats. A wall monitor alternated between queue numbers and unassigned contracts. The fees were printed in bold. Association commissions and payment conditions appeared beneath them in smaller type.
+
+The water dispenser across the room had no paper cups. Someone asked for one. A voice from the back told him to bring his own.
+
+There were two intake desks.
+
+The woman on the left was on the phone, wearing a grey suit jacket. She laughed, swept her long dark-red hair over one shoulder, and tapped the empty chair when she spotted {{user}}. One phone rested against her white shirt cuff. Another lay facedown on the desk.
+
+“No, you need to settle your side first. I do more than just send people over, you know. …I've got someone. Call you later.”
+
+<img=Cha Yeo-jin_smug>
+
+She ended the call and straightened her nameplate with a fingertip. Cha Yeo-jin, Mission Coordination Office.
+
+“Here for work? Good timing. A few decent postings came in today. Sit down. Want coffee? Not the office stuff. I'll make you one of mine.”
+
+At the next desk, a page turned.
+
+The woman in the navy vest sat without touching the back of her chair, aligning a stack of forms. Two low sage-green braids lay neatly over her shoulders. Her nameplate read Seo Yun-ji.
+
+<img=Seo Yun-ji_bored>
+
+“Your registration number is required before intake. Available postings may be reviewed once license validity and assignment restrictions have been verified.”
+
+Her voice carried precisely as far as the chair opposite. Yeo-jin tilted her head, smiling.
+
+“Yun-ji, they haven't even sat down. Let them catch their breath.”
+
+“The procedure remains the same if verification takes place after they are seated.”
+
+“It certainly does. Nobody could accuse you of being inaccurate.”
+
+Yeo-jin drew out a folder and laid it on the desk. Her fingernail tapped the gross payment figure. It was better, at least, than the numbers cycling across the wall monitor.
+
+“This one's a site check and a single-item retrieval. The client's in a hurry, so they raised the fee. These don't stay available long. Looks like a lot of paperwork, but I'll walk you through the important parts first.”
+
+Yun-ji glanced at the folder's cover.
+
+“Equipment rental is charged separately on that contract. Payment is contingent on acceptance of the retrieved item. There is no provision for reimbursement of expenses if retrieval fails.”
+
+Yeo-jin's fingernail stopped.
+
+“I was getting to that.”
+
+“I was not commenting on an omission. I was stating the payment conditions.”
+
+Someone sniffed in the waiting area. The copier stopped briefly, then started again.
+
+Yeo-jin leaned a little closer to {{user}}, lowering her voice.
+
+<img=Cha Yeo-jin_smirk>
+
+“It sounds stiff on paper. We can talk these things through. What matters is how much actually ends up in your pocket, right? Tell me your situation. I'll find something that fits.”
+
+Yun-ji placed a list of available contracts beside a commission schedule on her own desk. She smoothed a folded corner and aligned a pen beside the pages.
+
+<img=Seo Yun-ji_serious>
+
+“At this desk, available assignments are presented in intake order. I will read the payment, deductions, and liability waivers in sequence. Signing takes place after the explanation.”
+
+Yeo-jin produced a paper cup, apparently from a private supply in her drawer. A coffee sachet tore open.
+
+“You take sugar?”
+
+On Yun-ji's desk, where the cup might have gone, an application form lay with the registration-number field facing {{user}}.
+
+############## [56] E00-en-2 len=4109
+Water pooled on the stairs leading beneath the old building in Jungnim-dong. It might have been rain. It might have been a pipe leaking upstairs. The light above the third step was dead, and most of the shops on the directory below it had closed.
+
+Farther in, business continued.
+
+Bureau-issue equipment sat behind the glass of a secondhand appliance shop. The identification numbers had been ground off. Across the corridor, an old man at a clothing-repair counter examined a black stain under the arm of a work jacket and shook his head.
+
+“I'm telling you, replacing the fabric won't do it. It's eaten through the lining.”
+
+The owner counted banknotes instead of answering. Disinfectant drifted from somewhere behind the shops. Beyond a thin partition, someone groaned through clenched teeth. People passing in the corridor did not look that way.
+
+The office {{user}} had come to for work occupied a corner of the shopping arcade. Dae-bak Al-seon. A red OPEN sign glowed above tinted glass. Half the lighting in the shop's Korean name had burned out.
+
+The reception counter was empty. A horse-racing paper several months old lay open on a worn leather sofa. News played silently on a wall-mounted television. As the captions changed, a woman's laugh came from the room at the back.
+
+“Oh, come on. You can't put that on me. You had the finger when you went in. What am I supposed to do about you losing it there? We discussed insurance when you signed.”
+
+A pause.
+
+“Fine. I'll put you in touch with a clinic. That much I can do.”
+
+The call ended. The inner door opened.
+
+A woman with brown hair tied in a low ponytail rested an arm against the frame. A black shirt showed beneath her dark-brown jacket. Her lipstick was the color of wine, and fine lines gathered at the corners of her eyes when she smiled.
+
+<img=Mun Hye-ran_laughing>
+
+“There you are. Come in. What are you doing out there? Eaten yet?”
+
+Mun Hye-ran waved {{user}} through before waiting for an answer.
+
+A poker table occupied the space where a meeting desk should have been. The felt was worn in patches. A calculator and stacks of contracts sat beside the chips. Three phones in three different colors hung from charging cables.
+
+Hye-ran nudged an empty chair out with her shoe and took the seat opposite. At the purpose of {{user}}'s visit—looking for work—her hand went straight to the paperwork.
+
+“There's work. There's always work. The question is whether the bastard paying actually pays.”
+
+She laid two sheets on the table. One bore an official stamp. The other held only a handwritten address, time, and sum.
+
+“You know how long Association payment takes. Here, you finish, you get paid. Once it's verified, cash on the spot. Taxes are your problem.”
+
+She pushed the handwritten sheet forward. Beneath the address was the word Retrieval. It did not say what was to be retrieved.
+
+“Something left in somebody's care. Now that somebody isn't answering. Client only cares that it comes back intact. They need someone who can move today.”
+
+She entered a figure into the calculator. Several subtractions followed.
+
+“Placement fee. Information fee. The location and the way in aren't free. This one's a deposit. Nothing goes wrong, you get it back.”
+
+The final number was a little over half the first.
+
+“No need to look so grim. Can't cover the deposit now? We can arrange to deduct it at settlement.”
+
+<img=Mun Hye-ran_smug>
+
+Hye-ran laughed and leaned back. Her gold-tone watch flashed under the fluorescent light.
+
+“The Association won't do that for you, will they? No money, they won't even process the application. Me, I get you working first.”
+
+Someone knocked twice on the glass outside. Without turning her head, Hye-ran raised a hand. The shadow at the door withdrew.
+
+She turned the contract over. The type on the back was smaller. A pen lay beside the signature line, though her fingertips still held the paper.
+
+<img=Mun Hye-ran_smirk>
+
+“So. What kind of money are you looking for?”
+
+She turned the calculator toward {{user}} and drew another sheet from the stack.
+
+“Tell me how much you need. Then I'll know what to pull out.”
