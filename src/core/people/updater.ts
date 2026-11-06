@@ -142,6 +142,8 @@ export interface BuildOpts {
   ended?: EndedNow[];
   /** 모델 Router 가 본 미등록 이름 (힌트). 자료 name_hints */
   hints?: { name: string; aliases: string[]; quote: string }[];
+  /** 하이파 요약 (리수폿 J-3). 자료 memory: 배경일 뿐 근거 아님 */
+  memory?: string[];
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
@@ -259,6 +261,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     }),
     known_names: Object.keys(store.people),
     ...(o.hints?.length ? { name_hints: o.hints.filter((h) => !store.people[h.name]).slice(0, 4) } : {}),
+    ...(o.memory?.length ? { memory: o.memory } : {}),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))
       ? Object.values(store.docs).filter((d) => o.settings.features.has(docFeature(d.type) as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
       : undefined,
@@ -295,9 +298,25 @@ export const LANG_EN_RULE = [
   'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소], slot names, and every `quote`.',
 ].join('\n');
 
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko'): string {
+/** 절 본문 (첫 번째 나오는 절 = 본문 절. 출력 계약 줄의 같은 이름 절은 두 번째) */
+export function sectionBody(text: string, name: string): string | null {
+  const m = new RegExp(`<<SECTION:${name}>>\\n([\\s\\S]*?)<<END:${name}>>`).exec(text);
+  return m ? m[1].replace(/\n$/, '') : null;
+}
+/** 절 덮어쓰기 (리수폿 J-1 지침 편집): 첫 번째(본문) 절만 바꾼다. 출력 계약 줄은 그대로 */
+export function overrideSections(text: string, overrides: Record<string, string>): string {
+  let out = text;
+  for (const [name, body] of Object.entries(overrides)) {
+    if (!/^[a-z_]+$/.test(name) || !body.trim()) continue;
+    out = out.replace(new RegExp(`<<SECTION:${name}>>\\n[\\s\\S]*?<<END:${name}>>`), () => `<<SECTION:${name}>>\n${body.trim()}\n<<END:${name}>>`);
+  }
+  return out;
+}
+
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}): string {
   const rules = (lang === 'en' ? `${LANG_EN_RULE}\n\n${userRules.trim()}` : userRules).trim();
   const on = new Set(enabled);
+  if (Object.keys(overrides).length) text = overrideSections(text, overrides);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
   let out = text;

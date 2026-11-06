@@ -279,6 +279,16 @@ export interface FactionRecord {
   seeded: { at: string };
 }
 
+/** 한 번의 갱신이 새로 만든 항목·변경·문서 항목·관찰·새 인물 */
+export interface LastRun {
+  at: string;
+  entries: { who: string; slot: string; id: string }[];
+  docs: { key: string; id: string }[];
+  changes: string[];
+  observations: { who: string; cand: string; id: string }[];
+  newPeople: string[];
+}
+
 export interface PeopleStore {
   schema: 1;
   people: Record<string, Person>;
@@ -294,6 +304,8 @@ export interface PeopleStore {
   identity?: Identity;
   /** 새 인물 후보 (2턴 규칙·확인 모드): 이름 → 처음 본 기준 메시지 */
   pending: Record<string, { anchor: string; aliases: string[] }>;
+  /** 마지막 갱신이 만든 것 (되돌리기용, 리수폿 J-4). 되돌리면 지운다 */
+  lastRun?: LastRun;
   /** 사용자가 「무시」한 이름: 다시 새 인물로 올리지 않는다 */
   ignored: string[];
   migrated?: string[];

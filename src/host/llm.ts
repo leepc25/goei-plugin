@@ -53,12 +53,13 @@ async function withPhotos(messages: (LlmMessage & { images?: string[] })[]): Pro
   );
 }
 
-export async function runModel(messages: LlmMessage[], model: ModelChoice): Promise<string> {
+/** staticModel: 기능별 전용 모델 ID (있으면 메인·보조 대신 그 모델) */
+export async function runModel(messages: LlmMessage[], model: ModelChoice, staticModel?: string): Promise<string> {
   let res: unknown;
   try {
     // allowPlugins: 사용자가 플러그인이 제공하는 모델(pluginmodel:::)을 메인·보조로 쓰면 이게 없을 때 Risu가 막는다.
     // 이 플러그인은 모델 제공 플러그인이 아니라서 서로 부르는 고리가 생기지 않는다.
-    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model === 'aux' ? 'submodel' : 'model', allowPlugins: true });
+    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model === 'aux' ? 'submodel' : 'model', allowPlugins: true, ...(staticModel ? { staticModel } : {}) });
   } catch (error) {
     throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -89,6 +90,8 @@ export interface RetryOptions {
   state?: Record<string, unknown>;
   /** 첫 요청을 대신 보낼 곳 (괴담넷·괴담톡 자동 확인 한 번에 묶기, host/joint.ts). 다시 묻기는 따로 보낸다 */
   first?: (messages: LlmMessage[]) => Promise<string>;
+  /** 기능별 전용 모델 ID. 다시 물을 때도 그대로 쓴다 */
+  staticModel?: string;
 }
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
@@ -121,7 +124,7 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
+      raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use, o.staticModel);
       if (o.state) applyAdvanced(o.state);
       return { raw, value: parse(raw) };
     } catch (error) {
