@@ -2821,6 +2821,12 @@ button.mk-go:hover { color: var(--signal); }
 .gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
 .gx-wallettab section { padding: 0; }
 .gx-wt-day + .gx-wt-day { margin-top: 10px; }
+/* 달 줄 (2026-11-06): 그달 첫 날짜 묶음 위에 수입·지출 합계 */
+.gx-wt-month { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 14px 2px 4px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); font-size: 13px; color: var(--dim); }
+.gx-wt-month:first-child { margin-top: 0; }
+.gx-wt-month b { margin-right: auto; font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: .06em; }
+.gx-wt-month em { font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gx-wt-month em.in { color: var(--signal); } .gx-wt-month em.out { color: var(--danger, #FF7A6B); }
 .gx-wallettab .in { color: var(--signal); }
 .gx-wallettab .out { color: var(--danger); }
 .gx-wt-balrow b { font-variant-numeric: tabular-nums; white-space: nowrap; }

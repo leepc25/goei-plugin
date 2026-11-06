@@ -71,6 +71,8 @@ for (const vp of ['pc', 'phone']) {
   await page.waitForTimeout(300);
   await click('[data-action="rec-sub"][data-value="chronicle"]');
   await shot('연대기');
+  await click('[data-action="rec-sub"][data-value="wallet"]');
+  await shot('가계부_달줄');
   console.log(vp, errors.length ? errors : '오류 없음');
   await page.close();
 }
