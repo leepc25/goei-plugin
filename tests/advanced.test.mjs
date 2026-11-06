@@ -24,7 +24,7 @@ test('advanced: defaults match the original, invalid values fall back, changed k
   // 기능 상한이 0이면 공통 상한
   assert.equal(budgetFor({ '$gen_budget': '9000' }, 'ph'), 9000);
   assert.equal(budgetFor({ '$gen_budget': '9000', '$ph_adv_budget': '5000' }, 'ph'), 5000);
-  assert.deepEqual(genSettings({}), { language: null, retries: 1, retryModel: 'same' });
+  assert.deepEqual(genSettings({}), { language: null, retries: 1, retryModel: 'same', userMessages: true, concurrent: 0 });
   assert.equal(genSettings({ '$gen_lang': 'en' }).language, 'Write all output in English.');
   // 새 채팅 기본값으로 저장되는 변수
   for (const k of ['$ph_adv_turns', '$nw_adv_ctx_count', '$gen_lang', '$lb_cfg_lb-gn.adv_ctx_own', '$nw_context', '$ph_context_messages']) assert.ok(settings.PREF_VAR.test(k), k);

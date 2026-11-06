@@ -17,6 +17,7 @@ type State = Record<string, unknown> | undefined;
 
 function control(f: AdvFeature, item: AdvItem, cur: string): string {
   const id = `${f}:${item.key}`;
+  if (item.type === 'text') return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id}" value="${esc(cur)}" placeholder="비우면 기본" aria-label="${esc(item.label)}">`;
   if (item.type === 'pick') {
     return `<div class="gx-segs gx-segs-sm">${(item.opts ?? [])
       .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc(label)}</button>`)
@@ -97,7 +98,8 @@ function parse(value: string): [AdvFeature, AdvItem, string] | null {
     const n = Number(v);
     if (v === '' || !Number.isFinite(n)) return [f, item, blank(item)];
     v = String(Math.min(item.max ?? Infinity, Math.max(item.min ?? 0, Math.round(n))));
-  } else if (item.type === 'bool' ? v !== '0' && v !== '1' : !item.opts?.some(([o]) => o === v)) return null;
+  } else if (item.type === 'text') v = v.slice(0, 120);
+  else if (item.type === 'bool' ? v !== '0' && v !== '1' : !item.opts?.some(([o]) => o === v)) return null;
   return [f, item, v === String(item.def) ? blank(item) : v];
 }
 

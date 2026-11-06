@@ -31,7 +31,7 @@ import { bindMapZoom } from './mapzoom';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -822,6 +822,7 @@ async function handle(action: string, value?: string): Promise<void> {
       // 「창을 열 때」 확인: 본편이 진행됐으면 이 탭을 열 때 한 번
       if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
       if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
+      if (view.kind === 'started' && tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
       return;
     case 'nav-back':
     case 'nav-fwd': {
@@ -1363,7 +1364,7 @@ function startedBody(ctx: ChatContext): string {
     case 'mission':
       return missionTab(ctx, false, notice, busy);
     case 'wiki':
-      return wikiTab(ctx);
+      return wikiTab(ctx, wikiEnv);
     case 'gnet':
       return gnetTab(ctx, gnetEnv);
     case 'phone':

@@ -8,9 +8,10 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
-  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
 } from '../core/phone';
-import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
+import { refreshPrompt, refreshRetry, replyPrompt, viewPrompt } from '../core/phonePrompt';
+import { parseView, PH_VIEW_LAST, readViews, VIEW_PRESETS, viewSettings, viewUnread, writeViews } from '../core/phoneView';
 import { agentFace, imageUrl, stChip } from './images';
 import { readWorld, worldOn } from '../core/world/output';
 import { ICONS } from './icons';
@@ -23,6 +24,7 @@ import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate as askModel } from '../host/llm';
+import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { advNum, budgetFor, genSettings } from '../core/advanced';
 import { advancedBox } from './advanced';
@@ -32,13 +34,15 @@ import { playerSource } from '../core/player';
 import { updateChat, type ChatContext } from '../host/risu';
 import { isPhone } from './media';
 
-type Sub = 'contacts' | 'chats' | 'notices';
+type Sub = 'contacts' | 'chats' | 'notices' | 'views';
 
 interface PhoneUi {
   sub: Sub;
   tab: string;
   query: string;
-  view: 'list' | 'room' | 'group' | 'call' | 'add' | 'settings' | 'notice';
+  view: 'list' | 'room' | 'group' | 'call' | 'add' | 'settings' | 'notice' | 'view';
+  /** 열어 둔 보기 전용 방 */
+  viewId: string | null;
   /** 작성칸 + 버튼으로 연 첨부 메뉴 */
   attachMenu: boolean;
   pickQuery: string;
@@ -71,7 +75,7 @@ interface PhoneUi {
 export const phone: PhoneUi = {
   sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', gname: '', draft: '', page: 1, call: '', callText: '',
   addName: '', addNote: '', openNotice: null, noticePage: 1, attach: [], confirm: null, notice: '', failure: null, attachMenu: false, pickQuery: '',
-  chatFilter: 'all', noticeFilter: 'all', noticeFaction: '', pickTab: '',
+  chatFilter: 'all', noticeFilter: 'all', noticeFaction: '', pickTab: '', viewId: null,
 };
 
 export function resetPhone() {
@@ -153,6 +157,14 @@ async function run(ctx: ChatContext, env: PhoneEnv, label: string, work: () => P
   return true;
 }
 
+/** 응답 끝 말버릇 칸을 이번 방 사람들 것만 합친다 (라이트보드 미니톡, 2026-11-06) */
+function habitVars(chat: Chat, raw: string, rooms: PRoom[]): Record<string, string> {
+  if (!phoneSettings(chat.scriptstate).habits) return {};
+  const ids = new Map<string, string>();
+  for (const r of rooms) for (const [cid, p] of Object.entries(r.people)) ids.set(cid, p.name);
+  return mergeHabits(chat.scriptstate, parseHabits(raw), ids) ?? {};
+}
+
 function viewingRoom(env: PhoneEnv): string | null {
   return env.visible() && phone.view === 'room' ? phone.room : null;
 }
@@ -179,7 +191,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
     let result: ReturnType<typeof parseReply>;
     try {
       const prompt = fitPrompt(budgetFor(saved.scriptstate, 'ph'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
-      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), state: saved.scriptstate }));
+      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), reiterate: craftSettings(saved.scriptstate, 'ph').reiterate, staticModel: featureModel(saved.scriptstate, 'ph'), state: saved.scriptstate }));
     } catch (error) {
       await markFailed(ctx, rid, req);
       const msg = error instanceof Error ? error.message : String(error);
@@ -199,7 +211,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
       room.pending = undefined;
       if (viewingRoom(env) === rid) readRoom(room);
       if (!added) note = room.kind === 'group' ? '아무도 말하지 않았어요.' : '답장이 없어요.';
-      return writePhone(chat, cur, unsolicitedRefresh && added ? cooldownMark(chat, 'incoming') : {});
+      return writePhone(chat, cur, { ...(unsolicitedRefresh && added ? cooldownMark(chat, 'incoming') : {}), ...habitVars(chat, raw, [room]) });
     });
     return note;
   });
@@ -369,8 +381,10 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     const prompt = plan.prompt;
     const model = phoneSettings(ctx.chat.scriptstate).model;
     // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
-    const { value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+    const { raw: refreshRaw, value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
       ...genSettings(ctx.chat.scriptstate),
+      reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate,
+      staticModel: featureModel(ctx.chat.scriptstate, 'ph'),
       state: ctx.chat.scriptstate,
       fix: (_raw, reason) => refreshRetry(prompt, reason),
       first: joint && ((m) => joint.ask('phone', m)),
@@ -418,7 +432,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
       note = received || result.invitations.length || notices
         ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.`
         : automatic ? '' : '새 메시지가 없어요.';
-      return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks });
+      return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks, ...habitVars(chat, refreshRaw, [...plan.selected.values()]) });
     });
     return note;
   });
@@ -447,11 +461,27 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: 
   if (!env && envForAuto(ctx) === quietEnv) phone.notice = notice;
 }
 
+/** 보기 전용 방 자동 만들기 (「매 턴」은 채팅 응답 뒤, 「창을 열 때」는 탭을 열 때). 같은 응답에는 한 번 */
+export async function autoView(ctx: ChatContext, messageIndex: number, env?: PhoneEnv): Promise<void> {
+  const set = viewSettings(ctx.chat.scriptstate);
+  if (!(env ? set.auto === 'open' : set.auto === 'turn') || phoneBusy(ctx)) return;
+  const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
+  if (!data.trim()) return;
+  const stamp = `${messageIndex}:${data.length}`;
+  if (String(ctx.chat.scriptstate?.[PH_VIEW_LAST] ?? '') === stamp) return;
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [PH_VIEW_LAST]: stamp } }));
+  if (!saved) return;
+  const notice = phone.notice;
+  await makeView({ ...ctx, chat: saved }, env ?? envForAuto(ctx), true);
+  if (!env && envForAuto(ctx) === quietEnv) phone.notice = notice;
+}
+
 /** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답을 아직 확인하지 않았으면 한 번 확인 */
 export function openCheck(ctx: ChatContext, env: PhoneEnv): void {
-  if (!phoneSettings(ctx.chat.scriptstate).autoOpen) return;
   const at = lastReply(ctx.chat);
   if (at < 0) return;
+  if (viewSettings(ctx.chat.scriptstate).auto === 'open') void autoView(ctx, at, env).catch((error) => console.log(`[goei] 보기 전용 방 실패: ${error instanceof Error ? error.message : String(error)}`));
+  if (!phoneSettings(ctx.chat.scriptstate).autoOpen) return;
   void autoRefresh(ctx, at, env).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
@@ -672,6 +702,85 @@ function roomDel(id: string, pending: boolean, label: string): string {
 
 const dayOf = (t: string) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
 
+// ── 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06) ──
+function viewsList(ctx: ChatContext): string {
+  const set = viewSettings(ctx.chat.scriptstate);
+  const busy = jobs.has(chatKey(ctx));
+  const list = readViews(ctx.chat.scriptstate).reverse();
+  const make = `<div class="ph-view-new"><button class="gx-mini" data-action="ph-view-new" ${busy ? 'disabled' : ''}>${esc(VIEW_PRESETS[set.preset])} 새로 보기</button><small>종류·시점 인물은 괴담톡 설정에서 바꿔요</small></div>`;
+  if (!list.length) return make + blank('아직 보기 전용 방이 없어요.<br>내가 끼지 않는 짧은 장면(사이드스토리·혼잣말)을 폰으로 봐요.');
+  return make + `<ul class="ph-list ph-chats">${list
+    .map((r) => {
+      const last = [...r.messages].reverse().find((m) => m.type === 'text');
+      const who = r.people.find((p) => p.id === last?.sender)?.name ?? '';
+      const on = phone.view === 'view' && phone.viewId === r.id;
+      const del = phone.confirm === `view:${r.id}`
+        ? `<button class="gx-mini danger ph-rdel" data-action="ph-view-del" data-value="${esc(r.id)}">정말 삭제</button>`
+        : `<button class="ph-tool sm ph-rdel" data-action="ph-view-del" data-value="${esc(r.id)}" title="삭제" aria-label="${esc(r.name)} 삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main${on ? ' on' : ''}" data-action="ph-view-open" data-value="${esc(r.id)}"><span class="ph-avatar group">${ICONS.group}<i>${r.people.length}</i></span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc(r.name)}</b><small class="ph-time">${esc(VIEW_PRESETS[r.preset])}</small></span>
+        <span class="ph-who-bot"><small>${esc([...`${who ? `${who}: ` : ''}${last?.text ?? ''}`].slice(0, 60).join(''))}</small>${r.unread ? '<span class="ph-badge">N</span>' : ''}</span></span></button>${del}</li>`;
+    })
+    .join('')}</ul>`;
+}
+
+function viewPane(ctx: ChatContext, busy: boolean): string {
+  const r = readViews(ctx.chat.scriptstate).find((x) => x.id === phone.viewId);
+  if (!r) return '<div class="ph-empty"><p class="gx-none">보기 전용 방을 찾지 못했어요.</p></div>';
+  const name = (id: string) => r.people.find((p) => p.id === id)?.name ?? id;
+  const bubbles = r.messages
+    .map((m, i) => {
+      if (m.type === 'skip') return '<div class="ph-sys skip">생략됨</div>';
+      if (m.type === 'pause') return `<div class="ph-sys pause">${esc(m.text)}</div>`;
+      const prev = r.messages[i - 1];
+      const me = r.preset !== 'side' ? false : m.sender === r.pov;
+      const first = !prev || prev.type !== 'text' || prev.sender !== m.sender;
+      const head = !me && first ? `<b class="ph-name">${esc(name(m.sender))}</b>` : '';
+      return `<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${me ? '' : '<span class="ph-face-gap"></span>'}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${esc(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
+    })
+    .join('');
+  return `<div class="ph-room">
+    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
+      <span class="ph-avatar group sm">${ICONS.group}</span><div class="ph-room-title"><b>${esc(r.name)}</b><small>${esc(VIEW_PRESETS[r.preset])} · ${esc(name(r.pov))} 시점 · ${esc(shortTime(r.time))}</small></div></header>
+    <div class="ph-log">${bubbles}</div>
+    <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy ? 'disabled' : ''}>새로 보기</button></div>
+  </div>`;
+}
+
+/** 보기 전용 방 하나 만들기 */
+function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
+  const set = viewSettings(ctx.chat.scriptstate);
+  return run(ctx, env, `${VIEW_PRESETS[set.preset]}을 만드는 중이에요.`, async () => {
+    const startLength = ctx.chat.message?.length ?? 0;
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate)));
+    const { value } = await askModel(prompt.messages, phoneSettings(ctx.chat.scriptstate).model, (raw) => parseView(raw, set.preset), {
+      ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate,
+    });
+    let note = '';
+    let id = '';
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+      if (automatic && (chat.message?.length ?? 0) !== startLength) {
+        note = '채팅이 이어져서 이번 보기 전용 방은 저장하지 않았어요.';
+        return null;
+      }
+      const list = readViews(chat.scriptstate);
+      id = `v_${Date.now().toString(36)}`;
+      const seen = !automatic || (phone.sub === 'views' && phone.view === 'list');
+      list.push({ ...value, id, time: phoneTime(chat), unread: !seen });
+      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...writeViews(list) } };
+    });
+    if (id && !automatic) Object.assign(phone, { sub: 'views', view: 'view', viewId: id });
+    else if (id) note = `보기 전용 방 「${value.name}」이 생겼어요.`;
+    return note;
+  });
+}
+
+/** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
+const reactionChips = (v?: string) => {
+  const list = parseReactions(v);
+  return list.length ? `<div class="ph-reacts">${list.map((r) => `<span class="ph-react">${esc(r.emoji)}<small>${r.count}</small></span>`).join('')}</div>` : '';
+};
+
 function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): string {
   const r = phone.room ? st.rooms[phone.room] : undefined;
   if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
@@ -689,6 +798,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
       const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : '';
       const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : '';
       if (day) lastDay = day;
+      if (m.kind === 'skip') return `${sep}<div class="ph-sys skip">생략됨</div>`;
       if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === 'pause' ? ' pause' : ''}">${esc(m.text)}</div>`;
       const prev = shown[i - 1];
       const next = shown[i + 1];
@@ -701,7 +811,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
       const pic = !me ? (first ? face(ctx, who, name(m.sender), ' ph-face') : '<span class="ph-face-gap"></span>') : '';
       const head = !me && first ? `<b class="ph-name">${esc(name(m.sender))}</b>` : '';
       const meta = last || unread ? `<span class="ph-meta-t">${unread ? '<i>1</i>' : ''}${last ? esc(shortTime(m.time)) : ''}</span>` : '';
-      return `${sep}<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
+      return `${sep}<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
     })
     .join('');
   const pending = r.pending
@@ -933,6 +1043,7 @@ function settingsView(ctx: ChatContext): string {
   const pct = (k: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc(v(k))}" aria-label="확률"><span>%</span></span>`;
   const num = (k: string, cur: number, lo: number, hi: number, unit: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
   const notices = noticeSettings(ctx.chat.scriptstate);
+  const vs = viewSettings(ctx.chat.scriptstate);
   const rest = (k: string) => {
     const n = advNum(ctx.chat.scriptstate, 'ph', k);
     return n ? `받은 뒤 ${n}턴 쉬어요` : '';
@@ -947,14 +1058,27 @@ function settingsView(ctx: ChatContext): string {
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
         row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
+        row('말버릇 기록', onoff('habits'), '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요'),
+        row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
       ].join(''))}
       ${group('새 메시지', [
         row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
+        row('단톡 수다', `<span class="ph-inline">${onoff('banter')}${pct('banter_chance')}</span>`, '새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요'),
         row('소속 공지 받기', onoff('announcements'), '내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요'),
         row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴'), '공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요'),
         row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개'), '새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요'),
+      ].join(''))}
+      ${group('보기 전용 방', [
+        row('종류', seg('view_preset', vs.preset, [['side', '사이드스토리'], ['mono', '혼잣말'], ['multi', '다중인격 혼잣말']]), '사이드스토리 = 본편에 안 나온 짧은 대화 · 혼잣말 = 시점 인물의 속마음 · 다중인격 혼잣말 = 마음속 여러 갈래가 단톡처럼 주고받아요'),
+        row('시점 인물', `<input class="gx-search ps-text" data-change="ph-text" data-key="view_pov" value="${esc(vs.pov)}" placeholder="비우면 주인공">`),
+        row('시점 인물 대사', onoff('view_speak'), '켜면 시점 인물의 말도 모델이 써요. 끄면 시점 인물은 조용히 있어요'),
+        ...(vs.preset === 'side' ? [
+          row('등장인물 범위', seg('view_scope', vs.scope, [['0', '주요 인물'], ['1', '장면 안'], ['2', '장면 안 주요 인물'], ['3', '자율']])),
+          row('방 크기', seg('view_size', vs.size, [['0', '자동'], ['1', '둘이서'], ['2', '여럿']])),
+        ] : []),
+        row('만들기', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
       ].join(''))}
       ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'), '켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만')].join(''))}
       ${group('보관', [
@@ -969,6 +1093,7 @@ function settingsView(ctx: ChatContext): string {
 /** 왼쪽 목록 (연락처·대화·공지) */
 function listHtml(ctx: ChatContext, st: PState, d: Directory): string {
   if (phone.query.trim()) return searchView(ctx, st, d);
+  if (phone.sub === 'views') return viewsList(ctx);
   return phone.sub === 'contacts' ? contactsView(ctx, d, st) : phone.sub === 'chats' ? chatsView(ctx, st, d) : noticesView(ctx);
 }
 
@@ -980,6 +1105,7 @@ function paneHtml(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
   if (phone.view === 'add') return addView();
   if (phone.view === 'settings') return settingsView(ctx);
   if (phone.view === 'notice') return noticeDetail(ctx);
+  if (phone.view === 'view') return viewPane(ctx, busy);
   return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.phone}</span><b>괴담톡</b><p>왼쪽에서 대화나 연락처를 고르세요.</p></div>`;
 }
 
@@ -1031,7 +1157,7 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
   return `<main class="gx-body ph ph-app ${detail ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담톡 목록">
       <div class="ph-side-head">
-        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
+        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}${subBtn('views', '관전', badge(viewUnread(readViews(ctx.chat.scriptstate))))}</div>
         <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
       ${detail ? '' : status}
@@ -1158,6 +1284,30 @@ export async function handlePhone(action: string, value: string | undefined, ctx
     case 'ph-refresh':
       void refreshInbox(ctx, env);
       return true;
+    case 'ph-view-new':
+      void makeView(ctx, env);
+      return true;
+    case 'ph-view-open': {
+      const list = readViews(ctx.chat.scriptstate);
+      const r = list.find((x) => x.id === v);
+      if (!r) break;
+      if (r.unread) {
+        r.unread = false;
+        await setVars(ctx, env, writeViews(list));
+      }
+      Object.assign(phone, { view: 'view', viewId: v, confirm: null });
+      break;
+    }
+    case 'ph-view-del': {
+      if (phone.confirm !== `view:${v}`) {
+        phone.confirm = `view:${v}`;
+        break;
+      }
+      phone.confirm = null;
+      await setVars(ctx, env, writeViews(readViews(ctx.chat.scriptstate).filter((x) => x.id !== v)));
+      if (phone.viewId === v) Object.assign(phone, { view: phone.view === 'view' ? 'list' : phone.view, viewId: null });
+      return true;
+    }
     case 'ph-group':
       Object.assign(phone, { view: 'group', invite: null, picked: [], topic: '', gname: '', pickQuery: '', pickTab: '' });
       break;
@@ -1263,10 +1413,15 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       await setVars(ctx, env, vars);
       return true;
     }
+    case 'ph-text': {
+      const [k, ...rest] = v.split('=');
+      if (k === 'view_pov') await setVars(ctx, env, { [PH(k)]: rest.join('=').trim().slice(0, 40) });
+      return true;
+    }
     case 'ph-num': {
       const [k, val] = v.split('=');
       const range: Record<string, [number, number]> = {
-        incoming_chance: [0, 100], group_invite_chance: [0, 100], announcement_gap: [1, 100], announcement_history: [1, 50],
+        incoming_chance: [0, 100], group_invite_chance: [0, 100], banter_chance: [0, 100], announcement_gap: [1, 100], announcement_history: [1, 50],
         storage_limit_dm: [1, STORAGE_MAX], storage_limit_group: [1, STORAGE_MAX], storage_limit_notice: [1, STORAGE_MAX],
       };
       const r = range[k];

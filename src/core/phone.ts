@@ -28,6 +28,14 @@ export const PH_UNREAD = '$st_unread_phone';
 export const PH_DEFAULTS: Record<string, string> = {
   model: 'aux', auto: '0', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
   incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
+  /** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
+  reactions: '1',
+  /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
+  habits: '1',
+  /** 단톡 수다: 확인할 때 내 단톡방 하나에서 NPC끼리 대화 한 조각 (라이트보드 미니톡 기본 동작, 2026-11-06) */
+  banter: '0', banter_chance: '30',
+  /** 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06). core/phoneView.ts */
+  view_preset: 'side', view_pov: '', view_speak: '0', view_scope: '0', view_size: '0', view_auto: 'manual',
 };
 
 /** 카드 Settings 로어북의 괴담톡 값과 같은 기본값 */
@@ -83,6 +91,10 @@ export interface PhoneSettings {
   contextMessages: boolean;
   contextAnnouncements: boolean;
   related: boolean;
+  reactions: boolean;
+  habits: boolean;
+  banter: boolean;
+  banterChance: number;
 }
 
 export function phoneValue(state: Record<string, unknown> | undefined, key: string): string {
@@ -112,6 +124,10 @@ export function phoneSettings(state: Record<string, unknown> | undefined): Phone
     contextMessages: v('context_messages') !== '0',
     contextAnnouncements: v('context_announcements') !== '0',
     related: v('related') === '1',
+    reactions: v('reactions') !== '0',
+    habits: v('habits') !== '0',
+    banter: v('banter') === '1',
+    banterChance: pct('banter_chance'),
   };
 }
 
@@ -283,7 +299,8 @@ export function contactDetails(c: PPerson | undefined): string {
 
 // ── 대화방 ──
 
-export type MsgKind = 'message' | 'pause' | 'invite' | 'exit';
+/** skip = 중간 대화를 얼마간 생략함 (라이트보드 미니톡, 2026-11-06) */
+export type MsgKind = 'message' | 'pause' | 'skip' | 'invite' | 'exit';
 export interface PMsg {
   id: number;
   sender: string;
@@ -293,6 +310,8 @@ export interface PMsg {
   audience: string[];
   participant?: string;
   inviter?: string;
+  /** 이모지 반응 「👍3 😭1」 */
+  reactions?: string;
 }
 export type ActionType = 'send' | 'invite_initial' | 'invite_more' | 'refresh';
 export interface PRoom {
@@ -511,7 +530,7 @@ export function splitRecords(text: string): string[] {
 
 /** 생각 블록·코드 울타리·허용된 바깥 태그만 벗기고, 끝의 쉼표 같은 확실한 형식 오류만 고친다 (원본 decodeObject) */
 export function decodeJson(raw: string): unknown {
-  let text = String(raw ?? '').replace(/^﻿/, '').trim();
+  let text = stripHabits(String(raw ?? '')).replace(/^﻿/, '').trim();
   for (let i = 0; i < 12; i++) {
     const before = text;
     if (text.startsWith('{') || text.startsWith('[')) break;
@@ -546,7 +565,88 @@ export function decodeJson(raw: string): unknown {
   }
 }
 
-export type PEvent = { type: 'message'; sender: string; text: string } | { type: 'pause'; text: string } | { type: 'exit'; participant: string };
+export type PEvent =
+  | { type: 'message'; sender: string; text: string; reactions?: string }
+  | { type: 'pause'; text: string }
+  | { type: 'skip' }
+  | { type: 'react'; record: number; reactions: string }
+  | { type: 'exit'; participant: string };
+
+// ── 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) ──
+// 연락처 이름은 고정이라 닉네임은 없고 문자 습관만 쌓는다. 응답 끝 <ph-habits>[…]</ph-habits> 칸으로 받는다
+export const PH_HABITS = PH('habits_list');
+export interface Habit { id: string; name: string; note: string }
+const HABITS_RE = /<ph-habits>\s*([\s\S]*?)\s*<\/ph-habits>/gi;
+export const stripHabits = (raw: string) => raw.replace(HABITS_RE, '').trim();
+
+export function readHabits(state: Record<string, unknown> | undefined): Habit[] {
+  try {
+    const v = JSON.parse(String(state?.[PH_HABITS] ?? '[]'));
+    return Array.isArray(v) ? v.filter((x) => x && typeof x.id === 'string' && typeof x.note === 'string' && x.note) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** 응답의 말버릇 칸을 읽는다. 없거나 깨졌으면 빈 배열 (본 응답은 그대로 쓴다) */
+export function parseHabits(raw: string): unknown[] {
+  const out: unknown[] = [];
+  for (const m of String(raw ?? '').matchAll(HABITS_RE)) {
+    try {
+      const v = JSON.parse(m[1]);
+      if (Array.isArray(v)) out.push(...v);
+    } catch {
+      /* 무시 */
+    }
+  }
+  return out;
+}
+
+/** 이번 요청에 나온 연락처(ids → 이름)의 말버릇만 합친다. 바뀐 게 없으면 null */
+export function mergeHabits(state: Record<string, unknown> | undefined, rows: unknown[], ids: Map<string, string>): Record<string, string> | null {
+  const list = readHabits(state);
+  let changed = false;
+  for (const r of rows as Record<string, unknown>[]) {
+    const id = String(r?.sender ?? r?.id ?? '').trim();
+    const note = String(r?.note ?? '').trim().slice(0, 300);
+    if (!ids.has(id) || !note) continue;
+    const i = list.findIndex((x) => x.id === id);
+    const row = { id, name: ids.get(id)!, note };
+    if (i >= 0 && list[i].note === note) continue;
+    if (i >= 0) list.splice(i, 1);
+    list.push(row);
+    changed = true;
+  }
+  return changed ? { [PH_HABITS]: JSON.stringify(list.slice(-80)) } : null;
+}
+
+// ── 이모지 반응 (라이트보드 미니톡 parseReactions, 2026-11-06) ──
+export interface Reaction { emoji: string; count: number }
+/** 「👍3 😭1」을 읽는다. 「-」·빈 값은 반응 없음 */
+export function parseReactions(value: unknown): Reaction[] {
+  if (typeof value !== 'string') return [];
+  const out: Reaction[] = [];
+  for (const token of value.split(/[\s,]+/)) {
+    if (!token || token === '-') continue;
+    const m = /^(.*?)(\d+)$/.exec(token);
+    const emoji = (m ? m[1] : token).trim();
+    const count = m ? Number(m[2]) : 1;
+    if (!emoji || /[\p{L}\p{N}]/u.test(emoji) || [...emoji].length > 8 || count < 1) continue;
+    const old = out.find((r) => r.emoji === emoji);
+    if (old) old.count = Math.max(old.count, count);
+    else out.push({ emoji, count });
+  }
+  return out.slice(0, 6);
+}
+/** 반응할 수 있는 사람 수: 그 말풍선을 본 사람 중 보낸 사람과 나를 뺀 수 (나는 반응하지 않는다) */
+export function reactionCap(m: { sender: string; audience: string[] }): number {
+  return m.audience.filter((c) => c !== m.sender && c !== 'me').length;
+}
+/** 반응을 사람 수에 맞춰 줄이고 다시 글자로. 남는 게 없으면 '' */
+export function clampReactions(value: unknown, cap: number): string {
+  if (cap < 1) return '';
+  return parseReactions(value).map((r) => `${r.emoji}${Math.min(r.count, cap)}`).join(' ');
+}
 
 function fail(msg: string): never {
   throw new PhoneError(msg);
@@ -576,13 +676,21 @@ function readOp(op: Record<string, unknown>, r: PRoom, allowTitle: boolean, even
     setTitle(op.value.trim());
     return null;
   }
+  const react = op.op === 'replace' && typeof op.path === 'string' ? /^\/messages\/(\d+)\/reactions$/.exec(op.path) : null;
+  if (react) {
+    if (typeof op.value !== 'string') return '반응 형식이 잘못됐어요.';
+    events.push({ type: 'react', record: Number(react[1]), reactions: op.value });
+    return null;
+  }
   if (op.op !== 'add' || op.path !== '/messages/-') return '기존 기록은 고치거나 지울 수 없어요. 새 메시지만 추가하세요.';
   const m = op.value as Record<string, unknown>;
   if (!m || typeof m !== 'object' || typeof m.content !== 'string' || typeof m.sender !== 'string' || typeof m.type !== 'string') return '메시지에는 content·sender·type 문자열이 필요해요.';
-  if (m.type === 'text') events.push({ type: 'message', sender: m.sender, text: m.content });
+  if (m.type === 'text') events.push({ type: 'message', sender: m.sender, text: m.content, ...(typeof m.reactions === 'string' && m.reactions.trim() !== '-' ? { reactions: m.reactions } : {}) });
   else if (m.type === 'exit') {
     if (m.sender !== '-') return '퇴장 형식이 잘못됐어요.';
     events.push({ type: 'exit', participant: m.content });
+  } else if (m.type === 'skip') {
+    events.push({ type: 'skip' });
   } else if (m.type === 'pause') {
     if (m.sender !== '-') return '대기 형식이 잘못됐어요.';
     if (!hiddenPause(m.content)) events.push({ type: 'pause', text: m.content });
@@ -615,6 +723,9 @@ function eventProblem(e: PEvent, r: PRoom, active: Set<string>): string | null {
     if (!active.has(e.sender) || !e.text.trim()) return '참여하지 않은 인물의 메시지예요.';
     if (r.kind !== 'dm' && /\[\[ATTACH:gift\]\]/i.test(e.text)) return '단톡방에서는 선물을 보낼 수 없어요.';
     if (tokens(e.text) > LIMITS.reply_tokens) return `답장 한 개는 ${LIMITS.reply_tokens}토큰 이내여야 해요.`;
+  } else if (e.type === 'skip') return null;
+  else if (e.type === 'react') {
+    if (!r.messages.some((m) => m.id === e.record && m.kind === 'message')) return '반응을 달 메시지를 찾지 못했어요.';
   } else if (e.type === 'pause') {
     if (!e.text.trim()) return '대기 설명이 없어요.';
     if (tokens(e.text) > LIMITS.pause_tokens) return `대기 설명은 ${LIMITS.pause_tokens}토큰 이내여야 해요.`;
@@ -648,12 +759,25 @@ export function applyEvents(st: PState, r: PRoom, events: PEvent[], time: string
   const waiting = r.kind === 'dm' && conversationState(r).ownerHasNotReplied;
   for (const e of events) {
     if (e.type === 'message') {
+      let last: PMsg | undefined;
       for (const rec of splitRecords(stripForged(e.text))) {
-        push(st, r, e.sender, rec, time);
+        last = push(st, r, e.sender, rec, time);
         count++;
       }
+      const rx = last && e.reactions ? clampReactions(e.reactions, reactionCap(last)) : '';
+      if (last && rx) last.reactions = rx;
     } else if (e.type === 'pause') {
       if (!hiddenPause(e.text)) push(st, r, 'system', e.text, time, 'pause');
+    } else if (e.type === 'skip') {
+      // 생략 줄이 연달아 오면 하나만
+      if (r.messages[r.messages.length - 1]?.kind !== 'skip') push(st, r, 'system', '', time, 'skip');
+    } else if (e.type === 'react') {
+      const m = r.messages.find((x) => x.id === e.record && x.kind === 'message');
+      if (m) {
+        const rx = clampReactions(e.reactions, reactionCap(m));
+        if (rx) m.reactions = rx;
+        else delete m.reactions;
+      }
     } else membership(st, r, 'exit', e.participant, time);
   }
   r.unread = (r.unread || 0) + count;
@@ -926,7 +1050,7 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
       const names = [roomLabel(r), ...Object.values(r.people).flatMap((p) => [p.name, p.english ?? ''])];
       const roomHit = related(focus, names);
       for (const m of r.messages) {
-        if (m.kind === 'pause' && hiddenPause(m.text)) continue;
+        if ((m.kind === 'pause' && hiddenPause(m.text)) || m.kind === 'skip') continue;
         items.push({
           order: m.id, related: roomHit || related(focus, [], m.text),
           data: {

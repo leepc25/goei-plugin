@@ -14,6 +14,7 @@ import { shouldKeepSeed } from './core/request';
 import { messageText } from './core/refs';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
+import { viewSettings } from './core/phoneView';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
 import { advNum, applyAdvanced } from './core/advanced';
 import { fitTotal, type ContextPart } from './core/budget';
@@ -21,7 +22,10 @@ import { makeFocus, sceneText } from './core/focus';
 import { buildRegistry } from './core/world/registry';
 import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
-import { autoRefresh } from './ui/phone';
+import { autoRefresh, autoView } from './ui/phone';
+import { autoWriteWiki } from './ui/wiki';
+import { wikiSettings } from './core/wiki';
+import { featureModel } from './core/craft';
 import { autoRefreshGnet } from './ui/gnet';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
@@ -478,7 +482,9 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
     const gnetAuto = gnetSettings(now.scriptstate).auto;
-    if (phoneAuto || gnetAuto) {
+    const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
+    const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
+    if (phoneAuto || gnetAuto || viewAuto || wikiAuto) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -488,19 +494,25 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         applyAdvanced(now!.scriptstate);
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+        const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
         const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
         const model = phoneSettings(now!.scriptstate).model;
-        if (phoneAuto && gnetAuto && gnetSettings(now!.scriptstate).model === model) {
-          const joint = new Joint(model);
+        const fixed = featureModel(now!.scriptstate, 'ph');
+        if (phoneAuto && gnetAuto && gnetSettings(now!.scriptstate).model === model && featureModel(now!.scriptstate, 'gn') === fixed) {
+          const joint = new Joint(model, fixed);
           await Promise.all([
             autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
             autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
           ]);
+          if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+          if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
           return;
         }
         if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
         if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
+        if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+        if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
       })();
     }
   } catch (error) {

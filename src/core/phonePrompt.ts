@@ -5,15 +5,17 @@ import { readGnet } from './gnet';
 import {
   agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
-  type PState, phoneTime, hiddenPause, cooldownReady,
+  type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { previousView, viewSettings, type ViewRoom } from './phoneView';
+import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
 
 export interface PhonePrompt {
-  messages: { role: 'system' | 'user'; content: string }[];
+  messages: CraftMessage[];
   contactMode: boolean;
 }
 
@@ -51,6 +53,7 @@ interface Body {
   invitationCheck?: InvitationCheck;
   recipientEvidenceSources?: { id: string; kind: string; text: string; sender?: string }[];
   singlePassContact?: boolean;
+  textingHabits?: { sender: string; note: string }[];
 }
 
 /** 원본 ruleBuilder: 실제 요청에 해당하는 섹션만 */
@@ -74,6 +77,8 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     if (body.crossRoomMessages?.length || (body.rooms?.length ?? 0) > 1) keys.push('CROSS_ROOM');
     if (hasAttachment(JSON.stringify(body))) keys.push('ATTACHMENT_READ');
     keys.push('ATTACHMENT_OUTPUT', 'PATCH');
+    // 이모지 반응 (라이트보드 미니톡, 2026-11-06). 옛 카드에 절이 없으면 붙이지 않는다
+    if (phoneSettings(src.chat.scriptstate).reactions && p.REACTIONS !== undefined) keys.push('REACTIONS');
   }
   keys.push(mode);
   if (mode === 'REPLY') {
@@ -81,11 +86,14 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     const map: Record<string, string> = { send: 'ACTION_SEND', invite_initial: 'ACTION_INVITE_INITIAL', invite_more: 'ACTION_INVITE_MORE', refresh: 'ACTION_REFRESH' };
     keys.push(map[action] ?? 'ACTION_REFRESH');
   } else {
+    if (body.rooms?.some((x) => x.banter) && p.BANTER !== undefined) keys.push('BANTER');
     if (body.invitationCheck?.allowed) keys.push('GROUP_INVITES');
     if (body.announcementCheck?.allowed) keys.push('ANNOUNCEMENTS');
   }
   if (manual) keys.push('MANUAL_CONTACT', 'CONTACT_CONTEXT', 'SINGLE_PASS_CONTACT');
   keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
+  // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
+  if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
 }
 
@@ -99,15 +107,17 @@ interface RoomPacket {
   activeMembers: string[];
   participants: { id: string; name?: string }[];
   pov: 'me';
-  messages: { sender: string; type: string; time: string; content: string; audience: string[]; recordID: number }[];
+  messages: { sender: string; type: string; time: string; content: string; audience: string[]; recordID: number; reactions?: string }[];
   conversationState: ReturnType<typeof conversationState> & { directReplyPending?: boolean; followupAlreadySent?: boolean; defaultNextAction?: string };
   candidateOnly: boolean;
   directoryEstablishesRelationship: false;
   action: { type: string; invited?: string[] };
   receiveMessages?: boolean;
+  /** 단톡 수다를 꼭 만들 방 */
+  banter?: boolean;
 }
 
-export function roomPacket(r: PRoom): RoomPacket {
+export function roomPacket(r: PRoom, reactions = false): RoomPacket {
   const messages = r.messages
     .slice(-HISTORY.room)
     .filter((m) => m.kind !== 'pause' || !hiddenPause(m.text))
@@ -115,9 +125,10 @@ export function roomPacket(r: PRoom): RoomPacket {
       sender: m.sender === 'system' ? '-' : m.sender,
       type: m.kind === 'message' ? 'text' : m.kind === 'invite' ? 'invited' : m.kind,
       time: m.time,
-      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.text,
+      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : m.text,
       audience: m.audience,
       recordID: m.id,
+      ...(reactions && m.kind === 'message' ? { reactions: m.reactions || '-' } : {}),
     }));
   const participants: RoomPacket['participants'] = [{ id: 'me' }, ...Object.entries(r.people).map(([id, c]) => ({ id, name: c.name }))];
   const hasTalk = !!r.conversationBaseline?.lastSender || r.messages.some((m) => m.kind === 'message');
@@ -185,7 +196,7 @@ function ownerCharacter(src: RefSource): { character?: string; rank?: string } {
 function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
   applyAdvanced(src.chat.scriptstate);
   const n = trimTurns(HISTORY.turns);
-  const turns = n ? recentTurns(src.chat, n) : [];
+  const turns = n ? recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages) : [];
   const recentStory: Narrator['recentStory'] = [];
   turns.forEach((t, i) => {
     if (t.user) recentStory.push({ role: 'user', text: t.user, turn: i + 1 });
@@ -281,14 +292,19 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
     body.recipientEvidenceSources = contactSources(body);
     body.singlePassContact = true;
   }
+  if (phoneSettings(src.chat.scriptstate).habits) {
+    const ids = new Set(body.participants.map((x) => x.sender));
+    const rows = readHabits(src.chat.scriptstate).filter((h) => ids.has(h.id)).map((h) => ({ sender: h.id, note: h.note }));
+    if (rows.length) body.textingHabits = rows;
+  }
   const system = rules(src, body, mode);
-  return {
-    messages: [
-      { role: 'system', content: factionCodesToNames(system, names) },
-      { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
-    ],
-    contactMode,
-  };
+  const p = sections(src);
+  const read = (k: string) => (p[k] === undefined ? '' : section(p, k));
+  const messages: CraftMessage[] = [
+    { role: 'system', content: factionCodesToNames(system, names) },
+    { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
+  ];
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode };
 }
 
 function gnetBoard(src: RefSource, query: string): unknown {
@@ -302,7 +318,7 @@ function gnetBoard(src: RefSource, query: string): unknown {
 /** 한 방에 대한 답장 요청 (보내기·단톡 만들기·초대·방 새로고침) */
 export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory, names: Record<string, string>): PhonePrompt {
   const set = phoneSettings(src.chat.scriptstate);
-  const packet = roomPacket(r);
+  const packet = roomPacket(r, set.reactions);
   const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
   const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(packet)) };
   crossRoom(body, st);
@@ -356,7 +372,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   const rooms: RoomPacket[] = [];
   const memo = new Map<string, Participant>();
   for (const r of candidates) {
-    const packet = roomPacket(r);
+    const packet = roomPacket(r, set.reactions);
     packet.action = { type: 'refresh' };
     packet.receiveMessages = refreshAllowed(chat, r, set, incomingOn)[0];
     rooms.push(packet);
@@ -365,6 +381,11 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
     for (const cid of r.members) {
       if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
     }
+  }
+  // 단톡 수다: NPC가 둘 이상인 내 단톡방 하나를 골라 대화 한 조각을 꼭 만들게 한다
+  if (set.banter && chancePassed(set.banterChance, rng)) {
+    const groups = rooms.filter((x) => x.kind === 'group' && x.receiveMessages && x.activeMembers.length >= 2);
+    if (groups.length) groups[Math.min(groups.length - 1, Math.floor(rng() * groups.length))].banter = true;
   }
   const participants = [...memo.values()];
   const { channel: _channel, ...publicAnnounce } = announce;
@@ -388,12 +409,40 @@ function personOfContact(c: Contact): PPerson {
 
 /** 새로고침 응답이 형식에 안 맞을 때 같은 자료로 한 번 더 (원본 재시도 문구) */
 export function refreshRetry(prompt: PhonePrompt, reason: string): PhonePrompt['messages'] {
-  const [sys, user] = prompt.messages;
+  const [sys, ...rest] = prompt.messages;
   return [
     {
       role: 'system',
-      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}`,
+      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}`,
     },
-    user,
+    ...rest,
   ];
+}
+
+// ── 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06) ──
+/** 보기 전용 방 한 개를 만드는 요청 */
+export function viewPrompt(src: RefSource, names: Record<string, string>, views: ViewRoom[]): PhonePrompt {
+  const set = viewSettings(src.chat.scriptstate);
+  const p = sections(src);
+  const opt = (k: string) => (p[k] === undefined ? '' : section(p, k));
+  const keys = ['VIEW.COMMON'];
+  if (set.preset === 'side') keys.push('VIEW.SIDE', `VIEW.SIDE.SPEAK.${set.speak ? 1 : 0}`, `VIEW.SCOPE.${set.scope}`, ...(set.size === '0' ? [] : [`VIEW.SIZE.${set.size}`]));
+  else keys.push('VIEW.MIND', set.preset === 'mono' ? 'VIEW.MONO' : 'VIEW.MULTI', ...(set.preset === 'multi' ? [`VIEW.MULTI.SPEAK.${set.speak ? 1 : 0}`] : []));
+  keys.push('VIEW.OUTPUT');
+  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
+  const previousRoom = previousView(views, set.preset);
+  const owner = ownerCharacter(src).character;
+  const body = {
+    viewpoint: { name: set.pov || owner || '주인공', isPhoneOwner: !set.pov || set.pov === owner },
+    kind: set.preset,
+    ...(previousRoom ? { previousRoom } : {}),
+    narratorOnly: narrator(src, names, phoneSettings(src.chat.scriptstate).related, `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
+  };
+  const read = (k: string) => opt(k);
+  const messages: CraftMessage[] = [
+    { role: 'system', content: factionCodesToNames(system, names) },
+    { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
+  ];
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
 }
