@@ -6,6 +6,7 @@
 import {
   JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
+  buildChronicle, CHRON_KIND_LABEL, type ChronEntry, type ChronKind,
 } from '../core/journal';
 import { debriefRunning, requestDebrief } from '../host/journal';
 import { getPrefs } from '../core/settings';
@@ -51,6 +52,8 @@ export const rec = {
   info: '',
   busy: false,
   toast: null as null | { rpt: string; name: string },
+  /** 연대기에서 끈 종류 (2026-11-06 사용자: 자잘한 것까지 다 쌓이면 곤란 → 종류별 칩) */
+  chronOff: [] as ChronKind[],
   /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
   png: null as null | { url: string; name: string; no: string },
 };
@@ -86,7 +89,7 @@ export function recordsMarkName(r: RecordsNav, chat: Chat | null): string {
   if (r.view === 'person') return `${r.id} 기록`;
   if (r.view === 'docs') return '기록 문서';
   if (r.view === 'faction') return `세력 ${r.id}`;
-  return r.sub === 'journal' ? '일지' : r.sub === 'wallet' ? '가계부' : r.sub === 'people' ? '이 채팅의 인물' : '세력';
+  return r.sub === 'journal' ? '일지' : r.sub === 'chronicle' ? '연대기' : r.sub === 'wallet' ? '가계부' : r.sub === 'people' ? '이 채팅의 인물' : '세력';
 }
 
 // ── 시각·글 도우미 ──
@@ -129,7 +132,7 @@ function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
 
 // ── 화면 ──
 
-const SUBS: [RecSub, string][] = [['journal', '일지'], ['wallet', '가계부'], ['people', '인물'], ['factions', '세력']];
+const SUBS: [RecSub, string][] = [['journal', '일지'], ['chronicle', '연대기'], ['wallet', '가계부'], ['people', '인물'], ['factions', '세력']];
 
 export function recordsTab(ctx: ChatContext): string {
   const tabs = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
@@ -139,7 +142,7 @@ export function recordsTab(ctx: ChatContext): string {
   });
   // 하위 탭 넷은 PC·폰 모두 내용 위 탭 줄 (2026-11-05 사용자: 서랍에 묻혀 보이지 않았다).
   // 폰 서랍에는 일지 칩·찾기, 가계부 칩·찾기만 한 줄로. 넣을 게 없는 화면(인물·세력·상세)은 서랍 없음
-  const tools = rec.view !== 'list' ? '' : rec.sub === 'wallet' ? walletTools(ctx) : rec.sub === 'journal' ? journalTools() : '';
+  const tools = rec.view !== 'list' ? '' : rec.sub === 'wallet' ? walletTools(ctx) : rec.sub === 'journal' ? journalTools() : rec.sub === 'chronicle' ? chronicleTools() : '';
   const drawer = tools && isPhone() ? drawerBox(tools, 'gx-rdrawer') : '';
   // 보고서 팝업은 본문(main) 밖, 창 뿌리에 (2026-11-05 사용자: 흐름 안에 끼어 공간을 먹지 않게 — 사원증 창과 같은 자리)
   const rpt = rec.view === 'report' ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx, rec.id)}</div></div>` : '';
@@ -166,6 +169,7 @@ function pane(ctx: ChatContext): string {
   if (rec.view === 'docs') return `<div class="gx-rec-pane">${peopleDocsView(ctx)}</div>`;
   if (rec.view === 'faction') return `<div class="gx-rec-pane">${factionView(ctx, rec.id)}</div>`;
   switch (rec.sub) {
+    case 'chronicle': return chroniclePane(ctx);
     case 'wallet': return walletPane(ctx);
     case 'people': return `<div class="gx-rec-pane">${peopleListView(ctx)}</div>`;
     case 'factions': return `<div class="gx-rec-pane">${factionListView(ctx)}</div>`;
@@ -274,6 +278,41 @@ function journalRow(ctx: ChatContext, r: JournalRow): string {
     `;  // 오른쪽 시각 칸은 뺌 (2026-11-05 사용자: 카드의 END 시각과 중복)
   const cls = `gx-jr-row${r.mine ? ' mine' : ''}`;
   return `<li>${rep ? `<button class="${cls}" data-action="rec-open" data-value="${esc(r.rpt)}" aria-label="${esc(r.name)} 보고서">${inner}</button>` : `<div class="${cls}">${inner}</div>`}</li>`;
+}
+
+// ── 연대기 (2026-11-06 사용자 「진행시켜」): 유저의 사건·출동·인물 단계·세력 구간·신분 변경을 날짜순 한 줄씩 ──
+
+const CHRON_KINDS = Object.entries(CHRON_KIND_LABEL) as [ChronKind, string][];
+
+function chronicleTools(): string {
+  return `<div class="gx-rec-tools gx-wt-tools">${CHRON_KINDS.map(([k, l]) => `<button class="gx-chip${rec.chronOff.includes(k) ? '' : ' on'}" data-action="rec-chron" data-value="${k}" aria-pressed="${!rec.chronOff.includes(k)}">${l}</button>`).join('')}</div>`;
+}
+
+function chroniclePane(ctx: ChatContext): string {
+  const all = buildChronicle(ctx.chat, ctx.char.globalLore);
+  const shown = all.filter((e) => !rec.chronOff.includes(e.kind));
+  const n = (k: ChronKind) => all.filter((e) => e.kind === k).length;
+  const mon = monitor('연대기', '', '', [
+    { label: '사건', value: String(n('event')), sub: '내가 나간 종료', tone: 'mint' },
+    { label: '인물', value: String(n('person')), sub: '호감 단계 변화', tone: 'amb' },
+    { label: '세력', value: String(n('faction')), sub: '평판 구간 변화' },
+    { label: '신분', value: String(n('rank')), sub: n('rank') ? '변경' : '없음' },
+  ], { cls: 'gx-jr-tiles' });
+  if (!shown.length) return `${mon}${isPhone() ? '' : chronicleTools()}<p class="gx-wt-empty">${all.length ? '켠 종류에 해당하는 줄이 없어요.' : '아직 쌓인 것이 없어요. 내가 나간 사건이 끝나거나, 인물 호감·세력 평판의 단계가 바뀌면 여기에 한 줄씩 쌓여요.'}</p>`;
+  const groups: { day: string; rows: ChronEntry[] }[] = [];
+  for (const e of shown) {
+    const g = groups[groups.length - 1];
+    if (g && g.day === e.day) g.rows.push(e);
+    else groups.push({ day: e.day, rows: [e] });
+  }
+  const line = (e: ChronEntry) => {
+    const act = e.rpt ? ` data-action="rec-open" data-value="${esc(e.rpt)}"` : e.person ? ` data-action="rec-person" data-value="${esc(e.person)}"` : e.faction ? ` data-action="rec-faction" data-value="${esc(e.faction)}"` : '';
+    const mark = e.kind === 'event' ? gmark(e.grade && /^[A-Za-z]+$/.test(e.grade) ? 'an' : 'in', e.grade) : `<i class="gx-cr-dot ${e.kind}"></i>`;
+    const inner = `${mark}<span class="gx-cr-main"><b>${esc(e.title)}</b><small>${esc(e.text)}</small></span><em>${esc(CHRON_KIND_LABEL[e.kind])}</em>`;
+    return `<li class="gx-cr-row ${e.kind}">${act ? `<button class="gx-cr-btn"${act}>${inner}</button>` : `<div class="gx-cr-btn">${inner}</div>`}</li>`;
+  };
+  return `${mon}${isPhone() ? '' : chronicleTools()}
+    <div class="gx-chron">${groups.map((g) => `<section class="gx-cr-day"><h3>${esc(g.day || '날짜 없음')}</h3><ul>${g.rows.map(line).join('')}</ul></section>`).join('')}</div>`;
 }
 
 // ── 보고서 요약 조각 (일지 줄에 붙는다) ──
@@ -436,6 +475,10 @@ export async function handleRecords(action: string, value: string | undefined, c
       break;
     case 'rec-filter':
       if (FILTERS.some(([f]) => f === v)) rec.filter = v as JournalFilter;
+      break;
+    case 'rec-chron':
+      if (!(v in CHRON_KIND_LABEL)) return true;
+      rec.chronOff = rec.chronOff.includes(v as ChronKind) ? rec.chronOff.filter((k) => k !== v) : [...rec.chronOff, v as ChronKind];
       break;
     case 'rec-open':
       closeToast();
