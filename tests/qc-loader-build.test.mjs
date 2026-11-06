@@ -70,7 +70,7 @@ test('자료 팩 조각: 이어 붙이면 팩 글, 지문이 본체에 박혀 �
   const i = JSON.parse(installPackText());
   assert.deepEqual([i.schema, i.kind, i.greetings.texts.length, i.icon.file], [1, 'install', 1, 'icon.png']);
   // 본체 크기: 자료를 뺀 뒤 (개선 나1 전 3.42MB · 18조각)
-  assert.ok(Buffer.byteLength(body) < 2_300_000, `본체 ${Buffer.byteLength(body)} 바이트 < 2.3MB`);
+  assert.ok(Buffer.byteLength(body) < 2_500_000, `본체 ${Buffer.byteLength(body)} 바이트 < 2.5MB`); // 리수폿·라이트보드(11-06) 뒤 2.32MB
   // 세계 자료 한 파일(goei-data-world.txt, 릴리스 zip 에 넣어 받기 창의 「파일로 넣기」로): 조각을 이은 글과 같다
   assert.equal(read('dist/goei-data-world.txt'), worldPackText(), 'goei-data-world.txt = 팩 글 전체');
   // 시험용 예외 주입(src/body.ts faultOn 의 GOEI_TEST 블록)은 배포 본체에 없고 시험 본체(dist-test/goei-body.js)에만 있다
