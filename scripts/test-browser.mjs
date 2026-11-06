@@ -7,6 +7,7 @@
 //   --only a,b         이 이름들만 (쉼표, 여러 번 가능. 이름 = browser-suite.json 의 name, 파일 이름도 됨)
 //   --skip a,b         이 이름들은 빼고
 //   --group plugin,game,legacy   묶음으로 고르기
+//   --fast             빠른 묶음만 (browser-suite.json 에 fast: true 인 시험, 3~5분. 커밋 전 확인용, 2026-11-06)
 //   --list             고른 시험 표만 보이고 끝
 //   --out <폴더>       기록 폴더. 기본 .scratch/test-browser/ (GOEI_TEST_OUT). 시험마다 logs/<이름>.log, 사진 shots/<이름>/, 결과 result.md·result.json
 //   --timeout-scale n  제한 시간 배수 (느린 기계 2 등)
@@ -25,7 +26,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SUITE = resolve(ROOT, 'tests/browser-suite.json');
 
 // ---- 인자 ------------------------------------------------------------------------------------------------------
-const opt = { fixture: process.env.GOEI_FIXTURE || '', build: true, only: [], skip: [], group: [], list: false, out: process.env.GOEI_TEST_OUT || '', scale: 1 };
+const opt = { fixture: process.env.GOEI_FIXTURE || '', build: true, only: [], skip: [], group: [], fast: false, list: false, out: process.env.GOEI_TEST_OUT || '', scale: 1 };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -36,6 +37,7 @@ const opt = { fixture: process.env.GOEI_FIXTURE || '', build: true, only: [], sk
     else if (k === '--only') opt.only.push(...list(v()));
     else if (k === '--skip') opt.skip.push(...list(v()));
     else if (k === '--group') opt.group.push(...list(v()));
+    else if (k === '--fast') opt.fast = true;
     else if (k === '--list') opt.list = true;
     else if (k === '--out') opt.out = v();
     else if (k === '--timeout-scale') opt.scale = Number(v()) || 1;
@@ -49,7 +51,7 @@ mkdirSync(resolve(OUT, 'logs'), { recursive: true });
 // ---- 시험 고르기 ----------------------------------------------------------------------------------------------
 const suite = JSON.parse(readFileSync(SUITE, 'utf8')).tests;
 const nameOf = (t) => [t.name, basename(t.file), basename(t.file).replace(/\.mjs$/, ''), basename(t.file).replace(/-browser\.mjs$/, '')];
-const picked = (t) => (!opt.only.length || opt.only.some((n) => nameOf(t).includes(n))) && !opt.skip.some((n) => nameOf(t).includes(n)) && (!opt.group.length || opt.group.includes(t.group));
+const picked = (t) => (!opt.only.length || opt.only.some((n) => nameOf(t).includes(n))) && !opt.skip.some((n) => nameOf(t).includes(n)) && (!opt.group.length || opt.group.includes(t.group)) && (!opt.fast || t.fast === true);
 for (const n of [...opt.only, ...opt.skip]) if (!suite.some((t) => nameOf(t).includes(n))) console.warn(`경고: 목록에 없는 이름 ${n}`);
 const tests = suite.filter(picked);
 if (!tests.length) { console.error('고른 시험이 없어요'); process.exit(2); }
