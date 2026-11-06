@@ -146,11 +146,11 @@ export interface Personnel {
   closed: number;
   /** 그 가운데 괴이 클리어 */
   cleared: number;
-  /** 같이 간 요원 Top3 [이름, 횟수] (나 자신은 빼고) */
+  /** 같이 간 요원 전부 [이름, 횟수] 많은 순 (나 자신은 빼고, 팝업이라 다 보인다 — 사용자 11-06) */
   companions: [string, number][];
 }
 
-/** 인사 기록 숫자 (팝업): 배치일, 끝낸 내 사건 수·클리어, 같이 간(투입 칸에 같이 적힌) 요원 Top3. 지출은 넣지 않는다 (사용자 11-06) */
+/** 인사 기록 숫자 (팝업): 배치일, 끝낸 내 사건 수·클리어, 같이 간(투입 칸에 같이 적힌) 요원 전부. 지출은 넣지 않는다 (사용자 11-06) */
 export function buildPersonnel(chat: Chat, lore: LoreEntry[] | undefined): Personnel {
   const rows = readJournal(chat).rows.filter((r) => r.mine && r.kind !== 'fd');
   const me = playerAgent(lore, chat.scriptstate);
@@ -163,6 +163,6 @@ export function buildPersonnel(chat: Chat, lore: LoreEntry[] | undefined): Perso
     since: first ? lastStatusFields([str(first.data)])?.date ?? '' : '',
     closed: rows.length,
     cleared: rows.filter((r) => r.cleared).length,
-    companions: [...comp.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3),
+    companions: [...comp.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
   };
 }

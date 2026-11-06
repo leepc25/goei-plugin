@@ -1572,26 +1572,37 @@ function idCard(ctx: ChatContext): string {
     </div>`;
 }
 
-/** 인사 기록부 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로). 머리(사진·이름·소속·직급·사원 번호·배치일) ·
- *  숫자(끝낸 내 사건, 클리어) · 같이 간 요원 Top3 (사건 투입 칸에 같이 적힌 횟수). 모델 호출 없음 */
+/** 인사 기록 카드 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로 「인사기록카드 느낌」). 서식 종이처럼:
+ *  머리(소속 · 「인사 기록 카드」 · 사원 번호) · 증명사진 + 인적 사항 표(성명·소속·직급·배치일) · 근무 기록 표(끝낸 내 사건·클리어) ·
+ *  같이 간 요원 표(전부, 많이 간 순 — 사건 투입 칸에 같이 적힌 횟수). 모델 호출 없음 */
 function personnelCard(ctx: ChatContext): string {
   const facs = factionList(ctx.char.globalLore);
   const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '') || currentChoice(ctx.chat).faction || '';
   const f = code ? findFaction(code, facs) : undefined;
+  const org = f ? selfName(ctx, f.code, f.name) : '';
   const pa = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
   const u = userInfo();
   const photo = pa ? imageUrl(ctx.char, facePic(ctx.char, pa, true)) : u.photo;
-  const role = [f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · ');
   const p = buildPersonnel(ctx.chat, ctx.char.globalLore);
-  const cell = (label: string, value: string) => `<span class="gx-pr-cell"><i>${label}</i><b>${esc(value)}</b></span>`;
+  const dir = readDirectory(ctx.char.globalLore);
+  const row = (k: string, v: string) => `<tr><th>${k}</th><td>${esc(v || '—')}</td></tr>`;
   const comp = p.companions.length
-    ? `<ol class="gx-pr-comp">${p.companions.map(([n, c]) => `<li><span>${esc(n)}</span><em>${c}회</em></li>`).join('')}</ol>`
+    ? `<div class="gx-pr-scroll"><table class="gx-pr-tbl gx-pr-comp"><thead><tr><th>번호</th><th>요원</th><th>소속·직급</th><th>횟수</th></tr></thead><tbody>${p.companions.map(([n, c], i) => {
+      const a = dir.agents.find((x) => x.name === n);
+      const sub = a ? [a.department, a.rank].filter(Boolean).join(' · ') : '';
+      return `<tr><td class="no">${i + 1}</td><td class="who"><span>${avatar(ctx.char, a?.english, n, 'sq')}<b>${esc(n)}</b></span></td><td class="sub">${esc(sub || '—')}</td><td class="n">${c}회</td></tr>`;
+    }).join('')}</tbody></table></div>`
     : '<p class="gx-pr-none">아직 같이 간 요원이 없어요.</p>';
-  return `<div class="gx-pr" role="document" aria-label="인사 기록">
-      <span class="gx-pr-head"><i>인사 기록</i>${pa?.id ? `<em>${esc(pa.id)}</em>` : ''}</span>
-      <span class="gx-pr-who">${photo ? `<span class="gx-pr-photo"><img src="${esc(photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}<span><b>${esc(pa?.name || u.name || '나')}</b><small>${esc(role)}</small>${p.since ? `<small class="gx-pr-since">배치 ${esc(p.since)}</small>` : ''}</span></span>
-      <span class="gx-pr-cells">${cell('끝낸 내 사건', `${p.closed}건`)}${cell('클리어', `${p.cleared}건`)}</span>
-      <span class="gx-pr-sec"><i>같이 간 요원 (많이 간 순 3명)</i>${comp}</span>
+  return `<div class="gx-pr" role="document" aria-label="인사 기록 카드">
+      <header class="gx-pr-head"><small>${esc(org || '소속 없음')}</small><b>인사 기록 카드</b><em>${esc(pa?.id ? `No. ${pa.id}` : '')}</em></header>
+      <section class="gx-pr-id">
+        ${photo ? `<span class="gx-pr-photo"><img src="${esc(photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}
+        <table class="gx-pr-tbl gx-pr-kv"><tbody>${row('성명', pa?.name || u.name || '나')}${row('소속', [org, pa?.department ?? ''].filter(Boolean).join(' · '))}${row('직급', pa?.rank ?? '')}${row('배치일', p.since)}</tbody></table>
+      </section>
+      <section class="gx-pr-sec"><h4>근무 기록</h4>
+        <table class="gx-pr-tbl gx-pr-kv"><tbody>${row('끝낸 내 사건', `${p.closed}건`)}${row('클리어', `${p.cleared}건`)}</tbody></table>
+      </section>
+      <section class="gx-pr-sec"><h4>같이 간 요원 <em>${p.companions.length}명</em></h4>${comp}</section>
     </div>`;
 }
 
