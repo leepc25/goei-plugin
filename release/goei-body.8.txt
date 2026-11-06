@@ -2350,7 +2350,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   function undoBar(ctx2) {
     const u = settingsUi.undo;
     if (!u || u.charIndex !== ctx2.charIndex || u.chatIndex !== ctx2.chatIndex || settingsUi.confirm) return "";
-    return `<div class="st-confirm st-barconfirm ps-defconfirm st-undobar"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? "disabled" : ""}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
+    return `<div class="st-confirm st-undobar ps-defconfirm"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? "disabled" : ""}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
   }
   function mainDefaultsConfirm(ctx2) {
     const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
@@ -3082,4 +3082,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   var FEATURE_INFO = {
     // 2026-10-29 사용자: 응답 태그 형식 같은 안쪽 사정은 예시로 보이지 않는다 (상황판·이미지는 설명만)
-   
+    board: { desc

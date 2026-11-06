@@ -1,4 +1,5 @@
-인 */
+
+/* 위키 메인 */
 .nw-home { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 22px 24px 28px; }
 .nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
 .nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
@@ -2459,5 +2460,4 @@ ${note.trim()}` : card2;
           env3.render();
           return true;
         }
-        field3.place = v2;
-        con
+        field3.place = v

@@ -1,4 +1,4 @@
- board: { desc: "응답마다 괴이·사건·특수 발생을 판정하고 상황판·지도·요원 상태를 갱신해요.", example: "", off: "끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요." },
+: "응답마다 괴이·사건·특수 발생을 판정하고 상황판·지도·요원 상태를 갱신해요.", example: "", off: "끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요." },
     image: { desc: "본문에 등장한 캐릭터의 등록 이미지를 채팅 속에 띄워요. 이미지 목록은 봇 카드에 있어요.", example: "", off: "끄면 캐릭터 이미지를 띄우지 않고 이미지 지침도 요청에 넣지 않아요." },
     gnet: { desc: "괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.", example: "「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 본편 요청에 참고로 붙어요." },
     phone: { desc: "괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.", example: "「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 본편 요청에 참고로 붙어요." },
@@ -2509,8 +2509,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
   .ps-defaults .st-act { padding: 0 8px; }
 }
-.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
-.st-barconfirm p { color: var(--text); }
+.st-barconfirm, .st-undobar { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p, .st-undobar p { color: var(--text); }
 .ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
 .ps-save:hover { background: var(--accent-bg); }
 .ph-room-head .ph-act .ps-save { margin-right: 4px; }
@@ -2609,4 +2609,3 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-nohit .gx-start svg { width: 18px; height: 18px; }
 .nw-main .ph-room-head.nw-noback { padding-left: 16px; }
 .nw-main .nw-doc > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
-/* 위키 메

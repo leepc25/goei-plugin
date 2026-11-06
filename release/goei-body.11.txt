@@ -1,4 +1,5 @@
-st x = readCtx(ctx2);
+2;
+        const x = readCtx(ctx2);
         const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
         if (!here.length) field3.target = placeTarget(v2);
         env3.render();

@@ -1660,8 +1660,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
   .ps-defaults .st-act { padding: 0 8px; }
 }
-.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
-.st-barconfirm p { color: var(--text); }
+.st-barconfirm, .st-undobar { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p, .st-undobar p { color: var(--text); }
 .ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
 .ps-save:hover { background: var(--accent-bg); }
 .ph-room-head .ph-act .ps-save { margin-right: 4px; }
