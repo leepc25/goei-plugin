@@ -9,7 +9,7 @@ Thread 필드 기능 확인 사항 정하기, 11:39–11:43. Recorded in docs/�
 - Table: wall-facing (washing/urinal/sink, north motions) behind 200px; standing/covering/dressing/walking facing side 700px (= WITNESS_PX), behind 300px; closed stall = no detection. Running intruder doubles behind range. Shout → same-sex within 700px follow 1–3s later. Nobody detects → leaving = nothing.
 - Toilets: 2F men / 3F women; motions exist (100/104 north, 101–103 south); toilet intrusion dialogue cells WRITTEN 11-01 (branch claude/project-thread-d5kaiz db01ab9f4d, off 1h1kah): toilet.<fac>.<rep>.intrude/stay1/stay2, 51 named + 16 faction NPCs, GROUPS_24 has toilet; calling code still owed when the feature is built.
 - Numbers are Claude's recommendation accepted as 「일단 반영」; the feature itself stays on hold (handoff §5).
-**How to apply:** when building the shower feature, implement this table; never trigger on door entry. See [[goei-restroom-motions]], [[goei-konjus-adult]], [[goei-field-no-model]].
+**How to apply:** when building the shower feature, implement this table; never trigger on door entry. See [[goei-restroom-motions]], [[goei-field-no-model]].
 
 **14:19 threads:** 화장실 게임에 넣기 cmsg_01SMy6spzkHA3Ttz9fg54ZY8H4XrfCZgMkpaLvdL9fEUnb owns toilet walk/occlusion/stall doors/motion wiring on top of claude/project-thread-1h1kah and will expose a per-person state(칸 안/소변기/세면대/걷기)+face function; field thread (필드 기능 확인 사항 정하기) wires detection table + toilet.* dialogue calls on top of it. 화장실 침입 대사 쓰기 thread is done/resolved.
 
