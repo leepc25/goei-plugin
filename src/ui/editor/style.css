@@ -17,13 +17,12 @@
 .gw-top > b { font-size: 15px; font-weight: 700; }
 .gw-brand { display: inline-flex; color: var(--signal); margin-right: -4px; }
 .gw-brand svg { width: 22px; height: 22px; }
-.gw-where { font-size: 12.5px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
 .gw-notice { margin-left: auto; font-size: 12.5px; color: var(--sub); }
 .gw-notice.err { color: var(--danger); }
 .gw-notice + .gw-top-right { margin-left: 0; }
 .gw-top-right { display: flex; align-items: center; gap: var(--gap); margin-left: auto; flex: none; }
 .gw-save { display: inline-flex; align-items: center; gap: var(--gap); }
-.gw-save-state, .gw-save-note { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
+.gw-save-state { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 .gw-save.dirty .gw-save-state { color: var(--amber); }
 .gw-menu { display: none; }
 .gw .gx-x { width: var(--h); height: var(--h); border-radius: var(--r); font-size: 16px; }
@@ -64,7 +63,6 @@
 .gw-page.split { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); padding: 0; height: 100%; }
 .gw-detail { overflow: auto; }
 .gw-detail.empty { display: grid; place-items: center; color: var(--dim); }
-.gw-page-inner { padding: 0; }
 /* 페이지 머리: 제목 (배지) · 오른쪽 단추 · 설명 한 단락 */
 .gw-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 18px; }
 .gw-head h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; font-size: 19px; font-weight: 700; line-height: 1.3; }
@@ -76,10 +74,6 @@
 .gw-off-note { color: var(--amber); }
 .gw-tokens { font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
 .gw .gx-hint, .gw .gx-err { margin: 0 0 14px; padding: 10px 12px; border-radius: var(--r); font-size: 13px; line-height: 1.5; }
-.gw-set-guide { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
-.gw-setbody > .gw-set-guide:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-.gw-set-guide .gw-head h3 { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 16px; }
-.gw-set-guide .gw-head h3 small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
 
 /* 묶음: 작은 제목 + 카드 하나 */
 .gw .gx-settings { display: block; }
@@ -258,7 +252,6 @@
 .gw .gw-anote summary small { font-size: 12.5px; font-weight: 400; color: var(--dim); }
 .gw .gw-anote > .gx-muted { margin: 0 0 8px; font-size: 13px; color: var(--dim); }
 .gw .gw-anote > .gx-row-btns { margin-top: var(--gap); }
-.gw .gw-roster { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
 
 /* ── 목록 칸 (세계 기록·세력 관계): 검색 · 추가 · 줄 ── */
 .gw-list-pane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--sunk); }
@@ -383,7 +376,7 @@
   .gw-list-pane .gw-add { padding: 0 14px 10px; }
   .gw-list-pane > .gw-anote { margin: 0 14px 10px; }
   .gw-page, .gw-detail { padding: 14px 14px 60px; }
-  .gw-save-state, .gw-where { display: none; }
+  .gw-save-state { display: none; }
   .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }
   .gw .st-col-row { grid-template-areas: 'label label' 'use show' 'hint hint'; grid-template-columns: auto auto; justify-content: start; }
   .gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .st-col-name > b { min-height: 0; }

@@ -10,7 +10,7 @@ const which = process.argv[4] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 mkdirSync(out, { recursive: true });
 const browser = await launch();
-const NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:visit', 'set:people', 'set:adv', 'set:update', 'agent', 'org', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
+const NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:status', 'set:journal', 'set:wallet', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'set:update', 'agent', 'org', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
 const name = (n) => n.replace(':', '-');
 
 for (const vp of vps) {
