@@ -1,4 +1,8 @@
-;
+rn true;
+      case "ph-notice": {
+        const id = Number(v);
+        if (isPhone()) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === "notice" ? "list" : phone.view });
+        else if (phone.view === "notice" && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: "list" });
         else Object.assign(phone, { openNotice: id, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
@@ -1322,7 +1326,7 @@ ${job.trailing}` : body5;
   }
 
   // src/core/imgprompt.ts
-  var IMG_KEYWORDS_DEFAULT = ["default", "angry", "annoyed", "bored", "confused", "contemptuous", "crying", "curious", "dumbfounded", "embarrassed", "excited", "exhausted", "happy", "laughing", "lovestruck", "lustful", "nervous", "proud", "sad", "scared", "serious", "shy", "smile", "smirk", "smug", "surprised", "thinking"];
+  var IMG_KEYWORDS_DEFAULT = ["default", "angry", "annoyed", "bored", "confused", "contemptuous", "crying", "curious", "dumbfounded", "embarrassed", "excited", "exhausted", "happy", "laughing", "lovestruck", "lustful", "nervous", "proud", "sad", "scared", "serious", "shy", "smile", "smirk", "smug", "surprised", "thinking", "suspicious", "worried", "relieved", "disgusted", "determined", "jealous", "pleading", "forced smiling", "indifferent", "guilty", "pouting", "angry smile", "expressionless", "tormented", "crazy smile"];
   var IMG_PROMPT_DEFAULT = `## Inserting Character Visual Images
 
 ### Objective
@@ -1692,7 +1696,7 @@ Next Paragraph Text
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.20.8" : "0";
+  var PLUGIN_VERSION = true ? "0.20.9" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -2031,8 +2035,8 @@ Next Paragraph Text
     }
     return { hash: "", sha256: "", length: 0 };
   }
-  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"c3f417ca","sha256":"dc584c665c79e92f296548e0233790992b25a3f7634fdc97bf3cb6ed93f1640c","length":1482855}' : void 0) };
-  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"b4f86a3f","sha256":"ac9bb50276281ae82ba301637d22ff76c67fa40fd641178c7ac75792ff86d162","length":109711}' : void 0) };
+  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"01046e28","sha256":"0afc2a936a061b4fc65d929212e021db188f7792653cc445dfbe882ad1fefb13","length":1482883}' : void 0) };
+  var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"31f59edf","sha256":"b2bd2c28600c1e974931e7aa7b47035c6d931617c3861f3ad481b9da4f37d0f7","length":153725}' : void 0) };
   function packMatches(text4, expect) {
     return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
   }
@@ -3721,18 +3725,4 @@ Next Paragraph Text
       case "dir-fac-type": {
         const at = v.indexOf("|");
         const arg = v.slice(0, at);
-        const o = d.orgs.find((x) => x.name === v.slice(at + 1));
-        if (!o) break;
-        if (action === "dir-fac-hide") o.spec.hidden = arg === "0";
-        else if (action === "dir-fac-type") o.spec.type = arg;
-        else if (!o.faction) {
-          setPlayable(d, o, arg === "1");
-          if (arg === "1" && o.spec.playable && o.spec.code) stUi.sel = o.spec.code;
-          else if (arg === "0" && stUi.sel === o.spec.code) stUi.sel = "";
-        }
-        dirUi.done = "";
-        break;
-      }
-      case "dir-fac-patch": {
-        dirUi.busy = true;
-        env3.render();
+        const o = d.orgs.find((x) => x.name === 

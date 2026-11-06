@@ -557,26 +557,19 @@ def patch_desc(text):
     return text
 
 
-# 첫 메시지(시작 장면)의 표정 태그 중 지금 표정 세트(assets/portraits 27종)에 없는 것 → 가장 가까운 표정 (2026-10-26 사용자 지시)
-EMOTION_FIX = {
-    'acting coy': 'shy', 'admiring': 'lovestruck', 'depressed': 'sad', 'determined': 'serious', 'disgusted': 'contemptuous',
-    'enraged': 'angry', 'evil smiling': 'smug', 'forced smiling': 'nervous', 'happy smile': 'happy', 'indifferent': 'bored',
-    'joyful': 'excited', 'neutral': 'default', 'scared screaming': 'scared', 'seductive smile': 'smirk', 'sniggering': 'laughing',
-    'suspicious': 'thinking', 'tormented': 'exhausted', 'worried': 'nervous',
-}
+# 첫 메시지(시작 장면) 표정 태그는 지금 표정 세트(assets/portraits 42종) 안의 것만 쓴다. 세트에 없는 태그는 원본 카드 글에서 고친다 (사용자 11-06)
 EMOTIONS = set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing '
-               'lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split())
+               'lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split()) | {
+    # 추가 15종 (사용자 11-06)
+    'suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'}
 
 
 def fix_emotion_tags(text):
-    """<img=이름_표정> 의 표정을 지금 세트로. 세트에도 표(EMOTION_FIX)에도 없으면 빌드를 멈춘다"""
+    """<img=이름_표정> 의 표정이 세트에 없으면 빌드를 멈춘다"""
     def one(m):
-        name, kw = m.group(1), m.group(2).strip()
-        if kw in EMOTIONS:
-            return m.group(0)
-        if kw not in EMOTION_FIX:
-            raise SystemExit(f'표정 세트에 없는 태그: <img={name}_{kw}>')
-        return f'<img={name}_{EMOTION_FIX[kw]}>'
+        if m.group(2).strip() not in EMOTIONS:
+            raise SystemExit(f'표정 세트에 없는 태그: {m.group(0)}')
+        return m.group(0)
     return re.sub(r'<img=([^>_]+)_([^>]+)>', one, text)
 
 
