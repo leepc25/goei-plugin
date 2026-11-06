@@ -5,7 +5,7 @@ import { readGnet } from './gnet';
 import {
   agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
-  type PState, phoneTime, hiddenPause, cooldownReady,
+  type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
@@ -52,6 +52,7 @@ interface Body {
   invitationCheck?: InvitationCheck;
   recipientEvidenceSources?: { id: string; kind: string; text: string; sender?: string }[];
   singlePassContact?: boolean;
+  textingHabits?: { sender: string; note: string }[];
 }
 
 /** 원본 ruleBuilder: 실제 요청에 해당하는 섹션만 */
@@ -89,6 +90,8 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   }
   if (manual) keys.push('MANUAL_CONTACT', 'CONTACT_CONTEXT', 'SINGLE_PASS_CONTACT');
   keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
+  // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
+  if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
   return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
 }
 
@@ -284,6 +287,11 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
   if (contactMode) {
     body.recipientEvidenceSources = contactSources(body);
     body.singlePassContact = true;
+  }
+  if (phoneSettings(src.chat.scriptstate).habits) {
+    const ids = new Set(body.participants.map((x) => x.sender));
+    const rows = readHabits(src.chat.scriptstate).filter((h) => ids.has(h.id)).map((h) => ({ sender: h.id, note: h.note }));
+    if (rows.length) body.textingHabits = rows;
   }
   const system = rules(src, body, mode);
   const p = sections(src);

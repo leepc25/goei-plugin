@@ -8,7 +8,7 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
-  chancePassed, parseReactions, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
 import { agentFace, imageUrl, stChip } from './images';
@@ -154,6 +154,14 @@ async function run(ctx: ChatContext, env: PhoneEnv, label: string, work: () => P
   return true;
 }
 
+/** 응답 끝 말버릇 칸을 이번 방 사람들 것만 합친다 (라이트보드 미니톡, 2026-11-06) */
+function habitVars(chat: Chat, raw: string, rooms: PRoom[]): Record<string, string> {
+  if (!phoneSettings(chat.scriptstate).habits) return {};
+  const ids = new Map<string, string>();
+  for (const r of rooms) for (const [cid, p] of Object.entries(r.people)) ids.set(cid, p.name);
+  return mergeHabits(chat.scriptstate, parseHabits(raw), ids) ?? {};
+}
+
 function viewingRoom(env: PhoneEnv): string | null {
   return env.visible() && phone.view === 'room' ? phone.room : null;
 }
@@ -200,7 +208,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
       room.pending = undefined;
       if (viewingRoom(env) === rid) readRoom(room);
       if (!added) note = room.kind === 'group' ? '아무도 말하지 않았어요.' : '답장이 없어요.';
-      return writePhone(chat, cur, unsolicitedRefresh && added ? cooldownMark(chat, 'incoming') : {});
+      return writePhone(chat, cur, { ...(unsolicitedRefresh && added ? cooldownMark(chat, 'incoming') : {}), ...habitVars(chat, raw, [room]) });
     });
     return note;
   });
@@ -370,7 +378,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     const prompt = plan.prompt;
     const model = phoneSettings(ctx.chat.scriptstate).model;
     // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
-    const { value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+    const { raw: refreshRaw, value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
       ...genSettings(ctx.chat.scriptstate),
       reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate,
       state: ctx.chat.scriptstate,
@@ -420,7 +428,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
       note = received || result.invitations.length || notices
         ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.`
         : automatic ? '' : '새 메시지가 없어요.';
-      return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks });
+      return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks, ...habitVars(chat, refreshRaw, [...plan.selected.values()]) });
     });
     return note;
   });
@@ -956,6 +964,7 @@ function settingsView(ctx: ChatContext): string {
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
         row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
+        row('말버릇 기록', onoff('habits'), '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요'),
         row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
       ].join(''))}
       ${group('새 메시지', [

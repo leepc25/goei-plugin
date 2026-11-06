@@ -44,3 +44,16 @@ test('괴담톡: 요청에 반응·생략 줄이 실린다', () => {
   assert.equal(P.phoneSettings({}).reactions, true);
   assert.equal(P.phoneSettings({ '$ph_reactions': '0' }).reactions, false);
 });
+
+test('괴담톡: 말버릇 칸은 본 응답을 깨지 않고, 이번 사람 것만 합친다', () => {
+  const g = room('group', ['c_1', 'c_2']);
+  const raw = '{"updates":[],"announcements":[],"invitations":[]}\n<ph-habits>[{"sender":"c_1","note":"짧게 끊어 보냄"},{"sender":"c_9","note":"남"}]</ph-habits>';
+  assert.deepEqual(P.decodeJson(raw), { updates: [], announcements: [], invitations: [] });
+  const rows = P.parseHabits(raw);
+  const ids = new Map([['c_1', '가'], ['c_2', '나']]);
+  const v = P.mergeHabits({}, rows, ids);
+  assert.deepEqual(P.readHabits(v), [{ id: 'c_1', name: '가', note: '짧게 끊어 보냄' }]);
+  assert.equal(P.mergeHabits(v, rows, ids), null, '같은 내용이면 저장하지 않는다');
+  assert.equal(P.parseReply('<lb-minitalk-patch>[]</lb-minitalk-patch><ph-habits>깨짐</ph-habits>', g, false).events.length, 0);
+  assert.deepEqual(P.parseHabits('<ph-habits>깨짐</ph-habits>'), []);
+});

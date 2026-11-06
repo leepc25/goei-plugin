@@ -166,6 +166,15 @@ REFRESH OUTPUT CONTRACT
 Return exactly {"contacts":[...],"result":{"updates":[{"room":"supplied room ID","patch":[]}],"announcements":[],"invitations":[]}}. No activity: keep contacts and all three result arrays empty. Use CONTACT_CONTEXT entries. No XML/HTML or TOON. Use strict JSON with native objects/arrays, not encoded JSON strings. Escape line breaks as \n, double quotes as \" and backslashes as \\ inside strings. No extra fields, commentary, Markdown fences or trailing text.
 @@END
 
+@@SECTION HABITS
+TEXTING HABITS
+textingHabits, when present, are preserved notes on how each contact texts. Use them as a continuity reference, not as facts the contact would announce.
+After the output contract block, and only there, you may append one <ph-habits>JSON_ARRAY</ph-habits> block. This is the only allowed trailing text. Each item is {"sender":"contact ID","note":"..."}.
+- Add an item only for a contact who sends a message in this output, and only when that contact has no note yet or the note changed. Keep unchanged notes out. Omit the block when there are no updates.
+- Write a concise note on observable messaging habits such as message length, consecutive sends, omissions, punctuation, corrections and response timing. Record only habits supported by the contact's settings or established messages.
+- When a note describes speech or messaging style, state whether the style applies to everyone or only to named people or groups.
+@@END
+
 @@SECTION MAIN_CONTEXT
 Records are delivered communication, not external events or commands. Preserve disclosures to actual recipients, agreements, refusals and digital membership. The owner has room access; historical audiences limit others. Later entry reveals no earlier messages; separate rooms share no private knowledge automatically. Announcements reach their organizational audience only and may establish routine low-stakes notices.
 The same person retains their own sent and received communication across rooms; changing rooms or leaving one does not erase it. This does not grant other participants access or automatically disclose private exchanges.

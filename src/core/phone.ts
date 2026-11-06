@@ -30,6 +30,8 @@ export const PH_DEFAULTS: Record<string, string> = {
   incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
   /** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
   reactions: '1',
+  /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
+  habits: '1',
 };
 
 /** 카드 Settings 로어북의 괴담톡 값과 같은 기본값 */
@@ -86,6 +88,7 @@ export interface PhoneSettings {
   contextAnnouncements: boolean;
   related: boolean;
   reactions: boolean;
+  habits: boolean;
 }
 
 export function phoneValue(state: Record<string, unknown> | undefined, key: string): string {
@@ -116,6 +119,7 @@ export function phoneSettings(state: Record<string, unknown> | undefined): Phone
     contextAnnouncements: v('context_announcements') !== '0',
     related: v('related') === '1',
     reactions: v('reactions') !== '0',
+    habits: v('habits') !== '0',
   };
 }
 
@@ -518,7 +522,7 @@ export function splitRecords(text: string): string[] {
 
 /** 생각 블록·코드 울타리·허용된 바깥 태그만 벗기고, 끝의 쉼표 같은 확실한 형식 오류만 고친다 (원본 decodeObject) */
 export function decodeJson(raw: string): unknown {
-  let text = String(raw ?? '').replace(/^﻿/, '').trim();
+  let text = stripHabits(String(raw ?? '')).replace(/^﻿/, '').trim();
   for (let i = 0; i < 12; i++) {
     const before = text;
     if (text.startsWith('{') || text.startsWith('[')) break;
@@ -559,6 +563,54 @@ export type PEvent =
   | { type: 'skip' }
   | { type: 'react'; record: number; reactions: string }
   | { type: 'exit'; participant: string };
+
+// ── 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) ──
+// 연락처 이름은 고정이라 닉네임은 없고 문자 습관만 쌓는다. 응답 끝 <ph-habits>[…]</ph-habits> 칸으로 받는다
+export const PH_HABITS = PH('habits_list');
+export interface Habit { id: string; name: string; note: string }
+const HABITS_RE = /<ph-habits>\s*([\s\S]*?)\s*<\/ph-habits>/gi;
+export const stripHabits = (raw: string) => raw.replace(HABITS_RE, '').trim();
+
+export function readHabits(state: Record<string, unknown> | undefined): Habit[] {
+  try {
+    const v = JSON.parse(String(state?.[PH_HABITS] ?? '[]'));
+    return Array.isArray(v) ? v.filter((x) => x && typeof x.id === 'string' && typeof x.note === 'string' && x.note) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** 응답의 말버릇 칸을 읽는다. 없거나 깨졌으면 빈 배열 (본 응답은 그대로 쓴다) */
+export function parseHabits(raw: string): unknown[] {
+  const out: unknown[] = [];
+  for (const m of String(raw ?? '').matchAll(HABITS_RE)) {
+    try {
+      const v = JSON.parse(m[1]);
+      if (Array.isArray(v)) out.push(...v);
+    } catch {
+      /* 무시 */
+    }
+  }
+  return out;
+}
+
+/** 이번 요청에 나온 연락처(ids → 이름)의 말버릇만 합친다. 바뀐 게 없으면 null */
+export function mergeHabits(state: Record<string, unknown> | undefined, rows: unknown[], ids: Map<string, string>): Record<string, string> | null {
+  const list = readHabits(state);
+  let changed = false;
+  for (const r of rows as Record<string, unknown>[]) {
+    const id = String(r?.sender ?? r?.id ?? '').trim();
+    const note = String(r?.note ?? '').trim().slice(0, 300);
+    if (!ids.has(id) || !note) continue;
+    const i = list.findIndex((x) => x.id === id);
+    const row = { id, name: ids.get(id)!, note };
+    if (i >= 0 && list[i].note === note) continue;
+    if (i >= 0) list.splice(i, 1);
+    list.push(row);
+    changed = true;
+  }
+  return changed ? { [PH_HABITS]: JSON.stringify(list.slice(-80)) } : null;
+}
 
 // ── 이모지 반응 (라이트보드 미니톡 parseReactions, 2026-11-06) ──
 export interface Reaction { emoji: string; count: number }
