@@ -1,4 +1,4 @@
-// 점검 탭: 설정 내보내기(기기 설정 내보내기·가져오기, 저장소 사용량), 상태 점검, 요청 기록(최근 실패·인물 기록 갱신 기록).
+// 점검 탭: 설정 내보내기(기기 설정 내보내기·가져오기, 저장소 사용량), 상태 점검, 요청 기록(진단 묶음 내려받기·최근 실패·인물 기록 갱신 기록).
 // 설치·점검과 업데이트는 각각 install.ts / ui/update.ts.
 import { chatSettingVars, getPrefs, isChatSettingVar } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
@@ -115,6 +115,36 @@ function exportJson(ctx: ChatContext, withChat = false): string {
   return JSON.stringify({ ...getPrefs(), ...(directory ? { directory } : {}), ...(chat ? { chat } : {}) }, null, 2);
 }
 
+/** 진단 묶음 (2026-11-06 사용자 「넣어」): 제보 한 번에 재현할 수 있게 판·설정·최근 실패 원문·인물 기록 갱신 최근 10회를 JSON 하나로.
+ *  대화 본문은 넣지 않는다. 설정 내보내기(exportJson)와 요청 기록 페이지가 각각 보여 주던 것을 한데 묶은 것 */
+function diagBundle(ctx: ChatContext, canChat: boolean): string {
+  const lore = ctx.char.globalLore;
+  const fail = (f: { reason: string; raw: string } | null) => (f ? { reason: f.reason, raw: f.raw } : null);
+  const runs = (manUi.diag ?? []).slice(0, 10).map((r) => ({ at: r.at, reason: r.reason, model: r.model, people: r.people, ms: r.ms, ok: r.ok, ...(r.stage ? { stage: r.stage } : {}), ...(r.error ? { error: r.error } : {}) }));
+  return JSON.stringify({
+    kind: 'goei-diag',
+    at: new Date().toISOString(),
+    plugin: PLUGIN_VERSION,
+    card: isGoeiLore(lore) ? cardVersion(lore) : null,
+    tokenizer: tokenizerName() || null,
+    wikiPack: !!storedWikiPack(),
+    chat: canChat ? { messages: Array.isArray(ctx.chat.message) ? ctx.chat.message.length : 0, vars: chatSettingVars(ctx.chat.scriptstate) } : null,
+    prefs: getPrefs(),
+    failures: { gnet: fail(gnet.failure), phone: fail(phone.failure), wiki: fail(wiki.failure) },
+    peopleRuns: runs,
+  }, null, 2);
+}
+
+/** 글을 파일로 내려받기 (설정 내보내기·진단 묶음 공용) */
+function downloadJson(name: string, json: string): void {
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 function backupPage(ctx: ChatContext, canChat: boolean): string {
   const withChat = canChat && manUi.withChat;
   const json = exportJson(ctx, withChat);
@@ -177,7 +207,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
     </div></div>`;
 }
 
-function logPage(): string {
+function logPage(ctx: ChatContext, canChat: boolean): string {
   const fail = (name: string, f: { reason: string; raw: string } | null) =>
     f ? `<div class="ps-row"><div class="ps-label"><b>${esc(name)}</b><small>${esc(f.reason)}</small></div><textarea readonly rows="4">${esc(f.raw)}</textarea></div>` : '';
   const fails = fail('괴담넷', gnet.failure) + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
@@ -187,8 +217,10 @@ function logPage(): string {
       ? diag.map((r) => row(`${esc(r.at)} · ${esc(r.reason)}`, badge(r.ok, r.ok ? '성공' : `실패${r.stage ? ` · ${r.stage}` : ''}`), `${r.model} · ${r.people.join(', ') || '대상 없음'} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc(r.error)}` : ''}`)).join('')
       : '<p class="ps-note">아직 갱신 기록이 없어요.</p>'
     : '<p class="ps-note">읽는 중…</p>';
+  const bundle = diagBundle(ctx, canChat);
   return `<div class="gw-page gw-set">${head('', '요청 기록', '괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.')}
     <div class="gx-settings gw-setbody">
+    <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row('내려받기', `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, '판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.')}</div></section>
     <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ''}</div></section>
     <section class="ps-group"><h3>인물 기록 갱신 <small>최근 ${diag?.length ?? 0}건</small></h3><div class="ps-rows">${runs}${diag?.length ? `<div class="ps-row gw-rel-foot">${manUi.confirm === 'drop-diag' ? `<button class="gx-mini danger" data-action="man-drop-diag-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-diag">${ICONS.trash}기록 지우기</button>`}</div>` : ''}</div></section>
     </div></div>`;
@@ -197,7 +229,7 @@ function logPage(): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
-  return logPage();
+  return logPage(ctx, canChat);
 }
 
 export function manageInput(name: string, value: string): boolean {
@@ -260,13 +292,18 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     case 'man-download': {
       try {
         const json = ctx ? exportJson(ctx, manUi.withChat && !!canChat) : JSON.stringify(getPrefs(), null, 2);
-        const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `goei-settings-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        downloadJson(`goei-settings-${new Date().toISOString().slice(0, 10)}.json`, json);
         manUi.info = '내려받기를 시작했어요. 안 되면 「복사」로 글을 옮기세요.';
+      } catch (error) {
+        manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      return true;
+    }
+    case 'man-diag-download': {
+      if (!ctx) return true;
+      try {
+        downloadJson(`goei-diag-${new Date().toISOString().slice(0, 10)}.json`, diagBundle(ctx, !!canChat));
+        manUi.info = '진단 묶음 내려받기를 시작했어요. 제보할 때 이 파일 하나를 보내면 돼요.';
       } catch (error) {
         manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
       }
