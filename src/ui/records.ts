@@ -27,6 +27,7 @@ import { avatar, stLabel } from './images';
 import { evArt } from './evpic';
 import { factionListView, factionView, peopleDocsView, peopleListView, personView, resetPeopleUi } from './people';
 import { toast } from './toast';
+import { isPhone } from './media';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -139,7 +140,7 @@ export function recordsTab(ctx: ChatContext): string {
   // 하위 탭 넷은 PC·폰 모두 내용 위 탭 줄 (2026-11-05 사용자: 서랍에 묻혀 보이지 않았다).
   // 폰 서랍에는 일지 칩·찾기, 가계부 칩·찾기만 한 줄로. 넣을 게 없는 화면(인물·세력·상세)은 서랍 없음
   const tools = rec.view !== 'list' ? '' : rec.sub === 'wallet' ? walletTools(ctx) : rec.sub === 'journal' ? journalTools() : '';
-  const drawer = tools && matchMedia('(max-width: 760px)').matches ? drawerBox(tools, 'gx-rdrawer') : '';
+  const drawer = tools && isPhone() ? drawerBox(tools, 'gx-rdrawer') : '';
   // 보고서 팝업은 본문(main) 밖, 창 뿌리에 (2026-11-05 사용자: 흐름 안에 끼어 공간을 먹지 않게 — 사원증 창과 같은 자리)
   const rpt = rec.view === 'report' ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx, rec.id)}</div></div>` : '';
   return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${rpt}${pngModal()}${drawer}`;
@@ -235,7 +236,7 @@ function journalPane(ctx: ChatContext): string {
     { label: '오늘', value: String(todayRows.length), sub: avg !== null ? `평균 ${longDur(avg)}` : todayRows.length ? '소요 미상' : '없음' },
   ], { cls: 'gx-jr-tiles' });
   return `${mon}
-    ${matchMedia('(max-width: 760px)').matches ? '' : journalTools()}
+    ${isPhone() ? '' : journalTools()}
     <div class="gx-jr-list">${journalList(ctx)}</div>`;
 }
 

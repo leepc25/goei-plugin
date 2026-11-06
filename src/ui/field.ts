@@ -24,6 +24,7 @@ import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
 import { drawerBox } from './drawer';
 import { draftBases } from './directory';
+import { isPhone } from './media';
 
 export type Target =
   | { type: 'event'; key: string; kind: EventKind; name: string; loc: string }
@@ -156,7 +157,7 @@ function targetName(t: Target): string {
 }
 
 /** PC에서는 고른 것을 한 번 더 누르면 풀린다 (모바일은 누르면 편성으로 넘어가서 취소 칩으로 푼다) */
-const isPC = () => !matchMedia('(max-width: 760px)').matches;
+const isPC = () => !isPhone();
 
 function sameTarget(a: Target | null, key: string): boolean {
   if (!a) return false;
@@ -193,7 +194,7 @@ function hotClass(list: WorldEvent[]): string {
   return ` hot hot-${kinds.size === 1 ? [...kinds][0] : 'all'}`;
 }
 
-const narrow = () => matchMedia('(max-width: 760px)').matches;
+const narrow = () => isPhone();
 
 /** 지역 고르기·장소 검색 줄 (PC는 지도 위, 모바일은 하단 서랍) */
 function mapBar(x: Ctx): string {
@@ -449,7 +450,7 @@ function toStep(step: 'goal' | 'team', env: FieldEnv): void {
   field.step = step;
   env.render();
   const body = document.querySelector('.gx .gx-body');
-  if (body && matchMedia('(max-width: 760px)').matches) body.scrollTop = 0;
+  if (body && isPhone()) body.scrollTop = 0;
 }
 
 export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: boolean): string {

@@ -9,6 +9,7 @@ import { findStatusTags } from '../core/world/status';
 import { getPrefs } from '../core/settings';
 import { messageKey } from '../core/people/store';
 import { ICONS } from './icons';
+import { isPhone } from './media';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -148,7 +149,7 @@ export function walletPane(ctx: ChatContext): string {
       </div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
-    ${matchMedia('(max-width: 760px)').matches ? '' : walletTools(ctx)}
+    ${isPhone() ? '' : walletTools(ctx)}
     <div class="gx-wt-list">${walletList(ctx)}</div>
   </div>`;
 }

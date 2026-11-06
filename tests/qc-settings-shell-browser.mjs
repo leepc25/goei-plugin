@@ -3,7 +3,7 @@
 // 폰 한 열·가로 넘침 없음·글칸 전체 폭, 편집 창 서랍, Esc·바깥 클릭 닫기.
 // 사용법: node tests/qc-settings-shell-browser.mjs <fixture.json> [pc|phone|land|all]
 import assert from 'node:assert/strict';
-import { auditDom, boot, clickSel, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
+import { auditDom, boot, clickSel, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
@@ -17,7 +17,7 @@ const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listen
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
-  const narrow = VIEWPORTS[vp].width <= 760; // 편집 창 한 열·서랍·쓸기 뒤로·상황판 서랍은 화면 760px 이하 (폰 가로 844 는 PC 배치)
+  const narrow = isPhoneVp(vp); // 편집 창 한 열·서랍·쓸기 뒤로·상황판 서랍은 폰 배치 (2026-11-06: 폰 가로 844×390 도 폰 배치)
   const { page, errors } = await boot(browser, fx, started(), vp);
   // ── 열기/닫기 50회 ──
   await openWin(page);
@@ -120,7 +120,8 @@ for (const vp of vps) {
   } else {
     // 오른쪽으로 쓸면 뒤로, 왼쪽으로 쓸면 앞으로 (화면 가운데에서)
     const swipe = async (dir) => {
-      const box = await page.$eval('.gx .gx-content', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      // 본문 가운데 세로줄에서 입력 칸·하단 바·서랍이 아닌 첫 자리를 고른다 (쓸기는 input 위에서는 일부러 안 먹는다; 폰 가로 위키는 가운데가 검색 칸)
+      const box = await page.$eval('.gx .gx-content', (e) => { const r = e.getBoundingClientRect(); const x = r.left + r.width / 2; for (let y = r.top + r.height / 2; y > r.top + 8; y -= 16) { const el = document.elementFromPoint(x, y); if (el && !el.closest('input, textarea, select, [contenteditable], .gx-mbar, .gx-nav, .ph-drawer, .nw-rail, .nw-panel')) return { x, y }; } return { x, y: r.top + r.height / 2 }; });
       const x0 = box.x - dir * 60;
       await page.touchscreen.tap; // noop (hasTouch 확인)
       const cdp = await page.context().newCDPSession(page);

@@ -59,6 +59,7 @@ import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
+import { isPhone, PHONE_MQ } from './media';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
@@ -269,7 +270,7 @@ function ensureRoot(): HTMLElement {
   // PC↔모바일 폭이 바뀌면 다시 그린다 (괴담넷은 모바일에서 목록 안 펼침, PC는 두 칸)
   if (!widthWatch) {
     widthWatch = true;
-    matchMedia('(max-width: 760px)').addEventListener?.('change', () => root && render());
+    matchMedia(PHONE_MQ).addEventListener?.('change', () => root && render());
     // 창 둘레 기기 틀: 뷰포트 폭·필드 전체화면이 바뀌어 그릴지 말지가 달라질 때만 다시 그린다 (ui/frame.ts)
     const frameWatch = () => {
       if (!root || root.style.display === 'none') return;
@@ -807,7 +808,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'nav-tab':
     case 'tab':
       // PC 왼쪽 메뉴(nav-tab): 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일 아래 줄(tab)은 그대로)
-      if (action === 'nav-tab' && value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
+      if (action === 'nav-tab' && value === tab && value !== 'board' && !isPhone()) value = 'board';
       if (value === 'settings') return handle('ed-open', 'set:screen');
       if (value === 'wallet') return openWallet();
       // 다른 탭에서 기록으로 들어오면 일지 목록부터 (2026-11-05 사용자: 가계부를 보고 나온 뒤 기록을 누르면 가계부가 다시 열렸다)
@@ -859,7 +860,7 @@ async function handle(action: string, value?: string): Promise<void> {
       opsUi.sel = value ?? '';
       field.confirmEnd = null;
       render();
-      if (matchMedia('(max-width: 760px)').matches) root?.querySelector('.gx-opview')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      if (isPhone()) root?.querySelector('.gx-opview')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
       return;
     case 'ops-mode':
       opsUi.mode = value === 'map' ? 'map' : 'feed';
@@ -1205,7 +1206,7 @@ function render(): void {
 
 /** 모바일 상황판 하단 서랍: 즐겨찾기 다섯 칸 (2026-10-20 사용자: 순찰·설정 두 버튼 자리를 즐겨찾기로. 설정은 위 머리에 있다) */
 function boardDrawer(): string {
-  if (!matchMedia('(max-width: 760px)').matches) return '';
+  if (!isPhone()) return '';
   return drawerHtml(markSlots(), '', 'gx-bdrawer');
 }
 

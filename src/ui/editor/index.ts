@@ -29,6 +29,8 @@ import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
+import { isPhone } from '../media';
+import { morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
@@ -244,6 +246,7 @@ function ensureRoot(): HTMLElement {
     if (el?.dataset?.input === 'dir-crop-size') return render();
     if (el?.dataset?.change?.startsWith('ed-')) return void run(el.dataset.change, el.value);
     if (el?.dataset?.change === 'man-import-file') return void manageFile(el as unknown as HTMLInputElement).then(() => render());
+    if (el?.dataset?.change === 'man-with-chat') return void manageAction('man-with-chat', root, host?.ctx() ?? null, host?.canChat?.() ?? true).then(() => render());
     // 명부 드롭다운(거점 지역·시군구)·이미지 지침 체크는 이 창의 처리기로: 패널 처리기로 보내면 패널만 다시 그려 지도·시군구 목록·체크 표시가 그대로였다 (2026-10-28 QC)
     if (el?.dataset?.change?.startsWith('dir-') || el?.dataset?.change?.startsWith('ip-')) return void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
     host?.change?.(el);
@@ -593,7 +596,7 @@ export function render(): void {
   const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
   lastDrawn = edUi.node;
   // 폰(2026-10-29 사용자): 설정도 본 창의 한 화면처럼 — 머리는 본 창과 같은 모양(제목 「설정」만), 아래에 숨은 서랍(기능·세계·지침·점검)과 본 창의 하단 바
-  const phone = matchMedia('(max-width: 760px)').matches;
+  const phone = isPhone();
   const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
   const right = `${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
   const top = phone
@@ -610,17 +613,23 @@ export function render(): void {
     </header>`;
   const tabTools = TABS.map(([id, label, icon]) => `<button class="ph-tool" data-action="ed-tab" data-value="${id}" aria-pressed="${tab === id}" aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`).join('');
   const foot = phone ? `${drawerHtml(tabTools, '', 'gw-tabdrawer')}${host.mobileNav?.() ?? ''}` : '';
-  root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}${phone ? ' phone' : ''}">
+  const html = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}${phone ? ' phone' : ''}">
     ${top}
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
     ${foot}
     ${confirm}
   </div>`;
+  // 같은 화면을 다시 그릴 때는 바뀐 곳만 (2026-11-06 사용자, 전수점검 남은 것 6). 다른 화면으로 갈 때·처음 열 때는 통째로
+  if (sameNode && root.querySelector('.gw-win')) morph(root, html);
+  else root.innerHTML = html;
   labelSwitches(root);
   if (phone) {
-    bindDrawer(root);
-    bindMbar(root, () => void run('ed-close'));
+    // 바뀐 곳만 그리면 서랍·하단 바 요소가 그대로 남으니 한 번만 묶는다
+    const box = root.querySelector<HTMLElement>('.ph-drawer');
+    const bar = root.querySelector<HTMLElement>('.gx-mbar');
+    if (box && !boundOnce.has(box)) { boundOnce.add(box); bindDrawer(root); }
+    if (bar && !boundOnce.has(bar)) { boundOnce.add(bar); bindMbar(root, () => void run('ed-close')); }
   }
   if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
   if (focusSel) {
@@ -631,6 +640,8 @@ export function render(): void {
     }
   }
 }
+
+const boundOnce = new WeakSet<HTMLElement>();
 
 const env = { render: () => render(), refresh: async () => { await host?.refresh(); render(); } };
 
@@ -787,7 +798,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('man-')) {
-    if (await manageAction(action, root, ctx)) render();
+    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true)) render();
     return;
   }
   if (action.startsWith('ed-rule-')) {
@@ -801,7 +812,7 @@ export async function handle(action: string, value?: string): Promise<void> {
   // 그 밖의 동작(설정 단추·기능 설정)은 패널과 같은 처리기로. 패널이 다시 그려질 때 설정 페이지도 같이 그린다 (app.ts render)
   else if (host?.handle && !action.startsWith('ed-')) {
     // 폰 하단 바의 탭 단추: 설정을 닫고 본 창의 그 화면으로
-    if ((action === 'tab' || action === 'nav-tab') && matchMedia('(max-width: 760px)').matches) {
+    if ((action === 'tab' || action === 'nav-tab') && isPhone()) {
       closeEditor();
       await host.handle(action, value);
       return;

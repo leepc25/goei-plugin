@@ -1,6 +1,7 @@
 // 모바일 앞뒤로 쓸기 (v0.16.24, 2026-10-19 브라우저 ←·→ 처럼): 화면 아무 데서나 오른쪽으로 쓸면 뒤로, 왼쪽으로 쓸면 앞으로.
 // 갈 곳은 app.ts가 정한다(step: -1 뒤로, 1 앞으로). 같은 방향 쓸기를 이미 쓰는 곳(지도, 위키 세로바·목록, 하단 바, 도구 서랍,
 // 가로로 넘기는 줄, 입력칸)에서 시작한 쓸기는 건드리지 않는다.
+import { isPhone } from './media';
 
 const SKIP = 'input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer';
 const FIRE = 72;
@@ -37,7 +38,7 @@ export function bindSwipeBack(root: HTMLElement, step: (dir: -1 | 1) => (() => v
   };
   root.addEventListener('touchstart', (e) => {
     mode = 'off';
-    if (e.touches.length !== 1 || !matchMedia('(max-width: 760px)').matches) return;
+    if (e.touches.length !== 1 || !isPhone()) return;
     const t = e.target as Element;
     if (t.closest(SKIP) || inSideScroller(t, root)) return;
     x0 = e.touches[0].clientX;

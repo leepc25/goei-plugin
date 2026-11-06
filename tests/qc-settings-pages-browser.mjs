@@ -3,7 +3,7 @@
 // 경계값·잘못된 입력, 다시 열었을 때 같은 값이 보이는지를 본다. 세 뷰포트.
 // 사용법: node tests/qc-settings-pages-browser.mjs <fixture.json> [pc|phone|land|all]
 import assert from 'node:assert/strict';
-import { auditDom, boot, chatOf, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, setChat, setInput, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
+import { auditDom, boot, chatOf, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, setChat, setInput, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
@@ -319,9 +319,9 @@ for (const vp of vps) {
       await page.evaluate((w) => document.querySelector(`.gw [data-action="set-editor-width"][data-value="${w}"]`).click(), w);
       await settle(page);
       const width = await page.evaluate(() => document.querySelector('.gw-win').getBoundingClientRect().width);
-      // 화면 760px 이하(폰 세로)만 늘 전체 폭. 폰 가로 844 는 PC 처럼 % 를 따른다
+      // 폰 배치(폰 세로·폰 가로)는 늘 전체 폭. PC 는 % 를 따른다 (2026-11-06: 폰 가로도 폰 배치)
       const W = VIEWPORTS[vp].width;
-      if (W > 760) assert.ok(Math.abs(width - (W * Number(w)) / 100) < 4, `창 폭 ${w}% → ${width}`);
+      if (!isPhoneVp(vp)) assert.ok(Math.abs(width - (W * Number(w)) / 100) < 4, `창 폭 ${w}% → ${width}`);
       else assert.ok(Math.abs(width - W) < 2, `폰은 늘 전체 폭 (${w}% → ${width})`);
     }
     // 위의 「기본값으로 저장」이 테마도 기본값에 넣었으니(한 번에 전부), 여기서는 「테마 줄은 기본값을 안 건드린다」만 본다

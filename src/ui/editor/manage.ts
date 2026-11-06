@@ -1,15 +1,15 @@
 // 점검 탭: 설정 내보내기(기기 설정 내보내기·가져오기, 저장소 사용량), 상태 점검, 요청 기록(최근 실패·인물 기록 갱신 기록).
 // 설치·점검과 업데이트는 각각 install.ts / ui/update.ts.
-import { getPrefs } from '../../core/settings';
+import { chatSettingVars, getPrefs, isChatSettingVar } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
 import { isGoeiLore } from '../../core/install';
-import { cardVersion, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
+import { cardVersion, compareVersions, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
 import { tokenizerName } from '../../core/tokenizer';
 import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
 import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
-import { updateCharacterLore, type ChatContext } from '../../host/risu';
+import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
 import { gnet } from '../gnet';
@@ -64,6 +64,8 @@ export const manUi = {
   /** 상태 점검의 「받기」 진행 중인 것과 진행 글 (2026-11-06 사용자 승인, 전수점검 9-9) */
   getting: '' as '' | 'tok' | 'wiki',
   progress: '',
+  /** 내보내기에 지금 채팅의 설정 값($st_·$wg_·기능 설정 변수)도 넣을지 (2026-11-06 사용자, 전수점검 남은 것 5). 시작 전에는 칸 자체가 없다 */
+  withChat: false,
 };
 /** 점검 페이지를 다시 그리는 손잡이 (받기 진행 글을 띄울 때) */
 let rerender: (() => void) | null = null;
@@ -107,13 +109,16 @@ const head = (crumb: string, title: string, desc: string, act = '') =>
   `<header class="gw-head"><h2>${esc(title)}${crumb ? `<small>${esc(crumb)}</small>` : ''}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ''}<p class="gx-muted">${esc(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc(manUi.notice)}</div>` : ''}${manUi.info ? `<p class="gx-hint">${esc(manUi.info)}</p>` : ''}</header>`;
 
 /** 내보낼 글: 기기 설정 전부 + 카드 명부(세계 편집: 요원·조직·괴이·파밍·부록·세력 관계·명부)를 「directory」로 (2026-11-05 사용자) */
-function exportJson(ctx: ChatContext): string {
+function exportJson(ctx: ChatContext, withChat = false): string {
   const directory = readDirectoryData(ctx.char.globalLore ?? []);
-  return JSON.stringify(directory ? { ...getPrefs(), directory } : getPrefs(), null, 2);
+  const chat = withChat ? { vars: chatSettingVars(ctx.chat.scriptstate) } : null;
+  return JSON.stringify({ ...getPrefs(), ...(directory ? { directory } : {}), ...(chat ? { chat } : {}) }, null, 2);
 }
 
-function backupPage(ctx: ChatContext): string {
-  const json = exportJson(ctx);
+function backupPage(ctx: ChatContext, canChat: boolean): string {
+  const withChat = canChat && manUi.withChat;
+  const json = exportJson(ctx, withChat);
+  const chatN = canChat ? Object.keys(chatSettingVars(ctx.chat.scriptstate)).length : 0;
   const sizes = manUi.sizes;
   const store = STORE.map(([key, label, help, drop]) => {
     const n = sizes?.[key] ?? 0;
@@ -129,6 +134,8 @@ function backupPage(ctx: ChatContext): string {
     <section class="ps-group"><h3>기기 설정</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 범위의 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
         <div class="ps-ctl"><span class="gw-tokens">${kb(json.length)}</span><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
+      ${canChat ? `<div class="ps-row"><div class="ps-label"><b>지금 채팅 값도 넣기</b><small>이 채팅에서 바꾼 설정 값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·생성 공통) ${chatN}개를 「chat」으로 같이 넣어요. 가져올 때 채팅이 열려 있으면 그 채팅에 적혀요. 기록(상황판 내용·인물 기록·일지)은 안 들어가요.</small></div>
+        <div class="ps-ctl"><label class="pp-check"><input type="checkbox" data-change="man-with-chat" ${withChat ? 'checked' : ''}> 넣기</label></div></div>` : ''}
       ${importRows}
     </div></section>
     <section class="ps-group"><h3>저장소 사용량 <small>이 기기 플러그인 저장소에 있는 것</small></h3><div class="ps-rows">${store}</div></section>
@@ -152,6 +159,10 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
   const rows = [
     row('카드', badge(goei, goei ? '괴이 카드' : '괴이 카드 아님'), goei ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`} · 명부·매니페스트 있음` : '설치 · 점검에서 심으면 괴이 카드가 돼요'),
     row('플러그인', badge(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : '업데이트 주소가 없는 빌드'),
+    // 카드 판 ≠ 플러그인 판이면 빨간 줄 (2026-11-06 사용자, 전수점검 남은 것 4): 카드가 낡았으면 업데이트 페이지로, 카드가 더 새면 플러그인을 받으라고
+    ...(goei && compareVersions(ver, PLUGIN_VERSION) !== 0 ? [row('판 맞춤', badge(false, compareVersions(ver, PLUGIN_VERSION) < 0 ? '카드가 낡음' : '플러그인이 낡음'), compareVersions(ver, PLUGIN_VERSION) < 0
+      ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`}, 플러그인 v${PLUGIN_VERSION}. 새 기능·지침이 카드에 없을 수 있어요. 업데이트에서 카드를 플러그인 판으로 올리세요. <button class="gx-mini" data-action="ed-node" data-value="set:update">${ICONS.refresh}업데이트로</button>`
+      : `카드 v${ver}, 플러그인 v${PLUGIN_VERSION}. 플러그인을 새 판으로 받으세요.`)] : []),
     row('채팅', badge(canChat, canChat ? '진행 중' : '시작 전'), canChat ? `메시지 ${msgs}개 · 이 채팅 값으로 동작해요` : '시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요'),
     // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
     row('토크나이저', badge(!!tok, tok || '어림값') + getBtn('tok', '받기 (약 2MB)', !!tok), tok ? '토큰 수를 정확히 세요' : '안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요.'),
@@ -184,7 +195,7 @@ function logPage(): string {
 }
 
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
-  if (node === 'manage:backup') return backupPage(ctx);
+  if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
   return logPage();
 }
@@ -212,7 +223,7 @@ export async function manageFile(el: HTMLInputElement): Promise<boolean> {
   return true;
 }
 
-export async function manageAction(action: string, root: HTMLElement | null, ctx: ChatContext | null = null): Promise<boolean> {
+export async function manageAction(action: string, root: HTMLElement | null, ctx: ChatContext | null = null, canChat = true): Promise<boolean> {
   if (!action.startsWith('man-')) return false;
   manUi.notice = '';
   manUi.info = '';
@@ -220,9 +231,12 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     case 'man-no':
       manUi.confirm = '';
       return true;
+    case 'man-with-chat':
+      manUi.withChat = !manUi.withChat;
+      return true;
     case 'man-copy': {
       if (!ctx) return true;
-      const json = exportJson(ctx);
+      const json = exportJson(ctx, manUi.withChat && !!canChat);
       // Risu 안에서는 navigator.clipboard 가 막혀 있을 때가 있다 → 임시 글칸을 골라 execCommand('copy') 로 한 번 더 시도 (2026-11-05 사용자)
       let ok = false;
       try {
@@ -245,7 +259,7 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     }
     case 'man-download': {
       try {
-        const json = ctx ? exportJson(ctx) : JSON.stringify(getPrefs(), null, 2);
+        const json = ctx ? exportJson(ctx, manUi.withChat && !!canChat) : JSON.stringify(getPrefs(), null, 2);
         const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
         const a = document.createElement('a');
         a.href = url;
@@ -267,12 +281,25 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
         const parsed = JSON.parse(manUi.importText) as unknown;
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('설정 JSON 이 아니에요.');
         // 세계 편집(명부)이 들어 있으면 카드 로어북 Directory 에 적는다 (2026-11-05 사용자)
-        const { directory, ...prefs } = parsed as { directory?: unknown } & Record<string, unknown>;
+        const { directory, chat, ...prefs } = parsed as { directory?: unknown; chat?: unknown } & Record<string, unknown>;
         let wrote = '';
         if (directory && typeof directory === 'object' && !Array.isArray(directory)) {
           if (!ctx) throw new Error('세계 편집을 적을 카드가 없어요.');
           await updateCharacterLore(ctx.charIndex, (lore) => withDirectory(lore, directory as DirectoryData));
           wrote = ' 세계 편집(명부)도 카드에 적었어요.';
+        }
+        // 「chat」(지금 채팅 값)은 채팅이 열려 있을 때만 그 채팅 변수에 적는다. 설정 변수가 아닌 열쇠는 버린다 (2026-11-06 사용자, 전수점검 남은 것 5)
+        const cv = chat && typeof chat === 'object' && !Array.isArray(chat) ? (chat as { vars?: unknown }).vars : null;
+        if (cv && typeof cv === 'object' && !Array.isArray(cv)) {
+          const vars = Object.entries(cv as Record<string, unknown>).filter(([k, v]) => isChatSettingVar(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'));
+          if (ctx && canChat && vars.length) {
+            await updateChat(ctx.charIndex, ctx.chatIndex, (c) => {
+              c.scriptstate ??= {};
+              for (const [k, v] of vars) c.scriptstate[k] = String(v);
+              return c;
+            });
+            wrote += ` 채팅 값 ${vars.length}개도 이 채팅에 적었어요.`;
+          } else if (vars.length) wrote += ' 채팅 값은 시작 전이라 적지 않았어요.';
         }
         await savePrefs(() => prefs as unknown as ReturnType<typeof getPrefs>);
         manUi.importText = '';

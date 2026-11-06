@@ -140,7 +140,7 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   const dropped = new Set(['탐미주의', '진조 세크리엠', '발푸르기스 협회', '십마녀 아벤샤', '무명찬란교']);
   const after = parseCatalog(moved);
   // 명부로 옮기면 시작 묶음 「중립」(다음 코드 F00)이 기본으로 생긴다 (2026-11-05)
-  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)), affiliations: { ...before.affiliations, F00: '중립' } }));
+  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)), affiliations: { ...before.affiliations, F00: '이면의 주민들' } }));
   const outside = new Set(OLD_OUTSIDE_PLACES);
   const places = (l) => buildRegistry(l).entries.filter((e) => !e.key.startsWith('Agent roster/'));
   // 별칭은 빠진 항목이 쓰던 것을 다른 항목이 넘겨받을 수 있어(Mumyeong Chanran-gyo → 해피엔딩 홀) 이름만 견줌
@@ -200,4 +200,28 @@ test('폴더 밖 괴이·특수 후보: 옮길 때 빼고, 옛 카드 명부에�
   assert.ok(!readDirectory(clean).sites.some((r) => r.lore === '세계정치 게시판'));
   assert.equal(readDirectory(clean).anomalies.length, d.anomalies.length);
   assert.equal(dropOldOutsidePlaces(moved), moved, '뺄 게 없으면 그대로');
+});
+
+test('시작 묶음 「중립」「다른 세력」(판 5 이하)은 읽을 때 「이면의 주민들」로 이름·영문·물린 설명이 바뀜 (2026-11-06 사용자)', () => {
+  const base = small();
+  const data = directoryData(readDirectory(base));
+  const g = data['시작 묶음']['이면의 주민들'];
+  assert.ok(g, '기본값에 「이면의 주민들」 묶음이 있음');
+  delete data['시작 묶음']['이면의 주민들'];
+  data['시작 묶음']['중립'] = { ...g, english: 'Neutral', blurb: '제 조직과 제 목적을 따로 가진 자들. 누구의 편도 아니고, 필요하면 누구와도 손을 잡는다.' };
+  data.roster_v = 4;
+  const d = readDirectory(withDirectory(base, data));
+  const after = d.startGroups.find((x) => x.code === g.code);
+  assert.deepEqual([after.name, after.english, after.blurb], ['이면의 주민들', 'Residents of the Hidden World', '저마다의 사정과 목적을 품고, 서울의 이면을 살아가는 이들.']);
+  assert.ok(!d.startGroups.some((x) => x.name === '중립'));
+  // 판 5 「다른 세력」도 같이
+  data['시작 묶음'] = { '다른 세력': { ...g, english: 'Other Factions', blurb: '다른 세력의 인물 하나를 골라 그 사람으로 시작한다.' } };
+  data.roster_v = 5;
+  const d5 = readDirectory(withDirectory(base, data));
+  assert.deepEqual(d5.startGroups.map((x) => [x.name, x.english, x.blurb]), [['이면의 주민들', 'Residents of the Hidden World', '저마다의 사정과 목적을 품고, 서울의 이면을 살아가는 이들.']]);
+  // 사용자가 직접 고친 설명은 그대로
+  data['시작 묶음'] = { 중립: { ...g, blurb: '내 글' } };
+  data.roster_v = 4;
+  const d2 = readDirectory(withDirectory(base, data));
+  assert.equal(d2.startGroups.find((x) => x.code === g.code).blurb, '내 글');
 });

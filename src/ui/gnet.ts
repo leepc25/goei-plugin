@@ -26,6 +26,7 @@ import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
+import { isPhone } from './media';
 
 type Compose =
   | { kind: 'post' }
@@ -401,7 +402,7 @@ function paneHead(title: string, sub: string, right = '', back = true): string {
 /** 오른쪽 칸(모바일은 목록 대신)에 무엇을 띄울지 (v0.16.22: 괴담톡처럼 두 칸) */
 type Pane = 'settings' | 'compose' | 'post' | 'dm' | null;
 /** 모바일: 글·쪽지는 화면을 넘기지 않고 목록 안에서 펼친다 (사용자 요청) */
-const narrow = () => matchMedia('(max-width: 760px)').matches;
+const narrow = () => isPhone();
 
 function paneKind(st: GState, mobile = narrow()): Pane {
   if (gnet.settings) return 'settings';

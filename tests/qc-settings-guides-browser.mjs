@@ -189,6 +189,30 @@ for (const vp of vps) {
   assert.equal((await prefsOf(page)).rules.length, 100);
   await goNode(page, 'rule:new');
   assert.equal(await page.isDisabled('.gw [data-action="ed-rule-new"]'), true, '100개면 새 규칙 잠김');
+  // 내보내기 「지금 채팅 값도 넣기」(2026-11-06 사용자, 전수점검 남은 것 5): 기본은 안 넣음 → 체크하면 chat.vars 에 이 채팅의 설정 변수만, 가져오면 그 채팅 변수에 적힘
+  await goNode(page, 'manage:backup');
+  await page.waitForSelector('.gw [data-change="man-with-chat"]');
+  const sizeBefore = await page.textContent('.gw .ps-row .gw-tokens');
+  await page.evaluate(() => { const el = document.querySelector('.gw [data-change="man-with-chat"]'); el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForFunction(() => document.querySelector('.gw [data-change="man-with-chat"]')?.checked);
+  assert.notEqual(await page.textContent('.gw .ps-row .gw-tokens'), sizeBefore, '체크하면 내보내기 크기가 달라짐');
+  await page.evaluate(() => { window.__clip = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__clip = t; } }, configurable: true }); });
+  await clickSel(page, '.gw [data-action="man-copy"]');
+  await page.waitForFunction(() => window.__clip);
+  const exportedChat = JSON.parse(await page.evaluate(() => window.__clip));
+  assert.ok(exportedChat.chat && exportedChat.chat.vars && typeof exportedChat.chat.vars === "object", "chat.vars 가 들어감");
+  assert.ok(!Object.keys(exportedChat.chat.vars).some((k) => /^\$st_(faction|lang|fm)$/.test(k)), '상태 변수($st_faction 등)는 안 들어감');
+  const chatImport = { ...exportedChat, chat: { vars: { '$st_agent_limit': '7', '$wg_random_p': '33', '$st_faction': 'B00', 'x': '1' } } };
+  await setInput(page, '.gw textarea[data-input="man-import-text"]', JSON.stringify(chatImport), 'input');
+  await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
+  await clickSel(page, '.gw [data-action="man-import-yes"]');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('채팅 값 2개도 이 채팅에 적었어요'));
+  const ss = await page.evaluate(() => window.__chat.scriptstate);
+  assert.deepEqual([ss.$st_agent_limit, ss.$wg_random_p, ss.$st_faction, ss.x], ['7', '33', 'A00', undefined], '설정 변수만 이 채팅에 적히고 상태 변수·모르는 열쇠는 버림');
+  // 체크를 풀면 chat 이 빠진다 (아래 「내보내기 JSON = 저장된 기기 설정」 비교를 위해 되돌림)
+  await page.evaluate(() => { const el = document.querySelector('.gw [data-change="man-with-chat"]'); el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForFunction(() => document.querySelector('.gw [data-change="man-with-chat"]') && !document.querySelector('.gw [data-change="man-with-chat"]').checked);
   // 저장소를 비워 되돌린다
   await page.evaluate(() => { delete window.__store['p:goei:prefs']; });
   await goNode(page, 'manage:backup');
@@ -205,6 +229,27 @@ for (const vp of vps) {
   const diag = await page.textContent('.gw .gw-setbody');
   assert.ok(diag.includes('괴이 카드') && diag.includes('진행 중') && diag.includes('메시지 2개'), `상태 점검 내용: ${diag.slice(0, 200)}`);
   assert.ok(/플러그인[^·]{0,120}v\d+\.\d+\.\d+/.test(diag.replace(/\s+/g, ' ')), '플러그인 버전 (줄 이름 · 설명 · 배지 순)');
+  // 카드 판 ≠ 플러그인 판 경고 (2026-11-06 사용자, 전수점검 남은 것 4): 같은 저장소에서 만든 카드라 처음엔 없고, 매니페스트 판이 다른 카드는 빨간 줄 + 업데이트로 가는 단추
+  assert.ok(!diag.includes('판 맞춤'), '카드·플러그인 판이 같으면 경고 없음');
+  const fxVer = (v) => { const f = JSON.parse(JSON.stringify(fx.fixture)); const e = f.globalLore.find((e) => e.comment === 'Plugin manifest'); const j = JSON.parse(e.content); if (v === null) delete j.version; else j.version = v; e.content = JSON.stringify(j); return { fixture: f, fixtureDir: fx.fixtureDir }; };
+  for (const [v, expect] of [['0.1.0', '카드가 낡음'], [null, '카드 이전 판'], ['99.0.0', '플러그인이 낡음']]) {
+    const { page: p2 } = await boot(browser, fxVer(v), { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } }, vp);
+    await openWin(p2);
+    await p2.waitForSelector('.gx-tabhead');
+    await openEditor(p2, 'manage:diag');
+    await p2.waitForSelector('.gw .gw-setbody .ps-row');
+    const warn = (await p2.textContent('.gw .gw-setbody')).replace(/\s+/g, ' ');
+    assert.ok(warn.includes('판 맞춤') && warn.includes(expect) && new RegExp(`카드 ${v === null ? '이전 판' : `v${v}`}, 플러그인 v\\d+\\.\\d+\\.\\d+`).test(warn), `${vp} ${v}: 판 경고 ${expect}: ${warn.slice(Math.max(0, warn.indexOf('판 맞춤')), warn.indexOf('판 맞춤') + 140)}`);
+    assert.ok(await p2.$('.gw .gw-setbody .gw-state.bad'), '빨간 배지');
+    const btn = await p2.$('.gw .gw-setbody [data-action="ed-node"][data-value="set:update"]');
+    if (expect === '플러그인이 낡음') assert.ok(!btn, '카드가 더 새면 업데이트 단추 없음(플러그인을 받으라고만)');
+    else {
+      assert.ok(btn, '카드가 낡으면 업데이트로 가는 단추');
+      await clickSel(p2, '.gw .gw-setbody [data-action="ed-node"][data-value="set:update"]');
+      await p2.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'set:update');
+    }
+    await p2.close();
+  }
   await goNode(page, 'manage:log');
   await page.waitForSelector('.gw .gw-setbody');
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('실패한 요청이 없어요'));

@@ -167,6 +167,17 @@ export function getPrefs(): Prefs {
   return prefs;
 }
 
+/** 이 채팅에 적힌 「설정」 변수만 (상태·기록 변수는 빼고): 기능 설정(PREF_VAR) + 기본 설정($st_*) + 괴이 생성 수치($wg_*).
+ *  설정 내보내기의 「지금 채팅 값도 넣기」와 가져오기가 쓴다 (2026-11-06 사용자, 전수점검 남은 것 5) */
+export function isChatSettingVar(k: string): boolean {
+  return PREF_VAR.test(k) || k === '$st_anomaly_on' || (Object.values(ST) as string[]).includes(k) || WORLD_SPEC.some((f) => wgKey(f.key) === k);
+}
+export function chatSettingVars(ss: ScriptState | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(ss ?? {})) if (isChatSettingVar(k) && v !== undefined && v !== null && v !== '') out[k] = String(v);
+  return out;
+}
+
 /** 저장소에서 읽은 값을 검사해 넣는다. 틀린 항목은 버린다 */
 export function setPrefs(raw: unknown): Prefs {
   const o = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
