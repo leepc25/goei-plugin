@@ -22,6 +22,7 @@ export * from './update';
 export * from './pictures';
 export { OLD_DIRECTORY, OLD_MANIFEST, LEGACY_DATA, RETIRED, isDirectory } from './lorebooks';
 export * as advanced from './advanced';
+export * as craft from './craft';
 export * as budget from './budget';
 export * as focus from './focus';
 export * from './navhist';

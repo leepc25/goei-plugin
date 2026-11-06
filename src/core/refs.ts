@@ -175,12 +175,13 @@ export function messageText(data: string): string {
 }
 
 /** 유저 메시지가 턴을 시작하고 뒤따르는 응답이 그 턴에 붙는다. 마지막 n턴 */
-export function recentTurns(chat: Chat, n: number): Turn[] {
+/** 최근 n턴. withUser=false면 유저 메시지 글은 비운다 (생성 공통 「유저 메시지 빼기」, 턴 나눔은 그대로) */
+export function recentTurns(chat: Chat, n: number, withUser = true): Turn[] {
   const turns: Turn[] = [];
   for (const m of chat.message ?? []) {
     const text = messageText(m.data);
     if (!text || /%GNET_|%LB_SETTINGS|%PHONE_CALL_PENDING%/.test(m.data)) continue;
-    if (m.role === 'user') turns.push({ user: text, char: [] });
+    if (m.role === 'user') turns.push({ user: withUser ? text : '', char: [] });
     else if (turns.length) turns[turns.length - 1].char.push(text);
     else turns.push({ user: '', char: [text] });
   }

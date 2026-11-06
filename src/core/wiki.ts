@@ -4,6 +4,7 @@ import { advNum, advOn, genSettings, refToggles } from './advanced';
 import { related, type Focus } from './focus';
 import { tokens } from './gnet';
 import { trimPrevious, trimRelated, trimSecondary, trimTurns } from './budget';
+import { craftMessages, craftSettings, memoTexts, type CraftMessage } from './craft';
 import { collectRefs, factionCodesToNames, hasBook, limitRefs, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
 import type { Chat, LoreEntry } from './types';
 import { buildRegistry, resolveName, type Registry } from './world/registry';
@@ -233,7 +234,7 @@ export interface WikiRequest {
 }
 
 export interface WikiPrompt {
-  messages: { role: 'system' | 'user'; content: string }[];
+  messages: CraftMessage[];
   sources: string[];
   primarySources: string[];
 }
@@ -243,7 +244,7 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   for (const k of REQUIRED) if (!sec[k]) throw new WikiError(`Wiki 로어북의 ${k} 섹션이 없어요.`);
   const r = registry ?? buildRegistry(src.char.globalLore);
   const n = trimTurns(s.chatTurns);
-  const story = n ? storyText(recentTurns(src.chat, n)) : '';
+  const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
   const primary = [req.title, ...(hasBook(src, req.title) ? [] : req.inherited)];
   const t = refToggles(src.chat.scriptstate, 'nw');
   const rows = limitRefs(
@@ -267,11 +268,13 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   if (req.docRequest?.trim()) user += `\n\n[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n${req.docRequest.trim()}`;
   const sources = [...new Set(rows.flatMap((x) => x.sources))];
   const primarySources = [...new Set(rows.filter((x) => x.kind === 'primary').flatMap((x) => x.sources))];
+  const messages: CraftMessage[] = [
+    { role: 'system', content: factionCodesToNames(system.join('\n'), factionNames) },
+    { role: 'user', content: factionCodesToNames(user, factionNames) },
+  ];
+  const read = (k: string) => (sec[k] ?? '').replace(/<!--[\s\S]*?-->/g, '').trim();
   return {
-    messages: [
-      { role: 'system', content: factionCodesToNames(system.join('\n'), factionNames) },
-      { role: 'user', content: factionCodesToNames(user, factionNames) },
-    ],
+    messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'nw'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }),
     sources,
     primarySources,
   };

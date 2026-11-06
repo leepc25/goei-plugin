@@ -23,6 +23,7 @@ import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate as askModel } from '../host/llm';
+import { craftSettings } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { advNum, budgetFor, genSettings } from '../core/advanced';
 import { advancedBox } from './advanced';
@@ -179,7 +180,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
     let result: ReturnType<typeof parseReply>;
     try {
       const prompt = fitPrompt(budgetFor(saved.scriptstate, 'ph'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
-      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), state: saved.scriptstate }));
+      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), reiterate: craftSettings(saved.scriptstate, 'ph').reiterate, state: saved.scriptstate }));
     } catch (error) {
       await markFailed(ctx, rid, req);
       const msg = error instanceof Error ? error.message : String(error);
@@ -371,6 +372,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
     const { value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
       ...genSettings(ctx.chat.scriptstate),
+      reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate,
       state: ctx.chat.scriptstate,
       fix: (_raw, reason) => refreshRetry(prompt, reason),
       first: joint && ((m) => joint.ask('phone', m)),

@@ -2,6 +2,7 @@
 import { prepareAttachments } from '../core/attach';
 import { photoData } from './photo';
 import { applyAdvanced } from '../core/advanced';
+import { RETRY_ANALYZE } from '../core/craft';
 export type ModelChoice = 'main' | 'aux';
 
 export interface LlmMessage {
@@ -15,9 +16,9 @@ export class LlmError extends Error {
   }
 }
 
-/** 생각 블록 제거 */
+/** 생각 블록 제거 (생각 단계 「적고 지움」의 <lb-process> 포함) */
 function stripThoughts(s: string): string {
-  return s.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').replace(/<(?:thoughts|think)\b[^>]*>[\s\S]*$/gi, '');
+  return s.replace(/<(thoughts|think|lb-process)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').replace(/<(?:thoughts|think|lb-process)\b[^>]*>[\s\S]*$/gi, '');
 }
 
 async function readStream(stream: ReadableStream<unknown>): Promise<string> {
@@ -89,7 +90,34 @@ export interface RetryOptions {
   state?: Record<string, unknown>;
   /** 첫 요청을 대신 보낼 곳 (괴담넷·괴담톡 자동 확인 한 번에 묶기, host/joint.ts). 다시 묻기는 따로 보낸다 */
   first?: (messages: LlmMessage[]) => Promise<string>;
+  /** 다시 보기 횟수 (라이트보드 Reiteration). 첫 응답 뒤에만 */
+  reiterate?: number;
+  /** 동시 요청 수에 셀지 (괴담넷·괴담톡·위키). 0이면 제한 없음 */
+  concurrent?: number;
 }
+
+// ── 동시 요청 수 (라이트보드 「동시요청수」, 2026-11-06). 괴담넷·괴담톡·위키 요청만 센다. 인물 기록은 세지 않는다 (리수폿 스레드 요청) ──
+let running = 0;
+const waiting: (() => void)[] = [];
+async function slot<T>(limit: number | undefined, run: () => Promise<T>): Promise<T> {
+  if (!limit || limit < 1) return run();
+  while (running >= limit) await new Promise<void>((r) => waiting.push(r));
+  running++;
+  try {
+    return await run();
+  } finally {
+    running--;
+    waiting.shift()?.();
+  }
+}
+
+/** 다시 보기 문장 (원본 그대로) */
+const reiterationText = (i: number, n: number) => `<system>
+Reiteration phase (${i}/${n})
+Now, read the instruction and your previous output carefully. Is it format-adhering? Did it follow all the instructions without any omission?
+Carefully think, then if it is OK, output the required node without any changes. If it needs changes, apply the changes and output the node.
+</system>`;
+
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
 const retryable = (error: unknown) => !(error instanceof LlmError);
@@ -97,7 +125,7 @@ const retryable = (error: unknown) => !(error instanceof LlmError);
 const defaultFix = (messages: LlmMessage[]) => (raw: string, reason: string): LlmMessage[] => [
   ...messages,
   ...(raw ? [{ role: 'assistant' as const, content: raw }] : []),
-  { role: 'user', content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}` },
+  { role: 'user', content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}` },
 ];
 
 /** 실패 화면에 원문을 보여 주도록 오류에 응답 원문을 붙인다 (이미 있으면 그대로) */
@@ -121,7 +149,17 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
+      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use)));
+      // 다시 보기: 첫 응답을 다시 읽고 고치게 한다. 실패하면 첫 응답을 쓴다 (원본과 같음)
+      for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
+        const again: LlmMessage[] = [...ask, { role: 'assistant', content: raw }, { role: 'user', content: reiterationText(i, o.reiterate ?? 0) }];
+        try {
+          const next = await slot(o.concurrent, () => runModel(again, use));
+          if (next.trim()) raw = next;
+        } catch {
+          break;
+        }
+      }
       if (o.state) applyAdvanced(o.state);
       return { raw, value: parse(raw) };
     } catch (error) {

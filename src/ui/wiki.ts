@@ -9,6 +9,7 @@ import {
   type WikiMeta, type WikiSettings, wikiContextOn,
 } from '../core/wiki';
 import { generate as askModel } from '../host/llm';
+import { craftSettings } from '../core/craft';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
@@ -189,7 +190,7 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s, catalogNames, registry(ctx)));
     let body: string;
     try {
-      body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), state: ctx.chat.scriptstate })).value;
+      body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'nw').reiterate, state: ctx.chat.scriptstate })).value;
     } catch (error) {
       const raw = (error as { raw?: string }).raw;
       if (raw) wiki.failure = { title, reason: error instanceof Error ? error.message : String(error), raw };

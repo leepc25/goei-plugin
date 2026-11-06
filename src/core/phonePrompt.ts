@@ -8,12 +8,13 @@ import {
   type PState, phoneTime, hiddenPause, cooldownReady,
 } from './phone';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
 
 export interface PhonePrompt {
-  messages: { role: 'system' | 'user'; content: string }[];
+  messages: CraftMessage[];
   contactMode: boolean;
 }
 
@@ -185,7 +186,7 @@ function ownerCharacter(src: RefSource): { character?: string; rank?: string } {
 function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
   applyAdvanced(src.chat.scriptstate);
   const n = trimTurns(HISTORY.turns);
-  const turns = n ? recentTurns(src.chat, n) : [];
+  const turns = n ? recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages) : [];
   const recentStory: Narrator['recentStory'] = [];
   turns.forEach((t, i) => {
     if (t.user) recentStory.push({ role: 'user', text: t.user, turn: i + 1 });
@@ -282,13 +283,13 @@ function finish(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH', names: Re
     body.singlePassContact = true;
   }
   const system = rules(src, body, mode);
-  return {
-    messages: [
-      { role: 'system', content: factionCodesToNames(system, names) },
-      { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
-    ],
-    contactMode,
-  };
+  const p = sections(src);
+  const read = (k: string) => (p[k] === undefined ? '' : section(p, k));
+  const messages: CraftMessage[] = [
+    { role: 'system', content: factionCodesToNames(system, names) },
+    { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
+  ];
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode };
 }
 
 function gnetBoard(src: RefSource, query: string): unknown {
@@ -388,12 +389,12 @@ function personOfContact(c: Contact): PPerson {
 
 /** 새로고침 응답이 형식에 안 맞을 때 같은 자료로 한 번 더 (원본 재시도 문구) */
 export function refreshRetry(prompt: PhonePrompt, reason: string): PhonePrompt['messages'] {
-  const [sys, user] = prompt.messages;
+  const [sys, ...rest] = prompt.messages;
   return [
     {
       role: 'system',
-      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}`,
+      content: `${sys.content}\nThe previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason.slice(0, 600)}\n${RETRY_ANALYZE}`,
     },
-    user,
+    ...rest,
   ];
 }

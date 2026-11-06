@@ -18,6 +18,7 @@ import type { Chat } from '../core/types';
 import { lastReply } from '../core/phone';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate, type LlmMessage, type RetryOptions } from '../host/llm';
+import { craftSettings } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
@@ -74,7 +75,7 @@ const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIn
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
+const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, 'gn').reiterate, state: chat.scriptstate });
 const source = (ctx: ChatContext, chat = ctx.chat): RefSource => playerSource({ char: ctx.char as RefSource['char'], chat, persona: personaText() } as RefSource);
 
 function names(ctx: ChatContext): Record<string, string> {
