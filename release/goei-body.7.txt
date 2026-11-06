@@ -1,4 +1,37 @@
-es the same and feels aversion. If no usable visual evidence exists, record that the first impression is unknown. Once this entry exists, never upsert or remove it, however wrong it later proves; later understanding goes only to 「현재 평가:」.",
+a background figure.",
+    "",
+    "Keep these elements of a profile distinct when you reason and when you write `personality` or `relationship` entries:",
+    "- **Scope of interest**: who can be an object of romantic or sexual interest at all. Having no such targets is valid. Being outside the scope does not remove friendship, respect, aesthetic appreciation or camaraderie.",
+    "- **Attractive elements**: observable traits with testable evidence (「다른 사람을 위해 손해를 감수한 사람」), not labels (「착한 사람」).",
+    "- **Repellent elements**: never the automatic opposite of attractive ones. A person who likes strength may dislike someone who pretends to be strong more than someone who is weak.",
+    "- **Primary tastes**: what matters most; do not change it from scene to scene without evidence.",
+    "- **Values**: the order in which the person evaluates people and what they consider irrelevant.",
+    "- **Observation criteria**: which visible surfaces this person actually examines (clothing, equipment, speech, conduct, skill).",
+    "- **Biases**: the person's own logic for reading those surfaces. Distinguish a general bias from a judgment about one target.",
+    "- **Form of feeling**: the direction the feeling takes: appreciation, romantic attachment, protection, possession, competition, physical interest.",
+    "- **Restraint and approach style**: how strongly feelings are concealed and through what conduct they show. Concealing well does not mean feeling little. `express` (0–3) is the single baseline for how readily emotion becomes visible; it describes visibility, not intensity. Lower values yield fewer and subtler cues, higher values clearer and more immediate ones.",
+    "",
+    "Ground taste in appearance, attitude and speech, directly observed ability, known status and reputation, actual sensory information and relationship context. An ability supports direct observation only after it is displayed; a report about an ability is transmitted reputation. When the person is not close enough or lacks the relevant sensory channel, never use scent, touch or minute expressions as evidence.",
+    "",
+    "Update `personality` for taste only after genuinely contradictory reactions recur or an event changes the person's values. Paying a cost for a bias, or accumulating counterexamples, may justify a change. One target being an exception does not rewrite the whole person.",
+    "",
+    "### 7.3 From observation to appraisal",
+    "First determine which features of the user's character this person actually observed or was told. Then connect them to the person's tastes, aversions and values. Without evidence, do not invent special attraction or dislike. When different persons like the same target, each needs their own reason; never make everyone like a target identically, and never force one person to dislike the target merely to create contrast.",
+    "",
+    "Status, wealth and reputation reach a person only through displays, statements or introductions, a reputation attached to a name the person already knows, or observable material signals. Worn clothing is an observation; 「가난해 보임」 is an interpretation produced by applying a bias to it. The user's actual background in the persona or lorebook is not known to the observer by itself.",
+    "",
+    "A mistaken interpretation can be internally consistent with the evidence the person has. Do not correct it with narrator knowledge. New facts may break the interpretation, but the attitude may remain until the person actually changes it.",
+    "",
+    "When elements conflict, do not average them away. Pick the mode the span supports:",
+    "- **Ignore**: the person does not value that element, so there is no inner conflict. Do not force tension.",
+    "- **Accept the cost**: the person sees the problem and accepts it for another reason. Preserve what is accepted and which condition could destabilize the choice.",
+    "- **Yield to constraint**: values or constraints suppress behavior while attraction remains. The person may keep noticing the target while outwardly belittling them.",
+    "",
+    "When a person learns their interpretation was wrong, judge attitude change separately: they may find another reason to keep the old attitude, overcorrect in the opposite direction, or admit the mistake and change how they treat the target. Choose the one the span shows; never apply all possibilities at once, and never assume attitude and interpretation changed at the same time.",
+    "",
+    "### 7.4 Recording appraisals and intent in `relationship`",
+    "Risupot kept these in eight separate fields; here they are entries in the `relationship` slot toward `@user`, each with a short Korean prefix so they can be told apart. Write each only with evidence, as an interpretation, and only when it is new or changed:",
+    "- 「첫인상:」 **first impression**, written once, when the person first speaks with or is addressed by the user's character in a confirmed span and no 첫인상 entry exists. Visible cue → the subjective image the person formed → the resulting feeling and its personality-based reason, from scene-visible face, build, grooming, clothing, equipment, carried items, posture or expression and the person's known tastes and biases. Example of reasoning, not of fact: a person who values money sees expensive clothes and a watch, infers wealth, and feels anticipation; an ostentation-averse person sees the same and feels aversion. If no usable visual evidence exists, record that the first impression is unknown. Once this entry exists, never upsert or remove it, however wrong it later proves; later understanding goes only to 「현재 평가:」.",
     "- 「현재 평가:」 **current evaluation**: the person's present reading of the user's character, its concrete reason, and the resulting feeling, through the person's own personality. A favorable first impression may coexist with an unfavorable current evaluation. A corrected interpretation need not change the emotion, and a changed feeling need not change every judgment. Upsert the one existing entry when it changes; do not write a diary of evaluations and do not restate it when nothing changed. Distinguish 「부유해 보임」 from verified wealth; hidden wealth, background, ability, intentions and private traits are not automatically known.",
     "- 「의도:」 **nature and intent of interest**: the primary intent and, when needed, a secondary one, from the table in 7.5. Distinguish nonromantic interest from romantic or sexual interest; strong affinity does not make everyone a romantic candidate. A real catalyst is required when the nature of interest changes.",
     "- 「태도:」 **stance**: how the person currently interprets and treats the target, as two separate elements, with the evidence for the latest change.",
@@ -1775,7 +1808,7 @@ Return the JSON object.` }
       if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act("open");
     }, { passive: true });
   }
-  var wide = () => !matchMedia("(max-width: 760px)").matches;
+  var wide = () => !isPhone();
   async function handleWiki(action, value, ctx2, env3) {
     const v = value ?? "";
     if (action !== "wiki-delete") wiki.confirmDelete = null;
@@ -1870,121 +1903,4 @@ Return the JSON object.` }
         if (!v || wiki.rewrite !== v) break;
         void generate3(ctx2, env3, v, true, wiki.docReq, wiki.rewritePrev);
         break;
-      case "wiki-delete":
-        if (wiki.confirmDelete !== v) {
-          wiki.confirmDelete = v;
-          break;
-        }
-        wiki.confirmDelete = null;
-        if (wiki.title === v && wiki.view === "doc" && !baseDocs(ctx2.char.globalLore).some((d) => d.title === v)) Object.assign(wiki, { view: "home", title: "", history: [] });
-        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => deleteDoc(chat, v));
-        await env3.refresh();
-        return true;
-      case "wiki-jump": {
-        const el = document.getElementById(v);
-        const fold2 = el?.closest("details");
-        if (fold2) fold2.open = true;
-        el?.scrollIntoView({ behavior: "smooth", block: "start" });
-        return true;
-      }
-      case "wiki-request":
-        await setVar2(ctx2, env3, "$nw_writing_request", v.trim());
-        return true;
-      case "wiki-length":
-      case "wiki-mode":
-      case "wiki-model":
-      case "wiki-refresh_previous":
-      case "wiki-context":
-        await setVar2(ctx2, env3, `$nw_${action.slice(5)}`, v);
-        return true;
-      case "wiki-settings":
-        if (wiki.view === "settings") go("home");
-        else go("settings");
-        wiki.listOpen = false;
-        break;
-      default:
-        return false;
-    }
-    env3.render();
-    return true;
-  }
-  function wikiInput(name, value) {
-    if (name === "wiki-new") return void (wiki.newTitle = value), true;
-    if (name === "wiki-docreq") return void (wiki.docReq = value), true;
-    return false;
-  }
-  var wikiSettingsPane = (ctx2) => settingsView3(ctx2);
-
-  // src/ui/editor/manage.ts
-  var esc20 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var kb = (n2) => n2 >= 1e6 ? `${(n2 / 1e6).toFixed(1)}MB` : n2 >= 1e3 ? `${Math.round(n2 / 1e3)}KB` : `${n2}B`;
-  var isManageNode = (n2) => n2 === "manage:backup" || n2 === "manage:diag" || n2 === "manage:log";
-  var GAME_PACK_PREFIX = "goei:game:pack:";
-  var GAME_PACKS = `${GAME_PACK_PREFIX}*`;
-  var STORE = [
-    ["goei:prefs", "기기 설정", "화면·이미지·지침 고친 글·추가 규칙·새 채팅 기본값"],
-    ["goei:wikibase", "위키 기본 문서", "카드에서 뺀 기본 문서 묶음. 지우면 설치·점검에서 다시 받아요", "man-drop-wiki"],
-    ["goei:tok-o200k", "토크나이저", "o200k_base 순위표. 지우면 토큰 수가 어림값이 돼요", "man-drop-tok"],
-    ["goei-people-diag", "인물 기록 실행 기록", "최근 갱신의 입력·출력 원문", "man-drop-diag"],
-    // 2026-10-28 QC: 옛 키(goei:game-pack:action-normal-v4)는 쓰는 곳이 없어 늘 「없음」이었다. 실제 키로 (src/main.ts·host/game/code.ts·host/game/packs.ts)
-    ["goei:body", "플러그인 본체", "괴이 카드를 열 때 받아 둔 goei-body.js. 플러그인 판이 바뀌면 다시 받아요"],
-    ["goei:data-world", "세계 자료", "요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요"],
-    ["goei:data-install", "설치 자료", "인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요"],
-    // 필드(게임)는 2026-11-04 플러그인에서 뺐다. 예전에 받아 둔 것이 남아 있으면 크기만 보여 준다
-    ["goei:game:code", "옛 게임 코드", "예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"],
-    [GAME_PACKS, "옛 게임 자산 팩", "예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"]
-  ];
-  async function sizeOf(key2) {
-    try {
-      const raw = await risuai.pluginStorage.getItem(key2);
-      return typeof raw === "string" ? raw.length : raw ? JSON.stringify(raw).length : 0;
-    } catch {
-      return 0;
-    }
-  }
-  var manUi = {
-    sizes: null,
-    /** 올린 파일 이름 (가져오기) */
-    importName: "",
-    pending: false,
-    importText: "",
-    confirm: "",
-    info: "",
-    notice: "",
-    diag: null,
-    /** 상태 점검의 「받기」 진행 중인 것과 진행 글 (2026-11-06 사용자 승인, 전수점검 9-9) */
-    getting: "",
-    progress: ""
-  };
-  var rerender = null;
-  async function refresh() {
-    const sizes = {};
-    for (const [key2] of STORE) {
-      if (key2 === GAME_PACKS) {
-        let total = 0;
-        try {
-          const keys = await risuai.pluginStorage.keys();
-          for (const k of Array.isArray(keys) ? keys : []) if (typeof k === "string" && k.startsWith(GAME_PACK_PREFIX)) total += await sizeOf(k);
-        } catch {
-        }
-        sizes[key2] = total;
-      } else sizes[key2] = await sizeOf(key2);
-    }
-    manUi.sizes = sizes;
-    try {
-      manUi.diag = await loadDiag();
-    } catch {
-      manUi.diag = [];
-    }
-  }
-  function ensureManage(render3) {
-    rerender = render3;
-    if (manUi.sizes || manUi.pending) return;
-    manUi.pending = true;
-    void refresh().finally(() => {
-      manUi.pending = false;
-      render3();
-    });
-  }
-  var row5 = (label2, ctl, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${ctl}</div></div>`;
-  var badge2 = (ok, text4) => `<span
+      case "wi

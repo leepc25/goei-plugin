@@ -526,7 +526,7 @@ if (!skip()) {
   await frame.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 180000 });
   const ms = Date.now() - t0;
   const info = await frame.textContent('.gw-install .gx-hint');
-  assert.match(info, /로어북·인사말·봇 이름 · 사진 1696장 · 아이콘 · 위키 기본 문서 · 토크나이저 — 끝났어요/, info);
+  assert.match(info, /로어북·인사말·봇 이름 · 사진 1697장 · 아이콘 · 위키 기본 문서 · 토크나이저 — 끝났어요/, info);
   assert.equal(await frame.locator('.gx-err').count(), 0, '안 된 것 없음');
   const ch = await frame.evaluate(() => window.__chars[0]);
   assert.equal(ch.name, '괴이 ː ANOMALY');
@@ -597,14 +597,14 @@ if (!skip()) {
   await frame.click('[data-action="ed-inst-all"]');
   await frame.waitForFunction(() => /안 된 것/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
   const err2 = await frame.textContent('.gw-install .gx-err');
-  assert.match(err2, /100\/1696장까지 받았어요/, err2);
+  assert.match(err2, /100\/1697장까지 받았어요/, err2);
   assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 100, '받은 묶음까지만 저장');
-  assert.match(await frame.textContent('.gw-install'), /100\/1696장/, '점검표에 남은 수');
+  assert.match(await frame.textContent('.gw-install'), /100\/1697장/, '점검표에 남은 수');
   // 404 를 고치고 다시 누르면 이어서 받는다
   await frame.evaluate(() => { window.__fetchHook = (n, u) => (u.includes('/pic/') ? new Uint8Array([1, 2, 3]) : undefined); });
   await frame.click('[data-action="ed-inst-all"]');
-  await frame.waitForFunction(() => /사진 1596장/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
-  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 1696);
+  await frame.waitForFunction(() => /사진 1597장/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
+  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 1697);
   assert.equal(await frame.locator('.gw-inst-no').count(), 0);
   await closeOf(page, errors);
   ok('설치 부분 실패: 지문 불일치·404 묶음은 카드 그대로, 다른 단계 계속, 다시 누르면 이어서');

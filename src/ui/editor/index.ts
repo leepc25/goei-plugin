@@ -30,7 +30,7 @@ import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 import { isPhone } from '../media';
-import { morph } from '../morph';
+import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
@@ -243,6 +243,7 @@ function ensureRoot(): HTMLElement {
   });
   root.addEventListener('change', (ev) => {
     const el = ev.target as HTMLSelectElement;
+    markCommitted(el);
     if (el?.dataset?.input === 'dir-crop-size') return render();
     if (el?.dataset?.change?.startsWith('ed-')) return void run(el.dataset.change, el.value);
     if (el?.dataset?.change === 'man-import-file') return void manageFile(el as unknown as HTMLInputElement).then(() => render());

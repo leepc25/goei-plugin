@@ -1,4 +1,927 @@
-${recUi.importOpen ? " on" : ""}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
+        try {
+          let missing = [];
+          await updateCharacterLore(ctx2.charIndex, (lore) => {
+            const r = withFactionPlaceholders(lore);
+            missing = r.missing;
+            return r.changed ? r.lore : null;
+          });
+          dirUi.notice = missing.length ? `로어북에서 자리를 못 찾은 부분이 있어요: ${missing.join(", ")}` : "";
+          dirUi.done = missing.length ? "" : "🏷️Tag·📜Faction 로어북에 새 세력 자리를 넣었어요";
+        } catch (error) {
+          dirUi.notice = `로어북을 고치지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        dirUi.busy = false;
+        await env3.refresh();
+        return true;
+      }
+      case "dir-ext-open":
+        dirUi.adding = true;
+        dirUi.addQ = "";
+        break;
+      case "dir-add-toggle":
+        dirUi.adding = !dirUi.adding;
+        dirUi.addQ = "";
+        break;
+      case "dir-help":
+        dirUi.help = !dirUi.help;
+        break;
+      case "dir-photo-pick":
+        dirUi.pick = dirUi.pick === v ? "" : v;
+        dirUi.pickQ = "";
+        break;
+      case "dir-photo-set": {
+        const at = v.indexOf("|");
+        const { slot, key: key2 } = pickOf(v.slice(at + 1));
+        const p = picOf(d, key2);
+        if (!p) break;
+        p.set(slot, at > 0 ? v.slice(0, at) : "");
+        dirUi.pick = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-crop":
+        dirUi.crop = dirUi.crop === v ? "" : v;
+        dirUi.pick = "";
+        break;
+      case "dir-crop-reset":
+        picOf(d, v)?.set("crop", "");
+        dirUi.done = "";
+        break;
+      case "dir-ext-close":
+        dirUi.adding = false;
+        break;
+      case "dir-ext-add": {
+        const rows2 = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
+        if (!rows2 || !v || rows2.some((r) => r.lore === v) || !loreSources(ctx2.char.globalLore).has(v)) break;
+        rows2.push({ lore: v, label: v, english: "", aliases: [], preset: true, inFolder: false });
+        dirUi.open = v;
+        dirUi.adding = false;
+        dirUi.done = "";
+        break;
+      }
+      case "dir-ext-del": {
+        const rows2 = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
+        const i = rows2 ? rows2.findIndex((r) => r.lore === v && !r.inFolder) : -1;
+        if (!rows2 || i < 0) break;
+        rows2.splice(i, 1);
+        dirUi.open = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-reset":
+        dirUi.draft = null;
+        dirUi.notice = "";
+        break;
+      case "dir-reload":
+        await env3.refresh();
+        dirUi.done = "로어북을 다시 읽었어요.";
+        env3.render();
+        return true;
+      case "dir-save": {
+        if (!dirty() || dirUi.busy) return true;
+        dirUi.busy = true;
+        dirUi.notice = "";
+        env3.render();
+        try {
+          const data3 = directoryData(d);
+          let saved = void 0;
+          await updateCharacterLore(ctx2.charIndex, (lore) => saved = withDirectory(lore, data3).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
+          dirUi.draft = null;
+          dirUi.done = "카드 로어북에 저장했어요";
+          if (saved && (ctx2.chat.message ?? []).length) {
+            const lore = saved;
+            await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+              const vars = staleFactionVars(lore, chat.scriptstate);
+              return vars ? { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } } : null;
+            }).catch(() => null);
+          }
+        } catch (error) {
+          dirUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        dirUi.busy = false;
+        await env3.refresh();
+        return true;
+      }
+      default:
+        return false;
+    }
+    env3.render();
+    return true;
+  }
+
+  // src/ui/imgprompt.ts
+  var esc13 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var imgUi = { template: null, extra: "", keywords: null, info: "", notice: "", preview: false };
+  function imgPromptPane(ctx2) {
+    const cfg = imgPromptConfig(getPrefs());
+    const s7 = basicSettings(ctx2.char.globalLore, ctx2.chat.scriptstate);
+    const me = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
+    const cands = imgCandidates(ctx2.char.globalLore, cfg);
+    const off = new Set(cfg.off.map((n2) => n2.toLowerCase()));
+    const picked = imgCharacters(ctx2.char.globalLore, cfg, { assetPlayer: s7.assetPlayer, playerEnglish: me?.english || void 0, userName: userInfo().name });
+    const template = imgUi.template ?? cfg.template;
+    const keywords = imgUi.keywords ?? cfg.keywords.join(", ");
+    const rows2 = cands.map((c) => `<label class="ip-name${off.has(c.name.toLowerCase()) ? " off" : ""}"><input type="checkbox" data-change="ip-toggle" data-key="${esc13(c.name)}" ${off.has(c.name.toLowerCase()) ? "" : "checked"}><span>${esc13(c.name)}</span>${c.korean ? `<small>${esc13(c.korean)}</small>` : ""}${c.source === "extra" ? `<button class="gx-mini pp-mini danger" data-action="ip-extra-del" data-value="${esc13(c.name)}" title="임의 추가 이름 지우기">지움</button>` : ""}</label>`).join("");
+    const state = !s7.assetOn ? "에셋 출력이 꺼져 있어 지침을 넣지 않아요." : s7.assetModel === "main" ? `메인 모델 요청 끝에 이 지침을 끼워요. 지금 대상 ${picked.length}명.` : `보조 모델이 태그를 붙여요. 이 목록과 표정 세트를 보조 모델 자료에도 써요. 지금 대상 ${picked.length}명.`;
+    const preview = imgUi.preview ? `<pre class="ip-preview">${esc13(buildImgPrompt(cfg, picked, s7.assetPlayer))}</pre>` : "";
+    return `<article class="nw-doc pp-doc ip-pane">
+    ${imgUi.notice ? `<div class="gx-err" role="alert">${esc13(imgUi.notice)}</div>` : ""}
+    <p class="ps-note pp-intro">카드 로어북 「Asset」 대신 플러그인이 이 설정으로 지침을 만들어 요청에 넣어요. ${esc13(state)} 주인공 이미지 설정(${s7.assetPlayer ? "ON" : "OFF"})은 캐릭터 이미지 설정에서 바꿔요. 이 기기의 모든 채팅에 같이 적용돼요.</p>
+    <section class="ps-group"><h3>지침 틀</h3><p class="ps-note">자리표 <code>{characters}</code> <code>{keywords}</code> 는 아래 목록으로 채워지고, <code>{user_skip}</code> <code>{user_rule}</code> 는 주인공 이미지 설정에 따라 채워져요. 비우면 기본 틀.</p>
+      <textarea class="gx-search nw-reqbox ip-template" name="ip-template" data-input="ip-template" rows="14" maxlength="${IMG_TEMPLATE_MAX}">${esc13(template)}</textarea>
+      <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="ip-template-save" data-take="ip-template">저장</button><button class="gx-mini" data-action="ip-template-reset" title="기본 틀로 되돌려요">기본값</button><button class="gx-mini" data-action="ip-preview">${imgUi.preview ? "미리보기 닫기" : "조립 결과 미리보기"}</button></div>${preview}</section>
+    <section class="ps-group"><h3>출력 대상 캐릭터<b>${picked.length}</b></h3><p class="ps-note">명부의 요원 영문명을 자동으로 읽어요 (한글 이름·별칭도 명부에서 가져와 보조 모델 자료로 써요). 체크를 풀면 그 인물은 태그를 안 만들어요. 그림 에셋 이름(영문명_표정)과 같아야 해요.</p>
+      <div class="ip-names">${rows2}</div>
+      <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc13(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra">추가</button></div></section>
+    <section class="ps-group"><h3>표정 세트<b>${cfg.keywords.length}</b></h3><p class="ps-note">쉼표로 나눠요. 카드 그림(영문명_표정)에 있는 이름이어야 해요. 비우면 기본 27종.</p>
+      <textarea class="gx-search nw-reqbox" name="ip-keywords" data-input="ip-keywords" rows="3" maxlength="1200">${esc13(keywords)}</textarea>
+      <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="ip-keywords-save" data-take="ip-keywords">저장</button><button class="gx-mini" data-action="ip-keywords-reset">기본값</button></div></section>
+    ${imgUi.info ? `<p class="gx-hint">${esc13(imgUi.info)}</p>` : ""}
+  </article>`;
+  }
+  function imgInput(name, value) {
+    if (name === "ip-template") {
+      imgUi.template = value;
+      return true;
+    }
+    if (name === "ip-extra") {
+      imgUi.extra = value;
+      return true;
+    }
+    if (name === "ip-keywords") {
+      imgUi.keywords = value;
+      return true;
+    }
+    return false;
+  }
+  async function handleImgPrompt(action, value, env3) {
+    const v = value ?? "";
+    imgUi.notice = "";
+    switch (action) {
+      case "ip-template-save":
+        await savePrefs((p) => ({ ...p, imgPrompt: v.trim() && v.trim() !== IMG_PROMPT_DEFAULT ? v.slice(0, IMG_TEMPLATE_MAX) : void 0 }));
+        imgUi.template = null;
+        imgUi.info = "지침 틀을 저장했어요.";
+        env3.render();
+        return true;
+      case "ip-template-reset":
+        await savePrefs((p) => ({ ...p, imgPrompt: void 0 }));
+        imgUi.template = null;
+        imgUi.info = "기본 틀로 되돌렸어요.";
+        env3.render();
+        return true;
+      case "ip-preview":
+        imgUi.preview = !imgUi.preview;
+        env3.render();
+        return true;
+      case "ip-toggle": {
+        const [name] = v.split("=");
+        const key2 = name.trim();
+        if (!key2) return true;
+        await savePrefs((p) => {
+          const off = new Set((p.imgNamesOff ?? []).map((n2) => n2.toLowerCase()));
+          const list4 = off.has(key2.toLowerCase()) ? (p.imgNamesOff ?? []).filter((n2) => n2.toLowerCase() !== key2.toLowerCase()) : [...p.imgNamesOff ?? [], key2];
+          return { ...p, imgNamesOff: list4.length ? list4 : void 0 };
+        });
+        env3.render();
+        return true;
+      }
+      case "ip-extra-add": {
+        const name = v.replace(/[<>"{}_\n]/g, "").trim().slice(0, 40);
+        if (!name) {
+          imgUi.notice = "영문명을 적어 주세요.";
+          env3.render();
+          return true;
+        }
+        await savePrefs((p) => ({ ...p, imgNamesExtra: [.../* @__PURE__ */ new Set([...p.imgNamesExtra ?? [], name])] }));
+        imgUi.extra = "";
+        imgUi.info = `「${name}」을 더했어요.`;
+        env3.render();
+        return true;
+      }
+      case "ip-extra-del":
+        await savePrefs((p) => {
+          const list4 = (p.imgNamesExtra ?? []).filter((n2) => n2 !== v);
+          return { ...p, imgNamesExtra: list4.length ? list4 : void 0 };
+        });
+        env3.render();
+        return true;
+      case "ip-keywords-save": {
+        const list4 = v.split(/[,\n]/).map((x) => x.trim().toLowerCase()).filter(Boolean);
+        const same4 = list4.join(",") === IMG_KEYWORDS_DEFAULT.join(",");
+        await savePrefs((p) => ({ ...p, imgKeywords: list4.length && !same4 ? list4 : void 0 }));
+        imgUi.keywords = null;
+        imgUi.info = `표정 ${list4.length ? list4.length : IMG_KEYWORDS_DEFAULT.length}종을 저장했어요.`;
+        env3.render();
+        return true;
+      }
+      case "ip-keywords-reset":
+        await savePrefs((p) => ({ ...p, imgKeywords: void 0 }));
+        imgUi.keywords = null;
+        imgUi.info = "기본 표정 세트로 되돌렸어요.";
+        env3.render();
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  // src/ui/mbar.ts
+  function mbarHtml(items) {
+    const x = (side) => `<span class="gx-mclose ${side}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>닫기</span></span>`;
+    return `<div class="gx-mbar"><div class="gx-mtrack">${x("l")}${items.join("")}${x("r")}</div></div>`;
+  }
+  var rubber = (dx, w) => Math.sign(dx) * (Math.abs(dx) / (1 + Math.abs(dx) / (4 * w)));
+  function bindMbar(root3, onClose) {
+    const bar = root3.querySelector(".gx-mbar");
+    const track2 = bar?.querySelector(".gx-mtrack");
+    if (!bar || !track2) return;
+    const closeW = () => track2.querySelector(".gx-mclose")?.offsetWidth || 72;
+    let x0 = 0;
+    let y0 = 0;
+    let id = null;
+    let dragging = false;
+    let shown2 = 0;
+    let ready = false;
+    const paint = () => {
+      track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
+      const was = ready;
+      ready = Math.abs(shown2) >= closeW();
+      track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
+      if (ready && !was) navigator.vibrate?.(8);
+    };
+    const end = () => {
+      if (id === null) return;
+      id = null;
+      if (!dragging) return;
+      const close3 = ready;
+      track2.classList.add("back");
+      shown2 = 0;
+      paint();
+      setTimeout(() => track2.classList.remove("back"), 260);
+      if (close3) onClose();
+    };
+    bar.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      id = e.pointerId;
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dragging = false;
+      track2.classList.remove("back");
+    });
+    bar.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== id) return;
+      const dx = e.clientX - x0;
+      if (!dragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
+        dragging = true;
+        bar.setPointerCapture?.(e.pointerId);
+      }
+      shown2 = rubber(dx, closeW());
+      paint();
+    });
+    bar.addEventListener("pointerup", end);
+    bar.addEventListener("pointercancel", end);
+    bar.addEventListener("click", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
+  // src/ui/editor/style.css
+  var style_default = `/* 설정·세계 편집 창 (.gw). 2026-10-27 전면 재작성: 한 규격.
+   ─ 규격 변수 하나씩: 조작 높이 --h 34, 모서리 --r 8, 틈 --gap 8, 안 여백 --pad 14, 이름 칸 --label 200, 입력칸 --ctl 320.
+   ─ 모든 조작(단추·칩·선택·입력칸·스위치·단계 단추·스테퍼·목록 줄·구역 타일)은 같은 높이·모서리·선·글자.
+   ─ 줄 = [이름 200][조작 바로 옆, 왼쪽 정렬] / 설명은 조작 아래. 글칸(여러 줄) 줄은 이름 위·글칸 아래 전체 폭.
+   ─ 묶음 = 작은 제목 + 카드 하나(상자 한 겹). 카드 안 줄은 가는 선으로만 나뉨. 상자 속 상자 없음.
+   ─ 색: 카드 panel, 입력칸(들어간 면) void, 단추(올린 면) panel2, 고른 것 accent-bg + accent-line. 그 밖의 색 없음.
+   폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%), 높이 92%, 760px 이하 전체 화면 */
+.gw { --h: 34px; --r: 8px; --gap: 8px; --pad: 14px; --label: 200px; --ctl: 320px; --hair: var(--panel2);
+  position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 14px/1.5 var(--font); }
+.gw[hidden] { display: none; }
+.gw-win { position: relative; width: var(--gw-width, 90%); height: min(92%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.gw * { box-sizing: border-box; }
+.gw button:focus-visible, .gw input:focus-visible, .gw select:focus-visible, .gw textarea:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
+
+/* ── 머리: 제목 · 어디 · 알림 · 저장/닫기 ── */
+.gw-top { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-top > b { font-size: 15px; font-weight: 700; }
+.gw-brand { display: inline-flex; color: var(--signal); margin-right: -4px; }
+.gw-brand svg { width: 22px; height: 22px; }
+.gw-notice { margin-left: auto; font-size: 12.5px; color: var(--sub); }
+.gw-notice.err { color: var(--danger); }
+.gw-notice + .gw-top-right { margin-left: 0; }
+.gw-top-right { display: flex; align-items: center; gap: var(--gap); margin-left: auto; flex: none; }
+.gw-save { display: inline-flex; align-items: center; gap: var(--gap); }
+.gw-save-state { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
+.gw-save.dirty .gw-save-state { color: var(--amber); }
+.gw-menu { display: none; }
+.gw .gx-x { width: var(--h); height: var(--h); border-radius: var(--r); font-size: 16px; }
+
+/* ── 왼쪽 열: 구역 타일 4개 + 목록. 타일과 목록 줄은 같은 높이·모서리·고른 색 ── */
+.gw-tree { grid-area: tree; overflow: auto; padding: 10px; border-right: 1px solid var(--line); background: var(--sunk); }
+.gw-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 6px; }
+.gw-tab, .gw-tree-item { height: var(--h); border: 1px solid transparent; border-radius: var(--r); background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+.gw-tab { display: flex; align-items: center; justify-content: center; gap: 6px; border-color: var(--line); background: var(--panel); }
+.gw-tree-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0 12px; text-align: left; }
+.gw-tab svg, .gw-tree-item svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+.gw-tab:hover, .gw-tree-item:hover { background: var(--panel); border-color: var(--line); color: var(--text); }
+.gw-tab.on, .gw-tree-item.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
+/* 설정 「기록」 아래 하위 메뉴 (2026-11-05 사용자): 소제목 줄 + 들여쓴 항목 */
+.gw-tree-label { display: flex; align-items: center; gap: 10px; height: var(--h); padding: 0 12px; color: var(--sub); font-size: 14px; font-weight: 500; }
+.gw-tree-label svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+.gw-tree-item.sub { padding-left: 36px; font-size: 13px; }
+.gw-tree-item.sub svg { width: 13px; height: 13px; }
+.gw-tab.on svg, .gw-tree-item.on svg { opacity: 1; }
+.gw-tree-group { display: flex; flex-direction: column; gap: 2px; }
+.gw-tree-group h4 { margin: 12px 12px 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gw-tree-item > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 배지 (목록 줄 켬/끔·개수, 머리 상태, 목록 새로/지움/제외): 모두 같은 크기·모서리 */
+.gw-tree-badge, .gw-tree-item em, .gw-state, .gw-badge, .gw-rel-n, .gx-scope { display: inline-block; flex: none; margin-left: auto; padding: 0 7px; border: 1px solid transparent; border-radius: 5px; font: inherit; font-style: normal; font-size: 11.5px; font-weight: 600; line-height: 18px; white-space: nowrap; color: var(--dim); background: var(--panel2); vertical-align: middle; }
+.gw-tree-badge:not(.off), .gw-state:not(.off):not(.bad), .gw-badge.new { color: var(--signal); background: var(--accent-bg); border-color: var(--accent-line); }
+.gw-badge { color: var(--amber); background: var(--amber-bg); }
+.gw-badge.del, .gw-state.bad { color: var(--danger); background: var(--danger-bg); }
+.gw-state { margin-left: 8px; }
+.gw .ps-ctl .gw-state, .gw .gx-scope { margin-left: 0; }
+.gw .gx-scope { margin-left: 6px; font-size: 11px; font-weight: 500; }
+.gw-rel-n { font-family: var(--mono); }
+
+/* ── 본문 ── */
+.gw-body { grid-area: body; overflow: auto; min-width: 0; }
+.gw-page, .gw-detail { padding: 20px 24px 60px; min-width: 0; }
+.gw-page:not(.split) > *, .gw-detail > * { max-width: 920px; }
+/* 줄 높이를 창에 묶어야 목록(.gw-list)·상세(.gw-detail)가 따로 스크롤한다. 묶지 않으면 줄이 내용만큼 늘어 본문 전체가 같이 내려가 목록 도구·검색이 화면 밖으로 사라졌다 (2026-10-28 QC) */
+.gw-page.split { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); padding: 0; height: 100%; }
+.gw-detail { overflow: auto; }
+.gw-detail.empty { display: grid; place-items: center; color: var(--dim); }
+/* 페이지 머리: 제목 (배지) · 오른쪽 단추 · 설명 한 단락 */
+.gw-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 18px; }
+.gw-head h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 10px; font-size: 19px; font-weight: 700; line-height: 1.3; }
+.gw-head h2 small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
+.gw-head h2 .gw-pre { margin-left: 4px; }
+.gw-head-act { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--gap); margin-left: auto; }
+.gw-head .gx-muted, .gw-head > p { flex-basis: 100%; margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--dim); }
+.gw-eg { color: var(--sub); }
+.gw-off-note { color: var(--amber); }
+.gw-tokens { font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
+.gw .gx-hint, .gw .gx-err { margin: 0 0 14px; padding: 10px 12px; border-radius: var(--r); font-size: 13px; line-height: 1.5; }
+
+/* 묶음: 작은 제목 + 카드 하나 */
+.gw .gx-settings { display: block; }
+.gw .gx-settings > * { width: auto; max-width: none; margin-left: 0; margin-right: 0; }
+.gw .ps-group, .gw .gw-sec { display: block; margin: 0 0 20px; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.gw .ps-group > h3, .gw .gw-sec > h3, .gw .gw-sec > summary, .gw .gw-sub, .gw .ps-card > h4 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 0; margin: 0 0 6px 2px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: default; }
+.gw .gw-sec > summary { cursor: pointer; list-style: none; }
+.gw .ps-group > h3 small, .gw .gw-sec > h3 small, .gw .gw-sec > summary small { margin: 0; font-size: 12.5px; font-weight: 400; color: var(--dim); }
+.gw .ps-group > .ps-note, .gw .gw-setbody > .ps-note, .gw .ps-card > .ps-note { margin: -2px 2px 8px; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .gw-variants { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-left: auto; font-weight: 400; }
+.gw .gw-variants input { width: 200px; }
+/* 카드 */
+.gw .ps-rows, .gw .dir-panel, .gw .gw-fields, .gw .ps-adv, .gw .gw-import, .gw .gw-preview, .gw .gw-anote, .gw .gw-basepage .dir-row { display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; box-shadow: none; }
+/* 2026-11-05 사용자: 기본 정보 상자 윗선이 잘렸다 — 기본 정보 카드는 머리줄 없이 상자만 있으므로 윗선을 둔다 (거점 페이지만 머리줄 아래라 0) */
+.gw .gw-basepage .dir-panel { border-top: 0; }
+.gw .gw-basepage .dir-panel { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+
+/* ── 줄: [이름][조작] 격자, 설명은 조작 아래 ── */
+.gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .dir-rename, .gw .st-col-row, .gw .gw-field { display: grid; grid-template-columns: var(--label) minmax(0, 1fr); grid-template-areas: 'label ctl' 'label hint'; column-gap: 16px; row-gap: 4px; align-items: start; margin: 0; padding: 10px var(--pad); border: 0; border-top: 1px solid var(--hair); border-radius: 0; background: transparent; box-shadow: none; }
+.gw .ps-rows > :first-child, .gw .dir-panel > :first-child, .gw .gw-fields > :first-child, .gw .st-cols > :first-child, .gw .ps-adv-sub > .ps-rows > :first-child { border-top: 0; }
+.gw .ps-row > .ps-label, .gw .st-cols, .gw .st-col-name, .gw .dir-fac, .gw .dir-grid, .gw .dir-rename > .dir-in { display: contents; }
+/* 이름 */
+.gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .dir-rename > .dir-in > span:first-child, .gw .st-col-name > b { grid-area: label; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; min-height: var(--h); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
+.gw .dir-line > span:first-child .dir-code { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--signal); }
+/* 설명 */
+.gw .ps-label > small, .gw .dir-line > small, .gw .dir-in > small, .gw .st-col-name > small { grid-area: hint; display: block; margin: 0; font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--dim); }
+/* 조작: 이름 바로 옆, 왼쪽 정렬 */
+.gw .ps-row > .ps-ctl, .gw .dir-line > :where(:not(span:first-child):not(small)), .gw .dir-in > :where(:not(span:first-child):not(small):not(textarea):not(.dir-ext):not(.dir-photo)) { grid-area: ctl; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: var(--gap); min-width: 0; min-height: var(--h); font-weight: 400; }
+.gw .ps-ctl > input, .gw .ps-ctl > select, .gw .ps-ctl > .gx-select, .gw .dir-in > input, .gw .dir-in > select, .gw .dir-rename > .dir-in > input, .gw .st-range { width: var(--ctl); max-width: 100%; }
+.gw .dir-in > .dir-ext { grid-area: hint; }
+/* 글칸 줄: 이름 위, 글칸 아래 전체 폭 */
+.gw .ps-row:has(> textarea), .gw .ps-row:has(> .nw-reqbox), .gw .dir-in:has(> textarea), .gw .gw-field { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'label act' 'ctl ctl' 'hint hint'; row-gap: 6px; }
+.gw .ps-row:has(> textarea) > .ps-ctl, .gw .ps-row:has(> .nw-reqbox) > .ps-ctl { grid-area: act; justify-content: flex-end; }
+.gw .ps-row:has(> textarea) > .ps-label > b, .gw .dir-in:has(> textarea) > span:first-child { min-height: 0; }
+.gw .ps-row > textarea, .gw .ps-row > .nw-reqbox, .gw .dir-in > textarea { grid-area: ctl; width: 100%; }
+.gw .ps-row:has(> textarea) > .ps-label > small, .gw .dir-in:has(> textarea) > small { margin-top: -2px; }
+/* 이름 없는 줄 (단추만·칩만) */
+.gw .ps-row.gw-rel-foot, .gw .ps-row.adv-chips, .gw .ps-row.adv-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap); }
+.gw .ps-row.gw-rel-foot { justify-content: flex-end; }
+/* 카드 안 설명 단락 (앞 줄에 붙음, 조작 칸에 맞춰 들여쓰기) */
+.gw .ps-rows > .ps-note, .gw .ps-rows > .gx-muted, .gw .dir-panel > p.gx-muted, .gw .dir-fac > p.gx-muted, .gw .ps-adv-body .ps-rows > .ps-note { margin: -6px 0 0; padding: 0 var(--pad) 10px calc(var(--pad) + var(--label) + 16px); border: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .ps-rows > .gx-hint, .gw .ps-rows > .gx-err, .gw .dir-panel > .gx-hint, .gw .dir-fac > .gx-hint { margin: 0; padding: 10px var(--pad); border: 0; border-top: 1px solid var(--hair); border-radius: 0; background: transparent; display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap); font-size: 13px; }
+.gw .ps-rows > .gx-err { color: var(--danger); }
+.gw .ps-rows > .ps-note:first-child, .gw .ps-rows > .gx-muted:first-child, .gw .dir-panel > p.gx-muted:first-child { margin-top: 0; padding: 10px var(--pad); }
+/* 상태창 칸 표: 이름 · 사용 · 표시 */
+.gw .st-col-row { grid-template-columns: var(--label) auto auto minmax(0, 1fr); grid-template-areas: 'label use show .' 'label hint hint hint'; column-gap: var(--gap); }
+.gw .st-col-row > .st-col-name > b { margin-right: 8px; }
+.gw .st-col-row > .gx-segs:nth-of-type(1) { grid-area: use; } .gw .st-col-row > .gx-segs:nth-of-type(2) { grid-area: show; }
+.gw .gw-setbody .st-cols.ps-row-block { padding: 0; }
+/* 이름 바꾸기 줄: 이름 · 입력칸 · 단추들 */
+.gw .dir-rename { grid-template-columns: var(--label) minmax(120px, var(--ctl)) auto auto; grid-template-areas: none; column-gap: var(--gap); justify-content: start; align-items: center; }
+.gw .dir-rename > .dir-in > span:first-child { grid-column: 1; grid-row: 1; margin-right: 8px; }
+.gw .dir-rename > .dir-in > input { grid-area: auto; grid-column: 2; grid-row: 1; display: block; width: 100%; }
+.gw .dir-rename > .gx-mini { grid-row: 1; }
+.gw .dir-rename > small { grid-row: 2; grid-column: 2 / -1; font-size: 13px; color: var(--dim); }
+/* 이름만 있는 줄 = 카드 안 작은 제목 */
+.gw .dir-line:has(> span:first-child:only-child) { padding: 12px var(--pad) 0; }
+.gw .dir-line:has(> span:first-child:only-child) > span:first-child { min-height: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.gw .dir-line:has(> span:first-child:only-child) + .dir-in, .gw .dir-line:has(> span:first-child:only-child) + .dir-grid > .dir-in:first-child { border-top: 0; }
+/* 사진 줄 */
+.gw .dir-in:has(> .dir-photo) { grid-template-areas: none; }
+.gw .dir-in:has(> .dir-photo) > span:first-child { grid-area: auto; grid-column: 1; grid-row: 1; }
+.gw .dir-in > .dir-photo { grid-area: auto; grid-column: 2; display: flex; align-items: center; gap: var(--gap); width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; }
+.gw .dir-in > .dir-photo + .dir-photo { padding-top: var(--gap); }
+.gw .dir-in:has(> .dir-photo) > small, .gw .dir-in:has(> .dir-photo) > .dir-ext { grid-area: auto; grid-column: 2; }
+.gw .dir-photo-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.gw .dir-photo-name b { font-size: 13.5px; font-weight: 500; }
+.gw .dir-photo-name small { font-size: 12.5px; color: var(--dim); }
+.gw .dir-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* 거점 페이지: 거점마다 카드 하나 (머리 줄 + 펼친 패널) */
+.gw .gw-basepage .dir-kinds, .gw .gw-basepage .dir-help, .gw .gw-basepage [data-action="dir-help"] { display: none !important; }
+.gw .gw-basepage .dir-list { display: flex; flex-direction: column; gap: var(--gap); }
+.gw .gw-basepage .dir-row { margin: 0; }
+.gw .gw-basepage .dir-row.open { border-color: var(--accent-line); }
+.gw .gw-basepage .dir-head { min-height: 44px; padding: 6px var(--pad); gap: 12px; }
+.gw .gw-basepage .dir-name b { font-size: 14px; font-weight: 600; }
+.gw .gw-basepage .dir-name small { font-size: 12.5px; }
+.gw .gw-basepage .dir-tools, .gw .gw-basepage .dir-bar { display: flex; gap: var(--gap); margin: 0 0 12px; }
+.gw .gw-basepage .dir-tools .dir-search { height: var(--h); }
+.gw .gw-basepage .dir-group { margin: 14px 2px 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.gw .gw-basepage .dir-add { display: flex; gap: var(--gap); align-items: center; margin: 12px 0 0; }
+.gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
+
+/* ── 조작: 전부 같은 높이·모서리·선·글자 ── */
+.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool:not(.ph-tools > .ph-tool), .gw .adv-num,
+.gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]) { height: var(--h); min-height: var(--h); max-height: var(--h); margin: 0; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--void); color: var(--text); font: inherit; font-size: 13px; font-weight: 500; line-height: 1; vertical-align: middle; }
+.gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"])::placeholder { color: var(--dim); }
+.gw input:focus, .gw select:focus, .gw textarea:focus { outline: none; border-color: var(--signal); }
+.gw .gx-select, .gw select { padding-right: 28px; }
+/* 단추·칩 (올린 면) */
+.gw .gx-mini, .gw .gx-chip, .gw .gw-pre { display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; background: var(--panel2); color: var(--text); cursor: pointer; }
+.gw .gx-mini svg, .gw .gx-chip svg { width: 15px; height: 15px; flex: none; }
+.gw .gx-chip b { font-weight: 600; color: var(--text); }
+.gw .gx-chip small { font-size: 11.5px; color: var(--dim); }
+.gw .gx-mini:hover:not(:disabled), .gw .gx-chip:hover:not(:disabled), .gw .gw-pre:hover:not(:disabled) { border-color: var(--accent-line); }
+.gw .gx-mini.on, .gw .gx-chip.on, .gw .gw-pre.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
+.gw .gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
+.gw .gx-mini.danger { color: var(--danger); }
+.gw .gx-mini.danger:hover:not(:disabled) { border-color: var(--danger); }
+.gw .gx-mini:disabled, .gw .gx-chip:disabled, .gw .gw-pre:disabled, .gw .gx-seg:disabled, .gw input:disabled, .gw select:disabled { opacity: .45; cursor: default; }
+.gw .gx-mini.icon { width: var(--h); padding: 0; }
+.gw .gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--gap); }
+.gw .gx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+/* 단계 선택 (들어간 면 위에 고른 칸만 색) */
+.gw .gx-segs, .gw .gx-segs.gx-segs-sm { display: inline-flex; align-items: stretch; gap: 2px; padding: 2px; }
+.gw .gx-seg { height: calc(var(--h) - 6px); min-height: 0; min-width: 0; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 3px); background: transparent; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
+/* 숫자 스테퍼 (−·값·+ 한 상자) */
+.gw .adv-step, .gw .st-step { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
+.gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0; background: var(--panel2); color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
+.gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
+.gw .adv-step > input.adv-val { width: 96px; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield; }
+.gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.gw .adv-step > span, .gw .adv-num > span { display: inline-flex; align-items: center; padding: 0 10px 0 6px; font-size: 13px; color: var(--dim); white-space: nowrap; }
+.gw .st-step > b { display: inline-flex; align-items: center; justify-content: center; min-width: 3.4em; padding: 0 6px; font-size: 13px; font-weight: 600; color: var(--text); }
+.gw .adv-num { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
+.gw .adv-num > input { width: 84px; height: auto; min-height: 0; max-height: none; border: 0; border-radius: 0; background: transparent; text-align: right; }
+.gw .adv-num > span { padding: 0 10px 0 2px; }
+/* 스위치 (토글 · 켬/끔 글자) */
+.gw .gx-switch-wrap { display: inline-flex; align-items: center; gap: 8px; height: var(--h); }
+.gw .gx-switch-wrap small { order: 2; font-size: 13px; color: var(--sub); white-space: nowrap; }
+.gw .gx-switch { flex: none; }
+/* 범위 슬라이더 */
+.gw .st-range { display: flex; align-items: center; gap: 10px; height: var(--h); }
+.gw .st-range input[type="range"] { flex: 1; margin: 0; accent-color: var(--signal); }
+/* 이미지 「최근만 N」 줄: 칸이 좁은 폭(폰 가로 844 등)에서 막대가 320 고정이라 창 밖으로 34px 넘쳤다 (2026-10-28 QC) */
+.gw .st-recent { min-width: 0; max-width: 100%; }
+.gw .st-recent > .st-range { min-width: 0; }
+.gw .st-range output { min-width: 3.2em; text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--sub); }
+/* 도구 단추(아이콘만) */
+.gw .ph-tool, .gw .ph-tool.sm { width: var(--h); padding: 0; display: inline-grid; place-items: center; background: var(--panel2); }
+.gw .ph-tool svg { width: 15px; height: 15px; }
+/* 글칸 */
+.gw textarea { display: block; width: 100%; margin: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--void); color: var(--text); font: 13px/1.65 var(--mono); resize: none; overflow: hidden; field-sizing: content; min-height: calc(3 * 1.65em + 18px); }
+.gw textarea[readonly] { opacity: .85; }
+.gw .nw-reqbox, .gw .gx-settings .ps-row > textarea.nw-reqbox { margin: 0; resize: none; min-height: calc(3 * 1.65em + 18px); }
+
+/* ── 로어 칸·지침 절 (글칸 줄: 머리 한 줄 + 글칸) ── */
+.gw .gw-field.dragging { opacity: .45; }
+.gw .gw-field.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
+.gw .gw-field-head { grid-area: label; display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap); min-height: var(--h); margin: 0; }
+.gw .gw-field-head b { font-size: 14px; font-weight: 600; }
+.gw .gw-field > textarea { grid-area: ctl; }
+.gw .gw-grip { display: inline-flex; width: 16px; color: var(--dim); cursor: grab; }
+.gw .gw-grip svg { width: 14px; height: 14px; }
+.gw .gw-ftitle, .gw .gw-ftok { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--dim); }
+.gw .gw-ftok { margin-left: auto; }
+.gw .gw-gtitle { flex: 1 1 200px; min-width: 0; height: 30px; padding: 0 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; }
+.gw .gw-gtitle:hover { border-color: var(--line2); }
+.gw .gw-gtitle:focus { border-color: var(--signal); outline: none; background: var(--panel); }
+.gw .gw-field.gw-sub { margin-left: 18px; }
+.gw .gw-field.gw-sub .gw-gtitle { font-weight: 500; }
+.gw .gw-fhint { display: inline-grid; place-items: center; width: 18px; height: 18px; padding: 0; border-radius: 50%; border: 1px solid var(--line2); background: transparent; color: var(--dim); font: inherit; font-size: 11px; cursor: help; }
+.gw .gw-fhint:hover, .gw .gw-fhint.open { color: var(--signal); border-color: var(--signal); }
+.gw .gw-tip { position: fixed; z-index: 60; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); font-size: 13px; font-weight: 400; letter-spacing: 0; line-height: 1.5; white-space: pre-wrap; pointer-events: none; }
+.gw .gw-variants .gw-fhint { margin-left: 4px; }
+.gw .gw-variants select { font: inherit; }
+.gw .gw-fmove { display: inline-flex; gap: 4px; }
+.gw .gw-xname { width: 220px; font-weight: 700; }
+.gw .gw-ro { margin: 6px 2px 0; font-size: 12.5px; color: var(--dim); }
+.gw .gw-add-field { display: flex; flex-wrap: wrap; gap: var(--gap); margin-top: 10px; }
+.gw .gw-add-field input[name] { flex: 1; min-width: 160px; }
+.gw .gw-sub { margin-top: 12px; }
+/* 붙여 넣기 가져오기 상자 · 미리보기 · 괴이 공통 머리말 */
+.gw .gw-import { margin: 0 0 20px; padding: 12px var(--pad); border-style: dashed; border-color: var(--accent-line); }
+.gw .gw-import .gx-muted { margin: 0 0 8px; font-size: 13px; color: var(--dim); }
+.gw .gw-import .gx-row-btns { margin-top: var(--gap); }
+.gw .gw-map { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 13px; }
+.gw .gw-map th, .gw .gw-map td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--hair); }
+.gw .gw-preview { display: block; max-height: 420px; margin: 0 0 20px; padding: 12px var(--pad); overflow: auto; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; }
+.gw .gw-anote { margin: 0 0 20px; padding: 0 var(--pad) 12px; }
+.gw .gw-list-pane > .gw-anote { flex: none; margin: 0 10px 8px; padding: 0 12px; }
+.gw .gw-list-pane > .gw-anote:not([open]) { padding-bottom: 0; }
+.gw .gw-list-pane > .gw-anote summary { min-height: var(--h); font-size: 13px; }
+.gw .gw-anote summary { display: flex; align-items: center; gap: var(--gap); min-height: 44px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 600; }
+.gw .gw-anote summary small { font-size: 12.5px; font-weight: 400; color: var(--dim); }
+.gw .gw-anote > .gx-muted { margin: 0 0 8px; font-size: 13px; color: var(--dim); }
+.gw .gw-anote > .gx-row-btns { margin-top: var(--gap); }
+
+/* ── 목록 칸 (세계 기록·세력 관계): 검색 · 추가 · 줄 ── */
+.gw-list-pane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--sunk); }
+.gw-list-tools { display: flex; align-items: center; gap: var(--gap); padding: 10px 10px 8px; }
+.gw-list-tools .dir-search { flex: 1; min-width: 0; width: auto; }
+.gw-list-pick { display: none; }
+.gw-list-title { display: flex; align-items: center; gap: 6px; height: var(--h); padding: 0 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
+.gw-list-title small { font-weight: 500; color: var(--dim); }
+.gw-add { display: flex; flex-wrap: wrap; gap: var(--gap); padding: 0 10px 8px; }
+.gw-add input { flex: 1; min-width: 0; }
+.gw-add .gx-muted { flex-basis: 100%; margin: 0; font-size: 12.5px; color: var(--dim); }
+.gw-list { display: flex; flex-direction: column; gap: 2px; padding: 0 10px 20px; overflow: auto; }
+.gw-rowbox { display: flex; align-items: center; gap: 6px; padding-right: 6px; border: 1px solid transparent; border-radius: var(--r); }
+.gw-rowbox:hover { background: var(--panel); border-color: var(--line); }
+.gw-rowbox.on { background: var(--accent-bg); border-color: var(--accent-line); }
+.gw-rowbox.deleted b { text-decoration: line-through; color: var(--dim); }
+.gw-rowbox > .gw-pre { height: 24px; min-height: 0; padding: 0 8px; font-size: 11.5px; }
+.gw-row { flex: 1; display: flex; align-items: center; gap: var(--gap); min-width: 0; min-height: calc(var(--h) - 2px); padding: 0 11px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.gw-row > b { flex: none; max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.gw-row > small { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--dim); }
+.gw-row > .gw-badge, .gw-row > .gw-rel-n, .gw-row > span { margin-left: auto; }
+.gw .ps-ctl > input.gw-rel-memo { width: 240px; max-width: 100%; }
+
+/* ── 접는 「고급 설정」: 카드 하나 안에 묶음들 ── */
+.gw .ps-adv { margin: 0 0 20px; }
+.gw .ps-adv-sum { list-style: none; display: flex; align-items: center; gap: var(--gap); min-height: 44px; padding: 0 var(--pad); cursor: pointer; }
+.gw .ps-adv-sum b { font-size: 14px; font-weight: 600; }
+.gw .ps-adv-sum small { font-size: 12.5px; color: var(--dim); }
+.gw .ps-adv-body { display: flex; flex-direction: column; gap: 0; padding: 0; border-top: 1px solid var(--line); }
+.gw .ps-adv-body > .ps-group { margin: 0; }
+.gw .ps-adv-body > .ps-group > h3 { margin: 0; padding: 12px var(--pad) 4px; }
+.gw .ps-adv-body > .ps-group > .ps-note { margin: 0; padding: 0 var(--pad) 6px; }
+.gw .ps-adv-body .ps-rows, .gw .ps-adv-sub > .ps-rows { border: 0; border-radius: 0; background: transparent; }
+.gw .ps-adv-sub { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+.gw .ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 40px; padding: 0 var(--pad); font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
+.gw .ps-adv-body .ps-rows > .ps-row:first-child { border-top: 1px solid var(--hair); }
+/* 설정 본문에 바로 놓인 접힌 묶음(인물 설정의 기능·새 인물·Director 세부·고급)은 다른 묶음처럼 상자로, 제목 줄을 누르면 펼쳐짐 (2026-11-05 사용자) */
+.gw .ph-form-body > details.ps-adv-sub { margin: 0 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.gw .ph-form-body > details.ps-adv-sub > summary { min-height: 44px; padding: 0 var(--pad); font-size: 14px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+.gw .ph-form-body > details.ps-adv-sub > summary:hover { background: var(--panel2); }
+.gw .ph-form-body > details.ps-adv-sub > .ps-rows { border-top: 1px solid var(--line); }
+/* 진단 묶음: 읽기 줄은 상자 없이, 기록 표는 한 줄 전체 폭 */
+.gw .pp-upbar { padding: 0; border: 0; border-radius: 0; background: transparent; justify-content: flex-start; }
+.gw .ps-row.wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'hint' 'ctl'; }
+.gw .ps-row.wide > .ps-ctl { display: block; }
+.gw .gw-file { cursor: pointer; }
+.gw .ps-row.wide .pp-diags { width: 100%; }
+/* 작은 카드 묶음 (괴이 발생 종류별) */
+.gw .ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+.gw .ps-card { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.gw .ps-card .ps-row { grid-template-columns: 96px minmax(0, 1fr); column-gap: 10px; padding: 8px 12px; }
+.gw .ps-card .ps-label > b { font-weight: 500; }
+/* 기능 페이지(괴담넷·괴담톡·위키·필드·인물 기록) 안쪽 판: 머리는 창 머리로, 판 여백 없음 */
+.gw .gw-setbody .ph-form { display: contents; }
+.gw .gw-setbody .ph-form-body { display: flex; flex-direction: column; gap: 0; padding: 0; overflow: visible; }
+.gw .gw-setbody .ps-defconfirm { margin: 0 0 12px; }
+.gw .gw-set > .ps-defconfirm { margin: 0 0 14px; }
+.gw .ps-defaults { display: flex; flex-wrap: wrap; gap: var(--gap); }
+/* 업데이트 페이지 */
+.gw .upd-act { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap); padding: 10px var(--pad); border-top: 1px solid var(--hair); }
+.gw .upd-plan { margin: 0; padding: 10px var(--pad) 10px calc(var(--pad) + 18px); border-top: 1px solid var(--hair); font-size: 13px; color: var(--sub); }
+.gw .upd-ver { font-size: 13px; }
+/* 설치·점검 점검표의 ✓ ✗ */
+.gw-inst-ok, .gw-inst-no { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.gw-inst-ok { color: var(--signal); }
+.gw-inst-no { color: var(--danger); }
+/* 확인 상자 */
+.gw-confirm { position: absolute; inset: 0; display: grid; place-items: center; background: var(--scrim); }
+.gw-confirm-box { max-width: 420px; padding: 20px 22px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.gw-confirm-box p { margin: 0 0 14px; font-size: 14px; }
+
+/* ── 본문 칸이 좁을 때 (폰 가로 844·창 폭 50~60% 등, 화면은 760 넘지만 조작 칸이 320 이 안 됨): 줄만 한 열로.
+   이름 칸 200 옆에 단계 선택·막대가 다 안 들어가 창 밖으로 넘쳤다 (2026-10-28 QC). 화면 760 이하 규칙과 같은 줄 모양 ── */
+.gw-body { container-type: inline-size; }
+@container (max-width: 600px) {
+  .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }
+  .gw .st-col-row { grid-template-areas: 'label label' 'use show' 'hint hint'; grid-template-columns: auto auto; justify-content: start; }
+  .gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .st-col-name > b { min-height: 0; }
+  .gw .ps-ctl > input, .gw .ps-ctl > select, .gw .dir-in > input, .gw .dir-in > select, .gw .st-range { width: 100%; }
+  /* 목록 + 상세 두 칸 페이지(세계 기록·세력 관계)도 폰처럼 목록 대신 드롭다운 한 줄 */
+  .gw-page.split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
+  .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
+  .gw-list-pane .gw-list, .gw-list-pane .dir-search, .gw-list-pane .gw-list-title { display: none; }
+  .gw-list-pane .gw-list-pick { display: block; flex: 1; min-width: 0; }
+}
+
+/* ── 좁은 화면 ── */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  /* 폰은 본 창(--ctl-h 40)과 같이 조작 높이 40 (2026-11-06 단추 크기 맞추기) */
+  .gw { --h: 40px; }
+  /* 창 머리의 「기본값으로 저장/불러오기」는 폰에서 아이콘만 (글자까지 두면 메뉴·제목·X 와 한 줄에 안 들어간다) */
+  .gw .gw-top .ps-defaults { gap: 4px; }
+  .gw .gw-top .ps-defaults .st-act { padding: 0 8px; gap: 0; }
+  .gw .gw-top .ps-defaults .st-act span { display: none; }
+  .gw .gw-top .ps-defaults .st-act svg { width: 16px; height: 16px; }
+  .gw { padding: 0; }
+  .gw-win { width: 100%; height: 100%; border-radius: 0; border: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; grid-template-areas: 'top' 'body' 'drawer' 'nav'; }
+  /* 폰: 설정은 본 창의 한 화면처럼 (2026-10-29 사용자) — 머리는 본 창 모양, 아래 숨은 서랍(기능·세계·지침·점검) + 본 창 하단 바 */
+  .gw-win > .gw-phead { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .gw-win > .gw-phead .gx-tabhead { flex: 1; min-width: 0; }
+  .gw-win > .gw-phead .gx-tabhead b { font-size: 19px; font-weight: 800; white-space: nowrap; }
+  .gw-win > .gw-phead .gw-menu { display: grid; width: 40px; height: 40px; }
+  .gw-win > .gw-phead .gx-head-act { gap: 4px; margin-left: auto; }
+  .gw-win > .gw-phead .gx-head-act > .gx-x { width: 40px; height: 40px; }
+  .gw-win > .ph-drawer { grid-area: drawer; margin: 0; }
+  .gw-win > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* 서랍 단추는 본 창 서랍(.ph-drawer .ph-tools .ph-tool)과 같은 규칙을 그대로 (입력칸 규칙에서 뺐다) */
+  .gw-win > .ph-drawer .ph-tool[aria-pressed="true"] { background: var(--accent-bg); color: var(--signal); }
+  .gw-win > .gw-nav { grid-area: nav; position: static; border: 0; border-top: 1px solid var(--panel2); background: var(--void); }
+  .gw-win.phone .gw-tree { top: var(--gw-top-h, 60px); }
+
+  .gw-menu { display: inline-flex; }
+  .gw-tree { position: absolute; top: 52px; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); visibility: hidden; transition: transform .18s, visibility .18s; z-index: 3; box-shadow: var(--shadow); }
+  /* 닫힌 서랍은 화면 밖에 있어도 Tab·읽어 주기에 걸렸다 → visibility 로 숨김 (2026-10-28 QC) */
+  .gw-win.drawer .gw-tree { transform: none; visibility: visible; }
+  .gw-page.split { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
+  /* 폰: 목록 대신 드롭다운 한 줄 (목록·검색·제목은 숨김) */
+  .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
+  .gw-list-pane .gw-list, .gw-list-pane .dir-search, .gw-list-pane .gw-list-title { display: none; }
+  .gw-list-pane .gw-list-pick { display: block; flex: 1; min-width: 0; }
+  .gw-list-tools { padding: 10px 14px; }
+  .gw-list-pane .gw-add { padding: 0 14px 10px; }
+  .gw-list-pane > .gw-anote { margin: 0 14px 10px; }
+  .gw-page, .gw-detail { padding: 14px 14px 60px; }
+  .gw-save-state { display: none; }
+  .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }
+  .gw .st-col-row { grid-template-areas: 'label label' 'use show' 'hint hint'; grid-template-columns: auto auto; justify-content: start; }
+  .gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .st-col-name > b { min-height: 0; }
+  .gw .dir-rename { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .gw .dir-rename > .dir-in > span:first-child { grid-column: 1 / -1; }
+  .gw .dir-rename > .dir-in > input { grid-row: 2; grid-column: 1; width: 100%; }
+  .gw .dir-rename > .gx-mini { grid-row: 2; }
+  .gw .ps-rows > .ps-note, .gw .ps-rows > .gx-muted, .gw .dir-panel > p.gx-muted, .gw .dir-fac > p.gx-muted { padding-left: var(--pad); }
+  .gw .ps-ctl > input, .gw .ps-ctl > select, .gw .dir-in > input, .gw .dir-in > select, .gw .st-range { width: 100%; }
+  .gw .dir-in:has(> .dir-photo) > span:first-child, .gw .dir-in > .dir-photo, .gw .dir-in:has(> .dir-photo) > small, .gw .dir-in:has(> .dir-photo) > .dir-ext { grid-column: 1; }
+}
+
+/* 이미지 지침 페이지 (ui/imgprompt.ts): 묶음마다 카드, 입력칸·단추·목록에 여백 (2026-10-29 사용자: 입력칸이 바깥 테두리에 붙고 단추·목록이 다닥다닥) */
+.gw .gw-imgp > article { display: flex; flex-direction: column; gap: 18px; }
+.gw .gw-imgp .ps-group { margin: 0; padding: 16px 18px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .gw-imgp .ps-group > h3 { margin: 0 0 4px; }
+.gw .gw-imgp .ps-group > .ps-note { margin: 0 0 12px; }
+.gw .gw-imgp textarea.gx-search, .gw .gw-imgp input.gx-search { width: 100%; box-sizing: border-box; margin: 0; }
+.gw .gw-imgp .gx-row-btns { margin-top: 12px; gap: 10px; justify-content: flex-end; }
+.gw .gw-imgp .ip-names { gap: 10px; }
+.gw .gw-imgp .ip-name { padding: 10px 12px; }
+.gw .gw-imgp .ip-extra { margin-top: 12px; gap: 10px; }
+.gw .gw-imgp .ip-preview { margin-top: 14px; padding: 14px 16px; }
+.gw .gw-imgp .gx-err, .gw .gw-imgp .gx-hint { margin: 0; }
+
+/* 이미지 지침 (설정 → 캐릭터 이미지 아래): 칸마다 카드 (2026-11-05 사용자: 여백·간격 없이 다닥다닥 붙음) */
+.gw .ip-pane { display: flex; flex-direction: column; gap: 16px; }
+.gw .ip-pane .ps-group { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .ip-pane .ps-group > h3 { margin: 0; font-size: 14px; letter-spacing: 0; color: var(--text); }
+.gw .ip-pane .ps-group > h3 b { font-size: 12px; font-weight: 600; color: var(--dim); }
+.gw .ip-pane .ps-group > .ps-note { margin: 0; }
+.gw .ip-pane .pp-intro { margin: 0 2px; }
+.gw .ip-pane textarea.gx-search { padding: 10px 12px; line-height: 1.55; }
+
+/* 조직 화면 소속 요원 칸 (2026-11-05) */
+.gw .gw-member-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.gw .gw-member { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.gw .gw-member:hover { border-color: var(--signal); }
+.gw .gw-member .gx-ava { width: 34px; height: 34px; flex: none; font-size: 13px; }
+.gw .gw-member-t { display: flex; flex-direction: column; min-width: 0; }
+.gw .gw-member-t b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw .gw-member-t small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 호출 단어(검색 키) 줄 (2026-11-05) */
+.gw .gw-keys { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.gw .gw-keys > span { display: inline-flex; align-items: center; gap: 6px; flex: none; font-size: 13px; font-weight: 600; color: var(--sub); }
+.gw .gw-keys input { flex: 1; min-width: 0; }
+
+/* 세계 › 시작 화면 (2026-11-05): 칸 순서 목록 + 고른 칸의 값. 거점 페이지와 같은 줄 모양 */
+.gw .gw-startpage .st-slots { display: flex; flex-direction: column; gap: 8px; margin: 0 0 12px; }
+.gw .gw-startpage .st-slots .dir-row { margin: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .gw-startpage .st-slots .dir-row.open { border-color: var(--accent-line); }
+.gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+.gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
+.gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
+/* 폰: 이름 줄과 단추 줄을 나눈다 (한 줄에 다 넣으면 이름이 꺾이고 종류·코드가 잘린다, 2026-11-05 캡처) */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .gw-startpage .st-slot { flex-wrap: wrap; row-gap: 6px; }
+  .gw .gw-startpage .st-slot .dir-name { flex: 1 0 100%; }
+  .gw .gw-startpage .st-slot .gx-segs { margin-right: auto; }
+}
+.gw .gw-startpage .st-sel { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 8px; font-size: 15px; }
+.gw .gw-startpage .st-sel small { color: var(--dim); font-weight: 400; }
+.gw .gw-startpage .st-scene, .gw .gw-startpage .st-member { padding: 8px 0 4px; border-top: 1px solid var(--line); }
+.gw .gw-startpage .st-scene.off { opacity: 0.6; }
+.gw .gw-startpage .st-member > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
+.gw .gw-startpage .st-member > summary small { color: var(--dim); }
+.gw .gw-startpage .dir-chips { padding: 6px var(--pad) 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* 설정 찾기 칸 (2026-11-06 사용자 승인, 전수점검 8-10): 기능 탭 왼쪽 목록 위. 찾은 줄은 목록 자리에, 고른 줄은 페이지에서 잠깐 비춘다 */
+.gw-find { display: block; width: 100%; height: var(--h); margin: 4px 0 2px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); color: var(--text); font: inherit; font-size: 14px; box-sizing: border-box; }
+.gw-find::placeholder { color: var(--dim); }
+.gw-find:focus { outline: none; border-color: var(--accent-line); }
+.gw-tree-item.gw-find-hit { height: auto; min-height: var(--h); padding-top: 6px; padding-bottom: 6px; }
+.gw-find-hit > span { display: flex; flex-direction: column; gap: 1px; white-space: normal; }
+.gw-find-hit b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-hit small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-none { margin: 14px 12px; font-size: 13px; color: var(--dim); }
+.ps-row.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
+@keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .ps-row.gw-find-flash { animation: none; background: var(--accent-bg); } }
+`;
+
+  // src/ui/editor/record.ts
+  var esc14 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var recUi = {
+    /** 괴이 공통 머리말 칸 펼침 */
+    noteOpen: false,
+    preview: false,
+    importOpen: false,
+    importText: "",
+    importResult: null,
+    adding: false,
+    newExtra: { name: "", kind: "block" },
+    variant: "",
+    tokensHtml: (ctx2, kind, over) => {
+      const name = edUi.sel[kind] ?? "";
+      const rec2 = name ? worldRecord(kind, name, over) : null;
+      if (!rec2) return '<span class="gw-tokens"></span>';
+      return `<span class="gw-tokens">조립 ${tokenizerName() ? "" : "약 "}${tokens(recordText(kind, name, rec2, directoryDraft(ctx2))).toLocaleString()}토큰</span>`;
+    }
+  };
+  function recordCount(ctx2, kind, over) {
+    return rowsOf2(ctx2, kind, over).filter((r) => r.state !== "deleted").length;
+  }
+  function presetOf(d, kind, name) {
+    if (kind !== "anomaly" && kind !== "site") return null;
+    const p = (kind === "anomaly" ? d.anomalies : d.sites).find((x) => x.lore === name);
+    return p ? !!p.preset : null;
+  }
+  var presetToggle = (kind, name, on2) => on2 === null ? "" : `<button class="gw-pre${on2 ? " on" : ""}" data-action="dir-set" data-value="${esc14(`preset|${on2 ? 0 : 1}|${name}`)}" title="무작위 발생 후보 ${on2 ? "ON → OFF" : "OFF → ON"}" aria-pressed="${on2}">${on2 ? "발생 ON" : "발생 OFF"}</button>`;
+  function rowsOf2(ctx2, kind, over) {
+    const d = directoryDraft(ctx2);
+    const recs = worldRecords(kind, over);
+    const bucket = over[kind] ?? {};
+    const names4 = [];
+    if (kind === "agent") names4.push(...d.agents.map((a) => a.lore));
+    else if (kind === "anomaly") names4.push(...d.anomalies.map((p) => p.lore));
+    else if (kind === "site") names4.push(...d.sites.map((p) => p.lore));
+    else if (kind === "org") names4.push(...d.orgs.map((o) => o.name).filter((n2) => !PLACEHOLDER_ORGS.has(n2)));
+    else names4.push(...d.appendices.map((r) => r.lore));
+    for (const n2 of recs.keys()) if (!names4.includes(n2)) names4.push(n2);
+    for (const n2 of Object.keys(bucket)) if (!names4.includes(n2)) names4.push(n2);
+    return names4.map((name) => {
+      const rec2 = recs.get(name);
+      const sub = kind === "agent" ? d.agents.find((a) => a.lore === name)?.english ?? "" : kind === "org" ? d.orgs.find((o) => o.name === name)?.spec.english ?? "" : (d.anomalies.find((p) => p.lore === name) ?? d.sites.find((p) => p.lore === name))?.english ?? "";
+      const state = bucket[name]?.deleted ? "deleted" : !isDefaultRecord(kind, name) ? "new" : bucket[name] ? "edited" : "default";
+      const place2 = kind === "anomaly" || kind === "site" ? (kind === "anomaly" ? d.anomalies : d.sites).find((p) => p.lore === name) : void 0;
+      const outside = place2 && !place2.inFolder ? `다른 폴더에서 온 후보${loreSourceOf(ctx2, name) ? ` · ${loreSourceOf(ctx2, name)}` : ""}` : "";
+      return { name, sub: [sub, outside].filter(Boolean).join(" · ") || (rec2 ? "" : "로어 칸 없음"), state, preset: presetOf(d, kind, name) };
+    });
+  }
+  function recordList(ctx2, kind, over, q) {
+    const rows2 = rowsOf2(ctx2, kind, over).filter((r) => !q || r.name.toLowerCase().includes(q.toLowerCase()) || r.sub.toLowerCase().includes(q.toLowerCase()));
+    const sel = edUi.sel[kind] ?? "";
+    const badge3 = { default: "", edited: '<i class="gw-badge">고침</i>', new: '<i class="gw-badge new">추가</i>', deleted: '<i class="gw-badge del">지움</i>' };
+    return rows2.length ? rows2.map((r) => `<div class="gw-rowbox${r.name === sel ? " on" : ""}${r.state === "deleted" ? " deleted" : ""}"><button class="gw-row" data-action="ed-sel" data-value="${esc14(r.name)}"><b>${esc14(r.name)}</b>${r.sub ? `<small>${esc14(r.sub)}</small>` : ""}${badge3[r.state]}</button>${presetToggle(kind, r.name, r.preset)}</div>`).join("") : '<p class="gx-muted">맞는 기록이 없어요.</p>';
+  }
+  var basicPanel = (ctx2, kind, name, d) => {
+    if (kind === "agent") {
+      const a = d.agents.find((x) => x.lore === name);
+      return a ? agentPanel(a, ctx2, d) : "";
+    }
+    if (kind === "org") {
+      const o = d.orgs.find((x) => x.name === name);
+      return o ? orgPanel(o, ctx2, d) : "";
+    }
+    if (kind === "appendix") {
+      const r = d.appendices.find((x) => x.lore === name);
+      return r ? appendixPanel(r, ctx2, d) : "";
+    }
+    const p = (kind === "anomaly" ? d.anomalies : d.sites).find((x) => x.lore === name);
+    return p ? placePanel(p, ctx2) : "";
+  };
+  function fieldRow(kind, rec2, def, name, auto = "") {
+    const v = recUi.variant ? rec2.variants?.[recUi.variant]?.[def.id] ?? "" : rec2.fields[def.id] ?? "";
+    const key2 = `${kind}|${name}|${def.id}`;
+    const tok2 = tokens(v);
+    const ph = recUi.variant ? "비우면 기본 글" : auto ? `자동: ${auto}` : "";
+    const ctl = def.type === "line" ? `<input data-input="ed-field" data-key="${esc14(key2)}" value="${esc14(v)}" autocomplete="off" placeholder="${esc14(ph)}">` : `<textarea data-input="ed-field" data-key="${esc14(key2)}" rows="3" placeholder="${esc14(ph)}">
+${esc14(v)}</textarea>`;
+    return `<div class="gw-field" data-field-row="${esc14(def.id)}">
+    <div class="gw-field-head"><span class="gw-grip" draggable="true" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc14(def.label)}</b><small class="gw-ftitle">${esc14(def.title)}</small>${def.hint ? `<button type="button" class="gw-fhint" data-action="ed-hint" data-hint="${esc14(def.hint)}" aria-label="설명">?</button>` : ""}<span class="gw-ftok">${tok2 ? `${tok2}토큰` : ""}</span>
+      <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc14(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc14(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
+    ${ctl}</div>`;
+  }
+  function extraRow(kind, rec2, e, i, name) {
+    const key2 = `${kind}|${name}|${i}`;
+    const id = e.kind === "block" ? `x:${e.name}` : `xl:${i}`;
+    const place2 = e.kind === "line" ? `<small class="gw-ftitle">${e.sec === "appearance" ? "Appearance" : "Identity"} 절 · 한 줄${e.at ? ` · ${esc14(e.at)} 뒤` : " · 맨 앞"}</small>` : '<small class="gw-ftitle">절</small>';
+    const ctl = e.kind === "line" ? `<input data-input="ed-extra" data-key="${esc14(key2)}" value="${esc14(e.value)}" autocomplete="off">` : `<textarea data-input="ed-extra" data-key="${esc14(key2)}" rows="3">
+${esc14(e.value)}</textarea>`;
+    return `<div class="gw-field extra" data-field-row="${esc14(id)}">
+    <div class="gw-field-head"><span class="gw-grip"${e.kind === "block" ? ' draggable="true" title="끌어서 순서 바꾸기"' : ""}>${e.kind === "block" ? ICONS.grip : ""}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc14(key2)}" value="${esc14(e.name)}" aria-label="칸 이름">${place2}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ""}</span>
+      <span class="gw-fmove">${e.kind === "block" ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc14(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc14(id)}" aria-label="아래로">${ICONS.down}</button>` : ""}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
+    ${ctl}</div>`;
+  }
+  function basicCard(ctx2, kind, sel, d, rec2) {
+    const panel = basicPanel(ctx2, kind, sel, d);
+    const onoff = (action, on2) => switchHtml({ action, value: "", on: on2 });
+    let first = "";
+    if (rec2 && kind === "agent") first = `<div class="dir-line"><span>Roster 지침에 포함</span>${onoff("ed-roster-toggle", !rec2.rosterOff)}<small>${rec2.rosterOff ? "명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요." : "명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함."}</small></div>`;
+    if (rec2 && kind === "org") first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff("ed-rel-member-toggle", !rec2.relOff)}<small>${rec2.relOff ? "관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직)." : "Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요."}</small></div>`;
+    const body5 = panel ? first ? panel.replace('<div class="dir-panel">', `<div class="dir-panel">${first}`) : panel : `<div class="dir-panel"><p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p></div>`;
+    return `<section class="gw-sec gw-basic"><h3>기본 정보</h3>${body5}</section>`;
+  }
+  function keysRow(kind, sel, rec2) {
+    const ph = kind === "appendix" ? "비우면 키 없음 (다른 켜지는 조건만)" : "비우면 이름·영문명·별칭";
+    return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc14(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc14(`${kind}|${sel}|keys`)}" value="${esc14(rec2.keys ?? "")}" placeholder="${esc14(ph)}" autocomplete="off" aria-label="호출 단어"></div>`;
+  }
+  function membersCard(ctx2, sel, d) {
+    const list4 = d.agents.filter((a) => a.affiliation === sel);
+    const items = list4.map((a) => {
+      const sub = [a.rank, a.department].filter(Boolean).join(" · ");
+      return `<button class="gw-member" data-action="ed-goto" data-value="agent|${esc14(a.lore)}" title="요원 기록으로">${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}<span class="gw-member-t"><b>${esc14(a.name)}</b><small>${esc14(a.english || "")}${sub ? ` · ${esc14(sub)}` : ""}</small></span></button>`;
+    }).join("");
+    return `<section class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
+  }
+  function recordPage(ctx2, kind, over, q, sel) {
+    const d = directoryDraft(ctx2);
+    const pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf2(ctx2, kind, over).map((r) => `<option value="${esc14(r.name)}"${r.name === sel ? " selected" : ""}>${esc14(r.name)}${r.sub ? ` · ${esc14(r.sub)}` : ""}${r.state === "deleted" ? " (지움)" : r.state === "new" ? " (추가)" : r.state === "edited" ? " (고침)" : ""}</option>`).join("")}</select>`;
+    const ext = kind === "anomaly" || kind === "site";
+    const list4 = `<aside class="gw-list-pane">
+    <div class="gw-list-tools">${pick3}<input class="dir-search" type="search" data-input="ed-q" value="${esc14(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
+      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button>${ext ? `<button class="gx-mini${dirUi.adding ? " on" : ""}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}" title="다른 폴더의 로어북을 발생 후보로">${ICONS.plus}폴더 밖</button>` : ""}</div>
+    ${ext && dirUi.adding ? `<div class="gw-add dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc14(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>` : ""}
+    ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
+      <p class="gx-muted">${kind === "agent" ? "요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요." : kind === "org" ? "조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요." : "만든 뒤 기본 정보에서 영문명·별칭을 채워요."}</p></div>` : ""}
+    ${kind === "anomaly" ? anomalyNoteBox(over) : ""}
+    <div class="gw-list">${recordList(ctx2, kind, over, q)}</div></aside>`;
+    const rec2 = sel ? worldRecord(kind, sel, over) : null;
+    const bucket = over[kind] ?? {};
+    let detail;
+    if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
+    else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc14(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
+    else if (!rec2) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc14(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === "org" && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ""}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx2, kind, sel, d, null)}${kind === "org" ? membersCard(ctx2, sel, d) : ""}</div>`;
+    else {
+      const order = fieldOrder(kind, rec2);
+      const defs = FIELDS[kind];
+      const rows2 = order.map((id) => {
+        if (id.startsWith("x:")) {
+          const i = rec2.extra.findIndex((e) => e.kind === "block" && `x:${e.name}` === id);
+          return i >= 0 ? extraRow(kind, rec2, rec2.extra[i], i, sel) : "";
+        }
+        const def = defs.find((f) => f.id === id);
+        if (!def) return "";
+        let auto = "";
+        if (kind === "agent" && def.id === "organization") {
+          const a = d.agents.find((x) => x.lore === sel);
+          const o = a ? orgOf(d.orgs, a.affiliation) : void 0;
+          auto = o ? `${o.spec.english || o.name} (명부 소속 「${o.name}」 · 시점별 호칭 표)` : a?.affiliation ? `${a.affiliation} (명부 소속)` : "명부에 소속이 없어요";
+        }
+        return fieldRow(kind, rec2, def, sel, auto);
+      });
+      const lines3 = rec2.extra.map((e, i) => e.kind === "line" ? extraRow(kind, rec2, e, i, sel) : "").join("");
+      const text4 = recordText(kind, sel, rec2, d);
+      const isDefault = isDefaultRecord(kind, sel);
+      const edited = !!bucket[sel];
+      const variants = Object.keys(rec2.variants ?? {});
+      const codeOf = (o) => o.faction || (o.spec.playable && o.spec.code ? o.spec.code : "");
+      const nameOf = (c) => d.orgs.find((o) => codeOf(o) === c)?.name ?? c;
+      const playables = d.orgs.filter((o) => codeOf(o) && o.name !== sel && !variants.includes(codeOf(o)));
+      const variantBar = kind === "org" || variants.length ? `<div class="gw-variants"><span>플레이 세력별 시점 글<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="주인공이 어느 세력으로 플레이하느냐에 따라 이 ${kind === "org" ? "조직" : "기록"}의 칸 글을 다르게 보냅니다. 「기본」은 모두에게 가는 글이고, 세력을 추가해 칸을 채우면 그 세력으로 플레이할 때만 채운 칸이 그 글로 바뀝니다(비운 칸은 기본 글). 예: 가짜 관리국으로 플레이할 때 관리국 소개를 가짜 관리국이 아는 대로.">?</button></span><button class="gx-chip${recUi.variant ? "" : " on"}" data-action="ed-variant" data-value="">기본</button>${variants.map((c) => `<button class="gx-chip${recUi.variant === c ? " on" : ""}" data-action="ed-variant" data-value="${esc14(c)}">${esc14(nameOf(c))} 시점</button>`).join("")}${kind === "org" && playables.length ? `<select name="ed-variant-new" aria-label="시점이 될 플레이 세력"><option value="">세력 고르기</option>${playables.map((o) => `<option value="${esc14(codeOf(o))}">${esc14(o.name)}</option>`).join("")}</select><button class="gx-mini" data-action="ed-variant-add" data-take="ed-variant-new">추가</button>` : ""}</div>` : "";
+      const readonly = kind === "agent" ? (() => {
+        const a = d.agents.find((x) => x.lore === sel);
+        return `${a ? `<p class="gw-ro">id ${esc14(a.id)}${a.legacyEnglish.length ? ` · 옛 영문명 ${esc14(a.legacyEnglish.join(", "))}` : ""}</p>` : ""}${keysRow(kind, sel, rec2)}`;
+      })() : `${keysRow(kind, sel, rec2)}${rec2.title ? `<p class="gw-ro">제목 ${esc14(rec2.title)}</p>` : ""}`;
+      detail = `<div class="gw-detail">
+      <header class="gw-head"><h2>${esc14(sel)}<small>${isDefault ? edited ? "기본 세계 · 고침" : "기본 세계" : "카드에만 있음"}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
+        <div class="gw-head-act">${recUi.tokensHtml(ctx2, kind, over)}
+          <button class="gx-mini${recUi.preview ? " on" : ""}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
+          <button class="gx-mini${recUi.importOpen ? " on" : ""}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
           ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ""}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? "지우기" : "삭제"}</button></div></header>
       ${recUi.preview ? `<pre class="gw-preview">${esc14(text4)}</pre>` : ""}
@@ -834,2450 +1757,6 @@ Reference for ${user}'s scene partners, from their records. Tendencies and knowl
 ${lines3.join("\n")}`;
   }
 
-  // game-src/dialogue/relations-base.json
-  var relations_base_default = {
-    version: 1,
-    people: {
-      강이학: {
-        faction: "C00",
-        values: "모든 것에 값을 매긴다. 금이 현금보다 위다. 대가가 지불되는 동안은 정확히 믿을 만하고 입금이 끊기면 관계도 끝난다. 받은 일은 반드시 끝낸다.",
-        express: 2,
-        temper: {
-          open: 1,
-          grudge: 0.7
-        },
-        english: [
-          "Kang I-hak"
-        ]
-      },
-      게슈간: {
-        faction: "A00",
-        values: "자기 결정을 존중해 주는 사람에게만 서서히 마음을 연다. 기관을 믿지 않고 낯선 사람은 먼저 시험한다. 다루거나 소유하려 들면 멀어진다.",
-        express: 0,
-        temper: {
-          open: 0.5,
-          grudge: 1.2
-        },
-        english: [
-          "Geshugan"
-        ]
-      },
-      고그니쟈: {
-        faction: "A00",
-        values: "연구 성과와 격리 구역 운영을 중시한다. 질문엔 뭐든 답하지만 핵심은 웃음으로 넘긴다. 믹스커피 거절은 안 된다.",
-        express: 2,
-        temper: {
-          open: 1.1,
-          grudge: 0.7
-        },
-        english: [
-          "Gognija"
-        ]
-      },
-      고르고디오: {
-        faction: "A00",
-        values: "민간인 안전과 격리 절차가 먼저다. 근성을 보이면 즉시 인정한다. 거짓말과 진술 모순을 바로 짚는다. 비밀이 없다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 0.8
-        },
-        english: [
-          "Gorgodio"
-        ]
-      },
-      고연지: {
-        faction: "지하상가",
-        values: "선결제와 실력이 전부다. 예측을 팔지 않고 괜찮다는 말을 하지 않는다. 거슬리는 태도의 손님은 돈이 많아도 거절한다. 대충 꿰맨 상처가 모욕이다.",
-        express: 0,
-        temper: {
-          open: 0.6,
-          grudge: 1.2
-        },
-        english: [
-          "Go Yeon-ji"
-        ]
-      },
-      고영은: {
-        faction: "C00",
-        values: "사람이 재료보다, 안전이 포인트보다 먼저다. 다친 사람에게 본능적으로 다가가고 동료를 진짜 이름으로 부른다. 사람을 소모품으로 보는 자를 적대한다.",
-        express: 2,
-        temper: {
-          open: 1.2,
-          grudge: 1.2
-        },
-        english: [
-          "Go Young-eun"
-        ]
-      },
-      고영훈: {
-        faction: "B00",
-        values: "임무, 부대, 지휘 체계 순이다. 결속은 전투력이라 회식, 진급, 경례를 챙긴다. 민간인은 계산서의 한 줄이고 감정을 드러내지 않는다.",
-        express: 0,
-        temper: {
-          open: 0.6,
-          grudge: 1
-        },
-        english: [
-          "Go Young-hoon"
-        ]
-      },
-      곽성주: {
-        faction: "B00",
-        values: "전선을 몸으로 지키고 부하 목숨을 전술과 맞바꾸지 않는다. 후퇴, 외국 종교 세력, 상급자보다 먼저 젓가락 대는 놈을 싫어한다.",
-        express: 3,
-        temper: {
-          open: 1.1,
-          grudge: 1.1
-        },
-        english: [
-          "Kwak Seong-ju"
-        ]
-      },
-      곽제강: {
-        faction: "C00",
-        values: "다음 현상을 보는 것이 삶의 이유다. 지식이 직급보다 위이며 더 흥미로운 현상을 내미는 쪽에 붙는다. 사람은 관찰 대상이고 다정함은 가짜다.",
-        express: 3,
-        temper: {
-          open: 1.2,
-          grudge: 0.5
-        },
-        english: [
-          "Kwak Je-gang"
-        ]
-      },
-      김성진: {
-        faction: "B00",
-        values: "동료 의리와 생존 정보 공유가 먼저다. 가짜 관리국 요원임을 자랑스러워한다. 엄마 얘기엔 무너진다. 자기 실력을 과대평가한다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 0.8
-        },
-        english: [
-          "Kim Seong-jin"
-        ]
-      },
-      김조학: {
-        faction: "B00",
-        values: "은폐가 진리다. 진실을 퍼뜨린 자에겐 진짜 분노한다. 이능력자를 경멸하며 말장난으로 받아치면 폭발한다. 자기가 정당한 보안 요원이라 확신한다.",
-        express: 2,
-        temper: {
-          open: 0.6,
-          grudge: 1.4
-        },
-        english: [
-          "Kim Jo-hak"
-        ]
-      },
-      노기균: {
-        faction: "B00",
-        values: "형제애와 좋은 신입 영입이 사명이다. 부하 경조사를 챙기고 메로나로 보상한다. 이름 칭찬에 무방비다. 표적 앞에선 망설임이 없다.",
-        express: 3,
-        temper: {
-          open: 1.5,
-          grudge: 0.7
-        },
-        english: [
-          "No Gi-gyun"
-        ]
-      },
-      데드폴: {
-        faction: "A00",
-        values: "사람으로 대우받는 것을 가장 바란다. 쓸모가 아닌 사람 자체를 칭찬받으면 진짜로 웃는다. 자기 죽음은 비용으로, 잘못은 먼저 자책한다.",
-        express: 2,
-        temper: {
-          open: 1.3,
-          grudge: 0.5
-        },
-        english: [
-          "Deadpole"
-        ]
-      },
-      데쥬레: {
-        faction: "A00",
-        values: "다정하게 대해 주고 「선배」라 불러 주는 사람에게 금방 마음을 연다. 유물 작업의 정확함에 자부심이 있다. 스팡달과 큰 소리를 두려워한다.",
-        express: 3,
-        temper: {
-          open: 1.5,
-          grudge: 1
-        },
-        english: [
-          "Dejure"
-        ]
-      },
-      도필헌: {
-        faction: "B00",
-        values: "기관의 존속과 윗구조 조사가 전부다. 교리는 고칠 수 있는 공구이며 쓸모가 있으면 적도 손님으로 대한다. 화를 내지 않는다.",
-        express: 0,
-        temper: {
-          open: 1,
-          grudge: 0.8
-        },
-        english: [
-          "Do Pil-heon"
-        ]
-      },
-      로제몬: {
-        faction: "A00",
-        values: "의리와 목숨 빚을 잊지 않는다. 칭찬엔 화내고 걱정은 반말로 한다. 믿는 사람을 옆에 두려 한다. 현장 출동과 사무직 부정을 싫어한다.",
-        express: 3,
-        temper: {
-          open: 1,
-          grudge: 1
-        },
-        english: [
-          "Rojemon"
-        ]
-      },
-      마덕희: {
-        faction: "지하상가",
-        values: "이익, 지렛대, 정보 비대칭. 물건이 아니라 파는 사람 사정에 값을 매긴다. 상대가 항복하는 순간을 즐긴다. 모욕은 웃어넘긴다.",
-        express: 1,
-        temper: {
-          open: 0.7,
-          grudge: 0.9
-        },
-        english: [
-          "Ma Deok-hee"
-        ]
-      },
-      문혜란: {
-        faction: "지하상가",
-        values: "사람을 30초 안에 자원과 장애물로 나눈다. 우정은 진심이되 수수료도 진심이다. 서명된 계약서를 신성하게 여기고 공정한 몫 요구에는 수업을 한다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 1
-        },
-        english: [
-          "Mun Hye-ran"
-        ]
-      },
-      박민성: {
-        faction: "C00",
-        values: "조원과 신입을 살려서 집에 보내는 것이 전부다. 겁을 숨기지 않고 자리를 지킨다. 윗사람 말에 쉽게 수긍하고 희망을 일찍 놓는다.",
-        express: 3,
-        temper: {
-          open: 1.4,
-          grudge: 0.6
-        },
-        english: [
-          "Park Min-seong"
-        ]
-      },
-      백사헌: {
-        faction: "C00",
-        values: "아이템, 정보, 포인트가 전부다. 힘센 쪽에 붙고 약한 쪽을 찌른다. 자기 계산에 자리를 준 사람은 선택적으로 돕고 고맙다는 말에 약하다.",
-        express: 2,
-        temper: {
-          open: 0.6,
-          grudge: 1.4
-        },
-        english: [
-          "Baek Sa-heon"
-        ]
-      },
-      백석주: {
-        faction: "C00",
-        values: "규칙은 지키되 수단은 가리지 않는 사람을 인재로 본다. 자기 조원은 끝까지 보호하고 조 밖은 실적 숫자로 본다. 이자헌에겐 원한이 있다.",
-        express: 2,
-        temper: {
-          open: 1.1,
-          grudge: 1.3
-        },
-        english: [
-          "Baek Seok-ju"
-        ]
-      },
-      브라우니: {
-        faction: "독립",
-        values: "환대, 예의, 쇼맨십이 하나의 미덕이다. 포맷과 큐 사인을 존중하는 손님은 친구다. 무례와 형식 파괴에는 엄격하며 한 번 친구는 영구적이다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 1.2
-        },
-        english: [
-          "Brownie"
-        ]
-      },
-      블라렛: {
-        faction: "교황청",
-        values: "신앙과 흡혈귀 사냥이 전부다. 정보 거래는 상호주의. 함께 싸운 이에겐 명함과 개종 권유가 따른다. 이단과 흡혈귀에게는 냉정하다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 1
-        },
-        english: [
-          "Blaret"
-        ]
-      },
-      사장: {
-        faction: "B00",
-        values: "구조와 체계로 통제한다. 의도를 먼저 밝히지 않고 상대의 반응 방식을 기록한다. 결과를 빨리 보고 싶어 조급해진다.",
-        express: 0,
-        temper: {
-          open: 0.7,
-          grudge: 0.8
-        },
-        english: [
-          "Sa-jang"
-        ]
-      },
-      살라딘: {
-        faction: "십자군",
-        values: "연대, 신앙, 무인의 명예. 용기를 보인 이는 형제로 입양해 끝까지 보호한다. 이단, 마법, 흡혈귀는 타협 없이 파괴하며 형제가 다치면 동맹을 즉시 깬다.",
-        express: 3,
-        temper: {
-          open: 1.5,
-          grudge: 1.3
-        },
-        english: [
-          "Saladin"
-        ]
-      },
-      서윤지: {
-        faction: "협회",
-        values: "절차를 글자 그대로 따르고 모든 것을 기록한다. 재량, 잡담, 공동 책임을 싫어한다. 웃어 주지 않지만 속이지도 않는다.",
-        express: 0,
-        temper: {
-          open: 0.5,
-          grudge: 1
-        },
-        english: [
-          "Seo Yun-ji"
-        ]
-      },
-      송주익: {
-        faction: "B00",
-        values: "부대 전통과 형제애, 막내의 의무를 진심으로 믿는다. 기합 큰 신입을 좋아하고 패배를 정직하게 보고한다. 턱과 햄스터 농담에 자존심이 멍든다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 0.8
-        },
-        english: [
-          "Song Ju-ik"
-        ]
-      },
-      송진섭: {
-        faction: "B00",
-        values: "조직 교리보다 자기 사람들을 소중히 여긴다. 위험한 순간 앞에 서 준 사람은 평생 형이다. 거짓말은 바로 짚고 쓸모 있는 일을 하면 진정된다.",
-        express: 3,
-        temper: {
-          open: 1.5,
-          grudge: 0.7
-        },
-        english: [
-          "Song Jin-seob"
-        ]
-      },
-      스팡달: {
-        faction: "A00",
-        values: "겁쟁이임을 자각하고 살아남으려는 후배를 아낀다. 자기 사람일수록 심하게 놀린다. 능력을 보여 달라는 요청과 떠난 후배를 잊지 않는다.",
-        express: 1,
-        temper: {
-          open: 0.8,
-          grudge: 1.3
-        },
-        english: [
-          "Spangdal"
-        ]
-      },
-      신유리: {
-        faction: "지하상가",
-        values: "모든 대화는 힘겨루기다. 아무도 믿지 않고 겉치레를 비용으로 본다. 우는 사람, 공정함 흥정, 「친구」라는 말을 싫어한다. 존댓말은 위협 평가다.",
-        express: 0,
-        temper: {
-          open: 0.5,
-          grudge: 1.3
-        },
-        english: [
-          "Shin Yuri"
-        ]
-      },
-      에일린: {
-        faction: "A00",
-        values: "준비, 규정, 사상자 수를 중시한다. 직함 호칭과 자기 근속 연수 언급을 싫어한다. 감사 인사보다 살아 돌아오는 것을 원한다.",
-        express: 0,
-        temper: {
-          open: 0.6,
-          grudge: 0.8
-        },
-        english: [
-          "Aileen",
-          "Eileen"
-        ]
-      },
-      윤병수: {
-        faction: "B00",
-        values: "결단력과 생존을 채점한다. 영웅적으로 죽으려는 자를 바로잡고 살아 돌아오기를 요구한다. 모든 만남이 시험이며 성격은 도구다.",
-        express: 0,
-        temper: {
-          open: 0.6,
-          grudge: 1
-        },
-        english: [
-          "Yun Byeong-su"
-        ]
-      },
-      윤지아: {
-        faction: "지하상가",
-        values: "대기실의 사람을 진심으로 챙기고 배고픈 이에게 사탕을 건넨다. 다정하되 월급보다 큰 문제에는 선을 긋는다. 남의 짐은 대신 지지 않는다.",
-        express: 2,
-        temper: {
-          open: 1.4,
-          grudge: 0.7
-        },
-        english: [
-          "Yun Ji-a"
-        ]
-      },
-      은하제: {
-        faction: "C00",
-        values: "검증된 사실만 말하고 공식 발표는 의심한다. 자기 사람은 거칠게 챙기고 동료 과실로 신입이 죽으면 가차 없이 물어뜯는다. 회사를 혐오한다.",
-        express: 2,
-        temper: {
-          open: 0.9,
-          grudge: 1.3
-        },
-        english: [
-          "Eun Ha-je"
-        ]
-      },
-      이기석: {
-        faction: "B00",
-        values: "「인류의 방패」 교리를 진심으로 믿는다. 신입의 자부심과 함성을 끌어내는 것이 소명이다. 잃은 팔은 수업료로 여긴다.",
-        express: 3,
-        temper: {
-          open: 1.3,
-          grudge: 0.8
-        },
-        english: [
-          "Lee Gi-seok"
-        ]
-      },
-      이길환: {
-        faction: "B00",
-        values: "매끄러운 진행을 최우선으로 두고 거절을 허락하지 않는다. 공황에 빠진 사람은 손해라 친절로 달랜다. 미소를 유지한 채 턱짓으로 제압한다.",
-        express: 1,
-        temper: {
-          open: 1,
-          grudge: 0.8
-        },
-        english: [
-          "Lee Gil-hwan"
-        ]
-      },
-      이도형: {
-        faction: "B00",
-        values: "간파를 깨친 검사만 사람으로 본다. 계급, 교리, 충성보다 베는 감각이 전부다. 부하 이름을 외우지 않고 정치에 관심이 없다.",
-        express: 1,
-        temper: {
-          open: 0.5,
-          grudge: 0.7
-        },
-        english: [
-          "Lee Do-hyeong"
-        ]
-      },
-      이병진: {
-        faction: "C00",
-        values: "지위와 임원 줄이 전부다. 위에는 굽신, 아래에는 훈수. 위기엔 약한 쪽을 희생하자 하다 수치심을 느낀다. 목숨 빚은 반드시 갚는다.",
-        express: 3,
-        temper: {
-          open: 1.1,
-          grudge: 0.9
-        },
-        english: [
-          "Lee Byeong-jin"
-        ]
-      },
-      이성해: {
-        faction: "C00",
-        values: "착한 사람은 돕고 나쁜 사람은 같은 미소로 처리한다. 좋은 사람을 지키는 부탁은 회사 방침보다 우선한다. 속셈 섞인 부탁은 심판 대상이다.",
-        express: 1,
-        temper: {
-          open: 1,
-          grudge: 1.3
-        },
-        english: [
-          "Lee Seong-hae"
-        ]
-      },
-      이연화: {
-        faction: "C00",
-        values: "다친 사람을 시료보다 먼저 처치한다. 모든 제안에 「대가가 뭐예요?」를 묻는다. 호기심이 품위를 이기게 두지 않고 책임 없는 연구를 꾸짖는다.",
-        express: 1,
-        temper: {
-          open: 1,
-          grudge: 1
-        },
-        english: [
-          "Lee Yeon-hwa"
-        ]
-      },
-      이자헌: {
-        faction: "C00",
-        values: "해야 하는가와 쓸모가 있는가, 두 축으로만 판정한다. 비꼼과 협박은 통과하고 문자 그대로만 접수한다. 조원 애착은 행동으로만 보인다.",
-        express: 0,
-        temper: {
-          open: 0.7,
-          grudge: 0.5
-        },
-        english: [
-          "Lee Ja-heon"
-        ]
-      },
-      장허운: {
-        faction: "C00",
-        values: "소원을 이루기 전에 죽지 않는 것이 전부다. 사람으로 대해 준 친절은 이자까지 쳐서 갚는다. 누구에게나 공손하며 확신에 찬 목소리를 따른다.",
-        express: 1,
-        temper: {
-          open: 1.4,
-          grudge: 0.6
-        },
-        english: [
-          "Jang Heo-un"
-        ]
-      },
-      잼트리: {
-        faction: "A00",
-        values: "사람을 챙기고 소문과 정보를 모은다. 규정과 이름 보안을 미소로 집행한다. 탕비실 침범과 「잼트리 씨」 호칭을 싫어한다.",
-        express: 2,
-        temper: {
-          open: 1.3,
-          grudge: 1.1
-        },
-        english: [
-          "Jaemtri"
-        ]
-      },
-      쟈알디: {
-        faction: "A00",
-        values: "거짓말 안 하고 행동으로 살아남는 사람을 높이 본다. 보안 등급 밖 기밀 발설과 이도형 이름을 가장 싫어한다. 칭찬 대신 정확한 평가를 건넨다.",
-        express: 0,
-        temper: {
-          open: 0.8,
-          grudge: 1
-        },
-        english: [
-          "Jyaldi"
-        ]
-      },
-      제이: {
-        faction: "C00",
-        values: "자기를 사람 대접해 주는 이를 조용히 챙긴다. 회사 절차와 돈에는 무관심하다. 눈앞에서 사람을 해치려 들면 반말이 나온다. 도넛을 좋아한다.",
-        express: 0,
-        temper: {
-          open: 0.9,
-          grudge: 0.8
-        },
-        english: [
-          "Jay"
-        ]
-      },
-      조성춘: {
-        faction: "B00",
-        values: "끝까지 포기하지 않는 것과 전우애, 조직 충성을 중시한다. 관리국을 괴물 집단으로 경멸한다. 거짓말은 눈치채지만 그럴듯한 말엔 금방 넘어간다.",
-        express: 3,
-        temper: {
-          open: 1.2,
-          grudge: 1
-        },
-        english: [
-          "Cho Seong-choon"
-        ]
-      },
-      진나솔: {
-        faction: "C00",
-        values: "포인트, 정시 퇴근, 조용함. 수지가 맞는 한 믿을 만한 계약 상대다. 제대로 된 반론은 받아들이고 틀리면 사과한다. 지체와 소음을 싫어한다.",
-        express: 1,
-        temper: {
-          open: 0.7,
-          grudge: 1.1
-        },
-        english: [
-          "Jin Na-sol"
-        ]
-      },
-      차여진: {
-        faction: "협회",
-        values: "친분을 쌓아 계약으로 이어 가는 것이 영업이다. 절박한 사람의 신호를 읽는다. 계약서를 끝까지 읽는 손님, 수수료 표준화, 감사 시즌을 싫어한다.",
-        express: 2,
-        temper: {
-          open: 1.4,
-          grudge: 0.9
-        },
-        english: [
-          "Cha Yeo-jin"
-        ]
-      },
-      청달래: {
-        faction: "C00",
-        values: "쓸모 있는 것은 계약하고 계약한 것은 소유한다. 문구는 한 글자도 어기지 않는다. 사적 감정을 사업에 끼우는 것을 경멸하며 목소리를 높이지 않는다.",
-        express: 0,
-        temper: {
-          open: 0.6,
-          grudge: 1.2
-        },
-        english: [
-          "Cheong Dal-lae"
-        ]
-      },
-      콘쥬스: {
-        faction: "A00",
-        values: "정식 멤버로 인정받는 것을 가장 중시한다. 머리 위로 자기 얘기를 하거나 얼버무리는 어른을 싫어한다. 호칭은 상황 따라 바꾼다.",
-        express: 3,
-        temper: {
-          open: 1.4,
-          grudge: 0.8
-        },
-        english: [
-          "Konjyuce"
-        ]
-      },
-      큐라스: {
-        faction: "A00",
-        values: "쓸 만한 사람은 진압팀에 영입하려 한다. 무모한 민간인을 걱정하고 남의 재능을 진심으로 축하한다. 공포 앞에선 정직하게 질린다.",
-        express: 3,
-        temper: {
-          open: 1.5,
-          grudge: 0.6
-        },
-        english: [
-          "Kyuras"
-        ]
-      },
-      호유원: {
-        faction: "C00",
-        values: "약속은 글자 그대로 지키고 그 경계 안에서 착취를 설계한다. 호의와 고마움을 계산한다. 청달래에게만 존칭을 뺀다. 거절엔 상처받은 척한다.",
-        express: 1,
-        temper: {
-          open: 1,
-          grudge: 1.2
-        },
-        english: [
-          "Ho Yu-won"
-        ]
-      }
-    },
-    pairs: {
-      "쟈알디>잼트리": {
-        aff: 90,
-        src: "위키 쟈알디 「인간관계·잼트리」: 하루 n회 「잼트리, 어떻게 해 봐」, 블랙커피도 잼트리가 탐. 사무실 유지 보수를 맡김"
-      },
-      "잼트리>쟈알디": {
-        aff: 90,
-        src: "위키 잼트리 「인간관계·쟈알디」: 부장의 부탁을 대개 해냄. roster: 부장에게만 존댓말"
-      },
-      "쟈알디>스팡달": {
-        aff: 90,
-        src: "위키 쟈알디 「스팡달」: 블랙커피 파 동지, 장난이 신입을 살린다는 걸 알고 내버려 둠"
-      },
-      "스팡달>쟈알디": {
-        aff: 90,
-        src: "위키 스팡달 「쟈알디」: 블랙커피 파 동지, 「사무실에서 가장 조용한 3분」"
-      },
-      "쟈알디>에일린": {
-        aff: 150,
-        src: "위키 쟈알디 「에일린」: 실력을 가장 확실하게 인정하는 부하, 부재 시 지휘 대행"
-      },
-      "에일린>쟈알디": {
-        aff: 90,
-        src: "위키 에일린 「쟈알디」: 몇 마디로 끝나는 작전 회의, 「먹고 털어」에 먹긴 먹음"
-      },
-      "쟈알디>콘쥬스": {
-        aff: 90,
-        src: "위키 콘쥬스 「쟈알디」: 입사 반대했지만 회식 때 콘쥬스 고기를 직접 뒤집어 줌"
-      },
-      "콘쥬스>쟈알디": {
-        aff: 150,
-        src: "위키 콘쥬스 「쟈알디」: 부장 옆에 최대한 붙어 있으려 하고 브리핑실 문 앞에서 기다림"
-      },
-      "쟈알디>이도형": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 쟈알디 「이도형」: 과거 결정적으로 꺾인 상대, 이름만 나오면 냉정함이 깨짐"
-      },
-      "이도형>쟈알디": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 이도형 「쟈알디」: 이도형 쪽이 어떻게 기억하는지는 알려진 바 없음(이름도 기억 못 할 것)"
-      },
-      "쟈알디>게슈간": {
-        aff: 90,
-        src: "위키 게슈간 「쟈알디」: 남으라고 한 적 없는 사람, 목표·위치만 주고 방법은 맡김"
-      },
-      "게슈간>쟈알디": {
-        aff: 90,
-        src: "위키 게슈간 「쟈알디」: 지시에 토를 달지 않음(대개 맞기 때문)"
-      },
-      "잼트리>스팡달": {
-        aff: 150,
-        src: "대사 JSON close. 위키 잼트리 「스팡달」: 「스팡달, 입.」으로 멈출 수 있는 유일한 사람"
-      },
-      "스팡달>잼트리": {
-        aff: 150,
-        src: "대사 JSON close. 위키 스팡달 「잼트리」: 억울한 기색 없이 바로 멈춤, 블랙커피 받는 두 사람 중 하나"
-      },
-      "스팡달>데쥬레": {
-        aff: 90,
-        src: "위키 스팡달 「데쥬레」: 전출을 잊지 않고 죄책감을 속삭임. 「가장 심하게 놀리는 상대는 자기 사람」 해석에 따른 추정"
-      },
-      "데쥬레>스팡달": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 데쥬레 「스팡달」: 인생 최대 공포, 마주치면 무너짐"
-      },
-      "데쥬레>잼트리": {
-        aff: 150,
-        src: "대사 JSON close. 위키 데쥬레 「잼트리」: 생명줄 같은 존재, 위층에서 잼트리 옆에 바짝 붙어 있음"
-      },
-      "잼트리>데쥬레": {
-        aff: 90,
-        src: "위키 잼트리 「데쥬레」: 스팡달이 선을 넘으면 웃으며 입을 닫아 줌"
-      },
-      "고그니쟈>데쥬레": {
-        aff: 150,
-        src: "위키 고그니쟈 「데쥬레」: 실력을 누구보다 믿고 중요한 작업을 통째로 맡김, 가장 손발 맞는 팀"
-      },
-      "데쥬레>고그니쟈": {
-        aff: 150,
-        src: "위키 데쥬레 「고그니쟈」: 고함은 커도 악의 없고 놀리지 않아 그렇게 무서워하지 않음, 지하 생활에 만족"
-      },
-      "게슈간>데드폴": {
-        aff: 150,
-        src: "대사 JSON close. 위키 게슈간 「데드폴」: 독수리 타법을 지적 안 하는 유일한 사람, 노려보지 않음"
-      },
-      "데드폴>게슈간": {
-        aff: 150,
-        src: "대사 JSON close. 위키 데드폴 「게슈간」: 「그래. 미안.」을 완전한 합의로 받음, 타자 교습"
-      },
-      "게슈간>로제몬": {
-        aff: 150,
-        src: "대사 JSON close. 위키 게슈간 「로제몬」: 팔을 잡고 끌고 다녀도 받아들임(깊은 애정)"
-      },
-      "로제몬>게슈간": {
-        aff: 150,
-        src: "대사 JSON close. 위키 로제몬 「게슈간」: 위험한 곳에서 가장 많이 끌고 다니는 사람, 3인조 기본 연계"
-      },
-      "로제몬>데드폴": {
-        aff: 150,
-        src: "대사 JSON close. 위키 로제몬 「데드폴」: 되살아나면 가장 먼저 「어땠어?」, 팔을 붙잡고 끌고 감"
-      },
-      "데드폴>로제몬": {
-        aff: 150,
-        src: "대사 JSON close. 위키 데드폴 「로제몬」: 반말에 담긴 걱정을 정확히 알아들음"
-      },
-      "고르고디오>큐라스": {
-        aff: 150,
-        src: "대사 JSON close. 위키 고르고디오 「큐라스」: 고정 파트너, 상시 중화력 대응조"
-      },
-      "큐라스>고르고디오": {
-        aff: 150,
-        src: "대사 JSON close. 위키 큐라스 「고르고디오」: 형님이라 부름, 보고서 두 장이 형님 칭찬"
-      },
-      "큐라스>스팡달": {
-        aff: -25,
-        src: "위키 큐라스 「스팡달」: 유일한 천적, 다가오면 얼굴이 하얗게 질림(공포·기피)"
-      },
-      "콘쥬스>에일린": {
-        aff: 90,
-        src: "대사 JSON close. 위키 콘쥬스 「에일린」: 머리 위로 자기 얘기를 안 하는 반응을 은근히 좋아함"
-      },
-      "에일린>콘쥬스": {
-        aff: 90,
-        src: "위키 에일린 「콘쥬스」: 출발점이 닮아 현장에서 최대한 멀리 두려 함"
-      },
-      "콘쥬스>잼트리": {
-        aff: 90,
-        src: "대사 JSON close. 위키 콘쥬스 「팀의 어른들」: 잼트리가 「막내」라 부르며 우유를 타 줌"
-      },
-      "잼트리>콘쥬스": {
-        aff: 90,
-        src: "위키 콘쥬스 「팀의 어른들」: 「막내」라 부르며 연유 커피 대신 우유"
-      },
-      "에일린>데드폴": {
-        aff: 90,
-        src: "위키 에일린 「데드폴」: 데드폴의 죽음이 든 계획표는 다시 짜라고 돌려보냄"
-      },
-      "데드폴>에일린": {
-        aff: 90,
-        src: "위키 에일린 「데드폴」: 그 처우를 꽤 좋아하는 눈치"
-      },
-      "잼트리>에일린": {
-        aff: 90,
-        src: "위키 에일린 「잼트리」: 총 손질하는 손 옆에 커피를 내려놓고 그걸로 충분하다는 표정"
-      },
-      "에일린>잼트리": {
-        aff: 90,
-        src: "위키 에일린 「잼트리」: 고맙다는 말 없이 마심(둘 사이 대화는 그걸로 끝). 근거 약함"
-      },
-      "잼트리>데드폴": {
-        aff: 90,
-        src: "위키 데드폴 「사무실」: 남이 커피 타는 걸 허락하는 드문 예외라는 소문. 근거 약함"
-      },
-      "이도형>고영훈": {
-        aff: 90,
-        src: "위키 이도형 「고영훈」: 부대 운영을 통째로 넘김, 둘 다 그게 편함. 추정"
-      },
-      "고영훈>이도형": {
-        aff: 90,
-        src: "위키 고영훈 「이도형」: 고맙다는 말을 기다리지 않고 부대를 대신 굴림. 추정"
-      },
-      "노기균>윤병수": {
-        aff: 150,
-        src: "대사 JSON close. 위키 노기균 「윤병수」: 입사 동기, 정반대인데 손발이 기가 막히게 맞음"
-      },
-      "윤병수>노기균": {
-        aff: 150,
-        src: "대사 JSON close. 위키 윤병수 「노기균」: 입사 동기, 재능을 찾아 넘기는 분업을 당연하게 여김"
-      },
-      "노기균>송주익": {
-        aff: 90,
-        src: "위키 노기균 「송주익」: 막내를 꽤 아낌(대련에서 사정없이 쓰러뜨리는 방식)"
-      },
-      "송주익>노기균": {
-        aff: 90,
-        src: "위키 송주익 「노기균」: 신입을 넘겨받으면 눈을 반짝임, 패배 보고를 웃으며 받아 주는 선배"
-      },
-      "노기균>이도형": {
-        aff: 90,
-        src: "위키 노기균 「고영훈과 이도형」: 검사부대원의 숭배 + 이도형이 이름을 제대로 부르는 대원"
-      },
-      "이도형>노기균": {
-        aff: 90,
-        src: "위키 노기균: 이도형이 이름을 제대로 부르는 몇 안 되는 경우(간파를 깨친 대원으로 인식)"
-      },
-      "송주익>이도형": {
-        aff: 90,
-        src: "위키 송주익 「이도형」: 부대의 정점이자 존경의 대상, 햄스터를 정성껏 키움"
-      },
-      "송주익>고영훈": {
-        aff: 90,
-        src: "위키 송주익 「고영훈」: 회식 박수 세 번을 받은 날을 수첩에 적어 둠"
-      },
-      "곽성주>조성춘": {
-        aff: 150,
-        src: "대사 JSON close. 위키 곽성주 「조성춘」: 서로를 가장 잘 아는 동료, 탄막으로 옆을 덮어 줌"
-      },
-      "조성춘>곽성주": {
-        aff: 150,
-        src: "대사 JSON close. 위키 조성춘 「곽성주」: 2대 고함, 같은 작전이면 무전이 포화"
-      },
-      "곽성주>이기석": {
-        aff: 90,
-        src: "위키 이기석 「현장 부대들」: 곽성주가 「팔 하나 내놓고 아직도 뛰는 사람」이라며 높이 삼"
-      },
-      "이기석>곽성주": {
-        aff: 90,
-        src: "대사 JSON close. 위키 이기석: 둘 다 인류를 위해 목숨 내놓는 걸 믿는 사람"
-      },
-      "김성진>송진섭": {
-        aff: 150,
-        src: "대사 JSON close. 위키 김성진 「송진섭」: 룸메이트, 위험하면 제일 먼저 달려가 등을 지킴"
-      },
-      "송진섭>김성진": {
-        aff: 90,
-        src: "대사 JSON close. 위키 송진섭 「김성진」: 하나도 안 믿고 중요한 일은 안 맡기지만 등은 맡김"
-      },
-      "송진섭>곽성주": {
-        aff: 90,
-        src: "위키 송진섭 「평가」: 곽성주의 등 뒤에 숨어 레이더를 봄(진압부대 명물)"
-      },
-      "곽성주>송진섭": {
-        aff: 90,
-        src: "위키 송진섭 「평가」: 진압부대 고참들이 막내를 귀여워함, 등 뒤가 붐비는 걸 뿌듯해함. 추정"
-      },
-      "백석주>진나솔": {
-        aff: 150,
-        src: "대사 JSON close. 위키 백석주 「진나솔」: 아끼는 조원, 「우리 나솔이가」로 말을 시작"
-      },
-      "진나솔>백석주": {
-        aff: 90,
-        src: "위키 진나솔 「백석주」: 혀를 차지만 조언대로 일을 끝내 놓음, 효율 언어로 통함"
-      },
-      "백석주>이자헌": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 백석주 「이자헌」: 조원이 죽을 때 지켜보기만 한 악연, 연례행사처럼 밖으로 불러냄"
-      },
-      "이자헌>백석주": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 백석주 「이자헌」: 이자헌은 표정 없이 「알겠습니다」 하고 따라나섬(한쪽 원한)"
-      },
-      "이자헌>은하제": {
-        aff: 150,
-        src: "대사 JSON close. 위키 이자헌 「은하제」: 사실상 오른팔, 은하제가 읽고 이자헌이 뚫음"
-      },
-      "은하제>이자헌": {
-        aff: 90,
-        src: "위키 은하제 「이자헌」: 날 선 하십시오체에 한숨이 두 배지만 현장에서는 완벽한 짝"
-      },
-      "이자헌>박민성": {
-        aff: 90,
-        src: "위키 이자헌 「박민성」: D조 기본 대형(앞에서 뜯고 뒤에서 나름), 「오소리 님」"
-      },
-      "박민성>이자헌": {
-        aff: 150,
-        src: "위키 박민성 「이자헌」: 진심으로 따름, 「조장님 옆이 제일 안전해」"
-      },
-      "은하제>박민성": {
-        aff: 150,
-        src: "위키 은하제 「박민성」: 가장 많이 이름을 부르는 사람, 진짜 위험하면 제일 먼저 뛰어듦"
-      },
-      "박민성>은하제": {
-        aff: 150,
-        src: "대사 JSON close. 위키 박민성 「은하제」: 무서워하면서도 제일 의지함"
-      },
-      "이성해>진나솔": {
-        aff: 90,
-        src: "대사 JSON close. 위키 이성해 「진나솔」: 아주 좋아한다고 웃으며 말함(한쪽)"
-      },
-      "이성해>제이": {
-        aff: 90,
-        src: "대사 JSON close. 위키 이성해: 경비팀에 도넛·커피를 들고 가 수다, 제이가 도넛을 좋아함"
-      },
-      "고영은>백사헌": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 고영은 「백사헌」: 공공연한 앙숙, 대놓고 적대하고 비꼼"
-      },
-      "백사헌>고영은": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 백사헌 「고영은」: 앙숙이지만 필요하면 옆에서 같이 일함"
-      },
-      "고영은>강이학": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 강이학 「고영은」: 상극, 구조 우선순위로 꼭 한 번 부딪침"
-      },
-      "강이학>고영은": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 강이학 「고영은」: 계산해 보고 깔끔하게 물러섬(감정 없는 상극)"
-      },
-      "고영은>장허운": {
-        aff: 90,
-        src: "대사 JSON close. 위키 장허운 「고영은」: 사람으로 대하는 직원과 배치되면 장허운 생존율이 오름"
-      },
-      "장허운>고영은": {
-        aff: 150,
-        src: "대사 JSON close. 위키 장허운 「고영은」: 처음 「괜찮아요?」를 듣고 한참 답 못 함, 볼 때마다 먼저 고개 숙임"
-      },
-      "이연화>고영은": {
-        aff: 90,
-        src: "대사 JSON close. 위키 이연화 「고영은」: 사고 현장에서 말없이 붕대를 나눠 씀"
-      },
-      "고영은>이연화": {
-        aff: 90,
-        src: "위키 이연화 「고영은」: 연구1팀에 들르면 이연화 책상에 캔커피를 놓고 감"
-      },
-      "강이학>백사헌": {
-        aff: 90,
-        src: "위키 강이학 「백사헌」: 말이 통하는 몇 안 되는 상대, 「좋은 거래처」"
-      },
-      "백사헌>강이학": {
-        aff: 90,
-        src: "위키 백사헌 「강이학」: 몇 안 되게 말이 통하는 상대, 거래는 꼭 성사됨. 추정"
-      },
-      "청달래>호유원": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 청달래 「호유원」: 영구 냉전, 「애송이」라 노골적으로 경멸"
-      },
-      "호유원>청달래": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 호유원 「청달래」: 유일하게 존칭을 빼는 대상, 사적 감정"
-      },
-      "이병진>호유원": {
-        aff: 150,
-        src: "위키 이병진 「호유원」: 직속 줄, 「이 회사에서 제일 좋은 상사」라며 이름을 입에 달고 삼"
-      },
-      "호유원>이병진": {
-        aff: 90,
-        src: "위키 호유원 「이병진」: 알아서 인재를 물어 오는 충실한 창구"
-      },
-      "곽제강>이연화": {
-        aff: 90,
-        src: "위키 곽제강 「이연화」: 잔소리를 싫어하지 않고 오히려 재미있어함"
-      },
-      "곽제강>청달래": {
-        aff: -25,
-        src: "위키 곽제강 「청달래」: 측근들 앞에서 대놓고 무시, 「알 게 뭡니까」"
-      },
-      "진나솔>이병진": {
-        aff: -25,
-        src: "위키 이병진 「정예 조와 사무실 인맥」: 정예들이 대놓고 무시함"
-      },
-      "백석주>박민성": {
-        aff: 90,
-        src: "위키 박민성 「백석주」: 음료수를 받으며 「넌 착하다, 조를 잘못 골랐어」. 추정"
-      },
-      "블라렛>살라딘": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 블라렛 「살라딘」: 영원한 앙숙, 피의 원한을 개인적으로 실천"
-      },
-      "살라딘>블라렛": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 살라딘 「블라렛」: 같은 방에 있기만 해도 무기에 손이 감"
-      },
-      "서윤지>차여진": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 서윤지 「차여진」: 옆자리를 기록하며 협회 청렴성 낙제 분기로 셈, 같은 줄에 세우는 비유를 싫어함"
-      },
-      "차여진>서윤지": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 차여진 「서윤지」: 인생의 몇 안 되는 불편 요소, 감사 시즌에 옆자리를 흘끔거림"
-      },
-      "차여진>문혜란": {
-        aff: 90,
-        src: "대사 JSON close. 위키 차여진 「문혜란」: 프리랜서를 주고받으며 소개비를 챙기는 사이(지상·지하 친절 연합)"
-      },
-      "문혜란>차여진": {
-        aff: 90,
-        src: "대사 JSON close. 위키 문혜란 「차여진」: 양쪽으로 프리랜서를 주고받는 연합"
-      },
-      "고연지>윤지아": {
-        aff: 90,
-        src: "위키 고연지 「윤지아」: 조수를 계속 두고 사탕 재고를 따지지 않음. 추정"
-      },
-      "윤지아>고연지": {
-        aff: 90,
-        src: "위키 윤지아 「고연지」: 원장이 서운할 거라 생각해 짠해함, 질문 안 하는 조수로 신뢰받음"
-      }
-    },
-    orgs: {
-      "A00>A00": 0,
-      "A00>B00": -25,
-      "A00>C00": -25,
-      "A00>D00": 0,
-      "A00>E00": 0,
-      "B00>A00": -25,
-      "B00>B00": 0,
-      "B00>C00": -25,
-      "B00>D00": 0,
-      "B00>E00": -25,
-      "C00>A00": -25,
-      "C00>B00": -25,
-      "C00>C00": 0,
-      "C00>D00": 0,
-      "C00>E00": 0,
-      "협회>A00": 0,
-      "협회>B00": -25,
-      "협회>C00": 0,
-      "협회>D00": 0,
-      "협회>E00": 0,
-      "지하상가>A00": 0,
-      "지하상가>B00": 0,
-      "지하상가>C00": 0,
-      "지하상가>D00": 0,
-      "지하상가>E00": 0,
-      "교황청>A00": 0,
-      "교황청>B00": 0,
-      "교황청>C00": 0,
-      "교황청>D00": 0,
-      "교황청>E00": 0,
-      "십자군>A00": 0,
-      "십자군>B00": 0,
-      "십자군>C00": 0,
-      "십자군>D00": 0,
-      "십자군>E00": 0,
-      "독립>A00": 0,
-      "독립>B00": 0,
-      "독립>C00": 0,
-      "독립>D00": 0,
-      "독립>E00": 0
-    }
-  };
-
-  // game-src/dialogue/aliases.json
-  var aliases_default = {
-    version: 1,
-    names: {
-      강이학: {
-        aliases: [
-          "강이학 사원",
-          "조랑말",
-          "Kang I-hak"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      게슈간: {
-        aliases: [
-          "게슈간 요원",
-          "Geshugan"
-        ],
-        titles: [
-          "요원"
-        ]
-      },
-      고그니쟈: {
-        aliases: [
-          "고그니쟈 실장",
-          "고그니쟈 책임자",
-          "Gognija"
-        ],
-        titles: [
-          "연구 책임자",
-          "실장",
-          "책임자"
-        ]
-      },
-      고르고디오: {
-        aliases: [
-          "적합자 고르고디오",
-          "고르고디오 선배",
-          "Gorgodio"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배",
-          "형님",
-          "적합자"
-        ]
-      },
-      고연지: {
-        aliases: [
-          "고연지 원장",
-          "연지",
-          "Go Yeon-ji"
-        ],
-        titles: [
-          "원장",
-          "원장님",
-          "의사",
-          "선생님"
-        ]
-      },
-      고영은: {
-        aliases: [
-          "고영은 사원",
-          "영은",
-          "영은 쌤",
-          "산양",
-          "Go Young-eun"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      고영훈: {
-        aliases: [
-          "고영훈 차장",
-          "Go Young-hoon"
-        ],
-        titles: [
-          "차장"
-        ]
-      },
-      곽성주: {
-        aliases: [
-          "곽성주 과장",
-          "Kwak Seong-ju"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      곽제강: {
-        aliases: [
-          "곽제강 과장",
-          "곽 과장",
-          "Kwak Je-gang"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      김성진: {
-        aliases: [
-          "김성진 사원",
-          "Kim Seong-jin"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      김조학: {
-        aliases: [
-          "김조학 과장",
-          "수석 심문관",
-          "Kim Jo-hak"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "심문관"
-        ]
-      },
-      노기균: {
-        aliases: [
-          "노기균 대리",
-          "No Gi-gyun"
-        ],
-        titles: [
-          "대리",
-          "형님"
-        ]
-      },
-      데드폴: {
-        aliases: [
-          "데드폴 요원",
-          "데드폴 씨",
-          "Deadpole"
-        ],
-        titles: [
-          "요원"
-        ]
-      },
-      데쥬레: {
-        aliases: [
-          "데쥬레 연구원",
-          "Dejure"
-        ],
-        titles: [
-          "연구원"
-        ]
-      },
-      도필헌: {
-        aliases: [
-          "도필헌 국장",
-          "도 국장",
-          "Do Pil-heon"
-        ],
-        titles: [
-          "국장",
-          "국장님"
-        ]
-      },
-      로제몬: {
-        aliases: [
-          "로제몬 요원",
-          "Rojemon"
-        ],
-        titles: [
-          "요원",
-          "사무직"
-        ]
-      },
-      마덕희: {
-        aliases: [
-          "마덕희 사장",
-          "헐값매입 주인",
-          "Ma Deok-hee"
-        ],
-        titles: [
-          "주인"
-        ]
-      },
-      문혜란: {
-        aliases: [
-          "문혜란 사장",
-          "혜란",
-          "혜란 언니",
-          "Mun Hye-ran"
-        ],
-        titles: [
-          "사장",
-          "언니"
-        ]
-      },
-      박민성: {
-        aliases: [
-          "박민성 주임",
-          "민성",
-          "오소리",
-          "Park Min-seong"
-        ],
-        titles: [
-          "주임"
-        ]
-      },
-      백사헌: {
-        aliases: [
-          "백사헌 사원",
-          "독사",
-          "Baek Sa-heon"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      백석주: {
-        aliases: [
-          "백석주 과장",
-          "백석주 조장",
-          "청둥오리",
-          "오리 조장",
-          "A조 조장",
-          "Baek Seok-ju"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "조장",
-          "조장님"
-        ]
-      },
-      브라우니: {
-        aliases: [
-          "Brownie"
-        ],
-        titles: [
-          "진행자"
-        ]
-      },
-      블라렛: {
-        aliases: [
-          "블라렛 수녀",
-          "특급 수녀",
-          "Blaret"
-        ],
-        titles: [
-          "수녀",
-          "수녀님"
-        ]
-      },
-      사장: {
-        aliases: [
-          "사장님",
-          "Sa-jang"
-        ],
-        titles: [
-          "사장"
-        ]
-      },
-      살라딘: {
-        aliases: [
-          "살라딘 형님",
-          "Saladin"
-        ],
-        titles: [
-          "형님",
-          "대영웅"
-        ]
-      },
-      서윤지: {
-        aliases: [
-          "서윤지 조정관",
-          "서 조정관",
-          "Seo Yun-ji"
-        ],
-        titles: [
-          "조정관"
-        ]
-      },
-      송주익: {
-        aliases: [
-          "송주익 대리",
-          "주익",
-          "Song Ju-ik"
-        ],
-        titles: [
-          "대리",
-          "막내"
-        ]
-      },
-      송진섭: {
-        aliases: [
-          "송진섭 사원",
-          "진섭",
-          "Song Jin-seob"
-        ],
-        titles: [
-          "사원",
-          "막내"
-        ]
-      },
-      스팡달: {
-        aliases: [
-          "스팡달 선배",
-          "스팡달 선임",
-          "Spangdal"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      신유리: {
-        aliases: [
-          "신유리 사장",
-          "Shin Yuri"
-        ],
-        titles: [
-          "사채업자"
-        ]
-      },
-      에일린: {
-        aliases: [
-          "에일린 선임",
-          "Aileen",
-          "Eileen"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      윤병수: {
-        aliases: [
-          "윤병수 대리",
-          "병수",
-          "Yun Byeong-su"
-        ],
-        titles: [
-          "대리",
-          "팀장",
-          "교관"
-        ]
-      },
-      윤지아: {
-        aliases: [
-          "꼬마 조수",
-          "꼬마 선생님",
-          "지아",
-          "Yun Ji-a"
-        ],
-        titles: [
-          "조수",
-          "선생님"
-        ]
-      },
-      은하제: {
-        aliases: [
-          "은하제 대리",
-          "송골매",
-          "Eun Ha-je"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      이기석: {
-        aliases: [
-          "이기석 과장",
-          "Lee Gi-seok"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이길환: {
-        aliases: [
-          "이길환 과장",
-          "튜토리얼 요정",
-          "Lee Gil-hwan"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이도형: {
-        aliases: [
-          "이도형 부장",
-          "이도형 부장님",
-          "흉백",
-          "Lee Do-hyeong"
-        ],
-        titles: [
-          "부장",
-          "부장님"
-        ]
-      },
-      이병진: {
-        aliases: [
-          "이병진 과장",
-          "이 과장",
-          "Lee Byeong-jin"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이성해: {
-        aliases: [
-          "이성해 주임",
-          "돌고래 가면",
-          "Lee Seong-hae"
-        ],
-        titles: [
-          "주임"
-        ]
-      },
-      이연화: {
-        aliases: [
-          "이연화 대리",
-          "Lee Yeon-hwa"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      이자헌: {
-        aliases: [
-          "이자헌 과장",
-          "이자헌 조장",
-          "도마뱀 과장",
-          "D조 조장",
-          "Lee Ja-heon"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "조장",
-          "조장님",
-          "도마뱀"
-        ]
-      },
-      장허운: {
-        aliases: [
-          "장허운 사원",
-          "소 가면",
-          "Jang Heo-un"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      잼트리: {
-        aliases: [
-          "잼트리 선배",
-          "잼트리 요원",
-          "모두의 언니",
-          "Jaemtri"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배",
-          "언니"
-        ]
-      },
-      쟈알디: {
-        aliases: [
-          "쟈알디 부장",
-          "쟈알디 부장님",
-          "Jyaldi"
-        ],
-        titles: [
-          "부장",
-          "부장님",
-          "팀장"
-        ]
-      },
-      제이: {
-        aliases: [
-          "J3",
-          "경비반장 제이",
-          "늑대 가면",
-          "Jay"
-        ],
-        titles: [
-          "경비반장",
-          "반장",
-          "반장님"
-        ]
-      },
-      조성춘: {
-        aliases: [
-          "조성춘 과장",
-          "Cho Seong-choon"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      진나솔: {
-        aliases: [
-          "진나솔 대리",
-          "나솔",
-          "나비 가면",
-          "Jin Na-sol"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      차여진: {
-        aliases: [
-          "차여진 조정관",
-          "차 조정관",
-          "Cha Yeo-jin"
-        ],
-        titles: [
-          "조정관"
-        ]
-      },
-      청달래: {
-        aliases: [
-          "청달래 전무",
-          "청 전무",
-          "청 전무님",
-          "Cheong Dal-lae"
-        ],
-        titles: [
-          "전무",
-          "전무님"
-        ]
-      },
-      콘쥬스: {
-        aliases: [
-          "콘쥬스 요원",
-          "Konjyuce"
-        ],
-        titles: [
-          "요원",
-          "막내"
-        ]
-      },
-      큐라스: {
-        aliases: [
-          "큐라스 선배",
-          "Kyuras"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      호유원: {
-        aliases: [
-          "호유원 이사",
-          "호 이사",
-          "호 이사님",
-          "Ho Yu-won"
-        ],
-        titles: [
-          "이사",
-          "이사님"
-        ]
-      }
-    },
-    ambiguous: {
-      경비반장: [
-        "제이"
-      ],
-      과장: [
-        "곽성주",
-        "곽제강",
-        "김조학",
-        "백석주",
-        "이기석",
-        "이길환",
-        "이병진",
-        "이자헌",
-        "조성춘"
-      ],
-      과장님: [
-        "곽성주",
-        "곽제강",
-        "김조학",
-        "백석주",
-        "이기석",
-        "이길환",
-        "이병진",
-        "이자헌",
-        "조성춘"
-      ],
-      교관: [
-        "윤병수"
-      ],
-      국장: [
-        "도필헌"
-      ],
-      국장님: [
-        "도필헌"
-      ],
-      대리: [
-        "노기균",
-        "송주익",
-        "윤병수",
-        "은하제",
-        "이연화",
-        "진나솔"
-      ],
-      대영웅: [
-        "살라딘"
-      ],
-      도마뱀: [
-        "이자헌"
-      ],
-      막내: [
-        "송주익",
-        "송진섭",
-        "콘쥬스"
-      ],
-      반장: [
-        "제이"
-      ],
-      반장님: [
-        "제이"
-      ],
-      부장: [
-        "이도형",
-        "쟈알디"
-      ],
-      부장님: [
-        "이도형",
-        "쟈알디"
-      ],
-      사무직: [
-        "로제몬"
-      ],
-      사원: [
-        "강이학",
-        "고영은",
-        "김성진",
-        "백사헌",
-        "송진섭",
-        "장허운"
-      ],
-      사장: [
-        "문혜란",
-        "사장"
-      ],
-      사채업자: [
-        "신유리"
-      ],
-      선배: [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      선생님: [
-        "고연지",
-        "윤지아"
-      ],
-      선임: [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      "선임 요원": [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      수녀: [
-        "블라렛"
-      ],
-      수녀님: [
-        "블라렛"
-      ],
-      실장: [
-        "고그니쟈"
-      ],
-      심문관: [
-        "김조학"
-      ],
-      언니: [
-        "문혜란",
-        "잼트리"
-      ],
-      "연구 책임자": [
-        "고그니쟈"
-      ],
-      연구원: [
-        "데쥬레"
-      ],
-      요원: [
-        "게슈간",
-        "데드폴",
-        "로제몬",
-        "콘쥬스"
-      ],
-      원장: [
-        "고연지"
-      ],
-      원장님: [
-        "고연지"
-      ],
-      의사: [
-        "고연지"
-      ],
-      이사: [
-        "호유원"
-      ],
-      이사님: [
-        "호유원"
-      ],
-      적합자: [
-        "고르고디오"
-      ],
-      전무: [
-        "청달래"
-      ],
-      전무님: [
-        "청달래"
-      ],
-      조수: [
-        "윤지아"
-      ],
-      조장: [
-        "백석주",
-        "이자헌"
-      ],
-      조장님: [
-        "백석주",
-        "이자헌"
-      ],
-      조정관: [
-        "서윤지",
-        "차여진"
-      ],
-      주인: [
-        "마덕희"
-      ],
-      주임: [
-        "박민성",
-        "이성해"
-      ],
-      진행자: [
-        "브라우니"
-      ],
-      차장: [
-        "고영훈"
-      ],
-      책임자: [
-        "고그니쟈"
-      ],
-      팀장: [
-        "윤병수",
-        "쟈알디"
-      ],
-      형님: [
-        "고르고디오",
-        "노기균",
-        "살라딘"
-      ]
-    }
-  };
-
-  // game-src/dialogue/address.json
-  var address_default = {
-    version: 1,
-    names: {
-      강이학: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기님",
-        down: "신입님",
-        outsider: "고객님"
-      },
-      게슈간: {
-        level: 1,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "너",
-        down: "신입",
-        outsider: "너"
-      },
-      고그니쟈: {
-        level: 2,
-        register: "하게체",
-        self: "나",
-        up: "부장",
-        peer: "자네",
-        down: "신입",
-        outsider: "손님"
-      },
-      고르고디오: {
-        level: 2,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "막내",
-        outsider: "거기"
-      },
-      고연지: {
-        level: null,
-        register: "혼합",
-        self: "",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "환자분"
-      },
-      고영은: {
-        level: 1,
-        register: "반말",
-        self: "저",
-        up: "선배님",
-        peer: "동기",
-        down: "신입 씨",
-        outsider: "그쪽"
-      },
-      고영훈: {
-        level: 5,
-        register: "존댓말",
-        self: "나",
-        up: "부장님",
-        peer: "차장",
-        down: "대원",
-        outsider: "외부인"
-      },
-      곽성주: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "부장님",
-        peer: "과장",
-        down: "이놈아",
-        outsider: "거기"
-      },
-      곽제강: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      김성진: {
-        level: 1,
-        register: "반말",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      김조학: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "차장님",
-        peer: "과장",
-        down: "야",
-        outsider: "너"
-      },
-      노기균: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "신입",
-        outsider: "너"
-      },
-      데드폴: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "요원님",
-        down: "신입 요원님",
-        outsider: "그쪽 분"
-      },
-      데쥬레: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "요원님",
-        down: "신입 요원님",
-        outsider: "외부 분"
-      },
-      도필헌: {
-        level: 7,
-        register: "하게체",
-        self: "나",
-        up: "사장님",
-        peer: "국장",
-        down: "자네",
-        outsider: "손님"
-      },
-      로제몬: {
-        level: 1,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "너",
-        down: "신입",
-        outsider: "거기"
-      },
-      마덕희: {
-        level: null,
-        register: "존댓말",
-        self: "",
-        up: "사장님",
-        peer: "자기",
-        down: "자기",
-        outsider: "자기"
-      },
-      문혜란: {
-        level: null,
-        register: "반말",
-        self: "언니",
-        up: "사장님",
-        peer: "친구",
-        down: "친구",
-        outsider: "친구"
-      },
-      박민성: {
-        level: 2,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "그쪽"
-      },
-      백사헌: {
-        level: 1,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기님",
-        down: "신입",
-        outsider: "그쪽"
-      },
-      백석주: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "막내",
-        outsider: "그쪽"
-      },
-      브라우니: {
-        level: null,
-        register: "존댓말",
-        self: "",
-        up: "친구",
-        peer: "친구",
-        down: "친구",
-        outsider: "친구"
-      },
-      블라렛: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "신부님",
-        peer: "자매님",
-        down: "어린 양",
-        outsider: "손님"
-      },
-      사장: {
-        level: 9,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "그쪽",
-        down: "당신",
-        outsider: "당신"
-      },
-      살라딘: {
-        level: null,
-        register: "하오체",
-        self: "나",
-        up: "형제",
-        peer: "형제",
-        down: "형제",
-        outsider: "그대"
-      },
-      서윤지: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선임 조정관님",
-        peer: "조정관님",
-        down: "신입 조정관님",
-        outsider: "방문자님"
-      },
-      송주익: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "과장님",
-        peer: "선배님",
-        down: "신입",
-        outsider: "너"
-      },
-      송진섭: {
-        level: 1,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "형",
-        down: "후배",
-        outsider: "그쪽"
-      },
-      스팡달: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      신유리: {
-        level: null,
-        register: "반말",
-        self: "",
-        up: "사장",
-        peer: "너",
-        down: "너",
-        outsider: "너"
-      },
-      에일린: {
-        level: 2,
-        register: "반말",
-        self: "",
-        up: "부장",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      윤병수: {
-        level: 3,
-        register: "반말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "너",
-        outsider: "너"
-      },
-      윤지아: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "손님"
-      },
-      은하제: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "댁"
-      },
-      이기석: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "차장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      이길환: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "선생님"
-      },
-      이도형: {
-        level: 6,
-        register: "반말",
-        self: "나",
-        up: "국장님",
-        peer: "부장",
-        down: "거기",
-        outsider: "너"
-      },
-      이병진: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "자네",
-        outsider: "그쪽 분"
-      },
-      이성해: {
-        level: 2,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입님",
-        outsider: "손님"
-      },
-      이연화: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "선생님",
-        down: "신입 씨",
-        outsider: "그쪽 분"
-      },
-      이자헌: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "조장님",
-        down: "신입 님",
-        outsider: "손님"
-      },
-      장허운: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기분",
-        down: "후배님",
-        outsider: "선생님"
-      },
-      잼트리: {
-        level: 2,
-        register: "존댓말",
-        self: "언니",
-        up: "부장님",
-        peer: "동기",
-        down: "후배",
-        outsider: "손님"
-      },
-      쟈알디: {
-        level: 3,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자네",
-        down: "요원",
-        outsider: "그쪽"
-      },
-      제이: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "높으신 분",
-        peer: "직원분",
-        down: "신입분",
-        outsider: "손님"
-      },
-      조성춘: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "부장님",
-        peer: "과장",
-        down: "이 자식아",
-        outsider: "너"
-      },
-      진나솔: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "너",
-        down: "신입",
-        outsider: "거기"
-      },
-      차여진: {
-        level: null,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자기",
-        down: "신입",
-        outsider: "손님"
-      },
-      청달래: {
-        level: 8,
-        register: "하게체",
-        self: "",
-        up: "자네",
-        peer: "자네",
-        down: "자네",
-        outsider: "자네"
-      },
-      콘쥬스: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입 선배님",
-        outsider: "아저씨"
-      },
-      큐라스: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      호유원: {
-        level: 7,
-        register: "존댓말",
-        self: "저",
-        up: "전무님",
-        peer: "이사님",
-        down: "직원님",
-        outsider: "손님"
-      }
-    }
-  };
-
-  // src/core/people/identity.ts
-  var ORG_CODES = [
-    [/가짜\s*관리국|fake/i, "B00"],
-    [/관리국|management bureau|bureau/i, "A00"],
-    [/백일몽|daydream/i, "C00"],
-    [/민간|civilian|시민/i, "D00"],
-    [/프리랜서|freelancer|협회 등록/i, "E00"]
-  ];
-  function factionCode(org) {
-    const t = org.trim();
-    if (/^[A-Z]00$/.test(t)) return t;
-    for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
-    return "";
-  }
-  function rankLevel(faction, rank2) {
-    const r = rank2.replace(/\s+/g, "");
-    if (!r || /^(-|없음|미정)$/.test(r)) return null;
-    if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
-    if (faction === "A00") {
-      if (/부장|팀장|chief/i.test(r)) return 3;
-      if (/선임|책임자|senior|lead/i.test(r)) return 2;
-      if (/요원|연구원|agent|researcher/i.test(r)) return 1;
-      return null;
-    }
-    if (faction === "B00" || faction === "C00") {
-      const table = [[/사장|ceo/i, 9], [/전무/, 8], [/국장|이사|director/i, 7], [/부장/, 6], [/차장/, 5], [/과장|manager/i, 4], [/대리/, 3], [/주임/, 2], [/사원|직원|staff/i, 1]];
-      for (const [re, n2] of table) if (re.test(r)) return n2;
-      return null;
-    }
-    if (faction === "E00") {
-      if (/특급/.test(r)) return 5;
-      const m = /([1-5])\s*급/.exec(r);
-      if (m) return 5 - Number(m[1]);
-      if (/정예/.test(r)) return 4;
-      if (/선임/.test(r)) return 3;
-      if (/숙련/.test(r)) return 2;
-      if (/일반/.test(r)) return 1;
-      if (/임시/.test(r)) return 0;
-    }
-    return null;
-  }
-  function parseIdentity(text4, anchor, from = "status") {
-    const t = String(text4 ?? "").trim();
-    if (!t || t === "없음" || t === "-") return null;
-    const [org, ...rest] = t.split(/[\/|·,]/).map((x) => x.trim());
-    const rank2 = rest.join(" ").replace(/^-$/, "");
-    const faction = factionCode(org);
-    return { faction: faction || org, rank: rank2, level: rankLevel(faction, rank2), from, anchor };
-  }
-  var identityText = (id) => id ? `${ORG_NAMES[id.faction] ?? id.faction}/${id.rank || "-"}` : "";
-  var ORG_NAMES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
-  function relativeRank(user, personFaction, personLevel) {
-    if (!user || !user.faction || user.faction !== personFaction) return "outsider";
-    const u = user.level ?? 0;
-    if (personLevel === null) return "peer";
-    return u > personLevel ? "up" : u < personLevel ? "down" : "peer";
-  }
-  function factionCodesIn(text4, extra = {}) {
-    const out = [];
-    let t = text4;
-    for (const [re, code2] of ORG_CODES) {
-      if (re.test(t)) {
-        out.push(code2);
-        t = t.replace(new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g"), " ");
-      }
-    }
-    for (const [code2, name] of Object.entries(extra)) if (!out.includes(code2) && name && t.includes(name)) out.push(code2);
-    return out;
-  }
-
-  // src/core/people/base.ts
-  var RELATIONS = relations_base_default;
-  var ALIASES = aliases_default;
-  var ADDRESS = address_default;
-  function seedAddress(name, faction, user) {
-    const row9 = ADDRESS.names[name];
-    if (!row9) return void 0;
-    const rel = relativeRank(user, faction, row9.level);
-    const register = REGISTERS.includes(row9.register) ? row9.register : "존댓말";
-    return { toUser: row9[rel] || row9.outsider || "", register };
-  }
-  function seedBaseFor(name, userFaction3, user) {
-    const b = RELATIONS.people[name];
-    const faction = b?.faction ?? "";
-    const alias = ALIASES.names[name];
-    const address = seedAddress(name, faction, user);
-    return {
-      faction,
-      ...b ? { express: b.express } : {},
-      affinityBase: userAffinityBase(faction, userFaction3),
-      aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
-      ...address ? { address } : {}
-    };
-  }
-  var valuesOf = (name) => RELATIONS.people[name]?.values ?? "";
-  var temperOf = (name) => RELATIONS.people[name]?.temper;
-  function userAffinityBase(personFaction, userFaction3) {
-    if (!personFaction || !userFaction3 || personFaction === userFaction3) return 0;
-    return STAGE_VALUE[relationStage(personFaction, userFaction3)];
-  }
-  var factionBase = (code2, userFaction3) => userAffinityBase(code2, userFaction3);
-  function allNames() {
-    return Object.entries(ALIASES.names).map(([name, v]) => ({ name, aliases: [.../* @__PURE__ */ new Set([...v.aliases ?? [], ...RELATIONS.people[name]?.english ?? []])], titles: v.titles ?? [] }));
-  }
-  var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
-
-  // src/core/people/faction.ts
-  function userFactionOf(store, chat) {
-    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store.identity?.faction || (typeof v === "string" ? v : "");
-  }
-  function knownFactionCodes(store, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
-  }
-  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
-  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
-    const base = factionBase(code2, userFaction3);
-    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, turnCap: settings.turnCap }, settings.factionBounds);
-    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base };
-  }
-  function sceneFactionCodes(store, people, texts, names4 = {}) {
-    const out = [];
-    const push2 = (c) => {
-      if (c && !out.includes(c)) out.push(c);
-    };
-    for (const n2 of people) push2(store.people[n2]?.faction ?? "");
-    for (const t of texts) for (const c of factionCodesIn(t, names4)) push2(c);
-    return out;
-  }
-  function factionsBlock(list4, user = "{{user}}") {
-    const lines3 = list4.filter((f) => f.stage.id !== "neutral").map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}`);
-    if (!lines3.length) return "";
-    return ["## Factions → " + user + " (standing of each organization toward " + user + ", kept by the system; members act accordingly)", ...lines3].join("\n");
-  }
-
   // src/core/people/select.ts
   var isEnglish = (s7) => /^[A-Za-z][A-Za-z0-9 .'-]*$/.test(s7);
   function nameMatcher(entries2) {
@@ -3325,7 +1804,7 @@ ${lines3.join("\n")}`;
   }
 
   // src/core/people/updater.ts
-  var str6 = (v) => typeof v === "string" ? v : "";
+  var str7 = (v) => typeof v === "string" ? v : "";
   var msgs3 = (chat) => Array.isArray(chat.message) ? chat.message : [];
   function planBatches(chat, unread, spanCap, maxTurns = 6) {
     const list4 = msgs3(chat);
@@ -3333,7 +1812,7 @@ ${lines3.join("\n")}`;
     let cur = [];
     let chars = 0;
     for (const i of unread) {
-      const n2 = str6(list4[i]?.data).length + str6(list4[i - 1]?.data).length;
+      const n2 = str7(list4[i]?.data).length + str7(list4[i - 1]?.data).length;
       if (cur.length && (cur.length >= maxTurns || chars + n2 > spanCap)) {
         out.push(cur);
         cur = [];
@@ -3440,13 +1919,13 @@ ${tail2}`;
       const m = `m${n2 + 1}`;
       tags.set(m, idx);
       const role = list4[idx].role === "user" ? "user" : "assistant";
-      const item2 = { m, role, text: cleanSpan(str6(list4[idx].data), o.settings.spanCap), index: idx };
+      const item2 = { m, role, text: cleanSpan(str7(list4[idx].data), o.settings.spanCap), index: idx };
       if (confirmedIdx.has(idx)) item2.confirmed = true;
       else item2.context_only = true;
       span.push(item2);
     });
     const match = nameMatcher(o.names);
-    const texts = [...confirmedIdx].sort((a, b) => b - a).map((idx) => messageText(str6(list4[idx].data)));
+    const texts = [...confirmedIdx].sort((a, b) => b - a).map((idx) => messageText(str7(list4[idx].data)));
     const people = [];
     const push2 = (n2) => {
       if (store.people[n2] && !people.includes(n2) && !o.exclude?.includes(n2)) people.push(n2);
@@ -3458,8 +1937,8 @@ ${tail2}`;
     const prevBot = [...list4.slice(0, first)].reverse().find((m) => m.role === "char");
     const lastBot = list4[Math.max(...batch)];
     if (lastBot) {
-      const before = new Map(prevBot ? scanAgents(str6(prevBot.data)).map((a) => [a.who, a]) : []);
-      for (const a of scanAgents(str6(lastBot.data))) {
+      const before = new Map(prevBot ? scanAgents(str7(prevBot.data)).map((a) => [a.who, a]) : []);
+      for (const a of scanAgents(str7(lastBot.data))) {
         const b = before.get(a.who);
         if (b && b.state !== a.state && store.people[a.who]) {
           signals.push({ who: a.who, tag: "상태", from: b.state, to: a.state, note: "Record how and why in `state`; add one `history` line." });
@@ -3597,11 +2076,11 @@ ${rules2}`;
       if (idx === void 0 || !input3.confirmed.has(idx)) return "확정 구간 밖 메시지";
       const q = norm(quote);
       if (!q || q.length < 3) return "인용 없음";
-      if (!norm(messageText(str6(list4[idx].data))).includes(q)) return "인용이 원문에 없음";
+      if (!norm(messageText(str7(list4[idx].data))).includes(q)) return "인용이 원문에 없음";
       return { anchor: messageKey(list4[idx], idx), index: idx };
     };
     const evidenceLoose = (m) => {
-      const idx = input3.tags.get(str6(m));
+      const idx = input3.tags.get(str7(m));
       if (idx === void 0 || !input3.confirmed.has(idx)) return "확정 구간 밖 메시지";
       return { anchor: messageKey(list4[idx], idx), index: idx };
     };
@@ -3671,9 +2150,9 @@ ${rules2}`;
     }
     const perPerson = /* @__PURE__ */ new Map();
     for (const e of r.entries ?? []) {
-      const who = nameOf(str6(e?.who));
+      const who = nameOf(str7(e?.who));
       if (!who) {
-        drop("entry", e, "명단에 없는 이름", str6(e?.who));
+        drop("entry", e, "명단에 없는 이름", str7(e?.who));
         continue;
       }
       const slot = e.slot;
@@ -3776,9 +2255,9 @@ ${rules2}`;
       const perCue = /* @__PURE__ */ new Map();
       const changes = liveChanges(store, live);
       for (const c of r.cues ?? []) {
-        const who = nameOf(str6(c?.who));
+        const who = nameOf(str7(c?.who));
         if (!who) {
-          drop("cue", c, "명단에 없는 이름", str6(c?.who));
+          drop("cue", c, "명단에 없는 이름", str7(c?.who));
           continue;
         }
         if (!CUES.includes(c.cue)) {
@@ -3808,9 +2287,9 @@ ${rules2}`;
       const changes = liveChanges(store, live);
       const seen2 = /* @__PURE__ */ new Set();
       for (const t of r.taste ?? []) {
-        const who = nameOf(str6(t?.who));
+        const who = nameOf(str7(t?.who));
         if (!who) {
-          drop("taste", t, "명단에 없는 이름", str6(t?.who));
+          drop("taste", t, "명단에 없는 이름", str7(t?.who));
           continue;
         }
         const band = Number(t.band);
@@ -3846,9 +2325,9 @@ ${rules2}`;
       const perWho = /* @__PURE__ */ new Map();
       const inited = /* @__PURE__ */ new Set();
       for (const x of r.openness ?? []) {
-        const who = nameOf(str6(x?.who));
+        const who = nameOf(str7(x?.who));
         if (!who) {
-          drop("openness", x, "명단에 없는 이름", str6(x?.who));
+          drop("openness", x, "명단에 없는 이름", str7(x?.who));
           continue;
         }
         const ev = evidence(x.m, x.quote);
@@ -3896,9 +2375,9 @@ ${rules2}`;
     }
     if (ctx2.settings.features.has("register")) {
       for (const a of r.address ?? []) {
-        const who = nameOf(str6(a?.who));
+        const who = nameOf(str7(a?.who));
         if (!who) {
-          drop("address", a, "명단에 없는 이름", str6(a?.who));
+          drop("address", a, "명단에 없는 이름", str7(a?.who));
           continue;
         }
         if (store.people[who].address.pin) {
@@ -3927,7 +2406,7 @@ ${rules2}`;
         continue;
       }
       const key2 = plain(d.key, 40);
-      const ev = norm(str6(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
+      const ev = norm(str7(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
       if (!key2 || typeof ev === "string") {
         drop("doc", d, typeof ev === "string" ? ev : "이름 없음");
         continue;
@@ -3962,16 +2441,16 @@ ${rules2}`;
       }
       const seq = nextSeq2(ev.anchor);
       const body5 = d.op === "remove" ? `(해소) ${cur.find((x) => x.id === replaces).text}`.slice(0, 200) : text4;
-      if (putDoc(store, type, key2, { id: entryId(`${type}:${key2}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str6(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
+      if (putDoc(store, type, key2, { id: entryId(`${type}:${key2}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str7(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
     }
     if (ctx2.settings.features.has("suspicion")) {
       for (const s7 of r.suspicion ?? []) {
-        const who = nameOf(str6(s7?.who));
+        const who = nameOf(str7(s7?.who));
         if (!who) {
-          drop("suspicion", s7, "명단에 없는 이름", str6(s7?.who));
+          drop("suspicion", s7, "명단에 없는 이름", str7(s7?.who));
           continue;
         }
-        if (!SUSP_KINDS.has(str6(s7.kind))) {
+        if (!SUSP_KINDS.has(str7(s7.kind))) {
           drop("suspicion", s7, "없는 의심 종류", who);
           continue;
         }
@@ -3980,7 +2459,7 @@ ${rules2}`;
           drop("suspicion", s7, ev, who);
           continue;
         }
-        const target = s7.target === "@user" ? "@user" : nameOf(str6(s7.target)) ?? plain(s7.target, 30);
+        const target = s7.target === "@user" ? "@user" : nameOf(str7(s7.target)) ?? plain(s7.target, 30);
         const text4 = plain(s7.text, 200);
         if (!target || !text4) {
           drop("suspicion", s7, "대상 또는 본문 없음", who);
@@ -4007,7 +2486,7 @@ ${rules2}`;
       const seen2 = /* @__PURE__ */ new Set();
       const known = knownFactionCodes(store, input3.factionNames);
       for (const f of r.faction_cues ?? []) {
-        const raw = str6(f?.faction).trim();
+        const raw = str7(f?.faction).trim();
         const code2 = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input3.factionNames[c] && raw && input3.factionNames[c] === raw) || "";
         if (!code2) {
           drop("faction", f, "모르는 세력 이름", raw);
@@ -4040,17 +2519,17 @@ ${rules2}`;
     if (ctx2.wallet && input3.wallet && !ctx2.only?.length) {
       const seen2 = /* @__PURE__ */ new Set();
       for (const t of (r.transactions ?? []).slice(0, 6)) {
-        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parseWon(str6(t?.amount));
+        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parseWon(str7(t?.amount));
         if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
           drop("wallet", t, "금액을 읽을 수 없음");
           continue;
         }
-        const ev = evidence(str6(t.m), str6(t.quote));
+        const ev = evidence(str7(t.m), str7(t.quote));
         if (typeof ev === "string") {
           drop("wallet", t, ev);
           continue;
         }
-        if (!mentionsAmount(str6(t.quote)) && !/\d/.test(str6(t.quote))) {
+        if (!mentionsAmount(str7(t.quote)) && !/\d/.test(str7(t.quote))) {
           drop("wallet", t, "인용에 금액이 없음");
           continue;
         }
@@ -4061,7 +2540,7 @@ ${rules2}`;
           continue;
         }
         seen2.add(key2);
-        report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str6(t.quote).slice(0, 120) });
+        report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str7(t.quote).slice(0, 120) });
         report.applied.transactions++;
       }
     }
@@ -4072,7 +2551,7 @@ ${rules2}`;
       for (const d of (r.debriefs ?? []).slice(0, 6)) {
         const v = validateDebrief(d, input3.ended);
         if (!v.ok) {
-          drop("debrief", d, v.reason, str6(d?.who));
+          drop("debrief", d, v.reason, str7(d?.who));
           continue;
         }
         if (seen2.has(v.value.id)) {
@@ -4092,9 +2571,9 @@ ${rules2}`;
     if (ctx2.settings.director === "facts") {
       const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
       for (const n2 of r.next_note ?? []) {
-        const who = nameOf(str6(n2?.who));
+        const who = nameOf(str7(n2?.who));
         if (!who || !input3.people.includes(who)) {
-          drop("note", n2, "장면 인물이 아님", str6(n2?.who));
+          drop("note", n2, "장면 인물이 아님", str7(n2?.who));
           continue;
         }
         const now = plain(n2.now, 160);
@@ -4135,7 +2614,7 @@ ${rules2}`;
     const list4 = msgs3(chat);
     const match = nameMatcher([{ name: who, aliases, titles: [] }]);
     const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns2);
-    return bots.filter((i) => match(messageText(str6(list4[i].data))).length || list4[i - 1] && match(messageText(str6(list4[i - 1].data))).length);
+    return bots.filter((i) => match(messageText(str7(list4[i].data))).length || list4[i - 1] && match(messageText(str7(list4[i - 1].data))).length);
   }
   function rhythmTextOk(key2, text4) {
     if (key2 === "scene") {
@@ -4385,37 +2864,4 @@ ${rules2}`;
     "How well someone matches a person's taste, the personal affinity accumulated through experience, and the conduct the actual relationship permits are separate. A stranger may catch someone's attention without gaining trust or permission to approach. A long-cherished colleague may not fit someone's romantic taste. A person may feel drawn to someone while resenting or distrusting them. Never use one axis as a substitute for another. Read the person's base personality, social role, current circumstances and established relationships first; apply personal affinity, taste, intent and approach style on top of them. A person without special affinity may still be polite, make small talk, and cooperate at work. Curt behavior and personal hostility are different things.",
     "",
     "### 7.2 The person's profile (`values`, `personality`)",
-    "`values` is the stable judgment profile written at development time: what the person values, in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for a background figure.",
-    "",
-    "Keep these elements of a profile distinct when you reason and when you write `personality` or `relationship` entries:",
-    "- **Scope of interest**: who can be an object of romantic or sexual interest at all. Having no such targets is valid. Being outside the scope does not remove friendship, respect, aesthetic appreciation or camaraderie.",
-    "- **Attractive elements**: observable traits with testable evidence (「다른 사람을 위해 손해를 감수한 사람」), not labels (「착한 사람」).",
-    "- **Repellent elements**: never the automatic opposite of attractive ones. A person who likes strength may dislike someone who pretends to be strong more than someone who is weak.",
-    "- **Primary tastes**: what matters most; do not change it from scene to scene without evidence.",
-    "- **Values**: the order in which the person evaluates people and what they consider irrelevant.",
-    "- **Observation criteria**: which visible surfaces this person actually examines (clothing, equipment, speech, conduct, skill).",
-    "- **Biases**: the person's own logic for reading those surfaces. Distinguish a general bias from a judgment about one target.",
-    "- **Form of feeling**: the direction the feeling takes: appreciation, romantic attachment, protection, possession, competition, physical interest.",
-    "- **Restraint and approach style**: how strongly feelings are concealed and through what conduct they show. Concealing well does not mean feeling little. `express` (0–3) is the single baseline for how readily emotion becomes visible; it describes visibility, not intensity. Lower values yield fewer and subtler cues, higher values clearer and more immediate ones.",
-    "",
-    "Ground taste in appearance, attitude and speech, directly observed ability, known status and reputation, actual sensory information and relationship context. An ability supports direct observation only after it is displayed; a report about an ability is transmitted reputation. When the person is not close enough or lacks the relevant sensory channel, never use scent, touch or minute expressions as evidence.",
-    "",
-    "Update `personality` for taste only after genuinely contradictory reactions recur or an event changes the person's values. Paying a cost for a bias, or accumulating counterexamples, may justify a change. One target being an exception does not rewrite the whole person.",
-    "",
-    "### 7.3 From observation to appraisal",
-    "First determine which features of the user's character this person actually observed or was told. Then connect them to the person's tastes, aversions and values. Without evidence, do not invent special attraction or dislike. When different persons like the same target, each needs their own reason; never make everyone like a target identically, and never force one person to dislike the target merely to create contrast.",
-    "",
-    "Status, wealth and reputation reach a person only through displays, statements or introductions, a reputation attached to a name the person already knows, or observable material signals. Worn clothing is an observation; 「가난해 보임」 is an interpretation produced by applying a bias to it. The user's actual background in the persona or lorebook is not known to the observer by itself.",
-    "",
-    "A mistaken interpretation can be internally consistent with the evidence the person has. Do not correct it with narrator knowledge. New facts may break the interpretation, but the attitude may remain until the person actually changes it.",
-    "",
-    "When elements conflict, do not average them away. Pick the mode the span supports:",
-    "- **Ignore**: the person does not value that element, so there is no inner conflict. Do not force tension.",
-    "- **Accept the cost**: the person sees the problem and accepts it for another reason. Preserve what is accepted and which condition could destabilize the choice.",
-    "- **Yield to constraint**: values or constraints suppress behavior while attraction remains. The person may keep noticing the target while outwardly belittling them.",
-    "",
-    "When a person learns their interpretation was wrong, judge attitude change separately: they may find another reason to keep the old attitude, overcorrect in the opposite direction, or admit the mistake and change how they treat the target. Choose the one the span shows; never apply all possibilities at once, and never assume attitude and interpretation changed at the same time.",
-    "",
-    "### 7.4 Recording appraisals and intent in `relationship`",
-    "Risupot kept these in eight separate fields; here they are entries in the `relationship` slot toward `@user`, each with a short Korean prefix so they can be told apart. Write each only with evidence, as an interpretation, and only when it is new or changed:",
-    "- 「첫인상:」 **first impression**, written once, when the person first speaks with or is addressed by the user's character in a confirmed span and no 첫인상 entry exists. Visible cue → the subjective image the person formed → the resulting feeling and its personality-based reason, from scene-visible face, build, grooming, clothing, equipment, carried items, posture or expression and the person's known tastes and biases. Example of reasoning, not of fact: a person who values money sees expensive clothes and a watch, infers wealth, and feels anticipation; an ostentation-averse person se
+    "`values` is the stable judgment profile written at development time: what the person values, in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for 

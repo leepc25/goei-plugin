@@ -18,7 +18,8 @@ export function toast(key: string, text: string, clear: (text: string) => void):
       const el = document.querySelector<HTMLElement>(`.gx-toast[data-toast="${key}"]`);
       if (!el) return;
       el.classList.add('out');
-      setTimeout(() => el.remove(), 300);
+      // 바뀐 곳만 다시 그리기(morph)가 그 사이 이 요소를 다른 칸(예: 설정 본문)으로 바꿔 썼을 수 있다 → 아직 토스트일 때만 지운다 (2026-11-06: 기본값 불러오기 뒤 설정 칸이 사라짐)
+      setTimeout(() => { if (el.matches(`.gx-toast[data-toast="${key}"]`)) el.remove(); }, 300);
     }, ms);
     timers.set(key, { text, id });
   }

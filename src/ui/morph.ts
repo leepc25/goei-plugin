@@ -6,6 +6,12 @@
 
 const KEEP = ['.ph-drawer', '.gx-mbar'];
 
+/** change 로 값을 넘긴 칸: 아직 포커스가 있어도 다음 한 번은 새 값(예: 「120만」→「1,200,000」)으로 맞춘다 (2026-11-06, 시험 browser.mjs 시작 잔고) */
+let committed: Element | null = null;
+export function markCommitted(el: Element | null): void {
+  committed = el;
+}
+
 function syncAttrs(a: Element, b: Element): void {
   for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
   for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
@@ -13,7 +19,7 @@ function syncAttrs(a: Element, b: Element): void {
 
 /** 입력칸의 「지금 값」을 새 HTML 의 값으로 (속성만 맞추면 한 번 손댄 칸은 화면이 안 바뀐다) */
 function syncForm(a: Element, b: Element): void {
-  const active = document.activeElement === a;
+  const active = document.activeElement === a && a !== committed;
   if (a instanceof HTMLInputElement && b instanceof HTMLInputElement) {
     if (a.type === 'checkbox' || a.type === 'radio') {
       if (a.checked !== b.hasAttribute('checked')) a.checked = b.hasAttribute('checked');
@@ -79,4 +85,5 @@ export function morph(root: Element, html: string): void {
   const tpl = document.createElement('template');
   tpl.innerHTML = html;
   morphChildren(root, tpl.content as unknown as Element);
+  committed = null;
 }
