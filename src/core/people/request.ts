@@ -59,6 +59,8 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         maxChars: Math.floor(o.settings.blockCap / people.length),
         taste: o.settings.features.has('taste'),
         openness: o.settings.features.has('openness'),
+        axes: o.settings.features.has('axes'),
+        features: o.settings.features,
       }),
     );
   }

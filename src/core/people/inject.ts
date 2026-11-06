@@ -6,7 +6,8 @@ const REGISTER_EN: Record<string, string> = { 존댓말: 'formal (존댓말)', �
 import { liveEntries, plain, type Liveness } from './store';
 import { fixedSections } from './seed';
 import { norm } from './store';
-import { OPENNESS_MAX, TASTE_STAGES, opennessStage, type Change, type Entry, type PeopleStore, type Person } from './types';
+import { OPENNESS_MAX, SLOT_META, TASTE_STAGES, opennessStage, slotsFor, type Change, type Entry, type PeopleStore, type Person, type SlotId } from './types';
+import { axesLinesEn } from './axes';
 
 const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   0: 'Expression: almost never shown; appears only through actions and priorities, not words.',
@@ -30,9 +31,28 @@ export interface BlockOpts extends AffinityOpts {
   /** 켜진 선택 기능 (taste·openness 줄을 넣을지) */
   taste?: boolean;
   openness?: boolean;
+  /** 성격 6축 줄을 넣을지 (기능 axes) */
+  axes?: boolean;
+  /** 켜진 기능 (전용 칸을 넣을지 정함). 없으면 기본 칸만 */
+  features?: Set<string>;
 }
 
 const lines = (list: Entry[]) => list.map((e) => `- ${plain(e.text, 300)}`).join('\n');
+/** 대상 칸: 유저 대상은 그대로, 다른 인물 대상은 「→ 이름:」 */
+const targetedLines = (list: Entry[], user: string) => list.map((e) => `- ${e.target && e.target !== '@user' ? `→ ${e.target}: ` : ''}${plain(e.text, 300)}`).join('\n');
+/** 기능별 전용 칸 묶음 (2026-11-06 「I」): 켜진 기능의 칸만, 비어 있으면 뺀다 */
+const FEATURE_GROUPS: { title: string; slots: SlotId[] }[] = [
+  { title: 'Taste and appraisal', slots: ['affinity.profile', 'affinity.values', 'affinity.appraisal', 'affinity.current_appraisal', 'affinity.intent', 'affinity.stance', 'affinity.bind', 'affinity.private', 'affinity.approach', 'affinity.surface_actual'] },
+  { title: 'Address and relationship stage', slots: ['register.context', 'register.stage_assessment', 'register.knowledge_gap', 'register.restraint'] },
+  { title: 'Perception', slots: ['perception.profile', 'perception.modifiers', 'perception.channels', 'perception.reading', 'perception.secret'] },
+  { title: 'Intimacy conditions', slots: ['openness.context'] },
+];
+const SLOT_EN: Record<string, string> = {
+  'affinity.profile': 'Taste profile', 'affinity.values': 'Values and biases', 'affinity.appraisal': 'First impression (fixed)', 'affinity.current_appraisal': 'Current appraisal', 'affinity.intent': 'Intent', 'affinity.stance': 'Stance', 'affinity.bind': 'Constraint', 'affinity.private': 'Unexpressed', 'affinity.approach': 'Approach', 'affinity.surface_actual': 'Surface vs purpose',
+  'register.context': 'Address conditions', 'register.stage_assessment': 'Relationship stage', 'register.knowledge_gap': 'Last contact', 'register.restraint': 'Restraint',
+  'perception.profile': 'Observation tendency', 'perception.modifiers': 'Current impairments', 'perception.channels': 'Scene conditions', 'perception.reading': 'Clues read', 'perception.secret': 'Secrets held',
+  'openness.context': 'Conditions',
+};
 
 /** 예산을 넘으면 오래된 항목부터 뺀다: 지난 일 → 아는 것 → 행동 → 장면 → 목표 순. 다른 절은 그대로 */
 const TRIM_ORDER: (keyof Person['slots'])[] = ['history', 'knowledge', 'behavior', 'scene', 'threads'];
@@ -55,6 +75,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   if (id.length) out.push('Identity:\n' + lines(id));
   const per = slot('personality');
   if (per.length) out.push('Personality:\n' + lines(per));
+  if (o.axes) out.push('Personality axes (baseline traits, not current feeling):\n' + axesLinesEn(p.axes).join('\n') + (p.patterns?.length ? '\nLong-term changes:\n' + p.patterns.map((t) => `- ${plain(t, 300)}`).join('\n') : ''));
   if (o.sheet && mode === 'split') for (const s of fixedSections(o.sheet)) out.push(`${s.name}:\n${s.body}`);
   const st = slot('state');
   if (st.length) out.push('Current state:\n' + lines(st));
@@ -81,6 +102,13 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   }
   if (relOther.length) out.push('Relationships with others:\n' + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));
   if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);
+  // 기능별 전용 칸 (켜진 기능만)
+  const enabled = new Set(slotsFor(o.features ?? new Set()));
+  for (const g of FEATURE_GROUPS) {
+    const parts = g.slots.filter((s) => enabled.has(s)).map((s) => ({ s, list: slot(s) })).filter((x) => x.list.length);
+    if (!parts.length) continue;
+    out.push(`${g.title}:\n` + parts.map((x) => `${SLOT_EN[x.s] ?? SLOT_META[x.s].label}:\n${targetedLines(x.list, user)}`).join('\n'));
+  }
   const sp = slot('speech').filter((e) => e.target && e.target !== '@user');
   if (sp.length) out.push('Speech toward others:\n' + sp.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));
   const be = slot('behavior');

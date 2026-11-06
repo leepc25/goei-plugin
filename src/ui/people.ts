@@ -14,7 +14,8 @@ import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, DOC_TYPES, FACTION_MAX, FACTION_MIN, FACTION_STAGES, REGISTERS, SLOTS, STAGES, TASTE_STAGES, factionWho, opennessStage, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, AXIS_LABEL, CORE_SLOTS, DOC_TYPES, FACTION_MAX, FACTION_MIN, FACTION_STAGES, FEATURE_SLOTS, REGISTERS, SLOTS, SLOT_META, STAGES, TASTE_STAGES, factionWho, opennessStage, slotsFor, stageOf, type Candidate, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { approveCandidate, axesView, candidateStats, liveEvidence, rejectCandidate, revertCandidate } from '../core/people/axes';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 import { toast } from './toast';
@@ -115,23 +116,16 @@ export function bindPeopleHold(root: HTMLElement): void {
 
 // ── 공통 조각 ──
 
-const SLOT_LABEL: Record<SlotId, string> = {
-  identity: '기본정보', personality: '성격', state: '현재 상태', relationship: '인간관계', speech: '말투', behavior: '행동 경향', knowledge: '아는 정보', threads: '목표·미해결', history: '주요 행적', scene: '현재 장면', suspicion: '의심',
-};
+const SLOT_LABEL = Object.fromEntries(SLOTS.map((s) => [s, SLOT_META[s].label])) as Record<SlotId, string>;
 /** 칸 이름의 한 줄 도움말 (title) */
-const SLOT_HELP: Record<SlotId, string> = {
-  identity: '이름·나이·소속·외모처럼 잘 바뀌지 않는 기본 정보. 로어북 시트의 Identity 절이 시작값',
-  personality: '성격·가치관·버릇. 시트의 Character 절이 시작값이고 이야기에서 드러난 면이 더해져요',
-  state: '지금의 몸·마음 상태(부상·피로·기분 등). 바뀌면 이전 항목을 대신해요',
-  relationship: '주인공·다른 인물에 대한 감정과 관계. 「→ 이름」은 그 대상에 대한 것',
-  speech: '말투·호칭 습관(존댓말·반말, 자주 쓰는 표현)',
-  behavior: '자주 보이는 행동 패턴과 반응 경향',
-  knowledge: '이 인물이 알게 된 것·모르는 것. 본편에서 비밀을 함부로 누설하지 않게 해요',
-  threads: '이 인물의 목표와 아직 풀리지 않은 일',
-  history: '이야기 속에서 한 주요 행동·겪은 일 (오래된 것부터 접혀요)',
-  scene: '지금 장면에서의 위치·행동 (짧게 유지돼요)',
-  suspicion: '누구를·무엇을 의심하는지 (정체·배신·거짓말·오염·범행)',
-};
+const SLOT_HELP = Object.fromEntries(SLOTS.map((s) => [s, SLOT_META[s].help])) as Record<SlotId, string>;
+/** 기능별 전용 칸 묶음 (사원증에서 기능별로 묶어 보임, 2026-11-06 「I」) */
+const SLOT_GROUPS: { key: string; title: string; help: string; slots: SlotId[] }[] = [
+  { key: 'affinity', title: '취향·평가', help: '호감 기능의 전용 칸. 이 인물 자체의 취향·가치와, 대상마다의 첫인상·현재 평가·의도·태도·제약·속마음·접근·겉과 속', slots: FEATURE_SLOTS.filter((s) => s.startsWith('affinity.')) },
+  { key: 'register', title: '호칭·관계 단계', help: '호칭·말투 기능의 전용 칸. 호칭 적용 조건·관계 단계·마지막 접점·절제', slots: FEATURE_SLOTS.filter((s) => s.startsWith('register.')) },
+  { key: 'perception', title: '인식', help: '인식 기능의 전용 칸. 관찰 성향·현재 손상·장면 조건·단서 읽기·비밀', slots: FEATURE_SLOTS.filter((s) => s.startsWith('perception.')) },
+  { key: 'openness', title: '음란도 조건', help: '음란도 기능의 전용 칸. 친밀한 상황에서 실제로 보인 태도·조건', slots: FEATURE_SLOTS.filter((s) => s.startsWith('openness.')) },
+];
 const SRC_LABEL: Record<EntrySrc, string> = { seed: '시트', story: '본편', field: '필드', manual: '수동' };
 const SRC_HELP: Record<EntrySrc, string> = {
   seed: '출처: 시트 — 로어북 시트·필드 대사에서 가져온 시작값',
@@ -219,6 +213,7 @@ async function setVars(ctx: ChatContext, env: PeopleEnv, vars: Record<string, st
 
 const FEATURE_HELP: Record<Feature, [string, string]> = {
   affinity: ['호감', '계기(작은친절·도움·배신…)를 기록하고 8단계로 계산해요'],
+  axes: ['성격 6축', '인물마다 관계 주도성·표현 직접성·감정 표출성·경계 성향·충동성·관계 지속성을 0~100으로 둬요. 갱신기는 「이 장면에서 이런 모습이 보였다」는 관찰만 돌려주고, 같은 방향 관찰이 4번·세 장면 이상 쌓이면 사원증에 「성격이 바뀐 것 같아요」가 떠요. 승인해야 축이 움직여요. 리수폿 People'],
   register: ['호칭·말투', '이 인물이 주인공을 부르는 말과 존댓말·반말 변화'],
   perception: ['인식', '이 인물이 아는 것·모르는 것(비밀 누설 방지)'],
   perception_ext: ['인식 확장', '감각 경로·관찰 성향까지 기록해요'],
@@ -641,6 +636,30 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
 }
 
 /** 선택 기능 카드: 취향 띠·음란도 (켜져 있을 때만) */
+/** 성격 6축 카드 (기능 axes): 축 막대 + 검토할 변화 후보 + 승인한 변화 (되돌리기). 2026-11-06 「F」 */
+function axesCard(ctx: ChatContext, p: Person, live: Liveness): string {
+  if (!peopleSettings(ctx.chat.scriptstate).features.has('axes')) return '';
+  const bars = axesView(p.axes).map((a) => `<div class="pp-axis" title="${esc(a.band)}"><div><b>${esc(a.label)}</b><span>${a.value}</span></div><span class="pp-axis-bar"><i style="width:${a.value}%"></i></span><small>${esc(a.band)}</small></div>`).join('');
+  const from = p.axesFrom === 'default' ? '시작값: 아직 모델이 정하지 않음 (표현 정도만 반영된 기본값)' : p.axesFrom === 'model' ? '시작값: 갱신기가 시트·본편에서 정함' : '사용자가 승인·수정한 값';
+  const all = Object.values(p.candidates ?? {});
+  const withStats = all.map((c) => ({ c, st: candidateStats(c, live) }));
+  const review = withStats.filter((x) => x.c.status === 'collecting' && x.st.ready);
+  const collecting = withStats.filter((x) => x.c.status === 'collecting' && !x.st.ready && x.st.n > 0);
+  const approved = withStats.filter((x) => x.c.status === 'approved');
+  const what = (c: Candidate, delta: number) => (c.axis === 'pattern' ? `장기 변화 ${c.direction === 'weaken' ? '지우기' : '추가'}: ${c.pattern}` : `${AXIS_LABEL[c.axis]} ${delta > 0 ? '+' : ''}${delta} — ${c.pattern}`);
+  const evList = (c: Candidate) => liveEvidence(c, live).map((e) => { const no = msgNo(e.anchor, live); return `<li><small>${no ? `${no} ` : ''}${esc(e.reason)}${e.quote ? ` <q>${esc(e.quote)}</q>` : ''}</small></li>`; }).join('');
+  const reviewHtml = review.length
+    ? `<div class="pp-cands"><p class="pp-extra"><b>성격이 바뀐 것 같아요</b> <small>같은 방향 관찰이 쌓였어요. 승인하면 축이 움직이고, 거절하면 이 후보는 더 모으지 않아요.</small></p>${review.map(({ c, st }) => `<div class="pp-cand"><div class="pp-cand-main">${esc(what(c, st.delta))}<small> · 관찰 ${st.n}회 · 장면 ${st.scenes} · 확신 ${st.confidence}</small></div><ul class="pp-cand-ev">${evList(c)}</ul><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-axis-approve" data-value="${esc(`${p.name}|${c.id}`)}" ${peopleUi.busy ? 'disabled' : ''}>승인</button><button class="gx-mini danger" data-action="pp-axis-reject" data-value="${esc(`${p.name}|${c.id}`)}" ${peopleUi.busy ? 'disabled' : ''}>거절</button></div></div>`).join('')}</div>`
+    : '';
+  const approvedHtml = approved.length
+    ? `<details class="ps-adv-sub" data-keep="pp-axes-approved"${keepOpen('pp-axes-approved')}><summary>승인한 변화<b>${approved.length}</b></summary><ul class="pp-entries">${approved.map(({ c }) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(c.applied && 'axis' in c.applied ? `${AXIS_LABEL[c.applied.axis]} ${c.applied.before} → ${c.applied.after} — ${c.pattern}` : what(c, 0))}</span></div><div class="pp-entry-meta"><span class="pp-entry-btns"><button class="gx-mini pp-mini" data-action="pp-axis-revert" data-value="${esc(`${p.name}|${c.id}`)}" title="이 변화를 전으로 되돌려요">되돌리기</button></span></div></li>`).join('')}</ul></details>`
+    : '';
+  const collectingHtml = collecting.length
+    ? `<details class="ps-adv-sub" data-keep="pp-axes-collecting"${keepOpen('pp-axes-collecting')}><summary title="아직 검토 조건(관찰 4회·장면 3개·확신 55)을 못 채운 후보">모으는 중<b>${collecting.length}</b></summary><ul class="pp-entries">${collecting.map(({ c, st }) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(what(c, st.delta))}<small> · 관찰 ${st.n}회 · 장면 ${st.scenes} · 확신 ${st.confidence}</small></span></div><ul class="pp-cand-ev">${evList(c)}</ul></li>`).join('')}</ul></details>`
+    : '';
+  return `<section class="pp-card"><h4 title="성격의 바탕 6축 (0~100). 갱신기는 관찰만 돌려주고, 쌓인 관찰을 사용자가 승인해야 축이 움직여요">성격 6축</h4><div class="pp-card-body"><div class="pp-axes">${bars}</div><small class="ps-note">${esc(from)}</small>${p.patterns.length ? `<p class="pp-extra"><b>장기 변화</b></p><ul class="pp-entries">${p.patterns.map((t) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(t)}</span></div></li>`).join('')}</ul>` : ''}${reviewHtml}${approvedHtml}${collectingHtml}</div></section>`;
+}
+
 function extraCards(ctx: ChatContext, p: Person, changes: Change[]): string {
   const f = peopleSettings(ctx.chat.scriptstate).features;
   const out: string[] = [];
@@ -696,12 +715,20 @@ export function personView(ctx: ChatContext, name: string): string {
         <label class="pp-check"><input type="checkbox" data-change="pp-addr-pin" ${peopleUi.addrPin ? 'checked' : ''}> 고정 (갱신기가 바꾸지 못하게)</label>
         <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-addr-save" data-value="${esc(name)}" ${peopleUi.busy ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="pp-addr-cancel">취소</button></div></div>`
     : `<div class="pp-addr">${addr.toUser ? `<b title="이 인물이 주인공을 부르는 말">「${esc(addr.toUser)}」</b>` : '<span class="pp-addr-none">아직 없음 — 본편에서 부르는 말이 확인되면 기록돼요</span>'}<span class="gx-badge" title="주인공에게 쓰는 말투">${esc(addr.register)}</span>${p.address.pin ? `<span class="gx-badge live" title="고정: 갱신기가 호칭·말투를 바꾸지 못해요">${ICONS.pin}고정</span>` : ''}<button class="gx-mini" data-action="pp-addr-edit" data-value="${esc(name)}" title="호칭과 말투를 직접 적어요">직접 수정</button></div>`;
-  const slots = SLOTS.map((s) => {
+  const enabledSlots = new Set(slotsFor(peopleSettings(ctx.chat.scriptstate).features));
+  const slotSection = (s: SlotId) => {
     const all = p.slots[s] ?? [];
-    if (!all.length) return '';
+    if (!all.length || !enabledSlots.has(s)) return '';
     const aliveN = liveEntries(all, live).length;
     return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s}`, (e, st) => entryRow(ctx, name, s, e, live, st))}</section>`;
+  };
+  // 기본 칸 → 기능별 전용 칸 묶음 (꺼진 기능의 칸은 통째로 숨김)
+  const groups = SLOT_GROUPS.map((g) => {
+    const body = g.slots.map(slotSection).join('');
+    return body ? `<details class="ps-adv-sub pp-group" data-keep="pp-group:${g.key}"${keepOpen(`pp-group:${g.key}`)} open><summary title="${esc(g.help)}">${esc(g.title)}<b>${g.slots.reduce((n, s) => n + (enabledSlots.has(s) ? liveEntries(p.slots[s] ?? [], live).length : 0), 0)}</b></summary><div class="pp-group-body">${body}</div></details>` : '';
   }).join('');
+  const hiddenN = FEATURE_SLOTS.filter((s) => !enabledSlots.has(s) && (p.slots[s]?.length ?? 0) > 0).length;
+  const slots = CORE_SLOTS.map(slotSection).join('') + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : '');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
   const busyNow = peopleUi.busy || peopleStatus().busy ? 'disabled' : '';
@@ -709,7 +736,7 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${affinityBar(aff.value)}${affEdit}</div></section>${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${extraCards(ctx, p, changes)}
       <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}
@@ -909,6 +936,24 @@ export async function handlePeople(action: string, value: string | undefined, ct
         return true;
       });
       return true;
+    case 'pp-axis-approve':
+    case 'pp-axis-reject':
+    case 'pp-axis-revert': {
+      const i = v.indexOf('|');
+      const who = v.slice(0, i);
+      const id = v.slice(i + 1);
+      await mutate(ctx, env, (store, chat) => {
+        const p = store.people[who];
+        if (!p) return false;
+        const now = new Date().toISOString();
+        const err = action === 'pp-axis-approve' ? approveCandidate(p, id, liveness(chat), now) : action === 'pp-axis-reject' ? rejectCandidate(p, id, now) : revertCandidate(p, id, now);
+        if (err) throw new Error(err);
+        return true;
+      });
+      peopleUi.info = action === 'pp-axis-approve' ? '성격 변화를 반영했어요.' : action === 'pp-axis-reject' ? '이 후보는 더 모으지 않아요.' : '전으로 되돌렸어요.';
+      env.render();
+      return true;
+    }
     case 'pp-change-void':
       await mutate(ctx, env, (store) => {
         const c = store.log.find((x) => x.id === v);

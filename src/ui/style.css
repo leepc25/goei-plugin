@@ -2690,6 +2690,21 @@ button.mk-go:hover { color: var(--signal); }
 .pp-oldbox > summary b { margin-left: 6px; font-weight: 600; }
 
 .pp-extra { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+/* 성격 6축 (2026-11-06 「F」) */
+.pp-axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pp-axis { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.pp-axis > div { display: flex; justify-content: space-between; font-size: 12px; }
+.pp-axis small { font-size: 11px; color: var(--dim); line-height: 1.35; }
+.pp-axis-bar { display: block; height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pp-axis-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent, #5eead4); }
+.pp-cands { display: flex; flex-direction: column; gap: 8px; }
+.pp-cand { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.pp-cand-main { font-size: 13px; line-height: 1.5; }
+.pp-cand-ev { margin: 0; padding-left: 16px; }
+.pp-cand-ev li { font-size: 12px; line-height: 1.45; color: var(--dim); }
+.pp-group > summary { font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.pp-group-body { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+@media (max-width: 520px) { .pp-axes { grid-template-columns: 1fr; } }
 .pp-extra b { font-size: 16px; margin-right: 6px; }
 
 /* 세력 평판 */

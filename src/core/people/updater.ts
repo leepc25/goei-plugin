@@ -7,6 +7,8 @@ import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
+import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
@@ -14,7 +16,7 @@ import { validateDebrief, type DebriefItem, type EndedNow } from '../journal/deb
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, SLOT_META, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, slotsFor, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -91,12 +93,12 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; turnCap?: number } = {}) {
-  const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
-  for (const s of SLOTS) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[] } = {}) {
+  const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
+  for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
-    entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}) }));
+    entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}), ...(e.pin ? { pin: true as const } : {}) }));
   }
   const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
   const addr = addressOf(p, changes);
@@ -108,6 +110,8 @@ export function personPayload(p: Person, live: Liveness, changes: Change[], unkn
     address_now: addr,
     ...(extra.taste ? { taste_now: tasteOf(p, changes) } : {}),
     ...(extra.openness ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
+    // 성격 6축 (기능 axes): 값·띠 설명, 아직 시작값이 없으면 axes_init_needed, 장기 변화
+    ...(extra.axes ? { axes: axesView(p.axes).map((a) => ({ axis: a.axis, value: a.value, band: a.band })), ...(p.axesFrom === 'default' ? { axes_init_needed: true } : {}), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
     entries,
     ...(unknown?.length ? { unknown_to: unknown } : {}),
   };
@@ -224,11 +228,11 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
-    slots: SLOTS.filter((s) => s !== 'suspicion' || o.settings.features.has('suspicion')),
+    slots: slotsFor(o.settings.features),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), turnCap: o.settings.turnCap }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features) }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))
@@ -262,7 +266,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
 export const LANG_EN_RULE = [
   '## Record language',
   'Write every free-text field you produce in English even where this document says Korean: entry `text`, cue `reason`, new person `identity` and `speech`, doc `text`, suspicion text, debrief `text`, and `next_note`.',
-  'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소] and 첫인상/현재 평가 labels, and every `quote`.',
+  'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소], slot names, and every `quote`.',
 ].join('\n');
 
 export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko'): string {
@@ -306,6 +310,10 @@ export interface UpdateResult {
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소감: 이번 턴 종료 사건의 담당 요원 소감 (사건당 1건) */
   debriefs?: { id: string; who: string; text: string }[];
+  /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
+  observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
+  /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
+  axes_init?: { who: string; axes: Record<string, number>; m: string; quote: string }[];
 }
 
 /** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
@@ -319,7 +327,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'observations', 'axes_init'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -329,7 +337,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -495,7 +503,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     newCount++;
   }
 
-  // 2. 칸 항목
+  // 2. 칸 항목 (켜진 기능의 칸만. 2026-11-06 「I」: 기능별 전용 칸)
+  const enabledSlots = slotsFor(ctx.settings.features);
   const perPerson = new Map<string, number>();
   for (const e of r.entries ?? []) {
     const who = nameOf(str(e?.who));
@@ -504,8 +513,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     const slot = e.slot as SlotId;
-    if (!SLOTS.includes(slot) || (slot === 'suspicion')) {
-      drop('entry', e, '없는 칸', who);
+    if (!enabledSlots.includes(slot) || slot === 'suspicion') {
+      drop('entry', e, enabledSlots.includes(slot) ? '의심은 suspicion 항목으로' : '없는 칸(또는 꺼진 기능의 칸)', who);
       continue;
     }
     // merge(정리)는 인용 없이 기준 메시지만, 그 밖은 인용이 원문에 있어야
@@ -573,6 +582,14 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       drop('entry', e, '본문 없음', who);
       continue;
     }
+    const meta = SLOT_META[slot];
+    // 대상 칸(첫인상·현재 평가·호칭 조건…)은 대상이 없으면 유저
+    const target = typeof e.target === 'string' && e.target ? (e.target === '@user' ? '@user' : nameOf(e.target) ?? plain(e.target, 40)) : meta.targeted && slot !== 'relationship' && slot !== 'speech' ? '@user' : undefined;
+    // 한 번 쓰면 안 고치는 칸(첫인상): 같은 대상에 이미 있으면 어떤 연산도 받지 않는다
+    if (meta.once && cur.some((x) => (x.target ?? '@user') === (target ?? '@user'))) {
+      drop('entry', e, '한 번 쓰면 고치지 않는 칸 (이미 있음)', who);
+      continue;
+    }
     let replaces: string | undefined;
     if (op === 'upsert') {
       const target = cur.find((x) => x.id === e.replace);
@@ -599,8 +616,74 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     const seq = nextSeq(ev.anchor);
-    const target = typeof e.target === 'string' && e.target ? (e.target === '@user' ? '@user' : nameOf(e.target) ?? plain(e.target, 40)) : undefined;
     if (putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, text), text, src: 'story', anchor: ev.anchor, seq, quote: e.quote, ...(target ? { target } : {}), ...(replaces ? { replaces } : {}) })) report.applied.entries++;
+  }
+
+  // 2b. 성격 6축 (기능 axes): 시작값은 axes_init_needed 인 인물만 한 번, 관찰은 후보에 모은다 (코드가 검토로 띄움, 축은 사용자 승인 뒤에만)
+  if (ctx.settings.features.has('axes')) {
+    const now = ctx.now ?? new Date().toISOString();
+    for (const p of Object.values(store.people)) ensureAxes(p);
+    report.applied.observations = 0;
+    report.applied.axesInit = 0;
+    for (const x of r.axes_init ?? []) {
+      const who = nameOf(str(x?.who));
+      if (!who) {
+        drop('axes_init', x, '명단에 없는 이름', str(x?.who));
+        continue;
+      }
+      const p = store.people[who];
+      if (p.axesFrom !== 'default') {
+        drop('axes_init', x, '이미 시작값이 있음', who);
+        continue;
+      }
+      const ev = evidence(x.m, x.quote);
+      if (typeof ev === 'string') {
+        drop('axes_init', x, ev, who);
+        continue;
+      }
+      const raw = x.axes && typeof x.axes === 'object' ? x.axes : null;
+      if (!raw || !AXES.every((a) => Number.isInteger(raw[a]) && raw[a] >= 0 && raw[a] <= 100)) {
+        drop('axes_init', x, '여섯 축 모두 0~100 정수여야 함', who);
+        continue;
+      }
+      setAxes(p, readAxes(raw), 'model');
+      report.applied.axesInit++;
+    }
+    const perWho = new Map<string, number>();
+    for (const x of r.observations ?? []) {
+      const who = nameOf(str(x?.who));
+      if (!who) {
+        drop('observation', x, '명단에 없는 이름', str(x?.who));
+        continue;
+      }
+      const axis = x.axis === 'pattern' ? 'pattern' : isAxis(x.axis) ? x.axis : null;
+      if (!axis) {
+        drop('observation', x, '없는 축', who);
+        continue;
+      }
+      if (!isDirection(x.direction) || (axis === 'pattern' ? !['new', 'weaken'].includes(x.direction) : !['up', 'down'].includes(x.direction))) {
+        drop('observation', x, '방향은 축이면 up|down, pattern 이면 new|weaken', who);
+        continue;
+      }
+      const ev = evidence(x.m, x.quote);
+      if (typeof ev === 'string') {
+        drop('observation', x, ev, who);
+        continue;
+      }
+      const n = (perWho.get(who) ?? 0) + 1;
+      if (n > 2) {
+        drop('observation', x, '인물당 2개 상한', who);
+        continue;
+      }
+      perWho.set(who, n);
+      const res = observe(store.people[who], { axis, direction: x.direction, pattern: str(x.pattern), anchor: ev.anchor, seq: nextSeq(ev.anchor), quote: x.quote, reason: str(x.reason) || str(x.pattern), strength: Number(x.strength ?? 50), confidence: Number(x.confidence ?? 50) }, now);
+      if (!res.ok) {
+        drop('observation', x, res.reason, who);
+        continue;
+      }
+      report.applied.observations++;
+    }
+    for (const p of Object.values(store.people)) pruneCandidates(p, live);
   }
 
   // 3. 호감 계기
@@ -988,6 +1071,8 @@ export function clearStoryRecords(store: PeopleStore, who: string): number {
   const before = store.log.length;
   store.log = store.log.filter((c) => !(c.who === who && c.src === 'story'));
   n += before - store.log.length;
+  // 모으는 중·거절된 성격 변화 후보도 이야기 기록이라 지운다 (승인·되돌린 것은 사용자 결정이라 남김)
+  for (const [id, c] of Object.entries(p.candidates ?? {})) if (c.status === 'collecting' || c.status === 'rejected') { delete p.candidates[id]; n++; }
   return n;
 }
 

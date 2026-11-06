@@ -3,7 +3,7 @@
 // 사라진 항목은 지우지 않는다 (화면에서 회색, 되살리기 가능).
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
-import { PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { AXES, PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, DEFAULT_AXES, EXPRESS_TO_AXIS, emptyStore, expressOf, type Candidate, type Change, type Doc, type Entry, type Observation, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 /** 채팅 마지막 메시지 chatId (없으면 #순번): 기록의 기준 자리 */
 export function anchorOf(chat: Chat): string {
@@ -46,7 +46,17 @@ export function peopleStore(chat: Chat): PeopleStore {
       address: { toUser: str(p.address?.toUser), register: REGISTERS.includes(p.address?.register as Register) ? (p.address!.register as Register) : '존댓말', ...(p.address?.pin ? { pin: true } : {}) },
       express: ([0, 1, 2, 3] as const).includes(p.express as 0) ? (p.express as 0 | 1 | 2 | 3) : 1,
       aliases: Array.isArray(p.aliases) ? p.aliases.filter((a): a is string => typeof a === 'string') : [],
+      axes: DEFAULT_AXES(),
+      axesFrom: p.axesFrom === 'model' || p.axesFrom === 'manual' ? p.axesFrom : 'default',
+      patterns: Array.isArray(p.patterns) ? p.patterns.filter((t): t is string => typeof t === 'string').slice(0, 30) : [],
+      candidates: readCandidates(p.candidates),
     };
+    const me = out.people[name];
+    // 축: 저장된 것이 있으면 읽고, 없으면 express 에서 (감정 표출성만). express 는 늘 축에서 다시 계산
+    if (p.axes && typeof p.axes === 'object') {
+      for (const a of AXES) if ((p.axes as Record<string, unknown>)[a] !== undefined) me.axes[a] = Math.max(0, Math.min(100, Math.round(Number((p.axes as Record<string, unknown>)[a]) || 0)));
+    } else me.axes.emotionalExpressiveness = EXPRESS_TO_AXIS[me.express];
+    me.express = expressOf(me.axes);
   }
   for (const [k, d] of Object.entries(raw.docs ?? {})) {
     if (!d || !DOC_TYPES.includes(d.type) || typeof d.key !== 'string') continue;
@@ -63,6 +73,17 @@ export function peopleStore(chat: Chat): PeopleStore {
   out.ignored = Array.isArray(raw.ignored) ? raw.ignored.filter((n): n is string => typeof n === 'string') : [];
   if (raw.identity && typeof raw.identity === 'object') out.identity = raw.identity;
   if (Array.isArray(raw.migrated)) out.migrated = raw.migrated.filter((m): m is string => typeof m === 'string');
+  return out;
+}
+
+function readCandidates(raw: unknown): Record<string, Candidate> {
+  const out: Record<string, Candidate> = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [id, c] of Object.entries(raw as Record<string, Partial<Candidate>>)) {
+    if (!c || typeof c !== 'object' || typeof c.pattern !== 'string' || typeof c.axis !== 'string') continue;
+    const evidence = Array.isArray(c.evidence) ? (c.evidence as Partial<Observation>[]).filter((e) => e && typeof e.id === 'string' && typeof e.anchor === 'string').map((e) => ({ id: e.id!, anchor: e.anchor!, seq: Number(e.seq) || 0, quote: str(e.quote), reason: str(e.reason), strength: Number(e.strength) || 0, confidence: Number(e.confidence) || 0, ...(e.void ? { void: true } : {}) })) : [];
+    out[id] = { id, axis: c.axis as Candidate['axis'], direction: (['up', 'down', 'new', 'weaken'] as const).includes(c.direction as 'up') ? (c.direction as Candidate['direction']) : 'up', pattern: c.pattern, evidence, status: (['collecting', 'approved', 'rejected', 'reverted'] as const).includes(c.status as 'collecting') ? (c.status as Candidate['status']) : 'collecting', at: str(c.at), ...(c.applied && typeof c.applied === 'object' ? { applied: c.applied } : {}) };
+  }
   return out;
 }
 
