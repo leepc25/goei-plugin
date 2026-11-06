@@ -1,0 +1,89 @@
+---
+name: goei-baekilmong-interior-1102
+description: 백일몽 본사 내부 배경 스레드(11-02) — 그릴 곳 최소안·로비 요청문 초안·브랜치
+metadata:
+  type: project
+  modified: 2026-11-02T11:02:36.622Z
+---
+- 2026-11-02 스레드 「백일몽 배경 뽑기」 cmsg_01SMy6spzkHA3Ttz9fg54ZY8SmqVz1PTszAmEUmmU7VbGf, 브랜치 claude/project-thread-hyzd0n (merge-1101 기반). 외관은 외부도로 스레드 담당, 이 스레드는 내부.
+- 설정 출처: docs/필드_거점_설계안.md 6장 (흰색·청록 #27685b·밝은 회색, 차가운 흰 면 조명, 제약 대기업 사옥).
+- 최소안 제안: 1층 로비 → 13층 복도 → 13층 D조 사무실. 나머지 층은 나중.
+- 로비 p1 요청문 = 협회 sdra_f1_p4 요청문 + 첫 문장 장소만 「pharmaceutical company HQ in Gangnam」, 분위기 구절에 「white and teal green tones, cool white panel lighting」 추가. specs/by_lobby_p1_prompt.txt. 11:05 사용자 「로비는 엘리베이터+왼쪽 현관만」 → 첫 초안 유지. 11:06 「뽑아」 → p1 생성(gen_bg.py, 에일린 256 색 끔, ORIG=협회 p4 NO_CEIL=1 FLOOR_40=1; FLOOR_40 옵션은 이 스레드가 prompt_diff에 추가). 결과 game-src/art/pixellab-baekilmong/by_lobby_p1_632x424.png: 현관·엘베·청록 OK, 천장 20%·오른쪽 기계실·바닥 앞 구석 물건 문제. 판단 대기.
+- 잔액 11-02 11:00: 구독 0회, 크레딧 $40.38.
+See [[daydream-sprites]].
+- 11:10 사용자 p1 격노 「무슨 공장이냐, 엘리베이터 왜 이리 멀어」. 원인 추정: 장소 줄 「pharmaceutical company」→ 배관·장비, 「cool white panel lighting」→ 천장 그려지고 엘베 멀어짐. **장소 줄·조명 말 바꾸지 말 것.** 11:11 사용자 「왜 자꾸 톤을 니가 정하려 그래」 → 톤·색 말 금지. p2 = 협회 p4 글자 그대로(specs/by_lobby_p2_prompt.txt), 「뽑아」 대기.
+- 11:11 사용자 격노 「백일몽이 무슨 청록이야」: 거점 설계안 6장의 팔레트(청록 등)는 사용자 결정 아님 — 쓰지 말 것. 색·톤은 Claude가 정하지 않는다.
+- 11:15~16 사용자 「요청문을 니가 잘 꾸며봐」「필요하면 로비도 만들고」「백일몽은 대기업 느낌」 → p3 요청문(specs/by_lobby_p3_prompt.txt, 1,993자): 대기업 본사 1층, 위쪽 뒷벽만, 엘베 flush·가깝게, 엘베 오른쪽 안내 데스크, 햇빛, 바닥 비움. 색 지정 없음. p2(p4 그대로)는 천장·먼 엘베·어두움으로 실패. 「뽑아」 대기.
+- 11:23 사용자 「제일 중요한 건 엘리베이터가 너무 멀면 안 돼」, 「바닥 비움 문장은 필요 없음」 → p3에서 바닥 비움 삭제, 엘베 「no recess around them… very close to the viewer」(1,996자). 「뽑아」 대기.
+- 11:27 p3 결과 by_lobby_p3_632x424.png: 엘베 flush·가까움 성공, 천장 얇은 띠, 대리석 고급, 안내 데스크. 단점: 휑함·대리석 얼룩 뭉개짐·오른쪽 끝 꺾인 벽. 판단 대기.
+- 11:28 사용자 p3 격노 「이게 뭐냐」. 원인: 채우기 구절을 「elegant, spotless entrance floor」로 바꾼 것 → 빈 대리석 방. **채우기 구절 「a busy, lived-in modern office floor」 절대 바꾸지 말 것.** p4 = p3 엘베 문장+데스크 유지, 채우기 원문 복귀, 장소 「headquarters of a large company in Seoul」, 햇빛 문장 삭제(specs/by_lobby_p4_prompt.txt). 「뽑아」 대기.
+- 11:29 사용자 「바쁘고 손때 묻은 사무실 층 ← 로비에 이건 아니지」 → p4 채우기 구절 = 「a busy, richly furnished main entrance floor of a big company, full of decor and fixtures, with real depth」(1,949자). 「뽑아」 대기.
+- 11:33 p4 결과 by_lobby_p4: 천장 없음·엘베 바닥선 가까움·안내 데스크(모니터)·조각상·차단줄, 대리석 고급. 바닥에 큰 타일 줄. 판단 대기.
+- 11:35 사용자 p4 「괜찮은데 너무 멀어」「가이드라인 그어서 넣어봐」「구도를 못 잡고 있어」 → guides/by_lobby_guide_v1.png(바닥선 y254, 엘베 246–386×36–254, 왼쪽 옆벽 모서리 x130+유리 양문, 데스크 450–632×196–272). gen_bg_guide.py에 GUIDE_USAGE·STYLE env 추가. 보낼 것 = p4 요청문 + 가이드 + 에일린 화풍. 「뽑아」 대기.
+- 11:42 g1(p4 요청문+가이드v1+화풍) 결과 by_lobby_g1: 엘베 크고 가까움(가이드보다 위 끝 낮음), 유리 현관·데스크 OK, 대신 고급감 떨어짐(배전반·바닥 종이·평범 타일). 판단 대기.
+- 11:42 사용자 g1 「이게 무슨 로비야 사무실이지」「고급지게 하라는 거 넣었어?」 → 넣지 않았었음. p6 요청문 = p4 + 「luxurious and grand」, 「fixtures」 삭제. 보낼 것: p6 + 가이드 v1 + 화풍. 「뽑아」 대기. **로비는 고급감 말을 반드시 넣을 것.**
+- 11:48 g2(p6+가이드v1+화풍) by_lobby_g2: 고급(나무·대리석·조형물), 엘베 가까움, 유리 현관·대리석 데스크, 위에 얇은 천장 띠. 판단 대기.
+- 11:51 사용자 g2 채택(「너무 멀긴 한데 이거라도 써야지, 원근 조절하면 되니까」) → by_lobby_final_632x424.png. 캐릭터 원근 배율은 게임 탑재 때 조정.
+- 11:52 다음 = 13층 조별 사무실. 요청문 specs/by_d_office_p1_prompt.txt = 관리국 hq_office_p5 + 장소(13th floor HQ of a large company) + 채우기 구절 luxurious·big company. 대조 ORIG=hq_office_p5 FLOOR_HALF=1 NO_CEIL=1. 「뽑아」 대기.
+- 11:53 사용자 「조별 사무실 아니라 복도를」, 「설정상 조별 사무실 전부 따로지만 그렇게 못 함」 → 복도에 사무실 문 하나(공용). 13층 복도 p1 = 협회 sdra_hall_p3 틀 + 장소·유리문 너머 팀 사무실·엘베 flush 문장·고급 채우기 구절(specs/by_f13_hall_p1_prompt.txt) + guides/by_f13_hall_guide_v1.png + 화풍. ORIG=hall_p3(wy99zh) NO_CEIL=1 FLOOR_40=1. 「뽑아」 대기.
+- 11:53 사용자 「2개만: 일반팀 사무실, 정예팀 사무실」 → 복도 왼쪽·오른쪽 유리 양문(가이드 문 x50–190, x442–582, y90–254). 1,990자.
+- 11:54 사용자: 13층 = 일반팀 사무실·정예팀 사무실·휴게실·남녀 화장실 5개. 안: 첫 장(엘베+사무실 문 2) → 오른쪽 잇기 휴게실 문 → 왼쪽 잇기 화장실 남·여 문(협회 B1처럼 하나씩). 방 안 그림은 관리국 재사용 추천(답 대기).
+- 11:57 13층 복도 g1 by_f13_hall_g1: 엘베·유리 양문 2 가깝고 큼, 월넛·대리석 고급, 천장 띠 약 12%, 바닥 약 26%(40% 아님). 판단 대기.
+- 11:57 사용자: 엘베 양옆에 사무실 바짝 붙은 건 비현실적(천장은 상관없음), 사무실 유리문은 불투명하게. → p2 첫 장 = 엘베만(specs/by_f13_hall_p2_prompt.txt, guides/by_f13_hall_guide_v2.png). 사무실 문은 잇기로 떨어뜨려 붙이고 문장은 frosted opaque glass double doors(faint 금지). 「뽑아」 대기.
+- 11:58 사용자 「첫 장에 엘베만 아깝다, 오른쪽 엘베·왼쪽 사무실 양문」 → p3(specs/by_f13_hall_p3_prompt.txt, frosted opaque, well apart) + guide v3(엘베 x452–592, 문 x50–190). 「뽑아」 대기.
+- 12:05 복도 g2(p3+가이드v3): 왼쪽 불투명 유리 양문·오른쪽 엘베 OK, 엘베 위 「13」 숫자, 벽에 구리 배관(공장 느낌 위험), 바닥 약 22%. 판단 대기.
+- 12:12 사용자 「일단 왼쪽으로 이어봐」(g2 바탕 by_f13_hall_base) → ext1L 요청문(여자 화장실 문, 나무 단문+픽토그램) keep192 new320 ov60 ERASE=1, 창 미리보기 올림, 「뽑아」 대기. 보낼 때 ORIG=hall_p3 NO_CEIL=1 FLOOR_40=1 (NO_FILL 쓰지 말 것).
+- 12:19 ext1L 결과 by_f13_hall_ext1L.png(952): 왼쪽 끝 나무 단문+여자 픽토그램, 이음 x337–377 쓰레기통 자리 자연스러움, 벽 배관 많음. $0.15. 판단 대기.
+- 12:22 사용자 ext1L 「개같이 망했네」. 추정: 문이 왼쪽 끝에 반쯤 끼임, 배관·판넬로 어수선. 어디가 문제인지 물음, 답 대기.
+- 12:22 사용자 「왜 왼쪽 끝에 처박아」 → 원인: 「left part」 문장+새 칸 320. v2: 「왼쪽 끝과 유리 양문 사이 가운데, 양옆 벽」, 양문과 같은 높이, new 260(specs/by_f13_hall_ext1L_v2_prompt.txt). 「뽑아」 대기.
+- 12:26 ext1L_v2(new260 ov72) by_f13_hall_ext1L_v2.png(892): 여자 문(나무+픽토그램 문 위) 양문 왼쪽 약 50px 옆, 이음 깔끔, 왼쪽 끝 기둥·그림 액자. 판단 대기.
+- 12:26 사용자 ext1L_v2 격노(문이 양문에 바짝·녹슨 주황 문). 「200px만 벽 잇기」 제안도 격노(「200px만 왜 이어」) → 쪼개 잇기 제안 금지. v3 = new320 keep192 ov72, 문 「left part, fully inside, wide stretch of wall from glass doors」, 짙은 광택 나무(specs/by_f13_hall_ext1L_v3_prompt.txt). 「뽑아」 대기.
+- 12:30 v3 결과: 문 또 왼쪽 끝, 가운데에 안쪽으로 꺾인 움푹한 통로(원근 깨짐), 바닥 무늬 이음 어긋남. 실패로 보고.
+- 12:33 사용자 「뭐하자는 거냐」 → v4 = 밑그림 창(벽·바닥 단색 + 문 자리 x110–200, 위 y125, 바닥선 y324) game-src/art/pixellab-baekilmong/by_f13_hall_ext1L_v4_sketch_window.png, extend_left.py에 SKETCH env 추가. 요청문 v3 그대로. 「뽑아」 대기.
+- 12:34 사용자: v3의 왼쪽 문 = 여자 화장실, 거기서 왼쪽으로 이어 남자 화장실 → ext2L(바탕 v3, keep192 new320 ov60, 여자 문 안 지움, 밑그림 문 x115–205) specs/by_f13_hall_ext2L_prompt.txt. 「뽑아」 대기.
+- 12:34 사용자 「아니다, 못쓰겠다」 v3 폐기(바닥 이음 안 맞음 x≈390). ext2L 준비 취소. 남은 안: g2 바탕 v4 밑그림 창(문 자리 그려 넣기).
+- 12:38 v4 결과 by_f13_hall_ext1L_v4.png(952): 여자 문 x10–110(밑그림보다 왼쪽), 온전, 양문과 약 290px 벽, 뒷벽 평평, 바닥 이음 맞음. 판단 대기.
+- 12:39 사용자 v4 이음 자리(x≈390, 위 판넬·띠) 끊김 지적 → 이음 띠 x330–395 y30–325 지우고 inpaint_region 1회 제안, 「뽑아」 대기.
+- 12:50 v5(윗띠 x320–512 y<128도 다시 그림, 위·아래 따로 DP 이음) by_f13_hall_ext1L_v5.png: 여자 문(적갈색 광택) x110–200 밑그림 자리 그대로, 판넬·은색 띠 고급. 그러나 양문 위 오른쪽(x≈490–510)에서 은색 띠·화면이 끊김. 주의: extend_left는 ov_top 구간을 결과에 안 붙임(DP는 ov 안만).
+- 12:49 사용자 「이 층 폐기」 → 13층 복도(g1·g2·ext1L v1~v5) 전부 폐기 판정. 파일은 지우지 않고 그대로 둠. 다음 지시 대기. 교훈: 잇기(extend_left)로 문 위치 잡기·이음 모두 실패 반복 — 말로 위치 지정 안 먹힘, 밑그림 창은 위치는 됨, 윗띠 이음 끊김.
+- 12:50 사용자 「13층 복도 다시 뽑자」「배관 덕지덕지 말고」. g3은 p3 그대로 이미 나감(배관 위험). p4 = p3 + 채우기 구절 「executive floor… clean wooden and marble wall paneling everywhere」(pipe 낱말 안 씀). 「뽑아」 대기.
+- 12:51 사용자 「프롬프트에 문제가 있다」 → 진단: 「Pack… walls full of objects; a busy… floor」가 빈 복도 벽을 배관·배전함·금속판으로 채움(협회 1층 배관도 같은 원인). 고칠 안: 물건 꽉 채우기 빼고 「고급 나무·대리석 판넬·벽등·액자, 디테일 촘촘」. 답 대기. g3(p3 그대로) 진행 중.
+- 12:52 사용자 「벽이라고 지정하지 마」「채우기는 필요하되 벽만 채울 필요 없음」 → p5 채우기 = 「Pack the whole image with objects, fine detail and texture everywhere, spread over the whole scene, not only on the walls; a richly decorated, luxurious and grand executive floor…」. 「뽑아」 대기.
+- 12:54 g3(p3 그대로) by_f13_hall_g3: 배관 없음, 따뜻한 나무·대리석 고급, 양문·엘베 가이드대로, 소화전 함에 엉터리 한글 「소시전」, 왼쪽 끝 모서리 벽. g4(p5) 진행 중.
+- 12:56 g4 (p5, PACK_FREE「Pack the whole image with objects... not only on the walls」+guide v3+style) posted: no pipes, wood/marble/gold luxury, frosted double doors L, elevator R. Floor only ~22%, empty floor. Awaiting user verdict.
+- 13:0x g4 왼쪽 잇기1 준비: specs/by_f13_hall_g4_ext1L_prompt.txt(p5에서 문 두 문장만 여자 화장실 문+오른쪽 끝 유리 양문으로), 밑그림 창 by_f13_hall_g4_ext1L_sketch_window.png(문 x117–203, keep192 new320 ov60). 보낼 때 ORIG=hall_p3 NO_CEIL FLOOR_40 PACK_FREE SKETCH. 「뽑아」 대기. 다음 잇기2 = 남자 화장실.
+- 13:12 g4 ext1L 결과 by_f13_hall_g4_ext1L.png(952): 여자 문(나무+픽토그램) 밑그림 자리 그대로, 양옆 벽등, 이음 x348–368 기둥에서 깔끔. $0.15. 다음 남자 화장실 잇기 2.
+- 13:15 이 스레드 첨부 24장 참 + 프로젝트 파일 저장소 50000개 꽉 참. ext2L(남자) 준비: specs/by_f13_hall_g4_ext2L_prompt.txt, 밑그림 창 by_f13_hall_g4_ext2L_sketch_window.png(바탕 g4_ext1L, keep192 new240 ov60, 문 x77–163 → 문 사이 간격 약 195로 여자문~유리문 간격과 같음). 미리보기 /tmp/claude-0/-home-user-goei-plugin/349d644d-8eac-5ed7-b5df-649d70b85af5/scratchpad/g4e2_prev.png. 「뽑아」 대기.
+- 13:17 새 스레드 「백일몽 13층 복도 이어서」 cmsg_01SMy6spzkHA3Ttz9fg54ZY8Xmma8U9pj9ZMrafurZH3dA 이어받음. 남자 화장실 ext2L은 옛 스레드가 보냄(여기선 안 보냄). 오른쪽 잇기1 준비: specs/by_f13_hall_g4_ext1R_prompt.txt(p5에서 문 두 문장만: 가운데 유리 양문=휴게실(사용자 13:18, 정예팀은 다른 층), 왼쪽 끝 엘베), 밑그림 by_f13_hall_g4_ext1R_sketch_window.png(keep192 new320 ov60, 문 이미지 x1060–1221). extend_right.py에 SKETCH 추가(9abf40f). 보낼 때 ORIG=hall_p3 NO_CEIL FLOOR_40 PACK_FREE SKETCH, 바탕은 남자 화장실 결과 그림. 「뽑아」 대기. 휴게실은 다음 잇기.
+- 13:19 사용자 「휴게실을 유리 양문으로 하면 안 되지」 → 추천안(나무 외문+커피잔 표지, 화장실 문과 같은 모양)으로 요청문·밑그림 고침(문 이미지 x1093–1189). 입구 모양 카드(나무 외문/문 없는 입구/유리벽) 답 대기.
+- 13:20 사용자 카드에서 「나무 외문+커피잔 표지」 선택(확정). 남자 화장실 결과 ed8f314 by_f13_hall_g4_ext2L.png(1192) 올림(이음 결함: 벽등 둘 붙음·장식띠 끊김·아래틀 계단). 오른쪽 잇기1은 ext2L 바탕, 「뽑아」 대기.
+- 13:26 오른쪽 잇기1 결과 by_f13_hall_g4_ext1R.png(1272, ext1L 바탕, $0.15): 휴게실 나무문+커피잔 표지 x≈870–935, 이음 x≈893(엘베 오른쪽 대리석 기둥). 결함: 이음 오른쪽 윗부분이 천장 띠·코니스로 바뀌고 바닥 대리석 결이 다름. 남자 화장실 다시 잇기 창 by_f13_hall_g4_ext2L_v2_sketch_window(keep192 new240 ov100) 「뽑아」 대기.
+- 13:26 사용자 「여긴 닫아」 → 백일몽 배경 뽑기 스레드 닫음. 이어서는 「백일몽 13층 복도 이어서」 스레드.
+- 13:33 남자 화장실 다시 잇기 v2 by_f13_hall_g4_ext2L_v2.png(1192, ov100): 윗띠 이어짐, 벽등 겹침 없음. 이음 x≈295–310(여자 문 왼쪽 장식 기둥 옆)에 가는 기둥 조각 겹침·아래 틀 작은 계단. 휴게실 v3 생성 중.
+- 13:36 휴게실 v3 by_f13_hall_g4_ext1R_v3.png(1208, 같은 창): 이음이 엘베 오른쪽 기둥에서 깔끔, 윗띠·바닥 이어짐, 바닥 물건 없음, 휴게실 문 처마 장식 달림. 기둥에 가는 점선 하나. 다음: ext2L_v2 + v3 오른쪽 합치기(사용자 허락 후).
+- 13:38 사용자 「여기 코드로 어떻게좀 해봐」(이음 x≈295 아래 틀) → by_f13_hall_g4_ext2L_v2_fix.png: x266–339를 생성 창 그대로 붙여 이음을 x340(여자 문틀 옆)으로 옮김, tools/bg_fix/by_f13_ext2L_v2_fix.py. 판정 대기.
+- 13:45 x340 이음 세 곳(사용자 13:38 핀) 손질: x340–346 옛 좁은 띠(y30–330)를 새 기둥 x333–339로 채움. 합친 전체판 by_f13_hall_g4_full.png 1448×424(남자·여자 화장실, 유리 양문, 엘베, 휴게실), tools/bg_fix/by_f13_hall_merge.py. 판정 대기. 관리국 화장실 배경 2장 보여 줌(13:39 요청).
+- 13:50 전체판 손질 by_f13_hall_g4_full_fix.png(tools/bg_fix/by_f13_hall_full_fix.py): 여자 문 옆 기둥 머리 오른쪽 끝 = 왼쪽 끝 뒤집어 붙임, 엘베 양옆 기둥 점선 x939·x1173 y13–255 이은 선. 판정 대기.
+- 13:48 사용자 「일단 이걸로 픽스」: 13층 복도 확정 = by_f13_hall_g4_full_fix.png(1448×424). 할 일: 마스크 따기 + 상호작용 연결. 화장실·휴게실 = 관리국 장면 그대로 재사용.
+- 13:50 사용자: 백일몽 15층 = 정예팀(사무실) + 남·여 샤워실 (위키도 15층 정예조·샤워실). 13층 = 복도·일반팀 사무실(유리 양문)·휴게실·화장실 남녀.
+- 13:55 사무실 금색 톤 시안 by_office_gold_A/B/C(tools/bg_fix/by_office_gold_tone.py, 복도 밝기별 색 띠로 색만 옮김): A 전부, B 반반, C 회색·푸른 픽셀만. 선택 대기. 13층 연결 작업 중(merge-1101 합침 완료, 문 좌표 1x: 남 83–170, 여 357–443, 유리 639–802 이음 721, 엘베 1000–1118 이음 1059, 휴게 1273–1363, 바닥 y330).
+- 14:05 13·15층 게임 탑재 커밋(브랜치 hyzd0n, merge-1101 합침): tools/mapedit/author_by_f13.py, 장면 by_f13·by_f15(PAINTED 별칭)·by_wc_m/f·by_lounge·by_office·by_elite(관리국 office room)·by_shower_m/f·by_bath_m/f, ELEVATOR bldg 'by'(hub·places도 bldg). 테스트 580 통과. 들어갈 길(로비·거리) 없음 → 사용자에게 물음.
+- 14:05 사용자 「닫아」 → 스레드 「백일몽 13층 복도 이어서」 닫음. 남은 질문(금색 톤 A/B/C, 들어올 길)은 새 스레드로.
+- 14:13 사용자 「그래」 → 자리 매칭 커밋(map.ts BY_DESK_OWNERS, HqSpot owner/shared). 주의: owner는 관리국 사무실도 map.json 자료일 뿐 게임 코드가 아직 안 씀(NPC는 빈 의자 아무 데나). 14:13 사무실 배경 4배 버그(bgScale 2인데 그림이 이미 2배) → office·office_riot bgScale 1로 고침 2a84e5b, 필드 스레드에 전달 요청함. npm test 580 중 579(실패 1 = merge-1101의 clinic.infirmary 출구 방향).
+- 14:20 사용자 「2번(merge 넘기기) 넘기고, 강남 거리는 다른 데서」→ 필드 스레드에 합치기 넘김. 14:22 「17층에는 연구팀만, 연구팀 사무실은 다시 뽑아야(관리국 거 못 씀)」→ by_f17 = 13층 그림 x452~1246(유리 양문=연구1팀 잠금, 엘베) 3b53058, 엘베 17 추가. 연구1팀 p1 요청문 specs/by_lab_f17_p1_prompt.txt(=관리국 office p5 + 장소 「research team office on the 17th floor of the headquarters of a large company in Seoul」+ 고급 채우기), 「뽑아」 대기. 보낼 때 ORIG=hq_office_p5 FLOOR_HALF=1 NO_CEIL=1, 에일린 화풍 256 색 끔.
+- 14:26 사용자 격노: 연구1팀 p1(관리국 사무실 요청문)은 「연구실을 만들라니까 사무실」, p2(격리팀 실험실 p7 그대로)도 「격리팀 연구실과 완전 다른 분위기」. **백일몽 17층 연구실 = 꿈결용액을 가공해 시약을 만드는 제약 연구실.** p3 요청문 specs/by_lab_f17_p3_prompt.txt(p7 틀 + 장소「pharmaceutical research laboratory… where a precious collected liquid is refined, graded by concentration and processed into reagents」+ 고급 채우기), 「뽑아」 대기.
+- 14:38 연구실 p3 결과 by_lab_f17_p3_632x424.png: 유리 정제 원통(주황·파랑 액체)·계기·시약 진열장, 그러나 짙은 남색·어둡고 공장 설비 느낌·배관 많음. 판정 대기.
+- 14:40 사용자 격노 「관리국 지하 거 그대로 갖다 썼지」(p3 = 격리팀 p7 틀). **백일몽 방 요청문에 관리국 지하 실험실 문장 쓰지 말 것.** p4 = by_f13_hall_p5 틀 + 장소(17층 제약 연구실)·시약 유리 캐비닛+긴 실험대(어른보다 조금 큼)·「research floor」 채우기, specs/by_lab_f17_p4_prompt.txt, 「뽑아」 대기. 보낼 때 PROMPT_ORIG=by_f13_hall_p5.
+- 14:51 p4 결과 by_lab_f17_p4: 밝은 흰 제약 연구실(시약 캐비닛·실험대), 지하 느낌 없음. 바닥 가운데 물건 많음(PACK_FREE 탓), 나무·대리석 고급감은 약함. 판정 대기.
+- 14:54 사용자 p4 「분위기는 괜찮은데 너무 작다」→ p5(캐비닛 어른 1.5배·바닥선·아주 가깝게). 14:58 p5 결과 by_lab_f17_p5: 캐비닛 1x 약 170px(p4 130), 바닥 비움, 푸르스름, 뒷벽 위 유리 칸막이 너머 실험실, 위 배관, 바닥 옅은 줄. 판정 대기.
+- 15:00 사용자 p5 「나쁘지 않아 일단 이걸 쓴다, 왼쪽으로 이으면서 의무실 통하는 문 하나」→ ext1L 준비: specs/by_lab_f17_ext1L_prompt.txt(p5 + 「가운데 양옆 벽, 의무실 단문, 가는 금속 틀, 캐비닛 높이」), 밑그림 by_lab_f17_ext1L_sketch_window.png(keep192 new320 ov60, 문 x115–205 y138–308). 보낼 때 SKETCH ERASE=1 NO_CEIL FLOOR_40 PACK_FREE. 「뽑아」 대기.
+- 15:15 ext1L 결과 by_lab_f17_ext1L.png(952, $0.15): 의무실 문 밑그림 자리 OK, 그러나 위쪽 밑그림 단색 벽·천장 띠가 남아 x≈375에서 끊김, 실험대가 비스듬히 바닥으로 튀어나옴. 교훈: 밑그림 창은 문 자리만 두고 벽 위쪽은 단색으로 칠하면 그대로 남음. 판정 대기.
+- 15:16 사용자 「밑그림 창을 빼」. 15:20 ext1L_v2(밑그림 없음, ERASE) by_lab_f17_ext1L_v2.png: 배관 이어짐, 물건 뒷벽에 붙음, 의무실 단문 x≈195–275(손잡이 안 보임). 판정 대기.
+- 15:22 v2 「망했는데」(이음에서 벽 캐비닛·책상이 큰 캐비닛 뒤로 잘림). 15:28 v3(keep300 new212 ov250, 창 최대 512) by_lab_f17_ext1L_v3.png 844: 캐비닛 통째로 다시 그려 잘림 없음, 이음 정수기 옆 OK, 의무실 단문(손잡이 없음) 2배 x≈460–590. 흠: 맨 위 천장 띠 2배 x≈590 끊김(코드 손질 제안). 판정 대기.
+- 15:27 사용자 「왼쪽 포기, 오른쪽으로」, 15:28 「의무실 문은 뒤(뒷벽)에 놓지 말고 관리국 지하처럼 벽을 치고 오른쪽에」= 오른쪽 끝 옆벽 + 옆벽 가운데 의무실 문. 준비: specs/by_lab_f17_ext1R_prompt.txt(p5 + 옆벽·문 문장, 1998자, 관리국 문장 안 씀), guides/by_lab_f17_right_wall_guide_512.png(모서리 x262 y40~308, 아래선 0.30, 윗선 0.22, 문 x340–415), extend_right keep228 new284 ov177, GUIDE ERASE NO_CEIL FLOOR_40 PACK_FREE SIDE_WALLS. 「뽑아」 대기. extend_right.py에 GUIDE 추가.
+- 15:36 ext1R 결과 by_lab_f17_ext1R.png(916): 오른쪽 옆벽+의무실 문(창·손잡이) 각도 OK, 이음 서랍 실험대 옆 OK. 흠: 옆벽 빈 벽·문 주변 빛 번짐. 판정 대기.
+- 15:45 사용자 핀 「여기 잘렸는데」(초록 모니터) → tools/bg_fix/by_lab_f17_ext1R_fix.py: p5의 x440–494 y172–232 + x440–487 y232–252 되붙임 → by_lab_f17_ext1R_fix.png. 판정 대기.
+- 15:41 사용자 핀 4곳(전선 허공·모니터 잘림·작업대 끊김·바닥선 끊김) = ext1R 이음선(ov177이 옛 작업대를 유리장으로 바꿈). 조각 붙이기로 못 고침 → ov100으로 다시 잇기 1회 제안, 「뽑아」 대기.
+- 15:50 ext1R_v2(겹침 100, 안내선 x<128 잘라 씀) 생성·커밋: 작업대·전선·바닥선 이음 자연스러움, 옆벽 의무실 문+잠금패드. 판정 대기.
+- 15:55 사용자 「양호」 → ext1R_v2 확정. 게임 탑재: by_lab(tools/mapedit/author_by_lab_f17.py) — 17층 연구1팀 유리문 → 연구실, 오른쪽 옆벽 문(kind exit) → by_infirmary(painted 'infirmary', 관리국 의무실 재사용). 실험대 오브젝트 L05(서향, 왼쪽 배치): obj_gen.py 256 8방향, STYLE_REF=specs/L05_style_ref_lab_256.png STYLE_COLOR=1, 요청문 specs/L05_by_pharma_bench_prompt.txt, 「뽑아」 대기. 옆면은 8방향 돌리기 west만 제대로 나옴(D05 확인).
+- 16:05 L05 8방향 생성($0.08), west.png를 by_lab 왼쪽(BX300·FOOT770 월드) 1.25배 배치(2배는 상판이 어깨 높이로 너무 큼). 발판 h88. 판정 대기. 이 스레드 첨부 24장 참 → 새 스레드 요청(그림 /mnt/project-files/baekilmong/by_lab_bench_game.png).
