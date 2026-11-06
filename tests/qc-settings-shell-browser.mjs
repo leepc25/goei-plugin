@@ -120,7 +120,8 @@ for (const vp of vps) {
   } else {
     // 오른쪽으로 쓸면 뒤로, 왼쪽으로 쓸면 앞으로 (화면 가운데에서)
     const swipe = async (dir) => {
-      const box = await page.$eval('.gx .gx-content', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      // 본문 가운데 세로줄에서 입력 칸·하단 바·서랍이 아닌 첫 자리를 고른다 (쓸기는 input 위에서는 일부러 안 먹는다; 폰 가로 위키는 가운데가 검색 칸)
+      const box = await page.$eval('.gx .gx-content', (e) => { const r = e.getBoundingClientRect(); const x = r.left + r.width / 2; for (let y = r.top + r.height / 2; y > r.top + 8; y -= 16) { const el = document.elementFromPoint(x, y); if (el && !el.closest('input, textarea, select, [contenteditable], .gx-mbar, .gx-nav, .ph-drawer, .nw-rail, .nw-panel')) return { x, y }; } return { x, y: r.top + r.height / 2 }; });
       const x0 = box.x - dir * 60;
       await page.touchscreen.tap; // noop (hasTouch 확인)
       const cdp = await page.context().newCDPSession(page);
