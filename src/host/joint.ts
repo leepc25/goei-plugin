@@ -117,7 +117,7 @@ export class Joint {
   private left: Set<JointKind>;
   private fired = false;
 
-  constructor(private model: ModelChoice) {
+  constructor(private model: ModelChoice, private staticModel?: string) {
     this.left = new Set<JointKind>(['gnet', 'phone']);
   }
 
@@ -126,7 +126,7 @@ export class Joint {
     // 사진이 붙은 요청이나 이미 보낸 뒤면 혼자 보낸다
     if (this.fired || !this.left.has(kind) || messages.some((m) => m.images?.length)) {
       this.done(kind);
-      return runModel(messages, this.model);
+      return runModel(messages, this.model, this.staticModel);
     }
     return new Promise<string>((resolve, reject) => {
       this.waits.set(kind, { messages, resolve, reject });
@@ -146,13 +146,13 @@ export class Joint {
     const g = this.waits.get('gnet');
     const p = this.waits.get('phone');
     if (g && p) void this.both(g, p);
-    else for (const w of this.waits.values()) runModel(w.messages, this.model).then(w.resolve, w.reject);
+    else for (const w of this.waits.values()) runModel(w.messages, this.model, this.staticModel).then(w.resolve, w.reject);
   }
 
   private async both(g: Wait, p: Wait): Promise<void> {
     let raw = '';
     try {
-      raw = await runModel(combinedPrompts(g.messages, p.messages), this.model);
+      raw = await runModel(combinedPrompts(g.messages, p.messages), this.model, this.staticModel);
     } catch (error) {
       g.reject(error);
       p.reject(error);
@@ -171,7 +171,7 @@ export class Joint {
     for (const [k, w] of [['gnet', g], ['phone', p]] as const) {
       const part = parts[k];
       if (part) w.resolve(part);
-      else runModel(w.messages, this.model).then(w.resolve, w.reject);
+      else runModel(w.messages, this.model, this.staticModel).then(w.resolve, w.reject);
     }
   }
 }

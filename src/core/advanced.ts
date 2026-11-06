@@ -9,7 +9,7 @@ export type AdvFeature = 'gn' | 'ph' | 'nw' | 'gen';
 export interface AdvItem {
   key: string;
   label: string;
-  type: 'num' | 'bool' | 'pick';
+  type: 'num' | 'bool' | 'pick' | 'text';
   def: number | string;
   min?: number;
   max?: number;
@@ -45,6 +45,7 @@ const craftGroup = (): AdvGroup => ({
     { key: 'thoughts', label: '생각 단계', type: 'pick', def: 'off', opts: [['off', '안 함'], ['inner', '속으로만'], ['note', '적고 지움']], hint: '모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요' },
     { key: 'memo', label: '비망록', type: 'pick', def: '0', opts: [['0', '끔'], ['1', '켬']], hint: '모델 거부를 줄이는 긴 앞글이에요(원본 라이트보드 「탈옥 (비망록)」). 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요' },
     num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '공통', hint: '0이면 생성 공통 값을 따라요' }),
+    { key: 'model_id', label: '전용 모델', type: 'text', def: '', hint: 'Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인·보조) 설정' },
   ],
 });
 
@@ -184,6 +185,7 @@ export function advCheck(item: AdvItem, raw: unknown): string | null {
   if (!s || s === 'null') return null;
   if (item.type === 'bool') return s === '1' || s === '0' ? s : null;
   if (item.type === 'pick') return item.opts?.some(([v]) => v === s) ? s : null;
+  if (item.type === 'text') return s.slice(0, 120);
   const n = Number(s);
   return Number.isInteger(n) && n >= (item.min ?? 0) && n <= (item.max ?? Infinity) ? String(n) : null;
 }

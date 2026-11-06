@@ -54,12 +54,13 @@ async function withPhotos(messages: (LlmMessage & { images?: string[] })[]): Pro
   );
 }
 
-export async function runModel(messages: LlmMessage[], model: ModelChoice): Promise<string> {
+/** staticModel: 기능별 전용 모델 ID (있으면 메인·보조 대신 그 모델) */
+export async function runModel(messages: LlmMessage[], model: ModelChoice, staticModel?: string): Promise<string> {
   let res: unknown;
   try {
     // allowPlugins: 사용자가 플러그인이 제공하는 모델(pluginmodel:::)을 메인·보조로 쓰면 이게 없을 때 Risu가 막는다.
     // 이 플러그인은 모델 제공 플러그인이 아니라서 서로 부르는 고리가 생기지 않는다.
-    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model === 'aux' ? 'submodel' : 'model', allowPlugins: true });
+    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model === 'aux' ? 'submodel' : 'model', allowPlugins: true, ...(staticModel ? { staticModel } : {}) });
   } catch (error) {
     throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -94,6 +95,8 @@ export interface RetryOptions {
   reiterate?: number;
   /** 동시 요청 수에 셀지 (괴담넷·괴담톡·위키). 0이면 제한 없음 */
   concurrent?: number;
+  /** 기능별 전용 모델 ID. 다시 물을 때도 그대로 쓴다 */
+  staticModel?: string;
 }
 
 // ── 동시 요청 수 (라이트보드 「동시요청수」, 2026-11-06). 괴담넷·괴담톡·위키 요청만 센다. 인물 기록은 세지 않는다 (리수폿 스레드 요청) ──
@@ -149,12 +152,12 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use)));
+      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel)));
       // 다시 보기: 첫 응답을 다시 읽고 고치게 한다. 실패하면 첫 응답을 쓴다 (원본과 같음)
       for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
         const again: LlmMessage[] = [...ask, { role: 'assistant', content: raw }, { role: 'user', content: reiterationText(i, o.reiterate ?? 0) }];
         try {
-          const next = await slot(o.concurrent, () => runModel(again, use));
+          const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel));
           if (next.trim()) raw = next;
         } catch {
           break;

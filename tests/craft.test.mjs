@@ -51,3 +51,9 @@ test('craft: 세 기능 요청문에 실제로 붙고, 유저 메시지 빼기�
   const w = wikiPrompt(src({ '$nw_adv_thoughts': 'inner' }), { title: '시험', writingRequest: '', inherited: [] }, wikiSettings({}), {});
   assert.match(w.messages[0].content, /# Thoughts Guideline/);
 });
+
+test('craft: 기능별 전용 모델 ID', () => {
+  assert.equal(craft.featureModel({}, 'gn'), undefined);
+  assert.equal(craft.featureModel({ '$lb_cfg_lb-gn.adv_model_id': ' gpt-4o ' }, 'gn'), 'gpt-4o');
+  assert.equal(craft.featureModel({ '$ph_adv_model_id': 'x' }, 'nw'), undefined);
+});

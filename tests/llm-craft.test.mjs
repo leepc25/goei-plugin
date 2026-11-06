@@ -33,3 +33,15 @@ test('llm: 재시도 문구에 원인 분석, 동시 요청 수를 넘지 않는
   await Promise.all([1, 2, 3].map(() => generate([{ role: 'user', content: 'Q' }], 'aux', (r) => r, { retries: 0, retryModel: 'same' })));
   assert.equal(peak, 3, '0이면 제한 없음');
 });
+
+test('llm: 전용 모델 ID는 staticModel로, 다시 물을 때도 그대로', async () => {
+  const calls = [];
+  globalThis.risuai = { runLLMModel: async (o) => (calls.push(o), { type: 'success', result: calls.length === 1 ? 'bad' : 'ok' }) };
+  await generate([{ role: 'user', content: 'Q' }], 'aux', (r) => { if (r === 'bad') throw new Error('형식'); return r; }, { retries: 1, retryModel: 'main', staticModel: 'gpt-4o' });
+  assert.equal(calls[0].staticModel, 'gpt-4o');
+  assert.equal(calls[1].staticModel, 'gpt-4o');
+  assert.equal(calls[1].mode, 'model');
+  calls.length = 0;
+  await generate([{ role: 'user', content: 'Q' }], 'aux', (r) => r, { retries: 0, retryModel: 'same' });
+  assert.equal('staticModel' in calls[0], false, '비우면 보내지 않는다');
+});
