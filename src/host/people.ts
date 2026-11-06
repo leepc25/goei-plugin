@@ -12,6 +12,7 @@ import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateR
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
+import { buildRouter, parseRouter, type RouterHint } from '../core/people/router';
 import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
 import { playerAgent } from '../core/player';
 import { promptFor } from '../core/people/prompt';
@@ -262,7 +263,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
       const ended = [] as ReturnType<typeof endedNowOf>[];
       void batchKeys;
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
@@ -463,6 +464,48 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
     diag.ms = Date.now() - t0;
     await pushDiag(diag, settings.keepRaw);
     setStatus({ busy: false, label: '' });
+  }
+}
+
+// ── 모델 Router (본편 앞, 설정 router=model) ──
+
+let routerCache: { key: string; selected: string[] } | null = null;
+let routerHints: RouterHint[] = [];
+let routerSlowStreak = 0;
+/** 마지막 Router 가 본 미등록 이름 (갱신기 힌트) */
+export const routerHintsNow = (): RouterHint[] => routerHints;
+
+/** 모델이 고른 장면 인물. 실패·지연·빈 결과면 null (코드 Router 로). 입력·최근 글·명단이 같으면 재사용 */
+export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = []): Promise<string[] | null> {
+  if (settings.router !== 'model' || routerSlowStreak >= 3 || !Object.keys(store.people).length) return null;
+  const names = allNames();
+  const built = buildRouter(chat, store, names, input, { exclude });
+  if (routerCache?.key === built.key) return routerCache.selected;
+  const t0 = Date.now();
+  const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.model, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+  try {
+    const raw = await Promise.race([
+      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.model),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.routerTimeout}초`)), settings.routerTimeout * 1000)),
+    ]);
+    diag.raw = raw;
+    diag.outChars = raw.length;
+    const r = parseRouter(raw, store, names, built.max);
+    diag.people = r.selected;
+    diag.ok = true;
+    routerCache = { key: built.key, selected: r.selected };
+    routerHints = r.newCharacters;
+    routerSlowStreak = 0;
+    return r.selected.length ? r.selected : null;
+  } catch (error) {
+    diag.error = error instanceof Error ? error.message : String(error);
+    diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
+    if (/시간 제한/.test(diag.error)) routerSlowStreak++;
+    console.log(`[goei] Router 생략 (코드 Router 로): ${diag.error}`);
+    return null;
+  } finally {
+    diag.ms = Date.now() - t0;
+    await pushDiag(diag, settings.keepRaw);
   }
 }
 

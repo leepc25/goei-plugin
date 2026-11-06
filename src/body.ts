@@ -63,7 +63,7 @@ import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
-import { requestPeopleUpdate, directorNoteText, factionNamesOf } from './host/people';
+import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
 import { bookText } from './core/refs';
 import { stripMarkers } from './core/sanitize';
 
@@ -325,7 +325,9 @@ async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }
     const text = e ? stripDecorators(evaluate(e.content as string, env)).trim() : '';
     return text || bookText({ char, chat }, name) || null;
   };
-  const opts = { settings, store, sheetOf, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore) };
+  // 모델 Router (선택): 보조 모델이 장면 인물을 고른다. 실패·지연이면 코드 Router (이름이 나온 사람)
+  const routed = await routerPeople(chat, store, input, settings, me?.name ? [me.name] : []).catch(() => null);
+  const opts = { settings, store, sheetOf, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore), ...(routed ? { people: routed } : {}) };
   let out = withPeopleBlock(messages, chat, opts);
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
   if (settings.director === 'scene') {

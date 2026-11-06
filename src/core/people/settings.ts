@@ -25,6 +25,9 @@ export const PP_DEFAULTS: Record<string, string> = {
   /** 리수폿 B: 자료가 모자라면 검색(채팅·로어북·위키)을 요청해 2차 호출. C: 켜진 기능마다 Director 적용 지침 */
   director_search: '1',
   director_features: '1',
+  /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
+  router: 'code',
+  router_timeout: '15',
   speed: '1',
   /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
   turn_cap: '10',
@@ -74,6 +77,8 @@ export interface PeopleSettings {
   directorReuse: boolean;
   directorSearch: boolean;
   directorFeatures: boolean;
+  router: 'code' | 'model';
+  routerTimeout: number;
   speed: number;
   turnCap: number;
   features: Set<Feature>;
@@ -124,6 +129,8 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     directorReuse: v('director_reuse') !== '0',
     directorSearch: v('director_search') !== '0',
     directorFeatures: v('director_features') !== '0',
+    router: v('router') === 'model' ? 'model' : 'code',
+    routerTimeout: num('router_timeout', 5, 60),
     speed: num('speed', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
     features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),

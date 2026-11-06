@@ -337,6 +337,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
+    row('장면 인물 고르기', seg('router', s.router, [['code', '코드'], ['model', '모델']]), '코드 = 최근 글에 이름·별명이 나온 사람과 동행 칸 (비용 0). 모델 = 보조 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신기에 알려요. 턴당 보조 1회 추가, 실패하면 코드로'),
     row('Director', seg('director', s.director, [['off', 'OFF'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 오르내려요'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),

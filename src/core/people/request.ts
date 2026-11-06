@@ -27,6 +27,8 @@ export interface RequestOpts {
   user?: string;
   /** 세력 코드 → 이름 (명부) */
   factionNames?: Record<string, string>;
+  /** 모델 Router 가 고른 장면 인물 (있으면 코드 Router 대신). 기록에 있는 이름만 */
+  people?: string[];
 }
 
 /** 장면 인물의 기록 블록 (본편용). 대상이 없으면 빈 문자열 */
@@ -34,7 +36,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (!o.settings.on || o.settings.inject === 'off') return { text: '', people: [], sheets: [] };
   const names: NameEntry[] = entriesOf(o.store, o.extraNames ?? {});
   const match = nameMatcher(names);
-  const people = scenePeople(chat, o.store, match, { input: o.input });
+  const people = o.people?.length ? o.people.filter((n) => o.store.people[n]).slice(0, 6) : scenePeople(chat, o.store, match, { input: o.input });
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);

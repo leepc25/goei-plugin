@@ -41,6 +41,7 @@ export const UPDATER_COMPACT: string = [
   "If a puzzle, cipher, ritual, code, password or assembly device appears, preserve observed elements, order, placement, pairing, blanks, attempts and results exactly; separate inferred answers from observation.",
   "",
   "## 4. New people first, then existing people",
+  "- `name_hints` (if present): names a pre-pass saw but did not record. Hints only; register one only when the confirmed span meets the rules below.",
   "- Find persons absent from `people` who are named with a proper name (or a unique nickname used as a name) in the confirmed span and who speak or interact. Register ≤2 per span in `new_people`. Not registered: role-only references (「경비원」), passing mentions, disposable background figures, persons existing only in memory or rumor, names appearing only in context_only text.",
   "- Give `name` (the form used most), `aliases`, `identity` (Korean ≤200: affiliation, rank, role, age, appearance only as stated; unknown parts 미확인; nothing known → 미확인), `speech` (Korean ≤200: address and register toward the user from actual dialogue; null if they did not speak to the user), `m`, `quote`.",
   "- Registration needs no relationship change. Never invent biography, feelings, scores or hidden facts; never register one person twice for two spellings (use `aliases`).",
