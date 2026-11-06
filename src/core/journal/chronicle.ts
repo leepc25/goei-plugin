@@ -13,7 +13,6 @@ import { liveChanges, liveness, peopleStore } from '../people/store';
 import { lastStatusFields } from '../world/tags';
 import { locName } from '../world/geo';
 import { readDirectory } from '../world/directory';
-import { playerAgent } from '../player';
 import { readJournal } from './store';
 import { JOURNAL_KIND_LABEL, type JournalKind } from './types';
 
@@ -137,32 +136,4 @@ export function buildChronicle(chat: Chat, lore: LoreEntry[] | undefined): Chron
     out.push({ pos: posOf(c), seq: 1 + c.seq, kind: 'rank', day: day(posOf(c)), title: '신분', text: `${what}${c.reason ? ` · ${c.reason}` : ''}` });
   }
   return out.sort((a, b) => a.pos - b.pos || a.seq - b.seq);
-}
-
-export interface Personnel {
-  /** 이 채팅 첫 응답의 상태창 날짜 (배치일) */
-  since: string;
-  /** 「내 사건」(일지 mine) 가운데 끝난 것. 진행 중인 출동은 세지 않는다 */
-  closed: number;
-  /** 그 가운데 괴이 클리어 */
-  cleared: number;
-  /** 같이 간 요원 전부 [이름, 횟수] 많은 순 (나 자신은 빼고, 팝업이라 다 보인다 — 사용자 11-06) */
-  companions: [string, number][];
-}
-
-/** 인사 기록 숫자 (팝업): 배치일, 끝낸 내 사건 수·클리어, 같이 간(투입 칸에 같이 적힌) 요원 전부. 지출은 넣지 않는다 (사용자 11-06) */
-export function buildPersonnel(chat: Chat, lore: LoreEntry[] | undefined): Personnel {
-  const rows = readJournal(chat).rows.filter((r) => r.mine && r.kind !== 'fd');
-  const me = playerAgent(lore, chat.scriptstate);
-  const comp = new Map<string, number>();
-  for (const r of rows) {
-    for (const name of new Set(r.agents.map((a) => a.name).filter((n) => n && n !== me?.name))) comp.set(name, (comp.get(name) ?? 0) + 1);
-  }
-  const first = (Array.isArray(chat.message) ? chat.message : []).find((m) => m.role === 'char' && lastStatusFields([str(m.data)])?.date);
-  return {
-    since: first ? lastStatusFields([str(first.data)])?.date ?? '' : '',
-    closed: rows.length,
-    cleared: rows.filter((r) => r.cleared).length,
-    companions: [...comp.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
-  };
 }
