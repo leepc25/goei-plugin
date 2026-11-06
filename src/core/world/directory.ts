@@ -730,7 +730,7 @@ function ordered<T extends { lore: string }>(rows: T[], saved: string[], legacy:
 const cache = new WeakMap<LoreEntry[], Directory>();
 
 /** 명부가 아직 없는 카드(경량 카드 빌드·깡통봇)에도 저장된 명부와 같은 기본값을 준다 (roster-v.ts migrateRoster 와 같은 뜻):
- *  민간인·프리랜서 목록은 비우고, 시작 묶음 「다른 세력」(옛 「중립」)을 다음 코드로 만들어 기본 인물 13명을 넣는다. 2026-11-05 */
+ *  민간인·프리랜서 목록은 비우고, 시작 묶음 「이면의 주민들」(옛 「중립」)을 다음 코드로 만들어 기본 인물 13명을 넣는다. 2026-11-05 */
 function freshDefaults(dir: Directory): void {
   for (const o of dir.orgs) o.rosterFor = o.rosterFor.filter((f) => f !== 'D00' && f !== 'E00');
   for (const a of dir.agents) a.rosterFor = a.rosterFor.filter((f) => f !== 'D00' && f !== 'E00');
