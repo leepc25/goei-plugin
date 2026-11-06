@@ -2,6 +2,7 @@
 
 import { ICONS } from './icons';
 import { headSeg } from './evcard';
+import { isPhone } from './media';
 
 export type AgentView = 'wall' | 'list';
 /** 편성 기준: 작전 중(op) · 편성 가능(ok) · 작전 중은 아니지만 편성 불가(lock: 실종·사망 등) */
@@ -131,7 +132,7 @@ export function bindAgentTips(root: HTMLElement): void {
     queued = 0;
     // PC 요원 칸은 상자 높이를 꼭 채운다 (2026-10-21 사용자: 아래가 남았다). 모니터 두 줄 · 목록 여섯 줄, 넘치면 그 크기로 스크롤
     // CSS 퍼센트 줄 높이는 브라우저에 따라 안 먹어서 실제 높이를 재서 넣는다
-    const pc = matchMedia('(min-width: 761px)').matches;
+    const pc = !isPhone();
     for (const ul of root.querySelectorAll<HTMLElement>('.gx-agwall, .gx-agrows')) {
       if (!pc) ul.style.removeProperty('--agrow');
       else if (ul.classList.contains('gx-agwall')) ul.style.setProperty('--agrow', `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);

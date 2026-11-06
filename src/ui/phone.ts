@@ -30,6 +30,7 @@ import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { updateChat, type ChatContext } from '../host/risu';
+import { isPhone } from './media';
 
 type Sub = 'contacts' | 'chats' | 'notices';
 
@@ -1091,12 +1092,12 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       break;
     case 'ph-dm':
       // PC: 열린 대화의 연락처를 다시 누르면 닫힌다 (대화 목록과 같음)
-      if (phone.view === 'room' && phone.room === `dm_${v}` && !matchMedia('(max-width: 760px)').matches) return handlePhone('ph-back', undefined, ctx, env);
+      if (phone.view === 'room' && phone.room === `dm_${v}` && !isPhone()) return handlePhone('ph-back', undefined, ctx, env);
       await openDm(ctx, env, v);
       return true;
     case 'ph-room':
       // PC: 열린 방을 다시 누르면 닫힌다 (‹ 뒤로와 같음)
-      if (phone.view === 'room' && phone.room === v && !matchMedia('(max-width: 760px)').matches) return handlePhone('ph-back', undefined, ctx, env);
+      if (phone.view === 'room' && phone.room === v && !isPhone()) return handlePhone('ph-back', undefined, ctx, env);
       await openRoom(ctx, env, v);
       return true;
     case 'ph-back':
@@ -1197,7 +1198,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
     case 'ph-notice': {
       const id = Number(v);
       // PC: 오른쪽 칸에 본문 하나. 모바일: 목록 안에서 펼치고 다시 누르면 접는다
-      if (matchMedia('(max-width: 760px)').matches) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === 'notice' ? 'list' : phone.view });
+      if (isPhone()) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === 'notice' ? 'list' : phone.view });
       else if (phone.view === 'notice' && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: 'list' });
       else Object.assign(phone, { openNotice: id, view: 'notice' });
       {

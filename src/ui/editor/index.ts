@@ -29,6 +29,7 @@ import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
+import { isPhone } from '../media';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
@@ -593,7 +594,7 @@ export function render(): void {
   const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
   lastDrawn = edUi.node;
   // 폰(2026-10-29 사용자): 설정도 본 창의 한 화면처럼 — 머리는 본 창과 같은 모양(제목 「설정」만), 아래에 숨은 서랍(기능·세계·지침·점검)과 본 창의 하단 바
-  const phone = matchMedia('(max-width: 760px)').matches;
+  const phone = isPhone();
   const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
   const right = `${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
   const top = phone
@@ -801,7 +802,7 @@ export async function handle(action: string, value?: string): Promise<void> {
   // 그 밖의 동작(설정 단추·기능 설정)은 패널과 같은 처리기로. 패널이 다시 그려질 때 설정 페이지도 같이 그린다 (app.ts render)
   else if (host?.handle && !action.startsWith('ed-')) {
     // 폰 하단 바의 탭 단추: 설정을 닫고 본 창의 그 화면으로
-    if ((action === 'tab' || action === 'nav-tab') && matchMedia('(max-width: 760px)').matches) {
+    if ((action === 'tab' || action === 'nav-tab') && isPhone()) {
       closeEditor();
       await host.handle(action, value);
       return;

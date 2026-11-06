@@ -28,6 +28,7 @@ import { lastStatusFields } from '../core/world/tags';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
+import { isPhone } from './media';
 
 /** 위키는 문서만 (2026-10-29: 이 채팅의 인물·개인 기록·세력·기록 문서 화면은 왼쪽 메뉴 「기록」으로 옮겼다, ui/records.ts) */
 type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new';
@@ -825,7 +826,7 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
   }, { passive: true });
 }
 
-const wide = () => !matchMedia('(max-width: 760px)').matches;
+const wide = () => !isPhone();
 
 /** 위키 탭의 버튼. 처리했으면 true */
 export async function handleWiki(action: string, value: string | undefined, ctx: ChatContext, env: WikiEnv): Promise<boolean> {
