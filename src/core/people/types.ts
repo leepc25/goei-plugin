@@ -10,7 +10,8 @@ export type FeatureSlotId =
   | 'affinity.profile' | 'affinity.values' | 'affinity.appraisal' | 'affinity.current_appraisal' | 'affinity.intent' | 'affinity.stance' | 'affinity.bind' | 'affinity.private' | 'affinity.approach' | 'affinity.surface_actual'
   | 'register.context' | 'register.stage_assessment' | 'register.knowledge_gap' | 'register.restraint'
   | 'perception.profile' | 'perception.modifiers' | 'perception.channels' | 'perception.reading' | 'perception.secret'
-  | 'openness.context';
+  | 'openness.context'
+  | 'affinity.regard' | 'affinity.speech' | 'affinity.behavior' | 'suspicion.concern' | 'suspicion.speech' | 'suspicion.behavior' | 'openness.attitude' | 'openness.speech' | 'openness.behavior';
 export type SlotId = CoreSlotId | FeatureSlotId;
 export const CORE_SLOTS: CoreSlotId[] = ['identity', 'personality', 'state', 'relationship', 'speech', 'behavior', 'knowledge', 'threads', 'history', 'scene', 'suspicion'];
 
@@ -27,6 +28,8 @@ export interface SlotMeta {
   targeted?: boolean;
   /** 한 번 쓰면 안 고치는 칸 (첫인상) */
   once?: boolean;
+  /** num = 수치 모드에서만, qual = 정성 모드(수치 끔)에서만 있는 칸 */
+  gate?: 'num' | 'qual';
 }
 export const SLOT_META: Record<SlotId, SlotMeta> = {
   identity: { feature: null, label: '기본정보', help: '이름·나이·소속·외모처럼 잘 바뀌지 않는 기본 정보. 로어북 시트의 Identity 절이 시작값', hint: 'who this person is (affiliation, rank, role, age, appearance)' },
@@ -39,7 +42,7 @@ export const SLOT_META: Record<SlotId, SlotMeta> = {
   threads: { feature: null, label: '목표·미해결', help: '이 인물의 목표와 아직 풀리지 않은 일', hint: 'open promises, goals, unresolved matters' },
   history: { feature: null, label: '주요 행적', help: '이야기 속에서 한 주요 행동·겪은 일 (오래된 것부터 접혀요)', hint: 'notable past events with this person, oldest first' },
   scene: { feature: null, label: '현재 장면', help: '지금 장면에서의 위치·행동 (짧게 유지돼요)', hint: 'present scene facts' },
-  suspicion: { feature: 'suspicion', label: '의심', help: '누구를·무엇을 의심하는지 (정체·배신·거짓말·오염·범행)', hint: 'suspicion cases (prefixes [시작]/[단서]/[반응]/[해소] stay)', targeted: true },
+  suspicion: { feature: 'suspicion', gate: 'num', label: '의심', help: '누구를·무엇을 의심하는지 (정체·배신·거짓말·오염·범행)', hint: 'suspicion cases (prefixes [시작]/[단서]/[반응]/[해소] stay)', targeted: true },
   'affinity.profile': { feature: 'affinity', label: '취향 프로필', help: '관심 범위·끌리는 요소·거슬리는 요소·감정의 형태·절제와 접근 방식. 이 인물 자체의 것(대상 무관)', hint: "the person's scope of interest, observable tastes and aversions, form of feeling, restraint and approach style, with evidence" },
   'affinity.values': { feature: 'affinity', label: '가치 기준', help: '무엇을 먼저 보는지, 관찰 기준, 일반적인 편견과 그 논리', hint: "value priorities, observation criteria, general biases, and the person's logic for them" },
   'affinity.appraisal': { feature: 'affinity', label: '첫인상', help: '처음 마주쳤을 때 겉모습으로 만든 평가와 감정. 한 번 쓰면 절대 안 고쳐요', hint: 'first impression only: the unchanging initial appearance-based appraisal and feeling', targeted: true, once: true },
@@ -59,13 +62,28 @@ export const SLOT_META: Record<SlotId, SlotMeta> = {
   'perception.channels': { feature: 'perception_ext', label: '장면 조건', help: '지금 장면의 감각 조건 (거리·빛·소음·통화)', hint: "the scene's sensory conditions (distance, light, noise, call connection)" },
   'perception.reading': { feature: 'perception_ext', label: '단서 읽기', help: '실제로 지각한 단서와 그 해석 (단서가 등장했다고 알아챈 것은 아님)', hint: 'a clue actually perceived and its interpretation; a clue appearing is not a clue noticed' },
   'perception.secret': { feature: 'perception', label: '비밀', help: '이 인물이 지키는 비밀 하나당 한 항목: 아는 사람·모르는 사람', hint: 'one entry per meaningful secret this person holds: who knows it and who does not' },
+  'affinity.regard': { feature: 'affinity', gate: 'qual', label: '호감 설명', help: '정성 모드: 이 대상에게 지금 어떤 호감·비호감을 느끼는지와 그 근거 (숫자 없이 글로)', hint: 'qualitative: the current goodwill or ill will toward this target, what it rests on, what the person accepted, and which reactions now differ; never a score, grade or threshold', targeted: true },
+  'affinity.speech': { feature: 'affinity', gate: 'qual', label: '호감에 따른 말투', help: '정성 모드: 지금의 호감이 이 대상에게 쓰는 말에 어떻게 나타나는지', hint: 'qualitative: how current goodwill adjusts speech toward this target, kept apart from the base speech entry', targeted: true },
+  'affinity.behavior': { feature: 'affinity', gate: 'qual', label: '호감에 따른 행동', help: '정성 모드: 지금의 호감이 관심·질문·배려·거리에 어떻게 나타나는지', hint: 'qualitative: how current goodwill adjusts attention, questions, care and distance toward this target', targeted: true },
+  'suspicion.concern': { feature: 'suspicion', gate: 'qual', label: '의심 내용', help: '정성 모드: 무엇을 왜 의심하는지, 받아들인 반증, 남은 의문 (점수 없이)', hint: 'qualitative: what this person actually received about the target, why it raises a question, which counterevidence they accepted, and what remains; no score or band', targeted: true },
+  'suspicion.speech': { feature: 'suspicion', gate: 'qual', label: '의심에 따른 말투', help: '정성 모드: 의심이 이 대상에게 쓰는 말에 어떻게 나타나는지', hint: 'qualitative: how the suspicion adjusts speech toward this target', targeted: true },
+  'suspicion.behavior': { feature: 'suspicion', gate: 'qual', label: '의심에 따른 행동', help: '정성 모드: 지켜봄·시험·대면 같은 실제 대응', hint: 'qualitative: what the person actually does about the suspicion toward this target (watching, testing, confronting, reporting)', targeted: true },
+  'openness.attitude': { feature: 'openness', gate: 'qual', label: '성적 태도', help: '정성 모드: 친밀한 상황에서의 태도와 그 근거 (숫자·단계 없이)', hint: 'qualitative: the current attitude in intimate contexts and its evidence; never a score, band or stage', targeted: true },
+  'openness.speech': { feature: 'openness', gate: 'qual', label: '태도에 따른 말투', help: '정성 모드: 그 태도가 말에 어떻게 나타나는지', hint: 'qualitative: how that attitude shows in speech toward this target', targeted: true },
+  'openness.behavior': { feature: 'openness', gate: 'qual', label: '태도에 따른 행동', help: '정성 모드: 그 태도가 행동·조건·망설임에 어떻게 나타나는지', hint: 'qualitative: how that attitude shows in conduct, stated conditions and hesitation toward this target', targeted: true },
   'openness.context': { feature: 'openness', label: '음란도 조건', help: '친밀한 상황에서 실제로 보인 태도·조건(피임 요구, 경계, 거부)을 글로', hint: 'conditions and attitudes actually shown in intimate contexts (contraception demands, boundaries, refusals), as text' },
 };
 export const FEATURE_SLOTS: FeatureSlotId[] = (Object.keys(SLOT_META) as SlotId[]).filter((s): s is FeatureSlotId => s.includes('.'));
 /** 모든 칸 (저장 읽기·순회용). 지침·화면은 slotsFor 로 켜진 칸만 */
 export const SLOTS: SlotId[] = [...CORE_SLOTS, ...FEATURE_SLOTS];
-/** 켜진 기능에 맞는 칸 목록 */
-export const slotsFor = (features: Set<string>): SlotId[] => SLOTS.filter((s) => { const f = SLOT_META[s].feature; return !f || features.has(f); });
+/** 켜진 기능에 맞는 칸 목록. qual = 정성 모드(수치 끔)인 기능: gate 'num' 칸은 빠지고 gate 'qual' 칸이 들어간다 */
+export const slotsFor = (features: Set<string>, qual: Set<string> = new Set()): SlotId[] => SLOTS.filter((s) => {
+  const m = SLOT_META[s];
+  if (m.feature && !features.has(m.feature)) return false;
+  if (m.gate === 'num') return !qual.has(m.feature!);
+  if (m.gate === 'qual') return qual.has(m.feature!);
+  return true;
+});
 /** 칸의 기능 묶음 이름 (화면용): affinity.* → affinity */
 export const slotGroup = (s: SlotId): string => (s.includes('.') ? s.split('.')[0] : 'core');
 

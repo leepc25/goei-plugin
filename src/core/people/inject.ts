@@ -31,6 +31,8 @@ export interface BlockOpts extends AffinityOpts {
   /** 켜진 선택 기능 (taste·openness 줄을 넣을지) */
   taste?: boolean;
   openness?: boolean;
+  /** 정성 모드(수치 끔)인 기능: 단계·숫자 줄 대신 전용 칸 */
+  qual?: Set<string>;
   /** 성격 6축 줄을 넣을지 (기능 axes) */
   axes?: boolean;
   /** 켜진 기능 (전용 칸을 넣을지 정함). 없으면 기본 칸만 */
@@ -46,12 +48,18 @@ const FEATURE_GROUPS: { title: string; slots: SlotId[] }[] = [
   { title: 'Address and relationship stage', slots: ['register.context', 'register.stage_assessment', 'register.knowledge_gap', 'register.restraint'] },
   { title: 'Perception', slots: ['perception.profile', 'perception.modifiers', 'perception.channels', 'perception.reading', 'perception.secret'] },
   { title: 'Intimacy conditions', slots: ['openness.context'] },
+  { title: 'Goodwill (qualitative; no score exists)', slots: ['affinity.regard', 'affinity.speech', 'affinity.behavior'] },
+  { title: 'Suspicion (qualitative; no score exists)', slots: ['suspicion.concern', 'suspicion.speech', 'suspicion.behavior'] },
+  { title: 'Intimacy attitude (qualitative; no score exists)', slots: ['openness.attitude', 'openness.speech', 'openness.behavior'] },
 ];
 const SLOT_EN: Record<string, string> = {
   'affinity.profile': 'Taste profile', 'affinity.values': 'Values and biases', 'affinity.appraisal': 'First impression (fixed)', 'affinity.current_appraisal': 'Current appraisal', 'affinity.intent': 'Intent', 'affinity.stance': 'Stance', 'affinity.bind': 'Constraint', 'affinity.private': 'Unexpressed', 'affinity.approach': 'Approach', 'affinity.surface_actual': 'Surface vs purpose',
   'register.context': 'Address conditions', 'register.stage_assessment': 'Relationship stage', 'register.knowledge_gap': 'Last contact', 'register.restraint': 'Restraint',
   'perception.profile': 'Observation tendency', 'perception.modifiers': 'Current impairments', 'perception.channels': 'Scene conditions', 'perception.reading': 'Clues read', 'perception.secret': 'Secrets held',
   'openness.context': 'Conditions',
+  'affinity.regard': 'Goodwill', 'affinity.speech': 'Speech', 'affinity.behavior': 'Behavior',
+  'suspicion.concern': 'Concern', 'suspicion.speech': 'Speech', 'suspicion.behavior': 'Behavior',
+  'openness.attitude': 'Attitude', 'openness.speech': 'Speech', 'openness.behavior': 'Behavior',
 };
 
 /** 예산을 넘으면 오래된 항목부터 뺀다: 지난 일 → 아는 것 → 행동 → 장면 → 목표 순. 다른 절은 그대로 */
@@ -87,13 +95,14 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const relOther = rel.filter((e) => e.target && e.target !== '@user');
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, o);
   const addr = addressOf(p, changes);
-  const relLine = [`Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
+  // 정성 모드면 단계 없이 (호감은 전용 칸의 글로만)
+  const relLine = [o.qual?.has('affinity') ? `Relationship → ${user}:` : `Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser) : ''));
   if (o.taste) {
     const band = tasteOf(p, changes);
     if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${TASTE_STAGES[band]?.en ?? ''}. A separate axis from the relationship above; it never grants closeness by itself.`);
   }
-  if (o.openness) {
+  if (o.openness && !o.qual?.has('openness')) {
     const v = opennessOf(p, changes);
     if (v !== null) {
       const st = opennessStage(v);
@@ -103,7 +112,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   if (relOther.length) out.push('Relationships with others:\n' + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));
   if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);
   // 기능별 전용 칸 (켜진 기능만)
-  const enabled = new Set(slotsFor(o.features ?? new Set()));
+  const enabled = new Set(slotsFor(o.features ?? new Set(), o.qual));
   for (const g of FEATURE_GROUPS) {
     const parts = g.slots.filter((s) => enabled.has(s)).map((s) => ({ s, list: slot(s) })).filter((x) => x.list.length);
     if (!parts.length) continue;
@@ -115,7 +124,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   if (be.length) out.push('Behavior:\n' + lines(be));
   const th = slot('threads');
   if (th.length) out.push('Open threads:\n' + lines(th));
-  const su = slot('suspicion');
+  const su = o.qual?.has('suspicion') ? [] : slot('suspicion');
   if (su.length) out.push('Suspicion:\n' + su.map((e) => `- ${e.target ? `about ${e.target === '@user' ? user : e.target}` : ''}${e.kind ? ` [${e.kind}]` : ''}: ${plain(e.text, 200)}`).join('\n'));
   const hi = slot('history');
   if (hi.length) out.push('Recent (this chat):\n' + lines(hi));

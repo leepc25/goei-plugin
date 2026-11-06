@@ -2,6 +2,9 @@
 export const PP = (key: string) => `$pp_${key}`;
 
 export type Feature = 'axes' | 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm' | 'faction_rep';
+/** 수치가 있는 기능. 수치를 끄면 정성 모드 (리수폿 qualitative): 점수 없이 글로만 */
+export type NumericFeature = 'affinity' | 'suspicion' | 'openness';
+export const NUMERIC_FEATURES: NumericFeature[] = ['affinity', 'suspicion', 'openness'];
 export const FEATURES: Feature[] = ['axes', 'affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm', 'faction_rep'];
 
 export const PP_DEFAULTS: Record<string, string> = {
@@ -26,6 +29,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   axes: '1',
   affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
+  /** 수치 사용 (1) / 정성 모드 (0). 호감·의심·음란도 (리수폿 E). 취향 띠는 호감 수치가 켜져 있을 때만 */
+  num_affinity: '1', num_suspicion: '1', num_openness: '1',
   /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
   taste: '0', openness: '0', rhythm: '0',
   /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
@@ -67,6 +72,10 @@ export interface PeopleSettings {
   speed: number;
   turnCap: number;
   features: Set<Feature>;
+  /** 수치를 켠 기능 */
+  numeric: Set<NumericFeature>;
+  /** 켜져 있지만 수치를 끈 기능 (정성 모드) */
+  qualitative: Set<NumericFeature>;
   newPeople: 'auto' | 'confirm';
   twoTurn: boolean;
   prevPairs: number;
@@ -110,7 +119,9 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     directorReuse: v('director_reuse') !== '0',
     speed: num('speed', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
-    features: new Set(FEATURES.filter((f) => v(f) === '1')),
+    features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),
+    numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== '0')),
+    qualitative: new Set(NUMERIC_FEATURES.filter((f) => v(f) === '1' && v(`num_${f}`) === '0')),
     newPeople: v('newpeople') === 'confirm' ? 'confirm' : 'auto',
     twoTurn: v('twoturn') !== '0',
     prevPairs: num('prev_pairs', 0, 3),

@@ -33,7 +33,7 @@ export function buildConsolidate(store: PeopleStore, chat: Parameters<typeof liv
   const live = liveness(chat);
   const slots: ConsolidateInput['data']['slots'] = {};
   const ids = new Map<string, { slot: SlotId; entry: Entry }>();
-  const enabled = slotsFor(settings.features);
+  const enabled = slotsFor(settings.features, settings.qualitative);
   for (const slot of enabled) {
     if (SLOT_META[slot].once) continue;
     const cur = liveEntries(p.slots[slot], live).filter((e) => !e.pin);
@@ -72,7 +72,7 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
   if (!p || !r.slots) return report;
   for (const [slotName, items] of Object.entries(r.slots)) {
     const slot = slotName as SlotId;
-    if (!slotsFor(settings.features).includes(slot) || !input.data.slots[slot] || !Array.isArray(items)) {
+    if (!slotsFor(settings.features, settings.qualitative).includes(slot) || !input.data.slots[slot] || !Array.isArray(items)) {
       report.dropped.push({ slot: slotName, reason: '없는 칸이거나 목록이 아님', item: items });
       continue;
     }

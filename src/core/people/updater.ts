@@ -93,7 +93,7 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[] } = {}) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string> } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
   for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
@@ -106,10 +106,10 @@ export function personPayload(p: Person, live: Liveness, changes: Change[], unkn
     name: p.name,
     aliases: p.aliases,
     express: p.express,
-    affinity_now: `${aff.stage.label}(${aff.stage.max})`,
+    ...(extra.qual?.has('affinity') ? {} : { affinity_now: `${aff.stage.label}(${aff.stage.max})` }),
     address_now: addr,
     ...(extra.taste ? { taste_now: tasteOf(p, changes) } : {}),
-    ...(extra.openness ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
+    ...(extra.openness && !extra.qual?.has('openness') ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
     // 성격 6축 (기능 axes): 값·띠 설명, 아직 시작값이 없으면 axes_init_needed, 장기 변화
     ...(extra.axes ? { axes: axesView(p.axes).map((a) => ({ axis: a.axis, value: a.value, band: a.band })), ...(p.axesFrom === 'default' ? { axes_init_needed: true } : {}), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
     entries,
@@ -227,18 +227,18 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const userFaction = userFactionOf(store, chat);
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
-    cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
-    slots: slotsFor(o.settings.features),
+    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+    slots: slotsFor(o.settings.features, o.settings.qualitative),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features) }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))
       ? Object.values(store.docs).filter((d) => o.settings.features.has(docFeature(d.type) as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
       : undefined,
-    suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
+    suspicion_now: o.settings.features.has('suspicion') && !o.settings.qualitative.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
@@ -273,7 +273,12 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
   const rules = (lang === 'en' ? `${LANG_EN_RULE}\n\n${userRules.trim()}` : userRules).trim();
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
-  let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
+  // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
+  let out = text;
+  for (let prev = ''; prev !== out; ) {
+    prev = out;
+    out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
+  }
   out = out.replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
@@ -282,6 +287,8 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
 export function enabledSections(s: PeopleSettings): Set<string> {
   const on = new Set<string>();
   for (const f of s.features) on.add(f);
+  // 수치 모드·정성 모드 절 (리수폿 E): 기능이 켜져 있을 때 둘 중 하나만
+  for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
   if (s.director === 'facts') on.add('next_note');
   return on;
 }
@@ -504,7 +511,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 2. 칸 항목 (켜진 기능의 칸만. 2026-11-06 「I」: 기능별 전용 칸)
-  const enabledSlots = slotsFor(ctx.settings.features);
+  const enabledSlots = slotsFor(ctx.settings.features, ctx.settings.qualitative);
   const perPerson = new Map<string, number>();
   for (const e of r.entries ?? []) {
     const who = nameOf(str(e?.who));
@@ -687,7 +694,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 3. 호감 계기
-  if (ctx.settings.features.has('affinity')) {
+  if (ctx.settings.features.has('affinity') && !ctx.settings.qualitative.has('affinity')) {
     const perCue = new Map<string, number>();
     const changes = liveChanges(store, live);
     for (const c of r.cues ?? []) {
@@ -760,7 +767,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 3c. 음란도: 시작값은 표의 값 중 하나로 한 번만, 그 뒤는 새 반응마다 표의 변화량. 기준 메시지당 합 -5~+10 은 계산에서
-  if (ctx.settings.features.has('openness')) {
+  if (ctx.settings.features.has('openness') && !ctx.settings.qualitative.has('openness')) {
     const changes = liveChanges(store, live);
     const perWho = new Map<string, number>();
     const inited = new Set<string>();
@@ -890,7 +897,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 6. 의심 (인물의 suspicion 칸, 대상·종류 있음)
-  if (ctx.settings.features.has('suspicion')) {
+  if (ctx.settings.features.has('suspicion') && !ctx.settings.qualitative.has('suspicion')) {
     for (const s of r.suspicion ?? []) {
       const who = nameOf(str(s?.who));
       if (!who) {

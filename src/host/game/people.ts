@@ -21,7 +21,7 @@ export function liveSheetOf(c: { char: ChatContext['char']; chat: ChatContext['c
   if (!settings.on || !p) return sheet;
   const live = liveness(c.chat);
   const changes = liveChanges(store, live);
-  return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user, note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap, axes: settings.features.has('axes'), features: settings.features });
+  return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user, note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap, axes: settings.features.has('axes'), features: settings.features, qual: settings.qualitative });
 }
 
 export function createPeople(): GamePeople {

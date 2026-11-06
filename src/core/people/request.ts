@@ -61,6 +61,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         openness: o.settings.features.has('openness'),
         axes: o.settings.features.has('axes'),
         features: o.settings.features,
+        qual: o.settings.qualitative,
       }),
     );
   }
