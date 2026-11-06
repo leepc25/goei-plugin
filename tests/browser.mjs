@@ -2807,14 +2807,15 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="rec-chron"][data-value="event"]');
   assert.equal(await page.locator('.gx-chron .gx-cr-row.event').count(), 0, '사건 칩을 끄면 사건 줄 없음');
   await page.click('[data-action="rec-chron"][data-value="event"]');
-  // 사원증 뒷면 = 인사 기록부: 출동·종료 건 · 같이 간 요원 · 총 지출, 앞면으로 돌아가기
-  await page.click('.gx-nav-brand [data-action="id-flip"]');
-  await page.waitForSelector('.gx-nav-brand .gx-id.back');
-  assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-id.back .gx-pr-cell i', (l) => l.map((e) => e.textContent)), ['출동·종료', '클리어', '총 지출']);
-  assert.equal(await page.locator('.gx-nav-brand .gx-id.back .gx-pr-comp li').count(), 2, '같이 간 요원 둘 (P001·P002)');
-  assert.ok((await page.textContent('.gx-nav-brand .gx-id.back')).includes('1건'), '내가 나간 사건 1건');
-  await page.click('.gx-nav-brand [data-action="id-flip"]');
-  await page.waitForSelector('.gx-nav-brand .gx-id:not(.back) .gx-id-photo');
+  // 인사 기록 = 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로): 끝낸 내 사건 · 클리어 · 같이 간 요원
+  await page.click('.gx-nav-brand [data-action="id-record"]');
+  await page.waitForSelector('.gx-prpop .gx-pr');
+  assert.deepEqual(await page.$$eval('.gx-prpop .gx-pr-cell i', (l) => l.map((e) => e.textContent)), ['끝낸 내 사건', '클리어'], '총 지출은 없음 (사용자 11-06)');
+  assert.ok((await page.textContent('.gx-prpop .gx-pr')).includes('1건'), '내가 나간 사건 1건');
+  assert.equal(await page.locator('.gx-prpop .gx-pr-comp li').count(), 2, '같이 간 요원 둘 (P001·P002)');
+  assert.equal(await page.locator('.gx-nav-brand .gx-id .gx-id-photo').count(), 1, '사원증은 그대로');
+  await page.click('.gx-prpop .gx-agpop-x');
+  assert.equal(await page.locator('.gx-prpop').count(), 0, '닫힘');
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
   // 종료 줄 아이콘 → 보고서 페이지 (창이 아니라 기록 탭 안)

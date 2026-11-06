@@ -26,7 +26,7 @@ test('연대기: 내가 나간 사건만, 필드 줄 빼고, 한 메시지 안 �
   assert.equal(list[1].day, '2025.01.02');
 });
 
-test('인사 기록부: 내 사건 수·클리어·같이 간 요원 Top3(나 빼고)·지출(직접 수정 제외)', () => {
+test('인사 기록: 끝낸 내 사건 수·클리어·같이 간 요원 Top3(나 빼고), 지출은 없음', () => {
   const ag = (...n) => n.map((name) => ({ id: '', name, st: '' }));
   const rows = [
     row({ name: 'a', agents: ag('A', 'B'), cleared: true }), row({ name: 'b', agents: ag('A', 'C') }), row({ name: 'c', agents: ag('A', 'B', 'D') }),
@@ -38,9 +38,9 @@ test('인사 기록부: 내 사건 수·클리어·같이 간 요원 Top3(나 �
     { id: 'w3', anchor: '', amount: -900, memo: '맞춤', src: 'manual', at: '' },
   ] };
   const chat = { message: msgs('u1', 'c1'), scriptstate: { $goei_journal: JSON.stringify({ v: 1, rows }), $st_wallet: JSON.stringify(wallet) } };
-  const p = buildPersonnel(chat, [], 0);
+  const p = buildPersonnel(chat, []);
   assert.equal(p.closed, 3);
   assert.equal(p.cleared, 1);
   assert.deepEqual(p.companions, [['A', 3], ['B', 2], ['C', 1]]);
-  assert.equal(p.spent, 300);
+  assert.ok(!('spent' in p), '지출은 넣지 않는다');
 });

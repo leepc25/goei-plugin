@@ -103,8 +103,6 @@ const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
-/** 사원증 뒷면(인사 기록부)을 보고 있나 (2026-11-06) */
-let idBack = false;
 /** 시작 화면에서 연 새 채팅 기본 설정 */
 let pickerPrefs = false;
 let lastChat = '';
@@ -884,12 +882,11 @@ async function handle(action: string, value?: string): Promise<void> {
       showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
       return;
     }
-    case 'id-flip':
-      // 사원증 앞·뒷면 (뒷면 = 인사 기록부). 폰 작은 창에서 누르면 창을 다시 띄운다
+    case 'id-record':
+      // 인사 기록부 팝업 (2026-11-06 사용자: 사원증은 그대로 두고 팝업으로). 폰 사원증 창에서 누르면 그 창 대신 뜬다
       if (view.kind !== 'started') return;
-      idBack = !idBack;
-      if (value === 'pop') showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
-      return render();
+      showIdCard(personnelCard(view.ctx), (a, v) => void run(a, v), 'gx-prpop');
+      return;
     case 'wallet-pop':
       // 옛 잔고 칩 → 가계부 탭
       return handle('tab', 'wallet');
@@ -1566,8 +1563,7 @@ function idCard(ctx: ChatContext): string {
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
   const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
   const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
-  const flip = `<button class="gx-id-flip" data-action="id-flip" aria-pressed="${idBack}">${idBack ? '앞면' : '인사 기록'}</button>`;
-  if (idBack) return personnelCard(ctx, { bg, photo: photoUrl ?? null, name, role: [f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '), no: pa?.id ?? '', flip });
+  const flip = `<button class="gx-id-flip" data-action="id-record">인사 기록</button>`;
   return `<div class="gx-id">${bg}
       ${photo}
       ${who}
@@ -1576,21 +1572,26 @@ function idCard(ctx: ChatContext): string {
     </div>`;
 }
 
-/** 사원증 뒷면 = 인사 기록부 (2026-11-06 사용자: 「아예 뒷면으로 넘겨서 그럴싸하게」). 카드째 뒤집혀 인사 기록 카드 한 장:
- *  머리(작은 사진·이름·소속·직급·사원 번호·배치일) · 숫자 셋(출동·종료, 클리어, 총 지출) · 같이 간 요원 Top3. 모델 호출 없음 */
-function personnelCard(ctx: ChatContext, o: { bg: string; photo: string | null; name: string; role: string; no: string; flip: string }): string {
-  const p = buildPersonnel(ctx.chat, ctx.char.globalLore, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  const walletOn = colConfig(ctx.chat.scriptstate).wallet !== 'off';
-  const cell = (label: string, value: string, wide = false) => `<span class="gx-pr-cell${wide ? ' wide' : ''}"><i>${label}</i><b>${esc(value)}</b></span>`;
+/** 인사 기록부 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로). 머리(사진·이름·소속·직급·사원 번호·배치일) ·
+ *  숫자(끝낸 내 사건, 클리어) · 같이 간 요원 Top3 (사건 투입 칸에 같이 적힌 횟수). 모델 호출 없음 */
+function personnelCard(ctx: ChatContext): string {
+  const facs = factionList(ctx.char.globalLore);
+  const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '') || currentChoice(ctx.chat).faction || '';
+  const f = code ? findFaction(code, facs) : undefined;
+  const pa = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  const u = userInfo();
+  const photo = pa ? imageUrl(ctx.char, facePic(ctx.char, pa, true)) : u.photo;
+  const role = [f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · ');
+  const p = buildPersonnel(ctx.chat, ctx.char.globalLore);
+  const cell = (label: string, value: string) => `<span class="gx-pr-cell"><i>${label}</i><b>${esc(value)}</b></span>`;
   const comp = p.companions.length
     ? `<ol class="gx-pr-comp">${p.companions.map(([n, c]) => `<li><span>${esc(n)}</span><em>${c}회</em></li>`).join('')}</ol>`
     : '<p class="gx-pr-none">아직 같이 간 요원이 없어요.</p>';
-  return `<div class="gx-id back">${o.bg}
-      <span class="gx-pr-head"><i>인사 기록</i>${o.no ? `<em>${esc(o.no)}</em>` : ''}</span>
-      <span class="gx-pr-who">${o.photo ? `<span class="gx-pr-photo"><img src="${esc(o.photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}<span><b>${esc(o.name)}</b><small>${esc(o.role)}</small>${p.since ? `<small class="gx-pr-since">배치 ${esc(p.since)}</small>` : ''}</span></span>
-      <span class="gx-pr-cells">${cell('출동·종료', `${p.closed}건`)}${cell('클리어', `${p.cleared}건`)}${walletOn ? cell('총 지출', formatWon(p.spent), true) : ''}</span>
-      <span class="gx-pr-sec"><i>같이 간 요원</i>${comp}</span>
-      ${o.flip}
+  return `<div class="gx-pr" role="document" aria-label="인사 기록">
+      <span class="gx-pr-head"><i>인사 기록</i>${pa?.id ? `<em>${esc(pa.id)}</em>` : ''}</span>
+      <span class="gx-pr-who">${photo ? `<span class="gx-pr-photo"><img src="${esc(photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}<span><b>${esc(pa?.name || u.name || '나')}</b><small>${esc(role)}</small>${p.since ? `<small class="gx-pr-since">배치 ${esc(p.since)}</small>` : ''}</span></span>
+      <span class="gx-pr-cells">${cell('끝낸 내 사건', `${p.closed}건`)}${cell('클리어', `${p.cleared}건`)}</span>
+      <span class="gx-pr-sec"><i>같이 간 요원 (많이 간 순 3명)</i>${comp}</span>
     </div>`;
 }
 

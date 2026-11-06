@@ -51,9 +51,10 @@ for (const vp of ['pc', 'phone']) {
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector('.gw [data-action="ed-close"]')?.click());
   if (vp === 'pc') {
-    await click('.gx-nav-brand [data-action="id-flip"]');
-    await shot('사원증_뒷면');
-    await click('.gx-nav-brand [data-action="id-flip"]');
+    await click('.gx-nav-brand [data-action="id-record"]');
+    await page.waitForSelector('.gx-prpop');
+    await shot('인사기록_팝업');
+    await page.evaluate(() => document.querySelectorAll('.gx-idpop').forEach((b) => b.remove()));
   } else {
     await page.waitForTimeout(800);
     await page.evaluate(() => document.querySelector('.gw [data-action="ed-close"]')?.click());
@@ -62,9 +63,9 @@ for (const vp of ['pc', 'phone']) {
     await page.click('.gx-idbtn');
     await page.waitForSelector('.gx-idpop');
     await shot('사원증_앞면');
-    await click('.gx-idpop [data-action="id-flip"]');
-    await page.waitForSelector('.gx-idpop .gx-id.back');
-    await shot('사원증_뒷면');
+    await click('.gx-idpop [data-action="id-record"]');
+    await page.waitForSelector('.gx-prpop');
+    await shot('인사기록_팝업');
     await page.evaluate(() => document.querySelectorAll('.gx-idpop').forEach((b) => b.remove()));
   }
   await click('[data-action="tab"][data-value="records"]');
