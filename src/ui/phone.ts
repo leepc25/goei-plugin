@@ -1157,7 +1157,7 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
   return `<main class="gx-body ph ph-app ${detail ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담톡 목록">
       <div class="ph-side-head">
-        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}${subBtn('views', '보기 전용', badge(viewUnread(readViews(ctx.chat.scriptstate))))}</div>
+        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}${subBtn('views', '관전', badge(viewUnread(readViews(ctx.chat.scriptstate))))}</div>
         <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
       ${detail ? '' : status}
