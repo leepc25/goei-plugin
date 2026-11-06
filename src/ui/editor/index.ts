@@ -245,6 +245,7 @@ function ensureRoot(): HTMLElement {
     if (el?.dataset?.input === 'dir-crop-size') return render();
     if (el?.dataset?.change?.startsWith('ed-')) return void run(el.dataset.change, el.value);
     if (el?.dataset?.change === 'man-import-file') return void manageFile(el as unknown as HTMLInputElement).then(() => render());
+    if (el?.dataset?.change === 'man-with-chat') return void manageAction('man-with-chat', root, host?.ctx() ?? null, host?.canChat?.() ?? true).then(() => render());
     // 명부 드롭다운(거점 지역·시군구)·이미지 지침 체크는 이 창의 처리기로: 패널 처리기로 보내면 패널만 다시 그려 지도·시군구 목록·체크 표시가 그대로였다 (2026-10-28 QC)
     if (el?.dataset?.change?.startsWith('dir-') || el?.dataset?.change?.startsWith('ip-')) return void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
     host?.change?.(el);
@@ -788,7 +789,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('man-')) {
-    if (await manageAction(action, root, ctx)) render();
+    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true)) render();
     return;
   }
   if (action.startsWith('ed-rule-')) {

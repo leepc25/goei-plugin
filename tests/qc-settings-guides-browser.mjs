@@ -189,6 +189,30 @@ for (const vp of vps) {
   assert.equal((await prefsOf(page)).rules.length, 100);
   await goNode(page, 'rule:new');
   assert.equal(await page.isDisabled('.gw [data-action="ed-rule-new"]'), true, '100개면 새 규칙 잠김');
+  // 내보내기 「지금 채팅 값도 넣기」(2026-11-06 사용자, 전수점검 남은 것 5): 기본은 안 넣음 → 체크하면 chat.vars 에 이 채팅의 설정 변수만, 가져오면 그 채팅 변수에 적힘
+  await goNode(page, 'manage:backup');
+  await page.waitForSelector('.gw [data-change="man-with-chat"]');
+  const sizeBefore = await page.textContent('.gw .ps-row .gw-tokens');
+  await page.evaluate(() => { const el = document.querySelector('.gw [data-change="man-with-chat"]'); el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForFunction(() => document.querySelector('.gw [data-change="man-with-chat"]')?.checked);
+  assert.notEqual(await page.textContent('.gw .ps-row .gw-tokens'), sizeBefore, '체크하면 내보내기 크기가 달라짐');
+  await page.evaluate(() => { window.__clip = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__clip = t; } }, configurable: true }); });
+  await clickSel(page, '.gw [data-action="man-copy"]');
+  await page.waitForFunction(() => window.__clip);
+  const exportedChat = JSON.parse(await page.evaluate(() => window.__clip));
+  assert.ok(exportedChat.chat && exportedChat.chat.vars && typeof exportedChat.chat.vars === "object", "chat.vars 가 들어감");
+  assert.ok(!Object.keys(exportedChat.chat.vars).some((k) => /^\$st_(faction|lang|fm)$/.test(k)), '상태 변수($st_faction 등)는 안 들어감');
+  const chatImport = { ...exportedChat, chat: { vars: { '$st_agent_limit': '7', '$wg_random_p': '33', '$st_faction': 'B00', 'x': '1' } } };
+  await setInput(page, '.gw textarea[data-input="man-import-text"]', JSON.stringify(chatImport), 'input');
+  await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
+  await clickSel(page, '.gw [data-action="man-import-yes"]');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('채팅 값 2개도 이 채팅에 적었어요'));
+  const ss = await page.evaluate(() => window.__chat.scriptstate);
+  assert.deepEqual([ss.$st_agent_limit, ss.$wg_random_p, ss.$st_faction, ss.x], ['7', '33', 'A00', undefined], '설정 변수만 이 채팅에 적히고 상태 변수·모르는 열쇠는 버림');
+  // 체크를 풀면 chat 이 빠진다 (아래 「내보내기 JSON = 저장된 기기 설정」 비교를 위해 되돌림)
+  await page.evaluate(() => { const el = document.querySelector('.gw [data-change="man-with-chat"]'); el.checked = false; el.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForFunction(() => document.querySelector('.gw [data-change="man-with-chat"]') && !document.querySelector('.gw [data-change="man-with-chat"]').checked);
   // 저장소를 비워 되돌린다
   await page.evaluate(() => { delete window.__store['p:goei:prefs']; });
   await goNode(page, 'manage:backup');
