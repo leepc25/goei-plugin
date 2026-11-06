@@ -3,7 +3,8 @@
 // 사용법: node tests/qc-settings-start-browser.mjs <fixture.json> [pc|phone|land|all]
 import { sceneOf } from './qc-host.mjs';
 import assert from 'node:assert/strict';
-import { boot, chatOf, closeWin, launch, loadFixture, openEditor, closeEditor, openWin, setChat, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
+import { readFileSync } from 'node:fs';
+import { boot, chatOf, closeWin, launch, loadFixture, openEditor, closeEditor, openWin, setChat, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
@@ -11,6 +12,7 @@ const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const { fixture, manifest } = fx;
 const scenarios = JSON.parse((await import('node:fs')).readFileSync(new URL('../src/data/scenarios.json', import.meta.url), 'utf8'));
 const directory = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Directory').content);
+const agentScenes = JSON.parse(readFileSync(new URL('../src/data/world/scenes.json', import.meta.url), 'utf8')).인물 ?? {};
 
 const browser = await launch();
 let starts = 0;
@@ -137,7 +139,9 @@ for (const vp of vps) {
       await page.evaluate((id) => document.querySelector(`.gx-whoc[data-value="${id}"]`).click(), who[1]);
       await page.waitForFunction(() => document.querySelector('.gx-whoc.on')?.dataset.value !== '');
       const left = await page.$$eval('.gx-sc', (els) => els.map((e) => e.dataset.value));
-      assert.deepEqual(left, f.scenarios.filter((s) => s.kind !== 'opening').map((s) => String(s.fm)), `${f.code}: 캐릭터 플레이는 직접 입력·커스텀만`);
+      // 그 인물의 첫 장면(src/data/world/scenes.json 「인물」, fm 0)이 있으면 맨 앞에 「○○의 첫 장면」 하나가 더 보인다 (2026-11-06 55명 탑재)
+      const own = agentScenes[who[1]] ? ['0'] : [];
+      assert.deepEqual(left, [...own, ...f.scenarios.filter((s) => s.kind !== 'opening').map((s) => String(s.fm))], `${f.code}: 캐릭터 플레이는 그 인물의 첫 장면 + 직접 입력·커스텀만`);
       const on = await page.getAttribute('.gx-sc.on', 'data-value');
       assert.ok(left.includes(on), `${f.code}: 고른 장면이 남은 것 중 하나 (${on})`);
       const direct = f.scenarios.find((s) => s.kind === 'direct');
@@ -171,8 +175,8 @@ for (const vp of vps) {
   // 시작 전(staged) 설정 창: 「이 채팅」 없음, 테마를 바꾸면 이 채팅에도 적힌다
   await openEditor(page, 'set:screen');
   assert.equal(await page.$('.gw [data-action="set-bar"]'), null, '시작 전에는 기본값으로 저장·불러오기 없음 (기본값을 바로 고침)');
-  // 폰(760px 이하)은 본 창과 같은 상단바에 제목 「설정」만 (2026-10-29 사용자)
-  if (VIEWPORTS[vp].width > 760) assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
+  // 폰 배치(폰 세로·가로)는 본 창과 같은 상단바에 제목 「설정」만 (2026-10-29 사용자; 2026-11-06 폰 가로도 폰 배치)
+  if (!isPhoneVp(vp)) assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
   await page.evaluate(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="light"]').click());
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'light' && JSON.parse(window.__store['p:goei:prefs']).theme === 'light');
   assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.theme), 'light', '창 배색도 바로');

@@ -16,6 +16,8 @@ export const VIEWPORTS = {
   phone: { width: 390, height: 844, touch: true },
   land: { width: 844, height: 390, touch: true },
 };
+/** 폰 배치인 뷰포트: 폭 760px 이하, 또는 손가락 화면에서 짧은 쪽이 500px 미만 (2026-11-06: 폰 가로 844×390 도 폰 배치, src/ui/media.ts PHONE_MQ) */
+export const isPhoneVp = (vp) => { const v = typeof vp === 'string' ? VIEWPORTS[vp] : vp; return v.width <= 760 || (v.touch && Math.min(v.width, v.height) < 500); };
 
 export function loadFixture(path) {
   const fixture = JSON.parse(readFileSync(path, 'utf8'));

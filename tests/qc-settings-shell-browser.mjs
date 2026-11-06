@@ -3,7 +3,7 @@
 // 폰 한 열·가로 넘침 없음·글칸 전체 폭, 편집 창 서랍, Esc·바깥 클릭 닫기.
 // 사용법: node tests/qc-settings-shell-browser.mjs <fixture.json> [pc|phone|land|all]
 import assert from 'node:assert/strict';
-import { auditDom, boot, clickSel, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
+import { auditDom, boot, clickSel, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, prefsOf, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
@@ -17,7 +17,7 @@ const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listen
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
-  const narrow = VIEWPORTS[vp].width <= 760; // 편집 창 한 열·서랍·쓸기 뒤로·상황판 서랍은 화면 760px 이하 (폰 가로 844 는 PC 배치)
+  const narrow = isPhoneVp(vp); // 편집 창 한 열·서랍·쓸기 뒤로·상황판 서랍은 폰 배치 (2026-11-06: 폰 가로 844×390 도 폰 배치)
   const { page, errors } = await boot(browser, fx, started(), vp);
   // ── 열기/닫기 50회 ──
   await openWin(page);
