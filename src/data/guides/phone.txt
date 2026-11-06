@@ -115,6 +115,14 @@ updates: PATCH rows, add /messages/- only, each supplied room ID at most once. O
 invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. announcements: require announcementCheck.allowed and ANNOUNCEMENTS; otherwise []. Every limit is a ceiling; keep the entire result complete, and never invent activity to fill arrays.
 @@END
 
+@@SECTION BANTER
+GROUP BANTER
+A room with banter=true is the exception to "first decide whether there is reason to speak": it must get one fresh slice of conversation among its NPC members, about 6-12 rows, in that room's update.
+- Continue from the room history and the current story time. Members talk to each other in their own voices: daily life, shared interests, teasing, small disagreements, follow-ups on earlier talk. They need no reason to address the owner, and the owner never speaks.
+- Keep it a side exchange. Do not advance, resolve or reveal main-story incidents, and do not invent emergencies or external events.
+- Not every member must speak. Pause and skip rows may mark gaps. Other limits, knowledge boundaries and departures still apply.
+@@END
+
 @@SECTION GROUP_INVITES
 When invitationCheck.allowed, return 0–__LIMIT_invitations__ invitations: {"inviter":"candidate NPC ID","members":["candidate NPC ID","another candidate NPC ID"],"name":"room name, at most __LIMIT_room_name__ characters","patch":[]}.
 members: 2–__LIMIT_members__ distinct invitationCheck.candidates, including inviter. The owner joins implicitly; exclude me. The inviter needs an established contact route and plausible shared purpose with these members, grounded in character/relationship evidence; directory membership is insufficient. Entry establishes digital membership, not mission consent, unseen conversations, friendship, secret disclosures or external progress. Reject duplicate name+members in existingGroups.

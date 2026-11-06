@@ -85,6 +85,7 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     const map: Record<string, string> = { send: 'ACTION_SEND', invite_initial: 'ACTION_INVITE_INITIAL', invite_more: 'ACTION_INVITE_MORE', refresh: 'ACTION_REFRESH' };
     keys.push(map[action] ?? 'ACTION_REFRESH');
   } else {
+    if (body.rooms?.some((x) => x.banter) && p.BANTER !== undefined) keys.push('BANTER');
     if (body.invitationCheck?.allowed) keys.push('GROUP_INVITES');
     if (body.announcementCheck?.allowed) keys.push('ANNOUNCEMENTS');
   }
@@ -111,6 +112,8 @@ interface RoomPacket {
   directoryEstablishesRelationship: false;
   action: { type: string; invited?: string[] };
   receiveMessages?: boolean;
+  /** 단톡 수다를 꼭 만들 방 */
+  banter?: boolean;
 }
 
 export function roomPacket(r: PRoom, reactions = false): RoomPacket {
@@ -377,6 +380,11 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
     for (const cid of r.members) {
       if (!memo.has(cid)) memo.set(cid, participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
     }
+  }
+  // 단톡 수다: NPC가 둘 이상인 내 단톡방 하나를 골라 대화 한 조각을 꼭 만들게 한다
+  if (set.banter && chancePassed(set.banterChance, rng)) {
+    const groups = rooms.filter((x) => x.kind === 'group' && x.receiveMessages && x.activeMembers.length >= 2);
+    if (groups.length) groups[Math.min(groups.length - 1, Math.floor(rng() * groups.length))].banter = true;
   }
   const participants = [...memo.values()];
   const { channel: _channel, ...publicAnnounce } = announce;

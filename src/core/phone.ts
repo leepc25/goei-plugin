@@ -32,6 +32,8 @@ export const PH_DEFAULTS: Record<string, string> = {
   reactions: '1',
   /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
   habits: '1',
+  /** 단톡 수다: 확인할 때 내 단톡방 하나에서 NPC끼리 대화 한 조각 (라이트보드 미니톡 기본 동작, 2026-11-06) */
+  banter: '0', banter_chance: '30',
 };
 
 /** 카드 Settings 로어북의 괴담톡 값과 같은 기본값 */
@@ -89,6 +91,8 @@ export interface PhoneSettings {
   related: boolean;
   reactions: boolean;
   habits: boolean;
+  banter: boolean;
+  banterChance: number;
 }
 
 export function phoneValue(state: Record<string, unknown> | undefined, key: string): string {
@@ -120,6 +124,8 @@ export function phoneSettings(state: Record<string, unknown> | undefined): Phone
     related: v('related') === '1',
     reactions: v('reactions') !== '0',
     habits: v('habits') !== '0',
+    banter: v('banter') === '1',
+    banterChance: pct('banter_chance'),
   };
 }
 

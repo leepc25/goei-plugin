@@ -57,3 +57,25 @@ test('괴담톡: 말버릇 칸은 본 응답을 깨지 않고, 이번 사람 것
   assert.equal(P.parseReply('<lb-minitalk-patch>[]</lb-minitalk-patch><ph-habits>깨짐</ph-habits>', g, false).events.length, 0);
   assert.deepEqual(P.parseHabits('<ph-habits>깨짐</ph-habits>'), []);
 });
+
+test('괴담톡: 단톡 수다를 켜면 단톡방 하나에 수다 표시가 붙고, 말버릇이 요청에 실린다', () => {
+  const st = P.blankState();
+  const g = room('group', ['c_1', 'c_2']);
+  st.rooms[g.id] = g;
+  st.order.push(g.id);
+  P.push(st, g, 'c_1', '안녕', 't');
+  const vars = { '$ph_banter': '1', '$ph_banter_chance': '100', '$ph_incoming': '0', '$ph_group_invites': '0', '$ph_announcements': '0', '$ph_habits_list': JSON.stringify([{ id: 'c_1', name: 'c_1', note: '짧게 씀' }]) };
+  const src = (v) => ({ char: { name: '괴이', desc: '', globalLore: [] }, chat: { message: [{ role: 'user', data: 'a' }, { role: 'char', data: 'b' }], scriptstate: v, localLore: [] } });
+  const dir = { contacts: [], map: new Map(), tabs: [] };
+  const plan = PP.refreshPrompt(src(vars), st, dir, {}, () => 0);
+  const body = JSON.parse(plan.prompt.messages[1].content);
+  assert.equal(body.rooms[0].banter, true);
+  assert.match(plan.prompt.messages[0].content, /GROUP BANTER/);
+  assert.deepEqual(body.textingHabits, [{ sender: 'c_1', note: '짧게 씀' }]);
+  assert.match(plan.prompt.messages[0].content, /TEXTING HABITS/);
+  const off = PP.refreshPrompt(src({ ...vars, '$ph_banter': '0', '$ph_habits': '0' }), st, dir, {}, () => 0);
+  const ob = JSON.parse(off.prompt.messages[1].content);
+  assert.equal(ob.rooms[0].banter, undefined);
+  assert.equal(ob.textingHabits, undefined);
+  assert.doesNotMatch(off.prompt.messages[0].content, /GROUP BANTER|TEXTING HABITS/);
+});
