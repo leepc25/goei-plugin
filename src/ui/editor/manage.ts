@@ -3,7 +3,7 @@
 import { getPrefs } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
 import { isGoeiLore } from '../../core/install';
-import { cardVersion, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
+import { cardVersion, compareVersions, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
 import { tokenizerName } from '../../core/tokenizer';
 import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
@@ -152,6 +152,10 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
   const rows = [
     row('카드', badge(goei, goei ? '괴이 카드' : '괴이 카드 아님'), goei ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`} · 명부·매니페스트 있음` : '설치 · 점검에서 심으면 괴이 카드가 돼요'),
     row('플러그인', badge(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : '업데이트 주소가 없는 빌드'),
+    // 카드 판 ≠ 플러그인 판이면 빨간 줄 (2026-11-06 사용자, 전수점검 남은 것 4): 카드가 낡았으면 업데이트 페이지로, 카드가 더 새면 플러그인을 받으라고
+    ...(goei && compareVersions(ver, PLUGIN_VERSION) !== 0 ? [row('판 맞춤', badge(false, compareVersions(ver, PLUGIN_VERSION) < 0 ? '카드가 낡음' : '플러그인이 낡음'), compareVersions(ver, PLUGIN_VERSION) < 0
+      ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`}, 플러그인 v${PLUGIN_VERSION}. 새 기능·지침이 카드에 없을 수 있어요. 업데이트에서 카드를 플러그인 판으로 올리세요. <button class="gx-mini" data-action="ed-node" data-value="set:update">${ICONS.refresh}업데이트로</button>`
+      : `카드 v${ver}, 플러그인 v${PLUGIN_VERSION}. 플러그인을 새 판으로 받으세요.`)] : []),
     row('채팅', badge(canChat, canChat ? '진행 중' : '시작 전'), canChat ? `메시지 ${msgs}개 · 이 채팅 값으로 동작해요` : '시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요'),
     // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
     row('토크나이저', badge(!!tok, tok || '어림값') + getBtn('tok', '받기 (약 2MB)', !!tok), tok ? '토큰 수를 정확히 세요' : '안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요.'),
