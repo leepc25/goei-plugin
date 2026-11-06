@@ -881,6 +881,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
 .ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
 .ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
+.ph-sys.skip { background: none; border-color: transparent; letter-spacing: 0.1em; }
+.ph-reacts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+.ph-msg.me .ph-reacts { justify-content: flex-end; }
+.ph-react { display: inline-flex; align-items: center; gap: 2px; padding: 1px 7px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; }
+.ph-react small { color: var(--sub); font-size: 11px; }
 .ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
 .ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
 .ph-typing i:nth-child(2) { animation-delay: .15s; }

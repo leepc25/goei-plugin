@@ -75,6 +75,8 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
     if (body.crossRoomMessages?.length || (body.rooms?.length ?? 0) > 1) keys.push('CROSS_ROOM');
     if (hasAttachment(JSON.stringify(body))) keys.push('ATTACHMENT_READ');
     keys.push('ATTACHMENT_OUTPUT', 'PATCH');
+    // 이모지 반응 (라이트보드 미니톡, 2026-11-06). 옛 카드에 절이 없으면 붙이지 않는다
+    if (phoneSettings(src.chat.scriptstate).reactions && p.REACTIONS !== undefined) keys.push('REACTIONS');
   }
   keys.push(mode);
   if (mode === 'REPLY') {
@@ -100,7 +102,7 @@ interface RoomPacket {
   activeMembers: string[];
   participants: { id: string; name?: string }[];
   pov: 'me';
-  messages: { sender: string; type: string; time: string; content: string; audience: string[]; recordID: number }[];
+  messages: { sender: string; type: string; time: string; content: string; audience: string[]; recordID: number; reactions?: string }[];
   conversationState: ReturnType<typeof conversationState> & { directReplyPending?: boolean; followupAlreadySent?: boolean; defaultNextAction?: string };
   candidateOnly: boolean;
   directoryEstablishesRelationship: false;
@@ -108,7 +110,7 @@ interface RoomPacket {
   receiveMessages?: boolean;
 }
 
-export function roomPacket(r: PRoom): RoomPacket {
+export function roomPacket(r: PRoom, reactions = false): RoomPacket {
   const messages = r.messages
     .slice(-HISTORY.room)
     .filter((m) => m.kind !== 'pause' || !hiddenPause(m.text))
@@ -116,9 +118,10 @@ export function roomPacket(r: PRoom): RoomPacket {
       sender: m.sender === 'system' ? '-' : m.sender,
       type: m.kind === 'message' ? 'text' : m.kind === 'invite' ? 'invited' : m.kind,
       time: m.time,
-      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.text,
+      content: m.kind === 'invite' || m.kind === 'exit' ? m.participant ?? '' : m.kind === 'skip' ? '-' : m.text,
       audience: m.audience,
       recordID: m.id,
+      ...(reactions && m.kind === 'message' ? { reactions: m.reactions || '-' } : {}),
     }));
   const participants: RoomPacket['participants'] = [{ id: 'me' }, ...Object.entries(r.people).map(([id, c]) => ({ id, name: c.name }))];
   const hasTalk = !!r.conversationBaseline?.lastSender || r.messages.some((m) => m.kind === 'message');
@@ -303,7 +306,7 @@ function gnetBoard(src: RefSource, query: string): unknown {
 /** 한 방에 대한 답장 요청 (보내기·단톡 만들기·초대·방 새로고침) */
 export function replyPrompt(src: RefSource, st: PState, r: PRoom, dir: Directory, names: Record<string, string>): PhonePrompt {
   const set = phoneSettings(src.chat.scriptstate);
-  const packet = roomPacket(r);
+  const packet = roomPacket(r, set.reactions);
   const participants = r.members.map((cid) => participant(src, dir.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set.related, set.status, names));
   const body: Body = { room: packet, participants, narratorOnly: narrator(src, names, set.related, JSON.stringify(packet)) };
   crossRoom(body, st);
@@ -357,7 +360,7 @@ export function refreshPrompt(src: RefSource, st: PState, dir: Directory, names:
   const rooms: RoomPacket[] = [];
   const memo = new Map<string, Participant>();
   for (const r of candidates) {
-    const packet = roomPacket(r);
+    const packet = roomPacket(r, set.reactions);
     packet.action = { type: 'refresh' };
     packet.receiveMessages = refreshAllowed(chat, r, set, incomingOn)[0];
     rooms.push(packet);

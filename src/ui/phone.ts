@@ -8,7 +8,7 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
-  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  chancePassed, parseReactions, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
 import { agentFace, imageUrl, stChip } from './images';
@@ -674,6 +674,12 @@ function roomDel(id: string, pending: boolean, label: string): string {
 
 const dayOf = (t: string) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
 
+/** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
+const reactionChips = (v?: string) => {
+  const list = parseReactions(v);
+  return list.length ? `<div class="ph-reacts">${list.map((r) => `<span class="ph-react">${esc(r.emoji)}<small>${r.count}</small></span>`).join('')}</div>` : '';
+};
+
 function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): string {
   const r = phone.room ? st.rooms[phone.room] : undefined;
   if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
@@ -691,6 +697,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
       const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : '';
       const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : '';
       if (day) lastDay = day;
+      if (m.kind === 'skip') return `${sep}<div class="ph-sys skip">생략됨</div>`;
       if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === 'pause' ? ' pause' : ''}">${esc(m.text)}</div>`;
       const prev = shown[i - 1];
       const next = shown[i + 1];
@@ -703,7 +710,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
       const pic = !me ? (first ? face(ctx, who, name(m.sender), ' ph-face') : '<span class="ph-face-gap"></span>') : '';
       const head = !me && first ? `<b class="ph-name">${esc(name(m.sender))}</b>` : '';
       const meta = last || unread ? `<span class="ph-meta-t">${unread ? '<i>1</i>' : ''}${last ? esc(shortTime(m.time)) : ''}</span>` : '';
-      return `${sep}<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
+      return `${sep}<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
     })
     .join('');
   const pending = r.pending
@@ -949,6 +956,7 @@ function settingsView(ctx: ChatContext): string {
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
         row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
+        row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
       ].join(''))}
       ${group('새 메시지', [
         row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),

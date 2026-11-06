@@ -78,7 +78,14 @@ NPCs may send a warranted virtual attachment inside an ordinary text/content fie
 PATCH ROWS
 Use ordered JSON operations. New text: {"op":"add","path":"/messages/-","value":{"content":"sent text","sender":"active NPC ID","type":"text"}}.
 For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC's own message text or omit them. Never use dots/ellipsis ("...", "…") as a loading, typing or silence placeholder. An NPC's deliberately sent "..." is ordinary text; no response uses an empty patch.
-At most __LIMIT_events__ operations per room, __LIMIT_reply_tokens__ tokens per text and __LIMIT_pause_tokens__ per pause. The app assigns times and record IDs; omit them. Do not copy timestamps or change old records. Operations are add /messages/- unless this request explicitly permits initial naming. Never add/swap members or create invitations through PATCH. Follow the selected outer output contract.
+When an unknown amount of conversation over an unknown duration is omitted between kept messages, use type="skip", sender="-", content="-". Use a skip only when the omission itself helps the reader see that the kept messages are not consecutive. Use a pause instead when the elapsed time is known.
+At most __LIMIT_events__ operations per room, __LIMIT_reply_tokens__ tokens per text and __LIMIT_pause_tokens__ per pause. The app assigns times and record IDs; omit them. Do not copy timestamps or change old records. Operations are add /messages/- unless this request explicitly permits initial naming or the EMOJI REACTIONS rule allows a reaction replace. Never add/swap members or create invitations through PATCH. Follow the selected outer output contract.
+@@END
+
+@@SECTION REACTIONS
+EMOJI REACTIONS
+Messages may carry emoji reactions that other participants attached, as space-separated emoji each followed by its count, such as "👍3 😭1"; "-" means none. A new text row may include "reactions" in its value. Participants may also react to an existing message: {"op":"replace","path":"/messages/RECORD_ID/reactions","value":"👍2"}, where RECORD_ID is that message's recordID; the value replaces its old reactions.
+Count only other participants who have seen the message and would plausibly react that way. Keep each count within the number of those participants. Use reactions sparingly, mostly for messages that invite acknowledgment or a quick emotional response, not on every message. Never let the owner react. In a one-to-one room, leave the NPC's own messages without reactions. A reaction alone is a valid result when nothing else needs to be said.
 @@END
 
 @@SECTION REPLY
