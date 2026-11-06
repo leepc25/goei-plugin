@@ -2983,7 +2983,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   </div>`;
   }
   function boardList(st, busy4, mobile) {
-    if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
+    if (!st.posts.length) return `<div class="ph-blank"><div class="ph-blank-in"><p>게시글이 없어요.</p><button class="ph-blank-go" data-action="gn-refresh" ${busy4 ? "disabled" : ""}>${busy4 ? "불러오는 중…" : "새로고침"}</button></div></div>`;
     return `<ul class="ph-list gn-list">${st.posts.map((p) => {
       const on2 = gnet.open === p.id && !gnet.settings;
       return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
@@ -3836,7 +3836,4 @@ Next Paragraph Text
     needsCharacterCheck(s7) {
       return s7.charIndex !== this.charIndex;
     }
-    /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 같은 캐릭터라 그냥 두면 「괴이 카드 아님」이 남는다) */
-    forget() {
-      this.charIndex = -2;
-    }
+    /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 

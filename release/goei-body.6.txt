@@ -1,4 +1,25 @@
->다른 봇의 캐릭터 로어북 글을 붙여 넣으면 제목(#·**굵게**)으로 절을 나눠 칸에 배정해요. 안 맞는 절은 그 제목 그대로 추가 칸이 돼요. 기존 칸 글은 뒤에 이어 붙여요.</p>
+${recUi.importOpen ? " on" : ""}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
+          ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ""}
+          <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? "지우기" : "삭제"}</button></div></header>
+      ${recUi.preview ? `<pre class="gw-preview">${esc14(text4)}</pre>` : ""}
+      ${recUi.importOpen ? importPane(kind) : ""}
+      ${basicCard(ctx2, kind, sel, d, rec2)}
+      ${kind === "org" ? membersCard(ctx2, sel, d) : ""}
+      <section class="gw-sec"><h3>로어 칸 ${variantBar}</h3>
+        <div class="gw-fields">${rows2.join("")}</div>
+        ${lines3 ? `<h4 class="gw-sub">한 줄 추가 항목</h4><div class="gw-fields">${lines3}</div>` : ""}
+        <div class="gw-add-field"><input name="ed-extra-name" placeholder="새 칸 이름" data-enter="ed-extra-add" autocomplete="off">
+          ${kind === "agent" ? `<select name="ed-extra-kind"><option value="block">절 (글)</option><option value="identity">Identity 한 줄</option><option value="appearance">Appearance 한 줄</option></select>` : '<input type="hidden" name="ed-extra-kind" value="block">'}
+          <button class="gx-mini" data-action="ed-extra-add" data-take="ed-extra-name">${ICONS.plus}칸 추가</button><button class="gx-mini" data-action="ed-order-reset">기본 순서로</button></div>
+      </section>
+      ${readonly}
+    </div>`;
+    }
+    return `<div class="gw-page split">${list4}${detail}</div>`;
+  }
+  function importPane(kind) {
+    const r = recUi.importResult;
+    return `<div class="gw-import"><p class="gx-muted">다른 봇의 캐릭터 로어북 글을 붙여 넣으면 제목(#·**굵게**)으로 절을 나눠 칸에 배정해요. 안 맞는 절은 그 제목 그대로 추가 칸이 돼요. 기존 칸 글은 뒤에 이어 붙여요.</p>
     <textarea data-input="ed-import" rows="8" placeholder="여기에 붙여 넣기">${esc14(recUi.importText)}</textarea>
     <div class="gx-row-btns"><button class="gx-mini" data-action="ed-import-parse">배정 보기</button>${r ? '<button class="gx-mini" data-action="ed-import-apply">이대로 넣기</button>' : ""}</div>
     ${r ? `<table class="gw-map"><thead><tr><th>절</th><th>→ 칸</th></tr></thead><tbody>${r.map.map(([t, id]) => `<tr><td>${esc14(t)}</td><td>${esc14(id.startsWith("x:") ? `추가 칸 「${id.slice(2)}」` : FIELDS[kind].find((f) => f.id === id)?.label ?? id)}</td></tr>`).join("")}</tbody></table>` : ""}
@@ -4397,9 +4418,4 @@ ${rules2}`;
     "",
     "### 7.4 Recording appraisals and intent in `relationship`",
     "Risupot kept these in eight separate fields; here they are entries in the `relationship` slot toward `@user`, each with a short Korean prefix so they can be told apart. Write each only with evidence, as an interpretation, and only when it is new or changed:",
-    "- 「첫인상:」 **first impression**, written once, when the person first speaks with or is addressed by the user's character in a confirmed span and no 첫인상 entry exists. Visible cue → the subjective image the person formed → the resulting feeling and its personality-based reason, from scene-visible face, build, grooming, clothing, equipment, carried items, posture or expression and the person's known tastes and biases. Example of reasoning, not of fact: a person who values money sees expensive clothes and a watch, infers wealth, and feels anticipation; an ostentation-averse person sees the same and feels aversion. If no usable visual evidence exists, record that the first impression is unknown. Once this entry exists, never upsert or remove it, however wrong it later proves; later understanding goes only to 「현재 평가:」.",
-    "- 「현재 평가:」 **current evaluation**: the person's present reading of the user's character, its concrete reason, and the resulting feeling, through the person's own personality. A favorable first impression may coexist with an unfavorable current evaluation. A corrected interpretation need not change the emotion, and a changed feeling need not change every judgment. Upsert the one existing entry when it changes; do not write a diary of evaluations and do not restate it when nothing changed. Distinguish 「부유해 보임」 from verified wealth; hidden wealth, background, ability, intentions and private traits are not automatically known.",
-    "- 「의도:」 **nature and intent of interest**: the primary intent and, when needed, a secondary one, from the table in 7.5. Distinguish nonromantic interest from romantic or sexual interest; strong affinity does not make everyone a romantic candidate. A real catalyst is required when the nature of interest changes.",
-    "- 「태도:」 **stance**: how the person currently interprets and treats the target, as two separate elements, with the evidence for the latest change.",
-    "- 「제약:」 **duty and how it is handled**: see 7.6.",
-    "- 「속마음:」 **unexpressed feeling**: what is felt but not shown, what limits expression, actual leaks (gaze, interrupted sentences, delays), and who perceived them. Never transfer this into another p
+    "- 「첫인상:」 **first impression**, written once, when the person first speaks with or is addressed by the user's character in a confirmed span and no 첫인상 entry exists. Visible cue → the subjective image the person formed → the resulting feeling and its personality-based reason, from scene-visible face, build, grooming, clothing, equipment, carried items, posture or expression and the person's known tastes and biases. Example of reasoning, not of fact: a person who values money sees expensive clothes and a watch, infers wealth, and feels anticipation; an ostentation-averse person se

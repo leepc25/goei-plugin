@@ -7,7 +7,7 @@ import { cardVersion, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
 import { tokenizerName } from '../../core/tokenizer';
 import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
-import { dropOldGame, dropTokenizer, dropWikiPack } from '../../host/install';
+import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { updateCharacterLore, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
@@ -61,7 +61,12 @@ export const manUi = {
   info: '',
   notice: '',
   diag: null as DiagRun[] | null,
+  /** 상태 점검의 「받기」 진행 중인 것과 진행 글 (2026-11-06 사용자 승인, 전수점검 9-9) */
+  getting: '' as '' | 'tok' | 'wiki',
+  progress: '',
 };
+/** 점검 페이지를 다시 그리는 손잡이 (받기 진행 글을 띄울 때) */
+let rerender: (() => void) | null = null;
 
 async function refresh(): Promise<void> {
   const sizes: Record<string, number> = {};
@@ -87,6 +92,7 @@ async function refresh(): Promise<void> {
 
 /** 처음 열 때 저장소 크기·기록을 읽고 다시 그린다 */
 export function ensureManage(render: () => void): void {
+  rerender = render;
   if (manUi.sizes || manUi.pending) return;
   manUi.pending = true;
   void refresh().finally(() => {
@@ -129,6 +135,13 @@ function backupPage(ctx: ChatContext): string {
     </div></div>`;
 }
 
+/** 상태 점검 줄의 「받기」 단추: 이미 있으면 없음, 받는 중이면 진행 글 */
+function getBtn(what: 'tok' | 'wiki', label: string, has: boolean): string {
+  if (has) return '';
+  if (manUi.getting === what) return `<span class="gx-muted gw-getting">${esc(manUi.progress || '받는 중…')}</span>`;
+  return `<button class="gx-mini" data-action="man-get-${what}" ${manUi.getting ? 'disabled' : ''}>${ICONS.refresh}${esc(label)}</button>`;
+}
+
 function diagPage(ctx: ChatContext, canChat: boolean): string {
   const lore = ctx.char.globalLore;
   const goei = isGoeiLore(lore);
@@ -140,8 +153,9 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
     row('카드', badge(goei, goei ? '괴이 카드' : '괴이 카드 아님'), goei ? `카드 ${ver === '0' ? '이전 판' : `v${ver}`} · 명부·매니페스트 있음` : '설치 · 점검에서 심으면 괴이 카드가 돼요'),
     row('플러그인', badge(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : '업데이트 주소가 없는 빌드'),
     row('채팅', badge(canChat, canChat ? '진행 중' : '시작 전'), canChat ? `메시지 ${msgs}개 · 이 채팅 값으로 동작해요` : '시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요'),
-    row('토크나이저', badge(!!tok, tok || '어림값'), tok ? '토큰 수를 정확히 세요' : '설치에서 받으면 정확해져요'),
-    row('위키 기본 문서', badge(!!storedWikiPack(), storedWikiPack() ? '있음' : '없음'), '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)'),
+    // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
+    row('토크나이저', badge(!!tok, tok || '어림값') + getBtn('tok', '받기 (약 2MB)', !!tok), tok ? '토큰 수를 정확히 세요' : '안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요.'),
+    row('위키 기본 문서', badge(!!storedWikiPack(), storedWikiPack() ? '있음' : '없음') + getBtn('wiki', '받기 (약 1MB)', !!storedWikiPack()), storedWikiPack() ? '카드에서 뺀 기본 문서 묶음 (이 기기 저장소)' : '안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요.'),
     row('로어북 보내기', badge(null, mode === 'risu' ? 'Risu가 직접' : '플러그인이 고름'), '설정 → 고급 → 로어북 보내기'),
   ].join('');
   const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : '', phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
@@ -268,6 +282,30 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       } catch (error) {
         manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
       }
+      return true;
+    }
+    case 'man-get-tok':
+    case 'man-get-wiki': {
+      // 상태 점검에서 바로 받기 (설치 페이지와 같은 함수). 진행 글은 그 줄에 띄우고, 끝나면 배지가 바뀐다
+      if (manUi.getting) return true;
+      const what = action === 'man-get-tok' ? 'tok' : 'wiki';
+      manUi.getting = what;
+      manUi.progress = '';
+      rerender?.();
+      const progress = (t: string) => {
+        manUi.progress = t;
+        rerender?.();
+      };
+      try {
+        if (what === 'tok') await installTokenizer(progress);
+        else await installWikiPack(progress);
+        manUi.info = what === 'tok' ? '토크나이저를 받았어요. 이제 토큰 수를 정확히 세요.' : '위키 기본 문서를 받았어요. 위키 탭에서 읽을 수 있어요.';
+      } catch (error) {
+        manUi.notice = `${what === 'tok' ? '토크나이저' : '위키 기본 문서'}를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      manUi.getting = '';
+      manUi.progress = '';
+      manUi.sizes = null; // 저장소 사용량 다시 읽기
       return true;
     }
     case 'man-drop-wiki':

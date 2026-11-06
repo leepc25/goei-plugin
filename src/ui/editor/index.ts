@@ -76,6 +76,8 @@ export const edUi = {
   confirm: '' as '' | 'close' | 'reset',
   /** 탭마다 마지막으로 보던 페이지 */
   last: {} as Partial<Record<Tab, EditorNode>>,
+  /** 기능 탭 「설정 찾기」 칸에 적은 말 (2026-11-06 사용자 승인, 전수점검 8-10) */
+  sq: '',
 };
 
 let root: HTMLElement | null = null;
@@ -107,6 +109,7 @@ export function openEditor(h: EditorHost, node?: EditorNode): void {
   edUi.notice = '';
   // 저장소 사용량은 창을 열 때마다 다시 읽는다 (2026-10-28 QC: 처음 한 번만 읽어 설정을 바꿔도 크기가 그대로였다)
   manUi.sizes = null;
+  findIndex = null; // 찾기 목록은 창을 열 때마다 새로 만든다 (기능을 켜고 끄면 줄이 바뀐다)
   syncSettingsPage();
   ensureRoot();
   render();
@@ -180,6 +183,12 @@ function ensureRoot(): HTMLElement {
     if (name === 'dir') {
       directoryInput(el.dataset.key ?? '', el.value, null);
       touched();
+      return;
+    }
+    if (name === 'ed-sq') {
+      edUi.sq = el.value;
+      const box = root?.querySelector('.gw-find-out');
+      if (box) box.innerHTML = edUi.sq.trim() ? findResults(ctx ?? null) : treeGroups(treeCounts(ctx ?? null), featureState(ctx ?? null));
       return;
     }
     if (name === 'ed-q') {
@@ -402,7 +411,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
     : '</header>';
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
-    ${canChat ? mainDefaultsConfirm() : ''}
+    ${canChat ? mainDefaultsConfirm(ctx) : ''}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
@@ -433,9 +442,73 @@ function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>
   return out;
 }
 
+/* 설정 찾기 (2026-11-06 사용자 승인, 전수점검 8-10·9-3): 기능 탭 왼쪽 목록 위의 칸 하나.
+   각 설정 페이지를 그린 HTML에서 줄 이름·설명·묶음 제목을 모아 두고, 적은 말이 들어간 줄을 목록 자리에 보여 준다. 누르면 그 페이지로 가서 그 줄을 비춘다 */
+type FindHit = { page: SetPage; label: string; group: string; help: string };
+let findIndex: FindHit[] | null = null;
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'people', 'factions', 'lore', 'adv'];
+const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
+function buildFindIndex(ctx: ChatContext): FindHit[] {
+  const out: FindHit[] = [];
+  const keepPage = settingsUi.page;
+  for (const page of FIND_PAGES) {
+    let html = '';
+    try {
+      settingsUi.page = page === 'gnet' || page === 'phone' || page === 'wiki' || page === 'people' || page === 'journal' || page === 'factions' ? page : '';
+      html = settingsPage(ctx, page);
+    } catch {
+      continue;
+    }
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll<HTMLElement>('.ps-row').forEach((row) => {
+      const b = row.querySelector<HTMLElement>('.ps-label > b');
+      if (!b) return;
+      const label = [...b.childNodes].filter((n) => !(n instanceof HTMLElement && n.tagName === 'I')).map((n) => n.textContent ?? '').join('').trim();
+      if (!label) return;
+      const group = row.closest('.ps-group, .ps-card, details')?.querySelector('h3, h4, summary')?.textContent?.trim() ?? '';
+      const help = row.querySelector('.ps-label > small')?.textContent?.trim() ?? '';
+      out.push({ page, label, group, help });
+    });
+  }
+  settingsUi.page = keepPage;
+  return out;
+}
+function findResults(ctx: ChatContext | null): string {
+  const q = findNorm(edUi.sq);
+  if (!ctx) return '<p class="gw-find-none">채팅 정보를 읽지 못했어요.</p>';
+  findIndex ??= buildFindIndex(ctx);
+  const score = (h: FindHit) => (findNorm(h.label).includes(q) ? 0 : findNorm(SET_LABEL[h.page] + h.group).includes(q) ? 1 : findNorm(h.help).includes(q) ? 2 : -1);
+  const hits = findIndex.map((h, i) => ({ h, i, s: score(h) })).filter((x) => x.s >= 0).sort((a, b) => a.s - b.s || a.i - b.i).slice(0, 40);
+  if (!hits.length) return '<p class="gw-find-none">찾는 설정이 없어요.</p>';
+  return `<div class="gw-tree-group gw-find-res"><h4>찾은 설정 ${hits.length}개</h4>${hits
+    .map(({ h, i }) => `<button class="gw-tree-item gw-find-hit" data-action="ed-find-go" data-value="${i}">${SET_ICON[h.page]}<span><b>${esc(h.label)}</b><small>${esc(SET_LABEL[h.page])}${h.group && h.group !== h.label && h.group !== SET_LABEL[h.page] ? ` · ${esc(h.group)}` : ''}</small></span></button>`)
+    .join('')}</div>`;
+}
+/** 찾은 줄로 간 뒤: 그 줄을 화면 가운데로 옮기고 잠깐 비춘다 */
+function flashFound(hit: FindHit): void {
+  const rows = [...(root?.querySelectorAll<HTMLElement>('.gw-body .ps-row') ?? [])];
+  const row = rows.find((r) => {
+    const b = r.querySelector<HTMLElement>('.ps-label > b');
+    return b && [...b.childNodes].filter((n) => !(n instanceof HTMLElement && n.tagName === 'I')).map((n) => n.textContent ?? '').join('').trim() === hit.label;
+  });
+  if (!row) return;
+  const box = row.closest('details');
+  if (box && !box.open) box.open = true;
+  row.scrollIntoView({ block: 'center' });
+  row.classList.add('gw-find-flash');
+  setTimeout(() => row.classList.remove('gw-find-flash'), 2200);
+}
+
 function tree(ctx: ChatContext | null): string {
   const counts = treeCounts(ctx);
   const on = featureState(ctx);
+  const tab = tabOf(edUi.node);
+  const find = tab === 'set' ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">` : '';
+  if (tab === 'set' && edUi.sq.trim()) return `${find}<div class="gw-find-out">${findResults(ctx)}</div>`;
+  return find + (tab === 'set' ? '<div class="gw-find-out">' : '') + treeGroups(counts, on) + (tab === 'set' ? '</div>' : '');
+}
+
+function treeGroups(counts: Partial<Record<EditorNode, number>>, on: Partial<Record<EditorNode, boolean>>): string {
   return treeOf(tabOf(edUi.node)).map(
     (g) => `<div class="gw-tree-group"><h4>${g.title}</h4>${g.items
       .map(([id, label, icon, badge, sub]) => id.startsWith('label:')
@@ -678,6 +751,13 @@ export async function handle(action: string, value?: string): Promise<void> {
         instUi.forChar = -1; // 열 때마다 다시 점검
       }
       return render();
+    case 'ed-find-go': {
+      const hit = findIndex?.[Number(value)];
+      if (!hit) return;
+      await handle('ed-node', `set:${hit.page}`);
+      flashFound(hit);
+      return;
+    }
     case 'ed-width': {
       const w = Math.max(50, Math.min(100, Number(value) || 90));
       await savePrefs((p) => ({ ...p, editorWidth: w }));
