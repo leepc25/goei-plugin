@@ -2810,7 +2810,8 @@ if (fixture.globalLore.some(packed)) {
   // 사원증 뒷면 = 인사 기록부: 출동·종료 건 · 같이 간 요원 · 총 지출, 앞면으로 돌아가기
   await page.click('.gx-nav-brand [data-action="id-flip"]');
   await page.waitForSelector('.gx-nav-brand .gx-id.back');
-  assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-id.back .gx-op-ln i', (l) => l.map((e) => e.textContent)), ['출동·종료', '같이 간 요원', '총 지출']);
+  assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-id.back .gx-pr-cell i', (l) => l.map((e) => e.textContent)), ['출동·종료', '클리어', '총 지출']);
+  assert.equal(await page.locator('.gx-nav-brand .gx-id.back .gx-pr-comp li').count(), 2, '같이 간 요원 둘 (P001·P002)');
   assert.ok((await page.textContent('.gx-nav-brand .gx-id.back')).includes('1건'), '내가 나간 사건 1건');
   await page.click('.gx-nav-brand [data-action="id-flip"]');
   await page.waitForSelector('.gx-nav-brand .gx-id:not(.back) .gx-id-photo');
@@ -2997,9 +2998,9 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-rptpop [data-action="rec-back"]');
   await page.waitForSelector('.gx-jr-row');
   await noOverflow('폰 일지(보고서에서 뒤로)');
-  // 폰도 하위 탭 넷은 내용 위 (2026-11-05 사용자). 서랍에는 일지 칩 셋 + 찾기가 한 줄
+  // 폰도 하위 탭(11-06 연대기 더해 다섯)은 내용 위 (2026-11-05 사용자). 서랍에는 일지 칩 셋 + 찾기가 한 줄
   const tabW = await page.$$eval('.gx-rec-tabs [data-action="rec-sub"]', (l) => l.map((b) => b.getBoundingClientRect().width));
-  assert.ok(tabW.length === 4 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 네 칸 보임·같은 너비 (${tabW.join(',')})`);
+  assert.ok(tabW.length === 5 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 다섯 칸 보임·같은 너비 (${tabW.join(',')})`);
   assert.equal(await page.locator('.gx-rdrawer .ph-tool[data-action="rec-sub"]').count(), 0, '서랍에 하위 탭 단추 없음');
   await page.click('.gx-rdrawer .ph-grip');
   const tops = await page.$$eval('.gx-rdrawer .gx-wt-tools > *', (l) => l.map((b) => Math.round(b.getBoundingClientRect().top)));

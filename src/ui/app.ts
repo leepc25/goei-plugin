@@ -1567,7 +1567,7 @@ function idCard(ctx: ChatContext): string {
   const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
   const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
   const flip = `<button class="gx-id-flip" data-action="id-flip" aria-pressed="${idBack}">${idBack ? '앞면' : '인사 기록'}</button>`;
-  if (idBack) return `<div class="gx-id back">${bg}${who}${personnelRows(ctx)}${flip}</div>`;
+  if (idBack) return personnelCard(ctx, { bg, photo: photoUrl ?? null, name, role: [f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '), no: pa?.id ?? '', flip });
   return `<div class="gx-id">${bg}
       ${photo}
       ${who}
@@ -1576,16 +1576,22 @@ function idCard(ctx: ChatContext): string {
     </div>`;
 }
 
-/** 사원증 뒷면 = 인사 기록부 (2026-11-06 사용자 「진행시켜」): 이 채팅에서 내가 나간 사건 수·같이 간 요원 Top3·총 지출. 모델 호출 없음 */
-function personnelRows(ctx: ChatContext): string {
+/** 사원증 뒷면 = 인사 기록부 (2026-11-06 사용자: 「아예 뒷면으로 넘겨서 그럴싸하게」). 카드째 뒤집혀 인사 기록 카드 한 장:
+ *  머리(작은 사진·이름·소속·직급·사원 번호·배치일) · 숫자 셋(출동·종료, 클리어, 총 지출) · 같이 간 요원 Top3. 모델 호출 없음 */
+function personnelCard(ctx: ChatContext, o: { bg: string; photo: string | null; name: string; role: string; no: string; flip: string }): string {
   const p = buildPersonnel(ctx.chat, ctx.char.globalLore, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  const line = (label: string, value: string) => `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>`;
-  const comp = p.companions.length ? p.companions.map(([n, c]) => `${n} ${c}회`).join(' · ') : '없음';
-  return `<span class="gx-op-st gx-id-rec">
-      ${line('출동·종료', `${p.closed}건${p.cleared ? ` (클리어 ${p.cleared})` : ''}`)}
-      ${line('같이 간 요원', comp)}
-      ${colConfig(ctx.chat.scriptstate).wallet === 'off' ? '' : line('총 지출', formatWon(p.spent))}
-    </span>`;
+  const walletOn = colConfig(ctx.chat.scriptstate).wallet !== 'off';
+  const cell = (label: string, value: string, wide = false) => `<span class="gx-pr-cell${wide ? ' wide' : ''}"><i>${label}</i><b>${esc(value)}</b></span>`;
+  const comp = p.companions.length
+    ? `<ol class="gx-pr-comp">${p.companions.map(([n, c]) => `<li><span>${esc(n)}</span><em>${c}회</em></li>`).join('')}</ol>`
+    : '<p class="gx-pr-none">아직 같이 간 요원이 없어요.</p>';
+  return `<div class="gx-id back">${o.bg}
+      <span class="gx-pr-head"><i>인사 기록</i>${o.no ? `<em>${esc(o.no)}</em>` : ''}</span>
+      <span class="gx-pr-who">${o.photo ? `<span class="gx-pr-photo"><img src="${esc(o.photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}<span><b>${esc(o.name)}</b><small>${esc(o.role)}</small>${p.since ? `<small class="gx-pr-since">배치 ${esc(p.since)}</small>` : ''}</span></span>
+      <span class="gx-pr-cells">${cell('출동·종료', `${p.closed}건`)}${cell('클리어', `${p.cleared}건`)}${walletOn ? cell('총 지출', formatWon(p.spent), true) : ''}</span>
+      <span class="gx-pr-sec"><i>같이 간 요원</i>${comp}</span>
+      ${o.flip}
+    </div>`;
 }
 
 /** 사원증 잔고 줄 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 가계부 화면 (2026-10-29: 가계부가 왼쪽 메뉴에서 빠져 이 줄이 PC 의 입구) */

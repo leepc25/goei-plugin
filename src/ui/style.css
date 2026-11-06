@@ -1241,7 +1241,35 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 사원증 앞·뒷면 단추와 뒷면(인사 기록부) (2026-11-06) */
 .gx-id-flip { align-self: center; min-height: var(--ctl-sm, 30px); padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel2); color: var(--dim); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
 .gx-id-flip:hover { border-color: var(--signal); color: var(--signal); }
-.gx-id.back .gx-id-rec { gap: 6px; }
+/* 뒷면: 카드째 뒤집히는 인사 기록 카드 */
+.gx-id.back { align-items: stretch; gap: 12px; text-align: left; animation: gx-id-turn .32s ease-out; }
+@keyframes gx-id-turn { from { transform: perspective(800px) rotateY(-90deg); opacity: .4; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .gx-id.back { animation: none; } }
+.gx-pr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.gx-pr-head i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .14em; color: var(--signal); }
+.gx-pr-head em { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--dim); }
+.gx-pr-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gx-pr-who > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gx-pr-who b { font-size: 16px; font-weight: 800; color: var(--text); overflow-wrap: anywhere; }
+.gx-pr-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.gx-pr-who small.gx-pr-since { font-weight: 500; color: var(--dim); font-family: var(--mono); }
+.gx-pr-photo { position: relative; flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 12px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); }
+.gx-pr-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-pr-photo.none svg { width: 26px; height: 26px; }
+.gx-pr-cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: color-mix(in srgb, var(--panel2) 70%, transparent); }
+.gx-pr-cell { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 8px 10px; }
+.gx-pr-cell + .gx-pr-cell { border-left: 1px solid var(--line); }
+.gx-pr-cell.wide { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: baseline; border-left: 0; border-top: 1px solid var(--line); }
+.gx-pr-cell i { font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--dim); white-space: nowrap; }
+.gx-pr-cell b { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-pr-sec { display: flex; flex-direction: column; gap: 6px; }
+.gx-pr-sec > i { font-style: normal; font-size: 12px; font-weight: 700; color: var(--dim); }
+.gx-pr-comp { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; counter-reset: pr; }
+.gx-pr-comp li { display: flex; align-items: baseline; gap: 8px; font-size: 13px; counter-increment: pr; }
+.gx-pr-comp li::before { content: counter(pr); width: 16px; font-family: var(--mono); font-size: 12px; color: var(--signal); }
+.gx-pr-comp li span { flex: 1; min-width: 0; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.gx-pr-comp li em { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--dim); }
+.gx-pr-none { margin: 0; font-size: 12.5px; color: var(--dim); }
 .gx-idbtn { display: none; overflow: hidden; padding: 0; }
 .gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
 .gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
@@ -2978,12 +3006,12 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 .gx-pngcard .ps-note { margin: 0; font-size: 13px; color: var(--sub); }
 .gx-png-acts { display: flex; gap: 8px; justify-content: flex-end; }
 
-/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (넷이 같은 너비) */
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
+/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (다섯이 같은 너비, 11-06 연대기 추가) */
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
 
 /* ── 기록·가계부: 상황판 톤 (2026-10-29 사용자 시안 docs/시안/기록_가계부_2) ── */
 .gx-records, .gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
 /* 모니터 판: 상황판 CCTV 와 같은 어두운 화면·주사선·테두리 어둠, 고정폭 숫자에 은은한 빛 */
 .gx-mon { position: relative; flex: none; border-radius: 14px; overflow: hidden; background: #0b110f; color: #e8f3ef; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); box-shadow: inset 0 0 60px rgba(0, 0, 0, .6); }
 .gx-mon::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px); }

@@ -297,7 +297,7 @@ function chroniclePane(ctx: ChatContext): string {
     { label: '사건', value: String(n('event')), sub: '내가 나간 종료', tone: 'mint' },
     { label: '인물', value: String(n('person')), sub: '호감 단계 변화', tone: 'amb' },
     { label: '세력', value: String(n('faction')), sub: '평판 구간 변화' },
-    { label: '신분', value: String(n('rank')), sub: '소속·직급 변경' },
+    { label: '신분', value: String(n('rank')), sub: '소속·직급' },
   ], { cls: 'gx-jr-tiles' });
   const tools = isPhone() ? '' : chronicleTools();
   if (!shown.length) return `${mon}${tools}<p class="gx-wt-empty">${all.length ? '켠 종류에 해당하는 줄이 없어요.' : '아직 쌓인 것이 없어요. 내가 나간 사건이 끝나거나, 인물 호감·세력 평판의 단계가 바뀌면 여기에 한 줄씩 쌓여요.'}</p>`;
@@ -308,7 +308,7 @@ function chroniclePane(ctx: ChatContext): string {
     else groups.push({ day: e.day, rows: [e] });
   }
   const line = (e: ChronEntry) => {
-    const act = e.rpt && readReports(ctx.chat).items.some((r) => r.id === e.rpt) ? ` data-action="rec-open" data-value="${esc(e.rpt)}"`
+    const act = e.rpt && readReports(ctx.chat).items.some((r) => r.id === e.rpt) ? ` data-action="rec-chron-open" data-value="${esc(e.rpt)}"`
       : e.person ? ` data-action="rec-person" data-value="${esc(e.person)}"`
       : e.faction ? ` data-action="rec-faction" data-value="${esc(e.faction)}"` : '';
     const mark = e.jk ? gmark(e.jk, e.grade) : `<i class="gx-cr-dot ${e.kind}" aria-hidden="true"></i>`;
@@ -485,13 +485,14 @@ export async function handleRecords(action: string, value: string | undefined, c
       rec.chronOff = rec.chronOff.includes(v as ChronKind) ? rec.chronOff.filter((k) => k !== v) : [...rec.chronOff, v as ChronKind];
       break;
     case 'rec-open':
+    case 'rec-chron-open':
       closeToast();
       if (!readReports(ctx.chat).items.some((r) => r.id === v)) {
         rec.notice = '이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.';
         break;
       }
-      // 연대기에서 연 보고서는 닫으면 연대기로
-      Object.assign(rec, { sub: rec.sub === 'chronicle' ? 'chronicle' : 'journal', view: 'report', id: v, notice: '' });
+      // 연대기 줄에서 연 보고서(rec-chron-open)는 연대기 위에 뜨고 닫으면 연대기로. 그 밖(상황판·알림·일지)은 일지 위
+      Object.assign(rec, { sub: action === 'rec-chron-open' ? 'chronicle' : 'journal', view: 'report', id: v, notice: '' });
       break;
     case 'rec-people':
       Object.assign(rec, { sub: 'people', view: 'list', id: '', notice: '' });

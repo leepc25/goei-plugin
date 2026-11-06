@@ -141,6 +141,8 @@ export function buildChronicle(chat: Chat, lore: LoreEntry[] | undefined): Chron
 }
 
 export interface Personnel {
+  /** 이 채팅 첫 응답의 상태창 날짜 (배치일) */
+  since: string;
   /** 내가 나간 사건 가운데 끝난 것 */
   closed: number;
   /** 그 가운데 괴이 클리어 */
@@ -151,7 +153,7 @@ export interface Personnel {
   spent: number;
 }
 
-/** 인사 기록부 숫자 (사원증 뒷면): 출동·종료 건, 같이 간 요원 Top3, 총 지출 */
+/** 인사 기록부 숫자 (사원증 뒷면): 배치일, 출동·종료 건, 같이 간 요원 Top3, 총 지출 */
 export function buildPersonnel(chat: Chat, lore: LoreEntry[] | undefined, walletStart: number): Personnel {
   const rows = readJournal(chat).rows.filter((r) => r.mine && r.kind !== 'fd');
   const me = playerAgent(lore, chat.scriptstate);
@@ -160,7 +162,9 @@ export function buildPersonnel(chat: Chat, lore: LoreEntry[] | undefined, wallet
     for (const name of new Set(r.agents.map((a) => a.name).filter((n) => n && n !== me?.name))) comp.set(name, (comp.get(name) ?? 0) + 1);
   }
   const trades = liveWallet(readWallet(chat.scriptstate, walletStart), aliveAnchors(chat));
+  const first = (Array.isArray(chat.message) ? chat.message : []).find((m) => m.role === 'char' && lastStatusFields([str(m.data)])?.date);
   return {
+    since: first ? lastStatusFields([str(first.data)])?.date ?? '' : '',
     closed: rows.length,
     cleared: rows.filter((r) => r.cleared).length,
     companions: [...comp.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3),
