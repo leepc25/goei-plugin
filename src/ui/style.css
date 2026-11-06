@@ -2350,7 +2350,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-body .gx-agbox { display: flex; flex-direction: column; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
 .gx-agbox > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
 .gx-hseg { display: flex; gap: 2px; margin-left: -6px; padding: 2px; border-radius: 9px; background: var(--void); box-shadow: inset 0 0 0 1px var(--line); }
-.gx-hseg button { display: grid; place-items: center; min-width: var(--ctl-sm); height: var(--ctl-sm); padding: 0; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
+.gx-hseg button { display: grid; place-items: center; width: 34px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
 .gx-hseg button:hover { color: var(--text); }
 .gx-hseg button.on { background: var(--accent-bg); color: var(--signal); }
 .gx-hseg svg { width: 19px; height: 19px; }
@@ -2376,11 +2376,11 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agmon.op .gx-agmon-scr::after { background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%), radial-gradient(ellipse 80% 75% at 50% 45%, transparent 68%, rgba(225, 40, 28, .45) 100%); box-shadow: inset 0 0 14px rgba(230, 45, 30, .45); }
 .gx-agmon.lock .gx-agmon-scr > .gx-ava img { filter: grayscale(1) brightness(.35) contrast(1.15); }
 .gx-agmon.lock .gx-agmon-cap b { color: rgba(255, 255, 255, .55); }
-.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; align-items: center; gap: 4px; font: 600 12px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
+.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; align-items: center; gap: 4px; font: 600 10.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
 .gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; padding: 2px 5px; border-radius: 3px; background: rgba(4, 8, 8, .55); color: var(--c); font: 700 11px/1.1 var(--font, inherit); letter-spacing: 0; }
 .gx-agmon-cap { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .gx-agmon-cap b { font-size: 14.5px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-agmon-cap small { font: 600 12px/1.25 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon-cap small { font: 600 11px/1.25 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-agmon:hover .gx-agmon-scr { box-shadow: inset 0 0 0 1px #000, 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
 
 /* 목록: 얼굴 · 이름 · 상태(점+글자) · 상황 · 톡·위키. PC 두 줄, 모바일 한 줄. 줄을 칠하지 않고 점 색으로만 */
@@ -2433,7 +2433,7 @@ button.mk-go:hover { color: var(--signal); }
 @media (max-width: 760px) {
   .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
   .gx-agmon { aspect-ratio: 1; }
-  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 12px; } .gx-agmon-osd { font-size: 12px; }
+  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 10px; } .gx-agmon-osd { font-size: 9.5px; }
   /* 모바일은 화면 전체가 넘어가니 요원 칸 안쪽 스크롤 없음 (2026-10-21 사용자) */
   .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { flex: none; max-height: none; overflow: visible; }
   .gx-agrows { grid-template-columns: minmax(0, 1fr); }
