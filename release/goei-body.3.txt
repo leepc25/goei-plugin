@@ -68,7 +68,8 @@
     return text4.includes("<img=");
   }
   var SELF = "{{source::user}}";
-  var EMOTIONS = new Set("default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking".split(" "));
+  var ADDED_EMOTIONS = ["suspicious", "worried", "relieved", "disgusted", "determined", "jealous", "pleading", "forced smiling", "indifferent", "guilty", "pouting", "angry smile", "expressionless", "tormented", "crazy smile"];
+  var EMOTIONS = /* @__PURE__ */ new Set([..."default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking".split(" "), ...ADDED_EMOTIONS]);
   var tagName = (who, expr, pick3, self) => {
     const name = who.trim();
     const want = `${name}_${expr.trim()}`;
@@ -5124,12 +5125,4 @@ ${themeVars("[x-goei-fab]")}
   // src/core/budget.ts
   var level = 0;
   var LAST = 6;
-  var trimPrevious = () => level >= 1;
-  var trimSecondary = () => level >= 2;
-  var trimRelated = () => level >= 3;
-  function trimTurns(n2) {
-    if (n2 <= 0) return 0;
-    return level < 4 ? n2 : Math.max(1, Math.floor(n2 / 2 ** (level - 3)));
-  }
-  var BudgetError = class extends Error {
- 
+  var trimPrevious = () => 

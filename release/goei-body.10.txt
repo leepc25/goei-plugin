@@ -1,4 +1,15 @@
-칸) 모바일에서 줄을 넘기지 않고 접는다 */
+padding: 0 4px 4px; }
+  .gn-inline .gn-post-body { min-height: 0; padding: 10px 6px 12px; font-size: 15px; line-height: 1.65; }
+  .gn-inline .gn-csec { margin-top: 2px; }
+  .gn-inline .gn-chead { padding: 4px 4px 4px 6px; border-bottom-width: 1px; }
+  .gn-inline .gn-ccount { font-size: 14px; }
+  .gn-c { gap: 0 8px; padding-top: 6px; padding-bottom: 6px; }
+  .gn-c-who { min-height: 24px; font-size: 13.5px; }
+  .gn-c-body { font-size: 14.5px; line-height: 1.55; }
+  .gn-reply { min-height: 24px; padding: 0 8px; font-size: 12.5px; }
+  .gn-c-compose { padding: 6px 4px 8px calc(4px + var(--gn-depth, 1) * 14px); }
+}
+/* 설정 줄의 버튼 묶음이 길면 (괴담넷 사생활 다섯 칸) 모바일에서 줄을 넘기지 않고 접는다 */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .ps-ctl { max-width: 100%; min-width: 0; }
   .ps-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
@@ -2439,16 +2450,4 @@ ${note.trim()}` : card2;
         const w = structuredClone(x.world);
         const err = change(w, x);
         if (err) throw new Error(err);
-        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
-        if (w.closed?.length) {
-          const index = closeIndexOf(latest);
-          const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
-          if (built.rows.length) {
-            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
-            closedAt = index;
-          }
-        }
-        return next;
-      });
-      if (sav
+        const prev =

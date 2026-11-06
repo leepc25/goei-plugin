@@ -603,7 +603,7 @@ if (!skip()) {
   // 404 를 고치고 다시 누르면 이어서 받는다
   await frame.evaluate(() => { window.__fetchHook = (n, u) => (u.includes('/pic/') ? new Uint8Array([1, 2, 3]) : undefined); });
   await frame.click('[data-action="ed-inst-all"]');
-  await frame.waitForFunction(() => /사진 1597장/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
+  await frame.waitForFunction(() => /사진 2422장/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
   assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 2522);
   assert.equal(await frame.locator('.gw-inst-no').count(), 0);
   await closeOf(page, errors);
