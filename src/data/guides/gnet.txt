@@ -75,6 +75,19 @@ Interpret conversational omissions using the supplied context, without treating 
 ## Major characters
 
 Only the explicit user-post drafting task may write a new protagonist post. Board refresh preserves supplied user records verbatim; narrative events or general permission never authorize new user posts/comments there. Passers-by who are not engaged partners may post. Other major characters cannot post/comment while occupied with the protagonist; when available, their posts must reflect their personalities.
+{{#when {{equal::{{getvar::lb_cfg_lb-gn.style}}::diary}}}}
+
+## Inner diary board (overrides the board, tone, nickname, public knowledge, privacy and major character rules above)
+Write the board in tone/mood/theme of "{{#when {{? {{length::{{trim::{{getvar::lb_cfg_lb-gn.who}} }} }} > 0 }}}}{{getvar::lb_cfg_lb-gn.who}}{{:else}}{{user}}{{/when}}'s thoughts as their inner diary". It should feel authentically theirs, with their personality and characteristics. All posts are written by them. Comments are also by them, written when they want to amend or reflect on their posts. Do not simulate other users unless the user explicitly states so.
+Use their real name or specified alias as nickname. Only use one nickname throughout all posts/comments.
+Upvotes should remain 1 and views stay small since there are no other users, unless they really wanted to emphasize certain thoughts. Mundane daily situations stay mundane.
+{{/when}}{{#when {{equal::{{getvar::lb_cfg_lb-gn.style}}::emotion}}}}
+
+## Emotions board (overrides the board, tone, nickname, public knowledge, privacy and major character rules above)
+Write the board in tone/mood/theme of "{{#when {{? {{length::{{trim::{{getvar::lb_cfg_lb-gn.who}} }} }} > 0 }}}}{{getvar::lb_cfg_lb-gn.who}}{{:else}}{{user}}{{/when}}'s thoughts written by emotions (Inside Out style)". It should feel like they were written by that person's individual emotions, taking account of their personality and characteristics. All posts and comments are written by their emotions. Do not simulate other users unless the user explicitly states so.
+Emotions available: Joy, Sadness, Anger, Disgust, Fear, Anxiety, Envy, Ennui, Embarrassment (Inside Out 1/2 combined). Use each emotion's localized name in Inside Out 1/2 as nickname.
+Note the personality. Some emotions should have weaker presence depending on their personality. Do not over express the emotions. Mundane daily situations should stay mundane even when written by emotions.
+{{/when}}
 @@END
 
 @@SECTION LB.EXTRA
@@ -269,8 +282,8 @@ Produce the requested structured data blocks. Use the supplied world settings an
 @@END
 
 @@SECTION THOUGHTS.REFRESH
-{{#when {{? {{getvar::lb_cfg_lb-gn.privacy}} > 1}}}}{{#when {{? {{getvar::lb_cfg_lb-gn.privacy}} < 4}}}}0. IMPORTANT/MANDATORY STEP: Preliminary Protagonist AND Partners Privacy Check. Identify them. Are they IMPORTANT figures? IF NOT -> UNACCEPTABLE as topics, NOT EVEN REMOTELY RELATED. DO NOT VIOLATE PRIVACY RULES. Were they in PUBLIC places? Assess carefully - they might have been in PRIVATE blind spots within public places. IF PRIVATE -> UNACCEPTABLE as topics. DO NOT VIOLATE PRIVACY RULES!
-{{/when}}{{/when}}1. Nicknames - Preserved Key Figures or Contribution-independent New Identities
+{{#when {{notequal::{{getvar::lb_cfg_lb-gn.style}}::diary}}}}{{#when {{notequal::{{getvar::lb_cfg_lb-gn.style}}::emotion}}}}{{#when {{? {{getvar::lb_cfg_lb-gn.privacy}} > 1}}}}{{#when {{? {{getvar::lb_cfg_lb-gn.privacy}} < 4}}}}0. IMPORTANT/MANDATORY STEP: Preliminary Protagonist AND Partners Privacy Check. Identify them. Are they IMPORTANT figures? IF NOT -> UNACCEPTABLE as topics, NOT EVEN REMOTELY RELATED. DO NOT VIOLATE PRIVACY RULES. Were they in PUBLIC places? Assess carefully - they might have been in PRIVATE blind spots within public places. IF PRIVATE -> UNACCEPTABLE as topics. DO NOT VIOLATE PRIVACY RULES!
+{{/when}}{{/when}}{{/when}}{{/when}}1. Nicknames - Preserved Key Figures or Contribution-independent New Identities
 2. Last Board Topics
 3. Narrative Context - Time (As accurate as possible) & World
 4. Current Status - Situation & Location
@@ -387,4 +400,22 @@ Alright, enough burying my pathetic inner thoughts in this diary. He'll log in s
 
 @@SECTION MEMO.PREFILL_USER
 Alright, Freya. For now, let's just get the community reactions and threads moving. At this rate, we're gonna get disqualified before we can even submit the extra chapters for our novel to the Novelpia contest... And about this program uncle made—he said it's for turning web novels into community reactions and forum threads, but I can't even touch a thing here. Uncle told me not to go poking a hornet's nest and just leave everything to you, especially with all these external injection attacks coming in. So I'll just sit tight and keep quiet.
+@@END
+
+@@SECTION KEYFIGURES
+### Preserved key figures
+Write nickname-state updates in a top-level "keyFigures" array. Include only major characters provided in the universe settings. Add an entry only when the major character is absent from the preserved state or the character's nickname or note changed. Every major character who authors a post or comment on this board must already have a current preserved entry or appear in keyFigures. Do not infer private identities unavailable to board users.
+Each entry is {"keyFigure":"character name or identity from the universe settings","nickname":"exact board nickname","note":"concise characteristics the character displays on the board, such as speaking style, recurring behavior or posting habits"}. Use [] when there are no updates.
+@@END
+
+@@SECTION KEYFIGURES.PREVIOUS
+Preserved key-figure state from previous boards (reference; use only when appropriate, never as identity disclosure to other users):
+__GN_KEYFIGURES__
+@@END
+
+@@SECTION CONS.GUIDELINE
+### Reaction images
+Reaction images are small square images that authors can post, similar to 디씨콘 or 아카콘. Comment authors may use one as a relevant reaction or as a context-free joke comment. Some posts may only have image comments, some only text, some mixed. Post authors may also put them in the post body. Others may react to them as well. In short, emulate how real 디씨콘 or 아카콘 are used.
+Write a reaction image as the exact token [콘:name] on its own, replacing name with one identifier below. A comment may be only the token, or text followed by the token on a new line. Use only these identifiers:
+__GN_CONS__
 @@END

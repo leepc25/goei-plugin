@@ -6,7 +6,7 @@ import {
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
-  userNick, writeGnet, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
+  userNick, writeGnet, consList, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
@@ -158,7 +158,8 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
       const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s, date: dateNow(chat) }));
       const inc = saveIncoming(chat, res.st, (value as { incoming?: unknown }).incoming, plan);
       note = [res.notice, res.emptyComments ? '이번 게시판에는 댓글이 하나도 없어요.' : '', inc.note].filter(Boolean).join(' ');
-      return writeGnet(withVars(chat, inc.vars), res.st, { ack: viewing() });
+      const figs = s.keyFigures ? mergeKeyFigures(chat.scriptstate, (value as { keyFigures?: unknown }).keyFigures) : null;
+      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing() });
     });
     if (!automatic) gnet.open = null;
     else if (gnet.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), gnet.open)) gnet.open = null;
@@ -387,7 +388,18 @@ function seg(key: string, cur: string, items: [string, string][]): string {
     .join('')}</div>`;
 }
 
-const body = (text: string) => attachBody(text, true);
+/** 반응 그림 표 (라이트보드 미니콘, 2026-11-06). gnetTab이 그릴 때마다 채운다 */
+let consMap = new Map<string, string>();
+const CON_RE = /\[콘:([^\[\]:]{1,30})\]/g;
+/** 본문의 [콘:이름]을 그림으로 바꾼다. 목록에 없는 이름은 글자 그대로 둔다 */
+export function withCons(html: string, map: Map<string, string>): string {
+  if (!map.size) return html;
+  return html.replace(CON_RE, (m, name: string) => {
+    const src = map.get(name);
+    return src ? `<img class="gn-con" src="${src}" alt="${name}" title="${name}" loading="lazy">` : m;
+  });
+}
+const body = (text: string) => withCons(attachBody(text, true), consMap);
 
 function time(date: string): string {
   return /(\d\d:\d\d)/.exec(date)?.[1] ?? '';
@@ -613,11 +625,15 @@ function settingsView(ctx: ChatContext, back = true): string {
       ].join(''))}
       ${group('게시판', [
         row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
-        row('성격', seg('style', ['gal', 'wpf'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳). 이용자 구성과 기본 말투만 바뀌고 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
+        row('성격', seg('style', ['gal', 'wpf', 'diary', 'emotion'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게'], ['diary', '일기장'], ['emotion', '감정 게시판']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
+        ...(['diary', 'emotion'].includes(v('style')) ? [row('누구', text('who', '비우면 주인공'), '일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요')] : []),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
         row('보호 대상', text('protagonist', '비우면 주인공'), '위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공'),
+        row('주요 인물 닉네임', seg('keyfigures', v('keyfigures') === '0' ? '0' : '1', [['1', '보존'], ['0', '안 함']]), '주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요'),
+        row('반응 그림', seg('cons', v('cons') === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '디시콘처럼 댓글·글에 반응 그림을 붙여요. 아래 목록에 그림이 있어야 켜져요'),
+        ...(v('cons') === '1' ? [row('반응 그림 목록', `<textarea class="gx-search ps-text" rows="5" data-change="gn-text" data-key="cons_list" placeholder="한 줄에 하나씩: 이름 | 그림 주소(https)">${esc(v('cons_list'))}</textarea>`, '이름은 30자 안쪽, 대괄호·쌍점 없이')] : []),
         row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']]), '새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요'),
         row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']]), '내가 댓글을 단 남의 글도 새로고침 때 남길지예요'),
       ].join(''))}
@@ -640,6 +656,7 @@ function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): stri
 export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   if (env) liveEnv = env;
   const st = readGnet(ctx.chat);
+  consMap = gnetSettings(ctx.chat.scriptstate).cons ? new Map(consList(ctx.chat.scriptstate).filter((c) => /^(https?:\/\/|data:image\/)/.test(c.src)).map((c) => [esc(c.name), esc(c.src)])) : new Map();
   const me = userNick(ctx.chat.scriptstate);
   const job = jobs.get(chatKey(ctx));
   const busy = !!job;
@@ -949,7 +966,7 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
     }
     case 'gn-text': {
       const [k, ...rest] = v.split('=');
-      if (['subject', 'mood', 'protagonist'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
+      if (['subject', 'mood', 'protagonist', 'who', 'cons_list'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
       return true;
     }
     default:

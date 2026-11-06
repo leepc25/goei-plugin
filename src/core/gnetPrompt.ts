@@ -4,7 +4,7 @@
 import { hasAttachment } from './attach';
 import { evaluate } from './cbs';
 import {
-  activityContext, findPost, gnetSettings, gnetVars, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
+  activityContext, consList, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
   type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField,
 } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
@@ -121,6 +121,25 @@ export function boardJson(posts: GPost[]): string {
   });
 }
 
+/** 주요 인물 닉네임 (write = 이번 응답에 갱신을 쓰게 함). 반응 그림 지침. 라이트보드 미니보드 (2026-11-06) */
+function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline: string; format: string } {
+  const s = gnetSettings(src.chat.scriptstate);
+  const parts: string[] = [];
+  let format = '';
+  if (s.keyFigures) {
+    const kept = keyFigures(src.chat.scriptstate);
+    if (kept.length) parts.push(fill(b.read('KEYFIGURES.PREVIOUS'), { KEYFIGURES: JSON.stringify(kept) }));
+    if (write) {
+      parts.push(b.read('KEYFIGURES'));
+      format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
+    }
+  }
+  if (s.cons) parts.push(fill(b.read('CONS.GUIDELINE'), { CONS: consList(src.chat.scriptstate).map((c) => c.name).join(', ') }));
+  return { guideline: parts.filter(Boolean).join('\n\n'), format };
+}
+
+const seed = () => Math.floor(Math.random() * 2147483647).toString(36);
+
 // ── 작업별 ──
 
 export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, nick: string, factionNames: Record<string, string>): GnetPrompt {
@@ -131,10 +150,14 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
     `${b.read('LB')}\n\n${b.read('BOARD.GUIDELINE')}`,
     b.read('AUTO.GUIDELINE').replace(/__GN_POST_RANGE__/g, range),
     `${b.read('ATTACHMENTS')}\n${incomingRules(b, plan)}`,
-  ].join('\n\n');
-  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`;
+  ];
+  const ex = boardExtras(src, b, true);
+  if (ex.guideline) guideline.push(ex.guideline);
+  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}${ex.format}`;
   if (s.sampling) {
-    format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample each from low-probability possibilities below 0.10 and order them by probability descending. The application validates both and uses alternativePosts, the second candidate.';
+    // 원본 미니보드 5.0.0: 두 벌 각각 확률을 적게 하고, 요청마다 무작위 씨앗 둘을 넣는다
+    format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.'
+      + `\n<x-output-seed-a>${seed()}</x-output-seed-a>\n<x-output-seed-b>${seed()}</x-output-seed-b>`;
   }
   const protectedIds: number[] = [];
   const reference = st.posts.filter((p, i) => {
@@ -146,7 +169,7 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
     TIME: dateNow(src.chat), USER_NICK: nick, KEEP_OWN: String(s.keepOwn), KEEP_REPLIED: String(s.keepReplied), PROTECTED: protectedIds.join(','),
     POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: b.read('ACTION.REFRESH'), BOARD: boardJson(reference),
   }) + incomingTask(plan);
-  return pack(src, b, 'THOUGHTS.REFRESH', guideline, format, extras, factionNames);
+  return pack(src, b, 'THOUGHTS.REFRESH', guideline.join('\n\n'), format, extras, factionNames);
 }
 
 export interface PublicPrompt extends GnetPrompt {
@@ -157,7 +180,7 @@ export interface PublicPrompt extends GnetPrompt {
 export function postPrompt(src: RefSource, st: GState, input: string, plan: IncomingPlan, factionNames: Record<string, string>): PublicPrompt {
   const b = gnetBooks(src);
   const activity = activityContext(st, null);
-  const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts)].join('\n\n');
+  const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
   return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity };
 }
@@ -196,7 +219,7 @@ export function commentPrompt(
     action, userHandle: nick,
   });
   const activity = activityContext(st, p.id);
-  const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts)].join('\n\n');
+  const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = task + incomingTask(plan, activity.posts);
   return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity, supplied: selected, total };
 }
