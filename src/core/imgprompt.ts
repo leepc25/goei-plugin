@@ -3,8 +3,8 @@
 import type { LoreEntry } from './types';
 import { readDirectory } from './world/directory';
 
-/** 표정 세트 기본 (카드 그림 assets/portraits 27종) */
-export const IMG_KEYWORDS_DEFAULT = ['default', 'angry', 'annoyed', 'bored', 'confused', 'contemptuous', 'crying', 'curious', 'dumbfounded', 'embarrassed', 'excited', 'exhausted', 'happy', 'laughing', 'lovestruck', 'lustful', 'nervous', 'proud', 'sad', 'scared', 'serious', 'shy', 'smile', 'smirk', 'smug', 'surprised', 'thinking'];
+/** 표정 세트 기본 (카드 그림 assets/portraits 42종: 기본 27 + 추가 15, 사용자 11-06) */
+export const IMG_KEYWORDS_DEFAULT = ['default', 'angry', 'annoyed', 'bored', 'confused', 'contemptuous', 'crying', 'curious', 'dumbfounded', 'embarrassed', 'excited', 'exhausted', 'happy', 'laughing', 'lovestruck', 'lustful', 'nervous', 'proud', 'sad', 'scared', 'serious', 'shy', 'smile', 'smirk', 'smug', 'surprised', 'thinking', 'suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'];
 
 /** 지침 틀 기본 (카드 로어북 「Asset」 원문에서 CBS 를 뺀 것). 자리표: {characters} {keywords} {user_rule} {user_skip} */
 export const IMG_PROMPT_DEFAULT = `## Inserting Character Visual Images

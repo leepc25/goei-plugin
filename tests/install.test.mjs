@@ -14,7 +14,7 @@ test('설치 자료(팩): 빈 인사말 하나와 직접 입력 키 10개, 사�
   assert.equal(Object.keys(INSTALL_GREETINGS.index).length, 10, '키(세력×언어, 직접 입력) 10개');
   assert.deepEqual(INSTALL_GREETINGS.texts, ['']);
   assert.ok(Object.values(INSTALL_GREETINGS.index).every((n) => n === 0));
-  assert.ok(INSTALL_PICTURES.length > 1600, `사진 ${INSTALL_PICTURES.length}장 (옛 요원 그림 55장을 뺀 뒤 1697)`);
+  assert.ok(INSTALL_PICTURES.length > 1600, `사진 ${INSTALL_PICTURES.length}장 (옛 요원 그림 55장을 뺀 뒤 1697, 추가 표정 825장을 더해 2522)`);
   assert.equal(DEFAULT_DIRECTORY.schema, 1);
   assert.equal(Object.keys(DEFAULT_DIRECTORY.요원).length, 55);
 });
