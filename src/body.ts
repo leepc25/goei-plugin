@@ -330,7 +330,7 @@ async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
   if (settings.director === 'scene') {
     const { people } = peopleBlockFor(chat, opts);
-    const note = await directorNoteText(chat, store, people, input, settings, user).catch(() => '');
+    const note = await directorNoteText(chat, store, people, input, settings, user, char.globalLore).catch(() => '');
     if (note) out = insertBlock(out, note);
   }
   return out;

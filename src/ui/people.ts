@@ -355,6 +355,8 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
         row('길이', seg('director_len', s.directorLen, [['short', '짧게'], ['normal', '보통']]), 'Director 메모의 길이예요'),
         s.director === 'scene' ? row('시간 제한', seg('director_timeout', String(s.directorTimeout), [['10', '10초'], ['20', '20초'], ['40', '40초']]), '넘기면 이번 턴은 지시 없이 보내요.') : '',
         row('재사용', onoff('director_reuse'), '장면이 그대로면 지난 지시를 다시 써요.'),
+        s.director === 'scene' ? row('기능별 지침', onoff('director_features'), '켜진 기능(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토큰 적음)') : '',
+        s.director === 'scene' ? row('2차 검색', onoff('director_search'), '자료가 모자라면 Director가 채팅·로어북·위키 검색을 요청하고, 코드가 찾아 한 번 더 불러요 (그 턴만 보조 1회 추가)') : '',
       ].join(''))
     : '';
   // 두 「추가 지침」이 헷갈려 한 묶음에 나란히 (2026-10-26 사용자)
