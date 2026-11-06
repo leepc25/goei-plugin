@@ -38,15 +38,16 @@ for (const vp of ['pc', 'phone']) {
     if (l) await l({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: 1 });
   }, REPLY);
   await page.waitForTimeout(800);
-  console.log(await page.evaluate(({ rows, people, wallet, more }) => {
+  console.log(await page.evaluate(({ rows, people, wallet, more, pl }) => {
     const c = window.__chat;
     c.message.push(...more);
     c.scriptstate.$goei_journal = JSON.stringify({ v: 1, rows });
     c.scriptstate.$st_wallet = JSON.stringify(wallet);
+    if (pl) c.scriptstate.$st_player = pl;
     c.goeiPeopleV1 = people;
     window.__button.cb(); // 닫기
     return [c.message.length, c.message.map((m) => m.role).join(','), Object.keys(c.scriptstate).length];
-  }, { rows, people, wallet, more: [{ role: 'user', data: '계속', chatId: 'u2' }, { role: 'char', data: `둘째.\n${ST(1, '04:11 AM')}`, chatId: 'c2' }, { role: 'user', data: '계속', chatId: 'u3' }, { role: 'char', data: `셋째.\n${ST(2, '09:30 AM')}`, chatId: 'c3' }] }));
+  }, { rows, people, wallet, pl: process.env.PLAYER || '', more: [{ role: 'user', data: '계속', chatId: 'u2' }, { role: 'char', data: `둘째.\n${ST(1, '04:11 AM')}`, chatId: 'c2' }, { role: 'user', data: '계속', chatId: 'u3' }, { role: 'char', data: `셋째.\n${ST(2, '09:30 AM')}`, chatId: 'c3' }] }));
   await openWin(page);
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector('.gw [data-action="ed-close"]')?.click());
