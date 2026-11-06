@@ -1573,7 +1573,7 @@ function idCard(ctx: ChatContext): string {
 }
 
 /** 인사 기록 카드 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로 「인사기록카드 느낌」). 서식 종이처럼:
- *  머리(소속 · 「인사 기록 카드」 · 사원 번호) · 증명사진 + 인적 사항 표(성명·소속·직급·배치일) · 근무 기록 표(끝낸 내 사건·클리어) ·
+ *  머리(소속 · 「인사 기록 카드」 · 사원 번호) · 증명사진 + 사진 옆 한 표(성명·소속·직급(명부 요원일 때만)·끝낸 내 사건·클리어, 배치일 없음 사용자 11-06) ·
  *  같이 간 요원 표(전부, 많이 간 순 — 사건 투입 칸에 같이 적힌 횟수). 모델 호출 없음 */
 function personnelCard(ctx: ChatContext): string {
   const facs = factionList(ctx.char.globalLore);
@@ -1597,10 +1597,7 @@ function personnelCard(ctx: ChatContext): string {
       <header class="gx-pr-head"><small>${esc(org || '소속 없음')}</small><b>인사 기록 카드</b><em>${esc(pa?.id ? `No. ${pa.id}` : '')}</em></header>
       <section class="gx-pr-id">
         ${photo ? `<span class="gx-pr-photo"><img src="${esc(photo)}" alt=""></span>` : `<span class="gx-pr-photo none">${ICONS.idcard}</span>`}
-        <table class="gx-pr-tbl gx-pr-kv"><tbody>${row('성명', pa?.name || u.name || '나')}${row('소속', [org, pa?.department ?? ''].filter(Boolean).join(' · '))}${row('직급', pa?.rank ?? '')}${row('배치일', p.since)}</tbody></table>
-      </section>
-      <section class="gx-pr-sec"><h4>근무 기록</h4>
-        <table class="gx-pr-tbl gx-pr-kv"><tbody>${row('끝낸 내 사건', `${p.closed}건`)}${row('클리어', `${p.cleared}건`)}</tbody></table>
+        <table class="gx-pr-tbl gx-pr-kv"><tbody>${row('성명', pa?.name || u.name || '나')}${row('소속', [org, pa?.department ?? ''].filter(Boolean).join(' · '))}${pa?.rank ? row('직급', pa.rank) : ''}${row('끝낸 내 사건', `${p.closed}건`)}${row('클리어', `${p.cleared}건`)}</tbody></table>
       </section>
       <section class="gx-pr-sec"><h4>같이 간 요원 <em>${p.companions.length}명</em></h4>${comp}</section>
     </div>`;

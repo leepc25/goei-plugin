@@ -2810,7 +2810,7 @@ if (fixture.globalLore.some(packed)) {
   // 인사 기록 = 팝업 (2026-11-06 사용자: 사원증은 그대로, 팝업으로): 끝낸 내 사건 · 클리어 · 같이 간 요원
   await page.click('.gx-nav-brand [data-action="id-record"]');
   await page.waitForSelector('.gx-prpop .gx-pr');
-  assert.deepEqual(await page.$$eval('.gx-prpop .gx-pr-kv th', (l) => l.map((e) => e.textContent)), ['성명', '소속', '직급', '배치일', '끝낸 내 사건', '클리어'], '총 지출은 없음 (사용자 11-06)');
+  assert.deepEqual(await page.$$eval('.gx-prpop .gx-pr-kv th', (l) => l.map((e) => e.textContent)), ['성명', '소속', '끝낸 내 사건', '클리어'], '총 지출·배치일 없음, 「나」는 직급 없음 (사용자 11-06)');
   assert.ok((await page.textContent('.gx-prpop .gx-pr')).includes('1건'), '내가 나간 사건 1건');
   assert.equal(await page.locator('.gx-prpop .gx-pr-comp tbody tr').count(), 2, '같이 간 요원 둘 (P001·P002)');
   assert.equal(await page.locator('.gx-nav-brand .gx-id .gx-id-photo').count(), 1, '사원증은 그대로');
