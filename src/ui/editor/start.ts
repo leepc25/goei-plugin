@@ -62,6 +62,24 @@ function scenesBlock(code: string, d: Directory): string {
 }
 
 /** 묶음 구성원: 명부의 모든 요원 중 고르기 + 구성원별 첫 장면 */
+/** 인물별 첫 장면 상태 글 (요약 줄). 기본 글(세계 자료 팩)이 없는 인물은 「없음」 — 11-05 캡처에서 글이 없는데도 「기본 글」이라 적혀 있었다 */
+export function agentSceneState(id: string, d: Directory): string {
+  const saved = agentSceneSaved(id, d.scenes);
+  return saved?.ko || saved?.en || saved?.label ? '직접 고친 글' : agentScene(id, undefined) ? '기본 글' : '첫 장면 없음';
+}
+
+/** 인물별 첫 장면 입력 칸(제목·한국어·영어). 시작 화면 묶음 구성원과 요원 화면(record.ts)이 같이 쓴다.
+ *  11-07 사용자: 「기본 글」이라면서 칸이 비어 있음 → 기본 글을 칸에 그대로 보인다. 고치면 저장값, 기본 글과 같거나 비우면 저장값을 지운다(directoryInput ascene:) */
+export function agentSceneFields(id: string, d: Directory): string {
+  const saved = agentSceneSaved(id, d.scenes);
+  const def = agentScene(id, undefined);
+  const hasDefault = !!def;
+  const k = (f: string) => `ascene:${id}|${f}`;
+  return `${input(k('label'), saved?.label ?? def?.label ?? '', '제목', '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
+    ${area(k('ko'), saved?.ko ?? def?.ko ?? '', '한국어', 10, hasDefault ? '기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
+    ${area(k('en'), saved?.en ?? def?.en ?? '', 'English', 10, hasDefault ? '기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '')}`;
+}
+
 function membersBlock(code: string, d: Directory): string {
   const all = d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name);
   const members = all.filter((a) => a.rosterFor.includes(code));
@@ -69,19 +87,7 @@ function membersBlock(code: string, d: Directory): string {
     .map((a) => `<button class="gx-chip${a.rosterFor.includes(code) ? ' on' : ''}" data-action="dir-group-member" data-value="${esc(`${code}|${a.id}`)}" aria-pressed="${a.rosterFor.includes(code)}">${esc(a.name)}</button>`)
     .join('');
   const scenes = members
-    .map((a) => {
-      const saved = agentSceneSaved(a.id, d.scenes);
-      // 기본 글(세계 자료 팩)이 없는 인물은 「없음」으로 — 11-05 캡처에서 글이 없는데도 「기본 글」이라 적혀 있었다
-      const def = agentScene(a.id, undefined);
-      const hasDefault = !!def;
-      // 11-07 사용자: 「기본 글」이라면서 칸이 비어 있음 → 기본 글을 칸에 그대로 보인다. 고치면 저장값, 기본 글과 같거나 비우면 저장값을 지운다(directoryInput ascene:)
-      const k = (f: string) => `ascene:${a.id}|${f}`;
-      return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en || saved?.label ? '직접 고친 글' : hasDefault ? '기본 글' : '첫 장면 없음'}</small></summary>
-        ${input(k('label'), saved?.label ?? def?.label ?? '', '제목', '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
-        ${area(k('ko'), saved?.ko ?? def?.ko ?? '', '한국어', 10, hasDefault ? '기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
-        ${area(k('en'), saved?.en ?? def?.en ?? '', 'English', 10, hasDefault ? '기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '')}
-      </details>`;
-    })
+    .map((a) => `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`)
     .join('');
   return `<div class="dir-line"><span>구성원 ${members.length}명</span></div><div class="dir-chips">${chips}</div>
     <p class="gx-muted">묶음으로 시작하면 내 페르소나 없이 구성원 한 명을 골라 그 인물로 시작해요. 사원증·괴담톡 탭·소속은 그 인물의 원래 조직을 따르고, 묶음 이름은 모델에게 알리지 않아요.</p>
