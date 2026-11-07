@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "훌라후프",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hula hoop. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "인형 옷",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny doll dress. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "봉제 인형",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stuffed animal plush. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "토끼 인형",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bunny plush toy. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자동차 장난감",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red toy car. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팽이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spinning top. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "요요",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yoyo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "큐브 퍼즐",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful rubik's cube. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "퍼즐 조각",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single jigsaw puzzle piece. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "주사위",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two white dice. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장기판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded wooden janggi board. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "바둑알",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few black and white go stones. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화투",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few hwatu flower cards. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "트럼프",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deck of playing cards in a closed box, plain box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "구슬",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glass marbles. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "딱지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few folded paper ddakji tiles. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

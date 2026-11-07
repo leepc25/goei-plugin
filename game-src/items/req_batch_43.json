@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "보고서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few clipped white report sheets. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "생환 보고서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red folder with papers inside. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "의뢰서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single form sheet with boxes, no readable text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사진첩",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown photo album. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "증명사진",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ID photo of a faceless silhouette. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가족사진 액자",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden photo frame with a blurred family photo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "폴라로이드 사진",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single polaroid photo of a dark hallway. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "낡은 일기장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old leather diary with a clasp. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "공책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed plain notebook. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "스케치북",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spiral sketchbook with a plain cover. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "달력",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wall calendar with a grid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "포스터",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled poster tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "QR 코드 포스터",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper poster with a black and white QR code square. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부고장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white envelope with a black border. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청첩장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white envelope with a pink ribbon. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "초대장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a decorative invitation card in an envelope. Only this item, nothing else beside it, no text."
+  }
+ ]
+}
