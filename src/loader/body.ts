@@ -1,6 +1,7 @@
 // 본체 받기·실행. 본체(goei-body.js)는 「// goei-body 판」 줄로 시작하고, 실행하면 globalThis.__goeiBody를 남긴다.
 import type { BodyHandlers } from '../body';
 import { sha256Text, textHash } from '../core/texthash';
+import { fetchParts } from '../core/fetchparts';
 
 export type Body = BodyHandlers;
 export const BODY_KEY = 'goei:body';
@@ -77,11 +78,10 @@ export async function fetchBody(version: string): Promise<string> {
   }
   if (index?.version !== version) throw new BodyError('아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');
   if (!Array.isArray(index.parts) || typeof index.length !== 'number') throw new BodyError('본체 정보가 올바르지 않아요.');
-  let code = '';
   for (const name of index.parts) {
     if (typeof name !== 'string' || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError('본체 정보가 올바르지 않아요.');
-    code += await getText(name);
   }
+  const code = await fetchParts(index.parts as string[], getText);
   if (code.length !== index.length || bodyVersion(code) !== version) throw new BodyError('본체를 끝까지 받지 못했어요.');
   // 지문이 있는 판(0.17.9~)은 글자까지 맞는지 본다: crypto.subtle 이 있는 환경(보안 컨텍스트)이면 sha256(전체 UTF-8 바이트),
   // 없으면 hash(UTF-16 FNV-1a). 둘 다 없는 옛 release 의 목록은 길이·판만 (호환). 불일치는 받기 창의 「다시 받기」로

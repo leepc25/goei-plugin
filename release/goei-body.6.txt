@@ -1048,7 +1048,7 @@ Next Paragraph Text
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.0" : "0";
+  var PLUGIN_VERSION = true ? "0.21.1" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -1431,6 +1431,29 @@ Next Paragraph Text
     setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String) }, pictures: j.pictures, directory: j.directory, icon: j.icon });
   }
 
+  // src/core/fetchparts.ts
+  var PART_CONCURRENCY = 4;
+  async function fetchParts(names4, get, onDone, limit = PART_CONCURRENCY) {
+    const out = new Array(names4.length);
+    let next = 0;
+    let done3 = 0;
+    let failed = false;
+    const worker = async () => {
+      while (next < names4.length && !failed) {
+        const i = next++;
+        try {
+          out[i] = await get(names4[i]);
+        } catch (error) {
+          failed = true;
+          throw error;
+        }
+        onDone?.(++done3);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(limit, names4.length) }, worker));
+    return out.join("");
+  }
+
   // src/host/datapack.ts
   var WORLD_KEY2 = "goei:data-world";
   var INSTALL_KEY = "goei:data-install";
@@ -1483,13 +1506,11 @@ Next Paragraph Text
     if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack3.label} 목록 형식이 달라요.`);
     if (index.hash !== pack3.expect.hash) throw new DataPackError(`아직 이 판의 ${pack3.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
     const re = new RegExp(`^${pack3.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
-    let text4 = "";
-    let n2 = 0;
     for (const name of index.parts) {
       if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack3.label} 목록 형식이 달라요.`);
-      text4 += await getText(name);
-      progress?.(`${pack3.label} 받는 중 ${++n2}/${index.parts.length}`);
     }
+    const parts = index.parts;
+    const text4 = await fetchParts(parts, getText, (n2) => progress?.(`${pack3.label} 받는 중 ${n2}/${parts.length}`));
     if (text4.length !== pack3.expect.length) throw new DataPackError(`${pack3.label}를 끝까지 받지 못했어요. (${text4.length}/${pack3.expect.length}자)`);
     const got = await sha256Text(text4);
     if (got !== null) {
@@ -3573,9 +3594,4 @@ Next Paragraph Text
 .gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0; background: var(--panel2); color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
 .gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
 .gw .adv-step > input.adv-val { width: 96px; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield; }
-.gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.gw .adv-step > span, .gw .adv-num > span { display: inline-flex; align-items: center; padding: 0 10px 0 6px; font-size: 13px; color: var(--dim); white-space: nowrap; }
-.gw .st-step > b { display: inline-flex; align-items: center; justify-content: center; min-width: 3.4em; padding: 0 6px; font-size: 13px; font-weight: 600; color: var(--text); }
-.gw .adv-num { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
-.gw .adv-num > input { width: 84px; height: auto; min-height: 0; max-height: none; border: 0; border-radius: 0; background: transparent; text-align: right; }
-.gw .adv-num > span { pad
+.gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: no

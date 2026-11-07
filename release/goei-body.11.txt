@@ -1,4 +1,11 @@
-: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+px 13px 0 0; }
+/* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
+.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.st-scopebar .st-scope { flex: none; margin: 0; }
+/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
+.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
+/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
 .st-act svg { width: 14px; height: 14px; flex: none; }
 .st-act:hover:not(:disabled) { background: var(--accent-bg); }
 .st-act:disabled { opacity: .4; cursor: default; }
@@ -2439,15 +2446,4 @@ ${note.trim()}` : card2;
         const w = structuredClone(x.world);
         const err = change(w, x);
         if (err) throw new Error(err);
-        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
-        if (w.closed?.length) {
-          const index = closeIndexOf(latest);
-          const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
-          if (built.rows.length) {
-            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
-            closedAt = index;
-          }
-        }
-        return next;
-   
+        const prev = prevWorldVars(lates

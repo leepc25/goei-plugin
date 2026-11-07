@@ -1,4 +1,13 @@
-alue !== b.textContent) a.value = b.textContent ?? "";
+..b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
+  }
+  function syncForm(a, b) {
+    const active3 = document.activeElement === a && a !== committed;
+    if (a instanceof HTMLInputElement && b instanceof HTMLInputElement) {
+      if (a.type === "checkbox" || a.type === "radio") {
+        if (a.checked !== b.hasAttribute("checked")) a.checked = b.hasAttribute("checked");
+      } else if (a.type !== "file" && !active3 && a.value !== b.getAttribute("value")) a.value = b.getAttribute("value") ?? "";
+    } else if (a instanceof HTMLTextAreaElement && b instanceof HTMLTextAreaElement) {
+      if (!active3 && a.value !== b.textContent) a.value = b.textContent ?? "";
     } else if (a instanceof HTMLSelectElement && b instanceof HTMLSelectElement) {
       const want = [...b.options].findIndex((o) => o.hasAttribute("selected"));
       if (want >= 0 && a.selectedIndex !== want) a.selectedIndex = want;
@@ -2749,11 +2758,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 /* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
 .gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
-.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
-/* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
-.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.st-scopebar .st-scope { flex: none; margin: 0; }
-/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
-.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
-/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
-.st-act { display
+.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13

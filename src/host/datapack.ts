@@ -10,6 +10,7 @@
 import { applyInstallPack, applyWorldPack, INSTALL_PACK, packMatches, WORLD_PACK, type PackSpec } from '../core/datapack';
 import { installDataReady } from '../core/install';
 import { sha256Text, textHash } from '../core/texthash';
+import { fetchParts } from '../core/fetchparts';
 import { UPDATE_BASE } from '../core/update';
 import { worldDataReady } from '../core/world/records';
 import { toBytes } from './assets';
@@ -81,13 +82,11 @@ export async function fetchPack(pack: PackSpec, progress?: Progress): Promise<st
   if (!index || !Array.isArray(index.parts) || typeof index.length !== 'number') throw new DataPackError(`${pack.label} 목록 형식이 달라요.`);
   if (index.hash !== pack.expect.hash) throw new DataPackError(`아직 이 판의 ${pack.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
   const re = new RegExp(`^${pack.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.\\d+\\.txt$`);
-  let text = '';
-  let n = 0;
   for (const name of index.parts) {
     if (typeof name !== 'string' || !re.test(name)) throw new DataPackError(`${pack.label} 목록 형식이 달라요.`);
-    text += await getText(name);
-    progress?.(`${pack.label} 받는 중 ${++n}/${index.parts.length}`);
   }
+  const parts = index.parts as string[];
+  const text = await fetchParts(parts, getText, (n) => progress?.(`${pack.label} 받는 중 ${n}/${parts.length}`));
   if (text.length !== pack.expect.length) throw new DataPackError(`${pack.label}를 끝까지 받지 못했어요. (${text.length}/${pack.expect.length}자)`);
   const got = await sha256Text(text);
   if (got !== null) {

@@ -1,4 +1,8 @@
-oup"><h3>진단 묶음</h3><div class="ps-rows">${row5("내려받기", `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, "판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.")}</div></section>
+20(r.at)} · ${esc20(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc20(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
+    const bundle = diagBundle(ctx2, canChat);
+    return `<div class="gw-page gw-set">${head("", "요청 기록", "괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.")}
+    <div class="gx-settings gw-setbody">
+    <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row5("내려받기", `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, "판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.")}</div></section>
     <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
     <section class="ps-group"><h3>인물 기록 갱신 <small>최근 ${diag?.length ?? 0}건</small></h3><div class="ps-rows">${runs}${diag?.length ? `<div class="ps-row gw-rel-foot">${manUi.confirm === "drop-diag" ? `<button class="gx-mini danger" data-action="man-drop-diag-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-diag">${ICONS.trash}기록 지우기</button>`}</div>` : ""}</div></section>
     </div></div>`;
@@ -2935,13 +2939,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   function syncAttrs(a, b) {
     for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
-    for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
-  }
-  function syncForm(a, b) {
-    const active3 = document.activeElement === a && a !== committed;
-    if (a instanceof HTMLInputElement && b instanceof HTMLInputElement) {
-      if (a.type === "checkbox" || a.type === "radio") {
-        if (a.checked !== b.hasAttribute("checked")) a.checked = b.hasAttribute("checked");
-      } else if (a.type !== "file" && !active3 && a.value !== b.getAttribute("value")) a.value = b.getAttribute("value") ?? "";
-    } else if (a instanceof HTMLTextAreaElement && b instanceof HTMLTextAreaElement) {
-      if (!active3 && a.v
+    for (const { name, value } of [.

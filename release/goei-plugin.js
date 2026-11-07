@@ -1,7 +1,7 @@
 //@name goei-plugin
-//@display-name 괴이: ANOMALY v0.21.0
+//@display-name 괴이: ANOMALY v0.21.1
 //@api 3.0
-//@version 0.21.0
+//@version 0.21.1
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/texthash.ts
@@ -19,6 +19,29 @@ async function sha256Text(text) {
   } catch {
     return null;
   }
+}
+
+// src/core/fetchparts.ts
+var PART_CONCURRENCY = 4;
+async function fetchParts(names, get, onDone, limit = PART_CONCURRENCY) {
+  const out = new Array(names.length);
+  let next = 0;
+  let done = 0;
+  let failed = false;
+  const worker = async () => {
+    while (next < names.length && !failed) {
+      const i = next++;
+      try {
+        out[i] = await get(names[i]);
+      } catch (error) {
+        failed = true;
+        throw error;
+      }
+      onDone?.(++done);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, names.length) }, worker));
+  return out.join("");
 }
 
 // src/loader/body.ts
@@ -74,11 +97,10 @@ async function fetchBody(version) {
   }
   if (index?.version !== version) throw new BodyError("아직 이 판의 본체가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.");
   if (!Array.isArray(index.parts) || typeof index.length !== "number") throw new BodyError("본체 정보가 올바르지 않아요.");
-  let code = "";
   for (const name of index.parts) {
     if (typeof name !== "string" || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError("본체 정보가 올바르지 않아요.");
-    code += await getText(name);
   }
+  const code = await fetchParts(index.parts, getText);
   if (code.length !== index.length || bodyVersion(code) !== version) throw new BodyError("본체를 끝까지 받지 못했어요.");
   const got = typeof index.sha256 === "string" ? await sha256(code) : null;
   if (got !== null) {
@@ -180,7 +202,7 @@ function showPanel(version, install2, message = "") {
 }
 
 // src/main.ts
-var VERSION = true ? "0.21.0" : "";
+var VERSION = true ? "0.21.1" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));

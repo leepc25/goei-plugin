@@ -1,4 +1,15 @@
-   });
+t.scriptstate, (p) => change(p, x));
+        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+        if (w.closed?.length) {
+          const index = closeIndexOf(latest);
+          const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+          if (built.rows.length) {
+            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+            closedAt = index;
+          }
+        }
+        return next;
+      });
       if (saved && closedAt >= 0) {
         try {
           await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex, { chat: saved, char: ctx2.char });
@@ -2350,5 +2361,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.0", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.1", start: start2 };
 })();

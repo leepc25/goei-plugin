@@ -965,7 +965,14 @@ if (!skip()) {
   assert.equal(await a.frame.locator('.gl-card').count(), 0);
   await a.frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">x</div>'));
   await waitFab(a.frame, 'block', 15000);
-  assert.deepEqual(await fetched(a.frame), [...bodyFiles, 'goei-data-world.json', 'goei-data-world.1.txt', 'goei-data-world.2.txt', ...worldFiles], '처음 받기(2번 조각에서 멈춤) + 다시 받기 한 번, 그 뒤는 저장소에서');
+  // 조각은 4개씩 동시에 받는다 (src/core/fetchparts.ts): 2번이 실패할 때 이미 나간 3·4번(늦으면 5번까지)은 받지만 그 뒤는 안 받는다. 요청은 늘 조각 순서대로 나간다
+  const got = await fetched(a.frame);
+  const head = [...bodyFiles, 'goei-data-world.json'];
+  const firstTry = got.slice(head.length, got.length - worldFiles.length);
+  assert.deepEqual(got.slice(0, head.length), head, '본체 다음 세계 자료 목록');
+  assert.deepEqual(got.slice(got.length - worldFiles.length), worldFiles, '다시 받기 한 번, 그 뒤는 저장소에서');
+  assert.ok(firstTry.length >= 2 && firstTry.length <= 5, `처음 받기는 2번 조각에서 멈춤 (받은 조각 ${firstTry.length}개)`);
+  assert.deepEqual(firstTry, worldFiles.filter((n) => n !== 'goei-data-world.json').slice(0, firstTry.length), '처음 받기는 1번부터 차례로');
   await closeOf(a.page, a.errors);
   const b = await boot([fixture], 0, chat, { serve: missing, loader: 'old', clock: true });
   await b.frame.waitForSelector('.gl-card', { timeout: 15000 });
