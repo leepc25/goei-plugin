@@ -3229,6 +3229,11 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-band i { font-style: normal; font-size: 11px; margin-right: 1px; }
 .sh-c.poor .sh-band { color: var(--red); }
 .sh-c:disabled { opacity: .5; cursor: default; }
+.sh-band.dim { color: var(--dim); }
+.sh-ref.sell { background: color-mix(in srgb, var(--signal) 14%, var(--panel2)); }
+/* 팔 것 고르기 머리 줄 */
+.sh-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--sub); }
+.sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
 .sh-grid .it-tip { width: 260px; padding: 12px; }
 .sh-grid .it-tip b { font-size: 14px; margin-bottom: 6px; white-space: normal; }
 .sh-grid .it-tip .sh-amt { display: inline-block; margin-top: 8px; }

@@ -6,6 +6,8 @@
 // - 주인에게 말하기(흥정·문의·요청)는 글을 그대로 넘기고, 모델이 맥락을 읽어 응답 형식 안에서 「변경 없음 / 일부 / 전체」를 고른다.
 //   문구를 맞춰 보는 일은 없다. 흥정이 받아들여지면 그 칸 값만 바뀐다. 주인이 거래를 끊으면 진열대를 잠근다.
 // - 구입은 플러그인이 한다: 가계부 src:'store' + 소지품 from:'store'. 다음 턴 [Inventory] 글의 This turn 에 「새로 산 것」·주인과 나눈 말이 간다.
+// - 팔기(11-07 사용자): 내 소지품에서 하나 골라 주인에게 보이면(한마디·내가 부르는 값은 자유) 모델이 대사와 함께 사는 값을 정한다(<offer>). 값은 전부 모델 자율,
+//   플러그인은 숫자를 읽고 가게 값대를 터무니없이 벗어난 값만 버린다. 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
 // - 잔고·소지품은 모델에 넘기지 않는다. PixelLab 그림은 표시용(이름 매칭)이라 모델과 무관하다.
 import type { Chat } from './types';
 import { ITEM_KINDS, itemKind, itemKindLabel, type ItemKind } from './items';
@@ -131,6 +133,26 @@ export interface ShopLine {
   text: string;
 }
 
+/** 팔려는 물건 (소지품 한 줄의 사본). price: 주인이 부른 값 — 아직 안 물었으면 undefined, 안 사면 null */
+export interface ShopOffer {
+  itemId: string;
+  name: string;
+  desc: string;
+  kind: ItemKind;
+  effect: string;
+  /** 상점에서 산 물건이면 산 값 */
+  paid?: number;
+  price?: number | null;
+  /** 처음 부른 값 (흥정으로 바뀌었을 때만) */
+  first?: number;
+}
+
+/** 이번 방문에 판 것 */
+export interface ShopSale {
+  name: string;
+  price: number;
+}
+
 export interface ShopState {
   shop: string;
   owner: string;
@@ -144,16 +166,35 @@ export interface ShopState {
   closed: boolean;
   /** 지난 진열대의 물건 이름 (새로고침 때 피하기) */
   prev: string[];
+  /** 팔기 진행 중인 물건 */
+  sell?: ShopOffer | null;
+  /** 이번 방문에 판 것 */
+  sales: ShopSale[];
 }
 
 const EMPTY_ID: ShopIdentity = { sells: [], never: '', prices: '', min: 0, max: 0 };
 
-export const emptyShop = (tag: ShopTag, key: string): ShopState => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [] });
+export const emptyShop = (tag: ShopTag, key: string): ShopState => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
 
 const isItem = (e: unknown): e is ShopItem => {
   const x = e as ShopItem;
   return !!x && typeof x === 'object' && typeof x.id === 'string' && typeof x.name === 'string' && Number.isSafeInteger(x.price);
 };
+
+function readOffer(v: unknown): ShopOffer | null {
+  const o = v as Partial<ShopOffer>;
+  if (!o || typeof o !== 'object' || typeof o.itemId !== 'string' || typeof o.name !== 'string' || !o.name) return null;
+  return {
+    itemId: o.itemId,
+    name: clean(o.name, 30),
+    desc: clean(o.desc, 120),
+    kind: itemKind(o.kind),
+    effect: clean(o.effect, 60),
+    ...(Number.isSafeInteger(o.paid) ? { paid: o.paid as number } : {}),
+    ...(o.price === null ? { price: null } : Number.isSafeInteger(o.price) ? { price: o.price as number } : {}),
+    ...(Number.isSafeInteger(o.first) ? { first: o.first as number } : {}),
+  };
+}
 
 export function readShop(vars: Vars): ShopState | null {
   const raw = vars?.[SHOP_VAR];
@@ -178,6 +219,8 @@ export function readShop(vars: Vars): ShopState | null {
       talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').slice(-40),
       closed: !!o.closed,
       prev: Array.isArray(o.prev) ? o.prev.filter((x): x is string => typeof x === 'string').slice(-40) : [],
+      sell: readOffer(o.sell),
+      sales: (Array.isArray(o.sales) ? o.sales : []).filter((x): x is ShopSale => !!x && typeof x === 'object' && typeof (x as ShopSale).name === 'string' && Number.isSafeInteger((x as ShopSale).price)).slice(-40),
     };
   } catch {
     return null;
@@ -323,6 +366,8 @@ export interface TalkReply {
   /** 전체 다시 짬 */
   all: Omit<ShopItem, 'id'>[];
   closed: boolean;
+  /** 팔기: 주인이 부른 값 (none → null, 말 안 했으면 undefined) */
+  offer?: number | null;
 }
 
 /** 주인에게 말한 뒤의 응답: 대사 + 진열대 변경(없음·일부·전체) + 거래 끊음 */
@@ -333,6 +378,15 @@ export function parseTalk(raw: string): TalkReply {
   const modeRaw = (m && /mode\s*=\s*["']?(none|partial|all)/i.exec(m[1])?.[1]) ?? 'none';
   const mode = modeRaw.toLowerCase() as TalkMode;
   const out: TalkReply = { owner, mode, add: [], reprice: [], remove: [], all: [], closed: /<closed\s*\/?>/i.test(raw) };
+  const of = /<offer\b([^>]*)>([\s\S]*?)<\/offer\s*>|<offer\s+none\s*\/?>/i.exec(raw);
+  if (of) {
+    const body = (of[2] ?? '').trim();
+    if (of[0].toLowerCase().includes('none') || /^(none|no|x|-|거절|안)/i.test(body)) out.offer = null;
+    else {
+      const n = priceOf(body);
+      if (n !== null) out.offer = n;
+    }
+  }
   const body = m ? m[2] : '';
   if (mode === 'all') {
     out.all = body.split('\n').map(parseLine).filter((x): x is Omit<ShopItem, 'id'> => !!x);
@@ -405,7 +459,41 @@ export function applyTalk(st: ShopState, r: TalkReply, kick = true): ShopState {
     items = [...items, ...withIds(st, r.add, items)];
   }
   const talk: ShopLine[] = [...st.talk, { who: 'owner', text: r.owner }];
-  return { ...st, items: items.slice(0, 40), talk: talk.slice(-40), closed: st.closed || (kick && r.closed) };
+  let sell = st.sell ?? null;
+  if (sell) {
+    // 부른 값: <offer> 가 우선, 없으면 「~ 이름|값」 줄이 팔 물건 이름이면 그것. 가게 값대를 터무니없이 넘는 값은 버린다(안 삼)
+    let price: number | null | undefined = r.offer;
+    if (price === undefined) {
+      const rp = r.reprice.find((p) => sameShopName(p.name, sell!.name));
+      if (rp) price = rp.price;
+    }
+    if (price !== undefined) {
+      if (price !== null && !offerFits(price, st.identity)) price = null;
+      const first = sell.first ?? (typeof sell.price === 'number' && price !== null && price !== sell.price ? sell.price : undefined);
+      sell = { ...sell, price, ...(first !== undefined ? { first } : {}) };
+    }
+  }
+  const closed = st.closed || (kick && r.closed);
+  return { ...st, items: items.slice(0, 40), talk: talk.slice(-40), closed, sell: closed ? null : sell };
+}
+
+/** 사는 값 검사: 가게 보통 값대의 두 배를 넘으면 터무니없는 값으로 본다 (싼 쪽은 제한 없음 — 헐값은 있을 수 있다) */
+export function offerFits(price: number, id: ShopIdentity): boolean {
+  return price >= 0 && !(id.max > 0 && price > id.max * 2);
+}
+
+/** 팔기 시작: 소지품 한 줄을 들고 주인에게 보인다 (값은 아직 없음). 내 말은 부르는 쪽이 sayToOwner 로 적는다 */
+export function startSell(st: ShopState, it: Omit<ShopOffer, 'price' | 'first'>): ShopState {
+  return { ...st, sell: { itemId: it.itemId, name: clean(it.name, 30), desc: clean(it.desc, 120), kind: itemKind(it.kind), effect: clean(it.effect, 60), ...(Number.isSafeInteger(it.paid) ? { paid: it.paid } : {}) } };
+}
+
+export const cancelSell = (st: ShopState): ShopState => ({ ...st, sell: null });
+
+/** 팔기 확정: 부른 값이 있을 때만. 판 것 목록에 남고 팔기 상태는 비운다 */
+export function closeSale(st: ShopState): ShopState | null {
+  const o = st.sell;
+  if (!o || typeof o.price !== 'number') return null;
+  return { ...st, sell: null, sales: [...st.sales, { name: o.name, price: o.price }].slice(-40) };
 }
 
 export function sayToOwner(st: ShopState, text: string): ShopState {
@@ -430,6 +518,7 @@ export function shopEvents(chat: Chat): string[] {
   const out: string[] = [];
   const lastOwner = [...st.talk].reverse().find((l) => l.who === 'owner');
   const spoke = st.talk.some((l) => l.who === 'me');
+  if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} won)`).join(', ')} to the owner of ${st.shop}`);
   if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ''}`);
   else if (spoke && lastOwner) out.push(`talked with the owner of ${st.shop}; last thing the owner said: "${lastOwner.text.slice(0, 80)}"`);
   return out;
@@ -481,6 +570,9 @@ export const SHOP_THOUGHTS =
 const TALK_THOUGHTS =
   '1. What did the player actually say or want (question, request, haggling, chat)?\n2. Given this owner\'s character and the shop identity, what is the honest reaction: answer only, fetch something, re-stock the whole shelf, lower a price, refuse, or end the dealing?\n3. Pick exactly one change mode. Only things within the shop identity may be added.\n4. Write the owner\'s line in character.';
 
+const SELL_THOUGHTS =
+  '1. What is the protagonist offering, and what did they say (a price? haggling? just showing it)?\n2. Would this shop buy such a thing at all (identity: what it sells, what it never deals in)? If not, refuse in character.\n3. If yes: what would this owner pay — below what it would sell for, adjusted by condition and how much they want it. React to the protagonist\'s figure honestly.\n4. Write the owner\'s line with the figure, and the <offer>.';
+
 function material(src: ShopSource, s: ShopSettings): string {
   const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
   if (src.st.loaded) {
@@ -518,6 +610,11 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const st = src.st;
   const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${x.kind}|${x.desc}|${x.effect}`).join('\n') || '(empty)';
   const sold = soldItems(st).map((x) => x.name).join(', ');
+  const o = st.sell;
+  const sellRule = o
+    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all and what it would pay — a shop buys cheaper than it sells; condition, usefulness to this shop, and the protagonist\'s words (they may name a price, or haggle on your earlier figure) all matter. ' +
+      'Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner\'s line too. The shelf change mode is normally none while selling.'
+    : '';
   const system = [
     SYSTEM_COMMON,
     'The protagonist speaks to the owner. Read what they mean from context — do not keyword-match. Decide the owner\'s reaction from the owner\'s character and the fixed shop identity. ' +
@@ -525,12 +622,15 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     'Requests for something not on the shelf: fetch it (partial add) only if it fits the shop identity; otherwise the owner says they do not carry it. ' +
     'If the player wants a different selection, re-stock the whole shelf (all). Questions and small talk change nothing (none). ' +
     (s.kick ? 'If the owner has had enough (insults, endless haggling, trouble), they may end the dealing: say so in character and add <closed/>.' : 'The owner never ends the dealing; however annoyed, they keep the shop open (never output <closed/>).'),
-    `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ 이름|값|종류|설명|효과" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (이름|값|종류|설명|효과).\n</change>\n<closed/> only if the owner ends the dealing.`,
+    sellRule,
+    `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ 이름|값|종류|설명|효과" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (이름|값|종류|설명|효과).\n</change>${o ? '\n<offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).' : ''}\n<closed/> only if the owner ends the dealing.`,
     SHELF_RULES(s, st),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
   const talk = st.talk.map((l) => `${l.who === 'me' ? '[주인공]' : '[주인]'} ${l.text}`).join('\n');
-  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[지금 진열대]\n${shelf}${sold ? `\n\n[이번 방문에 산 것]\n${sold}` : ''}\n\n[이번 방문 대화 — 마지막 줄이 지금 한 말]\n${talk}` }], s, TALK_THOUGHTS);
+  const sales = st.sales.map((x) => `${x.name} (${x.price})`).join(', ');
+  const selling = o ? `\n\n[팔려는 물건 — 주인공이 내민 것]\n${o.name}|${o.kind}|${o.desc || '-'}|${o.effect || '-'}${o.paid !== undefined ? `\n(bought earlier for ${o.paid} won)` : ''}${typeof o.price === 'number' ? `\n(your last offer: ${o.price} won)` : ''}` : '';
+  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[지금 진열대]\n${shelf}${sold ? `\n\n[이번 방문에 산 것]\n${sold}` : ''}${sales ? `\n\n[이번 방문에 주인이 산 것]\n${sales}` : ''}${selling}\n\n[이번 방문 대화 — 마지막 줄이 지금 한 말]\n${talk}` }], s, o ? SELL_THOUGHTS : TALK_THOUGHTS);
 }
 
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄) */

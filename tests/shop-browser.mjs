@@ -1,4 +1,4 @@
-// 상점 사진·흐름 (2026-11-07): 응답 표식 → 응답 처리 → 「상점 열기」 카드(display) → 팝업(보조 모델 가짜 응답) → 상세·구입·흥정·거래 끊음, PC·폰.
+// 상점 사진·흐름 (2026-11-07): 응답 표식 → 응답 처리 → 「상점 열기」 카드(display) → 팝업(보조 모델 가짜 응답) → 상세·구입·흥정·팔기(제안·흥정·확정)·거래 끊음, PC·폰.
 // 사용법: node tests/shop-browser.mjs <out-dir>
 import { mkdirSync } from 'node:fs';
 import { boot, closeEditor, closeWin, launch, loadFixture, openEditor, openWin, sleep } from './qc-settings-harness.mjs';
@@ -31,6 +31,14 @@ const TALK_REPRICE = `<owner>건전지는 따로야. 둘이 같이 가져가면 
 <change mode="partial">
 ~ 손전등|17000
 </change>`;
+const SELL_OFFER = `<owner>손전등? 방금 산 거잖소. 중고는 만 이천이면 많이 쳐 주는 거요.</owner>
+<change mode="none">
+</change>
+<offer>12000</offer>`;
+const SELL_HAGGLE = `<owner>…만 사천. 그 이상은 안 되오.</owner>
+<change mode="none">
+</change>
+<offer>14000</offer>`;
 const TALK_CLOSED = `<owner>됐소. 살 거 아니면 나가쇼.</owner>
 <change mode="none">
 </change>
@@ -117,6 +125,36 @@ for (const vp of ['pc', 'phone']) {
   if (!bought || bought.name !== '손전등' || bought.walletId !== wl?.id) errorsAll.push(`[${vp}] item: ${JSON.stringify(after.it.list)}`);
   if (!after.st.items.find((x) => x.name === '손전등')?.sold) errorsAll.push(`[${vp}] not marked sold`);
   await shot('bought');
+  // 5b. 팔기: 「팔기」 → 내 소지품(방금 산 손전등) 고름 → 칩 → 보냄(글 없이) → 제안 12,000 → 상세 → 흥정 「만오천」 → 14,000(처음 값 취소선) → 팔기 확정
+  await act('shop-pick');
+  await shot('pick');
+  const myId = after.it.list.find((e) => e.from === 'store')?.id;
+  await act('shop-sell-pick', myId);
+  await sleep(200);
+  await shot('sell_chip');
+  await page.evaluate((t) => { window.__llm = [t]; }, SELL_OFFER);
+  await act('shop-say', '');
+  await waitIdle(); await sleep(300);
+  const so = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_shop || 'null'));
+  if (so?.sell?.price !== 12000) errorsAll.push(`[${vp}] sell offer: ${JSON.stringify(so?.sell)} talk=${JSON.stringify(so?.talk?.slice(-2))}`);
+  if (!so?.talk.some((l) => l.who === 'me' && l.text === '[팔기: 손전등]')) errorsAll.push(`[${vp}] sell line: ${JSON.stringify(so?.talk)}`);
+  await shot('sell_offer');
+  await page.evaluate((t) => { window.__llm = [t]; }, SELL_HAGGLE);
+  await act('shop-sell-haggle');
+  await act('shop-say', '만오천은 줘야지');
+  await waitIdle(); await sleep(300);
+  const sh = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_shop || 'null'));
+  if (sh?.sell?.price !== 14000 || sh?.sell?.first !== 12000) errorsAll.push(`[${vp}] sell haggle: ${JSON.stringify(sh?.sell)}`);
+  await shot('sell_haggled');
+  await act('shop-sell');
+  await sleep(300);
+  const afterSell = await page.evaluate(() => ({ w: JSON.parse(window.__chat.scriptstate.$st_wallet || '{}'), it: JSON.parse(window.__chat.scriptstate.$st_items || '{}'), st: JSON.parse(window.__chat.scriptstate.$st_shop || 'null') }));
+  const sl = afterSell.w.log?.find((e) => e.src === 'store' && e.amount === 14000);
+  if (!sl || sl.anchor !== 'c1') errorsAll.push(`[${vp}] sell wallet: ${JSON.stringify(afterSell.w.log)}`);
+  if (afterSell.it.list?.some((e) => e.id === myId) || !afterSell.it.log?.some((l) => l.what === 'sell' && l.name === '손전등')) errorsAll.push(`[${vp}] sell item: ${JSON.stringify(afterSell.it)}`);
+  if (afterSell.st?.sell || afterSell.st?.sales?.[0]?.price !== 14000) errorsAll.push(`[${vp}] sell state: ${JSON.stringify({ sell: afterSell.st?.sell, sales: afterSell.st?.sales })}`);
+  await shot('sold');
+  if (vp === 'phone' && await page.evaluate(() => !!document.querySelector('.sh-drawer'))) await act('shop-drawer');
   // 6. 잔고 부족: 잔고를 1만으로 → 값 빨강·구입 비활성
   await page.evaluate(() => { const w = JSON.parse(window.__chat.scriptstate.$st_wallet); w.start = 60000; window.__chat.scriptstate.$st_wallet = JSON.stringify(w); });
   await act('shop-close'); await closeWin(page); await sleep(200); await openWin(page); await sleep(300);
@@ -142,7 +180,7 @@ for (const vp of ['pc', 'phone']) {
     return out.map((m) => String(m.content));
   });
   const inv = req.find((l) => l.includes('[Inventory]')) ?? '';
-  if (!inv.includes('just bought 손전등') || !inv.includes('refused service') || !inv.includes('[shop:')) errorsAll.push(`[${vp}] inventory block: ${inv.slice(0, 200)} … ${inv.slice(-300)}`);
+  if (inv.includes('just bought 손전등') || !inv.includes('just sold 손전등 (14,000 won)') || !inv.includes('refused service') || !inv.includes('[shop:')) errorsAll.push(`[${vp}] inventory block: ${inv.slice(0, 200)} … ${inv.slice(-300)}`);
   // 9. 설정 페이지
   await openWin(page); await sleep(300);
   await openEditor(page, 'set:shop'); await sleep(300);

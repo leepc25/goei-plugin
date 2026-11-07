@@ -69,7 +69,7 @@ export interface Item {
   at: string;
 }
 
-export type ItemLogWhat = 'use' | 'drop' | 'gone' | 'merge';
+export type ItemLogWhat = 'use' | 'drop' | 'gone' | 'merge' | 'sell';
 export type ItemLogBy = 'story' | 'manual' | 'use';
 
 /** 사용·처분 기록 한 줄 (화면 「기록」·찾기). 상한 없음, 저장 안전용 400줄 */
@@ -198,7 +198,7 @@ export function addItemLog(it: Items, l: Omit<ItemLog, 'id' | 'at'> & { id?: str
   return { ...it, log: [...it.log, row].slice(-400) };
 }
 
-/** 물건 빼기 → 기록에 한 줄. what: drop(버림)·gone(본문에서 없어짐)·use(다 씀) */
+/** 물건 빼기 → 기록에 한 줄. what: drop(버림)·gone(본문에서 없어짐)·use(다 씀)·sell(상점에 팖) */
 export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLogBy, anchor = '', extra: { quote?: string; note?: string } = {}): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;

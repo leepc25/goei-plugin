@@ -113,7 +113,7 @@ function cell(it: Item, over: boolean): string {
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}" data-action="items-open" data-value="${esc(it.id)}" aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${tip}</button>`;
 }
 
-const WHAT: Record<ItemLog['what'], string> = { use: '사용', drop: '버림', gone: '없어짐', merge: '합침' };
+const WHAT: Record<ItemLog['what'], string> = { use: '사용', drop: '버림', gone: '없어짐', merge: '합침', sell: '팖' };
 const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추' };
 
 /** 기록: 가계부 거래 줄과 같은 모양 (최근 것부터) */

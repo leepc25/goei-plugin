@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  applyShelf, applyTalk, currentShop, findShopTag, fitsIdentity, inventoryText, markSold, parseShelf, parseTalk, readShop, sayToOwner, settleShop, shelfItems, shopEvents, shopSettings, shopVars, shortWon, stripShopTags,
+  applyShelf, applyTalk, cancelSell, closeSale, currentShop, findShopTag, fitsIdentity, inventoryText, markSold, parseShelf, parseTalk, readShop, sayToOwner, settleShop, shelfItems, shopEvents, shopSettings, shopVars, shortWon, startSell, stripShopTags, talkPrompt,
 } from '../dist-test/core.mjs';
 
 const chat = (last, extra = {}) => ({
@@ -93,4 +93,33 @@ test('구입·다음 턴 사건·값 표기', () => {
   assert.equal(shortWon(1538000), '1,538,000');
   assert.equal(shortWon(120000000), '1.2억');
   assert.equal(shortWon(0), '0');
+});
+
+test('팔기: 제안 읽기(offer·~줄), 터무니없는 값은 안 삼, 흥정하면 처음 값 남음, 거절, 확정·그만, 다음 턴 사건, 요청문에 팔 물건', () => {
+  const st0 = applyShelf(readShop(settleShop(chat('x\n[shop: 철물점|주인]'), 3).vars), parseShelf(SHELF, null), shopSettings({}));
+  const mine = { itemId: 'i_1', name: '낡은 손전등', desc: '흠집', kind: 'tool', effect: '', paid: 18000 };
+  let st = sayToOwner(startSell(st0, mine), '[팔기: 낡은 손전등]');
+  assert.equal(st.sell.price, undefined);
+  assert.match(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).at(-1).content, /팔려는 물건[\s\S]*낡은 손전등\|tool/);
+  const r1 = parseTalk('<owner>만 이천 주지.</owner>\n<change mode="none"></change>\n<offer>12,000원</offer>');
+  assert.equal(r1.offer, 12000);
+  st = applyTalk(st, r1);
+  assert.equal(st.sell.price, 12000);
+  assert.equal(st.sell.first, undefined);
+  // 흥정: ~ 줄로도 받는다. 처음 값이 남는다
+  st = applyTalk(sayToOwner(st, '[팔기: 낡은 손전등] 만오천은 줘야지'), parseTalk('<owner>만 사천.</owner>\n<change mode="partial">\n~ 낡은 손전등|14000\n</change>'));
+  assert.equal(st.sell.price, 14000);
+  assert.equal(st.sell.first, 12000);
+  // 터무니없는 값(값대 5만의 두 배 넘음) → 안 삼
+  assert.equal(applyTalk(st, parseTalk('<owner>백만.</owner>\n<change mode="none"></change>\n<offer>1000000</offer>')).sell.price, null);
+  assert.equal(parseTalk('<owner>안 사.</owner>\n<change mode="none"></change>\n<offer>none</offer>').offer, null);
+  assert.equal(parseTalk('<owner>응.</owner>\n<change mode="none"></change>').offer, undefined);
+  // 확정 → 판 것 목록, 팔기 비움. 값 없으면 못 함
+  assert.equal(closeSale(cancelSell(st)), null);
+  const done = closeSale(st);
+  assert.deepEqual(done.sales, [{ name: '낡은 손전등', price: 14000 }]);
+  assert.equal(done.sell, null);
+  assert.match(shopEvents(chat('x\n[shop: 철물점|주인]', shopVars(done)))[0], /just sold 낡은 손전등 \(14,000 won\)/);
+  // 거래 끊기면 팔기도 비움
+  assert.equal(applyTalk(st, parseTalk('<owner>나가.</owner>\n<change mode="none"></change>\n<closed/>')).sell, null);
 });
