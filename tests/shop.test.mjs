@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  applyShelf, applyTalk, cancelSell, closeSale, currentShop, findShopTag, fitsIdentity, inventoryText, markSold, parseShelf, parseTalk, readShop, sayToOwner, settleShop, shelfItems, shopEvents, shopSettings, shopVars, shortWon, startSell, stripShopTags, talkPrompt,
+  applyShelf, applyTalk, cancelSell, closeSale, currentShop, findShopTag, fitsIdentity, inventoryText, markSold, parseShelf, parseTalk, readShop, sayToOwner, settleShop, shelfItems, shopEvents, shopSettings, shopVars, shortWon, startSell, stripShopTags, talkPrompt, shelfPrompt,
 } from '../dist-test/core.mjs';
 
 const chat = (last, extra = {}) => ({
@@ -102,6 +102,9 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
   let st = sayToOwner(startSell(st0, mine), '[판매: 낡은 손전등]');
   assert.equal(st.sell.price, undefined);
   assert.match(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).at(-1).content, /팔려는 물건[\s\S]*낡은 손전등\|tool/);
+  // 새로고침 요청에도 이번 방문 대화 전부
+  { const re = shelfPrompt({ st: { ...st, loaded: true }, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).at(-1).content;
+    assert.match(re, /\[이번 방문 대화\][\s\S]*\[주인공\] \[판매: 낡은 손전등\]/); }
   // 값은 모델 판단: 물건 가치를 종합해 적정 값을 정하라는 지시
   { const sys = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).map((m) => m.content).join('\n');
     assert.match(sys, /real worth as a whole/); assert.match(sys, /No program checks the figure/); }

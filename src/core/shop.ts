@@ -650,10 +650,12 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     SHELF_RULES(s, src.st),
     first
       ? `First visit. Decide the shop's identity once from the scene and the owner's character; it will be fixed for the rest of this visit.\nOutput, in this order:\n${IDENTITY_FORMAT}\n<owner>\nthe owner's first line to the protagonist, in character, 1–3 sentences, Korean, no stage directions\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`
-      : `Re-stock: the identity is fixed; make a different shelf that still fits it.\nOutput, in this order:\n<owner>\none short line from the owner about the new goods (or empty)\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`,
+      : `Re-stock: the identity is fixed; make a different shelf that still fits it. If [이번 방문 대화] is given, the owner remembers it: what the protagonist asked for or complained about, the mood between them. Let it shape the new goods and the owner's line.\nOutput, in this order:\n<owner>\none short line from the owner about the new goods (or empty)\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`,
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
-  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, SHOP_THOUGHTS);
+  // 새로고침: 이번 방문 대화 전부를 같이 (2026-11-07 사용자: 주인이 방금 나눈 말을 알고 새 물건·한마디를 내게)
+  const talk = !first && src.st.talk.length ? `\n\n[이번 방문 대화]\n${src.st.talk.map((l) => `${l.who === 'me' ? '[주인공]' : '[주인]'} ${l.text}`).join('\n')}` : '';
+  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}${talk}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, SHOP_THOUGHTS);
 }
 
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
