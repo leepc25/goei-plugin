@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel dental extraction forceps, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a magnifying glass with a black handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw broom with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal hand cart dolly, side view, empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver metal whistle on a cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange rescue buoy tube with a rope, front view, plain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic fly swatter, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver conductor's baton with a round knob, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld microphone, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown clipboard holding a sheet with checkbox lines only, no readable text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper queue ticket, blank with no numbers. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a screwdriver with a yellow handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of pliers with red handles, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of wire cutters with blue handles, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large bolt cutter with long red handles, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel open-end spanner wrench, lying diagonally. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "발치 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel dental extraction forceps, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "돋보기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a magnifying glass with a black handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빗자루",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw broom with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손수레",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal hand cart dolly, side view, empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "호루라기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver metal whistle on a cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "구조용 부표",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange rescue buoy tube with a rope, front view, plain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "파리채",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic fly swatter, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "은빛 지휘봉",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver conductor's baton with a round knob, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마이크",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld microphone, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "체크리스트 보드",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown clipboard holding a sheet with checkbox lines only, no readable text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "번호표",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper queue ticket, blank with no numbers. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "드라이버",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a screwdriver with a yellow handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "펜치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of pliers with red handles, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "니퍼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of wire cutters with blue handles, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "볼트 커터",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large bolt cutter with long red handles, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "스패너",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel open-end spanner wrench, lying diagonally. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

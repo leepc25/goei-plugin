@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round gold monocle with a thin chain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin gold-rimmed reading glasses, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of orange foam earplugs connected by a cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a light green apron laid flat, front view, plain with no pictures. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink headband with white bunny ears, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bright paper theme park wristband loop, plain with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black bow tie, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw boater hat with a black band, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden mallard duck head mask, front view, eye holes empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden butterfly-shaped eye mask, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green lizard head mask, front view, eye holes empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a badger head mask with black and white stripes, front view, eye holes empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mountain goat head mask with curved horns, front view, eye holes empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown pony head mask, front view, eye holes empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white doctor's lab coat laid flat, front view, plain with no name. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black nun's habit dress with a white collar and a veil, laid flat, front view. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "외알 안경",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round gold monocle with a thin chain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "돋보기안경",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin gold-rimmed reading glasses, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "귀마개",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of orange foam earplugs connected by a cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "연두색 앞치마",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a light green apron laid flat, front view, plain with no pictures. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "토끼 머리띠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink headband with white bunny ears, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "테마파크 입장 팔찌",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bright paper theme park wristband loop, plain with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나비넥타이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black bow tie, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "밀짚모자",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw boater hat with a black band, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금빛 청둥오리 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden mallard duck head mask, front view, eye holes empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금빛 나비 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden butterfly-shaped eye mask, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도마뱀 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green lizard head mask, front view, eye holes empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오소리 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a badger head mask with black and white stripes, front view, eye holes empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "산양 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mountain goat head mask with curved horns, front view, eye holes empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "조랑말 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown pony head mask, front view, eye holes empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "흰 가운",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white doctor's lab coat laid flat, front view, plain with no name. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수녀복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black nun's habit dress with a white collar and a veil, laid flat, front view. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

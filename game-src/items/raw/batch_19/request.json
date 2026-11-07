@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up green tent in a bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up blue sleeping bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up straw picnic mat. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded checked wool blanket. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white pillow. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red twin-bell alarm clock, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an hourglass with sand, upright. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coil of thin white cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coil of steel wire. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of black thread with a needle stuck in it. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few silver safety pins. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few silver paper clips. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black stapler, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ballpoint pen, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fountain pen with a gold nib, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow pencil, lying diagonally. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "텐트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up green tent in a bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "침낭",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up blue sleeping bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "돗자리",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled-up straw picnic mat. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "담요",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded checked wool blanket. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "베개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white pillow. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자명종",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red twin-bell alarm clock, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "모래시계",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an hourglass with sand, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "줄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coil of thin white cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "철사",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coil of steel wire. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "실과 바늘",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of black thread with a needle stuck in it. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "안전핀",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few silver safety pins. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "클립",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few silver paper clips. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "스테이플러",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black stapler, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "펜",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ballpoint pen, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "만년필",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fountain pen with a gold nib, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "연필",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow pencil, lying diagonally. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,6206 @@
+[
+{
+"ko": "은 말뚝",
+"kind": "weapon",
+"src": "위키",
+"en": "a single long silver stake, a simple straight tapered spike with a sharp point, no handle, no guard, no hilt. Only the stake, nothing else beside it."
+},
+{
+"ko": "검은 일본도",
+"kind": "weapon",
+"src": "위키",
+"en": "a single black-bladed katana. Only this one item, nothing else beside it."
+},
+{
+"ko": "기관단총",
+"kind": "weapon",
+"src": "위키",
+"en": "a single compact submachine gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "소총",
+"kind": "weapon",
+"src": "위키",
+"en": "a single assault rifle. Only this one item, nothing else beside it."
+},
+{
+"ko": "AK-47",
+"kind": "weapon",
+"src": "위키",
+"en": "a single AK-47 rifle with curved magazine. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "언월도",
+"kind": "weapon",
+"src": "위키",
+"en": "a single curved scimitar. Only this one item, nothing else beside it."
+},
+{
+"ko": "미니건",
+"kind": "weapon",
+"src": "위키",
+"en": "a single heavy rotary minigun. Only this one item, nothing else beside it."
+},
+{
+"ko": "중기관총",
+"kind": "weapon",
+"src": "위키",
+"en": "a single heavy machine gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "화염방사기",
+"kind": "weapon",
+"src": "위키",
+"en": "a single flamethrower with fuel tank. Only this one item, nothing else beside it."
+},
+{
+"ko": "수류탄",
+"kind": "weapon",
+"src": "위키",
+"en": "a single frag grenade. Only this one item, nothing else beside it."
+},
+{
+"ko": "폭약",
+"kind": "weapon",
+"src": "위키",
+"en": "Bundle of dynamite explosives. Only this one item, nothing else beside it."
+},
+{
+"ko": "특제 버터나이프",
+"kind": "weapon",
+"src": "위키",
+"en": "a single ornate butter knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹슨 칼",
+"kind": "weapon",
+"src": "위키",
+"en": "a single rusty old knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "올가미",
+"kind": "weapon",
+"src": "위키",
+"en": "a single rope noose. Only this one item, nothing else beside it."
+},
+{
+"ko": "식칼",
+"kind": "weapon",
+"src": "",
+"en": "a single kitchen knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "정육점 칼",
+"kind": "weapon",
+"src": "",
+"en": "a single butcher cleaver. Only this one item, nothing else beside it."
+},
+{
+"ko": "회칼",
+"kind": "weapon",
+"src": "",
+"en": "a single long sashimi knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "과도",
+"kind": "weapon",
+"src": "",
+"en": "a single small fruit knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "커터칼",
+"kind": "weapon",
+"src": "",
+"en": "a single box cutter. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "가위",
+"kind": "weapon",
+"src": "",
+"en": "Pair of scissors. Only this one item, nothing else beside it."
+},
+{
+"ko": "송곳",
+"kind": "weapon",
+"src": "",
+"en": "a single awl. Only this one item, nothing else beside it."
+},
+{
+"ko": "드라이버(흉기)",
+"kind": "weapon",
+"src": "",
+"en": "a single sharp screwdriver. Only this one item, nothing else beside it."
+},
+{
+"ko": "낫",
+"kind": "weapon",
+"src": "",
+"en": "a single sickle. Only this one item, nothing else beside it."
+},
+{
+"ko": "도끼",
+"kind": "weapon",
+"src": "",
+"en": "a single wood axe. Only this one item, nothing else beside it."
+},
+{
+"ko": "손도끼",
+"kind": "weapon",
+"src": "",
+"en": "a single hatchet. Only this one item, nothing else beside it."
+},
+{
+"ko": "곡괭이",
+"kind": "weapon",
+"src": "",
+"en": "a single pickaxe. Only this one item, nothing else beside it."
+},
+{
+"ko": "각목",
+"kind": "weapon",
+"src": "",
+"en": "a single wooden plank club. Only this one item, nothing else beside it."
+},
+{
+"ko": "알루미늄 배트",
+"kind": "weapon",
+"src": "",
+"en": "a single aluminum baseball bat. Only this one item, nothing else beside it."
+},
+{
+"ko": "골프채",
+"kind": "weapon",
+"src": "",
+"en": "a single golf club. Only this one item, nothing else beside it."
+},
+{
+"ko": "하키 스틱",
+"kind": "weapon",
+"src": "",
+"en": "a single hockey stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "목검",
+"kind": "weapon",
+"src": "",
+"en": "a single wooden training sword. Only this one item, nothing else beside it."
+},
+{
+"ko": "죽도",
+"kind": "weapon",
+"src": "",
+"en": "a single bamboo kendo sword. Only this one item, nothing else beside it."
+},
+{
+"ko": "쌍절곤",
+"kind": "weapon",
+"src": "",
+"en": "a single nunchaku. Only this one item, nothing else beside it."
+},
+{
+"ko": "너클",
+"kind": "weapon",
+"src": "",
+"en": "a single brass knuckles. Only this one item, nothing else beside it."
+},
+{
+"ko": "삼단봉",
+"kind": "weapon",
+"src": "",
+"en": "a single telescopic baton. Only this one item, nothing else beside it."
+},
+{
+"ko": "경찰봉",
+"kind": "weapon",
+"src": "",
+"en": "a single police nightstick. Only this one item, nothing else beside it."
+},
+{
+"ko": "진압봉",
+"kind": "weapon",
+"src": "",
+"en": "a single riot baton. Only this one item, nothing else beside it."
+},
+{
+"ko": "진압 방패",
+"kind": "weapon",
+"src": "",
+"en": "a single riot shield. Only this one item, nothing else beside it."
+},
+{
+"ko": "테이저건",
+"kind": "weapon",
+"src": "",
+"en": "a single taser gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "산탄총",
+"kind": "weapon",
+"src": "",
+"en": "a single pump shotgun. Only this one item, nothing else beside it."
+},
+{
+"ko": "저격총",
+"kind": "weapon",
+"src": "",
+"en": "a single sniper rifle with scope. Only this one item, nothing else beside it."
+},
+{
+"ko": "리볼버",
+"kind": "weapon",
+"src": "",
+"en": "a single revolver. Only this one item, nothing else beside it."
+},
+{
+"ko": "소음기 권총",
+"kind": "weapon",
+"src": "",
+"en": "a single pistol with silencer. Only this one item, nothing else beside it."
+},
+{
+"ko": "기관권총",
+"kind": "weapon",
+"src": "",
+"en": "a single machine pistol. Only this one item, nothing else beside it."
+},
+{
+"ko": "탄창",
+"kind": "weapon",
+"src": "",
+"en": "a single pistol magazine. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "총알 상자",
+"kind": "weapon",
+"src": "",
+"en": "Box of bullets. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "은탄",
+"kind": "weapon",
+"src": "",
+"en": "a single silver bullets. Only this one item, nothing else beside it."
+},
+{
+"ko": "석궁",
+"kind": "weapon",
+"src": "",
+"en": "a single crossbow. Only this one item, nothing else beside it."
+},
+{
+"ko": "활과 화살",
+"kind": "weapon",
+"src": "",
+"en": "a single bow and arrows. Only this one item, nothing else beside it."
+},
+{
+"ko": "새총",
+"kind": "weapon",
+"src": "",
+"en": "a single slingshot. Only this one item, nothing else beside it."
+},
+{
+"ko": "작살",
+"kind": "weapon",
+"src": "",
+"en": "a single harpoon. Only this one item, nothing else beside it."
+},
+{
+"ko": "창",
+"kind": "weapon",
+"src": "",
+"en": "a single spear. Only this one item, nothing else beside it."
+},
+{
+"ko": "삼지창",
+"kind": "weapon",
+"src": "",
+"en": "a single trident. Only this one item, nothing else beside it."
+},
+{
+"ko": "장검",
+"kind": "weapon",
+"src": "",
+"en": "a single longsword. Only this one item, nothing else beside it."
+},
+{
+"ko": "단검",
+"kind": "weapon",
+"src": "",
+"en": "a single dagger. Only this one item, nothing else beside it."
+},
+{
+"ko": "군용 대검",
+"kind": "weapon",
+"src": "",
+"en": "a single combat knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "마체테",
+"kind": "weapon",
+"src": "",
+"en": "a single machete. Only this one item, nothing else beside it."
+},
+{
+"ko": "전기톱",
+"kind": "weapon",
+"src": "",
+"en": "a single chainsaw. Only this one item, nothing else beside it."
+},
+{
+"ko": "못 박힌 방망이",
+"kind": "weapon",
+"src": "",
+"en": "a single nail-studded bat. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠사슬 채찍",
+"kind": "weapon",
+"src": "",
+"en": "a single chain whip. Only this one item, nothing else beside it."
+},
+{
+"ko": "화염병",
+"kind": "weapon",
+"src": "",
+"en": "a single molotov cocktail. Only this one item, nothing else beside it."
+},
+{
+"ko": "섬광탄",
+"kind": "weapon",
+"src": "",
+"en": "a single flashbang grenade. Only this one item, nothing else beside it."
+},
+{
+"ko": "최루탄",
+"kind": "weapon",
+"src": "",
+"en": "a single tear gas grenade. Only this one item, nothing else beside it."
+},
+{
+"ko": "지뢰",
+"kind": "weapon",
+"src": "",
+"en": "a single land mine. Only this one item, nothing else beside it."
+},
+{
+"ko": "C4",
+"kind": "weapon",
+"src": "",
+"en": "a single C4 explosive with detonator. Only this one item, nothing else beside it."
+},
+{
+"ko": "기폭 장치",
+"kind": "weapon",
+"src": "",
+"en": "a single detonator remote. Only this one item, nothing else beside it."
+},
+{
+"ko": "권총집",
+"kind": "weapon",
+"src": "",
+"en": "a single leather pistol holster. Only this one item, nothing else beside it."
+},
+{
+"ko": "칼집",
+"kind": "weapon",
+"src": "",
+"en": "a single knife sheath. Only this one item, nothing else beside it."
+},
+{
+"ko": "부엌 포크",
+"kind": "weapon",
+"src": "",
+"en": "a single large kitchen fork. Only this one item, nothing else beside it."
+},
+{
+"ko": "우산 칼",
+"kind": "weapon",
+"src": "",
+"en": "a single umbrella with hidden blade. Only this one item, nothing else beside it."
+},
+{
+"ko": "은 십자가 단검",
+"kind": "weapon",
+"src": "",
+"en": "a single silver cross dagger. Only this one item, nothing else beside it."
+},
+{
+"ko": "부적 붙은 칼",
+"kind": "weapon",
+"src": "",
+"en": "a single knife wrapped with paper talisman. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 묻은 망치",
+"kind": "weapon",
+"src": "",
+"en": "a single bloody hammer. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠망치(대형)",
+"kind": "weapon",
+"src": "",
+"en": "a single sledgehammer. Only this one item, nothing else beside it."
+},
+{
+"ko": "렌치",
+"kind": "weapon",
+"src": "",
+"en": "a single large wrench. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠갈고리",
+"kind": "weapon",
+"src": "",
+"en": "a single iron meat hook. Only this one item, nothing else beside it."
+},
+{
+"ko": "부채",
+"kind": "weapon",
+"src": "",
+"en": "a single folding fan. Only this one item, nothing else beside it."
+},
+{
+"ko": "표창",
+"kind": "weapon",
+"src": "",
+"en": "a single throwing star. Only this one item, nothing else beside it."
+},
+{
+"ko": "투척용 칼",
+"kind": "weapon",
+"src": "",
+"en": "a single throwing knives. Only this one item, nothing else beside it."
+},
+{
+"ko": "비비탄총",
+"kind": "weapon",
+"src": "",
+"en": "a single toy BB gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "물총",
+"kind": "weapon",
+"src": "",
+"en": "a single water gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "대못",
+"kind": "weapon",
+"src": "",
+"en": "a single large iron nail. Only this one item, nothing else beside it."
+},
+{
+"ko": "피아노 줄",
+"kind": "weapon",
+"src": "",
+"en": "a single piano wire. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 정장",
+"kind": "wear",
+"src": "",
+"en": "a single folded black suit jacket. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 코트",
+"kind": "wear",
+"src": "",
+"en": "a single long black coat. Only this one item, nothing else beside it."
+},
+{
+"ko": "장갑",
+"kind": "wear",
+"src": "",
+"en": "Pair of black leather gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "동물 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single animal head mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "안전모",
+"kind": "wear",
+"src": "",
+"en": "a single yellow hard hat. Only this one item, nothing else beside it."
+},
+{
+"ko": "마스크",
+"kind": "wear",
+"src": "",
+"en": "a single white face mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "우비",
+"kind": "wear",
+"src": "",
+"en": "a single transparent raincoat. Only this one item, nothing else beside it."
+},
+{
+"ko": "방독면",
+"kind": "wear",
+"src": "",
+"en": "a single gas mask with filter. Only this one item, nothing else beside it."
+},
+{
+"ko": "선글라스",
+"kind": "wear",
+"src": "",
+"en": "a single black sunglasses. Only this one item, nothing else beside it."
+},
+{
+"ko": "방탄조끼",
+"kind": "wear",
+"src": "위키",
+"en": "a single tactical bulletproof vest. Only this one item, nothing else beside it."
+},
+{
+"ko": "전신 강철 판금",
+"kind": "wear",
+"src": "위키",
+"en": "a single steel plate armor. Only this one item, nothing else beside it."
+},
+{
+"ko": "오토바이 헬멧",
+"kind": "wear",
+"src": "위키",
+"en": "a single motorcycle helmet. Only this one item, nothing else beside it."
+},
+{
+"ko": "오토바이 재킷",
+"kind": "wear",
+"src": "위키",
+"en": "a single motorcycle riding jacket. Only this one item, nothing else beside it."
+},
+{
+"ko": "모방 머플러",
+"kind": "wear",
+"src": "위키",
+"en": "a single knitted muffler scarf. Only this one item, nothing else beside it."
+},
+{
+"ko": "외알 안경",
+"kind": "wear",
+"src": "위키",
+"en": "a single monocle. Only this one item, nothing else beside it."
+},
+{
+"ko": "돋보기안경",
+"kind": "wear",
+"src": "위키",
+"en": "a single reading glasses. Only this one item, nothing else beside it."
+},
+{
+"ko": "귀마개",
+"kind": "wear",
+"src": "위키",
+"en": "a single earplugs. Only this one item, nothing else beside it."
+},
+{
+"ko": "연두색 앞치마",
+"kind": "wear",
+"src": "위키",
+"en": "a single light green apron. Only this one item, nothing else beside it."
+},
+{
+"ko": "토끼 머리띠",
+"kind": "wear",
+"src": "위키",
+"en": "a single bunny ear headband. Only this one item, nothing else beside it."
+},
+{
+"ko": "테마파크 입장 팔찌",
+"kind": "wear",
+"src": "위키",
+"en": "a single theme park wristband. Only this one item, nothing else beside it."
+},
+{
+"ko": "나비넥타이",
+"kind": "wear",
+"src": "위키",
+"en": "a single bow tie. Only this one item, nothing else beside it."
+},
+{
+"ko": "밀짚모자",
+"kind": "wear",
+"src": "위키",
+"en": "a single straw hat. Only this one item, nothing else beside it."
+},
+{
+"ko": "금빛 청둥오리 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single golden mallard duck mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "금빛 나비 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single golden butterfly mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "도마뱀 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single lizard mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "오소리 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single badger mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "산양 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single mountain goat mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "조랑말 가면",
+"kind": "wear",
+"src": "위키",
+"en": "a single pony mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "흰 가운",
+"kind": "wear",
+"src": "위키",
+"en": "a single white lab coat. Only this one item, nothing else beside it."
+},
+{
+"ko": "수녀복",
+"kind": "wear",
+"src": "위키",
+"en": "a single black nun habit. Only this one item, nothing else beside it."
+},
+{
+"ko": "과잠",
+"kind": "wear",
+"src": "위키",
+"en": "a single university varsity jacket. Only this one item, nothing else beside it."
+},
+{
+"ko": "요원 정장",
+"kind": "wear",
+"src": "",
+"en": "a single black agent suit. Only this one item, nothing else beside it."
+},
+{
+"ko": "넥타이",
+"kind": "wear",
+"src": "",
+"en": "a single necktie. Only this one item, nothing else beside it."
+},
+{
+"ko": "와이셔츠",
+"kind": "wear",
+"src": "",
+"en": "a single white dress shirt. Only this one item, nothing else beside it."
+},
+{
+"ko": "구두",
+"kind": "wear",
+"src": "",
+"en": "a single black leather shoes. Only this one item, nothing else beside it."
+},
+{
+"ko": "운동화",
+"kind": "wear",
+"src": "",
+"en": "a single sneakers. Only this one item, nothing else beside it."
+},
+{
+"ko": "등산화",
+"kind": "wear",
+"src": "위키",
+"en": "a single hiking boots. Only this one item, nothing else beside it."
+},
+{
+"ko": "장화",
+"kind": "wear",
+"src": "",
+"en": "a single rubber boots. Only this one item, nothing else beside it."
+},
+{
+"ko": "슬리퍼",
+"kind": "wear",
+"src": "",
+"en": "a single slippers. Only this one item, nothing else beside it."
+},
+{
+"ko": "후드티",
+"kind": "wear",
+"src": "",
+"en": "a single hoodie. Only this one item, nothing else beside it."
+},
+{
+"ko": "패딩",
+"kind": "wear",
+"src": "",
+"en": "a single puffer jacket. Only this one item, nothing else beside it."
+},
+{
+"ko": "트렌치코트",
+"kind": "wear",
+"src": "",
+"en": "a single trench coat. Only this one item, nothing else beside it."
+},
+{
+"ko": "가죽 재킷",
+"kind": "wear",
+"src": "",
+"en": "a single leather jacket. Only this one item, nothing else beside it."
+},
+{
+"ko": "청바지",
+"kind": "wear",
+"src": "",
+"en": "a single jeans. Only this one item, nothing else beside it."
+},
+{
+"ko": "치마 정장",
+"kind": "wear",
+"src": "위키",
+"en": "a single skirt suit. Only this one item, nothing else beside it."
+},
+{
+"ko": "교복",
+"kind": "wear",
+"src": "",
+"en": "a single school uniform. Only this one item, nothing else beside it."
+},
+{
+"ko": "군복",
+"kind": "wear",
+"src": "",
+"en": "a single military camo uniform. Only this one item, nothing else beside it."
+},
+{
+"ko": "경찰 제복",
+"kind": "wear",
+"src": "",
+"en": "a single police uniform. Only this one item, nothing else beside it."
+},
+{
+"ko": "경비원 제복",
+"kind": "wear",
+"src": "",
+"en": "a single security guard uniform. Only this one item, nothing else beside it."
+},
+{
+"ko": "간호사복",
+"kind": "wear",
+"src": "",
+"en": "a single nurse uniform. Only this one item, nothing else beside it."
+},
+{
+"ko": "수술복",
+"kind": "wear",
+"src": "위키",
+"en": "a single navy surgical scrubs. Only this one item, nothing else beside it."
+},
+{
+"ko": "환자복",
+"kind": "wear",
+"src": "",
+"en": "a single hospital patient gown. Only this one item, nothing else beside it."
+},
+{
+"ko": "작업복",
+"kind": "wear",
+"src": "",
+"en": "a single work overalls. Only this one item, nothing else beside it."
+},
+{
+"ko": "한복",
+"kind": "wear",
+"src": "",
+"en": "a single hanbok. Only this one item, nothing else beside it."
+},
+{
+"ko": "비옷 판초",
+"kind": "wear",
+"src": "",
+"en": "a single rain poncho. Only this one item, nothing else beside it."
+},
+{
+"ko": "야구 모자",
+"kind": "wear",
+"src": "",
+"en": "a single baseball cap. Only this one item, nothing else beside it."
+},
+{
+"ko": "비니",
+"kind": "wear",
+"src": "",
+"en": "a single knit beanie. Only this one item, nothing else beside it."
+},
+{
+"ko": "중절모",
+"kind": "wear",
+"src": "",
+"en": "a single fedora hat. Only this one item, nothing else beside it."
+},
+{
+"ko": "방탄 헬멧",
+"kind": "wear",
+"src": "",
+"en": "a single tactical helmet. Only this one item, nothing else beside it."
+},
+{
+"ko": "야간 투시경",
+"kind": "wear",
+"src": "",
+"en": "a single night vision goggles. Only this one item, nothing else beside it."
+},
+{
+"ko": "고글",
+"kind": "wear",
+"src": "",
+"en": "a single safety goggles. Only this one item, nothing else beside it."
+},
+{
+"ko": "무릎 보호대",
+"kind": "wear",
+"src": "",
+"en": "a single knee pads. Only this one item, nothing else beside it."
+},
+{
+"ko": "팔 보호대",
+"kind": "wear",
+"src": "",
+"en": "a single arm guards. Only this one item, nothing else beside it."
+},
+{
+"ko": "전술 장갑",
+"kind": "wear",
+"src": "",
+"en": "a single tactical gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "고무장갑",
+"kind": "wear",
+"src": "위키",
+"en": "a single rubber gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "목장갑",
+"kind": "wear",
+"src": "",
+"en": "a single cotton work gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "방화복",
+"kind": "wear",
+"src": "",
+"en": "a single fire protective suit. Only this one item, nothing else beside it."
+},
+{
+"ko": "방호복",
+"kind": "wear",
+"src": "",
+"en": "a single hazmat suit. Only this one item, nothing else beside it."
+},
+{
+"ko": "목도리",
+"kind": "wear",
+"src": "",
+"en": "a single scarf. Only this one item, nothing else beside it."
+},
+{
+"ko": "양말",
+"kind": "wear",
+"src": "",
+"en": "a single socks. Only this one item, nothing else beside it."
+},
+{
+"ko": "벨트",
+"kind": "wear",
+"src": "",
+"en": "a single leather belt. Only this one item, nothing else beside it."
+},
+{
+"ko": "전술 벨트",
+"kind": "wear",
+"src": "",
+"en": "a single tactical utility belt. Only this one item, nothing else beside it."
+},
+{
+"ko": "백팩",
+"kind": "wear",
+"src": "",
+"en": "a single backpack. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "등산 가방",
+"kind": "wear",
+"src": "위키",
+"en": "a single hiking backpack. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "서류 가방",
+"kind": "wear",
+"src": "위키",
+"en": "a single leather briefcase. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "크로스백",
+"kind": "wear",
+"src": "",
+"en": "a single crossbody bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "힙색",
+"kind": "wear",
+"src": "",
+"en": "a single waist pouch. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "탄띠",
+"kind": "wear",
+"src": "위키",
+"en": "a single ammo bandolier. Only this one item, nothing else beside it."
+},
+{
+"ko": "탄약 주머니",
+"kind": "wear",
+"src": "위키",
+"en": "a single ammo pouches. Only this one item, nothing else beside it."
+},
+{
+"ko": "나비 머리핀",
+"kind": "wear",
+"src": "위키",
+"en": "a single butterfly hair clip. Only this one item, nothing else beside it."
+},
+{
+"ko": "브로치",
+"kind": "wear",
+"src": "위키",
+"en": "a single brooch. Only this one item, nothing else beside it."
+},
+{
+"ko": "닭 깃털 브로치",
+"kind": "wear",
+"src": "위키",
+"en": "a single rooster feather brooch. Only this one item, nothing else beside it."
+},
+{
+"ko": "십자가 목걸이",
+"kind": "wear",
+"src": "위키",
+"en": "a single silver cross necklace. Only this one item, nothing else beside it."
+},
+{
+"ko": "귀걸이",
+"kind": "wear",
+"src": "",
+"en": "a single earrings. Only this one item, nothing else beside it."
+},
+{
+"ko": "팔찌",
+"kind": "wear",
+"src": "",
+"en": "a single bracelet. Only this one item, nothing else beside it."
+},
+{
+"ko": "안경",
+"kind": "wear",
+"src": "",
+"en": "a single glasses. Only this one item, nothing else beside it."
+},
+{
+"ko": "안대",
+"kind": "wear",
+"src": "",
+"en": "a single eye patch. Only this one item, nothing else beside it."
+},
+{
+"ko": "가발",
+"kind": "wear",
+"src": "",
+"en": "a single wig. Only this one item, nothing else beside it."
+},
+{
+"ko": "가면무도회 가면",
+"kind": "wear",
+"src": "",
+"en": "a single masquerade mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "하회탈",
+"kind": "wear",
+"src": "",
+"en": "a single Korean hahoe mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "광대 가면",
+"kind": "wear",
+"src": "",
+"en": "a single clown mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "하키 마스크",
+"kind": "wear",
+"src": "",
+"en": "a single hockey mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "붕대 감은 장갑",
+"kind": "wear",
+"src": "",
+"en": "a single bandaged glove. Only this one item, nothing else beside it."
+},
+{
+"ko": "네일아트 손톱",
+"kind": "wear",
+"src": "위키",
+"en": "a single long decorated nail tips. Only this one item, nothing else beside it."
+},
+{
+"ko": "빨간 손전등",
+"kind": "tool",
+"src": "위키",
+"en": "a single red emergency flashlight. Only this one item, nothing else beside it."
+},
+{
+"ko": "밧줄",
+"kind": "tool",
+"src": "",
+"en": "a single coiled rope. Only this one item, nothing else beside it."
+},
+{
+"ko": "테이프",
+"kind": "tool",
+"src": "",
+"en": "Roll of grey duct tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠지레",
+"kind": "tool",
+"src": "",
+"en": "a single steel crowbar. Only this one item, nothing else beside it."
+},
+{
+"ko": "자물쇠",
+"kind": "tool",
+"src": "",
+"en": "a single brass padlock. Only this one item, nothing else beside it."
+},
+{
+"ko": "망치",
+"kind": "tool",
+"src": "",
+"en": "a single claw hammer. Only this one item, nothing else beside it."
+},
+{
+"ko": "삽",
+"kind": "tool",
+"src": "",
+"en": "a single small folding shovel. Only this one item, nothing else beside it."
+},
+{
+"ko": "라이터",
+"kind": "tool",
+"src": "",
+"en": "a single metal lighter with flame. Only this one item, nothing else beside it."
+},
+{
+"ko": "성냥",
+"kind": "tool",
+"src": "",
+"en": "a single matchbox with matches. Only this one item, nothing else beside it."
+},
+{
+"ko": "초",
+"kind": "tool",
+"src": "",
+"en": "a single white candle, lit. Only this one item, nothing else beside it."
+},
+{
+"ko": "쌍안경",
+"kind": "tool",
+"src": "",
+"en": "a single black binoculars. Only this one item, nothing else beside it."
+},
+{
+"ko": "접이식 우산",
+"kind": "tool",
+"src": "",
+"en": "a single folded black umbrella. Only this one item, nothing else beside it."
+},
+{
+"ko": "노끈",
+"kind": "tool",
+"src": "",
+"en": "Bundle of twine. Only this one item, nothing else beside it."
+},
+{
+"ko": "레이더",
+"kind": "tool",
+"src": "위키",
+"en": "a single handheld radar device. Only this one item, nothing else beside it."
+},
+{
+"ko": "수갑",
+"kind": "tool",
+"src": "위키",
+"en": "a single handcuffs. Only this one item, nothing else beside it."
+},
+{
+"ko": "방음 밀봉재",
+"kind": "tool",
+"src": "위키",
+"en": "Roll of soundproof sealing strip. Only this one item, nothing else beside it."
+},
+{
+"ko": "발치 집게",
+"kind": "tool",
+"src": "위키",
+"en": "a single dental extraction forceps. Only this one item, nothing else beside it."
+},
+{
+"ko": "돋보기",
+"kind": "tool",
+"src": "",
+"en": "a single magnifying glass. Only this one item, nothing else beside it."
+},
+{
+"ko": "빗자루",
+"kind": "tool",
+"src": "위키",
+"en": "a single broom. Only this one item, nothing else beside it."
+},
+{
+"ko": "손수레",
+"kind": "tool",
+"src": "위키",
+"en": "a single hand cart. Only this one item, nothing else beside it."
+},
+{
+"ko": "호루라기",
+"kind": "tool",
+"src": "위키",
+"en": "a single whistle. Only this one item, nothing else beside it."
+},
+{
+"ko": "구조용 부표",
+"kind": "tool",
+"src": "위키",
+"en": "a single rescue buoy. Only this one item, nothing else beside it."
+},
+{
+"ko": "파리채",
+"kind": "tool",
+"src": "위키",
+"en": "a single fly swatter. Only this one item, nothing else beside it."
+},
+{
+"ko": "은빛 지휘봉",
+"kind": "tool",
+"src": "위키",
+"en": "a single silver baton. Only this one item, nothing else beside it."
+},
+{
+"ko": "마이크",
+"kind": "tool",
+"src": "위키",
+"en": "a single microphone. Only this one item, nothing else beside it."
+},
+{
+"ko": "체크리스트 보드",
+"kind": "tool",
+"src": "위키",
+"en": "a single clipboard with checklist. Only this one item, nothing else beside it."
+},
+{
+"ko": "번호표",
+"kind": "tool",
+"src": "위키",
+"en": "a single paper queue number ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "드라이버",
+"kind": "tool",
+"src": "",
+"en": "a single screwdriver. Only this one item, nothing else beside it."
+},
+{
+"ko": "펜치",
+"kind": "tool",
+"src": "",
+"en": "a single pliers. Only this one item, nothing else beside it."
+},
+{
+"ko": "니퍼",
+"kind": "tool",
+"src": "",
+"en": "a single wire cutters. Only this one item, nothing else beside it."
+},
+{
+"ko": "볼트 커터",
+"kind": "tool",
+"src": "",
+"en": "a single bolt cutters. Only this one item, nothing else beside it."
+},
+{
+"ko": "스패너",
+"kind": "tool",
+"src": "",
+"en": "a single spanner. Only this one item, nothing else beside it."
+},
+{
+"ko": "공구함",
+"kind": "tool",
+"src": "",
+"en": "a single red toolbox. Only this one item, nothing else beside it."
+},
+{
+"ko": "전동 드릴",
+"kind": "tool",
+"src": "",
+"en": "a single power drill. Only this one item, nothing else beside it."
+},
+{
+"ko": "톱",
+"kind": "tool",
+"src": "",
+"en": "a single hand saw. Only this one item, nothing else beside it."
+},
+{
+"ko": "줄자",
+"kind": "tool",
+"src": "",
+"en": "a single tape measure. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "자",
+"kind": "tool",
+"src": "",
+"en": "a single ruler. Only this one item, nothing else beside it."
+},
+{
+"ko": "못",
+"kind": "tool",
+"src": "",
+"en": "a single nails. Only this one item, nothing else beside it."
+},
+{
+"ko": "나사",
+"kind": "tool",
+"src": "",
+"en": "a single screws. Only this one item, nothing else beside it."
+},
+{
+"ko": "케이블 타이",
+"kind": "tool",
+"src": "",
+"en": "a single cable ties. Only this one item, nothing else beside it."
+},
+{
+"ko": "청테이프",
+"kind": "tool",
+"src": "",
+"en": "a single blue tape roll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "절연 테이프",
+"kind": "tool",
+"src": "",
+"en": "a single black electrical tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사다리",
+"kind": "tool",
+"src": "",
+"en": "a single step ladder. Only this one item, nothing else beside it."
+},
+{
+"ko": "갈고리 로프",
+"kind": "tool",
+"src": "",
+"en": "a single grappling hook with rope. Only this one item, nothing else beside it."
+},
+{
+"ko": "카라비너",
+"kind": "tool",
+"src": "",
+"en": "a single carabiner. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠 지팡이",
+"kind": "tool",
+"src": "",
+"en": "a single iron cane. Only this one item, nothing else beside it."
+},
+{
+"ko": "지팡이",
+"kind": "tool",
+"src": "",
+"en": "a single wooden walking stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "등산 스틱",
+"kind": "tool",
+"src": "",
+"en": "a single trekking pole. Only this one item, nothing else beside it."
+},
+{
+"ko": "낚싯대",
+"kind": "tool",
+"src": "",
+"en": "a single fishing rod. Only this one item, nothing else beside it."
+},
+{
+"ko": "그물",
+"kind": "tool",
+"src": "",
+"en": "a single fishing net. Only this one item, nothing else beside it."
+},
+{
+"ko": "양동이",
+"kind": "tool",
+"src": "",
+"en": "a single bucket. Only this one item, nothing else beside it."
+},
+{
+"ko": "대야",
+"kind": "tool",
+"src": "",
+"en": "a single basin. Only this one item, nothing else beside it."
+},
+{
+"ko": "걸레",
+"kind": "tool",
+"src": "",
+"en": "a single mop. Only this one item, nothing else beside it."
+},
+{
+"ko": "청소 솔",
+"kind": "tool",
+"src": "",
+"en": "a single scrub brush. Only this one item, nothing else beside it."
+},
+{
+"ko": "분무기",
+"kind": "tool",
+"src": "",
+"en": "a single spray bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "살충제",
+"kind": "tool",
+"src": "",
+"en": "a single bug spray can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "락스",
+"kind": "tool",
+"src": "",
+"en": "a single bleach bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "소금 뿌리개",
+"kind": "tool",
+"src": "",
+"en": "a single salt shaker. Only this one item, nothing else beside it."
+},
+{
+"ko": "부채(도구)",
+"kind": "tool",
+"src": "",
+"en": "a single paper hand fan. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "성냥갑",
+"kind": "tool",
+"src": "",
+"en": "a single small matchbox. Only this one item, nothing else beside it."
+},
+{
+"ko": "토치",
+"kind": "tool",
+"src": "",
+"en": "a single blow torch. Only this one item, nothing else beside it."
+},
+{
+"ko": "휴대용 버너",
+"kind": "tool",
+"src": "",
+"en": "a single portable gas stove. Only this one item, nothing else beside it."
+},
+{
+"ko": "부탄가스",
+"kind": "tool",
+"src": "",
+"en": "a single butane gas canister. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "코펠",
+"kind": "tool",
+"src": "",
+"en": "a single camping cook pot. Only this one item, nothing else beside it."
+},
+{
+"ko": "텐트",
+"kind": "tool",
+"src": "",
+"en": "a single folded tent. Only this one item, nothing else beside it."
+},
+{
+"ko": "침낭",
+"kind": "tool",
+"src": "",
+"en": "a single sleeping bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "돗자리",
+"kind": "tool",
+"src": "",
+"en": "a single rolled picnic mat. Only this one item, nothing else beside it."
+},
+{
+"ko": "담요",
+"kind": "tool",
+"src": "",
+"en": "a single folded blanket. Only this one item, nothing else beside it."
+},
+{
+"ko": "베개",
+"kind": "tool",
+"src": "",
+"en": "a single pillow. Only this one item, nothing else beside it."
+},
+{
+"ko": "자명종",
+"kind": "tool",
+"src": "",
+"en": "a single alarm clock. Only this one item, nothing else beside it."
+},
+{
+"ko": "모래시계",
+"kind": "tool",
+"src": "",
+"en": "a single hourglass. Only this one item, nothing else beside it."
+},
+{
+"ko": "줄",
+"kind": "tool",
+"src": "",
+"en": "a single rope coil thin. Only this one item, nothing else beside it."
+},
+{
+"ko": "철사",
+"kind": "tool",
+"src": "",
+"en": "a single wire coil. Only this one item, nothing else beside it."
+},
+{
+"ko": "실과 바늘",
+"kind": "tool",
+"src": "",
+"en": "a single thread and needle. Only this one item, nothing else beside it."
+},
+{
+"ko": "안전핀",
+"kind": "tool",
+"src": "",
+"en": "a single safety pins. Only this one item, nothing else beside it."
+},
+{
+"ko": "클립",
+"kind": "tool",
+"src": "",
+"en": "a single paper clips. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "스테이플러",
+"kind": "tool",
+"src": "",
+"en": "a single stapler. Only this one item, nothing else beside it."
+},
+{
+"ko": "펜",
+"kind": "tool",
+"src": "",
+"en": "a single ballpoint pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "만년필",
+"kind": "tool",
+"src": "",
+"en": "a single fountain pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "연필",
+"kind": "tool",
+"src": "",
+"en": "a single pencil. Only this one item, nothing else beside it."
+},
+{
+"ko": "매직펜",
+"kind": "tool",
+"src": "",
+"en": "a single marker pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "붓",
+"kind": "tool",
+"src": "",
+"en": "a single calligraphy brush. Only this one item, nothing else beside it."
+},
+{
+"ko": "먹과 벼루",
+"kind": "tool",
+"src": "",
+"en": "a single ink stick and inkstone. Only this one item, nothing else beside it."
+},
+{
+"ko": "물감",
+"kind": "tool",
+"src": "",
+"en": "a single paint tubes. Only this one item, nothing else beside it."
+},
+{
+"ko": "크레파스",
+"kind": "tool",
+"src": "",
+"en": "a single crayons. Only this one item, nothing else beside it."
+},
+{
+"ko": "지우개",
+"kind": "tool",
+"src": "",
+"en": "a single eraser. Only this one item, nothing else beside it."
+},
+{
+"ko": "계산기",
+"kind": "tool",
+"src": "",
+"en": "a single calculator. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "도장",
+"kind": "tool",
+"src": "",
+"en": "a single personal seal stamp. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "인주",
+"kind": "tool",
+"src": "",
+"en": "a single red ink pad. Only this one item, nothing else beside it."
+},
+{
+"ko": "확성기",
+"kind": "tool",
+"src": "",
+"en": "a single megaphone. Only this one item, nothing else beside it."
+},
+{
+"ko": "경광봉",
+"kind": "tool",
+"src": "",
+"en": "a single traffic baton light. Only this one item, nothing else beside it."
+},
+{
+"ko": "라바콘",
+"kind": "tool",
+"src": "",
+"en": "a single traffic cone. Only this one item, nothing else beside it."
+},
+{
+"ko": "자전거 자물쇠",
+"kind": "tool",
+"src": "",
+"en": "a single bike chain lock. Only this one item, nothing else beside it."
+},
+{
+"ko": "금고",
+"kind": "tool",
+"src": "",
+"en": "a single small safe. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "열쇠 따개",
+"kind": "tool",
+"src": "",
+"en": "a single lock picks. Only this one item, nothing else beside it."
+},
+{
+"ko": "유리 깨는 망치",
+"kind": "tool",
+"src": "",
+"en": "a single emergency glass hammer. Only this one item, nothing else beside it."
+},
+{
+"ko": "소방 도끼",
+"kind": "tool",
+"src": "",
+"en": "a single fire axe. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠막대",
+"kind": "tool",
+"src": "",
+"en": "a single iron bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "빠루",
+"kind": "tool",
+"src": "",
+"en": "a single pry bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "저울",
+"kind": "tool",
+"src": "위키",
+"en": "a single weighing scale. Only this one item, nothing else beside it."
+},
+{
+"ko": "추첨통",
+"kind": "tool",
+"src": "위키",
+"en": "a single lottery draw box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "큐 카드",
+"kind": "tool",
+"src": "위키",
+"en": "a single cue cards. Only this one item, nothing else beside it."
+},
+{
+"ko": "와이더 무전기",
+"kind": "device",
+"src": "위키",
+"en": "Pair of colorful toy walkie-talkies. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹음기",
+"kind": "device",
+"src": "",
+"en": "a single small digital voice recorder. Only this one item, nothing else beside it."
+},
+{
+"ko": "카세트 녹음기",
+"kind": "device",
+"src": "",
+"en": "a single portable cassette recorder. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "카메라",
+"kind": "device",
+"src": "",
+"en": "a single compact digital camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "캠코더",
+"kind": "device",
+"src": "",
+"en": "a single handheld camcorder. Only this one item, nothing else beside it."
+},
+{
+"ko": "휴대폰",
+"kind": "device",
+"src": "",
+"en": "a single black smartphone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보조 배터리",
+"kind": "device",
+"src": "위키",
+"en": "a single portable power bank with cable. Only this one item, nothing else beside it."
+},
+{
+"ko": "손목시계",
+"kind": "device",
+"src": "",
+"en": "a single wristwatch. Only this one item, nothing else beside it."
+},
+{
+"ko": "나침반",
+"kind": "device",
+"src": "",
+"en": "a single brass compass. Only this one item, nothing else beside it."
+},
+{
+"ko": "도청기",
+"kind": "device",
+"src": "",
+"en": "a single tiny black bug listening device. Only this one item, nothing else beside it."
+},
+{
+"ko": "소형 전등",
+"kind": "device",
+"src": "",
+"en": "a single small LED lamp. Only this one item, nothing else beside it."
+},
+{
+"ko": "헤드랜턴",
+"kind": "device",
+"src": "",
+"en": "a single head lamp with strap. Only this one item, nothing else beside it."
+},
+{
+"ko": "이어폰",
+"kind": "device",
+"src": "",
+"en": "a single wired earphones. Only this one item, nothing else beside it."
+},
+{
+"ko": "요원 단말기",
+"kind": "device",
+"src": "위키",
+"en": "a single rugged agent tablet terminal. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "폴더폰",
+"kind": "device",
+"src": "위키",
+"en": "a single flip phone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "대포폰",
+"kind": "device",
+"src": "위키",
+"en": "a single cheap burner phone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "큐브",
+"kind": "device",
+"src": "위키",
+"en": "a single small metal cube. Only this one item, nothing else beside it."
+},
+{
+"ko": "고출력 헤드램프",
+"kind": "device",
+"src": "위키",
+"en": "a single high-power headlamp. Only this one item, nothing else beside it."
+},
+{
+"ko": "레이저 스캐너",
+"kind": "device",
+"src": "위키",
+"en": "a single handheld laser scanner. Only this one item, nothing else beside it."
+},
+{
+"ko": "보조배터리(통화)",
+"kind": "device",
+"src": "위키",
+"en": "a single power bank with glowing seal. Only this one item, nothing else beside it."
+},
+{
+"ko": "무대용 마이크",
+"kind": "device",
+"src": "위키",
+"en": "a single stage microphone with cable. Only this one item, nothing else beside it."
+},
+{
+"ko": "브라운관 텔레비전",
+"kind": "device",
+"src": "위키",
+"en": "a single old CRT television. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비디오 데크",
+"kind": "device",
+"src": "위키",
+"en": "a single VCR player. Only this one item, nothing else beside it."
+},
+{
+"ko": "캠코더(옛날)",
+"kind": "device",
+"src": "",
+"en": "a single old camcorder. Only this one item, nothing else beside it."
+},
+{
+"ko": "노트북",
+"kind": "device",
+"src": "",
+"en": "a single laptop. Only this one item, nothing else beside it."
+},
+{
+"ko": "태블릿",
+"kind": "device",
+"src": "",
+"en": "a single tablet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "스마트워치",
+"kind": "device",
+"src": "",
+"en": "a single smartwatch. Only this one item, nothing else beside it."
+},
+{
+"ko": "전자시계",
+"kind": "device",
+"src": "위키",
+"en": "a single digital wristwatch. Only this one item, nothing else beside it."
+},
+{
+"ko": "USB",
+"kind": "device",
+"src": "",
+"en": "a single USB flash drive. Only this one item, nothing else beside it."
+},
+{
+"ko": "외장하드",
+"kind": "device",
+"src": "",
+"en": "a single external hard drive. Only this one item, nothing else beside it."
+},
+{
+"ko": "SD 카드",
+"kind": "device",
+"src": "",
+"en": "a single memory card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "충전기",
+"kind": "device",
+"src": "",
+"en": "a single phone charger. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "멀티탭",
+"kind": "device",
+"src": "",
+"en": "a single power strip. Only this one item, nothing else beside it."
+},
+{
+"ko": "이어폰(무선)",
+"kind": "device",
+"src": "",
+"en": "a single wireless earbuds. Only this one item, nothing else beside it."
+},
+{
+"ko": "헤드폰",
+"kind": "device",
+"src": "",
+"en": "a single headphones. Only this one item, nothing else beside it."
+},
+{
+"ko": "블루투스 스피커",
+"kind": "device",
+"src": "",
+"en": "a single bluetooth speaker. Only this one item, nothing else beside it."
+},
+{
+"ko": "라디오",
+"kind": "device",
+"src": "",
+"en": "a single portable radio. Only this one item, nothing else beside it."
+},
+{
+"ko": "워크맨",
+"kind": "device",
+"src": "",
+"en": "a single cassette walkman. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "MP3 플레이어",
+"kind": "device",
+"src": "",
+"en": "a single mp3 player. Only this one item, nothing else beside it."
+},
+{
+"ko": "게임기",
+"kind": "device",
+"src": "",
+"en": "a single handheld game console. Only this one item, nothing else beside it."
+},
+{
+"ko": "디지털카메라",
+"kind": "device",
+"src": "",
+"en": "a single digital camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "폴라로이드 카메라",
+"kind": "device",
+"src": "",
+"en": "a single instant polaroid camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "필름 카메라",
+"kind": "device",
+"src": "",
+"en": "a single film camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "드론",
+"kind": "device",
+"src": "",
+"en": "a single small drone. Only this one item, nothing else beside it."
+},
+{
+"ko": "블랙박스",
+"kind": "device",
+"src": "",
+"en": "a single car dashcam. Only this one item, nothing else beside it."
+},
+{
+"ko": "CCTV 카메라",
+"kind": "device",
+"src": "",
+"en": "a single cctv camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "몰래카메라",
+"kind": "device",
+"src": "",
+"en": "a single hidden pinhole camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "GPS 추적기",
+"kind": "device",
+"src": "",
+"en": "a single gps tracker. Only this one item, nothing else beside it."
+},
+{
+"ko": "금속 탐지기",
+"kind": "device",
+"src": "",
+"en": "a single metal detector. Only this one item, nothing else beside it."
+},
+{
+"ko": "열화상 카메라",
+"kind": "device",
+"src": "",
+"en": "a single thermal camera. Only this one item, nothing else beside it."
+},
+{
+"ko": "EMF 측정기",
+"kind": "device",
+"src": "",
+"en": "a single emf meter. Only this one item, nothing else beside it."
+},
+{
+"ko": "가이거 계수기",
+"kind": "device",
+"src": "",
+"en": "a single geiger counter. Only this one item, nothing else beside it."
+},
+{
+"ko": "온도계",
+"kind": "device",
+"src": "",
+"en": "a single thermometer. Only this one item, nothing else beside it."
+},
+{
+"ko": "무선 이어피스",
+"kind": "device",
+"src": "",
+"en": "a single earpiece radio. Only this one item, nothing else beside it."
+},
+{
+"ko": "위성 전화",
+"kind": "device",
+"src": "",
+"en": "a single satellite phone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "공중전화 카드",
+"kind": "device",
+"src": "",
+"en": "a single phone card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "삐삐",
+"kind": "device",
+"src": "",
+"en": "a single old pager. Only this one item, nothing else beside it."
+},
+{
+"ko": "전자사전",
+"kind": "device",
+"src": "",
+"en": "a single electronic dictionary. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "전기 랜턴",
+"kind": "device",
+"src": "",
+"en": "a single electric lantern. Only this one item, nothing else beside it."
+},
+{
+"ko": "야광봉",
+"kind": "device",
+"src": "",
+"en": "a single glow stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "레이저 포인터",
+"kind": "device",
+"src": "",
+"en": "a single laser pointer. Only this one item, nothing else beside it."
+},
+{
+"ko": "UV 손전등",
+"kind": "device",
+"src": "",
+"en": "a single uv flashlight. Only this one item, nothing else beside it."
+},
+{
+"ko": "전기 파리채",
+"kind": "device",
+"src": "",
+"en": "a single electric fly swatter. Only this one item, nothing else beside it."
+},
+{
+"ko": "휴대용 선풍기",
+"kind": "device",
+"src": "",
+"en": "a single handheld fan. Only this one item, nothing else beside it."
+},
+{
+"ko": "손난로",
+"kind": "device",
+"src": "",
+"en": "a single hand warmer. Only this one item, nothing else beside it."
+},
+{
+"ko": "전자담배",
+"kind": "device",
+"src": "",
+"en": "a single e-cigarette. Only this one item, nothing else beside it."
+},
+{
+"ko": "도어락 리모컨",
+"kind": "device",
+"src": "",
+"en": "a single remote key fob. Only this one item, nothing else beside it."
+},
+{
+"ko": "무선 마이크",
+"kind": "device",
+"src": "",
+"en": "a single wireless microphone. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹음 펜",
+"kind": "device",
+"src": "",
+"en": "a single recording pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "도청 탐지기",
+"kind": "device",
+"src": "",
+"en": "a single bug detector. Only this one item, nothing else beside it."
+},
+{
+"ko": "소형 모니터",
+"kind": "device",
+"src": "",
+"en": "a single small monitor. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "유리 등롱에 담긴 부적",
+"kind": "charm",
+"src": "위키",
+"en": "a single small glass lantern holding a paper talisman written in red. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "십자가",
+"kind": "charm",
+"src": "",
+"en": "a single silver cross. Only this one item, nothing else beside it."
+},
+{
+"ko": "묵주",
+"kind": "charm",
+"src": "",
+"en": "a single rosary beads with cross. Only this one item, nothing else beside it."
+},
+{
+"ko": "염주",
+"kind": "charm",
+"src": "",
+"en": "a single wooden prayer beads. Only this one item, nothing else beside it."
+},
+{
+"ko": "성수병",
+"kind": "charm",
+"src": "",
+"en": "a single small glass bottle of holy water. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "향",
+"kind": "charm",
+"src": "",
+"en": "Bundle of incense sticks, smoking. Only this one item, nothing else beside it."
+},
+{
+"ko": "소금 봉지",
+"kind": "charm",
+"src": "",
+"en": "a single small bag of white salt. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "팥 봉지",
+"kind": "charm",
+"src": "",
+"en": "a single small bag of red beans. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "붉은 실",
+"kind": "charm",
+"src": "",
+"en": "a single spool of red thread. Only this one item, nothing else beside it."
+},
+{
+"ko": "종",
+"kind": "charm",
+"src": "",
+"en": "a single small brass hand bell. Only this one item, nothing else beside it."
+},
+{
+"ko": "거울",
+"kind": "charm",
+"src": "",
+"en": "a single small round hand mirror. Only this one item, nothing else beside it."
+},
+{
+"ko": "방울",
+"kind": "charm",
+"src": "",
+"en": "a single shaman brass bell cluster. Only this one item, nothing else beside it."
+},
+{
+"ko": "축복받은 십자가",
+"kind": "charm",
+"src": "위키",
+"en": "a single blessed silver cross. Only this one item, nothing else beside it."
+},
+{
+"ko": "성유물",
+"kind": "charm",
+"src": "위키",
+"en": "a single reliquary box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "성인 메달",
+"kind": "charm",
+"src": "위키",
+"en": "a single saint medal. Only this one item, nothing else beside it."
+},
+{
+"ko": "성경책(낡은)",
+"kind": "charm",
+"src": "",
+"en": "a single old worn bible. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "관리국 부적",
+"kind": "charm",
+"src": "위키",
+"en": "a single talisman written in red on back of library card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "찢긴 부적",
+"kind": "charm",
+"src": "위키",
+"en": "a single torn paper talisman. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "액막이 부적",
+"kind": "charm",
+"src": "위키",
+"en": "a single protective talisman folded. Only this one item, nothing else beside it."
+},
+{
+"ko": "곰팡이 핀 부적",
+"kind": "charm",
+"src": "위키",
+"en": "a single moldy crumbling talisman. Only this one item, nothing else beside it."
+},
+{
+"ko": "호리병",
+"kind": "charm",
+"src": "위키",
+"en": "a single gourd bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "조개 껍데기",
+"kind": "charm",
+"src": "위키",
+"en": "a single seashell. Only this one item, nothing else beside it."
+},
+{
+"ko": "엽전",
+"kind": "charm",
+"src": "위키",
+"en": "a single old Korean coin with square hole. Only this one item, nothing else beside it."
+},
+{
+"ko": "엽전 꾸러미",
+"kind": "charm",
+"src": "위키",
+"en": "String of old coins. Only this one item, nothing else beside it."
+},
+{
+"ko": "금줄",
+"kind": "charm",
+"src": "위키",
+"en": "a single straw rope with red peppers. Only this one item, nothing else beside it."
+},
+{
+"ko": "복주머니",
+"kind": "charm",
+"src": "",
+"en": "a single lucky pouch. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "부채(무당)",
+"kind": "charm",
+"src": "",
+"en": "a single shaman fan. Only this one item, nothing else beside it."
+},
+{
+"ko": "무당 방울",
+"kind": "charm",
+"src": "",
+"en": "a single shaman bell rattle. Only this one item, nothing else beside it."
+},
+{
+"ko": "오방기",
+"kind": "charm",
+"src": "",
+"en": "a single five-color flags. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "팥",
+"kind": "charm",
+"src": "",
+"en": "Handful of red beans. Only this one item, nothing else beside it."
+},
+{
+"ko": "소금 한 줌",
+"kind": "charm",
+"src": "",
+"en": "Handful of salt. Only this one item, nothing else beside it."
+},
+{
+"ko": "쑥",
+"kind": "charm",
+"src": "",
+"en": "Bundle of mugwort. Only this one item, nothing else beside it."
+},
+{
+"ko": "복숭아나무 가지",
+"kind": "charm",
+"src": "",
+"en": "a single peach tree branch. Only this one item, nothing else beside it."
+},
+{
+"ko": "복숭아나무 칼",
+"kind": "charm",
+"src": "",
+"en": "a single peachwood sword. Only this one item, nothing else beside it."
+},
+{
+"ko": "팔찌 염주",
+"kind": "charm",
+"src": "",
+"en": "a single bead bracelet. Only this one item, nothing else beside it."
+},
+{
+"ko": "목탁",
+"kind": "charm",
+"src": "",
+"en": "a single wooden moktak. Only this one item, nothing else beside it."
+},
+{
+"ko": "불상",
+"kind": "charm",
+"src": "",
+"en": "a single small buddha statue. Only this one item, nothing else beside it."
+},
+{
+"ko": "향로",
+"kind": "charm",
+"src": "",
+"en": "a single incense burner. Only this one item, nothing else beside it."
+},
+{
+"ko": "촛대",
+"kind": "charm",
+"src": "",
+"en": "a single candlestick. Only this one item, nothing else beside it."
+},
+{
+"ko": "성모상",
+"kind": "charm",
+"src": "",
+"en": "a single small madonna statue. Only this one item, nothing else beside it."
+},
+{
+"ko": "성작",
+"kind": "charm",
+"src": "",
+"en": "a single chalice. Only this one item, nothing else beside it."
+},
+{
+"ko": "성유",
+"kind": "charm",
+"src": "",
+"en": "a single holy oil vial. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "성체",
+"kind": "charm",
+"src": "",
+"en": "a single communion wafer. Only this one item, nothing else beside it."
+},
+{
+"ko": "코란",
+"kind": "charm",
+"src": "",
+"en": "a single koran book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "기도 매트",
+"kind": "charm",
+"src": "",
+"en": "a single prayer rug. Only this one item, nothing else beside it."
+},
+{
+"ko": "부적 주머니",
+"kind": "charm",
+"src": "",
+"en": "a single charm pouch. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "드림캐처",
+"kind": "charm",
+"src": "",
+"en": "a single dreamcatcher. Only this one item, nothing else beside it."
+},
+{
+"ko": "타로 카드",
+"kind": "charm",
+"src": "",
+"en": "a single tarot cards. Only this one item, nothing else beside it."
+},
+{
+"ko": "수정 구슬",
+"kind": "charm",
+"src": "",
+"en": "a single crystal ball. Only this one item, nothing else beside it."
+},
+{
+"ko": "룬 돌",
+"kind": "charm",
+"src": "",
+"en": "a single rune stones. Only this one item, nothing else beside it."
+},
+{
+"ko": "은 귀걸이",
+"kind": "charm",
+"src": "",
+"en": "a single silver earring charm. Only this one item, nothing else beside it."
+},
+{
+"ko": "마늘",
+"kind": "charm",
+"src": "",
+"en": "a single garlic bulb. Only this one item, nothing else beside it."
+},
+{
+"ko": "은 종",
+"kind": "charm",
+"src": "",
+"en": "a single silver bell. Only this one item, nothing else beside it."
+},
+{
+"ko": "풍경",
+"kind": "charm",
+"src": "",
+"en": "a single wind chime. Only this one item, nothing else beside it."
+},
+{
+"ko": "오뚝이",
+"kind": "charm",
+"src": "",
+"en": "a single daruma doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "마네키네코",
+"kind": "charm",
+"src": "",
+"en": "a single lucky cat figure. Only this one item, nothing else beside it."
+},
+{
+"ko": "장승 미니어처",
+"kind": "charm",
+"src": "",
+"en": "a single small jangseung totem. Only this one item, nothing else beside it."
+},
+{
+"ko": "솟대",
+"kind": "charm",
+"src": "",
+"en": "a single sotdae bird pole. Only this one item, nothing else beside it."
+},
+{
+"ko": "굿 부채",
+"kind": "charm",
+"src": "",
+"en": "a single ritual paper fan. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "제문",
+"kind": "charm",
+"src": "위키",
+"en": "a single ritual prayer scroll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "영물",
+"kind": "charm",
+"src": "위키",
+"en": "a single mysterious glowing relic. Only this one item, nothing else beside it."
+},
+{
+"ko": "붕대",
+"kind": "medical",
+"src": "",
+"en": "Roll of white bandage. Only this one item, nothing else beside it."
+},
+{
+"ko": "진통제",
+"kind": "medical",
+"src": "",
+"en": "a single blister pack of pills. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "소독약",
+"kind": "medical",
+"src": "",
+"en": "a single brown bottle of antiseptic. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "지혈대",
+"kind": "medical",
+"src": "",
+"en": "a single tourniquet strap. Only this one item, nothing else beside it."
+},
+{
+"ko": "반창고",
+"kind": "medical",
+"src": "",
+"en": "a single adhesive bandages. Only this one item, nothing else beside it."
+},
+{
+"ko": "수면제",
+"kind": "medical",
+"src": "",
+"en": "a single small pill bottle, sleeping pills. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "주사기",
+"kind": "medical",
+"src": "",
+"en": "a single syringe. Only this one item, nothing else beside it."
+},
+{
+"ko": "안정제",
+"kind": "medical",
+"src": "",
+"en": "a single small medicine vial. Only this one item, nothing else beside it."
+},
+{
+"ko": "비타민",
+"kind": "medical",
+"src": "",
+"en": "a single vitamin bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "구급상자",
+"kind": "medical",
+"src": "위키",
+"en": "a single first aid box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "지혈제",
+"kind": "medical",
+"src": "위키",
+"en": "a single hemostatic powder pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "두통약",
+"kind": "medical",
+"src": "위키",
+"en": "a single headache pills. Only this one item, nothing else beside it."
+},
+{
+"ko": "물약",
+"kind": "medical",
+"src": "위키",
+"en": "a single small potion bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "회복 물약",
+"kind": "medical",
+"src": "위키",
+"en": "a single red healing potion. Only this one item, nothing else beside it."
+},
+{
+"ko": "시약",
+"kind": "medical",
+"src": "위키",
+"en": "a single vial of reagent. Only this one item, nothing else beside it."
+},
+{
+"ko": "혈액 팩",
+"kind": "medical",
+"src": "위키",
+"en": "a single blood bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "의수",
+"kind": "medical",
+"src": "위키",
+"en": "a single prosthetic arm. Only this one item, nothing else beside it."
+},
+{
+"ko": "청진기",
+"kind": "medical",
+"src": "",
+"en": "a single stethoscope. Only this one item, nothing else beside it."
+},
+{
+"ko": "혈압계",
+"kind": "medical",
+"src": "",
+"en": "a single blood pressure monitor. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "체온계",
+"kind": "medical",
+"src": "",
+"en": "a single digital thermometer. Only this one item, nothing else beside it."
+},
+{
+"ko": "거즈",
+"kind": "medical",
+"src": "",
+"en": "a single gauze pads. Only this one item, nothing else beside it."
+},
+{
+"ko": "압박 붕대",
+"kind": "medical",
+"src": "",
+"en": "a single elastic bandage. Only this one item, nothing else beside it."
+},
+{
+"ko": "부목",
+"kind": "medical",
+"src": "",
+"en": "a single splint. Only this one item, nothing else beside it."
+},
+{
+"ko": "깁스",
+"kind": "medical",
+"src": "",
+"en": "a single cast. Only this one item, nothing else beside it."
+},
+{
+"ko": "목발",
+"kind": "medical",
+"src": "",
+"en": "a single crutches. Only this one item, nothing else beside it."
+},
+{
+"ko": "휠체어",
+"kind": "medical",
+"src": "",
+"en": "a single wheelchair. Only this one item, nothing else beside it."
+},
+{
+"ko": "링거",
+"kind": "medical",
+"src": "",
+"en": "a single iv drip bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "수술용 메스",
+"kind": "medical",
+"src": "",
+"en": "a single scalpel. Only this one item, nothing else beside it."
+},
+{
+"ko": "봉합 키트",
+"kind": "medical",
+"src": "",
+"en": "a single suture kit. Only this one item, nothing else beside it."
+},
+{
+"ko": "핀셋",
+"kind": "medical",
+"src": "",
+"en": "a single tweezers. Only this one item, nothing else beside it."
+},
+{
+"ko": "의료용 가위",
+"kind": "medical",
+"src": "",
+"en": "a single medical scissors. Only this one item, nothing else beside it."
+},
+{
+"ko": "라텍스 장갑",
+"kind": "medical",
+"src": "",
+"en": "a single latex gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "마스크(의료)",
+"kind": "medical",
+"src": "",
+"en": "a single surgical mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "산소마스크",
+"kind": "medical",
+"src": "",
+"en": "a single oxygen mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "산소통",
+"kind": "medical",
+"src": "",
+"en": "a single oxygen tank. Only this one item, nothing else beside it."
+},
+{
+"ko": "제세동기",
+"kind": "medical",
+"src": "",
+"en": "a single aed defibrillator. Only this one item, nothing else beside it."
+},
+{
+"ko": "인공호흡 마스크",
+"kind": "medical",
+"src": "",
+"en": "a single cpr mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "약봉지",
+"kind": "medical",
+"src": "",
+"en": "a single pharmacy medicine packet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "알약 통",
+"kind": "medical",
+"src": "",
+"en": "a single pill organizer. Only this one item, nothing else beside it."
+},
+{
+"ko": "감기약",
+"kind": "medical",
+"src": "",
+"en": "a single cold medicine. Only this one item, nothing else beside it."
+},
+{
+"ko": "소화제",
+"kind": "medical",
+"src": "",
+"en": "a single digestive medicine. Only this one item, nothing else beside it."
+},
+{
+"ko": "파스",
+"kind": "medical",
+"src": "",
+"en": "a single pain relief patch. Only this one item, nothing else beside it."
+},
+{
+"ko": "연고",
+"kind": "medical",
+"src": "",
+"en": "a single ointment tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "안약",
+"kind": "medical",
+"src": "",
+"en": "a single eye drops. Only this one item, nothing else beside it."
+},
+{
+"ko": "해열제",
+"kind": "medical",
+"src": "",
+"en": "a single fever syrup. Only this one item, nothing else beside it."
+},
+{
+"ko": "항생제",
+"kind": "medical",
+"src": "",
+"en": "a single antibiotics. Only this one item, nothing else beside it."
+},
+{
+"ko": "진정제 주사",
+"kind": "medical",
+"src": "",
+"en": "a single sedative injector. Only this one item, nothing else beside it."
+},
+{
+"ko": "아드레날린 주사",
+"kind": "medical",
+"src": "",
+"en": "a single epinephrine pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "모르핀",
+"kind": "medical",
+"src": "",
+"en": "a single morphine ampoule. Only this one item, nothing else beside it."
+},
+{
+"ko": "해독제",
+"kind": "medical",
+"src": "",
+"en": "a single antidote vial. Only this one item, nothing else beside it."
+},
+{
+"ko": "화상 연고",
+"kind": "medical",
+"src": "",
+"en": "a single burn cream. Only this one item, nothing else beside it."
+},
+{
+"ko": "소독용 알코올",
+"kind": "medical",
+"src": "",
+"en": "a single rubbing alcohol. Only this one item, nothing else beside it."
+},
+{
+"ko": "면봉",
+"kind": "medical",
+"src": "",
+"en": "a single cotton swabs. Only this one item, nothing else beside it."
+},
+{
+"ko": "솜",
+"kind": "medical",
+"src": "",
+"en": "a single cotton balls. Only this one item, nothing else beside it."
+},
+{
+"ko": "얼음 팩",
+"kind": "medical",
+"src": "",
+"en": "a single ice pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "핫팩",
+"kind": "medical",
+"src": "",
+"en": "a single heat pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "포르말린 병",
+"kind": "medical",
+"src": "위키",
+"en": "a single formalin specimen jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "차트",
+"kind": "medical",
+"src": "위키",
+"en": "a single medical chart clipboard. Only this one item, nothing else beside it."
+},
+{
+"ko": "엑스레이 필름",
+"kind": "medical",
+"src": "",
+"en": "a single x-ray film. Only this one item, nothing else beside it."
+},
+{
+"ko": "처방전",
+"kind": "medical",
+"src": "",
+"en": "a single prescription paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "약병(갈색)",
+"kind": "medical",
+"src": "",
+"en": "a single amber medicine bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "커피",
+"kind": "food",
+"src": "위키",
+"en": "a single canned coffee. Only this one item, nothing else beside it."
+},
+{
+"ko": "담배",
+"kind": "food",
+"src": "위키",
+"en": "a single pack of cigarettes. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "휴대용 재떨이",
+"kind": "food",
+"src": "위키",
+"en": "a single small portable ashtray pouch. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "에너지바",
+"kind": "food",
+"src": "",
+"en": "a single wrapped energy bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "초콜릿",
+"kind": "food",
+"src": "",
+"en": "a single chocolate bar, half unwrapped. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "컵라면",
+"kind": "food",
+"src": "",
+"en": "a single instant cup noodle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "소주",
+"kind": "food",
+"src": "",
+"en": "a single green glass soju bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "껌",
+"kind": "food",
+"src": "",
+"en": "a single pack of chewing gum. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사탕",
+"kind": "food",
+"src": "",
+"en": "a single wrapped candies. Only this one item, nothing else beside it."
+},
+{
+"ko": "도시락",
+"kind": "food",
+"src": "",
+"en": "a single convenience store lunch box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "앨리스 피크닉 세트",
+"kind": "food",
+"src": "위키",
+"en": "a single picnic set: small drink bottle and cookies. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "메로나",
+"kind": "food",
+"src": "위키",
+"en": "a single green melon popsicle bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "도넛 상자",
+"kind": "food",
+"src": "위키",
+"en": "Box of donuts. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "도넛",
+"kind": "food",
+"src": "위키",
+"en": "a single glazed donut. Only this one item, nothing else beside it."
+},
+{
+"ko": "믹스커피",
+"kind": "food",
+"src": "위키",
+"en": "a single instant coffee mix stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "편의점 커피",
+"kind": "food",
+"src": "위키",
+"en": "a single convenience store iced coffee cup. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "자판기 커피",
+"kind": "food",
+"src": "위키",
+"en": "a single paper cup vending coffee. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "막걸리",
+"kind": "food",
+"src": "위키",
+"en": "a single plastic makgeolli bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "약주",
+"kind": "food",
+"src": "위키",
+"en": "a single clay jar of rice wine. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "메밀묵",
+"kind": "food",
+"src": "위키",
+"en": "a single buckwheat jelly. Only this one item, nothing else beside it."
+},
+{
+"ko": "꿀병",
+"kind": "food",
+"src": "위키",
+"en": "a single small honey jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "과자",
+"kind": "food",
+"src": "위키",
+"en": "Bag of snack chips. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "팝콘",
+"kind": "food",
+"src": "위키",
+"en": "a single popcorn bucket. Only this one item, nothing else beside it."
+},
+{
+"ko": "통조림",
+"kind": "food",
+"src": "위키",
+"en": "a single tin can of food. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "과일 바구니",
+"kind": "food",
+"src": "위키",
+"en": "a single fruit basket. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "케이크",
+"kind": "food",
+"src": "위키",
+"en": "a single cake box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "음료수 캔",
+"kind": "food",
+"src": "위키",
+"en": "a single soda can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "붉은 열매",
+"kind": "food",
+"src": "위키",
+"en": "a single small red berries. Only this one item, nothing else beside it."
+},
+{
+"ko": "귤",
+"kind": "food",
+"src": "위키",
+"en": "a single tangerine. Only this one item, nothing else beside it."
+},
+{
+"ko": "간식 봉지",
+"kind": "food",
+"src": "위키",
+"en": "Bag of assorted snacks. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "생수 2L",
+"kind": "food",
+"src": "",
+"en": "a single large water bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이온음료",
+"kind": "food",
+"src": "",
+"en": "a single sports drink bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "에너지 드링크",
+"kind": "food",
+"src": "",
+"en": "a single energy drink can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "우유",
+"kind": "food",
+"src": "",
+"en": "a single milk carton. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "바나나우유",
+"kind": "food",
+"src": "",
+"en": "a single banana milk. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "두유",
+"kind": "food",
+"src": "",
+"en": "a single soy milk carton. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "주스",
+"kind": "food",
+"src": "",
+"en": "a single juice box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "탄산수",
+"kind": "food",
+"src": "",
+"en": "a single sparkling water. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹차",
+"kind": "food",
+"src": "",
+"en": "a single green tea bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "맥주",
+"kind": "food",
+"src": "",
+"en": "a single beer can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "와인",
+"kind": "food",
+"src": "",
+"en": "a single wine bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "양주",
+"kind": "food",
+"src": "",
+"en": "a single whiskey bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "소주잔",
+"kind": "food",
+"src": "",
+"en": "a single soju shot glass. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보온병",
+"kind": "food",
+"src": "",
+"en": "a single thermos. Only this one item, nothing else beside it."
+},
+{
+"ko": "텀블러",
+"kind": "food",
+"src": "",
+"en": "a single tumbler cup. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "삼각김밥",
+"kind": "food",
+"src": "",
+"en": "a single triangle kimbap. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "김밥",
+"kind": "food",
+"src": "",
+"en": "a single kimbap roll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "샌드위치",
+"kind": "food",
+"src": "",
+"en": "a single sandwich. Only this one item, nothing else beside it."
+},
+{
+"ko": "햄버거",
+"kind": "food",
+"src": "",
+"en": "a single hamburger. Only this one item, nothing else beside it."
+},
+{
+"ko": "핫도그",
+"kind": "food",
+"src": "",
+"en": "a single corn dog. Only this one item, nothing else beside it."
+},
+{
+"ko": "떡볶이",
+"kind": "food",
+"src": "",
+"en": "a single tteokbokki cup. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "순대",
+"kind": "food",
+"src": "",
+"en": "a single sundae sausage. Only this one item, nothing else beside it."
+},
+{
+"ko": "어묵",
+"kind": "food",
+"src": "",
+"en": "a single fish cake skewer. Only this one item, nothing else beside it."
+},
+{
+"ko": "붕어빵",
+"kind": "food",
+"src": "",
+"en": "a single fish-shaped bread. Only this one item, nothing else beside it."
+},
+{
+"ko": "호빵",
+"kind": "food",
+"src": "",
+"en": "a single steamed bun. Only this one item, nothing else beside it."
+},
+{
+"ko": "군고구마",
+"kind": "food",
+"src": "",
+"en": "a single roasted sweet potato. Only this one item, nothing else beside it."
+},
+{
+"ko": "치킨",
+"kind": "food",
+"src": "",
+"en": "a single fried chicken box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "피자",
+"kind": "food",
+"src": "",
+"en": "a single pizza slice. Only this one item, nothing else beside it."
+},
+{
+"ko": "라면 봉지",
+"kind": "food",
+"src": "",
+"en": "a single instant ramen pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "즉석밥",
+"kind": "food",
+"src": "",
+"en": "a single instant rice bowl. Only this one item, nothing else beside it."
+},
+{
+"ko": "참치캔",
+"kind": "food",
+"src": "",
+"en": "a single tuna can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "스팸",
+"kind": "food",
+"src": "",
+"en": "a single spam can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "육포",
+"kind": "food",
+"src": "",
+"en": "a single beef jerky. Only this one item, nothing else beside it."
+},
+{
+"ko": "건빵",
+"kind": "food",
+"src": "",
+"en": "a single hardtack crackers. Only this one item, nothing else beside it."
+},
+{
+"ko": "전투식량",
+"kind": "food",
+"src": "",
+"en": "a single military ration pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비상식량",
+"kind": "food",
+"src": "",
+"en": "a single emergency food bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사과",
+"kind": "food",
+"src": "",
+"en": "a single red apple. Only this one item, nothing else beside it."
+},
+{
+"ko": "바나나",
+"kind": "food",
+"src": "",
+"en": "a single banana. Only this one item, nothing else beside it."
+},
+{
+"ko": "빵",
+"kind": "food",
+"src": "",
+"en": "a single loaf of bread. Only this one item, nothing else beside it."
+},
+{
+"ko": "단팥빵",
+"kind": "food",
+"src": "",
+"en": "a single red bean bun. Only this one item, nothing else beside it."
+},
+{
+"ko": "쿠키",
+"kind": "food",
+"src": "",
+"en": "a single cookies. Only this one item, nothing else beside it."
+},
+{
+"ko": "비스킷",
+"kind": "food",
+"src": "",
+"en": "a single biscuits. Only this one item, nothing else beside it."
+},
+{
+"ko": "젤리",
+"kind": "food",
+"src": "",
+"en": "a single gummy candy. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "막대사탕",
+"kind": "food",
+"src": "",
+"en": "a single lollipop. Only this one item, nothing else beside it."
+},
+{
+"ko": "박하사탕",
+"kind": "food",
+"src": "",
+"en": "a single mint candy. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "초코파이",
+"kind": "food",
+"src": "",
+"en": "a single choco pie. Only this one item, nothing else beside it."
+},
+{
+"ko": "아이스크림",
+"kind": "food",
+"src": "",
+"en": "a single ice cream cone. Only this one item, nothing else beside it."
+},
+{
+"ko": "떡",
+"kind": "food",
+"src": "",
+"en": "a single rice cake. Only this one item, nothing else beside it."
+},
+{
+"ko": "송편",
+"kind": "food",
+"src": "",
+"en": "a single songpyeon rice cake. Only this one item, nothing else beside it."
+},
+{
+"ko": "약과",
+"kind": "food",
+"src": "",
+"en": "a single yakgwa honey cookie. Only this one item, nothing else beside it."
+},
+{
+"ko": "도시락(집)",
+"kind": "food",
+"src": "",
+"en": "a single home lunch box with cloth wrap. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "반찬통",
+"kind": "food",
+"src": "",
+"en": "a single side dish container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "김치",
+"kind": "food",
+"src": "",
+"en": "a single kimchi container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "계란",
+"kind": "food",
+"src": "",
+"en": "a single eggs. Only this one item, nothing else beside it."
+},
+{
+"ko": "고기",
+"kind": "food",
+"src": "",
+"en": "a single raw meat pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "생선",
+"kind": "food",
+"src": "",
+"en": "a single fish. Only this one item, nothing else beside it."
+},
+{
+"ko": "날고기",
+"kind": "food",
+"src": "",
+"en": "a single raw red meat chunk. Only this one item, nothing else beside it."
+},
+{
+"ko": "소금",
+"kind": "food",
+"src": "",
+"en": "a single salt container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "설탕",
+"kind": "food",
+"src": "",
+"en": "a single sugar packet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "고춧가루",
+"kind": "food",
+"src": "",
+"en": "a single red pepper powder. Only this one item, nothing else beside it."
+},
+{
+"ko": "향신료",
+"kind": "food",
+"src": "",
+"en": "a single spice jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "식용유",
+"kind": "food",
+"src": "",
+"en": "a single cooking oil bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "간장",
+"kind": "food",
+"src": "",
+"en": "a single soy sauce bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "꿀",
+"kind": "food",
+"src": "",
+"en": "a single honey jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "잼",
+"kind": "food",
+"src": "",
+"en": "a single jam jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "시리얼",
+"kind": "food",
+"src": "",
+"en": "a single cereal box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "컵커피",
+"kind": "food",
+"src": "",
+"en": "a single cup coffee. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "티백",
+"kind": "food",
+"src": "",
+"en": "a single tea bags. Only this one item, nothing else beside it."
+},
+{
+"ko": "라이터와 담배",
+"kind": "food",
+"src": "",
+"en": "a single cigarette and lighter. Only this one item, nothing else beside it."
+},
+{
+"ko": "시가",
+"kind": "food",
+"src": "",
+"en": "a single cigar. Only this one item, nothing else beside it."
+},
+{
+"ko": "궐련",
+"kind": "food",
+"src": "",
+"en": "a single loose rolled cigarette. Only this one item, nothing else beside it."
+},
+{
+"ko": "씹는 담배",
+"kind": "food",
+"src": "",
+"en": "a single chewing tobacco tin. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사탕 봉지",
+"kind": "food",
+"src": "위키",
+"en": "Bag of candy. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "정체불명 길거리 음식",
+"kind": "food",
+"src": "위키",
+"en": "a single strange skewered street food. Only this one item, nothing else beside it."
+},
+{
+"ko": "진공 용기",
+"kind": "food",
+"src": "위키",
+"en": "a single vacuum food container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "도토리묵",
+"kind": "food",
+"src": "",
+"en": "a single acorn jelly. Only this one item, nothing else beside it."
+},
+{
+"ko": "만두",
+"kind": "food",
+"src": "",
+"en": "a single dumplings. Only this one item, nothing else beside it."
+},
+{
+"ko": "국밥",
+"kind": "food",
+"src": "",
+"en": "a single bowl of gukbap. Only this one item, nothing else beside it."
+},
+{
+"ko": "짜장면",
+"kind": "food",
+"src": "",
+"en": "a single black bean noodles. Only this one item, nothing else beside it."
+},
+{
+"ko": "햇반 캔밥",
+"kind": "food",
+"src": "",
+"en": "a single canned rice. Only this one item, nothing else beside it."
+},
+{
+"ko": "물병(바코드)",
+"kind": "food",
+"src": "위키",
+"en": "a single water bottle with barcode label. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "포션 음료",
+"kind": "food",
+"src": "위키",
+"en": "a single glowing potion drink. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "해피메이커",
+"kind": "food",
+"src": "위키",
+"en": "a single candy-like pain relief stick. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "지도",
+"kind": "paper",
+"src": "",
+"en": "a single folded paper map. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "수첩",
+"kind": "paper",
+"src": "",
+"en": "a single small black notebook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사진",
+"kind": "paper",
+"src": "",
+"en": "a single old photograph. Only this one item, nothing else beside it."
+},
+{
+"ko": "낡은 졸업 앨범",
+"kind": "paper",
+"src": "위키",
+"en": "a single old worn graduation album. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "전단지(알바 모집)",
+"kind": "paper",
+"src": "",
+"en": "a single paper flyer. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "명함",
+"kind": "paper",
+"src": "",
+"en": "a single business card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "편지",
+"kind": "paper",
+"src": "",
+"en": "a single sealed envelope letter. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "영수증",
+"kind": "paper",
+"src": "",
+"en": "a single long paper receipt. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "신문",
+"kind": "paper",
+"src": "",
+"en": "a single folded newspaper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹취록",
+"kind": "paper",
+"src": "",
+"en": "a single stapled typed transcript papers. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "메모지",
+"kind": "paper",
+"src": "",
+"en": "a single sticky notes. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "책",
+"kind": "paper",
+"src": "",
+"en": "a single hardcover book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "성경",
+"kind": "paper",
+"src": "",
+"en": "a single black bible with cross. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "관람 안내 책자",
+"kind": "paper",
+"src": "위키",
+"en": "a single museum guide pamphlet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이용 안내 소책자",
+"kind": "paper",
+"src": "위키",
+"en": "a single small guide booklet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "물감 냄새 쪽지",
+"kind": "paper",
+"src": "위키",
+"en": "a single paint-stained handwritten note. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "붓글씨 쪽지",
+"kind": "paper",
+"src": "위키",
+"en": "a single calligraphy note paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "대출 카드",
+"kind": "paper",
+"src": "위키",
+"en": "a single library loan card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "대출자 명단",
+"kind": "paper",
+"src": "위키",
+"en": "a single borrower list paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "유서",
+"kind": "paper",
+"src": "위키",
+"en": "a single folded last letter. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "엽서",
+"kind": "paper",
+"src": "위키",
+"en": "a single old postcard. Only this one item, nothing else beside it."
+},
+{
+"ko": "우표 수집첩",
+"kind": "paper",
+"src": "위키",
+"en": "a single stamp album. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "잡지",
+"kind": "paper",
+"src": "위키",
+"en": "a single old magazine. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "대본",
+"kind": "paper",
+"src": "위키",
+"en": "a single script booklet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "유치원 교육책",
+"kind": "paper",
+"src": "위키",
+"en": "a single brown-covered kindergarten textbook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "점검표",
+"kind": "paper",
+"src": "위키",
+"en": "a single inspection checklist. Only this one item, nothing else beside it."
+},
+{
+"ko": "결재 서류",
+"kind": "paper",
+"src": "위키",
+"en": "a single approval document folder. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "계약서",
+"kind": "paper",
+"src": "위키",
+"en": "a single contract papers. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "가죽 장부",
+"kind": "paper",
+"src": "위키",
+"en": "a single leather ledger book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "전당포 영수증",
+"kind": "paper",
+"src": "위키",
+"en": "a single pawnshop receipt. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "무료 숙박권",
+"kind": "paper",
+"src": "위키",
+"en": "a single free hotel voucher. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "프로모션 쿠폰",
+"kind": "paper",
+"src": "위키",
+"en": "a single promotion coupon. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "공연 표",
+"kind": "paper",
+"src": "위키",
+"en": "a single theater ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "팸플릿",
+"kind": "paper",
+"src": "위키",
+"en": "a single theater pamphlet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "청록색 간행물",
+"kind": "paper",
+"src": "위키",
+"en": "a single teal commemorative booklet. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "마트 전단지",
+"kind": "paper",
+"src": "위키",
+"en": "a single supermarket flyer. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "양피지",
+"kind": "paper",
+"src": "위키",
+"en": "a single blank parchment scroll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "해명문",
+"kind": "paper",
+"src": "위키",
+"en": "a single written apology letter. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "매뉴얼",
+"kind": "paper",
+"src": "위키",
+"en": "a single thick manual binder. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "필기 노트",
+"kind": "paper",
+"src": "위키",
+"en": "a single study notebook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보고서",
+"kind": "paper",
+"src": "위키",
+"en": "a single report document. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "생환 보고서",
+"kind": "paper",
+"src": "위키",
+"en": "a single survival report file. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "의뢰서",
+"kind": "paper",
+"src": "위키",
+"en": "a single job request form. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사진첩",
+"kind": "paper",
+"src": "",
+"en": "a single photo album. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "증명사진",
+"kind": "paper",
+"src": "",
+"en": "a single id photo. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "가족사진 액자",
+"kind": "paper",
+"src": "",
+"en": "a single family photo frame. Only this one item, nothing else beside it."
+},
+{
+"ko": "폴라로이드 사진",
+"kind": "paper",
+"src": "",
+"en": "a single polaroid photo. Only this one item, nothing else beside it."
+},
+{
+"ko": "낡은 일기장",
+"kind": "paper",
+"src": "",
+"en": "a single old diary. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "공책",
+"kind": "paper",
+"src": "",
+"en": "a single notebook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "스케치북",
+"kind": "paper",
+"src": "",
+"en": "a single sketchbook. Only this one item, nothing else beside it."
+},
+{
+"ko": "달력",
+"kind": "paper",
+"src": "",
+"en": "a single calendar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "포스터",
+"kind": "paper",
+"src": "",
+"en": "a single rolled poster. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "QR 코드 포스터",
+"kind": "paper",
+"src": "위키",
+"en": "a single poster with qr code. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "부고장",
+"kind": "paper",
+"src": "",
+"en": "a single funeral notice. Only this one item, nothing else beside it."
+},
+{
+"ko": "청첩장",
+"kind": "paper",
+"src": "",
+"en": "a single wedding invitation. Only this one item, nothing else beside it."
+},
+{
+"ko": "초대장",
+"kind": "paper",
+"src": "",
+"en": "a single invitation card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "봉투",
+"kind": "paper",
+"src": "",
+"en": "a single envelope. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "택배 송장",
+"kind": "paper",
+"src": "",
+"en": "a single shipping label. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "우편물",
+"kind": "paper",
+"src": "",
+"en": "Bundle of mail. Only this one item, nothing else beside it."
+},
+{
+"ko": "등기 우편",
+"kind": "paper",
+"src": "",
+"en": "a single registered mail. Only this one item, nothing else beside it."
+},
+{
+"ko": "설계도",
+"kind": "paper",
+"src": "",
+"en": "a single blueprint roll. Only this one item, nothing else beside it."
+},
+{
+"ko": "건물 도면",
+"kind": "paper",
+"src": "",
+"en": "a single building floor plan. Only this one item, nothing else beside it."
+},
+{
+"ko": "지하철 노선도",
+"kind": "paper",
+"src": "",
+"en": "a single subway map. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "여권",
+"kind": "paper",
+"src": "",
+"en": "a single passport. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "주민등록증",
+"kind": "paper",
+"src": "",
+"en": "a single korean id card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "운전면허증",
+"kind": "paper",
+"src": "",
+"en": "a single driver license. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "학생증",
+"kind": "paper",
+"src": "",
+"en": "a single student id. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "요원 수첩",
+"kind": "paper",
+"src": "",
+"en": "a single agent pocket notebook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사건 사진",
+"kind": "paper",
+"src": "",
+"en": "a single evidence photos. Only this one item, nothing else beside it."
+},
+{
+"ko": "증거 봉투",
+"kind": "paper",
+"src": "",
+"en": "a single evidence bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "기밀 문서",
+"kind": "paper",
+"src": "",
+"en": "a single classified document stamped red. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "진술서",
+"kind": "paper",
+"src": "",
+"en": "a single statement form. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "부적 종이 다발",
+"kind": "paper",
+"src": "",
+"en": "Stack of blank talisman paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "한지",
+"kind": "paper",
+"src": "",
+"en": "a single hanji paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "고서",
+"kind": "paper",
+"src": "위키",
+"en": "a single ancient book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "경전",
+"kind": "paper",
+"src": "위키",
+"en": "a single scripture scroll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "마법서",
+"kind": "paper",
+"src": "",
+"en": "a single grimoire. Only this one item, nothing else beside it."
+},
+{
+"ko": "동화책",
+"kind": "paper",
+"src": "",
+"en": "a single picture book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "만화책",
+"kind": "paper",
+"src": "",
+"en": "a single comic book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "교과서",
+"kind": "paper",
+"src": "",
+"en": "a single textbook. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사전",
+"kind": "paper",
+"src": "",
+"en": "a single dictionary. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "악보",
+"kind": "paper",
+"src": "",
+"en": "a single sheet music. Only this one item, nothing else beside it."
+},
+{
+"ko": "복권",
+"kind": "paper",
+"src": "",
+"en": "a single lottery ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "경품 막대",
+"kind": "paper",
+"src": "위키",
+"en": "a single lottery stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "입장권",
+"kind": "paper",
+"src": "",
+"en": "a single admission ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "영화표",
+"kind": "paper",
+"src": "",
+"en": "a single movie ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "승차권",
+"kind": "paper",
+"src": "",
+"en": "a single train ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "지하철 표",
+"kind": "paper",
+"src": "",
+"en": "a single subway ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "주차권",
+"kind": "paper",
+"src": "",
+"en": "a single parking ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "명단",
+"kind": "paper",
+"src": "위키",
+"en": "a single list of names. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 묻은 쪽지",
+"kind": "paper",
+"src": "",
+"en": "a single blood-stained note. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "열쇠 꾸러미",
+"kind": "key",
+"src": "",
+"en": "Ring of many keys. Only this one item, nothing else beside it."
+},
+{
+"ko": "카드키",
+"kind": "key",
+"src": "",
+"en": "a single white key card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사원증",
+"kind": "key",
+"src": "",
+"en": "a single employee ID card on lanyard. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "출입증",
+"kind": "key",
+"src": "",
+"en": "a single access pass badge. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "차 키",
+"kind": "key",
+"src": "",
+"en": "a single car key fob. Only this one item, nothing else beside it."
+},
+{
+"ko": "사물함 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single small numbered locker key. Only this one item, nothing else beside it."
+},
+{
+"ko": "격리 시설 출입증",
+"kind": "key",
+"src": "위키",
+"en": "a single containment facility access badge. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "법인카드",
+"kind": "key",
+"src": "위키",
+"en": "a single corporate credit card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "신용카드",
+"kind": "key",
+"src": "위키",
+"en": "a single credit card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "체크카드",
+"kind": "key",
+"src": "위키",
+"en": "a single debit card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "교통카드",
+"kind": "key",
+"src": "",
+"en": "a single transit card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "살 길 열쇠",
+"kind": "key",
+"src": "위키",
+"en": "a single strange key with tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "사물함 열쇠(물)",
+"kind": "key",
+"src": "위키",
+"en": "a single locker key with wet tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "카드 키(워터파크)",
+"kind": "key",
+"src": "위키",
+"en": "a single waterproof card key. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "호텔 키",
+"kind": "key",
+"src": "",
+"en": "a single hotel room key with tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "자동차 키",
+"kind": "key",
+"src": "",
+"en": "a single car key. Only this one item, nothing else beside it."
+},
+{
+"ko": "오토바이 키",
+"kind": "key",
+"src": "",
+"en": "a single motorcycle key. Only this one item, nothing else beside it."
+},
+{
+"ko": "현관 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single house key. Only this one item, nothing else beside it."
+},
+{
+"ko": "금고 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single safe key. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "마스터키",
+"kind": "key",
+"src": "",
+"en": "a single master key. Only this one item, nothing else beside it."
+},
+{
+"ko": "해골 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single skeleton key. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹슨 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single rusty iron key. Only this one item, nothing else beside it."
+},
+{
+"ko": "황금 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single golden key. Only this one item, nothing else beside it."
+},
+{
+"ko": "열쇠고리",
+"kind": "key",
+"src": "위키",
+"en": "a single keychain. Only this one item, nothing else beside it."
+},
+{
+"ko": "비밀번호 메모",
+"kind": "key",
+"src": "",
+"en": "a single password note. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보안 카드",
+"kind": "key",
+"src": "",
+"en": "a single security card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "방문증",
+"kind": "key",
+"src": "",
+"en": "a single visitor pass. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "관리국 사원증",
+"kind": "key",
+"src": "위키",
+"en": "a single agency id badge. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "백일몽 사원증",
+"kind": "key",
+"src": "위키",
+"en": "a single daydream company id badge. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "협회 등록증",
+"kind": "key",
+"src": "위키",
+"en": "a single association license card. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "프리랜서 면허증",
+"kind": "key",
+"src": "위키",
+"en": "a single freelancer license. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "번호 패",
+"kind": "key",
+"src": "",
+"en": "a single numbered token. Only this one item, nothing else beside it."
+},
+{
+"ko": "코인",
+"kind": "key",
+"src": "",
+"en": "a single arcade token. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠 명찰",
+"kind": "key",
+"src": "",
+"en": "a single metal name tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "가슴 명찰",
+"kind": "key",
+"src": "위키",
+"en": "a single school chest name tag. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "목걸이 열쇠",
+"kind": "key",
+"src": "",
+"en": "a single key on necklace. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single black box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "밀폐 용기",
+"kind": "seal",
+"src": "",
+"en": "a single plastic airtight container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "유리병",
+"kind": "seal",
+"src": "",
+"en": "a single glass jar with lid. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "봉인 테이프",
+"kind": "seal",
+"src": "",
+"en": "Roll of yellow warning tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇠사슬",
+"kind": "seal",
+"src": "",
+"en": "a single coiled iron chain. Only this one item, nothing else beside it."
+},
+{
+"ko": "자루",
+"kind": "seal",
+"src": "",
+"en": "a single burlap sack tied with rope. Only this one item, nothing else beside it."
+},
+{
+"ko": "지퍼백",
+"kind": "seal",
+"src": "",
+"en": "a single zip plastic bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "가방",
+"kind": "seal",
+"src": "",
+"en": "a single black duffel bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이빨 요정 선물 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single pink gift box with green ribbon. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "웅웅거리는 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single humming wooden box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이빨 병",
+"kind": "seal",
+"src": "위키",
+"en": "a single jar full of teeth. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "택배 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single cardboard parcel box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보드게임 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single board game box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "판촉물 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single promotional gift box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "폐기물 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single hazard waste box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "서류 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single document storage box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "꿈결 수집기",
+"kind": "seal",
+"src": "위키",
+"en": "a single empty glass collector vial. Only this one item, nothing else beside it."
+},
+{
+"ko": "꿈결 병",
+"kind": "seal",
+"src": "위키",
+"en": "a single vial of glowing dream liquid. Only this one item, nothing else beside it."
+},
+{
+"ko": "장난감 상자",
+"kind": "seal",
+"src": "위키",
+"en": "a single toy chest. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "바구니",
+"kind": "seal",
+"src": "위키",
+"en": "a single wicker basket. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "엽전 바구니",
+"kind": "seal",
+"src": "위키",
+"en": "a single brown basket of old coins. Only this one item, nothing else beside it."
+},
+{
+"ko": "쟁반",
+"kind": "seal",
+"src": "위키",
+"en": "a single tray. Only this one item, nothing else beside it."
+},
+{
+"ko": "보관함",
+"kind": "seal",
+"src": "",
+"en": "a single storage bin. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "아이스박스",
+"kind": "seal",
+"src": "",
+"en": "a single cooler box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "캐리어",
+"kind": "seal",
+"src": "",
+"en": "a single suitcase. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "쇼핑백",
+"kind": "seal",
+"src": "",
+"en": "a single paper shopping bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "종이봉투",
+"kind": "seal",
+"src": "",
+"en": "a single paper bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보자기",
+"kind": "seal",
+"src": "",
+"en": "a single cloth wrapping bundle. Only this one item, nothing else beside it."
+},
+{
+"ko": "항아리",
+"kind": "seal",
+"src": "",
+"en": "a single clay jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "단지",
+"kind": "seal",
+"src": "",
+"en": "a single small earthen pot. Only this one item, nothing else beside it."
+},
+{
+"ko": "봉인 부적 상자",
+"kind": "seal",
+"src": "",
+"en": "a single box sealed with talismans. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "납 상자",
+"kind": "seal",
+"src": "",
+"en": "a single lead box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "철제 케이스",
+"kind": "seal",
+"src": "",
+"en": "a single metal case. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "총기 케이스",
+"kind": "seal",
+"src": "",
+"en": "a single gun case. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "악기 케이스",
+"kind": "seal",
+"src": "",
+"en": "a single instrument case. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "관",
+"kind": "seal",
+"src": "",
+"en": "a single small coffin. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "유골함",
+"kind": "seal",
+"src": "",
+"en": "a single urn. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "시험관",
+"kind": "seal",
+"src": "",
+"en": "a single test tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비커",
+"kind": "seal",
+"src": "",
+"en": "a single beaker. Only this one item, nothing else beside it."
+},
+{
+"ko": "플라스크",
+"kind": "seal",
+"src": "",
+"en": "a single flask. Only this one item, nothing else beside it."
+},
+{
+"ko": "앰플",
+"kind": "seal",
+"src": "",
+"en": "a single glass ampoule. Only this one item, nothing else beside it."
+},
+{
+"ko": "보틀(빈)",
+"kind": "seal",
+"src": "",
+"en": "a single empty glass bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "드럼통",
+"kind": "seal",
+"src": "",
+"en": "a single metal drum barrel. Only this one item, nothing else beside it."
+},
+{
+"ko": "자물쇠 달린 상자",
+"kind": "seal",
+"src": "",
+"en": "a single locked chest. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "보석함",
+"kind": "seal",
+"src": "",
+"en": "a single jewelry box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "오르골",
+"kind": "seal",
+"src": "",
+"en": "a single music box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "도시락통",
+"kind": "seal",
+"src": "",
+"en": "a single lunch box tin. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "사탕 통",
+"kind": "seal",
+"src": "",
+"en": "a single candy jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비디오테이프",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single VHS video tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "은화 뱀",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single coiled snake figure made of silver coins. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹슨 무전기",
+"kind": "anomaly",
+"src": "",
+"en": "a single rusty old walkie-talkie. Only this one item, nothing else beside it."
+},
+{
+"ko": "이름표 떨어진 조끼",
+"kind": "anomaly",
+"src": "",
+"en": "a single worn vest with torn-off name tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "인형",
+"kind": "anomaly",
+"src": "",
+"en": "a single creepy porcelain doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "가면",
+"kind": "anomaly",
+"src": "",
+"en": "a single pale blank mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "깨진 거울",
+"kind": "anomaly",
+"src": "",
+"en": "a single cracked hand mirror. Only this one item, nothing else beside it."
+},
+{
+"ko": "머리카락 뭉치",
+"kind": "anomaly",
+"src": "",
+"en": "a single clump of black hair. Only this one item, nothing else beside it."
+},
+{
+"ko": "낡은 신발",
+"kind": "anomaly",
+"src": "",
+"en": "a single single worn shoe. Only this one item, nothing else beside it."
+},
+{
+"ko": "손목 시계(멈춤)",
+"kind": "anomaly",
+"src": "",
+"en": "a single stopped wristwatch with cracked glass. Only this one item, nothing else beside it."
+},
+{
+"ko": "「천사의 한숨」 카세트",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single blue plastic cassette recorder with two buttons on the front. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "위 헬프!",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single small mysterious gift box with a price tag. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "아머",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single transforming combat armor device. Only this one item, nothing else beside it."
+},
+{
+"ko": "소원권",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single golden wish ticket. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "치유 반지",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single healing ring. Only this one item, nothing else beside it."
+},
+{
+"ko": "화폐 지갑",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single anomalous coin wallet. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "실 뽑는 네일아트",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single nail tips pulling silk threads. Only this one item, nothing else beside it."
+},
+{
+"ko": "착한 친구 키링",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single cute plush keyring charm. Only this one item, nothing else beside it."
+},
+{
+"ko": "유쾌 테마파크 상자",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single colorful board game box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "금지된 VHS",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single unlabeled vhs tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "황금 닭 보물",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single golden rooster statue. Only this one item, nothing else beside it."
+},
+{
+"ko": "황금 닭 누름돌",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single golden rooster stone weight. Only this one item, nothing else beside it."
+},
+{
+"ko": "반짝이는 깃털",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single glittering feather. Only this one item, nothing else beside it."
+},
+{
+"ko": "마리오네트",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single marionette puppet. Only this one item, nothing else beside it."
+},
+{
+"ko": "마리오네트 실",
+"kind": "anomaly",
+"src": "위키",
+"en": "Bundle of puppet strings. Only this one item, nothing else beside it."
+},
+{
+"ko": "잘린 손가락",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single severed finger. Only this one item, nothing else beside it."
+},
+{
+"ko": "어금니",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single human molar tooth. Only this one item, nothing else beside it."
+},
+{
+"ko": "눈알",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single eyeball. Only this one item, nothing else beside it."
+},
+{
+"ko": "콩팥",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single kidney organ. Only this one item, nothing else beside it."
+},
+{
+"ko": "병에 담긴 인격",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single jar with glowing soul. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이름표 붙은 유실물",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single lost item with name tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "낯선 꽃씨",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single strange flower seeds. Only this one item, nothing else beside it."
+},
+{
+"ko": "조화 한 송이",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single single artificial flower. Only this one item, nothing else beside it."
+},
+{
+"ko": "말라 죽은 꽃",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single dried dead flower. Only this one item, nothing else beside it."
+},
+{
+"ko": "색종이",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single confetti paper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "웅웅거리는 큐브",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single humming cube. Only this one item, nothing else beside it."
+},
+{
+"ko": "증명의 십자가 조각",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single fragment of black cross. Only this one item, nothing else beside it."
+},
+{
+"ko": "톱니바퀴",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single iron gear. Only this one item, nothing else beside it."
+},
+{
+"ko": "이빨 나무 가지",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single branch with teeth. Only this one item, nothing else beside it."
+},
+{
+"ko": "얼룩진 동전",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single stained coin. Only this one item, nothing else beside it."
+},
+{
+"ko": "카지노 칩",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single casino chips. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "트럼프 카드",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single deck of playing cards. Only this one item, nothing else beside it."
+},
+{
+"ko": "해피엔딩 경전",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single scripture book. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 상자(구도자)",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single black box with numbered lid. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "꿈 배양기",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single dream incubator jar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "포션 메이커",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single small potion maker device. Only this one item, nothing else beside it."
+},
+{
+"ko": "미용 애벌레 알주머니",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single egg sac diet supplement. Only this one item, nothing else beside it."
+},
+{
+"ko": "골드 에디션 혈액 욕조",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single miniature gold bathtub. Only this one item, nothing else beside it."
+},
+{
+"ko": "끝까지 밝은 손전등",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single strange bright flashlight. Only this one item, nothing else beside it."
+},
+{
+"ko": "눈물 닦개(방수)",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single waterproof tissue. Only this one item, nothing else beside it."
+},
+{
+"ko": "선크림 SPF 100+",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single sunscreen tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "오늘의 우산",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single plain umbrella with tag. Only this one item, nothing else beside it."
+},
+{
+"ko": "이쑤시개",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single toothpick. Only this one item, nothing else beside it."
+},
+{
+"ko": "점 하나 찍힌 지도",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single map with single dot. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 흘리는 글씨 종이",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single paper with bleeding writing. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "모방 장비",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single disguise gadget. Only this one item, nothing else beside it."
+},
+{
+"ko": "신원 은폐 장치",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single identity masking implant. Only this one item, nothing else beside it."
+},
+{
+"ko": "괴이 등급 의수",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single anomalous prosthetic hand. Only this one item, nothing else beside it."
+},
+{
+"ko": "이상 물품 상자",
+"kind": "anomaly",
+"src": "위키",
+"en": "Box of anomalous goods. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "외계 물품",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single alien glowing gadget. Only this one item, nothing else beside it."
+},
+{
+"ko": "초록 UFO 장난감",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single green ufo toy. Only this one item, nothing else beside it."
+},
+{
+"ko": "주술 인형",
+"kind": "anomaly",
+"src": "",
+"en": "a single voodoo doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "저주받은 반지",
+"kind": "anomaly",
+"src": "",
+"en": "a single cursed ring. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 묻은 인형",
+"kind": "anomaly",
+"src": "",
+"en": "a single bloody doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "목 없는 인형",
+"kind": "anomaly",
+"src": "",
+"en": "a single headless doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "눈 없는 곰인형",
+"kind": "anomaly",
+"src": "",
+"en": "a single eyeless teddy bear. Only this one item, nothing else beside it."
+},
+{
+"ko": "오래된 오르골",
+"kind": "anomaly",
+"src": "",
+"en": "a single old music box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "멈춘 회중시계",
+"kind": "anomaly",
+"src": "",
+"en": "a single stopped pocket watch. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹슨 방울",
+"kind": "anomaly",
+"src": "",
+"en": "a single rusty bell. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 깃털",
+"kind": "anomaly",
+"src": "",
+"en": "a single black feather. Only this one item, nothing else beside it."
+},
+{
+"ko": "뼈",
+"kind": "anomaly",
+"src": "",
+"en": "a single bone. Only this one item, nothing else beside it."
+},
+{
+"ko": "해골",
+"kind": "anomaly",
+"src": "",
+"en": "a single skull. Only this one item, nothing else beside it."
+},
+{
+"ko": "손 모양 조각",
+"kind": "anomaly",
+"src": "",
+"en": "a single carved hand figure. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 묻은 칼",
+"kind": "anomaly",
+"src": "",
+"en": "a single bloody knife. Only this one item, nothing else beside it."
+},
+{
+"ko": "피 묻은 옷",
+"kind": "anomaly",
+"src": "",
+"en": "a single bloody shirt. Only this one item, nothing else beside it."
+},
+{
+"ko": "찢어진 사진",
+"kind": "anomaly",
+"src": "",
+"en": "a single torn photo. Only this one item, nothing else beside it."
+},
+{
+"ko": "얼굴 지워진 사진",
+"kind": "anomaly",
+"src": "",
+"en": "a single photo with erased face. Only this one item, nothing else beside it."
+},
+{
+"ko": "낡은 카세트테이프",
+"kind": "anomaly",
+"src": "",
+"en": "a single old cassette tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "녹음테이프",
+"kind": "anomaly",
+"src": "",
+"en": "a single reel tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "깨진 휴대폰",
+"kind": "anomaly",
+"src": "",
+"en": "a single cracked phone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "켜지지 않는 휴대폰",
+"kind": "anomaly",
+"src": "",
+"en": "a single dead black phone. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "젖은 신발",
+"kind": "anomaly",
+"src": "",
+"en": "a single wet shoe. Only this one item, nothing else beside it."
+},
+{
+"ko": "아이 신발",
+"kind": "anomaly",
+"src": "",
+"en": "a single child's shoe. Only this one item, nothing else beside it."
+},
+{
+"ko": "머리핀(유품)",
+"kind": "anomaly",
+"src": "",
+"en": "a single old hairpin. Only this one item, nothing else beside it."
+},
+{
+"ko": "유품 상자",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single keepsake box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "이상한 덩어리",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single strange flesh lump. Only this one item, nothing else beside it."
+},
+{
+"ko": "살아있는 식재료",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single squirming food. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 물병",
+"kind": "anomaly",
+"src": "",
+"en": "a single bottle of black water. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "민속촌 물",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single bottle of murky water. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "검은 액체",
+"kind": "anomaly",
+"src": "",
+"en": "a single black liquid vial. Only this one item, nothing else beside it."
+},
+{
+"ko": "붉은 실타래",
+"kind": "anomaly",
+"src": "",
+"en": "a single red yarn ball. Only this one item, nothing else beside it."
+},
+{
+"ko": "빈 액자",
+"kind": "anomaly",
+"src": "",
+"en": "a single empty picture frame. Only this one item, nothing else beside it."
+},
+{
+"ko": "그림 조각",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single torn painting piece. Only this one item, nothing else beside it."
+},
+{
+"ko": "캔버스",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single small canvas painting. Only this one item, nothing else beside it."
+},
+{
+"ko": "가면(동물, 주인 없음)",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single abandoned animal mask. Only this one item, nothing else beside it."
+},
+{
+"ko": "이름 적힌 쪽지",
+"kind": "anomaly",
+"src": "",
+"en": "a single note with name. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "소라 껍데기 카세트",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single cassette with seashell emblem. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보라색 머리카락",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single purple hair strand. Only this one item, nothing else beside it."
+},
+{
+"ko": "가짜 관리국 배지",
+"kind": "anomaly",
+"src": "위키",
+"en": "a single fake agency badge. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "목걸이",
+"kind": "valuable",
+"src": "",
+"en": "a single gold necklace. Only this one item, nothing else beside it."
+},
+{
+"ko": "금괴",
+"kind": "valuable",
+"src": "",
+"en": "a single gold bar. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "보석",
+"kind": "valuable",
+"src": "",
+"en": "a single cut gemstone. Only this one item, nothing else beside it."
+},
+{
+"ko": "시계(고급)",
+"kind": "valuable",
+"src": "",
+"en": "a single luxury gold wristwatch. Only this one item, nothing else beside it."
+},
+{
+"ko": "금 장신구",
+"kind": "valuable",
+"src": "위키",
+"en": "a single gold jewelry. Only this one item, nothing else beside it."
+},
+{
+"ko": "골동품 도자기",
+"kind": "valuable",
+"src": "위키",
+"en": "a single antique porcelain vase. Only this one item, nothing else beside it."
+},
+{
+"ko": "금속 골동품",
+"kind": "valuable",
+"src": "위키",
+"en": "a single antique metal ornament. Only this one item, nothing else beside it."
+},
+{
+"ko": "명품 가방",
+"kind": "valuable",
+"src": "",
+"en": "a single luxury handbag. Only this one item, nothing else beside it."
+},
+{
+"ko": "명품 지갑",
+"kind": "valuable",
+"src": "",
+"en": "a single luxury wallet. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "지갑",
+"kind": "valuable",
+"src": "",
+"en": "a single leather wallet. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "상품권",
+"kind": "valuable",
+"src": "",
+"en": "a single gift certificate. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "가상화폐 지갑",
+"kind": "valuable",
+"src": "",
+"en": "a single crypto hardware wallet. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "진주 목걸이",
+"kind": "valuable",
+"src": "",
+"en": "a single pearl necklace. Only this one item, nothing else beside it."
+},
+{
+"ko": "다이아 반지",
+"kind": "valuable",
+"src": "",
+"en": "a single diamond ring. Only this one item, nothing else beside it."
+},
+{
+"ko": "루비",
+"kind": "valuable",
+"src": "",
+"en": "a single ruby. Only this one item, nothing else beside it."
+},
+{
+"ko": "에메랄드",
+"kind": "valuable",
+"src": "",
+"en": "a single emerald. Only this one item, nothing else beside it."
+},
+{
+"ko": "사파이어",
+"kind": "valuable",
+"src": "",
+"en": "a single sapphire. Only this one item, nothing else beside it."
+},
+{
+"ko": "금니",
+"kind": "valuable",
+"src": "",
+"en": "a single gold tooth. Only this one item, nothing else beside it."
+},
+{
+"ko": "금목걸이 두꺼운",
+"kind": "valuable",
+"src": "",
+"en": "a single thick gold chain. Only this one item, nothing else beside it."
+},
+{
+"ko": "커프스",
+"kind": "valuable",
+"src": "",
+"en": "a single cufflinks. Only this one item, nothing else beside it."
+},
+{
+"ko": "만년필(고급)",
+"kind": "valuable",
+"src": "",
+"en": "a single luxury fountain pen. Only this one item, nothing else beside it."
+},
+{
+"ko": "회중시계",
+"kind": "valuable",
+"src": "",
+"en": "a single pocket watch. Only this one item, nothing else beside it."
+},
+{
+"ko": "그림(명화)",
+"kind": "valuable",
+"src": "",
+"en": "a single framed painting. Only this one item, nothing else beside it."
+},
+{
+"ko": "조각상",
+"kind": "valuable",
+"src": "",
+"en": "a single small statue. Only this one item, nothing else beside it."
+},
+{
+"ko": "트로피",
+"kind": "valuable",
+"src": "",
+"en": "a single trophy. Only this one item, nothing else beside it."
+},
+{
+"ko": "메달",
+"kind": "valuable",
+"src": "",
+"en": "a single medal. Only this one item, nothing else beside it."
+},
+{
+"ko": "훈장",
+"kind": "valuable",
+"src": "",
+"en": "a single military decoration. Only this one item, nothing else beside it."
+},
+{
+"ko": "인감",
+"kind": "valuable",
+"src": "",
+"en": "a single official seal. Only this one item, nothing else beside it."
+},
+{
+"ko": "부동산 문서",
+"kind": "valuable",
+"src": "",
+"en": "a single property deed. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "어음",
+"kind": "valuable",
+"src": "",
+"en": "a single promissory note. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "담보 증서",
+"kind": "valuable",
+"src": "위키",
+"en": "a single collateral certificate. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "점포 임대권",
+"kind": "valuable",
+"src": "위키",
+"en": "a single shop lease certificate. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "필름",
+"kind": "consumable",
+"src": "",
+"en": "a single 35mm film roll. Only this one item, nothing else beside it."
+},
+{
+"ko": "테이프 두루마리",
+"kind": "consumable",
+"src": "",
+"en": "Roll of clear tape. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "라이터 기름",
+"kind": "consumable",
+"src": "",
+"en": "a single small lighter fluid can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "연막탄",
+"kind": "consumable",
+"src": "",
+"en": "a single smoke grenade. Only this one item, nothing else beside it."
+},
+{
+"ko": "조명탄",
+"kind": "consumable",
+"src": "",
+"en": "a single red signal flare. Only this one item, nothing else beside it."
+},
+{
+"ko": "분필",
+"kind": "consumable",
+"src": "",
+"en": "Pieces of white chalk. Only this one item, nothing else beside it."
+},
+{
+"ko": "스프레이 페인트",
+"kind": "consumable",
+"src": "",
+"en": "a single spray paint can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "AAA 건전지",
+"kind": "consumable",
+"src": "",
+"en": "a single aaa batteries. Only this one item, nothing else beside it."
+},
+{
+"ko": "9V 건전지",
+"kind": "consumable",
+"src": "",
+"en": "a single 9v battery. Only this one item, nothing else beside it."
+},
+{
+"ko": "단추 전지",
+"kind": "consumable",
+"src": "",
+"en": "a single button cell battery. Only this one item, nothing else beside it."
+},
+{
+"ko": "충전 배터리 팩",
+"kind": "consumable",
+"src": "",
+"en": "a single battery pack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "산탄",
+"kind": "consumable",
+"src": "",
+"en": "a single shotgun shells. Only this one item, nothing else beside it."
+},
+{
+"ko": "소총탄",
+"kind": "consumable",
+"src": "",
+"en": "a single rifle cartridges. Only this one item, nothing else beside it."
+},
+{
+"ko": "권총탄",
+"kind": "consumable",
+"src": "",
+"en": "a single pistol rounds. Only this one item, nothing else beside it."
+},
+{
+"ko": "탄띠(기관총)",
+"kind": "consumable",
+"src": "",
+"en": "a single machine gun ammo belt. Only this one item, nothing else beside it."
+},
+{
+"ko": "연료통",
+"kind": "consumable",
+"src": "",
+"en": "a single jerry can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "휘발유",
+"kind": "consumable",
+"src": "",
+"en": "a single gasoline can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "등유",
+"kind": "consumable",
+"src": "",
+"en": "a single kerosene container. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "가스통",
+"kind": "consumable",
+"src": "",
+"en": "a single gas canister. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "성냥 한 갑",
+"kind": "consumable",
+"src": "",
+"en": "Box of matches. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "양초 묶음",
+"kind": "consumable",
+"src": "",
+"en": "Bundle of candles. Only this one item, nothing else beside it."
+},
+{
+"ko": "향초",
+"kind": "consumable",
+"src": "",
+"en": "a single scented candle. Only this one item, nothing else beside it."
+},
+{
+"ko": "숯",
+"kind": "consumable",
+"src": "",
+"en": "a single charcoal. Only this one item, nothing else beside it."
+},
+{
+"ko": "장작",
+"kind": "consumable",
+"src": "",
+"en": "a single firewood. Only this one item, nothing else beside it."
+},
+{
+"ko": "번개탄",
+"kind": "consumable",
+"src": "",
+"en": "a single charcoal briquette. Only this one item, nothing else beside it."
+},
+{
+"ko": "비닐 랩",
+"kind": "consumable",
+"src": "",
+"en": "a single plastic wrap roll. Only this one item, nothing else beside it."
+},
+{
+"ko": "알루미늄 호일",
+"kind": "consumable",
+"src": "",
+"en": "a single aluminum foil. Only this one item, nothing else beside it."
+},
+{
+"ko": "휴지",
+"kind": "consumable",
+"src": "",
+"en": "a single toilet paper roll. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "물티슈",
+"kind": "consumable",
+"src": "",
+"en": "a single wet wipes. Only this one item, nothing else beside it."
+},
+{
+"ko": "각티슈",
+"kind": "consumable",
+"src": "",
+"en": "a single tissue box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "키친타월",
+"kind": "consumable",
+"src": "",
+"en": "a single paper towels. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비누",
+"kind": "consumable",
+"src": "",
+"en": "a single bar of soap. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "샴푸",
+"kind": "consumable",
+"src": "",
+"en": "a single shampoo bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "치약",
+"kind": "consumable",
+"src": "",
+"en": "a single toothpaste. Only this one item, nothing else beside it."
+},
+{
+"ko": "칫솔",
+"kind": "consumable",
+"src": "",
+"en": "a single toothbrush. Only this one item, nothing else beside it."
+},
+{
+"ko": "면도기",
+"kind": "consumable",
+"src": "",
+"en": "a single razor. Only this one item, nothing else beside it."
+},
+{
+"ko": "생리대",
+"kind": "consumable",
+"src": "",
+"en": "a single sanitary pads. Only this one item, nothing else beside it."
+},
+{
+"ko": "손 소독제",
+"kind": "consumable",
+"src": "",
+"en": "a single hand sanitizer. Only this one item, nothing else beside it."
+},
+{
+"ko": "순간접착제",
+"kind": "consumable",
+"src": "",
+"en": "a single super glue. Only this one item, nothing else beside it."
+},
+{
+"ko": "본드",
+"kind": "consumable",
+"src": "",
+"en": "a single glue tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "실리콘",
+"kind": "consumable",
+"src": "",
+"en": "a single silicone tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "페인트 통",
+"kind": "consumable",
+"src": "",
+"en": "a single paint can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "형광펜",
+"kind": "consumable",
+"src": "",
+"en": "a single highlighter. Only this one item, nothing else beside it."
+},
+{
+"ko": "포스트잇",
+"kind": "consumable",
+"src": "",
+"en": "a single post-it notes. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "A4 용지",
+"kind": "consumable",
+"src": "",
+"en": "a single a4 paper stack. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "비닐장갑",
+"kind": "consumable",
+"src": "",
+"en": "a single disposable gloves. Only this one item, nothing else beside it."
+},
+{
+"ko": "쓰레기봉투",
+"kind": "consumable",
+"src": "",
+"en": "a single garbage bags. Only this one item, nothing else beside it."
+},
+{
+"ko": "마대 자루",
+"kind": "consumable",
+"src": "",
+"en": "a single large sack. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "노끈 뭉치",
+"kind": "consumable",
+"src": "",
+"en": "a single twine bundle. Only this one item, nothing else beside it."
+},
+{
+"ko": "모래주머니",
+"kind": "consumable",
+"src": "",
+"en": "a single sandbag. Only this one item, nothing else beside it."
+},
+{
+"ko": "소금 포대",
+"kind": "consumable",
+"src": "",
+"en": "Bag of salt. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "조명탄 권총",
+"kind": "consumable",
+"src": "",
+"en": "a single flare gun. Only this one item, nothing else beside it."
+},
+{
+"ko": "신호 거울",
+"kind": "consumable",
+"src": "",
+"en": "a single signal mirror. Only this one item, nothing else beside it."
+},
+{
+"ko": "방수 성냥",
+"kind": "consumable",
+"src": "",
+"en": "a single waterproof matches. Only this one item, nothing else beside it."
+},
+{
+"ko": "산소 캔",
+"kind": "consumable",
+"src": "",
+"en": "a single oxygen can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "발화 막대",
+"kind": "consumable",
+"src": "",
+"en": "a single fire starter. Only this one item, nothing else beside it."
+},
+{
+"ko": "우산",
+"kind": "misc",
+"src": "",
+"en": "a single long black umbrella. Only this one item, nothing else beside it."
+},
+{
+"ko": "수건",
+"kind": "misc",
+"src": "",
+"en": "a single folded towel. Only this one item, nothing else beside it."
+},
+{
+"ko": "손수건",
+"kind": "misc",
+"src": "",
+"en": "a single folded handkerchief. Only this one item, nothing else beside it."
+},
+{
+"ko": "인형(평범)",
+"kind": "misc",
+"src": "",
+"en": "a single plush teddy bear. Only this one item, nothing else beside it."
+},
+{
+"ko": "풍선",
+"kind": "misc",
+"src": "",
+"en": "a single red balloon. Only this one item, nothing else beside it."
+},
+{
+"ko": "장난감",
+"kind": "misc",
+"src": "",
+"en": "a single toy robot. Only this one item, nothing else beside it."
+},
+{
+"ko": "돌멩이",
+"kind": "misc",
+"src": "",
+"en": "a single small grey stone. Only this one item, nothing else beside it."
+},
+{
+"ko": "조개",
+"kind": "misc",
+"src": "위키",
+"en": "a single clam shell. Only this one item, nothing else beside it."
+},
+{
+"ko": "공",
+"kind": "misc",
+"src": "",
+"en": "a single ball. Only this one item, nothing else beside it."
+},
+{
+"ko": "축구공",
+"kind": "misc",
+"src": "",
+"en": "a single soccer ball. Only this one item, nothing else beside it."
+},
+{
+"ko": "농구공",
+"kind": "misc",
+"src": "",
+"en": "a single basketball. Only this one item, nothing else beside it."
+},
+{
+"ko": "야구공",
+"kind": "misc",
+"src": "",
+"en": "a single baseball. Only this one item, nothing else beside it."
+},
+{
+"ko": "글러브",
+"kind": "misc",
+"src": "",
+"en": "a single baseball glove. Only this one item, nothing else beside it."
+},
+{
+"ko": "줄넘기",
+"kind": "misc",
+"src": "",
+"en": "a single jump rope. Only this one item, nothing else beside it."
+},
+{
+"ko": "훌라후프",
+"kind": "misc",
+"src": "",
+"en": "a single hula hoop. Only this one item, nothing else beside it."
+},
+{
+"ko": "인형 옷",
+"kind": "misc",
+"src": "위키",
+"en": "a single doll clothes. Only this one item, nothing else beside it."
+},
+{
+"ko": "봉제 인형",
+"kind": "misc",
+"src": "위키",
+"en": "a single stuffed animal. Only this one item, nothing else beside it."
+},
+{
+"ko": "토끼 인형",
+"kind": "misc",
+"src": "위키",
+"en": "a single bunny plush. Only this one item, nothing else beside it."
+},
+{
+"ko": "자동차 장난감",
+"kind": "misc",
+"src": "",
+"en": "a single toy car. Only this one item, nothing else beside it."
+},
+{
+"ko": "팽이",
+"kind": "misc",
+"src": "",
+"en": "a single spinning top. Only this one item, nothing else beside it."
+},
+{
+"ko": "요요",
+"kind": "misc",
+"src": "",
+"en": "a single yoyo. Only this one item, nothing else beside it."
+},
+{
+"ko": "큐브 퍼즐",
+"kind": "misc",
+"src": "",
+"en": "a single rubik's cube. Only this one item, nothing else beside it."
+},
+{
+"ko": "퍼즐 조각",
+"kind": "misc",
+"src": "",
+"en": "a single puzzle piece. Only this one item, nothing else beside it."
+},
+{
+"ko": "주사위",
+"kind": "misc",
+"src": "",
+"en": "a single dice. Only this one item, nothing else beside it."
+},
+{
+"ko": "장기판",
+"kind": "misc",
+"src": "",
+"en": "a single janggi board. Only this one item, nothing else beside it."
+},
+{
+"ko": "바둑알",
+"kind": "misc",
+"src": "",
+"en": "a single go stones. Only this one item, nothing else beside it."
+},
+{
+"ko": "화투",
+"kind": "misc",
+"src": "",
+"en": "a single hwatu cards. Only this one item, nothing else beside it."
+},
+{
+"ko": "트럼프",
+"kind": "misc",
+"src": "",
+"en": "a single playing card deck. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "구슬",
+"kind": "misc",
+"src": "",
+"en": "a single glass marbles. Only this one item, nothing else beside it."
+},
+{
+"ko": "딱지",
+"kind": "misc",
+"src": "",
+"en": "a single ddakji paper tiles. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "크리스마스 장식",
+"kind": "misc",
+"src": "",
+"en": "a single christmas ornament. Only this one item, nothing else beside it."
+},
+{
+"ko": "화분",
+"kind": "misc",
+"src": "",
+"en": "a single potted plant. Only this one item, nothing else beside it."
+},
+{
+"ko": "꽃다발",
+"kind": "misc",
+"src": "",
+"en": "a single bouquet. Only this one item, nothing else beside it."
+},
+{
+"ko": "꽃 한 송이",
+"kind": "misc",
+"src": "",
+"en": "a single single flower. Only this one item, nothing else beside it."
+},
+{
+"ko": "나뭇가지",
+"kind": "misc",
+"src": "",
+"en": "a single stick. Only this one item, nothing else beside it."
+},
+{
+"ko": "나뭇잎",
+"kind": "misc",
+"src": "",
+"en": "a single leaf. Only this one item, nothing else beside it."
+},
+{
+"ko": "솔방울",
+"kind": "misc",
+"src": "",
+"en": "a single pine cone. Only this one item, nothing else beside it."
+},
+{
+"ko": "조약돌",
+"kind": "misc",
+"src": "",
+"en": "a single pebble. Only this one item, nothing else beside it."
+},
+{
+"ko": "벽돌",
+"kind": "misc",
+"src": "",
+"en": "a single brick. Only this one item, nothing else beside it."
+},
+{
+"ko": "유리 조각",
+"kind": "misc",
+"src": "",
+"en": "a single glass shard. Only this one item, nothing else beside it."
+},
+{
+"ko": "깡통",
+"kind": "misc",
+"src": "",
+"en": "a single empty can. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "빈 병",
+"kind": "misc",
+"src": "",
+"en": "a single empty bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "빈 상자",
+"kind": "misc",
+"src": "",
+"en": "a single empty box. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "헌 신문지",
+"kind": "misc",
+"src": "",
+"en": "a single old newspaper bundle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "담배꽁초",
+"kind": "misc",
+"src": "",
+"en": "a single cigarette butt. Only this one item, nothing else beside it."
+},
+{
+"ko": "껌 종이",
+"kind": "misc",
+"src": "",
+"en": "a single gum wrapper. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "영수증 뭉치",
+"kind": "misc",
+"src": "",
+"en": "a single crumpled receipts. Only this one item, nothing else beside it."
+},
+{
+"ko": "머리끈",
+"kind": "misc",
+"src": "",
+"en": "a single hair tie. Only this one item, nothing else beside it."
+},
+{
+"ko": "빗",
+"kind": "misc",
+"src": "",
+"en": "a single comb. Only this one item, nothing else beside it."
+},
+{
+"ko": "손거울",
+"kind": "misc",
+"src": "",
+"en": "a single compact mirror. Only this one item, nothing else beside it."
+},
+{
+"ko": "립스틱",
+"kind": "misc",
+"src": "",
+"en": "a single lipstick. Only this one item, nothing else beside it."
+},
+{
+"ko": "향수",
+"kind": "misc",
+"src": "",
+"en": "a single perfume bottle. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "화장품 파우치",
+"kind": "misc",
+"src": "",
+"en": "a single makeup pouch. Closed, nothing spilling out. Only this one item, nothing else beside it."
+},
+{
+"ko": "손톱깎이",
+"kind": "misc",
+"src": "",
+"en": "a single nail clipper. Only this one item, nothing else beside it."
+},
+{
+"ko": "열쇠고리 인형",
+"kind": "misc",
+"src": "",
+"en": "a single small keychain doll. Only this one item, nothing else beside it."
+},
+{
+"ko": "우산 비닐",
+"kind": "misc",
+"src": "",
+"en": "a single umbrella bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "부채(여름)",
+"kind": "misc",
+"src": "",
+"en": "a single summer fan. Only this one item, nothing else beside it."
+},
+{
+"ko": "선풍기",
+"kind": "misc",
+"src": "위키",
+"en": "a single electric fan. Only this one item, nothing else beside it."
+},
+{
+"ko": "에어컨 리모컨",
+"kind": "misc",
+"src": "",
+"en": "a single remote control. Only this one item, nothing else beside it."
+},
+{
+"ko": "TV 리모컨",
+"kind": "misc",
+"src": "",
+"en": "a single tv remote. Only this one item, nothing else beside it."
+},
+{
+"ko": "전구",
+"kind": "misc",
+"src": "",
+"en": "a single light bulb. Only this one item, nothing else beside it."
+},
+{
+"ko": "형광등",
+"kind": "misc",
+"src": "",
+"en": "a single fluorescent tube. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "시계(벽)",
+"kind": "misc",
+"src": "",
+"en": "a single wall clock. Only this one item, nothing else beside it."
+},
+{
+"ko": "컵",
+"kind": "misc",
+"src": "",
+"en": "a single mug. Only this one item, nothing else beside it."
+},
+{
+"ko": "종이컵",
+"kind": "misc",
+"src": "",
+"en": "a single paper cup. Plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "머그컵",
+"kind": "misc",
+"src": "",
+"en": "a single coffee mug. Only this one item, nothing else beside it."
+},
+{
+"ko": "접시",
+"kind": "misc",
+"src": "",
+"en": "a single plate. Only this one item, nothing else beside it."
+},
+{
+"ko": "젓가락",
+"kind": "misc",
+"src": "",
+"en": "a single chopsticks. Only this one item, nothing else beside it."
+},
+{
+"ko": "숟가락",
+"kind": "misc",
+"src": "",
+"en": "a single spoon. Only this one item, nothing else beside it."
+},
+{
+"ko": "포크",
+"kind": "misc",
+"src": "",
+"en": "a single fork. Only this one item, nothing else beside it."
+},
+{
+"ko": "냄비",
+"kind": "misc",
+"src": "",
+"en": "a single pot. Only this one item, nothing else beside it."
+},
+{
+"ko": "프라이팬",
+"kind": "misc",
+"src": "",
+"en": "a single frying pan. Only this one item, nothing else beside it."
+},
+{
+"ko": "국자",
+"kind": "misc",
+"src": "",
+"en": "a single ladle. Only this one item, nothing else beside it."
+},
+{
+"ko": "도마",
+"kind": "misc",
+"src": "",
+"en": "a single cutting board. Only this one item, nothing else beside it."
+},
+{
+"ko": "햄스터",
+"kind": "misc",
+"src": "위키",
+"en": "a single hamster. Only this one item, nothing else beside it."
+},
+{
+"ko": "고양이",
+"kind": "misc",
+"src": "",
+"en": "a single black cat. Only this one item, nothing else beside it."
+},
+{
+"ko": "강아지",
+"kind": "misc",
+"src": "",
+"en": "a single small dog. Only this one item, nothing else beside it."
+},
+{
+"ko": "새장",
+"kind": "misc",
+"src": "",
+"en": "a single birdcage. Only this one item, nothing else beside it."
+},
+{
+"ko": "금붕어 어항",
+"kind": "misc",
+"src": "",
+"en": "a single goldfish bowl. Only this one item, nothing else beside it."
+},
+{
+"ko": "거북이",
+"kind": "misc",
+"src": "",
+"en": "a single turtle. Only this one item, nothing else beside it."
+},
+{
+"ko": "목줄",
+"kind": "misc",
+"src": "",
+"en": "a single pet leash. Only this one item, nothing else beside it."
+},
+{
+"ko": "사료",
+"kind": "misc",
+"src": "",
+"en": "a single pet food bag. Closed, nothing spilling out, plain surfaces with no writing, no logos, no numbers. Only this one item, nothing else beside it."
+},
+{
+"ko": "자전거",
+"kind": "misc",
+"src": "",
+"en": "a single bicycle. Only this one item, nothing else beside it."
+},
+{
+"ko": "킥보드",
+"kind": "misc",
+"src": "",
+"en": "a single kick scooter. Only this one item, nothing else beside it."
+},
+{
+"ko": "유모차",
+"kind": "misc",
+"src": "",
+"en": "a single stroller. Only this one item, nothing else beside it."
+},
+{
+"ko": "휠 캐리어",
+"kind": "misc",
+"src": "",
+"en": "a single rolling cart. Only this one item, nothing else beside it."
+},
+{
+"ko": "우편함 열쇠",
+"kind": "misc",
+"src": "",
+"en": "a single mailbox key. Only this one item, nothing else beside it."
+}
+]

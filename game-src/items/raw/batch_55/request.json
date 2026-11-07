@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange dark prosthetic hand with glowing joints. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden crate with faint glowing light leaking from the cracks. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange smooth alien gadget with glowing green lights. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small green toy flying saucer. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw voodoo doll with pins stuck in it. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ring with a dark red stone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plush doll with dark red blood stains. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a headless doll in a dress. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a teddy bear with empty stitched eye holes. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old wooden music box, closed, scratched. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open pocket watch with stopped hands. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small rusty bell. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black feather. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single long white bone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human skull. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale carved hand sculpture. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "괴이 등급 의수",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange dark prosthetic hand with glowing joints. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이상 물품 상자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden crate with faint glowing light leaking from the cracks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "외계 물품",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange smooth alien gadget with glowing green lights. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "초록 UFO 장난감",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small green toy flying saucer. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "주술 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw voodoo doll with pins stuck in it. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "저주받은 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ring with a dark red stone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "피 묻은 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plush doll with dark red blood stains. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목 없는 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a headless doll in a dress. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "눈 없는 곰인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a teddy bear with empty stitched eye holes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오래된 오르골",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old wooden music box, closed, scratched. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "멈춘 회중시계",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open pocket watch with stopped hands. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹슨 방울",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small rusty bell. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "검은 깃털",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black feather. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "뼈",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single long white bone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해골",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human skull. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손 모양 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale carved hand sculpture. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

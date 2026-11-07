@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed red metal toolbox with a handle, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow cordless power drill, side view facing right, no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand saw with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow tape measure with a bit of tape pulled out. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic ruler lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of steel nails. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of steel screws. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of black cable ties. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of blue tape, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of black electrical tape, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small aluminum step ladder, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a three-pronged steel grappling hook tied to a coiled rope. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum carabiner clip. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black iron walking cane with a curved handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain wooden walking stick, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black trekking pole, lying diagonally. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "공구함",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed red metal toolbox with a handle, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전동 드릴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow cordless power drill, side view facing right, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "톱",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand saw with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "줄자",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow tape measure with a bit of tape pulled out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic ruler lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "못",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of steel nails. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나사",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of steel screws. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "케이블 타이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of black cable ties. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of blue tape, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "절연 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of black electrical tape, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사다리",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small aluminum step ladder, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "갈고리 로프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a three-pronged steel grappling hook tied to a coiled rope. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "카라비너",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum carabiner clip. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠 지팡이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black iron walking cane with a curved handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지팡이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain wooden walking stick, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "등산 스틱",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black trekking pole, lying diagonally. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

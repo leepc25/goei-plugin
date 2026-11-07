@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deck of playing cards fanned out face down. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old bound scripture book with a pale cover, closed, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black box with a small number dial on the lid, no readable digits. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass incubator jar with a glowing egg inside and tubes. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass machine with glass vials and tubes. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a translucent gel capsule with small pale eggs inside. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny golden clawfoot bathtub filled with dark red liquid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain flashlight with an unusually bright white beam. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small folded waterproof tissue pack, plain wrapper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white sunscreen tube, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain closed umbrella with a small paper tag tied on, blank tag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden toothpick. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blank folded map with only one red dot. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of paper with dark red dripping marks, abstract marks only. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black disguise gadget badge with a shimmering surface. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver implant chip with tiny wires. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "트럼프 카드",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deck of playing cards fanned out face down. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해피엔딩 경전",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old bound scripture book with a pale cover, closed, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "검은 상자(구도자)",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black box with a small number dial on the lid, no readable digits. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꿈 배양기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass incubator jar with a glowing egg inside and tubes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "포션 메이커",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass machine with glass vials and tubes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "미용 애벌레 알주머니",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a translucent gel capsule with small pale eggs inside. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "골드 에디션 혈액 욕조",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny golden clawfoot bathtub filled with dark red liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "끝까지 밝은 손전등",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain flashlight with an unusually bright white beam. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "눈물 닦개(방수)",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small folded waterproof tissue pack, plain wrapper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "선크림 SPF 100+",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white sunscreen tube, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오늘의 우산",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain closed umbrella with a small paper tag tied on, blank tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이쑤시개",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden toothpick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "점 하나 찍힌 지도",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blank folded map with only one red dot. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "피 흘리는 글씨 종이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of paper with dark red dripping marks, abstract marks only. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "모방 장비",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black disguise gadget badge with a shimmering surface. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "신원 은폐 장치",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver implant chip with tiny wires. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

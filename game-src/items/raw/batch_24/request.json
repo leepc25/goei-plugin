@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and silver film camera, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black quadcopter drone, front angle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black car dashcam. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white CCTV security camera on a bracket, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny black pinhole camera module with a wire. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black square gps tracker with a blinking green dot. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld black metal detector wand, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow handheld thermal camera, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld EMF meter with a row of colored lights. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow handheld geiger counter with a probe, front view, blank dial. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass mercury thermometer, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black earpiece with a coiled clear tube. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black satellite phone with a thick antenna, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain blank phone card. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black pager, front view, blank screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver electronic dictionary, side view. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "필름 카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and silver film camera, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "드론",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black quadcopter drone, front angle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "블랙박스",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black car dashcam. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "CCTV 카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white CCTV security camera on a bracket, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "몰래카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny black pinhole camera module with a wire. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "GPS 추적기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black square gps tracker with a blinking green dot. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금속 탐지기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld black metal detector wand, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "열화상 카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow handheld thermal camera, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "EMF 측정기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld EMF meter with a row of colored lights. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가이거 계수기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow handheld geiger counter with a probe, front view, blank dial. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "온도계",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass mercury thermometer, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무선 이어피스",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black earpiece with a coiled clear tube. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "위성 전화",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black satellite phone with a thick antenna, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "공중전화 카드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain blank phone card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "삐삐",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black pager, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전자사전",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver electronic dictionary, side view. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

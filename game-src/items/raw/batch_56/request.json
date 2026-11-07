@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knife with dark red blood on the blade, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white shirt stained with dark red blood, laid flat. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a torn half of an old photograph. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old photograph of a person with the face scratched out. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old cassette tape with a blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open reel of magnetic tape. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smartphone with a shattered screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dead black smartphone with a dark screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single soaking wet sneaker dripping water. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single small child's shoe. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old hairpin with a small faded flower. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small old wooden keepsake box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange pulsing lump of pink flesh. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a squirming dark tentacled food item on a plate. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle filled with black water, corked. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle of murky gray water, corked. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "피 묻은 칼",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knife with dark red blood on the blade, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "피 묻은 옷",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white shirt stained with dark red blood, laid flat. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "찢어진 사진",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a torn half of an old photograph. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "얼굴 지워진 사진",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old photograph of a person with the face scratched out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "낡은 카세트테이프",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old cassette tape with a blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹음테이프",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open reel of magnetic tape. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "깨진 휴대폰",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smartphone with a shattered screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "켜지지 않는 휴대폰",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dead black smartphone with a dark screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "젖은 신발",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single soaking wet sneaker dripping water. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "아이 신발",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single small child's shoe. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "머리핀(유품)",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old hairpin with a small faded flower. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유품 상자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small old wooden keepsake box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이상한 덩어리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange pulsing lump of pink flesh. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "살아있는 식재료",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a squirming dark tentacled food item on a plate. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "검은 물병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle filled with black water, corked. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "민속촌 물",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle of murky gray water, corked. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

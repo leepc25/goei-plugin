@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of blank yellow talisman papers. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded sheet of off-white hanji paper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old thread-bound book. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long rolled scripture scroll. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old thick book with a metal clasp and a strange symbol. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful picture book, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a comic book with a colorful cover, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a school textbook with a plain cover. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick dictionary. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of music with staff lines. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lottery ticket with scratch boxes, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin wooden lottery stick. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an admission ticket with a perforated stub, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a movie ticket, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small train ticket, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round subway token card. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "부적 종이 다발",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of blank yellow talisman papers. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "한지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded sheet of off-white hanji paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "고서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old thread-bound book. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경전",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long rolled scripture scroll. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마법서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old thick book with a metal clasp and a strange symbol. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "동화책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful picture book, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "만화책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a comic book with a colorful cover, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "교과서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a school textbook with a plain cover. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사전",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick dictionary. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "악보",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of music with staff lines. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "복권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lottery ticket with scratch boxes, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경품 막대",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin wooden lottery stick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "입장권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an admission ticket with a perforated stub, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "영화표",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a movie ticket, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "승차권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small train ticket, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지하철 표",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round subway token card. Only this item, nothing else beside it, no text."
+  }
+ ]
+}
