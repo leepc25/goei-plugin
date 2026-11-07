@@ -1,0 +1,120 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small vibrating clips joined by a cord to a controller Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a disposable cup-shaped masturbator, plain red, no text Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather puppy hood mask with ears Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass smoking pipe with a bulb Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small TENS stimulation unit with wires and pads Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace panties with a small pocket and a small remote control beside it Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean bamboo flute danso Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car tire Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open makeup compact with a mirror and powder puff Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass Korean gong kkwaenggwari with a wooden mallet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round pink blush compact with a brush Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tweezers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeshadow palette with colored pans Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mascara tube with the wand out Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bicycle helmet Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "유두 진동 클립",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small vibrating clips joined by a cord to a controller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오나컵",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a disposable cup-shaped masturbator, plain red, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펫 플레이 가면",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather puppy hood mask with ears Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리 파이프",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass smoking pipe with a bulb Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "저주파 자극기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small TENS stimulation unit with wires and pads Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "진동 팬티",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace panties with a small pocket and a small remote control beside it Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "단소",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean bamboo flute danso Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "타이어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car tire Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "콤팩트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open makeup compact with a mirror and powder puff Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "꽹과리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass Korean gong kkwaenggwari with a wooden mallet Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "블러셔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round pink blush compact with a brush Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "립글로스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "족집게",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tweezers Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "아이섀도",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeshadow palette with colored pans Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "마스카라",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mascara tube with the wand out Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "자전거 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bicycle helmet Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  }
+ ]
+}

@@ -2612,6 +2612,16 @@
   },
   {
    "keywords": [
+    "저주파 자극기"
+   ],
+   "file": "adult_099.png",
+   "kind": "adult",
+   "base": false,
+   "name": "저주파 자극기",
+   "src": "game-src/items/raw/batch_150/02.png"
+  },
+  {
+   "keywords": [
     "야구 방망이"
    ],
    "file": "weapon_003.png",
@@ -4889,6 +4899,16 @@
    "base": false,
    "name": "자전거 헬멧",
    "src": "game-src/items/raw/batch_149/04.png"
+  },
+  {
+   "keywords": [
+    "유리 파이프"
+   ],
+   "file": "consumable_105.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "유리 파이프",
+   "src": "game-src/items/raw/batch_150/01.png"
   },
   {
    "keywords": [
@@ -8336,6 +8356,16 @@
    "base": false,
    "name": "체위 쿠션",
    "src": "game-src/items/raw/batch_149/12.png"
+  },
+  {
+   "keywords": [
+    "진동 팬티"
+   ],
+   "file": "adult_100.png",
+   "kind": "adult",
+   "base": false,
+   "name": "진동 팬티",
+   "src": "game-src/items/raw/batch_150/03.png"
   },
   {
    "keywords": [
