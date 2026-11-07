@@ -3370,3 +3370,28 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
   .it-card { width: min(360px, 100%); }
   .gx-idrawer .ph-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* 점검 → 호출 흐름 (11-07 사용자): 턴마다 세로 줄로 이은 칸. 왼쪽 점·선은 순서, 칸은 ps-row 와 같은 바탕 */
+.gw-flow { list-style: none; margin: 0; padding: 4px 0 0; display: flex; flex-direction: column; }
+.gw-flow-node { position: relative; display: grid; grid-template-columns: 22px 1fr; gap: 0 8px; padding: 0 0 10px; }
+.gw-flow-node::before { content: ''; position: absolute; left: 10px; top: 14px; bottom: -4px; width: 2px; background: var(--line); }
+.gw-flow-node:last-child::before { display: none; }
+.gw-flow-dot { position: relative; z-index: 1; width: 12px; height: 12px; margin: 10px 0 0 5px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px var(--panel); }
+.gw-flow-dot.bad { background: var(--danger); }
+.gw-flow-dot.off { background: var(--dim); }
+.gw-flow-node.k-main .gw-flow-dot, .gw-flow-node.k-reply .gw-flow-dot { background: var(--blue); }
+.gw-flow-node.k-main .gw-flow-dot.bad, .gw-flow-node.k-reply .gw-flow-dot.bad { background: var(--danger); }
+.gw-flow-node.k-reply .gw-flow-dot.off { background: var(--dim); }
+.gw-flow-card { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunk); }
+.gw-flow-node.k-main .gw-flow-card, .gw-flow-node.k-reply .gw-flow-card { border-color: var(--accent-line); background: var(--accent-bg); }
+.gw-flow-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gw-flow-top b { font-size: 14px; }
+.gw-flow-top .gx-mini { margin-left: auto; }
+.gw-flow-meta { color: var(--dim); font-size: 12px; word-break: break-all; }
+.gw-flow-err { color: var(--danger); font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+.gw-flow-body { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.gw-flow-io { display: flex; flex-direction: column; gap: 4px; }
+.gw-flow-io b, .gw-flow-io small { font-size: 12px; color: var(--sub); }
+.gw-flow-io textarea { width: 100%; box-sizing: border-box; font: 12px/1.45 var(--mono); resize: vertical; }
+.gw-flow-tools { justify-content: flex-start; }
+/* 설정 묶음 안의 접이식 칸(로어북 확인 등)은 위 줄과 띄운다 (11-07 사용자: 「로어북 보내기」와 「로어북 확인」이 딱 붙어 있다고 여러 번 지적) */
+.ps-group > .ps-rows + .ps-adv { margin-top: 14px; }

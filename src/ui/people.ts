@@ -435,8 +435,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     idBox('update', v('model_id_update')),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     `<div class="ps-row wide"><div class="ps-label"><b>기록할 것</b><small>켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</small></div></div>`,
-    fold('pp-feat', '기록 항목', features),
-    fold('pp-new', '새 인물', newPeople),
+    // 11-07 사용자: 기록 항목(정량·정성 포함)과 새 인물은 접지 않고 그대로 보인다 (접어 두니 「설정 절반이 날아갔다」)
+    features,
+    newPeople,
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
     fold('pp-ps', '지침 고쳐 쓰기', promptEditor(state, s.prompt)),
   ].join('');
@@ -491,9 +492,10 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     <div class="ph-form-body ps">
       ${group('호출 흐름 (한 턴)', flow, '한 턴에 모델을 부르는 순서예요. 테두리가 밝은 칸이 지금 켜져 있는 단계. 여기서 바로 켜고 끌 수 있고, 「설정 →」을 누르면 그 단계의 세부 설정으로 가요.')}
       ${blk('pp-blk-common', '공통', common)}
-      ${blk('pp-blk-update', '갱신 (본편 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
+      ${/* 11-07 사용자: 세부 블록도 흐름 순서(공통 → Router → Director → 갱신 → 정리) */ ''}
       ${blk('pp-blk-router', 'Router (본편 전)', router, '본편을 보내기 전에 이번 응답에 필요한 인물을 고르는 단계예요. 고른 인물의 기록만 본편 요청에 들어가요.')}
       ${blk('pp-blk-director', 'Director (본편 전)', director, '고른 인물의 기록을 보고 「이번 턴 이렇게 연기해라」는 짧은 지시를 본편 요청에 끼워요.')}
+      ${blk('pp-blk-update', '갱신 (본편 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
       ${blk('pp-blk-tidy', '정리', tidy, '한 인물의 기록이 저장 상한을 넘으면 옛 항목을 합쳐 줄여요.')}
       ${advanced}
       ${diag}
