@@ -230,7 +230,8 @@
    "kind": "adult",
    "base": false,
    "name": "추 달린 니플 클램프",
-   "src": "game-src/items/raw/batch_201/01.png"
+   "src": "game-src/items/raw/batch_206/02.png",
+   "old_src": "game-src/items/raw/batch_201/01.png"
   },
   {
    "keywords": [
@@ -534,7 +535,8 @@
    "kind": "anomaly",
    "base": false,
    "name": "새장 속 그림자 새",
-   "src": "game-src/items/raw/batch_204/11.png"
+   "src": "game-src/items/raw/batch_206/08.png",
+   "old_src": "game-src/items/raw/batch_204/11.png"
   },
   {
    "keywords": [
@@ -960,6 +962,16 @@
    "base": false,
    "name": "DNA 채취 키트",
    "src": "game-src/items/raw/batch_204/12.png"
+  },
+  {
+   "keywords": [
+    "생체 접착 젤 건"
+   ],
+   "file": "medical_143.png",
+   "kind": "medical",
+   "base": false,
+   "name": "생체 접착 젤 건",
+   "src": "game-src/items/raw/batch_206/04.png"
   },
   {
    "keywords": [
@@ -2144,7 +2156,8 @@
    "kind": "food",
    "base": false,
    "name": "눈물 결정 사탕",
-   "src": "game-src/items/raw/batch_200/10.png"
+   "src": "game-src/items/raw/batch_206/06.png",
+   "old_src": "game-src/items/raw/batch_200/10.png"
   },
   {
    "keywords": [
@@ -2174,7 +2187,8 @@
    "kind": "medical",
    "base": false,
    "name": "수술용 골 드릴",
-   "src": "game-src/items/raw/batch_202/07.png"
+   "src": "game-src/items/raw/batch_206/09.png",
+   "old_src": "game-src/items/raw/batch_202/07.png"
   },
   {
    "keywords": [
@@ -2205,6 +2219,26 @@
    "base": false,
    "name": "현장 감식 가방",
    "src": "game-src/items/raw/batch_203/12.png"
+  },
+  {
+   "keywords": [
+    "운명의 실 가위"
+   ],
+   "file": "anomaly_252.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "운명의 실 가위",
+   "src": "game-src/items/raw/batch_206/13.png"
+  },
+  {
+   "keywords": [
+    "코인 락커 열쇠"
+   ],
+   "file": "key_066.png",
+   "kind": "key",
+   "base": false,
+   "name": "코인 락커 열쇠",
+   "src": "game-src/items/raw/batch_206/15.png"
   },
   {
    "keywords": [
@@ -4021,6 +4055,16 @@
    "base": false,
    "name": "리얼굿즈 박스",
    "src": "game-src/items/raw/batch_204/15.png"
+  },
+  {
+   "keywords": [
+    "기억 구슬 병"
+   ],
+   "file": "anomaly_250.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "기억 구슬 병",
+   "src": "game-src/items/raw/batch_206/10.png"
   },
   {
    "keywords": [
@@ -6802,6 +6846,26 @@
    "base": false,
    "name": "달빛 우유병",
    "src": "game-src/items/raw/batch_204/09.png"
+  },
+  {
+   "keywords": [
+    "손가락 과자"
+   ],
+   "file": "food_378.png",
+   "kind": "food",
+   "base": false,
+   "name": "손가락 과자",
+   "src": "game-src/items/raw/batch_206/11.png"
+  },
+  {
+   "keywords": [
+    "덕트 테이프"
+   ],
+   "file": "tool_265.png",
+   "kind": "tool",
+   "base": false,
+   "name": "덕트 테이프",
+   "src": "game-src/items/raw/batch_206/14.png"
   },
   {
    "keywords": [
@@ -10218,7 +10282,8 @@
    "kind": "adult",
    "base": false,
    "name": "니플 체인",
-   "src": "game-src/items/raw/batch_148/08.png"
+   "src": "game-src/items/raw/batch_206/03.png",
+   "old_src": "game-src/items/raw/batch_148/08.png"
   },
   {
    "keywords": [
@@ -11073,6 +11138,26 @@
    "base": false,
    "name": "협박 편지",
    "src": "game-src/items/raw/batch_204/13.png"
+  },
+  {
+   "keywords": [
+    "해골 랜턴"
+   ],
+   "file": "anomaly_251.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "해골 랜턴",
+   "src": "game-src/items/raw/batch_206/12.png"
+  },
+  {
+   "keywords": [
+    "계란무드등"
+   ],
+   "file": "anomaly_253.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "계란무드등",
+   "src": "game-src/items/raw/batch_206/16.png"
   },
   {
    "keywords": [
@@ -19972,7 +20057,8 @@
    "kind": "body",
    "base": false,
    "name": "횡격막",
-   "src": "game-src/items/raw/batch_183/05.png"
+   "src": "game-src/items/raw/batch_206/05.png",
+   "old_src": "game-src/items/raw/batch_183/05.png"
   },
   {
    "keywords": [
@@ -22757,8 +22843,8 @@
    "kind": "food",
    "base": false,
    "name": "핫바",
-   "src": "game-src/items/raw/batch_134/12.png",
-   "old_src": "game-src/items/raw/batch_79/07.png"
+   "src": "game-src/items/raw/batch_206/07.png",
+   "old_src": "game-src/items/raw/batch_134/12.png"
   },
   {
    "keywords": [
@@ -25441,8 +25527,8 @@
    "kind": "body",
    "base": false,
    "name": "음낭",
-   "src": "game-src/items/raw/batch_196/01.png",
-   "old_src": "game-src/items/raw/batch_190/01.png"
+   "src": "game-src/items/raw/batch_206/01.png",
+   "old_src": "game-src/items/raw/batch_196/01.png"
   },
   {
    "keywords": [
