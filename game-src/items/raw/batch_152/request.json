@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of cold raw fish soup in red broth with ice and vegetables Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gas cutting torch with two hoses Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden mortar with a pestle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole raw crab marinated in dark soy sauce, orange roe visible Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tub of petroleum jelly, plain white lid with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few flat chewy orange Korean snack strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean shuttlecock toy made of a coin wrapped in colorful paper strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few pink cooked shrimp Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of Korean straw rice strainers tied with red string Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few fried Korean seaweed glass-noodle rolls, golden crispy batter Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round white ceiling smoke detector with a red light Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small electric lint shaver Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tight rock climbing shoes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few pieces of grilled conger eel on skewers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded paper crane, red paper Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled Korean flower-patterned straw mat Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "물회",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of cold raw fish soup in red broth with ice and vegetables Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "산소 절단기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gas cutting torch with two hoses Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "절구",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden mortar with a pestle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "간장게장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole raw crab marinated in dark soy sauce, orange roe visible Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바세린",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tub of petroleum jelly, plain white lid with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쫀드기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few flat chewy orange Korean snack strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제기차기 제기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean shuttlecock toy made of a coin wrapped in colorful paper strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "새우",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few pink cooked shrimp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "복조리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of Korean straw rice strainers tied with red string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "김말이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few fried Korean seaweed glass-noodle rolls, golden crispy batter Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화재 감지기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round white ceiling smoke detector with a red light Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보풀 제거기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small electric lint shaver Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "암벽화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tight rock climbing shoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붕장어구이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few pieces of grilled conger eel on skewers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "종이학",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded paper crane, red paper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화문석",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled Korean flower-patterned straw mat Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

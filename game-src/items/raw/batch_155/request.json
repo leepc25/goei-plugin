@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sticky lint roller Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tube of sweetened condensed milk, plain white tube with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shallow pan of red rice cakes, ramen and fish cakes cooking Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mug of warm ginger tea with ginger slices Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round dried gourd water dipper Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful baby rattle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic convenience store lunch box with clear lid, rice and side dishes inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long hollow woven bamboo body pillow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small gold foil wrapped round herbal pill in a tiny box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim stick cordless vacuum cleaner Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small walnut-shaped Korean pastries Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round flat brown dalgona honeycomb candy with a star shape pressed in the middle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic bag of frozen dumplings, plain blue bag with a dumpling picture, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handful of steel ball bearings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red boxing gloves Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable welding machine with cables and a torch Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "돌돌이 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sticky lint roller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tube of sweetened condensed milk, plain white tube with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "즉석 떡볶이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shallow pan of red rice cakes, ramen and fish cakes cooking Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "생강차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mug of warm ginger tea with ginger slices Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바가지",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round dried gourd water dipper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "딸랑이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful baby rattle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "편의점 도시락",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic convenience store lunch box with clear lid, rice and side dishes inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "죽부인",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long hollow woven bamboo body pillow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "우황청심환",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small gold foil wrapped round herbal pill in a tiny box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무선 청소기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim stick cordless vacuum cleaner Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호두과자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small walnut-shaped Korean pastries Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "달고나",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round flat brown dalgona honeycomb candy with a star shape pressed in the middle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "냉동만두",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic bag of frozen dumplings, plain blue bag with a dumpling picture, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠구슬",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handful of steel ball bearings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "권투 글러브",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red boxing gloves Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "용접기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable welding machine with cables and a torch Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
