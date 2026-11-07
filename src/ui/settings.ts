@@ -225,10 +225,15 @@ export function undoBar(ctx: ChatContext): string {
   if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex || settingsUi.confirm) return '';
   return `<div class="st-confirm st-undobar ps-defconfirm"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? 'disabled' : ''}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
 }
+/** 페이지 안: 되돌리기 띠만. 확인은 팝업(mainDefaultsPopup) — 11-07 사용자: 전체 설정에 관한 확인이 괴담넷 같은 한 페이지 안에 뜨면 안 된다 */
 export function mainDefaultsConfirm(ctx?: ChatContext): string {
+  return ctx ? undoBar(ctx) : '';
+}
+/** 설정 창 전체 위에 뜨는 확인 팝업 (닫기 확인과 같은 모양) */
+export function mainDefaultsPopup(): string {
   const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
-  if (!c) return ctx ? undoBar(ctx) : '';
-  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`;
+  if (!c) return '';
+  return `<div class="gw-confirm"><div class="gw-confirm-box"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' || settingsUi.confirm === 'reset' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div></div>`;
 }
 
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;

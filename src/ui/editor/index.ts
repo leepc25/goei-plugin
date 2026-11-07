@@ -24,7 +24,7 @@ import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './gui
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
-import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
@@ -633,7 +633,7 @@ export function render(): void {
   const confirm = edUi.confirm
     ? `<div class="gw-confirm"><div class="gw-confirm-box"><p>${edUi.confirm === 'close' ? '고친 것이 저장되지 않았어요. 저장하지 않고 닫을까요?' : '고친 것을 전부 버리고 카드에 저장된 값으로 되돌릴까요?'}</p>
         <div class="gx-row-btns"><button class="gx-mini danger" data-action="${edUi.confirm === 'close' ? 'ed-close-force' : 'ed-revert-force'}">${edUi.confirm === 'close' ? '저장 안 하고 닫기' : '고친 것 버리기'}</button><button class="gx-mini" data-action="ed-confirm-no">취소</button></div></div></div>`
-    : '';
+    : tabOf(edUi.node) === 'set' ? mainDefaultsPopup() : '';
   const tab = tabOf(edUi.node);
   edUi.last[tab] = edUi.node;
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');

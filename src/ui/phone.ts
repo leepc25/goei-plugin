@@ -11,7 +11,7 @@ import {
   chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt, viewPrompt } from '../core/phonePrompt';
-import { parseView, PH_VIEW_LAST, readViews, VIEW_PRESETS, viewSettings, viewUnread, writeViews } from '../core/phoneView';
+import { parseView, PH_VIEW_LAST, readViews, VIEW_HISTORY, VIEW_PRESETS, viewSettings, viewUnread, writeViews, type ViewRoom } from '../core/phoneView';
 import { agentFace, imageUrl, stChip } from './images';
 import { readWorld, worldOn } from '../core/world/output';
 import { ICONS } from './icons';
@@ -34,7 +34,7 @@ import { playerSource } from '../core/player';
 import { updateChat, type ChatContext } from '../host/risu';
 import { isPhone } from './media';
 
-type Sub = 'contacts' | 'chats' | 'notices' | 'views';
+type Sub = 'contacts' | 'chats' | 'notices';
 
 interface PhoneUi {
   sub: Sub;
@@ -669,14 +669,19 @@ function chatRooms(st: PState, q: string) {
 
 function chatsView(ctx: ChatContext, st: PState, d: Directory): string {
   const all = chatRooms(st, '');
-  if (!all.length) return blank('아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.');
+  // 11-07 사용자: 관전(보기 전용 방)은 따로 탭이 아니라 대화 목록의 단톡방으로
+  const views = readViews(ctx.chat.scriptstate).reverse();
+  if (!all.length && !views.length) return blank('아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.');
   const unread = all.filter((r) => r.unread);
+  const vunread = views.filter((r) => r.unread);
   const head = chips('ph-chat-filter', phone.chatFilter, [
-    { id: 'all', label: '전체', count: all.length },
-    { id: 'unread', label: '안읽음', alert: unread.reduce((n, r) => n + r.unread, 0) },
+    { id: 'all', label: '전체', count: all.length + views.length },
+    { id: 'unread', label: '안읽음', alert: unread.reduce((n, r) => n + r.unread, 0) + vunread.length },
   ]);
   const rows = phone.chatFilter === 'unread' ? unread : all;
-  return head + (rows.length ? chatList(ctx, rows, d) : blank('안 읽은 대화가 없어요.'));
+  const vrows = phone.chatFilter === 'unread' ? vunread : views;
+  if (!rows.length && !vrows.length) return head + blank('안 읽은 대화가 없어요.');
+  return head + viewRows(ctx, vrows, d) + (rows.length ? chatList(ctx, rows, d) : '');
 }
 
 function chatList(ctx: ChatContext, rows: ReturnType<typeof chatRooms>, d: Directory): string {
@@ -702,14 +707,18 @@ function roomDel(id: string, pending: boolean, label: string): string {
 
 const dayOf = (t: string) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
 
-// ── 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06) ──
-function viewsList(ctx: ChatContext): string {
-  const set = viewSettings(ctx.chat.scriptstate);
-  const busy = jobs.has(chatKey(ctx));
-  const list = readViews(ctx.chat.scriptstate).reverse();
-  const make = `<div class="ph-view-new"><button class="gx-mini" data-action="ph-view-new" ${busy ? 'disabled' : ''}>${esc(VIEW_PRESETS[set.preset])} 새로 보기</button><small>종류·시점 인물은 괴담톡 설정에서 바꿔요</small></div>`;
-  if (!list.length) return make + blank('아직 보기 전용 방이 없어요.<br>내가 끼지 않는 짧은 장면(사이드스토리·혼잣말)을 폰으로 봐요.');
-  return make + `<ul class="ph-list ph-chats">${list
+// ── 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06). 11-07 사용자: 탭이 아니라 대화 목록의 단톡방으로, 사진 보이게, 같은 종류는 한 방에 이어 쓰기 ──
+/** 방 사람의 사진: 연락처 id → 이름 → (혼잣말·다중인격은) 시점 인물 */
+function viewFace(ctx: ChatContext, d: Directory, r: ViewRoom, id: string, cls = ''): string {
+  const byName = (n: string) => (n ? [...d.map.values()].find((c) => c.name === n) : undefined);
+  const p = r.people.find((x) => x.id === id);
+  const who = d.map.get(id) ?? byName(p?.name ?? '') ?? (r.preset !== 'side' ? d.map.get(r.pov) ?? byName(r.people.find((x) => x.id === r.pov)?.name ?? '') : undefined);
+  return face(ctx, who, p?.name ?? id, cls);
+}
+
+function viewRows(ctx: ChatContext, list: ViewRoom[], d: Directory): string {
+  if (!list.length) return '';
+  return `<ul class="ph-list ph-chats ph-views">${list
     .map((r) => {
       const last = [...r.messages].reverse().find((m) => m.type === 'text');
       const who = r.people.find((p) => p.id === last?.sender)?.name ?? '';
@@ -717,33 +726,40 @@ function viewsList(ctx: ChatContext): string {
       const del = phone.confirm === `view:${r.id}`
         ? `<button class="gx-mini danger ph-rdel" data-action="ph-view-del" data-value="${esc(r.id)}">정말 삭제</button>`
         : `<button class="ph-tool sm ph-rdel" data-action="ph-view-del" data-value="${esc(r.id)}" title="삭제" aria-label="${esc(r.name)} 삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main${on ? ' on' : ''}" data-action="ph-view-open" data-value="${esc(r.id)}"><span class="ph-avatar group">${ICONS.group}<i>${r.people.length}</i></span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc(r.name)}</b><small class="ph-time">${esc(VIEW_PRESETS[r.preset])}</small></span>
+      return `<li class="ph-row"><button class="ph-main${on ? ' on' : ''}" data-action="ph-view-open" data-value="${esc(r.id)}"><span class="ph-vface">${viewFace(ctx, d, r, r.pov)}${r.people.length > 1 ? `<i>${r.people.length}</i>` : ''}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc(r.name)}</b><small class="ph-time">${esc(shortTime(r.time))}</small></span>
         <span class="ph-who-bot"><small>${esc([...`${who ? `${who}: ` : ''}${last?.text ?? ''}`].slice(0, 60).join(''))}</small>${r.unread ? '<span class="ph-badge">N</span>' : ''}</span></span></button>${del}</li>`;
     })
     .join('')}</ul>`;
 }
 
-function viewPane(ctx: ChatContext, busy: boolean): string {
+function viewPane(ctx: ChatContext, d: Directory, busy: boolean): string {
   const r = readViews(ctx.chat.scriptstate).find((x) => x.id === phone.viewId);
   if (!r) return '<div class="ph-empty"><p class="gx-none">보기 전용 방을 찾지 못했어요.</p></div>';
   const name = (id: string) => r.people.find((p) => p.id === id)?.name ?? id;
   const bubbles = r.messages
     .map((m, i) => {
       if (m.type === 'skip') return '<div class="ph-sys skip">생략됨</div>';
+      if (m.type === 'time') return `<div class="ph-day"><span>${esc(m.text)}</span></div>`;
       if (m.type === 'pause') return `<div class="ph-sys pause">${esc(m.text)}</div>`;
       const prev = r.messages[i - 1];
       const me = r.preset !== 'side' ? false : m.sender === r.pov;
       const first = !prev || prev.type !== 'text' || prev.sender !== m.sender;
       const head = !me && first ? `<b class="ph-name">${esc(name(m.sender))}</b>` : '';
-      return `<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${me ? '' : '<span class="ph-face-gap"></span>'}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${esc(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
+      const pic = !me ? (first ? viewFace(ctx, d, r, m.sender, ' ph-face') : '<span class="ph-face-gap"></span>') : '';
+      return `<div class="ph-msg ${me ? 'me' : 'npc'}${first ? ' first' : ''}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${esc(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
     })
     .join('');
+  const confirm = phone.confirm === `view:${r.id}`;
   return `<div class="ph-room">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
-      <span class="ph-avatar group sm">${ICONS.group}</span><div class="ph-room-title"><b>${esc(r.name)}</b><small>${esc(VIEW_PRESETS[r.preset])} · ${esc(name(r.pov))} 시점 · ${esc(shortTime(r.time))}</small></div></header>
+      ${viewFace(ctx, d, r, r.pov, ' sm')}<div class="ph-room-title"><b>${esc(r.name)}</b><small>${esc(VIEW_PRESETS[r.preset])} · ${esc(name(r.pov))} 시점 · ${r.people.length}명 · ${esc(shortTime(r.time))}</small></div>
+      <span class="ph-act">
+        ${tool('ph-view-new', ICONS.refresh, '이어 보기', busy ? 'disabled' : '')}
+        ${confirm ? `<button class="gx-mini danger" data-action="ph-view-del" data-value="${esc(r.id)}">정말 삭제</button>` : tool('ph-view-del', ICONS.trash, '방 삭제', `data-value="${esc(r.id)}"`)}
+      </span></header>
     <div class="ph-log">${bubbles}</div>
-    <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy ? 'disabled' : ''}>새로 보기</button></div>
+    <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy ? 'disabled' : ''}>이어 보기</button></div>
   </div>`;
 }
 
@@ -764,13 +780,26 @@ function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
         return null;
       }
       const list = readViews(chat.scriptstate);
-      id = `v_${Date.now().toString(36)}`;
-      const seen = !automatic || (phone.sub === 'views' && phone.view === 'list');
-      list.push({ ...value, id, time: phoneTime(chat), unread: !seen });
+      // 11-07 사용자: 매 턴 새 방을 파지 않는다 — 같은 종류는 한 방에 이어 쓴다
+      const cur = [...list].reverse().find((x) => x.preset === set.preset);
+      const time = phoneTime(chat);
+      const seen = !automatic || (phone.sub === 'chats' && (phone.view === 'list' || (phone.view === 'view' && phone.viewId === cur?.id)));
+      if (cur) {
+        id = cur.id;
+        for (const p of value.people) if (!cur.people.some((x) => x.id === p.id)) cur.people.push(p);
+        cur.pov = value.pov;
+        cur.time = time;
+        cur.unread = !seen;
+        cur.messages.push({ sender: '-', type: 'time', text: time }, ...value.messages);
+        if (cur.messages.length > VIEW_HISTORY) cur.messages.splice(0, cur.messages.length - VIEW_HISTORY);
+      } else {
+        id = `v_${Date.now().toString(36)}`;
+        list.push({ ...value, id, time, unread: !seen });
+      }
       return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...writeViews(list) } };
     });
-    if (id && !automatic) Object.assign(phone, { sub: 'views', view: 'view', viewId: id });
-    else if (id) note = `보기 전용 방 「${value.name}」이 생겼어요.`;
+    if (id && !automatic) Object.assign(phone, { sub: 'chats', view: 'view', viewId: id });
+    else if (id) note = `「${value.name}」 방에 새 글이 왔어요.`;
     return note;
   });
 }
@@ -1093,7 +1122,6 @@ function settingsView(ctx: ChatContext): string {
 /** 왼쪽 목록 (연락처·대화·공지) */
 function listHtml(ctx: ChatContext, st: PState, d: Directory): string {
   if (phone.query.trim()) return searchView(ctx, st, d);
-  if (phone.sub === 'views') return viewsList(ctx);
   return phone.sub === 'contacts' ? contactsView(ctx, d, st) : phone.sub === 'chats' ? chatsView(ctx, st, d) : noticesView(ctx);
 }
 
@@ -1105,7 +1133,7 @@ function paneHtml(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
   if (phone.view === 'add') return addView();
   if (phone.view === 'settings') return settingsView(ctx);
   if (phone.view === 'notice') return noticeDetail(ctx);
-  if (phone.view === 'view') return viewPane(ctx, busy);
+  if (phone.view === 'view') return viewPane(ctx, d, busy);
   return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.phone}</span><b>괴담톡</b><p>왼쪽에서 대화나 연락처를 고르세요.</p></div>`;
 }
 
@@ -1151,13 +1179,14 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
   const tools = [
     tool('ph-refresh', ICONS.refresh, '새 메시지 확인', busy ? 'disabled' : '', '새로고침'),
     tool('ph-group', ICONS.group, '단톡 만들기', busy ? 'disabled' : '', '단톡'),
+    tool('ph-view-new', ICONS.cctv, `${VIEW_PRESETS[viewSettings(ctx.chat.scriptstate).preset]} 보기 (내가 끼지 않는 방)`, busy ? 'disabled' : '', '관전'),
     tool('ph-add', ICONS.addUser, '연락처 추가', '', '추가'),
     tool('ph-call', ICONS.call, '전화 걸기', 'data-value=""', '전화'),
   ].join('');
   return `<main class="gx-body ph ph-app ${detail ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담톡 목록">
       <div class="ph-side-head">
-        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}${subBtn('views', '관전', badge(viewUnread(readViews(ctx.chat.scriptstate))))}</div>
+        <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', badge(unread + viewUnread(readViews(ctx.chat.scriptstate))))}${subBtn('notices', '공지', badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
         <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
       ${detail ? '' : status}
@@ -1295,7 +1324,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
         r.unread = false;
         await setVars(ctx, env, writeViews(list));
       }
-      Object.assign(phone, { view: 'view', viewId: v, confirm: null });
+      Object.assign(phone, { sub: 'chats', view: 'view', viewId: v, confirm: null });
       break;
     }
     case 'ph-view-del': {
