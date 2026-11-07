@@ -1,6 +1,6 @@
-// 장터 화면 초안 (11-07): 실제 플러그인을 띄운 뒤 채팅 본문 흉내(상태창은 플러그인 display 처리기가 그린 것) 아래 「장터 열기」 단추,
-// 그리고 소지품 틀(it-*)을 그대로 쓴 장터 팝업을 끼워 넣어 찍는다. 그림은 PixelLab 소지품 2회 미리보기에서 잘라 둔 12장.
-// 사용법: node docs/인계/장터_1107/mock.mjs  → /mnt/project-files/작업_1107/장터_초안/*.png
+// 상점 화면 초안 (11-07): 실제 플러그인을 띄운 뒤 채팅 본문 흉내(상태창은 플러그인 display 처리기가 그린 것) 아래 「상점 열기」 단추,
+// 그리고 소지품 틀(it-*)을 그대로 쓴 상점 팝업을 끼워 넣어 찍는다. 그림은 PixelLab 소지품 2회 미리보기에서 잘라 둔 12장.
+// 사용법: node docs/인계/상점_1107/mock.mjs  → /mnt/project-files/작업_1107/상점_초안/*.png
 import { readFileSync } from 'node:fs';
 import { boot, closeEditor, closeWin, launch, loadFixture, openWin, sleep } from '../../../tests/qc-settings-harness.mjs';
 const fx = loadFixture(new URL('../../../.scratch/fixture/fixture.json', import.meta.url).pathname);
@@ -61,7 +61,7 @@ const popup = (vp, mode) => {
 const CHAR_TEXT = `철문을 밀자 기름 냄새와 쇠 냄새가 한꺼번에 밀려왔다. 천장까지 쌓인 선반 사이로 주인이 고개만 내밀었다. 「뭐 찾소.」 묻는 말이 아니라 그냥 던지는 소리였다. 카운터 뒤 라디오에서 저녁 뉴스가 작게 흘렀다.\n\n[▣|2025.01.12|07:40 PM|☁️|2°C|을지로 철물점|실종자 수색]`;
 const chatCard = (p) => `<div data-goei-card="shop" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;flex-wrap:wrap;margin-top:14px">
   <span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">${SHOP}</b> · 여기서 물건을 살 수 있다.</span>
-  <button type="button" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">장터 열기</button></div>`;
+  <button type="button" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">상점 열기</button></div>`;
 const css = `
 .sh-chat{position:fixed;inset:0;overflow:auto;background:#1b1d22;color:#e6e6e6;font:15px/1.75 'Noto Sans KR',system-ui,sans-serif;padding:24px 0 120px}
 .sh-msg{max-width:760px;margin:0 auto;padding:0 20px;display:flex;gap:14px}.sh-ava{flex:none;width:40px;height:40px;border-radius:50%;background:#3a4650}.sh-txt{flex:1;min-width:0}
@@ -102,7 +102,7 @@ const css = `
 .it-right{display:contents}.sh-bal{order:1}.it-right .it-act{order:2;margin-left:auto;flex:none}.sh-q{order:3;width:100%;flex:1 1 100%}.sh-go{top:4px}
 .sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:12px}.sh-ph .it-ic{width:96px;height:96px}
 .sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
-const b = await launch(); const out = '/mnt/project-files/작업_1107/장터_초안/';
+const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: '철물점 문을 열고 들어간다.' }, { role: 'char', data: CHAR_TEXT }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
   await openWin(page); await sleep(300); if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true); await sleep(200);
