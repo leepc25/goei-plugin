@@ -141,8 +141,11 @@ async function goMission(page) {
 }
 async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.locator(`${row} [data-action="mission-open"]`).first().click();
+  const goal = () => page.evaluate(() => document.querySelector('.gx-goal b')?.textContent.trim() ?? null);
+  const before = await goal();
   await page.click('.gx-mlist li.gx-mx.open [data-action="mission-pick"]');
-  await page.waitForTimeout(700); // 선택 효과(0.55초) 뒤에 편성 단계로 (2026-11-05)
+  // 잠금 효과(ui/evcard AIM_LOCK_MS) 뒤에 목표가 바뀌고 편성 단계로 (11-07: 1.5초). 시간을 박지 않고 목표가 바뀔 때까지
+  await page.waitForFunction((b) => (document.querySelector('.gx-goal b')?.textContent.trim() ?? null) !== b, before);
 }
 
 // 설정 창(2026-10-27 개편: 별도 창 .gw 하나, 탭 기능·세계·지침·점검 + 왼쪽 목록의 페이지 노드)
@@ -269,7 +272,8 @@ async function leaveField(page) {
   assert.ok(!(await page.evaluate(() => window.__calls.handlers.display('다른 글'))).includes('data-goei-card="opening"'), '다른 글에는 안내 없음');
   const hintVis = await page.evaluate((h) => {
     const d = document.querySelector('.default-chat-screen');
-    d.innerHTML = `<div class="risu-chat" id="fm">${h}</div>`;
+    // 숨김 조건(host/overlay OPENING_CSS): 메시지 칸이 둘 이상일 때. 첫 장면 하나만이면 보인다
+    d.innerHTML = `<div class="chat-message-container"><div class="risu-chat" id="fm">${h}</div></div>`;
     const v1 = getComputedStyle(d.querySelector('[data-goei-card="opening"]')).display !== 'none';
     d.insertAdjacentHTML('afterbegin', '<div class="chat-message-container"><div class="risu-chat">첫 행동</div></div>');
     const v2 = getComputedStyle(d.querySelector('[data-goei-card="opening"]')).display !== 'none';
@@ -1348,7 +1352,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.nw-pane .nw-title, .nw-compose');
   await swipeRight('.nw-main');
   await page.waitForSelector('.gx-board');
-  await page.click('.gx-mbar .gx-nb[data-value="wiki"]');
+  // 폰 하단 바에는 위키가 없다 (11-07 사용자: 5탭 바). 바 위 손잡이로 공용 서랍을 열어 위키로
+  await page.click('.gx-cgrip[data-action="cdr"]');
+  await page.click('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
   await page.waitForSelector('.nw-main');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.click('.nw-rail [data-action="wiki-home"]');
@@ -1467,8 +1473,9 @@ if (fixture.globalLore.some(packed)) {
   // 본편 요청에 기록이 붙는다 (마지막 사용자 메시지 바로 앞 system 메시지)
   const req = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: 'u' }], 'model')));
   assert.equal(req[req.length - 1].content, 'u', '사용자 메시지가 맨 끝');
-  const last = req[req.length - 2];
-  assert.equal(last.role, 'system');
+  // 사용자 메시지 앞 system 들 가운데 (소지품 [Inventory] 등 다른 기능 글도 붙는다, 11-07)
+  const last = req.slice(0, -1).find((m) => m.role === 'system' && String(m.content).startsWith('[MODULE_CONTEXT_BEGIN]'));
+  assert.ok(last, '기록 글이 사용자 메시지 앞 system 에 있다');
   assert.ok(last.content.startsWith('[MODULE_CONTEXT_BEGIN]\nThese saved records are reference data'));
   assert.ok(last.content.includes('"kind":"private_message"'));
   const sub = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'submodel'));
@@ -1476,14 +1483,14 @@ if (fixture.globalLore.some(packed)) {
   // 본편 반영 총 상한: 너무 작으면 아무 기록도 안 붙음
   await page.evaluate(() => { window.__chat.scriptstate.$gen_ctx_total = '10'; });
   const tight = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
-  assert.equal(tight.length, 1, '총 상한 안에 못 들면 빼기');
+  assert.ok(!tight.some((m) => String(m.content).includes('[MODULE_CONTEXT_BEGIN]')), '총 상한 안에 못 들면 빼기');
   await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
   await featSet(page, 'set:gnet');
   await page.click('.gw [data-action="gn-cfg"][data-value="context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
   const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
-  assert.equal(off.length, 1);
+  assert.ok(!off.some((m) => String(m.content).includes('[MODULE_CONTEXT_BEGIN]')), '본편 반영 끔');
   // 내 글 삭제 (두 번 눌러야)
   await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-sub"][data-value="board"]');
@@ -1636,8 +1643,9 @@ if (fixture.globalLore.some(packed)) {
   const req = await page.evaluate(async (r) => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model')), rec);
   assert.equal(req[req.length - 1].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
   // 본편 반영: 대화·공지가 마지막 사용자 메시지 바로 앞 system 메시지로
-  const ctx = req[req.length - 2];
-  assert.equal(ctx.role, 'system');
+  // 사용자 메시지 앞 system 들 가운데 (소지품 [Inventory] 등 다른 기능 글도 붙는다, 11-07)
+  const ctx = req.slice(0, -1).find((m) => m.role === 'system' && String(m.content).includes('"feature":"phone"'));
+  assert.ok(ctx, '괴담톡 기록이 사용자 메시지 앞 system 에 있다');
   assert.ok(ctx.content.includes('"feature":"phone"') && ctx.content.includes('선배 지금 어디예요?') && ctx.content.includes('지하 2층 출입 통제'));
   // 자동 확인: 본편 응답이 끝나면 한 번 (같은 응답에는 다시 안 함)
   // 인물 기록(기본 켬)도 응답마다 보조 모델을 부르므로 이 절은 괴담톡 호출만 세게 끈다
