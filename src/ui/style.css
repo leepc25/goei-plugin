@@ -3120,3 +3120,12 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .ph-meta-t, .gn-mynick small, .gn-dm-t, .ph-tool-l, .ph-drawer .ph-tool-l, .dir-pic small, .st-col-name small, .gx-rpt-acts .gx-mini small, .gx-rpt-times i, .gx-rpt-first, .ph-notice-facs .gx-chip small { font-size: 12px; }
 }
+/* 인물 설정 (2026-11-07 사용자: 전용 모델 ID·지침 고쳐 쓰기가 여백 없이 붙어 있었다) */
+.pp-mid-ctl { flex: 1 1 320px; gap: 8px; align-items: center; flex-wrap: nowrap; width: 100%; }
+.pp-mid-ctl > .gx-search { flex: 1 1 auto; min-width: 0; margin: 0; }
+.pp-mid-ctl > .gx-mini { flex: 0 0 auto; }
+.ps-adv-sub > .ps-rows > .pp-ps { padding: 14px; }
+.pp-ps-pick { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pp-ps-pick > b { font-size: 15px; font-weight: 600; }
+.pp-ps-pick > .gx-select { min-width: 220px; max-width: 100%; }
+.pp-ps > .nw-reqbox { field-sizing: fixed; height: 320px; min-height: 160px; max-height: 60vh; overflow: auto; }
