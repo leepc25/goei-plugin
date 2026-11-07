@@ -11,8 +11,8 @@ const fx = loadFixture(process.argv[3] ?? new URL('../.scratch/fixture/fixture.j
 mkdirSync(out, { recursive: true });
 const looks = JSON.parse(distPack('goei-data-looks')).looks;
 assert.equal(looks.length, 126, '팩: 126명');
-const count = (g, fac) => looks.filter((r) => !r.unique && r.g === g && (!r.fac || r.fac === fac)).length;
-assert.deepEqual(looks.filter((r) => r.fac).map((r) => r.fac).sort().join(''), 'A00A00A00A00B00B00B00B00B00B00C00C00C00C00', '세력 전용: 관리국 4 · 가짜 관리국 6 · 백일몽 4');
+const count = (g) => looks.filter((r) => !r.unique && r.g === g).length;
+assert.deepEqual([count('남'), count('여')], [38, 33], '공통 풀: 남38·여33 (세력 구분 없음)');
 
 const b = await launch();
 const fails = [];
@@ -28,10 +28,10 @@ for (const vp of ['pc', 'phone']) {
   await click('.gx-fac[data-value="A00"]');
   const heads = await page.$$eval('.gx-body > section > h2', (els) => els.map((e) => e.textContent.trim()));
   if (!heads.includes('3아바타')) fails.push(`[${vp}] 아바타 단계 없음 ${JSON.stringify(heads)}`);
-  // 처음엔 기본 아바타(시민남1)가 골라져 있다
-  const first = looks.find((r) => !r.unique && r.name === '시민남1').id;
+  // 처음엔 기본 아바타(관리국여A, 치마 입은 관리국 직원)가 골라져 있다
+  const first = looks.find((r) => !r.unique && r.name === '관리국여A').id;
   const chipLook = () => page.$eval('.gx-lookchip', (e) => e.dataset.look);
-  if ((await chipLook()) !== first) fails.push(`[${vp}] 기본 아바타가 시민남1이 아님 (${await chipLook()})`);
+  if ((await chipLook()) !== first) fails.push(`[${vp}] 기본 아바타가 관리국여A가 아님 (${await chipLook()})`);
   if (await page.isDisabled('.gx-start')) fails.push(`[${vp}] 기본 아바타인데 출발이 막힘`);
   await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
@@ -40,30 +40,24 @@ for (const vp of ['pc', 'phone']) {
   if (!(await page.$('.gx-lookpop [data-action="look-g"]'))) fails.push(`[${vp}] 팝업에 남·여 단추 없음`);
   await shot('2a_팝업_성별전');
   await click('.gx-lookpop [data-action="look-g"][data-value="여"]');
-  if ((await cells()) !== count('여', 'A00')) fails.push(`[${vp}] 관리국 여: ${await cells()}칸 (기대 ${count('여', 'A00')})`);
+  if ((await cells()) !== count('여')) fails.push(`[${vp}] 관리국 여: ${await cells()}칸 (기대 ${count('여')})`);
   await shot('2_팝업_여_관리국');
   await click('.gx-lookpop [data-action="look-g"][data-value="남"]');
-  if ((await cells()) !== count('남', 'A00')) fails.push(`[${vp}] 관리국 남: ${await cells()}칸 (기대 ${count('남', 'A00')})`);
-  const names = await page.$$eval('.gx-lookpop .gx-lookc', (els) => els.map((e) => e.dataset.value));
-  const fake = looks.filter((r) => r.fac === 'B00').map((r) => r.id);
-  if (names.some((id) => fake.includes(id))) fails.push(`[${vp}] 관리국인데 가짜 관리국 그림이 보임`);
+  if ((await cells()) !== count('남')) fails.push(`[${vp}] 관리국 남: ${await cells()}칸 (기대 ${count('남')})`);
   // 움직임
   const pos = () => page.$eval('.gx-lookpop .gx-look', (e) => getComputedStyle(e).backgroundPositionX);
   const p1 = await pos(); await sleep(700); const p2 = await pos();
   if (p1 === p2) fails.push(`[${vp}] 대기 동작이 안 움직임 (${p1})`);
-  const own = looks.find((r) => r.fac === 'A00' && r.g === '남').id;
+  const own = looks.find((r) => r.name === '가짜관리국검사A').id;
   await click(`.gx-lookpop .gx-lookc[data-value="${own}"]`);
   if (await page.$('.gx-lookpop')) fails.push(`[${vp}] 고른 뒤 팝업이 안 닫힘`);
   await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
   await shot('3_시작패널_고른뒤');
-  // 세력을 바꾸면 그 세력 전용 아바타는 빠진다
+  // 세력을 바꿔도 고른 아바타는 그대로 (공통 풀)
   await click('.gx-fac[data-value="C00"]');
-  if ((await chipLook()) === own) fails.push(`[${vp}] 백일몽으로 바꿨는데 관리국 아바타가 남음`);
+  if ((await chipLook()) !== own) fails.push(`[${vp}] 세력을 바꾸니 아바타가 바뀜`);
   await click('.gx-fac[data-value="A00"]');
-  await click('.gx-lookchip');
-  await click('.gx-lookpop [data-action="look-g"][data-value="남"]');
-  await click(`.gx-lookpop .gx-lookc[data-value="${own}"]`);
   // 기존 인물을 고르면 아바타 칸은 그 인물 성별·모습으로 잠긴다
   const agent = await page.evaluate(() => document.querySelector('.gx-whoc[data-value^="P"]')?.dataset.value);
   await click(`.gx-whoc[data-value="${agent}"]`);

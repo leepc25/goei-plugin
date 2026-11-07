@@ -1,5 +1,5 @@
 // 아바타 고르기 (2026-11-07~08 사용자): 시작 패널(내 페르소나)과 시작한 뒤가 같은 팝업을 쓴다.
-// 남·여를 고르면 그 성별 일반 NPC 프리셋 + 고른 세력 전용 프리셋이 정면 대기 동작으로 움직이는 격자에서 하나를 꼭 고른다.
+// 남·여를 고르면 그 성별 일반 NPC 프리셋 전부가 정면 대기 동작으로 움직이는 격자에서 하나를 꼭 고른다.
 // 대기 동작은 1배(픽셀 그대로)로 CSS steps 로 돌린다. 고른 것은 이 채팅 변수 $st_look 에 둔다 (core/looks.ts).
 import { LOOK_GENDERS, LOOK_KEY, lookId, looksOf, type LookGender, type LookRow } from '../core/looks';
 import { playerAgent } from '../core/player';
@@ -41,10 +41,10 @@ export function lookSprite(look: IdleLook, cls = ''): string {
 const genderOf = (rows: LookRow[] | null, id: string): LookGender | '' => rows?.find((r) => r.id === id)?.g ?? '';
 
 /**
- * 성별 단추 + 아바타 격자. sel = 고른 번호, g = 보고 있는 성별('' 이면 고른 것의 성별), faction = 시작 세력(전용 프리셋 거르기).
+ * 성별 단추 + 아바타 격자. sel = 고른 번호, g = 보고 있는 성별('' 이면 고른 것의 성별).
  * 단추: look-g(성별) · look(아바타) · look-retry(팩 다시 받기)
  */
-function chooser(sel: string, g: LookGender | '', faction: string, withSegs: boolean): string {
+function chooser(sel: string, g: LookGender | '', withSegs: boolean): string {
   const rows = lookRows();
   const shown = g || genderOf(rows, sel);
   const segs = !withSegs ? '' : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown ? ' on' : ''}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown}">${x}</button>`).join('')}</div>`;
@@ -56,17 +56,17 @@ function chooser(sel: string, g: LookGender | '', faction: string, withSegs: boo
     return `${segs}<div class="gx-hint">${msg}</div>`;
   }
   if (!shown) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
-  const cells = looksOf(rows, shown, faction)
+  const cells = looksOf(rows, shown)
     .map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? ' on' : ''}" data-action="look" data-value="${esc(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc(r.id)}">${lookSprite(idleOf(r))}</button>`)
     .join('');
   return `${segs}<div class="gx-lookg">${cells}</div>`;
 }
 
-/** 아바타 팝업. sel = 지금 고른 번호, faction = 시작 세력, lockedName = 고유 인물로 플레이 중이면 그 이름(고를 수 없음).
+/** 아바타 팝업. sel = 지금 고른 번호, lockedName = 고유 인물로 플레이 중이면 그 이름(고를 수 없음).
  *  g 를 주면(시작 패널에서 성별을 고른 뒤) 그 성별만, 안 주면(시작한 뒤) 팝업 안에 성별 단추 */
-export function lookPopup(sel: string, faction: string, lockedName = '', g: LookGender | '' = ''): string {
+export function lookPopup(sel: string, lockedName = '', g: LookGender | '' = ''): string {
   if (!lookUi.open) return '';
-  const inner = lockedName ? `<p class="gx-hint">${esc(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g || lookUi.g, faction, !g);
+  const inner = lockedName ? `<p class="gx-hint">${esc(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g || lookUi.g, !g);
   return `<div class="gx-agpop gx-lookpop" data-action="look-close" role="dialog" aria-label="아바타"><div class="gx-agpop-card gx-lookpop-card" data-action="look-keep">
     <div class="gx-lookpop-head"><b>아바타</b><button class="gx-x" data-action="look-close" aria-label="닫기">${ICONS.close}</button></div>
     ${inner}${lookUi.notice ? `<div class="gx-err" role="alert">${esc(lookUi.notice)}</div>` : ''}
@@ -77,7 +77,7 @@ export function lookPopup(sel: string, faction: string, lockedName = '', g: Look
 export function chatLookPopup(ctx: ChatContext): string {
   if (!lookUi.open) return '';
   const s = ctx.chat.scriptstate;
-  return lookPopup(lookId(s), String(s?.['$st_faction'] ?? ''), playerAgent(ctx.char.globalLore, s)?.name ?? '');
+  return lookPopup(lookId(s), playerAgent(ctx.char.globalLore, s)?.name ?? '');
 }
 
 /** 팝업 공통 단추 (닫기·성별·다시 받기). 처리했으면 true. 아바타를 고르는 「look」은 부르는 쪽이 따로 */

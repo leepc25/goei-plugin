@@ -75,12 +75,9 @@ export function itemsPackText() {
   return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
 }
 
-/** 세력 전용 NPC 프리셋: 이름 앞머리 → 시작 세력 코드 (사용자 11-08: 관리국 4·가짜 관리국 6·백일몽 4는 그 세력으로 시작할 때만) */
-const LOOK_FACTION = [['가짜관리국', 'B00'], ['관리국', 'A00'], ['백일몽', 'C00']];
-
-/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, fac, n, w, h, cw, ch, ox, oy, img}] }.
+/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, n, w, h, cw, ch, ox, oy, img}] }.
  *  id = 인물 팩 번호(char-6.54 → '6.54'). 고유 인물(char-1~5)은 명부 이름(cfg.name)으로 찾는다.
- *  성별 g: 일반 NPC(char-6)만 필드 신상표(src/game/world/mobProfiles.json sex). 고유 인물은 고르는 창이 안 열려 성별이 필요 없다(''), fac = 그 세력으로 시작할 때만 고를 수 있는 프리셋의 세력 코드.
+ *  성별 g: 일반 NPC(char-6)만 필드 신상표(src/game/world/mobProfiles.json sex). 고유 인물은 고르는 창이 안 열려 성별이 필요 없다('').
  *  img = 정면 대기 줄(A['50'], 남쪽을 봄) 시트 base64 webp. src/core/looks.ts parseLooksPack 이 읽는 모양 */
 export function looksPackText() {
   const dir = new URL('game-pack/', ROOT);
@@ -102,8 +99,7 @@ export function looksPackText() {
     const unique = !id.startsWith('6.');
     const sex = unique ? '' : profiles[name]?.sex;
     const g = sex === '남' || sex === '여' ? sex : '';
-    const fac = unique ? '' : (LOOK_FACTION.find(([p]) => name.startsWith(p))?.[1] ?? '');
-    looks.push({ id, name, g, unique, fac, n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
+    looks.push({ id, name, g, unique, n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
   }
   return JSON.stringify({ schema: 1, kind: 'looks', looks });
 }

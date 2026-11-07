@@ -16,7 +16,7 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
-import { defaultLook, LOOK_KEY, lookAllowed, lookId } from '../core/looks';
+import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
 import { lookRows, onLooksReady } from '../host/looks';
 import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
@@ -837,9 +837,6 @@ async function handle(action: string, value?: string): Promise<void> {
         }
       }
       draft.faction = f.code;
-      // 세력 전용 아바타(관리국·가짜 관리국·백일몽 직원)는 그 세력일 때만: 세력을 바꾸면 다시 고른다
-      const rows = lookRows();
-      if (draft.look && rows && !lookAllowed(rows, draft.look, f.code)) draft.look = '';
       notice = '';
       return renderPicker();
     }
@@ -1477,7 +1474,7 @@ function body(): string {
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '', draft.faction ?? '')}`;
+      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '')}`;
   }
 }
 
@@ -1533,7 +1530,7 @@ function picker(): string {
   const needLook = !!f && !f.group && !playing;
   // 아바타 기본값: 마지막에 고른 것, 없으면 처음 기본 (2026-11-08 사용자: 매번 고르기 귀찮다)
   const lookRowsNow = lookRows();
-  if (needLook && !draft.look && lookRowsNow && f) draft.look = defaultLook(lookRowsNow, f.code, getPrefs().look);
+  if (needLook && !draft.look && lookRowsNow) draft.look = defaultLook(lookRowsNow, getPrefs().look);
   const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;
