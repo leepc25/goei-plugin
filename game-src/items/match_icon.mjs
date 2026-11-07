@@ -117,6 +117,8 @@ const stem = w => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s') && !w.e
 /** 말 → { words, head, mods, ko, joined } (영어는 끝 s 뗌) */
 function headOf(s) {
   const words = normIcon(s).split(' ').filter(Boolean).map(stem);
+  // 끝에 붙은 번호(봉인 상자 1, 2)는 몸통이 아님
+  while (words.length > 1 && /^\d+$/.test(words[words.length - 1])) words.pop();
   if (!words.length) return null;
   return { words, head: words[words.length - 1], mods: words.slice(0, -1), ko: /[가-힣]/.test(words[words.length - 1]), joined: words.join('') };
 }

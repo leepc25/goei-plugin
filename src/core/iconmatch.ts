@@ -128,6 +128,7 @@ interface Found { file: string; s: number; hit: number; plain: boolean; isRep: n
 
 function headOf(s: string): Head | null {
   const words = normIcon(s).split(' ').filter(Boolean).map(stem);
+  while (words.length > 1 && /^\d+$/.test(words[words.length - 1])) words.pop(); // 끝 번호(봉인 상자 1)는 몸통이 아님
   if (!words.length) return null;
   const head = words[words.length - 1];
   return { words, head, mods: words.slice(0, -1), ko: /[가-힣]/.test(head), joined: words.join('') };
