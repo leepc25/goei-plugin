@@ -122,6 +122,8 @@ export interface Prefs {
   marksSeeded?: boolean;
   /** 종료 알림(보고서가 기록에 저장됐어요)을 이미 띄운 보고서 id (최근 50). 2026-11-05 사용자: 한 번 본 알림이 다시 뜨지 않게 기기에 남긴다 */
   noticedReports?: string[];
+  /** 마지막에 고른 아바타 (인물 팩 번호, 이 기기 공통). 새 채팅 시작 패널에서 기본으로 골라 둔다 (2026-11-08 사용자) */
+  look?: string;
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
   imgPrompt?: string;
   imgNamesOff?: string[];
@@ -204,6 +206,7 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
+  const look = typeof o.look === 'string' && /^\d+\.\d+$/.test(o.look) ? o.look : undefined;
   const wikiSide = o.wikiSide === 'left' ? 'left' : o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
@@ -246,7 +249,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
   return prefs;
 }
 

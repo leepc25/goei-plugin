@@ -1,9 +1,10 @@
 // 아바타 고르기 (2026-11-07~08 사용자): 시작 패널(내 페르소나)과 시작한 뒤가 같은 팝업을 쓴다.
-// 남·여를 고르면 그 성별 일반 NPC 프리셋 + 고른 세력 전용 프리셋이 정면 대기 동작으로 움직이는 격자에서 하나를 꼭 고른다.
+// 남·여를 고르면 그 성별 일반 NPC 프리셋 전부가 정면 대기 동작으로 움직이는 격자에서 하나를 꼭 고른다.
 // 대기 동작은 1배(픽셀 그대로)로 CSS steps 로 돌린다. 고른 것은 이 채팅 변수 $st_look 에 둔다 (core/looks.ts).
 import { LOOK_GENDERS, LOOK_KEY, lookId, looksOf, type LookGender, type LookRow } from '../core/looks';
 import { playerAgent } from '../core/player';
 import { idleOf, looksStatus, lookRows, ensureLooks, type IdleLook } from '../host/looks';
+import { savePrefs } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
@@ -40,10 +41,10 @@ export function lookSprite(look: IdleLook, cls = ''): string {
 const genderOf = (rows: LookRow[] | null, id: string): LookGender | '' => rows?.find((r) => r.id === id)?.g ?? '';
 
 /**
- * 성별 단추 + 아바타 격자. sel = 고른 번호, g = 보고 있는 성별('' 이면 고른 것의 성별), faction = 시작 세력(전용 프리셋 거르기).
+ * 성별 단추 + 아바타 격자. sel = 고른 번호, g = 보고 있는 성별('' 이면 고른 것의 성별).
  * 단추: look-g(성별) · look(아바타) · look-retry(팩 다시 받기)
  */
-function chooser(sel: string, g: LookGender | '', faction: string, withSegs: boolean): string {
+function chooser(sel: string, g: LookGender | '', withSegs: boolean): string {
   const rows = lookRows();
   const shown = g || genderOf(rows, sel);
   const segs = !withSegs ? '' : `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === shown ? ' on' : ''}" data-action="look-g" data-value="${x}" aria-pressed="${x === shown}">${x}</button>`).join('')}</div>`;
@@ -55,17 +56,17 @@ function chooser(sel: string, g: LookGender | '', faction: string, withSegs: boo
     return `${segs}<div class="gx-hint">${msg}</div>`;
   }
   if (!shown) return `${segs}<div class="gx-hint">성별을 고르면 고를 수 있는 아바타가 보여요.</div>`;
-  const cells = looksOf(rows, shown, faction)
+  const cells = looksOf(rows, shown)
     .map((r) => `<button class="gx-whoc gx-lookc${r.id === sel ? ' on' : ''}" data-action="look" data-value="${esc(r.id)}" aria-pressed="${r.id === sel}" aria-label="아바타 ${esc(r.id)}">${lookSprite(idleOf(r))}</button>`)
     .join('');
   return `${segs}<div class="gx-lookg">${cells}</div>`;
 }
 
-/** 아바타 팝업. sel = 지금 고른 번호, faction = 시작 세력, lockedName = 고유 인물로 플레이 중이면 그 이름(고를 수 없음).
+/** 아바타 팝업. sel = 지금 고른 번호, lockedName = 고유 인물로 플레이 중이면 그 이름(고를 수 없음).
  *  g 를 주면(시작 패널에서 성별을 고른 뒤) 그 성별만, 안 주면(시작한 뒤) 팝업 안에 성별 단추 */
-export function lookPopup(sel: string, faction: string, lockedName = '', g: LookGender | '' = ''): string {
+export function lookPopup(sel: string, lockedName = '', g: LookGender | '' = ''): string {
   if (!lookUi.open) return '';
-  const inner = lockedName ? `<p class="gx-hint">${esc(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g || lookUi.g, faction, !g);
+  const inner = lockedName ? `<p class="gx-hint">${esc(lockedName)}(으)로 플레이 중이라 그 인물 모습을 써요.</p>` : chooser(sel, g || lookUi.g, !g);
   return `<div class="gx-agpop gx-lookpop" data-action="look-close" role="dialog" aria-label="아바타"><div class="gx-agpop-card gx-lookpop-card" data-action="look-keep">
     <div class="gx-lookpop-head"><b>아바타</b><button class="gx-x" data-action="look-close" aria-label="닫기">${ICONS.close}</button></div>
     ${inner}${lookUi.notice ? `<div class="gx-err" role="alert">${esc(lookUi.notice)}</div>` : ''}
@@ -76,7 +77,7 @@ export function lookPopup(sel: string, faction: string, lockedName = '', g: Look
 export function chatLookPopup(ctx: ChatContext): string {
   if (!lookUi.open) return '';
   const s = ctx.chat.scriptstate;
-  return lookPopup(lookId(s), String(s?.['$st_faction'] ?? ''), playerAgent(ctx.char.globalLore, s)?.name ?? '');
+  return lookPopup(lookId(s), playerAgent(ctx.char.globalLore, s)?.name ?? '');
 }
 
 /** 팝업 공통 단추 (닫기·성별·다시 받기). 처리했으면 true. 아바타를 고르는 「look」은 부르는 쪽이 따로 */
@@ -111,29 +112,23 @@ export async function lookAction(action: string, value: string | undefined, ctx:
     return null;
   });
   if (saved !== null || !lookUi.notice) lookUi.open = false;
+  // 마지막에 고른 아바타 = 다음 새 채팅 기본
+  await savePrefs((p) => ({ ...p, look: value })).catch(() => {});
   await refresh();
   return true;
 }
 
 /**
- * 시작 패널 「아바타」 단계 (한 줄): 성별 단추(look-sex) + 고른 아바타 얼굴 칸(1배로 움직임, 누르면 그 성별 격자 팝업). 성별 → 아바타 순서로 꼭 고른다.
- * player 를 주면(기존 인물로 시작) 그 인물의 성별·모습이 들어간 채 잠긴다
+ * 시작 패널 「아바타」 단계: 주인공 칸과 같은 크기의 아바타 칸 하나(얼굴 1배로 움직임). 누르면 팝업(맨 위 남·여, 아래 격자)에서 꼭 고른다.
+ * player 를 주면(기존 인물로 시작) 그 인물 모습·성별이 들어간 채 잠긴다
  */
-export function lookStep(sel: string, g: LookGender | '', player = ''): string {
+export function lookStep(sel: string, player = ''): string {
   const rows = lookRows();
-  const own = player && rows ? rows.find((x) => x.unique && x.name === player) : undefined;
-  const r = player ? own : sel && rows ? rows.find((x) => x.id === sel) : undefined;
-  const sex = player ? (own?.g ?? '') : g;
-  const lock = player ? ' disabled' : '';
-  const segs = `<div class="gx-segs">${LOOK_GENDERS.map((x) => `<button class="gx-seg${x === sex ? ' on' : ''}" data-action="look-sex" data-value="${x}" aria-pressed="${x === sex}"${lock}>${x}</button>`).join('')}</div>`;
+  const r = player ? rows?.find((x) => x.unique && x.name === player) : sel ? rows?.find((x) => x.id === sel) : undefined;
   const face = r ? `<span class="gx-ava gx-lookface">${lookSprite(idleOf(r))}</span>` : `<span class="gx-ava"><span>${ICONS.person}</span></span>`;
-  const label = player ? `${esc(player)} 모습` : r ? '바꾸기' : g ? '눌러서 고르기' : '성별을 먼저 골라요';
-  const chip = `<button class="gx-whoc gx-lookchip${r ? ' on' : ''}" data-action="look-open" ${player || !g ? 'disabled' : ''} aria-pressed="${!!r}">${face}<span class="gx-whot"><b>아바타</b><small>${label}</small></span></button>`;
-  return `<div class="gx-lookstep${player ? ' locked' : ''}">${segs}${chip}</div>`;
+  const label = player ? `${player} 모습` : r ? '바꾸기' : '눌러서 고르기';
+  return `<div class="gx-who"><button class="gx-whoc gx-lookchip${r ? ' on' : ''}" data-action="look-open" data-look="${r?.id ?? ''}" ${player ? 'disabled' : ''} aria-pressed="${!!r}">${face}<span class="gx-whot"><b>아바타</b><small>${esc(label)}</small></span></button></div>`;
 }
-
-/** 고른 아바타의 성별 */
-export const lookGender = (id: string): LookGender | '' => genderOf(lookRows(), id);
 
 /** 이 채팅의 대기 동작 (host/looks.ts idleLook). 화면 쪽에서 한 곳에서 가져다 쓰게 */
 export { idleLook } from '../host/looks';
@@ -148,17 +143,10 @@ export const LOOK_CSS = `
 .gx-lookpop-card .gx-segs { align-self: flex-start; }
 .gx-lookpop-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .gx-lookpop-head b { font-size: 16px; }
-.gx-lookstep { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.gx-lookchip { flex: 0 1 220px; min-width: 0; }
-.gx-lookchip:disabled { opacity: .5; cursor: default; }
-.gx-lookstep.locked .gx-lookchip, .gx-lookstep.locked .gx-seg { opacity: .7; cursor: default; }
+.gx-lookchip:disabled { cursor: default; opacity: .75; }
 .gx-lookface { width: 34px; height: 34px; border-radius: 9px; }
 .gx-lookface .gx-look { position: absolute; left: 50%; top: 0; translate: -50% 0; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gx-lookstep { flex-wrap: nowrap; }
-  .gx-lookstep > .gx-segs { flex: none; }
-  .gx-lookstep .gx-seg { min-width: 48px; }
-  .gx-lookchip { flex: 1; }
   .gx-lookg { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
   .gx-lookc { height: 262px; padding: 4px 2px; }
 }

@@ -1,5 +1,4 @@
 // 내 모습 (2026-11-07 사용자): 페르소나로 시작할 때 꼭 고르는 필드 인물 모습 = 일반 NPC 프리셋 하나의 정면(남쪽) 대기 동작.
-// 세력 전용 프리셋(관리국·가짜 관리국·백일몽 직원 그림)은 그 세력으로 시작할 때만 고를 수 있다 (사용자 11-08).
 // 고유 인물로 시작하면 고르지 않고 그 인물 모습. 고른 것은 채팅 변수 $st_look(인물 팩 번호, 예 '6.54')에 둔다.
 // 성별은 격자를 거르는 데만 쓰고 본편 모델에 넘기지 않는다 (사용자: 페르소나 시트에 이미 있다).
 // 그림·측정값은 내 모습 팩(scripts/data-pack.mjs looksPackText)에서 온다. 여기는 순수 계산.
@@ -23,11 +22,9 @@ export interface LookRow {
   id: string;
   /** 프리셋 이름(시민남3) 또는 고유 인물 이름(에일린) */
   name: string;
-  /** 성별 (일반 NPC = 필드 신상표, 고유 인물 = 세계 자료) */
+  /** 일반 NPC 성별 (필드 신상표). 고유 인물은 '' */
   g: LookGender | '';
   unique: boolean;
-  /** 이 세력으로 시작할 때만 고를 수 있는 프리셋이면 그 세력 코드 ('' = 누구나) */
-  fac: string;
   /** 장 수 */
   n: number;
   /** 원래 칸 크기 (128×256) */
@@ -38,6 +35,8 @@ export interface LookRow {
   ch: number;
   ox: number;
   oy: number;
+  /** 장 하나 길이 (초) */
+  sec: number;
   /** 정면 대기 줄 시트 base64 webp (가로로 n장, 장마다 cw×ch) */
   img: string;
 }
@@ -60,7 +59,7 @@ export function parseLooksPack(text: string): LookRow[] {
     const n = num(r.n), cw = num(r.cw), ch = num(r.ch);
     if (!(n >= 1 && cw > 0 && ch > 0)) continue;
     const g = r.g === '남' || r.g === '여' ? r.g : '';
-    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, fac: typeof r.fac === 'string' ? r.fac : '', n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, img: r.img });
+    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, sec: num(r.sec) > 0 ? num(r.sec) : LOOK_FRAME_SEC, img: r.img });
   }
   return out;
 }
@@ -71,11 +70,18 @@ export const lookId = (state: ScriptState | Record<string, unknown> | undefined)
   return /^\d+\.\d+$/.test(v) ? v : '';
 };
 
-/** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 + 그 세력 전용 프리셋 (팩 순서 그대로) */
-export const looksOf = (rows: LookRow[], g: LookGender, faction: string): LookRow[] => rows.filter((r) => !r.unique && r.g === g && (!r.fac || r.fac === faction));
+/** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 (팩 순서 그대로, 세력 구분 없음 — 2026-11-08 사용자) */
+export const looksOf = (rows: LookRow[], g: LookGender): LookRow[] => rows.filter((r) => !r.unique && r.g === g);
 
-/** 이 세력으로 시작할 때 고를 수 있는 모습인가 */
-export const lookAllowed = (rows: LookRow[], id: string, faction: string): boolean => rows.some((r) => r.id === id && !r.unique && !!r.g && (!r.fac || r.fac === faction));
+/** 한 번도 고른 적 없을 때 기본 아바타 (2026-11-08 사용자: PixelLab 페르소나 여자 A) */
+export const LOOK_FIRST = '페르소나여A';
+
+/** 시작 패널 기본 아바타: 마지막에 고른 것 → 처음 기본 */
+export function defaultLook(rows: LookRow[], last: string | undefined): string {
+  if (last && rows.some((r) => r.id === last && !r.unique && !!r.g)) return last;
+  return rows.find((r) => !r.unique && r.name === LOOK_FIRST)?.id ?? '';
+}
+
 
 /**
  * 이 채팅의 플레이 인물 모습: 고유 인물로 플레이하면 그 인물(명부 이름으로 찾음), 아니면 고른 프리셋. 없으면 undefined
