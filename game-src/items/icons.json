@@ -1,5 +1,5 @@
 {
-"note": "소지품 그림 매칭 표(11-07). 긴 키워드 먼저. base=종류 기본 그림(목록에 없으면 이 그림). 그림 85×85 배경 없음. 다시 뽑을 후보는 docs/인계/소지품_그림_결과_점검_1107.md",
+"note": "소지품 그림 매칭 표(11-07). 긴 키워드 먼저. base=종류 기본 그림(목록에 없으면 이 그림). 그림 85×85 배경 없음. 다시 뽑을 후보는 docs/인계/소지품_그림_결과_점검_1107.md merged_into=같은 물건이라 대표 그림을 씀(own_file은 원래 뽑은 그림, 지우지 않음).",
 "icons": [
 {
 "keywords": [
@@ -467,7 +467,8 @@
 },
 {
 "keywords": [
-"고출력 헤드램프"
+"고출력 헤드램프",
+"헤드랜턴"
 ],
 "file": "device_019.png",
 "kind": "device",
@@ -984,11 +985,13 @@
 "keywords": [
 "무대용 마이크"
 ],
-"file": "device_022.png",
+"file": "tool_026.png",
 "kind": "device",
 "base": false,
 "name": "무대용 마이크",
-"src": "game-src/items/raw/batch_22/11.png"
+"src": "game-src/items/raw/batch_22/11.png",
+"merged_into": "마이크",
+"own_file": "device_022.png"
 },
 {
 "keywords": [
@@ -1374,11 +1377,13 @@
 "keywords": [
 "오래된 오르골"
 ],
-"file": "anomaly_068.png",
+"file": "seal_047.png",
 "kind": "anomaly",
 "base": false,
 "name": "오래된 오르골",
-"src": "game-src/items/raw/batch_55/10.png"
+"src": "game-src/items/raw/batch_55/10.png",
+"merged_into": "오르골",
+"own_file": "anomaly_068.png"
 },
 {
 "keywords": [
@@ -1434,11 +1439,13 @@
 "keywords": [
 "AAA 건전지"
 ],
-"file": "consumable_009.png",
+"file": "consumable_001.png",
 "kind": "consumable",
 "base": false,
 "name": "AAA 건전지",
-"src": "game-src/items/raw/batch_60/02.png"
+"src": "game-src/items/raw/batch_60/02.png",
+"merged_into": "건전지",
+"own_file": "consumable_009.png"
 },
 {
 "keywords": [
@@ -1489,6 +1496,40 @@
 "base": false,
 "name": "에어컨 리모컨",
 "src": "game-src/items/raw/batch_66/13.png"
+},
+{
+"keywords": [
+"건전지",
+"AAA 건전지"
+],
+"file": "consumable_001.png",
+"kind": "consumable",
+"base": true,
+"name": "건전지",
+"src": "game-src/items/raw/batch_01/13.png"
+},
+{
+"keywords": [
+"마이크",
+"무선 마이크",
+"무대용 마이크"
+],
+"file": "tool_026.png",
+"kind": "tool",
+"base": false,
+"name": "마이크",
+"src": "game-src/items/raw/batch_16/09.png"
+},
+{
+"keywords": [
+"오르골",
+"오래된 오르골"
+],
+"file": "seal_047.png",
+"kind": "seal",
+"base": false,
+"name": "오르골",
+"src": "game-src/items/raw/batch_51/05.png"
 },
 {
 "keywords": [
@@ -1725,11 +1766,13 @@
 "keywords": [
 "절연 테이프"
 ],
-"file": "tool_043.png",
+"file": "tool_004.png",
 "kind": "tool",
 "base": false,
 "name": "절연 테이프",
-"src": "game-src/items/raw/batch_17/10.png"
+"src": "game-src/items/raw/batch_17/10.png",
+"merged_into": "테이프",
+"own_file": "tool_043.png"
 },
 {
 "keywords": [
@@ -1867,11 +1910,13 @@
 "keywords": [
 "무선 마이크"
 ],
-"file": "device_069.png",
+"file": "tool_026.png",
 "kind": "device",
 "base": false,
 "name": "무선 마이크",
-"src": "game-src/items/raw/batch_25/10.png"
+"src": "game-src/items/raw/batch_25/10.png",
+"merged_into": "마이크",
+"own_file": "device_069.png"
 },
 {
 "keywords": [
@@ -1898,11 +1943,13 @@
 "성경책 낡은",
 "성경책"
 ],
-"file": "charm_017.png",
+"file": "paper_014.png",
 "kind": "charm",
 "base": false,
 "name": "성경책(낡은)",
-"src": "game-src/items/raw/batch_26/13.png"
+"src": "game-src/items/raw/batch_26/13.png",
+"merged_into": "성경",
+"own_file": "charm_017.png"
 },
 {
 "keywords": [
@@ -1946,7 +1993,9 @@
 },
 {
 "keywords": [
-"소금 한 줌"
+"소금 한 줌",
+"소금",
+"소금 봉지"
 ],
 "file": "charm_032.png",
 "kind": "charm",
@@ -1986,7 +2035,8 @@
 },
 {
 "keywords": [
-"라텍스 장갑"
+"라텍스 장갑",
+"비닐장갑"
 ],
 "file": "medical_033.png",
 "kind": "medical",
@@ -1999,11 +2049,13 @@
 "마스크 의료",
 "마스크"
 ],
-"file": "medical_034.png",
+"file": "wear_007.png",
 "kind": "medical",
 "base": false,
 "name": "마스크(의료)",
-"src": "game-src/items/raw/batch_31/11.png"
+"src": "game-src/items/raw/batch_31/11.png",
+"merged_into": "마스크",
+"own_file": "medical_034.png"
 },
 {
 "keywords": [
@@ -2328,7 +2380,8 @@
 },
 {
 "keywords": [
-"트럼프 카드"
+"트럼프 카드",
+"트럼프"
 ],
 "file": "anomaly_043.png",
 "kind": "anomaly",
@@ -2441,11 +2494,13 @@
 "keywords": [
 "다이아 반지"
 ],
-"file": "valuable_015.png",
+"file": "valuable_001.png",
 "kind": "valuable",
 "base": false,
 "name": "다이아 반지",
-"src": "game-src/items/raw/batch_58/08.png"
+"src": "game-src/items/raw/batch_58/08.png",
+"merged_into": "반지",
+"own_file": "valuable_015.png"
 },
 {
 "keywords": [
@@ -2503,15 +2558,18 @@
 "탄띠 기관총",
 "탄띠"
 ],
-"file": "consumable_016.png",
+"file": "wear_079.png",
 "kind": "consumable",
 "base": false,
 "name": "탄띠(기관총)",
-"src": "game-src/items/raw/batch_60/09.png"
+"src": "game-src/items/raw/batch_60/09.png",
+"merged_into": "탄띠",
+"own_file": "consumable_016.png"
 },
 {
 "keywords": [
-"성냥 한 갑"
+"성냥 한 갑",
+"성냥갑"
 ],
 "file": "consumable_021.png",
 "kind": "consumable",
@@ -2581,6 +2639,63 @@
 },
 {
 "keywords": [
+"마스크",
+"마스크 의료"
+],
+"file": "wear_007.png",
+"kind": "wear",
+"base": false,
+"name": "마스크",
+"src": "game-src/items/raw/batch_09/08.png"
+},
+{
+"keywords": [
+"테이프",
+"청테이프",
+"절연 테이프"
+],
+"file": "tool_004.png",
+"kind": "tool",
+"base": false,
+"name": "테이프",
+"src": "game-src/items/raw/batch_15/03.png"
+},
+{
+"keywords": [
+"반지",
+"다이아 반지"
+],
+"file": "valuable_001.png",
+"kind": "valuable",
+"base": true,
+"name": "반지",
+"src": "game-src/items/raw/batch_03/06.png"
+},
+{
+"keywords": [
+"탄띠",
+"탄띠 기관총"
+],
+"file": "wear_079.png",
+"kind": "wear",
+"base": false,
+"name": "탄띠",
+"src": "game-src/items/raw/batch_13/16.png"
+},
+{
+"keywords": [
+"성경",
+"성경책 낡은",
+"성경책"
+],
+"file": "paper_014.png",
+"kind": "paper",
+"base": false,
+"name": "성경",
+"src": "game-src/items/raw/batch_41/05.png"
+},
+{
+"keywords": [
 "접이식 칼"
 ],
 "file": "weapon_001.png",
@@ -2601,7 +2716,8 @@
 },
 {
 "keywords": [
-"낡은 열쇠"
+"낡은 열쇠",
+"녹슨 열쇠"
 ],
 "file": "key_001.png",
 "kind": "key",
@@ -2813,11 +2929,13 @@
 "keywords": [
 "돋보기안경"
 ],
-"file": "wear_017.png",
+"file": "wear_087.png",
 "kind": "wear",
 "base": false,
 "name": "돋보기안경",
-"src": "game-src/items/raw/batch_10/02.png"
+"src": "game-src/items/raw/batch_10/02.png",
+"merged_into": "안경",
+"own_file": "wear_017.png"
 },
 {
 "keywords": [
@@ -3034,11 +3152,13 @@
 "부채 도구",
 "부채"
 ],
-"file": "tool_060.png",
+"file": "misc_058.png",
 "kind": "tool",
 "base": false,
 "name": "부채(도구)",
-"src": "game-src/items/raw/batch_18/11.png"
+"src": "game-src/items/raw/batch_18/11.png",
+"merged_into": "부채(여름)",
+"own_file": "tool_060.png"
 },
 {
 "keywords": [
@@ -3154,11 +3274,13 @@
 "keywords": [
 "소금 봉지"
 ],
-"file": "charm_008.png",
+"file": "charm_032.png",
 "kind": "charm",
 "base": false,
 "name": "소금 봉지",
-"src": "game-src/items/raw/batch_26/04.png"
+"src": "game-src/items/raw/batch_26/04.png",
+"merged_into": "소금 한 줌",
+"own_file": "charm_008.png"
 },
 {
 "keywords": [
@@ -3185,11 +3307,13 @@
 "부채 무당",
 "부채"
 ],
-"file": "charm_028.png",
+"file": "charm_060.png",
 "kind": "charm",
 "base": false,
 "name": "부채(무당)",
-"src": "game-src/items/raw/batch_27/08.png"
+"src": "game-src/items/raw/batch_27/08.png",
+"merged_into": "굿 부채",
+"own_file": "charm_028.png"
 },
 {
 "keywords": [
@@ -3366,11 +3490,13 @@
 "keywords": [
 "생수 2L"
 ],
-"file": "food_032.png",
+"file": "food_001.png",
 "kind": "food",
 "base": false,
 "name": "생수 2L",
-"src": "game-src/items/raw/batch_35/06.png"
+"src": "game-src/items/raw/batch_35/06.png",
+"merged_into": "생수",
+"own_file": "food_032.png"
 },
 {
 "keywords": [
@@ -3627,11 +3753,13 @@
 "keywords": [
 "자동차 키"
 ],
-"file": "key_017.png",
+"file": "key_006.png",
 "kind": "key",
 "base": false,
 "name": "자동차 키",
-"src": "game-src/items/raw/batch_47/03.png"
+"src": "game-src/items/raw/batch_47/03.png",
+"merged_into": "차 키",
+"own_file": "key_017.png"
 },
 {
 "keywords": [
@@ -3667,11 +3795,13 @@
 "keywords": [
 "녹슨 열쇠"
 ],
-"file": "key_023.png",
+"file": "key_001.png",
 "kind": "key",
 "base": false,
 "name": "녹슨 열쇠",
-"src": "game-src/items/raw/batch_47/09.png"
+"src": "game-src/items/raw/batch_47/09.png",
+"merged_into": "낡은 열쇠",
+"own_file": "key_023.png"
 },
 {
 "keywords": [
@@ -3687,11 +3817,13 @@
 "keywords": [
 "보안 카드"
 ],
-"file": "key_027.png",
+"file": "key_003.png",
 "kind": "key",
 "base": false,
 "name": "보안 카드",
-"src": "game-src/items/raw/batch_47/13.png"
+"src": "game-src/items/raw/batch_47/13.png",
+"merged_into": "카드키",
+"own_file": "key_027.png"
 },
 {
 "keywords": [
@@ -4008,11 +4140,13 @@
 "keywords": [
 "명품 지갑"
 ],
-"file": "valuable_010.png",
+"file": "valuable_011.png",
 "kind": "valuable",
 "base": false,
 "name": "명품 지갑",
-"src": "game-src/items/raw/batch_58/03.png"
+"src": "game-src/items/raw/batch_58/03.png",
+"merged_into": "지갑",
+"own_file": "valuable_010.png"
 },
 {
 "keywords": [
@@ -4107,7 +4241,8 @@
 },
 {
 "keywords": [
-"마대 자루"
+"마대 자루",
+"자루"
 ],
 "file": "consumable_049.png",
 "kind": "consumable",
@@ -4119,11 +4254,13 @@
 "keywords": [
 "노끈 뭉치"
 ],
-"file": "consumable_050.png",
+"file": "tool_014.png",
 "kind": "consumable",
 "base": false,
 "name": "노끈 뭉치",
-"src": "game-src/items/raw/batch_62/11.png"
+"src": "game-src/items/raw/batch_62/11.png",
+"merged_into": "노끈",
+"own_file": "consumable_050.png"
 },
 {
 "keywords": [
@@ -4178,7 +4315,8 @@
 {
 "keywords": [
 "인형 평범",
-"인형"
+"인형",
+"봉제 인형"
 ],
 "file": "misc_005.png",
 "kind": "misc",
@@ -4190,11 +4328,13 @@
 "keywords": [
 "봉제 인형"
 ],
-"file": "misc_018.png",
+"file": "misc_005.png",
 "kind": "misc",
 "base": false,
 "name": "봉제 인형",
-"src": "game-src/items/raw/batch_64/03.png"
+"src": "game-src/items/raw/batch_64/03.png",
+"merged_into": "인형(평범)",
+"own_file": "misc_018.png"
 },
 {
 "keywords": [
@@ -4259,7 +4399,8 @@
 {
 "keywords": [
 "부채 여름",
-"부채"
+"부채",
+"부채 도구"
 ],
 "file": "misc_058.png",
 "kind": "misc",
@@ -4276,6 +4417,85 @@
 "base": false,
 "name": "휠 캐리어",
 "src": "game-src/items/raw/batch_68/08.png"
+},
+{
+"keywords": [
+"굿 부채",
+"부채 무당",
+"부채"
+],
+"file": "charm_060.png",
+"kind": "charm",
+"base": false,
+"name": "굿 부채",
+"src": "game-src/items/raw/batch_29/08.png"
+},
+{
+"keywords": [
+"카드키",
+"보안 카드"
+],
+"file": "key_003.png",
+"kind": "key",
+"base": false,
+"name": "카드키",
+"src": "game-src/items/raw/batch_46/05.png"
+},
+{
+"keywords": [
+"차 키",
+"자동차 키"
+],
+"file": "key_006.png",
+"kind": "key",
+"base": false,
+"name": "차 키",
+"src": "game-src/items/raw/batch_46/08.png"
+},
+{
+"keywords": [
+"생수",
+"생수 2L"
+],
+"file": "food_001.png",
+"kind": "food",
+"base": true,
+"name": "생수",
+"src": "game-src/items/raw/batch_03/03.png"
+},
+{
+"keywords": [
+"안경",
+"돋보기안경"
+],
+"file": "wear_087.png",
+"kind": "wear",
+"base": false,
+"name": "안경",
+"src": "game-src/items/raw/batch_14/08.png"
+},
+{
+"keywords": [
+"노끈",
+"노끈 뭉치",
+"줄"
+],
+"file": "tool_014.png",
+"kind": "tool",
+"base": false,
+"name": "노끈",
+"src": "game-src/items/raw/batch_15/13.png"
+},
+{
+"keywords": [
+"지갑",
+"명품 지갑"
+],
+"file": "valuable_011.png",
+"kind": "valuable",
+"base": false,
+"name": "지갑",
+"src": "game-src/items/raw/batch_58/04.png"
 },
 {
 "keywords": [
@@ -4491,11 +4711,13 @@
 "keywords": [
 "청테이프"
 ],
-"file": "tool_042.png",
+"file": "tool_004.png",
 "kind": "tool",
 "base": false,
 "name": "청테이프",
-"src": "game-src/items/raw/batch_17/09.png"
+"src": "game-src/items/raw/batch_17/09.png",
+"merged_into": "테이프",
+"own_file": "tool_042.png"
 },
 {
 "keywords": [
@@ -4571,11 +4793,13 @@
 "keywords": [
 "헤드랜턴"
 ],
-"file": "device_013.png",
+"file": "device_019.png",
 "kind": "device",
 "base": false,
 "name": "헤드랜턴",
-"src": "game-src/items/raw/batch_22/02.png"
+"src": "game-src/items/raw/batch_22/02.png",
+"merged_into": "고출력 헤드램프",
+"own_file": "device_013.png"
 },
 {
 "keywords": [
@@ -4641,11 +4865,13 @@
 "keywords": [
 "팥 봉지"
 ],
-"file": "charm_009.png",
+"file": "charm_031.png",
 "kind": "charm",
 "base": false,
 "name": "팥 봉지",
-"src": "game-src/items/raw/batch_26/05.png"
+"src": "game-src/items/raw/batch_26/05.png",
+"merged_into": "팥",
+"own_file": "charm_009.png"
 },
 {
 "keywords": [
@@ -4676,16 +4902,6 @@
 "base": false,
 "name": "드림캐처",
 "src": "game-src/items/raw/batch_28/12.png"
-},
-{
-"keywords": [
-"굿 부채"
-],
-"file": "charm_060.png",
-"kind": "charm",
-"base": false,
-"name": "굿 부채",
-"src": "game-src/items/raw/batch_29/08.png"
 },
 {
 "keywords": [
@@ -4901,15 +5117,19 @@
 "keywords": [
 "법인카드"
 ],
-"file": "key_009.png",
+"file": "key_010.png",
 "kind": "key",
 "base": false,
 "name": "법인카드",
-"src": "game-src/items/raw/batch_46/11.png"
+"src": "game-src/items/raw/batch_46/11.png",
+"merged_into": "신용카드",
+"own_file": "key_009.png"
 },
 {
 "keywords": [
-"신용카드"
+"신용카드",
+"체크카드",
+"법인카드"
 ],
 "file": "key_010.png",
 "kind": "key",
@@ -4921,11 +5141,13 @@
 "keywords": [
 "체크카드"
 ],
-"file": "key_011.png",
+"file": "key_010.png",
 "kind": "key",
 "base": false,
 "name": "체크카드",
-"src": "game-src/items/raw/batch_46/13.png"
+"src": "game-src/items/raw/batch_46/13.png",
+"merged_into": "신용카드",
+"own_file": "key_011.png"
 },
 {
 "keywords": [
@@ -5011,11 +5233,13 @@
 "keywords": [
 "종이봉투"
 ],
-"file": "seal_028.png",
+"file": "seal_027.png",
 "kind": "seal",
 "base": false,
 "name": "종이봉투",
-"src": "game-src/items/raw/batch_50/02.png"
+"src": "game-src/items/raw/batch_50/02.png",
+"merged_into": "쇼핑백",
+"own_file": "seal_028.png"
 },
 {
 "keywords": [
@@ -5042,11 +5266,13 @@
 "보틀 빈",
 "보틀"
 ],
-"file": "seal_043.png",
+"file": "misc_043.png",
 "kind": "seal",
 "base": false,
 "name": "보틀(빈)",
-"src": "game-src/items/raw/batch_51/01.png"
+"src": "game-src/items/raw/batch_51/01.png",
+"merged_into": "빈 병",
+"own_file": "seal_043.png"
 },
 {
 "keywords": [
@@ -5122,11 +5348,13 @@
 "keywords": [
 "사파이어"
 ],
-"file": "valuable_018.png",
+"file": "valuable_004.png",
 "kind": "valuable",
 "base": false,
 "name": "사파이어",
-"src": "game-src/items/raw/batch_58/11.png"
+"src": "game-src/items/raw/batch_58/11.png",
+"merged_into": "보석",
+"own_file": "valuable_018.png"
 },
 {
 "keywords": [
@@ -5172,11 +5400,13 @@
 "keywords": [
 "비닐장갑"
 ],
-"file": "consumable_047.png",
+"file": "medical_033.png",
 "kind": "consumable",
 "base": false,
 "name": "비닐장갑",
-"src": "game-src/items/raw/batch_62/08.png"
+"src": "game-src/items/raw/batch_62/08.png",
+"merged_into": "라텍스 장갑",
+"own_file": "consumable_047.png"
 },
 {
 "keywords": [
@@ -5281,6 +5511,51 @@
 },
 {
 "keywords": [
+"쇼핑백",
+"종이봉투"
+],
+"file": "seal_027.png",
+"kind": "seal",
+"base": false,
+"name": "쇼핑백",
+"src": "game-src/items/raw/batch_50/01.png"
+},
+{
+"keywords": [
+"빈 병",
+"보틀 빈",
+"보틀"
+],
+"file": "misc_043.png",
+"kind": "misc",
+"base": false,
+"name": "빈 병",
+"src": "game-src/items/raw/batch_65/12.png"
+},
+{
+"keywords": [
+"보석",
+"사파이어"
+],
+"file": "valuable_004.png",
+"kind": "valuable",
+"base": false,
+"name": "보석",
+"src": "game-src/items/raw/batch_57/13.png"
+},
+{
+"keywords": [
+"팥",
+"팥 봉지"
+],
+"file": "charm_031.png",
+"kind": "charm",
+"base": false,
+"name": "팥",
+"src": "game-src/items/raw/batch_27/11.png"
+},
+{
+"keywords": [
 "무전기"
 ],
 "file": "device_001.png",
@@ -5298,16 +5573,6 @@
 "base": true,
 "name": "구급함",
 "src": "game-src/items/raw/batch_01/06.png"
-},
-{
-"keywords": [
-"건전지"
-],
-"file": "consumable_001.png",
-"kind": "consumable",
-"base": true,
-"name": "건전지",
-"src": "game-src/items/raw/batch_01/13.png"
 },
 {
 "keywords": [
@@ -5433,15 +5698,19 @@
 "keywords": [
 "삼단봉"
 ],
-"file": "weapon_045.png",
+"file": "weapon_046.png",
 "kind": "weapon",
 "base": false,
 "name": "삼단봉",
-"src": "game-src/items/raw/batch_06/02.png"
+"src": "game-src/items/raw/batch_06/02.png",
+"merged_into": "경찰봉",
+"own_file": "weapon_045.png"
 },
 {
 "keywords": [
-"경찰봉"
+"경찰봉",
+"진압봉",
+"삼단봉"
 ],
 "file": "weapon_046.png",
 "kind": "weapon",
@@ -5453,11 +5722,13 @@
 "keywords": [
 "진압봉"
 ],
-"file": "weapon_047.png",
+"file": "weapon_046.png",
 "kind": "weapon",
 "base": false,
 "name": "진압봉",
-"src": "game-src/items/raw/batch_06/04.png"
+"src": "game-src/items/raw/batch_06/04.png",
+"merged_into": "경찰봉",
+"own_file": "weapon_047.png"
 },
 {
 "keywords": [
@@ -5568,16 +5839,6 @@
 "base": false,
 "name": "안전모",
 "src": "game-src/items/raw/batch_09/07.png"
-},
-{
-"keywords": [
-"마스크"
-],
-"file": "wear_007.png",
-"kind": "wear",
-"base": false,
-"name": "마스크",
-"src": "game-src/items/raw/batch_09/08.png"
 },
 {
 "keywords": [
@@ -5781,17 +6042,8 @@
 },
 {
 "keywords": [
-"테이프"
-],
-"file": "tool_004.png",
-"kind": "tool",
-"base": false,
-"name": "테이프",
-"src": "game-src/items/raw/batch_15/03.png"
-},
-{
-"keywords": [
-"쇠지레"
+"쇠지레",
+"빠루"
 ],
 "file": "tool_005.png",
 "kind": "tool",
@@ -5878,16 +6130,6 @@
 "base": false,
 "name": "파리채",
 "src": "game-src/items/raw/batch_16/07.png"
-},
-{
-"keywords": [
-"마이크"
-],
-"file": "tool_026.png",
-"kind": "tool",
-"base": false,
-"name": "마이크",
-"src": "game-src/items/raw/batch_16/09.png"
 },
 {
 "keywords": [
@@ -5983,11 +6225,13 @@
 "keywords": [
 "성냥갑"
 ],
-"file": "tool_061.png",
+"file": "consumable_021.png",
 "kind": "tool",
 "base": false,
 "name": "성냥갑",
-"src": "game-src/items/raw/batch_18/12.png"
+"src": "game-src/items/raw/batch_18/12.png",
+"merged_into": "성냥 한 갑",
+"own_file": "tool_061.png"
 },
 {
 "keywords": [
@@ -6393,11 +6637,13 @@
 "keywords": [
 "은 종"
 ],
-"file": "charm_054.png",
+"file": "charm_011.png",
 "kind": "charm",
 "base": false,
 "name": "은 종",
-"src": "game-src/items/raw/batch_29/02.png"
+"src": "game-src/items/raw/batch_29/02.png",
+"merged_into": "종",
+"own_file": "charm_054.png"
 },
 {
 "keywords": [
@@ -6863,11 +7109,13 @@
 "keywords": [
 "날고기"
 ],
-"file": "food_088.png",
+"file": "food_086.png",
 "kind": "food",
 "base": false,
 "name": "날고기",
-"src": "game-src/items/raw/batch_38/14.png"
+"src": "game-src/items/raw/batch_38/14.png",
+"merged_into": "고기",
+"own_file": "food_088.png"
 },
 {
 "keywords": [
@@ -7201,17 +7449,9 @@
 },
 {
 "keywords": [
-"카드키"
-],
-"file": "key_003.png",
-"kind": "key",
-"base": false,
-"name": "카드키",
-"src": "game-src/items/raw/batch_46/05.png"
-},
-{
-"keywords": [
-"사원증"
+"사원증",
+"출입증",
+"방문증"
 ],
 "file": "key_004.png",
 "kind": "key",
@@ -7223,31 +7463,25 @@
 "keywords": [
 "출입증"
 ],
-"file": "key_005.png",
+"file": "key_004.png",
 "kind": "key",
 "base": false,
 "name": "출입증",
-"src": "game-src/items/raw/batch_46/07.png"
-},
-{
-"keywords": [
-"차 키"
-],
-"file": "key_006.png",
-"kind": "key",
-"base": false,
-"name": "차 키",
-"src": "game-src/items/raw/batch_46/08.png"
+"src": "game-src/items/raw/batch_46/07.png",
+"merged_into": "사원증",
+"own_file": "key_005.png"
 },
 {
 "keywords": [
 "방문증"
 ],
-"file": "key_028.png",
+"file": "key_004.png",
 "kind": "key",
 "base": false,
 "name": "방문증",
-"src": "game-src/items/raw/batch_47/14.png"
+"src": "game-src/items/raw/batch_47/14.png",
+"merged_into": "사원증",
+"own_file": "key_028.png"
 },
 {
 "keywords": [
@@ -7311,16 +7545,6 @@
 },
 {
 "keywords": [
-"쇼핑백"
-],
-"file": "seal_027.png",
-"kind": "seal",
-"base": false,
-"name": "쇼핑백",
-"src": "game-src/items/raw/batch_50/01.png"
-},
-{
-"keywords": [
 "보자기"
 ],
 "file": "seal_029.png",
@@ -7378,16 +7602,6 @@
 "base": false,
 "name": "보석함",
 "src": "game-src/items/raw/batch_51/04.png"
-},
-{
-"keywords": [
-"오르골"
-],
-"file": "seal_047.png",
-"kind": "seal",
-"base": false,
-"name": "오르골",
-"src": "game-src/items/raw/batch_51/05.png"
 },
 {
 "keywords": [
@@ -7521,7 +7735,8 @@
 },
 {
 "keywords": [
-"연료통"
+"연료통",
+"휘발유"
 ],
 "file": "consumable_017.png",
 "kind": "consumable",
@@ -7533,11 +7748,13 @@
 "keywords": [
 "휘발유"
 ],
-"file": "consumable_018.png",
+"file": "consumable_017.png",
 "kind": "consumable",
 "base": false,
 "name": "휘발유",
-"src": "game-src/items/raw/batch_60/11.png"
+"src": "game-src/items/raw/batch_60/11.png",
+"merged_into": "연료통",
+"own_file": "consumable_018.png"
 },
 {
 "keywords": [
@@ -7733,11 +7950,13 @@
 "keywords": [
 "트럼프"
 ],
-"file": "misc_029.png",
+"file": "anomaly_043.png",
 "kind": "misc",
 "base": false,
 "name": "트럼프",
-"src": "game-src/items/raw/batch_64/14.png"
+"src": "game-src/items/raw/batch_64/14.png",
+"merged_into": "트럼프 카드",
+"own_file": "misc_029.png"
 },
 {
 "keywords": [
@@ -7778,16 +7997,6 @@
 "base": false,
 "name": "조약돌",
 "src": "game-src/items/raw/batch_65/08.png"
-},
-{
-"keywords": [
-"빈 병"
-],
-"file": "misc_043.png",
-"kind": "misc",
-"base": false,
-"name": "빈 병",
-"src": "game-src/items/raw/batch_65/12.png"
 },
 {
 "keywords": [
@@ -7951,6 +8160,28 @@
 },
 {
 "keywords": [
+"고기",
+"날고기"
+],
+"file": "food_086.png",
+"kind": "food",
+"base": false,
+"name": "고기",
+"src": "game-src/items/raw/batch_38/12.png"
+},
+{
+"keywords": [
+"종",
+"은 종"
+],
+"file": "charm_011.png",
+"kind": "charm",
+"base": false,
+"name": "종",
+"src": "game-src/items/raw/batch_26/07.png"
+},
+{
+"keywords": [
 "권총"
 ],
 "file": "weapon_002.png",
@@ -7968,26 +8199,6 @@
 "base": true,
 "name": "부적",
 "src": "game-src/items/raw/batch_03/02.png"
-},
-{
-"keywords": [
-"생수"
-],
-"file": "food_001.png",
-"kind": "food",
-"base": true,
-"name": "생수",
-"src": "game-src/items/raw/batch_03/03.png"
-},
-{
-"keywords": [
-"반지"
-],
-"file": "valuable_001.png",
-"kind": "valuable",
-"base": true,
-"name": "반지",
-"src": "game-src/items/raw/batch_03/06.png"
 },
 {
 "keywords": [
@@ -8411,16 +8622,6 @@
 },
 {
 "keywords": [
-"탄띠"
-],
-"file": "wear_079.png",
-"kind": "wear",
-"base": false,
-"name": "탄띠",
-"src": "game-src/items/raw/batch_13/16.png"
-},
-{
-"keywords": [
 "팔찌"
 ],
 "file": "wear_086.png",
@@ -8428,16 +8629,6 @@
 "base": false,
 "name": "팔찌",
 "src": "game-src/items/raw/batch_14/07.png"
-},
-{
-"keywords": [
-"안경"
-],
-"file": "wear_087.png",
-"kind": "wear",
-"base": false,
-"name": "안경",
-"src": "game-src/items/raw/batch_14/08.png"
 },
 {
 "keywords": [
@@ -8488,16 +8679,6 @@
 "base": false,
 "name": "성냥",
 "src": "game-src/items/raw/batch_15/09.png"
-},
-{
-"keywords": [
-"노끈"
-],
-"file": "tool_014.png",
-"kind": "tool",
-"base": false,
-"name": "노끈",
-"src": "game-src/items/raw/batch_15/13.png"
 },
 {
 "keywords": [
@@ -8723,11 +8904,13 @@
 "keywords": [
 "빠루"
 ],
-"file": "tool_100.png",
+"file": "tool_005.png",
 "kind": "tool",
 "base": false,
 "name": "빠루",
-"src": "game-src/items/raw/batch_21/03.png"
+"src": "game-src/items/raw/batch_21/03.png",
+"merged_into": "쇠지레",
+"own_file": "tool_100.png"
 },
 {
 "keywords": [
@@ -9181,7 +9364,8 @@
 },
 {
 "keywords": [
-"꿀병"
+"꿀병",
+"꿀"
 ],
 "file": "food_022.png",
 "kind": "food",
@@ -9441,16 +9625,6 @@
 },
 {
 "keywords": [
-"고기"
-],
-"file": "food_086.png",
-"kind": "food",
-"base": false,
-"name": "고기",
-"src": "game-src/items/raw/batch_38/12.png"
-},
-{
-"keywords": [
 "생선"
 ],
 "file": "food_087.png",
@@ -9463,11 +9637,13 @@
 "keywords": [
 "소금"
 ],
-"file": "food_089.png",
+"file": "charm_032.png",
 "kind": "food",
 "base": false,
 "name": "소금",
-"src": "game-src/items/raw/batch_38/15.png"
+"src": "game-src/items/raw/batch_38/15.png",
+"merged_into": "소금 한 줌",
+"own_file": "food_089.png"
 },
 {
 "keywords": [
@@ -9598,16 +9774,6 @@
 "base": false,
 "name": "신문",
 "src": "game-src/items/raw/batch_41/01.png"
-},
-{
-"keywords": [
-"성경"
-],
-"file": "paper_014.png",
-"kind": "paper",
-"base": false,
-"name": "성경",
-"src": "game-src/items/raw/batch_41/05.png"
 },
 {
 "keywords": [
@@ -9773,11 +9939,13 @@
 "keywords": [
 "자루"
 ],
-"file": "seal_007.png",
+"file": "consumable_049.png",
 "kind": "seal",
 "base": false,
 "name": "자루",
-"src": "game-src/items/raw/batch_48/13.png"
+"src": "game-src/items/raw/batch_48/13.png",
+"merged_into": "마대 자루",
+"own_file": "seal_007.png"
 },
 {
 "keywords": [
@@ -9898,26 +10066,6 @@
 "base": false,
 "name": "금괴",
 "src": "game-src/items/raw/batch_57/12.png"
-},
-{
-"keywords": [
-"보석"
-],
-"file": "valuable_004.png",
-"kind": "valuable",
-"base": false,
-"name": "보석",
-"src": "game-src/items/raw/batch_57/13.png"
-},
-{
-"keywords": [
-"지갑"
-],
-"file": "valuable_011.png",
-"kind": "valuable",
-"base": false,
-"name": "지갑",
-"src": "game-src/items/raw/batch_58/04.png"
 },
 {
 "keywords": [
@@ -10393,11 +10541,13 @@
 "keywords": [
 "줄"
 ],
-"file": "tool_073.png",
+"file": "tool_014.png",
 "kind": "tool",
 "base": false,
 "name": "줄",
-"src": "game-src/items/raw/batch_19/08.png"
+"src": "game-src/items/raw/batch_19/08.png",
+"merged_into": "노끈",
+"own_file": "tool_073.png"
 },
 {
 "keywords": [
@@ -10428,26 +10578,6 @@
 "base": false,
 "name": "향",
 "src": "game-src/items/raw/batch_26/03.png"
-},
-{
-"keywords": [
-"종"
-],
-"file": "charm_011.png",
-"kind": "charm",
-"base": false,
-"name": "종",
-"src": "game-src/items/raw/batch_26/07.png"
-},
-{
-"keywords": [
-"팥"
-],
-"file": "charm_031.png",
-"kind": "charm",
-"base": false,
-"name": "팥",
-"src": "game-src/items/raw/batch_27/11.png"
 },
 {
 "keywords": [
@@ -10513,11 +10643,13 @@
 "keywords": [
 "꿀"
 ],
-"file": "food_095.png",
+"file": "food_022.png",
 "kind": "food",
 "base": false,
 "name": "꿀",
-"src": "game-src/items/raw/batch_39/05.png"
+"src": "game-src/items/raw/batch_39/05.png",
+"merged_into": "꿀병",
+"own_file": "food_095.png"
 },
 {
 "keywords": [
