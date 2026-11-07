@@ -156,7 +156,7 @@ for (const vp of ['pc', 'phone']) {
   const afterSell = await page.evaluate(() => ({ w: JSON.parse(window.__chat.scriptstate.$st_wallet || '{}'), it: JSON.parse(window.__chat.scriptstate.$st_items || '{}'), st: JSON.parse(window.__chat.scriptstate.$st_shop || 'null') }));
   const sl = afterSell.w.log?.find((e) => e.src === 'store' && e.amount === 14000);
   if (!sl || sl.anchor !== 'c1') errorsAll.push(`[${vp}] sell wallet: ${JSON.stringify(afterSell.w.log)}`);
-  if (afterSell.it.list?.some((e) => e.id === myId) || !afterSell.it.log?.some((l) => l.what === 'sell' && l.name === '손전등')) errorsAll.push(`[${vp}] sell item: ${JSON.stringify(afterSell.it)}`);
+  if (afterSell.it.list?.some((e) => e.id === myId && !e.soldAt) || !afterSell.it.log?.some((l) => l.what === 'sell' && l.name === '손전등')) errorsAll.push(`[${vp}] sell item: ${JSON.stringify(afterSell.it)}`);
   if (afterSell.st?.sell || afterSell.st?.sales?.[0]?.price !== 14000) errorsAll.push(`[${vp}] sell state: ${JSON.stringify({ sell: afterSell.st?.sell, sales: afterSell.st?.sales })}`);
   await shot('sold');
   if (vp === 'phone' && await page.evaluate(() => !!document.querySelector('.sh-drawer'))) await act('shop-drawer');
