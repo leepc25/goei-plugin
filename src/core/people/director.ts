@@ -9,6 +9,7 @@ import { axesLinesEn } from './axes';
 import { KNOWLEDGE_RULE, personBlock, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
+import { speechVarietyBlock } from './speech';
 import type { PeopleSettings } from './settings';
 import { SLOT_META, slotsFor, type PeopleStore, type SlotId } from './types';
 
@@ -119,7 +120,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const rhythm = s.directorFeatures && s.features.has('rhythm')
     ? Object.values(store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })))
     : [];
-  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f]]) : [];
+  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f], ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : [])]) : [];
   // 기본 지침은 사용자가 덮어쓸 수 있다 (리수폿 J-1). 기능별 절·검색·출력 계약은 그대로
   const base = s.directorPrompt ? [s.directorPrompt] : [...SYSTEM_FACTS, ...(s.director === 'scene' ? SYSTEM_SCENE : [])];
   const system = [...base, ...guides, '', ...(s.directorSearch ? SYSTEM_SEARCH : []), OUTPUT, s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']

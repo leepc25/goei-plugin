@@ -5,6 +5,7 @@ import { messageText } from '../refs';
 import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
+import { SPEECH_ENTRY_CHARS, applySpeechSign, parseSpeechMarker, speechVariety } from './speech';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
@@ -287,6 +288,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     wallet_now: typeof o.wallet === 'number' ? { balance: o.wallet, unit: 'KRW' } : undefined,
     // 소감 (core/journal/debrief): 이 묶음에서 종료된 사건이 있을 때만
     ended_now: o.ended?.length ? o.ended : undefined,
+    ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
   };
   return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
@@ -317,8 +319,9 @@ export function overrideSections(text: string, overrides: Record<string, string>
   return out;
 }
 
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}): string {
-  const rules = (lang === 'en' ? `${LANG_EN_RULE}\n\n${userRules.trim()}` : userRules).trim();
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}, extra = ''): string {
+  // extra: 설정으로 켠 덧붙임 지침(말투 다변화 등). 사용자 지침보다 앞에 둔다 (원본 V3: 내장 규칙이 사용자 규칙 앞)
+  const rules = [lang === 'en' ? LANG_EN_RULE : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
   const on = new Set(enabled);
   if (Object.keys(overrides).length) text = overrideSections(text, overrides);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
@@ -637,7 +640,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       report.applied.entries++;
       continue;
     }
-    const text = plain(e.text, 200);
+    const variety = speechVariety(ctx.settings);
+    let text = plain(e.text, slot === 'speech' && variety.level !== 'off' ? SPEECH_ENTRY_CHARS + 80 : 200);
     if (!text) {
       drop('entry', e, '본문 없음', who);
       continue;
@@ -661,12 +665,22 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('entry', e, '고정된 항목', who);
         continue;
       }
-      if (similar(target.text, text)) {
+      // 말투 다변화 2단계: SIGN 을 세어 표지를 붙이고, 저장된 글은 바꾸지 않는다 (speech.ts applySpeechSign)
+      if (slot === 'speech' && variety.level === 'two') {
+        const before = text;
+        text = applySpeechSign(target.text, text, variety);
+        if (text === target.text) {
+          drop('entry', e, before !== text ? '조짐만 있고 바뀐 글이 없음 (집계 유지)' : '바뀐 내용이 없음', who);
+          continue;
+        }
+      } else if (slot === 'speech') text = applySpeechSign('', text, variety);
+      if (similar(target.text, text) && parseSpeechMarker(target.text).state === parseSpeechMarker(text).state && parseSpeechMarker(target.text).count === parseSpeechMarker(text).count) {
         drop('entry', e, '바뀐 내용이 없음', who);
         continue;
       }
       replaces = target.id;
     } else if (op === 'add') {
+      if (slot === 'speech') text = applySpeechSign('', text, variety);
       if (cur.some((x) => similar(x.text, text))) {
         drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
         continue;
@@ -889,6 +903,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('address', a, '고정된 호칭', who);
         continue;
       }
+      // 말투 다변화 2단계(집계 중): 유저 대상 말투 항목에 「변경 가능」 표지가 있을 때만 호칭·말높임을 바꿀 수 있다 (원본: 표지 없이는 바꾸지 못함)
+      const variety = speechVariety(ctx.settings);
+      const speechNow = variety.level === 'two' && variety.counted ? liveEntries(store.people[who].slots.speech, live).find((x) => (x.target ?? '@user') === '@user') : undefined;
+      if (speechNow) {
+        const st = parseSpeechMarker(speechNow.text).state;
+        if (st !== 'ready') {
+          drop('address', a, st === 'pending' ? '말투 변경 승인 대기 (인물 화면에서 승인해야 바뀜)' : '말투 변화 조짐 집계 중 (변경 가능 표시 없음)', who);
+          continue;
+        }
+      }
       const ev = evidence(a.m, a.quote);
       if (typeof ev === 'string') {
         drop('address', a, ev, who);
@@ -901,7 +925,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       const seq = nextSeq(ev.anchor);
-      if (putChange(store, { id: changeId(who, 'address', ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'address', toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) report.applied.address++;
+      if (putChange(store, { id: changeId(who, 'address', ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'address', toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) {
+        report.applied.address++;
+        // 「변경 가능」 표지로 바꿨으면 표지를 지운다 (모델이 말투 항목을 같이 안 고쳤을 때). 고친 경우는 applySpeechSign 이 이미 지웠다
+        const stillReady = liveEntries(store.people[who].slots.speech, live).find((x) => (x.target ?? '@user') === '@user' && parseSpeechMarker(x.text).state === 'ready');
+        if (stillReady) {
+          const seq2 = nextSeq(ev.anchor);
+          const base = parseSpeechMarker(stillReady.text).base || `${toUser} (${register})`;
+          putEntry(store, who, 'speech', { id: entryId(who, 'speech', ev.anchor, seq2, `=${stillReady.id}`), text: base, src: 'story', anchor: ev.anchor, seq: seq2, quote: a.quote, replaces: stillReady.id, target: '@user' });
+        }
+      }
     }
   }
 

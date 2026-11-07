@@ -177,7 +177,8 @@ export function putEntry(store: PeopleStore, who: string, slot: SlotId, entry: E
   if (!p) return false;
   const list = (p.slots[slot] ??= []);
   if (list.some((e) => e.id === entry.id)) return false;
-  list.push({ ...entry, text: plain(entry.text, 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
+  // 말투 항목은 다변화(speech.ts) 때 450자 + 표지가 붙을 수 있어 상한을 더 준다
+  list.push({ ...entry, text: plain(entry.text, slot === 'speech' ? 600 : 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
   return true;
 }
 

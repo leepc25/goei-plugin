@@ -14,6 +14,7 @@ import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
 import { buildRouter, parseRouter, type RouterHint } from '../core/people/router';
+import { speechVarietyBlock } from '../core/people/speech';
 import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
 import { playerAgent } from '../core/player';
 import { promptFor } from '../core/people/prompt';
@@ -270,7 +271,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (ended.length) sections.add('debrief');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides);
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'));
       input.system = system;
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)

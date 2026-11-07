@@ -7,7 +7,7 @@ import { tokens } from '../core/gnet';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 import { backfillPeople, chatId, clearDiag, consolidatePerson, loadDiag, rereadPerson, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
-import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, splitUnread, withPeople, type EntryState, type Liveness } from '../core/people/store';
+import { anchorOf, changeId, entryId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, putEntry, splitUnread, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
 import { factionNow, knownFactionCodes, userFactionOf } from '../core/people/faction';
 import { FEATURES, NUMERIC_FEATURES, PP, PP_DEFAULTS, PS, peopleSettings, ppValue, type Feature, type NumericFeature, type Stage } from '../core/people/settings';
@@ -16,6 +16,7 @@ import { UPDATER_DETAILED, UPDATER_COMPACT } from '../core/people/prompt';
 import { UPDATER_SECTIONS } from '../core/people/prompt/detailed';
 import { DIRECTOR_BASE_TEXT } from '../core/people/director';
 import { ROUTER_SYSTEM } from '../core/people/router';
+import { decideSpeechPending, speechState } from '../core/people/speech';
 import { undoLastRun } from '../core/people/store';
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
@@ -403,7 +404,15 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
   // 수치 끄기 = 정성 모드 (리수폿 E): 점수 없이 전용 칸의 글로만
   const numRow = (f: NumericFeature) => (v(f) === '1' ? row(`${FEATURE_HELP[f][0]} 수치`, onoff(`num_${f}`), NUMERIC_HELP[f]) : '');
-  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '')).join('');
+  // 말투의 다변화 (리수폿 원본 관계·호칭 세부, 2026-11-07 K): 단계 → 2단계면 조짐 횟수·변경 방식
+  const registerRows = v('register') === '1' ? [
+    row('말투의 다변화', seg('register_variety', s.registerVariety, [['off', '끔'], ['one', '1단계'], ['two', '2단계']]), '끔 = 기존대로 최소 말투 관리 (호칭과 말높임). 1단계 = 개성과 대상에 맞게 변경. 상대에 따라 달라지는 지점과 실제 대사에서 보인 말버릇을 함께 기록. 2단계 = 관계 변경이 생기면 말투가 바뀌는 빈도가 높음. 친분·신분·호감 변화의 조짐을 기록하고, 조짐이 쌓이면 말투를 변경'),
+    ...(s.registerVariety === 'two' ? [
+      row('관계변화 조짐 횟수', seg('register_sign_limit', String(s.registerSignLimit), [['1', '1 (AI 판단)'], ['2', '2 (AI 판단)'], ['3', '3회'], ['4', '4회'], ['5', '5회'], ['7', '7회'], ['9', '9회']]), '같은 방향의 조짐이 이 횟수만큼 쌓이면 말투를 바꿔요. 반대 방향의 조짐이 나오면 처음부터 다시 세요. 기본 3회. 3 미만으로 두면 횟수를 세지 않고 AI가 알아서 판단해 바꿔요'),
+      row('말투 변경 시', seg('register_change', s.registerChange, [['ask', '묻기'], ['auto', '자동 반영']]), s.registerSignLimit < 3 ? '조짐 횟수가 3 미만이라 AI가 바로 판단해 바꿔요. 이 설정은 쓰이지 않아요.' : s.registerChange === 'auto' ? '조짐이 다 쌓이면 다음 턴에 갱신기가 말투를 바꿔요.' : '조짐이 다 쌓이면 인물 화면의 말투 항목에 승인·거절 버튼이 떠요. 승인해야 바뀌어요.'),
+    ] : []),
+  ].join('') : '';
+  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '') + (f === 'register' ? registerRows : '')).join('');
   const newPeople = [
     row('새 인물', seg('newpeople', s.newPeople, [['auto', '자동'], ['confirm', '확인 뒤 등록']]), '확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요.'),
     row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
@@ -725,7 +734,7 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
   return `<li class="pp-entry${dead ? ' dead' : ''}${e.void ? ' void' : ''}${e.pin ? ' pinned' : ''}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div>
     <div class="pp-entry-meta">${meta}${stateMark(st)}
-      <span class="pp-entry-btns"><button class="gx-mini pp-mini${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요'}" aria-pressed="${!!e.pin}">${e.pin ? '고정됨' : '고정'}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
+      <span class="pp-entry-btns">${slot === 'speech' && st === 'alive' && speechState(e.text) === 'pending' ? `<button class="gx-mini pp-mini ps-save" data-action="pp-speech-approve" data-value="${esc(key)}" title="다음 턴 갱신기가 호칭·말투를 바꿀 수 있게 허락해요">말투 변경 승인</button><button class="gx-mini pp-mini" data-action="pp-speech-reject" data-value="${esc(key)}" title="쌓인 조짐을 지우고 지금 말투를 유지해요">거절</button>` : ''}<button class="gx-mini pp-mini${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요'}" aria-pressed="${!!e.pin}">${e.pin ? '고정됨' : '고정'}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
     ${evidenceBox(ctx, live, key, e.anchor, e.quote)}
   </li>`;
 }
@@ -1067,6 +1076,21 @@ export async function handlePeople(action: string, value: string | undefined, ct
         return true;
       });
       return true;
+    case 'pp-speech-approve':
+    case 'pp-speech-reject': {
+      // 말투 변경 승인 대기(speech.ts): 승인 = 「변경 가능」 표지로 바꿔 다음 턴 갱신기가 호칭을 바꿀 수 있게, 거절 = 집계 지움. 같은 기준 메시지에 대체 항목으로
+      const approve = action === 'pp-speech-approve';
+      await mutate(ctx, env, (store) => {
+        const [who, slot] = v.split('|');
+        const e = findEntry(store, v);
+        if (!e || slot !== 'speech' || speechState(e.text) !== 'pending') return false;
+        const text = decideSpeechPending(e.text, approve);
+        const seq = nextSeq(store, e.anchor);
+        return putEntry(store, who, 'speech', { id: entryId(who, 'speech', e.anchor, seq, `${approve ? '+' : '-'}${e.id}`), text, src: 'manual', anchor: e.anchor, seq, replaces: e.id, ...(e.target ? { target: e.target } : {}) });
+      });
+      peopleUi.info = approve ? '다음 턴에 갱신기가 말투를 바꿀 수 있어요.' : '말투 변경을 거절했어요. 조짐을 지웠어요.';
+      return true;
+    }
     case 'pp-void':
       await mutate(ctx, env, (store) => {
         const e = findEntry(store, v);
