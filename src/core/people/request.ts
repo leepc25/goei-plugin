@@ -1,5 +1,6 @@
 // 본편 요청에 인물 기록 블록을 끼운다 (beforeRequest). 모델은 부르지 않는다.
 // 절 단위 혼합(split)이면 요원 자리에 들어간 그 인물의 시트 원문을 요청에서 빼고 기록 블록으로 대신한다.
+import { sexualTexts } from './sexual';
 import type { Chat } from '../types';
 import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
@@ -37,7 +38,13 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (!o.settings.on || o.settings.inject === 'off') return { text: '', people: [], sheets: [] };
   const names: NameEntry[] = entriesOf(o.store, o.extraNames ?? {});
   const match = nameMatcher(names);
-  const people = o.people?.length ? o.people.filter((n) => o.store.people[n]).slice(0, 6) : scenePeople(chat, o.store, match, { input: o.input });
+  // 코드 Router(이름이 직접 나온 인물·동행)는 늘 들어가고, 모델 Router 가 더 고른 인물(이름 없이 가리킨 제3자 등)을 뒤에 합친다.
+  // 2026-11-07 전수검사 2 의 B: 모델 결과가 코드 결과를 대체하면 모델이 빠뜨린 인물이 그 턴 기록에서 사라졌다 (원본 includeMentionedCharacters 와 같게)
+  // 항상 포함할 인물(설정 always, 원본 tracked)은 맨 앞에: 글에 안 나와도 그 턴 기록·Director 자료에 든다
+  const always = o.settings.always.filter((n) => o.store.people[n]);
+  const byCode = scenePeople(chat, o.store, match, { input: o.input }).filter((n) => !always.includes(n));
+  const byModel = (o.people ?? []).filter((n) => o.store.people[n] && !always.includes(n) && !byCode.includes(n));
+  const people = [...always, ...byCode, ...byModel].slice(0, Math.max(6, always.length));
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
@@ -47,7 +54,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     const p = o.store.people[n];
     const sheet = o.sheetOf(n);
     if (sheet) sheets.push(sheet);
-    const note = o.settings.director === 'facts' ? latestNote(o.store, n, live) : null;
+    const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
     blocks.push(
       personBlock(p, o.store, live, changes, {
         sheet,
@@ -57,6 +64,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         note,
         temper: o.temperOf?.(n),
         speed: o.settings.speed,
+        speedDown: o.settings.speedDown,
         turnCap: o.settings.turnCap,
         // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
         maxChars: Math.floor(o.settings.blockCap / people.length),
@@ -65,13 +73,14 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         axes: o.settings.features.has('axes'),
         features: o.settings.features,
         qual: o.settings.qualitative,
+        sexual: sexualTexts(p, o.settings),
       }),
     );
   }
   // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
   if (o.settings.features.has('rhythm')) {
     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
-    const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
+    const note = o.settings.director === 'note' ? latestNote(o.store, '@rhythm', live)?.now : null;
     const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
     if (rb) blocks.unshift(rb);
   }

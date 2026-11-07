@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "팔 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black arm guards. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전술 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black tactical gloves with knuckle guards. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "고무장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of yellow rubber kitchen gloves. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white cotton work gloves with red rubber palms. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방화복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tan firefighter turnout coat with reflective stripes laid flat, front view, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방호복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white hazmat protective suit with a hood laid flat, front view, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목도리",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red wool scarf folded in a loop. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "양말",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of gray socks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "벨트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather belt coiled with a silver buckle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전술 벨트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical utility belt with small pouches. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "백팩",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black backpack, front view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "등산 가방",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed large green hiking backpack, front view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "서류 가방",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown leather briefcase, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "크로스백",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small black crossbody bag with a strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "힙색",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black waist pouch with a strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "탄띠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass ammo bandolier belt with rows of bullets, laid in an X. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

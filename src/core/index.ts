@@ -38,4 +38,5 @@ export * from './datapack';
 export * from './texthash';
 export * from './tokenizer';
 export * from './wallet';
+export * from './items';
 export * from './journal';

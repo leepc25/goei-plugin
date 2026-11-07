@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden Y-shaped slingshot with a rubber band. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a harpoon spear with a barbed metal tip and a wooden shaft, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spear with a leaf-shaped steel head and a long wooden shaft, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a three-pronged steel trident on a long shaft, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight double-edged longsword with a cross guard, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short double-edged dagger with a cross guard, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black military combat knife with a serrated spine, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long machete with a black handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange chainsaw with a long chain bar, side view, not running. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden baseball bat with long nails driven through the head, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy iron chain coiled loosely with a wrapped handle at one end. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle with a cloth rag stuffed in the neck, unlit, no label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cylindrical flashbang stun grenade with a pin and lever, plain casing. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray cylindrical tear gas canister with a pin, plain casing. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round olive-green anti-personnel land mine with a pressure plate on top. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of white C4 plastic explosive wrapped in clear film with a small detonator and two wires, no text. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "새총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden Y-shaped slingshot with a rubber band. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "작살",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a harpoon spear with a barbed metal tip and a wooden shaft, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "창",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spear with a leaf-shaped steel head and a long wooden shaft, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "삼지창",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a three-pronged steel trident on a long shaft, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight double-edged longsword with a cross guard, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "단검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short double-edged dagger with a cross guard, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "군용 대검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black military combat knife with a serrated spine, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마체테",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long machete with a black handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전기톱",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange chainsaw with a long chain bar, side view, not running. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "못 박힌 방망이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden baseball bat with long nails driven through the head, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠사슬 채찍",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy iron chain coiled loosely with a wrapped handle at one end. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화염병",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass bottle with a cloth rag stuffed in the neck, unlit, no label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "섬광탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cylindrical flashbang stun grenade with a pin and lever, plain casing. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "최루탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray cylindrical tear gas canister with a pin, plain casing. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지뢰",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round olive-green anti-personnel land mine with a pressure plate on top. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "C4",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of white C4 plastic explosive wrapped in clear film with a small detonator and two wires, no text. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

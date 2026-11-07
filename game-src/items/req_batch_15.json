@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "빨간 손전등",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red plastic emergency flashlight, lying horizontally, lens facing left. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "밧줄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled thick brown rope. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of gray duct tape, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠지레",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel crowbar with a curved end, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자물쇠",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brass padlock, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "망치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a claw hammer with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "삽",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small folding army shovel, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라이터",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver metal flip lighter, closed, no flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성냥",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden match with a red head, lying diagonally, unlit. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "초",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white candle with a small flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쌍안경",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black binoculars, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "접이식 우산",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black compact umbrella with a strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "노끈",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of tan twine string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "레이더",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld radar scanner with a round green screen and a short antenna, screen shows only green rings. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수갑",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel handcuffs, closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방음 밀봉재",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of gray foam sealing strip. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

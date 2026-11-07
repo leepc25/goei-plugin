@@ -50,7 +50,15 @@ async function dispatch(doc: Doc, x: number, y: number): Promise<void> {
 }
 
 export async function elements(doc: Doc, selector: string): Promise<El[]> {
-  return (await risuai.unwarpSafeArray(await doc.querySelectorAll(selector)).catch(() => [])) as El[];
+  const got = (await risuai.unwarpSafeArray(await doc.querySelectorAll(selector)).catch(() => [])) as unknown;
+  if (Array.isArray(got)) return got as El[];
+  // 풀리지 않은 SafeArray(length()·at()) 도 받아 준다 (시험 틀·옛 Risu)
+  const sa = got as { length?: () => Promise<number>; at?: (i: number) => Promise<El> } | null;
+  if (!sa || typeof sa.length !== 'function' || typeof sa.at !== 'function') return [];
+  const n = await sa.length();
+  const out: El[] = [];
+  for (let i = 0; i < n; i++) out.push(await sa.at(i));
+  return out;
 }
 
 export async function hit(el: El, x: number, y: number): Promise<boolean> {

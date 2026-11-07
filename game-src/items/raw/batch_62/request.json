@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small super glue tube, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow glue tube, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a caulk silicone tube, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed metal paint can with a drip of blue. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow highlighter pen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pad of yellow sticky notes. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of white A4 paper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of clear disposable gloves. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tied black garbage bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large closed woven sack. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of brown twine. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tied canvas sandbag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large white sack of salt, plain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange flare gun. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small square signal mirror. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small waterproof match container. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "순간접착제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small super glue tube, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "본드",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow glue tube, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "실리콘",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a caulk silicone tube, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "페인트 통",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed metal paint can with a drip of blue. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "형광펜",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow highlighter pen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "포스트잇",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pad of yellow sticky notes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "A4 용지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of white A4 paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비닐장갑",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of clear disposable gloves. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쓰레기봉투",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tied black garbage bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마대 자루",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large closed woven sack. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "노끈 뭉치",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of brown twine. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "모래주머니",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tied canvas sandbag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소금 포대",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large white sack of salt, plain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "조명탄 권총",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange flare gun. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "신호 거울",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small square signal mirror. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방수 성냥",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small waterproof match container. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

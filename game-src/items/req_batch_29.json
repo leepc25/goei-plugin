@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "마늘",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white garlic bulb. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "은 종",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver bell. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "풍경",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal wind chime with hanging rods. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오뚝이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red round daruma doll with blank eyes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마네키네코",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white beckoning lucky cat figure raising one paw. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장승 미니어처",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small carved wooden jangseung totem pole. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "솟대",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden pole with a carved bird on top. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "굿 부채",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ritual paper fan painted with colorful abstract patterns. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "제문",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled paper scroll tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "영물",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small mysterious stone relic glowing faintly. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붕대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of white bandage. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진통제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blister pack of white pills, plain foil back. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소독약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brown bottle of antiseptic, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지혈대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical tourniquet strap with a windlass rod. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "반창고",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few adhesive bandage strips. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수면제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small orange pill bottle with white cap, blank label. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

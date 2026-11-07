@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed olive ammo pouch with a buckle flap. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair clip with a butterfly ornament. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver brooch with a round stone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brooch made of golden-brown rooster feathers. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver cross pendant on a thin chain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small silver drop earrings. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin silver bracelet. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black-framed glasses, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black eye patch with a strap. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black wig, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and gold masquerade eye mask, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean hahoe wooden mask with a smiling face, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white clown mask with a red nose, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white hockey goalie mask with holes, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single glove wrapped in dirty white bandages. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of five long decorated false nail tips laid in a row. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "탄약 주머니",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed olive ammo pouch with a buckle flap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나비 머리핀",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair clip with a butterfly ornament. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "브로치",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver brooch with a round stone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "닭 깃털 브로치",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brooch made of golden-brown rooster feathers. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "십자가 목걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver cross pendant on a thin chain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "귀걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small silver drop earrings. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팔찌",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin silver bracelet. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "안경",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black-framed glasses, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "안대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black eye patch with a strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가발",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black wig, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가면무도회 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and gold masquerade eye mask, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "하회탈",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean hahoe wooden mask with a smiling face, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "광대 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white clown mask with a red nose, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "하키 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white hockey goalie mask with holes, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붕대 감은 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single glove wrapped in dirty white bandages. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "네일아트 손톱",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of five long decorated false nail tips laid in a row. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

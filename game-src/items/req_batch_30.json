@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "주사기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic syringe with a needle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "안정제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass medicine vial with clear liquid, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비타민",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white vitamin bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "구급상자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed red first aid bag with a white cross. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지혈제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sealed packet of hemostatic powder, plain packet. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "두통약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small box of headache pills, plain box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "물약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round glass potion bottle with blue liquid and a cork. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "회복 물약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round glass potion bottle with red liquid and a cork. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "시약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass vial of glowing green reagent with a stopper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "혈액 팩",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic bag of dark red blood with a tube, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "의수",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical prosthetic arm and hand, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청진기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stethoscope coiled. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "혈압계",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blood pressure cuff with a gauge. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "체온계",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white digital thermometer, blank display. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "거즈",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of white gauze pads. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "압박 붕대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of beige elastic bandage. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

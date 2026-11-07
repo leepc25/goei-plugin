@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black smartwatch, front view, dark screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black digital wristwatch, front view, blank display. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver USB flash drive. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black external hard drive with a cable. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blue memory card, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white phone charger plug with a cable. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white power strip with four sockets. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white wireless earbuds in an open case. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black over-ear headphones, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black cylindrical bluetooth speaker. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver portable radio with an antenna, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable cassette walkman with headphones. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver mp3 player, front view, blank screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray handheld game console, front view, blank screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver digital camera, front view, no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white instant polaroid camera, front view, no logo. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "스마트워치",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black smartwatch, front view, dark screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전자시계",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black digital wristwatch, front view, blank display. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "USB",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver USB flash drive. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "외장하드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black external hard drive with a cable. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "SD 카드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blue memory card, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "충전기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white phone charger plug with a cable. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "멀티탭",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white power strip with four sockets. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이어폰(무선)",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white wireless earbuds in an open case. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "헤드폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black over-ear headphones, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "블루투스 스피커",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black cylindrical bluetooth speaker. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라디오",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver portable radio with an antenna, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "워크맨",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable cassette walkman with headphones. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "MP3 플레이어",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver mp3 player, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "게임기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray handheld game console, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "디지털카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver digital camera, front view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "폴라로이드 카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white instant polaroid camera, front view, no logo. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

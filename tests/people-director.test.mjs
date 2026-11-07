@@ -17,7 +17,7 @@ const D = await mod('director');
 const T = await mod('types');
 const St = await mod('settings');
 
-const settings = (state = {}) => St.peopleSettings({ $pp_director: 'scene', ...state });
+const settings = (state = {}) => St.peopleSettings({ $pp_director: 'scene', $pp_rhythm: '0', ...state });
 const person = (name) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [], axes: T.DEFAULT_AXES(), axesFrom: 'default', patterns: [], candidates: {} });
 const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role, data, chatId })) });
 const c = chat(['user', '출근했다', 'u1'], ['char', '쟈알디가 말했다. "명일 아파트 건은 네가 맡아."', 'c1'], ['user', '알겠다고 했다', 'u2'], ['char', '쟈알디가 서류를 건넸다.', 'c2']);

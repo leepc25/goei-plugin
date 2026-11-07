@@ -16,7 +16,7 @@ const PREFIXES: Record<DefaultsPane, string[]> = {
   jr: ['$jr_'],
 };
 /** 메인 설정의 「덮어쓰기/불러오기」가 기능 설정과 함께 다루는 접두어 */
-export const MAIN_PREFIXES = ['$gen_', '$pp_'];
+export const MAIN_PREFIXES = ['$gen_', '$pp_', '$it_'];
 /** 설정 창 머리의 「기본값으로 저장」「기본값 불러오기」가 한 번에 다루는 채팅 변수 접두어 전부 (2026-10-29 사용자: 「현재 모든 상태가 한방에」).
  *  화면·이미지·상황판·괴이 발생·테마는 settings.ts set-bar-yes 가 따로 더한다 */
 export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, ...Object.values(PREFIXES).flat()])];

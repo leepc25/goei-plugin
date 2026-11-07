@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유치원 교육책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown-covered children's textbook, plain cover. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "점검표",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clipboard with a checklist grid, no readable text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "결재 서류",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue document folder with papers inside. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "계약서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two stapled contract sheets with a red seal stamp mark. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가죽 장부",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick brown leather ledger book, closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전당포 영수증",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small crumpled paper receipt with lines only. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무료 숙박권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden decorative voucher ticket, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "프로모션 쿠폰",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small colorful coupon ticket with a dotted edge, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "공연 표",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red theater ticket with a torn stub, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팸플릿",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded theater pamphlet with a red rose picture, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청록색 간행물",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a teal-colored commemorative booklet, plain cover. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마트 전단지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful supermarket flyer with product pictures, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "양피지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled blank parchment scroll. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해명문",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single handwritten letter sheet, scribbled lines only. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "매뉴얼",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick gray manual binder. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "필기 노트",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open spiral notebook with handwritten lines. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

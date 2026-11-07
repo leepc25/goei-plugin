@@ -59,6 +59,8 @@ import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
+import { settleItemUse, withInventory } from './core/items';
+import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from './core/wallet';
@@ -152,6 +154,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
         // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
+        // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
+        messages = step('소지품', () => withInventory(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
         messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
         // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
@@ -330,13 +334,13 @@ async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }
     return text || bookText({ char, chat }, name) || null;
   };
   // 모델 Router (선택): 보조 모델이 장면 인물을 고른다. 실패·지연이면 코드 Router (이름이 나온 사람)
-  const routed = await routerPeople(chat, store, input, settings, me?.name ? [me.name] : []).catch(() => null);
+  const routed = await routerPeople(chat, store, input, settings, me?.name ? [me.name] : [], sheetOf).catch(() => null);
   const opts = { settings, store, sheetOf, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore), ...(routed ? { people: routed } : {}) };
   let out = withPeopleBlock(messages, chat, opts);
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
-  if (settings.director === 'scene') {
+  if (settings.director === 'scene' || settings.director === 'facts') {
     const { people } = peopleBlockFor(chat, opts);
-    const note = await directorNoteText(chat, store, people, input, settings, user, char.globalLore).catch(() => '');
+    const note = await directorNoteText(chat, store, people, input, settings, user, char.globalLore, char).catch(() => '');
     if (note) out = insertBlock(out, note);
   }
   return out;
@@ -447,7 +451,15 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
       }).catch(() => null)) ?? latest;
     }
+    // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
+    if (settleItemUse(latest ?? chat, arg.messageIndex)) {
+      latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+        const vars = settleItemUse(cur, arg.messageIndex);
+        return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
+      }).catch(() => null)) ?? latest;
+    }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
+    if (now) await refreshUseBox(arg.characterIndex, arg.chatIndex, now).catch(() => {});
     if (!now || chatPhase(now) !== 'started') return;
     now.message ??= [];
     // 이전 버전에서 시작한 채팅: 에셋 모듈 로어북이 읽는 설정 변수를 채운다. 명부의 새 세력이 바뀌었으면 태그·세력 로어북 변수도 맞춘다
@@ -599,7 +611,16 @@ async function onDisplay(text: string): Promise<string> {
   if (typeof text !== 'string') return text;
   // 이미지 태그는 에셋 목록이 있어야 그린다. 목록을 아직 못 읽었으면 첫 읽기를 기다린다 (안 기다리면 원문 태그가 남고, 새로고침 전엔 다시 그려지지 않는다)
   if (hasImgTag(text) && !modulePicker()) await assetsFirst.catch(() => undefined);
+  // 플러그인이 넣은 첫 장면: 안내(첫 행동·재선택)를 붙일지 아직 모르면 지금 채팅 상태를 읽어 정한다.
+  // 채팅을 닫았다 다시 열면 Risu가 감시 차례(1초)보다 먼저 그려서 안내가 빠졌다 (사용자 11-07)
+  if (isSceneMessage(text) && !wantsOpeningHint(text)) await ensureOpeningHint().catch(() => undefined);
   return displayNow(text);
+}
+
+async function ensureOpeningHint(): Promise<void> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chatIndex = await risuai.getCurrentChatIndex();
+  if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
 }
 
 /** 플러그인이 뜨기 전에 Risu가 이미 그린 메시지는 다시 그려 주지 않는다 (업데이트·새로고침 직후 태그가 원문대로 남고, 다른 채팅에 갔다 와야 그려짐).
@@ -611,7 +632,11 @@ async function redrawAfterLoad(): Promise<void> {
     const ctx = await loadContext();
     if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
     if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
-    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+    // 같은 글을 그대로 저장하면 Risu(Chats.svelte, 글 해시로 그린 것을 재사용)가 다시 그리지 않는다. 그림 태그가 있는 글의 끝 줄바꿈을 붙였다 뗐다 해 글이 바뀌게 한다 (보이는 것·요청은 그대로)
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({
+      ...cur,
+      message: (cur.message ?? []).map((m) => (typeof m.data === 'string' && m.data.includes('<img=') ? { ...m, data: m.data.endsWith('\n') ? m.data.slice(0, -1) : `${m.data}\n` } : m)),
+    }));
   } catch {
     /* 다시 그리지 못해도 그만 (다음 채팅 전환 때 그려진다) */
   }
@@ -713,6 +738,9 @@ function startWatcher(fab: Fab | null): () => void {
         await readTheme(snap).catch(() => {});
         await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
         await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
+        await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {});
+      } else if (!next.fabVisible && next.changed) {
+        await hideUseBox().catch(() => {});
       }
       shownChat = chatKey;
       // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
@@ -750,8 +778,11 @@ export interface BodyHandlers {
  */
 export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers> {
   void dropOldGame(); // 옛 필드 게임 코드·자산 팩(최대 수백 MB)이 저장소에 남아 있으면 지운다 (2026-11-05 사용자)
+  // 어디서 시간이 가는지 콘솔에 남긴다 (v0.21.0 첫 시작 1분, 사용자 11-07)
+  const t0 = Date.now();
+  const lap = (what: string) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   try {
-    await loadWorldData();
+    lap(`세계 자료 ${await loadWorldData() === 'store' ? '저장소에서' : '받음'}`);
   } catch (error) {
     // 받기 창(까닭·다시 받기·파일로 넣기)은 세계 자료를 받는 쪽인 본체가 띄운다 (host/datapanel.ts)
     showWorldDataPanel(reason(error), !!o.prompt);
@@ -760,6 +791,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   await loadPrefs();
   await loadStoredWikiPack();
   await loadStoredTokenizer();
+  lap('설정·위키·토크나이저 읽음');
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
@@ -774,6 +806,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));
     stopWatcher = startWatcher(fab);
+    lap('유령 단추 붙임');
   } catch (error) {
     // 본 화면 접근 권한을 거부하면 플로팅 버튼 대신 채팅 메뉴 항목을 쓴다 (다른 봇에서는 눌러도 아무것도 안 뜸).
     // 감시(괴이 카드 판정 liteNow)는 버튼 없이도 돌아야 요청 손질·로어북 고르기가 된다 (QC 2026-10-28)

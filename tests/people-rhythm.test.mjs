@@ -25,7 +25,7 @@ const person = (name) => ({ name, faction: 'A00', seeded: { from: 'none', at: ''
 const chatOf = (n) => ({ message: Array.from({ length: n * 2 }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: i % 2 ? `쟈알디가 ${(i + 1) / 2}번째로 말했다. 명일 아파트.` : `입력 ${i / 2 + 1}`, chatId: i % 2 ? `c${(i + 1) / 2}` : `u${i / 2 + 1}` })) });
 const entry = (id, text, anchor, extra = {}) => ({ id, text, src: 'story', anchor, seq: 1, quote: '말했다', ...extra });
 const names = [{ name: '쟈알디', aliases: [], titles: [] }];
-const settings = (over = {}) => St.peopleSettings({ $pp_rhythm: '1', ...over });
+const settings = (over = {}) => St.peopleSettings({ $pp_rhythm: '1', $pp_director: 'note', $pp_prev_pairs: '1', ...over });
 
 test('훅 시계: 심은 턴·범위·넘김·연장·새 훅 허용', () => {
   const c = chatOf(12);
@@ -103,4 +103,19 @@ test('관계 재검토: 관계 기록이 20턴 그대로 + 그 사이 행적이 
   // 저장·읽기에 reviewTurn 이 남는다
   const raw = JSON.parse(JSON.stringify(store));
   assert.equal(S.peopleStore({ scriptstate: { $pp_store: JSON.stringify(raw) } }).people?.쟈알디?.reviewTurn ?? S.readStore?.(raw)?.people?.쟈알디?.reviewTurn ?? 25, 25);
+});
+
+test('2026-11-07 J: scene 의 [method:…] 표식을 코드가 기억해 다음 턴 시계에 「같은 방법 반복 금지」 줄을 붙인다', () => {
+  const c = chatOf(2);
+  const store = T.emptyStore();
+  store.docs['rhythm:scene'] = { type: 'rhythm', key: 'scene', entries: [{ id: 's1', text: '[phase:build_up] [engagement:active] [method:restraint] 말을 아낀다', src: 'story', anchor: 'c1', seq: 0, quote: '1번째로' }] };
+  const live = S.liveness(c);
+  const k = Rh.rhythmClock(store, c, live);
+  assert.equal(k.lastMethod, 'restraint');
+  assert.ok(Rh.rhythmClockLines(k).some((l) => /Previous staging method: restraint/.test(l)));
+  assert.equal(Rh.parseSceneMethod('[phase:peak] [engagement:active] 표식 없음'), null);
+  assert.equal(Rh.parseSceneMethod('[phase:peak] [engagement:active] [method:bogus]'), null, '목록 밖 방법은 무시');
+  assert.ok(U.rhythmTextOk('scene', '[phase:peak] [engagement:active] [method:seed] x'), '표식이 있어도 본문 검사는 통과');
+  store.docs['rhythm:scene'].entries.push({ id: 's2', text: '[phase:peak] [engagement:active] [method:none] 절정', src: 'story', anchor: 'c2', seq: 0, quote: '2번째로' });
+  assert.ok(!Rh.rhythmClockLines(Rh.rhythmClock(store, c, live)).some((l) => /Previous staging method/.test(l)), 'none 이면 줄 없음');
 });

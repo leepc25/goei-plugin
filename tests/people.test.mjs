@@ -177,3 +177,12 @@ test('읽음 해시: 이미지 태그·공백 차이는 바뀐 응답으로 치�
   assert.equal(S.messageHash(a), S.messageHash(b));
   assert.notEqual(S.messageHash(a), S.messageHash(d));
 });
+
+test('읽음 해시: 이미지 태그 보충이 <thoughts>·주석을 지우고 태그를 끼워도 읽은 응답 그대로 (2026-11-07)', () => {
+  const before = { role: 'char', data: '<thoughts>\n장면 계획\n</thoughts>\n쟈알디가 왔다.\n<!-- 메모 -->\n\n문장 둘.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' };
+  const after = { role: 'char', data: '쟈알디가 왔다.\n\n<img=Jyaldi_smile>\n\n문장 둘.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' };
+  assert.equal(S.messageHash(before), S.messageHash(after));
+  const store = { ...T.emptyStore() };
+  S.markRead(store, chat(['char', before.data, 'c1']), [0]);
+  assert.deepEqual(S.unreadIndexes(chat(['char', after.data, 'c1']), store), []);
+});

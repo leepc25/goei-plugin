@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, exists
 import { createHash } from 'node:crypto';
 import { buildGamePack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
-import { INSTALL_PACK_NAME, WORLD_PACK_NAME, installPackText, packOf, worldPackText } from './data-pack.mjs';
+import { INSTALL_PACK_NAME, ITEMS_PACK_NAME, WORLD_PACK_NAME, installPackText, itemsPackText, packOf, worldPackText } from './data-pack.mjs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION;
@@ -23,13 +23,13 @@ mkdirSync('dist', { recursive: true });
 
 // 자료 팩 (QC 개선 나1, scripts/data-pack.mjs): 세계 자료·설치 자료는 본체에 번들하지 않고 goei-data-<이름>.json + .N.txt 로 따로 받는다.
 // 지문(hash·sha256·length)을 본체에 박아(define) 본체가 자기와 맞는 자료만 쓴다. 조각은 본체와 같은 200KB 이하
-const dataPacks = [packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version)];
+const dataPacks = [packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version), packOf(ITEMS_PACK_NAME, itemsPackText(), pkg.version)];
 for (const f of readdirSync('dist')) if (/^goei-data-[a-z]+\.(\d+\.)?(txt|json)$/.test(f)) unlinkSync(`dist/${f}`);
 for (const p of dataPacks) {
   p.parts.forEach((part, i) => writeFileSync(`dist/${p.partNames[i]}`, part));
   writeFileSync(`dist/${p.name}.json`, JSON.stringify(p.index) + '\n');
 }
-const [worldPack, installPack] = dataPacks;
+const [worldPack, installPack, itemsPack] = dataPacks;
 // 세계 자료를 한 파일로도 (goei-data-world.txt): 릴리스 zip 에 넣어, 네트워크가 막힌 환경에서 본체(goei-body.js)와 함께 받기 창에 파일로 넣는다 (host/datapanel.ts)
 writeFileSync(`dist/${worldPack.name}.txt`, worldPack.text);
 
@@ -38,6 +38,7 @@ const define = {
   __PLUGIN_VERSION__: JSON.stringify(pkg.version),
   __WORLD_PACK__: JSON.stringify(JSON.stringify(worldPack.expect)),
   __INSTALL_PACK__: JSON.stringify(JSON.stringify(installPack.expect)),
+  __ITEMS_PACK__: JSON.stringify(JSON.stringify(itemsPack.expect)),
 };
 const common = {
   define,

@@ -30,7 +30,7 @@ test('캐릭터로 플레이: 고를 수 있는 요원, 주인공 글, 명단·�
   const state = { $st_player: a.id };
   assert.equal(playerAgent(books, state)?.lore, a.lore);
   const block = playerBlock(books, a, { vars: {}, char: 'x', user: '주인공' });
-  assert.ok(block.startsWith(PLAYER_HEAD) && block.includes(a.name) && block.includes('### Character') && !block.includes('@@dont_activate'));
+  assert.ok(!block.includes(PLAYER_HEAD) && !block.includes('Never write') && block.includes(a.english || a.name) && block.includes('### Character') && !block.includes('@@dont_activate'));
   const c = parseCatalog(books);
   const w = emptyWorld();
   assert.ok(rosterFor(w, c, 'A00', 99).some((p) => p.id === a.id));

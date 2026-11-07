@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain brown paper envelope. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shipping label sticker with barcode. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of envelopes tied with string. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large envelope with a red stamp mark. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled blue blueprint. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an unrolled floor plan sheet with room outlines. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded subway map with colored lines. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed dark green passport. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain ID card with a photo square. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain driver license card with a photo square. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain student ID card with a photo square. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather pocket notebook with a metal badge. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few evidence photos spread out. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic evidence bag with a red seal strip. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed folder with a red stamp mark, no readable text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lined form sheet with signature lines. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "봉투",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain brown paper envelope. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "택배 송장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shipping label sticker with barcode. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "우편물",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of envelopes tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "등기 우편",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large envelope with a red stamp mark. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "설계도",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled blue blueprint. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "건물 도면",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an unrolled floor plan sheet with room outlines. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지하철 노선도",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded subway map with colored lines. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "여권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed dark green passport. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "주민등록증",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain ID card with a photo square. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "운전면허증",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain driver license card with a photo square. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "학생증",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain student ID card with a photo square. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "요원 수첩",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather pocket notebook with a metal badge. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사건 사진",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few evidence photos spread out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "증거 봉투",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic evidence bag with a red seal strip. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "기밀 문서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed folder with a red stamp mark, no readable text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진술서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lined form sheet with signature lines. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

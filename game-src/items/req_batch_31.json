@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "부목",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a padded aluminum splint. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "깁스",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white plaster arm cast. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목발",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single metal crutch, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휠체어",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty folding wheelchair, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "링거",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear IV drip bag with a tube, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수술용 메스",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel surgical scalpel, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "봉합 키트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a needle holder, curved needle and thread laid together. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "핀셋",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel tweezers, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "의료용 가위",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of medical scissors with a bent tip. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라텍스 장갑",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of blue latex gloves. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마스크(의료)",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue surgical mask, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "산소마스크",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear oxygen mask with a tube. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "산소통",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small green oxygen tank with a valve, upright, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "제세동기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed portable AED defibrillator case with a heart symbol, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "인공호흡 마스크",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear CPR pocket mask. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "약봉지",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white paper pharmacy medicine packet, blank. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

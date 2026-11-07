@@ -22,7 +22,8 @@ const R = await mod('request');
 const C = await mod('consolidate');
 const P = await mod('prompt/index');
 
-const settings = (over = {}) => ({ ...St.peopleSettings({}), ...over });
+// 직전 쌍 1 로 고정: 아래 구간 태그(m4 등)가 그 기준 (기본값은 2026-11-07 W3 로 2)
+const settings = (over = {}) => ({ ...St.peopleSettings({ $pp_prev_pairs: '1' }), ...over });
 const person = (name, extra = {}) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [], axes: T.DEFAULT_AXES(), axesFrom: 'default', patterns: [], candidates: {}, ...extra });
 const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role, data, chatId })) });
 const names = [{ name: '쟈알디', aliases: [], titles: [] }];

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "검은 액체",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small vial of black liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붉은 실타래",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of red yarn. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빈 액자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty ornate picture frame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "그림 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a torn piece of a painted canvas. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "캔버스",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small framed oil painting of a dark landscape. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가면(동물, 주인 없음)",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cracked animal head mask lying on its side. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이름 적힌 쪽지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small folded note with a scribbled line. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소라 껍데기 카세트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cassette tape with a seashell pattern on its case. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보라색 머리카락",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single strand of purple hair. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가짜 관리국 배지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black badge with a silver emblem, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목걸이",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold necklace with a small pendant. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금괴",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny gold bar, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보석",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large cut blue gemstone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "시계(고급)",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a luxury gold wristwatch, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금 장신구",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of gold jewelry: rings and a chain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "골동품 도자기",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an antique blue and white porcelain vase. Only this item, nothing else beside it, no text."
+  }
+ ]
+}
