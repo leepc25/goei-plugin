@@ -97,7 +97,7 @@ test('인물 기록 숫자 설정: 0 도 고른 값으로 읽는다 (메시지�
   // 범위 밖·글자는 범위 안으로·기본값으로
   const bad = St.peopleSettings({ $pp_turn_cap: '500', $pp_prev_pairs: 'abc', $pp_speed: '0' });
   assert.equal(bad.turnCap, 100);
-  assert.equal(bad.prevPairs, 1);
+  assert.equal(bad.prevPairs, 2, '잘못된 값은 기본 2');
   assert.equal(bad.speed, 0.25, '속도는 최소 0.25');
 });
 
