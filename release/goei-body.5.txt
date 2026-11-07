@@ -1,4 +1,17 @@
- (typeof asset !== "string" || !asset) throw new PhotoError("사진을 저장하지 못했어요.");
+row new PhotoError("사진을 줄이지 못했어요.");
+    g2.imageSmoothingQuality = "high";
+    g2.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.86)) ?? await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.88));
+    if (!blob) throw new PhotoError("사진을 줄이지 못했어요.");
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let asset;
+    try {
+      asset = await risuai.saveAsset(bytes);
+    } catch (error) {
+      throw new PhotoError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (typeof asset !== "string" || !asset) throw new PhotoError("사진을 저장하지 못했어요.");
     return { asset, preview: URL.createObjectURL(blob) };
   }
   async function photoData(asset) {
@@ -3542,6 +3555,4 @@ ${RETRY_ANALYZE}` }
       ${group2("게시판", [
       row4("게시글 수", seg3("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), "새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요"),
       row4("성격", seg3("style", ["gal", "wpf", "diary", "emotion"].includes(v("style")) ? v("style") : "net", [["gal", "괴담갤"], ["net", "괴담넷"], ["wpf", "세정게"], ["diary", "일기장"], ["emotion", "감정 게시판"]]), "괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요."),
-      ...["diary", "emotion"].includes(v("style")) ? [row4("누구", text4("who", "비우면 주인공"), "일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요")] : [],
-      row4("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
-      row4("주제",
+      ...["diary", "emotion"].includes(v("style")) ? [row4("누구", text4("

@@ -1,6 +1,4 @@
-inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
-.gw .adv-num > input { width: 84px; height: auto; min-height: 0; max-height: none; border: 0; border-radius: 0; background: transparent; text-align: right; }
-.gw .adv-num > span { padding: 0 10px 0 2px; }
+ding: 0 10px 0 2px; }
 /* 스위치 (토글 · 켬/끔 글자) */
 .gw .gx-switch-wrap { display: inline-flex; align-items: center; gap: 8px; height: var(--h); }
 .gw .gx-switch-wrap small { order: 2; font-size: 13px; color: var(--sub); white-space: nowrap; }
@@ -240,15 +238,7 @@ inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .gw .gw-startpage .st-slots .dir-row.open { border-color: var(--accent-line); }
 .gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 .gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
-.gw .gw-startpage .st-slot { cursor: pointer; user-select: none; }
-.gw .gw-startpage .st-slot:hover { background: var(--panel2); }
-.gw .gw-startpage .st-slot .gw-grip { flex: 0 0 auto; touch-action: none; }
-.gw .gw-startpage .st-slot .st-caret { display: inline-flex; width: 18px; color: var(--dim); }
-.gw .gw-startpage .st-slot .st-caret svg { width: 16px; height: 16px; }
-.gw .gw-startpage .st-slots .dir-row.dragging { opacity: .45; }
-.gw .gw-startpage .st-slots .dir-row.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
-.gw .gw-startpage .st-slots .dir-row.drop-after { box-shadow: 0 3px 0 0 var(--signal); }
-.gw.dir-dragging, .gw.dir-dragging * { cursor: grabbing !important; user-select: none; }
+.gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
 /* 폰: 이름 줄과 단추 줄을 나눈다 (한 줄에 다 넣으면 이름이 꺾이고 종류·코드가 잘린다, 2026-11-05 캡처) */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .gw-startpage .st-slot { flex-wrap: wrap; row-gap: 6px; }
@@ -259,8 +249,8 @@ inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .gw .gw-startpage .st-sel small { color: var(--dim); font-weight: 400; }
 .gw .gw-startpage .st-scene, .gw .gw-startpage .st-member { padding: 8px 0 4px; border-top: 1px solid var(--line); }
 .gw .gw-startpage .st-scene.off { opacity: 0.6; }
-.gw .gw-startpage .st-member > summary, .gw .gw-startpage .st-scene > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
-.gw .gw-startpage .st-member > summary small, .gw .gw-startpage .st-scene > summary small { color: var(--dim); }
+.gw .gw-startpage .st-member > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
+.gw .gw-startpage .st-member > summary small { color: var(--dim); }
 .gw .gw-startpage .dir-chips { padding: 6px var(--pad) 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* 설정 찾기 칸 (2026-11-06 사용자 승인, 전수점검 8-10): 기능 탭 왼쪽 목록 위. 찾은 줄은 목록 자리에, 고른 줄은 페이지에서 잠깐 비춘다 */
@@ -384,11 +374,6 @@ ${esc15(e.value)}</textarea>`;
     const ph = kind === "appendix" ? "비우면 키 없음 (다른 켜지는 조건만)" : "비우면 이름·영문명·별칭";
     return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc15(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc15(`${kind}|${sel}|keys`)}" value="${esc15(rec2.keys ?? "")}" placeholder="${esc15(ph)}" autocomplete="off" aria-label="호출 단어"></div>`;
   }
-  function sceneCard(sel, d) {
-    const a = d.agents.find((x) => x.lore === sel);
-    if (!a || !/^P\d{3,}$/.test(a.id)) return "";
-    return `<details class="gw-sec gw-fscene"><summary>첫 장면<small>${esc15(a.id)} · ${agentSceneState(a.id, d)}</small></summary><div class="dir-panel">${agentSceneFields(a.id, d)}</div></details>`;
-  }
   function membersCard(ctx2, sel, d) {
     const list4 = d.agents.filter((a) => a.affiliation === sel);
     const items = list4.map((a) => {
@@ -414,7 +399,7 @@ ${esc15(e.value)}</textarea>`;
     let detail;
     if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
     else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc15(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-    else if (!rec2) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc15(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === "org" && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ""}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx2, kind, sel, d, null)}${kind === "agent" ? sceneCard(sel, d) : ""}${kind === "org" ? membersCard(ctx2, sel, d) : ""}</div>`;
+    else if (!rec2) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc15(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === "org" && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ""}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx2, kind, sel, d, null)}${kind === "org" ? membersCard(ctx2, sel, d) : ""}</div>`;
     else {
       const order = fieldOrder(kind, rec2);
       const defs = FIELDS[kind];
@@ -456,7 +441,6 @@ ${esc15(e.value)}</textarea>`;
       ${recUi.preview ? `<pre class="gw-preview">${esc15(text4)}</pre>` : ""}
       ${recUi.importOpen ? importPane(kind) : ""}
       ${basicCard(ctx2, kind, sel, d, rec2)}
-      ${kind === "agent" ? sceneCard(sel, d) : ""}
       ${kind === "org" ? membersCard(ctx2, sel, d) : ""}
       <section class="gw-sec"><h3>로어 칸 ${variantBar}</h3>
         <div class="gw-fields">${rows2.join("")}</div>
@@ -2942,4 +2926,10 @@ ${rules2}`;
     "Keep scene facts separate from person-specific perception: what happened in the room is not what every person in the room knows. Never copy one person's knowledge into another person's entry because they stood together.",
     "## 6. Chat-level documents: events, locations, factions, items",
     "",
-    "Besides people, the chat keeps small records of events, places, factions and items. Each lives in `docs_now` as `type`, `key` (its Korean name), `id`, `text`, `date`, `place`, `who`. You change them with `docs` items: `op` is `add` (new record), `upsert` (replace record `replace`), or `remove` (record `replace` is no longer true; needs a quote). The lorebook already describes the world; these records hold only what this chat changed, so every document rule below says: record only what changed. Create a record only for an entity that appeared or became meaningfully active in this span; never for every passing name, place name, or background object, and never in bulk from the setting. If `docs_now` already has the same entity unde
+    "Besides people, the chat keeps small records of events, places, factions and items. Each lives in `docs_now` as `type`, `key` (its Korean name), `id`, `text`, `date`, `place`, `who`. You change them with `docs` items: `op` is `add` (new record), `upsert` (replace record `replace`), or `remove` (record `replace` is no longer true; needs a quote). The lorebook already describes the world; these records hold only what this chat changed, so every document rule below says: record only what changed. Create a record only for an entity that appeared or became meaningfully active in this span; never for every passing name, place name, or background object, and never in bulk from the setting. If `docs_now` already has the same entity under another spelling, upsert it instead of adding a duplicate. If you cannot tell whether two names are the same entity, do not merge and do not add; omit. A name mentioned inside a person's entry does not replace a needed record, and a record does not replace the person entries that depend on it.",
+    "",
+    "Common fields: `text` is Korean ≤200 chars and is the complete content of that record. `date` is the in-world date as `YYYY.MM.DD` when the span or the record gives it exactly, otherwise null; never substitute today's real date, the message order, or a count of turns, and never fill unknown parts with 00. When only a relative expression is known (「무도회 다음날」, 「사흘 전」), keep that expression inside `text` and leave `date` null. `place` is the in-world place name or null. `who` lists the names of involved people (`@user` for the user's character); only people shown as involved, never everyone present in the chat.",
+    "",
+    "<<SECTION:docs_event>>",
+    "### 6.1 Event (사건)",
+    "An event is something that actually occurred, with its confirmed results. One record per event, written as a compact deduplicated account in material causal order: who did what, where, with what result; include the in-world time of day inside `text` when known. Do not repeat the same action or reaction in several sentences. `date`, `place` and `who` are required when known; when the d

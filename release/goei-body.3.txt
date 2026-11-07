@@ -1,4 +1,4 @@
-ges[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
+d);
   function unsolicited(r) {
     if (r.kind !== "dm") return false;
     for (let i = r.messages.length - 1; i >= 0; i--) if (r.messages[i].kind === "message") return r.messages[i].sender !== "me";
@@ -4820,4 +4820,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   };
   var hhmm3 = (at) => {
     if (at === null) return "";
-    const d = n
+    const d = new Date(at * 6e4);
+    return `${two5(d.getUTCHours())}:${two5(d.getUTCMinutes())}`;
+  };
+  funct

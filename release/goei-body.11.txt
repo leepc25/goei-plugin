@@ -1,48 +1,4 @@
- var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
-.gn-pane .gn-chead { padding: 16px 16px 12px; border-bottom: 1px solid var(--line2); }
-.gn-pane .gn-c { padding-left: calc(16px + var(--gn-depth, 0) * 20px); padding-right: 10px; }
-.gn-pane .gn-cnone { border-bottom: 0; }
-.gn-c { border-bottom-color: var(--line); }
-.gn-comments > li:last-child { border-bottom: 0; }
-.gn-c.re { background: color-mix(in srgb, var(--panel) 70%, transparent); }
-/* 답글 입력줄: 그 댓글 바로 밑 */
-.gn-c-compose { padding: 8px 10px 10px calc(16px + var(--gn-depth, 1) * 20px); border-bottom: 1px solid var(--line); background: var(--accent-bg); }
-.gn-c-compose .gn-composer { padding: 0; border-top: 0; background: none; }
-.gn-c-compose .ph-back2 { display: none !important; }
-/* 모바일 펼친 글의 댓글 머리줄 오른쪽: 글쓴이 쪽지 또는 내 글 삭제 */
-.gn-chead-act { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; }
-.gn-chead-dm { display: inline-flex; align-items: center; gap: 4px; min-width: 0; color: var(--dim); }
-.gn-chead-dm svg { width: 15px; height: 15px; flex: none; }
-.gn-chead-dm .gn-nick { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 모바일: 여백을 줄여 한 화면에 더 많이 */
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gn-inline .gn-doc { padding: 0 4px 4px; }
-  .gn-inline .gn-post-body { min-height: 0; padding: 10px 6px 12px; font-size: 15px; line-height: 1.65; }
-  .gn-inline .gn-csec { margin-top: 2px; }
-  .gn-inline .gn-chead { padding: 4px 4px 4px 6px; border-bottom-width: 1px; }
-  .gn-inline .gn-ccount { font-size: 14px; }
-  .gn-c { gap: 0 8px; padding-top: 6px; padding-bottom: 6px; }
-  .gn-c-who { min-height: 24px; font-size: 13.5px; }
-  .gn-c-body { font-size: 14.5px; line-height: 1.55; }
-  .gn-reply { min-height: 24px; padding: 0 8px; font-size: 12.5px; }
-  .gn-c-compose { padding: 6px 4px 8px calc(4px + var(--gn-depth, 1) * 14px); }
-}
-/* 설정 줄의 버튼 묶음이 길면 (괴담넷 사생활 다섯 칸) 모바일에서 줄을 넘기지 않고 접는다 */
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .ps-ctl { max-width: 100%; min-width: 0; }
-  .ps-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
-  .ps-ctl .gx-seg { min-width: 0; padding: 0 10px; }
-}
-/* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
-.gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
-.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
-/* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
-.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.st-scopebar .st-scope { flex: none; margin: 0; }
-/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
-.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
-/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
-.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
 .st-act svg { width: 14px; height: 14px; flex: none; }
 .st-act:hover:not(:disabled) { background: var(--accent-bg); }
 .st-act:disabled { opacity: .4; cursor: default; }
@@ -2430,4 +2386,68 @@ ${note.trim()}` : card2;
       } else {
         dest = destination(d, locName(target.loc));
       }
-      const name
+      const names4 = partyNames(x, team);
+      const body5 = sceneDirective(d, dest, names4, support, false);
+      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function sendMission(ctx2, env3, opening) {
+    const kind = field3.mpick;
+    const name = field3.mname;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest = destination(d, name);
+      if (kind === "lm") {
+        const lm = x.catalog.landmarks.find((l) => l.name === name);
+        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
+      } else if (kind === "ms") {
+        const site = x.world.ms.find((m) => m.name === name);
+        if (site) dest = destination(d, name, locName(site.loc));
+      }
+      const names4 = partyNames(x, team);
+      let chat = latest;
+      if (x.on) {
+        const w = structuredClone(x.world);
+        const last2 = (latest.message ?? []).at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body5 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function closeIndexOf(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return i;
+    return Math.max(0, list4.length - 1);
+  }
+  async function saveWorld(ctx2, env3, change) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    try {
+      let closedAt = -1;
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+        if (w.closed?.length) {
+          const index = closeIndexOf(latest);
+          const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+          if (built.rows.length) {
+            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+            closedAt = index;
+          }
+        }
+        return next;
+   
