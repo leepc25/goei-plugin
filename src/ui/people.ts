@@ -283,7 +283,9 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): { toggle: string; body: 
         : rep
           ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.applied.debriefs ? `<span class="gx-badge live">소감 ${rep.applied.debriefs}</span>` : ''}${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ''}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ''}`
           : '<span class="gx-badge live">반영</span>'
-      : `<span class="gx-badge bad">실패 · ${esc(r.stage ?? '')}</span><small class="pp-err">${esc(r.error ?? '')}</small>`;
+      : r.stage === 'budget'
+        ? `<span class="gx-badge bad">거부 · 입력 상한</span><small class="pp-err">${esc(r.error ?? '')}</small>`
+        : `<span class="gx-badge bad">실패 · ${esc(r.stage ?? '')}</span><small class="pp-err">${esc(r.error ?? '')}</small>`;
     const sysText = r.system ?? '';
     const dataText = r.data ?? '';
     const sizes = `지침 ${r.sizes.system ? tok(r.sizes.system, sysText || undefined) : '-'} / 자료 ${r.sizes.data ? tok(r.sizes.data, dataText || undefined) : '-'} / 구간 ${r.sizes.span ? tok(r.sizes.span) : '-'}`;
@@ -467,7 +469,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const advanced = fold('pp-adv', '고급', [
     row('직전 쌍 포함', seg('prev_pairs', String(s.prevPairs), [['0', '0'], ['1', '1'], ['2', '2']]), '읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수'),
     row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
-    row('응답 접기 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 구간 글자 수. 넘으면 중간을 접어요.'),
+    row('응답 길이 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 응답 글자 수. 이걸 넘는 응답은 보내지 않고 거부해요(진단 기록에 남음). 맥락 구간만 중간을 접어요.'),
     row('다른 보조 호출과 병렬', onoff('parallel'), '끄면 이미지·괴담톡 같은 다른 보조 호출 앞에 차례로 돌아요.'),
     row('하이파 참조', onoff('hypa'), 'Risu 하이파 메모리(HypaMemory) 요약을 갱신기·Director 자료에 배경으로 넣어요. 이번 입력·최근 글·장면 인물 이름과 관련 있는 요약부터, 중요 표시한 요약은 먼저. 근거로는 안 써요. 토큰이 늘어요'),
     s.hypa ? row('하이파 요약 개수', seg('hypa_items', String(s.hypaItems), [['8', '8'], ['16', '16'], ['32', '32']]), '한 번에 넣는 요약 수 상한') : '',

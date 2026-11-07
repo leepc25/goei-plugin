@@ -61,6 +61,8 @@ export interface UpdateInput {
   people: string[];
   /** 확정 메시지 위치 (근거로 쓸 수 있는 것) */
   confirmed: Set<number>;
+  /** 글이 「응답 길이 상한」을 넘는 확정 응답 위치 (2026-11-07 W4: 접지 않고 보내지 않는다 — host 가 거부) */
+  overBudget: number[];
   /** 이름 표 (별명·호칭으로 인물 찾기) */
   names: NameEntry[];
   /** 저장 상한을 넘긴 인물 (같은 호출에 정리를 얹을 대상) */
@@ -206,10 +208,13 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const span: SpanItem[] = [];
   const tags = new Map<string, number>();
   const all = [...ctxIdx, ...[...confirmedIdx].sort((a, b) => a - b)];
+  // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 구간 글이 상한을 넘으면 접지 않고 보내지 않는다 (overBudget 에 담아 host 가 거부). 맥락(context_only)만 접는다
+  const overBudget: number[] = [];
   all.forEach((idx, n) => {
     const m = `m${n + 1}`;
     tags.set(m, idx);
     const role = list[idx].role === 'user' ? 'user' : 'assistant';
+    if (confirmedIdx.has(idx) && cleanSpan(str(list[idx].data), Number.MAX_SAFE_INTEGER).length > o.settings.spanCap) overBudget.push(idx);
     const item: SpanItem = { m, role, text: cleanSpan(str(list[idx].data), o.settings.spanCap), index: idx };
     if (confirmedIdx.has(idx)) item.confirmed = true;
     else item.context_only = true;
@@ -303,7 +308,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
 }
 
 // ── 지침 조립 ──

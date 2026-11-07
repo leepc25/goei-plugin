@@ -43,7 +43,7 @@ export interface DiagRun {
   outChars: number;
   ms: number;
   ok: boolean;
-  stage?: 'build' | 'model' | 'parse' | 'save' | 'skip';
+  stage?: 'build' | 'model' | 'parse' | 'save' | 'skip' | 'budget';
   error?: string;
   report?: ApplyReport;
   /** 「정리」 결과 (reason 'consolidate') */
@@ -274,6 +274,14 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (ended.length) sections.add('debrief');
       const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
       input.system = system;
+      if (input.overBudget.length) {
+        // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 응답 글이 상한을 넘으면 접어서 보내지 않고 거부한다. 읽음 표시도 안 한다
+        diag.stage = 'budget';
+        diag.error = `입력 상한 넘김(${settings.spanCap.toLocaleString()}자, ${input.overBudget.length}개 응답): 보내지 않음. 설정 「응답 길이 상한」을 올리거나 긴 응답을 나눠 읽기`;
+        result.skipped.push(diag.error);
+        console.log(`[goei] 인물 기록 갱신 거부: ${diag.error}`);
+        continue;
+      }
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
         if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {

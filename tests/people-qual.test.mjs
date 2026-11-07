@@ -28,11 +28,12 @@ const names = [{ name: '쟈알디', aliases: [], titles: [] }];
 const c = chat(['user', '출근했다', 'u1'], ['char', '쟈알디가 커피를 내밀었다. "고마웠어, 어제." 눈을 피했다.', 'c1']);
 
 test('설정: 수치 끔 = 정성 모드, 취향 띠는 호감 수치가 꺼지면 같이 꺼진다', () => {
+  assert.ok(St.peopleSettings({}).qualitative.has('suspicion') && St.peopleSettings({}).features.has('rhythm'), '기본값: 의심 정성·리듬 켬 (11-07 사용자 결정)');
   const s = St.peopleSettings(qualState);
   assert.deepEqual([...s.qualitative].sort(), ['affinity', 'openness', 'suspicion']);
   assert.equal(s.numeric.size, 0);
   assert.ok(!s.features.has('taste'), '취향 띠는 호감 숫자 위에서만');
-  const d = St.peopleSettings({ $pp_taste: '1' });
+  const d = St.peopleSettings({ $pp_taste: '1', $pp_num_suspicion: '1' }); // 기본 의심은 정성(11-07 결정) — 수치 전부 켠 모양을 시험
   assert.equal(d.qualitative.size, 0);
   assert.ok(d.features.has('taste'));
   assert.deepEqual([...d.numeric].sort(), ['affinity', 'openness', 'suspicion']);
@@ -55,7 +56,7 @@ test('지침: 수치 절과 정성 절은 하나만 들어가고 겹친 절도 �
     assert.ok(q.includes('Qualitative mode') && q.includes('affinity.regard') && q.includes('suspicion.concern') && q.includes('openness.attitude'));
     assert.ok(!q.includes('"cues"') && !q.includes('"suspicion":[') && !q.includes('"openness":[') && !q.includes('| 작은친절 |'), '수치 출력 계약·계기표 없음');
     assert.ok(!/<<[A-Z_:a-z]+>>/.test(q));
-    const n = U.assemblePrompt(txt, U.enabledSections(St.peopleSettings({ $pp_openness: '1' })), '');
+    const n = U.assemblePrompt(txt, U.enabledSections(St.peopleSettings({ $pp_openness: '1', $pp_num_suspicion: '1' })), '');
     assert.ok(n.includes('"cues"') && n.includes('| 작은친절 |') && n.includes('"openness":[') && !n.includes('Qualitative mode'));
   }
 });
