@@ -22,6 +22,7 @@ import { relationsPage, relationsAction, relationsInput } from './relations';
 import { startPage } from './start';
 import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
+import { callSummary } from './flow';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
@@ -42,7 +43,8 @@ export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:')
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
 export type Tab = 'set' | 'world' | 'guide' | 'manage';
 const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['world', '세계', ICONS.map], ['guide', '지침', ICONS.book], ['manage', '점검', ICONS.refresh]];
-export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : 'set');
+export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
+// 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
 const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : (n as EditorNode));
 
@@ -369,6 +371,7 @@ const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Im
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
     case 'set': return [{ title: '기능', items: [
+      ['manage:flow', '호출 흐름', ICONS.swap],
       ...(['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki'] as SetPage[]).map(setItem),
       // 소지품 메뉴(가계부 | 소지품, 2026-11-07)의 두 하위 탭
       ['label:items', '소지품', ICONS.bag],
@@ -383,7 +386,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:flow', '호출 흐름', ICONS.swap], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -464,9 +467,11 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
   if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
+  // 인물 페이지는 맨 위에 자기 도식이 있으니 한 줄 요약은 겹친다
+  const calls = page === 'people' ? '' : callSummary(ctx, page);
   const lead = info
-    ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
-    : '</header>';
+    ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p>${calls}</header>`
+    : `${calls}</header>`;
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
     ${canChat ? mainDefaultsConfirm(ctx) : ''}
     ${settingsNotices()}

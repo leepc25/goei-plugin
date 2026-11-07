@@ -558,14 +558,18 @@ function unsentRow(): string {
 }
 
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
-function sceneCardHtml(s: { target: string; party: string; unsent?: boolean }): string {
+function sceneCardHtml(s: { target: string; party: string; unsent?: boolean; note?: string }): string {
   const p = cardPalette();
+  // 작전 메모는 상자 안 아랫줄에 (2026-11-07 사용자: 상자 밖에 따로 뜨면 별로)
+  const note = s.note
+    ? `<span style="flex-basis:100%;display:flex;align-items:baseline;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine};white-space:pre-wrap"><span style="flex:none;color:${p.signal};font-weight:600">메모</span><span>${escHtml(s.note)}</span></span>`
+    : '';
   const unsent = s.unsent
     ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>`
     : '';
   return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s.target)}</span>`
-    + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span>${unsent}</div>`;
+    + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span>${note}${unsent}</div>`;
 }
 
 /** 시작 화면 직접 입력의 첫 상황 카드 (적은 글 전체를 보인다) */

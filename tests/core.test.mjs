@@ -209,3 +209,9 @@ test('인물별 첫 장면의 「시작 로어」 목록은 첫 턴 시드로 �
   assert.deepEqual(seed.missing, ['없는이름']);
   assert.equal(buildSeed(lore, 'Z99', 0, []).text, '', '목록이 비면 시드 없음');
 });
+
+test('지시문 카드 뒤의 작전 메모는 카드 안(note)으로 (2026-11-07)', () => {
+  const rec = sceneRecord({ target: '중림 지하상가', party: '나' }, '본문');
+  assert.equal(renderSceneCards(`${rec}\n\n헐값 매입을 방문한다`, (s) => `[${s.target}|${s.note ?? ''}]`), '[중림 지하상가|헐값 매입을 방문한다]');
+  assert.equal(renderSceneCards(`${rec}`, (s) => `[${s.target}|${s.note ?? ''}]`), '[중림 지하상가|]');
+});

@@ -100,3 +100,16 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
     ${group('턴과 무관', '누르거나 열 때만', manual)}
     </div></div>`;
 }
+
+/** 기능 설정 페이지 맨 위 한 줄 (2026-11-07 사용자: 메뉴마다 도식은 중복, 「이 기능의 호출: …」 한 줄만). 그 페이지로 가는 칸의 호출 수만 모은다 */
+export function callSummary(ctx: ChatContext, page: string): string {
+  const { pre, post, manual } = flowNodes(ctx);
+  const mine = [...pre, ...post, ...manual].filter((n) => n.page === `set:${page}`);
+  if (!mine.length) return '';
+  const auto = mine.filter((n) => n.on);
+  const sure = auto.reduce((s, n) => s + n.sure, 0);
+  const maybe = auto.reduce((s, n) => s + n.maybe, 0);
+  const lead = auto.length ? `매 턴 보조 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 ${sure + maybe}회)` : ''}` : '매 턴 자동 호출 없음';
+  const parts = mine.map((n) => `<span class="gw-call${n.on ? ' on' : ''}">${esc(n.name)}<small>${esc(n.calls)}</small></span>`).join('');
+  return `<p class="gw-calls"><span class="gw-call-lead">이 기능의 호출 · ${lead}</span>${parts}<button class="gx-mini" data-action="ed-node" data-value="manage:flow">호출 흐름 →</button></p>`;
+}

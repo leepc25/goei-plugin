@@ -160,7 +160,7 @@ export async function closeWin(page) {
 }
 
 /** 편집 창 열기 (시작 전: prefs-open, 시작 뒤: ed-open) → 노드 */
-export const tabOfNode = (n) => (n.startsWith('guide:') || n.startsWith('rule:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
+export const tabOfNode = (n) => (n.startsWith('guide:') || n.startsWith('rule:') ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : n.startsWith('set:') || n === 'manage:flow' ? 'set' : 'world');
 export async function goNode(page, n) {
   await page.evaluate((t) => document.querySelector(`.gw [data-action="ed-tab"][data-value="${t}"]`)?.click(), tabOfNode(n));
   await page.waitForFunction((n) => !!document.querySelector(`.gw [data-action="ed-node"][data-value="${n}"]`), n);
