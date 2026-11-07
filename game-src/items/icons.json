@@ -373,7 +373,8 @@
    "kind": "device",
    "base": false,
    "name": "외계어 번역 이어폰",
-   "src": "game-src/items/raw/batch_182/12.png"
+   "src": "game-src/items/raw/batch_191/15.png",
+   "old_src": "game-src/items/raw/batch_182/12.png"
   },
   {
    "keywords": [
@@ -739,6 +740,26 @@
    "base": false,
    "name": "거미 다리 휴대폰",
    "src": "game-src/items/raw/batch_187/11.png"
+  },
+  {
+   "keywords": [
+    "신비한 양초 키트"
+   ],
+   "file": "anomaly_234.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "신비한 양초 키트",
+   "src": "game-src/items/raw/batch_191/05.png"
+  },
+  {
+   "keywords": [
+    "여우 상담실 팻말"
+   ],
+   "file": "key_060.png",
+   "kind": "key",
+   "base": false,
+   "name": "여우 상담실 팻말",
+   "src": "game-src/items/raw/batch_191/11.png"
   },
   {
    "keywords": [
@@ -1794,6 +1815,36 @@
    "base": false,
    "name": "층별 안내 책자",
    "src": "game-src/items/raw/batch_187/15.png"
+  },
+  {
+   "keywords": [
+    "간이 유리 감옥"
+   ],
+   "file": "anomaly_230.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "간이 유리 감옥",
+   "src": "game-src/items/raw/batch_190/15.png"
+  },
+  {
+   "keywords": [
+    "노스텔지어 캔디"
+   ],
+   "file": "food_363.png",
+   "kind": "food",
+   "base": false,
+   "name": "노스텔지어 캔디",
+   "src": "game-src/items/raw/batch_191/07.png"
+  },
+  {
+   "keywords": [
+    "뱀 무늬 은반지"
+   ],
+   "file": "wear_196.png",
+   "kind": "wear",
+   "base": false,
+   "name": "뱀 무늬 은반지",
+   "src": "game-src/items/raw/batch_191/12.png"
   },
   {
    "keywords": [
@@ -3330,6 +3381,26 @@
    "base": false,
    "name": "불운 포스트잇",
    "src": "game-src/items/raw/batch_187/14.png"
+  },
+  {
+   "keywords": [
+    "오방색 신발끈"
+   ],
+   "file": "wear_195.png",
+   "kind": "wear",
+   "base": false,
+   "name": "오방색 신발끈",
+   "src": "game-src/items/raw/batch_190/09.png"
+  },
+  {
+   "keywords": [
+    "도깨비불 호롱"
+   ],
+   "file": "anomaly_231.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "도깨비불 호롱",
+   "src": "game-src/items/raw/batch_190/16.png"
   },
   {
    "keywords": [
@@ -5900,6 +5971,66 @@
    "base": false,
    "name": "소토스 찻잔",
    "src": "game-src/items/raw/batch_186/15.png"
+  },
+  {
+   "keywords": [
+    "액운 삼키미"
+   ],
+   "file": "anomaly_227.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "액운 삼키미",
+   "src": "game-src/items/raw/batch_190/11.png"
+  },
+  {
+   "keywords": [
+    "해피 메이커"
+   ],
+   "file": "medical_125.png",
+   "kind": "medical",
+   "base": false,
+   "name": "해피 메이커",
+   "src": "game-src/items/raw/batch_191/06.png"
+  },
+  {
+   "keywords": [
+    "우리가 도움"
+   ],
+   "file": "device_163.png",
+   "kind": "device",
+   "base": false,
+   "name": "우리가 도움",
+   "src": "game-src/items/raw/batch_191/08.png"
+  },
+  {
+   "keywords": [
+    "VIP 카드"
+   ],
+   "file": "key_059.png",
+   "kind": "key",
+   "base": false,
+   "name": "VIP 카드",
+   "src": "game-src/items/raw/batch_191/09.png"
+  },
+  {
+   "keywords": [
+    "타투 스티커"
+   ],
+   "file": "consumable_118.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "타투 스티커",
+   "src": "game-src/items/raw/batch_191/10.png"
+  },
+  {
+   "keywords": [
+    "길거리 우표"
+   ],
+   "file": "paper_123.png",
+   "kind": "paper",
+   "base": false,
+   "name": "길거리 우표",
+   "src": "game-src/items/raw/batch_191/14.png"
   },
   {
    "keywords": [
@@ -9769,7 +9900,8 @@
    "kind": "tool",
    "base": false,
    "name": "연탄 집게",
-   "src": "game-src/items/raw/batch_183/11.png"
+   "src": "game-src/items/raw/batch_191/16.png",
+   "old_src": "game-src/items/raw/batch_183/11.png"
   },
   {
    "keywords": [
@@ -9860,6 +9992,66 @@
    "base": false,
    "name": "레몬 음료",
    "src": "game-src/items/raw/batch_187/16.png"
+  },
+  {
+   "keywords": [
+    "진실호흡기"
+   ],
+   "file": "device_162.png",
+   "kind": "device",
+   "base": false,
+   "name": "진실호흡기",
+   "src": "game-src/items/raw/batch_190/06.png"
+  },
+  {
+   "keywords": [
+    "공기누름돌"
+   ],
+   "file": "anomaly_225.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "공기누름돌",
+   "src": "game-src/items/raw/batch_190/07.png"
+  },
+  {
+   "keywords": [
+    "행방 막대"
+   ],
+   "file": "anomaly_226.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "행방 막대",
+   "src": "game-src/items/raw/batch_190/10.png"
+  },
+  {
+   "keywords": [
+    "머리 가죽"
+   ],
+   "file": "body_084.png",
+   "kind": "body",
+   "base": false,
+   "name": "머리 가죽",
+   "src": "game-src/items/raw/batch_191/02.png"
+  },
+  {
+   "keywords": [
+    "영선대옥종"
+   ],
+   "file": "anomaly_233.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "영선대옥종",
+   "src": "game-src/items/raw/batch_191/04.png"
+  },
+  {
+   "keywords": [
+    "당근이지콕"
+   ],
+   "file": "food_364.png",
+   "kind": "food",
+   "base": false,
+   "name": "당근이지콕",
+   "src": "game-src/items/raw/batch_191/13.png"
   },
   {
    "keywords": [
@@ -12382,6 +12574,36 @@
    "base": false,
    "name": "연근조림",
    "src": "game-src/items/raw/batch_187/08.png"
+  },
+  {
+   "keywords": [
+    "시금달큼"
+   ],
+   "file": "food_362.png",
+   "kind": "food",
+   "base": false,
+   "name": "시금달큼",
+   "src": "game-src/items/raw/batch_190/04.png"
+  },
+  {
+   "keywords": [
+    "유리손포"
+   ],
+   "file": "weapon_154.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "유리손포",
+   "src": "game-src/items/raw/batch_190/05.png"
+  },
+  {
+   "keywords": [
+    "햇살잡이"
+   ],
+   "file": "anomaly_228.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "햇살잡이",
+   "src": "game-src/items/raw/batch_190/12.png"
   },
   {
    "keywords": [
@@ -18731,6 +18953,46 @@
   },
   {
    "keywords": [
+    "줄잡이"
+   ],
+   "file": "wear_194.png",
+   "kind": "wear",
+   "base": false,
+   "name": "줄잡이",
+   "src": "game-src/items/raw/batch_190/03.png"
+  },
+  {
+   "keywords": [
+    "포승줄"
+   ],
+   "file": "tool_239.png",
+   "kind": "tool",
+   "base": false,
+   "name": "포승줄",
+   "src": "game-src/items/raw/batch_190/08.png"
+  },
+  {
+   "keywords": [
+    "사인검"
+   ],
+   "file": "weapon_155.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "사인검",
+   "src": "game-src/items/raw/batch_190/13.png"
+  },
+  {
+   "keywords": [
+    "옥방울"
+   ],
+   "file": "anomaly_232.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "옥방울",
+   "src": "game-src/items/raw/batch_191/03.png"
+  },
+  {
+   "keywords": [
     "권총"
    ],
    "file": "weapon_002.png",
@@ -23832,7 +24094,8 @@
    "kind": "body",
    "base": false,
    "name": "귀두",
-   "src": "game-src/items/raw/batch_181/02.png"
+   "src": "game-src/items/raw/batch_191/01.png",
+   "old_src": "game-src/items/raw/batch_181/02.png"
   },
   {
    "keywords": [
@@ -23952,7 +24215,8 @@
    "kind": "body",
    "base": false,
    "name": "음낭",
-   "src": "game-src/items/raw/batch_186/01.png"
+   "src": "game-src/items/raw/batch_190/01.png",
+   "old_src": "game-src/items/raw/batch_186/01.png"
   },
   {
    "keywords": [
@@ -23973,6 +24237,26 @@
    "base": false,
    "name": "편육",
    "src": "game-src/items/raw/batch_186/06.png"
+  },
+  {
+   "keywords": [
+    "난소"
+   ],
+   "file": "body_083.png",
+   "kind": "body",
+   "base": false,
+   "name": "난소",
+   "src": "game-src/items/raw/batch_190/02.png"
+  },
+  {
+   "keywords": [
+    "옥패"
+   ],
+   "file": "anomaly_229.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "옥패",
+   "src": "game-src/items/raw/batch_190/14.png"
   },
   {
    "keywords": [
