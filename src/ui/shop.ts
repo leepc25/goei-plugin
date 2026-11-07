@@ -449,8 +449,12 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const now = readShop(chat.scriptstate);
         if (!now || now.shop !== st.shop || now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
         const it0 = readItems(chat.scriptstate);
-        if (!it0.list.some((x) => x.id === o.itemId)) return null;
-        const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
+        const mine = it0.list.find((x) => x.id === o.itemId);
+        if (!mine) return null;
+        // 소지품에서 빼는 건 되돌리지 않으므로(목록에서 지움) 판 돈도 늘 남긴다(기준 없음). 다만 이번 방문에 산 물건이면 그 구입과 같이
+        // 이 응답에 묶는다 — 응답을 다시 굴리면 산 값도 돌아오고 물건도 없어지니, 판 돈만 남아 돈이 불어나지 않게 (11-08 전수점검)
+        const anchor = mine.anchor && mine.anchor === now.key ? now.key : '';
+        const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `sl_${o.itemId}_${now.sales.length}`, anchor, amount: now.sell.price, memo: o.name, src: 'store' });
         // 팔면 장착 칸에서도 빠지고(목록에서 빠지니), 「사용」 자리에 놓여 있었으면 거기서도 뺀다
         const items = removeItem(it0, o.itemId, 'sell', 'manual', now.key, { note: `${now.shop}에 팖` });
         const nextShop = closeSale(now);
