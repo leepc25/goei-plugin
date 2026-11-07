@@ -80,9 +80,9 @@ const css = `
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
 .sh-q{position:relative;display:inline-flex;width:300px}.sh-q .gx-wt-q{width:100%;max-width:none;margin:0;padding:0 38px 0 12px}.sh-go{position:absolute;right:4px;top:4px;width:calc(var(--h) - 8px);height:calc(var(--h) - 8px);border:0;border-radius:var(--ri);background:var(--accent-bg);color:var(--signal);font:700 14px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
-.sh-c{padding-bottom:0}.sh-c b{font-size:13px;padding:6px 0 7px}
-.sh-band{display:block;margin:0 -6px;padding:8px 4px;border-top:1px solid var(--accent-line);border-radius:0 0 calc(var(--rc) - 1px) calc(var(--rc) - 1px);background:var(--accent-bg);color:var(--signal);font:700 14px/1 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
-.sh-c.poor .sh-band{background:var(--red-bg);border-top-color:var(--red-ln);color:var(--red)}
+.sh-c b{font-size:13px;padding-top:7px}
+.sh-band{display:block;padding:3px 0 4px;color:var(--text);font:600 13px/1.2 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-c.poor .sh-band{color:var(--red)}
 /* 말풍선: 제목 14 · 메타 12.5 · 금액 14 · 글 13/1.5 */
 .sh-grid .it-tip{display:none;width:260px;padding:12px}.sh-grid .it-c.tipon .it-tip{display:block}.sh-grid .it-tip b{font-size:14px;margin-bottom:6px}.sh-grid .it-tip .sh-amt{display:inline-block;margin-top:8px}.sh-grid .it-tip p{font-size:13px;line-height:1.5;margin-top:8px}
 /* 불러오는 중 */
@@ -98,7 +98,7 @@ const css = `
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:flex-start;padding:14px 14px 96px}.sh-card{width:100%;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}
 .it-right{display:contents}.sh-bal{order:1}.it-right .it-act{order:2;margin-left:auto;flex:none}.sh-q{order:3;width:100%;flex:1 1 100%}.sh-go{top:4px}
-.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:13px;letter-spacing:-.02em;padding-left:2px;padding-right:2px}.sh-ph .it-ic{width:96px;height:96px}
+.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:12.5px;letter-spacing:-.02em}.sh-ph .it-ic{width:96px;height:96px}
 .sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/장터_초안/';
 for (const vp of ['pc', 'phone']) {
