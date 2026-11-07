@@ -3355,7 +3355,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-dlg-box p + p { margin-top: 6px; }
 /* 내가 한 말: 주인 대사와 바로 구분되게 다른 색 + 「나」 표 (2026-11-07 사용자) */
 /* 내 말 (2026-11-07 사용자: 「나」 딱지 별로): 메신저처럼 오른쪽에 붙은 옅은 파란 말풍선, 주인 말은 왼쪽 「」 */
-.sh-dlg-box p.me { width: fit-content; max-width: 78%; margin-left: auto; padding: 4px 11px; border-radius: 12px 12px 3px 12px; background: color-mix(in srgb, var(--blue) 13%, transparent); color: var(--blue); }
+.sh-dlg-box p.me { color: var(--blue); }
 .sh-dlg-box p.dim { color: var(--dim); }
 .sh-talk { display: flex; gap: 8px; margin: 0; }
 .sh-talk-in { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; min-height: var(--h); padding: 0 10px 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel2); font-size: 13.5px; color: var(--text); cursor: text; }
