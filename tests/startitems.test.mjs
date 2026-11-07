@@ -6,10 +6,10 @@ import { readStartItems, parseStartItems, startItemsText, startItemsState, start
 const install = JSON.parse(readFileSync(new URL('../src/data/install/directory.json', import.meta.url), 'utf8'));
 const of = (name) => readStartItems(install.요원[name].start_items);
 
-test('기본 명부: 37명에 87줄', () => {
+test('기본 명부: 45명에 116줄', () => {
   const rows = Object.values(install.요원).filter((a) => a.start_items?.length);
-  assert.equal(rows.length, 37);
-  assert.equal(rows.reduce((n, a) => n + a.start_items.length, 0), 87);
+  assert.equal(rows.length, 45);
+  assert.equal(rows.reduce((n, a) => n + a.start_items.length, 0), 116);
   for (const a of rows) assert.deepEqual(readStartItems(a.start_items), a.start_items, '저장 모양 그대로 읽힌다');
 });
 
@@ -45,7 +45,7 @@ test('편집 칸 글 ↔ 줄, 소모 띄어쓰기·「-」 빈칸', () => {
 test('시작 변수: 줄이 없으면 빈 소지품', () => {
   assert.deepEqual(startItemsVars([]), { $st_items: '' });
   const it = readItems(startItemsVars(of('쟈알디')));
-  assert.deepEqual(it.list.map((e) => e.name), ['권총', '담배']);
+  assert.deepEqual(it.list.map((e) => e.name), ['권총', '검은 장갑', '담배']);
   assert.ok(it.list.every((e) => e.anchor === '' && e.from === 'manual'));
 });
 
