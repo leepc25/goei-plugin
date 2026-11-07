@@ -1,4 +1,30 @@
-StatusLine(messages) {
+installWorldFile(await f.text()), "넣는 중");
+    });
+    root3.addEventListener("click", (ev) => {
+      const act = ev.target.closest("[data-gl]")?.dataset.gl;
+      if (act === "close") closeWorldDataPanel(true);
+      else if (act === "file") picker2.click();
+      else if (act === "get") run5(() => loadWorldData(true).then(() => void 0), "받는 중");
+    });
+  }
+  function done2(root3, say, btns) {
+    if (typeof g.__goeiRelaunch === "function") {
+      closeWorldDataPanel();
+      g.__goeiRelaunch();
+      return;
+    }
+    say("받았어요. 카드를 다시 열거나 메시지를 보내면 켜져요.");
+    for (const b of btns) {
+      b.disabled = false;
+      if (b.dataset.gl !== "close") b.hidden = true;
+    }
+    root3.setAttribute("data-gl-done", "1");
+  }
+
+  // src/core/statusctx.ts
+  var STATUS_HEAD = "[Previous status]";
+  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
+  function lastStatusLine(messages) {
     for (let i = messages.length - 1; i >= 0; i--) {
       const m = messages[i];
       if (m?.role !== "assistant" || typeof m.content !== "string") continue;

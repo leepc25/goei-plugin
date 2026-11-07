@@ -1,4 +1,29 @@
- }
+.who));
+        if (!who) {
+          drop("openness", x, "명단에 없는 이름", str9(x?.who));
+          continue;
+        }
+        const ev = evidence(x.m, x.quote);
+        if (typeof ev === "string") {
+          drop("openness", x, ev, who);
+          continue;
+        }
+        const cur = opennessOf(store.people[who], changes);
+        const seq = nextSeq2(ev.anchor);
+        if (x.op === "init") {
+          const value = Number(x.value);
+          if (cur !== null || inited.has(who)) {
+            drop("openness", x, "이미 시작값이 있음", who);
+            continue;
+          }
+          if (!OPENNESS_BASELINES.includes(value)) {
+            drop("openness", x, "시작값은 0·90·150·210·270 중 하나", who);
+            continue;
+          }
+          inited.add(who);
+          if (putChange(store, { id: changeId(who, "openness", ev.anchor, seq, `init${value}`), anchor: ev.anchor, seq, src: "story", who, kind: "openness", init: value, quote: x.quote, reason: plain(x.reason, 60) || `시작값 ${value}` })) report.applied.openness++;
+          continue;
+        }
         if (x.op !== "event") {
           drop("openness", x, "없는 연산", who);
           continue;
@@ -1374,12 +1399,4 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     "<<END:rhythm>>",
     "<<SECTION:faction_rep>>",
     "## 15a. Faction standing",
-    "A standing value per organization toward the user (−100…100, stages in `faction_stages`; present ones in `factions_now`). The program seeds and recomputes it; you return only `faction_cues`, when something in the confirmed span would change how that organization, as such, regards the user — you judge whether it reaches the organization's view (shared knowledge, decisions, treatment), not one person's private feeling: decisions or actions by the organization or members acting for it, deeds members witnessed and would carry back, deals, bans, audits, public acts toward it. A private exchange that stays between the user and one member does not. Never record one event twice: if it only produced a member's person `cue` and carries no weight beyond that member, no faction cue; if it reaches the organization, both may exist. Same cue names as person affinity, judged at the organization's scale; `reason` (Korean ≤40) names the event; cite `m` and a verbatim `quote`; ≤1 item per organization. Faction `docs` are prose between organizations; `faction_cues` change only standing toward the user.",
-    "<<END:faction_rep>>",
-    "<<SECTION:wallet>>",
-    "## 15b. Money",
-    "The program keeps the user's cash ledger (`wallet_now` = balance in won). Return `transactions` only for an explicit amount the user's character paid, received, lost or found in the confirmed span (digits like `50,000원`/`₩3,000` or Korean numerals like `3만 원`): `amount` signed integer won (negative = out), `memo` Korean ≤30, `m`, verbatim `quote` containing the amount. Never infer or estimate an unwritten amount, never record a mere price mention or another person's money; one item per transaction.",
-    "<<END:wallet>>",
-    "<<SECTION:items>>",
-    "## 15d. Items",
-    "The program keeps the user's character's inventory (`items_now` = what they carry now: name, state, kind). Return `items` only for a change the confirmed span states plainly, about the user's character: `new` when they obtain, buy, pick up, or are handed something they keep (not a glance at an object, not someone else's thing, not clothes already worn or everyday things merely 
+    "A standing value per organization toward the user (−100…100, stages in `faction_stages`; present ones in `factions_now`). The program seeds and recomputes it; you return only `faction_cues`, when something in the confirmed span would change how that organization, as such, regards the user — you judge whether it reaches the organization's view (shared knowledge, decisions, treatment), not one person's private feeling: decisions or actions by the organization or members acting for it, deeds members witnessed and would carry back, deals, bans, audits, public acts toward it. A private exchange that stays between the user and one member does not. Never record one event twice: if it only produced a member's person `cue` and carries no weight beyond that member, no faction cue; if it reaches the organization, both may exist. Same cue names as person affinity, judged at the organization's scale; `reason` (Korean ≤40) names the event; cite `m` and a verbatim `quote`; ≤1 item per organization. Faction `docs` are prose between organizations; `f

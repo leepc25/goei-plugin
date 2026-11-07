@@ -1,4 +1,20 @@
-e((n2, r) => n2 + r.e.amount, 0)))}</em></h3>
+itable(ctx2.chat.scriptstate);
+    const q = walletUi.q.trim().toLowerCase();
+    const shown2 = rows2.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
+    if (!shown2.length) return `<p class="gx-wt-empty">${rows2.length ? "맞는 거래가 없어요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
+    const groups = [];
+    for (const r of shown2) {
+      const g2 = groups[groups.length - 1];
+      if (g2 && g2.date === r.date) g2.rows.push(r);
+      else groups.push({ date: r.date, rows: [r] });
+    }
+    let lastMonth = null;
+    return groups.map((g2) => {
+      const month = monthOf(g2.date);
+      const head3 = month && month !== lastMonth ? monthLine(month, rows2) : "";
+      lastMonth = month;
+      return `${head3}<section class="gx-wt-day">
+    <h3><span>${esc23(dayLabel(g2.date))}</span><em>${esc23(formatDelta(g2.rows.filter((r) => r.e.src !== "manual").reduce((n2, r) => n2 + r.e.amount, 0)))}</em></h3>
     <ul>${g2.rows.map(({ e, after }) => {
         const open2 = walletUi.open === e.id;
         const sub = subOf(e);
@@ -3045,29 +3061,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .at-add:hover:not(:disabled) { color: var(--signal); border-color: var(--accent-line); }
 .at-add:disabled { opacity: .45; }
 .ph-notice-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 8px; }
-.ph-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; font-size: 14px; color: var(--dim); }
-.gn-me { color: var(--signal); }
-
-.gn-settings .gx-muted { margin: 8px 0 0; font-size: 13px; }
-
-/* ── 괴담톡 ── */
-/* 괴담톡: 아래 「괴담톡 (v0.12.0)」 */
-
-/* 설정 탭 */
-.gx-settings .gx-sec { margin-bottom: 18px; }
-
-.st-step { display: inline-flex; align-items: center; gap: 10px; }
-.st-step b { min-width: 3em; text-align: center; color: var(--signal); }
-.st-confirm p { margin: 0 0 8px; font-size: 14px; color: var(--danger); }
-.gx-row-btns { display: flex; gap: 8px; }
-
-/* ── 모바일: 전체 화면 + 하단 바 ── */
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gx { padding: 0; align-items: stretch; }
-  .gx-panel, .gx-panel.has-nav { width: 100%; height: 100%; border-radius: 0; border: 0;
-    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "head" "body" "nav"; }
-  .gx-head { padding: 12px 16px 10px; }
-  .gx-tabicon { width: 34px; height: 34px; border-radius: 11px; }
-  .gx-body { padding: 4px 16px 16px; }
-  .upd-banner { --gx-pad: 16px; }
-  .gx-nav { flex-dire
+.ph-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; font-size: 14px; color: var(--

@@ -1,4 +1,19 @@
-plate { font-family: ui-monospace, monospace; font-size: 12.5px; }
+드, 안쪽 여백·간격 (2026-11-05 사용자: 다닥다닥 붙음) */
+.ip-pane { gap: 16px; }
+.ip-pane .pp-intro { margin: 0 4px; }
+.ip-pane .ps-group { gap: 10px; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.ip-pane .ps-group h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--text); }
+.ip-pane .ps-group h3 b { font-size: 12px; font-weight: 600; color: var(--dim); }
+.ip-pane .ps-group > .ps-note { margin: 0; }
+.ip-pane textarea.gx-search { padding: 10px 12px; line-height: 1.55; }
+.ip-pane .gx-row-btns { margin-top: 2px; }
+.ip-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 2px; }
+.ip-name { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+.ip-name.off { color: var(--dim); }
+.ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
+.ip-extra { display: flex; gap: 6px; margin-top: 6px; }
+.ip-extra input { flex: 1; }
+.ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
 .ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
 
 .pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
@@ -663,11 +678,11 @@ ${themeVars("[x-goei-usebox]")}
       if (!failed) void ensureItemIcons();
       return null;
     }
-    const file = matchItemIcon(pack3.table, name, kind);
+    const file = matchItemIcon(pack3, name, kind);
     if (!file) return null;
     let u = urls2.get(file);
     if (!u) {
-      u = `data:image/png;base64,${pack3.icons[file]}`;
+      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
       urls2.set(file, u);
     }
     return u;
@@ -3413,30 +3428,4 @@ ${note.trim()}` : card2;
     picker2.addEventListener("change", () => {
       const f = picker2.files?.[0];
       picker2.value = "";
-      if (f) run5(async () => installWorldFile(await f.text()), "넣는 중");
-    });
-    root3.addEventListener("click", (ev) => {
-      const act = ev.target.closest("[data-gl]")?.dataset.gl;
-      if (act === "close") closeWorldDataPanel(true);
-      else if (act === "file") picker2.click();
-      else if (act === "get") run5(() => loadWorldData(true).then(() => void 0), "받는 중");
-    });
-  }
-  function done2(root3, say, btns) {
-    if (typeof g.__goeiRelaunch === "function") {
-      closeWorldDataPanel();
-      g.__goeiRelaunch();
-      return;
-    }
-    say("받았어요. 카드를 다시 열거나 메시지를 보내면 켜져요.");
-    for (const b of btns) {
-      b.disabled = false;
-      if (b.dataset.gl !== "close") b.hidden = true;
-    }
-    root3.setAttribute("data-gl-done", "1");
-  }
-
-  // src/core/statusctx.ts
-  var STATUS_HEAD = "[Previous status]";
-  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
-  function last
+      if (f) run5(async () => 

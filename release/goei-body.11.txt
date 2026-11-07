@@ -1,4 +1,29 @@
-ction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
+dim); }
+.gn-me { color: var(--signal); }
+
+.gn-settings .gx-muted { margin: 8px 0 0; font-size: 13px; }
+
+/* ── 괴담톡 ── */
+/* 괴담톡: 아래 「괴담톡 (v0.12.0)」 */
+
+/* 설정 탭 */
+.gx-settings .gx-sec { margin-bottom: 18px; }
+
+.st-step { display: inline-flex; align-items: center; gap: 10px; }
+.st-step b { min-width: 3em; text-align: center; color: var(--signal); }
+.st-confirm p { margin: 0 0 8px; font-size: 14px; color: var(--danger); }
+.gx-row-btns { display: flex; gap: 8px; }
+
+/* ── 모바일: 전체 화면 + 하단 바 ── */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx { padding: 0; align-items: stretch; }
+  .gx-panel, .gx-panel.has-nav { width: 100%; height: 100%; border-radius: 0; border: 0;
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "head" "body" "nav"; }
+  .gx-head { padding: 12px 16px 10px; }
+  .gx-tabicon { width: 34px; height: 34px; border-radius: 11px; }
+  .gx-body { padding: 4px 16px 16px; }
+  .upd-banner { --gx-pad: 16px; }
+  .gx-nav { flex-direction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
   .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
   .gx-logo.mob { display: grid; }
   .gx-nb, .gx-nb.mob { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 0 2px; border-radius: 0; font-size: 12px; text-align: center; background: transparent; }
@@ -2131,19 +2156,4 @@ button.mk-go:hover { color: var(--signal); }
 .pp-reread-sel { margin-left: 6px; }
 
 /* 이미지 지침 페이지 */
-/* 이미지 지침 (설정 → 캐릭터 이미지 아래): 칸마다 카드, 안쪽 여백·간격 (2026-11-05 사용자: 다닥다닥 붙음) */
-.ip-pane { gap: 16px; }
-.ip-pane .pp-intro { margin: 0 4px; }
-.ip-pane .ps-group { gap: 10px; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
-.ip-pane .ps-group h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; color: var(--text); }
-.ip-pane .ps-group h3 b { font-size: 12px; font-weight: 600; color: var(--dim); }
-.ip-pane .ps-group > .ps-note { margin: 0; }
-.ip-pane textarea.gx-search { padding: 10px 12px; line-height: 1.55; }
-.ip-pane .gx-row-btns { margin-top: 2px; }
-.ip-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 2px; }
-.ip-name { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
-.ip-name.off { color: var(--dim); }
-.ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
-.ip-extra { display: flex; gap: 6px; margin-top: 6px; }
-.ip-extra input { flex: 1; }
-.ip-tem
+/* 이미지 지침 (설정 → 캐릭터 이미지 아래): 칸마다 카

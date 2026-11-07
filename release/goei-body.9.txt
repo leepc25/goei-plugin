@@ -1,4 +1,12 @@
-mentioned); `update` when a listed item's state changes (partly used, broken, lent, now worn); `gone` when a listed item is used up, lost, destroyed, given away, or thrown away. `name` Korean ≤30 — for `update`/`gone` copy the listed name exactly; `desc` Korean ≤80 states amount/condition in words (never a count like ×3); `kind` one of `item_kinds`; `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one. Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.",
+action_cues` change only standing toward the user.",
+    "<<END:faction_rep>>",
+    "<<SECTION:wallet>>",
+    "## 15b. Money",
+    "The program keeps the user's cash ledger (`wallet_now` = balance in won). Return `transactions` only for an explicit amount the user's character paid, received, lost or found in the confirmed span (digits like `50,000원`/`₩3,000` or Korean numerals like `3만 원`): `amount` signed integer won (negative = out), `memo` Korean ≤30, `m`, verbatim `quote` containing the amount. Never infer or estimate an unwritten amount, never record a mere price mention or another person's money; one item per transaction.",
+    "<<END:wallet>>",
+    "<<SECTION:items>>",
+    "## 15d. Items",
+    "The program keeps the user's character's inventory (`items_now` = what they carry now: name, state, kind). Return `items` only for a change the confirmed span states plainly, about the user's character: `new` when they obtain, buy, pick up, or are handed something they keep (not a glance at an object, not someone else's thing, not clothes already worn or everyday things merely mentioned); `update` when a listed item's state changes (partly used, broken, lent, now worn); `gone` when a listed item is used up, lost, destroyed, given away, or thrown away. `name` Korean ≤30 — for `update`/`gone` copy the listed name exactly; `desc` Korean ≤80 states amount/condition in words (never a count like ×3); `kind` one of `item_kinds`; `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one. Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.",
     "<<END:items>>",
     "<<SECTION:debrief>>",
     "## 15c. Debrief",
@@ -2707,20 +2715,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   function walletList(ctx2) {
     const { rows: rows2 } = rowsOf3(ctx2);
-    const editable = walletEditable(ctx2.chat.scriptstate);
-    const q = walletUi.q.trim().toLowerCase();
-    const shown2 = rows2.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
-    if (!shown2.length) return `<p class="gx-wt-empty">${rows2.length ? "맞는 거래가 없어요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
-    const groups = [];
-    for (const r of shown2) {
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.date === r.date) g2.rows.push(r);
-      else groups.push({ date: r.date, rows: [r] });
-    }
-    let lastMonth = null;
-    return groups.map((g2) => {
-      const month = monthOf(g2.date);
-      const head3 = month && month !== lastMonth ? monthLine(month, rows2) : "";
-      lastMonth = month;
-      return `${head3}<section class="gx-wt-day">
-    <h3><span>${esc23(dayLabel(g2.date))}</span><em>${esc23(formatDelta(g2.rows.filter((r) => r.e.src !== "manual").reduc
+    const editable = walletEd

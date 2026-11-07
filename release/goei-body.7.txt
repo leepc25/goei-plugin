@@ -1,4 +1,16 @@
-t-child:only-child) > span:first-child { min-height: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+, 1fr); grid-template-areas: 'label use show .' 'label hint hint hint'; column-gap: var(--gap); }
+.gw .st-col-row > .st-col-name > b { margin-right: 8px; }
+.gw .st-col-row > .gx-segs:nth-of-type(1) { grid-area: use; } .gw .st-col-row > .gx-segs:nth-of-type(2) { grid-area: show; }
+.gw .gw-setbody .st-cols.ps-row-block { padding: 0; }
+/* 이름 바꾸기 줄: 이름 · 입력칸 · 단추들 */
+.gw .dir-rename { grid-template-columns: var(--label) minmax(120px, var(--ctl)) auto auto; grid-template-areas: none; column-gap: var(--gap); justify-content: start; align-items: center; }
+.gw .dir-rename > .dir-in > span:first-child { grid-column: 1; grid-row: 1; margin-right: 8px; }
+.gw .dir-rename > .dir-in > input { grid-area: auto; grid-column: 2; grid-row: 1; display: block; width: 100%; }
+.gw .dir-rename > .gx-mini { grid-row: 1; }
+.gw .dir-rename > small { grid-row: 2; grid-column: 2 / -1; font-size: 13px; color: var(--dim); }
+/* 이름만 있는 줄 = 카드 안 작은 제목 */
+.gw .dir-line:has(> span:first-child:only-child) { padding: 12px var(--pad) 0; }
+.gw .dir-line:has(> span:first-child:only-child) > span:first-child { min-height: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
 .gw .dir-line:has(> span:first-child:only-child) + .dir-in, .gw .dir-line:has(> span:first-child:only-child) + .dir-grid > .dir-in:first-child { border-top: 0; }
 /* 사진 줄 */
 .gw .dir-in:has(> .dir-photo) { grid-template-areas: none; }
@@ -2999,29 +3011,4 @@ ${rules2}`;
       const perWho = /* @__PURE__ */ new Map();
       const inited = /* @__PURE__ */ new Set();
       for (const x of r.openness ?? []) {
-        const who = nameOf(str9(x?.who));
-        if (!who) {
-          drop("openness", x, "명단에 없는 이름", str9(x?.who));
-          continue;
-        }
-        const ev = evidence(x.m, x.quote);
-        if (typeof ev === "string") {
-          drop("openness", x, ev, who);
-          continue;
-        }
-        const cur = opennessOf(store.people[who], changes);
-        const seq = nextSeq2(ev.anchor);
-        if (x.op === "init") {
-          const value = Number(x.value);
-          if (cur !== null || inited.has(who)) {
-            drop("openness", x, "이미 시작값이 있음", who);
-            continue;
-          }
-          if (!OPENNESS_BASELINES.includes(value)) {
-            drop("openness", x, "시작값은 0·90·150·210·270 중 하나", who);
-            continue;
-          }
-          inited.add(who);
-          if (putChange(store, { id: changeId(who, "openness", ev.anchor, seq, `init${value}`), anchor: ev.anchor, seq, src: "story", who, kind: "openness", init: value, quote: x.quote, reason: plain(x.reason, 60) || `시작값 ${value}` })) report.applied.openness++;
-          continue;
-       
+        const who = nameOf(str9(x?

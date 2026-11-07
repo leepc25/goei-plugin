@@ -1408,7 +1408,7 @@ Next Paragraph Text
   }
   var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"5704235f","sha256":"26665dfcaeec5cb98ba21b70cd1ad3f7fd8261e2fba6a9264fb3c8df0fcfa379","length":1502296}' : void 0) };
   var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"31f59edf","sha256":"b2bd2c28600c1e974931e7aa7b47035c6d931617c3861f3ad481b9da4f37d0f7","length":153725}' : void 0) };
-  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"79379747","sha256":"dbe09ccf2e54b11a2995dfb83e806807552bddbed15e83e80575fc7bd1a214cd","length":4184376}' : void 0) };
+  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"9a329b11","sha256":"385e21818dff49758fef1b2923c361176950ca701766fffa86cfdaffd1866eee","length":4317083}' : void 0) };
   function packMatches(text4, expect) {
     return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
   }
@@ -1450,6 +1450,7 @@ Next Paragraph Text
     if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
     setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String) }, pictures: j.pictures, directory: j.directory, icon: j.icon });
   }
+  var normIcon = (s7) => String(s7 ?? "").toLowerCase().replace(/[\s()「」'"!·.,_-]+/g, " ").trim();
   function applyItemsPack(text4) {
     let j;
     try {
@@ -1459,27 +1460,49 @@ Next Paragraph Text
     }
     if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
     const icons = j.icons;
-    const table = j.table.filter((r) => obj5(r) && Array.isArray(r.k) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons[r.f] === "string").map((r) => ({ k: r.k.map((x) => normIcon(String(x))).filter(Boolean), f: r.f, kind: r.kind, ...r.base ? { base: true } : {} })).sort((a, b) => Math.max(...b.k.map((x) => x.length), 0) - Math.max(...a.k.map((x) => x.length), 0));
-    return { table, icons };
-  }
-  var normIcon = (s7) => s7.toLowerCase().replace(/[\s·()\[\]「」.,'"]/g, "");
-  function matchItemIcon(table, name, kind) {
-    const n2 = normIcon(name);
-    if (n2) {
-      let best = null;
-      let bestLen = 0;
-      for (const r of table) {
-        for (const k of r.k) {
-          if (k.length < 2 || !n2.includes(k)) continue;
-          if (k.length > bestLen || k.length === bestLen && best && best.kind !== kind && r.kind === kind) {
-            best = r;
-            bestLen = k.length;
-          }
-        }
-      }
-      if (best) return best.f;
+    const strs = (v) => Array.isArray(v) ? v.map((x) => String(x)) : [];
+    const table = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...r.base ? { base: true } : {} }));
+    const rep = {};
+    if (obj5(j.rep)) {
+      for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons[f] === "string") rep[normIcon(k)] = f;
     }
-    return table.find((r) => r.base && r.kind === kind)?.f ?? null;
+    const kws = [];
+    for (const r of table) for (const k of r.k) {
+      const n2 = normIcon(k);
+      if (n2.length >= 2 && !rep[n2]) kws.push([n2, r]);
+    }
+    kws.sort((a, b) => b[0].length - a[0].length);
+    const base = {};
+    for (const r of table) if (r.base) base[r.kind] = r.f;
+    return { table, rep, icons, kws, base };
+  }
+  function hasWord(name, w) {
+    const n2 = normIcon(w);
+    if (n2.length < 1) return false;
+    const padded = ` ${name} `;
+    if (padded.includes(` ${n2} `)) return true;
+    return /[가-힣]/.test(n2) && n2.length >= 2 && name.includes(n2);
+  }
+  function matchItemIcon(pack4, itemName, kind) {
+    const name = normIcon(itemName);
+    const fallback = () => pack4.base[kind] ?? null;
+    if (!name) return fallback();
+    for (const [k, r] of pack4.kws) if (hasWord(name, k)) return r.f;
+    let best = null;
+    const heads = /* @__PURE__ */ new Set();
+    for (const r of pack4.table) {
+      const hs = r.h.filter((h) => hasWord(name, h));
+      if (!hs.length) continue;
+      for (const h of hs) heads.add(normIcon(h));
+      const f = r.ft.filter((x) => hasWord(name, x)).length;
+      if (!f) continue;
+      const score2 = f * 10 + (r.kind === kind ? 1 : 0);
+      if (!best || score2 > best.score || score2 === best.score && pack4.rep[normIcon(hs[0])] === r.f) best = { score: score2, r };
+    }
+    if (best) return best.r.f;
+    const longest = [...heads].sort((a, b) => b.length - a.length)[0];
+    if (longest && pack4.rep[longest]) return pack4.rep[longest];
+    return fallback();
   }
 
   // src/core/fetchparts.ts
@@ -3594,16 +3617,4 @@ Next Paragraph Text
 .gw .ps-rows > .gx-err { color: var(--danger); }
 .gw .ps-rows > .ps-note:first-child, .gw .ps-rows > .gx-muted:first-child, .gw .dir-panel > p.gx-muted:first-child { margin-top: 0; padding: 10px var(--pad); }
 /* 상태창 칸 표: 이름 · 사용 · 표시 */
-.gw .st-col-row { grid-template-columns: var(--label) auto auto minmax(0, 1fr); grid-template-areas: 'label use show .' 'label hint hint hint'; column-gap: var(--gap); }
-.gw .st-col-row > .st-col-name > b { margin-right: 8px; }
-.gw .st-col-row > .gx-segs:nth-of-type(1) { grid-area: use; } .gw .st-col-row > .gx-segs:nth-of-type(2) { grid-area: show; }
-.gw .gw-setbody .st-cols.ps-row-block { padding: 0; }
-/* 이름 바꾸기 줄: 이름 · 입력칸 · 단추들 */
-.gw .dir-rename { grid-template-columns: var(--label) minmax(120px, var(--ctl)) auto auto; grid-template-areas: none; column-gap: var(--gap); justify-content: start; align-items: center; }
-.gw .dir-rename > .dir-in > span:first-child { grid-column: 1; grid-row: 1; margin-right: 8px; }
-.gw .dir-rename > .dir-in > input { grid-area: auto; grid-column: 2; grid-row: 1; display: block; width: 100%; }
-.gw .dir-rename > .gx-mini { grid-row: 1; }
-.gw .dir-rename > small { grid-row: 2; grid-column: 2 / -1; font-size: 13px; color: var(--dim); }
-/* 이름만 있는 줄 = 카드 안 작은 제목 */
-.gw .dir-line:has(> span:first-child:only-child) { padding: 12px var(--pad) 0; }
-.gw .dir-line:has(> span:firs
+.gw .st-col-row { grid-template-columns: var(--label) auto auto minmax(0
