@@ -1,13 +1,13 @@
 // 상점 (2026-11-07 사용자 설계, docs/인계/상점_1107/). 라이트보드 알터 스토어를 괴이 세계에 맞게 고친 것.
 // - 메뉴·탭이 아니다. 본편 모델이 거래가 가능한 자리에서 응답 끝에 `[shop: 가게 이름|주인 이름]` 표식을 쓰면
 //   플러그인이 그 응답 아래에 「상점 열기」 카드를 붙이고(표식은 화면에서 지움), 누르면 창 위에 상점 팝업이 뜬다.
-// - 물건은 보조 모델이 맥락대로 창작한다. 첫 호출에서 진열대와 함께 가게 정체(파는 종류·없는 것·값대)를 받아 채팅 변수에 고정하고,
+// - 물건은 보조 모델이 맥락대로 창작한다. 첫 호출에서 진열대와 함께 가게 정체(파는 종류·없는 것·값 성격 한 줄)를 받아 채팅 변수에 고정하고,
 //   이후 호출(새로고침·주인에게 말하기)마다 정체를 넘기며 범위 밖 물건은 플러그인이 버린다 (뜬금없는 요청에 모델이 아무거나 만들지 않게).
 // - 주인에게 말하기(흥정·문의·요청)는 글을 그대로 넘기고, 모델이 맥락을 읽어 응답 형식 안에서 「변경 없음 / 일부 / 전체」를 고른다.
 //   문구를 맞춰 보는 일은 없다. 흥정이 받아들여지면 그 칸 값만 바뀐다. 주인이 거래를 끊으면 진열대를 잠근다.
 // - 구입은 플러그인이 한다: 가계부 src:'store' + 소지품 from:'store'. 다음 턴 [Inventory] 글의 This turn 에 「새로 산 것」·주인과 나눈 말이 간다.
 // - 팔기(11-07 사용자): 내 소지품에서 하나 골라 주인에게 보이면(한마디·내가 부르는 값은 자유) 모델이 대사와 함께 사는 값을 정한다(<offer>). 값은 전부 모델 자율,
-//   플러그인은 숫자를 읽고 가게 값대를 터무니없이 벗어난 값만 버린다. 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
+//   플러그인은 숫자만 읽고 값은 거르지 않는다(11-07 사용자). 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
 // - 잔고·소지품은 모델에 넘기지 않는다. PixelLab 그림은 표시용(이름 매칭)이라 모델과 무관하다.
 import type { Chat } from './types';
 import { ITEM_KINDS, itemKind, itemKindLabel, type ItemKind } from './items';
@@ -159,10 +159,8 @@ export interface ShopIdentity {
   sells: ItemKind[];
   /** 없는 것·안 파는 것 (한 줄) */
   never: string;
-  /** 값대 설명 (한 줄) */
+  /** 값 성격 (한 줄, 말로). 값대 숫자는 받지 않음 (사용자 11-07: 모델이 구간을 의식해 묶임) */
   prices: string;
-  min: number;
-  max: number;
 }
 
 export interface ShopLine {
@@ -209,7 +207,7 @@ export interface ShopState {
   sales: ShopSale[];
 }
 
-const EMPTY_ID: ShopIdentity = { sells: [], never: '', prices: '', min: 0, max: 0 };
+const EMPTY_ID: ShopIdentity = { sells: [], never: '', prices: '' };
 
 export const emptyShop = (tag: ShopTag, key: string): ShopState => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
 
@@ -249,8 +247,6 @@ export function readShop(vars: Vars): ShopState | null {
         sells: Array.isArray(id.sells) ? id.sells.filter((k): k is ItemKind => ITEM_KINDS.some((x) => x.id === k)) : [],
         never: clean(id.never, 120),
         prices: clean(id.prices, 120),
-        min: Number.isSafeInteger(id.min) ? (id.min as number) : 0,
-        max: Number.isSafeInteger(id.max) ? (id.max as number) : 0,
       },
       items: (Array.isArray(o.items) ? o.items.filter(isItem) : []).map((x) => ({ ...x, kind: itemKind(x.kind), desc: clean(x.desc, 120), effect: clean(x.effect, 60) })).slice(0, 40),
       talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').slice(-40),
@@ -395,9 +391,7 @@ export function parseShelf(raw: string, known: ShopIdentity | null): ShelfReply 
     if (!idText) throw new ShopError('응답에 <shop-identity> 블록이 없어요.');
     const get = (k: string) => (new RegExp(`^\\s*${k}\\s*[:：]\\s*(.*)$`, 'im').exec(idText)?.[1] ?? '').trim();
     const sells = get('sells').split(/[,，/·]/).map((s) => kindOf(s)).filter((k): k is ItemKind => !!k);
-    const range = get('price_range');
-    const nums = range.split(/[~\-–—]/).map((s) => priceOf(s)).filter((n): n is number => n !== null);
-    identity = { sells: [...new Set(sells)], never: clean(get('never'), 120), prices: clean(get('prices') || range, 120), min: nums.length === 2 ? Math.min(...nums) : 0, max: nums.length === 2 ? Math.max(...nums) : 0 };
+    identity = { sells: [...new Set(sells)], never: clean(get('never'), 120), prices: clean(get('prices'), 120) };
     if (!identity.sells.length) throw new ShopError('<shop-identity> 의 sells 에 아는 종류가 없어요.');
   }
   return { identity, owner: clean(block(raw, 'owner'), 300), items };
@@ -481,7 +475,6 @@ function withIds(st: ShopState, list: Omit<ShopItem, 'id'>[], exclude: ShopItem[
       }
       rare = true;
     }
-    // 희귀는 가게 값대를 넘어도 된다 (종류만 본다)
     if (!fitsIdentity(it, st.identity)) continue;
     if (out.some((x) => sameShopName(x.name, it.name)) || exclude.some((x) => sameShopName(x.name, it.name))) continue;
     out.push({ ...it, id: itemId(st.key, it.name, out.length + exclude.length) });
@@ -494,7 +487,7 @@ export function applyShelf(st: ShopState, r: ShelfReply, s: ShopSettings): ShopS
   const base: ShopState = { ...st, identity: st.loaded ? st.identity : r.identity, loaded: true };
   const [lo] = s.size;
   const items = withIds(base, r.items).slice(0, 40);
-  if (!items.length) throw new ShopError('받은 물건이 모두 가게 정체(파는 종류·값대) 밖이라 버렸어요. 다시 받아 보세요.');
+  if (!items.length) throw new ShopError('받은 물건이 모두 가게가 파는 종류 밖이라 버렸어요. 다시 받아 보세요.');
   if (items.length < Math.min(lo, 3) && r.items.length >= lo) throw new ShopError('가게 정체에 맞는 물건이 너무 적어요. 다시 받아 보세요.');
   const prev = [...new Set([...st.prev, ...st.items.filter((x) => !x.sold).map((x) => x.name)])].slice(-40);
   const talk = r.owner ? [...st.talk, { who: 'owner' as const, text: r.owner }] : st.talk;
@@ -609,18 +602,18 @@ const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
   return [
     `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: ${SHOP_LINE}. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
     s.feature
-      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost more than the usual range, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (원래값 = the usual price as an integer) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
+      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost far more than the rest, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (원래값 = the usual price as an integer) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
       : '구분: always leave it empty.',
     'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
     s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
     s.price ? `Price guide from the player: ${s.price}` : 'Prices should feel like real Korean prices for that kind of shop.',
-    'Price each item by its own worth and this shop\'s character (who the owner is, what the place is, how it gets its goods) — price_range only describes the usual; a piece may sit well outside it when it warrants. No program checks the prices.',
+    'Price each item by its own worth and this shop\'s character (who the owner is, what the place is, how it gets its goods) — a piece may cost far more or less than the rest when it warrants. No program checks the prices.',
     s.avoidPrev && st.prev.length ? `Previously shown here (do not repeat): ${st.prev.join(', ')}` : '',
   ].filter(Boolean).join('\n');
 };
 
 const IDENTITY_FORMAT =
-  '<shop-identity>\nsells: comma-separated 종류 ids this shop sells (subset of the list above)\nnever: what this shop does not and will not sell (one line)\nprices: this shop\'s price character in one line, from who runs it and what the place is\nprice_range: lowest~highest won a normal item here costs, as two integers joined by ~ (decide them from this shop alone)\n</shop-identity>';
+  '<shop-identity>\nsells: comma-separated 종류 ids this shop sells (subset of the list above)\nnever: what this shop does not and will not sell (one line)\nprices: this shop\'s price character in one line, from who runs it and what the place is\n</shop-identity>';
 
 export const SHOP_THOUGHTS =
   '1. What kind of place is this shop, who runs it, what does the scene say about it?\n2. What would really be on its shelf right now (season, district, events going on)?\n3. Which of those fit the required kinds; pick a varied set within the size limit.\n4. Owner\'s first line: in character, short, no exposition.';
@@ -635,7 +628,7 @@ function material(src: ShopSource, s: ShopSettings): string {
   const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
   if (src.st.loaded) {
     const id = src.st.identity;
-    parts.push(`[가게 정체 — 고정]\nsells: ${id.sells.join(', ')}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}${id.min && id.max ? `\nprice_range: ${id.min}~${id.max}` : ''}`);
+    parts.push(`[가게 정체 — 고정]\nsells: ${id.sells.join(', ')}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}`);
   }
   if (src.refs) parts.push(`[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${src.refs}`);
   if (s.context) {
@@ -670,7 +663,7 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const sellRule = o
-    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item\'s real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (the price range is for ordinary stock; a rare or strange piece may be worth far more), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist\'s words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. ' +
+    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item\'s real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (a rare or strange piece may be worth far more than ordinary stock), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist\'s words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. ' +
       'Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner\'s line too. The shelf change mode is normally none while selling.'
     : '';
   const system = [

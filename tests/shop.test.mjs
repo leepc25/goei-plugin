@@ -44,8 +44,8 @@ test('응답 처리: 새 가게는 새 판, 같은 가게는 그대로, 표식 �
 test('진열대 응답: 정체 블록·주인 대사·물건 줄. 정체 밖(파는 종류 아님)은 버린다, 값은 거르지 않음', () => {
   const r = parseShelf(SHELF, null);
   assert.deepEqual(r.identity.sells, ['tool', 'consumable']);
-  assert.equal(r.identity.min, 1000);
-  assert.equal(r.identity.max, 50000);
+  assert.equal(r.identity.prices, '싸다');
+  assert.equal('min' in r.identity || 'max' in r.identity, false, '값대 숫자는 받지 않음(옛 응답에 price_range 줄이 있어도 무시)');
   assert.equal(r.items.length, 4);
   const st0 = readShop(settleShop(chat('x\n[shop: 철물점|주인]'), 3).vars);
   const st = applyShelf(st0, r, shopSettings({}));
@@ -131,7 +131,7 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
 // 2026-11-07 사용자: 희귀는 단 하나·따로 화려한 칸, 특가는 원래 값에 줄 긋기, 분량은 최소·최대
 test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 더 클 때만, 분량 최소·최대·옛 구간', () => {
   const raw = '<shop-identity>\nsells: tool\nnever: x\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>자.</owner>\n<shelf>\n황동 나침반|900000|tool|괴이를 가리킨다||희귀\n은 손전등|200000|tool|||레어\n줄자|3000|tool|||특가:5000\n망치|9000|tool|||특가:8000\n끌|4000|tool|||할인：6,000원\n</shelf>';
-  const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: [], never: '', prices: '', min: 0, max: 0 }, loaded: false, items: [], talk: [], prev: [], sales: [], closed: false, sell: null };
+  const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: [], never: '', prices: '' }, loaded: false, items: [], talk: [], prev: [], sales: [], closed: false, sell: null };
   const st = applyShelf(st0, parseShelf(raw, null), shopSettings({}));
   const by = (n) => st.items.find((x) => x.name === n);
   assert.equal(by('황동 나침반').tag, 'rare', '희귀는 값대 두 배를 넘어도 남는다');
