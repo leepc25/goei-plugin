@@ -609,7 +609,7 @@ const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
   return [
     `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: ${SHOP_LINE}. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
     s.feature
-      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost more than the usual range, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (e.g. 특가:45000) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
+      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost more than the usual range, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (원래값 = the usual price as an integer) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
       : '구분: always leave it empty.',
     'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
     s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
@@ -620,7 +620,7 @@ const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
 };
 
 const IDENTITY_FORMAT =
-  '<shop-identity>\nsells: comma-separated 종류 ids this shop sells (subset of the list above)\nnever: what this shop does not and will not sell (one line)\nprices: price character in one line (e.g. 동네 철물점 값, 비싸지 않음)\nprice_range: lowest~highest won a normal item here costs, e.g. 1000~300000\n</shop-identity>';
+  '<shop-identity>\nsells: comma-separated 종류 ids this shop sells (subset of the list above)\nnever: what this shop does not and will not sell (one line)\nprices: this shop\'s price character in one line, from who runs it and what the place is\nprice_range: lowest~highest won a normal item here costs, as two integers joined by ~ (decide them from this shop alone)\n</shop-identity>';
 
 export const SHOP_THOUGHTS =
   '1. What kind of place is this shop, who runs it, what does the scene say about it?\n2. What would really be on its shelf right now (season, district, events going on)?\n3. Which of those fit the required kinds; pick a varied set within the size limit.\n4. Owner\'s first line: in character, short, no exposition.';
