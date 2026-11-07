@@ -1,0 +1,115 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrinkled sagging pouch of pinkish brown human skin holding two round testicles inside so its bottom bulges into two lobes, a vertical seam line down the middle, sparse short curly hairs scattered on the skin, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two small silver tweezer-like clamps with rubber tips, joined by a thin fine chain, each with a small teardrop weight dangling below Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin delicate silver chain with a small adjustable clamp ring at each end, jewelry-like, not handcuffs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue gun loaded with a cartridge of glowing pink flesh gel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin dome-shaped sheet of red muscle with a white shiny tendon area in the center, like a shallow upside-down bowl seen from the side Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few hard candies shaped like teardrops, clear pale blue glossy candy with a tiny glint Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean fish cake bar on a stick, a long grilled brown fish cake with grill marks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass birdcage holding a bird made entirely of black smoke and shadow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clean white and steel cordless surgical bone drill with a thin bit, sterile hospital tool Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of marbles, each marble showing a tiny glowing memory scene inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few biscuits shaped exactly like pale human fingers with almond fingernails Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lantern carved from a human skull with candlelight glowing from the eye sockets Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small golden scissors with a red thread caught in the blades Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of silver duct tape Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coin locker key with a numbered plastic tag on a rubber band Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an egg-shaped glowing lamp with the shadow of a creature curled inside Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "음낭",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrinkled sagging pouch of pinkish brown human skin holding two round testicles inside so its bottom bulges into two lobes, a vertical seam line down the middle, sparse short curly hairs scattered on the skin, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_196/01.png"
+  },
+  {
+   "ko": "추 달린 니플 클램프",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two small silver tweezer-like clamps with rubber tips, joined by a thin fine chain, each with a small teardrop weight dangling below Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_201/01.png"
+  },
+  {
+   "ko": "니플 체인",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin delicate silver chain with a small adjustable clamp ring at each end, jewelry-like, not handcuffs Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_148/08.png"
+  },
+  {
+   "ko": "생체 접착 젤 건",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue gun loaded with a cartridge of glowing pink flesh gel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "횡격막",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin dome-shaped sheet of red muscle with a white shiny tendon area in the center, like a shallow upside-down bowl seen from the side Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_183/05.png"
+  },
+  {
+   "ko": "눈물 결정 사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few hard candies shaped like teardrops, clear pale blue glossy candy with a tiny glint Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_200/10.png"
+  },
+  {
+   "ko": "핫바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean fish cake bar on a stick, a long grilled brown fish cake with grill marks Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_134/12.png"
+  },
+  {
+   "ko": "새장 속 그림자 새",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass birdcage holding a bird made entirely of black smoke and shadow Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_204/11.png"
+  },
+  {
+   "ko": "수술용 골 드릴",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clean white and steel cordless surgical bone drill with a thin bit, sterile hospital tool Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_202/07.png"
+  },
+  {
+   "ko": "기억 구슬 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of marbles, each marble showing a tiny glowing memory scene inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손가락 과자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few biscuits shaped exactly like pale human fingers with almond fingernails Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해골 랜턴",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lantern carved from a human skull with candlelight glowing from the eye sockets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "운명의 실 가위",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small golden scissors with a red thread caught in the blades Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "덕트 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of silver duct tape Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코인 락커 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coin locker key with a numbered plastic tag on a rubber band Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계란무드등",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an egg-shaped glowing lamp with the shadow of a creature curled inside Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
