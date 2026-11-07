@@ -27,29 +27,31 @@ const items = [
   ['spray', '호신 스프레이', '소모품', 15000, 5, '캡슐 하나짜리 호신 스프레이.', '대상 시야 방해'],
   ['sword', '낡은 검', '무기', 350000, 1, '벽에 걸려 있던 것. 주인은 값을 깎지 않는다.', '근접 공격 강화'],
 ];
+// ── 규격(기존 소지품·기록 틀 그대로): 조작 34px(폰 40)·모서리 조작 10/칸 12/안쪽 8 · 글 13.5/1.5·메타 12.5·제목 16 · 금액 mono 700 14(상세 머리만 16) · 색은 테마 변수만
+const amt = (n, cls = '') => `<em class="sh-amt${cls ? ' ' + cls : ''}">${won(n)}</em>`;
 const cell = (it, i, sel) => {
-  const [p, name, kind, price, stock] = it;
+  const [p, name, , price] = it;
   const poor = price > BAL;
-  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><em class="sh-price">${wonc(price)}</em>${tip(it)}</button>`;
+  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><span class="sh-band">${won(price)}</span>${tip(it)}</button>`;
 };
-const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b><small>${kind} · 재고 ${stock}</small><em class="sh-price sh-price-ln">${won(price)}</em><p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
+const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kind}</span>재고 ${stock}</small>`;
+const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
 const grid = (sel = -1) => `<div class="it-grid sh-grid">${items.map((it, i) => cell(it, i, sel)).join('')}</div>`;
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
 const tools = (vp, req) => `<div class="gx-rec-tools it-tools sh-tools">
-  <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal"><b>${won(BAL)}</b></span>
-  <span class="it-right"><button class="it-act${req ? ' on' : ''}">${ic('search')}물품 요청</button><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>
-  ${req ? `<div class="sh-req"><input class="gx-wt-q" type="text" value="밤에 쓸 조명 도구하고 소금 같은 거" placeholder="원하는 물건을 적으세요 — 가게 주인이 찾아 봅니다"><button class="it-act on">${ic('search')}찾아 달라기</button></div>` : ''}`;
-const detail = (it, phone) => {
+  <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal">${amt(BAL)}</span>
+  <span class="it-right"><span class="sh-q"><input class="gx-wt-q" type="text" value="${req ? '밤에 쓸 조명 도구하고 소금 같은 거' : ''}" placeholder="원하는 물건 적고 Enter"><button class="sh-go" aria-label="요청">↵</button></span><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
+const detail = (it) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
-  const money = `<div class="sh-money"><div><i>값</i><em>${won(price)}</em></div><div><i>지금 잔고</i><em>${won(BAL)}</em></div><div class="${poor ? 'bad' : 'ok'}"><i>${poor ? '부족' : '산 뒤 잔고'}</i><em>${poor ? '−' : ''}${won(Math.abs(BAL - price))}</em></div></div>`;
+  const money = `<div class="sh-money"><div><i>값</i>${amt(price)}</div><div><i>지금 잔고</i>${amt(BAL)}</div><div class="${poor ? 'bad' : 'ok'}"><i>${poor ? '부족' : '산 뒤 잔고'}</i>${amt(Math.abs(BAL - price)).replace('₩', poor ? '−₩' : '₩')}</div></div>`;
   return `<div class="gx-agpop it-pop sh-det"><div class="gx-agpop-card it-card"><button class="gx-agpop-x">✕</button>
-  <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b><small><span class="sh-kind">${kind}</span> 재고 ${stock}</small><em class="sh-price sh-price-ln sh-price-big">${won(price)}</em></div></div>
+  <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b>${meta(kind, stock)}${amt(price, 'big')}</div></div>
   <p>${desc}</p><p class="ef">효과: ${ef}</p>${money}
   <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>사기</button><button class="gx-chip">자세히</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
-  const body = mode === 'loading' ? loading : grid(mode === 'detail' || mode === 'poor' ? (mode === 'poor' ? 11 : 0) : mode === 'hover' ? -1 : -1);
+  const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1);
   return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${vp === 'phone' ? `<button class="gx-agpop-x">✕</button>` : ''}${tools(vp, mode === 'request')}<div class="it-body sh-body">${body}</div>${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
   ${mode === 'detail' ? detail(items[0]) : mode === 'poor' ? detail(items[11]) : ''}</div>`;
 };
@@ -63,21 +65,41 @@ const css = `
 .sh-msg{max-width:760px;margin:0 auto;padding:0 20px;display:flex;gap:14px}.sh-ava{flex:none;width:40px;height:40px;border-radius:50%;background:#3a4650}.sh-txt{flex:1;min-width:0}
 .sh-user{opacity:.8;margin-bottom:22px}.sh-user .sh-ava{background:#4a4a55}
 .sh-input{position:fixed;left:0;right:0;bottom:0;padding:14px 20px 22px;background:linear-gradient(transparent,#1b1d22 30%)}.sh-input div{max-width:760px;margin:0 auto;height:48px;border-radius:14px;background:#2a2d34;border:1px solid #3a3f48}
-.sh-wrap{background:var(--scrim)}
+.sh-wrap{background:var(--scrim);--h:34px;--r:10px;--rc:12px;--ri:8px;--red:color-mix(in srgb,var(--danger) 80%,#fff);--red-bg:color-mix(in srgb,var(--danger) 12%,transparent);--red-ln:color-mix(in srgb,var(--danger) 55%,transparent)}
+.sh-wrap *{box-sizing:border-box}
+/* 금액: 어디서나 같은 글꼴·굵기·크기 */
+.sh-amt{font:700 14px/1 var(--mono);font-style:normal;color:var(--text);white-space:nowrap;font-variant-numeric:tabular-nums}.sh-amt.big{font-size:16px;color:var(--signal)}
+/* 메타(종류 표 + 재고): 어디서나 12.5 sub */
+.sh-meta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);line-height:1.4}.sh-tag{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:var(--ri);color:var(--text);line-height:1.4}
+/* 팝업 본체 */
 .sh-card{width:min(100%,760px);align-items:stretch;gap:12px;padding:16px;max-height:calc(100% - 8px)}
-.sh-tools{gap:8px}.sh-name{display:inline-flex;align-items:center;gap:8px;height:34px;color:var(--text);font-size:16px;font-weight:700;white-space:nowrap}.sh-name svg{width:18px;height:18px;color:var(--signal)}
-.sh-bal b{font-size:14px;color:var(--text)}
-.sh-x{width:34px;padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
-.it-act.on{border-color:var(--signal);color:var(--signal)}
-.sh-req{display:flex;gap:8px}.sh-req .gx-wt-q{flex:1;max-width:none;margin:0;height:36px}
-.sh-c b{font-size:13.5px}.sh-c small{display:block;font-size:13px;color:var(--sub);font-family:var(--mono);line-height:1.2;padding-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sh-grid .it-tip small{font-size:13px;color:var(--sub)}.sh-grid .it-tip b{font-size:15px}.sh-grid .it-tip p{font-size:13.5px}.sh-det .it-ph{padding-right:40px}.sh-det .it-ph b{font-size:16px}.sh-det .it-ph small{font-size:13.5px;color:var(--sub)}.sh-det .it-card p{font-size:14px}
-.sh-price{display:block;margin:6px -6px -5px;padding:7px 4px;border-top:1px solid var(--accent-line);border-radius:0 0 11px 11px;background:var(--accent-bg);color:var(--signal);font:700 14px/1 var(--mono);font-style:normal;text-align:center;white-space:nowrap;letter-spacing:-.01em}.sh-c.poor .sh-price{background:color-mix(in srgb,var(--danger,#e5484d) 14%,transparent);border-top-color:color-mix(in srgb,var(--danger,#e5484d) 50%,transparent);color:#ff7b80}.sh-price-ln{display:inline-block;margin:8px 0 0;padding:5px 10px;border:1px solid var(--accent-line);border-radius:8px;font-size:15px}.sh-price-h{margin:0 0 0 auto;align-self:center}.sh-poor{font-size:13.5px !important}
-.sh-grid .it-tip{display:none}.sh-grid .it-c.tipon .it-tip{display:block}
-.sh-wait{display:flex;align-items:center;justify-content:center;gap:10px;min-height:260px;color:var(--sub);font-size:14px}
-.sh-spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--signal)}
-.sh-det .it-card{width:min(420px,calc(100vw - 28px))}.sh-ph{align-items:center;gap:14px}.sh-ph .it-ic{width:96px;height:96px;border-radius:14px}.sh-ph .it-ic img{width:84%;height:84%;object-fit:contain;image-rendering:pixelated}.sh-ph b{font-size:19px;line-height:1.2}.sh-phtx{display:flex;flex-direction:column;gap:4px;min-width:0}.sh-kind{display:inline-block;padding:2px 8px;margin-right:6px;border:1px solid var(--line2);border-radius:6px;font-size:12.5px;color:var(--text)}.sh-price-big{align-self:flex-start;margin-top:4px;font-size:18px;padding:6px 12px}.sh-ph small{font-size:13.5px;color:var(--sub)}.sh-money{display:flex;flex-direction:column;gap:0;margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--void);overflow:hidden}.sh-money>div{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--line)}.sh-money>div:first-child{border-top:0}.sh-money i{font-style:normal;font-size:13.5px;color:var(--sub)}.sh-money em{font:700 16px/1 var(--mono);font-style:normal;color:var(--text)}.sh-money .ok{background:var(--accent-bg)}.sh-money .ok em{color:var(--signal)}.sh-money .bad{background:color-mix(in srgb,var(--danger,#e5484d) 14%,transparent)}.sh-money .bad i,.sh-money .bad em{color:#ff7b80}.sh-poor{color:var(--danger,#e5484d) !important}
-.it-btns .gx-chip:disabled{opacity:.45}
-@media (max-width:760px){.sh-ph .it-ic{width:110px;height:110px}.sh-wrap{align-items:flex-start;padding:14px 14px 96px}.sh-card{width:100%;padding:12px;padding-top:14px;max-height:calc(100% - 0px)}.sh-close{width:100%;justify-content:center;height:44px;margin-top:4px;flex:none}.sh-close svg{color:var(--sub)}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}.it-right{margin-left:0;flex:1}.it-right .it-act{flex:1;justify-content:center}.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-req{flex-wrap:wrap}.sh-req .it-act{width:100%;justify-content:center}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
+/* 도구 줄: 모든 조작 34px·모서리 10 */
+.sh-tools{gap:8px}.sh-tools .it-act,.sh-tools .it-cnt,.sh-tools .gx-wt-q{height:var(--h);border-radius:var(--r);border:1px solid var(--line);background:var(--panel2);font-size:13.5px}
+.sh-name{display:inline-flex;align-items:center;gap:8px;height:var(--h);padding:0 4px;color:var(--text);font-size:16px;font-weight:700;white-space:nowrap}.sh-name svg{width:18px;height:18px;color:var(--signal)}
+.sh-bal{padding:0 12px;color:var(--text)}
+.sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
+.sh-q{position:relative;display:inline-flex;width:300px}.sh-q .gx-wt-q{width:100%;max-width:none;margin:0;padding:0 38px 0 12px}.sh-go{position:absolute;right:4px;top:4px;width:calc(var(--h) - 8px);height:calc(var(--h) - 8px);border:0;border-radius:var(--ri);background:var(--accent-bg);color:var(--signal);font:700 14px/1 inherit;cursor:pointer}
+/* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
+.sh-c{padding-bottom:0}.sh-c b{font-size:13px;padding:6px 0 7px}
+.sh-band{display:block;margin:0 -6px;padding:8px 4px;border-top:1px solid var(--accent-line);border-radius:0 0 calc(var(--rc) - 1px) calc(var(--rc) - 1px);background:var(--accent-bg);color:var(--signal);font:700 14px/1 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-c.poor .sh-band{background:var(--red-bg);border-top-color:var(--red-ln);color:var(--red)}
+/* 말풍선: 제목 14 · 메타 12.5 · 금액 14 · 글 13/1.5 */
+.sh-grid .it-tip{display:none;width:260px;padding:12px}.sh-grid .it-c.tipon .it-tip{display:block}.sh-grid .it-tip b{font-size:14px;margin-bottom:6px}.sh-grid .it-tip .sh-amt{display:inline-block;margin-top:8px}.sh-grid .it-tip p{font-size:13px;line-height:1.5;margin-top:8px}
+/* 불러오는 중 */
+.sh-wait{display:flex;align-items:center;justify-content:center;gap:10px;min-height:260px;color:var(--sub);font-size:13.5px}.sh-spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--signal)}
+/* 상세: 그림 88 → 이름 16·메타·금액 16 / 글 13.5 / 돈 표 / 단추 */
+.sh-det .it-card{width:min(420px,calc(100vw - 28px))}.sh-ph{align-items:center;gap:14px;padding-right:36px}.sh-ph .it-ic{width:88px;height:88px;border-radius:var(--rc)}.sh-ph .it-ic img{width:84%;height:84%;object-fit:contain;image-rendering:pixelated}
+.sh-phtx{display:flex;flex-direction:column;gap:6px;min-width:0}.sh-phtx b{font-size:16px;line-height:1.3}
+.sh-det .it-card p{font-size:13.5px;line-height:1.5;margin-top:12px}.sh-det .it-card p.ef{margin-top:6px}
+.sh-money{margin-top:12px;border:1px solid var(--line);border-radius:var(--rc);background:var(--void);overflow:hidden}.sh-money>div{display:flex;justify-content:space-between;align-items:center;height:36px;padding:0 12px;border-top:1px solid var(--line)}.sh-money>div:first-child{border-top:0}.sh-money i{font-style:normal;font-size:13.5px;color:var(--sub)}
+.sh-money .ok{background:var(--accent-bg)}.sh-money .ok .sh-amt{color:var(--signal)}.sh-money .bad{background:var(--red-bg)}.sh-money .bad i,.sh-money .bad .sh-amt{color:var(--red)}
+.sh-det .it-btns{margin-top:12px}.sh-det .it-btns .gx-chip{height:var(--h);border-radius:var(--r);font-size:13.5px}.it-btns .gx-chip:disabled{opacity:.45}
+.sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
+/* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
+@media (max-width:760px){.sh-wrap{--h:40px;align-items:flex-start;padding:14px 14px 96px}.sh-card{width:100%;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}
+.it-right{display:contents}.sh-bal{order:1}.it-right .it-act{order:2;margin-left:auto;flex:none}.sh-q{order:3;width:100%;flex:1 1 100%}.sh-go{top:4px}
+.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:13px;letter-spacing:-.02em;padding-left:2px;padding-right:2px}.sh-ph .it-ic{width:96px;height:96px}
+.sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/장터_초안/';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: '철물점 문을 열고 들어간다.' }, { role: 'char', data: CHAR_TEXT }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
