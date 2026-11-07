@@ -2,6 +2,7 @@
 // 사용법: node tests/shop-browser.mjs <out-dir>
 import { mkdirSync } from 'node:fs';
 import { boot, closeEditor, closeWin, launch, loadFixture, openEditor, openWin, sleep } from './qc-settings-harness.mjs';
+import { distPack } from './data-init.mjs';
 
 const fx = loadFixture(new URL('../.scratch/fixture/fixture.json', import.meta.url).pathname);
 const out = process.argv[2] ?? '/tmp/shop-shots';
@@ -51,7 +52,8 @@ for (const vp of ['pc', 'phone']) {
     message: [{ role: 'user', data: '철물점 문을 열고 들어간다.', chatId: 'u1' }, { role: 'char', data: CHAR, chatId: 'c1' }],
     scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0' },
   };
-  const { page, errors } = await boot(b, fx, chat, vp);
+  // 상품 그림 팩은 저장소에 미리 둔다 (소지품과 같은 그림, host/itemicons.ts)
+  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
   if (process.env.SHOP_DEBUG) page.on('console', (m) => { if (/goei/.test(m.text())) console.log('LOG', m.text().slice(0, 300)); });
   const shot = (n) => page.screenshot({ path: `${out}/${vp}_${n}.png` });
   const click = async (sel) => { await page.evaluate((q) => document.querySelector(q)?.click(), sel); await sleep(250); };

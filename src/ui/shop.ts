@@ -18,7 +18,7 @@ import { peopleStore } from '../core/people/store';
 import { peopleSettings } from '../core/people/settings';
 import { identityText } from '../core/people/identity';
 import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { addItem, itemKindLabel, itemsVars, liveItemsOf, readItems, removeItem, type Item } from '../core/items';
+import { addItem, itemKindLabel, itemsVars, liveItemsOf, readItems, removeItem, type Item, type ItemKind } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
   applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopSettings, shopVars, shortWon, startSell, talkPrompt,
@@ -27,6 +27,13 @@ import {
 import { ICONS } from './icons';
 import { imageUrl } from './images';
 import { ITEM_ICONS } from './itemIcons';
+import { itemIconUrl } from '../host/itemicons';
+
+/** 상품 그림: 소지품과 같은 PixelLab 그림 팩(host/itemicons.ts)에서 이름으로 찾고, 없거나 아직 못 받았으면 종류 선 아이콘 (표시 전용, 모델에는 안 넘김) */
+const pic = (name: string, kind: ItemKind): string => {
+  const u = itemIconUrl(name, kind);
+  return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[kind];
+};
 import { isPhone } from './media';
 import { toast } from './toast';
 
@@ -123,7 +130,7 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
   const poor = it.price > bal;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(itemKindLabel(it.kind))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}<span class="sh-amt">${esc(shortWon(it.price))}</span></span>`;
   return `<button class="it-c sh-c${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
-    <span class="it-ic">${ITEM_ICONS[it.kind]}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
+    <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
 }
 
 /** 팔 것 고르기: 진열대 자리에 내 소지품 (같은 격자). 고르면 입력창에 「팔기: 이름」 칩 */
@@ -138,7 +145,7 @@ function pickCell(it: Item, st: ShopState): string {
   const sel = st.sell?.itemId === it.id;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(itemKindLabel(it.kind))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}${Number.isSafeInteger(it.price) ? `<span class="sh-amt">산 값 ${esc(shortWon(it.price!))}</span>` : ''}</span>`;
   return `<button class="it-c sh-c${sel ? ' sel' : ''}" data-action="shop-sell-pick" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 팔기" ${shopUi.loading ? 'disabled' : ''}>
-    <span class="it-ic">${ITEM_ICONS[it.kind]}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(shortWon(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(shortWon(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
+    <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(shortWon(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(shortWon(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
 }
 
 /** 주인 사진이 없을 때 기본 얼굴: 어둠 속 역광 그림자 (사용자 11-07, 후보 C). 성별·옷·얼굴을 알 수 없는 형체만 */
@@ -183,7 +190,7 @@ function detailHtml(ctx: ChatContext, st: ShopState, bal: number): string {
     <div class="sum${poor ? ' bad' : ''}"><i>${poor ? '부족' : '잔액'}</i><span class="sh-amt">${esc(shortWon(poor ? -left : left))}</span></div>
   </div>`;
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${ITEM_ICONS[it.kind]}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta"><span class="sh-tag">${esc(itemKindLabel(it.kind))}</span>${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big">${esc(shortWon(it.price))}</span></div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.kind)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta"><span class="sh-tag">${esc(itemKindLabel(it.kind))}</span>${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big">${esc(shortWon(it.price))}</span></div></div>
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}
     ${it.sold ? '' : money}
@@ -208,7 +215,7 @@ function sellHtml(st: ShopState, bal: number): string {
   </div>`
     : refused ? '<p class="dim">주인이 이 물건은 사지 않겠대요.</p>' : '<p class="dim">아직 값을 묻지 않았어요.</p>';
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${ITEM_ICONS[o.kind]}</span><div class="sh-phtx"><b>${esc(o.name)}</b><span class="sh-meta"><span class="sh-tag">${esc(itemKindLabel(o.kind))}</span><span>내 물건</span>${o.paid !== undefined ? `<span>산 값 ${esc(shortWon(o.paid))}</span>` : ''}</span>${offered ? `<span class="sh-amt big">+${esc(shortWon(o.price as number))}</span>` : ''}</div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(o.name, o.kind)}</span><div class="sh-phtx"><b>${esc(o.name)}</b><span class="sh-meta"><span class="sh-tag">${esc(itemKindLabel(o.kind))}</span><span>내 물건</span>${o.paid !== undefined ? `<span>산 값 ${esc(shortWon(o.paid))}</span>` : ''}</span>${offered ? `<span class="sh-amt big">+${esc(shortWon(o.price as number))}</span>` : ''}</div></div>
     ${o.desc ? `<p>${esc(o.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${o.effect ? `<p class="ef">효과: ${esc(o.effect)}</p>` : ''}
     ${money}

@@ -163,7 +163,7 @@ function ensureRoot(): HTMLElement {
   });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
-    if (view.kind !== 'picker' && tab === 'items') render();
+    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open)) render();
   });
   const style = document.createElement('style');
   style.textContent = css;
