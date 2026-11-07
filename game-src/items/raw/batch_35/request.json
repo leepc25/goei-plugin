@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slice of strawberry cream cake. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red soda can, plain with no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cluster of shiny red berries on a twig. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single tangerine with a leaf. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear bag of assorted snacks tied with a twist tie. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large 2-liter clear water bottle with a blue cap, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue sports drink bottle, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim black energy drink can, plain with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white milk carton, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small yellow round banana milk bottle, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small soy milk carton with a straw, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small orange juice box with a straw, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glass sparkling water bottle, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic bottle of green tea, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold beer can, plain with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark red wine bottle with a cork, blank label. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "케이크",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slice of strawberry cream cake. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "음료수 캔",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red soda can, plain with no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붉은 열매",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cluster of shiny red berries on a twig. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "귤",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single tangerine with a leaf. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "간식 봉지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear bag of assorted snacks tied with a twist tie. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "생수 2L",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large 2-liter clear water bottle with a blue cap, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이온음료",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue sports drink bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "에너지 드링크",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim black energy drink can, plain with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "우유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white milk carton, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "바나나우유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small yellow round banana milk bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "두유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small soy milk carton with a straw, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "주스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small orange juice box with a straw, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "탄산수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glass sparkling water bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic bottle of green tea, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "맥주",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold beer can, plain with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "와인",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark red wine bottle with a cork, blank label. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

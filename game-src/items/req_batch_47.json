@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "카드 키(워터파크)",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue waterproof card key on a coil band. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "호텔 키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass hotel room key with a large wooden tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자동차 키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal car key with a black head. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오토바이 키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a motorcycle key with a small red head. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "현관 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver house door key. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금고 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long double-bit safe key. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마스터키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel master key. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해골 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old iron key with a skull-shaped bow. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹슨 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rusty iron key. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "황금 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate golden key. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "열쇠고리",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a keychain with a small charm. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비밀번호 메모",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small torn paper note with scribbled lines. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보안 카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain gray security card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방문증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain visitor pass badge with a clip. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "관리국 사원증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark blue agency ID badge with a silver emblem, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "백일몽 사원증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white corporate ID badge with a pastel logo shape, no text. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single slice of pepperoni pizza. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an instant ramen packet, plain red packet with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed white instant rice bowl, plain lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tuna can, plain lid with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed rectangular blue luncheon meat can, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few strips of beef jerky. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of hardtack crackers. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed olive military ration pouch, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed silver emergency food bar packet, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red apple. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single banana. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loaf of bread. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round bun with a dark top. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three round chocolate chip cookies. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of square biscuits. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few colorful gummy bears. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "피자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single slice of pepperoni pizza. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라면 봉지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an instant ramen packet, plain red packet with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "즉석밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed white instant rice bowl, plain lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "참치캔",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tuna can, plain lid with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "스팸",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed rectangular blue luncheon meat can, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "육포",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few strips of beef jerky. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "건빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of hardtack crackers. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전투식량",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed olive military ration pouch, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비상식량",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed silver emergency food bar packet, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사과",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red apple. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "바나나",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single banana. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loaf of bread. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "단팥빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round bun with a dark top. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쿠키",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three round chocolate chip cookies. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비스킷",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of square biscuits. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "젤리",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few colorful gummy bears. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

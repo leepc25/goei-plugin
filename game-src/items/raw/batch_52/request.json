@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wristwatch with cracked glass and stopped hands. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue plastic cassette recorder with two buttons on the front. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small mysterious gift box with a large price tag tied on, blank tag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact black metal bracelet device with glowing blue seams, folded armor core. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden ticket with an ornate border, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with a soft green glowing stone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old leather coin wallet with faint glowing coins peeking out. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-sized set of long decorated false nails with fine silver threads trailing from the tips. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cute smiling plush animal keyring charm with a ring. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed cheerful board game box in red, blue and yellow with a bunny silhouette, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black VHS tape with no label, slightly scratched. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shining golden rooster statue. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy golden stone shaped like a rooster. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single glittering iridescent feather. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden marionette puppet hanging from strings and a control bar. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden puppet control bar with tangled strings. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "손목 시계(멈춤)",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wristwatch with cracked glass and stopped hands. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "「천사의 한숨」 카세트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue plastic cassette recorder with two buttons on the front. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "위 헬프!",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small mysterious gift box with a large price tag tied on, blank tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "아머",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact black metal bracelet device with glowing blue seams, folded armor core. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소원권",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden ticket with an ornate border, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "치유 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with a soft green glowing stone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화폐 지갑",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old leather coin wallet with faint glowing coins peeking out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "실 뽑는 네일아트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-sized set of long decorated false nails with fine silver threads trailing from the tips. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "착한 친구 키링",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cute smiling plush animal keyring charm with a ring. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유쾌 테마파크 상자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed cheerful board game box in red, blue and yellow with a bunny silhouette, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금지된 VHS",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black VHS tape with no label, slightly scratched. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "황금 닭 보물",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shining golden rooster statue. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "황금 닭 누름돌",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy golden stone shaped like a rooster. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "반짝이는 깃털",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single glittering iridescent feather. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마리오네트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden marionette puppet hanging from strings and a control bar. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "마리오네트 실",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden puppet control bar with tangled strings. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an antique bronze ornament. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed luxury leather handbag, no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed luxury leather wallet, no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown leather wallet. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a decorative gift certificate card, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black hardware wallet device with a tiny screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white pearl necklace. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with a large diamond. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut red ruby gemstone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut green emerald gemstone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut blue sapphire gemstone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single gold tooth. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick gold chain necklace. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of gold cufflinks. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a luxury black and gold fountain pen, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold pocket watch on a chain, open. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "금속 골동품",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an antique bronze ornament. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "명품 가방",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed luxury leather handbag, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "명품 지갑",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed luxury leather wallet, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지갑",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown leather wallet. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "상품권",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a decorative gift certificate card, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가상화폐 지갑",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black hardware wallet device with a tiny screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진주 목걸이",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white pearl necklace. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "다이아 반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with a large diamond. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "루비",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut red ruby gemstone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "에메랄드",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut green emerald gemstone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사파이어",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cut blue sapphire gemstone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금니",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single gold tooth. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금목걸이 두꺼운",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick gold chain necklace. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "커프스",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of gold cufflinks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "만년필(고급)",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a luxury black and gold fountain pen, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "회중시계",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold pocket watch on a chain, open. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an unsheathed katana with a matte black blade and black-wrapped handle, lying diagonally, no scabbard. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black compact submachine gun with a short barrel, straight magazine and folded stock, side view facing right. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black modern assault rifle with a scope rail and straight magazine, side view facing right. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an AK-47 rifle with wooden stock and handguard and a curved steel magazine, side view facing right, no markings. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large Chinese guandao glaive with a broad curved blade on a long wooden pole, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy six-barrel rotary minigun with a carry handle and ammo feed, side view facing right. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy belt-fed machine gun with a bipod folded under the barrel, side view facing right. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flamethrower nozzle gun connected by a hose to a pair of metal fuel tanks, no flame. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round olive-green frag grenade with a pin and lever. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of three red dynamite sticks taped together with a fuse, no lit flame. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate silver butter knife with an engraved handle and a rounded blade, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old rusty knife with a chipped blade and a worn wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rope tied into a hangman's noose loop, hanging upright, rope end at the top. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean kitchen chef knife with a steel blade and black handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy rectangular butcher meat cleaver with a wooden handle, blade facing down. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thin Japanese sashimi knife with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "검은 일본도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an unsheathed katana with a matte black blade and black-wrapped handle, lying diagonally, no scabbard. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "기관단총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black compact submachine gun with a short barrel, straight magazine and folded stock, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black modern assault rifle with a scope rail and straight magazine, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "AK-47",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an AK-47 rifle with wooden stock and handguard and a curved steel magazine, side view facing right, no markings. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "언월도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large Chinese guandao glaive with a broad curved blade on a long wooden pole, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "미니건",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy six-barrel rotary minigun with a carry handle and ammo feed, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "중기관총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy belt-fed machine gun with a bipod folded under the barrel, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화염방사기",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flamethrower nozzle gun connected by a hose to a pair of metal fuel tanks, no flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수류탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round olive-green frag grenade with a pin and lever. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "폭약",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of three red dynamite sticks taped together with a fuse, no lit flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "특제 버터나이프",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate silver butter knife with an engraved handle and a rounded blade, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹슨 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old rusty knife with a chipped blade and a worn wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "올가미",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rope tied into a hangman's noose loop, hanging upright, rope end at the top. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "식칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean kitchen chef knife with a steel blade and black handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "정육점 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy rectangular butcher meat cleaver with a wooden handle, blade facing down. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "회칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thin Japanese sashimi knife with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

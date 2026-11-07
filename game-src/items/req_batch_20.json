@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "매직펜",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black marker pen with cap, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붓",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a calligraphy brush with a bamboo handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "먹과 벼루",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ink stick resting on a stone inkstone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "물감",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three paint tubes in red, blue and yellow, blank tubes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "크레파스",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few crayons in different colors. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지우개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white eraser. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "계산기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray pocket calculator, front view, blank display. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도장",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round wooden personal seal stamp, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "인주",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round red ink pad, open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "확성기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white megaphone with a handle, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경광봉",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange glowing traffic baton. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라바콘",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange traffic cone with white stripes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자전거 자물쇠",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled steel cable bike lock with a key lock. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금고",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small gray steel safe with a dial, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "열쇠 따개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of thin metal lock picks fanned out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유리 깨는 망치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red emergency glass-breaking hammer. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

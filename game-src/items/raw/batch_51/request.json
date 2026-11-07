@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty clear glass bottle with a cork. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue metal drum barrel, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden chest locked with a padlock. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed red velvet jewelry box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden music box with the lid open. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver metal lunch box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar full of colorful candies. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black VHS video tape with a blank white label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled snake figure made of linked old silver coins. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rusty old walkie-talkie with a bent antenna. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a worn dark vest with a torn rectangular patch where a name tag was ripped off. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a creepy porcelain doll in a faded dress, sitting. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale blank expressionless mask, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cracked round hand mirror. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tangled clump of long black hair. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single worn-out dirty shoe. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "보틀(빈)",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty clear glass bottle with a cork. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "드럼통",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue metal drum barrel, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자물쇠 달린 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden chest locked with a padlock. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보석함",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed red velvet jewelry box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오르골",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden music box with the lid open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도시락통",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver metal lunch box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사탕 통",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar full of colorful candies. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비디오테이프",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black VHS video tape with a blank white label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "은화 뱀",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled snake figure made of linked old silver coins. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹슨 무전기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rusty old walkie-talkie with a bent antenna. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이름표 떨어진 조끼",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a worn dark vest with a torn rectangular patch where a name tag was ripped off. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a creepy porcelain doll in a faded dress, sitting. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가면",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale blank expressionless mask, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "깨진 거울",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cracked round hand mirror. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "머리카락 뭉치",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tangled clump of long black hair. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "낡은 신발",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single worn-out dirty shoe. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

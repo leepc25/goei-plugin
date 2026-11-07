@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "숯",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few black charcoal lumps. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장작",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of firewood logs. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "번개탄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round charcoal briquette with holes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비닐 랩",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of plastic wrap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "알루미늄 호일",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of aluminum foil. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휴지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single roll of white toilet paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "물티슈",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of wet wipes, plain pack. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "각티슈",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a box of tissues with one tissue sticking out, plain box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "키친타월",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of paper towels. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비누",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bar of white soap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "샴푸",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white shampoo bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "치약",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a toothpaste tube, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "칫솔",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a toothbrush. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "면도기",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a disposable razor. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "생리대",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pouch of sanitary pads, plain wrapper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손 소독제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pump bottle of hand sanitizer gel, blank label. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

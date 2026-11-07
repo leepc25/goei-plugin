@@ -10,6 +10,8 @@ const readJson = (p) => JSON.parse(readFileSync(new URL(p, ROOT), 'utf8'));
 
 export const WORLD_PACK_NAME = 'goei-data-world';
 export const INSTALL_PACK_NAME = 'goei-data-install';
+/** 소지품 그림 팩 (2026-11-07): game-src/items/icons.json 매칭 표 + icons/*.png (85×85, 배경 없음) base64. 소지품 메뉴를 처음 열 때 받아 저장소에 둔다 (host/itemicons.ts) */
+export const ITEMS_PACK_NAME = 'goei-data-items';
 /** 조각 하나의 상한 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다. 본체 조각과 같은 200KB) */
 export const PART_BYTES = 200_000;
 
@@ -51,6 +53,19 @@ export function installPackText() {
     directory: readJson('src/data/install/directory.json'),
     icon: readJson('src/data/install/icon.json'),
   });
+}
+
+/** 소지품 그림 팩 글: { schema, kind:'items', table:[{k:키워드들, f:파일, kind, base?}], icons:{파일: base64 png} }. src/core/datapack.ts applyItemsPack 가 읽는 모양 */
+export function itemsPackText() {
+  const src = readJson('game-src/items/icons.json');
+  const table = [];
+  const icons = {};
+  for (const e of src.icons) {
+    if (!Array.isArray(e.keywords) || typeof e.file !== 'string') continue;
+    table.push({ k: e.keywords, f: e.file, kind: e.kind, ...(e.base ? { base: true } : {}) });
+    icons[e.file] = readFileSync(new URL(`game-src/items/icons/${e.file}`, ROOT)).toString('base64');
+  }
+  return JSON.stringify({ schema: 1, kind: 'items', table, icons });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */

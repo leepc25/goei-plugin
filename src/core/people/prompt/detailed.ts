@@ -438,6 +438,7 @@ export const UPDATER_DETAILED: string = [
   "- `gone`: a listed item is used up, lost, destroyed, given away, or thrown away. Copy the listed `name` exactly.",
   "- `name` Korean ≤30. `desc` Korean ≤80: amount and condition in words (never a count such as ×3). `kind` one of `item_kinds`. `effect` Korean ≤60 only when the text states what the item does; otherwise null. Cite `m` and a verbatim `quote`.",
   "- At most 4 items per response; one entry per item; never invent an item or an effect.",
+  "- Money is never an item: cash, bills, coins, cheques, gift certificates with a face value, and account balances belong to the ledger (`transactions`), not to `items`.",
   "<<END:items>>",
   "<<SECTION:debrief>>",
   "## 15c. Debrief — a deployed agent's short note on an incident that just ended",

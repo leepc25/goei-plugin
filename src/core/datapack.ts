@@ -21,6 +21,7 @@ export interface PackSpec {
 
 declare const __WORLD_PACK__: string | undefined;
 declare const __INSTALL_PACK__: string | undefined;
+declare const __ITEMS_PACK__: string | undefined;
 
 function expectOf(raw: unknown): PackExpect {
   try {
@@ -34,6 +35,8 @@ function expectOf(raw: unknown): PackExpect {
 
 export const WORLD_PACK: PackSpec = { name: 'goei-data-world', label: '세계 자료', expect: expectOf(typeof __WORLD_PACK__ === 'string' ? __WORLD_PACK__ : undefined) };
 export const INSTALL_PACK: PackSpec = { name: 'goei-data-install', label: '설치 자료', expect: expectOf(typeof __INSTALL_PACK__ === 'string' ? __INSTALL_PACK__ : undefined) };
+/** 소지품 그림 팩 (2026-11-07): 매칭 표 + 85×85 png base64. 부팅 때가 아니라 소지품 메뉴를 열 때 받는다 (host/itemicons.ts) */
+export const ITEMS_PACK: PackSpec = { name: 'goei-data-items', label: '소지품 그림', expect: expectOf(typeof __ITEMS_PACK__ === 'string' ? __ITEMS_PACK__ : undefined) };
 
 /** 저장소에서 읽은 글이 이 본체의 팩인가: 길이와 FNV 지문(동기, 880KB 에 수 ms). 지문이 비어 있는 빌드는 어떤 글도 맞지 않는다(늘 다시 받음) */
 export function packMatches(text: string, expect: PackExpect): boolean {
@@ -81,4 +84,50 @@ export function applyInstallPack(text: string): void {
   if (!obj(j.directory)) throw new Error('설치 자료 팩 형식이 달라요 (directory).');
   if (!obj(j.icon)) throw new Error('설치 자료 팩 형식이 달라요 (icon).');
   setInstallData({ greetings: { index: g.index as never, texts: g.texts.map(String) }, pictures: j.pictures as never, directory: j.directory, icon: j.icon as never });
+}
+
+// ── 소지품 그림 팩 (scripts/data-pack.mjs itemsPackText 와 같은 모양) ──
+
+export interface ItemIconRow { k: string[]; f: string; kind: string; base?: boolean }
+export interface ItemIconPack { table: ItemIconRow[]; icons: Record<string, string> }
+
+/** 소지품 그림 팩 글을 푼다. 표는 긴 키워드가 먼저 오게 정렬한다 (「소금 봉지」가 「소금」보다 먼저 맞게). 형식이 다르면 던진다 */
+export function applyItemsPack(text: string): ItemIconPack {
+  let j: unknown;
+  try {
+    j = JSON.parse(text);
+  } catch {
+    throw new Error('소지품 그림 팩이 JSON 이 아니에요.');
+  }
+  if (!obj(j) || j.schema !== 1 || j.kind !== 'items' || !Array.isArray(j.table) || !obj(j.icons)) throw new Error('소지품 그림 팩 형식이 달라요.');
+  const icons = j.icons as Record<string, unknown>;
+  const table = (j.table as unknown[])
+    .filter((r): r is ItemIconRow => obj(r) && Array.isArray(r.k) && typeof r.f === 'string' && typeof r.kind === 'string' && typeof icons[r.f] === 'string')
+    .map((r) => ({ k: r.k.map((x) => normIcon(String(x))).filter(Boolean), f: r.f, kind: r.kind, ...(r.base ? { base: true } : {}) }))
+    .sort((a, b) => Math.max(...b.k.map((x) => x.length), 0) - Math.max(...a.k.map((x) => x.length), 0));
+  return { table, icons: icons as Record<string, string> };
+}
+
+/** 이름 비교용: 띄어쓰기·기호 없이 소문자 */
+export const normIcon = (s: string) => s.toLowerCase().replace(/[\s·()\[\]「」.,'"]/g, '');
+
+/** 이름에 맞는 그림 파일: 가장 긴 키워드가 이름에 들어 있는 줄 → 없으면 그 종류의 기본 그림(base) → 없으면 null */
+export function matchItemIcon(table: ItemIconRow[], name: string, kind: string): string | null {
+  const n = normIcon(name);
+  if (n) {
+    // 같은 길이면 같은 종류를 먼저
+    let best: ItemIconRow | null = null;
+    let bestLen = 0;
+    for (const r of table) {
+      for (const k of r.k) {
+        if (k.length < 2 || !n.includes(k)) continue;
+        if (k.length > bestLen || (k.length === bestLen && best && best.kind !== kind && r.kind === kind)) {
+          best = r;
+          bestLen = k.length;
+        }
+      }
+    }
+    if (best) return best.f;
+  }
+  return table.find((r) => r.base && r.kind === kind)?.f ?? null;
 }

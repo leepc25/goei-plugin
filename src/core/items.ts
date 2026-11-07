@@ -38,7 +38,7 @@ export const ITEM_KINDS: { id: ItemKind; label: string; hint: string }[] = [
   { id: 'key', label: '열쇠·출입증', hint: '열쇠·카드키·신분증' },
   { id: 'seal', label: '봉인구·용기', hint: '수갑·봉인 상자·시료통' },
   { id: 'anomaly', label: '회수물·이상물', hint: '괴이에서 나온 것' },
-  { id: 'valuable', label: '귀중품', hint: '현금 봉투·보석·시계' },
+  { id: 'valuable', label: '귀중품', hint: '보석·시계·금붙이 (현금은 가계부)' },
   { id: 'consumable', label: '소모품', hint: '건전지·탄약·소금·초' },
   { id: 'misc', label: '기타', hint: '어디에도 안 맞는 것' },
 ];

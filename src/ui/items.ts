@@ -6,6 +6,7 @@
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { refreshUseBox } from '../host/usebox';
+import { itemIconStatus, itemIconUrl } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
   addItem, ITEM_USE_AT_VAR, itemKindLabel, ITEM_KINDS, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems, readItemUse, readItems, removeItem, searchItems, updateItem,
@@ -46,8 +47,10 @@ export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptsta
 export const liveOf = (ctx: ChatContext): Item[] => liveItems(itemsOf(ctx), aliveAnchors(ctx.chat));
 
 /** 칸 그림: PixelLab 물건 그림(game-src/items/, 이름 키워드 매칭)이 들어오면 여기서 고른다. 아직은 종류 선 아이콘 (자리 표시) */
+/** 물건 그림: PixelLab 그림 팩(host/itemicons.ts)에서 이름 키워드로 찾고, 없거나 아직 못 받았으면 종류 선 아이콘 */
 function itemPic(it: Item): string {
-  return ITEM_ICONS[it.kind];
+  const u = itemIconUrl(it.name, it.kind);
+  return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[it.kind];
 }
 
 const FROM_NAME: Record<Item['from'], string> = { store: '장터', story: '본문', manual: '직접' };
@@ -93,7 +96,10 @@ function itemsPane(ctx: ChatContext): string {
     ${isPhone() ? '' : `<span class="it-right">${addButton('it-act')}${mergeButton(ctx, 'it-act')}</span>`}
     <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
   </div>`;
-  return `${tools}<div class="it-body">${itemsUi.view === 'log' ? logList(ctx) : gridHtml(ctx)}</div>`;
+  // 그림 팩(host/itemicons.ts): 처음 열 때 받는다. 받는 동안·실패는 한 줄로만 알리고, 그림은 선 아이콘으로 대신한다
+  const st = itemIconStatus();
+  const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 종류 아이콘으로 보여요. (${esc(st.failed)})</p>` : '';
+  return `${tools}${picNote}<div class="it-body">${itemsUi.view === 'log' ? logList(ctx) : gridHtml(ctx)}</div>`;
 }
 
 /** 격자: 산 물건 → 빈 칸(칸 수까지) → 넘친 물건(붉은 테두리). 찾는 중이면 맞는 것만, 빈 칸 없음 */

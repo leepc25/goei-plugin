@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain beige license card. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain laminated license card. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass numbered tag with a hole, no digits. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass arcade token. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal name plate, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blank school name tag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small key on a necklace chain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed plain black box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed clear plastic airtight container with clip lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed glass jar with a metal lid, empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of yellow and black striped tape, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled heavy iron chain. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed burlap sack tied with rope. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed clear zip bag, empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black duffel bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink gift box tied with a green ribbon bow. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "협회 등록증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain beige license card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "프리랜서 면허증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain laminated license card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "번호 패",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass numbered tag with a hole, no digits. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "코인",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass arcade token. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠 명찰",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal name plate, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가슴 명찰",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blank school name tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목걸이 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small key on a necklace chain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "검은 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed plain black box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "밀폐 용기",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed clear plastic airtight container with clip lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유리병",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed glass jar with a metal lid, empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "봉인 테이프",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of yellow and black striped tape, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠사슬",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled heavy iron chain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "자루",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed burlap sack tied with rope. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "지퍼백",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed clear zip bag, empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가방",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black duffel bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이빨 요정 선물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink gift box tied with a green ribbon bow. Only this item, nothing else beside it, no text."
+  }
+ ]
+}
