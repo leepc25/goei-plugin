@@ -92,3 +92,21 @@ test('2026-11-07 설정 L·M·N·P: 항상 포함 인물, 최근 글 범위, 증
   assert.ok(/## User rules\n민간인은 빼라/.test(b.system));
   assert.ok(Ro.buildRouter(c, store, names, '입력').system.startsWith('# Router'));
 });
+
+test('2026-11-07 G: 명단에 정체 발췌(시트 첫 280자 또는 기본정보)·관계 상대, 예산 12,000자, 새 인물 힌트 12', () => {
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  store.people.데쥬레 = person('데쥬레');
+  store.people.쟈알디.slots.identity = [{ id: 'i1', text: '관리국 부장. 과묵하다.', src: 'seed', anchor: '#0', seq: 0 }];
+  store.people.쟈알디.slots.relationship = [{ id: 'r1', text: '부하', src: 'seed', anchor: '#0', seq: 1, target: '데쥬레' }, { id: 'r2', text: '유저', src: 'seed', anchor: '#0', seq: 2, target: '@user' }];
+  const b = Ro.buildRouter(c, store, names, '입력', { identityOf: (n) => (n === '데쥬레' ? '시트 '.repeat(200) : null) });
+  const j = b.data.catalog.find((x) => x.name === '쟈알디');
+  assert.equal(j.identity, '관리국 부장. 과묵하다.', '시트가 없으면 기본정보 칸');
+  assert.deepEqual(j.relations, ['데쥬레'], '관계 상대 (유저 제외)');
+  const d = b.data.catalog.find((x) => x.name === '데쥬레');
+  assert.equal(d.identity.length, Ro.ROUTER_IDENTITY_CHARS, '시트는 280자까지');
+  assert.equal(d.relations, undefined);
+  assert.ok(/`identity` excerpt/.test(b.system));
+  const many = Array.from({ length: 15 }, (_, i) => ({ name: `신규${i}`, aliases: [], quote: '' }));
+  assert.equal(Ro.parseRouter(JSON.stringify({ selected: [], new_characters: many }), store, names).newCharacters.length, 12);
+});

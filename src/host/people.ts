@@ -496,10 +496,10 @@ let routerHints: RouterHint[] = [];
 export const routerHintsNow = (): RouterHint[] => routerHints;
 
 /** 모델이 고른 장면 인물. 실패·지연·빈 결과면 null (코드 Router 로). 입력·최근 글·명단이 같으면 재사용 */
-export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = []): Promise<string[] | null> {
+export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = [], identityOf?: (name: string) => string | null | undefined): Promise<string[] | null> {
   if (settings.router !== 'model' || !Object.keys(store.people).length) return null;
   const names = allNames();
-  const built = buildRouter(chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules });
+  const built = buildRouter(chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules, identityOf });
   if (routerCache?.key === built.key) return routerCache.selected;
   const t0 = Date.now();
   const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
