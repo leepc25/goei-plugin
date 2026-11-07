@@ -93,7 +93,11 @@ export function looksPackText() {
     });
   const profiles = readJson('src/game/world/mobProfiles.json');
   const agents = readJson('src/data/world/agents.json').records;
-  const agentSex = (name) => ({ Male: '남', Female: '여' })[agents[name]?.fields?.gender] ?? '';
+  // 위키 성별 글은 「Female」「Male-presenting」「Presents as male. …」처럼 적혀 있다: 겉으로 드러나는 쪽(female/male 낱말)으로 읽는다
+  const agentSex = (name) => {
+    const t = String(agents[name]?.fields?.gender ?? '');
+    return /\bfemale\b/i.test(t) ? '여' : /\bmale\b/i.test(t) ? '남' : '';
+  };
   const looks = [];
   for (const d of ids) {
     const j = readJson(`game-pack/${d}/char.json`);
