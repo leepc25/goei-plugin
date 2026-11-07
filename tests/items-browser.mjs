@@ -12,12 +12,12 @@ const items = { list: [
   mk('생수', '두 병', { use: true, uses: 2 }), mk('검은 구슬', '차갑다'), mk('금반지', '봉인 그대로', { equip: 'gear' }), mk('접이식 칼', '', { equip: 'weapon', use: true, slot: 0 }), mk('권총', '탄창 하나', { equip: 'weapon', use: true }),
   mk('무전기', '젖어서 안 켜짐', { use: true, state: 'broken' }), ...Array.from({ length: 4 }, (_, i) => mk(`봉인 상자 ${i + 1}`, '무겁다')),
 ], log: [ { id: 'l1', name: '부적', item: 'i_부적', what: 'use', by: 'use', n: 1, anchor: 'c1', at: '2026-11-07T00:00:00Z' }, { id: 'l2', name: '손수건', what: 'drop', by: 'manual', anchor: '', at: '2026-11-06T00:00:00Z' }, { id: 'l3', name: '삼단봉', what: 'destroy', by: 'story', anchor: 'c1', quote: '삼단봉이 두 동강 났다', at: '2026-11-07T00:00:00Z' } ] };
-const chat = { message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]', chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_items: JSON.stringify(items) } };
+const chat = { message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]', chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_items: JSON.stringify(items), $st_look: JSON.parse(distPack('goei-data-looks')).looks.find((l) => l.g === '여')?.id ?? '' } };
 const b = await launch();
 const errorsAll = [];
 for (const vp of ['pc', 'phone']) {
   // 소지품 그림 팩은 저장소에 미리 둔다 (받기 없이 바로 그림, host/itemicons.ts)
-  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
+  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items'), 'p:goei:data-looks': distPack('goei-data-looks') } });
   await openWin(page); await sleep(300);
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
   await sleep(200);

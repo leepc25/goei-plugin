@@ -10,23 +10,21 @@ mkdirSync(out, { recursive: true });
 
 const CHAR = '철문을 밀자 기름 냄새와 쇠 냄새가 한꺼번에 밀려왔다. 천장까지 쌓인 선반 사이로 주인이 고개만 내밀었다.\n[▣|2025.01.01|02:47 PM|☀️|4°C|을지로 철물점|목표]\n[shop: 을지로 철물점|백사헌]';
 const SHELF = `<shop-identity>
-sells: tool, consumable, wear, device
+sells: 공구, 소모품, 작업복, 호신 기기
 never: 식품, 약, 부적 같은 종교물
 prices: 동네 철물점 값, 비싸지 않음
 price_range: 1000~200000
 </shop-identity>
 <owner>뭐 찾소. 급한 거면 왼쪽 선반부터 봐. 값은 적힌 대로고.</owner>
 <shelf>
-손전등|18000|tool|LED 손전등, 건전지 별매|어두운 곳을 비춘다
-공구 가방|42000|tool|튼튼한 캔버스 가방, 주머니 여섯|
-쇠파이프|7000|tool|1m 길이, 끝이 거칠다|둔기로 쓸 수 있다
-호신용 최루 스프레이 (대용량)|15000|tool|경찰 납품용이라고 적혀 있다|사람·짐승을 잠시 멈춘다
-건전지 AA 8개|6000|consumable|유통기한 넉넉|
-작업용 장갑|9000|wear|가죽 보강, 미끄럼 방지|
-전기충격기|65000|device|허가 번호 흐릿함|
-낡은 검|1538000|weapon|선반 뒤에 세워 둔 것, 주인이 눈치를 본다|
-부적|30000|charm|선반 구석|
-철제 봉인 상자|120000|tool|자물쇠 둘|
+손전등|18000|사용|flashlight|LED 손전등, 건전지 별매|어두운 곳을 비춘다
+공구 가방|42000|장비|tool bag|튼튼한 캔버스 가방, 주머니 여섯|
+쇠파이프|7000|무기·사용|iron pipe|1m 길이, 끝이 거칠다|둔기로 쓸 수 있다
+호신용 최루 스프레이 (대용량)|15000|소모5|pepper spray|경찰 납품용이라고 적혀 있다|사람·짐승을 잠시 멈춘다
+건전지 AA 8개|6000|소모8|batteries|유통기한 넉넉|
+작업용 장갑|9000|장비|work gloves|가죽 보강, 미끄럼 방지|
+전기충격기|65000|무기·사용|stun gun|허가 번호 흐릿함|
+철제 봉인 상자|120000|-|metal box|자물쇠 둘|
 </shelf>`;
 const TALK_REPRICE = `<owner>건전지는 따로야. 둘이 같이 가져가면 손전등은 천 원 빼 주지.</owner>
 <change mode="partial">
@@ -50,7 +48,8 @@ const errorsAll = [];
 for (const vp of ['pc', 'phone']) {
   const chat = {
     message: [{ role: 'user', data: '철물점 문을 열고 들어간다.', chatId: 'u1' }, { role: 'char', data: CHAR, chatId: 'c1' }],
-    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0' },
+    // 장착 중인 물건이 있으면 팔기 화면에 「장착」 상자가 같이 뜬다 (장착한 것도 팔 수 있게)
+    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_items: JSON.stringify({ list: [{ id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }], log: [] }) },
   };
   // 상품 그림 팩은 저장소에 미리 둔다 (소지품과 같은 그림, host/itemicons.ts)
   const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
@@ -92,8 +91,8 @@ for (const vp of ['pc', 'phone']) {
   await waitIdle(); await sleep(300);
   const st1 = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_shop || 'null'));
   if (!st1?.loaded || st1.items.length !== 8) errorsAll.push(`[${vp}] shelf: loaded=${st1?.loaded} items=${st1?.items?.map((x) => x.name).join(',')}`);
-  if (st1?.items.some((x) => x.name === '부적')) errorsAll.push(`[${vp}] identity guard did not drop 부적 (charm)`);
-  if (st1?.items.some((x) => x.name === '낡은 검')) errorsAll.push(`[${vp}] identity guard did not drop 낡은 검 (weapon)`);
+  const pipe = st1?.items.find((x) => x.name === '쇠파이프');
+  if (pipe?.equip !== 'weapon' || st1?.items.find((x) => x.name === '건전지 AA 8개')?.uses !== 8) errorsAll.push(`[${vp}] traits: ${JSON.stringify(st1?.items?.slice(0, 5))}`);
   if (vp === 'pc') { await page.hover('.sh-c[data-value]'); await sleep(200); }
   await shot('grid');
   // 3. 상세: 잔고 14만 → 전기충격기 6.5만 살 수 있음 / 봉인 상자 12만 가능 / 쇠파이프… 잔고 부족은 없음 → 잔고를 1만으로 낮춰 부족 화면도
@@ -130,6 +129,7 @@ for (const vp of ['pc', 'phone']) {
   // 5b. 팔기: 「팔기」 → 내 소지품(방금 산 손전등) 고름 → 칩 → 보냄(글 없이) → 제안 12,000 → 상세 → 흥정 「만오천」 → 14,000(처음 값 취소선) → 팔기 확정
   await act('shop-pick');
   await shot('pick');
+  if (!(await page.$('.sh-pick .it-eqbox [data-value="i_vest"]'))) errorsAll.push(`[${vp}] no equip box in sell pick`);
   const myId = after.it.list.find((e) => e.from === 'store')?.id;
   await act('shop-sell-pick', myId);
   await sleep(200);

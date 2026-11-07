@@ -17,8 +17,8 @@ import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { LOOK_KEY, lookId, type LookGender } from '../core/looks';
-import { ensureLooks, onLooksReady } from '../host/looks';
-import { LOOK_CSS, lookAction, lookChooser, lookPopup, lookUi, setLookRender } from './looks';
+import { ensureLooks, idleLook, looksStatus, onLooksReady } from '../host/looks';
+import { LOOK_CSS, lookAction, lookChooser, lookPopup, lookSprite, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
@@ -28,7 +28,7 @@ import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer } from './drawer';
-import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, type ItemsNav } from './items';
+import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, setAvatarHtml, type ItemsNav } from './items';
 import { addMark, markCandidates, markPop, marks, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
@@ -171,7 +171,15 @@ function ensureRoot(): HTMLElement {
   setLookRender(() => render());
   onLooksReady(() => {
     if (view.kind === 'picker') renderPicker();
-    else if (lookUi.open) render();
+    else if (lookUi.open || tab === 'items' || shopUi.open) render();
+  });
+  // 장착 상자 왼쪽 인물 자리 (ui/items.ts): 플레이 인물의 필드 대기 동작. 페르소나면 눌러서 다시 고르고, 고유 인물이면 그 인물 그대로
+  setAvatarHtml((ctx) => {
+    const look = idleLook(ctx);
+    const unique = !!playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+    const inner = look ? lookSprite(look, 'it-look') : `<span class="it-avnone">${looksStatus().loading ? '모습 받는 중…' : unique ? '' : '내 모습<br>고르기'}</span>`;
+    if (unique) return `<span class="it-avbtn">${inner}</span>`;
+    return `<button class="it-avbtn" data-action="look-open" aria-label="내 모습 바꾸기" title="내 모습 바꾸기">${inner}</button>`;
   });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
