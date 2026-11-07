@@ -14,6 +14,8 @@ import { genSettings } from '../core/advanced';
 import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefSource } from '../core/refs';
 import { readDirectory } from '../core/world';
 import { findStatusTags } from '../core/world/status';
+import { rebuildStatusLine } from '../core/statusctx';
+import { colConfig, usedCols } from '../core/world/statuscols';
 import { findDoc, innerBody } from '../core/wiki';
 import { peopleStore } from '../core/people/store';
 import { peopleSettings } from '../core/people/settings';
@@ -297,6 +299,8 @@ function source(ctx: ChatContext, st: ShopState): ShopSource {
     const tags = findStatusTags(String(msgs[i].data ?? ''));
     if (tags.length) status = tags[tags.length - 1].raw.trim();
   }
+  // 잔고는 상점 모델에 넘기지 않는다 (설정 「넘기는 것·남는 것」): 상태창 줄에서 잔고 칸을 빼고 다시 만든다 (11-08 전수점검: 잔고 칸이 그대로 갔다)
+  if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet'));
   const situation = ['$an_report', '$in_report'].map((k) => String(vars[k] ?? '').trim()).filter(Boolean).join('\n').slice(0, 1500);
   const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx.chat).identity) : '';
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
