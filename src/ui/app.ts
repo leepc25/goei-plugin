@@ -16,9 +16,9 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
-import { LOOK_KEY, lookId, type LookGender } from '../core/looks';
-import { ensureLooks, idleLook, looksStatus, onLooksReady } from '../host/looks';
-import { LOOK_CSS, lookAction, lookChooser, lookPopup, lookSprite, lookUi, setLookRender } from './looks';
+import { LOOK_KEY, lookAllowed, lookId } from '../core/looks';
+import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
+import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSlot, lookSprite, lookUi, openLookPicker, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
@@ -77,9 +77,8 @@ interface Draft {
   situation?: string;
   /** 캐릭터로 플레이: 유저가 연기할 요원 코드 ('' = 내 페르소나) */
   player?: string;
-  /** 내 모습 (페르소나로 시작할 때만): 고른 프리셋 번호 ('' = 고르지 않음) · 보고 있는 성별 (저장 안 함) */
+  /** 아바타 (페르소나로 시작할 때 필수): 고른 프리셋 번호 */
   look?: string;
-  lookG?: LookGender | '';
 }
 
 type View =
@@ -167,19 +166,20 @@ function ensureRoot(): HTMLElement {
     else render();
     if (editorOpen()) editorRender();
   });
-  // 내 모습: 다시 고르는 창은 지금 화면 위에 그린다. 인물 모습 팩이 받히면 시작 패널·그 창을 다시 그린다 (host/looks.ts)
+  // 아바타: 고르는 팝업은 지금 화면 위에 그린다. 그림 팩이 받히면 팝업·시작 패널 아바타 칸을 다시 그린다 (host/looks.ts)
   setLookRender(() => render());
   onLooksReady(() => {
-    if (view.kind === 'picker') renderPicker();
-    else if (lookUi.open || tab === 'items' || shopUi.open) render();
+    if (lookUi.open) render();
+    else if (view.kind === 'picker') renderPicker();
+    else if (tab === 'items' || shopUi.open) render();
   });
-  // 장착 상자 왼쪽 인물 자리 (ui/items.ts): 플레이 인물의 필드 대기 동작. 페르소나면 눌러서 다시 고르고, 고유 인물이면 그 인물 그대로
+  // 장착 상자 왼쪽 인물 자리 (ui/items.ts): 플레이 인물의 정면 대기 동작. 페르소나면 눌러서 아바타를 다시 고르고, 고유 인물이면 그 인물 그대로
   setAvatarHtml((ctx) => {
     const look = idleLook(ctx);
     const unique = !!playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
-    const inner = look ? lookSprite(look, 'it-look') : `<span class="it-avnone">${looksStatus().loading ? '모습 받는 중…' : unique ? '' : '내 모습<br>고르기'}</span>`;
+    const inner = look ? lookSprite(look, 'it-look') : `<span class="it-avnone">${looksStatus().loading ? '아바타 받는 중…' : unique ? '' : '아바타<br>고르기'}</span>`;
     if (unique) return `<span class="it-avbtn">${inner}</span>`;
-    return `<button class="it-avbtn" data-action="look-open" aria-label="내 모습 바꾸기" title="내 모습 바꾸기">${inner}</button>`;
+    return `<button class="it-avbtn" data-action="look-open" aria-label="아바타 바꾸기" title="아바타 바꾸기">${inner}</button>`;
   });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
@@ -685,7 +685,7 @@ async function refresh(): Promise<void> {
       else if (presetStaged && !repick) view = { kind: 'opening', ctx };
       else {
         view = { kind: 'picker', ctx, manifest, staged: phase === 'staged' };
-        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '', look: lookId(ctx.chat.scriptstate) || draft.look || '', lookG: draft.lookG ?? '' };
+        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '', look: lookId(ctx.chat.scriptstate) || draft.look || '' };
         if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
         const fsel = draft.faction ? findFaction(draft.faction, facs) : undefined;
         if (fsel) {
@@ -754,6 +754,17 @@ async function handle(action: string, value?: string): Promise<void> {
   // 소지품 저장: form submit 은 iframe(allow-forms 없음)에서 오지 않으니 그려진 입력 칸(.it-form)을 넘긴다
   if (featCtx && action.startsWith('items-') && (await itemsAction(action, value, featCtx, recordsEnv, root?.querySelector<HTMLElement>('[data-it-form]') ?? lastForm))) return;
   if (view.kind === 'started' && action.startsWith('look') && (await lookAction(action, value, view.ctx, refresh))) return;
+  // 아바타 팝업 (시작 패널): 고르면 출발 때 이 채팅에 적는다
+  if (view.kind === 'picker' && action.startsWith('look')) {
+    if (lookCommon(action, value)) return;
+    if (action === 'look' && value) {
+      draft.look = value;
+      lookUi.open = false;
+      notice = '';
+      return render();
+    }
+    return;
+  }
   if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
@@ -878,6 +889,9 @@ async function handle(action: string, value?: string): Promise<void> {
         }
       }
       draft.faction = f.code;
+      // 세력 전용 아바타(관리국·가짜 관리국·백일몽 직원)는 그 세력일 때만: 세력을 바꾸면 다시 고른다
+      const rows = lookRows();
+      if (draft.look && rows && !lookAllowed(rows, draft.look, f.code)) draft.look = '';
       notice = '';
       return renderPicker();
     }
@@ -895,6 +909,8 @@ async function handle(action: string, value?: string): Promise<void> {
       // 묶음은 내 페르소나로 시작할 수 없다
       if (f?.group && !value) return;
       draft.player = value ?? '';
+      // 내 페르소나로 바꿨는데 아바타가 없으면 바로 고르기 팝업
+      if (!draft.player && !draft.look) openLookPicker();
       // 공용 첫 장면은 신입 시점이라 캐릭터로 시작하면 그 인물의 첫 장면·직접 입력·커스텀 임무만. 페르소나로 돌아오면 인물 장면(0)은 못 쓴다
       if (f) {
         const list = scenariosFor(f, draft.player, lore);
@@ -903,16 +919,6 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       return renderPicker();
     }
-    // 내 모습 (시작 패널): 성별은 격자만 거르고, 고른 모습은 출발 때 이 채팅에 적는다
-    case 'look-g':
-      if (value === '남' || value === '여') draft.lookG = value;
-      return renderPicker();
-    case 'look':
-      draft.look = value ?? '';
-      return renderPicker();
-    case 'look-retry':
-      void ensureLooks();
-      return renderPicker();
     case 'start':
       return start();
     case 'nav-tab':
@@ -1114,7 +1120,7 @@ async function start(): Promise<void> {
       const theme = getPrefs().theme ?? 'dark';
       return {
         ...next,
-        // 내 모습: 페르소나로 시작할 때만 (고유 인물은 그 인물 모습, 고르지 않으면 빈 값)
+        // 아바타: 페르소나로 시작할 때만 (고유 인물은 그 인물 모습)
         scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}), [LOOK_KEY]: draft.player ? '' : (draft.look ?? '') },
       };
     });
@@ -1210,11 +1216,7 @@ function renderPicker(): void {
   const sections = main.querySelectorAll(':scope > section');
   const fresh = tpl.content.querySelectorAll('.gx-body > section');
   if (sections.length !== fresh.length) return render();
-  // 내 모습 격자는 길어서 안쪽으로 스크롤된다: 바꿔 끼워도 보던 자리를 지킨다
-  const lookTop = main.querySelector<HTMLElement>('.gx-lookg')?.scrollTop ?? 0;
   for (let i = 1; i < sections.length; i++) sections[i].replaceWith(fresh[i]);
-  const lookg = main.querySelector<HTMLElement>('.gx-lookg');
-  if (lookg && lookTop) lookg.scrollTop = lookTop;
   const foot = root.querySelector('.gx-foot');
   const nfoot = tpl.content.querySelector('.gx-foot');
   if (foot && nfoot) foot.replaceWith(nfoot);
@@ -1523,11 +1525,11 @@ function body(): string {
     case 'started':
       evSeenReset();
       if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}${lookPopup(view.ctx)}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
+      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '', draft.faction ?? '')}`;
   }
 }
 
@@ -1579,7 +1581,9 @@ function picker(): string {
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   // 직접 입력은 상황을 적어야 출발
-  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing);
+  // 내 페르소나로 시작하면 아바타를 꼭 골라야 출발 (2026-11-08 사용자)
+  const needLook = !!f && !f.group && !playing;
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;
   const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
@@ -1589,18 +1593,14 @@ function picker(): string {
     ? `<div class="gx-who">${[
         ...(f.group ? [] : [`<button class="gx-whoc${!playing ? ' on' : ''}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`]),
         ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? ' on' : ''}" data-action="player" data-value="${esc(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ''}<span class="gx-whot"><b>${esc(a.name)}</b>${a.rank ? `<small>${esc(a.rank)}</small>` : ''}</span></button>`),
-      ].join('')}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
+      ].join('')}</div>${needLook ? lookSlot(draft.look ?? '') : ''}${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
     : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
   const shown = list.length;
-  // 내 모습 (2026-11-07 사용자): 내 페르소나로 시작할 때만. 고유 인물은 그 인물 모습이라 건너뛴다. 고르지 않아도 된다
-  const look = f && !f.group && !playing ? `<section><h2><i>3</i>내 모습<small class="gx-h2-sub">고르지 않아도 돼요</small></h2>${lookChooser(draft.look ?? '', draft.lookG ?? '')}</section>` : '';
-  const n0 = look ? 4 : 3;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>주인공</h2>${who}</section>
-    ${look}
-    <section><h2><i>${n0}</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
-    <section><h2><i>${n0 + 1}</i>언어</h2><div class="gx-segs">${langs}</div></section>
+    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
     ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(list.indexOf(sc) + 1).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}

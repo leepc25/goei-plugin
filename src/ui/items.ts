@@ -1,7 +1,7 @@
 // 소지품 메뉴 (2026-11-07 사용자 설계, docs/인계/소지품_1107/초안/mock2.mjs 가 그림 초안):
 // 하위 탭 [가계부 | 소지품]. 가계부는 기록 메뉴에서 여기로 옮겨 왔다 (ui/wallet.ts 그대로).
 // 소지품: 도구 줄(칸 수 알약 · 넘침 배지 · 물건|기록 토글 · PC는 직접 넣기·합치기 · 찾기) + 세 상자 (2026-11-07 밤 사용자, memory goei-equip-design):
-//   「장착」(왼쪽 내 모습 + 무기 2 · 장비 4) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
+//   「장착」(왼쪽 아바타 + 무기 2 · 장비 4) → 소지품 격자(8열) → 「사용」(놓는 만큼 늘어남). 버리기는 끄는 동안만 붉은 띠로.
 // 끌어다 놓기(PC): 격자 → 장착 칸(장착) · 사용 상자(×n) · 버리기(한 번 확인), 장착 칸 → 격자(풀기). 팝업 단추(사용·장착·버리기)는 폰용으로 남김.
 // 칸을 올리면 설명 말풍선(PC), 누르면 팝업. 폰은 직접 넣기·합치기가 아래 도구 줄에.
 // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
@@ -146,14 +146,14 @@ function itemsPane(ctx: ChatContext): string {
   return `${tools}${picNote}${equipBox(ctx, 'items')}<div class="it-body">${gridHtml(ctx)}</div>${useBox(ctx)}<div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div>`;
 }
 
-/** 내 모습 자리 (시작 패널 「내 모습」에서 고른 필드 대기 동작). 고르기 전·고유 인물이 아니면 빈 자리 */
+/** 아바타 자리 (고른 아바타의 정면 대기 동작). 고르기 전·고유 인물이 아니면 빈 자리 */
 let avatarHtml: (ctx: ChatContext) => string = () => '';
 export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
   avatarHtml = fn;
 }
 
 /**
- * 「장착」 상자: 왼쪽 내 모습 + 무기 2 · 장비 4. where = 'items'(끌어다 놓기·누르면 팝업) · 'sell'(상점 팔기: 누르면 그 물건을 팔 물건으로)
+ * 「장착」 상자: 왼쪽 아바타 + 무기 2 · 장비 4. where = 'items'(끌어다 놓기·누르면 팝업) · 'sell'(상점 팔기: 누르면 그 물건을 팔 물건으로)
  * 칸 data-drop="equip:갈래:번호" — 끌어 온 물건이 그 갈래가 아니면 놓이지 않는다 (app.ts 끌기 처리)
  */
 export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): string {

@@ -1,4 +1,5 @@
-// 내 모습 (2026-11-07 사용자): 페르소나로 시작할 때 고르는 필드 인물 모습 = 일반 NPC 프리셋 하나의 대기 동작.
+// 내 모습 (2026-11-07 사용자): 페르소나로 시작할 때 꼭 고르는 필드 인물 모습 = 일반 NPC 프리셋 하나의 정면(남쪽) 대기 동작.
+// 세력 전용 프리셋(관리국·가짜 관리국·백일몽 직원 그림)은 그 세력으로 시작할 때만 고를 수 있다 (사용자 11-08).
 // 고유 인물로 시작하면 고르지 않고 그 인물 모습. 고른 것은 채팅 변수 $st_look(인물 팩 번호, 예 '6.54')에 둔다.
 // 성별은 격자를 거르는 데만 쓰고 본편 모델에 넘기지 않는다 (사용자: 페르소나 시트에 이미 있다).
 // 그림·측정값은 내 모습 팩(scripts/data-pack.mjs looksPackText)에서 온다. 여기는 순수 계산.
@@ -25,8 +26,8 @@ export interface LookRow {
   /** 일반 NPC 성별 ('' = 고유 인물이거나 성별 없는 프리셋) */
   g: LookGender | '';
   unique: boolean;
-  /** 그림이 보는 쪽 (W 면 좌우를 뒤집어 모두 오른쪽을 보게) */
-  dir: string;
+  /** 이 세력으로 시작할 때만 고를 수 있는 프리셋이면 그 세력 코드 ('' = 누구나) */
+  fac: string;
   /** 장 수 */
   n: number;
   /** 원래 칸 크기 (128×256) */
@@ -37,7 +38,7 @@ export interface LookRow {
   ch: number;
   ox: number;
   oy: number;
-  /** 대기 줄 시트 base64 webp (가로로 n장, 장마다 cw×ch) */
+  /** 정면 대기 줄 시트 base64 webp (가로로 n장, 장마다 cw×ch) */
   img: string;
 }
 
@@ -59,7 +60,7 @@ export function parseLooksPack(text: string): LookRow[] {
     const n = num(r.n), cw = num(r.cw), ch = num(r.ch);
     if (!(n >= 1 && cw > 0 && ch > 0)) continue;
     const g = r.g === '남' || r.g === '여' ? r.g : '';
-    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, dir: String(r.dir ?? 'E'), n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, img: r.img });
+    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, fac: typeof r.fac === 'string' ? r.fac : '', n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, img: r.img });
   }
   return out;
 }
@@ -70,8 +71,11 @@ export const lookId = (state: ScriptState | Record<string, unknown> | undefined)
   return /^\d+\.\d+$/.test(v) ? v : '';
 };
 
-/** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 (팩 순서 그대로) */
-export const looksOf = (rows: LookRow[], g: LookGender): LookRow[] => rows.filter((r) => !r.unique && r.g === g);
+/** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 + 그 세력 전용 프리셋 (팩 순서 그대로) */
+export const looksOf = (rows: LookRow[], g: LookGender, faction: string): LookRow[] => rows.filter((r) => !r.unique && r.g === g && (!r.fac || r.fac === faction));
+
+/** 이 세력으로 시작할 때 고를 수 있는 모습인가 */
+export const lookAllowed = (rows: LookRow[], id: string, faction: string): boolean => rows.some((r) => r.id === id && !r.unique && !!r.g && (!r.fac || r.fac === faction));
 
 /**
  * 이 채팅의 플레이 인물 모습: 고유 인물로 플레이하면 그 인물(명부 이름으로 찾음), 아니면 고른 프리셋. 없으면 undefined
