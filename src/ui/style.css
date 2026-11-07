@@ -3271,7 +3271,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-shelf > .sh-grid { padding: 0 calc(var(--zp) + 1px); }
 .sh-zone { position: relative; min-width: 0; padding: 10px var(--zp) var(--zp); border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
 .sh-zh { display: flex; align-items: center; gap: 8px; height: 22px; margin-bottom: 10px; }
-.sh-zh b { font: 700 12.5px/1 var(--mono); letter-spacing: .14em; color: var(--sub); }
+.sh-zh b { font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .02em; color: var(--sub); }
 .sh-zh small { font-size: 12px; color: var(--dim); }
 .sh-zh svg { width: 15px; height: 15px; color: var(--sub); }
 .sh-top { display: flex; gap: 12px; align-items: stretch; }
@@ -3313,7 +3313,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-rare-tx { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .sh-rare-lb { display: inline-flex; align-items: center; gap: 6px; color: var(--amber); }
 .sh-rare-lb svg { width: 15px; height: 15px; fill: currentColor; }
-.sh-rare-lb b { font: 800 12.5px/1 var(--mono); letter-spacing: .22em; }
+.sh-rare-lb b { font-size: 13px; font-weight: 800; line-height: 1; letter-spacing: .04em; }
 .sh-rare-lb small { padding: 2px 7px; border: 1px solid color-mix(in srgb, var(--amber) 50%, transparent); border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0; }
 .sh-rare-nm { font-size: 17px; font-weight: 800; line-height: 1.3; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; word-break: keep-all; overflow-wrap: anywhere; }
 .sh-rare-ds { font-size: 13px; line-height: 1.5; color: var(--sub); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
@@ -3417,6 +3417,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
   .it-grid.sh-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .sh-body { --zp: 10px; --shc: calc((100cqw - 2 * var(--zp) - 2px - 2 * 8px) / 3); }
   .sh-top { flex-direction: column; }
+  .sh-top > .sh-sale { flex: none; } /* 세로로 쌓을 땐 폭 계산이 높이가 되지 않게 */
   .sh-rare { flex: none; gap: 12px; padding: 12px; }
   .sh-rare-pic, .sh-rare-pic img { width: 85px; height: 85px; }
   .sh-c.sale .sh-band s { display: block; margin: 0 0 2px; }
