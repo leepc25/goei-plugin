@@ -235,7 +235,7 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
       : '<p class="ps-note">아직 갱신 기록이 없어요.</p>'
     : '<p class="ps-note">읽는 중…</p>';
   const bundle = diagBundle(ctx, canChat);
-  return `<div class="gw-page gw-set">${head('', '요청 기록', '괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.')}
+  return `<div class="gw-page gw-set">${head('', '실패·갱신 진단', '괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row('내려받기', `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, '판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.')}</div></section>
     <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ''}</div></section>
@@ -303,7 +303,7 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       await clearTrace();
       traceUi.turns = [];
       traceUi.open.clear();
-      manUi.info = '호출 흐름 기록을 지웠어요.';
+      manUi.info = '호출 기록을 지웠어요.';
       return true;
     case 'man-with-chat':
       manUi.withChat = !manUi.withChat;

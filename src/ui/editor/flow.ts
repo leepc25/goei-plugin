@@ -91,7 +91,7 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
   const maybe = all.reduce((n, x) => n + x.maybe, 0);
   const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
   const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
-  return `<div class="gw-page gw-set">${head('', '전체 호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 흐름」에서 봐요.')}
+  return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><div class="ps-rows"><p class="pp-flow-sum">턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.</p></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
