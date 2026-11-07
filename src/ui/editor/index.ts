@@ -383,7 +383,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:log', '요청 기록', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:log', '요청 기록', ICONS.mail], ['manage:trace', '호출 흐름', ICONS.list], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -852,7 +852,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('man-')) {
-    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true)) render();
+    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true, value)) render();
     return;
   }
   if (action.startsWith('ed-rule-')) {

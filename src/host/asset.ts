@@ -44,7 +44,7 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     const job = planAsset(msg.data, data, s.assetLimit, exclude);
     if (!job) return;
-    const raw = await runModel(job.messages, 'aux');
+    const raw = await runModel(job.messages, 'aux', undefined, '이미지 태그 보충');
     const next = finishAsset(job, raw, data, s.assetLimit);
     if (!next) {
       await note('이번 응답에는 붙일 이미지가 없었어요.');

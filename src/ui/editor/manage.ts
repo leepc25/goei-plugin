@@ -9,12 +9,18 @@ import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
 import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
+import { clearTrace, loadTrace } from '../../host/trace';
+import { tracePage, traceUi } from './trace';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
 import { gnet } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
+
+import { ICONS } from '../icons';
+
+const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 /** 저장된 ISO(UTC) 시각을 기기 시간대(한국)로 「YYYY.MM.DD HH:mm:ss」 (11-07 사용자: 모든 시각은 한국 시간 기준. UTC 그대로 보여 주니 새벽으로 오해) */
 const localWhen = (iso: string): string => {
@@ -23,13 +29,10 @@ const localWhen = (iso: string): string => {
   const p = (x: number) => String(x).padStart(2, '0');
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 };
-import { ICONS } from '../icons';
-
-const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `${Math.round(n / 1e3)}KB` : `${n}B`);
 
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log';
-export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log';
+export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace';
+export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace';
 
 /** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
 const GAME_PACK_PREFIX = 'goei:game:pack:';
@@ -97,6 +100,11 @@ async function refresh(): Promise<void> {
     manUi.diag = await loadDiag();
   } catch {
     manUi.diag = [];
+  }
+  try {
+    traceUi.turns = await loadTrace();
+  } catch {
+    traceUi.turns = [];
   }
 }
 
@@ -237,6 +245,12 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
+  if (node === 'manage:trace') {
+    const confirm = traceUi.confirm
+      ? `<button class="gx-mini danger" data-action="man-drop-trace-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>`
+      : `<button class="gx-mini" data-action="man-drop-trace">${ICONS.trash}기록 지우기</button>`;
+    return tracePage(head, confirm);
+  }
   return logPage(ctx, canChat);
 }
 
@@ -263,13 +277,31 @@ export async function manageFile(el: HTMLInputElement): Promise<boolean> {
   return true;
 }
 
-export async function manageAction(action: string, root: HTMLElement | null, ctx: ChatContext | null = null, canChat = true): Promise<boolean> {
+export async function manageAction(action: string, root: HTMLElement | null, ctx: ChatContext | null = null, canChat = true, value = ''): Promise<boolean> {
   if (!action.startsWith('man-')) return false;
   manUi.notice = '';
   manUi.info = '';
   switch (action) {
     case 'man-no':
       manUi.confirm = '';
+      traceUi.confirm = false;
+      return true;
+    case 'man-trace-toggle':
+      if (traceUi.open.has(value)) traceUi.open.delete(value);
+      else traceUi.open.add(value);
+      return true;
+    case 'man-trace-refresh':
+      traceUi.turns = await loadTrace().catch(() => []);
+      return true;
+    case 'man-drop-trace':
+      traceUi.confirm = true;
+      return true;
+    case 'man-drop-trace-yes':
+      traceUi.confirm = false;
+      await clearTrace();
+      traceUi.turns = [];
+      traceUi.open.clear();
+      manUi.info = '호출 흐름 기록을 지웠어요.';
       return true;
     case 'man-with-chat':
       manUi.withChat = !manUi.withChat;

@@ -75,7 +75,7 @@ const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIn
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, 'gn').reiterate, staticModel: featureModel(chat.scriptstate, 'gn'), state: chat.scriptstate });
+const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, 'gn').reiterate, staticModel: featureModel(chat.scriptstate, 'gn'), state: chat.scriptstate, label: '괴담넷' });
 const source = (ctx: ChatContext, chat = ctx.chat): RefSource => playerSource({ char: ctx.char as RefSource['char'], chat, persona: personaText() } as RefSource);
 
 function names(ctx: ChatContext): Record<string, string> {

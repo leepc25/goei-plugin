@@ -124,7 +124,7 @@ export function createVisit(): GameVisit {
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
         void which;
-        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const got0 = takeFieldTags(await runModel(prompt.messages, model, undefined, '게임 방문'));
         const gotCue = takeCueTag(got0.raw);
         const raw = gotCue.raw;
         const cue = peopleOn ? gotCue.cue : null;
@@ -185,7 +185,7 @@ export function createVisit(): GameVisit {
           tags: (mob.tags ?? []) as FieldTag[],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
-        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const got0 = takeFieldTags(await runModel(prompt.messages, model, undefined, '게임 방문'));
         const raw = got0.raw;
         const tags = got0.tags.filter(t => mob.tags?.includes(t));
         const reply = parseVisitGroup(raw, mob.name, [], prompt.limit).line;

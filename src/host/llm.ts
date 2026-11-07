@@ -1,5 +1,6 @@
 // 모델 호출 (위키·괴담넷·괴담톡 생성). 본편 요청과 따로, 사용자가 그 화면에서 누를 때만 부른다.
 import { prepareAttachments } from '../core/attach';
+import { clip, requestText, traceCall } from './trace';
 import { photoData } from './photo';
 import { applyAdvanced } from '../core/advanced';
 import { RETRY_ANALYZE } from '../core/craft';
@@ -55,7 +56,24 @@ async function withPhotos(messages: (LlmMessage & { images?: string[] })[]): Pro
 }
 
 /** staticModel: 기능별 전용 모델 ID (있으면 메인·보조 대신 그 모델) */
-export async function runModel(messages: LlmMessage[], model: ModelChoice, staticModel?: string): Promise<string> {
+export async function runModel(messages: LlmMessage[], model: ModelChoice, staticModel?: string, label = '기타'): Promise<string> {
+  // 호출 흐름 기록 (host/trace.ts): 성공·실패 모두 한 건으로 남긴다
+  const at = new Date().toISOString();
+  const t0 = Date.now();
+  const req = requestText(messages);
+  const done = (ok: boolean, response: string, error?: string) =>
+    void traceCall({ label, at, ms: Date.now() - t0, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, response: clip(response), responseChars: response.length }).catch(() => {});
+  try {
+    const text = await runModelRaw(messages, model, staticModel);
+    done(true, text);
+    return text;
+  } catch (error) {
+    done(false, error instanceof LlmError ? error.raw ?? '' : '', error instanceof Error ? error.message : String(error));
+    throw error;
+  }
+}
+
+async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticModel?: string): Promise<string> {
   let res: unknown;
   try {
     // allowPlugins: 사용자가 플러그인이 제공하는 모델(pluginmodel:::)을 메인·보조로 쓰면 이게 없을 때 Risu가 막는다.
@@ -97,6 +115,8 @@ export interface RetryOptions {
   concurrent?: number;
   /** 기능별 전용 모델 ID. 다시 물을 때도 그대로 쓴다 */
   staticModel?: string;
+  /** 호출 흐름 기록에 적을 이름 (host/trace.ts) */
+  label?: string;
 }
 
 // ── 동시 요청 수 (라이트보드 「동시요청수」, 2026-11-06). 괴담넷·괴담톡·위키 요청만 센다. 인물 기록은 세지 않는다 (리수폿 스레드 요청) ──
@@ -152,12 +172,12 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel)));
+      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label)));
       // 다시 보기: 첫 응답을 다시 읽고 고치게 한다. 실패하면 첫 응답을 쓴다 (원본과 같음)
       for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
         const again: LlmMessage[] = [...ask, { role: 'assistant', content: raw }, { role: 'user', content: reiterationText(i, o.reiterate ?? 0) }];
         try {
-          const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel));
+          const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? '기타'} 다시 보기 ${i}`));
           if (next.trim()) raw = next;
         } catch {
           break;

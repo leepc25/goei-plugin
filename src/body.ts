@@ -72,6 +72,7 @@ import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
+import { traceBegin, traceMain, traceReply } from './host/trace';
 import { bookText } from './core/refs';
 import { stripMarkers } from './core/sanitize';
 
@@ -137,6 +138,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
     let ctx: ChatContext | null = null;
     if (liteNow) {
+      // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
+      await stepAsync('호출 기록', () => traceBegin(), undefined);
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
       // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
       await stepAsync('유저 이름', () => readUser(), undefined);
@@ -177,7 +180,9 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
   if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(' · ')} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
   // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
-  return sanitize(messages);
+  const out = sanitize(messages);
+  if (liteNow) step('호출 기록', () => traceMain(out, failed), undefined);
+  return out;
 }
 
 /** 플러그인 표식만 지운다 (core/sanitize.ts). 시작기도 본체 beforeRequest 가 던졌을 때 이것을 부른다. 던지지 않는다 */
@@ -436,6 +441,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
     if (typeof raw !== 'string') return;
+    traceReply(raw);
     let latest: Chat | null = null;
     if (chat.scriptstate?.['$st_anomaly_on'] === '1') {
       const catalog = parseCatalog(char.globalLore);

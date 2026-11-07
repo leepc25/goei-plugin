@@ -314,7 +314,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         { role: 'system', content: system },
         { role: 'user', content: dataText },
       ];
-      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined });
+      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined, label: '갱신기' });
       diag.raw = raw;
       diag.outChars = raw.length;
       // 쓰기: 응답 대기 중이면 기다리고, 같은 채팅인지·메시지가 그대로인지 확인
@@ -472,7 +472,7 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
       { role: 'system', content: input.system },
       { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
     ];
-    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined });
+    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined, label: '정리' });
     diag.raw = raw;
     diag.outChars = raw.length;
     await waitNotBusy();
@@ -535,7 +535,7 @@ export async function routerPeople(chat: Chat, store: PeopleStore, input: string
   const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
   try {
     const raw = await Promise.race([
-      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || undefined),
+      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || undefined, '라우터'),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.routerTimeout}초`)), settings.routerTimeout * 1000)),
     ]);
     diag.raw = raw;
@@ -575,7 +575,7 @@ export async function directorNoteText(chat: Chat, store: PeopleStore, people: s
     const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason, model: settings.stageModel.director, people, indexes: [], sizes: { system: b.system.length, data: JSON.stringify(b.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
     try {
       const raw = await Promise.race([
-        runModel([{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }], settings.stageModel.director, settings.stageModelId.director || undefined),
+        runModel([{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }], settings.stageModel.director, settings.stageModelId.director || undefined, '디렉터'),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.directorTimeout}초`)), settings.directorTimeout * 1000)),
       ]);
       diag.raw = raw;

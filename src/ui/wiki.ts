@@ -200,7 +200,7 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));
     let body: string;
     try {
-      body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'nw').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'nw'), state: ctx.chat.scriptstate })).value;
+      body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'nw').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'nw'), state: ctx.chat.scriptstate, label: '위키 글' })).value;
     } catch (error) {
       const raw = (error as { raw?: string }).raw;
       if (raw) wiki.failure = { title, reason: error instanceof Error ? error.message : String(error), raw };
@@ -279,7 +279,7 @@ async function pickTitle(ctx: ChatContext): Promise<string> {
     }
   })();
   const s = wikiSettings(ctx.chat.scriptstate);
-  const { value } = await askModel(wikiTitlePrompt(source(ctx), candidates, [...written], names), s.model, (raw) => acceptTitle(raw, candidates), { ...genSettings(ctx.chat.scriptstate), staticModel: featureModel(ctx.chat.scriptstate, 'nw'), state: ctx.chat.scriptstate });
+  const { value } = await askModel(wikiTitlePrompt(source(ctx), candidates, [...written], names), s.model, (raw) => acceptTitle(raw, candidates), { ...genSettings(ctx.chat.scriptstate), staticModel: featureModel(ctx.chat.scriptstate, 'nw'), state: ctx.chat.scriptstate, label: '위키 제목' });
   return value;
 }
 

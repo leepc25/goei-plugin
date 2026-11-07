@@ -112,6 +112,7 @@ export function splitCombined(raw: string): Record<JointKind, string | null> {
 }
 
 /** 한 응답에 대한 두 자동 확인을 묶는 자리 */
+const NAME: Record<JointKind, string> = { gnet: '괴담넷', phone: '괴담톡' };
 export class Joint {
   private waits = new Map<JointKind, Wait>();
   private left: Set<JointKind>;
@@ -126,7 +127,7 @@ export class Joint {
     // 사진이 붙은 요청이나 이미 보낸 뒤면 혼자 보낸다
     if (this.fired || !this.left.has(kind) || messages.some((m) => m.images?.length)) {
       this.done(kind);
-      return runModel(messages, this.model, this.staticModel);
+      return runModel(messages, this.model, this.staticModel, NAME[kind]);
     }
     return new Promise<string>((resolve, reject) => {
       this.waits.set(kind, { messages, resolve, reject });
@@ -146,13 +147,13 @@ export class Joint {
     const g = this.waits.get('gnet');
     const p = this.waits.get('phone');
     if (g && p) void this.both(g, p);
-    else for (const w of this.waits.values()) runModel(w.messages, this.model, this.staticModel).then(w.resolve, w.reject);
+    else for (const [k, w] of this.waits) runModel(w.messages, this.model, this.staticModel, NAME[k]).then(w.resolve, w.reject);
   }
 
   private async both(g: Wait, p: Wait): Promise<void> {
     let raw = '';
     try {
-      raw = await runModel(combinedPrompts(g.messages, p.messages), this.model, this.staticModel);
+      raw = await runModel(combinedPrompts(g.messages, p.messages), this.model, this.staticModel, '괴담넷+괴담톡 통합');
     } catch (error) {
       g.reject(error);
       p.reject(error);
@@ -171,7 +172,7 @@ export class Joint {
     for (const [k, w] of [['gnet', g], ['phone', p]] as const) {
       const part = parts[k];
       if (part) w.resolve(part);
-      else runModel(w.messages, this.model, this.staticModel).then(w.resolve, w.reject);
+      else runModel(w.messages, this.model, this.staticModel, `${NAME[k]} (통합 뒤 따로)`).then(w.resolve, w.reject);
     }
   }
 }
