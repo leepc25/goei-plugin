@@ -1,25 +1,7 @@
 // 소지품 종류 아이콘 14종 (2026-11-07 사용자 결정 「그려봐」): ui/icons.ts 와 같은 선 그림체 (24 격자, 선 1.8).
-// 종류 값은 고정 목록. 장터·보조 모델·직접 넣기 모두 이 값 중 하나를 적고, 아이콘은 값을 1:1로 따라간다. 목록 밖 값은 misc.
-export type ItemKind = 'weapon' | 'wear' | 'tool' | 'device' | 'charm' | 'medical' | 'food' | 'paper' | 'key' | 'seal' | 'anomaly' | 'valuable' | 'consumable' | 'misc';
-
-export const ITEM_KINDS: { id: ItemKind; label: string; hint: string }[] = [
-  { id: 'weapon', label: '무기', hint: '총·칼·둔기' },
-  { id: 'wear', label: '방호구·옷', hint: '조끼·장갑·제복' },
-  { id: 'tool', label: '도구', hint: '손전등·밧줄·공구' },
-  { id: 'device', label: '전자기기', hint: '폰·녹음기·카메라·측정기' },
-  { id: 'charm', label: '종교물·부적', hint: '십자가·염주·부적·성수' },
-  { id: 'medical', label: '의료', hint: '약·붕대·주사' },
-  { id: 'food', label: '음식·기호품', hint: '물·초콜릿·담배·술' },
-  { id: 'paper', label: '기록물', hint: '서류·사진·수첩·USB' },
-  { id: 'key', label: '열쇠·출입증', hint: '열쇠·카드키·신분증' },
-  { id: 'seal', label: '봉인구·용기', hint: '수갑·봉인 상자·시료통' },
-  { id: 'anomaly', label: '회수물·이상물', hint: '괴이에서 나온 것' },
-  { id: 'valuable', label: '귀중품', hint: '현금 봉투·보석·시계' },
-  { id: 'consumable', label: '소모품', hint: '건전지·탄약·소금·초' },
-  { id: 'misc', label: '기타', hint: '어디에도 안 맞는 것' },
-];
-
-export const itemKind = (v: unknown): ItemKind => (ITEM_KINDS.some((k) => k.id === v) ? (v as ItemKind) : 'misc');
+// 종류 값은 core/items.ts ITEM_KINDS (고정 목록). 아이콘은 값을 1:1로 따라간다. 목록 밖 값은 misc. 이 선 그림은 자리 표시용 — 실제 그림은 PixelLab (game-src/items/).
+import type { ItemKind } from '../core/items';
+export { ITEM_KINDS, itemKind, type ItemKind } from '../core/items';
 
 const stroke = (d: string) =>
   `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
