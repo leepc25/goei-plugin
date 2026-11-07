@@ -9,7 +9,7 @@ import { updateChat, type ChatContext } from '../host/risu';
 import { backfillPeople, chatId, clearDiag, consolidatePerson, loadDiag, rereadPerson, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
 import { anchorOf, changeId, entryId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, putEntry, splitUnread, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
-import { factionNow, knownFactionCodes, userFactionOf } from '../core/people/faction';
+import { factionNow, knownFactionCodes, stageMid as factionStageMid, userFactionOf } from '../core/people/faction';
 import { FEATURES, NUMERIC_FEATURES, PP, PP_DEFAULTS, PS, peopleSettings, ppValue, type Feature, type NumericFeature, type Stage } from '../core/people/settings';
 import { sectionBody } from '../core/people/updater';
 import { UPDATER_DETAILED, UPDATER_COMPACT } from '../core/people/prompt';
@@ -514,9 +514,13 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
   const rows = [
     row(FEATURE_HELP.faction_rep[0], onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
     ...(s.features.has('faction_rep') ? [
+      // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
+      row('세력 평판 수치', onoff('num_faction_rep'), 'OFF = 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가고, 필드 몹 반응은 단계로 정해져요. 구간 경계·몹 목격 무게는 안 써요.'),
       row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
-      row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
-      row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
+      ...(s.factionQual ? [] : [
+        row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
+        row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
+      ]),
     ] : []),
   ].join('');
   return `<div class="ph-form pp-set">
@@ -631,10 +635,12 @@ function factionSection(ctx: ChatContext, store: PeopleStore, changes: Change[])
     const mine = store.log.filter((c) => c.who === factionWho(code)).length;
     return `<li class="ph-row"><button class="ph-main nw-row" data-action="rec-faction" data-value="${esc(code)}">
       <span class="ph-avatar nw-ava k-fac">${esc(f.name.slice(0, 1))}</span>
-      <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc(f.stage.mob)}">${esc(f.stage.label)}</span></span><small>${f.value} · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
+      <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc(f.stage.mob)}">${esc(f.stage.label)}</span></span><small>${s.factionQual ? esc(f.note ?? '시작 단계 (조직×조직 표)') : `${f.value} · 시작값 ${f.base}`}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
   }).join('');
   return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 바뀔 만한 일인지는 갱신기 모델이 판단해요">세력 평판<b>${knownFactionCodes(store, names).length}</b></h3><ul class="ph-list">${rows}</ul></section>`;
 }
+
+const factionStageLabel = (ctx: ChatContext, value: number) => FACTION_STAGES[factionStageId(value, peopleSettings(ctx.chat.scriptstate).factionBounds)].label;
 
 /** 세력 평판 막대: 5칸, 중립 기준 */
 function factionBar(value: number, bounds: readonly number[]): string {
@@ -661,17 +667,25 @@ export function factionView(ctx: ChatContext, code: string): string {
   const who = factionWho(code);
   const last = [...changes].reverse().find((c) => c.who === who && c.kind === 'cue' && c.pin === undefined);
   const mine = store.log.filter((c) => c.who === who).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
+  const qual = s.factionQual;
+  const stageIds = ['hostile', 'wary', 'neutral', 'favorable', 'friendly'] as const;
   const edit = peopleUi.affEdit
-    ? `<div class="pp-edit"><div class="pp-edit-row"><label>숫자 <input class="gx-search ph-pct" type="number" min="${FACTION_MIN}" max="${FACTION_MAX}" data-input="pp-aff-num" name="pp-aff-num" value="${esc(peopleUi.affNum)}" placeholder="${f.value}"></label></div>
+    ? `<div class="pp-edit"><div class="pp-edit-row">${qual
+        ? `<label>단계 <select class="gx-select" data-change="pp-aff-stage">${stageIds.map((id) => `<option value="${id}" ${(peopleUi.affStage || f.stage.id) === id ? 'selected' : ''}>${esc(FACTION_STAGES[id].label)}</option>`).join('')}</select></label>`
+        : `<label>숫자 <input class="gx-search ph-pct" type="number" min="${FACTION_MIN}" max="${FACTION_MAX}" data-input="pp-aff-num" name="pp-aff-num" value="${esc(peopleUi.affNum)}" placeholder="${f.value}"></label>`}</div>
         <input class="gx-search" data-input="pp-aff-reason" name="pp-aff-reason" maxlength="80" placeholder="이유 (필수)" value="${esc(peopleUi.affReason)}">
-        <p class="ps-note">고정하면 그 값으로 덮고, 이후 자동 계기는 무시해요. 변경 기록에서 취소하면 다시 자동 계산으로 돌아가요.</p>
+        <p class="ps-note">${qual ? '고정하면 그 단계로 두고, 갱신기가 다음에 다시 판단할 때까지 유지돼요.' : '고정하면 그 값으로 덮고, 이후 자동 계기는 무시해요. 변경 기록에서 취소하면 다시 자동 계산으로 돌아가요.'}</p>
         <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-fac-save" data-value="${esc(code)}" ${peopleUi.busy ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="pp-aff-cancel">취소</button></div></div>`
-    : `<div class="gx-row-btns"><button class="gx-mini" data-action="pp-aff-edit">값 직접 고정</button>${last ? `<small class="ps-note">마지막 계기: ${esc(last.cue ?? '')}${last.reason ? ` — ${esc(last.reason)}` : ''}</small>` : ''}</div>`;
+    : `<div class="gx-row-btns"><button class="gx-mini" data-action="pp-aff-edit">${qual ? '단계 직접 고정' : '값 직접 고정'}</button>${!qual && last ? `<small class="ps-note">마지막 계기: ${esc(last.cue ?? '')}${last.reason ? ` — ${esc(last.reason)}` : ''}</small>` : ''}</div>`;
+  // 정성 모드: 숫자 막대 대신 단계 + 갱신기가 적은 이유
+  const standing = qual
+    ? `<div class="pp-aff"><div class="pp-aff-top"><b>${esc(f.stage.label)}</b><span class="gx-badge fs-${f.stage.id}">${esc(f.stage.mob)}</span></div><p class="ps-note">${esc(f.note ?? '아직 갱신기 판단이 없어요. 시작 단계는 조직×조직 표에서 와요.')}</p></div>`
+    : factionBar(f.value, s.factionBounds);
   const mob = `<ul class="pp-mob">${(['friendly', 'favorable', 'neutral', 'wary', 'hostile'] as const).map((id) => `<li${f.stage.id === id ? ' class="cur"' : ''}><b>${esc(FACTION_STAGES[id].label)}</b> ${esc(FACTION_STAGES[id].mob)}</li>`).join('')}</ul>`;
-  return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}`)}
+  return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판${qual ? ' · 정성' : ` · 시작값 ${f.base}`}${code === uf ? ' · 주인공 소속' : ''}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4><div class="pp-card-body">${factionBar(f.value, s.factionBounds)}${edit}</div></section>
+      <section class="pp-card"><h4 title="${qual ? '세력이 주인공을 어떻게 보는지 (정성 모드: 단계와 이유). 갱신기 모델이 판단해요' : '세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요'}">평판</h4><div class="pp-card-body">${standing}${edit}</div></section>
       <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4><div class="pp-card-body">${mob}</div></section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast('pp', peopleUi.info, (t) => {
@@ -821,7 +835,7 @@ function extraCards(ctx: ChatContext, p: Person, changes: Change[]): string {
 function changeRow(ctx: ChatContext, c: Change, live: Liveness): string {
   const alive = isAlive(c, live);
   const no = msgNo(c.anchor, live);
-  const what = c.kind === 'taste' ? `취향 띠 → ${(c.band ?? 0) > 0 ? '+' : ''}${c.band ?? 0}` : c.kind === 'openness' ? (typeof c.init === 'number' ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? '+' : ''}${c.delta ?? 0}`) : c.kind === 'cue' ? (c.pin !== undefined ? `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ''}`) : c.kind === 'address' ? `호칭 「${c.toUser ?? ''}」${c.register ? ` · ${c.register}` : ''}` : c.kind === 'identity' ? `신분 ${[c.faction, c.rank].filter(Boolean).join(' ')}` : `메모 ${c.now ?? ''}`;
+  const what = c.kind === 'taste' ? `취향 띠 → ${(c.band ?? 0) > 0 ? '+' : ''}${c.band ?? 0}` : c.kind === 'openness' ? (typeof c.init === 'number' ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? '+' : ''}${c.delta ?? 0}`) : c.kind === 'cue' ? (c.pin !== undefined ? (c.who.startsWith('세력:') ? `평판 → ${factionStageLabel(ctx, c.pin)}${peopleSettings(ctx.chat.scriptstate).factionQual ? '' : ` (${c.pin})`}` : `호감 고정 ${c.pin}`) : `호감 · ${c.cue ?? ''}`) : c.kind === 'address' ? `호칭 「${c.toUser ?? ''}」${c.register ? ` · ${c.register}` : ''}` : c.kind === 'identity' ? `신분 ${[c.faction, c.rank].filter(Boolean).join(' ')}` : `메모 ${c.now ?? ''}`;
   const key = `chg|${c.id}`;
   return `<li class="pp-entry${!alive && !c.void ? ' dead' : ''}${c.void ? ' void' : ''}">
     <div class="pp-entry-main">${srcIcon(c.src)}<span class="pp-text"><b title="${esc(KIND_HELP[c.kind])}">${esc(KIND_LABEL[c.kind])}</b> ${esc(what)}${c.reason ? ` <small>— ${esc(c.reason)}</small>` : ''}</span></div>
@@ -1217,8 +1231,10 @@ export async function handlePeople(action: string, value: string | undefined, ct
       return true;
     case 'pp-fac-save': {
       const reason = peopleUi.affReason.trim();
-      const raw = Number(peopleUi.affNum);
-      if (!Number.isFinite(raw) || peopleUi.affNum.trim() === '') {
+      const fs = peopleSettings(ctx.chat.scriptstate);
+      const qualStage = fs.factionQual ? (peopleUi.affStage || factionNow(peopleStore(ctx.chat), v, liveChanges(peopleStore(ctx.chat), liveness(ctx.chat)), userFactionOf(peopleStore(ctx.chat), ctx.chat), fs).stage.id) : '';
+      const raw = qualStage ? factionStageMid(qualStage as 'neutral', fs.factionBounds) : Number(peopleUi.affNum);
+      if (!qualStage && (!Number.isFinite(raw) || peopleUi.affNum.trim() === '')) {
         peopleUi.notice = '숫자를 적어 주세요.';
         env.render();
         return true;
@@ -1237,7 +1253,7 @@ export async function handlePeople(action: string, value: string | undefined, ct
         return putChange(store, { id: changeId(who, 'cue', anchor, seq, `pin:${pin}:${reason}`), anchor, seq, src: 'manual', who, kind: 'cue', pin, reason: plain(reason, 80) });
       });
       peopleUi.affEdit = false;
-      peopleUi.info = `세력 평판을 ${pin}으로 고정했어요.`;
+      peopleUi.info = qualStage ? `세력 평판을 「${FACTION_STAGES[qualStage as 'neutral'].label}」로 고정했어요.` : `세력 평판을 ${pin}으로 고정했어요.`;
       env.render();
       return true;
     }

@@ -12,7 +12,7 @@ import { seedPerson } from './seed';
 import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
 import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
 import { AXES } from './types';
-import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
+import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
 import { ITEM_KINDS, itemKind, sameItemName, type ItemKind } from '../items';
@@ -300,7 +300,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(review.length ? { relationship_review: review } : {}),
     ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.' } } : {}),
     factions_now: o.settings.features.has('faction_rep')
-      ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
+      ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return o.settings.factionQual ? { code: f.code, name: f.name, stage: f.stage.label, stage_en: f.stage.id, ...(f.note ? { reason: f.note } : {}) } : { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,
     faction_stages: o.settings.features.has('faction_rep') ? Object.values(FACTION_STAGES).map((st) => `${st.label} (${st.id})`).join(' · ') : undefined,
     // 저장 상한을 넘긴 인물: 같은 호출에 정리(merge)를 얹는다 (설정 tidy=same)
@@ -371,6 +371,8 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   for (const f of s.features) on.add(f);
   // 수치 모드·정성 모드 절 (리수폿 E): 기능이 켜져 있을 때 둘 중 하나만
   for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
+  // 세력 평판도 수치/정성 (11-07 사용자: 호감·의심·음란도처럼 같이 따라간다)
+  if (s.features.has('faction_rep')) on.add(s.factionQual ? 'faction_rep_qual' : 'faction_rep_num');
   if (s.director === 'note') on.add('next_note');
   if (sexualAnyOn(s)) on.add('sexual');
   return on;
@@ -396,6 +398,8 @@ export interface UpdateResult {
   rhythm_note?: string | null;
   /** 세력 평판 계기 (집단 반응만) */
   faction_cues?: { faction: string; cue: string; m: string; quote: string; reason?: string }[];
+  /** 세력 평판 정성 모드: 단계 판단 */
+  faction_stance?: { faction: string; stage: string; m: string; quote: string; reason?: string }[];
   /** 가계부: 금액이 적힌 거래만 (원, 나가면 −) */
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소감: 이번 턴 종료 사건의 담당 요원 소감 (사건당 1건) */
@@ -423,7 +427,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'faction_stance', 'transactions', 'debriefs', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -1112,8 +1116,49 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
+  // 6b'. 세력 평판 정성 모드 (11-07): 모델이 단계와 이유를 판단. 코드는 이름→코드·단계 이름·인용·세력당 1건만 검사하고, 단계 대표값으로 고정(pin)해 둔다 (숫자는 안 보임)
+  if (ctx.settings.features.has('faction_rep') && ctx.settings.factionQual && !ctx.only?.length) {
+    const seen = new Set<string>();
+    const known = knownFactionCodes(store, input.factionNames);
+    for (const f of r.faction_stance ?? []) {
+      const raw = str(f?.faction).trim();
+      const code = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input.factionNames[c] && raw && input.factionNames[c] === raw) || '';
+      if (!code) {
+        drop('faction', f, '모르는 세력 이름', raw);
+        continue;
+      }
+      const stage = str(f?.stage).trim().toLowerCase();
+      if (!(stage in FACTION_STAGES)) {
+        drop('faction', f, '표에 없는 단계', code);
+        continue;
+      }
+      const ev = evidence(f.m, f.quote);
+      if (typeof ev === 'string') {
+        drop('faction', f, ev, code);
+        continue;
+      }
+      if (seen.has(code)) {
+        drop('faction', f, '세력당 1건', code);
+        continue;
+      }
+      const who = factionWho(code);
+      const userFaction = userFactionOf(store, chat);
+      const now = factionNow(store, code, liveChanges(store, live), userFaction, ctx.settings, input.factionNames);
+      const reason = plain(f.reason, 80);
+      if (now.stage.id === stage && now.note === reason) {
+        drop('faction', f, '지금 단계·이유 그대로', code);
+        continue;
+      }
+      seen.add(code);
+      if (!store.factions[code]) store.factions[code] = { code, name: factionNameOf(code, input.factionNames, store), seeded: { at: ctx.now ?? new Date().toISOString() } };
+      const seq = nextSeq(ev.anchor);
+      const pin = stageMid(stage as keyof typeof FACTION_STAGES, ctx.settings.factionBounds);
+      if (putChange(store, { id: changeId(who, 'cue', ev.anchor, seq, `stance:${stage}:${reason}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'cue', pin, quote: f.quote, reason: reason || FACTION_STAGES[stage as keyof typeof FACTION_STAGES].label })) report.applied.factions++;
+    }
+  }
+
   // 6b. 세력 평판 계기: 그 세력이 유저를 보는 눈이 바뀔 만한 일인지는 모델이 판단 (사용자 2026-10-26). 코드는 이름→코드, 인용, 세력당 1건, 같은 메시지 중복만 검사
-  if (ctx.settings.features.has('faction_rep') && !ctx.only?.length) {
+  if (ctx.settings.features.has('faction_rep') && !ctx.settings.factionQual && !ctx.only?.length) {
     const changes = liveChanges(store, live);
     const seen = new Set<string>();
     const known = knownFactionCodes(store, input.factionNames);

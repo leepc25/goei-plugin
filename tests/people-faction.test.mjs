@@ -174,3 +174,47 @@ test('필드 상한 묶음: 같은 메시지 뒤 여러 방문·장면은 상한
   assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, { turnCap: 10 }), 30);
   assert.ok(store.log.every((x) => x.group && x.group.startsWith('c1|')));
 });
+
+test('정성 모드(11-07): 수치 끄면 faction_stance 로 단계·이유만, 숫자 없는 자료·주입, 구간·몹 목격 안 씀', () => {
+  const s = settings({ ...St.peopleSettings({ $pp_num_faction_rep: '0' }) });
+  assert.equal(s.factionQual, true);
+  assert.equal(s.mobWeight, 'off', '정성 모드에서는 필드 몹 목격 계기를 쌓지 않는다');
+  const on = U.enabledSections(s);
+  assert.ok(on.has('faction_rep_qual') && !on.has('faction_rep_num'));
+  for (const prompt of ['detailed', 'compact']) {
+    const sys = U.assemblePrompt(P.promptFor({ ...s, prompt }), on, '');
+    assert.ok(sys.includes('"faction_stance"') && !sys.includes('"faction_cues"'), prompt);
+    const num = settings({ prompt });
+    const sysN = U.assemblePrompt(P.promptFor(num), U.enabledSections(num), '');
+    assert.ok(sysN.includes('"faction_cues"') && !sysN.includes('"faction_stance"'), prompt);
+  }
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디', 'A00');
+  const input = U.buildUpdate(c, store, [3], { settings: s, system: 'S', values: {}, names, factionNames: { A00: '관리국', B00: '가짜 관리국' } });
+  const fn = input.data.factions_now.find((f) => f.code === 'A00');
+  assert.ok(fn && fn.stage === '중립' && !('value' in fn), '정성 자료에는 숫자가 없다');
+  const r = {
+    faction_stance: [
+      { faction: '관리국', stage: 'favorable', m: 'm4', quote: '공식 포상을 내렸다', reason: '공식 포상을 내려 공로를 인정함' },
+      { faction: 'A00', stage: 'friendly', m: 'm4', quote: '공식 포상을 내렸다', reason: '또' },
+      { faction: 'B00', stage: 'strange', m: 'm4', quote: '쟈알디가 웃었다', reason: 'x' },
+    ],
+    faction_cues: [{ faction: 'B00', cue: '작은친절', m: 'm4', quote: '쟈알디가 웃었다', reason: '정성 모드에서는 무시' }],
+  };
+  const rep = U.applyUpdate(store, c, input, r, { settings: s });
+  assert.equal(rep.applied.factions, 1);
+  assert.ok(rep.dropped.some((d) => d.reason === '세력당 1건'));
+  assert.ok(rep.dropped.some((d) => d.reason === '표에 없는 단계'));
+  const live = S.liveness(c);
+  const now = F.factionNow(store, 'A00', S.liveChanges(store, live), 'A00', s);
+  assert.equal(now.stage.id, 'favorable');
+  assert.equal(now.note, '공식 포상을 내려 공로를 인정함');
+  const block = F.factionsBlock([now], '주인공');
+  assert.ok(block.includes('관리국 → 주인공: Favorable') && block.includes('why: 공식 포상'), block);
+  // 같은 단계·이유를 다시 보내면 중복으로 버림
+  const rep2 = U.applyUpdate(store, c, input, { faction_stance: [r.faction_stance[0]] }, { settings: s });
+  assert.equal(rep2.applied.factions, 0);
+  assert.ok(rep2.dropped.some((d) => d.reason === '지금 단계·이유 그대로'));
+  assert.equal(F.stageMid('neutral', [61, 21, -20, -60]), 0);
+  assert.equal(F.stageMid('hostile', [61, 21, -20, -60]), -80);
+});

@@ -63,6 +63,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   taste: '0', openness: '0', rhythm: '1',
   /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
   faction_rep: '1',
+  /** 세력 평판 수치 (1) / 정성 모드 (0): 갱신기가 단계(적대…우호)와 이유만 판단, 계기 점수·구간 경계·몹 목격 무게 안 씀 (11-07 사용자: 호감·의심·음란도처럼 따라간다) */
+  num_faction_rep: '1',
   faction_inject: '1',
   faction_bounds: '61,21,-20,-60',
   mob_weight: 'half',
@@ -144,6 +146,8 @@ export interface PeopleSettings {
   blockCap: number;
   tidy: 'same' | 'separate';
   factionInject: boolean;
+  /** 세력 평판 정성 모드 (num_faction_rep = 0) */
+  factionQual: boolean;
   factionBounds: [number, number, number, number];
   mobWeight: 'half' | 'full' | 'off';
   spanCap: number;
@@ -230,8 +234,10 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     blockCap: num('block_cap', 4000, 64000),
     tidy: v('tidy') === 'separate' ? 'separate' : 'same',
     factionInject: v('faction_inject') !== '0',
+    factionQual: v('faction_rep') === '1' && v('num_faction_rep') === '0',
     factionBounds: parseBounds(v('faction_bounds')),
-    mobWeight: one('mob_weight', ['half', 'full', 'off'] as const),
+    // 정성 모드에서는 필드 목격 계기를 쌓지 않는다 (단계는 갱신기 판단만)
+    mobWeight: v('num_faction_rep') === '0' ? 'off' : one('mob_weight', ['half', 'full', 'off'] as const),
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),
     directorRules: v('director_rules').slice(0, 2000),

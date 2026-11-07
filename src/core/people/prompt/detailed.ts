@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "faction_rep_num", "faction_rep_qual", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -416,11 +416,19 @@ export const UPDATER_DETAILED: string = [
   "<<SECTION:faction_rep>>",
   "## 15a. Faction standing — how each organization regards the user",
   "",
-  "Besides persons, the chat keeps a standing value per organization (관리국, 가짜 관리국, 백일몽, 민간, 프리랜서 협회, and any organization in the roster) toward the user's character: −100…100 in five stages (`faction_stages`). `factions_now` lists the organizations present in this span with their current stage. The program seeds each value from the organization table and recomputes it from cues; you never return a value.",
+  "Besides persons, the chat keeps a standing per organization (관리국, 가짜 관리국, 백일몽, 민간, 프리랜서 협회, and any organization in the roster) toward the user's character, in five stages (`faction_stages`). `factions_now` lists the organizations present in this span with their current stage.",
+  "<<SECTION:faction_rep_num>>",
+  "The standing is a value −100…100; the program seeds each value from the organization table and recomputes it from cues; you never return a value.",
   "- Return a `faction_cues` item when something in the confirmed span would change how THAT organization, as such, regards the user: you judge whether the event reaches the organization's view (its members' shared knowledge, its decisions, its treatment of the user), not just one person's private feeling. A decision or action by the organization or by members acting for it, a deed its members witnessed and would carry back, a deal, a ban, an audit, a public act toward the organization — all can qualify. A purely private exchange that stays between the user and one member, with no reason to reach the organization, does not.",
   "- Do not record the same event twice: when it already produced a person `cue` for a member and it carries no weight beyond that member, do not also return a faction cue; when it does reach the organization, both may be recorded (the person's feeling and the organization's standing are separate).",
   "- Use the same cue names as person affinity (`cues`) with the same meanings, judged at the organization's scale. The `reason` (Korean ≤40) names the event. Cite `m` and a verbatim `quote`. At most one item per organization per response.",
   "- Faction documents (`docs` type faction) describe what happened between organizations in prose; `faction_cues` changes only the organization's standing toward the user. The same event may appear in both.",
+  "<<END:faction_rep_num>>",
+  "<<SECTION:faction_rep_qual>>",
+  "Qualitative mode: no value, score or cue exists. `factions_now` gives each organization's current stage and the `reason` recorded with it. Return a `faction_stance` item only when something in the confirmed span changes how THAT organization, as such, regards the user: judge whether the event reaches the organization's view (its members' shared knowledge, its decisions, its treatment of the user), not one person's private feeling. A decision or action by the organization or by members acting for it, a deed its members witnessed and would carry back, a deal, a ban, an audit, a public act toward the organization — all can qualify; a private exchange that stays between the user and one member does not.",
+  "- `stage` is your judgement of the organization's overall standing NOW (one of `faction_stages` ids), not a delta; move at most one stage per response unless the span shows a decisive act (a public betrayal, a formal ban, saving the organization). `reason` (Korean ≤80) states what the organization now holds against or in favor of the user. Cite `m` and a verbatim `quote`. At most one item per organization. When nothing changed, return nothing for that organization.",
+  "- Faction documents (`docs` type faction) describe what happened between organizations in prose; `faction_stance` changes only the organization's standing toward the user.",
+  "<<END:faction_rep_qual>>",
   "<<END:faction_rep>>",
   "<<SECTION:wallet>>",
   "## 15b. Money — transactions with an explicit amount",
@@ -543,9 +551,12 @@ export const UPDATER_DETAILED: string = [
   "<<SECTION:rhythm>>",
   " \"rhythm_note\":\"<English ≤200 chars or null>\",",
   "<<END:rhythm>>",
-  "<<SECTION:faction_rep>>",
+  "<<SECTION:faction_rep_num>>",
   " \"faction_cues\":[{\"faction\":\"<organization code or Korean name>\",\"cue\":\"<cue name>\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤40 chars>\"}],",
-  "<<END:faction_rep>>",
+  "<<END:faction_rep_num>>",
+  "<<SECTION:faction_rep_qual>>",
+  " \"faction_stance\":[{\"faction\":\"<organization code or Korean name>\",\"stage\":\"hostile|wary|neutral|favorable|friendly\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤80 chars>\"}],",
+  "<<END:faction_rep_qual>>",
   "<<SECTION:wallet>>",
   " \"transactions\":[{\"amount\":-50000,\"memo\":\"<Korean ≤30 chars>\",\"m\":\"m2\",\"quote\":\"<verbatim, containing the amount>\"}],",
   "<<END:wallet>>",
