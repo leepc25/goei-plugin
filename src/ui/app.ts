@@ -1550,9 +1550,10 @@ function picker(): string {
       ].join('')}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
     : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
   const shown = list.length;
-  // 아바타 (2026-11-08 사용자): 내 페르소나로 시작할 때만 정식 단계. 성별 → 아바타(팝업 격자) 순서로 꼭 고른다. 고유 인물은 그 인물 모습이라 단계가 없다
+  // 아바타 (2026-11-08 사용자): 한 줄 단계. 내 페르소나면 성별 → 아바타(팝업 격자) 순서로 꼭 고른다
   const sex = draft.lookSex || lookGender(draft.look ?? '');
-  const look = needLook ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', sex)}</section>` : '';
+  // 기존 인물로 시작하면 칸은 그대로 두고 그 인물의 성별·모습으로 잠근다 (2026-11-08 사용자)
+  const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', sex, playing ? (people.find((a) => a.id === draft.player)?.name ?? '') : '')}</section>` : '';
   const n0 = look ? 4 : 3;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>

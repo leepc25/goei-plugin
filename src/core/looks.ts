@@ -23,7 +23,7 @@ export interface LookRow {
   id: string;
   /** 프리셋 이름(시민남3) 또는 고유 인물 이름(에일린) */
   name: string;
-  /** 일반 NPC 성별 ('' = 고유 인물이거나 성별 없는 프리셋) */
+  /** 성별 (일반 NPC = 필드 신상표, 고유 인물 = 세계 자료) */
   g: LookGender | '';
   unique: boolean;
   /** 이 세력으로 시작할 때만 고를 수 있는 프리셋이면 그 세력 코드 ('' = 누구나) */
