@@ -2,7 +2,7 @@
 // 따로 받는 팩으로 만든다. 글 하나(JSON) → 200KB 조각(goei-data-<이름>.N.txt) + 목록(goei-data-<이름>.json).
 // 본체에는 팩의 지문(hash·sha256·length)만 박혀 있어(scripts/build.mjs define) 자기와 맞는 자료만 쓴다.
 // 빌드(scripts/build.mjs)와 시험 초기화(tests/data-init.mjs)가 같은 함수로 같은 글을 만든다.
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const ROOT = new URL('../', import.meta.url);
@@ -12,6 +12,8 @@ export const WORLD_PACK_NAME = 'goei-data-world';
 export const INSTALL_PACK_NAME = 'goei-data-install';
 /** 소지품 그림 팩 (2026-11-07): game-src/items/icons.json 매칭 표 + icons/*.png (85×85, 배경 없음) base64. 소지품 메뉴를 처음 열 때 받아 저장소에 둔다 (host/itemicons.ts) */
 export const ITEMS_PACK_NAME = 'goei-data-items';
+/** 내 모습 팩 (2026-11-07 사용자): 필드 인물 126명의 대기 동작(game-pack/char-N/1.webp, 장마다 cw×ch 로 잘린 가로 줄) + 줄 측정값. 시작 패널 「내 모습」·소지품 인물 자리가 처음 그릴 때 받아 저장소에 둔다 (host/looks.ts) */
+export const LOOKS_PACK_NAME = 'goei-data-looks';
 /** 조각 하나의 상한 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다. 본체 조각과 같은 200KB) */
 export const PART_BYTES = 200_000;
 
@@ -71,6 +73,33 @@ export function itemsPackText() {
   const icons = {};
   for (const f of [...files].sort()) icons[f] = readFileSync(new URL(`game-src/items/icons/${f}`, ROOT)).toString('base64');
   return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
+}
+
+/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, dir, n, w, h, cw, ch, ox, oy, img}] }.
+ *  id = 인물 팩 번호(char-6.54 → '6.54'). 고유 인물(char-1~5)은 명부 이름(cfg.name)으로 찾는다.
+ *  일반 NPC(char-6)의 성별 g 는 프리셋 이름의 「남」「여」 글자(시민남3·관리국여A …)에서 읽고, 둘 다 없으면 ''(가짜관리국검사·의사·간호사 — 고르기 격자에 안 나옴).
+ *  img = 대기 줄(A['1']) 시트 base64 webp. src/core/looks.ts parseLooksPack 이 읽는 모양 */
+export function looksPackText() {
+  const dir = new URL('game-pack/', ROOT);
+  const ids = readdirSync(dir)
+    .filter((d) => /^char-\d+\.\d+$/.test(d))
+    .sort((a, b) => {
+      const [a1, a2] = a.slice(5).split('.').map(Number);
+      const [b1, b2] = b.slice(5).split('.').map(Number);
+      return a1 - b1 || a2 - b2;
+    });
+  const looks = [];
+  for (const d of ids) {
+    const j = readJson(`game-pack/${d}/char.json`);
+    const m = j.A?.['1'];
+    if (!m || typeof m.file !== 'string') continue;
+    const name = String(j.cfg?.name ?? '');
+    const id = d.slice(5);
+    const unique = !id.startsWith('6.');
+    const g = unique ? '' : /남/.test(name) ? '남' : /여/.test(name) ? '여' : '';
+    looks.push({ id, name, g, unique, dir: String(j.cfg?.dir ?? 'E'), n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
+  }
+  return JSON.stringify({ schema: 1, kind: 'looks', looks });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */

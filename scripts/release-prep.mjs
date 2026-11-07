@@ -84,7 +84,7 @@ if (opt.card) {
 // ④ dist → release (시작기·본체 조각·자료 팩·토크나이저 조각). 옛 조각은 지우지 않는다
 {
   const dist = resolve(ROOT, 'dist');
-  const files = readdirSync(dist).filter((f) => /^(goei-plugin\.js|goei-body\.(json|\d+\.txt)|goei-data-(world|install|items)\.(json|txt|\d+\.txt)|tok-o200k\.(json|\d+\.txt))$/.test(f));
+  const files = readdirSync(dist).filter((f) => /^(goei-plugin\.js|goei-body\.(json|\d+\.txt)|goei-data-(world|install|items|looks)\.(json|txt|\d+\.txt)|tok-o200k\.(json|\d+\.txt))$/.test(f));
   log(`④ dist → release 복사 ${files.length}개`);
   if (!opt.dry) for (const f of files) copyFileSync(resolve(dist, f), resolve(ROOT, 'release', f));
 }

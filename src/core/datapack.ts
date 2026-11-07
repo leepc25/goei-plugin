@@ -23,7 +23,7 @@ declare const __WORLD_PACK__: string | undefined;
 declare const __INSTALL_PACK__: string | undefined;
 declare const __ITEMS_PACK__: string | undefined;
 
-function expectOf(raw: unknown): PackExpect {
+export function expectOf(raw: unknown): PackExpect {
   try {
     const o = typeof raw === 'string' ? (JSON.parse(raw) as Partial<PackExpect>) : null;
     if (o && typeof o.hash === 'string' && typeof o.sha256 === 'string' && typeof o.length === 'number') return { hash: o.hash, sha256: o.sha256, length: o.length };
