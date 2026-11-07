@@ -27,7 +27,7 @@ const detail = `<section class="det"><div class="dh">${ic('consumable', 26)}<div
 <p>관리국 지급품. 문턱이나 창틀에 뿌려 두면 하룻밤은 버틴다.</p><p class="ef">효과: 저급 괴이의 접근을 늦춘다</p>
 <div class="btns"><button class="pri">사용</button><button>고치기</button><button>합치기</button><button class="danger">버리기</button></div></section>`;
 const tabs = `<div class="subs"><button>가계부</button><button class="on">소지품</button></div>`;
-const head = `<div class="hd"><div class="t">12 / 16</div></div>`;
+const head = `<div class="hd"><div class="t">12 / 16</div><div class="s">${nav('search')}<span>물건·기록 찾기</span></div></div>`;
 const foot = `<div class="foot"><button class="add">${nav('plus')} 직접 넣기</button><details><summary>사용·처분 기록 (3)</summary><div class="log">11-07 부적 1장 사용 (본문) · 11-06 생수 1병 사용 (사용 단추) · 11-06 손수건 버림</div></details></div>`;
 const css = `
 :root{--void:#1A2226;--panel:#232D32;--panel2:#2C383E;--line:#3A4A50;--line2:#46565D;--text:#E9F0EE;--sub:#BECBC8;--dim:#8A9A97;--signal:#5EEAD4;--accent-bg:rgba(94,234,212,.12);--danger:#e5484d}
