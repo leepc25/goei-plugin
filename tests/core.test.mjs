@@ -198,3 +198,14 @@ test('fab geometry: hit test, clamping and drag', () => {
   assert.deepEqual(parsePos('junk'), DEFAULT_FAB_POS);
   assert.deepEqual(parsePos(null), DEFAULT_FAB_POS);
 });
+
+test('인물별 첫 장면의 「시작 로어」 목록은 첫 턴 시드로 들어간다 (11-07)', async () => {
+  const { pickScenes } = await import('../dist-test/core.mjs');
+  const picked = pickScenes({ 인물: { P001: { ko: '글', lore: ['관리국', ' 쟈알디 ', ''] }, P002: { ko: '글', lore: 'x' } } });
+  assert.deepEqual(picked.인물.P001.lore, ['관리국', '쟈알디']);
+  assert.equal(picked.인물.P002.lore, undefined);
+  const seed = buildSeed(lore, 'Z99', 0, ['관리국', '쟈알디', '없는이름']);
+  assert.ok(seed.text.includes('BUREAU') && seed.text.includes('JYALDI'));
+  assert.deepEqual(seed.missing, ['없는이름']);
+  assert.equal(buildSeed(lore, 'Z99', 0, []).text, '', '목록이 비면 시드 없음');
+});
