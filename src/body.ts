@@ -60,12 +60,12 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
-import { hasShopTag, settleShop, shopOn } from './core/shop';
+import { hasShopTag, settleShop } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
-import { aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from './core/wallet';
+import { aliveAnchors, readWallet, recentWalletLines, syncWalletToStatus, walletBalance, walletRecentN, walletSyncOn, walletVars, WALLET_START_DEFAULT } from './core/wallet';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
 import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
@@ -312,8 +312,9 @@ async function withPlayer<M extends PromptMessage>(messages: M[], { char, chat }
 function statusShape({ chat }: ChatContext): StatusShape {
   const vars = chat.scriptstate ?? {};
   const cfg = colConfig(vars);
-  const wallet = cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
-  return { cols: usedCols(cfg), wallet };
+  const w = cfg.wallet !== 'off' ? readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT) : null;
+  const alive = aliveAnchors(chat);
+  return { cols: usedCols(cfg), wallet: w ? walletBalance(w, alive) : null, ...(w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {}) };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
@@ -453,7 +454,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 가계부: 이 응답의 상태창 잔고 칸에 장부를 맞춘다 (core/wallet.ts syncWalletToStatus). 머리 잔고·가계부가 상태창과 같이 움직이게
     // 먼저 손에 든 채팅으로 바뀔 게 있는지 보고, 있을 때만 저장한다 (응답 처리 한 번의 읽기 수를 늘리지 않게 — qc-pipeline 5-4)
     const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
-    if (colConfig(chat.scriptstate).wallet !== 'off' && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
+    // 설정 「상태창 잔고 따르기」를 끄면 맞추지 않는다 (장부 값만 믿고, 다음 요청의 [Previous status] 잔고를 장부로 덮는다)
+    if (colConfig(chat.scriptstate).wallet !== 'off' && walletSyncOn(chat.scriptstate) && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
         const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
         return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
@@ -470,7 +472,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
         const r = settleShop(cur, arg.messageIndex);
-        return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...(shopOn(cur.scriptstate) ? r.vars : { $st_shop: '' }) } } : null;
+        return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...r.vars } } : null;
       }).catch(() => null)) ?? latest;
     }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);

@@ -21,7 +21,7 @@ import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, wal
 import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, removeItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
-  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopSettings, shopVars, shortWon, startSell, talkPrompt,
+  applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
   type ShopItem, type ShopSource, type ShopState,
 } from '../core/shop';
 import { ICONS } from './icons';
@@ -358,6 +358,14 @@ export async function shopAction(action: string, value: string | undefined, ctx:
   const st = currentShop(ctx.chat);
   switch (action) {
     case 'shop-open': {
+      // 꺼져 있거나(설정에서 끔) 방문이 없으면 열지 않는다
+      if (!st || !shopOn(ctx.chat.scriptstate)) {
+        shopUi.open = false;
+        shopUi.solo = false;
+        shopUi.info = '';
+        env.render();
+        return true;
+      }
       shopUi.open = true;
       shopUi.detail = '';
       shopUi.drawer = false;

@@ -336,21 +336,10 @@ export function sectionBody(text: string, name: string): string | null {
   const m = new RegExp(`<<SECTION:${name}>>\\n([\\s\\S]*?)<<END:${name}>>`).exec(text);
   return m ? m[1].replace(/\n$/, '') : null;
 }
-/** 절 덮어쓰기 (리수폿 J-1 지침 편집): 첫 번째(본문) 절만 바꾼다. 출력 계약 줄은 그대로 */
-export function overrideSections(text: string, overrides: Record<string, string>): string {
-  let out = text;
-  for (const [name, body] of Object.entries(overrides)) {
-    if (!/^[a-z_]+$/.test(name) || !body.trim()) continue;
-    out = out.replace(new RegExp(`<<SECTION:${name}>>\\n[\\s\\S]*?<<END:${name}>>`), () => `<<SECTION:${name}>>\n${body.trim()}\n<<END:${name}>>`);
-  }
-  return out;
-}
-
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}, extra = '', sexualRules = ''): string {
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', extra = '', sexualRules = ''): string {
   // extra: 설정으로 켠 덧붙임 지침(말투 다변화 등). 사용자 지침보다 앞에 둔다 (원본 V3: 내장 규칙이 사용자 규칙 앞)
   const rules = [lang === 'en' ? LANG_EN_RULE : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
   const on = new Set(enabled);
-  if (Object.keys(overrides).length) text = overrideSections(text, overrides);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
   let out = text;
@@ -477,6 +466,8 @@ export interface ApplyCtx {
   keepRead?: boolean;
   /** 가계부 켜짐: 거래를 받아 report.wallet 에 담는다 */
   wallet?: boolean;
+  /** 설정 「거래 읽는 기준」이 어림(loose): 인용에 금액 표기가 없어도 받는다 (금액은 모델 어림) */
+  walletLoose?: boolean;
   /** 소지품 절 켜짐: 변화를 받아 report.items 에 담는다 (input.items 가 null 이면 아무것도 안 받는다) */
   items?: boolean;
 }
@@ -1214,7 +1205,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('wallet', t, ev);
         continue;
       }
-      if (!mentionsAmount(str(t.quote)) && !/\d/.test(str(t.quote))) {
+      if (!ctx.walletLoose && !mentionsAmount(str(t.quote)) && !/\d/.test(str(t.quote))) {
         drop('wallet', t, '인용에 금액이 없음');
         continue;
       }

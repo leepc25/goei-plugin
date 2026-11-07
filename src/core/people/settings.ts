@@ -109,7 +109,6 @@ export interface PeopleSettings {
   /** Router·Director 가 보는 최근 글 수 */
   recentMsgs: number;
   /** Router 지침 덮어쓰기(비면 기본)와 덧붙일 지침 */
-  routerPrompt: string;
   routerRules: string;
   /** 단계별 모델 (same 은 갱신 모델로 푼 값) 과 전용 모델 ID (비면 없음) */
   stageModel: Record<Stage, 'main' | 'aux'>;
@@ -119,8 +118,6 @@ export interface PeopleSettings {
   hypaItems: number;
   hypaPlus: boolean;
   /** 갱신기 절 덮어쓰기 (지금 지침 판 기준) 와 Director 기본 지침 덮어쓰기 */
-  promptOverrides: Record<string, string>;
-  directorPrompt: string;
   speed: number;
   /** 호감 감소 승수 */
   speedDown: number;
@@ -157,16 +154,6 @@ export interface PeopleSettings {
   keepRaw: boolean;
 }
 
-/** 리수폿 J-1 지침 편집: 절 본문 덮어쓰기 변수 (지침 판·절 이름별). director = 연출형 Director 기본 지침 */
-export const PS = (prompt: string, section: string) => `$pp_ps_${prompt}_${section}`;
-export const PS_PREFIX = '$pp_ps_';
-export function promptOverrides(state: Record<string, unknown> | undefined, prompt: string): Record<string, string> {
-  const out: Record<string, string> = {};
-  const head = `${PS_PREFIX}${prompt}_`;
-  for (const [k, v] of Object.entries(state ?? {})) if (k.startsWith(head) && typeof v === 'string' && v.trim()) out[k.slice(head.length)] = v;
-  return out;
-}
-
 export type Stage = 'update' | 'director' | 'router' | 'tidy';
 export const STAGES_ALL: Stage[] = ['update', 'director', 'router', 'tidy'];
 
@@ -200,7 +187,6 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     routerTimeout: num('router_timeout', 5, 300),
     always: [...new Set(v('always').split(/[,\n]/).map((x) => x.trim().normalize('NFC')).filter(Boolean))].slice(0, 12),
     recentMsgs: num('recent_msgs', 0, 12),
-    routerPrompt: (typeof state?.[PS('router', 'base')] === 'string' ? String(state[PS('router', 'base')]) : '').trim().slice(0, 12000),
     routerRules: v('router_rules').slice(0, 2000),
     stageModel: (() => {
       const base = v('model') === 'main' ? 'main' : 'aux';
@@ -212,8 +198,6 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     hypaCap: num('hypa_cap', 500, 24000),
     hypaItems: num('hypa_items', 1, 64),
     hypaPlus: v('hypa_plus') !== '0',
-    promptOverrides: promptOverrides(state, one('prompt', ['detailed', 'compact'] as const)),
-    directorPrompt: (typeof state?.[PS('director', 'base')] === 'string' ? String(state[PS('director', 'base')]) : '').trim().slice(0, 12000),
     speed: num('speed', 0.25, 4),
     speedDown: v('speed_down') === 'same' || v('speed_down') === '' ? num('speed', 0.25, 4) : num('speed_down', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),

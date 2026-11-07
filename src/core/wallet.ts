@@ -36,6 +36,24 @@ export const WALLET_MAX = 1_000_000_000_000;
 /** 잔고 직접 수정 (2026-10-27 사용자: 기본 끔. 컨텍스트가 쌓이면 이유 없이 바뀐 잔고가 모델을 헷갈리게 한다).
  * 켜면 가계부의 잔고 고치기·거래 지우기, 진행 중 채팅의 시작 잔고 바꾸기가 열린다. 채팅 변수 '1' = 켬 (새 채팅 기본값은 prefs.vars) */
 export const WALLET_EDIT_VAR = '$st_wallet_edit';
+/** 상태창 잔고 따르기 (기본 켬): 모델이 상태창 잔고 칸을 바꾸면 장부를 그 값에 맞춘다(차이 한 줄). 끄면 장부 값만 믿고 다음 요청의 [Previous status] 를 장부로 덮는다 */
+export const WALLET_SYNC_VAR = '$st_wallet_sync';
+export const walletSyncOn = (vars: Record<string, unknown> | undefined) => vars?.[WALLET_SYNC_VAR] !== '0';
+/** 거래 읽는 기준: strict(기본, 금액이 적힌 문장만) · loose(밥값·택시비처럼 금액이 안 적힌 거래도 어림해 받기) */
+export const WALLET_LOOSE_VAR = '$st_wallet_loose';
+export const walletLoose = (vars: Record<string, unknown> | undefined) => vars?.[WALLET_LOOSE_VAR] === '1';
+/** 최근 거래 넘기기: 본편 요청의 [Previous status] 아래에 최근 거래 N줄 (0~10, 기본 0) */
+export const WALLET_RECENT_VAR = '$st_wallet_recent';
+export const WALLET_RECENT_MAX = 10;
+export const walletRecentN = (vars: Record<string, unknown> | undefined): number => {
+  const n = Number(vars?.[WALLET_RECENT_VAR]);
+  return Number.isInteger(n) && n >= 0 ? Math.min(WALLET_RECENT_MAX, n) : 0;
+};
+/** 살아 있는 최근 거래 n줄 (영어 한 줄: 「-30,000 won 택시」). 상태창 맞춤 줄은 뺀다 */
+export function recentWalletLines(w: Wallet, alive: Set<string>, n: number): string[] {
+  if (n <= 0) return [];
+  return liveWallet(w, alive).filter((e) => e.memo !== WALLET_SYNC_MEMO).slice(-n).map((e) => `${e.amount > 0 ? '+' : ''}${e.amount.toLocaleString('en-US')} won ${e.memo}`);
+}
 export const walletEditable = (vars: Record<string, unknown> | undefined) => vars?.[WALLET_EDIT_VAR] === '1';
 /** 이야기가 시작됐나 (유저 메시지가 하나라도 있으면): 그 뒤로는 수정이 꺼져 있으면 시작 잔고도 못 바꾼다 */
 export const walletStarted = (chat: Chat) => (chat.message ?? []).some((m) => (m as { role?: string }).role === 'user');

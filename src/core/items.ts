@@ -52,7 +52,7 @@ export interface Item {
   from: ItemFrom;
   /** 기준 메시지 키 (messageKey). 직접 넣은 건 빈 문자열 (늘 산다) */
   anchor: string;
-  /** 장터: 값·가계부 거래 id */
+  /** 상점: 값·가계부 거래 id */
   price?: number;
   walletId?: string;
   /** 본문: 근거 인용 */
@@ -84,6 +84,8 @@ export interface ItemLog {
 export interface Items {
   list: Item[];
   log: ItemLog[];
+  /** 설정 「다 쓴 물건」이 「남겨 두기」면 true (readItems 가 채움, 저장하지 않음): 남은 0 인 소모품도 목록에 남는다 */
+  keep?: boolean;
 }
 
 const isItem = (e: unknown): e is Item => {
@@ -112,18 +114,19 @@ function normItem(x: Item): Item {
 export function readItems(vars: Record<string, unknown> | undefined): Items {
   const raw = vars?.[ITEMS_VAR];
   const empty: Items = { list: [], log: [] };
+  if (vars?.[ITEM_SPENT_VAR] === 'keep') empty.keep = true;
   if (typeof raw !== 'string' || !raw.trim()) return empty;
   try {
     const o = JSON.parse(raw) as Partial<Items>;
     if (!o || typeof o !== 'object') return empty;
     const list = (Array.isArray(o.list) ? o.list.filter(isItem) : []).map(normItem).slice(-200);
-    return { list, log: Array.isArray(o.log) ? o.log.filter(isLog).slice(-400) : [] };
+    return { list, log: Array.isArray(o.log) ? o.log.filter(isLog).slice(-400) : [], ...(vars?.[ITEM_SPENT_VAR] === 'keep' ? { keep: true } : {}) };
   } catch {
     return empty;
   }
 }
 
-export const itemsVars = (it: Items): Record<string, string> => ({ [ITEMS_VAR]: JSON.stringify(it) });
+export const itemsVars = (it: Items): Record<string, string> => ({ [ITEMS_VAR]: JSON.stringify({ list: it.list, log: it.log }) });
 
 /** 이 물건을 쓴 횟수 (살아 있는 사용 기록만 — 응답을 지우거나 다시 굴리면 돌아온다) */
 export function itemUsed(it: Items, id: string, alive: Set<string>): number {
@@ -138,7 +141,7 @@ export function itemLeft(it: Items, e: Item, alive: Set<string>): number | undef
 
 /** 살아 있는 물건 (직접 넣은 건 늘, 나머지는 기준 메시지가 남아 있을 때). 소모성은 남은 횟수가 0이면 빠진다 */
 export function liveItems(it: Items, alive: Set<string>): Item[] {
-  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && (e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
+  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && (it.keep || e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
 }
 
 /** 장착 칸 차지: 갈래별 칸 번호 → 물건 (같은 칸에 둘이면 앞의 것) */
@@ -339,9 +342,40 @@ export function itemSlots(vars: Record<string, unknown> | undefined): number {
 }
 export const itemLimit = (vars: Record<string, unknown> | undefined): string => clean(vars?.[ITEM_LIMIT_VAR], 60) || ITEM_LIMIT_DEFAULT;
 /** 본편에 넘기기 (기본 켬, '0' 이면 끔) */
-export const itemPushOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_PUSH_VAR] !== '0';
+/** 소지품·상점 스위치 (2026-11-07 사용자: 둘은 연동, 하나를 끄면 같이 꺼짐). '0' 이면 둘 다 끔. shop.ts 도 이 값을 본다. 가계부는 따로(상태창 잔고 칸 $st_col_wallet) */
+export const ITEM_ON_VAR = '$it_on';
+export const invOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_ON_VAR] !== '0';
+/** 진행 중에 소지품을 다시 켠 때의 메시지 수. 그 뒤 첫 응답이 오기 전까지 [Inventory] 에 「꺼져 있던 동안의 변화는 목록에 없다」를 붙인다 */
+export const ITEM_RESUMED_VAR = '$it_resumed';
+/** 다시 켠 뒤 아직 응답이 안 왔나 */
+export function invJustResumed(chat: Chat): boolean {
+  const at = Number(chat.scriptstate?.[ITEM_RESUMED_VAR] ?? '');
+  if (!Number.isInteger(at) || at < 0) return false;
+  return !(chat.message ?? []).slice(at).some((m) => m.role === 'char');
+}
+const RESUMED_EVENT = 'item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point';
+export const itemPushOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_PUSH_VAR] !== '0';
 /** 보조 모델이 본문을 읽어 목록을 맞추기 (기본 켬, '0' 이면 끔) */
-export const itemAutoOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_AUTO_VAR] !== '0';
+export const itemAutoOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_AUTO_VAR] !== '0';
+/** 시작 소지품 (기본 켬): 고유 인물로 시작할 때 명부의 시작 소지품을 넣고 무기·장비를 장착 */
+export const ITEM_START_VAR = '$it_start';
+/** 다 쓴 물건: remove(기본, 남은 0 이면 목록에서 빠짐) · keep(「다 씀」으로 남겨 둠) */
+export const ITEM_SPENT_VAR = '$it_spent';
+/** 상태 바꾸기 (기본 켬): 보조 모델이 손상·고장·파괴를 바꾼다 */
+export const ITEM_STATE_VAR = '$it_state';
+export const itemStateOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_STATE_VAR] !== '0';
+/** 본편에 넘길 내용: full(기본, 이름·설명·효과·판정) · state(이름·판정) · name(이름만) */
+export const ITEM_DETAIL_VAR = '$it_detail';
+export type ItemDetail = 'full' | 'state' | 'name';
+export const itemDetail = (vars: Record<string, unknown> | undefined): ItemDetail => (vars?.[ITEM_DETAIL_VAR] === 'state' || vars?.[ITEM_DETAIL_VAR] === 'name' ? vars[ITEM_DETAIL_VAR] as ItemDetail : 'full');
+/** 사용·처분 기록 넘기기: 최근 응답 N개의 기록(획득·사용·버림·없어짐·파괴·판 것)을 [Inventory] 에 (0~10, 기본 0) */
+export const ITEM_LOGTURNS_VAR = '$it_logturns';
+export const ITEM_LOGTURNS_MAX = 10;
+export const itemLogTurns = (vars: Record<string, unknown> | undefined): number => {
+  const n = Number(vars?.[ITEM_LOGTURNS_VAR]);
+  return Number.isInteger(n) && n >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n) : 0;
+};
+export const itemStartOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_START_VAR] !== '0';
 
 export interface ItemUse {
   id: string;
@@ -384,19 +418,20 @@ export function addUse(list: ItemUse[], e: Item, left: number | undefined): Item
 /** 「사용」 자리에서 빼기 */
 export const dropUse = (list: ItemUse[], id: string): ItemUse[] => list.filter((u) => u.id !== id);
 
-/** 이번 턴에 새로 산 것 (장터): 마지막 응답 뒤에 들어온 store 줄 — 아직 본편이 모르는 것 */
+/** 이번 턴에 새로 산 것 (상점): 마지막 응답 뒤에 들어온 store 줄 — 아직 본편이 모르는 것 */
 export function newlyBought(list: Item[], lastAnchor: string): Item[] {
   return list.filter((e) => e.from === 'store' && e.anchor === lastAnchor);
 }
 
 /** 본편에 넘기는 물건 한 줄: 이름 — 설명 (효과) [장착] [남은 횟수] [상태] */
-export function itemLine(e: Item, left: number | undefined, equipped: boolean): string {
-  const tags = [
+export function itemLine(e: Item, left: number | undefined, equipped: boolean, detail: ItemDetail = 'full'): string {
+  const tags = detail === 'name' ? [] : [
     equipped ? `equipped ${e.equip === 'weapon' ? 'weapon' : 'gear'}` : '',
-    left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
+    left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
-  return `- ${e.name}${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}${tags.map((t) => ` [${t}]`).join('')}`;
+  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}` : '';
+  return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }
 
 export interface BlockUse {
@@ -407,8 +442,8 @@ export interface BlockUse {
 }
 
 /** 본편에 넘기는 글. 비면 빈 문자열 (붙이지 않는다). 전부 넘김 — 자르지 않는다. 칸 수는 소지품 격자만 센다 (장착 칸에 놓인 건 빼고) */
-export function itemsBlock(list: Item[], opts: { slots: number; limit: string; left?: (e: Item) => number | undefined; use?: BlockUse[]; bought?: string[]; events?: string[]; always?: boolean }): string {
-  const lines = list.map((e) => itemLine(e, opts.left?.(e), isEquipped(e, list)));
+export function itemsBlock(list: Item[], opts: { slots: number; limit: string; left?: (e: Item) => number | undefined; use?: BlockUse[]; bought?: string[]; events?: string[]; always?: boolean; detail?: ItemDetail; recent?: string[] }): string {
+  const lines = list.map((e) => itemLine(e, opts.left?.(e), isEquipped(e, list), opts.detail));
   const use = (opts.use ?? []).filter((u) => u.name);
   const bought = (opts.bought ?? []).filter(Boolean);
   const extra = (opts.events ?? []).filter(Boolean);
@@ -416,6 +451,8 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; l
   const carried = gridItems(list).length;
   const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? ' (over the limit)' : ''}`, ...(lines.length ? lines : ['- (nothing)'])];
   out.push(`Carry limit: ${opts.limit}`);
+  const recent = (opts.recent ?? []).filter(Boolean);
+  if (recent.length) out.push(`Recently: ${recent.join('; ')}`);
   const events: string[] = [];
   if (use.length) events.push(`uses ${use.map((u) => `${u.name}${u.n > 1 ? ` ×${u.n}` : ''}${u.after === 0 ? ' (used up after this)' : u.after !== undefined ? ` (${u.after} left after this)` : ''}`).join(', ')}`);
   if (bought.length) events.push(`just bought ${bought.join(', ')}`);
@@ -449,6 +486,16 @@ export function lastUserKey(chat: Chat): string {
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'user') return messageKey(list[i], i);
   return '';
 }
+const LOG_VERB: Record<ItemLogWhat, string> = { get: 'got', use: 'used', drop: 'dropped', gone: 'lost', destroy: 'destroyed', merge: 'combined into', sell: 'sold' };
+/** 최근 봇 응답 n개에 묶인 사용·처분 기록 (설정 「사용·처분 기록 넘기기」). 직접 넣은·버린 줄(기준 메시지 없음)은 셀 수 없어 뺀다 */
+export function recentItemLog(chat: Chat, it: Items, n: number): string[] {
+  if (n <= 0) return [];
+  const list = chat.message ?? [];
+  const keys = new Set<string>();
+  for (let i = list.length - 1; i >= 0 && keys.size < n; i--) if (list[i].role === 'char') keys.add(messageKey(list[i], i));
+  return it.log.filter((l) => l.anchor && keys.has(l.anchor)).map((l) => `${LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ''}`);
+}
+
 /** 채팅의 마지막 봇 응답 키 (없으면 '') */
 export function lastBotKey(chat: Chat): string {
   const list = chat.message ?? [];
@@ -501,16 +548,19 @@ export function inventoryText(chat: Chat): string {
     const n = l !== undefined ? Math.min(u.n, l) : 1;
     return n > 0 ? [{ name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
   });
+  const resumed = invJustResumed(chat);
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
-    events: shop ? shopEvents(chat) : [],
-    always: shop,
+    events: [...(resumed ? [RESUMED_EVENT] : []), ...(shop ? shopEvents(chat) : [])],
+    always: shop || resumed,
+    detail: itemDetail(vars),
+    recent: recentItemLog(chat, it, itemLogTurns(vars)),
   });
-  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${shopGuide()}` : ''}` : '';
+  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${shopGuide(vars)}` : ''}` : '';
 }
 
 /** 메시지 키 k 가 유저 키 userKey 뒤의 응답인가 (다시 굴리는 턴의 옛 응답) */
@@ -584,9 +634,12 @@ export function itemsNowOf(chat: Chat): ItemNow[] {
 }
 
 /** 보고된 변화를 목록에: new 더하기(같은 이름은 갱신), update 설명·효과·판정·상태·남은 횟수, gone 빼기, destroyed 파괴로 빼기. 줄은 그 응답에 묶인다 */
-export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[]): Items {
+export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[], opts: { state?: boolean } = {}): Items {
   let it = it0;
-  for (const c of changes) {
+  // 설정 「상태 바꾸기」가 꺼져 있으면 손상·고장은 받지 않고, 파괴는 「없어짐」으로 (목록에서는 빠지되 상태 단계는 쓰지 않는다)
+  const stateOn = opts.state !== false;
+  for (const c0 of changes) {
+    const c: ItemChange = stateOn ? c0 : { ...c0, state: undefined, ...(c0.action === 'destroyed' ? { action: 'gone' as const } : {}) };
     const cur = liveItems(it, alive).find((e) => e.name === c.name);
     if (c.action === 'gone' || c.action === 'destroyed') {
       if (cur) it = removeItem(it, cur.id, c.action === 'gone' ? 'gone' : 'destroy', 'story', c.anchor, { quote: c.quote, ...(c.desc ? { note: c.desc } : {}) });
@@ -598,7 +651,7 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
       if (c.uses !== undefined && cur.uses !== undefined) {
         it = setItemLeft(it, alive, cur.id, c.uses);
         // 남은 0 = 다 씀: 목록에서 빼고 기록
-        if (c.uses === 0) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀' });
+        if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀' });
       }
     } else if (c.action === 'new') {
       it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? undefined, state: c.state, icon: c.icon, from: 'story', anchor: c.anchor, quote: c.quote });

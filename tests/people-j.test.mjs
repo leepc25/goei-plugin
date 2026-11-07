@@ -26,17 +26,11 @@ const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role
 const names = [{ name: '쟈알디', aliases: [], titles: [] }];
 const c = chat(['user', '출근했다', 'u1'], ['char', '쟈알디가 커피를 내밀었다. "고마웠어, 어제." 미나가 옆에서 웃었다.', 'c1']);
 
-test('지침 편집: 절 본문 읽기, 첫 번째(본문) 절만 덮어쓰고 출력 계약 줄은 그대로, 설정에서 읽기', () => {
+test('지침 편집: 절 본문 읽기 (기본 지침은 지침 탭에서만 고친다)', () => {
   const body = U.sectionBody(P.UPDATER_DETAILED, 'register');
   assert.ok(body.startsWith('"## 8.') || body.includes('## 8. Relationship'), body.slice(0, 80));
-  const over = U.overrideSections(P.UPDATER_DETAILED, { register: '## 8. MY RULES\nonly this', nope: 'x', 'bad name!': 'y' });
-  assert.ok(over.includes('<<SECTION:register>>\n## 8. MY RULES\nonly this\n<<END:register>>'));
-  assert.ok(over.includes('"address":['), '출력 계약 줄의 register 절은 남는다');
-  const s = St.peopleSettings({ $pp_ps_detailed_register: '## 8. MY RULES\nonly this', $pp_ps_compact_register: 'other', $pp_ps_detailed_empty: '   ' });
-  assert.deepEqual(s.promptOverrides, { register: '## 8. MY RULES\nonly this' });
-  const full = U.assemblePrompt(P.UPDATER_DETAILED, U.enabledSections(s), '', 'ko', s.promptOverrides);
-  assert.ok(full.includes('MY RULES') && !full.includes('### 8.2') && full.includes('"address":['));
-  assert.equal(St.PS('detailed', 'register'), '$pp_ps_detailed_register');
+  assert.equal(U.overrideSections, undefined, '채팅별 절 덮어쓰기는 없앰');
+  assert.equal(St.PS, undefined);
 });
 
 test('단계별 모델·전용 ID: same 은 갱신 모델을 따르고, ID 는 비면 없음', () => {
@@ -68,11 +62,13 @@ test('하이파 참조: V3 요약 → 없으면 V2, 글자 상한은 최근 것�
   const input = U.buildUpdate(c, store, [1], { settings: s, system: 'S', values: {}, names, memory: ['옛 요약'] });
   assert.deepEqual(input.data.memory, ['옛 요약']);
   assert.equal(U.buildUpdate(c, store, [1], { settings: s, system: 'S', values: {}, names }).data.memory, undefined);
-  const d = D.buildDirector(c, store, ['쟈알디'], 'x', St.peopleSettings({ $pp_director: 'scene', $pp_ps_director_base: '# MY DIRECTOR' }), {}, ['옛 요약']);
+  const d = D.buildDirector(c, store, ['쟈알디'], 'x', St.peopleSettings({ $pp_director: 'scene' }), {}, ['옛 요약'], { facts: '# MY DIRECTOR', scene: 'MY SCENE' });
   assert.deepEqual(d.data.memory, ['옛 요약']);
-  assert.ok(d.system.startsWith('# MY DIRECTOR') && !d.system.includes('# Scene Director · facts'), 'Director 기본 지침 덮어쓰기');
+  assert.ok(d.system.startsWith('# MY DIRECTOR\nMY SCENE') && !d.system.includes('# Scene Director · facts'), 'Director 기본 지침(지침 탭 FACTS·SCENE)');
   assert.ok(d.system.includes('## Affinity and taste'), '기능별 절은 그대로');
-  assert.ok(D.DIRECTOR_BASE_TEXT.includes('# Scene Director'));
+  const facts = D.buildDirector(c, store, ['쟈알디'], 'x', St.peopleSettings({ $pp_director: 'facts' }), {}, [], { facts: '# F', scene: 'S!' });
+  assert.ok(facts.system.startsWith('# F') && !facts.system.includes('S!'), '사실형엔 SCENE 절 없음');
+  assert.ok(D.buildDirector(c, store, ['쟈알디'], 'x', St.peopleSettings({ $pp_director: 'scene' }), {}).system.startsWith('# Scene Director'), '비면 내장 글');
 });
 
 test('되돌리기: 갱신이 만든 항목·계기·새 인물을 전부 취소하고, 전 것은 그대로', () => {

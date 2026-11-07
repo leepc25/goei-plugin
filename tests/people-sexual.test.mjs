@@ -61,10 +61,10 @@ test('지침: 켜진 칸·발정모드에 따라 절이 조립되고, 끄면 절
   assert.equal(Sx.sexualWriterSection(St.peopleSettings({ $pp_sexual_desire: '0', $pp_paraphilia: '0' })), '');
   assert.ok(!/`paraphilia`/.test(Sx.sexualWriterSection(St.peopleSettings({ $pp_paraphilia: '0' })).split('\n')[1]), '이상성욕만 끄면 그 칸은 지침에서 빠짐');
   for (const text of [PD.UPDATER_DETAILED, PC.UPDATER_COMPACT]) {
-    const full = U.assemblePrompt(text, U.enabledSections(on), '', 'ko', {}, '', Sx.sexualWriterSection(on));
+    const full = U.assemblePrompt(text, U.enabledSections(on), '', 'ko', '', Sx.sexualWriterSection(on));
     assert.ok(/## 7b\. Sexual desire and paraphilia/.test(full) && /"sexual_init"/.test(full) && !/<<SEXUAL_RULES>>/.test(full));
     const off = St.peopleSettings({ $pp_sexual_desire: '0', $pp_paraphilia: '0' });
-    const none = U.assemblePrompt(text, U.enabledSections(off), '', 'ko', {}, '', Sx.sexualWriterSection(off));
+    const none = U.assemblePrompt(text, U.enabledSections(off), '', 'ko', '', Sx.sexualWriterSection(off));
     assert.ok(!/7b\. Sexual/.test(none) && !/"sexual_init"/.test(none) && !/<<SEXUAL_RULES>>/.test(none));
   }
   assert.ok(U.enabledSections(on).has('sexual') && !U.enabledSections(St.peopleSettings({ $pp_axes: '0' })).has('sexual'));

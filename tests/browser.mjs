@@ -2,7 +2,7 @@
 // 가짜 risuai API로 시작 화면 → 저장까지 확인한다.
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
-import { distPackFiles, distWorldPack } from './data-init.mjs';
+import { distPack, distPackFiles, distWorldPack } from './data-init.mjs';
 import { gameFiles as pickGameFiles } from './qc-game-host.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -23,6 +23,8 @@ const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
 /** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
 const worldPack = distWorldPack();
+// 아바타 팩: 내 페르소나로 시작하려면 아바타가 있어야 출발 (2026-11-08 사용자)
+const looksPack = distPack('goei-data-looks');
 function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -50,6 +52,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null }
     if (${JSON.stringify(prefs)}) window.__store['p:goei:prefs'] = JSON.stringify(${JSON.stringify(prefs)});
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    if (!${noBody}) window.__store['p:goei:data-looks'] = ${JSON.stringify(looksPack)};
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -216,7 +219,7 @@ async function leaveField(page) {
   await page.click('[data-action="set-col"][data-value="weather:use:1"]');
   await page.waitForFunction(() => document.querySelector('.gw-set')?.textContent?.includes('10칸 사용'));
   // 시작 잔고·잔고 직접 수정은 설정 「기록 → 가계부」 (2026-11-05 사용자)
-  await page.click('[data-action="ed-node"][data-value="set:wallet"]');
+  await page.click('[data-action="ed-node"][data-value="set:items"]');
   await page.waitForSelector('.st-won');
   await page.fill('.st-won', '120만');
   await page.dispatchEvent('.st-won', 'change');
@@ -1054,6 +1057,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-search');
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
+  // 찾기 결과가 다시 그려지기 전의 목록을 고를 수 있어 (가끔 실패), 소라 랜드 줄이 보일 때까지 기다린다
+  await page.waitForFunction(() => [...document.querySelectorAll('.gx-mlist li.gx-mx')].every((li) => li.textContent.includes('소라')));
   await pickCustom(page);
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
@@ -1724,12 +1729,12 @@ if (fixture.globalLore.some(packed)) {
   // 이 채팅의 설정 전부(이미지·상황판·괴이 발생·테마·기능 페이지 변수·고급)를 한 번에 새 채팅 기본값으로, 「기본값 불러오기」가 한 번에 되돌린다
   // (src/ui/settings.ts mainDefaultsButtons · set-bar-yes, defaults.ts ALL_PREFIXES)
   assert.equal(await page.$('.gw [data-action="set-scope"]'), null, '범위 칩 없음');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '기본값으로 저장·기본값 불러오기 단추');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 3, '기본값으로 저장·기본값 불러오기·초기값으로 단추');
   // 취소하면 아무것도 안 바뀐다
   await page.click('.gw [data-action="set-bar"][data-value="save"]');
-  await page.waitForSelector('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
+  await page.waitForSelector('.gw .gw-confirm [data-action="set-bar-yes"][data-value="save"]');
   await page.click('.gw [data-action="set-bar-no"]');
-  await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+  await page.waitForFunction(() => !document.querySelector('.gw .gw-confirm'));
   assert.notEqual(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'] || '{}')).world?.incident_p, 40, '취소하면 기본값 그대로');
   // 저장: 괴이 발생(이 채팅 preset_cap 3·incident_p 40)·테마(paper)·기능 페이지 변수($pp_on 끔·$ph_auto 창을 열 때)가 한 번에 기본값으로.
   // 변수는 플러그인이 보는 채팅(ctx)에 들어가야 하니 화면으로 바꾼다 (window.__chat 을 직접 고치면 ctx 는 모른다)
@@ -1740,9 +1745,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === 'open');
   await edGo(page, 'set:board');
   await page.click('.gw [data-action="set-bar"][data-value="save"]');
-  await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
+  await page.click('.gw .gw-confirm [data-action="set-bar-yes"][data-value="save"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_p === 40);
-  await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+  await page.waitForFunction(() => !document.querySelector('.gw .gw-confirm'));
   {
     const prefs = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs']));
     assert.equal(prefs.world.preset_cap, 3, '괴이 발생 상한이 기본값으로');
@@ -1760,10 +1765,10 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === '0');
   // 기능 페이지(괴담톡) 머리에도 같은 단추, 칸별 단추는 없음
-  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, '기능 페이지도 같은 단추');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, '기능 페이지도 같은 단추');
   assert.equal(await page.locator('.gw [data-action="ph-def-ask"]').count(), 0, '칸별 덮어쓰기 없음');
   await page.click('.gw [data-action="set-bar"][data-value="load"]');
-  await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="load"]');
+  await page.click('.gw .gw-confirm [data-action="set-bar-yes"][data-value="load"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40' && window.__chat.scriptstate.$pp_on === '0' && window.__chat.scriptstate.$ph_auto === 'open');
   await page.waitForFunction(() => document.querySelector('.gw [data-action="ph-cfg"][data-value="auto=open"]')?.getAttribute('aria-pressed') === 'true');
   // 뒤 절을 위해 원래대로 (인물 기록 켬·괴담톡 수동)
@@ -2415,8 +2420,9 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   const m = vp.width < 500 ? 'm' : 'pc';
   if (m === 'pc') await edOpen(page, 'set:board');
   else {
-    // 폰 하단 메뉴에는 설정이 없고 머리의 설정 단추로 연다
-    await page.click('.gx-head [data-action="ed-open"]');
+    // 폰 하단 메뉴에는 설정이 없고 공용 서랍(도구 줄)의 설정 단추로 연다 (2026-11-07 폰 하단 구조)
+    await page.click('.gx-cgrip');
+    await page.click('.gx-cdr.open .gx-cpanel [data-action="ed-open"]');
     await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
     await edGo(page, 'set:board');
   }
@@ -2630,69 +2636,7 @@ if (fixture.globalLore.some(packed)) {
   console.log('PASS 얼굴 사진: 대표 사진에서 자르기, 틀 맞추기 저장');
 }
 
-// 즐겨찾기: PC ‹ ★ › 창에서 넣기·가기·빼기, 뒤로, 모바일 서랍 안내·좌우 밀기·칸
-{
-  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, { width: 1280, height: 860 });
-  await startedWithReply(page);
-  await open(page);
-  const tabNow = () => page.evaluate(() => document.querySelector('.gx').dataset.tab);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
-  await page.waitForSelector('.nw-home');
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
-  assert.equal(await page.locator('.gx-nh[data-action="nav-back"]').isDisabled(), false, '뒤로 갈 곳이 있으면 켜짐');
-  await page.click('.gx-nh.mk-star');
-  await page.waitForSelector('.mk-pop');
-  // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
-  // 지우기는 DOM 에서 바로 누른다: 줄이 빠질 때마다 팝업이 다시 그려져 Playwright 클릭이 그 사이 보고서 본문에 가로채일 때가 있다 (2026-11-05)
-  while (await page.$('.mk-pop [data-action="mk-del"]')) {
-    const n = await page.locator('.mk-row').count();
-    await page.$eval('.mk-pop [data-action="mk-del"]', (b) => b.click());
-    await page.waitForFunction((c) => document.querySelectorAll('.mk-row').length < c || !document.querySelector('.mk-pop'), n);
-  }
-  assert.ok((await page.textContent('.mk-pop')).includes('위키 메인'), '최근 본 화면');
-  await page.click('.mk-pop [data-action="mk-add"]');
-  assert.equal(await page.locator('.mk-pop [data-action="mk-here"]').count(), 0, '맨 상황판은 즐겨찾기에 못 넣음 (2026-11-05 사용자: 서랍이 상황판 안에 있다)');
-  const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs']));
-  assert.deepEqual(saved.marks.map((m) => m.name), ['위키 메인']);
-  if (shots) await page.screenshot({ path: `${shots}/19-marks-pop.png` });
-  await page.click('.mk-pop [data-action="mk-go"][data-value="0"]');
-  assert.equal(await tabNow(), 'wiki');
-  assert.equal(await page.locator('.mk-pop').count(), 0, '가면 창 닫힘');
-  await page.click('.gx-nh[data-action="nav-back"]');
-  assert.equal(await tabNow(), 'board', '‹ 는 바로 전 화면');
-  await page.click('.gx-nh.mk-star');
-  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks.length, 1);
-  await page.click('.mk-head [data-action="mk-pop"]');
-  // 모바일: 서랍에 즐겨찾기 칸, 비었으면 안내, 펼친 서랍을 좌우로 밀면 ★ 창
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
-  await page.click('.gx-bdrawer .ph-grip');
-  assert.equal(await page.locator('.gx-bdrawer .mk-slot:not(.empty)').count(), 1);
-  assert.equal(await page.locator('.gx-bdrawer [data-action="game-open"], .gx-bdrawer [data-value="settings"]').count(), 0, '순찰·설정 버튼은 뺌');
-  await page.click('.gx-bdrawer .mk-slot:not(.empty)');
-  assert.equal(await tabNow(), 'wiki', '칸을 누르면 그 화면');
-  assert.equal(await page.locator('.ph-drawer.open').count(), 0, '서랍에서 가면 서랍은 접힘');
-  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
-  await page.click('.gx-bdrawer .ph-grip');
-  await page.click('.gx-bdrawer .mk-slot.empty >> nth=0');
-  await page.waitForSelector('.mk-pop');
-  // 시험 틀에서는 유령 단추가 ★ 창의 × 위에 겹쳐 Playwright 클릭이 막힌다 (실기기에선 창이 전체 화면이라 가려짐) → 직접 click()
-  await page.evaluate(() => document.querySelector('.mk-pop [data-action="mk-del"][data-value="0"]').click());
-  await page.click('.mk-head [data-action="mk-pop"]');
-  await page.waitForSelector('.gx-bdrawer .mk-hint');
-  if (shots) await page.screenshot({ path: `${shots}/19-marks-mobile-hint.png` });
-  await page.evaluate(() => {
-    const el = document.querySelector('.gx-bdrawer .mk-hint');
-    const r = el.getBoundingClientRect();
-    const t = (x) => new Touch({ identifier: 1, target: el, clientX: x, clientY: r.top + 10 });
-    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [t(300)], changedTouches: [t(300)] }));
-    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [t(150)] }));
-  });
-  await page.waitForSelector('.mk-pop');
-  assert.deepEqual(errors, []);
-  await page.close();
-  console.log('PASS 즐겨찾기: ★ 창 넣기·가기·빼기, ‹ › 앞뒤, 모바일 서랍 칸·안내·좌우 밀기');
-}
+// 즐겨찾기는 2026-11-07 화면에서 뺐다 (26a49048f5)
 
 // 32) 기록 탭 (2026-10-29 사용자 결정, docs/설계안_기록_보고서.md 5장 · 묶음 2): 왼쪽 메뉴 「기록」(가계부 자리) · 하위 탭 넷 같은 너비 ·
 //     사원증 줄 순서(사진·이름+소속 칩·잔고·위치)와 잔고 줄 → 가계부 · 위키 홈에 인물 타일 없음 · 가짜 응답으로 사건 종료(목표였던 괴이 → 내가 출동)
@@ -2718,12 +2662,13 @@ if (fixture.globalLore.some(packed)) {
   // 잔고 줄 → 가계부 화면 (메뉴 없이도)
   await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
-  assert.equal(await tabNow(), 'records');
-  assert.equal(await page.locator('.gx-rec-tabs .ph-sub.on').textContent(), '가계부', '가계부는 기록의 하위 탭 (2026-11-05)');
-  // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음 (이미 기록 탭이라 메뉴를 다시 누르면 상황판으로 가니 하위 탭으로 이동)
+  assert.equal(await tabNow(), 'items');
+  assert.equal(await page.locator('.it-tabs .ph-sub.on').textContent(), '가계부', '가계부는 소지품 메뉴의 하위 탭 (2026-11-07)');
+  // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음
+  await page.click('.gx-nav > .gx-nb.desk[data-value="records"]');
   await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-records .gx-jr-tiles');
-  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '연대기', '가계부', '인물', '세력']);
+  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '연대기', '인물', '세력']);
   const widths = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...widths) - Math.min(...widths) <= 1, `하위 탭 같은 너비 (${widths.join(',')})`);
   assert.ok((await page.textContent('.gx-records')).includes('아직 종료된 상황이 없어요'));
@@ -2889,30 +2834,9 @@ if (fixture.globalLore.some(packed)) {
   await page.fill('[data-input="rec-q"]', '');
   await page.click('.gx-jr-row[data-action="rec-open"]');
   await page.waitForSelector('.gx-rpt');
-  // 즐겨찾기: 보고서 페이지를 넣고 다른 탭에서 돌아온다 (보고서는 팝업이라 머리 단추를 가린다 → 직접 click)
-  await page.$eval('.gx-nh.mk-star', (b) => b.click());
-  await page.waitForSelector('.mk-pop');
-  // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
-  // 보고서 본문(.gx-rpt-sec)이 팝업 단추의 클릭 판정을 가로채서 DOM 에서 바로 누른다 (2026-11-05)
-  while (await page.$('.mk-pop [data-action="mk-del"]')) {
-    const n = await page.locator('.mk-row').count();
-    await page.$eval('.mk-pop [data-action="mk-del"]', (b) => b.click());
-    await page.waitForFunction((c) => document.querySelectorAll('.mk-row').length < c || !document.querySelector('.mk-pop'), n);
-  }
-  await page.$eval('.mk-pop [data-action="mk-here"]', (b) => b.click());
-  const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks;
-  const mi = saved.findIndex((m) => m.s.tab === 'records' && m.s.r?.view === 'report' && m.s.r?.id === rpt.id);
-  assert.ok(mi >= 0 && saved[mi].name === `보고서 ${rpt.no}`, JSON.stringify(saved));
-  // 보고서 팝업(.gx-rptpop, fixed 최상위)이 떠 있는 동안은 팝업 밖 단추를 DOM 에서 누른다
-  await page.$eval('.mk-head [data-action="mk-pop"]', (b) => b.click());
+  // (즐겨찾기는 2026-11-07 화면에서 뺐다)
+  // 상황판으로 (보고서 팝업이 떠 있어 DOM 에서 누른다)
   await page.$eval('.gx-nav .gx-nb:not(.mob)[data-value="board"]', (b) => b.click());
-  await page.waitForSelector('.gx-board');
-  await page.click('.gx-nh.mk-star');
-  await page.click(`.mk-pop [data-action="mk-go"][data-value="${mi}"]`);
-  await page.waitForSelector('.gx-rptpop .gx-rpt');
-  assert.ok((await page.textContent('.gx-rptpop .gx-rpt')).includes(rpt.head.name), '즐겨찾기로 보고서 팝업 복원 (번호는 더 안 보인다, 2026-11-05)');
-  // PC ‹ (뒤로) = 상황판, 보고서 페이지에서 뒤로 단추 두 번 = 목록 → 이전 화면 (보고서 팝업이 떠 있어 DOM 에서 누른다)
-  await page.$eval('.gx-nh[data-action="nav-back"]', (b) => b.click());
   await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'board');
   assert.equal(await tabNow(), 'board');
   // 요원 격자 → 사원증 창 「기록」 → 기록 › 인물 상세 (인물 기록이 있을 때만 단추가 있다 → 기록을 하나 심는다)
@@ -2938,7 +2862,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gw .gw-setbody');
   const st = await page.textContent('.gw .gw-setbody');
   for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
-  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, '머리의 기본값으로 저장·불러오기');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, '머리의 기본값으로 저장·불러오기');
   // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
   const saves0 = await page.evaluate(() => window.__calls.setChat.length);
   await page.click('.gw [data-action="jr-set"][data-value="chat_card=off"]');
@@ -2965,21 +2889,17 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$jr_report_cap === '110');
   // 기본값으로 저장 → $jr_* 가 기기 기본값(prefs.vars)에 들어간다
   await page.click('.gw .gw-top [data-action="set-bar"][data-value="save"]');
-  await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
+  await page.click('.gw .gw-confirm [data-action="set-bar-yes"][data-value="save"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').vars?.$jr_chat_card === 'off');
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).vars.$jr_report_cap, '110', '보고서 상한도 기본값에');
   await edClose(page);
-  // PC 에서는 머리의 기록 단추가 안 보인다 (옆 메뉴에 있으니)
-  assert.equal(await page.locator('.gx-head-act .gx-recbtn:visible').count(), 0, 'PC 머리엔 기록 단추 없음');
-  // 폰(390×844): 머리에 「기록」 입구(필드 단추처럼) · 기록 탭 일지·보고서·보고서 페이지·상황판 알림 줄에 가로 넘침 없음
+  // 폰(390×844): 하단 바의 「기록」 · 기록 탭 일지·보고서·보고서 페이지·상황판 알림 줄에 가로 넘침 없음 (2026-11-07 폰 하단 구조: 머리 기록 단추 없앰)
   await page.setViewportSize({ width: 390, height: 844 });
   await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
   await page.waitForSelector('.gx-board');
-  assert.equal(await page.locator('.gx-head-act .gx-recbtn:visible').count(), 1, '폰 머리에 기록 단추');
-  await page.click('.gx-head-act .gx-recbtn');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="records"]:visible');
   await page.waitForSelector('.gx-records');
   assert.equal(await tabNow(), 'records');
-  assert.equal(await page.locator('.gx-head-act .gx-recbtn.on').count(), 1, '기록 탭이면 켜진 모양');
   await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
   await page.waitForSelector('.gx-board');
   const noOverflow = async (where) => {
@@ -2999,9 +2919,9 @@ if (fixture.globalLore.some(packed)) {
   await noOverflow('폰 일지(보고서에서 뒤로)');
   // 폰도 하위 탭(11-06 연대기 더해 다섯)은 내용 위 (2026-11-05 사용자). 서랍에는 일지 칩 셋 + 찾기가 한 줄
   const tabW = await page.$$eval('.gx-rec-tabs [data-action="rec-sub"]', (l) => l.map((b) => b.getBoundingClientRect().width));
-  assert.ok(tabW.length === 5 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 다섯 칸 보임·같은 너비 (${tabW.join(',')})`);
+  assert.ok(tabW.length === 4 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 네 칸 보임·같은 너비 (${tabW.join(',')})`);
   assert.equal(await page.locator('.gx-rdrawer .ph-tool[data-action="rec-sub"]').count(), 0, '서랍에 하위 탭 단추 없음');
-  await page.click('.gx-rdrawer .ph-grip');
+  // 서랍(도구 줄)은 늘 펼쳐져 있다 (2026-11-07 폰 하단 구조)
   const tops = await page.$$eval('.gx-rdrawer .gx-wt-tools > *', (l) => l.map((b) => Math.round(b.getBoundingClientRect().top)));
   // 찾기 칸이 칩보다 1px 커서 가운데 정렬 때 위가 1px 올라간다 → 1px 까지는 한 줄로 본다
   assert.ok(tops.length === 4 && Math.max(...tops) - Math.min(...tops) <= 1, `서랍 칩 셋+찾기 한 줄 (${tops.join(',')})`);
@@ -3015,29 +2935,8 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-wallettab');
   assert.deepEqual(errors, []);
   await page.close();
-  console.log('PASS 기록 탭: 메뉴·하위 탭·사원증·잔고 줄·종료 → 일지·보고서·알림·아이콘·보고서 페이지·고정·필터·찾기·즐겨찾기·사원증 창 기록·설정 묶음·폰 넘침 0');
+  console.log('PASS 기록 탭: 메뉴·하위 탭·사원증·잔고 줄·종료 → 일지·보고서·알림·아이콘·보고서 페이지·고정·필터·찾기·사원증 창 기록·설정 묶음·폰 넘침 0');
 }
 
-// 32-1) 옛 즐겨찾기 호환: 위키 안 인물 화면 `{tab:'wiki', w:{view:'person'}}` 은 기록 탭 › 인물 › 그 사람으로 열린다 (저장소에 미리 심고 부팅)
-{
-  const legacy = { marks: [{ s: { tab: 'wiki', w: { view: 'person', title: '쟈알디', list: false } }, name: '쟈알디 기록' }, { s: { tab: 'wiki', w: { view: 'faction', title: 'C00', list: false } }, name: '세력 C00' }] };
-  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, { width: 1280, height: 900 }, { prefs: legacy });
-  await startedWithReply(page);
-  await open(page);
-  await page.waitForSelector('.gx-board');
-  await page.click('.gx-nh.mk-star');
-  await page.waitForSelector('.mk-pop');
-  await page.click('.mk-pop [data-action="mk-go"][data-value="0"]');
-  await page.waitForSelector('.gx-records .pp-pane');
-  assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.tab), 'records');
-  assert.ok((await page.textContent('.gx-records .pp-pane .ph-room-title')).includes('쟈알디'), '옛 인물 즐겨찾기 → 기록 › 인물 › 쟈알디');
-  await page.click('.gx-nh.mk-star');
-  await page.click('.mk-pop [data-action="mk-go"][data-value="1"]');
-  await page.waitForFunction(() => document.querySelector('.gx-records .pp-pane .pp-cells, .gx-records .pp-pane'));
-  assert.ok((await page.textContent('.gx-records .pp-pane')).includes('세력'), '옛 세력 즐겨찾기 → 기록 › 세력');
-  assert.deepEqual(errors, []);
-  await page.close();
-  console.log('PASS 기록 탭: 옛 위키 인물·세력 즐겨찾기가 기록 탭으로');
-}
 
 await browser.close();

@@ -62,6 +62,7 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
+import { invOn, itemStartOn } from '../core/items';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
@@ -1101,7 +1102,7 @@ async function start(): Promise<void> {
       // 목록 로어북이 없으면 상황판 없이 시작한다 (대화는 그대로 가능)
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
     }
-    const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
+    const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world, itemStartOn(getPrefs().vars));
     // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다
     const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
     if (plan.kind === 'direct' && !situation) throw new StartError('시작할 상황을 적어 주세요.');
@@ -1497,7 +1498,8 @@ function startedBody(ctx: ChatContext): string {
     case 'records':
       return recordsTab(ctx);
     case 'items':
-      return itemsTab(ctx);
+      // 가계부·소지품이 둘 다 꺼졌으면 메뉴가 없으니 상황판으로
+      return invMenuOn(ctx) ? itemsTab(ctx) : board(ctx);
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
@@ -1630,7 +1632,7 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
-    ${item('items', '소지품', ICONS.bag, 'desk')}
+    ${!ctx || invMenuOn(ctx) ? item('items', '소지품', ICONS.bag, 'desk') : ''}
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
@@ -1639,6 +1641,8 @@ function tabs(): string {
   </nav>`;
 }
 
+/** 소지품 메뉴(가계부 | 소지품)는 가계부나 소지품 중 하나라도 켜져 있을 때만 (2026-11-07 사용자: 켜고 끄기) */
+const invMenuOn = (ctx: ChatContext) => invOn(ctx.chat.scriptstate) || colConfig(ctx.chat.scriptstate).wallet !== 'off';
 type NavItem = (id: Tab, label: string, icon: string, cls?: string, badge?: string) => string;
 /** 폰 하단 바 (임무·기록·상황판·괴담톡·소지품, 2026-11-07 사용자). 위키·괴담넷·설정은 바 위 손잡이로 여는 공용 서랍.
  *  설정 창(editor)도 폰에서 같은 바를 그린다 (서랍 없이) */
@@ -1648,7 +1652,7 @@ function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null,
     item('records', '기록', ICONS.records, 'mob'),
     item('board', '상황판', ICONS.board, 'home'),
     item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-    item('items', '소지품', ICONS.bag, 'mob'),
+    ...(!ctx || invMenuOn(ctx) ? [item('items', '소지품', ICONS.bag, 'mob')] : []),
   ]);
   return drawer ? commonDrawer(ctx) + bar : bar;
 }

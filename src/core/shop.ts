@@ -10,7 +10,8 @@
 //   플러그인은 숫자만 읽고 값은 거르지 않는다(11-07 사용자). 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
 // - 잔고·소지품은 모델에 넘기지 않는다. PixelLab 그림은 표시용(이름 매칭)이라 모델과 무관하다.
 import type { Chat } from './types';
-import { cleanIcon, itemEquip, itemUses, parseTraits, traitsText, type ItemEquip } from './items';
+import { cleanIcon, ITEM_ON_VAR, itemEquip, itemUses, parseTraits, traitsText, type ItemEquip } from './items';
+import { colConfig } from './world/statuscols';
 import { messageKey } from './people/store';
 import { parseWon } from './wallet';
 import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
@@ -32,6 +33,8 @@ export const SHOP_KICK_VAR = '$sh_kick';
 /** 넘길 최근 본문 턴 수·참고 로어북 수 (2026-11-07 사용자: 설정에 보여야 한다) */
 export const SHOP_TURNS_VAR = '$sh_turns';
 export const SHOP_REFS_VAR = '$sh_refs';
+export const SHOP_WHERE_VAR = '$sh_where';
+export type ShopWhere = 'any' | 'shop';
 export const SHOP_TURNS_DEFAULT = 3;
 export const SHOP_REFS_DEFAULT = 6;
 
@@ -68,6 +71,8 @@ export interface ShopSettings {
   model: 'main' | 'aux';
   /** 주인이 거래를 끊을 수 있음 (끄면 응답의 <closed/> 를 무시) */
   kick: boolean;
+  /** 상점이 열리는 자리 (any 판매자 없는 곳도 · shop 가게 장면만) */
+  where: ShopWhere;
   /** 넘길 최근 본문 턴 수 (1~8) */
   turns: number;
   /** 넘길 참고 로어북 수 (0~12) */
@@ -77,11 +82,19 @@ export interface ShopSettings {
 type Vars = Record<string, unknown> | undefined;
 const clean = (s: unknown, max: number) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 
+/** 상점을 켤 수 없는 까닭: 'items'(소지품 꺼짐) · 'wallet'(가계부 꺼짐) · 'both' · '' (켤 수 있음) */
+export function shopBlocked(vars: Vars): '' | 'items' | 'wallet' | 'both' {
+  const items = vars?.[ITEM_ON_VAR] === '0';
+  const wallet = colConfig(vars).wallet === 'off';
+  return items && wallet ? 'both' : items ? 'items' : wallet ? 'wallet' : '';
+}
+
 export function shopSettings(vars: Vars): ShopSettings {
   const c = String(vars?.[SHOP_COUNT_VAR] ?? '');
   const t = String(vars?.[SHOP_THOUGHTS_VAR] ?? '');
   return {
-    on: vars?.[SHOP_ON_VAR] !== '0',
+    // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 소지품($it_on)이나 가계부(상태창 잔고 칸)가 꺼지면 꺼진다
+    on: shopBlocked(vars) === '' && vars?.[SHOP_ON_VAR] !== '0',
     size: sizeOf(vars, c === '0' || c === '2' ? c : '1'),
     feature: vars?.[SHOP_FEATURE_VAR] !== '0',
     context: vars?.[SHOP_CTX_VAR] !== '0',
@@ -91,6 +104,7 @@ export function shopSettings(vars: Vars): ShopSettings {
     avoidPrev: vars?.[SHOP_PREV_VAR] !== '0',
     model: vars?.[SHOP_MODEL_VAR] === 'main' ? 'main' : 'aux',
     kick: vars?.[SHOP_KICK_VAR] !== '0',
+    where: vars?.[SHOP_WHERE_VAR] === 'shop' ? 'shop' : 'any',
     turns: numIn(vars?.[SHOP_TURNS_VAR], SHOP_TURNS_DEFAULT, 1, 8),
     refs: numIn(vars?.[SHOP_REFS_VAR], SHOP_REFS_DEFAULT, 0, 12),
   };
@@ -307,7 +321,9 @@ export function settleShop(chat: Chat, responseIndex: number): { vars: Record<st
   const m = list[responseIndex];
   if (!m || m.role !== 'char') return null;
   const text = typeof m.data === 'string' ? m.data : '';
-  const tag = findShopTag(text);
+  // 상점이 꺼져 있으면(상점·소지품·가계부 중 하나라도 끔) 이 응답의 표식까지 지우고 방문 상태도 비운다 — 카드가 남아 눌리지 않게
+  const on = shopOn(chat.scriptstate);
+  const tag = on ? findShopTag(text) : null;
   const key = messageKey(m, responseIndex);
   const cur = readShop(chat.scriptstate);
   let next: ShopState | null = null;
@@ -316,7 +332,7 @@ export function settleShop(chat: Chat, responseIndex: number): { vars: Record<st
   }
   let message: Chat['message'] | undefined;
   for (let i = 0; i < list.length; i++) {
-    if (i === responseIndex || list[i].role !== 'char' || !hasShopTag(String(list[i].data ?? ''))) continue;
+    if ((on && i === responseIndex) || list[i].role !== 'char' || !hasShopTag(String(list[i].data ?? ''))) continue;
     message ??= [...list];
     message[i] = { ...list[i], data: stripShopTags(String(list[i].data)) };
   }
@@ -666,6 +682,11 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 }
 
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄). 지침 「상점」의 MAIN_TAG 절 */
-export const shopGuide = (): string => fillGuide(G().MAIN_TAG, {});
+/** 상점이 열리는 자리 (설정): any(기본, 온라인몰·홈쇼핑·자판기·이면 쇼핑몰처럼 판매자가 없는 곳도) · shop(판매자가 있는 가게 장면만) */
+const WHERE: Record<ShopWhere, string> = {
+  any: 'This covers any way of buying: a store, stall or vendor in front of them, and also a shop with nobody at the counter, an online or in-app mall, TV or phone home shopping, a catalog, a vending machine, or an otherworldly mall — use that shop’s own name (the mall, channel or machine) as 가게 이름.',
+  shop: 'Only at a physical place of sale with a seller present (a store, stall, vendor, dealer); not for online malls, home shopping, catalogs or machines.',
+};
+export const shopGuide = (vars?: Vars): string => fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where] });
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;

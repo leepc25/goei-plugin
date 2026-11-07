@@ -2,7 +2,7 @@
 // 다음 전송 때 [Inventory] 글의 This turn 에 같이 넘어가고(core/items.ts withInventory), 응답이 붙으면 settleItemUse 가 상자를 정리한다.
 // 본 화면 DOM은 SafeElement 뿐이라 유령 버튼(overlay.ts)과 같은 방식: x-goei-usebox 속성 선택자 CSS, 클릭은 좌표로 맞춰 본다.
 import { aliveAnchors } from '../core/wallet';
-import { dropUse, ITEM_USE_AT_VAR, itemUseVars, liveItems, readItemUse, readItems } from '../core/items';
+import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, liveItems, readItemUse, readItems } from '../core/items';
 import type { Chat } from '../core/types';
 import { currentTheme, onThemeChange } from '../ui/theme';
 import { elements, hit } from './chatclicks';
@@ -31,7 +31,8 @@ let busy = false;
 
 /** 상자에 보일 것: 아직 보내지 않은 것만 (보낸 턴은 다시 굴리기용으로 변수에 남지만 칩은 숨긴다). 이름 ×n */
 export function useBoxNames(chat: Chat | null): { id: string; label: string }[] {
-  if (!chat || chat.scriptstate?.[ITEM_USE_AT_VAR]) return [];
+  // 소지품이 꺼져 있으면 상자도 없다 (2026-11-07 사용자: 켜고 끄기)
+  if (!chat || chat.scriptstate?.[ITEM_USE_AT_VAR] || !invOn(chat.scriptstate)) return [];
   const live = liveItems(readItems(chat.scriptstate), aliveAnchors(chat));
   return readItemUse(chat.scriptstate).flatMap((u) => {
     const e = live.find((x) => x.id === u.id);

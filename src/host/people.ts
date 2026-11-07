@@ -24,9 +24,15 @@ import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { addWalletEntry, aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { applyItemChanges, itemAutoOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
+import { addWalletEntry, aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
 import { getPrefs } from '../core/settings';
+import { guideSections } from '../core/guides';
+
+/** Director 기본 지침: 지침 탭 「Director」의 FACTS·SCENE 절 */
+/** Router 기본 지침: 지침 탭 「Router」의 ROLE·RULES 절 */
+const routerBase = () => { const g = guideSections('Router'); return [g.ROLE, g.RULES].filter((x) => x?.trim()).join('\n'); };
+const directorBase = () => { const g = guideSections('Director'); return { facts: g.FACTS, scene: g.SCENE }; };
 import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
@@ -273,8 +279,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
+      if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
       input.system = system;
       if (input.overBudget.length) {
         // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 응답 글이 상한을 넘으면 접어서 보내지 않고 거부한다. 읽음 표시도 안 한다
@@ -330,6 +337,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           only: o.scope?.only,
           keepRead: !!o.scope?.only,
           wallet: walletOn,
+          walletLoose: walletOn && walletLoose(cur.scriptstate),
           items: itemsOn,
         });
         diag.report = report;
@@ -348,7 +356,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         }
         // 소지품 변화를 목록($st_items)에 (core/items.ts applyItemChanges). 소모성 횟수는 「사용」 기록으로 이미 셈 — 여기선 본문이 말한 변화만
         if (report.items.length) {
-          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items);
+          const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate) });
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
         }
         return withPeople(next, s);
@@ -509,7 +517,7 @@ export const routerHintsNow = (): RouterHint[] => routerHints;
 export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = [], identityOf?: (name: string) => string | null | undefined): Promise<string[] | null> {
   if (settings.router !== 'model' || !Object.keys(store.people).length) return null;
   const names = allNames();
-  const built = buildRouter(chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules, identityOf });
+  const built = buildRouter(chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
   if (routerCache?.key === built.key) return routerCache.selected;
   const t0 = Date.now();
   const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
@@ -545,7 +553,7 @@ let directorCache: { key: string; notes: DirectorNote[] } | null = null;
 /** Director 메모 글(사실형·연출형). 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
 export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown, char?: { chaId?: string }): Promise<string> {
   if (settings.director !== 'scene' && settings.director !== 'facts') return '';
-  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-Math.max(1, settings.recentMsgs)).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)));
+  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-Math.max(1, settings.recentMsgs)).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)), directorBase());
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
   // 1차: 메모 또는 검색 요청. 검색 요청이면 코드가 찾아서 2차 (리수폿 B). 각 호출에 시간 제한
@@ -604,14 +612,14 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
   const input = messageText(String(lastUser?.data ?? ''));
   const names = allNames();
   if (settings.router === 'model' && Object.keys(store.people).length) {
-    const b = buildRouter(ctx.chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules, identityOf: sheetOf(ctx) });
+    const b = buildRouter(ctx.chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf: sheetOf(ctx) });
     out.router = [{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }];
   }
   if ((settings.director === 'scene' || settings.director === 'facts') && Object.keys(store.people).length) {
     const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
     const { people } = peopleBlockFor(ctx.chat, { settings, store, sheetOf: sheetOf(ctx), temperOf, extraNames: extraNames(), input, user: me?.name || userInfo().name || '주인공', factionNames: factionNamesOf(ctx.char.globalLore) });
     const memory = await hypaMemory(ctx.chat, ctx.char, [input, ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)).catch(() => [] as string[]);
-    const b = buildDirector(ctx.chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), memory);
+    const b = buildDirector(ctx.chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), memory, directorBase());
     if (b) out.director = [{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }];
   }
   if (settings.when === 'turn') {
@@ -630,8 +638,9 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const sections = enabledSections(settings);
       if (inp.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
+      if (walletOn && walletLoose(ctx.chat.scriptstate)) sections.add('wallet_loose');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
       out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
     }
   }

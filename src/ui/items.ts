@@ -11,7 +11,7 @@ import { refreshUseBox } from '../host/usebox';
 import { itemIconStatus, itemIconUrl } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canUse, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemLeft, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems,
+  addItem, addUse, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemLeft, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems,
   readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, unequipItem, updateItem,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
@@ -105,7 +105,9 @@ const leftOf = (ctx: ChatContext, it: Item) => itemLeft(itemsOf(ctx), it, aliveA
 // ── 화면 ──
 
 export function itemsTab(ctx: ChatContext): string {
-  const SUBS: [ItemsSub, string][] = [['wallet', '가계부'], ['items', '소지품']];
+  // 꺼진 쪽 하위 탭은 빼고(2026-11-07 사용자: 가계부·소지품 따로 켜고 끔), 지금 탭이 꺼졌으면 켜진 쪽으로
+  const SUBS = ([['wallet', '가계부'], ['items', '소지품']] as [ItemsSub, string][]).filter(([v]) => (v === 'wallet' ? walletOn(ctx) : invOn(ctx.chat.scriptstate)));
+  if (SUBS.length && !SUBS.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS[0][0];
   const tabs = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? ' on' : ''}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join('')}</div>`;
   const note = toast('items', itemsUi.info, (t) => {
     if (itemsUi.info === t) itemsUi.info = '';

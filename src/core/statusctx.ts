@@ -11,6 +11,8 @@ import type { PromptMessage } from './request';
 export interface StatusShape {
   cols: ColId[];
   wallet?: number | null;
+  /** 설정 「최근 거래 넘기기」: 블록 끝에 붙일 최근 거래 줄 (core/wallet.ts recentWalletLines) */
+  recent?: string[];
 }
 
 export const STATUS_HEAD = '[Previous status]';
@@ -87,6 +89,7 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
   const line = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
   const out = stripStatusLines(messages);
   const at = out.map((m) => m?.role).lastIndexOf('user');
-  const block = { role: 'system', content: statusBlock(line, shape?.cols) } as M;
+  const recent = (shape?.recent ?? []).filter(Boolean);
+  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${recent.length ? `\nRecent cash transactions (oldest first): ${recent.join('; ')}` : ''}` } as M;
   return at < 0 ? [...out, block] : [...out.slice(0, at), block, ...out.slice(at)];
 }

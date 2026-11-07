@@ -1,6 +1,7 @@
 // QC 03 · 시작 화면 전수: 세력 전부 × 언어(ko/en) × 시나리오 전부(직접 입력·커스텀 임무 포함)를 세 뷰포트에서 실제로 출발시켜
 // 저장된 chat(fmIndex·scriptstate·시드·명단)을 확인한다. 캐릭터로 플레이, 재선택(staged), 시작 전/뒤 설정 창 범위, 랜딩 메시지도.
 // 사용법: node tests/qc-settings-start-browser.mjs <fixture.json> [pc|phone|land|all]
+import { distPack } from './data-init.mjs';
 import { sceneOf } from './qc-host.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -27,7 +28,8 @@ async function waitStart(page, label) {
 }
 
 for (const vp of vps) {
-  const { page, errors } = await boot(browser, fx, { message: [], scriptstate: {} }, vp);
+  // 아바타 팩: 내 페르소나로 시작하려면 아바타가 있어야 출발 (2026-11-08 사용자). 기본은 마지막 고른 것 → 페르소나 여A
+  const { page, errors } = await boot(browser, fx, { message: [], scriptstate: {} }, vp, { store: { 'p:goei:data-looks': distPack('goei-data-looks') } });
   await openWin(page);
   await page.waitForSelector('.gx-fac');
   const facs = await page.$$eval('.gx-fac', (els) => els.map((e) => e.dataset.value));
@@ -132,12 +134,12 @@ for (const vp of vps) {
     assert.equal(n, f.scenarios.length, `${f.code}: 장면 ${f.scenarios.length}개`);
     assert.ok((await page.textContent('.gx-h2-sub')).includes(`${n}개`));
     // 캐릭터로 플레이: 주인공 카드가 있으면 준비된 첫 장면은 숨고 직접 입력·커스텀만
-    const who = await page.$$eval('.gx-whoc', (els) => els.map((e) => e.dataset.value));
+    const who = await page.$$eval('.gx-whoc:not(.gx-lookchip)', (els) => els.map((e) => e.dataset.value));
     assert.equal(who[0], '', `${f.code}: 첫 카드는 내 페르소나`);
     const agents = directory.요원?.filter?.((a) => (a.roster_for ?? []).includes(f.code)) ?? [];
     if (who.length > 1) {
-      await page.evaluate((id) => document.querySelector(`.gx-whoc[data-value="${id}"]`).click(), who[1]);
-      await page.waitForFunction(() => document.querySelector('.gx-whoc.on')?.dataset.value !== '');
+      await page.evaluate((id) => document.querySelector(`.gx-whoc:not(.gx-lookchip)[data-value="${id}"]`).click(), who[1]);
+      await page.waitForFunction(() => document.querySelector('.gx-whoc.on:not(.gx-lookchip)')?.dataset.value !== '');
       const left = await page.$$eval('.gx-sc', (els) => els.map((e) => e.dataset.value));
       // 그 인물의 첫 장면(src/data/world/scenes.json 「인물」, fm 0)이 있으면 맨 앞에 「○○의 첫 장면」 하나가 더 보인다 (2026-11-06 55명 탑재)
       const own = agentScenes[who[1]] ? ['0'] : [];
@@ -200,7 +202,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'set:board');
   assert.equal(await page.$('.gw-set [data-action="set-scope"]'), null, '범위 칩 없음');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '시작 뒤 기본값으로 저장·불러오기');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 3, '시작 뒤 기본값으로 저장·불러오기·초기값으로');
   await closeEditor(page);
   await closeWin(page);
 

@@ -423,6 +423,9 @@ Qualitative mode: no value, score or cue exists. `factions_now` gives each organ
 The chat keeps a ledger of the user's character's cash; `wallet_now` gives the current balance in won. The program owns the balance; you report only transactions.
 - Return a `transactions` item ONLY when the confirmed span states an explicit amount of money that the user's character paid, received, lost, found, or was charged (digits such as `50,000원`, `₩3,000`, or Korean numerals such as `3만 원`). `amount` is a signed integer in won: negative when money leaves the user, positive when it comes in. `memo` (Korean ≤30) names what it was for.
 - Cite `m` and a verbatim `quote` that contains the amount. Never infer, estimate, or round an amount that is not written; never record a price that is only mentioned or offered without the transaction happening; never record another person's money. If the same purchase is stated twice, report it once.
+<<SECTION:wallet_loose>>
+- Exception for this chat: also return a transaction when money clearly changed hands but no amount is written (a meal, a taxi ride, a coffee, a fare). Estimate a typical present-day Seoul price as the `amount`, add 「(어림)」 to the end of `memo`, and quote the sentence where it happened. Still never record a price that is only mentioned, or another person's money.
+<<END:wallet_loose>>
 <<END:wallet>>
 <<SECTION:items>>
 ## 15d. Items — what the user's character carries

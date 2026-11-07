@@ -10,12 +10,7 @@ import { backfillPeople, chatId, clearDiag, consolidatePerson, loadDiag, rereadP
 import { anchorOf, changeId, entryId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, putEntry, splitUnread, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
 import { factionNow, knownFactionCodes, stageMid as factionStageMid, userFactionOf } from '../core/people/faction';
-import { FEATURES, NUMERIC_FEATURES, PP, PP_DEFAULTS, PS, peopleSettings, ppValue, type Feature, type NumericFeature, type Stage } from '../core/people/settings';
-import { sectionBody } from '../core/people/updater';
-import { UPDATER_DETAILED, UPDATER_COMPACT } from '../core/people/prompt';
-import { UPDATER_SECTIONS } from '../core/people/prompt/detailed';
-import { DIRECTOR_BASE_TEXT } from '../core/people/director';
-import { ROUTER_SYSTEM } from '../core/people/router';
+import { FEATURES, NUMERIC_FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature, type NumericFeature, type Stage } from '../core/people/settings';
 import { decideSpeechPending, speechState } from '../core/people/speech';
 import { SEXUAL_FIELDS, SEXUAL_LABEL, SEXUAL_FIELD_OF, ensureSexual, explicitOn, isSexualAxis, setSexualText, sexualFieldOn, sexualGlobal } from '../core/people/sexual';
 import { undoLastRun } from '../core/people/store';
@@ -48,7 +43,6 @@ export const peopleUi = {
   /** 호감 직접 수정 칸 */
   affEdit: false,
   /** 지침 편집: 고른 절 (갱신기 절 이름 또는 'director') */
-  psSection: 'affinity',
   affStage: '',
   affNum: '',
   affReason: '',
@@ -341,29 +335,6 @@ function updateBar(ctx: ChatContext, canChat = true): string {
 function idBox(stage: Stage, value: string): string {
   return `<div class="ps-row pp-mid"><div class="ps-label"><b>전용 모델 ID</b><small>Risu 모델 ID를 적으면 이 호출만 그 모델로 불러요. 비우면 위 모델 선택대로</small></div><div class="ps-ctl pp-mid-ctl"><input class="gx-search" name="pp-mid-${stage}" data-input="pp-mid-${stage}" maxlength="120" placeholder="예: openai::gpt-x" value="${esc(value)}" aria-label="전용 모델 ID"><button class="gx-mini ps-save" data-action="pp-mid-save-${stage}" data-take="pp-mid-${stage}">저장</button></div></div>`;
 }
-/** 지침 편집 절 이름 (화면용 한국어) */
-const SECTION_LABEL: Record<string, string> = {
-  tidy: '기록 정리', taste: '취향 띠(첫인상)', openness: '음란도', rhythm: '서사 리듬', faction_rep: '세력 평판', axes: '성격 6축',
-  affinity: '호감과 취향', affinity_num: '호감 · 수치', affinity_qual: '호감 · 정성 모드', register: '호칭·말투', perception: '인식', perception_ext: '인식 확장',
-  suspicion: '의심', suspicion_num: '의심 · 수치', suspicion_qual: '의심 · 정성 모드', openness_num: '음란도 · 수치', openness_qual: '음란도 · 정성 모드',
-  docs_event: '사건 문서', docs_location: '장소 문서', docs_faction: '세력 문서', docs_item: '물건 문서', director: 'Director 기본 지침 (연출형)', router: 'Router 기본 지침',
-};
-/** 지침 편집 (리수폿 J-1): 절 하나를 골라 본문을 덮어쓴다. 지침 판(자세히·간결)마다 따로. 출력 계약 줄은 못 바꾼다 */
-function promptEditor(state: Record<string, unknown> | undefined, prompt: 'detailed' | 'compact'): string {
-  const text = prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
-  const names = [...UPDATER_SECTIONS.filter((n) => n !== 'user_rules' && n !== 'sexual' && sectionBody(text, n) !== null), 'director', 'router'];
-  const cur = names.includes(peopleUi.psSection) ? peopleUi.psSection : names[0];
-  const keyOf = (n: string) => (n === 'director' || n === 'router' ? PS(n, 'base') : PS(prompt, n));
-  const key = keyOf(cur);
-  const saved = typeof state?.[key] === 'string' ? String(state[key]) : '';
-  const original = cur === 'director' ? DIRECTOR_BASE_TEXT : cur === 'router' ? ROUTER_SYSTEM.join('\n') : sectionBody(text, cur) ?? '';
-  const options = names.map((n) => `<option value="${n}" ${n === cur ? 'selected' : ''}>${SECTION_LABEL[n] ?? n}${typeof state?.[keyOf(n)] === 'string' && String(state?.[keyOf(n)]).trim() ? ' ●' : ''}</option>`).join('');
-  return `<div class="pp-rule pp-ps"><label class="pp-ps-pick"><b>고칠 부분</b><select class="gx-select" data-change="pp-ps-pick">${options}</select></label>
-    <textarea class="gx-search nw-reqbox" name="pp-ps-text" data-input="pp-ps-text" rows="10" maxlength="12000">${esc(saved || original)}</textarea>
-    <small>갱신 지침(영어 원문)에서 고른 부분의 본문이에요. ${saved ? '지금은 <b>고쳐 쓴 글</b>을 쓰고 있어요.' : '지금은 원문이에요.'} 지침 판(${prompt === 'compact' ? '간결' : '자세히'})마다 따로 저장돼요. 제목 줄과 출력 형식(JSON 계약) 줄은 바꿀 수 없어요. ●는 고쳐 쓴 부분</small>
-    <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-ps-save" data-take="pp-ps-text">저장</button><button class="gx-mini" data-action="pp-ps-reset" ${saved ? '' : 'disabled'}>원본으로</button></div></div>`;
-}
-
 function ruleBox(name: string, label: string, value: string, help: string, max: number, placeholder: string, saveAction: string): string {
   return `<div class="pp-rule"><b>${label}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" rows="4" maxlength="${max}" placeholder="${esc(placeholder)}">${esc(value)}</textarea><small>${help}</small><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="${saveAction}" data-take="${name}">저장</button></div></div>`;
 }
@@ -433,19 +404,18 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
     row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
     idBox('update', v('model_id_update')),
-    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
+    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3. 지침 글은 설정 「지침 → 인물 기록 지침」에서 고쳐요.'),
     // 11-07 사용자: 기록 항목(정량·정성 포함)은 「기록할 것」의 하위 항목 — 눈에 띄는 띠 제목 칸 안에, 기본 펼침. 새 인물도 같은 모양의 칸
     fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</p>${features}`, true),
     fold('pp-new', '새 인물', newPeople, true),
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
-    fold('pp-ps', '지침 고쳐 쓰기', promptEditor(state, s.prompt)),
   ].join('');
   const router = [
     row('Router', seg('router', s.router, [['code', 'OFF (코드)'], ['model', 'ON (모델)']]), 'OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
     ...(s.router === 'model' ? [
       stageModel('router', 'Router 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델'),
       row('시간 제한', seg('router_timeout', String(s.routerTimeout), [['30', '30초'], ['60', '60초'], ['120', '120초']]), '넘기면 이번 턴은 코드로 골라요.'),
-      `<div class="pp-rules one">${ruleBox('pp-router-rules', 'Router 에 덧붙일 지침', v('router_rules'), '장면 인물을 고를 때 규칙을 더해요 (예: 어떤 인물은 늘 빼기). 기본 지침 전체를 고치려면 갱신 블록의 「고칠 부분 → Router 기본 지침」', 2000, '예: 관리국 요원만 고르고 민간인은 빼라', 'pp-rrules-save')}</div>`,
+      `<div class="pp-rules one">${ruleBox('pp-router-rules', 'Router 에 덧붙일 지침', v('router_rules'), '장면 인물을 고를 때 규칙을 더해요 (예: 어떤 인물은 늘 빼기). 기본 지침 전체는 설정 「지침 → 인물 기록 지침 → Router」에서 고쳐요', 2000, '예: 관리국 요원만 고르고 민간인은 빼라', 'pp-rrules-save')}</div>`,
     ] : []),
   ].join('');
   const director = [
@@ -977,7 +947,6 @@ export function peopleInput(name: string, value: string): boolean {
       return true;
     case 'pp-rules':
     case 'pp-director-rules':
-    case 'pp-ps-text':
       return true;
     default:
       if (name.startsWith('pp-mid-')) return true;
@@ -1032,19 +1001,6 @@ export async function handlePeople(action: string, value: string | undefined, ct
       await setVars(ctx, env, { [PP(k)]: val });
       // 발정모드 전체를 바꾸면 인물별 덮어쓰기는 다시 전체를 따른다 (원본 updateAllPeopleSexualStyle 과 같은 효과)
       if (k === 'explicit_style') await mutate(ctx, env, (store) => { let n = 0; for (const p of Object.values(store.people)) if (p.sexual && p.sexual.explicit !== null) { p.sexual.explicit = null; n++; } return n > 0; });
-      return true;
-    }
-    case 'pp-ps-pick':
-      peopleUi.psSection = v;
-      env.render();
-      return true;
-    case 'pp-ps-save':
-    case 'pp-ps-reset': {
-      const prompt = peopleSettings(ctx.chat.scriptstate).prompt;
-      const key = peopleUi.psSection === 'director' || peopleUi.psSection === 'router' ? PS(peopleUi.psSection, 'base') : PS(prompt, peopleUi.psSection);
-      await setVars(ctx, env, { [key]: action === 'pp-ps-reset' ? '' : v.slice(0, 12000) });
-      peopleUi.info = action === 'pp-ps-reset' ? '원본으로 되돌렸어요.' : '절을 덮어썼어요.';
-      env.render();
       return true;
     }
     case 'pp-undo-run': {

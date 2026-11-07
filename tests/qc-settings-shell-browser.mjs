@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const started = () => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } });
-const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:journal', 'set:wallet', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'set:update', 'agent', 'org', 'start', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
+const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:journal', 'set:items', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'set:update', 'agent', 'org', 'start', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
 const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records'];
 // 유령 버튼은 다시 보일 때 리스너를 떼고 다시 건다(떼기마다 비동기) → 그게 끝난 뒤에 잰다
 const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length })));
@@ -140,49 +140,7 @@ for (const vp of vps) {
     assert.equal(await curTab(), 'board');
   }
 
-  // ── 즐겨찾기 5개 상한 ──
-  const openMarks = async () => {
-    if (!narrow) await clickSel(page, '.gx [data-action="mk-pop"]');
-    else await page.evaluate(() => [...document.querySelectorAll('.gx .gx-bdrawer [data-action="mk-pop"], .gx [data-action="mk-pop"]')].pop()?.click());
-    await page.waitForSelector('.gx .mk-pop');
-  };
-  // 기본 즐겨찾기 4개(2026-10-29 사용자)가 처음부터 있다 → 화면에서 모두 지우고 시작
-  await openMarks();
-  while (await page.$('.gx .mk-pop [data-action="mk-del"]')) { await clickSel(page, '.gx .mk-pop [data-action="mk-del"]'); await sleep(60); }
-  assert.equal(((await prefsOf(page)).marks ?? []).length, 0, '기본 즐겨찾기 지움');
-  await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click());
-  await sleep(80);
-  // 맨 상황판은 즐겨찾기에 못 넣는다(2026-11-05) → 다섯 화면을 채운 뒤 여섯째(기록)에서 잠김
-  for (const tab of ['wiki', 'phone', 'gnet', 'map', 'mission', 'records']) {
-    await goTab(tab);
-    await openMarks();
-    const n = ((await prefsOf(page)).marks ?? []).length;
-    const here = await page.$('.gx .mk-pop [data-action="mk-here"]');
-    if (tab === 'records') {
-      assert.ok(!here || (await page.isDisabled('.gx .mk-pop [data-action="mk-here"]')), '5개면 「지금 화면」 잠김');
-      assert.ok((await page.textContent('.gx .mk-pop')).includes('5개까지'), '상한 안내');
-      assert.equal((await prefsOf(page)).marks.length, 5);
-    } else {
-      assert.ok(here, `${tab}: 지금 화면 추가 단추`);
-      await clickSel(page, '.gx .mk-pop [data-action="mk-here"]');
-      await page.waitForFunction((n) => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').marks ?? []).length === n + 1, n);
-    }
-    await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click());
-    await sleep(80);
-  }
-  await openMarks();
-  assert.ok((await page.textContent('.gx .mk-head')).includes('5/5'));
-  await clickSel(page, '.gx .mk-pop [data-action="mk-del"][data-value="0"]');
-  await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').marks ?? []).length === 4);
-  // 즐겨찾기로 이동
-  await clickSel(page, '.gx .mk-pop [data-action="mk-go"][data-value="0"]');
-  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'map'); // 새 즐겨찾기는 앞에 붙는다(2026-11-05): 커스텀(0번)을 뺐으니 다음은 임무 지도
-  if (narrow) {
-    await goTab('board');
-    // 회귀: 이 채팅은 상황판이 꺼져 있다(빈 화면). 그래도 서랍은 있어야 한다
-    assert.equal(await page.locator('.gx .gx-bdrawer .mk-slot').count(), 5, '폰 상황판 서랍 다섯 칸');
-  }
-  await page.evaluate(() => { const p = JSON.parse(window.__store['p:goei:prefs'] ?? '{}'); delete p.marks; window.__store['p:goei:prefs'] = JSON.stringify(p); });
+  // 즐겨찾기는 2026-11-07 화면에서 뺐다 (26a49048f5)
 
   // ── 메뉴 왼쪽/오른쪽 (PC) · 바깥 어둡기 단계 ──
   await openEditor(page, 'set:screen');
@@ -192,9 +150,6 @@ for (const vp of vps) {
     await clickSel(page, '.gw [data-action="set-nav"][data-value="right"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
     assert.equal(await navSide(), 'right', '메뉴 오른쪽');
-    const popSide = async () => { await closeEditor(page); await openMarks(); const r = await page.$eval('.gx .mk-pop', (e) => e.getBoundingClientRect()); const n = await page.$eval('.gx .gx-nav', (e) => e.getBoundingClientRect()); await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click()); await openEditor(page, 'set:screen'); return r.left >= n.right - 1 ? 'left' : r.right <= n.left + 1 ? 'right' : 'overlap'; };
-    // 즐겨찾기 창은 메뉴 바로 옆에 뜬다: 메뉴가 오른쪽이면 창은 메뉴의 왼쪽 가장자리 안쪽(겹치지 않음). 폭이 좁으면 창 가운데를 넘을 수 있어 좌우 거리로는 못 잰다
-    assert.equal(await popSide(), 'right', '즐겨찾기 창도 오른쪽 메뉴 옆 (메뉴와 겹치지 않음)');
     await clickSel(page, '.gw [data-action="set-nav"][data-value="left"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'left');
   }

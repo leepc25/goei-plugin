@@ -191,7 +191,7 @@ for (const vp of ['pc', 'phone']) {
   if (inv.includes('just bought 손전등') || !inv.includes('just sold 손전등 (14,000 won)') || !inv.includes('refused service') || !inv.includes('[shop:')) errorsAll.push(`[${vp}] inventory block: ${inv.slice(0, 200)} … ${inv.slice(-300)}`);
   // 9. 설정 페이지
   await openWin(page); await sleep(300);
-  await openEditor(page, 'set:shop'); await sleep(300);
+  await openEditor(page, 'set:items'); await sleep(300);
   await shot('settings');
   await closeEditor(page, true);
   await closeWin(page);

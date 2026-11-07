@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 
-const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'people', 'factions', 'lore', 'adv', 'update'];
+const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv', 'update'];
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['gnet', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
@@ -204,7 +204,7 @@ for (const vp of vps) {
         await page.waitForSelector('.gw .gw-setbody');
         if (p === 'update') continue;
         assert.equal(await page.$('.gw [data-action="set-scope"]'), null, `${vp} ${p}: 범위 칩 없음`);
-        assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, `${vp} ${p}: 창 머리의 기본값으로 저장·불러오기 (모든 페이지 같음)`);
+        assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, `${vp} ${p}: 창 머리의 기본값으로 저장·불러오기·초기값으로 (모든 페이지 같음)`);
         total += await sweepPage(page, p, mode, log);
         const a = await auditDom(page, '.gw');
         assert.deepEqual(a.missing, [], `${vp} ${p}/${mode}: 글자·aria-label 없는 단추`);
@@ -215,9 +215,9 @@ for (const vp of vps) {
     await goNode(page, 'set:board');
     const bar = async (what) => {
       await page.evaluate((w) => document.querySelector(`.gw .gw-top [data-action="set-bar"][data-value="${w}"]`).click(), what);
-      await page.waitForSelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${what}"]`);
-      await page.evaluate((w) => document.querySelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${w}"]`).click(), what);
-      await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+      await page.waitForSelector(`.gw .gw-confirm [data-action="set-bar-yes"][data-value="${what}"]`);
+      await page.evaluate((w) => document.querySelector(`.gw .gw-confirm [data-action="set-bar-yes"][data-value="${w}"]`).click(), what);
+      await page.waitForFunction(() => !document.querySelector('.gw .gw-confirm'));
       await settle(page);
     };
     const setAgent = async (_mode, n) => {
@@ -267,7 +267,7 @@ for (const vp of vps) {
       assert.ok(await page.$(worldBtn('preset_ttl', '+')), '자동 종료 ON → 유지 시간 줄');
     }
     // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 기록 페이지, 2026-11-05 사용자)
-    await goNode(page, 'set:wallet');
+    await goNode(page, 'set:items');
     const won = '.gw .st-won';
     if (await page.$(won)) {
       const chatWon = async () => JSON.parse((await chatOf(page)).scriptstate.$st_wallet ?? '{}');
