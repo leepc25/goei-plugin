@@ -4,13 +4,10 @@
 // 지역 서랍이 펼쳐져 지도를 가리고, 설정 창에서 접으면 상황판 서랍까지 접히던 문제(변수 하나를 모두가 같이 썼다).
 
 const opened = new Map<string, boolean>();
-const isOpen = (key: string) => opened.get(key) === true;
 
+/** 2026-11-07 사용자: 메뉴별 도구 줄은 폰에서도 접지 않고 늘 보인다 (손잡이 없음). 접고 펼치는 서랍은 하단 바 위 공용 서랍 하나 (app.ts commonDrawer) */
 function shell(key: string, cls: string, inner: string): string {
-  const open = isOpen(key);
-  return `<div class="ph-drawer${cls ? ` ${cls}` : ''}${open ? ' open' : ''}" data-drawer="${key}">
-    <button class="ph-grip" type="button" aria-label="${open ? '도구 접기' : '도구 펼치기'}" aria-expanded="${open}"><i></i></button>
-    ${inner}</div>`;
+  return `<div class="ph-drawer open${cls ? ` ${cls}` : ''}" data-drawer="${key}">${inner}</div>`;
 }
 
 /** 도구 단추 서랍. key = 펼침 상태를 기억하는 이름(기본은 cls, 둘 다 없으면 'tools') */

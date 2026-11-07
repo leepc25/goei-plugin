@@ -15,6 +15,7 @@ import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
+import { ITEM_KINDS, itemKind, sameItemName, type ItemKind } from '../items';
 import { validateDebrief, type DebriefItem, type EndedNow } from '../journal/debrief';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
@@ -79,7 +80,13 @@ export interface UpdateInput {
   wallet: boolean;
   /** 이 묶음에서 종료된 사건 (소감 절 켜짐이면 ≥1건, 아니면 빈 목록) */
   ended: EndedNow[];
+  /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
+  items: string[] | null;
 }
+
+/** 소지품 절 자료: 지금 가진 것 (core/items.ts). 모델에는 큰 종류(kind)만 준다 */
+export interface ItemNow { name: string; desc: string; kind: string }
+export const ITEM_KIND_IDS = ITEM_KINDS.map((k) => k.id);
 
 const CUE_MEANING: Record<Cue, string> = {
   작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
@@ -158,6 +165,8 @@ export interface BuildOpts {
   hints?: { name: string; aliases: string[]; quote: string }[];
   /** 하이파 요약 (리수폿 J-3). 자료 memory: 배경일 뿐 근거 아님 */
   memory?: string[];
+  /** 소지품 (설정 「보조 모델이 읽기」 켬): 지금 목록. 없거나 null 이면 소지품 절 없음 */
+  items?: ItemNow[] | null;
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
@@ -306,9 +315,12 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ended_now: o.ended?.length ? o.ended : undefined,
     ...(sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: 'sexual_context_only' } } : {}),
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
-    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
+    // 소지품 (2026-11-07 core/items.ts): 지금 목록 + 종류 표. 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
+    items_now: o.items ? o.items.map((e) => ({ name: e.name, state: e.desc || undefined, kind: e.kind })) : undefined,
+    item_kinds: o.items ? ITEM_KIND_IDS.join(' | ') : undefined,
+    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length, items: !!o.items },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [], items: o.items ? o.items.map((e) => e.name) : null };
 }
 
 // ── 지침 조립 ──
@@ -388,6 +400,8 @@ export interface UpdateResult {
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소감: 이번 턴 종료 사건의 담당 요원 소감 (사건당 1건) */
   debriefs?: { id: string; who: string; text: string }[];
+  /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
+  items?: { name: string; action: string; desc?: string | null; kind?: string | null; effect?: string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
@@ -409,7 +423,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -419,7 +433,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number; sexualInit?: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number; sexualInit?: number; items?: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -429,7 +443,10 @@ export interface ApplyReport {
   wallet: { anchor: string; amount: number; memo: string; quote: string }[];
   /** 받아들인 소감 (호출한 쪽이 보고서 `$goei_reports` 에 적는다) */
   debriefs?: DebriefItem[];
+  /** 받아들인 소지품 변화 (호출한 쪽이 `$st_items` 에 적는다, core/items.ts). new 는 더하고, update 는 설명·효과·종류 갱신, gone 은 빼고 기록 */
+  items: ItemChange[];
 }
+export interface ItemChange { anchor: string; name: string; action: 'new' | 'update' | 'gone'; desc: string; kind?: ItemKind; effect: string; quote: string }
 
 export interface ApplyCtx {
   settings: PeopleSettings;
@@ -450,6 +467,8 @@ export interface ApplyCtx {
   wallet?: boolean;
   /** 소감 절 켜짐: 소감을 받아 report.debriefs 에 담는다 (input.ended 가 비면 아무것도 안 받는다) */
   debrief?: boolean;
+  /** 소지품 절 켜짐: 변화를 받아 report.items 에 담는다 (input.items 가 null 이면 아무것도 안 받는다) */
+  items?: boolean;
 }
 
 const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
@@ -494,7 +513,7 @@ export function resolveName(who: string, store: PeopleStore, names: NameEntry[] 
 export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
   const list = msgs(chat);
   const live = liveness(chat);
-  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || 'note', who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], items: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || 'note', who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
   const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
   const roleWords = ctx.roleWords ?? ROLE_WORDS;
   const seqs = new Map<string, number>();
@@ -1157,6 +1176,49 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       seen.add(key);
       report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str(t.quote).slice(0, 120) });
       report.applied.transactions++;
+    }
+  }
+
+  // 6c-2. 소지품 (2026-11-07, core/items.ts): 본문에 분명히 적힌 변화만, 인용 필수. update·gone 은 목록에 있는 이름만, 같은 이름은 한 번. 다시 읽기(only)에서는 받지 않는다
+  if (ctx.items && input.items && !ctx.only?.length) {
+    report.applied.items = 0;
+    const seen = new Set<string>();
+    const has = (n: string) => input.items!.find((x) => sameItemName(x, n));
+    for (const t of (r.items ?? []).slice(0, 8)) {
+      const name = plain(t?.name, 30);
+      const action = str(t?.action).trim().toLowerCase();
+      if (!name) {
+        drop('items', t, '이름 없음');
+        continue;
+      }
+      if (action !== 'new' && action !== 'update' && action !== 'gone') {
+        drop('items', t, '모르는 action');
+        continue;
+      }
+      const ev = evidence(str(t.m), str(t.quote));
+      if (typeof ev === 'string') {
+        drop('items', t, ev);
+        continue;
+      }
+      const listed = has(name);
+      if (action !== 'new' && !listed) {
+        drop('items', t, '목록에 없는 이름');
+        continue;
+      }
+      if (seen.has(norm(listed ?? name))) {
+        drop('items', t, '같은 물건 중복');
+        continue;
+      }
+      if (report.items.length >= 4) {
+        drop('items', t, '한 번에 4개까지');
+        continue;
+      }
+      seen.add(norm(listed ?? name));
+      report.items.push({
+        anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : action,
+        desc: plain(t.desc, 80), ...(t.kind ? { kind: itemKind(str(t.kind).trim().toLowerCase()) } : {}), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+      });
+      report.applied.items++;
     }
   }
 

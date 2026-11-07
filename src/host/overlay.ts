@@ -18,7 +18,7 @@ const chatCss = (t: ThemeName) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + s
   + imgCss(getPrefs().imgSize, getPrefs().imgFoldOn === false ? 100 : getPrefs().imgFold, imgHidden(), getPrefs().imgFoldLock === true);
 
 /** 창과 같은 배색을 x-goei-theme 속성별 CSS 변수로 (본 화면에서는 style 속성으로 변수를 못 넣을 수 있어 선택자로 나눈다) */
-function themeVars(sel: string): string {
+export function themeVars(sel: string): string {
   return (Object.keys(PALETTES) as ThemeName[]).map((t) => {
     const p = PALETTES[t];
     return `${sel}${t === 'dark' ? '' : `[x-goei-theme="${t}"]`} { --g-void: ${p.void}; --g-panel: ${p.panel}; --g-line: ${p.line}; --g-text: ${p.text}; --g-sub: ${p.sub}; --g-signal: ${p.signal}; --g-acc: ${p.accentBg}; --g-acc-line: ${p.accentLine}; --g-scrim: ${p.scrim}; }`;

@@ -1,4 +1,315 @@
-tch(messageText(str9(list4[i].data))).length || list4[i - 1] && match(messageText(str9(list4[i - 1].data))).length);
+pending" ? "말투 변경 승인 대기 (인물 화면에서 승인해야 바뀜)" : "말투 변화 조짐 집계 중 (변경 가능 표시 없음)", who);
+            continue;
+          }
+        }
+        const ev = evidence(a.m, a.quote);
+        if (typeof ev === "string") {
+          drop("address", a, ev, who);
+          continue;
+        }
+        const toUser = plain(a.toUser, 20);
+        const register = REGISTERS.includes(a.register) ? a.register : null;
+        if (!toUser || !register) {
+          drop("address", a, "호칭·존댓말 값이 없음", who);
+          continue;
+        }
+        const seq = nextSeq2(ev.anchor);
+        if (putChange(store, { id: changeId(who, "address", ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: "story", who, kind: "address", toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) {
+          report.applied.address++;
+          const stillReady = liveEntries(store.people[who].slots.speech, live).find((x) => (x.target ?? "@user") === "@user" && parseSpeechMarker(x.text).state === "ready");
+          if (stillReady) {
+            const seq2 = nextSeq2(ev.anchor);
+            const base = parseSpeechMarker(stillReady.text).base || `${toUser} (${register})`;
+            putEntry(store, who, "speech", { id: entryId(who, "speech", ev.anchor, seq2, `=${stillReady.id}`), text: base, src: "story", anchor: ev.anchor, seq: seq2, quote: a.quote, replaces: stillReady.id, target: "@user" });
+          }
+        }
+      }
+    }
+    let hookActions = 0;
+    for (const d of ctx2.only?.length ? [] : r.docs ?? []) {
+      const type = d?.type;
+      if (!DOC_TYPES.includes(type) || !ctx2.settings.features.has(docFeature(type))) {
+        drop("doc", d, "없는 문서 종류 또는 꺼진 기능");
+        continue;
+      }
+      if (type === "rhythm" && typeof d.key === "string" && d.key.startsWith("hook:") && d.op !== "remove" && input3.clock) {
+        const isNew = !store.docs[`rhythm:${plain(d.key, 40)}`];
+        if (isNew && !input3.clock.plantAllowed) {
+          drop("doc", d, `새 훅을 심을 수 없음 (${input3.clock.plantBlocked})`, d.key);
+          continue;
+        }
+        const head3 = typeof d.text === "string" ? parseHookHead(d.text) : null;
+        const prev = input3.clock.hooks.find((h) => h.key === d.key);
+        const extendsNow = !!head3?.ext && !prev?.extended;
+        if (extendsNow && prev?.extended) {
+          drop("doc", d, "연장은 한 번만", d.key);
+          continue;
+        }
+        if (++hookActions > 1) {
+          drop("doc", d, "응답당 훅 행동 1개", d.key);
+          continue;
+        }
+      }
+      const key2 = plain(d.key, 40);
+      const ev = norm(str9(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
+      if (!key2 || typeof ev === "string") {
+        drop("doc", d, typeof ev === "string" ? ev : "이름 없음");
+        continue;
+      }
+      const doc2 = store.docs[`${type}:${key2}`];
+      const cur = doc2 ? liveEntries(doc2.entries, live) : [];
+      const text4 = plain(d.text, 200);
+      if (type === "rhythm" && text4 && !rhythmTextOk(key2, text4)) {
+        drop("doc", d, "리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])", key2);
+        continue;
+      }
+      let replaces;
+      if (d.op === "upsert" || d.op === "remove") {
+        const target = cur.find((x) => x.id === d.replace);
+        if (!target) {
+          drop("doc", d, "replace 가 실제 항목이 아님");
+          continue;
+        }
+        if (target.pin) {
+          drop("doc", d, "고정된 항목");
+          continue;
+        }
+        replaces = target.id;
+      }
+      if (d.op !== "remove" && !text4) {
+        drop("doc", d, "본문 없음");
+        continue;
+      }
+      if (d.op === "add" && cur.some((x) => similar2(x.text, text4))) {
+        drop("doc", d, "같은 뜻의 항목이 이미 있음");
+        continue;
+      }
+      const seq = nextSeq2(ev.anchor);
+      const body5 = d.op === "remove" ? `(해소) ${cur.find((x) => x.id === replaces).text}`.slice(0, 200) : text4;
+      if (putDoc(store, type, key2, { id: entryId(`${type}:${key2}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str9(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
+    }
+    if (ctx2.settings.features.has("suspicion") && !ctx2.settings.qualitative.has("suspicion")) {
+      for (const s7 of r.suspicion ?? []) {
+        const who = nameOf(str9(s7?.who));
+        if (!who) {
+          drop("suspicion", s7, "명단에 없는 이름", str9(s7?.who));
+          continue;
+        }
+        if (!SUSP_KINDS.has(str9(s7.kind))) {
+          drop("suspicion", s7, "없는 의심 종류", who);
+          continue;
+        }
+        const ev = evidence(s7.m, s7.quote);
+        if (typeof ev === "string") {
+          drop("suspicion", s7, ev, who);
+          continue;
+        }
+        const target = s7.target === "@user" ? "@user" : nameOf(str9(s7.target)) ?? plain(s7.target, 30);
+        const text4 = plain(s7.text, 200);
+        if (!target || !text4) {
+          drop("suspicion", s7, "대상 또는 본문 없음", who);
+          continue;
+        }
+        const cur = liveEntries(store.people[who].slots.suspicion, live).filter((x) => x.target === target && x.kind === s7.kind);
+        const seq = nextSeq2(ev.anchor);
+        const tag = s7.op === "clue" && s7.weight && s7.weight in SUSP_WEIGHT ? `·${s7.weight}` : s7.op === "respond" && s7.stage && /^(지켜봄|시험|대면|보고)$/.test(s7.stage) ? `·${s7.stage}` : s7.op === "close" && s7.result && /^(확인|해소|묻음)$/.test(s7.result) ? `·${s7.result}` : "";
+        const prefix = s7.op === "open" ? "[시작] " : s7.op === "clue" ? `[단서${tag}] ` : s7.op === "respond" ? `[반응${tag}] ` : s7.op === "close" ? `[해소${tag}] ` : "";
+        if (!prefix) {
+          drop("suspicion", s7, "없는 연산", who);
+          continue;
+        }
+        if (cur.some((x) => similar2(x.text, prefix + text4))) {
+          drop("suspicion", s7, "같은 뜻의 항목이 이미 있음", who);
+          continue;
+        }
+        const replaces = s7.op === "close" ? cur.at(-1)?.id : void 0;
+        if (putEntry(store, who, "suspicion", { id: entryId(who, "suspicion", ev.anchor, seq, prefix + text4), text: prefix + text4, src: "story", anchor: ev.anchor, seq, quote: s7.quote, target, kind: s7.kind, ...replaces ? { replaces } : {} })) report.applied.suspicion++;
+      }
+    }
+    if (ctx2.settings.features.has("faction_rep") && !ctx2.only?.length) {
+      const changes = liveChanges(store, live);
+      const seen2 = /* @__PURE__ */ new Set();
+      const known = knownFactionCodes(store, input3.factionNames);
+      for (const f of r.faction_cues ?? []) {
+        const raw = str9(f?.faction).trim();
+        const code2 = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input3.factionNames[c] && raw && input3.factionNames[c] === raw) || "";
+        if (!code2) {
+          drop("faction", f, "모르는 세력 이름", raw);
+          continue;
+        }
+        if (!CUES.includes(f.cue)) {
+          drop("faction", f, "표에 없는 계기", code2);
+          continue;
+        }
+        const ev = evidence(f.m, f.quote);
+        if (typeof ev === "string") {
+          drop("faction", f, ev, code2);
+          continue;
+        }
+        if (seen2.has(code2)) {
+          drop("faction", f, "세력당 1건", code2);
+          continue;
+        }
+        const who = factionWho(code2);
+        if (changes.some((x) => x.kind === "cue" && x.who === who && x.anchor === ev.anchor && x.cue === f.cue)) {
+          drop("faction", f, "같은 메시지에 같은 계기가 이미 있음", code2);
+          continue;
+        }
+        seen2.add(code2);
+        if (!store.factions[code2]) store.factions[code2] = { code: code2, name: factionName(code2, input3.factionNames, store), seeded: { at: ctx2.now ?? (/* @__PURE__ */ new Date()).toISOString() } };
+        const seq = nextSeq2(ev.anchor);
+        if (putChange(store, { id: changeId(who, "cue", ev.anchor, seq, f.cue), anchor: ev.anchor, seq, src: "story", who, kind: "cue", cue: f.cue, quote: f.quote, reason: plain(f.reason, 40) })) report.applied.factions++;
+      }
+    }
+    if (ctx2.wallet && input3.wallet && !ctx2.only?.length) {
+      const seen2 = /* @__PURE__ */ new Set();
+      for (const t of (r.transactions ?? []).slice(0, 6)) {
+        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parseWon(str9(t?.amount));
+        if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
+          drop("wallet", t, "금액을 읽을 수 없음");
+          continue;
+        }
+        const ev = evidence(str9(t.m), str9(t.quote));
+        if (typeof ev === "string") {
+          drop("wallet", t, ev);
+          continue;
+        }
+        if (!mentionsAmount(str9(t.quote)) && !/\d/.test(str9(t.quote))) {
+          drop("wallet", t, "인용에 금액이 없음");
+          continue;
+        }
+        const memo = plain(t.memo, 30) || (amount < 0 ? "지출" : "수입");
+        const key2 = `${ev.anchor}|${amount}|${memo}`;
+        if (seen2.has(key2)) {
+          drop("wallet", t, "같은 거래 중복");
+          continue;
+        }
+        seen2.add(key2);
+        report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str9(t.quote).slice(0, 120) });
+        report.applied.transactions++;
+      }
+    }
+    if (ctx2.items && input3.items && !ctx2.only?.length) {
+      report.applied.items = 0;
+      const seen2 = /* @__PURE__ */ new Set();
+      const has = (n2) => input3.items.find((x) => sameItemName(x, n2));
+      for (const t of (r.items ?? []).slice(0, 8)) {
+        const name = plain(t?.name, 30);
+        const action = str9(t?.action).trim().toLowerCase();
+        if (!name) {
+          drop("items", t, "이름 없음");
+          continue;
+        }
+        if (action !== "new" && action !== "update" && action !== "gone") {
+          drop("items", t, "모르는 action");
+          continue;
+        }
+        const ev = evidence(str9(t.m), str9(t.quote));
+        if (typeof ev === "string") {
+          drop("items", t, ev);
+          continue;
+        }
+        const listed = has(name);
+        if (action !== "new" && !listed) {
+          drop("items", t, "목록에 없는 이름");
+          continue;
+        }
+        if (seen2.has(norm(listed ?? name))) {
+          drop("items", t, "같은 물건 중복");
+          continue;
+        }
+        if (report.items.length >= 4) {
+          drop("items", t, "한 번에 4개까지");
+          continue;
+        }
+        seen2.add(norm(listed ?? name));
+        report.items.push({
+          anchor: ev.anchor,
+          name: listed ?? name,
+          action: action === "new" && listed ? "update" : action,
+          desc: plain(t.desc, 80),
+          ...t.kind ? { kind: itemKind(str9(t.kind).trim().toLowerCase()) } : {},
+          effect: plain(t.effect, 60),
+          quote: str9(t.quote).slice(0, 120)
+        });
+        report.applied.items++;
+      }
+    }
+    if (ctx2.debrief && input3.ended.length && !ctx2.only?.length) {
+      report.debriefs = [];
+      report.applied.debriefs = 0;
+      const seen2 = /* @__PURE__ */ new Set();
+      for (const d of (r.debriefs ?? []).slice(0, 6)) {
+        const v = validateDebrief(d, input3.ended);
+        if (!v.ok) {
+          drop("debrief", d, v.reason, str9(d?.who));
+          continue;
+        }
+        if (seen2.has(v.value.id)) {
+          drop("debrief", d, "사건당 1건", v.value.who);
+          continue;
+        }
+        seen2.add(v.value.id);
+        report.debriefs.push(v.value);
+        report.applied.debriefs++;
+      }
+    }
+    if (r.identity && (r.identity.faction || r.identity.rank) && (!store.identity || store.identity.from !== "status")) {
+      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+      store.identity = { faction: plain(r.identity.faction, 20), rank: plain(r.identity.rank, 20), level: null, from: "scan", anchor };
+      report.applied.identity = true;
+    }
+    if (ctx2.settings.director === "note") {
+      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+      for (const n2 of r.next_note ?? []) {
+        const who = nameOf(str9(n2?.who));
+        if (!who || !input3.people.includes(who)) {
+          drop("note", n2, "장면 인물이 아님", str9(n2?.who));
+          continue;
+        }
+        const now = plain(n2.now, 160);
+        const mustNot = Array.isArray(n2.must_not_reveal) ? n2.must_not_reveal.map((x) => plain(x, 100)).filter(Boolean).slice(0, 5) : [];
+        if (!now && !mustNot.length) continue;
+        const seq = nextSeq2(anchor);
+        if (putChange(store, { id: changeId(who, "note", anchor, seq, now + mustNot.join("|")), anchor, seq, src: "story", who, kind: "note", now, mustNot, reason: "다음 턴 메모" })) report.applied.notes++;
+      }
+    }
+    if (ctx2.settings.features.has("rhythm") && ctx2.settings.director === "note") {
+      const now = plain(r.rhythm_note, 200);
+      if (now) {
+        const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
+        const seq = nextSeq2(anchor);
+        if (putChange(store, { id: changeId("@rhythm", "note", anchor, seq, now), anchor, seq, src: "story", who: "@rhythm", kind: "note", now, reason: "리듬 메모" })) report.applied.notes++;
+      }
+    }
+    if (!ctx2.keepRead) markRead(store, chat, input3.indexes);
+    return report;
+  }
+  function clearStoryRecords(store, who) {
+    const p = store.people[who];
+    if (!p) return 0;
+    let n2 = 0;
+    for (const slot2 of SLOTS) {
+      const list4 = p.slots[slot2];
+      if (!list4) continue;
+      const keep = list4.filter((e) => e.src !== "story" || e.pin);
+      n2 += list4.length - keep.length;
+      p.slots[slot2] = keep;
+    }
+    const before = store.log.length;
+    store.log = store.log.filter((c) => !(c.who === who && c.src === "story"));
+    n2 += before - store.log.length;
+    for (const [id, c] of Object.entries(p.candidates ?? {})) if (c.status === "collecting" || c.status === "rejected") {
+      delete p.candidates[id];
+      n2++;
+    }
+    return n2;
+  }
+  function mentionIndexes(chat, who, aliases, turns2) {
+    const list4 = msgs3(chat);
+    const match = nameMatcher([{ name: who, aliases, titles: [] }]);
+    const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns2);
+    return bots.filter((i) => match(messageText(str9(list4[i].data))).length || list4[i - 1] && match(messageText(str9(list4[i - 1].data))).length);
   }
   function rhythmTextOk(key2, text4) {
     if (key2 === "scene") {
@@ -606,6 +917,16 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     "- Return a `transactions` item ONLY when the confirmed span states an explicit amount of money that the user's character paid, received, lost, found, or was charged (digits such as `50,000원`, `₩3,000`, or Korean numerals such as `3만 원`). `amount` is a signed integer in won: negative when money leaves the user, positive when it comes in. `memo` (Korean ≤30) names what it was for.",
     "- Cite `m` and a verbatim `quote` that contains the amount. Never infer, estimate, or round an amount that is not written; never record a price that is only mentioned or offered without the transaction happening; never record another person's money. If the same purchase is stated twice, report it once.",
     "<<END:wallet>>",
+    "<<SECTION:items>>",
+    "## 15d. Items — what the user's character carries",
+    "",
+    "The chat keeps the user's character's inventory; `items_now` lists what they carry now (name, state, kind) and `item_kinds` the allowed kinds. The program owns the list; you report only changes stated plainly in the confirmed span.",
+    "- `new`: the user's character obtains, buys, picks up, is handed, or takes something and keeps it. Not an object merely seen or described, not another person's belongings, not clothes already worn or everyday things only mentioned in passing.",
+    "- `update`: a listed item's state changes — partly used, damaged, lent out, now worn, refilled. Copy the listed `name` exactly; `desc` is the new state in words.",
+    "- `gone`: a listed item is used up, lost, destroyed, given away, or thrown away. Copy the listed `name` exactly.",
+    "- `name` Korean ≤30. `desc` Korean ≤80: amount and condition in words (never a count such as ×3). `kind` one of `item_kinds`. `effect` Korean ≤60 only when the text states what the item does; otherwise null. Cite `m` and a verbatim `quote`.",
+    "- At most 4 items per response; one entry per item; never invent an item or an effect.",
+    "<<END:items>>",
     "<<SECTION:debrief>>",
     "## 15c. Debrief — a deployed agent's short note on an incident that just ended",
     "",
@@ -715,6 +1036,9 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     "<<SECTION:wallet>>",
     ' "transactions":[{"amount":-50000,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],',
     "<<END:wallet>>",
+    "<<SECTION:items>>",
+    ' "items":[{"name":"<Korean ≤30 chars>","action":"new|update|gone","desc":"<Korean ≤80 chars>","kind":"<one of item_kinds>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],',
+    "<<END:items>>",
     "<<SECTION:debrief>>",
     ' "debriefs":[{"id":"<ended_now id>","who":"<agent name from that item>","text":"<Korean 2–3 sentences ≤240 chars>"}],',
     "<<END:debrief>>",
@@ -1016,154 +1340,14 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     "## 15b. Money",
     "The program keeps the user's cash ledger (`wallet_now` = balance in won). Return `transactions` only for an explicit amount the user's character paid, received, lost or found in the confirmed span (digits like `50,000원`/`₩3,000` or Korean numerals like `3만 원`): `amount` signed integer won (negative = out), `memo` Korean ≤30, `m`, verbatim `quote` containing the amount. Never infer or estimate an unwritten amount, never record a mere price mention or another person's money; one item per transaction.",
     "<<END:wallet>>",
+    "<<SECTION:items>>",
+    "## 15d. Items",
+    "The program keeps the user's character's inventory (`items_now` = what they carry now: name, state, kind). Return `items` only for a change the confirmed span states plainly, about the user's character: `new` when they obtain, buy, pick up, or are handed something they keep (not a glance at an object, not someone else's thing, not clothes already worn or everyday things merely mentioned); `update` when a listed item's state changes (partly used, broken, lent, now worn); `gone` when a listed item is used up, lost, destroyed, given away, or thrown away. `name` Korean ≤30 — for `update`/`gone` copy the listed name exactly; `desc` Korean ≤80 states amount/condition in words (never a count like ×3); `kind` one of `item_kinds`; `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one.",
+    "<<END:items>>",
     "<<SECTION:debrief>>",
     "## 15c. Debrief",
     "`ended_now` lists incidents that ended in this span (id, kind, name, grade, place, deployed `agents`, `result`, `trail_tail`, `mine`). The facts are already recorded; return one `debriefs` entry per item: `id` as given, `who` = one name from that item's `agents` (first when unsure), `text` = 2–3 Korean sentences (≤240 chars) in that agent's voice — what happened and how it felt. Only facts from `ended_now` and the confirmed span; never invent names, numbers, injuries or outcomes; no quotation marks around the whole note; no template symbols (double braces, double percent).",
     "<<END:debrief>>",
     "<<SECTION:tidy>>",
     "## 11. Tidying an oversized record",
-    '`tidy` lists persons over the storage budget (`name`, `chars`, `target`). For each, besides this turn\'s changes, add `merge` items: `{"who","slot","op":"merge","from":[ids…],"text":"≤300 chars","m":"<confirmed m>","quote":null}`. A merge joins 2+ live entries of one slot into one denser statement keeping every still-true fact; merge only what overlaps, repeats or is superseded; never pinned entries. Prefer `history` (adjacent events), `state`/`scene` (only what is still true), then `knowledge`, `behavior`, `threads`; `relationship`/`speech` and per-target feature slots keep one per target; `affinity.appraisal` is never merged. Stop near `target`. ≤24 items per tidied person; no `merge` for persons not listed.',
-    "<<END:tidy>>",
-    "<<SECTION:suspicion>>",
-    "## 10. Suspicion (general)",
-    "A person may suspect another person or the user's character. A case tracks what raised it, what the suspecting person learned, their interpretation, their response, and whether it was confirmed, dispelled or set aside. With numbers on, the program keeps a 0–100 score per case and derives a stage; you return case events, never numbers (qualitative mode: 10.6, no score). Kinds (`kind`): 정체 (not who or what they claim: fake agent, impostor, inhuman passing as human, false name or rank); 배신 (works for or informs another side, breaks trust, plays both sides); 거짓말 (a specific account is false or concealing: alibi, report, explanation); 오염 (affected by an anomaly, curse, infection or possession; dangerous or changed); 범행 (did a specific harmful act: theft, assault, sabotage, death). No case for ordinary disagreement, a joke, a vague feeling without a clue, or general distrustfulness. One case per `who`, `target`, `kind`; another kind toward the same target is a separate case. `who` suspects; `target` is a name from `people` or `new_people`, or `@user`. Never invent the user's suspicion or decision; the user's character is never a `who`.",
-    "",
-    "### 10.1 What the suspecting person learned",
-    "Distinguish facts actually observed or received by the suspecting person, their interpretation, and what is objectively confirmed. A rumor heard is a transmission fact, not proof. A sent message, obscured screen or potential later witness is nothing received. Information may arrive by call, relay or message; check what the medium conveyed and the sender's credibility. The target's private feelings, guilt, fear, thoughts and model-only secrets are not available evidence. An undiscovered clue stays out of the case: never raise suspicion from it or have the person speak its content. A vanished clue does not erase a learner's memory. An unidentified target later revealed as a known person → enrich the existing case under the real name, never a new case; unclear sameness → do not merge.",
-    "",
-    "### 10.2 What clues mean",
-    "A clue must connect to the actual target and kind. Ordinary kindness, laughter, lateness, slow replies, privacy, nervousness or an unusual habit are not evidence by themselves. Weights by what newly reached the person:",
-    "| Weight | Evidence |",
-    "|---|---|",
-    "| 약 (+2) | Relevant but ambiguous clue tied to this target and kind: an inconsistency, an unexplained absence, a changed reaction to a name or place, an unfamiliar trace, behavior not fitting the claimed identity or condition |",
-    "| 중 (+5) | A concrete specific question: a concealed meeting or contact seen or credibly reported, a document or object that should not be there, a changed explanation for the same matter, presence where the target should not be, a physical sign consistent with 오염 of unconfirmed cause |",
-    "| 강 (+10) | Independently verified facts contradicting the account or connecting the target to the matter: confirmed sighting, record, schedule, communication or witness conflicting with the explanation; the same rumor from several mouths is not independent |",
-    "One disordered detail, a bodily mark, one-sided contact or a suspicious object never confirms; unclear cause → record the question, not the conclusion. Harm suffered by the target is not the target's voluntary wrongdoing. Confirmation needs reliable evidence reaching the person that establishes identity, context, intent or voluntariness, and the actual act or state.",
-    "",
-    "### 10.3 Trust and affinity",
-    "Trust in ability versus trust in one explanation; liking versus suspecting: read trust about this matter separately from affinity. Distrust, relevant betrayal and the explanation's credibility outrank goodwill. A genuinely established trusting relationship (shown in the record, or, with affinity on, stage 끌림 or above toward this target) may mitigate one ambiguous clue once: 「약→0」 (omit the clue) or 「중→약」; never mitigate 강 or confirmation; never twice for one event. Affinity toward a third person is not trust about this target. Never lower affinity because suspicion rose or raise suspicion because affinity is low or zero.",
-    "",
-    "### 10.4 Disproof and closure",
-    "Weakening requires new explanation or counterevidence matching the question to reach the person and the span to show acceptance. A plea to be believed, a gift, closeness, apology, affinity increase or time alone erases nothing. Partial refutation keeps the rest; never drop unfavorable facts to manufacture counterevidence. Decrease weights: 「-약」 (−2: accepts a consistent explanation for a weak question or notices consistent behavior and revises an ambiguous concern); 「-중」 (−5: independent material, testimony or complete context refutes a specific question); 「-강」 (−10: several independent facts refute the main question while another remains). Closing (`op: close`, `result`): 확인 (clear reliable evidence reached the person; program sets score ≥80); 해소 (reliable new evidence refutes the whole allegation and the person changes their mind; score 0); 묻음 (a real fact kept, the person forgives or stops pursuing; score kept). A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence. Learning falsity and changing one's mind differs from accepting truth and forgiving; forgiveness erases no fact. Once convinced, the person is not frozen in suspicion; without new evidence they do not repeat the question indefinitely.",
-    "",
-    "### 10.5 Responses",
-    "What the person actually did about the suspicion (`op: respond`, `stage`): 지켜봄 (watches, says less, remembers answers, attends to a name or schedule); 시험 (asks concrete details, checks a discrepancy, sets a small trap, verifies a record); 대면 (asks for an explanation directly, states boundaries, creates distance, accuses); 보고 (tells a superior, colleague or outsider; requests investigation; uses the knowledge as pressure). Personality shapes it: verification-minded asks about the real discrepancy; watchful waits; insensitive is slow then confused; conflict-avoidant postpones while suspecting. Never force a stage from a high score: a high score is not confirmation; 대면 and 보고 require the act in the span. Distinguish thinking, stating intent, attempting, the recipient receiving, and outcome: 「보고하겠다」 is intent; a report does not make others believe. Never invent a harmful plan, access, surveillance that did not happen, or success. Program stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction. At any score the person may express evidence-grounded confirmed knowledge, and while the case is open they never state the matter as confirmed.",
-    "",
-    "<<SECTION:suspicion_num>>",
-    "### 10.6 Recording",
-    "`suspicion` items: `op: open` starts a case (text: what raised it and the person's reading) or reopens a closed one; `op: clue` adds newly received evidence with `weight` (약, 중, 강, -약, -중, -강) and the clue plus interpretation; `op: respond` with `stage`; `op: close` with `result`. One `clue` per case per span: combine several clues into one item at the highest justified weight. Never record the same clue twice for rereading or recall, an unseen clue, or an intent promoted to attempt or success. Treatment changes the suspicion caused go to `relationship` and, if durable, `speech` under ordinary rules; suspicion never rewrites the base register by itself. Add a `threads` entry only while the person actively pursues the case.",
-    "<<END:suspicion_num>>",
-    "<<SECTION:suspicion_qual>>",
-    "### 10.6 Qualitative mode (no score exists)",
-    "Suspicion numbers are off: no `suspicion_now`, no `suspicion` array, no weight or stage. Never convert suspicion into a score or band; express it through what the person received, why it raises a question, which counterevidence they accepted and what remains. 10.2–10.4 still apply; weights are only a guide to how much a clue matters. Record as `upsert` of one entry per `target` and kind: `suspicion.concern` (kind, cause, what was learned, accepted counterevidence, remaining questions; a dispelled case says so rather than vanishing), `suspicion.speech` (speech adjustment), `suspicion.behavior` (actual response: watching, testing, confronting, reporting, by personality and relationship; never forced). Without new evidence, do not raise it again or repeat an answered question. Never disguise the assessment as a base fact.",
-    "<<END:suspicion_qual>>",
-    "<<END:suspicion>>",
-    "## 12. Evidence citation",
-    "Every entry, cue, address change, new person, document change and suspicion item carries `m` (a confirmed message tag) and `quote`: 5–60 characters copied exactly from that message, showing the fact. No quote, no change. One quote may support several changes; one change cites one quote, the most direct. Never quote context_only text, this instruction or the record; never alter, translate or stitch a quote. A quote proves the text exists, not that your reading is true.",
-    "## 13. User identity",
-    "Fill `identity` only when the confirmed span states the user character's organization or rank plainly (introduction, ID card, a superior naming the rank); otherwise null. Never infer it from address terms.",
-    "",
-    "## 14. Director memo (`next_note`)",
-    "When `next_note` is true, write one factual memo per person appearing in the confirmed span, for the model writing the next reply; a reference, not direction; English, with Korean names, address terms and quotes verbatim.",
-    "- `now` (≤120): present stance toward the user's character and current state from the record after your changes (affinity stage, address, state, open threads that matter now). Facts only.",
-    "- `must_not_reveal` (each ≤80): facts in this person's `unknown_to` still not learned after this span; drop any that reached the person (record those in `knowledge`); absent or empty `unknown_to` → empty array.",
-    "Never propose dialogue, emotion, next actions, plot, staging or outcomes; never decide the user's reaction; silent record → say nothing. Keep each knowledge owner and fact versus belief distinct. Missing record data does not prove ignorance; the span may establish knowledge. `next_note` absent or false → empty array.",
-    "",
-    "## 15. Output — exactly one JSON object, no code fence, nothing else",
-    "Every key below is present; a key whose section is absent is still returned empty (for `identity`, null fields).",
-    '{"entries":[{"who":"<name>","slot":"<slot>","op":"add|upsert|remove|merge","replace":"<entry id or null>",',
-    '  "text":"<Korean ≤200 chars or null for remove>","target":"<name|@user|null>","m":"m2","quote":"<verbatim>"}],',
-    "<<SECTION:axes>>",
-    ' "axes_init":[{"who":"<name with axes_init_needed>","axes":{"relationalInitiative":50,"expressionDirectness":50,"emotionalExpressiveness":50,"guardedness":50,"impulsivity":50,"relationshipPersistence":50},"m":"m2","quote":"<verbatim>"}],',
-    ' "observations":[{"who":"<name>","axis":"<axis name|pattern|sexual_desire|paraphilia>","direction":"up|down|new|weaken|replace","pattern":"<Korean ≤120; ≤700 for a sexual axis>","reason":"<Korean ≤100>","strength":<0..100>,"confidence":<0..100>,"m":"m2","quote":"<verbatim>"}],',
-    "<<END:axes>>",
-    "<<SECTION:sexual>>",
-    ' "sexual_init":[{"who":"<name whose sexual.init_needed lists the field>","sexual_desire":"<Korean ≤700, <추정>…, 미확인, or omit>","paraphilia":"<Korean ≤700, <추정>…, 미확인, or omit>","m":"m2","quote":"<verbatim>"}],',
-    "<<END:sexual>>",
-    "<<SECTION:affinity_num>>",
-    ' "cues":[{"who":"<name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
-    "<<END:affinity_num>>",
-    "<<SECTION:register>>",
-    ' "address":[{"who":"<name>","toUser":"<term>","register":"존댓말|반말|혼합","m":"m2","quote":"<verbatim>"}],',
-    "<<END:register>>",
-    ' "identity":{"faction":"<Korean org name or null>","rank":"<Korean rank or null>"},',
-    ' "new_people":[{"name":"<name>","aliases":["<alias>"],"m":"m2","quote":"<verbatim>","identity":"<Korean ≤200 or 미확인>","speech":"<Korean ≤200 or null>"}],',
-    ' "docs":[{"type":"event|location|faction|item|rhythm","key":"<Korean name>","op":"add|upsert|remove","replace":"<id or null>","text":"<Korean ≤200 or null for remove>","m":"m2","quote":"<verbatim>","date":"<YYYY.MM.DD or null>","place":"<Korean place or null>","who":["<name or @user>"]}],',
-    "<<SECTION:suspicion_num>>",
-    ' "suspicion":[{"who":"<name>","target":"<name|@user>","kind":"정체|배신|거짓말|오염|범행","op":"open|clue|respond|close","weight":"<약|중|강|-약|-중|-강 for clue, else null>","stage":"<지켜봄|시험|대면|보고 for respond, else null>","result":"<확인|해소|묻음 for close, else null>","text":"<Korean ≤200>","m":"m2","quote":"<verbatim>"}],',
-    "<<END:suspicion_num>>",
-    "<<SECTION:taste>>",
-    ' "taste":[{"who":"<name>","band":<-3..3>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
-    "<<END:taste>>",
-    "<<SECTION:openness_num>>",
-    ' "openness":[{"who":"<name>","op":"init|event","value":<0|90|150|210|270 or null>,"delta":<1|3|5|10|-2|-4|-5 or null>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
-    "<<END:openness_num>>",
-    "<<SECTION:rhythm>>",
-    ' "rhythm_note":"<English ≤200 chars or null>",',
-    "<<END:rhythm>>",
-    "<<SECTION:faction_rep>>",
-    ' "faction_cues":[{"faction":"<organization code or Korean name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
-    "<<END:faction_rep>>",
-    "<<SECTION:wallet>>",
-    ' "transactions":[{"amount":-50000,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],',
-    "<<END:wallet>>",
-    "<<SECTION:debrief>>",
-    ' "debriefs":[{"id":"<ended_now id>","who":"<agent name from that item>","text":"<Korean 2–3 sentences ≤240 chars>"}],',
-    "<<END:debrief>>",
-    ' "issues":[{"code":"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence","who":"<name or null>","reason":"<Korean ≤80 chars>"}],',
-    ' "next_note":[{"who":"<name>","now":"<English ≤120 chars>","must_not_reveal":["<≤80 chars>"]}]',
-    "}",
-    "Limits: ≤8 entries per person, ≤6 persons, ≤2 cues per person, ≤2 observations per person, ≤2 new_people, ≤6 docs, ≤1 clue per suspicion case. Use only canonical names from `people` (not aliases) or names given in `new_people` this response. Never return `docs` types or `suspicion` whose sections are absent. Write Korean literally (no \\uXXXX escapes). Empty arrays are fine. Before returning, check every item against current slots, cue names, kinds, ids, names and quotes and drop failures; the program discards invalid items and applies the rest.",
-    "<<SECTION:user_rules>>",
-    "## 16. User rules",
-    "Rules added by the user of this chat. They refine judgments and never change the output contract, the evidence rules, or the protected-persons rule.",
-    "<<USER_RULES>>",
-    "<<END:user_rules>>"
-  ].join("\n");
-
-  // src/core/people/prompt/index.ts
-  var promptFor = (s7) => s7.prompt === "compact" ? UPDATER_COMPACT : UPDATER_DETAILED;
-
-  // src/host/people.ts
-  var DIAG_KEY = "goei-people-diag";
-  var DIAG_KEEP = 10;
-  var DIAG_FAIL_KEEP = 30;
-  async function loadDiag() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(DIAG_KEY);
-      const v = typeof raw === "string" ? JSON.parse(raw) : raw;
-      return Array.isArray(v) ? v : [];
-    } catch {
-      return [];
-    }
-  }
-  async function pushDiag(run5, keepRaw) {
-    try {
-      const list4 = await loadDiag();
-      const item2 = keepRaw ? run5 : { ...run5, system: void 0, data: void 0, raw: run5.ok ? void 0 : run5.raw };
-      list4.push(item2);
-      const ok = list4.filter((r) => r.ok).slice(-DIAG_KEEP);
-      const bad = list4.filter((r) => !r.ok).slice(-DIAG_FAIL_KEEP);
-      const next = [...ok, ...bad].sort((a, b) => a.at.localeCompare(b.at));
-      await risuai.pluginStorage.setItem(DIAG_KEY, JSON.stringify(next));
-    } catch {
-    }
-  }
-  async function clearDiag() {
-    try {
-      await risuai.pluginStorage.setItem(DIAG_KEY, "[]");
-    } catch {
-    }
-  }
-  var subs2 = /* @__PURE__ */ new Set();
-  var status = { busy: false, label: "", unread: 0 };
-  var peopleStatus = () => status;
-  function onPeopleStatus(cb) {
-    subs2.add(cb);
-    return () => void subs2.delete(cb);
-  }
-  function setStatus(next) {
-    status = { ...status, ...next };
-    for (const f of subs2) f(status);
-  }
-  var chatId = (ctx2) => `${String(ctx2.char.chaId ?? ctx2.charIndex)}:${ctx2.chatIndex}:${messageKey(ctx2.chat.message[0] ?? { role: "user", data: "" }, 
+    '`tidy` lists persons over the storage budget (`name`, `chars`, `target`). For each, besides this turn\'s changes, add `merge` items: `{"who","slot","op":"merge","from":[ids…],"text":"≤300 chars","m":"<confirmed m>","quote":null}`. A merge joins 2+ live entries of one slot into one denser statement keeping every still-true fact; merge only what overlaps, repeats or is superseded; never pinned entries. Prefer `history` (adjacent events), `state`/`scene` (only what is still true), then `knowledge`, `behavior`, `threads`; `relationship`/`speech` and per-target feature slots keep one per target; `affinity.appraisal` is never merged. Stop near `target`. 

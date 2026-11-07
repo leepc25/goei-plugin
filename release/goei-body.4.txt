@@ -1,4 +1,5 @@
-,
+action, userFaction3),
+      aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
       ...address ? { address } : {}
     };
   }
@@ -195,8 +196,8 @@
     const msg = messages[index];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
-    const clean2 = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean2)) return null;
+    const clean3 = cleanOutput(raw);
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean3)) return null;
     const prev = readPrev(state[PREV_KEY]);
     const pk = index > 0 && messages[index - 1] ? messageKey(messages[index - 1], index - 1) : "";
     const reroll = prev?.i === index && (prev.pk === void 0 || prev.pk === pk);
@@ -215,7 +216,7 @@
     markStart(base, result.world, messageKey(msg, index));
     const vars = {
       ...worldVars(result.world, c, s7, now),
-      [LAST_KEY]: fingerprint(index, clean2)
+      [LAST_KEY]: fingerprint(index, clean3)
     };
     if (reroll && !result.faction) {
       vars.$st_faction = before.faction;
@@ -228,7 +229,7 @@
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index] = { ...msg, data: clean2 };
+    message[index] = { ...msg, data: clean3 };
     const next = { ...chat, message, scriptstate: { ...state, ...vars } };
     const closed = result.world.closed ?? [];
     let made = [];
@@ -1178,22 +1179,22 @@ ${themeVars("[x-goei-fab]")}
     if (!root3) throw new Error("Risu 화면 접근 권한이 없어요.");
     const { doc: doc2 } = root3;
     await removeLeftovers(doc2);
-    const host2 = await doc2.createElement("div");
-    await host2.setAttribute("x-goei-fab", "true");
-    await host2.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
+    const host3 = await doc2.createElement("div");
+    await host3.setAttribute("x-goei-fab", "true");
+    await host3.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
     const style = await doc2.createElement("style");
     await style.setTextContent(FAB_CSS);
-    await host2.appendChild(style);
+    await host3.appendChild(style);
     const cardStyle2 = await doc2.createElement("style");
     await cardStyle2.setTextContent(chatCss("dark"));
-    await host2.appendChild(cardStyle2);
-    await root3.body.appendChild(host2);
-    const button = await host2.querySelector("button");
+    await host3.appendChild(cardStyle2);
+    await root3.body.appendChild(host3);
+    const button = await host3.querySelector("button");
     if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
     let pos = await loadPos();
     const applyPos = async () => {
-      await host2.setStyle("right", `${pos.right}px`);
-      await host2.setStyle("bottom", `${pos.bottom}px`);
+      await host3.setStyle("right", `${pos.right}px`);
+      await host3.setStyle("bottom", `${pos.bottom}px`);
     };
     await applyPos();
     let visible2 = false;
@@ -1203,7 +1204,7 @@ ${themeVars("[x-goei-fab]")}
       if (introTimer === void 0) return;
       clearTimeout(introTimer);
       introTimer = void 0;
-      void host2.setAttribute("x-goei-intro", "false").catch(() => {
+      void host3.setAttribute("x-goei-intro", "false").catch(() => {
       });
     };
     let drag = null;
@@ -1238,7 +1239,7 @@ ${themeVars("[x-goei-fab]")}
           if (!moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) continue;
           if (!moved) {
             moved = true;
-            await host2.setAttribute("x-goei-drag", "true");
+            await host3.setAttribute("x-goei-drag", "true");
           }
           pos = dragTo(d.start, dx, dy, hit3.vw, hit3.vh);
           await applyPos();
@@ -1282,12 +1283,12 @@ ${themeVars("[x-goei-fab]")}
       void (loop ?? Promise.resolve()).then(async () => {
         if (drag === d) drag = null;
         if (moved) {
-          await host2.setAttribute("x-goei-drag", "false");
+          await host3.setAttribute("x-goei-drag", "false");
           await savePos();
         }
       });
     };
-    const onClick = async (ev) => {
+    const onClick2 = async (ev) => {
       if (!visible2) return;
       if (!inside(await rect(), ev.clientX, ev.clientY)) return;
       await loop;
@@ -1301,18 +1302,18 @@ ${themeVars("[x-goei-fab]")}
       for (const { target, type, id } of old) await target.removeEventListener(type, id).catch(() => {
       });
     };
-    const moveTarget = typeof doc2?.addEventListener === "function" ? doc2 : host2;
+    const moveTarget = typeof doc2?.addEventListener === "function" ? doc2 : host3;
     let binding = Promise.resolve();
     const bind = () => binding = binding.catch(() => {
     }).then(bindNow);
     const bindNow = async () => {
       await unbind();
       for (const [target, type, fn2] of [
-        [host2, "pointerdown", onDown],
+        [host3, "pointerdown", onDown],
         [moveTarget, "pointermove", onMove],
         [moveTarget, "pointerup", onUp],
         [moveTarget, "pointercancel", onUp],
-        [host2, "click", onClick]
+        [host3, "click", onClick2]
       ]) {
         ids.push({ target, type, id: await target.addEventListener(type, fn2, { passive: true }) });
       }
@@ -1320,7 +1321,7 @@ ${themeVars("[x-goei-fab]")}
     await bind();
     const onHidden = (h) => {
       if (h) drag = null;
-      void host2.setStyle("display", visible2 && !h ? "block" : "none").catch(() => {
+      void host3.setStyle("display", visible2 && !h ? "block" : "none").catch(() => {
       });
     };
     hiddenSubs.add(onHidden);
@@ -1343,15 +1344,15 @@ ${themeVars("[x-goei-fab]")}
         endIntro();
         if (next && intro) {
           const { vw } = await viewport();
-          await host2.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
-          await host2.setAttribute("x-goei-intro", "true");
+          await host3.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
+          await host3.setAttribute("x-goei-intro", "true");
           introTimer = setTimeout(endIntro, INTRO_MS + 400);
         }
-        await host2.setStyle("display", next && !fieldHidden ? "block" : "none");
+        await host3.setStyle("display", next && !fieldHidden ? "block" : "none");
       },
       endIntro,
       async setTheme(theme) {
-        await host2.setAttribute("x-goei-theme", theme);
+        await host3.setAttribute("x-goei-theme", theme);
         await cardStyle2.setTextContent(chatCss(theme));
       },
       async chatScreenVisible() {
@@ -1362,7 +1363,7 @@ ${themeVars("[x-goei-fab]")}
         visible2 = false;
         drag = null;
         pending2 = null;
-        await host2.remove();
+        await host3.remove();
         await unbind();
       }
     };
@@ -1402,7 +1403,14 @@ ${themeVars("[x-goei-fab]")}
     }
   }
   async function elements(doc2, selector) {
-    return await risuai.unwarpSafeArray(await doc2.querySelectorAll(selector)).catch(() => []);
+    const got = await risuai.unwarpSafeArray(await doc2.querySelectorAll(selector)).catch(() => []);
+    if (Array.isArray(got)) return got;
+    const sa = got;
+    if (!sa || typeof sa.length !== "function" || typeof sa.at !== "function") return [];
+    const n2 = await sa.length();
+    const out = [];
+    for (let i = 0; i < n2; i++) out.push(await sa.at(i));
+    return out;
   }
   async function hit2(el, x, y) {
     const r = await el.getBoundingClientRect().catch(() => null);
@@ -3771,8 +3779,8 @@ ${block2.trim()}` };
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc32 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc32}\\b` : esc32, "g");
+      const esc34 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc34}\\b` : esc34, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -4158,9 +4166,3 @@ ${JSON.stringify(previousRoom ?? "")}`)
     ];
     return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "ph"), { thoughts: read("THOUGHTS"), memo: memoTexts(read) }), contactMode: false };
   }
-
-  // src/ui/controls.ts
-  var esc4 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var isOnOff = (items) => items.length === 2 && items.every(([, l]) => l === "ON" || l === "OFF");
-  function switchHtml(o) {
-    return `<span class="gx-switch-wrap"><small>${o.disabled ? "비활성" : o.on ? "켬" : "끔"}</sma

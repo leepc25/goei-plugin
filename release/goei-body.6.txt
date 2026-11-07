@@ -1,4 +1,5 @@
-in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy4, true) : ""}</li>`;
+te)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc10([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
   var row4 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
@@ -34,11 +35,11 @@ in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</
       ${advancedBox("gn", ctx2.chat.scriptstate)}`;
     return `<div class="ph-form">${paneHead3(`${gnetLabel(ctx2.chat.scriptstate)} 설정`, "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows2}</div></div>`;
   }
-  function paneHtml3(ctx2, st, kind, busy4) {
+  function paneHtml3(ctx2, st, kind, busy5) {
     if (kind === "settings") return settingsView3(ctx2);
-    if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy4);
-    if (kind === "post") return postView(findPost(st, gnet.open), busy4);
-    if (kind === "dm") return dmPane(st, gnet.openDm, busy4);
+    if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy5);
+    if (kind === "post") return postView(findPost(st, gnet.open), busy5);
+    if (kind === "dm") return dmPane(st, gnet.openDm, busy5);
     return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>${gnetLabel(ctx2.chat.scriptstate)}</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
   }
   function gnetTab(ctx2, env3) {
@@ -47,7 +48,7 @@ in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</
     consMap = gnetSettings(ctx2.chat.scriptstate).cons ? new Map(consList(ctx2.chat.scriptstate).filter((c) => /^(https?:\/\/|data:image\/)/.test(c.src)).map((c) => [esc10(c.name), esc10(c.src)])) : /* @__PURE__ */ new Map();
     const me = userNick(ctx2.chat.scriptstate);
     const job = jobs3.get(chatKey3(ctx2));
-    const busy4 = !!job;
+    const busy5 = !!job;
     const unreadDm = st.dms.filter((d) => d.unread).length;
     const mobile = narrow();
     const kind = paneKind(st, mobile);
@@ -58,7 +59,7 @@ in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</
       if (gnet.notice === t) gnet.notice = "";
     });
     const tools = [
-      tool3("gn-refresh", ICONS.refresh, "게시판 새로고침", busy4 ? "disabled" : "", "새로고침"),
+      tool3("gn-refresh", ICONS.refresh, "게시판 새로고침", busy5 ? "disabled" : "", "새로고침"),
       tool3("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기"),
       tool3("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지"),
       tool3("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임")
@@ -70,12 +71,12 @@ in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</
         <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc10(me)}</b></span></div>
       </div>
       ${kind ? "" : status2}
-      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy4, mobile) : dmList(st, busy4, mobile)}</div>
-      ${mobile && !kind ? inlineComposer(st, busy4) : ""}
+      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy5, mobile) : dmList(st, busy5, mobile)}</div>
+      ${mobile && !kind ? inlineComposer(st, busy5) : ""}
       ${fail3}
       ${drawerHtml(tools, nick, "", "gnet")}
     </section>
-    <section class="ph-pane">${kind ? status2 : ""}${paneHtml3(ctx2, st, kind, busy4)}</section>
+    <section class="ph-pane">${kind ? status2 : ""}${paneHtml3(ctx2, st, kind, busy5)}</section>
     ${note}
   </main>`;
   }
@@ -96,9 +97,9 @@ in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</
     if (!s7.enabled || !(open2 ? s7.autoOpen : s7.auto) || jobs3.has(chatKey3(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    let hash3 = 7;
-    for (let i = 0; i < data3.length; i++) hash3 = (hash3 * 131 + data3.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash3}`;
+    let hash4 = 7;
+    for (let i = 0; i < data3.length; i++) hash4 = (hash4 * 131 + data3.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash4}`;
     if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
     if (!saved) return;
@@ -1871,7 +1872,7 @@ Next Paragraph Text
   }
   function installPage(ctx2) {
     const s7 = instUi.state;
-    const busy4 = !!instUi.busy;
+    const busy5 = !!instUi.busy;
     if (!s7 || instUi.forChar !== ctx2.charIndex) {
       const failed = !instUi.pending && instUi.notice;
       return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 점검</h2>${failed ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ""}</header>
@@ -1881,7 +1882,7 @@ Next Paragraph Text
     const allDone = s7.goei && !missing.length && s7.icon && s7.tokenizer;
     const name = String(ctx2.char.name ?? "이 캐릭터");
     const head3 = s7.goei ? missing.length ? `${esc11(name)}: 빠진 것 ${missing.length}개. 오른쪽 단추 하나로 전부 채워요.` : `${esc11(name)}: 모두 갖춰져 있어요.` : `${esc11(name)}는 아직 ${esc11(BRAND.name)} 카드가 아니에요. 오른쪽 단추 하나로 설정 폴더·명부·인사말·사진·아이콘·위키 기본 문서·토크나이저를 전부 심어요.`;
-    const main = busy4 ? `<button class="gx-mini primary" disabled>${esc11(instUi.progress || "설치하는 중…")}</button>` : allDone ? `<button class="gx-mini" data-action="ed-inst-all">다시 점검·맞추기</button>` : `<button class="gx-mini primary" data-action="ed-inst-all">${s7.goei ? "빠진 것 전부 채우기" : `${esc11(BRAND.name)} 설치`}</button>`;
+    const main = busy5 ? `<button class="gx-mini primary" disabled>${esc11(instUi.progress || "설치하는 중…")}</button>` : allDone ? `<button class="gx-mini" data-action="ed-inst-all">다시 점검·맞추기</button>` : `<button class="gx-mini primary" data-action="ed-inst-all">${s7.goei ? "빠진 것 전부 채우기" : `${esc11(BRAND.name)} 설치`}</button>`;
     return `<div class="gw-page gw-set gw-install"><header class="gw-head"><h2>설치 · 점검</h2><div class="gw-head-act">${main}</div>
       <p class="gx-muted">${head3} 기존 로어북·인사말·에셋은 그대로 두고 덧붙여요. 사진은 받다 끊겨도 받은 만큼 저장되니 다시 누르면 이어서 받아요.</p></header>
     ${instUi.notice ? `<div class="gx-err" role="alert">${esc11(instUi.notice)}</div>` : ""}
@@ -1889,8 +1890,8 @@ Next Paragraph Text
     <div class="gx-settings gw-setbody">
     ${statusList(s7)}
     <section class="ps-group"><h3>세부 선택</h3><div class="ps-rows">
-      <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc11(BRAND.name)}」로 바꿀지. 지금 이름: ${esc11(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? " on" : ""}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy4 || instUi.setName ? "disabled" : ""}>바꿈</button><button class="gx-seg${instUi.setName ? "" : " on"}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy4 || !instUi.setName ? "disabled" : ""}>그대로</button></div></div></div>
-      ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy4 ? "disabled" : ""}>이전 아이콘으로</button></div></div>` : ""}
+      <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc11(BRAND.name)}」로 바꿀지. 지금 이름: ${esc11(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? " on" : ""}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy5 || instUi.setName ? "disabled" : ""}>바꿈</button><button class="gx-seg${instUi.setName ? "" : " on"}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy5 || !instUi.setName ? "disabled" : ""}>그대로</button></div></div></div>
+      ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy5 ? "disabled" : ""}>이전 아이콘으로</button></div></div>` : ""}
     </div></section>
     <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요. 받은 위키 문서·토크나이저는 「점검 → 설정 내보내기」의 저장소 사용량에서 지울 수 있어요.</p>
     </div>
@@ -3592,6 +3593,4 @@ Next Paragraph Text
 .gw .gw-basepage .dir-row.open { border-color: var(--accent-line); }
 .gw .gw-basepage .dir-head { min-height: 44px; padding: 6px var(--pad); gap: 12px; }
 .gw .gw-basepage .dir-name b { font-size: 14px; font-weight: 600; }
-.gw .gw-basepage .dir-name small { font-size: 12.5px; }
-.gw .gw-basepage .dir-tools, .gw .gw-basepage .dir-bar { display: flex; gap: var(--gap); margin: 0 0 12px; }
-.gw 
+.gw .gw-basep

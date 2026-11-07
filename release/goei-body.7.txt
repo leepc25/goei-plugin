@@ -1,4 +1,6 @@
-.gw-basepage .dir-tools .dir-search { height: var(--h); }
+age .dir-name small { font-size: 12.5px; }
+.gw .gw-basepage .dir-tools, .gw .gw-basepage .dir-bar { display: flex; gap: var(--gap); margin: 0 0 12px; }
+.gw .gw-basepage .dir-tools .dir-search { height: var(--h); }
 .gw .gw-basepage .dir-group { margin: 14px 2px 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
 .gw .gw-basepage .dir-add { display: flex; gap: var(--gap); align-items: center; margin: 12px 0 0; }
 .gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
@@ -743,14 +745,14 @@ ${v}` : v;
   var esc16 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var relUi = { org: "", preview: false };
   var sym = () => getPrefs().relationsSym !== false;
-  function setCell(over, key2, cell) {
+  function setCell(over, key2, cell2) {
     const pairs = { ...over.relations?.pairs ?? {} };
     const base = worldRelations().pairs[key2];
-    if (cell === null) {
+    if (cell2 === null) {
       if (base) pairs[key2] = null;
       else delete pairs[key2];
-    } else if (base && base.stage === cell.stage && (base.memo ?? "") === (cell.memo ?? "")) delete pairs[key2];
-    else pairs[key2] = cell;
+    } else if (base && base.stage === cell2.stage && (base.memo ?? "") === (cell2.memo ?? "")) delete pairs[key2];
+    else pairs[key2] = cell2;
     const relations = { ...over.relations ?? {}, pairs };
     if (!Object.keys(pairs).length) delete relations.pairs;
     const next = { ...over, relations };
@@ -823,8 +825,8 @@ ${v}` : v;
     if (name === "ed-rel-memo") {
       const rel = worldRelations(over);
       const stage = rel.pairs[key2]?.stage ?? "neutral";
-      const cell = stage === "neutral" && !value.trim() ? null : { stage, ...value.trim() ? { memo: value } : {} };
-      setOverrides(setCell(over, key2, cell));
+      const cell2 = stage === "neutral" && !value.trim() ? null : { stage, ...value.trim() ? { memo: value } : {} };
+      setOverrides(setCell(over, key2, cell2));
       return true;
     }
     return false;
@@ -871,8 +873,8 @@ ${v}` : v;
   function setStage(over, key2, stage, rel) {
     const apply = (o, k) => {
       const memo = rel.pairs[k]?.memo ?? "";
-      const cell = stage === "neutral" && !memo ? null : { stage, ...memo ? { memo } : {} };
-      return setCell(o, k, cell);
+      const cell2 = stage === "neutral" && !memo ? null : { stage, ...memo ? { memo } : {} };
+      return setCell(o, k, cell2);
     };
     let next = apply(over, key2);
     if (sym()) {
@@ -1976,6 +1978,251 @@ ${dialogues.join("\n")}` : ""}` : "";
     return selectHypa(items, query, { maxItems: o.maxItems, maxChars: cap }).map((it) => it.text);
   }
 
+  // src/core/items.ts
+  var ITEMS_VAR = "$st_items";
+  var ITEM_USE_VAR = "$st_item_use";
+  var ITEM_USE_AT_VAR = "$st_item_use_at";
+  var ITEM_SLOTS_VAR = "$it_slots";
+  var ITEM_LIMIT_VAR = "$it_limit";
+  var ITEM_PUSH_VAR = "$it_push";
+  var ITEM_AUTO_VAR = "$it_auto";
+  var ITEM_SLOTS_DEFAULT = 16;
+  var ITEM_SLOTS_MIN = 8;
+  var ITEM_SLOTS_MAX = 40;
+  var ITEM_LIMIT_DEFAULT = "가방 하나와 주머니, 두 손";
+  var ITEM_KINDS = [
+    { id: "weapon", label: "무기", hint: "총·칼·둔기" },
+    { id: "wear", label: "방호구·옷", hint: "조끼·장갑·제복" },
+    { id: "tool", label: "도구", hint: "손전등·밧줄·공구" },
+    { id: "device", label: "전자기기", hint: "폰·녹음기·카메라·측정기" },
+    { id: "charm", label: "종교물·부적", hint: "십자가·염주·부적·성수" },
+    { id: "medical", label: "의료", hint: "약·붕대·주사" },
+    { id: "food", label: "음식·기호품", hint: "물·초콜릿·담배·술" },
+    { id: "paper", label: "기록물", hint: "서류·사진·수첩·USB" },
+    { id: "key", label: "열쇠·출입증", hint: "열쇠·카드키·신분증" },
+    { id: "seal", label: "봉인구·용기", hint: "수갑·봉인 상자·시료통" },
+    { id: "anomaly", label: "회수물·이상물", hint: "괴이에서 나온 것" },
+    { id: "valuable", label: "귀중품", hint: "현금 봉투·보석·시계" },
+    { id: "consumable", label: "소모품", hint: "건전지·탄약·소금·초" },
+    { id: "misc", label: "기타", hint: "어디에도 안 맞는 것" }
+  ];
+  var itemKind = (v) => ITEM_KINDS.some((k) => k.id === v) ? v : "misc";
+  var itemKindLabel = (k) => ITEM_KINDS.find((x) => x.id === k)?.label ?? "기타";
+  var isItem = (e) => {
+    const x = e;
+    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && typeof x.anchor === "string" && (x.from === "store" || x.from === "story" || x.from === "manual");
+  };
+  var isLog = (e) => {
+    const x = e;
+    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && typeof x.what === "string";
+  };
+  var clean2 = (s7, max) => String(s7 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+  function readItems(vars) {
+    const raw = vars?.[ITEMS_VAR];
+    const empty2 = { list: [], log: [] };
+    if (typeof raw !== "string" || !raw.trim()) return empty2;
+    try {
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return empty2;
+      const list4 = (Array.isArray(o.list) ? o.list.filter(isItem) : []).map((x) => ({ ...x, kind: itemKind(x.kind), desc: clean2(x.desc, 80), effect: clean2(x.effect, 60) })).slice(-200);
+      return { list: list4, log: Array.isArray(o.log) ? o.log.filter(isLog).slice(-400) : [] };
+    } catch {
+      return empty2;
+    }
+  }
+  var itemsVars = (it) => ({ [ITEMS_VAR]: JSON.stringify(it) });
+  function liveItems(it, alive2) {
+    return it.list.filter((e) => !e.anchor || alive2.has(e.anchor));
+  }
+  var liveItemsOf = (it, chat) => liveItems(it, aliveAnchors(chat));
+  var hash3 = (text4) => {
+    let h = 2166136261;
+    for (const ch of text4) {
+      h ^= ch.codePointAt(0);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0).toString(36);
+  };
+  var normName = (s7) => clean2(s7, 30).toLowerCase().replace(/[\s·.,'"「」()]/g, "");
+  var sameItemName = (a, b) => normName(a) === normName(b) && normName(a) !== "";
+  var itemId = (anchor, name) => `i_${hash3(`${anchor}|${normName(name)}`)}`;
+  function addItem(it, alive2, e) {
+    const name = clean2(e.name, 30);
+    if (!name) return it;
+    const desc = clean2(e.desc, 80);
+    const effect = clean2(e.effect, 60);
+    const kind = e.kind === void 0 ? void 0 : itemKind(e.kind);
+    const quote = e.quote ? clean2(e.quote, 120) : void 0;
+    const found = liveItems(it, alive2).find((x) => sameItemName(x.name, name));
+    if (found) {
+      const next = { ...found, desc: desc || found.desc, effect: effect || found.effect, kind: kind ?? found.kind, ...quote ? { quote } : {} };
+      if (JSON.stringify(next) === JSON.stringify(found)) return it;
+      return { ...it, list: it.list.map((x) => x.id === found.id ? next : x) };
+    }
+    const id = e.id ?? itemId(e.anchor, name);
+    if (it.list.some((x) => x.id === id)) return it;
+    const row9 = {
+      id,
+      name,
+      desc,
+      kind: kind ?? "misc",
+      effect,
+      from: e.from,
+      anchor: e.anchor,
+      at: e.at ?? (/* @__PURE__ */ new Date()).toISOString(),
+      ...Number.isSafeInteger(e.price) ? { price: e.price } : {},
+      ...e.walletId ? { walletId: e.walletId } : {},
+      ...quote ? { quote } : {}
+    };
+    return { ...it, list: [...it.list, row9].slice(-200) };
+  }
+  function updateItem(it, id, patch) {
+    const cur = it.list.find((x) => x.id === id);
+    if (!cur) return it;
+    const next = {
+      ...cur,
+      ...patch.name !== void 0 && clean2(patch.name, 30) ? { name: clean2(patch.name, 30) } : {},
+      ...patch.desc !== void 0 ? { desc: clean2(patch.desc, 80) } : {},
+      ...patch.effect !== void 0 ? { effect: clean2(patch.effect, 60) } : {},
+      ...patch.kind !== void 0 ? { kind: itemKind(patch.kind) } : {}
+    };
+    return { ...it, list: it.list.map((x) => x.id === id ? next : x) };
+  }
+  var logId = (what, anchor, name, n2) => `l_${hash3(`${what}|${anchor}|${normName(name)}|${n2}`)}`;
+  function addItemLog(it, l) {
+    const id = l.id ?? logId(l.what, l.anchor, l.name, it.log.length);
+    if (it.log.some((x) => x.id === id)) return it;
+    const row9 = { ...l, id, name: clean2(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean2(l.quote, 120) } : {}, ...l.note ? { note: clean2(l.note, 60) } : {} };
+    return { ...it, log: [...it.log, row9].slice(-400) };
+  }
+  function removeItem(it, id, what, by, anchor = "", extra = {}) {
+    const cur = it.list.find((x) => x.id === id);
+    if (!cur) return it;
+    return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, { name: cur.name, what, by, anchor, ...extra });
+  }
+  function mergeItems(it, keepId, otherId, name) {
+    const keep = it.list.find((x) => x.id === keepId);
+    const other = it.list.find((x) => x.id === otherId);
+    if (!keep || !other || keepId === otherId) return it;
+    const desc = clean2([keep.desc, other.desc].filter(Boolean).join(" / "), 80);
+    const merged = {
+      ...keep,
+      name: clean2(name ?? keep.name, 30) || keep.name,
+      desc,
+      effect: keep.effect || other.effect,
+      ...keep.quote || other.quote ? { quote: clean2([keep.quote, other.quote].filter(Boolean).join(" / "), 120) } : {},
+      // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
+      anchor: keep.anchor && other.anchor ? keep.anchor : "",
+      from: keep.anchor && other.anchor ? keep.from : "manual"
+    };
+    const list4 = it.list.filter((x) => x.id !== otherId).map((x) => x.id === keepId ? merged : x);
+    return addItemLog({ ...it, list: list4 }, { name: other.name, what: "merge", by: "manual", anchor: "", note: `${merged.name}와 합침` });
+  }
+  function itemSlots(vars) {
+    const n2 = Number(vars?.[ITEM_SLOTS_VAR]);
+    if (!Number.isSafeInteger(n2)) return ITEM_SLOTS_DEFAULT;
+    return Math.min(ITEM_SLOTS_MAX, Math.max(ITEM_SLOTS_MIN, n2));
+  }
+  var itemLimit = (vars) => clean2(vars?.[ITEM_LIMIT_VAR], 60) || ITEM_LIMIT_DEFAULT;
+  var itemPushOn = (vars) => vars?.[ITEM_PUSH_VAR] !== "0";
+  var itemAutoOn = (vars) => vars?.[ITEM_AUTO_VAR] !== "0";
+  function readItemUse(vars) {
+    const raw = vars?.[ITEM_USE_VAR];
+    if (typeof raw !== "string" || !raw.trim()) return [];
+    try {
+      const a = JSON.parse(raw);
+      return Array.isArray(a) ? a.filter((x) => typeof x === "string").map((x) => clean2(x, 30)).filter(Boolean).slice(0, 8) : [];
+    } catch {
+      return [];
+    }
+  }
+  var itemUseVars = (names4) => ({ [ITEM_USE_VAR]: names4.length ? JSON.stringify(names4.slice(0, 8)) : "" });
+  function newlyBought(list4, lastAnchor) {
+    return list4.filter((e) => e.from === "store" && e.anchor === lastAnchor);
+  }
+  function itemsBlock(list4, opts) {
+    const lines3 = list4.map((e) => `- ${e.name}${e.desc ? ` — ${e.desc}` : ""}${e.effect ? ` (${e.effect})` : ""}`);
+    const use = (opts.use ?? []).filter(Boolean);
+    const bought = (opts.bought ?? []).filter(Boolean);
+    if (!lines3.length && !use.length && !bought.length) return "";
+    const out = [`[Inventory] ${list4.length}/${opts.slots}${list4.length > opts.slots ? " (over the limit)" : ""}`, ...lines3.length ? lines3 : ["- (nothing)"]];
+    out.push(`Carry limit: ${opts.limit}`);
+    const events = [];
+    if (use.length) events.push(`uses ${use.join(", ")}`);
+    if (bought.length) events.push(`just bought ${bought.join(", ")}`);
+    if (list4.length > opts.slots) events.push("carrying more than the limit");
+    if (events.length) out.push(`This turn: ${events.join("; ")}`);
+    return out.join("\n");
+  }
+  function searchItems(it, alive2, q) {
+    const k = q.trim().toLowerCase();
+    if (!k) return { items: liveItems(it, alive2), log: it.log.slice().reverse() };
+    const hit3 = (...s7) => s7.some((x) => (x ?? "").toLowerCase().includes(k));
+    return {
+      items: liveItems(it, alive2).filter((e) => hit3(e.name, e.desc, e.effect, e.quote, itemKindLabel(e.kind))),
+      log: it.log.filter((l) => hit3(l.name, l.note, l.quote)).reverse()
+    };
+  }
+  var INVENTORY_HEAD = "[Inventory]";
+  var INVENTORY_NOTE = 'What the protagonist carries right now (name — state (effect)); nothing else is on hand. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. Never print this list back.';
+  function lastUserKey(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "user") return messageKey(list4[i], i);
+    return "";
+  }
+  function lastBotKey(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return messageKey(list4[i], i);
+    return "";
+  }
+  function pendingItemUse(vars, userKey) {
+    const at = typeof vars?.[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
+    return !at || at === userKey ? readItemUse(vars) : [];
+  }
+  function inventoryText(chat) {
+    const vars = chat.scriptstate;
+    if (!itemPushOn(vars)) return "";
+    const live = liveItemsOf(readItems(vars), chat);
+    const text4 = itemsBlock(live, {
+      slots: itemSlots(vars),
+      limit: itemLimit(vars),
+      use: pendingItemUse(vars, lastUserKey(chat)).filter((n2) => live.some((e) => sameItemName(e.name, n2))),
+      bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name)
+    });
+    return text4 ? `${text4}
+${INVENTORY_NOTE}` : "";
+  }
+  function withInventory(messages, chat) {
+    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(INVENTORY_HEAD))) return messages;
+    const text4 = inventoryText(chat);
+    if (!text4) return messages;
+    const at = messages.map((m) => m?.role).lastIndexOf("user");
+    const block2 = { role: "system", content: text4 };
+    return at < 0 ? [...messages, block2] : [...messages.slice(0, at), block2, ...messages.slice(at)];
+  }
+  function settleItemUse(chat, responseIndex) {
+    const vars = chat.scriptstate ?? {};
+    const names4 = readItemUse(vars);
+    const at = typeof vars[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
+    if (!names4.length && !at) return null;
+    const userKey = lastUserKey(chat);
+    if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: "" };
+    if (!names4.length) return { [ITEM_USE_AT_VAR]: "" };
+    const m = chat.message?.[responseIndex];
+    if (!m || m.role !== "char") return null;
+    const anchor = messageKey(m, responseIndex);
+    const it0 = readItems(vars);
+    let it = it0;
+    const alive2 = aliveAnchors(chat);
+    for (const n2 of names4) {
+      if (it.log.some((l) => l.what === "use" && l.anchor === anchor && sameItemName(l.name, n2))) continue;
+      const item2 = liveItems(it, alive2).find((e) => sameItemName(e.name, n2));
+      it = addItemLog(it, { name: item2?.name ?? n2, what: "use", by: "use", anchor });
+    }
+    if (it === it0 && at === userKey) return null;
+    return { ...it === it0 ? {} : itemsVars(it), [ITEM_USE_AT_VAR]: userKey };
+  }
+
   // src/core/people/select.ts
   var isEnglish = (s7) => /^[A-Za-z][A-Za-z0-9 .'-]*$/.test(s7);
   function nameMatcher(entries2) {
@@ -2043,6 +2290,7 @@ ${dialogues.join("\n")}` : ""}` : "";
     if (cur.length) out.push(cur);
     return out;
   }
+  var ITEM_KIND_IDS = ITEM_KINDS.map((k) => k.id);
   var CUE_MEANING = {
     작은친절: "실제로 전해지고 받아들여진 작은 배려",
     도움: "의미 있는 도움, 약속을 지킴",
@@ -2241,9 +2489,12 @@ ${tail2}`;
       ended_now: o.ended?.length ? o.ended : void 0,
       ...sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: "sexual_context_only" } } : {},
       ...speechVariety(o.settings).level !== "off" ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === "two" && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {},
-      want: { new_people: true, next_note: wantNote, address: o.settings.features.has("register"), identity: true, transactions: typeof o.wallet === "number", debriefs: !!o.ended?.length }
+      // 소지품 (2026-11-07 core/items.ts): 지금 목록 + 종류 표. 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
+      items_now: o.items ? o.items.map((e) => ({ name: e.name, state: e.desc || void 0, kind: e.kind })) : void 0,
+      item_kinds: o.items ? ITEM_KIND_IDS.join(" | ") : void 0,
+      want: { new_people: true, next_note: wantNote, address: o.settings.features.has("register"), identity: true, transactions: typeof o.wallet === "number", debriefs: !!o.ended?.length, items: !!o.items }
     };
-    return { system: o.system, data: data3, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === "same" ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock: clock3, review, turn, wallet: typeof o.wallet === "number", ended: o.ended ?? [] };
+    return { system: o.system, data: data3, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === "same" ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock: clock3, review, turn, wallet: typeof o.wallet === "number", ended: o.ended ?? [], items: o.items ? o.items.map((e) => e.name) : null };
   }
   var LANG_EN_RULE = [
     "## Record language",
@@ -2299,7 +2550,7 @@ ${rules2}`;
     const v = JSON.parse(t.slice(a, b + 1));
     if (!v || typeof v !== "object" || Array.isArray(v)) throw new Error("JSON 객체가 아니에요");
     const r = v;
-    for (const k of ["entries", "cues", "address", "new_people", "docs", "suspicion", "next_note", "taste", "openness", "faction_cues", "transactions", "debriefs", "observations", "axes_init", "sexual_init", "issues"]) {
+    for (const k of ["entries", "cues", "address", "new_people", "docs", "suspicion", "next_note", "taste", "openness", "faction_cues", "transactions", "debriefs", "items", "observations", "axes_init", "sexual_init", "issues"]) {
       if (r[k] !== void 0 && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
     }
     return r;
@@ -2339,7 +2590,7 @@ ${rules2}`;
   function applyUpdate(store, chat, input3, r, ctx2) {
     const list4 = msgs3(chat);
     const live = liveness(chat);
-    const report = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || "note", who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
+    const report = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], items: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || "note", who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
     const drop = (kind, item2, reason3, who) => report.dropped.push({ kind, who, reason: reason3, item: item2 });
     const roleWords = ctx2.roleWords ?? ROLE_WORDS;
     const seqs = /* @__PURE__ */ new Map();
@@ -2793,269 +3044,4 @@ ${rules2}`;
         if (speechNow) {
           const st = parseSpeechMarker(speechNow.text).state;
           if (st !== "ready") {
-            drop("address", a, st === "pending" ? "말투 변경 승인 대기 (인물 화면에서 승인해야 바뀜)" : "말투 변화 조짐 집계 중 (변경 가능 표시 없음)", who);
-            continue;
-          }
-        }
-        const ev = evidence(a.m, a.quote);
-        if (typeof ev === "string") {
-          drop("address", a, ev, who);
-          continue;
-        }
-        const toUser = plain(a.toUser, 20);
-        const register = REGISTERS.includes(a.register) ? a.register : null;
-        if (!toUser || !register) {
-          drop("address", a, "호칭·존댓말 값이 없음", who);
-          continue;
-        }
-        const seq = nextSeq2(ev.anchor);
-        if (putChange(store, { id: changeId(who, "address", ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: "story", who, kind: "address", toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) {
-          report.applied.address++;
-          const stillReady = liveEntries(store.people[who].slots.speech, live).find((x) => (x.target ?? "@user") === "@user" && parseSpeechMarker(x.text).state === "ready");
-          if (stillReady) {
-            const seq2 = nextSeq2(ev.anchor);
-            const base = parseSpeechMarker(stillReady.text).base || `${toUser} (${register})`;
-            putEntry(store, who, "speech", { id: entryId(who, "speech", ev.anchor, seq2, `=${stillReady.id}`), text: base, src: "story", anchor: ev.anchor, seq: seq2, quote: a.quote, replaces: stillReady.id, target: "@user" });
-          }
-        }
-      }
-    }
-    let hookActions = 0;
-    for (const d of ctx2.only?.length ? [] : r.docs ?? []) {
-      const type = d?.type;
-      if (!DOC_TYPES.includes(type) || !ctx2.settings.features.has(docFeature(type))) {
-        drop("doc", d, "없는 문서 종류 또는 꺼진 기능");
-        continue;
-      }
-      if (type === "rhythm" && typeof d.key === "string" && d.key.startsWith("hook:") && d.op !== "remove" && input3.clock) {
-        const isNew = !store.docs[`rhythm:${plain(d.key, 40)}`];
-        if (isNew && !input3.clock.plantAllowed) {
-          drop("doc", d, `새 훅을 심을 수 없음 (${input3.clock.plantBlocked})`, d.key);
-          continue;
-        }
-        const head3 = typeof d.text === "string" ? parseHookHead(d.text) : null;
-        const prev = input3.clock.hooks.find((h) => h.key === d.key);
-        const extendsNow = !!head3?.ext && !prev?.extended;
-        if (extendsNow && prev?.extended) {
-          drop("doc", d, "연장은 한 번만", d.key);
-          continue;
-        }
-        if (++hookActions > 1) {
-          drop("doc", d, "응답당 훅 행동 1개", d.key);
-          continue;
-        }
-      }
-      const key2 = plain(d.key, 40);
-      const ev = norm(str9(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
-      if (!key2 || typeof ev === "string") {
-        drop("doc", d, typeof ev === "string" ? ev : "이름 없음");
-        continue;
-      }
-      const doc2 = store.docs[`${type}:${key2}`];
-      const cur = doc2 ? liveEntries(doc2.entries, live) : [];
-      const text4 = plain(d.text, 200);
-      if (type === "rhythm" && text4 && !rhythmTextOk(key2, text4)) {
-        drop("doc", d, "리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])", key2);
-        continue;
-      }
-      let replaces;
-      if (d.op === "upsert" || d.op === "remove") {
-        const target = cur.find((x) => x.id === d.replace);
-        if (!target) {
-          drop("doc", d, "replace 가 실제 항목이 아님");
-          continue;
-        }
-        if (target.pin) {
-          drop("doc", d, "고정된 항목");
-          continue;
-        }
-        replaces = target.id;
-      }
-      if (d.op !== "remove" && !text4) {
-        drop("doc", d, "본문 없음");
-        continue;
-      }
-      if (d.op === "add" && cur.some((x) => similar2(x.text, text4))) {
-        drop("doc", d, "같은 뜻의 항목이 이미 있음");
-        continue;
-      }
-      const seq = nextSeq2(ev.anchor);
-      const body5 = d.op === "remove" ? `(해소) ${cur.find((x) => x.id === replaces).text}`.slice(0, 200) : text4;
-      if (putDoc(store, type, key2, { id: entryId(`${type}:${key2}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str9(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
-    }
-    if (ctx2.settings.features.has("suspicion") && !ctx2.settings.qualitative.has("suspicion")) {
-      for (const s7 of r.suspicion ?? []) {
-        const who = nameOf(str9(s7?.who));
-        if (!who) {
-          drop("suspicion", s7, "명단에 없는 이름", str9(s7?.who));
-          continue;
-        }
-        if (!SUSP_KINDS.has(str9(s7.kind))) {
-          drop("suspicion", s7, "없는 의심 종류", who);
-          continue;
-        }
-        const ev = evidence(s7.m, s7.quote);
-        if (typeof ev === "string") {
-          drop("suspicion", s7, ev, who);
-          continue;
-        }
-        const target = s7.target === "@user" ? "@user" : nameOf(str9(s7.target)) ?? plain(s7.target, 30);
-        const text4 = plain(s7.text, 200);
-        if (!target || !text4) {
-          drop("suspicion", s7, "대상 또는 본문 없음", who);
-          continue;
-        }
-        const cur = liveEntries(store.people[who].slots.suspicion, live).filter((x) => x.target === target && x.kind === s7.kind);
-        const seq = nextSeq2(ev.anchor);
-        const tag = s7.op === "clue" && s7.weight && s7.weight in SUSP_WEIGHT ? `·${s7.weight}` : s7.op === "respond" && s7.stage && /^(지켜봄|시험|대면|보고)$/.test(s7.stage) ? `·${s7.stage}` : s7.op === "close" && s7.result && /^(확인|해소|묻음)$/.test(s7.result) ? `·${s7.result}` : "";
-        const prefix = s7.op === "open" ? "[시작] " : s7.op === "clue" ? `[단서${tag}] ` : s7.op === "respond" ? `[반응${tag}] ` : s7.op === "close" ? `[해소${tag}] ` : "";
-        if (!prefix) {
-          drop("suspicion", s7, "없는 연산", who);
-          continue;
-        }
-        if (cur.some((x) => similar2(x.text, prefix + text4))) {
-          drop("suspicion", s7, "같은 뜻의 항목이 이미 있음", who);
-          continue;
-        }
-        const replaces = s7.op === "close" ? cur.at(-1)?.id : void 0;
-        if (putEntry(store, who, "suspicion", { id: entryId(who, "suspicion", ev.anchor, seq, prefix + text4), text: prefix + text4, src: "story", anchor: ev.anchor, seq, quote: s7.quote, target, kind: s7.kind, ...replaces ? { replaces } : {} })) report.applied.suspicion++;
-      }
-    }
-    if (ctx2.settings.features.has("faction_rep") && !ctx2.only?.length) {
-      const changes = liveChanges(store, live);
-      const seen2 = /* @__PURE__ */ new Set();
-      const known = knownFactionCodes(store, input3.factionNames);
-      for (const f of r.faction_cues ?? []) {
-        const raw = str9(f?.faction).trim();
-        const code2 = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input3.factionNames[c] && raw && input3.factionNames[c] === raw) || "";
-        if (!code2) {
-          drop("faction", f, "모르는 세력 이름", raw);
-          continue;
-        }
-        if (!CUES.includes(f.cue)) {
-          drop("faction", f, "표에 없는 계기", code2);
-          continue;
-        }
-        const ev = evidence(f.m, f.quote);
-        if (typeof ev === "string") {
-          drop("faction", f, ev, code2);
-          continue;
-        }
-        if (seen2.has(code2)) {
-          drop("faction", f, "세력당 1건", code2);
-          continue;
-        }
-        const who = factionWho(code2);
-        if (changes.some((x) => x.kind === "cue" && x.who === who && x.anchor === ev.anchor && x.cue === f.cue)) {
-          drop("faction", f, "같은 메시지에 같은 계기가 이미 있음", code2);
-          continue;
-        }
-        seen2.add(code2);
-        if (!store.factions[code2]) store.factions[code2] = { code: code2, name: factionName(code2, input3.factionNames, store), seeded: { at: ctx2.now ?? (/* @__PURE__ */ new Date()).toISOString() } };
-        const seq = nextSeq2(ev.anchor);
-        if (putChange(store, { id: changeId(who, "cue", ev.anchor, seq, f.cue), anchor: ev.anchor, seq, src: "story", who, kind: "cue", cue: f.cue, quote: f.quote, reason: plain(f.reason, 40) })) report.applied.factions++;
-      }
-    }
-    if (ctx2.wallet && input3.wallet && !ctx2.only?.length) {
-      const seen2 = /* @__PURE__ */ new Set();
-      for (const t of (r.transactions ?? []).slice(0, 6)) {
-        const amount = typeof t?.amount === "number" ? Math.trunc(t.amount) : parseWon(str9(t?.amount));
-        if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
-          drop("wallet", t, "금액을 읽을 수 없음");
-          continue;
-        }
-        const ev = evidence(str9(t.m), str9(t.quote));
-        if (typeof ev === "string") {
-          drop("wallet", t, ev);
-          continue;
-        }
-        if (!mentionsAmount(str9(t.quote)) && !/\d/.test(str9(t.quote))) {
-          drop("wallet", t, "인용에 금액이 없음");
-          continue;
-        }
-        const memo = plain(t.memo, 30) || (amount < 0 ? "지출" : "수입");
-        const key2 = `${ev.anchor}|${amount}|${memo}`;
-        if (seen2.has(key2)) {
-          drop("wallet", t, "같은 거래 중복");
-          continue;
-        }
-        seen2.add(key2);
-        report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str9(t.quote).slice(0, 120) });
-        report.applied.transactions++;
-      }
-    }
-    if (ctx2.debrief && input3.ended.length && !ctx2.only?.length) {
-      report.debriefs = [];
-      report.applied.debriefs = 0;
-      const seen2 = /* @__PURE__ */ new Set();
-      for (const d of (r.debriefs ?? []).slice(0, 6)) {
-        const v = validateDebrief(d, input3.ended);
-        if (!v.ok) {
-          drop("debrief", d, v.reason, str9(d?.who));
-          continue;
-        }
-        if (seen2.has(v.value.id)) {
-          drop("debrief", d, "사건당 1건", v.value.who);
-          continue;
-        }
-        seen2.add(v.value.id);
-        report.debriefs.push(v.value);
-        report.applied.debriefs++;
-      }
-    }
-    if (r.identity && (r.identity.faction || r.identity.rank) && (!store.identity || store.identity.from !== "status")) {
-      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
-      store.identity = { faction: plain(r.identity.faction, 20), rank: plain(r.identity.rank, 20), level: null, from: "scan", anchor };
-      report.applied.identity = true;
-    }
-    if (ctx2.settings.director === "note") {
-      const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
-      for (const n2 of r.next_note ?? []) {
-        const who = nameOf(str9(n2?.who));
-        if (!who || !input3.people.includes(who)) {
-          drop("note", n2, "장면 인물이 아님", str9(n2?.who));
-          continue;
-        }
-        const now = plain(n2.now, 160);
-        const mustNot = Array.isArray(n2.must_not_reveal) ? n2.must_not_reveal.map((x) => plain(x, 100)).filter(Boolean).slice(0, 5) : [];
-        if (!now && !mustNot.length) continue;
-        const seq = nextSeq2(anchor);
-        if (putChange(store, { id: changeId(who, "note", anchor, seq, now + mustNot.join("|")), anchor, seq, src: "story", who, kind: "note", now, mustNot, reason: "다음 턴 메모" })) report.applied.notes++;
-      }
-    }
-    if (ctx2.settings.features.has("rhythm") && ctx2.settings.director === "note") {
-      const now = plain(r.rhythm_note, 200);
-      if (now) {
-        const anchor = messageKey(list4[Math.max(...input3.indexes)], Math.max(...input3.indexes));
-        const seq = nextSeq2(anchor);
-        if (putChange(store, { id: changeId("@rhythm", "note", anchor, seq, now), anchor, seq, src: "story", who: "@rhythm", kind: "note", now, reason: "리듬 메모" })) report.applied.notes++;
-      }
-    }
-    if (!ctx2.keepRead) markRead(store, chat, input3.indexes);
-    return report;
-  }
-  function clearStoryRecords(store, who) {
-    const p = store.people[who];
-    if (!p) return 0;
-    let n2 = 0;
-    for (const slot2 of SLOTS) {
-      const list4 = p.slots[slot2];
-      if (!list4) continue;
-      const keep = list4.filter((e) => e.src !== "story" || e.pin);
-      n2 += list4.length - keep.length;
-      p.slots[slot2] = keep;
-    }
-    const before = store.log.length;
-    store.log = store.log.filter((c) => !(c.who === who && c.src === "story"));
-    n2 += before - store.log.length;
-    for (const [id, c] of Object.entries(p.candidates ?? {})) if (c.status === "collecting" || c.status === "rejected") {
-      delete p.candidates[id];
-      n2++;
-    }
-    return n2;
-  }
-  function mentionIndexes(chat, who, aliases, turns2) {
-    const list4 = msgs3(chat);
-    const match = nameMatcher([{ name: who, aliases, titles: [] }]);
-    const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns2);
-    return bots.filter((i) => ma
+            drop("address", a, st === "

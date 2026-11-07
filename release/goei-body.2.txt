@@ -1,3 +1,6 @@
+ 65}`;
+  var cache = /* @__PURE__ */ new WeakMap();
+  function factionList(lore) {
     const books = lore ?? [];
     const hit3 = cache.get(books);
     if (hit3) return hit3;
@@ -1051,9 +1054,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return parts.length ? parts.map((e) => e.content).join("\n") : null;
   }
   function parseJson(raw, book2) {
-    const clean2 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
+    const clean3 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
     try {
-      return JSON.parse(clean2);
+      return JSON.parse(clean3);
     } catch {
       throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
     }
@@ -1185,11 +1188,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var NONE = "없음";
   function formatStatusLine(values, cols) {
-    const cell = (id) => {
+    const cell2 = (id) => {
       const v = (values[id] ?? "").replace(/[|\]\n\r]/g, " ").trim();
       return v || NONE;
     };
-    return `[▣|${cols.map(cell).join("|")}]`;
+    return `[▣|${cols.map(cell2).join("|")}]`;
   }
   var walletCell = (n2) => String(Math.trunc(n2));
   function parseWalletCell(text4) {
@@ -1254,13 +1257,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { companions: splitNames(x[0] ?? ""), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? "" : id, wallet: walletText(x[3] ?? "") };
   }
   function tail(rest) {
-    const clean2 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const clean3 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
     const after = rest.slice(1);
-    if (after.length <= 1) return { target: clean2(after[0] ?? ""), ...extras([]) };
-    return { target: clean2(after[0]), ...extras(after.slice(1, 5)) };
+    if (after.length <= 1) return { target: clean3(after[0] ?? ""), ...extras([]) };
+    return { target: clean3(after[0]), ...extras(after.slice(1, 5)) };
   }
   function byShape(f, shape) {
-    const clean2 = (t) => none(t) ? "" : t;
+    const clean3 = (t) => none(t) ? "" : t;
     const get = (id) => {
       const i = shape.indexOf(id);
       return i < 0 ? "" : (f[i] ?? "").trim();
@@ -1269,13 +1272,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return {
       date: get("date"),
       time: get("time"),
-      weather: clean2(get("weather")),
-      temp: clean2(get("temp")),
-      place: clean2(get("place")),
-      target: clean2(get("target")),
+      weather: clean3(get("weather")),
+      temp: clean3(get("temp")),
+      place: clean3(get("place")),
+      target: clean3(get("target")),
       companions: splitNames(get("companions")),
       deployed: shape.includes("deployed") ? none(d) ? false : /투입|deployed/i.test(d) : null,
-      identity: clean2(get("identity")),
+      identity: clean3(get("identity")),
       wallet: walletText(get("wallet"))
     };
   }
@@ -2738,8 +2741,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (!validAsset(asset)) throw new Error("사진 저장 위치가 올바르지 않아요.");
       return `%%ATTACHMENT:${hex(JSON.stringify({ kind: "image", content: String(content ?? "").trim(), asset }))}%%`;
     }
-    const clean2 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
-    return `[[ATTACH:${kind}]]${clean2}[[/ATTACH]]`;
+    const clean3 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
+    return `[[ATTACH:${kind}]]${clean3}[[/ATTACH]]`;
   }
   function stripForged(text4) {
     return String(text4 ?? "").replace(new RegExp(HEX, "g"), "[지원하지 않는 첨부]");
@@ -3529,7 +3532,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function gnetSettings(state) {
     const v = gnetVars(state);
     const s7 = (k) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
-    const clean2 = (k) => s7(k) === "-" ? "" : s7(k);
+    const clean3 = (k) => s7(k) === "-" ? "" : s7(k);
     const q = QUANTITY[s7("quantity")] ? s7("quantity") : "1";
     const chance = Number(s7("incoming_chance"));
     return {
@@ -3538,10 +3541,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
       autoOpen: s7("lazy") === "open",
       model: s7("mode") === "1" ? "main" : "aux",
       quantity: q,
-      subject: clean2("subject"),
-      mood: clean2("mood"),
+      subject: clean3("subject"),
+      mood: clean3("mood"),
       privacy: ["0", "1", "2", "3", "4"].includes(s7("privacy")) ? s7("privacy") : "1",
-      protagonist: clean2("protagonist"),
+      protagonist: clean3("protagonist"),
       sampling: s7("sampling") === "1",
       keepOwn: s7("keepown") === "1",
       keepReplied: s7("keepreplied") === "1",
@@ -3627,18 +3630,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc32 = false;
+    let esc34 = false;
     for (const c of line2) {
-      if (esc32) {
+      if (esc34) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc32 = false;
-      } else if (c === "\\") esc32 = true;
+        esc34 = false;
+      } else if (c === "\\") esc34 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc32) cur += "\\";
+    if (esc34) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4680,4 +4683,4 @@ ${JSON.stringify({ feature: "gnet", records })}
     const s7 = String(t ?? "").trim();
     return emptyPause(s7) || [...s7].length > 12 || /[다요][.!…]*$/.test(s7);
   };
-  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messa
+  var listedRooms = (st) => Object.keys(st.r

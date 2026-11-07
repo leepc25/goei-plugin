@@ -1,4 +1,151 @@
-0)}`;
+≤24 items per tidied person; no `merge` for persons not listed.',
+    "<<END:tidy>>",
+    "<<SECTION:suspicion>>",
+    "## 10. Suspicion (general)",
+    "A person may suspect another person or the user's character. A case tracks what raised it, what the suspecting person learned, their interpretation, their response, and whether it was confirmed, dispelled or set aside. With numbers on, the program keeps a 0–100 score per case and derives a stage; you return case events, never numbers (qualitative mode: 10.6, no score). Kinds (`kind`): 정체 (not who or what they claim: fake agent, impostor, inhuman passing as human, false name or rank); 배신 (works for or informs another side, breaks trust, plays both sides); 거짓말 (a specific account is false or concealing: alibi, report, explanation); 오염 (affected by an anomaly, curse, infection or possession; dangerous or changed); 범행 (did a specific harmful act: theft, assault, sabotage, death). No case for ordinary disagreement, a joke, a vague feeling without a clue, or general distrustfulness. One case per `who`, `target`, `kind`; another kind toward the same target is a separate case. `who` suspects; `target` is a name from `people` or `new_people`, or `@user`. Never invent the user's suspicion or decision; the user's character is never a `who`.",
+    "",
+    "### 10.1 What the suspecting person learned",
+    "Distinguish facts actually observed or received by the suspecting person, their interpretation, and what is objectively confirmed. A rumor heard is a transmission fact, not proof. A sent message, obscured screen or potential later witness is nothing received. Information may arrive by call, relay or message; check what the medium conveyed and the sender's credibility. The target's private feelings, guilt, fear, thoughts and model-only secrets are not available evidence. An undiscovered clue stays out of the case: never raise suspicion from it or have the person speak its content. A vanished clue does not erase a learner's memory. An unidentified target later revealed as a known person → enrich the existing case under the real name, never a new case; unclear sameness → do not merge.",
+    "",
+    "### 10.2 What clues mean",
+    "A clue must connect to the actual target and kind. Ordinary kindness, laughter, lateness, slow replies, privacy, nervousness or an unusual habit are not evidence by themselves. Weights by what newly reached the person:",
+    "| Weight | Evidence |",
+    "|---|---|",
+    "| 약 (+2) | Relevant but ambiguous clue tied to this target and kind: an inconsistency, an unexplained absence, a changed reaction to a name or place, an unfamiliar trace, behavior not fitting the claimed identity or condition |",
+    "| 중 (+5) | A concrete specific question: a concealed meeting or contact seen or credibly reported, a document or object that should not be there, a changed explanation for the same matter, presence where the target should not be, a physical sign consistent with 오염 of unconfirmed cause |",
+    "| 강 (+10) | Independently verified facts contradicting the account or connecting the target to the matter: confirmed sighting, record, schedule, communication or witness conflicting with the explanation; the same rumor from several mouths is not independent |",
+    "One disordered detail, a bodily mark, one-sided contact or a suspicious object never confirms; unclear cause → record the question, not the conclusion. Harm suffered by the target is not the target's voluntary wrongdoing. Confirmation needs reliable evidence reaching the person that establishes identity, context, intent or voluntariness, and the actual act or state.",
+    "",
+    "### 10.3 Trust and affinity",
+    "Trust in ability versus trust in one explanation; liking versus suspecting: read trust about this matter separately from affinity. Distrust, relevant betrayal and the explanation's credibility outrank goodwill. A genuinely established trusting relationship (shown in the record, or, with affinity on, stage 끌림 or above toward this target) may mitigate one ambiguous clue once: 「약→0」 (omit the clue) or 「중→약」; never mitigate 강 or confirmation; never twice for one event. Affinity toward a third person is not trust about this target. Never lower affinity because suspicion rose or raise suspicion because affinity is low or zero.",
+    "",
+    "### 10.4 Disproof and closure",
+    "Weakening requires new explanation or counterevidence matching the question to reach the person and the span to show acceptance. A plea to be believed, a gift, closeness, apology, affinity increase or time alone erases nothing. Partial refutation keeps the rest; never drop unfavorable facts to manufacture counterevidence. Decrease weights: 「-약」 (−2: accepts a consistent explanation for a weak question or notices consistent behavior and revises an ambiguous concern); 「-중」 (−5: independent material, testimony or complete context refutes a specific question); 「-강」 (−10: several independent facts refute the main question while another remains). Closing (`op: close`, `result`): 확인 (clear reliable evidence reached the person; program sets score ≥80); 해소 (reliable new evidence refutes the whole allegation and the person changes their mind; score 0); 묻음 (a real fact kept, the person forgives or stops pursuing; score kept). A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence. Learning falsity and changing one's mind differs from accepting truth and forgiving; forgiveness erases no fact. Once convinced, the person is not frozen in suspicion; without new evidence they do not repeat the question indefinitely.",
+    "",
+    "### 10.5 Responses",
+    "What the person actually did about the suspicion (`op: respond`, `stage`): 지켜봄 (watches, says less, remembers answers, attends to a name or schedule); 시험 (asks concrete details, checks a discrepancy, sets a small trap, verifies a record); 대면 (asks for an explanation directly, states boundaries, creates distance, accuses); 보고 (tells a superior, colleague or outsider; requests investigation; uses the knowledge as pressure). Personality shapes it: verification-minded asks about the real discrepancy; watchful waits; insensitive is slow then confused; conflict-avoidant postpones while suspecting. Never force a stage from a high score: a high score is not confirmation; 대면 and 보고 require the act in the span. Distinguish thinking, stating intent, attempting, the recipient receiving, and outcome: 「보고하겠다」 is intent; a report does not make others believe. Never invent a harmful plan, access, surveillance that did not happen, or success. Program stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction. At any score the person may express evidence-grounded confirmed knowledge, and while the case is open they never state the matter as confirmed.",
+    "",
+    "<<SECTION:suspicion_num>>",
+    "### 10.6 Recording",
+    "`suspicion` items: `op: open` starts a case (text: what raised it and the person's reading) or reopens a closed one; `op: clue` adds newly received evidence with `weight` (약, 중, 강, -약, -중, -강) and the clue plus interpretation; `op: respond` with `stage`; `op: close` with `result`. One `clue` per case per span: combine several clues into one item at the highest justified weight. Never record the same clue twice for rereading or recall, an unseen clue, or an intent promoted to attempt or success. Treatment changes the suspicion caused go to `relationship` and, if durable, `speech` under ordinary rules; suspicion never rewrites the base register by itself. Add a `threads` entry only while the person actively pursues the case.",
+    "<<END:suspicion_num>>",
+    "<<SECTION:suspicion_qual>>",
+    "### 10.6 Qualitative mode (no score exists)",
+    "Suspicion numbers are off: no `suspicion_now`, no `suspicion` array, no weight or stage. Never convert suspicion into a score or band; express it through what the person received, why it raises a question, which counterevidence they accepted and what remains. 10.2–10.4 still apply; weights are only a guide to how much a clue matters. Record as `upsert` of one entry per `target` and kind: `suspicion.concern` (kind, cause, what was learned, accepted counterevidence, remaining questions; a dispelled case says so rather than vanishing), `suspicion.speech` (speech adjustment), `suspicion.behavior` (actual response: watching, testing, confronting, reporting, by personality and relationship; never forced). Without new evidence, do not raise it again or repeat an answered question. Never disguise the assessment as a base fact.",
+    "<<END:suspicion_qual>>",
+    "<<END:suspicion>>",
+    "## 12. Evidence citation",
+    "Every entry, cue, address change, new person, document change and suspicion item carries `m` (a confirmed message tag) and `quote`: 5–60 characters copied exactly from that message, showing the fact. No quote, no change. One quote may support several changes; one change cites one quote, the most direct. Never quote context_only text, this instruction or the record; never alter, translate or stitch a quote. A quote proves the text exists, not that your reading is true.",
+    "## 13. User identity",
+    "Fill `identity` only when the confirmed span states the user character's organization or rank plainly (introduction, ID card, a superior naming the rank); otherwise null. Never infer it from address terms.",
+    "",
+    "## 14. Director memo (`next_note`)",
+    "When `next_note` is true, write one factual memo per person appearing in the confirmed span, for the model writing the next reply; a reference, not direction; English, with Korean names, address terms and quotes verbatim.",
+    "- `now` (≤120): present stance toward the user's character and current state from the record after your changes (affinity stage, address, state, open threads that matter now). Facts only.",
+    "- `must_not_reveal` (each ≤80): facts in this person's `unknown_to` still not learned after this span; drop any that reached the person (record those in `knowledge`); absent or empty `unknown_to` → empty array.",
+    "Never propose dialogue, emotion, next actions, plot, staging or outcomes; never decide the user's reaction; silent record → say nothing. Keep each knowledge owner and fact versus belief distinct. Missing record data does not prove ignorance; the span may establish knowledge. `next_note` absent or false → empty array.",
+    "",
+    "## 15. Output — exactly one JSON object, no code fence, nothing else",
+    "Every key below is present; a key whose section is absent is still returned empty (for `identity`, null fields).",
+    '{"entries":[{"who":"<name>","slot":"<slot>","op":"add|upsert|remove|merge","replace":"<entry id or null>",',
+    '  "text":"<Korean ≤200 chars or null for remove>","target":"<name|@user|null>","m":"m2","quote":"<verbatim>"}],',
+    "<<SECTION:axes>>",
+    ' "axes_init":[{"who":"<name with axes_init_needed>","axes":{"relationalInitiative":50,"expressionDirectness":50,"emotionalExpressiveness":50,"guardedness":50,"impulsivity":50,"relationshipPersistence":50},"m":"m2","quote":"<verbatim>"}],',
+    ' "observations":[{"who":"<name>","axis":"<axis name|pattern|sexual_desire|paraphilia>","direction":"up|down|new|weaken|replace","pattern":"<Korean ≤120; ≤700 for a sexual axis>","reason":"<Korean ≤100>","strength":<0..100>,"confidence":<0..100>,"m":"m2","quote":"<verbatim>"}],',
+    "<<END:axes>>",
+    "<<SECTION:sexual>>",
+    ' "sexual_init":[{"who":"<name whose sexual.init_needed lists the field>","sexual_desire":"<Korean ≤700, <추정>…, 미확인, or omit>","paraphilia":"<Korean ≤700, <추정>…, 미확인, or omit>","m":"m2","quote":"<verbatim>"}],',
+    "<<END:sexual>>",
+    "<<SECTION:affinity_num>>",
+    ' "cues":[{"who":"<name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
+    "<<END:affinity_num>>",
+    "<<SECTION:register>>",
+    ' "address":[{"who":"<name>","toUser":"<term>","register":"존댓말|반말|혼합","m":"m2","quote":"<verbatim>"}],',
+    "<<END:register>>",
+    ' "identity":{"faction":"<Korean org name or null>","rank":"<Korean rank or null>"},',
+    ' "new_people":[{"name":"<name>","aliases":["<alias>"],"m":"m2","quote":"<verbatim>","identity":"<Korean ≤200 or 미확인>","speech":"<Korean ≤200 or null>"}],',
+    ' "docs":[{"type":"event|location|faction|item|rhythm","key":"<Korean name>","op":"add|upsert|remove","replace":"<id or null>","text":"<Korean ≤200 or null for remove>","m":"m2","quote":"<verbatim>","date":"<YYYY.MM.DD or null>","place":"<Korean place or null>","who":["<name or @user>"]}],',
+    "<<SECTION:suspicion_num>>",
+    ' "suspicion":[{"who":"<name>","target":"<name|@user>","kind":"정체|배신|거짓말|오염|범행","op":"open|clue|respond|close","weight":"<약|중|강|-약|-중|-강 for clue, else null>","stage":"<지켜봄|시험|대면|보고 for respond, else null>","result":"<확인|해소|묻음 for close, else null>","text":"<Korean ≤200>","m":"m2","quote":"<verbatim>"}],',
+    "<<END:suspicion_num>>",
+    "<<SECTION:taste>>",
+    ' "taste":[{"who":"<name>","band":<-3..3>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
+    "<<END:taste>>",
+    "<<SECTION:openness_num>>",
+    ' "openness":[{"who":"<name>","op":"init|event","value":<0|90|150|210|270 or null>,"delta":<1|3|5|10|-2|-4|-5 or null>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
+    "<<END:openness_num>>",
+    "<<SECTION:rhythm>>",
+    ' "rhythm_note":"<English ≤200 chars or null>",',
+    "<<END:rhythm>>",
+    "<<SECTION:faction_rep>>",
+    ' "faction_cues":[{"faction":"<organization code or Korean name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
+    "<<END:faction_rep>>",
+    "<<SECTION:wallet>>",
+    ' "transactions":[{"amount":-50000,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],',
+    "<<END:wallet>>",
+    "<<SECTION:items>>",
+    ' "items":[{"name":"<Korean ≤30 chars>","action":"new|update|gone","desc":"<Korean ≤80 chars>","kind":"<one of item_kinds>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],',
+    "<<END:items>>",
+    "<<SECTION:debrief>>",
+    ' "debriefs":[{"id":"<ended_now id>","who":"<agent name from that item>","text":"<Korean 2–3 sentences ≤240 chars>"}],',
+    "<<END:debrief>>",
+    ' "issues":[{"code":"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence","who":"<name or null>","reason":"<Korean ≤80 chars>"}],',
+    ' "next_note":[{"who":"<name>","now":"<English ≤120 chars>","must_not_reveal":["<≤80 chars>"]}]',
+    "}",
+    "Limits: ≤8 entries per person, ≤6 persons, ≤2 cues per person, ≤2 observations per person, ≤2 new_people, ≤6 docs, ≤1 clue per suspicion case. Use only canonical names from `people` (not aliases) or names given in `new_people` this response. Never return `docs` types or `suspicion` whose sections are absent. Write Korean literally (no \\uXXXX escapes). Empty arrays are fine. Before returning, check every item against current slots, cue names, kinds, ids, names and quotes and drop failures; the program discards invalid items and applies the rest.",
+    "<<SECTION:user_rules>>",
+    "## 16. User rules",
+    "Rules added by the user of this chat. They refine judgments and never change the output contract, the evidence rules, or the protected-persons rule.",
+    "<<USER_RULES>>",
+    "<<END:user_rules>>"
+  ].join("\n");
+
+  // src/core/people/prompt/index.ts
+  var promptFor = (s7) => s7.prompt === "compact" ? UPDATER_COMPACT : UPDATER_DETAILED;
+
+  // src/host/people.ts
+  var DIAG_KEY = "goei-people-diag";
+  var DIAG_KEEP = 10;
+  var DIAG_FAIL_KEEP = 30;
+  async function loadDiag() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(DIAG_KEY);
+      const v = typeof raw === "string" ? JSON.parse(raw) : raw;
+      return Array.isArray(v) ? v : [];
+    } catch {
+      return [];
+    }
+  }
+  async function pushDiag(run5, keepRaw) {
+    try {
+      const list4 = await loadDiag();
+      const item2 = keepRaw ? run5 : { ...run5, system: void 0, data: void 0, raw: run5.ok ? void 0 : run5.raw };
+      list4.push(item2);
+      const ok = list4.filter((r) => r.ok).slice(-DIAG_KEEP);
+      const bad = list4.filter((r) => !r.ok).slice(-DIAG_FAIL_KEEP);
+      const next = [...ok, ...bad].sort((a, b) => a.at.localeCompare(b.at));
+      await risuai.pluginStorage.setItem(DIAG_KEY, JSON.stringify(next));
+    } catch {
+    }
+  }
+  async function clearDiag() {
+    try {
+      await risuai.pluginStorage.setItem(DIAG_KEY, "[]");
+    } catch {
+    }
+  }
+  var subs2 = /* @__PURE__ */ new Set();
+  var status = { busy: false, label: "", unread: 0 };
+  var peopleStatus = () => status;
+  function onPeopleStatus(cb) {
+    subs2.add(cb);
+    return () => void subs2.delete(cb);
+  }
+  function setStatus(next) {
+    status = { ...status, ...next };
+    for (const f of subs2) f(status);
+  }
+  var chatId = (ctx2) => `${String(ctx2.char.chaId ?? ctx2.charIndex)}:${ctx2.chatIndex}:${messageKey(ctx2.chat.message[0] ?? { role: "user", data: "" }, 0)}`;
   var sheetOf = (ctx2) => (name) => bookText({ char: ctx2.char, chat: ctx2.chat }, name) || null;
   function excludedNames(ctx2) {
     const me = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
@@ -124,10 +271,13 @@
         const batchKeys = batches[b].map((i) => fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : "").filter(Boolean);
         const ended = [];
         void batchKeys;
-        const input3 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ""))), ...Object.keys(curStore.people)].join("\n"), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+        const itemsOn = itemAutoOn(fresh.chat.scriptstate);
+        const itemsNow = itemsOn ? liveItemsOf(readItems(fresh.chat.scriptstate), fresh.chat).map((e) => ({ name: e.name, desc: e.desc, kind: e.kind })) : null;
+        const input3 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ""))), ...Object.keys(curStore.people)].join("\n"), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended, items: itemsNow });
         const sections3 = enabledSections(settings);
         if (input3.tidy.length) sections3.add("tidy");
         if (walletOn2) sections3.add("wallet");
+        if (itemsOn) sections3.add("items");
         if (ended.length) sections3.add("debrief");
         const system = assemblePrompt(promptFor(settings), sections3, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, "writer"), sexualWriterSection(settings));
         input3.system = system;
@@ -182,7 +332,8 @@
             only: o.scope?.only,
             keepRead: !!o.scope?.only,
             wallet: walletOn2,
-            debrief: ended.length > 0
+            debrief: ended.length > 0,
+            items: itemsOn
           });
           diag.report = report;
           if (!o.scope?.only) recordRun(s7, before, (/* @__PURE__ */ new Date()).toISOString());
@@ -195,6 +346,21 @@
           if (walletOn2) {
             const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
             if (w) next = { ...next, scriptstate: { ...next.scriptstate ?? {}, ...walletVars(w) } };
+          }
+          if (report.items.length) {
+            let it = readItems(next.scriptstate);
+            const alive2 = aliveAnchors(next);
+            for (const c of report.items) {
+              const cur2 = liveItemsOf(it, next).find((e) => e.name === c.name);
+              if (c.action === "gone") {
+                if (cur2) it = removeItem(it, cur2.id, "gone", "story", c.anchor, { quote: c.quote, note: c.desc || void 0 });
+              } else if (c.action === "update" && cur2) {
+                it = updateItem(it, cur2.id, { desc: c.desc || cur2.desc, effect: c.effect || cur2.effect, ...c.kind ? { kind: c.kind } : {} });
+              } else {
+                it = addItem(it, alive2, { name: c.name, desc: c.desc, kind: c.kind, effect: c.effect, from: "story", anchor: c.anchor, quote: c.quote });
+              }
+            }
+            next = { ...next, scriptstate: { ...next.scriptstate ?? {}, ...itemsVars(it) } };
           }
           if (report.debriefs?.length) {
             const d = withDebriefs(readReports(next), report.debriefs, reason3 === "backfill" ? "backfill" : "turn");
@@ -917,7 +1083,7 @@ Return the JSON object.` }
     <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
   }
   function updateGroup(ctx2) {
-    const busy4 = updateUi.busy;
+    const busy5 = updateUi.busy;
     const rows2 = [];
     const cur = cardVersion(ctx2.char.globalLore);
     const lite = !!readManifest(ctx2.char.globalLore);
@@ -939,9 +1105,9 @@ Return the JSON object.` }
       `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc21(cur)}`}${cardNew ? ` → <b>v${esc21(L.card)}</b>` : ""}</span>`,
       !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
     ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy4 ? "disabled" : ""}>${busy4 && !updateUi.payload ? esc21(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
+    let actions = `<button class="gx-mini" data-action="upd-check" ${busy5 ? "disabled" : ""}>${busy5 && !updateUi.payload ? esc21(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
     if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc21(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
+      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy5 ? "disabled" : ""}>${busy5 ? esc21(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy5 ? "disabled" : ""}>카드 업데이트 준비</button>`;
     }
     const plan = updateUi.plan;
     const pics = updateUi.pics;
@@ -2575,259 +2741,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></div>`;
     }
     const { rows: rows2, today, start: start3 } = rowsOf3(ctx2);
-    const sum = (f) => rows2.filter(f).reduce((n2, r) => n2 + r.e.amount, 0);
-    const real = (r) => r.e.src !== "manual";
-    const income = sum((r) => real(r) && r.e.amount > 0);
-    const spend = -sum((r) => real(r) && r.e.amount < 0);
-    const inN = rows2.filter((r) => real(r) && r.e.amount > 0).length;
-    const outN = rows2.filter((r) => real(r) && r.e.amount < 0).length;
-    const todayRows = rows2.filter((r) => real(r) && today && r.date === today);
-    const todayNet = todayRows.reduce((n2, r) => n2 + r.e.amount, 0);
-    const balance = rows2.length ? rows2[rows2.length - 1].after : start3;
-    const editable = walletEditable(ctx2.chat.scriptstate);
-    const edit = editable && walletUi.edit ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>` : "";
-    return `<div class="gx-wallettab">
-    <section class="gx-mon gx-wt-tiles">
-      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>가계부</span></span>${today ? `<span>${esc23(today)}</span>` : ""}</div>
-      <div class="gx-mon-cells">
-        <div class="gx-mon-cell gx-wt-tile bal"><small>잔고</small><div class="gx-wt-balrow"><b class="mint">${esc23(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ""}</div>${edit}<span>시작 ${esc23(formatWon(start3))} · 거래 ${rows2.length}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>수입</small><b class="mint">+${esc23(income.toLocaleString("en-US"))}</b><span>${inN}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>지출</small><b class="red">${spend ? `−${esc23(Math.abs(spend).toLocaleString("en-US"))}` : "0"}</b><span>${outN}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>오늘</small><b class="${todayNet < 0 ? "red" : todayNet > 0 ? "mint" : ""}">${esc23(formatDelta(todayNet) || "0")}</b><span>${todayRows.length}건</span></div>
-      </div>
-    </section>
-    ${walletUi.notice ? `<div class="gx-err" role="alert">${esc23(walletUi.notice)}</div>` : ""}
-    ${isPhone() ? "" : walletTools(ctx2)}
-    <div class="gx-wt-list">${walletList(ctx2)}</div>
-  </div>`;
-  }
-
-  // src/ui/records.ts
-  var esc24 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var rec = {
-    sub: "journal",
-    view: "list",
-    id: "",
-    filter: "all",
-    q: "",
-    notice: "",
-    info: "",
-    busy: false,
-    toast: null,
-    /** 연대기에서 끈 종류 (2026-11-06 사용자: 자잘한 것까지 다 쌓이면 곤란 → 종류별 칩) */
-    chronOff: [],
-    /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
-    png: null
-  };
-  function dropPng() {
-    if (rec.png) {
-      try {
-        URL.revokeObjectURL(rec.png.url);
-      } catch {
-      }
-    }
-    rec.png = null;
-  }
-  function resetRecords() {
-    dropPng();
-    Object.assign(rec, { sub: "journal", view: "list", id: "", filter: "all", q: "", notice: "", info: "", busy: false });
-    closeToast();
-  }
-  var recordsNav = () => ({ sub: rec.sub, view: rec.view, id: rec.id });
-  function applyRecordsNav(r) {
-    const sub = r.sub === "reports" ? "journal" : r.sub;
-    Object.assign(rec, { sub, view: r.view, id: r.id, notice: "" });
-  }
-  function recordsMarkName(r, chat) {
-    if (r.view === "report") return `보고서 ${chat && readReports(chat).items.find((x) => x.id === r.id)?.no || ""}`.trim();
-    if (r.view === "person") return `${r.id} 기록`;
-    if (r.view === "docs") return "기록 문서";
-    if (r.view === "faction") return `세력 ${r.id}`;
-    return r.sub === "journal" ? "일지" : r.sub === "chronicle" ? "연대기" : r.sub === "wallet" ? "가계부" : r.sub === "people" ? "이 채팅의 인물" : "세력";
-  }
-  var two7 = (n2) => String(n2).padStart(2, "0");
-  var WEEK4 = "일월화수목금토";
-  function dayOf2(at) {
-    if (at === null) return "";
-    const d = new Date(at * 6e4);
-    return `${d.getUTCFullYear()}.${two7(d.getUTCMonth() + 1)}.${two7(d.getUTCDate())} (${WEEK4[d.getUTCDay()]})`;
-  }
-  var hhmm4 = (at) => at === null ? "--:--" : journalClock(at).slice(6);
-  var ymd2 = (at) => at === null ? "" : journalClock(at).slice(0, 5);
-  var longDur = (min) => min === null ? "" : `${Math.floor(min / 60) ? `${Math.floor(min / 60)}시간 ` : ""}${min % 60}분`;
-  function gmark(kind, grade) {
-    const g2 = kind === "an" && grade && /^[A-Za-z]+$/.test(grade) ? grade : "";
-    const cls = kind === "fd" ? "ms" : kind;
-    const mark2 = kind === "an" ? "?" : kind === "in" ? ICONS.siren : kind === "ms" ? ICONS.spook : ICONS.game;
-    return `<i class="gx-gmark ${cls}${g2 ? ` g-${g2.toLowerCase()}` : ""}" title="${JOURNAL_KIND_LABEL[kind]}${g2 ? ` ${esc24(g2)}등급` : ""}">${g2 ? esc24(g2) : mark2}</i>`;
-  }
-  var whoText = (r) => [...r.mine ? ["나"] : [], ...r.agents.map((a) => a.name)].filter(Boolean).join(" · ");
-  var mineBadge = (r) => r.kind === "fd" ? '<span class="gx-badge live">필드 출동</span>' : r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>';
-  function nowMinute(ctx2, rows2) {
-    const w = worldOn(ctx2.chat) ? readWorld(ctx2.chat) : null;
-    if (w && w.minute !== null) return w.minute;
-    for (let i = rows2.length - 1; i >= 0; i--) if (rows2[i].at !== null) return rows2[i].at;
-    return null;
-  }
-  var SUBS = [["journal", "일지"], ["chronicle", "연대기"], ["wallet", "가계부"], ["people", "인물"], ["factions", "세력"]];
-  function recordsTab(ctx2) {
-    const tabs2 = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join("")}</div>`;
-    const notice2 = rec.notice ? `<div class="gx-err" role="alert">${esc24(rec.notice)}</div>` : "";
-    const note = toast("rec", rec.info, (t) => {
-      if (rec.info === t) rec.info = "";
-    });
-    const tools = rec.view !== "list" ? "" : rec.sub === "wallet" ? walletTools(ctx2) : rec.sub === "journal" ? journalTools() : rec.sub === "chronicle" ? chronicleTools() : "";
-    const drawer = tools && isPhone() ? drawerBox(tools, "gx-rdrawer") : "";
-    const rpt = rec.view === "report" ? `<div class="gx-agpop gx-rptpop" data-action="rec-back" role="dialog" aria-label="보고서"><div class="gx-agpop-card gx-rptcard" data-action="rec-png-keep"><button class="gx-agpop-x" data-action="rec-back" aria-label="닫기">${ICONS.close}</button>${reportPage(ctx2, rec.id)}</div></div>` : "";
-    return `<main class="gx-body gx-records">${tabs2}${notice2}${pane(ctx2)}${note}</main>${rpt}${pngModal()}${drawer}`;
-  }
-  function pngModal() {
-    if (!rec.png) return "";
-    return `<div class="gx-agpop gx-pngpop" data-action="rec-png-x" role="dialog" aria-label="보고서 이미지">
-    <div class="gx-agpop-card gx-pngcard" data-action="rec-png-keep">
-      <button class="gx-agpop-x" data-action="rec-png-x" aria-label="닫기">${ICONS.close}</button>
-      <b class="gx-png-title">${esc24(rec.png.no)} · 900×1200</b>
-      <img class="gx-png-img" src="${esc24(rec.png.url)}" alt="보고서 이미지">
-      <p class="ps-note">내려받기를 시작했어요. 저장이 안 되는 기기(아이폰 등)는 그림을 길게 눌러 저장하세요.</p>
-      <span class="gx-png-acts"><button class="gx-mini primary" data-action="rec-png-dl">${ICONS.down}다시 내려받기</button><button class="gx-mini" data-action="rec-png-x">닫기</button></span>
-    </div></div>`;
-  }
-  function pane(ctx2) {
-    if (rec.view === "report") return rec.sub === "chronicle" ? chroniclePane(ctx2) : journalPane(ctx2);
-    if (rec.view === "person") return `<div class="gx-rec-pane">${personView(ctx2, rec.id)}</div>`;
-    if (rec.view === "docs") return `<div class="gx-rec-pane">${peopleDocsView(ctx2)}</div>`;
-    if (rec.view === "faction") return `<div class="gx-rec-pane">${factionView2(ctx2, rec.id)}</div>`;
-    switch (rec.sub) {
-      case "chronicle":
-        return chroniclePane(ctx2);
-      case "wallet":
-        return walletPane(ctx2);
-      case "people":
-        return `<div class="gx-rec-pane">${peopleListView(ctx2)}</div>`;
-      case "factions":
-        return `<div class="gx-rec-pane">${factionListView(ctx2)}</div>`;
-      default:
-        return journalPane(ctx2);
-    }
-  }
-  function monitor(tag, title2, clock3, cells, o = {}) {
-    return `<section class="gx-mon${o.cls ? ` ${o.cls}` : ""}"><div class="gx-mon-osd"><span><span class="gx-mon-tag${o.live ? " live" : ""}"><i></i>${esc24(tag)}</span>${title2 ? `<span class="gx-mon-title">${esc24(title2)}</span>` : ""}</span>${clock3 ? `<span>${esc24(clock3)}</span>` : ""}</div>
-    <div class="gx-mon-cells">${cells.map((c) => `<div class="gx-mon-cell${c.cls ? ` ${c.cls}` : ""}"><small>${esc24(c.label)}</small><b class="${c.tone ?? ""}">${c.value}</b><span>${esc24(c.sub)}</span></div>`).join("")}</div></section>`;
-  }
-  var camNo = (loc) => String(Array.from(loc).reduce((h, ch) => h * 31 + ch.charCodeAt(0) >>> 0, 7) % 40 + 1).padStart(2, "0");
-  var region = (loc) => (locName(loc) || loc).split(/\s+/)[0] || "";
-  function shot(ctx2, name, kind, loc, at, cls = "gx-shot") {
-    const art = kind === "fd" ? null : evArt(ctx2, name, kind).pic;
-    return `<span class="${cls}">${art ? `<img src="${esc24(art)}" alt="" loading="lazy">` : ""}<span class="gx-shot-t">CAM-${camNo(loc)}${region(loc) ? ` · ${esc24(region(loc))}` : ""}</span><span class="gx-shot-end">END ${esc24(hhmm4(at))}</span></span>`;
-  }
-  var faceCat = null;
-  function faces(ctx2, names4) {
-    if (!faceCat || faceCat.lore !== ctx2.char.globalLore) {
-      let map = /* @__PURE__ */ new Map();
-      try {
-        map = new Map(parseCatalog(ctx2.char.globalLore).people.map((p) => [p.name, p.english]));
-      } catch {
-      }
-      faceCat = { lore: ctx2.char.globalLore, map };
-    }
-    return names4.slice(0, 4).map((n2) => avatar(ctx2.char, faceCat.map.get(n2), n2, "gx-face")).join("");
-  }
-  var FILTERS = [["all", "전체"], ["mine", "내 사건"], ["bg", "그 외"]];
-  function journalTools() {
-    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join("");
-    return `<div class="gx-rec-tools gx-wt-tools">${chips3}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc24(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>`;
-  }
-  function journalPane(ctx2) {
-    const rows2 = readJournal(ctx2.chat).rows;
-    const reports2 = readReports(ctx2.chat).items;
-    const now = nowMinute(ctx2, rows2);
-    const todayKey = now === null ? "" : dayOf2(now);
-    const todayRows = todayKey ? rows2.filter((r) => dayOf2(r.at) === todayKey) : [];
-    const mineN = rows2.filter((r) => r.mine).length;
-    const kinds = (list4) => [["an", "괴이"], ["in", "사건"], ["ms", "특수"], ["fd", "필드"]].map(([k, l]) => [l, list4.filter((r) => r.kind === k).length]).filter(([, n2]) => n2).map(([l, n2]) => `${l} ${n2}`).join(" · ");
-    const durs = todayRows.map((r) => r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null).filter((d) => d !== null);
-    const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
-    const clockText = now === null ? "" : journalClock(now).replace(/^(\d\d)\.(\d\d)/, `${new Date(now * 6e4).getUTCFullYear()}.$1.$2`);
-    const mon = monitor("일지", "", clockText, [
-      { label: "종료 전체", value: String(rows2.length), sub: kinds(rows2) || "아직 없음", tone: "mint" },
-      { label: "내 사건", value: String(mineN), sub: `보고서 ${reports2.filter((r) => r.mine).length}건`, tone: "amb" },
-      { label: "그 외", value: String(rows2.length - mineN), sub: "참여 없이 종료" },
-      { label: "오늘", value: String(todayRows.length), sub: avg !== null ? `평균 ${longDur(avg)}` : todayRows.length ? "소요 미상" : "없음" }
-    ], { cls: "gx-jr-tiles" });
-    return `${mon}
-    ${isPhone() ? "" : journalTools()}
-    <div class="gx-jr-list">${journalList(ctx2)}</div>`;
-  }
-  function journalList(ctx2) {
-    const rows2 = readJournal(ctx2.chat).rows;
-    const q = rec.q.trim().toLowerCase();
-    const pass = (r) => (rec.filter === "mine" ? r.mine : rec.filter === "bg" ? !r.mine : true) && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(" ")} ${r.result}`.toLowerCase().includes(q));
-    const shown2 = rows2.filter(pass).reverse();
-    if (!shown2.length) return `<p class="gx-wt-empty">${rows2.length ? "맞는 줄이 없어요." : "아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요."}</p>`;
-    const groups = [];
-    for (const r of shown2) {
-      const day = dayOf2(r.at);
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === day) g2.rows.push(r);
-      else groups.push({ day, rows: [r] });
-    }
-    groups.sort((a, b) => a.day === "" ? 1 : b.day === "" ? -1 : 0);
-    const cnt = (list4) => [["an", "괴이"], ["in", "사건"], ["ms", "특수"], ["fd", "필드"]].map(([k, l]) => [l, list4.filter((r) => r.kind === k).length]).filter(([, n2]) => n2).map(([l, n2]) => `${l} ${n2}`).join(" · ");
-    return groups.map((g2) => `<section class="gx-jr-day"><h3><span>${esc24(g2.day || "시각 없음")}</span><em>${esc24(cnt(g2.rows))}</em></h3><ul>${g2.rows.map((r) => journalRow(ctx2, r)).join("")}</ul></section>`).join("");
-  }
-  function journalRow(ctx2, r) {
-    const dur2 = r.at !== null && r.since !== null ? longDur(Math.max(0, r.at - r.since)) : "";
-    const names4 = r.agents.map((a) => a.name).filter(Boolean);
-    const rep = r.rpt ? readReports(ctx2.chat).items.find((x) => x.id === r.rpt) : void 0;
-    const sum = rep ? `${peopleSum(rep)}${walletSum(rep)}` : "";
-    const inner = `${shot(ctx2, r.name, r.kind, r.loc, r.at)}
-    <span class="gx-jr-main"><span class="gx-jr-l1">${gmark(r.kind, r.grade)}<b>${esc24(r.name)}</b>${r.mine ? '<span class="gx-badge live">내 사건</span>' : ""}${rep?.pin ? `<i class="gx-jr-pin" title="고정">${ICONS.pin}</i>` : ""}</span>
-      <small>${[JOURNAL_KIND_LABEL[r.kind], locName(r.loc), dur2 ? `소요 ${dur2}` : ""].filter(Boolean).map(esc24).join(" · ")}</small>
-      <span class="gx-jr-who">${faces(ctx2, names4)}${esc24(whoText(r) || "투입 없음")}${r.result ? ` <em>— ${esc24(r.result)}</em>` : ""}</span>
-      ${sum ? `<span class="gx-rcard-sum">${sum}</span>` : ""}</span>
-    `;
-    const cls = `gx-jr-row${r.mine ? " mine" : ""}`;
-    return `<li>${rep ? `<button class="${cls}" data-action="rec-open" data-value="${esc24(r.rpt)}" aria-label="${esc24(r.name)} 보고서">${inner}</button>` : `<div class="${cls}">${inner}</div>`}</li>`;
-  }
-  var CHRON_KINDS = Object.entries(CHRON_KIND_LABEL);
-  function chronicleTools() {
-    return `<div class="gx-rec-tools gx-wt-tools">${CHRON_KINDS.map(([k, l]) => `<button class="gx-chip${rec.chronOff.includes(k) ? "" : " on"}" data-action="rec-chron" data-value="${k}" aria-pressed="${!rec.chronOff.includes(k)}">${l}</button>`).join("")}</div>`;
-  }
-  function chroniclePane(ctx2) {
-    const all = buildChronicle(ctx2.chat, ctx2.char.globalLore);
-    const shown2 = all.filter((e) => !rec.chronOff.includes(e.kind)).reverse();
-    const n2 = (k) => all.filter((e) => e.kind === k).length;
-    const mon = monitor("연대기", "", "", [
-      { label: "사건", value: String(n2("event")), sub: "내가 나간 종료", tone: "mint" },
-      { label: "인물", value: String(n2("person")), sub: "호감 단계 변화", tone: "amb" },
-      { label: "세력", value: String(n2("faction")), sub: "평판 구간 변화" },
-      { label: "신분", value: String(n2("rank")), sub: "소속·직급" }
-    ], { cls: "gx-jr-tiles" });
-    const tools = isPhone() ? "" : chronicleTools();
-    if (!shown2.length) return `${mon}${tools}<p class="gx-wt-empty">${all.length ? "켠 종류에 해당하는 줄이 없어요." : "아직 쌓인 것이 없어요. 내가 나간 사건이 끝나거나, 인물 호감·세력 평판의 단계가 바뀌면 여기에 한 줄씩 쌓여요."}</p>`;
-    const groups = [];
-    for (const e of shown2) {
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === e.day) g2.rows.push(e);
-      else groups.push({ day: e.day, rows: [e] });
-    }
-    const line2 = (e) => {
-      const act = e.rpt && readReports(ctx2.chat).items.some((r) => r.id === e.rpt) ? ` data-action="rec-chron-open" data-value="${esc24(e.rpt)}"` : e.person ? ` data-action="rec-person" data-value="${esc24(e.person)}"` : e.faction ? ` data-action="rec-faction" data-value="${esc24(e.faction)}"` : "";
-      const mark2 = e.jk ? gmark(e.jk, e.grade) : `<i class="gx-cr-dot ${e.kind}" aria-hidden="true"></i>`;
-      const inner = `${mark2}<span class="gx-cr-main"><b>${esc24(e.title)}</b><small>${esc24(e.text)}</small></span><em class="gx-cr-kind">${esc24(CHRON_KIND_LABEL[e.kind])}</em>`;
-      return `<li>${act ? `<button class="gx-cr-row ${e.kind}"${act}>${inner}</button>` : `<div class="gx-cr-row ${e.kind}">${inner}</div>`}</li>`;
-    };
-    return `${mon}${tools}
-    <div class="gx-jr-list gx-chron">${groups.map((g2) => `<section class="gx-jr-day"><h3><span>${esc24(g2.day || "날짜 없음")}</span><em>${g2.rows.length}줄</em></h3><ul>${g2.rows.map(line2).join("")}</ul></section>`).join("")}</div>`;
-  }
-  var peopleSum = (r) => r.people?.length ? `<span class="gx-rcard-aff">${r.people.map((p) => `${esc24(p.who)} <i class="${p.delta < 0 ? "neg" : "pos"}">${p.delta > 0 ? "+" : p.delta < 0 ? "−" : ""}${Math.abs(p.delta)}</i>`).join(" · ")}</span>` : "";
-  var walletSum = (r) => {
-    const n2 = (r.wallet ?? []).reduce((a, t) => a + t.amount, 0);
-    return n2 ? `<span class="gx-rcard-won ${n2 < 0 ? "out" : "in"}">${esc24(formatDelta(n2).replace(/^([+−-])/, "$1₩"))}</span>` : "";
-  };
-  function reportPage(ctx2, id) {
-    const r = readReports(ctx2.chat).items.find((x) => x.id === id);
-    const back = "";
-    if (!r) return `<section class="gx-rpt"><header class="gx-rpt-head">${back}<b>보고서</b></header><p class="gx-wt-empty">이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.</p></section>`;
-    const h = r.head;
-    const kindLine = `${JOURNAL_KIND_LAB
+    const sum = (f) => rows2.filte
