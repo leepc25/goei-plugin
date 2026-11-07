@@ -10,7 +10,7 @@ export function makeMatcher(table) {
   // 몸통 말(head_rep에 있는 말)은 ①에서 쓰지 않음 → 특징 점수(②)·대표(③)로 감
   for (const r of rows) for (const k of r.keywords || []) { const n = norm(k); if (n.length >= 2 && !rep[n]) kws.push([n, r]); }
   kws.sort((a, b) => b[0].length - a[0].length);
-  const fileOf = r => r.own_file || r.file;
+  const fileOf = r => r.file; // merged_into 줄은 file이 대표 그림
   const base = {};
   for (const r of rows) if (r.base) base[r.kind] = fileOf(r);
   const has = (name, w) => { const n = norm(w); return n.length >= 1 && (` ${name} `.includes(` ${n} `) || (/[가-힣]/.test(n) && n.length >= 2 && name.includes(n)) || (/[가-힣]/.test(n) && n.length === 1 && ` ${name} `.includes(` ${n} `))); };

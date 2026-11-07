@@ -850,7 +850,9 @@
    "keywords": [
     "우리가 도움",
     "빨간 버튼",
-    "emergency red button"
+    "emergency red button",
+    "위 헬프!",
+    "we help"
    ],
    "file": "device_163.webp",
    "kind": "device",
@@ -4684,7 +4686,7 @@
     "we help",
     "emergency button"
    ],
-   "file": "anomaly_013.webp",
+   "file": "device_163.webp",
    "kind": "anomaly",
    "base": false,
    "name": "위 헬프!",
@@ -4697,7 +4699,9 @@
     "긴급",
     "탈출",
     "emergency"
-   ]
+   ],
+   "merged_into": "우리가 도움",
+   "own_file": "anomaly_013.webp"
   },
   {
    "keywords": [
@@ -10386,11 +10390,35 @@
   },
   {
    "keywords": [
+    "입 달린 배낭",
+    "mouth backpack",
+    "이빨 달린 배낭"
+   ],
+   "file": "anomaly_135.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "입 달린 배낭",
+   "src": "game-src/items/raw/batch_111/06.png",
+   "head": [
+    "배낭",
+    "가방",
+    "backpack",
+    "bag"
+   ],
+   "feats": [
+    "입",
+    "이빨",
+    "mouth",
+    "teeth"
+   ]
+  },
+  {
+   "keywords": [
     "가면 동물, 주인 없음",
     "가면",
     "가면(동물, 주인 없음)",
-    "동물 가면",
-    "animal mask"
+    "여우 가면",
+    "fox mask"
    ],
    "file": "anomaly_096.webp",
    "kind": "anomaly",
@@ -14051,6 +14079,31 @@
     "metal case 2"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "입 달린 가방",
+    "입 달린 핸드백",
+    "mouth bag",
+    "mouth handbag"
+   ],
+   "file": "anomaly_245.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "입 달린 가방",
+   "src": "game-src/items/raw/batch_202/11.png",
+   "head": [
+    "가방",
+    "핸드백",
+    "bag",
+    "handbag"
+   ],
+   "feats": [
+    "입",
+    "이빨",
+    "mouth",
+    "teeth"
+   ]
   },
   {
    "keywords": [
@@ -19565,7 +19618,10 @@
   {
    "keywords": [
     "동물 가면",
-    "animal mask"
+    "animal mask",
+    "토끼 가면",
+    "rabbit mask",
+    "bunny mask"
    ],
    "file": "wear_005.webp",
    "kind": "wear",
@@ -24110,8 +24166,7 @@
   {
    "keywords": [
     "모방 장비",
-    "mimic gear",
-    "모방 머플러"
+    "mimic gear"
    ],
    "file": "anomaly_057.webp",
    "kind": "anomaly",
@@ -24120,8 +24175,7 @@
    "src": "game-src/items/raw/batch_54/15.png",
    "head": [
     "장비",
-    "gear",
-    "머플러"
+    "gear"
    ],
    "feats": [
     "모방",
@@ -27360,26 +27414,6 @@
   },
   {
    "keywords": [
-    "입 달린 가방",
-    "mouth bag"
-   ],
-   "file": "anomaly_135.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "입 달린 가방",
-   "src": "game-src/items/raw/batch_111/06.png",
-   "head": [
-    "가방",
-    "bag"
-   ],
-   "feats": [
-    "입",
-    "이빨",
-    "mouth"
-   ]
-  },
-  {
-   "keywords": [
     "상처 봉합 젤",
     "wound gel"
    ],
@@ -27472,26 +27506,6 @@
     "videotape"
    ],
    "feats": []
-  },
-  {
-   "keywords": [
-    "입 달린 가방",
-    "mouth bag"
-   ],
-   "file": "anomaly_245.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "입 달린 가방",
-   "src": "game-src/items/raw/batch_202/11.png",
-   "head": [
-    "가방",
-    "bag"
-   ],
-   "feats": [
-    "입",
-    "이빨",
-    "mouth"
-   ]
   },
   {
    "keywords": [
