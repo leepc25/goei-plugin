@@ -26,7 +26,7 @@ const items = [
   ['pipe', '쇠파이프', '무기', 7000, 4, '절단해 둔 1m 쇠파이프.', '근접 공격'],
   ['taser', '전기충격기', '장비', 65000, 1, '허가증 없이 판다는 얘기는 하지 않는다.', '대상 기절 가능'],
   ['ext', '소화기', '도구', 38000, 2, '점검표가 붙은 분말 소화기.', '불 끄기'],
-  ['spray', '호신 스프레이', '소모품', 15000, 5, '캡슐 하나짜리 호신 스프레이.', '대상 시야 방해'],
+  ['spray', '호신용 최루 스프레이 (대용량)', '소모품', 15000, 5, '캡슐 하나짜리 호신 스프레이.', '대상 시야 방해'],
   ['sword', '낡은 검', '무기', 1538000, 1, '벽에 걸려 있던 것. 주인은 값을 깎지 않는다.', '근접 공격 강화'],
 ];
 // ── 규격(기존 소지품·기록 틀 그대로): 조작 34px(폰 40)·모서리 조작 10/칸 12/안쪽 8 · 글 13.5/1.5·메타 12.5·제목 16 · 금액 mono 700 14(상세 머리만 16) · 색은 테마 변수만
@@ -34,7 +34,7 @@ const amt = (n, cls = '') => `<em class="sh-amt${cls ? ' ' + cls : ''}">${won(n)
 const cell = (it, i, sel) => {
   const [p, name, , price] = it;
   const poor = price > BAL;
-  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><span class="sh-band">${price.toLocaleString('ko-KR')}</span>${tip(it)}</button>`;
+  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><span class="sh-nm"><b>${name}</b></span><span class="sh-band">${price.toLocaleString('ko-KR')}</span>${tip(it)}</button>`;
 };
 const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kind}</span>재고 ${stock}</small>`;
 const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
@@ -50,7 +50,7 @@ const detail = (it) => {
   return `<div class="gx-agpop it-pop sh-det"><div class="gx-agpop-card it-card"><button class="gx-agpop-x">✕</button>
   <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b>${meta(kind, stock)}${amt(price, 'big')}</div></div>
   <p>${desc}</p><p class="ef">효과: ${ef}</p>${money}
-  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>사기</button><button class="gx-chip">자세히</button></div></div></div>`;
+  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button><button class="gx-chip">자세히</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
   const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1);
@@ -83,7 +83,7 @@ const css = `
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
 .sh-q{position:relative;display:inline-flex;width:300px}.sh-q .gx-wt-q{width:100%;max-width:none;margin:0;padding:0 38px 0 12px}.sh-go{position:absolute;right:4px;top:4px;width:calc(var(--h) - 8px);height:calc(var(--h) - 8px);border:0;border-radius:var(--ri);background:var(--accent-bg);color:var(--signal);font:700 14px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
-.sh-c b{font-size:13.5px;padding-top:7px;color:var(--text)}
+.sh-nm{display:flex;align-items:center;justify-content:center;min-height:calc(13.5px * 1.3 * 2);margin-top:6px}.sh-c b{font-size:13.5px;padding:0;color:var(--text);white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;word-break:keep-all;overflow-wrap:anywhere}
 .sh-band{display:block;padding:3px 0 5px;color:var(--signal);font:600 12.5px/1.2 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 .sh-c.poor .sh-band{color:var(--red)}
 /* 말풍선: 제목 14 · 메타 12.5 · 금액 14 · 글 13/1.5 */
