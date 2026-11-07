@@ -85,7 +85,7 @@ export function lookUrl(r: LookRow): string {
   return u;
 }
 
-/** 대기 동작 한 벌: 시트 주소 + 장 수·장 크기·장 길이. 그리는 쪽은 1배(픽셀 그대로), steps(frames) 로 돌린다 */
+/** 정면 대기 동작 한 벌: 시트 주소 + 장 수·장 크기·장 길이. 그리는 쪽은 1배(픽셀 그대로), steps(frames) 로 돌린다 */
 export interface IdleLook {
   id: string;
   /** 시트 blob: 주소 (가로로 frames 장) */
@@ -96,8 +96,6 @@ export interface IdleLook {
   h: number;
   /** 장 하나 길이 (초) */
   sec: number;
-  /** 왼쪽을 보는 그림이면 true (좌우 뒤집어 오른쪽을 보게) */
-  flip: boolean;
   /** 원래 칸(128×256) 크기와 그 안의 자리 — 여러 인물을 같은 발밑에 맞출 때 */
   box: { w: number; h: number; ox: number; oy: number };
 }
@@ -109,7 +107,6 @@ export const idleOf = (r: LookRow): IdleLook => ({
   w: r.cw,
   h: r.ch,
   sec: LOOK_FRAME_SEC,
-  flip: r.dir === 'W' || r.dir === 'SW',
   box: { w: r.w, h: r.h, ox: r.ox, oy: r.oy },
 });
 
