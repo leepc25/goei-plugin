@@ -9,13 +9,11 @@ import { phoneSettings } from '../../core/phone';
 import { viewSettings, VIEW_PRESETS } from '../../core/phoneView';
 import { gnetSettings } from '../../core/gnet';
 import { wikiSettings } from '../../core/wiki';
-import { journalSettings } from '../../core/journal';
 import { promptTokens } from '../../core/budget';
 import { tokenizerName } from '../../core/tokenizer';
 import type { LlmMessage } from '../../host/llm';
 import { previewPeopleCalls } from '../../host/people';
 import { previewAsset } from '../../host/asset';
-import { previewDebrief } from '../../host/journal';
 import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
@@ -52,7 +50,6 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
     const t = count(w.title);
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
-  safe('보고서 소감', () => count(previewDebrief(ctx)));
   safe('상점', () => count(previewShopShelf(ctx)));
   return map;
 }
@@ -117,7 +114,6 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const vw = viewSettings(ss);
   const gn = gnetSettings(ss);
   const nw = wikiSettings(ss);
-  const jr = journalSettings(ss);
   const ppModel = (st: Stage) => id(pp.stageModelId[st]) || mm(pp.stageModel[st]);
   const routerOn = pp.on && pp.router === 'model';
   const directorOn = pp.on && (pp.director === 'scene' || pp.director === 'facts');
@@ -143,7 +139,6 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
     { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
     { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
-    { name: '보고서 소감', sub: '사건이 끝난 턴에 보고서 소감', kind: 'aux', on: jr.debriefAuto, model: jr.debriefAuto ? '보조' : undefined, calls: jr.debriefAuto ? '사건 종료 턴에만 1회' : '호출 없음', page: 'set:journal', sure: 0, maybe: jr.debriefAuto ? 1 : 0 },
   ];
   const manual: Node[] = [
     { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', sure: 0, maybe: 0 },

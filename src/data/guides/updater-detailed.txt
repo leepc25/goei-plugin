@@ -436,13 +436,6 @@ The chat keeps the user's character's inventory; `items_now` lists what they car
 - At most 4 items per response; one entry per item; never invent an item or an effect.
 - Money is never an item: cash, bills, coins, cheques, gift certificates with a face value, and account balances belong to the ledger (`transactions`), not to `items`.
 <<END:items>>
-<<SECTION:debrief>>
-## 15c. Debrief — a deployed agent's short note on an incident that just ended
-
-`ended_now` lists incidents that ended in this span (id, kind, name, grade, place, deployed `agents`, `result`, last situation lines `trail_tail`, and `mine` = the user's character took part). The program already recorded the facts; you add only the voice.
-- For each item return one `debriefs` entry: `id` copied as given, `who` = one name from that item's `agents` (the one most involved in the confirmed span; the first when unsure), `text` = 2–3 Korean sentences (≤240 characters) in that agent's voice: what happened and how it felt, as an after-action note.
-- Use only facts from `ended_now` and the confirmed span. Never invent names, numbers, injuries or outcomes; never quote the span verbatim at length; no quotation marks around the whole note; no template symbols (double braces, double percent). One entry per incident; skip an incident only when `agents` is empty and nothing in the span tells who handled it.
-<<END:debrief>>
 <<SECTION:tidy>>
 ## 11. Tidying an oversized record
 
@@ -551,9 +544,6 @@ The object has these keys. Every key listed here is present; a key whose section
 <<SECTION:items>>
  "items":[{"name":"<Korean ≤30 chars>","action":"new|update|gone","desc":"<Korean ≤80 chars>","kind":"<one of item_kinds>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
 <<END:items>>
-<<SECTION:debrief>>
- "debriefs":[{"id":"<ended_now id>","who":"<agent name from that item>","text":"<Korean 2–3 sentences ≤240 chars>"}],
-<<END:debrief>>
  "issues":[{"code":"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence","who":"<name or null>","reason":"<Korean ≤80 chars>"}],
  "next_note":[{"who":"<name>","now":"<English ≤120 chars>","must_not_reveal":["<≤80 chars>"]}]
 }

@@ -6,8 +6,8 @@ import {
   TRAIL_CAP, buildClosures, readJournal, readReports, rewindClosures, trimJournal, trimReports, pinReport, recordVars, journalSettings, JR, JR_DEFAULTS,
   journalLine, mineReasons, periodOf, parseAgents, settings,
 } from '../dist-test/core.mjs';
-// 묶음 3: PNG 카드(순수 그리기)·소감 검사·저장
-import { paintReport, wrapText, PNG_W, PNG_H, validateDebrief, withDebriefs, endedInBatch, endedNowOf, DEBRIEF_PROMPT, emptyReports } from '../dist-test/core.mjs';
+// 묶음 3: PNG 카드(순수 그리기)
+import { paintReport, wrapText, PNG_W, PNG_H } from '../dist-test/core.mjs';
 
 const worldBook = {
   괴이: [
@@ -350,13 +350,13 @@ test('상한 설정대로 조립 때 잘린다', () => {
 
 test('기록 설정: 기본값·경계값·글자', () => {
   const d = journalSettings(undefined);
-  assert.deepEqual(d, { chatCard: 'mine', debriefAuto: true, journalCap: 500, reportCap: 100 });
+  assert.deepEqual(d, { chatCard: 'mine', journalCap: 500, reportCap: 100 });
   assert.equal(JR_DEFAULTS.chat_card, 'mine');
-  const s = journalSettings({ [JR('chat_card')]: 'off', [JR('debrief_auto')]: '0', [JR('journal_cap')]: '-5', [JR('report_cap')]: 'abc' });
-  assert.deepEqual(s, { chatCard: 'off', debriefAuto: false, journalCap: 100, reportCap: 100 });
+  const s = journalSettings({ [JR('chat_card')]: 'off', [JR('journal_cap')]: '-5', [JR('report_cap')]: 'abc' });
+  assert.deepEqual(s, { chatCard: 'off', journalCap: 100, reportCap: 100 });
   assert.equal(journalSettings({ [JR('chat_card')]: 'all' }).chatCard, 'all');
   assert.equal(journalSettings({ [JR('chat_card')]: 'weird' }).chatCard, 'mine');
-  for (const k of ['$jr_chat_card', '$jr_debrief_auto', '$jr_journal_cap', '$jr_report_cap']) assert.ok(settings.PREF_VAR.test(k), `${k} 는 「기본값으로 저장」 범위`);
+  for (const k of ['$jr_chat_card', '$jr_journal_cap', '$jr_report_cap']) assert.ok(settings.PREF_VAR.test(k), `${k} 는 「기본값으로 저장」 범위`);
   assert.ok(!settings.PREF_VAR.test('$goei_journal'), '기록 자체는 설정이 아니다');
 });
 
@@ -401,10 +401,10 @@ test('PNG 카드: 바탕 900×1200 부터, 머리·그림 틀·제목·시각 �
   assert.deepEqual(foot.slice(2), [48, 1124]);
   // 간이 보고서: 인물·가계부 구역 없음, 「요원 처리」 배지
   const g2 = fakeCtx();
-  const r2 = paintReport(g2, pngReport({ full: false, mine: false, people: undefined, wallet: undefined, balance: undefined, debrief: { who: '쟈알디', text: '힘들었다.', src: 'turn', at: '2025-01-01' } }), { colors: COLORS, sans: 'sans-serif', mono: 'monospace' });
-  assert.deepEqual(r2.sections, ['bg', 'head', 'art-empty', 'title', 'tiles', 'trail', 'agents', 'result', 'debrief', 'foot']);
+  const r2 = paintReport(g2, pngReport({ full: false, mine: false, people: undefined, wallet: undefined, balance: undefined }), { colors: COLORS, sans: 'sans-serif', mono: 'monospace' });
+  assert.deepEqual(r2.sections, ['bg', 'head', 'art-empty', 'title', 'tiles', 'trail', 'agents', 'result', 'foot']);
   const texts2 = g2.calls.filter((c) => c[0] === 'fillText').map((c) => c[1]);
-  assert.ok(texts2.includes('요원 처리') && texts2.includes('쟈알디 소감') && texts2.includes('힘들었다.'));
+  assert.ok(texts2.includes('요원 처리'));
   assert.ok(!texts2.includes('가계부') && !texts2.includes('인물 기록 변화'));
   // 그림이 있으면 틀 안에 꽉 차게 (clip → drawImage → restore), 가로 804 틀에 1600×900 그림
   const g3 = fakeCtx();
@@ -425,40 +425,3 @@ test('PNG 줄바꿈: 글자 단위, 최대 줄 수를 넘으면 마지막 줄 �
   assert.deepEqual(wrapText(g, '짧다', 400, 1), ['짧다']);
 });
 
-// ── 묶음 3: 소감 검사·저장 (core/journal/debrief.ts) ──
-
-test('소감 검사: 이번 턴 종료 사건 id·투입 요원 이름·본문 규칙, 사건당 1건, manual 만 덮어쓴다', () => {
-  const rep = pngReport();
-  const ended = [endedNowOf(rep)];
-  assert.deepEqual(ended[0].agents, ['쟈알디', '스팡달']);
-  assert.equal(ended[0].trail_tail.length, 3);
-  assert.equal(ended[0].kind, '괴이');
-  assert.ok(ended[0].loc.includes('종로 지하상가'));
-  assert.equal(validateDebrief({ id: 'r9', who: '쟈알디', text: '현장은 조용했다. 다들 수고했다.' }, ended).ok, false);
-  assert.equal(validateDebrief({ id: 'r1', who: '쟈알디', text: '' }, ended).ok, false);
-  assert.equal(validateDebrief({ id: 'r1', who: '쟈알디', text: '{{user}} 덕분이다. 고맙다.' }, ended).ok, false);
-  assert.equal(validateDebrief(null, ended).ok, false);
-  const okOne = validateDebrief({ id: 'r1', who: '스팡달', text: '  팔이 아직  욱신거린다.\n그래도 다 끝났다. ' }, ended);
-  assert.ok(okOne.ok && okOne.value.who === '스팡달' && okOne.value.text === '팔이 아직 욱신거린다. 그래도 다 끝났다.');
-  const unknownWho = validateDebrief({ id: 'r1', who: '모르는사람', text: '현장은 조용했다. 다들 수고했다.' }, ended);
-  assert.ok(unknownWho.ok && unknownWho.value.who === '쟈알디', '모르는 이름이면 첫 요원');
-  const long = validateDebrief({ id: 'r1', who: '쟈알디', text: '가'.repeat(500) }, ended);
-  assert.ok(long.ok && long.value.text.length === 300, '300자에서 자름');
-  // 저장: 없는 id 무시, 같은 id 둘이면 첫 것, 있던 소감은 turn/backfill 로 안 덮고 manual 로는 덮는다
-  const store = { ...emptyReports(), items: [rep, { ...rep, id: 'r2', no: 'RPT-0101-02' }] };
-  const w1 = withDebriefs(store, [{ id: 'r1', who: '쟈알디', text: '첫 소감' }, { id: 'r1', who: '스팡달', text: '둘째' }, { id: 'r9', who: 'x', text: '없는 사건' }], 'turn', '2025-01-02T00:00:00.000Z');
-  assert.equal(w1.applied, 1);
-  assert.deepEqual(w1.store.items[0].debrief, { who: '쟈알디', text: '첫 소감', src: 'turn', at: '2025-01-02T00:00:00.000Z' });
-  assert.equal(w1.store.items[1].debrief, undefined);
-  const w2 = withDebriefs(w1.store, [{ id: 'r1', who: '스팡달', text: '다시' }], 'backfill');
-  assert.equal(w2.applied, 0, '있던 소감은 자동으로 안 덮는다');
-  const w3 = withDebriefs(w1.store, [{ id: 'r1', who: '스팡달', text: '다시' }], 'manual');
-  assert.ok(w3.applied === 1 && w3.store.items[0].debrief.src === 'manual' && w3.store.items[0].debrief.text === '다시');
-  // 묶음 안 종료 사건: anchor(메시지 열쇠)가 묶음에 있고 소감이 아직 없는 것만, 최대 3건. 번호(idx)는 보지 않는다 (메시지 삭제로 번호가 밀려도 다른 턴 발췌로 소감을 쓰지 않게)
-  const many = { v: 1, items: [1, 2, 3, 4, 5].map((i) => ({ ...rep, id: `r${i}`, idx: i, anchor: `#${i + 1}`, ...(i === 2 ? { debrief: { who: 'a', text: 'b', src: 'turn', at: '' } } : {}) })) };
-  assert.deepEqual(endedInBatch(many, ['#2', '#3', '#4', '#5', '#6']).map((r) => r.id), ['r3', 'r4', 'r5']);
-  assert.deepEqual(endedInBatch(many, ['#3', '#8']).map((r) => r.id), []);
-  assert.deepEqual(endedInBatch({ v: 1, items: [{ ...rep, id: 'rA', idx: 12, anchor: 'cid-old' }] }, ['#13']).map((r) => r.id), [], '번호 12 가 지금 다른 턴이어도 열쇠가 다르면 안 얹는다');
-  assert.ok(DEBRIEF_PROMPT.includes('"debriefs"') && !DEBRIEF_PROMPT.includes('{{'), '수동 지침은 짧고 템플릿 기호가 없다');
-  assert.ok(DEBRIEF_PROMPT.length < 1500);
-});

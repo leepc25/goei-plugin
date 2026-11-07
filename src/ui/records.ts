@@ -2,13 +2,12 @@
 // 2026-11-05 사용자: 「보고서」 하위 탭은 일지와 겹쳐서 뺐다(일지 줄을 누르면 그 보고서 페이지). 가계부는 따로 탭이 아니라 여기 하위 탭.
 // 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
-// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 소감 자동 · 일지 상한 · 보고서 상한 ($jr_*).
+// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
 import {
   JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
   buildChronicle, CHRON_KIND_LABEL, type ChronEntry, type ChronKind,
 } from '../core/journal';
-import { debriefRunning, requestDebrief } from '../host/journal';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { refreshStatusContext } from '../host/statusview';
@@ -353,7 +352,6 @@ function reportPage(ctx: ChatContext, id: string): string {
   const agents = r.agents.length
     ? `<ul class="gx-rpt-agents">${r.agents.map((a) => `<li>${avatar(ctx.char, byName.get(a.name)?.english, a.name, 'sm')}<span><b>${esc(a.name)}</b><small>${esc([a.st ? stLabel(a.st) : '상태 미상', a.situation].filter(Boolean).join(' · '))}</small></span></li>`).join('')}</ul>`
     : '<p class="ps-note">투입 기록이 없어요.</p>';
-  // 소감 칸·「소감 쓰기」는 뺐다 (2026-11-05 사용자: 보조 모델 한 줄짜리라 의미 없음). 자료(r.debrief)는 그대로 둔다
   const people = r.full
     ? `<section class="gx-rpt-sec"><h3>인물 기록 변화 <small>(종료 시점)</small></h3>${r.people?.length
       ? `<ul class="gx-rpt-people">${r.people.map((p) => `<li><b>${esc(p.who)}</b>${p.quote ? `<q>${esc(p.quote)}</q>` : ''}<em class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}${p.stage ? ` → ${esc(p.stage)}` : ''}</em></li>`).join('')}</ul>`
@@ -364,7 +362,7 @@ function reportPage(ctx: ChatContext, id: string): string {
       ? `<ul class="gx-rpt-wallet">${r.wallet.map((t) => `<li><span>${esc(t.memo || '(메모 없음)')}</span><b class="${t.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(t.amount).replace(/^([+−-])/, '$1₩ '))}</b></li>`).join('')}${r.balance !== undefined ? `<li class="bal"><span>종료 시점 잔고</span><b>${esc(formatWon(r.balance))}</b></li>` : ''}</ul>`
       : `<p class="ps-note">이 사건 동안 거래가 없어요.${r.balance !== undefined ? ` 종료 시점 잔고 ${esc(formatWon(r.balance))}` : ''}</p>`}</section>`
     : '';
-  // 「이미지로 저장」= 캔버스 900×1200 PNG 내려받기 (ui/reportpng). 「채팅에 넣기」는 없다 (결정). 「소감 쓰기」는 2026-11-05 뺌
+  // 「이미지로 저장」= 캔버스 900×1200 PNG 내려받기 (ui/reportpng). 「채팅에 넣기」는 없다 (결정)
   const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc(r.id)}" ${rec.busy ? 'disabled' : ''} title="PNG 900×1200 한 장으로 내려받아요">${ICONS.cctv}이미지로 저장</button>
     <button class="gx-mini${r.pin ? ' on' : ''}" data-action="rec-pin" data-value="${esc(r.id)}" aria-pressed="${!!r.pin}" title="${r.pin ? '고정 풀기' : '고정: 상한에 밀려 지워지지 않아요'}" ${rec.busy ? 'disabled' : ''}>${ICONS.pin}${r.pin ? '고정됨' : '고정'}</button>`;
   return `<section class="gx-rpt">
@@ -565,17 +563,6 @@ export async function handleRecords(action: string, value: string | undefined, c
     case 'rec-png-x':
       dropPng();
       break;
-    case 'rec-debrief': {
-      if (rec.busy || !v || debriefRunning(v)) return true;
-      rec.notice = '';
-      const run = requestDebrief(v);
-      env.render();
-      const r = await run;
-      if (r.ok) rec.info = r.message;
-      else rec.notice = r.message;
-      await env.refresh();
-      return true;
-    }
     default:
       return false;
   }
@@ -660,7 +647,6 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     const key = v.slice(0, i);
     let val = v.slice(i + 1);
     if (key === 'chat_card') val = val === 'off' || val === 'all' ? val : 'mine';
-    else if (key === 'debrief_auto') val = val === '0' ? '0' : '1';
     else return true;
     await setVars(ctx, env, { [JR(key)]: val });
     if (key === 'chat_card') {

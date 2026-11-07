@@ -2817,7 +2817,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(await page.locator('.gx-jr-row').count() >= 1, '팝업 뒤에 일지 목록');
   const rt = await page.textContent('.gx-rpt');
   for (const t of [preset.name, '내 사건', '경과', '셔터 안쪽으로 진입했다', '투입 요원', '쟈알디', '결과', rpt.result, '인물 기록 변화', '가계부', '종료 시점 잔고']) assert.ok(rt.includes(t), `보고서 페이지: ${t}`);
-  assert.equal(await page.locator('.gx-rpt [data-action="rec-debrief"], .gx-rpt-debrief, .gx-rpt .gx-rcard-no').count(), 0, '소감 칸·소감 쓰기·떠 있는 번호 없음 (2026-11-05 사용자)');
+  assert.equal(await page.locator('.gx-rpt .gx-rcard-no').count(), 0, '떠 있는 번호 없음 (2026-11-05 사용자)');
   assert.equal(await page.locator('.gx-rpt button:has-text("채팅에 넣기")').count(), 0, '수동 「채팅에 넣기」 없음');
   // 「이미지로 저장」 (묶음 3): a.download 클릭을 가로채 PNG 한 장 — image/png · 900×1200 · 미리보기 창 (길게 눌러 저장 안내) → 닫기
   await page.evaluate(() => {
@@ -2841,8 +2841,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok((await page.textContent('.gx-pngpop')).includes(rpt.no));
   await page.click('.gx-pngpop .gx-png-acts [data-action="rec-png-x"]');
   assert.equal(await page.locator('.gx-pngpop').count(), 0, '미리보기 닫힘');
-  // 「소감 쓰기」는 2026-11-05 사용자 결정으로 뺐다 (보조 모델 한 줄짜리)
-  // 모델 요청에는 카드가 없다 (요청 가공기를 직접 부르면 「응답 대기 중」이 켜져 그 뒤의 저장(소감 쓰기)이 응답을 기다리므로, 소감 뒤에 확인한다)
+  // 모델 요청에는 카드가 없다
   const reqCard = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: '시작' }, { role: 'assistant', content: t }, { role: 'user', content: '다음' }], 'model'), endReply);
   assert.ok(!reqCard.some((m) => /사건 보고서|data-goei-card|기록에서 보기/.test(String(m.content))), '모델 요청에는 카드가 없다');
   // 고정 → 채팅 변수 pin, 다시 누르면 풀림

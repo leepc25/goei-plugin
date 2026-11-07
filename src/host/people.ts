@@ -31,7 +31,6 @@ import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
-import { endedNowOf, readReports, reportVars, withDebriefs } from '../core/journal';
 
 // ── 진단 ──
 
@@ -264,22 +263,17 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const walletOn = colConfig(fresh.chat.scriptstate).wallet !== 'off';
       const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
-      // 소감 (core/journal/debrief): 설정 「소감 자동」이 켜져 있고 이 묶음에서 종료된 사건(보고서)이 있으면 같은 호출에 얹는다. 다시 읽기(only)는 제외
       const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
-      // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
-      const ended = [] as ReturnType<typeof endedNowOf>[];
-      void batchKeys;
       // 소지품 (core/items.ts): 설정 「보조 모델이 읽기」가 켜져 있으면 지금 목록을 자료에 넣고 소지품 절을 켠다
       const itemsOn = itemAutoOn(fresh.chat.scriptstate);
       const itemsNow = itemsOn ? liveItemsOf(readItems(fresh.chat.scriptstate), fresh.chat).map((e) => ({ name: e.name, desc: e.desc, kind: e.kind })) : null;
       const usedNow = itemsOn ? usedItemsAt(readItems(fresh.chat.scriptstate), batchKeys) : [];
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended, items: itemsNow, used: usedNow });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, items: itemsNow, used: usedNow });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (itemsOn) sections.add('items');
-      if (ended.length) sections.add('debrief');
       const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
       input.system = system;
       if (input.overBudget.length) {
@@ -336,7 +330,6 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           only: o.scope?.only,
           keepRead: !!o.scope?.only,
           wallet: walletOn,
-          debrief: ended.length > 0,
           items: itemsOn,
         });
         diag.report = report;
@@ -370,11 +363,6 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           // 「사용」했는데 보고가 없는 물건: 닳는 종류는 뺀다 (core/items.ts settleUsedItems)
           if (usedNow.length && !o.scope?.only) it = settleUsedItems(it, alive, usedNow, report.items.map((c) => c.name));
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
-        }
-        // 소감은 보고서($goei_reports)에 (종료 턴이면 turn, 지난 응답 읽기면 backfill)
-        if (report.debriefs?.length) {
-          const d = withDebriefs(readReports(next), report.debriefs, reason === 'backfill' ? 'backfill' : 'turn');
-          if (d.applied) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...reportVars(d.store) } };
         }
         return withPeople(next, s);
       });
@@ -651,7 +639,7 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const itemsNow = itemsOn ? liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat).map((e) => ({ name: e.name, desc: e.desc, kind: e.kind })) : null;
       const usedNow = itemsOn && list[last] ? usedItemsAt(readItems(ctx.chat.scriptstate), [messageKey(list[last], last)]) : [];
       const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
-      const inp = buildUpdate(ctx.chat, store, [last], { settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, ended: [], items: itemsNow, used: usedNow });
+      const inp = buildUpdate(ctx.chat, store, [last], { settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, items: itemsNow, used: usedNow });
       const sections = enabledSections(settings);
       if (inp.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
