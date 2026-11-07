@@ -5,10 +5,14 @@
 // 개수(×n)는 두지 않는다 — 양·상태는 설명 글로 (「두 봉지 남음」「입고 있음」).
 import type { Chat } from './types';
 import { aliveAnchors } from './wallet';
+import { messageKey } from './people/store';
+import type { PromptMessage } from './request';
 
 export const ITEMS_VAR = '$st_items';
 /** 「사용」 상자: 다음 보낼 때 본편에 넘길 물건 이름들 (JSON 배열). 보내면 비운다 */
 export const ITEM_USE_VAR = '$st_item_use';
+/** 「사용」 상자를 보낸 턴의 마지막 유저 메시지 키. 비면 아직 안 보냄. 같은 키면 그 턴의 다시 굴리기 (상자를 다시 넘긴다) */
+export const ITEM_USE_AT_VAR = '$st_item_use_at';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars): 칸 수·한계 문장·본편에 넘기기·보조 모델 자동 읽기 */
 export const ITEM_SLOTS_VAR = '$it_slots';
 export const ITEM_LIMIT_VAR = '$it_limit';
@@ -276,4 +280,83 @@ export function searchItems(it: Items, alive: Set<string>, q: string): { items: 
     items: liveItems(it, alive).filter((e) => hit(e.name, e.desc, e.effect, e.quote, itemKindLabel(e.kind))),
     log: it.log.filter((l) => hit(l.name, l.note, l.quote)).reverse(),
   };
+}
+
+// ── 본편 요청·응답 (body.ts) ──
+
+export const INVENTORY_HEAD = '[Inventory]';
+const INVENTORY_NOTE =
+  'What the protagonist carries right now (name — state (effect)); nothing else is on hand. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: ' +
+  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. Never print this list back.';
+
+/** 채팅의 마지막 유저 메시지 키 (없으면 '') */
+export function lastUserKey(chat: Chat): string {
+  const list = chat.message ?? [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'user') return messageKey(list[i], i);
+  return '';
+}
+/** 채팅의 마지막 봇 응답 키 (없으면 '') */
+export function lastBotKey(chat: Chat): string {
+  const list = chat.message ?? [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return messageKey(list[i], i);
+  return '';
+}
+
+/** 이번 요청에 넘길 「사용」 목록: 아직 안 보냈거나(at 비어 있음), 보낸 턴을 다시 굴리는 중일 때(at = 지금 마지막 유저 키) */
+export function pendingItemUse(vars: Record<string, unknown> | undefined, userKey: string): string[] {
+  const at = typeof vars?.[ITEM_USE_AT_VAR] === 'string' ? (vars[ITEM_USE_AT_VAR] as string) : '';
+  return !at || at === userKey ? readItemUse(vars) : [];
+}
+
+/** 이 채팅의 [Inventory] 글 (본편에 넘기기 설정이 꺼졌거나 넘길 게 없으면 '') */
+export function inventoryText(chat: Chat): string {
+  const vars = chat.scriptstate;
+  if (!itemPushOn(vars)) return '';
+  const live = liveItemsOf(readItems(vars), chat);
+  const text = itemsBlock(live, {
+    slots: itemSlots(vars),
+    limit: itemLimit(vars),
+    use: pendingItemUse(vars, lastUserKey(chat)).filter((n) => live.some((e) => sameItemName(e.name, n))),
+    bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
+  });
+  return text ? `${text}\n${INVENTORY_NOTE}` : '';
+}
+
+/** 요청: [Inventory] 글을 마지막 유저 메시지 앞에 system 으로 넣는다 (상태창 블록과 같은 자리). 이미 있으면 그대로 */
+export function withInventory<M extends PromptMessage>(messages: M[], chat: Chat): M[] {
+  if (messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(INVENTORY_HEAD))) return messages;
+  const text = inventoryText(chat);
+  if (!text) return messages;
+  const at = messages.map((m) => m?.role).lastIndexOf('user');
+  const block = { role: 'system', content: text } as M;
+  return at < 0 ? [...messages, block] : [...messages.slice(0, at), block, ...messages.slice(at)];
+}
+
+/**
+ * 응답이 붙은 뒤: 「사용」 상자를 정리한다. 바뀔 게 없으면 null.
+ * - 처음 보낸 턴: at 에 유저 키를 적고, 사용 기록을 이 응답에 묶어 남긴다 (응답이 지워지면 기록도 빠진다)
+ * - 같은 턴 다시 굴리기: 기록만 새 응답에 다시 묶는다 (옛 응답의 기록은 그 응답과 함께 사라짐)
+ * - 다음 턴: 상자를 비운다
+ */
+export function settleItemUse(chat: Chat, responseIndex: number): Record<string, string> | null {
+  const vars = chat.scriptstate ?? {};
+  const names = readItemUse(vars);
+  const at = typeof vars[ITEM_USE_AT_VAR] === 'string' ? (vars[ITEM_USE_AT_VAR] as string) : '';
+  if (!names.length && !at) return null;
+  const userKey = lastUserKey(chat);
+  if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: '' };
+  if (!names.length) return { [ITEM_USE_AT_VAR]: '' };
+  const m = chat.message?.[responseIndex];
+  if (!m || m.role !== 'char') return null;
+  const anchor = messageKey(m, responseIndex);
+  const it0 = readItems(vars);
+  let it = it0;
+  const alive = aliveAnchors(chat);
+  for (const n of names) {
+    if (it.log.some((l) => l.what === 'use' && l.anchor === anchor && sameItemName(l.name, n))) continue;
+    const item = liveItems(it, alive).find((e) => sameItemName(e.name, n));
+    it = addItemLog(it, { name: item?.name ?? n, what: 'use', by: 'use', anchor });
+  }
+  if (it === it0 && at === userKey) return null;
+  return { ...(it === it0 ? {} : itemsVars(it)), [ITEM_USE_AT_VAR]: userKey };
 }

@@ -5,9 +5,10 @@
 // 플러그인은 막지도 경고하지도 않는다: 칸이 넘치면 넘친 칸을 붉은 테두리로 보여 줄 뿐, 푸는 건 본편 응답 (core/items.ts).
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
+import { refreshUseBox } from '../host/usebox';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, itemKindLabel, ITEM_KINDS, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems, readItemUse, readItems, removeItem, searchItems, updateItem,
+  addItem, ITEM_USE_AT_VAR, itemKindLabel, ITEM_KINDS, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems, readItemUse, readItems, removeItem, searchItems, updateItem,
   type Item, type ItemLog, type Items,
 } from '../core/items';
 import { drawerBox, drawerHtml } from './drawer';
@@ -278,10 +279,13 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       const it = liveOf(ctx).find((x) => x.id === value);
       if (!it) return true;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const cur = readItemUse(chat.scriptstate);
+        // 이미 보낸 상자($st_item_use_at 있음)는 비우고 새로 시작한다 (지난 턴 것을 또 넘기지 않게)
+        const sent = !!chat.scriptstate?.[ITEM_USE_AT_VAR];
+        const cur = sent ? [] : readItemUse(chat.scriptstate);
         const next = cur.includes(it.name) ? cur.filter((n) => n !== it.name) : [...cur, it.name];
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next), [ITEM_USE_AT_VAR]: '' } };
       });
+      void refreshUseBox(ctx.charIndex, ctx.chatIndex);
       itemsUi.info = readItemUse(ctx.chat.scriptstate).includes(it.name) ? '사용을 취소했어요.' : `「${it.name}」을 다음 메시지에 같이 보내요.`;
       await env.refresh();
       return true;

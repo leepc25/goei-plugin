@@ -2764,6 +2764,7 @@ button.mk-go:hover { color: var(--signal); }
 .st-col-name b { font-size: 13px; }
 .st-col-name small { font-size: 11px; color: var(--dim); }
 .st-won { width: 150px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.st-text { width: 220px; max-width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
 /* ID카드 잔고 칩 + 장부 창 */
 .gx-wallet { width: 100%; padding: 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; font-variant-numeric: tabular-nums; }
 .gx-wallet em { font-weight: 700; }

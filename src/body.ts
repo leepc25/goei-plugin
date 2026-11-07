@@ -59,6 +59,8 @@ import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
+import { settleItemUse, withInventory } from './core/items';
+import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from './core/wallet';
@@ -152,6 +154,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
         // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
+        // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
+        messages = step('소지품', () => withInventory(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
         messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
         // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
@@ -447,7 +451,15 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
       }).catch(() => null)) ?? latest;
     }
+    // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
+    if (settleItemUse(latest ?? chat, arg.messageIndex)) {
+      latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+        const vars = settleItemUse(cur, arg.messageIndex);
+        return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
+      }).catch(() => null)) ?? latest;
+    }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
+    if (now) await refreshUseBox(arg.characterIndex, arg.chatIndex, now).catch(() => {});
     if (!now || chatPhase(now) !== 'started') return;
     now.message ??= [];
     // 이전 버전에서 시작한 채팅: 에셋 모듈 로어북이 읽는 설정 변수를 채운다. 명부의 새 세력이 바뀌었으면 태그·세력 로어북 변수도 맞춘다
@@ -713,6 +725,9 @@ function startWatcher(fab: Fab | null): () => void {
         await readTheme(snap).catch(() => {});
         await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
         await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
+        await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {});
+      } else if (!next.fabVisible && next.changed) {
+        await hideUseBox().catch(() => {});
       }
       shownChat = chatKey;
       // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)

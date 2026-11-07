@@ -1,6 +1,6 @@
 // 소지품 메뉴 사진 (2026-11-07): PC 격자·팝업·기록, 폰 격자·서랍·팝업·가계부. 사용법: node tests/items-browser.mjs <out-dir>
 import { mkdirSync } from 'node:fs';
-import { boot, closeEditor, launch, loadFixture, openWin, sleep } from './qc-settings-harness.mjs';
+import { boot, closeEditor, closeWin, launch, loadFixture, openEditor, openWin, sleep } from './qc-settings-harness.mjs';
 const fx = loadFixture(new URL('../.scratch/fixture/fixture.json', import.meta.url).pathname);
 const out = process.argv[2] ?? '/tmp/items-shots';
 mkdirSync(out, { recursive: true });
@@ -39,6 +39,29 @@ for (const vp of ['pc', 'phone']) {
   await click('[data-action="items-close"]');
   await click('[data-action="items-sub"][data-value="wallet"]');
   await shot('wallet');
+  // 「사용」 → 창을 닫으면 본 화면에 사용 상자 칩, 요청에 [Inventory] 글 (This turn: uses …)
+  await click('[data-action="items-sub"][data-value="items"]');
+  await click('.it-c[data-value="i_소금 봉지"]');
+  await click('[data-action="items-use"]');
+  await click('[data-action="items-close"]');
+  await closeWin(page); await sleep(300);
+  await shot('usebox');
+  const req = await page.evaluate(async () => {
+    window.__chat.message.push({ role: 'user', data: '소금을 뿌린다', chatId: 'u2' });
+    const out = await window.__calls.replacers[0]([{ role: 'user', content: 'hi' }, { role: 'assistant', content: '본문' }, { role: 'user', content: '소금을 뿌린다' }], 'model');
+    return out.map((m) => `${m.role}: ${String(m.content).slice(0, 60)}`);
+  });
+  const inv = req.find((l) => l.includes('[Inventory]'));
+  if (!inv) errorsAll.push(`[${vp}] no [Inventory] in request: ${JSON.stringify(req)}`);
+  // × 로 빼기: 칩의 × 좌표를 눌러 상자가 사라지는지
+  const x = await page.$('[x-goei-usebox] [data-gu-x]');
+  if (x) { await x.click(); await sleep(400); }
+  const boxShown = await page.evaluate(() => document.querySelector('[x-goei-usebox]')?.style.display);
+  if (boxShown !== 'none') errorsAll.push(`[${vp}] use box still shown after ×: ${boxShown}`);
+  await openWin(page); await sleep(300);
+  await openEditor(page, 'set:items'); await sleep(300);
+  await shot('settings');
+  await closeEditor(page, true);
   if (vp === 'phone') {
     await click('[data-action="tab"][data-value="records"]');
     await shot('records');

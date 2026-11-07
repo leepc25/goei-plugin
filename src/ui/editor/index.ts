@@ -33,10 +33,10 @@ import { isPhone } from '../media';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
+export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'start' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'people', 'factions', 'lore', 'adv', 'update'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'items', 'people', 'factions', 'lore', 'adv', 'update'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
@@ -312,8 +312,8 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
 /** [노드, 이름, 아이콘, 배지?, 하위 항목?]. 노드가 `label:…` 이면 누를 수 없는 소제목 줄 (설정 「기록」 아래 하위 메뉴, 2026-11-05 사용자) */
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
@@ -323,8 +323,11 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
     case 'set': return [{ title: '기능', items: [
       ...(['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki'] as SetPage[]).map(setItem),
+      // 소지품 메뉴(가계부 | 소지품, 2026-11-07)의 두 하위 탭
+      ['label:items', '소지품', ICONS.bag],
+      ...(['wallet', 'items'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
       ['label:records', '기록', ICONS.records],
-      ...(['journal', 'wallet', 'people', 'factions'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
+      ...(['journal', 'people', 'factions'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
       ...(['lore', 'adv'] as SetPage[]).map(setItem),
     ] }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['start', '시작 화면', ICONS.idcard], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
@@ -361,6 +364,7 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
   journal: { desc: '사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요.' },
   wallet: { desc: '본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 시작 잔고와, 가계부에서 잔고를 직접 고칠 수 있게 할지를 여기서 정해요.', example: '' },
+  items: { desc: '지금 가진 물건·한계·이번 턴 사건을 본편 요청에 [Inventory] 글로 넣어 모델이 상황을 알고 응답에 반영하게 해요. 칸 수와 한계 문장, 보조 모델이 본문을 읽어 목록을 맞출지를 여기서 정해요.', example: '[Inventory] 3/16 · 소금 봉지 — 두 봉지 (괴이를 늦춤) · This turn: uses 소금 봉지' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 아래 「로어북 확인」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
@@ -394,6 +398,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     // 기록 하위 메뉴 넷 (2026-11-05 사용자): 일지 · 가계부 · 인물 · 세력
     case 'journal': body = feat('journal'); break;
     case 'wallet': body = sec('wallet'); break;
+    case 'items': body = sec('items'); break;
     case 'factions': body = feat('factions'); break;
     case 'lore': body = sec('lore'); break;
     case 'adv': body = sec('adv'); break;
@@ -450,7 +455,7 @@ function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>
    각 설정 페이지를 그린 HTML에서 줄 이름·설명·묶음 제목을 모아 두고, 적은 말이 들어간 줄을 목록 자리에 보여 준다. 누르면 그 페이지로 가서 그 줄을 비춘다 */
 type FindHit = { page: SetPage; label: string; group: string; help: string };
 let findIndex: FindHit[] | null = null;
-const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'people', 'factions', 'lore', 'adv'];
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'items', 'people', 'factions', 'lore', 'adv'];
 const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 function buildFindIndex(ctx: ChatContext): FindHit[] {
   const out: FindHit[] = [];
