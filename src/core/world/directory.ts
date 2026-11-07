@@ -9,6 +9,7 @@ import { agentShared, orgShared } from '../sharedpics';
 import { pickScenes, type ScenesData } from '../scenes';
 import { freeGroupCode, migrateRoster, NEUTRAL_BLURB, NEUTRAL_ENGLISH, NEUTRAL_GROUP, NEUTRAL_IDS, ROSTER_V } from './roster-v';
 import type { LoreEntry } from '../types';
+import { readStartItems, type StartItem } from '../startitems';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
 export const DIRECTORY_SCHEMA = 1;
@@ -61,6 +62,8 @@ export interface AgentRow {
   gender?: Gender;
   /** 사진이 없을 때 쓸 공용 그림 후보 (저장하지 않음, core/sharedpics) */
   shared?: string[];
+  /** 그 인물로 시작할 때 넣는 소지품 (core/startitems) */
+  startItems?: StartItem[];
 }
 
 export type Gender = 'F' | 'M' | 'X';
@@ -191,6 +194,7 @@ export interface AgentData {
   face?: string;
   crop?: string;
   gender?: Gender;
+  start_items?: StartItem[];
 }
 export interface BaseData {
   label?: string;
@@ -819,6 +823,7 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
       ...(s(d.face) ? { face: s(d.face) } : {}),
       ...(s(d.crop) ? { crop: s(d.crop) } : {}),
       ...(d.gender === 'F' || d.gender === 'M' || d.gender === 'X' ? { gender: d.gender } : {}),
+      ...((items) => (items.length ? { startItems: items } : {}))(readStartItems(d.start_items)),
       rosterFor: Array.isArray(d.roster_for) ? list(d.roster_for) : base.rosterFor,
       phoneTabs: Array.isArray(d.phone_tabs) ? list(d.phone_tabs) : base.phoneTabs,
     });
@@ -969,6 +974,7 @@ export function directoryData(dir: Directory): DirectoryData {
     if (a.face) d.face = a.face;
     if (a.crop) d.crop = a.crop;
     if (a.gender) d.gender = a.gender;
+    if (a.startItems?.length) d.start_items = a.startItems;
     out.요원![a.lore] = d;
   }
   return out;

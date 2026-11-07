@@ -4,6 +4,7 @@ import { agentScene, factionScenes, sceneText } from './scenes';
 import { hasSceneCard, isSceneMessage, sceneMessage, UNSENT_MARK } from './dispatch';
 import { buildSeed } from './seed';
 import { readDirectory } from './world/directory';
+import { startItemsVars } from './startitems';
 import type { Chat, ChatMessage, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
 import { manifestEntry } from './lorebooks';
@@ -143,6 +144,8 @@ export function planStart(
       $seed_lore: seed.text,
       $seed_inputs: '0',
       $goei_last: '',
+      // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
+      ...startItemsVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
       ...factionVars(lore),
       ...(world ?? {}),
     },
