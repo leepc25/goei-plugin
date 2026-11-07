@@ -52,6 +52,7 @@ const css = `
 .common{height:52px;display:flex;gap:4px;padding:4px 8px;border-top:1px solid var(--line2);background:var(--panel);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}.common .tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:11px;font-weight:600}
 .bottom{position:relative}.grip{position:absolute;left:50%;top:-11px;transform:translateX(-50%);width:60px;height:22px;border-radius:11px;background:var(--panel2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;z-index:2}.grip i{width:28px;height:4px;border-radius:4px;background:var(--sub)}.grip.on{border-color:var(--signal)}.grip.on i{background:var(--signal)}
 .stack{position:relative}.drawer{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;gap:4px;padding:4px 8px;background:var(--panel);border-top:1px solid var(--line2);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}.drawer .tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:11px;font-weight:600}
+.win{position:relative}.dim{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5}.pop{position:relative;width:330px}.pop .det{margin:0;box-shadow:0 20px 40px -20px rgba(0,0,0,.8)}.pclose{position:absolute;right:8px;top:8px;width:30px;height:30px;border:0;background:none;color:var(--dim)}
 .bar{height:60px;display:flex;border-top:1px solid var(--line);background:var(--void)}.bar .nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600}.bar .nb.on{color:var(--signal)}
 .usebox{margin:0 14px 8px;background:var(--panel);border:1px solid var(--signal);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:12.5px}.usebox .chip{background:var(--accent-bg);color:var(--signal);border-radius:8px;padding:3px 8px;font-weight:600}.usebox .x{margin-left:auto;color:var(--dim)}
 .input{margin:0 14px 10px;height:44px;border:1px solid var(--line2);border-radius:12px;display:flex;align-items:center;padding:0 12px;color:var(--dim)}
@@ -62,9 +63,9 @@ const css = `
 .body{grid-area:body;display:grid;grid-template-columns:1fr 360px;overflow:hidden}.body .left{overflow:auto}.body .right{border-left:1px solid var(--line);padding-top:12px}.body .right .det{margin:0 14px}
 .pc .grid{grid-template-columns:repeat(6,minmax(0,1fr))}.pc .left{min-width:0}.pc .c{min-width:0}.pc .c b{font-size:11.5px}.pc .c b{font-size:12.5px}
 `;
-const phoneHtml = (open, over) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
+const phoneHtml = (open, over, pop = false) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
-<div style="overflow:auto">${tabs}${head}${grid(over)}${detail}${foot}</div>
+<div style="overflow:auto">${tabs}${head}${grid(over)}${foot}</div>${pop ? `<div class="dim"><div class="pop">${detail}<button class="pclose">${nav('close')}</button></div></div>` : ''}
 <div><div class="stack"><div class="tools"><div class="tb">${nav('plus')}직접 넣기</div><div class="tb">${nav('refresh')}합치기</div></div>${open ? `<div class="drawer"><div class="tb">${nav('wiki')}위키</div><div class="tb">${nav('gnet')}괴담넷</div><div class="tb">${nav('settings')}설정</div></div>` : ''}</div>
 <div class="bar bottom"><div class="grip${open ? ' on' : ''}"><i></i></div><div class="nb">${nav('map')}임무</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb on">${nav('bag')}소지품</div></div></div></div></body>`;
 const chatHtml = `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:300px;grid-template-rows:1fr auto;background:#141a1e}</style><body><div class="win"><div style="padding:14px;color:var(--dim);font-size:12.5px">(채팅 본문 — Risu 입력창 바로 위에 플러그인이 띄우는 상자)</div>
@@ -76,6 +77,7 @@ const pcHtml = `<!doctype html><meta charset="utf-8"><style>${css}</style><body>
 const b = await chromium.launch(); const out = '/mnt/project-files/작업_1107/초안_';
 let p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 860 } });
 await p.setContent(phoneHtml(false, false)); await p.screenshot({ path: out + '폰_소지품.png' });
+await p.setContent(phoneHtml(false, false, true)); await p.screenshot({ path: out + '폰_상세팝업.png' });
 await p.setContent(phoneHtml(true, true)); await p.screenshot({ path: out + '폰_서랍열림_넘침.png' });
 p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 310 } }); await p.setContent(chatHtml); await p.screenshot({ path: out + '폰_사용상자.png' });
 p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 1200, height: 780 } }); await p.setContent(pcHtml); await p.screenshot({ path: out + 'PC_소지품.png' });
