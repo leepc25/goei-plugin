@@ -1326,6 +1326,26 @@
   },
   {
    "keywords": [
+    "유두 진동 클립"
+   ],
+   "file": "adult_101.png",
+   "kind": "adult",
+   "base": false,
+   "name": "유두 진동 클립",
+   "src": "game-src/items/raw/batch_150/04.png"
+  },
+  {
+   "keywords": [
+    "펫 플레이 가면"
+   ],
+   "file": "adult_103.png",
+   "kind": "adult",
+   "base": false,
+   "name": "펫 플레이 가면",
+   "src": "game-src/items/raw/batch_150/06.png"
+  },
+  {
+   "keywords": [
     "드라이버 흉기",
     "드라이버"
    ],
@@ -15942,6 +15962,16 @@
    "base": false,
    "name": "군번줄",
    "src": "game-src/items/raw/batch_149/06.png"
+  },
+  {
+   "keywords": [
+    "오나컵"
+   ],
+   "file": "adult_102.png",
+   "kind": "adult",
+   "base": false,
+   "name": "오나컵",
+   "src": "game-src/items/raw/batch_150/05.png"
   },
   {
    "keywords": [
