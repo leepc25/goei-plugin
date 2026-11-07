@@ -50,8 +50,8 @@ const LINES = {
   open: '뭐 찾소. 급한 거면 왼쪽 선반부터 봐. 값은 적힌 대로고.',
   talk: '손전등? 건전지는 따로야. 둘이 같이 가져가면 천 원은 빼 주지.',
 };
-const owner = (mode, face = true) => `<div class="sh-owner"><span class="sh-face${face ? '' : ' none'}">${face ? `<img src="${FACE}" alt="">` : ic('person', 1.4)}</span><div class="sh-say"><b>${OWNER}</b><p>「${mode === 'talk' ? LINES.talk : LINES.open}」</p></div></div>
-  <div class="sh-talk"><div class="sh-talk-in${mode === 'talk' || mode === 'ask' ? ' has' : ''}">${mode === 'ask' ? `<span class="sh-ref">손전등</span><span class="sh-caret"></span>` : mode === 'talk' ? `<span class="sh-ref">손전등</span><span class="sh-typed">건전지도 같이 주면 안 돼?</span>` : `<span class="sh-ph">${OWNER}에게 말하기 — 흥정·문의·원하는 물건</span>`}</div><button class="sh-go" aria-label="보내기">↵</button></div>`;
+const owner = (mode, face = true) => `<div class="sh-owner"><span class="sh-face${face ? '' : ' none'}">${face ? `<img src="${FACE}" alt="">` : ic('person', 1.4)}</span><div class="sh-dlg"><div class="sh-dlg-name">${OWNER}<small>${SHOP}</small></div><div class="sh-dlg-box"><p>「${mode === 'talk' ? LINES.talk : LINES.open}」</p></div>
+  <div class="sh-talk"><div class="sh-talk-in${mode === 'talk' || mode === 'ask' ? ' has' : ''}">${mode === 'ask' ? `<span class="sh-ref">손전등</span><span class="sh-caret"></span>` : mode === 'talk' ? `<span class="sh-ref">손전등</span><span class="sh-typed">건전지도 같이 주면 안 돼?</span>` : `<span class="sh-ph">${OWNER}에게 말하기</span>`}</div><button class="sh-go" aria-label="보내기">↵</button></div></div></div>`;
 const detail = (it) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
@@ -90,7 +90,8 @@ const css = `
 .sh-name{display:inline-flex;align-items:center;gap:8px;height:var(--h);padding:0 4px;color:var(--text);font-size:16px;font-weight:700;white-space:nowrap}.sh-name svg{width:18px;height:18px;color:var(--signal)}
 .sh-bal{padding:0 12px;color:var(--text)}
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
-.sh-owner{display:flex;gap:12px;align-items:flex-start;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}.sh-face{flex:none;width:72px;height:72px;border-radius:var(--rc);overflow:hidden;border:1px solid var(--line);background:var(--void);display:grid;place-items:center;color:var(--dim)}.sh-face img{width:100%;height:100%;object-fit:cover;object-position:top}.sh-face svg{width:28px;height:28px}.sh-say{flex:1;min-width:0;padding-top:2px}.sh-say b{display:block;font-size:13.5px;color:var(--signal);margin-bottom:4px}.sh-say p{margin:0;font-size:13.5px;line-height:1.5;color:var(--text)}
+.sh-owner{display:flex;gap:14px;align-items:stretch;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}.sh-face{flex:none;width:128px;border-radius:var(--rc);overflow:hidden;border:1px solid var(--line);background:var(--void);display:grid;place-items:center;color:var(--dim)}.sh-face img{width:100%;height:100%;object-fit:cover;object-position:top}.sh-face svg{width:36px;height:36px}.sh-dlg{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}.sh-dlg-name{display:flex;align-items:baseline;gap:10px;height:24px;font-size:15px;font-weight:700;color:var(--text)}.sh-dlg-name small{font-size:12.5px;font-weight:500;color:var(--dim)}.sh-dlg-box{flex:1;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--rc);background:var(--void)}.sh-dlg-box p{margin:0;font-size:13.5px;line-height:1.6;color:var(--text)}
+.sh-talk{display:flex;gap:8px}
 .sh-talk{display:flex;gap:8px;margin-top:10px}.sh-talk-in{flex:1;display:flex;align-items:center;gap:6px;min-height:var(--h);padding:0 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2);font-size:13.5px;color:var(--text)}.sh-talk-in .sh-ph{color:var(--dim)}.sh-ref{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:var(--ri);background:var(--accent-bg);border:1px solid var(--accent-line);color:var(--signal);font-size:12.5px;font-weight:600;white-space:nowrap}.sh-caret{width:1px;height:16px;background:var(--text)}.sh-talk .sh-go{flex:none;width:var(--h);height:var(--h);border:1px solid var(--accent-line);border-radius:var(--r);background:var(--accent-bg);color:var(--signal);font:700 15px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
 .sh-nm{display:flex;align-items:center;justify-content:center;min-height:calc(13.5px * 1.3 * 2);margin-top:6px}.sh-c b{font-size:13.5px;padding:0;color:var(--text);white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;word-break:keep-all;overflow-wrap:anywhere}
@@ -110,7 +111,7 @@ const css = `
 .sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
-.it-right{margin-left:auto}.sh-face{width:64px;height:64px}
+.it-right{margin-left:auto}.sh-face{width:96px}.sh-dlg-box{min-height:60px}
 .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sh-ph .it-ic{width:96px;height:96px}
 .sh-card{display:flex;flex-direction:column;max-height:100%;overflow:hidden}.sh-body{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -2px;padding:0 2px}.sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
