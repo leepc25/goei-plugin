@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "양념게장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. pieces of crab coated in red spicy sauce in a small dish-less heap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "구두약",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tin of black shoe polish with a brush Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보리차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass pitcher of golden brown barley tea Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "댕기",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long red silk Korean hair ribbon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "색칠공부 책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a children's coloring book with a cartoon animal outline on the cover, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컵떡볶이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper cup of red spicy rice cakes with a toothpick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "등산 로프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled colorful climbing rope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "강정",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few square Korean rice puff crackers with sesame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유심칩",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny phone SIM card with a gold chip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "누룽지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round crisp golden scorched rice sheet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수혈 세트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blood transfusion tubing set with a needle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신발 깔창",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of shoe insoles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스노클",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a snorkel tube with a diving mask Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "만화경",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful kaleidoscope tube Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자전",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round golden Korean potato pancake Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가스 경보기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white wall gas leak alarm Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

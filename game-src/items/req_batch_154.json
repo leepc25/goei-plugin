@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "핫소스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bottle of red hot sauce, plain red label with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연어",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick raw orange salmon fillet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기 모기채",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric mosquito swatter racket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팽이채",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short whip for spinning tops Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오징어 순대",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few round slices of stuffed squid sausage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수면 양말",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of fuzzy pink sleep socks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "족두리",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black Korean bridal coronet with colorful beads Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장난감 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic toy sword, bright colors Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "양산",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open lace parasol, white Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케틀벨",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black iron kettlebell Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "생리컵",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink silicone menstrual cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비눗방울",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bottle of bubble liquid with a wand and floating bubbles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홍차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white teacup of red black tea with a tea bag string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계란말이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled Korean egg omelette cut into thick slices showing yellow layers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "폼롤러",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue foam roller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곰방대",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thin Korean tobacco pipe with a small metal bowl Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
