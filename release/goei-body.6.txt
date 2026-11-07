@@ -1,4 +1,23 @@
-큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
+in(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy4, true) : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  var row4 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var group2 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
+  function settingsView3(ctx2, back = true) {
+    const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
+    const text4 = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc10(v(k) === "-" ? "" : v(k))}" placeholder="${esc10(ph)}">`;
+    const keep = gnetRetention(ctx2.chat.scriptstate);
+    const rows2 = `${group2(gnetLabel(ctx2.chat.scriptstate), [
+      row4("모델", seg3("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]]), "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델"),
+      row4("새로고침", seg3("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
+      row4("채팅에 반영", seg3("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
+      row4("다양성 강화", seg3("sampling", v("sampling") === "1" ? "1" : "0", [["0", "OFF"], ["1", "ON"]]), "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 두 번째 벌을 써요(같은 토큰으로 늘 나오는 뻔한 글 대신 다른 쪽). 응답이 길어져 토큰을 더 써요")
+    ].join(""))}
+      ${group2("게시판", [
+      row4("게시글 수", seg3("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), "새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요"),
+      row4("성격", seg3("style", ["gal", "wpf", "diary", "emotion"].includes(v("style")) ? v("style") : "net", [["gal", "괴담갤"], ["net", "괴담넷"], ["wpf", "세정게"], ["diary", "일기장"], ["emotion", "감정 게시판"]]), "괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요."),
+      ...["diary", "emotion"].includes(v("style")) ? [row4("누구", text4("who", "비우면 주인공"), "일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요")] : [],
+      row4("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
       row4("주제", text4("subject", "비우면 세계관에 맞는 다양한 주제")),
       row4("분위기·말투", text4("mood", "비우면 익명 커뮤니티 말투")),
       row4("보호 대상", text4("protagonist", "비우면 주인공"), "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공"),
@@ -1539,9 +1558,9 @@ Next Paragraph Text
     try {
       text4 = await fetchPack(WORLD_PACK);
     } catch (error) {
-      const reason2 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      g2.__goeiWorldFail = { at: Date.now(), reason: reason2 };
-      throw new Error(reason2);
+      const reason3 = `${WORLD_PACK.label}(${WORLD_PACK.name})를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      g2.__goeiWorldFail = { at: Date.now(), reason: reason3 };
+      throw new Error(reason3);
     }
     await keepWorldData(text4);
     return "fetch";
@@ -3575,35 +3594,4 @@ Next Paragraph Text
 .gw .gw-basepage .dir-name b { font-size: 14px; font-weight: 600; }
 .gw .gw-basepage .dir-name small { font-size: 12.5px; }
 .gw .gw-basepage .dir-tools, .gw .gw-basepage .dir-bar { display: flex; gap: var(--gap); margin: 0 0 12px; }
-.gw .gw-basepage .dir-tools .dir-search { height: var(--h); }
-.gw .gw-basepage .dir-group { margin: 14px 2px 6px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
-.gw .gw-basepage .dir-add { display: flex; gap: var(--gap); align-items: center; margin: 12px 0 0; }
-.gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
-
-/* ── 조작: 전부 같은 높이·모서리·선·글자 ── */
-.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool:not(.ph-tools > .ph-tool), .gw .adv-num,
-.gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]) { height: var(--h); min-height: var(--h); max-height: var(--h); margin: 0; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--void); color: var(--text); font: inherit; font-size: 13px; font-weight: 500; line-height: 1; vertical-align: middle; }
-.gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"])::placeholder { color: var(--dim); }
-.gw input:focus, .gw select:focus, .gw textarea:focus { outline: none; border-color: var(--signal); }
-.gw .gx-select, .gw select { padding-right: 28px; }
-/* 단추·칩 (올린 면) */
-.gw .gx-mini, .gw .gx-chip, .gw .gw-pre { display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; background: var(--panel2); color: var(--text); cursor: pointer; }
-.gw .gx-mini svg, .gw .gx-chip svg { width: 15px; height: 15px; flex: none; }
-.gw .gx-chip b { font-weight: 600; color: var(--text); }
-.gw .gx-chip small { font-size: 11.5px; color: var(--dim); }
-.gw .gx-mini:hover:not(:disabled), .gw .gx-chip:hover:not(:disabled), .gw .gw-pre:hover:not(:disabled) { border-color: var(--accent-line); }
-.gw .gx-mini.on, .gw .gx-chip.on, .gw .gw-pre.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
-.gw .gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
-.gw .gx-mini.danger { color: var(--danger); }
-.gw .gx-mini.danger:hover:not(:disabled) { border-color: var(--danger); }
-.gw .gx-mini:disabled, .gw .gx-chip:disabled, .gw .gw-pre:disabled, .gw .gx-seg:disabled, .gw input:disabled, .gw select:disabled { opacity: .45; cursor: default; }
-.gw .gx-mini.icon { width: var(--h); padding: 0; }
-.gw .gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--gap); }
-.gw .gx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
-/* 단계 선택 (들어간 면 위에 고른 칸만 색) */
-.gw .gx-segs, .gw .gx-segs.gx-segs-sm { display: inline-flex; align-items: stretch; gap: 2px; padding: 2px; }
-.gw .gx-seg { height: calc(var(--h) - 6px); min-height: 0; min-width: 0; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 3px); background: transparent; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
-/* 숫자 스테퍼 (−·값·+ 한 상자) */
-.gw .adv-step, .gw .st-step { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
-.gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0;
+.gw 

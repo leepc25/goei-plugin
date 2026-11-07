@@ -1,4 +1,73 @@
-ew Date(at * 6e4);
+,
+      ...address ? { address } : {}
+    };
+  }
+  var valuesOf = (name) => RELATIONS.people[name]?.values ?? "";
+  var temperOf = (name) => RELATIONS.people[name]?.temper;
+  function userAffinityBase(personFaction, userFaction3) {
+    if (!personFaction || !userFaction3 || personFaction === userFaction3) return 0;
+    return STAGE_VALUE[relationStage(personFaction, userFaction3)];
+  }
+  var factionBase = (code2, userFaction3) => userAffinityBase(code2, userFaction3);
+  function allNames() {
+    return Object.entries(ALIASES.names).map(([name, v]) => ({ name, aliases: [.../* @__PURE__ */ new Set([...v.aliases ?? [], ...RELATIONS.people[name]?.english ?? []])], titles: v.titles ?? [] }));
+  }
+  var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
+
+  // src/core/people/faction.ts
+  function userFactionOf(store, chat) {
+    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
+    return store.identity?.faction || (typeof v === "string" ? v : "");
+  }
+  function knownFactionCodes(store, names4 = {}) {
+    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
+  }
+  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
+  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
+    const base = factionBase(code2, userFaction3);
+    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
+    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base };
+  }
+  function sceneFactionCodes(store, people, texts, names4 = {}) {
+    const out = [];
+    const push2 = (c) => {
+      if (c && !out.includes(c)) out.push(c);
+    };
+    for (const n2 of people) push2(store.people[n2]?.faction ?? "");
+    for (const t of texts) for (const c of factionCodesIn(t, names4)) push2(c);
+    return out;
+  }
+  function factionsBlock(list4, user = "{{user}}") {
+    const lines3 = list4.filter((f) => f.stage.id !== "neutral").map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}`);
+    if (!lines3.length) return "";
+    return ["## Factions → " + user + " (standing of each organization toward " + user + ", kept by the system; members act accordingly)", ...lines3].join("\n");
+  }
+
+  // src/core/journal/chronicle.ts
+  var CHRON_KIND_LABEL = { event: "사건", person: "인물", faction: "세력", rank: "신분" };
+  var str4 = (v) => typeof v === "string" ? v : "";
+  function dayLabels(chat) {
+    const list4 = Array.isArray(chat.message) ? chat.message : [];
+    const days = [];
+    let last2 = "";
+    list4.forEach((m, i) => {
+      if (m.role === "char") {
+        const st = lastStatusFields([str4(m.data)]);
+        if (st?.date) last2 = st.date;
+      }
+      days[i] = last2;
+    });
+    return (pos) => pos < 0 || !days.length ? "" : days[Math.min(pos, days.length - 1)] ?? "";
+  }
+  var two5 = (n2) => String(n2).padStart(2, "0");
+  var dayOfMinute = (at) => {
+    if (at === null) return "";
+    const d = new Date(at * 6e4);
+    return `${d.getUTCFullYear()}.${two5(d.getUTCMonth() + 1)}.${two5(d.getUTCDate())}`;
+  };
+  var hhmm3 = (at) => {
+    if (at === null) return "";
+    const d = new Date(at * 6e4);
     return `${two5(d.getUTCHours())}:${two5(d.getUTCMinutes())}`;
   };
   function factionNames2(lore) {
@@ -49,14 +118,14 @@ ew Date(at * 6e4);
         const now = label2(sumCues(who, base, list4.slice(0, i + 1), folded, min, max, o));
         if (now === prev) continue;
         const c = list4[i];
-        const reason2 = [...list4.slice(0, i + 1)].reverse().find((x) => x.anchor === c.anchor && x.reason)?.reason ?? "";
+        const reason3 = [...list4.slice(0, i + 1)].reverse().find((x) => x.anchor === c.anchor && x.reason)?.reason ?? "";
         out.push({
           pos: posOf(c),
           seq: 1 + c.seq,
           kind: isFac ? "faction" : "person",
           day: day(posOf(c)),
           title: isFac ? factionName(code2, names4, store) : who,
-          text: `${isFac ? "평판" : "호감"} ${prev} → ${now}${reason2 ? ` · ${reason2}` : ""}`,
+          text: `${isFac ? "평판" : "호감"} ${prev} → ${now}${reason3 ? ` · ${reason3}` : ""}`,
           ...isFac ? { faction: code2 } : { person: who }
         });
         prev = now;
@@ -4051,13 +4120,13 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     if (c.custom) p.custom = true;
     return p;
   }
-  function refreshRetry(prompt, reason2) {
+  function refreshRetry(prompt, reason3) {
     const [sys, ...rest] = prompt.messages;
     return [
       {
         role: "system",
         content: `${sys.content}
-The previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason2.slice(0, 600)}
+The previous response was rejected and nothing was saved. Recreate the complete result from the same supplied data, following the REFRESH OUTPUT CONTRACT. Return a compact COMPLETE JSON object. The configured message lengths/counts are ceilings, not targets; reduce optional messages rather than ending mid-JSON. Omit silent rooms from updates. Use valid JSON string escaping for newlines, quotation marks and backslashes. Do not copy these instructions into messages. Validation error: ${reason3.slice(0, 600)}
 ${RETRY_ANALYZE}`
       },
       ...rest
@@ -4094,74 +4163,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
   var esc4 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var isOnOff = (items) => items.length === 2 && items.every(([, l]) => l === "ON" || l === "OFF");
   function switchHtml(o) {
-    return `<span class="gx-switch-wrap"><small>${o.disabled ? "비활성" : o.on ? "켬" : "끔"}</small><button class="gx-switch" role="switch" aria-checked="${o.on}" data-action="${esc4(o.action)}" data-value="${esc4(o.value)}" ${o.disabled ? "disabled" : ""}${o.label ? ` aria-label="${esc4(o.label)}"` : ""}><i></i></button></span>`;
-  }
-  function onOffSwitch(items, cur, action, valueOf, disabled = false) {
-    if (!isOnOff(items)) return null;
-    const onV = items.find(([, l]) => l === "ON")[0];
-    const offV = items.find(([, l]) => l === "OFF")[0];
-    const on2 = cur === onV;
-    return switchHtml({ action, value: valueOf(on2 ? offV : onV), on: on2, disabled });
-  }
-  function labelSwitches(root3) {
-    root3.querySelectorAll('button.gx-switch[role="switch"]:not([aria-label])').forEach((b) => {
-      const row9 = b.closest(".ps-row, .dir-line, .st-col-row, .dir-in");
-      const name = row9?.querySelector(".ps-label > b, .st-col-name > b, :scope > span:first-child")?.textContent?.replace(/\s+/g, " ").trim();
-      if (name) b.setAttribute("aria-label", name);
-    });
-  }
-
-  // src/host/photo.ts
-  var UPLOAD_SIDE = 1280;
-  var MAX_FILE = 20 * 1024 * 1024;
-  var PhotoError = class extends Error {
-  };
-  function sniffMime(b) {
-    const s7 = (i, n2) => String.fromCharCode(...b.slice(i, i + n2));
-    if (b[0] === 137 && s7(1, 3) === "PNG") return "image/png";
-    if (b[0] === 255 && b[1] === 216) return "image/jpeg";
-    if (s7(0, 4) === "RIFF" && s7(8, 4) === "WEBP") return "image/webp";
-    if (s7(0, 3) === "GIF") return "image/gif";
-    if (s7(4, 4) === "ftyp" && /avi[fs]/.test(s7(8, 4))) return "image/avif";
-    return "image/png";
-  }
-  function toBytes2(data3) {
-    if (data3 instanceof Uint8Array) return data3;
-    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
-    if (Array.isArray(data3)) return new Uint8Array(data3);
-    if (data3 && typeof data3 === "object") {
-      const values = Object.values(data3);
-      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
-    }
-    return null;
-  }
-  function base642(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
-  }
-  async function savePhoto(file) {
-    if (!file.type.startsWith("image/")) throw new PhotoError("사진 파일만 보낼 수 있어요.");
-    if (file.size > MAX_FILE) throw new PhotoError("사진이 너무 커요 (20MB까지).");
-    let bitmap;
-    try {
-      bitmap = await createImageBitmap(file);
-    } catch {
-      throw new PhotoError("사진을 열지 못했어요. 다른 형식(JPG·PNG)으로 다시 시도해 주세요.");
-    }
-    const scale = Math.min(1, UPLOAD_SIDE / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    const g2 = canvas.getContext("2d");
-    if (!g2) throw new PhotoError("사진을 줄이지 못했어요.");
-    g2.imageSmoothingQuality = "high";
-    g2.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.86)) ?? await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.88));
-    if (!blob) throw new PhotoError("사진을 줄이지 못했어요.");
-    const bytes = new Uint8Array(await blob.arrayBuffer());
-    let asset;
-    try {
-      asset = await risuai.saveAsset(bytes);
-    } catc
+    return `<span class="gx-switch-wrap"><small>${o.disabled ? "비활성" : o.on ? "켬" : "끔"}</sma
