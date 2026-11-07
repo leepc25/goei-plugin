@@ -172,16 +172,17 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
 /** 팔 것 고르기: 진열대 자리에 내 소지품 (같은 격자). 고르면 입력창에 「팔기: 이름」 칩 */
 function pickHtml(ctx: ChatContext, st: ShopState): string {
   const mine = liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat);
-  const head = `<div class="sh-pick-head"><span>팔 물건을 고르세요</span><button class="gx-chip" data-action="shop-pick">진열대로</button></div>`;
-  if (!mine.length) return `${head}<p class="gx-wt-empty">팔 만한 소지품이 없어요.</p>`;
-  return `${head}<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>`;
+  // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
+  const head = `<header class="sh-zh"><b>소지품</b><small>${mine.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small><button class="gx-chip" data-action="shop-pick">진열대로</button></header>`;
+  const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : '<p class="gx-wt-empty">팔 만한 소지품이 없어요.</p>';
+  return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
 }
 
 function pickCell(it: Item, st: ShopState): string {
   const sel = st.sell?.itemId === it.id;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(itemKindLabel(it.kind))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}${Number.isSafeInteger(it.price) ? `<span class="sh-amt">산 값 ${esc(shortWon(it.price!))}</span>` : ''}</span>`;
   return `<button class="it-c sh-c${sel ? ' sel' : ''}" data-action="shop-sell-pick" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 팔기" ${shopUi.loading ? 'disabled' : ''}>
-    <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(shortWon(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(shortWon(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
+    <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span>${sel && typeof st.sell?.price === 'number' ? `<span class="sh-band dim"><i>▴</i>${esc(shortWon(st.sell.price))}</span>` : ''}${tip}</button>`;
 }
 
 /** 주인 사진이 없을 때 기본 얼굴: 어둠 속 역광 그림자 (사용자 11-07, 후보 C). 성별·옷·얼굴을 알 수 없는 형체만 */
