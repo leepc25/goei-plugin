@@ -1,4 +1,585 @@
-드, 안쪽 여백·간격 (2026-11-05 사용자: 다닥다닥 붙음) */
+; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.62) contrast(1.3) saturate(1.4); }
+.gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 55%, rgba(5, 10, 12, .55) 100%); }
+.gx-oppin { position: absolute; z-index: 2; transform: translate(-6px, -50%); display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
+.gx-oppin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent), 0 0 14px var(--c); }
+.gx-oppin em { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(8, 12, 14, .78); white-space: nowrap; }
+.gx-oppin.sel em { background: #5fe6c6; color: #0c1a17; } .gx-oppin.sel i { outline: 2px solid #fff; outline-offset: 2px; }
+.gx-oppin.k-an { --c: #ff8a7a; } .gx-oppin.k-in { --c: #ffc35a; } .gx-oppin.k-ms { --c: #8cc8ff; }
+.gx-opcross { position: absolute; z-index: 1; width: 64px; height: 64px; transform: translate(-50%, -50%); border: 1px solid rgba(79, 209, 181, .7); border-radius: 50%; pointer-events: none; }
+.gx-opcross::before, .gx-opcross::after { content: ''; position: absolute; background: rgba(79, 209, 181, .6); }
+.gx-opcross::before { left: -18px; right: -18px; top: 50%; height: 1px; } .gx-opcross::after { top: -18px; bottom: -18px; left: 50%; width: 1px; }
+/* 상황 일지 */
+.gx-oplog { min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.gx-oplog > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-oplog > h2 > b { white-space: nowrap; }
+.gx-opcnt { display: flex; } .gx-opcnt em { font-style: normal; display: flex; align-items: baseline; gap: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; color: var(--dim); }
+.gx-opcnt em + em { border-left: 1px solid var(--line); }
+.gx-opcnt em i { font: 700 17px/1 var(--mono); font-style: normal; color: var(--c); }
+.gx-opcnt em u { text-decoration: none; font: 600 11px var(--mono); margin-left: -2px; }
+.gx-opcnt .an { --c: #e8685a; } .gx-opcnt .in { --c: #d99a2b; } .gx-opcnt .ms { --c: #4a9be0; } .gx-opcnt .sig { --c: var(--signal); }
+.gx-oplog > ul { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 0; list-style: none; }
+.gx-oplog > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
+.gx-oprow { display: flex; align-items: center; gap: 11px; padding: 8px 12px 8px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); cursor: pointer; }
+.gx-oprow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.gx-oprow.sel { background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 14%, transparent), color-mix(in srgb, var(--signal) 3%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--signal) 45%, transparent); }
+.gx-oprow-pic { flex: none; width: 44px; height: 44px; border-radius: 9px; overflow: hidden; display: grid; place-items: center; background: var(--panel2); }
+.gx-oprow-pic img { width: 100%; height: 100%; object-fit: cover; }
+.gx-oprow-ico { font: 700 18px var(--mono); color: var(--dim); } .gx-oprow-ico svg { width: 20px; height: 20px; }
+.gx-oprow-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gx-oprow-t > b { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 14px; }
+.gx-oprow-t > b > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oprow-t > b > .gx-gmark { flex: none; width: 19px; height: 19px; font-size: 11px; border-radius: 5px; } .gx-oprow-t > b > .gx-gmark svg { width: 12px; height: 12px; }
+.gx-oprow-t > small { display: flex; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; } .gx-oprow-t > small > span { overflow: hidden; text-overflow: ellipsis; }
+.gx-oprow .gx-evc-note { color: var(--dim); text-shadow: none; } .gx-oprow .gx-evc-note::before { color: var(--dim); } .gx-oprow .gx-evc-note.op { color: #8a74e8; }
+.gx-oprow .gx-evdep { margin-left: 0; color: color-mix(in srgb, var(--text) 30%, transparent); }
+.gx-oprow .gx-evdep.on { color: var(--signal); filter: none; } .gx-oprow .gx-evdep.other { color: #d99a2b; filter: none; }
+.gx-oprow.ended { opacity: .5; } .gx-oprow.ended img { filter: grayscale(1); } .gx-oprow.ended .gx-oprow-t > b > span { text-decoration: line-through; }
+@media (min-width: 761px) and (min-height: 500px), (min-width: 761px) and (pointer: fine), (min-width: 761px) and (pointer: none) { .gx-board > .gx-ops { flex: none; } }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx-ops { display: flex; flex-direction: column; height: auto; }
+  .gx-opview { height: 340px; flex: none; scroll-margin-top: 8px; }
+  .gx-opcap .gx-evart-l1 > b { font-size: 19px; }
+  .gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { font-size: 13px; }
+  /* 모바일 일지는 안쪽 스크롤 없이 화면 전체 스크롤로 (2026-10-21 사용자: 폰에서 일지 위에선 스크롤·쓸기가 안 먹었다) */
+  .gx-oplog > ul { flex: none; max-height: none; overflow: visible; overscroll-behavior: auto; }
+  .gx-opcnt em { padding: 4px 6px; }
+}
+.gx-ops .gx-gmark { font-style: normal; }
+.gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
+.gx-oppin:not(.sel) em { opacity: .85; font-size: 12px; }
+
+/* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로 */
+.gx-oposd { flex-wrap: nowrap; align-items: center; gap: 10px; }
+.gx-oposd .cam { flex: 1 1 auto; flex-basis: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { flex: none; }
+.gx-opwho { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 13px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+.gx-opwho em { font-style: normal; font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, .6); margin-right: 2px; }
+.gx-opwho i { font-style: normal; color: rgba(255, 255, 255, .4); }
+.gx-opwho .on { color: #5fe6c6; } .gx-opwho .other { color: #ffc35a; }
+.gx-opmap { position: absolute; inset: 0; margin: 0; overflow: hidden; container-type: size; }
+.gx-opmapi { --w: max(100cqw, calc(100cqh * 1.25)); top: clamp(calc(100cqh - var(--w) * .8), calc(50cqh - var(--w) * .8 * var(--py) / 100), 0px); bottom: auto; left: clamp(calc(100cqw - var(--w)), calc(50cqw - var(--w) * var(--px) / 100), 0px); transform: none; width: var(--w); height: calc(var(--w) * .8); max-width: none; aspect-ratio: auto; transition: left .35s ease, top .35s ease; }
+.gx-opview.map::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(8, 12, 14, .55), transparent 70px); }
+@media (prefers-reduced-motion: reduce) { .gx-opmapi { transition: none; } }
+.gx-oposd .rec { flex: none; white-space: nowrap; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-oposd { font-size: 12px; letter-spacing: .04em; gap: 8px; } }
+/* 일지 칸: 일반 section 위 여백(14px)이 제목 위에 붙던 것 제거 */
+.gx-body .gx-oplog { padding: 0; margin: 0; }
+
+/* 상황판 요원 칸 (2026-10-20 사용자 시안): 일지처럼 제목줄이 상자 안. 모니터 벽(기본) 또는 근무 현황 목록.
+   칸 크기는 창 크기와 상관없이 고정이고, 요원이 많으면(최대 20명) 상자 안에서 스크롤 */
+.gx-body .gx-agbox { display: flex; flex-direction: column; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.gx-agbox > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-hseg { display: flex; gap: 2px; margin-left: -6px; padding: 2px; border-radius: 9px; background: var(--void); box-shadow: inset 0 0 0 1px var(--line); }
+.gx-hseg button { display: grid; place-items: center; width: 34px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
+.gx-hseg button:hover { color: var(--text); }
+.gx-hseg button.on { background: var(--accent-bg); color: var(--signal); }
+.gx-hseg svg { width: 19px; height: 19px; }
+.gx-agbox > .gx-hint { margin: 8px 14px 0; }
+.gx-agbox > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
+.gx-opcnt .op { --c: #e8685a; }
+.gx-agwall, .gx-agrows { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; list-style: none; background: var(--panel); }
+@media (min-width: 761px) and (min-height: 500px), (min-width: 761px) and (pointer: fine), (min-width: 761px) and (pointer: none) {
+  .gx-board { min-height: 100%; box-sizing: border-box; }
+  .gx-board > .gx-agbox { flex: 1 1 0; min-height: 330px; }
+}
+
+/* 모니터 벽: 감시 화면 한 칸에 한 명. 편성 가능은 밝게(살짝 눌러서), 작전 중은 가장자리·모서리만 붉게, 편성 불가는 어둡게 */
+.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: var(--agrow, max(150px, calc((100% - 24px) / 2))); gap: 8px; align-content: start; padding: 8px; }
+.gx-agmon { --c: #5fe6c6; position: relative; display: flex; min-width: 0; min-height: 0; padding: 5px 5px 14px; border-radius: 7px; background: linear-gradient(180deg, #2a3236, #1d2427); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 2px 4px rgba(0, 0, 0, .4); cursor: pointer; }
+.gx-agmon::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: var(--c); box-shadow: 0 0 5px var(--c); }
+.gx-agmon.op { --c: #ff6b5b; } .gx-agmon.lock { --c: #6d7a77; } .gx-agmon.lock::after { box-shadow: none; }
+.gx-agmon-scr { position: relative; flex: 1; min-width: 0; overflow: hidden; border-radius: 3px; background: #050807; box-shadow: inset 0 0 0 1px #000; }
+.gx-agmon-scr > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; font-size: 34px; }
+.gx-agmon-scr > .gx-ava img { object-position: 50% 22%; filter: saturate(.85) brightness(.9); }
+.gx-agmon-scr::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .14) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, .35) 100%); }
+.gx-agmon-scr::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%); }
+.gx-agmon.op .gx-agmon-scr::after { background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%), radial-gradient(ellipse 80% 75% at 50% 45%, transparent 68%, rgba(225, 40, 28, .45) 100%); box-shadow: inset 0 0 14px rgba(230, 45, 30, .45); }
+.gx-agmon.lock .gx-agmon-scr > .gx-ava img { filter: grayscale(1) brightness(.35) contrast(1.15); }
+.gx-agmon.lock .gx-agmon-cap b { color: rgba(255, 255, 255, .55); }
+.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; align-items: center; gap: 4px; font: 600 10.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
+.gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; padding: 2px 5px; border-radius: 3px; background: rgba(4, 8, 8, .55); color: var(--c); font: 700 11px/1.1 var(--font, inherit); letter-spacing: 0; }
+.gx-agmon-cap { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gx-agmon-cap b { font-size: 14.5px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon-cap small { font: 600 11px/1.25 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon:hover .gx-agmon-scr { box-shadow: inset 0 0 0 1px #000, 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
+
+/* 목록: 얼굴 · 이름 · 상태(점+글자) · 상황 · 톡·위키. PC 두 줄, 모바일 한 줄. 줄을 칠하지 않고 점 색으로만 */
+.gx-agrows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: var(--agrow, 54px); align-content: start; padding: 0; }
+.gx-agrow { --c: var(--signal); display: grid; grid-template-columns: 36px 4.6em auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-width: 0; padding: 0 8px 0 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.gx-agrow:nth-child(odd) { border-right: 1px solid var(--line); }
+.gx-agrow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.gx-agrow > .gx-ava { width: 36px; height: 36px; border-radius: 10px; font-size: 14px; }
+.gx-agrow > .gx-ava img { filter: brightness(.9); }
+.gx-agrow > b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agrow-st { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--c); white-space: nowrap; }
+.gx-agrow-st i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.gx-agrow.op { --c: #e8685a; } .gx-agrow.op .gx-agrow-st i { box-shadow: 0 0 6px #ff3b2b; }
+.gx-agrow.lock { --c: var(--dim); } .gx-agrow.lock > .gx-ava img { filter: grayscale(1) brightness(.5); } .gx-agrow.lock > b, .gx-agrow.lock .gx-agrow-msg { opacity: .55; }
+.gx-agrow-msg { min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agrow-msg.two { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; line-height: 1.35; }
+.gx-agrow-msg.two > span { display: inline; }
+.gx-agrow-tools { display: flex; gap: 0; }
+.gx-agrow-tools .gx-acard-tool { width: 30px; height: 30px; }
+
+/* 마우스를 올리면 머리 위 말풍선 (꼬리는 아래로, 칸 가운데를 가리킨다) */
+.gx-agtip { --tail: 24px; position: fixed; z-index: 70; max-width: 300px; padding: 9px 12px; border-radius: 10px; background: var(--panel2); color: var(--text); font-size: 13px; line-height: 1.5; box-shadow: 0 8px 24px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--line2); pointer-events: none; }
+.gx-agtip b { display: block; margin-bottom: 3px; font-size: 12px; color: var(--dim); }
+.gx-agtip::after { content: ''; position: absolute; top: 100%; left: calc(var(--tail) - 8px); width: 16px; height: 9px; background: var(--panel2); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+/* 요원 사원증 창 (가로 명함 비율): 위 띠 · 직사각형 사진 + 신상 · 아래 번호와 톡·위키 */
+.gx-agcard { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(500px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; box-sizing: border-box; border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); color: var(--text); box-shadow: 0 22px 60px rgba(0, 0, 0, .5); }
+.gx-agcard-band { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 6px 0 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 22%, var(--panel2)), var(--panel2)); border-bottom: 1px solid var(--line); font: 700 11px var(--mono); letter-spacing: .2em; color: var(--signal); }
+.gx-agcard-band b { font-family: inherit; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; color: var(--text); }
+.gx-agcard-x { margin-left: auto; width: 28px; height: 28px; border: 0; border-radius: 7px; background: none; color: var(--dim); font-size: 13px; cursor: pointer; }
+.gx-agcard-main { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding: 16px; }
+.gx-agcard-ph { position: relative; align-self: stretch; min-height: 168px; border-radius: 10px; overflow: hidden; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line); }
+.gx-agcard-ph > img, .gx-agcard-ph > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; object-fit: cover; object-position: 50% 12%; font-size: 40px; }
+.gx-agcard-ph > .gx-ava img { object-position: 50% 14%; }
+/* 큰 사진은 전신(832×1216)이라 상반신만 보이게 키운다 */
+.gx-agcard-ph > img { transform: scale(1.9); transform-origin: 50% 6%; }
+.gx-agcard-t { min-width: 0; display: flex; flex-direction: column; }
+.gx-agcard-t .nm { font-size: 24px; font-weight: 800; line-height: 1.15; }
+.gx-agcard-t .en { margin-top: 3px; font: 600 11px var(--mono); letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+.gx-agcard-t dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.gx-agcard-t dt { padding-top: 1px; font-size: 12px; font-weight: 700; color: var(--dim); }
+.gx-agcard-t dd { margin: 0; }
+.gx-agcard-t dd.dep { color: #e8685a; font-weight: 700; }
+.gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
+.gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
+.gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
+.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.gx-agcard-foot button:hover { color: var(--signal); }
+.gx-agcard-foot button svg { width: 15px; height: 15px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
+  .gx-agmon { aspect-ratio: 1; }
+  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 10px; } .gx-agmon-osd { font-size: 9.5px; }
+  /* 모바일은 화면 전체가 넘어가니 요원 칸 안쪽 스크롤 없음 (2026-10-21 사용자) */
+  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { flex: none; max-height: none; overflow: visible; }
+  .gx-agrows { grid-template-columns: minmax(0, 1fr); }
+  .gx-agrow:nth-child(odd) { border-right: 0; }
+  .gx-agrow { grid-template-columns: 34px 4.6em auto minmax(0, 1fr) auto; gap: 8px; padding: 0 4px 0 10px; }
+  .gx-agrow-tools { display: none; }
+  .gx-agcard-main { grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 14px; }
+  .gx-agcard-ph { min-height: 136px; }
+  .gx-agcard-t .nm { font-size: 21px; }
+  .gx-agcard-foot { padding: 10px 14px; }
+  .gx-agcard-foot .code u { display: none; }
+  .gx-agcard-foot button { width: 84px; }
+}
+
+/* 잘리는 상황 글: 넘칠 때만 왼쪽으로 흘렀다가 돌아온다 (전광판). 움직임 줄이기 설정이면 말줄임표 그대로 */
+.gx-flow > span { display: inline-block; }
+.gx-flow.on { text-overflow: clip; }
+.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear var(--fdl, 0s) infinite; will-change: transform; }
+.gx-flow.on > span::after { content: attr(data-t); padding-left: 3em; }
+@keyframes gx-flow { from { transform: translateX(0); } to { transform: translateX(var(--fd, 0)); } }
+@media (prefers-reduced-motion: reduce) { .gx-flow.on { text-overflow: ellipsis; } .gx-flow.on > span { animation: none; display: inline; } .gx-flow.on > span::after { content: none; } }
+.gx-flow.on { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
+
+/* 큰 보기 화면 표시 (2026-10-21 사용자): 버튼이 빠진 맨 윗줄에 REC·카메라, 그 아래 날짜. 위성도 같은 틀(LIVE·SAT-2) */
+.gx-opbar { align-items: flex-start; }
+.gx-opbar .gx-oposd { position: static; flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px 10px; padding: 6px 0 0 4px; }
+/* 날짜는 둘째 줄에서 카메라 이름과 같은 들여쓰기 */
+.gx-oposd .l1 { display: contents; }
+.gx-oposd .ts { grid-column: 2; }
+.gx-oposd .l1 .cam { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { color: rgba(235, 255, 240, .7); }
+.gx-oposd .rec.sat { color: #5fe6c6; } .gx-oposd .rec.sat i { background: #5fe6c6; box-shadow: 0 0 6px #5fe6c6; }
+/* 모바일 설정: 칸 고르기는 한 줄 (상태창 5칸이 두 줄로 밀리던 것, 2026-10-21 사용자) */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .ps-ctl .gx-segs { flex-wrap: nowrap; max-width: 100%; }
+  .ps-ctl .gx-seg { flex: 0 1 auto; min-width: 0; padding: 0 9px; white-space: nowrap; }
+}
+/* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
+.gx-evart-l1 .gx-goaltag { flex: none; }
+
+/* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
+/* 커스텀 띠의 위키 (2026-10-21 사용자): 접힌 띠에선 오른쪽 끝, 상태 표시는 그 왼쪽 */
+.gx-mlist li.gx-mx { position: relative; }
+.gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
+.gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
+/* 모바일 좌우 쓸기 (2026-10-21 사용자: 단추 위에서 시작하면 안 넘어간다): 가로 끌기는 브라우저가 가져가지 않게 세로 스크롤만 맡긴다.
+   가로로 넘기는 줄·지도는 자기 touch-action이 따로 있다 */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx-content { touch-action: pan-y pinch-zoom; }
+}
+/* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
+:where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
+:where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
+/* PC 임무 탭 지도 (2026-10-21 사용자): 그림은 칸 폭을 꽉 채우고, 칸 높이는 줄여 위아래는 끌어서 본다.
+   칸 높이 = 본문 높이 − (지역 줄 36 + 칸 사이 10×2 + 필터·카드 세 줄 342 + 틀 2) */
+@media (min-width: 761px) and (min-height: 500px), (min-width: 761px) and (pointer: fine), (min-width: 761px) and (pointer: none) {
+  .gx-map .gx-mapbar .gx-select, .gx-map .gx-mapbar .gx-search { min-height: 36px; }
+  .gx-map > .gx-mapcol > .gx-canvas:not(.ph) { width: 100%; margin: 0; height: calc(min(100vh - 28px, 950px) - 98px - 400px); background: #0c1315; }
+  .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { width: 100%; }
+  .gx-map .gx-mapimg { width: 100%; max-width: none; max-height: none; }
+}
+/* 카드 가운데 선택 과녁 (evcard.ts aimMark, 2026-10-29). 선은 늘 1px(크기와 무관), 중심은 고정(단추 크기 그대로, 그림만 scale).
+   안 고름: 크고 얇고 흐리게, 바깥 눈금이 천천히 돌고 안 원이 숨 쉰다. 고름: 2/3 로 조여들며 붉게 잠김. 해제: 흰 고리와 함께 다시 커짐 */
+.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: grid; place-items: center; width: 210px; height: 210px; padding: 0; border: 0; border-radius: 50%; background: none; color: #fff; transform: translate(-50%, -50%); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.gx-aim svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; opacity: .55; transform: scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); transition: opacity .2s ease; }
+/* 표식 아래 글자 「선택」·「해제」 (2026-11-05 사용자: 선택 단추인 걸 알 수 있게, 진하게 하지 않고 CCTV 글꼴로) */
+.gx-aim-l { position: absolute; left: 50%; top: calc(50% + 44px); transform: translateX(-50%); font: 700 11px/1 var(--mono); letter-spacing: .22em; text-indent: .22em; color: rgba(255, 255, 255, .82); text-shadow: 0 1px 3px rgba(0, 0, 0, .95), 0 0 8px rgba(0, 0, 0, .6); white-space: nowrap; pointer-events: none; transition: opacity .2s ease, top .3s ease, color .2s ease; }
+.gx-aim:hover .gx-aim-l { color: #fff; }
+.gx-aim.on .gx-aim-l { top: calc(50% + 34px); color: rgba(255, 179, 174, .95); }
+.gx-aim svg * { vector-effect: non-scaling-stroke; }
+.gx-aim:hover svg { opacity: .85; }
+.gx-aim .rot { transform-origin: 50% 50%; animation: gx-aim-spin 18s linear infinite; }
+.gx-aim .orb { stroke-dasharray: 1 5; }
+.gx-aim .ring { transform-origin: 50% 50%; animation: gx-aim-breathe 2.8s ease-in-out infinite; }
+.gx-aim .brk { opacity: 0; }
+.gx-aim .burst { opacity: 0; }
+.gx-aim .dot { fill: currentColor; stroke: none; }
+/* 고름: 같은 중심에서 2/3, 붉은 1px 선에 은은한 빛 */
+.gx-aim.on { color: #ff5f55; }
+.gx-aim.on svg { opacity: 1; transform: scale(.667); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .9)) drop-shadow(0 0 4px rgba(255, 70, 60, .85)) drop-shadow(0 0 12px rgba(255, 50, 40, .35)); }
+.gx-aim.on .rot { animation-duration: 5s; }
+.gx-aim.on .orb { stroke-dasharray: 6 3; }
+.gx-aim.on .ring { animation: none; }
+.gx-aim.on .brk { opacity: 1; }
+.gx-aim.on .dot { fill: #ff3b30; animation: gx-aim-pulse 1.1s ease-in-out infinite; }
+/* 누른 순간만 (fx): 잠금 — 살짝 더 조였다 놓이고, 붉은 고리가 퍼지며 사라지고, 괄호가 바깥에서 들어온다 */
+.gx-aim.on.fx svg { animation: gx-aim-lock .5s cubic-bezier(.2, 1, .3, 1); }
+.gx-aim.on.fx .burst { animation: gx-aim-burst .55s ease-out; stroke: #ff5f55; }
+.gx-aim.on.fx .brk { animation: gx-aim-brk .5s cubic-bezier(.2, 1, .3, 1); }
+/* 해제 — 흰 고리가 퍼지며 원래 크기로 */
+.gx-aim:not(.on).fx svg { animation: gx-aim-release .5s cubic-bezier(.2, 1.15, .35, 1); }
+.gx-aim:not(.on).fx .burst { animation: gx-aim-burst .5s ease-out; stroke: #fff; }
+@keyframes gx-aim-spin { to { transform: rotate(360deg); } }
+@keyframes gx-aim-breathe { 0%, 100% { transform: scale(1); opacity: .7; } 50% { transform: scale(1.05); opacity: 1; } }
+@keyframes gx-aim-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes gx-aim-lock { 0% { transform: scale(1); opacity: .55; } 60% { transform: scale(.62); opacity: 1; } 100% { transform: scale(.667); opacity: 1; } }
+@keyframes gx-aim-release { 0% { transform: scale(.667); opacity: 1; } 65% { transform: scale(1.03); opacity: .7; } 100% { transform: scale(1); opacity: .55; } }
+@keyframes gx-aim-burst { 0% { r: 30; opacity: .95; } 100% { r: 70; opacity: 0; } }
+@keyframes gx-aim-brk { 0% { transform: scale(1.5); transform-origin: 50% 50%; opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .gx-aim .rot, .gx-aim .ring, .gx-aim .dot, .gx-aim.fx svg, .gx-aim.fx .burst, .gx-aim.fx .brk { animation: none !important; } }
+/* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
+   안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
+.gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
+.gx-tgt svg { display: block; }
+.gx-tgt .dot { fill: #ff3b30; opacity: 0; }
+.gx-tgt:hover { color: rgba(255, 255, 255, .9); }
+.gx-tgt.on { color: #fff; }
+.gx-tgt.on .dot { opacity: 1; }
+.gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: var(--ctl-sm); height: var(--ctl-sm); margin: 0; border-radius: var(--ctl-r); background: rgba(8, 12, 14, .58); color: #f2f6f5; }
+.gx-evbtn.gx-tgt:hover { background: rgba(8, 12, 14, .82); }
+.gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
+.gx-mx.open .gx-evart-name .gx-evart-l1 > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-opcap .gx-evart-l1 > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 12px; }
+.gx-evart-l1 > b:has(+ .gx-tgt), .gx-evart-l1 > .gx-tgt { align-self: baseline; }
+.gx-evart-l1 > .gx-tgt { height: auto; font-size: 12px; }
+/* CCTV 잡음·위성 구름 (transform만 움직임) */
+.gx-opfx { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.gx-opfx > .n { position: absolute; inset: -96px; opacity: .26; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 4 -1.75'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23f)'/%3E%3C/svg%3E"); will-change: transform; animation: gx-opnoise .48s steps(1) infinite; }
+.gx-opfx > .r { position: absolute; left: 0; right: 0; top: 0; height: 26%; background: linear-gradient(transparent, rgba(255, 255, 255, .05) 45%, rgba(255, 255, 255, .09) 52%, transparent); will-change: transform; animation: gx-oproll 7.5s linear infinite; }
+@keyframes gx-opnoise { 0% { transform: translate(0, 0); } 17% { transform: translate(-61px, 23px); } 33% { transform: translate(37px, -71px); } 50% { transform: translate(-19px, 54px); } 67% { transform: translate(72px, 11px); } 83% { transform: translate(-44px, -38px); } }
+@keyframes gx-oproll { 0% { transform: translateY(-110%); } 100% { transform: translateY(420%); } }
+@keyframes gx-opjit { 0%, 91%, 93.5%, 100% { transform: none; } 91.5% { transform: translate(2px, -1px); } 92.5% { transform: translate(-3px, 1px) skewX(-1.5deg); } 93% { transform: translate(1px, 0); } }
+.gx-opview.feed > .gx-opfeed { animation: gx-opjit 6.3s steps(1) infinite; }
+.gx-opview.nosig > .gx-opfx > .n { opacity: .6; }
+.gx-opview.ended > .gx-opfx > .n, .gx-opview.ended > .gx-opfeed { animation: none; }
+.gx-opview.ended > .gx-opfx > .r { display: none; }
+@media (prefers-reduced-motion: reduce) { .gx-opfx > *, .gx-opview > .gx-opfeed { animation: none !important; } }
+.gx-opfx.sky > i { position: absolute; top: 0; left: 0; width: calc(100% + 820px); height: 100%; background-size: 512px 512px; will-change: transform; animation: gx-opsky 64s linear infinite; }
+.gx-opfx.sky > .c0 { background-position: 16px 20px; }
+.gx-opfx.sky > .c1 { opacity: .9; }
+.gx-opfx.sky > .c2 { opacity: .35; background-size: 820px 820px; background-position: 300px 140px; animation: gx-opsky2 120s linear infinite; }
+@keyframes gx-opsky { from { transform: translateX(-512px); } to { transform: translateX(0); } }
+@keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
+/* 2026-10-21 사용자: 어둡게는 접힌 띠에만. 펼친 커스텀은 글자 자리(아래)만 살짝 어둡게 */
+.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
+/* 「선택」 표식이 눈에 띄게 (2026-10-21 사용자: 효과가 약하다): 상자 없이 글자·조준선만. 고르기 전에는 붉게 깜빡이며
+   조준선에서 붉은 고리가 퍼지고, 고르면 붉은 빛으로 고정되고 한 번 「잠김」 번쩍임 */
+.gx-tgt:not(.gx-evbtn) { position: relative; color: #fff; font-size: 12px; letter-spacing: .06em; }
+.gx-tgt:not(.gx-evbtn) svg { position: relative; z-index: 1; }
+.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on)::before { content: ''; position: absolute; left: 2px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border: 2px solid #ff3b30; border-radius: 50%; box-sizing: border-box; pointer-events: none; animation: gx-tgt-ring 1.2s ease-out infinite; }
+.gx-tgt.on:not(.gx-evbtn) { color: #ff5a4e; text-shadow: 0 0 8px rgba(255, 59, 48, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); animation: gx-tgt-lock .5s ease-out 1; }
+.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
+.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 10px rgba(255, 70, 60, 1), 0 1px 2px rgba(0, 0, 0, .8); }
+@keyframes gx-tgt-pulse {
+  0%, 100% { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+  50% { color: #ff6a5e; text-shadow: 0 0 10px rgba(255, 59, 48, 1), 0 0 3px rgba(255, 120, 110, 1), 0 1px 2px rgba(0, 0, 0, .8); }
+}
+@keyframes gx-tgt-spin {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: none; }
+  50% { transform: scale(1.3) rotate(90deg); filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
+}
+@keyframes gx-tgt-ring { 0% { transform: scale(.8); opacity: .95; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes gx-tgt-lock { 0% { transform: scale(1.35); filter: brightness(2); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg, .gx-tgt.on:not(.gx-evbtn) { animation: none; }
+  .gx-tgt:not(.gx-evbtn):not(.on)::before { content: none; }
+}
+
+/* 편성 요원 카드 (임무·커스텀): 상황이 몇 줄이든 상황 2줄 높이로 고정하고, 사진을 그 높이만큼 키운다 (2026-10-21 사용자) */
+.gx-acard.pick.wide { box-sizing: border-box; height: var(--acard-h, 108px); align-items: stretch; overflow: hidden; }
+.gx-acard.pick.wide .gx-acard-side { align-self: stretch; display: flex; }
+.gx-acard.pick.wide .gx-acard-side > .gx-ava { width: auto; height: 100%; aspect-ratio: 1; }
+.gx-acard.pick.wide .gx-acard-txt { justify-content: center; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-acard.pick.wide { --acard-h: 100px; } .gx-acard.pick.wide small { white-space: nowrap; } }
+
+/* 상세 창 = 상황판 CCTV 그대로 (2026-10-21 사용자): 가로 600px, 세로는 PC 상황판 CCTV 비율(534×440) */
+.gx-opview.ev-pop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(600px, calc(100% - 32px)); height: auto; aspect-ratio: 534 / 440; max-height: calc(100% - 32px); box-shadow: 0 16px 48px rgba(0, 0, 0, .45); }
+/* CCTV 괴이 효과 (2026-10-21 사용자, ui/cctvfx.ts가 fx-* 클래스를 잠깐 붙인다) */
+.gx-optear, .gx-oplost, .gx-opshade { position: absolute; inset: 0; pointer-events: none; display: none; }
+.gx-optear { z-index: 1; }
+.gx-optear > i { position: absolute; inset: 0; background: var(--pic) center 40% / cover no-repeat; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15) drop-shadow(4px 0 rgba(255, 30, 60, .75)) drop-shadow(-4px 0 rgba(0, 230, 255, .6)); }
+.gx-optear > i:first-child { clip-path: inset(22% 0 61% 0); transform: translateX(-28px); }
+.gx-optear > i:last-child { clip-path: inset(58% 0 30% 0); transform: translateX(22px); }
+.gx-opview.fx-tear > .gx-optear { display: block; animation: gx-tear .26s steps(1) both; }
+.gx-opview.fx-tear > .gx-opfeed { animation: gx-tearimg .26s steps(1) both; }
+@keyframes gx-tear { 0% { transform: translateY(0); } 35% { transform: translateY(-9%); } 70% { transform: translateY(12%) scaleX(1.02); } }
+@keyframes gx-tearimg { 0% { transform: translateX(3px); filter: saturate(.3) contrast(1.4) brightness(.7) hue-rotate(-20deg); } 50% { transform: translateX(-5px) skewX(-3deg); filter: saturate(.2) contrast(1.6) brightness(1.1) invert(.08); } }
+.gx-oplost { z-index: 4; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 3px), #050807; }
+.gx-oplost > b { font: 700 15px/1 var(--mono); letter-spacing: .3em; color: rgba(235, 255, 240, .8); text-shadow: 0 0 6px rgba(235, 255, 240, .5); animation: gx-blink 1s steps(2, jump-none) infinite; }
+.gx-opview.fx-lost > .gx-oplost { display: grid; animation: gx-lost 1.5s steps(1) both; }
+@keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } }
+/* 신호가 돌아올 때 (2026-10-21 사용자: 너무 쓱 켜진다, 오싹하게, 숨어 있다 도망가거나 다양하게). 1.3초:
+   검은 화면 가운데 밝은 한 줄 → 세로로 펴지며 음화(반전) → 위아래로 흘러내림 → 한 번 꺼졌다 켜짐. 형체 연출은 data-back마다 다르다 (ui/cctvfx.ts) */
+.gx-opview.fx-back > .gx-opfeed { transform-origin: 50% 50%; animation: gx-backon 1.3s linear both; }
+@keyframes gx-backon {
+  0% { transform: scaleY(.008) scaleX(.7); filter: brightness(6) saturate(0); }
+  7% { transform: scaleY(.008) scaleX(1); filter: brightness(6) saturate(0); }
+  13% { transform: scaleY(1); filter: invert(1) saturate(0) contrast(1.8) brightness(1.2); }
+  20% { transform: translateY(-38%); filter: invert(1) saturate(0) contrast(1.8); }
+  21% { transform: translateY(42%); filter: invert(1) saturate(0) contrast(1.6); }
+  27% { transform: translateY(6%); filter: saturate(0) contrast(1.4) brightness(.6); }
+  31%, 51% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.7) sepia(.2); }
+  52%, 57% { transform: none; filter: brightness(0); }
+  58% { transform: translateX(-4px); filter: saturate(.2) contrast(1.6) brightness(1.5); }
+  66% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.45); }
+  74% { transform: none; filter: saturate(.5) contrast(1.15) brightness(1.1) sepia(.15); }
+  100% { transform: none; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+}
+/* 붉은 장면: 서 있는 형체와 함께 화면이 핏빛으로 한 번 */
+.gx-opview.fx-back[data-back="stand"] > .gx-opfeed { animation-name: gx-backred; }
+@keyframes gx-backred {
+  0% { transform: scaleY(.008) scaleX(.7); filter: brightness(6) saturate(0); }
+  7% { transform: scaleY(.008) scaleX(1); filter: brightness(6) saturate(0); }
+  13% { transform: scaleY(1); filter: invert(1) saturate(0) contrast(1.8) brightness(1.2); }
+  20% { transform: translateY(-38%); filter: invert(1) saturate(0) contrast(1.8); }
+  21% { transform: translateY(42%); filter: invert(1) saturate(0) contrast(1.6); }
+  27% { transform: translateY(6%); filter: saturate(0) contrast(1.4) brightness(.6); }
+  31%, 51% { transform: none; filter: sepia(1) hue-rotate(-45deg) saturate(5) contrast(1.5) brightness(.55); }
+  52%, 57% { transform: none; filter: brightness(0); }
+  58% { transform: translateX(-4px); filter: saturate(.2) contrast(1.6) brightness(1.5); }
+  66% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.45); }
+  74% { transform: none; filter: saturate(.5) contrast(1.15) brightness(1.1) sepia(.15); }
+  100% { transform: none; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+}
+.gx-opview.fx-back > .gx-oplost { display: grid; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .09) 0 1px, transparent 1px 3px); animation: gx-backnoise 1.3s steps(1) both; }
+.gx-opview.fx-back > .gx-oplost > b { display: none; }
+@keyframes gx-backnoise { 0% { opacity: 1; background-position: 0 0; } 15% { background-position: 0 7px; } 30% { background-position: 0 2px; } 45% { opacity: .8; background-position: 0 5px; } 66% { opacity: .35; } 80%, 100% { opacity: 0; } }
+.gx-opview.fx-back > .gx-opshade { display: block; width: auto; opacity: 0; animation: 1.3s both; }
+/* stand: 렌즈 바로 앞 가운데에 서 있다가, 꺼졌다 켜지면 없다 */
+.gx-opview.fx-back[data-back="stand"] > .gx-opshade { inset: -8% 18% -25%; animation-name: gx-bk-stand; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="stand"] > .gx-opshade svg { filter: blur(9px); }
+@keyframes gx-bk-stand { 0% { opacity: 0; } 31% { opacity: .92; transform: scale(1.04); } 42% { opacity: .92; transform: scale(1.12); } 52%, 100% { opacity: 0; } }
+/* flee: 켜지자 화면 가운데 있던 형체가 옆으로 휙 빠져나간다 */
+.gx-opview.fx-back[data-back="flee"] > .gx-opshade { inset: 22% 38% -6%; animation-name: gx-bk-flee; animation-timing-function: linear; }
+.gx-opview.fx-back[data-back="flee"] > .gx-opshade svg { filter: blur(3px); }
+@keyframes gx-bk-flee { 0%, 26% { opacity: 0; transform: none; } 27%, 38% { opacity: .95; transform: none; } 40% { opacity: .95; transform: translateX(-30%) skewX(12deg) scaleX(1.3); } 46% { opacity: .9; transform: translateX(-260%) skewX(20deg) scaleX(1.8); } 47%, 100% { opacity: 0; transform: translateX(-260%); } }
+.gx-opview.fx-back[data-back="flee"] > .gx-opfeed { animation-name: gx-backon, gx-bk-jolt; animation-duration: 1.3s, 1.3s; }
+@keyframes gx-bk-jolt { 0%, 39% { translate: 0; } 41% { translate: 6px 0; } 43% { translate: -5px 1px; } 46%, 100% { translate: 0; } }
+/* near: 멀리 작게 서 있다가, 꺼졌다 켜지면 훨씬 가까이, 그다음엔 없다 */
+.gx-opview.fx-back[data-back="near"] > .gx-opshade { inset: 30% 45% 28%; animation-name: gx-bk-near; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="near"] > .gx-opshade svg { filter: blur(1.5px); }
+@keyframes gx-bk-near { 0% { opacity: 0; } 27% { opacity: .95; transform: none; } 52% { opacity: 0; } 58% { opacity: .95; transform: translateY(32%) scale(3.4); } 66%, 100% { opacity: 0; } }
+/* peek: 화면 오른쪽 끝에 몸을 반쯤 숨기고 있다가 천천히 빠져나간다 */
+.gx-opview.fx-back[data-back="peek"] > .gx-opshade { inset: 6% -22% -20% 72%; animation-name: gx-bk-peek; animation-timing-function: ease-in; }
+.gx-opview.fx-back[data-back="peek"] > .gx-opshade svg { filter: blur(4px); }
+@keyframes gx-bk-peek { 0%, 26% { opacity: 0; transform: none; } 27%, 40% { opacity: .95; transform: none; } 70% { opacity: .95; transform: translateX(70%); } 71%, 100% { opacity: 0; transform: translateX(70%); } }
+/* lens: 켜지는 순간 렌즈에 바짝 붙은 머리가 화면을 가리고 있다가, 꺼졌다 켜지면 없다 */
+.gx-opview.fx-back[data-back="lens"] > .gx-opshade { inset: -30% -25% -90%; animation-name: gx-bk-lens; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="lens"] > .gx-opshade svg { filter: blur(20px); }
+@keyframes gx-bk-lens { 0%, 12% { opacity: 0; } 13% { opacity: .97; transform: none; } 40% { opacity: .97; transform: scale(1.08); } 52%, 100% { opacity: 0; } }
+/* 렌즈 앞을 스치는 것 (2026-10-21 사용자: 뒤에서 움직이는 사람 말고, 카메라 바로 앞을 섬뜩한 게 지나가는 느낌).
+   화면보다 큰 검은 형체가 초점이 안 맞은 채 0.2초 만에 가로지르고, 지나간 뒤 카메라 노출이 잠깐 튄다 */
+.gx-opshade { z-index: 2; inset: -20% auto -30% 0; width: 85%; }
+.gx-opshade svg { width: 100%; height: 100%; fill: #030204; filter: blur(16px); }
+.gx-opview.fx-shade > .gx-opshade { display: block; animation: gx-shade .22s cubic-bezier(.4, 0, .6, 1) both; }
+@keyframes gx-shade { 0% { transform: translateX(125%) rotate(4deg); opacity: .96; } 100% { transform: translateX(-130%) rotate(-3deg); opacity: .96; } }
+.gx-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
+@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
+/* 글자 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
+.gx-opview.fx-text :is(.gx-oposd, .gx-opcap) { animation: gx-textjit .75s steps(1) both; }
+@keyframes gx-textjit {
+  0% { transform: translate(2px, 0); text-shadow: 2px 0 rgba(255, 30, 60, .8), -2px 0 rgba(0, 230, 255, .6); }
+  20% { transform: translate(-3px, 1px) skewX(-6deg); } 40% { transform: translate(1px, -1px); text-shadow: -3px 0 rgba(255, 30, 60, .8), 3px 0 rgba(0, 230, 255, .6); }
+  60% { transform: translate(-1px, 0) skewX(4deg); } 80% { transform: none; }
+}
+/* 붉은 숨 (가끔만, 사용자: 늘 켜 두니 과하다): 괴이 화면 가장자리가 두 번 짙게 숨 쉬고 가라앉는다. 등급이 높을수록 짙게 */
+.gx-opview.feed.k-an { --bq: .42; }
+.gx-opview.feed.k-an[data-grade="s"] { --bq: .6; }
+.gx-opview.feed.k-an[data-grade="a"] { --bq: .5; }
+.gx-opview.feed.k-an:is([data-grade="c"], [data-grade="d"]) { --bq: .3; }
+.gx-opview.feed.k-an.fx-breath::after { animation: gx-breath 2.1s ease-in-out 2; }
+@keyframes gx-breath { 0%, 100% { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); } 50% { box-shadow: inset 0 0 120px rgba(190, 18, 10, var(--bq)); } }
+@media (prefers-reduced-motion: reduce) { .gx-opview.feed.k-an::after { animation: none; } }
+
+/* 기록: PC는 옆 메뉴, 모바일은 머리 버튼 (2026-10-29) */
+.gx-head-act .gx-recbtn { display: none; }
+
+/* ── 인물 기록 (ui/people.ts): 설정 페이지 · 위키 「이 채팅의 인물」 ── */
+.pp-pane .pp-doc { gap: 16px; }
+.pp-sec { display: flex; flex-direction: column; gap: 8px; }
+.pp-dot { font-style: normal; color: var(--signal); font-size: 10px; vertical-align: middle; }
+.nw-tile.k-pp .nw-tile-pics:not(:has(img)) { color: var(--signal); background: var(--accent-bg); }
+.pp-upbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.pp-upst { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--sub); }
+.pp-upst.busy { color: var(--signal); }
+.pp-spin { width: 12px; height: 12px; border: 2px solid var(--accent-line); border-top-color: var(--signal); border-radius: 50%; animation: pp-spin .8s linear infinite; }
+@keyframes pp-spin { to { transform: rotate(360deg); } }
+.pp-upbar .gx-mini { display: inline-flex; align-items: center; gap: 4px; }
+.pp-upbar .gx-mini svg { width: 16px; height: 16px; }
+.pp-card { display: flex; flex-direction: column; gap: 6px; }
+.pp-card-body { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.pp-card h4, .pp-slot h4 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.pp-card h4 b, .pp-slot h4 b, .pp-log > summary b { font-size: 12px; font-weight: 600; color: var(--dim); }
+.pp-aff { display: flex; flex-direction: column; gap: 8px; user-select: none; -webkit-user-select: none; }
+.pp-aff-top { display: flex; align-items: center; gap: 8px; }
+.pp-aff-top b { font-size: 16px; }
+.pp-aff-num { font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.pp-aff-num small { font-size: 12px; color: var(--dim); }
+/* 호감 8칸: 무관심(4번째 칸)이 기준. 기준에서 지금 단계까지만 채우고(음수 왼쪽 빨강·양수 오른쪽 초록), 지금 단계 칸만 진하게 (2026-10-26 사용자) */
+.pp-cells { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; height: 12px; }
+.pp-cell { border-radius: 4px; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); }
+.pp-cell.base { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sub) 70%, transparent); background: color-mix(in srgb, var(--sub) 18%, var(--panel2)); }
+.pp-cell.on.neg { background: color-mix(in srgb, var(--danger) 45%, var(--panel2)); box-shadow: none; }
+.pp-cell.on.pos { background: color-mix(in srgb, var(--signal) 45%, var(--panel2)); box-shadow: none; }
+.pp-cell.cur { background: var(--signal); box-shadow: 0 0 0 2px color-mix(in srgb, var(--signal) 35%, transparent); }
+.pp-cell.cur.neg { background: var(--danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent); }
+.pp-cell.cur.base { background: var(--sub); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sub) 35%, transparent); }
+.pp-aff-ends { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--dim); }
+.pp-addr-none { font-size: 13.5px; color: var(--dim); }
+.pp-stage.s-0, .pp-stage.s-1, .pp-stage.s-2 { color: var(--danger); background: var(--danger-bg); }
+.pp-stage.s-4, .pp-stage.s-5, .pp-stage.s-6, .pp-stage.s-7 { color: var(--signal); background: var(--accent-bg); }
+.pp-addr { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pp-addr b { font-size: 15px; }
+.pp-addr .gx-badge svg { width: 12px; height: 12px; vertical-align: -2px; }
+.pp-edit { display: flex; flex-direction: column; gap: 8px; }
+.pp-edit-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pp-edit-row label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--sub); }
+.pp-edit-row .gx-search { width: auto; flex: 1 1 160px; }
+.pp-check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.pp-check input { accent-color: var(--signal); width: 18px; height: 18px; }
+.pp-slot { display: flex; flex-direction: column; gap: 6px; }
+.pp-entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.pp-entry { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; }
+.pp-entry + .pp-entry { border-top: 1px solid var(--panel2); }
+.pp-entry.dead, .pp-entry.void { color: var(--dim); background: color-mix(in srgb, var(--panel2) 50%, transparent); }
+.pp-entry.dead .pp-text, .pp-entry.void .pp-text { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--dim) 60%, transparent); }
+.pp-entry.pinned { box-shadow: inset 3px 0 0 var(--signal); }
+.pp-entry-main { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.5; }
+.pp-text { min-width: 0; overflow-wrap: anywhere; }
+.pp-text small { color: var(--dim); }
+.pp-src { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 7px; background: var(--panel2); color: var(--dim); }
+.pp-src svg { width: 13px; height: 13px; }
+.pp-src.s-seed { color: var(--amber); background: var(--amber-bg); }
+.pp-src.s-story { color: var(--signal); background: var(--accent-bg); }
+.pp-src.s-field { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); }
+.pp-entry-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-left: 30px; font-size: 12.5px; color: var(--dim); }
+.pp-entry-meta q { quotes: '「' '」'; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.pp-no { padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--sub); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; }
+.pp-no:hover { border-color: var(--accent-line); color: var(--signal); }
+.pp-no.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+/* 「근거 #n」을 누르면 그 항목 아래: 인용 + 메시지 앞부분 */
+.pp-evidence { display: flex; flex-direction: column; gap: 4px; margin: 2px 0 0 30px; padding: 8px 10px; border-left: 2px solid var(--accent-line); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--panel2) 60%, transparent); font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+.pp-evidence q { quotes: '「' '」'; color: var(--text); }
+.pp-evidence small { font-size: 12.5px; color: var(--dim); overflow-wrap: anywhere; }
+.pp-evidence small b { color: var(--sub); }
+.pp-gone { color: var(--amber); }
+.pp-entry-btns { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+.pp-entry-btns .ph-tool.sm.on { color: var(--signal); background: var(--accent-bg); }
+.pp-mini { min-height: 28px; padding: 0 10px; font-size: 12.5px; }
+.pp-log { margin-top: 4px; }
+.pp-log > summary { gap: 6px; }
+.pp-log > .pp-entries, .pp-log > .ps-note { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
+.pp-log > .ps-note { margin: 0; padding: 12px 14px; }
+/* 설정 맨 위 설명 한 문단 */
+.pp-set .pp-intro { margin: 0 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); }
+.pp-set .pp-intro b { color: var(--text); font-weight: 600; }
+/* 「추가 지침」 두 칸 나란히 (모바일은 한 칸). 입력칸 위 빈 여백이 생기던 ps-label flex-basis 문제는 ps-row 를 쓰지 않아 없음 */
+.pp-rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; padding: 12px 14px; }
+.pp-rule { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pp-rule > b { font-size: 15px; font-weight: 600; }
+.pp-rule > .nw-reqbox { width: 100%; box-sizing: border-box; margin: 0; min-height: 96px; }
+.pp-rule > small { font-size: 13px; color: var(--dim); line-height: 1.45; }
+.pp-rule > .gx-row-btns { justify-content: flex-end; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .pp-rules { grid-template-columns: minmax(0, 1fr); padding: 12px; } }
+.pp-diags { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.pp-diag + .pp-diag { border-top: 1px solid var(--panel2); }
+.pp-diag-row { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 10px 12px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; }
+.pp-diag-row:hover { background: var(--panel2); }
+.pp-diag-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+.pp-diag-who { flex: 1 1 120px; min-width: 0; color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-diag-res { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.pp-diag-res .gx-badge { font-size: 12px; padding: 4px 8px; }
+.pp-err { color: var(--danger); font-size: 12px; }
+.pp-diag-sub { font-size: 12.5px; color: var(--dim); }
+.pp-diag-detail { display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px; }
+.pp-drops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.pp-drops li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pp-drops .gx-badge { font-size: 11.5px; padding: 3px 7px; }
+.pp-raw { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.45; resize: vertical; white-space: pre-wrap; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .pp-entry-meta { padding-left: 0; }
+  .pp-evidence { margin-left: 0; }
+  .pp-entry-btns { margin-left: 0; width: 100%; justify-content: flex-end; }
+  .pp-diag-who { flex-basis: 100%; }
+}
+/* 인물 기록: 지난 항목(대체·요약·취소·사라짐) 접기 */
+.pp-old { color: var(--dim); }
+.pp-oldbox { margin-top: 6px; }
+.pp-oldbox > summary { font-size: 12.5px; color: var(--dim); cursor: pointer; padding: 4px 12px; }
+.pp-oldbox > summary b { margin-left: 6px; font-weight: 600; }
+
+.pp-extra { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+/* 성격 6축 (2026-11-06 「F」) */
+.pp-axes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pp-axis { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.pp-axis > div { display: flex; justify-content: space-between; font-size: 12px; }
+.pp-axis small { font-size: 11px; color: var(--dim); line-height: 1.35; }
+.pp-axis-bar { display: block; height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pp-axis-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent, #5eead4); }
+.pp-cands { display: flex; flex-direction: column; gap: 8px; }
+.pp-cand { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.pp-cand-main { font-size: 13px; line-height: 1.5; }
+.pp-cand-ev { margin: 0; padding-left: 16px; }
+.pp-cand-ev li { font-size: 12px; line-height: 1.45; color: var(--dim); }
+.pp-group > summary { font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.pp-group-body { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+@media (max-width: 520px) { .pp-axes { grid-template-columns: 1fr; } }
+.pp-extra b { font-size: 16px; margin-right: 6px; }
+
+/* 세력 평판 */
+.gx-badge.fs-friendly { color: var(--signal); background: var(--accent-bg); }
+.gx-badge.fs-favorable { color: var(--signal); }
+.gx-badge.fs-wary { color: var(--amber); background: var(--amber-bg); }
+.gx-badge.fs-hostile { color: var(--bad, #c0392b); background: color-mix(in srgb, var(--bad, #c0392b) 14%, transparent); }
+.pp-mob { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--sub); }
+.pp-mob li { padding: 4px 8px; border-radius: 8px; }
+.pp-mob li.cur { background: var(--accent-bg); color: var(--text); }
+.pp-mob li b { margin-right: 6px; }
+.nw-ava.k-fac { background: var(--amber-bg); color: var(--amber); }
+.pp-bounds { max-width: 180px; }
+
+.pp-range { display: inline-flex; align-items: center; gap: 10px; }
+.pp-range input[type=range] { width: 180px; max-width: 60vw; }
+.pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }
+
+.pp-upgrp { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pp-backfill { margin-left: auto; }
+.pp-backfill .gx-select, .pp-reread-sel { min-height: 28px; font-size: 12.5px; }
+.pp-reread-sel { margin-left: 6px; }
+
+/* 이미지 지침 페이지 */
+/* 이미지 지침 (설정 → 캐릭터 이미지 아래): 칸마다 카드, 안쪽 여백·간격 (2026-11-05 사용자: 다닥다닥 붙음) */
 .ip-pane { gap: 16px; }
 .ip-pane .pp-intro { margin: 0 4px; }
 .ip-pane .ps-group { gap: 10px; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
@@ -104,6 +685,7 @@
 .gx-wt-ic svg { width: 18px; height: 18px; }
 .gx-wt-ic.field { background: var(--accent-bg); color: var(--signal); }
 .gx-wt-ic.manual { background: var(--amber-bg, var(--panel2)); color: var(--amber, var(--dim)); }
+.gx-wt-ic.store { background: var(--accent-bg); color: var(--signal); }
 .gx-wt-memo { display: flex; flex-direction: column; min-width: 0; }
 .gx-wt-memo b { font-size: 15px; font-weight: 700; }
 .gx-wt-memo small { overflow: hidden; font-size: 12.5px; color: var(--dim); white-space: nowrap; text-overflow: ellipsis; }
@@ -481,6 +1063,116 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-pickrow b { display: block; font-size: 13.5px; }
 .it-pickrow small { display: block; color: var(--dim); font-size: 11.5px; }
 .it-pickrow:hover { border-color: var(--signal); }
+/* 상점 팝업 (2026-11-07 사용자 설계, docs/인계/상점_1107/mock.mjs): 조작 34px·모서리 10, 칸·상자 12, 안쪽 8. 금액은 어디서나 같은 글꼴(mono 700 14), 색은 민트·흐림·빨강만 */
+.sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, transparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
+.sh-wrap *, .sh-det * { box-sizing: border-box; }
+.sh-amt { font: 700 14px/1 var(--mono); font-style: normal; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sh-amt.big { font-size: 16px; color: var(--signal); }
+.sh-amt s { color: var(--dim); font-weight: 500; }
+.sh-meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--sub); line-height: 1.4; }
+.sh-tag { display: inline-block; padding: 2px 8px; border: 1px solid var(--line); border-radius: var(--ri); color: var(--text); line-height: 1.4; }
+.sh-wrap-card { width: min(100%, 760px); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; max-height: calc(100% - 8px); overflow: hidden; }
+.sh-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 0 -2px; padding: 0 2px; }
+.sh-none { margin: 0; padding: 4px 30px 0 4px; font-size: 13.5px; line-height: 1.5; color: var(--sub); }
+.sh-err { margin: 0; white-space: pre-wrap; }
+.sh-err .sh-raw { min-height: 26px; margin-left: 6px; font-size: 12px; }
+/* 도구 줄 */
+.sh-tools { gap: 8px; }
+.sh-tools .it-act, .sh-tools .it-cnt { height: var(--h); border-radius: var(--r); border: 1px solid var(--line); background: var(--panel2); font-size: 13.5px; }
+.sh-name { display: inline-flex; align-items: center; gap: 8px; height: var(--h); padding: 0 4px; color: var(--text); font-size: 16px; font-weight: 700; white-space: nowrap; min-width: 0; }
+.sh-name b { overflow: hidden; text-overflow: ellipsis; }
+.sh-name svg { width: 18px; height: 18px; flex: none; color: var(--signal); }
+.sh-bal { padding: 0 12px; color: var(--text); font-size: 13.5px; font-weight: 600; }
+.sh-x { width: var(--h); padding: 0; justify-content: center; }
+.sh-x svg { color: var(--sub); }
+/* 주인 칸 (PC): 사진 128 · 이름 띠 · 대사 상자(4줄 넘으면 안에서 스크롤, 새 대사가 아래) · 입력창 */
+.sh-owner { display: flex; gap: 14px; align-items: stretch; margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--line); }
+.sh-face { flex: none; width: 128px; border-radius: var(--rc); overflow: hidden; border: 1px solid var(--line); background: var(--void); display: grid; place-items: center; color: var(--dim); }
+.sh-face img { width: 100%; height: calc(100% - 12px); margin-top: 12px; object-fit: cover; object-position: top; }
+.sh-face svg { width: 36px; height: 36px; }
+.sh-face .sh-shadow, .sh-ov-head .sh-face .sh-shadow { width: 100%; height: 100%; display: block; }
+.sh-dlg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.sh-dlg-name { display: flex; align-items: baseline; gap: 10px; height: 24px; font-size: 15px; font-weight: 700; color: var(--text); }
+.sh-dlg-name small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
+.sh-dlg-box { flex: 1; min-height: 52px; max-height: calc(13.5px * 1.6 * 4 + 20px); overflow-y: auto; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--rc); background: var(--void); }
+.sh-dlg-box p { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--text); }
+.sh-dlg-box p + p { margin-top: 6px; }
+.sh-dlg-box p.me { color: var(--dim); }
+.sh-dlg-box p.dim { color: var(--dim); }
+.sh-talk { display: flex; gap: 8px; margin: 0; }
+.sh-talk-in { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; min-height: var(--h); padding: 0 10px 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel2); font-size: 13.5px; color: var(--text); cursor: text; }
+.sh-talk-in input { flex: 1; width: 0; min-width: 0; height: calc(var(--h) - 2px); padding: 0; border: 0; background: none; color: var(--text); font: inherit; font-size: 13.5px; outline: none; }
+.sh-talk-in input::placeholder { color: var(--dim); }
+.sh-ref { display: inline-flex; align-items: center; flex: none; height: 24px; padding: 0 8px; border-radius: var(--ri); background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); font: 600 12.5px/1 inherit; white-space: nowrap; cursor: pointer; }
+.sh-go { flex: none; width: var(--h); height: var(--h); border: 1px solid var(--accent-line); border-radius: var(--r); background: var(--accent-bg); color: var(--signal); font: 700 15px/1 inherit; cursor: pointer; }
+.sh-go:disabled, .sh-talk-in input:disabled { opacity: .45; }
+/* 칸: 그림 → 이름(13.5, 두 줄까지) → 값(숫자만, 민트 / 잔고 부족 빨강 / 깎인 값 ▾) */
+.sh-c .sh-nm { display: flex; align-items: center; justify-content: center; min-height: calc(13.5px * 1.3 * 2); margin-top: 6px; }
+.sh-c b { font-size: 13.5px; padding: 0; color: var(--text); white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; word-break: keep-all; overflow-wrap: anywhere; }
+.sh-band { display: block; padding: 3px 0 5px; color: var(--signal); font: 600 12.5px/1.2 var(--mono); text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; }
+.sh-band i { font-style: normal; font-size: 11px; margin-right: 1px; }
+.sh-c.poor .sh-band { color: var(--red); }
+.sh-c:disabled { opacity: .5; cursor: default; }
+.sh-band.dim { color: var(--dim); }
+.sh-ref.sell { background: color-mix(in srgb, var(--signal) 14%, var(--panel2)); }
+/* 팔 것 고르기 머리 줄 */
+.sh-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--sub); }
+.sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
+.sh-grid .it-tip { width: 260px; padding: 12px; }
+.sh-grid .it-tip b { font-size: 14px; margin-bottom: 6px; white-space: normal; }
+.sh-grid .it-tip .sh-amt { display: inline-block; margin-top: 8px; }
+.sh-grid .it-tip p { font-size: 13px; line-height: 1.5; margin-top: 8px; }
+.sh-wait { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 260px; color: var(--sub); font-size: 13.5px; }
+.sh-spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line2); border-top-color: var(--signal); animation: sh-spin .8s linear infinite; }
+@keyframes sh-spin { to { transform: rotate(360deg); } }
+/* 상세: 그림 88 → 이름 16·종류·값 16 → 글 → 영수증(잔고 / 값 / 잔액) → [구입][문의] */
+.sh-det-card { width: min(420px, calc(100vw - 28px)); align-items: stretch; gap: 0; padding: 16px; }
+.sh-ph { align-items: center; gap: 14px; padding-right: 36px; }
+.sh-ph .it-ic { width: 88px; height: 88px; border-radius: var(--rc); }
+.sh-ph .it-ic svg { width: 48px; height: 48px; }
+.sh-ph .it-ic img { width: 84%; height: 84%; object-fit: contain; image-rendering: pixelated; }
+.sh-phtx { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sh-phtx b { font-size: 16px; line-height: 1.3; }
+.sh-det-card p { font-size: 13.5px; line-height: 1.5; margin-top: 12px; }
+.sh-det-card p.ef { margin-top: 6px; }
+.sh-money { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.sh-money > div { display: flex; justify-content: space-between; align-items: baseline; height: 26px; }
+.sh-money i { font-style: normal; font-size: 13.5px; color: var(--sub); }
+.sh-money .sh-amt { color: var(--sub); }
+.sh-money .sum { margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--line); }
+.sh-money .sum i { color: var(--text); }
+.sh-money .sum .sh-amt { color: var(--signal); font-size: 16px; }
+.sh-money .bad i, .sh-money .bad .sh-amt { color: var(--red); }
+.sh-det .it-btns { margin-top: 12px; }
+.sh-det .it-btns .gx-chip { height: var(--h, 34px); border-radius: var(--r, 10px); font-size: 13.5px; }
+.it-btns .gx-chip:disabled { opacity: .45; }
+.sh-det .gx-agpop-x, .sh-wrap-card .gx-agpop-x { width: 30px; height: 30px; border-radius: var(--ri, 8px); }
+/* 폰: 조작 40 · 전체 화면 · 3열 · 아래 [문의][닫기] · 문의 → 2/3 높이 주인 서랍 */
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .sh-wrap { --h: 40px; align-items: stretch; padding: 0; }
+  .sh-wrap-card { position: relative; width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; padding: 12px; }
+  .sh-tools { flex-wrap: wrap; }
+  .sh-name { flex: 1 1 100%; }
+  .sh-tools .it-right { margin-left: auto; }
+  .sh-owner, .sh-grid .it-tip { display: none; }
+  .it-grid.sh-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sh-ph .it-ic { width: 96px; height: 96px; }
+  .sh-foot { display: flex; gap: 8px; flex: none; }
+  .sh-foot .it-act { flex: 1; height: var(--h); justify-content: center; border-radius: var(--r); font-size: 13.5px; }
+  .sh-foot .it-act svg { color: var(--sub); }
+  .sh-foot .it-act.on { border-color: var(--signal); color: var(--signal); }
+  .sh-dim { position: absolute; inset: 0; background: var(--scrim); z-index: 5; }
+  .sh-drawer { position: absolute; left: 0; right: 0; bottom: 0; height: 66%; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 14px 12px 12px; border-top: 1px solid var(--line2); border-radius: 18px 18px 0 0; background: var(--panel); box-shadow: 0 -10px 24px -12px rgba(0, 0, 0, .7); }
+  .sh-drawer .it-grip { position: absolute; left: 50%; top: -1px; transform: translateX(-50%); width: 48px; height: 8px; min-height: 0; padding: 0; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 5px 5px; background: var(--panel); display: flex; align-items: center; justify-content: center; line-height: 0; }
+  .sh-drawer .it-grip i { width: 18px; height: 2px; border-radius: 2px; background: var(--signal); }
+  .sh-ov-head { display: flex; align-items: center; gap: 12px; }
+  .sh-ov-head .sh-face { width: 56px; height: 56px; border-radius: var(--r); }
+  .sh-ov-head .sh-face img { height: 100%; margin-top: 0; object-position: center 15%; }
+  .sh-ov-head .sh-face svg { width: 26px; height: 26px; }
+  .sh-ov-head .sh-dlg-name { height: auto; font-size: 16px; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .sh-drawer .sh-dlg-box { flex: 1; min-height: 0; max-height: none; overflow-y: auto; padding: 12px 14px; }
+  .sh-drawer .sh-dlg-box p { font-size: 14.5px; line-height: 1.7; }
+}
 /* 폰 공용 서랍 (2026-11-07 사용자): 하단 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색·테두리만 선 색). 열면 위키·괴담넷·설정 한 줄이 도구 줄을 덮는다 */
 .gx-cdr { display: none; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
@@ -544,7 +1236,7 @@ ${themeVars("[x-goei-usebox]")}
 [x-goei-usebox] [data-gu] b { font-weight: 600; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [x-goei-usebox] [data-gu-x] { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--g-acc); color: var(--g-signal); border: 1px solid var(--g-acc-line); font-size: 11px; line-height: 1; pointer-events: auto; cursor: pointer; }
 `;
-  var esc29 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc30 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var host2 = null;
   var where = { charIndex: -1, chatIndex: -1 };
   var shownNames = [];
@@ -612,7 +1304,7 @@ ${themeVars("[x-goei-usebox]")}
     if (!h) return;
     shownNames = names4;
     const wrap = await h.querySelector("[x-goei-uwrap]");
-    await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names4.map((n2) => `<span data-gu><b>${esc29(n2)}</b><span data-gu-x role="button" aria-label="${esc29(n2)} 빼기">×</span></span>`).join("")}`);
+    await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names4.map((n2) => `<span data-gu><b>${esc30(n2)}</b><span data-gu-x role="button" aria-label="${esc30(n2)} 빼기">×</span></span>`).join("")}`);
     await h.setStyle("display", "block");
   }
   async function hideUseBox() {
@@ -621,94 +1313,8 @@ ${themeVars("[x-goei-usebox]")}
     });
   }
 
-  // src/host/itemicons.ts
-  var ITEMS_KEY = "goei:data-items";
-  var pack3 = null;
-  var loading2 = null;
-  var failed = "";
-  var progress = "";
-  var redraw2 = () => {
-  };
-  var urls2 = /* @__PURE__ */ new Map();
-  function setItemIconRedraw(fn2) {
-    redraw2 = fn2;
-  }
-  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading2, progress, failed });
-  function ensureItemIcons() {
-    if (pack3 || loading2) return loading2 ?? Promise.resolve();
-    loading2 = (async () => {
-      failed = "";
-      try {
-        let saved = null;
-        try {
-          saved = await risuai.pluginStorage.getItem(ITEMS_KEY);
-        } catch {
-        }
-        if (typeof saved === "string" && packMatches(saved, ITEMS_PACK.expect)) {
-          try {
-            pack3 = applyItemsPack(saved);
-            return;
-          } catch (error) {
-            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
-          }
-        }
-        const text4 = await fetchPack(ITEMS_PACK, (t) => {
-          progress = t;
-          redraw2();
-        });
-        pack3 = applyItemsPack(text4);
-        try {
-          await risuai.pluginStorage.setItem(ITEMS_KEY, text4);
-        } catch (error) {
-          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
-        }
-      } catch (error) {
-        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
-        console.log(`[goei] 소지품 그림 팩: ${failed}`);
-      } finally {
-        progress = "";
-        loading2 = null;
-        redraw2();
-      }
-    })();
-    return loading2;
-  }
-  function itemIconUrl(name, kind) {
-    if (!pack3) {
-      if (!failed) void ensureItemIcons();
-      return null;
-    }
-    const file = matchItemIcon(pack3, name, kind);
-    if (!file) return null;
-    let u = urls2.get(file);
-    if (!u) {
-      u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
-      urls2.set(file, u);
-    }
-    return u;
-  }
-
-  // src/ui/itemIcons.ts
-  var stroke2 = (d) => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  var ITEM_ICONS = {
-    weapon: stroke2('<path d="M21 3c-1 4-4 8-9 12l-3-3C13 7 17 4 21 3Z"/><path d="m9 12-5 5 3 3 5-5"/><path d="m4 17 3 3"/>'),
-    wear: stroke2('<path d="M8 3h2l2 2 2-2h2l3 4-2 2v12H7V9L5 7Z"/><path d="M12 5v16"/>'),
-    tool: stroke2('<path d="M3 7h9l4 3v4l-4 3H3Z"/><path d="M7 7v10M16 10v4"/><path d="M19.5 9.5 21 8M19.5 14.5 21 16M20 12h1.5"/>'),
-    device: stroke2('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M10.5 6h3"/><path d="M11 18.5h2"/>'),
-    charm: stroke2('<path d="M7.5 2.5h9v17l-4.5 2-4.5-2Z"/><path d="M12 6v7"/><path d="M9.5 8.5h5"/><path d="M10 16h4"/>'),
-    medical: stroke2('<rect x="5" y="7" width="14" height="14" rx="2.5"/><path d="M9 4h6v3H9Z"/><path d="M12 11v6M9 14h6"/>'),
-    food: stroke2('<path d="M5 8h11v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4Z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8.5 3c0 1.2 1 1.6 1 2.8M12.5 3c0 1.2 1 1.6 1 2.8"/>'),
-    paper: stroke2('<path d="M7 3h7l5 5v13H7Z"/><path d="M14 3v5h5"/><path d="M10 12h7M10 16h7"/>'),
-    key: stroke2('<circle cx="8" cy="15.5" r="4.5"/><path d="M11.5 12 20 3.5"/><path d="m16.5 7 2.5 2.5M14 9.5l2.5 2.5"/>'),
-    seal: stroke2('<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/>'),
-    anomaly: stroke2('<path d="M2.5 12c2.5-4.5 6-7 9.5-7s7 2.5 9.5 7c-2.5 4.5-6 7-9.5 7s-7-2.5-9.5-7Z"/><circle cx="12" cy="12" r="3"/><path d="M12 2.5v1.5M12 20v1.5"/>'),
-    valuable: stroke2('<path d="M7 3h10l4 6-9 12L3 9Z"/><path d="M3 9h18M9.5 9 12 21M14.5 9 12 21M7 3l2.5 6M17 3l-2.5 6"/>'),
-    consumable: stroke2('<rect x="3" y="8" width="16" height="8" rx="2"/><path d="M19 10.5h2v3h-2"/><path d="M7 11v2M10.5 11v2"/>'),
-    misc: stroke2('<path d="M3 8 12 3l9 5-9 5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>')
-  };
-
   // src/ui/items.ts
-  var esc30 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc31 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var itemsUi = {
     sub: "items",
     view: "grid",
@@ -731,7 +1337,7 @@ ${themeVars("[x-goei-usebox]")}
     const u = itemIconUrl(it.name, it.kind);
     return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[it.kind];
   }
-  var FROM_NAME = { store: "장터", story: "본문", manual: "직접" };
+  var FROM_NAME = { store: "상점", story: "본문", manual: "직접" };
   var dateOf = (iso) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
     return m ? `${m[2]}-${m[3]}` : "";
@@ -747,7 +1353,7 @@ ${themeVars("[x-goei-usebox]")}
       const drawer2 = isPhone() && walletOn(ctx2) ? drawerBox(walletTools(ctx2), "gx-rdrawer") : "";
       return `<main class="gx-body gx-records gx-items">${tabs2}${walletPane(ctx2)}${note}</main>${drawer2}`;
     }
-    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc30(itemsUi.notice)}</div>` : "";
+    const notice2 = itemsUi.notice ? `<div class="gx-err" role="alert">${esc31(itemsUi.notice)}</div>` : "";
     const drawer = isPhone() ? drawerHtml(`${addButton("ph-tool")}${mergeButton(ctx2, "ph-tool")}`, "", "gx-idrawer") : "";
     return `<main class="gx-body gx-records gx-items">${tabs2}${notice2}${itemsPane(ctx2)}${note}</main>${popup(ctx2)}${drawer}`;
   }
@@ -766,10 +1372,10 @@ ${themeVars("[x-goei-usebox]")}
     ${over ? `<span class="it-over">넘침 <b>${over}</b></span>` : ""}
     <div class="gx-segs gx-segs-sm it-segs">${seg9("grid", "물건")}${seg9("log", "기록")}</div>
     ${isPhone() ? "" : `<span class="it-right">${addButton("it-act")}${mergeButton(ctx2, "it-act")}</span>`}
-    <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc30(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
+    <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc31(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
   </div>`;
     const st = itemIconStatus();
-    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc30(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 종류 아이콘으로 보여요. (${esc30(st.failed)})</p>` : "";
+    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc31(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 종류 아이콘으로 보여요. (${esc31(st.failed)})</p>` : "";
     return `${tools}${picNote}<div class="it-body">${itemsUi.view === "log" ? logList(ctx2) : gridHtml(ctx2)}</div>`;
   }
   function gridHtml(ctx2) {
@@ -778,59 +1384,59 @@ ${themeVars("[x-goei-usebox]")}
     const all = liveOf(ctx2);
     const list4 = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).items : all;
     if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
-    const cells = list4.map((it, i) => cell(it, !q && i >= slots));
+    const cells = list4.map((it, i) => cell2(it, !q && i >= slots));
     if (!q) for (let i = list4.length; i < slots; i++) cells.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
     return `<div class="it-grid">${cells.join("")}</div>`;
   }
-  function cell(it, over) {
-    const tip2 = `<span class="it-tip" aria-hidden="true"><b>${esc30(it.name)}</b><small>${esc30(sourceLine(it))}</small>${it.desc ? `<p>${esc30(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc30(it.effect)}</p>` : ""}</span>`;
-    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}" data-action="items-open" data-value="${esc30(it.id)}" aria-label="${esc30(it.name)}${over ? " (넘침)" : ""}"><span class="it-ic">${itemPic(it)}</span><b>${esc30(it.name)}</b>${tip2}</button>`;
+  function cell2(it, over) {
+    const tip2 = `<span class="it-tip" aria-hidden="true"><b>${esc31(it.name)}</b><small>${esc31(sourceLine(it))}</small>${it.desc ? `<p>${esc31(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc31(it.effect)}</p>` : ""}</span>`;
+    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}" data-action="items-open" data-value="${esc31(it.id)}" aria-label="${esc31(it.name)}${over ? " (넘침)" : ""}"><span class="it-ic">${itemPic(it)}</span><b>${esc31(it.name)}</b>${tip2}</button>`;
   }
-  var WHAT = { use: "사용", drop: "버림", gone: "없어짐", merge: "합침" };
+  var WHAT = { use: "사용", drop: "버림", gone: "없어짐", merge: "합침", sell: "팖" };
   var BY = { story: "본문", manual: "직접", use: "사용 단추" };
   function logList(ctx2) {
     const q = itemsUi.q.trim();
     const rows2 = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).log : itemsOf(ctx2).log.slice().reverse();
     if (!rows2.length) return `<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : "아직 사용·처분 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요."}</p>`;
-    return `<ul class="gx-wt-list it-log">${rows2.map((l) => `<li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>${esc30(l.name)} ${WHAT[l.what] ?? l.what}</b><small>${esc30([BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · "))}</small></span><span class="gx-wt-amt"><small>${esc30(dateOf(l.at))}</small></span></div></li>`).join("")}</ul>`;
+    return `<ul class="gx-wt-list it-log">${rows2.map((l) => `<li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>${esc31(l.name)} ${WHAT[l.what] ?? l.what}</b><small>${esc31([BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · "))}</small></span><span class="gx-wt-amt"><small>${esc31(dateOf(l.at))}</small></span></div></li>`).join("")}</ul>`;
   }
   function popup(ctx2) {
-    if (itemsUi.mode === "add") return shell2("직접 넣기", form(null));
+    if (itemsUi.mode === "add") return shell3("직접 넣기", form(null));
     if (!itemsUi.open) return "";
     const it = liveOf(ctx2).find((x) => x.id === itemsUi.open);
     if (!it) return "";
-    if (itemsUi.mode === "edit") return shell2("고치기", form(it));
-    if (itemsUi.mode === "merge") return shell2("합치기", mergePick(ctx2, it));
+    if (itemsUi.mode === "edit") return shell3("고치기", form(it));
+    if (itemsUi.mode === "merge") return shell3("합치기", mergePick(ctx2, it));
     const use = readItemUse(ctx2.chat.scriptstate);
     const queued2 = use.some((n2) => n2 === it.name);
-    const body5 = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc30(it.name)}</b><small>${esc30(sourceLine(it))}</small></div></div>
-    ${it.desc ? `<p>${esc30(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
-    ${it.effect ? `<p class="ef">효과: ${esc30(it.effect)}</p>` : ""}
-    ${it.quote ? `<p class="qt">근거 「${esc30(it.quote)}」</p>` : ""}
+    const body5 = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc31(it.name)}</b><small>${esc31(sourceLine(it))}</small></div></div>
+    ${it.desc ? `<p>${esc31(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
+    ${it.effect ? `<p class="ef">효과: ${esc31(it.effect)}</p>` : ""}
+    ${it.quote ? `<p class="qt">근거 「${esc31(it.quote)}」</p>` : ""}
     <div class="it-btns">
-      <button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc30(it.id)}" aria-pressed="${queued2}">${queued2 ? "사용 취소" : "사용"}</button>
+      <button class="gx-chip${queued2 ? " on" : ""}" data-action="items-use" data-value="${esc31(it.id)}" aria-pressed="${queued2}">${queued2 ? "사용 취소" : "사용"}</button>
       <button class="gx-chip" data-action="items-edit">고치기</button>
       <button class="gx-chip" data-action="items-merge" ${liveOf(ctx2).length < 2 ? "disabled" : ""}>합치기</button>
-      <button class="gx-chip red" data-action="items-drop" data-value="${esc30(it.id)}">버리기</button>
+      <button class="gx-chip red" data-action="items-drop" data-value="${esc31(it.id)}">버리기</button>
     </div>
     ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 본편에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
-    return shell2(it.name, body5);
+    return shell3(it.name, body5);
   }
-  var shell2 = (label2, inner) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc30(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
+  var shell3 = (label2, inner) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc31(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
   function form(it) {
     const kinds = ITEM_KINDS.map((k) => `<option value="${k.id}"${(it?.kind ?? "misc") === k.id ? " selected" : ""}>${k.label}</option>`).join("");
     return `<div class="it-form" data-it-form="1">
-    <label><span>이름</span><input name="name" maxlength="30" required value="${esc30(it?.name ?? "")}" placeholder="예: 소금 봉지"></label>
+    <label><span>이름</span><input name="name" maxlength="30" required value="${esc31(it?.name ?? "")}" placeholder="예: 소금 봉지"></label>
     <label><span>종류</span><select name="kind">${kinds}</select></label>
-    <label><span>설명</span><input name="desc" maxlength="80" value="${esc30(it?.desc ?? "")}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
-    <label><span>효과</span><input name="effect" maxlength="60" value="${esc30(it?.effect ?? "")}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
-    <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc30(it?.id ?? "")}">${it ? "저장" : "넣기"}</button><button type="button" class="gx-chip" data-action="${it ? "items-back" : "items-close"}">취소</button></div>
+    <label><span>설명</span><input name="desc" maxlength="80" value="${esc31(it?.desc ?? "")}" placeholder="양·상태도 글로 (예: 두 봉지 남음)"></label>
+    <label><span>효과</span><input name="effect" maxlength="60" value="${esc31(it?.effect ?? "")}" placeholder="있으면 (예: 저급 괴이의 접근을 늦춘다)"></label>
+    <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc31(it?.id ?? "")}">${it ? "저장" : "넣기"}</button><button type="button" class="gx-chip" data-action="${it ? "items-back" : "items-close"}">취소</button></div>
   </div>`;
   }
   function mergePick(ctx2, keep) {
     const others = liveOf(ctx2).filter((x) => x.id !== keep.id);
-    return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc30(keep.name)}</b><small>이 물건에 합칠 상대를 고르세요. 상대 칸은 빠지고 설명은 뒤에 붙어요.</small></div></div>
-    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc30(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc30(o.name)}</b><small>${esc30(o.desc || sourceLine(o))}</small></span></button></li>`).join("")}</ul>
+    return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc31(keep.name)}</b><small>이 물건에 합칠 상대를 고르세요. 상대 칸은 빠지고 설명은 뒤에 붙어요.</small></div></div>
+    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc31(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc31(o.name)}</b><small>${esc31(o.desc || sourceLine(o))}</small></span></button></li>`).join("")}</ul>
     <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
   }
   async function itemsAction(action, value, ctx2, env3, formEl) {
@@ -953,7 +1559,7 @@ ${themeVars("[x-goei-usebox]")}
   }
 
   // src/ui/marks.ts
-  var esc31 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc32 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var key = (m) => JSON.stringify(m.s);
   var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
   var markUi = { pop: false };
@@ -974,12 +1580,12 @@ ${themeVars("[x-goei-usebox]")}
     if (!markUi.pop) return "";
     const list4 = marks();
     const full = list4.length >= MARK_MAX;
-    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc31(m.name)}</span></button>
-        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc31(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current5 && !isMarked(current5) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc31(current5.name)}</span></button>` : "";
+    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc32(m.name)}</span></button>
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc32(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current5 && !isMarked(current5) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc32(current5.name)}</span></button>` : "";
     const cand = markCandidates(recent, current5);
-    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc31(m.name)}</span></span>
-        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc31(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
+    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc32(m.name)}</span></span>
+        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc32(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
     return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
     <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
       <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
@@ -1299,7 +1905,7 @@ ${themeVars("[x-goei-usebox]")}
     confirmEnd: null
   };
   var mapUrls = {};
-  var esc32 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc33 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var KIND_LABEL3 = { an: "괴이", in: "사건", ms: "특수" };
   var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
   function resetField(all = false) {
@@ -1377,8 +1983,8 @@ ${themeVars("[x-goei-usebox]")}
   }
   var boardMapUrl = (ctx2, env3) => mapImage(ctx2, "01", env3);
   function pin(action, value, label2, x, y, cls, count = 0) {
-    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc32(value)}" aria-label="${esc32(label2)}">
-    <span class="gx-dot"></span><span class="gx-pname">${esc32(label2)}${count ? `<b>${count}</b>` : ""}</span></button>`;
+    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc33(value)}" aria-label="${esc33(label2)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc33(label2)}${count ? `<b>${count}</b>` : ""}</span></button>`;
   }
   function hotClass(list4) {
     if (!list4.length) return "";
@@ -1388,10 +1994,10 @@ ${themeVars("[x-goei-usebox]")}
   var narrow2 = () => isPhone();
   function mapBar(x) {
     const code2 = field3.region;
-    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code2 ? " selected" : ""}>${c === "01" ? "전국" : esc32(regionName(c))}</option>`).join("");
+    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code2 ? " selected" : ""}>${c === "01" ? "전국" : esc33(regionName(c))}</option>`).join("");
     const bar = `<div class="gx-mapbar">
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
-      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc32(field3.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc33(field3.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
         <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
       ${modeSwap("mission")}
     </div>`;
@@ -1428,7 +2034,7 @@ ${themeVars("[x-goei-usebox]")}
         pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
       }
     }
-    const img = url ? `<img class="gx-mapimg" src="${esc32(url)}" alt="${esc32(code2 === "01" ? "전국" : regionName(code2))} 지도">` : `<div class="gx-mapph">${mapUrls[code2] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
+    const img = url ? `<img class="gx-mapimg" src="${esc33(url)}" alt="${esc33(code2 === "01" ? "전국" : regionName(code2))} 지도">` : `<div class="gx-mapph">${mapUrls[code2] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
     return `${narrow2() ? "" : mapBar(x)}
     <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code2}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code2 !== "01") : ""}</div>`;
   }
@@ -1446,7 +2052,7 @@ ${themeVars("[x-goei-usebox]")}
       if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
     }
     if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
-    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc32(h.value)}"><b>${esc32(h.name)}</b><small>${esc32(h.sub)}</small></button>`).join("");
+    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc33(h.value)}"><b>${esc33(h.name)}</b><small>${esc33(h.sub)}</small></button>`).join("");
   }
   function mapSuggestFor(ctx2, q) {
     field3.mapq = q;
@@ -1465,10 +2071,10 @@ ${themeVars("[x-goei-usebox]")}
       kind: e.kind,
       name: e.name,
       grade: e.grade,
-      loc: `${esc32(locName(e.loc))}${since ? ` · ${since}` : ""}`,
+      loc: `${esc33(locName(e.loc))}${since ? ` · ${since}` : ""}`,
       badge: badge3,
       chips: peopleChips(x.char, names4, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
-      extra: e.report ? `<span class="gx-evc-sit" title="${esc32(e.report)}">${esc32(e.report)}</span>` : "",
+      extra: e.report ? `<span class="gx-evc-sit" title="${esc33(e.report)}">${esc33(e.report)}</span>` : "",
       key: e.key,
       open: "pick-event",
       art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
@@ -1495,9 +2101,9 @@ ${themeVars("[x-goei-usebox]")}
       wiki2 = full;
     }
     const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
-    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc32(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc32(name)}</b>${tag}</span>
-    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc32(wiki2)}" title="위키" aria-label="${esc32(name)} 위키">${ICONS.wiki}</button></span></span>
-    <small>${esc32(sub || "장소")}</small></span></li>`;
+    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc33(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc33(name)}</b>${tag}</span>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc33(wiki2)}" title="위키" aria-label="${esc33(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc33(sub || "장소")}</small></span></li>`;
   }
   function situations(x, events) {
     const counts = { all: events.length, an: 0, in: 0, ms: 0 };
@@ -1519,7 +2125,7 @@ ${themeVars("[x-goei-usebox]")}
     const rec2 = x.world.agents[id];
     return agentLocked(rec2) ? rec2.st : null;
   }
-  function teamPanel(x, goal, action, label2, busy5, ctx2) {
+  function teamPanel(x, goal, action, label2, busy6, ctx2) {
     const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
     if (!x.supportOn) field3.support = 0;
     const used = field3.team.length + field3.support;
@@ -1531,10 +2137,10 @@ ${themeVars("[x-goei-usebox]")}
       const sit = x.world.agents[p.id]?.situation ?? "";
       {
         const c = ctx2 ? agentContact(ctx2, p.id) : null;
-        const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc32(p.id)}" title="괴담톡" aria-label="${esc32(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc32(c.wiki)}" title="위키" aria-label="${esc32(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
+        const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc33(p.id)}" title="괴담톡" aria-label="${esc33(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc33(c.wiki)}" title="위키" aria-label="${esc33(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
         const off = !!lock || full;
-        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc32(p.id)}" aria-pressed="${on2}" aria-disabled="${off}"
-          ${lock ? `title="${esc32(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc33(p.id)}" aria-pressed="${on2}" aria-disabled="${off}"
+          ${lock ? `title="${esc33(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
       }
     }).join("");
     const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field3.support > 0 ? " on" : ""}">
@@ -1546,11 +2152,11 @@ ${themeVars("[x-goei-usebox]")}
         <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
       </span>
     </div>` : "";
-    const ready = !!goal && validTeam(field3.team.length, field3.support) && !busy5;
-    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy5 ? "보내는 중…" : esc32(label2)}</button>`;
+    const ready = !!goal && validTeam(field3.team.length, field3.support) && !busy6;
+    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy6 ? "보내는 중…" : esc33(label2)}</button>`;
     lastGo = go2;
     return `<section class="gx-team">
-    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc32(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
+    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc33(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips3}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
     ${narrow2() ? "" : noteBox()}
@@ -1560,7 +2166,7 @@ ${themeVars("[x-goei-usebox]")}
   var lastGo = "";
   function noteBox() {
     return `<label class="gx-note">
-      <textarea rows="2" aria-label="작전 메모"${field3.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc32(field3.note)}</textarea></label>`;
+      <textarea rows="2" aria-label="작전 메모"${field3.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc33(field3.note)}</textarea></label>`;
   }
   function fieldDrawer(x, withMap, custom = "") {
     if (!narrow2()) return "";
@@ -1573,7 +2179,7 @@ ${themeVars("[x-goei-usebox]")}
   }
   function stepBar(goal, swap) {
     const used = field3.team.length + field3.support + 1;
-    const b = (k, n2, label2, sub) => `<button class="gx-stepb${field3.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field3.step === k}"><i>${n2}</i><span><b>${label2}</b><small>${esc32(sub)}</small></span></button>`;
+    const b = (k, n2, label2, sub) => `<button class="gx-stepb${field3.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field3.step === k}"><i>${n2}</i><span><b>${label2}</b><small>${esc33(sub)}</small></span></button>`;
     const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
     return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
   }
@@ -1583,10 +2189,10 @@ ${themeVars("[x-goei-usebox]")}
     const body5 = document.querySelector(".gx .gx-body");
     if (body5 && isPhone()) body5.scrollTop = 0;
   }
-  function mapTab(ctx2, env3, notice2, busy5) {
+  function mapTab(ctx2, env3, notice2, busy6) {
     artCtx = ctx2;
     const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc32(x)}</div>`;
+    if (typeof x === "string") return `<div class="gx-empty">${esc33(x)}</div>`;
     const events = x.on ? activeEvents(x.world) : [];
     const t = field3.target;
     if (t?.type === "event" && !events.some((e) => e.key === t.key)) field3.target = null;
@@ -1596,8 +2202,8 @@ ${themeVars("[x-goei-usebox]")}
     <div class="gx-mapcol">${mapCanvas(ctx2, x, events, env3)}
       <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
     <div class="gx-sidecol">
-      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc32(notice2)}</div>` : ""}
-      ${teamPanel(x, goal, "depart", "출발", busy5, ctx2)}
+      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc33(notice2)}</div>` : ""}
+      ${teamPanel(x, goal, "depart", "출발", busy6, ctx2)}
     </div>
   </main>${fieldDrawer(x, true)}`;
   }
@@ -1627,16 +2233,16 @@ ${themeVars("[x-goei-usebox]")}
     const q = field3.query.trim().toLowerCase();
     const row9 = (kind, r) => {
       const sel = field3.mname === r.name && field3.mpick === kind;
-      const val = `${kind}:${esc32(r.name)}`;
+      const val = `${kind}:${esc33(r.name)}`;
       const open2 = field3.mopen === `${kind}:${r.name}`;
       const art = evArt(ctx2, r.name, kind);
       const link = kind === "lm" ? baseLink(ctx2, r.name) : null;
       if (link) r = { ...r, sub: [link.org, r.sub].filter(Boolean).join(" · ") };
       const status2 = missionStatus(x, kind, r.name);
-      const bg = art.pic ? ` style="background-image:url('${esc32(art.pic)}')"` : "";
-      const cap = `<span class="gx-evart-name"><b>${esc32(r.name)}</b>${r.sub ? `<small>${esc32(r.sub)}</small>` : ""}</span>`;
-      const capOpen = (mark2) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc32(r.name)}</b>${mark2}</span>${r.sub ? `<small>${esc32(r.sub)}</small>` : ""}</span>`;
-      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc32(link?.doc ?? r.name)}" title="위키" aria-label="${esc32(r.name)} 위키">${ICONS.wiki}</button>`;
+      const bg = art.pic ? ` style="background-image:url('${esc33(art.pic)}')"` : "";
+      const cap = `<span class="gx-evart-name"><b>${esc33(r.name)}</b>${r.sub ? `<small>${esc33(r.sub)}</small>` : ""}</span>`;
+      const capOpen = (mark2) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc33(r.name)}</b>${mark2}</span>${r.sub ? `<small>${esc33(r.sub)}</small>` : ""}</span>`;
+      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc33(link?.doc ?? r.name)}" title="위키" aria-label="${esc33(r.name)} 위키">${ICONS.wiki}</button>`;
       if (!open2) {
         return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status2 ? `<span class="gx-evart-top">${status2}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
@@ -1644,7 +2250,7 @@ ${themeVars("[x-goei-usebox]")}
       const aim = sel ? aimMark(true, "mission-unpick", val) : aimMark(false, "mission-pick", val);
       return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
       ${aim}<span class="gx-evart-top">${status2}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${capOpen("")}${art.desc ? `<span class="gx-evc-desc">${esc32(art.desc)}</span>` : ""}</span></div></li>`;
+      <span class="gx-evart-cap">${capOpen("")}${art.desc ? `<span class="gx-evc-desc">${esc33(art.desc)}</span>` : ""}</span></div></li>`;
     };
     const hit3 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
     if (!q) {
@@ -1656,14 +2262,14 @@ ${themeVars("[x-goei-usebox]")}
     const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g2) => g2.rows.length).map((g2) => `<li class="gx-mgrp">${MISSION_LABEL[g2.k]}<small>${g2.rows.length}</small></li>${g2.rows.map((r) => row9(g2.k, r)).join("")}`).join("");
     return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
   }
-  function missionTab(ctx2, opening, notice2, busy5) {
+  function missionTab(ctx2, opening, notice2, busy6) {
     const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc32(x)}</div>`;
+    if (typeof x === "string") return `<div class="gx-empty">${esc33(x)}</div>`;
     const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field3.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field3.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
     const p = x.world.pending;
-    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc32(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
+    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc33(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
     const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
-    const filter = `<div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc32(field3.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field3.mname)}${opening ? "" : modeSwap("map")}</div>`;
+    const filter = `<div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc33(field3.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field3.mname)}${opening ? "" : modeSwap("map")}</div>`;
     return `<main class="gx-body gx-field gx-mission" data-step="${field3.step}">
     ${stepBar(field3.mname, opening ? void 0 : "map")}
     <div class="gx-mapcol">
@@ -1672,10 +2278,10 @@ ${themeVars("[x-goei-usebox]")}
       <div class="gx-mbox">${missionList(ctx2, opening)}</div>
     </div>
     <div class="gx-sidecol">
-      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc32(notice2)}</div>` : ""}
-      ${x.world.notice && x.on ? `<div class="gx-hint">${esc32(x.world.notice)}</div>` : ""}
+      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc33(notice2)}</div>` : ""}
+      ${x.world.notice && x.on ? `<div class="gx-hint">${esc33(x.world.notice)}</div>` : ""}
       ${pend}
-      ${teamPanel(x, field3.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy5, opening ? void 0 : ctx2)}
+      ${teamPanel(x, field3.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy6, opening ? void 0 : ctx2)}
     </div>
   </main>${fieldDrawer(x, false, filter)}`;
   }
@@ -2030,7 +2636,7 @@ ${note.trim()}` : card2;
       await refresh2();
     }
   };
-  var esc33 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc34 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   function ensureRoot2() {
     if (root2) return root2;
     setImageRedraw(() => {
@@ -2039,7 +2645,7 @@ ${note.trim()}` : card2;
       if (editorOpen()) render();
     });
     setItemIconRedraw(() => {
-      if (view.kind !== "picker" && tab === "items") render2();
+      if (view.kind !== "picker" && (tab === "items" || shopUi.open)) render2();
     });
     const style = document.createElement("style");
     style.textContent = style_default2;
@@ -2176,1256 +2782,4 @@ ${note.trim()}` : card2;
     });
     root2.addEventListener("keydown", (ev) => {
       const el = ev.target;
-      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
-        const send2 = root2?.querySelector(".ph-send");
-        ev.preventDefault();
-        if (send2 && !send2.disabled) void run4("ph-send", send2.dataset.value);
-        return;
-      }
-      if (ev.key !== "Enter" || ev.isComposing || !el?.dataset?.enter) return;
-      ev.preventDefault();
-      void run4(el.dataset.enter, el.value);
-    });
-    root2.addEventListener("submit", (ev) => {
-      ev.preventDefault();
-      const form2 = ev.target;
-      const input3 = form2.querySelector("input");
-      lastForm = form2;
-      if (form2.dataset.submit) void run4(form2.dataset.submit, form2.dataset.submit.startsWith("items-") ? form2.dataset.value ?? "" : input3?.value ?? "");
-    });
-    root2.addEventListener("change", (ev) => panelChange(ev.target));
-    root2.addEventListener("input", (ev) => panelInput(ev.target));
-    bindAgentTips(root2);
-    bindPeopleStatus(() => {
-      if (shown && view.kind === "started") render2();
-    });
-    bindPeopleHold(root2);
-    document.addEventListener("keydown", (ev) => {
-      if (ev.key !== "Escape") return;
-      if (editorOpen()) return;
-      if (document.querySelector(".gx-rptpop")) return void handle2("rec-back");
-      if (view.kind === "started" && tab === "items" && (itemsUi.open || itemsUi.mode === "add")) return void handle2("items-close");
-      const pop = document.querySelector(".gx-agpop");
-      if (pop) return void pop.remove();
-      if (evUi.pop || agUi.pop) {
-        evUi.pop = agUi.pop = "";
-        render2();
-        return;
-      }
-      void close2();
-    });
-    return root2;
-  }
-  function panelChange(el) {
-    if (el?.dataset?.change) void run4(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
-  }
-  function panelInput(el) {
-    if (el?.dataset?.input === "dim" && root2) {
-      paintVeil(root2, Number(el.value));
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = `${el.value}%`;
-      return;
-    }
-    if (el?.dataset?.input === "pp-cap") {
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
-      return;
-    }
-    if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
-      const out = el.parentElement?.querySelector("output");
-      if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
-      return;
-    }
-    if (el?.dataset?.input === "wallet-q" && view.kind === "started") {
-      walletUi.q = el.value;
-      const box3 = root2?.querySelector(".gx-wt-list");
-      if (box3) box3.innerHTML = walletList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "items-q" && view.kind === "started" && root2) return itemsInput(root2, view.ctx, el.value);
-    if (el?.dataset?.input === "rec-q" && view.kind === "started") {
-      recordsInput("rec-q", el.value);
-      const box3 = root2?.querySelector(".gx-jr-list");
-      if (box3) box3.innerHTML = journalList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "wiki-query" && view.kind === "started") {
-      wiki.query = el.value;
-      const box3 = root2?.querySelector(".nw .ph-content");
-      if (box3) box3.innerHTML = wikiList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "wiki-home-query" && view.kind === "started") {
-      wiki.homeQuery = el.value;
-      const box3 = root2?.querySelector(".nw-hero-res");
-      if (box3) box3.innerHTML = wikiHomeResults(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
-    if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
-    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
-    if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
-    if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
-    if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
-    if (el?.dataset?.input === "ph-query" && view.kind === "started") {
-      const box3 = root2?.querySelector(".ph-content");
-      if (box3) box3.innerHTML = phoneContent(view.ctx, el.value);
-      return;
-    }
-    if (el?.dataset?.input === "ph-pick-q" && view.kind === "started") {
-      phoneInput("ph-pick-q", el.value);
-      const box3 = root2?.querySelector(".ph-pick");
-      if (box3) box3.innerHTML = phonePickList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "dir-q" && (view.kind === "started" || view.kind === "picker")) {
-      dirUi.q = el.value;
-      const box3 = root2?.querySelector(".dir-list");
-      if (box3) box3.innerHTML = directoryList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "dir-crop-size") {
-      const key2 = el.dataset.key ?? "";
-      const [x, y] = cropValue(key2);
-      setCrop(key2, [x, y, Number(el.value)]);
-      const frame = root2?.querySelector("[data-crop] .dir-crop-frame");
-      if (frame) frame.style.width = `${el.value}%`;
-      return;
-    }
-    if (el?.dataset?.input === "dir-photo-q" && (view.kind === "started" || view.kind === "picker")) {
-      dirUi.pickQ = el.value;
-      const box3 = root2?.querySelector(".dir-pics");
-      if (box3) box3.innerHTML = directoryPhotoList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "dir-ext-q" && (view.kind === "started" || view.kind === "picker")) {
-      dirUi.addQ = el.value;
-      const box3 = root2?.querySelector(".dir-ext-list");
-      if (box3) box3.innerHTML = directoryExtList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
-    if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
-    if (el?.dataset?.input === "field-note") return void (field3.note = el.value);
-    if (el?.dataset?.input === "map-query" && view.kind === "started") {
-      const box3 = root2?.querySelector(".gx-mapsug");
-      if (box3) box3.innerHTML = mapSuggestFor(view.ctx, el.value);
-      return;
-    }
-    if (el?.dataset?.input === "start-note") {
-      const had = !!(draft.situation ?? "").trim();
-      draft.situation = el.value;
-      if (had !== !!el.value.trim()) root2?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy4);
-      return;
-    }
-    if (el?.dataset?.input !== "mission-query") return;
-    field3.query = el.value;
-    const box2 = root2?.querySelector(".gx-mbox");
-    if (box2 && (view.kind === "started" || view.kind === "opening")) box2.innerHTML = missionList(view.ctx, view.kind === "opening");
-  }
-  async function addPhotos(prefix, files) {
-    if (view.kind !== "started") return;
-    const ui = prefix === "gn" ? gnet : prefix === "ph" ? phone : null;
-    if (!ui) return;
-    if (prefix === "gn" && !gnet.compose) return;
-    if (prefix === "ph") {
-      const r = readPhone(view.ctx.chat).rooms[phone.room ?? ""];
-      if (!r || !r.members.length || r.pending) return;
-    }
-    for (const file of files) {
-      if (ui.attach.length >= ATTACH_MAX) {
-        ui.notice = `첨부는 ${ATTACH_MAX}개까지예요.`;
-        break;
-      }
-      try {
-        const { asset, preview } = await savePhoto(file);
-        addPhoto(ui.attach, asset, preview);
-        ui.notice = "";
-      } catch (error) {
-        ui.notice = error instanceof Error ? error.message : String(error);
-        break;
-      }
-    }
-    render2();
-  }
-  var widthWatch = false;
-  async function openApp(opts = {}) {
-    ensureRoot2();
-    if (opts.quietIfNotLite) {
-      const ctx2 = await loadContext().catch(() => null);
-      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
-    }
-    view = { kind: "loading" };
-    notice = "";
-    render2();
-    shown = true;
-    if (root2) startCctvFx(root2);
-    await showWindow();
-    await refresh2();
-    void loadModuleAssets().then((changed) => {
-      if (shown && changed) render2();
-    });
-    void readUser().then((u) => {
-      if (shown && (u.name || u.photo)) render2();
-    });
-    void checkLatest(settingsEnv);
-  }
-  var installCtx = null;
-  async function openInstall() {
-    if (!shown) await openApp();
-    installCtx = await loadContext().catch(() => null);
-    if (!installCtx) {
-      ensureRoot2();
-      view = { kind: "error", message: "선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요." };
-      render2();
-      shown = true;
-      await showWindow();
-      return;
-    }
-    if (view.kind === "picker") pickerPrefs = true;
-    const host3 = {
-      ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : installCtx,
-      refresh: async () => {
-        installCtx = await loadContext().catch(() => null) ?? installCtx;
-        if (shown) await refresh2();
-        if (view.kind === "picker") pickerPrefs = true;
-      },
-      theme: () => root2?.dataset.theme ?? getPrefs().theme ?? "dark",
-      handle: (a, v) => handle2(a, v),
-      input: panelInput,
-      change: panelChange,
-      canChat: () => view.kind === "started",
-      mobileNav: mobileNavHtml
-    };
-    await refreshInstall(installCtx);
-    openEditor(host3, "install");
-  }
-  async function openWiki2(title2) {
-    await openApp({ quietIfNotLite: true });
-    if (view.kind === "started") await handle2("wiki-goto", title2);
-  }
-  async function openRecords2(id) {
-    await openApp({ quietIfNotLite: true });
-    if (view.kind === "started") await handle2("rec-open", id);
-  }
-  async function refresh2() {
-    try {
-      const ctx2 = await loadContext();
-      if (ctx2) await prepareBaseDocs(ctx2.char.globalLore).catch(() => void 0);
-      if (!ctx2) {
-        view = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
-      } else {
-        const manifest = readManifest(ctx2.char.globalLore);
-        const phase = chatPhase(ctx2.chat);
-        if (manifest) {
-          applyAdvanced(ctx2.chat.scriptstate);
-          void readPersona();
-        }
-        const chatKey4 = `${ctx2.charIndex}:${ctx2.chatIndex}`;
-        if (chatKey4 !== lastChat) {
-          lastChat = chatKey4;
-          navHist.clear();
-          resetField(true);
-          resetWiki();
-          resetRecords();
-          resetItems();
-          resetGnet();
-          resetPhone();
-          resetSettings();
-          resetDirectory();
-          pickerPrefs = false;
-          repick = false;
-        }
-        const cur = currentChoice(ctx2.chat);
-        const facs = factionList(ctx2.char.globalLore);
-        const presetStaged = phase === "staged" && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === "preset";
-        if (!manifest) view = { kind: "not-lite", name: String(ctx2.char.name ?? ""), goei: isGoeiLore(ctx2.char.globalLore) };
-        else if (phase === "started") view = { kind: "started", ctx: ctx2 };
-        else if (presetStaged && !repick) view = { kind: "opening", ctx: ctx2 };
-        else {
-          view = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
-          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "" };
-          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
-          const fsel = draft.faction ? findFaction(draft.faction, facs) : void 0;
-          if (fsel) {
-            const list4 = scenariosFor(fsel, draft.player, ctx2.char.globalLore);
-            if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm ?? defaultScenario(fsel.code, facs);
-          }
-        }
-      }
-    } catch (error) {
-      view = { kind: "error", message: `채팅 정보를 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}` };
-    }
-    render2();
-  }
-  async function close2() {
-    shown = false;
-    stopCctvFx();
-    await risuai.hideContainer();
-  }
-  async function stagedTheme(ctx2, value) {
-    if (value !== "light" && value !== "dark" && value !== "paper") return;
-    try {
-      const saved = await updateChat(
-        ctx2.charIndex,
-        ctx2.chatIndex,
-        (chat) => chatPhase(chat) === "started" || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
-      );
-      if (saved) ctx2.chat = saved;
-    } catch (error) {
-      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    render2();
-  }
-  var run4 = (action, value) => handle2(action, value).catch((error) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
-  async function handle2(action, value) {
-    if (busy4) return;
-    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
-    if (agUi.pop && action !== "agent-info") agUi.pop = "";
-    if (action.startsWith("adv-") && (view.kind === "started" || view.kind === "picker" && pickerPrefs)) {
-      const feat = (value ?? "").split(/[:=]/)[0];
-      const scope = feat !== "gen" ? "chat" : view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
-      await handleAdvanced(action, value, view.ctx, { render: render2, refresh: refresh2 }, scope);
-      return;
-    }
-    const featCtx = view.kind === "started" || view.kind === "picker" && pickerPrefs && settingsUi.page ? view.ctx : null;
-    if (action === "wiki-back" && view.kind === "started" && !wiki.history.some((h) => h.view !== "home") && navHist.can(-1)) {
-      const run5 = navStep(-1);
-      return run5 ? run5() : render2();
-    }
-    if (featCtx && action.startsWith("wiki-") && await handleWiki(action, value, featCtx, wikiEnv)) return;
-    if (featCtx && action.startsWith("pp-") && await handlePeople(action, value, featCtx, peopleEnv)) return;
-    if (featCtx && action.startsWith("items-") && await itemsAction(action, value, featCtx, recordsEnv, root2?.querySelector("[data-it-form]") ?? lastForm)) return;
-    if (action === "cdr") {
-      cdrOpen = !cdrOpen;
-      root2?.querySelector(".gx-cdr")?.classList.toggle("open", cdrOpen);
-      root2?.querySelector(".gx-cgrip")?.setAttribute("aria-expanded", String(cdrOpen));
-      return;
-    }
-    if (featCtx && (action.startsWith("rec-") || action.startsWith("jr-"))) {
-      if (action === "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv)) {
-        const go2 = navStep(-1);
-        return go2 ? go2() : render2();
-      }
-      const switching = (action === "rec-open" || action === "rec-journal" || action === "rec-person" || action === "rec-people") && tab !== "records";
-      if (switching) {
-        tab = "records";
-        notice = "";
-        field3.confirmEnd = null;
-        resetSettings();
-      }
-      if (action !== "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv) && switching) render2();
-      return;
-    }
-    if (action.startsWith("ip-") && await handleImgPrompt(action, value, { render: render2 })) return;
-    if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv)) return;
-    if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
-    if (action === "ed-open") {
-      document.querySelectorAll(".gx-agpop").forEach((b) => b.remove());
-      if (!(view.kind === "started" || view.kind === "picker" || view.kind === "opening")) return;
-      if (view.kind === "picker") pickerPrefs = true;
-      settingsUi.scope = view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
-      openEditor({
-        ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : null,
-        refresh: () => refresh2(),
-        theme: () => root2?.dataset.theme ?? "dark",
-        handle: (a, v) => handle2(a, v),
-        input: panelInput,
-        change: panelChange,
-        canChat: () => view.kind === "started",
-        mobileNav: mobileNavHtml
-      }, value || void 0);
-      return;
-    }
-    if (action === "install-open") {
-      await openInstall();
-      return;
-    }
-    if (action === "set-editor-width") {
-      await savePrefs((p) => ({ ...p, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
-      return render2();
-    }
-    const FEAT_SET = { "gn-settings": "set:gnet", "ph-settings": "set:phone", "wiki-settings": "set:wiki" };
-    if (FEAT_SET[action]) return handle2("ed-open", FEAT_SET[action]);
-    if (action === "prefs-open" || action === "prefs-close") {
-      resetSettings();
-      resetDirectory();
-      settingsUi.scope = "defaults";
-      if (action === "prefs-open") return handle2("ed-open", "set:screen");
-      pickerPrefs = false;
-      return render2();
-    }
-    if ((view.kind === "started" || view.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
-      if (action === "dir-save" || action === "dir-reset") settingsUi.confirm = "";
-      await handleDirectory(action, value, view.ctx, settingsEnv);
-      return;
-    }
-    if (view.kind === "picker" && pickerPrefs && (action.startsWith("set-") || action.startsWith("visit-"))) {
-      if (settingsUi.busy) return;
-      await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
-      if (action === "set-theme" && view.kind === "picker" && view.staged) await stagedTheme(view.ctx, value);
-      return;
-    }
-    if (view.kind === "started" && (action.startsWith("set-") || action.startsWith("visit-"))) {
-      const scope = action === "set-theme" ? "chat" : settingsUi.scope === "defaults" ? "defaults" : "chat";
-      if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, scope);
-      return;
-    }
-    if (action === "upd-go") {
-      return handle2("ed-open", "set:update");
-    }
-    if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
-    if (action === "pick-event" && view.kind === "started" && tab !== "map") {
-      await aimFlash(value ?? "");
-      await handleField(action, value, view.ctx, env2, false);
-      if (field3.target?.type === "event" && field3.target.key === value && showOnMap(view.ctx, value ?? "")) {
-        tab = "map";
-        evUi.pop = "";
-        field3.step = "goal";
-        notice = "";
-        render2();
-      }
-      return;
-    }
-    if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env2, view.kind === "opening")) return;
-    switch (action) {
-      case "close":
-        return close2();
-      case "faction": {
-        const facs = view.kind === "picker" ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
-        const f = findFaction(value ?? "", facs);
-        if (!f) return;
-        if (draft.faction !== f.code) {
-          draft.fm = defaultScenario(f.code, facs);
-          draft.player = "";
-          if (f.group && view.kind === "picker") {
-            const first = playableAgents(view.ctx.char.globalLore, f.code)[0];
-            if (first) {
-              draft.player = first.id;
-              draft.fm = scenariosFor(f, first.id, view.ctx.char.globalLore)[0]?.fm;
-            }
-          }
-        }
-        draft.faction = f.code;
-        notice = "";
-        return renderPicker();
-      }
-      case "lang":
-        if (value === "ko" || value === "en") draft.lang = value;
-        return renderPicker();
-      case "fm":
-        draft.fm = Number(value);
-        notice = "";
-        return renderPicker();
-      case "player": {
-        if (view.kind !== "picker") return;
-        const lore = view.ctx.char.globalLore;
-        const f = draft.faction ? findFaction(draft.faction, factionList(lore)) : void 0;
-        if (f?.group && !value) return;
-        draft.player = value ?? "";
-        if (f) {
-          const list4 = scenariosFor(f, draft.player, lore);
-          if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm;
-        }
-        notice = "";
-        return renderPicker();
-      }
-      case "start":
-        return start();
-      case "nav-tab":
-      case "tab":
-        if (action === "nav-tab" && value === tab && value !== "board" && !isPhone()) value = "board";
-        if (value === "settings") return handle2("ed-open", "set:screen");
-        if (value === "wallet") return openWallet();
-        if (value === "records" && tab !== "records") applyRecordsNav({ sub: "journal", view: "list", id: "" });
-        if (value === "items" && tab !== "items") applyItemsNav({ sub: "items", view: "grid", open: "" });
-        cdrOpen = false;
-        tab = TABS3.includes(value) ? value : "board";
-        notice = "";
-        field3.confirmEnd = null;
-        resetSettings();
-        render2();
-        if (view.kind === "started" && tab === "phone") openCheck(view.ctx, phoneEnv);
-        if (view.kind === "started" && tab === "gnet") gnetOpenCheck(view.ctx, gnetEnv);
-        if (view.kind === "started" && tab === "wiki") wikiOpenCheck(view.ctx, wikiEnv);
-        return;
-      case "nav-back":
-      case "nav-fwd": {
-        markUi.pop = false;
-        const run5 = navStep(action === "nav-back" ? -1 : 1);
-        return run5 ? run5() : render2();
-      }
-      case "mk-pop":
-        markUi.pop = !markUi.pop;
-        return render2();
-      case "mk-go": {
-        const m = marks()[Number(value)];
-        if (!m || view.kind !== "started") return;
-        markUi.pop = false;
-        closeDrawer("gx-bdrawer");
-        if (m.s.tab === "settings") return handle2("ed-open", "set:screen");
-        return applyNav(openable(view.ctx, m.s));
-      }
-      case "mk-here":
-      case "mk-add": {
-        if (view.kind !== "started") return;
-        const m = action === "mk-here" ? currentMark() : markCandidates(recentMarks(), currentMark())[Number(value)];
-        if (m) await addMark(m);
-        return render2();
-      }
-      case "mk-del":
-        await removeMarkAt(Number(value));
-        return render2();
-      case "feature-set":
-        if (value === "phone" || value === "wiki" || value === "people" || value === "image" || value === "gnet" && GNET_ON) return handle2("ed-open", `set:${value}`);
-        return;
-      case "ops-sel":
-        opsUi.sel = value ?? "";
-        field3.confirmEnd = null;
-        render2();
-        if (isPhone()) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
-        return;
-      case "ops-mode":
-        opsUi.mode = value === "map" ? "map" : "feed";
-        return render2();
-      case "ev-pop":
-        evUi.pop = evUi.pop === value ? "" : value ?? "";
-        return render2();
-      case "board-map":
-        if (view.kind !== "started" || !showOnMap(view.ctx, value ?? "")) return;
-        tab = "map";
-        notice = "";
-        return render2();
-      case "id-card": {
-        if (view.kind !== "started") return;
-        showIdCard(idCard(view.ctx), (a, v) => void run4(a, v));
-        return;
-      }
-      case "wallet-pop":
-        return handle2("tab", "wallet");
-      case "wallet-filter":
-        walletUi.filter = value === "in" || value === "out" ? value : "all";
-        return render2();
-      case "wallet-open":
-        walletUi.open = walletUi.open === value ? null : value ?? null;
-        return render2();
-      case "wallet-edit":
-        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
-        walletUi.edit = !walletUi.edit;
-        walletUi.notice = "";
-        render2();
-        if (walletUi.edit) root2?.querySelector('[name="wt-adj"]')?.focus();
-        return;
-      case "wallet-del": {
-        if (view.kind !== "started" || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
-        const ctx2 = view.ctx;
-        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(removeWalletEntry(w, value ?? "")) } };
-        });
-        return refresh2();
-      }
-      case "wallet-adj": {
-        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
-        const n2 = parseWon(value ?? "");
-        if (n2 === null) {
-          walletUi.notice = "금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.";
-          return render2();
-        }
-        const ctx2 = view.ctx;
-        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(adjustWallet(w, aliveAnchors(chat), n2)) } };
-        });
-        walletUi.notice = "";
-        walletUi.edit = false;
-        return refresh2();
-      }
-      case "agents-view":
-        if (value !== "wall" && value !== "list") return;
-        await savePrefs((p) => ({ ...p, agents: value === "list" ? "list" : void 0 }));
-        return render2();
-      case "agent-info":
-        agUi.pop = agUi.pop === value ? "" : value ?? "";
-        return render2();
-      case "agent-talk":
-        if (view.kind !== "started") return;
-        tab = "phone";
-        notice = "";
-        resetField();
-        if (!await openAgentDm(view.ctx, phoneEnv, value ?? "")) render2();
-        if (view.kind === "started") openCheck(view.ctx, phoneEnv);
-        return;
-      case "wiki-goto":
-        if (view.kind !== "started") return;
-        tab = "wiki";
-        resetWiki();
-        gnet.compose = null;
-        phone.view = phone.view === "room" ? "room" : "list";
-        resetField();
-        await handleWiki("wiki-write", value, view.ctx, wikiEnv);
-        return;
-      case "people-goto":
-        if (view.kind !== "started" || !value || !hasPersonRecord(view.ctx, value)) return;
-        tab = "records";
-        gnet.compose = null;
-        phone.view = phone.view === "room" ? "room" : "list";
-        resetField();
-        await handleRecords("rec-person", value, view.ctx, recordsEnv);
-        return;
-      case "repick":
-        repick = true;
-        notice = "";
-        return refresh2();
-      case "world-on":
-        return turnWorldOn();
-    }
-  }
-  async function start() {
-    if (view.kind !== "picker" || !draft.faction || draft.fm === void 0) return;
-    const { ctx: ctx2, manifest } = view;
-    busy4 = true;
-    notice = "";
-    render2();
-    try {
-      const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm, ...draft.player ? { player: draft.player } : {} };
-      const lore = ctx2.char.globalLore ?? [];
-      let world2 = null;
-      try {
-        if (basicDefaults(lore).anomalyOn) world2 = startWorldVars(parseCatalog(lore), worldDefaults(lore), effectiveFaction(lore, choice.faction, draft.player), Math.random, draft.player ?? "");
-      } catch (error) {
-        console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
-      }
-      const plan = planStart(choice, manifest, lore, ctx2.char.alternateGreetings?.length ?? 0, world2);
-      const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
-      if (plan.kind === "direct" && !situation) throw new StartError("시작할 상황을 적어 주세요.");
-      setOpeningHint(plan.kind === "opening" ? plan.scene ?? null : null);
-      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
-        const next = applyStart(chat, plan);
-        if (situation) next.message = [...next.message ?? [], newMessage2(startRecord(situation))];
-        const theme = getPrefs().theme ?? "dark";
-        return {
-          ...next,
-          scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...getPrefs().vars ?? {}, ...next.scriptstate ?? {} }
-        };
-      });
-      if (!saved) throw new StartError("저장하지 못했어요.");
-      if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(", ")}`);
-      busy4 = false;
-      repick = false;
-      settingsUi.scope = "chat";
-      pickerPrefs = false;
-      if (plan.kind === "preset") {
-        resetField(true);
-        return refresh2();
-      }
-      draft.situation = "";
-      if (situation && !await sendNow()) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
-      });
-      await close2();
-      await refresh2();
-    } catch (error) {
-      busy4 = false;
-      notice = error instanceof Error ? error.message : String(error);
-      render2();
-    }
-  }
-  async function turnWorldOn() {
-    if (view.kind !== "started") return;
-    const { ctx: ctx2 } = view;
-    busy4 = true;
-    notice = "";
-    render2();
-    try {
-      const catalog = parseCatalog(ctx2.char.globalLore);
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        if (worldOn(chat)) return null;
-        const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
-        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...startWorldVars(catalog, worldSettings(ctx2.char.globalLore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? "")) } };
-      });
-      busy4 = false;
-      await refresh2();
-    } catch (error) {
-      busy4 = false;
-      notice = error instanceof Error ? error.message : String(error);
-      render2();
-    }
-  }
-  var TAB_TITLE = {
-    board: "상황판",
-    map: "임무",
-    mission: "커스텀",
-    gnet: "괴담넷",
-    phone: "괴담톡",
-    wiki: "위키",
-    items: "소지품",
-    records: "기록",
-    settings: "설정"
-  };
-  function header(title2, extra = "", sub = "") {
-    return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${esc33(title2)}</b>${sub ? `<small>${esc33(sub)}</small>` : ""}</div></div>
-    <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
-  </header>`;
-  }
-  function startedHeader(ctx2) {
-    return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${tab === "gnet" ? gnetLabel(ctx2.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
-    <div class="gx-head-act">
-      ${walletHeadButton(ctx2)}
-      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc33(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
-      <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
-  </header>`;
-  }
-  function renderPicker() {
-    const facs = root2?.querySelectorAll(".gx-facs .gx-fac");
-    const main = root2?.querySelector(".gx-body");
-    if (!root2 || view.kind !== "picker" || !facs?.length || !main || root2.querySelector(".gx-settings")) return render2();
-    const tpl = document.createElement("template");
-    tpl.innerHTML = body4();
-    const next = tpl.content.querySelectorAll(".gx-facs .gx-fac");
-    if (next.length !== facs.length) return render2();
-    next.forEach((b, i) => {
-      if (b.classList.contains("has-img") !== facs[i].classList.contains("has-img")) return void facs[i].replaceWith(b);
-      facs[i].className = b.className;
-      facs[i].setAttribute("aria-pressed", b.getAttribute("aria-pressed") ?? "false");
-    });
-    const sections3 = main.querySelectorAll(":scope > section");
-    const fresh = tpl.content.querySelectorAll(".gx-body > section");
-    if (sections3.length !== fresh.length) return render2();
-    for (let i = 1; i < sections3.length; i++) sections3[i].replaceWith(fresh[i]);
-    const foot = root2.querySelector(".gx-foot");
-    const nfoot = tpl.content.querySelector(".gx-foot");
-    if (foot && nfoot) foot.replaceWith(nfoot);
-    else return render2();
-  }
-  var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups";
-  var PAGE_SCROLL = ".st-featpage .ph-form-body, .nw-pane .nw-doc";
-  var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
-  function render2() {
-    if (!root2) return;
-    if (editorOpen() && editorOnSettings()) queueMicrotask(() => render());
-    const nav = view.kind === "started";
-    if (view.kind === "started") syncCloseToast(view.ctx.chat, render2);
-    const scroller = root2.querySelector(".gx-body");
-    const keep = scroller && root2.dataset.tab === tab ? scroller.scrollTop : 0;
-    const inner = root2.dataset.tab === tab ? [...root2.querySelectorAll(INNER_SCROLL)].map((el) => el.scrollTop) : [];
-    const pageKeep = root2.dataset.pk === pageKey() ? [...root2.querySelectorAll(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
-    const log = root2.querySelector(".ph-log");
-    const logRoom = root2.dataset.room ?? "";
-    const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
-    const gnKey = `${gnet.sub}:${gnet.open}:${gnet.openDm}`;
-    const gnKeep = tab === "gnet" && root2.dataset.tab === "gnet" && root2.dataset.gn === gnKey ? [".gn .ph-content", ".gn-pane .gn-doc"].map((q) => root2.querySelector(q)?.scrollTop ?? 0) : null;
-    const act = document.activeElement;
-    const focusSel = act && root2.contains(act) && act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
-    const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
-    root2.dataset.theme = themeOf();
-    const pf = getPrefs();
-    root2.dataset.nav = pf.nav ?? "left";
-    root2.dataset.wikiSide = pf.wikiSide ?? "right";
-    paintVeil(root2, pf.dim ?? DIM_DEFAULT);
-    const fr = frameState(pf.frame, nav);
-    root2.dataset.frame = fr.kind;
-    if (fr.hidden) root2.dataset.frameHidden = "1";
-    else delete root2.dataset.frameHidden;
-    const panel = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body4()}</div>`;
-    root2.innerHTML = fr.kind === "none" ? panel : frameHtml(fr.kind, !nav, panel);
-    if (dirUi.scrollTo) {
-      dirUi.scrollTo = "";
-      root2.querySelector(".dir-row.open")?.scrollIntoView({ block: "center" });
-    }
-    root2.dataset.tab = tab;
-    const toastEl = root2.querySelector(".gx-rectoast");
-    if (toastEl) {
-      toastEl.addEventListener("pointerenter", holdToast);
-      toastEl.addEventListener("pointerleave", () => releaseToast(render2));
-    }
-    if (focusSel) {
-      const el = [...root2.querySelectorAll(focusSel)].find((x) => x.offsetParent);
-      if (el) {
-        el.focus({ preventScroll: true });
-        if (caret) try {
-          el.setSelectionRange(caret[0], caret[1]);
-        } catch {
-        }
-      }
-    }
-    const next = root2.querySelector(".gx-body");
-    if (next && keep) next.scrollTop = keep;
-    if (inner.length) root2.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
-    root2.dataset.pk = pageKey();
-    if (pageKeep.length) root2.querySelectorAll(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
-    const nlog = root2.querySelector(".ph-log");
-    root2.dataset.room = phone.room ?? "";
-    if (nlog) {
-      nlog.scrollTop = logKeep < 0 ? nlog.scrollHeight : logKeep;
-      if (logKeep < 0) nlog.querySelectorAll("img").forEach((img) => img.addEventListener("load", () => nlog.scrollTop = nlog.scrollHeight, { once: true }));
-    }
-    root2.dataset.gn = gnKey;
-    if (gnKeep) [".gn .ph-content", ".gn-pane .gn-doc"].forEach((q, i) => {
-      const el = root2.querySelector(q);
-      if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
-    });
-    hydratePhotos(root2);
-    labelSwitches(root2);
-    bindMapZoom(root2);
-    bindMbar(root2, () => void run4("close"));
-    bindDrawer(root2, () => void run4("mk-pop"));
-    bindWikiSide(root2, (v) => void run4("wiki-list", v));
-    bindFootnotes(root2);
-    const stBar = root2.querySelector(".gx-settings > .st-scopebar");
-    if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
-    bindSwipeBack(root2, navStep);
-    if (view.kind === "started") navHist.record(navState());
-    root2.querySelectorAll('.gx-nh[data-action^="nav-"]').forEach((b) => b.disabled = !navHist.can(b.dataset.action === "nav-back" ? -1 : 1));
-    setCurrentTheme(themeName(root2.dataset.theme));
-  }
-  function boardDrawer() {
-    return "";
-  }
-  var navHist = new NavHistory();
-  function openWallet() {
-    tab = "items";
-    notice = "";
-    field3.confirmEnd = null;
-    cdrOpen = false;
-    resetSettings();
-    applyItemsNav({ sub: "wallet", view: "grid", open: "" });
-    render2();
-  }
-  function navState() {
-    const s7 = { tab };
-    if (tab === "wiki") s7.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
-    if (tab === "records") s7.r = recordsNav();
-    if (tab === "items") s7.i = itemsNav();
-    if (tab === "phone") s7.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
-    if (tab === "gnet") s7.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === "post" || gnet.compose?.kind === "newdm" ? gnet.compose : null };
-    if (tab === "map" || tab === "mission") s7.f = field3.step;
-    if (tab === "settings") s7.d = dirUi.open;
-    if (tab === "board" && agUi.pop) s7.a = agUi.pop;
-    return s7;
-  }
-  function markState(s7) {
-    const o = JSON.parse(JSON.stringify(s7));
-    if (o.w) o.w.list = false;
-    if (o.g) o.g.c = null;
-    if (o.p && o.p.view !== "room" && o.p.view !== "settings" && o.p.view !== "notice") Object.assign(o.p, { view: "list", room: null, n: null });
-    return o;
-  }
-  var PH_SUB = { contacts: "연락처", chats: "대화", notices: "공지" };
-  function markOf(raw) {
-    const s7 = markState(raw);
-    const ctx2 = view.kind === "started" ? view.ctx : null;
-    let name = s7.tab === "gnet" ? gnetLabel(ctx2?.chat.scriptstate) : TAB_TITLE[s7.tab];
-    if (s7.w) name = s7.w.view === "doc" || s7.w.view === "compose" ? s7.w.title || "위키" : s7.w.view === "settings" ? "위키 설정" : s7.w.view === "new" ? "위키 새 문서" : "위키 메인";
-    if (s7.r) name = recordsMarkName(s7.r, ctx2?.chat ?? null);
-    if (s7.p) {
-      const r = s7.p.view === "room" && s7.p.room && ctx2 ? readPhone(ctx2.chat).rooms[s7.p.room] : void 0;
-      name = r ? roomLabel(r) : s7.p.view === "settings" ? "괴담톡 설정" : `괴담톡 ${PH_SUB[s7.p.sub] ?? ""}`.trim();
-    }
-    if (s7.g) {
-      const post = s7.g.open !== null && ctx2 ? findPost(readGnet(ctx2.chat), s7.g.open) : void 0;
-      name = s7.g.s ? `${gnetLabel(ctx2?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx2?.chat.scriptstate)} 글` : s7.g.dm ? `${s7.g.dm} 쪽지` : s7.g.sub === "dm" ? "괴담넷 쪽지" : "괴담넷";
-    }
-    if (s7.f === "team") name = `${name} 편성`;
-    if (s7.tab === "settings" && s7.d) name = "명부";
-    return { s: s7, name };
-  }
-  var plainBoard = (s7) => s7.tab === "board" && !s7.a;
-  function currentMark() {
-    const s7 = navState();
-    return plainBoard(s7) ? null : markOf(s7);
-  }
-  function recentMarks() {
-    const seen2 = /* @__PURE__ */ new Set();
-    return navHist.recent().filter((s7) => s7.tab !== "settings" && !plainBoard(s7)).map(markOf).filter((m) => {
-      const k = JSON.stringify(m.s);
-      return !seen2.has(k) && (seen2.add(k), true);
-    });
-  }
-  function openable(ctx2, s7) {
-    const o = JSON.parse(JSON.stringify(s7));
-    const legacy = o.tab === "wiki" && o.w ? legacyWikiNav(o.w.view, o.w.title) : null;
-    if (legacy) {
-      o.tab = "records";
-      o.r = legacy;
-      delete o.w;
-    }
-    if (o.tab === "wallet" || o.tab === "records" && o.r?.sub === "wallet") {
-      o.tab = "items";
-      o.i = { sub: "wallet", view: "grid", open: "" };
-      delete o.r;
-    }
-    if (!TABS3.includes(o.tab)) o.tab = "board";
-    if (o.p?.room && !readPhone(ctx2.chat).rooms[o.p.room]) Object.assign(o.p, { view: "list", room: null });
-    return o;
-  }
-  function applyNav(s7) {
-    tab = s7.tab;
-    notice = "";
-    field3.confirmEnd = null;
-    if (s7.w) Object.assign(wiki, { view: s7.w.view, title: s7.w.title, listOpen: s7.w.list });
-    if (s7.r) applyRecordsNav(s7.r);
-    if (s7.i) applyItemsNav(s7.i);
-    if (s7.p) Object.assign(phone, { sub: s7.p.sub, tab: s7.p.tab, view: s7.p.view, room: s7.p.room, openNotice: s7.p.n });
-    if (s7.g) Object.assign(gnet, { sub: s7.g.sub, open: s7.g.open, openDm: s7.g.dm, settings: s7.g.s, compose: s7.g.c });
-    if (s7.d !== void 0) dirUi.open = s7.d;
-    agUi.pop = s7.a ?? "";
-    if (s7.f && s7.f !== field3.step) return void run4("field-step", s7.f);
-    render2();
-  }
-  function navStep(dir2) {
-    const go2 = (action, value) => () => void run4(action, value);
-    if (view.kind === "picker") return dir2 < 0 && pickerPrefs ? go2("prefs-close") : null;
-    if (view.kind === "opening") return dir2 < 0 ? go2("repick") : null;
-    if (view.kind !== "started") return null;
-    if (evUi.pop && dir2 < 0) return () => void run4("ev-pop", evUi.pop);
-    if (agUi.pop && dir2 < 0) return () => void run4("agent-info", agUi.pop);
-    if (!navHist.can(dir2)) return null;
-    return () => {
-      const s7 = navHist.go(dir2);
-      if (s7) applyNav(s7);
-    };
-  }
-  function themeOf() {
-    const ctx2 = view.kind === "started" || view.kind === "opening" || view.kind === "picker" ? view.ctx : null;
-    const v = String(ctx2?.chat.scriptstate?.["$st_fixed_theme"] ?? "");
-    if (v === "light" || v === "paper" || v === "dark") return v;
-    if (view.kind === "picker") return getPrefs().theme ?? "dark";
-    return "light";
-  }
-  function startedBody(ctx2) {
-    switch (tab) {
-      case "map":
-        return mapTab(ctx2, env2, notice, busy4);
-      case "mission":
-        return missionTab(ctx2, false, notice, busy4);
-      case "wiki":
-        return wikiTab(ctx2, wikiEnv);
-      case "gnet":
-        return gnetTab(ctx2, gnetEnv);
-      case "phone":
-        return phoneTab(ctx2, phoneEnv);
-      case "records":
-        return recordsTab(ctx2);
-      case "items":
-        return itemsTab(ctx2);
-      case "settings": {
-        return settingsTab(ctx2, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope) + boardDrawer();
-      }
-      default:
-        return board(ctx2);
-    }
-  }
-  function body4() {
-    switch (view.kind) {
-      case "loading":
-        return `${header("불러오는 중")}<div class="gx-empty">채팅 정보를 읽는 중이에요…</div>`;
-      case "error":
-        return `${header("오류")}<div class="gx-empty">${esc33(view.message)}</div>`;
-      case "not-lite":
-        return `${header("연결 안 됨")}<div class="gx-empty">
-        <p><b>${esc33(view.name || "이 캐릭터")}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
-        <p>${view.goei ? "설치 · 점검에서 매니페스트와 인사말을 다시 심으면 시작 화면이 열려요." : `이 봇에 ${BRAND.name}를 설치하면(설정 폴더·명부·인사말·사진·아이콘을 심어요) 여기서 바로 쓸 수 있어요. 기존 로어북·인사말·에셋은 그대로 둬요.`}</p>
-        <button class="gx-start" data-action="install-open">${view.goei ? "설치 · 점검 열기" : `이 봇에 ${BRAND.name} 설치`}</button>
-      </div>`;
-      case "started":
-        evSeenReset();
-        return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc33(notice)}</div>` : ""}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === "board" ? agentPopup((n2) => view.kind === "started" && hasPersonRecord(view.ctx, n2)) : ""}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
-      case "opening":
-        return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy4)}</div>`;
-      case "picker":
-        return `${header(view.staged ? "다시 고르기" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>`, view.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "")}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
-    }
-  }
-  function scenariosFor(f, player, lore) {
-    if (!player) return f.scenarios;
-    const ownScene = agentScene(player, scenesOf(lore));
-    const own = ownScene ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? "이 인물", ownScene.label)] : [];
-    return [...own, ...f.scenarios.filter((x) => x.kind !== "opening")];
-  }
-  function picker() {
-    const facs = view.kind === "picker" ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
-    const lore = view.kind === "picker" ? view.ctx.char.globalLore : void 0;
-    const f = draft.faction ? findFaction(draft.faction, facs) : void 0;
-    const list4 = f ? scenariosFor(f, draft.player, lore) : [];
-    const sc = f && draft.fm !== void 0 ? list4.find((x) => x.fm === draft.fm) : void 0;
-    const factions = facs.filter((x) => !x.hidden).map(
-      (x) => {
-        const img = view.kind === "picker" ? imageUrl(view.ctx.char, factionPic(view.ctx.char, x)) : null;
-        return `<button class="gx-fac${x.code === draft.faction ? " on" : ""}${img ? " has-img" : ""}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
-        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc33(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc33(x.name)}</b><span>${esc33(x.blurb)}</span></span></button>`;
-      }
-    ).join("");
-    const langs = SCENARIOS.languages.map(
-      (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc33(l.label)}</button>`
-    ).join("");
-    const playing = !!draft.player;
-    const scenarios = f ? list4.map((s7, i) => {
-      return `<button class="gx-sc${s7.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s7.fm}" aria-pressed="${s7.fm === draft.fm}">
-            <b>${String(i + 1).padStart(2, "0")}</b><span>${esc33(s7.label)}</span></button>`;
-    }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
-    const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
-          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc33(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
-    const ready = !!(f && sc) && (sc.kind !== "direct" || !!(draft.situation ?? "").trim()) && !(f?.group && !playing);
-    const ctxP = view.kind === "picker" ? view.ctx : null;
-    const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
-    const me = userInfo();
-    const who = f ? `<div class="gx-who">${[
-      ...f.group ? [] : [`<button class="gx-whoc${!playing ? " on" : ""}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc33(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`],
-      ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? " on" : ""}" data-action="player" data-value="${esc33(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ""}<span class="gx-whot"><b>${esc33(a.name)}</b>${a.rank ? `<small>${esc33(a.rank)}</small>` : ""}</span></button>`)
-    ].join("")}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list4.some((x) => x.fm === PLAYER_FM) ? "그 인물의 첫 장면이나 " : ""}직접 입력·커스텀 임무로 시작해요.</div>` : ""}` : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
-    const shown2 = list4.length;
-    return `<main class="gx-body">
-    <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
-    <section><h2><i>2</i>주인공</h2>${who}</section>
-    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc33(f.name)} · ${shown2}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
-    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
-  </main>
-  <footer class="gx-foot">
-    ${f && sc ? `<div class="gx-foot-sum">${esc33(f.name)}${playing ? ` · ${esc33(people.find((a) => a.id === draft.player)?.name ?? "")}` : ""} · ${String(list4.indexOf(sc) + 1).padStart(2, "0")} ${esc33(sc.label)}</div>` : ""}
-    ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc33(notice)}</div>` : ""}
-    <button class="gx-start" data-action="start" ${ready && !busy4 ? "" : "disabled"}>${busy4 ? "시작하는 중…" : "출 발"}</button>
-  </footer>`;
-  }
-  function tabs() {
-    const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
-    const cur = tab === "mission" ? "map" : tab;
-    const item2 = (id, label2, icon2, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label2}</span>${badge3}</button>`;
-    const ctx2 = view.kind === "started" ? view.ctx : null;
-    return `<nav class="gx-nav" aria-label="주요 화면">
-    ${ctx2 ? brand(ctx2) : ""}
-    ${item2("board", "상황판", ICONS.board)}
-    ${item2("map", "임무", ICONS.map, "desk")}
-    ${item2("map", "임무", ICONS.map, "mob")}
-    ${item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : "")}
-    ${GNET_ON ? item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet) : ""}
-    ${item2("wiki", "위키", ICONS.wiki)}
-    ${item2("items", "소지품", ICONS.bag, "desk")}
-    ${item2("records", "기록", ICONS.records, "desk")}
-    <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ""}</button>
-    <span class="gx-nav-gap"></span>
-    ${ctx2 ? navHistBar(currentMark()) : ""}
-    ${mobileBar(item2, unreadPhone, ctx2)}
-  </nav>`;
-  }
-  function mobileBar(item2, unreadPhone, ctx2, drawer = true) {
-    const bar = mbarHtml([
-      item2("map", "임무", ICONS.map, "mob"),
-      item2("records", "기록", ICONS.records, "mob"),
-      item2("board", "상황판", ICONS.board, "home"),
-      item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ""),
-      item2("items", "소지품", ICONS.bag, "mob")
-    ]);
-    return drawer ? commonDrawer(ctx2) + bar : bar;
-  }
-  function commonDrawer(ctx2) {
-    const b = (id, label2, icon2, action = "tab", value = id, badge3 = "") => `<button class="ph-tool${tab === id ? " on" : ""}" data-action="${action}" data-value="${value}">${icon2}<span class="ph-tool-l">${esc33(label2)}</span>${badge3}</button>`;
-    return `<div class="gx-cdr${cdrOpen ? " open" : ""}">
-    <div class="gx-cpanel ph-tools">${b("wiki", "위키", ICONS.wiki)}${GNET_ON ? b("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet) : ""}${b("settings", "설정", ICONS.settings, "ed-open", "set:screen", ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}</div>
-    <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
-  </div>`;
-  }
-  function mobileNavHtml() {
-    const ctx2 = view.kind === "started" ? view.ctx : null;
-    const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
-    const cur = tab === "mission" ? "map" : tab;
-    const item2 = (id, label2, icon2, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id ? " on" : ""}" data-action="tab" data-value="${id}">${icon2}<span>${esc33(label2)}</span>${badge3}</button>`;
-    return `<nav class="gx-nav gw-nav">${mobileBar(item2, unreadPhone, ctx2, false)}</nav>`;
-  }
-  function brand(ctx2) {
-    return `<div class="gx-nav-brand">
-      ${idCard(ctx2)}
-    </div>`;
-  }
-  function idCard(ctx2) {
-    const facs = factionList(ctx2.char.globalLore);
-    const code2 = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "") || currentChoice(ctx2.chat).faction || "";
-    const f = code2 ? findFaction(code2, facs) : void 0;
-    const img = f ? imageUrl(ctx2.char, factionPic(ctx2.char, f)) : null;
-    const w = worldOn(ctx2.chat) ? readWorld(ctx2.chat) : null;
-    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
-    const time2 = (w ? clock2(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
-    const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
-    const line2 = (label2, value) => value ? `<span class="gx-op-ln"><i>${label2}</i><em>${esc33(value)}</em></span>` : "";
-    const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc33(time2)}</span><span>${esc33(weather)}</span></span>` : "";
-    const status2 = line2("위치", st?.place ?? "") + line2("목표", st?.target ?? "") + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : "");
-    const u = userInfo();
-    const pa = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
-    const paPic = pa ? imageUrl(ctx2.char, facePic(ctx2.char, pa, true)) : null;
-    const name = pa?.name || u.name || "나";
-    const photoUrl2 = pa ? paPic : u.photo;
-    const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc33(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-    const who = `<span class="gx-id-who"><b>${esc33(name)}</b><small>${esc33([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>`;
-    const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc33(img)}')"></span>` : "";
-    return `<div class="gx-id">${bg}
-      ${photo}
-      ${who}
-      ${status2 || walletChip(ctx2) ? `<span class="gx-op-st">${walletChip(ctx2)}${status2}</span>` : ""}
-    </div>`;
-  }
-  function walletChip(ctx2) {
-    if (colConfig(ctx2.chat.scriptstate).wallet === "off") return "";
-    const w = readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-    return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc33(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</em></button>`;
-  }
-  function selfName(ctx2, code2, name) {
-    const c = parseCatalog(ctx2.char.globalLore);
-    const outside = factionNames(c, void 0)[code2];
-    return outside && name === outside ? factionNames(c, code2)[code2] ?? name : name;
-  }
-  function clock2(minute) {
-    if (minute === null) return "";
-    const d = new Date(minute * 6e4);
-    const p = (n2) => String(n2).padStart(2, "0");
-    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-  }
-  function board(ctx2) {
-    if (!worldOn(ctx2.chat)) {
-      return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
-      <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
-      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc33(notice)}</div>` : ""}
-      <button class="gx-start" data-action="world-on" ${busy4 ? "disabled" : ""}>${busy4 ? "켜는 중…" : "상황판 켜기"}</button></div>${boardDrawer()}`;
-    }
-    let catalog;
-    try {
-      catalog = parseCatalog(ctx2.char.globalLore);
-    } catch (error) {
-      return `<div class="gx-empty">${esc33(error instanceof Error ? error.message : String(error))}</div>`;
-    }
-    const w = readWorld(ctx2.chat);
-    const faction = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
-    const roster = rosterFor(w, catalog, faction, worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit);
-    const byName = new Map(roster.map((p) => [p.name, p]));
-    const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
-    const display = factionNames(catalog, faction);
-    const ownName = display[faction] ?? "";
-    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n2) => n2.trim());
-    const chips3 = (codes) => peopleChips(ctx2.char, names4(codes), byName, ownName);
-    const cards2 = [];
-    const add = (kind, i, locCode, c) => {
-      const key2 = keys.get(`${kind}${i}`);
-      if (!key2) return;
-      cards2.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field3.confirmEnd === key2, selected: field3.target?.type === "event" && field3.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
-    };
-    const since = (m) => elapsedText(w.minute, m);
-    const sit = (t) => t ? `<span class="gx-evc-sit">${esc33(t)}</span>` : "";
-    const locText = (loc, m) => `${esc33(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
-    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
-    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', chips: chips3(e.deploy ?? ""), extra: sit(e.situation) }));
-    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc33(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
-    for (const e of endedShown(w)) {
-      const name = e.name || "이름 미확인";
-      const rp = endedReport(ctx2.chat, e.kind, e.name, e.loc);
-      cards2.push({ kind: e.kind, name, grade: e.grade, loc: esc33(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind), ...rp?.rpt ? { rpt: rp.rpt } : {}, ...rp?.mine ? { mine: true } : {} });
-    }
-    const sentTo = (codes, id) => (codes ?? "").split(",").map((x) => x.trim()).includes(id);
-    const deployedAt = (id) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id))?.name ?? "";
-    const dir2 = readDirectory(ctx2.char.globalLore ?? []).agents;
-    const agents = roster.map((p) => {
-      const rec2 = w.agents[p.id];
-      const st = rec2?.st ?? "미정";
-      const c = agentContact(ctx2, p.id);
-      const big = p.english ? mainPic(ctx2.char, dir2.find((x) => x.english === p.english) ?? { english: p.english }) : "";
-      return {
-        id: p.id,
-        name: p.name,
-        english: p.english ?? "",
-        st: stLabel(st),
-        side: st === "작전투입" ? "op" : agentLocked(rec2) ? "lock" : "ok",
-        situation: rec2?.situation ?? "",
-        dept: p.department ?? "",
-        rank: p.rank ?? "",
-        face: avatar(ctx2.char, p.english, p.name, "sq"),
-        photo: big ? imageUrl(ctx2.char, big) : null,
-        deployed: st === "작전투입" ? deployedAt(p.id) : "",
-        wiki: c ? c.wiki : null
-      };
-    });
-    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc33(w.promoted.join(", "))}</p>` : "";
-    const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
-    const cnt = (cls, label2, n2) => `<em class="${cls}">${label2}<i>${n2}</i></em>`;
-    const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
-    const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
-    const clock3 = boardClock(ctx2);
-    return `<main class="gx-body gx-board">
-    ${opsBoard(cards2, { mapUrl: boardMapUrl(ctx2, env2), clock: clock3, counts, empty: "지금 발생한 상황이 없어요." })}
-    ${agentPanel2(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
-  </main>${boardDrawer()}`;
-  }
-  function boardClock(ctx2) {
-    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
-    return [st?.date, st?.time].filter(Boolean).join(" ");
-  }
-
-  // src/loader/panel.ts
-  var PANEL_CSS = `
-.gl-back{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,8,10,.72);font:14px/1.5 system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#E6EEEC;box-sizing:border-box}
-.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #37464D;border-radius:14px;background:#232D32;box-sizing:border-box}
-.gl-card b{font-size:16px}
-.gl-card p{margin:0;color:#B5C4C0}
-.gl-msg{padding:8px 12px;border-radius:8px;background:#172328;color:#E6EEEC!important}
-.gl-act{display:flex;gap:8px;margin-top:6px}
-.gl-act button{flex:1;min-height:42px;padding:0 14px;border:1px solid #24343B;border-radius:10px;background:#172328;color:#E6EEEC;font:inherit;font-weight:700;cursor:pointer}
-.gl-act button.primary{border-color:#5EEAD4;background:#10302C;color:#5EEAD4}
-.gl-act button[disabled]{opacity:.5;cursor:default}
-@media (max-width:520px){.gl-back{align-items:flex-end}.gl-act{flex-direction:column}}
-`;
-
-  // src/host/datapanel.ts
-  var MARK2 = "data-gl-world";
-  var g = globalThis;
-  var current4 = () => document.querySelector(`[${MARK2}]`);
-  function closeWorldDataPanel(byUser = false) {
-    const root3 = current4();
-    if (!root3) return;
-    root3.remove();
-    g.__goeiBodyPanel = false;
-    if (byUser) g.__goeiWorldDismissed = true;
-    void risuai.hideContainer();
-  }
-  function showWorldDataPanel(reason3, prompt = false) {
-    const had = current4();
-    if (had) {
-      const msg2 = had.querySelector(".gl-msg");
-      if (msg2) msg2.hidden = false, msg2.textContent = reason3;
-      return;
-    }
-    if (!prompt && g.__goeiWorldDismissed) {
-      console.log(`[goei] 세계 자료 받기 창은 닫혀 있어 다시 띄우지 않아요 (카드를 다시 열면 띄움): ${reason3}`);
-      return;
-    }
-    delete g.__goeiWorldDismissed;
-    const root3 = document.createElement("div");
-    root3.setAttribute(MARK2, "1");
-    root3.innerHTML = `<style>${PANEL_CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː ANOMALY">
-      <b>괴이 ː ANOMALY</b>
-      <p>세계 자료(요원·조직·괴이 기록)를 받지 못했어요. 플러그인은 이 자료를 받아 둔 뒤에 켜져요. 네트워크를 확인하고 다시 받거나, 릴리스 zip에 든 goei-data-world.txt를 넣어 주세요.</p>
-      <p class="gl-msg"></p>
-      <div class="gl-act"><button class="primary" data-gl="get">다시 받기</button><button data-gl="file">파일로 넣기</button><button data-gl="close">닫기</button></div>
-    </div></div>`;
-    document.body.append(root3);
-    g.__goeiBodyPanel = true;
-    void risuai.showContainer("fullscreen");
-    const msg = root3.querySelector(".gl-msg");
-    const btns = [...root3.querySelectorAll("button")];
-    const say = (t) => (msg.hidden = !t, msg.textContent = t);
-    say(reason3);
-    const run5 = (job, busy5) => {
-      btns.forEach((b) => b.disabled = true);
-      say(busy5);
-      void job().then(() => done2(root3, say, btns)).catch((e) => {
-        say(e instanceof Error ? e.message : String(e));
-        btns.forEach((b) => b.disabled = false);
-      });
-    };
-    const picker2 = document.createElement("input");
-    picker2.type = "file";
-    picker2.accept = ".txt,.json";
-    picker2.hidden = true;
-    root3.append(picker2);
-    picker2.addEventListener("change", () => {
-      const f = picker2.files?.[0];
-      picker2.value = "";
-      if (f) run5(async () => 
+      if (ev.key === "Enter" && !ev.shi

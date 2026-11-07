@@ -1,4 +1,4 @@
-action, userFaction3),
+  affinityBase: userAffinityBase(faction, userFaction3),
       aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
       ...address ? { address } : {}
     };
@@ -196,8 +196,8 @@ action, userFaction3),
     const msg = messages[index];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
-    const clean3 = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean3)) return null;
+    const clean4 = cleanOutput(raw);
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean4)) return null;
     const prev = readPrev(state[PREV_KEY]);
     const pk = index > 0 && messages[index - 1] ? messageKey(messages[index - 1], index - 1) : "";
     const reroll = prev?.i === index && (prev.pk === void 0 || prev.pk === pk);
@@ -216,7 +216,7 @@ action, userFaction3),
     markStart(base, result.world, messageKey(msg, index));
     const vars = {
       ...worldVars(result.world, c, s7, now),
-      [LAST_KEY]: fingerprint(index, clean3)
+      [LAST_KEY]: fingerprint(index, clean4)
     };
     if (reroll && !result.faction) {
       vars.$st_faction = before.faction;
@@ -229,7 +229,7 @@ action, userFaction3),
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index] = { ...msg, data: clean3 };
+    message[index] = { ...msg, data: clean4 };
     const next = { ...chat, message, scriptstate: { ...state, ...vars } };
     const closed = result.world.closed ?? [];
     let made = [];
@@ -2032,7 +2032,7 @@ ${SEED_CLOSE}` : "", missing };
     let out = messages;
     const steps = texts.thoughts?.trim();
     if (steps && s7.thoughts !== "off") {
-      const block2 = s7.thoughts === "note" ? `# Thoughts
+      const block3 = s7.thoughts === "note" ? `# Thoughts
 ${NOTE_HEAD}
 
 ${steps}
@@ -2043,7 +2043,7 @@ ${INNER_HEAD}
 ${steps}`;
       out = editSystem(out, (sys) => `${sys}
 
-${block2}`);
+${block3}`);
     }
     const memo = texts.memo;
     if (s7.memo && memo && memo.persona.trim()) {
@@ -2853,16 +2853,16 @@ ${story}`,
       secondary: t.secondary && !trimSecondary(),
       extra: [{ source: "현재 발생 상황", content: b.read("LB.EXTRA") }]
     });
-    const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]
+    const material2 = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]
 ${refText(rows2)}
 [최근 본문]
 ${story}
 [현재 작업]
 ${extras2}`;
-    const attachments = hasAttachment(material);
+    const attachments = hasAttachment(material2);
     const messages = [
       { role: "system", content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames3) },
-      { role: "user", content: factionCodesToNames(material, factionNames3) }
+      { role: "user", content: factionCodesToNames(material2, factionNames3) }
     ];
     return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "gn"), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }) };
   }
@@ -3016,16 +3016,16 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames3), activity, suppl
   }
   function dmPrompt(src, st, nick, latest, userHandle, factionNames3) {
     const b = gnetBooks(src);
-    const source4 = st.sources[nick];
+    const source5 = st.sources[nick];
     let anchor = b.read("DM.NO-ORIGIN");
-    if (source4) {
+    if (source5) {
       anchor = [
-        `Original forum post #${source4.postid} (preserved at first contact):`,
-        `Title: ${source4.title}`,
-        `Posted by: ${source4.author}`,
-        `Post text: ${source4.body}`,
-        source4.quote ? `Referenced public comment — author: ${source4.quoteAuthor.trim() || "[not retained; do not attribute to the contact]"}
-${source4.quote}` : ""
+        `Original forum post #${source5.postid} (preserved at first contact):`,
+        `Title: ${source5.title}`,
+        `Posted by: ${source5.author}`,
+        `Post text: ${source5.body}`,
+        source5.quote ? `Referenced public comment — author: ${source5.quoteAuthor.trim() || "[not retained; do not attribute to the contact]"}
+${source5.quote}` : ""
       ].join("\n");
     }
     const lines3 = [];
@@ -3723,10 +3723,10 @@ ${after}`);
     return parts.filter((p) => p.text.trim()).sort((a, b) => a.order - b.order).map((p) => p.text.trim()).join("\n\n");
   }
   var LORE_MARK = "<!-- goei:lore -->";
-  function insertLoreBlock(messages, block2, firstChat) {
-    if (!block2.trim() || messages.some((m) => typeof m?.content === "string" && m.content.startsWith(LORE_MARK))) return messages;
+  function insertLoreBlock(messages, block3, firstChat) {
+    if (!block3.trim() || messages.some((m) => typeof m?.content === "string" && m.content.startsWith(LORE_MARK))) return messages;
     const msg = { role: "system", content: `${LORE_MARK}
-${block2.trim()}` };
+${block3.trim()}` };
     const keys = (Array.isArray(firstChat) ? firstChat : [firstChat]).map((k) => (k ?? "").trim().slice(0, 80)).filter(Boolean);
     let at = -1;
     for (const key2 of keys) {
@@ -3759,28 +3759,28 @@ ${block2.trim()}` };
     if (!agent) return src;
     return { ...src, persona: playerBlock(src.char.globalLore, agent, { vars: src.chat.scriptstate ?? {}, char: src.char.name, user: "주인공" }) };
   }
-  function applyPlayer(messages, block2, persona2, userName, agentName) {
-    if (!block2) return messages;
+  function applyPlayer(messages, block3, persona2, userName, agentName) {
+    if (!block3) return messages;
     let out = messages;
     const p = persona2.trim();
     let placed = false;
     if (p.length >= 8) {
       out = out.map((m) => {
         if (typeof m?.content !== "string" || !m.content.includes(p)) return m;
-        const content = placed ? m.content.split(p).join("") : m.content.replace(p, () => block2);
+        const content = placed ? m.content.split(p).join("") : m.content.replace(p, () => block3);
         placed = true;
         return { ...m, content };
       });
     }
-    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(block2))) {
+    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(block3))) {
       const at = out.findIndex((m) => m?.role === "system");
-      const add = { role: "system", content: block2 };
+      const add = { role: "system", content: block3 };
       out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc34 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc34}\\b` : esc34, "g");
+      const esc36 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc36}\\b` : esc36, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -4164,5 +4164,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
       { role: "system", content: factionCodesToNames(system, names4) },
       { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
     ];
-    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "ph"), { thoughts: read("THOUGHTS"), memo: memoTexts(read) }), contactMode: false };
-  }
+    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "ph"), { thoughts: read("THOUGHTS"), memo: memoText

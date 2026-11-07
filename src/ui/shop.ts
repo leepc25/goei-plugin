@@ -170,10 +170,11 @@ function talkbox(st: ShopState): string {
   const sell = shopUi.chipKind === 'sell';
   const chip = shopUi.chip ? `<button type="button" class="sh-ref${sell ? ' sell' : ''}" data-action="shop-chip-x" aria-label="${esc(shopUi.chip)} 빼기">${sell ? '팔기: ' : ''}${esc(shopUi.chip)} ×</button>` : '';
   const ph = st.closed ? '거래가 끊겼어요' : sell ? (typeof st.sell?.price === 'number' ? '값을 다시 불러 보기' : '값을 부르거나 그냥 보내기') : shopUi.chip ? '이 물건에 대해 묻기' : '주인에게 말하기';
-  return `<form class="sh-talk" data-submit="shop-say">
-    <label class="sh-talk-in">${chip}<input type="text" data-input="shop-say" value="${esc(shopUi.input)}" maxlength="300" placeholder="${ph}" aria-label="주인에게 말하기" ${off ? 'disabled' : ''}></label>
-    <button type="submit" class="sh-go" aria-label="보내기" ${off ? 'disabled' : ''}>↵</button>
-  </form>`;
+  // 폼 제출은 플러그인 iframe(allow-forms 없음)에서 안 오므로 Enter(data-enter)·단추(data-action+data-take)로 보낸다
+  return `<div class="sh-talk" data-sh-talk="1">
+    <label class="sh-talk-in">${chip}<input type="text" name="shop-say" data-input="shop-say" data-enter="shop-say" value="${esc(shopUi.input)}" maxlength="300" placeholder="${ph}" aria-label="주인에게 말하기" ${off ? 'disabled' : ''}></label>
+    <button type="button" class="sh-go" data-action="shop-say" data-take="shop-say" aria-label="보내기" ${off ? 'disabled' : ''}>↵</button>
+  </div>`;
 }
 
 /** 상세 팝업: 그림 88 → 이름·종류·값 → 설명·효과 → 영수증(잔고 / 값 / 잔액) → [구입][문의] */

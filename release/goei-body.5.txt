@@ -1,4 +1,5 @@
-
+s(read) }), contactMode: false };
+  }
 
   // src/ui/controls.ts
   var esc4 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -340,10 +341,10 @@
     const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
     return [c(n2[0], 0, 100), c(n2[1], 0, 100), c(n2[2], 5, 100)];
   }
-  function splitPic(pic) {
-    const at = pic.lastIndexOf("#");
-    const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
-    return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
+  function splitPic(pic2) {
+    const at = pic2.lastIndexOf("#");
+    const crop = at > 0 ? parseCrop(pic2.slice(at + 1)) : null;
+    return crop ? { name: pic2.slice(0, at), crop } : { name: pic2, crop: null };
   }
   function mainPic(char, p) {
     const en2 = p.english ?? "";
@@ -428,13 +429,13 @@
       return url;
     }
   }
-  function imageUrl(char, pic) {
-    if (!pic) return null;
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic}`;
+  function imageUrl(char, pic2) {
+    if (!pic2) return null;
+    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic2}`;
     const hit3 = urls.get(key2);
     if (hit3 === void 0) {
       urls.set(key2, "loading");
-      const { name, crop } = splitPic(pic);
+      const { name, crop } = splitPic(pic2);
       void assetUrl(char, name).then(async (raw) => {
         const url = raw ? await shrink(raw, crop) : null;
         urls.set(key2, url);
@@ -455,8 +456,8 @@
     const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
     return slot2 === "face" ? facePic(char, src) : mainPic(char, src);
   }
-  function picAvatar(char, pic, name, cls = "") {
-    const url = imageUrl(char, pic);
+  function picAvatar(char, pic2, name, cls = "") {
+    const url = imageUrl(char, pic2);
     const first = escAttr(Array.from(name.trim())[0] ?? "?");
     return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
   }
@@ -756,15 +757,15 @@ ${RETRY_ANALYZE}` }
   }
   async function generate(messages, model2, parse3, o) {
     const fix = o.fix ?? defaultFix(messages);
-    let ask = messages;
+    let ask2 = messages;
     let use = model2;
     let earlier = null;
     for (let attempt = 0; ; attempt++) {
       let raw = "";
       try {
-        raw = await slot(o.concurrent, () => attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel));
+        raw = await slot(o.concurrent, () => attempt === 0 && o.first ? o.first(ask2) : runModel(ask2, use, o.staticModel));
         for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
-          const again = [...ask, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
+          const again = [...ask2, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
           try {
             const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel));
             if (next.trim()) raw = next;
@@ -778,7 +779,7 @@ ${RETRY_ANALYZE}` }
         if (earlier && !retryable(error)) throw earlier;
         if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
         earlier = withRawText(error, raw);
-        ask = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        ask2 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
         use = o.retryModel === "same" ? model2 : o.retryModel;
       }
     }
@@ -1287,9 +1288,9 @@ ${RETRY_ANALYZE}` }
     if (!(env3 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    let hash4 = 7;
-    for (let i = 0; i < data3.length; i++) hash4 = (hash4 * 131 + data3.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash4}`;
+    let hash5 = 7;
+    for (let i = 0; i < data3.length; i++) hash5 = (hash5 * 131 + data3.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash5}`;
     if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
     if (!saved) return;
@@ -1485,9 +1486,9 @@ ${RETRY_ANALYZE}` }
   var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
   function viewsList(ctx2) {
     const set2 = viewSettings(ctx2.chat.scriptstate);
-    const busy5 = jobs.has(chatKey(ctx2));
+    const busy6 = jobs.has(chatKey(ctx2));
     const list4 = readViews(ctx2.chat.scriptstate).reverse();
-    const make = `<div class="ph-view-new"><button class="gx-mini" data-action="ph-view-new" ${busy5 ? "disabled" : ""}>${esc8(VIEW_PRESETS[set2.preset])} 새로 보기</button><small>종류·시점 인물은 괴담톡 설정에서 바꿔요</small></div>`;
+    const make = `<div class="ph-view-new"><button class="gx-mini" data-action="ph-view-new" ${busy6 ? "disabled" : ""}>${esc8(VIEW_PRESETS[set2.preset])} 새로 보기</button><small>종류·시점 인물은 괴담톡 설정에서 바꿔요</small></div>`;
     if (!list4.length) return make + blank3("아직 보기 전용 방이 없어요.<br>내가 끼지 않는 짧은 장면(사이드스토리·혼잣말)을 폰으로 봐요.");
     return make + `<ul class="ph-list ph-chats">${list4.map((r) => {
       const last2 = [...r.messages].reverse().find((m) => m.type === "text");
@@ -1499,7 +1500,7 @@ ${RETRY_ANALYZE}` }
         <span class="ph-who-bot"><small>${esc8([...`${who ? `${who}: ` : ""}${last2?.text ?? ""}`].slice(0, 60).join(""))}</small>${r.unread ? '<span class="ph-badge">N</span>' : ""}</span></span></button>${del}</li>`;
     }).join("")}</ul>`;
   }
-  function viewPane(ctx2, busy5) {
+  function viewPane(ctx2, busy6) {
     const r = readViews(ctx2.chat.scriptstate).find((x) => x.id === phone.viewId);
     if (!r) return '<div class="ph-empty"><p class="gx-none">보기 전용 방을 찾지 못했어요.</p></div>';
     const name = (id) => r.people.find((p) => p.id === id)?.name ?? id;
@@ -1516,7 +1517,7 @@ ${RETRY_ANALYZE}` }
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
       <span class="ph-avatar group sm">${ICONS.group}</span><div class="ph-room-title"><b>${esc8(r.name)}</b><small>${esc8(VIEW_PRESETS[r.preset])} · ${esc8(name(r.pov))} 시점 · ${esc8(shortTime(r.time))}</small></div></header>
     <div class="ph-log">${bubbles}</div>
-    <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy5 ? "disabled" : ""}>새로 보기</button></div>
+    <div class="ph-view-foot"><span>보기 전용 방이에요. 끼어들 수 없어요.</span><button class="gx-mini" data-action="ph-view-new" ${busy6 ? "disabled" : ""}>새로 보기</button></div>
   </div>`;
   }
   function makeView(ctx2, env3, automatic = false) {
@@ -1552,7 +1553,7 @@ ${RETRY_ANALYZE}` }
     const list4 = parseReactions(v);
     return list4.length ? `<div class="ph-reacts">${list4.map((r) => `<span class="ph-react">${esc8(r.emoji)}<small>${r.count}</small></span>`).join("")}</div>` : "";
   };
-  function roomView(ctx2, st, d, busy5) {
+  function roomView(ctx2, st, d, busy6) {
     const r = phone.room ? st.rooms[phone.room] : void 0;
     if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
     const confirm = phone.confirm === `room:${r.id}`;
@@ -1576,12 +1577,12 @@ ${RETRY_ANALYZE}` }
       const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
-      const pic = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
+      const pic2 = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
       const head3 = !me && first ? `<b class="ph-name">${esc8(name(m.sender))}</b>` : "";
       const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc8(shortTime(m.time)) : ""}</span>` : "";
-      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
+      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic2}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
     }).join("");
-    const pending2 = r.pending ? r.pending.status === "working" || busy5 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc8(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc8(r.id)}">건너뛰기</button></div>` : "";
+    const pending2 = r.pending ? r.pending.status === "working" || busy6 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc8(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc8(r.id)}">건너뛰기</button></div>` : "";
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
     const sub = r.kind === "dm" ? contactDetails(who) : `${r.members.length + 1}명${r.topic ? ` · ${r.topic}` : ""}`;
     const off = !r.members.length;
@@ -1591,9 +1592,9 @@ ${RETRY_ANALYZE}` }
       ${r.kind === "group" ? `<span class="ph-avatar group sm">${ICONS.group}</span>` : face(ctx2, who, roomLabel(r), " sm")}
       <div class="ph-room-title"><b>${esc8(roomLabel(r))}</b>${sub ? `<small>${esc8(sub)}</small>` : ""}</div>
       <span class="ph-act">
-        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc8(r.id)}" ${busy5 || off ? "disabled" : ""}`)}
+        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc8(r.id)}" ${busy6 || off ? "disabled" : ""}`)}
         ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc8(roomLabel(r))}"`) : ""}
-        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc8(r.id)}" ${busy5 || r.pending ? "disabled" : ""}`)}
+        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc8(r.id)}" ${busy6 || r.pending ? "disabled" : ""}`)}
         ${confirm ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc8(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc8(r.id)}" ${r.pending ? "disabled" : ""}`)}
       </span></header>
     ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc8(r.members.map(name).join(", "))}</p>` : ""}
@@ -1603,7 +1604,7 @@ ${RETRY_ANALYZE}` }
       <div class="ph-compose">
         <button class="ph-tool ph-plus${phone.attachMenu ? " on" : ""}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? "disabled" : ""}>${ICONS.plus}</button>
         <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc8(phone.draft)}</textarea>
-        <button class="ph-send" data-action="ph-send" data-value="${esc8(r.id)}" aria-label="보내기" title="보내기" ${busy5 || locked ? "disabled" : ""}>${ICONS.send}</button>
+        <button class="ph-send" data-action="ph-send" data-value="${esc8(r.id)}" aria-label="보내기" title="보내기" ${busy6 || locked ? "disabled" : ""}>${ICONS.send}</button>
         <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
       </div>
     </div>
@@ -1816,14 +1817,14 @@ ${RETRY_ANALYZE}` }
     if (phone.sub === "views") return viewsList(ctx2);
     return phone.sub === "contacts" ? contactsView(ctx2, d, st) : phone.sub === "chats" ? chatsView(ctx2, st, d) : noticesView(ctx2);
   }
-  function paneHtml(ctx2, st, d, busy5) {
-    if (phone.view === "room") return roomView(ctx2, st, d, busy5);
+  function paneHtml(ctx2, st, d, busy6) {
+    if (phone.view === "room") return roomView(ctx2, st, d, busy6);
     if (phone.view === "group") return groupView(ctx2, st, d);
     if (phone.view === "call") return callView();
     if (phone.view === "add") return addView();
     if (phone.view === "settings") return settingsView(ctx2);
     if (phone.view === "notice") return noticeDetail(ctx2);
-    if (phone.view === "view") return viewPane(ctx2, busy5);
+    if (phone.view === "view") return viewPane(ctx2, busy6);
     return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.phone}</span><b>괴담톡</b><p>왼쪽에서 대화나 연락처를 고르세요.</p></div>`;
   }
   function phoneContent(ctx2, query) {
@@ -1845,7 +1846,7 @@ ${RETRY_ANALYZE}` }
       return `<main class="gx-body"><div class="gx-empty">${esc8(error instanceof Error ? error.message : String(error))}</div></main>`;
     }
     const job = jobs.get(chatKey(ctx2));
-    const busy5 = !!job;
+    const busy6 = !!job;
     let b;
     try {
       b = readBulletins(ctx2.chat);
@@ -1861,8 +1862,8 @@ ${RETRY_ANALYZE}` }
     });
     const detail = phone.view !== "list";
     const tools = [
-      tool("ph-refresh", ICONS.refresh, "새 메시지 확인", busy5 ? "disabled" : "", "새로고침"),
-      tool("ph-group", ICONS.group, "단톡 만들기", busy5 ? "disabled" : "", "단톡"),
+      tool("ph-refresh", ICONS.refresh, "새 메시지 확인", busy6 ? "disabled" : "", "새로고침"),
+      tool("ph-group", ICONS.group, "단톡 만들기", busy6 ? "disabled" : "", "단톡"),
       tool("ph-add", ICONS.addUser, "연락처 추가", "", "추가"),
       tool("ph-call", ICONS.call, "전화 걸기", 'data-value=""', "전화")
     ].join("");
@@ -1877,7 +1878,7 @@ ${RETRY_ANALYZE}` }
       ${fail3}
       ${drawerHtml(tools, "", "", "phone")}
     </section>
-    <section class="ph-pane">${detail ? status2 : ""}${paneHtml(ctx2, st, d, busy5)}</section>
+    <section class="ph-pane">${detail ? status2 : ""}${paneHtml(ctx2, st, d, busy6)}</section>
     ${note}
   </main>`;
   }
@@ -2261,10 +2262,10 @@ ${RETRY_ANALYZE}` }
       const own = !swap && findDoc(ctx2.chat, b.name, ctx2.char.globalLore);
       const lore = ctx2.char.globalLore ?? [];
       const outside = (en2) => en2 && hasAsset(ctx2.char, `Base ${en2}`) ? `Base ${en2}` : "";
-      const pic = (swap ? outside(org.spec.english) : outside(b.english) || mainPic(ctx2.char, b)) || (org ? mainPic(ctx2.char, org.spec) : "");
+      const pic2 = (swap ? outside(org.spec.english) : outside(b.english) || mainPic(ctx2.char, b)) || (org ? mainPic(ctx2.char, org.spec) : "");
       const title2 = own ? b.name : swap ? orgLoreName(lore, org.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
-      const shared = pic ? "" : baseShared(b.name, b.label).find((n2) => hasAsset(ctx2.char, n2)) ?? "";
-      map.set(b.name, { pic: pic || shared, title: title2, org: org ? org.faction && names4[org.faction] || org.name : "" });
+      const shared = pic2 ? "" : baseShared(b.name, b.label).find((n2) => hasAsset(ctx2.char, n2)) ?? "";
+      map.set(b.name, { pic: pic2 || shared, title: title2, org: org ? org.faction && names4[org.faction] || org.name : "" });
     }
     cache8 = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
     return map;
@@ -2279,7 +2280,7 @@ ${RETRY_ANALYZE}` }
   function evArt(ctx2, name, kind, text4 = "") {
     const r = rows(ctx2).get(name);
     const shared = !r?.pic && kind && sharedFor(kind, name, text4).find((n2) => hasAsset(ctx2.char, n2)) || "";
-    const pic = imageUrl(ctx2.char, r?.pic || shared);
+    const pic2 = imageUrl(ctx2.char, r?.pic || shared);
     const title2 = r?.title ?? name;
     let desc = descs.get(title2);
     if (desc === void 0) {
@@ -2287,7 +2288,7 @@ ${RETRY_ANALYZE}` }
       desc = doc2 ? docSummary(doc2.body) : "";
       descs.set(title2, desc);
     }
-    return { pic, desc };
+    return { pic: pic2, desc };
   }
 
   // src/ui/wiki.ts
@@ -2787,10 +2788,10 @@ ${RETRY_ANALYZE}` }
     const saved = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
     const e = entryFor(ctx2, doc2.title);
     const s7 = wikiSettings(ctx2.chat.scriptstate);
-    let pic = s7.images === "off" ? "" : e?.photo ?? "";
-    const mood = pic && e?.cat === "ag" ? portraitMood(doc2.body) : "";
-    if (mood && /_default$/.test(pic.replace(/#.*$/, "")) && hasAsset(ctx2.char, pic.replace(/#.*$/, "").replace(/_default$/, `_${mood}`))) pic = pic.replace(/_default(#|$)/, `_${mood}$1`);
-    const photo = pic ? imageUrl(ctx2.char, pic) : null;
+    let pic2 = s7.images === "off" ? "" : e?.photo ?? "";
+    const mood = pic2 && e?.cat === "ag" ? portraitMood(doc2.body) : "";
+    if (mood && /_default$/.test(pic2.replace(/#.*$/, "")) && hasAsset(ctx2.char, pic2.replace(/#.*$/, "").replace(/_default$/, `_${mood}`))) pic2 = pic2.replace(/_default(#|$)/, `_${mood}$1`);
+    const photo = pic2 ? imageUrl(ctx2.char, pic2) : null;
     const r = renderArticle(doc2.body, {
       saved: (t) => saved.has(t),
       canon: c,
@@ -3465,47 +3466,47 @@ ${RETRY_ANALYZE}` }
     if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return "dm";
     return null;
   }
-  function inlineComposer(st, busy5) {
+  function inlineComposer(st, busy6) {
     const c = gnet.compose;
     if (c && c.kind !== "comment" && c.kind !== "dm") return "";
     if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) {
       if (c?.kind === "comment" && c.post === gnet.open && c.parent > 0) return "";
-      return composer(busy5, "댓글 입력");
+      return composer(busy6, "댓글 입력");
     }
     if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
       const ph = c?.kind === "dm" && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
-      return composer(busy5, ph);
+      return composer(busy6, ph);
     }
     return "";
   }
-  function composer(busy5, placeholder, chip3 = "") {
+  function composer(busy6, placeholder, chip3 = "") {
     return `<div class="ph-composer gn-composer">
     ${chip3}
-    ${attachEditor("gn", gnet.attach, GN_KINDS, busy5, "", gnet.attachMenu)}
+    ${attachEditor("gn", gnet.attach, GN_KINDS, busy6, "", gnet.attachMenu)}
     <div class="ph-compose">
       <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
-      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc10(placeholder)}" ${busy5 ? "disabled" : ""}>${esc10(gnet.draft)}</textarea>
-      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy5 ? "disabled" : ""}>${ICONS.send}</button>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc10(placeholder)}" ${busy6 ? "disabled" : ""}>${esc10(gnet.draft)}</textarea>
+      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy6 ? "disabled" : ""}>${ICONS.send}</button>
       <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
     </div>
   </div>`;
   }
-  function composeView(c, busy5) {
+  function composeView(c, busy6) {
     const post = c.kind === "post";
     const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc10(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc10(c.nick)}</b></p>` : "";
     const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
     return `<div class="ph-form gn-cpane">${paneHead3(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc10(c.label) : "")}
     <div class="ph-form-body">${to}
       <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc10(ph)}" aria-label="내용">${esc10(gnet.draft)}</textarea>
-      ${attachEditor("gn", gnet.attach, GN_KINDS, busy5)}
+      ${attachEditor("gn", gnet.attach, GN_KINDS, busy6)}
     </div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy5 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
+    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy6 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
   }
-  function replyBox(label2, busy5, depth) {
+  function replyBox(label2, busy6, depth) {
     const chip3 = `<div class="gn-replyto"><span>${esc10(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
-    return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy5, "답글 입력", chip3)}</li>`;
+    return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy6, "답글 입력", chip3)}</li>`;
   }
-  function commentTree(p, busy5) {
+  function commentTree(p, busy6) {
     const kids = /* @__PURE__ */ new Map();
     p.comments.forEach((c, i) => {
       const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
@@ -3526,7 +3527,7 @@ ${RETRY_ANALYZE}` }
         <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ""}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}</div>
         <div class="gn-c-body">${body2(c.body)}</div>
         <div class="gn-c-act">${commentClock(p, c)}<button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
-        if (target === k && gnet.compose?.kind === "comment") out.push(replyBox(gnet.compose.label, busy5, depth + 1));
+        if (target === k && gnet.compose?.kind === "comment") out.push(replyBox(gnet.compose.label, busy6, depth + 1));
         walk(k, depth + 1);
       }
     };
@@ -3538,12 +3539,12 @@ ${RETRY_ANALYZE}` }
     const same4 = c.time.slice(0, 10) === String(p.date).slice(0, 10);
     return `<time class="gn-c-time">${esc10(same4 ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
   }
-  function postView(p, busy5, inline = false) {
+  function postView(p, busy6, inline = false) {
     const c = gnet.compose;
     const reply = c?.kind === "comment" && c.post === p.id && c.parent > 0 ? c : null;
     const confirm = gnet.confirm === `p:${p.id}`;
     const right = p.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool3("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
-    const again = tool3("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy5 ? "disabled" : ""}`);
+    const again = tool3("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy6 ? "disabled" : ""}`);
     const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc10(p.nick)}</button>`;
     const head3 = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc10(p.title)}</h2>
           <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc10(p.nick)}</b>` : who}</span>
@@ -3555,12 +3556,12 @@ ${RETRY_ANALYZE}` }
         <div class="gn-post-body">${body2(p.body)}</div>
       </article>
       <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail2}</div>
-        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy5)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
+        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy6)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
-    ${inline || reply ? "" : composer(busy5, "댓글 입력")}
+    ${inline || reply ? "" : composer(busy6, "댓글 입력")}
   </div>`;
   }
-  function dmPane(st, nick, busy5, inline = false) {
+  function dmPane(st, nick, busy6, inline = false) {
     const t = dmThreads(st).find((x) => x.nick === nick);
     if (!t) return "";
     const confirm = gnet.confirm === `d:${nick}`;
@@ -3575,20 +3576,20 @@ ${RETRY_ANALYZE}` }
       return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc10(d.date)}</small>` : ""}</div></div>`;
     }).join("")}
     </div>
-    ${inline ? "" : composer(busy5, ph)}
+    ${inline ? "" : composer(busy6, ph)}
   </div>`;
   }
-  function boardList(st, busy5, mobile) {
-    if (!st.posts.length) return `<div class="ph-blank"><div class="ph-blank-in"><p>게시글이 없어요.</p><button class="ph-blank-go" data-action="gn-refresh" ${busy5 ? "disabled" : ""}>${busy5 ? "불러오는 중…" : "새로고침"}</button></div></div>`;
+  function boardList(st, busy6, mobile) {
+    if (!st.posts.length) return `<div class="ph-blank"><div class="ph-blank-in"><p>게시글이 없어요.</p><button class="ph-blank-go" data-action="gn-refresh" ${busy6 ? "disabled" : ""}>${busy6 ? "불러오는 중…" : "새로고침"}</button></div></div>`;
     return `<ul class="ph-list gn-list">${st.posts.map((p) => {
       const on2 = gnet.open === p.id && !gnet.settings;
       return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
         <span class="gn-title"><b>${esc10(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
         <span class="gn-row-meta"><span class="gn-row-nick">${esc10(p.nick)}</span><span>${esc10(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
-      </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy5, true) : ""}</li>`;
+      </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy6, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
-  function dmList(st, busy5, mobile) {
+  function dmList(st, busy6, mobile) {
     const threads = dmThreads(st);
     if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
     return `<ul class="ph-list gn-list">${threads.map((t) => {
@@ -3598,4 +3599,4 @@ ${RETRY_ANALYZE}` }
       const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}" aria-label="${esc10(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
       return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc10(t.nick)}" aria-pressed="${on2}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc10(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc10(time(t.lastDate) || t.lastDa
+        <span class="ph-who"><span class="ph-who-top"><b>${esc10(t.nick)}</b>${

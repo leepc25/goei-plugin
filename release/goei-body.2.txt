@@ -1054,9 +1054,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return parts.length ? parts.map((e) => e.content).join("\n") : null;
   }
   function parseJson(raw, book2) {
-    const clean3 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
+    const clean4 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
     try {
-      return JSON.parse(clean3);
+      return JSON.parse(clean4);
     } catch {
       throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
     }
@@ -1188,11 +1188,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var NONE = "없음";
   function formatStatusLine(values, cols) {
-    const cell2 = (id) => {
+    const cell3 = (id) => {
       const v = (values[id] ?? "").replace(/[|\]\n\r]/g, " ").trim();
       return v || NONE;
     };
-    return `[▣|${cols.map(cell2).join("|")}]`;
+    return `[▣|${cols.map(cell3).join("|")}]`;
   }
   var walletCell = (n2) => String(Math.trunc(n2));
   function parseWalletCell(text4) {
@@ -1257,13 +1257,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { companions: splitNames(x[0] ?? ""), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? "" : id, wallet: walletText(x[3] ?? "") };
   }
   function tail(rest) {
-    const clean3 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const clean4 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
     const after = rest.slice(1);
-    if (after.length <= 1) return { target: clean3(after[0] ?? ""), ...extras([]) };
-    return { target: clean3(after[0]), ...extras(after.slice(1, 5)) };
+    if (after.length <= 1) return { target: clean4(after[0] ?? ""), ...extras([]) };
+    return { target: clean4(after[0]), ...extras(after.slice(1, 5)) };
   }
   function byShape(f, shape) {
-    const clean3 = (t) => none(t) ? "" : t;
+    const clean4 = (t) => none(t) ? "" : t;
     const get = (id) => {
       const i = shape.indexOf(id);
       return i < 0 ? "" : (f[i] ?? "").trim();
@@ -1272,13 +1272,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return {
       date: get("date"),
       time: get("time"),
-      weather: clean3(get("weather")),
-      temp: clean3(get("temp")),
-      place: clean3(get("place")),
-      target: clean3(get("target")),
+      weather: clean4(get("weather")),
+      temp: clean4(get("temp")),
+      place: clean4(get("place")),
+      target: clean4(get("target")),
       companions: splitNames(get("companions")),
       deployed: shape.includes("deployed") ? none(d) ? false : /투입|deployed/i.test(d) : null,
-      identity: clean3(get("identity")),
+      identity: clean4(get("identity")),
       wallet: walletText(get("wallet"))
     };
   }
@@ -2741,8 +2741,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (!validAsset(asset)) throw new Error("사진 저장 위치가 올바르지 않아요.");
       return `%%ATTACHMENT:${hex(JSON.stringify({ kind: "image", content: String(content ?? "").trim(), asset }))}%%`;
     }
-    const clean3 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
-    return `[[ATTACH:${kind}]]${clean3}[[/ATTACH]]`;
+    const clean4 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
+    return `[[ATTACH:${kind}]]${clean4}[[/ATTACH]]`;
   }
   function stripForged(text4) {
     return String(text4 ?? "").replace(new RegExp(HEX, "g"), "[지원하지 않는 첨부]");
@@ -3532,7 +3532,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function gnetSettings(state) {
     const v = gnetVars(state);
     const s7 = (k) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
-    const clean3 = (k) => s7(k) === "-" ? "" : s7(k);
+    const clean4 = (k) => s7(k) === "-" ? "" : s7(k);
     const q = QUANTITY[s7("quantity")] ? s7("quantity") : "1";
     const chance = Number(s7("incoming_chance"));
     return {
@@ -3541,10 +3541,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
       autoOpen: s7("lazy") === "open",
       model: s7("mode") === "1" ? "main" : "aux",
       quantity: q,
-      subject: clean3("subject"),
-      mood: clean3("mood"),
+      subject: clean4("subject"),
+      mood: clean4("mood"),
       privacy: ["0", "1", "2", "3", "4"].includes(s7("privacy")) ? s7("privacy") : "1",
-      protagonist: clean3("protagonist"),
+      protagonist: clean4("protagonist"),
       sampling: s7("sampling") === "1",
       keepOwn: s7("keepown") === "1",
       keepReplied: s7("keepreplied") === "1",
@@ -3630,18 +3630,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc34 = false;
+    let esc36 = false;
     for (const c of line2) {
-      if (esc34) {
+      if (esc36) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc34 = false;
-      } else if (c === "\\") esc34 = true;
+        esc36 = false;
+      } else if (c === "\\") esc36 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc34) cur += "\\";
+    if (esc36) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -3908,9 +3908,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
       quoteAuthor: c ? c.nick : ""
     };
   }
-  function addOutgoingDm(st, nick, body5, date, source4) {
+  function addOutgoingDm(st, nick, body5, date, source5) {
     if (!st.sources[nick]) {
-      const s7 = source4 ?? findPublicSource(st, nick);
+      const s7 = source5 ?? findPublicSource(st, nick);
       if (s7) st.sources[nick] = s7;
     }
     st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });

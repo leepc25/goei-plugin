@@ -25,7 +25,8 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 
 // ── 1) 새 카드(자리 항목 없음): 플러그인이 로어 덩어리를 직접 끼운다 ──
 {
-  const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
+  // $sh_on '0': 상점(11-07)은 기본 켜짐이라 [Inventory] 블록이 늘 들어가 자리 검사가 밀린다. 상점 켜진 경우는 shop-browser.mjs 가 본다
+  const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: { $sh_on: '0' } }, { fixtureDir });
   const saved = await startChat(page, 'A00', 2);
   const greeting = sceneOf(saved);
   const first = '쟈알디 부장님께 인사하고 출동 준비를 한다.';
@@ -254,7 +255,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 
 // ── 3) 설정 조합: 에셋·주인공·캐릭터로 플레이·인물 기록·참고 기록·방문 기록 ──
 {
-  const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
+  const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: { $sh_on: '0' } }, { fixtureDir });
   const saved = await startChat(page, 'A00', 2);
   const greeting = sceneOf(saved);
   await page.evaluate(() => { window.__userName = 'Tester'; window.__persona = 'Tester is a rookie agent who loves coffee.'; window.__chat.message.push({ role: 'user', data: '쟈알디와 인사한다.', chatId: 'u1' }); });
@@ -437,7 +438,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 
 // ── 5) 응답 처리: 다시 굴리기·편집·옛 채팅 보강·상황판 극값 ──
 {
-  const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
+  const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: { $sh_on: '0' } }, { fixtureDir });
   await startChat(page, 'A00', 2);
   // 이 절은 응답 처리만 본다: 플러그인이 넣은 첫 장면 메시지는 비우고 빈 채팅에서 시작한다 (2026-11-05)
   await page.evaluate(() => { window.__chat.message = []; });

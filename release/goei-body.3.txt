@@ -631,18 +631,18 @@ ${body5}
     const books = allBooks(src);
     const registry2 = o.registry ?? buildRegistry(src.char.globalLore);
     const rows2 = [];
-    const add = (kind, source4, content) => {
+    const add = (kind, source5, content) => {
       const text4 = content.trim();
       if (!text4) return;
       const rank2 = ["base", "primary", "active", "direct", "secondary"];
       const same4 = rows2.find((r) => r.content === text4);
       if (same4) {
-        if (!same4.sources.includes(source4)) same4.sources.push(source4);
+        if (!same4.sources.includes(source5)) same4.sources.push(source5);
         if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same4.kind)) same4.kind = kind;
         same4.required = same4.required || required(kind);
         return;
       }
-      rows2.push({ kind, sources: [source4], content: text4, required: required(kind) });
+      rows2.push({ kind, sources: [source5], content: text4, required: required(kind) });
     };
     const required = (kind) => o.scope === "wiki" ? kind === "base" || kind === "primary" || kind === "active" : kind === "base" || kind === "direct";
     if (o.description !== false && src.char.desc) add("base", "봇 설명", stripModules(evaluate(src.char.desc, env3)));
@@ -1587,7 +1587,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   ];
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit|\$it_(slots|limit|push|auto))$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit|\$it_(slots|limit|push|auto)|\$sh_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -1781,7 +1781,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var walletStarted = (chat) => (chat.message ?? []).some((m) => m.role === "user");
   var isEntry2 = (e) => {
     const x = e;
-    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.anchor === "string" && Number.isSafeInteger(x.amount) && typeof x.memo === "string" && (x.src === "story" || x.src === "manual" || x.src === "field");
+    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.anchor === "string" && Number.isSafeInteger(x.amount) && typeof x.memo === "string" && (x.src === "story" || x.src === "manual" || x.src === "field" || x.src === "store");
   };
   function readWallet(vars, defaultStart = 0) {
     const raw = vars?.[WALLET_VAR];
@@ -4796,4 +4796,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return {
       faction,
       ...b ? { express: b.express } : {},
-      affinityBase: userAffinityBase(f
+    
