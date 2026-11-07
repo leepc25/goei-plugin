@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single small rectangular grey plastic radiation dosimeter badge with a yellow and black radiation symbol and a metal clip on top, front view, nothing attached to it. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a powered exoskeleton suit for the lower body and back: thick black metal leg braces with knee motors and a backplate with a battery, chunky mechanical parts, front view, empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown leather forearm bracer with a thin steel blade sliding out from under it toward the hand, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with one long sharp needle-like thorn sticking out from the band, clearly visible, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ear cuff earring with leaf engravings, shaped to clip on the curved outer edge of an ear, shown alone, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a septum nose ring, a small silver horseshoe-shaped ring with two tiny ball ends, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future sleek blue diving rebreather face mask with a clear visor and two small cylindrical oxygen capsules on the sides, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain wooden item crate with metal corner brackets, closed lid, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark grey metal supply case with latches and a white stripe, closed, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain brown cardboard box sealed with tape, closed, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red gift box with a gold ribbon and a big bow on top, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black gift box tied with a thin silver ribbon and a small bow, slightly eerie, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small square cream white gift box with a pink satin ribbon bow, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a parcel wrapped in brown paper and tied with twine in a cross, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gift box with its lid slightly lifted and soft golden light glowing out from inside, ribbon loosened, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round cylindrical hat box gift with a striped pattern and a ribbon around it, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "방사선 선량계 배지",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single small rectangular grey plastic radiation dosimeter badge with a yellow and black radiation symbol and a metal clip on top, front view, nothing attached to it. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "근력 보조 외골격",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a powered exoskeleton suit for the lower body and back: thick black metal leg braces with knee motors and a backplate with a battery, chunky mechanical parts, front view, empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소매 숨긴 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown leather forearm bracer with a thin steel blade sliding out from under it toward the hand, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈서용 가시 반지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring with one long sharp needle-like thorn sticking out from the band, clearly visible, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀 커프",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ear cuff earring with leaf engravings, shaped to clip on the curved outer edge of an ear, shown alone, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a septum nose ring, a small silver horseshoe-shaped ring with two tiny ball ends, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수중 호흡 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future sleek blue diving rebreather face mask with a clear visor and two small cylindrical oxygen capsules on the sides, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나무 아이템 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain wooden item crate with metal corner brackets, closed lid, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금속 보급 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark grey metal supply case with latches and a white stripe, closed, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "판지 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain brown cardboard box sealed with tape, closed, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "선물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red gift box with a gold ribbon and a big bow on top, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 선물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black gift box tied with a thin silver ribbon and a small bow, slightly eerie, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "작은 선물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small square cream white gift box with a pink satin ribbon bow, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈색 소포",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a parcel wrapped in brown paper and tied with twine in a cross, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빛이 새는 선물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gift box with its lid slightly lifted and soft golden light glowing out from inside, ribbon loosened, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "둥근 선물 통",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round cylindrical hat box gift with a striped pattern and a ribbon around it, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
