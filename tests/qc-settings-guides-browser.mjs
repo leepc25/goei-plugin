@@ -9,7 +9,7 @@ const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
-const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki']; // Visit(필드)는 2026-11-04 제거
+const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router']; // Visit(필드)는 2026-11-04 제거
 const settle = () => sleep(150);
 // 기본 지침 원문 (플러그인에 내장된 것과 같은 파일)
 const defaults = {
@@ -19,11 +19,14 @@ const defaults = {
   Directive: readFileSync(new URL('../src/data/guides/directive.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   RP: readFileSync(new URL('../src/data/guides/rp.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Tag: readFileSync(new URL('../src/data/guides/tag.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  Shop: readFileSync(new URL('../src/data/guides/shop.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  Updater: readFileSync(new URL('../src/data/guides/updater-detailed.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  UpdaterCompact: readFileSync(new URL('../src/data/guides/updater-compact.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
 };
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
-  const { page, errors } = await boot(browser, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } }, vp);
+  const { page, errors } = await boot(browser, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $it_detail: 'name' } }, vp);
   await openWin(page);
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'guide:RP');
@@ -195,13 +198,15 @@ for (const vp of vps) {
   const sizeBefore = await page.textContent('.gw .ps-row .gw-tokens');
   await page.evaluate(() => { const el = document.querySelector('.gw [data-change="man-with-chat"]'); el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.waitForFunction(() => document.querySelector('.gw [data-change="man-with-chat"]')?.checked);
-  assert.notEqual(await page.textContent('.gw .ps-row .gw-tokens'), sizeBefore, '체크하면 내보내기 크기가 달라짐');
+  // 크기는 KB 로 반올림돼 작은 차이는 안 보인다 (앞에서 규칙 100개를 넣음) → 복사한 글에 chat.vars 가 들어가는지로 본다
+  void sizeBefore;
   await page.evaluate(() => { window.__clip = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__clip = t; } }, configurable: true }); });
   await clickSel(page, '.gw [data-action="man-copy"]');
   await page.waitForFunction(() => window.__clip);
   const exportedChat = JSON.parse(await page.evaluate(() => window.__clip));
   assert.ok(exportedChat.chat && exportedChat.chat.vars && typeof exportedChat.chat.vars === "object", "chat.vars 가 들어감");
   assert.ok(!Object.keys(exportedChat.chat.vars).some((k) => /^\$st_(faction|lang|fm)$/.test(k)), '상태 변수($st_faction 등)는 안 들어감');
+  assert.equal(exportedChat.chat.vars.$it_detail, 'name', '설정 변수는 들어감');
   const chatImport = { ...exportedChat, chat: { vars: { '$st_agent_limit': '7', '$wg_random_p': '33', '$st_faction': 'B00', 'x': '1' } } };
   await setInput(page, '.gw textarea[data-input="man-import-text"]', JSON.stringify(chatImport), 'input');
   await clickSel(page, '.gw [data-action="man-import"]');

@@ -16,6 +16,9 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
+import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
+import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
+import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
@@ -25,7 +28,7 @@ import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer } from './drawer';
-import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, type ItemsNav } from './items';
+import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, setAvatarHtml, type ItemsNav } from './items';
 import { addMark, markCandidates, markPop, marks, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
@@ -59,6 +62,7 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
+import { invOn, itemStartOn } from '../core/items';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
@@ -74,6 +78,8 @@ interface Draft {
   situation?: string;
   /** 캐릭터로 플레이: 유저가 연기할 요원 코드 ('' = 내 페르소나) */
   player?: string;
+  /** 아바타 (페르소나로 시작할 때 필수): 고른 프리셋 번호 */
+  look?: string;
 }
 
 type View =
@@ -161,12 +167,27 @@ function ensureRoot(): HTMLElement {
     else render();
     if (editorOpen()) editorRender();
   });
+  // 아바타: 고르는 팝업은 지금 화면 위에 그린다. 그림 팩이 받히면 팝업·시작 패널 아바타 칸을 다시 그린다 (host/looks.ts)
+  setLookRender(() => render());
+  onLooksReady(() => {
+    if (lookUi.open) render();
+    else if (view.kind === 'picker') renderPicker();
+    else if (tab === 'items' || shopUi.open) render();
+  });
+  // 장착 상자 왼쪽 인물 자리 (ui/items.ts): 플레이 인물의 정면 대기 동작. 페르소나면 눌러서 아바타를 다시 고르고, 고유 인물이면 그 인물 그대로
+  setAvatarHtml((ctx) => {
+    const look = idleLook(ctx);
+    const unique = !!playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+    const inner = look ? lookSprite(look, 'it-look') : `<span class="it-avnone">${looksStatus().loading ? '아바타 받는 중…' : unique ? '' : '아바타<br>고르기'}</span>`;
+    if (unique) return `<span class="it-avbtn">${inner}</span>`;
+    return `<button class="it-avbtn" data-action="look-open" aria-label="아바타 바꾸기" title="아바타 바꾸기">${inner}</button>`;
+  });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
     if (view.kind !== 'picker' && (tab === 'items' || shopUi.open)) render();
   });
   const style = document.createElement('style');
-  style.textContent = css;
+  style.textContent = css + LOOK_CSS;
   document.head.appendChild(style);
   root = document.createElement('div');
   root.className = 'gx';
@@ -301,6 +322,49 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('dragover', (ev) => {
     if (photoTarget(ev.target) && ev.dataTransfer?.types.includes('Files')) ev.preventDefault();
   });
+  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
+  let dragItem: { id: string; equip: string; usable: boolean } | null = null;
+  const dropAt = (t: EventTarget | null) => (t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null);
+  const dropOk = (z: HTMLElement | null) => {
+    if (!z || !dragItem) return false;
+    const to = z.dataset.drop ?? '';
+    if (to.startsWith('equip:')) return to.split(':')[1] === dragItem.equip;
+    if (to === 'use') return dragItem.usable;
+    return to === 'grid' || to === 'drop';
+  };
+  const clearDrag = () => {
+    dragItem = null;
+    root?.querySelector('.gx-items')?.classList.remove('it-dragging');
+    root?.querySelectorAll('.it-over-ok').forEach((x) => x.classList.remove('it-over-ok'));
+  };
+  root.addEventListener('dragstart', (ev) => {
+    const el = ev.target instanceof Element ? ev.target.closest<HTMLElement>('[data-drag]') : null;
+    if (!el) return;
+    dragItem = { id: el.dataset.drag ?? '', equip: el.dataset.equip ?? '', usable: el.dataset.usable === '1' };
+    ev.dataTransfer?.setData('text/plain', dragItem.id);
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
+    root?.querySelector('.gx-items')?.classList.add('it-dragging');
+  });
+  root.addEventListener('dragover', (ev) => {
+    if (!dragItem) return;
+    const z = dropAt(ev.target);
+    root?.querySelectorAll('.it-over-ok').forEach((x) => x !== z && x.classList.remove('it-over-ok'));
+    if (!dropOk(z)) return;
+    ev.preventDefault();
+    z!.classList.add('it-over-ok');
+  });
+  root.addEventListener('drop', (ev) => {
+    if (!dragItem) return;
+    const z = dropAt(ev.target);
+    const it = dragItem;
+    const ok = dropOk(z);
+    clearDrag();
+    if (!z || !ok) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    void run('items-dnd', `${it.id}|${z.dataset.drop}`);
+  });
+  root.addEventListener('dragend', clearDrag);
   root.addEventListener('drop', (ev) => {
     const prefix = photoTarget(ev.target);
     if (!prefix || !ev.dataTransfer?.files.length) return;
@@ -574,6 +638,8 @@ export async function openWiki(title: string): Promise<void> {
 /** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
 export async function openShop(): Promise<void> {
   await openApp({ quietIfNotLite: true });
+  // 카드에서 열면 상점만 (2026-11-07 사용자: 상황판이 배경으로 뜨면 안 됨)
+  shopUi.solo = true;
   if (view.kind === 'started') await handle('shop-open');
 }
 
@@ -620,7 +686,7 @@ async function refresh(): Promise<void> {
       else if (presetStaged && !repick) view = { kind: 'opening', ctx };
       else {
         view = { kind: 'picker', ctx, manifest, staged: phase === 'staged' };
-        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '' };
+        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '', look: lookId(ctx.chat.scriptstate) || draft.look || '' };
         if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
         const fsel = draft.faction ? findFaction(draft.faction, facs) : undefined;
         if (fsel) {
@@ -688,7 +754,19 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
   // 소지품 저장: form submit 은 iframe(allow-forms 없음)에서 오지 않으니 그려진 입력 칸(.it-form)을 넘긴다
   if (featCtx && action.startsWith('items-') && (await itemsAction(action, value, featCtx, recordsEnv, root?.querySelector<HTMLElement>('[data-it-form]') ?? lastForm))) return;
-  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, wikiEnv))) return;
+  if (view.kind === 'started' && action.startsWith('look') && (await lookAction(action, value, view.ctx, refresh))) return;
+  // 아바타 팝업 (시작 패널): 고르면 출발 때 이 채팅에 적는다
+  if (view.kind === 'picker' && action.startsWith('look')) {
+    if (lookCommon(action, value)) return;
+    if (action === 'look' && value) {
+      draft.look = value;
+      lookUi.open = false;
+      notice = '';
+      return render();
+    }
+    return;
+  }
+  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
     root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
@@ -1024,7 +1102,7 @@ async function start(): Promise<void> {
       // 목록 로어북이 없으면 상황판 없이 시작한다 (대화는 그대로 가능)
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
     }
-    const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
+    const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world, itemStartOn(getPrefs().vars));
     // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다
     const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
     if (plan.kind === 'direct' && !situation) throw new StartError('시작할 상황을 적어 주세요.');
@@ -1038,10 +1116,13 @@ async function start(): Promise<void> {
       const theme = getPrefs().theme ?? 'dark';
       return {
         ...next,
-        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}) },
+        // 아바타: 페르소나로 시작할 때만 (고유 인물은 그 인물 모습)
+        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}), [LOOK_KEY]: draft.player ? '' : (draft.look ?? '') },
       };
     });
     if (!saved) throw new StartError('저장하지 못했어요.');
+    // 고른 아바타를 기억해 다음 새 채팅의 기본으로
+    if (!draft.player && draft.look && getPrefs().look !== draft.look) await savePrefs((p) => ({ ...p, look: draft.look })).catch(() => {});
     if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(', ')}`);
     busy = false;
     repick = false;
@@ -1140,7 +1221,7 @@ function renderPicker(): void {
   else return render();
 }
 
-const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups';
+const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups, .gx-lookg';
 /** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
  *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
 const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
@@ -1188,8 +1269,10 @@ function render(): void {
   if (fr.hidden) root.dataset.frameHidden = '1';
   else delete root.dataset.frameHidden;
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
-  const panel = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
-  root.innerHTML = fr.kind === 'none' ? panel : frameHtml(fr.kind, !nav, panel);
+  // 카드에서 연 상점은 창 틀 없이 화면 위에 바로 (2026-11-07 사용자: 상황판과 별개, 높이는 화면 전체의 90%)
+  const solo = view.kind === 'started' && shopUi.open && shopUi.solo;
+  const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  root.innerHTML = fr.kind === 'none' || solo ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {
     dirUi.scrollTo = '';
@@ -1415,7 +1498,8 @@ function startedBody(ctx: ChatContext): string {
     case 'records':
       return recordsTab(ctx);
     case 'items':
-      return itemsTab(ctx);
+      // 가계부·소지품이 둘 다 꺼졌으면 메뉴가 없으니 상황판으로
+      return invMenuOn(ctx) ? itemsTab(ctx) : board(ctx);
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
@@ -1441,11 +1525,12 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}`;
+      if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
+      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '')}`;
   }
 }
 
@@ -1497,7 +1582,12 @@ function picker(): string {
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   // 직접 입력은 상황을 적어야 출발
-  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing);
+  // 내 페르소나로 시작하면 아바타를 꼭 골라야 출발 (2026-11-08 사용자)
+  const needLook = !!f && !f.group && !playing;
+  // 아바타 기본값: 마지막에 고른 것, 없으면 처음 기본 (2026-11-08 사용자: 매번 고르기 귀찮다)
+  const lookRowsNow = lookRows();
+  if (needLook && !draft.look && lookRowsNow) draft.look = defaultLook(lookRowsNow, getPrefs().look);
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;
   const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
@@ -1510,11 +1600,16 @@ function picker(): string {
       ].join('')}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
     : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
   const shown = list.length;
+  // 아바타 (2026-11-08 사용자): 주인공 칸 크기의 칸 하나. 내 페르소나면 눌러서 팝업(남·여 → 격자)에서 꼭 고른다
+  // 기존 인물로 시작하면 칸은 그대로 두고 그 인물의 성별·모습으로 잠근다 (2026-11-08 사용자)
+  const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', playing ? (people.find((a) => a.id === draft.player)?.name ?? '') : '')}</section>` : '';
+  const n0 = look ? 4 : 3;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>주인공</h2>${who}</section>
-    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
-    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
+    ${look}
+    <section><h2><i>${n0}</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>${n0 + 1}</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
     ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(list.indexOf(sc) + 1).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
@@ -1537,7 +1632,7 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
-    ${item('items', '소지품', ICONS.bag, 'desk')}
+    ${!ctx || invMenuOn(ctx) ? item('items', '소지품', ICONS.bag, 'desk') : ''}
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
@@ -1546,6 +1641,8 @@ function tabs(): string {
   </nav>`;
 }
 
+/** 소지품 메뉴(가계부 | 소지품)는 가계부나 소지품 중 하나라도 켜져 있을 때만 (2026-11-07 사용자: 켜고 끄기) */
+const invMenuOn = (ctx: ChatContext) => invOn(ctx.chat.scriptstate) || colConfig(ctx.chat.scriptstate).wallet !== 'off';
 type NavItem = (id: Tab, label: string, icon: string, cls?: string, badge?: string) => string;
 /** 폰 하단 바 (임무·기록·상황판·괴담톡·소지품, 2026-11-07 사용자). 위키·괴담넷·설정은 바 위 손잡이로 여는 공용 서랍.
  *  설정 창(editor)도 폰에서 같은 바를 그린다 (서랍 없이) */
@@ -1555,7 +1652,7 @@ function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null,
     item('records', '기록', ICONS.records, 'mob'),
     item('board', '상황판', ICONS.board, 'home'),
     item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-    item('items', '소지품', ICONS.bag, 'mob'),
+    ...(!ctx || invMenuOn(ctx) ? [item('items', '소지품', ICONS.bag, 'mob')] : []),
   ]);
   return drawer ? commonDrawer(ctx) + bar : bar;
 }
@@ -1613,7 +1710,9 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
+  // 묶음(이면의 주민들 등)은 세력이 아니라 시작 칸일 뿐: 소속은 고른 인물의 원 소속($ib_affiliation, 로어북·명부 기준) (11-07 사용자)
+  const aff = f?.group ? String(ctx.chat.scriptstate?.['$ib_affiliation'] ?? '').trim() : '';
+  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? (f.group ? (aff && aff !== f.name ? aff : '') : selfName(ctx, f.code, f.name)) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
   const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
   return `<div class="gx-id">${bg}
       ${photo}

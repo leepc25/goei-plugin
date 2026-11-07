@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "설피",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of traditional wooden snowshoes with woven rope netting, top view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전술 고글",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black tactical ballistic goggles with a smoke grey lens and an elastic strap, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뇌파 차단 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future grey helmet covered in copper coils and small antennas that blocks mind control, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방검 바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black stab-resistant pants with a tight woven armor fabric texture, laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해골 반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ring shaped like a small skull, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방탄 안면 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black armored ballistic face mask with eye holes, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small gold nose ring hoop, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은실 장갑",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black gloves embroidered with fine silver thread cross patterns, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수중 호흡 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future compact underwater breathing mask with small gill-like filters on both sides, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머리카락 엮은 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ring woven from long black human hair, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "입마개",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather and metal mouth muzzle with straps for a human face, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안면 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic full face shield on a headband, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소원 팔찌",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin woven friendship bracelet of faded string, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손목 석궁",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wrist-mounted crossbow strapped to a leather bracer, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다용도 조끼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a khaki utility vest covered in many small pockets, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제트팩",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future compact jetpack with two small thrusters and shoulder straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -53,7 +53,7 @@ const presetToggle = (kind: WorldKind, name: string, on: boolean | null) =>
   on === null ? '' : `<button class="gw-pre${on ? ' on' : ''}" data-action="dir-set" data-value="${esc(`preset|${on ? 0 : 1}|${name}`)}" title="무작위 발생 후보 ${on ? 'ON → OFF' : 'OFF → ON'}" aria-pressed="${on}">${on ? '발생 ON' : '발생 OFF'}</button>`;
 
 /** 종류별 기록 이름·부제 (목록용) */
-function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name: string; sub: string; state: 'default' | 'edited' | 'new' | 'deleted'; preset: boolean | null }[] {
+export function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name: string; sub: string; state: 'default' | 'edited' | 'new' | 'deleted'; preset: boolean | null }[] {
   const d = directoryDraft(ctx);
   const recs = worldRecords(kind, over);
   const bucket = (over[kind] ?? {}) as Record<string, Partial<WorldRecord> & { deleted?: boolean }>;

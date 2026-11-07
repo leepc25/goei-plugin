@@ -105,6 +105,8 @@ export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
       throw new CatalogError('Agent roster: version 2 인물 명부가 필요합니다.');
     }
   }
+  // 시작 묶음 코드(이면의 주민들 F00 등)는 시작 화면 칸에 인물을 넣는 표시일 뿐, 요원풀이 아니다 (11-07 사용자: 묶음으로 시작하면 요원풀은 비어야 한다)
+  const groupCodes = new Set(dir.startGroups.map((g) => g.code));
   const people: Person[] = dir.agents
     .map((a) => ({
       id: a.id,
@@ -113,7 +115,7 @@ export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
       affiliation: a.affiliation,
       rank: a.rank,
       department: a.department,
-      rosterFor: a.rosterFor as FactionCode[],
+      rosterFor: a.rosterFor.filter((c) => !groupCodes.has(c)) as FactionCode[],
     }))
     .filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
   const refill = dir.refill;

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a firefighter self-contained breathing apparatus: a yellow air cylinder on a black back harness with a hose and full face mask, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black armored neck guard collar made of hard plates that wraps around the throat, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark tactical vest with yellow paper talismans with red ink symbols stuck all over it, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clip-on radiation dosimeter badge, grey plastic with a yellow trefoil mark and a clip, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future powered exoskeleton frame for legs and back, black metal struts and joints with small blue lights, front view, empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ghillie suit, a shaggy camouflage jacket covered in strips of green and brown burlap like leaves, laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a broken green glass bottle held by the neck, jagged sharp shards at the bottom, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single giant steel fish hook with a barbed point and an eye ring at the top, tied to a short rope, J-shaped hook, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical thigh guard pad with straps, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown leather leg gaiters with buckles that wrap the lower legs, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leg sheath strapped to a thigh band holding a combat knife, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical drop-leg pouch with a thigh strap and belt loop, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel gorget, a curved metal plate armor that protects the throat and upper chest, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel greaves, metal leg armor covering knee to ankle, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick silver aluminized heat-resistant gloves, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white cloth headband with a yellow paper talisman with red ink symbols tied at the front, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "공기호흡기",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a firefighter self-contained breathing apparatus: a yellow air cylinder on a black back harness with a hose and full face mask, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "넥가드",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black armored neck guard collar made of hard plates that wraps around the throat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부적 조끼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark tactical vest with yellow paper talismans with red ink symbols stuck all over it, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방사선 선량계 배지",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clip-on radiation dosimeter badge, grey plastic with a yellow trefoil mark and a clip, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "근력 보조 외골격",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future powered exoskeleton frame for legs and back, black metal struts and joints with small blue lights, front view, empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "길리 슈트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ghillie suit, a shaggy camouflage jacket covered in strips of green and brown burlap like leaves, laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깨진 병",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a broken green glass bottle held by the neck, jagged sharp shards at the bottom, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚싯바늘 갈고리",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single giant steel fish hook with a barbed point and an eye ring at the top, tied to a short rope, J-shaped hook, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "허벅지 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical thigh guard pad with straps, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 각반",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown leather leg gaiters with buckles that wrap the lower legs, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리 칼집",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leg sheath strapped to a thigh band holding a combat knife, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "드롭 레그 파우치",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical drop-leg pouch with a thigh strap and belt loop, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠 목가리개",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel gorget, a curved metal plate armor that protects the throat and upper chest, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철제 다리 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel greaves, metal leg armor covering knee to ankle, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방열 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick silver aluminized heat-resistant gloves, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부적 머리띠",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white cloth headband with a yellow paper talisman with red ink symbols tied at the front, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

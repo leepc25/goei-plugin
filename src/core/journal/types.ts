@@ -82,13 +82,6 @@ export interface ReportTrade {
   quote?: string;
 }
 
-export interface Debrief {
-  who: string;
-  text: string;
-  src: 'turn' | 'backfill' | 'manual';
-  at: string;
-}
-
 export interface Report {
   /** `r` + 일지 줄과 같은 hash */
   id: string;
@@ -111,7 +104,6 @@ export interface Report {
   wallet?: ReportTrade[];
   /** 종료 시점 잔고 (전체만) */
   balance?: number;
-  debrief?: Debrief;
   pin?: boolean;
   idx: number;
   anchor: string;

@@ -85,9 +85,9 @@ test('2026-11-07 설정 L·M·N·P: 항상 포함 인물, 최근 글 범위, 증
   assert.equal(A.cueDelta(cue('도움'), { speed: 2, speedDown: 0.5 }), 6);
   assert.equal(A.cueDelta(cue('무시'), { speed: 2, speedDown: 0.5 }), -2);
   assert.equal(A.cueDelta(cue('무시'), { speed: 2 }), -8, 'speedDown 없으면 speed');
-  // P: Router 지침 덮어쓰기(ps_router_base)와 덧붙이기(router_rules)
-  const p = St.peopleSettings({ $pp_ps_router_base: '# 내 Router\n최대 {{MAX}}명', $pp_router_rules: '민간인은 빼라' });
-  const b = Ro.buildRouter(c, store, names, '입력', { prompt: p.routerPrompt, rules: p.routerRules });
+  // P: Router 기본 지침(지침 탭 글이 prompt 로)과 덧붙이기(router_rules)
+  const p = St.peopleSettings({ $pp_router_rules: '민간인은 빼라' });
+  const b = Ro.buildRouter(c, store, names, '입력', { prompt: '# 내 Router\n최대 {{MAX}}명', rules: p.routerRules });
   assert.ok(b.system.startsWith('# 내 Router\n최대 6명'));
   assert.ok(/## User rules\n민간인은 빼라/.test(b.system));
   assert.ok(Ro.buildRouter(c, store, names, '입력').system.startsWith('# Router'));

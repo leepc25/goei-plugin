@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "전투복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark grey combat uniform jacket and pants laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "위장복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green camouflage military jacket laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "롱코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black coat reaching the ankles, on a hanger, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "망토",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain dark red cloak with a clasp at the collar, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마녀 망토",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black witch cloak with a pointed hood and tattered hem, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "후드 망토",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grey hooded cloak, hood up and empty, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 앞치마",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy brown leather work apron with dark stains, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown leather gloves, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin black gloves, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "용접 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick tan leather welding gauntlets, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "어깨 권총집",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown leather shoulder holster harness with a pistol pouch under one arm, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가터벨트 권총집",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black garter belt thigh holster with two silver pistols in it, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리 권총집",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical drop-leg holster with straps, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "군용 배낭",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large olive military rucksack with straps and pouches, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숄더백",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather shoulder bag with a long strap, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "에코백",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain beige canvas tote bag, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

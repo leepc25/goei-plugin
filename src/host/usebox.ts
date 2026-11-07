@@ -1,7 +1,8 @@
 // 「사용」 상자 (2026-11-07 소지품): 소지품 메뉴에서 「사용」을 누른 물건을 본 화면 입력칸 위에 칩으로 보여 준다.
 // 다음 전송 때 [Inventory] 글의 This turn 에 같이 넘어가고(core/items.ts withInventory), 응답이 붙으면 settleItemUse 가 상자를 정리한다.
 // 본 화면 DOM은 SafeElement 뿐이라 유령 버튼(overlay.ts)과 같은 방식: x-goei-usebox 속성 선택자 CSS, 클릭은 좌표로 맞춰 본다.
-import { ITEM_USE_AT_VAR, itemUseVars, readItemUse } from '../core/items';
+import { aliveAnchors } from '../core/wallet';
+import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, liveItems, readItemUse, readItems } from '../core/items';
 import type { Chat } from '../core/types';
 import { currentTheme, onThemeChange } from '../ui/theme';
 import { elements, hit } from './chatclicks';
@@ -25,13 +26,18 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 
 let host: El | null = null;
 let where = { charIndex: -1, chatIndex: -1 };
-let shownNames: string[] = [];
+let shown: { id: string; label: string }[] = [];
 let busy = false;
 
-/** 상자에 보일 이름: 아직 보내지 않은 것만 (보낸 턴은 다시 굴리기용으로 변수에 남지만 칩은 숨긴다) */
-export function useBoxNames(chat: Chat | null): string[] {
-  if (!chat || chat.scriptstate?.[ITEM_USE_AT_VAR]) return [];
-  return readItemUse(chat.scriptstate);
+/** 상자에 보일 것: 아직 보내지 않은 것만 (보낸 턴은 다시 굴리기용으로 변수에 남지만 칩은 숨긴다). 이름 ×n */
+export function useBoxNames(chat: Chat | null): { id: string; label: string }[] {
+  // 소지품이 꺼져 있으면 상자도 없다 (2026-11-07 사용자: 켜고 끄기)
+  if (!chat || chat.scriptstate?.[ITEM_USE_AT_VAR] || !invOn(chat.scriptstate)) return [];
+  const live = liveItems(readItems(chat.scriptstate), aliveAnchors(chat));
+  return readItemUse(chat.scriptstate).flatMap((u) => {
+    const e = live.find((x) => x.id === u.id);
+    return e ? [{ id: u.id, label: `${e.name}${u.n > 1 ? ` ×${u.n}` : ''}` }] : [];
+  });
 }
 
 async function ensure(): Promise<El | null> {
@@ -61,17 +67,17 @@ async function ensure(): Promise<El | null> {
 }
 
 async function onClick(doc: Root['doc'], x: number, y: number): Promise<void> {
-  if (busy || !shownNames.length || where.charIndex < 0) return;
+  if (busy || !shown.length || where.charIndex < 0) return;
   const xs = await elements(doc, '[x-goei-usebox] [data-gu-x]');
   for (let i = 0; i < xs.length; i++) {
     if (!(await hit(xs[i], x, y))) continue;
-    const name = shownNames[i];
-    if (!name) return;
+    const id = shown[i]?.id;
+    if (!id) return;
     busy = true;
     try {
       const { charIndex, chatIndex } = where;
       await updateChat(charIndex, chatIndex, (chat) => {
-        const next = readItemUse(chat.scriptstate).filter((n) => n !== name);
+        const next = dropUse(readItemUse(chat.scriptstate), id);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemUseVars(next) } };
       });
       await refreshUseBox(charIndex, chatIndex);
@@ -93,13 +99,13 @@ export async function refreshUseBox(charIndex: number, chatIndex: number, known?
   if (!names.length) return hideUseBox();
   const h = await ensure();
   if (!h) return;
-  shownNames = names;
+  shown = names;
   const wrap = await h.querySelector('[x-goei-uwrap]');
-  await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names.map((n) => `<span data-gu><b>${esc(n)}</b><span data-gu-x role="button" aria-label="${esc(n)} 빼기">×</span></span>`).join('')}`);
+  await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names.map((n) => `<span data-gu><b>${esc(n.label)}</b><span data-gu-x role="button" aria-label="${esc(n.label)} 빼기">×</span></span>`).join('')}`);
   await h.setStyle('display', 'block');
 }
 
 export async function hideUseBox(): Promise<void> {
-  shownNames = [];
+  shown = [];
   if (host) await host.setStyle('display', 'none').catch(() => {});
 }

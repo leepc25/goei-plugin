@@ -10,10 +10,13 @@ export const VIEW_PRESETS: Record<ViewPreset, string> = { side: '사이드스토
 export const PH_VIEWS = PH('views');
 export const PH_VIEW_LAST = PH('view_last');
 export const VIEW_KEEP = 30;
+/** 한 방에 쌓아 두는 말풍선 수 (같은 종류는 한 방에 이어 쓰므로)*/
+export const VIEW_HISTORY = 300;
 export const VIEW_LIMITS = { messages: 30, text: 600, name: 60, people: 10 };
 
 export interface ViewPerson { id: string; name: string }
-export interface ViewMsg { sender: string; type: 'text' | 'pause' | 'skip'; text: string; reactions?: string }
+/** time: 이어 쓸 때 끼우는 시각 줄 (11-07) */
+export interface ViewMsg { sender: string; type: 'text' | 'pause' | 'skip' | 'time'; text: string; reactions?: string }
 export interface ViewRoom {
   id: string;
   preset: ViewPreset;
@@ -73,7 +76,7 @@ export function previousView(list: ViewRoom[], preset: ViewPreset): unknown {
   if (!r) return undefined;
   return {
     name: r.name, pov: r.pov, participants: r.people,
-    messages: r.messages.map((m) => ({ sender: m.type === 'text' ? m.sender : '-', type: m.type, content: m.type === 'text' ? m.text : m.type === 'pause' ? m.text : '-' })),
+    messages: r.messages.filter((m) => m.type !== 'time').slice(-VIEW_LIMITS.messages).map((m) => ({ sender: m.type === 'text' ? m.sender : '-', type: m.type, content: m.type === 'text' ? m.text : m.type === 'pause' ? m.text : '-' })),
   };
 }
 

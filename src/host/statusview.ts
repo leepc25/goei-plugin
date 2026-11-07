@@ -13,6 +13,11 @@ import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { getChar } from './risu';
 
 let ctx: StatusContext = { timeline: null, terms: [], hide: new Set() };
+/** 채팅을 옮길 때: 앞 채팅의 목록을 바로 버린다 (다시 모을 때까지 비교 없이 그린다) */
+export function resetStatusContext(): void {
+  ctx = { timeline: null, terms: ctx.terms, hide: ctx.hide };
+  cards = new Map();
+}
 /** 상태창 원문(trim) → 그 응답에서 종료된 사건의 보고서 (설정이 off 면 빈 표) */
 let cards = new Map<string, Report[]>();
 /** 위키 이름을 누르면 (app.ts가 채운다) */

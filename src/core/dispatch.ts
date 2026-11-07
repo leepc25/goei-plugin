@@ -107,6 +107,8 @@ export interface SceneSummary {
   party: string;
   /** 자동 전송이 막혀 아직 안 보낸 요청 (카드에 「전송을 눌러 주세요」·취소) */
   unsent?: boolean;
+  /** 화면용: 카드 뒤에 덧붙인 작전 메모 (2026-11-07 사용자: 상자 밖에 따로 뜨지 않게 상자 안에). 원문은 그대로 카드 뒤에 남는다 */
+  note?: string;
 }
 
 const OPEN_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n/;
@@ -214,8 +216,16 @@ export function stripSceneCard(text: string): string {
   return text.replace(/%%SCENE_CARD:[0-9a-f]+%%\r?\n/g, '').replace(/\r?\n%%\/SCENE_CARD%%/g, '');
 }
 
-/** 화면용: 기록 전체를 카드 하나로. render는 HTML 이스케이프한 목표·투입을 받는다 */
+/** 화면용: 기록 전체를 카드 하나로. render는 HTML 이스케이프한 목표·투입을 받는다.
+ * 메시지가 카드 하나와 그 뒤의 작전 메모만이면 메모를 카드의 note 로 넘겨 상자 안에 그린다 (2026-11-07 사용자) */
 export function renderSceneCards(text: string, render: (s: SceneSummary) => string): string {
+  const one = /^\s*%%SCENE_CARD:([0-9a-f]+)%%\r?\n[\s\S]*?\r?\n%%\/SCENE_CARD%%(?:\r?\n+([\s\S]*?))?\s*$/.exec(text);
+  if (one && one[2]?.trim()) {
+    try {
+      const s = JSON.parse(fromHex(one[1])) as SceneSummary;
+      return render({ target: String(s.target ?? ''), party: String(s.party ?? ''), ...(s.unsent ? { unsent: true } : {}), note: one[2].trim() });
+    } catch { /* 아래 일반 처리로 */ }
+  }
   return text.replace(CARD_RE, (all, hex: string) => {
     try {
       const s = JSON.parse(fromHex(hex)) as SceneSummary;

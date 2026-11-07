@@ -156,12 +156,15 @@ export function aimMark(on: boolean, action: string, value: string, key = value)
   const label = on ? '해제' : '선택';
   const fx = !aimHit.used && aimHit.key === key && aimHit.wasOn !== on;
   if (fx) aimHit.used = true;
+  // 11-07 사용자: 글자(선택/해제) 없이, 늘 또렷하게도 말고(미관) — 나타날 때 한 번 밝게 켜졌다 가라앉고, 4초마다 레이더 핑이 퍼지고, 희미한 부채꼴이 돈다. 잠글 때 붉은 고리 셋이 차례로 퍼진다
   return `<button class="gx-aim${on ? ' on' : ''}${fx ? ' fx' : ''}" data-action="${action}" data-value="${esc(value)}" data-key="${esc(key)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="34"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg><span class="gx-aim-l" aria-hidden="true">${label}</span></button>`;
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst b1" cx="50" cy="50" r="34"/><circle class="burst b2" cx="50" cy="50" r="34"/><circle class="burst b3" cx="50" cy="50" r="34"/><circle class="ping" cx="50" cy="50" r="10"/><path class="sweep" d="M50 50L50 4A46 46 0 0 1 73 10.2Z"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg></button>`;
 }
 
-/** 선택·해제 효과를 먼저 보여 주고(0.55초) 화면을 바꾼다 (2026-11-05 사용자: 누르자마자 닫히면 골랐는지 안 보인다).
+/** 선택·해제 효과를 먼저 보여 주고 화면을 바꾼다 (2026-11-05 사용자: 누르자마자 닫히면 골랐는지 안 보인다. 11-07 사용자: 1~2초 화려하게 → 잠금 1.5초, 해제 0.9초).
  *  지금 화면의 그 표식을 바로 뒤집어 잠금·해제 애니메이션을 돌리고 끝날 때까지 기다린다. 표식이 안 보이면 바로 돌아간다 */
+export const AIM_LOCK_MS = 1500;
+export const AIM_RELEASE_MS = 900;
 export async function aimFlash(key: string): Promise<void> {
   const b = [...document.querySelectorAll<HTMLElement>('.gx-aim')].find((x) => x.dataset.key === key && x.getBoundingClientRect().width > 0);
   if (!b || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -169,10 +172,9 @@ export async function aimFlash(key: string): Promise<void> {
   b.classList.toggle('on', on);
   b.classList.add('fx');
   b.setAttribute('aria-pressed', String(on));
-  const l = b.querySelector('.gx-aim-l');
-  if (l) l.textContent = on ? '해제' : '선택';
+  b.setAttribute('title', on ? '해제' : '선택');
   aimHit.used = true;
-  await new Promise((r) => setTimeout(r, 560));
+  await new Promise((r) => setTimeout(r, on ? AIM_LOCK_MS : AIM_RELEASE_MS));
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.

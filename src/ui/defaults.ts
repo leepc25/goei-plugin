@@ -12,7 +12,7 @@ const PREFIXES: Record<DefaultsPane, string[]> = {
   wiki: ['$nw_'],
   /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
   pp: ['$pp_'],
-  /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·소감 자동·상한 둘 */
+  /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·상한 둘 */
   jr: ['$jr_'],
 };
 /** 메인 설정의 「덮어쓰기/불러오기」가 기능 설정과 함께 다루는 접두어 */

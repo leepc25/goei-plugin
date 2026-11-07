@@ -7,7 +7,7 @@ import { runModel } from '../llm';
 import { loadContext } from '../risu';
 
 export const gameTalk: GameTalk = {
-  model: (messages, which) => runModel(messages, which === 'aux' ? 'aux' : 'main'),
+  model: (messages, which) => runModel(messages, which === 'aux' ? 'aux' : 'main', undefined, '게임 대화'),
   async lore(name) {
     const ctx = await loadContext().catch(() => null);
     if (!ctx) return null;

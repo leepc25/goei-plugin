@@ -3,5 +3,5 @@
 import { runModel } from '../../../host/llm';
 import type { TalkModel } from './ai';
 
-export const risuMainModel: TalkModel = (messages) => runModel(messages, 'main');
-export const risuAuxModel: TalkModel = (messages) => runModel(messages, 'aux');
+export const risuMainModel: TalkModel = (messages) => runModel(messages, 'main', undefined, '게임 이야기');
+export const risuAuxModel: TalkModel = (messages) => runModel(messages, 'aux', undefined, '게임 이야기');

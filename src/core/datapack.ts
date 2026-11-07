@@ -2,6 +2,7 @@
 // (goei-data-world.json + goei-data-world.N.txt, goei-data-install.*) 으로 받는다. 빌드(scripts/build.mjs)가 팩마다 지문을 여기 박아 두어
 // 본체는 자기와 맞는 자료만 쓴다 (판이 다르면 다시 받음). 받기·저장은 host/datapack.ts, 여기는 순수 계산(지문 비교·형식 검사·넣기).
 import { setInstallData } from './install';
+import { makeIconIndex, normIcon } from './iconmatch';
 import { textHash } from './texthash';
 import { setWorldData } from './world/records';
 
@@ -23,7 +24,7 @@ declare const __WORLD_PACK__: string | undefined;
 declare const __INSTALL_PACK__: string | undefined;
 declare const __ITEMS_PACK__: string | undefined;
 
-function expectOf(raw: unknown): PackExpect {
+export function expectOf(raw: unknown): PackExpect {
   try {
     const o = typeof raw === 'string' ? (JSON.parse(raw) as Partial<PackExpect>) : null;
     if (o && typeof o.hash === 'string' && typeof o.sha256 === 'string' && typeof o.length === 'number') return { hash: o.hash, sha256: o.sha256, length: o.length };
@@ -86,7 +87,13 @@ export function applyInstallPack(text: string): void {
   setInstallData({ greetings: { index: g.index as never, texts: g.texts.map(String) }, pictures: j.pictures as never, directory: j.directory, icon: j.icon as never });
 }
 
-// ── 소지품 그림 팩 (scripts/data-pack.mjs itemsPackText 와 같은 모양, 매칭은 game-src/items/match_icon.mjs 를 그대로 옮김) ──
+// ── 소지품 그림 팩 (scripts/data-pack.mjs itemsPackText 와 같은 모양, 매칭은 game-src/items/match_icon.mjs 와 같은 규칙 — 시험이 둘을 맞대 봄) ──
+// ① 모델이 쓴 「그림 찾기 낱말」(영어 icon) ② 물건 이름 — 둘 다 글자 조각 점수로 표의 줄과 견준다.
+//   조각 = 한글은 띄어쓰기를 지운 뒤 한 글자·두 글자, 영어·숫자는 낱말. 조각마다 무게 = 표에 드문 조각일수록 큼(IDF).
+//   점수 = 겹친 무게 / (겹친 무게 + A×물건 쪽 남는 무게 + B×줄 쪽 남는 무게) — 줄의 키워드·몸통 말 중 가장 높은 것.
+//   이름에는 한국어 몸통이 끝에 온다는 것을 씀: 끝 말이 같으면 덤, 마지막 글자가 줄에 없으면 깎음.
+//   짧은 낱말이 긴 이름 안에 끼어 먼저 잡히던 것(확성기 → 「성기」, 봉지라면 → 「지라」)은 나머지 조각이 안 맞아 점수가 낮다.
+// ③ 가장 높은 점수가 낮으면(흔한 조각 「키트·상자」만 맞음 등) 공통 그림.
 
 export interface ItemIconRow { k: string[]; h: string[]; ft: string[]; f: string; kind: string; base?: boolean }
 export interface ItemIconPack {
@@ -94,13 +101,19 @@ export interface ItemIconPack {
   /** 몸통 말(정규화) → 대표 그림 파일 */
   rep: Record<string, string>;
   icons: Record<string, string>;
-  /** ① 고유 키워드(몸통 말이 아닌 것) 긴 것 먼저 */
-  kws: [string, ItemIconRow][];
+  /** 종류 → 기본 그림 (공통 그림은 base.misc) */
   base: Record<string, string>;
+  /** 이름·그림 찾기 낱말 → 그림 파일, 점수가 낮으면 null */
+  find: (name: string, icon?: string) => string | null;
 }
 
-/** 이름 비교용 (match_icon.mjs norm 과 같게): 소문자, 기호는 띄어쓰기로 */
-export const normIcon = (s: unknown) => String(s ?? '').toLowerCase().replace(/[\s()「」'"!·.,_-]+/g, ' ').trim();
+export { normIcon } from './iconmatch';
+
+/** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
+function makeIconFind(table: ItemIconRow[], rep: Record<string, string>): (name: string, icon?: string) => string | null {
+  const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h] })), rep);
+  return (name, icon) => m(name, icon)?.file ?? null;
+}
 
 /** 소지품 그림 팩 글을 푼다. 형식이 다르면 던진다 */
 export function applyItemsPack(text: string): ItemIconPack {
@@ -118,48 +131,12 @@ export function applyItemsPack(text: string): ItemIconPack {
     .map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...(r.base ? { base: true } : {}) }));
   const rep: Record<string, string> = {};
   if (obj(j.rep)) for (const [k, f] of Object.entries(j.rep)) if (typeof f === 'string' && typeof icons[f] === 'string') rep[normIcon(k)] = f;
-  const kws: [string, ItemIconRow][] = [];
-  for (const r of table) for (const k of r.k) {
-    const n = normIcon(k);
-    if (n.length >= 2 && !rep[n]) kws.push([n, r]);
-  }
-  kws.sort((a, b) => b[0].length - a[0].length);
   const base: Record<string, string> = {};
   for (const r of table) if (r.base) base[r.kind] = r.f;
-  return { table, rep, icons, kws, base };
+  return { table, rep, icons, base, find: makeIconFind(table, rep) };
 }
 
-/** 이름(정규화됨)에 말이 들어 있나: 낱말 단위, 한글은 붙어 있어도 됨 (match_icon.mjs has) */
-function hasWord(name: string, w: string): boolean {
-  const n = normIcon(w);
-  if (n.length < 1) return false;
-  const padded = ` ${name} `;
-  if (padded.includes(` ${n} `)) return true;
-  return /[가-힣]/.test(n) && n.length >= 2 && name.includes(n);
-}
-
-/**
- * 이름 → 그림 파일 (표시 전용). ① 고유 키워드 가장 긴 것 → ② 몸통 말 + 특징 말 점수(같으면 종류 같은 것, 그다음 대표) →
- * ③ 몸통 말만 맞으면 그 몸통의 대표 → ④ 종류 기본 그림 → 없으면 null
- */
-export function matchItemIcon(pack: ItemIconPack, itemName: string, kind: string): string | null {
-  const name = normIcon(itemName);
-  const fallback = () => pack.base[kind] ?? null;
-  if (!name) return fallback();
-  for (const [k, r] of pack.kws) if (hasWord(name, k)) return r.f;
-  let best: { score: number; r: ItemIconRow } | null = null;
-  const heads = new Set<string>();
-  for (const r of pack.table) {
-    const hs = r.h.filter((h) => hasWord(name, h));
-    if (!hs.length) continue;
-    for (const h of hs) heads.add(normIcon(h));
-    const f = r.ft.filter((x) => hasWord(name, x)).length;
-    if (!f) continue;
-    const score = f * 10 + (r.kind === kind ? 1 : 0);
-    if (!best || score > best.score || (score === best.score && pack.rep[normIcon(hs[0])] === r.f)) best = { score, r };
-  }
-  if (best) return best.r.f;
-  const longest = [...heads].sort((a, b) => b.length - a.length)[0];
-  if (longest && pack.rep[longest]) return pack.rep[longest];
-  return fallback();
+/** 이름(+모델이 쓴 그림 찾기 낱말) → 그림 파일 (표시 전용). 맞는 게 없으면 공통 그림(base.misc), 그것도 없으면 null */
+export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string): string | null {
+  return pack.find(itemName, icon) ?? pack.base.misc ?? null;
 }

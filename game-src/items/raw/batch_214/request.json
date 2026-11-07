@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vintage stage microphone on a tall chrome stand, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical pencil, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chocolate bar in a wrapper, half opened. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few brass rifle cartridges standing upright. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old Buddhist sutra book with a brown cover and folded pages. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick old occult book with a pentagram and strange symbols on a dark leather cover. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spirit talking board with an alphabet arc and a heart-shaped planchette on it, top view, letters as unreadable marks. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small Korean ancestral rite table with fruit, rice cakes and candles on it, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear sealed sample container with a screw cap and a hazard sticker. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round colorful mandala painting on cloth. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ancient round bronze mirror with relief patterns on the back. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow firefighter helmet with a long back brim, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather bandolier belt holding a row of red shotgun shells. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain silver bangle bracelet. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet with small brass shaman bells. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single steel shoulder pauldron with straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "스탠드 마이크",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vintage stage microphone on a tall chrome stand, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "샤프",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical pencil, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "초코바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chocolate bar in a wrapper, half opened. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "실탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few brass rifle cartridges standing upright. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "불경",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old Buddhist sutra book with a brown cover and folded pages. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오컬트 서적",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick old occult book with a pentagram and strange symbols on a dark leather cover. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "위저 보드",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spirit talking board with an alphabet arc and a heart-shaped planchette on it, top view, letters as unreadable marks. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제사상",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small Korean ancestral rite table with fruit, rice cakes and candles on it, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시료통",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear sealed sample container with a screw cap and a hazard sticker. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "만다라",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round colorful mandala painting on cloth. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "청동 거울",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ancient round bronze mirror with relief patterns on the back. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소방 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow firefighter helmet with a long back brim, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "산탄총 탄띠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather bandolier belt holding a row of red shotgun shells. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은팔찌",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain silver bangle bracelet. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방울 팔찌",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet with small brass shaman bells. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "어깨 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single steel shoulder pauldron with straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

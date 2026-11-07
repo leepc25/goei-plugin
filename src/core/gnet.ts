@@ -171,6 +171,11 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
 
 // ── 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) ──
 export const GN_KEYFIG = '$gn_keyfigures';
+/** 지금 게시판 글이 어느 성격(괴담갤·괴담넷·세정게…)으로 만들어졌는지. 성격을 바꾸면 다음 새로고침은 옛 글을 참고로 주지 않는다 (11-07 사용자: 성격을 바꿔도 똑같이 나온다) */
+export const GN_BOARD_STYLE = '$gn_board_style';
+export const boardStyle = (state: Record<string, unknown> | undefined): string => String(state?.[GN_BOARD_STYLE] ?? '');
+/** 성격이 바뀌어 게시판을 새로 시작해야 하는가 (아직 한 번도 안 받았으면 아니오) */
+export const styleSwitched = (state: Record<string, unknown> | undefined): boolean => boardStyle(state) !== '' && boardStyle(state) !== gnetStyle(state);
 export interface KeyFigure { keyFigure: string; nickname: string; note: string }
 
 export function keyFigures(state: Record<string, unknown> | undefined): KeyFigure[] {

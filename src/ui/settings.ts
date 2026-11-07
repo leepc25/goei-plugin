@@ -3,7 +3,7 @@
 import { onOffSwitch } from './controls';
 import { repaintTheme } from './theme';
 import {
-  AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
+  AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, isChatSettingVar, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
@@ -14,15 +14,15 @@ import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidd
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
-import { ITEM_AUTO_VAR, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
-import { SHOP_COUNT_VAR, SHOP_COUNTS, SHOP_CTX_VAR, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_THOUGHTS_VAR, shopSettings } from '../core/shop';
-import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_MAX, walletBalance, walletEditable, walletStarted, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { invOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
+import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
-import { imgPromptPane } from './imgprompt';
+import { resetShop } from './shop';
 
 export interface SettingsEnv {
   render: () => void;
@@ -33,13 +33,13 @@ export interface SettingsEnv {
 export const THEME_KEY = '$st_fixed_theme';
 
 export const settingsUi = {
-  page: '' as '' | 'phone' | 'gnet' | 'wiki' | 'people' | 'journal' | 'factions' | 'image',
+  page: '' as '' | 'phone' | 'gnet' | 'wiki' | 'people' | 'journal' | 'factions',
   confirmOff: false,
   busy: false,
   notice: '',
   info: '',
   scope: 'chat' as SettingsScope,
-  confirm: '' as '' | 'save' | 'load',
+  confirm: '' as '' | 'save' | 'load' | 'reset',
   /** 「기본값 불러오기」 직전에 보관해 둔 이 채팅의 값 (2026-11-06 사용자 승인, 전수점검 9-7). 불러온 뒤 「되돌리기」 한 번. 없던 키는 undefined */
   undo: null as null | { charIndex: number; chatIndex: number; before: Record<string, string | number | boolean | undefined> },
 };
@@ -182,14 +182,16 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 
 // 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「덮어쓰기」「불러오기」 (전환보다 한 단계 작게). 설정에서는 새 채팅 기본값을,
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
-const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>> = {
+const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load' | 'reset', [string, string]>> = {
   chat: {
     save: ['이 채팅의 설정 전부(캐릭터 이미지·상황판·괴담넷·괴담톡·위키·필드·인물 기록·고급)를 새 채팅 기본값으로 저장할까요? 앞으로 새로 시작하는 채팅이 이 값으로 시작해요.', '저장'],
     load: ['저장해 둔 새 채팅 기본값 전부를 이 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
+    reset: ['이 채팅의 설정 전부와 저장해 둔 새 채팅 기본값을 버리고 플러그인 초기값으로 되돌릴까요? 상황판 켜기·끄기는 그대로 둬요. 되돌리기 띠로 한 번 되돌릴 수 있어요.', '초기값으로'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
     load: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
+    reset: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
   },
 };
 
@@ -215,7 +217,7 @@ function scopeBar(scope: SettingsScope, canChat: boolean, ctx?: ChatContext): st
  *  처리는 set-bar / set-bar-yes / set-bar-no */
 export const mainDefaultsButtons = (): string => {
   const off = settingsUi.busy ? 'disabled' : '';
-  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
+  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button><button class="st-act" data-action="set-bar" data-value="reset" title="플러그인 초기값으로" aria-label="플러그인 초기값으로" ${off}>${ICONS.back}<span>초기값으로</span></button></span>`;
 };
 /** 불러오기 뒤의 「되돌리기」 띠: 보관해 둔 값이 이 채팅 것일 때만 */
 export function undoBar(ctx: ChatContext): string {
@@ -223,22 +225,23 @@ export function undoBar(ctx: ChatContext): string {
   if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex || settingsUi.confirm) return '';
   return `<div class="st-confirm st-undobar ps-defconfirm"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? 'disabled' : ''}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
 }
+/** 페이지 안: 되돌리기 띠만. 확인은 팝업(mainDefaultsPopup) — 11-07 사용자: 전체 설정에 관한 확인이 괴담넷 같은 한 페이지 안에 뜨면 안 된다 */
 export function mainDefaultsConfirm(ctx?: ChatContext): string {
+  return ctx ? undoBar(ctx) : '';
+}
+/** 설정 창 전체 위에 뜨는 확인 팝업 (닫기 확인과 같은 모양) */
+export function mainDefaultsPopup(): string {
   const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
-  if (!c) return ctx ? undoBar(ctx) : '';
-  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`;
+  if (!c) return '';
+  return `<div class="gw-confirm"><div class="gw-confirm-box"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' || settingsUi.confirm === 'reset' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div></div>`;
 }
 
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
-  let pane = '';
-  if (page === 'image') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>이미지 지침</b><small>이 기기 공통</small></div></header>${imgPromptPane(ctx)}`;
-  else {
-    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
-    // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
-    pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
-  }
+  const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
+  // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
+  let pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   // 시작 전(시작 패널): 설정 값은 이 채팅에 바로 적히고, 갱신·열기 같은 동작은 시작 뒤에 된다
   if (!canChat) pane = pane.replace(/<\/header>/, '</header><p class="gx-hint st-prehint">채팅을 시작하기 전이에요. 여기서 바꾼 값은 이 채팅에 그대로 적용되고, 갱신·열기 같은 동작은 시작한 뒤에 할 수 있어요.</p>');
   return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
@@ -353,34 +356,56 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
 `,
     // 가계부(시작 잔고·잔고 직접 수정): 설정 「기록」 페이지 안의 묶음 (2026-11-05 사용자: 가계부가 기록 하위 탭이니 상태창에는 잔고 칸 표시만)
-    wallet: group('가계부', colCfg.wallet === 'off'
-      ? '<p class="ps-note">상태창 칸에서 「잔고」를 안 쓰기로 해서 가계부가 꺼져 있어요. 설정 「상태창 → 상태창 칸」에서 잔고를 켜면 여기서 시작 잔고를 정할 수 있어요.</p>'
-      : [
+    // 2026-11-07 사용자: 가계부·소지품·상점 설정을 「소지품」 한 페이지로, 켜고 끄기는 따로 (가계부 = 상태창 잔고 칸 $st_col_wallet)
+    wallet: group('가계부', [
+      field('가계부', seg('set-wallet-on', colCfg.wallet === 'off' ? '0' : '1', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 상태창에 잔고 칸을 두고, 본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 끄면 잔고 칸과 거래 기록이 빠져요. 소지품·상점과 따로 켜고 꺼요.'),
+      ...(colCfg.wallet === 'off' ? [] : [
         field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.'),
         field('잔고 직접 수정', seg('set-wallet-edit', walletEdit ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.'),
-      ].join('')),
+        field('상태창 잔고 따르기', seg('set-wallet-sync', walletSyncOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요(차이를 「상태창 잔고」 한 줄로). 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요.'),
+        field('거래 읽는 기준', seg('set-wallet-loose', walletLoose(itVars) ? '1' : '0', [['0', '금액이 적힌 것만'], ['1', '어림도 받기']], busy), '금액이 적힌 것만이면 「3만 원을 냈다」처럼 금액이 글에 있는 거래만 적어요. 어림도 받기면 「밥을 사 먹었다」처럼 금액이 없는 거래도 보조 모델이 서울 물가로 어림해 메모에 「(어림)」을 붙여 적어요.'),
+        field('최근 거래 넘기기', stepper('set-wallet-recent', 'n', `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, '최근 거래 줄 수', busy), `본편 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.`),
+      ]),
+    ].join('')),
     // 소지품 (2026-11-07): 본편에 넘기기·보조 모델 읽기·칸 수·한계 문장. 채팅 변수 $it_* 또는 새 채팅 기본값
     items: group('소지품', [
+      field('소지품', seg('set-inv-on', invOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요.'),
+      ...(!invOn(itVars) ? [] : [
       field('본편에 넘기기', seg('set-items-push', itemPushOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요.'),
-      field('보조 모델이 읽기', seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 끄면 직접 넣기·장터로만 바뀌어요.'),
+      field('보조 모델이 읽기', seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 끄면 직접 넣기·상점으로만 바뀌어요.'),
       field('칸 수', stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘치면 「17/16」처럼 보이고 그대로 본편에 넘겨요. 푸는 건 이야기 쪽이에요.`),
       field('지닐 수 있는 한계', `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.'),
+      field('본편에 넘길 내용', seg('set-items-detail', itemDetail(itVars), [['full', '전부'], ['state', '이름·판정'], ['name', '이름만']], busy), '[Inventory] 한 줄에 무엇을 넣을지예요. 전부 = 이름·설명·효과·장착·남은 횟수·상태, 이름·판정 = 설명·효과를 빼고, 이름만 = 이름뿐. 물건이 많을 때 줄이면 토큰이 덜 들어요.'),
+      field('상태 바꾸기', seg('set-items-state', itemStateOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 보조 모델이 본문을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.'),
+      field('다 쓴 물건', seg('set-items-spent', itemsUiSpent(itVars), [['remove', '목록에서 빼기'], ['keep', '남겨 두기']], busy), '남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 본편에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼).'),
+      field('사용·처분 기록 넘기기', stepper('set-items-logturns', 'n', `${itemLogTurns(itVars)}턴`, itemLogTurns(itVars) > 0, itemLogTurns(itVars) < ITEM_LOGTURNS_MAX, '기록 턴 수', busy), `최근 몇 턴 동안 얻고·쓰고·버리고·잃은 기록을 [Inventory] 에 「Recently」 한 줄로 붙일지예요(0~${ITEM_LOGTURNS_MAX}, 0이면 안 붙여요).`),
+      field('시작 소지품', seg('set-items-start', itemStartOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요.'),
+      ]),
     ].join('')),
     // 상점 (2026-11-07 사용자): 표식 `[shop: 가게|주인]` 으로 열리는 상점 팝업의 생성 방식. 채팅 변수 $sh_* 또는 새 채팅 기본값
     shop: (() => {
       const sh = shopSettings(itVars);
+      const blocked = shopBlocked(itVars);
       const onoff = (action: string, cur: boolean) => seg(action, cur ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy);
       return group('상점', [
+        // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 둘 중 하나가 꺼지면 꺼지고 스위치도 잠긴다
+        blocked ? field('상점', seg('set-shop-on', '0', [['1', 'ON'], ['0', 'OFF']], true), `${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 상점도 꺼져 있어요. 상점은 물건을 소지품에 넣고 돈을 가계부로 주고받아서 둘 다 켜져 있어야 써요.`) :
         field('상점', onoff('set-shop-on', sh.on), '켜면 본편 모델에 「거래가 가능한 자리에서 응답 끝에 [shop: 가게|주인] 표식을 쓰라」고 알려 주고, 표식이 온 응답 아래에 「상점 열기」가 붙어요. 물건은 열 때 보조 모델이 맥락대로 지어요. 잔고·소지품은 모델에 넘기지 않아요.'),
         ...(sh.on ? [
           field('모델', seg('set-shop-model', sh.model, [['main', '메인모델'], ['aux', '보조모델']], busy), '진열대와 주인 대사를 지을 모델이에요.'),
-          field('진열대 분량', seg('set-shop-count', sh.count, SHOP_COUNTS.map((c) => [c.id, c.label] as [string, string]), busy), '한 번에 받을 물건 수예요. 새로고침·전체 다시 짜기에도 같은 범위예요.'),
+          field('진열대 분량', `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.`),
+          field('희귀·특가 구획', onoff('set-shop-feature', sh.feature), '켜면 진열대마다 희귀 물건 단 하나와 특가 물건 1~3개를 따로 받아, 희귀는 진열장에, 특가는 원래 값에 줄을 긋고 할인율을 붙여 따로 보여 줘요. 끄면 한 격자에 늘어놓아요.'),
           field('맥락 반영', seg('set-shop-ctx', sh.context ? '1' : '0', [['1', '맥락'], ['0', '가게만']], busy), '맥락이면 최근 본문·상태창(시각·장소)·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요. 가게만이면 가게 정체와 참고 자료만 넘겨요.'),
           field('값 기준', `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 값 기준 한 줄이에요. 비우면 그 가게에 어울리는 실제 물가로 지어요.'),
           field('다양성', onoff('set-shop-diverse', sh.diverse), '켜면 뻔한 물건만 늘어놓지 않고 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
           field('생각 단계', seg('set-shop-thoughts', sh.thoughts, [['off', '없음'], ['inner', '속으로만'], ['note', '적고 지움']], busy), '물건을 짓기 전에 가게·장면·주인을 먼저 정리하게 해요. 적고 지움은 응답이 길어져요.'),
           field('지난 진열대 피하기', onoff('set-shop-prev', sh.avoidPrev), '새로고침할 때 이번 방문에 이미 보였던 물건을 피해요.'),
           field('거래 끊음', onoff('set-shop-kick', sh.kick), '켜면 주인이 모욕·끝없는 흥정 같은 일에 거래를 끊을 수 있어요. 끊기면 진열대가 잠기고 다음 턴 본편에 넘어가요. 끄면 주인이 아무리 화나도 가게는 열려 있어요.'),
+          // 숫자는 고르는 단추 말고 −/+ 한 칸씩 (2026-11-07 사용자)
+          field('상점이 열리는 자리', seg('set-shop-where', sh.where, [['any', '어디서든'], ['shop', '가게 장면만']], busy), '어디서든이면 판매자가 있는 가게뿐 아니라 온라인몰·홈쇼핑·카탈로그·자판기·이면의 쇼핑몰처럼 주인이 없는 곳에서도 「상점 열기」가 붙어요. 가게 장면만이면 판매자가 그 자리에 있는 가게·노점에서만 붙어요.'),
+          field('최근 본문 턴 수', stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy), '진열대·주인 대사를 지을 때 넘기는 최근 본문 턴 수예요(1~8, 맥락 반영이 「맥락」일 때).'),
+          field('참고 로어북 수', stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy), '봇 설명·지금 켜진 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서 가운데 최대 몇 개를 넘길지예요(0~12).'),
+          field('넘기는 것·남는 것', '', '모델에 가는 것: 가게 이름·주인, 가게 정체(첫 호출 뒤 고정), 위의 참고 로어북, 맥락이면 주인공 신분·상태창 마지막 줄·진행 중 괴이·최근 본문, 이번 방문 진열대·대화 전부. 안 가는 것: 잔고·소지품·페르소나·작가 노트. 본편에는 다음 턴 [Inventory] 글의 This turn 으로 「새로 산 것」·「판 것」·「주인과 나눈 대화 전부」·「쫓겨남」이 넘어가고, 산 물건은 소지품에, 돈은 가계부에 남아요. 조립된 요청 원문은 점검 → 호출 기록에서 봐요.'),
         ] : []),
       ].join(''));
     })(),
@@ -399,6 +424,28 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     })}
   </main>`;
 }
+
+/** 상점이 꺼질 때(상점·소지품·가계부 끔): 채팅에 남은 표식을 지워 「상점 열기」 카드가 남지 않게 (core/shop.ts stripShopTags) */
+async function dropShopTags(ctx: ChatContext): Promise<void> {
+  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    const list = chat.message ?? [];
+    if (!list.some((m) => m.role === 'char' && hasShopTag(String(m.data ?? '')))) return null;
+    return { ...chat, message: list.map((m) => (m.role === 'char' && hasShopTag(String(m.data ?? '')) ? { ...m, data: stripShopTags(String(m.data)) } : m)) };
+  }).catch(() => null);
+}
+
+const itemsUiSpent = (vars: Record<string, unknown> | undefined) => (vars?.[ITEM_SPENT_VAR] === 'keep' ? 'keep' : 'remove');
+/** 소지품·가계부 단순 옵션: 켬/끔·고르기(values) 또는 −/+ 숫자(max·num) */
+const INV_OPTS: Record<string, { key: string; values: string[]; max?: number; num?: (vars: Record<string, unknown> | undefined) => number }> = {
+  'set-items-start': { key: ITEM_START_VAR, values: ['1', '0'] },
+  'set-items-detail': { key: ITEM_DETAIL_VAR, values: ['full', 'state', 'name'] },
+  'set-items-state': { key: ITEM_STATE_VAR, values: ['1', '0'] },
+  'set-items-spent': { key: ITEM_SPENT_VAR, values: ['remove', 'keep'] },
+  'set-items-logturns': { key: ITEM_LOGTURNS_VAR, values: [], max: ITEM_LOGTURNS_MAX, num: itemLogTurns },
+  'set-wallet-sync': { key: WALLET_SYNC_VAR, values: ['1', '0'] },
+  'set-wallet-loose': { key: WALLET_LOOSE_VAR, values: ['1', '0'] },
+  'set-wallet-recent': { key: WALLET_RECENT_VAR, values: [], max: WALLET_RECENT_MAX, num: walletRecentN },
+};
 
 async function save(ctx: ChatContext, env: SettingsEnv, change: (chat: Chat) => ScriptState | null): Promise<void> {
   settingsUi.busy = true;
@@ -469,7 +516,7 @@ export async function handleSettings(action: string, value: string | undefined, 
     return true;
   }
   if (action === 'set-bar') {
-    settingsUi.confirm = v === 'save' || v === 'load' ? v : '';
+    settingsUi.confirm = v === 'save' || v === 'load' || v === 'reset' ? v : '';
     env.render();
     return true;
   }
@@ -535,6 +582,31 @@ export async function handleSettings(action: string, value: string | undefined, 
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
       env.render();
+    } else if (what === 'reset') {
+      // 플러그인 초기값으로 (11-07 사용자: 「기본값으로 저장·불러오기」만 있고 초기값 롤백이 없다): 이 채팅의 설정 변수를 전부 지워 코드 기본값으로,
+      // 저장해 둔 새 채팅 기본값(prefs basic·world·theme·vars)도 비운다. 상황판 켜기·끄기는 그대로. 불러오기와 같은 「되돌리기」 띠 한 번
+      let before: Record<string, string | number | boolean | undefined> | null = null;
+      await save(ctx, env, (chat) => {
+        const ss = { ...(chat.scriptstate ?? {}) };
+        before = {};
+        for (const k of Object.keys(ss)) {
+          if (k === '$st_anomaly_on' || !(isChatSettingVar(k) || k === THEME_KEY)) continue;
+          before[k] = ss[k] as string | number | boolean | undefined;
+          delete ss[k];
+        }
+        chat.scriptstate = ss;
+        const vars: ScriptState = {};
+        if (worldOn(chat)) {
+          const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? ''));
+          for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k] as string | number | boolean | undefined;
+          Object.assign(vars, wv);
+        }
+        return vars;
+      });
+      if (!settingsUi.notice) await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {} }));
+      if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
+      if (!settingsUi.notice) settingsUi.info = '이 채팅 설정과 새 채팅 기본값을 플러그인 초기값으로 되돌렸어요.';
+      env.render();
     } else env.render();
     return true;
   }
@@ -595,16 +667,60 @@ export async function handleSettings(action: string, value: string | undefined, 
     return true;
   }
   // 상점 설정 (set-shop-<키>): 두 범위 같은 처리. 값 검사는 변수마다
+  // 소지품·가계부 옵션 (2026-11-07 사용자): 켬/끔·고르기는 값 그대로, 숫자는 −/+ 한 칸씩. 두 범위 같은 처리
+  const simple = INV_OPTS[action];
+  if (simple) {
+    const vars = scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate;
+    let next: string | null = null;
+    if (simple.max !== undefined) {
+      if (/^n:[+-]$/.test(v)) next = String(Math.max(0, Math.min(simple.max, simple.num!(vars) + (v.endsWith('+') ? 1 : -1))));
+    } else if (simple.values.includes(v)) next = v;
+    if (next === null) return true;
+    const key = simple.key;
+    const val = next;
+    if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: val } }));
+    else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === val ? null : { [key]: val }));
+    return true;
+  }
   if (action.startsWith('set-shop-')) {
-    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
+    // 최소·최대: −/+ 한 칸씩, 서로 넘으면 다른 쪽도 같이 민다
+    if (action === 'set-shop-min' || action === 'set-shop-max') {
+      const vars = scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate;
+      let [lo, hi] = shopSettings(vars).size;
+      const d = v.endsWith('+') ? 1 : -1;
+      if (action === 'set-shop-min') lo = Math.max(SHOP_SIZE_LO, Math.min(SHOP_SIZE_HI, lo + d));
+      else hi = Math.max(SHOP_SIZE_LO, Math.min(SHOP_SIZE_HI, hi + d));
+      if (lo > hi) action === 'set-shop-min' ? (hi = lo) : (lo = hi);
+      const patch = { [SHOP_MIN_VAR]: String(lo), [SHOP_MAX_VAR]: String(hi) };
+      if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), ...patch } }));
+      else await save(ctx, env, (chat) => (String(chat.scriptstate?.[SHOP_MIN_VAR] ?? '') === patch[SHOP_MIN_VAR] && String(chat.scriptstate?.[SHOP_MAX_VAR] ?? '') === patch[SHOP_MAX_VAR] ? null : patch));
+      return true;
+    }
+    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, feature: SHOP_FEATURE_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR, where: SHOP_WHERE_VAR };
     const k = action.slice(9);
     const key = KEY[k];
     if (!key) return true;
-    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? SHOP_COUNTS.some((c) => c.id === v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : v === '1' || v === '0';
+    // 턴 수·로어북 수: −/+ 한 칸씩
+    if ((k === 'turns' || k === 'refs') && /^n:[+-]$/.test(v)) {
+      const cur = shopSettings(scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate)[k];
+      const [lo, hi] = k === 'turns' ? [1, 8] : [0, 12];
+      const nv = String(Math.max(lo, Math.min(hi, cur + (v.endsWith('+') ? 1 : -1))));
+      if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: nv } }));
+      else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === nv ? null : { [key]: nv }));
+      return true;
+    }
+    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? ['0', '1', '2'].includes(v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : k === 'where' ? v === 'any' || v === 'shop' : k === 'turns' ? /^[1-8]$/.test(v) : k === 'refs' ? /^([0-9]|1[0-2])$/.test(v) : v === '1' || v === '0';
     if (!ok) return true;
     const next = k === 'price' ? v.replace(/\s+/g, ' ').trim().slice(0, 80) : v;
     if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: next } }));
-    else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === next ? null : { [key]: next }));
+    else {
+      // 진행 중 상점을 끄면 이번 방문을 닫고 남은 표식을 지운다
+      await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === next ? null : { [key]: next, ...(k === 'on' && next === '0' ? { [SHOP_VAR]: '' } : {}) }));
+      if (k === 'on' && next === '0') {
+        resetShop();
+        await dropShopTags(ctx);
+      }
+    }
     return true;
   }
   if (scope === 'defaults') {
@@ -632,6 +748,13 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-wallet-edit':
         // 새 채팅 기본값의 잔고 직접 수정 ($st_wallet_edit)
         if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [WALLET_EDIT_VAR]: v } }));
+        return true;
+      case 'set-wallet-on':
+        // 가계부 켬/끔 = 새 채팅 기본값의 상태창 잔고 칸 (2026-11-07 사용자: 가계부·소지품·상점 켜고 끄기는 따로)
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [colVar('wallet')]: v === '1' ? 'on' : 'off' } }));
+        return true;
+      case 'set-inv-on':
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ON_VAR]: v } }));
         return true;
       case 'set-items-push':
       case 'set-items-auto':
@@ -717,6 +840,37 @@ export async function handleSettings(action: string, value: string | undefined, 
     case 'set-wallet-edit':
       if (v !== '1' && v !== '0') return true;
       await save(ctx, env, (chat) => (walletEditable(chat.scriptstate) === (v === '1') ? null : { [WALLET_EDIT_VAR]: v }));
+      return true;
+    case 'set-wallet-on':
+      // 진행 중 가계부 켬/끔 (2026-11-07 사용자): 장부는 그대로 두고 상태창 잔고 칸만 그 시점부터 빼거나 되돌린다(칸 구성 기록에 남겨 옛 응답은 옛 구성으로 읽음).
+      // 끄면 상점도 꺼지므로 이번 방문을 닫는다. 다시 켜면 끈 때 장부 잔고에서 이어 간다
+      if (v !== '1' && v !== '0') return true;
+      await save(ctx, env, (chat) => {
+        const cfg = colConfig(chat.scriptstate);
+        const mode: ColMode = v === '1' ? (cfg.wallet === 'off' ? 'on' : cfg.wallet) : 'off';
+        if (mode === cfg.wallet) return null;
+        const next = { ...cfg, wallet: mode };
+        return { [colVar('wallet')]: mode, [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)), ...(v === '0' ? { [SHOP_VAR]: '' } : {}) };
+      });
+      if (v === '0') {
+        resetShop();
+        await dropShopTags(ctx);
+      }
+      return true;
+    case 'set-inv-on':
+      // 진행 중 소지품 켬/끔 (2026-11-07 사용자): 물건 목록·기록은 지우지 않는다(다시 켜면 끈 때 그대로).
+      // 끄면 「다음 메시지에 사용」을 비우고 상점 방문을 닫는다. 다시 켜면 첫 응답 전까지 [Inventory] 에 「그 사이 변화는 목록에 없다」를 붙인다
+      if (v !== '1' && v !== '0') return true;
+      await save(ctx, env, (chat): ScriptState | null => {
+        if (invOn(chat.scriptstate) === (v === '1')) return null;
+        return v === '0'
+          ? { [ITEM_ON_VAR]: '0', [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [SHOP_VAR]: '', [ITEM_RESUMED_VAR]: '' }
+          : { [ITEM_ON_VAR]: '1', [ITEM_RESUMED_VAR]: (chat.message ?? []).length ? String((chat.message ?? []).length) : '' };
+      });
+      if (v === '0') {
+        resetShop();
+        await dropShopTags(ctx);
+      }
       return true;
     case 'set-items-push':
     case 'set-items-auto': {

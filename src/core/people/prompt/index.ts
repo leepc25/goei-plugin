@@ -3,5 +3,8 @@ import { UPDATER_DETAILED } from './detailed';
 import { UPDATER_COMPACT } from './compact';
 import type { PeopleSettings } from '../settings';
 
-export const promptFor = (s: PeopleSettings): string => (s.prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED);
+import { guideText } from '../../guides';
+
+/** 요청에 쓰는 갱신기 지침: 설정 → 지침의 「인물 기록 갱신기」(고친 글, 없으면 기본 = UPDATER_*) */
+export const promptFor = (s: PeopleSettings): string => guideText(s.prompt === 'compact' ? 'UpdaterCompact' : 'Updater').replace(/\n$/, '');
 export { UPDATER_DETAILED, UPDATER_COMPACT };

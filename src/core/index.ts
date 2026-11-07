@@ -40,5 +40,6 @@ export * from './texthash';
 export * from './tokenizer';
 export * from './wallet';
 export * from './items';
+export * from './startitems';
 export * from './shop';
 export * from './journal';

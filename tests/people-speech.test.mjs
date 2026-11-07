@@ -64,7 +64,7 @@ test('설정: register_variety/change/sign_limit, 기능 register 끄면 off, �
   assert.ok(/own judgment/.test(Sp.speechVarietyBlock(St.peopleSettings({ $pp_register_variety: 'two', $pp_register_sign_limit: '1' }), 'writer')));
   assert.ok(/말투 변화 조짐/.test(Sp.speechVarietyBlock(s, 'director')));
   // 갱신기 지침에 덧붙음 (사용자 지침보다 앞), Director 자료의 register 지침 뒤에
-  const sys = U.assemblePrompt('# P\n<<USER_RULES>>', new Set(), '내 규칙', 'ko', {}, Sp.speechVarietyBlock(s, 'writer'));
+  const sys = U.assemblePrompt('# P\n<<USER_RULES>>', new Set(), '내 규칙', 'ko', Sp.speechVarietyBlock(s, 'writer'));
   assert.ok(sys.indexOf('Speech variety') < sys.indexOf('내 규칙'));
 });
 

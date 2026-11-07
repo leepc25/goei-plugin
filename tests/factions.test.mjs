@@ -158,3 +158,14 @@ test('v0.17 카드(🏷️Tag·📜Faction 로어북 없음): 플러그인 내�
   assert.equal(placeholdersReady([...lite, { comment: '🏷️Tag', content: TAG }]), false);
   assert.ok(factionList(withWalpurgis(lite)).some((f) => f.code === 'F00'), '시작 화면에 새 세력');
 });
+
+test('시작 묶음(이면의 주민들)은 세력이 아님: 묶음 표시(roster_for)는 요원풀에 안 들어가고, 소속은 그 인물 원 소속 (11-07 사용자)', () => {
+  const d = readDirectory(base());
+  const data = directoryData(d);
+  const code = Object.values(data['시작 묶음'] ?? {})[0]?.code;
+  assert.ok(code, '기본 명부에 시작 묶음이 있음');
+  data.요원.블라렛 = { ...data.요원.블라렛, affiliation: '교황청', roster_for: [code] };
+  const lore = withDirectory(base(), data);
+  const p = parseCatalog(lore).people.find((x) => x.name === '블라렛');
+  assert.ok(p && !p.rosterFor.includes(code), '묶음 코드는 요원풀 코드가 아님');
+});

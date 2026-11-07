@@ -3,7 +3,7 @@
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
 import { overrideCount } from '../../core/world/draft';
 import type { WorldOverrides } from '../../core/world/records';
-import type { WorldKind } from '../../core/world/schema';
+import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
 import { GUIDE_LABEL, type GuideName } from '../../core/guides';
 import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
@@ -17,14 +17,15 @@ import { bindDrawer, drawerHtml } from '../drawer';
 import { bindMbar } from '../mbar';
 import { rememberPanel } from '../panels';
 import editorCss from './style.css';
-import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
+import { recordCount, recordList, recordPage, recordAction, recordInput, recUi, rowsOf } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { startPage } from './start';
 import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
+import { callSummary } from './flow';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
-import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
@@ -42,7 +43,8 @@ export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:')
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
 export type Tab = 'set' | 'world' | 'guide' | 'manage';
 const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['world', '세계', ICONS.map], ['guide', '지침', ICONS.book], ['manage', '점검', ICONS.refresh]];
-export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : 'set');
+export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
+// 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
 const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : (n as EditorNode));
 
@@ -80,6 +82,8 @@ export const edUi = {
   last: {} as Partial<Record<Tab, EditorNode>>,
   /** 기능 탭 「설정 찾기」 칸에 적은 말 (2026-11-06 사용자 승인, 전수점검 8-10) */
   sq: '',
+  /** 세계 통합 검색 (2026-11-07 사용자: 종류마다 검색 말고 요원·조직·괴이·파밍·부록을 한 칸에서) */
+  wq: '',
 };
 
 let root: HTMLElement | null = null;
@@ -192,6 +196,12 @@ function ensureRoot(): HTMLElement {
       edUi.sq = el.value;
       const box = root?.querySelector('.gw-find-out');
       if (box) box.innerHTML = edUi.sq.trim() ? findResults(ctx ?? null) : treeGroups(treeCounts(ctx ?? null), featureState(ctx ?? null));
+      return;
+    }
+    if (name === 'ed-wq') {
+      edUi.wq = el.value;
+      const box = root?.querySelector('.gw-find-out');
+      if (box) box.innerHTML = edUi.wq.trim() ? worldFindResults(ctx ?? null) : treeGroups(treeCounts(ctx ?? null), featureState(ctx ?? null));
       return;
     }
     if (name === 'ed-q') {
@@ -369,10 +379,10 @@ const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Im
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
     case 'set': return [{ title: '기능', items: [
+      ['manage:flow', '호출 흐름', ICONS.swap],
       ...(['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki'] as SetPage[]).map(setItem),
-      // 소지품 메뉴(가계부 | 소지품, 2026-11-07)의 두 하위 탭
-      ['label:items', '소지품', ICONS.bag],
-      ...(['wallet', 'items', 'shop'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
+      // 가계부·소지품·상점은 한 페이지 「소지품」 (2026-11-07 사용자: 각자 설정이 적어 합침, 켜고 끄기는 따로)
+      setItem('items'),
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
       ...(['lore', 'adv'] as SetPage[]).map(setItem),
@@ -381,9 +391,10 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
-      { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image', 'Shop'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:log', '요청 기록', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -410,8 +421,7 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   people: { desc: '본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청이 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요.' },
   // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
   journal: { desc: '사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요.' },
-  wallet: { desc: '본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 시작 잔고와, 가계부에서 잔고를 직접 고칠 수 있게 할지를 여기서 정해요.', example: '' },
-  items: { desc: '지금 가진 물건·한계·이번 턴 사건을 본편 요청에 [Inventory] 글로 넣어 모델이 상황을 알고 응답에 반영하게 해요. 칸 수와 한계 문장, 보조 모델이 본문을 읽어 목록을 맞출지를 여기서 정해요.', example: '[Inventory] 3/16 · 소금 봉지 — 두 봉지 (괴이를 늦춤) · This turn: uses 소금 봉지' },
+  items: { desc: '가계부·소지품·상점을 한곳에서 정해요. 셋은 따로 켜고 끄고, 상점은 소지품과 가계부가 둘 다 켜져 있어야 써요. 소지품은 지금 가진 물건·한계·이번 턴 사건을 본편 요청에 [Inventory] 글로 넣어 모델이 응답에 반영하게 해요.', example: '[Inventory] 3/16 · 소금 봉지 — 두 봉지 (괴이를 늦춤) · This turn: uses 소금 봉지' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 아래 「로어북 확인」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
@@ -419,6 +429,8 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
 
 /** 설정 페이지: 패널 설정의 묶음을 그대로 (지침은 지침 탭) */
 function settingsPage(ctx: ChatContext, page: SetPage): string {
+  // 옛 자리(set:wallet · set:shop)는 합친 「소지품」 페이지로
+  if (page === 'wallet' || page === 'shop') page = 'items';
   const canChat = host?.canChat?.() ?? true;
   // 범위 칩(이 채팅 / 새 채팅 기본값)은 없다 (2026-10-29 사용자 결정, v0.16.23 설계로 복귀): 값은 늘 이 채팅, 시작 전에는 새 채팅 기본값을 바로 고친다.
   // 머리의 「기본값으로 저장」「기본값 불러오기」가 설정 전부를 한 번에 옮긴다
@@ -444,9 +456,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'people': body = feat('people'); break;
     // 기록 하위 메뉴 넷 (2026-11-05 사용자): 일지 · 가계부 · 인물 · 세력
     case 'journal': body = feat('journal'); break;
-    case 'wallet': body = sec('wallet'); break;
-    case 'items': body = sec('items'); break;
-    case 'shop': body = sec('shop'); break;
+    case 'items': body = sec('wallet') + sec('items') + sec('shop'); break;
     case 'factions': body = feat('factions'); break;
     case 'lore': body = sec('lore'); break;
     case 'adv': body = sec('adv'); break;
@@ -464,9 +474,11 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
   if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
+  // 인물 페이지는 맨 위에 자기 도식이 있으니 한 줄 요약은 겹친다
+  const calls = page === 'people' ? '' : callSummary(ctx, page);
   const lead = info
-    ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
-    : '</header>';
+    ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p>${calls}</header>`
+    : `${calls}</header>`;
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
     ${canChat ? mainDefaultsConfirm(ctx) : ''}
     ${settingsNotices()}
@@ -503,7 +515,7 @@ function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>
    각 설정 페이지를 그린 HTML에서 줄 이름·설명·묶음 제목을 모아 두고, 적은 말이 들어간 줄을 목록 자리에 보여 준다. 누르면 그 페이지로 가서 그 줄을 비춘다 */
 type FindHit = { page: SetPage; label: string; group: string; help: string };
 let findIndex: FindHit[] | null = null;
-const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'items', 'people', 'factions', 'lore', 'adv'];
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv'];
 const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 function buildFindIndex(ctx: ChatContext): FindHit[] {
   const out: FindHit[] = [];
@@ -556,13 +568,51 @@ function flashFound(hit: FindHit): void {
   setTimeout(() => row.classList.remove('gw-find-flash'), 2200);
 }
 
+/* 세계 통합 검색 (2026-11-07 사용자): 세계 탭 왼쪽 목록 위 칸 하나. 요원·조직·괴이·파밍·부록 이름·부제를 한꺼번에 찾고, 누르면 그 종류 화면에서 그 기록을 연다 */
+const WORLD_FIND_KINDS: WorldKind[] = ['agent', 'org', 'anomaly', 'site', 'appendix'];
+const WORLD_FIND_ICON: Record<WorldKind, string> = { agent: ICONS.person, org: ICONS.org, anomaly: ICONS.spook, site: ICONS.star, appendix: ICONS.book };
+function worldFindResults(ctx: ChatContext | null): string {
+  const q = findNorm(edUi.wq);
+  if (!ctx) return '<p class="gw-find-none">채팅 정보를 읽지 못했어요.</p>';
+  const over = overridesOf(ctx);
+  const d = directoryDraft(ctx);
+  // 요원은 소속·부서·직급으로도 찾는다 (「협회」로 그 소속 요원까지)
+  const more = (kind: WorldKind, name: string) => {
+    if (kind !== 'agent') return '';
+    const a = d.agents.find((x) => x.lore === name);
+    return a ? [a.affiliation, a.department, a.rank].filter(Boolean).join(' · ') : '';
+  };
+  const hits: { kind: WorldKind; name: string; sub: string; state: string; s: number }[] = [];
+  for (const kind of WORLD_FIND_KINDS) {
+    for (const r of rowsOf(ctx, kind, over)) {
+      const extra = more(kind, r.name);
+      const s = findNorm(r.name).includes(q) ? 0 : findNorm(r.sub).includes(q) ? 1 : extra && findNorm(extra).includes(q) ? 2 : -1;
+      if (s === 2) { hits.push({ kind, name: r.name, sub: extra, state: r.state, s }); continue; }
+      if (s >= 0) hits.push({ kind, name: r.name, sub: r.sub, state: r.state, s });
+    }
+  }
+  hits.sort((a, b) => a.s - b.s);
+  const top = hits.slice(0, 60);
+  if (!top.length) return '<p class="gw-find-none">맞는 기록이 없어요.</p>';
+  const st = (x: string) => (x === 'deleted' ? ' (지움)' : x === 'new' ? ' (추가)' : x === 'edited' ? ' (고침)' : '');
+  return `<div class="gw-tree-group gw-find-res"><h4>찾은 기록 ${hits.length}개${hits.length > top.length ? ` (앞 ${top.length}개)` : ''}</h4>${top
+    .map((h) => `<button class="gw-tree-item gw-find-hit" data-action="ed-goto" data-value="${esc(`${h.kind}|${h.name}`)}">${WORLD_FIND_ICON[h.kind]}<span><b>${esc(h.name)}</b><small>${esc(WORLD_KIND_LABEL[h.kind])}${h.sub ? ` · ${esc(h.sub)}` : ''}${st(h.state)}</small></span></button>`)
+    .join('')}</div>`;
+}
+
 function tree(ctx: ChatContext | null): string {
   const counts = treeCounts(ctx);
   const on = featureState(ctx);
   const tab = tabOf(edUi.node);
-  const find = tab === 'set' ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">` : '';
+  const find = tab === 'set'
+    ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">`
+    : tab === 'world'
+      ? `<input class="gw-find" type="search" data-input="ed-wq" value="${esc(edUi.wq)}" placeholder="세계 검색 (요원·조직·괴이·파밍·부록)" aria-label="세계 검색" autocomplete="off">`
+      : '';
   if (tab === 'set' && edUi.sq.trim()) return `${find}<div class="gw-find-out">${findResults(ctx)}</div>`;
-  return find + (tab === 'set' ? '<div class="gw-find-out">' : '') + treeGroups(counts, on) + (tab === 'set' ? '</div>' : '');
+  if (tab === 'world' && edUi.wq.trim()) return `${find}<div class="gw-find-out">${worldFindResults(ctx)}</div>`;
+  const wrap = tab === 'set' || tab === 'world';
+  return find + (wrap ? '<div class="gw-find-out">' : '') + treeGroups(counts, on) + (wrap ? '</div>' : '');
 }
 
 function treeGroups(counts: Partial<Record<EditorNode, number>>, on: Partial<Record<EditorNode, boolean>>): string {
@@ -633,7 +683,7 @@ export function render(): void {
   const confirm = edUi.confirm
     ? `<div class="gw-confirm"><div class="gw-confirm-box"><p>${edUi.confirm === 'close' ? '고친 것이 저장되지 않았어요. 저장하지 않고 닫을까요?' : '고친 것을 전부 버리고 카드에 저장된 값으로 되돌릴까요?'}</p>
         <div class="gx-row-btns"><button class="gx-mini danger" data-action="${edUi.confirm === 'close' ? 'ed-close-force' : 'ed-revert-force'}">${edUi.confirm === 'close' ? '저장 안 하고 닫기' : '고친 것 버리기'}</button><button class="gx-mini" data-action="ed-confirm-no">취소</button></div></div></div>`
-    : '';
+    : tabOf(edUi.node) === 'set' ? mainDefaultsPopup() : '';
   const tab = tabOf(edUi.node);
   edUi.last[tab] = edUi.node;
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
@@ -852,7 +902,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('man-')) {
-    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true)) render();
+    if (await manageAction(action, root, ctx, host?.canChat?.() ?? true, value)) render();
     return;
   }
   if (action.startsWith('ed-rule-')) {

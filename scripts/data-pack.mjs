@@ -2,7 +2,7 @@
 // 따로 받는 팩으로 만든다. 글 하나(JSON) → 200KB 조각(goei-data-<이름>.N.txt) + 목록(goei-data-<이름>.json).
 // 본체에는 팩의 지문(hash·sha256·length)만 박혀 있어(scripts/build.mjs define) 자기와 맞는 자료만 쓴다.
 // 빌드(scripts/build.mjs)와 시험 초기화(tests/data-init.mjs)가 같은 함수로 같은 글을 만든다.
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const ROOT = new URL('../', import.meta.url);
@@ -12,6 +12,8 @@ export const WORLD_PACK_NAME = 'goei-data-world';
 export const INSTALL_PACK_NAME = 'goei-data-install';
 /** 소지품 그림 팩 (2026-11-07): game-src/items/icons.json 매칭 표 + icons/*.png (85×85, 배경 없음) base64. 소지품 메뉴를 처음 열 때 받아 저장소에 둔다 (host/itemicons.ts) */
 export const ITEMS_PACK_NAME = 'goei-data-items';
+/** 내 모습 팩 (2026-11-07 사용자): 필드 인물 126명의 정면 대기 동작(game-pack/char-N/50.webp, 장마다 cw×ch 로 잘린 가로 줄) + 줄 측정값. 시작 패널 「내 모습」·소지품 인물 자리가 처음 그릴 때 받아 저장소에 둔다 (host/looks.ts) */
+export const LOOKS_PACK_NAME = 'goei-data-looks';
 /** 조각 하나의 상한 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다. 본체 조각과 같은 200KB) */
 export const PART_BYTES = 200_000;
 
@@ -71,6 +73,43 @@ export function itemsPackText() {
   const icons = {};
   for (const f of [...files].sort()) icons[f] = readFileSync(new URL(`game-src/items/icons/${f}`, ROOT)).toString('base64');
   return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
+}
+
+/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, n, w, h, cw, ch, ox, oy, sec?, img}] }.
+ *  id = 인물 팩 번호(char-6.54 → '6.54'). 고유 인물(char-1~5)은 명부 이름(cfg.name)으로 찾는다.
+ *  맨 앞에는 페르소나 전용 아바타(game-src/looks/<이름>/look.json + 시트, 사용자가 PixelLab에서 만든 것, id 7.N).
+ *  성별 g: 일반 NPC(char-6)만 필드 신상표(src/game/world/mobProfiles.json sex). 고유 인물은 고르는 창이 안 열려 성별이 필요 없다('').
+ *  img = 정면 대기 줄(A['50'], 남쪽을 봄) 시트 base64 webp. src/core/looks.ts parseLooksPack 이 읽는 모양 */
+export function looksPackText() {
+  const dir = new URL('game-pack/', ROOT);
+  const ids = readdirSync(dir)
+    .filter((d) => /^char-\d+\.\d+$/.test(d))
+    .sort((a, b) => {
+      const [a1, a2] = a.slice(5).split('.').map(Number);
+      const [b1, b2] = b.slice(5).split('.').map(Number);
+      return a1 - b1 || a2 - b2;
+    });
+  const profiles = readJson('src/game/world/mobProfiles.json');
+  const looks = [];
+  const own = new URL('game-src/looks/', ROOT);
+  const persona = readdirSync(own)
+    .map((d) => ({ d, j: readJson(`game-src/looks/${d}/look.json`) }))
+    .sort((a, b) => Number(a.j.id.split('.')[1]) - Number(b.j.id.split('.')[1]));
+  for (const { d, j } of persona) {
+    looks.push({ id: j.id, name: j.name, g: j.g, unique: false, n: j.n, w: j.w, h: j.h, cw: j.cw, ch: j.ch, ox: j.ox, oy: j.oy, sec: j.sec, img: readFileSync(new URL(`game-src/looks/${d}/${j.file}`, ROOT)).toString('base64') });
+  }
+  for (const d of ids) {
+    const j = readJson(`game-pack/${d}/char.json`);
+    const m = j.A?.['50'];
+    if (!m || typeof m.file !== 'string') continue;
+    const name = String(j.cfg?.name ?? '');
+    const id = d.slice(5);
+    const unique = !id.startsWith('6.');
+    const sex = unique ? '' : profiles[name]?.sex;
+    const g = sex === '남' || sex === '여' ? sex : '';
+    looks.push({ id, name, g, unique, n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
+  }
+  return JSON.stringify({ schema: 1, kind: 'looks', looks });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */

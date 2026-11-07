@@ -1,7 +1,7 @@
 // 보고서 → 공유용 이미지 카드 한 장 (docs/설계안_기록_보고서.md 5-9절, 시안 Card.dc.html). 세로 900×1200.
 // 여기는 순수 그리기: 캔버스 2D 의 아주 작은 부분집합(PaintCtx)만 쓰므로 node 시험에서 가짜 ctx 로 호출 순서·배치를 검사할 수 있다.
 // DOM(캔버스 만들기·글꼴 기다리기·그림 읽기·내려받기)은 ui/reportpng.ts.
-// 세로 예산 (전체 보고서, 요원 2명·경과 6줄·결과 3줄·소감 2줄): 머리 52 · 그림 188 · 제목 90 · 타일 84 · 경과 ≤192 · 요원 ≤84 · 결과 ≤106 · 소감 ≤84 · 인물|가계부 두 열 ≤140 → 1068 ≤ 1088 (바닥글 자리 전)
+// 세로 예산 (전체 보고서, 요원 2명·경과 6줄·결과 3줄): 머리 52 · 그림 188 · 제목 90 · 타일 84 · 경과 ≤192 · 요원 ≤84 · 결과 ≤106 · 인물|가계부 두 열 ≤140 → 984 ≤ 1088 (바닥글 자리 전)
 import { locName } from '../world/geo';
 import { journalClock } from './line';
 import { JOURNAL_KIND_LABEL, type Report } from './types';
@@ -333,20 +333,6 @@ export function paintReport(g: PaintCtx, r: Report, o: PaintOpts): PaintResult {
     }
     y += 8;
     sections.push('result');
-  }
-
-  // 소감 (있을 때만, 2줄)
-  if (r.debrief && room(HEAD_H + LH)) {
-    heading(`${r.debrief.who} 소감`);
-    y += HEAD_H;
-    g.font = `400 14px ${sans}`;
-    for (const line of wrapText(g, r.debrief.text, W, 2)) {
-      if (!room(LH)) break;
-      text(g, line, PAD, y, { size: 14, color: c.sub, family: sans });
-      y += LH;
-    }
-    y += 8;
-    sections.push('debrief');
   }
 
   // 인물 기록 변화 | 가계부 (전체 보고서만, 두 열)

@@ -16,6 +16,7 @@ import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu'
 import { imageUrl, picAvatar } from './images';
 import { ICONS } from './icons';
 import { stUi } from './editor/start';
+import { parseStartItems, START_ITEM_COLUMNS, startItemsText } from '../core/startitems';
 
 export interface DirectoryEnv {
   render: () => void;
@@ -160,8 +161,8 @@ function tabsOf(d: Directory, lore: ChatContext['char']['globalLore']) {
   return tabs;
 }
 
-const area = (key: string, value: string, label: string, help = '') =>
-  `<label class="dir-in"><span>${label}</span><textarea data-input="dir" data-key="${esc(key)}" rows="3">${esc(value)}</textarea>${help ? `<small>${help}</small>` : ''}</label>`;
+const area = (key: string, value: string, label: string, help = '', rows = 3) =>
+  `<label class="dir-in"><span>${label}</span><textarea data-input="dir" data-key="${esc(key)}" rows="${rows}">${esc(value)}</textarea>${help ? `<small>${help}</small>` : ''}</label>`;
 
 /** 로어북 이름 → 들어 있는 폴더(이모지 포함)와, 요원 폴더면 구분선 이름 (예: 🙂요원 · 개체) */
 const SEP = /^\s*-{2,}\s*(.*?)\s*-{2,}\s*$/;
@@ -391,6 +392,7 @@ export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string 
     ${input(k('english'), a.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
     ${photoBlock(a.lore, ctx)}
     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
+    ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
   </div>`;
 }
@@ -893,7 +895,11 @@ export function directoryInput(key: string, value: string, bar: Element | null):
   const row = findRow(d, key.slice(at + 1)) as (PlaceRow & AgentRow) | undefined;
   if (!row) return;
   if (field === 'aliases') row.aliases = splitList(value);
-  else if (field === 'label') row.label = value.trim() || row.lore;
+  else if (field === 'items') {
+    const items = parseStartItems(value);
+    if (items.length) row.startItems = items;
+    else delete row.startItems;
+  } else if (field === 'label') row.label = value.trim() || row.lore;
   else if (field === 'english' || field === 'rank' || field === 'department' || field === 'affiliation') row[field] = value.trim();
   else return;
   dirUi.done = '';

@@ -35,7 +35,7 @@ const MAX_SIDE = 720;
 /** 얼굴로 자른 사진의 한 변 (작은 사진이라 이 정도면 충분) */
 const FACE_SIDE = 256;
 /** crop: 얼굴 틀 [가로 중심, 세로 중심, 한 변(그림 너비 대비)] % */
-async function shrink(url: string, crop: [number, number, number] | null = null): Promise<string> {
+async function shrink(url: string, crop: [number, number, number] | null = null, tall = 1): Promise<string> {
   try {
     const im = new Image();
     im.src = url;
@@ -49,6 +49,8 @@ async function shrink(url: string, crop: [number, number, number] | null = null)
       sx = Math.min(W - side, Math.max(0, (crop[0] / 100) * W - side / 2));
       sy = Math.min(H - side, Math.max(0, (crop[1] / 100) * H - side / 2));
       sw = sh = side;
+      // 아래로만 늘림: 위·폭은 얼굴 틀 그대로, 그림 바닥까지만
+      if (tall > 1) sh = Math.max(side, Math.min(H - sy, side * tall));
     }
     const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
     if (!crop && !(scale < 1)) return url;
@@ -73,9 +75,9 @@ export function imageUrl(char: CharacterSnapshot, pic: string | undefined): stri
   const hit = urls.get(key);
   if (hit === undefined) {
     urls.set(key, 'loading');
-    const { name, crop } = splitPic(pic);
+    const { name, crop, tall } = splitPic(pic);
     void assetUrl(char, name).then(async (raw) => {
-      const url = raw ? await shrink(raw, crop) : null;
+      const url = raw ? await shrink(raw, crop, tall) : null;
       urls.set(key, url);
       if (url) schedule();
     });

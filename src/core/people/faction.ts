@@ -7,7 +7,7 @@ import { factionCodesIn, ORG_NAMES } from './identity';
 import type { PeopleSettings } from './settings';
 import { FACTION_STAGES, factionWho, type Change, type FactionStage, type PeopleStore } from './types';
 
-export interface FactionNow { code: string; name: string; value: number; stage: FactionStage; base: number }
+export interface FactionNow { code: string; name: string; value: number; stage: FactionStage; base: number; /** 정성 모드: 마지막 판단의 이유 */ note?: string }
 
 /** 유저 소속 코드 (상태창 신분 → 채팅 변수) */
 export function userFactionOf(store: PeopleStore, chat: { scriptstate?: Record<string, unknown> }): string {
@@ -26,7 +26,9 @@ export const factionName = (code: string, names: Record<string, string> = {}, st
 export function factionNow(store: PeopleStore, code: string, changes: Change[], userFaction: string, settings: PeopleSettings, names: Record<string, string> = {}): FactionNow {
   const base = factionBase(code, userFaction);
   const v = factionView(code, base, changes, store.folded[factionWho(code)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
-  return { code, name: factionName(code, names, store), value: v.value, stage: v.stage, base };
+  // 정성 모드: 갱신기 판단(단계 고정)의 이유를 함께. 수치 모드에서는 숫자가 말해 주므로 없음
+  const note = settings.factionQual ? [...changes].reverse().find((c) => c.who === factionWho(code) && c.kind === 'cue' && c.pin !== undefined)?.reason : undefined;
+  return { code, name: factionName(code, names, store), value: v.value, stage: v.stage, base, ...(note ? { note } : {}) };
 }
 
 /** 장면 세력: 장면 인물의 소속 ∪ 글에 이름이 나온 세력. 유저 자신의 소속도 포함 (자기 조직의 평판) */
@@ -40,9 +42,16 @@ export function sceneFactionCodes(store: PeopleStore, people: string[], texts: s
 
 /** 본편에 넣을 세력 절: 중립은 생략. 비어 있으면 '' */
 export function factionsBlock(list: FactionNow[], user = '{{user}}'): string {
-  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}`);
+  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}${f.note ? ` (why: ${f.note})` : ''}`);
   if (!lines.length) return '';
   return ['## Factions → ' + user + ' (standing of each organization toward ' + user + ', kept by the system; members act accordingly)', ...lines].join('\n');
 }
 
 export const stageLabel = (id: FactionStage['id']) => FACTION_STAGES[id].label;
+
+/** 정성 모드에서 단계를 고를 때 안에 넣는 대표값 (구간 한가운데). 숫자는 화면에 안 보이고 필드 몹 반응·본편 주입은 단계로 간다 */
+export function stageMid(id: FactionStage['id'], bounds: readonly number[]): number {
+  const [a, b, c, d] = bounds;
+  const mid = (lo: number, hi: number) => Math.round((lo + hi) / 2);
+  return id === 'friendly' ? mid(a, 100) : id === 'favorable' ? mid(b, a - 1) : id === 'neutral' ? mid(c, b - 1) : id === 'wary' ? mid(d, c - 1) : mid(-100, d - 1);
+}

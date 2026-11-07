@@ -1,0 +1,18 @@
+{
+ "id": "7.2",
+ "name": "페르소나남A",
+ "g": "남",
+ "pixellab_id": "9cb911fe-dbcc-4d3c-8398-dfc777391847",
+ "pixellab_name": "Persona Male A. Adult Korean",
+ "animation": "Idle (v3:idle breathing, south)",
+ "n": 8,
+ "w": 128,
+ "h": 256,
+ "cw": 74,
+ "ch": 242,
+ "ox": 27,
+ "oy": 8,
+ "sec": 0.3,
+ "file": "idle_south.webp",
+ "note": "사용자가 PixelLab에서 만든 페르소나 아바타 (2026-11-08 받음). 프레임 캔버스 256×256 → 128 칸 기준 ox 는 -64"
+}
