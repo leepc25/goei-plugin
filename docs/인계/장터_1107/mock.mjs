@@ -10,6 +10,8 @@ const icons = Object.fromEntries([...readFileSync(new URL('../../../src/ui/icons
 const ic = (k, w = 1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${icons[k]}</svg>`;
 const won = (n) => `₩ ${n.toLocaleString('ko-KR')}`;
 const wonc = (n) => `₩${n.toLocaleString('ko-KR')}`;
+// 칸용 짧은 표기: 「12만 원」「8만 5천 원」「1,500원」 (가계부 parseWon이 읽는 꼴)
+const wonShort = (n) => { if (n < 10000) return `${n.toLocaleString('ko-KR')}원`; const man = Math.floor(n / 10000), chon = Math.round((n % 10000) / 1000); return `${man.toLocaleString('ko-KR')}만${chon ? ` ${chon}천` : ''} 원`; };
 const BAL = 184000;
 const SHOP = '을지로 철물점';
 // 모델이 창작한 진열대 흉내: 이름·종류·값·재고·설명·효과. 그림은 이름으로 매칭된 것
@@ -32,7 +34,7 @@ const amt = (n, cls = '') => `<em class="sh-amt${cls ? ' ' + cls : ''}">${won(n)
 const cell = (it, i, sel) => {
   const [p, name, , price] = it;
   const poor = price > BAL;
-  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><span class="sh-band">${won(price)}</span>${tip(it)}</button>`;
+  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><span class="sh-band">${wonShort(price)}</span>${tip(it)}</button>`;
 };
 const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kind}</span>재고 ${stock}</small>`;
 const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
@@ -80,8 +82,8 @@ const css = `
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
 .sh-q{position:relative;display:inline-flex;width:300px}.sh-q .gx-wt-q{width:100%;max-width:none;margin:0;padding:0 38px 0 12px}.sh-go{position:absolute;right:4px;top:4px;width:calc(var(--h) - 8px);height:calc(var(--h) - 8px);border:0;border-radius:var(--ri);background:var(--accent-bg);color:var(--signal);font:700 14px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
-.sh-c b{font-size:13px;padding-top:7px}
-.sh-band{display:block;padding:3px 0 4px;color:var(--text);font:600 13px/1.2 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-c b{font-size:13.5px;padding-top:7px;color:var(--text)}
+.sh-band{display:block;padding:3px 0 5px;color:var(--signal);font:600 12.5px/1.2 inherit;font-family:inherit;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 .sh-c.poor .sh-band{color:var(--red)}
 /* 말풍선: 제목 14 · 메타 12.5 · 금액 14 · 글 13/1.5 */
 .sh-grid .it-tip{display:none;width:260px;padding:12px}.sh-grid .it-c.tipon .it-tip{display:block}.sh-grid .it-tip b{font-size:14px;margin-bottom:6px}.sh-grid .it-tip .sh-amt{display:inline-block;margin-top:8px}.sh-grid .it-tip p{font-size:13px;line-height:1.5;margin-top:8px}
@@ -98,7 +100,7 @@ const css = `
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:flex-start;padding:14px 14px 96px}.sh-card{width:100%;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}
 .it-right{display:contents}.sh-bal{order:1}.it-right .it-act{order:2;margin-left:auto;flex:none}.sh-q{order:3;width:100%;flex:1 1 100%}.sh-go{top:4px}
-.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:12.5px;letter-spacing:-.02em}.sh-ph .it-ic{width:96px;height:96px}
+.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-band{font-size:12px}.sh-ph .it-ic{width:96px;height:96px}
 .sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/장터_초안/';
 for (const vp of ['pc', 'phone']) {
