@@ -98,7 +98,7 @@ export function shopPopup(ctx: ChatContext): string {
     <span class="sh-name">${ICONS.bag}<b>${esc(st.shop)}</b></span>
     <span class="it-cnt sh-bal" title="잔고">${esc(formatWon(bal))}</span>
     <span class="it-right">
-      ${phone ? '' : `<button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="판매">${ICONS.swap}<span>판매</span></button>`}
+      ${phone ? '' : `<button class="it-act" data-action="shop-pick" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="${shopUi.pick ? '구매' : '판매'}">${ICONS.swap}<span>${shopUi.pick ? '구매' : '판매'}</span></button>`}
       <button class="it-act" data-action="shop-refresh" ${shopUi.loading || st.closed ? 'disabled' : ''} aria-label="새로고침">${ICONS.refresh}<span>새로고침</span></button>
       ${phone ? '' : `<button class="it-act sh-x" data-action="shop-close" aria-label="닫기">${ICONS.close}</button>`}
     </span>
@@ -112,7 +112,7 @@ export function shopPopup(ctx: ChatContext): string {
   let inner: string;
   if (phone) {
     const foot = `<div class="sh-foot">
-      <button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="판매">${ICONS.swap}<span>판매</span></button>
+      <button class="it-act" data-action="shop-pick" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="${shopUi.pick ? '구매' : '판매'}">${ICONS.swap}<span>${shopUi.pick ? '구매' : '판매'}</span></button>
       <button class="it-act${shopUi.drawer ? ' on' : ''}" data-action="shop-drawer" aria-pressed="${shopUi.drawer}" aria-label="주인에게 말하기">${ICONS.person}<span>문의</span></button>
       <button class="it-act sh-close" data-action="shop-close" aria-label="닫기">${ICONS.close}<span>닫기</span></button>
     </div>`;
@@ -173,7 +173,7 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
 function pickHtml(ctx: ChatContext, st: ShopState): string {
   const mine = liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat);
   // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
-  const head = `<header class="sh-zh"><b>소지품</b><small>${mine.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small><button class="gx-chip" data-action="shop-pick">진열대로</button></header>`;
+  const head = `<header class="sh-zh"><b>소지품</b><small>${mine.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small></header>`;
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : '<p class="gx-wt-empty">팔 만한 소지품이 없어요.</p>';
   return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
 }

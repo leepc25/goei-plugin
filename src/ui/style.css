@@ -3376,7 +3376,6 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 /* 팔 것 고르기 머리 줄 */
 .sh-shelf.sh-pick { min-height: inherit; } /* 판매로 바꿔도 창 높이 그대로: 소지품 상자가 그 높이를 채움 */
 .sh-pick > .sh-mine { flex: 1 1 auto; }
-.sh-mine .sh-zh .gx-chip { margin-left: auto; min-height: 26px; font-size: 12.5px; }
 .sh-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--sub); }
 .sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
 /* 진열대 설명창: 칸 안에서 열어 창 밖으로 안 나가게 — 왼쪽 3칸은 오른쪽으로, 오른쪽 3칸은 왼쪽으로 펼친다 (가로 스크롤 방지, 2026-11-07 사용자) */
