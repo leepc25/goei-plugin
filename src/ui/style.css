@@ -3099,6 +3099,7 @@ button.gx-cr-row { cursor: pointer; } button.gx-cr-row:hover { border-color: var
 .gx-jr-pin svg { width: 13px; height: 13px; }
 /* 가계부 거래 줄: 카드 한 장씩, 금액은 고정폭 */
 .gx-wt-row { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gx-wt-row:last-child { border-bottom: 1px solid var(--line); } /* 줄이 저마다 카드라 마지막 줄 아래 선도 있어야 (2026-11-07 사용자: 테두리 잘림) */
 .gx-wt-row .gx-wt-main { padding: 10px 14px; }
 .gx-wt-amt b { font-family: var(--mono); font-size: 15px; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
@@ -3198,7 +3199,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 6px 6px 5px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: center; cursor: pointer; }
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
-.it-c .it-ic img { width: 84%; height: 84%; object-fit: contain; image-rendering: pixelated; }
+.it-c .it-ic img { width: 85px; height: 85px; max-width: 86%; max-height: 86%; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 줄인다 */
 .it-ph .it-ic img, .it-pickrow .it-ic img { width: 86%; height: 86%; object-fit: contain; image-rendering: pixelated; }
 .it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
 .it-c b { padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -3215,8 +3216,12 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-tip p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
 .it-tip .ef { color: var(--text); }
 @media (pointer: fine) { .it-c:not(.empty):hover .it-tip { display: block; } }
-.it-log .gx-wt-row { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.it-log .gx-wt-main { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 14px; }
+.it-log { list-style: none; margin: 0; padding: 0; } /* ul 기본 들여쓰기 없음 (2026-11-07 사용자) */
+.it-log .gx-wt-row { grid-template-columns: minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.it-log .gx-wt-main { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 14px 8px 10px; cursor: default; }
+.it-log .it-ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
+.it-log .it-ic svg { width: 24px; height: 24px; }
+.it-log .it-ic img { width: 34px; height: 34px; object-fit: contain; image-rendering: pixelated; }
 /* 팝업 */
 .it-card { align-items: stretch; width: 380px; gap: 0; padding: 16px; }
 .it-ph { display: flex; gap: 10px; align-items: center; padding-right: 30px; }

@@ -12,6 +12,8 @@ import {
   addItem, ITEM_USE_AT_VAR, itemKindLabel, ITEM_KINDS, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems, readItemUse, readItems, removeItem, searchItems, updateItem,
   type Item, type ItemLog, type Items,
 } from '../core/items';
+import { findStatusTags } from '../core/world/status';
+import { messageKey } from '../core/people/store';
 import { drawerBox, drawerHtml } from './drawer';
 import { ICONS } from './icons';
 import { ITEM_ICONS } from './itemIcons';
@@ -54,11 +56,36 @@ function itemPic(it: Item): string {
 }
 
 const FROM_NAME: Record<Item['from'], string> = { store: '상점', story: '본문', manual: '직접' };
-const dateOf = (iso: string) => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  return m ? `${m[2]}-${m[3]}` : '';
+
+/** 기준 메시지 → 그때 상태창 날짜·시각 (RP 시간, 가계부 datesOf 와 같은 셈). 2026-11-07 사용자: 현실 날짜가 아니라 RP 날짜·시각을 보여야 한다 */
+interface When { at: Map<string, string>; last: string }
+function whenOf(ctx: ChatContext): When {
+  const at = new Map<string, string>();
+  let cur = '';
+  (ctx.chat.message ?? []).forEach((m, i) => {
+    const tags = findStatusTags(String((m as { data?: unknown }).data ?? ''));
+    if (tags.length) {
+      const t = tags[tags.length - 1];
+      const d = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(t.date ?? '');
+      const date = d ? `${d[1]}.${d[2].padStart(2, '0')}.${d[3].padStart(2, '0')}` : (t.date ?? '').trim();
+      const next = [date, (t.time ?? '').trim()].filter(Boolean).join(' ');
+      if (next) cur = next;
+    }
+    at.set(messageKey(m, i), cur);
+  });
+  return { at, last: cur };
+}
+/** 현실 시각 (KST) — 상태창이 없는 채팅에서만 */
+const realOf = (iso: string) => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? '';
+  return `${g('year')}.${g('month')}.${g('day')} ${g('hour')}:${g('minute')}`;
 };
-const sourceLine = (it: Item) => [itemKindLabel(it.kind), FROM_NAME[it.from], dateOf(it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price!.toLocaleString('en-US')}` : ''].filter(Boolean).join(' · ');
+/** 줄의 때: 기준 메시지의 RP 날짜·시각 → 없으면(직접 넣기·버리기) 마지막 RP 시각 → 상태창이 없으면 현실 시각 */
+const whenLabel = (w: When, anchor: string, iso: string) => (anchor ? w.at.get(anchor) : '') || w.last || realOf(iso);
+const sourceLine = (it: Item, w: When) => [itemKindLabel(it.kind), FROM_NAME[it.from], whenLabel(w, it.anchor, it.at), Number.isSafeInteger(it.price) ? `₩ ${it.price!.toLocaleString('en-US')}` : ''].filter(Boolean).join(' · ');
 
 // ── 화면 ──
 
@@ -109,13 +136,14 @@ export function gridHtml(ctx: ChatContext): string {
   const all = liveOf(ctx);
   const list = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).items : all;
   if (q && !list.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
-  const cells = list.map((it, i) => cell(it, !q && i >= slots));
+  const w = whenOf(ctx);
+  const cells = list.map((it, i) => cell(it, !q && i >= slots, w));
   if (!q) for (let i = list.length; i < slots; i++) cells.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
   return `<div class="it-grid">${cells.join('')}</div>`;
 }
 
-function cell(it: Item, over: boolean): string {
-  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(sourceLine(it))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}</span>`;
+function cell(it: Item, over: boolean, w: When): string {
+  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(sourceLine(it, w))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}</span>`;
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}" data-action="items-open" data-value="${esc(it.id)}" aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${tip}</button>`;
 }
 
@@ -127,7 +155,13 @@ function logList(ctx: ChatContext): string {
   const q = itemsUi.q.trim();
   const rows = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).log : itemsOf(ctx).log.slice().reverse();
   if (!rows.length) return `<p class="gx-wt-empty">${q ? '맞는 기록이 없어요.' : '아직 사용·처분 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요.'}</p>`;
-  return `<ul class="gx-wt-list it-log">${rows.map((l) => `<li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>${esc(l.name)} ${WHAT[l.what] ?? l.what}</b><small>${esc([BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · '))}</small></span><span class="gx-wt-amt"><small>${esc(dateOf(l.at))}</small></span></div></li>`).join('')}</ul>`;
+  const w = whenOf(ctx);
+  // 줄 앞 물건 그림 (2026-11-07 사용자): 기록 줄의 종류로 찾고, 옛 줄(종류 없음)은 이름만으로
+  const pic = (l: ItemLog) => {
+    const u = itemIconUrl(l.name, l.kind ?? 'misc');
+    return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[l.kind ?? 'misc'];
+  };
+  return `<ul class="gx-wt-list it-log">${rows.map((l) => `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} ${WHAT[l.what] ?? l.what}</b><small>${esc([BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · '))}</small></span><span class="gx-wt-amt"><small>${esc(whenLabel(w, l.anchor, l.at))}</small></span></div></li>`).join('')}</ul>`;
 }
 
 // ── 팝업 ──
@@ -141,7 +175,7 @@ function popup(ctx: ChatContext): string {
   if (itemsUi.mode === 'merge') return shell('합치기', mergePick(ctx, it));
   const use = readItemUse(ctx.chat.scriptstate);
   const queued = use.some((n) => n === it.name);
-  const body = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc(it.name)}</b><small>${esc(sourceLine(it))}</small></div></div>
+  const body = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc(it.name)}</b><small>${esc(sourceLine(it, whenOf(ctx)))}</small></div></div>
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}
     ${it.quote ? `<p class="qt">근거 「${esc(it.quote)}」</p>` : ''}
@@ -172,8 +206,9 @@ function form(it: Item | null): string {
 /** 합칠 상대 고르기: 지금 물건이 남고 고른 물건이 그 줄로 들어간다 (이름이 달라도 된다) */
 function mergePick(ctx: ChatContext, keep: Item): string {
   const others = liveOf(ctx).filter((x) => x.id !== keep.id);
+  const w = whenOf(ctx);
   return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc(keep.name)}</b><small>이 물건에 합칠 상대를 고르세요. 상대 칸은 빠지고 설명은 뒤에 붙어요.</small></div></div>
-    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc(o.name)}</b><small>${esc(o.desc || sourceLine(o))}</small></span></button></li>`).join('')}</ul>
+    <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc(o.name)}</b><small>${esc(o.desc || sourceLine(o, w))}</small></span></button></li>`).join('')}</ul>
     <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
 }
 

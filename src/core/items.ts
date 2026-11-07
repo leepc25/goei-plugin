@@ -81,6 +81,8 @@ export interface ItemLog {
   anchor: string;
   quote?: string;
   note?: string;
+  /** 물건 종류 (그림 찾기용, 2026-11-07). 옛 줄엔 없다 */
+  kind?: ItemKind;
   at: string;
 }
 
@@ -194,7 +196,7 @@ const logId = (what: string, anchor: string, name: string, n: number) => `l_${ha
 export function addItemLog(it: Items, l: Omit<ItemLog, 'id' | 'at'> & { id?: string; at?: string }): Items {
   const id = l.id ?? logId(l.what, l.anchor, l.name, it.log.length);
   if (it.log.some((x) => x.id === id)) return it;
-  const row: ItemLog = { ...l, id, name: clean(l.name, 30), at: l.at ?? new Date().toISOString(), ...(l.quote ? { quote: clean(l.quote, 120) } : {}), ...(l.note ? { note: clean(l.note, 60) } : {}) };
+  const row: ItemLog = { ...l, id, name: clean(l.name, 30), at: l.at ?? new Date().toISOString(), ...(l.quote ? { quote: clean(l.quote, 120) } : {}), ...(l.note ? { note: clean(l.note, 60) } : {}), ...(l.kind ? { kind: itemKind(l.kind) } : {}) };
   return { ...it, log: [...it.log, row].slice(-400) };
 }
 
@@ -202,7 +204,7 @@ export function addItemLog(it: Items, l: Omit<ItemLog, 'id' | 'at'> & { id?: str
 export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLogBy, anchor = '', extra: { quote?: string; note?: string } = {}): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;
-  return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, { name: cur.name, what, by, anchor, ...extra });
+  return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, { name: cur.name, kind: cur.kind, what, by, anchor, ...extra });
 }
 
 /** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 설명은 「남는 설명 / 상대 설명」, 근거는 둘 다.
@@ -223,7 +225,7 @@ export function mergeItems(it: Items, keepId: string, otherId: string, name?: st
     from: keep.anchor && other.anchor ? keep.from : 'manual',
   };
   const list = it.list.filter((x) => x.id !== otherId).map((x) => (x.id === keepId ? merged : x));
-  return addItemLog({ ...it, list }, { name: other.name, what: 'merge', by: 'manual', anchor: '', note: `${merged.name}와 합침` });
+  return addItemLog({ ...it, list }, { name: other.name, kind: other.kind, what: 'merge', by: 'manual', anchor: '', note: `${merged.name}와 합침` });
 }
 
 /** 칸 수 설정 (8~40, 기본 16) */
@@ -305,6 +307,32 @@ export function lastBotKey(chat: Chat): string {
   return '';
 }
 
+/** 사용 뒤 보고가 없으면 없어진 것으로 보는 종류 (한 번 쓰면 닳는 것). 도구·무기·기기는 남는다 */
+export const CONSUMED_KINDS: ReadonlySet<ItemKind> = new Set<ItemKind>(['consumable', 'food', 'medical']);
+
+/** 이 응답들에서 「사용」 단추로 쓴 물건 (기록 what=use). 보조 모델 자료 used_now 와 보고 없을 때 정리에 쓴다 */
+export function usedItemsAt(it: Items, anchors: string[]): { name: string; anchor: string }[] {
+  const set = new Set(anchors.filter(Boolean));
+  return it.log.filter((l) => l.what === 'use' && l.by === 'use' && set.has(l.anchor)).map((l) => ({ name: l.name, anchor: l.anchor }));
+}
+
+/**
+ * 「사용」했는데 보조 모델이 아무 변화도 보고하지 않은 물건: 닳는 종류(CONSUMED_KINDS)면 목록에서 뺀다 (2026-11-07 사용자: 사용했는데 소지품에 그대로 남음).
+ * 도구·무기처럼 남는 종류는 그대로 둔다. reported = 이번 보고에 들어 있던 이름
+ */
+export function settleUsedItems(it: Items, alive: Set<string>, used: { name: string; anchor: string }[], reported: Iterable<string>): Items {
+  const done = new Set([...reported].map(normName));
+  let out = it;
+  for (const u of used) {
+    if (done.has(normName(u.name))) continue;
+    const cur = liveItems(out, alive).find((e) => sameItemName(e.name, u.name));
+    if (!cur || !CONSUMED_KINDS.has(cur.kind)) continue;
+    out = removeItem(out, cur.id, 'gone', 'use', u.anchor, { note: '사용해서 없어짐' });
+    done.add(normName(u.name));
+  }
+  return out;
+}
+
 /** 이번 요청에 넘길 「사용」 목록: 아직 안 보냈거나(at 비어 있음), 보낸 턴을 다시 굴리는 중일 때(at = 지금 마지막 유저 키) */
 export function pendingItemUse(vars: Record<string, unknown> | undefined, userKey: string): string[] {
   const at = typeof vars?.[ITEM_USE_AT_VAR] === 'string' ? (vars[ITEM_USE_AT_VAR] as string) : '';
@@ -362,7 +390,7 @@ export function settleItemUse(chat: Chat, responseIndex: number): Record<string,
   for (const n of names) {
     if (it.log.some((l) => l.what === 'use' && l.anchor === anchor && sameItemName(l.name, n))) continue;
     const item = liveItems(it, alive).find((e) => sameItemName(e.name, n));
-    it = addItemLog(it, { name: item?.name ?? n, what: 'use', by: 'use', anchor });
+    it = addItemLog(it, { name: item?.name ?? n, ...(item ? { kind: item.kind } : {}), what: 'use', by: 'use', anchor });
   }
   if (it === it0 && at === userKey) return null;
   return { ...(it === it0 ? {} : itemsVars(it)), [ITEM_USE_AT_VAR]: userKey };

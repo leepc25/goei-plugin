@@ -82,6 +82,8 @@ export interface UpdateInput {
   ended: EndedNow[];
   /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
   items: string[] | null;
+  /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
+  used: { name: string; anchor: string }[];
 }
 
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 모델에는 큰 종류(kind)만 준다 */
@@ -167,6 +169,8 @@ export interface BuildOpts {
   memory?: string[];
   /** 소지품 (설정 「보조 모델이 읽기」 켬): 지금 목록. 없거나 null 이면 소지품 절 없음 */
   items?: ItemNow[] | null;
+  /** 이 묶음 응답에서 「사용」 단추로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 반드시 gone 이나 update 로 답하게 한다 */
+  used?: { name: string; anchor: string }[];
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
@@ -318,9 +322,10 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     // 소지품 (2026-11-07 core/items.ts): 지금 목록 + 종류 표. 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
     items_now: o.items ? o.items.map((e) => ({ name: e.name, state: e.desc || undefined, kind: e.kind })) : undefined,
     item_kinds: o.items ? ITEM_KIND_IDS.join(' | ') : undefined,
+    used_now: o.items && o.used?.length ? o.used.map((u) => u.name) : undefined,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length, items: !!o.items },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [], items: o.items ? o.items.map((e) => e.name) : null };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [], items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
 }
 
 // ── 지침 조립 ──
@@ -1240,7 +1245,10 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('items', t, '모르는 action');
         continue;
       }
-      const ev = evidence(str(t.m), str(t.quote));
+      // 「사용」한 물건(used_now)은 인용이 없어도 그 응답을 기준으로 받는다 (프로그램이 이미 아는 사실)
+      const usedAt = (input.used ?? []).find((u) => sameItemName(u.name, name));
+      const ev0 = evidence(str(t.m), str(t.quote));
+      const ev = typeof ev0 === 'string' && usedAt ? { anchor: usedAt.anchor, index: -1 } : ev0;
       if (typeof ev === 'string') {
         drop('items', t, ev);
         continue;

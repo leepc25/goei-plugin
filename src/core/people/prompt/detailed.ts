@@ -444,6 +444,7 @@ export const UPDATER_DETAILED: string = [
   "- `new`: the user's character obtains, buys, picks up, is handed, or takes something and keeps it. Not an object merely seen or described, not another person's belongings, not clothes already worn or everyday things only mentioned in passing.",
   "- `update`: a listed item's state changes — partly used, damaged, lent out, now worn, refilled. Copy the listed `name` exactly; `desc` is the new state in words.",
   "- `gone`: a listed item is used up, lost, destroyed, given away, or thrown away. Copy the listed `name` exactly.",
+  "- `used_now` (when present) lists items the user's character used this turn through the inventory; the program already knows they were used. For EVERY name in `used_now` return exactly one entry: `gone` if the use consumes it (eaten, drunk, applied, burnt, spent, single-use), or `update` with the remaining state in `desc` if it survives use (a tool, device, weapon, garment, or a multi-dose/multi-piece item with some left). Never leave a `used_now` item unreported.",
   "- `name` Korean ≤30. `desc` Korean ≤80: amount and condition in words (never a count such as ×3). `kind` one of `item_kinds`. `effect` Korean ≤60 only when the text states what the item does; otherwise null. Cite `m` and a verbatim `quote`.",
   "- At most 4 items per response; one entry per item; never invent an item or an effect.",
   "- Money is never an item: cash, bills, coins, cheques, gift certificates with a face value, and account balances belong to the ledger (`transactions`), not to `items`.",

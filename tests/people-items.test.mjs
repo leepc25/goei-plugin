@@ -83,3 +83,28 @@ test('검사: 인용·확정 구간, update·gone 은 목록 이름만, new 가 
   const parsed = U.parseUpdate('{"items":[{"name":"x","action":"new","m":"m4","quote":"q"}]}');
   assert.equal(parsed.items.length, 1);
 });
+
+// 2026-11-07 사용자: 「사용」했는데 소지품에 그대로 남음 → used_now 자료 + 인용 없이도 받기 + 보고 없으면 닳는 종류는 뺌
+test('used_now: 자료에 들어가고, 그 물건은 인용 없이도 받으며, 보고 없는 닳는 종류는 settleUsedItems 가 뺀다', async () => {
+  const s = settings();
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  const used = [{ name: '소금 봉지', anchor: 'c2' }, { name: '부적', anchor: 'c2' }];
+  const input = U.buildUpdate(c, store, [3], { settings: s, system: 'S', values: {}, names, items: itemsNow, used });
+  assert.deepEqual(input.data.used_now, ['소금 봉지', '부적']);
+  assert.deepEqual(input.used, used);
+  for (const text of [P.UPDATER_DETAILED, P.UPDATER_COMPACT]) assert.ok(U.assemblePrompt(text, new Set(['items'])).includes('used_now'));
+  const rep = U.applyUpdate(store, c, input, { items: [{ name: '부적', action: 'update', desc: '귀퉁이가 탔다', m: 'm4', quote: '' }] }, { settings: s, items: true });
+  assert.deepEqual(rep.items.map((e) => [e.anchor, e.name, e.action]), [['c2', '부적', 'update']], '사용한 물건은 인용 없어도 그 응답 기준으로');
+  const I = await import('../dist-test/core.mjs');
+  let it = { list: [], log: [] };
+  const alive = new Set(['c1', 'c2']);
+  it = I.addItem(it, alive, { name: '소금 봉지', desc: '두 봉지', kind: 'consumable', from: 'story', anchor: 'c1' });
+  it = I.addItem(it, alive, { name: '부적', kind: 'charm', from: 'story', anchor: 'c1' });
+  it = I.addItem(it, alive, { name: '손전등', kind: 'tool', from: 'manual', anchor: '' });
+  const next = I.settleUsedItems(it, alive, [...used, { name: '손전등', anchor: 'c2' }], rep.items.map((e) => e.name));
+  assert.deepEqual(I.liveItems(next, alive).map((e) => e.name), ['부적', '손전등'], '보고된 부적·남는 종류 손전등은 그대로, 소모품 소금은 빠짐');
+  const g = next.log.find((l) => l.what === 'gone');
+  assert.equal(g.name, '소금 봉지'); assert.equal(g.by, 'use'); assert.equal(g.anchor, 'c2'); assert.equal(g.kind, 'consumable');
+  assert.deepEqual(I.usedItemsAt(next, ['c2']), [], '사용 기록(what=use)은 settleItemUse 가 남기는 것이라 여기선 없음');
+});
