@@ -1613,7 +1613,9 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
+  // 묶음(이면의 주민들 등)은 세력이 아니라 시작 칸일 뿐: 소속은 고른 인물의 원 소속($ib_affiliation, 로어북·명부 기준) (11-07 사용자)
+  const aff = f?.group ? String(ctx.chat.scriptstate?.['$ib_affiliation'] ?? '').trim() : '';
+  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? (f.group ? (aff && aff !== f.name ? aff : '') : selfName(ctx, f.code, f.name)) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
   const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
   return `<div class="gx-id">${bg}
       ${photo}
