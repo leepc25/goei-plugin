@@ -18,6 +18,7 @@ const HELP: Record<GuideName, string> = {
   Directive: '요원 이동·커스텀 임무 때 모델에 주는 장면 지시문. COMMON·OPENING·CONTINUATION·CONTEXT·FORMAT(JSON) 절.',
   RP: '카드 description 에 있던 RP 지침(세계 설정·진행 원칙). 요청 맨 앞 로어 덩어리에 들어가요. 카드 description 에 「## RP Guidance」가 남아 있으면 넣지 않아요.',
   Tag: '상황판 태그 지침(괴이·사건·거점 출력 규칙). 상태창 절은 `{status_section}` 자리에 설정 「상황판 → 상태창 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
+  Shop: '상점 지침: 진열대 짜기·주인 대화·판매 값·본편 상점 표식. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{kinds}·{price}·{prev} 자리는 플러그인이 채워요.',
 };
 
 export function guidePage(name: GuideName, crumb = ''): string {

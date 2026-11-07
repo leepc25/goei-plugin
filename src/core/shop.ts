@@ -15,6 +15,7 @@ import { messageKey } from './people/store';
 import { parseWon } from './wallet';
 import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
 import { genSettings } from './advanced';
+import { fillGuide, guideSections } from './guides';
 
 export const SHOP_VAR = '$st_shop';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars) */
@@ -592,37 +593,25 @@ export interface ShopSource {
 
 const kindsLine = () => ITEM_KINDS.map((k) => `${k.id} (${k.label}: ${k.hint})`).join(', ');
 
-const SYSTEM_COMMON =
-  'You run a shop inside an ongoing Korean urban-horror roleplay (서울의 이면, 괴이). You are the application backend for the shop screen, not the narrator: ' +
-  'you only decide what is on the shelf and what the shop owner says. The protagonist is the player. Write everything in Korean unless told otherwise. ' +
-  'Prices are in Korean won as plain integers. Never mention the player\'s money or inventory (you do not know them). Do not write anything outside the required blocks.';
+// 지침 글은 플러그인 내장 지침 「Shop」(src/data/guides/shop.txt, 설정 → 지침 → 상점에서 고침). 여기는 절을 골라 자리만 채운다 (2026-11-07 사용자: 지침은 전부 지침 메뉴에서)
+const G = () => guideSections('Shop');
 
-const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
+const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState) => {
   const r = s.size;
+  const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: SHOP_LINE, kinds: kindsLine(), price: s.price, prev: st.prev.join(', ') };
   return [
-    `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: ${SHOP_LINE}. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
-    s.feature
-      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost far more than the rest, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (원래값 = the usual price as an integer) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
-      : '구분: always leave it empty.',
-    'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
-    s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
-    s.price ? `Price guide from the player: ${s.price}` : 'Prices should feel like real Korean prices for that kind of shop.',
-    'Price each item by its own worth and this shop\'s character (who the owner is, what the place is, how it gets its goods) — a piece may cost far more or less than the rest when it warrants. No program checks the prices.',
-    s.avoidPrev && st.prev.length ? `Previously shown here (do not repeat): ${st.prev.join(', ')}` : '',
+    fillGuide(g.SHELF, v),
+    fillGuide(s.feature ? g.SHELF_FEATURE : g.SHELF_PLAIN, v),
+    fillGuide(g.STOCK, v),
+    s.diverse ? fillGuide(g.VARIETY, v) : '',
+    fillGuide(s.price ? g.PRICE_GUIDE : g.PRICE_DEFAULT, v),
+    fillGuide(g.PRICING, v),
+    s.avoidPrev && st.prev.length ? fillGuide(g.AVOID_PREV, v) : '',
   ].filter(Boolean).join('\n');
 };
 
-const IDENTITY_FORMAT =
-  '<shop-identity>\nsells: comma-separated 종류 ids this shop sells (subset of the list above)\nnever: what this shop does not and will not sell (one line)\nprices: this shop\'s price character in one line, from who runs it and what the place is\n</shop-identity>';
-
-export const SHOP_THOUGHTS =
-  '1. What kind of place is this shop, who runs it, what does the scene say about it?\n2. What would really be on its shelf right now (season, district, events going on)?\n3. Which of those fit the required kinds; pick a varied set within the size limit.\n4. Owner\'s first line: in character, short, no exposition.';
-
-const TALK_THOUGHTS =
-  '1. What did the player actually say or want (question, request, haggling, chat)?\n2. Given this owner\'s character and the shop identity, what is the honest reaction: answer only, fetch something, re-stock the whole shelf, lower a price, refuse, or end the dealing?\n3. Pick exactly one change mode. Only things within the shop identity may be added.\n4. Write the owner\'s line in character.';
-
-const SELL_THOUGHTS =
-  '1. What is the protagonist offering, and what did they say (a price? haggling? just showing it)?\n2. Would this shop buy such a thing at all (identity: what it sells, what it never deals in)? If not, refuse in character.\n3. If yes: what is this thing actually worth? Weigh it as a whole — what it is and how rare, its condition, its effect or uses, what it would fetch on this shop\'s own shelf (a rare or strange piece can be worth far more than ordinary stock), what the protagonist paid if known, and how much this owner wants it.\n4. From that worth, decide a fair buying price for this owner (a shop buys below what it would sell for; greedy or generous as the character is). React to the protagonist\'s figure honestly — accept, counter, or laugh it off.\n5. Write the owner\'s line with the figure, and the <offer>.';
+/** 진열대 생각 단계 (호출 흐름 미리 보기도 쓴다) */
+export const shopThoughts = (): string => fillGuide(G().THOUGHTS_SHELF, {});
 
 function material(src: ShopSource, s: ShopSettings): string {
   const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
@@ -645,17 +634,16 @@ const craft = (messages: CraftMessage[], s: ShopSettings, thoughts: string) => c
 /** 첫 호출(정체 + 진열대 + 주인 첫 대사) 또는 새로고침(진열대 + 한마디) */
 export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const first = !src.st.loaded;
+  const g = G();
   const system = [
-    SYSTEM_COMMON,
-    SHELF_RULES(s, src.st),
-    first
-      ? `First visit. Decide the shop's identity once from the scene and the owner's character; it will be fixed for the rest of this visit.\nOutput, in this order:\n${IDENTITY_FORMAT}\n<owner>\nthe owner's first line to the protagonist, in character, 1–3 sentences, Korean, no stage directions\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`
-      : `Re-stock: the identity is fixed; make a different shelf that still fits it. If [이번 방문 대화] is given, the owner remembers it: what the protagonist asked for or complained about, the mood between them. Let it shape the new goods and the owner's line.\nOutput, in this order:\n<owner>\none short line from the owner about the new goods (or empty)\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`,
+    fillGuide(g.COMMON, {}),
+    SHELF_RULES(g, s, src.st),
+    fillGuide(first ? g.FIRST : g.RESTOCK, { line: SHOP_LINE }),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
   // 새로고침: 이번 방문 대화 전부를 같이 (2026-11-07 사용자: 주인이 방금 나눈 말을 알고 새 물건·한마디를 내게)
   const talk = !first && src.st.talk.length ? `\n\n[이번 방문 대화]\n${src.st.talk.map((l) => `${l.who === 'me' ? '[주인공]' : '[주인]'} ${l.text}`).join('\n')}` : '';
-  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}${talk}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, SHOP_THOUGHTS);
+  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}${talk}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, fillGuide(g.THOUGHTS_SHELF, {}));
 }
 
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
@@ -664,34 +652,24 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${x.kind}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}`).join('\n') || '(empty)';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
-  const sellRule = o
-    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item\'s real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (a rare or strange piece may be worth far more than ordinary stock), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist\'s words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. ' +
-      'Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner\'s line too. The shelf change mode is normally none while selling.'
-    : '';
+  const g = G();
+  const v = { line: SHOP_LINE };
   const system = [
-    SYSTEM_COMMON,
-    'The protagonist speaks to the owner. Read what they mean from context — do not keyword-match. Decide the owner\'s reaction from the owner\'s character and the fixed shop identity. ' +
-    'Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then lower that item\'s price. ' +
-    'Requests for something not on the shelf: fetch it (partial add) only if it fits the shop identity; otherwise the owner says they do not carry it. ' +
-    'If the player wants a different selection, re-stock the whole shelf (all). Questions and small talk change nothing (none). ' +
-    (s.feature
-      ? 'Shelf lines end with 구분: 「희귀」 marks the one rare piece on display — the owner knows exactly what it is, where it came from and why it is special, and prizes it (discounts on it are rare and grudging). 「특가:N」 marks goods put out today below their usual price N — the owner knows why (재고 정리, 흠집, 유통기한 등) and can say so. When adding or re-stocking, keep 구분 the same way: at most one 희귀 on the shelf, 특가 only with the usual price. '
-      : 'Leave 구분 (the last column of a shelf line) empty. ') +
-    (s.kick ? 'If the owner has had enough (insults, endless haggling, trouble), they may end the dealing: say so in character and add <closed/>.' : 'The owner never ends the dealing; however annoyed, they keep the shop open (never output <closed/>).'),
-    sellRule,
-    `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ ${SHOP_LINE}" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (${SHOP_LINE}).\n</change>${o ? '\n<offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).' : ''}\n<closed/> only if the owner ends the dealing.`,
-    SHELF_RULES(s, st),
+    fillGuide(g.COMMON, v),
+    [fillGuide(g.TALK, v), fillGuide(s.feature ? g.TALK_FEATURE : g.TALK_PLAIN, v), fillGuide(s.kick ? g.KICK_ON : g.KICK_OFF, v)].filter(Boolean).join(' '),
+    o ? fillGuide(g.SELL, v) : '',
+    [fillGuide(g.TALK_OUTPUT, v), o ? fillGuide(g.TALK_OUTPUT_OFFER, v) : '', fillGuide(g.TALK_OUTPUT_END, v)].filter(Boolean).join('\n'),
+    SHELF_RULES(g, s, st),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
   const talk = st.talk.map((l) => `${l.who === 'me' ? '[주인공]' : '[주인]'} ${l.text}`).join('\n');
   const sales = st.sales.map((x) => `${x.name} (${x.price})`).join(', ');
   const selling = o ? `\n\n[팔려는 물건 — 주인공이 내민 것]\n${o.name}|${o.kind}|${o.desc || '-'}|${o.effect || '-'}${o.paid !== undefined ? `\n(bought earlier for ${o.paid} won)` : ''}${typeof o.price === 'number' ? `\n(your last offer: ${o.price} won)` : ''}` : '';
-  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[지금 진열대]\n${shelf}${sold ? `\n\n[이번 방문에 산 것]\n${sold}` : ''}${sales ? `\n\n[이번 방문에 주인이 산 것]\n${sales}` : ''}${selling}\n\n[이번 방문 대화 — 마지막 줄이 지금 한 말]\n${talk}` }], s, o ? SELL_THOUGHTS : TALK_THOUGHTS);
+  return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[지금 진열대]\n${shelf}${sold ? `\n\n[이번 방문에 산 것]\n${sold}` : ''}${sales ? `\n\n[이번 방문에 주인이 산 것]\n${sales}` : ''}${selling}\n\n[이번 방문 대화 — 마지막 줄이 지금 한 말]\n${talk}` }], s, fillGuide(o ? g.THOUGHTS_SELL : g.THOUGHTS_TALK, v));
 }
 
-/** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄) */
-export const SHOP_GUIDE =
-  'Shop tag: when the scene ends somewhere the protagonist could buy things from someone present (a store, stall, vendor, dealer), add one line after the status line: [shop: 가게 이름|주인 이름] (주인 이름 = the seller’s name exactly as already given in the story or the roster; if the seller has no name in the story, leave it empty — never invent a name or a description). Omit the tag when no trade is possible. Never list goods or prices yourself; the shop screen handles them.';
+/** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄). 지침 「상점」의 MAIN_TAG 절 */
+export const shopGuide = (): string => fillGuide(G().MAIN_TAG, {});
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;
 export const kindLabel = itemKindLabel;

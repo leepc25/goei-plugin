@@ -392,7 +392,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
-      { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image', 'Shop'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
     case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
   }

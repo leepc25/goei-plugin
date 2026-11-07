@@ -7,10 +7,11 @@ import wiki from '../data/guides/wiki.txt';
 import directive from '../data/guides/directive.txt';
 import rp from '../data/guides/rp.txt';
 import tag from '../data/guides/tag.txt';
+import shop from '../data/guides/shop.txt';
 
-export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그' };
+export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점' };
 
 const DEFAULTS: Record<GuideName, string> = {
   GNet: gnet.replace(/\r/g, ''),
@@ -19,6 +20,7 @@ const DEFAULTS: Record<GuideName, string> = {
   Directive: directive.replace(/\r/g, ''),
   RP: rp.replace(/\r/g, ''),
   Tag: tag.replace(/\r/g, ''),
+  Shop: shop.replace(/\r/g, ''),
 };
 
 const overrides = new Map<GuideName, string>();
@@ -129,3 +131,14 @@ export function guidePrompt(name: GuideName): string {
   parts[i] = { ...parts[i], body: `${parts[i].body}\n\n${rules}` };
   return joinGuide(parts);
 }
+
+/** 지침의 @@SECTION 절들 (고친 글 + 내가 추가한 규칙 반영). 상점처럼 로어북 없이 플러그인 지침만 쓰는 곳 */
+export function guideSections(name: GuideName): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const m of guidePrompt(name).matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out[m[1].trim()] = m[2];
+  return out;
+}
+
+/** 절 글의 {이름} 자리를 채운다. 모르는 이름은 그대로 둔다 */
+export const fillGuide = (text: string | undefined, vars: Record<string, string>): string =>
+  String(text ?? '').replace(/\{([a-z_]+)\}/g, (all, k: string) => (k in vars ? vars[k] : all)).trim();

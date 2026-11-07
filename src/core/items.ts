@@ -7,7 +7,7 @@ import type { Chat } from './types';
 import { aliveAnchors } from './wallet';
 import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
-import { shopEvents, shopOn, SHOP_GUIDE } from './shop';
+import { shopEvents, shopOn, shopGuide } from './shop';
 
 export const ITEMS_VAR = '$st_items';
 /** 「사용」 상자: 다음 보낼 때 본편에 넘길 물건 이름들 (JSON 배열). 보내면 비운다 */
@@ -356,7 +356,7 @@ export function inventoryText(chat: Chat): string {
     events: shop ? shopEvents(chat) : [],
     always: shop,
   });
-  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${SHOP_GUIDE}` : ''}` : '';
+  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${shopGuide()}` : ''}` : '';
 }
 
 /** 요청: [Inventory] 글을 마지막 유저 메시지 앞에 system 으로 넣는다 (상태창 블록과 같은 자리). 이미 있으면 그대로 */
