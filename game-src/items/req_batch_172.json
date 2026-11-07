@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "질",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human vaginal canal organ, pink muscular tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "림프절",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small human lymph nodes, pale bean-shaped lumps with thin vessels, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대동맥",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human aorta, a thick red curved artery with branches, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "후두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human larynx, pale cartilage voice box, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성대",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human vocal cords seen from above, pale pink folds, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "간",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human liver organ, large dark red-brown lobed organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈비찜",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of braised Korean short ribs with carrots and chestnuts in brown sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고사리나물",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of brown seasoned fern stems Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콩자반",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of glossy black braised beans Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컵과일",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear plastic cup of mixed fruit pieces with a lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시체 가방",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black body bag with a zipper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "김발",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled bamboo sushi mat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "그물총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld net launcher gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 불꽃 초",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white candle burning with a pitch black flame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 렌즈 안경",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of glasses with pitch black void lenses Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "저승사자 명부",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ledger book with a red seal stamp, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

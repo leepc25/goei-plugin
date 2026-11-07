@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유방",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single human female breast tissue mound, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human nose, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시신경 달린 눈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human eyeball with a long optic nerve trailing behind, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "척수",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human spinal cord, a long pale cord with nerve roots, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신경 다발",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of pale yellow human nerve fibers, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부신",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human adrenal glands, small yellow triangular organs, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쭈꾸미볶음",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heap of small spicy red stir-fried baby octopus Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멸치볶음",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of tiny glossy stir-fried anchovies with almonds Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다시마",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few sheets of dried kelp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해삼",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark spiky sea cucumber Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "칠판 지우개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a felt blackboard eraser with chalk dust Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철가방",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver metal Korean food delivery box with a handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카메라 렌즈",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black camera lens Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 염주",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a string of prayer beads made of human teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사람 얼굴 나방 표본",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pinned moth specimen with a human face pattern on its wings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혀 내민 편지 봉투",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an envelope with a wet tongue sticking out of the flap Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
