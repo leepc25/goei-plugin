@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "axes", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -136,6 +136,9 @@ export const UPDATER_DETAILED: string = [
   "- **Observations (`observations`)**: you never move an axis. For an existing baseline, return an observation only for a plausible persistent change that appears independently in confirmed roleplay: `axis` (one of the six, or `pattern` for a change that is better said in words), `direction` (`up`/`down` for an axis, `new`/`weaken` for a pattern), `pattern` (Korean ≤120: what persistent change this points to, phrased the same way each time so repeated observations group together), `reason` (Korean ≤100: what was seen in this span), `strength` and `confidence` 0–100, `m`, `quote`. Ordinary compliance with a Director plan, a temporary reaction, one mood, intoxication, a crisis, or one target-specific affinity change is not personality evidence. Never predict the new value: the program groups observations by axis, direction and pattern, needs at least four across at least three different messages with mean confidence ≥55, and then asks the user to approve before anything changes. At most 2 observations per person per response; none is the normal answer.",
   "- `patterns` are long-term changes the user already approved; treat them as part of the personality and do not propose them again.",
   "<<END:axes>>",
+  "<<SECTION:sexual>>",
+  "<<SEXUAL_RULES>>",
+  "<<END:sexual>>",
   "<<SECTION:affinity>>",
   "## 7. Affinity and taste (feeling of a person toward the user's character)",
   "",
@@ -503,8 +506,11 @@ export const UPDATER_DETAILED: string = [
   "  \"text\":\"<Korean ≤200 chars or null for remove>\",\"target\":\"<name|@user|null>\",\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
   "<<SECTION:axes>>",
   " \"axes_init\":[{\"who\":\"<name with axes_init_needed>\",\"axes\":{\"relationalInitiative\":50,\"expressionDirectness\":50,\"emotionalExpressiveness\":50,\"guardedness\":50,\"impulsivity\":50,\"relationshipPersistence\":50},\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
-  " \"observations\":[{\"who\":\"<name>\",\"axis\":\"<axis name|pattern>\",\"direction\":\"up|down|new|weaken\",\"pattern\":\"<Korean ≤120>\",\"reason\":\"<Korean ≤100>\",\"strength\":<0..100>,\"confidence\":<0..100>,\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
+  " \"observations\":[{\"who\":\"<name>\",\"axis\":\"<axis name|pattern|sexual_desire|paraphilia>\",\"direction\":\"up|down|new|weaken|replace\",\"pattern\":\"<Korean ≤120; ≤700 for a sexual axis>\",\"reason\":\"<Korean ≤100>\",\"strength\":<0..100>,\"confidence\":<0..100>,\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
   "<<END:axes>>",
+  "<<SECTION:sexual>>",
+  " \"sexual_init\":[{\"who\":\"<name whose sexual.init_needed lists the field>\",\"sexual_desire\":\"<Korean ≤700, <추정>…, 미확인, or omit>\",\"paraphilia\":\"<Korean ≤700, <추정>…, 미확인, or omit>\",\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
+  "<<END:sexual>>",
   "<<SECTION:affinity_num>>",
   " \"cues\":[{\"who\":\"<name>\",\"cue\":\"<cue name>\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤40 chars>\"}],",
   "<<END:affinity_num>>",

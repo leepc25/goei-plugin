@@ -10,6 +10,7 @@ import { KNOWLEDGE_RULE, personBlock, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import { speechVarietyBlock } from './speech';
+import { SEXUAL_DIRECTOR_POLICY, SEXUAL_POLICY, sexualAnyOn, sexualTexts } from './sexual';
 import type { PeopleSettings } from './settings';
 import { SLOT_META, slotsFor, type PeopleStore, type SlotId } from './types';
 
@@ -108,6 +109,8 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       address: addressOf(p, changes),
       express: p.express,
       ...(s.directorFeatures && s.features.has('axes') ? { axes: axesLinesEn(p.axes), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
+      // 성적 욕망·이상성욕 (원본 director people_profile: text + policy sexual_context_only)
+      ...(() => { const t = sexualTexts(p, s); return { ...(t.desire ? { sexual_desire: { text: t.desire, policy: SEXUAL_POLICY } } : {}), ...(t.paraphilia ? { paraphilia: { text: t.paraphilia, policy: SEXUAL_POLICY } } : {}) }; })(),
       record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
       state: slot('state'),
       threads: slot('threads'),
@@ -120,7 +123,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const rhythm = s.directorFeatures && s.features.has('rhythm')
     ? Object.values(store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })))
     : [];
-  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f], ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : [])]) : [];
+  const guides = s.directorFeatures ? GUIDE_ORDER.filter((f) => (s.features as Set<string>).has(f)).flatMap((f) => ['', ...FEATURE_GUIDE[f], ...(f === 'register' && speechVarietyBlock(s, 'director') ? [speechVarietyBlock(s, 'director')] : []), ...(f === 'axes' && sexualAnyOn(s) ? [`\`sexual_desire\` / \`paraphilia\` on a person are that person's sexual profile. ${SEXUAL_DIRECTOR_POLICY}`] : [])]) : [];
   // 기본 지침은 사용자가 덮어쓸 수 있다 (리수폿 J-1). 기능별 절·검색·출력 계약은 그대로
   const base = s.directorPrompt ? [s.directorPrompt] : [...SYSTEM_FACTS, ...(s.director === 'scene' ? SYSTEM_SCENE : [])];
   const system = [...base, ...guides, '', ...(s.directorSearch ? SYSTEM_SEARCH : []), OUTPUT, s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']

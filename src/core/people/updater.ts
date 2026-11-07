@@ -6,6 +6,7 @@ import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { SPEECH_ENTRY_CHARS, applySpeechSign, parseSpeechMarker, speechVariety } from './speech';
+import { SEXUAL_FIELDS, SEXUAL_AXIS_OF, explicitOn, isSexualAxis, sexualAnyOn, sexualFieldOn, sexualGlobal, setSexualText } from './sexual';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
@@ -100,7 +101,7 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string> } = {}) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string>; sexual?: PeopleSettings } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
   for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
@@ -119,6 +120,16 @@ export function personPayload(p: Person, live: Liveness, changes: Change[], unkn
     ...(extra.openness && !extra.qual?.has('openness') ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
     // 성격 6축 (기능 axes): 값·띠 설명, 아직 시작값이 없으면 axes_init_needed, 장기 변화
     ...(extra.axes ? { axes: axesView(p.axes).map((a) => ({ axis: a.axis, value: a.value, band: a.band })), ...(p.axesFrom === 'default' ? { axes_init_needed: true } : {}), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
+    // 성적 욕망·이상성욕 (sexual.ts): 이 인물이 쓰는 칸만, 현재 글(없으면 null), 아직 빈 칸(init_needed), 어휘 방식
+    ...(extra.sexual && sexualAnyOn(extra.sexual) ? (() => {
+      const on = SEXUAL_FIELDS.filter((f) => sexualFieldOn(p, f, extra.sexual!));
+      if (!on.length) return {};
+      const sx: Record<string, unknown> = { fields: on.map((f) => SEXUAL_AXIS_OF[f]), explicit_style: explicitOn(p, extra.sexual!) };
+      const need: string[] = [];
+      for (const f of on) { const t = p.sexual?.[f]?.text?.trim() || null; sx[SEXUAL_AXIS_OF[f]] = t; if (!t) need.push(SEXUAL_AXIS_OF[f]); }
+      if (need.length) sx.init_needed = need;
+      return { sexual: sx };
+    })() : {}),
     entries,
     ...(unknown?.length ? { unknown_to: unknown } : {}),
   };
@@ -261,7 +272,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     ...(o.hints?.length ? { name_hints: o.hints.filter((h) => !store.people[h.name]).slice(0, 4) } : {}),
@@ -288,6 +299,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     wallet_now: typeof o.wallet === 'number' ? { balance: o.wallet, unit: 'KRW' } : undefined,
     // 소감 (core/journal/debrief): 이 묶음에서 종료된 사건이 있을 때만
     ended_now: o.ended?.length ? o.ended : undefined,
+    ...(sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: 'sexual_context_only' } } : {}),
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
   };
@@ -319,7 +331,7 @@ export function overrideSections(text: string, overrides: Record<string, string>
   return out;
 }
 
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}, extra = ''): string {
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}, extra = '', sexualRules = ''): string {
   // extra: 설정으로 켠 덧붙임 지침(말투 다변화 등). 사용자 지침보다 앞에 둔다 (원본 V3: 내장 규칙이 사용자 규칙 앞)
   const rules = [lang === 'en' ? LANG_EN_RULE : '', extra.trim(), userRules.trim()].filter(Boolean).join('\n\n').trim();
   const on = new Set(enabled);
@@ -331,7 +343,8 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
     prev = out;
     out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
   }
-  out = out.replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  // 성적 욕망·이상성욕 절 본문은 설정(켠 칸·발정모드)에 따라 조립된다 (sexual.ts sexualWriterSection)
+  out = out.replace('<<SEXUAL_RULES>>', () => sexualRules.trim()).replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
 }
@@ -342,6 +355,7 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   // 수치 모드·정성 모드 절 (리수폿 E): 기능이 켜져 있을 때 둘 중 하나만
   for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
   if (s.director === 'note') on.add('next_note');
+  if (sexualAnyOn(s)) on.add('sexual');
   return on;
 }
 
@@ -373,6 +387,8 @@ export interface UpdateResult {
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
   axes_init?: { who: string; axes: Record<string, number>; m: string; quote: string }[];
+  /** 성적 욕망·이상성욕 첫 글 (sexual.init_needed 인 칸만, 한 번). 그 뒤 변경은 observations 의 성적 축 */
+  sexual_init?: { who: string; sexual_desire?: string | null; paraphilia?: string | null; m: string; quote: string }[];
   /** 바꾸지 않은 이유·빠진 규칙 (원본 issues[]). 빈 답인지 「확인했는데 변화 없음」인지 가른다 (2026-11-07) */
   issues?: { code?: string; who?: string | null; reason?: string }[];
 }
@@ -388,7 +404,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'observations', 'axes_init', 'issues'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -398,7 +414,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number; sexualInit?: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -726,6 +742,27 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       setAxes(p, readAxes(raw), 'model');
       report.applied.axesInit++;
     }
+    // 성적 욕망·이상성욕 첫 글 (sexual.ts): 빈 칸에만, 전체·인물 둘 다 켜져 있을 때만. 그 뒤엔 관찰(성적 축) → 승인으로만 바뀐다
+    if (sexualAnyOn(ctx.settings)) {
+      report.applied.sexualInit = 0;
+      for (const x of r.sexual_init ?? []) {
+        const who = nameOf(str(x?.who));
+        if (!who) { drop('sexual_init', x, '명단에 없는 이름', str(x?.who)); continue; }
+        const ev = evidence(x.m, x.quote);
+        if (typeof ev === 'string') { drop('sexual_init', x, ev, who); continue; }
+        const p = store.people[who];
+        let wrote = 0;
+        for (const f of SEXUAL_FIELDS) {
+          const t = str((x as Record<string, unknown>)[SEXUAL_AXIS_OF[f]]);
+          if (!t) continue;
+          if (!sexualFieldOn(p, f, ctx.settings)) { drop('sexual_init', { who, field: SEXUAL_AXIS_OF[f] }, '꺼진 성적 칸', who); continue; }
+          if (p.sexual?.[f]?.text) { drop('sexual_init', { who, field: SEXUAL_AXIS_OF[f] }, '이미 글이 있음 (변경은 관찰로)', who); continue; }
+          setSexualText(p, f, t, now, false);
+          wrote++;
+        }
+        if (wrote) report.applied.sexualInit += wrote;
+      }
+    }
     const perWho = new Map<string, number>();
     for (const x of r.observations ?? []) {
       const who = nameOf(str(x?.who));
@@ -733,12 +770,17 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('observation', x, '명단에 없는 이름', str(x?.who));
         continue;
       }
-      const axis = x.axis === 'pattern' ? 'pattern' : isAxis(x.axis) ? x.axis : null;
+      const axis = x.axis === 'pattern' ? 'pattern' : isAxis(x.axis) || isSexualAxis(x.axis) ? x.axis : null;
       if (!axis) {
         drop('observation', x, '없는 축', who);
         continue;
       }
-      if (!isDirection(x.direction) || (axis === 'pattern' ? !['new', 'weaken'].includes(x.direction) : !['up', 'down'].includes(x.direction))) {
+      if (isSexualAxis(axis)) {
+        // 성적 축 (sexual.ts): 전체·인물 둘 다 켜져 있어야, 방향은 replace, pattern 은 바꿀 전체 글. 아직 첫 글이 없으면 sexual_init 으로
+        if (!sexualFieldOn(store.people[who], axis === 'sexual_desire' ? 'desire' : 'paraphilia', ctx.settings)) { drop('observation', x, '꺼진 성적 칸', who); continue; }
+        if (x.direction !== 'replace') { drop('observation', x, '성적 축의 방향은 replace', who); continue; }
+        if (!store.people[who].sexual?.[axis === 'sexual_desire' ? 'desire' : 'paraphilia']?.text) { drop('observation', x, '첫 글이 없음 (sexual_init 으로)', who); continue; }
+      } else if (!isDirection(x.direction) || (axis === 'pattern' ? !['new', 'weaken'].includes(x.direction) : !['up', 'down'].includes(x.direction))) {
         drop('observation', x, '방향은 축이면 up|down, pattern 이면 new|weaken', who);
         continue;
       }

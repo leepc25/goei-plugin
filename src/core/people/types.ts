@@ -190,7 +190,26 @@ export interface Person {
   candidates: Record<string, Candidate>;
   /** 관계 재검토(리수폿 G)를 마지막으로 요청한 턴. 20턴 무변화가 다시 쌓여야 또 요청 */
   reviewTurn?: number;
+  /** 성적 욕망·이상성욕 (리수폿 sexualDesire·paraphilia, 2026-11-07). core/people/sexual.ts */
+  sexual?: SexualProfile;
 }
+
+// ── 성적 욕망·이상성욕 (리수폿 원본 People profile 의 sexualDesire·paraphilia) ──
+export type SexualField = 'desire' | 'paraphilia';
+export type SexualAxis = 'sexual_desire' | 'paraphilia';
+export interface SexualRecord { text: string; at: string; manual?: boolean }
+export interface SexualProfile {
+  desire: SexualRecord;
+  paraphilia: SexualRecord;
+  /** 인물별 켬/끔 (원본 sexualDesireEnabled·paraphiliaEnabled, 기본 켬) */
+  desireOn: boolean;
+  paraphiliaOn: boolean;
+  /** 발정 버전 덮어쓰기: null = 전체 설정을 따름 (원본 explicitSexualStyleOverride) */
+  explicit: boolean | null;
+}
+export const SEXUAL_CHARS = 700;
+/** 성적 축 후보가 검토로 가는 조건 (원본: 관찰 6·장면 4·확신 75) */
+export const SEXUAL_READY = { evidence: 6, scenes: 4, confidence: 75 } as const;
 
 // ── 성격 6축 (리수폿 People profile, 2026-11-06 사용자 결정 「F」) ──
 export const AXES = ['relationalInitiative', 'expressionDirectness', 'emotionalExpressiveness', 'guardedness', 'impulsivity', 'relationshipPersistence'] as const;
@@ -235,13 +254,14 @@ export interface Observation {
   confidence: number;
   void?: boolean;
 }
-export type CandidateDirection = 'up' | 'down' | 'new' | 'weaken';
+/** replace = 성적 축(글 전체를 바꾸는 제안) */
+export type CandidateDirection = 'up' | 'down' | 'new' | 'weaken' | 'replace';
 export type CandidateStatus = 'collecting' | 'approved' | 'rejected' | 'reverted';
 /** 성격 변화 후보: 같은 축·방향·설명의 관찰 묶음. 살아 있는 관찰이 4개 이상·서로 다른 메시지 3개 이상·확신 평균 55 이상이면 검토 대상 */
 export interface Candidate {
   id: string;
-  /** 축 이름 또는 'pattern'(글로 적는 장기 변화) */
-  axis: Axis | 'pattern';
+  /** 축 이름, 'pattern'(글로 적는 장기 변화), 또는 성적 축 sexual_desire|paraphilia (글 전체 교체 제안) */
+  axis: Axis | 'pattern' | SexualAxis;
   direction: CandidateDirection;
   /** 변화의 설명 (한국어 ≤120). pattern 이면 장기 변화 본문 */
   pattern: string;
@@ -249,7 +269,7 @@ export interface Candidate {
   status: CandidateStatus;
   at: string;
   /** 승인 시 적용한 것 (되돌리기용) */
-  applied?: { axis: Axis; before: number; after: number } | { pattern: string; removed?: boolean };
+  applied?: { axis: Axis; before: number; after: number } | { pattern: string; removed?: boolean } | { sexual: SexualAxis; before: string; after: string };
 }
 export const CANDIDATE_READY = { evidence: 4, scenes: 3, confidence: 55 } as const;
 

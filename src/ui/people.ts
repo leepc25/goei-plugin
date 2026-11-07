@@ -17,11 +17,12 @@ import { UPDATER_SECTIONS } from '../core/people/prompt/detailed';
 import { DIRECTOR_BASE_TEXT } from '../core/people/director';
 import { ROUTER_SYSTEM } from '../core/people/router';
 import { decideSpeechPending, speechState } from '../core/people/speech';
+import { SEXUAL_FIELDS, SEXUAL_LABEL, SEXUAL_FIELD_OF, ensureSexual, explicitOn, isSexualAxis, setSexualText, sexualFieldOn, sexualGlobal } from '../core/people/sexual';
 import { undoLastRun } from '../core/people/store';
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, AXIS_LABEL, CORE_SLOTS, DOC_TYPES, FACTION_MAX, FACTION_MIN, FACTION_STAGES, FEATURE_SLOTS, REGISTERS, SLOTS, SLOT_META, STAGES, TASTE_STAGES, factionWho, opennessStage, slotsFor, stageOf, type Candidate, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, AXIS_LABEL, CORE_SLOTS, DOC_TYPES, FACTION_MAX, FACTION_MIN, FACTION_STAGES, FEATURE_SLOTS, REGISTERS, SLOTS, SLOT_META, STAGES, TASTE_STAGES, factionWho, opennessStage, slotsFor, stageOf, type Candidate, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SexualField, type SlotId, SEXUAL_CHARS } from '../core/people/types';
 import { approveCandidate, axesView, candidateStats, liveEvidence, rejectCandidate, revertCandidate } from '../core/people/axes';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
@@ -56,6 +57,9 @@ export const peopleUi = {
   addrTo: '',
   addrReg: '존댓말' as Register,
   addrPin: false,
+  /** 성적 욕망·이상성욕 편집 칸: '이름|desire' 또는 '' */
+  sexEdit: '',
+  sexDraft: '',
   /** 진단 (플러그인 저장소에서 한 번 읽어 둔다) */
   diag: null as DiagRun[] | null,
   /** 진단: 모든 채팅 보기 (기본은 이 채팅만) */
@@ -345,7 +349,7 @@ const SECTION_LABEL: Record<string, string> = {
 /** 지침 편집 (리수폿 J-1): 절 하나를 골라 본문을 덮어쓴다. 지침 판(자세히·간결)마다 따로. 출력 계약 줄은 못 바꾼다 */
 function promptEditor(state: Record<string, unknown> | undefined, prompt: 'detailed' | 'compact'): string {
   const text = prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
-  const names = [...UPDATER_SECTIONS.filter((n) => n !== 'user_rules' && sectionBody(text, n) !== null), 'director', 'router'];
+  const names = [...UPDATER_SECTIONS.filter((n) => n !== 'user_rules' && n !== 'sexual' && sectionBody(text, n) !== null), 'director', 'router'];
   const cur = names.includes(peopleUi.psSection) ? peopleUi.psSection : names[0];
   const keyOf = (n: string) => (n === 'director' || n === 'router' ? PS(n, 'base') : PS(prompt, n));
   const key = keyOf(cur);
@@ -412,7 +416,13 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
       row('말투 변경 시', seg('register_change', s.registerChange, [['ask', '묻기'], ['auto', '자동 반영']]), s.registerSignLimit < 3 ? '조짐 횟수가 3 미만이라 AI가 바로 판단해 바꿔요. 이 설정은 쓰이지 않아요.' : s.registerChange === 'auto' ? '조짐이 다 쌓이면 다음 턴에 갱신기가 말투를 바꿔요.' : '조짐이 다 쌓이면 인물 화면의 말투 항목에 승인·거절 버튼이 떠요. 승인해야 바뀌어요.'),
     ] : []),
   ].join('') : '';
-  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '') + (f === 'register' ? registerRows : '')).join('');
+  // 성적 욕망·이상성욕·발정모드 (리수폿 원본 인물관계 기록 설정 3개, 2026-11-07). 성격 6축 기능 안의 칸
+  const sexualRows = v('axes') === '1' ? [
+    row('성적 욕망 기록', onoff('sexual_desire'), '인물마다 「침대에서 무엇을 좋아하는지」 3~5문장을 기록해요. 처음 글은 갱신기가 한 번 쓰고, 그 뒤엔 실제 성적 장면의 관찰이 6회·4장면·확신 75 이상 쌓여 승인해야 바뀌어요. 본편엔 성적 상황에서만 쓰라는 규칙과 함께 넣어요. 끄면 저장값은 보존돼요'),
+    row('이상성욕 기록', onoff('paraphilia'), '성인 합의 범위의 성향 목록(페티시·사디즘·마조히즘·노출·관음 등)에서 고르거나 미확인. 성적 욕망과 같은 규칙으로 기록·변경돼요'),
+    row('발정모드', onoff('explicit_style'), '켬 = 노골적인 한국어 비속어로 쓰게 해요(원본 0.10.9). 끔 = 직설적이되 강한 어휘를 강요하지 않아요(0.10.7). 인물 화면에서 인물별로 따로 정할 수 있고, 여기서 바꾸면 인물별 설정은 다시 전체를 따라요'),
+  ].join('') : '';
+  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '') + (f === 'register' ? registerRows : '') + (f === 'axes' ? sexualRows : '')).join('');
   const newPeople = [
     row('새 인물', seg('newpeople', s.newPeople, [['auto', '자동'], ['confirm', '확인 뒤 등록']]), '확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요.'),
     row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
@@ -739,6 +749,30 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
   </li>`;
 }
 
+/** 성적 욕망·이상성욕 카드 (sexual.ts, 원본 인물 탭의 성적 프로필 칸): 인물별 켬/끔·글·편집·삭제·발정 버전 */
+function sexualCard(ctx: ChatContext, p: Person): string {
+  const s = peopleSettings(ctx.chat.scriptstate);
+  const g = sexualGlobal(s);
+  const fields = SEXUAL_FIELDS.filter((f) => g[f]);
+  if (!fields.length) return '';
+  const explicit = explicitOn(p, s);
+  const style = `<div class="pp-addr"><button class="gx-mini pp-mini${explicit ? ' on' : ''}" data-action="pp-sex-style" data-value="${esc(p.name)}" aria-pressed="${explicit}" title="이 인물의 발정 버전을 켜고 꺼요 (전체 설정보다 우선)">발정 버전 ${explicit ? 'ON' : 'OFF'}</button><small>${explicit ? '발정난 음란/이상성욕 (노골적 어휘)' : '적당한 음란/이상성욕'}${p.sexual?.explicit === null || p.sexual?.explicit === undefined ? ' · 전체 설정을 따름' : ' · 이 인물만 따로 정함'}</small></div>`;
+  const cards = fields.map((f) => {
+    const on = sexualFieldOn(p, f, s);
+    const key = `${p.name}|${f}`;
+    const text = p.sexual?.[f]?.text ?? '';
+    const editing = on && peopleUi.sexEdit === key;
+    const body = !on
+      ? '<p class="ps-note">이 인물에서는 사용하지 않아요. 저장된 내용은 보존돼요.</p>'
+      : editing
+        ? `<div class="pp-edit"><textarea class="gx-search nw-reqbox" name="pp-sex-text" data-input="pp-sex-text" rows="4" maxlength="${SEXUAL_CHARS}">${esc(peopleUi.sexDraft)}</textarea><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-sex-save" data-value="${esc(key)}" data-take="pp-sex-text">저장</button><button class="gx-mini" data-action="pp-sex-cancel">취소</button></div></div>`
+        : `<p class="pp-extra">${text ? esc(text) : '<span class="pp-addr-none">아직 글이 없어요 — 다음 갱신에서 모델이 한 번 써요</span>'}</p>${text && p.sexual?.[f]?.manual ? '<small class="ps-note">사용자가 직접 쓴 글</small>' : ''}`;
+    const btns = `<span class="pp-entry-btns"><button class="gx-mini pp-mini${on ? ' on' : ''}" data-action="pp-sex-on" data-value="${esc(key)}" aria-pressed="${on}" title="이 인물에서 이 칸을 쓸지">${on ? 'ON' : 'OFF'}</button>${on && !editing ? `<button class="gx-mini pp-mini" data-action="pp-sex-edit" data-value="${esc(key)}">편집</button>${text ? `<button class="gx-mini pp-mini danger" data-action="pp-sex-clear" data-value="${esc(key)}" title="글을 지워요. 다음 갱신에서 모델이 다시 써요">삭제</button>` : ''}` : ''}</span>`;
+    return `<section class="pp-slot"><h4>${SEXUAL_LABEL[f]}${btns}</h4>${body}</section>`;
+  }).join('');
+  return `<section class="pp-card"><h4 title="리수폿 성적 프로필: 성적 상황에서만 쓰는 글. 변경은 실제 성적 장면의 관찰이 쌓여 승인해야 돼요">성적 욕망·이상성욕</h4><div class="pp-card-body">${style}${cards}</div></section>`;
+}
+
 /** 선택 기능 카드: 취향 띠·음란도 (켜져 있을 때만) */
 /** 성격 6축 카드 (기능 axes): 축 막대 + 검토할 변화 후보 + 승인한 변화 (되돌리기). 2026-11-06 「F」 */
 function axesCard(ctx: ChatContext, p: Person, live: Liveness): string {
@@ -750,7 +784,7 @@ function axesCard(ctx: ChatContext, p: Person, live: Liveness): string {
   const review = withStats.filter((x) => x.c.status === 'collecting' && x.st.ready);
   const collecting = withStats.filter((x) => x.c.status === 'collecting' && !x.st.ready && x.st.n > 0);
   const approved = withStats.filter((x) => x.c.status === 'approved');
-  const what = (c: Candidate, delta: number) => (c.axis === 'pattern' ? `장기 변화 ${c.direction === 'weaken' ? '지우기' : '추가'}: ${c.pattern}` : `${AXIS_LABEL[c.axis]} ${delta > 0 ? '+' : ''}${delta} — ${c.pattern}`);
+  const what = (c: Candidate, delta: number) => (isSexualAxis(c.axis) ? `${SEXUAL_LABEL[SEXUAL_FIELD_OF[c.axis]]} 변화 (글 전체 교체): ${c.pattern}` : c.axis === 'pattern' ? `장기 변화 ${c.direction === 'weaken' ? '지우기' : '추가'}: ${c.pattern}` : `${AXIS_LABEL[c.axis]} ${delta > 0 ? '+' : ''}${delta} — ${c.pattern}`);
   const evList = (c: Candidate) => liveEvidence(c, live).map((e) => { const no = msgNo(e.anchor, live); return `<li><small>${no ? `${no} ` : ''}${esc(e.reason)}${e.quote ? ` <q>${esc(e.quote)}</q>` : ''}</small></li>`; }).join('');
   const reviewHtml = review.length
     ? `<div class="pp-cands"><p class="pp-extra"><b>성격이 바뀐 것 같아요</b> <small>같은 방향 관찰이 쌓였어요. 승인하면 축이 움직이고, 거절하면 이 후보는 더 모으지 않아요.</small></p>${review.map(({ c, st }) => `<div class="pp-cand"><div class="pp-cand-main">${esc(what(c, st.delta))}<small> · 관찰 ${st.n}회 · 장면 ${st.scenes} · 확신 ${st.confidence}</small></div><ul class="pp-cand-ev">${evList(c)}</ul><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-axis-approve" data-value="${esc(`${p.name}|${c.id}`)}" ${peopleUi.busy ? 'disabled' : ''}>승인</button><button class="gx-mini danger" data-action="pp-axis-reject" data-value="${esc(`${p.name}|${c.id}`)}" ${peopleUi.busy ? 'disabled' : ''}>거절</button></div></div>`).join('')}</div>`
@@ -759,7 +793,7 @@ function axesCard(ctx: ChatContext, p: Person, live: Liveness): string {
     ? `<details class="ps-adv-sub" data-keep="pp-axes-approved"${keepOpen('pp-axes-approved')}><summary>승인한 변화<b>${approved.length}</b></summary><ul class="pp-entries">${approved.map(({ c }) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(c.applied && 'axis' in c.applied ? `${AXIS_LABEL[c.applied.axis]} ${c.applied.before} → ${c.applied.after} — ${c.pattern}` : what(c, 0))}</span></div><div class="pp-entry-meta"><span class="pp-entry-btns"><button class="gx-mini pp-mini" data-action="pp-axis-revert" data-value="${esc(`${p.name}|${c.id}`)}" title="이 변화를 전으로 되돌려요">되돌리기</button></span></div></li>`).join('')}</ul></details>`
     : '';
   const collectingHtml = collecting.length
-    ? `<details class="ps-adv-sub" data-keep="pp-axes-collecting"${keepOpen('pp-axes-collecting')}><summary title="아직 검토 조건(관찰 4회·장면 3개·확신 55)을 못 채운 후보">모으는 중<b>${collecting.length}</b></summary><ul class="pp-entries">${collecting.map(({ c, st }) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(what(c, st.delta))}<small> · 관찰 ${st.n}회 · 장면 ${st.scenes} · 확신 ${st.confidence}</small></span></div><ul class="pp-cand-ev">${evList(c)}</ul></li>`).join('')}</ul></details>`
+    ? `<details class="ps-adv-sub" data-keep="pp-axes-collecting"${keepOpen('pp-axes-collecting')}><summary title="아직 검토 조건(관찰 4회·장면 3개·확신 55, 성적 욕망·이상성욕은 6회·4개·75)을 못 채운 후보">모으는 중<b>${collecting.length}</b></summary><ul class="pp-entries">${collecting.map(({ c, st }) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(what(c, st.delta))}<small> · 관찰 ${st.n}회 · 장면 ${st.scenes} · 확신 ${st.confidence}</small></span></div><ul class="pp-cand-ev">${evList(c)}</ul></li>`).join('')}</ul></details>`
     : '';
   return `<section class="pp-card"><h4 title="성격의 바탕 6축 (0~100). 갱신기는 관찰만 돌려주고, 쌓인 관찰을 사용자가 승인해야 축이 움직여요">성격 6축</h4><div class="pp-card-body"><div class="pp-axes">${bars}</div><small class="ps-note">${esc(from)}</small>${p.patterns.length ? `<p class="pp-extra"><b>장기 변화</b></p><ul class="pp-entries">${p.patterns.map((t) => `<li class="pp-entry"><div class="pp-entry-main"><span class="pp-text">${esc(t)}</span></div></li>`).join('')}</ul>` : ''}${reviewHtml}${approvedHtml}${collectingHtml}</div></section>`;
 }
@@ -843,7 +877,7 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있고 게임 대사 칸 고르기에만 쓰여요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있고 게임 대사 칸 고르기에만 쓰여요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${sexualCard(ctx, p)}${extraCards(ctx, p, changes)}
       <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}
@@ -921,6 +955,9 @@ export function peopleInput(name: string, value: string): boolean {
     case 'pp-addr-to':
       peopleUi.addrTo = value;
       return true;
+    case 'pp-sex-text':
+      peopleUi.sexDraft = value;
+      return true;
     case 'pp-rules':
     case 'pp-director-rules':
     case 'pp-ps-text':
@@ -976,6 +1013,8 @@ export async function handlePeople(action: string, value: string | undefined, ct
         peopleUi.info = k === 'model' ? '응답마다 메인 모델을 한 번 더 불러요.' : '응답마다 보조 모델을 한 번 더 불러요.';
       }
       await setVars(ctx, env, { [PP(k)]: val });
+      // 발정모드 전체를 바꾸면 인물별 덮어쓰기는 다시 전체를 따른다 (원본 updateAllPeopleSexualStyle 과 같은 효과)
+      if (k === 'explicit_style') await mutate(ctx, env, (store) => { let n = 0; for (const p of Object.values(store.people)) if (p.sexual && p.sexual.explicit !== null) { p.sexual.explicit = null; n++; } return n > 0; });
       return true;
     }
     case 'pp-ps-pick':
@@ -1075,6 +1114,44 @@ export async function handlePeople(action: string, value: string | undefined, ct
         else e.pin = true;
         return true;
       });
+      return true;
+    case 'pp-sex-on':
+    case 'pp-sex-clear':
+    case 'pp-sex-save': {
+      const [who, f] = v.split('|') as [string, SexualField];
+      await mutate(ctx, env, (store) => {
+        const p = store.people[who];
+        if (!p || !SEXUAL_FIELDS.includes(f)) return false;
+        const sx = ensureSexual(p);
+        if (action === 'pp-sex-on') { if (f === 'desire') sx.desireOn = !sx.desireOn; else sx.paraphiliaOn = !sx.paraphiliaOn; }
+        else setSexualText(p, f, action === 'pp-sex-clear' ? '' : peopleUi.sexDraft, new Date().toISOString(), true);
+        return true;
+      });
+      if (action === 'pp-sex-save') { peopleUi.sexEdit = ''; peopleUi.info = '저장했어요.'; }
+      if (action === 'pp-sex-clear') peopleUi.info = '글을 지웠어요. 다음 갱신에서 모델이 다시 써요.';
+      env.render();
+      return true;
+    }
+    case 'pp-sex-style': {
+      // 인물별 발정 버전 덮어쓰기 (원본 explicitSexualStyleOverride): 지금 보이는 값을 뒤집어 이 인물에 고정
+      await mutate(ctx, env, (store) => {
+        const p = store.people[v];
+        if (!p) return false;
+        ensureSexual(p).explicit = !explicitOn(p, peopleSettings(ctx.chat.scriptstate));
+        return true;
+      });
+      return true;
+    }
+    case 'pp-sex-edit': {
+      const [who, f] = v.split('|') as [string, SexualField];
+      peopleUi.sexEdit = v;
+      peopleUi.sexDraft = peopleStore(ctx.chat).people[who]?.sexual?.[f]?.text ?? '';
+      env.render();
+      return true;
+    }
+    case 'pp-sex-cancel':
+      peopleUi.sexEdit = '';
+      env.render();
       return true;
     case 'pp-speech-approve':
     case 'pp-speech-reject': {

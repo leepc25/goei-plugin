@@ -1,5 +1,6 @@
 // 본편 요청에 인물 기록 블록을 끼운다 (beforeRequest). 모델은 부르지 않는다.
 // 절 단위 혼합(split)이면 요원 자리에 들어간 그 인물의 시트 원문을 요청에서 빼고 기록 블록으로 대신한다.
+import { sexualTexts } from './sexual';
 import type { Chat } from '../types';
 import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
@@ -72,6 +73,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         axes: o.settings.features.has('axes'),
         features: o.settings.features,
         qual: o.settings.qualitative,
+        sexual: sexualTexts(p, o.settings),
       }),
     );
   }

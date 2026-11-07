@@ -49,6 +49,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   turn_cap: '10',
   /** 성격 6축·관찰 누적 (리수폿 People). 기본 켬 */
   axes: '1',
+  /** 성적 욕망 기록·이상성욕 기록·발정모드 (원본 sexualDesireEnabled·paraphiliaEnabled·explicitSexualStyleEnabled). 원본 새 설치 기본값 = 셋 다 켬. 2026-11-07. core/people/sexual.ts */
+  sexual_desire: '1', paraphilia: '1', explicit_style: '1',
   affinity: '1', register: '1', perception: '1',
   /** 말투의 다변화 (원본 features.register.variety off/one/two · change ask/auto · signLimit 1~9). 2026-11-07 K. core/people/speech.ts */
   register_variety: 'off', register_change: 'ask', register_sign_limit: '3', perception_ext: '1', suspicion: '1',
@@ -120,6 +122,10 @@ export interface PeopleSettings {
   speedDown: number;
   turnCap: number;
   features: Set<Feature>;
+  /** 성적 욕망·이상성욕 기록, 발정모드 (성격 6축 기능 안의 칸) */
+  sexualDesire: boolean;
+  paraphilia: boolean;
+  explicitStyle: boolean;
   /** 말투의 다변화 단계·변경 방식·조짐 횟수 (기능 register 안의 세부) */
   registerVariety: 'off' | 'one' | 'two';
   registerChange: 'ask' | 'auto';
@@ -206,6 +212,9 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     speedDown: v('speed_down') === 'same' || v('speed_down') === '' ? num('speed', 0.25, 4) : num('speed_down', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
     features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),
+    sexualDesire: v('sexual_desire') === '1',
+    paraphilia: v('paraphilia') === '1',
+    explicitStyle: v('explicit_style') === '1',
     registerVariety: one('register_variety', ['off', 'one', 'two'] as const),
     registerChange: v('register_change') === 'auto' ? 'auto' : 'ask',
     registerSignLimit: num('register_sign_limit', 1, 9),

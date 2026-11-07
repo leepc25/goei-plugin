@@ -6,8 +6,9 @@ const REGISTER_EN: Record<string, string> = { 존댓말: 'formal (존댓말)', �
 import { liveEntries, plain, type Liveness } from './store';
 import { fixedSections } from './seed';
 import { norm } from './store';
-import { OPENNESS_MAX, SLOT_META, TASTE_STAGES, opennessStage, slotsFor, type Change, type Entry, type PeopleStore, type Person, type SlotId } from './types';
+import { OPENNESS_MAX, SEXUAL_CHARS, SLOT_META, TASTE_STAGES, opennessStage, slotsFor, type Change, type Entry, type PeopleStore, type Person, type SlotId } from './types';
 import { axesLinesEn } from './axes';
+import { SEXUAL_DIRECTOR_POLICY, SEXUAL_POLICY } from './sexual';
 
 const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   0: 'Expression: almost never shown; appears only through actions and priorities, not words.',
@@ -37,6 +38,8 @@ export interface BlockOpts extends AffinityOpts {
   axes?: boolean;
   /** 켜진 기능 (전용 칸을 넣을지 정함). 없으면 기본 칸만 */
   features?: Set<string>;
+  /** 성적 욕망·이상성욕 글 (sexual.ts sexualTexts, 켜져 있고 글이 있을 때만). sexual_context_only 정책과 함께 넣는다 */
+  sexual?: Partial<Record<'desire' | 'paraphilia', string>>;
 }
 
 const lines = (list: Entry[]) => list.map((e) => `- ${plain(e.text, 300)}`).join('\n');
@@ -84,6 +87,8 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const per = slot('personality');
   if (per.length) out.push('Personality:\n' + lines(per));
   if (o.axes) out.push('Personality axes (baseline traits, not current feeling):\n' + axesLinesEn(p.axes).join('\n') + (p.patterns?.length ? '\nLong-term changes:\n' + p.patterns.map((t) => `- ${plain(t, 300)}`).join('\n') : ''));
+  // 성적 욕망·이상성욕 (원본 people_profile 의 sexual_desire/paraphilia + policy sexual_context_only)
+  if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${SEXUAL_DIRECTOR_POLICY})\n` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : '', o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ''].filter(Boolean).join('\n'));
   if (o.sheet && mode === 'split') for (const s of fixedSections(o.sheet)) out.push(`${s.name}:\n${s.body}`);
   const st = slot('state');
   if (st.length) out.push('Current state:\n' + lines(st));
