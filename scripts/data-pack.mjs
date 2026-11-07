@@ -55,17 +55,22 @@ export function installPackText() {
   });
 }
 
-/** 소지품 그림 팩 글: { schema, kind:'items', table:[{k:키워드들, f:파일, kind, base?}], icons:{파일: base64 png} }. src/core/datapack.ts applyItemsPack 가 읽는 모양 */
+/** 소지품 그림 팩 글 (game-src/items/README.md 표 기준, 11-07 최종): { schema, kind:'items', table:[{k:키워드, h:몸통 말, ft:특징 말, f:파일, kind, base?}], rep:{몸통 말: 파일}, icons:{파일: base64 webp} }.
+ *  「빼」한 줄(excluded_note)은 뺀다. merged_into 줄은 file 이 대표 그림이라 그대로 둔다. src/core/datapack.ts applyItemsPack·matchItemIcon 가 읽는 모양 */
 export function itemsPackText() {
   const src = readJson('game-src/items/icons.json');
   const table = [];
-  const icons = {};
+  const files = new Set();
   for (const e of src.icons) {
-    if (!Array.isArray(e.keywords) || typeof e.file !== 'string') continue;
-    table.push({ k: e.keywords, f: e.file, kind: e.kind, ...(e.base ? { base: true } : {}) });
-    icons[e.file] = readFileSync(new URL(`game-src/items/icons/${e.file}`, ROOT)).toString('base64');
+    if (!Array.isArray(e.keywords) || typeof e.file !== 'string' || e.excluded_note) continue;
+    table.push({ k: e.keywords, h: Array.isArray(e.head) ? e.head : [], ft: Array.isArray(e.feats) ? e.feats : [], f: e.file, kind: e.kind, ...(e.base ? { base: true } : {}) });
+    files.add(e.file);
   }
-  return JSON.stringify({ schema: 1, kind: 'items', table, icons });
+  const rep = {};
+  for (const [k, f] of Object.entries(src.head_rep ?? {})) if (typeof f === 'string') (rep[k] = f), files.add(f);
+  const icons = {};
+  for (const f of [...files].sort()) icons[f] = readFileSync(new URL(`game-src/items/icons/${f}`, ROOT)).toString('base64');
+  return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */
