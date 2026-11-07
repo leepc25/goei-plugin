@@ -9,6 +9,7 @@ const pic = (n) => `data:image/png;base64,${readFileSync(`${PIC}/${n}.png`).toSt
 const icons = Object.fromEntries([...readFileSync(new URL('../../../src/ui/icons.ts', import.meta.url), 'utf8').matchAll(/^  (\w+): stroke\('(.*)'\),$/gm)].map((m) => [m[1], m[2]]));
 const ic = (k, w = 1.8) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${icons[k]}</svg>`;
 const won = (n) => `₩ ${n.toLocaleString('ko-KR')}`;
+const wonc = (n) => `₩${n.toLocaleString('ko-KR')}`;
 const BAL = 184000;
 const SHOP = '을지로 철물점';
 // 모델이 창작한 진열대 흉내: 이름·종류·값·재고·설명·효과. 그림은 이름으로 매칭된 것
@@ -29,9 +30,9 @@ const items = [
 const cell = (it, i, sel) => {
   const [p, name, kind, price, stock] = it;
   const poor = price > BAL;
-  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><small>${won(price)}</small>${tip(it)}</button>`;
+  return `<button class="it-c sh-c${i === sel ? ' sel' : ''}${poor ? ' poor' : ''}"><span class="it-ic"><img src="${pic(p)}" alt=""></span><b>${name}</b><em class="sh-price">${wonc(price)}</em>${tip(it)}</button>`;
 };
-const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b><small>${kind} · ${won(price)} · 재고 ${stock}</small><p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
+const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b><small>${kind} · 재고 ${stock}</small><em class="sh-price sh-price-ln">${won(price)}</em><p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
 const grid = (sel = -1) => `<div class="it-grid sh-grid">${items.map((it, i) => cell(it, i, sel)).join('')}</div>`;
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
 const tools = (vp, req) => `<div class="gx-rec-tools it-tools sh-tools">
@@ -41,14 +42,15 @@ const tools = (vp, req) => `<div class="gx-rec-tools it-tools sh-tools">
 const detail = (it, phone) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
+  const money = `<div class="sh-money"><div><i>값</i><em>${won(price)}</em></div><div><i>지금 잔고</i><em>${won(BAL)}</em></div><div class="${poor ? 'bad' : 'ok'}"><i>${poor ? '부족' : '산 뒤 잔고'}</i><em>${poor ? '−' : ''}${won(Math.abs(BAL - price))}</em></div></div>`;
   return `<div class="gx-agpop it-pop sh-det"><div class="gx-agpop-card it-card"><button class="gx-agpop-x">✕</button>
-  <div class="it-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div><b>${name}</b><small>${kind} · ${won(price)} · 재고 ${stock}</small></div></div>
-  <p>${desc}</p><p class="ef">효과: ${ef}</p>${poor ? `<p class="dim sh-poor">잔고 ${won(BAL)} · ${won(price - BAL)} 부족</p>` : ''}
+  <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b><small><span class="sh-kind">${kind}</span> 재고 ${stock}</small><em class="sh-price sh-price-ln sh-price-big">${won(price)}</em></div></div>
+  <p>${desc}</p><p class="ef">효과: ${ef}</p>${money}
   <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>사기</button><button class="gx-chip">자세히</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
   const body = mode === 'loading' ? loading : grid(mode === 'detail' || mode === 'poor' ? (mode === 'poor' ? 11 : 0) : mode === 'hover' ? -1 : -1);
-  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${vp === 'phone' ? `<button class="gx-agpop-x">✕</button>` : ''}${tools(vp, mode === 'request')}<div class="it-body sh-body">${body}</div></div>
+  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${vp === 'phone' ? `<button class="gx-agpop-x">✕</button>` : ''}${tools(vp, mode === 'request')}<div class="it-body sh-body">${body}</div>${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
   ${mode === 'detail' ? detail(items[0]) : mode === 'poor' ? detail(items[11]) : ''}</div>`;
 };
 // 채팅 본문 흉내 (Risu 기본 어두운 화면). 상태창은 플러그인 display 처리기 결과를 그대로 넣는다
@@ -68,14 +70,14 @@ const css = `
 .sh-x{width:34px;padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
 .it-act.on{border-color:var(--signal);color:var(--signal)}
 .sh-req{display:flex;gap:8px}.sh-req .gx-wt-q{flex:1;max-width:none;margin:0;height:36px}
-.sh-c small{display:block;font-size:11.5px;color:var(--dim);font-family:var(--mono);line-height:1.2;padding-top:2px}
-.sh-c.poor small{color:var(--danger,#e5484d)}
+.sh-c b{font-size:13.5px}.sh-c small{display:block;font-size:13px;color:var(--sub);font-family:var(--mono);line-height:1.2;padding-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sh-grid .it-tip small{font-size:13px;color:var(--sub)}.sh-grid .it-tip b{font-size:15px}.sh-grid .it-tip p{font-size:13.5px}.sh-det .it-ph{padding-right:40px}.sh-det .it-ph b{font-size:16px}.sh-det .it-ph small{font-size:13.5px;color:var(--sub)}.sh-det .it-card p{font-size:14px}
+.sh-price{display:block;margin:6px -6px -5px;padding:7px 4px;border-top:1px solid var(--accent-line);border-radius:0 0 11px 11px;background:var(--accent-bg);color:var(--signal);font:700 14px/1 var(--mono);font-style:normal;text-align:center;white-space:nowrap;letter-spacing:-.01em}.sh-c.poor .sh-price{background:color-mix(in srgb,var(--danger,#e5484d) 14%,transparent);border-top-color:color-mix(in srgb,var(--danger,#e5484d) 50%,transparent);color:#ff7b80}.sh-price-ln{display:inline-block;margin:8px 0 0;padding:5px 10px;border:1px solid var(--accent-line);border-radius:8px;font-size:15px}.sh-price-h{margin:0 0 0 auto;align-self:center}.sh-poor{font-size:13.5px !important}
 .sh-grid .it-tip{display:none}.sh-grid .it-c.tipon .it-tip{display:block}
 .sh-wait{display:flex;align-items:center;justify-content:center;gap:10px;min-height:260px;color:var(--sub);font-size:14px}
 .sh-spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--signal)}
-.sh-det .it-card{width:380px}.it-ph .it-ic img{width:30px;height:30px;object-fit:contain;image-rendering:pixelated}.sh-poor{color:var(--danger,#e5484d) !important}
+.sh-det .it-card{width:min(420px,calc(100vw - 28px))}.sh-ph{align-items:center;gap:14px}.sh-ph .it-ic{width:96px;height:96px;border-radius:14px}.sh-ph .it-ic img{width:84%;height:84%;object-fit:contain;image-rendering:pixelated}.sh-ph b{font-size:19px;line-height:1.2}.sh-phtx{display:flex;flex-direction:column;gap:4px;min-width:0}.sh-kind{display:inline-block;padding:2px 8px;margin-right:6px;border:1px solid var(--line2);border-radius:6px;font-size:12.5px;color:var(--text)}.sh-price-big{align-self:flex-start;margin-top:4px;font-size:18px;padding:6px 12px}.sh-ph small{font-size:13.5px;color:var(--sub)}.sh-money{display:flex;flex-direction:column;gap:0;margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--void);overflow:hidden}.sh-money>div{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--line)}.sh-money>div:first-child{border-top:0}.sh-money i{font-style:normal;font-size:13.5px;color:var(--sub)}.sh-money em{font:700 16px/1 var(--mono);font-style:normal;color:var(--text)}.sh-money .ok{background:var(--accent-bg)}.sh-money .ok em{color:var(--signal)}.sh-money .bad{background:color-mix(in srgb,var(--danger,#e5484d) 14%,transparent)}.sh-money .bad i,.sh-money .bad em{color:#ff7b80}.sh-poor{color:var(--danger,#e5484d) !important}
 .it-btns .gx-chip:disabled{opacity:.45}
-@media (max-width:760px){.sh-card{width:100%;padding:12px;padding-top:14px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}.it-right{margin-left:0;flex:1}.it-right .it-act{flex:1;justify-content:center}.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-req{flex-wrap:wrap}.sh-req .it-act{width:100%;justify-content:center}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
+@media (max-width:760px){.sh-ph .it-ic{width:110px;height:110px}.sh-wrap{align-items:flex-start;padding:14px 14px 96px}.sh-card{width:100%;padding:12px;padding-top:14px;max-height:calc(100% - 0px)}.sh-close{width:100%;justify-content:center;height:44px;margin-top:4px;flex:none}.sh-close svg{color:var(--sub)}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%;padding-right:36px}.it-right{margin-left:0;flex:1}.it-right .it-act{flex:1;justify-content:center}.sh-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sh-req{flex-wrap:wrap}.sh-req .it-act{width:100%;justify-content:center}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/장터_초안/';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: '철물점 문을 열고 들어간다.' }, { role: 'char', data: CHAR_TEXT }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
