@@ -43,7 +43,7 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openRecords, openWiki } from './ui/app';
+import { openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
@@ -60,6 +60,8 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
+import { hasShopTag, settleShop, shopOn } from './core/shop';
+import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
@@ -458,6 +460,13 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       }).catch(() => null)) ?? latest;
     }
+    // 상점 표식 `[shop: 가게|주인]`: 이 응답 기준으로 상점 상태를 맞추고 지난 응답의 표식은 지운다 (core/shop.ts settleShop). 설정이 꺼져 있어도 남은 표식은 정리
+    if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex)) {
+      latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+        const r = settleShop(cur, arg.messageIndex);
+        return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...(shopOn(cur.scriptstate) ? r.vars : { $st_shop: '' }) } } : null;
+      }).catch(() => null)) ?? latest;
+    }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
     if (now) await refreshUseBox(arg.characterIndex, arg.chatIndex, now).catch(() => {});
     if (!now || chatPhase(now) !== 'started') return;
@@ -647,7 +656,7 @@ function displayNow(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || text.includes(SCENE_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || text.includes(SCENE_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text) || hasShopTag(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
@@ -660,6 +669,8 @@ function displayNow(text: string): string {
     if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
     // 상태창은 카드 정규식 대신 플러그인이 그린다 (칸이 어긋나도 깨지지 않게, 설정의 배색으로)
     if (hasStatusTag(out)) out = renderStatus(out);
+    // 상점 표식 → 「상점 열기」 카드 (host/shopcard.ts). 상태창 뒤에 붙으니 상태창 상자 아래에 온다
+    if (hasShopTag(out)) out = renderShopCard(out);
     // 캐릭터 이미지 태그는 플러그인이 그림 칸으로. Lite 판정 전(다른 채팅에서 돌아온 직후)에는 태그가 모두 에셋 모듈에 있는 이름일 때만
     if (hasImgTag(out)) {
       const pick = modulePicker();
@@ -798,6 +809,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   setWikiOpener((title) => void openWiki(title));
   setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+  setShopOpener(() => void openShop());
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {

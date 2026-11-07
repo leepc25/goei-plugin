@@ -7,6 +7,7 @@ import type { Chat } from './types';
 import { aliveAnchors } from './wallet';
 import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
+import { shopEvents, shopOn, SHOP_GUIDE } from './shop';
 
 export const ITEMS_VAR = '$st_items';
 /** 「사용」 상자: 다음 보낼 때 본편에 넘길 물건 이름들 (JSON 배열). 보내면 비운다 */
@@ -68,7 +69,7 @@ export interface Item {
   at: string;
 }
 
-export type ItemLogWhat = 'use' | 'drop' | 'gone' | 'merge';
+export type ItemLogWhat = 'use' | 'drop' | 'gone' | 'merge' | 'sell';
 export type ItemLogBy = 'story' | 'manual' | 'use';
 
 /** 사용·처분 기록 한 줄 (화면 「기록」·찾기). 상한 없음, 저장 안전용 400줄 */
@@ -197,7 +198,7 @@ export function addItemLog(it: Items, l: Omit<ItemLog, 'id' | 'at'> & { id?: str
   return { ...it, log: [...it.log, row].slice(-400) };
 }
 
-/** 물건 빼기 → 기록에 한 줄. what: drop(버림)·gone(본문에서 없어짐)·use(다 씀) */
+/** 물건 빼기 → 기록에 한 줄. what: drop(버림)·gone(본문에서 없어짐)·use(다 씀)·sell(상점에 팖) */
 export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLogBy, anchor = '', extra: { quote?: string; note?: string } = {}): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;
@@ -256,16 +257,18 @@ export function newlyBought(list: Item[], lastAnchor: string): Item[] {
 }
 
 /** 본편에 넘기는 글. 비면 빈 문자열 (붙이지 않는다). 전부 넘김 — 자르지 않는다 */
-export function itemsBlock(list: Item[], opts: { slots: number; limit: string; use?: string[]; bought?: string[] }): string {
+export function itemsBlock(list: Item[], opts: { slots: number; limit: string; use?: string[]; bought?: string[]; events?: string[]; always?: boolean }): string {
   const lines = list.map((e) => `- ${e.name}${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}`);
   const use = (opts.use ?? []).filter(Boolean);
   const bought = (opts.bought ?? []).filter(Boolean);
-  if (!lines.length && !use.length && !bought.length) return '';
+  const extra = (opts.events ?? []).filter(Boolean);
+  if (!lines.length && !use.length && !bought.length && !extra.length && !opts.always) return '';
   const out = [`[Inventory] ${list.length}/${opts.slots}${list.length > opts.slots ? ' (over the limit)' : ''}`, ...(lines.length ? lines : ['- (nothing)'])];
   out.push(`Carry limit: ${opts.limit}`);
   const events: string[] = [];
   if (use.length) events.push(`uses ${use.join(', ')}`);
   if (bought.length) events.push(`just bought ${bought.join(', ')}`);
+  events.push(...extra);
   if (list.length > opts.slots) events.push('carrying more than the limit');
   if (events.length) out.push(`This turn: ${events.join('; ')}`);
   return out.join('\n');
@@ -313,13 +316,17 @@ export function inventoryText(chat: Chat): string {
   const vars = chat.scriptstate;
   if (!itemPushOn(vars)) return '';
   const live = liveItemsOf(readItems(vars), chat);
+  // 상점(core/shop.ts): 켜져 있으면 물건이 없어도 블록을 보내 표식 지침을 넘기고, 이번 방문의 사건(주인과 나눈 말·쫓겨남)을 This turn 에 더한다
+  const shop = shopOn(vars);
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),
     use: pendingItemUse(vars, lastUserKey(chat)).filter((n) => live.some((e) => sameItemName(e.name, n))),
     bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
+    events: shop ? shopEvents(chat) : [],
+    always: shop,
   });
-  return text ? `${text}\n${INVENTORY_NOTE}` : '';
+  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${SHOP_GUIDE}` : ''}` : '';
 }
 
 /** 요청: [Inventory] 글을 마지막 유저 메시지 앞에 system 으로 넣는다 (상태창 블록과 같은 자리). 이미 있으면 그대로 */
