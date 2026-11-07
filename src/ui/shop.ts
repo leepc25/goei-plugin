@@ -5,6 +5,7 @@
 // 팔기(11-07): 도구 줄 「팔기」 → 진열대 자리에 내 소지품 → 하나 고르면 입력창에 「팔기: 이름」 칩(값을 부르거나 그냥 보냄) → 주인이 값을 부르면 상세 창(잔고 / +값 / 잔액) [팔기][흥정][그만].
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
+import { refreshUseBox } from '../host/usebox';
 import { generate, type LlmMessage } from '../host/llm';
 import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
@@ -463,6 +464,8 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       shopUi.detail = '';
       if (shopUi.chipKind === 'sell') { shopUi.chip = ''; shopUi.chipKind = ''; }
       shopUi.info = sold ? `「${o.name}」을 ${shortWon(o.price as number)}에 팔았어요.` : '팔 수 없는 상태예요 (물건이 없거나 값이 바뀌었어요).';
+      // 「사용」 자리에서 뺐으면 본 화면 상자도 다시 그린다 (소지품 버리기와 같이)
+      if (sold) void refreshUseBox(ctx.charIndex, ctx.chatIndex);
       await env.refresh();
       return true;
     }
