@@ -434,6 +434,22 @@ async function dropShopTags(ctx: ChatContext): Promise<void> {
   }).catch(() => null);
 }
 
+/** 설정을 한꺼번에 바꿀 때(기본값 불러오기·초기값으로·되돌리기, 11-08 전수점검): 한 칸씩 바꿀 때 하던 뒷정리를 같이 한다.
+ *  상태창 칸 구성이 바뀌면 바뀐 시점 기록, 소지품이 꺼지면 「사용」 자리 비움, 다시 켜지면 「그 사이 변화는 목록에 없다」, 상점이 꺼지면 이번 방문 닫기.
+ *  prev = 지금 채팅 변수, next = 바뀐 뒤 변수 전부. 돌려주는 값을 바꿀 변수에 더한다. shopOff 면 저장 뒤 resetShop·dropShopTags */
+function bulkSideVars(chat: Chat, prev: ScriptState | undefined, next: ScriptState): { vars: ScriptState; shopOff: boolean } {
+  const vars: ScriptState = {};
+  const n = (chat.message ?? []).length;
+  const before = usedCols(colConfig(prev));
+  const after = usedCols(colConfig(next));
+  if (before.join() !== after.join()) vars[COL_LOG_VAR] = withColLog(prev, n, after);
+  if (invOn(prev) && !invOn(next)) Object.assign(vars, { [ITEM_USE_VAR]: '', [ITEM_USE_AT_VAR]: '', [ITEM_RESUMED_VAR]: '' });
+  else if (!invOn(prev) && invOn(next)) vars[ITEM_RESUMED_VAR] = n ? String(n) : '';
+  const shopOff = shopSettings(prev).on && !shopSettings(next).on;
+  if (shopOff) vars[SHOP_VAR] = '';
+  return { vars, shopOff };
+}
+
 const itemsUiSpent = (vars: Record<string, unknown> | undefined) => (vars?.[ITEM_SPENT_VAR] === 'keep' ? 'keep' : 'remove');
 /** 소지품·가계부 단순 옵션: 켬/끔·고르기(values) 또는 −/+ 숫자(max·num) */
 const INV_OPTS: Record<string, { key: string; values: string[]; max?: number; num?: (vars: Record<string, unknown> | undefined) => number }> = {
@@ -535,20 +551,28 @@ export async function handleSettings(action: string, value: string | undefined, 
     const u = settingsUi.undo;
     if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex) return true;
     settingsUi.undo = null;
+    let shopOff = false;
     await save(ctx, env, (chat) => {
+      const prev = chat.scriptstate;
       const vars: ScriptState = {};
       const drop: string[] = [];
       for (const [k, val] of Object.entries(u.before)) {
+        // 칸 구성 기록은 보관한 옛 값으로 덮거나 지우지 않고 이어 쓴다 (불러온 동안 쓰인 응답도 그 구성으로 읽게)
+        if (k === COL_LOG_VAR) continue;
         if (val === undefined) drop.push(k);
         else vars[k] = val;
       }
-      if (drop.length) {
-        const ss = { ...(chat.scriptstate ?? {}) };
-        for (const k of drop) delete ss[k];
-        chat.scriptstate = ss;
-      }
-      return vars;
+      const ss = { ...(chat.scriptstate ?? {}) };
+      for (const k of drop) delete ss[k];
+      const side = bulkSideVars(chat, prev, { ...ss, ...vars });
+      shopOff = side.shopOff;
+      if (drop.length) chat.scriptstate = ss;
+      return { ...vars, ...side.vars };
     });
+    if (shopOff) {
+      resetShop();
+      await dropShopTags(ctx);
+    }
     if (!settingsUi.notice) settingsUi.info = '기본값을 불러오기 전 설정으로 되돌렸어요.';
     env.render();
     return true;
@@ -568,6 +592,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       const d = current(ctx, 'defaults');
       // 덮어쓰기 직전에 바뀔 키의 지금 값을 보관한다 (2026-11-06 사용자 승인, 전수점검 9-7): 불러온 뒤 「되돌리기」 한 번
       let before: Record<string, string | number | boolean | undefined> | null = null;
+      let shopOff = false;
       await save(ctx, env, (chat) => {
         const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
@@ -575,10 +600,17 @@ export async function handleSettings(action: string, value: string | undefined, 
           const ss = { ...(chat.scriptstate ?? {}), ...vars };
           Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? '')));
         }
+        const side = bulkSideVars(chat, chat.scriptstate, { ...(chat.scriptstate ?? {}), ...vars });
+        shopOff = side.shopOff;
+        Object.assign(vars, side.vars);
         before = {};
         for (const k of Object.keys(vars)) before[k] = chat.scriptstate?.[k];
         return vars;
       });
+      if (shopOff) {
+        resetShop();
+        await dropShopTags(ctx);
+      }
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
       env.render();
@@ -586,7 +618,9 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 플러그인 초기값으로 (11-07 사용자: 「기본값으로 저장·불러오기」만 있고 초기값 롤백이 없다): 이 채팅의 설정 변수를 전부 지워 코드 기본값으로,
       // 저장해 둔 새 채팅 기본값(prefs basic·world·theme·vars)도 비운다. 상황판 켜기·끄기는 그대로. 불러오기와 같은 「되돌리기」 띠 한 번
       let before: Record<string, string | number | boolean | undefined> | null = null;
+      let shopOff = false;
       await save(ctx, env, (chat) => {
+        const prev = chat.scriptstate;
         const ss = { ...(chat.scriptstate ?? {}) };
         before = {};
         for (const k of Object.keys(ss)) {
@@ -594,8 +628,11 @@ export async function handleSettings(action: string, value: string | undefined, 
           before[k] = ss[k] as string | number | boolean | undefined;
           delete ss[k];
         }
+        const side = bulkSideVars(chat, prev, ss);
+        shopOff = side.shopOff;
+        for (const k of Object.keys(side.vars)) if (!(k in before)) before[k] = prev?.[k] as string | number | boolean | undefined;
         chat.scriptstate = ss;
-        const vars: ScriptState = {};
+        const vars: ScriptState = { ...side.vars };
         if (worldOn(chat)) {
           const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? ''));
           for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k] as string | number | boolean | undefined;
@@ -603,6 +640,10 @@ export async function handleSettings(action: string, value: string | undefined, 
         }
         return vars;
       });
+      if (shopOff) {
+        resetShop();
+        await dropShopTags(ctx);
+      }
       if (!settingsUi.notice) await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {} }));
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '이 채팅 설정과 새 채팅 기본값을 플러그인 초기값으로 되돌렸어요.';

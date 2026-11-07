@@ -99,3 +99,15 @@ test('직전 상태 블록: 모양이 주어지면 그 칸 구성과 칸 이름�
   assert.ok(block.includes('[▣|2025.01.01|02:47 AM|서울 종로구 거리|관리국/신입|300000]'));
   assert.ok(block.includes('Fields: 날짜 | 시각 | 위치 | 신분 | 잔고'));
 });
+
+// 11-08 전수점검: 기본값과 다른 구성으로 시작한 채팅에서 처음 바꿀 때 옛 구성을 0번부터로 남긴다. 기록 변수는 설정 변수가 아니다
+test('구성 기록: 비어 있으면 바뀌기 전 구성을 먼저 남김, $st_col_log 는 설정 변수 아님', async () => {
+  const { settings } = await import('../dist-test/core.mjs');
+  const prev = { $st_col_weather: 'off' };
+  const log = colLog({ $st_col_log: withColLog(prev, 4, COL_IDS) });
+  assert.deepEqual(log.map((e) => e.from), [0, 4]);
+  assert.deepEqual(log[0].cols, COL_IDS.filter((c) => c !== 'weather'));
+  assert.equal(colLog({ $st_col_log: withColLog({}, 0, ['date', 'time', 'place']) }).length, 1, '메시지가 없으면 그대로');
+  assert.equal(settings.isChatSettingVar('$st_col_log'), false);
+  assert.equal(settings.isChatSettingVar('$st_col_wallet'), true);
+});

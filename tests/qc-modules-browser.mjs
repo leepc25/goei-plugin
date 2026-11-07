@@ -2,7 +2,7 @@
 // 사용법: node tests/qc-modules-browser.mjs <fixture.json> [screenshot-dir]   (fixture: tests/make_fixture.py). ONLY=G1,P2 로 절만 골라 돌린다
 // 호스트 흉내(hostScript·boot·open)는 tests/browser.mjs 와 같다. 모델 응답은 window.__llm 큐에 넣어 흉내 낸다.
 import { createRequire } from 'node:module';
-import { distWorldPack } from './data-init.mjs';
+import { distPack, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -38,6 +38,8 @@ const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.j
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
 /** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
 const worldPack = distWorldPack();
+// 아바타 팩: 내 페르소나로 시작하려면 아바타가 있어야 출발 (2026-11-08 사용자). browser.mjs 와 같이 저장소에 미리 둔다
+const looksPack = distPack('goei-data-looks');
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -64,6 +66,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    if (!${noBody}) window.__store['p:goei:data-looks'] = ${JSON.stringify(looksPack)};
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;

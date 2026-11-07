@@ -85,7 +85,11 @@ export function colLog(vars: Record<string, unknown> | undefined): ColLogEntry[]
 
 /** 칸 구성이 바뀔 때 기록에 더한다 (같은 구성이면 그대로). 최근 20개만 */
 export function withColLog(vars: Record<string, unknown> | undefined, messageCount: number, cols: ColId[]): string {
-  const log = colLog(vars);
+  // 기록이 비어 있으면 지금(바뀌기 전) 구성을 0번부터로 먼저 남긴다 (11-08 전수점검): 기본값과 다른 구성으로 시작한 채팅의 옛 응답을
+  // 알려진 모양(앞에서부터 N칸)으로 잘못 읽지 않게
+  const seed = colLog(vars);
+  const prev = usedCols(colConfig(vars));
+  const log = !seed.length && messageCount > 0 && prev.join() !== cols.join() ? [{ from: 0, cols: prev }] : seed;
   const last = log.at(-1);
   if (last && last.cols.join() === cols.join()) return JSON.stringify(log);
   const next = last && last.from === messageCount ? [...log.slice(0, -1), { from: messageCount, cols }] : [...log, { from: messageCount, cols }];
