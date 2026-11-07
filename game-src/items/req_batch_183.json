@@ -1,0 +1,88 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유방",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single round soft human breast, smooth dome of skin with an areola and nipple on top, seen from the side, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_176/01.png"
+  },
+  {
+   "ko": "나팔관",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single thin pink fallopian tube alone, a long thin wavy tube with a frilly finger-like fringe at one end and a tiny oval ovary beside it, no uterus Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_173/02.png"
+  },
+  {
+   "ko": "흉선",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale grayish pink soft two-lobed gland, flat and leaf-shaped, larger and paler than the thyroid Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_174/02.png"
+  },
+  {
+   "ko": "견갑골",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat triangular white shoulder blade bone with a ridge across the back Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "횡격막",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dome-shaped thin sheet of red muscle with a white tendon center, like an upside-down bowl Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "턱뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human lower jawbone with teeth, U-shaped Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "책갈피",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bookmark with a pressed four-leaf clover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "접이식 컵",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a collapsible silicone cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚시 루어",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful fishing lure with hooks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "밥주걱",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white plastic rice paddle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연탄 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of long iron coal briquette tongs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "블랙홀 쓰레기통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round trash can with a swirling black hole inside instead of a bottom Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "차원 주머니",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small drawstring pouch whose open mouth shows a starry void inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꿈결 앰플 세트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small case holding a row of glass ampoules with glowing liquid in different colors Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기적의 세제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bright yellow bottle of miracle cleaner with sparkle marks, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "납작 사람 전단지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper-thin flattened human figure printed like an advertisement flyer, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

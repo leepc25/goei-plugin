@@ -1,0 +1,109 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loose wrinkled ring-shaped sleeve of skin, flattened, shown large and close up, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small puckered round ring of dark pink muscle with radiating creases, seen straight on Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deep red butterfly-shaped gland with two wings joined by a thin bridge in the middle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human forearm and upper arm with the elbow bent Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long flat shiny white tendon strip like a silver ribbon Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thick human thigh bone with a round ball on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round black grill pan for Korean barbecue Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cable reel with orange extension cord Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rubber bath plug with a chain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black cylindrical coal briquette with many holes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few scallops in fan-shaped shells Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single odd alien earpiece, smooth green shell with a tiny antenna Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal headband with two antennae tipped with glowing orbs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tube of clear green gel with a stitch symbol Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wide padded vibrating slimming belt with a small control box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hanging paper lantern glowing so bright white it looks burning Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "포피",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loose wrinkled ring-shaped sleeve of skin, flattened, shown large and close up, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_170/01.png"
+  },
+  {
+   "ko": "항문",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small puckered round ring of dark pink muscle with radiating creases, seen straight on Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갑상선",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deep red butterfly-shaped gland with two wings joined by a thin bridge in the middle Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/08.png"
+  },
+  {
+   "ko": "잘린 팔",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human forearm and upper arm with the elbow bent Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "힘줄",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long flat shiny white tendon strip like a silver ribbon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대퇴골",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thick human thigh bone with a round ball on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "불판",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round black grill pan for Korean barbecue Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전선 릴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cable reel with orange extension cord Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "욕조 마개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rubber bath plug with a chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연탄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black cylindrical coal briquette with many holes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가리비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few scallops in fan-shaped shells Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "외계어 번역 이어폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single odd alien earpiece, smooth green shell with a tiny antenna Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "텔레파시 머리띠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal headband with two antennae tipped with glowing orbs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "상처 봉합 젤",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tube of clear green gel with a stitch symbol Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진동 다이어트 벨트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wide padded vibrating slimming belt with a small control box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈 태우는 등불",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hanging paper lantern glowing so bright white it looks burning Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
