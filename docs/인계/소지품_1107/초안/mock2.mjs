@@ -36,7 +36,7 @@ const css = `
 .it-bottom{position:absolute;left:0;right:0;z-index:4}.it-tools,.it-drawer{height:52px;display:flex;gap:4px;padding:4px 8px;border-top:1px solid var(--line);background:var(--void)}
 .it-drawer{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line2);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}
 .it-tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;color:var(--sub);font:600 11px/1 inherit;font-family:inherit}.it-tb svg{width:22px !important;height:22px !important;flex:none;display:block}
-.it-grip{position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);width:48px;height:8px;background:var(--void);border:1px solid var(--line);border-bottom:0;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;padding:0;z-index:6}.it-grip i{width:18px;height:2px;border-radius:2px;background:var(--dim)}.it-grip.on i{background:var(--signal)}`;
+.it-grip{position:absolute !important;left:50% !important;bottom:-1px !important;top:auto !important;transform:translateX(-50%) !important;width:48px !important;min-width:0 !important;height:8px !important;min-height:0 !important;line-height:0;background:var(--void);border:1px solid var(--line);border-bottom:0;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;padding:0;z-index:6}.it-grip i{width:18px;height:2px;border-radius:2px;background:var(--dim)}.it-grip.on i{background:var(--signal)}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/초안2_';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
@@ -75,6 +75,7 @@ for (const vp of ['pc', 'phone']) {
       }
     }, { html: body(mode === 'drawer' ? 'grid' : mode, vp), mode });
     await sleep(200);
+    if (process.env.DBG && mode === 'drawer') console.log(await page.evaluate(() => { const g = document.querySelector('.it-grip'); const r = g.getBoundingClientRect(); const e = document.elementFromPoint(r.left + 24, r.top + 4); return JSON.stringify({ r: [r.left, r.top, r.width, r.height], top: e?.className, disp: getComputedStyle(g).display, vis: getComputedStyle(g).visibility, op: getComputedStyle(g).opacity, wrap: document.querySelector('.it-bottom').getBoundingClientRect().bottom, ov: getComputedStyle(document.querySelector('.it-bottom')).overflow }); }));
     await page.screenshot({ path: `${out}${vp}_${mode}.png` });
   }
   await page.close();
