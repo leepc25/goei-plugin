@@ -5192,6 +5192,16 @@
   },
   {
    "keywords": [
+    "근육 덩어리"
+   ],
+   "file": "body_010.png",
+   "kind": "body",
+   "base": false,
+   "name": "근육 덩어리",
+   "src": "game-src/items/raw/batch_166/10.png"
+  },
+  {
+   "keywords": [
     "접이식 칼"
    ],
    "file": "weapon_001.png",
@@ -8839,6 +8849,36 @@
   },
   {
    "keywords": [
+    "음핵 포피"
+   ],
+   "file": "body_002.png",
+   "kind": "body",
+   "base": false,
+   "name": "음핵 포피",
+   "src": "game-src/items/raw/batch_166/02.png"
+  },
+  {
+   "keywords": [
+    "얼굴 가죽"
+   ],
+   "file": "body_011.png",
+   "kind": "body",
+   "base": false,
+   "name": "얼굴 가죽",
+   "src": "game-src/items/raw/batch_166/11.png"
+  },
+  {
+   "keywords": [
+    "잘린 다리"
+   ],
+   "file": "body_013.png",
+   "kind": "body",
+   "base": false,
+   "name": "잘린 다리",
+   "src": "game-src/items/raw/batch_166/13.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -11208,6 +11248,16 @@
    "base": false,
    "name": "돼지국밥",
    "src": "game-src/items/raw/batch_161/13.png"
+  },
+  {
+   "keywords": [
+    "달팽이관"
+   ],
+   "file": "body_009.png",
+   "kind": "body",
+   "base": false,
+   "name": "달팽이관",
+   "src": "game-src/items/raw/batch_166/09.png"
   },
   {
    "keywords": [
@@ -17165,6 +17215,16 @@
   },
   {
    "keywords": [
+    "갑상선"
+   ],
+   "file": "body_008.png",
+   "kind": "body",
+   "base": false,
+   "name": "갑상선",
+   "src": "game-src/items/raw/batch_166/08.png"
+  },
+  {
+   "keywords": [
     "권총"
    ],
    "file": "weapon_002.png",
@@ -21806,6 +21866,106 @@
    "base": false,
    "name": "투호",
    "src": "game-src/items/raw/batch_161/16.png"
+  },
+  {
+   "keywords": [
+    "고환"
+   ],
+   "file": "body_001.png",
+   "kind": "body",
+   "base": false,
+   "name": "고환",
+   "src": "game-src/items/raw/batch_166/01.png"
+  },
+  {
+   "keywords": [
+    "식도"
+   ],
+   "file": "body_003.png",
+   "kind": "body",
+   "base": false,
+   "name": "식도",
+   "src": "game-src/items/raw/batch_166/03.png"
+  },
+  {
+   "keywords": [
+    "직장"
+   ],
+   "file": "body_004.png",
+   "kind": "body",
+   "base": false,
+   "name": "직장",
+   "src": "game-src/items/raw/batch_166/04.png"
+  },
+  {
+   "keywords": [
+    "기관"
+   ],
+   "file": "body_005.png",
+   "kind": "body",
+   "base": false,
+   "name": "기관",
+   "src": "game-src/items/raw/batch_166/05.png"
+  },
+  {
+   "keywords": [
+    "골수"
+   ],
+   "file": "body_006.png",
+   "kind": "body",
+   "base": false,
+   "name": "골수",
+   "src": "game-src/items/raw/batch_166/06.png"
+  },
+  {
+   "keywords": [
+    "자궁"
+   ],
+   "file": "body_007.png",
+   "kind": "body",
+   "base": false,
+   "name": "자궁",
+   "src": "game-src/items/raw/batch_166/07.png"
+  },
+  {
+   "keywords": [
+    "쇄골"
+   ],
+   "file": "body_012.png",
+   "kind": "body",
+   "base": false,
+   "name": "쇄골",
+   "src": "game-src/items/raw/batch_166/12.png"
+  },
+  {
+   "keywords": [
+    "젖니"
+   ],
+   "file": "body_014.png",
+   "kind": "body",
+   "base": false,
+   "name": "젖니",
+   "src": "game-src/items/raw/batch_166/14.png"
+  },
+  {
+   "keywords": [
+    "음경"
+   ],
+   "file": "body_015.png",
+   "kind": "body",
+   "base": false,
+   "name": "음경",
+   "src": "game-src/items/raw/batch_166/15.png"
+  },
+  {
+   "keywords": [
+    "유륜"
+   ],
+   "file": "body_016.png",
+   "kind": "body",
+   "base": false,
+   "name": "유륜",
+   "src": "game-src/items/raw/batch_166/16.png"
   },
   {
    "keywords": [
