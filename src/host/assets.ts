@@ -150,10 +150,13 @@ export function parseCrop(s: string | undefined): [number, number, number] | nul
 }
 
 /** 사진 이름 「이름#가로,세로,크기」 → 에셋 이름과 자를 틀 */
-export function splitPic(pic: string): { name: string; crop: [number, number, number] | null } {
+export function splitPic(pic: string): { name: string; crop: [number, number, number] | null; tall?: number } {
   const at = pic.lastIndexOf('#');
-  const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
-  return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
+  // 「~비율」을 붙이면 같은 틀 위·폭 그대로 아래로만 늘려 자른다 (세로/가로 비율, 상점 주인 칸 11-07)
+  const [cut, t] = at > 0 ? pic.slice(at + 1).split('~') : ['', ''];
+  const crop = at > 0 ? parseCrop(cut) : null;
+  const tall = Number(t);
+  return crop ? { name: pic.slice(0, at), crop, ...(tall > 1 && tall <= 4 ? { tall } : {}) } : { name: pic, crop: null };
 }
 
 /** 대표 사진 (위키 문서 정보표·시작 화면 세력 카드·ID카드 배경): 고른 대표 → 「영문명_default」 → 「영문명」 */

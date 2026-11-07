@@ -68,13 +68,17 @@ export function resetShop(): void {
 const balanceOf = (ctx: ChatContext) => walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat));
 
 /** 주인 얼굴: 명부 인물(이름·별칭·영문명)이면 그 얼굴 사진, 아니면 빈 얼굴 칸 */
+/** 주인 사진을 자를 세로/가로 비율 (칸 150 × 약 270 보다 조금 길게, 넘치는 아래는 칸이 가린다) */
+const OWNER_TALL = 2;
+
 function ownerFace(ctx: ChatContext, owner: string): string | null {
   const key = owner.trim().toLowerCase();
   if (!key) return null;
   const a = readDirectory(ctx.char.globalLore).agents.find((x) => [x.name, x.english, ...x.aliases].some((n) => n && n.trim().toLowerCase() === key));
   if (!a) return null;
   const pic = facePic(ctx.char, a, true);
-  return pic ? imageUrl(ctx.char, pic) : null;
+  // 얼굴 틀에서 자른 사진이면 폭은 그대로 두고 아래로 길게 잘라 온다 (사용자 11-07: 확대 말고 밑으로 더 보이게)
+  return pic ? imageUrl(ctx.char, pic.includes('#') ? `${pic}~${OWNER_TALL}` : pic) : null;
 }
 
 // ── 화면 ──
@@ -94,7 +98,7 @@ export function shopPopup(ctx: ChatContext): string {
     <span class="sh-name">${ICONS.bag}<b>${esc(st.shop)}</b></span>
     <span class="it-cnt sh-bal" title="잔고">${esc(formatWon(bal))}</span>
     <span class="it-right">
-      ${phone ? '' : `<button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="팔기">${ICONS.swap}<span>팔기</span></button>`}
+      ${phone ? '' : `<button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="판매">${ICONS.swap}<span>판매</span></button>`}
       <button class="it-act" data-action="shop-refresh" ${shopUi.loading || st.closed ? 'disabled' : ''} aria-label="새로고침">${ICONS.refresh}<span>새로고침</span></button>
       ${phone ? '' : `<button class="it-act sh-x" data-action="shop-close" aria-label="닫기">${ICONS.close}</button>`}
     </span>
@@ -108,7 +112,7 @@ export function shopPopup(ctx: ChatContext): string {
   let inner: string;
   if (phone) {
     const foot = `<div class="sh-foot">
-      <button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="팔기">${ICONS.swap}<span>팔기</span></button>
+      <button class="it-act${shopUi.pick ? ' on' : ''}" data-action="shop-pick" aria-pressed="${shopUi.pick}" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="판매">${ICONS.swap}<span>판매</span></button>
       <button class="it-act${shopUi.drawer ? ' on' : ''}" data-action="shop-drawer" aria-pressed="${shopUi.drawer}" aria-label="주인에게 말하기">${ICONS.person}<span>문의</span></button>
       <button class="it-act sh-close" data-action="shop-close" aria-label="닫기">${ICONS.close}<span>닫기</span></button>
     </div>`;
@@ -189,7 +193,7 @@ function ownerHtml(ctx: ChatContext, st: ShopState, drawer: boolean): string {
   const face = `<span class="sh-face${url ? '' : ' none'}">${url ? `<img src="${esc(url)}" alt="">` : SHADOW_FACE}</span>`;
   const name = `<div class="sh-dlg-name">${esc(st.owner || '주인')}<small>${esc(st.shop)}</small></div>`;
   const lines = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<p class="me"><i>나</i>${esc(l.text)}</p>` : `<p>「${esc(l.text)}」</p>`)).join('')
+    ? st.talk.map((l) => (l.who === 'me' ? `<p class="me">${esc(l.text)}</p>` : `<p>「${esc(l.text)}」</p>`)).join('')
     : `<p class="dim">${shopUi.loading === 'shelf' ? '…' : st.loaded ? '' : '진열대를 받으면 주인이 말을 걸어요.'}</p>`;
   const box = `<div class="sh-dlg-box" data-sh-log>${lines}${shopUi.loading === 'talk' ? '<p class="dim">…</p>' : ''}</div>`;
   const talk = talkbox(st);

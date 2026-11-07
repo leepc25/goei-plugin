@@ -686,6 +686,9 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     'Haggling: the owner may refuse, counter, or accept; accept only when it makes sense for this owner, and then lower that item\'s price. ' +
     'Requests for something not on the shelf: fetch it (partial add) only if it fits the shop identity; otherwise the owner says they do not carry it. ' +
     'If the player wants a different selection, re-stock the whole shelf (all). Questions and small talk change nothing (none). ' +
+    (s.feature
+      ? 'Shelf lines end with 구분: 「희귀」 marks the one rare piece on display — the owner knows exactly what it is, where it came from and why it is special, and prizes it (discounts on it are rare and grudging). 「특가:N」 marks goods put out today below their usual price N — the owner knows why (재고 정리, 흠집, 유통기한 등) and can say so. When adding or re-stocking, keep 구분 the same way: at most one 희귀 on the shelf, 특가 only with the usual price. '
+      : 'Leave 구분 (the last column of a shelf line) empty. ') +
     (s.kick ? 'If the owner has had enough (insults, endless haggling, trouble), they may end the dealing: say so in character and add <closed/>.' : 'The owner never ends the dealing; however annoyed, they keep the shop open (never output <closed/>).'),
     sellRule,
     `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ ${SHOP_LINE}" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (${SHOP_LINE}).\n</change>${o ? '\n<offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).' : ''}\n<closed/> only if the owner ends the dealing.`,

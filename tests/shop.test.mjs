@@ -127,7 +127,7 @@ test('팔기: 제안 읽기(offer·~줄), 터무니없는 값은 안 삼, 흥정
 // 2026-11-07 사용자: 희귀는 단 하나·따로 화려한 칸, 특가는 원래 값에 줄 긋기, 분량은 최소·최대
 test('구분: 희귀 단 하나(값대 넘어도 됨, 둘째부터 보통), 특가는 원래 값이 더 클 때만, 분량 최소·최대·옛 구간', () => {
   const raw = '<shop-identity>\nsells: tool\nnever: x\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>자.</owner>\n<shelf>\n황동 나침반|900000|tool|괴이를 가리킨다||희귀\n은 손전등|200000|tool|||레어\n줄자|3000|tool|||특가:5000\n망치|9000|tool|||특가:8000\n끌|4000|tool|||할인：6,000원\n</shelf>';
-  const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: [], never: '', prices: '', min: 0, max: 0 }, loaded: false, items: [], talk: [], prev: [], closed: false, sell: null };
+  const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: [], never: '', prices: '', min: 0, max: 0 }, loaded: false, items: [], talk: [], prev: [], sales: [], closed: false, sell: null };
   const st = applyShelf(st0, parseShelf(raw, null), shopSettings({}));
   const by = (n) => st.items.find((x) => x.name === n);
   assert.equal(by('황동 나침반').tag, 'rare', '희귀는 값대 두 배를 넘어도 남는다');
@@ -138,6 +138,12 @@ test('구분: 희귀 단 하나(값대 넘어도 됨, 둘째부터 보통), 특�
   // 대화로 더한 희귀: 이미 희귀가 있으면 보통으로
   const t = applyTalk(st, parseTalk('<owner>하나 더.</owner>\n<change mode="partial">\n+ 금빛 끌|9000|tool|||희귀\n</change>'));
   assert.equal(t.items.filter((x) => x.tag === 'rare').length, 1);
+  // 주인도 안다: 대화 요청의 진열대 줄에 구분이 실리고, 지침이 그 뜻을 알려 준다
+  const talk = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).map((m) => m.content).join('\n');
+  assert.match(talk, /황동 나침반\|900000\|tool\|[^\n]*\|희귀/);
+  assert.match(talk, /줄자\|3000\|tool\|[^\n]*\|특가:5000/);
+  assert.match(talk, /「희귀」 marks the one rare piece/);
+  assert.doesNotMatch(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({ $sh_feature: '0' })).map((m) => m.content).join('\n'), /「희귀」 marks/);
   assert.deepEqual(shopSettings({}).size, [5, 8], '기본 5~8');
   assert.deepEqual(shopSettings({ $sh_count: '2' }).size, [8, 12], '옛 구간은 그대로 읽는다');
   assert.deepEqual(shopSettings({ $sh_count: '2', $sh_min: '4', $sh_max: '10' }).size, [4, 10]);
