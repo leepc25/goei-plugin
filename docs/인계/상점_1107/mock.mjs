@@ -13,6 +13,8 @@ const wonc = (n) => `₩${n.toLocaleString('ko-KR')}`;
 // 칸용 짧은 표기: 「12만 원」「8만 5천 원」「1,500원」 (가계부 parseWon이 읽는 꼴)
 const wonShort = (n) => { if (n < 10000) return `${n.toLocaleString('ko-KR')}원`; const man = Math.floor(n / 10000), chon = Math.round((n % 10000) / 1000); return `${man.toLocaleString('ko-KR')}만${chon ? ` ${chon}천` : ''} 원`; };
 const BAL = 184000;
+const FACE = `data:image/avif;base64,${readFileSync(new URL('../../../.scratch/fixture/assets/Baek Sa-heon_bored.avif', import.meta.url)).toString('base64')}`;
+const OWNER = '주인';
 const SHOP = '을지로 철물점';
 // 모델이 창작한 진열대 흉내: 이름·종류·값·재고·설명·효과. 그림은 이름으로 매칭된 것
 const items = [
@@ -40,21 +42,28 @@ const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kin
 const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
 const grid = (sel = -1) => `<div class="it-grid sh-grid">${items.map((it, i) => cell(it, i, sel)).join('')}</div>`;
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
-const tools = (vp, req) => `<div class="gx-rec-tools it-tools sh-tools">
+const tools = (vp) => `<div class="gx-rec-tools it-tools sh-tools">
   <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal">${amt(BAL)}</span>
-  <span class="it-right"><span class="sh-q"><input class="gx-wt-q" type="text" value="${req ? '밤에 쓸 조명 도구하고 소금 같은 거' : ''}" placeholder="이런 물건들로 진열대 다시 짜기 (Enter)"><button class="sh-go" aria-label="요청">↵</button></span><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
+  <span class="it-right"><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
+// 주인 칸: 왼쪽 사진(명부 인물이면 카드 사진·감정별, 아니면 빈 얼굴 칸) + 오른쪽 대사, 그 밑 말하기 글칸. 문의는 글칸 앞에 물건 이름 칩
+const LINES = {
+  open: '뭐 찾소. 급한 거면 왼쪽 선반부터 봐. 값은 적힌 대로고.',
+  talk: '손전등? 건전지는 따로야. 둘이 같이 가져가면 천 원은 빼 주지.',
+};
+const owner = (mode, face = true) => `<div class="sh-owner"><span class="sh-face${face ? '' : ' none'}">${face ? `<img src="${FACE}" alt="">` : ic('person', 1.4)}</span><div class="sh-say"><b>${OWNER}</b><p>「${mode === 'talk' ? LINES.talk : LINES.open}」</p></div></div>
+  <div class="sh-talk"><div class="sh-talk-in${mode === 'talk' || mode === 'ask' ? ' has' : ''}">${mode === 'ask' ? `<span class="sh-ref">손전등</span><span class="sh-caret"></span>` : mode === 'talk' ? `<span class="sh-ref">손전등</span><span class="sh-typed">건전지도 같이 주면 안 돼?</span>` : `<span class="sh-ph">${OWNER}에게 말하기 — 흥정·문의·원하는 물건</span>`}</div><button class="sh-go" aria-label="보내기">↵</button></div>`;
 const detail = (it) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
   const money = `<div class="sh-money"><div><i>잔고</i>${amt(BAL)}</div><div><i>값</i>${amt(price).replace('₩', '−₩')}</div><div class="sum${poor ? ' bad' : ''}"><i>잔액</i>${amt(BAL - price).replace('₩ -', '−₩ ')}</div></div>`;
   return `<div class="gx-agpop it-pop sh-det"><div class="gx-agpop-card it-card"><button class="gx-agpop-x">✕</button>
   <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b>${meta(kind, stock)}${amt(price, 'big')}</div></div>
-  <p>${desc}</p><p class="ef">효과: ${ef}</p><p class="sh-more"><button class="sh-link">자세히 묻기</button></p>${money}
-  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button></div></div></div>`;
+  <p>${desc}</p><p class="ef">효과: ${ef}</p>${money}
+  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button><button class="gx-chip">문의</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
   const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1);
-  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${tools(vp, mode === 'request')}<div class="it-body sh-body">${body}</div>${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
+  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${tools(vp)}<div class="it-body sh-body">${body}</div>${mode === 'loading' ? '' : owner(mode, mode !== 'noface')}${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
   ${mode === 'detail' ? detail(items[0]) : mode === 'poor' ? detail(items[11]) : ''}</div>`;
 };
 // 채팅 본문 흉내 (Risu 기본 어두운 화면). 상태창은 플러그인 display 처리기 결과를 그대로 넣는다
@@ -81,7 +90,8 @@ const css = `
 .sh-name{display:inline-flex;align-items:center;gap:8px;height:var(--h);padding:0 4px;color:var(--text);font-size:16px;font-weight:700;white-space:nowrap}.sh-name svg{width:18px;height:18px;color:var(--signal)}
 .sh-bal{padding:0 12px;color:var(--text)}
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
-.sh-q{position:relative;display:inline-flex;width:300px}.sh-q .gx-wt-q{width:100%;max-width:none;margin:0;padding:0 38px 0 12px}.sh-go{position:absolute;right:4px;top:4px;width:calc(var(--h) - 8px);height:calc(var(--h) - 8px);border:0;border-radius:var(--ri);background:var(--accent-bg);color:var(--signal);font:700 14px/1 inherit;cursor:pointer}
+.sh-owner{display:flex;gap:12px;align-items:flex-start;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}.sh-face{flex:none;width:72px;height:72px;border-radius:var(--rc);overflow:hidden;border:1px solid var(--line);background:var(--void);display:grid;place-items:center;color:var(--dim)}.sh-face img{width:100%;height:100%;object-fit:cover;object-position:top}.sh-face svg{width:28px;height:28px}.sh-say{flex:1;min-width:0;padding-top:2px}.sh-say b{display:block;font-size:13.5px;color:var(--signal);margin-bottom:4px}.sh-say p{margin:0;font-size:13.5px;line-height:1.5;color:var(--text)}
+.sh-talk{display:flex;gap:8px;margin-top:10px}.sh-talk-in{flex:1;display:flex;align-items:center;gap:6px;min-height:var(--h);padding:0 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2);font-size:13.5px;color:var(--text)}.sh-talk-in .sh-ph{color:var(--dim)}.sh-ref{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:var(--ri);background:var(--accent-bg);border:1px solid var(--accent-line);color:var(--signal);font-size:12.5px;font-weight:600;white-space:nowrap}.sh-caret{width:1px;height:16px;background:var(--text)}.sh-talk .sh-go{flex:none;width:var(--h);height:var(--h);border:1px solid var(--accent-line);border-radius:var(--r);background:var(--accent-bg);color:var(--signal);font:700 15px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
 .sh-nm{display:flex;align-items:center;justify-content:center;min-height:calc(13.5px * 1.3 * 2);margin-top:6px}.sh-c b{font-size:13.5px;padding:0;color:var(--text);white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3;word-break:keep-all;overflow-wrap:anywhere}
 .sh-band{display:block;padding:3px 0 5px;color:var(--signal);font:600 12.5px/1.2 var(--mono);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -96,11 +106,11 @@ const css = `
 .sh-det .it-card p{font-size:13.5px;line-height:1.5;margin-top:12px}.sh-det .it-card p.ef{margin-top:6px}
 .sh-money{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.sh-money>div{display:flex;justify-content:space-between;align-items:baseline;height:26px}.sh-money i{font-style:normal;font-size:13.5px;color:var(--sub)}.sh-money .sh-amt{color:var(--sub)}.sh-money .sum{margin-top:4px;padding-top:6px;border-top:1px dashed var(--line)}.sh-money .sum i{color:var(--text)}.sh-money .sum .sh-amt{color:var(--signal);font-size:16px}
 .sh-money .bad i,.sh-money .bad .sh-amt{color:var(--red)}
-.sh-more{margin-top:6px !important;text-align:right}.sh-link{border:0;background:none;padding:0;color:var(--dim);font:inherit;font-size:12.5px;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}.sh-link:hover{color:var(--text)}.sh-det .it-btns{margin-top:12px}.sh-det .it-btns .gx-chip{height:var(--h);border-radius:var(--r);font-size:13.5px}.it-btns .gx-chip:disabled{opacity:.45}
+.sh-det .it-btns{margin-top:12px}.sh-det .it-btns .gx-chip{height:var(--h);border-radius:var(--r);font-size:13.5px}.it-btns .gx-chip:disabled{opacity:.45}
 .sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
-.it-right{display:contents}.sh-bal{order:1}.it-right .it-act{order:2;margin-left:auto;flex:none}.sh-q{order:3;width:100%;flex:1 1 100%}.sh-go{top:4px}
+.it-right{margin-left:auto}.sh-face{width:64px;height:64px}
 .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sh-ph .it-ic{width:96px;height:96px}
 .sh-card{display:flex;flex-direction:column;max-height:100%;overflow:hidden}.sh-body{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -2px;padding:0 2px}.sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
@@ -113,7 +123,7 @@ for (const vp of ['pc', 'phone']) {
   await closeWin(page); await sleep(200);
   await page.evaluate(() => { for (const el of document.body.querySelectorAll('*')) { if (el.children.length === 0 && /ANOMALY SIMULATION/.test(el.textContent || '')) { let n = el; while (n && n !== document.body && getComputedStyle(n).position !== 'fixed') n = n.parentElement; if (n && n !== document.body) n.style.display = 'none'; } } });
   const chat = `<div class="sh-chat"><div class="sh-msg sh-user"><div class="sh-ava"></div><div class="sh-txt">철물점 문을 열고 들어간다.</div></div><div class="sh-msg chat-message-container"><div class="sh-ava"></div><div class="sh-txt risu-chat">${statusHtml.replace(/\n/g, '<br>')}${chatCard(palette)}</div></div><div class="sh-input"><div></div></div></div>`;
-  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'request', 'loading'] : ['chat', 'grid', 'detail', 'request'];
+  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'ask', 'talk', 'noface', 'loading'] : ['chat', 'grid', 'detail', 'ask', 'talk'];
   for (const mode of modes) {
     await page.evaluate(({ chat, pop }) => {
       document.querySelectorAll('.gx').forEach((g) => { if (!g.classList.contains('sh-wrap')) g.style.display = 'none'; });
