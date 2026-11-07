@@ -15,7 +15,7 @@ import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
 import { ITEM_AUTO_VAR, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
-import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, shopSettings } from '../core/shop';
+import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, shopSettings } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_MAX, walletBalance, walletEditable, walletStarted, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
@@ -382,6 +382,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
         ...(sh.on ? [
           field('모델', seg('set-shop-model', sh.model, [['main', '메인모델'], ['aux', '보조모델']], busy), '진열대와 주인 대사를 지을 모델이에요.'),
           field('진열대 분량', `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.`),
+          field('희귀·특가 구획', onoff('set-shop-feature', sh.feature), '켜면 진열대마다 희귀 물건 단 하나와 특가 물건 1~3개를 따로 받아, 희귀는 진열장에, 특가는 원래 값에 줄을 긋고 할인율을 붙여 따로 보여 줘요. 끄면 한 격자에 늘어놓아요.'),
           field('맥락 반영', seg('set-shop-ctx', sh.context ? '1' : '0', [['1', '맥락'], ['0', '가게만']], busy), '맥락이면 최근 본문·상태창(시각·장소)·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요. 가게만이면 가게 정체와 참고 자료만 넘겨요.'),
           field('값 기준', `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 값 기준 한 줄이에요. 비우면 그 가게에 어울리는 실제 물가로 지어요.'),
           field('다양성', onoff('set-shop-diverse', sh.diverse), '켜면 뻔한 물건만 늘어놓지 않고 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
@@ -644,7 +645,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       else await save(ctx, env, (chat) => (String(chat.scriptstate?.[SHOP_MIN_VAR] ?? '') === patch[SHOP_MIN_VAR] && String(chat.scriptstate?.[SHOP_MAX_VAR] ?? '') === patch[SHOP_MAX_VAR] ? null : patch));
       return true;
     }
-    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR };
+    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, feature: SHOP_FEATURE_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR };
     const k = action.slice(9);
     const key = KEY[k];
     if (!key) return true;

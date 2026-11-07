@@ -36,6 +36,8 @@ export const ICONS = {
   back: stroke('<path d="m15 5-7 7 7 7"/>'),
   // 관찰형 게임 「관리국 순찰」: 게임패드
   star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
+  tag: stroke('<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3-8.7 8.7Z"/><circle cx="8" cy="8" r="1.4"/>'),
+
   game: stroke('<path d="M7 8h10a4 4 0 0 1 4 4.5l-.6 3.6a2.4 2.4 0 0 1-4.2 1.1L14.5 15h-5l-1.7 2.2a2.4 2.4 0 0 1-4.2-1.1L3 12.5A4 4 0 0 1 7 8Z"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01"/>'),
   search: stroke('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
   cctv: stroke('<rect x="2.5" y="4.5" width="19" height="13" rx="2"/><path d="M8 21h8M12 17.5V21"/><circle cx="7" cy="9" r="1.5" fill="currentColor" stroke="none"/>'),

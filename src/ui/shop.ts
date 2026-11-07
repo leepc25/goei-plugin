@@ -125,14 +125,41 @@ function bodyHtml(ctx: ChatContext, st: ShopState, bal: number): string {
     if (st.closed) return `<p class="gx-wt-empty">주인이 거래를 끊었어요.</p>`;
     return `<p class="gx-wt-empty">${st.loaded ? '진열대가 비었어요. 새로고침으로 다시 받아 보세요.' : '진열대를 아직 못 받았어요.'}${shopUi.notice ? '' : ' <button class="gx-chip" data-action="shop-refresh">받기</button>'}</p>`;
   }
-  return `<div class="it-grid sh-grid">${list.map((it) => cell(it, bal, st.closed)).join('')}</div>`;
+  // 희귀(단 하나)·특가는 따로 구획 (2026-11-07 사용자: 한 칸에 늘어놓지 말고 구획을 나눠 화려하게). 설정에서 끄면 한 격자
+  const feature = shopSettings(ctx.chat.scriptstate).feature;
+  const rare = feature ? list.find((x) => x.tag === 'rare') : undefined;
+  const sale = feature ? list.filter((x) => x.tag === 'sale' && x.was) : [];
+  const rest = list.filter((x) => x !== rare && !sale.includes(x));
+  const grid = (xs: ShopItem[]) => `<div class="it-grid sh-grid">${xs.map((it) => cell(it, bal, st.closed)).join('')}</div>`;
+  if (!rare && !sale.length) return `<div class="sh-shelf">${grid(rest)}</div>`;
+  const top = `<div class="sh-top">${rare ? rareHtml(rare, bal, st.closed) : ''}${sale.length ? `<section class="sh-zone sh-sale" aria-label="특가"><header class="sh-zh">${ICONS.tag}<b>특가</b><small>오늘만 내놓은 값</small></header>${grid(sale)}</section>` : ''}</div>`;
+  const main = rest.length ? `<section class="sh-zone sh-main" aria-label="진열대"><header class="sh-zh"><b>진열대</b><small>${rest.length}</small></header>${grid(rest)}</section>` : '';
+  return `<div class="sh-shelf">${top}${main}</div>`;
+}
+
+/** 희귀 진열장: 단 하나. 그림 2배(170px, 정수 확대)·이름·설명·효과·값을 다 펼쳐 보이고, 테두리에 빛이 돈다. 누르면 상세 */
+function rareHtml(it: ShopItem, bal: number, closed: boolean): string {
+  const poor = it.price > bal;
+  return `<button class="sh-zone sh-rare${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="희귀 ${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
+    <span class="sh-rare-ring" aria-hidden="true"></span>
+    <span class="sh-rare-pic"><span class="sh-rare-glow" aria-hidden="true"></span>${pic(it.name, it.kind)}</span>
+    <span class="sh-rare-tx">
+      <span class="sh-rare-lb">${ICONS.star}<b>희귀</b><small>단 하나</small></span>
+      <b class="sh-rare-nm">${esc(it.name)}</b>
+      ${it.desc ? `<span class="sh-rare-ds">${esc(it.desc)}</span>` : ''}
+      ${it.effect ? `<span class="sh-rare-ef">효과 · ${esc(it.effect)}</span>` : ''}
+      <span class="sh-rare-pr">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>
+    </span>
+  </button>`;
 }
 
 function cell(it: ShopItem, bal: number, closed: boolean): string {
   const poor = it.price > bal;
+  const sale = it.tag === 'sale' && !!it.was && it.was > it.price;
+  const off = sale ? Math.max(1, Math.round((1 - it.price / it.was!) * 100)) : 0;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(itemKindLabel(it.kind))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}<span class="sh-amt">${esc(shortWon(it.price))}</span></span>`;
-  return `<button class="it-c sh-c${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
-    <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
+  return `<button class="it-c sh-c${sale ? ' sale' : ''}${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
+    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ''}<span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${sale ? `<s>${esc(shortWon(it.was!))}</s>` : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
 }
 
 /** 팔 것 고르기: 진열대 자리에 내 소지품 (같은 격자). 고르면 입력창에 「팔기: 이름」 칩 */
@@ -193,7 +220,7 @@ function detailHtml(ctx: ChatContext, st: ShopState, bal: number): string {
     <div class="sum${poor ? ' bad' : ''}"><i>${poor ? '부족' : '잔액'}</i><span class="sh-amt">${esc(shortWon(poor ? -left : left))}</span></div>
   </div>`;
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.kind)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta"><span class="sh-tag">${esc(itemKindLabel(it.kind))}</span>${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big">${esc(shortWon(it.price))}</span></div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.kind)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta">${it.tag === 'rare' ? `<span class="sh-tag rare">${ICONS.star}희귀</span>` : ''}${it.tag === 'sale' && it.was ? '<span class="sh-tag sale">특가</span>' : ''}<span class="sh-tag">${esc(itemKindLabel(it.kind))}</span>${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big">${it.tag === 'sale' && it.was ? `<s>${esc(shortWon(it.was))}</s> ` : ''}${esc(shortWon(it.price))}</span></div></div>
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}
     ${it.sold ? '' : money}

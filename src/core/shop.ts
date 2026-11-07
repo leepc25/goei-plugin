@@ -44,6 +44,8 @@ export const SHOP_COUNTS: { id: ShopCount; label: string; range: [number, number
 /** 진열대 최소·최대 (2026-11-07 사용자: 구간 셋이 아니라 각자 정하게). 없으면 옛 $sh_count 구간, 그것도 없으면 5~8 */
 export const SHOP_MIN_VAR = '$sh_min';
 export const SHOP_MAX_VAR = '$sh_max';
+/** 희귀·특가 구획 켜기 (기본 켬) */
+export const SHOP_FEATURE_VAR = '$sh_feature';
 export const SHOP_SIZE_LO = 1;
 export const SHOP_SIZE_HI = 16;
 
@@ -51,6 +53,8 @@ export interface ShopSettings {
   on: boolean;
   /** 진열대 물건 수 [최소, 최대] */
   size: [number, number];
+  /** 희귀(단 하나)·특가를 따로 받아 구획에 보여 준다 */
+  feature: boolean;
   /** 최근 본문·상태창·괴이를 넘겨 맥락대로 (끄면 가게 정체만) */
   context: boolean;
   /** 값 기준 한 줄 (비우면 모델이 정함) */
@@ -78,6 +82,7 @@ export function shopSettings(vars: Vars): ShopSettings {
   return {
     on: vars?.[SHOP_ON_VAR] !== '0',
     size: sizeOf(vars, c === '0' || c === '2' ? c : '1'),
+    feature: vars?.[SHOP_FEATURE_VAR] !== '0',
     context: vars?.[SHOP_CTX_VAR] !== '0',
     price: clean(vars?.[SHOP_PRICE_VAR], 80),
     diverse: vars?.[SHOP_DIVERSE_VAR] !== '0',
@@ -141,6 +146,10 @@ export interface ShopItem {
   price: number;
   /** 흥정 전 값 (깎였을 때만) */
   orig?: number;
+  /** 진열 구분 (2026-11-07 사용자): 희귀 = 진열대에 단 하나, 특가 = 원래 값(was)에서 깎아 내놓은 것 */
+  tag?: 'rare' | 'sale';
+  /** 특가의 원래 값 (값보다 클 때만) */
+  was?: number;
   /** 산 뒤 (진열대에서 빠진 것, 영수증·다음 턴 사건용) */
   sold?: boolean;
 }
@@ -342,7 +351,10 @@ function priceOf(s: string): number | null {
   return n !== null && n >= 0 ? n : null;
 }
 
-/** 「이름|값|종류|설명|효과」 한 줄 → 물건. 이름이나 값이 없으면 null */
+/** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게) */
+export const SHOP_LINE = '이름|값|종류|설명|효과|구분';
+
+/** 「이름|값|종류|설명|효과|구분」 한 줄 → 물건. 이름이나 값이 없으면 null. 구분: 비움 · 희귀 · 특가:원래값 */
 function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const cells = line.replace(/^[-*•+]\s*/, '').split('|').map((c) => c.trim());
   if (cells.length < 2) return null;
@@ -350,7 +362,14 @@ function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const price = priceOf(cells[1] ?? '');
   if (!name || price === null) return null;
   const kind = kindOf(cells[2] ?? '') ?? 'misc';
-  return { name, price, kind, desc: clean(cells[3], 120), effect: clean(cells[4], 60) };
+  const out: Omit<ShopItem, 'id'> = { name, price, kind, desc: clean(cells[3], 120), effect: clean(cells[4], 60) };
+  const tag = (cells[5] ?? '').trim();
+  if (/^(희귀|레어|rare)/i.test(tag)) out.tag = 'rare';
+  else if (/^(특가|할인|세일|sale)/i.test(tag)) {
+    const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ''));
+    if (was !== null && was > price) Object.assign(out, { tag: 'sale', was });
+  }
+  return out;
 }
 
 function block(raw: string, tag: string): string {
@@ -369,7 +388,7 @@ export function parseShelf(raw: string, known: ShopIdentity | null): ShelfReply 
   const shelf = block(raw, 'shelf');
   if (!shelf) throw new ShopError('응답에 <shelf> 블록이 없어요.');
   const items = shelf.split('\n').map(parseLine).filter((x): x is Omit<ShopItem, 'id'> => !!x);
-  if (!items.length) throw new ShopError('<shelf> 블록에 읽을 수 있는 물건 줄이 없어요 (이름|값|종류|설명|효과).');
+  if (!items.length) throw new ShopError(`<shelf> 블록에 읽을 수 있는 물건 줄이 없어요 (${SHOP_LINE}).`);
   let identity = known ?? EMPTY_ID;
   const idText = block(raw, 'shop-identity');
   if (!known) {
@@ -453,8 +472,19 @@ const itemId = (key: string, name: string, n: number) => `s_${hash(`${key}|${nor
 
 function withIds(st: ShopState, list: Omit<ShopItem, 'id'>[], exclude: ShopItem[] = []): ShopItem[] {
   const out: ShopItem[] = [];
-  for (const it of list) {
-    if (!fitsIdentity(it, st.identity)) continue;
+  // 희귀는 진열대에 단 하나: 이미 걸린 희귀(안 팔린 것)가 있거나 앞에서 하나 받았으면 뒤의 것은 보통 물건으로
+  let rare = exclude.some((x) => x.tag === 'rare' && !x.sold);
+  for (const it0 of list) {
+    let it = it0;
+    if (it.tag === 'rare') {
+      if (rare) {
+        const { tag: _t, ...rest } = it;
+        it = rest;
+      }
+      rare = true;
+    }
+    // 희귀는 가게 값대를 넘어도 된다 (종류만 본다)
+    if (!fitsIdentity(it.tag === 'rare' ? { kind: it.kind, price: st.identity.min || 0 } : it, st.identity)) continue;
     if (out.some((x) => sameShopName(x.name, it.name)) || exclude.some((x) => sameShopName(x.name, it.name))) continue;
     out.push({ ...it, id: itemId(st.key, it.name, out.length + exclude.length) });
   }
@@ -585,7 +615,10 @@ const SYSTEM_COMMON =
 const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
   const r = s.size;
   return [
-    `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: 이름|값|종류|설명|효과. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
+    `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: ${SHOP_LINE}. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
+    s.feature
+      ? '구분: leave empty for ordinary goods. Mark exactly ONE item 「희귀」 — the single most special thing this shop has right now (a rare find, a one-off, the owner\'s pride), still of a 종류 this shop sells; it may cost more than the usual range, and give it a vivid 설명. Mark 1 to 3 items 「특가:원래값」 (e.g. 특가:45000) — goods the owner is selling below their usual price today, where 값 is the reduced price and 원래값 the usual price; give a reason in 설명 if it fits (재고 정리, 흠집, 유통기한). The 희귀 item is never also 특가.'
+      : '구분: always leave it empty.',
     'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
     s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
     s.price ? `Price guide from the player: ${s.price}` : 'Prices should feel like real Korean prices for that kind of shop.',
@@ -630,8 +663,8 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     SYSTEM_COMMON,
     SHELF_RULES(s, src.st),
     first
-      ? `First visit. Decide the shop's identity once from the scene and the owner's character; it will be fixed for the rest of this visit.\nOutput, in this order:\n${IDENTITY_FORMAT}\n<owner>\nthe owner's first line to the protagonist, in character, 1–3 sentences, Korean, no stage directions\n</owner>\n<shelf>\n이름|값|종류|설명|효과\n...\n</shelf>`
-      : 'Re-stock: the identity is fixed; make a different shelf that still fits it.\nOutput, in this order:\n<owner>\none short line from the owner about the new goods (or empty)\n</owner>\n<shelf>\n이름|값|종류|설명|효과\n...\n</shelf>',
+      ? `First visit. Decide the shop's identity once from the scene and the owner's character; it will be fixed for the rest of this visit.\nOutput, in this order:\n${IDENTITY_FORMAT}\n<owner>\nthe owner's first line to the protagonist, in character, 1–3 sentences, Korean, no stage directions\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`
+      : `Re-stock: the identity is fixed; make a different shelf that still fits it.\nOutput, in this order:\n<owner>\none short line from the owner about the new goods (or empty)\n</owner>\n<shelf>\n${SHOP_LINE}\n...\n</shelf>`,
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
   return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[현재 작업]\n${first ? '가게 정체·주인 첫 대사·진열대' : '진열대 새로 짜기'}` }], s, SHOP_THOUGHTS);
@@ -640,7 +673,7 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
 export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const st = src.st;
-  const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${x.kind}|${x.desc}|${x.effect}`).join('\n') || '(empty)';
+  const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${x.kind}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}`).join('\n') || '(empty)';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const sellRule = o
@@ -655,7 +688,7 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     'If the player wants a different selection, re-stock the whole shelf (all). Questions and small talk change nothing (none). ' +
     (s.kick ? 'If the owner has had enough (insults, endless haggling, trouble), they may end the dealing: say so in character and add <closed/>.' : 'The owner never ends the dealing; however annoyed, they keep the shop open (never output <closed/>).'),
     sellRule,
-    `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ 이름|값|종류|설명|효과" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (이름|값|종류|설명|효과).\n</change>${o ? '\n<offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).' : ''}\n<closed/> only if the owner ends the dealing.`,
+    `Output, in this order:\n<owner>\nthe owner's reply, in character, Korean, 1–4 sentences, no stage directions\n</owner>\n<change mode="none|partial|all">\nnone: empty.\npartial: one change per line — "+ ${SHOP_LINE}" to add, "~ 이름|새값" to change a price, "- 이름" to remove.\nall: full new shelf, one item per line (${SHOP_LINE}).\n</change>${o ? '\n<offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).' : ''}\n<closed/> only if the owner ends the dealing.`,
     SHELF_RULES(s, st),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
