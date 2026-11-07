@@ -52,6 +52,8 @@ export const shopUi = {
   chipKind: '' as '' | 'ask' | 'sell',
   /** 진열대 자리에 내 소지품(팔 것 고르기) */
   pick: false,
+  /** 팔기로 넘어갈 때 진열대 높이(px): 창이 늘었다 줄었다 하지 않게 팔기 화면에 그 높이를 준다 (2026-11-07 사용자) */
+  lockH: 0,
   input: '',
   notice: '',
   info: '',
@@ -60,7 +62,7 @@ export const shopUi = {
 };
 
 export function resetShop(): void {
-  Object.assign(shopUi, { open: false, solo: false, loading: '', detail: '', drawer: false, chip: '', chipKind: '', pick: false, input: '', notice: '', info: '', failRaw: '' });
+  Object.assign(shopUi, { open: false, solo: false, loading: '', detail: '', drawer: false, chip: '', chipKind: '', pick: false, lockH: 0, input: '', notice: '', info: '', failRaw: '' });
 }
 
 const balanceOf = (ctx: ChatContext) => walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat));
@@ -97,7 +99,8 @@ export function shopPopup(ctx: ChatContext): string {
       ${phone ? '' : `<button class="it-act sh-x" data-action="shop-close" aria-label="닫기">${ICONS.close}</button>`}
     </span>
   </div>`;
-  const body = `<div class="sh-body">${bodyHtml(ctx, st, bal)}</div>`;
+  const lock = shopUi.pick && shopUi.lockH > 0 && !phone ? ` style="min-height:${Math.round(shopUi.lockH)}px"` : '';
+  const body = `<div class="sh-body"${lock}>${bodyHtml(ctx, st, bal)}</div>`;
   const note = toast('shop', shopUi.info, (t) => {
     if (shopUi.info === t) shopUi.info = '';
   });
@@ -132,8 +135,8 @@ function bodyHtml(ctx: ChatContext, st: ShopState, bal: number): string {
   const rest = list.filter((x) => x !== rare && !sale.includes(x));
   const grid = (xs: ShopItem[]) => `<div class="it-grid sh-grid">${xs.map((it) => cell(it, bal, st.closed)).join('')}</div>`;
   if (!rare && !sale.length) return `<div class="sh-shelf">${grid(rest)}</div>`;
-  const top = `<div class="sh-top">${rare ? rareHtml(rare, bal, st.closed) : ''}${sale.length ? `<section class="sh-zone sh-sale" aria-label="특가"><header class="sh-zh">${ICONS.tag}<b>특가</b><small>오늘만 내놓은 값</small></header>${grid(sale)}</section>` : ''}</div>`;
-  const main = rest.length ? `<section class="sh-zone sh-main" aria-label="진열대"><header class="sh-zh"><b>진열대</b><small>${rest.length}</small></header>${grid(rest)}</section>` : '';
+  const top = `<div class="sh-top">${rare ? rareHtml(rare, bal, st.closed) : ''}${sale.length ? `<section class="sh-zone sh-sale" style="--n:${sale.length}" aria-label="특가"><header class="sh-zh">${ICONS.tag}<b>특가</b><small>오늘만 내놓은 값</small></header>${grid(sale)}</section>` : ''}</div>`;
+  const main = rest.length ? `<section class="sh-zone sh-main" aria-label="판매 중"><header class="sh-zh"><b>판매 중</b><small>${rest.length}</small></header>${grid(rest)}</section>` : '';
   return `<div class="sh-shelf">${top}${main}</div>`;
 }
 
@@ -383,6 +386,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       return true;
     case 'shop-pick':
       if (!st || st.closed || !st.loaded) return true;
+      if (!shopUi.pick) shopUi.lockH = document.querySelector('.sh-body')?.getBoundingClientRect().height ?? 0;
       shopUi.pick = !shopUi.pick;
       shopUi.detail = '';
       env.render();

@@ -3259,10 +3259,11 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-amt s { color: var(--dim); font-weight: 500; }
 .sh-meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--sub); line-height: 1.4; }
 .sh-tag { display: inline-block; padding: 2px 8px; border: 1px solid var(--line); border-radius: var(--ri); color: var(--text); line-height: 1.4; }
-.sh-wrap-card { width: min(100%, 980px); height: min(calc(100% - 8px), 900px); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; max-height: calc(100% - 8px); overflow: hidden; }
+/* 높이는 진열대만큼 (2026-11-07 사용자: 고정 높이는 휑함), 화면의 90%까지. 넘치면 진열대 안에서 스크롤 */
+.sh-wrap-card { width: min(100%, 980px); height: auto; max-height: min(90%, calc(100% - 8px)); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; overflow: hidden; }
 /* 상점만 열었을 때(카드에서): 창 본문은 비우고 팝업만 (2026-11-07 사용자) */
 .gx-solo { position: absolute; inset: 0; background: var(--void); }
-.sh-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0 -2px; padding: 0 2px 8px; }
+.sh-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0 -2px; padding: 0 2px; }
 /* 진열대 구획 (2026-11-07 사용자): 칸 크기는 소지품과 같은 8열 — 구획 안쪽 여백을 빼고도 같은 칸이 되게 본문 너비(cqw)로 칸 폭을 정한다 */
 .sh-body { container-type: inline-size; --zp: 12px; --shc: calc((100cqw - 2 * var(--zp) - 2px - 7 * 8px) / 8); }
 .sh-shelf { display: flex; flex-direction: column; gap: 12px; }
@@ -3274,7 +3275,11 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-zh small { font-size: 12px; color: var(--dim); }
 .sh-zh svg { width: 15px; height: 15px; color: var(--sub); }
 .sh-top { display: flex; gap: 12px; align-items: stretch; }
-.sh-top > .sh-sale { flex: 1 1 0; }
+/* 특가 구획은 물건 수만큼 딱 (빈 자리 없이), 희귀 진열장이 나머지를 채운다 */
+.sh-top > .sh-sale { flex: 0 0 calc(var(--n, 3) * var(--shc) + (var(--n, 3) - 1) * 8px + 2 * var(--zp) + 2px); }
+.sh-top > .sh-sale:only-child { flex: 1 1 auto; }
+.sh-sale .sh-zh { min-width: 0; white-space: nowrap; }
+.sh-sale .sh-zh small { overflow: hidden; text-overflow: ellipsis; }
 
 /* 특가: 붉은 기운이 도는 구획, 칸 왼쪽 위 할인 딱지, 원래 값은 줄을 긋는다 */
 .sh-sale { border-color: var(--red-ln); background: linear-gradient(160deg, var(--red-bg), transparent 55%), var(--sunk); }
@@ -3287,7 +3292,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 
 /* 희귀: 단 하나. 어두운 진열장 + 그림 뒤 금빛 후광 + 테두리를 도는 빛줄기. 그림은 원본 2배(170px, 정수 확대) */
 @property --sh-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-.sh-rare { flex: 0 0 calc(4 * var(--shc) + 3 * 8px + 2 * var(--zp) + 2px); display: flex; align-items: center; gap: 16px; padding: 14px 16px 14px 14px; overflow: hidden; border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background:
+.sh-rare { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 14px 16px 14px 14px; overflow: hidden; border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background:
   radial-gradient(70% 90% at 22% 50%, color-mix(in srgb, var(--amber) 22%, transparent), transparent 70%),
   linear-gradient(145deg, color-mix(in srgb, var(--amber) 8%, var(--void)), var(--sunk));
   color: var(--text); font: inherit; text-align: left; cursor: pointer; }
@@ -3334,16 +3339,17 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-x { width: var(--h); padding: 0; justify-content: center; }
 .sh-x svg { color: var(--sub); }
 /* 주인 칸 (PC): 사진 128 · 이름 띠 · 대사 상자(4줄 넘으면 안에서 스크롤, 새 대사가 아래) · 입력창 */
-.sh-owner { display: flex; gap: 14px; align-items: flex-start; flex: none; margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--line); }
+/* 주인 칸 (2026-11-07 사용자: 사진·이름·대화·입력이 따로 논다): 진열대 구획과 같은 틀 하나에, 사진은 오른쪽 칸 높이 그대로, 글자는 모두 안쪽 12px 줄에 맞춘다 */
+.sh-owner { display: flex; gap: 12px; align-items: stretch; flex: none; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
 /* 주인 사진: 크기 고정(대사가 늘어도 안 변함), 머리가 잘리지 않게 위 기준 (2026-11-07 사용자) */
-.sh-face { flex: none; width: 150px; height: 190px; border-radius: var(--rc); overflow: hidden; border: 1px solid var(--line); background: var(--void); display: grid; place-items: center; color: var(--dim); }
+.sh-face { flex: none; width: 150px; height: auto; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--void); display: grid; place-items: center; color: var(--dim); }
 .sh-face img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .sh-face svg { width: 36px; height: 36px; }
 .sh-face .sh-shadow, .sh-ov-head .sh-face .sh-shadow { width: 100%; height: 100%; display: block; }
 .sh-dlg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-.sh-dlg-name { display: flex; align-items: baseline; gap: 10px; height: 24px; font-size: 15px; font-weight: 700; color: var(--text); }
+.sh-dlg-name { display: flex; align-items: center; gap: 10px; height: 24px; padding: 0 12px; font-size: 15px; font-weight: 700; color: var(--text); }
 .sh-dlg-name small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
-.sh-dlg-box { flex: none; height: calc(14px * 1.6 * 5 + 20px); overflow-y: auto; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--rc); background: var(--void); }
+.sh-dlg-box { flex: none; height: calc(14px * 1.6 * 5 + 20px); overflow-y: auto; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .sh-dlg-box p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text); }
 .sh-dlg-box p + p { margin-top: 6px; }
 /* 내가 한 말: 주인 대사와 바로 구분되게 다른 색 + 「나」 표 (2026-11-07 사용자) */
