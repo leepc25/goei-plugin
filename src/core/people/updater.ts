@@ -15,7 +15,7 @@ import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
-import { ITEM_KINDS, itemKind, sameItemName, type ItemKind } from '../items';
+import { cleanIcon, itemEquip, itemState, itemUses, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -80,12 +80,11 @@ export interface UpdateInput {
   /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
   items: string[] | null;
   /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
-  used: { name: string; anchor: string }[];
+  used: UsedNow[];
 }
 
-/** 소지품 절 자료: 지금 가진 것 (core/items.ts). 모델에는 큰 종류(kind)만 준다 */
-export interface ItemNow { name: string; desc: string; kind: string }
-export const ITEM_KIND_IDS = ITEM_KINDS.map((k) => k.id);
+/** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
+export interface ItemNow { name: string; desc: string; use: boolean; left?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState }
 
 const CUE_MEANING: Record<Cue, string> = {
   작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
@@ -164,8 +163,8 @@ export interface BuildOpts {
   memory?: string[];
   /** 소지품 (설정 「보조 모델이 읽기」 켬): 지금 목록. 없거나 null 이면 소지품 절 없음 */
   items?: ItemNow[] | null;
-  /** 이 묶음 응답에서 「사용」 단추로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 반드시 gone 이나 update 로 답하게 한다 */
-  used?: { name: string; anchor: string }[];
+  /** 이 묶음 응답에서 「사용」 자리로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 소모성 횟수는 프로그램이 이미 뺐다 */
+  used?: UsedNow[];
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
@@ -312,10 +311,11 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     wallet_now: typeof o.wallet === 'number' ? { balance: o.wallet, unit: 'KRW' } : undefined,
     ...(sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: 'sexual_context_only' } } : {}),
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
-    // 소지품 (2026-11-07 core/items.ts): 지금 목록 + 종류 표. 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
-    items_now: o.items ? o.items.map((e) => ({ name: e.name, state: e.desc || undefined, kind: e.kind })) : undefined,
-    item_kinds: o.items ? ITEM_KIND_IDS.join(' | ') : undefined,
-    used_now: o.items && o.used?.length ? o.used.map((u) => u.name) : undefined,
+    // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
+    items_now: o.items
+      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
+      : undefined,
+    used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', items: !!o.items },
   };
   return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
@@ -401,7 +401,7 @@ export interface UpdateResult {
   /** 가계부: 금액이 적힌 거래만 (원, 나가면 −) */
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
-  items?: { name: string; action: string; desc?: string | null; kind?: string | null; effect?: string | null; m: string; quote: string }[];
+  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
@@ -441,10 +441,24 @@ export interface ApplyReport {
   issues: { code: string; who: string; reason: string }[];
   /** 받아들인 거래 (호출한 쪽이 장부 `$st_wallet` 에 적는다) */
   wallet: { anchor: string; amount: number; memo: string; quote: string }[];
-  /** 받아들인 소지품 변화 (호출한 쪽이 `$st_items` 에 적는다, core/items.ts). new 는 더하고, update 는 설명·효과·종류 갱신, gone 은 빼고 기록 */
+  /** 받아들인 소지품 변화 (호출한 쪽이 `$st_items` 에 적는다, core/items.ts). new 는 더하고, update 는 설명·효과·상태·남은 횟수 갱신, gone·destroyed 는 빼고 기록 */
   items: ItemChange[];
 }
-export interface ItemChange { anchor: string; name: string; action: 'new' | 'update' | 'gone'; desc: string; kind?: ItemKind; effect: string; quote: string }
+export interface ItemChange {
+  anchor: string;
+  name: string;
+  action: 'new' | 'update' | 'gone' | 'destroyed';
+  desc: string;
+  effect: string;
+  quote: string;
+  /** 판정 (new 에서 정하고, update 에서는 준 칸만 바꾼다). uses: new 는 처음 횟수, update 는 지금 남은 횟수 */
+  use?: boolean;
+  uses?: number;
+  /** null = 장착 갈래 없음 */
+  equip?: ItemEquip | null;
+  state?: ItemState;
+  icon?: string;
+}
 
 export interface ApplyCtx {
   settings: PeopleSettings;
@@ -1228,7 +1242,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('items', t, '이름 없음');
         continue;
       }
-      if (action !== 'new' && action !== 'update' && action !== 'gone') {
+      if (action !== 'new' && action !== 'update' && action !== 'gone' && action !== 'destroyed') {
         drop('items', t, '모르는 action');
         continue;
       }
@@ -1254,9 +1268,18 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       seen.add(norm(listed ?? name));
+      const eq = t.equip === undefined ? undefined : t.equip === null || /^(none|null|-|)$/i.test(str(t.equip).trim()) ? null : itemEquip(str(t.equip).trim().toLowerCase());
+      const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
+      const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
+      const icon = cleanIcon(t.icon);
       report.items.push({
-        anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : action,
-        desc: plain(t.desc, 80), ...(t.kind ? { kind: itemKind(str(t.kind).trim().toLowerCase()) } : {}), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+        anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : (action as ItemChange['action']),
+        desc: plain(t.desc, 80), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
+        ...(typeof t.usable === 'boolean' ? { use: t.usable } : {}),
+        ...(uses !== undefined ? { uses } : {}),
+        ...(eq !== undefined ? { equip: eq ?? null } : {}),
+        ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
+        ...(icon ? { icon } : {}),
       });
       report.applied.items++;
     }
