@@ -28,6 +28,11 @@ export const SHOP_PREV_VAR = '$sh_prev';
 export const SHOP_MODEL_VAR = '$sh_model';
 /** 주인이 거래를 끊을 수 있는지 (사용자 11-07: 설정으로) */
 export const SHOP_KICK_VAR = '$sh_kick';
+/** 넘길 최근 본문 턴 수·참고 로어북 수 (2026-11-07 사용자: 설정에 보여야 한다) */
+export const SHOP_TURNS_VAR = '$sh_turns';
+export const SHOP_REFS_VAR = '$sh_refs';
+export const SHOP_TURNS_DEFAULT = 3;
+export const SHOP_REFS_DEFAULT = 6;
 
 export type ShopCount = '0' | '1' | '2';
 export const SHOP_COUNTS: { id: ShopCount; label: string; range: [number, number] }[] = [
@@ -51,6 +56,10 @@ export interface ShopSettings {
   model: 'main' | 'aux';
   /** 주인이 거래를 끊을 수 있음 (끄면 응답의 <closed/> 를 무시) */
   kick: boolean;
+  /** 넘길 최근 본문 턴 수 (1~8) */
+  turns: number;
+  /** 넘길 참고 로어북 수 (0~12) */
+  refs: number;
 }
 
 type Vars = Record<string, unknown> | undefined;
@@ -69,7 +78,13 @@ export function shopSettings(vars: Vars): ShopSettings {
     avoidPrev: vars?.[SHOP_PREV_VAR] !== '0',
     model: vars?.[SHOP_MODEL_VAR] === 'main' ? 'main' : 'aux',
     kick: vars?.[SHOP_KICK_VAR] !== '0',
+    turns: numIn(vars?.[SHOP_TURNS_VAR], SHOP_TURNS_DEFAULT, 1, 8),
+    refs: numIn(vars?.[SHOP_REFS_VAR], SHOP_REFS_DEFAULT, 0, 12),
   };
+}
+function numIn(v: unknown, def: number, lo: number, hi: number): number {
+  const n = Number(v);
+  return v === undefined || v === '' || !Number.isFinite(n) ? def : Math.max(lo, Math.min(hi, Math.round(n)));
 }
 export const shopOn = (vars: Vars): boolean => shopSettings(vars).on;
 
@@ -520,7 +535,11 @@ export function shopEvents(chat: Chat): string[] {
   const spoke = st.talk.some((l) => l.who === 'me');
   if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} won)`).join(', ')} to the owner of ${st.shop}`);
   if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ''}`);
-  else if (spoke && lastOwner) out.push(`talked with the owner of ${st.shop}; last thing the owner said: "${lastOwner.text.slice(0, 80)}"`);
+  else if (spoke && lastOwner) {
+    // 주인과 나눈 말: 마지막 한 마디가 아니라 이번 방문 대화의 끝 6줄 (2026-11-07 사용자: 상점 대화가 본편에 남아야)
+    const tail = st.talk.slice(-6).map((l) => `${l.who === 'me' ? 'protagonist' : 'owner'}: "${l.text.slice(0, 100)}"`).join(' / ');
+    out.push(`talked with the owner of ${st.shop} — ${tail}`);
+  }
   return out;
 }
 

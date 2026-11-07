@@ -5,7 +5,7 @@
 // 팔기(11-07): 도구 줄 「팔기」 → 진열대 자리에 내 소지품 → 하나 고르면 입력창에 「팔기: 이름」 칩(값을 부르거나 그냥 보냄) → 주인이 값을 부르면 상세 창(잔고 / +값 / 잔액) [팔기][흥정][그만].
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
-import { generate } from '../host/llm';
+import { generate, type LlmMessage } from '../host/llm';
 import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
@@ -42,6 +42,8 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 /** 팝업 상태 (채팅이 바뀌면 resetShop). detail = 상세 팝업의 물건 id, drawer = 폰 주인 서랍, chip = 문의 중인 물건 이름 */
 export const shopUi = {
   open: false,
+  /** 채팅 카드에서 열었을 때: 창의 탭·본문 없이 상점만 (2026-11-07 사용자: 상황판이 배경으로 뜨면 안 됨). 닫으면 창도 닫는다 */
+  solo: false,
   loading: '' as '' | 'shelf' | 'talk',
   detail: '',
   drawer: false,
@@ -58,7 +60,7 @@ export const shopUi = {
 };
 
 export function resetShop(): void {
-  Object.assign(shopUi, { open: false, loading: '', detail: '', drawer: false, chip: '', chipKind: '', pick: false, input: '', notice: '', info: '', failRaw: '' });
+  Object.assign(shopUi, { open: false, solo: false, loading: '', detail: '', drawer: false, chip: '', chipKind: '', pick: false, input: '', notice: '', info: '', failRaw: '' });
 }
 
 const balanceOf = (ctx: ChatContext) => walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat));
@@ -157,7 +159,7 @@ function ownerHtml(ctx: ChatContext, st: ShopState, drawer: boolean): string {
   const face = `<span class="sh-face${url ? '' : ' none'}">${url ? `<img src="${esc(url)}" alt="">` : SHADOW_FACE}</span>`;
   const name = `<div class="sh-dlg-name">${esc(st.owner || '주인')}<small>${esc(st.shop)}</small></div>`;
   const lines = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<p class="me">${esc(l.text)}</p>` : `<p>「${esc(l.text)}」</p>`)).join('')
+    ? st.talk.map((l) => (l.who === 'me' ? `<p class="me"><i>나</i>${esc(l.text)}</p>` : `<p>「${esc(l.text)}」</p>`)).join('')
     : `<p class="dim">${shopUi.loading === 'shelf' ? '…' : st.loaded ? '' : '진열대를 받으면 주인이 말을 걸어요.'}</p>`;
   const box = `<div class="sh-dlg-box" data-sh-log>${lines}${shopUi.loading === 'talk' ? '<p class="dim">…</p>' : ''}</div>`;
   const talk = talkbox(st);
@@ -235,6 +237,8 @@ export interface ShopEnv {
   refresh(): Promise<void>;
   /** 지금 보고 있는 채팅 (응답이 돌아왔을 때 다른 채팅이면 버린다) */
   current(): ChatContext | null;
+  /** 상점만 열었을 때(solo) 닫으면 창도 닫는다 */
+  closeApp?(): Promise<void>;
 }
 
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
@@ -242,12 +246,13 @@ const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
 function source(ctx: ChatContext, st: ShopState): ShopSource {
   const src = playerSource({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() } as RefSource);
   const vars = ctx.chat.scriptstate ?? {};
-  const story = storyText(recentTurns(ctx.chat, 3, genSettings(vars).userMessages));
+  const sh = shopSettings(vars);
+  const story = storyText(recentTurns(ctx.chat, sh.turns, genSettings(vars).userMessages));
   // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
   const doc = findDoc(ctx.chat, st.shop, ctx.char.globalLore);
   const rows = limitRefs(
     collectRefs(src, { scope: 'gnet', text: `${st.shop}\n${st.owner}\n${story}`, authors: false, persona: false, related: true, extra: doc ? [{ source: `위키: ${st.shop}`, content: innerBody(doc.body).slice(0, 3000) }] : [] }),
-    6,
+    sh.refs,
   );
   let status = '';
   const msgs = ctx.chat.message ?? [];
@@ -336,6 +341,11 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       shopUi.open = false;
       shopUi.detail = '';
       shopUi.drawer = false;
+      if (shopUi.solo) {
+        shopUi.solo = false;
+        await env.closeApp?.();
+        return true;
+      }
       env.render();
       return true;
     case 'shop-refresh':
@@ -504,4 +514,11 @@ async function saveShop(ctx: ChatContext, st: ShopState, next: ShopState): Promi
 /** 입력칸: 글만 기억한다 (다시 그리지 않는다 — 커서 유지) */
 export function shopInput(v: string): void {
   shopUi.input = v;
+}
+
+/** 호출 흐름 미리 계산: 지금 열 수 있는 상점의 진열대 요청 (없으면 null) */
+export function previewShopShelf(ctx: ChatContext): LlmMessage[] | null {
+  const st = currentShop(ctx.chat);
+  if (!st) return null;
+  return shelfPrompt(source(ctx, st), shopSettings(ctx.chat.scriptstate));
 }

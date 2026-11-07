@@ -10,8 +10,8 @@ import { updateChat } from './risu';
 
 const CSS = `
 ${themeVars('[x-goei-usebox]')}
-[x-goei-usebox] { position: fixed; left: 16px; bottom: 96px; z-index: 44; display: none; max-width: min(72vw, 560px); font: 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; pointer-events: none; }
-[x-goei-usebox] [x-goei-uwrap] { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+[x-goei-usebox] { position: fixed; right: 76px; bottom: 100px; z-index: 46; display: none; max-width: min(72vw, 560px); font: 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; pointer-events: none; }
+[x-goei-usebox] [x-goei-uwrap] { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; align-items: center; }
 [x-goei-usebox] [data-gu-label] { color: var(--g-sub); font-size: 11px; letter-spacing: .02em; margin-right: 2px; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
 [x-goei-usebox] [data-gu] { display: inline-flex; align-items: center; gap: 6px; padding: 6px 7px 6px 10px; border-radius: 999px; background: var(--g-panel); color: var(--g-text); border: 1px solid var(--g-line); box-shadow: 0 6px 14px -8px rgba(0,0,0,.6); }
 [x-goei-usebox] [data-gu] b { font-weight: 600; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -19,6 +19,7 @@ import { previewDebrief } from '../../host/journal';
 import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
+import { previewShopShelf } from '../shop';
 import { traceUi } from './trace';
 
 // ── 토큰 미리 계산 (2026-11-07 사용자: 지금 설정값으로 들어갈 요청이 정해져 있으니 토큰을 계산해 보인다) ──
@@ -52,6 +53,7 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
   safe('보고서 소감', () => count(previewDebrief(ctx)));
+  safe('상점', () => count(previewShopShelf(ctx)));
   return map;
 }
 
@@ -150,7 +152,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
   const map = flowTok.map;
-  if (map) for (const n of [...pre, ...post]) if (n.name in map) n.tok = map[n.name];
+  if (map) for (const n of [...pre, ...post, ...manual]) if (n.name in map) n.tok = map[n.name];
   // 본편: Risu 가 조립하니 마지막 호출 기록의 실측
   const lastMain = [...(traceUi.turns ?? [])].reverse().find((t) => t.main?.totalTokens !== undefined)?.main;
   if (lastMain?.totalTokens !== undefined) {
@@ -163,7 +165,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
 const tokLabel = (n: Node): string => {
   if (n.kind === 'plain') return '';
   if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
-  if (n.tok === null) return '지금은 보낼 것 없음';
+  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : '지금은 보낼 것 없음';
   return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
 };
 function nodeHtml(n: Node): string {

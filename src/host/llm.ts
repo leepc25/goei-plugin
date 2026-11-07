@@ -145,6 +145,10 @@ Carefully think, then if it is OK, output the required node without any changes.
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
 const retryable = (error: unknown) => !(error instanceof LlmError);
+/** 모델 쪽 일시 오류 (빈 응답·Gemini MALFORMED_RESPONSE·과부하·429/5xx): 같은 요청을 그대로 다시 보낸다 (2026-11-07 사용자: 상점에서 빈 응답·오류가 잦음) */
+const TRANSIENT = /빈 응답|MALFORMED|finishReason|overloaded|UNAVAILABLE|RESOURCE_EXHAUSTED|rate ?limit|\b(429|500|502|503|504)\b|timeout|timed out|ECONNRESET|fetch failed/i;
+const transient = (error: unknown) => error instanceof LlmError && TRANSIENT.test(`${error.message}\n${error.raw}`);
+const TRANSIENT_RETRIES = 2;
 
 const defaultFix = (messages: LlmMessage[]) => (raw: string, reason: string): LlmMessage[] => [
   ...messages,
@@ -170,10 +174,21 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   let ask = messages;
   let use = model;
   let earlier: unknown = null;
+  let transientLeft = TRANSIENT_RETRIES;
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label)));
+      try {
+        raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label)));
+      } catch (error) {
+        // 모델 쪽 일시 오류면 형식 재시도 횟수와 무관하게 같은 요청을 다시 (최대 2회)
+        if (!transient(error) || transientLeft <= 0) throw error;
+        transientLeft--;
+        console.log(`[goei] 모델 일시 오류, 다시 보냄 (${TRANSIENT_RETRIES - transientLeft}/${TRANSIENT_RETRIES}): ${error instanceof Error ? error.message.split('\n')[0] : String(error)}`);
+        await new Promise((r) => setTimeout(r, 1200));
+        attempt--;
+        continue;
+      }
       // 다시 보기: 첫 응답을 다시 읽고 고치게 한다. 실패하면 첫 응답을 쓴다 (원본과 같음)
       for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
         const again: LlmMessage[] = [...ask, { role: 'assistant', content: raw }, { role: 'user', content: reiterationText(i, o.reiterate ?? 0) }];

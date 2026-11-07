@@ -15,7 +15,7 @@ import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
 import { ITEM_AUTO_VAR, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
-import { SHOP_COUNT_VAR, SHOP_COUNTS, SHOP_CTX_VAR, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_THOUGHTS_VAR, shopSettings } from '../core/shop';
+import { SHOP_COUNT_VAR, SHOP_COUNTS, SHOP_CTX_VAR, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, shopSettings } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_MAX, walletBalance, walletEditable, walletStarted, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
@@ -388,6 +388,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           field('생각 단계', seg('set-shop-thoughts', sh.thoughts, [['off', '없음'], ['inner', '속으로만'], ['note', '적고 지움']], busy), '물건을 짓기 전에 가게·장면·주인을 먼저 정리하게 해요. 적고 지움은 응답이 길어져요.'),
           field('지난 진열대 피하기', onoff('set-shop-prev', sh.avoidPrev), '새로고침할 때 이번 방문에 이미 보였던 물건을 피해요.'),
           field('거래 끊음', onoff('set-shop-kick', sh.kick), '켜면 주인이 모욕·끝없는 흥정 같은 일에 거래를 끊을 수 있어요. 끊기면 진열대가 잠기고 다음 턴 본편에 넘어가요. 끄면 주인이 아무리 화나도 가게는 열려 있어요.'),
+          field('최근 본문 턴 수', seg('set-shop-turns', String(sh.turns), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'], ['6', '6'], ['8', '8']], busy), '진열대·주인 대사를 지을 때 넘기는 최근 본문 턴 수예요 (맥락 반영이 「맥락」일 때).'),
+          field('참고 로어북 수', seg('set-shop-refs', String(sh.refs), [['0', '0'], ['3', '3'], ['6', '6'], ['9', '9'], ['12', '12']], busy), '봇 설명·지금 켜진 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서 가운데 최대 몇 개를 넘길지예요.'),
+          field('넘기는 것·남는 것', '', '모델에 가는 것: 가게 이름·주인, 가게 정체(첫 호출 뒤 고정), 위의 참고 로어북, 맥락이면 주인공 신분·상태창 마지막 줄·진행 중 괴이·최근 본문, 이번 방문 진열대·대화 전부. 안 가는 것: 잔고·소지품·페르소나·작가 노트. 본편에는 다음 턴 [Inventory] 글의 This turn 으로 「새로 산 것」·「판 것」·「주인과 나눈 대화 끝 6줄」·「쫓겨남」이 넘어가고, 산 물건은 소지품에, 돈은 가계부에 남아요. 조립된 요청 원문은 점검 → 호출 기록에서 봐요.'),
         ] : []),
       ].join(''));
     })(),
@@ -628,11 +631,11 @@ export async function handleSettings(action: string, value: string | undefined, 
   }
   // 상점 설정 (set-shop-<키>): 두 범위 같은 처리. 값 검사는 변수마다
   if (action.startsWith('set-shop-')) {
-    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
+    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR };
     const k = action.slice(9);
     const key = KEY[k];
     if (!key) return true;
-    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? SHOP_COUNTS.some((c) => c.id === v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : v === '1' || v === '0';
+    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? SHOP_COUNTS.some((c) => c.id === v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : k === 'turns' ? /^[1-8]$/.test(v) : k === 'refs' ? /^(0|3|6|9|12)$/.test(v) : v === '1' || v === '0';
     if (!ok) return true;
     const next = k === 'price' ? v.replace(/\s+/g, ' ').trim().slice(0, 80) : v;
     if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: next } }));

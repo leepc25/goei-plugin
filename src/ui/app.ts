@@ -574,6 +574,8 @@ export async function openWiki(title: string): Promise<void> {
 /** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
 export async function openShop(): Promise<void> {
   await openApp({ quietIfNotLite: true });
+  // 카드에서 열면 상점만 (2026-11-07 사용자: 상황판이 배경으로 뜨면 안 됨)
+  shopUi.solo = true;
   if (view.kind === 'started') await handle('shop-open');
 }
 
@@ -688,7 +690,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
   // 소지품 저장: form submit 은 iframe(allow-forms 없음)에서 오지 않으니 그려진 입력 칸(.it-form)을 넘긴다
   if (featCtx && action.startsWith('items-') && (await itemsAction(action, value, featCtx, recordsEnv, root?.querySelector<HTMLElement>('[data-it-form]') ?? lastForm))) return;
-  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close() }))) return;
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
     root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
@@ -1441,6 +1443,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
+      if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
       return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
