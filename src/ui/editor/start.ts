@@ -48,13 +48,14 @@ function scenesBlock(code: string, d: Directory): string {
   const list = rows
     .map((r) => {
       const k = (f: string) => `scene:${code}|${r.fm}|${f}`;
-      return `<div class="st-scene${r.hidden ? ' off' : ''}">
+      // 11-07 사용자: 공용 장면 일곱 편이 한 번에 다 펼쳐져 보여 과함 → 구성원별 첫 장면처럼 접어 두고 제목만 보인다
+      return `<details class="st-scene${r.hidden ? ' off' : ''}"><summary><b>${esc(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}${r.hidden ? ' · 숨김' : ''}</small></summary>
         <div class="dir-line"><span>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}</span>
           <span class="gx-row-btns">${seg('dir-scene-show', `${code}|${r.fm}`, !r.hidden, '보임', '숨김')}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc(`${code}|${r.fm}`)}">지우기</button>` : ''}</span></div>
         ${input(k('label'), r.label, '이름')}
         ${area(k('ko'), r.ko, '한국어', 6, r.hasDefault ? '비우면 기본 글로 돌아가요' : '')}
         ${area(k('en'), r.en, 'English', 6, r.hasDefault ? '비우면 기본 글로 돌아가요' : '')}
-      </div>`;
+      </details>`;
     })
     .join('');
   const tail = (BUILTIN.includes(code) ? SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? [] : []).filter((s) => s.kind !== 'opening').map((s) => s.label);
