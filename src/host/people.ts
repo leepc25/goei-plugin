@@ -21,6 +21,7 @@ import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
 import { addWalletEntry, aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { addItem, itemAutoOn, itemsVars, liveItemsOf, readItems, removeItem, updateItem } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
@@ -264,11 +265,15 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
       const ended = [] as ReturnType<typeof endedNowOf>[];
       void batchKeys;
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: settings.hypa ? hypaSummaries(fresh.chat, settings.hypaCap) : [], exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+      // 소지품 (core/items.ts): 설정 「보조 모델이 읽기」가 켜져 있으면 지금 목록을 자료에 넣고 소지품 절을 켠다
+      const itemsOn = itemAutoOn(fresh.chat.scriptstate);
+      const itemsNow = itemsOn ? liveItemsOf(readItems(fresh.chat.scriptstate), fresh.chat).map((e) => ({ name: e.name, desc: e.desc, kind: e.kind })) : null;
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: settings.hypa ? hypaSummaries(fresh.chat, settings.hypaCap) : [], exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended, items: itemsNow });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
+      if (itemsOn) sections.add('items');
       if (ended.length) sections.add('debrief');
       const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides);
       input.system = system;
@@ -319,6 +324,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           keepRead: !!o.scope?.only,
           wallet: walletOn,
           debrief: ended.length > 0,
+          items: itemsOn,
         });
         diag.report = report;
         // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
@@ -333,6 +339,22 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (walletOn) {
           const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
           if (w) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...walletVars(w) } };
+        }
+        // 소지품 변화를 목록($st_items)에: new 더하기(같은 이름은 설명만 갱신), update 고치기, gone 빼고 기록. 줄은 그 응답에 묶인다
+        if (report.items.length) {
+          let it = readItems(next.scriptstate);
+          const alive = aliveAnchors(next);
+          for (const c of report.items) {
+            const cur = liveItemsOf(it, next).find((e) => e.name === c.name);
+            if (c.action === 'gone') {
+              if (cur) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: c.desc || undefined });
+            } else if (c.action === 'update' && cur) {
+              it = updateItem(it, cur.id, { desc: c.desc || cur.desc, effect: c.effect || cur.effect, ...(c.kind ? { kind: c.kind } : {}) });
+            } else {
+              it = addItem(it, alive, { name: c.name, desc: c.desc, kind: c.kind, effect: c.effect, from: 'story', anchor: c.anchor, quote: c.quote });
+            }
+          }
+          next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
         }
         // 소감은 보고서($goei_reports)에 (종료 턴이면 turn, 지난 응답 읽기면 backfill)
         if (report.debriefs?.length) {
