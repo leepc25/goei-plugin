@@ -3,7 +3,7 @@
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
 import { overrideCount } from '../../core/world/draft';
 import type { WorldOverrides } from '../../core/world/records';
-import type { WorldKind } from '../../core/world/schema';
+import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
 import { GUIDE_LABEL, type GuideName } from '../../core/guides';
 import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
@@ -17,7 +17,7 @@ import { bindDrawer, drawerHtml } from '../drawer';
 import { bindMbar } from '../mbar';
 import { rememberPanel } from '../panels';
 import editorCss from './style.css';
-import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
+import { recordCount, recordList, recordPage, recordAction, recordInput, recUi, rowsOf } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { startPage } from './start';
 import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
@@ -82,6 +82,8 @@ export const edUi = {
   last: {} as Partial<Record<Tab, EditorNode>>,
   /** 기능 탭 「설정 찾기」 칸에 적은 말 (2026-11-06 사용자 승인, 전수점검 8-10) */
   sq: '',
+  /** 세계 통합 검색 (2026-11-07 사용자: 종류마다 검색 말고 요원·조직·괴이·파밍·부록을 한 칸에서) */
+  wq: '',
 };
 
 let root: HTMLElement | null = null;
@@ -194,6 +196,12 @@ function ensureRoot(): HTMLElement {
       edUi.sq = el.value;
       const box = root?.querySelector('.gw-find-out');
       if (box) box.innerHTML = edUi.sq.trim() ? findResults(ctx ?? null) : treeGroups(treeCounts(ctx ?? null), featureState(ctx ?? null));
+      return;
+    }
+    if (name === 'ed-wq') {
+      edUi.wq = el.value;
+      const box = root?.querySelector('.gw-find-out');
+      if (box) box.innerHTML = edUi.wq.trim() ? worldFindResults(ctx ?? null) : treeGroups(treeCounts(ctx ?? null), featureState(ctx ?? null));
       return;
     }
     if (name === 'ed-q') {
@@ -561,13 +569,51 @@ function flashFound(hit: FindHit): void {
   setTimeout(() => row.classList.remove('gw-find-flash'), 2200);
 }
 
+/* 세계 통합 검색 (2026-11-07 사용자): 세계 탭 왼쪽 목록 위 칸 하나. 요원·조직·괴이·파밍·부록 이름·부제를 한꺼번에 찾고, 누르면 그 종류 화면에서 그 기록을 연다 */
+const WORLD_FIND_KINDS: WorldKind[] = ['agent', 'org', 'anomaly', 'site', 'appendix'];
+const WORLD_FIND_ICON: Record<WorldKind, string> = { agent: ICONS.person, org: ICONS.org, anomaly: ICONS.spook, site: ICONS.star, appendix: ICONS.book };
+function worldFindResults(ctx: ChatContext | null): string {
+  const q = findNorm(edUi.wq);
+  if (!ctx) return '<p class="gw-find-none">채팅 정보를 읽지 못했어요.</p>';
+  const over = overridesOf(ctx);
+  const d = directoryDraft(ctx);
+  // 요원은 소속·부서·직급으로도 찾는다 (「협회」로 그 소속 요원까지)
+  const more = (kind: WorldKind, name: string) => {
+    if (kind !== 'agent') return '';
+    const a = d.agents.find((x) => x.lore === name);
+    return a ? [a.affiliation, a.department, a.rank].filter(Boolean).join(' · ') : '';
+  };
+  const hits: { kind: WorldKind; name: string; sub: string; state: string; s: number }[] = [];
+  for (const kind of WORLD_FIND_KINDS) {
+    for (const r of rowsOf(ctx, kind, over)) {
+      const extra = more(kind, r.name);
+      const s = findNorm(r.name).includes(q) ? 0 : findNorm(r.sub).includes(q) ? 1 : extra && findNorm(extra).includes(q) ? 2 : -1;
+      if (s === 2) { hits.push({ kind, name: r.name, sub: extra, state: r.state, s }); continue; }
+      if (s >= 0) hits.push({ kind, name: r.name, sub: r.sub, state: r.state, s });
+    }
+  }
+  hits.sort((a, b) => a.s - b.s);
+  const top = hits.slice(0, 60);
+  if (!top.length) return '<p class="gw-find-none">맞는 기록이 없어요.</p>';
+  const st = (x: string) => (x === 'deleted' ? ' (지움)' : x === 'new' ? ' (추가)' : x === 'edited' ? ' (고침)' : '');
+  return `<div class="gw-tree-group gw-find-res"><h4>찾은 기록 ${hits.length}개${hits.length > top.length ? ` (앞 ${top.length}개)` : ''}</h4>${top
+    .map((h) => `<button class="gw-tree-item gw-find-hit" data-action="ed-goto" data-value="${esc(`${h.kind}|${h.name}`)}">${WORLD_FIND_ICON[h.kind]}<span><b>${esc(h.name)}</b><small>${esc(WORLD_KIND_LABEL[h.kind])}${h.sub ? ` · ${esc(h.sub)}` : ''}${st(h.state)}</small></span></button>`)
+    .join('')}</div>`;
+}
+
 function tree(ctx: ChatContext | null): string {
   const counts = treeCounts(ctx);
   const on = featureState(ctx);
   const tab = tabOf(edUi.node);
-  const find = tab === 'set' ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">` : '';
+  const find = tab === 'set'
+    ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">`
+    : tab === 'world'
+      ? `<input class="gw-find" type="search" data-input="ed-wq" value="${esc(edUi.wq)}" placeholder="세계 검색 (요원·조직·괴이·파밍·부록)" aria-label="세계 검색" autocomplete="off">`
+      : '';
   if (tab === 'set' && edUi.sq.trim()) return `${find}<div class="gw-find-out">${findResults(ctx)}</div>`;
-  return find + (tab === 'set' ? '<div class="gw-find-out">' : '') + treeGroups(counts, on) + (tab === 'set' ? '</div>' : '');
+  if (tab === 'world' && edUi.wq.trim()) return `${find}<div class="gw-find-out">${worldFindResults(ctx)}</div>`;
+  const wrap = tab === 'set' || tab === 'world';
+  return find + (wrap ? '<div class="gw-find-out">' : '') + treeGroups(counts, on) + (wrap ? '</div>' : '');
 }
 
 function treeGroups(counts: Partial<Record<EditorNode, number>>, on: Partial<Record<EditorNode, boolean>>): string {
