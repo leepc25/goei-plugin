@@ -1,4 +1,7 @@
-onst specs = orgSpecs(books);
+    const books = lore ?? [];
+    const hit3 = cache.get(books);
+    if (hit3) return hit3;
+    const specs = orgSpecs(books);
     const scenes = scenesOf(books);
     const out = SCENARIOS.factions.map((f, i) => {
       const spec = specs.find(([, v]) => v.code === f.code)?.[1] ?? {};
@@ -4677,4 +4680,4 @@ ${JSON.stringify({ feature: "gnet", records })}
     const s7 = String(t ?? "").trim();
     return emptyPause(s7) || [...s7].length > 12 || /[다요][.!…]*$/.test(s7);
   };
-  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].i
+  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messa

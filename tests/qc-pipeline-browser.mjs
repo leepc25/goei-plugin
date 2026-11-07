@@ -281,7 +281,8 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     await setVars(page, { $st_player: 'P001' });
     let out = await request(page, [...base(), bot('Tester가 웃었다. - Characters {name}: Jyaldi, Aileen')]);
     const s0 = out[0].content;
-    assert.ok(s0.includes('## Player Character') && s0.includes('The user plays 쟈알디 (Jyaldi)') && !s0.includes('loves coffee'), `페르소나 자리에 주인공 글: ${s0.slice(0, 120)}`);
+    // 11-07 사용자: 페르소나 자리에는 그 요원 로어북만 (틀 지침 「대사·행동을 쓰지 마라」 없음, core/player.ts playerBlock)
+    assert.ok(s0.includes('### Character - Jyaldi') && !s0.includes('## Player Character') && !s0.includes('The user plays') && !s0.includes('loves coffee'), `페르소나 자리에 요원 로어북만: ${s0.slice(0, 120)}`);
     assert.ok(!out.some((m) => /\bTester\b/.test(m.content)), '페르소나 이름 → 요원 이름');
     assert.ok(out.at(-2).content.includes('쟈알디가 웃었다'));
     assert.ok(!imgPrompt(out).includes('Jyaldi'), '주인공 OFF: 주인공 요원은 이미지 명단에서 뺌');

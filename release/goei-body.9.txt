@@ -1,4 +1,15 @@
-all></div><textarea readonly rows="4">${esc20(f.raw)}</textarea></div>` : "";
+oredWikiPack()), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
+      row5("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 고급 → 로어북 보내기")
+    ].join("");
+    const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : "", phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
+    return `<div class="gw-page gw-set">${head("", "상태 점검", "플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.")}
+    <div class="gx-settings gw-setbody">
+    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows2}${row5("최근 실패", fails.length ? badge2(false, `${fails.length}건`) : badge2(true, "없음"), fails.length ? "요청 기록에서 원문을 볼 수 있어요" : "괴담넷·괴담톡·위키 요청이 실패한 적이 없어요")}</div></section>
+    ${canChat ? loreCheckBox(ctx2) : ""}
+    </div></div>`;
+  }
+  function logPage(ctx2, canChat) {
+    const fail3 = (name, f) => f ? `<div class="ps-row"><div class="ps-label"><b>${esc20(name)}</b><small>${esc20(f.reason)}</small></div><textarea readonly rows="4">${esc20(f.raw)}</textarea></div>` : "";
     const fails = fail3("괴담넷", gnet.failure) + fail3("괴담톡", phone.failure) + fail3("위키", wiki.failure);
     const diag = manUi.diag;
     const runs = diag ? diag.length ? diag.map((r) => row5(`${esc20(r.at)} · ${esc20(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc20(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
@@ -2900,38 +2911,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
           if (next === cur) return null;
           const vars = withBasic(ctx2, chat, { agentLimit: next });
           if (worldOn(chat)) {
-            const ss = { ...chat.scriptstate ?? {}, ...vars };
-            Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
-          }
-          return vars;
-        });
-        return true;
-      case "set-theme":
-        if (v !== "light" && v !== "dark" && v !== "paper") return true;
-        await save(ctx2, env3, (chat) => chat.scriptstate?.[THEME_KEY] === v ? null : { [THEME_KEY]: v });
-        return true;
-      case "set-support":
-        await save(ctx2, env3, (chat) => withBasic(ctx2, chat, { supportOn: v === "1" }));
-        return true;
-      case "set-asset":
-        await save(ctx2, env3, (chat) => withBasic(ctx2, chat, { assetOn: v === "1" }));
-        if (setImgHidden(v !== "1")) repaintTheme();
-        return true;
-      case "set-asset-model":
-        if (v !== "main" && v !== "aux") return true;
-        await save(ctx2, env3, (chat) => withBasic(ctx2, chat, { assetModel: v }));
-        return true;
-      case "set-asset-player":
-        await save(ctx2, env3, (chat) => withBasic(ctx2, chat, { assetPlayer: v === "1" }));
-        return true;
-      case "set-asset-limit": {
-        const n2 = Number(v);
-        if (!Number.isInteger(n2) || n2 < 1 || n2 > 4) return true;
-        await save(ctx2, env3, (chat) => withBasic(ctx2, chat, { assetLimit: n2 }));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // src/ui/
+            const ss

@@ -1,4 +1,9 @@
-it exactly, otherwise null; never substitute today's real date, the message order, or a count of turns, and never fill unknown parts with 00. When only a relative expression is known (「무도회 다음날」, 「사흘 전」), keep that expression inside `text` and leave `date` null. `place` is the in-world place name or null. `who` lists the names of involved people (`@user` for the user's character); only people shown as involved, never everyone present in the chat.",
+person in the room knows. Never copy one person's knowledge into another person's entry because they stood together.",
+    "## 6. Chat-level documents: events, locations, factions, items",
+    "",
+    "Besides people, the chat keeps small records of events, places, factions and items. Each lives in `docs_now` as `type`, `key` (its Korean name), `id`, `text`, `date`, `place`, `who`. You change them with `docs` items: `op` is `add` (new record), `upsert` (replace record `replace`), or `remove` (record `replace` is no longer true; needs a quote). The lorebook already describes the world; these records hold only what this chat changed, so every document rule below says: record only what changed. Create a record only for an entity that appeared or became meaningfully active in this span; never for every passing name, place name, or background object, and never in bulk from the setting. If `docs_now` already has the same entity under another spelling, upsert it instead of adding a duplicate. If you cannot tell whether two names are the same entity, do not merge and do not add; omit. A name mentioned inside a person's entry does not replace a needed record, and a record does not replace the person entries that depend on it.",
+    "",
+    "Common fields: `text` is Korean ≤200 chars and is the complete content of that record. `date` is the in-world date as `YYYY.MM.DD` when the span or the record gives it exactly, otherwise null; never substitute today's real date, the message order, or a count of turns, and never fill unknown parts with 00. When only a relative expression is known (「무도회 다음날」, 「사흘 전」), keep that expression inside `text` and leave `date` null. `place` is the in-world place name or null. `who` lists the names of involved people (`@user` for the user's character); only people shown as involved, never everyone present in the chat.",
     "",
     "<<SECTION:docs_event>>",
     "### 6.1 Event (사건)",
@@ -1448,15 +1453,4 @@ Return the JSON object.` }
       row5("채팅", badge2(canChat, canChat ? "진행 중" : "시작 전"), canChat ? `메시지 ${msgs4}개 · 이 채팅 값으로 동작해요` : "시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요"),
       // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
       row5("토크나이저", badge2(!!tok2, tok2 || "어림값") + getBtn("tok", "받기 (약 2MB)", !!tok2), tok2 ? "토큰 수를 정확히 세요" : "안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요."),
-      row5("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!storedWikiPack()), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
-      row5("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 고급 → 로어북 보내기")
-    ].join("");
-    const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : "", phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
-    return `<div class="gw-page gw-set">${head("", "상태 점검", "플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.")}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows2}${row5("최근 실패", fails.length ? badge2(false, `${fails.length}건`) : badge2(true, "없음"), fails.length ? "요청 기록에서 원문을 볼 수 있어요" : "괴담넷·괴담톡·위키 요청이 실패한 적이 없어요")}</div></section>
-    ${canChat ? loreCheckBox(ctx2) : ""}
-    </div></div>`;
-  }
-  function logPage(ctx2, canChat) {
-    const fail3 = (name, f) => f ? `<div class="ps-row"><div class="ps-label"><b>${esc20(name)}</b><small>${esc20(f.reason)}</sm
+      row5("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!st
