@@ -42,7 +42,7 @@ const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kin
 const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
 const grid = (sel = -1, many = false) => `<div class="it-grid sh-grid">${(many ? [...items, ...items.slice(0, 6)] : items).map((it, i) => cell(it, i, sel)).join('')}</div>`;
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
-const tools = (vp) => `<div class="gx-rec-tools it-tools sh-tools">
+const tools = (vp, view = 'grid') => `<div class="gx-rec-tools it-tools sh-tools">
   <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal">${amt(BAL)}</span>
   <span class="it-right"><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
 // 주인 칸: 왼쪽 사진(명부 인물이면 카드 사진·감정별, 아니면 빈 얼굴 칸) + 오른쪽 대사, 그 밑 말하기 글칸. 문의는 글칸 앞에 물건 이름 칩
@@ -51,7 +51,12 @@ const LINES = {
   talk: '손전등? 건전지는 따로야. 둘이 같이 가져가면 천 원은 빼 주지.',
 };
 const owner = (mode, face = true) => `<div class="sh-owner"><span class="sh-face${face ? '' : ' none'}">${face ? `<img src="${FACE}" alt="">` : ic('person', 1.4)}</span><div class="sh-dlg"><div class="sh-dlg-name">${OWNER}<small>${SHOP}</small></div><div class="sh-dlg-box"><p>「${mode === 'talk' ? LINES.talk : LINES.open}」</p></div>
-  <div class="sh-talk"><div class="sh-talk-in${mode === 'talk' || mode === 'ask' ? ' has' : ''}">${mode === 'ask' ? `<span class="sh-ref">손전등</span><span class="sh-caret"></span>` : mode === 'talk' ? `<span class="sh-ref">손전등</span><span class="sh-typed">건전지도 같이 주면 안 돼?</span>` : `<span class="sh-ph">${OWNER}에게 말하기</span>`}</div><button class="sh-go" aria-label="보내기">↵</button></div></div></div>`;
+  ${talkbox(mode)}</div></div>`;
+const talkbox = (mode) => `<div class="sh-talk"><div class="sh-talk-in${mode === 'talk' || mode === 'ask' ? ' has' : ''}">${mode === 'ask' ? `<span class="sh-ref">손전등</span><span class="sh-caret"></span>` : mode === 'talk' ? `<span class="sh-ref">손전등</span><span class="sh-typed">건전지도 같이 주면 안 돼?</span>` : `<span class="sh-ph">${OWNER}에게 말하기</span>`}</div><button class="sh-go" aria-label="보내기">↵</button></div>`;
+// 폰 주인 화면: 위에 사진+이름, 가운데 이번 방문의 대화 기록(주인·나), 밑에 입력창
+const drawer = (mode, face = true) => `<div class="sh-drawer"><button class="it-grip on" aria-label="서랍"><i></i></button>
+  <div class="sh-ov-head"><span class="sh-face${face ? '' : ' none'}">${face ? `<img src="${FACE}" alt="">` : ic('person', 1.4)}</span><div class="sh-dlg-name">${OWNER}<small>${SHOP}</small></div></div>
+  <div class="sh-dlg-box"><p>「${mode === 'talk' ? LINES.talk : LINES.open}」</p></div>${talkbox(mode)}</div>`;
 const detail = (it) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
@@ -63,7 +68,8 @@ const detail = (it) => {
 };
 const popup = (vp, mode) => {
   const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1, mode === 'many');
-  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${tools(vp)}<div class="it-body sh-body">${body}</div>${mode === 'loading' ? '' : owner(mode, mode !== 'noface')}${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
+  const open = vp === 'phone' && (mode === 'owner' || mode === 'talk' || mode === 'ask');
+  return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${tools(vp)}<div class="it-body sh-body">${body}</div>${mode === 'loading' || vp === 'phone' ? '' : owner(mode, mode !== 'noface')}${vp === 'phone' ? `<div class="sh-foot"><button class="it-act sh-ask${open ? ' on' : ''}">${ic('person')}문의</button><button class="it-act sh-close">${ic('close')}닫기</button></div>` : ''}${open ? `<div class="sh-dim"></div>${drawer(mode)}` : ''}</div>
   ${mode === 'detail' ? detail(items[0]) : mode === 'poor' ? detail(items[11]) : ''}</div>`;
 };
 // 채팅 본문 흉내 (Risu 기본 어두운 화면). 상태창은 플러그인 display 처리기 결과를 그대로 넣는다
@@ -111,7 +117,8 @@ const css = `
 .sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
-.it-right{margin-left:auto}.sh-face{display:none}.sh-owner{gap:0}.sh-dlg-box{min-height:calc(13.5px * 1.6 * 3 + 20px)}
+.it-right{margin-left:auto}.sh-card{position:relative}.sh-foot{display:flex;gap:8px;flex:none}.sh-foot .it-act{flex:1;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px}.sh-foot .it-act svg{color:var(--sub)}.sh-foot .it-act.on{border-color:var(--signal);color:var(--signal)}.sh-close{width:auto;margin:0}
+.sh-dim{position:absolute;inset:0;background:var(--scrim);z-index:5}.sh-drawer{position:absolute;left:0;right:0;bottom:0;height:66%;z-index:6;display:flex;flex-direction:column;gap:10px;padding:14px 12px 12px;border-top:1px solid var(--line2);border-radius:18px 18px 0 0;background:var(--panel);box-shadow:0 -10px 24px -12px rgba(0,0,0,.7)}.sh-drawer .it-grip{position:absolute;left:50%;top:-1px;transform:translateX(-50%);width:48px;height:8px;min-height:0;padding:0;border:1px solid var(--line);border-top:0;border-radius:0 0 5px 5px;background:var(--panel);display:flex;align-items:center;justify-content:center;line-height:0}.sh-drawer .it-grip i{width:18px;height:2px;border-radius:2px;background:var(--signal)}.sh-ov-head{display:flex;align-items:center;gap:12px}.sh-ov-head .sh-face{width:56px;height:56px;border-radius:var(--r)}.sh-ov-head .sh-face img{height:100%;margin-top:0;object-position:center 15%}.sh-ov-head .sh-dlg-name{height:auto;font-size:16px;flex-direction:column;align-items:flex-start;gap:2px}.sh-drawer .sh-dlg-box{flex:1;min-height:0;max-height:none;overflow-y:auto;padding:12px 14px}.sh-drawer .sh-dlg-box p{font-size:14.5px;line-height:1.7}
 .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sh-ph .it-ic{width:96px;height:96px}
 .sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
@@ -124,7 +131,7 @@ for (const vp of ['pc', 'phone']) {
   await closeWin(page); await sleep(200);
   await page.evaluate(() => { for (const el of document.body.querySelectorAll('*')) { if (el.children.length === 0 && /ANOMALY SIMULATION/.test(el.textContent || '')) { let n = el; while (n && n !== document.body && getComputedStyle(n).position !== 'fixed') n = n.parentElement; if (n && n !== document.body) n.style.display = 'none'; } } });
   const chat = `<div class="sh-chat"><div class="sh-msg sh-user"><div class="sh-ava"></div><div class="sh-txt">철물점 문을 열고 들어간다.</div></div><div class="sh-msg chat-message-container"><div class="sh-ava"></div><div class="sh-txt risu-chat">${statusHtml.replace(/\n/g, '<br>')}${chatCard(palette)}</div></div><div class="sh-input"><div></div></div></div>`;
-  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'ask', 'talk', 'noface', 'loading', 'many'] : ['chat', 'grid', 'detail', 'ask', 'talk'];
+  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'ask', 'talk', 'noface', 'loading', 'many'] : ['chat', 'grid', 'detail', 'owner', 'ask', 'talk'];
   for (const mode of modes) {
     await page.evaluate(({ chat, pop }) => {
       document.querySelectorAll('.gx').forEach((g) => { if (!g.classList.contains('sh-wrap')) g.style.display = 'none'; });
