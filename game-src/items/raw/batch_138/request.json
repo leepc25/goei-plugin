@@ -1,0 +1,118 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black silicone teardrop-shaped stopper with a flat flared base Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a string of graduated purple silicone beads with a ring pull at the end Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black curved silicone gadget with a small round handle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact pink curved handheld gadget with a round soft opening at its tip Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather harness belt with buckles and a metal O-ring at the front Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass cleaner spray bottle with blue liquid, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small single-use eye drop vials, plain clear plastic, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deodorant stick, plain dark blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nail polish remover bottle, plain pink, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small dropper bottle of e-liquid, plain amber glass, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal trash can with a lid, plain gray, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of bird seed, plain kraft paper with a small bird drawing, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of cat litter, plain white bag with a small cat drawing, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden doghouse, no sign, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden go board with a grid of black lines on light wood, a few black and white stones on it, bright light wood color Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaving cream can, plain white and blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "애널 플러그",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black silicone teardrop-shaped stopper with a flat flared base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "애널 비즈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a string of graduated purple silicone beads with a ring pull at the end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전립선 마사지기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black curved silicone gadget with a small round handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흡입 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact pink curved handheld gadget with a round soft opening at its tip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스트랩온",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather harness belt with buckles and a metal O-ring at the front Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리 세정제",
+   "kind": "consumable",
+   "redo": "118-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass cleaner spray bottle with blue liquid, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인공눈물",
+   "kind": "consumable",
+   "redo": "118-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small single-use eye drop vials, plain clear plastic, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "데오드란트",
+   "kind": "consumable",
+   "redo": "118-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deodorant stick, plain dark blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아세톤",
+   "kind": "consumable",
+   "redo": "118-6",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nail polish remover bottle, plain pink, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전자담배 액상",
+   "kind": "consumable",
+   "redo": "118-7",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small dropper bottle of e-liquid, plain amber glass, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쓰레기통",
+   "kind": "misc",
+   "redo": "119-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal trash can with a lid, plain gray, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "새 모이",
+   "kind": "misc",
+   "redo": "119-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of bird seed, plain kraft paper with a small bird drawing, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 모래",
+   "kind": "misc",
+   "redo": "119-7",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of cat litter, plain white bag with a small cat drawing, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개집",
+   "kind": "misc",
+   "redo": "119-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden doghouse, no sign, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바둑판",
+   "kind": "misc",
+   "redo": "121-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden go board with a grid of black lines on light wood, a few black and white stones on it, bright light wood color Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "면도크림",
+   "kind": "misc",
+   "redo": "123-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaving cream can, plain white and blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

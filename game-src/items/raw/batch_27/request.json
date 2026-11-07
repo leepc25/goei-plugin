@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumbling yellow paper talisman covered in green-gray mold spots. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown gourd bottle with a cork and a red cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single white seashell. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old bronze Korean coin with a square hole. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a string of old bronze coins with square holes on a red cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short braided straw rope with small red peppers and charcoal pieces tied on. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red silk Korean lucky pouch tied with a cord. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful Korean shaman ritual fan, half open. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaman's bell rattle with a cluster of brass bells and colored ribbons. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small ritual flags in blue, red, yellow, white and black on sticks. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handful of red beans. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of coarse white salt. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dried bundle of green mugwort tied with string. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a peach tree branch with a few leaves. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden sword carved from peach wood, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet of round wooden beads. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "곰팡이 핀 부적",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumbling yellow paper talisman covered in green-gray mold spots. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "호리병",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown gourd bottle with a cork and a red cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "조개 껍데기",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single white seashell. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "엽전",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old bronze Korean coin with a square hole. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "엽전 꾸러미",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a string of old bronze coins with square holes on a red cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "금줄",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short braided straw rope with small red peppers and charcoal pieces tied on. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "복주머니",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red silk Korean lucky pouch tied with a cord. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부채(무당)",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful Korean shaman ritual fan, half open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무당 방울",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaman's bell rattle with a cluster of brass bells and colored ribbons. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "오방기",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small ritual flags in blue, red, yellow, white and black on sticks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팥",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handful of red beans. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소금 한 줌",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of coarse white salt. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쑥",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dried bundle of green mugwort tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "복숭아나무 가지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a peach tree branch with a few leaves. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "복숭아나무 칼",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden sword carved from peach wood, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팔찌 염주",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet of round wooden beads. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "바이올린",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a violin with its bow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "단소",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean bamboo flute danso Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "죄수복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue prison uniform shirt and pants, folded, number patch blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리 파이프",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass smoking pipe with a bulb Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "립글로스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀이개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo ear pick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타이어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car tire Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "저주파 자극기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small TENS stimulation unit with wires and pads Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진동 팬티",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace panties with a small pocket and a small remote control beside it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유두 진동 클립",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small vibrating clips joined by a cord to a controller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오나컵",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a disposable cup-shaped masturbator, plain red, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펫 플레이 가면",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather puppy hood mask with ears Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방수 시트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black waterproof sheet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "링 재갈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal ring gag on a black leather strap Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "혀 모양 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink silicone vibrator shaped like a tongue Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "페니스 익스텐더",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear silicone extension sleeve Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

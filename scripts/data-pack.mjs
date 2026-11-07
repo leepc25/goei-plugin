@@ -10,6 +10,8 @@ const readJson = (p) => JSON.parse(readFileSync(new URL(p, ROOT), 'utf8'));
 
 export const WORLD_PACK_NAME = 'goei-data-world';
 export const INSTALL_PACK_NAME = 'goei-data-install';
+/** 소지품 그림 팩 (2026-11-07): game-src/items/icons.json 매칭 표 + icons/*.png (85×85, 배경 없음) base64. 소지품 메뉴를 처음 열 때 받아 저장소에 둔다 (host/itemicons.ts) */
+export const ITEMS_PACK_NAME = 'goei-data-items';
 /** 조각 하나의 상한 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다. 본체 조각과 같은 200KB) */
 export const PART_BYTES = 200_000;
 
@@ -51,6 +53,24 @@ export function installPackText() {
     directory: readJson('src/data/install/directory.json'),
     icon: readJson('src/data/install/icon.json'),
   });
+}
+
+/** 소지품 그림 팩 글 (game-src/items/README.md 표 기준, 11-07 최종): { schema, kind:'items', table:[{k:키워드, h:몸통 말, ft:특징 말, f:파일, kind, base?}], rep:{몸통 말: 파일}, icons:{파일: base64 webp} }.
+ *  「빼」한 줄(excluded_note)은 뺀다. merged_into 줄은 file 이 대표 그림이라 그대로 둔다. src/core/datapack.ts applyItemsPack·matchItemIcon 가 읽는 모양 */
+export function itemsPackText() {
+  const src = readJson('game-src/items/icons.json');
+  const table = [];
+  const files = new Set();
+  for (const e of src.icons) {
+    if (!Array.isArray(e.keywords) || typeof e.file !== 'string' || e.excluded_note) continue;
+    table.push({ k: e.keywords, h: Array.isArray(e.head) ? e.head : [], ft: Array.isArray(e.feats) ? e.feats : [], f: e.file, kind: e.kind, ...(e.base ? { base: true } : {}) });
+    files.add(e.file);
+  }
+  const rep = {};
+  for (const [k, f] of Object.entries(src.head_rep ?? {})) if (typeof f === 'string') (rep[k] = f), files.add(f);
+  const icons = {};
+  for (const f of [...files].sort()) icons[f] = readFileSync(new URL(`game-src/items/icons/${f}`, ROOT)).toString('base64');
+  return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */

@@ -1,0 +1,93 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "대음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human labia majora only, the two outer folds alone, realistic anatomy specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_173/01.png"
+  },
+  {
+   "ko": "십이지장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. one short thick pink tube bent into the letter C shape, a single curve only, with a small pale pancreas lump nestled inside the curve, no other intestines Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_198/16.png"
+  },
+  {
+   "ko": "괴이 명함",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black rectangular business card lying flat, with a small red eye printed on it Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_199/13.png"
+  },
+  {
+   "ko": "통신 단추",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single large round dark metal coat button with four holes, shown big and filling the square, a tiny blue light glowing between the holes Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_196/05.png"
+  },
+  {
+   "ko": "공기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small colorful plastic Korean gonggi game pebbles scattered Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_159/06.png"
+  },
+  {
+   "ko": "시체 가방",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black body bag lying flat, zipped shut, with a long zipper down the middle and handles on the sides Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_172/11.png"
+  },
+  {
+   "ko": "동그랑땡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small thick round Korean meat patties coated in golden egg batter, with bits of green onion and carrot Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_187/07.png"
+  },
+  {
+   "ko": "도토리묵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few cubes of brown translucent acorn jelly with soy sauce and green onion on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_134/10.png"
+  },
+  {
+   "ko": "봉합 바늘",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few curved half-moon surgical needles with black thread Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식용 동물 귀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed furry animal ear with surgical stitches at its base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수정 진자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear quartz crystal pendulum hanging from a thin silver chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "경면주사 병",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of bright red cinnabar powder with a brush, used for writing talismans Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "축문 두루마리",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled white paper ritual prayer scroll tied with a red string, brush writing visible Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엘리베이터 버튼 판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a torn-off elevator button panel with a row of round unmarked buttons, one glowing red Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "괴담 수칙 쪽지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled handwritten note with a numbered list of rules, stained and creased Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흉터 분장 키트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small makeup kit with fake wound putty, a stipple sponge and fake scar pieces Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved kukri knife Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved karambit claw knife with ring Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a butterfly knife open Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ice pick Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a garden pitchfork head with a short handle, compact Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal leaf rake head with a short handle, compact Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact gas brush cutter, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an angle grinder with a disc Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nail gun Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a less-lethal launcher with orange stock Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange flare gun Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a speargun, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an air rifle, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shoulder rocket launcher tube, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grenade launcher with a fat barrel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved green claymore mine on small legs Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "쿠크리",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved kukri knife Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카람빗",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved karambit claw knife with ring Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발리송",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a butterfly knife open Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "얼음송곳",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ice pick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠스랑",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a garden pitchfork head with a short handle, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈퀴",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal leaf rake head with a short handle, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "예초기",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact gas brush cutter, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전동 그라인더",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an angle grinder with a disc Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "네일건",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nail gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고무탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a less-lethal launcher with orange stock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신호탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange flare gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "작살총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a speargun, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공기총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an air rifle, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로켓 발사기",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shoulder rocket launcher tube, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유탄발사기",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grenade launcher with a fat barrel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "크레이모어",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved green claymore mine on small legs Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -17,7 +17,8 @@ export interface WalletEntry {
   amount: number;
   /** 무엇에 (한국어 ≤30) */
   memo: string;
-  src: 'story' | 'manual' | 'field';
+  /** story 본문(갱신기·상태창 맞춤) · manual 직접 · field 필드 거래 · store 상점 구입 */
+  src: 'story' | 'manual' | 'field' | 'store';
   quote?: string;
   /** 필드 거래: 장면 이름·필드 시각 (게임이 넘김) */
   place?: string;
@@ -41,7 +42,7 @@ export const walletStarted = (chat: Chat) => (chat.message ?? []).some((m) => (m
 
 const isEntry = (e: unknown): e is WalletEntry => {
   const x = e as WalletEntry;
-  return !!x && typeof x === 'object' && typeof x.id === 'string' && typeof x.anchor === 'string' && Number.isSafeInteger(x.amount) && typeof x.memo === 'string' && (x.src === 'story' || x.src === 'manual' || x.src === 'field');
+  return !!x && typeof x === 'object' && typeof x.id === 'string' && typeof x.anchor === 'string' && Number.isSafeInteger(x.amount) && typeof x.memo === 'string' && (x.src === 'story' || x.src === 'manual' || x.src === 'field' || x.src === 'store');
 };
 
 /** 장부 읽기. 없거나 깨졌으면 시작 잔고 defaultStart 의 빈 장부 */

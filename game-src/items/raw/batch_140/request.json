@@ -1,0 +1,110 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an acoustic guitar, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large brass gong jing with a padded mallet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black electronic ankle monitor strap with a small device box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled piece of aluminum foil with burn marks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black eyeliner pencil Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld massage gun Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white car license plate, blank, no numbers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small clear suction cups with pump bulbs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small purple silicone finger sleeve vibrator Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a polished green jade egg with a string Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of long thin stainless steel rods of different sizes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather strap with clips connecting cuffs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fabric door swing with straps and handles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an enema bulb syringe with a long nozzle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small delicate jeweled clamp with a dangling chain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of graduated smooth pink silicone dilator rods Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "통기타",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an acoustic guitar, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "징",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large brass gong jing with a padded mallet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전자발찌",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black electronic ankle monitor strap with a small device box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은박 호일",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled piece of aluminum foil with burn marks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이라이너",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black eyeliner pencil Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안마기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld massage gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자동차 번호판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white car license plate, blank, no numbers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "니플 석션",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small clear suction cups with pump bulbs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "핑거 바이브레이터",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small purple silicone finger sleeve vibrator Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요니 에그",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a polished green jade egg with a string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요도 사운드",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of long thin stainless steel rods of different sizes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호그타이 연결끈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather strap with clips connecting cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문틀 그네",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fabric door swing with straps and handles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "관장기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an enema bulb syringe with a long nozzle Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "클리 집게",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small delicate jeweled clamp with a dangling chain Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "질 확장기 세트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of graduated smooth pink silicone dilator rods Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

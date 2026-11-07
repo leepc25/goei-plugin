@@ -90,14 +90,14 @@ test('인물 기록 숫자 설정: 0 도 고른 값으로 읽는다 (메시지�
   const St = await import(pathToFileURL(join(dir, 'settings.mjs')));
   const d = St.peopleSettings({});
   assert.equal(d.turnCap, 10, '기본 ±10');
-  assert.equal(d.prevPairs, 1, '기본 직전 쌍 1');
+  assert.equal(d.prevPairs, 2, '기본 직전 쌍 2 (11-07 리수폿 보충 936bb9e73: 1 → 2)');
   const zero = St.peopleSettings({ $pp_turn_cap: '0', $pp_prev_pairs: '0' });
   assert.equal(zero.turnCap, 0, '0 = 한도 없음 (예전엔 기본값 10 으로 바뀌었다)');
   assert.equal(zero.prevPairs, 0, '직전 쌍 0 (예전엔 1)');
   // 범위 밖·글자는 범위 안으로·기본값으로
   const bad = St.peopleSettings({ $pp_turn_cap: '500', $pp_prev_pairs: 'abc', $pp_speed: '0' });
   assert.equal(bad.turnCap, 100);
-  assert.equal(bad.prevPairs, 1);
+  assert.equal(bad.prevPairs, 2, '잘못된 값은 기본 2');
   assert.equal(bad.speed, 0.25, '속도는 최소 0.25');
 });
 

@@ -16,35 +16,51 @@ export const PP_DEFAULTS: Record<string, string> = {
   prompt: 'detailed',
   /** split = 절 단위 혼합, append = 시트 전체 + 기록, record = 기록만, off = 본편에 안 넣음 */
   inject: 'split',
-  /** off / facts(뒤, 갱신기에 얹음) / scene(앞, 연출형) */
+  /** off / note(뒤, 갱신기에 얹은 메모만, 호출 없음) / facts(앞, 사실형 — 본편 전 보조 1회, 원본 directorRole facts) / scene(앞, 연출형).
+   *  2026-11-07: 옛 facts(호출 없음)는 note 로 이름을 바꿈. 원본처럼 사실형도 본편 앞에 Director 를 부른다 */
   director: 'facts',
   director_lang: 'en',
   director_len: 'short',
-  director_timeout: '20',
+  director_timeout: '90',
   director_reuse: '1',
   /** 리수폿 B: 자료가 모자라면 검색(채팅·로어북·위키)을 요청해 2차 호출. C: 켜진 기능마다 Director 적용 지침 */
   director_search: '1',
   director_features: '1',
   /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
   router: 'code',
-  router_timeout: '15',
+  router_timeout: '60',
+  /** 2026-11-07 (전수검사 4 의 L·M·P, 원본 trackedCharactersByScope·stageContext·Router 지침): 항상 포함할 인물(쉼표·줄바꿈), Router·Director 가 보는 최근 글 수, Router 에 덧붙일 지침 */
+  always: '',
+  recent_msgs: '4',
+  router_rules: '',
   /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
   model_director: 'same', model_router: 'same', model_tidy: 'same',
   model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
   /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
   hypa: '0',
   hypa_cap: '3000',
+  /** 하이파 요약 개수 상한(원본 directorMemoryLimit 16)과 하이파 플러스(플러그인 저장소) 읽기 (2026-11-07) */
+  hypa_items: '16',
+  hypa_plus: '1',
   speed: '1',
+  /** 호감 감소 승수 (원본 affinity.decrease). same = 증가 승수(speed)와 같게 (전수검사 4 의 N) */
+  speed_down: 'same',
   /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
   turn_cap: '10',
   /** 성격 6축·관찰 누적 (리수폿 People). 기본 켬 */
   axes: '1',
-  affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
+  /** 성적 욕망 기록·이상성욕 기록·발정모드 (원본 sexualDesireEnabled·paraphiliaEnabled·explicitSexualStyleEnabled). 원본 새 설치 기본값 = 셋 다 켬. 2026-11-07. core/people/sexual.ts */
+  sexual_desire: '1', paraphilia: '1', explicit_style: '1',
+  affinity: '1', register: '1', perception: '1',
+  /** 말투의 다변화 (원본 features.register.variety off/one/two · change ask/auto · signLimit 1~9). 2026-11-07 K. core/people/speech.ts */
+  register_variety: 'off', register_change: 'ask', register_sign_limit: '3', perception_ext: '1', suspicion: '1',
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
   /** 수치 사용 (1) / 정성 모드 (0). 호감·의심·음란도 (리수폿 E). 취향 띠는 호감 수치가 켜져 있을 때만 */
-  num_affinity: '1', num_suspicion: '1', num_openness: '1',
-  /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
-  taste: '0', openness: '0', rhythm: '0',
+  /** 2026-11-07 사용자 결정(O): 의심은 원본처럼 정성(글)이 기본. 수치는 스위치로 */
+  num_affinity: '1', num_suspicion: '0', num_openness: '1',
+  /** 리수폿 선택 기능: 취향 띠·음란도 기본 끔 */
+  /** 2026-11-07 사용자 결정(O): 서사 리듬은 원본처럼 기본 켬 */
+  taste: '0', openness: '0', rhythm: '1',
   /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
   faction_rep: '1',
   faction_inject: '1',
@@ -53,7 +69,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',
-  prev_pairs: '1',
+  /** 갱신기 앞에 붙이는 직전 유저·봇 쌍 (원본 stageContext.writer 2). 2026-11-07 W3: 1 → 2 */
+  prev_pairs: '2',
   /** 기록 본문 언어 (ko / en). 이름·인용·호칭은 늘 원문 */
   lang: 'ko',
   /** 인물당 저장 상한 (글자). 리수폿 절 상한 합계와 같은 10,000 */
@@ -76,7 +93,7 @@ export interface PeopleSettings {
   model: 'main' | 'aux';
   prompt: 'detailed' | 'compact';
   inject: 'split' | 'append' | 'record' | 'off';
-  director: 'off' | 'facts' | 'scene';
+  director: 'off' | 'note' | 'facts' | 'scene';
   directorLang: 'en' | 'ko';
   directorLen: 'short' | 'normal';
   directorTimeout: number;
@@ -85,17 +102,36 @@ export interface PeopleSettings {
   directorFeatures: boolean;
   router: 'code' | 'model';
   routerTimeout: number;
+  /** 항상 포함할 인물 이름 (기록에 있는지는 쓰는 쪽이 확인) */
+  always: string[];
+  /** Router·Director 가 보는 최근 글 수 */
+  recentMsgs: number;
+  /** Router 지침 덮어쓰기(비면 기본)와 덧붙일 지침 */
+  routerPrompt: string;
+  routerRules: string;
   /** 단계별 모델 (same 은 갱신 모델로 푼 값) 과 전용 모델 ID (비면 없음) */
   stageModel: Record<Stage, 'main' | 'aux'>;
   stageModelId: Record<Stage, string>;
   hypa: boolean;
   hypaCap: number;
+  hypaItems: number;
+  hypaPlus: boolean;
   /** 갱신기 절 덮어쓰기 (지금 지침 판 기준) 와 Director 기본 지침 덮어쓰기 */
   promptOverrides: Record<string, string>;
   directorPrompt: string;
   speed: number;
+  /** 호감 감소 승수 */
+  speedDown: number;
   turnCap: number;
   features: Set<Feature>;
+  /** 성적 욕망·이상성욕 기록, 발정모드 (성격 6축 기능 안의 칸) */
+  sexualDesire: boolean;
+  paraphilia: boolean;
+  explicitStyle: boolean;
+  /** 말투의 다변화 단계·변경 방식·조짐 횟수 (기능 register 안의 세부) */
+  registerVariety: 'off' | 'one' | 'two';
+  registerChange: 'ask' | 'auto';
+  registerSignLimit: number;
   /** 수치를 켠 기능 */
   numeric: Set<NumericFeature>;
   /** 켜져 있지만 수치를 끈 기능 (정성 모드) */
@@ -149,15 +185,19 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     model: v('model') === 'main' ? 'main' : 'aux',
     prompt: one('prompt', ['detailed', 'compact'] as const),
     inject: one('inject', ['split', 'append', 'record', 'off'] as const),
-    director: one('director', ['off', 'facts', 'scene'] as const),
+    director: one('director', ['off', 'note', 'facts', 'scene'] as const),
     directorLang: v('director_lang') === 'ko' ? 'ko' : 'en',
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
-    directorTimeout: num('director_timeout', 5, 120),
+    directorTimeout: num('director_timeout', 5, 300),
     directorReuse: v('director_reuse') !== '0',
     directorSearch: v('director_search') !== '0',
     directorFeatures: v('director_features') !== '0',
     router: v('router') === 'model' ? 'model' : 'code',
-    routerTimeout: num('router_timeout', 5, 60),
+    routerTimeout: num('router_timeout', 5, 300),
+    always: [...new Set(v('always').split(/[,\n]/).map((x) => x.trim().normalize('NFC')).filter(Boolean))].slice(0, 12),
+    recentMsgs: num('recent_msgs', 0, 12),
+    routerPrompt: (typeof state?.[PS('router', 'base')] === 'string' ? String(state[PS('router', 'base')]) : '').trim().slice(0, 12000),
+    routerRules: v('router_rules').slice(0, 2000),
     stageModel: (() => {
       const base = v('model') === 'main' ? 'main' : 'aux';
       const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);
@@ -165,12 +205,21 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     })(),
     stageModelId: { update: v('model_id_update').trim().slice(0, 120), director: v('model_id_director').trim().slice(0, 120), router: v('model_id_router').trim().slice(0, 120), tidy: v('model_id_tidy').trim().slice(0, 120) },
     hypa: v('hypa') === '1',
-    hypaCap: num('hypa_cap', 500, 12000),
+    hypaCap: num('hypa_cap', 500, 24000),
+    hypaItems: num('hypa_items', 1, 64),
+    hypaPlus: v('hypa_plus') !== '0',
     promptOverrides: promptOverrides(state, one('prompt', ['detailed', 'compact'] as const)),
     directorPrompt: (typeof state?.[PS('director', 'base')] === 'string' ? String(state[PS('director', 'base')]) : '').trim().slice(0, 12000),
     speed: num('speed', 0.25, 4),
+    speedDown: v('speed_down') === 'same' || v('speed_down') === '' ? num('speed', 0.25, 4) : num('speed_down', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
     features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),
+    sexualDesire: v('sexual_desire') === '1',
+    paraphilia: v('paraphilia') === '1',
+    explicitStyle: v('explicit_style') === '1',
+    registerVariety: one('register_variety', ['off', 'one', 'two'] as const),
+    registerChange: v('register_change') === 'auto' ? 'auto' : 'ask',
+    registerSignLimit: num('register_sign_limit', 1, 9),
     numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== '0')),
     qualitative: new Set(NUMERIC_FEATURES.filter((f) => v(f) === '1' && v(`num_${f}`) === '0')),
     newPeople: v('newpeople') === 'confirm' ? 'confirm' : 'auto',

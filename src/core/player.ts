@@ -26,19 +26,11 @@ export function playableAgents(lore: LoreEntry[] | undefined, faction: string): 
 
 export const PLAYER_HEAD = '## Player Character';
 
-/** 요청에 넣을 주인공 글: 틀 지침 + 그 요원 로어북 (CBS를 풀고 장식 줄을 뗀다) */
+/** 요청에 넣을 주인공 글 = 그 요원 로어북 그대로 (CBS를 풀고 장식 줄을 뗀다).
+ *  11-07 사용자: 페르소나 자리에 지침을 덧붙이지 말고 로어북만 넣을 것. 전에 붙였던 「대사·행동을 쓰지 마라, 서술만 하라」 네 줄이 인물 플레이 응답에서 대사를 없앴다. */
 export function playerBlock(lore: LoreEntry[] | undefined, agent: AgentRow, env: CbsEnv): string {
   const entry = (lore ?? []).find((e) => e.mode !== 'folder' && String(e.comment ?? '') === agent.lore);
-  const body = entry ? stripDecorators(evaluate(String(entry.content ?? ''), env)).trim() : '';
-  const who = agent.english ? `${agent.name} (${agent.english})` : agent.name;
-  return [
-    PLAYER_HEAD,
-    `The user plays ${who}${agent.rank ? `, ${agent.rank}` : ''}. This character is the protagonist (the user-controlled character).`,
-    '- Never write this character\'s dialogue, actions, thoughts or decisions. Narrate only the world and other characters\' reactions.',
-    '- This character already knows their own background, abilities, relationships and secrets, including anything the lore marks as hidden. Colleagues, superiors and acquaintances already know them and treat them according to the lore below.',
-    '- Other characters address and refer to this character by this name.',
-    body,
-  ].filter(Boolean).join('\n');
+  return entry ? stripDecorators(evaluate(String(entry.content ?? ''), env)).trim() : '';
 }
 
 /** 괴담넷·괴담톡·위키 참고 자료: 캐릭터로 플레이면 페르소나 설명 대신 주인공 글 */
@@ -65,7 +57,7 @@ export function applyPlayer<M extends { role?: unknown; content?: unknown }>(mes
       return { ...m, content };
     });
   }
-  if (!placed && !out.some((m) => typeof m?.content === 'string' && m.content.includes(PLAYER_HEAD))) {
+  if (!placed && !out.some((m) => typeof m?.content === 'string' && m.content.includes(block))) {
     const at = out.findIndex((m) => m?.role === 'system');
     const add = { role: 'system', content: block } as M;
     out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];

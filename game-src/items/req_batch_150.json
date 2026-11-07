@@ -1,0 +1,98 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유리 파이프",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass smoking pipe with a bulb Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "저주파 자극기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small TENS stimulation unit with wires and pads Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진동 팬티",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace panties with a small pocket and a small remote control beside it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유두 진동 클립",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small vibrating clips joined by a cord to a controller Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "오나컵",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a disposable cup-shaped masturbator, plain red, no text Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "펫 플레이 가면",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather puppy hood mask with ears Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "바이올린",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a violin with its bow Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "하모니카",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver harmonica Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "드럼 스틱",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of wooden drumsticks Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "북",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean barrel drum buk with a stick Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "목베개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a U-shaped travel neck pillow Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "썬캡",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visor sun cap Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "효자손",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden back scratcher Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "군번줄",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. military dog tags on a ball chain, blank tags Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "귀이개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo ear pick Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  },
+  {
+   "ko": "손풍기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handheld fan Only this item, nothing else beside it, no text, fully inside its square.",
+   "alt": true
+  }
+ ]
+}

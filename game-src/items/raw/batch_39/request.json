@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bag of red pepper powder, plain bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass spice jar with brown spice. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic bottle of yellow cooking oil, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark soy sauce bottle, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a honey dipper with dripping honey. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of red jam with a checked lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed cereal box, plain box with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plastic cup coffee with a foil lid, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two tea bags with strings and blank tags. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single cigarette next to a disposable lighter. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown cigar. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single hand-rolled cigarette. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tin, plain lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear bag full of colorful wrapped candies. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden skewer of strange dark purple grilled meat chunks. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleek silver vacuum food container with a clear lid. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "고춧가루",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bag of red pepper powder, plain bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "향신료",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass spice jar with brown spice. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "식용유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic bottle of yellow cooking oil, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "간장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark soy sauce bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꿀",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a honey dipper with dripping honey. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "잼",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of red jam with a checked lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "시리얼",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed cereal box, plain box with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "컵커피",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plastic cup coffee with a foil lid, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "티백",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two tea bags with strings and blank tags. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "라이터와 담배",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single cigarette next to a disposable lighter. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "시가",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown cigar. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "궐련",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single hand-rolled cigarette. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "씹는 담배",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tin, plain lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사탕 봉지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear bag full of colorful wrapped candies. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "정체불명 길거리 음식",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden skewer of strange dark purple grilled meat chunks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진공 용기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleek silver vacuum food container with a clear lid. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

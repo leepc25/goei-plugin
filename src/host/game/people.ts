@@ -10,6 +10,7 @@ import { affinityView, addressOf } from '../../core/people/affinity';
 import { personBlock, unknownTo } from '../../core/people/inject';
 import { latestNote } from '../../core/people/updater';
 import { temperOf } from '../../core/people/base';
+import { sexualTexts } from '../../core/people/sexual';
 import { onPeopleStatus } from '../people';
 import { relationStage } from '../../core/world/records';
 
@@ -21,7 +22,7 @@ export function liveSheetOf(c: { char: ChatContext['char']; chat: ChatContext['c
   if (!settings.on || !p) return sheet;
   const live = liveness(c.chat);
   const changes = liveChanges(store, live);
-  return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user, note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap, axes: settings.features.has('axes'), features: settings.features, qual: settings.qualitative });
+  return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user, note: settings.director === 'note' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap, axes: settings.features.has('axes'), features: settings.features, qual: settings.qualitative, sexual: sexualTexts(p, settings) });
 }
 
 export function createPeople(): GamePeople {
@@ -36,9 +37,9 @@ export function createPeople(): GamePeople {
       const changes = liveChanges(store, live);
       const list = Object.values(store.people).filter((p) => !names || names.includes(p.name));
       return list.map((p): PersonView => {
-        const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, turnCap: settings.turnCap });
+        const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap });
         const texts = (k: 'state' | 'knowledge' | 'threads') => liveEntries(p.slots[k], live).map((e) => e.text);
-        const note = settings.director === 'facts' ? latestNote(store, p.name, live) : null;
+        const note = settings.director === 'note' ? latestNote(store, p.name, live) : null;
         return {
           name: p.name,
           faction: p.faction,

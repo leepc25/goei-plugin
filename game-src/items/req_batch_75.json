@@ -1,0 +1,87 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "도마",
+   "kind": "misc",
+   "redo": "67-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden cutting board with a handle hole, only one board Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사료",
+   "kind": "misc",
+   "redo": "68-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of pet food kibble, plain bag with a dog picture, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비빔밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black stone bowl of bibimbap with colorful vegetables, a fried egg and red chili paste on rice, seen from a slight angle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "김치찌개",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black pot of bubbling red kimchi stew with tofu and pork pieces Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "된장찌개",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown earthenware pot of soybean paste stew with tofu, zucchini and green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "순두부찌개",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black earthenware pot of fiery red soft tofu stew with a raw egg on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부대찌개",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wide shallow pot of red army stew with sausages, ham slices, ramen noodles and a cheese slice Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large pot of red pork bone stew with big pork spine bones and potatoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해장국",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark earthenware bowl of hangover soup with dark broth, ox blood cubes and cabbage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "설렁탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowl of milky white ox bone soup with thin beef slices and chopped green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삼계탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black earthenware pot with a whole small chicken in clear soup, a jujube and ginseng root Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "미역국",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowl of dark green seaweed soup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "떡국",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowl of rice cake soup with oval white rice cake slices, egg strips and seaweed flakes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "육개장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of spicy red beef soup with shredded beef, bracken and green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈비탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of clear beef short rib soup with a big beef rib bone sticking out Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "추어탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thick brown loach soup with green onion Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

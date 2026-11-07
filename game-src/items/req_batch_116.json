@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "착화제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fire starter cube pack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쿨링 시트",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cooling gel sheet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "모기향",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green spiral mosquito coil Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "모기 기피제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mosquito repellent spray Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방향제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an air freshener Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탈취제",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deodorizer spray Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "핸드크림",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tube of hand cream Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "립밤",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lip balm stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "선크림",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tube of sunscreen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로션",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of lotion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클렌징 폼",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cleansing foam tube Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마스크팩",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet mask pack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "염색약",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair dye box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "왁스",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair wax tin Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤어스프레이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hairspray can Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화장솜",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of cotton pads Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

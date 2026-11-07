@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of embroidered Korean flower shoes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy polished steel chest plate armor piece only, no arms, no legs, no person Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black turtleneck sweater Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain white t-shirt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white sleeveless tank top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of khaki cargo pants with side pockets Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mini skirt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long beige pleated skirt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an olive military field jacket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fleece zip jacket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green bomber jacket with orange lining Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel toe safety shoes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of flip flops Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white indoor school slippers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bucket hat Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black cloth head wrap Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "꽃신",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of embroidered Korean flower shoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "강철 흉갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy polished steel chest plate armor piece only, no arms, no legs, no person Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "터틀넥",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black turtleneck sweater Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반팔 티셔츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain white t-shirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "민소매",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white sleeveless tank top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카고 바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of khaki cargo pants with side pockets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "미니스커트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mini skirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "롱스커트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long beige pleated skirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "야상",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an olive military field jacket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "플리스",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fleece zip jacket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "항공 점퍼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green bomber jacket with orange lining Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안전화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel toe safety shoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쪼리",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of flip flops Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "실내화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white indoor school slippers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "버킷햇",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bucket hat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두건",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black cloth head wrap Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

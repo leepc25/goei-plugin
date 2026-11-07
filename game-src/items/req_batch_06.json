@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "너클",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brass knuckles, gold-colored metal. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "삼단봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black extended telescopic steel baton with a rubber grip, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경찰봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black police nightstick with a side handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진압봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black riot control baton, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진압 방패",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear polycarbonate riot shield with a black rim, front view, blank with no lettering. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "테이저건",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow and black taser gun, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "산탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black pump-action shotgun with a wooden pump, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "저격총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long sniper rifle with a large scope and a bipod, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "리볼버",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel six-shot revolver with a wooden grip, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소음기 권총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black pistol with a long cylindrical silencer attached, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "기관권총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black machine pistol with an extended magazine, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "탄창",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black pistol magazine with brass bullets visible at the top, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "총알 상자",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small open cardboard box holding rows of brass bullets, plain box with no printing. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "은탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three silver bullets standing upright side by side. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "석궁",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crossbow with a loaded bolt, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "활과 화살",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden recurve bow with one arrow crossed over it. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

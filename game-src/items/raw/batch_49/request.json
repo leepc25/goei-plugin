@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed old wooden box with faint vibration lines around it. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar filled with human teeth, closed lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed taped cardboard parcel box, no labels. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed colorful board game box with red, blue and yellow patterns, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed neat white gift box with a ribbon. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed yellow hazard waste box with a biohazard symbol, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown cardboard archive box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty glass collector vial with a metal cap and a small gauge. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass vial filled with swirling glowing pastel liquid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden toy chest painted in bright colors. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty wicker basket with a handle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown woven basket full of old bronze coins with square holes. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty round metal tray. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed gray plastic storage bin. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed blue and white cooler box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black rolling suitcase. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "웅웅거리는 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed old wooden box with faint vibration lines around it. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이빨 병",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar filled with human teeth, closed lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "택배 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed taped cardboard parcel box, no labels. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보드게임 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed colorful board game box with red, blue and yellow patterns, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "판촉물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed neat white gift box with a ribbon. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "폐기물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed yellow hazard waste box with a biohazard symbol, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "서류 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed brown cardboard archive box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꿈결 수집기",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty glass collector vial with a metal cap and a small gauge. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꿈결 병",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass vial filled with swirling glowing pastel liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장난감 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden toy chest painted in bright colors. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "바구니",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty wicker basket with a handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "엽전 바구니",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown woven basket full of old bronze coins with square holes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쟁반",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty round metal tray. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보관함",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed gray plastic storage bin. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "아이스박스",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed blue and white cooler box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "캐리어",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black rolling suitcase. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

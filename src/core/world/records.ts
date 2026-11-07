@@ -74,6 +74,8 @@ export interface SceneDefault {
   label?: string;
   ko?: string;
   en?: string;
+  /** 인물별 장면: 첫 턴에 강제로 넣을 로어북 이름 */
+  lore?: string[];
 }
 export interface ScenesDefaults {
   세력: Record<string, Record<string, SceneDefault>>;

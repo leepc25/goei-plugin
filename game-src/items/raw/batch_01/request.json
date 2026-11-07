@@ -1,0 +1,139 @@
+{
+ "body": {
+  "description": "pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "folding pocket knife, blade open, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "black stab-proof vest, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "black metal flashlight, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "handheld walkie-talkie radio with antenna, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "yellow paper talisman with red brush marks, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "white first aid kit box with red cross, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "plastic bottle of water, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "manila case file folder with papers, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "old brass key, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "small box wrapped in sealing tape, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "glossy black orb, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "white envelope with banknotes, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "two AA batteries, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "white plastic shopping bag, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "wooden baseball bat, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline",
+   "black semi-automatic pistol, pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline"
+  ]
+ },
+ "items": [
+  {
+   "kind": "weapon",
+   "ko": "접이식 칼",
+   "en": "folding pocket knife, blade open",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "wear",
+   "ko": "방검 조끼",
+   "en": "black stab-proof vest",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "tool",
+   "ko": "손전등",
+   "en": "black metal flashlight",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "device",
+   "ko": "무전기",
+   "en": "handheld walkie-talkie radio with antenna",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "charm",
+   "ko": "부적",
+   "en": "yellow paper talisman with red brush marks",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "medical",
+   "ko": "구급함",
+   "en": "white first aid kit box with red cross",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "food",
+   "ko": "생수",
+   "en": "plastic bottle of water",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "paper",
+   "ko": "사건 파일",
+   "en": "manila case file folder with papers",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "key",
+   "ko": "낡은 열쇠",
+   "en": "old brass key",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "seal",
+   "ko": "봉인 상자",
+   "en": "small box wrapped in sealing tape",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "anomaly",
+   "ko": "검은 구슬",
+   "en": "glossy black orb",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "valuable",
+   "ko": "현금 봉투",
+   "en": "white envelope with banknotes",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "consumable",
+   "ko": "건전지",
+   "en": "two AA batteries",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "misc",
+   "ko": "비닐봉지",
+   "en": "white plastic shopping bag",
+   "src": "",
+   "base": true
+  },
+  {
+   "kind": "weapon",
+   "ko": "야구 방망이",
+   "en": "wooden baseball bat",
+   "src": "",
+   "base": false
+  },
+  {
+   "kind": "weapon",
+   "ko": "권총",
+   "en": "black semi-automatic pistol",
+   "src": "위키",
+   "base": false
+  }
+ ]
+}

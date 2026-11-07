@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "썰매",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sled Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "튜브",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a swim ring Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "물안경",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. swimming goggles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오리발",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of swim fins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "파라솔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded beach parasol Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "캠핑 의자",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding camping chair Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장바구니",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a reusable shopping bag Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시장 카트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding shopping cart Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개밥그릇",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dog food bowl Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "그릇",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ceramic bowl Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뚝배기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an earthenware pot Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "주전자",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kettle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "와인잔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wine glass Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "맥주잔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a beer mug Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "변기 뚫어뻥",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a toilet plunger Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "때수건",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green exfoliating towel mitt Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

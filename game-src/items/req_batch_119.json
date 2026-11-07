@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "쓰레기통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a trash can Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탁상시계",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a desk clock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꽃병",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vase with flowers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "새 모이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of bird seed Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 장난감",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cat feather wand toy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "강아지 장난감",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a squeaky dog bone toy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 모래",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag of cat litter Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배변 패드",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pet pee pad Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개집",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small doghouse Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "햄스터 쳇바퀴",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hamster wheel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "앵무새",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green parrot Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토끼",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white rabbit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뱀",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled snake Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도마뱀",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lizard Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타란툴라",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tarantula Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개구리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green frog Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

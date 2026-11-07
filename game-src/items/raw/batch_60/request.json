@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red spray paint can, no label text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three thin AAA batteries side by side. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single rectangular 9V battery. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small silver button cell batteries. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rechargeable battery pack. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few red shotgun shells. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few long brass rifle cartridges. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few short brass pistol rounds. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long belt of linked brass machine gun bullets. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red plastic jerry can. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red metal gasoline can with a spout. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white plastic kerosene container. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blue gas cylinder. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small open matchbox with matches. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of white candles tied with string. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scented candle in a glass jar, unlit. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "스프레이 페인트",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red spray paint can, no label text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "AAA 건전지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three thin AAA batteries side by side. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "9V 건전지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single rectangular 9V battery. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "단추 전지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small silver button cell batteries. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "충전 배터리 팩",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rechargeable battery pack. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "산탄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few red shotgun shells. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소총탄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few long brass rifle cartridges. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "권총탄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few short brass pistol rounds. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "탄띠(기관총)",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long belt of linked brass machine gun bullets. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "연료통",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red plastic jerry can. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휘발유",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red metal gasoline can with a spout. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "등유",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white plastic kerosene container. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가스통",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blue gas cylinder. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성냥 한 갑",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small open matchbox with matches. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "양초 묶음",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of white candles tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "향초",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scented candle in a glass jar, unlit. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

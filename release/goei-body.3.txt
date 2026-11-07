@@ -1,4 +1,9 @@
-d);
+t) => String(t ?? "").replace(/[\s.…⋯．]/g, "") === "";
+  var hiddenPause = (t) => {
+    const s7 = String(t ?? "").trim();
+    return emptyPause(s7) || [...s7].length > 12 || /[다요][.!…]*$/.test(s7);
+  };
+  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
   function unsolicited(r) {
     if (r.kind !== "dm") return false;
     for (let i = r.messages.length - 1; i >= 0; i--) if (r.messages[i].kind === "message") return r.messages[i].sender !== "me";
@@ -189,8 +194,8 @@ d);
     const before = dropped.length;
     let title2;
     for (const op of patch) {
-      const reason2 = readOp(op, r, allowTitle && title2 === void 0, events, (t) => title2 = t);
-      if (reason2) dropped.push(reason2);
+      const reason3 = readOp(op, r, allowTitle && title2 === void 0, events, (t) => title2 = t);
+      if (reason3) dropped.push(reason3);
     }
     const kept = keepValid(events, r, dropped);
     if (!kept.length && title2 === void 0 && dropped.length > before) fail(dropped[before]);
@@ -631,18 +636,18 @@ ${body5}
     const books = allBooks(src);
     const registry2 = o.registry ?? buildRegistry(src.char.globalLore);
     const rows2 = [];
-    const add = (kind, source4, content) => {
+    const add = (kind, source5, content) => {
       const text4 = content.trim();
       if (!text4) return;
       const rank2 = ["base", "primary", "active", "direct", "secondary"];
       const same4 = rows2.find((r) => r.content === text4);
       if (same4) {
-        if (!same4.sources.includes(source4)) same4.sources.push(source4);
+        if (!same4.sources.includes(source5)) same4.sources.push(source5);
         if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same4.kind)) same4.kind = kind;
         same4.required = same4.required || required(kind);
         return;
       }
-      rows2.push({ kind, sources: [source4], content: text4, required: required(kind) });
+      rows2.push({ kind, sources: [source5], content: text4, required: required(kind) });
     };
     const required = (kind) => o.scope === "wiki" ? kind === "base" || kind === "primary" || kind === "active" : kind === "base" || kind === "direct";
     if (o.description !== false && src.char.desc) add("base", "봇 설명", stripModules(evaluate(src.char.desc, env3)));
@@ -779,6 +784,8 @@ ${c}`)]).join("\n\n");
   var AFF_MIN = -100;
   var AFF_MAX = 300;
   var REGISTERS = ["존댓말", "반말", "혼합", "하게체", "하오체"];
+  var SEXUAL_CHARS = 700;
+  var SEXUAL_READY = { evidence: 6, scenes: 4, confidence: 75 };
   var AXES = ["relationalInitiative", "expressionDirectness", "emotionalExpressiveness", "guardedness", "impulsivity", "relationshipPersistence"];
   var AXIS_LABEL = { relationalInitiative: "관계 주도성", expressionDirectness: "표현 직접성", emotionalExpressiveness: "감정 표출성", guardedness: "경계 성향", impulsivity: "충동성", relationshipPersistence: "관계 지속성" };
   var AXIS_LABEL_EN = { relationalInitiative: "relational initiative", expressionDirectness: "expression directness", emotionalExpressiveness: "emotional expressiveness", guardedness: "guardedness", impulsivity: "impulsivity", relationshipPersistence: "relationship persistence" };
@@ -913,7 +920,8 @@ ${c}`)]).join("\n\n");
         axesFrom: p.axesFrom === "model" || p.axesFrom === "manual" ? p.axesFrom : "default",
         patterns: Array.isArray(p.patterns) ? p.patterns.filter((t) => typeof t === "string").slice(0, 30) : [],
         candidates: readCandidates(p.candidates),
-        ...Number.isInteger(p.reviewTurn) ? { reviewTurn: p.reviewTurn } : {}
+        ...Number.isInteger(p.reviewTurn) ? { reviewTurn: p.reviewTurn } : {},
+        ...p.sexual && typeof p.sexual === "object" ? { sexual: readSexual(p.sexual) } : {}
       };
       const me = out.people[name];
       if (p.axes && typeof p.axes === "object") {
@@ -939,13 +947,20 @@ ${c}`)]).join("\n\n");
     if (Array.isArray(raw.migrated)) out.migrated = raw.migrated.filter((m) => typeof m === "string");
     return out;
   }
+  function readSexual(raw) {
+    const rec2 = (v) => {
+      const r = v && typeof v === "object" ? v : {};
+      return { text: plain(r.text, SEXUAL_CHARS), at: str3(r.at), ...r.manual ? { manual: true } : {} };
+    };
+    return { desire: rec2(raw.desire), paraphilia: rec2(raw.paraphilia), desireOn: raw.desireOn !== false, paraphiliaOn: raw.paraphiliaOn !== false, explicit: raw.explicit === true ? true : raw.explicit === false ? false : null };
+  }
   function readCandidates(raw) {
     const out = {};
     if (!raw || typeof raw !== "object") return out;
     for (const [id, c] of Object.entries(raw)) {
       if (!c || typeof c !== "object" || typeof c.pattern !== "string" || typeof c.axis !== "string") continue;
       const evidence = Array.isArray(c.evidence) ? c.evidence.filter((e) => e && typeof e.id === "string" && typeof e.anchor === "string").map((e) => ({ id: e.id, anchor: e.anchor, seq: Number(e.seq) || 0, quote: str3(e.quote), reason: str3(e.reason), strength: Number(e.strength) || 0, confidence: Number(e.confidence) || 0, ...e.void ? { void: true } : {} })) : [];
-      out[id] = { id, axis: c.axis, direction: ["up", "down", "new", "weaken"].includes(c.direction) ? c.direction : "up", pattern: c.pattern, evidence, status: ["collecting", "approved", "rejected", "reverted"].includes(c.status) ? c.status : "collecting", at: str3(c.at), ...c.applied && typeof c.applied === "object" ? { applied: c.applied } : {} };
+      out[id] = { id, axis: c.axis, direction: ["up", "down", "new", "weaken", "replace"].includes(c.direction) ? c.direction : "up", pattern: c.pattern, evidence, status: ["collecting", "approved", "rejected", "reverted"].includes(c.status) ? c.status : "collecting", at: str3(c.at), ...c.applied && typeof c.applied === "object" ? { applied: c.applied } : {} };
     }
     return out;
   }
@@ -1004,7 +1019,7 @@ ${c}`)]).join("\n\n");
     if (!p) return false;
     const list4 = p.slots[slot2] ??= [];
     if (list4.some((e) => e.id === entry3.id)) return false;
-    list4.push({ ...entry3, text: plain(entry3.text, 300), ...entry3.quote ? { quote: plain(entry3.quote, 60) } : {} });
+    list4.push({ ...entry3, text: plain(entry3.text, slot2 === "speech" ? 600 : 300), ...entry3.quote ? { quote: plain(entry3.quote, 60) } : {} });
     return true;
   }
   function putDoc(store, type, key2, entry3) {
@@ -1098,7 +1113,9 @@ ${c}`)]).join("\n\n");
     const id = m.chatId;
     return typeof id === "string" && id ? id : `#${index + 1}`;
   };
-  var messageHash = (m) => hash(messageText(str3(m.data)).replace(/<img=.*?>/g, "").replace(/\s+/g, " ").trim());
+  var messageHash = (m) => hash(
+    messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\s+/g, " ").trim()
+  );
   function unreadIndexes(chat, store) {
     const out = [];
     msgs(chat).forEach((m, i) => {
@@ -1182,7 +1199,7 @@ ${c}`)]).join("\n\n");
     const raw = CUE_VALUE[c.cue] ?? 0;
     const base = typeof c.scale === "number" && c.scale !== 1 ? Math.trunc(raw * c.scale) : raw;
     const t = o.temper ?? DEFAULT_TEMPER;
-    return base * (base >= 0 ? t.open : t.grudge) * (o.speed ?? 1);
+    return base * (base >= 0 ? t.open : t.grudge) * (base >= 0 ? o.speed ?? 1 : o.speedDown ?? o.speed ?? 1);
   }
   function sumCues(who, base, changes, folded, min, max, o = {}) {
     let value = clamp(base + folded, min, max);
@@ -1248,7 +1265,7 @@ ${c}`)]).join("\n\n");
     return value === null ? null : Math.round(value * 100) / 100;
   }
   function factionOf(code2, base, changes, folded = 0, o = {}) {
-    return sumCues(factionWho(code2), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, turnCap: o.turnCap });
+    return sumCues(factionWho(code2), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, speedDown: o.speedDown, turnCap: o.turnCap });
   }
   function factionView(code2, base, changes, folded = 0, o = {}, bounds) {
     const value = factionOf(code2, base, changes, folded, o);
@@ -1270,18 +1287,23 @@ ${c}`)]).join("\n\n");
     prompt: "detailed",
     /** split = 절 단위 혼합, append = 시트 전체 + 기록, record = 기록만, off = 본편에 안 넣음 */
     inject: "split",
-    /** off / facts(뒤, 갱신기에 얹음) / scene(앞, 연출형) */
+    /** off / note(뒤, 갱신기에 얹은 메모만, 호출 없음) / facts(앞, 사실형 — 본편 전 보조 1회, 원본 directorRole facts) / scene(앞, 연출형).
+     *  2026-11-07: 옛 facts(호출 없음)는 note 로 이름을 바꿈. 원본처럼 사실형도 본편 앞에 Director 를 부른다 */
     director: "facts",
     director_lang: "en",
     director_len: "short",
-    director_timeout: "20",
+    director_timeout: "90",
     director_reuse: "1",
     /** 리수폿 B: 자료가 모자라면 검색(채팅·로어북·위키)을 요청해 2차 호출. C: 켜진 기능마다 Director 적용 지침 */
     director_search: "1",
     director_features: "1",
     /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
     router: "code",
-    router_timeout: "15",
+    router_timeout: "60",
+    /** 2026-11-07 (전수검사 4 의 L·M·P, 원본 trackedCharactersByScope·stageContext·Router 지침): 항상 포함할 인물(쉼표·줄바꿈), Router·Director 가 보는 최근 글 수, Router 에 덧붙일 지침 */
+    always: "",
+    recent_msgs: "4",
+    router_rules: "",
     /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
     model_director: "same",
     model_router: "same",
@@ -1293,14 +1315,27 @@ ${c}`)]).join("\n\n");
     /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
     hypa: "0",
     hypa_cap: "3000",
+    /** 하이파 요약 개수 상한(원본 directorMemoryLimit 16)과 하이파 플러스(플러그인 저장소) 읽기 (2026-11-07) */
+    hypa_items: "16",
+    hypa_plus: "1",
     speed: "1",
+    /** 호감 감소 승수 (원본 affinity.decrease). same = 증가 승수(speed)와 같게 (전수검사 4 의 N) */
+    speed_down: "same",
     /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
     turn_cap: "10",
     /** 성격 6축·관찰 누적 (리수폿 People). 기본 켬 */
     axes: "1",
+    /** 성적 욕망 기록·이상성욕 기록·발정모드 (원본 sexualDesireEnabled·paraphiliaEnabled·explicitSexualStyleEnabled). 원본 새 설치 기본값 = 셋 다 켬. 2026-11-07. core/people/sexual.ts */
+    sexual_desire: "1",
+    paraphilia: "1",
+    explicit_style: "1",
     affinity: "1",
     register: "1",
     perception: "1",
+    /** 말투의 다변화 (원본 features.register.variety off/one/two · change ask/auto · signLimit 1~9). 2026-11-07 K. core/people/speech.ts */
+    register_variety: "off",
+    register_change: "ask",
+    register_sign_limit: "3",
     perception_ext: "1",
     suspicion: "1",
     docs_event: "1",
@@ -1309,13 +1344,15 @@ ${c}`)]).join("\n\n");
     docs_item: "1",
     npc_emotion: "1",
     /** 수치 사용 (1) / 정성 모드 (0). 호감·의심·음란도 (리수폿 E). 취향 띠는 호감 수치가 켜져 있을 때만 */
+    /** 2026-11-07 사용자 결정(O): 의심은 원본처럼 정성(글)이 기본. 수치는 스위치로 */
     num_affinity: "1",
-    num_suspicion: "1",
+    num_suspicion: "0",
     num_openness: "1",
-    /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
+    /** 리수폿 선택 기능: 취향 띠·음란도 기본 끔 */
+    /** 2026-11-07 사용자 결정(O): 서사 리듬은 원본처럼 기본 켬 */
     taste: "0",
     openness: "0",
-    rhythm: "0",
+    rhythm: "1",
     /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
     faction_rep: "1",
     faction_inject: "1",
@@ -1324,7 +1361,8 @@ ${c}`)]).join("\n\n");
     /** auto / confirm */
     newpeople: "auto",
     twoturn: "0",
-    prev_pairs: "1",
+    /** 갱신기 앞에 붙이는 직전 유저·봇 쌍 (원본 stageContext.writer 2). 2026-11-07 W3: 1 → 2 */
+    prev_pairs: "2",
     /** 기록 본문 언어 (ko / en). 이름·인용·호칭은 늘 원문 */
     lang: "ko",
     /** 인물당 저장 상한 (글자). 리수폿 절 상한 합계와 같은 10,000 */
@@ -1365,15 +1403,19 @@ ${c}`)]).join("\n\n");
       model: v("model") === "main" ? "main" : "aux",
       prompt: one2("prompt", ["detailed", "compact"]),
       inject: one2("inject", ["split", "append", "record", "off"]),
-      director: one2("director", ["off", "facts", "scene"]),
+      director: one2("director", ["off", "note", "facts", "scene"]),
       directorLang: v("director_lang") === "ko" ? "ko" : "en",
       directorLen: v("director_len") === "normal" ? "normal" : "short",
-      directorTimeout: num4("director_timeout", 5, 120),
+      directorTimeout: num4("director_timeout", 5, 300),
       directorReuse: v("director_reuse") !== "0",
       directorSearch: v("director_search") !== "0",
       directorFeatures: v("director_features") !== "0",
       router: v("router") === "model" ? "model" : "code",
-      routerTimeout: num4("router_timeout", 5, 60),
+      routerTimeout: num4("router_timeout", 5, 300),
+      always: [...new Set(v("always").split(/[,\n]/).map((x) => x.trim().normalize("NFC")).filter(Boolean))].slice(0, 12),
+      recentMsgs: num4("recent_msgs", 0, 12),
+      routerPrompt: (typeof state?.[PS("router", "base")] === "string" ? String(state[PS("router", "base")]) : "").trim().slice(0, 12e3),
+      routerRules: v("router_rules").slice(0, 2e3),
       stageModel: (() => {
         const base = v("model") === "main" ? "main" : "aux";
         const pick3 = (k) => v(k) === "main" ? "main" : v(k) === "aux" ? "aux" : base;
@@ -1381,12 +1423,21 @@ ${c}`)]).join("\n\n");
       })(),
       stageModelId: { update: v("model_id_update").trim().slice(0, 120), director: v("model_id_director").trim().slice(0, 120), router: v("model_id_router").trim().slice(0, 120), tidy: v("model_id_tidy").trim().slice(0, 120) },
       hypa: v("hypa") === "1",
-      hypaCap: num4("hypa_cap", 500, 12e3),
+      hypaCap: num4("hypa_cap", 500, 24e3),
+      hypaItems: num4("hypa_items", 1, 64),
+      hypaPlus: v("hypa_plus") !== "0",
       promptOverrides: promptOverrides(state, one2("prompt", ["detailed", "compact"])),
       directorPrompt: (typeof state?.[PS("director", "base")] === "string" ? String(state[PS("director", "base")]) : "").trim().slice(0, 12e3),
       speed: num4("speed", 0.25, 4),
+      speedDown: v("speed_down") === "same" || v("speed_down") === "" ? num4("speed", 0.25, 4) : num4("speed_down", 0.25, 4),
       turnCap: num4("turn_cap", 0, 100),
       features: new Set(FEATURES.filter((f) => v(f) === "1" && !(f === "taste" && v("num_affinity") === "0"))),
+      sexualDesire: v("sexual_desire") === "1",
+      paraphilia: v("paraphilia") === "1",
+      explicitStyle: v("explicit_style") === "1",
+      registerVariety: one2("register_variety", ["off", "one", "two"]),
+      registerChange: v("register_change") === "auto" ? "auto" : "ask",
+      registerSignLimit: num4("register_sign_limit", 1, 9),
       numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== "0")),
       qualitative: new Set(NUMERIC_FEATURES.filter((f) => v(f) === "1" && v(`num_${f}`) === "0")),
       newPeople: v("newpeople") === "confirm" ? "confirm" : "auto",
@@ -1541,7 +1592,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   ];
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit|\$it_(slots|limit|push|auto)|\$sh_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -1735,7 +1786,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var walletStarted = (chat) => (chat.message ?? []).some((m) => m.role === "user");
   var isEntry2 = (e) => {
     const x = e;
-    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.anchor === "string" && Number.isSafeInteger(x.amount) && typeof x.memo === "string" && (x.src === "story" || x.src === "manual" || x.src === "field");
+    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.anchor === "string" && Number.isSafeInteger(x.amount) && typeof x.memo === "string" && (x.src === "story" || x.src === "manual" || x.src === "field" || x.src === "store");
   };
   function readWallet(vars, defaultStart = 0) {
     const raw = vars?.[WALLET_VAR];
@@ -4742,85 +4793,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const register = REGISTERS.includes(row9.register) ? row9.register : "존댓말";
     return { toUser: row9[rel] || row9.outsider || "", register };
   }
-  function seedBaseFor(name, userFaction3, user) {
-    const b = RELATIONS.people[name];
-    const faction = b?.faction ?? "";
-    const alias = ALIASES.names[name];
-    const address = seedAddress(name, faction, user);
-    return {
-      faction,
-      ...b ? { express: b.express } : {},
-      affinityBase: userAffinityBase(faction, userFaction3),
-      aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
-      ...address ? { address } : {}
-    };
-  }
-  var valuesOf = (name) => RELATIONS.people[name]?.values ?? "";
-  var temperOf = (name) => RELATIONS.people[name]?.temper;
-  function userAffinityBase(personFaction, userFaction3) {
-    if (!personFaction || !userFaction3 || personFaction === userFaction3) return 0;
-    return STAGE_VALUE[relationStage(personFaction, userFaction3)];
-  }
-  var factionBase = (code2, userFaction3) => userAffinityBase(code2, userFaction3);
-  function allNames() {
-    return Object.entries(ALIASES.names).map(([name, v]) => ({ name, aliases: [.../* @__PURE__ */ new Set([...v.aliases ?? [], ...RELATIONS.people[name]?.english ?? []])], titles: v.titles ?? [] }));
-  }
-  var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
-
-  // src/core/people/faction.ts
-  function userFactionOf(store, chat) {
-    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store.identity?.faction || (typeof v === "string" ? v : "");
-  }
-  function knownFactionCodes(store, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
-  }
-  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
-  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
-    const base = factionBase(code2, userFaction3);
-    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, turnCap: settings.turnCap }, settings.factionBounds);
-    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base };
-  }
-  function sceneFactionCodes(store, people, texts, names4 = {}) {
-    const out = [];
-    const push2 = (c) => {
-      if (c && !out.includes(c)) out.push(c);
-    };
-    for (const n2 of people) push2(store.people[n2]?.faction ?? "");
-    for (const t of texts) for (const c of factionCodesIn(t, names4)) push2(c);
-    return out;
-  }
-  function factionsBlock(list4, user = "{{user}}") {
-    const lines3 = list4.filter((f) => f.stage.id !== "neutral").map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}`);
-    if (!lines3.length) return "";
-    return ["## Factions → " + user + " (standing of each organization toward " + user + ", kept by the system; members act accordingly)", ...lines3].join("\n");
-  }
-
-  // src/core/journal/chronicle.ts
-  var CHRON_KIND_LABEL = { event: "사건", person: "인물", faction: "세력", rank: "신분" };
-  var str4 = (v) => typeof v === "string" ? v : "";
-  function dayLabels(chat) {
-    const list4 = Array.isArray(chat.message) ? chat.message : [];
-    const days = [];
-    let last2 = "";
-    list4.forEach((m, i) => {
-      if (m.role === "char") {
-        const st = lastStatusFields([str4(m.data)]);
-        if (st?.date) last2 = st.date;
-      }
-      days[i] = last2;
-    });
-    return (pos) => pos < 0 || !days.length ? "" : days[Math.min(pos, days.length - 1)] ?? "";
-  }
-  var two5 = (n2) => String(n2).padStart(2, "0");
-  var dayOfMinute = (at) => {
-    if (at === null) return "";
-    const d = new Date(at * 6e4);
-    return `${d.getUTCFullYear()}.${two5(d.getUTCMonth() + 1)}.${two5(d.getUTCDate())}`;
-  };
-  var hhmm3 = (at) => {
-    if (at === null) return "";
-    const d = new Date(at * 6e4);
-    return `${two5(d.getUTCHours())}:${two5(d.getUTCMinutes())}`;
-  };
-  funct
+  function seedBaseFor(name, userF

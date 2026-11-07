@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "곰탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of clear beef bone soup with green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꿀떡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small round colorful rice cakes glistening with honey Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "놋그릇",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny brass Korean rice bowl with lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뽁뽁이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of bubble wrap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요강",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass Korean chamber pot with lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "식권",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper meal ticket, plain, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "돼지코 어댑터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round travel plug adapter Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "셔틀콕",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white feather shuttlecock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마패",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round bronze Joseon horse token with horse pictures, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "염산 병",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown glass chemical bottle with a hazard symbol, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가락지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of plain gold Korean twin rings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장어",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grilled eel glazed with brown sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean rectangular kite with a hole in the center and a spool of string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "식빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loaf of white sliced bread Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "키",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean winnowing basket made of woven bamboo Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소금빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny golden salt butter roll with salt flakes on top Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "음모",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tuft of curly dark human pubic hair, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흉선",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human thymus gland, pale pink two-lobed organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "태반",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human placenta, a round dark red disc organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요관",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin human ureter tubes, pale pink, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요도",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human urethra, a short thin pale pink tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "편도",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human tonsils, small pink oval lumps, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "찜닭",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of Korean braised chicken with glass noodles and potatoes in dark soy sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "더덕구이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few grilled flattened deodeok roots with red glaze Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화채",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of pink fruit punch with watermelon balls Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홍합",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few black mussels Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "구속복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white straitjacket with long sleeves and buckles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "샤워기 헤드",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chrome shower head with a hose Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조각칼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of wood carving knives Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "날개 달린 열쇠",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old brass key with small feathered wings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붉은 수액 화분",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small potted plant bleeding dark red sap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "여우 구슬",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glowing pale blue fox bead orb Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

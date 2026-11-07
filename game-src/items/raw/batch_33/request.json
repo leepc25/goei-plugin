@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue gel ice pack. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white disposable heat pack, blank. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass specimen jar with yellowish liquid and a pale preserved specimen inside, sealed lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical chart clipboard with lined paper, no readable text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an x-ray film sheet showing a hand bone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sheet of prescription paper with lines only. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an amber medicine bottle with a white cap, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper takeout coffee cup with a lid and sleeve, plain with no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed pack of cigarettes, plain white and gray pack with no brand or text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round black portable ashtray pouch, closed. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrapped energy bar, plain wrapper with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark chocolate bar half unwrapped from plain brown paper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed instant cup noodle with a paper lid, plain red cup with no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glass soju bottle with a cap, blank label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pack of chewing gum, plain wrapper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three wrapped hard candies with twisted ends. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "얼음 팩",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue gel ice pack. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "핫팩",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white disposable heat pack, blank. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "포르말린 병",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass specimen jar with yellowish liquid and a pale preserved specimen inside, sealed lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "차트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical chart clipboard with lined paper, no readable text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "엑스레이 필름",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an x-ray film sheet showing a hand bone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "처방전",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sheet of prescription paper with lines only. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "약병(갈색)",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an amber medicine bottle with a white cap, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "커피",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper takeout coffee cup with a lid and sleeve, plain with no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "담배",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed pack of cigarettes, plain white and gray pack with no brand or text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휴대용 재떨이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round black portable ashtray pouch, closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "에너지바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrapped energy bar, plain wrapper with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "초콜릿",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark chocolate bar half unwrapped from plain brown paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "컵라면",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed instant cup noodle with a paper lid, plain red cup with no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소주",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glass soju bottle with a cap, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "껌",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pack of chewing gum, plain wrapper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three wrapped hard candies with twisted ends. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

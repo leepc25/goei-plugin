@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "샐러드",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear bowl of green salad with tomatoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수프",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white cup bowl of creamy cream soup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "튀김",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of Korean deep-fried snacks: battered shrimp, sweet potato and seaweed rolls Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꼬치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden skewer with grilled meat chunks and green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호떡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round golden sweet pancake with dark brown sugar syrup oozing from it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계란빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small oval bread loaf with a whole egg baked on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토스트",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean street toast sandwich with egg, cabbage and ham in folded paper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "와플",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden square waffle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "크로와상",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden flaky croissant Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "베이글",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sesame bagel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머핀",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chocolate chip muffin Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마카롱",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three pastel colored macarons stacked Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "푸딩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a caramel custard pudding with dark caramel on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요거트",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plastic cup of yogurt with peeled foil lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빙수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall bowl of shaved ice with red bean, rice cake pieces and condensed milk Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자칩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of thin wavy potato chips Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

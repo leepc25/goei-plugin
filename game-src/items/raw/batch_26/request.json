@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loop of dark wooden Buddhist prayer beads. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear glass vial of water with a cross-shaped stopper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of thin incense sticks with gray smoke curling up. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear plastic pouch of white salt, tied closed. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth pouch of red beans, tied closed. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of red thread. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass hand bell with a wooden handle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round hand mirror with a dark frame, reflecting only gray. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cluster of small brass shaman bells on a handle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate silver cross with a faint golden glow, upright. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small golden reliquary box with a glass window, closed. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round silver saint medal on a short chain, plain face with no letters. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old worn black book with a cross on the cover, closed, no letters. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper card with red brush talisman marks, abstract marks only. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow paper talisman torn in half, red brush marks. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded triangle yellow paper talisman. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "염주",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loop of dark wooden Buddhist prayer beads. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성수병",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear glass vial of water with a cross-shaped stopper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "향",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of thin incense sticks with gray smoke curling up. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소금 봉지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear plastic pouch of white salt, tied closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "팥 봉지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth pouch of red beans, tied closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "붉은 실",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of red thread. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "종",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass hand bell with a wooden handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "거울",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round hand mirror with a dark frame, reflecting only gray. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방울",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cluster of small brass shaman bells on a handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "축복받은 십자가",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate silver cross with a faint golden glow, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성유물",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small golden reliquary box with a glass window, closed. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성인 메달",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round silver saint medal on a short chain, plain face with no letters. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성경책(낡은)",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old worn black book with a cross on the cover, closed, no letters. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "관리국 부적",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper card with red brush talisman marks, abstract marks only. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "찢긴 부적",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow paper talisman torn in half, red brush marks. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "액막이 부적",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded triangle yellow paper talisman. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

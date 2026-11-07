@@ -1,4 +1,4 @@
-// goei-body 0.21.0
+// goei-body 0.21.1
 "use strict";
 (() => {
   var __create = Object.create;
@@ -1488,6 +1488,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     plus: stroke('<path d="M12 5v14M5 12h14"/>'),
     trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
     /** 기록 메뉴 (일지·보고서·인물·세력): 클립보드 */
+    bag: stroke('<path d="M5 8h14l-1 12H6Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
     records: stroke('<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>'),
     book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
     back: stroke('<path d="m15 5-7 7 7 7"/>'),
@@ -2058,6 +2059,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       if (s2(o.ko).trim()) row9.ko = s2(o.ko);
       if (s2(o.en).trim()) row9.en = s2(o.en);
       if (o.hidden === true) row9.hidden = true;
+      const names4 = Array.isArray(o.lore) ? o.lore.map((x) => s2(x).trim()).filter(Boolean) : [];
+      if (names4.length) row9.lore = names4;
       return Object.keys(row9).length ? row9 : null;
     };
     for (const [code2, rows2] of Object.entries(obj2(d.세력))) {
@@ -2103,7 +2106,9 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const o = saved?.인물?.[agentId];
     const ko = o?.ko || b?.ko || "";
     const en2 = o?.en || b?.en || "";
-    return ko.trim() || en2.trim() ? { ko, en: en2 } : null;
+    const label2 = (o?.label || b?.label || "").trim();
+    const lore = o?.lore?.length ? o.lore : (b?.lore ?? []).filter((x) => typeof x === "string" && x.trim());
+    return ko.trim() || en2.trim() ? { ko, en: en2, label: label2, lore } : null;
   }
   function agentSceneSaved(agentId, saved) {
     return saved?.인물?.[agentId];
@@ -2129,7 +2134,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   ];
   var isFactionCode = (v) => typeof v === "string" && /^[A-Z]00$/.test(v);
   var PLAYER_FM = 0;
-  var playerScenario = (name) => ({ fm: PLAYER_FM, label: `${name}의 첫 장면`, kind: "opening" });
+  var playerScenario = (name, label2) => ({ fm: PLAYER_FM, label: label2?.trim() || `${name}의 첫 장면`, kind: "opening" });
   var s3 = (v) => typeof v === "string" ? v.trim() : "";
   var list = (v) => Array.isArray(v) ? v.map(s3).filter(Boolean) : [];
   var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
@@ -2188,13 +2193,4 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const books = (lore ?? []).filter((e) => e.goeiVirtual !== true);
     const tag = books.some((e) => e.comment === TAG_BOOK) ? loreText(books, TAG_BOOK) : guideText("Tag");
     const fac = loreText(books, FACTION_BOOK);
-    return tag.includes("{{getvar::fac_codes}}") && tag.includes("{{getvar::fac_ac}}") && (!fac || placeFactionExtra(fac) === fac);
-  }
-  var builtinType = (code2) => code2 === "D00" ? "civilian" : code2 === "E00" ? "freelancer" : "org";
-  var extraTabId = (code2) => `T${100 + code2.charCodeAt(0) - 65}`;
-  var cache = /* @__PURE__ */ new WeakMap();
-  function factionList(lore) {
-    const books = lore ?? [];
-    const hit3 = cache.get(books);
-    if (hit3) return hit3;
-    c
+    return tag.includes("{{getvar::fac_

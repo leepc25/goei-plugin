@@ -14,6 +14,8 @@ import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidd
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
+import { ITEM_AUTO_VAR, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
+import { SHOP_COUNT_VAR, SHOP_COUNTS, SHOP_CTX_VAR, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_THOUGHTS_VAR, shopSettings } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_MAX, walletBalance, walletEditable, walletStarted, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
@@ -243,7 +245,7 @@ function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>
 }
 
 /** 설정 묶음 하나 (편집 창의 「설정」 페이지가 묶음별로 가져다 쓴다, 2026-10-27) */
-export type SettingsSection = 'screen' | 'image' | 'board' | 'status' | 'wallet' | 'lore' | 'adv' | 'update';
+export type SettingsSection = 'screen' | 'image' | 'board' | 'status' | 'wallet' | 'items' | 'shop' | 'lore' | 'adv' | 'update';
 export function settingsSection(ctx: ChatContext, scope: SettingsScope, canChat: boolean, section: SettingsSection): string {
   return settingsTab(ctx, scope, canChat, section);
 }
@@ -301,6 +303,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
   // 잔고 직접 수정 (기본 끔): 가계부 잔고 고치기·거래 지우기, 진행 중 시작 잔고 바꾸기를 한꺼번에
   const walletEdit = walletEditable(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);
+  const itVars = scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars;
   const startLocked = scope === 'chat' && !walletEdit && walletStarted(ctx.chat);
   const S: Record<SettingsSection, string> = {
     screen: `${group('화면', [
@@ -353,9 +356,34 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     wallet: group('가계부', colCfg.wallet === 'off'
       ? '<p class="ps-note">상태창 칸에서 「잔고」를 안 쓰기로 해서 가계부가 꺼져 있어요. 설정 「상태창 → 상태창 칸」에서 잔고를 켜면 여기서 시작 잔고를 정할 수 있어요.</p>'
       : [
-        field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 기록 → 가계부에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.'),
+        field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.'),
         field('잔고 직접 수정', seg('set-wallet-edit', walletEdit ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.'),
       ].join('')),
+    // 소지품 (2026-11-07): 본편에 넘기기·보조 모델 읽기·칸 수·한계 문장. 채팅 변수 $it_* 또는 새 채팅 기본값
+    items: group('소지품', [
+      field('본편에 넘기기', seg('set-items-push', itemPushOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요.'),
+      field('보조 모델이 읽기', seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 끄면 직접 넣기·장터로만 바뀌어요.'),
+      field('칸 수', stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘치면 「17/16」처럼 보이고 그대로 본편에 넘겨요. 푸는 건 이야기 쪽이에요.`),
+      field('지닐 수 있는 한계', `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.'),
+    ].join('')),
+    // 상점 (2026-11-07 사용자): 표식 `[shop: 가게|주인]` 으로 열리는 상점 팝업의 생성 방식. 채팅 변수 $sh_* 또는 새 채팅 기본값
+    shop: (() => {
+      const sh = shopSettings(itVars);
+      const onoff = (action: string, cur: boolean) => seg(action, cur ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy);
+      return group('상점', [
+        field('상점', onoff('set-shop-on', sh.on), '켜면 본편 모델에 「거래가 가능한 자리에서 응답 끝에 [shop: 가게|주인] 표식을 쓰라」고 알려 주고, 표식이 온 응답 아래에 「상점 열기」가 붙어요. 물건은 열 때 보조 모델이 맥락대로 지어요. 잔고·소지품은 모델에 넘기지 않아요.'),
+        ...(sh.on ? [
+          field('모델', seg('set-shop-model', sh.model, [['main', '메인모델'], ['aux', '보조모델']], busy), '진열대와 주인 대사를 지을 모델이에요.'),
+          field('진열대 분량', seg('set-shop-count', sh.count, SHOP_COUNTS.map((c) => [c.id, c.label] as [string, string]), busy), '한 번에 받을 물건 수예요. 새로고침·전체 다시 짜기에도 같은 범위예요.'),
+          field('맥락 반영', seg('set-shop-ctx', sh.context ? '1' : '0', [['1', '맥락'], ['0', '가게만']], busy), '맥락이면 최근 본문·상태창(시각·장소)·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요. 가게만이면 가게 정체와 참고 자료만 넘겨요.'),
+          field('값 기준', `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 값 기준 한 줄이에요. 비우면 그 가게에 어울리는 실제 물가로 지어요.'),
+          field('다양성', onoff('set-shop-diverse', sh.diverse), '켜면 뻔한 물건만 늘어놓지 않고 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
+          field('생각 단계', seg('set-shop-thoughts', sh.thoughts, [['off', '없음'], ['inner', '속으로만'], ['note', '적고 지움']], busy), '물건을 짓기 전에 가게·장면·주인을 먼저 정리하게 해요. 적고 지움은 응답이 길어져요.'),
+          field('지난 진열대 피하기', onoff('set-shop-prev', sh.avoidPrev), '새로고침할 때 이번 방문에 이미 보였던 물건을 피해요.'),
+          field('거래 끊음', onoff('set-shop-kick', sh.kick), '켜면 주인이 모욕·끝없는 흥정 같은 일에 거래를 끊을 수 있어요. 끊기면 진열대가 잠기고 다음 턴 본편에 넘어가요. 끄면 주인이 아무리 화나도 가게는 열려 있어요.'),
+        ] : []),
+      ].join(''));
+    })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
     lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {}, [1])}`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0])}`,
@@ -566,6 +594,19 @@ export async function handleSettings(action: string, value: string | undefined, 
     env.render();
     return true;
   }
+  // 상점 설정 (set-shop-<키>): 두 범위 같은 처리. 값 검사는 변수마다
+  if (action.startsWith('set-shop-')) {
+    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
+    const k = action.slice(9);
+    const key = KEY[k];
+    if (!key) return true;
+    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? SHOP_COUNTS.some((c) => c.id === v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : v === '1' || v === '0';
+    if (!ok) return true;
+    const next = k === 'price' ? v.replace(/\s+/g, ' ').trim().slice(0, 80) : v;
+    if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: next } }));
+    else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === next ? null : { [key]: next }));
+    return true;
+  }
   if (scope === 'defaults') {
     const d = current(ctx, 'defaults');
     switch (action) {
@@ -591,6 +632,18 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-wallet-edit':
         // 새 채팅 기본값의 잔고 직접 수정 ($st_wallet_edit)
         if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [WALLET_EDIT_VAR]: v } }));
+        return true;
+      case 'set-items-push':
+      case 'set-items-auto':
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [action === 'set-items-push' ? ITEM_PUSH_VAR : ITEM_AUTO_VAR]: v } }));
+        return true;
+      case 'set-items-slots': {
+        const next = Math.min(ITEM_SLOTS_MAX, Math.max(ITEM_SLOTS_MIN, itemSlots(getPrefs().vars) + (v.endsWith('+') ? 1 : -1)));
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_SLOTS_VAR]: String(next) } }));
+        return true;
+      }
+      case 'set-items-limit':
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LIMIT_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, 60) } }));
         return true;
       case 'set-agent': {
         const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith('+') ? 1 : -1)));
@@ -664,6 +717,26 @@ export async function handleSettings(action: string, value: string | undefined, 
     case 'set-wallet-edit':
       if (v !== '1' && v !== '0') return true;
       await save(ctx, env, (chat) => (walletEditable(chat.scriptstate) === (v === '1') ? null : { [WALLET_EDIT_VAR]: v }));
+      return true;
+    case 'set-items-push':
+    case 'set-items-auto': {
+      if (v !== '1' && v !== '0') return true;
+      const key = action === 'set-items-push' ? ITEM_PUSH_VAR : ITEM_AUTO_VAR;
+      await save(ctx, env, (chat) => ((action === 'set-items-push' ? itemPushOn(chat.scriptstate) : itemAutoOn(chat.scriptstate)) === (v === '1') ? null : { [key]: v }));
+      return true;
+    }
+    case 'set-items-slots':
+      await save(ctx, env, (chat) => {
+        const cur = itemSlots(chat.scriptstate);
+        const next = Math.min(ITEM_SLOTS_MAX, Math.max(ITEM_SLOTS_MIN, cur + (v.endsWith('+') ? 1 : -1)));
+        return next === cur ? null : { [ITEM_SLOTS_VAR]: String(next) };
+      });
+      return true;
+    case 'set-items-limit':
+      await save(ctx, env, (chat) => {
+        const next = v.replace(/\s+/g, ' ').trim().slice(0, 60);
+        return next === String(chat.scriptstate?.[ITEM_LIMIT_VAR] ?? '') ? null : { [ITEM_LIMIT_VAR]: next };
+      });
       return true;
     case 'set-anomaly':
       if (v === 'off') {

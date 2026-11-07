@@ -1,0 +1,118 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink smooth cylindrical silicone handheld massager with a rounded tip and one button Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth pink silicone rod-shaped toy with a flat round base Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pink egg-shaped bullet massager connected by a thin cord to a small remote Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white wand massager with a round soft head and a long handle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a purple silicone handheld massager with a small branch shaped like rabbit ears Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lotion pump bottle, plain cream color, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cleansing foam tube, plain light blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet mask pouch, plain silver, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair dye box, plain brown, completely blank with no writing, no face picture Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hairspray can, plain black, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few tampons in plain white wrappers, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain white putty tub with a lid, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of instant film cartridges, plain black, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round black plastic cockroach bait trap disc, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small box of rat poison with a skull symbol only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a weed killer pump sprayer bottle, plain green, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "바이브레이터",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink smooth cylindrical silicone handheld massager with a rounded tip and one button Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "딜도",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth pink silicone rod-shaped toy with a flat round base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로터",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pink egg-shaped bullet massager connected by a thin cord to a small remote Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "완드 마사지기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white wand massager with a round soft head and a long handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "래빗 바이브레이터",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a purple silicone handheld massager with a small branch shaped like rabbit ears Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로션",
+   "kind": "consumable",
+   "redo": "116-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lotion pump bottle, plain cream color, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클렌징 폼",
+   "kind": "consumable",
+   "redo": "116-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cleansing foam tube, plain light blue, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마스크팩",
+   "kind": "consumable",
+   "redo": "116-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet mask pouch, plain silver, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "염색약",
+   "kind": "consumable",
+   "redo": "116-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair dye box, plain brown, completely blank with no writing, no face picture Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤어스프레이",
+   "kind": "consumable",
+   "redo": "116-15",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hairspray can, plain black, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탐폰",
+   "kind": "consumable",
+   "redo": "117-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few tampons in plain white wrappers, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "퍼티",
+   "kind": "consumable",
+   "redo": "117-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain white putty tub with a lid, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "즉석 필름",
+   "kind": "consumable",
+   "redo": "117-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of instant film cartridges, plain black, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바퀴벌레 약",
+   "kind": "consumable",
+   "redo": "117-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round black plastic cockroach bait trap disc, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쥐약",
+   "kind": "consumable",
+   "redo": "117-15",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small box of rat poison with a skull symbol only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제초제",
+   "kind": "consumable",
+   "redo": "118-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a weed killer pump sprayer bottle, plain green, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -38,6 +38,14 @@ export interface RhythmClock {
   plantBlocked: string;
   /** 우선순위: 넘긴 흐름 → 준비된 회수 → 진전 때가 된 것 → 새 훅 */
   priority: string[];
+  /** 직전 장면 기록의 연출 방법 (`[method:…]`, 원본 anticipation 6종). 연속 턴에 같은 방법 금지를 코드가 알려 준다 (2026-11-07 J) */
+  lastMethod: string | null;
+}
+/** 기대 쌓기 연출 방법 (원본 rhythm.pulse.choices.anticipation) */
+export const RHYTHM_METHODS = ['proximity', 'external_delay', 'restraint', 'seed', 'interruption', 'chosen_delay', 'none'] as const;
+export function parseSceneMethod(text: string): string | null {
+  const m = /\[method:([a-z_]+)\]/.exec(text);
+  return m && (RHYTHM_METHODS as readonly string[]).includes(m[1]) ? m[1] : null;
 }
 
 /** 메시지 위치까지의 확정 응답 수 (턴) */
@@ -89,7 +97,11 @@ export function rhythmClock(store: PeopleStore, chat: Chat, live: Liveness, upto
   for (const h of hooks.filter((h) => h.stage === 'payoff_ready' && !h.overdue).sort(byNeglect)) priority.push(`payoff ready: ${h.key}`);
   for (const h of hooks.filter((h) => h.due && h.stage !== 'payoff_ready' && (h.tier !== 'long' || h.sinceLast >= 5)).sort(byNeglect)) priority.push(`advance due: ${h.key} (${h.sinceLast} turns since last advance)`);
   if (plantAllowed) priority.push(`new plant allowed (${room.join('/')})`);
-  return { turn, hooks, active, lastPlant, plantAllowed, plantBlocked, priority };
+  // 직전 장면 기록의 연출 방법 (end 까지의 살아 있는 scene 항목 중 마지막)
+  const sceneDoc = Object.values(store.docs).find((d) => d.type === 'rhythm' && d.key === 'scene');
+  const scenes = sceneDoc ? liveEntries(sceneDoc.entries, live).filter((e) => (live.at.get(e.anchor) ?? -1) <= end) : [];
+  const lastMethod = scenes.length ? parseSceneMethod(scenes[scenes.length - 1].text) : null;
+  return { turn, hooks, active, lastPlant, plantAllowed, plantBlocked, priority, lastMethod };
 }
 
 /** 지침·본편용 영어 요약 줄 */
@@ -97,5 +109,6 @@ export function rhythmClockLines(c: RhythmClock): string[] {
   const out = [`Turn ${c.turn} (confirmed replies). Active hooks: short ${c.active.short}/${HOOK_LIMIT.short}, mid ${c.active.mid}/${HOOK_LIMIT.mid}, long ${c.active.long}/${HOOK_LIMIT.long}. New plant ${c.plantAllowed ? 'allowed' : `not allowed: ${c.plantBlocked}`}.`];
   for (const h of c.hooks) if (ACTIVE.includes(h.stage)) out.push(`- ${h.key}: ${h.stage}, ${h.tier}, planted ${h.age} turn(s) ago, last advance ${h.sinceLast} turn(s) ago, payoff window ${h.window[0]}–${h.window[1]}${h.overdue ? ' — OVERDUE' : h.due ? ' — in window' : ''}${h.extended ? ' (extended)' : ''}`);
   if (c.priority.length) out.push(`Priority: ${c.priority.join(' · ')}`);
+  if (c.lastMethod && c.lastMethod !== 'none') out.push(`Previous staging method: ${c.lastMethod} — do not use the same anticipation method in consecutive turns.`);
   return out;
 }

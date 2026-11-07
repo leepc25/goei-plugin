@@ -13,6 +13,7 @@ import { agentPanel, appendixPanel, directoryDraft, directoryExtList, dirUi, lor
 import { facePic } from '../../host/assets';
 import { picAvatar } from '../images';
 import { ICONS } from '../icons';
+import { agentSceneFields, agentSceneState } from './start';
 import { edUi, overridesOf, setOverrides } from './index';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -148,6 +149,13 @@ function keysRow(kind: WorldKind, sel: string, rec: WorldRecord): string {
   return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc(`${kind}|${sel}|keys`)}" value="${esc(rec.keys ?? '')}" placeholder="${esc(ph)}" autocomplete="off" aria-label="호출 단어"></div>`;
 }
 
+/** 첫 장면 칸 (요원 화면): 이 인물로 시작할 때의 첫 장면(제목·한국어·영어). 기본 세력 인물은 여기서만 고친다. 11-07 사용자: 기본은 접혀 있어야 한다 */
+function sceneCard(sel: string, d: Directory): string {
+  const a = d.agents.find((x) => x.lore === sel);
+  if (!a || !/^P\d{3,}$/.test(a.id)) return '';
+  return `<details class="gw-sec gw-fscene"><summary>첫 장면<small>${esc(a.id)} · ${agentSceneState(a.id, d)}</small></summary><div class="dir-panel">${agentSceneFields(a.id, d)}</div></details>`;
+}
+
 /** 소속 요원 칸 (조직 화면): 명부에서 이 조직 소속 요원을 보여 주고, 누르면 그 요원 기록으로 (2026-11-05 사용자: 조직 ↔ 요원 연동) */
 function membersCard(ctx: ChatContext, sel: string, d: Directory): string {
   const list = d.agents.filter((a) => a.affiliation === sel);
@@ -179,7 +187,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   let detail: string;
   if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
   else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === 'org' && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ''}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}${kind === 'org' ? membersCard(ctx, sel, d) : ''}</div>`;
+  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === 'org' && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ''}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}${kind === 'agent' ? sceneCard(sel, d) : ''}${kind === 'org' ? membersCard(ctx, sel, d) : ''}</div>`;
   else {
     const order = fieldOrder(kind, rec);
     const defs = FIELDS[kind];
@@ -224,6 +232,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
       ${basicCard(ctx, kind, sel, d, rec)}
+      ${kind === 'agent' ? sceneCard(sel, d) : ''}
       ${kind === 'org' ? membersCard(ctx, sel, d) : ''}
       <section class="gw-sec"><h3>로어 칸 ${variantBar}</h3>
         <div class="gw-fields">${rows.join('')}</div>

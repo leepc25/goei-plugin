@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "잘린 손가락",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single severed human finger. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "어금니",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single human molar tooth. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "눈알",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single human eyeball. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "콩팥",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark red kidney organ. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "병에 담긴 인격",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar with a faintly glowing ghostly wisp inside, sealed lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이름표 붙은 유실물",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small worn bag with a paper name tag tied on, blank tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "낯선 꽃씨",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few strange glowing blue seeds. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "조화 한 송이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single artificial red flower with a plastic stem. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "말라 죽은 꽃",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single dried dead flower. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "색종이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few scattered pieces of colorful confetti paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "웅웅거리는 큐브",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark metal cube with faint vibration lines around it. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "증명의 십자가 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a broken fragment of a black wooden cross. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "톱니바퀴",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single rusty iron gear. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이빨 나무 가지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a twisted dark branch with human teeth growing from it. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "얼룩진 동전",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single dirty stained coin. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "카지노 칩",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of red and black casino chips, no text. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "알약 통",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a weekly pill organizer box, blank lids. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "감기약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small syrup bottle with a measuring cup, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소화제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brown medicine bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "파스",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single beige pain relief patch. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "연고",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ointment tube, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "안약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small eye drop bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해열제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pink syrup bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "항생제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blister pack of capsules, plain foil back. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "진정제 주사",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small auto-injector pen, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "아드레날린 주사",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow epinephrine auto-injector pen, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "모르핀",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass ampoule of clear liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "해독제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass vial of green antidote with a stopper, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화상 연고",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round tin of burn cream, plain lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소독용 알코올",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic bottle of rubbing alcohol, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "면봉",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few cotton swabs. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "솜",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few cotton balls. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

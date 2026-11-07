@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green camouflage military uniform jacket laid flat, front view, no patches. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a navy police uniform shirt laid flat, front view, no badges or text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray security guard uniform shirt laid flat, front view, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white nurse uniform top laid flat, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of navy surgical scrubs laid flat, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a striped blue hospital patient gown laid flat, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray work coverall suit laid flat, front view, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean hanbok jacket and skirt laid flat, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded yellow rain poncho. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black baseball cap, side view, no logo. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark gray knit beanie hat. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fedora hat, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an olive tactical ballistic helmet, side view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of night vision goggles with green lenses, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of clear safety goggles with an elastic strap. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black knee pads. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "군복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green camouflage military uniform jacket laid flat, front view, no patches. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경찰 제복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a navy police uniform shirt laid flat, front view, no badges or text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "경비원 제복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray security guard uniform shirt laid flat, front view, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "간호사복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white nurse uniform top laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "수술복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of navy surgical scrubs laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "환자복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a striped blue hospital patient gown laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "작업복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray work coverall suit laid flat, front view, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "한복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean hanbok jacket and skirt laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비옷 판초",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded yellow rain poncho. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "야구 모자",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black baseball cap, side view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비니",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark gray knit beanie hat. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "중절모",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black fedora hat, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "방탄 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an olive tactical ballistic helmet, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "야간 투시경",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of night vision goggles with green lenses, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "고글",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of clear safety goggles with an elastic strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무릎 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black knee pads. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

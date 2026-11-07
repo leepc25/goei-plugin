@@ -12,6 +12,8 @@ export interface SceneData {
   en?: string;
   /** 시작 화면에서 숨김 (기본 장면을 빼고 싶을 때. 지우지 않고 숨긴다) */
   hidden?: boolean;
+  /** 시작 로어 (인물별 장면): 첫 턴에 강제로 넣을 로어북 이름. 세력 장면의 「시작 로어북」 표와 같은 구실 (11-07 사용자: 인물 첫 장면은 키워드 검색에서 빠져 괴이가 안 불림) */
+  lore?: string[];
 }
 export interface ScenesData {
   /** 세력 코드 → fm → 장면 */
@@ -49,6 +51,8 @@ export function pickScenes(raw: unknown): ScenesData {
     if (s(o.ko).trim()) row.ko = s(o.ko);
     if (s(o.en).trim()) row.en = s(o.en);
     if (o.hidden === true) row.hidden = true;
+    const names = Array.isArray(o.lore) ? o.lore.map((x) => s(x).trim()).filter(Boolean) : [];
+    if (names.length) row.lore = names;
     return Object.keys(row).length ? row : null;
   };
   for (const [code, rows] of Object.entries(obj(d.세력))) {
@@ -93,13 +97,15 @@ export function factionScenes(code: string, saved: ScenesData | undefined): Scen
   });
 }
 
-/** 인물별 첫 장면 (저장값이 있으면 그것, 없으면 기본값). 둘 다 비면 null */
-export function agentScene(agentId: string, saved: ScenesData | undefined): { ko: string; en: string } | null {
+/** 인물별 첫 장면 (저장값이 있으면 그것, 없으면 기본값). 둘 다 비면 null. label = 시작 화면에 보일 제목 (11-07 사용자: 「○○의 첫 장면」 대신 제목) */
+export function agentScene(agentId: string, saved: ScenesData | undefined): { ko: string; en: string; label: string; lore: string[] } | null {
   const b = safeDefaults().인물[agentId];
   const o = saved?.인물?.[agentId];
   const ko = o?.ko || b?.ko || '';
   const en = o?.en || b?.en || '';
-  return ko.trim() || en.trim() ? { ko, en } : null;
+  const label = (o?.label || b?.label || '').trim();
+  const lore = o?.lore?.length ? o.lore : (b?.lore ?? []).filter((x) => typeof x === 'string' && x.trim());
+  return ko.trim() || en.trim() ? { ko, en, label, lore } : null;
 }
 
 /** 저장값만 (기본값 없이) — 설정 창에서 「직접 고친 글」을 구분할 때 */

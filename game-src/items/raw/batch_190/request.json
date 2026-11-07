@@ -1,0 +1,108 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty wrinkled sagging pouch of dark pinkish skin, anatomical specimen, flesh not fabric Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single whitish oval ovary with a wrinkled bumpy surface, like a small almond-sized egg Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black leather gun holster with a strap Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few caramel candies wrapped in rectangular silver foil Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ivory white pistol with a few colorful glass bead bullets beside it Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear hospital oxygen mask with a small digital display box attached Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth flat round pale gray stone with a faint carved cloud pattern glowing softly Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled thick red braided rope for binding prisoners Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of shoelaces braided in five colors, blue red yellow white and black Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bent rod made of clear glass and brass, slowly spinning Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact yellow industrial vacuum cleaner with a wide hose Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clumsy handmade glass suncatcher with lumpy colored glass pieces catching light Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight Korean ceremonial sword with stars and constellations inlaid in gold on the blade Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small carved green jade tablet pendant on a red tassel cord Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear glass marble with a tiny prison cell with bars visible inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small old Korean clay oil lamp burning with a floating blue ghost flame Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "음낭",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty wrinkled sagging pouch of dark pinkish skin, anatomical specimen, flesh not fabric Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_186/01.png"
+  },
+  {
+   "ko": "난소",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single whitish oval ovary with a wrinkled bumpy surface, like a small almond-sized egg Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "줄잡이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black leather gun holster with a strap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시금달큼",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few caramel candies wrapped in rectangular silver foil Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리손포",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ivory white pistol with a few colorful glass bead bullets beside it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진실호흡기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear hospital oxygen mask with a small digital display box attached Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공기누름돌",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth flat round pale gray stone with a faint carved cloud pattern glowing softly Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "포승줄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled thick red braided rope for binding prisoners Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오방색 신발끈",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of shoelaces braided in five colors, blue red yellow white and black Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "행방 막대",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bent rod made of clear glass and brass, slowly spinning Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "액운 삼키미",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact yellow industrial vacuum cleaner with a wide hose Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "햇살잡이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clumsy handmade glass suncatcher with lumpy colored glass pieces catching light Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사인검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight Korean ceremonial sword with stars and constellations inlaid in gold on the blade Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "옥패",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small carved green jade tablet pendant on a red tassel cord Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "간이 유리 감옥",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear glass marble with a tiny prison cell with bars visible inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도깨비불 호롱",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small old Korean clay oil lamp burning with a floating blue ghost flame Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

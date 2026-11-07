@@ -1,4 +1,5 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
+import { resetShop, shopAction, shopInput, shopPopup, shopUi } from './shop';
 import { showWindow } from '../host/container';
 import { factionList, PLAYER_FM, playerScenario, scenesOf } from '../core/factions';
 import { agentScene } from '../core/scenes';
@@ -23,11 +24,13 @@ import { frameHtml, frameState } from './frame';
 import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
-import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
-import { addMark, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
+import { bindDrawer, closeDrawer } from './drawer';
+import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, type ItemsNav } from './items';
+import { addMark, markCandidates, markPop, marks, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
+import { setItemIconRedraw } from '../host/itemicons';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
@@ -97,8 +100,12 @@ let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
 /** records = 「기록」(일지·가계부·인물·세력, 2026-10-29 가계부 메뉴 자리). 가계부는 2026-11-05부터 기록의 하위 탭: 사원증 잔고 줄·폰 머리 칩·옛 「wallet」 탭 요청은 openWallet() 으로 */
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records'];
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'items' | 'records' | 'settings';
+/** items = 「소지품」(가계부|소지품, 2026-11-07 사용자: 가계부는 기록에서 소지품 메뉴로) */
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'items', 'records'];
+/** 폰 공용 서랍(위키·괴담넷·설정) 펼침 (2026-11-07 사용자: 메뉴별 도구 줄은 늘 보이고, 서랍은 전 메뉴 공통) */
+let cdrOpen = false;
+let lastForm: HTMLFormElement | null = null;
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -153,6 +160,10 @@ function ensureRoot(): HTMLElement {
     if (view.kind === 'picker') renderPicker();
     else render();
     if (editorOpen()) editorRender();
+  });
+  // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
+  setItemIconRedraw(() => {
+    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open)) render();
   });
   const style = document.createElement('style');
   style.textContent = css;
@@ -316,7 +327,8 @@ function ensureRoot(): HTMLElement {
     ev.preventDefault();
     const form = ev.target as HTMLFormElement;
     const input = form.querySelector('input');
-    if (form.dataset.submit) void run(form.dataset.submit, input?.value ?? '');
+    lastForm = form;
+    if (form.dataset.submit) void run(form.dataset.submit, form.dataset.submit.startsWith('items-') ? form.dataset.value ?? '' : input?.value ?? '');
   });
   root.addEventListener('change', (ev) => panelChange(ev.target as HTMLSelectElement));
   // 검색어는 목록만 다시 그린다 (입력창 포커스 유지)
@@ -335,6 +347,9 @@ function ensureRoot(): HTMLElement {
     // 사원증·요원 정보 작은 창이 떠 있으면 그것만 닫는다 (2026-11-05: Esc가 창을 지나쳐 패널 전체를 닫던 문제)
     // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
+    if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
+    // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
+    if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
     const pop = document.querySelector('.gx-agpop');
     if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
@@ -377,6 +392,8 @@ function panelInput(el: HTMLInputElement): void {
     if (box) box.innerHTML = walletList(view.ctx);
     return;
   }
+  if (el?.dataset?.input === 'items-q' && view.kind === 'started' && root) return itemsInput(root, view.ctx, el.value);
+  if (el?.dataset?.input === 'shop-say') return shopInput(el.value);
   if (el?.dataset?.input === 'rec-q' && view.kind === 'started') {
     // 기록 › 일지 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
     recordsInput('rec-q', el.value);
@@ -554,6 +571,12 @@ export async function openWiki(title: string): Promise<void> {
   if (view.kind === 'started') await handle('wiki-goto', title);
 }
 
+/** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
+export async function openShop(): Promise<void> {
+  await openApp({ quietIfNotLite: true });
+  if (view.kind === 'started') await handle('shop-open');
+}
+
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
@@ -580,6 +603,8 @@ async function refresh(): Promise<void> {
         resetField(true);
         resetWiki();
         resetRecords();
+        resetItems();
+        resetShop();
         resetGnet();
         resetPhone();
         resetSettings();
@@ -661,6 +686,15 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  // 소지품 저장: form submit 은 iframe(allow-forms 없음)에서 오지 않으니 그려진 입력 칸(.it-form)을 넘긴다
+  if (featCtx && action.startsWith('items-') && (await itemsAction(action, value, featCtx, recordsEnv, root?.querySelector<HTMLElement>('[data-it-form]') ?? lastForm))) return;
+  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, wikiEnv))) return;
+  if (action === 'cdr') {
+    cdrOpen = !cdrOpen;
+    root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
+    root?.querySelector('.gx-cgrip')?.setAttribute('aria-expanded', String(cdrOpen));
+    return;
+  }
   // 기록 메뉴(일지·보고서·인물·세력)와 설정 「기록」 묶음. 상황판 종료 줄·알림의 보고서 지름길(rec-open)·「기록에서 전부 보기」(rec-journal)는 기록 탭으로 넘어간다
   if (featCtx && (action.startsWith('rec-') || action.startsWith('jr-'))) {
     if (action === 'rec-back' && !(await handleRecords(action, value, featCtx, recordsEnv))) {
@@ -813,6 +847,9 @@ async function handle(action: string, value?: string): Promise<void> {
       if (value === 'wallet') return openWallet();
       // 다른 탭에서 기록으로 들어오면 일지 목록부터 (2026-11-05 사용자: 가계부를 보고 나온 뒤 기록을 누르면 가계부가 다시 열렸다)
       if (value === 'records' && tab !== 'records') applyRecordsNav({ sub: 'journal', view: 'list', id: '' });
+      // 다른 탭에서 소지품으로 들어오면 소지품 격자부터 (가계부는 잔고 단추로)
+      if (value === 'items' && tab !== 'items') applyItemsNav({ sub: 'items', view: 'grid', open: '' });
+      cdrOpen = false;
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
@@ -1052,7 +1089,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', items: '소지품', records: '기록', settings: '설정',
 };
 
 /** 시작 전 창 머리: 제목 + 작은 안내. 「괴이 ː ANOMALY」 표기는 상황판에서 뺐다 (사용자 2026-11-05) */
@@ -1063,15 +1100,14 @@ function header(title: string, extra = '', sub = ''): string {
   </header>`;
 }
 
-/** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
+/** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정).
+ *  단추는 잔고·사원증·닫기만 (2026-11-07 사용자: 기록·설정은 하단 바·공용 서랍으로) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${walletHeadButton(ctx)}
-      <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
-      <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -1190,6 +1226,8 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  // 상점 주인 대사 상자: 새 대사가 아래에 쌓이니 늘 맨 아래를 보인다
+  root.querySelectorAll<HTMLElement>('[data-sh-log]').forEach((el) => (el.scrollTop = el.scrollHeight));
   labelSwitches(root);
   bindMapZoom(root);
   bindMbar(root, () => void run('close'));
@@ -1205,10 +1243,9 @@ function render(): void {
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
-/** 모바일 상황판 하단 서랍: 즐겨찾기 다섯 칸 (2026-10-20 사용자: 순찰·설정 두 버튼 자리를 즐겨찾기로. 설정은 위 머리에 있다) */
+/** 모바일 상황판 하단 서랍(즐겨찾기 다섯 칸)은 2026-11-07 사용자 결정으로 없앴다. 즐겨찾기 자체도 뺌 (ui/marks.ts 는 남겨 둠) */
 function boardDrawer(): string {
-  if (!isPhone()) return '';
-  return drawerHtml(markSlots(), '', 'gx-bdrawer');
+  return '';
 }
 
 /** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */
@@ -1217,6 +1254,8 @@ interface NavState {
   w?: { view: string; title: string; list: boolean };
   /** 기록 탭: 하위 탭·화면·대상 */
   r?: RecordsNav;
+  /** 소지품 탭: 가계부|소지품·물건|기록·팝업 */
+  i?: ItemsNav;
   p?: { sub: string; tab: string; view: string; room: string | null; n: number | null };
   g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
   f?: 'goal' | 'team';
@@ -1226,13 +1265,14 @@ interface NavState {
 }
 const navHist = new NavHistory<NavState>();
 
-/** 잔고 칩·사원증 잔고 줄·옛 「가계부」 탭 요청 → 기록 › 가계부 (2026-11-05 사용자: 가계부는 기록의 하위 탭) */
+/** 잔고 칩·사원증 잔고 줄·옛 「가계부」 탭 요청 → 소지품 › 가계부 (2026-11-07 사용자: 가계부는 소지품 메뉴의 하위 탭) */
 function openWallet(): void {
-  tab = 'records';
+  tab = 'items';
   notice = '';
   field.confirmEnd = null;
+  cdrOpen = false;
   resetSettings();
-  applyRecordsNav({ sub: 'wallet', view: 'list', id: '' });
+  applyItemsNav({ sub: 'wallet', view: 'grid', open: '' });
   render();
 }
 
@@ -1240,6 +1280,7 @@ function navState(): NavState {
   const s: NavState = { tab };
   if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
   if (tab === 'records') s.r = recordsNav();
+  if (tab === 'items') s.i = itemsNav();
   if (tab === 'phone') s.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
   // 괴담넷 글쓰기·새 쪽지 화면만 기록 (댓글 답글 칸은 화면 이동이 아니다)
   if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
@@ -1308,10 +1349,11 @@ function openable(ctx: ChatContext, s: NavState): NavState {
     o.r = legacy;
     delete o.w;
   }
-  // 옛 즐겨찾기 「가계부」 탭 → 기록 › 가계부 (2026-11-05)
-  if ((o.tab as string) === 'wallet') {
-    o.tab = 'records';
-    o.r = { sub: 'wallet', view: 'list', id: '' };
+  // 옛 「가계부」 탭·기록 › 가계부 → 소지품 › 가계부 (2026-11-07)
+  if ((o.tab as string) === 'wallet' || (o.tab === 'records' && o.r?.sub === 'wallet')) {
+    o.tab = 'items';
+    o.i = { sub: 'wallet', view: 'grid', open: '' };
+    delete o.r;
   }
   if (!TABS.includes(o.tab)) o.tab = 'board';
   if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
@@ -1324,6 +1366,7 @@ function applyNav(s: NavState): void {
   field.confirmEnd = null;
   if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list });
   if (s.r) applyRecordsNav(s.r);
+  if (s.i) applyItemsNav(s.i);
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
@@ -1370,14 +1413,14 @@ function startedBody(ctx: ChatContext): string {
     case 'phone':
       return phoneTab(ctx, phoneEnv);
     case 'records':
-      // 폰: 기록 탭의 서랍엔 하위 탭 넷(ui/records.ts), 필드 탭은 상황판처럼 즐겨찾기 서랍 (2026-10-29 사용자)
       return recordsTab(ctx);
+    case 'items':
+      return itemsTab(ctx);
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
       // 명부는 자기 검색 서랍이 있어 그대로
-      const html = settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
-      return html.includes('ph-drawer') ? html : html + boardDrawer();
+      return settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope) + boardDrawer();
     }
     default:
       return board(ctx);
@@ -1398,7 +1441,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1409,7 +1452,8 @@ function body(): string {
 /** 시작 화면에 보일 상황 목록: 인물로 시작하면 그 인물의 첫 장면(있을 때, fm 0) + 직접 입력·커스텀 임무, 페르소나면 공용 장면 + 직접 입력·커스텀 임무 */
 function scenariosFor(f: Faction, player: string | undefined, lore: LoreEntry[] | undefined) {
   if (!player) return f.scenarios;
-  const own = agentScene(player, scenesOf(lore)) ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? '이 인물')] : [];
+  const ownScene = agentScene(player, scenesOf(lore));
+  const own = ownScene ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? '이 인물', ownScene.label)] : [];
   return [...own, ...f.scenarios.filter((x) => x.kind !== 'opening')];
 }
 
@@ -1493,6 +1537,7 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
+    ${item('items', '소지품', ICONS.bag, 'desk')}
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
@@ -1502,15 +1547,27 @@ function tabs(): string {
 }
 
 type NavItem = (id: Tab, label: string, icon: string, cls?: string, badge?: string) => string;
-/** 폰 하단 바 (위키·임무·상황판·괴담톡·괴담넷). 설정 창(editor)도 폰에서 같은 바를 그린다 */
-function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null): string {
-  return mbarHtml([
-    item('wiki', '위키', ICONS.wiki),
+/** 폰 하단 바 (임무·기록·상황판·괴담톡·소지품, 2026-11-07 사용자). 위키·괴담넷·설정은 바 위 손잡이로 여는 공용 서랍.
+ *  설정 창(editor)도 폰에서 같은 바를 그린다 (서랍 없이) */
+function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null, drawer = true): string {
+  const bar = mbarHtml([
     item('map', '임무', ICONS.map, 'mob'),
+    item('records', '기록', ICONS.records, 'mob'),
     item('board', '상황판', ICONS.board, 'home'),
     item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-    ...(GNET_ON ? [item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet)] : []),
+    item('items', '소지품', ICONS.bag, 'mob'),
   ]);
+  return drawer ? commonDrawer(ctx) + bar : bar;
+}
+
+/** 폰 공용 서랍: 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색). 누르면 위키·괴담넷·설정 한 줄이 메뉴별 도구 줄을 덮으며 올라온다 */
+function commonDrawer(ctx: ChatContext | null): string {
+  const b = (id: string, label: string, icon: string, action = 'tab', value = id, badge = '') =>
+    `<button class="ph-tool${tab === id ? ' on' : ''}" data-action="${action}" data-value="${value}">${icon}<span class="ph-tool-l">${esc(label)}</span>${badge}</button>`;
+  return `<div class="gx-cdr${cdrOpen ? ' open' : ''}">
+    <div class="gx-cpanel ph-tools">${b('wiki', '위키', ICONS.wiki)}${GNET_ON ? b('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}${b('settings', '설정', ICONS.settings, 'ed-open', 'set:screen', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}</div>
+    <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
+  </div>`;
 }
 
 /** 설정 창(폰)에 주는 하단 바: 본 창과 같은 항목, 지금 탭 표시 */
@@ -1520,7 +1577,7 @@ function mobileNavHtml(): string {
   const cur: Tab = tab === 'mission' ? 'map' : tab;
   const item: NavItem = (id, label, icon, cls = '', badge = '') =>
     `<button class="gx-nb${cls ? ` ${cls}` : ''}${cur === id ? ' on' : ''}" data-action="tab" data-value="${id}">${icon}<span>${esc(label)}</span>${badge}</button>`;
-  return `<nav class="gx-nav gw-nav">${mobileBar(item, unreadPhone, ctx)}</nav>`;
+  return `<nav class="gx-nav gw-nav">${mobileBar(item, unreadPhone, ctx, false)}</nav>`;
 }
 
 /** 왼쪽 위: 표지 + 세로 ID카드 */

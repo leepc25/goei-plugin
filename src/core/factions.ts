@@ -29,7 +29,7 @@ export const isFactionCode = (v: unknown): v is string => typeof v === 'string' 
 
 /** 인물별 첫 장면의 시나리오 번호 (그 인물로 플레이할 때만 목록에 보인다. core/scenes.ts agentScene) */
 export const PLAYER_FM = 0;
-export const playerScenario = (name: string): Scenario => ({ fm: PLAYER_FM, label: `${name}의 첫 장면`, kind: 'opening' });
+export const playerScenario = (name: string, label?: string): Scenario => ({ fm: PLAYER_FM, label: label?.trim() || `${name}의 첫 장면`, kind: 'opening' });
 
 /** 명부 조직 칸에 저장되는 세력 값 (조직 이름이 열쇠) */
 export interface FactionSpec {

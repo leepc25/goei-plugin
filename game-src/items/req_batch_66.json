@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "영수증 뭉치",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled ball of receipts. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "머리끈",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black hair tie. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빗",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic comb. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손거울",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact mirror, open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "립스틱",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red lipstick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "향수",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass perfume bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화장품 파우치",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small makeup pouch. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손톱깎이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel nail clipper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "열쇠고리 인형",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small doll keychain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "우산 비닐",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear umbrella plastic sleeve. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부채(여름)",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding paper fan, plain. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "선풍기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white electric fan. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "에어컨 리모컨",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white air conditioner remote, blank display. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "TV 리모컨",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black TV remote. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전구",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a light bulb. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "형광등",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long fluorescent tube. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

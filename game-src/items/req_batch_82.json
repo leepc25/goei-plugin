@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "체리",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two red cherries joined by stems Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "파인애플",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole pineapple Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "석류",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red pomegranate split open showing red seeds Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대추",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few dried red jujubes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "밤",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few brown chestnuts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곶감",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three dried persimmons Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배달 봉지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black plastic delivery bag tied at the top, holding food boxes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이유식",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small baby food jar with orange puree Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "분유",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round can of baby formula powder with a scoop, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "젖병",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a baby bottle with milk and a nipple top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "김치볶음밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mound of red kimchi fried rice with a fried egg on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자튀김",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red paper carton of french fries Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타코야키",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. six round takoyaki balls with sauce and bonito flakes in a paper boat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kebab wrap in paper with meat and vegetables Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부리또",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a burrito wrapped in foil, cut in half Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나초",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of tortilla chips with melted cheese Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

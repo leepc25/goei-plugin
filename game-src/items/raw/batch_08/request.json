@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld remote detonator with a red button and a short antenna, no text. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty brown leather pistol holster with a strap. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black leather knife sheath. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large two-pronged steel carving fork with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black umbrella with a hidden blade sliding out of the handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver dagger whose hilt and guard form a cross, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight knife with a yellow paper talisman wrapped around the blade, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a claw hammer with dark red blood stains on the head, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy sledgehammer with a long wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large steel pipe wrench, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rusty iron meat hook with a wooden T-handle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black folding iron war fan, half open. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a four-pointed steel throwing star. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three thin black throwing knives fanned out. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange-tipped toy airsoft pistol, side view facing right. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bright plastic toy water gun, side view facing right. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "기폭 장치",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld remote detonator with a red button and a short antenna, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "권총집",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty brown leather pistol holster with a strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "칼집",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black leather knife sheath. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부엌 포크",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large two-pronged steel carving fork with a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "우산 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black umbrella with a hidden blade sliding out of the handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "은 십자가 단검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver dagger whose hilt and guard form a cross, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부적 붙은 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight knife with a yellow paper talisman wrapped around the blade, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "피 묻은 망치",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a claw hammer with dark red blood stains on the head, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠망치(대형)",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy sledgehammer with a long wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "렌치",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large steel pipe wrench, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠갈고리",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rusty iron meat hook with a wooden T-handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부채",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black folding iron war fan, half open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "표창",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a four-pointed steel throwing star. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "투척용 칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three thin black throwing knives fanned out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비비탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange-tipped toy airsoft pistol, side view facing right. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "물총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bright plastic toy water gun, side view facing right. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

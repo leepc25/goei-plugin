@@ -1,0 +1,108 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval iron claw tongs with four curved spikes on each jaw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two large alligator clamps on red and black cables attached to a car battery Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small leather roll holding thin long steel needles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small steel hook with a long thin handle for pulling out entrails Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray plastic skin stapler gun for closing wounds Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a segmented metal spine of linked steel vertebrae with wires Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large syringe-like trocar with a hollow thick needle and a small implant inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal cap covered in electrodes and many wires Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tin can with a pastel cloud and moon picture, lid slightly open with glowing mist Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale pink eraser block with a faint glow and shavings of letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glossy red candy shaped like a human heart, slightly pulsing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum forensic kit case opened showing swabs, vials and powder brushes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mourning armband with two white stripes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a very short narrow translucent pale tube, like a small straw, shown large Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fluffy orange fox tail with a white tip, tied with red string Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky clicky ballpoint pen with three colored sliders, red blue and black Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "가슴 찢개",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval iron claw tongs with four curved spikes on each jaw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기 고문 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two large alligator clamps on red and black cables attached to a car battery Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손톱 밑 바늘 세트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small leather roll holding thin long steel needles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "내장 갈고리",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small steel hook with a long thin handle for pulling out entrails Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수술용 스테이플러",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray plastic skin stapler gun for closing wounds Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기계 척추",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a segmented metal spine of linked steel vertebrae with wires Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피하 임플란트 삽입기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large syringe-like trocar with a hollow thick needle and a small implant inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뇌 전극 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal cap covered in electrodes and many wires Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꿈 통조림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small tin can with a pastel cloud and moon picture, lid slightly open with glowing mist Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이름 지우개",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale pink eraser block with a faint glow and shavings of letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뛰는 심장 사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glossy red candy shaped like a human heart, slightly pulsing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "현장 감식 가방",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum forensic kit case opened showing swabs, vials and powder brushes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "상주 완장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mourning armband with two white stripes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요도",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a very short narrow translucent pale tube, like a small straw, shown large Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_174/05.png"
+  },
+  {
+   "ko": "여우 꼬리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fluffy orange fox tail with a white tip, tied with red string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삼색 볼펜",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky clicky ballpoint pen with three colored sliders, red blue and black Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

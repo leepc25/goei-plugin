@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "사망 진단서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a death certificate paper with a black border, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "실종 전단",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a missing person flyer with a photo, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수배 전단",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wanted poster with a face, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "경고문",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red and white warning sign, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "암호문",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper with strange symbols Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "난수표",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper with a grid of dots Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지령서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed envelope with a wax seal Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연구 노트",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lab notebook Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "출석부",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an attendance book Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스크랩북",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scrapbook with clippings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "주민등록등본",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an official document sheet with a seal Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "차용증",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an IOU paper with a thumbprint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "각서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pledge paper with a red seal Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스탬프 카드",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stamp card with stamps Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고체 연료",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a can of solid fuel gel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "알코올 램프",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an alcohol lamp Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -10,7 +10,8 @@ declare const __PLUGIN_VERSION__: string | undefined;
 const WATCH_MS = 1000;
 
 /** 이 봇 메시지·요청에만 있는 표식 (시드, 이동·전화 지시문, 시작 카드, 상태창) */
-const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', '%%GOEI_UNSENT%%', '%%GOEI_START%%', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
+// %%GOEI_SCENE%% = 플러그인이 넣은 첫 장면 (core/dispatch SCENE_MARK). 빠져 있어서 본체가 뜨기 전 Risu가 그린 첫 장면의 그림 태그가 원문으로 남았다 (사용자 11-07)
+const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', '%%GOEI_UNSENT%%', '%%GOEI_START%%', '%%GOEI_SCENE%%', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
 const ours = (t: unknown) => typeof t === 'string' && MARKS.some((m) => t.includes(m));
 
 let body: Body | null = null;
@@ -34,12 +35,16 @@ link.__goeiRelaunch = () => {
 async function load(prompt: boolean): Promise<Body | null> {
   let code: string | null = null;
   let fromStore = false;
+  // 어디서 시간이 가는지 콘솔에 남긴다 (v0.21.0 첫 시작 1분, 사용자 11-07)
+  const t0 = Date.now();
+  const lap = (what: string) => console.log(`[goei] 시작 ${what}: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   try {
     const saved: unknown = await risuai.pluginStorage.getItem(BODY_KEY);
     if (typeof saved === 'string' && bodyVersion(saved) === VERSION) (code = saved), (fromStore = true);
   } catch {
     // 아래에서 받는다
   }
+  lap(fromStore ? '저장된 본체 읽음' : '저장된 본체 없음(받는다)');
   if (!code) {
     try {
       code = await fetchBody(VERSION);
@@ -49,9 +54,12 @@ async function load(prompt: boolean): Promise<Body | null> {
       if (prompt) showPanel(VERSION, install);
       return null;
     }
+    lap('본체 받음');
     await save(code);
+    lap('본체 저장');
   }
   const b = await start(code, prompt);
+  lap(b ? '본체 켜짐' : '본체 시작 실패');
   if (!b) {
     failedAt = Date.now();
     // 저장해 둔 본체가 깨져 있으면(판은 맞는데 실행이 안 됨) 지워서 다음에 다시 받게 한다. 그냥 두면 플러그인 판이 바뀔 때까지 영영 안 뜬다
