@@ -106,7 +106,7 @@ export function planStart(
   if (faction.group && !choice.player) throw new StartError('이 칸은 인물을 골라 시작해요.');
   // 인물별 첫 장면 (fm 0): 그 인물로 플레이할 때만, 글이 있을 때만
   const playerScene = choice.fm === PLAYER_FM && choice.player ? agentScene(choice.player, scenesOf(lore)) : null;
-  const scenario = playerScene ? { fm: PLAYER_FM, label: '첫 장면', kind: 'opening' as const } : findScenario(choice.faction, choice.fm, factions);
+  const scenario = playerScene ? { fm: PLAYER_FM, label: playerScene.label || '첫 장면', kind: 'opening' as const } : findScenario(choice.faction, choice.fm, factions);
   if (!scenario) throw new StartError('상황을 골라 주세요.');
   // 세력 공용 장면은 신입(페르소나) 시점이라 캐릭터 플레이에는 인물별 장면·직접 입력·커스텀 임무만
   if (choice.player && scenario.kind === 'opening' && !playerScene) throw new StartError('캐릭터로 시작할 때는 그 인물의 첫 장면이나 직접 입력·커스텀 임무를 골라 주세요.');

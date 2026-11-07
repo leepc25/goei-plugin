@@ -431,7 +431,15 @@
 .gw .gw-startpage .st-slots .dir-row.open { border-color: var(--accent-line); }
 .gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 .gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
-.gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
+.gw .gw-startpage .st-slot { cursor: pointer; user-select: none; }
+.gw .gw-startpage .st-slot:hover { background: var(--panel2); }
+.gw .gw-startpage .st-slot .gw-grip { flex: 0 0 auto; touch-action: none; }
+.gw .gw-startpage .st-slot .st-caret { display: inline-flex; width: 18px; color: var(--dim); }
+.gw .gw-startpage .st-slot .st-caret svg { width: 16px; height: 16px; }
+.gw .gw-startpage .st-slots .dir-row.dragging { opacity: .45; }
+.gw .gw-startpage .st-slots .dir-row.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
+.gw .gw-startpage .st-slots .dir-row.drop-after { box-shadow: 0 3px 0 0 var(--signal); }
+.gw.dir-dragging, .gw.dir-dragging * { cursor: grabbing !important; user-select: none; }
 /* 폰: 이름 줄과 단추 줄을 나눈다 (한 줄에 다 넣으면 이름이 꺾이고 종류·코드가 잘린다, 2026-11-05 캡처) */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .gw-startpage .st-slot { flex-wrap: wrap; row-gap: 6px; }
@@ -442,8 +450,8 @@
 .gw .gw-startpage .st-sel small { color: var(--dim); font-weight: 400; }
 .gw .gw-startpage .st-scene, .gw .gw-startpage .st-member { padding: 8px 0 4px; border-top: 1px solid var(--line); }
 .gw .gw-startpage .st-scene.off { opacity: 0.6; }
-.gw .gw-startpage .st-member > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
-.gw .gw-startpage .st-member > summary small { color: var(--dim); }
+.gw .gw-startpage .st-member > summary, .gw .gw-startpage .st-scene > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
+.gw .gw-startpage .st-member > summary small, .gw .gw-startpage .st-scene > summary small { color: var(--dim); }
 .gw .gw-startpage .dir-chips { padding: 6px var(--pad) 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* 설정 찾기 칸 (2026-11-06 사용자 승인, 전수점검 8-10): 기능 탭 왼쪽 목록 위. 찾은 줄은 목록 자리에, 고른 줄은 페이지에서 잠깐 비춘다 */
