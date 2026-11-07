@@ -8,7 +8,7 @@ const mk = (name, kind, desc, from = 'story', anchor = 'c1', extra = {}) => ({ i
 const items = { list: [
   mk('소금 봉지', 'consumable', '관리국 지급품, 두 봉지 남음', 'store', 'c1', { effect: '저급 괴이의 접근을 늦춘다', price: 6000 }), mk('손전등', 'tool', '건전지 넉넉'), mk('부적', 'charm', '세 장', 'manual', ''),
   mk('낡은 열쇠', 'key', '어디 것인지 모름'), mk('녹음기', 'device', '테이프 하나'), mk('방검 조끼', 'wear', '입고 있음'), mk('사건 파일', 'paper', '유계역 건'), mk('진통제', 'medical', '네 알'),
-  mk('생수', 'food', '두 병'), mk('검은 구슬', 'anomaly', '차갑다'), mk('현금 봉투', 'valuable', '봉인 그대로'), mk('접이식 칼', 'weapon', ''), ...Array.from({ length: 5 }, (_, i) => mk(`봉인 상자 ${i + 1}`, 'seal', '무겁다')),
+  mk('생수', 'food', '두 병'), mk('검은 구슬', 'anomaly', '차갑다'), mk('금반지', 'valuable', '봉인 그대로'), mk('접이식 칼', 'weapon', ''), ...Array.from({ length: 5 }, (_, i) => mk(`봉인 상자 ${i + 1}`, 'seal', '무겁다')),
 ], log: [ { id: 'l1', name: '부적', what: 'use', by: 'story', anchor: 'c1', quote: '부적을 꺼내 문틈에 끼웠다', at: '2026-11-07T00:00:00Z' }, { id: 'l2', name: '손수건', what: 'drop', by: 'manual', anchor: '', at: '2026-11-06T00:00:00Z' } ] };
 const chat = { message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]', chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_items: JSON.stringify(items) } };
 const b = await launch();
