@@ -1,4 +1,7 @@
-t.scriptstate, (p) => change(p, x));
+ = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
         const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
         if (w.closed?.length) {
           const index = closeIndexOf(latest);
@@ -2316,8 +2319,10 @@ ${texts.anomaly}`;
   }
   async function start2(o = {}) {
     void dropOldGame();
+    const t0 = Date.now();
+    const lap = (what) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
     try {
-      await loadWorldData();
+      lap(`세계 자료 ${await loadWorldData() === "store" ? "저장소에서" : "받음"}`);
     } catch (error) {
       showWorldDataPanel(reason(error), !!o.prompt);
       throw error;
@@ -2325,6 +2330,7 @@ ${texts.anomaly}`;
     await loadPrefs();
     await loadStoredWikiPack();
     await loadStoredTokenizer();
+    lap("설정·위키·토크나이저 읽음");
     assetsFirst = loadModuleAssets();
     void redrawAfterLoad();
     setWikiOpener((title2) => void openWiki2(title2));
@@ -2339,6 +2345,7 @@ ${texts.anomaly}`;
       onThemeChange((t) => void f.setTheme(t).catch(() => {
       }));
       stopWatcher = startWatcher(fab);
+      lap("유령 단추 붙임");
     } catch (error) {
       console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
       fab = null;

@@ -86,7 +86,9 @@ export async function fetchPack(pack: PackSpec, progress?: Progress): Promise<st
     if (typeof name !== 'string' || !re.test(name)) throw new DataPackError(`${pack.label} 목록 형식이 달라요.`);
   }
   const parts = index.parts as string[];
+  const t0 = Date.now();
   const text = await fetchParts(parts, getText, (n) => progress?.(`${pack.label} 받는 중 ${n}/${parts.length}`));
+  console.log(`[goei] ${pack.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   if (text.length !== pack.expect.length) throw new DataPackError(`${pack.label}를 끝까지 받지 못했어요. (${text.length}/${pack.expect.length}자)`);
   const got = await sha256Text(text);
   if (got !== null) {

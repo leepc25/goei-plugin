@@ -1,4 +1,6 @@
-..b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
+a, b) {
+    for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
+    for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
   }
   function syncForm(a, b) {
     const active3 = document.activeElement === a && a !== committed;
@@ -2757,5 +2759,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .ps-ctl .gx-seg { min-width: 0; padding: 0 10px; }
 }
 /* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
-.gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
-.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13
+.gn-row:has(> .gn-inline) .gn-row

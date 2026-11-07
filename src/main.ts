@@ -34,12 +34,16 @@ link.__goeiRelaunch = () => {
 async function load(prompt: boolean): Promise<Body | null> {
   let code: string | null = null;
   let fromStore = false;
+  // 어디서 시간이 가는지 콘솔에 남긴다 (v0.21.0 첫 시작 1분, 사용자 11-07)
+  const t0 = Date.now();
+  const lap = (what: string) => console.log(`[goei] 시작 ${what}: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   try {
     const saved: unknown = await risuai.pluginStorage.getItem(BODY_KEY);
     if (typeof saved === 'string' && bodyVersion(saved) === VERSION) (code = saved), (fromStore = true);
   } catch {
     // 아래에서 받는다
   }
+  lap(fromStore ? '저장된 본체 읽음' : '저장된 본체 없음(받는다)');
   if (!code) {
     try {
       code = await fetchBody(VERSION);
@@ -49,9 +53,12 @@ async function load(prompt: boolean): Promise<Body | null> {
       if (prompt) showPanel(VERSION, install);
       return null;
     }
+    lap('본체 받음');
     await save(code);
+    lap('본체 저장');
   }
   const b = await start(code, prompt);
+  lap(b ? '본체 켜짐' : '본체 시작 실패');
   if (!b) {
     failedAt = Date.now();
     // 저장해 둔 본체가 깨져 있으면(판은 맞는데 실행이 안 됨) 지워서 다음에 다시 받게 한다. 그냥 두면 플러그인 판이 바뀔 때까지 영영 안 뜬다

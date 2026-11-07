@@ -76,11 +76,14 @@ function timeout(p, what) {
 async function getText(name) {
   const url = `${BASE}/${name}?t=${Date.now()}`;
   const legacy = risuai.risuFetch;
+  const t0 = Date.now();
   if (legacy) {
     try {
       const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), name);
       if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-    } catch {
+      console.log(`[goei] ${name}: risuFetch 가 ${((Date.now() - t0) / 1e3).toFixed(1)}초 만에 ${r?.ok ? "다른 형식으로" : `실패(${r?.status})`} → nativeFetch 로`);
+    } catch (error) {
+      console.log(`[goei] ${name}: risuFetch 가 ${((Date.now() - t0) / 1e3).toFixed(1)}초 만에 실패(${error instanceof Error ? error.message : String(error)}) → nativeFetch 로`);
     }
   }
   const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), name);
@@ -100,7 +103,9 @@ async function fetchBody(version) {
   for (const name of index.parts) {
     if (typeof name !== "string" || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError("본체 정보가 올바르지 않아요.");
   }
+  const t0 = Date.now();
   const code = await fetchParts(index.parts, getText);
+  console.log(`[goei] 본체 ${index.parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
   if (code.length !== index.length || bodyVersion(code) !== version) throw new BodyError("본체를 끝까지 받지 못했어요.");
   const got = typeof index.sha256 === "string" ? await sha256(code) : null;
   if (got !== null) {
@@ -219,11 +224,14 @@ link.__goeiRelaunch = () => {
 async function load(prompt) {
   let code = null;
   let fromStore = false;
+  const t0 = Date.now();
+  const lap = (what) => console.log(`[goei] 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
   try {
     const saved = await risuai.pluginStorage.getItem(BODY_KEY);
     if (typeof saved === "string" && bodyVersion(saved) === VERSION) code = saved, fromStore = true;
   } catch {
   }
+  lap(fromStore ? "저장된 본체 읽음" : "저장된 본체 없음(받는다)");
   if (!code) {
     try {
       code = await fetchBody(VERSION);
@@ -233,9 +241,12 @@ async function load(prompt) {
       if (prompt) showPanel(VERSION, install);
       return null;
     }
+    lap("본체 받음");
     await save(code);
+    lap("본체 저장");
   }
   const b = await start(code, prompt);
+  lap(b ? "본체 켜짐" : "본체 시작 실패");
   if (!b) {
     failedAt = Date.now();
     if (fromStore && codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {

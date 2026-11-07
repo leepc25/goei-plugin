@@ -1,4 +1,6 @@
-20(r.at)} · ${esc20(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc20(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
+phone.failure) + fail3("위키", wiki.failure);
+    const diag = manUi.diag;
+    const runs = diag ? diag.length ? diag.map((r) => row5(`${esc20(r.at)} · ${esc20(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc20(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
     const bundle = diagBundle(ctx2, canChat);
     return `<div class="gw-page gw-set">${head("", "요청 기록", "괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.")}
     <div class="gx-settings gw-setbody">
@@ -2937,6 +2939,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   function markCommitted(el) {
     committed = el;
   }
-  function syncAttrs(a, b) {
-    for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
-    for (const { name, value } of [.
+  function syncAttrs(

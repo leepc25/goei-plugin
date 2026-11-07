@@ -750,8 +750,11 @@ export interface BodyHandlers {
  */
 export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers> {
   void dropOldGame(); // 옛 필드 게임 코드·자산 팩(최대 수백 MB)이 저장소에 남아 있으면 지운다 (2026-11-05 사용자)
+  // 어디서 시간이 가는지 콘솔에 남긴다 (v0.21.0 첫 시작 1분, 사용자 11-07)
+  const t0 = Date.now();
+  const lap = (what: string) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   try {
-    await loadWorldData();
+    lap(`세계 자료 ${await loadWorldData() === 'store' ? '저장소에서' : '받음'}`);
   } catch (error) {
     // 받기 창(까닭·다시 받기·파일로 넣기)은 세계 자료를 받는 쪽인 본체가 띄운다 (host/datapanel.ts)
     showWorldDataPanel(reason(error), !!o.prompt);
@@ -760,6 +763,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   await loadPrefs();
   await loadStoredWikiPack();
   await loadStoredTokenizer();
+  lap('설정·위키·토크나이저 읽음');
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
@@ -774,6 +778,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));
     stopWatcher = startWatcher(fab);
+    lap('유령 단추 붙임');
   } catch (error) {
     // 본 화면 접근 권한을 거부하면 플로팅 버튼 대신 채팅 메뉴 항목을 쓴다 (다른 봇에서는 눌러도 아무것도 안 뜸).
     // 감시(괴이 카드 판정 liteNow)는 버튼 없이도 돌아야 요청 손질·로어북 고르기가 된다 (QC 2026-10-28)

@@ -54,12 +54,14 @@ function timeout<T>(p: Promise<T>, what: string): Promise<T> {
 async function getText(name: string): Promise<string> {
   const url = `${BASE}/${name}?t=${Date.now()}`;
   const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
+  const t0 = Date.now();
   if (legacy) {
     try {
       const r = await timeout(legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } }), name);
       if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-    } catch {
-      // 아래에서 다시
+      console.log(`[goei] ${name}: risuFetch 가 ${((Date.now() - t0) / 1000).toFixed(1)}초 만에 ${r?.ok ? '다른 형식으로' : `실패(${r?.status})`} → nativeFetch 로`);
+    } catch (error) {
+      console.log(`[goei] ${name}: risuFetch 가 ${((Date.now() - t0) / 1000).toFixed(1)}초 만에 실패(${error instanceof Error ? error.message : String(error)}) → nativeFetch 로`);
     }
   }
   const res = await timeout(risuai.nativeFetch(url, { method: 'GET' }), name);
@@ -81,7 +83,9 @@ export async function fetchBody(version: string): Promise<string> {
   for (const name of index.parts) {
     if (typeof name !== 'string' || !/^goei-body\.\d+\.txt$/.test(name)) throw new BodyError('본체 정보가 올바르지 않아요.');
   }
+  const t0 = Date.now();
   const code = await fetchParts(index.parts as string[], getText);
+  console.log(`[goei] 본체 ${index.parts.length}조각 받기: ${((Date.now() - t0) / 1000).toFixed(1)}초`);
   if (code.length !== index.length || bodyVersion(code) !== version) throw new BodyError('본체를 끝까지 받지 못했어요.');
   // 지문이 있는 판(0.17.9~)은 글자까지 맞는지 본다: crypto.subtle 이 있는 환경(보안 컨텍스트)이면 sha256(전체 UTF-8 바이트),
   // 없으면 hash(UTF-16 FNV-1a). 둘 다 없는 옛 release 의 목록은 길이·판만 (호환). 불일치는 받기 창의 「다시 받기」로

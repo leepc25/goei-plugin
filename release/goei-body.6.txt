@@ -1510,7 +1510,9 @@ Next Paragraph Text
       if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack3.label} 목록 형식이 달라요.`);
     }
     const parts = index.parts;
+    const t0 = Date.now();
     const text4 = await fetchParts(parts, getText, (n2) => progress?.(`${pack3.label} 받는 중 ${n2}/${parts.length}`));
+    console.log(`[goei] ${pack3.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
     if (text4.length !== pack3.expect.length) throw new DataPackError(`${pack3.label}를 끝까지 받지 못했어요. (${text4.length}/${pack3.expect.length}자)`);
     const got = await sha256Text(text4);
     if (got !== null) {
@@ -3593,5 +3595,4 @@ Next Paragraph Text
 .gw .adv-step, .gw .st-step { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0; background: var(--panel2); color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
 .gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
-.gw .adv-step > input.adv-val { width: 96px; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield; }
-.gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: no
+.gw .adv-step > input.adv-val { width: 96px; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield;

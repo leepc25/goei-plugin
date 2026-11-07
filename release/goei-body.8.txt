@@ -1,4 +1,4 @@
-ce` is the in-world place name or null. `who` lists the names of involved people (`@user` for the user's character); only people shown as involved, never everyone present in the chat.",
+y a relative expression is known (「무도회 다음날」, 「사흘 전」), keep that expression inside `text` and leave `date` null. `place` is the in-world place name or null. `who` lists the names of involved people (`@user` for the user's character); only people shown as involved, never everyone present in the chat.",
     "",
     "<<SECTION:docs_event>>",
     "### 6.1 Event (사건)",
@@ -1460,6 +1460,4 @@ Return the JSON object.` }
   }
   function logPage(ctx2, canChat) {
     const fail3 = (name, f) => f ? `<div class="ps-row"><div class="ps-label"><b>${esc20(name)}</b><small>${esc20(f.reason)}</small></div><textarea readonly rows="4">${esc20(f.raw)}</textarea></div>` : "";
-    const fails = fail3("괴담넷", gnet.failure) + fail3("괴담톡", phone.failure) + fail3("위키", wiki.failure);
-    const diag = manUi.diag;
-    const runs = diag ? diag.length ? diag.map((r) => row5(`${esc
+    const fails = fail3("괴담넷", gnet.failure) + fail3("괴담톡", 

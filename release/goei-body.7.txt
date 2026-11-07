@@ -1,4 +1,5 @@
-ne; margin: 0; }
+ }
+.gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .gw .adv-step > span, .gw .adv-num > span { display: inline-flex; align-items: center; padding: 0 10px 0 6px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .gw .st-step > b { display: inline-flex; align-items: center; justify-content: center; min-width: 3.4em; padding: 0 6px; font-size: 13px; font-weight: 600; color: var(--text); }
 .gw .adv-num { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
@@ -2933,4 +2934,4 @@ ${rules2}`;
     "",
     "Besides people, the chat keeps small records of events, places, factions and items. Each lives in `docs_now` as `type`, `key` (its Korean name), `id`, `text`, `date`, `place`, `who`. You change them with `docs` items: `op` is `add` (new record), `upsert` (replace record `replace`), or `remove` (record `replace` is no longer true; needs a quote). The lorebook already describes the world; these records hold only what this chat changed, so every document rule below says: record only what changed. Create a record only for an entity that appeared or became meaningfully active in this span; never for every passing name, place name, or background object, and never in bulk from the setting. If `docs_now` already has the same entity under another spelling, upsert it instead of adding a duplicate. If you cannot tell whether two names are the same entity, do not merge and do not add; omit. A name mentioned inside a person's entry does not replace a needed record, and a record does not replace the person entries that depend on it.",
     "",
-    "Common fields: `text` is Korean ≤200 chars and is the complete content of that record. `date` is the in-world date as `YYYY.MM.DD` when the span or the record gives it exactly, otherwise null; never substitute today's real date, the message order, or a count of turns, and never fill unknown parts with 00. When only a relative expression is known (「무도회 다음날」, 「사흘 전」), keep that expression inside `text` and leave `date` null. `pla
+    "Common fields: `text` is Korean ≤200 chars and is the complete content of that record. `date` is the in-world date as `YYYY.MM.DD` when the span or the record gives it exactly, otherwise null; never substitute today's real date, the message order, or a count of turns, and never fill unknown parts with 00. When onl
