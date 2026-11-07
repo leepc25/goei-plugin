@@ -74,6 +74,15 @@ export const lookId = (state: ScriptState | Record<string, unknown> | undefined)
 /** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 + 그 세력 전용 프리셋 (팩 순서 그대로) */
 export const looksOf = (rows: LookRow[], g: LookGender, faction: string): LookRow[] => rows.filter((r) => !r.unique && r.g === g && (!r.fac || r.fac === faction));
 
+/** 한 번도 고른 적 없을 때 기본 아바타 (2026-11-08: 사용자가 정하기 전 임시) */
+export const LOOK_FIRST = '시민남1';
+
+/** 시작 패널 기본 아바타: 마지막에 고른 것(그 세력에서 고를 수 있을 때) → 처음 기본 */
+export function defaultLook(rows: LookRow[], faction: string, last: string | undefined): string {
+  if (last && lookAllowed(rows, last, faction)) return last;
+  return rows.find((r) => !r.unique && r.name === LOOK_FIRST)?.id ?? '';
+}
+
 /** 이 세력으로 시작할 때 고를 수 있는 모습인가 */
 export const lookAllowed = (rows: LookRow[], id: string, faction: string): boolean => rows.some((r) => r.id === id && !r.unique && !!r.g && (!r.fac || r.fac === faction));
 

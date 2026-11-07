@@ -4,6 +4,7 @@
 import { LOOK_GENDERS, LOOK_KEY, lookId, looksOf, type LookGender, type LookRow } from '../core/looks';
 import { playerAgent } from '../core/player';
 import { idleOf, looksStatus, lookRows, ensureLooks, type IdleLook } from '../host/looks';
+import { savePrefs } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
@@ -111,6 +112,8 @@ export async function lookAction(action: string, value: string | undefined, ctx:
     return null;
   });
   if (saved !== null || !lookUi.notice) lookUi.open = false;
+  // 마지막에 고른 아바타 = 다음 새 채팅 기본
+  await savePrefs((p) => ({ ...p, look: value })).catch(() => {});
   await refresh();
   return true;
 }
@@ -124,7 +127,7 @@ export function lookStep(sel: string, player = ''): string {
   const r = player ? rows?.find((x) => x.unique && x.name === player) : sel ? rows?.find((x) => x.id === sel) : undefined;
   const face = r ? `<span class="gx-ava gx-lookface">${lookSprite(idleOf(r))}</span>` : `<span class="gx-ava"><span>${ICONS.person}</span></span>`;
   const label = player ? `${player} 모습` : r ? '바꾸기' : '눌러서 고르기';
-  return `<div class="gx-who"><button class="gx-whoc gx-lookchip${r ? ' on' : ''}" data-action="look-open" ${player ? 'disabled' : ''} aria-pressed="${!!r}">${face}<span class="gx-whot"><b>아바타</b><small>${esc(label)}</small></span></button></div>`;
+  return `<div class="gx-who"><button class="gx-whoc gx-lookchip${r ? ' on' : ''}" data-action="look-open" data-look="${r?.id ?? ''}" ${player ? 'disabled' : ''} aria-pressed="${!!r}">${face}<span class="gx-whot"><b>아바타</b><small>${esc(label)}</small></span></button></div>`;
 }
 
 /** 이 채팅의 대기 동작 (host/looks.ts idleLook). 화면 쪽에서 한 곳에서 가져다 쓰게 */

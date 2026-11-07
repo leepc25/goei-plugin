@@ -16,7 +16,7 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
-import { LOOK_KEY, lookAllowed, lookId } from '../core/looks';
+import { defaultLook, LOOK_KEY, lookAllowed, lookId } from '../core/looks';
 import { lookRows, onLooksReady } from '../host/looks';
 import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
@@ -1071,6 +1071,8 @@ async function start(): Promise<void> {
       };
     });
     if (!saved) throw new StartError('저장하지 못했어요.');
+    // 고른 아바타를 기억해 다음 새 채팅의 기본으로
+    if (!draft.player && draft.look && getPrefs().look !== draft.look) await savePrefs((p) => ({ ...p, look: draft.look })).catch(() => {});
     if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(', ')}`);
     busy = false;
     repick = false;
@@ -1529,6 +1531,9 @@ function picker(): string {
   // 직접 입력은 상황을 적어야 출발
   // 내 페르소나로 시작하면 아바타를 꼭 골라야 출발 (2026-11-08 사용자)
   const needLook = !!f && !f.group && !playing;
+  // 아바타 기본값: 마지막에 고른 것, 없으면 처음 기본 (2026-11-08 사용자: 매번 고르기 귀찮다)
+  const lookRowsNow = lookRows();
+  if (needLook && !draft.look && lookRowsNow && f) draft.look = defaultLook(lookRowsNow, f.code, getPrefs().look);
   const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing) && (!needLook || !!draft.look);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;

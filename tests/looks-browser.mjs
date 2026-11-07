@@ -28,7 +28,11 @@ for (const vp of ['pc', 'phone']) {
   await click('.gx-fac[data-value="A00"]');
   const heads = await page.$$eval('.gx-body > section > h2', (els) => els.map((e) => e.textContent.trim()));
   if (!heads.includes('3아바타')) fails.push(`[${vp}] 아바타 단계 없음 ${JSON.stringify(heads)}`);
-  if (!(await page.isDisabled('.gx-start'))) fails.push(`[${vp}] 아바타 없이 출발이 열림`);
+  // 처음엔 기본 아바타(시민남1)가 골라져 있다
+  const first = looks.find((r) => !r.unique && r.name === '시민남1').id;
+  const chipLook = () => page.$eval('.gx-lookchip', (e) => e.dataset.look);
+  if ((await chipLook()) !== first) fails.push(`[${vp}] 기본 아바타가 시민남1이 아님 (${await chipLook()})`);
+  if (await page.isDisabled('.gx-start')) fails.push(`[${vp}] 기본 아바타인데 출발이 막힘`);
   await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
   await shot('1_시작패널_고르기전');
@@ -55,7 +59,7 @@ for (const vp of ['pc', 'phone']) {
   await shot('3_시작패널_고른뒤');
   // 세력을 바꾸면 그 세력 전용 아바타는 빠진다
   await click('.gx-fac[data-value="C00"]');
-  if (await page.$('.gx-lookchip.on')) fails.push(`[${vp}] 백일몽으로 바꿨는데 관리국 아바타가 남음`);
+  if ((await chipLook()) === own) fails.push(`[${vp}] 백일몽으로 바꿨는데 관리국 아바타가 남음`);
   await click('.gx-fac[data-value="A00"]');
   await click('.gx-lookchip');
   await click('.gx-lookpop [data-action="look-g"][data-value="남"]');
@@ -75,6 +79,8 @@ for (const vp of ['pc', 'phone']) {
   await page.waitForFunction(() => window.__calls.setChat.length >= 1, null, { timeout: 15000 }).catch(() => {});
   const saved = (await chatOf(page)).scriptstate?.$st_look;
   if (saved !== own) fails.push(`[${vp}] 저장된 아바타 ${saved} (기대 ${own})`);
+  const pf = await page.evaluate(() => JSON.parse(window.__store['p:goei:prefs'] || '{}'));
+  if (pf.look !== own) fails.push(`[${vp}] 마지막 아바타를 기억 안 함 (${pf.look})`);
   // 시작한 뒤 다시 고르는 팝업 (장착 상자가 부를 openLookPicker 와 같은 단추)
   await closeWin(page);
   await setChat(page, { message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'char', data: '본문', chatId: 'c1' }], scriptstate: { ...(await chatOf(page)).scriptstate } });
