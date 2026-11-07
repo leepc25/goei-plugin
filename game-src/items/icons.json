@@ -540,6 +540,16 @@
   },
   {
    "keywords": [
+    "지하철 분실물 상자"
+   ],
+   "file": "misc_256.png",
+   "kind": "misc",
+   "base": false,
+   "name": "지하철 분실물 상자",
+   "src": "game-src/items/raw/batch_208/09.png"
+  },
+  {
+   "keywords": [
     "브라운관 텔레비전"
    ],
    "file": "device_023.png",
@@ -801,7 +811,8 @@
    "kind": "adult",
    "base": false,
    "name": "남성 정조 케이지",
-   "src": "game-src/items/raw/batch_148/12.png"
+   "src": "game-src/items/raw/batch_208/06.png",
+   "old_src": "game-src/items/raw/batch_148/12.png"
   },
   {
    "keywords": [
@@ -2156,8 +2167,8 @@
    "kind": "food",
    "base": false,
    "name": "눈물 결정 사탕",
-   "src": "game-src/items/raw/batch_206/06.png",
-   "old_src": "game-src/items/raw/batch_200/10.png"
+   "src": "game-src/items/raw/batch_208/15.png",
+   "old_src": "game-src/items/raw/batch_206/06.png"
   },
   {
    "keywords": [
@@ -2239,6 +2250,26 @@
    "base": false,
    "name": "코인 락커 열쇠",
    "src": "game-src/items/raw/batch_206/15.png"
+  },
+  {
+   "keywords": [
+    "이빨 뽑는 펜치"
+   ],
+   "file": "tool_267.png",
+   "kind": "tool",
+   "base": false,
+   "name": "이빨 뽑는 펜치",
+   "src": "game-src/items/raw/batch_208/02.png"
+  },
+  {
+   "keywords": [
+    "물 흐르는 액자"
+   ],
+   "file": "anomaly_254.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "물 흐르는 액자",
+   "src": "game-src/items/raw/batch_208/08.png"
   },
   {
    "keywords": [
@@ -4065,6 +4096,36 @@
    "base": false,
    "name": "기억 구슬 병",
    "src": "game-src/items/raw/batch_206/10.png"
+  },
+  {
+   "keywords": [
+    "소몰이 전기봉"
+   ],
+   "file": "weapon_159.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "소몰이 전기봉",
+   "src": "game-src/items/raw/batch_208/03.png"
+  },
+  {
+   "keywords": [
+    "뼛가루 주머니"
+   ],
+   "file": "anomaly_255.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "뼛가루 주머니",
+   "src": "game-src/items/raw/batch_208/10.png"
+  },
+  {
+   "keywords": [
+    "반쯤 탄 부적"
+   ],
+   "file": "charm_122.png",
+   "kind": "charm",
+   "base": false,
+   "name": "반쯤 탄 부적",
+   "src": "game-src/items/raw/batch_208/12.png"
   },
   {
    "keywords": [
@@ -6866,6 +6927,16 @@
    "base": false,
    "name": "덕트 테이프",
    "src": "game-src/items/raw/batch_206/14.png"
+  },
+  {
+   "keywords": [
+    "가짜 피 병"
+   ],
+   "file": "consumable_123.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "가짜 피 병",
+   "src": "game-src/items/raw/batch_208/07.png"
   },
   {
    "keywords": [
@@ -11161,6 +11232,26 @@
   },
   {
    "keywords": [
+    "와이어 톱"
+   ],
+   "file": "tool_268.png",
+   "kind": "tool",
+   "base": false,
+   "name": "와이어 톱",
+   "src": "game-src/items/raw/batch_208/04.png"
+  },
+  {
+   "keywords": [
+    "인형의 집"
+   ],
+   "file": "misc_258.png",
+   "kind": "misc",
+   "base": false,
+   "name": "인형의 집",
+   "src": "game-src/items/raw/batch_208/14.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -13832,6 +13923,26 @@
    "base": false,
    "name": "금두꺼비",
    "src": "game-src/items/raw/batch_202/14.png"
+  },
+  {
+   "keywords": [
+    "심령사진"
+   ],
+   "file": "paper_129.png",
+   "kind": "paper",
+   "base": false,
+   "name": "심령사진",
+   "src": "game-src/items/raw/batch_208/11.png"
+  },
+  {
+   "keywords": [
+    "메트로놈"
+   ],
+   "file": "misc_257.png",
+   "kind": "misc",
+   "base": false,
+   "name": "메트로놈",
+   "src": "game-src/items/raw/batch_208/13.png"
   },
   {
    "keywords": [
@@ -20304,6 +20415,16 @@
   },
   {
    "keywords": [
+    "개구기"
+   ],
+   "file": "medical_144.png",
+   "kind": "medical",
+   "base": false,
+   "name": "개구기",
+   "src": "game-src/items/raw/batch_208/05.png"
+  },
+  {
+   "keywords": [
     "권총"
    ],
    "file": "weapon_002.png",
@@ -22843,8 +22964,8 @@
    "kind": "food",
    "base": false,
    "name": "핫바",
-   "src": "game-src/items/raw/batch_206/07.png",
-   "old_src": "game-src/items/raw/batch_134/12.png"
+   "src": "game-src/items/raw/batch_208/16.png",
+   "old_src": "game-src/items/raw/batch_206/07.png"
   },
   {
    "keywords": [
@@ -25619,6 +25740,16 @@
    "base": false,
    "name": "큐렛",
    "src": "game-src/items/raw/batch_201/06.png"
+  },
+  {
+   "keywords": [
+    "족쇄"
+   ],
+   "file": "tool_266.png",
+   "kind": "tool",
+   "base": false,
+   "name": "족쇄",
+   "src": "game-src/items/raw/batch_208/01.png"
   },
   {
    "keywords": [
