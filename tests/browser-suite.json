@@ -4,6 +4,7 @@
     {"name": "browser", "file": "tests/browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 30, "frame": "자체 hostScript(가짜 risuai 원본)", "note": "패널 전체 31절. 17c·17d 는 묶음 위키 카드에서만. 사진 인자는 안 넘김: 9절의 사진 전용 경로가 옛 설정 탭(.gx-nb[data-value=settings])을 눌러 시간 초과(QC 도 사진 없이 돌렸음)"},
     {"name": "install", "fast": true, "file": "tests/install-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "시작 화면 → 저장"},
     {"name": "editor", "fast": true, "file": "tests/editor-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "자체 boot(가짜 risuai, 편집 창 전용)", "note": "세계 편집 → 기록 고치기 → 저장"},
+    {"name": "shop", "fast": true, "file": "tests/shop-browser.mjs", "group": "plugin", "args": ["shots"], "timeoutMin": 10, "frame": "tests/qc-settings-harness.mjs", "note": "상점(2026-11-07): 표식 → 카드 → 팝업 → 진열대·흥정·구입·거래 끊음, PC·폰"},
     {"name": "wallet", "fast": true, "file": "tests/wallet-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "가계부 탭 PC·폰"},
     {"name": "wiki-side", "fast": true, "file": "tests/wiki-side-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "위키 목록 위치"},
     {"name": "qc-loader", "file": "tests/qc-loader-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 15, "frame": "자체 hostScript(browser.mjs 사본 확장, iframe sandbox + CSP)", "note": "시작기·본체 로딩·설치·업데이트 15절"},

@@ -1,4 +1,5 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
+import { resetShop, shopAction, shopInput, shopPopup, shopUi } from './shop';
 import { showWindow } from '../host/container';
 import { factionList, PLAYER_FM, playerScenario, scenesOf } from '../core/factions';
 import { agentScene } from '../core/scenes';
@@ -347,6 +348,8 @@ function ensureRoot(): HTMLElement {
     // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
+    // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
+    if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
     const pop = document.querySelector('.gx-agpop');
     if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
@@ -390,6 +393,7 @@ function panelInput(el: HTMLInputElement): void {
     return;
   }
   if (el?.dataset?.input === 'items-q' && view.kind === 'started' && root) return itemsInput(root, view.ctx, el.value);
+  if (el?.dataset?.input === 'shop-say') return shopInput(el.value);
   if (el?.dataset?.input === 'rec-q' && view.kind === 'started') {
     // 기록 › 일지 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
     recordsInput('rec-q', el.value);
@@ -567,6 +571,12 @@ export async function openWiki(title: string): Promise<void> {
   if (view.kind === 'started') await handle('wiki-goto', title);
 }
 
+/** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
+export async function openShop(): Promise<void> {
+  await openApp({ quietIfNotLite: true });
+  if (view.kind === 'started') await handle('shop-open');
+}
+
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
@@ -594,6 +604,7 @@ async function refresh(): Promise<void> {
         resetWiki();
         resetRecords();
         resetItems();
+        resetShop();
         resetGnet();
         resetPhone();
         resetSettings();
@@ -676,6 +687,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
   if (featCtx && action.startsWith('items-') && (await itemsAction(action, value, featCtx, recordsEnv, lastForm))) return;
+  if (featCtx && action.startsWith('shop-') && (await shopAction(action, value, featCtx, wikiEnv))) return;
   if (action === 'cdr') {
     cdrOpen = !cdrOpen;
     root?.querySelector('.gx-cdr')?.classList.toggle('open', cdrOpen);
@@ -1213,6 +1225,8 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  // 상점 주인 대사 상자: 새 대사가 아래에 쌓이니 늘 맨 아래를 보인다
+  root.querySelectorAll<HTMLElement>('[data-sh-log]').forEach((el) => (el.scrollTop = el.scrollHeight));
   labelSwitches(root);
   bindMapZoom(root);
   bindMbar(root, () => void run('close'));
@@ -1426,7 +1440,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
