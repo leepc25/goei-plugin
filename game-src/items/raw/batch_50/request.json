@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown paper shopping bag with handles, empty. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded brown paper bag. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle wrapped in a knotted patterned cloth. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown Korean clay jar with a lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small earthen pot with a lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden box covered with yellow paper talismans. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed dull gray lead box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver metal case with latches. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed long black hard gun case. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black violin case. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small closed wooden coffin. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white ceramic funeral urn with a lid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass test tube with blue liquid and a stopper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass beaker half full of green liquid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round glass flask with purple liquid. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sealed glass ampoule. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "쇼핑백",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown paper shopping bag with handles, empty. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "종이봉투",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded brown paper bag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보자기",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle wrapped in a knotted patterned cloth. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "항아리",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown Korean clay jar with a lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "단지",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small earthen pot with a lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "봉인 부적 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed wooden box covered with yellow paper talismans. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "납 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed dull gray lead box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "철제 케이스",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed silver metal case with latches. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "총기 케이스",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed long black hard gun case. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "악기 케이스",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed black violin case. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "관",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small closed wooden coffin. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유골함",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white ceramic funeral urn with a lid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "시험관",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass test tube with blue liquid and a stopper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비커",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass beaker half full of green liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "플라스크",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round glass flask with purple liquid. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "앰플",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sealed glass ampoule. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

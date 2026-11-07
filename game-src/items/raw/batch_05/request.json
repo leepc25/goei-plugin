@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paring fruit knife with a plastic handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow box cutter with the snap-off blade extended, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel scissors with black handles, slightly open. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp steel awl with a round wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long flathead screwdriver with a sharpened tip and a red plastic handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a farm sickle with a curved steel blade and a wooden handle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wood-chopping axe with a long wooden handle and steel head, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hatchet with a short wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pickaxe with a curved iron head and a wooden handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rough square wooden plank stick used as a club, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum baseball bat with black grip tape, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golf driver club with a black grip, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ice hockey stick with white tape on the blade, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden bokken training sword, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo kendo shinai sword with a leather tip and handle, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black nunchaku, two sticks joined by a short chain. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "과도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paring fruit knife with a plastic handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "커터칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow box cutter with the snap-off blade extended, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가위",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel scissors with black handles, slightly open. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "송곳",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp steel awl with a round wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "드라이버(흉기)",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long flathead screwdriver with a sharpened tip and a red plastic handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "낫",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a farm sickle with a curved steel blade and a wooden handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도끼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wood-chopping axe with a long wooden handle and steel head, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손도끼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hatchet with a short wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "곡괭이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pickaxe with a curved iron head and a wooden handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "각목",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rough square wooden plank stick used as a club, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "알루미늄 배트",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver aluminum baseball bat with black grip tape, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "골프채",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golf driver club with a black grip, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "하키 스틱",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ice hockey stick with white tape on the blade, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "목검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden bokken training sword, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "죽도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo kendo shinai sword with a leather tip and handle, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쌍절곤",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black nunchaku, two sticks joined by a short chain. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

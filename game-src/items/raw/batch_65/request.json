@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red Christmas ornament ball. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small potted green plant. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bouquet of flowers wrapped in paper. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single red rose. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bare branch. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single autumn leaf. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pine cone. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth pebble. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red brick. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp shard of glass. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty crushed tin can, no label. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty brown glass bottle. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty open cardboard box. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of old newspapers tied with string. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single cigarette butt. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled gum wrapper. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "크리스마스 장식",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red Christmas ornament ball. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "화분",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small potted green plant. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꽃다발",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bouquet of flowers wrapped in paper. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "꽃 한 송이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single red rose. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나뭇가지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bare branch. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나뭇잎",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single autumn leaf. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "솔방울",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pine cone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "조약돌",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth pebble. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "벽돌",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red brick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유리 조각",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp shard of glass. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "깡통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty crushed tin can, no label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빈 병",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty brown glass bottle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빈 상자",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty open cardboard box. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "헌 신문지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of old newspapers tied with string. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "담배꽁초",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single cigarette butt. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "껌 종이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crumpled gum wrapper. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

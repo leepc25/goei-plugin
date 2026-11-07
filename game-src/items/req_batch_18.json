@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "낚싯대",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fishing rod with a reel, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "그물",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundled fishing net. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "양동이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty blue plastic bucket with a handle, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "대야",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty round metal basin, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "걸레",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mop with a gray head, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청소 솔",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scrub brush with a wooden handle. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "분무기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic spray bottle with a trigger nozzle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "살충제",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an aerosol bug spray can, plain colored can with no label text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "락스",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white plastic bleach bottle, blank label. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소금 뿌리개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass salt shaker with a metal cap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부채(도구)",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round paper hand fan with a bamboo handle, plain with no pictures. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "성냥갑",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small closed matchbox, plain cover. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "토치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld gas blow torch nozzle on a small canister, no flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휴대용 버너",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable single-burner gas stove, side view, no flame. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "부탄가스",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single butane gas canister, plain can with no label text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "코펠",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nested set of aluminum camping pots. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

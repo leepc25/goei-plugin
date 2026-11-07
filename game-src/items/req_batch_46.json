@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "주차권",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small parking ticket, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "명단",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single paper list with rows of lines. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "피 묻은 쪽지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small folded note stained with dark red blood. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "열쇠 꾸러미",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel key ring holding many different keys. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "카드키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain white key card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사원증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ID badge card on a blue lanyard, photo square, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "출입증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain plastic access pass badge with a clip. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "차 키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black car key fob with buttons. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사물함 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small locker key on a rubber band tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "격리 시설 출입증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray access badge with a red stripe on a lanyard, no text. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "법인카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain black credit card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "신용카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain gold credit card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "체크카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain blue debit card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "교통카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain green transit card. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "살 길 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small old key with a paper tag tied on, blank tag. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "사물함 열쇠(물)",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small locker key on a wet rubber wristband. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

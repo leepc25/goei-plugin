@@ -1,0 +1,69 @@
+{
+ "description": "pixel art inventory icon of exactly one item, side view, the item fills most of the square, transparent background, clean dark outline, realistic muted colors. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "손전등(다시)",
+   "en": "a black metal tactical flashlight lying horizontally, lens facing left. Only the flashlight, nothing under it or beside it."
+  },
+  {
+   "ko": "부적(다시)",
+   "en": "a vertical strip of yellow paper talisman with red ink brush swirls (abstract marks, not readable letters). Only the paper strip."
+  },
+  {
+   "ko": "생수(다시)",
+   "en": "a clear plastic water bottle with a blue cap and a plain blue label with no writing. Only the bottle."
+  },
+  {
+   "ko": "사건 파일(다시)",
+   "en": "a closed manila file folder with a few white sheets sticking out the side, plain cover with no writing and no stamps. Only the folder."
+  },
+  {
+   "ko": "봉인 상자(다시)",
+   "en": "a small dark wooden box bound crosswise with plain yellow tape bands and a red wax seal on top, no labels. Only the box."
+  },
+  {
+   "ko": "금반지(귀중품 기본 그림)",
+   "en": "a single plain gold ring with a small clear gemstone, standing upright. Only the ring."
+  },
+  {
+   "ko": "비닐봉지(다시)",
+   "en": "an empty crumpled white plastic shopping bag with two loop handles, nothing inside, plain with no print. Only the bag."
+  },
+  {
+   "ko": "야구 방망이(다시)",
+   "en": "a single wooden baseball bat lying diagonally, handle at the bottom left. Nothing else beside it."
+  },
+  {
+   "ko": "은탄 쌍권총",
+   "en": "two identical silver-plated pistols with engraved slides, crossed. Only the two pistols."
+  },
+  {
+   "ko": "은 말뚝",
+   "en": "a single long sharp silver stake with a pointed tip. Only the stake."
+  },
+  {
+   "ko": "쇠파이프",
+   "en": "a single rusty steel pipe lying diagonally. Only the pipe."
+  },
+  {
+   "ko": "전기충격기",
+   "en": "a black handheld stun gun with two metal prongs and a small blue electric spark between them. Only the stun gun."
+  },
+  {
+   "ko": "소화기",
+   "en": "a red fire extinguisher with a black hose and handle, blank label. Only the extinguisher."
+  },
+  {
+   "ko": "호신용 스프레이",
+   "en": "a small black pepper spray canister with a red cap, blank label. Only the canister."
+  },
+  {
+   "ko": "포크와 나이프 무기 세트",
+   "en": "an oversized silver dinner fork and dinner knife crossed, blades stained with dark red blood. Only the fork and knife."
+  },
+  {
+   "ko": "일본도",
+   "en": "a katana sheathed in a black scabbard, lying horizontally. Only the sword."
+  }
+ ]
+}

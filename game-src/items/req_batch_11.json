@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "과잠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a navy university varsity jacket with white sleeves, front view, no letters or patches. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "요원 정장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black suit jacket with a white shirt and black tie, laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "넥타이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark red necktie laid straight, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "와이셔츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded white dress shirt with collar, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "구두",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leather dress shoes, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "운동화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white sneakers, side view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "등산화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown hiking boots, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "장화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black rubber rain boots, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "슬리퍼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of gray slide slippers, top-front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "후드티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray hoodie laid flat, front view, plain with no print. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "패딩",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black puffer down jacket laid flat, front view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "트렌치코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a beige trench coat laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "가죽 재킷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather jacket laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "청바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of blue jeans laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "치마 정장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black skirt suit, jacket and skirt laid flat, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "교복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean school uniform blazer with a tie, laid flat, front view, no name tag. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

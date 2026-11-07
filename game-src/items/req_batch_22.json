@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "소형 전등",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white LED lamp, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "헤드랜턴",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black head lamp on an elastic strap. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "이어폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white wired earphones with a coiled cable. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "요원 단말기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rugged black handheld tablet terminal with a rubber frame, front view, dark blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "폴더폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver flip phone, open, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "대포폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cheap black plastic phone, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "큐브",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brushed steel cube. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "고출력 헤드램프",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large black high-power headlamp with a thick strap, lens glowing white. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "레이저 스캐너",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld laser scanner gun with a red beam window, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보조배터리(통화)",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray portable power bank with a faint glowing seal mark, short cable. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무대용 마이크",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver stage microphone with a black cable coiled. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "브라운관 텔레비전",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old boxy CRT television, front view, gray static screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "비디오 데크",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black VHS video player, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "캠코더(옛날)",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old bulky shoulder camcorder, side view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "노트북",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open silver laptop, side angle, dark blank screen, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "태블릿",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tablet, front view, dark blank screen. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

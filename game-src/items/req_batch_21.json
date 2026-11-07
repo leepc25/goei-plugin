@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "소방 도끼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red fire axe with a pick end, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "쇠막대",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straight iron bar, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "빠루",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short steel pry bar, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "저울",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass balance scale with two pans, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "추첨통",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden rooster-shaped lottery box with sticks poking out. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "큐 카드",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of blank white cue cards. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "와이더 무전기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of colorful plastic toy walkie-talkies, red and blue, with short antennas. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹음기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver digital voice recorder, front view, blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "카세트 녹음기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black portable cassette recorder with buttons on top, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "카메라",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black compact digital camera, front view, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "캠코더",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld camcorder, side view facing right, no logo. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휴대폰",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black smartphone, front view, dark blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "보조 배터리",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white portable power bank with a short cable. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손목시계",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver wristwatch with a leather strap, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "나침반",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass pocket compass, open, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도청기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny black listening bug device with a short wire antenna. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

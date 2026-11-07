@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black camping LED lantern with a handle, glowing. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glowing glow stick. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver laser pointer pen, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small purple UV flashlight, lying horizontally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric fly swatter racket, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handheld fan, front view. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small orange rechargeable hand warmer. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim black e-cigarette vape, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black remote key fob. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black wireless handheld microphone, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black pen-shaped voice recorder, lying diagonally. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld bug detector with a short antenna and lights. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black monitor on a stand, front view, dark blank screen. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass lantern with a brass frame, a folded paper talisman with red brush marks visible inside. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain silver cross, upright. Only this item, nothing else beside it, no text.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden rosary bead loop with a small cross. Only this item, nothing else beside it, no text."
+  ]
+ },
+ "items": [
+  {
+   "ko": "전기 랜턴",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black camping LED lantern with a handle, glowing. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "야광봉",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green glowing glow stick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "레이저 포인터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver laser pointer pen, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "UV 손전등",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small purple UV flashlight, lying horizontally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전기 파리채",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric fly swatter racket, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "휴대용 선풍기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handheld fan, front view. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "손난로",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small orange rechargeable hand warmer. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "전자담배",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim black e-cigarette vape, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도어락 리모컨",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black remote key fob. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "무선 마이크",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black wireless handheld microphone, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "녹음 펜",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black pen-shaped voice recorder, lying diagonally. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도청 탐지기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black handheld bug detector with a short antenna and lights. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소형 모니터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black monitor on a stand, front view, dark blank screen. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "유리 등롱에 담긴 부적",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass lantern with a brass frame, a folded paper talisman with red brush marks visible inside. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "십자가",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain silver cross, upright. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "묵주",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden rosary bead loop with a small cross. Only this item, nothing else beside it, no text."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. No pedestal, no stand, no display base, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "막대사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round swirl lollipop on a stick. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "박하사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few white mint candies with red stripes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "초코파이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round chocolate-coated snack cake. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "아이스크림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vanilla ice cream cone. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "떡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few white rice cakes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "송편",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few half-moon songpyeon rice cakes. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "약과",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few flower-shaped honey cookies. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "도시락(집)",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lunch box wrapped in a knotted cloth. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "반찬통",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a closed small plastic side dish container. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "김치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of red kimchi. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "계란",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three white eggs. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "고기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a raw marbled beef steak on a foam tray wrapped in film. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "생선",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole silver fish. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "날고기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunk of raw red meat. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "소금",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of white salt. Only this item, nothing else beside it, no text."
+  },
+  {
+   "ko": "설탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white sugar packet, plain. Only this item, nothing else beside it, no text."
+  }
+ ]
+}
