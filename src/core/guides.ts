@@ -8,10 +8,12 @@ import directive from '../data/guides/directive.txt';
 import rp from '../data/guides/rp.txt';
 import tag from '../data/guides/tag.txt';
 import shop from '../data/guides/shop.txt';
+import updater from '../data/guides/updater-detailed.txt';
+import updaterCompact from '../data/guides/updater-compact.txt';
 
-export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점' };
+export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)' };
 
 const DEFAULTS: Record<GuideName, string> = {
   GNet: gnet.replace(/\r/g, ''),
@@ -21,6 +23,8 @@ const DEFAULTS: Record<GuideName, string> = {
   RP: rp.replace(/\r/g, ''),
   Tag: tag.replace(/\r/g, ''),
   Shop: shop.replace(/\r/g, ''),
+  Updater: updater.replace(/\r/g, ''),
+  UpdaterCompact: updaterCompact.replace(/\r/g, ''),
 };
 
 const overrides = new Map<GuideName, string>();
