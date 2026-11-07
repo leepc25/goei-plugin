@@ -1,154 +1,7517 @@
-{"note":"소지품 그림 뽑을 목록 안(11-07). base=종류 기본 그림. 사용자 확정 전.",
-"items":[
-["weapon","접이식 칼","folding pocket knife, blade open",1],
-["weapon","야구 방망이","wooden baseball bat"],
-["weapon","권총","black semi-automatic pistol"],
-["weapon","은탄 쌍권총","pair of silver-plated pistols"],
-["weapon","은 말뚝","sharp silver stake"],
-["weapon","쇠파이프","rusty steel pipe"],
-["weapon","전기충격기","handheld stun gun with blue spark"],
-["weapon","소화기","red fire extinguisher"],
-["weapon","호신용 스프레이","small pepper spray canister"],
-["weapon","포크와 나이프 무기 세트","oversized silver fork and knife set, blood-stained blades"],
-["wear","방검 조끼","black stab-proof vest",1],
-["wear","검은 정장","folded black suit jacket"],
-["wear","검은 코트","long black coat"],
-["wear","장갑","pair of black leather gloves"],
-["wear","동물 가면","animal head mask"],
-["wear","안전모","yellow hard hat"],
-["wear","마스크","white face mask"],
-["wear","우비","transparent raincoat"],
-["wear","방독면","gas mask with filter"],
-["wear","선글라스","black sunglasses"],
-["tool","손전등","black metal flashlight",1],
-["tool","빨간 손전등","red emergency flashlight"],
-["tool","밧줄","coiled rope"],
-["tool","테이프","roll of grey duct tape"],
-["tool","쇠지레","steel crowbar"],
-["tool","자물쇠","brass padlock"],
-["tool","망치","claw hammer"],
-["tool","삽","small folding shovel"],
-["tool","라이터","metal lighter with flame"],
-["tool","성냥","matchbox with matches"],
-["tool","초","white candle, lit"],
-["tool","쌍안경","black binoculars"],
-["tool","접이식 우산","folded black umbrella"],
-["tool","노끈","bundle of twine"],
-["device","무전기","handheld walkie-talkie radio with antenna",1],
-["device","와이더 무전기","pair of colorful toy walkie-talkies"],
-["device","녹음기","small digital voice recorder"],
-["device","카세트 녹음기","portable cassette recorder"],
-["device","카메라","compact digital camera"],
-["device","캠코더","handheld camcorder"],
-["device","휴대폰","black smartphone"],
-["device","보조 배터리","portable power bank with cable"],
-["device","손목시계","wristwatch"],
-["device","나침반","brass compass"],
-["device","도청기","tiny black bug listening device"],
-["device","소형 전등","small LED lamp"],
-["device","헤드랜턴","head lamp with strap"],
-["device","이어폰","wired earphones"],
-["charm","부적","yellow paper talisman with red brush marks",1],
-["charm","유리 등롱에 담긴 부적","small glass lantern holding a paper talisman written in red"],
-["charm","십자가","silver cross"],
-["charm","묵주","rosary beads with cross"],
-["charm","염주","wooden prayer beads"],
-["charm","성수병","small glass bottle of holy water"],
-["charm","향","bundle of incense sticks, smoking"],
-["charm","소금 봉지","small bag of white salt"],
-["charm","팥 봉지","small bag of red beans"],
-["charm","붉은 실","spool of red thread"],
-["charm","종","small brass hand bell"],
-["charm","거울","small round hand mirror"],
-["charm","방울","shaman brass bell cluster"],
-["medical","구급함","white first aid kit box with red cross",1],
-["medical","붕대","roll of white bandage"],
-["medical","진통제","blister pack of pills"],
-["medical","소독약","brown bottle of antiseptic"],
-["medical","지혈대","tourniquet strap"],
-["medical","반창고","adhesive bandages"],
-["medical","수면제","small pill bottle, sleeping pills"],
-["medical","주사기","syringe"],
-["medical","안정제","small medicine vial"],
-["medical","비타민","vitamin bottle"],
-["food","생수","plastic bottle of water",1],
-["food","커피","canned coffee"],
-["food","담배","pack of cigarettes"],
-["food","휴대용 재떨이","small portable ashtray pouch"],
-["food","에너지바","wrapped energy bar"],
-["food","초콜릿","chocolate bar, half unwrapped"],
-["food","컵라면","instant cup noodle"],
-["food","소주","green glass soju bottle"],
-["food","껌","pack of chewing gum"],
-["food","사탕","wrapped candies"],
-["food","도시락","convenience store lunch box"],
-["food","앨리스 피크닉 세트","picnic set: small drink bottle and cookies"],
-["paper","사건 파일","manila case file folder with papers",1],
-["paper","지도","folded paper map"],
-["paper","수첩","small black notebook"],
-["paper","사진","old photograph"],
-["paper","낡은 졸업 앨범","old worn graduation album"],
-["paper","전단지(알바 모집)","paper flyer"],
-["paper","명함","business card"],
-["paper","편지","sealed envelope letter"],
-["paper","영수증","long paper receipt"],
-["paper","신문","folded newspaper"],
-["paper","녹취록","stapled typed transcript papers"],
-["paper","메모지","sticky notes"],
-["paper","책","hardcover book"],
-["paper","성경","black bible with cross"],
-["key","낡은 열쇠","old brass key",1],
-["key","열쇠 꾸러미","ring of many keys"],
-["key","카드키","white key card"],
-["key","사원증","employee ID card on lanyard"],
-["key","출입증","access pass badge"],
-["key","차 키","car key fob"],
-["key","사물함 열쇠","small numbered locker key"],
-["seal","봉인 상자","small box wrapped in sealing tape",1],
-["seal","검은 상자","black box"],
-["seal","밀폐 용기","plastic airtight container"],
-["seal","유리병","glass jar with lid"],
-["seal","봉인 테이프","roll of yellow warning tape"],
-["seal","쇠사슬","coiled iron chain"],
-["seal","자루","burlap sack tied with rope"],
-["seal","지퍼백","zip plastic bag"],
-["seal","가방","black duffel bag"],
-["anomaly","검은 구슬","glossy black orb",1],
-["anomaly","비디오테이프","VHS video tape"],
-["anomaly","은화 뱀","coiled snake figure made of silver coins"],
-["anomaly","녹슨 무전기","rusty old walkie-talkie"],
-["anomaly","이름표 떨어진 조끼","worn vest with torn-off name tag"],
-["anomaly","인형","creepy porcelain doll"],
-["anomaly","가면","pale blank mask"],
-["anomaly","깨진 거울","cracked hand mirror"],
-["anomaly","머리카락 뭉치","clump of black hair"],
-["anomaly","낡은 신발","single worn shoe"],
-["anomaly","손목 시계(멈춤)","stopped wristwatch with cracked glass"],
-["anomaly","「천사의 한숨」 카세트","blue plastic cassette recorder with two buttons on the front"],
-["anomaly","위 헬프!","small mysterious gift box with a price tag"],
-["valuable","현금 봉투","white envelope with banknotes",1],
-["valuable","지폐 다발","stack of banknotes with band"],
-["valuable","동전","pile of coins"],
-["valuable","반지","gold ring"],
-["valuable","목걸이","gold necklace"],
-["valuable","금괴","gold bar"],
-["valuable","보석","cut gemstone"],
-["valuable","시계(고급)","luxury gold wristwatch"],
-["valuable","수표","paper check"],
-["consumable","건전지","two AA batteries",1],
-["consumable","필름","35mm film roll"],
-["consumable","테이프 두루마리","roll of clear tape"],
-["consumable","라이터 기름","small lighter fluid can"],
-["consumable","연막탄","smoke grenade"],
-["consumable","조명탄","red signal flare"],
-["consumable","분필","pieces of white chalk"],
-["consumable","스프레이 페인트","spray paint can"],
-["misc","비닐봉지","white plastic shopping bag",1],
-["misc","우산","long black umbrella"],
-["misc","수건","folded towel"],
-["misc","손수건","folded handkerchief"],
-["misc","인형(평범)","plush teddy bear"],
-["misc","풍선","red balloon"],
-["misc","장난감","toy robot"],
-["misc","돌멩이","small grey stone"]
-]}
+{
+"note": "소지품 그림 뽑을 목록 안(11-07). 사용자 확정 전. base=종류 기본 그림, src=위키면 위키에 나오는 물건.",
+"size": 85,
+"items": [
+{
+"kind": "weapon",
+"ko": "접이식 칼",
+"en": "folding pocket knife, blade open",
+"src": "",
+"base": true
+},
+{
+"kind": "wear",
+"ko": "방검 조끼",
+"en": "black stab-proof vest",
+"src": "",
+"base": true
+},
+{
+"kind": "tool",
+"ko": "손전등",
+"en": "black metal flashlight",
+"src": "",
+"base": true
+},
+{
+"kind": "device",
+"ko": "무전기",
+"en": "handheld walkie-talkie radio with antenna",
+"src": "",
+"base": true
+},
+{
+"kind": "charm",
+"ko": "부적",
+"en": "yellow paper talisman with red brush marks",
+"src": "",
+"base": true
+},
+{
+"kind": "medical",
+"ko": "구급함",
+"en": "white first aid kit box with red cross",
+"src": "",
+"base": true
+},
+{
+"kind": "food",
+"ko": "생수",
+"en": "plastic bottle of water",
+"src": "",
+"base": true
+},
+{
+"kind": "paper",
+"ko": "사건 파일",
+"en": "manila case file folder with papers",
+"src": "",
+"base": true
+},
+{
+"kind": "key",
+"ko": "낡은 열쇠",
+"en": "old brass key",
+"src": "",
+"base": true
+},
+{
+"kind": "seal",
+"ko": "봉인 상자",
+"en": "small box wrapped in sealing tape",
+"src": "",
+"base": true
+},
+{
+"kind": "anomaly",
+"ko": "검은 구슬",
+"en": "glossy black orb",
+"src": "",
+"base": true
+},
+{
+"kind": "valuable",
+"ko": "현금 봉투",
+"en": "white envelope with banknotes",
+"src": "",
+"base": true
+},
+{
+"kind": "consumable",
+"ko": "건전지",
+"en": "two AA batteries",
+"src": "",
+"base": true
+},
+{
+"kind": "misc",
+"ko": "비닐봉지",
+"en": "white plastic shopping bag",
+"src": "",
+"base": true
+},
+{
+"kind": "weapon",
+"ko": "야구 방망이",
+"en": "wooden baseball bat",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "권총",
+"en": "black semi-automatic pistol",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "은탄 쌍권총",
+"en": "pair of silver-plated pistols",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "은 말뚝",
+"en": "sharp silver stake",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "쇠파이프",
+"en": "rusty steel pipe",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "전기충격기",
+"en": "handheld stun gun with blue spark",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "소화기",
+"en": "red fire extinguisher",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "호신용 스프레이",
+"en": "small pepper spray canister",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "포크와 나이프 무기 세트",
+"en": "oversized silver fork and knife set, blood-stained blades",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "일본도",
+"en": "katana in black scabbard",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "검은 일본도",
+"en": "black-bladed katana",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "기관단총",
+"en": "compact submachine gun",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "소총",
+"en": "assault rifle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "AK-47",
+"en": "AK-47 rifle with curved magazine",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "언월도",
+"en": "curved scimitar",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "미니건",
+"en": "heavy rotary minigun",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "중기관총",
+"en": "heavy machine gun",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "화염방사기",
+"en": "flamethrower with fuel tank",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "수류탄",
+"en": "frag grenade",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "폭약",
+"en": "bundle of dynamite explosives",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "특제 버터나이프",
+"en": "ornate butter knife",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "녹슨 칼",
+"en": "rusty old knife",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "올가미",
+"en": "rope noose",
+"src": "위키",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "식칼",
+"en": "kitchen knife",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "정육점 칼",
+"en": "butcher cleaver",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "회칼",
+"en": "long sashimi knife",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "과도",
+"en": "small fruit knife",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "커터칼",
+"en": "box cutter",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "가위",
+"en": "pair of scissors",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "송곳",
+"en": "awl",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "드라이버(흉기)",
+"en": "sharp screwdriver",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "낫",
+"en": "sickle",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "도끼",
+"en": "wood axe",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "손도끼",
+"en": "hatchet",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "곡괭이",
+"en": "pickaxe",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "각목",
+"en": "wooden plank club",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "알루미늄 배트",
+"en": "aluminum baseball bat",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "골프채",
+"en": "golf club",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "하키 스틱",
+"en": "hockey stick",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "목검",
+"en": "wooden training sword",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "죽도",
+"en": "bamboo kendo sword",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "쌍절곤",
+"en": "nunchaku",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "너클",
+"en": "brass knuckles",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "삼단봉",
+"en": "telescopic baton",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "경찰봉",
+"en": "police nightstick",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "진압봉",
+"en": "riot baton",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "진압 방패",
+"en": "riot shield",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "테이저건",
+"en": "taser gun",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "산탄총",
+"en": "pump shotgun",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "저격총",
+"en": "sniper rifle with scope",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "리볼버",
+"en": "revolver",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "소음기 권총",
+"en": "pistol with silencer",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "기관권총",
+"en": "machine pistol",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "탄창",
+"en": "pistol magazine",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "총알 상자",
+"en": "box of bullets",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "은탄",
+"en": "silver bullets",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "석궁",
+"en": "crossbow",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "활과 화살",
+"en": "bow and arrows",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "새총",
+"en": "slingshot",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "작살",
+"en": "harpoon",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "창",
+"en": "spear",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "삼지창",
+"en": "trident",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "장검",
+"en": "longsword",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "단검",
+"en": "dagger",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "군용 대검",
+"en": "combat knife",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "마체테",
+"en": "machete",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "전기톱",
+"en": "chainsaw",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "못 박힌 방망이",
+"en": "nail-studded bat",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "쇠사슬 채찍",
+"en": "chain whip",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "화염병",
+"en": "molotov cocktail",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "섬광탄",
+"en": "flashbang grenade",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "최루탄",
+"en": "tear gas grenade",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "지뢰",
+"en": "land mine",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "C4",
+"en": "C4 explosive with detonator",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "기폭 장치",
+"en": "detonator remote",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "권총집",
+"en": "leather pistol holster",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "칼집",
+"en": "knife sheath",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "부엌 포크",
+"en": "large kitchen fork",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "우산 칼",
+"en": "umbrella with hidden blade",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "은 십자가 단검",
+"en": "silver cross dagger",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "부적 붙은 칼",
+"en": "knife wrapped with paper talisman",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "피 묻은 망치",
+"en": "bloody hammer",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "쇠망치(대형)",
+"en": "sledgehammer",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "렌치",
+"en": "large wrench",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "쇠갈고리",
+"en": "iron meat hook",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "부채",
+"en": "folding fan",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "표창",
+"en": "throwing star",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "투척용 칼",
+"en": "throwing knives",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "비비탄총",
+"en": "toy BB gun",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "물총",
+"en": "water gun",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "대못",
+"en": "large iron nail",
+"src": "",
+"base": false
+},
+{
+"kind": "weapon",
+"ko": "피아노 줄",
+"en": "piano wire",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "검은 정장",
+"en": "folded black suit jacket",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "검은 코트",
+"en": "long black coat",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "장갑",
+"en": "pair of black leather gloves",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "동물 가면",
+"en": "animal head mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "안전모",
+"en": "yellow hard hat",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "마스크",
+"en": "white face mask",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "우비",
+"en": "transparent raincoat",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "방독면",
+"en": "gas mask with filter",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "선글라스",
+"en": "black sunglasses",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "방탄조끼",
+"en": "tactical bulletproof vest",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "전신 강철 판금",
+"en": "steel plate armor",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "오토바이 헬멧",
+"en": "motorcycle helmet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "오토바이 재킷",
+"en": "motorcycle riding jacket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "모방 머플러",
+"en": "knitted muffler scarf",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "외알 안경",
+"en": "monocle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "돋보기안경",
+"en": "reading glasses",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "귀마개",
+"en": "earplugs",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "연두색 앞치마",
+"en": "light green apron",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "토끼 머리띠",
+"en": "bunny ear headband",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "테마파크 입장 팔찌",
+"en": "theme park wristband",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "나비넥타이",
+"en": "bow tie",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "밀짚모자",
+"en": "straw hat",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "금빛 청둥오리 가면",
+"en": "golden mallard duck mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "금빛 나비 가면",
+"en": "golden butterfly mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "도마뱀 가면",
+"en": "lizard mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "오소리 가면",
+"en": "badger mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "산양 가면",
+"en": "mountain goat mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "조랑말 가면",
+"en": "pony mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "흰 가운",
+"en": "white lab coat",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "수녀복",
+"en": "black nun habit",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "과잠",
+"en": "university varsity jacket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "요원 정장",
+"en": "black agent suit",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "넥타이",
+"en": "necktie",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "와이셔츠",
+"en": "white dress shirt",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "구두",
+"en": "black leather shoes",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "운동화",
+"en": "sneakers",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "등산화",
+"en": "hiking boots",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "장화",
+"en": "rubber boots",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "슬리퍼",
+"en": "slippers",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "후드티",
+"en": "hoodie",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "패딩",
+"en": "puffer jacket",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "트렌치코트",
+"en": "trench coat",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "가죽 재킷",
+"en": "leather jacket",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "청바지",
+"en": "jeans",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "치마 정장",
+"en": "skirt suit",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "교복",
+"en": "school uniform",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "군복",
+"en": "military camo uniform",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "경찰 제복",
+"en": "police uniform",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "경비원 제복",
+"en": "security guard uniform",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "간호사복",
+"en": "nurse uniform",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "수술복",
+"en": "navy surgical scrubs",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "환자복",
+"en": "hospital patient gown",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "작업복",
+"en": "work overalls",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "한복",
+"en": "hanbok",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "비옷 판초",
+"en": "rain poncho",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "야구 모자",
+"en": "baseball cap",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "비니",
+"en": "knit beanie",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "중절모",
+"en": "fedora hat",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "방탄 헬멧",
+"en": "tactical helmet",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "야간 투시경",
+"en": "night vision goggles",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "고글",
+"en": "safety goggles",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "무릎 보호대",
+"en": "knee pads",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "팔 보호대",
+"en": "arm guards",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "전술 장갑",
+"en": "tactical gloves",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "고무장갑",
+"en": "rubber gloves",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "목장갑",
+"en": "cotton work gloves",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "방화복",
+"en": "fire protective suit",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "방호복",
+"en": "hazmat suit",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "목도리",
+"en": "scarf",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "양말",
+"en": "socks",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "벨트",
+"en": "leather belt",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "전술 벨트",
+"en": "tactical utility belt",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "백팩",
+"en": "backpack",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "등산 가방",
+"en": "hiking backpack",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "서류 가방",
+"en": "leather briefcase",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "크로스백",
+"en": "crossbody bag",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "힙색",
+"en": "waist pouch",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "탄띠",
+"en": "ammo bandolier",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "탄약 주머니",
+"en": "ammo pouches",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "나비 머리핀",
+"en": "butterfly hair clip",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "브로치",
+"en": "brooch",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "닭 깃털 브로치",
+"en": "rooster feather brooch",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "십자가 목걸이",
+"en": "silver cross necklace",
+"src": "위키",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "귀걸이",
+"en": "earrings",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "팔찌",
+"en": "bracelet",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "안경",
+"en": "glasses",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "안대",
+"en": "eye patch",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "가발",
+"en": "wig",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "가면무도회 가면",
+"en": "masquerade mask",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "하회탈",
+"en": "Korean hahoe mask",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "광대 가면",
+"en": "clown mask",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "하키 마스크",
+"en": "hockey mask",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "붕대 감은 장갑",
+"en": "bandaged glove",
+"src": "",
+"base": false
+},
+{
+"kind": "wear",
+"ko": "네일아트 손톱",
+"en": "long decorated nail tips",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "빨간 손전등",
+"en": "red emergency flashlight",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "밧줄",
+"en": "coiled rope",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "테이프",
+"en": "roll of grey duct tape",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "쇠지레",
+"en": "steel crowbar",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "자물쇠",
+"en": "brass padlock",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "망치",
+"en": "claw hammer",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "삽",
+"en": "small folding shovel",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "라이터",
+"en": "metal lighter with flame",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "성냥",
+"en": "matchbox with matches",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "초",
+"en": "white candle, lit",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "쌍안경",
+"en": "black binoculars",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "접이식 우산",
+"en": "folded black umbrella",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "노끈",
+"en": "bundle of twine",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "레이더",
+"en": "handheld radar device",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "수갑",
+"en": "handcuffs",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "방음 밀봉재",
+"en": "roll of soundproof sealing strip",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "발치 집게",
+"en": "dental extraction forceps",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "돋보기",
+"en": "magnifying glass",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "빗자루",
+"en": "broom",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "손수레",
+"en": "hand cart",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "호루라기",
+"en": "whistle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "구조용 부표",
+"en": "rescue buoy",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "파리채",
+"en": "fly swatter",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "은빛 지휘봉",
+"en": "silver baton",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "마이크",
+"en": "microphone",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "체크리스트 보드",
+"en": "clipboard with checklist",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "번호표",
+"en": "paper queue number ticket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "드라이버",
+"en": "screwdriver",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "펜치",
+"en": "pliers",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "니퍼",
+"en": "wire cutters",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "볼트 커터",
+"en": "bolt cutters",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "스패너",
+"en": "spanner",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "공구함",
+"en": "red toolbox",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "전동 드릴",
+"en": "power drill",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "톱",
+"en": "hand saw",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "줄자",
+"en": "tape measure",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "자",
+"en": "ruler",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "못",
+"en": "nails",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "나사",
+"en": "screws",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "케이블 타이",
+"en": "cable ties",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "청테이프",
+"en": "blue tape roll",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "절연 테이프",
+"en": "black electrical tape",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "사다리",
+"en": "step ladder",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "갈고리 로프",
+"en": "grappling hook with rope",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "카라비너",
+"en": "carabiner",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "쇠 지팡이",
+"en": "iron cane",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "지팡이",
+"en": "wooden walking stick",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "등산 스틱",
+"en": "trekking pole",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "낚싯대",
+"en": "fishing rod",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "그물",
+"en": "fishing net",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "양동이",
+"en": "bucket",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "대야",
+"en": "basin",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "걸레",
+"en": "mop",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "청소 솔",
+"en": "scrub brush",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "분무기",
+"en": "spray bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "살충제",
+"en": "bug spray can",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "락스",
+"en": "bleach bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "소금 뿌리개",
+"en": "salt shaker",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "부채(도구)",
+"en": "paper hand fan",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "성냥갑",
+"en": "small matchbox",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "토치",
+"en": "blow torch",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "휴대용 버너",
+"en": "portable gas stove",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "부탄가스",
+"en": "butane gas canister",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "코펠",
+"en": "camping cook pot",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "텐트",
+"en": "folded tent",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "침낭",
+"en": "sleeping bag",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "돗자리",
+"en": "rolled picnic mat",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "담요",
+"en": "folded blanket",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "베개",
+"en": "pillow",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "자명종",
+"en": "alarm clock",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "모래시계",
+"en": "hourglass",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "줄",
+"en": "rope coil thin",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "철사",
+"en": "wire coil",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "실과 바늘",
+"en": "thread and needle",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "안전핀",
+"en": "safety pins",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "클립",
+"en": "paper clips",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "스테이플러",
+"en": "stapler",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "펜",
+"en": "ballpoint pen",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "만년필",
+"en": "fountain pen",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "연필",
+"en": "pencil",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "매직펜",
+"en": "marker pen",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "붓",
+"en": "calligraphy brush",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "먹과 벼루",
+"en": "ink stick and inkstone",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "물감",
+"en": "paint tubes",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "크레파스",
+"en": "crayons",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "지우개",
+"en": "eraser",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "계산기",
+"en": "calculator",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "도장",
+"en": "personal seal stamp",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "인주",
+"en": "red ink pad",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "확성기",
+"en": "megaphone",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "경광봉",
+"en": "traffic baton light",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "라바콘",
+"en": "traffic cone",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "자전거 자물쇠",
+"en": "bike chain lock",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "금고",
+"en": "small safe",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "열쇠 따개",
+"en": "lock picks",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "유리 깨는 망치",
+"en": "emergency glass hammer",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "소방 도끼",
+"en": "fire axe",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "쇠막대",
+"en": "iron bar",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "빠루",
+"en": "pry bar",
+"src": "",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "저울",
+"en": "weighing scale",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "추첨통",
+"en": "lottery draw box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "tool",
+"ko": "큐 카드",
+"en": "cue cards",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "와이더 무전기",
+"en": "pair of colorful toy walkie-talkies",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "녹음기",
+"en": "small digital voice recorder",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "카세트 녹음기",
+"en": "portable cassette recorder",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "카메라",
+"en": "compact digital camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "캠코더",
+"en": "handheld camcorder",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "휴대폰",
+"en": "black smartphone",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "보조 배터리",
+"en": "portable power bank with cable",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "손목시계",
+"en": "wristwatch",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "나침반",
+"en": "brass compass",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "도청기",
+"en": "tiny black bug listening device",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "소형 전등",
+"en": "small LED lamp",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "헤드랜턴",
+"en": "head lamp with strap",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "이어폰",
+"en": "wired earphones",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "요원 단말기",
+"en": "rugged agent tablet terminal",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "폴더폰",
+"en": "flip phone",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "대포폰",
+"en": "cheap burner phone",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "큐브",
+"en": "small metal cube",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "고출력 헤드램프",
+"en": "high-power headlamp",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "레이저 스캐너",
+"en": "handheld laser scanner",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "보조배터리(통화)",
+"en": "power bank with glowing seal",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "무대용 마이크",
+"en": "stage microphone with cable",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "브라운관 텔레비전",
+"en": "old CRT television",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "비디오 데크",
+"en": "VCR player",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "캠코더(옛날)",
+"en": "old camcorder",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "노트북",
+"en": "laptop",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "태블릿",
+"en": "tablet",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "스마트워치",
+"en": "smartwatch",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "전자시계",
+"en": "digital wristwatch",
+"src": "위키",
+"base": false
+},
+{
+"kind": "device",
+"ko": "USB",
+"en": "USB flash drive",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "외장하드",
+"en": "external hard drive",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "SD 카드",
+"en": "memory card",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "충전기",
+"en": "phone charger",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "멀티탭",
+"en": "power strip",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "이어폰(무선)",
+"en": "wireless earbuds",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "헤드폰",
+"en": "headphones",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "블루투스 스피커",
+"en": "bluetooth speaker",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "라디오",
+"en": "portable radio",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "워크맨",
+"en": "cassette walkman",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "MP3 플레이어",
+"en": "mp3 player",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "게임기",
+"en": "handheld game console",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "디지털카메라",
+"en": "digital camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "폴라로이드 카메라",
+"en": "instant polaroid camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "필름 카메라",
+"en": "film camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "드론",
+"en": "small drone",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "블랙박스",
+"en": "car dashcam",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "CCTV 카메라",
+"en": "cctv camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "몰래카메라",
+"en": "hidden pinhole camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "GPS 추적기",
+"en": "gps tracker",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "금속 탐지기",
+"en": "metal detector",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "열화상 카메라",
+"en": "thermal camera",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "EMF 측정기",
+"en": "emf meter",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "가이거 계수기",
+"en": "geiger counter",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "온도계",
+"en": "thermometer",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "무선 이어피스",
+"en": "earpiece radio",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "위성 전화",
+"en": "satellite phone",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "공중전화 카드",
+"en": "phone card",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "삐삐",
+"en": "old pager",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "전자사전",
+"en": "electronic dictionary",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "전기 랜턴",
+"en": "electric lantern",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "야광봉",
+"en": "glow stick",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "레이저 포인터",
+"en": "laser pointer",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "UV 손전등",
+"en": "uv flashlight",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "전기 파리채",
+"en": "electric fly swatter",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "휴대용 선풍기",
+"en": "handheld fan",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "손난로",
+"en": "hand warmer",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "전자담배",
+"en": "e-cigarette",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "도어락 리모컨",
+"en": "remote key fob",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "무선 마이크",
+"en": "wireless microphone",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "녹음 펜",
+"en": "recording pen",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "도청 탐지기",
+"en": "bug detector",
+"src": "",
+"base": false
+},
+{
+"kind": "device",
+"ko": "소형 모니터",
+"en": "small monitor",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "유리 등롱에 담긴 부적",
+"en": "small glass lantern holding a paper talisman written in red",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "십자가",
+"en": "silver cross",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "묵주",
+"en": "rosary beads with cross",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "염주",
+"en": "wooden prayer beads",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성수병",
+"en": "small glass bottle of holy water",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "향",
+"en": "bundle of incense sticks, smoking",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "소금 봉지",
+"en": "small bag of white salt",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "팥 봉지",
+"en": "small bag of red beans",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "붉은 실",
+"en": "spool of red thread",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "종",
+"en": "small brass hand bell",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "거울",
+"en": "small round hand mirror",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "방울",
+"en": "shaman brass bell cluster",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "축복받은 십자가",
+"en": "blessed silver cross",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성유물",
+"en": "reliquary box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성인 메달",
+"en": "saint medal",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성경책(낡은)",
+"en": "old worn bible",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "관리국 부적",
+"en": "talisman written in red on back of library card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "찢긴 부적",
+"en": "torn paper talisman",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "액막이 부적",
+"en": "protective talisman folded",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "곰팡이 핀 부적",
+"en": "moldy crumbling talisman",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "호리병",
+"en": "gourd bottle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "조개 껍데기",
+"en": "seashell",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "엽전",
+"en": "old Korean coin with square hole",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "엽전 꾸러미",
+"en": "string of old coins",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "금줄",
+"en": "straw rope with red peppers",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "복주머니",
+"en": "lucky pouch",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "부채(무당)",
+"en": "shaman fan",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "무당 방울",
+"en": "shaman bell rattle",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "오방기",
+"en": "five-color flags",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "팥",
+"en": "handful of red beans",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "소금 한 줌",
+"en": "handful of salt",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "쑥",
+"en": "bundle of mugwort",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "복숭아나무 가지",
+"en": "peach tree branch",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "복숭아나무 칼",
+"en": "peachwood sword",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "팔찌 염주",
+"en": "bead bracelet",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "목탁",
+"en": "wooden moktak",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "불상",
+"en": "small buddha statue",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "향로",
+"en": "incense burner",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "촛대",
+"en": "candlestick",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성모상",
+"en": "small madonna statue",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성작",
+"en": "chalice",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성유",
+"en": "holy oil vial",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "성체",
+"en": "communion wafer",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "코란",
+"en": "koran book",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "기도 매트",
+"en": "prayer rug",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "부적 주머니",
+"en": "charm pouch",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "드림캐처",
+"en": "dreamcatcher",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "타로 카드",
+"en": "tarot cards",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "수정 구슬",
+"en": "crystal ball",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "룬 돌",
+"en": "rune stones",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "은 귀걸이",
+"en": "silver earring charm",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "마늘",
+"en": "garlic bulb",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "은 종",
+"en": "silver bell",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "풍경",
+"en": "wind chime",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "오뚝이",
+"en": "daruma doll",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "마네키네코",
+"en": "lucky cat figure",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "장승 미니어처",
+"en": "small jangseung totem",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "솟대",
+"en": "sotdae bird pole",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "굿 부채",
+"en": "ritual paper fan",
+"src": "",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "제문",
+"en": "ritual prayer scroll",
+"src": "위키",
+"base": false
+},
+{
+"kind": "charm",
+"ko": "영물",
+"en": "mysterious glowing relic",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "붕대",
+"en": "roll of white bandage",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "진통제",
+"en": "blister pack of pills",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "소독약",
+"en": "brown bottle of antiseptic",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "지혈대",
+"en": "tourniquet strap",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "반창고",
+"en": "adhesive bandages",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "수면제",
+"en": "small pill bottle, sleeping pills",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "주사기",
+"en": "syringe",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "안정제",
+"en": "small medicine vial",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "비타민",
+"en": "vitamin bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "구급상자",
+"en": "first aid box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "지혈제",
+"en": "hemostatic powder pack",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "두통약",
+"en": "headache pills",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "물약",
+"en": "small potion bottle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "회복 물약",
+"en": "red healing potion",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "시약",
+"en": "vial of reagent",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "혈액 팩",
+"en": "blood bag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "의수",
+"en": "prosthetic arm",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "청진기",
+"en": "stethoscope",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "혈압계",
+"en": "blood pressure monitor",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "체온계",
+"en": "digital thermometer",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "거즈",
+"en": "gauze pads",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "압박 붕대",
+"en": "elastic bandage",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "부목",
+"en": "splint",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "깁스",
+"en": "cast",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "목발",
+"en": "crutches",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "휠체어",
+"en": "wheelchair",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "링거",
+"en": "iv drip bag",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "수술용 메스",
+"en": "scalpel",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "봉합 키트",
+"en": "suture kit",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "핀셋",
+"en": "tweezers",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "의료용 가위",
+"en": "medical scissors",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "라텍스 장갑",
+"en": "latex gloves",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "마스크(의료)",
+"en": "surgical mask",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "산소마스크",
+"en": "oxygen mask",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "산소통",
+"en": "oxygen tank",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "제세동기",
+"en": "aed defibrillator",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "인공호흡 마스크",
+"en": "cpr mask",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "약봉지",
+"en": "pharmacy medicine packet",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "알약 통",
+"en": "pill organizer",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "감기약",
+"en": "cold medicine",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "소화제",
+"en": "digestive medicine",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "파스",
+"en": "pain relief patch",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "연고",
+"en": "ointment tube",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "안약",
+"en": "eye drops",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "해열제",
+"en": "fever syrup",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "항생제",
+"en": "antibiotics",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "진정제 주사",
+"en": "sedative injector",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "아드레날린 주사",
+"en": "epinephrine pen",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "모르핀",
+"en": "morphine ampoule",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "해독제",
+"en": "antidote vial",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "화상 연고",
+"en": "burn cream",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "소독용 알코올",
+"en": "rubbing alcohol",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "면봉",
+"en": "cotton swabs",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "솜",
+"en": "cotton balls",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "얼음 팩",
+"en": "ice pack",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "핫팩",
+"en": "heat pack",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "포르말린 병",
+"en": "formalin specimen jar",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "차트",
+"en": "medical chart clipboard",
+"src": "위키",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "엑스레이 필름",
+"en": "x-ray film",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "처방전",
+"en": "prescription paper",
+"src": "",
+"base": false
+},
+{
+"kind": "medical",
+"ko": "약병(갈색)",
+"en": "amber medicine bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "커피",
+"en": "canned coffee",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "담배",
+"en": "pack of cigarettes",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "휴대용 재떨이",
+"en": "small portable ashtray pouch",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "에너지바",
+"en": "wrapped energy bar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "초콜릿",
+"en": "chocolate bar, half unwrapped",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "컵라면",
+"en": "instant cup noodle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "소주",
+"en": "green glass soju bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "껌",
+"en": "pack of chewing gum",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "사탕",
+"en": "wrapped candies",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "도시락",
+"en": "convenience store lunch box",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "앨리스 피크닉 세트",
+"en": "picnic set: small drink bottle and cookies",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "메로나",
+"en": "green melon popsicle bar",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "도넛 상자",
+"en": "box of donuts",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "도넛",
+"en": "glazed donut",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "믹스커피",
+"en": "instant coffee mix stick",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "편의점 커피",
+"en": "convenience store iced coffee cup",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "자판기 커피",
+"en": "paper cup vending coffee",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "막걸리",
+"en": "plastic makgeolli bottle",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "약주",
+"en": "clay jar of rice wine",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "메밀묵",
+"en": "buckwheat jelly",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "꿀병",
+"en": "small honey jar",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "과자",
+"en": "bag of snack chips",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "팝콘",
+"en": "popcorn bucket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "통조림",
+"en": "tin can of food",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "과일 바구니",
+"en": "fruit basket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "케이크",
+"en": "cake box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "음료수 캔",
+"en": "soda can",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "붉은 열매",
+"en": "small red berries",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "귤",
+"en": "tangerine",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "간식 봉지",
+"en": "bag of assorted snacks",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "생수 2L",
+"en": "large water bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "이온음료",
+"en": "sports drink bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "에너지 드링크",
+"en": "energy drink can",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "우유",
+"en": "milk carton",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "바나나우유",
+"en": "banana milk",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "두유",
+"en": "soy milk carton",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "주스",
+"en": "juice box",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "탄산수",
+"en": "sparkling water",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "녹차",
+"en": "green tea bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "맥주",
+"en": "beer can",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "와인",
+"en": "wine bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "양주",
+"en": "whiskey bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "소주잔",
+"en": "soju shot glass",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "보온병",
+"en": "thermos",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "텀블러",
+"en": "tumbler cup",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "삼각김밥",
+"en": "triangle kimbap",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "김밥",
+"en": "kimbap roll",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "샌드위치",
+"en": "sandwich",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "햄버거",
+"en": "hamburger",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "핫도그",
+"en": "corn dog",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "떡볶이",
+"en": "tteokbokki cup",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "순대",
+"en": "sundae sausage",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "어묵",
+"en": "fish cake skewer",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "붕어빵",
+"en": "fish-shaped bread",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "호빵",
+"en": "steamed bun",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "군고구마",
+"en": "roasted sweet potato",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "치킨",
+"en": "fried chicken box",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "피자",
+"en": "pizza slice",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "라면 봉지",
+"en": "instant ramen pack",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "즉석밥",
+"en": "instant rice bowl",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "참치캔",
+"en": "tuna can",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "스팸",
+"en": "spam can",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "육포",
+"en": "beef jerky",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "건빵",
+"en": "hardtack crackers",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "전투식량",
+"en": "military ration pack",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "비상식량",
+"en": "emergency food bar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "사과",
+"en": "red apple",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "바나나",
+"en": "banana",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "빵",
+"en": "loaf of bread",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "단팥빵",
+"en": "red bean bun",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "쿠키",
+"en": "cookies",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "비스킷",
+"en": "biscuits",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "젤리",
+"en": "gummy candy",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "막대사탕",
+"en": "lollipop",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "박하사탕",
+"en": "mint candy",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "초코파이",
+"en": "choco pie",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "아이스크림",
+"en": "ice cream cone",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "떡",
+"en": "rice cake",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "송편",
+"en": "songpyeon rice cake",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "약과",
+"en": "yakgwa honey cookie",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "도시락(집)",
+"en": "home lunch box with cloth wrap",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "반찬통",
+"en": "side dish container",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "김치",
+"en": "kimchi container",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "계란",
+"en": "eggs",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "고기",
+"en": "raw meat pack",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "생선",
+"en": "fish",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "날고기",
+"en": "raw red meat chunk",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "소금",
+"en": "salt container",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "설탕",
+"en": "sugar packet",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "고춧가루",
+"en": "red pepper powder",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "향신료",
+"en": "spice jar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "식용유",
+"en": "cooking oil bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "간장",
+"en": "soy sauce bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "꿀",
+"en": "honey jar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "잼",
+"en": "jam jar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "시리얼",
+"en": "cereal box",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "컵커피",
+"en": "cup coffee",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "티백",
+"en": "tea bags",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "라이터와 담배",
+"en": "cigarette and lighter",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "시가",
+"en": "cigar",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "궐련",
+"en": "loose rolled cigarette",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "씹는 담배",
+"en": "chewing tobacco tin",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "사탕 봉지",
+"en": "bag of candy",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "정체불명 길거리 음식",
+"en": "strange skewered street food",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "진공 용기",
+"en": "vacuum food container",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "도토리묵",
+"en": "acorn jelly",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "만두",
+"en": "dumplings",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "국밥",
+"en": "bowl of gukbap",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "짜장면",
+"en": "black bean noodles",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "햇반 캔밥",
+"en": "canned rice",
+"src": "",
+"base": false
+},
+{
+"kind": "food",
+"ko": "물병(바코드)",
+"en": "water bottle with barcode label",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "포션 음료",
+"en": "glowing potion drink",
+"src": "위키",
+"base": false
+},
+{
+"kind": "food",
+"ko": "해피메이커",
+"en": "candy-like pain relief stick",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "지도",
+"en": "folded paper map",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "수첩",
+"en": "small black notebook",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "사진",
+"en": "old photograph",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "낡은 졸업 앨범",
+"en": "old worn graduation album",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "전단지(알바 모집)",
+"en": "paper flyer",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "명함",
+"en": "business card",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "편지",
+"en": "sealed envelope letter",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "영수증",
+"en": "long paper receipt",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "신문",
+"en": "folded newspaper",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "녹취록",
+"en": "stapled typed transcript papers",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "메모지",
+"en": "sticky notes",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "책",
+"en": "hardcover book",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "성경",
+"en": "black bible with cross",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "관람 안내 책자",
+"en": "museum guide pamphlet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "이용 안내 소책자",
+"en": "small guide booklet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "물감 냄새 쪽지",
+"en": "paint-stained handwritten note",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "붓글씨 쪽지",
+"en": "calligraphy note paper",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "대출 카드",
+"en": "library loan card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "대출자 명단",
+"en": "borrower list paper",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "유서",
+"en": "folded last letter",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "엽서",
+"en": "old postcard",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "우표 수집첩",
+"en": "stamp album",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "잡지",
+"en": "old magazine",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "대본",
+"en": "script booklet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "유치원 교육책",
+"en": "brown-covered kindergarten textbook",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "점검표",
+"en": "inspection checklist",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "결재 서류",
+"en": "approval document folder",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "계약서",
+"en": "contract papers",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "가죽 장부",
+"en": "leather ledger book",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "전당포 영수증",
+"en": "pawnshop receipt",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "무료 숙박권",
+"en": "free hotel voucher",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "프로모션 쿠폰",
+"en": "promotion coupon",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "공연 표",
+"en": "theater ticket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "팸플릿",
+"en": "theater pamphlet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "청록색 간행물",
+"en": "teal commemorative booklet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "마트 전단지",
+"en": "supermarket flyer",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "양피지",
+"en": "blank parchment scroll",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "해명문",
+"en": "written apology letter",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "매뉴얼",
+"en": "thick manual binder",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "필기 노트",
+"en": "study notebook",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "보고서",
+"en": "report document",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "생환 보고서",
+"en": "survival report file",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "의뢰서",
+"en": "job request form",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "사진첩",
+"en": "photo album",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "증명사진",
+"en": "id photo",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "가족사진 액자",
+"en": "family photo frame",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "폴라로이드 사진",
+"en": "polaroid photo",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "낡은 일기장",
+"en": "old diary",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "공책",
+"en": "notebook",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "스케치북",
+"en": "sketchbook",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "달력",
+"en": "calendar",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "포스터",
+"en": "rolled poster",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "QR 코드 포스터",
+"en": "poster with qr code",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "부고장",
+"en": "funeral notice",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "청첩장",
+"en": "wedding invitation",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "초대장",
+"en": "invitation card",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "봉투",
+"en": "envelope",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "택배 송장",
+"en": "shipping label",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "우편물",
+"en": "bundle of mail",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "등기 우편",
+"en": "registered mail",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "설계도",
+"en": "blueprint roll",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "건물 도면",
+"en": "building floor plan",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "지하철 노선도",
+"en": "subway map",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "여권",
+"en": "passport",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "주민등록증",
+"en": "korean id card",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "운전면허증",
+"en": "driver license",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "학생증",
+"en": "student id",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "요원 수첩",
+"en": "agent pocket notebook",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "사건 사진",
+"en": "evidence photos",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "증거 봉투",
+"en": "evidence bag",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "기밀 문서",
+"en": "classified document stamped red",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "진술서",
+"en": "statement form",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "부적 종이 다발",
+"en": "stack of blank talisman paper",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "한지",
+"en": "hanji paper",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "고서",
+"en": "ancient book",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "경전",
+"en": "scripture scroll",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "마법서",
+"en": "grimoire",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "동화책",
+"en": "picture book",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "만화책",
+"en": "comic book",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "교과서",
+"en": "textbook",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "사전",
+"en": "dictionary",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "악보",
+"en": "sheet music",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "복권",
+"en": "lottery ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "경품 막대",
+"en": "lottery stick",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "입장권",
+"en": "admission ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "영화표",
+"en": "movie ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "승차권",
+"en": "train ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "지하철 표",
+"en": "subway ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "주차권",
+"en": "parking ticket",
+"src": "",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "명단",
+"en": "list of names",
+"src": "위키",
+"base": false
+},
+{
+"kind": "paper",
+"ko": "피 묻은 쪽지",
+"en": "blood-stained note",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "열쇠 꾸러미",
+"en": "ring of many keys",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "카드키",
+"en": "white key card",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "사원증",
+"en": "employee ID card on lanyard",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "출입증",
+"en": "access pass badge",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "차 키",
+"en": "car key fob",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "사물함 열쇠",
+"en": "small numbered locker key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "격리 시설 출입증",
+"en": "containment facility access badge",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "법인카드",
+"en": "corporate credit card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "신용카드",
+"en": "credit card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "체크카드",
+"en": "debit card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "교통카드",
+"en": "transit card",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "살 길 열쇠",
+"en": "strange key with tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "사물함 열쇠(물)",
+"en": "locker key with wet tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "카드 키(워터파크)",
+"en": "waterproof card key",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "호텔 키",
+"en": "hotel room key with tag",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "자동차 키",
+"en": "car key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "오토바이 키",
+"en": "motorcycle key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "현관 열쇠",
+"en": "house key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "금고 열쇠",
+"en": "safe key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "마스터키",
+"en": "master key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "해골 열쇠",
+"en": "skeleton key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "녹슨 열쇠",
+"en": "rusty iron key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "황금 열쇠",
+"en": "golden key",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "열쇠고리",
+"en": "keychain",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "비밀번호 메모",
+"en": "password note",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "보안 카드",
+"en": "security card",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "방문증",
+"en": "visitor pass",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "관리국 사원증",
+"en": "agency id badge",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "백일몽 사원증",
+"en": "daydream company id badge",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "협회 등록증",
+"en": "association license card",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "프리랜서 면허증",
+"en": "freelancer license",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "번호 패",
+"en": "numbered token",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "코인",
+"en": "arcade token",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "쇠 명찰",
+"en": "metal name tag",
+"src": "",
+"base": false
+},
+{
+"kind": "key",
+"ko": "가슴 명찰",
+"en": "school chest name tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "key",
+"ko": "목걸이 열쇠",
+"en": "key on necklace",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "검은 상자",
+"en": "black box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "밀폐 용기",
+"en": "plastic airtight container",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "유리병",
+"en": "glass jar with lid",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "봉인 테이프",
+"en": "roll of yellow warning tape",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "쇠사슬",
+"en": "coiled iron chain",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "자루",
+"en": "burlap sack tied with rope",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "지퍼백",
+"en": "zip plastic bag",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "가방",
+"en": "black duffel bag",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "이빨 요정 선물 상자",
+"en": "pink gift box with green ribbon",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "웅웅거리는 상자",
+"en": "humming wooden box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "이빨 병",
+"en": "jar full of teeth",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "택배 상자",
+"en": "cardboard parcel box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "보드게임 상자",
+"en": "board game box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "판촉물 상자",
+"en": "promotional gift box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "폐기물 상자",
+"en": "hazard waste box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "서류 상자",
+"en": "document storage box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "꿈결 수집기",
+"en": "empty glass collector vial",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "꿈결 병",
+"en": "vial of glowing dream liquid",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "장난감 상자",
+"en": "toy chest",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "바구니",
+"en": "wicker basket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "엽전 바구니",
+"en": "brown basket of old coins",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "쟁반",
+"en": "tray",
+"src": "위키",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "보관함",
+"en": "storage bin",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "아이스박스",
+"en": "cooler box",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "캐리어",
+"en": "suitcase",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "쇼핑백",
+"en": "paper shopping bag",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "종이봉투",
+"en": "paper bag",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "보자기",
+"en": "cloth wrapping bundle",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "항아리",
+"en": "clay jar",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "단지",
+"en": "small earthen pot",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "봉인 부적 상자",
+"en": "box sealed with talismans",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "납 상자",
+"en": "lead box",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "철제 케이스",
+"en": "metal case",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "총기 케이스",
+"en": "gun case",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "악기 케이스",
+"en": "instrument case",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "관",
+"en": "small coffin",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "유골함",
+"en": "urn",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "시험관",
+"en": "test tube",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "비커",
+"en": "beaker",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "플라스크",
+"en": "flask",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "앰플",
+"en": "glass ampoule",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "보틀(빈)",
+"en": "empty glass bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "드럼통",
+"en": "metal drum barrel",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "자물쇠 달린 상자",
+"en": "locked chest",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "보석함",
+"en": "jewelry box",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "오르골",
+"en": "music box",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "도시락통",
+"en": "lunch box tin",
+"src": "",
+"base": false
+},
+{
+"kind": "seal",
+"ko": "사탕 통",
+"en": "candy jar",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "비디오테이프",
+"en": "VHS video tape",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "은화 뱀",
+"en": "coiled snake figure made of silver coins",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "녹슨 무전기",
+"en": "rusty old walkie-talkie",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이름표 떨어진 조끼",
+"en": "worn vest with torn-off name tag",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "인형",
+"en": "creepy porcelain doll",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "가면",
+"en": "pale blank mask",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "깨진 거울",
+"en": "cracked hand mirror",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "머리카락 뭉치",
+"en": "clump of black hair",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "낡은 신발",
+"en": "single worn shoe",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "손목 시계(멈춤)",
+"en": "stopped wristwatch with cracked glass",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "「천사의 한숨」 카세트",
+"en": "blue plastic cassette recorder with two buttons on the front",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "위 헬프!",
+"en": "small mysterious gift box with a price tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "아머",
+"en": "transforming combat armor device",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "소원권",
+"en": "golden wish ticket",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "치유 반지",
+"en": "healing ring",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "화폐 지갑",
+"en": "anomalous coin wallet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "실 뽑는 네일아트",
+"en": "nail tips pulling silk threads",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "착한 친구 키링",
+"en": "cute plush keyring charm",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "유쾌 테마파크 상자",
+"en": "colorful board game box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "금지된 VHS",
+"en": "unlabeled vhs tape",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "황금 닭 보물",
+"en": "golden rooster statue",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "황금 닭 누름돌",
+"en": "golden rooster stone weight",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "반짝이는 깃털",
+"en": "glittering feather",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "마리오네트",
+"en": "marionette puppet",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "마리오네트 실",
+"en": "bundle of puppet strings",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "잘린 손가락",
+"en": "severed finger",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "어금니",
+"en": "human molar tooth",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "눈알",
+"en": "eyeball",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "콩팥",
+"en": "kidney organ",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "병에 담긴 인격",
+"en": "jar with glowing soul",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이름표 붙은 유실물",
+"en": "lost item with name tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "낯선 꽃씨",
+"en": "strange flower seeds",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "조화 한 송이",
+"en": "single artificial flower",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "말라 죽은 꽃",
+"en": "dried dead flower",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "색종이",
+"en": "confetti paper",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "웅웅거리는 큐브",
+"en": "humming cube",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "증명의 십자가 조각",
+"en": "fragment of black cross",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "톱니바퀴",
+"en": "iron gear",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이빨 나무 가지",
+"en": "branch with teeth",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "얼룩진 동전",
+"en": "stained coin",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "카지노 칩",
+"en": "casino chips",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "트럼프 카드",
+"en": "deck of playing cards",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "해피엔딩 경전",
+"en": "scripture book",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "검은 상자(구도자)",
+"en": "black box with numbered lid",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "꿈 배양기",
+"en": "dream incubator jar",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "포션 메이커",
+"en": "small potion maker device",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "미용 애벌레 알주머니",
+"en": "egg sac diet supplement",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "골드 에디션 혈액 욕조",
+"en": "miniature gold bathtub",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "끝까지 밝은 손전등",
+"en": "strange bright flashlight",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "눈물 닦개(방수)",
+"en": "waterproof tissue",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "선크림 SPF 100+",
+"en": "sunscreen tube",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "오늘의 우산",
+"en": "plain umbrella with tag",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이쑤시개",
+"en": "toothpick",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "점 하나 찍힌 지도",
+"en": "map with single dot",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "피 흘리는 글씨 종이",
+"en": "paper with bleeding writing",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "모방 장비",
+"en": "disguise gadget",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "신원 은폐 장치",
+"en": "identity masking implant",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "괴이 등급 의수",
+"en": "anomalous prosthetic hand",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이상 물품 상자",
+"en": "box of anomalous goods",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "외계 물품",
+"en": "alien glowing gadget",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "초록 UFO 장난감",
+"en": "green ufo toy",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "주술 인형",
+"en": "voodoo doll",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "저주받은 반지",
+"en": "cursed ring",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "피 묻은 인형",
+"en": "bloody doll",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "목 없는 인형",
+"en": "headless doll",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "눈 없는 곰인형",
+"en": "eyeless teddy bear",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "오래된 오르골",
+"en": "old music box",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "멈춘 회중시계",
+"en": "stopped pocket watch",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "녹슨 방울",
+"en": "rusty bell",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "검은 깃털",
+"en": "black feather",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "뼈",
+"en": "bone",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "해골",
+"en": "skull",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "손 모양 조각",
+"en": "carved hand figure",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "피 묻은 칼",
+"en": "bloody knife",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "피 묻은 옷",
+"en": "bloody shirt",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "찢어진 사진",
+"en": "torn photo",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "얼굴 지워진 사진",
+"en": "photo with erased face",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "낡은 카세트테이프",
+"en": "old cassette tape",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "녹음테이프",
+"en": "reel tape",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "깨진 휴대폰",
+"en": "cracked phone",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "켜지지 않는 휴대폰",
+"en": "dead black phone",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "젖은 신발",
+"en": "wet shoe",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "아이 신발",
+"en": "child's shoe",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "머리핀(유품)",
+"en": "old hairpin",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "유품 상자",
+"en": "keepsake box",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이상한 덩어리",
+"en": "strange flesh lump",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "살아있는 식재료",
+"en": "squirming food",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "검은 물병",
+"en": "bottle of black water",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "민속촌 물",
+"en": "bottle of murky water",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "검은 액체",
+"en": "black liquid vial",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "붉은 실타래",
+"en": "red yarn ball",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "빈 액자",
+"en": "empty picture frame",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "그림 조각",
+"en": "torn painting piece",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "캔버스",
+"en": "small canvas painting",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "가면(동물, 주인 없음)",
+"en": "abandoned animal mask",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "이름 적힌 쪽지",
+"en": "note with name",
+"src": "",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "소라 껍데기 카세트",
+"en": "cassette with seashell emblem",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "보라색 머리카락",
+"en": "purple hair strand",
+"src": "위키",
+"base": false
+},
+{
+"kind": "anomaly",
+"ko": "가짜 관리국 배지",
+"en": "fake agency badge",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "지폐 다발",
+"en": "stack of banknotes with band",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "동전",
+"en": "pile of coins",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "반지",
+"en": "gold ring",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "목걸이",
+"en": "gold necklace",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금괴",
+"en": "gold bar",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "보석",
+"en": "cut gemstone",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "시계(고급)",
+"en": "luxury gold wristwatch",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "수표",
+"en": "paper check",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금 장신구",
+"en": "gold jewelry",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금화",
+"en": "gold coin",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "은화",
+"en": "silver coin",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "골동품 도자기",
+"en": "antique porcelain vase",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금속 골동품",
+"en": "antique metal ornament",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "명품 가방",
+"en": "luxury handbag",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "명품 지갑",
+"en": "luxury wallet",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "지갑",
+"en": "leather wallet",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "동전 주머니",
+"en": "coin pouch",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "돼지 저금통",
+"en": "piggy bank",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "상품권",
+"en": "gift certificate",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "외화",
+"en": "foreign banknotes",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "달러",
+"en": "us dollar bills",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "엔화",
+"en": "yen bills",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "5만원권 다발",
+"en": "stack of 50000 won bills",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "만원권",
+"en": "10000 won bill",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "천원권",
+"en": "1000 won bill",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "500원 동전",
+"en": "500 won coin",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "통장",
+"en": "bankbook",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "가상화폐 지갑",
+"en": "crypto hardware wallet",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "진주 목걸이",
+"en": "pearl necklace",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "다이아 반지",
+"en": "diamond ring",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "루비",
+"en": "ruby",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "에메랄드",
+"en": "emerald",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "사파이어",
+"en": "sapphire",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금니",
+"en": "gold tooth",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "금목걸이 두꺼운",
+"en": "thick gold chain",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "커프스",
+"en": "cufflinks",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "만년필(고급)",
+"en": "luxury fountain pen",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "회중시계",
+"en": "pocket watch",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "그림(명화)",
+"en": "framed painting",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "조각상",
+"en": "small statue",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "트로피",
+"en": "trophy",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "메달",
+"en": "medal",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "훈장",
+"en": "military decoration",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "인감",
+"en": "official seal",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "부동산 문서",
+"en": "property deed",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "어음",
+"en": "promissory note",
+"src": "",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "담보 증서",
+"en": "collateral certificate",
+"src": "위키",
+"base": false
+},
+{
+"kind": "valuable",
+"ko": "점포 임대권",
+"en": "shop lease certificate",
+"src": "위키",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "필름",
+"en": "35mm film roll",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "테이프 두루마리",
+"en": "roll of clear tape",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "라이터 기름",
+"en": "small lighter fluid can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "연막탄",
+"en": "smoke grenade",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "조명탄",
+"en": "red signal flare",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "분필",
+"en": "pieces of white chalk",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "스프레이 페인트",
+"en": "spray paint can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "AAA 건전지",
+"en": "aaa batteries",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "9V 건전지",
+"en": "9v battery",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "단추 전지",
+"en": "button cell battery",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "충전 배터리 팩",
+"en": "battery pack",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "산탄",
+"en": "shotgun shells",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "소총탄",
+"en": "rifle cartridges",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "권총탄",
+"en": "pistol rounds",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "탄띠(기관총)",
+"en": "machine gun ammo belt",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "연료통",
+"en": "jerry can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "휘발유",
+"en": "gasoline can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "등유",
+"en": "kerosene container",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "가스통",
+"en": "gas canister",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "성냥 한 갑",
+"en": "box of matches",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "양초 묶음",
+"en": "bundle of candles",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "향초",
+"en": "scented candle",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "숯",
+"en": "charcoal",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "장작",
+"en": "firewood",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "번개탄",
+"en": "charcoal briquette",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "비닐 랩",
+"en": "plastic wrap roll",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "알루미늄 호일",
+"en": "aluminum foil",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "휴지",
+"en": "toilet paper roll",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "물티슈",
+"en": "wet wipes",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "각티슈",
+"en": "tissue box",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "키친타월",
+"en": "paper towels",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "비누",
+"en": "bar of soap",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "샴푸",
+"en": "shampoo bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "치약",
+"en": "toothpaste",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "칫솔",
+"en": "toothbrush",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "면도기",
+"en": "razor",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "생리대",
+"en": "sanitary pads",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "손 소독제",
+"en": "hand sanitizer",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "순간접착제",
+"en": "super glue",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "본드",
+"en": "glue tube",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "실리콘",
+"en": "silicone tube",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "페인트 통",
+"en": "paint can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "형광펜",
+"en": "highlighter",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "포스트잇",
+"en": "post-it notes",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "A4 용지",
+"en": "a4 paper stack",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "비닐장갑",
+"en": "disposable gloves",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "쓰레기봉투",
+"en": "garbage bags",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "마대 자루",
+"en": "large sack",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "노끈 뭉치",
+"en": "twine bundle",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "모래주머니",
+"en": "sandbag",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "소금 포대",
+"en": "bag of salt",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "조명탄 권총",
+"en": "flare gun",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "신호 거울",
+"en": "signal mirror",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "방수 성냥",
+"en": "waterproof matches",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "산소 캔",
+"en": "oxygen can",
+"src": "",
+"base": false
+},
+{
+"kind": "consumable",
+"ko": "발화 막대",
+"en": "fire starter",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "우산",
+"en": "long black umbrella",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "수건",
+"en": "folded towel",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "손수건",
+"en": "folded handkerchief",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "인형(평범)",
+"en": "plush teddy bear",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "풍선",
+"en": "red balloon",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "장난감",
+"en": "toy robot",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "돌멩이",
+"en": "small grey stone",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "조개",
+"en": "clam shell",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "공",
+"en": "ball",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "축구공",
+"en": "soccer ball",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "농구공",
+"en": "basketball",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "야구공",
+"en": "baseball",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "글러브",
+"en": "baseball glove",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "줄넘기",
+"en": "jump rope",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "훌라후프",
+"en": "hula hoop",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "인형 옷",
+"en": "doll clothes",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "봉제 인형",
+"en": "stuffed animal",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "토끼 인형",
+"en": "bunny plush",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "자동차 장난감",
+"en": "toy car",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "팽이",
+"en": "spinning top",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "요요",
+"en": "yoyo",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "큐브 퍼즐",
+"en": "rubik's cube",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "퍼즐 조각",
+"en": "puzzle piece",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "주사위",
+"en": "dice",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "장기판",
+"en": "janggi board",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "바둑알",
+"en": "go stones",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "화투",
+"en": "hwatu cards",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "트럼프",
+"en": "playing card deck",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "구슬",
+"en": "glass marbles",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "딱지",
+"en": "ddakji paper tiles",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "크리스마스 장식",
+"en": "christmas ornament",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "화분",
+"en": "potted plant",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "꽃다발",
+"en": "bouquet",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "꽃 한 송이",
+"en": "single flower",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "나뭇가지",
+"en": "stick",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "나뭇잎",
+"en": "leaf",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "솔방울",
+"en": "pine cone",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "조약돌",
+"en": "pebble",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "벽돌",
+"en": "brick",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "유리 조각",
+"en": "glass shard",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "깡통",
+"en": "empty can",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "빈 병",
+"en": "empty bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "빈 상자",
+"en": "empty box",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "헌 신문지",
+"en": "old newspaper bundle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "담배꽁초",
+"en": "cigarette butt",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "껌 종이",
+"en": "gum wrapper",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "영수증 뭉치",
+"en": "crumpled receipts",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "머리끈",
+"en": "hair tie",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "빗",
+"en": "comb",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "손거울",
+"en": "compact mirror",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "립스틱",
+"en": "lipstick",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "향수",
+"en": "perfume bottle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "화장품 파우치",
+"en": "makeup pouch",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "손톱깎이",
+"en": "nail clipper",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "열쇠고리 인형",
+"en": "small keychain doll",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "우산 비닐",
+"en": "umbrella bag",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "부채(여름)",
+"en": "summer fan",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "선풍기",
+"en": "electric fan",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "에어컨 리모컨",
+"en": "remote control",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "TV 리모컨",
+"en": "tv remote",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "전구",
+"en": "light bulb",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "형광등",
+"en": "fluorescent tube",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "시계(벽)",
+"en": "wall clock",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "컵",
+"en": "mug",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "종이컵",
+"en": "paper cup",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "머그컵",
+"en": "coffee mug",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "접시",
+"en": "plate",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "젓가락",
+"en": "chopsticks",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "숟가락",
+"en": "spoon",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "포크",
+"en": "fork",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "냄비",
+"en": "pot",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "프라이팬",
+"en": "frying pan",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "국자",
+"en": "ladle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "도마",
+"en": "cutting board",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "햄스터",
+"en": "hamster",
+"src": "위키",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "고양이",
+"en": "black cat",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "강아지",
+"en": "small dog",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "새장",
+"en": "birdcage",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "금붕어 어항",
+"en": "goldfish bowl",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "거북이",
+"en": "turtle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "목줄",
+"en": "pet leash",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "사료",
+"en": "pet food bag",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "자전거",
+"en": "bicycle",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "킥보드",
+"en": "kick scooter",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "유모차",
+"en": "stroller",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "휠 캐리어",
+"en": "rolling cart",
+"src": "",
+"base": false
+},
+{
+"kind": "misc",
+"ko": "우편함 열쇠",
+"en": "mailbox key",
+"src": "",
+"base": false
+}
+]
+}
