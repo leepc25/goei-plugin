@@ -30,8 +30,8 @@ export function walletHeadButton(ctx: ChatContext, here = false): string {
   return `<button class="gx-hwallet" data-action="tab" data-value="wallet" aria-label="가계부 · 잔고 ${esc(balanceText(ctx))}">${esc(balanceText(ctx))}</button>`;
 }
 
-const SRC_ICON: Record<WalletEntry['src'], string> = { story: ICONS.phone, field: ICONS.game, manual: ICONS.pen };
-const SRC_NAME: Record<WalletEntry['src'], string> = { story: '본문', field: '필드', manual: '직접 수정' };
+const SRC_ICON: Record<WalletEntry['src'], string> = { story: ICONS.phone, field: ICONS.game, manual: ICONS.pen, store: ICONS.bag };
+const SRC_NAME: Record<WalletEntry['src'], string> = { story: '본문', field: '필드', manual: '직접 수정', store: '상점' };
 const WEEK = '일월화수목금토';
 
 /** 메시지마다 그때까지의 마지막 상태창 날짜 (거래를 날짜별로 묶는 데 쓴다. 장부에는 날짜가 없다) */

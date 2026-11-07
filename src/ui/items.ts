@@ -50,7 +50,7 @@ function itemPic(it: Item): string {
   return ITEM_ICONS[it.kind];
 }
 
-const FROM_NAME: Record<Item['from'], string> = { store: '장터', story: '본문', manual: '직접' };
+const FROM_NAME: Record<Item['from'], string> = { store: '상점', story: '본문', manual: '직접' };
 const dateOf = (iso: string) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   return m ? `${m[2]}-${m[3]}` : '';
