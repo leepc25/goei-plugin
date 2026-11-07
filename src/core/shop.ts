@@ -535,7 +535,7 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄) */
 export const SHOP_GUIDE =
-  'Shop tag: when the scene ends somewhere the protagonist could buy things from someone present (a store, stall, vendor, dealer), add one line after the status line: [shop: 가게 이름|주인 이름] (주인 이름 = the seller's name exactly as already given in the story or the roster; if the seller has no name in the story, leave it empty — never invent a name or a description). Omit the tag when no trade is possible. Never list goods or prices yourself; the shop screen handles them.';
+  'Shop tag: when the scene ends somewhere the protagonist could buy things from someone present (a store, stall, vendor, dealer), add one line after the status line: [shop: 가게 이름|주인 이름] (주인 이름 = the seller’s name exactly as already given in the story or the roster; if the seller has no name in the story, leave it empty — never invent a name or a description). Omit the tag when no trade is possible. Never list goods or prices yourself; the shop screen handles them.';
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;
 export const kindLabel = itemKindLabel;
