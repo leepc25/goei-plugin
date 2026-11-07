@@ -232,7 +232,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...changes.filter((c) => c.kind === 'cue' && chosen.includes(c.who) && [...confirmedIdx].some((idx) => live.at.get(c.anchor) === idx)).map((c) => ({ who: c.who, kind: 'cue', cue: c.cue })),
     ...chosen.flatMap((n) => SLOTS.flatMap((s) => liveEntries(store.people[n].slots[s], live).filter((e) => [...confirmedIdx].some((idx) => live.at.get(e.anchor) === idx)).map((e) => ({ who: n, kind: 'entry', slot: s, text: e.text })))),
   ];
-  const wantNote = o.settings.director === 'facts';
+  const wantNote = o.settings.director === 'note';
   const over = chosen.filter((n) => recordChars(store.people[n], live) > o.settings.personCap);
   // 세력 평판: 장면 세력(인물 소속 ∪ 글에 나온 세력)의 현재값
   const factionCodes = o.settings.features.has('faction_rep') ? sceneFactionCodes(store, chosen, texts, o.factionNames) : [];
@@ -334,7 +334,7 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   for (const f of s.features) on.add(f);
   // 수치 모드·정성 모드 절 (리수폿 E): 기능이 켜져 있을 때 둘 중 하나만
   for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
-  if (s.director === 'facts') on.add('next_note');
+  if (s.director === 'note') on.add('next_note');
   return on;
 }
 
@@ -1105,7 +1105,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 8. 다음 턴 메모 (사실형 Director)
-  if (ctx.settings.director === 'facts') {
+  if (ctx.settings.director === 'note') {
     const anchor = messageKey(list[Math.max(...input.indexes)], Math.max(...input.indexes));
     for (const n of r.next_note ?? []) {
       const who = nameOf(str(n?.who));
@@ -1122,7 +1122,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 8b. 서사 리듬 메모 (사실형 Director, 장면 전체): 인물이 아니라 '@rhythm' 에 둔다
-  if (ctx.settings.features.has('rhythm') && ctx.settings.director === 'facts') {
+  if (ctx.settings.features.has('rhythm') && ctx.settings.director === 'note') {
     const now = plain(r.rhythm_note, 200);
     if (now) {
       const anchor = messageKey(list[Math.max(...input.indexes)], Math.max(...input.indexes));

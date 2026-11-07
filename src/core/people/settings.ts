@@ -16,7 +16,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   prompt: 'detailed',
   /** split = 절 단위 혼합, append = 시트 전체 + 기록, record = 기록만, off = 본편에 안 넣음 */
   inject: 'split',
-  /** off / facts(뒤, 갱신기에 얹음) / scene(앞, 연출형) */
+  /** off / note(뒤, 갱신기에 얹은 메모만, 호출 없음) / facts(앞, 사실형 — 본편 전 보조 1회, 원본 directorRole facts) / scene(앞, 연출형).
+   *  2026-11-07: 옛 facts(호출 없음)는 note 로 이름을 바꿈. 원본처럼 사실형도 본편 앞에 Director 를 부른다 */
   director: 'facts',
   director_lang: 'en',
   director_len: 'short',
@@ -79,7 +80,7 @@ export interface PeopleSettings {
   model: 'main' | 'aux';
   prompt: 'detailed' | 'compact';
   inject: 'split' | 'append' | 'record' | 'off';
-  director: 'off' | 'facts' | 'scene';
+  director: 'off' | 'note' | 'facts' | 'scene';
   directorLang: 'en' | 'ko';
   directorLen: 'short' | 'normal';
   directorTimeout: number;
@@ -154,7 +155,7 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     model: v('model') === 'main' ? 'main' : 'aux',
     prompt: one('prompt', ['detailed', 'compact'] as const),
     inject: one('inject', ['split', 'append', 'record', 'off'] as const),
-    director: one('director', ['off', 'facts', 'scene'] as const),
+    director: one('director', ['off', 'note', 'facts', 'scene'] as const),
     directorLang: v('director_lang') === 'ko' ? 'ko' : 'en',
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
     directorTimeout: num('director_timeout', 5, 300),

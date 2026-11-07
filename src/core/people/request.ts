@@ -51,7 +51,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     const p = o.store.people[n];
     const sheet = o.sheetOf(n);
     if (sheet) sheets.push(sheet);
-    const note = o.settings.director === 'facts' ? latestNote(o.store, n, live) : null;
+    const note = o.settings.director === 'note' ? latestNote(o.store, n, live) : null;
     blocks.push(
       personBlock(p, o.store, live, changes, {
         sheet,
@@ -75,7 +75,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
   if (o.settings.features.has('rhythm')) {
     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
-    const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
+    const note = o.settings.director === 'note' ? latestNote(o.store, '@rhythm', live)?.now : null;
     const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
     if (rb) blocks.unshift(rb);
   }

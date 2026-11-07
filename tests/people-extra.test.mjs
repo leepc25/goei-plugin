@@ -22,7 +22,7 @@ const I = await mod('inject');
 const R = await mod('request');
 const P = await mod('prompt/index');
 
-const settings = (over = {}) => ({ ...St.peopleSettings({}), ...over });
+const settings = (over = {}) => ({ ...St.peopleSettings({ $pp_director: 'note' }), ...over });
 const withFeatures = (...fs) => { const s = settings(); s.features = new Set([...s.features, ...fs]); return s; };
 const person = (name) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [] });
 const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role, data, chatId })) });

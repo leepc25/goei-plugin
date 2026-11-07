@@ -525,14 +525,14 @@ export async function routerPeople(chat: Chat, store: PeopleStore, input: string
   }
 }
 
-// ── 연출형 Director (본편 앞) ──
+// ── Director (본편 앞, 사실형·연출형. 원본은 두 역할 다 본편 앞 1회 호출) ──
 
 let directorCache: { key: string; notes: DirectorNote[] } | null = null;
 // 2026-11-07: directorSlowStreak(3회 초과 시 세션 끝까지 끔) 뺌. 실패는 그 턴만 메모 없이 진행
 
-/** 연출형 메모 글. 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
+/** Director 메모 글(사실형·연출형). 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
 export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown, char?: { chaId?: string }): Promise<string> {
-  if (settings.director !== 'scene') return '';
+  if (settings.director !== 'scene' && settings.director !== 'facts') return '';
   const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-4).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)));
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
@@ -548,7 +548,7 @@ export async function directorNoteText(chat: Chat, store: PeopleStore, people: s
       ]);
       diag.raw = raw;
       diag.outChars = raw.length;
-      const r = parseDirectorAny(raw, people, true, allowSearch);
+      const r = parseDirectorAny(raw, people, settings.director === 'scene', allowSearch);
       diag.ok = true;
       return r;
     } catch (error) {
@@ -574,7 +574,7 @@ export async function directorNoteText(chat: Chat, store: PeopleStore, people: s
 
 /** 설정 요약 (화면용) */
 export function describeSettings(s: PeopleSettings): string {
-  return [`갱신 ${s.when === 'turn' ? '매 턴' : '수동'}`, `모델 ${s.model === 'main' ? '메인' : '보조'}`, `지침 ${s.prompt === 'detailed' ? '자세히' : '간결'}`, `Director ${s.director === 'off' ? '끔' : s.director === 'facts' ? '사실형' : '연출형'}`].join(' · ');
+  return [`갱신 ${s.when === 'turn' ? '매 턴' : '수동'}`, `모델 ${s.model === 'main' ? '메인' : '보조'}`, `지침 ${s.prompt === 'detailed' ? '자세히' : '간결'}`, `Director ${s.director === 'off' ? '끔' : s.director === 'note' ? '메모형' : s.director === 'facts' ? '사실형' : '연출형'}`].join(' · ');
 }
 
 export { liveness };

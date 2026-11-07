@@ -1,5 +1,5 @@
-// 짧은 Director (본편 앞, 선택 기능 「연출형」). 사실형은 갱신기가 뒤에서 next_note 로 미리 써 두므로 호출이 없다.
-// 연출형은 이번 유저 입력까지 보고 「이번 턴 반응 방향」을 쓰려 하므로 본편 앞에 보조 모델 1회가 든다.
+// Director (본편 앞). 사실형(facts)은 기록에서 사실·지식 한계만, 연출형(scene)은 거기에 이번 턴 반응 방향(react)을 더한다 — 둘 다 본편 앞 보조 1회 (원본 directorRole facts/directing).
+// 메모형(note)은 호출 없이 갱신기가 뒤에서 next_note 로 써 둔 메모를 끼운다 (2026-11-07 전까지 「사실형」이라 불렀던 방식).
 // 리수폿 B·C (2026-11-06 사용자 결정): 자료가 모자라면 검색을 요청해 2차 호출(need → found), 켜진 기능마다 Director 적용 지침을 얹는다.
 import type { Chat, LoreEntry } from '../types';
 import { messageText } from '../refs';

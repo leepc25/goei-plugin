@@ -105,6 +105,24 @@ await R.section('4b Director 형식 오류 → 고침 요청 1회 더 → 메모
   assert.ok(out.some((m) => String(m.content).includes('Repaired note')), '고친 답이 메모로 들어감');
 });
 
+await R.section('4c 사실형(facts): 본편 앞 Director 1회 (react 없음), 메모형(note)은 호출 없음', async () => {
+  await setVars(page, { $pp_director: 'facts' });
+  await resetLlm(page, [ok({ selected: [{ name: '쟈알디', reason: 'x' }], new_characters: [] }), ok({ notes: [{ who: '쟈알디', now: 'Facts only.', react: 'should be dropped', must_not_reveal: [] }] })]);
+  let out = await request(page, [...base2.slice(0, -1), usr(U2 + ' (사실형)')]);
+  let calls = await llmCalls(page);
+  const dcalls = calls.filter((c) => /Director/.test(c.system));
+  assert.equal(dcalls.length, 1, `사실형 Director 호출 ${dcalls.length}`);
+  assert.ok(!dcalls[0].system.includes('You may add `react`'), '사실형 지침에는 react 절 없음');
+  const dn = out.find((m) => String(m.content).startsWith('[Director note]'));
+  assert.ok(dn && dn.content.includes('Facts only') && !dn.content.includes('should be dropped'), '사실형 메모: now 만, react 는 버림');
+  await setVars(page, { $pp_director: 'note' });
+  await resetLlm(page, [ok({ selected: [{ name: '쟈알디', reason: 'x' }], new_characters: [] })]);
+  out = await request(page, [...base2.slice(0, -1), usr(U2 + ' (메모형)')]);
+  calls = await llmCalls(page);
+  assert.equal(calls.filter((c) => /Director/.test(c.system)).length, 0, '메모형은 Director 호출 없음');
+  await setVars(page, { $pp_director: 'scene' });
+});
+
 await R.section('5 둘째 응답 → 갱신기: 항목 반영·읽음 표시', async () => {
   await push(page, 'char', C2, 'c2');
   // 응답은 요청 자료를 보고 만든다: 마지막 확정 span 항목(assistant)의 태그를 쓴다

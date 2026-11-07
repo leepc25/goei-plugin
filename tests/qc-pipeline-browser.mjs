@@ -328,8 +328,8 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     await setVars(page, { $pp_director_reuse: '0' });
     out = await request(page, base());
     assert.ok(!out.some((m) => m.content.startsWith('[Director note]')) && block(out), '실패하면 메모 없이 진행');
-    await setVars(page, { $pp_director: 'facts' });
-    assert.ok(block(await request(page, base())), 'facts 모드');
+    await setVars(page, { $pp_director: 'note' });
+    assert.ok(block(await request(page, base())), 'note(메모형) 모드: 호출 없이 블록만');
     await page.evaluate(() => { delete window.__chat.goeiPeopleV1; });
   });
 
