@@ -80,13 +80,6 @@
 "base": true
 },
 {
-"kind": "valuable",
-"ko": "현금 봉투",
-"en": "white envelope with banknotes",
-"src": "",
-"base": true
-},
-{
 "kind": "consumable",
 "ko": "건전지",
 "en": "two AA batteries",
@@ -97,6 +90,13 @@
 "kind": "misc",
 "ko": "비닐봉지",
 "en": "white plastic shopping bag",
+"src": "",
+"base": true
+},
+{
+"kind": "valuable",
+"ko": "반지",
+"en": "gold ring",
 "src": "",
 "base": true
 },
@@ -6178,27 +6178,6 @@
 },
 {
 "kind": "valuable",
-"ko": "지폐 다발",
-"en": "stack of banknotes with band",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "동전",
-"en": "pile of coins",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "반지",
-"en": "gold ring",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
 "ko": "목걸이",
 "en": "gold necklace",
 "src": "",
@@ -6227,30 +6206,9 @@
 },
 {
 "kind": "valuable",
-"ko": "수표",
-"en": "paper check",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
 "ko": "금 장신구",
 "en": "gold jewelry",
 "src": "위키",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "금화",
-"en": "gold coin",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "은화",
-"en": "silver coin",
-"src": "",
 "base": false
 },
 {
@@ -6290,78 +6248,8 @@
 },
 {
 "kind": "valuable",
-"ko": "동전 주머니",
-"en": "coin pouch",
-"src": "위키",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "돼지 저금통",
-"en": "piggy bank",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
 "ko": "상품권",
 "en": "gift certificate",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "외화",
-"en": "foreign banknotes",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "달러",
-"en": "us dollar bills",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "엔화",
-"en": "yen bills",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "5만원권 다발",
-"en": "stack of 50000 won bills",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "만원권",
-"en": "10000 won bill",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "천원권",
-"en": "1000 won bill",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "500원 동전",
-"en": "500 won coin",
-"src": "",
-"base": false
-},
-{
-"kind": "valuable",
-"ko": "통장",
-"en": "bankbook",
 "src": "",
 "base": false
 },
