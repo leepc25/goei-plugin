@@ -40,7 +40,7 @@ const cell = (it, i, sel) => {
 };
 const meta = (kind, stock) => `<small class="sh-meta"><span class="sh-tag">${kind}</span>재고 ${stock}</small>`;
 const tip = ([, name, kind, price, stock, desc, ef]) => `<div class="it-tip"><b>${name}</b>${meta(kind, stock)}${amt(price)}<p>${desc}</p><p class="ef">효과: ${ef}</p></div>`;
-const grid = (sel = -1) => `<div class="it-grid sh-grid">${items.map((it, i) => cell(it, i, sel)).join('')}</div>`;
+const grid = (sel = -1, many = false) => `<div class="it-grid sh-grid">${(many ? [...items, ...items.slice(0, 6)] : items).map((it, i) => cell(it, i, sel)).join('')}</div>`;
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
 const tools = (vp) => `<div class="gx-rec-tools it-tools sh-tools">
   <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal">${amt(BAL)}</span>
@@ -62,7 +62,7 @@ const detail = (it) => {
   <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button><button class="gx-chip">문의</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
-  const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1);
+  const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1, mode === 'many');
   return `<div class="gx sh-wrap"><div class="gx-agpop-card it-card sh-card">${tools(vp)}<div class="it-body sh-body">${body}</div>${mode === 'loading' ? '' : owner(mode, mode !== 'noface')}${vp === 'phone' ? `<button class="it-act sh-close">${ic('close')}닫기</button>` : ''}</div>
   ${mode === 'detail' ? detail(items[0]) : mode === 'poor' ? detail(items[11]) : ''}</div>`;
 };
@@ -84,13 +84,13 @@ const css = `
 /* 메타(종류 표 + 재고): 어디서나 12.5 sub */
 .sh-meta{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--sub);line-height:1.4}.sh-tag{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:var(--ri);color:var(--text);line-height:1.4}
 /* 팝업 본체 */
-.sh-card{width:min(100%,760px);align-items:stretch;gap:12px;padding:16px;max-height:calc(100% - 8px)}
+.sh-card{width:min(100%,760px);display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:16px;max-height:calc(100% - 8px);overflow:hidden}.sh-body{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -2px;padding:0 2px}
 /* 도구 줄: 모든 조작 34px·모서리 10 */
 .sh-tools{gap:8px}.sh-tools .it-act,.sh-tools .it-cnt,.sh-tools .gx-wt-q{height:var(--h);border-radius:var(--r);border:1px solid var(--line);background:var(--panel2);font-size:13.5px}
 .sh-name{display:inline-flex;align-items:center;gap:8px;height:var(--h);padding:0 4px;color:var(--text);font-size:16px;font-weight:700;white-space:nowrap}.sh-name svg{width:18px;height:18px;color:var(--signal)}
 .sh-bal{padding:0 12px;color:var(--text)}
 .sh-x{width:var(--h);padding:0;justify-content:center}.sh-x svg{color:var(--sub)}
-.sh-owner{display:flex;gap:14px;align-items:stretch;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}.sh-face{flex:none;width:128px;border-radius:var(--rc);overflow:hidden;border:1px solid var(--line);background:var(--void);display:grid;place-items:center;color:var(--dim)}.sh-face img{width:100%;height:100%;object-fit:cover;object-position:center 8%}.sh-face svg{width:36px;height:36px}.sh-dlg{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}.sh-dlg-name{display:flex;align-items:baseline;gap:10px;height:24px;font-size:15px;font-weight:700;color:var(--text)}.sh-dlg-name small{font-size:12.5px;font-weight:500;color:var(--dim)}.sh-dlg-box{flex:1;min-height:52px;max-height:calc(13.5px * 1.6 * 4 + 20px);overflow-y:auto;padding:10px 14px;border:1px solid var(--line);border-radius:var(--rc);background:var(--void)}.sh-dlg-box p{margin:0;font-size:13.5px;line-height:1.6;color:var(--text)}
+.sh-owner{display:flex;gap:14px;align-items:stretch;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}.sh-face{flex:none;width:128px;border-radius:var(--rc);overflow:hidden;border:1px solid var(--line);background:var(--void);display:grid;place-items:center;color:var(--dim)}.sh-face img{width:100%;height:calc(100% - 12px);margin-top:12px;object-fit:cover;object-position:top}.sh-face svg{width:36px;height:36px}.sh-dlg{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}.sh-dlg-name{display:flex;align-items:baseline;gap:10px;height:24px;font-size:15px;font-weight:700;color:var(--text)}.sh-dlg-name small{font-size:12.5px;font-weight:500;color:var(--dim)}.sh-dlg-box{flex:1;min-height:52px;max-height:calc(13.5px * 1.6 * 4 + 20px);overflow-y:auto;padding:10px 14px;border:1px solid var(--line);border-radius:var(--rc);background:var(--void)}.sh-dlg-box p{margin:0;font-size:13.5px;line-height:1.6;color:var(--text)}
 .sh-talk{display:flex;gap:8px}
 .sh-talk{display:flex;gap:8px;margin-top:10px}.sh-talk-in{flex:1;display:flex;align-items:center;gap:6px;min-height:var(--h);padding:0 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2);font-size:13.5px;color:var(--text)}.sh-talk-in .sh-ph{color:var(--dim)}.sh-ref{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:var(--ri);background:var(--accent-bg);border:1px solid var(--accent-line);color:var(--signal);font-size:12.5px;font-weight:600;white-space:nowrap}.sh-caret{width:1px;height:16px;background:var(--text)}.sh-talk .sh-go{flex:none;width:var(--h);height:var(--h);border:1px solid var(--accent-line);border-radius:var(--r);background:var(--accent-bg);color:var(--signal);font:700 15px/1 inherit;cursor:pointer}
 /* 칸: 그림 → 이름 13 → 값 띠(칸 아랫부분을 그대로 씀) */
@@ -113,7 +113,7 @@ const css = `
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
 .it-right{margin-left:auto}.sh-face{width:96px}.sh-dlg-box{min-height:60px}
 .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sh-ph .it-ic{width:96px;height:96px}
-.sh-card{display:flex;flex-direction:column;max-height:100%;overflow:hidden}.sh-body{flex:1 1 auto;min-height:0;overflow-y:auto;margin:0 -2px;padding:0 2px}.sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
+.sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: '철물점 문을 열고 들어간다.' }, { role: 'char', data: CHAR_TEXT }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
@@ -124,7 +124,7 @@ for (const vp of ['pc', 'phone']) {
   await closeWin(page); await sleep(200);
   await page.evaluate(() => { for (const el of document.body.querySelectorAll('*')) { if (el.children.length === 0 && /ANOMALY SIMULATION/.test(el.textContent || '')) { let n = el; while (n && n !== document.body && getComputedStyle(n).position !== 'fixed') n = n.parentElement; if (n && n !== document.body) n.style.display = 'none'; } } });
   const chat = `<div class="sh-chat"><div class="sh-msg sh-user"><div class="sh-ava"></div><div class="sh-txt">철물점 문을 열고 들어간다.</div></div><div class="sh-msg chat-message-container"><div class="sh-ava"></div><div class="sh-txt risu-chat">${statusHtml.replace(/\n/g, '<br>')}${chatCard(palette)}</div></div><div class="sh-input"><div></div></div></div>`;
-  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'ask', 'talk', 'noface', 'loading'] : ['chat', 'grid', 'detail', 'ask', 'talk'];
+  const modes = vp === 'pc' ? ['chat', 'grid', 'hover', 'detail', 'poor', 'ask', 'talk', 'noface', 'loading', 'many'] : ['chat', 'grid', 'detail', 'ask', 'talk'];
   for (const mode of modes) {
     await page.evaluate(({ chat, pop }) => {
       document.querySelectorAll('.gx').forEach((g) => { if (!g.classList.contains('sh-wrap')) g.style.display = 'none'; });
