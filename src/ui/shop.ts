@@ -118,10 +118,13 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
     <span class="it-ic">${ITEM_ICONS[it.kind]}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
 }
 
+/** 주인 사진이 없을 때 기본 얼굴: 어둠 속 역광 그림자 (사용자 11-07, 후보 C). 성별·옷·얼굴을 알 수 없는 형체만 */
+const SHADOW_FACE = '<svg class="sh-shadow" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="shg" cx="50%" cy="100%" r="90%"><stop offset="0" stop-color="#232329"/><stop offset="1" stop-color="#070709"/></radialGradient><filter id="shf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs><rect width="100" height="100" fill="url(#shg)"/><g filter="url(#shf)" fill="#040405" opacity=".95"><ellipse cx="50" cy="40" rx="16" ry="18"/><path d="M10 100 C12 72 30 62 50 62 C70 62 88 72 90 100Z"/></g></svg>';
+
 /** 주인 칸: PC = 사진 128 + 이름·대사·입력창 / 폰 서랍 = 사진 56 + 이름 머리 → 대사 상자(꽉 차면 안에서 스크롤, 새 대사가 아래) → 입력창 */
 function ownerHtml(ctx: ChatContext, st: ShopState, drawer: boolean): string {
   const url = ownerFace(ctx, st.owner);
-  const face = `<span class="sh-face${url ? '' : ' none'}">${url ? `<img src="${esc(url)}" alt="">` : ICONS.person}</span>`;
+  const face = `<span class="sh-face${url ? '' : ' none'}">${url ? `<img src="${esc(url)}" alt="">` : SHADOW_FACE}</span>`;
   const name = `<div class="sh-dlg-name">${esc(st.owner || '주인')}<small>${esc(st.shop)}</small></div>`;
   const lines = st.talk.length
     ? st.talk.map((l) => (l.who === 'me' ? `<p class="me">${esc(l.text)}</p>` : `<p>「${esc(l.text)}」</p>`)).join('')

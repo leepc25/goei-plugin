@@ -3206,6 +3206,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-face { flex: none; width: 128px; border-radius: var(--rc); overflow: hidden; border: 1px solid var(--line); background: var(--void); display: grid; place-items: center; color: var(--dim); }
 .sh-face img { width: 100%; height: calc(100% - 12px); margin-top: 12px; object-fit: cover; object-position: top; }
 .sh-face svg { width: 36px; height: 36px; }
+.sh-face .sh-shadow, .sh-ov-head .sh-face .sh-shadow { width: 100%; height: 100%; display: block; }
 .sh-dlg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .sh-dlg-name { display: flex; align-items: baseline; gap: 10px; height: 24px; font-size: 15px; font-weight: 700; color: var(--text); }
 .sh-dlg-name small { font-size: 12.5px; font-weight: 500; color: var(--dim); }
