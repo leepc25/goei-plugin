@@ -461,11 +461,9 @@ export function parseTalk(raw: string): TalkReply {
 
 // ── 적용 (정체 밖 물건은 버린다) ──
 
-/** 가게 정체에 맞는 물건만. 값대는 여유 있게(절반~두 배) 본다 — 가게에 비싼 물건 하나쯤은 있을 수 있다 */
+/** 가게 정체에 맞는 물건만: 파는 종류인지만 본다. 값은 모델이 가게 특성대로 정한 그대로 (사용자 11-07: 값대로 거르지 말 것) */
 export function fitsIdentity(it: Pick<ShopItem, 'kind' | 'price'>, id: ShopIdentity): boolean {
-  if (id.sells.length && !id.sells.includes(it.kind)) return false;
-  if (id.min > 0 && id.max > 0 && (it.price < id.min / 2 || it.price > id.max * 2)) return false;
-  return true;
+  return !id.sells.length || id.sells.includes(it.kind);
 }
 
 const itemId = (key: string, name: string, n: number) => `s_${hash(`${key}|${normName(name)}|${n}`)}`;
@@ -484,7 +482,7 @@ function withIds(st: ShopState, list: Omit<ShopItem, 'id'>[], exclude: ShopItem[
       rare = true;
     }
     // 희귀는 가게 값대를 넘어도 된다 (종류만 본다)
-    if (!fitsIdentity(it.tag === 'rare' ? { kind: it.kind, price: st.identity.min || 0 } : it, st.identity)) continue;
+    if (!fitsIdentity(it, st.identity)) continue;
     if (out.some((x) => sameShopName(x.name, it.name)) || exclude.some((x) => sameShopName(x.name, it.name))) continue;
     out.push({ ...it, id: itemId(st.key, it.name, out.length + exclude.length) });
   }
@@ -616,6 +614,7 @@ const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
     'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
     s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
     s.price ? `Price guide from the player: ${s.price}` : 'Prices should feel like real Korean prices for that kind of shop.',
+    'Price each item by its own worth and this shop\'s character (who the owner is, what the place is, how it gets its goods) — price_range only describes the usual; a piece may sit well outside it when it warrants. No program checks the prices.',
     s.avoidPrev && st.prev.length ? `Previously shown here (do not repeat): ${st.prev.join(', ')}` : '',
   ].filter(Boolean).join('\n');
 };

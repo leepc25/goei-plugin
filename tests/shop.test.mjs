@@ -41,7 +41,7 @@ test('응답 처리: 새 가게는 새 판, 같은 가게는 그대로, 표식 �
   assert.equal(currentShop({ ...c3, scriptstate: shopVars(st2) }), null);
 });
 
-test('진열대 응답: 정체 블록·주인 대사·물건 줄. 정체 밖(종류·값대)은 버린다', () => {
+test('진열대 응답: 정체 블록·주인 대사·물건 줄. 정체 밖(파는 종류 아님)은 버린다, 값은 거르지 않음', () => {
   const r = parseShelf(SHELF, null);
   assert.deepEqual(r.identity.sells, ['tool', 'consumable']);
   assert.equal(r.identity.min, 1000);
@@ -51,7 +51,8 @@ test('진열대 응답: 정체 블록·주인 대사·물건 줄. 정체 밖(종
   const st = applyShelf(st0, r, shopSettings({}));
   assert.deepEqual(shelfItems(st).map((x) => x.name), ['손전등', '생수']);
   assert.equal(st.talk[0].text, '뭐 찾소.');
-  assert.equal(fitsIdentity({ kind: 'tool', price: 100001 }, st.identity), false);
+  assert.equal(fitsIdentity({ kind: 'tool', price: 100001 }, st.identity), true, '값대 밖이어도 파는 종류면 남김');
+  assert.equal(fitsIdentity({ kind: 'valuable', price: 1000 }, st.identity), false);
   assert.throws(() => parseShelf('<shelf>\n이름만\n</shelf>', null), /물건 줄/);
   assert.throws(() => parseShelf('<owner>a</owner>\n<shelf>\n손전등|1000|tool||\n</shelf>', null), /shop-identity/);
   // 새로고침: 정체는 그대로, 지난 진열대는 prev 로
@@ -128,13 +129,13 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
 });
 
 // 2026-11-07 사용자: 희귀는 단 하나·따로 화려한 칸, 특가는 원래 값에 줄 긋기, 분량은 최소·최대
-test('구분: 희귀 단 하나(값대 넘어도 됨, 둘째부터 보통), 특가는 원래 값이 더 클 때만, 분량 최소·최대·옛 구간', () => {
+test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 더 클 때만, 분량 최소·최대·옛 구간', () => {
   const raw = '<shop-identity>\nsells: tool\nnever: x\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>자.</owner>\n<shelf>\n황동 나침반|900000|tool|괴이를 가리킨다||희귀\n은 손전등|200000|tool|||레어\n줄자|3000|tool|||특가:5000\n망치|9000|tool|||특가:8000\n끌|4000|tool|||할인：6,000원\n</shelf>';
   const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: [], never: '', prices: '', min: 0, max: 0 }, loaded: false, items: [], talk: [], prev: [], sales: [], closed: false, sell: null };
   const st = applyShelf(st0, parseShelf(raw, null), shopSettings({}));
   const by = (n) => st.items.find((x) => x.name === n);
   assert.equal(by('황동 나침반').tag, 'rare', '희귀는 값대 두 배를 넘어도 남는다');
-  assert.equal(by('은 손전등'), undefined, '둘째 희귀는 보통 물건이 되어 값대 검사에 걸려 빠진다');
+  assert.equal(by('은 손전등').tag, undefined, '둘째 희귀는 보통 물건으로 남는다(값은 거르지 않음)');
   assert.deepEqual([by('줄자').tag, by('줄자').was], ['sale', 5000]);
   assert.equal(by('망치').tag, undefined, '원래 값이 더 싸면 특가 아님');
   assert.deepEqual([by('끌').tag, by('끌').was], ['sale', 6000]);
