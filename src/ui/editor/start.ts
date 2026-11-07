@@ -74,12 +74,14 @@ function membersBlock(code: string, d: Directory): string {
     .map((a) => {
       const saved = agentSceneSaved(a.id, d.scenes);
       // 기본 글(세계 자료 팩)이 없는 인물은 「없음」으로 — 11-05 캡처에서 글이 없는데도 「기본 글」이라 적혀 있었다
-      const hasDefault = !!agentScene(a.id, undefined);
+      const def = agentScene(a.id, undefined);
+      const hasDefault = !!def;
+      // 11-07 사용자: 「기본 글」이라면서 칸이 비어 있음 → 기본 글을 칸에 그대로 보인다. 고치면 저장값, 기본 글과 같거나 비우면 저장값을 지운다(directoryInput ascene:)
       const k = (f: string) => `ascene:${a.id}|${f}`;
-      return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en ? '직접 쓴 글' : hasDefault ? '기본 글' : '첫 장면 없음'}</small></summary>
-        ${input(k('label'), saved?.label ?? '', '제목', hasDefault ? '비우면 기본 제목으로 돌아가요. 시작 화면 첫 장면 칸에 보여요' : '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
-        ${area(k('ko'), saved?.ko ?? '', '한국어', 6, hasDefault ? '비우면 기본 글(세계 자료)로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
-        ${area(k('en'), saved?.en ?? '', 'English', 6, hasDefault ? '비우면 기본 글로 돌아가요' : '')}
+      return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en || saved?.label ? '직접 고친 글' : hasDefault ? '기본 글' : '첫 장면 없음'}</small></summary>
+        ${input(k('label'), saved?.label ?? def?.label ?? '', '제목', '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
+        ${area(k('ko'), saved?.ko ?? def?.ko ?? '', '한국어', 10, hasDefault ? '기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
+        ${area(k('en'), saved?.en ?? def?.en ?? '', 'English', 10, hasDefault ? '기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '')}
       </details>`;
     })
     .join('');

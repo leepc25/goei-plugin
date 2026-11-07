@@ -11,7 +11,7 @@ import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, person
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
-import { CUSTOM_FM, factionScenes, nextCustomFm } from '../core/scenes';
+import { CUSTOM_FM, agentScene, factionScenes, nextCustomFm } from '../core/scenes';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { imageUrl, picAvatar } from './images';
 import { ICONS } from './icons';
@@ -860,7 +860,10 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     if (!id || !(field === 'ko' || field === 'en' || field === 'label')) return;
     const rows = (d.scenes.인물 ??= {});
     const row = (rows[id] ??= {});
-    if (value.trim()) row[field] = value;
+    // 기본 글(세계 자료 팩)과 같으면 저장값을 두지 않는다 (편집 칸이 기본 글을 그대로 보여 주므로, 11-07)
+    const def = agentScene(id, undefined);
+    const same = def ? (field === 'label' ? value.trim() === def.label : value === def[field]) : false;
+    if (value.trim() && !same) row[field] = value;
     else delete row[field];
     if (!Object.keys(row).length) delete rows[id];
     dirUi.done = '';
