@@ -2,6 +2,7 @@
 // (goei-data-world.json + goei-data-world.N.txt, goei-data-install.*) 으로 받는다. 빌드(scripts/build.mjs)가 팩마다 지문을 여기 박아 두어
 // 본체는 자기와 맞는 자료만 쓴다 (판이 다르면 다시 받음). 받기·저장은 host/datapack.ts, 여기는 순수 계산(지문 비교·형식 검사·넣기).
 import { setInstallData } from './install';
+import { makeIconIndex, normIcon } from './iconmatch';
 import { textHash } from './texthash';
 import { setWorldData } from './world/records';
 
@@ -106,118 +107,12 @@ export interface ItemIconPack {
   find: (name: string, icon?: string) => string | null;
 }
 
-/** 이름 비교용 (match_icon.mjs normIcon 과 같게): 소문자, 한글·영어·숫자 말고는 띄어쓰기로 */
-export const normIcon = (s: unknown) => String(s ?? '').toLowerCase().replace(/[^0-9a-z가-힣]+/g, ' ').trim();
+export { normIcon } from './iconmatch';
 
-const ICON_MIN = 0.42; // 이보다 낮으면 공통 그림
-const ICON_A = 0.7; // 물건 쪽 조각이 줄에 없을 때 깎는 몫
-const ICON_B = 0.3; // 줄 쪽 조각이 물건에 없을 때 깎는 몫 — 줄이 물건 이름을 다 덮으면(표본병 → 괴이 표본 병) 덜 깎임
-const ICON_NAME_W = 0.2; // 그림 찾기 낱말이 있으면 그것으로 고르고, 이름은 비슷한 점수를 가르는 데만
-const ICON_HEAD_MISS = 0.65; // 이름의 마지막 글자(몸통)가 줄에 없으면 — 위장복 → 위, 가죽 장갑 → 가죽 장부
-const ICON_TAIL = 0.15; // 이름의 끝 말이 같을 때 덤(드물수록 큼). 낱말에는 안 씀 — acupuncture kit 이 kit 로 끌려가지 않게
-const ICON_MOD_W = 0.5; // 꾸밈말(뒤에 낱말이 더 오고 끝 받침 ㄴ: 속삭이는, 피 묻은, 녹슨) 무게
-
-interface IconFrags { set: Map<string, number>; tail: string; last: string; w: number }
-
-const isModWord = (wd: string) => wd.length >= 2 && (wd.charCodeAt(wd.length - 1) - 0xac00) % 28 === 4;
-
-/** 조각 → 배수. tail = 끝 말(한글 두 글자·영어 낱말), last = 마지막 글자·낱말 */
-function iconFrags(s: string): Omit<IconFrags, 'w'> {
-  const out = new Map<string, number>();
-  const put = (f: string, m: number) => out.set(f, Math.max(out.get(f) ?? 0, m));
-  let tail = '';
-  let last = '';
-  for (const p of normIcon(s).match(/[가-힣]+(?: +[가-힣]+)*|[0-9a-z]+/g) ?? []) {
-    if (/[가-힣]/.test(p)) {
-      const words = p.split(' ');
-      const c = words.join('');
-      const mult: number[] = [];
-      words.forEach((wd, i) => {
-        const m = i < words.length - 1 && isModWord(wd) ? ICON_MOD_W : 1;
-        for (let j = 0; j < wd.length; j++) mult.push(m);
-      });
-      for (let i = 0; i < c.length; i++) {
-        put(c[i], mult[i]);
-        if (i + 1 < c.length) put(c.slice(i, i + 2), Math.max(mult[i], mult[i + 1]));
-      }
-      tail = c.length > 1 ? c.slice(-2) : c;
-      last = c.slice(-1);
-    } else {
-      const w = p.length > 3 && p.endsWith('s') && !p.endsWith('ss') ? p.slice(0, -1) : p;
-      put(w, 1);
-      tail = w;
-      last = w;
-    }
-  }
-  return { set: out, tail, last };
-}
-
-/** 표 → 찾기 함수 (match_icon.mjs makeIconIndex) */
+/** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
 function makeIconFind(table: ItemIconRow[], rep: Record<string, string>): (name: string, icon?: string) => string | null {
-  const df = new Map<string, number>();
-  const items = table.map((r) => {
-    const ps = [...new Set([...r.k, ...r.h].map(normIcon).filter(Boolean))].map((t) => ({ t, ...iconFrags(t), w: 0 })).filter((p) => p.set.size);
-    const all = new Set<string>();
-    for (const p of ps) for (const f of p.set.keys()) all.add(f);
-    for (const f of all) df.set(f, (df.get(f) ?? 0) + 1);
-    return { file: r.f, ps };
-  });
-  const N = items.length || 1;
-  const idf = (f: string) => Math.log(1 + N / (df.get(f) || 0.5));
-  const idfMax = Math.log(1 + N / 0.5);
-  const sum = (m: Map<string, number>) => {
-    let a = 0;
-    for (const [f, x] of m) a += idf(f) * x;
-    return a;
-  };
-  for (const it of items) for (const p of it.ps) p.w = sum(p.set);
-  const score = (q: IconFrags, it: (typeof items)[number], isName: boolean) => {
-    let best = 0;
-    let by = '';
-    for (const p of it.ps) {
-      let c = 0;
-      for (const [f, x] of p.set) {
-        const y = q.set.get(f);
-        if (y) c += idf(f) * Math.min(x, y);
-      }
-      if (!c) continue;
-      let s = c / (c + ICON_A * (q.w - c) + ICON_B * (p.w - c));
-      if (isName) {
-        if (q.tail && q.tail === p.tail) s += (ICON_TAIL * idf(q.tail)) / idfMax;
-        if (q.last && !p.set.has(q.last)) s *= ICON_HEAD_MISS;
-      }
-      if (s > best) (best = s), (by = p.t);
-    }
-    return { s: best, by };
-  };
-  const query = (s: string | undefined): IconFrags | null => {
-    if (!s) return null;
-    const q = iconFrags(s);
-    return q.set.size ? { ...q, w: sum(q.set) } : null;
-  };
-  const none = { s: 0, by: '' };
-  const pick = (qn: IconFrags | null, qi: IconFrags | null): string | null => {
-    let best: { file: string; total: number; score: number; isRep: number } | null = null;
-    for (const it of items) {
-      const a = qn ? score(qn, it, true) : none;
-      const b = qi ? score(qi, it, false) : none;
-      const top = qi ? b.s : a.s;
-      if (!top) continue;
-      const total = qi ? b.s + ICON_NAME_W * a.s : a.s;
-      // 같은 점수면 그 말의 대표 그림(head_rep)
-      const isRep = rep[a.by] === it.file || rep[b.by] === it.file ? 1 : 0;
-      if (!best || total > best.total + 1e-9 || (Math.abs(total - best.total) <= 1e-9 && isRep > best.isRep)) best = { file: it.file, total, score: top, isRep };
-    }
-    return best && best.score >= ICON_MIN ? best.file : null;
-  };
-  return (name, icon) => {
-    // 이름·낱말이 몸통 말 그 자체면 그 말의 대표 그림(방패 → 진압 방패)
-    const r = rep[normIcon(icon)] ?? rep[normIcon(name)];
-    if (r) return r;
-    const qn = query(name);
-    const qi = query(icon);
-    return (qi && pick(qn, qi)) || (qn && pick(qn, null)) || null;
-  };
+  const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h] })), rep);
+  return (name, icon) => m(name, icon)?.file ?? null;
 }
 
 /** 소지품 그림 팩 글을 푼다. 형식이 다르면 던진다 */
