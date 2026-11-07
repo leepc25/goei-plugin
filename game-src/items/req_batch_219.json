@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "천사 고리 머리띠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a headband with a glowing golden halo floating above it on a wire, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낙하산 배낭",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a packed parachute backpack with a ripcord handle and harness straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "칼날 나오는 구두",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather dress shoe with a small blade sticking out of the toe, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "독 반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold ring with a large hinged gem lid opening to a hidden poison compartment, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈서용 가시 반지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin silver ring with a single sharp thorn pointing inward, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반쪽 하트 목걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace with half of a broken silver heart pendant, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방한 벙어리장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick padded black winter mittens, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손목 갈고리 발사기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a near-future wrist grappling hook launcher with a coiled cable, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성수병 벨트",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown leather belt with three small glass holy water vials with cross stoppers, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "네잎클로버",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a four-leaf clover pressed in a small clear laminated card, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "칼 꽂는 요대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wide black waist belt with several short knives tucked in sheaths around it, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발가락 반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain silver toe ring, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오색 천 허리띠",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a waist sash braided from five colored cloth strips, red blue yellow white black, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뒤꽂이",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean traditional hair pin ornament with a jade flower on top, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전술 바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. dark grey tactical cargo pants with built-in knee pads, laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "등 칼집",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long sword sheath on a diagonal back strap harness, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

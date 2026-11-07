@@ -36,7 +36,7 @@ test('띄어쓰기만 다른 것', () => {
   is('케이블타이', '', '케이블 타이');
   is('SD카드', '', 'SD 카드');
   is('돋보기 안경', '', '돋보기안경');
-  is('이어피스', '', '무선 이어피스');
+  is('무선 이어피스', '', '무선 이어피스');
 });
 
 test('비슷한 이름·다른 이름', () => {
@@ -56,7 +56,7 @@ test('비슷한 이름·다른 이름', () => {
 });
 
 test('그림 찾기 낱말이 이름보다 먼저', () => {
-  is('침술 키트', 'acupuncture kit', '침');
+  is('침술 키트', 'acupuncture needles', '침');
   is('속삭이는 거울', 'hand mirror', '손거울');
   is('가스마스크', 'gas mask', '방독면');
   is('정체 모를 것', 'wristwatch', '손목시계');
@@ -64,10 +64,10 @@ test('그림 찾기 낱말이 이름보다 먼저', () => {
 });
 
 test('몸통 말 먼저: 꾸밈말에 끌려가지 않음 (11-07 사용자 지적)', () => {
-  is('', 'pump shotgun', '산탄총');
+  is('', 'pump shotgun', '펌프 산탄총'); // 펌프 그림(성인용품)으로 가지 않음
   is('', 'old mask', '가면');
   is('', 'old leather bag', '가방');
-  is('데린저', 'derringer pistol', '권총');
+  is('리버레이터', 'liberator pistol', '권총'); // 표에 없는 이름도 낱말 끝(종류 말)으로
   is('낡은 침', '', '침');
   is('낡은 향', '', '향');
   is('낡은 무전기', '', '무전기');
@@ -81,7 +81,7 @@ test('몸통 말 먼저: 꾸밈말에 끌려가지 않음 (11-07 사용자 지�
 });
 
 test('흔한 조각만 맞거나 아무것도 안 맞으면 공통 그림', () => {
-  for (const n of ['녹슨 심령 침술 키트', '전혀 모르는 ㅁㄴㅇ', '위장복', '']) assert.equal(matchItemIcon(pack, n), pack.base.misc, n);
+  for (const n of ['침술 키트', '녹슨 심령 침술 키트', '전혀 모르는 ㅁㄴㅇ', '리버레이터', '']) assert.equal(matchItemIcon(pack, n), pack.base.misc, n);
 });
 
 test('game-src/items/match_icon.mjs 와 플러그인이 같은 답', () => {

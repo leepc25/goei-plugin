@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "쇠 발 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel sabaton, armored plate boot, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기충격 장갑",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black glove with metal knuckle contacts and small blue electric sparks, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠 건틀릿",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval steel plate gauntlet with articulated fingers, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가슴장화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. dark green chest waders, rubber boots joined to waterproof overalls with suspenders, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은 사슬 셔츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shirt made of shining silver chainmail rings, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "박쥐 브로치",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black enamel brooch shaped like a bat with red gem eyes, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진압복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a full black riot armor suit with chest, shoulder, arm and leg plates, front view, empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "응급 파우치",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red belt-mounted first aid pouch with a white cross patch, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "청력 보호 귀덮개",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of bright orange hearing protection ear muffs on a headband, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "물주머니 배낭",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim hydration backpack with a drinking tube, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성기사 투구",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver knight great helm with a cross-shaped eye slit, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "떨잠",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean Joseon trembling hair ornament with silver butterflies on springs and jade, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 팔찌",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wide brown leather wrist cuff bracelet with snaps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스프링 신발",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of near-future boots with metal spring coils under the soles, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "굵은 금 체인",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick heavy gold chain necklace, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두정갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean Joseon brigandine armor coat of dark red cloth studded with brass rivets, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

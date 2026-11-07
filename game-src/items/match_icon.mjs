@@ -6,7 +6,7 @@
 //    - 꾸밈말이 하나도 안 맞았는데 몸통 말 하나로 된 그림이 없으면(키트·상자처럼 저마다 다른 특수 물건뿐) 쓰지 않음 — 「침술 키트」가 양초 키트로 가지 않게
 // ② 조각 단계: ①에서 못 찾으면 글자 조각 점수(아래 makeFragIndex). 성수 → 성수병, 방검복 → 방검 조끼 같은 것
 // ③ 둘 다 못 찾으면 공통 그림.
-export const ICON_MIN = 0.42; // 이보다 낮으면 공통 그림
+export const ICON_MIN = 0.7; // 조각 단계에서 이보다 낮으면 공통 그림 (몸통 단계에서 못 찾은 것이라 엄하게 — 리버레이터가 성인용품으로, 침술 키트가 양초 키트로 가지 않게)
 // 물건 쪽 조각이 줄에 없으면 A, 줄 쪽 조각이 물건에 없으면 B 만큼 깎음 — 줄이 물건 이름을 다 덮으면(표본병 → 괴이 표본 병) 덜 깎임
 const A = 0.7, B = 0.3;
 // 그림 찾기 낱말이 있으면 그것으로 고르고, 이름은 같은 점수 근처를 가르는 데만 씀
@@ -198,7 +198,7 @@ export function makeIconIndex(rows, rep = {}) {
     // 낱말·이름 둘 다 보고 더 확실한 쪽: 표의 말과 같음 > 꾸밈말까지 맞음 > 몸통만 맞음 (같으면 낱말). kukri knife 이 식칼로 가지 않고 이름 「쿠크리」로
     const rank = h => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
     const hi = icon ? head(icon) : null, hn = name ? head(name) : null;
-    const h = rank(hn) > rank(hi) ? hn : hi || hn;
+    const h = rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn; // 둘 다 표의 말과 같으면 이름 (염소 가면 | goat mask → 염소 가면)
     if (h) return { file: h.file, score: 1 };
     return frag(name, icon);
   };

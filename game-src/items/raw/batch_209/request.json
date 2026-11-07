@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact black carbine rifle with a short barrel and folding stock, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pump-action shotgun with a wooden fore-grip and long barrel, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a double-barrel break-action shotgun with a dark wooden stock, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a huge anti-materiel sniper rifle with a long barrel, muzzle brake, bipod and large scope, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a light machine gun with a bipod, carry handle and an ammunition box under it, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a modern black compound bow with pulley cams at both ends and taut strings, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny two-barrel derringer pistol with a pearl grip, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an antique flintlock pistol with brass fittings and a carved wooden grip, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old long musket with a wooden stock and iron barrel, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical combat knife with a serrated spine and rubber grip, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long wide jungle machete with a broad curved blade and wrapped handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical battle axe with a spiked back and a long synthetic handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved Middle Eastern scimitar sword with a wide crescent blade and ornate gold hilt, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Chinese guandao polearm with a big curved blade decorated with a dragon, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean Joseon hwando sword, slightly curved single-edged blade with a round guard, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel war hammer with a square head and a spike on the back, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "카빈",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact black carbine rifle with a short barrel and folding stock, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펌프 산탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pump-action shotgun with a wooden fore-grip and long barrel, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "더블배럴 산탄총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a double-barrel break-action shotgun with a dark wooden stock, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대물 저격총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a huge anti-materiel sniper rifle with a long barrel, muzzle brake, bipod and large scope, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "경기관총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a light machine gun with a bipod, carry handle and an ammunition box under it, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컴파운드 보우",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a modern black compound bow with pulley cams at both ends and taut strings, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "데린저",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny two-barrel derringer pistol with a pearl grip, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골동품 권총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an antique flintlock pistol with brass fittings and a carved wooden grip, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머스킷",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old long musket with a wooden stock and iron barrel, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전투 나이프",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical combat knife with a serrated spine and rubber grip, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정글도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long wide jungle machete with a broad curved blade and wrapped handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전투 도끼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical battle axe with a spiked back and a long synthetic handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시미터",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved Middle Eastern scimitar sword with a wide crescent blade and ornate gold hilt, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "청룡도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Chinese guandao polearm with a big curved blade decorated with a dragon, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "환도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean Joseon hwando sword, slightly curved single-edged blade with a round guard, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "워해머",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel war hammer with a square head and a spike on the back, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -12,7 +12,7 @@ export interface IconHit { file: string; score: number }
 const isMod = (wd: string) => wd.length >= 2 && (wd.charCodeAt(wd.length - 1) - 0xac00) % 28 === 4;
 
 // ── ② 조각 단계 ──
-const ICON_MIN = 0.42; // 이보다 낮으면 공통 그림
+const ICON_MIN = 0.7; // 조각 단계에서 이보다 낮으면 공통 그림 (몸통 단계에서 못 찾은 것이라 엄하게)
 const A = 0.7; // 물건 쪽 조각이 줄에 없을 때 깎는 몫
 const B = 0.3; // 줄 쪽 조각이 물건에 없을 때 깎는 몫
 const NAME_W = 0.2; // 그림 찾기 낱말이 있으면 그것으로 고르고, 이름은 비슷한 점수를 가르는 데만
@@ -211,7 +211,7 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {})
   return (name, icon) => {
     const hi = icon ? head(icon) : null;
     const hn = name ? head(name) : null;
-    const h = rank(hn) > rank(hi) ? hn : hi || hn;
+    const h = rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
     if (h) return { file: h.file, score: 1 };
     return frag(name, icon);
   };

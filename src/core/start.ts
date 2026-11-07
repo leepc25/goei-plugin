@@ -4,7 +4,7 @@ import { agentScene, factionScenes, sceneText } from './scenes';
 import { hasSceneCard, isSceneMessage, sceneMessage, UNSENT_MARK } from './dispatch';
 import { buildSeed } from './seed';
 import { readDirectory } from './world/directory';
-import { startItemsVars } from './startitems';
+import { startItemsVars } from './items';
 import type { Chat, ChatMessage, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
 import { manifestEntry } from './lorebooks';

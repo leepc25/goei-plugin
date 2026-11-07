@@ -70,6 +70,22 @@
   },
   {
    "keywords": [
+    "오색실 팔찌",
+    "five color thread bracelet"
+   ],
+   "file": "charm_149.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "오색실 팔찌",
+   "src": "game-src/items/raw/batch_220/13.png",
+   "head": [
+    "오색실 팔찌",
+    "five color thread bracelet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "떡갈비",
     "grilled short rib patties"
    ],
@@ -81,6 +97,40 @@
    "head": [
     "떡갈비",
     "grilled short rib patties"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "뇌파 차단 헬멧",
+    "mind shield helmet",
+    "brainwave blocking helmet"
+   ],
+   "file": "wear_305.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "뇌파 차단 헬멧",
+   "src": "game-src/items/raw/batch_221/03.png",
+   "head": [
+    "뇌파 차단 헬멧",
+    "mind shield helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "수중 호흡 마스크",
+    "rebreather mask",
+    "underwater breathing mask"
+   ],
+   "file": "wear_314.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "수중 호흡 마스크",
+   "src": "game-src/items/raw/batch_222/07.png",
+   "head": [
+    "수중 호흡 마스크",
+    "rebreather mask"
    ],
    "feats": []
   },
@@ -208,6 +258,39 @@
    "head": [
     "메주",
     "fermented soybean block"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "산탄총 탄띠",
+    "shotgun shell bandolier"
+   ],
+   "file": "wear_245.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "산탄총 탄띠",
+   "src": "game-src/items/raw/batch_214/13.png",
+   "head": [
+    "산탄총 탄띠",
+    "shotgun shell bandolier"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "은장도",
+    "eunjangdo",
+    "silver ornamental knife"
+   ],
+   "file": "weapon_186.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "은장도",
+   "src": "game-src/items/raw/batch_220/04.png",
+   "head": [
+    "은장도",
+    "eunjangdo"
    ],
    "feats": []
   },
@@ -435,6 +518,39 @@
    "head": [
     "혈압계",
     "blood pressure monitor"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "양압 방호복",
+    "positive pressure suit",
+    "biohazard suit"
+   ],
+   "file": "wear_264.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "양압 방호복",
+   "src": "game-src/items/raw/batch_216/11.png",
+   "head": [
+    "양압 방호복",
+    "positive pressure suit"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "은 사슬 셔츠",
+    "silver chainmail shirt"
+   ],
+   "file": "wear_280.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "은 사슬 셔츠",
+   "src": "game-src/items/raw/batch_218/05.png",
+   "head": [
+    "은 사슬 셔츠",
+    "silver chainmail shirt"
    ],
    "feats": []
   },
@@ -697,6 +813,70 @@
    "head": [
     "짬뽕",
     "spicy seafood noodles"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "더블배럴 산탄총",
+    "double barrel shotgun"
+   ],
+   "file": "weapon_162.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "더블배럴 산탄총",
+   "src": "game-src/items/raw/batch_209/03.png",
+   "head": [
+    "더블배럴 산탄총",
+    "double barrel shotgun"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가시 너클",
+    "spiked brass knuckles"
+   ],
+   "file": "weapon_176.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "가시 너클",
+   "src": "game-src/items/raw/batch_210/01.png",
+   "head": [
+    "가시 너클",
+    "spiked brass knuckles"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방열 장갑",
+    "heat resistant gloves"
+   ],
+   "file": "wear_257.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방열 장갑",
+   "src": "game-src/items/raw/batch_215/15.png",
+   "head": [
+    "방열 장갑",
+    "heat resistant gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가죽 팔찌",
+    "leather cuff bracelet"
+   ],
+   "file": "wear_286.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가죽 팔찌",
+   "src": "game-src/items/raw/batch_218/13.png",
+   "head": [
+    "가죽 팔찌",
+    "leather cuff bracelet"
    ],
    "feats": []
   },
@@ -1028,6 +1208,119 @@
    "head": [
     "굴비",
     "dried yellow croaker"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "제사상",
+    "ancestral rite table"
+   ],
+   "file": "misc_260.webp",
+   "kind": "misc",
+   "base": false,
+   "name": "제사상",
+   "src": "game-src/items/raw/batch_214/08.png",
+   "head": [
+    "제사상",
+    "ancestral rite table"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "악마 뿔 머리띠",
+    "devil horns headband"
+   ],
+   "file": "wear_263.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "악마 뿔 머리띠",
+   "src": "game-src/items/raw/batch_216/10.png",
+   "head": [
+    "악마 뿔 머리띠",
+    "devil horns headband"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "귀신 보는 안경",
+    "ghost seeing glasses",
+    "spirit glasses"
+   ],
+   "file": "device_176.webp",
+   "kind": "device",
+   "base": false,
+   "name": "귀신 보는 안경",
+   "src": "game-src/items/raw/batch_217/05.png",
+   "head": [
+    "귀신 보는 안경",
+    "ghost seeing glasses"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방검 셔츠",
+    "stab resistant shirt"
+   ],
+   "file": "wear_273.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방검 셔츠",
+   "src": "game-src/items/raw/batch_217/09.png",
+   "head": [
+    "방검 셔츠",
+    "stab resistant shirt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "손목 갈고리 발사기",
+    "wrist grappling hook"
+   ],
+   "file": "device_178.webp",
+   "kind": "device",
+   "base": false,
+   "name": "손목 갈고리 발사기",
+   "src": "game-src/items/raw/batch_219/08.png",
+   "head": [
+    "손목 갈고리 발사기",
+    "wrist grappling hook"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방검 바지",
+    "stab resistant pants"
+   ],
+   "file": "wear_306.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방검 바지",
+   "src": "game-src/items/raw/batch_221/04.png",
+   "head": [
+    "방검 바지",
+    "stab resistant pants"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "은실 장갑",
+    "silver thread gloves"
+   ],
+   "file": "charm_150.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "은실 장갑",
+   "src": "game-src/items/raw/batch_221/08.png",
+   "head": [
+    "은실 장갑",
+    "silver thread gloves"
    ],
    "feats": []
   },
@@ -1830,6 +2123,138 @@
    "head": [
     "침",
     "acupuncture needles"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전술 장갑",
+    "tactical gloves",
+    "cut-resistant glove",
+    "방검 장갑"
+   ],
+   "file": "wear_065.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전술 장갑",
+   "src": "game-src/items/raw/batch_13/02.png",
+   "head": [
+    "전술 장갑",
+    "tactical gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "대물 저격총",
+    "anti-materiel rifle"
+   ],
+   "file": "weapon_163.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "대물 저격총",
+   "src": "game-src/items/raw/batch_209/04.png",
+   "head": [
+    "대물 저격총",
+    "anti-materiel rifle"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "공기호흡기",
+    "SCBA",
+    "breathing apparatus"
+   ],
+   "file": "wear_247.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "공기호흡기",
+   "src": "game-src/items/raw/batch_215/01.png",
+   "head": [
+    "공기호흡기",
+    "SCBA"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "반쪽 하트 목걸이",
+    "half heart necklace"
+   ],
+   "file": "wear_290.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "반쪽 하트 목걸이",
+   "src": "game-src/items/raw/batch_219/06.png",
+   "head": [
+    "반쪽 하트 목걸이",
+    "half heart necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "피 담긴 병 목걸이",
+    "blood vial necklace"
+   ],
+   "file": "wear_297.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "피 담긴 병 목걸이",
+   "src": "game-src/items/raw/batch_220/08.png",
+   "head": [
+    "피 담긴 병 목걸이",
+    "blood vial necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방탄 하의",
+    "ballistic leg armor"
+   ],
+   "file": "wear_300.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방탄 하의",
+   "src": "game-src/items/raw/batch_220/14.png",
+   "head": [
+    "방탄 하의",
+    "ballistic leg armor"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방탄 안면 마스크",
+    "ballistic face mask"
+   ],
+   "file": "wear_307.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방탄 안면 마스크",
+   "src": "game-src/items/raw/batch_221/06.png",
+   "head": [
+    "방탄 안면 마스크",
+    "ballistic face mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소원 팔찌",
+    "friendship bracelet",
+    "wish bracelet"
+   ],
+   "file": "charm_151.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "소원 팔찌",
+   "src": "game-src/items/raw/batch_221/13.png",
+   "head": [
+    "소원 팔찌",
+    "friendship bracelet"
    ],
    "feats": []
   },
@@ -2790,6 +3215,152 @@
   },
   {
    "keywords": [
+    "성수 수류탄",
+    "holy water grenade"
+   ],
+   "file": "weapon_178.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "성수 수류탄",
+   "src": "game-src/items/raw/batch_210/05.png",
+   "head": [
+    "성수 수류탄",
+    "holy water grenade"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "폭발물 처리복",
+    "bomb disposal suit"
+   ],
+   "file": "wear_207.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "폭발물 처리복",
+   "src": "game-src/items/raw/batch_210/11.png",
+   "head": [
+    "폭발물 처리복",
+    "bomb disposal suit"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "위장복",
+    "camouflage uniform"
+   ],
+   "file": "wear_228.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "위장복",
+   "src": "game-src/items/raw/batch_212/02.png",
+   "head": [
+    "위장복",
+    "camouflage uniform"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "불경",
+    "sutra book",
+    "buddhist scripture"
+   ],
+   "file": "charm_129.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "불경",
+   "src": "game-src/items/raw/batch_214/05.png",
+   "head": [
+    "불경",
+    "sutra book"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소방 헬멧",
+    "firefighter helmet"
+   ],
+   "file": "wear_244.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "소방 헬멧",
+   "src": "game-src/items/raw/batch_214/12.png",
+   "head": [
+    "소방 헬멧",
+    "firefighter helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "수호천사 핀",
+    "guardian angel pin"
+   ],
+   "file": "charm_139.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "수호천사 핀",
+   "src": "game-src/items/raw/batch_217/06.png",
+   "head": [
+    "수호천사 핀",
+    "guardian angel pin"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "청력 보호 귀덮개",
+    "ear muffs",
+    "hearing protection"
+   ],
+   "file": "wear_283.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "청력 보호 귀덮개",
+   "src": "game-src/items/raw/batch_218/09.png",
+   "head": [
+    "청력 보호 귀덮개",
+    "ear muffs"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "호랑이 발톱 노리개",
+    "tiger claw norigae"
+   ],
+   "file": "charm_146.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "호랑이 발톱 노리개",
+   "src": "game-src/items/raw/batch_220/03.png",
+   "head": [
+    "호랑이 발톱 노리개",
+    "tiger claw norigae"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "역병 의사 가면",
+    "plague doctor mask"
+   ],
+   "file": "wear_301.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "역병 의사 가면",
+   "src": "game-src/items/raw/batch_220/15.png",
+   "head": [
+    "역병 의사 가면",
+    "plague doctor mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "머리카락 자라는 인형",
     "hair growing doll"
    ],
@@ -2811,7 +3382,10 @@
   {
    "keywords": [
     "금빛 청둥오리 가면",
-    "gold mallard mask"
+    "gold mallard mask",
+    "황금 청둥오리 가면",
+    "duck mask",
+    "mallard mask"
    ],
    "file": "wear_024.webp",
    "kind": "wear",
@@ -3767,6 +4341,203 @@
   },
   {
    "keywords": [
+    "경기관총",
+    "light machine gun"
+   ],
+   "file": "weapon_164.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "경기관총",
+   "src": "game-src/items/raw/batch_209/05.png",
+   "head": [
+    "경기관총",
+    "light machine gun"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방울칼",
+    "shaman bell knife"
+   ],
+   "file": "charm_123.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "방울칼",
+   "src": "game-src/items/raw/batch_210/03.png",
+   "head": [
+    "방울칼",
+    "shaman bell knife"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "금빛 돌고래 가면",
+    "gold dolphin mask"
+   ],
+   "file": "wear_225.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "금빛 돌고래 가면",
+   "src": "game-src/items/raw/batch_211/13.png",
+   "head": [
+    "금빛 돌고래 가면",
+    "gold dolphin mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "군용 배낭",
+    "military rucksack"
+   ],
+   "file": "wear_240.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "군용 배낭",
+   "src": "game-src/items/raw/batch_212/14.png",
+   "head": [
+    "군용 배낭",
+    "military rucksack"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "부적 목걸이",
+    "talisman necklace",
+    "amulet necklace"
+   ],
+   "file": "charm_124.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "부적 목걸이",
+   "src": "game-src/items/raw/batch_213/03.png",
+   "head": [
+    "부적 목걸이",
+    "talisman necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "부적 팔찌",
+    "talisman bracelet"
+   ],
+   "file": "charm_125.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "부적 팔찌",
+   "src": "game-src/items/raw/batch_213/04.png",
+   "head": [
+    "부적 팔찌",
+    "talisman bracelet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "샤프",
+    "mechanical pencil"
+   ],
+   "file": "paper_130.webp",
+   "kind": "paper",
+   "base": false,
+   "name": "샤프",
+   "src": "game-src/items/raw/batch_214/02.png",
+   "head": [
+    "샤프",
+    "mechanical pencil"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "부적 머리띠",
+    "talisman headband"
+   ],
+   "file": "charm_133.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "부적 머리띠",
+   "src": "game-src/items/raw/batch_215/16.png",
+   "head": [
+    "부적 머리띠",
+    "talisman headband"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "절연 장갑",
+    "insulating gloves",
+    "electrical gloves"
+   ],
+   "file": "wear_268.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "절연 장갑",
+   "src": "game-src/items/raw/batch_217/01.png",
+   "head": [
+    "절연 장갑",
+    "insulating gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "떨잠",
+    "tteoljam",
+    "trembling hairpin"
+   ],
+   "file": "valuable_064.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "떨잠",
+   "src": "game-src/items/raw/batch_218/12.png",
+   "head": [
+    "떨잠",
+    "tteoljam"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "뒤꽂이",
+    "dwikkoji",
+    "hair ornament pin"
+   ],
+   "file": "valuable_068.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "뒤꽂이",
+   "src": "game-src/items/raw/batch_219/14.png",
+   "head": [
+    "뒤꽂이",
+    "dwikkoji"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전술 고글",
+    "tactical goggles",
+    "ballistic goggles"
+   ],
+   "file": "wear_304.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전술 고글",
+   "src": "game-src/items/raw/batch_221/02.png",
+   "head": [
+    "전술 고글",
+    "tactical goggles"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "유리 등롱에 담긴 부적",
     "talisman lantern"
    ],
@@ -3889,7 +4660,9 @@
   {
    "keywords": [
     "격리 시설 출입증",
-    "containment pass"
+    "containment pass",
+    "access card",
+    "출입증"
    ],
    "file": "key_008.webp",
    "kind": "key",
@@ -4830,7 +5603,8 @@
    "keywords": [
     "방탄조끼",
     "방탄 조끼",
-    "bulletproof vest"
+    "bulletproof vest",
+    "ballistic vest"
    ],
    "file": "wear_011.webp",
    "kind": "wear",
@@ -5582,6 +6356,236 @@
     "키",
     "dustpan sieve",
     "winnowing basket"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "수첩",
+    "pocket notebook",
+    "planner",
+    "leather notebook",
+    "가죽 수첩"
+   ],
+   "file": "paper_003.webp",
+   "kind": "paper",
+   "base": false,
+   "name": "수첩",
+   "src": "game-src/items/raw/batch_40/10.png",
+   "head": [
+    "수첩",
+    "pocket notebook",
+    "planner"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "골동품 권총",
+    "flintlock pistol"
+   ],
+   "file": "weapon_167.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "골동품 권총",
+   "src": "game-src/items/raw/batch_209/08.png",
+   "head": [
+    "골동품 권총",
+    "flintlock pistol"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방탄 방패",
+    "ballistic shield"
+   ],
+   "file": "wear_203.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방탄 방패",
+   "src": "game-src/items/raw/batch_210/07.png",
+   "head": [
+    "방탄 방패",
+    "ballistic shield"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "어깨 권총집",
+    "shoulder holster"
+   ],
+   "file": "wear_237.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "어깨 권총집",
+   "src": "game-src/items/raw/batch_212/11.png",
+   "head": [
+    "어깨 권총집",
+    "shoulder holster"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "스탠드 마이크",
+    "stand microphone",
+    "stage microphone"
+   ],
+   "file": "device_174.webp",
+   "kind": "device",
+   "base": false,
+   "name": "스탠드 마이크",
+   "src": "game-src/items/raw/batch_214/01.png",
+   "head": [
+    "스탠드 마이크",
+    "stand microphone"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "시료통",
+    "sample container"
+   ],
+   "file": "seal_072.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "시료통",
+   "src": "game-src/items/raw/batch_214/09.png",
+   "head": [
+    "시료통",
+    "sample container"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "바포메트 펜던트",
+    "baphomet pendant"
+   ],
+   "file": "charm_134.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "바포메트 펜던트",
+   "src": "game-src/items/raw/batch_216/01.png",
+   "head": [
+    "바포메트 펜던트",
+    "baphomet pendant"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "경찰 근무 벨트",
+    "police duty belt"
+   ],
+   "file": "wear_269.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "경찰 근무 벨트",
+   "src": "game-src/items/raw/batch_217/03.png",
+   "head": [
+    "경찰 근무 벨트",
+    "police duty belt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "폭탄 목걸이",
+    "explosive collar",
+    "bomb collar"
+   ],
+   "file": "wear_270.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "폭탄 목걸이",
+   "src": "game-src/items/raw/batch_217/04.png",
+   "head": [
+    "폭탄 목걸이",
+    "explosive collar"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "경문 속적삼",
+    "sutra undershirt"
+   ],
+   "file": "charm_141.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "경문 속적삼",
+   "src": "game-src/items/raw/batch_217/13.png",
+   "head": [
+    "경문 속적삼",
+    "sutra undershirt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "깃털 귀걸이",
+    "feather earrings"
+   ],
+   "file": "wear_276.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "깃털 귀걸이",
+   "src": "game-src/items/raw/batch_217/16.png",
+   "head": [
+    "깃털 귀걸이",
+    "feather earrings"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "네잎클로버",
+    "four leaf clover"
+   ],
+   "file": "charm_143.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "네잎클로버",
+   "src": "game-src/items/raw/batch_219/10.png",
+   "head": [
+    "네잎클로버",
+    "four leaf clover"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "발소리 죽이는 덧신",
+    "silent overshoes"
+   ],
+   "file": "wear_298.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "발소리 죽이는 덧신",
+   "src": "game-src/items/raw/batch_220/11.png",
+   "head": [
+    "발소리 죽이는 덧신",
+    "silent overshoes"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "빛이 새는 선물 상자",
+    "glowing gift box"
+   ],
+   "file": "seal_079.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "빛이 새는 선물 상자",
+   "src": "game-src/items/raw/batch_222/15.png",
+   "head": [
+    "빛이 새는 선물 상자",
+    "glowing gift box"
    ],
    "feats": []
   },
@@ -6422,22 +7426,6 @@
    "head": [
     "돋보기안경",
     "reading glasses"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "전술 장갑",
-    "tactical gloves"
-   ],
-   "file": "wear_065.webp",
-   "kind": "wear",
-   "base": false,
-   "name": "전술 장갑",
-   "src": "game-src/items/raw/batch_13/02.png",
-   "head": [
-    "전술 장갑",
-    "tactical gloves"
    ],
    "feats": []
   },
@@ -7364,24 +8352,6 @@
   },
   {
    "keywords": [
-    "수첩",
-    "pocket notebook",
-    "planner"
-   ],
-   "file": "paper_003.webp",
-   "kind": "paper",
-   "base": false,
-   "name": "수첩",
-   "src": "game-src/items/raw/batch_40/10.png",
-   "head": [
-    "수첩",
-    "pocket notebook",
-    "planner"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
     "인감",
     "seal",
     "registered seal"
@@ -7603,6 +8573,232 @@
     "휴대용 버너(68회 덤)",
     "버너 2",
     "camping stove 2"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전술 헬멧",
+    "tactical helmet"
+   ],
+   "file": "wear_211.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전술 헬멧",
+   "src": "game-src/items/raw/batch_210/15.png",
+   "head": [
+    "전술 헬멧",
+    "tactical helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "열화상 고글",
+    "thermal goggles"
+   ],
+   "file": "wear_226.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "열화상 고글",
+   "src": "game-src/items/raw/batch_211/14.png",
+   "head": [
+    "열화상 고글",
+    "thermal goggles"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "마늘 목걸이",
+    "garlic necklace"
+   ],
+   "file": "charm_126.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "마늘 목걸이",
+   "src": "game-src/items/raw/batch_213/11.png",
+   "head": [
+    "마늘 목걸이",
+    "garlic necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "낚싯바늘 갈고리",
+    "giant fish hook"
+   ],
+   "file": "weapon_183.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "낚싯바늘 갈고리",
+   "src": "game-src/items/raw/batch_215/08.png",
+   "head": [
+    "낚싯바늘 갈고리",
+    "giant fish hook"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가죽 각반",
+    "leather gaiters"
+   ],
+   "file": "wear_252.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가죽 각반",
+   "src": "game-src/items/raw/batch_215/10.png",
+   "head": [
+    "가죽 각반",
+    "leather gaiters"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "사슬 장갑",
+    "chainmail glove"
+   ],
+   "file": "wear_260.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "사슬 장갑",
+   "src": "game-src/items/raw/batch_216/06.png",
+   "head": [
+    "사슬 장갑",
+    "chainmail glove"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "부적 그린 장갑",
+    "talisman gloves"
+   ],
+   "file": "charm_137.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "부적 그린 장갑",
+   "src": "game-src/items/raw/batch_216/14.png",
+   "head": [
+    "부적 그린 장갑",
+    "talisman gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "진압복",
+    "riot armor suit"
+   ],
+   "file": "wear_281.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "진압복",
+   "src": "game-src/items/raw/batch_218/07.png",
+   "head": [
+    "진압복",
+    "riot armor suit"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "응급 파우치",
+    "IFAK",
+    "first aid pouch"
+   ],
+   "file": "wear_282.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "응급 파우치",
+   "src": "game-src/items/raw/batch_218/08.png",
+   "head": [
+    "응급 파우치",
+    "IFAK"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "성수병 벨트",
+    "holy water belt"
+   ],
+   "file": "charm_142.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "성수병 벨트",
+   "src": "game-src/items/raw/batch_219/09.png",
+   "head": [
+    "성수병 벨트",
+    "holy water belt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "오색 천 허리띠",
+    "five color sash"
+   ],
+   "file": "charm_144.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "오색 천 허리띠",
+   "src": "game-src/items/raw/batch_219/13.png",
+   "head": [
+    "오색 천 허리띠",
+    "five color sash"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가시 왕관",
+    "crown of thorns"
+   ],
+   "file": "charm_145.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "가시 왕관",
+   "src": "game-src/items/raw/batch_220/02.png",
+   "head": [
+    "가시 왕관",
+    "crown of thorns"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "사슬 치마 갑옷",
+    "chainmail skirt"
+   ],
+   "file": "wear_296.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "사슬 치마 갑옷",
+   "src": "game-src/items/raw/batch_220/07.png",
+   "head": [
+    "사슬 치마 갑옷",
+    "chainmail skirt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방사선 선량계 배지",
+    "dosimeter badge",
+    "radiation badge"
+   ],
+   "file": "device_180.webp",
+   "kind": "device",
+   "base": false,
+   "name": "방사선 선량계 배지",
+   "src": "game-src/items/raw/batch_222/01.png",
+   "head": [
+    "방사선 선량계 배지",
+    "dosimeter badge"
    ],
    "feats": []
   },
@@ -10416,6 +11612,335 @@
   },
   {
    "keywords": [
+    "요원 정장",
+    "agent suit",
+    "anti-tear suit",
+    "방검 정장"
+   ],
+   "file": "wear_033.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "요원 정장",
+   "src": "game-src/items/raw/batch_11/02.png",
+   "head": [
+    "정장",
+    "suit"
+   ],
+   "feats": [
+    "요원",
+    "agent"
+   ]
+  },
+  {
+   "keywords": [
+    "정글도",
+    "jungle machete"
+   ],
+   "file": "weapon_170.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "정글도",
+   "src": "game-src/items/raw/batch_209/11.png",
+   "head": [
+    "정글도",
+    "jungle machete"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전투복",
+    "combat uniform"
+   ],
+   "file": "wear_227.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전투복",
+   "src": "game-src/items/raw/batch_212/01.png",
+   "head": [
+    "전투복",
+    "combat uniform"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가죽 장갑",
+    "leather gloves"
+   ],
+   "file": "wear_234.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가죽 장갑",
+   "src": "game-src/items/raw/batch_212/08.png",
+   "head": [
+    "가죽 장갑",
+    "leather gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "용접 장갑",
+    "welding gloves"
+   ],
+   "file": "wear_236.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "용접 장갑",
+   "src": "game-src/items/raw/batch_212/10.png",
+   "head": [
+    "용접 장갑",
+    "welding gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가터벨트 권총집",
+    "garter holster"
+   ],
+   "file": "wear_238.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가터벨트 권총집",
+   "src": "game-src/items/raw/batch_212/12.png",
+   "head": [
+    "가터벨트 권총집",
+    "garter holster"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "신분증 목걸이",
+    "ID lanyard",
+    "id card holder"
+   ],
+   "file": "key_068.webp",
+   "kind": "key",
+   "base": false,
+   "name": "신분증 목걸이",
+   "src": "game-src/items/raw/batch_213/10.png",
+   "head": [
+    "신분증 목걸이",
+    "ID lanyard"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "팥 주머니",
+    "red bean pouch"
+   ],
+   "file": "charm_128.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "팥 주머니",
+   "src": "game-src/items/raw/batch_213/13.png",
+   "head": [
+    "팥 주머니",
+    "red bean pouch"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "어깨 갑옷",
+    "pauldron",
+    "shoulder armor"
+   ],
+   "file": "wear_246.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "어깨 갑옷",
+   "src": "game-src/items/raw/batch_214/16.png",
+   "head": [
+    "어깨 갑옷",
+    "pauldron"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "드롭 레그 파우치",
+    "drop leg pouch"
+   ],
+   "file": "wear_254.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "드롭 레그 파우치",
+   "src": "game-src/items/raw/batch_215/12.png",
+   "head": [
+    "드롭 레그 파우치",
+    "drop leg pouch"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "짐승 이빨 목걸이",
+    "fang necklace",
+    "tooth necklace"
+   ],
+   "file": "wear_259.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "짐승 이빨 목걸이",
+   "src": "game-src/items/raw/batch_216/04.png",
+   "head": [
+    "짐승 이빨 목걸이",
+    "fang necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "무전 배낭",
+    "radio backpack"
+   ],
+   "file": "device_175.webp",
+   "kind": "device",
+   "base": false,
+   "name": "무전 배낭",
+   "src": "game-src/items/raw/batch_216/13.png",
+   "head": [
+    "무전 배낭",
+    "radio backpack"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "물주머니 배낭",
+    "hydration pack"
+   ],
+   "file": "wear_284.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "물주머니 배낭",
+   "src": "game-src/items/raw/batch_218/10.png",
+   "head": [
+    "물주머니 배낭",
+    "hydration pack"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "낙하산 배낭",
+    "parachute pack"
+   ],
+   "file": "wear_289.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "낙하산 배낭",
+   "src": "game-src/items/raw/batch_219/02.png",
+   "head": [
+    "낙하산 배낭",
+    "parachute pack"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전술 바지",
+    "tactical pants"
+   ],
+   "file": "wear_293.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전술 바지",
+   "src": "game-src/items/raw/batch_219/15.png",
+   "head": [
+    "전술 바지",
+    "tactical pants"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "십자가 귀걸이",
+    "cross earrings"
+   ],
+   "file": "charm_148.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "십자가 귀걸이",
+   "src": "game-src/items/raw/batch_220/09.png",
+   "head": [
+    "십자가 귀걸이",
+    "cross earrings"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "손목 석궁",
+    "wrist crossbow"
+   ],
+   "file": "weapon_187.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "손목 석궁",
+   "src": "game-src/items/raw/batch_221/14.png",
+   "head": [
+    "손목 석궁",
+    "wrist crossbow"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "검은 선물 상자",
+    "black gift box"
+   ],
+   "file": "seal_076.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "검은 선물 상자",
+   "src": "game-src/items/raw/batch_222/12.png",
+   "head": [
+    "검은 선물 상자",
+    "black gift box"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "작은 선물 상자",
+    "small gift box"
+   ],
+   "file": "seal_077.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "작은 선물 상자",
+   "src": "game-src/items/raw/batch_222/13.png",
+   "head": [
+    "작은 선물 상자",
+    "small gift box"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "둥근 선물 통",
+    "hat box",
+    "round gift box"
+   ],
+   "file": "seal_080.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "둥근 선물 통",
+   "src": "game-src/items/raw/batch_222/16.png",
+   "head": [
+    "둥근 선물 통",
+    "hat box"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "가면 동물, 주인 없음",
     "가면",
     "가면(동물, 주인 없음)",
@@ -12688,7 +14213,8 @@
   {
    "keywords": [
     "전자시계",
-    "digital clock"
+    "digital clock",
+    "digital watch"
    ],
    "file": "device_029.webp",
    "kind": "device",
@@ -14107,6 +15633,333 @@
     "mouth",
     "teeth"
    ]
+  },
+  {
+   "keywords": [
+    "은 단검",
+    "silver dagger"
+   ],
+   "file": "weapon_177.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "은 단검",
+   "src": "game-src/items/raw/batch_210/02.png",
+   "head": [
+    "은 단검",
+    "silver dagger"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전술 조끼",
+    "tactical vest"
+   ],
+   "file": "wear_204.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "전술 조끼",
+   "src": "game-src/items/raw/batch_210/08.png",
+   "head": [
+    "전술 조끼",
+    "tactical vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가죽 갑옷",
+    "leather armor"
+   ],
+   "file": "wear_206.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가죽 갑옷",
+   "src": "game-src/items/raw/batch_210/10.png",
+   "head": [
+    "가죽 갑옷",
+    "leather armor"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가죽 앞치마",
+    "leather apron"
+   ],
+   "file": "wear_233.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가죽 앞치마",
+   "src": "game-src/items/raw/batch_212/07.png",
+   "head": [
+    "가죽 앞치마",
+    "leather apron"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "구급 가방",
+    "first aid bag"
+   ],
+   "file": "medical_145.webp",
+   "kind": "medical",
+   "base": false,
+   "name": "구급 가방",
+   "src": "game-src/items/raw/batch_213/02.png",
+   "head": [
+    "구급 가방",
+    "first aid bag"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "변장 구슬",
+    "disguise bead",
+    "glass bead",
+    "유리 변장 구슬"
+   ],
+   "file": "anomaly_256.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "변장 구슬",
+   "src": "game-src/items/raw/batch_213/15.png",
+   "head": [
+    "변장 구슬",
+    "disguise bead"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "초코바",
+    "chocolate bar"
+   ],
+   "file": "food_379.webp",
+   "kind": "food",
+   "base": false,
+   "name": "초코바",
+   "src": "game-src/items/raw/batch_214/03.png",
+   "head": [
+    "초코바",
+    "chocolate bar"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "청동 거울",
+    "bronze mirror",
+    "동경"
+   ],
+   "file": "charm_131.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "청동 거울",
+   "src": "game-src/items/raw/batch_214/11.png",
+   "head": [
+    "청동 거울",
+    "bronze mirror"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "은팔찌",
+    "silver bangle"
+   ],
+   "file": "valuable_062.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "은팔찌",
+   "src": "game-src/items/raw/batch_214/14.png",
+   "head": [
+    "은팔찌",
+    "silver bangle"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방울 팔찌",
+    "bell bracelet"
+   ],
+   "file": "charm_132.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "방울 팔찌",
+   "src": "game-src/items/raw/batch_214/15.png",
+   "head": [
+    "방울 팔찌",
+    "bell bracelet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "부적 조끼",
+    "talisman vest"
+   ],
+   "file": "wear_249.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "부적 조끼",
+   "src": "game-src/items/raw/batch_215/03.png",
+   "head": [
+    "부적 조끼",
+    "talisman vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "깨진 병",
+    "broken bottle"
+   ],
+   "file": "weapon_182.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "깨진 병",
+   "src": "game-src/items/raw/batch_215/07.png",
+   "head": [
+    "깨진 병",
+    "broken bottle"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "엽전 목걸이",
+    "coin necklace"
+   ],
+   "file": "charm_138.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "엽전 목걸이",
+   "src": "game-src/items/raw/batch_217/02.png",
+   "head": [
+    "엽전 목걸이",
+    "coin necklace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "조선 투구",
+    "Joseon helmet"
+   ],
+   "file": "wear_274.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "조선 투구",
+   "src": "game-src/items/raw/batch_217/10.png",
+   "head": [
+    "조선 투구",
+    "Joseon helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "낭심 보호대",
+    "groin guard",
+    "cup protector"
+   ],
+   "file": "wear_275.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "낭심 보호대",
+   "src": "game-src/items/raw/batch_217/15.png",
+   "head": [
+    "낭심 보호대",
+    "groin guard"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "성기사 투구",
+    "great helm",
+    "knight helmet"
+   ],
+   "file": "wear_285.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "성기사 투구",
+   "src": "game-src/items/raw/batch_218/11.png",
+   "head": [
+    "성기사 투구",
+    "great helm"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "천사 고리 머리띠",
+    "halo headband"
+   ],
+   "file": "wear_288.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "천사 고리 머리띠",
+   "src": "game-src/items/raw/batch_219/01.png",
+   "head": [
+    "천사 고리 머리띠",
+    "halo headband"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "등 칼집",
+    "back scabbard"
+   ],
+   "file": "wear_294.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "등 칼집",
+   "src": "game-src/items/raw/batch_219/16.png",
+   "head": [
+    "등 칼집",
+    "back scabbard"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "짐승 이빨 귀걸이",
+    "fang earrings"
+   ],
+   "file": "wear_299.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "짐승 이빨 귀걸이",
+   "src": "game-src/items/raw/batch_220/12.png",
+   "head": [
+    "짐승 이빨 귀걸이",
+    "fang earrings"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "판지 상자",
+    "cardboard box",
+    "item box",
+    "아이템 상자"
+   ],
+   "file": "misc_261.webp",
+   "kind": "misc",
+   "base": true,
+   "name": "판지 상자",
+   "src": "game-src/items/raw/batch_222/10.png",
+   "head": [
+    "판지 상자",
+    "cardboard box"
+   ],
+   "feats": []
   },
   {
    "keywords": [
@@ -18497,6 +20350,344 @@
   },
   {
    "keywords": [
+    "펌프 산탄총",
+    "pump shotgun"
+   ],
+   "file": "weapon_161.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "펌프 산탄총",
+   "src": "game-src/items/raw/batch_209/02.png",
+   "head": [
+    "펌프 산탄총",
+    "pump shotgun"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "컴파운드 보우",
+    "compound bow"
+   ],
+   "file": "weapon_165.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "컴파운드 보우",
+   "src": "game-src/items/raw/batch_209/06.png",
+   "head": [
+    "컴파운드 보우",
+    "compound bow"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전투 나이프",
+    "combat knife"
+   ],
+   "file": "weapon_169.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "전투 나이프",
+   "src": "game-src/items/raw/batch_209/10.png",
+   "head": [
+    "전투 나이프",
+    "combat knife"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "후드 망토",
+    "hooded cloak"
+   ],
+   "file": "wear_232.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "후드 망토",
+   "src": "game-src/items/raw/batch_212/06.png",
+   "head": [
+    "후드 망토",
+    "hooded cloak"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "검은 장갑",
+    "black gloves"
+   ],
+   "file": "wear_235.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "검은 장갑",
+   "src": "game-src/items/raw/batch_212/09.png",
+   "head": [
+    "검은 장갑",
+    "black gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "숄더백",
+    "shoulder bag"
+   ],
+   "file": "wear_241.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "숄더백",
+   "src": "game-src/items/raw/batch_212/15.png",
+   "head": [
+    "숄더백",
+    "shoulder bag"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "자폭 조끼",
+    "suicide vest"
+   ],
+   "file": "weapon_180.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "자폭 조끼",
+   "src": "game-src/items/raw/batch_213/14.png",
+   "head": [
+    "자폭 조끼",
+    "suicide vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "타짜 카드",
+    "marked cards"
+   ],
+   "file": "misc_259.webp",
+   "kind": "misc",
+   "base": false,
+   "name": "타짜 카드",
+   "src": "game-src/items/raw/batch_213/16.png",
+   "head": [
+    "타짜 카드",
+    "marked cards"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "길리 슈트",
+    "ghillie suit"
+   ],
+   "file": "wear_250.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "길리 슈트",
+   "src": "game-src/items/raw/batch_215/06.png",
+   "head": [
+    "길리 슈트",
+    "ghillie suit"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "화관",
+    "flower crown"
+   ],
+   "file": "wear_258.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "화관",
+   "src": "game-src/items/raw/batch_216/03.png",
+   "head": [
+    "화관",
+    "flower crown"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "사제 영대",
+    "priest stole"
+   ],
+   "file": "charm_136.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "사제 영대",
+   "src": "game-src/items/raw/batch_216/05.png",
+   "head": [
+    "사제 영대",
+    "priest stole"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "광부 헬멧",
+    "miner helmet"
+   ],
+   "file": "wear_261.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "광부 헬멧",
+   "src": "game-src/items/raw/batch_216/08.png",
+   "head": [
+    "광부 헬멧",
+    "miner helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "수류탄 벨트",
+    "grenade belt"
+   ],
+   "file": "wear_265.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "수류탄 벨트",
+   "src": "game-src/items/raw/batch_216/12.png",
+   "head": [
+    "수류탄 벨트",
+    "grenade belt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "눈알 반지",
+    "eyeball ring"
+   ],
+   "file": "anomaly_259.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "눈알 반지",
+   "src": "game-src/items/raw/batch_217/14.png",
+   "head": [
+    "눈알 반지",
+    "eyeball ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전기충격 장갑",
+    "shock gloves",
+    "taser glove"
+   ],
+   "file": "weapon_184.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "전기충격 장갑",
+   "src": "game-src/items/raw/batch_218/02.png",
+   "head": [
+    "전기충격 장갑",
+    "shock gloves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "가슴장화",
+    "chest waders"
+   ],
+   "file": "wear_279.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "가슴장화",
+   "src": "game-src/items/raw/batch_218/04.png",
+   "head": [
+    "가슴장화",
+    "chest waders"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "스프링 신발",
+    "spring boots"
+   ],
+   "file": "device_177.webp",
+   "kind": "device",
+   "base": false,
+   "name": "스프링 신발",
+   "src": "game-src/items/raw/batch_218/14.png",
+   "head": [
+    "스프링 신발",
+    "spring boots"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "뱀 팔뚝 팔찌",
+    "snake armlet"
+   ],
+   "file": "valuable_069.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "뱀 팔뚝 팔찌",
+   "src": "game-src/items/raw/batch_220/10.png",
+   "head": [
+    "뱀 팔뚝 팔찌",
+    "snake armlet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "다용도 조끼",
+    "utility vest"
+   ],
+   "file": "wear_310.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "다용도 조끼",
+   "src": "game-src/items/raw/batch_221/15.png",
+   "head": [
+    "다용도 조끼",
+    "utility vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소매 숨긴 칼",
+    "hidden blade"
+   ],
+   "file": "weapon_188.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "소매 숨긴 칼",
+   "src": "game-src/items/raw/batch_222/03.png",
+   "head": [
+    "소매 숨긴 칼",
+    "hidden blade"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "나무 아이템 상자",
+    "wooden crate",
+    "item crate"
+   ],
+   "file": "seal_073.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "나무 아이템 상자",
+   "src": "game-src/items/raw/batch_222/08.png",
+   "head": [
+    "나무 아이템 상자",
+    "wooden crate"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "정체불명 길거리 음식",
     "길거리 음식",
     "street food"
@@ -20388,7 +22579,7 @@
    ],
    "file": "misc_001.webp",
    "kind": "misc",
-   "base": true,
+   "base": false,
    "name": "비닐봉지",
    "src": "game-src/items/raw/batch_03/07.png",
    "head": [
@@ -20396,7 +22587,8 @@
     "plastic bag",
     "봉지"
    ],
-   "feats": []
+   "feats": [],
+   "note": "11-07 사용자: 공통 그림은 판지 상자로 바꿈"
   },
   {
    "keywords": [
@@ -22631,6 +24823,399 @@
   },
   {
    "keywords": [
+    "흰 가운",
+    "lab coat",
+    "white coat",
+    "doctor coat",
+    "의사 가운",
+    "실험 가운",
+    "실험복"
+   ],
+   "file": "wear_030.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "흰 가운",
+   "src": "game-src/items/raw/batch_10/15.png",
+   "head": [
+    "흰 가운",
+    "lab coat",
+    "white coat"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소금탄",
+    "salt shells"
+   ],
+   "file": "weapon_179.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "소금탄",
+   "src": "game-src/items/raw/batch_210/06.png",
+   "head": [
+    "소금탄",
+    "salt shells"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "화학 방호복",
+    "hazmat suit"
+   ],
+   "file": "wear_208.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "화학 방호복",
+   "src": "game-src/items/raw/batch_210/12.png",
+   "head": [
+    "화학 방호복",
+    "hazmat suit"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "정강이 보호대",
+    "shin guards"
+   ],
+   "file": "wear_210.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "정강이 보호대",
+   "src": "game-src/items/raw/batch_210/14.png",
+   "head": [
+    "정강이 보호대",
+    "shin guards"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "마녀 망토",
+    "witch cloak"
+   ],
+   "file": "wear_231.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "마녀 망토",
+   "src": "game-src/items/raw/batch_212/05.png",
+   "head": [
+    "마녀 망토",
+    "witch cloak"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "다리 권총집",
+    "leg holster"
+   ],
+   "file": "wear_239.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "다리 권총집",
+   "src": "game-src/items/raw/batch_212/13.png",
+   "head": [
+    "다리 권총집",
+    "leg holster"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "허리 주머니",
+    "hip pouch",
+    "waist pouch"
+   ],
+   "file": "wear_243.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "허리 주머니",
+   "src": "game-src/items/raw/batch_213/01.png",
+   "head": [
+    "허리 주머니",
+    "hip pouch"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "인장 반지",
+    "signet ring"
+   ],
+   "file": "valuable_059.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "인장 반지",
+   "src": "game-src/items/raw/batch_213/06.png",
+   "head": [
+    "인장 반지",
+    "signet ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "실탄",
+    "live rounds",
+    "cartridges"
+   ],
+   "file": "weapon_181.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "실탄",
+   "src": "game-src/items/raw/batch_214/04.png",
+   "head": [
+    "실탄",
+    "live rounds"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "오컬트 서적",
+    "occult book"
+   ],
+   "file": "paper_131.webp",
+   "kind": "paper",
+   "base": false,
+   "name": "오컬트 서적",
+   "src": "game-src/items/raw/batch_214/06.png",
+   "head": [
+    "오컬트 서적",
+    "occult book"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "위저 보드",
+    "ouija board"
+   ],
+   "file": "anomaly_257.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "위저 보드",
+   "src": "game-src/items/raw/batch_214/07.png",
+   "head": [
+    "위저 보드",
+    "ouija board"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "허벅지 보호대",
+    "thigh guard"
+   ],
+   "file": "wear_251.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "허벅지 보호대",
+   "src": "game-src/items/raw/batch_215/09.png",
+   "head": [
+    "허벅지 보호대",
+    "thigh guard"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "묵주 반지",
+    "rosary ring"
+   ],
+   "file": "charm_135.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "묵주 반지",
+   "src": "game-src/items/raw/batch_216/02.png",
+   "head": [
+    "묵주 반지",
+    "rosary ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "진압 헬멧",
+    "riot helmet"
+   ],
+   "file": "wear_262.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "진압 헬멧",
+   "src": "game-src/items/raw/batch_216/09.png",
+   "head": [
+    "진압 헬멧",
+    "riot helmet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "인식 팔찌",
+    "ID bracelet"
+   ],
+   "file": "wear_266.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "인식 팔찌",
+   "src": "game-src/items/raw/batch_216/15.png",
+   "head": [
+    "인식 팔찌",
+    "ID bracelet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방울 목걸이",
+    "bell choker"
+   ],
+   "file": "wear_271.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방울 목걸이",
+   "src": "game-src/items/raw/batch_217/07.png",
+   "head": [
+    "방울 목걸이",
+    "bell choker"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "극지 방한복",
+    "polar parka"
+   ],
+   "file": "wear_272.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "극지 방한복",
+   "src": "game-src/items/raw/batch_217/08.png",
+   "head": [
+    "극지 방한복",
+    "polar parka"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방울 발찌",
+    "bell anklet"
+   ],
+   "file": "charm_140.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "방울 발찌",
+   "src": "game-src/items/raw/batch_217/11.png",
+   "head": [
+    "방울 발찌",
+    "bell anklet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "독 반지",
+    "poison ring"
+   ],
+   "file": "valuable_066.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "독 반지",
+   "src": "game-src/items/raw/batch_219/04.png",
+   "head": [
+    "독 반지",
+    "poison ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "열선 조끼",
+    "heated vest"
+   ],
+   "file": "wear_295.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "열선 조끼",
+   "src": "game-src/items/raw/batch_220/01.png",
+   "head": [
+    "열선 조끼",
+    "heated vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "행운의 토끼발",
+    "rabbit foot"
+   ],
+   "file": "charm_147.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "행운의 토끼발",
+   "src": "game-src/items/raw/batch_220/05.png",
+   "head": [
+    "행운의 토끼발",
+    "rabbit foot"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "안면 보호대",
+    "face shield"
+   ],
+   "file": "wear_309.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "안면 보호대",
+   "src": "game-src/items/raw/batch_221/12.png",
+   "head": [
+    "안면 보호대",
+    "face shield"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "근력 보조 외골격",
+    "exoskeleton"
+   ],
+   "file": "wear_311.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "근력 보조 외골격",
+   "src": "game-src/items/raw/batch_222/02.png",
+   "head": [
+    "근력 보조 외골격",
+    "exoskeleton"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "금속 보급 상자",
+    "supply case",
+    "metal case"
+   ],
+   "file": "seal_074.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "금속 보급 상자",
+   "src": "game-src/items/raw/batch_222/09.png",
+   "head": [
+    "금속 보급 상자",
+    "supply case"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "테마파크 입장 팔찌",
     "wristband"
    ],
@@ -23901,25 +26486,6 @@
   },
   {
    "keywords": [
-    "요원 정장",
-    "agent suit"
-   ],
-   "file": "wear_033.webp",
-   "kind": "wear",
-   "base": false,
-   "name": "요원 정장",
-   "src": "game-src/items/raw/batch_11/02.png",
-   "head": [
-    "정장",
-    "suit"
-   ],
-   "feats": [
-    "요원",
-    "agent"
-   ]
-  },
-  {
-   "keywords": [
     "치마 정장",
     "skirt suit"
    ],
@@ -24705,26 +27271,6 @@
    "head": [
     "선글라스",
     "sunglasses"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "흰 가운",
-    "lab coat",
-    "white coat",
-    "실험 가운",
-    "실험복"
-   ],
-   "file": "wear_030.webp",
-   "kind": "wear",
-   "base": false,
-   "name": "흰 가운",
-   "src": "game-src/items/raw/batch_10/15.png",
-   "head": [
-    "흰 가운",
-    "lab coat",
-    "white coat"
    ],
    "feats": []
   },
@@ -26367,7 +28913,8 @@
   {
    "keywords": [
     "힙색",
-    "fanny pack"
+    "fanny pack",
+    "hip pouch"
    ],
    "file": "wear_078.webp",
    "kind": "wear",
@@ -26992,6 +29539,264 @@
     "자물쇠(68회 덤)",
     "자물쇠 2",
     "padlock 2"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "전투 도끼",
+    "battle axe"
+   ],
+   "file": "weapon_171.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "전투 도끼",
+   "src": "game-src/items/raw/batch_209/12.png",
+   "head": [
+    "전투 도끼",
+    "battle axe"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "워해머",
+    "war hammer"
+   ],
+   "file": "weapon_175.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "워해머",
+   "src": "game-src/items/raw/batch_209/16.png",
+   "head": [
+    "워해머",
+    "war hammer"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "팔꿈치 보호대",
+    "elbow pads"
+   ],
+   "file": "wear_209.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "팔꿈치 보호대",
+   "src": "game-src/items/raw/batch_210/13.png",
+   "head": [
+    "팔꿈치 보호대",
+    "elbow pads"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방진 마스크",
+    "dust mask",
+    "respirator"
+   ],
+   "file": "wear_218.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방진 마스크",
+   "src": "game-src/items/raw/batch_211/06.png",
+   "head": [
+    "방진 마스크",
+    "dust mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소금 주머니",
+    "salt pouch"
+   ],
+   "file": "charm_127.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "소금 주머니",
+   "src": "game-src/items/raw/batch_213/12.png",
+   "head": [
+    "소금 주머니",
+    "salt pouch"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "넥가드",
+    "neck guard"
+   ],
+   "file": "wear_248.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "넥가드",
+   "src": "game-src/items/raw/batch_215/02.png",
+   "head": [
+    "넥가드",
+    "neck guard"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "다리 칼집",
+    "leg sheath"
+   ],
+   "file": "wear_253.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "다리 칼집",
+   "src": "game-src/items/raw/batch_215/11.png",
+   "head": [
+    "다리 칼집",
+    "leg sheath"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "살로 된 조끼",
+    "flesh vest",
+    "skin vest"
+   ],
+   "file": "anomaly_258.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "살로 된 조끼",
+   "src": "game-src/items/raw/batch_217/12.png",
+   "head": [
+    "살로 된 조끼",
+    "flesh vest"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "박쥐 브로치",
+    "bat brooch"
+   ],
+   "file": "valuable_063.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "박쥐 브로치",
+   "src": "game-src/items/raw/batch_218/06.png",
+   "head": [
+    "박쥐 브로치",
+    "bat brooch"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "굵은 금 체인",
+    "gold chain"
+   ],
+   "file": "valuable_065.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "굵은 금 체인",
+   "src": "game-src/items/raw/batch_218/15.png",
+   "head": [
+    "굵은 금 체인",
+    "gold chain"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "두정갑",
+    "brigandine"
+   ],
+   "file": "wear_287.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "두정갑",
+   "src": "game-src/items/raw/batch_218/16.png",
+   "head": [
+    "두정갑",
+    "brigandine"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "칼날 나오는 구두",
+    "blade shoe"
+   ],
+   "file": "weapon_185.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "칼날 나오는 구두",
+   "src": "game-src/items/raw/batch_219/03.png",
+   "head": [
+    "칼날 나오는 구두",
+    "blade shoe"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "칼 꽂는 요대",
+    "knife belt"
+   ],
+   "file": "wear_292.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "칼 꽂는 요대",
+   "src": "game-src/items/raw/batch_219/11.png",
+   "head": [
+    "칼 꽂는 요대",
+    "knife belt"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "해골 반지",
+    "skull ring"
+   ],
+   "file": "valuable_070.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "해골 반지",
+   "src": "game-src/items/raw/batch_221/05.png",
+   "head": [
+    "해골 반지",
+    "skull ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "머리카락 엮은 반지",
+    "hair ring"
+   ],
+   "file": "anomaly_260.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "머리카락 엮은 반지",
+   "src": "game-src/items/raw/batch_221/10.png",
+   "head": [
+    "머리카락 엮은 반지",
+    "hair ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "혈서용 가시 반지",
+    "thorn ring"
+   ],
+   "file": "charm_152.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "혈서용 가시 반지",
+   "src": "game-src/items/raw/batch_222/04.png",
+   "head": [
+    "혈서용 가시 반지",
+    "thorn ring"
    ],
    "feats": []
   },
@@ -31078,6 +33883,183 @@
   },
   {
    "keywords": [
+    "데린저",
+    "derringer"
+   ],
+   "file": "weapon_166.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "데린저",
+   "src": "game-src/items/raw/batch_209/07.png",
+   "head": [
+    "데린저",
+    "derringer"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "사슬 갑옷",
+    "chainmail"
+   ],
+   "file": "wear_205.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "사슬 갑옷",
+   "src": "game-src/items/raw/batch_210/09.png",
+   "head": [
+    "사슬 갑옷",
+    "chainmail"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "삿갓",
+    "straw hat",
+    "satgat"
+   ],
+   "file": "wear_217.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "삿갓",
+   "src": "game-src/items/raw/batch_211/05.png",
+   "head": [
+    "삿갓",
+    "straw hat"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "늑대 가면",
+    "wolf mask"
+   ],
+   "file": "wear_220.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "늑대 가면",
+   "src": "game-src/items/raw/batch_211/08.png",
+   "head": [
+    "늑대 가면",
+    "wolf mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "까마귀 가면",
+    "crow mask"
+   ],
+   "file": "wear_221.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "까마귀 가면",
+   "src": "game-src/items/raw/batch_211/09.png",
+   "head": [
+    "까마귀 가면",
+    "crow mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "철 가면",
+    "iron mask"
+   ],
+   "file": "wear_222.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "철 가면",
+   "src": "game-src/items/raw/batch_211/10.png",
+   "head": [
+    "철 가면",
+    "iron mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "염소 가면",
+    "goat mask"
+   ],
+   "file": "wear_223.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "염소 가면",
+   "src": "game-src/items/raw/batch_211/11.png",
+   "head": [
+    "염소 가면",
+    "goat mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "롱코트",
+    "long coat"
+   ],
+   "file": "wear_229.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "롱코트",
+   "src": "game-src/items/raw/batch_212/03.png",
+   "head": [
+    "롱코트",
+    "long coat"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "금반지",
+    "gold ring"
+   ],
+   "file": "valuable_058.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "금반지",
+   "src": "game-src/items/raw/batch_213/05.png",
+   "head": [
+    "금반지",
+    "gold ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "설피",
+    "snowshoes"
+   ],
+   "file": "wear_303.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "설피",
+   "src": "game-src/items/raw/batch_221/01.png",
+   "head": [
+    "설피",
+    "snowshoes"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "코걸이",
+    "nose ring"
+   ],
+   "file": "wear_313.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "코걸이",
+   "src": "game-src/items/raw/batch_222/06.png",
+   "head": [
+    "코걸이",
+    "nose ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "못 박힌 방망이",
     "nail bat"
    ],
@@ -34417,6 +37399,232 @@
   },
   {
    "keywords": [
+    "시미터",
+    "scimitar"
+   ],
+   "file": "weapon_172.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "시미터",
+   "src": "game-src/items/raw/batch_209/13.png",
+   "head": [
+    "시미터",
+    "scimitar"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "수녀 베일",
+    "nun veil"
+   ],
+   "file": "wear_215.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "수녀 베일",
+   "src": "game-src/items/raw/batch_211/03.png",
+   "head": [
+    "수녀 베일",
+    "nun veil"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "고양이 가면",
+    "cat mask"
+   ],
+   "file": "wear_219.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "고양이 가면",
+   "src": "game-src/items/raw/batch_211/07.png",
+   "head": [
+    "고양이 가면",
+    "cat mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "소 가면",
+    "cow mask"
+   ],
+   "file": "wear_224.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "소 가면",
+   "src": "game-src/items/raw/batch_211/12.png",
+   "head": [
+    "소 가면",
+    "cow mask"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "이어피스",
+    "earpiece"
+   ],
+   "file": "device_173.webp",
+   "kind": "device",
+   "base": false,
+   "name": "이어피스",
+   "src": "game-src/items/raw/batch_211/16.png",
+   "head": [
+    "이어피스",
+    "earpiece"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "에코백",
+    "tote bag",
+    "eco bag"
+   ],
+   "file": "wear_242.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "에코백",
+   "src": "game-src/items/raw/batch_212/16.png",
+   "head": [
+    "에코백",
+    "tote bag"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "명찰",
+    "name tag"
+   ],
+   "file": "key_067.webp",
+   "kind": "key",
+   "base": false,
+   "name": "명찰",
+   "src": "game-src/items/raw/batch_213/09.png",
+   "head": [
+    "명찰",
+    "name tag"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "철제 다리 갑옷",
+    "greaves"
+   ],
+   "file": "wear_256.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "철제 다리 갑옷",
+   "src": "game-src/items/raw/batch_215/14.png",
+   "head": [
+    "철제 다리 갑옷",
+    "greaves"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "쇠 팔 갑옷",
+    "vambrace"
+   ],
+   "file": "wear_267.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "쇠 팔 갑옷",
+   "src": "game-src/items/raw/batch_216/16.png",
+   "head": [
+    "쇠 팔 갑옷",
+    "vambrace"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "쇠 건틀릿",
+    "gauntlet"
+   ],
+   "file": "wear_278.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "쇠 건틀릿",
+   "src": "game-src/items/raw/batch_218/03.png",
+   "head": [
+    "쇠 건틀릿",
+    "gauntlet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "방한 벙어리장갑",
+    "mittens"
+   ],
+   "file": "wear_291.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "방한 벙어리장갑",
+   "src": "game-src/items/raw/batch_219/07.png",
+   "head": [
+    "방한 벙어리장갑",
+    "mittens"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "발가락 반지",
+    "toe ring"
+   ],
+   "file": "valuable_067.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "발가락 반지",
+   "src": "game-src/items/raw/batch_219/12.png",
+   "head": [
+    "발가락 반지",
+    "toe ring"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "귀 커프",
+    "ear cuff"
+   ],
+   "file": "wear_312.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "귀 커프",
+   "src": "game-src/items/raw/batch_222/05.png",
+   "head": [
+    "귀 커프",
+    "ear cuff"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "선물 상자",
+    "gift box",
+    "present"
+   ],
+   "file": "seal_075.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "선물 상자",
+   "src": "game-src/items/raw/batch_222/11.png",
+   "head": [
+    "선물 상자",
+    "gift box"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "연두색 앞치마",
     "앞치마",
     "apron"
@@ -37030,6 +40238,152 @@
     "생굴",
     "oyster",
     "oysters"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "카빈",
+    "carbine"
+   ],
+   "file": "weapon_160.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "카빈",
+   "src": "game-src/items/raw/batch_209/01.png",
+   "head": [
+    "카빈",
+    "carbine"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "청룡도",
+    "guandao"
+   ],
+   "file": "weapon_173.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "청룡도",
+   "src": "game-src/items/raw/batch_209/14.png",
+   "head": [
+    "청룡도",
+    "guandao"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "헤드셋",
+    "headset"
+   ],
+   "file": "device_172.webp",
+   "kind": "device",
+   "base": false,
+   "name": "헤드셋",
+   "src": "game-src/items/raw/batch_211/15.png",
+   "head": [
+    "헤드셋",
+    "headset"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "펜던트",
+    "pendant"
+   ],
+   "file": "valuable_060.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "펜던트",
+   "src": "game-src/items/raw/batch_213/07.png",
+   "head": [
+    "펜던트",
+    "pendant"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "만다라",
+    "mandala"
+   ],
+   "file": "charm_130.webp",
+   "kind": "charm",
+   "base": false,
+   "name": "만다라",
+   "src": "game-src/items/raw/batch_214/10.png",
+   "head": [
+    "만다라",
+    "mandala"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "쇠 발 갑옷",
+    "sabaton"
+   ],
+   "file": "wear_277.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "쇠 발 갑옷",
+   "src": "game-src/items/raw/batch_218/01.png",
+   "head": [
+    "쇠 발 갑옷",
+    "sabaton"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "손목 방패",
+    "buckler"
+   ],
+   "file": "wear_302.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "손목 방패",
+   "src": "game-src/items/raw/batch_220/16.png",
+   "head": [
+    "손목 방패",
+    "buckler"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "제트팩",
+    "jetpack"
+   ],
+   "file": "device_179.webp",
+   "kind": "device",
+   "base": false,
+   "name": "제트팩",
+   "src": "game-src/items/raw/batch_221/16.png",
+   "head": [
+    "제트팩",
+    "jetpack"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "갈색 소포",
+    "parcel",
+    "package",
+    "소포"
+   ],
+   "file": "seal_078.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "갈색 소포",
+   "src": "game-src/items/raw/batch_222/14.png",
+   "head": [
+    "갈색 소포",
+    "parcel"
    ],
    "feats": []
   },
@@ -39964,6 +43318,102 @@
   },
   {
    "keywords": [
+    "머스킷",
+    "musket"
+   ],
+   "file": "weapon_168.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "머스킷",
+   "src": "game-src/items/raw/batch_209/09.png",
+   "head": [
+    "머스킷",
+    "musket"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "환도",
+    "hwando"
+   ],
+   "file": "weapon_174.webp",
+   "kind": "weapon",
+   "base": false,
+   "name": "환도",
+   "src": "game-src/items/raw/batch_209/15.png",
+   "head": [
+    "환도",
+    "hwando"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "터번",
+    "turban"
+   ],
+   "file": "wear_212.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "터번",
+   "src": "game-src/items/raw/batch_210/16.png",
+   "head": [
+    "터번",
+    "turban"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "로켓 목걸이",
+    "locket"
+   ],
+   "file": "valuable_061.webp",
+   "kind": "valuable",
+   "base": false,
+   "name": "로켓 목걸이",
+   "src": "game-src/items/raw/batch_213/08.png",
+   "head": [
+    "로켓 목걸이",
+    "locket"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "쇠 목가리개",
+    "gorget"
+   ],
+   "file": "wear_255.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "쇠 목가리개",
+   "src": "game-src/items/raw/batch_215/13.png",
+   "head": [
+    "쇠 목가리개",
+    "gorget"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "입마개",
+    "muzzle"
+   ],
+   "file": "wear_308.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "입마개",
+   "src": "game-src/items/raw/batch_221/11.png",
+   "head": [
+    "입마개",
+    "muzzle"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "생수",
     "생수 2L",
     "물",
@@ -42256,6 +45706,38 @@
   },
   {
    "keywords": [
+    "히잡",
+    "hijab"
+   ],
+   "file": "wear_213.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "히잡",
+   "src": "game-src/items/raw/batch_211/01.png",
+   "head": [
+    "히잡",
+    "hijab"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "망토",
+    "cloak"
+   ],
+   "file": "wear_230.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "망토",
+   "src": "game-src/items/raw/batch_212/04.png",
+   "head": [
+    "망토",
+    "cloak"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "톱니바퀴",
     "gear",
     "cog"
@@ -43574,6 +47056,22 @@
   },
   {
    "keywords": [
+    "베일",
+    "veil"
+   ],
+   "file": "wear_214.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "베일",
+   "src": "game-src/items/raw/batch_211/02.png",
+   "head": [
+    "베일",
+    "veil"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "항아리",
     "jar",
     "pot"
@@ -44454,6 +47952,22 @@
    "head": [
     "햄",
     "ham"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "갓",
+    "gat"
+   ],
+   "file": "wear_216.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "갓",
+   "src": "game-src/items/raw/batch_211/04.png",
+   "head": [
+    "갓",
+    "gat"
    ],
    "feats": []
   },
