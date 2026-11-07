@@ -492,6 +492,16 @@
   },
   {
    "keywords": [
+    "핑거 바이브레이터"
+   ],
+   "file": "adult_067.png",
+   "kind": "adult",
+   "base": false,
+   "name": "핑거 바이브레이터",
+   "src": "game-src/items/raw/batch_140/09.png"
+  },
+  {
+   "keywords": [
     "호신용 스프레이"
    ],
    "file": "weapon_009.png",
@@ -1203,6 +1213,46 @@
    "base": false,
    "name": "전립선 마사지기",
    "src": "game-src/items/raw/batch_138/03.png"
+  },
+  {
+   "keywords": [
+    "호그타이 연결끈"
+   ],
+   "file": "adult_070.png",
+   "kind": "adult",
+   "base": false,
+   "name": "호그타이 연결끈",
+   "src": "game-src/items/raw/batch_140/12.png"
+  },
+  {
+   "keywords": [
+    "질 확장기 세트"
+   ],
+   "file": "adult_074.png",
+   "kind": "adult",
+   "base": false,
+   "name": "질 확장기 세트",
+   "src": "game-src/items/raw/batch_140/16.png"
+  },
+  {
+   "keywords": [
+    "클리 후드 집게"
+   ],
+   "file": "adult_077.png",
+   "kind": "adult",
+   "base": false,
+   "name": "클리 후드 집게",
+   "src": "game-src/items/raw/batch_143/10.png"
+  },
+  {
+   "keywords": [
+    "문 끼움 구속끈"
+   ],
+   "file": "adult_079.png",
+   "kind": "adult",
+   "base": false,
+   "name": "문 끼움 구속끈",
+   "src": "game-src/items/raw/batch_143/12.png"
   },
   {
    "keywords": [
@@ -2429,6 +2479,56 @@
    "base": false,
    "name": "본디지 마스크",
    "src": "game-src/items/raw/batch_139/02.png"
+  },
+  {
+   "keywords": [
+    "자동차 번호판"
+   ],
+   "file": "misc_187.png",
+   "kind": "misc",
+   "base": false,
+   "name": "자동차 번호판",
+   "src": "game-src/items/raw/batch_140/07.png"
+  },
+  {
+   "keywords": [
+    "흰 가루 봉지"
+   ],
+   "file": "consumable_102.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "흰 가루 봉지",
+   "src": "game-src/items/raw/batch_143/03.png"
+  },
+  {
+   "keywords": [
+    "성인 보드게임"
+   ],
+   "file": "adult_076.png",
+   "kind": "adult",
+   "base": false,
+   "name": "성인 보드게임",
+   "src": "game-src/items/raw/batch_143/09.png"
+  },
+  {
+   "keywords": [
+    "성인용 물티슈"
+   ],
+   "file": "adult_081.png",
+   "kind": "adult",
+   "base": false,
+   "name": "성인용 물티슈",
+   "src": "game-src/items/raw/batch_143/14.png"
+  },
+  {
+   "keywords": [
+    "G스팟 진동기"
+   ],
+   "file": "adult_082.png",
+   "kind": "adult",
+   "base": false,
+   "name": "G스팟 진동기",
+   "src": "game-src/items/raw/batch_143/15.png"
   },
   {
    "keywords": [
@@ -4649,6 +4749,36 @@
    "base": false,
    "name": "흡입 진동기",
    "src": "game-src/items/raw/batch_138/04.png"
+  },
+  {
+   "keywords": [
+    "요도 사운드"
+   ],
+   "file": "adult_069.png",
+   "kind": "adult",
+   "base": false,
+   "name": "요도 사운드",
+   "src": "game-src/items/raw/batch_140/11.png"
+  },
+  {
+   "keywords": [
+    "귀두 진동기"
+   ],
+   "file": "adult_078.png",
+   "kind": "adult",
+   "base": false,
+   "name": "귀두 진동기",
+   "src": "game-src/items/raw/batch_143/11.png"
+  },
+  {
+   "keywords": [
+    "가죽 스트랩"
+   ],
+   "file": "adult_080.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가죽 스트랩",
+   "src": "game-src/items/raw/batch_143/13.png"
   },
   {
    "keywords": [
@@ -7939,6 +8069,76 @@
   },
   {
    "keywords": [
+    "은박 호일"
+   ],
+   "file": "consumable_101.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "은박 호일",
+   "src": "game-src/items/raw/batch_140/04.png"
+  },
+  {
+   "keywords": [
+    "아이라이너"
+   ],
+   "file": "misc_186.png",
+   "kind": "misc",
+   "base": false,
+   "name": "아이라이너",
+   "src": "game-src/items/raw/batch_140/05.png"
+  },
+  {
+   "keywords": [
+    "니플 석션"
+   ],
+   "file": "adult_066.png",
+   "kind": "adult",
+   "base": false,
+   "name": "니플 석션",
+   "src": "game-src/items/raw/batch_140/08.png"
+  },
+  {
+   "keywords": [
+    "요니 에그"
+   ],
+   "file": "adult_068.png",
+   "kind": "adult",
+   "base": false,
+   "name": "요니 에그",
+   "src": "game-src/items/raw/batch_140/10.png"
+  },
+  {
+   "keywords": [
+    "문틀 그네"
+   ],
+   "file": "adult_071.png",
+   "kind": "adult",
+   "base": false,
+   "name": "문틀 그네",
+   "src": "game-src/items/raw/batch_140/13.png"
+  },
+  {
+   "keywords": [
+    "클리 집게"
+   ],
+   "file": "adult_073.png",
+   "kind": "adult",
+   "base": false,
+   "name": "클리 집게",
+   "src": "game-src/items/raw/batch_140/15.png"
+  },
+  {
+   "keywords": [
+    "파운데이션"
+   ],
+   "file": "misc_190.png",
+   "kind": "misc",
+   "base": false,
+   "name": "파운데이션",
+   "src": "game-src/items/raw/batch_143/04.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -10088,6 +10288,16 @@
    "name": "도토리묵",
    "src": "game-src/items/raw/batch_134/10.png",
    "old_src": "game-src/items/raw/batch_71/13.png"
+  },
+  {
+   "keywords": [
+    "전자발찌"
+   ],
+   "file": "wear_172.png",
+   "kind": "wear",
+   "base": false,
+   "name": "전자발찌",
+   "src": "game-src/items/raw/batch_140/03.png"
   },
   {
    "keywords": [
@@ -15275,6 +15485,56 @@
   },
   {
    "keywords": [
+    "통기타"
+   ],
+   "file": "misc_184.png",
+   "kind": "misc",
+   "base": false,
+   "name": "통기타",
+   "src": "game-src/items/raw/batch_140/01.png"
+  },
+  {
+   "keywords": [
+    "안마기"
+   ],
+   "file": "device_143.png",
+   "kind": "device",
+   "base": false,
+   "name": "안마기",
+   "src": "game-src/items/raw/batch_140/06.png"
+  },
+  {
+   "keywords": [
+    "관장기"
+   ],
+   "file": "adult_072.png",
+   "kind": "adult",
+   "base": false,
+   "name": "관장기",
+   "src": "game-src/items/raw/batch_140/14.png"
+  },
+  {
+   "keywords": [
+    "트럼펫"
+   ],
+   "file": "misc_189.png",
+   "kind": "misc",
+   "base": false,
+   "name": "트럼펫",
+   "src": "game-src/items/raw/batch_143/02.png"
+  },
+  {
+   "keywords": [
+    "헤어롤"
+   ],
+   "file": "misc_191.png",
+   "kind": "misc",
+   "base": false,
+   "name": "헤어롤",
+   "src": "game-src/items/raw/batch_143/05.png"
+  },
+  {
+   "keywords": [
     "권총"
    ],
    "file": "weapon_002.png",
@@ -19494,7 +19754,8 @@
    "kind": "adult",
    "base": false,
    "name": "딜도",
-   "src": "game-src/items/raw/batch_137/02.png"
+   "src": "game-src/items/raw/batch_143/07.png",
+   "old_src": "game-src/items/raw/batch_137/02.png"
   },
   {
    "keywords": [
@@ -19515,6 +19776,36 @@
    "base": false,
    "name": "재갈",
    "src": "game-src/items/raw/batch_139/01.png"
+  },
+  {
+   "keywords": [
+    "장구"
+   ],
+   "file": "misc_188.png",
+   "kind": "misc",
+   "base": false,
+   "name": "장구",
+   "src": "game-src/items/raw/batch_143/01.png"
+  },
+  {
+   "keywords": [
+    "참빗"
+   ],
+   "file": "misc_192.png",
+   "kind": "misc",
+   "base": false,
+   "name": "참빗",
+   "src": "game-src/items/raw/batch_143/06.png"
+  },
+  {
+   "keywords": [
+    "질경"
+   ],
+   "file": "adult_075.png",
+   "kind": "adult",
+   "base": false,
+   "name": "질경",
+   "src": "game-src/items/raw/batch_143/08.png"
   },
   {
    "keywords": [
@@ -19962,6 +20253,16 @@
    "base": false,
    "name": "윷",
    "src": "game-src/items/raw/batch_121/06.png"
+  },
+  {
+   "keywords": [
+    "징"
+   ],
+   "file": "misc_185.png",
+   "kind": "misc",
+   "base": false,
+   "name": "징",
+   "src": "game-src/items/raw/batch_140/02.png"
   },
   {
    "keywords": [],
