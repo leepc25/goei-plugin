@@ -51,10 +51,10 @@ export function statusHtml(tag: StatusTag, ctx: StatusContext): string {
   const day = hid('date') ? null : dayInfo(tag.date);
   // 시각: 지난 장면·흐른 시간·시작부터 (아는 것만)
   const rows: [string, string][] = [];
-  // 모아 둔 목록에 없는 태그는 방금 들어온 응답: 마지막으로 본 장면이 지난 장면
+  // 모아 둔 목록(이 채팅의 상태창 전부)에 있는 태그만 지난 장면을 안다. 목록에 없는 태그에 「마지막 장면」을 붙이던 어림은 뺌
+  // (2026-11-07 사용자: 다른 채팅으로 옮기면 앞 채팅의 마지막 값과 비교해 엉뚱한 ±잔고·흐른 시간이 떴다). 새 응답은 저장 뒤 목록을 다시 모아 그린다
   const tl = ctx.timeline;
-  const known = tl?.prev.get(tag.raw.trim());
-  const prev = known ?? (tl?.last && !tl.seen.has(tag.raw.trim()) ? tl.last.minute : undefined);
+  const prev = tl?.prev.get(tag.raw.trim());
   if (now !== null && prev !== undefined) rows.push(['지난 장면', sceneLabel(prev, now)], ['흐른 시간', elapsedLabel(prev, now)]);
   const start = ctx.timeline?.start;
   if (now !== null && start !== null && start !== undefined && now >= start) {
@@ -77,7 +77,7 @@ export function statusHtml(tag: StatusTag, ctx: StatusContext): string {
   let cash = '';
   if (tag.wallet && !hid('wallet')) {
     const n = Number(tag.wallet);
-    const pw = tl?.prevWallet.get(tag.raw.trim()) ?? (tl?.lastWallet !== null && tl?.lastWallet !== undefined && !tl.seen.has(tag.raw.trim()) ? tl.lastWallet : undefined);
+    const pw = tl?.prevWallet.get(tag.raw.trim());
     const delta = pw === undefined ? 0 : n - pw;
     cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n))}${delta ? `<small class="${delta > 0 ? 'gst-up' : 'gst-down'}">${esc(formatDelta(delta))}</small>` : ''}</span></div>`;
   }

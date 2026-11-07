@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { chatCardsAt, refreshStatusContext, renderStatus, setRecordsOpener, setWikiOpener } from './host/statusview';
+import { chatCardsAt, refreshStatusContext, renderStatus, resetStatusContext, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MARK, START_MARK, stripSceneMark, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
@@ -756,8 +756,13 @@ function startWatcher(fab: Fab | null): () => void {
       // 같은 봇 안에서 채팅만 바꿔도(버튼은 그대로) 그 채팅의 배색·상태창 칸 구성·시작 안내로 (QC 2026-10-28: 앞 채팅 것이 남았다)
       const chatKey = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : '';
       if (next.fabVisible && (next.changed || chatKey !== shownChat)) {
+        const switched = shownChat !== '' && chatKey !== shownChat;
+        // 채팅을 옮기면 앞 채팅의 상태창 목록은 바로 버린다 (다시 모을 때까지 ±잔고·흐른 시간을 앞 채팅 값으로 계산하지 않게, 2026-11-07 사용자)
+        if (switched) resetStatusContext();
         await readTheme(snap).catch(() => {});
         await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
+        // Risu 가 옮긴 직후 앞 채팅 목록으로 그린 상태창이 남아 있을 수 있으니 채팅을 그대로 한 번 저장해 다시 그리게 한다
+        if (switched) await updateChat(snap.charIndex, snap.chatIndex, (cur) => ({ ...cur })).catch(() => null);
         await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
         await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {});
       } else if (!next.fabVisible && next.changed) {

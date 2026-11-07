@@ -536,8 +536,8 @@ export function shopEvents(chat: Chat): string[] {
   if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} won)`).join(', ')} to the owner of ${st.shop}`);
   if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ''}`);
   else if (spoke && lastOwner) {
-    // 주인과 나눈 말: 마지막 한 마디가 아니라 이번 방문 대화의 끝 6줄 (2026-11-07 사용자: 상점 대화가 본편에 남아야)
-    const tail = st.talk.slice(-6).map((l) => `${l.who === 'me' ? 'protagonist' : 'owner'}: "${l.text.slice(0, 100)}"`).join(' / ');
+    // 주인과 나눈 말: 이번 방문 대화 전부 (2026-11-07 사용자: 6줄이 아니라 전부). 그 턴 한 번만 넘어가고, 다음 응답에 표식이 없으면 상점 상태와 함께 비운다
+    const tail = st.talk.map((l) => `${l.who === 'me' ? 'protagonist' : 'owner'}: "${l.text}"`).join(' / ');
     out.push(`talked with the owner of ${st.shop} — ${tail}`);
   }
   return out;
