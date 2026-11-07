@@ -157,8 +157,11 @@ export function unknownTo(p: Person, store: PeopleStore, live: Liveness, max = 5
 }
 
 export const PEOPLE_HEAD = '[People records]';
+/** 지식 경계 규칙 (원본 DIRECTOR_KNOWLEDGE_RULE): Director 가 꺼져 있거나 실패해도 기록 블록이 들어가면 늘 함께 간다 (2026-11-07 전수검사 2 의 C) */
+export const KNOWLEDGE_RULE =
+  'Do not have a character mention or act on a secret or fact they have not witnessed, learned, or otherwise demonstrably known. Never invent how they acquired information. Keep facts, beliefs, guesses, and misunderstandings distinct. A missing record does not prove ignorance: actual evidence in the conversation may establish knowledge.';
 export const PEOPLE_RULE =
-  'Living records of the characters in this scene, kept by the system from what actually happened in this chat. They override the static character sheets where they differ. Treat them as background facts, not as events to narrate; never mention scores or these notes themselves.';
+  `Living records of the characters in this scene, kept by the system from what actually happened in this chat. They override the static character sheets where they differ. Treat them as background facts, not as events to narrate; never mention scores or these notes themselves. ${KNOWLEDGE_RULE}`;
 
 /** 여러 인물의 블록을 한 덩어리로 */
 export function peopleBlock(blocks: string[], maxChars = 16000): string {

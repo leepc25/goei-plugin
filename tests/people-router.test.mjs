@@ -41,7 +41,7 @@ test('Router 자료: 이름 목록만(기록 본문 없음), 제외 인물 빼�
   assert.throws(() => Ro.parseRouter('{"x":1}', store, names), /selected/);
 });
 
-test('본편: Router 가 고른 인물이 있으면 그 사람들로, 없으면 코드 Router; 갱신기 자료에 name_hints', () => {
+test('본편: 코드 Router(이름 나온 사람) ∪ 모델 Router 가 고른 인물 (2026-11-07: 대체 아님); 갱신기 자료에 name_hints', () => {
   const store = T.emptyStore();
   store.people.쟈알디 = person('쟈알디');
   store.people.데쥬레 = person('데쥬레');
@@ -50,7 +50,8 @@ test('본편: Router 가 고른 인물이 있으면 그 사람들로, 없으면 
   assert.equal(St.peopleSettings({}).router, 'code');
   const base = { settings: s, store, sheetOf: () => null };
   assert.deepEqual(R.peopleBlockFor(c, base).people, ['쟈알디'], '코드: 이름이 나온 사람만');
-  assert.deepEqual(R.peopleBlockFor(c, { ...base, people: ['데쥬레', '쟈알디', '없음'] }).people, ['데쥬레', '쟈알디']);
+  assert.deepEqual(R.peopleBlockFor(c, { ...base, people: ['데쥬레', '쟈알디', '없음'] }).people, ['쟈알디', '데쥬레'], '이름 나온 사람 먼저, 모델이 더 고른 사람 뒤에');
+  assert.deepEqual(R.peopleBlockFor(c, { ...base, people: ['데쥬레'] }).people, ['쟈알디', '데쥬레'], '모델이 빠뜨린 이름 나온 사람도 들어감');
   const input = U.buildUpdate(c, store, [1], { settings: s, system: 'S', values: {}, names, hints: [{ name: '미나', aliases: ['미나씨'], quote: '미나가 웃었다' }, { name: '쟈알디', aliases: [], quote: '' }] });
   assert.deepEqual(input.data.name_hints, [{ name: '미나', aliases: ['미나씨'], quote: '미나가 웃었다' }]);
   const none = U.buildUpdate(c, store, [1], { settings: s, system: 'S', values: {}, names });

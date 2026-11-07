@@ -285,6 +285,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): { toggle: string; body: 
       ? `<div class="pp-diag-detail">
           ${rep?.applied.newPeople.length ? `<p class="ps-note">새 인물: ${esc(rep.applied.newPeople.join(', '))}</p>` : ''}
           ${rep?.dropped.length ? `<p class="ps-note"><b>버린 항목</b></p><ul class="pp-drops">${rep.dropped.map((d) => `<li><span class="gx-badge">${esc(d.kind)}</span>${d.who ? `<b>${esc(d.who)}</b>` : ''}<span>${esc(d.reason)}</span></li>`).join('')}</ul>` : ''}
+          ${rep?.issues?.length ? `<p class="ps-note"><b>모델이 밝힌 사유</b></p><ul class="pp-drops">${rep.issues.map((d) => `<li><span class="gx-badge wait">${esc(d.code)}</span>${d.who ? `<b>${esc(d.who)}</b>` : ''}<span>${esc(d.reason)}</span></li>`).join('')}</ul>` : ''}
           ${rep?.held.length ? `<p class="ps-note"><b>보류(확인 필요)</b></p><ul class="pp-drops">${rep.held.map((d) => `<li><span class="gx-badge wait">${esc(d.kind)}</span>${d.who ? `<b>${esc(d.who)}</b>` : ''}<span>${esc(d.reason)}</span></li>`).join('')}</ul>` : ''}
           <div class="gx-row-btns">
             ${keepRaw && r.system ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc(`${id}:prompt`)}">보낸 프롬프트 보기</button>` : ''}

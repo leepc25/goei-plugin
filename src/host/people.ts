@@ -3,7 +3,7 @@
 import type { Chat } from '../core/types';
 import { bookText } from '../core/refs';
 import { generate, runModel, LlmError, type LlmMessage } from './llm';
-import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
+import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, repairDirector, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
@@ -475,13 +475,13 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
 
 let routerCache: { key: string; selected: string[] } | null = null;
 let routerHints: RouterHint[] = [];
-let routerSlowStreak = 0;
+// 2026-11-07: 시간 초과 누적으로 세션 끝까지 끄던 routerSlowStreak 는 뺌 (원본은 그 턴만 생략). 전수검사 2 의 A
 /** 마지막 Router 가 본 미등록 이름 (갱신기 힌트) */
 export const routerHintsNow = (): RouterHint[] => routerHints;
 
 /** 모델이 고른 장면 인물. 실패·지연·빈 결과면 null (코드 Router 로). 입력·최근 글·명단이 같으면 재사용 */
 export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = []): Promise<string[] | null> {
-  if (settings.router !== 'model' || routerSlowStreak >= 3 || !Object.keys(store.people).length) return null;
+  if (settings.router !== 'model' || !Object.keys(store.people).length) return null;
   const names = allNames();
   const built = buildRouter(chat, store, names, input, { exclude });
   if (routerCache?.key === built.key) return routerCache.selected;
@@ -499,12 +499,10 @@ export async function routerPeople(chat: Chat, store: PeopleStore, input: string
     diag.ok = true;
     routerCache = { key: built.key, selected: r.selected };
     routerHints = r.newCharacters;
-    routerSlowStreak = 0;
     return r.selected.length ? r.selected : null;
   } catch (error) {
     diag.error = error instanceof Error ? error.message : String(error);
     diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
-    if (/시간 제한/.test(diag.error)) routerSlowStreak++;
     console.log(`[goei] Router 생략 (코드 Router 로): ${diag.error}`);
     return null;
   } finally {
@@ -516,17 +514,17 @@ export async function routerPeople(chat: Chat, store: PeopleStore, input: string
 // ── 연출형 Director (본편 앞) ──
 
 let directorCache: { key: string; notes: DirectorNote[] } | null = null;
-let directorSlowStreak = 0;
-export const directorPaused = () => directorSlowStreak >= 3;
+// 2026-11-07: directorSlowStreak(3회 초과 시 세션 끝까지 끔) 뺌. 실패는 그 턴만 메모 없이 진행
 
 /** 연출형 메모 글. 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
 export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown): Promise<string> {
-  if (settings.director !== 'scene' || directorPaused()) return '';
+  if (settings.director !== 'scene') return '';
   const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), settings.hypa ? hypaSummaries(chat, Math.min(settings.hypaCap, 2000)) : []);
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
   // 1차: 메모 또는 검색 요청. 검색 요청이면 코드가 찾아서 2차 (리수폿 B). 각 호출에 시간 제한
-  const call = async (b: DirectorInput, reason: string, allowSearch: boolean) => {
+  // 출력 검증(JSON·notes)에 실패하면 원본처럼 「고침 요청」을 붙여 1회 더 묻는다 (repairDirectorPrompt 상당)
+  const call = async (b: DirectorInput, reason: string, allowSearch: boolean, repaired = false): Promise<ReturnType<typeof parseDirectorAny> | null> => {
     const t0 = Date.now();
     const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason, model: settings.stageModel.director, people, indexes: [], sizes: { system: b.system.length, data: JSON.stringify(b.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
     try {
@@ -542,8 +540,8 @@ export async function directorNoteText(chat: Chat, store: PeopleStore, people: s
     } catch (error) {
       diag.error = error instanceof Error ? error.message : String(error);
       diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
-      if (/시간 제한/.test(diag.error)) directorSlowStreak++;
-      console.log(`[goei] Director 메모 생략: ${diag.error}`);
+      console.log(`[goei] Director 메모 ${diag.stage === 'parse' && !repaired ? '고침 요청' : '생략'}: ${diag.error}`);
+      if (diag.stage === 'parse' && !repaired && diag.raw) return call(repairDirector(b, diag.raw, diag.error), `${reason}-repair`, allowSearch, true);
       return null;
     } finally {
       diag.ms = Date.now() - t0;
@@ -557,7 +555,6 @@ export async function directorNoteText(chat: Chat, store: PeopleStore, people: s
   }
   if (!r || !('notes' in r)) return '';
   directorCache = { key: built.key, notes: r.notes };
-  directorSlowStreak = 0;
   return directorBlock(r.notes, user);
 }
 

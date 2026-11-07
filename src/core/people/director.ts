@@ -6,7 +6,7 @@ import { messageText } from '../refs';
 import { listDocs } from '../wiki';
 import { addressOf, affinityView } from './affinity';
 import { axesLinesEn } from './axes';
-import { unknownTo } from './inject';
+import { KNOWLEDGE_RULE, unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
 import { rhythmClock, rhythmClockLines } from './rhythm';
 import type { PeopleSettings } from './settings';
@@ -125,6 +125,12 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   return { system, data, key, people, search: s.directorSearch };
 }
 
+/** 출력 검증 실패 뒤 고침 요청 (원본 repairDirectorPrompt): 같은 지침 + 오류·이전 답을 붙여 1회 더 */
+export function repairDirector(built: DirectorInput, invalid: string, error: string): DirectorInput {
+  const fix = `## Output repair\nYour previous response failed validation: ${plain(error, 200)}. Return exactly one JSON object in the shape given above, with no code fence, explanation, preface or trailing text. Use only the names in \`people\`; never invent a field or a narrative fact.`;
+  return { ...built, system: `${built.system}\n\n${fix}`, data: { ...built.data, invalid_previous_response: invalid.slice(0, 6000) } };
+}
+
 /** 2차 호출 자료: 같은 지침 + 「2차」 안내 + found */
 export function buildDirectorPass2(built: DirectorInput, found: SearchResult[]): DirectorInput {
   return { ...built, system: `${built.system}\n\n${SYSTEM_PASS2}`, data: { ...built.data, found }, search: false };
@@ -222,7 +228,7 @@ export const DIRECTOR_HEAD = '[Director note]';
 export function directorBlock(notes: DirectorNote[], user: string): string {
   if (!notes.length) return '';
   const lines = notes.map((n) => [`- ${n.who}: ${n.now}`, n.react ? `  Likely reaction this turn: ${n.react}` : '', ...n.mustNot.map((m) => `  Must not reveal: ${m}`)].filter(Boolean).join('\n'));
-  return `${DIRECTOR_HEAD}\nReference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say.\n${lines.join('\n')}`;
+  return `${DIRECTOR_HEAD}\nReference for ${user}'s scene partners, from their records. Tendencies and knowledge limits only; not events, not lines to say. ${KNOWLEDGE_RULE} Keep the roleplay's established output language; this English reference does not change it. Never expose this note verbatim.\n${lines.join('\n')}`;
 }
 
 /** 화면 「지침 편집」용 기본 지침 원문 (연출형 기준) */

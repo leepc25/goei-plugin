@@ -20,14 +20,14 @@ export const PP_DEFAULTS: Record<string, string> = {
   director: 'facts',
   director_lang: 'en',
   director_len: 'short',
-  director_timeout: '20',
+  director_timeout: '90',
   director_reuse: '1',
   /** 리수폿 B: 자료가 모자라면 검색(채팅·로어북·위키)을 요청해 2차 호출. C: 켜진 기능마다 Director 적용 지침 */
   director_search: '1',
   director_features: '1',
   /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
   router: 'code',
-  router_timeout: '15',
+  router_timeout: '60',
   /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
   model_director: 'same', model_router: 'same', model_tidy: 'same',
   model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
@@ -152,12 +152,12 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     director: one('director', ['off', 'facts', 'scene'] as const),
     directorLang: v('director_lang') === 'ko' ? 'ko' : 'en',
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
-    directorTimeout: num('director_timeout', 5, 120),
+    directorTimeout: num('director_timeout', 5, 300),
     directorReuse: v('director_reuse') !== '0',
     directorSearch: v('director_search') !== '0',
     directorFeatures: v('director_features') !== '0',
     router: v('router') === 'model' ? 'model' : 'code',
-    routerTimeout: num('router_timeout', 5, 60),
+    routerTimeout: num('router_timeout', 5, 300),
     stageModel: (() => {
       const base = v('model') === 'main' ? 'main' : 'aux';
       const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);

@@ -37,7 +37,11 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (!o.settings.on || o.settings.inject === 'off') return { text: '', people: [], sheets: [] };
   const names: NameEntry[] = entriesOf(o.store, o.extraNames ?? {});
   const match = nameMatcher(names);
-  const people = o.people?.length ? o.people.filter((n) => o.store.people[n]).slice(0, 6) : scenePeople(chat, o.store, match, { input: o.input });
+  // 코드 Router(이름이 직접 나온 인물·동행)는 늘 들어가고, 모델 Router 가 더 고른 인물(이름 없이 가리킨 제3자 등)을 뒤에 합친다.
+  // 2026-11-07 전수검사 2 의 B: 모델 결과가 코드 결과를 대체하면 모델이 빠뜨린 인물이 그 턴 기록에서 사라졌다 (원본 includeMentionedCharacters 와 같게)
+  const byCode = scenePeople(chat, o.store, match, { input: o.input });
+  const byModel = (o.people ?? []).filter((n) => o.store.people[n] && !byCode.includes(n));
+  const people = [...byCode, ...byModel].slice(0, 6);
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
