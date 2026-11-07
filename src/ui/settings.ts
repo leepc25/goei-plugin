@@ -371,7 +371,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     items: group('소지품', [
       field('소지품', seg('set-inv-on', invOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요.'),
       ...(!invOn(itVars) ? [] : [
-      field('본편에 넘기기', seg('set-items-push', itemPushOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요.'),
+      field('본편에 넘기기', seg('set-items-push', itemPushOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요. 끄면 물건 목록은 안 가고, 상점이 켜져 있으면 상점 표식 지침과 상점 사건만 [Shop] 글로 가요.'),
       field('보조 모델이 읽기', seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 끄면 직접 넣기·상점으로만 바뀌어요.'),
       field('칸 수', stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘치면 「17/16」처럼 보이고 그대로 본편에 넘겨요. 푸는 건 이야기 쪽이에요.`),
       field('지닐 수 있는 한계', `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.'),
@@ -815,13 +815,22 @@ export async function handleSettings(action: string, value: string | undefined, 
       return true;
     case 'set-col':
       // 상태창 칸 사용·표시: 채팅 변수 + 바뀐 시점 기록 (파서가 옛 응답을 옛 구성으로 읽게)
-      await save(ctx, env, (chat) => {
-        const cfg = colConfig(chat.scriptstate);
-        const hit = nextColMode(cfg, v);
-        if (!hit) return null;
-        const next = { ...cfg, [hit[0]]: hit[1] };
-        return { [colVar(hit[0])]: hit[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)) };
-      });
+      // 잔고 칸을 「안 씀」으로 하면 가계부가 꺼진 것이라 상점도 꺼진다: 「가계부」 OFF(set-wallet-on 0)와 같이 이번 방문을 닫고 남은 표식을 지운다
+      {
+        let walletOff = false;
+        await save(ctx, env, (chat) => {
+          const cfg = colConfig(chat.scriptstate);
+          const hit = nextColMode(cfg, v);
+          if (!hit) return null;
+          const next = { ...cfg, [hit[0]]: hit[1] };
+          walletOff = hit[0] === 'wallet' && hit[1] === 'off';
+          return { [colVar(hit[0])]: hit[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)), ...(walletOff ? { [SHOP_VAR]: '' } : {}) };
+        });
+        if (walletOff) {
+          resetShop();
+          await dropShopTags(ctx);
+        }
+      }
       return true;
     case 'set-wallet-start': {
       const n = parseWon(v);

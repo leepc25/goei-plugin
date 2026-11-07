@@ -146,7 +146,13 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.equal(out[2].role, 'system');
   assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
   assert.equal(withInventory(out, chat), out);
-  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } }).length, 3, '끄면 안 넣는다');
+  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_on: '0' } }).length, 3, '끄면 안 넣는다');
+  // 넘기기를 꺼도 상점이 켜져 있으면 물건 목록 없이 상점 지침만 ([Shop])
+  { const s = withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } });
+    assert.equal(s.length, 4);
+    assert.match(s[2].content, /^\[Shop\]\n[\s\S]*\[shop: 가게 이름\|주인 이름\]/);
+    assert.doesNotMatch(s[2].content, /소금 봉지|\[Inventory\]/);
+    assert.equal(withInventory(s, chat), s); }
   // 응답이 붙은 뒤: 사용 기록(id·횟수)이 응답에 묶이고, 다 써서 목록에서 빠진다
   chat.message.push({ role: 'char', data: '뿌렸다', chatId: 'b2' });
   const vars = settleItemUse(chat, 3);

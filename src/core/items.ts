@@ -476,6 +476,8 @@ export function searchItems(it: Items, alive: Set<string>, q: string): { items: 
 // ── 본편 요청·응답 (body.ts) ──
 
 export const INVENTORY_HEAD = '[Inventory]';
+/** 본편에 넘기기가 꺼지고 상점만 켜졌을 때의 글 머리 */
+export const SHOP_HEAD = '[Shop]';
 const INVENTORY_NOTE =
   'What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: ' +
   'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back.';
@@ -530,7 +532,16 @@ export function pendingItemUse(vars: Record<string, unknown> | undefined, userKe
 /** 이 채팅의 [Inventory] 글 (본편에 넘기기 설정이 꺼졌거나 넘길 게 없으면 '') */
 export function inventoryText(chat: Chat): string {
   const vars = chat.scriptstate;
-  if (!itemPushOn(vars)) return '';
+  if (!itemPushOn(vars)) {
+    // 본편에 넘기기를 꺼도 상점은 켜져 있을 수 있다: 물건 목록 없이 상점 표식 지침과 이번 방문 사건만 [Shop] 글로 넘긴다
+    // (지침이 [Inventory] 에만 실려 있어, 넘기기를 끄면 모델이 표식을 쓰지 않아 상점이 열리지 않던 것, 11-08 전수점검)
+    if (!shopOn(vars)) return '';
+    const it = readItems(vars);
+    const live = liveItems(it, aliveAnchors(chat));
+    const bought = newlyBought(live, lastBotKey(chat)).map((e) => e.name);
+    const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...shopEvents(chat)];
+    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), shopGuide(vars)].join('\n');
+  }
   const it = readItems(vars);
   const userKey = lastUserKey(chat);
   // 다시 굴리기: 이번 턴 사용 기록(옛 응답에 묶인 것)은 셈에서 빼고 본다 — 지금 응답이 그 사용을 다시 쓰는 중
@@ -577,7 +588,7 @@ function keyAfter(chat: Chat, k: string, userKey: string): boolean {
 
 /** 요청: [Inventory] 글을 마지막 유저 메시지 앞에 system 으로 넣는다 (상태창 블록과 같은 자리). 이미 있으면 그대로 */
 export function withInventory<M extends PromptMessage>(messages: M[], chat: Chat): M[] {
-  if (messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(INVENTORY_HEAD))) return messages;
+  if (messages.some((m) => typeof m?.content === 'string' && (m.content.startsWith(INVENTORY_HEAD) || m.content.startsWith(SHOP_HEAD)))) return messages;
   const text = inventoryText(chat);
   if (!text) return messages;
   const at = messages.map((m) => m?.role).lastIndexOf('user');
