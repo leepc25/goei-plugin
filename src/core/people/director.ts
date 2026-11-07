@@ -87,14 +87,14 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const live = liveness(chat);
   const changes = liveChanges(store, live);
   const list = Array.isArray(chat.message) ? chat.message : [];
-  const recent = list.slice(-4).map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', text: messageText(String(m.data ?? '')).slice(0, 3000) }));
+  const recent = (s.recentMsgs > 0 ? list.slice(-s.recentMsgs) : []).map((m) => ({ role: m.role === 'user' ? 'user' : 'assistant', text: messageText(String(m.data ?? '')).slice(0, 3000) }));
   const featureSlots = s.directorFeatures ? slotsFor(s.features, s.qualitative).filter((x) => SLOT_META[x].feature) : [];
   // 기록 전문(본편이 받는 인물 블록과 같은 글)을 `record` 로 준다 (2026-11-07 E: 꼬리 6개만 주던 것 → 전문). 인물 수로 예산을 나눈다
   const recordCap = Math.max(1500, Math.floor(s.blockCap / Math.max(1, people.length)));
   const persons = people.map((n) => {
     const p = store.people[n];
     const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
-    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed, turnCap: s.turnCap });
+    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap });
     const slots: Record<string, { text: string; target?: string }[]> = {};
     for (const k of featureSlots) {
       const es = liveEntries(p.slots[k as SlotId], live).slice(-4).map((e) => ({ text: e.text, ...(e.target ? { target: e.target } : {}) }));
@@ -107,7 +107,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
       address: addressOf(p, changes),
       express: p.express,
       ...(s.directorFeatures && s.features.has('axes') ? { axes: axesLinesEn(p.axes), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
-      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speed: s.speed, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
+      record: personBlock(p, store, live, changes, { mode: 'record', unknown: [], speed: s.speed, speedDown: s.speedDown, turnCap: s.turnCap, maxChars: recordCap, taste: s.features.has('taste'), openness: s.features.has('openness'), axes: false, features: s.features, qual: s.qualitative }),
       state: slot('state'),
       threads: slot('threads'),
       knowledge: slot('knowledge'),

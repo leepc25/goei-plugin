@@ -15,6 +15,7 @@ import { sectionBody } from '../core/people/updater';
 import { UPDATER_DETAILED, UPDATER_COMPACT } from '../core/people/prompt';
 import { UPDATER_SECTIONS } from '../core/people/prompt/detailed';
 import { DIRECTOR_BASE_TEXT } from '../core/people/director';
+import { ROUTER_SYSTEM } from '../core/people/router';
 import { undoLastRun } from '../core/people/store';
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
@@ -199,7 +200,7 @@ function factionName(ctx: ChatContext, code: string): string {
   return factionList(ctx.char.globalLore).find((f) => f.code === code)?.name ?? code;
 }
 
-const affOpts = (ctx: ChatContext, name: string) => ({ temper: temperOf(name), speed: peopleSettings(ctx.chat.scriptstate).speed, turnCap: peopleSettings(ctx.chat.scriptstate).turnCap });
+const affOpts = (ctx: ChatContext, name: string) => ({ temper: temperOf(name), speed: peopleSettings(ctx.chat.scriptstate).speed, speedDown: peopleSettings(ctx.chat.scriptstate).speedDown, turnCap: peopleSettings(ctx.chat.scriptstate).turnCap });
 
 /** 사원증 창의 「기록」 단추: 그 이름의 기록이 있나 */
 export function hasPersonRecord(ctx: ChatContext, name: string): boolean {
@@ -338,17 +339,18 @@ const SECTION_LABEL: Record<string, string> = {
   tidy: '기록 정리', taste: '취향 띠(첫인상)', openness: '음란도', rhythm: '서사 리듬', faction_rep: '세력 평판', axes: '성격 6축',
   affinity: '호감과 취향', affinity_num: '호감 · 수치', affinity_qual: '호감 · 정성 모드', register: '호칭·말투', perception: '인식', perception_ext: '인식 확장',
   suspicion: '의심', suspicion_num: '의심 · 수치', suspicion_qual: '의심 · 정성 모드', openness_num: '음란도 · 수치', openness_qual: '음란도 · 정성 모드',
-  docs_event: '사건 문서', docs_location: '장소 문서', docs_faction: '세력 문서', docs_item: '물건 문서', director: 'Director 기본 지침 (연출형)',
+  docs_event: '사건 문서', docs_location: '장소 문서', docs_faction: '세력 문서', docs_item: '물건 문서', director: 'Director 기본 지침 (연출형)', router: 'Router 기본 지침',
 };
 /** 지침 편집 (리수폿 J-1): 절 하나를 골라 본문을 덮어쓴다. 지침 판(자세히·간결)마다 따로. 출력 계약 줄은 못 바꾼다 */
 function promptEditor(state: Record<string, unknown> | undefined, prompt: 'detailed' | 'compact'): string {
   const text = prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
-  const names = [...UPDATER_SECTIONS.filter((n) => n !== 'user_rules' && sectionBody(text, n) !== null), 'director'];
+  const names = [...UPDATER_SECTIONS.filter((n) => n !== 'user_rules' && sectionBody(text, n) !== null), 'director', 'router'];
   const cur = names.includes(peopleUi.psSection) ? peopleUi.psSection : names[0];
-  const key = cur === 'director' ? PS('director', 'base') : PS(prompt, cur);
+  const keyOf = (n: string) => (n === 'director' || n === 'router' ? PS(n, 'base') : PS(prompt, n));
+  const key = keyOf(cur);
   const saved = typeof state?.[key] === 'string' ? String(state[key]) : '';
-  const original = cur === 'director' ? DIRECTOR_BASE_TEXT : sectionBody(text, cur) ?? '';
-  const options = names.map((n) => `<option value="${n}" ${n === cur ? 'selected' : ''}>${SECTION_LABEL[n] ?? n}${typeof state?.[cur === n ? key : n === 'director' ? PS('director', 'base') : PS(prompt, n)] === 'string' && String(state?.[n === 'director' ? PS('director', 'base') : PS(prompt, n)]).trim() ? ' ●' : ''}</option>`).join('');
+  const original = cur === 'director' ? DIRECTOR_BASE_TEXT : cur === 'router' ? ROUTER_SYSTEM.join('\n') : sectionBody(text, cur) ?? '';
+  const options = names.map((n) => `<option value="${n}" ${n === cur ? 'selected' : ''}>${SECTION_LABEL[n] ?? n}${typeof state?.[keyOf(n)] === 'string' && String(state?.[keyOf(n)]).trim() ? ' ●' : ''}</option>`).join('');
   return `<div class="pp-rule pp-ps"><label class="pp-ps-pick"><b>고칠 부분</b><select class="gx-select" data-change="pp-ps-pick">${options}</select></label>
     <textarea class="gx-search nw-reqbox" name="pp-ps-text" data-input="pp-ps-text" rows="10" maxlength="12000">${esc(saved || original)}</textarea>
     <small>갱신 지침(영어 원문)에서 고른 부분의 본문이에요. ${saved ? '지금은 <b>고쳐 쓴 글</b>을 쓰고 있어요.' : '지금은 원문이에요.'} 지침 판(${prompt === 'compact' ? '간결' : '자세히'})마다 따로 저장돼요. 제목 줄과 출력 형식(JSON 계약) 줄은 바꿀 수 없어요. ●는 고쳐 쓴 부분</small>
@@ -392,7 +394,10 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
-    row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 오르내려요'),
+    row('호감 증가 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요 (리수폿 increase)'),
+    row('호감 감소 속도', seg('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown), [['same', '증가와 같게'], ['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 내리는 계기 점수에 곱하는 배율이에요 (리수폿 decrease). 「증가와 같게」면 위 값을 써요'),
+    row('항상 포함할 인물', `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">`, '쉼표로 구분한 이름. 글에 이름이 안 나와도 매 턴 본편 기록·Director 자료에 넣고, 갱신기도 되짚어요 (리수폿 자동 추적). 기록에 있는 이름만 들어가요'),
+    row('최근 글 범위', seg('recent_msgs', String(s.recentMsgs), [['2', '2개'], ['4', '4개'], ['6', '6개'], ['8', '8개']]), 'Router·Director 가 이번 입력과 함께 보는 최근 메시지 수 (리수폿 stageContext)'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
   // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
@@ -419,6 +424,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ...(s.router === 'model' ? [
       stageModel('router', 'Router 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델'),
       row('시간 제한', seg('router_timeout', String(s.routerTimeout), [['30', '30초'], ['60', '60초'], ['120', '120초']]), '넘기면 이번 턴은 코드로 골라요.'),
+      `<div class="pp-rules one">${ruleBox('pp-router-rules', 'Router 에 덧붙일 지침', v('router_rules'), '장면 인물을 고를 때 규칙을 더해요 (예: 어떤 인물은 늘 빼기). 기본 지침 전체를 고치려면 갱신 블록의 「고칠 부분 → Router 기본 지침」', 2000, '예: 관리국 요원만 고르고 민간인은 빼라', 'pp-rrules-save')}</div>`,
     ] : []),
   ].join('');
   const director = [
@@ -970,7 +976,7 @@ export async function handlePeople(action: string, value: string | undefined, ct
     case 'pp-ps-save':
     case 'pp-ps-reset': {
       const prompt = peopleSettings(ctx.chat.scriptstate).prompt;
-      const key = peopleUi.psSection === 'director' ? PS('director', 'base') : PS(prompt, peopleUi.psSection);
+      const key = peopleUi.psSection === 'director' || peopleUi.psSection === 'router' ? PS(peopleUi.psSection, 'base') : PS(prompt, peopleUi.psSection);
       await setVars(ctx, env, { [key]: action === 'pp-ps-reset' ? '' : v.slice(0, 12000) });
       peopleUi.info = action === 'pp-ps-reset' ? '원본으로 되돌렸어요.' : '절을 덮어썼어요.';
       env.render();
@@ -984,9 +990,10 @@ export async function handlePeople(action: string, value: string | undefined, ct
       return true;
     }
     case 'pp-rules-save':
-    case 'pp-drules-save': {
+    case 'pp-drules-save':
+    case 'pp-rrules-save': {
       // data-take 로 입력칸 글이 value 로 온다
-      const key = action === 'pp-drules-save' ? 'director_rules' : 'rules';
+      const key = action === 'pp-drules-save' ? 'director_rules' : action === 'pp-rrules-save' ? 'router_rules' : 'rules';
       await setVars(ctx, env, { [PP(key)]: v.slice(0, key === 'rules' ? 4000 : 2000) });
       peopleUi.info = '지침을 저장했어요.';
       env.render();
@@ -1195,6 +1202,11 @@ export async function handlePeople(action: string, value: string | undefined, ct
       const n = Math.max(0, Math.min(100, Math.round(Number(v))));
       if (!Number.isFinite(n)) return true;
       await setVars(ctx, env, { [PP('turn_cap')]: String(n) });
+      return true;
+    }
+    case 'pp-always': {
+      // 항상 포함할 인물: 쉼표 목록 그대로 저장 (기록에 있는지는 쓰는 쪽이 거른다)
+      await setVars(ctx, env, { [PP('always')]: v.replace(/\s*,\s*/g, ', ').trim().slice(0, 400) });
       return true;
     }
     case 'pp-bounds': {

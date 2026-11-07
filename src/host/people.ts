@@ -497,7 +497,7 @@ export const routerHintsNow = (): RouterHint[] => routerHints;
 export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = []): Promise<string[] | null> {
   if (settings.router !== 'model' || !Object.keys(store.people).length) return null;
   const names = allNames();
-  const built = buildRouter(chat, store, names, input, { exclude });
+  const built = buildRouter(chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules });
   if (routerCache?.key === built.key) return routerCache.selected;
   const t0 = Date.now();
   const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
@@ -533,7 +533,7 @@ let directorCache: { key: string; notes: DirectorNote[] } | null = null;
 /** Director 메모 글(사실형·연출형). 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
 export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown, char?: { chaId?: string }): Promise<string> {
   if (settings.director !== 'scene' && settings.director !== 'facts') return '';
-  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-4).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)));
+  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-Math.max(1, settings.recentMsgs)).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)));
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
   // 1차: 메모 또는 검색 요청. 검색 요청이면 코드가 찾아서 2차 (리수폿 B). 각 호출에 시간 제한

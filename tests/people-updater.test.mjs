@@ -18,7 +18,7 @@ const T = await mod('types');
 const St = await mod('settings');
 const A = await mod('affinity');
 
-const settings = (over = {}) => ({ ...St.peopleSettings({ $pp_director: 'note' }), ...over });
+const settings = (over = {}) => ({ ...St.peopleSettings({ $pp_director: 'note', $pp_prev_pairs: '1' }), ...over });
 const person = (name, extra = {}) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [], ...extra });
 const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role, data, chatId })) });
 const names = [{ name: '쟈알디', aliases: ['Jyaldi'], titles: ['부장'] }, { name: '데쥬레', aliases: [], titles: [] }];
@@ -217,7 +217,7 @@ test('유저가 연기하는 요원은 장면 인물·새 인물에서 빠진다
 });
 
 test('기본값: 인물끼리 감정 켬, 기록 상한 2000, 접기 상한 20000, 말투 5종', () => {
-  const s = St.peopleSettings({ $pp_director: 'note' });
+  const s = St.peopleSettings({ $pp_director: 'note', $pp_prev_pairs: '1' });
   assert.ok(s.features.has('npc_emotion'));
   assert.equal(s.spanCap, 20000);
   assert.deepEqual(T.REGISTERS, ['존댓말', '반말', '혼합', '하게체', '하오체']);

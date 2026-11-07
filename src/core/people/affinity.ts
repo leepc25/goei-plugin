@@ -6,8 +6,10 @@ const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
 export interface AffinityOpts {
   temper?: Temper;
-  /** 설정 「호감 변화 속도」 0.5~2 */
+  /** 설정 「호감 변화 속도」 0.25~4 (증가 승수) */
   speed?: number;
+  /** 감소 승수 (원본 affinity.decrease). 없으면 speed 와 같게 */
+  speedDown?: number;
   /** 설정 「메시지당 변화 상한」. 0 = 한도 없음. 없으면 기본 10 */
   turnCap?: number;
 }
@@ -19,7 +21,7 @@ export function cueDelta(c: Change, o: AffinityOpts = {}): number {
   // 배율 (필드 몹 목격 0.5): 소수점 버림. 0 이면 계기 없음
   const base = typeof c.scale === 'number' && c.scale !== 1 ? Math.trunc(raw * c.scale) : raw;
   const t = o.temper ?? DEFAULT_TEMPER;
-  return base * (base >= 0 ? t.open : t.grudge) * (o.speed ?? 1);
+  return base * (base >= 0 ? t.open : t.grudge) * (base >= 0 ? o.speed ?? 1 : o.speedDown ?? o.speed ?? 1);
 }
 
 /** 계기 합 (호감·세력 공용): 시작값 + 살아 있는 계기, 기준 메시지당 ±10, 고정은 덮음 */
@@ -100,7 +102,7 @@ export function opennessOf(person: Person, changes: Change[]): number | null {
 
 /** 세력 → 유저 평판 현재값: 시작값(조직×조직 표) + 살아 있는 계기. 세력 성격 계수는 1, 설정 속도는 적용 */
 export function factionOf(code: string, base: number, changes: Change[], folded = 0, o: AffinityOpts = {}): number {
-  return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, turnCap: o.turnCap });
+  return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, speedDown: o.speedDown, turnCap: o.turnCap });
 }
 
 export function factionView(code: string, base: number, changes: Change[], folded = 0, o: AffinityOpts = {}, bounds?: readonly number[]) {

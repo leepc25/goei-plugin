@@ -25,7 +25,7 @@ const person = (name) => ({ name, faction: 'A00', seeded: { from: 'none', at: ''
 const chatOf = (n) => ({ message: Array.from({ length: n * 2 }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: i % 2 ? `쟈알디가 ${(i + 1) / 2}번째로 말했다. 명일 아파트.` : `입력 ${i / 2 + 1}`, chatId: i % 2 ? `c${(i + 1) / 2}` : `u${i / 2 + 1}` })) });
 const entry = (id, text, anchor, extra = {}) => ({ id, text, src: 'story', anchor, seq: 1, quote: '말했다', ...extra });
 const names = [{ name: '쟈알디', aliases: [], titles: [] }];
-const settings = (over = {}) => St.peopleSettings({ $pp_rhythm: '1', $pp_director: 'note', ...over });
+const settings = (over = {}) => St.peopleSettings({ $pp_rhythm: '1', $pp_director: 'note', $pp_prev_pairs: '1', ...over });
 
 test('훅 시계: 심은 턴·범위·넘김·연장·새 훅 허용', () => {
   const c = chatOf(12);

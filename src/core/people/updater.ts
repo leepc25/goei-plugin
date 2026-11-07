@@ -213,6 +213,9 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   for (const t of texts) for (const n of match(t)) push(n);
   const scoped = { ...chat, message: list.slice(0, Math.max(...batch) + 1) } as Chat;
   for (const n of scenePeople(scoped, store, match, { recent: 2 })) push(n);
+  // 항상 포함할 인물 (설정 always, 원본 tracking_review): 글에 안 나와도 되짚되, 안 나온 건 근거가 아니다
+  const tracked = o.settings.always.filter((n) => store.people[n] && !o.exclude?.includes(n));
+  for (const n of tracked) push(n);
   // 태그 신호: 묶음 앞 응답과 묶음 마지막 응답의 요원 태그 비교
   const signals: Signal[] = [];
   const prevBot = [...list.slice(0, first)].reverse().find((m) => m.role === 'char');
@@ -269,6 +272,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
     ...(clock ? { rhythm_clock: rhythmClockLines(clock) } : {}),
     ...(review.length ? { relationship_review: review } : {}),
+    ...(tracked.some((n) => chosen.includes(n)) ? { tracking_review: { refs: tracked.filter((n) => chosen.includes(n)), rule: 'Review every listed person after this completed exchange even when absent from the text. Tracking is permission to review, not evidence of participation, acquired knowledge, emotion or change. Never force a rewrite to fill the card; for an unchanged person return a `no_canonical_change` issue.' } } : {}),
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,

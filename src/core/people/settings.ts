@@ -29,6 +29,10 @@ export const PP_DEFAULTS: Record<string, string> = {
   /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
   router: 'code',
   router_timeout: '60',
+  /** 2026-11-07 (전수검사 4 의 L·M·P, 원본 trackedCharactersByScope·stageContext·Router 지침): 항상 포함할 인물(쉼표·줄바꿈), Router·Director 가 보는 최근 글 수, Router 에 덧붙일 지침 */
+  always: '',
+  recent_msgs: '4',
+  router_rules: '',
   /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
   model_director: 'same', model_router: 'same', model_tidy: 'same',
   model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
@@ -39,6 +43,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   hypa_items: '16',
   hypa_plus: '1',
   speed: '1',
+  /** 호감 감소 승수 (원본 affinity.decrease). same = 증가 승수(speed)와 같게 (전수검사 4 의 N) */
+  speed_down: 'same',
   /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
   turn_cap: '10',
   /** 성격 6축·관찰 누적 (리수폿 People). 기본 켬 */
@@ -57,7 +63,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',
-  prev_pairs: '1',
+  /** 갱신기 앞에 붙이는 직전 유저·봇 쌍 (원본 stageContext.writer 2). 2026-11-07 W3: 1 → 2 */
+  prev_pairs: '2',
   /** 기록 본문 언어 (ko / en). 이름·인용·호칭은 늘 원문 */
   lang: 'ko',
   /** 인물당 저장 상한 (글자). 리수폿 절 상한 합계와 같은 10,000 */
@@ -89,6 +96,13 @@ export interface PeopleSettings {
   directorFeatures: boolean;
   router: 'code' | 'model';
   routerTimeout: number;
+  /** 항상 포함할 인물 이름 (기록에 있는지는 쓰는 쪽이 확인) */
+  always: string[];
+  /** Router·Director 가 보는 최근 글 수 */
+  recentMsgs: number;
+  /** Router 지침 덮어쓰기(비면 기본)와 덧붙일 지침 */
+  routerPrompt: string;
+  routerRules: string;
   /** 단계별 모델 (same 은 갱신 모델로 푼 값) 과 전용 모델 ID (비면 없음) */
   stageModel: Record<Stage, 'main' | 'aux'>;
   stageModelId: Record<Stage, string>;
@@ -100,6 +114,8 @@ export interface PeopleSettings {
   promptOverrides: Record<string, string>;
   directorPrompt: string;
   speed: number;
+  /** 호감 감소 승수 */
+  speedDown: number;
   turnCap: number;
   features: Set<Feature>;
   /** 수치를 켠 기능 */
@@ -164,6 +180,10 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     directorFeatures: v('director_features') !== '0',
     router: v('router') === 'model' ? 'model' : 'code',
     routerTimeout: num('router_timeout', 5, 300),
+    always: [...new Set(v('always').split(/[,\n]/).map((x) => x.trim().normalize('NFC')).filter(Boolean))].slice(0, 12),
+    recentMsgs: num('recent_msgs', 0, 12),
+    routerPrompt: (typeof state?.[PS('router', 'base')] === 'string' ? String(state[PS('router', 'base')]) : '').trim().slice(0, 12000),
+    routerRules: v('router_rules').slice(0, 2000),
     stageModel: (() => {
       const base = v('model') === 'main' ? 'main' : 'aux';
       const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);
@@ -177,6 +197,7 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     promptOverrides: promptOverrides(state, one('prompt', ['detailed', 'compact'] as const)),
     directorPrompt: (typeof state?.[PS('director', 'base')] === 'string' ? String(state[PS('director', 'base')]) : '').trim().slice(0, 12000),
     speed: num('speed', 0.25, 4),
+    speedDown: v('speed_down') === 'same' || v('speed_down') === '' ? num('speed', 0.25, 4) : num('speed_down', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
     features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),
     numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== '0')),

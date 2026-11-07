@@ -39,9 +39,11 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   const match = nameMatcher(names);
   // 코드 Router(이름이 직접 나온 인물·동행)는 늘 들어가고, 모델 Router 가 더 고른 인물(이름 없이 가리킨 제3자 등)을 뒤에 합친다.
   // 2026-11-07 전수검사 2 의 B: 모델 결과가 코드 결과를 대체하면 모델이 빠뜨린 인물이 그 턴 기록에서 사라졌다 (원본 includeMentionedCharacters 와 같게)
-  const byCode = scenePeople(chat, o.store, match, { input: o.input });
-  const byModel = (o.people ?? []).filter((n) => o.store.people[n] && !byCode.includes(n));
-  const people = [...byCode, ...byModel].slice(0, 6);
+  // 항상 포함할 인물(설정 always, 원본 tracked)은 맨 앞에: 글에 안 나와도 그 턴 기록·Director 자료에 든다
+  const always = o.settings.always.filter((n) => o.store.people[n]);
+  const byCode = scenePeople(chat, o.store, match, { input: o.input }).filter((n) => !always.includes(n));
+  const byModel = (o.people ?? []).filter((n) => o.store.people[n] && !always.includes(n) && !byCode.includes(n));
+  const people = [...always, ...byCode, ...byModel].slice(0, Math.max(6, always.length));
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
@@ -61,6 +63,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         note,
         temper: o.temperOf?.(n),
         speed: o.settings.speed,
+        speedDown: o.settings.speedDown,
         turnCap: o.settings.turnCap,
         // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
         maxChars: Math.floor(o.settings.blockCap / people.length),
