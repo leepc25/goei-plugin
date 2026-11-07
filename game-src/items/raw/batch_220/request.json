@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black padded heated vest with glowing orange heating lines and a small battery pack, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crown woven from dark thorny branches with long sharp thorns, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean norigae ornament with a tiger claw set in silver and a red silk tassel, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small Korean silver ornamental knife in a carved sheath with a tassel, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lucky rabbit foot charm on a small chain, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ear cuff that wraps around the outer ear rim, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval chainmail skirt armor hanging from a leather belt, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace with a small glass vial pendant filled with dark red blood, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small silver cross drop earrings, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold upper arm bracelet shaped like a coiled snake, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick soft grey felt overshoes for silent walking, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of earrings with long animal fang pendants, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet braided from five colored threads, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black ballistic leg armor pants with hard plates on thighs and shins, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plague doctor mask with a long curved leather beak and round glass eyes, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round steel buckler shield strapped to a forearm bracer, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "열선 조끼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black padded heated vest with glowing orange heating lines and a small battery pack, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가시 왕관",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crown woven from dark thorny branches with long sharp thorns, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호랑이 발톱 노리개",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean norigae ornament with a tiger claw set in silver and a red silk tassel, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은장도",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small Korean silver ornamental knife in a carved sheath with a tassel, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "행운의 토끼발",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lucky rabbit foot charm on a small chain, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀 커프",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver ear cuff that wraps around the outer ear rim, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사슬 치마 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval chainmail skirt armor hanging from a leather belt, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피 담긴 병 목걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace with a small glass vial pendant filled with dark red blood, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "십자가 귀걸이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small silver cross drop earrings, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뱀 팔뚝 팔찌",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold upper arm bracelet shaped like a coiled snake, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발소리 죽이는 덧신",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thick soft grey felt overshoes for silent walking, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "짐승 이빨 귀걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of earrings with long animal fang pendants, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오색실 팔찌",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet braided from five colored threads, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방탄 하의",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black ballistic leg armor pants with hard plates on thighs and shins, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "역병 의사 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plague doctor mask with a long curved leather beak and round glass eyes, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손목 방패",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round steel buckler shield strapped to a forearm bracer, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
