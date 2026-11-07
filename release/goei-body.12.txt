@@ -1,4 +1,68 @@
-   });
+s4 = partyNames(x, team);
+      const body5 = sceneDirective(d, dest, names4, support, false);
+      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function sendMission(ctx2, env3, opening) {
+    const kind = field3.mpick;
+    const name = field3.mname;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest = destination(d, name);
+      if (kind === "lm") {
+        const lm = x.catalog.landmarks.find((l) => l.name === name);
+        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
+      } else if (kind === "ms") {
+        const site = x.world.ms.find((m) => m.name === name);
+        if (site) dest = destination(d, name, locName(site.loc));
+      }
+      const names4 = partyNames(x, team);
+      let chat = latest;
+      if (x.on) {
+        const w = structuredClone(x.world);
+        const last2 = (latest.message ?? []).at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body5 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function closeIndexOf(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return i;
+    return Math.max(0, list4.length - 1);
+  }
+  async function saveWorld(ctx2, env3, change) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    try {
+      let closedAt = -1;
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+        if (w.closed?.length) {
+          const index = closeIndexOf(latest);
+          const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+          if (built.rows.length) {
+            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+            closedAt = index;
+          }
+        }
+        return next;
+      });
       if (saved && closedAt >= 0) {
         try {
           await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex, { chat: saved, char: ctx2.char });
@@ -1306,7 +1370,8 @@
   }
   function scenariosFor(f, player, lore) {
     if (!player) return f.scenarios;
-    const own = agentScene(player, scenesOf(lore)) ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? "이 인물")] : [];
+    const ownScene = agentScene(player, scenesOf(lore));
+    const own = ownScene ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? "이 인물", ownScene.label)] : [];
     return [...own, ...f.scenarios.filter((x) => x.kind !== "opening")];
   }
   function picker() {
@@ -2350,5 +2415,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.0", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.1", start: start2 };
 })();

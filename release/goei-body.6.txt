@@ -1,6 +1,4 @@
-who", "비우면 주인공"), "일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요")] : [],
-      row4("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
-      row4("주제", text4("subject", "비우면 세계관에 맞는 다양한 주제")),
+ text4("subject", "비우면 세계관에 맞는 다양한 주제")),
       row4("분위기·말투", text4("mood", "비우면 익명 커뮤니티 말투")),
       row4("보호 대상", text4("protagonist", "비우면 주인공"), "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공"),
       row4("주요 인물 닉네임", seg3("keyfigures", v("keyfigures") === "0" ? "0" : "1", [["1", "보존"], ["0", "안 함"]]), "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요"),
@@ -1048,7 +1046,7 @@ Next Paragraph Text
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.0" : "0";
+  var PLUGIN_VERSION = true ? "0.21.1" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -1387,7 +1385,7 @@ Next Paragraph Text
     }
     return { hash: "", sha256: "", length: 0 };
   }
-  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"94ff3a99","sha256":"61f2ad5da9eca36b1939db5ab8241a2c3975d679f5657510e4bb7eb9636fdf3c","length":1504095}' : void 0) };
+  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"5704235f","sha256":"26665dfcaeec5cb98ba21b70cd1ad3f7fd8261e2fba6a9264fb3c8df0fcfa379","length":1502296}' : void 0) };
   var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"31f59edf","sha256":"b2bd2c28600c1e974931e7aa7b47035c6d931617c3861f3ad481b9da4f37d0f7","length":153725}' : void 0) };
   function packMatches(text4, expect) {
     return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
@@ -1931,18 +1929,15 @@ Next Paragraph Text
   var input = (key2, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc12(key2)}" value="${esc12(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
   var area = (key2, value, label2, rows2 = 6, help = "") => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc12(key2)}" rows="${rows2}">${esc12(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
   var seg4 = (action, value, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc12(`1|${value}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc12(`0|${value}`)}">${b}</button></div>`;
-  function slotRow(s7, i, n2) {
+  function slotRow(s7) {
     const open2 = stUi.sel === s7.code;
     const kind = s7.kind === "builtin" ? "기본 세력" : s7.kind === "group" ? "묶음" : "플레이 조직";
-    return `<div class="dir-row${open2 ? " open" : ""}">
-    <div class="dir-head st-slot">
+    return `<div class="dir-row${open2 ? " open" : ""}" data-slot-row="${esc12(s7.code)}">
+    <div class="dir-head st-slot" data-action="dir-start-open" data-value="${esc12(s7.code)}" role="button" aria-expanded="${open2}">
+      <span class="gw-grip" data-drag-slot="${esc12(s7.code)}" title="끌어서 순서 바꾸기">${ICONS.grip}</span>
       <span class="dir-name"><b>${esc12(s7.name)}</b><small>${kind} · ${esc12(s7.code)}${s7.count ? ` · ${s7.count}명` : ""}</small></span>
       ${seg4("dir-start-show", s7.code, !s7.hidden, "보임", "숨김")}
-      <span class="gx-row-btns">
-        <button class="gx-mini" data-action="dir-start-move" data-value="${esc12(`up|${s7.code}`)}" ${i === 0 ? "disabled" : ""} aria-label="위로">${ICONS.up}</button>
-        <button class="gx-mini" data-action="dir-start-move" data-value="${esc12(`down|${s7.code}`)}" ${i === n2 - 1 ? "disabled" : ""} aria-label="아래로">${ICONS.down}</button>
-        <button class="gx-mini" data-action="dir-start-open" data-value="${esc12(s7.code)}" aria-expanded="${open2}">${open2 ? "접기" : "열기"}</button>
-      </span>
+      <span class="st-caret">${open2 ? ICONS.up : ICONS.down}</span>
     </div>
   </div>`;
   }
@@ -1950,32 +1945,37 @@ Next Paragraph Text
     const rows2 = factionScenes(code2, d.scenes);
     const list4 = rows2.map((r) => {
       const k = (f) => `scene:${code2}|${r.fm}|${f}`;
-      return `<div class="st-scene${r.hidden ? " off" : ""}">
+      return `<details class="st-scene${r.hidden ? " off" : ""}"><summary><b>${esc12(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? "새 장면" : "기본 장면"} ${r.fm}${r.hidden ? " · 숨김" : ""}</small></summary>
         <div class="dir-line"><span>${r.custom ? "새 장면" : "기본 장면"} ${r.fm}</span>
           <span class="gx-row-btns">${seg4("dir-scene-show", `${code2}|${r.fm}`, !r.hidden, "보임", "숨김")}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc12(`${code2}|${r.fm}`)}">지우기</button>` : ""}</span></div>
         ${input(k("label"), r.label, "이름")}
         ${area(k("ko"), r.ko, "한국어", 6, r.hasDefault ? "비우면 기본 글로 돌아가요" : "")}
         ${area(k("en"), r.en, "English", 6, r.hasDefault ? "비우면 기본 글로 돌아가요" : "")}
-      </div>`;
+      </details>`;
     }).join("");
     const tail2 = (BUILTIN.includes(code2) ? SCENARIOS.factions.find((f) => f.code === code2)?.scenarios ?? [] : []).filter((s7) => s7.kind !== "opening").map((s7) => s7.label);
     return `<div class="dir-line"><span>첫 장면</span><button class="gx-mini" data-action="dir-scene-add" data-value="${esc12(code2)}">${ICONS.plus} 장면 추가</button></div>
     <p class="gx-muted">내 페르소나로 시작할 때 고르는 공용 장면이에요. 인물로 시작하면 그 인물의 첫 장면(요원 기록 · 묶음 구성원 칸)과 직접 입력·커스텀 임무만 보여요.${tail2.length ? ` 직접 입력·커스텀 임무는 늘 있어요.` : ""}</p>
     ${list4 || '<p class="gx-muted">공용 장면이 없어요. 직접 입력·커스텀 임무로 시작해요.</p>'}`;
   }
+  function agentSceneState(id, d) {
+    const saved = agentSceneSaved(id, d.scenes);
+    return saved?.ko || saved?.en || saved?.label ? "직접 고친 글" : agentScene(id, void 0) ? "기본 글" : "첫 장면 없음";
+  }
+  function agentSceneFields(id, d) {
+    const saved = agentSceneSaved(id, d.scenes);
+    const def = agentScene(id, void 0);
+    const hasDefault = !!def;
+    const k = (f) => `ascene:${id}|${f}`;
+    return `${input(k("label"), saved?.label ?? def?.label ?? "", "제목", "시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」")}
+    ${area(k("ko"), saved?.ko ?? def?.ko ?? "", "한국어", 10, hasDefault ? "기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요")}
+    ${area(k("en"), saved?.en ?? def?.en ?? "", "English", 10, hasDefault ? "기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "")}`;
+  }
   function membersBlock(code2, d) {
     const all = d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name);
     const members = all.filter((a) => a.rosterFor.includes(code2));
     const chips3 = all.map((a) => `<button class="gx-chip${a.rosterFor.includes(code2) ? " on" : ""}" data-action="dir-group-member" data-value="${esc12(`${code2}|${a.id}`)}" aria-pressed="${a.rosterFor.includes(code2)}">${esc12(a.name)}</button>`).join("");
-    const scenes = members.map((a) => {
-      const saved = agentSceneSaved(a.id, d.scenes);
-      const hasDefault = !!agentScene(a.id, void 0);
-      const k = (f) => `ascene:${a.id}|${f}`;
-      return `<details class="st-member"><summary><b>${esc12(a.name)}</b><small>${esc12(a.id)} · ${saved?.ko || saved?.en ? "직접 쓴 글" : hasDefault ? "기본 글" : "첫 장면 없음"}</small></summary>
-        ${area(k("ko"), saved?.ko ?? "", "한국어", 6, hasDefault ? "비우면 기본 글(세계 자료)로 돌아가요" : "비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요")}
-        ${area(k("en"), saved?.en ?? "", "English", 6, hasDefault ? "비우면 기본 글로 돌아가요" : "")}
-      </details>`;
-    }).join("");
+    const scenes = members.map((a) => `<details class="st-member"><summary><b>${esc12(a.name)}</b><small>${esc12(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`).join("");
     return `<div class="dir-line"><span>구성원 ${members.length}명</span></div><div class="dir-chips">${chips3}</div>
     <p class="gx-muted">묶음으로 시작하면 내 페르소나 없이 구성원 한 명을 골라 그 인물로 시작해요. 사원증·괴담톡 탭·소속은 그 인물의 원래 조직을 따르고, 묶음 이름은 모델에게 알리지 않아요.</p>
     <div class="dir-line"><span>구성원별 첫 장면</span></div>${scenes || '<p class="gx-muted">구성원을 고르면 인물별 첫 장면을 고칠 수 있어요.</p>'}`;
@@ -2017,7 +2017,7 @@ Next Paragraph Text
     const addOrg = idle.length ? `<div class="dir-line"><span>조직을 시작 칸으로</span></div><div class="dir-chips">${idle.map((o) => `<button class="gx-chip" data-action="dir-fac-play" data-value="${esc12(`1|${o.name}`)}">${ICONS.plus} ${esc12(o.name)}</button>`).join("")}</div>` : "";
     return `<div class="gw-page gw-startpage">
     <header class="gw-head"><h2>시작 화면</h2><p class="gx-muted">새 채팅의 「어느 쪽에 설까요?」에 보이는 칸이에요. 순서와 보임을 정하고, 칸을 열어 이름·설명·사진·첫 장면을 고쳐요. 묶음은 조직이 아니라 여러 조직의 인물을 한 칸에 모은 거예요.</p></header>
-    <div class="dir-list st-slots">${slots.map((s7, i) => slotRow(s7, i, slots.length)).join("")}</div>
+    <div class="dir-list st-slots">${slots.map((s7) => slotRow(s7)).join("")}</div>
     <div class="dir-line"><button class="gx-mini" data-action="dir-group-add">${ICONS.plus} 묶음 추가</button></div>
     ${addOrg}
     ${sel ? `<h3 class="st-sel"><span>${esc12(sel.name)}</span><small>${esc12(sel.code)}</small></h3>${slotDetail(sel, ctx2, d)}` : ""}
@@ -2699,10 +2699,12 @@ Next Paragraph Text
     }
     if (key2.startsWith("ascene:")) {
       const [id, field5] = key2.slice(7).split("|");
-      if (!id || !(field5 === "ko" || field5 === "en")) return;
+      if (!id || !(field5 === "ko" || field5 === "en" || field5 === "label")) return;
       const rows2 = d.scenes.인물 ??= {};
       const row10 = rows2[id] ??= {};
-      if (value.trim()) row10[field5] = value;
+      const def = agentScene(id, void 0);
+      const same4 = def ? field5 === "label" ? value.trim() === def.label : value === def[field5] : false;
+      if (value.trim() && !same4) row10[field5] = value;
       else delete row10[field5];
       if (!Object.keys(row10).length) delete rows2[id];
       dirUi.done = "";
@@ -3007,6 +3009,16 @@ Next Paragraph Text
         const j = how === "up" ? i - 1 : i + 1;
         if (i < 0 || j < 0 || j >= order.length) break;
         [order[i], order[j]] = [order[j], order[i]];
+        d.startOrder = order;
+        dirUi.done = "";
+        break;
+      }
+      case "dir-start-drop": {
+        const [how, from, to] = v.split("|");
+        const order = startSlots(d).map((x) => x.code).filter((c) => c !== from);
+        const j = order.indexOf(to ?? "");
+        if (!from || j < 0 || from === to) break;
+        order.splice(how === "after" ? j + 1 : j, 0, from);
         d.startOrder = order;
         dirUi.done = "";
         break;
@@ -3576,6 +3588,4 @@ Next Paragraph Text
 .gw .adv-step > input.adv-val::-webkit-outer-spin-button, .gw .adv-step > input.adv-val::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .gw .adv-step > span, .gw .adv-num > span { display: inline-flex; align-items: center; padding: 0 10px 0 6px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .gw .st-step > b { display: inline-flex; align-items: center; justify-content: center; min-width: 3.4em; padding: 0 6px; font-size: 13px; font-weight: 600; color: var(--text); }
-.gw .adv-num { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
-.gw .adv-num > input { width: 84px; height: auto; min-height: 0; max-height: none; border: 0; border-radius: 0; background: transparent; text-align: right; }
-.gw .adv-num > span { pad
+.gw .adv-num { display: 

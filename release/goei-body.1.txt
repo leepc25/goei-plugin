@@ -1,4 +1,4 @@
-// goei-body 0.21.0
+// goei-body 0.21.1
 "use strict";
 (() => {
   var __create = Object.create;
@@ -2103,7 +2103,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const o = saved?.인물?.[agentId];
     const ko = o?.ko || b?.ko || "";
     const en2 = o?.en || b?.en || "";
-    return ko.trim() || en2.trim() ? { ko, en: en2 } : null;
+    const label2 = (o?.label || b?.label || "").trim();
+    return ko.trim() || en2.trim() ? { ko, en: en2, label: label2 } : null;
   }
   function agentSceneSaved(agentId, saved) {
     return saved?.인물?.[agentId];
@@ -2129,7 +2130,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   ];
   var isFactionCode = (v) => typeof v === "string" && /^[A-Z]00$/.test(v);
   var PLAYER_FM = 0;
-  var playerScenario = (name) => ({ fm: PLAYER_FM, label: `${name}의 첫 장면`, kind: "opening" });
+  var playerScenario = (name, label2) => ({ fm: PLAYER_FM, label: label2?.trim() || `${name}의 첫 장면`, kind: "opening" });
   var s3 = (v) => typeof v === "string" ? v.trim() : "";
   var list = (v) => Array.isArray(v) ? v.map(s3).filter(Boolean) : [];
   var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
@@ -2194,7 +2195,3 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   var extraTabId = (code2) => `T${100 + code2.charCodeAt(0) - 65}`;
   var cache = /* @__PURE__ */ new WeakMap();
   function factionList(lore) {
-    const books = lore ?? [];
-    const hit3 = cache.get(books);
-    if (hit3) return hit3;
-    c

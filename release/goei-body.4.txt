@@ -1,4 +1,7 @@
-ion factionNames2(lore) {
+ew Date(at * 6e4);
+    return `${two5(d.getUTCHours())}:${two5(d.getUTCMinutes())}`;
+  };
+  function factionNames2(lore) {
     return Object.fromEntries(readDirectory(lore).orgs.filter((o) => o.faction).map((o) => [o.faction, o.name]));
   }
   function buildChronicle(chat, lore) {
@@ -2487,7 +2490,7 @@ ${SEED_CLOSE}` : "", missing };
     if (!isLang(choice.lang)) throw new StartError("언어를 골라 주세요.");
     if (faction.group && !choice.player) throw new StartError("이 칸은 인물을 골라 시작해요.");
     const playerScene = choice.fm === PLAYER_FM && choice.player ? agentScene(choice.player, scenesOf(lore)) : null;
-    const scenario = playerScene ? { fm: PLAYER_FM, label: "첫 장면", kind: "opening" } : findScenario(choice.faction, choice.fm, factions);
+    const scenario = playerScene ? { fm: PLAYER_FM, label: playerScene.label || "첫 장면", kind: "opening" } : findScenario(choice.faction, choice.fm, factions);
     if (!scenario) throw new StartError("상황을 골라 주세요.");
     if (choice.player && scenario.kind === "opening" && !playerScene) throw new StartError("캐릭터로 시작할 때는 그 인물의 첫 장면이나 직접 입력·커스텀 임무를 골라 주세요.");
     let scene = "";
@@ -3666,19 +3669,9 @@ ${block2.trim()}` };
   function playableAgents(lore, faction) {
     return readDirectory(lore).agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(faction));
   }
-  var PLAYER_HEAD = "## Player Character";
   function playerBlock(lore, agent, env3) {
     const entry3 = (lore ?? []).find((e) => e.mode !== "folder" && String(e.comment ?? "") === agent.lore);
-    const body5 = entry3 ? stripDecorators(evaluate(String(entry3.content ?? ""), env3)).trim() : "";
-    const who = agent.english ? `${agent.name} (${agent.english})` : agent.name;
-    return [
-      PLAYER_HEAD,
-      `The user plays ${who}${agent.rank ? `, ${agent.rank}` : ""}. This character is the protagonist (the user-controlled character).`,
-      "- Never write this character's dialogue, actions, thoughts or decisions. Narrate only the world and other characters' reactions.",
-      "- This character already knows their own background, abilities, relationships and secrets, including anything the lore marks as hidden. Colleagues, superiors and acquaintances already know them and treat them according to the lore below.",
-      "- Other characters address and refer to this character by this name.",
-      body5
-    ].filter(Boolean).join("\n");
+    return entry3 ? stripDecorators(evaluate(String(entry3.content ?? ""), env3)).trim() : "";
   }
   function playerSource(src) {
     const agent = playerAgent(src.char.globalLore, src.chat.scriptstate);
@@ -3698,7 +3691,7 @@ ${block2.trim()}` };
         return { ...m, content };
       });
     }
-    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(PLAYER_HEAD))) {
+    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(block2))) {
       const at = out.findIndex((m) => m?.role === "system");
       const add = { role: "system", content: block2 };
       out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];
@@ -4157,4 +4150,17 @@ ${JSON.stringify(previousRoom ?? "")}`)
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));
     const g2 = canvas.getContext("2d");
-    if (!g2) th
+    if (!g2) throw new PhotoError("사진을 줄이지 못했어요.");
+    g2.imageSmoothingQuality = "high";
+    g2.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.86)) ?? await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.88));
+    if (!blob) throw new PhotoError("사진을 줄이지 못했어요.");
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let asset;
+    try {
+      asset = await risuai.saveAsset(bytes);
+    } catch (error) {
+      throw new PhotoError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if
