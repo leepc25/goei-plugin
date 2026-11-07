@@ -69,8 +69,8 @@ export interface Item {
   at: string;
 }
 
-export type ItemLogWhat = 'use' | 'drop' | 'gone' | 'merge' | 'sell';
-export type ItemLogBy = 'story' | 'manual' | 'use';
+export type ItemLogWhat = 'get' | 'use' | 'drop' | 'gone' | 'merge' | 'sell';
+export type ItemLogBy = 'story' | 'manual' | 'use' | 'store';
 
 /** 사용·처분 기록 한 줄 (화면 「기록」·찾기). 상한 없음, 저장 안전용 400줄 */
 export interface ItemLog {
@@ -173,7 +173,9 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(quote ? { quote } : {}),
   };
-  return { ...it, list: [...it.list, row].slice(-200) };
+  // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
+  const got = addItemLog(it, { name, kind: row.kind, what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}), ...(Number.isSafeInteger(e.price) ? { note: `₩ ${e.price!.toLocaleString('en-US')}` } : {}), at: row.at });
+  return { ...got, list: [...got.list, row].slice(-200) };
 }
 
 /** 이름·설명·효과·종류 고치기 (직접) */

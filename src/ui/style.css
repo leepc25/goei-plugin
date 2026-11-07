@@ -3195,14 +3195,14 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-tools .it-q { margin-left: 0; width: 180px; flex: none; height: 34px; box-sizing: border-box; }
 .it-body { display: flex; flex-direction: column; gap: 10px; }
 .it-body .gx-wt-list { width: 100%; max-width: none; margin: 0; }
-.it-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-content: start; }
+.it-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; align-content: start; } /* 8열: 그림 85px 에 맞춘 칸 (2026-11-07 사용자: 6열은 휑함) */
 .it-c { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 6px 6px 5px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: center; cursor: pointer; }
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
-.it-c .it-ic img { width: 85px; height: 85px; max-width: 86%; max-height: 86%; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 줄인다 */
+.it-c .it-ic img { width: 85px; height: 85px; max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 줄인다 */
 .it-ph .it-ic img, .it-pickrow .it-ic img { width: 42.5px; height: 42.5px; max-width: 90%; max-height: 90%; object-fit: contain; image-rendering: pixelated; } /* 원본의 절반 */
 .it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
-.it-c b { padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.it-c b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: calc(12.5px * 1.2 * 2 + 5px); padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; word-break: break-all; } /* 이름 두 줄까지, 그 뒤 생략, 높이는 늘 두 줄 */
 .it-c.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
 .it-c.empty .it-ic { background: none; }
 .it-c.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal) inset; }
@@ -3210,13 +3210,18 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c:not(.empty):hover { background: color-mix(in srgb, var(--signal) 6%, var(--panel)); }
 /* PC: 칸에 마우스를 올리면 설명 말풍선 (누르면 팝업) */
 .it-tip { display: none; position: absolute; left: calc(100% + 8px); top: 0; z-index: 6; width: 240px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; background: var(--void); color: var(--text); text-align: left; box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .8); pointer-events: none; }
-.it-c:nth-child(6n) .it-tip, .it-c:nth-child(6n-1) .it-tip { left: auto; right: calc(100% + 8px); }
+.it-c:nth-child(8n) .it-tip, .it-c:nth-child(8n-1) .it-tip, .it-c:nth-child(8n-2) .it-tip { left: auto; right: calc(100% + 8px); }
 .it-tip b { display: block; font-size: 14px; }
 .it-tip small { display: block; color: var(--dim); font-size: 11.5px; }
 .it-tip p { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--sub); }
 .it-tip .ef { color: var(--text); }
 @media (pointer: fine) { .it-c:not(.empty):hover .it-tip { display: block; } }
-.it-log { list-style: none; margin: 0; padding: 0; } /* ul 기본 들여쓰기 없음 (2026-11-07 사용자) */
+.it-log ul { list-style: none; margin: 0; padding: 0; } /* ul 기본 들여쓰기 없음 (2026-11-07 사용자) */
+.it-logchips { margin-bottom: 2px; }
+.it-logchips .gx-chip small { margin-left: 2px; font-size: 11px; color: var(--dim); }
+.it-what { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; vertical-align: 1px; }
+.it-what.get { color: var(--signal); background: color-mix(in srgb, var(--signal) 14%, var(--panel2)); }
+.it-what.out { color: var(--sub); background: var(--panel2); }
 .it-log .gx-wt-row { grid-template-columns: minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .it-log .gx-wt-main { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 14px 8px 10px; cursor: default; }
 .it-log .it-ic { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
@@ -3308,7 +3313,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
 /* 진열대 설명창: 칸 안에서 열어 창 밖으로 안 나가게 — 왼쪽 3칸은 오른쪽으로, 오른쪽 3칸은 왼쪽으로 펼친다 (가로 스크롤 방지, 2026-11-07 사용자) */
 .sh-grid .it-tip { width: 260px; padding: 12px; left: 0; right: auto; top: 0; }
-.sh-grid .it-c:nth-child(6n) .it-tip, .sh-grid .it-c:nth-child(6n-1) .it-tip, .sh-grid .it-c:nth-child(6n-2) .it-tip { left: auto; right: 0; }
+.sh-grid .it-c:nth-child(8n) .it-tip, .sh-grid .it-c:nth-child(8n-1) .it-tip, .sh-grid .it-c:nth-child(8n-2) .it-tip, .sh-grid .it-c:nth-child(8n-3) .it-tip { left: auto; right: 0; }
 .sh-grid .it-tip b { font-size: 14px; margin-bottom: 6px; white-space: normal; }
 .sh-grid .it-tip .sh-amt { display: inline-block; margin-top: 8px; }
 .sh-grid .it-tip p { font-size: 13px; line-height: 1.5; margin-top: 8px; }

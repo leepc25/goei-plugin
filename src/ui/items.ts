@@ -30,6 +30,8 @@ export interface ItemsNav { sub: ItemsSub; view: 'grid' | 'log'; open: string }
 export const itemsUi = {
   sub: 'items' as ItemsSub,
   view: 'grid' as 'grid' | 'log',
+  /** 기록 거르기: 전체 · 얻음 · 사용·처분 */
+  logFilter: 'all' as 'all' | 'get' | 'out',
   q: '',
   open: '',
   mode: 'view' as 'view' | 'edit' | 'merge' | 'add',
@@ -147,21 +149,49 @@ function cell(it: Item, over: boolean, w: When): string {
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}" data-action="items-open" data-value="${esc(it.id)}" aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${tip}</button>`;
 }
 
-const WHAT: Record<ItemLog['what'], string> = { use: '사용', drop: '버림', gone: '없어짐', merge: '합침', sell: '팖' };
-const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추' };
+const WHAT: Record<ItemLog['what'], string> = { get: '얻음', use: '사용', drop: '버림', gone: '없어짐', merge: '합침', sell: '팖' };
+const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추', store: '상점' };
+const WEEK = '일월화수목금토';
+/** 「2025.05.10 15:41」 → 「2025.05.10 (토)」 (가계부 날짜 줄과 같은 꼴) */
+function dayOf(when: string): string {
+  const m = /(\d{4})\.(\d{2})\.(\d{2})/.exec(when);
+  if (!m) return when.split(' ')[0] || '날짜 없음';
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  return `${m[1]}.${m[2]}.${m[3]} (${WEEK[d.getUTCDay()]})`;
+}
 
-/** 기록: 가계부 거래 줄과 같은 모양 (최근 것부터) */
+/** 기록: 가계부와 같은 꼴 — 거르기 칩(전체·얻음·사용·처분) + RP 날짜별 묶음, 줄 앞 물건 그림, 최근 것부터 (2026-11-07 사용자) */
 function logList(ctx: ChatContext): string {
   const q = itemsUi.q.trim();
-  const rows = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).log : itemsOf(ctx).log.slice().reverse();
-  if (!rows.length) return `<p class="gx-wt-empty">${q ? '맞는 기록이 없어요.' : '아직 사용·처분 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요.'}</p>`;
+  const all = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).log : itemsOf(ctx).log.slice().reverse();
+  const rows = all.filter((l) => (itemsUi.logFilter === 'get' ? l.what === 'get' : itemsUi.logFilter === 'out' ? l.what !== 'get' : true));
+  const chip = (v: typeof itemsUi.logFilter, label: string, n: number) => `<button class="gx-chip${itemsUi.logFilter === v ? ' on' : ''}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label}${n ? ` <small>${n}</small>` : ''}</button>`;
+  const got = all.filter((l) => l.what === 'get').length;
+  const chips = `<div class="gx-rec-tools it-logchips">${chip('all', '전체', all.length)}${chip('get', '얻음', got)}${chip('out', '사용·처분', all.length - got)}</div>`;
+  if (!rows.length) return `${chips}<p class="gx-wt-empty">${q ? '맞는 기록이 없어요.' : itemsUi.logFilter === 'get' ? '아직 얻은 물건 기록이 없어요.' : '아직 사용·처분 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요.'}</p>`;
   const w = whenOf(ctx);
-  // 줄 앞 물건 그림 (2026-11-07 사용자): 기록 줄의 종류로 찾고, 옛 줄(종류 없음)은 이름만으로
   const pic = (l: ItemLog) => {
     const u = itemIconUrl(l.name, l.kind ?? 'misc');
     return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[l.kind ?? 'misc'];
   };
-  return `<ul class="gx-wt-list it-log">${rows.map((l) => `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} ${WHAT[l.what] ?? l.what}</b><small>${esc([BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · '))}</small></span><span class="gx-wt-amt"><small>${esc(whenLabel(w, l.anchor, l.at))}</small></span></div></li>`).join('')}</ul>`;
+  const row = (l: ItemLog) => {
+    const when = whenLabel(w, l.anchor, l.at);
+    const sub = [BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · ');
+    return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} <em class="it-what ${l.what === 'get' ? 'get' : 'out'}">${WHAT[l.what] ?? l.what}</em></b><small>${esc(sub)}</small></span><span class="gx-wt-amt"><small>${esc(when.split(' ')[1] ?? when)}</small></span></div></li>`;
+  };
+  // RP 날짜별 묶음 (가계부처럼). 같은 날은 한 묶음, 묶음 머리에 얻음·사용 수
+  const groups: { day: string; rows: ItemLog[] }[] = [];
+  for (const l of rows) {
+    const day = dayOf(whenLabel(w, l.anchor, l.at));
+    const g = groups[groups.length - 1];
+    if (g && g.day === day) g.rows.push(l);
+    else groups.push({ day, rows: [l] });
+  }
+  return `${chips}<div class="gx-wallettab it-log">${groups.map((g) => {
+    const gi = g.rows.filter((l) => l.what === 'get').length;
+    const go = g.rows.length - gi;
+    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `얻음 ${gi}` : '', go ? `사용·처분 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.rows.map(row).join('')}</ul></section>`;
+  }).join('')}</div>`;
 }
 
 // ── 팝업 ──
@@ -233,6 +263,10 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       itemsUi.open = '';
       itemsUi.mode = 'view';
       itemsUi.notice = '';
+      env.render();
+      return true;
+    case 'items-log-filter':
+      itemsUi.logFilter = value === 'get' ? 'get' : value === 'out' ? 'out' : 'all';
       env.render();
       return true;
     case 'items-view':

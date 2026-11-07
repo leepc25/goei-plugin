@@ -38,9 +38,10 @@ test('버리기·합치기는 기록 한 줄, 합치기는 이름이 달라도 �
   assert.equal(it.list[0].desc, '새 봉지 / 한 줌');
   assert.equal(it.list[0].anchor, '');
   assert.equal(it.log.at(-1).what, 'merge');
+  assert.deepEqual(it.log.filter((l) => l.what === 'get').map((l) => l.by).sort(), ['manual', 'story'], '얻음 기록');
   it = removeItem(it, it.list[0].id, 'drop', 'manual');
   assert.equal(it.list.length, 0);
-  assert.deepEqual(it.log.map((l) => l.what), ['merge', 'drop']);
+  assert.deepEqual(it.log.filter((l) => l.what !== 'get').map((l) => l.what), ['merge', 'drop']);
   assert.equal(removeItem(it, 'nope', 'drop', 'manual'), it);
 });
 
@@ -84,13 +85,13 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   const vars = settleItemUse(chat, 3);
   assert.equal(vars[ITEM_USE_AT_VAR], 'u2');
   const after = readItems(vars);
-  assert.deepEqual(after.log.map((l) => [l.what, l.anchor, l.name]), [['use', 'b2', '소금 봉지']]);
+  assert.deepEqual(after.log.filter((l) => l.what !== 'get').map((l) => [l.what, l.anchor, l.name]), [['use', 'b2', '소금 봉지']]);
   Object.assign(chat.scriptstate, vars);
   // 같은 턴 리롤: 다시 넘기고, 새 응답에 다시 묶는다 (두 번 묶지 않음)
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u2'), ['소금 봉지']);
   chat.message[3] = { role: 'char', data: '다시 뿌렸다', chatId: 'b3' };
   const again = settleItemUse(chat, 3);
-  assert.deepEqual(readItems(again).log.map((l) => l.anchor), ['b2', 'b3']);
+  assert.deepEqual(readItems(again).log.filter((l) => l.what !== 'get').map((l) => l.anchor), ['b2', 'b3']);
   Object.assign(chat.scriptstate, again);
   assert.equal(settleItemUse(chat, 3), null, '바뀔 게 없으면 null');
   // 다음 턴: 넘기지 않고, 응답 뒤 상자를 비운다
