@@ -2375,42 +2375,60 @@ button.mk-go:hover { color: var(--signal); }
 /* 카드 가운데 선택 과녁 (evcard.ts aimMark, 2026-10-29). 선은 늘 1px(크기와 무관), 중심은 고정(단추 크기 그대로, 그림만 scale).
    안 고름: 크고 얇고 흐리게, 바깥 눈금이 천천히 돌고 안 원이 숨 쉰다. 고름: 2/3 로 조여들며 붉게 잠김. 해제: 흰 고리와 함께 다시 커짐 */
 .gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: grid; place-items: center; width: 210px; height: 210px; padding: 0; border: 0; border-radius: 50%; background: none; color: #fff; transform: translate(-50%, -50%); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.gx-aim svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; opacity: .55; transform: scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); transition: opacity .2s ease; }
-/* 표식 아래 글자 「선택」·「해제」 (2026-11-05 사용자: 선택 단추인 걸 알 수 있게, 진하게 하지 않고 CCTV 글꼴로) */
-.gx-aim-l { position: absolute; left: 50%; top: calc(50% + 44px); transform: translateX(-50%); font: 700 11px/1 var(--mono); letter-spacing: .22em; text-indent: .22em; color: rgba(255, 255, 255, .82); text-shadow: 0 1px 3px rgba(0, 0, 0, .95), 0 0 8px rgba(0, 0, 0, .6); white-space: nowrap; pointer-events: none; transition: opacity .2s ease, top .3s ease, color .2s ease; }
-.gx-aim:hover .gx-aim-l { color: #fff; }
-.gx-aim.on .gx-aim-l { top: calc(50% + 34px); color: rgba(255, 179, 174, .95); }
+/* 선택 전 (11-07 사용자: 회색 링이 잘 안 보인다. 글자도, 늘 또렷하게도 X → 평소엔 은은하게 두고 움직임으로 눈에 띄게).
+   나타날 때 한 번 밝게 켜졌다 가라앉고(boot), 4초마다 레이더 핑 고리가 퍼지고(ping), 희미한 부채꼴이 돌고, 바깥 점선 고리가 돌며 숨 쉰다. 올리면 밝아진다 */
+.gx-aim svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; opacity: .6; transform: scale(1); transform-origin: 50% 50%; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .9)) drop-shadow(0 0 4px rgba(255, 255, 255, .25)); transition: opacity .25s ease, filter .25s ease; }
 .gx-aim svg * { vector-effect: non-scaling-stroke; }
-.gx-aim:hover svg { opacity: .85; }
-.gx-aim .rot { transform-origin: 50% 50%; animation: gx-aim-spin 18s linear infinite; }
-.gx-aim .orb { stroke-dasharray: 1 5; }
-.gx-aim .ring { transform-origin: 50% 50%; animation: gx-aim-breathe 2.8s ease-in-out infinite; }
+.gx-aim:not(.on):not(.fx) svg { animation: gx-aim-boot 1s ease-out backwards; }
+.gx-aim:hover svg { opacity: .95; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .9)) drop-shadow(0 0 8px rgba(255, 255, 255, .55)); }
+.gx-aim .sweep { fill: currentColor; stroke: none; opacity: .14; transform-origin: 50% 50%; animation: gx-aim-spin 3s linear infinite; }
+.gx-aim .ping { opacity: 0; stroke-width: 1.4; animation: gx-aim-ping 4s ease-out 1s infinite; }
+.gx-aim.on .ping, .gx-aim.fx .ping { animation: none; opacity: 0; }
+.gx-aim .rot { transform-origin: 50% 50%; animation: gx-aim-spin 14s linear infinite; }
+.gx-aim .orb { stroke-dasharray: 2 5; stroke-width: 1.6; }
+.gx-aim .ring { transform-origin: 50% 50%; animation: gx-aim-breathe 2.2s ease-in-out infinite; }
 .gx-aim .brk { opacity: 0; }
 .gx-aim .burst { opacity: 0; }
 .gx-aim .dot { fill: currentColor; stroke: none; }
-/* 고름: 같은 중심에서 2/3, 붉은 1px 선에 은은한 빛 */
+/* 고름: 2/3 로 조여들어 붉게 잠김 */
 .gx-aim.on { color: #ff5f55; }
 .gx-aim.on svg { opacity: 1; transform: scale(.667); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .9)) drop-shadow(0 0 4px rgba(255, 70, 60, .85)) drop-shadow(0 0 12px rgba(255, 50, 40, .35)); }
+.gx-aim.on .sweep { opacity: .3; animation-duration: 1.6s; }
 .gx-aim.on .rot { animation-duration: 5s; }
 .gx-aim.on .orb { stroke-dasharray: 6 3; }
 .gx-aim.on .ring { animation: none; }
 .gx-aim.on .brk { opacity: 1; }
 .gx-aim.on .dot { fill: #ff3b30; animation: gx-aim-pulse 1.1s ease-in-out infinite; }
-/* 누른 순간만 (fx): 잠금 — 살짝 더 조였다 놓이고, 붉은 고리가 퍼지며 사라지고, 괄호가 바깥에서 들어온다 */
-.gx-aim.on.fx svg { animation: gx-aim-lock .5s cubic-bezier(.2, 1, .3, 1); }
-.gx-aim.on.fx .burst { animation: gx-aim-burst .55s ease-out; stroke: #ff5f55; }
-.gx-aim.on.fx .brk { animation: gx-aim-brk .5s cubic-bezier(.2, 1, .3, 1); }
-/* 해제 — 흰 고리가 퍼지며 원래 크기로 */
-.gx-aim:not(.on).fx svg { animation: gx-aim-release .5s cubic-bezier(.2, 1.15, .35, 1); }
-.gx-aim:not(.on).fx .burst { animation: gx-aim-burst .5s ease-out; stroke: #fff; }
+/* 누른 순간만 (fx) 1.5초: 조여들며 두 번 튕기고, 붉은 고리 셋이 차례로 퍼지고, 괄호가 바깥에서 꽂히고, 조준선이 빠르게 돌고, 붉은 빛이 번진다 (11-07 사용자: 일이초 화려하게) */
+.gx-aim.on.fx svg { animation: gx-aim-lock 1.5s cubic-bezier(.2, 1, .3, 1) both; }
+.gx-aim.on.fx .burst { stroke: #ff5f55; stroke-width: 2; animation: gx-aim-burst 1s ease-out both; }
+.gx-aim.on.fx .burst.b2 { animation-delay: .28s; }
+.gx-aim.on.fx .burst.b3 { animation-delay: .56s; }
+.gx-aim.on.fx .brk { animation: gx-aim-brk .55s cubic-bezier(.2, 1, .3, 1) both; }
+.gx-aim.on.fx .rot { animation: gx-aim-spin .7s linear infinite; }
+.gx-aim.on.fx .sweep { animation-duration: .5s; opacity: .4; }
+.gx-aim.on.fx .dot { animation: gx-aim-pulse .25s ease-in-out infinite; }
+.gx-aim.fx::after { content: ''; position: absolute; inset: -30%; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(255, 70, 60, .55) 0%, rgba(255, 70, 60, .18) 40%, transparent 68%); animation: gx-aim-glow 1.5s ease-out both; }
+.gx-aim:not(.on).fx::after { background: radial-gradient(circle, rgba(255, 255, 255, .4) 0%, rgba(255, 255, 255, .12) 40%, transparent 68%); animation-duration: .9s; }
+/* 카드 테두리도 같이 붉게 깜빡 */
+.gx-mx-art:has(> .gx-aim.on.fx), .gx-evart:has(> .gx-aim.on.fx) { animation: gx-aim-frame 1.5s ease-out both; }
+/* 해제 0.9초 — 흰 고리가 퍼지며 원래 크기로 */
+.gx-aim:not(.on).fx svg { animation: gx-aim-release .9s cubic-bezier(.2, 1.15, .35, 1) both; }
+.gx-aim:not(.on).fx .burst { stroke: #fff; animation: gx-aim-burst .8s ease-out both; }
+.gx-aim:not(.on).fx .burst.b2 { animation-delay: .2s; }
+.gx-aim:not(.on).fx .burst.b3 { animation-delay: .4s; }
 @keyframes gx-aim-spin { to { transform: rotate(360deg); } }
-@keyframes gx-aim-breathe { 0%, 100% { transform: scale(1); opacity: .7; } 50% { transform: scale(1.05); opacity: 1; } }
+@keyframes gx-aim-boot { 0% { opacity: 0; transform: scale(1.25); } 30% { opacity: 1; transform: scale(.97); } 100% { opacity: .6; transform: scale(1); } }
+@keyframes gx-aim-ping { 0% { r: 8; opacity: 0; } 4% { opacity: .9; } 28% { r: 60; opacity: 0; } 100% { r: 60; opacity: 0; } }
+@keyframes gx-aim-breathe { 0%, 100% { transform: scale(1); opacity: .75; } 50% { transform: scale(1.06); opacity: 1; } }
 @keyframes gx-aim-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
-@keyframes gx-aim-lock { 0% { transform: scale(1); opacity: .55; } 60% { transform: scale(.62); opacity: 1; } 100% { transform: scale(.667); opacity: 1; } }
-@keyframes gx-aim-release { 0% { transform: scale(.667); opacity: 1; } 65% { transform: scale(1.03); opacity: .7; } 100% { transform: scale(1); opacity: .55; } }
-@keyframes gx-aim-burst { 0% { r: 30; opacity: .95; } 100% { r: 70; opacity: 0; } }
-@keyframes gx-aim-brk { 0% { transform: scale(1.5); transform-origin: 50% 50%; opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .gx-aim .rot, .gx-aim .ring, .gx-aim .dot, .gx-aim.fx svg, .gx-aim.fx .burst, .gx-aim.fx .brk { animation: none !important; } }
+@keyframes gx-aim-lock { 0% { transform: scale(1); opacity: .6; } 18% { transform: scale(.56); opacity: 1; } 32% { transform: scale(.74); } 46% { transform: scale(.63); } 60% { transform: scale(.69); } 100% { transform: scale(.667); opacity: 1; } }
+@keyframes gx-aim-release { 0% { transform: scale(.667); opacity: 1; } 55% { transform: scale(1.06); opacity: .85; } 100% { transform: scale(1); opacity: .6; } }
+@keyframes gx-aim-burst { 0% { r: 30; opacity: .95; } 100% { r: 78; opacity: 0; } }
+@keyframes gx-aim-brk { 0% { transform: scale(1.8); transform-origin: 50% 50%; opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes gx-aim-glow { 0% { opacity: 0; transform: scale(.6); } 12% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes gx-aim-frame { 0% { box-shadow: inset 0 0 0 0 rgba(255, 70, 60, 0); } 15% { box-shadow: inset 0 0 0 3px rgba(255, 70, 60, .95), inset 0 0 40px rgba(255, 50, 40, .45); } 45% { box-shadow: inset 0 0 0 2px rgba(255, 70, 60, .5), inset 0 0 20px rgba(255, 50, 40, .2); } 60% { box-shadow: inset 0 0 0 3px rgba(255, 70, 60, .9), inset 0 0 30px rgba(255, 50, 40, .35); } 100% { box-shadow: inset 0 0 0 0 rgba(255, 70, 60, 0); } }
+@media (prefers-reduced-motion: reduce) { .gx-aim .rot, .gx-aim .ring, .gx-aim .dot, .gx-aim .sweep, .gx-aim .ping, .gx-aim:not(.on):not(.fx) svg, .gx-aim.fx svg, .gx-aim.fx .burst, .gx-aim.fx .brk, .gx-aim.fx::after { animation: none !important; } }
 /* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
    안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
 .gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
