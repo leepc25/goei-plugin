@@ -57,6 +57,8 @@ export interface Item {
   walletId?: string;
   /** 본문: 근거 인용 */
   quote?: string;
+  /** 상점에 판 응답 키: 그 응답이 살아 있는 동안 목록에서 안 보인다 (다시 굴리면 판 돈과 함께 돌아온다) */
+  soldAt?: string;
   at: string;
 }
 
@@ -141,7 +143,7 @@ export function itemLeft(it: Items, e: Item, alive: Set<string>): number | undef
 
 /** 살아 있는 물건 (직접 넣은 건 늘, 나머지는 기준 메시지가 남아 있을 때). 소모성은 남은 횟수가 0이면 빠진다 */
 export function liveItems(it: Items, alive: Set<string>): Item[] {
-  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && (it.keep || e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
+  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && (it.keep || e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
 }
 
 /** 장착 칸 차지: 갈래별 칸 번호 → 물건 (같은 칸에 둘이면 앞의 것) */
@@ -310,6 +312,15 @@ export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLog
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;
   return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what, by, anchor, ...extra });
+}
+
+/** 상점에 팔기: 목록에서 지우지 않고 판 응답(anchor)에 묶어 숨긴다 → 기록에 sell 한 줄. 판 돈(가계부)도 같은 응답에 묶이니,
+ *  응답을 다시 굴리거나 지우면 물건과 돈이 같이 돌아온다 (11-08 전수점검: 지우면 물건만 사라지고 돈은 없어졌다). 장착 칸에서도 뺀다 */
+export function sellItem(it: Items, id: string, anchor: string, note?: string): Items {
+  const cur = it.list.find((x) => x.id === id);
+  if (!cur || !anchor) return it;
+  const { slot: _slot, ...rest } = cur;
+  return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? { ...rest, soldAt: anchor } : x)) }, { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'sell', by: 'manual', anchor, ...(note ? { note } : {}) });
 }
 
 /** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 설명은 「남는 설명 / 상대 설명」, 근거는 둘 다. 둘 다 소모성이면 상대의 남은 횟수를 더한다.

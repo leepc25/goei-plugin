@@ -174,3 +174,17 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u3'), []);
   assert.deepEqual(settleItemUse(chat, 5), { $st_item_use: '', [ITEM_USE_AT_VAR]: '' });
 });
+
+// 11-08 전수점검: 상점에 판 물건은 판 응답에 묶여 숨고, 그 응답이 사라지면 돌아온다
+test('팔기: 판 응답이 살아 있는 동안만 숨고 장착 칸에서 빠진다', async () => {
+  const { sellItem } = await import('../dist-test/core.mjs');
+  let it = addItem(empty, alive, { name: '단검', equip: 'weapon', from: 'manual', anchor: '', wear: true });
+  const id = it.list[0].id;
+  assert.equal(equippedOf(liveItems(it, alive)).weapon[0]?.id, id);
+  it = sellItem(it, id, 'c2', '철물점에 팖');
+  assert.equal(liveItems(it, alive).length, 0);
+  assert.equal(it.log.at(-1).what, 'sell');
+  const back = liveItems(it, new Set(['c1']));
+  assert.deepEqual(back.map((e) => e.name), ['단검']);
+  assert.equal(back[0].slot, undefined);
+});
