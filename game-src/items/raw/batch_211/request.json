@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark headscarf hijab, folded, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheer black lace veil, laid flat. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and white Catholic nun veil with white coif band, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean black gat hat made of fine horsehair with a wide brim, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean conical straw hat satgat, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white dust respirator mask with twin filters and elastic straps, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cat head mask with pointed ears, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grey wolf head mask with a long snout, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black crow mask with a long beak, side view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a riveted iron face mask with narrow eye slits, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a goat head mask with short horns and a little beard, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cow head mask with small horns and black and white patches, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden dolphin-shaped mask, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. thermal imaging goggles with a single thick lens and head strap, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical headset with one boom microphone, side view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black security earpiece with a coiled clear cable. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "히잡",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark headscarf hijab, folded, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "베일",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheer black lace veil, laid flat. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수녀 베일",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black and white Catholic nun veil with white coif band, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갓",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean black gat hat made of fine horsehair with a wide brim, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삿갓",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean conical straw hat satgat, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방진 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white dust respirator mask with twin filters and elastic straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cat head mask with pointed ears, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "늑대 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grey wolf head mask with a long snout, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "까마귀 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black crow mask with a long beak, side view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a riveted iron face mask with narrow eye slits, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "염소 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a goat head mask with short horns and a little beard, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cow head mask with small horns and black and white patches, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금빛 돌고래 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden dolphin-shaped mask, front view, eye holes empty. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "열화상 고글",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. thermal imaging goggles with a single thick lens and head strap, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤드셋",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical headset with one boom microphone, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이어피스",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black security earpiece with a coiled clear cable. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

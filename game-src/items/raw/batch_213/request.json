@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small beige hip pouch with a zipper and belt clip, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red first aid bag with a white cross and shoulder strap, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace with a small folded yellow Korean talisman paper in a clear case. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet of red string with a tiny yellow talisman tied to it. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain gold ring, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy gold signet ring with a carved seal face, diagonal view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver pendant with a dark gemstone on a chain. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open gold locket necklace with a tiny old photo inside. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small rectangular metal name tag with a pin, blank. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ID card holder on a black lanyard, card blank. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace made of a string of white garlic bulbs. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth pouch tied with string, coarse white salt spilling out. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red cloth pouch tied with string, red beans spilling out. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black vest wired with explosive blocks, cables and a detonator switch, front view. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glowing marble that shows a blurred shifting face inside. Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fanned deck of playing cards with tiny marks on the backs. Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "허리 주머니",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small beige hip pouch with a zipper and belt clip, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "구급 가방",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red first aid bag with a white cross and shoulder strap, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부적 목걸이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace with a small folded yellow Korean talisman paper in a clear case. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부적 팔찌",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bracelet of red string with a tiny yellow talisman tied to it. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain gold ring, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인장 반지",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy gold signet ring with a carved seal face, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펜던트",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver pendant with a dark gemstone on a chain. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로켓 목걸이",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open gold locket necklace with a tiny old photo inside. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "명찰",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small rectangular metal name tag with a pin, blank. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신분증 목걸이",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ID card holder on a black lanyard, card blank. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마늘 목걸이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace made of a string of white garlic bulbs. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소금 주머니",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth pouch tied with string, coarse white salt spilling out. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팥 주머니",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small red cloth pouch tied with string, red beans spilling out. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자폭 조끼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black vest wired with explosive blocks, cables and a detonator switch, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "변장 구슬",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glowing marble that shows a blurred shifting face inside. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타짜 카드",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fanned deck of playing cards with tiny marks on the backs. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
