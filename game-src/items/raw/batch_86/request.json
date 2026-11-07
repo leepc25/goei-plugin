@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded patterned silk scarf Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wool shawl with fringe Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big red hair ribbon bow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large tortoiseshell hair claw clip Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean hairpin with a jade end Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black wrist guards Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin windbreaker jacket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown sheepskin shearling jacket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall white chef hat Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white double-breasted chef jacket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black maid dress with white apron and frills Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red floral kimono Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red silk qipao dress with gold patterns Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black priest cassock with white collar Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful Korean shaman ritual robe Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray Buddhist monk robe Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "스카프",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded patterned silk scarf Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숄",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wool shawl with fringe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "리본",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big red hair ribbon bow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤어집게",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large tortoiseshell hair claw clip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비녀",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional Korean hairpin with a jade end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손목 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black wrist guards Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바람막이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin windbreaker jacket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무스탕",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown sheepskin shearling jacket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요리사 모자",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall white chef hat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "셰프복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white double-breasted chef jacket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "메이드복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black maid dress with white apron and frills Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기모노",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red floral kimono Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "치파오",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red silk qipao dress with gold patterns Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사제복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black priest cassock with white collar Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful Korean shaman ritual robe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "승복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray Buddhist monk robe Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

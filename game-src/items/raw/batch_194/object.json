@@ -1,0 +1,43 @@
+{
+ "id": "9629b94b-f0af-48fd-a85e-7843afd2e0c1",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-07T11:56:02.360862+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {},
+ "frame_urls": null,
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two thin delicate pink inner labia folds with wavy edges, only the folds alone, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of tiny grilled dried baby pollack fish beside a little dish of red pepper paste Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fluffy orange fox tail with a white tip, tied with red string Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleek black merchandise box with a small silver emblem on the lid, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold foil gift box holding two small bottles of shimmering purple-silver liquid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky clicky ballpoint pen with three colored sliders, red blue and black Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver shield-shaped badge pin with a heart shape in the middle, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "failed",
+ "group_id": "4d80b93a-c182-4c29-bf93-7d111860b3d9",
+ "progress_percent": 2,
+ "eta_seconds": 137,
+ "animations": []
+}

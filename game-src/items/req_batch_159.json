@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "슬라임",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blob of glossy green slime Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소쿠리",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round bamboo basket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전동 못박기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cordless nail driver tool Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수육",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few thick slices of boiled pork belly Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤드밴드",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black sports headband Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small colorful plastic jacks stones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "볼링핀",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowling pin with red stripes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "체인 블록",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a manual chain hoist with a hook Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수제비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of Korean hand-torn dough soup with zucchini Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "한약 봉지",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few brown pouches of Korean herbal medicine Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "종이비행기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white folded paper airplane Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비상벨",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round red emergency alarm bell push button box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "채반",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat round bamboo drying tray Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가래떡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few long white cylindrical rice cake sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홍두깨",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long thick wooden rolling club Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이스커피",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cup of iced coffee with ice cubes and a straw Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

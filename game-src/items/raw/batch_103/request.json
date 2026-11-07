@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dental floss case Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of dentures Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mouthguard Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blister pack of pills Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round birth control pill pack Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pregnancy test stick Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a urine sample cup Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few blood collection tubes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a test tube of dark red blood in a rack Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glass microscope slides Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dissection kit open with scalpels and probes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a surgical bone saw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cervical neck brace Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a back support belt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knee brace Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a prosthetic leg Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "치실",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dental floss case Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "틀니",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of dentures Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마우스피스",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mouthguard Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "생리통약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small blister pack of pills Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피임약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round birth control pill pack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "임신 테스트기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pregnancy test stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소변 컵",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a urine sample cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "채혈관",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few blood collection tubes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈액 샘플",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a test tube of dark red blood in a rack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "표본 슬라이드",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glass microscope slides Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해부 도구 세트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dissection kit open with scalpels and probes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 톱",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a surgical bone saw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "목 보호대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cervical neck brace Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "허리 보호대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a back support belt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무릎 보조기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knee brace Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "의족",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a prosthetic leg Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

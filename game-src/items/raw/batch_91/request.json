@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small throwing axe Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden boomerang Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small gas pistol Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few scattered brass bullet casings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round steel shield Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round wooden shield with metal rim Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharpened bamboo spear, short enough to fit, lying diagonally Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp iron skewer spike Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a walking cane with a hidden blade partly drawn from the cane itself, one object Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden club Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hexagonal Korean wooden club Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long wooden staff, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tonfa baton with side handle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sai metal truncheon with two side prongs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rifle scope Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bayonet Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "투척 도끼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small throwing axe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부메랑",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden boomerang Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가스총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small gas pistol Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탄피",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few scattered brass bullet casings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철제 방패",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round steel shield Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나무 방패",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round wooden shield with metal rim Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "죽창",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharpened bamboo spear, short enough to fit, lying diagonally Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠꼬챙이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sharp iron skewer spike Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지팡이칼",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a walking cane with a hidden blade partly drawn from the cane itself, one object Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곤봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden club Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "육모방망이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hexagonal Korean wooden club Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long wooden staff, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "톤파",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tonfa baton with side handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sai metal truncheon with two side prongs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조준경",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rifle scope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "총검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bayonet Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

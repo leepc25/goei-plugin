@@ -1,4 +1,4 @@
-// 소지품 그림 (2026-11-07): PixelLab 으로 뽑은 85×85 그림 1,057장 + 매칭 표를 자료 팩(goei-data-items)으로 받아 저장소에 둔다.
+// 소지품 그림 (2026-11-07): PixelLab 으로 뽑은 85×85 WebP 그림 2,600여 장 + 매칭 표(game-src/items/README.md)를 자료 팩(goei-data-items)으로 받아 저장소에 둔다.
 // 부팅 때 받지 않고 소지품 메뉴가 처음 그림을 찾을 때 받는다 (세계 자료처럼 host/datapack.ts fetchPack · 조각 200KB).
 // 그림이 아직 없으면 null 을 주고(화면은 종류 선 아이콘으로), 다 받히면 다시 그리기를 한 번 부른다.
 import { applyItemsPack, ITEMS_PACK, matchItemIcon, packMatches, type ItemIconPack } from '../core/datapack';
@@ -68,11 +68,11 @@ export function itemIconUrl(name: string, kind: string): string | null {
     if (!failed) void ensureItemIcons();
     return null;
   }
-  const file = matchItemIcon(pack.table, name, kind);
+  const file = matchItemIcon(pack, name, kind);
   if (!file) return null;
   let u = urls.get(file);
   if (!u) {
-    u = `data:image/png;base64,${pack.icons[file]}`;
+    u = `data:image/${file.endsWith('.png') ? 'png' : 'webp'};base64,${pack.icons[file]}`;
     urls.set(file, u);
   }
   return u;

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear acrylic and steel press with two plates and wing screws Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron cage mask with a metal tongue plate, a scold's bridle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron hand claw tool with four curved hooks on a wooden handle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skinning knife with a wide curved blade and a gut hook Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pen-shaped electric cautery tool with a thin glowing hot tip and a cord Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical artificial heart of chrome and tubes, pumping red fluid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white and steel surgical bone drill with a thin bit Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky metal stapler gun with a strip of large steel staples Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick white candle with a clock face embedded in the wax, burning Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black paper train ticket with gold edges and a red punched hole Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handbag whose opening is a mouth full of sharp teeth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a manila case folder with photos and papers sticking out and a red confidential stamp Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain white Korean condolence money envelope with a black border Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small solid gold toad figurine Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of tiny grilled dried baby pollack fish beside a little dish of red pepper paste Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold foil gift box holding two small bottles of shimmering purple-silver liquid Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "고환 압착기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear acrylic and steel press with two plates and wing screws Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철 굴레 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron cage mask with a metal tongue plate, a scold's bridle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 발톱",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron hand claw tool with four curved hooks on a wooden handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 벗기는 칼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skinning knife with a wide curved blade and a gut hook Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기 소작기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pen-shaped electric cautery tool with a thin glowing hot tip and a cord Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인공 심장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical artificial heart of chrome and tubes, pumping red fluid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수술용 골 드릴",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white and steel surgical bone drill with a thin bit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피부 스테이플 건",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky metal stapler gun with a strip of large steel staples Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수명 양초",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick white candle with a clock face embedded in the wax, burning Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 열차표",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black paper train ticket with gold edges and a red punched hole Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "입 달린 가방",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handbag whose opening is a mouth full of sharp teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수사 파일",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a manila case folder with photos and papers sticking out and a red confidential stamp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부의 봉투",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plain white Korean condolence money envelope with a black border Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금두꺼비",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small solid gold toad figurine Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "노가리",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bundle of tiny grilled dried baby pollack fish beside a little dish of red pepper paste Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사막방울뱀 독 물약",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold foil gift box holding two small bottles of shimmering purple-silver liquid Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

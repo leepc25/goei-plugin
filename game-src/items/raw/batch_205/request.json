@@ -1,0 +1,116 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical anatomy model of the outer labia, two long rounded ridges of soft skin lying parallel with a narrow gap between them, sparse short hairs on the outer sides, seen from the front Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. one short thick pink tube bent into the letter C shape, a single curve only, with a small pale pancreas lump nestled inside the curve, no other intestines Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black rectangular business card lying flat, with a small red eye printed on it Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single large round dark metal coat button with four holes, shown big and filling the square, a tiny blue light glowing between the holes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small colorful plastic Korean gonggi game pebbles scattered Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black body bag lying flat, zipped shut, with a long zipper down the middle and handles on the sides Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small thick round Korean meat patties coated in golden egg batter, with bits of green onion and carrot Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few cubes of brown translucent acorn jelly with soy sauce and green onion on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of heavy iron leg shackles joined by a short chain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. rusty dental pliers with curved jaws gripping a pulled tooth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long cattle prod with two metal prongs crackling with blue electricity Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flexible serrated wire saw with two ring handles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel surgical retractor with two curved blades spread apart by a ratchet screw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few curved half-moon surgical needles with black thread Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed furry animal ear with surgical stitches at its base Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small curved clear plastic tube-shaped cage with a base ring and a tiny padlock Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "대음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical anatomy model of the outer labia, two long rounded ridges of soft skin lying parallel with a narrow gap between them, sparse short hairs on the outer sides, seen from the front Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_173/01.png"
+  },
+  {
+   "ko": "십이지장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. one short thick pink tube bent into the letter C shape, a single curve only, with a small pale pancreas lump nestled inside the curve, no other intestines Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_198/16.png"
+  },
+  {
+   "ko": "괴이 명함",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single black rectangular business card lying flat, with a small red eye printed on it Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_199/13.png"
+  },
+  {
+   "ko": "통신 단추",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single large round dark metal coat button with four holes, shown big and filling the square, a tiny blue light glowing between the holes Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_196/05.png"
+  },
+  {
+   "ko": "공기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five small colorful plastic Korean gonggi game pebbles scattered Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_159/06.png"
+  },
+  {
+   "ko": "시체 가방",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long black body bag lying flat, zipped shut, with a long zipper down the middle and handles on the sides Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_172/11.png"
+  },
+  {
+   "ko": "동그랑땡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small thick round Korean meat patties coated in golden egg batter, with bits of green onion and carrot Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_187/07.png"
+  },
+  {
+   "ko": "도토리묵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few cubes of brown translucent acorn jelly with soy sauce and green onion on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_134/10.png"
+  },
+  {
+   "ko": "족쇄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of heavy iron leg shackles joined by a short chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 뽑는 펜치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. rusty dental pliers with curved jaws gripping a pulled tooth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소몰이 전기봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long cattle prod with two metal prongs crackling with blue electricity Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "와이어 톱",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flexible serrated wire saw with two ring handles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개구기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel surgical retractor with two curved blades spread apart by a ratchet screw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "봉합 바늘",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few curved half-moon surgical needles with black thread Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식용 동물 귀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed furry animal ear with surgical stitches at its base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "남성 정조 케이지",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small curved clear plastic tube-shaped cage with a base ring and a tiny padlock Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_148/12.png"
+  }
+ ]
+}

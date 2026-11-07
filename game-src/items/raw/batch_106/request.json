@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean shaman ritual knife with long paper streamers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sword made of old brass coins tied with red string Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five colored cloth strips tied together Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of white paper burning at one corner Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white paper cutout shaped like a human soul, plain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white paper doll for the spirit Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw effigy doll Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small scarecrow figure Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone lantern for graves, small Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink lotus lantern Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional oil lamp dish with a flame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue and red silk Korean lantern Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black obsidian scrying mirror Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear crystal pendant on a cord Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate amulet pendant with a gem Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a carved owl charm figure Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "신칼",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean shaman ritual knife with long paper streamers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엽전 칼",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sword made of old brass coins tied with red string Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오색 천",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. five colored cloth strips tied together Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소지 종이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of white paper burning at one corner Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "넋전",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white paper cutout shaped like a human soul, plain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "넋 인형",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white paper doll for the spirit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "짚 인형",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a straw effigy doll Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "허수아비",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small scarecrow figure Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장명등",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone lantern for graves, small Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연등",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink lotus lantern Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "등잔",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a traditional oil lamp dish with a flame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "청사초롱",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue and red silk Korean lantern Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흑요석 거울",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black obsidian scrying mirror Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수정 펜던트",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear crystal pendant on a cord Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아뮬렛",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate amulet pendant with a gem Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부엉이 장식",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a carved owl charm figure Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

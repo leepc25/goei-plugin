@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "샤워볼",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shower puff Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "면도크림",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaving cream can Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바디워시",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a body wash bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "러그",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled rug Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "서류철",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a document folder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펀치",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hole puncher Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "테이프 커터",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tape dispenser Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자석",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a horseshoe magnet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화이트보드 마커",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whiteboard marker Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "필통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pencil case Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "리코더",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a recorder flute Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컴퍼스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a drawing compass Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "각도기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a protractor Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삼각자",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a triangle ruler Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "재떨이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass ashtray Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "선인장",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a potted cactus Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

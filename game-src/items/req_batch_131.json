@@ -1,0 +1,86 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "승마 채찍",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a riding crop Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정조대",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chastity belt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "촉감 바퀴",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pinwheel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오픈 브라",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open bra Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "슬립 원피스",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silk slip dress Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "테디",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lace teddy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시스루 가운",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheer robe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사이하이 부츠",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. thigh-high boots Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사정 지연 스프레이",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small spray bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흥분 젤",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gel tube Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "여성 청결제",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a feminine wash bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성인 만화책",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a comic book, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토이 클리너",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cleaner spray bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바니걸 의상",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bunny girl costume Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고양이 귀 머리띠",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cat ear headband Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진압 방패",
+   "kind": "weapon",
+   "redo": "6-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall clear polycarbonate riot shield seen from the front, slightly curved, black rim, small viewing area, plain surface with no markings, one handle visible on the back edge, shaped like a shield not a door Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval pear of anguish, an iron pear-shaped device with four segments and a key screw on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather paddle with small metal studs and spikes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long iron branding rod with a glowing red hot symbol end Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval iron knee splitter, two spiked wooden jaws on a screw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel bone cutting shears with long handles and short curved blades Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long steel surgical bone chisel with a flat sharp tip Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cybernetic mechanical human arm of steel plates, cables and pistons, cut off at the shoulder Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel mechanical lower jaw with metal teeth and hinge bolts Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large syringe full of glowing green liquid with a helix symbol Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spool wound with thread made of living black shadow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few crunchy white biscuits shaped like small bones Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old parchment contract scroll with a bloody fingerprint seal Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black business card with a single red eye printed in the center Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few snapped glowing green chemical light sticks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black portable external hard drive with a short cable Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black power bank with a short stubby antenna and a green light Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "고뇌의 배",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval pear of anguish, an iron pear-shaped device with four segments and a key screw on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가시 패들",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather paddle with small metal studs and spikes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낙인 인두",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long iron branding rod with a glowing red hot symbol end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무릎 파쇄기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval iron knee splitter, two spiked wooden jaws on a screw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 절단 가위",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel bone cutting shears with long handles and short curved blades Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 끌",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long steel surgical bone chisel with a flat sharp tip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기계 팔",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cybernetic mechanical human arm of steel plates, cables and pistons, cut off at the shoulder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금속 턱",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel mechanical lower jaw with metal teeth and hinge bolts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유전자 주입 주사기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large syringe full of glowing green liquid with a helix symbol Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "그림자 실타래",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spool wound with thread made of living black shadow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 과자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few crunchy white biscuits shaped like small bones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피로 쓴 계약서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old parchment contract scroll with a bloody fingerprint seal Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "괴이 명함",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black business card with a single red eye printed in the center Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케미컬 라이트",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few snapped glowing green chemical light sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "외장 하드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black portable external hard drive with a short cable Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보조배터리 통신기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black power bank with a short stubby antenna and a green light Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

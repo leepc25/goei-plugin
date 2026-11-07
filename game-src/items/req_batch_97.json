@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "글루건",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hot glue gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "열풍기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heat gun Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "페인트 붓",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paint brush Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "페인트 롤러",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paint roller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마스킹 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of beige masking tape Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "와이어 스트리퍼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wire stripper tool Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기 테스터",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a voltage tester screwdriver Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자동차 잭",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scissor car jack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "견인 로프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled tow strap with hooks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부스터 케이블",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red and black jumper cables Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안전 삼각대",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red reflective warning triangle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소화 담요",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red fire blanket pouch Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean wooden A-frame back carrier Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "들것",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding stretcher, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멀티툴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded multitool Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방수포",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded blue tarp Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

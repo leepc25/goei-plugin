@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "반다나",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red paisley bandana Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멜빵",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of suspenders Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "넥타이핀",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver tie clip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피어싱",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small silver piercing rings and studs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "목욕 가운",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white fluffy bathrobe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화살통",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather quiver with a few arrows Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "석궁 볼트",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three short crossbow bolts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "블로우건",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short blowgun tube with darts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "독침",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin needle dart with a green tip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쿠나이",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black kunai throwing knife with ring handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사슬낫",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sickle attached to a chain with a weight Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "철퇴",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short iron mace with flanged head Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "모닝스타",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spiked iron ball mace, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "할버드",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a halberd head and short shaft, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "레이피어",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin rapier with a swept hilt, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사브르",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved saber with a knuckle guard, lying diagonally Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

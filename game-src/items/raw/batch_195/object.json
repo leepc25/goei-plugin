@@ -1,0 +1,77 @@
+{
+ "id": "ddbd378e-0b98-409b-b0fd-65d1d90f5609",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-07T11:56:02.259329+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {
+  "frame_0": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_0.png",
+  "frame_1": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_1.png",
+  "frame_2": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_2.png",
+  "frame_3": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_3.png",
+  "frame_4": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_4.png",
+  "frame_5": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_5.png",
+  "frame_6": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_6.png",
+  "frame_7": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_7.png",
+  "frame_8": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_8.png",
+  "frame_9": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_9.png",
+  "frame_10": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_10.png",
+  "frame_11": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_11.png",
+  "frame_12": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_12.png",
+  "frame_13": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_13.png",
+  "frame_14": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_14.png",
+  "frame_15": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_15.png"
+ },
+ "frame_urls": [
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_0.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_1.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_2.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_3.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_4.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_5.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_6.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_7.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_8.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_9.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_10.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_11.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_12.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_13.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_14.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ddbd378e-0b98-409b-b0fd-65d1d90f5609/rotations/frame_15.png"
+ ],
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. the short round pink neck of the uterus seen from its end, a firm smooth dome with a small central opening, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of peanuts in shells Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a retro silver ray gun with a round emitter and fins, glowing green Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crystal teardrop-shaped bottle filled with swirling rainbow liquid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow smiley face sticker in a small clear plastic package Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin bracelet braided from long black human hair Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded sheet of clean white eco cushioning wrap with a small barcode Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "review",
+ "group_id": "2e241484-c639-4f3e-bfd7-df039035b4f0",
+ "progress_percent": 66,
+ "eta_seconds": 160,
+ "animations": []
+}

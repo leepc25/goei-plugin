@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "고추장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red plastic tub of red chili paste Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "된장",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown earthenware jar of soybean paste Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "참기름",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass bottle of golden sesame oil Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "식초",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear bottle of vinegar, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "후추",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black pepper grinder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "원두 봉지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brown kraft paper coffee bean bag with a valve Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "얼음컵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cup full of ice cubes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유자차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of yellow citron tea marmalade Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쌍화차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cup of dark herbal tea with a jujube and pine nuts on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "원피스",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a simple navy one-piece dress, front view Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "블라우스",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white blouse with ruffled collar Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "셔츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plaid button-up shirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "니트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick cream knit sweater Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가디건",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray button cardigan Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조끼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark knit vest Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of dark gray trousers Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

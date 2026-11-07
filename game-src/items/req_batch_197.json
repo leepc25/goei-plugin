@@ -1,0 +1,86 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "대음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two separate puffy skin-colored outer labia folds side by side, like two plump curved cushions, nothing else between them, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_173/01.png"
+  },
+  {
+   "ko": "족쇄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of heavy iron leg shackles joined by a short chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 뽑는 펜치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. rusty dental pliers with curved jaws gripping a pulled tooth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소몰이 전기봉",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long cattle prod with two metal prongs crackling with blue electricity Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "와이어 톱",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flexible serrated wire saw with two ring handles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "개구기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel surgical retractor with two curved blades spread apart by a ratchet screw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "봉합 바늘",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few curved half-moon surgical needles with black thread Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식용 동물 귀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed furry animal ear with surgical stitches at its base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "생체 접착 젤 건",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue gun loaded with a cartridge of glowing pink flesh gel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기억 구슬 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of marbles, each marble showing a tiny glowing memory scene inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손가락 과자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few biscuits shaped exactly like pale human fingers with almond fingernails Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해골 랜턴",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lantern carved from a human skull with candlelight glowing from the eye sockets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "운명의 실 가위",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small golden scissors with a red thread caught in the blades Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "덕트 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of silver duct tape Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코인 락커 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coin locker key with a numbered plastic tag on a rubber band Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계란무드등",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an egg-shaped glowing lamp with the shadow of a creature curled inside Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "장구",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean hourglass drum janggu with red and blue ropes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "트럼펫",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brass trumpet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흰 가루 봉지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear zip bag of white powder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "파운데이션",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a liquid foundation glass bottle, plain, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤어롤",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few velcro hair rollers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "참빗",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fine-toothed bamboo comb Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "딜도",
+   "kind": "adult",
+   "redo": "137-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a realistic flesh-toned silicone dildo with a rounded swollen tip, a slightly curved shaft and a flat suction cup base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "질경",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stainless steel duckbill speculum Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성인 보드게임",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a board game box with a red heart on the lid, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클리 후드 집게",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny silver ring clamp with two small prongs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀두 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black silicone vibrating sleeve ring Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문 끼움 구속끈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of cuffs on straps with door anchor knobs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 스트랩",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black leather strap with a handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성인용 물티슈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of wet wipes, plain pink, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "G스팟 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a purple curved silicone vibrator with a bulbous curved tip Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "요도 사운드",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of long thin stainless steel rods of different sizes Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

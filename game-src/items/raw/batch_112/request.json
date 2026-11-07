@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a funeral banner on a short pole, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white mourning lantern Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a root shaped like a small human Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeball with small wings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale severed hand crawling on fingers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mug with a mouth and teeth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grinning skull Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human tooth with tiny engravings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a specimen jar with a strange creature inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shard of dark crystallized anomaly residue Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a jar of black slime Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long iron nail used for cursing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pendant with an eye inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an upside-down cross Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a door knocker shaped like a hand Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mushroom shaped like an ear Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "만장",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a funeral banner on a short pole, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조등",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white mourning lantern Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사람 모양 뿌리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a root shaped like a small human Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "날개 달린 눈알",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeball with small wings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기어 다니는 손",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale severed hand crawling on fingers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "입 달린 컵",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mug with a mouth and teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "웃는 해골",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a grinning skull Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이름 새겨진 이빨",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human tooth with tiny engravings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "괴이 표본 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a specimen jar with a strange creature inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "괴이 잔해 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shard of dark crystallized anomaly residue Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 점액 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a jar of black slime Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "저주 못",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long iron nail used for cursing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숨겨진 눈 펜던트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pendant with an eye inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뒤집힌 십자가",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an upside-down cross Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손 모양 문고리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a door knocker shaped like a hand Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀 모양 버섯",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mushroom shaped like an ear Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

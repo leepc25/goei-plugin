@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "일렉 기타",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric guitar, lying diagonally, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "헤어드라이어",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair dryer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고데기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hair straightener Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기면도기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric shaver Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전동 칫솔",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric toothbrush Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전자레인지",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a microwave oven Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기포트",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric kettle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "커피머신",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a capsule coffee machine Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토스터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a toaster Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "밥솥",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electric rice cooker Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전기장판",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded electric heating mat with a controller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가습기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a humidifier with mist Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공기청정기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an air purifier Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로봇청소기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round robot vacuum Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무드등",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glowing mood lamp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탁상 스탠드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a desk lamp Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

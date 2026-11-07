@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue stick Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pencil sharpener Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a neon yellow reflective safety vest Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small personal alarm keychain with a pull pin Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a climbing harness with buckles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel crampons Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ice axe Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a camping gas lantern Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round kerosene heater Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small charcoal brazier Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of long charcoal tongs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel kitchen tongs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kitchen spatula turner Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wire whisk Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knife sharpening stone Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle opener Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "풀",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연필깎이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pencil sharpener Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "형광 조끼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a neon yellow reflective safety vest Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호신용 경보기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small personal alarm keychain with a pull pin Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하네스",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a climbing harness with buckles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이젠",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel crampons Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피켈",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ice axe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가스 랜턴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a camping gas lantern Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "등유 난로",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round kerosene heater Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화로",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small charcoal brazier Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숯불 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of long charcoal tongs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고기 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of steel kitchen tongs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뒤집개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kitchen spatula turner Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "거품기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wire whisk Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "칼갈이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knife sharpening stone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "병따개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle opener Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

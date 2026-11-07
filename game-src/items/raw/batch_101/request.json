@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a card reader Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld barcode scanner Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fingerprint scanner pad Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iris scanner device Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a motion sensor Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electronic lock pick device Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a signal jammer with many antennas Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a boxy EMP device with coils Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small portable generator Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding solar panel charger Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable car jump starter with clamps Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a game controller Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a game console box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a webcam Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an e-book reader Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round smart speaker Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "카드 리더기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a card reader Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바코드 스캐너",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handheld barcode scanner Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지문 인식기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fingerprint scanner pad Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홍채 스캐너",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iris scanner device Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "동작 감지기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a motion sensor Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자물쇠 해제기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an electronic lock pick device Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전파 방해기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a signal jammer with many antennas Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "EMP 장치",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a boxy EMP device with coils Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소형 발전기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small portable generator Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "태양광 충전기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding solar panel charger Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "점프 스타터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable car jump starter with clamps Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "게임 패드",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a game controller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콘솔 게임기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a game console box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "웹캠",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a webcam Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전자책 리더기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an e-book reader Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스마트 스피커",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round smart speaker Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

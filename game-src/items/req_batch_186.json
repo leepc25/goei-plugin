@@ -1,0 +1,87 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "음낭",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrinkled dark skin pouch, empty and saggy, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "식도",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long very thin pale pink flexible tube, about the length of a forearm, curving gently, muscular rings faintly visible Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/03.png"
+  },
+  {
+   "ko": "신경 다발",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a loose tangle of thin bright yellow nerve threads, wavy and stringy, no central cord Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_176/05.png"
+  },
+  {
+   "ko": "탯줄",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long coiled bluish white twisted umbilical cord, glossy like a rope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈비뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of curved white human ribs fanning out from a short spine piece Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "편육",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few thin square slices of pressed beef with clear jelly layers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "백김치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole white napa cabbage kimchi in clear brine, not red Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "닭갈비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of spicy red stir-fried chicken with cabbage and rice cakes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손자국 손거울",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand mirror with a bloody handprint on the inside of the glass Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손가락 나뭇가지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dead tree branch ending in human fingers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "세 눈 개구리 박제",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stuffed green frog with three eyes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홀로그램 펫 큐브",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear cube projecting a tiny glowing hologram of a cute alien creature Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "복지몰 포인트 카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleek corporate point card with a small animal mask logo, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "미인 약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of pink translucent soft capsules, plain pink label with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소토스 찻잔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fine white porcelain teacup with a thin gold rim on a saucer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타투 도안 책",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a worn tattoo design book open to a drawing of a tree with one red tomato Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

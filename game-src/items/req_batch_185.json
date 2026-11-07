@@ -1,0 +1,88 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "고환",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of smooth pale oval testicles with thin cords on top, no skin pouch, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/01.png"
+  },
+  {
+   "ko": "맹장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny worm-shaped appendix, a small closed pink finger-like pouch hanging from a short stub of intestine Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_171/05.png"
+  },
+  {
+   "ko": "척수",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long straight white cord with many short paired nerve roots on both sides, like a long white ladder Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_176/04.png"
+  },
+  {
+   "ko": "뇌하수체",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny pea-sized pinkish gray gland hanging on a short thin stalk, shown large and close up Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무릎뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single small round flat kneecap bone, triangular at the bottom Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발가락",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few severed human toes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빛나는 버섯",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cluster of glowing blue mushrooms Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붉은 눈 고양이 조각상",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black cat statue with glowing red eyes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은하 구슬",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass marble with a tiny galaxy swirling inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손톱 박힌 빗",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old wooden comb with human fingernails stuck in its teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "만보기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clip-on pedometer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "운석 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark rough meteorite chunk with glowing green crystal veins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "중력 구슬",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy dark metal sphere with rings of light orbiting it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탐사 생존 키트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a compact black zip case opened showing a flashlight, bandages, and a small knife Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방청객 출입증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lanyard pass card for a TV studio audience, red lanyard, blank card Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도깨비불 초롱",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small Korean lantern holding a floating blue ghost flame Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

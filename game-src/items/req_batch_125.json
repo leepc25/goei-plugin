@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "산호 장신구",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coral necklace Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호박 보석",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an amber gem Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오팔",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an opal gem Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자수정",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an amethyst crystal Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "상아 조각",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a carved ivory figure Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은 촛대",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver candelabra Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "크리스탈 잔",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crystal glass Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은수저",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver spoon and chopsticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "황금 두꺼비",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden toad statue Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "산삼",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wild ginseng root Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "녹용",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. deer antler velvet slices Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "차고 리모컨",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a garage remote Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아파트 출입 카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an apartment key fob Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엘리베이터 키",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an elevator key Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비상구 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a key with a green tag Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "옥상 열쇠",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a key with a red tag Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

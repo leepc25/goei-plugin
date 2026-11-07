@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a projector Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wireless charging pad Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car GPS navigation device Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a digital door lock keypad Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a video doorbell Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. smart glasses Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a drone remote controller Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an insulin pen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small vial of glucose test strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an asthma inhaler Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nebulizer machine with a mask Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contact lens case Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ear thermometer Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nasal spray bottle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few throat lozenges Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of mouthwash, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "프로젝터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a projector Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무선 충전기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wireless charging pad Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "내비게이션",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car GPS navigation device Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "디지털 도어락",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a digital door lock keypad Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비디오 초인종",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a video doorbell Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스마트 안경",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. smart glasses Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "드론 조종기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a drone remote controller Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인슐린 펜",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an insulin pen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈당 시험지",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small vial of glucose test strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "흡입기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an asthma inhaler Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "네뷸라이저",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nebulizer machine with a mask Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콘택트렌즈 통",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contact lens case Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀 체온계",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ear thermometer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비강 스프레이",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nasal spray bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "목캔디",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few throat lozenges Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가글",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of mouthwash, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

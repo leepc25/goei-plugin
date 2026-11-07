@@ -1,0 +1,87 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "음핵 포피",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hood-shaped fold of pink skin, like a tiny curved cap, shown large and close up, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/02.png"
+  },
+  {
+   "ko": "귀두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. the rounded tip of a human penis only, mushroom-cap shaped, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유방 지방 조직",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a soft shapeless lump of bright yellow fat, greasy and shiny, no glands, no ducts Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_170/04.png"
+  },
+  {
+   "ko": "잘린 손",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human hand lying palm up Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "입술",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of severed full red human lips, slightly parted Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골반뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human pelvis bone, a wide basin-shaped bone with two large wing-like hips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엔진오일 통",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plastic engine oil jug, plain, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하이패스 단말기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small car toll pass device Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지구본",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small desk globe on a stand Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성게",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black spiny sea urchin cut open showing orange roe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "굴비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few dried yellow croakers tied with straw rope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반중력 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of silver space gloves with small glowing blue pads floating slightly Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "외계 식물 화분",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pot holding a strange alien plant with glowing purple bulbs and tentacle leaves Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기억 지우개 스프레이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white spray can with an eraser symbol, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홈쇼핑 아이크림",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small fancy jar of eye cream with a gold lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "색색 눈알 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of eyeballs with bright unnatural colored irises Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

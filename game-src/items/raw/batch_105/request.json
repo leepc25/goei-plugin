@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden tongue depressor Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an otoscope Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical penlight Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a reflex hammer Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an allergy pill box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small vial of amber serum Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather doctor's bag Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable ECG monitor with leads Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean ancestral spirit tablet, plain wooden tablet on its small base, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a funeral portrait frame with black ribbons on the top corners, a dim silhouette inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of brass ancestral ritual bowls Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded white paper ancestral tablet slip Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small lidded incense box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small earthenware spirit jar wrapped with straw rope Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round brass shaman mirror with a tassel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of shaman ritual straw-cutter blades, compact Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "설압자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden tongue depressor Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이경",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an otoscope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펜라이트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical penlight Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반사 망치",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a reflex hammer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "알레르기약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an allergy pill box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈청 병",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small vial of amber serum Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "왕진 가방",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather doctor's bag Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "휴대용 심전도기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable ECG monitor with leads Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "위패",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean ancestral spirit tablet, plain wooden tablet on its small base, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "영정 사진",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a funeral portrait frame with black ribbons on the top corners, a dim silhouette inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제기",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of brass ancestral ritual bowls Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지방",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded white paper ancestral tablet slip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "향합",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small lidded incense box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신주 단지",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small earthenware spirit jar wrapped with straw rope Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "명두",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round brass shaman mirror with a tassel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "작두",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of shaman ritual straw-cutter blades, compact Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

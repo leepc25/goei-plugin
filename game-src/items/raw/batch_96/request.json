@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dustpan Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat floor mop, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green scrubbing sponge Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded white dishcloth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bar of laundry soap Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of liquid detergent, blank label Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of fabric softener, blank label Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded ironing board, compact Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic laundry basket Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty plastic clothes hanger Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few wooden clothespins Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal hand file Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of hex keys Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a socket wrench set in an open case Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paint scraper Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a caulking gun Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "쓰레받기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dustpan Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대걸레",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat floor mop, compact, fully inside the frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수세미",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green scrubbing sponge Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "행주",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded white dishcloth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빨랫비누",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bar of laundry soap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "세제",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of liquid detergent, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "섬유유연제",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of fabric softener, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리미판",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded ironing board, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빨래 바구니",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic laundry basket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "옷걸이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty plastic clothes hanger Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빨래집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few wooden clothespins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠줄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal hand file Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "육각 렌치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of hex keys Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소켓 세트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a socket wrench set in an open case Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스크래퍼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paint scraper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "실리콘 건",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a caulking gun Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

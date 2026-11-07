@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "새우과자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of long thin shrimp flavored puffed snacks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "견과류",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pile of mixed nuts: almonds, walnuts, cashews Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오징어채",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tangle of shredded dried squid strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쥐포",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat sheet of dried filefish jerky Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "번데기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper cup full of boiled silkworm pupae Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "떡꼬치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skewer of rice cakes coated in sticky red sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "핫바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fish cake bar on a stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소시지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two pink sausages Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "햄",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of pink ham with one slice cut Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "치즈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wedge of yellow cheese with holes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "버터",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of yellow butter half unwrapped from silver foil Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두부",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white block of tofu Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콩나물",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of soybean sprouts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시금치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bunch of fresh spinach Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two brown potatoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고구마",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two purple-skinned sweet potatoes Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

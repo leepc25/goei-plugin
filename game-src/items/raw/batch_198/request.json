@@ -1,0 +1,108 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two thin delicate pink inner labia folds with wavy edges, only the folds alone, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron thumbscrew device, two bars tightened by a wing screw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather glove with metal spikes on the knuckles and palm Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coarse steel metal file with a wooden handle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy meat tenderizer mallet with spiked square faces Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old hand-cranked steel trephine, a brace handle with a round crown saw bit Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small steel surgical spoon with a deep round cup for scooping an eyeball Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a square patch of pale human skin with thick black stitches around the edges Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of yellow fluid with a lump of living pink flesh growing inside, tubes in the lid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a corked glass bottle holding a swirling pale mist shaped like a sound wave Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small juice box with a straw, dark red drips at the straw, plain red box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a calligraphy brush with a tuft of white fox fur and a red tassel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black glass perfume bottle with a gray mist, plain label Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red steel crowbar with a curved claw end Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of glasses with one lens shattered and a bent frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. only a short pink intestine segment bent into a tight C shape cradling a small pale gland, not the whole intestine Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "소음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two thin delicate pink inner labia folds with wavy edges, only the folds alone, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손가락 죄기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an iron thumbscrew device, two bars tightened by a wing screw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가시 박힌 장갑",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather glove with metal spikes on the knuckles and palm Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 가는 줄칼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coarse steel metal file with a wooden handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 분쇄 망치",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy meat tenderizer mallet with spiked square faces Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두개골 천공기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old hand-cranked steel trephine, a brace handle with a round crown saw bit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안구 적출 스푼",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small steel surgical spoon with a deep round cup for scooping an eyeball Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꿰맨 자국 피부 패치",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a square patch of pale human skin with thick black stitches around the edges Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조직 배양 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of yellow fluid with a lump of living pink flesh growing inside, tubes in the lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "병에 든 목소리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a corked glass bottle holding a swirling pale mist shaped like a sound wave Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피 주스 팩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small juice box with a straw, dark red drips at the straw, plain red box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "구미호 털 붓",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a calligraphy brush with a tuft of white fox fur and a red tassel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사람 냄새 지우는 향수",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black glass perfume bottle with a gray mist, plain label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠지렛대",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red steel crowbar with a curved claw end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깨진 안경",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of glasses with one lens shattered and a bent frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "십이지장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. only a short pink intestine segment bent into a tight C shape cradling a small pale gland, not the whole intestine Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_187/03.png"
+  }
+ ]
+}

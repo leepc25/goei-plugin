@@ -1,0 +1,101 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "피 묻은 칼",
+   "kind": "anomaly",
+   "redo": "56-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kitchen knife with blood on the blade, nothing behind it, lying diagonally Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "찢어진 사진",
+   "kind": "anomaly",
+   "redo": "56-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a printed photo torn in half, the half showing a person's shoulder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "살아있는 식재료",
+   "kind": "anomaly",
+   "redo": "56-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a writhing dark tentacled ingredient, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부동산 문서",
+   "kind": "valuable",
+   "redo": "59-7",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a real estate deed paper with a red official seal, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "어음",
+   "kind": "valuable",
+   "redo": "59-8",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a promissory note slip with a red seal, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "담보 증서",
+   "kind": "valuable",
+   "redo": "59-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a collateral certificate with an ornate border and a red seal, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "점포 임대권",
+   "kind": "valuable",
+   "redo": "59-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a store lease document with a red seal, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "라이터 기름",
+   "kind": "consumable",
+   "redo": "59-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small yellow lighter fluid tin with a spout, plain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "단추 전지",
+   "kind": "consumable",
+   "redo": "60-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three round silver button cell batteries, shown large and close up Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탄띠(기관총)",
+   "kind": "consumable",
+   "redo": "60-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short belt of machine gun ammunition curled in a U shape, fully inside the square Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연료통",
+   "kind": "consumable",
+   "redo": "60-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a solid red metal jerrycan fuel container, filled color Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "포스트잇",
+   "kind": "consumable",
+   "redo": "62-6",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of yellow square sticky notes, one corner lifted Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바둑알",
+   "kind": "misc",
+   "redo": "64-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of black and white go stones, shown large and close up Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "트럼프",
+   "kind": "misc",
+   "redo": "64-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a deck of playing cards fanned out, card backs red Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "프라이팬",
+   "kind": "misc",
+   "redo": "67-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black frying pan with a short handle, the whole pan fully inside the square Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "국자",
+   "kind": "misc",
+   "redo": "67-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel soup ladle, short, fully inside the square Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
