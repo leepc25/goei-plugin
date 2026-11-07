@@ -1,4 +1,5 @@
-phone.failure) + fail3("위키", wiki.failure);
+all></div><textarea readonly rows="4">${esc20(f.raw)}</textarea></div>` : "";
+    const fails = fail3("괴담넷", gnet.failure) + fail3("괴담톡", phone.failure) + fail3("위키", wiki.failure);
     const diag = manUi.diag;
     const runs = diag ? diag.length ? diag.map((r) => row5(`${esc20(r.at)} · ${esc20(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc20(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
     const bundle = diagBundle(ctx2, canChat);
@@ -2933,10 +2934,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return false;
   }
 
-  // src/ui/morph.ts
-  var KEEP = [".ph-drawer", ".gx-mbar"];
-  var committed = null;
-  function markCommitted(el) {
-    committed = el;
-  }
-  function syncAttrs(
+  // src/ui/

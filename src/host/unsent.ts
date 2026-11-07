@@ -5,6 +5,7 @@ import type { Chat } from '../core/types';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { updateChat } from './risu';
 import { isWaiting } from './waiting';
+import { openRepick } from './openinghint';
 
 /** 방금 놓은 마지막 유저 메시지(기록 카드·직접 입력)를 「아직 안 보냄」으로 */
 export async function markUnsent(charIndex: number, chatIndex: number): Promise<void> {
@@ -38,13 +39,15 @@ onChatClick('unsent', async (_doc, x, y) => {
   try {
     const charIndex = await risuai.getCurrentCharacterIndex();
     const chatIndex = await risuai.getCurrentChatIndex();
-    await updateChat(charIndex, chatIndex, (chat) => {
+    const saved = await updateChat(charIndex, chatIndex, (chat) => {
       const msgs = chat.message ?? [];
       const last = msgs[msgs.length - 1];
       if (!last || last.role !== 'user' || typeof last.data !== 'string' || !isUnsent(last.data)) return null;
       chat.message = msgs.slice(0, -1);
       return chat;
     });
+    // 취소로 채팅이 비면(시작 화면 직접 입력·커스텀 임무를 물린 것) 다시 고르게 시작 화면을 연다 (사용자 11-07: 취소해도 선택 창이 안 열림)
+    if (saved && !(saved.message ?? []).length) openRepick();
   } catch (error) {
     console.log(`[goei] 요청 취소 실패: ${error instanceof Error ? error.message : String(error)}`);
   } finally {

@@ -1,4 +1,7 @@
--main { border-radius: 11px 11px 0 0; }
+
+}
+/* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
+.gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
 .gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
 /* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
 .st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -2441,7 +2444,4 @@ ${note.trim()}` : card2;
     env3.setBusy(true);
     env3.setNotice("");
     try {
-      let closedAt = -1;
-      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
-        const x = ctxOf(ctx2, latest);
-        const w
+      let cl

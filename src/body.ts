@@ -599,7 +599,16 @@ async function onDisplay(text: string): Promise<string> {
   if (typeof text !== 'string') return text;
   // 이미지 태그는 에셋 목록이 있어야 그린다. 목록을 아직 못 읽었으면 첫 읽기를 기다린다 (안 기다리면 원문 태그가 남고, 새로고침 전엔 다시 그려지지 않는다)
   if (hasImgTag(text) && !modulePicker()) await assetsFirst.catch(() => undefined);
+  // 플러그인이 넣은 첫 장면: 안내(첫 행동·재선택)를 붙일지 아직 모르면 지금 채팅 상태를 읽어 정한다.
+  // 채팅을 닫았다 다시 열면 Risu가 감시 차례(1초)보다 먼저 그려서 안내가 빠졌다 (사용자 11-07)
+  if (isSceneMessage(text) && !wantsOpeningHint(text)) await ensureOpeningHint().catch(() => undefined);
   return displayNow(text);
+}
+
+async function ensureOpeningHint(): Promise<void> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chatIndex = await risuai.getCurrentChatIndex();
+  if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
 }
 
 /** 플러그인이 뜨기 전에 Risu가 이미 그린 메시지는 다시 그려 주지 않는다 (업데이트·새로고침 직후 태그가 원문대로 남고, 다른 채팅에 갔다 와야 그려짐).
@@ -611,7 +620,11 @@ async function redrawAfterLoad(): Promise<void> {
     const ctx = await loadContext();
     if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
     if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
-    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+    // 같은 글을 그대로 저장하면 Risu(Chats.svelte, 글 해시로 그린 것을 재사용)가 다시 그리지 않는다. 그림 태그가 있는 글의 끝 줄바꿈을 붙였다 뗐다 해 글이 바뀌게 한다 (보이는 것·요청은 그대로)
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({
+      ...cur,
+      message: (cur.message ?? []).map((m) => (typeof m.data === 'string' && m.data.includes('<img=') ? { ...m, data: m.data.endsWith('\n') ? m.data.slice(0, -1) : `${m.data}\n` } : m)),
+    }));
   } catch {
     /* 다시 그리지 못해도 그만 (다음 채팅 전환 때 그려진다) */
   }

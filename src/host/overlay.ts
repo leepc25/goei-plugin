@@ -9,8 +9,9 @@ import { statusCss } from '../ui/status';
 import { getPrefs } from '../core/settings';
 import { imgCss, imgHidden } from '../core/imgtag';
 
-/** 시작 메시지 안내(host/openinghint.ts): 대화가 시작되면(메시지가 하나라도 생기면) 숨긴다. 첫 장면은 .chat-message-container 밖에 있다 */
-const OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
+/** 시작 메시지 안내(host/openinghint.ts): 대화가 시작되면 숨긴다. 첫 장면은 플러그인이 넣은 채팅 메시지라(v0.20.6, core/start.ts applyStart) 자기도 .chat-message-container 안에 있다.
+ *  그래서 메시지가 둘 이상일 때만 숨긴다 (하나일 때도 숨겨서 안내가 아예 안 보였다, 사용자 11-07) */
+const OPENING_CSS = '.default-chat-screen:has(.chat-message-container ~ .chat-message-container) [data-goei-card="opening"]{display:none!important}';
 
 /** 채팅 속 카드·상태창 배색 (상태창은 설정 「상태창」을, 캐릭터 이미지 칸은 「이미지 크기」·「접는 정도」·에셋 출력을 따른다) */
 const chatCss = (t: ThemeName) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? 'auto', t)

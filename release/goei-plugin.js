@@ -209,7 +209,7 @@ function showPanel(version, install2, message = "") {
 // src/main.ts
 var VERSION = true ? "0.21.1" : "";
 var WATCH_MS = 1e3;
-var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
+var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", "%%GOEI_SCENE%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
 var body = null;
 var loading = null;

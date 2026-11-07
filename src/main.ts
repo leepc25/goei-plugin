@@ -10,7 +10,8 @@ declare const __PLUGIN_VERSION__: string | undefined;
 const WATCH_MS = 1000;
 
 /** 이 봇 메시지·요청에만 있는 표식 (시드, 이동·전화 지시문, 시작 카드, 상태창) */
-const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', '%%GOEI_UNSENT%%', '%%GOEI_START%%', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
+// %%GOEI_SCENE%% = 플러그인이 넣은 첫 장면 (core/dispatch SCENE_MARK). 빠져 있어서 본체가 뜨기 전 Risu가 그린 첫 장면의 그림 태그가 원문으로 남았다 (사용자 11-07)
+const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', '%%GOEI_UNSENT%%', '%%GOEI_START%%', '%%GOEI_SCENE%%', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
 const ours = (t: unknown) => typeof t === 'string' && MARKS.some((m) => t.includes(m));
 
 let body: Body | null = null;

@@ -1,4 +1,7 @@
- = structuredClone(x.world);
+osedAt = -1;
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
         const err = change(w, x);
         if (err) throw new Error(err);
         const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
@@ -2209,7 +2212,13 @@ ${texts.anomaly}`;
   async function onDisplay(text4) {
     if (typeof text4 !== "string") return text4;
     if (hasImgTag(text4) && !modulePicker()) await assetsFirst.catch(() => void 0);
+    if (isSceneMessage(text4) && !wantsOpeningHint(text4)) await ensureOpeningHint().catch(() => void 0);
     return displayNow(text4);
+  }
+  async function ensureOpeningHint() {
+    const charIndex = await risuai.getCurrentCharacterIndex();
+    const chatIndex = await risuai.getCurrentChatIndex();
+    if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
   }
   async function redrawAfterLoad() {
     try {
@@ -2218,7 +2227,11 @@ ${texts.anomaly}`;
       const ctx2 = await loadContext();
       if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
       if (!ctx2.chat.message.some((m) => typeof m.data === "string" && m.data.includes("<img="))) return;
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({
+        ...cur,
+        message: (cur.message ?? []).map((m) => typeof m.data === "string" && m.data.includes("<img=") ? { ...m, data: m.data.endsWith("\n") ? m.data.slice(0, -1) : `${m.data}
+` } : m)
+      }));
     } catch {
     }
   }

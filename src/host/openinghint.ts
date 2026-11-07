@@ -32,6 +32,11 @@ export function setRepickOpener(f: () => void): void {
   opener = f;
 }
 
+/** 시작 화면(고르기)을 연다: 재선택 버튼, 전송 대기 취소(host/unsent.ts) 뒤 */
+export function openRepick(): void {
+  opener?.();
+}
+
 /** display: 이 글이 안내를 붙일 첫 장면인지 */
 export function wantsOpeningHint(text: string): boolean {
   return !!marker && text.includes(marker);

@@ -1,4 +1,5 @@
-who", "비우면 주인공"), "일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요")] : [],
+새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요."),
+      ...["diary", "emotion"].includes(v("style")) ? [row4("누구", text4("who", "비우면 주인공"), "일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요")] : [],
       row4("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
       row4("주제", text4("subject", "비우면 세계관에 맞는 다양한 주제")),
       row4("분위기·말투", text4("mood", "비우면 익명 커뮤니티 말투")),
@@ -3595,4 +3596,4 @@ Next Paragraph Text
 .gw .adv-step, .gw .st-step { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0; background: var(--panel2); color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
 .gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
-.gw .adv-step > input.adv-val { width: 96px; height: auto; min-height: 0; max-height: none; padding: 0 6px; border: 0; border-radius: 0; background: transparent; text-align: center; -moz-appearance: textfield;
+.gw .adv-step > input.adv-val { width: 96px; height: auto; 

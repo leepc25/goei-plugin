@@ -975,7 +975,7 @@ ${body5}` : `##### ${sec.title}`);
 `;
 
   // src/host/overlay.ts
-  var OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
+  var OPENING_CSS = '.default-chat-screen:has(.chat-message-container ~ .chat-message-container) [data-goei-card="opening"]{display:none!important}';
   var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t) + imgCss(getPrefs().imgSize, getPrefs().imgFoldOn === false ? 100 : getPrefs().imgFold, imgHidden(), getPrefs().imgFoldLock === true);
   function themeVars(sel) {
     return Object.keys(PALETTES).map((t) => {
@@ -1631,6 +1631,208 @@ ${themeVars("[x-goei-fab]")}
     return () => void subs.delete(cb);
   }
 
+  // src/core/seed.ts
+  var SEED_OPEN = "%%SEED%%";
+  var SEED_CLOSE = "%%/SEED%%";
+  function buildSeed(lore, faction, fm, names4) {
+    const byComment = /* @__PURE__ */ new Map();
+    for (const e of lore) {
+      if (typeof e.comment !== "string" || typeof e.content !== "string" || !e.content) continue;
+      const list4 = byComment.get(e.comment) ?? [];
+      if (!list4.includes(e.content)) list4.push(e.content);
+      byComment.set(e.comment, list4);
+    }
+    names4 ??= seedSection(lore)[`${faction}-${fm}`];
+    if (!names4?.length) return { text: "", missing: [] };
+    const parts = [];
+    const missing = [];
+    for (const name of names4) {
+      const bodies = byComment.get(name);
+      if (bodies) parts.push(bodies.join("\n\n"));
+      else missing.push(name);
+    }
+    const joined = parts.join("\n\n");
+    return { text: joined ? `${SEED_OPEN}
+${joined}
+${SEED_CLOSE}` : "", missing };
+  }
+  function seedBody(text4, env3) {
+    const inner = String(text4 ?? "").replace(SEED_MARKER, "");
+    if (!inner.trim()) return "";
+    return evaluate(inner, env3).split("\n").filter((l) => !/^\s*@@[\w-]+(?:\s.*)?$/.test(l)).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  var SEED_BLOCK = /%%SEED%%[\s\S]*?%%\/SEED%%\n?/g;
+  var SEED_MARKER = /%%\/?SEED%%\n?/g;
+  function applySeedLifetime(text4, keep) {
+    if (!text4.includes(SEED_OPEN)) return text4;
+    return keep ? text4.replace(SEED_MARKER, "") : text4.replace(SEED_BLOCK, "");
+  }
+
+  // src/core/start.ts
+  function readManifest(lore) {
+    const entry3 = manifestEntry(lore);
+    if (!entry3 || typeof entry3.content !== "string") return null;
+    try {
+      const m = JSON.parse(entry3.content);
+      if (m && m.plugin === "goei-plugin" && m.greetings && typeof m.greetings === "object") return m;
+    } catch {
+    }
+    return null;
+  }
+  function unsentOpening(chat) {
+    const m = chat.message ?? [];
+    const text4 = String(m[0]?.data ?? "");
+    if (m.length !== 1) return false;
+    if (m[0]?.role === "char") return isSceneMessage(text4);
+    return m[0]?.role === "user" && (hasSceneCard(text4) || text4.includes(UNSENT_MARK));
+  }
+  var sceneStaged = (chat) => (chat.message ?? []).length === 1 && chat.message[0]?.role === "char" && isSceneMessage(chat.message[0].data);
+  function chatPhase(chat) {
+    if ((chat.message ?? []).length > 0 && !unsentOpening(chat)) return "started";
+    return isFaction(chat.scriptstate?.["$st_faction"]) ? "staged" : "fresh";
+  }
+  function currentChoice(chat) {
+    const s7 = chat.scriptstate ?? {};
+    const faction = isFaction(s7["$st_pick"]) ? s7["$st_pick"] : isFaction(s7["$st_faction"]) ? s7["$st_faction"] : void 0;
+    const lang = isLang(s7["$st_lang"]) ? s7["$st_lang"] : void 0;
+    const fm = Number(s7["$st_fm"]);
+    const player = String(s7["$st_player"] ?? "");
+    return { faction, lang, fm: Number.isInteger(fm) && (fm > 0 || fm === 0 && !!player) ? fm : void 0, ...player ? { player } : {} };
+  }
+  var StartError = class extends Error {
+  };
+  function memberAffiliation(lore, playerId2, fallback) {
+    const a = readDirectory(lore).agents.find((x) => x.id === playerId2);
+    if (!a?.affiliation) return fallback;
+    const facs = factionList(lore);
+    const f = BUILTIN.includes(a.affiliation) ? facs.find((x) => x.code === a.affiliation) : facs.find((x) => !x.builtin && !x.group && x.org === a.affiliation);
+    return f?.affiliation ?? a.affiliation;
+  }
+  function effectiveFaction(lore, code2, playerId2) {
+    const facs = factionList(lore);
+    const f = facs.find((x) => x.code === code2);
+    if (!f?.group || !playerId2) return code2;
+    const a = readDirectory(lore).agents.find((x) => x.id === playerId2);
+    if (!a?.affiliation) return code2;
+    if (BUILTIN.includes(a.affiliation)) return a.affiliation;
+    return facs.find((x) => !x.builtin && !x.group && x.org === a.affiliation)?.code ?? code2;
+  }
+  function planStart(choice, manifest, lore, greetingCount, world2 = null) {
+    const factions = factionList(lore);
+    const faction = findFaction(choice.faction, factions);
+    if (!faction) throw new StartError("소속을 골라 주세요.");
+    if (!isLang(choice.lang)) throw new StartError("언어를 골라 주세요.");
+    if (faction.group && !choice.player) throw new StartError("이 칸은 인물을 골라 시작해요.");
+    const playerScene = choice.fm === PLAYER_FM && choice.player ? agentScene(choice.player, scenesOf(lore)) : null;
+    const scenario = playerScene ? { fm: PLAYER_FM, label: "첫 장면", kind: "opening" } : findScenario(choice.faction, choice.fm, factions);
+    if (!scenario) throw new StartError("상황을 골라 주세요.");
+    if (choice.player && scenario.kind === "opening" && !playerScene) throw new StartError("캐릭터로 시작할 때는 그 인물의 첫 장면이나 직접 입력·커스텀 임무를 골라 주세요.");
+    let scene = "";
+    if (scenario.kind === "opening") {
+      scene = playerScene ? sceneText(playerScene, choice.lang) : sceneText(factionScenes(choice.faction, scenesOf(lore)).find((r) => r.fm === choice.fm) ?? null, choice.lang);
+      if (!scene.trim()) throw new StartError(`「${scenario.label}」의 ${choice.lang === "en" ? "영어" : "한국어"} 글이 없어요. 설정 창 세계 › 시작 화면에서 적어 주세요.`);
+    }
+    const fmIndex = emptyGreeting(manifest, greetingCount);
+    if (fmIndex < 0) throw new StartError("이 카드에 빈 첫 장면이 없어요. 설치 · 점검에서 인사말을 다시 심어 주세요.");
+    const seed2 = buildSeed(lore, choice.faction, choice.fm, faction.builtin ? void 0 : faction.group ? [] : faction.seed);
+    return {
+      fmIndex,
+      kind: scenario.kind,
+      ...scene ? { scene } : {},
+      seedMissing: seed2.missing,
+      scriptstate: {
+        // 묶음은 모델·사원증·톡 탭에 고른 인물의 원 소속으로 보인다 (묶음 이름은 모델에 알리지 않음, 2026-11-05 사용자). 고른 칸은 $st_pick 에
+        $st_faction: effectiveFaction(lore, choice.faction, choice.player),
+        $st_player: choice.player ?? "",
+        $st_lang: choice.lang,
+        $st_fm: String(choice.fm),
+        $st_pick: choice.faction,
+        $st_lang_pick: choice.lang,
+        $st_fm_pick: String(choice.fm),
+        $ib_affiliation: faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation,
+        $st_anomaly_on: "0",
+        $an_report: "",
+        $in_report: "",
+        $ms_report: "",
+        $ag_report: "",
+        $seed_lore: seed2.text,
+        $seed_inputs: "0",
+        $goei_last: "",
+        ...factionVars(lore),
+        ...world2 ?? {}
+      }
+    };
+  }
+  function emptyGreeting(manifest, greetingCount) {
+    const keys = [];
+    for (const f of SCENARIOS.factions) for (const sc of f.scenarios) if (sc.kind === "direct") for (const l of SCENARIOS.languages) keys.push(greetingKey(f.code, l.code, sc.fm));
+    for (const k of keys) {
+      const n2 = manifest.greetings[k];
+      if (Number.isInteger(n2) && n2 >= 0 && n2 < greetingCount) return n2;
+    }
+    return -1;
+  }
+  function sceneChatMessage(text4, id) {
+    return { role: "char", data: sceneMessage(text4), time: Date.now(), chatId: id };
+  }
+  function applyStart(chat, plan, sceneId = "") {
+    const message = unsentOpening(chat) ? [] : [...chat.message ?? []];
+    if (plan.scene) message.push(sceneChatMessage(plan.scene, sceneId || `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`));
+    return {
+      ...chat,
+      message,
+      fmIndex: plan.fmIndex,
+      scriptstate: { ...chat.scriptstate ?? {}, ...plan.scriptstate }
+    };
+  }
+
+  // src/host/openinghint.ts
+  var marker = "";
+  var opener = null;
+  function greetingMarker(greeting) {
+    const lines3 = greeting.split("\n").map((l) => l.trim()).filter((l) => l && !/[{}<>[\]]/.test(l));
+    const best = lines3.sort((a, b) => b.length - a.length)[0] ?? "";
+    return best.length >= 8 ? best.slice(0, 40) : "";
+  }
+  function openingStaged(chat, _lore) {
+    return sceneStaged(chat);
+  }
+  function setOpeningHint(greeting) {
+    marker = greeting ? greetingMarker(greeting) : "";
+  }
+  function setRepickOpener(f) {
+    opener = f;
+  }
+  function openRepick() {
+    opener?.();
+  }
+  function wantsOpeningHint(text4) {
+    return !!marker && text4.includes(marker);
+  }
+  async function refreshOpeningHint(charIndex, chatIndex) {
+    if (charIndex < 0 || chatIndex < 0) return void (marker = "");
+    const chat = await risuai.getChatFromIndex(charIndex, chatIndex);
+    setOpeningHint(chat && openingStaged(chat) ? stripSceneMark(String(chat.message[0].data)) : null);
+  }
+  var busy = false;
+  onChatClick("opening", async (doc2, x, y) => {
+    const list4 = await elements(doc2, "[data-goei-repick]");
+    if (!list4.length) return "idle";
+    let on2 = false;
+    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
+    if (!on2 || busy) return false;
+    busy = true;
+    try {
+      opener?.();
+    } finally {
+      busy = false;
+    }
+    return true;
+  });
+  function openingShown() {
+    armChatClick("opening");
+  }
+
   // src/host/unsent.ts
   async function markUnsent(charIndex, chatIndex) {
     await updateChat(charIndex, chatIndex, (chat) => {
@@ -1647,29 +1849,30 @@ ${themeVars("[x-goei-fab]")}
     chat.message = list4.map((m) => typeof m.data === "string" && isUnsent(m.data) ? { ...m, data: setUnsent(m.data, false) } : m);
     return chat;
   }
-  var busy = false;
+  var busy2 = false;
   onChatClick("unsent", async (_doc, x, y) => {
-    if (busy) return false;
+    if (busy2) return false;
     const list4 = await elements(_doc, "[data-goei-cancel]");
     if (!list4.length) return "idle";
     let on2 = false;
     for (const el of list4) if (await hit2(el, x, y)) on2 = true;
     if (!on2 || isWaiting()) return false;
-    busy = true;
+    busy2 = true;
     try {
       const charIndex = await risuai.getCurrentCharacterIndex();
       const chatIndex = await risuai.getCurrentChatIndex();
-      await updateChat(charIndex, chatIndex, (chat) => {
+      const saved = await updateChat(charIndex, chatIndex, (chat) => {
         const msgs4 = chat.message ?? [];
         const last2 = msgs4[msgs4.length - 1];
         if (!last2 || last2.role !== "user" || typeof last2.data !== "string" || !isUnsent(last2.data)) return null;
         chat.message = msgs4.slice(0, -1);
         return chat;
       });
+      if (saved && !(saved.message ?? []).length) openRepick();
     } catch (error) {
       console.log(`[goei] 요청 취소 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
-      busy = false;
+      busy2 = false;
     }
     return true;
   });
@@ -2393,205 +2596,6 @@ ${story}`;
     }
     return true;
   });
-
-  // src/core/seed.ts
-  var SEED_OPEN = "%%SEED%%";
-  var SEED_CLOSE = "%%/SEED%%";
-  function buildSeed(lore, faction, fm, names4) {
-    const byComment = /* @__PURE__ */ new Map();
-    for (const e of lore) {
-      if (typeof e.comment !== "string" || typeof e.content !== "string" || !e.content) continue;
-      const list4 = byComment.get(e.comment) ?? [];
-      if (!list4.includes(e.content)) list4.push(e.content);
-      byComment.set(e.comment, list4);
-    }
-    names4 ??= seedSection(lore)[`${faction}-${fm}`];
-    if (!names4?.length) return { text: "", missing: [] };
-    const parts = [];
-    const missing = [];
-    for (const name of names4) {
-      const bodies = byComment.get(name);
-      if (bodies) parts.push(bodies.join("\n\n"));
-      else missing.push(name);
-    }
-    const joined = parts.join("\n\n");
-    return { text: joined ? `${SEED_OPEN}
-${joined}
-${SEED_CLOSE}` : "", missing };
-  }
-  function seedBody(text4, env3) {
-    const inner = String(text4 ?? "").replace(SEED_MARKER, "");
-    if (!inner.trim()) return "";
-    return evaluate(inner, env3).split("\n").filter((l) => !/^\s*@@[\w-]+(?:\s.*)?$/.test(l)).join("\n").replace(/\n{3,}/g, "\n\n").trim();
-  }
-  var SEED_BLOCK = /%%SEED%%[\s\S]*?%%\/SEED%%\n?/g;
-  var SEED_MARKER = /%%\/?SEED%%\n?/g;
-  function applySeedLifetime(text4, keep) {
-    if (!text4.includes(SEED_OPEN)) return text4;
-    return keep ? text4.replace(SEED_MARKER, "") : text4.replace(SEED_BLOCK, "");
-  }
-
-  // src/core/start.ts
-  function readManifest(lore) {
-    const entry3 = manifestEntry(lore);
-    if (!entry3 || typeof entry3.content !== "string") return null;
-    try {
-      const m = JSON.parse(entry3.content);
-      if (m && m.plugin === "goei-plugin" && m.greetings && typeof m.greetings === "object") return m;
-    } catch {
-    }
-    return null;
-  }
-  function unsentOpening(chat) {
-    const m = chat.message ?? [];
-    const text4 = String(m[0]?.data ?? "");
-    if (m.length !== 1) return false;
-    if (m[0]?.role === "char") return isSceneMessage(text4);
-    return m[0]?.role === "user" && (hasSceneCard(text4) || text4.includes(UNSENT_MARK));
-  }
-  var sceneStaged = (chat) => (chat.message ?? []).length === 1 && chat.message[0]?.role === "char" && isSceneMessage(chat.message[0].data);
-  function chatPhase(chat) {
-    if ((chat.message ?? []).length > 0 && !unsentOpening(chat)) return "started";
-    return isFaction(chat.scriptstate?.["$st_faction"]) ? "staged" : "fresh";
-  }
-  function currentChoice(chat) {
-    const s7 = chat.scriptstate ?? {};
-    const faction = isFaction(s7["$st_pick"]) ? s7["$st_pick"] : isFaction(s7["$st_faction"]) ? s7["$st_faction"] : void 0;
-    const lang = isLang(s7["$st_lang"]) ? s7["$st_lang"] : void 0;
-    const fm = Number(s7["$st_fm"]);
-    const player = String(s7["$st_player"] ?? "");
-    return { faction, lang, fm: Number.isInteger(fm) && (fm > 0 || fm === 0 && !!player) ? fm : void 0, ...player ? { player } : {} };
-  }
-  var StartError = class extends Error {
-  };
-  function memberAffiliation(lore, playerId2, fallback) {
-    const a = readDirectory(lore).agents.find((x) => x.id === playerId2);
-    if (!a?.affiliation) return fallback;
-    const facs = factionList(lore);
-    const f = BUILTIN.includes(a.affiliation) ? facs.find((x) => x.code === a.affiliation) : facs.find((x) => !x.builtin && !x.group && x.org === a.affiliation);
-    return f?.affiliation ?? a.affiliation;
-  }
-  function effectiveFaction(lore, code2, playerId2) {
-    const facs = factionList(lore);
-    const f = facs.find((x) => x.code === code2);
-    if (!f?.group || !playerId2) return code2;
-    const a = readDirectory(lore).agents.find((x) => x.id === playerId2);
-    if (!a?.affiliation) return code2;
-    if (BUILTIN.includes(a.affiliation)) return a.affiliation;
-    return facs.find((x) => !x.builtin && !x.group && x.org === a.affiliation)?.code ?? code2;
-  }
-  function planStart(choice, manifest, lore, greetingCount, world2 = null) {
-    const factions = factionList(lore);
-    const faction = findFaction(choice.faction, factions);
-    if (!faction) throw new StartError("소속을 골라 주세요.");
-    if (!isLang(choice.lang)) throw new StartError("언어를 골라 주세요.");
-    if (faction.group && !choice.player) throw new StartError("이 칸은 인물을 골라 시작해요.");
-    const playerScene = choice.fm === PLAYER_FM && choice.player ? agentScene(choice.player, scenesOf(lore)) : null;
-    const scenario = playerScene ? { fm: PLAYER_FM, label: "첫 장면", kind: "opening" } : findScenario(choice.faction, choice.fm, factions);
-    if (!scenario) throw new StartError("상황을 골라 주세요.");
-    if (choice.player && scenario.kind === "opening" && !playerScene) throw new StartError("캐릭터로 시작할 때는 그 인물의 첫 장면이나 직접 입력·커스텀 임무를 골라 주세요.");
-    let scene = "";
-    if (scenario.kind === "opening") {
-      scene = playerScene ? sceneText(playerScene, choice.lang) : sceneText(factionScenes(choice.faction, scenesOf(lore)).find((r) => r.fm === choice.fm) ?? null, choice.lang);
-      if (!scene.trim()) throw new StartError(`「${scenario.label}」의 ${choice.lang === "en" ? "영어" : "한국어"} 글이 없어요. 설정 창 세계 › 시작 화면에서 적어 주세요.`);
-    }
-    const fmIndex = emptyGreeting(manifest, greetingCount);
-    if (fmIndex < 0) throw new StartError("이 카드에 빈 첫 장면이 없어요. 설치 · 점검에서 인사말을 다시 심어 주세요.");
-    const seed2 = buildSeed(lore, choice.faction, choice.fm, faction.builtin ? void 0 : faction.group ? [] : faction.seed);
-    return {
-      fmIndex,
-      kind: scenario.kind,
-      ...scene ? { scene } : {},
-      seedMissing: seed2.missing,
-      scriptstate: {
-        // 묶음은 모델·사원증·톡 탭에 고른 인물의 원 소속으로 보인다 (묶음 이름은 모델에 알리지 않음, 2026-11-05 사용자). 고른 칸은 $st_pick 에
-        $st_faction: effectiveFaction(lore, choice.faction, choice.player),
-        $st_player: choice.player ?? "",
-        $st_lang: choice.lang,
-        $st_fm: String(choice.fm),
-        $st_pick: choice.faction,
-        $st_lang_pick: choice.lang,
-        $st_fm_pick: String(choice.fm),
-        $ib_affiliation: faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation,
-        $st_anomaly_on: "0",
-        $an_report: "",
-        $in_report: "",
-        $ms_report: "",
-        $ag_report: "",
-        $seed_lore: seed2.text,
-        $seed_inputs: "0",
-        $goei_last: "",
-        ...factionVars(lore),
-        ...world2 ?? {}
-      }
-    };
-  }
-  function emptyGreeting(manifest, greetingCount) {
-    const keys = [];
-    for (const f of SCENARIOS.factions) for (const sc of f.scenarios) if (sc.kind === "direct") for (const l of SCENARIOS.languages) keys.push(greetingKey(f.code, l.code, sc.fm));
-    for (const k of keys) {
-      const n2 = manifest.greetings[k];
-      if (Number.isInteger(n2) && n2 >= 0 && n2 < greetingCount) return n2;
-    }
-    return -1;
-  }
-  function sceneChatMessage(text4, id) {
-    return { role: "char", data: sceneMessage(text4), time: Date.now(), chatId: id };
-  }
-  function applyStart(chat, plan, sceneId = "") {
-    const message = unsentOpening(chat) ? [] : [...chat.message ?? []];
-    if (plan.scene) message.push(sceneChatMessage(plan.scene, sceneId || `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`));
-    return {
-      ...chat,
-      message,
-      fmIndex: plan.fmIndex,
-      scriptstate: { ...chat.scriptstate ?? {}, ...plan.scriptstate }
-    };
-  }
-
-  // src/host/openinghint.ts
-  var marker = "";
-  var opener = null;
-  function greetingMarker(greeting) {
-    const lines3 = greeting.split("\n").map((l) => l.trim()).filter((l) => l && !/[{}<>[\]]/.test(l));
-    const best = lines3.sort((a, b) => b.length - a.length)[0] ?? "";
-    return best.length >= 8 ? best.slice(0, 40) : "";
-  }
-  function openingStaged(chat, _lore) {
-    return sceneStaged(chat);
-  }
-  function setOpeningHint(greeting) {
-    marker = greeting ? greetingMarker(greeting) : "";
-  }
-  function setRepickOpener(f) {
-    opener = f;
-  }
-  function wantsOpeningHint(text4) {
-    return !!marker && text4.includes(marker);
-  }
-  async function refreshOpeningHint(charIndex, chatIndex) {
-    if (charIndex < 0 || chatIndex < 0) return void (marker = "");
-    const chat = await risuai.getChatFromIndex(charIndex, chatIndex);
-    setOpeningHint(chat && openingStaged(chat) ? stripSceneMark(String(chat.message[0].data)) : null);
-  }
-  var busy2 = false;
-  onChatClick("opening", async (doc2, x, y) => {
-    const list4 = await elements(doc2, "[data-goei-repick]");
-    if (!list4.length) return "idle";
-    let on2 = false;
-    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
-    if (!on2 || busy2) return false;
-    busy2 = true;
-    try {
-      opener?.();
-    } finally {
-      busy2 = false;
-    }
-    return true;
-  });
-  function openingShown() {
-    armChatClick("opening");
-  }
 
   // src/host/user.ts
   var USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""><b data-goei-uname>{{user}}</b></span>';
@@ -4154,7 +4158,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
     }
     const scale = Math.min(1, UPLOAD_SIDE / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    const g2 = canvas.getContext("2d");
-    if (!g2) th
+    canvas.width = Math.max(1, Math.rou

@@ -1,4 +1,7 @@
-row new PhotoError("사진을 줄이지 못했어요.");
+nd(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const g2 = canvas.getContext("2d");
+    if (!g2) throw new PhotoError("사진을 줄이지 못했어요.");
     g2.imageSmoothingQuality = "high";
     g2.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close();
@@ -3554,5 +3557,4 @@ ${RETRY_ANALYZE}` }
     ].join(""))}
       ${group2("게시판", [
       row4("게시글 수", seg3("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), "새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요"),
-      row4("성격", seg3("style", ["gal", "wpf", "diary", "emotion"].includes(v("style")) ? v("style") : "net", [["gal", "괴담갤"], ["net", "괴담넷"], ["wpf", "세정게"], ["diary", "일기장"], ["emotion", "감정 게시판"]]), "괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요."),
-      ...["diary", "emotion"].includes(v("style")) ? [row4("누구", text4("
+      row4("성격", seg3("style", ["gal", "wpf", "diary", "emotion"].includes(v("style")) ? v("style") : "net", [["gal", "괴담갤"], ["net", "괴담넷"], ["wpf", "세정게"], ["diary", "일기장"], ["emotion", "감정 게시판"]]), "괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 
