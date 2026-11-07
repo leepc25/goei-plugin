@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big bowl of knife-cut noodle soup with thick flat noodles, zucchini and clams Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel bowl of cold buckwheat noodles in icy broth with half a boiled egg and cucumber Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thin white wheat noodles in clear anchovy broth with zucchini and egg strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of chewy noodles with red spicy sauce, cabbage and half a boiled egg Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big bowl of red spicy seafood noodle soup with squid, mussels and vegetables Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of fried pork pieces glazed with glossy orange sweet and sour sauce Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mound of fried rice with diced carrot and egg on a white oval dish Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow omelet folded over rice with a stripe of red ketchup on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. white rice with thick yellow curry sauce with potato and carrot chunks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a breaded pork cutlet sliced in strips with brown sauce Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of red spicy stir-fried pork with onion slices Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of sweet marinated beef slices with onion and green onion Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three strips of grilled pork belly with grill marks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. sliced braised pig's trotter with dark glossy skin Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. sliced boiled pork belly with a small heap of red radish kimchi Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of sticky glazed fried chicken bites with sesame seeds Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "칼국수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big bowl of knife-cut noodle soup with thick flat noodles, zucchini and clams Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "냉면",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel bowl of cold buckwheat noodles in icy broth with half a boiled egg and cucumber Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잔치국수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thin white wheat noodles in clear anchovy broth with zucchini and egg strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쫄면",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of chewy noodles with red spicy sauce, cabbage and half a boiled egg Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "짬뽕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big bowl of red spicy seafood noodle soup with squid, mussels and vegetables Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탕수육",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of fried pork pieces glazed with glossy orange sweet and sour sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "볶음밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mound of fried rice with diced carrot and egg on a white oval dish Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오므라이스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow omelet folded over rice with a stripe of red ketchup on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카레라이스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. white rice with thick yellow curry sauce with potato and carrot chunks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "돈까스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a breaded pork cutlet sliced in strips with brown sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "제육볶음",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of red spicy stir-fried pork with onion slices Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "불고기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of sweet marinated beef slices with onion and green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삼겹살",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three strips of grilled pork belly with grill marks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "족발",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. sliced braised pig's trotter with dark glossy skin Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보쌈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. sliced boiled pork belly with a small heap of red radish kimchi Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "닭강정",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of sticky glazed fried chicken bites with sesame seeds Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of khaki shorts Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black slacks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leggings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a navy track jacket and track pants set with white stripes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pajama set with blue stripes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black one-piece swimsuit Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long-sleeve rash guard top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red two-piece bikini Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black lace bra Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white cotton panties Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of sheer black stockings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red high heel shoes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown strap sandals Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown leather loafers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leather knee boots Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black military combat boots with laces Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "반바지",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of khaki shorts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "슬랙스",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black slacks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "레깅스",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leggings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "트레이닝복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a navy track jacket and track pants set with white stripes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잠옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pajama set with blue stripes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수영복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black one-piece swimsuit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "래시가드",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long-sleeve rash guard top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비키니",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red two-piece bikini Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "브래지어",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black lace bra Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white cotton panties Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스타킹",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of sheer black stockings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하이힐",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red high heel shoes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "샌들",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown strap sandals Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "로퍼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of brown leather loafers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leather knee boots Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "군화",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black military combat boots with laces Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

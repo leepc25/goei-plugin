@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole yellow onion Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long green onion, short enough to fit, lying diagonally Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole napa cabbage Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white Korean radish with green leaves on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two carrots with green tops Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green cucumber Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green Korean zucchini Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cluster of brown shiitake mushrooms Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two green and red chili peppers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sack of rice tied at the top with grains visible Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white paper bag of flour, folded top, plain without print Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red cola can with a brown liquid splash design, no logo Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green soda can with bubble design, no logo Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear cup of sweet rice drink with rice grains floating Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bowl of dark cinnamon punch with pine nuts floating Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall clear plastic cup of iced black coffee with ice cubes and a straw Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "양파",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole yellow onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대파",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long green onion, short enough to fit, lying diagonally Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배추",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole napa cabbage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white Korean radish with green leaves on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "당근",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two carrots with green tops Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green cucumber Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "애호박",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green Korean zucchini Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "버섯",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cluster of brown shiitake mushrooms Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고추",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two green and red chili peppers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쌀",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sack of rice tied at the top with grains visible Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "밀가루",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white paper bag of flour, folded top, plain without print Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콜라",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red cola can with a brown liquid splash design, no logo Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사이다",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green soda can with bubble design, no logo Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "식혜",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear cup of sweet rice drink with rice grains floating Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수정과",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bowl of dark cinnamon punch with pine nuts floating Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아메리카노",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall clear plastic cup of iced black coffee with ice cubes and a straw Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
