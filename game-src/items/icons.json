@@ -184,6 +184,16 @@
   },
   {
    "keywords": [
+    "포장지 12B357나"
+   ],
+   "file": "misc_252.png",
+   "kind": "misc",
+   "base": false,
+   "name": "포장지 12B357나",
+   "src": "game-src/items/raw/batch_195/07.png"
+  },
+  {
+   "keywords": [
     "테마파크 입장 팔찌"
    ],
    "file": "wear_021.png",
@@ -760,6 +770,16 @@
    "base": false,
    "name": "여우 상담실 팻말",
    "src": "game-src/items/raw/batch_191/11.png"
+  },
+  {
+   "keywords": [
+    "백화점 고객 카드"
+   ],
+   "file": "key_061.png",
+   "kind": "key",
+   "base": false,
+   "name": "백화점 고객 카드",
+   "src": "game-src/items/raw/batch_193/04.png"
   },
   {
    "keywords": [
@@ -1845,6 +1865,26 @@
    "base": false,
    "name": "뱀 무늬 은반지",
    "src": "game-src/items/raw/batch_191/12.png"
+  },
+  {
+   "keywords": [
+    "노스텔지어 키티"
+   ],
+   "file": "anomaly_235.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "노스텔지어 키티",
+   "src": "game-src/items/raw/batch_193/05.png"
+  },
+  {
+   "keywords": [
+    "정신 안정 사탕"
+   ],
+   "file": "food_368.png",
+   "kind": "food",
+   "base": false,
+   "name": "정신 안정 사탕",
+   "src": "game-src/items/raw/batch_196/03.png"
   },
   {
    "keywords": [
@@ -3401,6 +3441,36 @@
    "base": false,
    "name": "도깨비불 호롱",
    "src": "game-src/items/raw/batch_190/16.png"
+  },
+  {
+   "keywords": [
+    "스마일 스티커"
+   ],
+   "file": "consumable_119.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "스마일 스티커",
+   "src": "game-src/items/raw/batch_195/05.png"
+  },
+  {
+   "keywords": [
+    "머리카락 팔찌"
+   ],
+   "file": "wear_197.png",
+   "kind": "wear",
+   "base": false,
+   "name": "머리카락 팔찌",
+   "src": "game-src/items/raw/batch_195/06.png"
+  },
+  {
+   "keywords": [
+    "줄 없는 수갑"
+   ],
+   "file": "tool_240.png",
+   "kind": "tool",
+   "base": false,
+   "name": "줄 없는 수갑",
+   "src": "game-src/items/raw/batch_196/06.png"
   },
   {
    "keywords": [
@@ -6031,6 +6101,16 @@
    "base": false,
    "name": "길거리 우표",
    "src": "game-src/items/raw/batch_191/14.png"
+  },
+  {
+   "keywords": [
+    "하얀 그립톡"
+   ],
+   "file": "device_164.png",
+   "kind": "device",
+   "base": false,
+   "name": "하얀 그립톡",
+   "src": "game-src/items/raw/batch_193/07.png"
   },
   {
    "keywords": [
@@ -10055,6 +10135,36 @@
   },
   {
    "keywords": [
+    "회색 코인"
+   ],
+   "file": "misc_251.png",
+   "kind": "misc",
+   "base": false,
+   "name": "회색 코인",
+   "src": "game-src/items/raw/batch_193/06.png"
+  },
+  {
+   "keywords": [
+    "소원 물약"
+   ],
+   "file": "anomaly_236.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "소원 물약",
+   "src": "game-src/items/raw/batch_195/04.png"
+  },
+  {
+   "keywords": [
+    "통신 단추"
+   ],
+   "file": "device_165.png",
+   "kind": "device",
+   "base": false,
+   "name": "통신 단추",
+   "src": "game-src/items/raw/batch_196/05.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -12593,7 +12703,8 @@
    "kind": "weapon",
    "base": false,
    "name": "유리손포",
-   "src": "game-src/items/raw/batch_190/05.png"
+   "src": "game-src/items/raw/batch_193/08.png",
+   "old_src": "game-src/items/raw/batch_190/05.png"
   },
   {
    "keywords": [
@@ -12604,6 +12715,16 @@
    "base": false,
    "name": "햇살잡이",
    "src": "game-src/items/raw/batch_190/12.png"
+  },
+  {
+   "keywords": [
+    "자궁경부"
+   ],
+   "file": "body_086.png",
+   "kind": "body",
+   "base": false,
+   "name": "자궁경부",
+   "src": "game-src/items/raw/batch_195/01.png"
   },
   {
    "keywords": [
@@ -18939,7 +19060,8 @@
    "kind": "body",
    "base": false,
    "name": "눈꺼풀",
-   "src": "game-src/items/raw/batch_187/05.png"
+   "src": "game-src/items/raw/batch_193/02.png",
+   "old_src": "game-src/items/raw/batch_187/05.png"
   },
   {
    "keywords": [
@@ -18989,7 +19111,28 @@
    "kind": "anomaly",
    "base": false,
    "name": "옥방울",
-   "src": "game-src/items/raw/batch_191/03.png"
+   "src": "game-src/items/raw/batch_196/07.png",
+   "old_src": "game-src/items/raw/batch_191/03.png"
+  },
+  {
+   "keywords": [
+    "전정구"
+   ],
+   "file": "body_085.png",
+   "kind": "body",
+   "base": false,
+   "name": "전정구",
+   "src": "game-src/items/raw/batch_193/01.png"
+  },
+  {
+   "keywords": [
+    "광선총"
+   ],
+   "file": "weapon_156.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "광선총",
+   "src": "game-src/items/raw/batch_195/03.png"
   },
   {
    "keywords": [
@@ -24215,8 +24358,8 @@
    "kind": "body",
    "base": false,
    "name": "음낭",
-   "src": "game-src/items/raw/batch_190/01.png",
-   "old_src": "game-src/items/raw/batch_186/01.png"
+   "src": "game-src/items/raw/batch_196/01.png",
+   "old_src": "game-src/items/raw/batch_190/01.png"
   },
   {
    "keywords": [
@@ -24257,6 +24400,46 @@
    "base": false,
    "name": "옥패",
    "src": "game-src/items/raw/batch_190/14.png"
+  },
+  {
+   "keywords": [
+    "육회"
+   ],
+   "file": "food_365.png",
+   "kind": "food",
+   "base": false,
+   "name": "육회",
+   "src": "game-src/items/raw/batch_193/03.png"
+  },
+  {
+   "keywords": [
+    "땅콩"
+   ],
+   "file": "food_366.png",
+   "kind": "food",
+   "base": false,
+   "name": "땅콩",
+   "src": "game-src/items/raw/batch_195/02.png"
+  },
+  {
+   "keywords": [
+    "미역"
+   ],
+   "file": "food_367.png",
+   "kind": "food",
+   "base": false,
+   "name": "미역",
+   "src": "game-src/items/raw/batch_196/02.png"
+  },
+  {
+   "keywords": [
+    "유관"
+   ],
+   "file": "body_087.png",
+   "kind": "body",
+   "base": false,
+   "name": "유관",
+   "src": "game-src/items/raw/batch_196/04.png"
   },
   {
    "keywords": [
