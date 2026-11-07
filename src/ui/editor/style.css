@@ -458,3 +458,6 @@
 .ps-row.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
 @keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
 @media (prefers-reduced-motion: reduce) { .ps-row.gw-find-flash { animation: none; background: var(--accent-bg); } }
+/* 인물 설정 전용 모델 ID 줄: 입력칸과 저장이 한 줄 (2026-11-07 사용자: 폰에서 저장이 아래로 떨어졌다) */
+.gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
+.gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }

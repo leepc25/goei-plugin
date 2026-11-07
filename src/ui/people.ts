@@ -35,6 +35,8 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 
 /** 화면 상태 (입력 중인 글은 다시 그려도 지킨다) */
 export const peopleUi = {
+  /** 호출 흐름 도식에서 방금 「설정 ↓」로 간 블록 (잠깐 테두리를 밝힌다) */
+  hit: '',
   notice: '',
   info: '',
   busy: false,
@@ -362,23 +364,54 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const v = (k: string) => ppValue(state, k);
   const s = peopleSettings(state);
   const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
-  const intro = `<p class="ps-note">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
-  // 2026-11-07 사용자: 켜기·모델·시간 제한이 흩어져 있어 알아볼 수 없었다 → 모델을 부르는 단계(갱신·Router·Director·정리)마다 한 묶음에 모으고,
-  // 그 단계가 꺼져 있으면 모델·세부 칸은 숨긴다
+  // 2026-11-07 사용자: 어떤 게 보조 모델을 부르고 무엇을 하는지 알 수 없었다 → 맨 위에 호출 흐름 도식(켜고 끄기·블록으로 바로가기),
+  // 그 아래 공통 설정, 그 아래 호출 단계(갱신·Router·Director·정리)마다 한 블록. 꺼진 단계의 세부 칸은 숨긴다
+  const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk${peopleUi.hit === id ? ' pp-blk-hit' : ''}" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
+  const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인' : '보조');
   const stageModel = (st: Exclude<Stage, 'update'>, help: string) =>
     row('모델', seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['aux', '보조'], ['main', '메인']]), help) + idBox(st, v(`model_id_${st}`));
-  const main = [
+  const routerOn = s.on && s.router === 'model';
+  const sceneOn = s.on && s.director === 'scene';
+  const updateOn = s.on && s.when === 'turn';
+  const tidyOn = s.on && s.tidy === 'separate';
+  const preCalls = (routerOn ? 1 : 0) + (sceneOn ? 1 : 0);
+  type Node = { name: string; sub: string; kind: 'aux' | 'main' | 'plain'; on: boolean; model?: string; calls: string; control?: string; block?: string };
+  const nodes: Node[] = [
+    { name: '입력', sub: '유저 메시지', kind: 'plain', on: s.on, calls: '' },
+    { name: 'Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: modelOf('router'), calls: routerOn ? '보조 1회' : '호출 없음 (코드가 고름)', control: seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), block: 'pp-blk-router' },
+    { name: 'Director', sub: '이번 턴 연기 지시', kind: 'aux', on: sceneOn, model: modelOf('director'), calls: sceneOn ? (s.directorSearch ? '보조 1회 (검색 땐 2회)' : '보조 1회') : s.director === 'facts' ? '호출 없음 (갱신에 얹음)' : '호출 없음', control: seg('director', s.director, [['off', 'OFF'], ['facts', '사실형'], ['scene', '연출형']]), block: 'pp-blk-director' },
+    { name: '본편', sub: '응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회' },
+    { name: '갱신', sub: '응답을 읽어 기록', kind: 'aux', on: updateOn, model: modelOf('update'), calls: updateOn ? `${s.model === 'main' ? '메인' : '보조'} 1회` : s.on ? '수동 (누를 때만)' : '호출 없음', control: seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), block: 'pp-blk-update' },
+    { name: '정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: modelOf('tidy'), calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', control: seg('tidy', s.tidy, [['same', 'OFF'], ['separate', 'ON']]), block: 'pp-blk-tidy' },
+  ];
+  const flowNode = (n: Node) => `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${n.name}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${n.sub}</small></div><span class="pp-fn-calls">${n.calls}</span><div class="pp-fn-ctl">${n.control ?? ''}</div>${n.block ? `<button class="gx-mini pp-fn-go" data-action="pp-goto" data-value="${n.block}">설정 →</button>` : '<span></span>'}</div>`;
+  const flow = `<div class="pp-flow">${nodes.map(flowNode).join('<i class="pp-fn-arrow" aria-hidden="true">↓</i>')}</div>
+    <p class="pp-flow-sum">${s.on ? `턴마다 보조 호출: 본편 전 <b>${preCalls}회</b> · 본편 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? ' (+정리)' : ''}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : '인물 기록이 꺼져 있어 아무 호출도 하지 않아요.'} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
+  const common = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
-    row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
-  ].join('');
-  const update = [
-    row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「새 응답 읽기」를 눌렀을 때만 읽어요.'),
-    row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
-    idBox('update', v('model_id_update')),
-    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
+    row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 오르내려요'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
+  ].join('');
+  // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
+  // 수치 끄기 = 정성 모드 (리수폿 E): 점수 없이 전용 칸의 글로만
+  const numRow = (f: NumericFeature) => (v(f) === '1' ? row(`${FEATURE_HELP[f][0]} 수치`, onoff(`num_${f}`), NUMERIC_HELP[f]) : '');
+  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '')).join('');
+  const newPeople = [
+    row('새 인물', seg('newpeople', s.newPeople, [['auto', '자동'], ['confirm', '확인 뒤 등록']]), '확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요.'),
+    row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
+  ].join('');
+  const update = [
+    row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
+    row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
+    idBox('update', v('model_id_update')),
+    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
+    `<div class="ps-row wide"><div class="ps-label"><b>기록할 것</b><small>켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</small></div></div>`,
+    fold('pp-feat', '기록 항목', features),
+    fold('pp-new', '새 인물', newPeople),
+    `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
+    fold('pp-ps', '지침 고쳐 쓰기', promptEditor(state, s.prompt)),
   ].join('');
   const router = [
     row('Router', seg('router', s.router, [['code', 'OFF (코드)'], ['model', 'ON (모델)']]), 'OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
@@ -395,29 +428,16 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
       row('언어', seg('director_lang', s.directorLang, [['en', '영어'], ['ko', '한국어']]), 'Director 메모를 쓰는 언어예요. 영어가 토큰이 적어요'),
       row('길이', seg('director_len', s.directorLen, [['short', '짧게'], ['normal', '보통']]), 'Director 메모의 길이예요'),
       row('재사용', onoff('director_reuse'), '장면이 그대로면 지난 지시를 다시 써요 (호출 없음).'),
-      row('기능별 지침', onoff('director_features'), '켜진 기능(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토큰 적음)'),
+      row('기능별 지침', onoff('director_features'), '켜진 기록 항목(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토큰 적음)'),
       row('2차 검색', onoff('director_search'), '자료가 모자라면 Director가 채팅·로어북·위키 검색을 요청하고, 코드가 찾아 한 번 더 불러요 (그 턴만 1회 추가)'),
     ] : []),
+    ...(s.director !== 'off' ? [`<div class="pp-rules one">${ruleBox('pp-director-rules', 'Director 메모에 덧붙일 지침', v('director_rules'), '본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.', 2000, '예: 메모는 한 문장으로, 다음 장면의 분위기만', 'pp-drules-save')}</div>`] : []),
   ].join('');
   const tidy = [
     row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요.'),
     row('정리 방식', seg('tidy', s.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']]), '같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음 (추가 호출 없음, 모델은 갱신 모델). 별도 = 갱신 뒤 그 인물만 정리 호출 1회.'),
     ...(s.tidy === 'separate' ? [stageModel('tidy', '별도 정리 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델')] : []),
   ].join('');
-  // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
-  // 수치 끄기 = 정성 모드 (리수폿 E): 점수 없이 전용 칸의 글로만
-  const numRow = (f: NumericFeature) => (v(f) === '1' ? row(`${FEATURE_HELP[f][0]} 수치`, onoff(`num_${f}`), NUMERIC_HELP[f]) : '');
-  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '')).join('');
-  const newPeople = [
-    row('새 인물', seg('newpeople', s.newPeople, [['auto', '자동'], ['confirm', '확인 뒤 등록']]), '확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요.'),
-    row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
-  ].join('');
-  // 두 「추가 지침」이 헷갈려 한 묶음에 나란히 (2026-10-26 사용자)
-  const rules = group('추가 지침', `<div class="pp-rules">
-      ${ruleBox('pp-rules', '기록 갱신기에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}
-      ${ruleBox('pp-director-rules', 'Director 메모에 덧붙일 지침', v('director_rules'), `본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.${s.director === 'off' ? ' 지금은 Director 가 꺼져 있어 쓰이지 않아요.' : ''}`, 2000, '예: 메모는 한 문장으로, 다음 장면의 분위기만', 'pp-drules-save')}
-    </div>`);
-  const editor = fold('pp-ps', '지침 고쳐 쓰기', promptEditor(state, s.prompt));
   const advanced = fold('pp-adv', '고급', [
     row('직전 쌍 포함', seg('prev_pairs', String(s.prevPairs), [['0', '0'], ['1', '1'], ['2', '2']]), '읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수'),
     row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
@@ -439,16 +459,12 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>인물 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('pp')}</span></header>${defaultsConfirm('pp')}
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
     <div class="ph-form-body ps">
-      ${intro}
-      ${group('인물', main)}
-      ${group('갱신 (응답 뒤 1회)', update)}
-      ${fold('pp-feat', '기능', features)}
-      ${group('Router (장면 인물 고르기)', router)}
-      ${group('Director', director)}
-      ${group('정리', tidy)}
-      ${fold('pp-new', '새 인물', newPeople)}
-      ${rules}
-      ${editor}
+      ${group('호출 흐름 (한 턴)', flow, '한 턴에 모델을 부르는 순서예요. 테두리가 밝은 칸이 지금 켜져 있는 단계. 여기서 바로 켜고 끌 수 있고, 「설정 →」을 누르면 그 단계의 세부 설정으로 가요.')}
+      ${blk('pp-blk-common', '공통', common)}
+      ${blk('pp-blk-update', '갱신 (본편 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
+      ${blk('pp-blk-router', 'Router (본편 전)', router, '본편을 보내기 전에 이번 응답에 필요한 인물을 고르는 단계예요. 고른 인물의 기록만 본편 요청에 들어가요.')}
+      ${blk('pp-blk-director', 'Director (본편 전)', director, '고른 인물의 기록을 보고 「이번 턴 이렇게 연기해라」는 짧은 지시를 본편 요청에 끼워요.')}
+      ${blk('pp-blk-tidy', '정리', tidy, '한 인물의 기록이 저장 상한을 넘으면 옛 항목을 합쳐 줄여요.')}
       ${advanced}
       ${diag}
     </div>
@@ -920,6 +936,16 @@ export async function handlePeople(action: string, value: string | undefined, ct
     return true;
   }
   switch (action) {
+    case 'pp-goto': {
+      // 호출 흐름 도식 → 그 단계의 설정 블록 (접힌 칸은 펼치고, 잠깐 테두리를 밝힌다). 화면은 다시 그리지 않는다
+      // 설정 창은 조작 뒤 늘 다시 그리므로, 표시는 상태로 넣고 스크롤은 다시 그린 뒤에
+      peopleUi.hit = v;
+      setTimeout(() => {
+        document.getElementById(v)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        peopleUi.hit = '';
+      }, 30);
+      return true;
+    }
     case 'pp-set': {
       const i = v.indexOf('=');
       if (i < 0) return true;
