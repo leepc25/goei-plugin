@@ -23,7 +23,7 @@ import type { RefSource } from '../core/refs';
 import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { generate as askModel } from '../host/llm';
+import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { advNum, budgetFor, genSettings } from '../core/advanced';
@@ -1560,3 +1560,23 @@ export function phoneUnread(ctx: ChatContext): boolean {
 
 /** 메인 설정 「기능별 설정」에서 연다 */
 export const phoneSettingsPane = (ctx: ChatContext): string => settingsView(ctx);
+
+/** 호출 흐름 미리 계산: 지금 설정으로 새 메시지 확인이 보낼 요청 (보낼 게 없으면 null) */
+export function previewPhoneRefresh(ctx: ChatContext): LlmMessage[] | null {
+  const st = readPhone(ctx.chat);
+  const d = dir(ctx);
+  const rolls: number[] = [];
+  let k = 0;
+  const roll = () => (k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]));
+  const plan = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => {
+    k = 0;
+    const p = refreshPrompt(source(ctx), st, d, names(ctx), roll);
+    return { ...p, messages: p.prompt?.messages ?? [] };
+  });
+  return plan.prompt ? plan.prompt.messages : null;
+}
+
+/** 호출 흐름 미리 계산: 관전(보기 전용 방) 요청 */
+export function previewPhoneView(ctx: ChatContext): LlmMessage[] {
+  return fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
+}

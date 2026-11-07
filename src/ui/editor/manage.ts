@@ -11,7 +11,7 @@ import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWiki
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { clearTrace, loadTrace } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
-import { flowPage } from './flow';
+import { ensureFlow, flowPage, flowRecount } from './flow';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
@@ -246,7 +246,10 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
-  if (node === 'manage:flow') return flowPage(ctx, head);
+  if (node === 'manage:flow') {
+    ensureFlow(ctx, () => rerender?.());
+    return flowPage(ctx, head);
+  }
   if (node === 'manage:trace') {
     const confirm = traceUi.confirm
       ? `<button class="gx-mini danger" data-action="man-drop-trace-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>`
@@ -294,6 +297,9 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       return true;
     case 'man-trace-refresh':
       traceUi.turns = await loadTrace().catch(() => []);
+      return true;
+    case 'man-flow-recount':
+      flowRecount();
       return true;
     case 'man-drop-trace':
       traceUi.confirm = true;

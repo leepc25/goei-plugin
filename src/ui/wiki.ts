@@ -10,7 +10,7 @@ import {
 } from '../core/wiki';
 import { lastReply } from '../core/phone';
 import { playerAgent } from '../core/player';
-import { generate as askModel } from '../host/llm';
+import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
@@ -162,6 +162,29 @@ function search(ctx: ChatContext, q: string): boolean {
   return false;
 }
 
+
+/** 문서 요청 조립 (generate 와 호출 흐름 미리 계산이 같이 쓴다) */
+function articlePrompt(ctx: ChatContext, title: string, o: { inherited: string[]; previousDoc: ReturnType<typeof findDoc>; writingRequest: string; docRequest: string; direct: boolean }) {
+  const s: WikiSettings = wikiSettings(ctx.chat.scriptstate);
+  const { inherited, previousDoc, writingRequest, docRequest, direct } = o;
+    const catalogNames = (() => {
+      try {
+        return factionNames(parseCatalog(ctx.char.globalLore), String(ctx.chat.scriptstate?.['$st_faction'] ?? ''));
+      } catch {
+        return {};
+      }
+    })();
+    // 그림 (라이트보드 나무위키 W3): 본문까지면 괴이·특수·거점·조직 그림 후보, 인물 문서면 정보칸 표정 후보
+    const subject = entryFor(ctx, title);
+    const images = s.images === 'body'
+      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [subject] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject)]
+          .filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i)
+          .map((e) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name }))
+      : [];
+    const moods = s.images !== 'off' && subject?.cat === 'ag' ? portraitMoods(ctx, subject.photo) : [];
+    return fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));
+}
+
 // ── 생성 ──
 
 async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean): Promise<void> {
@@ -182,22 +205,7 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
   wiki.notice = '';
   env.render();
   try {
-    const catalogNames = (() => {
-      try {
-        return factionNames(parseCatalog(ctx.char.globalLore), String(ctx.chat.scriptstate?.['$st_faction'] ?? ''));
-      } catch {
-        return {};
-      }
-    })();
-    // 그림 (라이트보드 나무위키 W3): 본문까지면 괴이·특수·거점·조직 그림 후보, 인물 문서면 정보칸 표정 후보
-    const subject = entryFor(ctx, title);
-    const images = s.images === 'body'
-      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [subject] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject)]
-          .filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i)
-          .map((e) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name }))
-      : [];
-    const moods = s.images !== 'off' && subject?.cat === 'ag' ? portraitMoods(ctx, subject.photo) : [];
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));
+    const prompt = articlePrompt(ctx, title, { inherited, previousDoc, writingRequest, docRequest, direct });
     let body: string;
     try {
       body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'nw').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'nw'), state: ctx.chat.scriptstate, label: '위키 글' })).value;
@@ -1082,3 +1090,25 @@ export function wikiInput(name: string, value: string): boolean {
 
 /** 메인 설정 「기능별 설정」에서 연다 */
 export const wikiSettingsPane = (ctx: ChatContext): string => settingsView(ctx);
+
+/** 호출 흐름 미리 계산: 매 턴 자동 작성이 보낼 요청 (제목 고르기 + 본문). 제목은 설정대로, 모델이 고르는 설정이면 후보 첫 항목으로 친다 */
+export function previewWikiAuto(ctx: ChatContext): { title: LlmMessage[] | null; article: LlmMessage[] | null } {
+  const s = wikiSettings(ctx.chat.scriptstate);
+  const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  const written = new Set(listDocs(ctx.chat, ctx.char.globalLore).filter((d) => !d.base).map((d) => d.title));
+  const candidates = [...new Set(entries(ctx).filter((e) => !(me && e.cat === 'ag' && e.name === me.name)).map((e) => e.title))];
+  const names = (() => {
+    try {
+      return factionNames(parseCatalog(ctx.char.globalLore), String(ctx.chat.scriptstate?.['$st_faction'] ?? ''));
+    } catch {
+      return {};
+    }
+  })();
+  const titleMsgs = s.autoTitle === 'model' && candidates.length ? wikiTitlePrompt(source(ctx), candidates, [...written], names) : null;
+  const title = s.autoTitle === 'input' ? (s.autoQuery ? canon(ctx)(s.autoQuery) : '') : candidates.find((c) => !written.has(c)) ?? candidates[0] ?? '';
+  if (!title) return { title: titleMsgs, article: null };
+  const old = findDoc(ctx.chat, title, ctx.char.globalLore);
+  const regenerate = !!old && !old.base;
+  const p = articlePrompt(ctx, title, { inherited: regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : [], previousDoc: regenerate && s.refreshPrevious ? old : null, writingRequest: String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? ''), docRequest: '', direct: regenerate ? !!old?.meta?.direct : false });
+  return { title: titleMsgs, article: p.messages };
+}

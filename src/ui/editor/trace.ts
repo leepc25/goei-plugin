@@ -24,6 +24,8 @@ const ymd = (iso: string): string => {
 };
 const sec = (ms: number) => `${Math.round(ms / 100) / 10}초`;
 const chars = (n: number) => `${n.toLocaleString('ko-KR')}자`;
+/** 토큰 (기록에 없으면 빈 글. 2026-11-07 사용자: 호출 기록에 토큰수) */
+const tok = (n: number | undefined) => (n === undefined ? '' : ` ${n.toLocaleString('ko-KR')}토큰`);
 const modelName = (m: string) => (m === 'main' ? '메인' : m === 'aux' ? '보조' : m);
 
 type Node = { key: string; kind: 'main' | 'call' | 'reply'; title: string; meta: string; ok: boolean | null; error?: string; body: string };
@@ -34,7 +36,7 @@ function nodes(t: TraceTurn): Node[] {
     key: `${t.id}:c${i}`,
     kind: 'call',
     title: c.label,
-    meta: `${modelName(c.model)} · ${sec(c.ms)} · ${hms(c.at)} · 요청 ${chars(c.requestChars)} → 응답 ${chars(c.responseChars)}`,
+    meta: `${modelName(c.model)} · ${sec(c.ms)} · ${hms(c.at)} · 요청 ${chars(c.requestChars)}${tok(c.requestTokens)} → 응답 ${chars(c.responseChars)}${tok(c.responseTokens)}`,
     ok: c.ok,
     ...(c.error ? { error: c.error } : {}),
     body: `<div class="gw-flow-io"><b>요청</b><textarea readonly rows="8">${esc(c.request)}</textarea></div><div class="gw-flow-io"><b>받은 값</b><textarea readonly rows="8">${esc(c.response || (c.ok ? '' : '(없음)'))}</textarea></div>`,
@@ -49,13 +51,13 @@ function nodes(t: TraceTurn): Node[] {
       key: `${t.id}:main`,
       kind: 'main',
       title: '본편 요청 조립',
-      meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
+      meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
       body: `<div class="gw-flow-io"><b>마지막 메시지 셋 (플러그인이 끼운 블록은 보통 여기)</b>${m.tail.map((r) => `<small>[${esc(r.role)}]</small><textarea readonly rows="8">${esc(r.content)}</textarea>`).join('')}</div>`,
     });
   }
   for (const [c, i] of before) out.push(call(c, i));
-  if (t.reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}`, ok: true, body: `<div class="gw-flow-io"><b>받은 글</b><textarea readonly rows="10">${esc(t.reply.text)}</textarea></div>` });
+  if (t.reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io"><b>받은 글</b><textarea readonly rows="10">${esc(t.reply.text)}</textarea></div>` });
   else if (t.main) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: '아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)', ok: null, body: '' });
   for (const [c, i] of after) out.push(call(c, i));
   for (const [c, i] of manual) out.push({ ...call(c, i), title: `${c.label} (수동)` });

@@ -5,7 +5,7 @@ import { playerAgent } from '../core/player';
 import { imgCharacters, imgPromptConfig } from '../core/imgprompt';
 import { basicSettings, getPrefs } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
-import { runModel } from './llm';
+import { runModel, type LlmMessage } from './llm';
 import { updateChat } from './risu';
 import { userInfo } from './user';
 
@@ -66,5 +66,25 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     await note(why.slice(0, 300));
   } finally {
     running = false;
+  }
+}
+
+/** 호출 흐름 미리 계산: 마지막 응답에 대해 태그 보충이 보낼 요청 (보충할 게 없으면 null) */
+export function previewAsset(lore: LoreEntry[] | undefined, chat: Chat): LlmMessage[] | null {
+  const s = basicSettings(lore, chat.scriptstate);
+  const list = chat.message ?? [];
+  const msg = list[list.length - 1];
+  if (!s.assetOn || s.assetModel !== 'aux' || !msg || msg.role !== 'char' || typeof msg.data !== 'string' || !msg.data) return null;
+  try {
+    const agent = playerAgent(lore, chat.scriptstate);
+    const cfg = imgPromptConfig(getPrefs());
+    const picked = imgCharacters(lore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: agent?.english || undefined, userName: userInfo().name });
+    if (!picked.length) return null;
+    const tuned = imageDataFrom(lore, picked, cfg.keywords);
+    const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
+    const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
+    return planAsset(msg.data, data, s.assetLimit, exclude)?.messages ?? null;
+  } catch {
+    return null;
   }
 }

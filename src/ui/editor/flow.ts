@@ -10,6 +10,76 @@ import { viewSettings, VIEW_PRESETS } from '../../core/phoneView';
 import { gnetSettings } from '../../core/gnet';
 import { wikiSettings } from '../../core/wiki';
 import { journalSettings } from '../../core/journal';
+import { promptTokens } from '../../core/budget';
+import { tokenizerName } from '../../core/tokenizer';
+import type { LlmMessage } from '../../host/llm';
+import { previewPeopleCalls } from '../../host/people';
+import { previewAsset } from '../../host/asset';
+import { previewDebrief } from '../../host/journal';
+import { previewGnetRefresh } from '../gnet';
+import { previewPhoneRefresh, previewPhoneView } from '../phone';
+import { previewWikiAuto } from '../wiki';
+import { traceUi } from './trace';
+
+// ── 토큰 미리 계산 (2026-11-07 사용자: 지금 설정값으로 들어갈 요청이 정해져 있으니 토큰을 계산해 보인다) ──
+// 각 기능의 preview* 가 모델을 부르지 않고 요청만 조립한다. 채팅·설정이 바뀌면 다시 센다. 본편은 플러그인이 조립하지 않으니 마지막 「호출 기록」 실측
+type TokMap = Record<string, number | null | undefined>;
+const flowTok = { key: '', map: null as TokMap | null, pending: false, error: '' };
+const tokKey = (ctx: ChatContext) => `${ctx.chatIndex}:${ctx.chat.message?.length ?? 0}:${JSON.stringify(ctx.chat.scriptstate ?? {}).length}`;
+const count = (m: LlmMessage[] | null | undefined): number | null => (m ? promptTokens({ messages: m }) : null);
+
+async function computeTokens(ctx: ChatContext): Promise<TokMap> {
+  const map: TokMap = {};
+  const safe = (name: string, f: () => number | null) => {
+    try {
+      map[name] = f();
+    } catch {
+      map[name] = null;
+    }
+  };
+  const pp = await previewPeopleCalls(ctx).catch(() => ({ router: null, director: null, update: null }));
+  map['인물 Router'] = count(pp.router);
+  map['인물 Director'] = count(pp.director);
+  map['인물 갱신'] = count(pp.update);
+  safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
+  safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
+  safe('괴담넷 새로고침', () => count(previewGnetRefresh(ctx)));
+  safe('괴담톡 관전', () => count(previewPhoneView(ctx)));
+  safe('위키 자동 작성', () => {
+    const w = previewWikiAuto(ctx);
+    const a = count(w.article);
+    const t = count(w.title);
+    return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
+  });
+  safe('보고서 소감', () => count(previewDebrief(ctx)));
+  return map;
+}
+
+/** 호출 흐름 페이지를 그리기 전에 부른다: 셈이 없거나 낡았으면 뒤에서 다시 세고 render 로 다시 그린다 */
+export function ensureFlow(ctx: ChatContext, render: () => void): void {
+  const key = tokKey(ctx);
+  if (flowTok.pending || (flowTok.map && flowTok.key === key)) return;
+  flowTok.pending = true;
+  flowTok.error = '';
+  void computeTokens(ctx)
+    .then((map) => {
+      flowTok.map = map;
+      flowTok.key = key;
+    })
+    .catch((e) => {
+      flowTok.error = e instanceof Error ? e.message : String(e);
+    })
+    .finally(() => {
+      flowTok.pending = false;
+      render();
+    });
+}
+
+/** 「다시 세기」 단추 */
+export function flowRecount(): void {
+  flowTok.map = null;
+  flowTok.key = '';
+}
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -30,6 +100,8 @@ interface Node {
   sure: number;
   /** 조건부(사건 종료·검색·상한 초과)로 더 갈 수 있는 수 */
   maybe: number;
+  /** 지금 조립한 요청 토큰 (null = 지금은 보낼 게 없음, undefined = 셈 없음) */
+  tok?: number | null;
 }
 
 const id = (v: string | undefined) => (v ? `ID ${v.slice(0, 18)}` : '');
@@ -77,11 +149,26 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', sure: 0, maybe: 0 },
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
+  const map = flowTok.map;
+  if (map) for (const n of [...pre, ...post]) if (n.name in map) n.tok = map[n.name];
+  // 본편: Risu 가 조립하니 마지막 호출 기록의 실측
+  const lastMain = [...(traceUi.turns ?? [])].reverse().find((t) => t.main?.totalTokens !== undefined)?.main;
+  if (lastMain?.totalTokens !== undefined) {
+    main.tok = lastMain.totalTokens;
+    main.sub = `Risu 가 응답 생성 · 마지막 요청 실측 ${lastMain.totalTokens.toLocaleString('ko-KR')}토큰`;
+  }
   return { pre, main, post, manual };
 }
 
+const tokLabel = (n: Node): string => {
+  if (n.kind === 'plain') return '';
+  if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
+  if (n.tok === null) return '지금은 보낼 것 없음';
+  return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
+};
 function nodeHtml(n: Node): string {
-  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-node" data-value="${esc(n.page)}">설정 →</button>` : '<span></span>'}</div>`;
+  const tl = tokLabel(n);
+  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}${tl ? `<small class="pp-fn-tok">${esc(tl)}</small>` : ''}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-node" data-value="${esc(n.page)}">설정 →</button>` : '<span></span>'}</div>`;
 }
 
 export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, desc: string) => string): string {
@@ -89,11 +176,19 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
   const all = [...pre, main, ...post];
   const sure = all.reduce((n, x) => n + x.sure, 0);
   const maybe = all.reduce((n, x) => n + x.maybe, 0);
+  const auxTok = [...pre, ...post].filter((x) => x.on && typeof x.tok === 'number').reduce((n, x) => n + (x.tok as number), 0);
+  const tokNote = flowTok.pending
+    ? ' 요청 토큰을 세는 중이에요…'
+    : flowTok.error
+      ? ` 토큰 셈 실패: ${esc(flowTok.error)}`
+      : flowTok.map
+        ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? '' : '약 '}<b>${auxTok.toLocaleString('ko-KR')}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외). <button class="gx-mini" data-action="man-flow-recount">다시 세기</button>`
+        : '';
   const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
   const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
   return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><p class="pp-flow-sum">턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.</p></div></section>
+    <section class="ps-group"><div class="ps-rows"><p class="pp-flow-sum">턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
     ${group('본편', '', [main])}
     ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)', post)}

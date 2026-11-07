@@ -6,7 +6,7 @@ import { cleanSpan, parseUpdate } from '../core/people/updater';
 import { peopleSettings } from '../core/people/settings';
 import { generate, LlmError, type LlmMessage } from './llm';
 import { chatId, peopleUpdating, pushDiag, type DiagRun } from './people';
-import { loadContext, updateChat } from './risu';
+import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 
 const running = new Set<string>();
@@ -105,4 +105,21 @@ export async function requestDebrief(reportId: string): Promise<DebriefResult> {
     diag.ms = Date.now() - t0;
     await pushDiag(diag, settings.keepRaw);
   }
+}
+
+/** 호출 흐름 미리 계산: 사건이 끝난 턴에 보낼 소감 요청의 어림 (가장 최근 보고서와 그 앞뒤 발췌. 보고서가 없으면 지침만) */
+export function previewDebrief(ctx: ChatContext): LlmMessage[] {
+  const settings = peopleSettings(ctx.chat.scriptstate);
+  const list = Array.isArray(ctx.chat.message) ? ctx.chat.message : [];
+  const report = readReports(ctx.chat).items.slice(-1)[0];
+  const idx = report?.idx ?? list.length - 1;
+  const span: { m: string; role: 'user' | 'assistant'; text: string }[] = [];
+  for (let i = Math.max(0, idx - 2); i <= Math.min(list.length - 1, idx + 2); i++) {
+    const m = list[i];
+    if (!m || (m.role !== 'user' && m.role !== 'char')) continue;
+    const text = cleanSpan(typeof m.data === 'string' ? m.data : '', settings.spanCap);
+    if (text) span.push({ m: `m${span.length + 1}`, role: m.role === 'user' ? 'user' : 'assistant', text });
+  }
+  const data = { ended_now: [report ? endedNowOf(report) : {}], span };
+  return [{ role: 'system', content: DEBRIEF_PROMPT }, { role: 'user', content: JSON.stringify(data) }];
 }

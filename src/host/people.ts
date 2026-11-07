@@ -16,8 +16,10 @@ import { nameMatcher } from '../core/people/select';
 import { buildRouter, parseRouter, type RouterHint } from '../core/people/router';
 import { speechVarietyBlock } from '../core/people/speech';
 import { sexualWriterSection } from '../core/people/sexual';
-import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
+import { allNames, extraNames, seedBaseFor, temperOf, valuesOf } from '../core/people/base';
 import { playerAgent } from '../core/player';
+import { peopleBlockFor } from '../core/people/request';
+import { userInfo } from './user';
 import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
@@ -610,3 +612,49 @@ export function describeSettings(s: PeopleSettings): string {
 }
 
 export { liveness };
+
+// ── 호출 흐름 미리 계산 (2026-11-07 사용자: 지금 설정으로 들어갈 요청을 조립해 토큰을 보인다). 모델을 부르지 않고 요청만 만든다 ──
+
+/** 지금 설정·채팅으로 Router·Director·갱신기가 보낼 요청 (없으면 null). 유저 입력은 마지막 유저 메시지로 친다 */
+export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: LlmMessage[] | null; director: LlmMessage[] | null; update: LlmMessage[] | null }> {
+  const out = { router: null as LlmMessage[] | null, director: null as LlmMessage[] | null, update: null as LlmMessage[] | null };
+  const settings = peopleSettings(ctx.chat.scriptstate);
+  if (!settings.on) return out;
+  const store = peopleStore(ctx.chat);
+  const exclude = excludedNames(ctx);
+  const lastUser = [...(ctx.chat.message ?? [])].reverse().find((m) => m.role === 'user');
+  const input = messageText(String(lastUser?.data ?? ''));
+  const names = allNames();
+  if (settings.router === 'model' && Object.keys(store.people).length) {
+    const b = buildRouter(ctx.chat, store, names, input, { exclude, recent: settings.recentMsgs, prompt: settings.routerPrompt, rules: settings.routerRules, identityOf: sheetOf(ctx) });
+    out.router = [{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }];
+  }
+  if ((settings.director === 'scene' || settings.director === 'facts') && Object.keys(store.people).length) {
+    const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+    const { people } = peopleBlockFor(ctx.chat, { settings, store, sheetOf: sheetOf(ctx), temperOf, extraNames: extraNames(), input, user: me?.name || userInfo().name || '주인공', factionNames: factionNamesOf(ctx.char.globalLore) });
+    const memory = await hypaMemory(ctx.chat, ctx.char, [input, ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)).catch(() => [] as string[]);
+    const b = buildDirector(ctx.chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), memory);
+    if (b) out.director = [{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }];
+  }
+  if (settings.when === 'turn') {
+    // 다음 턴 갱신기는 「마지막 응답 하나」를 읽는다고 치고 조립한다
+    const list = ctx.chat.message ?? [];
+    let last = -1;
+    for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') { last = i; break; }
+    if (last >= 0) {
+      const walletOn = colConfig(ctx.chat.scriptstate).wallet !== 'off';
+      const balance = walletOn ? walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat)) : null;
+      const itemsOn = itemAutoOn(ctx.chat.scriptstate);
+      const itemsNow = itemsOn ? liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat).map((e) => ({ name: e.name, desc: e.desc, kind: e.kind })) : null;
+      const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
+      const inp = buildUpdate(ctx.chat, store, [last], { settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, ended: [], items: itemsNow });
+      const sections = enabledSections(settings);
+      if (inp.tidy.length) sections.add('tidy');
+      if (walletOn) sections.add('wallet');
+      if (itemsOn) sections.add('items');
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
+    }
+  }
+  return out;
+}

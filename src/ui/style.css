@@ -3023,12 +3023,11 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 .gx-pngcard .ps-note { margin: 0; font-size: 13px; color: var(--sub); }
 .gx-png-acts { display: flex; gap: 8px; justify-content: flex-end; }
 
-/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (다섯이 같은 너비, 11-06 연대기 추가) */
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
+/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭. 가계부가 소지품으로 간 뒤 넷이니 넷 균등 (2026-11-07 사용자: 다섯째 칸이 비어 있었다) */
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
 
 /* ── 기록·가계부: 상황판 톤 (2026-10-29 사용자 시안 docs/시안/기록_가계부_2) ── */
 .gx-records, .gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
 /* 모니터 판: 상황판 CCTV 와 같은 어두운 화면·주사선·테두리 어둠, 고정폭 숫자에 은은한 빛 */
 .gx-mon { position: relative; flex: none; border-radius: 14px; overflow: hidden; background: #0b110f; color: #e8f3ef; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); box-shadow: inset 0 0 60px rgba(0, 0, 0, .6); }
 .gx-mon::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px); }
@@ -3156,6 +3155,9 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .pp-fn-chip { font-size: 11px; line-height: 1.6; padding: 0 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
 .pp-fn-calls { grid-area: calls; font-size: 12px; font-weight: 600; color: var(--signal); }
 .pp-fn:not(.on) .pp-fn-calls { color: var(--dim); font-weight: 500; }
+/* 칸의 요청 토큰 (호출 흐름 미리 계산, 2026-11-07) */
+.pp-fn-tok { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 500; color: var(--sub); }
+.pp-fn:not(.on) .pp-fn-tok { color: var(--dim); }
 .pp-fn-ctl { grid-area: ctl; display: flex; justify-content: flex-end; }
 .pp-fn-ctl .gx-segs { margin: 0; flex-wrap: nowrap; }
 .pp-fn-ctl .gx-seg { min-width: 0; padding: 0 9px; font-size: 12px; white-space: nowrap; }

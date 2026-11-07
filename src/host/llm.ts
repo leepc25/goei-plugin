@@ -1,6 +1,7 @@
 // 모델 호출 (위키·괴담넷·괴담톡 생성). 본편 요청과 따로, 사용자가 그 화면에서 누를 때만 부른다.
 import { prepareAttachments } from '../core/attach';
 import { clip, requestText, traceCall } from './trace';
+import { tokens } from '../core/gnet';
 import { photoData } from './photo';
 import { applyAdvanced } from '../core/advanced';
 import { RETRY_ANALYZE } from '../core/craft';
@@ -62,7 +63,7 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
   const t0 = Date.now();
   const req = requestText(messages);
   const done = (ok: boolean, response: string, error?: string) =>
-    void traceCall({ label, at, ms: Date.now() - t0, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, response: clip(response), responseChars: response.length }).catch(() => {});
+    void traceCall({ label, at, ms: Date.now() - t0, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: tokens(req), response: clip(response), responseChars: response.length, responseTokens: tokens(response) }).catch(() => {});
   try {
     const text = await runModelRaw(messages, model, staticModel);
     done(true, text);

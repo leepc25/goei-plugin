@@ -981,3 +981,12 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
 
 /** 메인 설정 「기능별 설정」에서 연다 */
 export const gnetSettingsPane = (ctx: ChatContext): string => settingsView(ctx, true);
+
+/** 호출 흐름 미리 계산: 지금 설정으로 새로고침이 보낼 요청 (모델은 안 부름). 확률 계획은 Math.random 그대로라 매번 조금 다를 수 있다 */
+export function previewGnetRefresh(ctx: ChatContext): LlmMessage[] {
+  const before = readGnet(ctx.chat);
+  const nick = userNick(ctx.chat.scriptstate);
+  const s = gnetSettings(ctx.chat.scriptstate);
+  const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
+  return fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx))).messages;
+}
