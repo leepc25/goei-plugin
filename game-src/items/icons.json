@@ -74,6 +74,26 @@
   },
   {
    "keywords": [
+    "사람 냄새 지우는 향수"
+   ],
+   "file": "consumable_120.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "사람 냄새 지우는 향수",
+   "src": "game-src/items/raw/batch_198/13.png"
+  },
+  {
+   "keywords": [
+    "뼈 고정 나사·판 세트"
+   ],
+   "file": "medical_131.png",
+   "kind": "medical",
+   "base": false,
+   "name": "뼈 고정 나사·판 세트",
+   "src": "game-src/items/raw/batch_200/09.png"
+  },
+  {
+   "keywords": [
     "정체불명 길거리 음식"
    ],
    "file": "food_105.png",
@@ -191,6 +211,46 @@
    "base": false,
    "name": "포장지 12B357나",
    "src": "game-src/items/raw/batch_195/07.png"
+  },
+  {
+   "keywords": [
+    "꿰맨 자국 피부 패치"
+   ],
+   "file": "body_089.png",
+   "kind": "body",
+   "base": false,
+   "name": "꿰맨 자국 피부 패치",
+   "src": "game-src/items/raw/batch_198/08.png"
+  },
+  {
+   "keywords": [
+    "추 달린 니플 클램프"
+   ],
+   "file": "adult_108.png",
+   "kind": "adult",
+   "base": false,
+   "name": "추 달린 니플 클램프",
+   "src": "game-src/items/raw/batch_201/01.png"
+  },
+  {
+   "keywords": [
+    "피하 임플란트 삽입기"
+   ],
+   "file": "medical_139.png",
+   "kind": "medical",
+   "base": false,
+   "name": "피하 임플란트 삽입기",
+   "src": "game-src/items/raw/batch_203/07.png"
+  },
+  {
+   "keywords": [
+    "신경 접속 바늘 세트"
+   ],
+   "file": "medical_141.png",
+   "kind": "medical",
+   "base": false,
+   "name": "신경 접속 바늘 세트",
+   "src": "game-src/items/raw/batch_204/07.png"
   },
   {
    "keywords": [
@@ -425,6 +485,56 @@
    "base": false,
    "name": "은하 지도 두루마리",
    "src": "game-src/items/raw/batch_187/12.png"
+  },
+  {
+   "keywords": [
+    "유전자 주입 주사기"
+   ],
+   "file": "medical_129.png",
+   "kind": "medical",
+   "base": false,
+   "name": "유전자 주입 주사기",
+   "src": "game-src/items/raw/batch_199/09.png"
+  },
+  {
+   "keywords": [
+    "사막방울뱀 독 물약"
+   ],
+   "file": "anomaly_246.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "사막방울뱀 독 물약",
+   "src": "game-src/items/raw/batch_202/16.png"
+  },
+  {
+   "keywords": [
+    "손톱 밑 바늘 세트"
+   ],
+   "file": "tool_256.png",
+   "kind": "tool",
+   "base": false,
+   "name": "손톱 밑 바늘 세트",
+   "src": "game-src/items/raw/batch_203/03.png"
+  },
+  {
+   "keywords": [
+    "이식 장기 보존 병"
+   ],
+   "file": "medical_142.png",
+   "kind": "medical",
+   "base": false,
+   "name": "이식 장기 보존 병",
+   "src": "game-src/items/raw/batch_204/08.png"
+  },
+  {
+   "keywords": [
+    "새장 속 그림자 새"
+   ],
+   "file": "anomaly_249.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "새장 속 그림자 새",
+   "src": "game-src/items/raw/batch_204/11.png"
   },
   {
    "keywords": [
@@ -780,6 +890,76 @@
    "base": false,
    "name": "백화점 고객 카드",
    "src": "game-src/items/raw/batch_193/04.png"
+  },
+  {
+   "keywords": [
+    "보조배터리 통신기"
+   ],
+   "file": "device_167.png",
+   "kind": "device",
+   "base": false,
+   "name": "보조배터리 통신기",
+   "src": "game-src/items/raw/batch_199/16.png"
+  },
+  {
+   "keywords": [
+    "남의 얼굴 콤팩트"
+   ],
+   "file": "anomaly_242.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "남의 얼굴 콤팩트",
+   "src": "game-src/items/raw/batch_201/11.png"
+  },
+  {
+   "keywords": [
+    "피부 스테이플 건"
+   ],
+   "file": "medical_137.png",
+   "kind": "medical",
+   "base": false,
+   "name": "피부 스테이플 건",
+   "src": "game-src/items/raw/batch_202/08.png"
+  },
+  {
+   "keywords": [
+    "수술용 스테이플러"
+   ],
+   "file": "medical_138.png",
+   "kind": "medical",
+   "base": false,
+   "name": "수술용 스테이플러",
+   "src": "game-src/items/raw/batch_203/05.png"
+  },
+  {
+   "keywords": [
+    "유두 압착 나사판"
+   ],
+   "file": "adult_112.png",
+   "kind": "adult",
+   "base": false,
+   "name": "유두 압착 나사판",
+   "src": "game-src/items/raw/batch_204/01.png"
+  },
+  {
+   "keywords": [
+    "수동 고기 분쇄기"
+   ],
+   "file": "tool_262.png",
+   "kind": "tool",
+   "base": false,
+   "name": "수동 고기 분쇄기",
+   "src": "game-src/items/raw/batch_204/04.png"
+  },
+  {
+   "keywords": [
+    "DNA 채취 키트"
+   ],
+   "file": "tool_264.png",
+   "kind": "tool",
+   "base": false,
+   "name": "DNA 채취 키트",
+   "src": "game-src/items/raw/batch_204/12.png"
   },
   {
    "keywords": [
@@ -1885,6 +2065,146 @@
    "base": false,
    "name": "정신 안정 사탕",
    "src": "game-src/items/raw/batch_196/03.png"
+  },
+  {
+   "keywords": [
+    "가시 박힌 장갑"
+   ],
+   "file": "wear_198.png",
+   "kind": "wear",
+   "base": false,
+   "name": "가시 박힌 장갑",
+   "src": "game-src/items/raw/batch_198/03.png"
+  },
+  {
+   "keywords": [
+    "이빨 가는 줄칼"
+   ],
+   "file": "tool_242.png",
+   "kind": "tool",
+   "base": false,
+   "name": "이빨 가는 줄칼",
+   "src": "game-src/items/raw/batch_198/04.png"
+  },
+  {
+   "keywords": [
+    "안구 적출 스푼"
+   ],
+   "file": "medical_127.png",
+   "kind": "medical",
+   "base": false,
+   "name": "안구 적출 스푼",
+   "src": "game-src/items/raw/batch_198/07.png"
+  },
+  {
+   "keywords": [
+    "병에 든 목소리"
+   ],
+   "file": "anomaly_238.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "병에 든 목소리",
+   "src": "game-src/items/raw/batch_198/10.png"
+  },
+  {
+   "keywords": [
+    "피로 쓴 계약서"
+   ],
+   "file": "paper_124.png",
+   "kind": "paper",
+   "base": false,
+   "name": "피로 쓴 계약서",
+   "src": "game-src/items/raw/batch_199/12.png"
+  },
+  {
+   "keywords": [
+    "바늘 놀이 세트"
+   ],
+   "file": "adult_107.png",
+   "kind": "adult",
+   "base": false,
+   "name": "바늘 놀이 세트",
+   "src": "game-src/items/raw/batch_200/02.png"
+  },
+  {
+   "keywords": [
+    "손톱 뽑는 집게"
+   ],
+   "file": "tool_248.png",
+   "kind": "tool",
+   "base": false,
+   "name": "손톱 뽑는 집게",
+   "src": "game-src/items/raw/batch_200/03.png"
+  },
+  {
+   "keywords": [
+    "눈물 결정 사탕"
+   ],
+   "file": "food_371.png",
+   "kind": "food",
+   "base": false,
+   "name": "눈물 결정 사탕",
+   "src": "game-src/items/raw/batch_200/10.png"
+  },
+  {
+   "keywords": [
+    "메모리얼 그립톡"
+   ],
+   "file": "device_170.png",
+   "kind": "device",
+   "base": false,
+   "name": "메모리얼 그립톡",
+   "src": "game-src/items/raw/batch_200/16.png"
+  },
+  {
+   "keywords": [
+    "가죽 벗기는 칼"
+   ],
+   "file": "tool_254.png",
+   "kind": "tool",
+   "base": false,
+   "name": "가죽 벗기는 칼",
+   "src": "game-src/items/raw/batch_202/04.png"
+  },
+  {
+   "keywords": [
+    "수술용 골 드릴"
+   ],
+   "file": "medical_136.png",
+   "kind": "medical",
+   "base": false,
+   "name": "수술용 골 드릴",
+   "src": "game-src/items/raw/batch_202/07.png"
+  },
+  {
+   "keywords": [
+    "전기 고문 집게"
+   ],
+   "file": "tool_255.png",
+   "kind": "tool",
+   "base": false,
+   "name": "전기 고문 집게",
+   "src": "game-src/items/raw/batch_203/02.png"
+  },
+  {
+   "keywords": [
+    "뛰는 심장 사탕"
+   ],
+   "file": "food_375.png",
+   "kind": "food",
+   "base": false,
+   "name": "뛰는 심장 사탕",
+   "src": "game-src/items/raw/batch_203/11.png"
+  },
+  {
+   "keywords": [
+    "현장 감식 가방"
+   ],
+   "file": "tool_258.png",
+   "kind": "tool",
+   "base": false,
+   "name": "현장 감식 가방",
+   "src": "game-src/items/raw/batch_203/12.png"
   },
   {
    "keywords": [
@@ -3471,6 +3791,236 @@
    "base": false,
    "name": "줄 없는 수갑",
    "src": "game-src/items/raw/batch_196/06.png"
+  },
+  {
+   "keywords": [
+    "뼈 분쇄 망치"
+   ],
+   "file": "tool_243.png",
+   "kind": "tool",
+   "base": false,
+   "name": "뼈 분쇄 망치",
+   "src": "game-src/items/raw/batch_198/05.png"
+  },
+  {
+   "keywords": [
+    "두개골 천공기"
+   ],
+   "file": "medical_126.png",
+   "kind": "medical",
+   "base": false,
+   "name": "두개골 천공기",
+   "src": "game-src/items/raw/batch_198/06.png"
+  },
+  {
+   "keywords": [
+    "조직 배양 병"
+   ],
+   "file": "anomaly_237.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "조직 배양 병",
+   "src": "game-src/items/raw/batch_198/09.png"
+  },
+  {
+   "keywords": [
+    "구미호 털 붓"
+   ],
+   "file": "anomaly_239.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "구미호 털 붓",
+   "src": "game-src/items/raw/batch_198/12.png"
+  },
+  {
+   "keywords": [
+    "뼈 절단 가위"
+   ],
+   "file": "tool_247.png",
+   "kind": "tool",
+   "base": false,
+   "name": "뼈 절단 가위",
+   "src": "game-src/items/raw/batch_199/05.png"
+  },
+  {
+   "keywords": [
+    "그림자 실타래"
+   ],
+   "file": "anomaly_240.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "그림자 실타래",
+   "src": "game-src/items/raw/batch_199/10.png"
+  },
+  {
+   "keywords": [
+    "케미컬 라이트"
+   ],
+   "file": "consumable_121.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "케미컬 라이트",
+   "src": "game-src/items/raw/batch_199/14.png"
+  },
+  {
+   "keywords": [
+    "바이올렛 원드"
+   ],
+   "file": "adult_106.png",
+   "kind": "adult",
+   "base": false,
+   "name": "바이올렛 원드",
+   "src": "game-src/items/raw/batch_200/01.png"
+  },
+  {
+   "keywords": [
+    "두개골 압착기"
+   ],
+   "file": "tool_249.png",
+   "kind": "tool",
+   "base": false,
+   "name": "두개골 압착기",
+   "src": "game-src/items/raw/batch_200/04.png"
+  },
+  {
+   "keywords": [
+    "뇌 연결 단자"
+   ],
+   "file": "device_168.png",
+   "kind": "device",
+   "base": false,
+   "name": "뇌 연결 단자",
+   "src": "game-src/items/raw/batch_200/08.png"
+  },
+  {
+   "keywords": [
+    "피안화 꽃다발"
+   ],
+   "file": "anomaly_241.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "피안화 꽃다발",
+   "src": "game-src/items/raw/batch_200/12.png"
+  },
+  {
+   "keywords": [
+    "관절 분리 칼"
+   ],
+   "file": "tool_253.png",
+   "kind": "tool",
+   "base": false,
+   "name": "관절 분리 칼",
+   "src": "game-src/items/raw/batch_201/05.png"
+  },
+  {
+   "keywords": [
+    "피부 이식 칼"
+   ],
+   "file": "medical_134.png",
+   "kind": "medical",
+   "base": false,
+   "name": "피부 이식 칼",
+   "src": "game-src/items/raw/batch_201/09.png"
+  },
+  {
+   "keywords": [
+    "눈 달린 지갑"
+   ],
+   "file": "anomaly_243.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "눈 달린 지갑",
+   "src": "game-src/items/raw/batch_201/12.png"
+  },
+  {
+   "keywords": [
+    "VHS 테이프"
+   ],
+   "file": "misc_254.png",
+   "kind": "misc",
+   "base": false,
+   "name": "VHS 테이프",
+   "src": "game-src/items/raw/batch_201/15.png"
+  },
+  {
+   "keywords": [
+    "철 굴레 가면"
+   ],
+   "file": "wear_200.png",
+   "kind": "wear",
+   "base": false,
+   "name": "철 굴레 가면",
+   "src": "game-src/items/raw/batch_202/02.png"
+  },
+  {
+   "keywords": [
+    "입 달린 가방"
+   ],
+   "file": "anomaly_245.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "입 달린 가방",
+   "src": "game-src/items/raw/batch_202/11.png"
+  },
+  {
+   "keywords": [
+    "뇌 전극 헬멧"
+   ],
+   "file": "wear_201.png",
+   "kind": "wear",
+   "base": false,
+   "name": "뇌 전극 헬멧",
+   "src": "game-src/items/raw/batch_203/08.png"
+  },
+  {
+   "keywords": [
+    "물고문 깔때기"
+   ],
+   "file": "tool_260.png",
+   "kind": "tool",
+   "base": false,
+   "name": "물고문 깔때기",
+   "src": "game-src/items/raw/batch_204/02.png"
+  },
+  {
+   "keywords": [
+    "대나무 꼬챙이"
+   ],
+   "file": "tool_261.png",
+   "kind": "tool",
+   "base": false,
+   "name": "대나무 꼬챙이",
+   "src": "game-src/items/raw/batch_204/03.png"
+  },
+  {
+   "keywords": [
+    "갈비뼈 벌리개"
+   ],
+   "file": "medical_140.png",
+   "kind": "medical",
+   "base": false,
+   "name": "갈비뼈 벌리개",
+   "src": "game-src/items/raw/batch_204/05.png"
+  },
+  {
+   "keywords": [
+    "피 잉크 깃펜"
+   ],
+   "file": "tool_263.png",
+   "kind": "tool",
+   "base": false,
+   "name": "피 잉크 깃펜",
+   "src": "game-src/items/raw/batch_204/10.png"
+  },
+  {
+   "keywords": [
+    "리얼굿즈 박스"
+   ],
+   "file": "misc_255.png",
+   "kind": "misc",
+   "base": false,
+   "name": "리얼굿즈 박스",
+   "src": "game-src/items/raw/batch_204/15.png"
   },
   {
    "keywords": [
@@ -6080,7 +6630,8 @@
    "kind": "key",
    "base": false,
    "name": "VIP 카드",
-   "src": "game-src/items/raw/batch_191/09.png"
+   "src": "game-src/items/raw/batch_201/16.png",
+   "old_src": "game-src/items/raw/batch_191/09.png"
   },
   {
    "keywords": [
@@ -6111,6 +6662,146 @@
    "base": false,
    "name": "하얀 그립톡",
    "src": "game-src/items/raw/batch_193/07.png"
+  },
+  {
+   "keywords": [
+    "손가락 죄기"
+   ],
+   "file": "tool_241.png",
+   "kind": "tool",
+   "base": false,
+   "name": "손가락 죄기",
+   "src": "game-src/items/raw/batch_198/02.png"
+  },
+  {
+   "keywords": [
+    "피 주스 팩"
+   ],
+   "file": "food_369.png",
+   "kind": "food",
+   "base": false,
+   "name": "피 주스 팩",
+   "src": "game-src/items/raw/batch_198/11.png"
+  },
+  {
+   "keywords": [
+    "무릎 파쇄기"
+   ],
+   "file": "tool_246.png",
+   "kind": "tool",
+   "base": false,
+   "name": "무릎 파쇄기",
+   "src": "game-src/items/raw/batch_199/04.png"
+  },
+  {
+   "keywords": [
+    "정육 갈고리"
+   ],
+   "file": "tool_250.png",
+   "kind": "tool",
+   "base": false,
+   "name": "정육 갈고리",
+   "src": "game-src/items/raw/batch_200/05.png"
+  },
+  {
+   "keywords": [
+    "그림자 비누"
+   ],
+   "file": "consumable_122.png",
+   "kind": "consumable",
+   "base": false,
+   "name": "그림자 비누",
+   "src": "game-src/items/raw/batch_200/11.png"
+  },
+  {
+   "keywords": [
+    "가시 목걸이"
+   ],
+   "file": "wear_199.png",
+   "kind": "wear",
+   "base": false,
+   "name": "가시 목걸이",
+   "src": "game-src/items/raw/batch_201/03.png"
+  },
+  {
+   "keywords": [
+    "이식 주입기"
+   ],
+   "file": "medical_133.png",
+   "kind": "medical",
+   "base": false,
+   "name": "이식 주입기",
+   "src": "game-src/items/raw/batch_201/08.png"
+  },
+  {
+   "keywords": [
+    "고환 압착기"
+   ],
+   "file": "adult_110.png",
+   "kind": "adult",
+   "base": false,
+   "name": "고환 압착기",
+   "src": "game-src/items/raw/batch_202/01.png"
+  },
+  {
+   "keywords": [
+    "고양이 발톱"
+   ],
+   "file": "weapon_158.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "고양이 발톱",
+   "src": "game-src/items/raw/batch_202/03.png"
+  },
+  {
+   "keywords": [
+    "전기 소작기"
+   ],
+   "file": "medical_135.png",
+   "kind": "medical",
+   "base": false,
+   "name": "전기 소작기",
+   "src": "game-src/items/raw/batch_202/05.png"
+  },
+  {
+   "keywords": [
+    "검은 열차표"
+   ],
+   "file": "key_064.png",
+   "kind": "key",
+   "base": false,
+   "name": "검은 열차표",
+   "src": "game-src/items/raw/batch_202/10.png"
+  },
+  {
+   "keywords": [
+    "내장 갈고리"
+   ],
+   "file": "tool_257.png",
+   "kind": "tool",
+   "base": false,
+   "name": "내장 갈고리",
+   "src": "game-src/items/raw/batch_203/04.png"
+  },
+  {
+   "keywords": [
+    "이름 지우개"
+   ],
+   "file": "anomaly_247.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "이름 지우개",
+   "src": "game-src/items/raw/batch_203/10.png"
+  },
+  {
+   "keywords": [
+    "달빛 우유병"
+   ],
+   "file": "food_376.png",
+   "kind": "food",
+   "base": false,
+   "name": "달빛 우유병",
+   "src": "game-src/items/raw/batch_204/09.png"
   },
   {
    "keywords": [
@@ -10165,6 +10856,226 @@
   },
   {
    "keywords": [
+    "깨진 안경"
+   ],
+   "file": "misc_253.png",
+   "kind": "misc",
+   "base": false,
+   "name": "깨진 안경",
+   "src": "game-src/items/raw/batch_198/15.png"
+  },
+  {
+   "keywords": [
+    "고뇌의 배"
+   ],
+   "file": "adult_104.png",
+   "kind": "adult",
+   "base": false,
+   "name": "고뇌의 배",
+   "src": "game-src/items/raw/batch_199/01.png"
+  },
+  {
+   "keywords": [
+    "가시 패들"
+   ],
+   "file": "adult_105.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가시 패들",
+   "src": "game-src/items/raw/batch_199/02.png"
+  },
+  {
+   "keywords": [
+    "낙인 인두"
+   ],
+   "file": "tool_245.png",
+   "kind": "tool",
+   "base": false,
+   "name": "낙인 인두",
+   "src": "game-src/items/raw/batch_199/03.png"
+  },
+  {
+   "keywords": [
+    "괴이 명함"
+   ],
+   "file": "key_062.png",
+   "kind": "key",
+   "base": false,
+   "name": "괴이 명함",
+   "src": "game-src/items/raw/batch_199/13.png"
+  },
+  {
+   "keywords": [
+    "외장 하드"
+   ],
+   "file": "device_166.png",
+   "kind": "device",
+   "base": false,
+   "name": "외장 하드",
+   "src": "game-src/items/raw/batch_199/15.png"
+  },
+  {
+   "keywords": [
+    "기계 다리"
+   ],
+   "file": "body_092.png",
+   "kind": "body",
+   "base": false,
+   "name": "기계 다리",
+   "src": "game-src/items/raw/batch_200/07.png"
+  },
+  {
+   "keywords": [
+    "수정테이프"
+   ],
+   "file": "tool_251.png",
+   "kind": "tool",
+   "base": false,
+   "name": "수정테이프",
+   "src": "game-src/items/raw/batch_200/15.png"
+  },
+  {
+   "keywords": [
+    "악몽 젤리"
+   ],
+   "file": "food_372.png",
+   "kind": "food",
+   "base": false,
+   "name": "악몽 젤리",
+   "src": "game-src/items/raw/batch_201/10.png"
+  },
+  {
+   "keywords": [
+    "경찰 수첩"
+   ],
+   "file": "paper_125.png",
+   "kind": "paper",
+   "base": false,
+   "name": "경찰 수첩",
+   "src": "game-src/items/raw/batch_201/13.png"
+  },
+  {
+   "keywords": [
+    "인공 심장"
+   ],
+   "file": "body_093.png",
+   "kind": "body",
+   "base": false,
+   "name": "인공 심장",
+   "src": "game-src/items/raw/batch_202/06.png"
+  },
+  {
+   "keywords": [
+    "수명 양초"
+   ],
+   "file": "anomaly_244.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "수명 양초",
+   "src": "game-src/items/raw/batch_202/09.png"
+  },
+  {
+   "keywords": [
+    "수사 파일"
+   ],
+   "file": "paper_126.png",
+   "kind": "paper",
+   "base": false,
+   "name": "수사 파일",
+   "src": "game-src/items/raw/batch_202/12.png"
+  },
+  {
+   "keywords": [
+    "부의 봉투"
+   ],
+   "file": "paper_127.png",
+   "kind": "paper",
+   "base": false,
+   "name": "부의 봉투",
+   "src": "game-src/items/raw/batch_202/13.png"
+  },
+  {
+   "keywords": [
+    "가슴 찢개"
+   ],
+   "file": "adult_111.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가슴 찢개",
+   "src": "game-src/items/raw/batch_203/01.png"
+  },
+  {
+   "keywords": [
+    "기계 척추"
+   ],
+   "file": "body_094.png",
+   "kind": "body",
+   "base": false,
+   "name": "기계 척추",
+   "src": "game-src/items/raw/batch_203/06.png"
+  },
+  {
+   "keywords": [
+    "꿈 통조림"
+   ],
+   "file": "food_374.png",
+   "kind": "food",
+   "base": false,
+   "name": "꿈 통조림",
+   "src": "game-src/items/raw/batch_203/09.png"
+  },
+  {
+   "keywords": [
+    "상주 완장"
+   ],
+   "file": "wear_202.png",
+   "kind": "wear",
+   "base": false,
+   "name": "상주 완장",
+   "src": "game-src/items/raw/batch_203/13.png"
+  },
+  {
+   "keywords": [
+    "여우 꼬리"
+   ],
+   "file": "anomaly_248.png",
+   "kind": "anomaly",
+   "base": false,
+   "name": "여우 꼬리",
+   "src": "game-src/items/raw/batch_203/15.png"
+  },
+  {
+   "keywords": [
+    "삼색 볼펜"
+   ],
+   "file": "tool_259.png",
+   "kind": "tool",
+   "base": false,
+   "name": "삼색 볼펜",
+   "src": "game-src/items/raw/batch_203/16.png"
+  },
+  {
+   "keywords": [
+    "기계 눈알"
+   ],
+   "file": "body_095.png",
+   "kind": "body",
+   "base": false,
+   "name": "기계 눈알",
+   "src": "game-src/items/raw/batch_204/06.png"
+  },
+  {
+   "keywords": [
+    "협박 편지"
+   ],
+   "file": "paper_128.png",
+   "kind": "paper",
+   "base": false,
+   "name": "협박 편지",
+   "src": "game-src/items/raw/batch_204/13.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -12663,7 +13574,8 @@
    "kind": "body",
    "base": false,
    "name": "십이지장",
-   "src": "game-src/items/raw/batch_187/03.png"
+   "src": "game-src/items/raw/batch_198/16.png",
+   "old_src": "game-src/items/raw/batch_187/03.png"
   },
   {
    "keywords": [
@@ -12725,6 +13637,116 @@
    "base": false,
    "name": "자궁경부",
    "src": "game-src/items/raw/batch_195/01.png"
+  },
+  {
+   "keywords": [
+    "쇠지렛대"
+   ],
+   "file": "tool_244.png",
+   "kind": "tool",
+   "base": false,
+   "name": "쇠지렛대",
+   "src": "game-src/items/raw/batch_198/14.png"
+  },
+  {
+   "keywords": [
+    "기계 팔"
+   ],
+   "file": "body_090.png",
+   "kind": "body",
+   "base": false,
+   "name": "기계 팔",
+   "src": "game-src/items/raw/batch_199/07.png"
+  },
+  {
+   "keywords": [
+    "금속 턱"
+   ],
+   "file": "body_091.png",
+   "kind": "body",
+   "base": false,
+   "name": "금속 턱",
+   "src": "game-src/items/raw/batch_199/08.png"
+  },
+  {
+   "keywords": [
+    "뼈 과자"
+   ],
+   "file": "food_370.png",
+   "kind": "food",
+   "base": false,
+   "name": "뼈 과자",
+   "src": "game-src/items/raw/batch_199/11.png"
+  },
+  {
+   "keywords": [
+    "골 망치"
+   ],
+   "file": "medical_130.png",
+   "kind": "medical",
+   "base": false,
+   "name": "골 망치",
+   "src": "game-src/items/raw/batch_200/06.png"
+  },
+  {
+   "keywords": [
+    "공무원증"
+   ],
+   "file": "key_063.png",
+   "kind": "key",
+   "base": false,
+   "name": "공무원증",
+   "src": "game-src/items/raw/batch_200/13.png"
+  },
+  {
+   "keywords": [
+    "집게 줄"
+   ],
+   "file": "adult_109.png",
+   "kind": "adult",
+   "base": false,
+   "name": "집게 줄",
+   "src": "game-src/items/raw/batch_201/02.png"
+  },
+  {
+   "keywords": [
+    "혀 집게"
+   ],
+   "file": "tool_252.png",
+   "kind": "tool",
+   "base": false,
+   "name": "혀 집게",
+   "src": "game-src/items/raw/batch_201/04.png"
+  },
+  {
+   "keywords": [
+    "이식 칩"
+   ],
+   "file": "device_171.png",
+   "kind": "device",
+   "base": false,
+   "name": "이식 칩",
+   "src": "game-src/items/raw/batch_201/07.png"
+  },
+  {
+   "keywords": [
+    "은 탄환"
+   ],
+   "file": "weapon_157.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "은 탄환",
+   "src": "game-src/items/raw/batch_201/14.png"
+  },
+  {
+   "keywords": [
+    "금두꺼비"
+   ],
+   "file": "valuable_057.png",
+   "kind": "valuable",
+   "base": false,
+   "name": "금두꺼비",
+   "src": "game-src/items/raw/batch_202/14.png"
   },
   {
    "keywords": [
@@ -19136,6 +20158,66 @@
   },
   {
    "keywords": [
+    "소음순"
+   ],
+   "file": "body_088.png",
+   "kind": "body",
+   "base": false,
+   "name": "소음순",
+   "src": "game-src/items/raw/batch_198/01.png"
+  },
+  {
+   "keywords": [
+    "뼈 끌"
+   ],
+   "file": "medical_128.png",
+   "kind": "medical",
+   "base": false,
+   "name": "뼈 끌",
+   "src": "game-src/items/raw/batch_199/06.png"
+  },
+  {
+   "keywords": [
+    "바디캠"
+   ],
+   "file": "device_169.png",
+   "kind": "device",
+   "base": false,
+   "name": "바디캠",
+   "src": "game-src/items/raw/batch_200/14.png"
+  },
+  {
+   "keywords": [
+    "노가리"
+   ],
+   "file": "food_373.png",
+   "kind": "food",
+   "base": false,
+   "name": "노가리",
+   "src": "game-src/items/raw/batch_202/15.png"
+  },
+  {
+   "keywords": [
+    "장조림"
+   ],
+   "file": "food_377.png",
+   "kind": "food",
+   "base": false,
+   "name": "장조림",
+   "src": "game-src/items/raw/batch_204/14.png"
+  },
+  {
+   "keywords": [
+    "은심장"
+   ],
+   "file": "key_065.png",
+   "kind": "key",
+   "base": false,
+   "name": "은심장",
+   "src": "game-src/items/raw/batch_204/16.png"
+  },
+  {
+   "keywords": [
     "권총"
    ],
    "file": "weapon_002.png",
@@ -24104,7 +25186,8 @@
    "kind": "body",
    "base": false,
    "name": "요도",
-   "src": "game-src/items/raw/batch_174/05.png"
+   "src": "game-src/items/raw/batch_203/14.png",
+   "old_src": "game-src/items/raw/batch_174/05.png"
   },
   {
    "keywords": [
@@ -24440,6 +25523,16 @@
    "base": false,
    "name": "유관",
    "src": "game-src/items/raw/batch_196/04.png"
+  },
+  {
+   "keywords": [
+    "큐렛"
+   ],
+   "file": "medical_132.png",
+   "kind": "medical",
+   "base": false,
+   "name": "큐렛",
+   "src": "game-src/items/raw/batch_201/06.png"
   },
   {
    "keywords": [
