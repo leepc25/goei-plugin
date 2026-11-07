@@ -15,6 +15,14 @@ import { loreCheckBox } from '../lorecheck';
 import { gnet } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
+
+/** 저장된 ISO(UTC) 시각을 기기 시간대(한국)로 「YYYY.MM.DD HH:mm:ss」 (11-07 사용자: 모든 시각은 한국 시간 기준. UTC 그대로 보여 주니 새벽으로 오해) */
+const localWhen = (iso: string): string => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const p = (x: number) => String(x).padStart(2, '0');
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+};
 import { ICONS } from '../icons';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -214,7 +222,7 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
   const diag = manUi.diag;
   const runs = diag
     ? diag.length
-      ? diag.map((r) => row(`${esc(r.at)} · ${esc(r.reason)}`, badge(r.ok, r.ok ? '성공' : `실패${r.stage ? ` · ${r.stage}` : ''}`), `${r.model} · ${r.people.join(', ') || '대상 없음'} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc(r.error)}` : ''}`)).join('')
+      ? diag.map((r) => row(`${esc(localWhen(r.at))} · ${esc(r.reason)}`, badge(r.ok, r.ok ? '성공' : `실패${r.stage ? ` · ${r.stage}` : ''}`), `${r.model} · ${r.people.join(', ') || '대상 없음'} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc(r.error)}` : ''}`)).join('')
       : '<p class="ps-note">아직 갱신 기록이 없어요.</p>'
     : '<p class="ps-note">읽는 중…</p>';
   const bundle = diagBundle(ctx, canChat);
