@@ -1,4 +1,7 @@
-t.lastDate ? `<small class="ph-time">${esc10(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+"삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc10(t.nick)}" aria-pressed="${on2}">
+        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc10(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc10(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
         <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc10([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy6, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
@@ -1962,7 +1965,7 @@ ${SHOP_GUIDE}` : ""}` : "";
     }
     return { hash: "", sha256: "", length: 0 };
   }
-  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"5704235f","sha256":"26665dfcaeec5cb98ba21b70cd1ad3f7fd8261e2fba6a9264fb3c8df0fcfa379","length":1502296}' : void 0) };
+  var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"5a9238db","sha256":"cffc46cfe193cd107c8b77ec2fb7f0619d028e38f8e43f404199358b2ecc35bd","length":1233571}' : void 0) };
   var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"31f59edf","sha256":"b2bd2c28600c1e974931e7aa7b47035c6d931617c3861f3ad481b9da4f37d0f7","length":153725}' : void 0) };
   var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"9a329b11","sha256":"385e21818dff49758fef1b2923c361176950ca701766fffa86cfdaffd1866eee","length":4317083}' : void 0) };
   function packMatches(text4, expect) {
@@ -3270,7 +3273,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     const k = (f) => `ascene:${id}|${f}`;
     return `${input(k("label"), saved?.label ?? def?.label ?? "", "제목", "시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」")}
     ${area(k("ko"), saved?.ko ?? def?.ko ?? "", "한국어", 10, hasDefault ? "기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요")}
-    ${area(k("en"), saved?.en ?? def?.en ?? "", "English", 10, hasDefault ? "기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "")}`;
+    ${area(k("en"), saved?.en ?? def?.en ?? "", "English", 10, hasDefault ? "기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요" : "")}
+    ${input(k("lore"), (saved?.lore ?? def?.lore ?? []).join(", "), "시작 로어", "이 장면으로 시작할 때 첫 턴에 넣을 로어북 이름 (쉼표로). 첫 장면 글은 키워드로 불리지 않아요")}`;
   }
   function membersBlock(code2, d) {
     const all = d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name);
@@ -3671,11 +3675,4 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc14(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
       <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc14(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
-    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc14(m.name)).join(", ")}</p>` : ""}
-    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc14(o.name)}">＋ 거점 추가</button></div></div>
-  </div>`;
-  }
-  function orgRow(o, ctx2, d, names4) {
-    const open2 = dirUi.open === o.name;
-    const n2 = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
-    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? 
+    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc14(m.name)).join(", ")}</p>` : 

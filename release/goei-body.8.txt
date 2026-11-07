@@ -1,4 +1,8 @@
-ail, or confront, chosen by personality, relationship and constraints. Never add a message not yet sent, a screen not read, or an investigation that did not occur, and never repeat an answered question without a new reason.`
+endency (`perception.profile`). Judge clue detection separately from its interpretation; expertise cannot open a closed channel. Never reuse an old impairment as current."
+    ],
+    suspicion: [
+      "## Suspicion",
+      `Read only the cases relevant to this scene; do not force a suspected target with no current interaction to appear. Separate what the suspecting person newly received, previously known evidence, interpretation, remaining questions and confirmation or closure; exclude undiscovered clues and the target's private state. A high stage never replaces actual confirmation; a disproved or closed case is not reopened without new evidence. Give a concrete direction for this turn instead of "is suspicious": attend only to a new discrepancy, suppress the question and keep distance, test a detail, or confront, chosen by personality, relationship and constraints. Never add a message not yet sent, a screen not read, or an investigation that did not occur, and never repeat an answered question without a new reason.`
     ],
     openness: [
       "## Openness and conditions",
@@ -2140,9 +2144,4 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     "",
     "## 2. What counts as evidence",
     '- Only `"confirmed": true` items are evidence, and every entry, cue, address change, document change, suspicion item and new person needs evidence.',
-    "- `context_only` items resolve pronouns, topic and which existing entry a change belongs to. They never support a new entry, removal, cue, address change or document change. Re-received old text is not a new event or reward.",
-    "- A user message confirms what the user's character did or said. A user question, plan or story request is not an event. Distinguish plan, attempt and result; never store an unrealized plan as fact.",
-    "- Retold, remembered, dreamed, imagined or summarized content is evidence of the telling, not of the event happening now. A flashback belongs to its own time; learning about it belongs to now.",
-    "- Edited or regenerated text is not in the span and never happened; the program handles rerolls.",
-    "- `already_recorded` is final.",
-    "- The lorebook sheet was seeded into the record 
+    "- `context_only` i

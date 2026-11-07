@@ -1,4 +1,21 @@
-ftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
+ault();
+      void addPhotos(prefix, files);
+    });
+    root2.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    root2.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files = imageFiles(ev.dataTransfer.files);
+      if (files.length) void addPhotos(prefix, files);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+    });
+    root2.addEventListener("keydown", (ev) => {
+      const el = ev.target;
+      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
         const send2 = root2?.querySelector(".ph-send");
         ev.preventDefault();
         if (send2 && !send2.disabled) void run4("ph-send", send2.dataset.value);

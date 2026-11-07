@@ -1,4 +1,12 @@
-; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.62) contrast(1.3) saturate(1.4); }
+: unset; }
+.gx-opview.nosig { display: grid; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), #101614; }
+.gx-opnosig { display: flex; flex-direction: column; align-items: center; gap: 8px; } .gx-opnosig b { font: 700 20px var(--mono); letter-spacing: .3em; color: rgba(255, 255, 255, .45); } .gx-opnosig small { color: rgba(255, 255, 255, .5); }
+/* 위성 지도 */
+.gx-opview.map { display: flex; flex-direction: column; background: #0b1113; }
+
+.gx-opmap { position: relative; flex: 1 1 0; min-height: 0; margin-top: 50px; }
+.gx-opmapi { position: absolute; top: 4px; bottom: 8px; left: 50%; transform: translateX(-50%); aspect-ratio: 1100 / 880; max-width: calc(100% - 16px); }
+.gx-opmapi > img { width: 100%; height: 100%; display: block; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.62) contrast(1.3) saturate(1.4); }
 .gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 55%, rgba(5, 10, 12, .55) 100%); }
 .gx-oppin { position: absolute; z-index: 2; transform: translate(-6px, -50%); display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
 .gx-oppin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent), 0 0 14px var(--c); }
@@ -2765,21 +2773,4 @@ ${note.trim()}` : card2;
       const prefix = photoTarget(ev.target);
       const files = imageFiles(ev.clipboardData?.items);
       if (!prefix || !files.length) return;
-      ev.preventDefault();
-      void addPhotos(prefix, files);
-    });
-    root2.addEventListener("dragover", (ev) => {
-      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
-    });
-    root2.addEventListener("drop", (ev) => {
-      const prefix = photoTarget(ev.target);
-      if (!prefix || !ev.dataTransfer?.files.length) return;
-      ev.preventDefault();
-      const files = imageFiles(ev.dataTransfer.files);
-      if (files.length) void addPhotos(prefix, files);
-      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
-      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
-    });
-    root2.addEventListener("keydown", (ev) => {
-      const el = ev.target;
-      if (ev.key === "Enter" && !ev.shi
+      ev.preventDef

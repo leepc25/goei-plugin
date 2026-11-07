@@ -2059,6 +2059,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       if (s2(o.ko).trim()) row9.ko = s2(o.ko);
       if (s2(o.en).trim()) row9.en = s2(o.en);
       if (o.hidden === true) row9.hidden = true;
+      const names4 = Array.isArray(o.lore) ? o.lore.map((x) => s2(x).trim()).filter(Boolean) : [];
+      if (names4.length) row9.lore = names4;
       return Object.keys(row9).length ? row9 : null;
     };
     for (const [code2, rows2] of Object.entries(obj2(d.세력))) {
@@ -2105,7 +2107,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const ko = o?.ko || b?.ko || "";
     const en2 = o?.en || b?.en || "";
     const label2 = (o?.label || b?.label || "").trim();
-    return ko.trim() || en2.trim() ? { ko, en: en2, label: label2 } : null;
+    const lore = o?.lore?.length ? o.lore : (b?.lore ?? []).filter((x) => typeof x === "string" && x.trim());
+    return ko.trim() || en2.trim() ? { ko, en: en2, label: label2, lore } : null;
   }
   function agentSceneSaved(agentId, saved) {
     return saved?.인물?.[agentId];
@@ -2190,7 +2193,4 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const books = (lore ?? []).filter((e) => e.goeiVirtual !== true);
     const tag = books.some((e) => e.comment === TAG_BOOK) ? loreText(books, TAG_BOOK) : guideText("Tag");
     const fac = loreText(books, FACTION_BOOK);
-    return tag.includes("{{getvar::fac_codes}}") && tag.includes("{{getvar::fac_ac}}") && (!fac || placeFactionExtra(fac) === fac);
-  }
-  var builtinType = (code2) => code2 === "D00" ? "civilian" : code2 === "E00" ? "freelancer" : "org";
-  var extraTabId = (code2) => `T${100 + code2.charCodeAt(0) -
+    return tag.includes("{{getvar::fac_

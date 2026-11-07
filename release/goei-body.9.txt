@@ -1,4 +1,9 @@
-by the program; you never see it. Replace an English seeded entry with Korean only when the span confirms or changes that fact; do not translate untouched entries.",
+tems resolve pronouns, topic and which existing entry a change belongs to. They never support a new entry, removal, cue, address change or document change. Re-received old text is not a new event or reward.",
+    "- A user message confirms what the user's character did or said. A user question, plan or story request is not an event. Distinguish plan, attempt and result; never store an unrealized plan as fact.",
+    "- Retold, remembered, dreamed, imagined or summarized content is evidence of the telling, not of the event happening now. A flashback belongs to its own time; learning about it belongs to now.",
+    "- Edited or regenerated text is not in the span and never happened; the program handles rerolls.",
+    "- `already_recorded` is final.",
+    "- The lorebook sheet was seeded into the record by the program; you never see it. Replace an English seeded entry with Korean only when the span confirms or changes that fact; do not translate untouched entries.",
     "- Director memos, status boards and plugin text are not in-world sources. If the main model made a person speak of something the record says they did not know (`unknown_to`, section 9), that utterance alone is not evidence of learning; record it in `knowledge` only when the span shows a path (saw, heard, read, was told).",
     "",
     "## 3. Six perspectives",
@@ -2068,10 +2073,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       return `<i class="pp-cell s-${i}${i === BASE_STAGE ? " base" : ""}${fill3}${i === idx ? " cur" : ""}" title="${esc23(s7.label)} (${stageRange(i)})${i === BASE_STAGE ? " · 기준" : ""}${i === idx ? " · 지금" : ""}"></i>`;
     }).join("");
     const num4 = peopleUi.showNum ? `<span class="pp-aff-num" title="호감 숫자. 범위는 ${AFF_MIN}~${AFF_MAX}, 무관심이 ${stageRange(BASE_STAGE)}">${value} <small>· 범위 ${AFF_MIN}~${AFF_MAX}, 무관심 ${stageRange(BASE_STAGE)}</small></span>` : "";
-    return `<div class="pp-aff" data-pp-hold="num"><div class="pp-aff-top"><b title="지금 호감 단계 (${stageRange(idx)}). 계기(작은친절·도움·배신…)가 쌓여 바뀌어요">${esc23(st.label)}</b>${num4}<button class="ph-tool sm" data-action="pp-num-toggle" title="호감 숫자와 범위 보기" aria-label="호감 숫자와 범위 보기" aria-pressed="${peopleUi.showNum}">${ICONS.info}</button></div>
-    <div class="pp-cells" role="img" aria-label="호감 ${value}, ${esc23(st.label)}">${cells}</div>
-    <div class="pp-aff-ends" aria-hidden="true"><span>${esc23(STAGES[0].label)}</span><span>${esc23(STAGES[STAGES.length - 1].label)}</span></div></div>`;
-  }
-  function evidenceButton(key2, no) {
-    const open2 = peopleUi.evOpen.has(key2);
-    return `<button class="pp-no${open2 ? " on" : ""}" data-action="pp-jump" data-value="${esc23(key2)}" title="${no.slice(1)}번째 메시지에서 확인됨. 누르면 그 부분을 보여 줘요" aria-expanded="${open2}">근거 ${no}</button>
+    return `<div class="pp-aff" data-pp-hold="num"><div class="pp-aff-top"><b title="지금 호감 단계 (${stageRange(idx)}). 계기(작은친절·도움·배신…)가 쌓여 바뀌어요">${esc23(s

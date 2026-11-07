@@ -1,4 +1,10 @@
-`;
+t.label)}</b>${num4}<button class="ph-tool sm" data-action="pp-num-toggle" title="호감 숫자와 범위 보기" aria-label="호감 숫자와 범위 보기" aria-pressed="${peopleUi.showNum}">${ICONS.info}</button></div>
+    <div class="pp-cells" role="img" aria-label="호감 ${value}, ${esc23(st.label)}">${cells}</div>
+    <div class="pp-aff-ends" aria-hidden="true"><span>${esc23(STAGES[0].label)}</span><span>${esc23(STAGES[STAGES.length - 1].label)}</span></div></div>`;
+  }
+  function evidenceButton(key2, no) {
+    const open2 = peopleUi.evOpen.has(key2);
+    return `<button class="pp-no${open2 ? " on" : ""}" data-action="pp-jump" data-value="${esc23(key2)}" title="${no.slice(1)}번째 메시지에서 확인됨. 누르면 그 부분을 보여 줘요" aria-expanded="${open2}">근거 ${no}</button>`;
   }
   function evidenceBox(ctx2, live, key2, anchor, quote) {
     if (!peopleUi.evOpen.has(key2)) return "";
@@ -3244,20 +3250,4 @@
   var STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
   var SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
   var SHADE = '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><path d="M50 2c17 0 27 14 27 33 0 14-5 25-12 31 20 6 35 22 35 50v24H0v-24c0-28 15-44 35-50-7-6-12-17-12-31C23 16 33 2 50 2z"/></svg>';
-  var FX = `<i class="gx-oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
-  function opsPick(_c) {
-    return "";
-  }
-  function opsFeed(c, clock3, empty2) {
-    if (!c) {
-      return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc28(empty2)}</small></div></div>`;
-    }
-    return feedView(c, clock3);
-  }
-  function feedView(c, clock3, cls = "") {
-    const name = esc28(c.name);
-    const btns = evBtns(c);
-    const pic2 = c.art?.pic ? `<img class="gx-opfeed" src="${esc28(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
-    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc28(c.art.desc)}</span>` : "";
-    const loc = c.locCode ?? "";
-    const region2 = locName(loc).split(" ").slice
+  var FX = `<i class="gx-

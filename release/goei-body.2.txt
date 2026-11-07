@@ -1,4 +1,7 @@
- 65}`;
+codes}}") && tag.includes("{{getvar::fac_ac}}") && (!fac || placeFactionExtra(fac) === fac);
+  }
+  var builtinType = (code2) => code2 === "D00" ? "civilian" : code2 === "E00" ? "freelancer" : "org";
+  var extraTabId = (code2) => `T${100 + code2.charCodeAt(0) - 65}`;
   var cache = /* @__PURE__ */ new WeakMap();
   function factionList(lore) {
     const books = lore ?? [];
@@ -4678,9 +4681,4 @@ ${JSON.stringify({ feature: "gnet", records })}
     m.participant = cid;
     if (kind === "exit") r.members = r.members.filter((x) => x !== cid);
   }
-  var emptyPause = (t) => String(t ?? "").replace(/[\s.…⋯．]/g, "") === "";
-  var hiddenPause = (t) => {
-    const s7 = String(t ?? "").trim();
-    return emptyPause(s7) || [...s7].length > 12 || /[다요][.!…]*$/.test(s7);
-  };
-  var listedRooms = (st) => Object.keys(st.r
+  var emptyPause = (

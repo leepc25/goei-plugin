@@ -1,4 +1,12 @@
-  affinityBase: userAffinityBase(faction, userFaction3),
+action3, user) {
+    const b = RELATIONS.people[name];
+    const faction = b?.faction ?? "";
+    const alias = ALIASES.names[name];
+    const address = seedAddress(name, faction, user);
+    return {
+      faction,
+      ...b ? { express: b.express } : {},
+      affinityBase: userAffinityBase(faction, userFaction3),
       aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
       ...address ? { address } : {}
     };
@@ -1814,7 +1822,7 @@ ${SEED_CLOSE}` : "", missing };
     }
     const fmIndex = emptyGreeting(manifest, greetingCount);
     if (fmIndex < 0) throw new StartError("이 카드에 빈 첫 장면이 없어요. 설치 · 점검에서 인사말을 다시 심어 주세요.");
-    const seed2 = buildSeed(lore, choice.faction, choice.fm, faction.builtin ? void 0 : faction.group ? [] : faction.seed);
+    const seed2 = playerScene ? buildSeed(lore, choice.faction, choice.fm, playerScene.lore) : buildSeed(lore, choice.faction, choice.fm, faction.builtin ? void 0 : faction.group ? [] : faction.seed);
     return {
       fmIndex,
       kind: scenario.kind,
@@ -4159,9 +4167,4 @@ ${RETRY_ANALYZE}`
       narratorOnly: narrator(src, names4, phoneSettings(src.chat.scriptstate).related, `${set2.pov}
 ${JSON.stringify(previousRoom ?? "")}`)
     };
-    const read = (k) => opt(k);
-    const messages = [
-      { role: "system", content: factionCodesToNames(system, names4) },
-      { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
-    ];
-    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "ph"), { thoughts: read("THOUGHTS"), memo: memoText
+    const read 

@@ -1,4 +1,9 @@
-s(read) }), contactMode: false };
+= (k) => opt(k);
+    const messages = [
+      { role: "system", content: factionCodesToNames(system, names4) },
+      { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
+    ];
+    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "ph"), { thoughts: read("THOUGHTS"), memo: memoTexts(read) }), contactMode: false };
   }
 
   // src/ui/controls.ts
@@ -3596,7 +3601,4 @@ ${RETRY_ANALYZE}` }
       const on2 = gnet.openDm === t.nick && !gnet.settings;
       const last2 = t.rows[t.rows.length - 1];
       const confirm = gnet.confirm === `d:${t.nick}`;
-      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}" aria-label="${esc10(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc10(t.nick)}" aria-pressed="${on2}">
-        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc10(t.nick)}</b>${
+      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc10(t.nick)}" aria-label="${esc10(t.nick)} 쪽지 삭제" title=

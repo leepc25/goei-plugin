@@ -1,4 +1,20 @@
-(0, 2).join(" ");
+oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
+  function opsPick(_c) {
+    return "";
+  }
+  function opsFeed(c, clock3, empty2) {
+    if (!c) {
+      return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc28(empty2)}</small></div></div>`;
+    }
+    return feedView(c, clock3);
+  }
+  function feedView(c, clock3, cls = "") {
+    const name = esc28(c.name);
+    const btns = evBtns(c);
+    const pic2 = c.art?.pic ? `<img class="gx-opfeed" src="${esc28(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc28(c.art.desc)}</span>` : "";
+    const loc = c.locCode ?? "";
+    const region2 = locName(loc).split(" ").slice(0, 2).join(" ");
     const cam = loc ? `CAM-${camNo2(loc)} · ${esc28(region2)}` : "CAM-00";
     const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? ` data-grade="${c.grade.toLowerCase()}"` : "";
     const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc28(c.art.pic)}')"><i></i><i></i></i>` : "";
@@ -2302,12 +2318,4 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opcap .gx-evc-who > .gx-badge:not(:has(.gx-ava)) { padding-left: 11px; }
 .gx-opcap .gx-evc-who > .gx-badge::before { content: none; }
 .gx-opcap .gx-evc-who .gx-ava { width: 24px; height: 24px; }
-.gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { display: block; margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, .88); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); white-space: normal; -webkit-line-clamp: unset; }
-.gx-opview.nosig { display: grid; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), #101614; }
-.gx-opnosig { display: flex; flex-direction: column; align-items: center; gap: 8px; } .gx-opnosig b { font: 700 20px var(--mono); letter-spacing: .3em; color: rgba(255, 255, 255, .45); } .gx-opnosig small { color: rgba(255, 255, 255, .5); }
-/* 위성 지도 */
-.gx-opview.map { display: flex; flex-direction: column; background: #0b1113; }
-
-.gx-opmap { position: relative; flex: 1 1 0; min-height: 0; margin-top: 50px; }
-.gx-opmapi { position: absolute; top: 4px; bottom: 8px; left: 50%; transform: translateX(-50%); aspect-ratio: 1100 / 880; max-width: calc(100% - 16px); }
-.gx-opmapi > img { width: 100%; height: 100%; display: block
+.gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { display: block; margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, .88); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); white-space: normal; -webkit-line-clamp

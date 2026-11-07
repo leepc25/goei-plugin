@@ -1,4 +1,11 @@
-f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
+""}
+    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc14(o.name)}">＋ 거점 추가</button></div></div>
+  </div>`;
+  }
+  function orgRow(o, ctx2, d, names4) {
+    const open2 = dirUi.open === o.name;
+    const n2 = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
+    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
     const play = o.faction || o.spec.playable && o.spec.code;
     return `<div class="dir-row${open2 ? " open" : ""}">
     <button class="dir-head" data-action="dir-open" data-value="${esc14(o.name)}" aria-expanded="${open2}">
@@ -320,13 +327,19 @@ f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
     }
     if (key2.startsWith("ascene:")) {
       const [id, field5] = key2.slice(7).split("|");
-      if (!id || !(field5 === "ko" || field5 === "en" || field5 === "label")) return;
+      if (!id || !(field5 === "ko" || field5 === "en" || field5 === "label" || field5 === "lore")) return;
       const rows2 = d.scenes.인물 ??= {};
       const row10 = rows2[id] ??= {};
       const def = agentScene(id, void 0);
-      const same4 = def ? field5 === "label" ? value.trim() === def.label : value === def[field5] : false;
-      if (value.trim() && !same4) row10[field5] = value;
-      else delete row10[field5];
+      if (field5 === "lore") {
+        const names4 = splitList(value);
+        if (names4.length && names4.join(",") !== (def?.lore ?? []).join(",")) row10.lore = names4;
+        else delete row10.lore;
+      } else {
+        const same4 = def ? field5 === "label" ? value.trim() === def.label : value === def[field5] : false;
+        if (value.trim() && !same4) row10[field5] = value;
+        else delete row10[field5];
+      }
       if (!Object.keys(row10).length) delete rows2[id];
       dirUi.done = "";
       if (bar) bar.innerHTML = directoryBar();
@@ -2897,8 +2910,4 @@ ${body5}`;
     ],
     perception_ext: [
       "## Sensory paths",
-      "Read the scene's light, distance, obstruction, noise, gaze and contact (`perception.channels`), current impairments (`perception.modifiers`) and the person's observation tendency (`perception.profile`). Judge clue detection separately from its interpretation; expertise cannot open a closed channel. Never reuse an old impairment as current."
-    ],
-    suspicion: [
-      "## Suspicion",
-      `Read only the cases relevant to this scene; do not force a suspected target with no current interaction to appear. Separate what the suspecting person newly received, previously known evidence, interpretation, remaining questions and confirmation or closure; exclude undiscovered clues and the target's private state. A high stage never replaces actual confirmation; a disproved or closed case is not reopened without new evidence. Give a concrete direction for this turn instead of "is suspicious": attend only to a new discrepancy, suppress the question and keep distance, test a det
+      "Read the scene's light, distance, obstruction, noise, gaze and contact (`perception.channels`), current impairments (`perception.modifiers`) and the person's observation t

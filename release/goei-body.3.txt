@@ -1,4 +1,9 @@
-ooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
+t) => String(t ?? "").replace(/[\s.…⋯．]/g, "") === "";
+  var hiddenPause = (t) => {
+    const s7 = String(t ?? "").trim();
+    return emptyPause(s7) || [...s7].length > 12 || /[다요][.!…]*$/.test(s7);
+  };
+  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
   function unsolicited(r) {
     if (r.kind !== "dm") return false;
     for (let i = r.messages.length - 1; i >= 0; i--) if (r.messages[i].kind === "message") return r.messages[i].sender !== "me";
@@ -4788,12 +4793,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const register = REGISTERS.includes(row9.register) ? row9.register : "존댓말";
     return { toUser: row9[rel] || row9.outsider || "", register };
   }
-  function seedBaseFor(name, userFaction3, user) {
-    const b = RELATIONS.people[name];
-    const faction = b?.faction ?? "";
-    const alias = ALIASES.names[name];
-    const address = seedAddress(name, faction, user);
-    return {
-      faction,
-      ...b ? { express: b.express } : {},
-    
+  function seedBaseFor(name, userF
