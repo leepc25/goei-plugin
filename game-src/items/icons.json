@@ -7710,16 +7710,6 @@
   },
   {
    "keywords": [
-    "촉감 바퀴"
-   ],
-   "file": "adult_020.png",
-   "kind": "adult",
-   "base": false,
-   "name": "촉감 바퀴",
-   "src": "game-src/items/raw/batch_131/03.png"
-  },
-  {
-   "keywords": [
     "오픈 브라"
    ],
    "file": "adult_021.png",
@@ -7727,6 +7717,17 @@
    "base": false,
    "name": "오픈 브라",
    "src": "game-src/items/raw/batch_131/04.png"
+  },
+  {
+   "keywords": [
+    "바람개비"
+   ],
+   "file": "misc_183.png",
+   "kind": "misc",
+   "base": false,
+   "name": "바람개비",
+   "src": "game-src/items/raw/batch_131/03.png",
+   "note": "촉감 바퀴로 뽑았는데 바람개비로 나옴(사용자 11-07: 바람개비로 씀)"
   },
   {
    "keywords": [
