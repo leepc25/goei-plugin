@@ -8,11 +8,15 @@ import json, sys, time, pathlib, requests
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 API = "https://api.pixellab.ai/v2"
 n = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-items = json.load(open(ROOT / "game-src/items/icon_list.json", encoding="utf-8"))["items"][(n - 1) * 16:n * 16]
-COMMON = "pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline"
+REQ = ROOT / f"game-src/items/req_batch_{n:02d}.json"  # 2회부터: 공용 글·칸 글을 사람이 확인한 파일 그대로
+if REQ.exists():
+    req = json.load(open(REQ, encoding="utf-8")); items = req["items"]; COMMON = req["description"]
+else:
+    items = json.load(open(ROOT / "game-src/items/icon_list.json", encoding="utf-8"))["items"][(n - 1) * 16:n * 16]
+    COMMON = "pixel art item icon, single object, centered, dark modern Korean urban horror setting, clean outline"
 out = ROOT / f"game-src/items/raw/batch_{n:02d}"; out.mkdir(parents=True, exist_ok=True)
 body = {"description": COMMON, "size": 85, "view": "sidescroller",
-        "item_descriptions": [f"{it['en']}, {COMMON}" for it in items]}
+        "item_descriptions": [it["en"] if REQ.exists() else f"{it['en']}, {COMMON}" for it in items]}
 json.dump({"body": body, "items": items}, open(out / "request.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 bal = lambda: requests.get(API + "/balance", timeout=30).json()
 b0 = bal(); print("before", json.dumps(b0), flush=True)
