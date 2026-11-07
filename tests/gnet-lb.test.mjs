@@ -48,3 +48,19 @@ test('괴담넷: 다양성 강화를 켜면 확률과 seed를 요구한다', () 
   assert.match(on, /alternativeProb/);
   assert.match(on, /<x-output-seed-a>\S+<\/x-output-seed-a>/);
 });
+
+test('성격 전환(11-07): 바뀐 뒤 첫 새로고침은 옛 글을 참고로 주지 않고 새 게시판이라고 못 박는다', async () => {
+  const { styleSwitched, GN_BOARD_STYLE } = await import('../dist-test/core.mjs');
+  const post = (id, mine = false) => ({ id, title: `글 ${id}`, body: '본문', author: 'ㅇㅇ', time: '2025.01.01 10:00', views: 1, up: 0, mine, comments: [], tag: '' });
+  const board = { posts: [post(100001), post(100002, true)], dms: [], sources: {}, seq: 100002 };
+  const all = (vars) => { const s = src(vars); return refreshPrompt(s, board, incomingPlan(s.chat, board, gnetSettings(vars), 'ㅇㅇ', () => 0.99), 'ㅇㅇ', {}).messages.map((m) => m.content).join('\n'); };
+  assert.equal(styleSwitched({}), false, '아직 한 번도 안 받았으면 전환 아님');
+  assert.equal(styleSwitched({ [GN_BOARD_STYLE]: 'net' }), false);
+  assert.equal(styleSwitched({ [GN_BOARD_STYLE]: 'net', [C('style')]: 'wpf' }), true);
+  const same = all({ [GN_BOARD_STYLE]: 'net' });
+  assert.ok(same.includes('글 100001') && !same.includes('has just changed'));
+  const sw = all({ [GN_BOARD_STYLE]: 'net', [C('style')]: 'wpf' });
+  assert.ok(!sw.includes('글 100001'), '옛 NPC 글은 참고에서 뺀다');
+  assert.ok(sw.includes('글 100002'), '내 글(보호)은 남긴다');
+  assert.ok(sw.includes('has just changed to 세정게'));
+});

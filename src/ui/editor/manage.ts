@@ -11,6 +11,7 @@ import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWiki
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { clearTrace, loadTrace } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
+import { flowPage } from './flow';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
@@ -31,8 +32,8 @@ const localWhen = (iso: string): string => {
 };
 const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `${Math.round(n / 1e3)}KB` : `${n}B`);
 
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace';
-export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace';
+export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow';
+export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow';
 
 /** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
 const GAME_PACK_PREFIX = 'goei:game:pack:';
@@ -245,6 +246,7 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
+  if (node === 'manage:flow') return flowPage(ctx, head);
   if (node === 'manage:trace') {
     const confirm = traceUi.confirm
       ? `<button class="gx-mini danger" data-action="man-drop-trace-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>`

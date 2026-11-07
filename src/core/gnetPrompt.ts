@@ -5,8 +5,7 @@ import { hasAttachment } from './attach';
 import { evaluate } from './cbs';
 import {
   activityContext, consList, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
-  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField,
-} from './gnet';
+  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField, styleSwitched, GN_STYLE_NAME, gnetStyle } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
@@ -160,14 +159,17 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
       + `\n<x-output-seed-a>${seed()}</x-output-seed-a>\n<x-output-seed-b>${seed()}</x-output-seed-b>`;
   }
   const protectedIds: number[] = [];
+  // 성격(괴담갤·괴담넷·세정게…)이 바뀐 뒤 첫 새로고침: 옛 성격의 글을 참고로 주면 모델이 그 결을 이어 가서 바뀐 티가 안 난다 (11-07 사용자) → 보호 글만 주고, 다른 게시판이라고 못 박는다
+  const switched = styleSwitched(src.chat.scriptstate);
   const reference = st.posts.filter((p, i) => {
     const prot = protectedPost(s, p);
     if (prot) protectedIds.push(p.id);
-    return i < HISTORY.refresh || prot;
+    return prot || (!switched && i < HISTORY.refresh);
   });
+  const action = b.read('ACTION.REFRESH') + (switched ? ` The board's character has just changed to ${GN_STYLE_NAME[gnetStyle(src.chat.scriptstate)]}: start it as a different community. Any saved posts listed here come from the previous board and are kept only as protected user records; do not continue their topics, threads, handles or tone.` : '');
   const extras = fill(b.read('EXTENSION.REQUEST'), {
     TIME: dateNow(src.chat), USER_NICK: nick, KEEP_OWN: String(s.keepOwn), KEEP_REPLIED: String(s.keepReplied), PROTECTED: protectedIds.join(','),
-    POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: b.read('ACTION.REFRESH'), BOARD: boardJson(reference),
+    POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: action, BOARD: boardJson(reference),
   }) + incomingTask(plan);
   return pack(src, b, 'THOUGHTS.REFRESH', guideline.join('\n\n'), format, extras, factionNames);
 }

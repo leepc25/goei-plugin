@@ -6,10 +6,11 @@ import {
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
-  userNick, writeGnet, consList, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
+  userNick, writeGnet, consList, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel, GN_BOARD_STYLE, gnetStyle, styleSwitched } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
+import { guideOverridden, guideText } from '../core/guides';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
@@ -159,7 +160,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
       const inc = saveIncoming(chat, res.st, (value as { incoming?: unknown }).incoming, plan);
       note = [res.notice, res.emptyComments ? '이번 게시판에는 댓글이 하나도 없어요.' : '', inc.note].filter(Boolean).join(' ');
       const figs = s.keyFigures ? mergeKeyFigures(chat.scriptstate, (value as { keyFigures?: unknown }).keyFigures) : null;
-      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing() });
+      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}), [GN_BOARD_STYLE]: gnetStyle(chat.scriptstate) }), res.st, { ack: viewing() });
     });
     if (!automatic) gnet.open = null;
     else if (gnet.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), gnet.open)) gnet.open = null;
@@ -626,6 +627,8 @@ function settingsView(ctx: ChatContext, back = true): string {
       ${group('게시판', [
         row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
         row('성격', seg('style', ['gal', 'wpf', 'diary', 'emotion'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게'], ['diary', '일기장'], ['emotion', '감정 게시판']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
+        ...(styleSwitched(ctx.chat.scriptstate) ? [`<p class="ps-note gn-style-note">성격이 바뀌었어요. 다음 새로고침은 지금 글을 참고하지 않고 새 게시판으로 시작해요 (내 글·답글 달린 글은 보호 설정대로 남아요).</p>`] : []),
+        ...(guideOverridden('GNet') && !guideText('GNet').includes('lb-gn.style') ? [`<p class="ps-note gx-err">지침 탭에서 고쳐 쓴 괴담넷 지침에 성격 분기(lb-gn.style)가 없어요. 그 지침을 쓰는 동안은 성격을 바꿔도 요청문이 같아요. 지침 탭 → 괴담넷 → 「원본으로」 뒤 다시 고쳐 쓰세요.</p>`] : []),
         ...(['diary', 'emotion'].includes(v('style')) ? [row('누구', text('who', '비우면 주인공'), '일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요')] : []),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
