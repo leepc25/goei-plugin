@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clump of spider web Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar full of crawling bugs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rose Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth bag of grave dirt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lump of melted candle wax Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a jar of glowing pale ectoplasm Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a doll stitched together from mismatched parts Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rag doll with button eyes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a full mannequin torso, compact Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mannequin arm Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bald mannequin head Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a porcelain doll Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ventriloquist dummy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a creepy clown doll Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a child's picture diary with crayon drawing, no text Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone with a spiral carving Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "거미줄 뭉치",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clump of spider web Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "벌레 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar full of crawling bugs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 장미",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black rose Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "묘지 흙 봉지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small cloth bag of grave dirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "녹은 촛농 덩어리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lump of melted candle wax Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엑토플라즘 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a jar of glowing pale ectoplasm Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꿰맨 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a doll stitched together from mismatched parts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "단추 눈 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rag doll with button eyes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마네킹",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a full mannequin torso, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마네킹 팔",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mannequin arm Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마네킹 머리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bald mannequin head Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도자기 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a porcelain doll Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "복화술 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ventriloquist dummy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "광대 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a creepy clown doll Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이 그림 일기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a child's picture diary with crayon drawing, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소용돌이 돌",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone with a spiral carving Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
