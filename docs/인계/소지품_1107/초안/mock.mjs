@@ -20,11 +20,11 @@ const items = [
   ['device', '녹음기', 1], ['wear', '방검 조끼', 1], ['paper', '사건 파일', 1], ['medical', '진통제', 4],
   ['food', '생수', 2], ['anomaly', '검은 구슬', 1], ['valuable', '현금 봉투', 1], ['weapon', '접이식 칼', 1],
 ];
-const cell = ([k, n, q], i, extra = '') => `<div class="c${extra}${i === 0 ? ' sel' : ''}">${q > 1 ? `<i class="q">×${q}</i>` : ''}<span class="ci">${ic(k)}</span><b>${n}</b></div>`;
+const cell = ([k, n], i, extra = '') => `<div class="c${extra}${i === 0 ? ' sel' : ''}"><span class="ci">${ic(k)}</span><b>${n}</b></div>`;
 const grid = (over) => `<div class="grid">${items.map((it, i) => cell(it, i)).join('')}${'<div class="c empty"></div>'.repeat(4)}</div>` +
   (over ? `<div class="overh">넘침 — 본편이 이번 턴에 처리해요</div><div class="grid">${cell(['seal', '봉인 상자', 1], 9, ' over')}</div>` : '');
 const detail = `<section class="det"><div class="dh">${ic('consumable', 26)}<div><b>소금 봉지</b><small>소모품 · 장터 · 11-07 ₩ 6,000</small></div></div>
-<p>관리국 지급품. 문턱이나 창틀에 뿌려 두면 하룻밤은 버틴다.</p><p class="ef">효과: 저급 괴이의 접근을 늦춘다</p>
+<p>관리국 지급품, 두 봉지 남음. 문턱이나 창틀에 뿌려 두면 하룻밤은 버틴다.</p><p class="ef">효과: 저급 괴이의 접근을 늦춘다</p>
 <div class="btns"><button class="pri">사용</button><button>고치기</button><button>합치기</button><button class="danger">버리기</button></div></section>`;
 const tabs = `<div class="subs"><button>가계부</button><button class="on">소지품</button></div>`;
 const head = `<div class="hd"><div class="t">12 / 16</div><div class="s">${nav('search')}<span>물건·기록 찾기</span></div></div>`;
@@ -61,7 +61,12 @@ const css = `
 .nav{grid-area:nav;border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px}.nav .nb{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:10px;color:var(--sub);font-weight:600}.nav .nb.on{background:var(--accent-bg);color:var(--signal)}
 .nav .card{background:var(--panel);border-radius:12px;height:150px;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--dim);font-size:12px}.nav .card .ph{width:56px;height:56px;border-radius:50%;background:var(--line2)}.nav .gap{flex:1}.nav .hist{display:flex;gap:6px;justify-content:center;color:var(--dim)}
 .body{grid-area:body;display:grid;grid-template-columns:1fr 360px;overflow:hidden}.body .left{overflow:auto}.body .right{border-left:1px solid var(--line);padding-top:12px}.body .right .det{margin:0 14px}
-.pc .grid{grid-template-columns:repeat(6,minmax(0,1fr))}.pc .left{min-width:0}.pc .c{min-width:0}.pc .c b{font-size:11.5px}.pc .c b{font-size:12.5px}
+.pc{width:1180px;height:620px}.pc .body{grid-template-columns:1fr 300px}.pc .left{min-width:0;padding:12px 16px}
+.pcbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}.pcbar .subs{padding:0;gap:0;border:1px solid var(--line2);border-radius:9px;overflow:hidden}.pcbar .subs button{flex:none;height:30px;padding:0 14px;border:0;border-radius:0;font-size:13px}.pcbar .t{font-weight:700;font-size:15px;margin-left:6px}.pcbar .ov{color:var(--danger);font-size:12px;font-weight:600;margin-left:4px}
+.pcbar .tb{display:flex;align-items:center;gap:5px;height:30px;padding:0 10px;border:1px solid var(--line2);border-radius:9px;color:var(--sub);font-size:12.5px;font-weight:600}.pcbar .tb:first-of-type{margin-left:auto}.pcbar .s{height:30px;padding:0 10px}
+.pc .grid{grid-template-columns:repeat(8,70px);gap:6px;padding:0}.pc .c{aspect-ratio:auto;height:70px;gap:4px;border-radius:9px;padding:4px}.pc .c svg{width:22px;height:22px}.pc .c b{font-size:11px}
+.logbox{margin-top:16px;border-top:1px solid var(--line);padding-top:10px}.logbox .lt{font-size:12px;font-weight:700;color:var(--dim);margin-bottom:6px}.lr{font-size:12.5px;color:var(--sub);line-height:1.9}.lr span{color:var(--dim);margin-right:8px}.lr em{font-style:normal;color:var(--dim);margin-left:6px;font-size:11.5px}
+.pc .right{padding:12px 0}
 `;
 const phoneHtml = (open, over, pop = false) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
@@ -70,15 +75,18 @@ const phoneHtml = (open, over, pop = false) => `<!doctype html><meta charset="ut
 <div class="bar bottom"><div class="grip${open ? ' on' : ''}"><i></i></div><div class="nb">${nav('map')}임무</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb on">${nav('bag')}소지품</div></div></div></div></body>`;
 const chatHtml = `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:300px;grid-template-rows:1fr auto;background:#141a1e}</style><body><div class="win"><div style="padding:14px;color:var(--dim);font-size:12.5px">(채팅 본문 — Risu 입력창 바로 위에 플러그인이 띄우는 상자)</div>
 <div><div class="usebox">이번 턴 사용 <span class="chip">소금 봉지</span><span class="chip">손전등</span><span class="x">×</span></div><div class="input">메시지를 입력하세요…</div></div></div></body>`;
+const pcGrid = `<div class="grid">${items.map((it, i) => cell(it, i)).join('')}${'<div class="c empty"></div>'.repeat(4)}${cell(['seal', '봉인 상자'], 9, ' over')}</div>`;
+const pcLeft = `<div class="pcbar"><div class="subs">${'<button>가계부</button><button class="on">소지품</button>'}</div><div class="t">12 / 16 <span class="ov">+1 넘침</span></div><div class="tb">${nav('plus')} 직접 넣기</div><div class="tb">${nav('refresh')} 합치기</div><div class="s">${nav('search')}<span>물건·기록 찾기</span></div></div>
+${pcGrid}<div class="logbox"><div class="lt">사용·처분 기록</div><div class="lr"><span>11-07</span>부적 1장 사용 <em>본문</em></div><div class="lr"><span>11-06</span>생수 1병 사용 <em>사용 단추</em></div><div class="lr"><span>11-06</span>손수건 버림 <em>직접</em></div></div>`;
 const pcHtml = `<!doctype html><meta charset="utf-8"><style>${css}</style><body><div class="win pc">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
 <div class="nav"><div class="card"><div class="ph"></div>사원증 카드</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('map')}임무</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb">${nav('gnet')}괴담넷</div><div class="nb">${nav('wiki')}위키</div><div class="nb on">${nav('bag')}소지품</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('settings')}설정</div><div class="gap"></div><div class="hist">‹ 뒤로 &nbsp; 앞으로 ›</div></div>
-<div class="body"><div class="left">${tabs}${head}${grid(true)}${foot}</div><div class="right">${detail}<div style="padding:12px 14px;color:var(--dim);font-size:12px">칸을 누르면 여기 상세. 「사용」은 입력창 위 상자에 올라가요.</div></div></div></div></body>`;
+<div class="body"><div class="left">${pcLeft}</div><div class="right">${detail}</div></div></div></body>`;
 const b = await chromium.launch(); const out = '/mnt/project-files/작업_1107/초안_';
 let p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 860 } });
 await p.setContent(phoneHtml(false, false)); await p.screenshot({ path: out + '폰_소지품.png' });
 await p.setContent(phoneHtml(false, false, true)); await p.screenshot({ path: out + '폰_상세팝업.png' });
 await p.setContent(phoneHtml(true, true)); await p.screenshot({ path: out + '폰_서랍열림_넘침.png' });
 p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 310 } }); await p.setContent(chatHtml); await p.screenshot({ path: out + '폰_사용상자.png' });
-p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 1200, height: 780 } }); await p.setContent(pcHtml); await p.screenshot({ path: out + 'PC_소지품.png' });
+p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 1200, height: 640 } }); await p.setContent(pcHtml); await p.screenshot({ path: out + 'PC_소지품.png' });
 await b.close(); console.log('ok');
