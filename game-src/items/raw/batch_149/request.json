@@ -1,0 +1,111 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a violin with its bow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo ear pick Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tactical radio headset with a boom microphone Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bicycle helmet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden back scratcher Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. military dog tags on a ball chain, blank tags Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny clear suction cup with a small pump bulb Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leather thigh cuffs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spanking paddle with holes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace crotchless panties, laid flat Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pair of metal thumb cuffs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red foam wedge cushion Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver harmonica Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tweezers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeshadow palette with colored pans Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "바이올린",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a violin with its bow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀이개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bamboo ear pick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "무전 헤드셋",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tactical radio headset with a boom microphone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자전거 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bicycle helmet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "효자손",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden back scratcher Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "군번줄",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. military dog tags on a ball chain, blank tags Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클리토리스 석션 컵",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny clear suction cup with a small pump bulb Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "허벅지 커프스",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black leather thigh cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나무 주걱",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden spanking paddle with holes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오픈 크로치 팬티",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace crotchless panties, laid flat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엄지 수갑",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pair of metal thumb cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "체위 쿠션",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red foam wedge cushion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "립글로스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "하모니카",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver harmonica Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "족집게",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tweezers Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "아이섀도",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeshadow palette with colored pans Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}
