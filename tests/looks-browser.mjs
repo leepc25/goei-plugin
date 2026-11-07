@@ -28,18 +28,17 @@ for (const vp of ['pc', 'phone']) {
   await click('.gx-fac[data-value="A00"]');
   const heads = await page.$$eval('.gx-body > section > h2', (els) => els.map((e) => e.textContent.trim()));
   if (!heads.includes('3아바타')) fails.push(`[${vp}] 아바타 단계 없음 ${JSON.stringify(heads)}`);
-  if (!(await page.isDisabled('.gx-lookchip'))) fails.push(`[${vp}] 성별 전에 아바타 칸이 열림`);
   if (!(await page.isDisabled('.gx-start'))) fails.push(`[${vp}] 아바타 없이 출발이 열림`);
-  await page.evaluate(() => document.querySelector('.gx-lookstep')?.scrollIntoView({ block: 'center' }));
+  await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
   await shot('1_시작패널_고르기전');
-  await click('[data-action="look-sex"][data-value="여"]');
   await click('.gx-lookchip');
+  if (!(await page.$('.gx-lookpop [data-action="look-g"]'))) fails.push(`[${vp}] 팝업에 남·여 단추 없음`);
+  await shot('2a_팝업_성별전');
+  await click('.gx-lookpop [data-action="look-g"][data-value="여"]');
   if ((await cells()) !== count('여', 'A00')) fails.push(`[${vp}] 관리국 여: ${await cells()}칸 (기대 ${count('여', 'A00')})`);
   await shot('2_팝업_여_관리국');
-  await click('[data-action="look-close"]');
-  await click('[data-action="look-sex"][data-value="남"]');
-  await click('.gx-lookchip');
+  await click('.gx-lookpop [data-action="look-g"][data-value="남"]');
   if ((await cells()) !== count('남', 'A00')) fails.push(`[${vp}] 관리국 남: ${await cells()}칸 (기대 ${count('남', 'A00')})`);
   const names = await page.$$eval('.gx-lookpop .gx-lookc', (els) => els.map((e) => e.dataset.value));
   const fake = looks.filter((r) => r.fac === 'B00').map((r) => r.id);
@@ -51,7 +50,7 @@ for (const vp of ['pc', 'phone']) {
   const own = looks.find((r) => r.fac === 'A00' && r.g === '남').id;
   await click(`.gx-lookpop .gx-lookc[data-value="${own}"]`);
   if (await page.$('.gx-lookpop')) fails.push(`[${vp}] 고른 뒤 팝업이 안 닫힘`);
-  await page.evaluate(() => document.querySelector('.gx-lookstep')?.scrollIntoView({ block: 'center' }));
+  await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
   await shot('3_시작패널_고른뒤');
   // 세력을 바꾸면 그 세력 전용 아바타는 빠진다
@@ -59,14 +58,14 @@ for (const vp of ['pc', 'phone']) {
   if (await page.$('.gx-lookchip.on')) fails.push(`[${vp}] 백일몽으로 바꿨는데 관리국 아바타가 남음`);
   await click('.gx-fac[data-value="A00"]');
   await click('.gx-lookchip');
+  await click('.gx-lookpop [data-action="look-g"][data-value="남"]');
   await click(`.gx-lookpop .gx-lookc[data-value="${own}"]`);
   // 기존 인물을 고르면 아바타 칸은 그 인물 성별·모습으로 잠긴다
   const agent = await page.evaluate(() => document.querySelector('.gx-whoc[data-value^="P"]')?.dataset.value);
   await click(`.gx-whoc[data-value="${agent}"]`);
-  if (!(await page.$('.gx-lookstep.locked .gx-lookface'))) fails.push(`[${vp}] 기존 인물인데 아바타 칸에 그 인물 모습이 없음`);
-  if (!(await page.$('.gx-lookstep.locked .gx-seg.on'))) fails.push(`[${vp}] 기존 인물 성별이 안 들어감`);
+  if (!(await page.$('.gx-lookchip .gx-lookface'))) fails.push(`[${vp}] 기존 인물인데 아바타 칸에 그 인물 모습이 없음`);
   if (!(await page.isDisabled('.gx-lookchip'))) fails.push(`[${vp}] 기존 인물인데 아바타 칸이 열림`);
-  await page.evaluate(() => document.querySelector('.gx-lookstep')?.scrollIntoView({ block: 'center' }));
+  await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
   await shot('5_기존인물');
   await click('.gx-whoc[data-value=""]');

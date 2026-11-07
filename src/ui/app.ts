@@ -16,9 +16,9 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
-import { LOOK_KEY, lookAllowed, lookId, type LookGender } from '../core/looks';
+import { LOOK_KEY, lookAllowed, lookId } from '../core/looks';
 import { lookRows, onLooksReady } from '../host/looks';
-import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookGender, lookPopup, lookStep, lookUi, setLookRender } from './looks';
+import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
@@ -77,8 +77,7 @@ interface Draft {
   situation?: string;
   /** 캐릭터로 플레이: 유저가 연기할 요원 코드 ('' = 내 페르소나) */
   player?: string;
-  /** 아바타 (페르소나로 시작할 때 필수): 성별 → 고른 프리셋 번호. 성별은 격자만 거르고 저장하지 않는다 */
-  lookSex?: LookGender | '';
+  /** 아바타 (페르소나로 시작할 때 필수): 고른 프리셋 번호 */
   look?: string;
 }
 
@@ -705,13 +704,6 @@ async function handle(action: string, value?: string): Promise<void> {
   if (view.kind === 'started' && action.startsWith('look') && (await lookAction(action, value, view.ctx, refresh))) return;
   // 아바타 팝업 (시작 패널): 고르면 출발 때 이 채팅에 적는다
   if (view.kind === 'picker' && action.startsWith('look')) {
-    if (action === 'look-sex') {
-      if (value !== '남' && value !== '여') return;
-      // 성별을 바꾸면 고른 아바타가 다른 성별이면 비운다
-      if (draft.look && lookGender(draft.look) !== value) draft.look = '';
-      draft.lookSex = value;
-      return renderPicker();
-    }
     if (lookCommon(action, value)) return;
     if (action === 'look' && value) {
       draft.look = value;
@@ -1483,7 +1475,7 @@ function body(): string {
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '', draft.faction ?? '', '', draft.lookSex || lookGender(draft.look ?? ''))}`;
+      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>${lookPopup(draft.look ?? '', draft.faction ?? '')}`;
   }
 }
 
@@ -1550,10 +1542,9 @@ function picker(): string {
       ].join('')}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
     : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
   const shown = list.length;
-  // 아바타 (2026-11-08 사용자): 한 줄 단계. 내 페르소나면 성별 → 아바타(팝업 격자) 순서로 꼭 고른다
-  const sex = draft.lookSex || lookGender(draft.look ?? '');
+  // 아바타 (2026-11-08 사용자): 주인공 칸 크기의 칸 하나. 내 페르소나면 눌러서 팝업(남·여 → 격자)에서 꼭 고른다
   // 기존 인물로 시작하면 칸은 그대로 두고 그 인물의 성별·모습으로 잠근다 (2026-11-08 사용자)
-  const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', sex, playing ? (people.find((a) => a.id === draft.player)?.name ?? '') : '')}</section>` : '';
+  const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', playing ? (people.find((a) => a.id === draft.player)?.name ?? '') : '')}</section>` : '';
   const n0 = look ? 4 : 3;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>

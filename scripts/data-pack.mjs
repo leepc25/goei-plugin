@@ -80,7 +80,7 @@ const LOOK_FACTION = [['가짜관리국', 'B00'], ['관리국', 'A00'], ['백일
 
 /** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, fac, n, w, h, cw, ch, ox, oy, img}] }.
  *  id = 인물 팩 번호(char-6.54 → '6.54'). 고유 인물(char-1~5)은 명부 이름(cfg.name)으로 찾는다.
- *  성별 g: 일반 NPC(char-6)는 필드 신상표(src/game/world/mobProfiles.json sex), 고유 인물은 세계 자료(src/data/world/agents.json gender), fac = 그 세력으로 시작할 때만 고를 수 있는 프리셋의 세력 코드.
+ *  성별 g: 일반 NPC(char-6)만 필드 신상표(src/game/world/mobProfiles.json sex). 고유 인물은 고르는 창이 안 열려 성별이 필요 없다(''), fac = 그 세력으로 시작할 때만 고를 수 있는 프리셋의 세력 코드.
  *  img = 정면 대기 줄(A['50'], 남쪽을 봄) 시트 base64 webp. src/core/looks.ts parseLooksPack 이 읽는 모양 */
 export function looksPackText() {
   const dir = new URL('game-pack/', ROOT);
@@ -92,12 +92,6 @@ export function looksPackText() {
       return a1 - b1 || a2 - b2;
     });
   const profiles = readJson('src/game/world/mobProfiles.json');
-  const agents = readJson('src/data/world/agents.json').records;
-  // 위키 성별 글은 「Female」「Male-presenting」「Presents as male. …」처럼 적혀 있다: 겉으로 드러나는 쪽(female/male 낱말)으로 읽는다
-  const agentSex = (name) => {
-    const t = String(agents[name]?.fields?.gender ?? '');
-    return /\bfemale\b/i.test(t) ? '여' : /\bmale\b/i.test(t) ? '남' : '';
-  };
   const looks = [];
   for (const d of ids) {
     const j = readJson(`game-pack/${d}/char.json`);
@@ -106,7 +100,7 @@ export function looksPackText() {
     const name = String(j.cfg?.name ?? '');
     const id = d.slice(5);
     const unique = !id.startsWith('6.');
-    const sex = unique ? agentSex(name) : profiles[name]?.sex;
+    const sex = unique ? '' : profiles[name]?.sex;
     const g = sex === '남' || sex === '여' ? sex : '';
     const fac = unique ? '' : (LOOK_FACTION.find(([p]) => name.startsWith(p))?.[1] ?? '');
     looks.push({ id, name, g, unique, fac, n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
