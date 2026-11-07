@@ -855,9 +855,9 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     return;
   }
   if (key.startsWith('ascene:')) {
-    // ascene:P001|ko — 인물별 첫 장면 (빈 값은 지워서 기본 글로)
+    // ascene:P001|ko — 인물별 첫 장면 (빈 값은 지워서 기본 글로). label = 제목 (11-07)
     const [id, field] = key.slice(7).split('|');
-    if (!id || !(field === 'ko' || field === 'en')) return;
+    if (!id || !(field === 'ko' || field === 'en' || field === 'label')) return;
     const rows = (d.scenes.인물 ??= {});
     const row = (rows[id] ??= {});
     if (value.trim()) row[field] = value;

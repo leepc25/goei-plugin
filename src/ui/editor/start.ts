@@ -77,6 +77,7 @@ function membersBlock(code: string, d: Directory): string {
       const hasDefault = !!agentScene(a.id, undefined);
       const k = (f: string) => `ascene:${a.id}|${f}`;
       return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en ? '직접 쓴 글' : hasDefault ? '기본 글' : '첫 장면 없음'}</small></summary>
+        ${input(k('label'), saved?.label ?? '', '제목', hasDefault ? '비우면 기본 제목으로 돌아가요. 시작 화면 첫 장면 칸에 보여요' : '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
         ${area(k('ko'), saved?.ko ?? '', '한국어', 6, hasDefault ? '비우면 기본 글(세계 자료)로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
         ${area(k('en'), saved?.en ?? '', 'English', 6, hasDefault ? '비우면 기본 글로 돌아가요' : '')}
       </details>`;

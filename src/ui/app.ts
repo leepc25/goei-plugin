@@ -1408,7 +1408,8 @@ function body(): string {
 /** 시작 화면에 보일 상황 목록: 인물로 시작하면 그 인물의 첫 장면(있을 때, fm 0) + 직접 입력·커스텀 임무, 페르소나면 공용 장면 + 직접 입력·커스텀 임무 */
 function scenariosFor(f: Faction, player: string | undefined, lore: LoreEntry[] | undefined) {
   if (!player) return f.scenarios;
-  const own = agentScene(player, scenesOf(lore)) ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? '이 인물')] : [];
+  const ownScene = agentScene(player, scenesOf(lore));
+  const own = ownScene ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? '이 인물', ownScene.label)] : [];
   return [...own, ...f.scenarios.filter((x) => x.kind !== 'opening')];
 }
 
