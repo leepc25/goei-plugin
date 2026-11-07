@@ -1335,27 +1335,27 @@ Next Paragraph Text
     }
     throw new PicError(`사진 「${p[0]}」을 받지 못했어요.`);
   }
-  async function fetchPictures(assets, plan, progress) {
+  async function fetchPictures(assets, plan, progress2) {
     const got = [];
     let i = 0;
-    let failed = false;
+    let failed2 = false;
     const worker = async () => {
-      while (i < plan.get.length && !failed) {
+      while (i < plan.get.length && !failed2) {
         const p = plan.get[i++];
         try {
           got.push([p, await fetchPicture(p)]);
         } catch (error) {
-          failed = true;
+          failed2 = true;
           throw error;
         }
-        progress(got.length, "get");
+        progress2(got.length, "get");
       }
     };
     await Promise.all([worker(), worker(), worker(), worker()]);
     const paths = new Array(got.length);
     let j = 0;
     let saved = 0;
-    progress(0, "save");
+    progress2(0, "save");
     const saver = async () => {
       while (j < got.length) {
         const k = j++;
@@ -1367,7 +1367,7 @@ Next Paragraph Text
         }
         if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
         paths[k] = path;
-        progress(++saved, "save");
+        progress2(++saved, "save");
       }
     };
     await Promise.all([saver(), saver(), saver(), saver()]);
@@ -1408,6 +1408,7 @@ Next Paragraph Text
   }
   var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"5704235f","sha256":"26665dfcaeec5cb98ba21b70cd1ad3f7fd8261e2fba6a9264fb3c8df0fcfa379","length":1502296}' : void 0) };
   var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"31f59edf","sha256":"b2bd2c28600c1e974931e7aa7b47035c6d931617c3861f3ad481b9da4f37d0f7","length":153725}' : void 0) };
+  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"79379747","sha256":"dbe09ccf2e54b11a2995dfb83e806807552bddbed15e83e80575fc7bd1a214cd","length":4184376}' : void 0) };
   function packMatches(text4, expect) {
     return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
   }
@@ -1449,6 +1450,37 @@ Next Paragraph Text
     if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
     setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String) }, pictures: j.pictures, directory: j.directory, icon: j.icon });
   }
+  function applyItemsPack(text4) {
+    let j;
+    try {
+      j = JSON.parse(text4);
+    } catch {
+      throw new Error("소지품 그림 팩이 JSON 이 아니에요.");
+    }
+    if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
+    const icons = j.icons;
+    const table = j.table.filter((r) => obj5(r) && Array.isArray(r.k) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons[r.f] === "string").map((r) => ({ k: r.k.map((x) => normIcon(String(x))).filter(Boolean), f: r.f, kind: r.kind, ...r.base ? { base: true } : {} })).sort((a, b) => Math.max(...b.k.map((x) => x.length), 0) - Math.max(...a.k.map((x) => x.length), 0));
+    return { table, icons };
+  }
+  var normIcon = (s7) => s7.toLowerCase().replace(/[\s·()\[\]「」.,'"]/g, "");
+  function matchItemIcon(table, name, kind) {
+    const n2 = normIcon(name);
+    if (n2) {
+      let best = null;
+      let bestLen = 0;
+      for (const r of table) {
+        for (const k of r.k) {
+          if (k.length < 2 || !n2.includes(k)) continue;
+          if (k.length > bestLen || k.length === bestLen && best && best.kind !== kind && r.kind === kind) {
+            best = r;
+            bestLen = k.length;
+          }
+        }
+      }
+      if (best) return best.f;
+    }
+    return table.find((r) => r.base && r.kind === kind)?.f ?? null;
+  }
 
   // src/core/fetchparts.ts
   var PART_CONCURRENCY = 4;
@@ -1456,14 +1488,14 @@ Next Paragraph Text
     const out = new Array(names4.length);
     let next = 0;
     let done3 = 0;
-    let failed = false;
+    let failed2 = false;
     const worker = async () => {
-      while (next < names4.length && !failed) {
+      while (next < names4.length && !failed2) {
         const i = next++;
         try {
           out[i] = await get(names4[i]);
         } catch (error) {
-          failed = true;
+          failed2 = true;
           throw error;
         }
         onDone?.(++done3);
@@ -1512,31 +1544,31 @@ Next Paragraph Text
     if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
     return new Uint8Array(await timeout(res.arrayBuffer(), name));
   }
-  async function fetchPack(pack3, progress) {
+  async function fetchPack(pack4, progress2) {
     if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
-    if (!pack3.expect.hash) throw new DataPackError(`이 빌드에는 ${pack3.label} 지문이 없어요.`);
-    progress?.(`${pack3.label} 목록 받는 중…`);
+    if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
+    progress2?.(`${pack4.label} 목록 받는 중…`);
     let index = null;
     try {
-      index = JSON.parse((await getText(`${pack3.name}.json`)).replace(/^﻿/, ""));
+      index = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
     } catch (error) {
-      throw new DataPackError(`${pack3.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
+      throw new DataPackError(`${pack4.label} 목록을 받지 못했어요 (${error instanceof Error ? error.message : String(error)})`);
     }
-    if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack3.label} 목록 형식이 달라요.`);
-    if (index.hash !== pack3.expect.hash) throw new DataPackError(`아직 이 판의 ${pack3.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
-    const re = new RegExp(`^${pack3.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
+    if (!index || !Array.isArray(index.parts) || typeof index.length !== "number") throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
+    if (index.hash !== pack4.expect.hash) throw new DataPackError(`아직 이 판의 ${pack4.label}가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.`);
+    const re = new RegExp(`^${pack4.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.\\d+\\.txt$`);
     for (const name of index.parts) {
-      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack3.label} 목록 형식이 달라요.`);
+      if (typeof name !== "string" || !re.test(name)) throw new DataPackError(`${pack4.label} 목록 형식이 달라요.`);
     }
     const parts = index.parts;
     const t0 = Date.now();
-    const text4 = await fetchParts(parts, getText, (n2) => progress?.(`${pack3.label} 받는 중 ${n2}/${parts.length}`));
-    console.log(`[goei] ${pack3.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
-    if (text4.length !== pack3.expect.length) throw new DataPackError(`${pack3.label}를 끝까지 받지 못했어요. (${text4.length}/${pack3.expect.length}자)`);
+    const text4 = await fetchParts(parts, getText, (n2) => progress2?.(`${pack4.label} 받는 중 ${n2}/${parts.length}`));
+    console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
+    if (text4.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text4.length}/${pack4.expect.length}자)`);
     const got = await sha256Text(text4);
     if (got !== null) {
-      if (got !== pack3.expect.sha256) throw new DataPackError(`받은 ${pack3.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
-    } else if (textHash(text4) !== pack3.expect.hash) throw new DataPackError(`받은 ${pack3.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
+      if (got !== pack4.expect.sha256) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(sha256). 다시 받아 주세요.`);
+    } else if (textHash(text4) !== pack4.expect.hash) throw new DataPackError(`받은 ${pack4.label}가 깨져 있어요(hash). 다시 받아 주세요.`);
     return text4;
   }
   async function loadWorldData(force = false) {
@@ -1591,7 +1623,7 @@ Next Paragraph Text
     await keepWorldData(text4);
   }
   var installPending = null;
-  async function ensureInstallData(progress) {
+  async function ensureInstallData(progress2) {
     if (installDataReady()) return;
     installPending ??= (async () => {
       let saved = null;
@@ -1607,7 +1639,7 @@ Next Paragraph Text
           console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
         }
       } else if (typeof saved === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
-      const text4 = await fetchPack(INSTALL_PACK, progress);
+      const text4 = await fetchPack(INSTALL_PACK, progress2);
       applyInstallPack(text4);
       try {
         await risuai.pluginStorage.setItem(INSTALL_KEY, text4);
@@ -1640,8 +1672,8 @@ Next Paragraph Text
     }
   }
   var charId = (char) => String(char.chaId ?? char.name ?? "");
-  async function checkInstall(charIndex, progress) {
-    await ensureInstallData(progress);
+  async function checkInstall(charIndex, progress2) {
+    await ensureInstallData(progress2);
     const char = await risuai.getCharacterFromIndex(charIndex) ?? {};
     const notes = await iconNotes();
     const note = notes[charId(char)];
@@ -1664,7 +1696,7 @@ Next Paragraph Text
     const lore = installLore(char.globalLore, planted.index);
     await risuai.setCharacterToIndex(charIndex, { ...char, ...o.name ? { name: o.name } : {}, globalLore: lore, alternateGreetings: planted.greetings });
   }
-  async function installPictures(charIndex, progress) {
+  async function installPictures(charIndex, progress2) {
     const char = await risuai.getCharacterFromIndex(charIndex);
     if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
     const { state } = await checkInstall(charIndex);
@@ -1681,7 +1713,7 @@ Next Paragraph Text
         assets = await fetchPictures(assets, { get, replaced: 0, added: get.length, bytes, drop: [] }, (n2, phase) => {
           if (n2 - last2 >= 10 || n2 === 0 || n2 === get.length) {
             last2 = n2;
-            progress(`사진 ${phase === "get" ? "받는" : "저장"} 중 ${saved + n2}/${all.length}`);
+            progress2(`사진 ${phase === "get" ? "받는" : "저장"} 중 ${saved + n2}/${all.length}`);
           }
         });
       } catch (error) {
@@ -1695,12 +1727,12 @@ Next Paragraph Text
     forgetImages();
     return saved;
   }
-  async function installIcon(charIndex, progress) {
+  async function installIcon(charIndex, progress2) {
     const icon2 = installData().icon;
     if (!icon2.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
     const char = await risuai.getCharacterFromIndex(charIndex);
     if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    progress("아이콘 받는 중…");
+    progress2("아이콘 받는 중…");
     const bytes = await getBytes(icon2.file);
     if (icon2.bytes && bytes.length !== icon2.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
     const d = icon2.digest ? await digest(bytes) : null;
@@ -1730,9 +1762,9 @@ Next Paragraph Text
     await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
     return true;
   }
-  async function installWikiPack(progress) {
+  async function installWikiPack(progress2) {
     if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
-    progress("위키 기본 문서 목록 받는 중…");
+    progress2("위키 기본 문서 목록 받는 중…");
     let index = null;
     try {
       index = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
@@ -1745,7 +1777,7 @@ Next Paragraph Text
     for (const name of index.parts) {
       if (typeof name !== "string" || !/^wiki-base\.\d+\.txt$/.test(name)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
       text4 += await getText(name);
-      progress(`위키 기본 문서 받는 중 ${++n2}/${index.parts.length}`);
+      progress2(`위키 기본 문서 받는 중 ${++n2}/${index.parts.length}`);
     }
     if (typeof index.length === "number" && text4.length !== index.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text4.length}/${index.length}자)`);
     if (!text4.startsWith(WIKI_PACK_HEAD)) throw new Error("위키 기본 문서 묶음 형식이 달라요.");
@@ -1760,9 +1792,9 @@ Next Paragraph Text
     } catch {
     }
   }
-  async function installTokenizer(progress) {
+  async function installTokenizer(progress2) {
     if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
-    progress("토크나이저 목록 받는 중…");
+    progress2("토크나이저 목록 받는 중…");
     let index = null;
     try {
       index = JSON.parse((await getText("tok-o200k.json")).replace(/^\uFEFF/, ""));
@@ -1775,7 +1807,7 @@ Next Paragraph Text
     for (const name of index.parts) {
       if (typeof name !== "string" || !/^tok-o200k\.\d+\.txt$/.test(name)) throw new Error("토크나이저 목록 형식이 달라요.");
       text4 += await getText(name);
-      progress(`토크나이저 받는 중 ${++n2}/${index.parts.length}`);
+      progress2(`토크나이저 받는 중 ${++n2}/${index.parts.length}`);
     }
     if (typeof index.length === "number" && text4.length !== index.length) throw new Error(`토크나이저를 끝까지 받지 못했어요. (${text4.length}/${index.length}자)`);
     if (!setTokenizerRanks(text4, "o200k_base")) throw new Error("토크나이저 순위표 형식이 달라요.");
@@ -1874,9 +1906,9 @@ Next Paragraph Text
     const s7 = instUi.state;
     const busy5 = !!instUi.busy;
     if (!s7 || instUi.forChar !== ctx2.charIndex) {
-      const failed = !instUi.pending && instUi.notice;
-      return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 점검</h2>${failed ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ""}</header>
-      ${failed ? `<div class="gx-err" role="alert">${esc11(instUi.notice)}</div>` : `<p class="gx-muted">${esc11(instUi.progress || "점검하는 중…")}</p>`}</div>`;
+      const failed2 = !instUi.pending && instUi.notice;
+      return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 점검</h2>${failed2 ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ""}</header>
+      ${failed2 ? `<div class="gx-err" role="alert">${esc11(instUi.notice)}</div>` : `<p class="gx-muted">${esc11(instUi.progress || "점검하는 중…")}</p>`}</div>`;
     }
     const missing = installSummary(s7);
     const allDone = s7.goei && !missing.length && s7.icon && s7.tokenizer;
@@ -1919,41 +1951,41 @@ Next Paragraph Text
     instUi.info = "";
     instUi.progress = "";
     env3.render();
-    const progress = (t) => {
+    const progress2 = (t) => {
       instUi.progress = t;
       env3.render();
     };
     const done3 = [];
-    const failed = [];
+    const failed2 = [];
     const run5 = async (label2, f) => {
       try {
         const r = await f();
         if (r) done3.push(r);
       } catch (error) {
-        failed.push(`${label2}: ${error instanceof Error ? error.message : String(error)}`);
+        failed2.push(`${label2}: ${error instanceof Error ? error.message : String(error)}`);
       }
     };
     const s7 = instUi.state;
     if (step === "all") {
       await run5("로어북·인사말", async () => {
-        progress("로어북·인사말 심는 중…");
+        progress2("로어북·인사말 심는 중…");
         await installLoreAndGreetings(ctx2.charIndex, instUi.setName ? { name: BRAND.name } : {});
         return instUi.setName ? "로어북·인사말·봇 이름" : "로어북·인사말";
       });
       notifyInstalled();
       await run5("사진", async () => {
-        const n2 = await installPictures(ctx2.charIndex, progress);
+        const n2 = await installPictures(ctx2.charIndex, progress2);
         return n2 ? `사진 ${n2}장` : null;
       });
-      if (!s7?.icon) await run5("아이콘", async () => (await installIcon(ctx2.charIndex, progress), "아이콘"));
-      if (!s7?.wikiPack) await run5("위키 기본 문서", async () => (await installWikiPack(progress), "위키 기본 문서"));
-      if (!s7?.tokenizer) await run5("토크나이저", async () => (await installTokenizer(progress), "토크나이저"));
+      if (!s7?.icon) await run5("아이콘", async () => (await installIcon(ctx2.charIndex, progress2), "아이콘"));
+      if (!s7?.wikiPack) await run5("위키 기본 문서", async () => (await installWikiPack(progress2), "위키 기본 문서"));
+      if (!s7?.tokenizer) await run5("토크나이저", async () => (await installTokenizer(progress2), "토크나이저"));
     } else if (step === "icon-back") {
       await run5("이전 아이콘", async () => await restoreIcon(ctx2.charIndex) ? "이전 아이콘" : null);
     }
     if (done3.length) instUi.info = `${done3.join(" · ")} — 끝났어요.`;
-    else if (!failed.length) instUi.info = "바꿀 것이 없었어요.";
-    if (failed.length) instUi.notice = `안 된 것 — ${failed.join(" / ")}. 다시 누르면 안 된 것만 이어서 해요.`;
+    else if (!failed2.length) instUi.info = "바꿀 것이 없었어요.";
+    if (failed2.length) instUi.notice = `안 된 것 — ${failed2.join(" / ")}. 다시 누르면 안 된 것만 이어서 해요.`;
     instUi.busy = "";
     instUi.progress = "";
     await env3.refresh();
@@ -3574,23 +3606,4 @@ Next Paragraph Text
 .gw .dir-rename > small { grid-row: 2; grid-column: 2 / -1; font-size: 13px; color: var(--dim); }
 /* 이름만 있는 줄 = 카드 안 작은 제목 */
 .gw .dir-line:has(> span:first-child:only-child) { padding: 12px var(--pad) 0; }
-.gw .dir-line:has(> span:first-child:only-child) > span:first-child { min-height: 0; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
-.gw .dir-line:has(> span:first-child:only-child) + .dir-in, .gw .dir-line:has(> span:first-child:only-child) + .dir-grid > .dir-in:first-child { border-top: 0; }
-/* 사진 줄 */
-.gw .dir-in:has(> .dir-photo) { grid-template-areas: none; }
-.gw .dir-in:has(> .dir-photo) > span:first-child { grid-area: auto; grid-column: 1; grid-row: 1; }
-.gw .dir-in > .dir-photo { grid-area: auto; grid-column: 2; display: flex; align-items: center; gap: var(--gap); width: 100%; min-width: 0; padding: 0; border: 0; background: transparent; }
-.gw .dir-in > .dir-photo + .dir-photo { padding-top: var(--gap); }
-.gw .dir-in:has(> .dir-photo) > small, .gw .dir-in:has(> .dir-photo) > .dir-ext { grid-area: auto; grid-column: 2; }
-.gw .dir-photo-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.gw .dir-photo-name b { font-size: 13.5px; font-weight: 500; }
-.gw .dir-photo-name small { font-size: 12.5px; color: var(--dim); }
-.gw .dir-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-/* 거점 페이지: 거점마다 카드 하나 (머리 줄 + 펼친 패널) */
-.gw .gw-basepage .dir-kinds, .gw .gw-basepage .dir-help, .gw .gw-basepage [data-action="dir-help"] { display: none !important; }
-.gw .gw-basepage .dir-list { display: flex; flex-direction: column; gap: var(--gap); }
-.gw .gw-basepage .dir-row { margin: 0; }
-.gw .gw-basepage .dir-row.open { border-color: var(--accent-line); }
-.gw .gw-basepage .dir-head { min-height: 44px; padding: 6px var(--pad); gap: 12px; }
-.gw .gw-basepage .dir-name b { font-size: 14px; font-weight: 600; }
-.gw .gw-basep
+.gw .dir-line:has(> span:firs

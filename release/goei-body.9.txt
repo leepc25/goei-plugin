@@ -1,4 +1,12 @@
-≤24 items per tidied person; no `merge` for persons not listed.',
+mentioned); `update` when a listed item's state changes (partly used, broken, lent, now worn); `gone` when a listed item is used up, lost, destroyed, given away, or thrown away. `name` Korean ≤30 — for `update`/`gone` copy the listed name exactly; `desc` Korean ≤80 states amount/condition in words (never a count like ×3); `kind` one of `item_kinds`; `effect` Korean ≤60 only when the text says what it does; `m`, verbatim `quote`. ≤4 items; never invent one. Cash, bills, coins, cheques and account money are never items — the ledger (`transactions`) handles money.",
+    "<<END:items>>",
+    "<<SECTION:debrief>>",
+    "## 15c. Debrief",
+    "`ended_now` lists incidents that ended in this span (id, kind, name, grade, place, deployed `agents`, `result`, `trail_tail`, `mine`). The facts are already recorded; return one `debriefs` entry per item: `id` as given, `who` = one name from that item's `agents` (first when unsure), `text` = 2–3 Korean sentences (≤240 chars) in that agent's voice — what happened and how it felt. Only facts from `ended_now` and the confirmed span; never invent names, numbers, injuries or outcomes; no quotation marks around the whole note; no template symbols (double braces, double percent).",
+    "<<END:debrief>>",
+    "<<SECTION:tidy>>",
+    "## 11. Tidying an oversized record",
+    '`tidy` lists persons over the storage budget (`name`, `chars`, `target`). For each, besides this turn\'s changes, add `merge` items: `{"who","slot","op":"merge","from":[ids…],"text":"≤300 chars","m":"<confirmed m>","quote":null}`. A merge joins 2+ live entries of one slot into one denser statement keeping every still-true fact; merge only what overlaps, repeats or is superseded; never pinned entries. Prefer `history` (adjacent events), `state`/`scene` (only what is still true), then `knowledge`, `behavior`, `threads`; `relationship`/`speech` and per-target feature slots keep one per target; `affinity.appraisal` is never merged. Stop near `target`. ≤24 items per tidied person; no `merge` for persons not listed.',
     "<<END:tidy>>",
     "<<SECTION:suspicion>>",
     "## 10. Suspicion (general)",
@@ -913,13 +921,13 @@ Return the JSON object.` }
         manUi.getting = what;
         manUi.progress = "";
         rerender?.();
-        const progress = (t) => {
+        const progress2 = (t) => {
           manUi.progress = t;
           rerender?.();
         };
         try {
-          if (what === "tok") await installTokenizer(progress);
-          else await installWikiPack(progress);
+          if (what === "tok") await installTokenizer(progress2);
+          else await installWikiPack(progress2);
           manUi.info = what === "tok" ? "토크나이저를 받았어요. 이제 토큰 수를 정확히 세요." : "위키 기본 문서를 받았어요. 위키 탭에서 읽을 수 있어요.";
         } catch (error) {
           manUi.notice = `${what === "tok" ? "토크나이저" : "위키 기본 문서"}를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
@@ -2715,30 +2723,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       const head3 = month && month !== lastMonth ? monthLine(month, rows2) : "";
       lastMonth = month;
       return `${head3}<section class="gx-wt-day">
-    <h3><span>${esc23(dayLabel(g2.date))}</span><em>${esc23(formatDelta(g2.rows.filter((r) => r.e.src !== "manual").reduce((n2, r) => n2 + r.e.amount, 0)))}</em></h3>
-    <ul>${g2.rows.map(({ e, after }) => {
-        const open2 = walletUi.open === e.id;
-        const sub = subOf(e);
-        return `<li class="gx-wt-row${open2 ? " open" : ""}">
-        <button class="gx-wt-main" data-action="wallet-open" data-value="${esc23(e.id)}" aria-expanded="${open2}" aria-label="${esc23(`${SRC_NAME[e.src]} · ${e.memo} ${formatDelta(e.amount)}`)}">
-          <span class="gx-wt-ic ${e.src}" title="${SRC_NAME[e.src]}">${SRC_ICON2[e.src]}</span>
-          <span class="gx-wt-memo"><b>${esc23(e.memo || "(메모 없음)")}</b>${sub ? `<small>${esc23(sub)}</small>` : ""}</span>
-          <span class="gx-wt-amt"><b class="${e.amount < 0 ? "out" : "in"}">${esc23(formatDelta(e.amount))}</b><small>${esc23(after.toLocaleString("en-US"))}</small></span>
-        </button>
-        ${editable ? `<button class="gx-wt-del" data-action="wallet-del" data-value="${esc23(e.id)}" aria-label="이 거래 지우기">✕</button>` : ""}
-      </li>`;
-      }).join("")}</ul>
-  </section>`;
-    }).join("");
-  }
-  function walletTools(ctx2) {
-    if (!walletOn(ctx2)) return "";
-    const chip3 = (v, label2) => `<button class="gx-chip${walletUi.filter === v ? " on" : ""}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label2}</button>`;
-    return `<div class="gx-rec-tools gx-wt-tools">${chip3("all", "전체")}${chip3("in", "수입")}${chip3("out", "지출")}<input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc23(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div>`;
-  }
-  function walletPane(ctx2) {
-    if (!walletOn(ctx2)) {
-      return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></div>`;
-    }
-    const { rows: rows2, today, start: start3 } = rowsOf3(ctx2);
-    const sum = (f) => rows2.filte
+    <h3><span>${esc23(dayLabel(g2.date))}</span><em>${esc23(formatDelta(g2.rows.filter((r) => r.e.src !== "manual").reduc

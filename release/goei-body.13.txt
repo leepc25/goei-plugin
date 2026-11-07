@@ -1,4 +1,110 @@
-latestNote(o.store, "@rhythm", live)?.now : null;
+StatusLine(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
+      const tags = findStatusTags(m.content);
+      if (tags.length) return tags[tags.length - 1].raw.trim();
+    }
+    return null;
+  }
+  function stripStatusLines(messages) {
+    return messages.map((m) => {
+      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
+      const tags = findStatusTags(m.content);
+      if (!tags.length) return m;
+      let c = m.content;
+      for (const t of tags) c = c.replace(t.raw, "");
+      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
+    });
+  }
+  function statusBlock(line2, cols) {
+    const fields3 = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(" | ")}
+` : "";
+    return `${STATUS_HEAD}
+${line2}
+${fields3}${NOTE}`;
+  }
+  function rebuildStatusLine(line2, cols, fill3 = {}) {
+    const t = findStatusTags(line2)[0];
+    if (!t || !t.date) return line2;
+    const values = {
+      date: t.date,
+      time: t.time,
+      weather: t.weather,
+      temp: t.temp,
+      place: t.place,
+      target: t.target,
+      companions: t.companions.join(","),
+      deployed: t.deployed ? "투입" : "",
+      identity: t.identity || fill3.identity || "",
+      wallet: fill3.wallet !== void 0 && fill3.wallet !== null ? walletCell(fill3.wallet) : t.wallet
+    };
+    return formatStatusLine(values, cols);
+  }
+  function withIdentity(line2, identity) {
+    if (!identity) return line2;
+    const tags = findStatusTags(line2);
+    const t = tags[0];
+    if (!t || t.identity) return line2;
+    const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
+    if (cols !== 8) return line2;
+    return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
+  }
+  function withStatusBlock(messages, identity = "", shape) {
+    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
+    const line0 = lastStatusLine(messages);
+    if (!line0) return messages;
+    const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
+    const out = stripStatusLines(messages);
+    const at = out.map((m) => m?.role).lastIndexOf("user");
+    const block2 = { role: "system", content: statusBlock(line2, shape?.cols) };
+    return at < 0 ? [...out, block2] : [...out.slice(0, at), block2, ...out.slice(at)];
+  }
+
+  // src/core/people/request.ts
+  function peopleBlockFor(chat, o) {
+    if (!o.settings.on || o.settings.inject === "off") return { text: "", people: [], sheets: [] };
+    const names4 = entriesOf(o.store, o.extraNames ?? {});
+    const match = nameMatcher(names4);
+    const always = o.settings.always.filter((n2) => o.store.people[n2]);
+    const byCode = scenePeople(chat, o.store, match, { input: o.input }).filter((n2) => !always.includes(n2));
+    const byModel = (o.people ?? []).filter((n2) => o.store.people[n2] && !always.includes(n2) && !byCode.includes(n2));
+    const people = [...always, ...byCode, ...byModel].slice(0, Math.max(6, always.length));
+    if (!people.length) return { text: "", people: [], sheets: [] };
+    const live = liveness(chat);
+    const changes = liveChanges(o.store, live);
+    const blocks = [];
+    const sheets = [];
+    for (const n2 of people) {
+      const p = o.store.people[n2];
+      const sheet = o.sheetOf(n2);
+      if (sheet) sheets.push(sheet);
+      const note = o.settings.director === "note" ? latestNote(o.store, n2, live) : null;
+      blocks.push(
+        personBlock(p, o.store, live, changes, {
+          sheet,
+          mode: o.settings.inject,
+          unknown: o.settings.features.has("perception") ? unknownTo(p, o.store, live) : [],
+          user: o.user,
+          note,
+          temper: o.temperOf?.(n2),
+          speed: o.settings.speed,
+          speedDown: o.settings.speedDown,
+          turnCap: o.settings.turnCap,
+          // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+          maxChars: Math.floor(o.settings.blockCap / people.length),
+          taste: o.settings.features.has("taste"),
+          openness: o.settings.features.has("openness"),
+          axes: o.settings.features.has("axes"),
+          features: o.settings.features,
+          qual: o.settings.qualitative,
+          sexual: sexualTexts(p, o.settings)
+        })
+      );
+    }
+    if (o.settings.features.has("rhythm")) {
+      const docs = Object.values(o.store.docs).filter((d) => d.type === "rhythm").flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+      const note = o.settings.director === "note" ? latestNote(o.store, "@rhythm", live)?.now : null;
       const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
       if (rb) blocks.unshift(rb);
     }
@@ -95,13 +201,13 @@ latestNote(o.store, "@rhythm", live)?.now : null;
   async function onBeforeRequest(messages, type) {
     if (type !== "model" || !Array.isArray(messages)) return messages;
     if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
-    const failed = [];
+    const failed2 = [];
     const step = (name, run5, fallback) => {
       try {
         if (faultOn(name)) throw new Error("시험용 예외 주입");
         return run5();
       } catch (error) {
-        failed.push(`${name}(${reason2(error)})`);
+        failed2.push(`${name}(${reason2(error)})`);
         return fallback;
       }
     };
@@ -110,7 +216,7 @@ latestNote(o.store, "@rhythm", live)?.now : null;
         if (faultOn(name)) throw new Error("시험용 예외 주입");
         return await run5();
       } catch (error) {
-        failed.push(`${name}(${reason2(error)})`);
+        failed2.push(`${name}(${reason2(error)})`);
         return fallback;
       }
     };
@@ -152,9 +258,9 @@ latestNote(o.store, "@rhythm", live)?.now : null;
         if (chat) messages = step("시드", () => processRequest(messages, chat).messages, messages);
       }
     } catch (error) {
-      failed.push(`전체(${reason2(error)})`);
+      failed2.push(`전체(${reason2(error)})`);
     }
-    if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
+    if (failed2.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed2.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
     return sanitize(messages);
   }
   function sanitize(messages) {

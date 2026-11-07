@@ -714,7 +714,8 @@ if (!skip()) {
   await frame.click('[x-goei-fab] button');
   await frame.waitForSelector('.upd-banner', { timeout: 10000 });
   assert.match(await frame.textContent('.upd-banner'), /카드 v9\.0\.0/);
-  assert.equal(await frame.locator('.gx-xdot').count(), 1, '설정 아이콘에 점');
+  // 설정 단추가 머리글(.gx-xdot)에서 아래 탭·폰 서랍(.gx-nbadge.dot)으로 옮겨짐 (소지품 가지 26a49048f, 11-07). PC 탭과 폰 서랍에 하나씩 그려질 수 있어 「하나 이상」
+  assert.ok((await frame.locator('.gx-nbadge.dot[aria-label="새 버전"]').count()) >= 1, '설정 아이콘에 점');
   await frame.click('[data-action="upd-skip"]');
   assert.equal(await frame.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
   assert.equal(await frame.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');

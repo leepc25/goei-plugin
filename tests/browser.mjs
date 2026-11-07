@@ -2289,7 +2289,7 @@ if (fixture.globalLore.some(packed)) {
     await page.screenshot({ path: `${shots}/update-banner-m.png` });
     await page.setViewportSize({ width: 1100, height: 900 });
   }
-  assert.equal(await page.locator('.gx-xdot').count(), 1, '설정 아이콘에 점');
+  assert.ok((await page.locator('.gx-nbadge.dot[aria-label="새 버전"]').count()) >= 1, '설정 아이콘에 점 (아래 탭·폰 서랍, 소지품 가지 26a49048f)');
   await page.click('[data-action="upd-skip"]');
   assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
   assert.equal(await page.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');
@@ -2316,7 +2316,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gw .gx-hint');
   if (shots) await page.locator('.gw .gx-hint').last().scrollIntoViewIfNeeded().catch(() => {}), await page.screenshot({ path: `${shots}/update-done.png` });
   assert.match(await page.textContent('.gw .gw-setbody'), /v9\.0\.0으로 바꿨어요/);
-  assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
+  assert.equal(await page.locator('.gx-nbadge.dot[aria-label="새 버전"]').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);
   console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지, 바뀐 카드 사진만 받기)');
   await page.close();

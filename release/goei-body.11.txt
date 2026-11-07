@@ -1,4 +1,26 @@
-:before { content: ''; position: absolute; inset: 4px 10%; border-radius: 14px; background: color-mix(in srgb, var(--signal) 9%, transparent); z-index: -1; }
+ction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
+  .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
+  .gx-logo.mob { display: grid; }
+  .gx-nb, .gx-nb.mob { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 0 2px; border-radius: 0; font-size: 12px; text-align: center; background: transparent; }
+  .gx-nb:hover { background: transparent; }
+  .gx-nb.on { background: transparent; }
+  .gx-nb svg { width: 24px; height: 24px; }
+  .gx-nb .gx-nbadge { position: absolute; top: 5px; left: calc(50% + 6px); margin: 0; min-width: 18px; height: 18px; font-size: 11px; }
+  /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
+  .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
+  /* 하단 바 (v0.16.23): 위키·임무·상황판·괴담톡·괴담넷 다섯 칸, 가운데 상황판이 홈. 닫기는 양 끝 밖에 숨었다가 당기면 나온다 (ui/mbar.ts) */
+  .gx-nav { padding: 2px 0 calc(2px + env(safe-area-inset-bottom)); }
+  .gx-nav > .gx-nb { display: none; }
+  .gx-mbar { display: block; flex: 1; min-width: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .gx-mtrack { position: relative; display: flex; will-change: transform; }
+  .gx-mtrack.back { transition: transform .26s cubic-bezier(.2, .9, .3, 1.25); }
+  /* 2026-10-19 사용자: 하단 바를 다시 크게 */
+  .gx-mtrack > .gx-nb { display: flex; flex: 1 1 0; min-width: 0; position: relative; min-height: 60px; gap: 4px; font-size: 12.5px; }
+  .gx-mtrack > .gx-nb svg { width: 25px; height: 25px; }
+  .gx-mtrack > .gx-nb .gx-nbadge.dot { top: 9px; }
+  /* 홈(상황판): 살짝 다른 색의 둥근 바탕 */
+  .gx-mtrack > .gx-nb.home { color: var(--mint); isolation: isolate; }
+  .gx-mtrack > .gx-nb.home::before { content: ''; position: absolute; inset: 4px 10%; border-radius: 14px; background: color-mix(in srgb, var(--signal) 9%, transparent); z-index: -1; }
   .gx-mtrack > .gx-nb.home.on { color: var(--signal); }
   .gx-mtrack > .gx-nb.home.on::before { background: color-mix(in srgb, var(--signal) 16%, transparent); }
   .gx-mclose { position: absolute; top: 0; bottom: 0; width: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-size: 11px; transition: color .12s ease, background .12s ease; }
@@ -2124,26 +2146,4 @@ button.mk-go:hover { color: var(--signal); }
 .ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
 .ip-extra { display: flex; gap: 6px; margin-top: 6px; }
 .ip-extra input { flex: 1; }
-.ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
-.ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
-
-.pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
-
-/* 상태창 칸 표 (설정 상황판 → 상태창 칸) */
-.st-cols { display: flex; flex-direction: column; gap: 4px; }
-.st-col-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
-.st-col-row:last-child { border-bottom: 0; }
-.st-col-row.off .st-col-name b { color: var(--dim); }
-.st-col-name { display: flex; flex-direction: column; min-width: 0; }
-.st-col-name b { font-size: 13px; }
-.st-col-name small { font-size: 11px; color: var(--dim); }
-.st-won { width: 150px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
-.st-text { width: 220px; max-width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
-/* ID카드 잔고 칩 + 장부 창 */
-.gx-wallet { width: 100%; padding: 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; font-variant-numeric: tabular-nums; }
-.gx-wallet em { font-weight: 700; }
-.gx-wallet:hover em { color: var(--signal); }
-
-/* ── 조작 모양 통일 (2026-10-27 사용자: 단추·칩·선택 상자가 제각각이면 안 된다) ──
-   높이 32 · 모서리 8 · 글자 13 · 아이콘 15 · 테두리 1 — 어느 화면이든 같은 모양 */
-.gx-mini, .gx-chip, .gx-select, .gx-step, .gx-seg, .ph-act .gx-mini, .pp-upbar .gx-mini, .gx-row-btns .gx-mini, .upd-act .gx-min
+.ip-tem

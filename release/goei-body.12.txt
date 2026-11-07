@@ -1,4 +1,26 @@
-i {
+plate { font-family: ui-monospace, monospace; font-size: 12.5px; }
+.ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
+
+.pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+
+/* 상태창 칸 표 (설정 상황판 → 상태창 칸) */
+.st-cols { display: flex; flex-direction: column; gap: 4px; }
+.st-col-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.st-col-row:last-child { border-bottom: 0; }
+.st-col-row.off .st-col-name b { color: var(--dim); }
+.st-col-name { display: flex; flex-direction: column; min-width: 0; }
+.st-col-name b { font-size: 13px; }
+.st-col-name small { font-size: 11px; color: var(--dim); }
+.st-won { width: 150px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.st-text { width: 220px; max-width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
+/* ID카드 잔고 칩 + 장부 창 */
+.gx-wallet { width: 100%; padding: 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; font-variant-numeric: tabular-nums; }
+.gx-wallet em { font-weight: 700; }
+.gx-wallet:hover em { color: var(--signal); }
+
+/* ── 조작 모양 통일 (2026-10-27 사용자: 단추·칩·선택 상자가 제각각이면 안 된다) ──
+   높이 32 · 모서리 8 · 글자 13 · 아이콘 15 · 테두리 1 — 어느 화면이든 같은 모양 */
+.gx-mini, .gx-chip, .gx-select, .gx-step, .gx-seg, .ph-act .gx-mini, .pp-upbar .gx-mini, .gx-row-btns .gx-mini, .upd-act .gx-mini {
   box-sizing: border-box; min-height: 32px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px;
   font: inherit; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; vertical-align: middle; cursor: pointer;
 }
@@ -402,6 +424,8 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
 .it-c .it-ic img { width: 84%; height: 84%; object-fit: contain; image-rendering: pixelated; }
+.it-ph .it-ic img, .it-pickrow .it-ic img { width: 86%; height: 86%; object-fit: contain; image-rendering: pixelated; }
+.it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
 .it-c b { padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .it-c.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
 .it-c.empty .it-ic { background: none; }
@@ -582,6 +606,73 @@ ${themeVars("[x-goei-usebox]")}
     });
   }
 
+  // src/host/itemicons.ts
+  var ITEMS_KEY = "goei:data-items";
+  var pack3 = null;
+  var loading2 = null;
+  var failed = "";
+  var progress = "";
+  var redraw2 = () => {
+  };
+  var urls2 = /* @__PURE__ */ new Map();
+  function setItemIconRedraw(fn2) {
+    redraw2 = fn2;
+  }
+  var itemIconStatus = () => ({ ready: !!pack3, loading: !!loading2, progress, failed });
+  function ensureItemIcons() {
+    if (pack3 || loading2) return loading2 ?? Promise.resolve();
+    loading2 = (async () => {
+      failed = "";
+      try {
+        let saved = null;
+        try {
+          saved = await risuai.pluginStorage.getItem(ITEMS_KEY);
+        } catch {
+        }
+        if (typeof saved === "string" && packMatches(saved, ITEMS_PACK.expect)) {
+          try {
+            pack3 = applyItemsPack(saved);
+            return;
+          } catch (error) {
+            console.log(`[goei] 저장된 소지품 그림을 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+        const text4 = await fetchPack(ITEMS_PACK, (t) => {
+          progress = t;
+          redraw2();
+        });
+        pack3 = applyItemsPack(text4);
+        try {
+          await risuai.pluginStorage.setItem(ITEMS_KEY, text4);
+        } catch (error) {
+          console.log(`[goei] 소지품 그림을 저장소에 두지 못했어요 (이번엔 메모리로): ${error instanceof Error ? error.message : String(error)}`);
+        }
+      } catch (error) {
+        failed = error instanceof DataPackError || error instanceof Error ? error.message : String(error);
+        console.log(`[goei] 소지품 그림 팩: ${failed}`);
+      } finally {
+        progress = "";
+        loading2 = null;
+        redraw2();
+      }
+    })();
+    return loading2;
+  }
+  function itemIconUrl(name, kind) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    const file = matchItemIcon(pack3.table, name, kind);
+    if (!file) return null;
+    let u = urls2.get(file);
+    if (!u) {
+      u = `data:image/png;base64,${pack3.icons[file]}`;
+      urls2.set(file, u);
+    }
+    return u;
+  }
+
   // src/ui/itemIcons.ts
   var stroke2 = (d) => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   var ITEM_ICONS = {
@@ -622,7 +713,8 @@ ${themeVars("[x-goei-usebox]")}
   var itemsOf = (ctx2) => readItems(ctx2.chat.scriptstate);
   var liveOf = (ctx2) => liveItems(itemsOf(ctx2), aliveAnchors(ctx2.chat));
   function itemPic(it) {
-    return ITEM_ICONS[it.kind];
+    const u = itemIconUrl(it.name, it.kind);
+    return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICONS[it.kind];
   }
   var FROM_NAME = { store: "장터", story: "본문", manual: "직접" };
   var dateOf = (iso) => {
@@ -661,7 +753,9 @@ ${themeVars("[x-goei-usebox]")}
     ${isPhone() ? "" : `<span class="it-right">${addButton("it-act")}${mergeButton(ctx2, "it-act")}</span>`}
     <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc30(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
   </div>`;
-    return `${tools}<div class="it-body">${itemsUi.view === "log" ? logList(ctx2) : gridHtml(ctx2)}</div>`;
+    const st = itemIconStatus();
+    const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc30(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 종류 아이콘으로 보여요. (${esc30(st.failed)})</p>` : "";
+    return `${tools}${picNote}<div class="it-body">${itemsUi.view === "log" ? logList(ctx2) : gridHtml(ctx2)}</div>`;
   }
   function gridHtml(ctx2) {
     const slots = itemSlots(ctx2.chat.scriptstate);
@@ -1928,6 +2022,9 @@ ${note.trim()}` : card2;
       if (view.kind === "picker") renderPicker();
       else render2();
       if (editorOpen()) render();
+    });
+    setItemIconRedraw(() => {
+      if (view.kind !== "picker" && tab === "items") render2();
     });
     const style = document.createElement("style");
     style.textContent = style_default2;
@@ -3342,110 +3439,4 @@ ${note.trim()}` : card2;
   // src/core/statusctx.ts
   var STATUS_HEAD = "[Previous status]";
   var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
-  function lastStatusLine(messages) {
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const m = messages[i];
-      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
-      const tags = findStatusTags(m.content);
-      if (tags.length) return tags[tags.length - 1].raw.trim();
-    }
-    return null;
-  }
-  function stripStatusLines(messages) {
-    return messages.map((m) => {
-      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
-      const tags = findStatusTags(m.content);
-      if (!tags.length) return m;
-      let c = m.content;
-      for (const t of tags) c = c.replace(t.raw, "");
-      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
-    });
-  }
-  function statusBlock(line2, cols) {
-    const fields3 = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(" | ")}
-` : "";
-    return `${STATUS_HEAD}
-${line2}
-${fields3}${NOTE}`;
-  }
-  function rebuildStatusLine(line2, cols, fill3 = {}) {
-    const t = findStatusTags(line2)[0];
-    if (!t || !t.date) return line2;
-    const values = {
-      date: t.date,
-      time: t.time,
-      weather: t.weather,
-      temp: t.temp,
-      place: t.place,
-      target: t.target,
-      companions: t.companions.join(","),
-      deployed: t.deployed ? "투입" : "",
-      identity: t.identity || fill3.identity || "",
-      wallet: fill3.wallet !== void 0 && fill3.wallet !== null ? walletCell(fill3.wallet) : t.wallet
-    };
-    return formatStatusLine(values, cols);
-  }
-  function withIdentity(line2, identity) {
-    if (!identity) return line2;
-    const tags = findStatusTags(line2);
-    const t = tags[0];
-    if (!t || t.identity) return line2;
-    const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
-    if (cols !== 8) return line2;
-    return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
-  }
-  function withStatusBlock(messages, identity = "", shape) {
-    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
-    const line0 = lastStatusLine(messages);
-    if (!line0) return messages;
-    const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
-    const out = stripStatusLines(messages);
-    const at = out.map((m) => m?.role).lastIndexOf("user");
-    const block2 = { role: "system", content: statusBlock(line2, shape?.cols) };
-    return at < 0 ? [...out, block2] : [...out.slice(0, at), block2, ...out.slice(at)];
-  }
-
-  // src/core/people/request.ts
-  function peopleBlockFor(chat, o) {
-    if (!o.settings.on || o.settings.inject === "off") return { text: "", people: [], sheets: [] };
-    const names4 = entriesOf(o.store, o.extraNames ?? {});
-    const match = nameMatcher(names4);
-    const always = o.settings.always.filter((n2) => o.store.people[n2]);
-    const byCode = scenePeople(chat, o.store, match, { input: o.input }).filter((n2) => !always.includes(n2));
-    const byModel = (o.people ?? []).filter((n2) => o.store.people[n2] && !always.includes(n2) && !byCode.includes(n2));
-    const people = [...always, ...byCode, ...byModel].slice(0, Math.max(6, always.length));
-    if (!people.length) return { text: "", people: [], sheets: [] };
-    const live = liveness(chat);
-    const changes = liveChanges(o.store, live);
-    const blocks = [];
-    const sheets = [];
-    for (const n2 of people) {
-      const p = o.store.people[n2];
-      const sheet = o.sheetOf(n2);
-      if (sheet) sheets.push(sheet);
-      const note = o.settings.director === "note" ? latestNote(o.store, n2, live) : null;
-      blocks.push(
-        personBlock(p, o.store, live, changes, {
-          sheet,
-          mode: o.settings.inject,
-          unknown: o.settings.features.has("perception") ? unknownTo(p, o.store, live) : [],
-          user: o.user,
-          note,
-          temper: o.temperOf?.(n2),
-          speed: o.settings.speed,
-          speedDown: o.settings.speedDown,
-          turnCap: o.settings.turnCap,
-          // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
-          maxChars: Math.floor(o.settings.blockCap / people.length),
-          taste: o.settings.features.has("taste"),
-          openness: o.settings.features.has("openness"),
-          axes: o.settings.features.has("axes"),
-          features: o.settings.features,
-          qual: o.settings.qualitative,
-          sexual: sexualTexts(p, o.settings)
-        })
-      );
-    }
-    if (o.settings.features.has("rhythm")) {
-      const docs = Object.values(o.store.docs).filter((d) => d.type === "rhythm").flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
-      const note = o.settings.director === "note" ? 
+  function last
