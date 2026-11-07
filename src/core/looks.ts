@@ -35,6 +35,8 @@ export interface LookRow {
   ch: number;
   ox: number;
   oy: number;
+  /** 장 하나 길이 (초) */
+  sec: number;
   /** 정면 대기 줄 시트 base64 webp (가로로 n장, 장마다 cw×ch) */
   img: string;
 }
@@ -57,7 +59,7 @@ export function parseLooksPack(text: string): LookRow[] {
     const n = num(r.n), cw = num(r.cw), ch = num(r.ch);
     if (!(n >= 1 && cw > 0 && ch > 0)) continue;
     const g = r.g === '남' || r.g === '여' ? r.g : '';
-    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, img: r.img });
+    out.push({ id: r.id, name: String(r.name ?? ''), g, unique: r.unique === true, n, w: num(r.w) || 128, h: num(r.h) || 256, cw, ch, ox: num(r.ox) || 0, oy: num(r.oy) || 0, sec: num(r.sec) > 0 ? num(r.sec) : LOOK_FRAME_SEC, img: r.img });
   }
   return out;
 }
@@ -71,8 +73,8 @@ export const lookId = (state: ScriptState | Record<string, unknown> | undefined)
 /** 고르기 격자에 보일 모습: 그 성별의 일반 NPC 프리셋 전부 (팩 순서 그대로, 세력 구분 없음 — 2026-11-08 사용자) */
 export const looksOf = (rows: LookRow[], g: LookGender): LookRow[] => rows.filter((r) => !r.unique && r.g === g);
 
-/** 한 번도 고른 적 없을 때 기본 아바타 (2026-11-08 사용자: 치마 입은 관리국 여자 직원) */
-export const LOOK_FIRST = '관리국여A';
+/** 한 번도 고른 적 없을 때 기본 아바타 (2026-11-08 사용자: PixelLab 페르소나 여자 A) */
+export const LOOK_FIRST = '페르소나여A';
 
 /** 시작 패널 기본 아바타: 마지막에 고른 것 → 처음 기본 */
 export function defaultLook(rows: LookRow[], last: string | undefined): string {

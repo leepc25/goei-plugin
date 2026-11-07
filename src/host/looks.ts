@@ -1,7 +1,7 @@
 // 내 모습 그림 (2026-11-07 사용자): 필드 인물 126명의 대기 동작 팩(goei-data-looks, 약 1.5MB 글)을 처음 그릴 때 한 번 받아 저장소에 둔다.
 // 받기·저장은 소지품 그림 팩(host/itemicons.ts)과 같다. 그림은 blob: 주소 하나씩 만들어 다시 그려도 같은 주소를 쓴다(화면 글이 가볍게).
 import { packMatches } from '../core/datapack';
-import { LOOK_FRAME_SEC, lookFor, LOOKS_PACK, parseLooksPack, type LookRow } from '../core/looks';
+import { lookFor, LOOKS_PACK, parseLooksPack, type LookRow } from '../core/looks';
 import { playerAgent } from '../core/player';
 import { DataPackError, fetchPack } from './datapack';
 import type { ChatContext } from './risu';
@@ -106,7 +106,7 @@ export const idleOf = (r: LookRow): IdleLook => ({
   frames: r.n,
   w: r.cw,
   h: r.ch,
-  sec: LOOK_FRAME_SEC,
+  sec: r.sec,
   box: { w: r.w, h: r.h, ox: r.ox, oy: r.oy },
 });
 

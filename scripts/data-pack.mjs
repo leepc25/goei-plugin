@@ -75,8 +75,9 @@ export function itemsPackText() {
   return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
 }
 
-/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, n, w, h, cw, ch, ox, oy, img}] }.
+/** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, n, w, h, cw, ch, ox, oy, sec?, img}] }.
  *  id = 인물 팩 번호(char-6.54 → '6.54'). 고유 인물(char-1~5)은 명부 이름(cfg.name)으로 찾는다.
+ *  맨 앞에는 페르소나 전용 아바타(game-src/looks/<이름>/look.json + 시트, 사용자가 PixelLab에서 만든 것, id 7.N).
  *  성별 g: 일반 NPC(char-6)만 필드 신상표(src/game/world/mobProfiles.json sex). 고유 인물은 고르는 창이 안 열려 성별이 필요 없다('').
  *  img = 정면 대기 줄(A['50'], 남쪽을 봄) 시트 base64 webp. src/core/looks.ts parseLooksPack 이 읽는 모양 */
 export function looksPackText() {
@@ -90,6 +91,13 @@ export function looksPackText() {
     });
   const profiles = readJson('src/game/world/mobProfiles.json');
   const looks = [];
+  const own = new URL('game-src/looks/', ROOT);
+  const persona = readdirSync(own)
+    .map((d) => ({ d, j: readJson(`game-src/looks/${d}/look.json`) }))
+    .sort((a, b) => Number(a.j.id.split('.')[1]) - Number(b.j.id.split('.')[1]));
+  for (const { d, j } of persona) {
+    looks.push({ id: j.id, name: j.name, g: j.g, unique: false, n: j.n, w: j.w, h: j.h, cw: j.cw, ch: j.ch, ox: j.ox, oy: j.oy, sec: j.sec, img: readFileSync(new URL(`game-src/looks/${d}/${j.file}`, ROOT)).toString('base64') });
+  }
   for (const d of ids) {
     const j = readJson(`game-pack/${d}/char.json`);
     const m = j.A?.['50'];

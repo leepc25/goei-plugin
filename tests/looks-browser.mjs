@@ -10,9 +10,9 @@ const out = process.argv[2] ?? '/tmp/looks-shots';
 const fx = loadFixture(process.argv[3] ?? new URL('../.scratch/fixture/fixture.json', import.meta.url).pathname);
 mkdirSync(out, { recursive: true });
 const looks = JSON.parse(distPack('goei-data-looks')).looks;
-assert.equal(looks.length, 126, '팩: 126명');
+assert.equal(looks.length, 128, '팩: 필드 인물 126명 + 페르소나 2명');
 const count = (g) => looks.filter((r) => !r.unique && r.g === g).length;
-assert.deepEqual([count('남'), count('여')], [38, 33], '공통 풀: 남38·여33 (세력 구분 없음)');
+assert.deepEqual([count('남'), count('여')], [39, 34], '공통 풀: 남39·여34 (페르소나 남A·여A 포함, 세력 구분 없음)');
 
 const b = await launch();
 const fails = [];
@@ -28,10 +28,10 @@ for (const vp of ['pc', 'phone']) {
   await click('.gx-fac[data-value="A00"]');
   const heads = await page.$$eval('.gx-body > section > h2', (els) => els.map((e) => e.textContent.trim()));
   if (!heads.includes('3아바타')) fails.push(`[${vp}] 아바타 단계 없음 ${JSON.stringify(heads)}`);
-  // 처음엔 기본 아바타(관리국여A, 치마 입은 관리국 직원)가 골라져 있다
-  const first = looks.find((r) => !r.unique && r.name === '관리국여A').id;
+  // 처음엔 기본 아바타(페르소나여A)가 골라져 있다
+  const first = looks.find((r) => !r.unique && r.name === '페르소나여A').id;
   const chipLook = () => page.$eval('.gx-lookchip', (e) => e.dataset.look);
-  if ((await chipLook()) !== first) fails.push(`[${vp}] 기본 아바타가 관리국여A가 아님 (${await chipLook()})`);
+  if ((await chipLook()) !== first) fails.push(`[${vp}] 기본 아바타가 페르소나여A가 아님 (${await chipLook()})`);
   if (await page.isDisabled('.gx-start')) fails.push(`[${vp}] 기본 아바타인데 출발이 막힘`);
   await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);
