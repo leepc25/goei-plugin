@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "가시 너클",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. brass knuckles with sharp metal spikes on the knuckle ridge, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은 단검",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shining silver dagger with a cross-shaped guard, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방울칼",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean shaman ritual knife with small brass bells and colored cloth tied to the handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚싯바늘 갈고리",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large rusty fishing gaff hook on a short wooden handle, diagonal view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성수 수류탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass grenade filled with glowing holy water, a small cross painted on it, metal pin on top. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소금탄",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a handful of shotgun shells packed with coarse white salt, one cracked open showing the salt. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방탄 방패",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black ballistic riot shield with a small bulletproof viewing window, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전술 조끼",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical vest with many magazine pouches and straps, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사슬 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chainmail shirt of interlocking steel rings, laid flat, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark brown leather armor vest with stitched plates and buckles, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "폭발물 처리복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy bulky bomb disposal suit with a thick padded body and big helmet with visor, standing empty, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화학 방호복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow hazmat chemical protection suit with hood and visor, standing empty, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팔꿈치 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black hard-shell elbow pads with straps. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정강이 보호대",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of black hard-shell shin guards with straps. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전술 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical helmet with side rails and a night vision mount on the front, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "터번",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrapped white turban, front view. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
