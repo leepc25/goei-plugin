@@ -8030,17 +8030,6 @@
   },
   {
    "keywords": [
-    "우산 칼"
-   ],
-   "file": "weapon_080.png",
-   "kind": "weapon",
-   "base": false,
-   "name": "우산 칼",
-   "src": "game-src/items/raw/batch_134/06.png",
-   "old_src": "game-src/items/raw/batch_69/08.png"
-  },
-  {
-   "keywords": [
     "쇠갈고리"
    ],
    "file": "weapon_086.png",
@@ -8527,17 +8516,6 @@
    "base": false,
    "name": "고춧가루",
    "src": "game-src/items/raw/batch_39/01.png"
-  },
-  {
-   "keywords": [
-    "도토리묵"
-   ],
-   "file": "food_107.png",
-   "kind": "food",
-   "base": false,
-   "name": "도토리묵",
-   "src": "game-src/items/raw/batch_134/10.png",
-   "old_src": "game-src/items/raw/batch_71/13.png"
   },
   {
    "keywords": [
@@ -10244,20 +10222,16 @@
    "keywords": [
     "삼단봉"
    ],
-   "file": "weapon_046.png",
+   "file": "weapon_045.png",
    "kind": "weapon",
    "base": false,
    "name": "삼단봉",
    "src": "game-src/items/raw/batch_69/02.png",
-   "merged_into": "경찰봉",
-   "own_file": "weapon_045.png",
    "old_src": "game-src/items/raw/batch_06/02.png"
   },
   {
    "keywords": [
-    "경찰봉",
-    "진압봉",
-    "삼단봉"
+    "경찰봉"
    ],
    "file": "weapon_046.png",
    "kind": "weapon",
@@ -10270,13 +10244,11 @@
    "keywords": [
     "진압봉"
    ],
-   "file": "weapon_046.png",
+   "file": "weapon_047.png",
    "kind": "weapon",
    "base": false,
    "name": "진압봉",
    "src": "game-src/items/raw/batch_69/04.png",
-   "merged_into": "경찰봉",
-   "own_file": "weapon_047.png",
    "old_src": "game-src/items/raw/batch_06/04.png"
   },
   {
@@ -20049,6 +20021,32 @@
    "src": "game-src/items/raw/batch_68/16.png",
    "merged_into": "자물쇠",
    "own_file": "tool_200.png"
+  }
+ ],
+ "excluded": [
+  {
+   "keywords": [
+    "우산 칼"
+   ],
+   "file": "weapon_080.png",
+   "kind": "weapon",
+   "base": false,
+   "name": "우산 칼",
+   "src": "game-src/items/raw/batch_134/06.png",
+   "old_src": "game-src/items/raw/batch_69/08.png",
+   "excluded_note": "사용자 11-07 「빼」: 그림이 안 됨. 파일은 남김"
+  },
+  {
+   "keywords": [
+    "도토리묵"
+   ],
+   "file": "food_107.png",
+   "kind": "food",
+   "base": false,
+   "name": "도토리묵",
+   "src": "game-src/items/raw/batch_134/10.png",
+   "old_src": "game-src/items/raw/batch_71/13.png",
+   "excluded_note": "사용자 11-07 「빼」: 그림이 안 됨. 파일은 남김"
   }
  ]
 }
