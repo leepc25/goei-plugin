@@ -17,36 +17,63 @@ const log = `<div class="gx-wt-list">
 <li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>부적 1장 사용</b><small>본문 · 「부적을 꺼내 문틈에 끼웠다」</small></span><span class="gx-wt-amt"><small>11-07</small></span></div></li>
 <li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>생수 1병 사용</b><small>사용 단추</small></span><span class="gx-wt-amt"><small>11-06</small></span></div></li>
 <li class="gx-wt-row"><div class="gx-wt-main"><span class="gx-wt-memo"><b>손수건 버림</b><small>직접</small></span><span class="gx-wt-amt"><small>11-06</small></span></div></li></div>`;
-const body = (mode) => `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist"><button class="ph-sub">가계부</button><button class="ph-sub on">소지품</button></div><div class="gx-wallettab it-tab">
-<section class="gx-mon gx-wt-tiles"><div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>소지품</span></span><span>2025.01.01</span></div>
-<div class="gx-mon-cells"><div class="gx-mon-cell gx-wt-tile bal"><small>칸</small><div class="gx-wt-balrow"><b class="mint">12 / 16</b></div><span>한계 「가방 하나와 주머니, 두 손」</span></div>
-<div class="gx-mon-cell gx-wt-tile"><small>넘침</small><b class="red">1</b><span>본편이 이번 턴에 처리</span></div><div class="gx-mon-cell gx-wt-tile"><small>이번 턴 사용</small><b class="mint">1</b><span>소금 봉지</span></div><div class="gx-mon-cell gx-wt-tile"><small>기록</small><b class="">3</b><span>사용·처분</span></div></div></section>
-<div class="gx-rec-tools gx-wt-tools"><button class="gx-chip${mode === 'log' ? '' : ' on'}">물건</button><button class="gx-chip${mode === 'log' ? ' on' : ''}">기록</button><button class="gx-chip">＋ 직접 넣기</button><button class="gx-chip">합치기</button><input class="gx-wt-q" type="search" placeholder="찾기: 물건·기록"></div>
+const body = (mode, vp) => `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist"><button class="ph-sub">가계부</button><button class="ph-sub on">소지품</button></div><div class="gx-wallettab it-tab">
+
+<div class="gx-rec-tools gx-wt-tools"><span class="it-cnt"><b>12 / 16</b><em>넘침 1</em></span><button class="gx-chip${mode === 'log' ? '' : ' on'}">물건</button><button class="gx-chip${mode === 'log' ? ' on' : ''}">기록</button>${vp === 'pc' ? '<button class="gx-chip">＋ 직접 넣기</button><button class="gx-chip">합치기</button>' : ''}<input class="gx-wt-q" type="search" placeholder="찾기: 물건·기록"></div>
 ${mode === 'log' ? log : grid}${mode === 'hover' ? tip : ''}${mode === 'pop' ? pop : ''}</div>`;
 const css = `
+.it-cnt{display:inline-flex;align-items:baseline;gap:8px;margin-right:4px;font-family:var(--mono)}.it-cnt b{font-size:16px;color:var(--signal)}.it-cnt em{font-style:normal;font-size:12px;color:#e5484d;font-weight:600}
 .it-tabs.gx-rec-tabs{grid-template-columns:repeat(2,1fr)}.it-tab{display:flex;flex-direction:column;flex:1;min-height:0;position:relative}
 .it-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:1fr;gap:10px;flex:1;min-height:0}
 .it-c{position:relative;min-width:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px;font:inherit}
 .it-c .it-ic{color:var(--signal);width:48%;aspect-ratio:1;display:grid;place-items:center}.it-c .it-ic svg{width:100%;height:100%}.it-c b{font-size:13px;font-weight:600;text-align:center;line-height:1.2}
 .it-c.empty{background:none;border:1px dashed var(--line2)}.it-c.sel{border-color:var(--signal);box-shadow:0 0 0 1px var(--signal) inset}.it-c.over{border-color:var(--danger,#e5484d)}.it-c:hover{background:color-mix(in srgb,var(--signal) 6%,var(--panel))}
-.it-tip{position:absolute;left:150px;top:214px;width:260px;background:var(--void);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.8);z-index:3}.it-tip b{display:block;font-size:14px}.it-tip small{color:var(--dim);font-size:11.5px}.it-tip p{margin:8px 0 0;font-size:12.5px;line-height:1.5;color:var(--sub)}.it-tip .ef{color:var(--text)}
+.it-tip{position:absolute;left:150px;top:66px;width:260px;background:var(--void);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.8);z-index:3}.it-tip b{display:block;font-size:14px}.it-tip small{color:var(--dim);font-size:11.5px}.it-tip p{margin:8px 0 0;font-size:12.5px;line-height:1.5;color:var(--sub)}.it-tip .ef{color:var(--text)}
 .it-dim{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:50}.it-pop{width:min(360px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line2);border-radius:14px;padding:14px;box-shadow:0 24px 50px -20px rgba(0,0,0,.9)}
 .it-ph{display:flex;gap:10px;align-items:center}.it-ph .it-ic{width:34px;height:34px;color:var(--signal)}.it-ph .it-ic svg{width:100%;height:100%}.it-ph b{display:block;font-size:15px}.it-ph small{color:var(--dim);font-size:11.5px}.it-x{margin-left:auto}
 .it-pop p{margin:10px 0 0;font-size:13px;line-height:1.5;color:var(--sub)}.it-pop .ef{color:var(--text)}.it-btns{display:flex;gap:6px;margin-top:12px}.it-btns .gx-chip{flex:1;justify-content:center}.it-btns .red{color:#e5484d;border-color:#e5484d}
-@media (max-width:760px){.it-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.it-tip{display:none}}`;
+@media (max-width:760px){.it-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.it-tip{display:none}.it-cnt b{font-size:15px}}
+.it-bottom{position:absolute;left:0;right:0;z-index:4}.it-tools,.it-drawer{height:52px;display:flex;gap:4px;padding:4px 8px;border-top:1px solid var(--line);background:var(--void)}
+.it-drawer{position:absolute;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line2);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}
+.it-tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;color:var(--sub);font:600 11px/1 inherit;font-family:inherit}.it-tb svg{width:22px !important;height:22px !important;flex:none;display:block}
+.it-grip{position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);width:48px;height:8px;background:var(--void);border:1px solid var(--line);border-bottom:0;border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;padding:0;z-index:6}.it-grip i{width:18px;height:2px;border-radius:2px;background:var(--dim)}.it-grip.on i{background:var(--signal)}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/초안2_';
 for (const vp of ['pc', 'phone']) {
   const { page } = await boot(b, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } }, vp);
   await openWin(page); await sleep(300); if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true); await sleep(200);
   await page.evaluate(() => document.querySelector('[data-action="tab"][data-value="records"]')?.click()); await sleep(300);
   await page.addStyleTag({ content: css });
-  for (const mode of vp === 'pc' ? ['hover', 'pop', 'log'] : ['grid', 'pop']) {
-    await page.evaluate((html) => {
+  await page.evaluate(() => { for (const el of document.body.querySelectorAll('*')) { if (el.children.length === 0 && /ANOMALY SIMULATION/.test(el.textContent || '')) { let n = el; while (n && n !== document.body && getComputedStyle(n).position !== 'fixed') n = n.parentElement; if (n && n !== document.body) n.style.display = 'none'; } } });
+  for (const mode of vp === 'pc' ? ['hover', 'pop', 'log'] : ['grid', 'pop', 'drawer']) {
+    await page.evaluate(({ html, mode }) => { document.body.dataset.itDrawer = mode === 'drawer' ? '1' : '';
       const m = document.querySelector('main.gx-body'); m.innerHTML = html;
       const t = document.querySelector('.gx-title, .gx-head h1, .gx-brand b'); if (t) t.textContent = '소지품';
       const nb = document.querySelector('.gx-nb[data-value="records"]'); if (nb && !document.querySelector('.gx-nb[data-value="items"]')) { const c = nb.cloneNode(true); c.dataset.value = 'items'; c.querySelector('span').textContent = '소지품'; c.classList.add('on'); nb.classList.remove('on'); nb.before(c); }
       const mb = document.querySelector('.gx-x.gx-recbtn'); if (mb) mb.classList.add('on');
-    }, body(mode));
+      if (window.innerWidth <= 760) {
+        const brand = document.querySelector('.gx-brand b'); if (brand) brand.textContent = '소지품';
+        document.querySelectorAll('.gx-head-act button').forEach(b => { const l = b.getAttribute('aria-label') || ''; if (/기록|설정/.test(l)) b.remove(); });
+        const track = document.querySelector('.gx-mtrack');
+        if (track && !track.querySelector('[data-value="items"]')) {
+          const get = (v) => track.querySelector(`[data-value="${v}"]`);
+          const mk = (v, label, svg) => { const b = get('map').cloneNode(true); b.dataset.value = v; b.querySelector('span').textContent = label; b.querySelector('svg').innerHTML = svg; return b; };
+          const bag = '<path d="M5 8h14l-1 12H6Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>';
+          const rec = '<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>';
+          const items = mk('items', '소지품', bag), recs = mk('records', '기록', rec);
+          const order = [get('map'), recs, get('board'), get('phone'), items];
+          get('wiki')?.remove(); get('gnet')?.remove();
+          track.innerHTML = ''; order.forEach(b => { b.classList.toggle('on', b.dataset.value === 'items'); b.setAttribute('aria-current', b.dataset.value === 'items'); track.append(b); });
+        }
+        const mbar = document.querySelector('.gx-mbar');
+        document.querySelector('.it-bottom')?.remove();
+        const wrap = document.createElement('div'); wrap.className = 'it-bottom';
+        const open = document.body.dataset.itDrawer === '1';
+        wrap.innerHTML = `<div class="it-tools"><button class="it-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>직접 넣기</span></button><button class="it-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg><span>합치기</span></button></div>
+          ${open ? `<div class="it-drawer"><button class="it-tb">${document.querySelector('.gx-head .gx-logo') ? '' : ''}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4Z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6Z"/></svg><span>위키</span></button><button class="it-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>괴담넷</span></button><button class="it-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>설정</span></button></div>` : ''}
+          <button class="it-grip${open ? ' on' : ''}" aria-label="서랍"><i></i></button>`;
+        const foot = mbar.parentElement; const panel = foot.parentElement; panel.style.position = 'relative'; wrap.style.bottom = foot.getBoundingClientRect().height + 'px'; panel.append(wrap); foot.querySelectorAll('.ph-grip').forEach(g => g.remove()); const main = document.querySelector('main.gx-body'); main.style.paddingBottom = '60px';
+      }
+    }, { html: body(mode === 'drawer' ? 'grid' : mode, vp), mode });
     await sleep(200);
     await page.screenshot({ path: `${out}${vp}_${mode}.png` });
   }
