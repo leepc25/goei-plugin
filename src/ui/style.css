@@ -3433,3 +3433,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 /* 괴담톡 관전 방 (11-07 사용자: 대화 목록의 단톡방으로, 사진 보이게). 시점 인물 사진 + 인원 수 */
 .ph-vface { position: relative; flex: none; }
 .ph-vface > i { position: absolute; right: -4px; bottom: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--amber-bg); color: var(--amber); font-style: normal; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; border: 2px solid var(--panel); }
+
+/* 설정 한 줄에 최소·최대 두 칸 (상점 진열대 분량) */
+.st-range { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.st-range > span { font-size: 13px; color: var(--dim); }

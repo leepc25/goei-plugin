@@ -34,16 +34,23 @@ export const SHOP_REFS_VAR = '$sh_refs';
 export const SHOP_TURNS_DEFAULT = 3;
 export const SHOP_REFS_DEFAULT = 6;
 
+/** 옛 세 구간 (3~5 · 5~8 · 8~12). 최소·최대를 따로 정하기 전에 저장한 채팅을 읽을 때만 쓴다 */
 export type ShopCount = '0' | '1' | '2';
 export const SHOP_COUNTS: { id: ShopCount; label: string; range: [number, number] }[] = [
   { id: '0', label: '3~5', range: [3, 5] },
   { id: '1', label: '5~8', range: [5, 8] },
   { id: '2', label: '8~12', range: [8, 12] },
 ];
+/** 진열대 최소·최대 (2026-11-07 사용자: 구간 셋이 아니라 각자 정하게). 없으면 옛 $sh_count 구간, 그것도 없으면 5~8 */
+export const SHOP_MIN_VAR = '$sh_min';
+export const SHOP_MAX_VAR = '$sh_max';
+export const SHOP_SIZE_LO = 1;
+export const SHOP_SIZE_HI = 16;
 
 export interface ShopSettings {
   on: boolean;
-  count: ShopCount;
+  /** 진열대 물건 수 [최소, 최대] */
+  size: [number, number];
   /** 최근 본문·상태창·괴이를 넘겨 맥락대로 (끄면 가게 정체만) */
   context: boolean;
   /** 값 기준 한 줄 (비우면 모델이 정함) */
@@ -70,7 +77,7 @@ export function shopSettings(vars: Vars): ShopSettings {
   const t = String(vars?.[SHOP_THOUGHTS_VAR] ?? '');
   return {
     on: vars?.[SHOP_ON_VAR] !== '0',
-    count: c === '0' || c === '2' ? c : '1',
+    size: sizeOf(vars, c === '0' || c === '2' ? c : '1'),
     context: vars?.[SHOP_CTX_VAR] !== '0',
     price: clean(vars?.[SHOP_PRICE_VAR], 80),
     diverse: vars?.[SHOP_DIVERSE_VAR] !== '0',
@@ -81,6 +88,12 @@ export function shopSettings(vars: Vars): ShopSettings {
     turns: numIn(vars?.[SHOP_TURNS_VAR], SHOP_TURNS_DEFAULT, 1, 8),
     refs: numIn(vars?.[SHOP_REFS_VAR], SHOP_REFS_DEFAULT, 0, 12),
   };
+}
+function sizeOf(vars: Vars, legacy: ShopCount): [number, number] {
+  const [dl, dh] = SHOP_COUNTS.find((x) => x.id === legacy)!.range;
+  const lo = numIn(vars?.[SHOP_MIN_VAR], dl, SHOP_SIZE_LO, SHOP_SIZE_HI);
+  const hi = numIn(vars?.[SHOP_MAX_VAR], Math.max(dh, lo), SHOP_SIZE_LO, SHOP_SIZE_HI);
+  return [Math.min(lo, hi), Math.max(lo, hi)];
 }
 function numIn(v: unknown, def: number, lo: number, hi: number): number {
   const n = Number(v);
@@ -451,7 +464,7 @@ function withIds(st: ShopState, list: Omit<ShopItem, 'id'>[], exclude: ShopItem[
 /** 첫 호출·새로고침 결과를 상태에 */
 export function applyShelf(st: ShopState, r: ShelfReply, s: ShopSettings): ShopState {
   const base: ShopState = { ...st, identity: st.loaded ? st.identity : r.identity, loaded: true };
-  const [lo] = SHOP_COUNTS.find((c) => c.id === s.count)!.range;
+  const [lo] = s.size;
   const items = withIds(base, r.items).slice(0, 40);
   if (!items.length) throw new ShopError('받은 물건이 모두 가게 정체(파는 종류·값대) 밖이라 버렸어요. 다시 받아 보세요.');
   if (items.length < Math.min(lo, 3) && r.items.length >= lo) throw new ShopError('가게 정체에 맞는 물건이 너무 적어요. 다시 받아 보세요.');
@@ -570,9 +583,9 @@ const SYSTEM_COMMON =
   'Prices are in Korean won as plain integers. Never mention the player\'s money or inventory (you do not know them). Do not write anything outside the required blocks.';
 
 const SHELF_RULES = (s: ShopSettings, st: ShopState) => {
-  const r = SHOP_COUNTS.find((c) => c.id === s.count)!.range;
+  const r = s.size;
   return [
-    `Shelf size: ${r[0]} to ${r[1]} items. One item per line, exactly: 이름|값|종류|설명|효과. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
+    `Shelf size: ${r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`} items. One item per line, exactly: 이름|값|종류|설명|효과. 종류 must be one of: ${kindsLine()}. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).`,
     'Items must be things this shop would actually stock, in this world, at this moment. Everyday goods are fine; strange goods only if the shop is that kind of place.',
     s.diverse ? 'Variety: avoid the most obvious choices; mix cheap and dear, common and specific. Do not repeat items from the previous shelf.' : '',
     s.price ? `Price guide from the player: ${s.price}` : 'Prices should feel like real Korean prices for that kind of shop.',
