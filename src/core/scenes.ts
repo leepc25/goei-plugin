@@ -93,13 +93,14 @@ export function factionScenes(code: string, saved: ScenesData | undefined): Scen
   });
 }
 
-/** 인물별 첫 장면 (저장값이 있으면 그것, 없으면 기본값). 둘 다 비면 null */
-export function agentScene(agentId: string, saved: ScenesData | undefined): { ko: string; en: string } | null {
+/** 인물별 첫 장면 (저장값이 있으면 그것, 없으면 기본값). 둘 다 비면 null. label = 시작 화면에 보일 제목 (11-07 사용자: 「○○의 첫 장면」 대신 제목) */
+export function agentScene(agentId: string, saved: ScenesData | undefined): { ko: string; en: string; label: string } | null {
   const b = safeDefaults().인물[agentId];
   const o = saved?.인물?.[agentId];
   const ko = o?.ko || b?.ko || '';
   const en = o?.en || b?.en || '';
-  return ko.trim() || en.trim() ? { ko, en } : null;
+  const label = (o?.label || b?.label || '').trim();
+  return ko.trim() || en.trim() ? { ko, en, label } : null;
 }
 
 /** 저장값만 (기본값 없이) — 설정 창에서 「직접 고친 글」을 구분할 때 */
