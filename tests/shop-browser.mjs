@@ -139,7 +139,7 @@ for (const vp of ['pc', 'phone']) {
   await waitIdle(); await sleep(300);
   const so = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_shop || 'null'));
   if (so?.sell?.price !== 12000) errorsAll.push(`[${vp}] sell offer: ${JSON.stringify(so?.sell)} talk=${JSON.stringify(so?.talk?.slice(-2))}`);
-  if (!so?.talk.some((l) => l.who === 'me' && l.text === '[팔기: 손전등]')) errorsAll.push(`[${vp}] sell line: ${JSON.stringify(so?.talk)}`);
+  if (!so?.talk.some((l) => l.who === 'me' && l.text === '[판매: 손전등]')) errorsAll.push(`[${vp}] sell line: ${JSON.stringify(so?.talk)}`);
   await shot('sell_offer');
   await page.evaluate((t) => { window.__llm = [t]; }, SELL_HAGGLE);
   await act('shop-sell-haggle');

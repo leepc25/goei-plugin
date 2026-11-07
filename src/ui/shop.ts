@@ -181,7 +181,7 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
 function pickCell(it: Item, st: ShopState): string {
   const sel = st.sell?.itemId === it.id;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b><small>${esc(itemKindLabel(it.kind))}</small>${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}${Number.isSafeInteger(it.price) ? `<span class="sh-amt">산 값 ${esc(shortWon(it.price!))}</span>` : ''}</span>`;
-  return `<button class="it-c sh-c${sel ? ' sel' : ''}" data-action="shop-sell-pick" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 팔기" ${shopUi.loading ? 'disabled' : ''}>
+  return `<button class="it-c sh-c${sel ? ' sel' : ''}" data-action="shop-sell-pick" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 판매" ${shopUi.loading ? 'disabled' : ''}>
     <span class="it-ic">${pic(it.name, it.kind)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(shortWon(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(shortWon(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
 }
 
@@ -205,7 +205,7 @@ function ownerHtml(ctx: ChatContext, st: ShopState, drawer: boolean): string {
 function talkbox(st: ShopState): string {
   const off = st.closed || !!shopUi.loading || !st.loaded;
   const sell = shopUi.chipKind === 'sell';
-  const chip = shopUi.chip ? `<button type="button" class="sh-ref${sell ? ' sell' : ''}" data-action="shop-chip-x" aria-label="${esc(shopUi.chip)} 빼기">${sell ? '팔기: ' : ''}${esc(shopUi.chip)} ×</button>` : '';
+  const chip = shopUi.chip ? `<button type="button" class="sh-ref${sell ? ' sell' : ''}" data-action="shop-chip-x" aria-label="${esc(shopUi.chip)} 빼기">${sell ? '판매: ' : ''}${esc(shopUi.chip)} ×</button>` : '';
   const ph = st.closed ? '거래가 끊겼어요' : sell ? (typeof st.sell?.price === 'number' ? '값을 다시 불러 보기' : '값을 부르거나 그냥 보내기') : shopUi.chip ? '이 물건에 대해 묻기' : '주인에게 말하기';
   // 폼 제출은 플러그인 iframe(allow-forms 없음)에서 안 오므로 Enter(data-enter)·단추(data-action+data-take)로 보낸다
   return `<div class="sh-talk" data-sh-talk="1">
@@ -258,11 +258,11 @@ function sellHtml(st: ShopState, bal: number): string {
     ${o.effect ? `<p class="ef">효과: ${esc(o.effect)}</p>` : ''}
     ${money}
     <div class="it-btns">
-      ${offered ? `<button class="gx-chip on" data-action="shop-sell" ${st.closed || shopUi.loading ? 'disabled' : ''}>팔기</button>` : ''}
+      ${offered ? `<button class="gx-chip on" data-action="shop-sell" ${st.closed || shopUi.loading ? 'disabled' : ''}>판매</button>` : ''}
       ${refused ? '' : `<button class="gx-chip" data-action="shop-sell-haggle" ${st.closed ? 'disabled' : ''}>${offered ? '흥정' : '값 묻기'}</button>`}
       <button class="gx-chip" data-action="shop-sell-cancel">그만</button>
     </div>`;
-  return shell(inner, 'sh-det', 'shop-detail-close', 'shop-keep', `${o.name} 팔기`);
+  return shell(inner, 'sh-det', 'shop-detail-close', 'shop-keep', `${o.name} 판매`);
 }
 
 // ── 동작 ──
@@ -493,7 +493,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       const sell = shopUi.chipKind === 'sell' && !!st?.sell;
       const said = (value ?? shopUi.input).trim();
       // 팔기 칩은 글이 없어도 보낼 수 있다 (물건만 내민다)
-      const text = sell ? `[팔기: ${st!.sell!.name}]${said ? ` ${said}` : ''}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ''}${said}`.trim();
+      const text = sell ? `[판매: ${st!.sell!.name}]${said ? ` ${said}` : ''}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ''}${said}`.trim();
       if (!st || !text || (!sell && !said) || st.closed || shopUi.loading || !st.loaded) return true;
       shopUi.input = '';
       shopUi.chip = '';

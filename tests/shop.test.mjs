@@ -99,7 +99,7 @@ test('구입·다음 턴 사건·값 표기', () => {
 test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하면 처음 값 남음, 거절, 확정·그만, 다음 턴 사건, 요청문에 팔 물건', () => {
   const st0 = applyShelf(readShop(settleShop(chat('x\n[shop: 철물점|주인]'), 3).vars), parseShelf(SHELF, null), shopSettings({}));
   const mine = { itemId: 'i_1', name: '낡은 손전등', desc: '흠집', kind: 'tool', effect: '', paid: 18000 };
-  let st = sayToOwner(startSell(st0, mine), '[팔기: 낡은 손전등]');
+  let st = sayToOwner(startSell(st0, mine), '[판매: 낡은 손전등]');
   assert.equal(st.sell.price, undefined);
   assert.match(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).at(-1).content, /팔려는 물건[\s\S]*낡은 손전등\|tool/);
   // 값은 모델 판단: 물건 가치를 종합해 적정 값을 정하라는 지시
@@ -111,7 +111,7 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
   assert.equal(st.sell.price, 12000);
   assert.equal(st.sell.first, undefined);
   // 흥정: ~ 줄로도 받는다. 처음 값이 남는다
-  st = applyTalk(sayToOwner(st, '[팔기: 낡은 손전등] 만오천은 줘야지'), parseTalk('<owner>만 사천.</owner>\n<change mode="partial">\n~ 낡은 손전등|14000\n</change>'));
+  st = applyTalk(sayToOwner(st, '[판매: 낡은 손전등] 만오천은 줘야지'), parseTalk('<owner>만 사천.</owner>\n<change mode="partial">\n~ 낡은 손전등|14000\n</change>'));
   assert.equal(st.sell.price, 14000);
   assert.equal(st.sell.first, 12000);
   // 값대를 크게 넘어도 모델이 부른 값 그대로 (사용자 11-07: 프로그램이 거르지 않음)
