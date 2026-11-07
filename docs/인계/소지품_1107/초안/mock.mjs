@@ -50,6 +50,8 @@ const css = `
 /* phone bottom */
 .tools{height:52px;display:flex;align-items:center;gap:4px;padding:4px 8px;border-top:1px solid var(--line);background:var(--void)}.tools .tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:11px;font-weight:600;border-radius:12px}.tools .menu{flex:0 0 44px;color:var(--text)}.tools .menu.on{background:var(--accent-bg);color:var(--signal)}
 .common{height:52px;display:flex;gap:4px;padding:4px 8px;border-top:1px solid var(--line2);background:var(--panel);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}.common .tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:11px;font-weight:600}
+.grip{height:18px;display:flex;align-items:center;justify-content:center;background:var(--void);border-top:1px solid var(--line)}.grip i{width:38px;height:4px;border-radius:4px;background:var(--line2)}.grip.on i{background:var(--signal)}
+.stack{position:relative}.drawer{position:absolute;left:0;right:0;bottom:0;height:52px;display:flex;gap:4px;padding:4px 8px;background:var(--panel);border-top:1px solid var(--line2);box-shadow:0 -10px 20px -14px rgba(0,0,0,.6)}.drawer .tb{flex:1;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub);font-size:11px;font-weight:600}
 .bar{height:60px;display:flex;border-top:1px solid var(--line);background:var(--void)}.bar .nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600}.bar .nb.on{color:var(--signal)}
 .usebox{margin:0 14px 8px;background:var(--panel);border:1px solid var(--signal);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:12.5px}.usebox .chip{background:var(--accent-bg);color:var(--signal);border-radius:8px;padding:3px 8px;font-weight:600}.usebox .x{margin-left:auto;color:var(--dim)}
 .input{margin:0 14px 10px;height:44px;border:1px solid var(--line2);border-radius:12px;display:flex;align-items:center;padding:0 12px;color:var(--dim)}
@@ -63,8 +65,8 @@ const css = `
 const phoneHtml = (open, over) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
 <div style="overflow:auto">${tabs}${head}${grid(over)}${detail}${foot}</div>
-<div>${open ? `<div class="common"><div class="tb">${nav('wiki')}위키</div><div class="tb">${nav('gnet')}괴담넷</div><div class="tb">${nav('settings')}설정</div></div>` : ''}
-<div class="tools"><div class="tb">${nav('plus')}직접 넣기</div><div class="tb">${nav('search')}찾기</div><div class="tb">${nav('refresh')}합치기</div><div class="tb menu${open ? ' on' : ''}">${nav('menu')}</div></div>
+<div><div class="stack"><div class="tools"><div class="tb">${nav('plus')}직접 넣기</div><div class="tb">${nav('search')}찾기</div><div class="tb">${nav('refresh')}합치기</div></div>${open ? `<div class="drawer"><div class="tb">${nav('wiki')}위키</div><div class="tb">${nav('gnet')}괴담넷</div><div class="tb">${nav('settings')}설정</div></div>` : ''}</div>
+<div class="grip${open ? ' on' : ''}"><i></i></div>
 <div class="bar"><div class="nb">${nav('map')}임무</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb on">${nav('bag')}소지품</div></div></div></div></body>`;
 const chatHtml = `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:300px;grid-template-rows:1fr auto;background:#141a1e}</style><body><div class="win"><div style="padding:14px;color:var(--dim);font-size:12.5px">(채팅 본문 — Risu 입력창 바로 위에 플러그인이 띄우는 상자)</div>
 <div><div class="usebox">이번 턴 사용 <span class="chip">소금 봉지</span><span class="chip">손전등</span><span class="x">×</span></div><div class="input">메시지를 입력하세요…</div></div></div></body>`;
@@ -75,7 +77,7 @@ const pcHtml = `<!doctype html><meta charset="utf-8"><style>${css}</style><body>
 const b = await chromium.launch(); const out = '/mnt/project-files/작업_1107/초안_';
 let p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 860 } });
 await p.setContent(phoneHtml(false, false)); await p.screenshot({ path: out + '폰_소지품.png' });
-await p.setContent(phoneHtml(true, true)); await p.screenshot({ path: out + '폰_메뉴열림_넘침.png' });
+await p.setContent(phoneHtml(true, true)); await p.screenshot({ path: out + '폰_서랍열림_넘침.png' });
 p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 310 } }); await p.setContent(chatHtml); await p.screenshot({ path: out + '폰_사용상자.png' });
 p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 1200, height: 780 } }); await p.setContent(pcHtml); await p.screenshot({ path: out + 'PC_소지품.png' });
 await b.close(); console.log('ok');
