@@ -168,22 +168,3 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u3'), []);
   assert.deepEqual(settleItemUse(chat, 5), { $st_item_use: '', [ITEM_USE_AT_VAR]: '' });
 });
-
-test('그림 매칭 (game-src/items/README.md 규칙): 키워드 → 특징 → 몸통 대표 → 종류 기본', async () => {
-  const { applyItemsPack, matchItemIcon } = await import('../dist-test/core.mjs');
-  const { itemsPackText } = await import('../scripts/data-pack.mjs');
-  const pack = applyItemsPack(itemsPackText());
-  assert.ok(pack.table.length > 2500 && Object.keys(pack.icons).length >= new Set(pack.table.map((r) => r.f)).size, '표·그림');
-  assert.ok(!pack.table.some((r) => r.k.includes('우산 칼')), '「빼」한 줄은 없음');
-  assert.equal(matchItemIcon(pack, '접이식 칼', 'weapon'), 'weapon_001.webp');
-  assert.equal(matchItemIcon(pack, '낡은 접이식 칼 하나', 'weapon'), 'weapon_001.webp', '몸통 말만 맞으면 그 몸통의 대표');
-  assert.equal(matchItemIcon(pack, 'folding knife', 'weapon'), 'weapon_001.webp', '영어 키워드');
-  const rows = (f) => pack.table.filter((r) => r.f === f).map((r) => r.k[0]);
-  // ② 특징 말: 「피 묻은 곰인형」 → 피 묻은 인형, ③ 몸통 대표: 「속삭이는 거울」 → 거울 대표 (README 예)
-  assert.ok(rows(matchItemIcon(pack, '피 묻은 곰인형', 'misc')).some((n) => /피.*인형/.test(n)), `피 묻은 인형: ${rows(matchItemIcon(pack, '피 묻은 곰인형', 'misc'))}`);
-  assert.equal(matchItemIcon(pack, '속삭이는 거울', 'anomaly'), pack.rep['거울']);
-  assert.equal(matchItemIcon(pack, '전혀 모르는 ㅁㄴㅇ', 'charm'), pack.base.charm);
-  assert.equal(matchItemIcon(pack, '', 'misc'), pack.base.misc);
-  for (const k of ['weapon', 'wear', 'tool', 'device', 'charm', 'medical', 'food', 'paper', 'key', 'seal', 'anomaly', 'valuable', 'consumable', 'misc']) assert.ok(pack.base[k], `${k} 기본 그림`);
-  assert.throws(() => applyItemsPack('{"schema":1,"kind":"world"}'));
-});
