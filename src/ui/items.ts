@@ -30,8 +30,8 @@ export interface ItemsNav { sub: ItemsSub; view: 'grid' | 'log'; open: string }
 export const itemsUi = {
   sub: 'items' as ItemsSub,
   view: 'grid' as 'grid' | 'log',
-  /** 기록 거르기: 획득 · 사용 (사용 = 쓰기·버리기·없어짐·합침·팖, 2026-11-07 사용자: 두 개로) */
-  logFilter: 'get' as 'get' | 'out',
+  /** 기록 거르기: 전체 · 획득 · 사용 (사용 = 쓰기·버리기·없어짐·합침·팖) */
+  logFilter: 'all' as 'all' | 'get' | 'out',
   q: '',
   open: '',
   mode: 'view' as 'view' | 'edit' | 'merge' | 'add',
@@ -160,15 +160,15 @@ function dayOf(when: string): string {
   return `${m[1]}.${m[2]}.${m[3]} (${WEEK[d.getUTCDay()]})`;
 }
 
-/** 기록: 가계부와 같은 꼴 — 거르기 칩(획득·사용) + RP 날짜별 묶음, 줄 앞 물건 그림, 최근 것부터 (2026-11-07 사용자) */
+/** 기록: 가계부와 같은 꼴 — 거르기 칩(전체·획득·사용) + RP 날짜별 묶음, 줄 앞 물건 그림, 최근 것부터 (2026-11-07 사용자) */
 function logList(ctx: ChatContext): string {
   const q = itemsUi.q.trim();
   const all = q ? searchItems(itemsOf(ctx), aliveAnchors(ctx.chat), q).log : itemsOf(ctx).log.slice().reverse();
-  const rows = all.filter((l) => (itemsUi.logFilter === 'get' ? l.what === 'get' : l.what !== 'get'));
-  const chip = (v: 'get' | 'out', label: string, n: number) => `<button class="gx-chip${itemsUi.logFilter === v ? ' on' : ''}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label}${n ? ` <small>${n}</small>` : ''}</button>`;
+  const rows = all.filter((l) => (itemsUi.logFilter === 'get' ? l.what === 'get' : itemsUi.logFilter === 'out' ? l.what !== 'get' : true));
+  const chip = (v: typeof itemsUi.logFilter, label: string, n: number) => `<button class="gx-chip${itemsUi.logFilter === v ? ' on' : ''}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label}${n ? ` <small>${n}</small>` : ''}</button>`;
   const got = all.filter((l) => l.what === 'get').length;
-  const chips = `<div class="gx-rec-tools it-logchips">${chip('get', '획득', got)}${chip('out', '사용', all.length - got)}</div>`;
-  if (!rows.length) return `${chips}<p class="gx-wt-empty">${q ? '맞는 기록이 없어요.' : itemsUi.logFilter === 'get' ? '아직 획득한 물건이 없어요.' : '아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요.'}</p>`;
+  const chips = `<div class="gx-rec-tools it-logchips">${chip('all', '전체', all.length)}${chip('get', '획득', got)}${chip('out', '사용', all.length - got)}</div>`;
+  if (!rows.length) return `${chips}<p class="gx-wt-empty">${q ? '맞는 기록이 없어요.' : itemsUi.logFilter === 'get' ? '아직 획득한 물건이 없어요.' : itemsUi.logFilter === 'out' ? '아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요.' : '아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요.'}</p>`;
   const w = whenOf(ctx);
   const pic = (l: ItemLog) => {
     const u = itemIconUrl(l.name, l.kind ?? 'misc');
@@ -179,7 +179,7 @@ function logList(ctx: ChatContext): string {
     const sub = [BY[l.by] ?? l.by, l.note, l.quote ? `「${l.quote}」` : ''].filter(Boolean).join(' · ');
     return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic(l)}</span><span class="gx-wt-memo"><b>${esc(l.name)} <em class="it-what ${l.what === 'get' ? 'get' : 'out'}">${WHAT[l.what] ?? l.what}</em></b><small>${esc(sub)}</small></span><span class="gx-wt-amt"><small>${esc(when.split(' ')[1] ?? when)}</small></span></div></li>`;
   };
-  // RP 날짜별 묶음 (가계부처럼). 같은 날은 한 묶음, 묶음 머리에 건수
+  // RP 날짜별 묶음 (가계부처럼). 같은 날은 한 묶음, 묶음 머리에 획득·사용 수
   const groups: { day: string; rows: ItemLog[] }[] = [];
   for (const l of rows) {
     const day = dayOf(whenLabel(w, l.anchor, l.at));
@@ -188,7 +188,9 @@ function logList(ctx: ChatContext): string {
     else groups.push({ day, rows: [l] });
   }
   return `${chips}<div class="gx-wallettab it-log">${groups.map((g) => {
-    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${g.rows.length}건</em></h3><ul>${g.rows.map(row).join('')}</ul></section>`;
+    const gi = g.rows.filter((l) => l.what === 'get').length;
+    const go = g.rows.length - gi;
+    return `<section class="gx-wt-day"><h3><span>${esc(g.day)}</span><em>${[gi ? `획득 ${gi}` : '', go ? `사용 ${go}` : ''].filter(Boolean).join(' · ')}</em></h3><ul>${g.rows.map(row).join('')}</ul></section>`;
   }).join('')}</div>`;
 }
 
@@ -264,7 +266,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       env.render();
       return true;
     case 'items-log-filter':
-      itemsUi.logFilter = value === 'out' ? 'out' : 'get';
+      itemsUi.logFilter = value === 'get' ? 'get' : value === 'out' ? 'out' : 'all';
       env.render();
       return true;
     case 'items-view':
