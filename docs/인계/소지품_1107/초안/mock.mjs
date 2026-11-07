@@ -27,7 +27,7 @@ const detail = `<section class="det"><div class="dh">${ic('consumable', 26)}<div
 <p>관리국 지급품. 문턱이나 창틀에 뿌려 두면 하룻밤은 버틴다.</p><p class="ef">효과: 저급 괴이의 접근을 늦춘다</p>
 <div class="btns"><button class="pri">사용</button><button>고치기</button><button>합치기</button><button class="danger">버리기</button></div></section>`;
 const tabs = `<div class="subs"><button>가계부</button><button class="on">소지품</button></div>`;
-const head = `<div class="hd"><div class="t">12 / 16</div><div class="s">${nav('search')}<span>찾기</span></div></div>`;
+const head = `<div class="hd"><div class="t">12 / 16</div></div>`;
 const foot = `<div class="foot"><button class="add">${nav('plus')} 직접 넣기</button><details><summary>사용·처분 기록 (3)</summary><div class="log">11-07 부적 1장 사용 (본문) · 11-06 생수 1병 사용 (사용 단추) · 11-06 손수건 버림</div></details></div>`;
 const css = `
 :root{--void:#1A2226;--panel:#232D32;--panel2:#2C383E;--line:#3A4A50;--line2:#46565D;--text:#E9F0EE;--sub:#BECBC8;--dim:#8A9A97;--signal:#5EEAD4;--accent-bg:rgba(94,234,212,.12);--danger:#e5484d}
@@ -65,7 +65,7 @@ const css = `
 const phoneHtml = (open, over) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
 <div style="overflow:auto">${tabs}${head}${grid(over)}${detail}${foot}</div>
-<div><div class="stack"><div class="tools"><div class="tb">${nav('plus')}직접 넣기</div><div class="tb">${nav('search')}찾기</div><div class="tb">${nav('refresh')}합치기</div></div>${open ? `<div class="drawer"><div class="tb">${nav('wiki')}위키</div><div class="tb">${nav('gnet')}괴담넷</div><div class="tb">${nav('settings')}설정</div></div>` : ''}</div>
+<div><div class="stack"><div class="tools"><div class="tb">${nav('plus')}직접 넣기</div><div class="tb">${nav('refresh')}합치기</div></div>${open ? `<div class="drawer"><div class="tb">${nav('wiki')}위키</div><div class="tb">${nav('gnet')}괴담넷</div><div class="tb">${nav('settings')}설정</div></div>` : ''}</div>
 <div class="grip${open ? ' on' : ''}"><i></i></div>
 <div class="bar"><div class="nb">${nav('map')}임무</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb on">${nav('bag')}소지품</div></div></div></div></body>`;
 const chatHtml = `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:300px;grid-template-rows:1fr auto;background:#141a1e}</style><body><div class="win"><div style="padding:14px;color:var(--dim);font-size:12.5px">(채팅 본문 — Risu 입력창 바로 위에 플러그인이 띄우는 상자)</div>
