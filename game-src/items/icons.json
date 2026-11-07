@@ -3965,7 +3965,8 @@
   {
    "keywords": [
     "전신 강철 판금",
-    "full plate armor"
+    "full plate armor",
+    "판금 갑옷"
    ],
    "file": "wear_012.webp",
    "kind": "wear",
@@ -8034,7 +8035,8 @@
   {
    "keywords": [
     "십자가 목걸이",
-    "cross necklace"
+    "cross necklace",
+    "은 십자가"
    ],
    "file": "wear_084.webp",
    "kind": "wear",
@@ -12637,7 +12639,8 @@
   {
    "keywords": [
     "간호사복",
-    "nurse uniform"
+    "nurse uniform",
+    "간호복"
    ],
    "file": "wear_051.webp",
    "kind": "wear",
@@ -18192,7 +18195,8 @@
   {
    "keywords": [
     "군화",
-    "combat boots"
+    "combat boots",
+    "전투화"
    ],
    "file": "wear_118.webp",
    "kind": "wear",
@@ -24708,7 +24712,9 @@
    "keywords": [
     "흰 가운",
     "lab coat",
-    "white coat"
+    "white coat",
+    "실험 가운",
+    "실험복"
    ],
    "file": "wear_030.webp",
    "kind": "wear",
@@ -27945,7 +27951,8 @@
   {
    "keywords": [
     "방검 조끼",
-    "stab vest"
+    "stab vest",
+    "방검복"
    ],
    "file": "wear_001.webp",
    "kind": "wear",
@@ -32584,7 +32591,8 @@
   {
    "keywords": [
     "방독면",
-    "gas mask"
+    "gas mask",
+    "가스마스크"
    ],
    "file": "wear_009.webp",
    "kind": "wear",
@@ -39038,7 +39046,8 @@
   {
    "keywords": [
     "묵주",
-    "rosary"
+    "rosary",
+    "로자리오"
    ],
    "file": "charm_004.webp",
    "kind": "charm",
@@ -49816,6 +49825,8 @@
   "흡혈 식기": "weapon_010.webp",
   "흰 가루 봉지": "consumable_102.webp",
   "흰 가운": "wear_030.webp",
-  "힙색": "wear_078.webp"
+  "힙색": "wear_078.webp",
+  "방패": "weapon_048.webp",
+  "shield": "weapon_048.webp"
  }
 }
