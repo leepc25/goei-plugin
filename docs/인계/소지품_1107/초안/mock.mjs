@@ -64,9 +64,9 @@ const css = `
 .pc{width:1180px;height:620px}.pc .body{grid-template-columns:1fr 300px}.pc .left{min-width:0;padding:12px 16px}
 .pcbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}.pcbar .subs{padding:0;gap:0;border:1px solid var(--line2);border-radius:9px;overflow:hidden}.pcbar .subs button{flex:none;height:30px;padding:0 14px;border:0;border-radius:0;font-size:13px}.pcbar .t{font-weight:700;font-size:15px;margin-left:6px}.pcbar .ov{color:var(--danger);font-size:12px;font-weight:600;margin-left:4px}
 .pcbar .tb{display:flex;align-items:center;gap:5px;height:30px;padding:0 10px;border:1px solid var(--line2);border-radius:9px;color:var(--sub);font-size:12.5px;font-weight:600}.pcbar .tb:first-of-type{margin-left:auto}.pcbar .s{height:30px;padding:0 10px}
-.pc .grid{grid-template-columns:repeat(8,70px);gap:6px;padding:0}.pc .c{aspect-ratio:auto;height:70px;gap:4px;border-radius:9px;padding:4px}.pc .c svg{width:22px;height:22px}.pc .c b{font-size:11px}
-.logbox{margin-top:16px;border-top:1px solid var(--line);padding-top:10px}.logbox .lt{font-size:12px;font-weight:700;color:var(--dim);margin-bottom:6px}.lr{font-size:12.5px;color:var(--sub);line-height:1.9}.lr span{color:var(--dim);margin-right:8px}.lr em{font-style:normal;color:var(--dim);margin-left:6px;font-size:11.5px}
-.pc .right{padding:12px 0}
+.pc .left{display:flex;flex-direction:column}.pc .grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr;gap:8px;padding:0;flex:1;min-height:0}.pc .c{aspect-ratio:auto;min-width:0;gap:6px;border-radius:12px}.pc .c svg{width:32px;height:32px}.pc .c b{font-size:12.5px}
+.logbox .lt{font-size:12px;font-weight:700;color:var(--dim);margin-bottom:6px}.lr{font-size:12.5px;color:var(--sub);line-height:1.9}.lr span{color:var(--dim);margin-right:8px}.lr em{font-style:normal;color:var(--dim);margin-left:6px;font-size:11.5px}
+.pc .right{padding:12px 0}.pc .right .logbox{margin:16px 14px 0;border-top:1px solid var(--line);padding-top:10px}
 `;
 const phoneHtml = (open, over, pop = false) => `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:844px;grid-template-rows:52px 1fr auto}</style><body><div class="win">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
@@ -76,12 +76,12 @@ const phoneHtml = (open, over, pop = false) => `<!doctype html><meta charset="ut
 const chatHtml = `<!doctype html><meta charset="utf-8"><style>${css}.win{width:390px;height:300px;grid-template-rows:1fr auto;background:#141a1e}</style><body><div class="win"><div style="padding:14px;color:var(--dim);font-size:12.5px">(채팅 본문 — Risu 입력창 바로 위에 플러그인이 띄우는 상자)</div>
 <div><div class="usebox">이번 턴 사용 <span class="chip">소금 봉지</span><span class="chip">손전등</span><span class="x">×</span></div><div class="input">메시지를 입력하세요…</div></div></div></body>`;
 const pcGrid = `<div class="grid">${items.map((it, i) => cell(it, i)).join('')}${'<div class="c empty"></div>'.repeat(4)}${cell(['seal', '봉인 상자'], 9, ' over')}</div>`;
-const pcLeft = `<div class="pcbar"><div class="subs">${'<button>가계부</button><button class="on">소지품</button>'}</div><div class="t">12 / 16 <span class="ov">+1 넘침</span></div><div class="tb">${nav('plus')} 직접 넣기</div><div class="tb">${nav('refresh')} 합치기</div><div class="s">${nav('search')}<span>물건·기록 찾기</span></div></div>
-${pcGrid}<div class="logbox"><div class="lt">사용·처분 기록</div><div class="lr"><span>11-07</span>부적 1장 사용 <em>본문</em></div><div class="lr"><span>11-06</span>생수 1병 사용 <em>사용 단추</em></div><div class="lr"><span>11-06</span>손수건 버림 <em>직접</em></div></div>`;
+const pcLog = `<div class="logbox"><div class="lt">사용·처분 기록</div><div class="lr"><span>11-07</span>부적 1장 사용 <em>본문</em></div><div class="lr"><span>11-06</span>생수 1병 사용 <em>사용 단추</em></div><div class="lr"><span>11-06</span>손수건 버림 <em>직접</em></div></div>`;
+const pcLeft = `<div class="pcbar"><div class="subs">${'<button>가계부</button><button class="on">소지품</button>'}</div><div class="t">12 / 16 <span class="ov">+1 넘침</span></div><div class="tb">${nav('plus')} 직접 넣기</div><div class="tb">${nav('refresh')} 합치기</div><div class="s">${nav('search')}<span>물건·기록 찾기</span></div></div>${pcGrid}`;
 const pcHtml = `<!doctype html><meta charset="utf-8"><style>${css}</style><body><div class="win pc">
 <div class="gxhead"><b>소지품</b><div class="act"><span class="won">₩ 134,000</span><button class="x">${nav('idcard')}</button><button class="x">${nav('close')}</button></div></div>
 <div class="nav"><div class="card"><div class="ph"></div>사원증 카드</div><div class="nb">${nav('board')}상황판</div><div class="nb">${nav('map')}임무</div><div class="nb">${nav('phone')}괴담톡</div><div class="nb">${nav('gnet')}괴담넷</div><div class="nb">${nav('wiki')}위키</div><div class="nb on">${nav('bag')}소지품</div><div class="nb">${nav('records')}기록</div><div class="nb">${nav('settings')}설정</div><div class="gap"></div><div class="hist">‹ 뒤로 &nbsp; 앞으로 ›</div></div>
-<div class="body"><div class="left">${pcLeft}</div><div class="right">${detail}</div></div></div></body>`;
+<div class="body"><div class="left">${pcLeft}</div><div class="right">${detail}${pcLog}</div></div></div></body>`;
 const b = await chromium.launch(); const out = '/mnt/project-files/작업_1107/초안_';
 let p = await b.newPage({ deviceScaleFactor: 2, viewport: { width: 400, height: 860 } });
 await p.setContent(phoneHtml(false, false)); await p.screenshot({ path: out + '폰_소지품.png' });
