@@ -18,6 +18,7 @@ export * as settings from './settings';
 export * as asset from './asset';
 export * as attach from './attach';
 export * from './factions';
+export * from './scenes';
 export * from './update';
 export * from './pictures';
 export { OLD_DIRECTORY, OLD_MANIFEST, LEGACY_DATA, RETIRED, isDirectory } from './lorebooks';

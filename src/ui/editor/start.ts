@@ -77,7 +77,8 @@ export function agentSceneFields(id: string, d: Directory): string {
   const k = (f: string) => `ascene:${id}|${f}`;
   return `${input(k('label'), saved?.label ?? def?.label ?? '', '제목', '시작 화면 첫 장면 칸에 보여요. 비우면 「○○의 첫 장면」')}
     ${area(k('ko'), saved?.ko ?? def?.ko ?? '', '한국어', 10, hasDefault ? '기본 글(세계 자료)이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
-    ${area(k('en'), saved?.en ?? def?.en ?? '', 'English', 10, hasDefault ? '기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '')}`;
+    ${area(k('en'), saved?.en ?? def?.en ?? '', 'English', 10, hasDefault ? '기본 글이에요. 고치면 고친 글로, 비우면 기본 글로 돌아가요' : '')}
+    ${input(k('lore'), (saved?.lore ?? def?.lore ?? []).join(', '), '시작 로어', '이 장면으로 시작할 때 첫 턴에 넣을 로어북 이름 (쉼표로). 첫 장면 글은 키워드로 불리지 않아요')}`;
 }
 
 function membersBlock(code: string, d: Directory): string {

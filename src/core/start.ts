@@ -118,7 +118,8 @@ export function planStart(
   // Risu 쪽 첫 메시지는 늘 카드의 공용 빈 첫 장면 (직접 입력용). 첫 장면 글은 플러그인이 메시지로 넣는다 (2026-11-05 사용자: Risu 추가 첫 메시지를 안 씀)
   const fmIndex = emptyGreeting(manifest, greetingCount);
   if (fmIndex < 0) throw new StartError('이 카드에 빈 첫 장면이 없어요. 설치 · 점검에서 인사말을 다시 심어 주세요.');
-  const seed = buildSeed(lore, choice.faction, choice.fm, faction.builtin ? undefined : faction.group ? [] : faction.seed);
+  // 인물별 첫 장면은 그 장면의 「시작 로어」 목록을 첫 턴에 넣는다 (세력 장면의 「시작 로어북」 표와 같은 구실. 11-07 사용자: 첫 장면 글은 키워드 검색에서 빠져 괴이가 안 불렸다)
+  const seed = playerScene ? buildSeed(lore, choice.faction, choice.fm, playerScene.lore) : buildSeed(lore, choice.faction, choice.fm, faction.builtin ? undefined : faction.group ? [] : faction.seed);
   return {
     fmIndex,
     kind: scenario.kind,

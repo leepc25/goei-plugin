@@ -857,14 +857,20 @@ export function directoryInput(key: string, value: string, bar: Element | null):
   if (key.startsWith('ascene:')) {
     // ascene:P001|ko — 인물별 첫 장면 (빈 값은 지워서 기본 글로). label = 제목 (11-07)
     const [id, field] = key.slice(7).split('|');
-    if (!id || !(field === 'ko' || field === 'en' || field === 'label')) return;
+    if (!id || !(field === 'ko' || field === 'en' || field === 'label' || field === 'lore')) return;
     const rows = (d.scenes.인물 ??= {});
     const row = (rows[id] ??= {});
     // 기본 글(세계 자료 팩)과 같으면 저장값을 두지 않는다 (편집 칸이 기본 글을 그대로 보여 주므로, 11-07)
     const def = agentScene(id, undefined);
-    const same = def ? (field === 'label' ? value.trim() === def.label : value === def[field]) : false;
-    if (value.trim() && !same) row[field] = value;
-    else delete row[field];
+    if (field === 'lore') {
+      const names = splitList(value);
+      if (names.length && names.join(',') !== (def?.lore ?? []).join(',')) row.lore = names;
+      else delete row.lore;
+    } else {
+      const same = def ? (field === 'label' ? value.trim() === def.label : value === def[field]) : false;
+      if (value.trim() && !same) row[field] = value;
+      else delete row[field];
+    }
     if (!Object.keys(row).length) delete rows[id];
     dirUi.done = '';
     if (bar) bar.innerHTML = directoryBar();
