@@ -42,15 +42,15 @@ const grid = (sel = -1) => `<div class="it-grid sh-grid">${items.map((it, i) => 
 const loading = `<div class="sh-wait"><span class="sh-spin"></span>진열대를 살피는 중…</div>`;
 const tools = (vp, req) => `<div class="gx-rec-tools it-tools sh-tools">
   <span class="sh-name">${ic('bag')}<b>${SHOP}</b></span><span class="it-cnt sh-bal">${amt(BAL)}</span>
-  <span class="it-right"><span class="sh-q"><input class="gx-wt-q" type="text" value="${req ? '밤에 쓸 조명 도구하고 소금 같은 거' : ''}" placeholder="원하는 물건 적고 Enter"><button class="sh-go" aria-label="요청">↵</button></span><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
+  <span class="it-right"><span class="sh-q"><input class="gx-wt-q" type="text" value="${req ? '밤에 쓸 조명 도구하고 소금 같은 거' : ''}" placeholder="이런 물건들로 진열대 다시 짜기 (Enter)"><button class="sh-go" aria-label="요청">↵</button></span><button class="it-act">${ic('refresh')}새로고침</button>${vp === 'pc' ? `<button class="it-act sh-x" aria-label="닫기">${ic('close')}</button>` : ''}</span></div>`;
 const detail = (it) => {
   const [p, name, kind, price, stock, desc, ef] = it;
   const poor = price > BAL;
   const money = `<div class="sh-money"><div><i>값</i>${amt(price)}</div><div><i>지금 잔고</i>${amt(BAL)}</div><div class="${poor ? 'bad' : 'ok'}"><i>${poor ? '부족' : '산 뒤 잔고'}</i>${amt(Math.abs(BAL - price)).replace('₩', poor ? '−₩' : '₩')}</div></div>`;
   return `<div class="gx-agpop it-pop sh-det"><div class="gx-agpop-card it-card"><button class="gx-agpop-x">✕</button>
   <div class="it-ph sh-ph"><span class="it-ic"><img src="${pic(p)}" alt=""></span><div class="sh-phtx"><b>${name}</b>${meta(kind, stock)}${amt(price, 'big')}</div></div>
-  <p>${desc}</p><p class="ef">효과: ${ef}</p>${money}
-  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button><button class="gx-chip">자세히</button></div></div></div>`;
+  <p>${desc}</p><p class="ef">효과: ${ef}</p><p class="sh-more"><button class="sh-link">자세히 묻기</button></p>${money}
+  <div class="it-btns"><button class="gx-chip on"${poor ? ' disabled' : ''}>구입</button></div></div></div>`;
 };
 const popup = (vp, mode) => {
   const body = mode === 'loading' ? loading : grid(mode === 'detail' ? 0 : mode === 'poor' ? 11 : -1);
@@ -96,7 +96,7 @@ const css = `
 .sh-det .it-card p{font-size:13.5px;line-height:1.5;margin-top:12px}.sh-det .it-card p.ef{margin-top:6px}
 .sh-money{margin-top:12px;border:1px solid var(--line);border-radius:var(--rc);background:var(--void);overflow:hidden}.sh-money>div{display:flex;justify-content:space-between;align-items:center;height:36px;padding:0 12px;border-top:1px solid var(--line)}.sh-money>div:first-child{border-top:0}.sh-money i{font-style:normal;font-size:13.5px;color:var(--sub)}
 .sh-money .ok{background:var(--accent-bg)}.sh-money .ok .sh-amt{color:var(--signal)}.sh-money .bad{background:var(--red-bg)}.sh-money .bad i,.sh-money .bad .sh-amt{color:var(--red)}
-.sh-det .it-btns{margin-top:12px}.sh-det .it-btns .gx-chip{height:var(--h);border-radius:var(--r);font-size:13.5px}.it-btns .gx-chip:disabled{opacity:.45}
+.sh-more{margin-top:6px !important;text-align:right}.sh-link{border:0;background:none;padding:0;color:var(--dim);font:inherit;font-size:12.5px;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}.sh-link:hover{color:var(--text)}.sh-det .it-btns{margin-top:12px}.sh-det .it-btns .gx-chip{height:var(--h);border-radius:var(--r);font-size:13.5px}.it-btns .gx-chip:disabled{opacity:.45}
 .sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
