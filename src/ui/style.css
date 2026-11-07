@@ -892,8 +892,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-react small { color: var(--sub); font-size: 11px; }
 .ph-view-new { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .ph-view-new small { color: var(--sub); font-size: 12px; }
-/* 11-07 사용자: 왼쪽 도구 줄(56px)과 높이·선을 맞춘다 */
-.ph-view-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 56px; padding: 0 14px; border-top: 1px solid var(--panel2); background: var(--void); color: var(--sub); font-size: 13px; }
+/* 11-07 사용자: 왼쪽 도구 서랍(.ph-drawer: 윗선 1px + 64px, 폰 56px)과 높이·윗선을 똑같이 */
+.ph-view-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 65px; padding: 0 14px; border-top: 1px solid var(--panel2); background: var(--void); color: var(--sub); font-size: 13px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .ph-view-foot { height: 57px; } }
 .ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
 .ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
 .ph-typing i:nth-child(2) { animation-delay: .15s; }
