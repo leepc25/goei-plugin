@@ -434,10 +434,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
     idBox('update', v('model_id_update')),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
-    `<div class="ps-row wide"><div class="ps-label"><b>기록할 것</b><small>켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</small></div></div>`,
-    // 11-07 사용자: 기록 항목(정량·정성 포함)과 새 인물은 접지 않고 그대로 보인다 (접어 두니 「설정 절반이 날아갔다」)
-    features,
-    newPeople,
+    // 11-07 사용자: 기록 항목(정량·정성 포함)은 「기록할 것」의 하위 항목 — 눈에 띄는 띠 제목 칸 안에, 기본 펼침. 새 인물도 같은 모양의 칸
+    fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</p>${features}`, true),
+    fold('pp-new', '새 인물', newPeople, true),
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
     fold('pp-ps', '지침 고쳐 쓰기', promptEditor(state, s.prompt)),
   ].join('');
