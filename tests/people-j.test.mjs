@@ -51,6 +51,13 @@ test('하이파 참조: V3 요약 → 없으면 V2, 글자 상한은 최근 것�
   const v3 = { ...c, hypaV3Data: { summaries: [{ text: '옛 요약 하나' }, { text: '둘' }, { text: '' }] } };
   assert.deepEqual(H.hypaSummaries(v3), ['옛 요약 하나', '둘']);
   assert.deepEqual(H.hypaSummaries(v3, 3), ['둘']);
+  // 2026-11-07 관련도 선택: 중요 표시 먼저, 질문 낱말이 든 요약 가점, 개수·글자 상한, 중복 제거, 결과는 원래 순서
+  const many = { ...c, hypaV3Data: { summaries: [{ text: '첫 요약 중요 표시', isImportant: true }, { text: '쟈알디가 커피를 탔다' }, { text: '쟈알디가 커피를 탔다' }, { text: '스팡달이 문을 열었다' }, { text: '마지막 요약 아무 상관 없음' }] } };
+  assert.deepEqual(H.hypaSummaries(many, 100000, '쟈알디 커피', { maxItems: 2 }), ['첫 요약 중요 표시', '쟈알디가 커피를 탔다'], '중요 표시 + 낱말 맞은 것, 2개, 중복 하나로');
+  assert.deepEqual(H.hypaSummaries(many, 100000, '', { maxItems: 2 }), ['첫 요약 중요 표시', '마지막 요약 아무 상관 없음'], '질문 없으면 중요 표시 + 최신');
+  const plus = JSON.stringify({ chunks: [{ nodes: [{ type: 'facts', content: '스팡달은 관리국 요원이다', characters: ['스팡달'], createdAt: 5, favorite: false }, { type: 'memory', content: '', createdAt: 6 }] }] });
+  assert.deepEqual(H.hypaPlusItems(plus).map((x) => x.text), ['[사실 · 스팡달]\n스팡달은 관리국 요원이다'], '하이파 플러스 노드');
+  assert.ok(H.hypaSummaries(many, 100000, '스팡달', { maxItems: 3, plus }).some((t) => t.includes('관리국 요원')), '플러스 항목도 관련도로 들어감');
   const v2 = { ...c, hypaV2Data: { mainChunks: [{ text: 'v2 요약' }] } };
   assert.deepEqual(H.hypaSummaries(v2), ['v2 요약']);
   assert.deepEqual(H.hypaSummaries(c), []);

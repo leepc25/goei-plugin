@@ -34,6 +34,9 @@ export const PP_DEFAULTS: Record<string, string> = {
   /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
   hypa: '0',
   hypa_cap: '3000',
+  /** 하이파 요약 개수 상한(원본 directorMemoryLimit 16)과 하이파 플러스(플러그인 저장소) 읽기 (2026-11-07) */
+  hypa_items: '16',
+  hypa_plus: '1',
   speed: '1',
   /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
   turn_cap: '10',
@@ -90,6 +93,8 @@ export interface PeopleSettings {
   stageModelId: Record<Stage, string>;
   hypa: boolean;
   hypaCap: number;
+  hypaItems: number;
+  hypaPlus: boolean;
   /** 갱신기 절 덮어쓰기 (지금 지침 판 기준) 와 Director 기본 지침 덮어쓰기 */
   promptOverrides: Record<string, string>;
   directorPrompt: string;
@@ -165,7 +170,9 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     })(),
     stageModelId: { update: v('model_id_update').trim().slice(0, 120), director: v('model_id_director').trim().slice(0, 120), router: v('model_id_router').trim().slice(0, 120), tidy: v('model_id_tidy').trim().slice(0, 120) },
     hypa: v('hypa') === '1',
-    hypaCap: num('hypa_cap', 500, 12000),
+    hypaCap: num('hypa_cap', 500, 24000),
+    hypaItems: num('hypa_items', 1, 64),
+    hypaPlus: v('hypa_plus') !== '0',
     promptOverrides: promptOverrides(state, one('prompt', ['detailed', 'compact'] as const)),
     directorPrompt: (typeof state?.[PS('director', 'base')] === 'string' ? String(state[PS('director', 'base')]) : '').trim().slice(0, 12000),
     speed: num('speed', 0.25, 4),

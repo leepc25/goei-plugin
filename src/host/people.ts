@@ -264,7 +264,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
       const ended = [] as ReturnType<typeof endedNowOf>[];
       void batchKeys;
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: settings.hypa ? hypaSummaries(fresh.chat, settings.hypaCap) : [], exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
@@ -471,6 +471,20 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
   }
 }
 
+/** 하이파 참조 (리수폿 J-3, 2026-11-07 관련도 선택·플러스): 설정이 꺼져 있으면 빈 목록. 플러스는 플러그인 저장소 hypaplus_state_<char>_<chat> */
+async function hypaMemory(chat: Chat, char: { chaId?: string } | undefined, query: string, s: PeopleSettings, cap = s.hypaCap): Promise<string[]> {
+  if (!s.hypa) return [];
+  let plus: unknown;
+  if (s.hypaPlus) {
+    const charId = String(char?.chaId ?? '').trim();
+    const chatKey = String((chat as Record<string, unknown>).id ?? '').trim();
+    if (charId && chatKey) {
+      try { plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId}_${chatKey}`); } catch { plus = undefined; }
+    }
+  }
+  return hypaSummaries(chat, cap, query, { plus: plus ?? undefined, maxItems: s.hypaItems });
+}
+
 // ── 모델 Router (본편 앞, 설정 router=model) ──
 
 let routerCache: { key: string; selected: string[] } | null = null;
@@ -517,9 +531,9 @@ let directorCache: { key: string; notes: DirectorNote[] } | null = null;
 // 2026-11-07: directorSlowStreak(3회 초과 시 세션 끝까지 끔) 뺌. 실패는 그 턴만 메모 없이 진행
 
 /** 연출형 메모 글. 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
-export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown): Promise<string> {
+export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown, char?: { chaId?: string }): Promise<string> {
   if (settings.director !== 'scene') return '';
-  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), settings.hypa ? hypaSummaries(chat, Math.min(settings.hypaCap, 2000)) : []);
+  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), await hypaMemory(chat, char, [input, ...(Array.isArray(chat.message) ? chat.message.slice(-4).map((m) => messageText(String(m.data ?? ''))) : []), ...people].join('\n'), settings, Math.min(settings.hypaCap, 6000)));
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
   // 1차: 메모 또는 검색 요청. 검색 요청이면 코드가 찾아서 2차 (리수폿 B). 각 호출에 시간 제한
