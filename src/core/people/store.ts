@@ -3,7 +3,7 @@
 // 사라진 항목은 지우지 않는다 (화면에서 회색, 되살리기 가능).
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
-import { AXES, PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, DEFAULT_AXES, EXPRESS_TO_AXIS, emptyStore, expressOf, type Candidate, type Change, type Doc, type Entry, type LastRun, type Observation, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { AXES, PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, DEFAULT_AXES, EXPRESS_TO_AXIS, emptyStore, expressOf, type Candidate, type Change, type Doc, type Entry, type LastRun, type Observation, type PeopleStore, type Person, type Register, type SexualProfile, type SexualRecord, type SlotId, SEXUAL_CHARS } from './types';
 
 /** 채팅 마지막 메시지 chatId (없으면 #순번): 기록의 기준 자리 */
 export function anchorOf(chat: Chat): string {
@@ -51,6 +51,7 @@ export function peopleStore(chat: Chat): PeopleStore {
       patterns: Array.isArray(p.patterns) ? p.patterns.filter((t): t is string => typeof t === 'string').slice(0, 30) : [],
       candidates: readCandidates(p.candidates),
       ...(Number.isInteger(p.reviewTurn) ? { reviewTurn: p.reviewTurn as number } : {}),
+      ...(p.sexual && typeof p.sexual === 'object' ? { sexual: readSexual(p.sexual as unknown as Record<string, unknown>) } : {}),
     };
     const me = out.people[name];
     // 축: 저장된 것이 있으면 읽고, 없으면 express 에서 (감정 표출성만). express 는 늘 축에서 다시 계산
@@ -78,13 +79,18 @@ export function peopleStore(chat: Chat): PeopleStore {
   return out;
 }
 
+function readSexual(raw: Record<string, unknown>): SexualProfile {
+  const rec = (v: unknown): SexualRecord => { const r = v && typeof v === 'object' ? (v as Record<string, unknown>) : {}; return { text: plain(r.text, SEXUAL_CHARS), at: str(r.at), ...(r.manual ? { manual: true } : {}) }; };
+  return { desire: rec(raw.desire), paraphilia: rec(raw.paraphilia), desireOn: raw.desireOn !== false, paraphiliaOn: raw.paraphiliaOn !== false, explicit: raw.explicit === true ? true : raw.explicit === false ? false : null };
+}
+
 function readCandidates(raw: unknown): Record<string, Candidate> {
   const out: Record<string, Candidate> = {};
   if (!raw || typeof raw !== 'object') return out;
   for (const [id, c] of Object.entries(raw as Record<string, Partial<Candidate>>)) {
     if (!c || typeof c !== 'object' || typeof c.pattern !== 'string' || typeof c.axis !== 'string') continue;
     const evidence = Array.isArray(c.evidence) ? (c.evidence as Partial<Observation>[]).filter((e) => e && typeof e.id === 'string' && typeof e.anchor === 'string').map((e) => ({ id: e.id!, anchor: e.anchor!, seq: Number(e.seq) || 0, quote: str(e.quote), reason: str(e.reason), strength: Number(e.strength) || 0, confidence: Number(e.confidence) || 0, ...(e.void ? { void: true } : {}) })) : [];
-    out[id] = { id, axis: c.axis as Candidate['axis'], direction: (['up', 'down', 'new', 'weaken'] as const).includes(c.direction as 'up') ? (c.direction as Candidate['direction']) : 'up', pattern: c.pattern, evidence, status: (['collecting', 'approved', 'rejected', 'reverted'] as const).includes(c.status as 'collecting') ? (c.status as Candidate['status']) : 'collecting', at: str(c.at), ...(c.applied && typeof c.applied === 'object' ? { applied: c.applied } : {}) };
+    out[id] = { id, axis: c.axis as Candidate['axis'], direction: (['up', 'down', 'new', 'weaken', 'replace'] as const).includes(c.direction as 'up') ? (c.direction as Candidate['direction']) : 'up', pattern: c.pattern, evidence, status: (['collecting', 'approved', 'rejected', 'reverted'] as const).includes(c.status as 'collecting') ? (c.status as Candidate['status']) : 'collecting', at: str(c.at), ...(c.applied && typeof c.applied === 'object' ? { applied: c.applied } : {}) };
   }
   return out;
 }
@@ -177,7 +183,8 @@ export function putEntry(store: PeopleStore, who: string, slot: SlotId, entry: E
   if (!p) return false;
   const list = (p.slots[slot] ??= []);
   if (list.some((e) => e.id === entry.id)) return false;
-  list.push({ ...entry, text: plain(entry.text, 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
+  // 말투 항목은 다변화(speech.ts) 때 450자 + 표지가 붙을 수 있어 상한을 더 준다
+  list.push({ ...entry, text: plain(entry.text, slot === 'speech' ? 600 : 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
   return true;
 }
 
@@ -257,8 +264,18 @@ export const messageKey = (m: ChatMessage, index: number) => {
   const id = (m as { chatId?: unknown }).chatId;
   return typeof id === 'string' && id ? id : `#${index + 1}`;
 };
-/** 읽음 판정용 내용 해시: 이미지 태그·공백 차이는 무시한다 (갱신기 뒤에 보조 모델이 <img=> 를 끼워도 「바뀐 응답」으로 다시 읽지 않게) */
-export const messageHash = (m: ChatMessage) => hash(messageText(str(m.data)).replace(/<img=.*?>/g, '').replace(/\s+/g, ' ').trim());
+/** 읽음 판정용 내용 해시: 이미지 태그·생각(<thoughts>)·HTML 주석·공백 차이는 무시한다.
+ *  갱신기 뒤에 보조 모델 이미지 태그 보충(host/asset.ts)이 본문을 다시 쓰며 <img=> 를 끼우고 <thoughts>·주석을 지운다 (core/asset.ts splitNarrative).
+ *  그걸 「바뀐 응답」으로 보면 방금 읽은 응답이 턴마다 「지난 응답 안 읽음」으로 쌓였다 (2026-11-07 사용자) */
+export const messageHash = (m: ChatMessage) =>
+  hash(
+    messageText(str(m.data))
+      .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<img\s*=[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
 
 /** 아직 읽지 않은(또는 내용이 바뀐) 봇 응답의 위치들 */
 export function unreadIndexes(chat: Chat, store: PeopleStore): number[] {

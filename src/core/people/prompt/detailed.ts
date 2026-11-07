@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "axes", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "axes", "sexual", "affinity", "affinity_num", "affinity_qual", "register", "perception", "perception_ext", "suspicion", "suspicion_num", "suspicion_qual", "openness_num", "openness_qual", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -15,7 +15,7 @@ export const UPDATER_DETAILED: string = [
   "",
   "You update the per-chat record of named characters in a Korean roleplay, and the small chat-level records of events, places, factions and items that depend on it. After each confirmed exchange you read the new text and return only the changes it supports, as one JSON object. You never write story prose, never stage or plan the next scene, never address the characters, and never compute scores, stages or totals: the program does that from what you return. This instruction is written in English for compliance; every text you put into the record is Korean. Names, address terms and quotes stay exactly as the roleplay wrote them.",
   "",
-  "Work only from this instruction and the data in the user message. Do not search, call tools, or ask for more material. If a rule you would need is missing, or two rules conflict for a case, omit that change instead of guessing. Returning no change is a normal answer; fewer, surer changes beat many guesses.",
+  "Work only from this instruction and the data in the user message. Do not search, call tools, or ask for more material. If a rule you would need is missing, or two rules conflict for a case, omit that change and say so in `issues`. Fewer, surer changes beat many guesses — but a response whose every list is empty is never acceptable: for each person in `people` who appears in the confirmed span and whose record you leave unchanged, return one `issues` item with code `no_canonical_change` and a short reason (what you checked, why nothing moved). The program reads `issues` to tell a real no-change from a response that skipped the work.",
   "",
   "## 1. Control information and narrative data",
   "",
@@ -136,6 +136,9 @@ export const UPDATER_DETAILED: string = [
   "- **Observations (`observations`)**: you never move an axis. For an existing baseline, return an observation only for a plausible persistent change that appears independently in confirmed roleplay: `axis` (one of the six, or `pattern` for a change that is better said in words), `direction` (`up`/`down` for an axis, `new`/`weaken` for a pattern), `pattern` (Korean ≤120: what persistent change this points to, phrased the same way each time so repeated observations group together), `reason` (Korean ≤100: what was seen in this span), `strength` and `confidence` 0–100, `m`, `quote`. Ordinary compliance with a Director plan, a temporary reaction, one mood, intoxication, a crisis, or one target-specific affinity change is not personality evidence. Never predict the new value: the program groups observations by axis, direction and pattern, needs at least four across at least three different messages with mean confidence ≥55, and then asks the user to approve before anything changes. At most 2 observations per person per response; none is the normal answer.",
   "- `patterns` are long-term changes the user already approved; treat them as part of the personality and do not propose them again.",
   "<<END:axes>>",
+  "<<SECTION:sexual>>",
+  "<<SEXUAL_RULES>>",
+  "<<END:sexual>>",
   "<<SECTION:affinity>>",
   "## 7. Affinity and taste (feeling of a person toward the user's character)",
   "",
@@ -402,7 +405,7 @@ export const UPDATER_DETAILED: string = [
   "## 14. Narrative rhythm and hooks — Risupot rhythm",
   "",
   "This feature tracks scene tension and aftermath, chapter flow, and the advancement and payoff of clues actually planted. It never adds an event every turn or forces the story into a shape; when emotion, goals or conflict are already moving, respect that flow. It is recorded as `docs` of type `rhythm` with fixed keys:",
-  "- `scene` (one record, upsert): text starts with `[phase:baseline|build_up|peak|aftermath|cooldown] [engagement:active|idle|intentional_rest]`, then the actual tension factors, evidence of meaningful quiet or stagnation, and the staging method actually applied. Phases may be skipped or repeated; do not attach a preparation phase to a sudden event, and do not cover a scene that needs aftermath with the next stimulus. Rest, mourning, lingering emotion and accepting a feeling are meaningful progression, never boredom. Review stagnation only when the same topic or purposeless talk continues across two or more confirmed turns; a short user input alone is not stagnation.",
+  "- `scene` (one record, upsert): text starts with `[phase:baseline|build_up|peak|aftermath|cooldown] [engagement:active|idle|intentional_rest]`, optionally a third marker `[method:proximity|external_delay|restraint|seed|interruption|chosen_delay|none]` naming the anticipation method actually applied in this reply (the program compares it with the previous turn and forbids the same method twice in a row), then the actual tension factors, evidence of meaningful quiet or stagnation, and the staging method actually applied. Phases may be skipped or repeated; do not attach a preparation phase to a sudden event, and do not cover a scene that needs aftermath with the next stimulus. Rest, mourning, lingering emotion and accepting a feeling are meaningful progression, never boredom. Review stagnation only when the same topic or purposeless talk continues across two or more confirmed turns; a short user input alone is not stagnation.",
   "- `chapter` (upsert): the chapter's shared theme, turning points and important event links, reviewed only after an actual scene cycle ends through a new location, date or subject.",
   "- `arc` (upsert): a long-term narrative assessment of the relationship's actual turning points and unresolved tension, reviewed only at a chapter boundary or an important event. Never duplicate the relationship entries or an affinity stage, and never overwrite them with rhythm vocabulary.",
   "- `hook:<short name>` (one per clue): text starts with `[stage:seeded|hinted|escalated|payoff_ready|resolved|retired] [tier:short|mid|long]`, then the evidence of the clue actually planted, its scale, payoff condition, actual advancement and links. Register a hook only when it actually appeared in completed text; never from a plan. Advance a stage only when the span actually shows it; at most one hook action per response.",
@@ -503,8 +506,11 @@ export const UPDATER_DETAILED: string = [
   "  \"text\":\"<Korean ≤200 chars or null for remove>\",\"target\":\"<name|@user|null>\",\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
   "<<SECTION:axes>>",
   " \"axes_init\":[{\"who\":\"<name with axes_init_needed>\",\"axes\":{\"relationalInitiative\":50,\"expressionDirectness\":50,\"emotionalExpressiveness\":50,\"guardedness\":50,\"impulsivity\":50,\"relationshipPersistence\":50},\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
-  " \"observations\":[{\"who\":\"<name>\",\"axis\":\"<axis name|pattern>\",\"direction\":\"up|down|new|weaken\",\"pattern\":\"<Korean ≤120>\",\"reason\":\"<Korean ≤100>\",\"strength\":<0..100>,\"confidence\":<0..100>,\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
+  " \"observations\":[{\"who\":\"<name>\",\"axis\":\"<axis name|pattern|sexual_desire|paraphilia>\",\"direction\":\"up|down|new|weaken|replace\",\"pattern\":\"<Korean ≤120; ≤700 for a sexual axis>\",\"reason\":\"<Korean ≤100>\",\"strength\":<0..100>,\"confidence\":<0..100>,\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
   "<<END:axes>>",
+  "<<SECTION:sexual>>",
+  " \"sexual_init\":[{\"who\":\"<name whose sexual.init_needed lists the field>\",\"sexual_desire\":\"<Korean ≤700, <추정>…, 미확인, or omit>\",\"paraphilia\":\"<Korean ≤700, <추정>…, 미확인, or omit>\",\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
+  "<<END:sexual>>",
   "<<SECTION:affinity_num>>",
   " \"cues\":[{\"who\":\"<name>\",\"cue\":\"<cue name>\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤40 chars>\"}],",
   "<<END:affinity_num>>",
@@ -535,6 +541,7 @@ export const UPDATER_DETAILED: string = [
   "<<SECTION:debrief>>",
   " \"debriefs\":[{\"id\":\"<ended_now id>\",\"who\":\"<agent name from that item>\",\"text\":\"<Korean 2–3 sentences ≤240 chars>\"}],",
   "<<END:debrief>>",
+  " \"issues\":[{\"code\":\"no_canonical_change|incomplete_contract|ambiguous_identity|insufficient_evidence\",\"who\":\"<name or null>\",\"reason\":\"<Korean ≤80 chars>\"}],",
   " \"next_note\":[{\"who\":\"<name>\",\"now\":\"<English ≤120 chars>\",\"must_not_reveal\":[\"<≤80 chars>\"]}]",
   "}",
   "Limits: ≤8 entries per person, ≤6 persons, ≤2 cues per person, ≤2 observations per person, ≤2 new_people, ≤6 docs, ≤1 clue per suspicion case. Use only names from `people` (canonical `name`, not an alias) or names you gave in `new_people` this response. `docs` types other than those whose sections are present, and `suspicion` when its section is absent, are never returned. Write Korean literally (no \\uXXXX escapes). Empty arrays are fine. Before returning, check every item against the current slots, cue names, kinds, ids, names and quotes, and drop anything that fails: the program discards invalid items and the rest still applies.",

@@ -18,7 +18,7 @@ const T = await mod('types');
 const St = await mod('settings');
 const A = await mod('affinity');
 
-const settings = (over = {}) => ({ ...St.peopleSettings({}), ...over });
+const settings = (over = {}) => ({ ...St.peopleSettings({ $pp_director: 'note', $pp_prev_pairs: '1', $pp_num_suspicion: '1' }), ...over });
 const person = (name, extra = {}) => ({ name, faction: 'A00', seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [], ...extra });
 const chat = (...msgs) => ({ message: msgs.map(([role, data, chatId]) => ({ role, data, chatId })) });
 const names = [{ name: '쟈알디', aliases: ['Jyaldi'], titles: ['부장'] }, { name: '데쥬레', aliases: [], titles: [] }];
@@ -47,6 +47,17 @@ test('묶음 계획: 6턴 또는 글자 상한', () => {
   const unread = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
   assert.deepEqual(U.planBatches(c, unread, 100000).map((b) => b.length), [6, 4]);
   assert.deepEqual(U.planBatches(c, unread, 5000).map((b) => b.length), [2, 2, 2, 2, 2]);
+});
+
+test('입력 상한(W4): 확정 응답이 상한을 넘으면 overBudget 에 담고(접지 않음), 맥락 구간만 접는다', () => {
+  const { c, store } = setup();
+  const small = { ...settings(), spanCap: 40 };
+  const long = { message: c.message.map((m, i) => (i === 3 ? { ...m, data: '쟈알디가 ' + '길게 말했다. '.repeat(30) } : m)) };
+  const input = U.buildUpdate(long, store, [3], { settings: small, system: 'S', values: {}, names });
+  assert.deepEqual(input.overBudget, [3]);
+  assert.ok(input.data.span[3].text.length > 40, '확정 글은 접지 않음');
+  const ok = U.buildUpdate(c, store, [3], { settings: settings(), system: 'S', values: {}, names });
+  assert.deepEqual(ok.overBudget, []);
 });
 
 test('요청 자료: 확정·맥락 구간, 꼬리표, 장면 인물, 태그 신호, 이미 기록된 것', () => {
@@ -217,7 +228,7 @@ test('유저가 연기하는 요원은 장면 인물·새 인물에서 빠진다
 });
 
 test('기본값: 인물끼리 감정 켬, 기록 상한 2000, 접기 상한 20000, 말투 5종', () => {
-  const s = St.peopleSettings({});
+  const s = St.peopleSettings({ $pp_director: 'note', $pp_prev_pairs: '1', $pp_num_suspicion: '1' });
   assert.ok(s.features.has('npc_emotion'));
   assert.equal(s.spanCap, 20000);
   assert.deepEqual(T.REGISTERS, ['존댓말', '반말', '혼합', '하게체', '하오체']);
