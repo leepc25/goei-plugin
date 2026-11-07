@@ -10080,6 +10080,17 @@
   },
   {
    "keywords": [
+    "도토리묵"
+   ],
+   "file": "food_107.png",
+   "kind": "food",
+   "base": false,
+   "name": "도토리묵",
+   "src": "game-src/items/raw/batch_134/10.png",
+   "old_src": "game-src/items/raw/batch_71/13.png"
+  },
+  {
+   "keywords": [
     "무전기"
    ],
    "file": "device_001.png",
@@ -20034,18 +20045,6 @@
    "name": "우산 칼",
    "src": "game-src/items/raw/batch_134/06.png",
    "old_src": "game-src/items/raw/batch_69/08.png",
-   "excluded_note": "사용자 11-07 「빼」: 그림이 안 됨. 파일은 남김"
-  },
-  {
-   "keywords": [
-    "도토리묵"
-   ],
-   "file": "food_107.png",
-   "kind": "food",
-   "base": false,
-   "name": "도토리묵",
-   "src": "game-src/items/raw/batch_134/10.png",
-   "old_src": "game-src/items/raw/batch_71/13.png",
    "excluded_note": "사용자 11-07 「빼」: 그림이 안 됨. 파일은 남김"
   }
  ]
