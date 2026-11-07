@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "라떼",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white ceramic cup of latte with heart latte art Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "버블티",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cup of milk tea with black tapioca pearls and a fat straw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "핫초코",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mug of hot chocolate with marshmallows Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사케",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white ceramic sake bottle with a small cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고량주",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short red and white ceramic bottle of Chinese liquor Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "샴페인",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark green champagne bottle with gold foil top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "칵테일",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cocktail glass with a red drink and a lemon slice Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수박",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slice of red watermelon with black seeds Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "딸기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three red strawberries Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "포도",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bunch of purple grapes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large round golden Korean pear Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an orange persimmon with green leaf top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "복숭아",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink peach Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "참외",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow Korean melon with white stripes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "레몬",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow lemon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "키위",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kiwi cut in half showing green flesh Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

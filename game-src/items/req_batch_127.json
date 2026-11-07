@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "철창 우리",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small iron cage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "궤짝",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old wooden chest Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보물 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a treasure chest Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반닫이",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean wooden chest Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문서함",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a document box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금고 가방",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal briefcase safe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "휴대용 냉장고",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable cooler Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리 돔",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass dome cloche Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소금 항아리",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a salt jar Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "트렁크",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old travel trunk Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "퍼즐 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden puzzle box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오동나무 상자",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paulownia wood box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혼수함",
+   "kind": "seal",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red wedding box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "콘돔",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few wrapped condom packets Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

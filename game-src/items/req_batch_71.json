@@ -1,0 +1,101 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "껌",
+   "kind": "food",
+   "redo": "33-15",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stick of chewing gum half out of its silver wrapper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "앨리스 피크닉 세트",
+   "kind": "food",
+   "redo": "34-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wicker picnic basket with a drink bottle and a cookie peeking out, no cloth under it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "믹스커피",
+   "kind": "food",
+   "redo": "34-6",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few slim yellow instant coffee mix sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "메밀묵",
+   "kind": "food",
+   "redo": "34-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of gray buckwheat jelly cut into a few cubes, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "과자",
+   "kind": "food",
+   "redo": "34-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open bag of snack chips with chips visible inside, plain bag Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케이크",
+   "kind": "food",
+   "redo": "35-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slice of chocolate cake with a strawberry on top, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두유",
+   "kind": "food",
+   "redo": "35-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small soy milk carton with a straw, plain beige carton with a soybean picture Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "순대",
+   "kind": "food",
+   "redo": "36-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few round slices of Korean blood sausage with visible glass noodles inside, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고기",
+   "kind": "food",
+   "redo": "38-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick raw marbled beef steak alone, no tray, no wrap, no label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "설탕",
+   "kind": "food",
+   "redo": "38-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of white sugar cubes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시리얼",
+   "kind": "food",
+   "redo": "39-7",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of cereal with milk and a spoon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "궐련",
+   "kind": "food",
+   "redo": "39-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single thin brown hand-rolled tobacco cigarette Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도토리묵",
+   "kind": "food",
+   "redo": "40-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a block of brown acorn jelly cut into slices, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "만두",
+   "kind": "food",
+   "redo": "40-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few steamed Korean dumplings, no plate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사진",
+   "kind": "paper",
+   "redo": "40-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a printed photograph with a white border, showing a dim figure, slightly curled corners Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전단지(알바 모집)",
+   "kind": "paper",
+   "redo": "40-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a part-time job flyer with tear-off phone strips at the bottom, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

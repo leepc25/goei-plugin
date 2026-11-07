@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "쥐",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gray rat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비둘기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pigeon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "까마귀",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black crow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나비 표본",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a framed butterfly specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곤충 채집통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bug catching box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잠자리채",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a butterfly net, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "우산꽂이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an umbrella stand Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "열쇠함",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wall key cabinet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공구 벨트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tool belt with tools Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "담배 케이스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal cigarette case Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카드 지갑",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim card wallet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round pin badge Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "자수 패치",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an embroidered patch Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스티커",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of stickers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "포토카드",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a photocard in a sleeve Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "응원봉",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glowing fan light stick Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

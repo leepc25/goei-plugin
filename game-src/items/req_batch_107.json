@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "호루스의 눈",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eye of Horus amulet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "함사",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hamsa hand amulet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나자르",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue nazar evil eye bead Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성수반",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone holy water font Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성광",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold monstrance Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성배",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ornate gold chalice Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "향 주머니",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small fabric scent pouch Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "세이지 다발",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of white sage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팔로산토",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few palo santo sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마법진 천",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black cloth with a white magic circle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "위자 보드",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ouija board, symbols only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "플랑셰트",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heart-shaped planchette Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "분신사바 종이",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of paper with a pencil circle and a red pen on it, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펜듈럼",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crystal pendulum on a chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다우징 막대",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of L-shaped dowsing rods Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오라클 카드",
+   "kind": "charm",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fanned deck of oracle cards Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

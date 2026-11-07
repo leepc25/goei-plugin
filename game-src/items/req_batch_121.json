@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "피규어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an action figure Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "프라모델",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a model kit runner frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "레고 블록",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few toy bricks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "체스판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chess board with pieces Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바둑판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a go board with stones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "윷",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. four Korean yut sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마작 패",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few mahjong tiles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three darts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "볼링공",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowling ball Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "테니스 라켓",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tennis racket Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배드민턴 라켓",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a badminton racket with shuttlecock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탁구채",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ping pong paddle with ball Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골프공",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golf ball Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스케이트보드",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skateboard Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인라인 스케이트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an inline skate Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스키",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of skis, compact Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

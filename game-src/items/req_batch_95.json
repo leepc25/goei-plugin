@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "와인 오프너",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a corkscrew wine opener Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깡통 따개",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a can opener Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "체",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mesh kitchen strainer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깔때기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic funnel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계량컵",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear measuring cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "타이머",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kitchen egg timer Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수통",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a military canteen with a cover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "반합",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a military mess kit pot Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "휴대용 정수기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a portable water filter straw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정수 알약",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bottle of water purification tablets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚시 바늘",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few fishing hooks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚시찌",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red and white fishing float bobber Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "덫",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel jaw trap, open Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쥐덫",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden mouse trap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "끈끈이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sticky glue trap board Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이동장",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a plastic pet carrier crate Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
