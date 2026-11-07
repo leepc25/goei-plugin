@@ -305,8 +305,8 @@
    "kind": "paper",
    "base": false,
    "name": "QR 코드 포스터",
-   "src": "game-src/items/raw/batch_72/08.png",
-   "old_src": "game-src/items/raw/batch_43/13.png"
+   "src": "game-src/items/raw/batch_134/11.png",
+   "old_src": "game-src/items/raw/batch_72/08.png"
   },
   {
    "keywords": [
@@ -479,6 +479,16 @@
    "base": false,
    "name": "고양이 귀 머리띠",
    "src": "game-src/items/raw/batch_131/15.png"
+  },
+  {
+   "keywords": [
+    "래빗 바이브레이터"
+   ],
+   "file": "adult_054.png",
+   "kind": "adult",
+   "base": false,
+   "name": "래빗 바이브레이터",
+   "src": "game-src/items/raw/batch_137/05.png"
   },
   {
    "keywords": [
@@ -1171,7 +1181,8 @@
    "kind": "misc",
    "base": false,
    "name": "화이트보드 마커",
-   "src": "game-src/items/raw/batch_123/09.png"
+   "src": "game-src/items/raw/batch_139/07.png",
+   "old_src": "game-src/items/raw/batch_123/09.png"
   },
   {
    "keywords": [
@@ -1182,6 +1193,16 @@
    "base": false,
    "name": "생물 표본 상자",
    "src": "game-src/items/raw/batch_126/13.png"
+  },
+  {
+   "keywords": [
+    "전립선 마사지기"
+   ],
+   "file": "adult_057.png",
+   "kind": "adult",
+   "base": false,
+   "name": "전립선 마사지기",
+   "src": "game-src/items/raw/batch_138/03.png"
   },
   {
    "keywords": [
@@ -1954,7 +1975,8 @@
    "kind": "device",
    "base": false,
    "name": "플로피 디스크",
-   "src": "game-src/items/raw/batch_98/11.png"
+   "src": "game-src/items/raw/batch_135/12.png",
+   "old_src": "game-src/items/raw/batch_98/11.png"
   },
   {
    "keywords": [
@@ -2014,7 +2036,8 @@
    "kind": "device",
    "base": false,
    "name": "전자책 리더기",
-   "src": "game-src/items/raw/batch_101/15.png"
+   "src": "game-src/items/raw/batch_135/14.png",
+   "old_src": "game-src/items/raw/batch_101/15.png"
   },
   {
    "keywords": [
@@ -2294,7 +2317,8 @@
    "kind": "consumable",
    "base": false,
    "name": "전자담배 액상",
-   "src": "game-src/items/raw/batch_118/07.png"
+   "src": "game-src/items/raw/batch_138/10.png",
+   "old_src": "game-src/items/raw/batch_118/07.png"
   },
   {
    "keywords": [
@@ -2375,6 +2399,36 @@
    "base": false,
    "name": "사이하이 부츠",
    "src": "game-src/items/raw/batch_131/08.png"
+  },
+  {
+   "keywords": [
+    "레이스 란제리"
+   ],
+   "file": "adult_045.png",
+   "kind": "adult",
+   "base": false,
+   "name": "레이스 란제리",
+   "src": "game-src/items/raw/batch_136/02.png"
+  },
+  {
+   "keywords": [
+    "완드 마사지기"
+   ],
+   "file": "adult_053.png",
+   "kind": "adult",
+   "base": false,
+   "name": "완드 마사지기",
+   "src": "game-src/items/raw/batch_137/04.png"
+  },
+  {
+   "keywords": [
+    "본디지 마스크"
+   ],
+   "file": "adult_061.png",
+   "kind": "adult",
+   "base": false,
+   "name": "본디지 마스크",
+   "src": "game-src/items/raw/batch_139/02.png"
   },
   {
    "keywords": [
@@ -3667,7 +3721,8 @@
    "kind": "device",
    "base": false,
    "name": "LP 레코드",
-   "src": "game-src/items/raw/batch_98/12.png"
+   "src": "game-src/items/raw/batch_135/13.png",
+   "old_src": "game-src/items/raw/batch_98/12.png"
   },
   {
    "keywords": [
@@ -4117,7 +4172,8 @@
    "kind": "paper",
    "base": false,
    "name": "사망 진단서",
-   "src": "game-src/items/raw/batch_115/01.png"
+   "src": "game-src/items/raw/batch_136/10.png",
+   "old_src": "game-src/items/raw/batch_115/01.png"
   },
   {
    "keywords": [
@@ -4157,7 +4213,8 @@
    "kind": "consumable",
    "base": false,
    "name": "모기 기피제",
-   "src": "game-src/items/raw/batch_116/04.png"
+   "src": "game-src/items/raw/batch_136/14.png",
+   "old_src": "game-src/items/raw/batch_116/04.png"
   },
   {
    "keywords": [
@@ -4167,7 +4224,8 @@
    "kind": "consumable",
    "base": false,
    "name": "헤어스프레이",
-   "src": "game-src/items/raw/batch_116/15.png"
+   "src": "game-src/items/raw/batch_137/10.png",
+   "old_src": "game-src/items/raw/batch_116/15.png"
   },
   {
    "keywords": [
@@ -4187,7 +4245,8 @@
    "kind": "consumable",
    "base": false,
    "name": "바퀴벌레 약",
-   "src": "game-src/items/raw/batch_117/14.png"
+   "src": "game-src/items/raw/batch_137/14.png",
+   "old_src": "game-src/items/raw/batch_117/14.png"
   },
   {
    "keywords": [
@@ -4197,7 +4256,8 @@
    "kind": "consumable",
    "base": false,
    "name": "유리 세정제",
-   "src": "game-src/items/raw/batch_118/02.png"
+   "src": "game-src/items/raw/batch_138/06.png",
+   "old_src": "game-src/items/raw/batch_118/02.png"
   },
   {
    "keywords": [
@@ -4227,7 +4287,8 @@
    "kind": "misc",
    "base": false,
    "name": "고양이 모래",
-   "src": "game-src/items/raw/batch_119/07.png"
+   "src": "game-src/items/raw/batch_138/13.png",
+   "old_src": "game-src/items/raw/batch_119/07.png"
   },
   {
    "keywords": [
@@ -4498,6 +4559,96 @@
    "base": false,
    "name": "바니걸 의상",
    "src": "game-src/items/raw/batch_131/14.png"
+  },
+  {
+   "keywords": [
+    "마사지 오일"
+   ],
+   "file": "adult_034.png",
+   "kind": "adult",
+   "base": false,
+   "name": "마사지 오일",
+   "src": "game-src/items/raw/batch_134/02.png"
+  },
+  {
+   "keywords": [
+    "페로몬 향수"
+   ],
+   "file": "adult_035.png",
+   "kind": "adult",
+   "base": false,
+   "name": "페로몬 향수",
+   "src": "game-src/items/raw/batch_134/03.png"
+  },
+  {
+   "keywords": [
+    "가죽 커프스"
+   ],
+   "file": "adult_041.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가죽 커프스",
+   "src": "game-src/items/raw/batch_135/04.png"
+  },
+  {
+   "keywords": [
+    "스프레더 바"
+   ],
+   "file": "adult_042.png",
+   "kind": "adult",
+   "base": false,
+   "name": "스프레더 바",
+   "src": "game-src/items/raw/batch_135/05.png"
+  },
+  {
+   "keywords": [
+    "가죽 하네스"
+   ],
+   "file": "adult_043.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가죽 하네스",
+   "src": "game-src/items/raw/batch_135/06.png"
+  },
+  {
+   "keywords": [
+    "라텍스 수트"
+   ],
+   "file": "adult_048.png",
+   "kind": "adult",
+   "base": false,
+   "name": "라텍스 수트",
+   "src": "game-src/items/raw/batch_136/05.png"
+  },
+  {
+   "keywords": [
+    "바이브레이터"
+   ],
+   "file": "adult_050.png",
+   "kind": "adult",
+   "base": false,
+   "name": "바이브레이터",
+   "src": "game-src/items/raw/batch_137/01.png"
+  },
+  {
+   "keywords": [
+    "애널 플러그"
+   ],
+   "file": "adult_055.png",
+   "kind": "adult",
+   "base": false,
+   "name": "애널 플러그",
+   "src": "game-src/items/raw/batch_138/01.png"
+  },
+  {
+   "keywords": [
+    "흡입 진동기"
+   ],
+   "file": "adult_058.png",
+   "kind": "adult",
+   "base": false,
+   "name": "흡입 진동기",
+   "src": "game-src/items/raw/batch_138/04.png"
   },
   {
    "keywords": [
@@ -6396,7 +6547,8 @@
    "kind": "food",
    "base": false,
    "name": "홍삼 스틱",
-   "src": "game-src/items/raw/batch_83/08.png"
+   "src": "game-src/items/raw/batch_134/15.png",
+   "old_src": "game-src/items/raw/batch_83/08.png"
   },
   {
    "keywords": [
@@ -6656,7 +6808,8 @@
    "kind": "tool",
    "base": false,
    "name": "정수 알약",
-   "src": "game-src/items/raw/batch_95/10.png"
+   "src": "game-src/items/raw/batch_135/09.png",
+   "old_src": "game-src/items/raw/batch_95/10.png"
   },
   {
    "keywords": [
@@ -6746,7 +6899,8 @@
    "kind": "tool",
    "base": false,
    "name": "소화 담요",
-   "src": "game-src/items/raw/batch_97/12.png"
+   "src": "game-src/items/raw/batch_135/11.png",
+   "old_src": "game-src/items/raw/batch_97/12.png"
   },
   {
    "keywords": [
@@ -6976,7 +7130,8 @@
    "kind": "medical",
    "base": false,
    "name": "알레르기약",
-   "src": "game-src/items/raw/batch_105/05.png"
+   "src": "game-src/items/raw/batch_136/07.png",
+   "old_src": "game-src/items/raw/batch_105/05.png"
   },
   {
    "keywords": [
@@ -7296,7 +7451,8 @@
    "kind": "paper",
    "base": false,
    "name": "실종 전단",
-   "src": "game-src/items/raw/batch_115/02.png"
+   "src": "game-src/items/raw/batch_136/11.png",
+   "old_src": "game-src/items/raw/batch_115/02.png"
   },
   {
    "keywords": [
@@ -7346,7 +7502,8 @@
    "kind": "consumable",
    "base": false,
    "name": "클렌징 폼",
-   "src": "game-src/items/raw/batch_116/11.png"
+   "src": "game-src/items/raw/batch_137/07.png",
+   "old_src": "game-src/items/raw/batch_116/11.png"
   },
   {
    "keywords": [
@@ -7376,7 +7533,8 @@
    "kind": "consumable",
    "base": false,
    "name": "즉석 필름",
-   "src": "game-src/items/raw/batch_117/13.png"
+   "src": "game-src/items/raw/batch_137/13.png",
+   "old_src": "game-src/items/raw/batch_117/13.png"
   },
   {
    "keywords": [
@@ -7386,7 +7544,8 @@
    "kind": "consumable",
    "base": false,
    "name": "데오드란트",
-   "src": "game-src/items/raw/batch_118/04.png"
+   "src": "game-src/items/raw/batch_138/08.png",
+   "old_src": "game-src/items/raw/batch_118/04.png"
   },
   {
    "keywords": [
@@ -7720,6 +7879,66 @@
   },
   {
    "keywords": [
+    "가죽 채찍"
+   ],
+   "file": "adult_038.png",
+   "kind": "adult",
+   "base": false,
+   "name": "가죽 채찍",
+   "src": "game-src/items/raw/batch_135/01.png"
+  },
+  {
+   "keywords": [
+    "바디스타킹"
+   ],
+   "file": "adult_047.png",
+   "kind": "adult",
+   "base": false,
+   "name": "바디스타킹",
+   "src": "game-src/items/raw/batch_136/04.png"
+  },
+  {
+   "keywords": [
+    "애널 비즈"
+   ],
+   "file": "adult_056.png",
+   "kind": "adult",
+   "base": false,
+   "name": "애널 비즈",
+   "src": "game-src/items/raw/batch_138/02.png"
+  },
+  {
+   "keywords": [
+    "구속 밴드"
+   ],
+   "file": "adult_062.png",
+   "kind": "adult",
+   "base": false,
+   "name": "구속 밴드",
+   "src": "game-src/items/raw/batch_139/03.png"
+  },
+  {
+   "keywords": [
+    "진공 펌프"
+   ],
+   "file": "adult_063.png",
+   "kind": "adult",
+   "base": false,
+   "name": "진공 펌프",
+   "src": "game-src/items/raw/batch_139/04.png"
+  },
+  {
+   "keywords": [
+    "촉감 바퀴"
+   ],
+   "file": "adult_065.png",
+   "kind": "adult",
+   "base": false,
+   "name": "촉감 바퀴",
+   "src": "game-src/items/raw/batch_139/09.png"
+  },
+  {
+   "keywords": [
     "바람개비"
    ],
    "file": "misc_183.png",
@@ -7817,8 +8036,8 @@
    "kind": "weapon",
    "base": false,
    "name": "우산 칼",
-   "src": "game-src/items/raw/batch_69/08.png",
-   "old_src": "game-src/items/raw/batch_08/05.png"
+   "src": "game-src/items/raw/batch_134/06.png",
+   "old_src": "game-src/items/raw/batch_69/08.png"
   },
   {
    "keywords": [
@@ -8206,8 +8425,8 @@
    "kind": "food",
    "base": false,
    "name": "믹스커피",
-   "src": "game-src/items/raw/batch_71/03.png",
-   "old_src": "game-src/items/raw/batch_34/06.png"
+   "src": "game-src/items/raw/batch_134/08.png",
+   "old_src": "game-src/items/raw/batch_71/03.png"
   },
   {
    "keywords": [
@@ -8317,8 +8536,8 @@
    "kind": "food",
    "base": false,
    "name": "도토리묵",
-   "src": "game-src/items/raw/batch_71/13.png",
-   "old_src": "game-src/items/raw/batch_40/01.png"
+   "src": "game-src/items/raw/batch_134/10.png",
+   "old_src": "game-src/items/raw/batch_71/13.png"
   },
   {
    "keywords": [
@@ -9102,7 +9321,8 @@
    "kind": "weapon",
    "base": false,
    "name": "지팡이칼",
-   "src": "game-src/items/raw/batch_91/09.png"
+   "src": "game-src/items/raw/batch_135/08.png",
+   "old_src": "game-src/items/raw/batch_91/09.png"
   },
   {
    "keywords": [
@@ -9302,7 +9522,8 @@
    "kind": "medical",
    "base": false,
    "name": "펜라이트",
-   "src": "game-src/items/raw/batch_105/03.png"
+   "src": "game-src/items/raw/batch_135/16.png",
+   "old_src": "game-src/items/raw/batch_105/03.png"
   },
   {
    "keywords": [
@@ -9532,7 +9753,8 @@
    "kind": "consumable",
    "base": false,
    "name": "마스크팩",
-   "src": "game-src/items/raw/batch_116/12.png"
+   "src": "game-src/items/raw/batch_137/08.png",
+   "old_src": "game-src/items/raw/batch_116/12.png"
   },
   {
    "keywords": [
@@ -9542,7 +9764,8 @@
    "kind": "consumable",
    "base": false,
    "name": "인공눈물",
-   "src": "game-src/items/raw/batch_118/03.png"
+   "src": "game-src/items/raw/batch_138/07.png",
+   "old_src": "game-src/items/raw/batch_118/03.png"
   },
   {
    "keywords": [
@@ -9572,7 +9795,8 @@
    "kind": "misc",
    "base": false,
    "name": "쓰레기통",
-   "src": "game-src/items/raw/batch_119/01.png"
+   "src": "game-src/items/raw/batch_138/11.png",
+   "old_src": "game-src/items/raw/batch_119/01.png"
   },
   {
    "keywords": [
@@ -9592,7 +9816,8 @@
    "kind": "misc",
    "base": false,
    "name": "새 모이",
-   "src": "game-src/items/raw/batch_119/04.png"
+   "src": "game-src/items/raw/batch_138/12.png",
+   "old_src": "game-src/items/raw/batch_119/04.png"
   },
   {
    "keywords": [
@@ -9682,7 +9907,8 @@
    "kind": "misc",
    "base": false,
    "name": "면도크림",
-   "src": "game-src/items/raw/batch_123/02.png"
+   "src": "game-src/items/raw/batch_138/16.png",
+   "old_src": "game-src/items/raw/batch_123/02.png"
   },
   {
    "keywords": [
@@ -9823,6 +10049,56 @@
    "base": false,
    "name": "흥분 젤",
    "src": "game-src/items/raw/batch_131/10.png"
+  },
+  {
+   "keywords": [
+    "리드 줄"
+   ],
+   "file": "adult_037.png",
+   "kind": "adult",
+   "base": false,
+   "name": "리드 줄",
+   "src": "game-src/items/raw/batch_134/05.png"
+  },
+  {
+   "keywords": [
+    "베이비돌"
+   ],
+   "file": "adult_046.png",
+   "kind": "adult",
+   "base": false,
+   "name": "베이비돌",
+   "src": "game-src/items/raw/batch_136/03.png"
+  },
+  {
+   "keywords": [
+    "끈 팬티"
+   ],
+   "file": "adult_049.png",
+   "kind": "adult",
+   "base": false,
+   "name": "끈 팬티",
+   "src": "game-src/items/raw/batch_136/06.png"
+  },
+  {
+   "keywords": [
+    "스트랩온"
+   ],
+   "file": "adult_059.png",
+   "kind": "adult",
+   "base": false,
+   "name": "스트랩온",
+   "src": "game-src/items/raw/batch_138/05.png"
+  },
+  {
+   "keywords": [
+    "케겔 볼"
+   ],
+   "file": "adult_064.png",
+   "kind": "adult",
+   "base": false,
+   "name": "케겔 볼",
+   "src": "game-src/items/raw/batch_139/05.png"
   },
   {
    "keywords": [
@@ -11022,8 +11298,8 @@
    "kind": "medical",
    "base": false,
    "name": "지혈제",
-   "src": "game-src/items/raw/batch_70/08.png",
-   "old_src": "game-src/items/raw/batch_30/05.png"
+   "src": "game-src/items/raw/batch_134/07.png",
+   "old_src": "game-src/items/raw/batch_70/08.png"
   },
   {
    "keywords": [
@@ -12828,7 +13104,8 @@
    "kind": "food",
    "base": false,
    "name": "애호박",
-   "src": "game-src/items/raw/batch_80/07.png"
+   "src": "game-src/items/raw/batch_134/13.png",
+   "old_src": "game-src/items/raw/batch_80/07.png"
   },
   {
    "keywords": [
@@ -12888,7 +13165,8 @@
    "kind": "food",
    "base": false,
    "name": "고량주",
-   "src": "game-src/items/raw/batch_81/05.png"
+   "src": "game-src/items/raw/batch_134/14.png",
+   "old_src": "game-src/items/raw/batch_81/05.png"
   },
   {
    "keywords": [
@@ -13028,7 +13306,8 @@
    "kind": "food",
    "base": false,
    "name": "고추장",
-   "src": "game-src/items/raw/batch_84/01.png"
+   "src": "game-src/items/raw/batch_134/16.png",
+   "old_src": "game-src/items/raw/batch_84/01.png"
   },
   {
    "keywords": [
@@ -13758,7 +14037,8 @@
    "kind": "tool",
    "base": false,
    "name": "끈끈이",
-   "src": "game-src/items/raw/batch_95/15.png"
+   "src": "game-src/items/raw/batch_135/10.png",
+   "old_src": "game-src/items/raw/batch_95/15.png"
   },
   {
    "keywords": [
@@ -14268,7 +14548,8 @@
    "kind": "paper",
    "base": false,
    "name": "시험지",
-   "src": "game-src/items/raw/batch_114/06.png"
+   "src": "game-src/items/raw/batch_136/08.png",
+   "old_src": "game-src/items/raw/batch_114/06.png"
   },
   {
    "keywords": [
@@ -14378,7 +14659,8 @@
    "kind": "paper",
    "base": false,
    "name": "차용증",
-   "src": "game-src/items/raw/batch_115/12.png"
+   "src": "game-src/items/raw/batch_136/12.png",
+   "old_src": "game-src/items/raw/batch_115/12.png"
   },
   {
    "keywords": [
@@ -14388,7 +14670,8 @@
    "kind": "consumable",
    "base": false,
    "name": "착화제",
-   "src": "game-src/items/raw/batch_116/01.png"
+   "src": "game-src/items/raw/batch_136/13.png",
+   "old_src": "game-src/items/raw/batch_116/01.png"
   },
   {
    "keywords": [
@@ -14418,7 +14701,8 @@
    "kind": "consumable",
    "base": false,
    "name": "탈취제",
-   "src": "game-src/items/raw/batch_116/06.png"
+   "src": "game-src/items/raw/batch_136/15.png",
+   "old_src": "game-src/items/raw/batch_116/06.png"
   },
   {
    "keywords": [
@@ -14428,7 +14712,8 @@
    "kind": "consumable",
    "base": false,
    "name": "선크림",
-   "src": "game-src/items/raw/batch_116/09.png"
+   "src": "game-src/items/raw/batch_136/16.png",
+   "old_src": "game-src/items/raw/batch_116/09.png"
   },
   {
    "keywords": [
@@ -14438,7 +14723,8 @@
    "kind": "consumable",
    "base": false,
    "name": "염색약",
-   "src": "game-src/items/raw/batch_116/13.png"
+   "src": "game-src/items/raw/batch_137/09.png",
+   "old_src": "game-src/items/raw/batch_116/13.png"
   },
   {
    "keywords": [
@@ -14508,7 +14794,8 @@
    "kind": "consumable",
    "base": false,
    "name": "제초제",
-   "src": "game-src/items/raw/batch_118/01.png"
+   "src": "game-src/items/raw/batch_137/16.png",
+   "old_src": "game-src/items/raw/batch_118/01.png"
   },
   {
    "keywords": [
@@ -14518,7 +14805,8 @@
    "kind": "consumable",
    "base": false,
    "name": "아세톤",
-   "src": "game-src/items/raw/batch_118/06.png"
+   "src": "game-src/items/raw/batch_138/09.png",
+   "old_src": "game-src/items/raw/batch_118/06.png"
   },
   {
    "keywords": [
@@ -14648,7 +14936,8 @@
    "kind": "misc",
    "base": false,
    "name": "바둑판",
-   "src": "game-src/items/raw/batch_121/05.png"
+   "src": "game-src/items/raw/batch_138/15.png",
+   "old_src": "game-src/items/raw/batch_121/05.png"
   },
   {
    "keywords": [
@@ -14778,7 +15067,8 @@
    "kind": "misc",
    "base": false,
    "name": "서류철",
-   "src": "game-src/items/raw/batch_123/05.png"
+   "src": "game-src/items/raw/batch_139/06.png",
+   "old_src": "game-src/items/raw/batch_123/05.png"
   },
   {
    "keywords": [
@@ -14969,6 +15259,36 @@
    "base": false,
    "name": "정조대",
    "src": "game-src/items/raw/batch_131/02.png"
+  },
+  {
+   "keywords": [
+    "러브젤"
+   ],
+   "file": "adult_033.png",
+   "kind": "adult",
+   "base": false,
+   "name": "러브젤",
+   "src": "game-src/items/raw/batch_134/01.png"
+  },
+  {
+   "keywords": [
+    "플로거"
+   ],
+   "file": "adult_040.png",
+   "kind": "adult",
+   "base": false,
+   "name": "플로거",
+   "src": "game-src/items/raw/batch_135/03.png"
+  },
+  {
+   "keywords": [
+    "코르셋"
+   ],
+   "file": "adult_044.png",
+   "kind": "adult",
+   "base": false,
+   "name": "코르셋",
+   "src": "game-src/items/raw/batch_136/01.png"
   },
   {
    "keywords": [
@@ -16205,8 +16525,8 @@
    "kind": "food",
    "base": false,
    "name": "두유",
-   "src": "game-src/items/raw/batch_71/07.png",
-   "old_src": "game-src/items/raw/batch_35/11.png"
+   "src": "game-src/items/raw/batch_134/09.png",
+   "old_src": "game-src/items/raw/batch_71/07.png"
   },
   {
    "keywords": [
@@ -17511,7 +17831,8 @@
    "kind": "food",
    "base": false,
    "name": "핫바",
-   "src": "game-src/items/raw/batch_79/07.png"
+   "src": "game-src/items/raw/batch_134/12.png",
+   "old_src": "game-src/items/raw/batch_79/07.png"
   },
   {
    "keywords": [
@@ -18081,7 +18402,8 @@
    "kind": "wear",
    "base": false,
    "name": "쪼리",
-   "src": "game-src/items/raw/batch_88/13.png"
+   "src": "game-src/items/raw/batch_135/07.png",
+   "old_src": "game-src/items/raw/batch_88/13.png"
   },
   {
    "keywords": [
@@ -18501,7 +18823,8 @@
    "kind": "medical",
    "base": false,
    "name": "의안",
-   "src": "game-src/items/raw/batch_104/14.png"
+   "src": "game-src/items/raw/batch_135/15.png",
+   "old_src": "game-src/items/raw/batch_104/14.png"
   },
   {
    "keywords": [
@@ -18771,7 +19094,8 @@
    "kind": "paper",
    "base": false,
    "name": "통장",
-   "src": "game-src/items/raw/batch_114/15.png"
+   "src": "game-src/items/raw/batch_136/09.png",
+   "old_src": "game-src/items/raw/batch_114/15.png"
   },
   {
    "keywords": [
@@ -18801,7 +19125,8 @@
    "kind": "consumable",
    "base": false,
    "name": "로션",
-   "src": "game-src/items/raw/batch_116/10.png"
+   "src": "game-src/items/raw/batch_137/06.png",
+   "old_src": "game-src/items/raw/batch_116/10.png"
   },
   {
    "keywords": [
@@ -18821,7 +19146,8 @@
    "kind": "consumable",
    "base": false,
    "name": "탐폰",
-   "src": "game-src/items/raw/batch_117/01.png"
+   "src": "game-src/items/raw/batch_137/11.png",
+   "old_src": "game-src/items/raw/batch_117/01.png"
   },
   {
    "keywords": [
@@ -18841,7 +19167,8 @@
    "kind": "consumable",
    "base": false,
    "name": "퍼티",
-   "src": "game-src/items/raw/batch_117/09.png"
+   "src": "game-src/items/raw/batch_137/12.png",
+   "old_src": "game-src/items/raw/batch_117/09.png"
   },
   {
    "keywords": [
@@ -18861,7 +19188,8 @@
    "kind": "consumable",
    "base": false,
    "name": "쥐약",
-   "src": "game-src/items/raw/batch_117/15.png"
+   "src": "game-src/items/raw/batch_137/15.png",
+   "old_src": "game-src/items/raw/batch_117/15.png"
   },
   {
    "keywords": [
@@ -18921,7 +19249,8 @@
    "kind": "misc",
    "base": false,
    "name": "개집",
-   "src": "game-src/items/raw/batch_119/09.png"
+   "src": "game-src/items/raw/batch_138/14.png",
+   "old_src": "game-src/items/raw/batch_119/09.png"
   },
   {
    "keywords": [
@@ -19081,7 +19410,8 @@
    "kind": "valuable",
    "base": false,
    "name": "족보",
-   "src": "game-src/items/raw/batch_124/13.png"
+   "src": "game-src/items/raw/batch_139/08.png",
+   "old_src": "game-src/items/raw/batch_124/13.png"
   },
   {
    "keywords": [
@@ -19152,6 +19482,56 @@
    "base": false,
    "name": "테디",
    "src": "game-src/items/raw/batch_131/06.png"
+  },
+  {
+   "keywords": [
+    "초커"
+   ],
+   "file": "adult_036.png",
+   "kind": "adult",
+   "base": false,
+   "name": "초커",
+   "src": "game-src/items/raw/batch_134/04.png"
+  },
+  {
+   "keywords": [
+    "패들"
+   ],
+   "file": "adult_039.png",
+   "kind": "adult",
+   "base": false,
+   "name": "패들",
+   "src": "game-src/items/raw/batch_135/02.png"
+  },
+  {
+   "keywords": [
+    "딜도"
+   ],
+   "file": "adult_051.png",
+   "kind": "adult",
+   "base": false,
+   "name": "딜도",
+   "src": "game-src/items/raw/batch_137/02.png"
+  },
+  {
+   "keywords": [
+    "로터"
+   ],
+   "file": "adult_052.png",
+   "kind": "adult",
+   "base": false,
+   "name": "로터",
+   "src": "game-src/items/raw/batch_137/03.png"
+  },
+  {
+   "keywords": [
+    "재갈"
+   ],
+   "file": "adult_060.png",
+   "kind": "adult",
+   "base": false,
+   "name": "재갈",
+   "src": "game-src/items/raw/batch_139/01.png"
   },
   {
    "keywords": [
