@@ -3199,7 +3199,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 6px 6px 5px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: center; cursor: pointer; }
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
-.it-c .it-ic img { width: 85px; height: 85px; max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 줄인다 */
+.it-c .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; } /* 그림 팩 원본 85px 그대로 (비정수 확대는 깨짐, 2026-11-07 사용자). 칸이 작으면 정사각형 그대로 줄인다 (높이를 박으면 폰에서 길쭉해짐) */
 .it-ph .it-ic img, .it-pickrow .it-ic img { width: 42.5px; height: 42.5px; max-width: 90%; max-height: 90%; object-fit: contain; image-rendering: pixelated; } /* 원본의 절반 */
 .it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
 .it-c b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: calc(12.5px * 1.2 * 2 + 5px); padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; word-break: break-all; } /* 이름 두 줄까지, 그 뒤 생략, 높이는 늘 두 줄 */
@@ -3251,29 +3251,38 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-pickrow b { display: block; font-size: 13.5px; }
 .it-pickrow small { display: block; color: var(--dim); font-size: 11.5px; }
 .it-pickrow:hover { border-color: var(--signal); }
-/* 세 상자 (2026-11-07 밤 사용자): 장착 → 소지품 격자 → 사용. 상자 모양은 상점 구획(.sh-zone)과 같게. 버리기는 끄는 동안만 붉은 띠 */
-.gx-items .it-box, .it-box { position: relative; min-width: 0; padding: 10px 12px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
-.it-boxh { display: flex; align-items: center; height: 22px; margin: 0 0 10px; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .02em; color: var(--sub); }
-.it-eqin { display: flex; gap: 14px; align-items: center; }
-.it-av { flex: none; display: grid; place-items: end center; width: 128px; height: 256px; border-radius: 12px; background: radial-gradient(ellipse at 50% 92%, color-mix(in srgb, var(--signal) 10%, transparent), transparent 60%); overflow: hidden; }
-.it-avbtn { display: grid; place-items: end center; width: 100%; height: 100%; padding: 0 0 6px; border: 0; background: none; color: var(--dim); font: inherit; cursor: default; }
+/* 장착 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 1배 | 장착 칸 3열 | 사용칸]. 상자 모양은 상점 구획(.sh-zone)과 같게. 버리기는 끄는 동안만 붉은 띠 */
+.gx-items .it-box, .it-box { position: relative; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
+.it-eqin { --slot: 97px; display: flex; gap: 14px; align-items: stretch; }
+.it-av { flex: none; display: grid; place-items: end center; width: 128px; height: 256px; border-radius: 12px; background: radial-gradient(ellipse at 50% 92%, color-mix(in srgb, var(--signal) 10%, transparent), transparent 60%); overflow: hidden; } /* 아바타는 자르지 않음 (사용자) */
+.it-avbtn { display: grid; place-items: end center; width: 100%; height: 100%; padding: 0; border: 0; background: none; color: var(--dim); font: inherit; cursor: default; }
 button.it-avbtn { cursor: pointer; }
 button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transparent); }
 .it-avnone { align-self: center; font-size: 12px; line-height: 1.5; text-align: center; }
-.it-eqrows { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.it-eqrow { display: flex; align-items: center; gap: 10px; }
-.it-eqlab { flex: none; width: 30px; font-size: 12px; font-weight: 700; color: var(--dim); }
-.it-eqslots { display: flex; gap: 8px; flex-wrap: wrap; }
-.it-slot { position: relative; display: grid; place-items: center; width: 97px; aspect-ratio: 1; padding: 6px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; cursor: pointer; }
+/* 칸 차례 = 무기 2 → 장비 4: 3열이면 무기·무기·장비 / 장비·장비·장비 */
+.it-eqslots { flex: none; display: grid; grid-template-columns: repeat(3, var(--slot, 97px)); grid-auto-rows: var(--slot, 97px); gap: 8px; align-content: center; }
+.it-slot { position: relative; display: grid; place-items: center; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; cursor: pointer; }
 .it-slot .it-ic { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-slot .it-ic svg { width: 56%; height: 56%; }
-.it-slot .it-ic img { width: 85px; height: 85px; max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; }
+.it-slot .it-ic img { width: min(85px, 100%); height: auto; aspect-ratio: 1; object-fit: contain; image-rendering: pixelated; }
+/* 무기 칸만 색이 다름 (호박색), 빈 칸은 기호(칼·방패)로 갈래 */
+.it-slot.it-s-weapon { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); }
+.it-slot.it-s-weapon .it-ic { background: color-mix(in srgb, var(--amber) 6%, color-mix(in srgb, var(--void) 60%, var(--panel))); }
 .it-slot.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
-.it-slot.empty .it-ic { background: none; }
+.it-slot.empty .it-ic { background: none; color: color-mix(in srgb, var(--dim) 55%, transparent); }
+.it-slot.empty .it-ic svg { width: 34%; height: 34%; }
+.it-slot.it-s-weapon.empty { border-color: color-mix(in srgb, var(--amber) 40%, var(--line2)); background: color-mix(in srgb, var(--amber) 5%, transparent); }
+.it-slot.it-s-weapon.empty .it-ic { color: color-mix(in srgb, var(--amber) 55%, transparent); }
 .it-slot.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal) inset; }
 .it-slot:not(.empty):hover { background: color-mix(in srgb, var(--signal) 6%, var(--panel)); }
 @media (pointer: fine) { .it-slot:not(.empty):hover .it-tip { display: block; } }
-.it-eq-gear .it-slot:nth-child(n+3) .it-tip { left: auto; right: calc(100% + 8px); }
+.it-eqslots .it-slot:nth-child(3n) .it-tip { left: auto; right: calc(100% + 8px); }
+/* 사용칸: 장착 칸 오른쪽 남는 자리. 놓는 만큼 칩이 늘어난다 */
+.it-usebox { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px dashed var(--line2); border-radius: 12px; }
+.it-ulab { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .02em; }
+.it-eqbox.sell .it-eqslots { grid-template-columns: repeat(6, var(--slot, 97px)); } /* 상점 팔기: 아바타·사용칸 없이 한 줄 */
+.it-eqbox.sell { --slot: 85px; display: flex; }
+.sh-body .it-eqbox.sell { --slot: var(--shc); padding: var(--zp); } /* 진열대·소지품 칸과 같은 크기 */
 /* 칸 위 표시: 남은 횟수(오른쪽 위 숫자) · 손상(노란 금) · 고장(흐림 + 붉은 띠) · 사용 예정(흐림 + 띠) */
 .it-left { position: absolute; top: 9px; right: 9px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: color-mix(in srgb, var(--void) 78%, transparent); color: var(--text); font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; pointer-events: none; }
 .it-crack { position: absolute; left: 9px; top: 9px; width: 22px; height: 22px; pointer-events: none; background: linear-gradient(135deg, transparent 44%, var(--amber) 45% 52%, transparent 53%) 0 0 / 12px 12px no-repeat, linear-gradient(60deg, transparent 44%, var(--amber) 45% 52%, transparent 53%) 7px 6px / 12px 14px no-repeat; filter: drop-shadow(0 0 1px rgba(0,0,0,.7)); }
@@ -3282,7 +3291,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-c.queued .it-ic { opacity: .4; }
 .it-q8 { position: absolute; left: 6px; right: 6px; top: calc(6px + (100% - 12px) * 0); margin-top: 0; padding: 2px 0; border-radius: 6px 6px 0 0; background: color-mix(in srgb, var(--signal) 22%, var(--void)); color: var(--signal); font-size: 10.5px; font-weight: 700; text-align: center; pointer-events: none; }
 .it-c b, .it-c .it-ic { transition: opacity .15s; }
-/* 사용 상자: 놓는 만큼 늘어난다 */
 .it-uchips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; align-items: center; }
 .it-uhint { margin: 0; font-size: 12.5px; color: var(--dim); }
 .it-uchip { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 4px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); }
@@ -3298,7 +3306,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-over-ok { outline: 2px solid var(--signal); outline-offset: 2px; }
 .it-usebox.it-over-ok, .it-grid.it-over-ok { outline-offset: 4px; border-radius: 12px; }
 .it-trash { display: none; }
-.it-dragging .it-trash { position: sticky; bottom: 8px; z-index: 7; display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border: 1px dashed color-mix(in srgb, var(--danger) 70%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--danger) 16%, var(--void)); color: color-mix(in srgb, var(--danger) 75%, var(--text)); font-size: 13.5px; font-weight: 700; }
+.it-dragging .it-trash { position: sticky; bottom: 8px; z-index: 7; display: flex; align-items: center; justify-content: center; gap: 8px; height: 104px; border: 1px dashed color-mix(in srgb, var(--danger) 70%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--danger) 16%, var(--void)); color: color-mix(in srgb, var(--danger) 75%, var(--text)); font-size: 13.5px; font-weight: 700; }
 .it-dragging .it-trash svg { width: 16px; height: 16px; }
 .it-dragging .it-trash.it-over-ok { outline: 0; background: color-mix(in srgb, var(--danger) 30%, var(--void)); border-style: solid; }
 .it-card p.bad { color: var(--danger); font-size: 12.5px; }
@@ -3307,12 +3315,15 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .sh-eq { margin-bottom: 10px; }
 .sh-eq .it-box { background: var(--sunk); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .it-av { width: auto; min-width: 64px; height: auto; min-height: 128px; } /* 대기 동작은 폰에서도 1배 (칸만 작게) */
-  .it-eqin { gap: 10px; }
-  .it-slot { width: 48px; padding: 3px; border-radius: 9px; } /* 장비 4칸이 한 줄에 (내 모습 1배 옆) */
-  .it-slot .it-ic img { width: 42.5px; height: 42.5px; }
-  .it-eqslots { gap: 5px; flex-wrap: nowrap; }
-  .it-eqlab { width: 26px; font-size: 11px; }
+  /* 폰 (2026-11-08 사용자): 끌기 없이 누르기만. 장착 칸은 일반 소지품 칸 크기, 2열 × 3줄로 아바타 옆에. 좁은 폰은 칸을 줄임 (아바타는 그대로) */
+  .it-eqin { --slot: min(82px, calc((100vw - 32px - 24px - 128px - 10px - 8px) / 2)); gap: 10px; flex-wrap: wrap; }
+  .it-eqslots { grid-template-columns: repeat(2, var(--slot)); }
+  .it-eqslots .it-slot:nth-child(3n) .it-tip { left: 0; right: auto; }
+  .it-slot { padding: 4px; border-radius: 10px; }
+  .it-usebox { flex-basis: 100%; }
+  .it-usebox.empty { display: none; }
+  .it-eqbox.sell { --slot: min(82px, calc((100vw - 32px - 24px - 16px) / 3)); }
+  .it-eqbox.sell .it-eqslots { grid-template-columns: repeat(3, var(--slot)); }
 }
 /* 상점 팝업 (2026-11-07 사용자 설계, docs/인계/상점_1107/mock.mjs): 조작 34px·모서리 10, 칸·상자 12, 안쪽 8. 금액은 어디서나 같은 글꼴(mono 700 14), 색은 민트·흐림·빨강만 */
 .sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, transparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
@@ -3325,7 +3336,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 높이는 진열대만큼 (2026-11-07 사용자: 고정 높이는 휑함), 화면의 90%까지. 넘치면 진열대 안에서 스크롤 */
 .sh-wrap-card { width: min(100%, 980px); height: auto; max-height: min(90%, calc(100% - 8px)); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; overflow: hidden; }
 /* 상점만 열었을 때(카드에서): 창 본문은 비우고 팝업만 (2026-11-07 사용자) */
-.gx-solo { position: absolute; inset: 0; background: var(--void); }
+.gx-solo { display: none; }
+.gx-panel.solo { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.gx-panel.solo .sh-wrap-card { height: 90vh; height: 90dvh; max-height: 90dvh; }
 .sh-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0 -2px; padding: 0 2px; }
 /* 진열대 구획 (2026-11-07 사용자): 칸 크기는 소지품과 같은 8열 — 구획 안쪽 여백을 빼고도 같은 칸이 되게 본문 너비(cqw)로 칸 폭을 정한다 */
 .sh-body { container-type: inline-size; --zp: 12px; --shc: calc((100cqw - 2 * var(--zp) - 2px - 7 * 8px) / 8); }
@@ -3476,6 +3489,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .sh-wrap { --h: 40px; align-items: stretch; padding: 0; }
   .sh-wrap-card { position: relative; width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; padding: 12px; }
+  .gx-panel.solo .sh-wrap-card { height: 100%; max-height: none; }
   .sh-tools { flex-wrap: wrap; }
   .sh-name { flex: 1 1 100%; }
   .sh-tools .it-right { margin-left: auto; }

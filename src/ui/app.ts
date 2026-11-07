@@ -1268,8 +1268,10 @@ function render(): void {
   if (fr.hidden) root.dataset.frameHidden = '1';
   else delete root.dataset.frameHidden;
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
-  const panel = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
-  root.innerHTML = fr.kind === 'none' ? panel : frameHtml(fr.kind, !nav, panel);
+  // 카드에서 연 상점은 창 틀 없이 화면 위에 바로 (2026-11-07 사용자: 상황판과 별개, 높이는 화면 전체의 90%)
+  const solo = view.kind === 'started' && shopUi.open && shopUi.solo;
+  const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  root.innerHTML = fr.kind === 'none' || solo ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {
     dirUi.scrollTo = '';

@@ -143,7 +143,7 @@ function itemsPane(ctx: ChatContext): string {
   const st = itemIconStatus();
   const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc(st.failed)})</p>` : '';
   if (itemsUi.view === 'log') return `${tools}${picNote}<div class="it-body">${logList(ctx)}</div>`;
-  return `${tools}${picNote}${equipBox(ctx, 'items')}<div class="it-body">${gridHtml(ctx)}</div>${useBox(ctx)}<div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div>`;
+  return `${tools}${picNote}${equipBox(ctx, 'items')}<div class="it-body">${gridHtml(ctx)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div>`;
 }
 
 /** 아바타 자리 (고른 아바타의 정면 대기 동작). 고르기 전·고유 인물이 아니면 빈 자리 */
@@ -153,7 +153,9 @@ export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
 }
 
 /**
- * 「장착」 상자: 왼쪽 아바타 + 무기 2 · 장비 4. where = 'items'(끌어다 놓기·누르면 팝업) · 'sell'(상점 팔기: 누르면 그 물건을 팔 물건으로)
+ * 「장착」 띠 (2026-11-08 사용자): 제목·「무기/장비」 글자 없이 [아바타 전신 | 장착 칸 | 사용칸].
+ * 장착 칸 차례는 무기 2 → 장비 4 — PC 3열(무기·무기·장비 / 장비·장비·장비), 폰 2열(무기·무기 / 장비·장비 / 장비·장비). 무기 칸은 색이 다르고, 빈 칸은 기호로 갈래를 보인다.
+ * where = 'items'(끌어다 놓기·누르면 팝업, 오른쪽에 사용칸) · 'sell'(상점 팔기: 아바타·사용칸 없이 칸만, 누르면 그 물건을 팔 물건으로)
  * 칸 data-drop="equip:갈래:번호" — 끌어 온 물건이 그 갈래가 아니면 놓이지 않는다 (app.ts 끌기 처리)
  */
 export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): string {
@@ -161,16 +163,17 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   const eq = equippedOf(live);
   const slot = (k: ItemEquip, i: number) => {
     const it = eq[k][i];
-    if (!it) return `<div class="it-slot empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸"><span class="it-ic"></span></div>`;
+    if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
     const act = where === 'sell' ? 'shop-sell-pick' : 'items-open';
-    return `<button class="it-slot${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
+    return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
   };
-  const row = (k: ItemEquip) => `<div class="it-eqrow"><span class="it-eqlab">${EQUIP_LABEL[k]}</span><div class="it-eqslots it-eq-${k}">${Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i)).join('')}</div></div>`;
+  const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
+  if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착">${slots}</section>`;
   const av = avatarHtml(ctx);
-  return `<section class="it-box it-eqbox" aria-label="장착"><h3 class="it-boxh">장착</h3><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}<div class="it-eqrows">${row('weapon')}${row('gear')}</div></div></section>`;
+  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
 }
 
-/** 「사용」 상자: 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
+/** 「사용」칸 (장착 띠 오른쪽): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
 function useBox(ctx: ChatContext): string {
   const live = liveOf(ctx);
   const q = useQueue(ctx).flatMap((u) => {
@@ -178,7 +181,7 @@ function useBox(ctx: ChatContext): string {
     return it ? [{ it, n: u.n }] : [];
   });
   const chips = q.map(({ it, n }) => `<span class="it-uchip"><span class="it-ic">${itemPic(it)}</span><b>${esc(it.name)}</b>${n > 1 ? `<em>×${n}</em>` : ''}<button class="it-ux" data-action="items-unuse" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 사용 취소">${ICONS.close}</button></span>`).join('');
-  return `<section class="it-box it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><h3 class="it-boxh">사용</h3><div class="it-uchips">${chips || `<p class="it-uhint">${isPhone() ? '물건을 눌러 「사용」을 고르면 여기에 모여요.' : '쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.'}</p>`}</div></section>`;
+  return `<div class="it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips || `<p class="it-uhint">${isPhone() ? '물건을 눌러 「사용」을 고르면 여기에 모여요.' : '쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.'}</p>`}</div></div>`;
 }
 
 const stateCls = (it: Item) => (it.state === 'broken' ? ' broken' : it.state === 'damaged' ? ' damaged' : '');
