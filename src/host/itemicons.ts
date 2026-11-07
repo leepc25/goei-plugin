@@ -62,13 +62,13 @@ export function ensureItemIcons(): Promise<void> {
   return loading;
 }
 
-/** 이름·종류에 맞는 그림 data URL. 팩이 없으면 받기 시작하고 null (화면은 선 아이콘으로) */
-export function itemIconUrl(name: string, kind: string): string | null {
+/** 이름·그림 낱말에 맞는 그림 data URL. 팩이 없으면 받기 시작하고 null (화면은 선 아이콘으로). 매칭 고침은 「소지품 그림 매칭 고치기」에서 */
+export function itemIconUrl(name: string, icon?: string): string | null {
   if (!pack) {
     if (!failed) void ensureItemIcons();
     return null;
   }
-  const file = matchItemIcon(pack, name, kind);
+  const file = (icon ? matchItemIcon(pack, icon, '') : null) ?? matchItemIcon(pack, name, 'misc');
   if (!file) return null;
   let u = urls.get(file);
   if (!u) {

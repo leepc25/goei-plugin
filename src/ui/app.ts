@@ -301,6 +301,49 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('dragover', (ev) => {
     if (photoTarget(ev.target) && ev.dataTransfer?.types.includes('Files')) ev.preventDefault();
   });
+  // 소지품 끌어다 놓기 (ui/items.ts): 격자·장착 칸의 물건([data-drag]) → 장착 칸 · 격자 · 사용 상자 · 버리기 띠([data-drop]). 끄는 동안 .it-dragging 이 버리기 띠를 띄운다
+  let dragItem: { id: string; equip: string; usable: boolean } | null = null;
+  const dropAt = (t: EventTarget | null) => (t instanceof Element ? t.closest<HTMLElement>('[data-drop]') : null);
+  const dropOk = (z: HTMLElement | null) => {
+    if (!z || !dragItem) return false;
+    const to = z.dataset.drop ?? '';
+    if (to.startsWith('equip:')) return to.split(':')[1] === dragItem.equip;
+    if (to === 'use') return dragItem.usable;
+    return to === 'grid' || to === 'drop';
+  };
+  const clearDrag = () => {
+    dragItem = null;
+    root?.querySelector('.gx-items')?.classList.remove('it-dragging');
+    root?.querySelectorAll('.it-over-ok').forEach((x) => x.classList.remove('it-over-ok'));
+  };
+  root.addEventListener('dragstart', (ev) => {
+    const el = ev.target instanceof Element ? ev.target.closest<HTMLElement>('[data-drag]') : null;
+    if (!el) return;
+    dragItem = { id: el.dataset.drag ?? '', equip: el.dataset.equip ?? '', usable: el.dataset.usable === '1' };
+    ev.dataTransfer?.setData('text/plain', dragItem.id);
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move';
+    root?.querySelector('.gx-items')?.classList.add('it-dragging');
+  });
+  root.addEventListener('dragover', (ev) => {
+    if (!dragItem) return;
+    const z = dropAt(ev.target);
+    root?.querySelectorAll('.it-over-ok').forEach((x) => x !== z && x.classList.remove('it-over-ok'));
+    if (!dropOk(z)) return;
+    ev.preventDefault();
+    z!.classList.add('it-over-ok');
+  });
+  root.addEventListener('drop', (ev) => {
+    if (!dragItem) return;
+    const z = dropAt(ev.target);
+    const it = dragItem;
+    const ok = dropOk(z);
+    clearDrag();
+    if (!z || !ok) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    void run('items-dnd', `${it.id}|${z.dataset.drop}`);
+  });
+  root.addEventListener('dragend', clearDrag);
   root.addEventListener('drop', (ev) => {
     const prefix = photoTarget(ev.target);
     if (!prefix || !ev.dataTransfer?.files.length) return;

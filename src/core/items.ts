@@ -8,6 +8,7 @@ import type { Chat } from './types';
 import { aliveAnchors } from './wallet';
 import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
+import type { ItemChange, ItemNow } from './people/updater';
 import { shopEvents, shopOn, shopGuide } from './shop';
 
 export const ITEMS_VAR = '$st_items';
@@ -618,4 +619,41 @@ export function settleItemUse(chat: Chat, responseIndex: number): Record<string,
   }
   if (it === it0 && at === userKey) return null;
   return { ...(it === it0 ? {} : itemsVars(it)), [ITEM_USE_AT_VAR]: userKey };
+}
+
+// ── 보조 모델(인물 갱신기) 자료·보고 (host/people.ts) ──
+
+/** 자료 items_now: 지금 가진 것과 판정·상태 */
+export function itemsNowOf(chat: Chat): ItemNow[] {
+  const it = readItems(chat.scriptstate);
+  const alive = aliveAnchors(chat);
+  const live = liveItems(it, alive);
+  return live.map((e) => {
+    const left = itemLeft(it, e, alive);
+    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}) };
+  });
+}
+
+/** 보고된 변화를 목록에: new 더하기(같은 이름은 갱신), update 설명·효과·판정·상태·남은 횟수, gone 빼기, destroyed 파괴로 빼기. 줄은 그 응답에 묶인다 */
+export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[]): Items {
+  let it = it0;
+  for (const c of changes) {
+    const cur = liveItems(it, alive).find((e) => e.name === c.name);
+    if (c.action === 'gone' || c.action === 'destroyed') {
+      if (cur) it = removeItem(it, cur.id, c.action === 'gone' ? 'gone' : 'destroy', 'story', c.anchor, { quote: c.quote, ...(c.desc ? { note: c.desc } : {}) });
+    } else if (c.action === 'update' && cur) {
+      it = updateItem(it, cur.id, {
+        desc: c.desc || cur.desc, effect: c.effect || cur.effect,
+        ...(c.use !== undefined ? { use: c.use } : {}), ...(c.equip !== undefined ? { equip: c.equip ?? '' } : {}), ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}),
+      });
+      if (c.uses !== undefined && cur.uses !== undefined) {
+        it = setItemLeft(it, alive, cur.id, c.uses);
+        // 남은 0 = 다 씀: 목록에서 빼고 기록
+        if (c.uses === 0) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀' });
+      }
+    } else if (c.action === 'new') {
+      it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? undefined, state: c.state, icon: c.icon, from: 'story', anchor: c.anchor, quote: c.quote });
+    }
+  }
+  return it;
 }
