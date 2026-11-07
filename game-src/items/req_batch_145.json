@@ -1,0 +1,89 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "북",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean barrel drum buk with a stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "군번줄",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. military dog tags on a ball chain, blank tags Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대마 말이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-rolled joint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마스카라",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mascara tube with the wand out Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "목베개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a U-shaped travel neck pillow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "썬캡",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visor sun cap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "링 재갈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal ring gag on a black leather strap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클리 집게",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small delicate jeweled clamp with a dangling chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "질 확장기 세트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of graduated smooth pink silicone dilator rods Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "남성 정조 케이지",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear plastic male chastity cage with a padlock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "엄지 수갑",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pair of metal thumb cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "체위 쿠션",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red foam wedge cushion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "질경",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stainless steel duckbill speculum Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "클리토리스 석션 컵",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny clear suction cup with a small pump bulb Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "귀두 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black silicone vibrating sleeve ring Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "오픈 크로치 팬티",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black lace crotchless panties, laid flat Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}
