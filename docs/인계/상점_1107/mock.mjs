@@ -111,7 +111,7 @@ const css = `
 .sh-det .gx-agpop-x,.sh-card .gx-agpop-x{width:30px;height:30px;border-radius:var(--ri)}
 /* 폰: 조작 40 · 4열 · 도구 줄은 [잔고 … 새로고침] 다음 줄 글칸 · 맨 아래 닫기 */
 @media (max-width:760px){.sh-wrap{--h:40px;align-items:stretch;padding:0}.sh-card{width:100%;height:100%;max-height:none;border:0;border-radius:0;padding:12px}.sh-tools{flex-wrap:wrap}.sh-name{flex:1 1 100%}
-.it-right{margin-left:auto}.sh-face{width:96px}.sh-dlg-box{min-height:60px}
+.it-right{margin-left:auto}.sh-face{display:none}.sh-owner{gap:0}.sh-dlg-box{min-height:calc(13.5px * 1.6 * 3 + 20px)}
 .sh-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sh-ph .it-ic{width:96px;height:96px}
 .sh-close{width:100%;height:var(--h);justify-content:center;border-radius:var(--r);font-size:13.5px;flex:none}.sh-close svg{color:var(--sub)}.sh-card .gx-agpop-x{top:8px;right:8px}}`;
 const b = await launch(); const out = '/mnt/project-files/작업_1107/상점_초안/';
