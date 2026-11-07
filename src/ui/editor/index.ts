@@ -162,6 +162,7 @@ function ensureRoot(): HTMLElement {
       if (x < 0 || x > 100 || y < 0 || y > 100) return;
       return void run('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
     }
+    if (slotDropped) return; // 손잡이를 놓은 직후의 click 은 칸 펼치기가 아니다
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     if (el.dataset.action === 'ed-hint') return hintFor === el ? hideHint() : showHint(el); // 폰: 누르면 열고 닫는다
@@ -294,6 +295,52 @@ function ensureRoot(): HTMLElement {
     const from = drag;
     drag = null;
     if (from && to && from !== to) void run('ed-field-drop', `${from}|${to}`);
+  });
+  let slotDropped = false;
+  // 시작 화면 칸 순서 (ui/editor/start.ts): 손잡이를 끌어 다른 칸 위·아래에 놓는다. 명부 요원 순서(app.ts)와 같은 방식
+  root.addEventListener('pointerdown', (ev) => {
+    const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-slot]');
+    const row = grip?.closest<HTMLElement>('[data-slot-row]');
+    if (!grip || !row || !root) return;
+    ev.preventDefault();
+    const box = root;
+    const rows = [...box.querySelectorAll<HTMLElement>('[data-slot-row]')].filter((r) => r !== row);
+    let drop: { el: HTMLElement; after: boolean } | null = null;
+    const mark = (next: typeof drop) => {
+      drop?.el.classList.remove('drop-before', 'drop-after');
+      drop = next;
+      drop?.el.classList.add(drop.after ? 'drop-after' : 'drop-before');
+    };
+    const move = (e: PointerEvent) => {
+      let best: typeof drop = null;
+      let gap = Infinity;
+      for (const r of rows) {
+        const b = r.getBoundingClientRect();
+        const d = Math.abs(e.clientY - (b.top + b.height / 2));
+        if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+      }
+      if (best?.el !== drop?.el || best?.after !== drop?.after) mark(best);
+    };
+    row.classList.add('dragging');
+    box.classList.add('dir-dragging');
+    grip.setPointerCapture?.(ev.pointerId);
+    const up = () => {
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', up);
+      grip.removeEventListener('pointercancel', up);
+      row.classList.remove('dragging');
+      box.classList.remove('dir-dragging');
+      const target = drop;
+      mark(null);
+      if (target) {
+        slotDropped = true;
+        setTimeout(() => (slotDropped = false), 0);
+      }
+      if (target) void run('dir-start-drop', `${target.after ? 'after' : 'before'}|${grip.dataset.dragSlot}|${target.el.dataset.slotRow}`);
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+    grip.addEventListener('pointercancel', up);
   });
   root.addEventListener('dragend', () => root?.querySelectorAll('.drop-before, .dragging').forEach((x) => x.classList.remove('drop-before', 'dragging')));
   return root;

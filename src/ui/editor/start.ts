@@ -25,19 +25,16 @@ const area = (key: string, value: string, label: string, rows = 6, help = '') =>
 const seg = (action: string, value: string, on: boolean, a: string, b: string) =>
   `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on ? ' on' : ''}" data-action="${action}" data-value="${esc(`1|${value}`)}">${a}</button><button class="gx-seg${!on ? ' on' : ''}" data-action="${action}" data-value="${esc(`0|${value}`)}">${b}</button></div>`;
 
-/** 칸 한 줄 (순서 목록) */
-function slotRow(s: StartSlot, i: number, n: number): string {
+/** 칸 한 줄 (순서 목록) — 줄을 누르면 펼치고, 손잡이를 끌어 순서를 바꾼다 (11-07 사용자: 열기/접기 단추·▲▼ 단추는 비효율) */
+function slotRow(s: StartSlot): string {
   const open = stUi.sel === s.code;
   const kind = s.kind === 'builtin' ? '기본 세력' : s.kind === 'group' ? '묶음' : '플레이 조직';
-  return `<div class="dir-row${open ? ' open' : ''}">
-    <div class="dir-head st-slot">
+  return `<div class="dir-row${open ? ' open' : ''}" data-slot-row="${esc(s.code)}">
+    <div class="dir-head st-slot" data-action="dir-start-open" data-value="${esc(s.code)}" role="button" aria-expanded="${open}">
+      <span class="gw-grip" data-drag-slot="${esc(s.code)}" title="끌어서 순서 바꾸기">${ICONS.grip}</span>
       <span class="dir-name"><b>${esc(s.name)}</b><small>${kind} · ${esc(s.code)}${s.count ? ` · ${s.count}명` : ''}</small></span>
       ${seg('dir-start-show', s.code, !s.hidden, '보임', '숨김')}
-      <span class="gx-row-btns">
-        <button class="gx-mini" data-action="dir-start-move" data-value="${esc(`up|${s.code}`)}" ${i === 0 ? 'disabled' : ''} aria-label="위로">${ICONS.up}</button>
-        <button class="gx-mini" data-action="dir-start-move" data-value="${esc(`down|${s.code}`)}" ${i === n - 1 ? 'disabled' : ''} aria-label="아래로">${ICONS.down}</button>
-        <button class="gx-mini" data-action="dir-start-open" data-value="${esc(s.code)}" aria-expanded="${open}">${open ? '접기' : '열기'}</button>
-      </span>
+      <span class="st-caret">${open ? ICONS.up : ICONS.down}</span>
     </div>
   </div>`;
 }
@@ -133,7 +130,7 @@ export function startPage(ctx: ChatContext): string {
     : '';
   return `<div class="gw-page gw-startpage">
     <header class="gw-head"><h2>시작 화면</h2><p class="gx-muted">새 채팅의 「어느 쪽에 설까요?」에 보이는 칸이에요. 순서와 보임을 정하고, 칸을 열어 이름·설명·사진·첫 장면을 고쳐요. 묶음은 조직이 아니라 여러 조직의 인물을 한 칸에 모은 거예요.</p></header>
-    <div class="dir-list st-slots">${slots.map((s, i) => slotRow(s, i, slots.length)).join('')}</div>
+    <div class="dir-list st-slots">${slots.map((s) => slotRow(s)).join('')}</div>
     <div class="dir-line"><button class="gx-mini" data-action="dir-group-add">${ICONS.plus} 묶음 추가</button></div>
     ${addOrg}
     ${sel ? `<h3 class="st-sel"><span>${esc(sel.name)}</span><small>${esc(sel.code)}</small></h3>${slotDetail(sel, ctx, d)}` : ''}

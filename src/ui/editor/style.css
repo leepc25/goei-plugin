@@ -431,7 +431,15 @@
 .gw .gw-startpage .st-slots .dir-row.open { border-color: var(--accent-line); }
 .gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 .gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
-.gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
+.gw .gw-startpage .st-slot { cursor: pointer; user-select: none; }
+.gw .gw-startpage .st-slot:hover { background: var(--panel2); }
+.gw .gw-startpage .st-slot .gw-grip { flex: 0 0 auto; touch-action: none; }
+.gw .gw-startpage .st-slot .st-caret { display: inline-flex; width: 18px; color: var(--dim); }
+.gw .gw-startpage .st-slot .st-caret svg { width: 16px; height: 16px; }
+.gw .gw-startpage .st-slots .dir-row.dragging { opacity: .45; }
+.gw .gw-startpage .st-slots .dir-row.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
+.gw .gw-startpage .st-slots .dir-row.drop-after { box-shadow: 0 3px 0 0 var(--signal); }
+.gw.dir-dragging, .gw.dir-dragging * { cursor: grabbing !important; user-select: none; }
 /* 폰: 이름 줄과 단추 줄을 나눈다 (한 줄에 다 넣으면 이름이 꺾이고 종류·코드가 잘린다, 2026-11-05 캡처) */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .gw-startpage .st-slot { flex-wrap: wrap; row-gap: 6px; }

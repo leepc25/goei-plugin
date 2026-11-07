@@ -1181,6 +1181,17 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.done = '';
       break;
     }
+    case 'dir-start-drop': {
+      // 손잡이 끌어 놓기: before|끈 칸|놓은 칸 (ui/editor/index.ts)
+      const [how, from, to] = v.split('|');
+      const order = startSlots(d).map((x) => x.code).filter((c) => c !== from);
+      const j = order.indexOf(to ?? '');
+      if (!from || j < 0 || from === to) break;
+      order.splice(how === 'after' ? j + 1 : j, 0, from);
+      d.startOrder = order;
+      dirUi.done = '';
+      break;
+    }
     case 'dir-group-add': {
       const code = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? ''), ...d.startGroups.map((g) => g.code)]);
       if (!code) {
