@@ -1,0 +1,96 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "재갈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red rubber ball on a black leather strap with a buckle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "본디지 마스크",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather hood mask with a zipper over the mouth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "구속 밴드",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black nylon cuff straps with buckles connected by long straps Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진공 펌프",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cylinder with a black hand pump bulb attached by a tube Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케겔 볼",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two pink silicone balls joined by a short cord with a loop Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "서류철",
+   "kind": "misc",
+   "redo": "123-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a manila document folder with a few papers, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "화이트보드 마커",
+   "kind": "misc",
+   "redo": "123-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whiteboard marker, plain white body with black cap, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "족보",
+   "kind": "valuable",
+   "redo": "124-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old thread-bound Korean family genealogy book, plain cover, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "촉감 바퀴",
+   "kind": "adult",
+   "redo": "131-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Wartenberg pinwheel: a small round metal wheel with many sharp pins around its edge, on a long thin metal handle, like a pizza cutter with spikes, not a toy pinwheel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "우산 칼",
+   "kind": "weapon",
+   "redo": "69-8",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single closed black umbrella lying diagonally, its curved handle pulled slightly out of the shaft to show a short silver blade attached to the handle, umbrella and blade connected as one piece Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "QR 코드 포스터",
+   "kind": "paper",
+   "redo": "72-8",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white paper poster with a large black QR code square pattern, bright white paper, nothing else printed Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지팡이칼",
+   "kind": "weapon",
+   "redo": "91-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden walking cane split at the handle, a thin silver blade sliding out of the cane shaft, both parts touching as one object Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "의안",
+   "kind": "medical",
+   "redo": "104-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth glass prosthetic eye, polished, clean white with a blue iris, no blood, no veins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펜라이트",
+   "kind": "medical",
+   "redo": "105-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small medical penlight shaped like a slim silver pen with a clip, nothing beside it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바둑판",
+   "kind": "misc",
+   "redo": "121-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden go board with a grid of black lines on light wood, a few black and white stones on it, bright light wood color Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "촉감 바퀴",
+   "kind": "adult",
+   "redo": "131-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Wartenberg pinwheel: a small round metal wheel with many sharp pins around its edge, on a long thin metal handle, like a pizza cutter with spikes, not a toy pinwheel Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "귀두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. the glans of a human penis, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "안구 근육",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human eyeball with eye muscles attached around it, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뇌하수체",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny human pituitary gland on a short stalk, pale pink pea-sized organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탯줄",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled human umbilical cord, bluish white twisted cord, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전립선",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human prostate gland, a small walnut-sized pale organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "난소",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human ovaries, small pale oval organs, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "닭갈비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of spicy red stir-fried chicken with cabbage and rice cakes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "연근조림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few round glossy braised lotus root slices with holes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "미역",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of dried dark green seaweed Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멍게",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red bumpy sea squirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지구본",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small desk globe on a stand Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "욕조 마개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rubber bath plug with a chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낚시 루어",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a colorful fishing lure with hooks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리 달린 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold ring with tiny spider legs crawling Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은하 구슬",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass marble with a tiny galaxy swirling inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손자국 손거울",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand mirror with a bloody handprint on the inside of the glass Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

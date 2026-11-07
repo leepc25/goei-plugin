@@ -1,0 +1,86 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "추 달린 니플 클램프",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small metal clamps joined by a chain with round weights hanging from them Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "집게 줄",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long string with many wooden clothespins attached in a row Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가시 목걸이",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy iron collar lined with sharp spikes on the inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혀 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of long iron tongs with flat serrated tips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "관절 분리 칼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short stiff boning knife with a narrow curved blade Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "큐렛",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slim steel surgical curette with a small sharp spoon loop at each end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식 칩",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tiny glass capsule implant chip with a glowing circuit inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식 주입기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pistol-shaped implant injector gun with a thick needle and a loaded capsule Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피부 이식 칼",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel dermatome, a handheld tool with a wide flat blade for slicing thin skin sheets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "악몽 젤리",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wobbly dark purple jelly with a tiny screaming face trapped inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "남의 얼굴 콤팩트",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open makeup compact whose mirror shows a stranger's face instead of a reflection Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈 달린 지갑",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather wallet with a single blinking human eye on its flap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "경찰 수첩",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black leather police notebook with a badge on the cover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은 탄환",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few silver bullets with engraved crosses Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "VHS 테이프",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old black VHS video cassette tape with a blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "VIP 카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny solid gold metallic card with a tiny embedded chip and a small round sticker, gold not black Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_191/09.png"
+  }
+ ]
+}

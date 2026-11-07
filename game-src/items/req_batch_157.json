@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "버선",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of white Korean cotton socks with pointed toes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel cold chisel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "배구공",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white and blue volleyball Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대나무 돗자리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled bamboo floor mat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다듬잇돌",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat smooth stone block for beating laundry Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숭늉",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of warm scorched rice water with rice bits Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컵누들",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper cup of instant rice noodles with lid peeled back Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "믹서기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a kitchen blender with a clear jar Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호패",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small wooden Joseon identification tag with a cord, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진공청소기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a canister vacuum cleaner with a hose and nozzle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문풍지",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of foam door draft sealing strip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "크림빵",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a soft round bun cut open with white cream inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아기 모빌",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hanging baby crib mobile with small stars and animals Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뽑기 캡슐",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round clear and red plastic capsule toy ball with a small toy inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가시철사",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coil of barbed wire Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "침",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few thin acupuncture needles on a cloth Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

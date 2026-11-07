@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human foreskin, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human gallbladder, a small green pear-shaped sac, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled human small intestine, pink tubes, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lump of yellow human breast fat tissue, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat piece of human skin with a black tattoo, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few human toenails, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human foot, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small whole radishes with green tops in red kimchi sauce Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of rice cake and dumpling soup with egg strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of striped sunflower seeds Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fingerprint kit with a soft brush, black powder jar and tape Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal box grater Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden abacus Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar holding a swirling living black shadow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of paper with a drawn door that is slightly open and glowing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall glass jar of liquor with a coiled snake inside Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "포피",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human foreskin, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쓸개",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human gallbladder, a small green pear-shaped sac, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled human small intestine, pink tubes, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유방 지방 조직",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lump of yellow human breast fat tissue, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문신 새긴 피부 조각",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat piece of human skin with a black tattoo, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발톱",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few human toenails, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human foot, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "총각김치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small whole radishes with green tops in red kimchi sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "떡만둣국",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of rice cake and dumpling soup with egg strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해바라기씨",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of striped sunflower seeds Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지문 채취 키트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fingerprint kit with a soft brush, black powder jar and tape Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "강판",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal box grater Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "주판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden abacus Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "그림자 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar holding a swirling living black shadow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문 그려진 종이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sheet of paper with a drawn door that is slightly open and glowing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뱀술",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall glass jar of liquor with a coiled snake inside Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "구운 계란",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. three brown roasted eggs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "군밤",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a paper bag of roasted chestnuts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "옥수수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steamed corn cob Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꽈배기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a twisted sugar-coated donut Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "츄러스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two long churros with sugar, short enough to fit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "솜사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. pink cotton candy on a stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탕후루",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skewer of sugar-glazed strawberries Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홍삼 스틱",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few slim red ginseng extract pouch sticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피로회복제 병",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brown glass energy tonic bottle, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "프로틴 쉐이크",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shaker bottle with a brown protein drink Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조미김",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of seasoned seaweed sheets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깍두기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bowl of red cubed radish kimchi Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "단무지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few slices of yellow pickled radish Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "젓갈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small glass jar of salted shrimp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "케첩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red squeeze bottle of ketchup, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마요네즈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white squeeze bottle of mayonnaise, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

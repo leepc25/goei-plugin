@@ -1,0 +1,53 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. the short round pink neck of the uterus seen from its end, a firm smooth dome with a small central opening, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of peanuts in shells Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a retro silver ray gun with a round emitter and fins, glowing green Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crystal teardrop-shaped bottle filled with swirling rainbow liquid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow smiley face sticker in a small clear plastic package Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin bracelet braided from long black human hair Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded sheet of clean white eco cushioning wrap with a small barcode Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "자궁경부",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. the short round pink neck of the uterus seen from its end, a firm smooth dome with a small central opening, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "땅콩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of peanuts in shells Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "광선총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a retro silver ray gun with a round emitter and fins, glowing green Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소원 물약",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a crystal teardrop-shaped bottle filled with swirling rainbow liquid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스마일 스티커",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow smiley face sticker in a small clear plastic package Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머리카락 팔찌",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin bracelet braided from long black human hair Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "포장지 12B357나",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded sheet of clean white eco cushioning wrap with a small barcode Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

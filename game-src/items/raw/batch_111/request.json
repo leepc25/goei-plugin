@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone with an eye on it Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old key with a tongue sticking out of the bow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wallet with teeth around its opening Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a book with an eye on its cover Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale leather book with stitched skin cover Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag with a mouth and teeth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of black hair thread Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small flute made of finger bones Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two dice made of bone Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skull candle holder with a candle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. eyeball candy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of red thread with the end trailing away Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of bat wings Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth faceless white mask Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black frame with darkness inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a carved colorful wooden funeral bier figure Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "눈 달린 돌",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stone with an eye on it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혀 달린 열쇠",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an old key with a tongue sticking out of the bow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 박힌 지갑",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wallet with teeth around its opening Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈 달린 책",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a book with an eye on its cover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사람 가죽 책",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale leather book with stitched skin cover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "입 달린 가방",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bag with a mouth and teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머리카락 실",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a spool of black hair thread Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손가락 뼈 피리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small flute made of finger bones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 주사위",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two dice made of bone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해골 촛대",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skull candle holder with a candle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈알 사탕",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. eyeball candy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "끝없는 실타래",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of red thread with the end trailing away Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "박쥐 날개",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of bat wings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "얼굴 없는 가면",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth faceless white mask Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 액자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an empty black frame with darkness inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "상여 장식",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a carved colorful wooden funeral bier figure Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

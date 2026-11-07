@@ -1,0 +1,112 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-rolled joint Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue prison uniform shirt and pants, folded, number patch blank Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of wooden drumsticks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round pink blush compact with a brush Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a police badge in a black leather holder, emblem only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small beige paper drink pack with a picture of yellow soybeans and a green leaf, a short straw on top, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a U-shaped travel neck pillow Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black waterproof sheet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal ring gag on a black leather strap Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink silicone vibrator shaped like a tongue Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear silicone extension sleeve Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red dice with small pictograms on the faces Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean bamboo flute danso Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car tire Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open makeup compact with a mirror and powder puff Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass Korean gong kkwaenggwari with a wooden mallet Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "대마 말이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-rolled joint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "죄수복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue prison uniform shirt and pants, folded, number patch blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "드럼 스틱",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of wooden drumsticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "블러셔",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round pink blush compact with a brush Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "경찰 배지",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a police badge in a black leather holder, emblem only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두유",
+   "kind": "food",
+   "redo": "134-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small beige paper drink pack with a picture of yellow soybeans and a green leaf, a short straw on top, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "목베개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a U-shaped travel neck pillow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방수 시트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded black waterproof sheet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "링 재갈",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal ring gag on a black leather strap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혀 모양 진동기",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink silicone vibrator shaped like a tongue Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "페니스 익스텐더",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear silicone extension sleeve Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "섹스 주사위",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of red dice with small pictograms on the faces Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "단소",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean bamboo flute danso Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "타이어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a car tire Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "콤팩트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open makeup compact with a mirror and powder puff Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "꽹과리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass Korean gong kkwaenggwari with a wooden mallet Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

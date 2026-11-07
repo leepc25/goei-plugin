@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "대음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human labia majora, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "나팔관",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human fallopian tubes with fringed ends, pink, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방광",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human bladder, a round pale pink sac, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈관 다발",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tangled bundle of red and blue human blood vessels, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human spleen, a small dark purple bean-shaped organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기관지",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human bronchi, a pale branching airway tree, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아귀찜",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red spicy braised monkfish with bean sprouts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도라지무침",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of white bellflower root strips in red seasoning Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "약밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few square pieces of brown sweet rice with chestnuts and dates Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바지락",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small clams in shells Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "발가락 이름표",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a manila paper toe tag with a string, blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "양념통",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small set of spice shaker bottles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "팔레트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a painter's palette with blobs of paint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "얼음 속 나비",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue butterfly frozen inside a clear block of ice Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "얼음 장미",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rose made of clear ice that never melts Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도깨비 방망이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean goblin club, a wooden club covered in round studs Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

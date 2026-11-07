@@ -1,0 +1,109 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink muscular vaginal canal as an internal organ, a short wide ridged tube shape seen from the side, open at one end, anatomical specimen like a textbook organ Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pink pea-sized clitoris glans with its two long internal legs forming a wishbone shape, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale cream bunch of grape-like milk gland clusters connected by thin branching ducts, like a small tree of tiny grapes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human wrist joint, a short chunk with the small wrist bones showing at the cut Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a column of five stacked white vertebrae bones with spiky side processes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human ear Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of yellow and black police line tape, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small yellow folding evidence marker tents, blank Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red bumpy sea squirt Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single large flattened stiff dried pollack fish, pale gray-white, split open Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sunny side up fried egg Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky retro silver stopwatch with a glowing green alien dial and frozen hands Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver squeeze tube of space food with a small green alien logo, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few square beige skin patches with a small calm face symbol Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny set of kitchen knives on a block with a gold sale sticker Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contact lens with a scrap of raw flesh stuck to it Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "질",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pink muscular vaginal canal as an internal organ, a short wide ridged tube shape seen from the side, open at one end, anatomical specimen like a textbook organ Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_172/01.png"
+  },
+  {
+   "ko": "음핵",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pink pea-sized clitoris glans with its two long internal legs forming a wishbone shape, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유선 조직",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pale cream bunch of grape-like milk gland clusters connected by thin branching ducts, like a small tree of tiny grapes Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_171/07.png"
+  },
+  {
+   "ko": "손목",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human wrist joint, a short chunk with the small wrist bones showing at the cut Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "척추뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a column of five stacked white vertebrae bones with spiky side processes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "귀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human ear Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "폴리스 라인 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of yellow and black police line tape, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "증거 번호 표지",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small yellow folding evidence marker tents, blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멍게",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red bumpy sea squirt Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "북어",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single large flattened stiff dried pollack fish, pale gray-white, split open Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계란후라이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sunny side up fried egg Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시간 멈춤 스톱워치",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a chunky retro silver stopwatch with a glowing green alien dial and frozen hands Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "우주 식량 튜브",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver squeeze tube of space food with a small green alien logo, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공포 억제 패치",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few square beige skin patches with a small calm face symbol Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "홈쇼핑 칼 세트",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny set of kitchen knives on a block with a gold sale sticker Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "살 붙은 렌즈",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contact lens with a scrap of raw flesh stuck to it Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

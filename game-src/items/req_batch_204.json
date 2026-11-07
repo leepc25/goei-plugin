@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유두 압착 나사판",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two small flat metal plates pressed together by thumb screws Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "물고문 깔때기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large tin funnel with a short rubber hose Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대나무 꼬챙이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of sharp thin bamboo slivers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수동 고기 분쇄기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hand-cranked cast iron meat grinder with a clamp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "갈비뼈 벌리개",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large steel rib spreader with two flat jaws on a toothed bar and a crank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기계 눈알",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mechanical eyeball with a red camera lens iris and metal shell Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신경 접속 바늘 세트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tray of very thin long needles each trailing a thin colored wire Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이식 장기 보존 병",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tall glass jar of clear blue preserving fluid holding a kidney with tubes attached Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "달빛 우유병",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass milk bottle filled with softly glowing silver moonlight milk Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피 잉크 깃펜",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black feather quill dipped in a small bottle of dark red blood ink Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "새장 속 그림자 새",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small brass birdcage holding a bird made of black shadow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "DNA 채취 키트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sealed sterile swab tube and a small evidence box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "협박 편지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a letter made of cut-out magazine letters glued on paper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장조림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few strips of soy-braised beef with boiled quail eggs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "리얼굿즈 박스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleek black merchandise box with a small silver emblem on the lid, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "은심장",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small silver shield-shaped badge pin with a heart shape in the middle, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

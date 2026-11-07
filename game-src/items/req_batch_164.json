@@ -1,0 +1,87 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유방",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single human female breast tissue mound, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human labia minora, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human nipple, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human large intestine section, thick pinkish brown bumpy tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "후두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human larynx, pale cartilage voice box, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈관 다발",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tangled bundle of red and blue human blood vessels, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요관",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin human ureter tubes, pale pink, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탯줄",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled human umbilical cord, bluish white twisted cord, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "척수",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human spinal cord, a long pale cord with nerve roots, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "힘줄",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long white shiny human tendon, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈꺼풀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human eyelids with eyelashes, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골반뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human pelvis bone, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잘린 손",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human hand, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "문신 새긴 피부 조각",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat piece of human skin with a black tattoo, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "외음부",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human female external genitalia vulva, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "대음순",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human labia majora, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

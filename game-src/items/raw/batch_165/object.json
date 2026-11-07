@@ -1,0 +1,52 @@
+{
+ "id": "bd9191d5-5317-449f-bfd5-cf2be86a6f3b",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-07T11:12:13.640810+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {},
+ "frame_urls": null,
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human penis organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human clitoris, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round human areola with nipple, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human appendix, a small pink finger-shaped pouch, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human vocal cords seen from above, pale pink folds, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human spleen, a small dark purple bean-shaped organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human urethra, a short thin pale pink tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human prostate gland, a small walnut-sized pale organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bundle of pale yellow human nerve fibers, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human diaphragm, a dome-shaped red muscle sheet, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human scalp with dark hair attached, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long human thigh bone, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human arm, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few human toenails, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human vaginal canal organ, pink muscular tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human labia minora, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "failed",
+ "group_id": "ae593833-8781-415b-8cdd-08ffa44b9897",
+ "progress_percent": 2,
+ "eta_seconds": 76,
+ "animations": []
+}

@@ -1,0 +1,123 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ornate gold reliquary box with a glass window showing a bone fragment inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round silver saint medal on a short chain with a relief figure of a praying saint Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow paper talisman folded into a small triangle with red brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a moldy old yellow paper talisman with green mold spots and red swirling brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green leather-bound book with gold geometric arabesque patterns on the cover, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear crystal ball with swirling mist inside, the ball alone, no stand, no base Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small carved jade spirit animal figurine with glowing eyes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hemostatic gauze packet with a red cross mark, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hanging blood bag filled with dark red blood, plain white label with no writing, tube at the bottom Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small weekly pill organizer with seven colored lids, short, compact, fully inside the square Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of cold medicine syrup with a measuring cup cap, plain label Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fluffy white cotton wool ball pile Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a doctor's prescription paper with a red stamp and scribbled lines, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open pack of cigarettes with a few cigarettes sticking out Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round metal pocket ashtray with a lid Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a styrofoam instant cup noodle with the paper lid half peeled open and noodles visible Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "성유물",
+   "kind": "charm",
+   "redo": "26-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ornate gold reliquary box with a glass window showing a bone fragment inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "성인 메달",
+   "kind": "charm",
+   "redo": "26-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round silver saint medal on a short chain with a relief figure of a praying saint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "액막이 부적",
+   "kind": "charm",
+   "redo": "26-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow paper talisman folded into a small triangle with red brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곰팡이 핀 부적",
+   "kind": "charm",
+   "redo": "27-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a moldy old yellow paper talisman with green mold spots and red swirling brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "코란",
+   "kind": "charm",
+   "redo": "28-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green leather-bound book with gold geometric arabesque patterns on the cover, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수정 구슬",
+   "kind": "charm",
+   "redo": "28-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear crystal ball with swirling mist inside, the ball alone, no stand, no base Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "영물",
+   "kind": "charm",
+   "redo": "29-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small carved jade spirit animal figurine with glowing eyes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지혈제",
+   "kind": "medical",
+   "redo": "30-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hemostatic gauze packet with a red cross mark, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "혈액 팩",
+   "kind": "medical",
+   "redo": "30-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hanging blood bag filled with dark red blood, plain white label with no writing, tube at the bottom Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "알약 통",
+   "kind": "medical",
+   "redo": "32-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small weekly pill organizer with seven colored lids, short, compact, fully inside the square Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감기약",
+   "kind": "medical",
+   "redo": "32-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of cold medicine syrup with a measuring cup cap, plain label Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "솜",
+   "kind": "medical",
+   "redo": "32-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fluffy white cotton wool ball pile Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "처방전",
+   "kind": "medical",
+   "redo": "33-6",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a doctor's prescription paper with a red stamp and scribbled lines, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "담배",
+   "kind": "food",
+   "redo": "33-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an open pack of cigarettes with a few cigarettes sticking out Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "휴대용 재떨이",
+   "kind": "food",
+   "redo": "33-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round metal pocket ashtray with a lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컵라면",
+   "kind": "food",
+   "redo": "33-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a styrofoam instant cup noodle with the paper lid half peeled open and noodles visible Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

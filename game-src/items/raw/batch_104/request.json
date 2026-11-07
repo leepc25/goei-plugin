@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a walking frame Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hospital patient wristband, blank Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an IV pole, compact Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled catheter tube Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a box of disposable gloves Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a surgical cap Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an organ transport cooler box Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nicotine patch Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleep mask Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a motion sickness patch box, blank Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hangover drink bottle Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bottle of stimulant pills Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of vitamin supplements Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass eye Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a triangular sling bandage Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hemostat clamp Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "보행기",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a walking frame Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "환자 팔찌",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hospital patient wristband, blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수액 걸이",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an IV pole, compact Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카테터",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coiled catheter tube Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장갑 상자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a box of disposable gloves Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수술 모자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a surgical cap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장기 운반 상자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an organ transport cooler box Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "니코틴 패치",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a nicotine patch Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수면 안대",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sleep mask Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "멀미약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a motion sickness patch box, blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "숙취 음료",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small hangover drink bottle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "각성제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bottle of stimulant pills Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "영양제",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bottle of vitamin supplements Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "의안",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass eye Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "삼각건",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a triangular sling bandage Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지혈 겸자",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hemostat clamp Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

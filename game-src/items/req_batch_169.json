@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "외음부",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human female external genitalia vulva, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "십이지장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human duodenum, a short C-shaped pink intestine section, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유관",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human milk ducts, branching thin pale tubes, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손목",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed human wrist joint piece, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잘린 손",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human hand, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잘린 팔",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed pale human arm, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "견갑골",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human shoulder blade bone, flat triangular bone, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "백김치",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole white napa cabbage kimchi in clear brine, not red Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "동그랑땡",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small round golden Korean meat patties Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "땅콩",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small heap of peanuts in shells Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "증거 번호 표지",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small yellow folding evidence marker tents, blank Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하이패스 단말기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small car toll pass device Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전선 릴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cable reel with orange extension cord Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "접이식 컵",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a collapsible silicone cup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붕대 감긴 곰인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a teddy bear wrapped in stained bandages with one button eye Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붉은 눈 고양이 조각상",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black cat statue with glowing red eyes Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

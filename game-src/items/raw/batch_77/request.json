@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of fiery red spicy chicken feet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of grilled beef intestine pieces Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round golden green onion pancake with long green onions Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of glossy glass noodles with spinach, carrot and beef strips Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowl of thick rice porridge Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a triangular rice ball covered in seaweed flakes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cup of rice with toppings and a lid on top Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thick white udon noodles in clear broth with a fish cake slice and green onion Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of ramen with pork slices, a halved soft egg and nori sheet Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two pieces of salmon nigiri sushi Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. thin slices of raw white fish fanned out Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of black bean sauce instant noodles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of Vietnamese rice noodle soup with beef slices and herbs Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of red numbing spicy soup with tofu skin, mushrooms and noodles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a twirl of spaghetti with red tomato sauce Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick grilled beef steak with grill marks Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "닭발",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of fiery red spicy chicken feet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "곱창",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of grilled beef intestine pieces Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "파전",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round golden green onion pancake with long green onions Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잡채",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pile of glossy glass noodles with spinach, carrot and beef strips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "죽",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white bowl of thick rice porridge Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "주먹밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a triangular rice ball covered in seaweed flakes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "컵밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic cup of rice with toppings and a lid on top Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "우동",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thick white udon noodles in clear broth with a fish cake slice and green onion Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "라멘",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of ramen with pork slices, a halved soft egg and nori sheet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "초밥",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two pieces of salmon nigiri sushi Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "회",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. thin slices of raw white fish fanned out Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "짜파게티",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of black bean sauce instant noodles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쌀국수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of Vietnamese rice noodle soup with beef slices and herbs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마라탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of red numbing spicy soup with tofu skin, mushrooms and noodles Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "파스타",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a twirl of spaghetti with red tomato sauce Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스테이크",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick grilled beef steak with grill marks Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

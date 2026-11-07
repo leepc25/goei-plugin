@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few sheets of sandpaper Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wood chisel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden hand plane Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hacksaw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal C-clamp Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bench vise Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow spirit level Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steam iron Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sewing machine Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red tomato pin cushion with pins Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal thimble Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two knitting needles with a bit of knitting Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of red wool yarn Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green cutting mat Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of clear tape on a dispenser Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of double-sided tape Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "사포",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few sheets of sandpaper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "끌",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wood chisel Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대패",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden hand plane Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠톱",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hacksaw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "클램프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal C-clamp Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바이스",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bench vise Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수평계",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a yellow spirit level Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리미",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steam iron Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "재봉틀",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small sewing machine Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바늘꽂이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red tomato pin cushion with pins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골무",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal thimble Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뜨개바늘",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two knitting needles with a bit of knitting Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "털실",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ball of red wool yarn Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "커터 매트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green cutting mat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스카치테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of clear tape on a dispenser Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "양면테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of double-sided tape Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

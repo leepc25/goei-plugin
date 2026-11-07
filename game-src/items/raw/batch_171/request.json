@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human nipple, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human lungs, pink spongy organs, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human pancreas, long pale pink bumpy organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human large intestine section, thick pinkish brown bumpy tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human appendix, a small pink finger-shaped pouch, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human stomach organ, pink J-shaped sac, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human mammary gland tissue, lobes of pale glands, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few stuffed cucumber kimchi pieces with red filling Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glossy soy-braised potato cubes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few white fluffy marshmallows Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small spray bottle glowing blue mist, plain, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vegetable peeler Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tranquilizer dart rifle with a dart Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small framed old portrait painting whose eyes are real wet human eyes Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cracked eggshell with a human eye inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small shriveled mummified mermaid with a monkey-like face and fish tail Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "유두",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human nipple, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "폐",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of human lungs, pink spongy organs, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "췌장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human pancreas, long pale pink bumpy organ, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human large intestine section, thick pinkish brown bumpy tube, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "맹장",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human appendix, a small pink finger-shaped pouch, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "위",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human stomach organ, pink J-shaped sac, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유선 조직",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. human mammary gland tissue, lobes of pale glands, realistic anatomy Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오이소박이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few stuffed cucumber kimchi pieces with red filling Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자조림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glossy soy-braised potato cubes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마시멜로",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few white fluffy marshmallows Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "루미놀 스프레이",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small spray bottle glowing blue mist, plain, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "감자칼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vegetable peeler Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마취총",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a tranquilizer dart rifle with a dart Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈동자 움직이는 초상화",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small framed old portrait painting whose eyes are real wet human eyes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈이 든 달걀",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cracked eggshell with a human eye inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "인어 미라",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small shriveled mummified mermaid with a monkey-like face and fish tail Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

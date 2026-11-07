@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "용접 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark welding helmet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "요가 매트",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled purple yoga mat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빨래건조대",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folding metal clothes drying rack Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도어 스토퍼",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rubber wedge door stopper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소고기 통조림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short round can of corned beef, plain red can with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공갈 젖꼭지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a baby pacifier Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해머 드릴",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy hammer drill with a long bit Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아령",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of iron dumbbells Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "떡갈비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few round grilled Korean minced beef patties Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뻥튀기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few large round white puffed rice cakes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뜸",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few small moxa cones burning with smoke Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "노리개",
+   "kind": "valuable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean ornamental tassel pendant with jade and red silk tassels Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낙지",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a live long-armed small octopus, gray brown Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "물풍선",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few colorful water balloons Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "꽃게",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a blue swimming crab Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "메주",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a brick-shaped block of dried fermented soybean tied with straw rope Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

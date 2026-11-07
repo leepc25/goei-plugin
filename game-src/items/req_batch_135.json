@@ -1,0 +1,95 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "가죽 채찍",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather whip Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "패들",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather paddle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "플로거",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flogger Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 커프스",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. leather cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스프레더 바",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a short metal bar with a leather cuff on each end Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가죽 하네스",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a leather harness Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쪼리",
+   "kind": "wear",
+   "redo": "88-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of rubber flip flops with a thin Y-shaped toe strap between the toes Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "지팡이칼",
+   "kind": "weapon",
+   "redo": "91-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single wooden walking cane split at the handle, a thin silver blade sliding out of the cane shaft, both parts touching as one object Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정수 알약",
+   "kind": "tool",
+   "redo": "95-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small plain white plastic pill bottle with tablets, completely blank with no label and no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "끈끈이",
+   "kind": "tool",
+   "redo": "95-15",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat cardboard sticky glue trap board with shiny glue surface, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소화 담요",
+   "kind": "tool",
+   "redo": "97-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red pouch with a pull tab for a fire blanket, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "플로피 디스크",
+   "kind": "device",
+   "redo": "98-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black floppy disk with a plain white label, completely blank with no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "LP 레코드",
+   "kind": "device",
+   "redo": "98-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vinyl record half out of a plain black sleeve, no cover art, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전자책 리더기",
+   "kind": "device",
+   "redo": "101-15",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an e-book reader with a gray screen showing only plain gray lines, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "의안",
+   "kind": "medical",
+   "redo": "104-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a smooth glass prosthetic eye, polished, clean white with a blue iris, no blood, no veins Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "펜라이트",
+   "kind": "medical",
+   "redo": "105-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small medical penlight shaped like a slim silver pen with a clip, nothing beside it Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

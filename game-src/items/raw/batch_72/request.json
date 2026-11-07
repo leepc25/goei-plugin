@@ -1,0 +1,123 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a narrow paper note with black brush ink strokes, abstract strokes only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a library checkout card in a small paper pocket, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stapled script booklet with a blank cover Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contract paper with a red seal stamp and a signature squiggle, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a supermarket flyer with pictures of food and red price tags, no letters, no numbers Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stapled report document with a paper clip, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a request form paper with checkboxes, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a poster with a large QR code, nothing else printed Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an elegant invitation card in an envelope with a wax seal, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a delivery parcel label sticker with a barcode, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a registered mail envelope with a red stamp mark, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a student ID card with a photo, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic evidence bag with a red seal strip and a knife inside, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick bundle of yellow talisman papers tied with red string, red brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a children's fairy tale book with a castle picture on the cover, no letters Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scratch lottery ticket with silver scratch panels, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "붓글씨 쪽지",
+   "kind": "paper",
+   "redo": "41-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a narrow paper note with black brush ink strokes, abstract strokes only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대출 카드",
+   "kind": "paper",
+   "redo": "41-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a library checkout card in a small paper pocket, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "대본",
+   "kind": "paper",
+   "redo": "41-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stapled script booklet with a blank cover Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "계약서",
+   "kind": "paper",
+   "redo": "42-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a contract paper with a red seal stamp and a signature squiggle, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "마트 전단지",
+   "kind": "paper",
+   "redo": "42-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a supermarket flyer with pictures of food and red price tags, no letters, no numbers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "보고서",
+   "kind": "paper",
+   "redo": "43-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stapled report document with a paper clip, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "의뢰서",
+   "kind": "paper",
+   "redo": "43-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a request form paper with checkboxes, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "QR 코드 포스터",
+   "kind": "paper",
+   "redo": "43-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a poster with a large QR code, nothing else printed Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "초대장",
+   "kind": "paper",
+   "redo": "43-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an elegant invitation card in an envelope with a wax seal, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "택배 송장",
+   "kind": "paper",
+   "redo": "44-2",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a delivery parcel label sticker with a barcode, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "등기 우편",
+   "kind": "paper",
+   "redo": "44-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a registered mail envelope with a red stamp mark, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "학생증",
+   "kind": "paper",
+   "redo": "44-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a student ID card with a photo, ruled lines only, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "증거 봉투",
+   "kind": "paper",
+   "redo": "44-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear plastic evidence bag with a red seal strip and a knife inside, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부적 종이 다발",
+   "kind": "paper",
+   "redo": "45-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thick bundle of yellow talisman papers tied with red string, red brush strokes, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "동화책",
+   "kind": "paper",
+   "redo": "45-6",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a children's fairy tale book with a castle picture on the cover, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "복권",
+   "kind": "paper",
+   "redo": "45-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a scratch lottery ticket with silver scratch panels, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

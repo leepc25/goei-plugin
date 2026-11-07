@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few wrapped tampons Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded diaper Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few drinking straws Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of paper plates Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrapped disposable spoon and chopsticks Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few rubber bands Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vacuum storage bag Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an epoxy syringe Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a putty tub Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stick of red sealing wax Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ink bottle with a feather pen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a printer toner cartridge Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of instant film Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cockroach bait trap Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a box of rat poison Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green pesticide bottle, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "탐폰",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few wrapped tampons Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기저귀",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a folded diaper Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "빨대",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few drinking straws Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "종이 접시",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stack of paper plates Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "일회용 수저",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wrapped disposable spoon and chopsticks Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고무줄",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few rubber bands Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "압축 봉투",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a vacuum storage bag Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "에폭시",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an epoxy syringe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "퍼티",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a putty tub Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "봉랍",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a stick of red sealing wax Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "잉크병",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an ink bottle with a feather pen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토너 카트리지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a printer toner cartridge Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "즉석 필름",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of instant film Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바퀴벌레 약",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cockroach bait trap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쥐약",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a box of rat poison Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "농약병",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a green pesticide bottle, blank label Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

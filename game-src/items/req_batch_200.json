@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "바이올렛 원드",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass electric violet wand glowing purple with a black handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바늘 놀이 세트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a sterile tray of thin hypodermic needles in sealed packets with gloves Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손톱 뽑는 집게",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small pair of rusty pincers with narrow pointed jaws Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두개골 압착기",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medieval iron head crusher, a cap and chin bar pressed by a big screw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "정육 갈고리",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a large steel S-shaped meat hook Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "골 망치",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy steel surgical mallet with a round head Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기계 다리",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cybernetic mechanical human leg of steel plates and hydraulic pistons Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뇌 연결 단자",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal socket port with pins and a short dangling cable, meant to be implanted in the skull Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 고정 나사·판 세트",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a set of steel surgical bone plates with holes and small screws Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈물 결정 사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few clear teardrop-shaped crystal candies Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "그림자 비누",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bar of pitch black soap that gives off a faint black smoke Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "피안화 꽃다발",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small bouquet of red spider lilies tied with a black ribbon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "공무원증",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a government employee ID card in a clear holder on a blue lanyard Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "바디캠",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black body camera with a clip and a red recording light Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "수정테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small white correction tape dispenser Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "메모리얼 그립톡",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round black phone grip disc with a yellow X mark on top Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

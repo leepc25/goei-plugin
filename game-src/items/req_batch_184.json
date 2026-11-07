@@ -1,0 +1,88 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "유륜",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flat circle of brownish pink skin with small bumps around the edge and a tiny nipple, seen from straight above like a flat disc Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/16.png"
+  },
+  {
+   "ko": "쇄골",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a single slender human collarbone, a thin bone with a gentle S curve lying horizontally, much thinner than a leg bone Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_166/12.png"
+  },
+  {
+   "ko": "편도",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two small almond-shaped pink lumps with pitted dotted surface, very small Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_174/06.png"
+  },
+  {
+   "ko": "안구 근육",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bare white eyeball with six thick red muscle straps attached around it like a crown, no optic nerve Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "고막",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small round thin translucent pearly gray membrane in a ring of bone, like a tiny drum Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손뼈",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a human hand skeleton with all the small finger bones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "머리카락 자라는 인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small porcelain doll with extremely long black hair spilling everywhere Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "붕대 감긴 곰인형",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a teddy bear wrapped in stained bandages with one button eye Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리 달린 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a gold ring with tiny spider legs crawling Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "장난감 기차",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small toy train engine Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "석쇠",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wire grill grate with a handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "별가루 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small corked glass bottle full of glittering stardust that glows Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "산소 알약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear bottle of blue glowing capsules Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "괴담 등급 판별 키트",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small kit with test strips and a color chart from gray to black Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방청객 번호 팻말",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round paddle sign with a big blank circle and a wooden handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도깨비 감투",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small black horsehair Korean goblin hat that makes the wearer invisible Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "id": "104f6220-dad1-48e2-91c5-a16c5c69841c",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-07T12:06:24.640796+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {},
+ "frame_urls": null,
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two separate puffy skin-colored outer labia folds side by side, like two plump curved cushions, nothing else between them, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of heavy iron leg shackles joined by a short chain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. rusty dental pliers with curved jaws gripping a pulled tooth Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a long cattle prod with two metal prongs crackling with blue electricity Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a flexible serrated wire saw with two ring handles Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a steel surgical retractor with two curved blades spread apart by a ratchet screw Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few curved half-moon surgical needles with black thread Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a severed furry animal ear with surgical stitches at its base Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glue gun loaded with a cartridge of glowing pink flesh gel Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar of marbles, each marble showing a tiny glowing memory scene inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few biscuits shaped exactly like pale human fingers with almond fingernails Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lantern carved from a human skull with candlelight glowing from the eye sockets Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of small golden scissors with a red thread caught in the blades Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of silver duct tape Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a coin locker key with a numbered plastic tag on a rubber band Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an egg-shaped glowing lamp with the shadow of a creature curled inside Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "failed",
+ "group_id": "6b50500c-5184-4388-8179-66fe1630764d",
+ "progress_percent": 4,
+ "eta_seconds": 86,
+ "animations": []
+}

@@ -1,0 +1,90 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "알약 봉지",
+   "kind": "consumable",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear zip bag of colorful unmarked pills Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "립글로스",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clear lip gloss tube with pink gloss Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하모니카",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver harmonica Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "족집게",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of tweezers Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이섀도",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an eyeshadow palette with colored pans Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "북",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a Korean barrel drum buk with a stick Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "썬캡",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visor sun cap Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "니플 체인",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of nipple clamps connected by a silver chain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "침대 구속 세트",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. black nylon bed restraint straps with four cuffs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "회초리",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin rattan cane with a curved handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "토이 보관 파우치",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black satin drawstring pouch Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "남성 정조 케이지",
+   "kind": "adult",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small clear plastic male chastity cage with a padlock Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "손풍기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small handheld fan Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "마스카라",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mascara tube with the wand out Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "두유",
+   "kind": "food",
+   "redo": "134-9",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small beige paper drink pack with a picture of yellow soybeans and a green leaf, a short straw on top, no writing Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  },
+  {
+   "ko": "목베개",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a U-shaped travel neck pillow Only this item, nothing else beside it, no text, fully inside its square.",
+   "dup": true
+  }
+ ]
+}

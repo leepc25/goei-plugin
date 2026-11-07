@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "미숫가루",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass of beige multigrain powder drink Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "기관 삽관 튜브",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a curved clear endotracheal tube with a cuff Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부싯돌",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a piece of flint with a steel striker Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조청",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small jar of thick dark amber grain syrup Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "순댓국",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a hot earthenware bowl of Korean sundae soup with sausage slices Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "맷돌",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round gray stone hand mill with a wooden handle Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "깻잎",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of green perilla leaves Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "호두",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few whole walnuts, one cracked open Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "부항",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a few glass cupping cups with a pump Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "가마솥",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a big black iron Korean cauldron with a heavy wooden lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "아이스바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rectangular ice pop on a wooden stick, chocolate coated Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "비빔국수",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bowl of thin noodles in red spicy sauce with half a boiled egg Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "압력솥",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a silver pressure cooker with a locking lid Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "전복",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a live abalone in its shell Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "짚신",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of Korean straw sandals Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오징어",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a whole raw squid Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

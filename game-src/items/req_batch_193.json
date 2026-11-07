@@ -1,0 +1,47 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "전정구",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. two elongated soft dark red spongy erectile tissue bulbs shaped like long teardrops lying side by side, anatomical specimen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "눈꺼풀",
+   "kind": "body",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pair of thin crescent shaped flaps of skin each with a row of long dark eyelashes along the edge Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_187/05.png"
+  },
+  {
+   "ko": "육회",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mound of raw beef strips topped with a raw egg yolk and pear slices Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "백화점 고객 카드",
+   "kind": "key",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black glossy department store membership card, no writing Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "노스텔지어 키티",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small ball of red yarn with a tiny silver bell tied to it Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "회색 코인",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dull gray metal coin engraved with an armored gauntlet Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "하얀 그립톡",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a round plain white phone grip disc with a faint soft glow Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "유리손포",
+   "kind": "weapon",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small toy-like ivory white pistol with a clear glass cylinder showing colorful glass marbles loaded inside instead of bullets Only this item, nothing else beside it, no text, fully inside its square.",
+   "redo_src": "game-src/items/raw/batch_190/05.png"
+  }
+ ]
+}

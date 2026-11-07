@@ -1,0 +1,101 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "지하철 표",
+   "kind": "paper",
+   "redo": "45-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper subway ticket with a magnetic stripe, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "주차권",
+   "kind": "paper",
+   "redo": "46-1",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small parking ticket stub, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "카드키",
+   "kind": "key",
+   "redo": "46-5",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white hotel keycard with a chip and a gray stripe Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방문증",
+   "kind": "key",
+   "redo": "47-14",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visitor badge on a lanyard, plain card, no letters Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "번호 패",
+   "kind": "key",
+   "redo": "48-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a metal number plate tag on a ring, blank, no digits Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쇠사슬",
+   "kind": "seal",
+   "redo": "48-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a heavy iron chain coiled loosely, large links clearly visible Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "관",
+   "kind": "seal",
+   "redo": "50-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark wooden coffin lying at an angle, lid closed, coffin shape with six sides Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "황금 닭 보물",
+   "kind": "anomaly",
+   "redo": "52-12",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shiny gold rooster statue covered with jewels, proud pose Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "황금 닭 누름돌",
+   "kind": "anomaly",
+   "redo": "52-13",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rough gray stone weight carved into the shape of a sitting golden hen, flat bottom, worn gold paint Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "낯선 꽃씨",
+   "kind": "anomaly",
+   "redo": "53-7",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small paper seed packet with a few odd glowing blue seeds spilling out Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "색종이",
+   "kind": "anomaly",
+   "redo": "53-10",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small stack of colorful origami paper sheets Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "웅웅거리는 큐브",
+   "kind": "anomaly",
+   "redo": "53-11",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a dark metal cube with faint glowing blue seams Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "끝까지 밝은 손전등",
+   "kind": "anomaly",
+   "redo": "54-8",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black tactical flashlight shown large, beam glowing from the front Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "신원 은폐 장치",
+   "kind": "anomaly",
+   "redo": "54-16",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a small metal implant chip device with wires, shown large and close up Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "외계 물품",
+   "kind": "anomaly",
+   "redo": "55-3",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a strange alien gadget with a glowing green orb and smooth silver shell Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "초록 UFO 장난감",
+   "kind": "anomaly",
+   "redo": "55-4",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a toy green flying saucer with a small dome and colorful lights Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

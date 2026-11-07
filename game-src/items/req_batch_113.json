@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "사람 얼굴 사과",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an apple with a human face Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 실 고치",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black thread cocoon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "해골 가면",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a skull mask Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 목걸이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a necklace of small bones Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 칼",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a knife carved from bone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "뼈 반지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a ring carved from bone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "미라 손",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mummified hand Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "쪼그라든 머리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a shrunken head with sewn lips Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "원숭이 손",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a withered monkey paw Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "두 머리 뱀 표본",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a jar with a two-headed snake Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "이빨 달린 물고기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a fish with human teeth Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "다리 많은 벌레 표본",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pinned bug with too many legs Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "날개 달린 쥐",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rat with bat wings Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 털 뭉치",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a clump of black fur Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "새 해골",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bird skull Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "결계 말뚝",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wooden barrier stake with a talisman tied on Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a capture net with weights Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar with a swirling ghostly light inside Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a broken piece of gravestone Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mourning ribbon Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black Korean gat hat Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a test paper sheet with check marks, no text Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an award certificate with gold border, no text Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled diploma with ribbon Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white envelope, plain Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a work log binder Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a patrol log clipboard Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visitor log book open Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a guest book with pen Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a menu board Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bank passbook Only this item, nothing else beside it, no text, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical certificate paper with a stamp, no text Only this item, nothing else beside it, no text, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "괴이 포획망",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a capture net with weights Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "영혼 포획 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a glass jar with a swirling ghostly light inside Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "묘비 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a broken piece of gravestone Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "근조 리본",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black mourning ribbon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "검은 갓",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a black Korean gat hat Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "시험지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a test paper sheet with check marks, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "상장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. an award certificate with gold border, no text Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "졸업장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a rolled diploma with ribbon Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "사직서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a white envelope, plain Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "업무 일지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a work log binder Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "순찰 일지",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a patrol log clipboard Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "출입 기록부",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a visitor log book open Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "방명록",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a guest book with pen Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "메뉴판",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a menu board Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "통장",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a bank passbook Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "진단서",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a medical certificate paper with a stamp, no text Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
