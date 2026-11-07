@@ -3395,3 +3395,17 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .gw-flow-tools { justify-content: flex-start; }
 /* 설정 묶음 안의 접이식 칸(로어북 확인 등)은 위 줄과 띄운다 (11-07 사용자: 「로어북 보내기」와 「로어북 확인」이 딱 붙어 있다고 여러 번 지적) */
 .ps-group > .ps-rows + .ps-adv { margin-top: 14px; }
+
+/* 접이식 칸 제목 줄 (2026-11-07 사용자: 접는 건 좋은데 눈에 띄어야 한다 — 흐릿한 글자 한 줄이면 안 보인다). 채운 띠 + 왼쪽 강조 줄 + 또렷한 제목 + 강조색 화살표 */
+.ps-adv-sub > summary, .ps-adv-sum { position: relative; gap: 10px; min-height: 48px; padding: 0 14px 0 18px; border-radius: 14px; background: var(--panel2); color: var(--text); font-size: 14px; font-weight: 700; letter-spacing: 0; transition: background .15s, box-shadow .15s; }
+.ps-adv-sub > summary::before, .ps-adv-sum::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--signal); opacity: .85; }
+.ps-adv-sub > summary:hover, .ps-adv-sum:hover { background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-radius: 14px 14px 0 0; background: var(--accent-bg); }
+.ps-adv-sub > summary::after, .ps-adv-sum::after { width: 10px; height: 10px; border-color: var(--signal); border-width: 2.5px; }
+.ps-adv-sub > summary > b, .pp-log > summary b { padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent-line); color: var(--signal); font-size: 12px; font-weight: 700; }
+.ps-adv-sub > summary > b { margin-left: 2px; }
+.pp-group > summary { font-size: 14px; font-weight: 700; letter-spacing: 0; color: var(--text); }
+.ps-adv-sub, .ps-adv { border-color: var(--line2); border-radius: 14px; overflow: hidden; }
+.ps-adv-sub > .ps-rows { border-radius: 0; }
+.pp-blk > .ps-rows > .ps-adv-sub { margin: 8px 10px 10px; border: 1px solid var(--line2); border-radius: 14px; background: var(--void); }
+.pp-blk > .ps-rows > .ps-adv-sub + .ps-adv-sub { margin-top: 0; }

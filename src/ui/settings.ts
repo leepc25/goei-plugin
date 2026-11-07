@@ -3,7 +3,7 @@
 import { onOffSwitch } from './controls';
 import { repaintTheme } from './theme';
 import {
-  AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
+  AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, isChatSettingVar, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
@@ -39,7 +39,7 @@ export const settingsUi = {
   notice: '',
   info: '',
   scope: 'chat' as SettingsScope,
-  confirm: '' as '' | 'save' | 'load',
+  confirm: '' as '' | 'save' | 'load' | 'reset',
   /** 「기본값 불러오기」 직전에 보관해 둔 이 채팅의 값 (2026-11-06 사용자 승인, 전수점검 9-7). 불러온 뒤 「되돌리기」 한 번. 없던 키는 undefined */
   undo: null as null | { charIndex: number; chatIndex: number; before: Record<string, string | number | boolean | undefined> },
 };
@@ -182,14 +182,16 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 
 // 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「덮어쓰기」「불러오기」 (전환보다 한 단계 작게). 설정에서는 새 채팅 기본값을,
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
-const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>> = {
+const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load' | 'reset', [string, string]>> = {
   chat: {
     save: ['이 채팅의 설정 전부(캐릭터 이미지·상황판·괴담넷·괴담톡·위키·필드·인물 기록·고급)를 새 채팅 기본값으로 저장할까요? 앞으로 새로 시작하는 채팅이 이 값으로 시작해요.', '저장'],
     load: ['저장해 둔 새 채팅 기본값 전부를 이 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
+    reset: ['이 채팅의 설정 전부와 저장해 둔 새 채팅 기본값을 버리고 플러그인 초기값으로 되돌릴까요? 상황판 켜기·끄기는 그대로 둬요. 되돌리기 띠로 한 번 되돌릴 수 있어요.', '초기값으로'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
     load: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
+    reset: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
   },
 };
 
@@ -215,7 +217,7 @@ function scopeBar(scope: SettingsScope, canChat: boolean, ctx?: ChatContext): st
  *  처리는 set-bar / set-bar-yes / set-bar-no */
 export const mainDefaultsButtons = (): string => {
   const off = settingsUi.busy ? 'disabled' : '';
-  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
+  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button><button class="st-act" data-action="set-bar" data-value="reset" title="플러그인 초기값으로" aria-label="플러그인 초기값으로" ${off}>${ICONS.back}<span>초기값으로</span></button></span>`;
 };
 /** 불러오기 뒤의 「되돌리기」 띠: 보관해 둔 값이 이 채팅 것일 때만 */
 export function undoBar(ctx: ChatContext): string {
@@ -469,7 +471,7 @@ export async function handleSettings(action: string, value: string | undefined, 
     return true;
   }
   if (action === 'set-bar') {
-    settingsUi.confirm = v === 'save' || v === 'load' ? v : '';
+    settingsUi.confirm = v === 'save' || v === 'load' || v === 'reset' ? v : '';
     env.render();
     return true;
   }
@@ -534,6 +536,31 @@ export async function handleSettings(action: string, value: string | undefined, 
       });
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
+      env.render();
+    } else if (what === 'reset') {
+      // 플러그인 초기값으로 (11-07 사용자: 「기본값으로 저장·불러오기」만 있고 초기값 롤백이 없다): 이 채팅의 설정 변수를 전부 지워 코드 기본값으로,
+      // 저장해 둔 새 채팅 기본값(prefs basic·world·theme·vars)도 비운다. 상황판 켜기·끄기는 그대로. 불러오기와 같은 「되돌리기」 띠 한 번
+      let before: Record<string, string | number | boolean | undefined> | null = null;
+      await save(ctx, env, (chat) => {
+        const ss = { ...(chat.scriptstate ?? {}) };
+        before = {};
+        for (const k of Object.keys(ss)) {
+          if (k === '$st_anomaly_on' || !(isChatSettingVar(k) || k === THEME_KEY)) continue;
+          before[k] = ss[k] as string | number | boolean | undefined;
+          delete ss[k];
+        }
+        chat.scriptstate = ss;
+        const vars: ScriptState = {};
+        if (worldOn(chat)) {
+          const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? ''));
+          for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k] as string | number | boolean | undefined;
+          Object.assign(vars, wv);
+        }
+        return vars;
+      });
+      if (!settingsUi.notice) await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {} }));
+      if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
+      if (!settingsUi.notice) settingsUi.info = '이 채팅 설정과 새 채팅 기본값을 플러그인 초기값으로 되돌렸어요.';
       env.render();
     } else env.render();
     return true;
