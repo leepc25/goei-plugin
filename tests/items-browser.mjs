@@ -1,6 +1,7 @@
 // 소지품 메뉴 사진 (2026-11-07): PC 격자·팝업·기록, 폰 격자·서랍·팝업·가계부. 사용법: node tests/items-browser.mjs <out-dir>
 import { mkdirSync } from 'node:fs';
 import { boot, closeEditor, closeWin, launch, loadFixture, openEditor, openWin, sleep } from './qc-settings-harness.mjs';
+import { distPack } from './data-init.mjs';
 const fx = loadFixture(new URL('../.scratch/fixture/fixture.json', import.meta.url).pathname);
 const out = process.argv[2] ?? '/tmp/items-shots';
 mkdirSync(out, { recursive: true });
@@ -14,7 +15,8 @@ const chat = { message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'ch
 const b = await launch();
 const errorsAll = [];
 for (const vp of ['pc', 'phone']) {
-  const { page, errors } = await boot(b, fx, chat, vp);
+  // 소지품 그림 팩은 저장소에 미리 둔다 (받기 없이 바로 그림, host/itemicons.ts)
+  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
   await openWin(page); await sleep(300);
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
   await sleep(200);

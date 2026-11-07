@@ -99,3 +99,17 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.equal(withInventory(msgs(chat), chat).find((m) => m.role === 'system').content.includes('uses 소금'), false);
   assert.deepEqual(settleItemUse(chat, 5), { $st_item_use: '', [ITEM_USE_AT_VAR]: '' });
 });
+
+test('그림 매칭: 긴 키워드 먼저, 이름에 없으면 종류 기본 그림', async () => {
+  const { applyItemsPack, matchItemIcon } = await import('../dist-test/core.mjs');
+  const { itemsPackText } = await import('../scripts/data-pack.mjs');
+  const pack = applyItemsPack(itemsPackText());
+  assert.ok(pack.table.length > 1000 && Object.keys(pack.icons).length === pack.table.length);
+  const base = (k) => pack.table.find((r) => r.base && r.kind === k)?.f;
+  assert.equal(matchItemIcon(pack.table, '접이식 칼', 'weapon'), 'weapon_001.png');
+  assert.equal(matchItemIcon(pack.table, '낡은 접이식칼 하나', 'weapon'), 'weapon_001.png', '띄어쓰기 무시·포함 매칭');
+  assert.equal(matchItemIcon(pack.table, '전혀 모르는 물건', 'charm'), base('charm'));
+  assert.equal(matchItemIcon(pack.table, '', 'misc'), base('misc'));
+  for (const k of ['weapon', 'wear', 'tool', 'device', 'charm', 'medical', 'food', 'paper', 'key', 'seal', 'anomaly', 'valuable', 'consumable', 'misc']) assert.ok(base(k), `${k} 기본 그림`);
+  assert.throws(() => applyItemsPack('{"schema":1,"kind":"world"}'));
+});

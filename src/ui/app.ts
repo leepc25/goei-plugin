@@ -29,6 +29,7 @@ import { addMark, markCandidates, markPop, marks, markUi, navHistBar, removeMark
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
+import { setItemIconRedraw } from '../host/itemicons';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
@@ -158,6 +159,10 @@ function ensureRoot(): HTMLElement {
     if (view.kind === 'picker') renderPicker();
     else render();
     if (editorOpen()) editorRender();
+  });
+  // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
+  setItemIconRedraw(() => {
+    if (view.kind !== 'picker' && tab === 'items') render();
   });
   const style = document.createElement('style');
   style.textContent = css;

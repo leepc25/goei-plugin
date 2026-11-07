@@ -3138,6 +3138,8 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 .it-c .it-ic { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 8px; background: color-mix(in srgb, var(--void) 60%, var(--panel)); color: var(--signal); }
 .it-c .it-ic svg { width: 56%; height: 56%; }
 .it-c .it-ic img { width: 84%; height: 84%; object-fit: contain; image-rendering: pixelated; }
+.it-ph .it-ic img, .it-pickrow .it-ic img { width: 86%; height: 86%; object-fit: contain; image-rendering: pixelated; }
+.it-picnote { margin: 0 0 8px; font-size: 12px; color: var(--sub); }
 .it-c b { padding-top: 5px; font-size: 12.5px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .it-c.empty { background: none; border-style: dashed; border-color: var(--line2); cursor: default; }
 .it-c.empty .it-ic { background: none; }
