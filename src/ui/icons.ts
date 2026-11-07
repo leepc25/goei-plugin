@@ -30,6 +30,7 @@ export const ICONS = {
   plus: stroke('<path d="M12 5v14M5 12h14"/>'),
   trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   /** 기록 메뉴 (일지·보고서·인물·세력): 클립보드 */
+  bag: stroke('<path d="M5 8h14l-1 12H6Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
   records: stroke('<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>'),
   book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
   back: stroke('<path d="m15 5-7 7 7 7"/>'),

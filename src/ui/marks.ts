@@ -60,11 +60,10 @@ export function markPop(current: Mark | null, recent: Mark[]): string {
     </div>`;
 }
 
-/** PC 메뉴 맨 아래: ‹ 뒤로 · ★ 즐겨찾기 · 앞으로 › (모바일 쓸기와 같은 기록) */
-export function navHistBar(current: Mark | null): string {
+/** PC 메뉴 맨 아래: ‹ 뒤로 · 앞으로 › (모바일 쓸기와 같은 기록). ★ 즐겨찾기 단추는 2026-11-07 사용자 결정으로 뺌 */
+export function navHistBar(_current: Mark | null): string {
   return `<div class="gx-navhist">
     <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
-    <button class="gx-nh mk-star${markUi.pop ? ' on' : ''}${current && isMarked(current) ? ' marked' : ''}" data-action="mk-pop" aria-label="즐겨찾기" title="즐겨찾기" aria-expanded="${markUi.pop}">${ICONS.star}</button>
     <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
 }
 

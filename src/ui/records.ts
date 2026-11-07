@@ -132,7 +132,8 @@ function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
 
 // ── 화면 ──
 
-const SUBS: [RecSub, string][] = [['journal', '일지'], ['chronicle', '연대기'], ['wallet', '가계부'], ['people', '인물'], ['factions', '세력']];
+/** 가계부는 2026-11-07부터 소지품 메뉴의 하위 탭 (ui/items.ts). 옛 이동 기록의 wallet 은 app.ts openable() 이 소지품으로 돌린다 */
+const SUBS: [RecSub, string][] = [['journal', '일지'], ['chronicle', '연대기'], ['people', '인물'], ['factions', '세력']];
 
 export function recordsTab(ctx: ChatContext): string {
   const tabs = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
