@@ -519,25 +519,19 @@ export function applyTalk(st: ShopState, r: TalkReply, kick = true): ShopState {
   const talk: ShopLine[] = [...st.talk, { who: 'owner', text: r.owner }];
   let sell = st.sell ?? null;
   if (sell) {
-    // 부른 값: <offer> 가 우선, 없으면 「~ 이름|값」 줄이 팔 물건 이름이면 그것. 가게 값대를 터무니없이 넘는 값은 버린다(안 삼)
+    // 부른 값: <offer> 가 우선, 없으면 「~ 이름|값」 줄이 팔 물건 이름이면 그것. 값은 모델이 정한 그대로 (사용자 11-07: 프로그램이 값대로 거르지 말 것)
     let price: number | null | undefined = r.offer;
     if (price === undefined) {
       const rp = r.reprice.find((p) => sameShopName(p.name, sell!.name));
       if (rp) price = rp.price;
     }
     if (price !== undefined) {
-      if (price !== null && !offerFits(price, st.identity)) price = null;
       const first = sell.first ?? (typeof sell.price === 'number' && price !== null && price !== sell.price ? sell.price : undefined);
       sell = { ...sell, price, ...(first !== undefined ? { first } : {}) };
     }
   }
   const closed = st.closed || (kick && r.closed);
   return { ...st, items: items.slice(0, 40), talk: talk.slice(-40), closed, sell: closed ? null : sell };
-}
-
-/** 사는 값 검사: 가게 보통 값대의 두 배를 넘으면 터무니없는 값으로 본다 (싼 쪽은 제한 없음 — 헐값은 있을 수 있다) */
-export function offerFits(price: number, id: ShopIdentity): boolean {
-  return price >= 0 && !(id.max > 0 && price > id.max * 2);
 }
 
 /** 팔기 시작: 소지품 한 줄을 들고 주인에게 보인다 (값은 아직 없음). 내 말은 부르는 쪽이 sayToOwner 로 적는다 */
@@ -636,7 +630,7 @@ const TALK_THOUGHTS =
   '1. What did the player actually say or want (question, request, haggling, chat)?\n2. Given this owner\'s character and the shop identity, what is the honest reaction: answer only, fetch something, re-stock the whole shelf, lower a price, refuse, or end the dealing?\n3. Pick exactly one change mode. Only things within the shop identity may be added.\n4. Write the owner\'s line in character.';
 
 const SELL_THOUGHTS =
-  '1. What is the protagonist offering, and what did they say (a price? haggling? just showing it)?\n2. Would this shop buy such a thing at all (identity: what it sells, what it never deals in)? If not, refuse in character.\n3. If yes: what would this owner pay — below what it would sell for, adjusted by condition and how much they want it. React to the protagonist\'s figure honestly.\n4. Write the owner\'s line with the figure, and the <offer>.';
+  '1. What is the protagonist offering, and what did they say (a price? haggling? just showing it)?\n2. Would this shop buy such a thing at all (identity: what it sells, what it never deals in)? If not, refuse in character.\n3. If yes: what is this thing actually worth? Weigh it as a whole — what it is and how rare, its condition, its effect or uses, what it would fetch on this shop\'s own shelf (a rare or strange piece can be worth far more than ordinary stock), what the protagonist paid if known, and how much this owner wants it.\n4. From that worth, decide a fair buying price for this owner (a shop buys below what it would sell for; greedy or generous as the character is). React to the protagonist\'s figure honestly — accept, counter, or laugh it off.\n5. Write the owner\'s line with the figure, and the <offer>.';
 
 function material(src: ShopSource, s: ShopSettings): string {
   const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
@@ -677,7 +671,7 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const sellRule = o
-    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all and what it would pay — a shop buys cheaper than it sells; condition, usefulness to this shop, and the protagonist\'s words (they may name a price, or haggle on your earlier figure) all matter. ' +
+    ? 'The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner\'s character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item\'s real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (the price range is for ordinary stock; a rare or strange piece may be worth far more), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist\'s words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. ' +
       'Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner\'s line too. The shelf change mode is normally none while selling.'
     : '';
   const system = [

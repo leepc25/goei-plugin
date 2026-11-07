@@ -95,12 +95,15 @@ test('구입·다음 턴 사건·값 표기', () => {
   assert.equal(shortWon(0), '0');
 });
 
-test('팔기: 제안 읽기(offer·~줄), 터무니없는 값은 안 삼, 흥정하면 처음 값 남음, 거절, 확정·그만, 다음 턴 사건, 요청문에 팔 물건', () => {
+test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하면 처음 값 남음, 거절, 확정·그만, 다음 턴 사건, 요청문에 팔 물건', () => {
   const st0 = applyShelf(readShop(settleShop(chat('x\n[shop: 철물점|주인]'), 3).vars), parseShelf(SHELF, null), shopSettings({}));
   const mine = { itemId: 'i_1', name: '낡은 손전등', desc: '흠집', kind: 'tool', effect: '', paid: 18000 };
   let st = sayToOwner(startSell(st0, mine), '[팔기: 낡은 손전등]');
   assert.equal(st.sell.price, undefined);
   assert.match(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).at(-1).content, /팔려는 물건[\s\S]*낡은 손전등\|tool/);
+  // 값은 모델 판단: 물건 가치를 종합해 적정 값을 정하라는 지시
+  { const sys = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).map((m) => m.content).join('\n');
+    assert.match(sys, /real worth as a whole/); assert.match(sys, /No program checks the figure/); }
   const r1 = parseTalk('<owner>만 이천 주지.</owner>\n<change mode="none"></change>\n<offer>12,000원</offer>');
   assert.equal(r1.offer, 12000);
   st = applyTalk(st, r1);
@@ -110,8 +113,8 @@ test('팔기: 제안 읽기(offer·~줄), 터무니없는 값은 안 삼, 흥정
   st = applyTalk(sayToOwner(st, '[팔기: 낡은 손전등] 만오천은 줘야지'), parseTalk('<owner>만 사천.</owner>\n<change mode="partial">\n~ 낡은 손전등|14000\n</change>'));
   assert.equal(st.sell.price, 14000);
   assert.equal(st.sell.first, 12000);
-  // 터무니없는 값(값대 5만의 두 배 넘음) → 안 삼
-  assert.equal(applyTalk(st, parseTalk('<owner>백만.</owner>\n<change mode="none"></change>\n<offer>1000000</offer>')).sell.price, null);
+  // 값대를 크게 넘어도 모델이 부른 값 그대로 (사용자 11-07: 프로그램이 거르지 않음)
+  assert.equal(applyTalk(st, parseTalk('<owner>백만.</owner>\n<change mode="none"></change>\n<offer>1000000</offer>')).sell.price, 1000000);
   assert.equal(parseTalk('<owner>안 사.</owner>\n<change mode="none"></change>\n<offer>none</offer>').offer, null);
   assert.equal(parseTalk('<owner>응.</owner>\n<change mode="none"></change>').offer, undefined);
   // 확정 → 판 것 목록, 팔기 비움. 값 없으면 못 함
