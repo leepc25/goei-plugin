@@ -175,6 +175,8 @@ const isAir = (id?: Json) => P.mode === 'air' && (id === '7' || id === '14');
 const restId = () => P.armed ? (has('W_1') ? 'W_1' : has('W') ? 'W' : idleId()) : idleId();
 // 손끝(총 없는 줄): 가장 앞으로 뻗은 손발 자리. 충전 모으기(23) 이펙트용(10-28 진나솔: 무릎에 생김)
 function handPt() { const id = P.clip && A[P.clip.id] ? P.clip.id : restId(), f = P.clip ? curF() : 0, a = A[id], ry = CH.reachY && CH.reachY[id] && CH.reachY[id][f]; if (!a || ry == null || (CH.gun || []).includes(id)) return muzzle(); return framePt(id, f, a.reach[f] - 6, ry); }
+// 손으로 짠 도트 이펙트 시험(11-08 사용자 「그래」): 대전에서 에일린 필살기에만 dot-* 그림(tools/dotfx/make_dotfx.py)
+const dotSample = () => view.clear && P.inSuper && String(CK).startsWith('1.4') && !!VFX['dot-impact'];
 function muzzle() { const id = P.clip && A[P.clip.id] ? P.clip.id : restId(), f = P.clip ? curF() : 0, a = A[id]; if (!a) return { x: P.x + P.face * 40, y: P.y - 150 }; const m = (a.mz && a.mz[f]) || [a.reach[f], a.h * 0.45]; return framePt(id, f, m[0] + 1, m[1]); }
 const mzAng = () => { const id = P.clip ? P.clip.id : restId(), a = A[id]; return (a && a.ang && a.ang[curF()]) || 0; };
 const MZ_GAP = 30;
@@ -384,7 +386,7 @@ function strike(h?: Json, y?: Json) {
     hitstop = Math.max(hitstop, h.stop ?? (big ? 0.14 : 0.07)); shake = Math.max(shake, h.shake ?? (big ? 12 : 5));
     curHit = h; curLast = i === n - 1; damageTarget(Math.round((h.dmg || 20) / n), kind); curHit = null; curLast = true; sfx('hit', { strength: big ? 3 : 1, kind: h.sfx });
     const hy = y ?? T.y - T.z - 110 * K(T.y);
-    if (!h.noVfx) { if (h.vfx && VFX[h.vfx]) vfx(h.vfx, T.x, hy, (h.vs || 1) * K(T.y), { center: true, flip: P.face < 0, tint: h.tint }); else if (!vfx(big ? 'hit_heavy' : 'hit_light', T.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(T.x, hy, 10, big); }   // h.vfx: 맞는 자리 그림(3판 타격 불꽃 등)
+    if (!h.noVfx) { if (dotSample()) vfx('dot-impact', T.x, hy, 1.5 * K(T.y), { center: true, flip: P.face < 0 }); else if (h.vfx && VFX[h.vfx]) vfx(h.vfx, T.x, hy, (h.vs || 1) * K(T.y), { center: true, flip: P.face < 0, tint: h.tint }); else if (!vfx(big ? 'hit_heavy' : 'hit_light', T.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(T.x, hy, 10, big); }   // h.vfx: 맞는 자리 그림(3판 타격 불꽃 등)
     if (h.text) fx.push({ k: 'num', x: T.x - 30, y: hy - 70, v: h.text, t: 1.2 });
     const hv = P.hitVfx; if (hv && P.t < hv.until && P.t - hv.last > 0.12 && VFX[hv.n]) { hv.last = P.t; (VFX[hv.n].mode === 'bottom' ? vfx(hv.n, T.x, T.y, hv.s * K(T.y), { bottom: true, flip: P.face < 0 }) : vfx(hv.n, T.x, hy, hv.s * K(T.y), { center: true, flip: P.face < 0 })); }   // 기술 전용 타격 그림을 맞는 자리에(10-29: 이펙트가 엉뚱한 곳에 나오지 않게)
   };
@@ -441,7 +443,7 @@ const FX = {
   // 폭발 하나: vfx 그림(기본 RPG 폭발) + 그을음. hand면 손 앞 공중, 아니면 바닥
   blast(s?: Json, c?: Json) {
     const p = posOf(s, c), sc = (s.scale || 1.6) * p.k, onAir = (s.at || 'hand') === 'hand' || s.air;
-    if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 26 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2, onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
+    if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 26 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2 * (s.vfxMul || 1), onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
     if (s.scorch) craterAt(p.x, p.gy, sc * 0.7, s.scorch);
     if (!onAir) dust(p.x, p.gy, 6, sc);
     boomSnd(2, P.x);
@@ -488,7 +490,8 @@ const FX = {
       fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 20, t: tt, t0: tt });
       shake = Math.max(shake, s.big ? 6 : 1.5);
       const use = curSrc;   // 늦게 맞아도 사격 출처(판정 형태 총 = 민)
-      if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.hy, 2)) sparks(endX, p.hy, 4, false, '#fff6d0'); const s0 = curSrc; curSrc = use; strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { dmg: 7, kind: 'light' }) }); curSrc = s0; });
+      const dot = dotSample();
+      if (hitD) later(tt, () => { if (dot ? !vfx('dot-impact', endX + (Math.random() - 0.5) * 30, p.hy + (Math.random() - 0.5) * 60, 1.1 * K(P.y), { center: true, flip: P.face < 0 }) : !vfx('bullet_hit_body', endX, p.hy, 2)) sparks(endX, p.hy, 4, false, '#fff6d0'); const s0 = curSrc; curSrc = use; strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { dmg: 7, kind: 'light' }) }); curSrc = s0; });
       return;
     }
     sfx(s.sfx || 'whiff');
@@ -636,14 +639,14 @@ const FX = {
   },
   // 에일린: 판독 표적 → 포격
   artillery(s?: Json) {
-    const spots: Json[] = [];
+    const spots: Json[] = [], dot = dotSample();
     for (let k = 0; k < (s.n || 12); k++) spots.push({ x: VX0 + 60 + Math.random() * (VW - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
     if (!!T) spots.splice(Math.random() * spots.length | 0, 0, { x: T.x, y: T.y, onT: true });
     const marks = spots.map(sp => ({ k: 'target', x: sp.x, y: sp.y, t: 8, onT: sp.onT }));
     [0, 1, 2].forEach(g => later(g * 0.38, () => { marks.forEach((m, n) => { if (n % 3 === g) fx.push(m); }); sfx('ui'); }));
     marks.forEach((m, i) => later(1.2 + i * 0.13 + Math.random() * 0.08, () => {
       fx.push({ k: 'mortar', x: m.x, y: m.y, t: 0.32, t0: 0.32 }); sfx('whiff', { strength: 2 });
-      later(0.32, () => { FX.blast({ at: 'target', air: false, scale: 1.4, scorch: 2.5, hit: m.onT ? { dmg: 55, kind: 'launch' } : null }, { pt: { x: m.x, y: m.y } }); m.t = 0; });
+      later(0.32, () => { FX.blast({ at: 'target', air: false, scale: 1.4, ...(dot ? { vfx: 'dot-boom', vfxMul: 0.62 } : {}), scorch: 2.5, hit: m.onT ? { dmg: 55, kind: 'launch' } : null }, { pt: { x: m.x, y: m.y } }); m.t = 0; });
     }));
   },
 };
@@ -826,7 +829,7 @@ function superMove() {
   // 컷인: 화면 정지 + 요원 색 띠 + 기술명
   sfx('super'); cut = 1.1; dark = 1.6; flash = 0.12; hitstop = 0.9;
   // 대전(11-08 사용자): 띠·대사 오버레이 대신 대전게임식 — 배경만 어두워지고(render.ts) 캐릭터가 하얗게 번쩍·둘레 빛, 기술 이름 도트 글자
-  if (view.clear) { cut = 0; P.armorT = 0.28; P.armorC = '#ffffff'; ring(P.x, P.y - 120 * K(P.y), 260 * K(P.y), 0.6, CH.color || '#fff', 8); ring(P.x, P.y - 120 * K(P.y), 160 * K(P.y), 0.45, '#ffffff', 5); vsSuperName = { text: sp.name || '필살기', t: 0.9 }; }
+  if (view.clear) { cut = 0; P.armorT = 0.28; P.armorC = '#ffffff'; if (dotSample()) vfx('dot-burst', P.x, P.y - 120 * K(P.y), 2 * K(P.y), { center: true }); else { ring(P.x, P.y - 120 * K(P.y), 260 * K(P.y), 0.6, CH.color || '#fff', 8); ring(P.x, P.y - 120 * K(P.y), 160 * K(P.y), 0.45, '#ffffff', 5); } vsSuperName = { text: sp.name || '필살기', t: 0.9 }; }
   const steps = sp.steps || [sp];
   const run = (i?: Json) => { if (i >= steps.length) { P.inSuper = false; P.inv = 0; env.perk?.superEnd(); return afterBuf(toIdle); } doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1)); };
   P.inv = 30; later(0.85, () => run(0));   // 컷인이 걷힌 뒤 몸동작·효과
