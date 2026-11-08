@@ -9,9 +9,8 @@ const VS_BG_NAMES: [string, string][] = [
   ['street', '종로 거리'], ['lobby', '관리국 1층 로비'], ['f2', '관리국 2층'], ['f3', '관리국 3층'], ['b1', '관리국 지하 1층'], ['b2', '격리 구역'],
   ['training', '훈련장'], ['clinic', '격리팀 사무실'], ['office', '종합대응팀'], ['lounge', '휴게실'], ['infirmary', '의무실'],
   ['by_street', '강남 거리'], ['by_lobby', '백일몽 1층 로비'], ['by_f13', '백일몽 13층'], ['by_lab', '연구1팀 연구실'],
-  ['sdra_street', '영등포 거리'], ['sdra_lobby', '협회 1층'], ['sdra_b1', '협회 지하 1층'],
+  ['sdra_street', '영등포 거리'], ['sdra_b1', '협회 지하 1층'],
   ['jr_entry', '중림 지하상가 입구'], ['jr_b1', '중림 지하상가 지하 1층'], ['jr_alley', '중림 뒷골목'], ['jr_b2', '중림 지하상가 지하 2층'],
-  ['jr_daebak', '대박 알선'], ['jr_heolgap', '헐값 매입'], ['jr_youngchang', '영창 컨설팅'], ['jr_songil', '손길 의원'], ['jr_jinryo', '진료실'], ['jr_op', '수술실'],
 ];
 
 let rerender = () => {};

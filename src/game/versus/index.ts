@@ -22,7 +22,7 @@ export interface VersusHandle {
 }
 
 /** 대전 배경 (11-08 사용자): 필드 장면 그림을 사람 크기에 맞춰(장면 dotK) 무대 1280 에 깐다. 발 줄(700)이 장면 앞줄에 오게 */
-interface BgMeta { w: number; h: number; dotK: number; lane: [number, number] }
+interface BgMeta { w: number; h: number; dotK: number; lane: [number, number]; cut?: number; objs?: { file: string; x: number; y: number; w: number; h: number; front: boolean }[] }
 let bgMeta: Promise<Record<string, BgMeta> | null> | null = null;
 async function loadBg(id: string | undefined): Promise<typeof view.vsBg> {
   if (!id) return null;
@@ -30,16 +30,23 @@ async function loadBg(id: string | undefined): Promise<typeof view.vsBg> {
   const m = (await bgMeta)?.[id];
   const u = m && (await commonUrl(`bg-${id}.webp`));
   if (!m || !u) return null;
-  const img = new Image();
-  img.src = u;
-  try { await img.decode(); } catch { return null; }
+  const pic = async (url: string) => { const im = new Image(); im.src = url; await im.decode(); return im; };
+  let img: HTMLImageElement;
+  try { img = await pic(u); } catch { return null; }
   const LINE = 700, pick = m.lane[1];
   // 사람과 같은 도트 크기, 단 무대 폭(1280)·위쪽 끝(0)까지는 덮게
   const s = Math.max(CHAR_K / m.dotK, 1280 / m.w, LINE / pick);
   const w = m.w * s, h = m.h * s;
   let y = LINE - pick * s;
   if (y + h < 720) y = 720 - h;
-  return { img, x: 640 - w / 2, y, w, h };
+  // 무대 1280 (2화면) 에 장면의 한 구간(cut 가운데)을 놓는다. 그림 끝이 무대 안으로 들어오지 않게
+  const x = Math.min(0, Math.max(1280 - w, 640 - (m.cut ?? m.w / 2) * s));
+  const objs = (await Promise.all((m.objs ?? []).map(async (o) => {
+    const ou = await commonUrl(`bgo-${o.file}.webp`);
+    const im = ou ? await pic(ou).catch(() => null) : null;
+    return im ? { img: im, x: x + o.x * s, y: y + o.y * s, w: o.w * s, h: o.h * s, front: o.front } : null;
+  }))).filter((o): o is NonNullable<typeof o> => !!o);
+  return { img, x, y, w, h, objs };
 }
 
 export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined } = {}): VersusHandle {

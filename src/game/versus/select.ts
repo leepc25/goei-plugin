@@ -170,6 +170,9 @@ const CSS = `
 .vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
 .vs-vfig[data-s="0"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
 .vs-vfig[data-s="1"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
+.vs-vnm{position:absolute;z-index:5;bottom:184px;transform:translateY(50%);display:flex;flex-direction:column;gap:6px}
+.vs-vnm[data-s="0"]{right:calc(50% + 84px);align-items:flex-end;animation:vs-inL .3s .3s steps(5) backwards}
+.vs-vnm[data-s="1"]{left:calc(50% + 84px);align-items:flex-start;animation:vs-inR .3s .3s steps(5) backwards}
 .vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-vname[data-s="0"]{left:8%}
 .vs-vname[data-s="1"]{right:8%;flex-direction:row-reverse}
@@ -187,6 +190,32 @@ function bigMode(text: string, on: boolean): HTMLCanvasElement {
   const cv = document.createElement('canvas');
   cv.width = src.width; cv.height = src.height;
   cv.getContext('2d')!.drawImage(src, 0, 0);
+  return crt2d(cv);
+}
+
+/** VS 화면 이름: HUD 도트 글자 3배, 1P 파랑·2P 빨강 세 단(위 밝게) + 오른쪽 아래 검은 그림자 한 도트 */
+const NAME_BAND = [['#e4f0ff', '#6fa8ff', '#2a4fb0'], ['#ffe0d8', '#ff6a4a', '#a8261a']];
+function nameBig(text: string, side: 0 | 1, k = 3): HTMLCanvasElement {
+  const src = dotText(text, '#ffffff', k);
+  const cv = document.createElement('canvas');
+  cv.width = src.width + k * 2; cv.height = src.height + k * 2;
+  const o = cv.getContext('2d')!;
+  const tint = (fill: (q: CanvasRenderingContext2D) => void) => { const t = document.createElement('canvas'); t.width = src.width; t.height = src.height; const q = t.getContext('2d')!; q.drawImage(src, 0, 0); q.globalCompositeOperation = 'source-in'; fill(q); return t; };
+  o.drawImage(tint((q) => { q.fillStyle = '#07090b'; q.fillRect(0, 0, src.width, src.height); }), k, k);
+  // dotText 는 테두리(어두운 색)가 붙어 나온다: 밝은 칸(글자 몸)만 세 단 색으로 바꾸고 테두리는 그대로
+  const band = NAME_BAND[side].map((c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)));
+  const g = document.createElement('canvas'); g.width = src.width; g.height = src.height;
+  const q = g.getContext('2d')!; q.drawImage(src, 0, 0);
+  const d = q.getImageData(0, 0, g.width, g.height);
+  for (let y = 0; y < g.height; y++) {
+    const c = band[Math.min(band.length - 1, Math.floor((y * band.length) / g.height))];
+    for (let x = 0; x < g.width; x++) {
+      const i = (y * g.width + x) * 4;
+      if (d.data[i + 3] > 0 && d.data[i] + d.data[i + 1] + d.data[i + 2] > 384) { d.data[i] = c[0]; d.data[i + 1] = c[1]; d.data[i + 2] = c[2]; }
+    }
+  }
+  q.putImageData(d, 0, 0);
+  o.drawImage(g, 0, 0);
   return crt2d(cv);
 }
 
@@ -595,10 +624,11 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
     fw.dataset.s = String(s);
     if (surv) { fw.style.height = `${figH}px`; fw.style.display = 'flex'; fw.style.alignItems = 'center'; fw.appendChild(dot('?', HUD_INK, 10)); }
     else { const f = troupe(figH, s === 1, Math.max(1, Math.min(3, list.length))); f.set(list); figs.push(f); fw.appendChild(f.el); }
+    // 이름 (11-08 사용자 「격투게임 VS 화면처럼」): VS 양옆에 크게, 상자 없이. 1P 파랑·2P 빨강, 팀은 셋 다 위아래로
     const nm = document.createElement('div');
-    nm.className = 'vs-vname';
+    nm.className = 'vs-vnm';
     nm.dataset.s = String(s);
-    nm.append(dot(s ? '2P' : '1P', P_COLOR[s], 2), dot(surv ? '웨이브 서바이벌' : list[0], HUD_INK, 2));   // 팀은 첫 사람 이름만, 셋은 위 얼굴 칸으로
+    for (const line of surv ? ['웨이브', '서바이벌'] : list) nm.appendChild(nameBig(line, s));
     el.append(fw, nm);
     if (list.length > 1) {
       const tm = document.createElement('div');

@@ -18,8 +18,11 @@ COMBAT |= set('2 28 29 32 35 116 142 143 144 145 147 157 168'.split())
 FACE = 64
 # 대전 배경으로 쓰는 필드 장면 (화장실·샤워실 빼고). 이름표는 src/ui/versus.ts VS_BG_NAMES
 VS_BGS = ['street', 'lobby', 'f2', 'f3', 'b1', 'b2', 'training', 'clinic', 'office', 'lounge', 'infirmary',
-          'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_lobby', 'sdra_b1',
-          'jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op']
+          'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_b1',
+          'jr_entry', 'jr_b1', 'jr_alley', 'jr_b2']
+# 무대는 2화면 (11-08 사용자 「일단 2화면으로 해보고 나중에 필요하면 늘리면 되니까」): 2화면이 안 되는 장면은 뺐고, 긴 장면은 한 구간만 쓴다.
+# 구간 가운데 (장면 그림 x). 없으면 그림 가운데. 중림 기둥 장면은 기둥 둘 사이 가게 한 칸 (양 끝에 기둥)
+VS_CUT = {'jr_b1': 1896, 'jr_alley': 1896, 'jr_b2': 1896}
 
 def mapedit_scenes():
     t = open(os.path.join(ROOT, 'src', 'game', 'action', 'hq', 'mapedit.gen.ts'), encoding='utf8').read()
@@ -88,7 +91,14 @@ def main():
         src = v and os.path.join(SRC, 'jr-field', v['file'] + '.webp')
         if not v or not os.path.exists(src): continue
         shutil.copy(src, os.path.join(com, f'bg-{sid}.webp'))
-        bgs[sid] = {'w': v['w'], 'h': v['h'], 'dotK': v.get('dotK', 1.4292), 'lane': v['lane']}
+        # 장면 물건(기둥·상자 등, 필드에서 따로 그리는 조각): 앞줄보다 앞(sortY > 앞줄)이면 사람 앞에 그린다 (11-08 사용자: 중림 기둥으로 가려야 이어진다)
+        objs = []
+        for o in v.get('objects') or []:
+            osrc = os.path.join(SRC, 'jr-field', o['file'] + '.webp')
+            if not os.path.exists(osrc): continue
+            shutil.copy(osrc, os.path.join(com, f"bgo-{o['file']}.webp"))
+            objs.append({'file': o['file'], 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'front': o.get('sortY', 0) > v['lane'][1]})
+        bgs[sid] = {'w': v['w'], 'h': v['h'], 'dotK': v.get('dotK', 1.4292), 'lane': v['lane'], 'cut': VS_CUT.get(sid, v['w'] / 2), 'objs': objs}
     json.dump(bgs, open(os.path.join(com, 'bg.json'), 'w'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []

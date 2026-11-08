@@ -28,7 +28,11 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     const pal = f.palette ?? { wall: '#2b343a', floor: '#3a4247', accent: '#5b6a72' };
     if (view.clear) {
       const bg = view.vsBg;
-      if (bg) { ctx.imageSmoothingEnabled = false; ctx.drawImage(bg.img, Math.round(bg.x - camX), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      if (bg) {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bg.img, Math.round(bg.x - camX), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h));
+        for (const o of bg.objs) if (!o.front) ctx.drawImage(o.img, Math.round(o.x - camX), Math.round(o.y), Math.round(o.w), Math.round(o.h));
+      }
       return;
     }
     const [top] = w.lane;
@@ -522,6 +526,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       w.hintShown = false;
       if (corePlayer(w.player)) w.player.drawFxLayer(ctx, camX);
       drawFx(w, camX);
+      // 대전 배경의 앞 물건 (중림 기둥 등): 사람 앞에
+      if (view.clear && view.vsBg) for (const o of view.vsBg.objs) if (o.front) ctx.drawImage(o.img, Math.round(o.x - camX), Math.round(o.y), Math.round(o.w), Math.round(o.h));
       if (w.floor.drawForeground) {
         ctx.save();
         ctx.translate(-camX, 0);
