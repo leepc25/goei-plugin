@@ -4,7 +4,7 @@
 // 인물 풀 = 이름 있는 인물만(NPC 빼기). 서바이벌 상대는 NPC 도 나온다 — 고르지 않고 웨이브가 낸다.
 // 키: 방향키 움직이기, Enter·Z 고르기, Backspace·X 되돌리기, Tab 모드 바꾸기, Esc 닫기. 마우스: 올리면 커서, 누르면 고르기, 오른쪽 단추 되돌리기.
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
-import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
+import { dotText, HUD_DIM, HUD_INK } from '../action/ui/pixelHud';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
@@ -22,16 +22,69 @@ const P_COLOR = ['#5a9cff', '#ff5a5a'];
 export type VsSfx = (id: 'move' | 'ok' | 'back' | 'vs' | 'start') => void;
 
 // 11-08 사용자: 본문을 덮지 않는다(배경판·띠 없음). 글자는 전부 도트(HUD 와 같은 pixelHud 글자), 효과는 인물 외곽 빛만.
+/** 도트 상자 틀 (11-08 사용자: 평평한 네모 말고 제대로 된 도트 상자). 12×12 원본을 border-image 로 2배(도트 한 칸 = 2px).
+ *  모서리 한 도트 깎기 · 검은 테 · 밝은 윗면/왼면 · 어두운 아랫면/오른면 · 안쪽 강조 줄 · 반투명 속 */
+interface FrameCol { edge: string; light: string; shadow: string; accent: string; fill: string }
+function framePixels(o: CanvasRenderingContext2D, n: number, c: FrameCol, px = 1) {
+  const dot = (x: number, y: number, col: string) => { o.fillStyle = col; o.fillRect(x * px, y * px, px, px); };
+  const N = n - 1;
+  for (let y = 0; y <= N; y++) for (let x = 0; x <= N; x++) {
+    const edgeX = x === 0 || x === N, edgeY = y === 0 || y === N;
+    if (edgeX && edgeY) continue;                                   // 모서리 깎기
+    if (edgeX || edgeY) { dot(x, y, c.edge); continue; }
+    if ((x === 1 || x === N - 1) && (y === 1 || y === N - 1)) { dot(x, y, c.edge); continue; }   // 깎은 모서리 안쪽을 닫는다
+    if (y === 1 || x === 1) { dot(x, y, c.light); continue; }
+    if (y === N - 1 || x === N - 1) { dot(x, y, c.shadow); continue; }
+    if (x === 2 || y === 2 || x === N - 2 || y === N - 2) { dot(x, y, c.accent); continue; }
+    dot(x, y, c.fill);
+  }
+}
+const frameCache = new Map<string, string>();
+function frameUrl(c: FrameCol): string {
+  const key = JSON.stringify(c);
+  let u = frameCache.get(key);
+  if (!u) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 12;
+    framePixels(cv.getContext('2d')!, 12, c);
+    u = cv.toDataURL();
+    frameCache.set(key, u);
+  }
+  return u;
+}
+const F_BASE: FrameCol = { edge: '#07090b', light: '#6a717c', shadow: '#272b31', accent: '#1a1e24', fill: 'rgba(15,18,22,.92)' };
+const F_ON: FrameCol = { edge: '#07090b', light: '#fff3c4', shadow: '#8a6a1c', accent: '#d9a72e', fill: 'rgba(40,32,14,.94)' };
+const frameCss = (c: FrameCol) => `border:8px solid transparent;border-image:url(${frameUrl(c)}) 4 fill / 8px stretch;image-rendering:pixelated;background:none`;
+/** 깜빡이는 도트 화살표 ▶ (5×7, 검은 테) */
+function arrowCanvas(color: string, flip = false): HTMLCanvasElement {
+  const rows = ['#....', '##...', '###..', '####.', '###..', '##...', '#....'];
+  const cv = document.createElement('canvas');
+  cv.width = 7; cv.height = 9;
+  const o = cv.getContext('2d')!;
+  const on = (x: number, y: number) => y >= 0 && y < 7 && x >= 0 && x < 5 && rows[y][flip ? 4 - x : x] === '#';
+  for (let y = -1; y <= 7; y++) for (let x = -1; x <= 5; x++) {
+    if (on(x, y)) { o.fillStyle = color; o.fillRect(x + 1, y + 1, 1, 1); }
+    else if ([-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)))) { o.fillStyle = '#07090b'; o.fillRect(x + 1, y + 1, 1, 1); }
+  }
+  cv.style.width = '14px'; cv.style.height = '18px';
+  return cv;
+}
+
 const CSS = `
 .vs-sel{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:40;user-select:none}
 .vs-sel *{box-sizing:border-box}
 .vs-sel canvas{image-rendering:pixelated;display:block}
 .vs-top{position:absolute;left:0;right:0;top:10px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5}
-.vs-title{padding:6px 14px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
-.vs-modes{display:flex;gap:4px;pointer-events:auto}
-.vs-mode{cursor:pointer;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
-.vs-mode.on{box-shadow:inset 0 0 0 1px ${HUD_INK}}
-.vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:5px 8px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-title{padding:0 10px;${frameCss(F_BASE)}}
+.vs-modes{display:flex;gap:30px;pointer-events:auto;padding:0 26px}
+.vs-mode{position:relative;cursor:pointer;padding:0 6px;${frameCss(F_BASE)}}
+.vs-mode.on{${frameCss(F_ON)}}
+.vs-mode.on:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 0 40%,rgba(255,255,255,.45) 40% 48%,transparent 48% 54%,rgba(255,255,255,.25) 54% 57%,transparent 57%);background-size:300% 100%;animation:vs-shine 1.6s steps(16) infinite}
+.vs-mode .ar{position:absolute;top:50%;margin-top:-9px;animation:vs-pulse .5s steps(2) infinite}
+.vs-mode .ar.l{left:-24px}
+.vs-mode .ar.r{right:-24px}
+@keyframes vs-shine{0%{background-position:100% 0}60%,100%{background-position:0 0}}
+.vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:0 4px;${frameCss(F_BASE)}}
 .vs-time.low{animation:vs-pulse .5s steps(2) infinite}
 .vs-fig{position:absolute;bottom:calc(var(--gh) + 50px);z-index:2;pointer-events:none}
 .vs-fig[data-s="0"]{left:3%}
@@ -44,7 +97,7 @@ const CSS = `
 .vs-fig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-fig.pick .vs-slot[data-k="0"] canvas{animation:vs-pick .3s steps(3)}
 .vs-fig .unk{position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center}
-.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:0 6px;${frameCss(F_BASE)}}
 .vs-nm[data-s="0"]{left:3%}
 .vs-nm[data-s="1"]{right:3%;flex-direction:row-reverse}
 .vs-picks{display:flex;gap:3px;margin-bottom:2px}
@@ -52,16 +105,16 @@ const CSS = `
 .vs-gridw{position:absolute;z-index:3;left:50%;bottom:24px;transform:translateX(-50%);pointer-events:auto}
 .vs-grid{display:grid;gap:2px}
 .vs-cell{position:relative;width:${CELL}px;height:${CELL}px;cursor:pointer}
-.vs-cell>canvas{position:absolute;left:0;top:0}
+.vs-cell>canvas{position:absolute;left:0;top:0;transition:transform .06s steps(2)}
+.vs-cell.cur>canvas{transform:translateY(-3px)}
 .vs-cell.rand{display:flex;align-items:center;justify-content:center}
-.vs-cell.taken>canvas{filter:grayscale(1) brightness(.45)}
-.vs-cur{position:absolute;left:-4px;top:-4px;animation:vs-pulse .4s steps(2) infinite;z-index:2}
-.vs-cur canvas{position:absolute;left:0;top:0}
-.vs-cur canvas+canvas{top:-14px;left:2px}
-.vs-cur.c1 canvas+canvas{left:${CELL - 12}px}
+.vs-cell.taken:not(.cur)>canvas{filter:grayscale(1) brightness(.45)}
+.vs-cell.taken.cur>canvas{filter:brightness(.8)}
+.vs-cur{position:absolute;left:0;top:-19px;z-index:2;animation:vs-pulse .4s steps(2) infinite}
+.vs-cur.c1{left:auto;right:0}
 .vs-say{position:absolute;z-index:4;left:0;right:0;bottom:calc(var(--gh) - 46px);display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
 .vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;display:flex;justify-content:center}
-.vs-say canvas,.vs-help canvas,.vs-load canvas{padding:4px 8px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-say canvas,.vs-help canvas,.vs-load canvas{padding:0 4px;${frameCss(F_BASE)}}
 @keyframes vs-blink{50%{border-color:${HUD_INK}}}
 @keyframes vs-pulse{50%{opacity:.4}}
 @keyframes vs-inL{from{transform:translateX(-80px);opacity:0}}
@@ -72,7 +125,7 @@ const CSS = `
 .vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
 .vs-vfig[data-s="0"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
 .vs-vfig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
-.vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:0 6px;${frameCss(F_BASE)}}
 .vs-vname[data-s="0"]{left:8%}
 .vs-vname[data-s="1"]{right:8%;flex-direction:row-reverse}
 .vs-vteam{position:absolute;top:14px;display:flex;gap:4px}
@@ -141,18 +194,18 @@ function figure(h: number, flip: boolean, k = 1) {
   };
 }
 
-/** 대형 (태그매치, 11-08 사용자): 앞사람(첫째, 안쪽)에서 바깥쪽 뒤로 대각선 줄. 뒤로 갈수록 원근으로 작게, 조금 위에. 1:1 은 한 명 */
-const FIG_H = 256, PERSP = [1, 0.84, 0.7], DX = 64, DY = 26;
+/** 대형 (태그매치, 11-08 사용자): 1P 「/」, 2P 「\」 대각선 줄. 뒤로 갈수록 원근으로 작게, 조금 위에. 1:1 은 한 명 */
+const FIG_H = 256, PERSP = [1, 0.93, 0.86], DX = 50, DY = 14;   // 살짝 겹치게, 원근은 적게 (11-08 사용자)
 function troupe(_h: number, flip: boolean, n = 3) {
   const figs = Array.from({ length: n }, (_, k) => figure(FIG_H, flip, PERSP[k]));
   const el = document.createElement('div');
   const w = figs[0].cv.width;
   el.style.cssText = `position:relative;width:${w + DX * (n - 1)}px;height:${FIG_H}px`;
-  // 1P 는 오른쪽이 안쪽(앞), 2P 는 왼쪽이 안쪽(앞). 뒤 사람 발은 앞사람보다 DY 씩 위
+  // 11-08 사용자: 1P 는 「/」 줄 — 앞사람이 바깥(왼쪽) 아래, 뒤 사람은 안쪽으로 DX·위로 DY 씩
   const slots = figs.map((f, k) => {
     const d = document.createElement('div');
     d.className = 'vs-slot'; d.dataset.k = String(k);
-    const cx = flip ? w / 2 + k * DX : w / 2 + (n - 1 - k) * DX;
+    const cx = flip ? w / 2 + (n - 1 - k) * DX : w / 2 + k * DX;   // 1P 「/」 (앞사람 왼쪽 아래 → 오른쪽 위로), 2P 는 거울 「\」
     d.style.left = `${Math.round(cx - f.cv.width / 2)}px`;
     d.style.bottom = `${k * DY}px`;
     d.style.zIndex = String(3 - k);
@@ -176,38 +229,31 @@ function troupe(_h: number, flip: boolean, n = 3) {
   };
 }
 
-/** 얼굴 칸 (11-08 사용자: 버튼 그림 말고 깔끔하게): 검은 1도트 테 + 회색 1도트 테, 안쪽에 얼굴판 얼굴을 1:1 로 (줄이지 않고 가운데를 자른다) */
-const CELL_IN = CELL - 4;
-function drawCell(cv: HTMLCanvasElement, name: string) {
+/** 얼굴 칸 (11-08 사용자): 상자와 같은 도트 틀(도트 한 칸 = 2px)에 얼굴판 얼굴을 1:1 로. 커서가 오면 1P·2P 색 틀로 빛나고 살짝 떠오른다 */
+const CELL_FRAME = 3 * 2, CELL_IN = CELL - CELL_FRAME * 2;
+const cellCol = (state: string): FrameCol =>
+  state === 'p0' ? { edge: '#07090b', light: '#cfe3ff', shadow: '#1d4f9a', accent: P_COLOR[0], fill: '#0f1216' }
+  : state === 'p1' ? { edge: '#07090b', light: '#ffd6d6', shadow: '#9a1d1d', accent: P_COLOR[1], fill: '#0f1216' }
+  : { ...F_BASE, fill: '#0f1216' };
+function drawCell(cv: HTMLCanvasElement, name: string, state = '') {
   const o = cv.getContext('2d')!;
   o.imageSmoothingEnabled = false;
-  const n = cv.width;
-  o.fillStyle = HUD_EDGE; o.fillRect(0, 0, n, n);
-  o.fillStyle = HUD_DIM; o.fillRect(1, 1, n - 2, n - 2);
-  o.fillStyle = '#0f1216'; o.fillRect(2, 2, n - 4, n - 4);
-  if (name === RANDOM) { const q = dotText('?', HUD_INK, 2); o.drawImage(q, Math.round((n - q.width) / 2), Math.round((n - q.height) / 2)); }
-  else if (name) { const f = charFace(name, 64, false); if (f) o.drawImage(f, Math.round((64 - CELL_IN) / 2), 2, CELL_IN, CELL_IN, 2, 2, CELL_IN, CELL_IN); }
+  o.clearRect(0, 0, cv.width, cv.height);
+  framePixels(o, CELL / 2, cellCol(state), 2);
+  const at = CELL_FRAME;
+  if (name === RANDOM) { const q = dotText('?', HUD_INK, 2); o.drawImage(q, Math.round((CELL - q.width) / 2), Math.round((CELL - q.height) / 2)); }
+  else if (name) {
+    const f = charFace(name, 64, false);
+    if (f) o.drawImage(f, Math.round((64 - CELL_IN) / 2), 6, CELL_IN, CELL_IN, at, at, CELL_IN, CELL_IN);
+    // 커서 칸: 얼굴 위에 옅은 빛 한 줄 (위쪽 2도트)
+    if (state) { o.fillStyle = 'rgba(255,255,255,.18)'; o.fillRect(at, at, CELL_IN, 2); }
+  }
 }
 function cellCanvas(name: string, css = CELL): HTMLCanvasElement {
   const cv = document.createElement('canvas');
   cv.width = cv.height = CELL;
   cv.style.width = cv.style.height = `${css}px`;
   drawCell(cv, name);
-  return cv;
-}
-/** 커서: 네 귀퉁이 도트 꺾쇠 (검은 1도트 테) */
-function cursorCanvas(color: string): HTMLCanvasElement {
-  const n = CELL + 8, L = 12, T = 3;
-  const cv = document.createElement('canvas');
-  cv.width = cv.height = n;
-  const o = cv.getContext('2d')!;
-  const bar = (x: number, y: number, w: number, h: number) => { o.fillStyle = HUD_EDGE; o.fillRect(x - 1, y - 1, w + 2, h + 2); };
-  const fill = (x: number, y: number, w: number, h: number) => { o.fillStyle = color; o.fillRect(x, y, w, h); };
-  const corners: [number, number, number, number][] = [];
-  for (const [cx, cy] of [[1, 1], [n - 1 - L, 1], [1, n - 1 - T], [n - 1 - L, n - 1 - T]]) corners.push([cx, cy, L, T]);
-  for (const [cx, cy] of [[1, 1], [n - 1 - T, 1], [1, n - 1 - L], [n - 1 - T, n - 1 - L]]) corners.push([cx, cy, T, L]);
-  corners.forEach((r) => bar(...r));
-  corners.forEach((r) => fill(...r));
   return cv;
 }
 
@@ -272,7 +318,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   const curEl = ([0, 1] as const).map((s) => {
     const d = document.createElement('div');
     d.className = `vs-cur c${s}`;
-    d.append(cursorCanvas(P_COLOR[s]), dot(s ? '2P' : '1P', P_COLOR[s], 1));
+    d.append(dot(s ? '2P' : '1P', P_COLOR[s], 1));
     return d;
   });
   const shown: [string, string] = ['', ''];
@@ -288,13 +334,20 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     el.querySelectorAll<HTMLElement>('.vs-mode').forEach((m) => {
       const on = m.dataset.m === mode.id;
       m.classList.toggle('on', on);
-      put(m, dot(MODES.find((x) => x.id === m.dataset.m)!.name, on ? HUD_INK : HUD_DIM, 2));
+      put(m, dot(MODES.find((x) => x.id === m.dataset.m)!.name, on ? '#fff3c4' : HUD_DIM, 2));
+      if (on) { const l = arrowCanvas('#ffd35a', true), r = arrowCanvas('#ffd35a'); l.className = 'ar l'; r.className = 'ar r'; m.append(l, r); }
     });
     const taken = new Set([...picks[0], ...picks[1]]);
     cells.forEach((c, i) => c.classList.toggle('taken', taken.has(names[i])));
-    // 커서: 지금 차례인 쪽만. 2P 차례면 1P 가 고른 칸은 회색
+    // 커서: 지금 차례인 쪽만. 그 칸은 1P·2P 색 틀로 다시 그리고 살짝 띄운다. 2P 차례면 1P 가 고른 칸은 회색
     curEl.forEach((d) => d.remove());
-    if (!done()) cells[cur[t]].appendChild(curEl[t]);
+    const ci = done() ? -1 : cur[t];
+    cells.forEach((c, i) => {
+      const st = i === ci ? `p${t}` : '';
+      if (c.dataset.st !== st) { c.dataset.st = st; drawCell(c.querySelector('canvas')!, names[i], st); }
+      c.classList.toggle('cur', i === ci);
+    });
+    if (ci >= 0) cells[ci].appendChild(curEl[t]);
     for (const s of [0, 1] as const) {
       const surv = s === 1 && mode.id === 'survival';
       const n = surv ? '' : t === s && !done() ? names[cur[s]] : picks[s][picks[s].length - 1] ?? (s === 1 ? names[cur[1]] : '');
