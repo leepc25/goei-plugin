@@ -353,7 +353,11 @@ def write_parts(folder, stem, text, extra=None):
 INSTALL_DIR = ROOT / 'src' / 'data' / 'install'
 
 
-def write_install_data(greetings, greeting_index, pictures, lore, icon):
+# 봇카드 이미지 (2026-11-08 사용자 확정: 유령만 가운데, 글자 없음, WebP). 있으면 원본 카드의 아이콘 대신 이것을 카드 아이콘·release 아이콘으로
+CARD_ICON = ROOT / 'card' / '봇카드.webp'
+
+
+def write_install_data(greetings, greeting_index, pictures, lore, icon, icon_name='icon.png'):
     """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 빈 인사말 하나와 직접 입력 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
     INSTALL_DIR.mkdir(parents=True, exist_ok=True)
     directory = json.loads(next(e for e in lore if e.get('comment') == 'Directory')['content'])
@@ -361,7 +365,7 @@ def write_install_data(greetings, greeting_index, pictures, lore, icon):
     dump('greetings.json', {'index': greeting_index, 'texts': greetings})
     dump('pictures.json', pictures)
     dump('directory.json', directory)
-    dump('icon.json', {'file': 'icon.png', 'digest': hashlib.sha1(icon).hexdigest()[:12], 'bytes': len(icon)} if icon else {})
+    dump('icon.json', {'file': icon_name, 'digest': hashlib.sha1(icon).hexdigest()[:12], 'bytes': len(icon)} if icon else {})
     return directory
 
 
@@ -945,6 +949,14 @@ def main(src, dst):
     if data.get('character_book'):
         data['character_book']['entries'] = [to_ccv3(e) for e in lore]
 
+    # 봇카드 이미지 바꾸기: 카드 속 아이콘 자산을 확정 그림(card/봇카드.webp)으로
+    if CARD_ICON.exists():
+        icon_asset = next((a for a in data.get('assets', []) if a.get('type') == 'icon'), None)
+        if icon_asset:
+            others.pop(str(icon_asset.get('uri', '')).replace('embeded://', ''), None)
+            icon_asset.update({'uri': 'embeded://assets/icon/image/main.webp', 'ext': 'webp'})
+            others['assets/icon/image/main.webp'] = CARD_ICON.read_bytes()
+
     lite_module = {
         'name': f"{data['name']} Module",
         'description': f"Module for {data['name']}",
@@ -967,9 +979,10 @@ def main(src, dst):
     wiki_parts = write_parts(Path(dst).parent, 'wiki-base', pack, {'version': version})['parts'] if pack else []
     icon_asset = next((a for a in data.get('assets', []) if a.get('type') == 'icon'), None)
     icon = others.get(str(icon_asset.get('uri', '')).replace('embeded://', '')) if icon_asset else None
+    icon_name = f"icon.{icon_asset.get('ext') or 'png'}" if icon_asset else 'icon.png'
     if icon:
-        (Path(dst).parent / 'icon.png').write_bytes(icon)
-    write_install_data(greetings, greeting_index, pictures, lore, icon)
+        (Path(dst).parent / icon_name).write_bytes(icon)
+    write_install_data(greetings, greeting_index, pictures, lore, icon, icon_name)
     (ROOT / 'src' / 'data' / 'world' / 'greetings.json').write_text(json.dumps({'index': scene_index, 'texts': scene_texts}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(

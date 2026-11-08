@@ -621,8 +621,8 @@ function cardPalette() {
 }
 function cardStyle(): string {
   const p = cardPalette();
-  // 채팅 속 카드는 전부 상점 카드와 같은 폭 규칙: 가운데, 420px 안팎, 내용만큼 (2026-11-08 사용자: 입력창 위 상자 크기가 제각각, 첫 행동 상자가 너무 길다)
-  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  // 채팅 속 카드는 전부 같은 폭 규칙: 왼쪽 정렬, 420px 안팎, 내용만큼 (2026-11-08 사용자: 입력창 위 상자 크기가 제각각, 첫 행동 상자가 너무 길다, 왼쪽 정렬)
+  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
 }
 
 /** 카드 안 단추 (상점 카드 「상점 열기」와 같은 모양) */
