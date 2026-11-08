@@ -31,13 +31,13 @@ export function imgPromptPane(ctx: ChatContext): string {
     <p class="ps-note pp-intro">카드 로어북 「Asset」 대신 플러그인이 이 설정으로 지침을 만들어 요청에 넣어요. ${esc(state)} 주인공 이미지 설정(${s.assetPlayer ? 'ON' : 'OFF'})은 캐릭터 이미지 설정에서 바꿔요. 이 기기의 모든 채팅에 같이 적용돼요.</p>
     <section class="ps-group"><h3>지침 틀</h3><p class="ps-note">자리표 <code>{characters}</code> <code>{keywords}</code> 는 아래 목록으로 채워지고, <code>{user_skip}</code> <code>{user_rule}</code> 는 주인공 이미지 설정에 따라 채워져요. 비우면 기본 틀.</p>
       <textarea class="gx-search nw-reqbox ip-template" name="ip-template" data-input="ip-template" data-autosave="ip-template-save" rows="14" maxlength="${IMG_TEMPLATE_MAX}">${esc(template)}</textarea>
-      <div class="gx-row-btns"><button class="gx-mini" data-action="ip-template-reset" title="기본 틀로 되돌려요">기본값</button><button class="gx-mini" data-action="ip-preview">${imgUi.preview ? '미리보기 닫기' : '조립 결과 미리보기'}</button></div>${preview}</section>
+      <div class="gx-row-btns"><button class="gx-mini" data-action="ip-template-reset" >초기값으로</button><button class="gx-mini" data-action="ip-preview">${imgUi.preview ? '미리보기 닫기' : '조립 결과 미리보기'}</button></div>${preview}</section>
     <section class="ps-group"><h3>출력 대상 캐릭터<b>${picked.length}</b></h3><p class="ps-note">명부의 요원 영문명을 자동으로 읽어요 (한글 이름·별칭도 명부에서 가져와 보조 모델 자료로 써요). 체크를 풀면 그 인물은 태그를 안 만들어요. 그림 에셋 이름(영문명_표정)과 같아야 해요.</p>
       <div class="ip-names">${rows}</div>
       <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra">추가</button></div></section>
     <section class="ps-group"><h3>표정 세트<b>${cfg.keywords.length}</b></h3><p class="ps-note">쉼표로 나눠요. 카드 그림(영문명_표정)에 있는 이름이어야 해요. 비우면 기본 27종.</p>
       <textarea class="gx-search nw-reqbox" name="ip-keywords" data-input="ip-keywords" data-autosave="ip-keywords-save" rows="3" maxlength="1200">${esc(keywords)}</textarea>
-      <div class="gx-row-btns"><button class="gx-mini" data-action="ip-keywords-reset">기본값</button></div></section>
+      <div class="gx-row-btns"><button class="gx-mini" data-action="ip-keywords-reset">초기값으로</button></div></section>
     ${imgUi.info ? `<p class="gx-hint">${esc(imgUi.info)}</p>` : ''}
   </article>`;
 }

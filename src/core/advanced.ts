@@ -205,11 +205,6 @@ export function advChanged(state: State, f: AdvFeature): string[] {
   return advItems(f).filter((i) => advValue(state, f, i.key) !== String(i.def)).map((i) => i.key);
 }
 
-/** 모두 기본값으로: 변수를 비운다 */
-export function advResetVars(f: AdvFeature): Record<string, string> {
-  return Object.fromEntries(advItems(f).map((i) => [advVar(f, i), i.v ? String(i.def) : '']));
-}
-
 // ── 요청에 쓰는 값 ──
 
 export interface RefToggles {

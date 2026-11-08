@@ -189,6 +189,12 @@ for (const vp of vps) {
   await closeEditor(page);
   await page.evaluate(() => document.querySelector('.gx-fac[data-value="B00"]').click());
   await page.evaluate(() => document.querySelector('.gx-sc[data-value="2"]').click());
+  // 시작 잔고 (2026-11-08 사용자): 첫 장면 다음 칸, 기본값이 들어 있고 고치면 이 채팅만 그 값으로
+  const won = '.gx-wallet-start input[data-change="start-wallet"]';
+  assert.equal(await page.inputValue(won), '140,000', '시작 잔고 칸에 기본값');
+  await page.fill(won, '50만');
+  await page.dispatchEvent(won, 'change');
+  await page.waitForFunction((sel) => document.querySelector(sel)?.value === '500,000', won);
   await page.evaluate(() => document.querySelector('.gx-start').click());
   await page.waitForFunction(() => window.__calls.setChat.length >= 2);
   const again = await page.evaluate(() => window.__calls.setChat.at(-1));
@@ -196,6 +202,8 @@ for (const vp of vps) {
   assert.equal(again.fmIndex, manifest.greetings['B00-ko-8'], '카드 쪽은 빈 인사말');
   assert.ok(sceneOf(again).length > 100 && again.message.length === 1, '첫 장면 메시지로 덮어씀');
   assert.equal(again.scriptstate.$st_fixed_theme, 'light', '시작 전에 고른 테마가 채팅에');
+  assert.equal(JSON.parse(again.scriptstate.$st_wallet ?? '{}').start, 500000, '시작 패널에서 고친 시작 잔고로 출발');
+  assert.equal(JSON.parse((await page.evaluate(() => window.__store['p:goei:prefs'])) ?? '{}').walletStart, undefined, '기본값은 그대로');
   // 기본값 되돌리기 (다음 뷰포트에 영향 없게 새 페이지를 쓰지만 저장소도 비운다)
   await page.evaluate(() => { delete window.__store['p:goei:prefs']; });
 

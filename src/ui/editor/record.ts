@@ -227,7 +227,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
-          ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ''}
+          ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">초기값으로</button>' : ''}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? '지우기' : '삭제'}</button></div></header>
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
@@ -271,7 +271,7 @@ function anomalyNoteBox(over: WorldOverrides): string {
   return `<details class="gw-anote"${recUi.noteOpen ? ' open' : ''}><summary data-action="ed-anote-toggle"><b>괴이 공통 머리말</b><small>${edited ? '고침 · ' : ''}${tokenizerName() ? '' : '약 '}${tokens(note).toLocaleString()}토큰</small></summary>
     <p class="gx-muted">모든 괴이 로어 앞에 한 번만 들어가는 공통 지침이에요 (괴이마다 붙지 않아요).</p>
     <textarea data-input="ed-anote" rows="5">${esc(note)}</textarea>
-    <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? '' : 'disabled'}>기본으로</button></div></details>`;
+    <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? '' : 'disabled'}>초기값으로</button></div></details>`;
 }
 
 export function recordInput(name: string, key: string, value: string, ctx: ChatContext): boolean {

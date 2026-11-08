@@ -1987,8 +1987,7 @@ if (fixture.globalLore.some(packed)) {
   const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === 'Directory'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
-  // 저장 알림: 예전 명부 토스트(.gx-toast[data-toast="dir"]) 대신 창 머리 알림
-  await page.waitForFunction(() => document.querySelector('.gw .gw-notice')?.textContent.includes('저장했어요'));
+  // 바로 저장(2026-11-08): 저장 알림 없음
   // 저장한 값으로 다시 읽힘: 새로 읽은 뒤에도 쟈알디는 테스트 조직
   await page.waitForSelector('.gw [data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"].on');
   await page.setViewportSize({ width: 390, height: 844 });
