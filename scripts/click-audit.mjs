@@ -243,6 +243,16 @@ async function pressStep(page, step, touch) {
   return { ok: true, x: h.x, y: h.y };
 }
 
+
+// 화면이 0.4초 동안 안 바뀔 때까지 기다린다(최대 4초). 임무 고르기처럼 효과 1.5초 뒤 다음 화면으로 넘어가는 것을 앞 단계로 다시 누를 때 필요
+async function quiet(page, still = 400, max = 4000) {
+  await page.evaluate(() => { if (window.__caQuiet) return; window.__caQuiet = { t: performance.now() }; new MutationObserver(() => { window.__caQuiet.t = performance.now(); }).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true }); });
+  await page.evaluate(() => { window.__caQuiet.t = performance.now(); });
+  const t0 = Date.now();
+  await sleep(150);
+  while (Date.now() - t0 < max) { const idle = await page.evaluate(() => performance.now() - window.__caQuiet.t); if (idle >= still) return; await sleep(100); }
+}
+
 async function prepPage(browser, vp, base, path) {
   const { page, errors } = await openFrom(browser, vp, base);
   await page.addScriptTag({ content: PAGE_LIB });
@@ -250,7 +260,7 @@ async function prepPage(browser, vp, base, path) {
   for (const st of path) {
     const r = await pressStep(page, st, touch);
     if (!r.ok) return { page, errors, fail: `앞 단계 「${st.key}」 ${r.why}` };
-    await sleep(st.wait ?? 700);
+    await quiet(page);
   }
   return { page, errors };
 }
@@ -348,6 +358,11 @@ if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.jso
   results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; }
 const browser = opt.reportOnly ? null : await launch();
 for (const vp of opt.reportOnly ? [] : opt.vp) {
+  // 누른 열쇠는 화면 크기마다 하나로 센다: 시작 화면에서 출발해 상황판에 들어가도 이미 누른 것은 다시 안 누른다
+  const done = new Set();
+  const perAct = {};
+  const offSeen = new Set();
+  const exploredVals = {};
   for (const startKind of opt.start) {
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
@@ -360,10 +375,6 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     await page.screenshot({ path: `${SHOTS}/${s0}`, fullPage: false });
     await page.close();
     states.push({ vp, start: startKind, path: opt.from.map((p) => p.key), shot: s0, audit: audit0 });
-    const done = new Set(); // 이 화면 크기에서 누른 열쇠
-    const perAct = {};
-    const offSeen = new Set();
-    const exploredVals = {};
     const queue = [];
     const enqueue = (path, list) => {
       for (const it of list) {
