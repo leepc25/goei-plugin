@@ -120,6 +120,8 @@ export interface Prefs {
   noticedReports?: string[];
   /** 대전 (이 기기 공통, 11-08 사용자): 켜면 PC 에서 유령 단추 밑에 게임패드 단추. 없으면 끔 */
   versus?: boolean;
+  /** 대전 배경 (이 기기 공통, 11-08 사용자): 필드 장면 id. 없으면 배경 없이 본문 위 투명 */
+  versusBg?: string;
   /** 마지막에 고른 아바타 (인물 팩 번호, 이 기기 공통). 새 채팅 시작 패널에서 기본으로 골라 둔다 (2026-11-08 사용자) */
   look?: string;
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
@@ -226,7 +228,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(o.versus === true ? { versus: true } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(o.versus === true ? { versus: true } : {}), ...(typeof o.versusBg === 'string' && /^[a-z0-9_]{1,32}$/.test(o.versusBg) ? { versusBg: o.versusBg } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}) };
   return prefs;
 }
 

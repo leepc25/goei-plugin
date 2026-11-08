@@ -1,7 +1,7 @@
 // 대전 (11-08 사용자 「기다리는 동안 대전」): 고르기 창 → VS 화면(고른 인물만 받기) → 경기 → 끝나면 고르기 창(직전 쌍에 커서).
 // 시험판(fighter/waitfight.ts)과 플러그인이 같이 쓴다. 자료는 대전 공용 팩 vs-common + 인물 팩 vs-<번호> (tools/build_vs_packs.py).
 import { mountGame } from '../action/main';
-import { prepareCharPacks, loadChar, charArt } from '../action/art/charPacks';
+import { prepareCharPacks, loadChar, charArt, commonUrl, CHAR_K } from '../action/art/charPacks';
 import { playerFactory } from '../action/engine/player';
 import { FighterPlayer } from '../action/fighter/player';
 import { view } from '../action/engine/view';
@@ -21,7 +21,28 @@ export interface VersusHandle {
   destroy(): void;
 }
 
-export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void } = {}): VersusHandle {
+/** 대전 배경 (11-08 사용자): 필드 장면 그림을 사람 크기에 맞춰(장면 dotK) 무대 1280 에 깐다. 발 줄(700)이 장면 앞줄에 오게 */
+interface BgMeta { w: number; h: number; dotK: number; lane: [number, number] }
+let bgMeta: Promise<Record<string, BgMeta> | null> | null = null;
+async function loadBg(id: string | undefined): Promise<typeof view.vsBg> {
+  if (!id) return null;
+  bgMeta ??= commonUrl('bg.json').then((u) => (u ? fetch(u).then((r) => r.json() as Promise<Record<string, BgMeta>>) : null)).catch(() => null);
+  const m = (await bgMeta)?.[id];
+  const u = m && (await commonUrl(`bg-${id}.webp`));
+  if (!m || !u) return null;
+  const img = new Image();
+  img.src = u;
+  try { await img.decode(); } catch { return null; }
+  const LINE = 700, pick = m.lane[1];
+  // 사람과 같은 도트 크기, 단 무대 폭(1280)·위쪽 끝(0)까지는 덮게
+  const s = Math.max(CHAR_K / m.dotK, 1280 / m.w, LINE / pick);
+  const w = m.w * s, h = m.h * s;
+  let y = LINE - pick * s;
+  if (y + h < 720) y = 720 - h;
+  return { img, x: 640 - w / 2, y, w, h };
+}
+
+export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined } = {}): VersusHandle {
   view.clear = true;
   const packs = prepareCharPacks(assets, 'vs-common');
   let game: Game | null = null;
@@ -59,6 +80,8 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
     showGame(true);
     vsSoundWarm();
     vsBgm(true);
+    view.vsBg = await loadBg(opts.bg?.());
+    if (dead) return;
     if (!game) {
       unmount = mountGame(box, { assets } as never, {
         charPacks: true,

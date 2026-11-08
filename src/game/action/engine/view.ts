@@ -7,6 +7,8 @@
 export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280, hub: false,
   /** 투명 무대 (11-08 기다리는 동안 대전): 배경·바닥을 그리지 않고 매 장 캔버스를 비운다. 본문 위에 인물만 보이게 */
   clear: false,
+  /** 대전 배경 (설정에서 고른 필드 장면, 11-08 사용자). 월드 좌표에 놓을 자리. null 이면 투명 무대 그대로 */
+  vsBg: null as null | { img: HTMLImageElement; x: number; y: number; w: number; h: number },
   /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */
   charMul: 1,
   /** 장면 전체(배경·사람·물건) 확대율. 사람 크기는 모든 장면에서 STD_DOTK로 같게 두고, 그림 규격(dotK)이 다른 장면은 화면 전체를 STD_DOTK/dotK 배로 보여 준다 (사용자 11-02 「화면마다 사람 크기가 들쑥날쑥」→ 통일) */

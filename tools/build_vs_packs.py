@@ -16,6 +16,21 @@ COMBAT = set('1 3 3_0 4 5 5_1 7 9 10 11 12 13 14 15 16 16_1 17 18 18_1 18_2 18_3
 # 태그매치 대기 인물 동작·판 끝 반응 (11-08 사용자): 개인 대기 2·응대 28·손짓 29·화내기 32·기뻐하기 35·통화 116·커피 142·기지개 143·팔굽혀펴기 144·흡연 145·폰 147·간식 157·구경 168
 COMBAT |= set('2 28 29 32 35 116 142 143 144 145 147 157 168'.split())
 FACE = 64
+# 대전 배경으로 쓰는 필드 장면 (화장실·샤워실 빼고). 이름표는 src/ui/versus.ts VS_BG_NAMES
+VS_BGS = ['street', 'lobby', 'f2', 'f3', 'b1', 'b2', 'training', 'clinic', 'office', 'lounge', 'infirmary',
+          'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_lobby', 'sdra_b1',
+          'jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op']
+
+def mapedit_scenes():
+    t = open(os.path.join(ROOT, 'src', 'game', 'action', 'hq', 'mapedit.gen.ts'), encoding='utf8').read()
+    i = t.index('= {') + 2
+    depth = 0
+    for j in range(i, len(t)):
+        if t[j] == '{': depth += 1
+        elif t[j] == '}':
+            depth -= 1
+            if depth == 0: break
+    return json.loads(t[i:j + 1])
 
 def rows_of(cfg):
     keep = set(COMBAT)
@@ -65,6 +80,16 @@ def main():
     for f in os.listdir(sdir):
         if f.endswith('.ogg') or f == 'sound.json': shutil.copy(os.path.join(sdir, f), com)
     shutil.copy(os.path.join(sdir, 'LICENSE.txt'), os.path.join(com, 'sound-LICENSE.txt'))
+    # 배경 (11-08 사용자 「기존에 뽑아 둔 배경을 설정에서 골라 켜고 끄기」): 필드 장면 그림(jr-field/me_*) 그대로 + 장면 값(dotK·lane·크기) bg.json
+    sc = mapedit_scenes()
+    bgs = {}
+    for sid in VS_BGS:
+        v = sc.get(sid)
+        src = v and os.path.join(SRC, 'jr-field', v['file'] + '.webp')
+        if not v or not os.path.exists(src): continue
+        shutil.copy(src, os.path.join(com, f'bg-{sid}.webp'))
+        bgs[sid] = {'w': v['w'], 'h': v['h'], 'dotK': v.get('dotK', 1.4292), 'lane': v['lane']}
+    json.dump(bgs, open(os.path.join(com, 'bg.json'), 'w'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []
     total = 0

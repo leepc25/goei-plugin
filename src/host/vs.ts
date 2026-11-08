@@ -3,6 +3,7 @@
 // - 데이터(코드·이펙트·얼굴판·명단·인물 126명 전투 동작, 약 100MB)는 설정 「대전」에서 한 번에 미리 받는다 (11-08 사용자)
 // - 싸우는 동안 창은 누르기를 통과시켜(pointer-events:none) 본문 스크롤·읽기가 그대로 되고, 키는 창이 초점을 가져 받는다
 // - 닫으면(게임패드 단추를 다시 누르거나 Esc) 멈추고 숨긴다. 다시 열면 이어서 (채팅마다)
+import { getPrefs } from '../core/settings';
 import { UPDATE_BASE } from '../core/update';
 import { GameFileError, getParts, type PackEntry } from './game/fetch';
 import { createPackStore } from './game/packs';
@@ -250,7 +251,7 @@ export async function toggleVersus(key: string, goSettings: () => void): Promise
   }
   open = true;
   if (!handle) {
-    handle = m.start(box, store.assets, { onClose: () => void closeVersus() });
+    handle = m.start(box, store.assets, { onClose: () => void closeVersus(), bg: () => getPrefs().versusBg });
   } else handle.resume();
   // 고르기 창이 있으면 누르기를 받는다 (얼굴 누르기). 경기 중이면 통과
   const syncPass = () => void setPass(!box?.querySelector('.vs-sel'));

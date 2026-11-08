@@ -26,7 +26,11 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function background(w: World, camX: number) {
     const f = w.floor;
     const pal = f.palette ?? { wall: '#2b343a', floor: '#3a4247', accent: '#5b6a72' };
-    if (view.clear) return;
+    if (view.clear) {
+      const bg = view.vsBg;
+      if (bg) { ctx.imageSmoothingEnabled = false; ctx.drawImage(bg.img, Math.round(bg.x - camX), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      return;
+    }
     const [top] = w.lane;
     // 필드는 엔진(game.ts)이 이미 화면 전체를 검게 칠했다: 장면 밖에 1280×720 회색 판이 남지 않게
     if (!view.hub) {

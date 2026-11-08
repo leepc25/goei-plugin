@@ -4,6 +4,16 @@ import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { downloadVsAll, vsDataState, type VsDataState } from '../host/vs';
 
+/** 대전 배경으로 고를 수 있는 필드 장면 (tools/build_vs_packs.py VS_BGS 와 같은 순서). 이름은 필드 지도(map.ts) 그대로 */
+const VS_BG_NAMES: [string, string][] = [
+  ['street', '종로 거리'], ['lobby', '관리국 1층 로비'], ['f2', '관리국 2층'], ['f3', '관리국 3층'], ['b1', '관리국 지하 1층'], ['b2', '격리 구역'],
+  ['training', '훈련장'], ['clinic', '격리팀 사무실'], ['office', '종합대응팀'], ['lounge', '휴게실'], ['infirmary', '의무실'],
+  ['by_street', '강남 거리'], ['by_lobby', '백일몽 1층 로비'], ['by_f13', '백일몽 13층'], ['by_lab', '연구1팀 연구실'],
+  ['sdra_street', '영등포 거리'], ['sdra_lobby', '협회 1층'], ['sdra_b1', '협회 지하 1층'],
+  ['jr_entry', '중림 지하상가 입구'], ['jr_b1', '중림 지하상가 지하 1층'], ['jr_alley', '중림 뒷골목'], ['jr_b2', '중림 지하상가 지하 2층'],
+  ['jr_daebak', '대박 알선'], ['jr_heolgap', '헐값 매입'], ['jr_youngchang', '영창 컨설팅'], ['jr_songil', '손길 의원'], ['jr_jinryo', '진료실'], ['jr_op', '수술실'],
+];
+
 let rerender = () => {};
 export const setVsRender = (f: () => void) => void (rerender = f);
 export const vsUi = { busy: false, progress: '', err: '', state: null as VsDataState | null, loading: false };
@@ -31,6 +41,11 @@ export function versusGroup(seg: (action: string, cur: string, items: [string, s
   const st = !s ? (vsUi.loading ? '확인 중…' : '—') : s.state === 'ready' ? '받음' : s.state === 'partial' ? `${s.done}/${s.total}` : '없음';
   rows.push(row('대전 데이터', `<span class="upd-ver">${esc(st)}</span>${s && s.state !== 'ready' ? btn('vs-get', busy ? vsUi.progress || '받는 중…' : `${s.state === 'partial' ? '이어 받기' : '받기'} (${mb(s.bytes)})`, true) : ''}`,
     '대전 코드·이펙트·인물 얼굴판과 인물 126명(이름 있는 인물 55명, NPC 71명)의 전투 동작이에요. 한 번 받으면 이 기기에 저장돼요. 다 받아야 대전을 열 수 있어요.'));
+  // 배경 (11-08 사용자): 필드 장면 그림. 고르면 다음 경기부터 본문 위를 덮는다
+  const bg = getPrefs().versusBg ?? '';
+  const opts = [['', '사용 안 함'], ...VS_BG_NAMES].map(([v, l]) => `<option value="${v}" ${v === bg ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  rows.push(row('배경', `<select class="gx-select" data-change="vs-bg" aria-label="대전 배경" ${busy ? 'disabled' : ''}>${opts}</select>`,
+    '경기 화면 뒤에 깔 장면이에요. 사용 안 함이면 배경 없이 채팅 본문 위에서 싸워요. 다음 경기부터 바뀌어요.', true));
   // 출처 (CC-BY-SA 4.0 은 출처를 보이게 적어야 한다): game-pack/vs-voice/LICENSE.txt
   rows.push(row('출처', '', '아나운서 목소리: MR. HAPPY · DRAGON (VoiceBosch, SoundBiter SFX library), CC-BY-SA 4.0. 배경음악: Final Punch (maxstack, CC-BY-SA 3.0), To the Wire (congusbongus, CC-BY 4.0), Electric Theme (Spring Spring, CC-BY 4.0), Chaos Factory (Mega Pixel Music Lab, CC-BY 4.0). 타격음: CGEffex (CC-BY 3.0), Socapex (CC-BY 3.0), will_leamon (OGA-BY 3.0). 움직임 소리: Vinrax (CC-BY 3.0), remaxim (CC0), leohpaz (CC-BY 4.0). 모두 OpenGameArt.org. 처리한 소리도 원래 조건 그대로예요.'));
   if (vsUi.err) rows.push(`<div class="gx-err" role="alert">${esc(vsUi.err)}</div>`);
@@ -41,6 +56,11 @@ export async function handleVersus(action: string, value: string, render: () => 
   if (!action.startsWith('vs-')) return false;
   if (action === 'vs-on') {
     await savePrefs((p) => ({ ...p, versus: value === '1' ? true : undefined }));
+    render();
+    return true;
+  }
+  if (action === 'vs-bg') {
+    await savePrefs((p) => ({ ...p, versusBg: value || undefined }));
     render();
     return true;
   }
