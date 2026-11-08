@@ -47,7 +47,7 @@ import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
-import { versus, fighterOf } from './versus';
+import { versus, fighterOf, KO_SEC } from './versus';
 import { surv, survivalTick, waveOf } from './survival';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
@@ -1627,7 +1627,7 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
   for (const side of [0, 1] as const) {
     const list = versus.team[side].slice(versus.cur[side] + 1);
     list.forEach((name, k) => {
-      const x = side === 0 ? 60 + k * 90 : 1280 - 60 - k * 90, y = VS_LINE - 150;   // 한 줄로 나란히, 싸우는 줄보다 뒤
+      const x = side === 0 ? 70 + k * 150 : 1280 - 70 - k * 150, y = VS_LINE - 150;   // 무대 양 끝에 겹치지 않게 나란히 (11-08 사용자), 싸우는 줄보다 뒤
       const dir: 1 | -1 = side === 0 ? 1 : -1;
       const key = `${side}|${name}`;
       let clip: string, since: number;
@@ -1671,6 +1671,13 @@ let vsSay: ((id: SfxId) => void) | null = null;
 /** 아나운서 (투명 무대만) */
 const vsCall = (id: VoiceId) => { if (view.clear) vsVoice(id); };
 const VS_GOLD = '#ffd35a';
+/** 큰 알림 글자 (11-08 사용자 「격투게임처럼 화면 절반」): 똑바로 선 굵은 글자를 화면 폭의 약 55%로 (도트 한 칸 정수 px).
+ *  U 는 예전 크기 힌트: 작은 글(부제 등)은 그대로 둔다 */
+function bigFit(text: string, pal: BigPal, _U: number): HTMLCanvasElement {
+  const one = bigText(text, pal, 1, { slant: false, bold: true });
+  const u = Math.max(4, Math.min(18, Math.floor((1024 * 0.55) / one.width)));
+  return bigText(text, pal, u, { slant: false, bold: true });
+}
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const dt = 1 / 60;
   vsT += dt;
@@ -1681,7 +1688,8 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     : w.bodies.find((b) => b.team === 'enemy');
   const k = 1.25, W = c.canvas.width / k, H = c.canvas.height / k;
   // 칸 자리: 그림판이 16:9보다 높아도 예전처럼 16:9 윗선 근처 (사용자 11-08 「꼭대기면 눈에 안 들어온다」)
-  const top = 14 + Math.max(0, c.canvas.height - 720) / k;
+  // 11-08 사용자: 캐릭터를 두 배로 키워서 막대를 더 위로 (머리와 겹치지 않게). 그림판 맨 위에서 남는 높이의 1/4 지점
+  const top = 14 + Math.max(0, c.canvas.height - 720) / k * 0.25;
   c.save();
   c.setTransform(k, 0, 0, k, 0, 0);
   c.imageSmoothingEnabled = false;
@@ -1775,11 +1783,12 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       c.drawImage(t1, sx, barY - 2); c.drawImage(t2, sx + t1.width + 10, barY - 2);
     }
   };
-  one(0, w.player);
-  one(1, foe);
+  // K.O. 순간에는 UI 를 숨긴다 (11-08 사용자). 큰 글자만
+  const hud = !versus.ko;
+  if (hud) { one(0, w.player); one(1, foe); }
   if (versus.mode === 'survival' && !foe) vsSide[1].last = -1;   // 다음에 나오는 상대 칸은 새로
   // 가운데 시간: 두 막대 사이, 큰 도트 숫자 (10초 아래면 빨갛게 깜빡)
-  if (versus.mode !== 'survival') {
+  if (hud && versus.mode !== 'survival') {
     const sec = Math.ceil(versus.clock), low = sec <= 10 && !versus.ko && !versus.over;
     const t = bigText(String(Math.max(0, sec)).padStart(2, '0'), low ? BIG_RED : BIG_FIRE, 6, { slant: false, bold: true, edge: 1 });
     if (!low || Math.floor(vsT * 4) % 2 === 0) c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(barY + barH / 2 - t.height / 2) + 2);
@@ -1788,7 +1797,7 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   // 연타 수 (1P): 두 번째 맞힘부터 왼쪽에 「N HIT」, 늘 때마다 살짝 튄다
   const combo = (w.player as unknown as { combo?: number }).combo ?? 0;
   if (combo !== vsCombo.n) { if (combo > vsCombo.n) vsCombo.at = vsT; vsCombo.n = combo; }
-  if (combo >= 2) {
+  if (hud && combo >= 2) {
     const jump = vsT - vsCombo.at < 0.06 ? 6 : 0;
     const num = dotText(String(combo), VS_GOLD, 5), hit = dotText('HIT', HUD_INK, 2);
     const nx = 22, ny = Math.round(top + (H - top) * 0.3) - jump;
@@ -1799,13 +1808,17 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   let key = '', text = '', sub = '', pal: BigPal = BIG_INK, U = 5, say: SfxId | null = null, call: VoiceId | null = null;
   if (versus.over && versus.mode === 'survival') { key = 'sover'; text = 'GAME OVER'; sub = `WAVE ${surv.wave} · ${versus.kills} KO`; pal = BIG_RED; say = 'down'; call = 'gameover'; }
   else if (versus.over) { const win = versus.over.side === 0; key = `over${win}`; text = win ? 'YOU WIN' : 'YOU LOSE'; pal = win ? BIG_GOLD : BIG_RED; U = 6; say = win ? 'levelUp' : 'down'; call = win ? 'youwin' : 'youlose'; }
-  else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; sub = k2 === 'perfect' ? 'PERFECT' : ''; pal = BIG_RED; U = k2 === 'time' ? 5 : 8; say = 'superHit'; call = k2 === 'time' ? 'time' : 'ko'; }
+  else if (versus.ko && versus.ko.t < KO_SEC - 1.4) {
+    // K.O. 다음 WINNER (11-08 사용자): 이긴 쪽은 이때 승리 동작 (game.ts)
+    key = `winner${versus.ko.side}`; text = 'WINNER'; sub = versus.ko.kind === 'perfect' ? 'PERFECT' : ''; pal = BIG_FIRE; say = 'levelUp'; call = 'winner';
+  }
+  else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; pal = BIG_RED; say = 'superHit'; call = k2 === 'time' ? 'time' : 'ko'; }
   else if (versus.intro > 0) {
     // ROUND → READY → GO! (INTRO_SEC 2.4)
     if (versus.intro > 1.4) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; pal = BIG_BLUE; U = 6; say = 'ding';
       call = versus.mode === 'survival' ? null : text === 'FINAL ROUND' ? 'final' : versus.round <= 3 ? (`round${versus.round}` as VoiceId) : 'final'; }
-    else if (versus.intro > 0.6) { key = `ready${versus.round}`; text = 'READY'; pal = BIG_GOLD; U = 6; }
-    else { key = `go${versus.round}`; text = 'GO!'; pal = BIG_GOLD; U = 9; say = 'superStart'; call = 'fight'; }
+    else if (versus.intro > 0.6) { key = `ready${versus.round}`; text = 'READY'; pal = BIG_FIRE; U = 6; }
+    else { key = `go${versus.round}`; text = 'GO!'; pal = BIG_FIRE; U = 9; say = 'superStart'; call = 'fight'; }
   } else if (versus.mode === 'survival' && surv.bannerT > 0) {
     const boss = waveOf(surv.wave).boss;
     key = `w${surv.wave}`; text = `WAVE ${surv.wave}`; sub = boss ? '대장 등장' : ''; pal = boss ? BIG_RED : BIG_BLUE; say = boss ? 'bossRoar' : 'enemySpawn';
@@ -1816,7 +1829,7 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     // 앞 글자가 다 접혀 나간 뒤에 새 글자를 편다 (겹치지 않게)
     const gap = vsBanner.img ? 0.2 : 0;
     if (vsBanner.img) vsBanner.out = { img: vsBanner.img, at: vsT };
-    vsBanner.key = key; vsBanner.at = vsT + gap; vsBanner.img = key ? bigText(text, pal, U) : null;
+    vsBanner.key = key; vsBanner.at = vsT + gap; vsBanner.img = key ? bigFit(text, pal, U) : null;
     if (say) vsSay?.(say);
     if (call) vsCall(call);
   }

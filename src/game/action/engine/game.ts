@@ -67,6 +67,9 @@ interface Scene {
   draw(alpha: number): void;
 }
 
+/** 대전 화면 확대 (11-08 사용자 「캐릭터 픽셀 2배」): 무대 1280 중 절반이 보이고 화면이 두 사람을 따라간다 */
+const VS_CAM = 2;
+
 export class Game {
   readonly canvas: HTMLCanvasElement;
   readonly ctx: CanvasRenderingContext2D;
@@ -74,6 +77,8 @@ export class Game {
   world: World | null = null;
   /** 대전 판 끝 반응할 몸 (이긴 쪽·진 쪽) */
   private vsReact: { win: unknown; lose: unknown } | null = null;
+  /** 대전 화면 왼쪽 끝(월드 x). -1 = 아직 없음 */
+  private vsCam = -1;
   scene: Scene;
   paused = false;
   private ownCanvas: boolean;
@@ -131,7 +136,9 @@ export class Game {
       this.last = now;
       if (dt > 0.25) dt = 0.25;
       this.mods.frame?.(dt);
-      this.acc += dt;
+      // 대전 K.O. 순간 슬로 모션 (11-08 사용자): 쓰러지기 시작한 판 시간 0.6초를 실제로는 약 2초에 걸쳐
+      const slow = view.clear && versus.ko && versus.ko.t > KO_SEC - 0.6 ? 0.3 : 1;
+      this.acc += dt * slow;
       const T = 1 / TICK_HZ;
       while (this.acc >= T) {
         this.acc -= T;
@@ -151,7 +158,7 @@ export class Game {
         // 11-02 사용자: 필드는 장면 세로를 창에 꽉 채우고(검은 띠 없음), 사람이 가장 큰 장면 기준으로 다른 장면은 더 키운다(view.sceneZoom ≥ 1, 위아래는 주인공을 따라 움직임). 10-27의 PC 1배 고정은 폐기.
         const H = this.inHub ? view.worldH : SCREEN_H;
         // 투명 무대(대전)는 그림판이 16:9보다 높다: 폭 기준으로 그리고 남는 위쪽은 비워 둔다
-        view.zoom = view.clear && !this.inHub ? this.canvas.width / SCREEN_W : (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
+        view.zoom = view.clear && !this.inHub ? (this.canvas.width / SCREEN_W) * VS_CAM : (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
@@ -161,7 +168,18 @@ export class Game {
         view.crop = 0;
         // 렌더러와 같은 보간값: 층 단추·대화창·본부 창이 떠서 월드가 멈춘 동안 여기만 틱 진행률로 움직이면 화면이 매 장 좌우로 떨린다 (리스 좁은 창)
         const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
-        if (vw < SCREEN_W && w) {
+        if (view.clear && !this.inHub && w && vw < SCREEN_W) {
+          // 대전 (11-08 사용자 「무대는 길고 화면이 왔다 갔다」): 두 사람 가운데를 따라간다. 무대 끝(대기 인물 자리)은 그쪽으로 가야 보인다
+          const a = frozen ? 1 : this.acc / T;
+          const at = (b: { x: number; px?: number }) => (b.px ?? b.x) + (b.x - (b.px ?? b.x)) * a;
+          const p = w.player, foes = w.bodies.filter((b) => b.team === 'enemy' && b.alive);
+          const foe = foes.sort((m, n) => Math.abs(m.x - p.x) - Math.abs(n.x - p.x))[0];
+          const mid = foe ? (at(p) + at(foe)) / 2 : at(p);
+          const want = Math.max(0, Math.min(SCREEN_W - vw, mid - vw / 2));
+          // 부드럽게 따라가기 (한 장에 남은 거리의 12%)
+          this.vsCam = this.vsCam < 0 ? want : this.vsCam + (want - this.vsCam) * (frozen ? 0 : 0.12);
+          view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - w.camX;
+        } else if (vw < SCREEN_W && w) {
           const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
             px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a,
@@ -179,6 +197,8 @@ export class Game {
         if (vh > H + 0.5) {
           // 장면이 화면보다 짧다: 가운데 두고 위아래는 검게
           view.cropY = -Math.round(((vh - H) / (view.clear ? 1 : 2)) * view.zoom) / view.zoom; // 투명 무대는 바닥을 아래에 붙인다
+        } else if (view.clear && !this.inHub) {
+          view.cropY = H - vh;   // 대전: 발밑 줄을 아래에 붙인다
         } else if (vh < H - 0.5 && w) {
           const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
@@ -190,6 +210,14 @@ export class Game {
         this.ctx.translate(-view.crop, -view.cropY);
         this.scene.draw(paused ? 1 : this.acc / T);
         this.ctx.restore();
+        // K.O. 순간 붉게 한 번 깜빡 (11-08 사용자): 그려진 캐릭터 위에만 (빈 곳=본문은 칠하지 않는다)
+        if (view.clear && versus.ko && versus.ko.t > KO_SEC - 0.1) {
+          this.ctx.save();
+          this.ctx.globalCompositeOperation = 'source-atop';
+          this.ctx.fillStyle = 'rgba(255,30,20,.75)';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          this.ctx.restore();
+        }
         this.mods.overlay?.(this.ctx, this.world, dt);
       }
     };
@@ -423,7 +451,7 @@ export class Game {
             const kind = timeUp && w.player.hp > 0 && !foeDown ? 'time' : win >= 0.999 ? 'perfect' : 'ko';
             versus.ko = { side, t: KO_SEC, kind, next: roundEnd(side, [rp, rf]) };
             this.vsReact = { win: side === 0 ? w.player : foe, lose: side === 0 ? foe : w.player };
-          } else if (versus.ko && versus.ko.t > KO_SEC - 0.6) {
+          } else if (versus.ko && versus.ko.t > KO_SEC - 1.4) {
             versus.ko.t -= 1 / TICK_HZ;   // 쓰러지는 걸 잠깐 보고
           } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) > 0) {
             // 판 끝 반응 (11-08 사용자): 이긴 쪽 기뻐하기(35), 서 있는 진 쪽(시간 끝) 화내기(32). 하던 동작이 끝나면 다시
