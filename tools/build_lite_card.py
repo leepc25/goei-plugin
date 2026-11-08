@@ -285,6 +285,26 @@ def add_start_items(entries):
     return entries
 
 
+CARRY_FILE = ROOT / 'card' / 'carry.json'
+
+
+def add_carry(entries):
+    """기본 명부 요원 줄의 「소지 한도」(carry, kg)를 card/carry.json 에서 채운다 (11-08 사용자 확정 표). start_items 와 같은 까닭으로 여기 둔다"""
+    if not CARRY_FILE.exists():
+        return entries
+    want = json.loads(CARRY_FILE.read_text(encoding='utf-8'))
+    d = next(e for e in entries if e.get('comment') == 'Directory')
+    data = json.loads(d['content'])
+    agents = data.get('요원', {})
+    missing = [k for k in want if k not in agents]
+    if missing:
+        raise SystemExit(f'carry.json: 명부에 없는 요원 {missing}')
+    for k, kg in want.items():
+        agents[k]['carry'] = kg
+    d['content'] = json.dumps(data, ensure_ascii=False, indent=1)
+    return entries
+
+
 def migrate_directory(entries):
     """괴이·미스틱 사이트·요원·거점·세력 호칭·괴담톡 탭·첫 턴 로어북을 명부(Directory)로 옮긴다 (플러그인과 같은 코드를 node로 실행, 먼저 npm run build)"""
     with tempfile.TemporaryDirectory() as tmp:
@@ -912,7 +932,7 @@ def main(src, dst):
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
     # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 로어북은 ⚙️설정 폴더·Directory·매니페스트
-    lore = drop_plugin_lore(drop_wiki_lore(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore))))))))
+    lore = drop_plugin_lore(drop_wiki_lore(add_carry(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))))
     lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)

@@ -1,7 +1,7 @@
 //@name goei-plugin
-//@display-name 괴이: ANOMALY v0.21.3
+//@display-name 괴이: ANOMALY v0.21.4
 //@api 3.0
-//@version 0.21.3
+//@version 0.21.4
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/texthash.ts
@@ -207,7 +207,7 @@ function showPanel(version, install2, message = "") {
 }
 
 // src/main.ts
-var VERSION = true ? "0.21.3" : "";
+var VERSION = true ? "0.21.4" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", "%%GOEI_SCENE%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
@@ -361,7 +361,8 @@ function watch() {
   };
   void tick();
 }
-void risuai.registerButton({ name: "괴이: ANOMALY 설치·점검", icon: "👻", iconType: "html", location: "hamburger", id: "goei-plugin-install" }, () => {
+var MENU_GHOST = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2.73 3.25 18 18" width="20" height="20" overflow="visible" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5C7.8 2.5 5.5 5.2 5.5 8.8V10.3L3.9 9.1C2.2 7.9 .6 10.1 2 11.5L5.5 15C5.8 19.5 9.3 22 13.7 22C18.1 22 21 19.6 22 16.8C19.4 18.3 17.5 17.8 17.5 15.5V15L21 11.5C22.4 10.1 20.8 7.9 19.1 9.1L17.5 10.3V8.5C17.5 5 15.1 2.5 11.5 2.5Z"/><g fill="currentColor" stroke="none"><ellipse cx="9" cy="9.2" rx="1.4" ry="1.9"/><ellipse cx="14" cy="9.2" rx="1.4" ry="1.9"/><ellipse cx="11.5" cy="13.6" rx="1.1" ry="1.6"/></g></svg>';
+void risuai.registerButton({ name: "괴이: ANOMALY 설치·점검", icon: MENU_GHOST, iconType: "html", location: "hamburger", id: "goei-plugin-install" }, () => {
   void ensure(true).then((b) => b?.install());
 }).catch((error) => console.log(`[goei] 설치 단추를 두지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
 for (const permission of ["replacer", "mainDom", "sendChat"]) {

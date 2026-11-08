@@ -1,4 +1,587 @@
-|책임자|senior|lead/i.test(r)) return 2;
+니쟈"
+      ],
+      심문관: [
+        "김조학"
+      ],
+      언니: [
+        "문혜란",
+        "잼트리"
+      ],
+      "연구 책임자": [
+        "고그니쟈"
+      ],
+      연구원: [
+        "데쥬레"
+      ],
+      요원: [
+        "게슈간",
+        "데드폴",
+        "로제몬",
+        "콘쥬스"
+      ],
+      원장: [
+        "고연지"
+      ],
+      원장님: [
+        "고연지"
+      ],
+      의사: [
+        "고연지"
+      ],
+      이사: [
+        "호유원"
+      ],
+      이사님: [
+        "호유원"
+      ],
+      적합자: [
+        "고르고디오"
+      ],
+      전무: [
+        "청달래"
+      ],
+      전무님: [
+        "청달래"
+      ],
+      조수: [
+        "윤지아"
+      ],
+      조장: [
+        "백석주",
+        "이자헌"
+      ],
+      조장님: [
+        "백석주",
+        "이자헌"
+      ],
+      조정관: [
+        "서윤지",
+        "차여진"
+      ],
+      주인: [
+        "마덕희"
+      ],
+      주임: [
+        "박민성",
+        "이성해"
+      ],
+      진행자: [
+        "브라우니"
+      ],
+      차장: [
+        "고영훈"
+      ],
+      책임자: [
+        "고그니쟈"
+      ],
+      팀장: [
+        "윤병수",
+        "쟈알디"
+      ],
+      형님: [
+        "고르고디오",
+        "노기균",
+        "살라딘"
+      ]
+    }
+  };
+
+  // game-src/dialogue/address.json
+  var address_default = {
+    version: 1,
+    names: {
+      강이학: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "동기님",
+        down: "신입님",
+        outsider: "고객님"
+      },
+      게슈간: {
+        level: 1,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "너",
+        down: "신입",
+        outsider: "너"
+      },
+      고그니쟈: {
+        level: 2,
+        register: "하게체",
+        self: "나",
+        up: "부장",
+        peer: "자네",
+        down: "신입",
+        outsider: "손님"
+      },
+      고르고디오: {
+        level: 2,
+        register: "혼합",
+        self: "",
+        up: "부장님",
+        peer: "동기",
+        down: "막내",
+        outsider: "거기"
+      },
+      고연지: {
+        level: null,
+        register: "혼합",
+        self: "",
+        up: "선생님",
+        peer: "사장님",
+        down: "손님",
+        outsider: "환자분"
+      },
+      고영은: {
+        level: 1,
+        register: "반말",
+        self: "저",
+        up: "선배님",
+        peer: "동기",
+        down: "신입 씨",
+        outsider: "그쪽"
+      },
+      고영훈: {
+        level: 5,
+        register: "존댓말",
+        self: "나",
+        up: "부장님",
+        peer: "차장",
+        down: "대원",
+        outsider: "외부인"
+      },
+      곽성주: {
+        level: 4,
+        register: "반말",
+        self: "나",
+        up: "부장님",
+        peer: "과장",
+        down: "이놈아",
+        outsider: "거기"
+      },
+      곽제강: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "손님"
+      },
+      김성진: {
+        level: 1,
+        register: "반말",
+        self: "",
+        up: "선배님",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      김조학: {
+        level: 4,
+        register: "반말",
+        self: "나",
+        up: "차장님",
+        peer: "과장",
+        down: "야",
+        outsider: "너"
+      },
+      노기균: {
+        level: 3,
+        register: "존댓말",
+        self: "",
+        up: "과장님",
+        peer: "대리",
+        down: "신입",
+        outsider: "너"
+      },
+      데드폴: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "요원님",
+        down: "신입 요원님",
+        outsider: "그쪽 분"
+      },
+      데쥬레: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "요원님",
+        down: "신입 요원님",
+        outsider: "외부 분"
+      },
+      도필헌: {
+        level: 7,
+        register: "하게체",
+        self: "나",
+        up: "사장님",
+        peer: "국장",
+        down: "자네",
+        outsider: "손님"
+      },
+      로제몬: {
+        level: 1,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "너",
+        down: "신입",
+        outsider: "거기"
+      },
+      마덕희: {
+        level: null,
+        register: "존댓말",
+        self: "",
+        up: "사장님",
+        peer: "자기",
+        down: "자기",
+        outsider: "자기"
+      },
+      문혜란: {
+        level: null,
+        register: "반말",
+        self: "언니",
+        up: "사장님",
+        peer: "친구",
+        down: "친구",
+        outsider: "친구"
+      },
+      박민성: {
+        level: 2,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "동기",
+        down: "신입",
+        outsider: "그쪽"
+      },
+      백사헌: {
+        level: 1,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "동기님",
+        down: "신입",
+        outsider: "그쪽"
+      },
+      백석주: {
+        level: 4,
+        register: "혼합",
+        self: "",
+        up: "부장님",
+        peer: "과장님",
+        down: "막내",
+        outsider: "그쪽"
+      },
+      브라우니: {
+        level: null,
+        register: "존댓말",
+        self: "",
+        up: "친구",
+        peer: "친구",
+        down: "친구",
+        outsider: "친구"
+      },
+      블라렛: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "신부님",
+        peer: "자매님",
+        down: "어린 양",
+        outsider: "손님"
+      },
+      사장: {
+        level: 9,
+        register: "존댓말",
+        self: "저",
+        up: "선생님",
+        peer: "그쪽",
+        down: "당신",
+        outsider: "당신"
+      },
+      살라딘: {
+        level: null,
+        register: "하오체",
+        self: "나",
+        up: "형제",
+        peer: "형제",
+        down: "형제",
+        outsider: "그대"
+      },
+      서윤지: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "선임 조정관님",
+        peer: "조정관님",
+        down: "신입 조정관님",
+        outsider: "방문자님"
+      },
+      송주익: {
+        level: 3,
+        register: "존댓말",
+        self: "",
+        up: "과장님",
+        peer: "선배님",
+        down: "신입",
+        outsider: "너"
+      },
+      송진섭: {
+        level: 1,
+        register: "존댓말",
+        self: "",
+        up: "선배님",
+        peer: "형",
+        down: "후배",
+        outsider: "그쪽"
+      },
+      스팡달: {
+        level: 2,
+        register: "존댓말",
+        self: "",
+        up: "부장님",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      신유리: {
+        level: null,
+        register: "반말",
+        self: "",
+        up: "사장",
+        peer: "너",
+        down: "너",
+        outsider: "너"
+      },
+      에일린: {
+        level: 2,
+        register: "반말",
+        self: "",
+        up: "부장",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      윤병수: {
+        level: 3,
+        register: "반말",
+        self: "",
+        up: "과장님",
+        peer: "대리",
+        down: "너",
+        outsider: "너"
+      },
+      윤지아: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "선생님",
+        peer: "사장님",
+        down: "손님",
+        outsider: "손님"
+      },
+      은하제: {
+        level: 3,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "동기",
+        down: "신입",
+        outsider: "댁"
+      },
+      이기석: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "차장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "손님"
+      },
+      이길환: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "선생님"
+      },
+      이도형: {
+        level: 6,
+        register: "반말",
+        self: "나",
+        up: "국장님",
+        peer: "부장",
+        down: "거기",
+        outsider: "너"
+      },
+      이병진: {
+        level: 4,
+        register: "혼합",
+        self: "",
+        up: "부장님",
+        peer: "과장님",
+        down: "자네",
+        outsider: "그쪽 분"
+      },
+      이성해: {
+        level: 2,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "선배님",
+        down: "신입님",
+        outsider: "손님"
+      },
+      이연화: {
+        level: 3,
+        register: "존댓말",
+        self: "",
+        up: "선배님",
+        peer: "선생님",
+        down: "신입 씨",
+        outsider: "그쪽 분"
+      },
+      이자헌: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "조장님",
+        down: "신입 님",
+        outsider: "손님"
+      },
+      장허운: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "동기분",
+        down: "후배님",
+        outsider: "선생님"
+      },
+      잼트리: {
+        level: 2,
+        register: "존댓말",
+        self: "언니",
+        up: "부장님",
+        peer: "동기",
+        down: "후배",
+        outsider: "손님"
+      },
+      쟈알디: {
+        level: 3,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "자네",
+        down: "요원",
+        outsider: "그쪽"
+      },
+      제이: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "높으신 분",
+        peer: "직원분",
+        down: "신입분",
+        outsider: "손님"
+      },
+      조성춘: {
+        level: 4,
+        register: "반말",
+        self: "나",
+        up: "부장님",
+        peer: "과장",
+        down: "이 자식아",
+        outsider: "너"
+      },
+      진나솔: {
+        level: 3,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "너",
+        down: "신입",
+        outsider: "거기"
+      },
+      차여진: {
+        level: null,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "자기",
+        down: "신입",
+        outsider: "손님"
+      },
+      청달래: {
+        level: 8,
+        register: "하게체",
+        self: "",
+        up: "자네",
+        peer: "자네",
+        down: "자네",
+        outsider: "자네"
+      },
+      콘쥬스: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "선배님",
+        down: "신입 선배님",
+        outsider: "아저씨"
+      },
+      큐라스: {
+        level: 2,
+        register: "존댓말",
+        self: "",
+        up: "부장님",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      호유원: {
+        level: 7,
+        register: "존댓말",
+        self: "저",
+        up: "전무님",
+        peer: "이사님",
+        down: "직원님",
+        outsider: "손님"
+      }
+    }
+  };
+
+  // src/core/people/identity.ts
+  var ORG_CODES = [
+    [/가짜\s*관리국|fake/i, "B00"],
+    [/관리국|management bureau|bureau/i, "A00"],
+    [/백일몽|daydream/i, "C00"],
+    [/민간|civilian|시민/i, "D00"],
+    [/프리랜서|freelancer|협회 등록/i, "E00"]
+  ];
+  function factionCode(org) {
+    const t = org.trim();
+    if (/^[A-Z]00$/.test(t)) return t;
+    for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
+    return "";
+  }
+  function rankLevel(faction, rank2) {
+    const r = rank2.replace(/\s+/g, "");
+    if (!r || /^(-|없음|미정)$/.test(r)) return null;
+    if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
+    if (faction === "A00") {
+      if (/부장|팀장|chief/i.test(r)) return 3;
+      if (/선임|책임자|senior|lead/i.test(r)) return 2;
       if (/요원|연구원|agent|researcher/i.test(r)) return 1;
       return null;
     }
@@ -53,11 +636,11 @@
   var ALIASES = aliases_default;
   var ADDRESS = address_default;
   function seedAddress(name, faction, user) {
-    const row9 = ADDRESS.names[name];
-    if (!row9) return void 0;
-    const rel = relativeRank(user, faction, row9.level);
-    const register = REGISTERS.includes(row9.register) ? row9.register : "존댓말";
-    return { toUser: row9[rel] || row9.outsider || "", register };
+    const row10 = ADDRESS.names[name];
+    if (!row10) return void 0;
+    const rel = relativeRank(user, faction, row10.level);
+    const register = REGISTERS.includes(row10.register) ? row10.register : "존댓말";
+    return { toUser: row10[rel] || row10.outsider || "", register };
   }
   function seedBaseFor(name, userFaction3, user) {
     const b = RELATIONS.people[name];
@@ -85,26 +668,26 @@
   var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
 
   // src/core/people/faction.ts
-  function userFactionOf(store, chat) {
+  function userFactionOf(store2, chat) {
     const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store.identity?.faction || (typeof v === "string" ? v : "");
+    return store2.identity?.faction || (typeof v === "string" ? v : "");
   }
-  function knownFactionCodes(store, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
+  function knownFactionCodes(store2, names4 = {}) {
+    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store2.factions), ...Object.keys(names4)])];
   }
-  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
-  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
+  var factionName = (code2, names4 = {}, store2) => names4[code2] || store2?.factions[code2]?.name || ORG_NAMES[code2] || code2;
+  function factionNow(store2, code2, changes, userFaction3, settings, names4 = {}) {
     const base = factionBase(code2, userFaction3);
-    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
+    const v = factionView(code2, base, changes, store2.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
     const note = settings.factionQual ? [...changes].reverse().find((c) => c.who === factionWho(code2) && c.kind === "cue" && c.pin !== void 0)?.reason : void 0;
-    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
+    return { code: code2, name: factionName(code2, names4, store2), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
   }
-  function sceneFactionCodes(store, people, texts, names4 = {}) {
+  function sceneFactionCodes(store2, people, texts, names4 = {}) {
     const out = [];
     const push3 = (c) => {
       if (c && !out.includes(c)) out.push(c);
     };
-    for (const n2 of people) push3(store.people[n2]?.faction ?? "");
+    for (const n2 of people) push3(store2.people[n2]?.faction ?? "");
     for (const t of texts) for (const c of factionCodesIn(t, names4)) push3(c);
     return out;
   }
@@ -170,11 +753,11 @@
         text: [kind, locName(r.loc) || r.loc, hhmm3(r.at), durText, how].filter(Boolean).join(" · ")
       });
     }
-    const store = peopleStore(chat);
+    const store2 = peopleStore(chat);
     const live = liveness(chat);
-    const changes = liveChanges(store, live);
+    const changes = liveChanges(store2, live);
     const s8 = peopleSettings(chat.scriptstate);
-    const uf = userFactionOf(store, chat);
+    const uf = userFactionOf(store2, chat);
     const names4 = factionNames2(lore);
     const posOf = (c) => live.at.get(c.anchor) ?? -1;
     const byWho = /* @__PURE__ */ new Map();
@@ -182,9 +765,9 @@
     for (const [who, list4] of byWho) {
       const isFac = who.startsWith("세력:");
       const code2 = isFac ? who.slice(3) : "";
-      if (isFac ? !code2 : !store.people[who]) continue;
-      const base = isFac ? factionBase(code2, uf) : store.people[who].affinity.base;
-      const folded = store.folded[who] ?? 0;
+      if (isFac ? !code2 : !store2.people[who]) continue;
+      const base = isFac ? factionBase(code2, uf) : store2.people[who].affinity.base;
+      const folded = store2.folded[who] ?? 0;
       const o = isFac ? { speed: s8.speed, turnCap: s8.turnCap } : { temper: temperOf(who), speed: s8.speed, turnCap: s8.turnCap };
       const [min, max] = isFac ? [FACTION_MIN, FACTION_MAX] : [AFF_MIN, AFF_MAX];
       const label2 = (v) => isFac ? factionStage(v, s8.factionBounds).label : stageOf(v).label;
@@ -200,7 +783,7 @@
           seq: 1 + c.seq,
           kind: isFac ? "faction" : "person",
           day: day(posOf(c)),
-          title: isFac ? factionName(code2, names4, store) : who,
+          title: isFac ? factionName(code2, names4, store2) : who,
           text: `${isFac ? "평판" : "호감"} ${prev} → ${now}${reason3 ? ` · ${reason3}` : ""}`,
           ...isFac ? { faction: code2 } : { person: who }
         });
@@ -209,7 +792,7 @@
     }
     for (const c of changes) {
       if (c.kind !== "identity") continue;
-      const what = [c.faction ? factionName(c.faction, names4, store) : "", c.rank ?? ""].filter(Boolean).join(" · ");
+      const what = [c.faction ? factionName(c.faction, names4, store2) : "", c.rank ?? ""].filter(Boolean).join(" · ");
       if (!what) continue;
       out.push({ pos: posOf(c), seq: 1 + c.seq, kind: "rank", day: day(posOf(c)), title: "신분", text: `${what}${c.reason ? ` · ${c.reason}` : ""}` });
     }
@@ -250,34 +833,34 @@
   function startWorldVars(c, s8, faction, rng, player = "") {
     return worldVars(bootstrap(c, s8, rng, player), c, s8, faction);
   }
-  function fingerprint(index, text4) {
+  function fingerprint(index3, text4) {
     let h = 2166136261;
     for (let i = 0; i < text4.length; i++) h = Math.imul(h ^ text4.charCodeAt(i), 16777619);
-    return `${index}:${text4.length}:${(h >>> 0).toString(36)}`;
+    return `${index3}:${text4.length}:${(h >>> 0).toString(36)}`;
   }
   function processOutput(chat, messageIndex, raw, c, s8, rng) {
     if (!worldOn(chat)) return null;
     const messages = chat.message ?? [];
-    let index = messageIndex;
-    if (messages[index]?.data !== raw) {
-      index = -1;
+    let index3 = messageIndex;
+    if (messages[index3]?.data !== raw) {
+      index3 = -1;
       for (let i = messages.length - 1; i >= 0; i--) {
         if (messages[i].role === "char" && messages[i].data === raw) {
-          index = i;
+          index3 = i;
           break;
         }
       }
     }
-    const msg = messages[index];
+    const msg = messages[index3];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
     const clean4 = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean4)) return null;
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index3, clean4)) return null;
     const prev = readPrev(state[PREV_KEY]);
-    const pk = index > 0 && messages[index - 1] ? messageKey(messages[index - 1], index - 1) : "";
-    const reroll = prev?.i === index && (prev.pk === void 0 || prev.pk === pk);
+    const pk = index3 > 0 && messages[index3 - 1] ? messageKey(messages[index3 - 1], index3 - 1) : "";
+    const reroll = prev?.i === index3 && (prev.pk === void 0 || prev.pk === pk);
     const before = reroll ? prev : {
-      i: index,
+      i: index3,
       world: String(state[WORLD_KEY] ?? ""),
       faction: String(state["$st_faction"] ?? ""),
       pick: String(state["$st_pick"] ?? ""),
@@ -288,10 +871,10 @@
     const base = parseWorld(before.world);
     const result = applyOutput(base, c, s8, faction, raw, rng);
     const now = result.faction ?? faction;
-    markStart(base, result.world, messageKey(msg, index));
+    markStart(base, result.world, messageKey(msg, index3));
     const vars = {
       ...worldVars(result.world, c, s8, now),
-      [LAST_KEY]: fingerprint(index, clean4)
+      [LAST_KEY]: fingerprint(index3, clean4)
     };
     if (reroll && !result.faction) {
       vars.$st_faction = before.faction;
@@ -304,7 +887,7 @@
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index] = { ...msg, data: clean4 };
+    message[index3] = { ...msg, data: clean4 };
     const next = { ...chat, message, scriptstate: { ...state, ...vars } };
     const closed = result.world.closed ?? [];
     let made = [];
@@ -313,13 +896,13 @@
       let rec2 = readReports(state);
       let changed = false;
       if (reroll) {
-        const r = rewindClosures(journal, rec2, before.made ?? index);
+        const r = rewindClosures(journal, rec2, before.made ?? index3);
         journal = r.journal;
         rec2 = r.reports;
         changed = r.changed;
       }
       if (closed.length) {
-        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index, world: result.world, closed, catalog: c, faction: now, settings: journalSettings(state) });
+        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index: index3, world: result.world, closed, catalog: c, faction: now, settings: journalSettings(state) });
         if (built.rows.length) {
           journal = built.journal;
           rec2 = built.reports;
@@ -739,10 +1322,10 @@ ${content}
     for (const kind of ["org", "site", "anomaly", "agent", "appendix"]) {
       const { key, make } = folderKey(base, kind);
       folders[kind] = key;
-      const fresh = [...recs[kind].keys()].filter((n2) => !existing.has(n2) && !(kind === "org" && recs.org.get(n2)?.summaryOnly));
-      if (!fresh.length) continue;
+      const fresh2 = [...recs[kind].keys()].filter((n2) => !existing.has(n2) && !(kind === "org" && recs.org.get(n2)?.summaryOnly));
+      if (!fresh2.length) continue;
       if (make) out.push(make);
-      for (const n2 of fresh) {
+      for (const n2 of fresh2) {
         names4[kind].push(n2);
         out.push(entry(kind, n2, recs[kind].get(n2).keys?.trim() ?? "", "", key, ORDER[kind]));
       }
@@ -817,10 +1400,10 @@ ${content}
     }
     if (Object.keys(fields3).length) out.fields = fields3;
     if (!same2(base.extra, full.extra)) out.extra = full.extra;
-    if (!same2(base.order, full.order)) out.order = full.order ?? [];
+    if (!same2(fieldOrder(kind, { ...full, order: base.order }), fieldOrder(kind, full))) out.order = full.order ?? [];
     if (!same2(base.variants, full.variants)) out.variants = full.variants ?? {};
-    if (!same2(base.keys, full.keys)) out.keys = full.keys ?? "";
-    if (!same2(base.title, full.title)) out.title = full.title ?? "";
+    if ((base.keys ?? "") !== (full.keys ?? "")) out.keys = full.keys ?? "";
+    if ((base.title ?? "") !== (full.title ?? "")) out.title = full.title ?? "";
     if (!same2(base.departments, full.departments)) out.departments = full.departments ?? {};
     if (!same2(base.roster_notes, full.roster_notes)) out.roster_notes = full.roster_notes ?? [];
     if (!!base.noSummary !== !!full.noSummary) out.noSummary = !!full.noSummary;
@@ -852,15 +1435,6 @@ ${content}
     return next;
   }
   var emptyRecord = () => ({ fields: {}, extra: [] });
-  function overrideCount(over) {
-    let n2 = 0;
-    for (const k of Object.keys(over)) {
-      if (k === "relations") n2 += Object.keys(over.relations?.pairs ?? {}).length + (over.relations?.common !== void 0 ? 1 : 0);
-      else if (k === "anomalyNote") n2 += over.anomalyNote !== void 0 ? 1 : 0;
-      else n2 += Object.keys(over[k] ?? {}).length;
-    }
-    return n2;
-  }
   function recordText(kind, name, rec2, dir2, faction) {
     if (kind === "agent") {
       const a = dir2.agents.find((x) => x.lore === name);
@@ -1013,6 +1587,89 @@ ${body5}` : `##### ${sec2.title}`);
     return order;
   }
 
+  // src/core/points.ts
+  var POINTS_VAR = "$st_points";
+  function readPoints(vars) {
+    const raw = vars?.[POINTS_VAR];
+    const empty2 = { start: 0, log: [] };
+    if (typeof raw !== "string" || !raw.trim()) return empty2;
+    try {
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return empty2;
+      return { start: Number.isSafeInteger(o.start) ? o.start : 0, log: Array.isArray(o.log) ? o.log.filter((e) => !!e && typeof e === "object" && typeof e.id === "string" && typeof e.anchor === "string" && Number.isSafeInteger(e.amount) && typeof e.memo === "string").slice(-400) : [] };
+    } catch {
+      return empty2;
+    }
+  }
+  var pointsVars = (w) => ({ [POINTS_VAR]: JSON.stringify(w) });
+  function lastIdentity(chat) {
+    const msgs4 = chat.message ?? [];
+    for (let i = msgs4.length - 1; i >= 0; i--) {
+      const tags = findStatusTags(String(msgs4[i].data ?? ""));
+      for (let k = tags.length - 1; k >= 0; k--) if (tags[k].identity) return tags[k].identity;
+    }
+    return "";
+  }
+  function pointsFlagFor(chat, fallback = false) {
+    const id2 = lastIdentity(chat);
+    const on2 = id2 ? isPointsOrg(id2) : fallback;
+    const want = on2 ? "1" : "0";
+    return chat.scriptstate?.[POINTS_ON_VAR] === want ? null : want;
+  }
+  function pointsOn(chat) {
+    return colConfig(chat.scriptstate).points !== "off" || readPoints(chat.scriptstate).log.length > 0;
+  }
+  function recentPointLines(w, alive, n2) {
+    if (n2 <= 0) return [];
+    return liveWallet(w, alive).filter((e) => e.memo !== POINTS_SYNC_MEMO).slice(-n2).map((e) => `${e.amount > 0 ? "+" : ""}${e.amount.toLocaleString("en-US")} p ${e.memo}`);
+  }
+  var POINTS_SYNC_MEMO = "상태창 포인트";
+  function syncPointsToStatus(w, chat) {
+    const msgs4 = chat.message ?? [];
+    let i = msgs4.length - 1;
+    while (i >= 0 && msgs4[i].role === "user") i--;
+    if (i < 0) return null;
+    const m = msgs4[i];
+    const tags = findStatusTags(typeof m.data === "string" ? m.data : "");
+    let target = null;
+    for (let k = tags.length - 1; k >= 0; k--) {
+      const n2 = tags[k].points ? Number(tags[k].points) : NaN;
+      if (Number.isSafeInteger(n2) && Math.abs(n2) <= WALLET_MAX) {
+        target = n2;
+        break;
+      }
+    }
+    if (target === null) return null;
+    const anchor = messageKey(m, i);
+    const id2 = `ps_${anchor}`;
+    const base = removeWalletEntry(w, id2);
+    const alive = aliveAnchors(chat);
+    const before = { ...base, log: base.log.filter((e) => !(e.src === "store" && e.anchor === anchor)) };
+    const diff = target - walletBalance(before, alive);
+    const next = diff === 0 ? base : addWalletEntry(base, { id: id2, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: "story" });
+    return JSON.stringify(next) === JSON.stringify(w) ? null : next;
+  }
+  function formatPoints(n2) {
+    return `${n2 < 0 ? "−" : ""}${Math.abs(Math.trunc(n2)).toLocaleString("en-US")} p`;
+  }
+  function parsePoints(text4) {
+    const t = String(text4 ?? "").replace(/\s+/g, "");
+    if (!t) return null;
+    const sign = /^[-−]/.test(t) ? -1 : 1;
+    const body5 = t.replace(/^[-−+]/, "").replace(/(p|P|포인트|points?)$/i, "").replace(/,/g, "");
+    if (/^\d+$/.test(body5)) {
+      const n3 = Number(body5);
+      return Number.isSafeInteger(n3) ? sign * n3 : null;
+    }
+    const m = /^(?:(\d+(?:\.\d+)?)억)?(?:(\d+(?:\.\d+)?)만)?(?:(\d+)천)?(?:(\d+)백)?(\d+)?$/.exec(body5);
+    if (!m || m.slice(1).every((x) => x === void 0)) return null;
+    const n2 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
+    return Number.isSafeInteger(n2) && n2 > 0 ? sign * n2 : null;
+  }
+  function mentionsPoints(text4) {
+    return /\d[\d,]*\s*(?:p\b|P\b|포인트|points?\b)|\d+\s*(?:억|만|천)\s*포인트/i.test(text4);
+  }
+
   // src/ui/status.ts
   var esc = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
@@ -1073,6 +1730,13 @@ ${body5}` : `##### ${sec2.title}`);
       const delta = pw === void 0 ? 0 : n2 - pw;
       cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n2))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span></div>`;
     }
+    if (tag.points && !hid("points")) {
+      const n2 = Number(tag.points);
+      const pp = tl?.prevPoints?.get(tag.raw.trim());
+      const delta = pp === void 0 ? 0 : n2 - pp;
+      const pts3 = `<span class="gst-pt">${esc(formatPoints(n2))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span>`;
+      cash = cash ? cash.replace(/<\/div>$/, `${pts3}</div>`) : `<div class="gst-ln gst-cash">${CASH}${pts3}</div>`;
+    }
     return `<div class="gst" data-goei-status="1">${top}${place3}${target}${cash}</div>`;
   }
   var VARS = {
@@ -1108,7 +1772,7 @@ ${body5}` : `##### ${sec2.title}`);
 .gst-loc{font-weight:700}.gst-loc svg{color:var(--gs-pin)}
 .gst-tgt{font-weight:600;color:var(--gs-tgt)}
 .gst-cash{font-weight:600;color:var(--gs-sub);font-variant-numeric:tabular-nums}.gst-cash svg{color:var(--gs-sub)}
-.gst-cash small{margin-left:7px;font-size:12px;font-weight:700}.gst-up{color:var(--gs-blue)}.gst-down{color:var(--gs-red)}
+.gst-cash small{margin-left:7px;font-size:12px;font-weight:700}.gst-cash>span+.gst-pt{margin-left:14px}.gst-up{color:var(--gs-blue)}.gst-down{color:var(--gs-red)}
 .gst-link{cursor:pointer;text-decoration:underline dotted;text-decoration-color:color-mix(in srgb,currentColor 50%,transparent);text-underline-offset:3px}
 [data-gst-tip]{cursor:pointer}
 .gst-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:6px 10px;border-radius:9px;background:var(--gs-text);color:var(--gs-panel);font-size:12px;font-weight:600;line-height:1.4;letter-spacing:0;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}
@@ -1200,6 +1864,10 @@ ${themeVars("[x-goei-fab]")}
   55% { opacity: 1; transform: scale(.96); filter: blur(0); }
   100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
 }
+/* 대전 단추 (설정 「대전」을 켠 PC 에서만): 유령 단추 바로 밑 */
+[x-goei-fab] button[data-vs] { position: absolute; top: calc(100% + 8px); left: 0; display: none; }
+[x-goei-fab][x-goei-vs="true"] button[data-vs] { display: flex; }
+[x-goei-fab][x-goei-vs-open="true"] button[data-vs] { background: var(--g-signal); color: var(--g-acc); border-color: var(--g-signal); }
 @keyframes goei-fab-pop {
   0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
   60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
@@ -1221,9 +1889,11 @@ ${themeVars("[x-goei-fab]")}
   100% { transform: translate(0); }
 }
 `;
+  var PAD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 8h9a4.5 4.5 0 0 1 4.4 3.6l.9 4.6a2.4 2.4 0 0 1-4.1 2.1L15.6 16H8.4l-2.1 2.3a2.4 2.4 0 0 1-4.1-2.1l.9-4.6A4.5 4.5 0 0 1 7.5 8z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11.2" r=".6" fill="currentColor"/><circle cx="17.3" cy="13" r=".6" fill="currentColor"/></svg>';
   var FAB_HTML = (label2) => `<span data-gr></span><span data-gr></span>
 <span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
-<button type="button" aria-label="${label2}">${GHOST_ICON}</button>`;
+<button type="button" aria-label="${label2}">${GHOST_ICON}</button>
+<button type="button" data-vs aria-label="대전">${PAD_ICON}</button>`;
   async function body() {
     const doc2 = await risuai.getRootDocument();
     if (!doc2) return null;
@@ -1248,7 +1918,7 @@ ${themeVars("[x-goei-fab]")}
     } catch {
     }
   }
-  async function createFab(onOpen) {
+  async function createFab(onOpen, onVersus) {
     const root3 = await body();
     if (!root3) throw new Error("Risu 화면 접근 권한이 없어요.");
     const { doc: doc2 } = root3;
@@ -1265,6 +1935,8 @@ ${themeVars("[x-goei-fab]")}
     await root3.body.appendChild(host3);
     const button = await host3.querySelector("button");
     if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
+    const padBtn = await host3.querySelector("button[data-vs]");
+    let padShown = false;
     let pos = await loadPos();
     const applyPos = async () => {
       await host3.setStyle("right", `${pos.right}px`);
@@ -1364,6 +2036,10 @@ ${themeVars("[x-goei-fab]")}
     };
     const onClick2 = async (ev) => {
       if (!visible2) return;
+      if (padShown && padBtn && onVersus && inside(await padBtn.getBoundingClientRect(), ev.clientX, ev.clientY)) {
+        onVersus();
+        return;
+      }
       if (!inside(await rect(), ev.clientX, ev.clientY)) return;
       await loop;
       if (moved) return;
@@ -1428,6 +2104,11 @@ ${themeVars("[x-goei-fab]")}
       async setTheme(theme) {
         await host3.setAttribute("x-goei-theme", theme);
         await cardStyle2.setTextContent(chatCss(theme));
+      },
+      async setVersus(show, open4 = false) {
+        padShown = show;
+        await host3.setAttribute("x-goei-vs", show ? "true" : "false");
+        await host3.setAttribute("x-goei-vs-open", open4 ? "true" : "false");
       },
       async chatScreenVisible() {
         return !!await doc2.querySelector(".default-chat-screen");
@@ -1500,10 +2181,10 @@ ${themeVars("[x-goei-fab]")}
   var craftGroup = () => ({
     title: "생성 방식",
     items: [
-      { key: "thoughts", label: "생각 단계", type: "pick", def: "off", opts: [["off", "안 함"], ["inner", "속으로만"], ["note", "적고 지움"]], hint: "모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요" },
-      { key: "memo", label: "비망록", type: "pick", def: "0", opts: [["0", "끔"], ["1", "켬"]], hint: "모델 거부를 줄이는 긴 앞글이에요(원본 라이트보드 「탈옥 (비망록)」). 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요" },
+      { key: "thoughts", label: "생각 단계", type: "pick", def: "off", opts: [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]], hint: "모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요" },
+      { key: "memo", label: "비망록", type: "pick", def: "0", opts: [["0", "끔"], ["1", "켬"]], hint: "모델 거부를 줄이는 긴 앞글이에요. 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요" },
       num3("reiterate", "다시 보기", 0, 0, 2, "회", { zero: "공통", hint: "0이면 생성 공통 값을 따라요" }),
-      { key: "model_id", label: "전용 모델", type: "text", def: "", hint: "Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인·보조) 설정" }
+      { key: "model_id", label: "전용 모델", type: "text", def: "", hint: "Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인 모델·보조 모델) 설정" }
     ]
   });
   var ADV = {
@@ -1513,9 +2194,9 @@ ${themeVars("[x-goei-fab]")}
         items: [
           { key: "lang", label: "생성 언어", type: "pick", def: "auto", opts: [["auto", "대화 언어"], ["ko", "한국어"], ["en", "영어"], ["ja", "일본어"]], hint: "괴담넷·괴담톡·위키가 쓸 언어" },
           num3("retries", "형식 오류 재시도", 1, 0, 3, "회"),
-          { key: "retry_model", label: "재시도 모델", type: "pick", def: "same", opts: [["same", "같은 모델"], ["main", "메인"], ["aux", "보조"]] },
+          { key: "retry_model", label: "재시도 모델", type: "pick", def: "same", opts: [["same", "같은 모델"], ["main", "메인 모델"], ["aux", "보조 모델"]] },
           num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요" }),
-          num3("ctx_total", "채팅 반영 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요" }),
+          num3("ctx_total", "컨텍스트 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요" }),
           // 라이트보드 5.0.0에서 옮김 (2026-11-06 사용자 「전부 넣어야지」)
           num3("reiterate", "다시 보기", 0, 0, 2, "회", { zero: "안 함", hint: "첫 응답을 받은 뒤 「지침과 형식을 빠짐없이 지켰나 다시 읽고, 괜찮으면 그대로, 아니면 고쳐서」를 이만큼 더 물어요. 형식·규칙을 더 잘 지키지만 한 번마다 호출이 하나 늘어요. 기능마다 따로 정할 수도 있어요" }),
           { key: "user_msgs", label: "유저 메시지", type: "pick", def: "1", opts: [["1", "포함"], ["0", "빼기"]], hint: "괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 본편에 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요" },
@@ -1543,13 +2224,13 @@ ${themeVars("[x-goei-fab]")}
         ]
       },
       {
-        title: "채팅 반영",
+        title: "컨텍스트에 포함",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_posts", "게시글·댓글", 1), chip("ctx_dms", "쪽지", 1), chip("ctx_own", "내가 쓴 것만", 0)],
         items: [
           num3("ctx_post_count", "넣을 게시글", 5, 1, 200, "개"),
           num3("ctx_comment_count", "글당 댓글", 10, 0, 1e3, "개"),
           num3("ctx_dm_count", "넣을 쪽지", 30, 1, 200, "통"),
-          num3("ctx_tokens", "반영 토큰 상한", 3e3, 0, 2e5, TOK, { zero: "제한 없음" })
+          num3("ctx_tokens", "컨텍스트 토큰 상한", 3e3, 0, 2e5, TOK, { zero: "제한 없음" })
         ]
       },
       {
@@ -1566,7 +2247,8 @@ ${themeVars("[x-goei-fab]")}
           num3("post_tokens", "글 본문", 4e3, 50, 5e4, TOK),
           num3("title_tokens", "글 제목", 80, 10, 500, TOK),
           num3("comment_tokens", "댓글", 1e3, 50, 2e4, TOK),
-          num3("replies", "한 번에 받을 답글", 4, 1, 20, "개"),
+          num3("replies_min", "한 번에 받을 답글 최소", 0, 0, 20, "개"),
+          num3("replies", "한 번에 받을 답글 최대", 4, 1, 20, "개"),
           num3("dm_tokens", "쪽지", 1500, 50, 2e4, TOK),
           num3("origin_tokens", "쪽지에 붙는 글", 2e3, 50, 2e4, TOK),
           num3("quote_tokens", "쪽지에 붙는 댓글", 1e3, 50, 2e4, TOK),
@@ -1582,12 +2264,12 @@ ${themeVars("[x-goei-fab]")}
         items: [turns(8), num3("room_history", "방마다 참고할 말풍선", 100, 10, 1e3, "개"), budget]
       },
       {
-        title: "채팅 반영",
+        title: "컨텍스트에 포함",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_messages", "메시지", 1, "$ph_context_messages"), chip("ctx_notices_on", "공지", 1, "$ph_context_announcements")],
         items: [
           num3("ctx_history", "넣을 말풍선", 200, 1, 1e3, "개"),
           num3("ctx_notices", "넣을 공지", 1, 0, 50, "개"),
-          num3("ctx_tokens", "반영 토큰 상한", 4e3, 0, 2e5, TOK, { zero: "제한 없음" })
+          num3("ctx_tokens", "컨텍스트 토큰 상한", 4e3, 0, 2e5, TOK, { zero: "제한 없음" })
         ]
       },
       {
@@ -1622,9 +2304,9 @@ ${themeVars("[x-goei-fab]")}
         items: [turns(8), num3("ref_count", "관련·2차 참조 최대", 20, 1, 200, "개"), { ...budget, hint: "넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" }]
       },
       {
-        title: "채팅 반영",
+        title: "컨텍스트에 포함",
         chips: [chip("ctx_focus", "채팅에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
-        items: [num3("ctx_count", "넣을 문서", 2, 1, 50, "개"), num3("ctx_tokens", "반영 토큰 상한", 8e3, 0, 2e5, TOK, { zero: "제한 없음" })]
+        items: [num3("ctx_count", "넣을 문서", 2, 1, 50, "개"), num3("ctx_tokens", "컨텍스트 토큰 상한", 8e3, 0, 2e5, TOK, { zero: "제한 없음" })]
       }
     ]
   };
@@ -1651,9 +2333,6 @@ ${themeVars("[x-goei-fab]")}
   var advOn = (state, f, key) => advValue(state, f, key) === "1";
   function advChanged(state, f) {
     return advItems(f).filter((i) => advValue(state, f, i.key) !== String(i.def)).map((i) => i.key);
-  }
-  function advResetVars(f) {
-    return Object.fromEntries(advItems(f).map((i) => [advVar(f, i), i.v ? String(i.def) : ""]));
   }
   function refToggles(state, f) {
     const on2 = (k, d) => advItem(f, k) ? advOn(state, f, k) : d;
@@ -1963,7 +2642,8 @@ ${memo.job.trim()}
     const uses = itemUses(x.uses);
     const equip = itemEquip(x.equip);
     const icon = cleanIcon(x.icon);
-    return { use: x.use === true || !!uses, ...uses ? { uses } : {}, ...equip ? { equip } : {}, ...icon ? { icon } : {} };
+    const weight = itemWeight(x.weight);
+    return { use: x.use === true || !!uses, ...uses ? { uses } : {}, ...equip ? { equip } : {}, ...icon ? { icon } : {}, ...weight !== void 0 ? { weight } : {} };
   };
   var emptyShop = (tag, key) => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
   var isItem = (e) => {
@@ -1999,10 +2679,11 @@ ${memo.job.trim()}
         identity: {
           sells: clean2(id2.sells, 120),
           never: clean2(id2.never, 120),
-          prices: clean2(id2.prices, 120)
+          prices: clean2(id2.prices, 120),
+          ...id2.points ? { points: true } : {}
         },
         items: (Array.isArray(o.items) ? o.items.filter(isItem) : []).map((x) => {
-          const { use: _u, uses: _n, equip: _e, icon: _i, ...rest } = x;
+          const { use: _u, uses: _n, equip: _e, icon: _i, weight: _w, ...rest } = x;
           return { ...rest, ...traitsOf(x), desc: clean2(x.desc, 120), effect: clean2(x.effect, 60) };
         }).slice(0, 40),
         talk: (Array.isArray(o.talk) ? o.talk : []).filter((l) => !!l && (l.who === "me" || l.who === "owner") && typeof l.text === "string").slice(-40),
@@ -2074,17 +2755,31 @@ ${memo.job.trim()}
     const n2 = parseWon(s8.replace(/[^\d억만천백,.₩원\-−]/g, ""));
     return n2 !== null && n2 >= 0 ? n2 : null;
   }
-  var SHOP_LINE = "이름|값|쓰임|그림|설명|효과|구분";
+  function costOf(cell3) {
+    const parts = cell3.split(/\s*[+＋]\s*/).map((x) => x.trim()).filter(Boolean);
+    if (!parts.length) return null;
+    let price = 0;
+    const text4 = [];
+    for (const part of parts) {
+      const won3 = /\d/.test(part) && /^[\s\d,.₩원억만천백\-−]+$/.test(part) ? priceOf(part) : null;
+      if (won3 !== null) price += won3;
+      else text4.push(part);
+    }
+    const pay = clean2(text4.join(" + "), 40);
+    return pay ? { price, pay } : { price };
+  }
+  var SHOP_LINE = "이름|값|쓰임|그림|무게|설명|효과|구분";
   function parseLine(line2) {
     const cells = line2.replace(/^[-*•+]\s*/, "").split("|").map((c) => c.trim());
     if (cells.length < 2) return null;
     const name = clean2(cells[0], 30);
-    const price = priceOf(cells[1] ?? "");
-    if (!name || price === null) return null;
-    const out = { name, price, ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3] }), desc: clean2(cells[4], 120), effect: clean2(cells[5], 60) };
-    const tag = (cells[6] ?? "").trim();
+    const cost = costOf(cells[1] ?? "");
+    if (!name || !cost) return null;
+    const price = cost.price;
+    const out = { name, price, ...cost.pay ? { pay: cost.pay } : {}, ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3], weight: cells[4] }), desc: clean2(cells[5], 120), effect: clean2(cells[6], 60) };
+    const tag = (cells[7] ?? "").trim();
     if (/^(희귀|레어|rare)/i.test(tag)) out.tag = "rare";
-    else if (/^(특가|할인|세일|sale)/i.test(tag)) {
+    else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
       const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ""));
       if (was !== null && was > price) Object.assign(out, { tag: "sale", was });
     }
@@ -2104,10 +2799,18 @@ ${memo.job.trim()}
     if (!known) {
       if (!idText) throw new ShopError("응답에 <shop-identity> 블록이 없어요.");
       const get = (k) => (new RegExp(`^\\s*${k}\\s*[:：]\\s*(.*)$`, "im").exec(idText)?.[1] ?? "").trim();
-      identity = { sells: clean2(get("sells"), 120), never: clean2(get("never"), 120), prices: clean2(get("prices"), 120) };
+      identity = { sells: clean2(get("sells"), 120), never: clean2(get("never"), 120), prices: clean2(get("prices"), 120), .../point|포인트/i.test(get("currency")) ? { points: true } : {} };
       if (!identity.sells) throw new ShopError("<shop-identity> 에 sells 줄이 없어요.");
     }
-    return { identity, owner: clean2(block2(raw, "owner"), 300), items };
+    return { identity, owner: clean2(block2(raw, "owner"), 300), items: identity.points ? items.map(pointPrice) : items };
+  }
+  function pointPrice(x) {
+    const m = x.pay && /^([\d,]+)\s*(?:p|P|포인트|points?)$/i.exec(x.pay.trim());
+    if (!m) return x;
+    const n2 = Number(m[1].replace(/,/g, ""));
+    if (!Number.isSafeInteger(n2)) return x;
+    const { pay: _p, ...rest } = x;
+    return { ...rest, price: x.price + n2 };
   }
   function parseTalk(raw) {
     const owner = clean2(block2(raw, "owner"), 400);
@@ -2137,9 +2840,9 @@ ${memo.job.trim()}
           const it = parseLine(line2.slice(1));
           if (it) out.add.push(it);
         } else if (line2.startsWith("~")) {
-          const [name, price] = line2.slice(1).split("|").map((c) => c.trim());
-          const n2 = priceOf(price ?? "");
-          if (name && n2 !== null) out.reprice.push({ name: clean2(name, 30), price: n2 });
+          const [name, price] = line2.slice(1).split("|").map((c2) => c2.trim());
+          const c = costOf(price ?? "");
+          if (name && c) out.reprice.push({ name: clean2(name, 30), ...c });
         } else if (line2.startsWith("-")) {
           const name = clean2(line2.slice(1), 30);
           if (name) out.remove.push(name);
@@ -2175,15 +2878,20 @@ ${memo.job.trim()}
     const talk = r.owner ? [...st.talk, { who: "owner", text: r.owner }] : st.talk;
     return { ...base, items: [...st.items.filter((x) => x.sold), ...items], talk: talk.slice(-40), prev, closed: false };
   }
-  function applyTalk(st, r, kick = true) {
+  function applyTalk(st, r0, kick = true) {
+    const r = st.identity.points ? { ...r0, all: r0.all.map(pointPrice), add: r0.add.map(pointPrice), reprice: r0.reprice.map(pointPrice) } : r0;
     let items = st.items.slice();
     if (r.mode === "all") {
-      const fresh = withIds(st, r.all, items.filter((x) => x.sold));
-      if (fresh.length) items = [...items.filter((x) => x.sold), ...fresh];
+      const fresh2 = withIds(st, r.all, items.filter((x) => x.sold));
+      if (fresh2.length) items = [...items.filter((x) => x.sold), ...fresh2];
     } else if (r.mode === "partial") {
       for (const n2 of r.remove) items = items.filter((x) => x.sold || !sameShopName(x.name, n2));
       for (const p2 of r.reprice) {
-        items = items.map((x) => !x.sold && sameShopName(x.name, p2.name) && p2.price !== x.price ? { ...x, price: p2.price, orig: x.orig ?? x.price } : x);
+        items = items.map((x) => {
+          if (x.sold || !sameShopName(x.name, p2.name) || p2.price === x.price && (p2.pay ?? "") === (x.pay ?? "")) return x;
+          const { pay: _p, ...rest } = x;
+          return { ...rest, price: p2.price, ...p2.pay ? { pay: p2.pay } : {}, ...x.pay ? {} : { orig: x.orig ?? x.price } };
+        });
       }
       items = [...items, ...withIds(st, r.add, items)];
     }
@@ -2193,7 +2901,7 @@ ${memo.job.trim()}
       let price = r.offer;
       if (price === void 0) {
         const rp = r.reprice.find((p2) => sameShopName(p2.name, sell.name));
-        if (rp) price = rp.price;
+        if (rp && !rp.pay) price = rp.price;
       }
       if (price !== void 0) {
         const first = sell.first ?? (typeof sell.price === "number" && price !== null && price !== sell.price ? sell.price : void 0);
@@ -2229,7 +2937,7 @@ ${memo.job.trim()}
     const out = [];
     const lastOwner = [...st.talk].reverse().find((l) => l.who === "owner");
     const spoke = st.talk.some((l) => l.who === "me");
-    if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString("en-US")} won)`).join(", ")} to the owner of ${st.shop}`);
+    if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString("en-US")} ${st.identity.points ? "Baekilmong points" : "won"})`).join(", ")} to the owner of ${st.shop}`);
     if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ""}`);
     else if (spoke && lastOwner) {
       const tail2 = st.talk.map((l) => `${l.who === "me" ? "protagonist" : "owner"}: "${l.text}"`).join(" / ");
@@ -2237,7 +2945,7 @@ ${memo.job.trim()}
     }
     return out;
   }
-  var G = () => guideSections("Shop");
+  var G = (name = "Shop") => guideSections(name);
   var SHELF_RULES = (g2, s8, st) => {
     const r = s8.size;
     const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: SHOP_LINE, price: s8.price, prev: st.prev.join(", ") };
@@ -2259,7 +2967,8 @@ ${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ""}`];
       parts.push(`[가게 정체 — 고정]
 sells: ${id2.sells || "-"}
 never: ${id2.never || "-"}
-prices: ${id2.prices || "-"}`);
+prices: ${id2.prices || "-"}
+currency: ${id2.points ? "points" : "won"}`);
     }
     if (src.refs) parts.push(`[참고 자료 — 작중 인물에게 자동 공개되지 않음]
 ${src.refs}`);
@@ -2276,12 +2985,13 @@ ${src.story}`);
     return parts.join("\n\n");
   }
   var craft = (messages, s8, thoughts) => craftMessages(messages, { thoughts: s8.thoughts, memo: false, reiterate: 0 }, { thoughts });
-  function shelfPrompt(src, s8) {
+  function shelfPrompt(src, s8, guide = "Shop") {
     const first = !src.st.loaded;
-    const g2 = G();
+    const g2 = G(guide);
     const system = [
       fillGuide(g2.COMMON, {}),
       SHELF_RULES(g2, s8, src.st),
+      src.st.identity.points ? fillGuide(g2.POINT_SHOP, {}) : "",
       fillGuide(first ? g2.FIRST : g2.RESTOCK, { line: SHOP_LINE }),
       src.language ?? ""
     ].filter(Boolean).join("\n\n");
@@ -2294,17 +3004,18 @@ ${src.st.talk.map((l) => `${l.who === "me" ? "[주인공]" : "[주인]"} ${l.tex
 [현재 작업]
 ${first ? "가게 정체·주인 첫 대사·진열대" : "진열대 새로 짜기"}` }], s8, fillGuide(g2.THOUGHTS_SHELF, {}));
   }
-  function talkPrompt(src, s8) {
+  function talkPrompt(src, s8, guide = "Shop") {
     const st = src.st;
-    const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? "-"}|${x.desc}|${x.effect}|${x.tag === "rare" ? "희귀" : x.tag === "sale" && x.was ? `특가:${x.was}` : ""}`).join("\n") || "(empty)";
+    const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? "-"}|${x.weight ?? "-"}|${x.desc}|${x.effect}|${x.tag === "rare" ? "희귀" : x.tag === "sale" && x.was ? `특가:${x.was}` : ""}`).join("\n") || "(empty)";
     const sold = soldItems(st).map((x) => x.name).join(", ");
     const o = st.sell;
-    const g2 = G();
+    const g2 = G(guide);
     const v = { line: SHOP_LINE };
     const system = [
       fillGuide(g2.COMMON, v),
       [fillGuide(g2.TALK, v), fillGuide(s8.feature ? g2.TALK_FEATURE : g2.TALK_PLAIN, v), fillGuide(s8.kick ? g2.KICK_ON : g2.KICK_OFF, v)].filter(Boolean).join(" "),
       o ? fillGuide(g2.SELL, v) : "",
+      st.identity.points ? fillGuide(g2.POINT_SHOP, v) : "",
       [fillGuide(g2.TALK_OUTPUT, v), o ? fillGuide(g2.TALK_OUTPUT_OFFER, v) : "", fillGuide(g2.TALK_OUTPUT_END, v)].filter(Boolean).join("\n"),
       SHELF_RULES(g2, s8, st),
       src.language ?? ""
@@ -2316,7 +3027,7 @@ ${first ? "가게 정체·주인 첫 대사·진열대" : "진열대 새로 짜�
 [팔려는 물건 — 주인공이 내민 것]
 ${o.name}|${traitsText(o)}|${o.desc || "-"}|${o.effect || "-"}${o.paid !== void 0 ? `
 (bought earlier for ${o.paid} won)` : ""}${typeof o.price === "number" ? `
-(your last offer: ${o.price} won)` : ""}` : "";
+(your last offer: ${o.price} ${st.identity.points ? "points" : "won"})` : ""}` : "";
     return craft([{ role: "system", content: system }, { role: "user", content: `${material(src, s8)}
 
 [지금 진열대]
@@ -2332,8 +3043,8 @@ ${sales}` : ""}${selling}
 ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   }
   var WHERE = {
-    any: "This covers any way of buying: a store, stall or vendor in front of them, and also a shop with nobody at the counter, an online or in-app mall, TV or phone home shopping, a catalog, a vending machine, or an otherworldly mall — use that shop’s own name (the mall, channel or machine) as 가게 이름.",
-    shop: "Only at a physical place of sale with a seller present (a store, stall, vendor, dealer); not for online malls, home shopping, catalogs or machines."
+    any: "Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.",
+    shop: "Only a physical store or stall with a seller present; not online, broadcast, catalog or machine."
   };
   var shopGuide = (vars) => fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where] });
 
@@ -2349,6 +3060,13 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   var ITEM_SLOTS_MIN = 8;
   var ITEM_SLOTS_MAX = 40;
   var ITEM_LIMIT_DEFAULT = "가방 하나와 주머니, 두 손";
+  var ITEM_CARRY_VAR = "$it_carry";
+  var ITEM_CARRY_PC_VAR = "$it_carry_pc";
+  var ITEM_CARRY_DEFAULT = 25;
+  var ITEM_CARRY_MIN = 1;
+  var ITEM_CARRY_MAX = 300;
+  var ITEM_EDIT_VAR = "$it_edit";
+  var itemEditOn = (vars) => vars?.[ITEM_EDIT_VAR] === "1";
   var isItem2 = (e) => {
     const x = e;
     return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && typeof x.anchor === "string" && (x.from === "store" || x.from === "story" || x.from === "manual");
@@ -2359,8 +3077,9 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   };
   var clean3 = (s8, max) => String(s8 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
   function normItem(x) {
-    const { uses: u0, equip: e0, slot: s0, icon: i0, ...rest } = x;
+    const { uses: u0, equip: e0, slot: s0, icon: i0, weight: w0, ...rest } = x;
     const uses = itemUses(u0);
+    const weight = itemWeight(w0);
     const equip = itemEquip(e0);
     const slot2 = equip && Number.isSafeInteger(s0) && s0 >= 0 && s0 < EQUIP_SLOTS[equip] ? s0 : void 0;
     const icon = cleanIcon(i0);
@@ -2373,7 +3092,8 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
       ...uses ? { uses } : {},
       ...equip ? { equip } : {},
       ...slot2 !== void 0 ? { slot: slot2 } : {},
-      ...icon ? { icon } : {}
+      ...icon ? { icon } : {},
+      ...weight !== void 0 ? { weight } : {}
     };
   }
   function readItems(vars) {
@@ -2464,12 +3184,17 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     }
     if (p2.state !== void 0) next.state = itemState(p2.state);
     if (p2.icon !== void 0) {
-      const ic = cleanIcon(p2.icon);
-      if (ic) next.icon = ic;
+      const ic2 = cleanIcon(p2.icon);
+      if (ic2) next.icon = ic2;
       else delete next.icon;
+    }
+    if (p2.weight !== void 0 && p2.weight !== null && p2.weight !== "") {
+      const w = itemWeight(p2.weight);
+      if (w !== void 0) next.weight = w;
     }
     return next;
   }
+  var paidNote = (e) => [Number.isSafeInteger(e.price) && (e.price > 0 || !e.paidWith) ? `₩ ${e.price.toLocaleString("en-US")}` : "", e.paidWith ? clean3(e.paidWith, 60) : ""].filter(Boolean).join(" + ");
   function addItem(it, alive, e) {
     const name = clean3(e.name, 30);
     if (!name) return it;
@@ -2479,14 +3204,16 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
     if (found) {
       const addUses = itemUses(e.uses);
-      const more = addUses && found.uses !== void 0 ? { uses: Math.min(999, found.uses + addUses) } : { uses: e.uses };
-      const next = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon }), desc: desc || found.desc, effect: effect || found.effect, ...quote ? { quote } : {} };
+      const stack = !!addUses && found.uses !== void 0;
+      const more = stack ? { uses: Math.min(999, found.uses + addUses) } : { uses: e.uses };
+      const weight = found.weight !== void 0 ? void 0 : e.weight;
+      const next = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...quote ? { quote } : {} };
       if (JSON.stringify(next) === JSON.stringify(found)) return it;
       return { ...it, list: it.list.map((x) => x.id === found.id ? next : x) };
     }
     const id2 = e.id ?? itemId2(e.anchor, name);
     if (it.list.some((x) => x.id === id2)) return it;
-    const row9 = withTraits({
+    const row10 = withTraits({
       id: id2,
       name,
       desc,
@@ -2498,11 +3225,12 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
       at: e.at ?? (/* @__PURE__ */ new Date()).toISOString(),
       ...Number.isSafeInteger(e.price) ? { price: e.price } : {},
       ...e.walletId ? { walletId: e.walletId } : {},
+      ...e.paidWith ? { paidWith: clean3(e.paidWith, 60) } : {},
       ...quote ? { quote } : {}
-    }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon });
-    const got = addItemLog(it, { name, item: id2, ...row9.icon ? { icon: row9.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...Number.isSafeInteger(e.price) ? { note: `₩ ${e.price.toLocaleString("en-US")}` } : {}, at: row9.at });
-    const out = { ...got, list: [...got.list, row9].slice(-200) };
-    return e.wear && row9.equip ? equipItem(out, alive, id2) : out;
+    }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
+    const got = addItemLog(it, { name, item: id2, ...row10.icon ? { icon: row10.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...paidNote(e) ? { note: paidNote(e) } : {}, at: row10.at });
+    const out = { ...got, list: [...got.list, row10].slice(-200) };
+    return e.wear && row10.equip ? equipItem(out, alive, id2) : out;
   }
   function updateItem(it, id2, patch) {
     const cur = it.list.find((x) => x.id === id2);
@@ -2526,8 +3254,8 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   function addItemLog(it, l) {
     const id2 = l.id ?? logId(l.what, l.anchor, l.name, it.log.length);
     if (it.log.some((x) => x.id === id2)) return it;
-    const row9 = { ...l, id: id2, name: clean3(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean3(l.quote, 120) } : {}, ...l.note ? { note: clean3(l.note, 60) } : {} };
-    return { ...it, log: [...it.log, row9].slice(-400) };
+    const row10 = { ...l, id: id2, name: clean3(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean3(l.quote, 120) } : {}, ...l.note ? { note: clean3(l.note, 60) } : {} };
+    return { ...it, log: [...it.log, row10].slice(-400) };
   }
   function removeItem(it, id2, what, by, anchor = "", extra = {}) {
     const cur = it.list.find((x) => x.id === id2);
@@ -2540,25 +3268,40 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     const { slot: _slot, ...rest } = cur;
     return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? { ...rest, soldAt: anchor } : x) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what: "sell", by: "manual", anchor, ...note ? { note } : {} });
   }
-  function mergeItems(it, alive, keepId, otherId, name) {
+  function canMerge(a, b) {
+    if (a.id === b.id || a.uses === void 0 || b.uses === void 0) return false;
+    const words = (n2) => clean3(n2, 30).toLowerCase().split(/[\s·.,'"「」()\-_/]+/).filter((w) => w.length >= 1);
+    const wa = new Set(words(a.name));
+    return words(b.name).some((w) => wa.has(w));
+  }
+  function mergeItems(it, alive, keepId, otherId, anchor = "") {
     const keep = it.list.find((x) => x.id === keepId);
     const other = it.list.find((x) => x.id === otherId);
-    if (!keep || !other || keepId === otherId) return it;
-    const desc = clean3([keep.desc, other.desc].filter(Boolean).join(" / "), 80);
+    if (!keep || !other || !canMerge(keep, other)) return it;
+    const weight = keep.weight ?? other.weight;
     const merged = {
       ...keep,
-      name: clean3(name ?? keep.name, 30) || keep.name,
-      desc,
-      effect: keep.effect || other.effect,
-      ...keep.uses !== void 0 && other.uses !== void 0 ? { uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)) } : {},
-      ...keep.quote || other.quote ? { quote: clean3([keep.quote, other.quote].filter(Boolean).join(" / "), 120) } : {},
+      uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)),
+      ...weight !== void 0 ? { weight } : {},
       // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
       anchor: keep.anchor && other.anchor ? keep.anchor : "",
       from: keep.anchor && other.anchor ? keep.from : "manual"
     };
     const list4 = it.list.filter((x) => x.id !== otherId).map((x) => x.id === keepId ? merged : x);
-    return addItemLog({ ...it, list: list4 }, { name: other.name, item: other.id, ...other.icon ? { icon: other.icon } : {}, what: "merge", by: "manual", anchor: "", note: `${merged.name}와 합침` });
+    return addItemLog({ ...it, list: list4 }, { name: other.name, item: other.id, ...other.icon ? { icon: other.icon } : {}, what: "merge", by: "manual", anchor, note: `${merged.name}와 합침` });
   }
+  function itemCarrySetting(vars) {
+    const n2 = Number(vars?.[ITEM_CARRY_VAR]);
+    if (!Number.isSafeInteger(n2)) return ITEM_CARRY_DEFAULT;
+    return Math.min(ITEM_CARRY_MAX, Math.max(ITEM_CARRY_MIN, n2));
+  }
+  function itemCarry(vars) {
+    const pc = itemWeight(vars?.[ITEM_CARRY_PC_VAR]);
+    return pc !== void 0 && pc > 0 ? pc : itemCarrySetting(vars);
+  }
+  var lineWeight = (e, left) => e.weight === void 0 ? void 0 : Math.round(e.weight * (e.uses !== void 0 ? left ?? e.uses : 1) * 1e3) / 1e3;
+  var totalWeight = (list4, left) => Math.round(list4.reduce((n2, e) => n2 + (lineWeight(e, left?.(e)) ?? 0), 0) * 1e3) / 1e3;
+  var kgText = (n2) => `${Number(n2.toFixed(1))} kg`;
   function itemSlots(vars) {
     const n2 = Number(vars?.[ITEM_SLOTS_VAR]);
     if (!Number.isSafeInteger(n2)) return ITEM_SLOTS_DEFAULT;
@@ -2618,9 +3361,14 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     return cur ? list4.map((u) => u.id === e.id ? { ...u, n: n2 } : u) : [...list4, { id: e.id, n: 1 }];
   }
   var dropUse = (list4, id2) => list4.filter((u) => u.id !== id2);
+  function mergedNow(it, lastAnchor) {
+    if (!lastAnchor) return [];
+    return it.log.filter((l) => l.what === "merge" && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? "").replace(/와 합침$/, "")}`);
+  }
   function newlyBought(list4, lastAnchor) {
     return list4.filter((e) => e.from === "store" && e.anchor === lastAnchor);
   }
+  var boughtLine = (e) => e.paidWith ? `${e.name} (paid with ${e.paidWith}${e.price ? ` + ${e.price.toLocaleString("en-US")} won` : ""})` : e.name;
   function itemLine(e, left, equipped, detail = "full") {
     const tags = detail === "name" ? [] : [
       equipped ? `equipped ${e.equip === "weapon" ? "weapon" : "gear"}` : "",
@@ -2638,6 +3386,10 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     if (!lines3.length && !use.length && !bought.length && !extra.length && !opts.always) return "";
     const carried = gridItems(list4).length;
     const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? " (over the limit)" : ""}`, ...lines3.length ? lines3 : ["- (nothing)"]];
+    if (opts.carry) {
+      const w = totalWeight(list4, opts.left);
+      out.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ""}`);
+    }
     out.push(`Carry limit: ${opts.limit}`);
     const recent = (opts.recent ?? []).filter(Boolean);
     if (recent.length) out.push(`Recently: ${recent.join("; ")}`);
@@ -2697,7 +3449,7 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
       if (!shopOn(vars)) return "";
       const it2 = readItems(vars);
       const live2 = liveItems(it2, aliveAnchors(chat));
-      const bought = newlyBought(live2, lastBotKey(chat)).map((e) => e.name);
+      const bought = newlyBought(live2, lastBotKey(chat)).map(boughtLine);
       const events = [...bought.length ? [`just bought ${bought.join(", ")}`] : [], ...shopEvents(chat)];
       return [SHOP_HEAD, ...events.length ? [`This turn: ${events.join("; ")}`] : [], shopGuide(vars)].join("\n");
     }
@@ -2720,10 +3472,11 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     const text4 = itemsBlock(live, {
       slots: itemSlots(vars),
       limit: itemLimit(vars),
+      carry: itemCarry(vars),
       left,
       use,
-      bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
-      events: [...resumed ? [RESUMED_EVENT] : [], ...shop ? shopEvents(chat) : []],
+      bought: newlyBought(live, lastBotKey(chat)).map(boughtLine),
+      events: [...resumed ? [RESUMED_EVENT] : [], ...mergedNow(it, lastBotKey(chat)), ...shop ? shopEvents(chat) : []],
       always: shop || resumed,
       detail: itemDetail(vars),
       recent: recentItemLog(chat, it, itemLogTurns(vars))
@@ -2782,7 +3535,7 @@ ${shopGuide(vars)}` : ""}` : "";
     const live = liveItems(it, alive);
     return live.map((e) => {
       const left = itemLeft(it, e, alive);
-      return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {} };
+      return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.weight !== void 0 ? { weight: e.weight } : {}, ...e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {} };
     });
   }
   function applyItemChanges(it0, alive, changes, opts = {}) {
@@ -2800,14 +3553,15 @@ ${shopGuide(vars)}` : ""}` : "";
           ...c.use !== void 0 ? { use: c.use } : {},
           ...c.equip !== void 0 ? { equip: c.equip ?? "" } : {},
           ...c.state ? { state: c.state } : {},
-          ...c.icon ? { icon: c.icon } : {}
+          ...c.icon ? { icon: c.icon } : {},
+          ...c.weight !== void 0 ? { weight: c.weight } : {}
         });
         if (c.uses !== void 0 && cur.uses !== void 0) {
           it = setItemLeft(it, alive, cur.id, c.uses);
           if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, "gone", "story", c.anchor, { quote: c.quote, note: "다 씀" });
         }
       } else if (c.action === "new") {
-        it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, from: "story", anchor: c.anchor, quote: c.quote });
+        it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, weight: c.weight, from: "story", anchor: c.anchor, quote: c.quote });
       }
     }
     return it;
@@ -2824,6 +3578,7 @@ ${shopGuide(vars)}` : ""}` : "";
         uses: e.uses,
         equip: e.equip,
         icon: e.icon,
+        weight: e.weight,
         wear: e.wear !== false,
         from: "manual",
         anchor: "",
@@ -2833,6 +3588,7 @@ ${shopGuide(vars)}` : ""}` : "";
     return it;
   }
   var startItemsVars = (list4) => list4.length ? itemsVars(startItemsState(list4)) : { [ITEMS_VAR]: "" };
+  var startCarryVars = (carry) => ({ [ITEM_CARRY_PC_VAR]: carry && carry > 0 ? String(carry) : "" });
 
   // src/core/start.ts
   function readManifest(lore) {
@@ -2916,6 +3672,8 @@ ${shopGuide(vars)}` : ""}` : "";
         $st_lang_pick: choice.lang,
         $st_fm_pick: String(choice.fm),
         $ib_affiliation: faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation,
+        // 백일몽 포인트 칸 「자동」: 백일몽 소속으로 시작하면 첫 응답부터 상태창에 포인트 칸 (core/world/statuscols.ts)
+        [POINTS_ON_VAR]: isPointsOrg(faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation) ? "1" : "0",
         $st_anomaly_on: "0",
         $an_report: "",
         $in_report: "",
@@ -2926,6 +3684,8 @@ ${shopGuide(vars)}` : ""}` : "";
         $goei_last: "",
         // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
         ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
+        // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
+        ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : void 0),
         ...factionVars(lore),
         ...world2 ?? {}
       }
@@ -3029,14 +3789,14 @@ ${shopGuide(vars)}` : ""}` : "";
     try {
       const charIndex = await risuai.getCurrentCharacterIndex();
       const chatIndex = await risuai.getCurrentChatIndex();
-      const saved = await updateChat(charIndex, chatIndex, (chat) => {
+      const saved2 = await updateChat(charIndex, chatIndex, (chat) => {
         const msgs4 = chat.message ?? [];
         const last2 = msgs4[msgs4.length - 1];
         if (!last2 || last2.role !== "user" || typeof last2.data !== "string" || !isUnsent(last2.data)) return null;
         chat.message = msgs4.slice(0, -1);
         return chat;
       });
-      if (saved && !(saved.message ?? []).length) openRepick();
+      if (saved2 && !(saved2.message ?? []).length) openRepick();
     } catch (error) {
       console.log(`[goei] 요청 취소 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -3377,16 +4137,16 @@ ${req.docRequest.trim()}`;
     });
   }
   function portraitMood(body5) {
-    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
-    const m = attrs(open3).portrait_mood ?? "";
+    const open4 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+    const m = attrs(open4).portrait_mood ?? "";
     return /^[a-z][a-z ]{0,20}$/i.test(m) ? m.trim().toLowerCase() : "";
   }
   var SPOILER_HEADING = /탈출|출구|금기|공략|해법|해결|클리어|생환|대처|수칙|정답|파훼|봉인|퇴치|살아남|빠져나|규칙|격리 ?(?:방법|절차)|약점/;
   var esc2 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var escText = (s8) => esc2(s8.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
-  function attrs(open3) {
+  function attrs(open4) {
     const out = {};
-    for (const m of open3.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
+    for (const m of open4.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
     return out;
   }
   function splitFields(s8, sep = "|") {
@@ -3409,8 +4169,8 @@ ${req.docRequest.trim()}`;
     return i < 0 ? ["", f.trim()] : [f.slice(0, i).trim(), f.slice(i + 1).trim()];
   }
   function renderArticle(body5, o) {
-    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
-    const a = attrs(open3);
+    const open4 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+    const a = attrs(open4);
     const color = /^#[0-9a-fA-F]{3,8}$/.test(a.main_color ?? "") ? a.main_color : "#27685b";
     const notes = [];
     const inline = (s8) => escText(s8).replace(/➡️([^➡]+?)➡️/g, (_all, t) => {
@@ -3472,7 +4232,7 @@ ${line2}`;
           break;
         }
         case "Toc":
-          if (headings.length) out.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}">${h.id}. ${inline(h.title)}</a>`).join("")}</nav>`);
+          if (headings.length) out.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}"><span class="no">${h.id}.</span> ${inline(h.title)}</a>`).join("")}</nav>`);
           break;
         case "Heading": {
           const h = headings[hi++];
@@ -3522,12 +4282,12 @@ ${line2}`;
   var wikiContextOn = (state) => String(state?.[NW_CONTEXT] ?? "") === "1";
   function wikiMainContext(chat, rules2, focus, capOverride) {
     const s8 = chat.scriptstate;
-    const count2 = advNum(s8, "nw", "ctx_count");
+    const count3 = advNum(s8, "nw", "ctx_count");
     const cap = capOverride ?? advNum(s8, "nw", "ctx_tokens");
     const onlyMentioned = advOn(s8, "nw", "ctx_focus");
     const withLore = advOn(s8, "nw", "ctx_lore");
     const created = advOn(s8, "nw", "ctx_created");
-    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count2);
+    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count3);
     const kept = [];
     const payload = () => `[MODULE_CONTEXT_BEGIN]
 ${rules2}
@@ -3597,10 +4357,10 @@ ${story}`;
     const meta = [place3, h.at !== null ? `종료 ${journalClock(h.at).slice(6)}` : "", h.duration !== null ? `소요 ${dur(h.duration)}` : ""].filter(Boolean).join(" · ");
     const who = r.agents.map((a) => a.name).filter(Boolean).join(" · ");
     const badge3 = r.mine ? "내가 출동" : "요원 처리";
-    const box2 = `display:block;margin-top:10px;padding:10px 12px;border:1px solid ${p2.accentLine};border-radius:12px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
+    const box3 = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
     const chip3 = `display:inline-block;padding:0 8px;border-radius:999px;border:1px solid ${r.mine ? p2.signal : p2.accentLine};color:${r.mine ? p2.signal : p2.sub};font-size:.85em;line-height:1.6;margin-left:6px;vertical-align:middle;`;
     const mark2 = `display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid ${p2.accentLine};background:${p2.panel};color:${p2.signal};font-weight:700;font-size:.95em;margin-right:8px;vertical-align:middle;`;
-    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box2}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
+    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box3}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
   }
 
   // src/host/statusview.ts
@@ -3627,509 +4387,4 @@ ${story}`;
       const list4 = map.get(r.statusKey);
       if (!list4) map.set(r.statusKey, [r]);
       else if (list4[0].idx === r.idx) list4.push(r);
-      else if (r.idx > list4[0].idx) map.set(r.statusKey, [r]);
-    }
-    return map;
-  }
-  function chatCardsAt(chat, index) {
-    const out = [];
-    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index) out.push(r);
-    return out;
-  }
-  async function refreshStatusContext(charIndex, chatIndex, known) {
-    if (charIndex < 0 || chatIndex < 0) return;
-    const chat = known?.chat ?? await risuai.getChatFromIndex(charIndex, chatIndex);
-    const char = known ? known.char : await getChar(charIndex);
-    if (!chat) return;
-    const texts = (chat.message ?? []).filter((m) => m.role === "char" && typeof m.data === "string").map((m) => m.data);
-    await prepareBaseDocs(char?.globalLore).catch(() => void 0);
-    const titles = /* @__PURE__ */ new Map();
-    for (const e of buildRegistry(char?.globalLore).entries) for (const t of e.terms) if (t.length >= 2 && !titles.has(t)) titles.set(t, e.name);
-    for (const d of listDocs(chat, char?.globalLore)) if (d.title.length >= 2 && !titles.has(d.title)) titles.set(d.title, d.title);
-    const terms = [...titles].map(([term, title2]) => ({ term, title: title2 })).sort((a, b) => b.term.length - a.term.length);
-    setStatusColumns(chat.scriptstate);
-    ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
-    cards = collectCards(chat);
-  }
-  function renderStatus(text4) {
-    const tags = findStatusTags(text4);
-    if (!tags.length) return text4;
-    armChatClick("status");
-    let out = text4;
-    for (const t of tags) {
-      const list4 = cards.get(t.raw.trim());
-      let extra = "";
-      if (list4?.length) {
-        armChatClick("report");
-        const p2 = cardPalette(currentTheme());
-        extra = list4.map((r) => reportCardHtml(r, p2)).join("");
-      }
-      out = out.replace(t.raw, () => statusHtml(t, ctx) + extra);
-    }
-    return out;
-  }
-  onChatClick("status", async (doc2, x, y) => {
-    const boxes = await elements(doc2, "[data-goei-status]");
-    if (!boxes.length) return "idle";
-    let inside2 = false;
-    for (const b of boxes) if (await hit2(b, x, y)) inside2 = true;
-    const tips = await elements(doc2, "[data-gst-tip]");
-    let hitTip = false;
-    for (const el of tips) {
-      const on2 = inside2 && await hit2(el, x, y);
-      const open3 = await el.hasClass("open").catch(() => false);
-      if (on2 && !open3) {
-        await el.addClass("open");
-        hitTip = true;
-      } else if (open3) await el.removeClass("open");
-      if (on2) hitTip = true;
-    }
-    if (hitTip || !inside2) return hitTip;
-    for (const el of await elements(doc2, "[data-goei-wiki]")) {
-      if (!await hit2(el, x, y)) continue;
-      const name = (await el.textContent().catch(() => "") ?? "").trim();
-      const title2 = ctx.terms.find((t) => t.term === name)?.title;
-      if (title2 && openWiki) openWiki(title2);
-      return true;
-    }
-    return false;
-  });
-  onChatClick("report", async (doc2, x, y) => {
-    const links = await elements(doc2, "[data-goei-rec]");
-    if (!links.length) return "idle";
-    let inside2 = false;
-    for (const el of links) if (await hit2(el, x, y)) inside2 = true;
-    if (!inside2) return false;
-    const ids = new Set([...cards.values()].flat().map((r) => r.id).filter((id2) => /^[A-Za-z0-9_-]+$/.test(id2)));
-    for (const id2 of ids) {
-      for (const el of await elements(doc2, `[data-goei-rec="${id2}"]`)) {
-        if (!await hit2(el, x, y)) continue;
-        if (openRecords) openRecords(id2);
-        return true;
-      }
-    }
-    return true;
-  });
-
-  // src/host/user.ts
-  var USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""><b data-goei-uname>{{user}}</b></span>';
-  var MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", avif: "image/avif" };
-  var cached = { name: "", photo: null };
-  var lastSrc = "";
-  var SRC_KEY = "goei:user-src";
-  var NAME_KEY = "goei:user-name";
-  function toBytes(data3) {
-    if (data3 instanceof Uint8Array) return data3;
-    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
-    if (Array.isArray(data3)) return new Uint8Array(data3);
-    if (data3 && typeof data3 === "object") {
-      const values = Object.values(data3);
-      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
-    }
-    return null;
-  }
-  var unescape = (s8) => s8.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-  function assetPathOf(src) {
-    const sw = src.match(/\/sw\/img\/([0-9a-f]+)/i);
-    if (sw) {
-      const hex3 = sw[1];
-      const bytes = new Uint8Array(hex3.length / 2);
-      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex3.slice(i * 2, i * 2 + 2), 16);
-      const path = new TextDecoder().decode(bytes);
-      return path.startsWith("assets/") ? path : null;
-    }
-    let s8 = src;
-    try {
-      s8 = decodeURIComponent(src);
-    } catch {
-    }
-    const m = s8.replace(/\\/g, "/").match(/(?:^|\/)assets\/([^/?#]+)$/);
-    return m ? `assets/${m[1]}` : null;
-  }
-  async function photoFrom(src) {
-    if (!src) return null;
-    if (src.startsWith("data:")) return src;
-    const path = assetPathOf(src);
-    if (!path) return null;
-    const data3 = await risuai.readImage(path);
-    if (typeof data3 === "string") return data3.startsWith("data:") ? data3 : null;
-    const bytes = toBytes(data3);
-    if (!bytes?.length) return null;
-    const ext = path.split(".").pop()?.toLowerCase() ?? "";
-    return URL.createObjectURL(new Blob([bytes], { type: MIME[ext] ?? "image/png" }));
-  }
-  async function readUser() {
-    let name = cached.name;
-    let photo = cached.photo;
-    try {
-      const doc2 = await risuai.getRootDocument();
-      const box2 = await doc2.querySelector("[data-goei-user]");
-      const html = box2 ? await box2.getInnerHTML() : "";
-      const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
-      if (shownName2 && shownName2 !== "{{user}}") {
-        if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
-        });
-        name = shownName2;
-      }
-      let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
-      if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
-      else if (!src.startsWith("data:")) await risuai.pluginStorage.setItem(SRC_KEY, src).catch(() => {
-      });
-      if (src && src !== lastSrc) {
-        const next = await photoFrom(src);
-        if (next) {
-          if (photo?.startsWith("blob:")) URL.revokeObjectURL(photo);
-          photo = next;
-          lastSrc = src;
-        }
-      }
-    } catch (error) {
-      console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    if (!name) {
-      try {
-        const n2 = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
-        if (n2 && !n2.includes("{{")) name = n2;
-      } catch {
-      }
-    }
-    if (!name) name = String(await risuai.pluginStorage.getItem(NAME_KEY).catch(() => "") ?? "");
-    cached = { name, photo };
-    return cached;
-  }
-  var userInfo = () => cached;
-  var persona = "";
-  async function readPersona() {
-    try {
-      const t = String(await risuai.parseRisuChat("{{persona}}") ?? "").trim();
-      persona = /\{\{\s*persona/i.test(t) ? "" : t;
-    } catch {
-    }
-    return persona;
-  }
-  var personaText = () => persona;
-
-  // src/core/gnetPrompt.ts
-  var REQUIRED_GNET = [
-    "LB",
-    "LB.EXTRA",
-    "EXTENSION.REQUEST",
-    "ACTION.REFRESH",
-    "AUTO.GUIDELINE",
-    "AUTO.FORMAT",
-    "REACT.GUIDELINE",
-    "DM.GUIDELINE",
-    "DM.FORMAT",
-    "INCOMING.GUIDELINE",
-    "DM.REQUEST",
-    "DM.NO-ORIGIN",
-    "TITLE.GUIDELINE",
-    "MAIN_CONTEXT",
-    "PUBLIC.GUIDELINE",
-    "PUBLIC.REACT_FORMAT",
-    "PUBLIC.POST_FORMAT",
-    "ACTIVITY.GUIDELINE",
-    "BOARD.GUIDELINE",
-    "ATTACHMENTS",
-    "INCOMING.COMBINED",
-    "INCOMING.DISABLED",
-    "ACTIVITY.DISABLED"
-  ];
-  var REQUIRED_LB = ["SYSTEM", "OUTPUT", "JAILBREAK", "JOB"];
-  function gnetBooks(src) {
-    const g2 = { ...policySections(src.char.globalLore, "LB Backend"), ...policySections(src.char.globalLore, "GNet") };
-    for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g2[k] === void 0) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
-    applyAdvanced(src.chat.scriptstate);
-    const env3 = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
-    return {
-      language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
-      read(name) {
-        const raw = g2[name] ?? "";
-        return evaluate(raw, env3).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
-      }
-    };
-  }
-  function fmt(template, ...args) {
-    let i = 0;
-    return template.replace(/%s/g, () => args[i++] ?? "");
-  }
-  function fill2(template, values) {
-    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
-  }
-  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
-  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
-  function systemText(b, guideline, format, identity, attachments = false) {
-    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
-    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
-    if (identity) outro += `
-ROLE BINDING (application-owned metadata):
-${JSON.stringify(identity)}`;
-    outro += `
-${b.language}`;
-    return `${intro}
-${outro}${attachments ? `
-
-${b.read("ATTACHMENTS.READ")}` : ""}`;
-  }
-  function pack2(src, b, thoughts, guideline, format, extras2, factionNames3, identity) {
-    const n2 = trimTurns(HISTORY.turns);
-    const story = n2 ? storyText(recentTurns(src.chat, n2, genSettings(src.chat.scriptstate).userMessages)) : "";
-    const t = refToggles(src.chat.scriptstate, "gn");
-    const rows3 = collectRefs(src, {
-      scope: "gnet",
-      text: `${extras2}
-${story}`,
-      description: t.description,
-      authors: t.authors,
-      persona: t.persona,
-      active: t.active,
-      related: t.related && !trimRelated(),
-      secondary: t.secondary && !trimSecondary(),
-      extra: [{ source: "현재 발생 상황", content: b.read("LB.EXTRA") }]
-    });
-    const material2 = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]
-${refText(rows3)}
-[최근 본문]
-${story}
-[현재 작업]
-${extras2}`;
-    const attachments = hasAttachment(material2);
-    const messages = [
-      { role: "system", content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames3) },
-      { role: "user", content: factionCodesToNames(material2, factionNames3) }
-    ];
-    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "gn"), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }) };
-  }
-  function incomingRules(b, plan) {
-    return plan.allowed ? `${b.read("INCOMING.GUIDELINE")}
-${b.read("INCOMING.COMBINED")}` : b.read("INCOMING.DISABLED");
-  }
-  function activityRules(b, posts) {
-    return b.read(posts.length ? "ACTIVITY.GUIDELINE" : "ACTIVITY.DISABLED");
-  }
-  function commentTimeRule(now) {
-    return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ""}. Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.`;
-  }
-  function boardJson(posts) {
-    return JSON.stringify({
-      posts: posts.map((p2) => ({
-        author: p2.nick,
-        id: p2.id,
-        title: p2.title,
-        time: /(\d\d:\d\d)/.exec(p2.date)?.[1] ?? "",
-        date: p2.date,
-        views: p2.views,
-        upvotes: p2.votes,
-        content: p2.body,
-        mine: p2.mine,
-        comments: p2.comments.map((c) => ({ author: c.nick, ...whenField(p2, c), content: c.body, parent: c.parent, mine: c.mine }))
-      }))
-    });
-  }
-  function boardExtras(src, b, write) {
-    const s8 = gnetSettings(src.chat.scriptstate);
-    const parts = [];
-    let format = "";
-    if (s8.keyFigures) {
-      const kept = keyFigures(src.chat.scriptstate);
-      if (kept.length) parts.push(fill2(b.read("KEYFIGURES.PREVIOUS"), { KEYFIGURES: JSON.stringify(kept) }));
-      if (write) {
-        parts.push(b.read("KEYFIGURES"));
-        format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
-      }
-    }
-    if (s8.cons) parts.push(fill2(b.read("CONS.GUIDELINE"), { CONS: consList(src.chat.scriptstate).map((c) => c.name).join(", ") }));
-    return { guideline: parts.filter(Boolean).join("\n\n"), format };
-  }
-  var seed = () => Math.floor(Math.random() * 2147483647).toString(36);
-  function refreshPrompt(src, st, plan, nick, factionNames3) {
-    const s8 = gnetSettings(src.chat.scriptstate);
-    const b = gnetBooks(src);
-    const range = QUANTITY[s8.quantity]?.range ?? "5-7";
-    const guideline = [
-      `${b.read("LB")}
-
-${b.read("BOARD.GUIDELINE")}`,
-      b.read("AUTO.GUIDELINE").replace(/__GN_POST_RANGE__/g, range),
-      `${b.read("ATTACHMENTS")}
-${incomingRules(b, plan)}`
-    ];
-    const ex = boardExtras(src, b, true);
-    if (ex.guideline) guideline.push(ex.guideline);
-    let format = `${b.read("AUTO.FORMAT")}
-${commentTimeRule(dateNow(src.chat))}${ex.format}`;
-    if (s8.sampling) {
-      format += `
-Diversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.
-<x-output-seed-a>${seed()}</x-output-seed-a>
-<x-output-seed-b>${seed()}</x-output-seed-b>`;
-    }
-    const protectedIds = [];
-    const switched = styleSwitched(src.chat.scriptstate);
-    const reference = st.posts.filter((p2, i) => {
-      const prot = protectedPost(s8, p2);
-      if (prot) protectedIds.push(p2.id);
-      return prot || !switched && i < HISTORY.refresh;
-    });
-    const action = b.read("ACTION.REFRESH") + (switched ? ` The board's character has just changed to ${GN_STYLE_NAME[gnetStyle(src.chat.scriptstate)]}: start it as a different community. Any saved posts listed here come from the previous board and are kept only as protected user records; do not continue their topics, threads, handles or tone.` : "");
-    const extras2 = fill2(b.read("EXTENSION.REQUEST"), {
-      TIME: dateNow(src.chat),
-      USER_NICK: nick,
-      KEEP_OWN: String(s8.keepOwn),
-      KEEP_REPLIED: String(s8.keepReplied),
-      PROTECTED: protectedIds.join(","),
-      POST_LIMIT: String(postLimit(s8)),
-      NEXT_ID: String(st.seq || 1e5),
-      ACTION: action,
-      BOARD: boardJson(reference)
-    }) + incomingTask(plan);
-    return pack2(src, b, "THOUGHTS.REFRESH", guideline.join("\n\n"), format, extras2, factionNames3);
-  }
-  function postPrompt(src, st, input3, plan, factionNames3) {
-    const b = gnetBooks(src);
-    const activity = activityContext(st, null);
-    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("TITLE.GUIDELINE"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join("\n\n");
-    const extras2 = input3 + incomingTask(plan, activity.posts);
-    return { ...pack2(src, b, "THOUGHTS.ACTION", guideline, `${b.read("PUBLIC.POST_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames3), activity };
-  }
-  function commentPrompt(src, st, postId2, replyTo, body5, plan, nick, factionNames3, action = `The protagonist publicly commented: ${body5}`) {
-    const b = gnetBooks(src);
-    const p2 = findPost(st, postId2);
-    if (!p2) throw new GnetError("대상 글이 없어졌어요.");
-    const limit = replyTo > 0 ? HISTORY.comment : HISTORY.post;
-    const total = p2.comments.length;
-    const selected = /* @__PURE__ */ new Set();
-    for (let i = Math.max(1, total - limit + 1); i <= total; i++) selected.add(i);
-    if (replyTo > 0) selected.add(replyTo);
-    for (const i of [...selected]) {
-      let n2 = i;
-      const seen2 = /* @__PURE__ */ new Set();
-      while (p2.comments[n2 - 1] && !seen2.has(n2)) {
-        seen2.add(n2);
-        selected.add(n2);
-        n2 = p2.comments[n2 - 1].parent;
-      }
-    }
-    const comments = p2.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
-    const task = JSON.stringify({
-      post: { id: p2.id, author: p2.nick, title: p2.title, content: p2.body },
-      comments,
-      commentCount: total,
-      replyTo,
-      action,
-      userHandle: nick
-    });
-    const activity = activityContext(st, p2.id);
-    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join("\n\n");
-    const extras2 = task + incomingTask(plan, activity.posts);
-    return { ...pack2(src, b, "THOUGHTS.ACTION", guideline, `${b.read("PUBLIC.REACT_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames3), activity, supplied: selected, total };
-  }
-  var POST_REFRESH_ACTION = "Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.";
-  function publicBoard(st, query) {
-    const ranked = st.posts.map((p2, i) => ({ p: p2, i, hit: !!p2.title && query.includes(p2.title) || new RegExp(`#${p2.id}(?![\\d.])`).test(query) }));
-    ranked.sort((a, b) => a.hit !== b.hit ? a.hit ? -1 : 1 : a.i - b.i);
-    const rows3 = [];
-    let used = 0;
-    const cap = 6e3;
-    for (const { p: p2 } of ranked) {
-      if (rows3.length >= 8) break;
-      const comments = p2.comments.slice(-12).map((c, j, arr) => ({ id: p2.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row9 = { id: p2.id, title: p2.title, author: p2.nick, date: p2.date, content: trimTokens(p2.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row9).length > (cap - used) * 2 && row9.comments.length) row9.comments.shift();
-      const n2 = Math.ceil(JSON.stringify(row9).length / 2);
-      if (used + n2 <= cap) {
-        rows3.push(row9);
-        used += n2;
-      }
-    }
-    if (!rows3.length) return null;
-    return {
-      access: "Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.",
-      posts: rows3
-    };
-  }
-  function dmPrompt(src, st, nick, latest, userHandle, factionNames3) {
-    const b = gnetBooks(src);
-    const source5 = st.sources[nick];
-    let anchor = b.read("DM.NO-ORIGIN");
-    if (source5) {
-      anchor = [
-        `Original forum post #${source5.postid} (preserved at first contact):`,
-        `Title: ${source5.title}`,
-        `Posted by: ${source5.author}`,
-        `Post text: ${source5.body}`,
-        source5.quote ? `Referenced public comment — author: ${source5.quoteAuthor.trim() || "[not retained; do not attribute to the contact]"}
-${source5.quote}` : ""
-      ].join("\n");
-    }
-    const lines3 = [];
-    for (let i = st.dms.length - 1; i >= 0 && lines3.length < HISTORY.dmHistory; i--) {
-      const d = st.dms[i];
-      if (d.nick !== nick) continue;
-      lines3.unshift({
-        speaker: d.side === "me" ? "user" : "npc_correspondent",
-        handle: d.side === "me" ? userHandle : nick,
-        date: d.date,
-        content: d.side === "me" ? d.body : trimTokens(d.body, LIMITS.history_tokens)
-      });
-    }
-    let task = `Current story time: ${dateNow(src.chat)}
-${fill2(b.read("DM.REQUEST"), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines3) })}`;
-    const pub = publicBoard(st, `${latest}
-${anchor}`);
-    if (pub) task += `
-PUBLIC BOARD REFERENCE:
-${JSON.stringify(pub)}`;
-    const identity = { speaker: { role: "npc_correspondent", handle: nick }, owner: { role: "user", handle: userHandle, personaName: "주인공", referenceOnly: true } };
-    return pack2(src, b, "THOUGHTS.DM", `${b.read("DM.GUIDELINE")}
-
-${b.read("ATTACHMENTS")}`, b.read("DM.FORMAT"), task, factionNames3, identity);
-  }
-  function retryMessages(prompt, raw, error) {
-    return [
-      ...prompt.messages,
-      { role: "assistant", content: raw },
-      {
-        role: "user",
-        content: `<system>
-Validation error!
-Your previous output did not adhere to the required format, or contained invalid data.
-Error message: ${error}
-Please fix your last output into correct structure as previously instructed, while keeping the data intact.
-${RETRY_ANALYZE}
-</system>`
-      }
-    ];
-  }
-  function mainContextRules(src) {
-    const g2 = policySections(src.char.globalLore, "GNet");
-    return g2.MAIN_CONTEXT?.trim() || null;
-  }
-
-  // src/core/request.ts
-  function userTurns(chat) {
-    let n2 = 0;
-    let prev = "";
-    for (const m of chat.message ?? []) {
-      if (m.role === "user" && prev !== "user") n2++;
-      prev = m.role;
-    }
-    return n2;
-  }
-  function shouldKeepSeed(chat) {
-    return userTurns(chat) < 2;
-  }
-  function processRequest(messages, chat) {
-    const keep = shouldKeepSeed(chat);
-    let changed = false;
-    const out = messages.map((m) => {
-      if (typeof m.content !== "string" || !m.content.includes(SEED_OPEN)) return m;
-      changed = true;
-      return { ...m, content: applySeedLifetime(m.content, keep) };
-    });
-    return { messages: out, changed };
-  }
-  function unwrapScenes(messages) {
-    if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) re
+      else if (r.idx > list4[0].idx) map.set(r.statusKe

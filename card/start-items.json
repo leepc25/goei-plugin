@@ -5,20 +5,23 @@
    "use": true,
    "equip": "weapon",
    "desc": "제식 권총",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   },
   {
    "name": "검은 장갑",
    "equip": "gear",
    "desc": "브리핑 중에도 만지작거리는 검은 장갑",
-   "icon": "glove"
+   "icon": "glove",
+   "weight": 0.1
   },
   {
    "name": "담배",
    "use": true,
    "uses": 20,
    "desc": "한 갑",
-   "icon": "cigarette"
+   "icon": "cigarette",
+   "weight": 0.001
   }
  ],
  "스팡달": [
@@ -27,7 +30,8 @@
    "use": true,
    "equip": "weapon",
    "desc": "일상 작전용 권총",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   }
  ],
  "잼트리": [
@@ -35,14 +39,16 @@
    "name": "태블릿",
    "use": true,
    "desc": "업무용 태블릿",
-   "icon": "tablet"
+   "icon": "tablet",
+   "weight": 0.5
   },
   {
    "name": "연유 커피",
    "use": true,
    "uses": 3,
    "desc": "건물 모두가 인정하는 연유 커피",
-   "icon": "coffee"
+   "icon": "coffee",
+   "weight": 0.3
   }
  ],
  "에일린": [
@@ -51,20 +57,23 @@
    "use": true,
    "equip": "weapon",
    "desc": "홀스터에 꽂은 권총, 늘 손질함",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   },
   {
    "name": "소총",
    "use": true,
    "equip": "weapon",
    "desc": "점검 끝내고 어깨에 멘 소총",
-   "icon": "rifle"
+   "icon": "rifle",
+   "weight": 3.5
   },
   {
    "name": "방탄조끼",
    "equip": "gear",
    "desc": "정장 위에 걸친 방탄조끼",
-   "icon": "ballistic vest"
+   "icon": "ballistic vest",
+   "weight": 4
   }
  ],
  "고르고디오": [
@@ -73,7 +82,8 @@
    "use": true,
    "equip": "weapon",
    "desc": "재킷 안에 숨긴 넓적한 칼, 갑옷 부를 정도가 아닌 싸움용",
-   "icon": "cleaver"
+   "icon": "cleaver",
+   "weight": 0.6
   }
  ],
  "큐라스": [
@@ -81,7 +91,8 @@
    "name": "오토바이 헬멧",
    "equip": "gear",
    "desc": "출동 때 쓰는 헬멧",
-   "icon": "motorcycle helmet"
+   "icon": "motorcycle helmet",
+   "weight": 1.5
   }
  ],
  "데드폴": [
@@ -90,20 +101,23 @@
    "equip": "gear",
    "desc": "관리국 방검 정장",
    "effect": "칼날에 찢기지 않고, 몸이 상해도 모양을 유지",
-   "icon": "anti-tear suit"
+   "icon": "anti-tear suit",
+   "weight": 2
   },
   {
    "name": "방검 장갑",
    "equip": "gear",
    "desc": "칼날·거친 물건을 잡는 검은 장갑",
-   "icon": "cut-resistant glove"
+   "icon": "cut-resistant glove",
+   "weight": 0.2
   },
   {
    "name": "권총",
    "use": true,
    "equip": "weapon",
    "desc": "순식간에 뽑는 권총",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   }
  ],
  "게슈간": [
@@ -111,7 +125,8 @@
    "name": "큐브",
    "use": true,
    "desc": "한 손에 들고 다니는 큐브",
-   "icon": "cube"
+   "icon": "cube",
+   "weight": 0.5
   }
  ],
  "로제몬": [
@@ -119,14 +134,16 @@
    "name": "기본 지급품",
    "use": true,
    "desc": "뜯지도 않은 기본 지급품",
-   "icon": "kit"
+   "icon": "kit",
+   "weight": 1.5
   },
   {
    "name": "간식",
    "use": true,
    "uses": 3,
    "desc": "챙겨 다니는 간식",
-   "icon": "snack"
+   "icon": "snack",
+   "weight": 0.1
   }
  ],
  "고그니쟈": [
@@ -134,13 +151,15 @@
    "name": "실험 가운",
    "equip": "gear",
    "desc": "요원 복장 위에 걸친 실험 가운",
-   "icon": "lab coat"
+   "icon": "lab coat",
+   "weight": 0.5
   },
   {
    "name": "고글",
    "equip": "gear",
    "desc": "둥근 고글",
-   "icon": "goggles"
+   "icon": "goggles",
+   "weight": 0.1
   }
  ],
  "데쥬레": [
@@ -148,13 +167,15 @@
    "name": "격리 시설 출입증",
    "use": true,
    "desc": "본인도 무서워하는 격리 시설 출입증",
-   "icon": "access card"
+   "icon": "access card",
+   "weight": 0.01
   },
   {
    "name": "실험 장비",
    "use": true,
    "desc": "휴대용 실험 장비",
-   "icon": "beaker"
+   "icon": "beaker",
+   "weight": 2
   }
  ],
  "이도형": [
@@ -163,21 +184,24 @@
    "use": true,
    "equip": "weapon",
    "desc": "허리에 찬 긴 일본도",
-   "icon": "katana"
+   "icon": "katana",
+   "weight": 1.2
   },
   {
    "name": "햄스터 방술 정장",
    "equip": "gear",
    "desc": "안감에 붕대로 싼 햄스터를 줄줄이 꿰맨 정장",
    "effect": "저주·술법을 햄스터가 대신 받음",
-   "icon": "suit"
+   "icon": "suit",
+   "weight": 3
   },
   {
    "name": "담배",
    "use": true,
    "uses": 20,
    "desc": "한 갑",
-   "icon": "cigarette"
+   "icon": "cigarette",
+   "weight": 0.001
   }
  ],
  "고영훈": [
@@ -186,13 +210,15 @@
    "use": true,
    "equip": "weapon",
    "desc": "허리에 찬 검은 일본도",
-   "icon": "katana"
+   "icon": "katana",
+   "weight": 1.2
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "추적 결과를 보고 추격 경로를 나누는 요원 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   }
  ],
  "노기균": [
@@ -201,13 +227,15 @@
    "use": true,
    "equip": "weapon",
    "desc": "검사부대 지급 검은 일본도",
-   "icon": "katana"
+   "icon": "katana",
+   "weight": 1.2
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "요원에게 지급되는 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   }
  ],
  "송주익": [
@@ -216,62 +244,39 @@
    "use": true,
    "equip": "weapon",
    "desc": "개인 검은 일본도",
-   "icon": "katana"
+   "icon": "katana",
+   "weight": 1.2
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "요원에게 지급되는 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   },
   {
    "name": "햄스터 돌봄 용품",
    "use": true,
    "desc": "막내 몫으로 맡아 둔 햄스터 용품",
-   "icon": "hamster"
+   "icon": "hamster",
+   "weight": 1
   }
  ],
  "곽성주": [
   {
-   "name": "오른손 중기관총",
+   "name": "중기관총",
    "use": true,
    "equip": "weapon",
-   "desc": "한 손에 하나씩 드는 중기관총",
-   "icon": "heavy machine gun"
-  },
-  {
-   "name": "왼손 중기관총",
-   "use": true,
-   "equip": "weapon",
-   "desc": "두 번째 중기관총",
-   "icon": "heavy machine gun"
+   "desc": "한 손으로 드는 중기관총",
+   "icon": "heavy machine gun",
+   "weight": 12
   },
   {
    "name": "강철 판금 갑옷",
    "equip": "gear",
    "desc": "정장 위에 볼트로 조인 전신 강철판",
-   "icon": "plate armor"
-  },
-  {
-   "name": "탄띠",
-   "equip": "gear",
-   "desc": "갑옷에 두른 탄띠",
-   "icon": "ammo belt"
-  },
-  {
-   "name": "확성기",
-   "use": true,
-   "desc": "전장에서 명령을 외칠 때 쓰는 확성기",
-   "icon": "megaphone"
-  },
-  {
-   "name": "판처파우스트",
-   "use": true,
-   "uses": 3,
-   "equip": "weapon",
-   "wear": false,
-   "desc": "장갑차를 부수는 일회용 대전차포",
-   "icon": "rocket launcher"
+   "icon": "plate armor",
+   "weight": 25
   }
  ],
  "윤병수": [
@@ -280,7 +285,8 @@
    "use": true,
    "equip": "weapon",
    "desc": "첫 출동에도 그냥 들고 가는 화염방사기",
-   "icon": "flamethrower"
+   "icon": "flamethrower",
+   "weight": 20
   },
   {
    "name": "수류탄",
@@ -289,20 +295,23 @@
    "equip": "weapon",
    "wear": false,
    "desc": "초동 대응에 아무렇지 않게 들고 나가는 수류탄",
-   "icon": "grenade"
+   "icon": "grenade",
+   "weight": 0.4
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "요원에게 지급되는 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   },
   {
    "name": "담배",
    "use": true,
    "uses": 20,
    "desc": "한 갑",
-   "icon": "cigarette"
+   "icon": "cigarette",
+   "weight": 0.001
   }
  ],
  "김성진": [
@@ -311,13 +320,15 @@
    "use": true,
    "equip": "weapon",
    "desc": "요원 권총",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "요원에게 지급되는 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   }
  ],
  "송진섭": [
@@ -326,7 +337,8 @@
    "use": true,
    "equip": "weapon",
    "desc": "말다툼 중에도 깔끔하게 쏘는 요원 권총",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 0.9
   },
   {
    "name": "자폭 조끼",
@@ -335,19 +347,22 @@
    "equip": "gear",
    "desc": "지급품으로 숨겨 입은 자폭 조끼",
    "effect": "붙잡히느니 터짐",
-   "icon": "suicide vest"
+   "icon": "suicide vest",
+   "weight": 5
   },
   {
    "name": "팀 레이더",
    "use": true,
    "desc": "신입 7팀의 레이더와 길 찾기를 맡는 장비",
-   "icon": "radar"
+   "icon": "radar",
+   "weight": 1
   },
   {
    "name": "요원 단말기",
    "use": true,
    "desc": "요원에게 지급되는 단말기",
-   "icon": "agent terminal"
+   "icon": "agent terminal",
+   "weight": 0.3
   }
  ],
  "이기석": [
@@ -355,13 +370,15 @@
    "name": "의수",
    "equip": "gear",
    "desc": "괴이에게 잃은 팔 대신 단 의수, 가끔 빠짐",
-   "icon": "prosthetic arm"
+   "icon": "prosthetic arm",
+   "weight": 2
   },
   {
    "name": "스탠드 마이크",
    "use": true,
    "desc": "무대용 마이크",
-   "icon": "stand microphone"
+   "icon": "stand microphone",
+   "weight": 3
   }
  ],
  "김조학": [
@@ -369,7 +386,8 @@
    "name": "노트북",
    "use": true,
    "desc": "감시용 노트북",
-   "icon": "laptop"
+   "icon": "laptop",
+   "weight": 1.5
   }
  ],
  "백석주": [
@@ -379,21 +397,30 @@
    "equip": "gear",
    "desc": "동료들이 대놓고 부러워하는 개인 재생 장비",
    "effect": "살을 되감아 상처를 되돌림",
-   "icon": "ring"
+   "icon": "ring",
+   "weight": 0.01
   },
   {
-   "name": "황금 청둥오리",
+   "name": "금빛 청둥오리 가면",
    "equip": "gear",
-   "desc": "얼굴을 가리는 금빛 청둥오리 가면",
-   "icon": "duck"
+   "desc": "눈을 가리는 금빛 청둥오리 가면",
+   "icon": "mallard mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "진나솔": [
   {
    "name": "금빛 나비 가면",
    "equip": "gear",
-   "desc": "얼굴을 가리는 금빛 나비 가면",
-   "icon": "butterfly mask"
+   "desc": "눈을 가리는 금빛 나비 가면",
+   "icon": "butterfly mask",
+   "weight": 0.3
   },
   {
    "name": "네일아트 손톱",
@@ -401,15 +428,29 @@
    "equip": "weapon",
    "desc": "떼어 내는 네일아트 손톱. 대표 무기",
    "effect": "거의 끝없는 투명 실이 나와 쏘고, 걸고, 매달리고, 자름",
-   "icon": "nail"
+   "icon": "nail",
+   "weight": 0.01
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "이성해": [
   {
    "name": "금빛 돌고래 가면",
    "equip": "gear",
-   "desc": "얼굴을 가리는 금빛 돌고래 가면",
-   "icon": "dolphin mask"
+   "desc": "눈을 가리는 금빛 돌고래 가면",
+   "icon": "dolphin mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "이자헌": [
@@ -418,7 +459,21 @@
    "use": true,
    "desc": "맞춤 제작한 버터나이프",
    "effect": "괴이 입구 매개를 갈라 작은 물건을 경계 너머로 넘김",
-   "icon": "butter knife"
+   "icon": "butter knife",
+   "weight": 0.1
+  },
+  {
+   "name": "도마뱀 가면",
+   "equip": "gear",
+   "desc": "눈을 가리는 도마뱀 가면",
+   "icon": "lizard mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "은하제": [
@@ -427,14 +482,16 @@
    "use": true,
    "desc": "폰에 꽂는 보조배터리",
    "effect": "괴이 안에서도 통화가 됨",
-   "icon": "power bank"
+   "icon": "power bank",
+   "weight": 0.2
   },
   {
    "name": "보이지 않는 사슬 수갑",
    "use": true,
    "desc": "보이지 않는 사슬로 이은 수갑",
    "effect": "찬 사람들을 일정 거리 안에 묶어 둠",
-   "icon": "handcuffs"
+   "icon": "handcuffs",
+   "weight": 0.3
   },
   {
    "name": "변장 구슬",
@@ -442,14 +499,29 @@
    "uses": 1,
    "desc": "유리 구슬",
    "effect": "삼키면 몸까지 완전히 변장",
-   "icon": "glass bead"
+   "icon": "glass bead",
+   "weight": 0.01
   },
   {
    "name": "담배",
    "use": true,
    "uses": 20,
    "desc": "늘 주머니에",
-   "icon": "cigarette"
+   "icon": "cigarette",
+   "weight": 0.001
+  },
+  {
+   "name": "송골매 가면",
+   "equip": "gear",
+   "desc": "눈을 가리는 송골매 가면",
+   "icon": "falcon mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "박민성": [
@@ -459,21 +531,30 @@
    "equip": "gear",
    "desc": "머리와 어깨에 두르는 천",
    "effect": "잠시 주변 무리와 같은 모습으로 보이게 함",
-   "icon": "scarf"
+   "icon": "scarf",
+   "weight": 0.3
   },
   {
    "name": "오소리 가면",
    "equip": "gear",
-   "desc": "얼굴을 가리는 오소리 가면",
-   "icon": "badger mask"
+   "desc": "눈을 가리는 오소리 가면",
+   "icon": "badger mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "백사헌": [
   {
    "name": "염소 가면",
    "equip": "gear",
-   "desc": "얼굴을 가리는 염소 가면",
-   "icon": "goat mask"
+   "desc": "눈을 가리는 염소 가면",
+   "icon": "goat mask",
+   "weight": 0.3
   },
   {
    "name": "역안 장치",
@@ -481,14 +562,16 @@
    "equip": "gear",
    "desc": "보라색 의안 자리, 늘 쓰는 의료용 안대 밑",
    "effect": "안대를 들면 위협이 색 후광으로 보임. 뜨거운 색일수록 치명적",
-   "icon": "eye patch"
+   "icon": "eye patch",
+   "weight": 0.05
   },
   {
    "name": "소리 막는 귀마개",
    "use": true,
    "desc": "숨겨 둔 귀마개. 값어치가 있으면 나눠 줌",
    "effect": "소리를 막음",
-   "icon": "earplug"
+   "icon": "earplug",
+   "weight": 0.01
   },
   {
    "name": "문틈 방음 밀봉재",
@@ -496,7 +579,14 @@
    "uses": 3,
    "desc": "문틈에 붙이는 작은 방음 밀봉재",
    "effect": "문틈으로 새는 소리를 막음",
-   "icon": "sealant"
+   "icon": "sealant",
+   "weight": 0.01
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "고영은": [
@@ -504,21 +594,30 @@
    "name": "산양 가면",
    "equip": "gear",
    "desc": "어색한 표정 위에 쓴 산양 가면",
-   "icon": "goat mask"
+   "icon": "goat mask",
+   "weight": 0.3
   },
   {
    "name": "헤드랜턴",
    "use": true,
    "equip": "gear",
    "desc": "늘 손질하는 고출력 헤드랜턴",
-   "icon": "headlamp"
+   "icon": "headlamp",
+   "weight": 0.2
   },
   {
    "name": "구급상자",
    "use": true,
    "uses": 5,
    "desc": "늘 다시 채워 두는 구급상자",
-   "icon": "first aid kit"
+   "icon": "first aid kit",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "강이학": [
@@ -526,13 +625,21 @@
    "name": "조랑말 가면",
    "equip": "gear",
    "desc": "사진발 좋게 관리하는 조랑말 가면",
-   "icon": "pony mask"
+   "icon": "pony mask",
+   "weight": 0.3
   },
   {
    "name": "괴이 화폐 지갑",
    "use": true,
    "desc": "괴이마다 모은 동전꼴 화폐를 담는 지갑",
-   "icon": "coin purse"
+   "icon": "coin purse",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "장허운": [
@@ -540,7 +647,14 @@
    "name": "소 가면",
    "equip": "gear",
    "desc": "사무실에서도 쓰는 지급 가면",
-   "icon": "cow mask"
+   "icon": "cow mask",
+   "weight": 0.3
+  },
+  {
+   "name": "빈 꿈결 수집기",
+   "desc": "괴담을 빠져나오거나 끝내면 꿈결로 차는 주사기 모양 눈금 실린더",
+   "icon": "dream collector",
+   "weight": 0.2
   }
  ],
  "곽제강": [
@@ -548,19 +662,22 @@
    "name": "실험 가운",
    "equip": "gear",
    "desc": "사무복 위에 걸친 흰 실험 가운",
-   "icon": "lab coat"
+   "icon": "lab coat",
+   "weight": 0.5
   },
   {
    "name": "펜",
    "use": true,
    "desc": "어디서 났는지 모를 펜",
-   "icon": "pen"
+   "icon": "pen",
+   "weight": 0.01
   },
   {
    "name": "남의 공책",
    "use": true,
    "desc": "남의 공책",
-   "icon": "notebook"
+   "icon": "notebook",
+   "weight": 0.2
   }
  ],
  "이연화": [
@@ -568,7 +685,8 @@
    "name": "연구원 가운",
    "equip": "gear",
    "desc": "늘 단정한 흰 연구원 가운",
-   "icon": "lab coat"
+   "icon": "lab coat",
+   "weight": 0.5
   }
  ],
  "제이": [
@@ -576,13 +694,15 @@
    "name": "경비원 제복",
    "equip": "gear",
    "desc": "낡은 경비 제복",
-   "icon": "guard uniform"
+   "icon": "guard uniform",
+   "weight": 1
   },
   {
    "name": "치과 마스크",
    "equip": "gear",
    "desc": "밖에서 쓰는 평범한 치과 마스크",
-   "icon": "mask"
+   "icon": "mask",
+   "weight": 0.005
   }
  ],
  "차여진": [
@@ -590,19 +710,22 @@
    "name": "휴대폰",
    "use": true,
    "desc": "협회 등록 폰",
-   "icon": "phone"
+   "icon": "phone",
+   "weight": 0.2
   },
   {
    "name": "두 번째 휴대폰",
    "use": true,
    "desc": "브로커 연락용, 등록 안 된 폰",
-   "icon": "phone"
+   "icon": "phone",
+   "weight": 0.2
   },
   {
    "name": "가죽 수첩",
    "use": true,
    "desc": "프리랜서별 셈을 본인만 읽는 약식으로 적은 수첩",
-   "icon": "leather notebook"
+   "icon": "leather notebook",
+   "weight": 0.2
   }
  ],
  "서윤지": [
@@ -610,13 +733,15 @@
    "name": "색인 수첩",
    "use": true,
    "desc": "자기 책임을 지키고 위반을 적어 두는 색인 가죽 수첩",
-   "icon": "notebook"
+   "icon": "notebook",
+   "weight": 0.2
   },
   {
    "name": "전자시계",
    "equip": "gear",
    "desc": "건물 시계에 맞춘 무음 전자시계",
-   "icon": "digital watch"
+   "icon": "digital watch",
+   "weight": 0.05
   }
  ],
  "고연지": [
@@ -624,7 +749,8 @@
    "name": "의사 가운",
    "equip": "gear",
    "desc": "가슴 주머니에 성이 수놓인 흰 가운",
-   "icon": "doctor coat"
+   "icon": "doctor coat",
+   "weight": 0.5
   }
  ],
  "윤지아": [
@@ -632,27 +758,31 @@
    "name": "간호복",
    "equip": "gear",
    "desc": "늘 깨끗한 흰 반소매 간호복",
-   "icon": "nurse uniform"
+   "icon": "nurse uniform",
+   "weight": 0.3
   },
   {
    "name": "힙색",
    "equip": "gear",
    "desc": "붕대·사탕·비상 간식을 넣은 작은 힙색",
-   "icon": "hip pouch"
+   "icon": "hip pouch",
+   "weight": 0.3
   },
   {
    "name": "붕대",
    "use": true,
    "uses": 5,
    "desc": "허리 주머니에 챙겨 다니는 붕대",
-   "icon": "bandage"
+   "icon": "bandage",
+   "weight": 0.05
   },
   {
    "name": "사탕",
    "use": true,
    "uses": 5,
    "desc": "배고픈 사람에게 몰래 나눠 주는 포장 사탕",
-   "icon": "candy"
+   "icon": "candy",
+   "weight": 0.005
   }
  ],
  "마덕희": [
@@ -660,19 +790,22 @@
    "name": "금팔찌",
    "equip": "gear",
    "desc": "가는 금팔찌",
-   "icon": "bracelet"
+   "icon": "bracelet",
+   "weight": 0.02
   },
   {
    "name": "반지",
    "equip": "gear",
    "desc": "민무늬 반지 두 개",
-   "icon": "ring"
+   "icon": "ring",
+   "weight": 0.01
   },
   {
    "name": "돋보기 안경",
    "equip": "gear",
    "desc": "가슴 주머니에 건 가는 돋보기 안경",
-   "icon": "reading glasses"
+   "icon": "reading glasses",
+   "weight": 0.03
   }
  ],
  "문혜란": [
@@ -681,38 +814,44 @@
    "use": true,
    "equip": "weapon",
    "desc": "허리 뒤에 찬 짧은 접이식 경찰봉",
-   "icon": "baton"
+   "icon": "baton",
+   "weight": 0.6
   },
   {
    "name": "타짜 카드",
    "use": true,
    "desc": "표시해 둔 카드 한 벌",
-   "icon": "playing cards"
+   "icon": "playing cards",
+   "weight": 0.1
   },
   {
    "name": "대포폰",
    "use": true,
    "desc": "색이 다른 대포폰 세 대",
-   "icon": "phone"
+   "icon": "phone",
+   "weight": 0.6
   },
   {
    "name": "가죽 장부",
    "use": true,
    "desc": "두꺼운 가죽 장부",
-   "icon": "ledger"
+   "icon": "ledger",
+   "weight": 1
   },
   {
    "name": "금빛 손목시계",
    "equip": "gear",
    "desc": "묵직한 금빛 손목시계",
-   "icon": "wristwatch"
+   "icon": "wristwatch",
+   "weight": 0.15
   },
   {
    "name": "비상용 야구방망이",
    "use": true,
    "equip": "weapon",
    "desc": "가게 계산대 뒤에 둔 비상용 야구방망이",
-   "icon": "baseball bat"
+   "icon": "baseball bat",
+   "weight": 1
   }
  ],
  "신유리": [
@@ -721,19 +860,22 @@
    "use": true,
    "equip": "weapon",
    "desc": "허리 뒤 칼집에 꽂은 짧은 고정날 칼",
-   "icon": "knife"
+   "icon": "knife",
+   "weight": 0.3
   },
   {
    "name": "가죽 재킷",
    "equip": "gear",
    "desc": "어두운 회색 티셔츠 위에 입은 검은 가죽 재킷",
-   "icon": "leather jacket"
+   "icon": "leather jacket",
+   "weight": 1.5
   },
   {
    "name": "안전화",
    "equip": "gear",
    "desc": "쇠코 부츠",
-   "icon": "boots"
+   "icon": "boots",
+   "weight": 1.5
   }
  ],
  "블라렛": [
@@ -742,7 +884,8 @@
    "use": true,
    "equip": "weapon",
    "desc": "은탄을 넣은 권총 두 자루",
-   "icon": "pistol"
+   "icon": "pistol",
+   "weight": 2
   },
   {
    "name": "은 말뚝",
@@ -750,31 +893,36 @@
    "uses": 3,
    "equip": "weapon",
    "desc": "허벅지 아래에 찬 은 말뚝",
-   "icon": "stake"
+   "icon": "stake",
+   "weight": 0.5
   },
   {
    "name": "전투 수녀복",
    "equip": "gear",
    "desc": "옆트임을 낸 수녀복과 베일",
-   "icon": "nun habit"
+   "icon": "nun habit",
+   "weight": 1.5
   },
   {
    "name": "가터벨트 권총집",
    "equip": "gear",
    "desc": "은탄 권총 두 자루를 차는 검은 가터벨트 권총집",
-   "icon": "holster"
+   "icon": "holster",
+   "weight": 0.3
   },
   {
    "name": "은 십자가",
    "equip": "gear",
    "desc": "굵은 사슬에 건 묵직한 은 십자가",
-   "icon": "crucifix"
+   "icon": "crucifix",
+   "weight": 0.5
   },
   {
    "name": "묵주",
    "equip": "gear",
    "desc": "손목에 감은 나무 묵주",
-   "icon": "rosary"
+   "icon": "rosary",
+   "weight": 0.05
   },
   {
    "name": "손바닥만 한 십자가",
@@ -783,7 +931,8 @@
    "wear": false,
    "desc": "쉬는 날 망치처럼 휘두르는 십자가",
    "effect": "성검을 뽑아낼 수 있음",
-   "icon": "cross"
+   "icon": "cross",
+   "weight": 0.3
   }
  ],
  "살라딘": [
@@ -792,20 +941,23 @@
    "use": true,
    "equip": "weapon",
    "desc": "허리에 찬 시미터",
-   "icon": "scimitar"
+   "icon": "scimitar",
+   "weight": 1.5
   },
   {
    "name": "AK-47",
    "use": true,
    "equip": "weapon",
    "desc": "등에 멘 돌격소총",
-   "icon": "assault rifle"
+   "icon": "assault rifle",
+   "weight": 4
   },
   {
    "name": "터번",
    "equip": "gear",
    "desc": "흰 터번",
-   "icon": "turban"
+   "icon": "turban",
+   "weight": 0.3
   },
   {
    "name": "폭약",
@@ -814,13 +966,15 @@
    "equip": "weapon",
    "wear": false,
    "desc": "가슴에 두른 폭약",
-   "icon": "explosive"
+   "icon": "explosive",
+   "weight": 1
   },
   {
    "name": "탄약 주머니",
    "equip": "gear",
    "desc": "가슴에 두른 탄약 주머니",
-   "icon": "ammo pouch"
+   "icon": "ammo pouch",
+   "weight": 2
   },
   {
    "name": "RPG",
@@ -829,7 +983,8 @@
    "equip": "weapon",
    "wear": false,
    "desc": "큰 적에게 바꿔 드는 로켓포",
-   "icon": "rocket launcher"
+   "icon": "rocket launcher",
+   "weight": 7
   }
  ],
  "아벤샤": [
@@ -837,7 +992,8 @@
    "name": "마녀 망토",
    "equip": "gear",
    "desc": "큰 에메랄드 걸쇠로 여민 짙은 보라 두건 망토",
-   "icon": "witch cloak"
+   "icon": "witch cloak",
+   "weight": 1.5
   },
   {
    "name": "연금술 약",
@@ -845,7 +1001,8 @@
    "uses": 3,
    "desc": "화학과 마술을 섞어 지은 약·영약·독",
    "effect": "재료 질에 따라 효력과 안전이 달라짐",
-   "icon": "potion"
+   "icon": "potion",
+   "weight": 0.2
   }
  ],
  "브라우니": [
@@ -853,7 +1010,8 @@
    "name": "쇼 호스트 장갑",
    "equip": "gear",
    "desc": "검은 쇼 호스트 장갑",
-   "icon": "glove"
+   "icon": "glove",
+   "weight": 0.1
   }
  ]
 }
