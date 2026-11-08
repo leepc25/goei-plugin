@@ -198,6 +198,8 @@ async function openFrom(browser, vp, base) {
   page.on('dialog', (d) => { errors.push(`(대화상자 ${d.type()}) ${d.message()}`); d.accept().catch(() => {}); });
   page.on('filechooser', () => {});
   T('boot');
+  // 가짜 모델: 따로 넣은 답이 없을 때 진열대 요청(상점·쇼핑몰)에는 진열대를 돌려준다 → 쇼핑몰 물건이 깔린 뒤 화면까지 누른다
+  await page.evaluate((shelf) => { const q = []; window.__llm = new Proxy(q, { get(t, p) { if (p === 'shift') return () => { if (t.length) return t.shift(); const s = JSON.stringify((window.__calls.llm || []).at(-1) || '').slice(-80000); return /<shelf>/.test(s) ? { type: 'success', result: shelf } : undefined; }; return Reflect.get(t, p); } }); }, SHELF);
   await openWin(page);
   T('openWin');
   await settle(page);
