@@ -25,11 +25,14 @@ function timeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
 /** 마지막으로 실패한 까닭들 (화면 오류 문구·측정용) */
 export const fetchLog: string[] = [];
 
-export async function getBytes(name: string): Promise<Uint8Array> {
-  if (!GAME_BASE) throw new GameFileError('받을 곳이 정해지지 않았어요. 파일로 넣어 주세요.');
+export const getBytes = (name: string) => getBytesFrom(GAME_BASE, name);
+
+/** base 폴더(release/game · release/vs)에서 받기 */
+export async function getBytesFrom(base: string, name: string): Promise<Uint8Array> {
+  if (!base) throw new GameFileError('받을 곳이 정해지지 않았어요. 파일로 넣어 주세요.');
   const why: string[] = [];
   for (let attempt = 1; attempt <= TRIES; attempt++) {
-    const url = `${GAME_BASE}/${name}?t=${Date.now()}`;
+    const url = `${base}/${name}?t=${Date.now()}`;
     const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
     if (legacy) {
       try {
@@ -68,10 +71,10 @@ function count(b: Uint8Array): Uint8Array {
 export const getText = async (name: string) => new TextDecoder().decode(await getBytes(name)).replace(/^﻿/, '');
 
 /** 받은 조각을 이어 붙인다 */
-export async function getParts(parts: string[], onPart?: (done: number, total: number) => void): Promise<Uint8Array> {
+export async function getParts(parts: string[], onPart?: (done: number, total: number) => void, base = GAME_BASE): Promise<Uint8Array> {
   const bufs: Uint8Array[] = [];
   for (const [i, p] of parts.entries()) {
-    bufs.push(await getBytes(p));
+    bufs.push(await getBytesFrom(base, p));
     onPart?.(i + 1, parts.length);
   }
   const out = new Uint8Array(bufs.reduce((n, b) => n + b.length, 0));

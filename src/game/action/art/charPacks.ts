@@ -22,7 +22,11 @@ export interface CharCfg {
   [k: string]: unknown;
 }
 export interface CharArt { key: string; cfg: CharCfg; A: Record<string, LineMeta>; IMG: Record<string, HTMLImageElement> }
-export interface RosterRow { key: string; name: string; num: string; pack: string; color?: string; dir: string; armed?: boolean; npc: boolean; kb: number }
+export interface RosterRow { key: string; name: string; num: string; pack: string; color?: string; dir: string; armed?: boolean; npc: boolean; kb: number;
+  /** 대전 자료(vs-common)만: 얼굴판 칸 번호, 전신판 [x, y, w, h] (tools/build_vs_packs.py) */
+  face?: number; body?: number[] }
+/** 대전 자료의 얼굴판·전신판: 인물 팩 없이 얼굴·전신을 그린다 (고르기 창) */
+export interface FaceSheet { img: HTMLImageElement; bodies: HTMLImageElement | null; side: number; cols: number }
 
 /** 주인공 그림 배율 (eileen/player.ts CHAR_K 와 같다: 맨 뒤 줄 키 1.65m = 235px) */
 export const CHAR_K = 1.28;
@@ -30,7 +34,7 @@ export const CHAR_K = 1.28;
 type UrlOf = (pack: string, file: string) => Promise<string>;
 type BytesOf = (pack: string, file: string) => Promise<Uint8Array | null>;
 let io: { urlOf: UrlOf; bytesOf: BytesOf; ready: (pack: string) => Promise<boolean> } | null = null;
-let fx: { VFX: Record<string, Vfx>; CHAIR: Record<string, HTMLImageElement>; roster: RosterRow[] } | null = null;
+let fx: { VFX: Record<string, Vfx>; CHAIR: Record<string, HTMLImageElement>; roster: RosterRow[]; sheet: FaceSheet | null } | null = null;
 const chars = new Map<string, CharArt>();
 const loading = new Map<string, Promise<CharArt | null>>();
 let revision = 0;
@@ -44,26 +48,31 @@ async function json<T>(pack: string, file: string): Promise<T | null> {
   return b ? (JSON.parse(new TextDecoder().decode(b)) as T) : null;
 }
 
-/** 시작: 공용 이펙트·의자·명단(action-fx 팩). 인물은 고를 때 받는다 */
-export function prepareCharPacks(assets?: { ready(p: string): Promise<boolean>; url: UrlOf; bytes: BytesOf }) {
+/** 시작: 공용 이펙트·의자·명단(action-fx 팩, 대전은 vs-common). 인물은 고를 때 받는다 */
+export function prepareCharPacks(assets?: { ready(p: string): Promise<boolean>; url: UrlOf; bytes: BytesOf }, common = 'action-fx') {
   const own = ++revision;
   fx = null; chars.clear(); loading.clear(); faces.clear();
   if (!assets) return { ready: Promise.resolve(), dispose: () => {} };
   io = { urlOf: (p, f) => assets.url(p, f), bytesOf: (p, f) => assets.bytes(p, f), ready: (p) => assets.ready(p) };
   const ready = (async () => {
-    if (!(await io!.ready('action-fx'))) return;
-    const vm = (await json<Record<string, VfxMeta>>('action-fx', 'vfx.json')) ?? {};
-    const roster = (await json<RosterRow[]>('action-fx', 'roster.json')) ?? [];
+    if (!(await io!.ready(common))) return;
+    const vm = (await json<Record<string, VfxMeta>>(common, 'vfx.json')) ?? {};
+    const rj = await json<RosterRow[] | { face: number; cols: number; chars: RosterRow[] }>(common, 'roster.json');
+    const roster = Array.isArray(rj) ? rj : rj?.chars ?? [];
+    let sheet: FaceSheet | null = null;
+    if (rj && !Array.isArray(rj)) {
+      try { sheet = { img: await img(await io!.urlOf(common, 'faces.webp')), bodies: await io!.urlOf(common, 'bodies.webp').then(img, () => null), side: rj.face, cols: rj.cols }; } catch { /* 얼굴판 없음 */ }
+    }
     const VFX: Record<string, Vfx> = {};
-    await Promise.all(Object.entries(vm).map(async ([k, v]) => { try { VFX[k] = { ...v, img: await img(await io!.urlOf('action-fx', v.file)) }; } catch { /* 이 그림만 없음 */ } }));
+    await Promise.all(Object.entries(vm).map(async ([k, v]) => { try { VFX[k] = { ...v, img: await img(await io!.urlOf(common, v.file)) }; } catch { /* 이 그림만 없음 */ } }));
     const CHAIR: Record<string, HTMLImageElement> = {};
     const dirs = ['south', 'south-east', 'south-west', 'east', 'west', 'north', 'north-east', 'north-west'];
-    await Promise.all(dirs.flatMap((d) => [
-      io!.urlOf('action-fx', `chair-${d}.webp`).then(img).then((im) => { CHAIR[d] = im; }, () => {}),
-      io!.urlOf('action-fx', `chair2-${d}.webp`).then(img).then((im) => { CHAIR['C02:' + d] = im; }, () => {}),
-      io!.urlOf('action-fx', `chairL-${d}.webp`).then(img).then((im) => { CHAIR['L:' + d] = im; }, () => {}),   // 휴게실 쉘 의자(11-02)
+    if (common === 'action-fx') await Promise.all(dirs.flatMap((d) => [
+      io!.urlOf(common, `chair-${d}.webp`).then(img).then((im) => { CHAIR[d] = im; }, () => {}),
+      io!.urlOf(common, `chair2-${d}.webp`).then(img).then((im) => { CHAIR['C02:' + d] = im; }, () => {}),
+      io!.urlOf(common, `chairL-${d}.webp`).then(img).then((im) => { CHAIR['L:' + d] = im; }, () => {}),   // 휴게실 쉘 의자(11-02)
     ]));
-    if (revision === own) fx = { VFX, CHAIR, roster };
+    if (revision === own) fx = { VFX, CHAIR, roster, sheet };
   })().catch((e) => { console.warn('[goei] action-fx 팩 없음', e); });
   return { ready, dispose: () => { if (revision === own) { revision++; fx = null; chars.clear(); loading.clear(); } } };
 }
@@ -342,6 +351,8 @@ export function charTop(nameOrKey: string): number {
 /** 얼굴 칸(네임텍·초상): 고개 젓기 첫 장(없으면 평상 대기) 머리 부분 */
 const faces = new Map<string, HTMLCanvasElement>();
 export function charFace(nameOrKey: string, side = 44, flip = false): HTMLCanvasElement | null {
+  const sf = sheetFace(nameOrKey, side, flip);
+  if (sf) return sf;
   const a = charArt(nameOrKey);
   const id = a?.A['31'] ? '31' : '1';
   const m = a?.A[id];
@@ -359,6 +370,29 @@ export function charFace(nameOrKey: string, side = 44, flip = false): HTMLCanvas
   if (flip) { o.translate(side, 0); o.scale(-1, 1); }
   o.drawImage(a.IMG[id], Math.round(fx0 - side / 2), Math.max(0, top + 2), side, side, 0, 0, side, side);
   return face;
+}
+
+/** 대전 얼굴판에서 얼굴 (인물 팩을 받지 않아도 된다). 얼굴판은 모두 오른쪽 보기 */
+function sheetFace(nameOrKey: string, side: number, flip: boolean): HTMLCanvasElement | null {
+  const sh = fx?.sheet, r = rosterOf(nameOrKey);
+  if (!sh || !r || r.face == null) return null;
+  const key = `sheet|${r.key}|${side}|${flip}`, hit = faces.get(key);
+  if (hit) return hit;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = side;
+  const o = cv.getContext('2d')!;
+  o.imageSmoothingEnabled = false;
+  if (flip) { o.translate(side, 0); o.scale(-1, 1); }
+  o.drawImage(sh.img, (r.face % sh.cols) * sh.side, Math.floor(r.face / sh.cols) * sh.side, sh.side, sh.side, 0, 0, side, side);
+  faces.set(key, cv);
+  return cv;
+}
+/** 대전 전신판에서 평상 대기 첫 장 (오른쪽 보기). 없으면 null */
+export function sheetBody(nameOrKey: string): { img: HTMLImageElement; x: number; y: number; w: number; h: number } | null {
+  const sh = fx?.sheet, r = rosterOf(nameOrKey);
+  if (!sh?.bodies || !r?.body) return null;
+  const [x, y, w, h] = r.body;
+  return { img: sh.bodies, x, y, w, h };
 }
 
 /** 통합창 전신: 평상 대기(1번) 첫 장, 오른쪽 보기로 */

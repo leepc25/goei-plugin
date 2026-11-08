@@ -109,7 +109,11 @@ function hpHue(r: number) {
 export interface PixelCard {
   name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; trail: number; hurtT: number;
   gauge?: number; superKey?: string; armor?: number; t: number;
+  /** 좌우로 뒤집은 칸 (대전 오른쪽 상대, 11-08 사용자): 틀·막대·게이지·얼굴 자리는 뒤집고 글자는 바로 */
+  mirror?: boolean;
 }
+/** 칸 폭 (초상화 + 틈 + 체력 막대) */
+export const PIXEL_CARD_W = HUD_ART.portrait.w + 4 + HUD_ART.hp.w;
 /** 왼쪽 위 주인공 칸 (판 없음). 돌려주는 값 = 칸 아래 끝 y */
 export function drawPixelCard(c: CanvasRenderingContext2D, s: PixelCard, x: number, y: number): number {
   const P = HUD_ART.portrait, pim = img('portrait'), him = img('hp'), gim = img('gauge');
@@ -117,26 +121,39 @@ export function drawPixelCard(c: CanvasRenderingContext2D, s: PixelCard, x: numb
   c.save();
   c.imageSmoothingEnabled = false;
   x = Math.round(x); y = Math.round(y);
+  // 뒤집은 칸: 그림은 칸 가운데 세로선 기준으로 뒤집어 그리고, 글자는 뒤집힌 자리에 바로 쓴다
+  const base = c.getTransform();
+  const flip = s.mirror ? base.translate(2 * x + PIXEL_CARD_W, 0).scale(-1, 1) : base;
+  const art = () => c.setTransform(flip);
+  const txt = (t: HTMLCanvasElement, tx: number, ty: number, align: 'left' | 'center' | 'right' = 'left') => {
+    let dx = align === 'center' ? Math.round(tx - t.width / 2) : align === 'right' ? Math.round(tx - t.width) : Math.round(tx);
+    if (s.mirror) dx = 2 * x + PIXEL_CARD_W - dx - t.width;
+    c.setTransform(base);
+    c.drawImage(t, dx, Math.round(ty));
+  };
+  art();
   // 얼굴: 틀 안쪽만 살짝 어둡게 (통짜 검은 상자 없이)
   const [fx0, fy0, fx1, fy1] = P.inner, fw = fx1 - fx0, fh = fy1 - fy0;
   c.fillStyle = 'rgba(12,15,19,0.6)';
   c.fillRect(x + fx0, y + fy0, fw, fh);
   if (s.face) c.drawImage(s.face, x + fx0, y + fy0, fw, fh);
-  else put(c, pixelText(s.name.slice(0, 1) || '?', INK, 33), x + P.w / 2, y + P.h / 2 - 18, 'center');
+  else txt(pixelText(s.name.slice(0, 1) || '?', INK, 33), x + P.w / 2, y + P.h / 2 - 18, 'center');
+  art();
   if (s.hurtT > 0) { c.fillStyle = `rgba(255,40,40,${Math.min(0.6, s.hurtT * 1.6)})`; c.fillRect(x + fx0, y + fy0, fw, fh); }
   c.drawImage(pim, x, y);
   // 이름 + 방어 표시
   const bx = x + P.w + 4;
   const nt = pixelText(s.name, INK, 22);
-  put(c, nt, bx + 14, y + 6);
-  if (s.armor) put(c, pixelText('◆'.repeat(s.armor), '#cfd3d6', 11), bx + 20 + nt.width, y + 14);
+  txt(nt, bx + 14, y + 6);
+  if (s.armor) txt(pixelText('◆'.repeat(s.armor), '#cfd3d6', 11), bx + 20 + nt.width, y + 14);
   // 체력 막대: 초록 → 노랑 → 빨강, 깎인 만큼 흰 띠가 늦게 따라온다
   const hy = y + 34, r = Math.max(0, s.hp) / s.maxHp, low = r < 0.25;
+  art();
   c.drawImage(him, bx, hy);
   fillHollow(c, 'hp', bx, hy, s.trail / s.maxHp, () => '#d8d2c4');
   const hue = hpHue(r), blink = low && Math.sin(s.t * 10) > 0;
   fillHollow(c, 'hp', bx, hy, r, (row, top, bot) => (row === top ? `hsl(${hue},75%,${blink ? 80 : 68}%)` : row >= bot - 1 ? `hsl(${hue},70%,${blink ? 48 : 32}%)` : `hsl(${hue},68%,${blink ? 66 : 48}%)`));
-  put(c, pixelText(`${Math.max(0, Math.ceil(s.hp))} / ${Math.ceil(s.maxHp)}`, INK, 11), bx + HUD_ART.hp.inner[2], y + 18, 'right');
+  txt(pixelText(`${Math.max(0, Math.ceil(s.hp))} / ${Math.ceil(s.maxHp)}`, INK, 11), bx + HUD_ART.hp.inner[2], y + 18, 'right');
   // 필살 게이지: 칸 다섯 개, 다 차면 숨쉬듯 빛나고 키를 띄운다
   let end = Math.max(y + P.h, hy + HUD_ART.hp.h + 14);
   if (s.gauge !== undefined) {
@@ -144,9 +161,10 @@ export function drawPixelCard(c: CanvasRenderingContext2D, s: PixelCard, x: numb
     const gy = hy + HUD_ART.hp.h + 5, full = s.gauge >= 100;
     const pulse = full ? 0.5 + 0.5 * Math.sin(s.t * 7) : 0;
     const gx2 = bx + 16;
+    art();
     c.drawImage(gim, gx2, gy);
     fillHollow(c, 'gauge', gx2, gy, s.gauge / 100, (row, top) => (full ? (row === top ? '#fff6d0' : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})`) : row === top ? '#e8f4ff' : '#9fc6e0'));
-    if (full && s.superKey) put(c, pixelText(s.superKey, '#ffe9a0', 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
+    if (full && s.superKey) txt(pixelText(s.superKey, '#ffe9a0', 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
     end = Math.max(end, gy + HUD_ART.gauge.h);
   }
   c.restore();

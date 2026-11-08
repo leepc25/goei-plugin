@@ -43,7 +43,8 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
+import { openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
+import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
 import { isGoeiLore } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
@@ -744,6 +745,18 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
   if (changed && currentTheme() === before) repaintTheme();
 }
 
+/** 대전: 지금 채팅, 대전을 연 채팅, 단추 상태 (같은 값이면 본 화면을 다시 만지지 않는다) */
+let vsChat = '';
+let vsShownChat = '';
+let vsPadKey = '';
+async function onVersusPad(fab: Fab | null): Promise<void> {
+  if (!vsChat) return;
+  vsShownChat = vsChat;
+  await toggleVersus(vsChat, () => void openVersusSettings());
+  vsPadKey = '';
+  await fab?.setVersus(true, vsOpen()).catch(() => {});
+}
+
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과.
 // fab 이 없어도(본 화면 접근 권한 거부) 감시는 돈다: liteNow 가 있어야 요청 손질·로어북 고르기·표시가 된다
 function startWatcher(fab: Fab | null): () => void {
@@ -780,6 +793,12 @@ function startWatcher(fab: Fab | null): () => void {
       shownChat = chatKey;
       // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
       if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
+      // 대전 단추 (설정 「대전」을 켠 PC, 11-08): 채팅을 옮기거나 괴이 채팅을 벗어나면 떠 있던 대전은 멈추고 닫는다
+      vsChat = chatKey;
+      if (vsOpen() && (!next.fabVisible || chatKey !== vsShownChat)) await closeVersus().catch(() => {});
+      const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
+      const padKey = `${pad}:${vsOpen()}`;
+      if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -837,7 +856,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
-    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })), () => void onVersusPad(fab));
     const f = fab;
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));
