@@ -24,7 +24,7 @@ VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
 #   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
 #   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
-VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 0.97, 'yF': 760}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
+VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 0.97, 'yF': 760, 'benchY': 700}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
           'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770}, 'office': {'yF': 826}}
 CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
 
@@ -97,6 +97,7 @@ def fit_stage(v, c):
                 xi = x0 + xw / s
                 for f in (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
                     y = L0 + f * (L1 - L0)
+                    if y < c.get('benchY', 0): continue  # 사용자 지정: 이보다 뒤에는 세우지 않음(필드 물건 자료 없는 장면)
                     if y < yF - 10 and ok(xi, y):
                         got = {'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)}; break
                 if got: break
