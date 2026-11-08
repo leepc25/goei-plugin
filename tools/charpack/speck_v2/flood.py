@@ -40,8 +40,20 @@ def frame(a,o,pal,junk=None):
         if nd.distance_transform_edt(m).max()<3: continue   # 가는 선(효과선·칼 궤적)은 그림
         ring=nd.binary_dilation(m,K)&~m
         tr=(~A[ring]).mean(); op=blob.lum(a)[ring&A]; dk=(op<=60).mean() if op.size else 1.0
+        if op.size and (op>=180).mean()>=0.1: continue   # 흰 옷(가운)에 붙은 회색은 옷 그림자
         if tr>=0.5: kill|=m   # 둘레 절반 이상이 투명 = 몸 밖에 떠 있는 판
         elif junk is not None and tr>=0.1 and dk>=0.8 and sz<=1500 and np.isin(code[m],junk).mean()>=0.8: kill|=m   # 검은 다리·몸 사이에 낀 판(같은 동작의 떠 있는 판과 같은 색)
+    if junk is not None:   # 검은 선에 완전히 갇힌 판도, 같은 동작의 떠 있는 판과 같은 색이면 찌꺼기
+        Lm=blob.lum(a)
+        for i in range(1,n+1):
+            if i in touch: continue
+            m=lab==i; sz=m.sum()
+            if sz<15 or sz>1500 or same[m].mean()<0.5: continue
+            if nd.distance_transform_edt(m).max()<2: continue
+            if np.isin(code[m],junk).mean()<0.8: continue
+            ring=nd.binary_dilation(m,K)&~m; op=Lm[ring&A]
+            if op.size and (op>=180).mean()>=0.1: continue
+            if op.size and (op<=60).mean()>=0.8: kill|=m
     if POCKET:
         L=blob.lum(a); sz=np.bincount(lab.ravel()); sl=nd.find_objects(lab)
         for i in range(1,n+1):
