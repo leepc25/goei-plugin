@@ -190,6 +190,24 @@
   },
   {
    "keywords": [
+    "표본 채취병",
+    "sample collection bottle",
+    "gauge bottle"
+   ],
+   "file": "seal_018.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "표본 채취병",
+   "src": "game-src/items/raw/batch_49/08.png",
+   "head": [
+    "표본 채취병",
+    "sample collection bottle"
+   ],
+   "feats": [],
+   "old_name": "꿈결 수집기"
+  },
+  {
+   "keywords": [
     "외계어 번역 이어폰",
     "alien translator earbud"
    ],
@@ -3358,6 +3376,24 @@
     "plague doctor mask"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "물약병",
+    "potion bottle",
+    "swirl potion flask"
+   ],
+   "file": "seal_019.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "물약병",
+   "src": "game-src/items/raw/batch_49/09.png",
+   "head": [
+    "물약병",
+    "potion bottle"
+   ],
+   "feats": [],
+   "old_name": "꿈결 병"
   },
   {
    "keywords": [
@@ -7199,22 +7235,6 @@
    "head": [
     "생환 보고서",
     "survival report"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 수집기",
-    "dream collector"
-   ],
-   "file": "seal_018.webp",
-   "kind": "seal",
-   "base": false,
-   "name": "꿈결 수집기",
-   "src": "game-src/items/raw/batch_49/08.png",
-   "head": [
-    "꿈결 수집기",
-    "dream collector"
    ],
    "feats": []
   },
@@ -11939,28 +11959,6 @@
   },
   {
    "keywords": [
-    "가면 동물, 주인 없음",
-    "가면",
-    "가면(동물, 주인 없음)",
-    "여우 가면",
-    "fox mask"
-   ],
-   "file": "anomaly_096.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "가면(동물, 주인 없음)",
-   "src": "game-src/items/raw/batch_57/06.png",
-   "head": [
-    "가면",
-    "mask"
-   ],
-   "feats": [
-    "동물",
-    "animal"
-   ]
-  },
-  {
-   "keywords": [
     "유전자 주입 주사기",
     "gene injector"
    ],
@@ -12175,27 +12173,6 @@
     "luminol spray"
    ],
    "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 앰플 세트",
-    "꿈결 앰플",
-    "dream ampoule"
-   ],
-   "file": "anomaly_206.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "꿈결 앰플 세트",
-   "src": "game-src/items/raw/batch_183/14.png",
-   "head": [
-    "앰플",
-    "ampoule"
-   ],
-   "feats": [
-    "꿈결",
-    "꿈",
-    "dream"
-   ]
   },
   {
    "keywords": [
@@ -15960,6 +15937,27 @@
   },
   {
    "keywords": [
+    "앰플 케이스",
+    "ampoule case"
+   ],
+   "file": "anomaly_206.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "앰플 케이스",
+   "src": "game-src/items/raw/batch_183/14.png",
+   "head": [
+    "앰플",
+    "ampoule"
+   ],
+   "feats": [
+    "꿈결",
+    "꿈",
+    "dream"
+   ],
+   "old_name": "꿈결 앰플 세트"
+  },
+  {
+   "keywords": [
     "선크림 SPF 100+",
     "sunscreen"
    ],
@@ -18257,22 +18255,6 @@
    "head": [
     "번호 패",
     "number plate"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 병",
-    "dream bottle"
-   ],
-   "file": "seal_019.webp",
-   "kind": "seal",
-   "base": false,
-   "name": "꿈결 병",
-   "src": "game-src/items/raw/batch_49/09.png",
-   "head": [
-    "꿈결 병",
-    "dream bottle"
    ],
    "feats": []
   },
@@ -21808,8 +21790,6 @@
   },
   {
    "keywords": [
-    "동물 가면",
-    "animal mask",
     "토끼 가면",
     "rabbit mask",
     "bunny mask"
@@ -21817,16 +21797,18 @@
    "file": "wear_005.webp",
    "kind": "wear",
    "base": false,
-   "name": "동물 가면",
+   "name": "토끼 가면",
    "src": "game-src/items/raw/batch_09/06.png",
    "head": [
     "가면",
     "mask"
    ],
    "feats": [
-    "동물",
-    "animal"
-   ]
+    "토끼",
+    "rabbit",
+    "bunny"
+   ],
+   "old_name": "동물 가면"
   },
   {
    "keywords": [
@@ -34050,6 +34032,26 @@
     "nose ring"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "여우 가면",
+    "fox mask"
+   ],
+   "file": "anomaly_096.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "여우 가면",
+   "src": "game-src/items/raw/batch_57/06.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "여우",
+    "fox"
+   ],
+   "old_name": "가면(동물, 주인 없음)"
   },
   {
    "keywords": [
@@ -48976,9 +48978,7 @@
   "dove": "misc_114.webp",
   "dowsing rods": "charm_101.webp",
   "drawer key": "key_046.webp",
-  "dream bottle": "seal_019.webp",
   "dream can": "food_374.webp",
-  "dream collector": "seal_018.webp",
   "dreamcatcher": "charm_048.webp",
   "dress": "wear_096.webp",
   "dress shirt": "wear_035.webp",
@@ -51247,8 +51247,6 @@
   "꿀떡": "food_300.webp",
   "꿀병": "food_022.webp",
   "꿈 통조림": "food_374.webp",
-  "꿈결 병": "seal_019.webp",
-  "꿈결 수집기": "seal_018.webp",
   "끈끈이": "tool_161.webp",
   "끈끈이 트랩": "tool_161.webp",
   "끌": "tool_116.webp",
@@ -53330,6 +53328,10 @@
   "흡혈 식기": "weapon_010.webp",
   "흰 가루 봉지": "consumable_102.webp",
   "흰 가운": "wear_030.webp",
-  "힙색": "wear_078.webp"
+  "힙색": "wear_078.webp",
+  "물약병": "seal_019.webp",
+  "potion bottle": "seal_019.webp",
+  "표본 채취병": "seal_018.webp",
+  "sample collection bottle": "seal_018.webp"
  }
 }
