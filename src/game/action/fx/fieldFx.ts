@@ -1,6 +1,7 @@
 // 필드 전투 효과 틀 (docs/요원_기술안.md 0.5 A표 · 0.6 필살 컷인). 그림 없이 코드가 그리는 공통 타격감과
 // GPT 도트 시트(game-src/art/field/fx, fx_목록.txt)를 재생하는 자리. 필드에는 아직 전투가 없어서 엔진은 필살 미리 보기만 부른다.
 // 좌표: world 함수는 월드 px(카메라 적용 뒤), screen 함수는 1280×720 기준(캔버스 크기에 맞춰 늘린다). 시간은 초, 히트스톱은 60fps 장 수.
+import { view } from '../engine/view';
 import { PIXEL_FONT } from '../ui/kit';
 
 export type Tier = 'light' | 'mid' | 'heavy' | 'super';
@@ -290,7 +291,7 @@ export class FieldFx {
 
   /** 화면 좌표에: 번쩍 · 필살 컷인 (맨 위) */
   drawScreen(c: CanvasRenderingContext2D) {
-    if (this.flashT > 0) {
+    if (this.flashT > 0 && !view.clear) { // 투명 무대(대전)는 화면 전체 번쩍임 없음
       c.save();
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.globalAlpha = this.flashA * Math.min(1, this.flashT / 0.05);
@@ -310,7 +311,7 @@ export class FieldFx {
     // 1. 암전 70% (끝 0.3초 동안 걷힌다)
     const dark = t > CUT.out[1] ? 0.7 * (1 - (t - CUT.out[1]) / (CUT.total - CUT.out[1])) : 0.7;
     c.fillStyle = `rgba(0,0,0,${dark})`;
-    c.fillRect(0, 0, 1280, 720);
+    if (!view.clear) c.fillRect(0, 0, 1280, 720); // 투명 무대는 암전 없이 띠만
     // 2. 비스듬한 띠 (왼쪽 아래 → 오른쪽 위 12도), 왼쪽에서 펼쳐지고 끝에 접힌다
     const open = t < CUT.bandIn[0] ? 0 : t < CUT.bandIn[1] ? (t - CUT.bandIn[0]) / (CUT.bandIn[1] - CUT.bandIn[0]) : t < CUT.out[0] ? 1 : Math.max(0, 1 - (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]));
     const bandH = 260 * (t < CUT.out[0] ? 1 : open);

@@ -1,5 +1,6 @@
 // 화면 효과: 땅 그림자, 어두운 층 조명·림라이트, 피격 섬광(하얀 실루엣), 흔들림, 스파크·충격파, 피해 숫자,
 // 층 제목, 전환(암전·승강기 문·조리개·지직). 엔진은 onEvent 로 사건만 알려 주면 된다.
+import { view } from '../engine/view';
 import { FONT, label, pfont, setPixelText } from './hud';
 import { H as H0, W as W0 } from './stage';
 
@@ -280,7 +281,7 @@ export class Fx {
     size(c);
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
-    if (this.dim > 0) (c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`), c.fillRect(0, 0, W, H);
+    if (this.dim > 0 && !view.clear) (c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`), c.fillRect(0, 0, W, H);
     if (hpRatio < 0.3) {
       const k = (0.3 - hpRatio) / 0.3;
       const pulse = 0.55 + Math.sin(this.time * (4 + k * 4)) * 0.25;
@@ -290,7 +291,7 @@ export class Fx {
       c.fillStyle = g;
       c.fillRect(0, 0, W, H);
     }
-    for (const f of this.flashes) {
+    for (const f of view.clear ? [] : this.flashes) { // 투명 무대(대전)는 화면 전체 번쩍임 없음
       c.globalAlpha = f.a * (1 - f.t / f.dur);
       c.fillStyle = f.color;
       c.fillRect(0, 0, W, H);

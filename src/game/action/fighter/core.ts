@@ -3,6 +3,7 @@
 // 게임과 맞닿는 곳: 표적 = env.targets()의 실제 적(T = 지금 가장 가까운 앞 상대 + 범위 검사에 든 상대 전부), 화면 = 보이는 화면(VX0~W)·게임 바닥, 키 = env.held, 소리 = env.sfx, 체력 = 게임.
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { view } from '../engine/view';
 import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit, seatFitAt } from './seats';
 import { showerPlan, UNDRESS_D, DRESS_D } from './shower';
 import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
@@ -1618,7 +1619,7 @@ function drawChargeAim() {
   if (lv) { ctx.fillStyle = CH_COL[Math.min(3, lv)]; ctx.font = 'bold 20px sans-serif'; ctx.fillText(lv >= max ? '최대' : lv + '단', P.x - 16, P.y - 250 * K(P.y)); }
 }
 function drawDying() {
-  if (P.hp > 25) return;
+  if (P.hp > 25 || view.clear) return; // 투명 무대(대전)는 화면 전체를 칠하지 않는다: 게임 칸이 붉은 네모로 드러남
   const t = (P.t * 1.1) % 1, beat = Math.max(0, 1 - Math.abs(t - 0.08) * 12) + Math.max(0, 1 - Math.abs(t - 0.28) * 12) * 0.7;
   const g = ctx.createRadialGradient(640, H / 2, H * 0.55, 640, H / 2, H * 0.95);
   g.addColorStop(0, 'rgba(160,0,0,0)'); g.addColorStop(1, `rgba(170,0,0,${0.55 * beat})`);
@@ -1646,7 +1647,7 @@ function drawCut() {
   /** 바닥 층 (사람보다 먼저): 어두워짐·표적·그을음·먼지·잔상·바닥 그림 이펙트 */
   function drawUnder(c: CanvasRenderingContext2D) {
     ctx = c;
-    if (dark) { ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, dark * 0.9)})`; ctx.fillRect(VX0, 0, 1280, H); }
+    if (dark && !view.clear) { ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, dark * 0.9)})`; ctx.fillRect(VX0, 0, 1280, H); } // 투명 무대(대전)는 암전 없음
     drawFxUnder();
     drawSheets(true);
     for (const it of items) { ctx.fillStyle = '#c94a4a'; ctx.fillRect(it.x - 6, it.y - 14, 12, 14); ctx.fillStyle = '#eee'; ctx.fillRect(it.x - 4, it.y - 18, 8, 4); drawVfxAt('item_sparkle', it.x + 6, it.y - 20, 2, P.t - it.t0); }
@@ -1669,7 +1670,7 @@ function drawCut() {
   function drawScreen(c: CanvasRenderingContext2D) {
     ctx = c;
     drawDying();
-    if (flash) { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, flash * 3)})`; ctx.fillRect(0, 0, 1280, H); }
+    if (flash && !view.clear) { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, flash * 3)})`; ctx.fillRect(0, 0, 1280, H); }
     const w0 = W; W = 1280; drawCut(); W = w0;
   }
   return {
