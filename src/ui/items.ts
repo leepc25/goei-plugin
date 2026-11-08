@@ -170,8 +170,9 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
     return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
   };
   const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
-  if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착">${slots}</section>`;
   const av = avatarHtml(ctx);
+  // 상점 팔기 (2026-11-08 사용자): 장착한 게 없어도 아바타와 빈 칸을 늘 보인다. 사용은 소지품 화면에서만 (사용자: 상점에서까지 쓰면 복잡)
+  if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}</div></section>`;
   return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
 }
 

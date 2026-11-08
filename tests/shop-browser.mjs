@@ -50,10 +50,10 @@ for (const vp of ['pc', 'phone']) {
   const chat = {
     message: [{ role: 'user', data: '철물점 문을 열고 들어간다.', chatId: 'u1' }, { role: 'char', data: CHAR, chatId: 'c1' }],
     // 장착 중인 물건이 있으면 팔기 화면에 「장착」 상자가 같이 뜬다 (장착한 것도 팔 수 있게)
-    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_items: JSON.stringify({ list: [{ id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }], log: [] }) },
+    scriptstate: { $st_look: '7.1', $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_items: JSON.stringify({ list: [{ id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }], log: [] }) },
   };
   // 상품 그림 팩은 저장소에 미리 둔다 (소지품과 같은 그림, host/itemicons.ts)
-  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
+  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items'), 'p:goei:data-looks': distPack('goei-data-looks') } });
   if (process.env.SHOP_DEBUG) page.on('console', (m) => { if (/goei/.test(m.text())) console.log('LOG', m.text().slice(0, 300)); });
   const shot = (n) => page.screenshot({ path: `${out}/${vp}_${n}.png` });
   const click = async (sel) => { await page.evaluate((q) => document.querySelector(q)?.click(), sel); await sleep(250); };

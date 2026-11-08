@@ -180,7 +180,7 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
   // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
   const head = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small></header>`;
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : `<p class="gx-wt-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  return `<div class="sh-shelf sh-pick">${all.length > mine.length ? `<div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div>` : ''}<section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
+  return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
 }
 
 function pickCell(it: Item, st: ShopState): string {

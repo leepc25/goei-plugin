@@ -3254,9 +3254,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 사용칸: 장착 칸 오른쪽 남는 자리. 놓는 만큼 칩이 늘어난다 */
 .it-usebox { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px dashed var(--line2); border-radius: 12px; }
 .it-ulab { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .02em; }
-.it-eqbox.sell .it-eqslots { grid-template-columns: repeat(6, var(--slot, 97px)); } /* 상점 팔기: 아바타·사용칸 없이 한 줄 */
-.it-eqbox.sell { --slot: 85px; display: flex; }
-.sh-body .it-eqbox.sell { --slot: var(--shc); padding: var(--zp); } /* 진열대·소지품 칸과 같은 크기 */
+.sh-body .it-eqbox.sell .it-eqin { --slot: var(--shc); } /* 상점 팔기: 소지품 화면과 같은 [아바타 | 장착 3열], 칸은 진열대·소지품 칸과 같은 크기 */
+.sh-body .it-eqbox.sell { padding: var(--zp); }
 /* 칸 위 표시: 남은 횟수(오른쪽 위 숫자) · 손상(노란 금) · 고장(흐림 + 붉은 띠) · 사용 예정(흐림 + 띠) */
 .it-left { position: absolute; top: 9px; right: 9px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: color-mix(in srgb, var(--void) 78%, transparent); color: var(--text); font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; pointer-events: none; }
 .it-crack { position: absolute; left: 9px; top: 9px; width: 22px; height: 22px; pointer-events: none; background: linear-gradient(135deg, transparent 44%, var(--amber) 45% 52%, transparent 53%) 0 0 / 12px 12px no-repeat, linear-gradient(60deg, transparent 44%, var(--amber) 45% 52%, transparent 53%) 7px 6px / 12px 14px no-repeat; filter: drop-shadow(0 0 1px rgba(0,0,0,.7)); }
@@ -3296,8 +3295,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .it-slot { padding: 4px; border-radius: 10px; }
   .it-usebox { flex-basis: 100%; }
   .it-usebox.empty { display: none; }
-  .it-eqbox.sell { --slot: min(82px, calc((100vw - 32px - 24px - 16px) / 3)); }
-  .it-eqbox.sell .it-eqslots { grid-template-columns: repeat(3, var(--slot)); }
+  /* 상점 팔기 (폰): 아바타 옆 2열이 상점 본문 폭(cqw) 안에 들어가게 */
+  .sh-body .it-eqbox.sell .it-eqin { --slot: min(82px, calc((100cqw - 2 * var(--zp) - 2px - 128px - 10px - 8px) / 2)); flex-wrap: nowrap; }
 }
 /* 상점 팝업 (2026-11-07 사용자 설계, docs/인계/상점_1107/mock.mjs): 조작 34px·모서리 10, 칸·상자 12, 안쪽 8. 금액은 어디서나 같은 글꼴(mono 700 14), 색은 민트·흐림·빨강만 */
 .sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, transparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
