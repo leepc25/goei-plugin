@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--void:#1A2226;--sunk:#151C1F;--panel:#232D32;--line:#37464D;--text:#E9F0EE;--dim:#97A9A5;--signal:#5EEAD4;--accent-bg:#1D403A;--accent-line:#3F8879;
+--cf:#202124;--ct:#35363a;--cbox:#202124;--ctx:#e8eaed;--cic:#c4c7c5;--cdim:#9aa0a6}
+*{box-sizing:border-box}
+body{margin:0;background:#0d1214;font-family:'Pretendard','Noto Sans KR',system-ui,sans-serif;color:var(--text)}
+.win{position:absolute;inset:16px;border-radius:18px;background:var(--void);overflow:hidden;display:grid;grid-template-rows:64px 1fr;border:1px solid #000}
+.head{display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:2px solid var(--accent-line)}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);border:1px solid var(--accent-line);display:grid;place-items:center;font-size:20px}
+.head b{font-size:20px}
+.main{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:0}
+.nav{padding:18px 12px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.nav span{padding:12px 14px;border-radius:10px;color:var(--dim);font-size:15px}
+.nav span.on{background:var(--accent-bg);color:var(--signal);font-weight:700}
+/* ── 크롬 틀 ── */
+.cr{position:relative;display:grid;grid-template-rows:auto auto auto 1fr;grid-template-columns:minmax(0,1fr);min-height:0;background:var(--cf);font-family:'Segoe UI','Noto Sans KR',system-ui,sans-serif}
+svg.i{width:20px;height:20px;fill:var(--cic);flex:none}
+svg.i.s{width:16px;height:16px}
+.tabs{display:flex;align-items:flex-end;height:38px;padding:0 8px;background:var(--cf);gap:0}
+.tab{position:relative;height:32px;width:230px;min-width:0;display:flex;align-items:center;gap:8px;padding:0 10px 0 12px;font-size:12px;color:var(--cdim);border-radius:8px 8px 0 0}
+.tab+.tab::before{content:'';position:absolute;left:0;top:9px;height:16px;width:1px;background:#5f6368}
+.tab.on{background:var(--ct);color:var(--ctx)}
+.tab.on::before,.tab.on+.tab::before{display:none}
+.tab.on::after{content:'';position:absolute;bottom:0;left:-8px;right:-8px;height:8px;background:radial-gradient(circle at 0 0,transparent 8px,var(--ct) 8.5px) left/8px 8px no-repeat,radial-gradient(circle at 100% 0,transparent 8px,var(--ct) 8.5px) right/8px 8px no-repeat;pointer-events:none}
+.tab .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab svg.i{width:16px;height:16px;fill:var(--cdim)}
+.tabs .plus{margin:0 0 6px 6px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+.tabs .plus svg{fill:var(--cic)}
+.tabs .sp{flex:1}
+.tabs .dd{margin-bottom:6px;width:28px;height:28px;display:grid;place-items:center}
+.tool{display:flex;align-items:center;gap:4px;height:40px;padding:0 8px;background:var(--ct)}
+.tb{width:32px;height:32px;border-radius:50%;display:grid;place-items:center}
+.tb.off svg{fill:#5f6368}
+.omni{flex:1;min-width:0;height:30px;border-radius:15px;background:var(--cbox);display:flex;align-items:center;gap:10px;padding:0 6px 0 4px;margin:0 6px;font-size:14px;color:var(--cdim);white-space:nowrap;overflow:hidden}
+.omni .ti{width:24px;height:24px;border-radius:50%;background:#303134;display:grid;place-items:center;flex:none}
+.omni .ti svg{width:14px;height:14px}
+.omni .u{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.omni .u b{font-weight:400;color:var(--ctx)}
+.prof{width:28px;height:28px;border-radius:50%;background:#5f6368;display:grid;place-items:center;margin:0 4px;overflow:hidden;flex:none}.prof img{width:100%;height:100%;image-rendering:pixelated;background:#cfe0f7}.prof svg{width:20px;height:20px;fill:#e8eaed}
+.lgn{position:absolute;right:10px;top:84px;width:300px;background:#292a2d;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.5);padding:18px;color:#e8eaed;font:13px "Noto Sans KR",sans-serif;z-index:5}
+.lgn h4{margin:0 0 4px;font-size:15px}.lgn p{margin:0 0 14px;color:#9aa0a6;font-size:12px;line-height:1.5}
+.lgn .fc{display:flex;align-items:center;gap:12px;margin-bottom:12px}.lgn .fc img{width:56px;height:56px;border-radius:50%;image-rendering:pixelated;background:#cfe0f7}
+.lgn .in{height:36px;border:1px solid #5f6368;border-radius:6px;display:flex;align-items:center;padding:0 10px;color:#e8eaed}
+.lgn .b1{margin-top:10px;height:36px;border-radius:18px;background:#8ab4f8;color:#202124;font-weight:700;display:grid;place-items:center}
+.lgn hr{border:0;border-top:1px solid #3c4043;margin:16px 0}
+.lgn .b2{height:36px;border-radius:18px;border:1px solid #5f6368;display:grid;place-items:center;color:#8ab4f8;font-weight:600}
+.lgn small{display:block;margin-top:8px;color:#9aa0a6;font-size:11.5px;line-height:1.5}
+.phone .lgn{right:8px;left:8px;width:auto;top:120px}
+.bms{display:flex;align-items:center;gap:2px;height:30px;padding:0 8px;background:var(--ct);border-bottom:1px solid #4a4c50;overflow:hidden}
+.bm{display:flex;align-items:center;gap:7px;padding:0 8px;height:24px;border-radius:12px;font-size:12px;color:var(--ctx);white-space:nowrap}
+.bms .sp{flex:1}
+.fv{width:16px;height:16px;flex:none}
+.page{overflow:auto;min-height:0;background:#fff}
+/* 휴대폰 크롬 */
+.phone .win{inset:0;border-radius:0;grid-template-rows:56px 1fr}
+.phone .main{grid-template-columns:minmax(0,1fr)}
+.phone .nav,.phone .tabs,.phone .pc{display:none}
+.phone .cr{grid-template-rows:auto auto 1fr}
+.phone .tool{height:56px;padding:0 6px}
+.phone .omni{height:40px;border-radius:20px;background:#3c3c3f;margin:0 4px;font-size:15px}
+.tabn{width:22px;height:22px;border:2px solid var(--cic);border-radius:5px;display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--cic);margin:0 6px}
+.mo{display:none}.phone .mo{display:grid}
+.phone .bms{height:34px;overflow-x:auto;scrollbar-width:none}
+/* ── 시작(새 탭) ── */
+.ntp{background:#202124;color:var(--ctx);min-height:100%;display:flex;flex-direction:column;align-items:center;padding:90px 20px 40px}
+.ntp .lg{font:700 56px/1 'Segoe UI',sans-serif;letter-spacing:-2px;margin-bottom:28px}
+.ntp .lg span:nth-child(1){color:#8ab4f8}.ntp .lg span:nth-child(2){color:#f28b82}.ntp .lg span:nth-child(3){color:#fdd663}.ntp .lg span:nth-child(4){color:#81c995}
+.ntp .q{width:min(580px,100%);height:46px;border-radius:23px;background:#303134;display:flex;align-items:center;gap:14px;padding:0 18px;color:var(--cdim);font-size:15px}
+.ntp .sc{display:grid;grid-template-columns:repeat(5,112px);gap:4px;margin-top:34px}
+.ntp .s{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 4px 12px;border-radius:6px;font-size:13px}
+.ntp .s i{width:48px;height:48px;border-radius:50%;background:#35363a;display:grid;place-items:center}
+.ntp .s i .fv{width:26px;height:26px}
+.phone .ntp{padding-top:60px}.phone .ntp .sc{grid-template-columns:repeat(4,1fr);width:100%}.phone .ntp .lg{font-size:44px}
+
+/* ── 괴담넷: 으스스한 후보 3가지 (변수) ── */
+.gn{--bg:#c7ccc6;--bg2:#d6dad3;--card:#e4e7e1;--line:#a9b0a8;--ink:#1d2320;--dim:#5f6862;--hd:#28302c;--hdi:#d9e0da;--ac:#2f6b5f;--red:#8e2b2b;--chip:#cfd4cd;
+ background:var(--bg) radial-gradient(ellipse at 50% -10%,rgba(255,255,255,.35),transparent 60%);color:var(--ink);min-height:100%;font:14px 'Pretendard','Noto Sans KR',sans-serif}
+.gn.vB{--bg:#d9d0bc;--bg2:#e3dbc9;--card:#ece5d5;--line:#b8ab90;--ink:#2a221c;--dim:#6e6253;--hd:#2e2620;--hdi:#e9dfc9;--ac:#7a2e22;--red:#9c2a1e;--chip:#ddd3bf;
+ background:var(--bg) repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 2px,transparent 2px 4px)}
+.gn.vC{--bg:#1f2a29;--bg2:#263332;--card:#2b3a38;--line:#3b4d4a;--ink:#d8e2df;--dim:#8ea19c;--hd:#141c1b;--hdi:#cfe0db;--ac:#7fd1bf;--red:#e06a6a;--chip:#33443f;
+ background:var(--bg) radial-gradient(ellipse at 50% 0%,rgba(127,209,191,.08),transparent 60%)}
+.gn .hd{display:flex;align-items:center;gap:26px;height:58px;padding:0 28px;background:var(--hd);color:var(--hdi);border-bottom:3px solid var(--red)}
+.gn .hd .lg{font-weight:900;font-size:21px;color:var(--hdi);letter-spacing:-.6px;display:flex;align-items:center;gap:8px}
+.gn .hd .lg small{color:var(--hdi)!important;opacity:.5}
+.gn .hd nav{display:flex;gap:20px;color:var(--hdi);opacity:.75;font-size:14px;font-weight:600}.gn .hd nav b{opacity:1}
+.gn .hd .sr{margin-left:auto;width:280px;height:34px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--hdi);opacity:.7;font-size:13px}
+.gn .hd .sr svg{fill:var(--hdi)}
+.gn .wrap{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;padding:20px 28px;max-width:1200px}
+.gn .side{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px;align-self:start}
+.gn .side a{display:block;padding:8px 12px;color:var(--dim);font-size:13.5px;border-radius:3px}
+.gn .side a.on{background:var(--hd);color:var(--hdi);font-weight:800}
+.gn .side h6{margin:10px 12px 4px;font-size:11px;color:var(--dim);opacity:.8;font-weight:700;letter-spacing:.05em}
+.gn .gmain{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.gn .bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.gn .bh h2{margin:0;font-size:19px}
+.gn .bh .w{padding:7px 14px;border-radius:3px;background:var(--red);color:#fff;font-weight:800;font-size:13px}
+.gn .sort{display:flex;gap:14px;font-size:13px;color:var(--dim);padding:6px 0 10px;border-bottom:2px solid var(--ink)}.gn .sort b{color:var(--ink)}
+.gn .row{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:14px;padding:12px 4px;border-bottom:1px dashed var(--line);align-items:center}
+.gn .row .c{display:inline-block;padding:1px 6px;border-radius:2px;font-size:11px;background:var(--chip);color:var(--dim);margin-right:6px;vertical-align:1px;font-weight:700}
+.gn .row .c.hot{background:var(--red);color:#fff}
+.gn .row .tt{font-size:14.5px;color:var(--ink)}.gn .row .tt em{font-style:normal;color:var(--red);font-size:12px;margin-left:5px;font-weight:800}
+.gn .row small{display:block;margin-top:5px;font-size:12px;color:var(--dim)}
+.gn .row .th{width:54px;height:54px;border-radius:3px;background:var(--bg2);display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);filter:grayscale(.35) contrast(1.05)}
+.gn .row .th img{width:42px;height:42px;image-rendering:pixelated}
+.gn .pg{display:flex;gap:6px;justify-content:center;padding:18px 0 4px;font-size:13px;color:var(--dim)}.gn .pg b{color:#fff;background:var(--red);border-radius:2px;padding:0 7px}
+.phone .gn .wrap{grid-template-columns:minmax(0,1fr);padding:10px}.phone .gn .side,.phone .gn .hd nav{display:none}.phone .gn .hd{padding:0 12px;gap:10px}.phone .gn .hd .sr{width:auto;flex:1}.phone .gn .gmain{padding:12px 14px}
+/* ── 괴담갤: 디시인사이드 갤러리 모양 ── */
+.dc{background:#fff;color:#333;min-height:100%;font:12.5px 'Nanum Gothic','Noto Sans KR','Dotum',sans-serif;min-width:1000px}
+.dc a{color:inherit;text-decoration:none}
+.dc .gnb0{opacity:.55;display:flex;justify-content:flex-end;gap:12px;padding:6px 0;width:1000px;margin:0 auto;color:#666;font-size:12px}
+.dc .hd{display:flex;align-items:center;gap:24px;height:46px;padding:0 max(16px,calc((100% - 1000px)/2));background:#3b4890}
+.dc .hd .lg{font:900 19px/1 'Noto Sans KR',sans-serif;color:#fff;letter-spacing:-.5px}
+.dc .hd .lg small{font:500 12px 'Noto Sans KR';color:#cfd5f5;letter-spacing:0;margin-left:8px}
+.dc .hd .sch{display:flex;border:2px solid #fff;height:30px;width:320px;background:#fff;margin-left:auto}
+.dc .hd .sch span{flex:1;padding:0 10px;line-height:26px;color:#999}
+.dc .hd .sch b{width:36px;background:#29367c;display:grid;place-items:center}
+.dc .hd .sch b svg{fill:#fff;width:20px;height:20px}
+.dc .gnb{background:#3b4890;height:37px}
+.dc .gnb ul{width:1000px;margin:0 auto;padding:0;list-style:none;display:flex;height:100%}
+.dc .gnb li{padding:0 14px;line-height:37px;color:#fff;font-weight:700;font-size:13px}
+.dc .gnb li.on{background:#29367c}
+.dc .gnb li+li{border-left:1px solid #4c5aa1}
+.dc .body{width:1000px;margin:0 auto;padding-top:10px}
+.dc .gt{display:flex;align-items:baseline;gap:8px;padding-bottom:6px}
+.dc .gt h2{margin:0;font-size:19px;color:#29367c;letter-spacing:-1px}
+.dc .gt .info{font-size:11px;color:#999}
+.dc .gt .ic{margin-left:auto;display:flex;gap:4px}.dc .gt .ic span{border:1px solid #ccc;padding:2px 6px;font-size:11px;color:#666}
+.dc .lt{display:flex;align-items:center;gap:0;margin:0}
+.dc .lt span{padding:6px 12px;border:1px solid #cfd2e0;border-left:0;background:#f7f7f9;color:#555;font-weight:700}
+.dc .lt span:first-child{border-left:1px solid #cfd2e0}
+.dc .lt span.on{background:#3b4890;color:#fff;border-color:#3b4890}
+.dc .lt .wr{margin-left:auto;padding:6px 14px;background:#3b4890;color:#fff;font-weight:700;border:1px solid #29367c}
+.dc .hds{display:flex;gap:4px;margin:8px 0 6px;flex-wrap:wrap}.dc .hds span{border:1px solid #d6d8e2;padding:3px 8px;color:#555;background:#fff}.dc .hds span.on{border-color:#3b4890;color:#3b4890;font-weight:700}
+.dc table{width:100%;border-collapse:collapse;table-layout:fixed;border-top:2px solid #3b4890}
+.dc th{height:32px;font-weight:400;color:#333;border-bottom:1px solid #3b4890}
+.dc td{height:31px;border-bottom:1px solid #eee;text-align:center;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc td.t{text-align:left;color:#333;padding-left:4px}
+.dc td.t .ii{display:inline-block;width:14px;height:14px;margin-right:5px;vertical-align:-3px;border-radius:2px}
+.dc .ii.tx{background:linear-gradient(#fff 0 0) 3px 4px/8px 1px no-repeat,linear-gradient(#fff 0 0) 3px 7px/8px 1px no-repeat,linear-gradient(#fff 0 0) 3px 10px/6px 1px no-repeat,#8d93b4}
+.dc .ii.im{background:radial-gradient(circle at 10px 4px,#fff 1.5px,transparent 2px),linear-gradient(135deg,transparent 55%,#fff 56%) 0 0/100% 100%,#3cb46e}
+.dc .ii.bt{background:radial-gradient(circle,#fff 3px,transparent 3.5px),#ef4f4f}
+.dc td.t em{font-style:normal;color:#3b4890;font-weight:700;margin-left:4px;font-size:11px}
+.dc td.n .ip{color:#999;font-size:11px}
+.dc td.n .fix{display:inline-block;width:12px;height:12px;border-radius:2px;background:#6b7bd0;margin-left:3px;vertical-align:-2px}
+.dc tr.ntc td{background:#f5f6fb}.dc tr.ntc td.t{font-weight:700;color:#29367c}
+.dc tr.ntc .sb{color:#3b4890;font-weight:700}
+.dc .bt2{display:flex;justify-content:space-between;margin-top:10px}.dc .bt2 span{border:1px solid #ccc;padding:5px 12px;background:#f8f8f8;font-weight:700}.dc .bt2 .wr{background:#3b4890;color:#fff;border-color:#29367c}
+.dc .pager{text-align:center;margin:18px 0 10px;font-size:13px;color:#333;word-spacing:8px}.dc .pager b{color:#3b4890;text-decoration:underline}
+.dc .bsch{display:flex;justify-content:center;gap:4px;margin-bottom:30px}.dc .bsch span{border:1px solid #ccc;padding:5px 10px}.dc .bsch .in{width:200px}.dc .bsch .go{background:#3b4890;color:#fff;border-color:#29367c}
+.dc .rbox{border:1px solid #d6d8e2;margin-bottom:12px}
+.dc .rbox h5{margin:0;padding:8px 10px;background:#f3f4f9;border-bottom:1px solid #d6d8e2;font-size:12px;color:#29367c}
+.dc .login{padding:12px;display:grid;gap:6px}.dc .login span{border:1px solid #ccc;padding:6px;color:#aaa}.dc .login b{background:#3b4890;color:#fff;text-align:center;padding:8px}
+.dc .rbox ul{margin:0;padding:8px 10px;list-style:none}.dc .rbox li{padding:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#333}.dc .rbox li em{font-style:normal;color:#3b4890;font-weight:700;margin-right:6px}
+.dc .ad{height:250px;background:repeating-linear-gradient(45deg,#f4f4f4 0 10px,#ececec 10px 20px);display:grid;place-items:center;color:#aaa;font-size:11px}
+.dc .ft{border-top:1px solid #ddd;margin-top:10px;padding:16px 0;text-align:center;color:#999;font-size:11px}
+/* 디시 모바일 */
+.phone .dc{min-width:0}
+.phone .dc .gnb0,.phone .dc .gnb,.phone .dc .rail,.phone .dc .hd .sch,.phone .dc .hds,.phone .dc .gt .ic{display:none}
+.phone .dc .hd{width:auto;height:48px;padding:0 12px;background:#3b4890}.phone .dc .hd .lg{color:#fff;font-size:17px}.phone .dc .hd .lg small{display:none}
+.phone .dc .body{width:auto;display:block;padding:0}
+.phone .dc .gt{padding:12px;border-bottom:1px solid #3b4890}
+.phone .dc .lt{margin:0;padding:8px 12px;border-bottom:1px solid #eee}
+.phone .dc table{display:none}
+.mlist{display:none}.phone .mlist{display:block}
+.mlist .it{padding:10px 12px;border-bottom:1px solid #eee}
+.mlist .it .t{font-size:14px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mlist .it .t em{font-style:normal;color:#3b4890;font-weight:700;margin-left:4px;font-size:12px}
+.mlist .it .m{font-size:11.5px;color:#999;margin-top:4px}
+.mlist .it.ntc .t{color:#29367c;font-weight:700}
+.phone .dc .bt2{padding:0 12px}.phone .dc .bsch{display:none}
+
+/* ── 세정게: 2000년대 제로보드 ── */
+.wp{background:#fff;color:#000;min-height:100%;font:12px 'Gulim','굴림','Noto Sans KR',sans-serif}
+.wp .pg{background:#fff;min-height:100%}
+.wp .ban{height:86px;background:linear-gradient(90deg,#0c1a3a,#24447a 55%,#0c1a3a);position:relative;overflow:hidden;border-bottom:3px solid #b00}
+.wp .ban b{position:absolute;left:18px;top:14px;font:900 30px 'Batang','Noto Serif KR',serif;color:#fff;letter-spacing:4px;text-shadow:2px 2px 0 #000}
+.wp .ban small{position:absolute;left:20px;top:56px;color:#ffd24a;font:bold 11px Verdana,sans-serif;letter-spacing:2px}
+.wp .ban .globe{position:absolute;right:20px;top:8px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8fd0ff,#1a5aa8 60%,#0a2550);box-shadow:0 0 0 2px #000}
+.wp .ban .globe::after{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(0deg,transparent 0 11px,rgba(255,255,255,.35) 11px 12px),repeating-linear-gradient(90deg,transparent 0 11px,rgba(255,255,255,.25) 11px 12px)}
+.wp .bar{background:#dcdcdc;border-bottom:1px solid #999;padding:4px 8px;font-size:11px}
+.wp .bar a{color:#00007a;margin-right:10px}
+.wp .cols{display:grid;grid-template-columns:150px 1fr}
+.wp .lm{background:#f2f2f2;border-right:1px solid #bbb;padding:8px}
+.wp .lm .t{background:#5a5a7a;color:#fff;font-weight:bold;padding:3px 6px;margin-bottom:4px}
+.wp .lm a{display:block;padding:3px 2px;color:#000;border-bottom:1px dotted #aaa}
+.wp .lm a::before{content:'▶ ';color:#b00;font-size:9px}
+.wp .lm .cnt{margin-top:10px;border:1px solid #999;background:#fff;padding:5px;font-size:11px;line-height:1.6}
+.wp .lm .cnt span{font-family:'Courier New',monospace;background:#000;color:#0f0;padding:0 3px}
+.wp .lm .poll{margin-top:10px;border:1px solid #999;background:#fff;padding:5px;font-size:11px;line-height:1.7}
+.wp .ct{padding:10px}
+.wp .warn{border:1px solid #f00;background:#fff0f0;color:#c00;font-weight:bold;padding:5px 7px;margin-bottom:8px}
+.wp .tot{font-size:11px;color:#555;margin-bottom:3px;display:flex;justify-content:space-between}
+.wp table{width:100%;border-collapse:collapse}
+.wp th{background:#5a5a7a url();color:#fff;font-weight:bold;height:22px;border-top:2px solid #333;font-size:11px}
+.wp td{height:22px;border-bottom:1px dotted #bbb;text-align:center;font-size:12px}
+.wp td.t{text-align:left;padding-left:4px}.wp td.t a{color:#000}.wp td.t a:hover{text-decoration:underline}
+.wp td.t .cm{color:#b00;font-size:10px;font-family:Verdana}
+.wp td.t .nw{display:inline-block;background:#f60;color:#fff;font:bold 8px Verdana;padding:0 2px;margin-left:3px;vertical-align:1px}
+.wp tr.ntc td{background:#fffbe0;font-weight:bold}
+.wp .gone{color:#aaa}
+.wp .nav2{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.wp .bb{display:inline-block;border:1px solid #777;background:linear-gradient(#fff,#d6d6d6);padding:1px 8px;font-size:11px;color:#000}
+.wp .pgn{text-align:center;margin:8px 0;font-size:12px}.wp .pgn b{color:#b00}.wp .pgn a{color:#00007a;margin:0 2px}
+.wp .sch{text-align:center;font-size:11px}.wp .sch .in{display:inline-block;width:120px;height:18px;border:1px solid #777;vertical-align:middle;background:#fff}
+.wp .wml{display:none}
+.phone .wp table{display:none}
+.phone .wp .wml{display:block;border-top:2px solid #333}
+.phone .wp .wml .it{padding:10px 4px;border-bottom:1px dotted #bbb}
+.phone .wp .wml .t{font-size:14.5px;line-height:1.45;color:#000}
+.phone .wp .wml .m{font-size:12px;color:#777;margin-top:4px}
+.phone .wp .wml .ntc{background:#fffbe0}.phone .wp .wml .ntc .t{font-weight:bold}
+.phone .wp .wml .gone .t{color:#aaa}
+.phone .wp .wml .cm{color:#b00;font-size:11px;font-family:Verdana}
+.phone .wp .wml .nw{display:inline-block;background:#f60;color:#fff;font:bold 9px Verdana;padding:0 3px;margin-left:4px;vertical-align:1px}
+.phone .wp .pgn{font-size:14px;word-spacing:4px}
+.phone .wp .bb{font-size:13px;padding:5px 14px}
+.phone .wp .tot{display:none}
+.wp .ft{border-top:1px solid #999;margin-top:8px;padding:6px;text-align:center;font:9px Verdana,sans-serif;color:#777}
+.phone .wp{padding:0}.phone .wp .cols{grid-template-columns:minmax(0,1fr)}.phone .wp .lm,.phone .wp .nav2 .sch{display:none}.phone .wp .ct{padding:8px}.phone .wp table{table-layout:fixed}.phone .wp td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.phone .wp td.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.phone .wp th:nth-child(1),.phone .wp td:nth-child(1),.phone .wp th:nth-child(5),.phone .wp td:nth-child(5){display:none}.phone .wp th:nth-child(3){width:70px!important}.phone .wp .ban{height:64px}.phone .wp .ban b{font-size:22px;top:10px;left:12px}.phone .wp .ban small{top:42px;left:13px}.phone .wp .ban svg{width:50px;height:50px}
+
+/* ── 연어 마켓: 덜 쨍하게, 사진 느낌 ── */
+.sm{background:#f6f3ee;color:#2b2622;min-height:100%;font:13.5px 'Pretendard','Noto Sans KR',sans-serif}
+.sm .hd{display:flex;align-items:center;gap:22px;height:58px;padding:0 28px;background:#fbf9f5;border-bottom:1px solid #e4ddd3}
+.sm .lg{display:flex;align-items:center;gap:6px;font-weight:900;font-size:20px;color:#c9573d;letter-spacing:-1px}
+.sm .hd nav{display:flex;gap:18px;font-size:14px;color:#6b625a;font-weight:600}.sm .hd nav b{color:#2b2622;border-bottom:2px solid #c9573d;padding-bottom:3px}
+.sm .hd .sr{margin-left:auto;width:260px;height:36px;border-radius:6px;background:#efe9e1;display:flex;align-items:center;padding:0 12px;color:#9a8f84;font-size:13px;white-space:nowrap;overflow:hidden}
+.sm .hd .ch{padding:7px 12px;border:1px solid #d8cfc3;border-radius:6px;font-size:13px;font-weight:700;background:#fff}
+.sm .hd .ch em{font-style:normal;color:#fff;background:#c9573d;border-radius:8px;padding:0 5px;margin-left:4px;font-size:11px}
+.sm .note{padding:8px 28px;background:#efe9e1;color:#7d7268;font-size:12px;border-bottom:1px solid #e4ddd3}
+.sm .sec{padding:18px 28px}
+.sm .bar2{display:flex;align-items:center;gap:6px;margin-bottom:16px}
+.sm .bar2 .loc{font-weight:800;font-size:15px;margin-right:10px}
+.sm .cats{display:flex;gap:6px}.sm .cats span{padding:5px 11px;border-radius:14px;border:1px solid #d8cfc3;background:#fff;font-size:12.5px;color:#6b625a;white-space:nowrap}.sm .cats span.on{background:#3a322c;border-color:#3a322c;color:#fff}
+.sm .sort{margin-left:auto;font-size:12.5px;color:#9a8f84;white-space:nowrap}.sm .sort b{color:#2b2622}
+.sm .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:26px 18px}
+.ph{aspect-ratio:1;border-radius:6px;display:grid;place-items:center;overflow:hidden;position:relative;box-shadow:inset 0 0 40px rgba(0,0,0,.28)}
+.ph img{width:170px;height:170px;image-rendering:pixelated;filter:drop-shadow(3px 5px 3px rgba(0,0,0,.35))}
+.ph.wood{background:repeating-linear-gradient(93deg,#8a5a36 0 9px,#7b4f2f 9px 13px,#93623c 13px 24px)}
+.ph.cloth{background:radial-gradient(circle at 30% 30%,#d8d0c2,#b7ad9c)}
+.ph.floor{background:repeating-linear-gradient(0deg,#cfc7b8 0 38px,#bdb4a4 38px 40px),#cfc7b8}
+.ph.desk{background:linear-gradient(160deg,#e9e6df,#c9c4b9)}
+.ph.news{background:repeating-linear-gradient(0deg,#e7e2d4 0 5px,#d6d0c0 5px 6px)}
+.ph.want{background:#fffdf8;border:1.5px dashed #c9b9a6;box-shadow:none;place-items:start;align-content:start;padding:16px;gap:10px;text-align:left}
+.ph.want b{background:#3a322c;color:#fff;font-size:12px;padding:3px 8px;border-radius:4px;justify-self:start}
+.ph.want p{margin:0;font-size:13.5px;line-height:1.55;color:#5b524a}
+.phone .sm .c .ph.want{padding:8px;gap:6px}.phone .sm .c .ph.want p{font-size:11px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ph.dark{background:radial-gradient(circle at 50% 40%,#4b4640,#24211e)}
+.ph .tag{position:absolute;left:8px;top:8px;padding:2px 7px;border-radius:3px;background:rgba(43,38,34,.85);color:#fff;font-size:11px;font-weight:700}
+.ph .tag.g{background:#3d7a58}
+.sm .c .nm{margin-top:10px;font-size:14px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm .c .pr{font-weight:800;margin-top:3px;font-size:14.5px}
+.sm .c .mt{font-size:12px;color:#9a8f84;margin-top:3px}
+.sm .act .back{display:block;margin:0}
+.sm .hd .wr{padding:7px 12px;border-radius:6px;font-size:13px;font-weight:700;background:#c9573d;color:#fff;white-space:nowrap}
+.sm .detail{display:grid;grid-template-columns:400px minmax(0,1fr);gap:34px;padding:16px 28px 28px;max-width:1000px}
+.sm .detail .ph{border-radius:8px}.sm .detail .ph img{width:340px;height:340px}
+.sm .seller{display:flex;align-items:center;gap:12px;padding:0 0 14px;border-bottom:1px solid #e4ddd3}
+.sm .seller i{width:42px;height:42px;border-radius:50%;background:#d8cfc3;display:block}
+.sm .seller small{display:block;color:#9a8f84;font-size:12.5px}
+.sm .temp{margin-left:auto;text-align:right}.sm .temp b{color:#c9573d;font-size:15px}.sm .temp small{color:#9a8f84}
+.sm h2{margin:16px 0 6px;font-size:20px;letter-spacing:-.5px}
+.sm .mt2{color:#9a8f84;font-size:12.5px}
+.sm .price{font-size:19px;font-weight:800;margin-top:8px}
+.sm .body{line-height:1.75;font-size:14.5px;margin:16px 0}
+.sm .stat{color:#9a8f84;font-size:12.5px}
+.sm .act{display:flex;gap:8px;margin-top:18px}
+.sm .act span{padding:11px 16px;border-radius:6px;border:1px solid #d8cfc3;background:#fff;font-weight:700}
+.sm .act span.chat{background:#c9573d;color:#fff;border-color:#c9573d;flex:1;text-align:center}
+.phone .sm .hd{padding:0 12px;gap:8px;height:52px}.phone .sm .hd nav,.phone .sm .hd .ch{display:none}.phone .sm .hd .sr{width:auto;flex:1;height:34px}
+.phone .sm .note{padding:7px 12px}.phone .sm .sec{padding:12px}
+.phone .sm .bar2{flex-wrap:wrap;row-gap:8px}.phone .sm .bar2 .loc{order:1}.phone .sm .sort{order:2}.phone .sm .cats{order:3;width:100%;overflow-x:auto;scrollbar-width:none}
+.phone .sm .grid{grid-template-columns:minmax(0,1fr);gap:0}
+.phone .sm .c{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid #e4ddd3}
+.phone .sm .c .ph{border-radius:6px}.phone .sm .c .ph img{width:85px;height:85px}.phone .sm .c .nm{margin-top:2px}
+
+.phone .sm .detail{grid-template-columns:minmax(0,1fr);padding:10px 0 20px;gap:14px}.phone .sm .detail .ph{border-radius:0}.phone .sm .detail>div:last-child{padding:0 14px}
+/* ── 괴이위키: 나무위키 같은 모양 ── */
+.wk{background:#f5f5f5;color:#373a3c;min-height:100%;font:14.5px 'Noto Sans KR',sans-serif}
+.wk .top{background:#27685b;height:52px;display:flex;align-items:center;gap:18px;padding:0 24px;color:#fff}
+.wk .top .lg{display:flex;align-items:center;gap:8px;font-weight:900;font-size:19px}
+.wk .top nav{display:flex;gap:16px;font-size:13.5px;opacity:.9}
+.wk .top .sr{margin-left:auto;width:260px;height:32px;border-radius:4px;background:#fff;color:#999;display:flex;align-items:center;padding:0 10px;font-size:13px}
+.wk .wrap{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;max-width:1200px;margin:0 auto;padding:18px 24px}
+.wk .doc{background:#fff;border:1px solid #ddd;border-radius:6px;padding:24px 30px}
+.wk h1{margin:0 0 6px;font-size:28px;letter-spacing:-.5px}
+.wk .dm{color:#888;font-size:12px;border-bottom:1px solid #ccc;padding-bottom:12px;margin-bottom:16px}
+.wk .ib{float:right;width:300px;margin:0 0 14px 18px;border-collapse:collapse;font-size:13px;border:2px solid #27685b}
+.wk .ib caption{background:#27685b;color:#fff;font-weight:800;padding:8px;font-size:15px}
+.wk .ib th{background:#e8f1ef;width:84px;padding:6px;border:1px solid #cfdcd9;text-align:center;font-weight:700}
+.wk .ib td{padding:6px 8px;border:1px solid #cfdcd9}
+.wk .toc{display:inline-block;border:1px solid #ccc;padding:12px 18px;margin:4px 0 16px;font-size:13.5px;line-height:1.9}
+.wk .toc b{display:block;font-size:15px;margin-bottom:2px}.wk .toc .t2{padding-left:16px}
+.wk .no{color:#27685b;font-weight:700}
+.wk .wh{border-bottom:1px solid #ccc;padding-bottom:6px;margin:26px 0 10px}.wk h2.wh{font-size:22px}.wk h3.wh{font-size:18px}
+.wk p{line-height:1.85;margin:0 0 12px}
+.wk a.wl{color:#0275d8;text-decoration:none}
+.wk s{color:#999}
+.wk sup.fn{color:#0275d8;font-size:11px}
+.wk blockquote{margin:10px 0 14px;padding:12px 16px;border-left:5px solid #27685b;background:#eef4f3}.wk blockquote cite{display:block;margin-top:6px;color:#888;font-size:12px;font-style:normal}
+.wk ul{margin:0 0 8px;padding-left:22px;line-height:1.8}
+.wk .fns{border-top:1px solid #ccc;margin-top:22px;padding-top:10px;font-size:12.5px;line-height:1.8;color:#555}
+.wk .mainp .hero{text-align:center;padding:22px 10px 18px;border-bottom:1px solid #eee;margin-bottom:16px}
+.wk .mainp .hero b{font-size:30px;color:#27685b;font-weight:900}
+.wk .mainp .hero p{margin:6px 0 14px;color:#666}
+.wk .mainp .bsr{display:flex;max-width:460px;margin:0 auto;border:2px solid #27685b;border-radius:4px;height:38px;align-items:center;padding-left:12px;color:#999;font-size:13.5px}
+.wk .mainp .bsr span{margin-left:auto;height:100%;background:#27685b;color:#fff;padding:0 16px;display:flex;align-items:center;font-weight:700}
+.wk .mainp .acts{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.wk .mainp .acts span{border:1px solid #ccc;border-radius:4px;padding:6px 12px;font-size:13px;background:#fafafa}
+.wk .mainp table.wel{width:100%;border-collapse:collapse;margin:4px 0 16px;border:2px solid #27685b;text-align:center}
+.wk .mainp table.wel th{background:#27685b;color:#fff;font-size:18px;padding:10px}
+.wk .mainp table.wel td{padding:14px;font-size:15px;line-height:1.8}
+.wk .mainp table.wel small{color:#666;font-size:13px}
+.wk .mainp .lst{line-height:2}
+.wk .mainp .cols{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+.wk .mainp .bx2 h3 small{font-weight:400;opacity:.8;margin-left:4px}
+.wk .mainp .bx2{border:1px solid #ddd;border-radius:4px;padding:0 0 8px;margin-bottom:14px}
+.wk .mainp .bx2 h3{margin:0 0 6px;padding:8px 12px;background:#27685b;color:#fff;font-size:14.5px;border-radius:3px 3px 0 0}
+.wk .mainp .bx2 a{display:block;padding:4px 12px;color:#0275d8;font-size:13.5px}
+.wk .mainp .bx2 a em{font-style:normal;color:#888;margin-left:6px}
+.wk .mainp .today p{padding:2px 12px;margin:0 0 4px}
+.wk .mainp .today .more{text-align:right}
+.wk .mainp .chips{display:flex;flex-wrap:wrap;gap:2px 0;padding:2px 6px}
+.wk .mainp .chips a{display:inline-block;padding:3px 8px}
+.wk .mainp .chips a.all{color:#888}
+.phone .wk .mainp .cols{grid-template-columns:minmax(0,1fr);gap:0}
+.wk.nm .top{background:#00a495}
+.wk.nm .top .rnd{margin-left:auto;width:34px;height:32px;background:#fff;color:#00a495;border-radius:4px 0 0 4px;display:grid;place-items:center;font-weight:900;border-right:1px solid #ddd}
+.wk.nm .top .sr{border-radius:0 4px 4px 0}
+.wk.nm .mainp .cat{border:1px solid #ddd;border-radius:3px;padding:5px 8px;font-size:13px}
+.wk.nm .hl{border:0;border-top:1px solid #ccc;margin:14px 0}
+.wk.nm .intro{text-align:center}
+.wk.nm .intro h3{margin:4px 0 6px;font-size:20px}
+.wk.nm .intro h3 span{color:#00a495}
+.wk.nm .intro p{margin:0 0 10px;line-height:1.7}
+.wk.nm .intro .sm2{font-size:14px;color:#444}
+.wk.nm .intro .bsr{display:flex;max-width:460px;margin:14px auto 4px;border:2px solid #00a495;border-radius:4px;height:38px;align-items:center;padding-left:12px;color:#999;font-size:13.5px;text-align:left}
+.wk.nm .intro .bsr span{margin-left:auto;height:100%;background:#00a495;color:#fff;padding:0 16px;display:flex;align-items:center;font-weight:700}
+.wk.nm table.irow{width:100%;border-collapse:collapse;border:2px solid #00a495}
+.wk.nm table.irow td{border-bottom:1px solid #ddd;padding:10px 12px;vertical-align:middle;line-height:1.7;font-size:14px}
+.wk.nm table.irow td.ic{width:72px;background:#00a495;text-align:center;border-bottom:1px solid #3dbcb0}
+.wk.nm table.irow .tt{font-size:17px;font-weight:800;margin-bottom:2px}
+.wk.nm table.irow .tt small{font-weight:400;color:#888;font-size:13px}
+.wk.nm .side .rc{display:flex;justify-content:space-between;align-items:center;padding:5px 12px}
+.wk.nm .side .rc a{border:0;padding:0}
+.wk.nm .side .rc small{color:#888;font-size:11px;white-space:nowrap;margin-left:8px}
+.phone .wk.nm table.irow td.ic{width:48px;padding:6px}.phone .wk.nm table.irow td.ic svg{width:30px;height:30px}
+
+/* 첨부 공통 */
+.ax{margin:12px 0;max-width:min(100%,520px)}
+.ax-img{position:relative;display:inline-block;border:1px solid rgba(0,0,0,.2);background:#000}
+.ax-img img{display:block;max-width:100%;max-height:360px;image-rendering:pixelated}
+.ax-img .zm{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.55);color:#fff;border-radius:4px;padding:1px 6px;font-size:13px}
+.ax figcaption{font-size:12.5px;opacity:.7;padding:5px 2px 0;background:none}
+.ax-img figcaption{background:var(--capbg,#fff);color:inherit;padding:5px 8px}
+.ax-ph .fr{aspect-ratio:4/3;max-width:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;text-align:center;background:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 10px,rgba(0,0,0,.09) 10px 20px);border:1px solid rgba(0,0,0,.18);color:rgba(0,0,0,.45)}
+.ax-ph p{margin:0;color:#333;font-size:13.5px;line-height:1.6;font-style:italic}
+.ax-vd .fr{position:relative;aspect-ratio:16/9;background:#111;color:#ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 22px 40px;text-align:center}
+.ax-vd .pl{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:20px;margin-bottom:10px}
+.ax-vd p{margin:0;font-size:13px;line-height:1.6;color:#cfcfcf}
+.ax-vd .bar{position:absolute;left:0;right:0;bottom:0;height:30px;display:flex;align-items:center;gap:10px;padding:0 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:11px}
+.ax-vd .bar i{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:2px}
+.axf{border-top:1px solid rgba(0,0,0,.15);margin-top:16px;padding-top:8px;font-size:13.5px}
+.axf b{display:block;font-size:12.5px;opacity:.7;margin-bottom:4px}
+.axf .r{display:flex;gap:6px;align-items:center;padding:3px 0}
+.axf a{color:#0b62c4;text-decoration:underline}
+/* 괴담넷 글 */
+.gn .gpost .ph1{border-bottom:2px solid var(--ink);padding-bottom:10px}
+.gn .gpost .c{display:inline-block;padding:1px 7px;border-radius:2px;font-size:11.5px;background:var(--chip);color:var(--dim);font-weight:700}
+.gn .gpost h2{margin:6px 0 6px;font-size:21px;color:var(--ink)}
+.gn .gpost .mt{font-size:12.5px;color:var(--dim)}
+.gn .gpost .pb{padding:14px 2px;color:var(--ink);font-size:15px;line-height:1.75}
+.gn .gpost .pb p{margin:0 0 8px}
+.gn .gpost .ax-ph .fr,.gn .gpost .ax-img{border-color:var(--line)}
+.gn .gpost .acts{display:flex;justify-content:center;gap:10px;padding:10px 0 16px;border-bottom:1px dashed var(--line)}
+.gn .gpost .acts span{border:1px solid var(--line);padding:7px 16px;border-radius:3px;font-weight:700;font-size:13.5px;color:var(--ink);background:var(--bg2)}
+.gn .gpost .acts .up{background:var(--red);color:#fff;border-color:var(--red)}
+.gn .gpost .cmh{padding:12px 0 6px;font-weight:800;color:var(--ink)}
+.gn .gpost .cmh b{color:var(--red)}
+.gn .gpost .cm{padding:10px 2px;border-bottom:1px dashed var(--line);color:var(--ink);font-size:14px}
+.gn .gpost .cm p{margin:4px 0 0}
+.gn .gpost .cm small{color:var(--dim)}
+.gn .gpost .cm .ax{margin:8px 0 2px}.gn .gpost .cm .ax-ph .fr{max-width:260px}
+.gn .gpost .cin{display:flex;align-items:center;margin-top:12px;border:1px solid var(--line);background:var(--bg2);height:40px;padding-left:12px;color:var(--dim);font-size:13px}
+.gn .gpost .cin span{margin-left:auto;height:100%;display:flex;align-items:center;padding:0 16px;background:var(--hd);color:var(--hdi);font-weight:700}
+.gn .gpost .bt{display:flex;justify-content:space-between;margin-top:14px}
+.gn .gpost .bt span{border:1px solid var(--line);padding:7px 14px;border-radius:3px;font-weight:700;font-size:13px;color:var(--ink)}
+.gn .gpost .bt .w{background:var(--red);color:#fff;border-color:var(--red)}
+/* 괴담갤 글 */
+.dc .dpost{padding-top:14px}
+.dc .dpost .vt{border-top:2px solid #3b4890;border-bottom:1px solid #ddd;padding:10px 4px}
+.dc .dpost h3{margin:0 0 6px;font-size:17px;color:#222}
+.dc .dpost h3 span{color:#3b4890}
+.dc .dpost .vm{display:flex;justify-content:space-between;color:#777;font-size:12px}
+.dc .dpost .ip{color:#999;font-size:11px}
+.dc .dpost .att{float:right;margin:10px 0 6px 12px;border:1px solid #ccc;background:#fafafa;padding:6px 10px;font-size:12px;min-width:210px}
+.dc .dpost .att b{display:block;color:#3b4890;margin-bottom:3px}
+.dc .dpost .att a{display:block;color:#333;padding:2px 0;text-decoration:underline}
+.dc .dpost .pb{padding:16px 4px;font-size:14px;line-height:1.8;color:#222;min-height:120px}
+.dc .dpost .pb p{margin:0 0 6px}
+.dc .dpost .rec{clear:both;display:flex;justify-content:center;gap:14px;padding:10px 0 20px}
+.dc .dpost .rec .b{width:84px;height:84px;border-radius:50%;border:3px solid #3b4890;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#3b4890}
+.dc .dpost .rec .b b{font-size:22px}.dc .dpost .rec .b span{font-size:11.5px;font-weight:700}
+.dc .dpost .rec .dn{border-color:#999;color:#666}
+.dc .dpost .cmh{border-top:2px solid #3b4890;border-bottom:1px solid #ddd;padding:8px 4px;font-weight:700;font-size:13px}
+.dc .dpost .cmh b{color:#d31900}
+.dc .dpost .cm{display:grid;grid-template-columns:130px minmax(0,1fr) 50px;gap:10px;padding:8px 4px;border-bottom:1px solid #eee;font-size:13px}
+.dc .dpost .cm p{margin:0}.dc .dpost .cm small{color:#999;text-align:right}
+.dc .dpost .cm .ax{margin:6px 0 0}.dc .dpost .cm .ax-ph .fr{max-width:240px}
+.dc .dpost .cin{display:flex;gap:6px;margin:10px 0;align-items:stretch}
+.dc .dpost .cin .nm{border:1px solid #ccc;padding:6px 10px;width:110px;color:#999}
+.dc .dpost .cin .tx{flex:1;border:1px solid #ccc;height:52px}
+.dc .dpost .cin .go{background:#3b4890;color:#fff;padding:0 18px;display:flex;align-items:center;font-weight:700}
+.dc .dpost .bt2 span:nth-child(2){margin-right:auto;margin-left:6px}
+/* 세정게 글 */
+.wp .wpost table.vw{width:100%;border-collapse:collapse;border-top:2px solid #333}
+.wp .wpost table.vw th{width:60px;background:#5a5a7a;color:#fff;font-size:11px;border:0;border-bottom:1px solid #fff;height:24px}
+.wp .wpost table.vw td{text-align:left;padding:3px 8px;border-bottom:1px dotted #bbb;font-size:12px;height:auto;white-space:normal}
+.wp .wpost table.vw td.tt{font-weight:bold;font-size:13px}
+.wp .wpost table.vw td a{color:#00007a;text-decoration:underline}
+.wp .wpost table.vw td.bd{padding:14px 10px;font-size:13px;line-height:1.8;border-bottom:2px solid #333}
+.wp .wpost table.vw td.bd p{margin:0 0 6px}
+.wp .wpost .ax-img{border:1px solid #777}
+.wp .wpost .cms{margin-top:8px;border:1px solid #bbb;background:#f6f6f6;padding:6px 8px;font-size:12px}
+.wp .wpost .cm{padding:4px 0;border-bottom:1px dotted #bbb}
+.wp .wpost .cm small{color:#888}
+.wp .wpost .cm .ax{margin:6px 0 2px}.wp .wpost .cm .ax-ph .fr{max-width:220px;padding:10px}
+.wp .wpost .cin{padding-top:6px;font-size:11px}
+.wp .wpost .cin .in{display:inline-block;width:260px;height:18px;border:1px solid #777;background:#fff;vertical-align:middle}.wp .wpost .cin .in.s{width:70px}
+/* 폰 */
+.phone .ax{max-width:100%}
+.phone .ax-ph .fr{max-width:100%}
+.phone .gn .gpost h2{font-size:18px}
+.phone .dc .dpost .att{float:none;margin:10px 0 0}
+.phone .dc .dpost .vm{flex-direction:column;gap:2px}
+.phone .dc .dpost .cm{grid-template-columns:minmax(0,1fr);gap:3px}.phone .dc .dpost .cm small{text-align:left}
+.phone .dc .dpost .cin .nm{display:none}
+.phone .dc .dpost{padding:10px 12px}
+.phone .wp .wpost table.vw th{width:48px}
+.phone .wp .wpost .cin .in{width:100%;display:block;margin:3px 0}.phone .wp .wpost .cin .in.s{width:100%}
+.wk .wrap.one{grid-template-columns:minmax(0,1fr)}
+.wk .top{min-width:0;overflow:hidden}.wk .top .sr{flex:0 1 300px;min-width:0;width:auto;white-space:nowrap;overflow:hidden}.wk .top .sr .sg{margin-left:auto;display:flex;flex:none}.wk .top .sr .sg svg{fill:#555;width:18px;height:18px}.wk .top nav{flex:none}.wk .top .lg{flex:none}
+.wk.hasdr{position:relative}
+.wk .top nav{align-items:center}
+.wk .wlb{margin-left:auto;width:34px;height:32px;border-radius:4px;background:#fff;color:#27685b;display:grid;place-items:center;flex:none}
+.wk.nm .wlb{color:#00a495}
+.wk .wlb+.sr{margin-left:-10px}
+.wk.nm .top .wlb+.rnd{margin-left:-8px}
+body:not(.phone) .wk .wgrab{display:none!important}
+.wk .wlb.on{background:#cfe9e4;box-shadow:inset 0 0 0 2px #fff}
+.wk .wdr{left:auto!important;right:0;border-right:0;border-left:1px solid #ccc;box-shadow:-10px 0 24px rgba(0,0,0,.18)}
+.wk .wgrab{display:none}
+.wk .wdr{left:0}
+.wk .wscrim{left:0}
+.phone .wk .wgrab{display:flex}
+.phone .wk .top nav{display:none}
+.phone .wk .wlb{display:none}
+.phone .wk .wlb+.sr,.phone .wk .wlb+.rnd{margin-left:auto}
+.wk .wgrab{position:absolute;left:0;top:52px;bottom:0;width:34px;border:0;border-right:1px solid #ccc;background:#fff;color:#27685b;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:16px;font:800 18px 'Noto Sans KR';z-index:4;cursor:pointer}
+.wk .wgrab span{writing-mode:vertical-rl;font-size:12.5px;letter-spacing:.2em;color:#555}
+.wk.nm .wgrab{color:#00a495}
+.wk .wdr{position:absolute;z-index:5;top:52px;bottom:0;width:300px;background:#fff;border-right:1px solid #ccc;box-shadow:10px 0 24px rgba(0,0,0,.18);display:none;flex-direction:column}
+.wk .wdr.open{display:flex}
+.wk .wscrim{position:absolute;z-index:3;right:0;top:52px;bottom:0;background:rgba(0,0,0,.18)}
+.wk .wsr{display:flex;align-items:center;gap:8px;margin:12px;height:36px;border:1px solid #ccc;border-radius:4px;padding:0 10px;color:#999;font-size:13px}
+.wk .wsr svg{width:16px;height:16px;fill:#888}
+.wk .wtabs{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 10px;border-bottom:1px solid #eee}
+.wk .wtabs span{border:1px solid #ccc;border-radius:12px;padding:3px 9px;font-size:12px;color:#555}
+.wk .wtabs span small{margin-left:4px;color:#999}
+.wk .wtabs span.on{background:#27685b;border-color:#27685b;color:#fff}.wk .wtabs span.on small{color:#cfe}
+.wk.nm .wtabs span.on{background:#00a495;border-color:#00a495}
+.wk .wls{overflow:auto;flex:1;padding:4px 0}
+.wk .wls h4{margin:0;padding:8px 14px 4px;font-size:13px;color:#27685b}
+.wk .wls h4 b{font-weight:400;color:#999;margin-left:6px;font-size:11px}
+.wk .wls a{display:flex;align-items:center;gap:6px;padding:7px 14px;color:#0275d8;font-size:13.5px;border:0}
+.wk .wls a.on{background:#eef4f3;font-weight:700}
+.wk .wls a i{width:6px;height:6px;border-radius:50%;background:#e0a100}
+.phone .wk.hasdr{padding-left:0}
+.phone .wk.hasdr>.top{margin-left:0}
+.phone .wk .wgrab{position:fixed;left:auto;right:0;top:auto;bottom:24px;height:110px;width:30px;border:1px solid #ccc;border-right:0;border-radius:12px 0 0 12px;padding:10px 0 0;box-shadow:-3px 4px 12px -6px rgba(0,0,0,.4)}
+.phone .wk.dr-open .wgrab{display:none}
+.phone .wk .wdr{left:auto;right:0;width:84%;border-right:0;border-left:1px solid #ccc;box-shadow:-10px 0 24px rgba(0,0,0,.2)}
+.phone .wk .wscrim{left:0}
+.wk .h1r{display:flex;align-items:flex-start;gap:12px}
+.wk .h1r h1{flex:1;min-width:0}
+.wk .dbtn{display:flex;border:1px solid #ccc;border-radius:4px;overflow:hidden;flex:none;margin-top:4px}
+.wk .dbtn span{padding:6px 12px;font-size:13px;background:#fff;color:#333}
+.wk .dbtn span+span{border-left:1px solid #ccc}
+.wk .dbtn span.on{background:#27685b;color:#fff}
+.wk .rwbox,.wk .nodoc{border:1px solid #ccc;border-radius:4px;padding:14px 16px;margin:0 0 16px;background:#fafafa}
+.wk .rwbox>b{display:block;margin-bottom:8px}
+.wk .ta{border:1px solid #ccc;border-radius:4px;background:#fff;color:#999;height:76px;padding:8px 10px;font-size:13.5px}
+.wk .crq{margin:6px 0 0;font-size:12.5px;color:#888}
+.wk .rr{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13.5px}
+.wk .rr .sp{flex:1}
+.wk .sg2{display:inline-flex;border:1px solid #ccc;border-radius:4px;overflow:hidden;font-size:12px}
+.wk .sg2 b,.wk .sg2 i{padding:3px 10px;font-style:normal}
+.wk .sg2 b{background:#27685b;color:#fff}
+.wk .bt{border:1px solid #ccc;border-radius:4px;padding:7px 16px;background:#fff;font-weight:700}
+.wk .bt.go{background:#27685b;border-color:#27685b;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.wk .spin{width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block}
+.wk .bz{margin:8px 0 0;text-align:right;font-size:12.5px;color:#888}
+.wk .nodoc p{margin:0 0 10px}
+.wk .nodoc .src{color:#666;font-size:13.5px}
+.wk .nodoc label{display:block;font-weight:700;margin-bottom:6px}
+.wk .in1{border:1px solid #ccc;border-radius:4px;background:#fff;color:#999;height:38px;display:flex;align-items:center;padding:0 10px;margin-bottom:8px}
+.wk .go1{border:1px solid #ddd;background:#f8f8f8;padding:10px 12px;border-radius:4px;margin-bottom:12px;font-size:14px}
+.wk .go1 .new{margin-left:6px;font-weight:700}
+.wk .sres{list-style:none;margin:0;padding:0}
+.wk .sres li{padding:12px 2px;border-bottom:1px solid #eee}
+.wk .sres .t{font-size:16px;font-weight:700}
+.wk .sres small{margin-left:8px;color:#888;font-size:12px}
+.wk .sres p{margin:4px 0 0;font-size:13.5px;color:#555;line-height:1.6}
+.wk .rel{border:1px solid #ddd;border-radius:4px;padding:8px 12px;margin-top:18px;font-size:13.5px}
+.wk .rel b{margin-right:8px}
+.wk .rel .none{color:#d33}
+.wk details.ref{margin-top:10px;font-size:12.5px;color:#777}
+.phone .wk .h1r{flex-direction:column;gap:4px}
+.wk .bt,.wk .sg2,.wk .rr>span{white-space:nowrap}
+.phone .wk .rr{flex-wrap:wrap}.phone .wk .rr .sp{flex-basis:100%;height:0}.phone .wk .rr .bt{flex:1;text-align:center;justify-content:center}
+.phone .wk .dbtn{margin:0 0 4px}
+.wk .side .bx{background:#fff;border:1px solid #ddd;border-radius:6px;margin-bottom:12px}
+.wk .side h5{margin:0;padding:10px 12px;border-bottom:1px solid #eee;font-size:13.5px}
+.wk .side a{display:block;padding:7px 12px;font-size:13px;color:#0275d8;border-bottom:1px solid #f2f2f2}
+.phone .wk .wrap{grid-template-columns:minmax(0,1fr);padding:8px}.phone .wk .side,.phone .wk .top nav{display:none}.phone .wk .top{padding:0 12px}.phone .wk .top .sr{width:auto;flex:1}
+.phone .wk .doc{padding:16px 14px}.phone .wk .ib{float:none;width:100%;margin:0 0 14px}
+/* ── 백일몽 포인트몰: 사내 쇼핑몰 ── */
+.bmm{background:#eef0f4;color:#1f2430;min-height:100%;font:13.5px 'Pretendard','Noto Sans KR',sans-serif}
+.bmm .gnb{background:#1f2a44;height:34px;display:flex;align-items:center;gap:16px;padding:0 24px;color:#aeb6c8;font-size:12px}
+.bmm .gnb b{color:#f3d9a4}.bmm .gnb .r{margin-left:auto}
+.bmm .hd{background:#fff;display:flex;align-items:center;gap:20px;height:66px;padding:0 24px;border-bottom:1px solid #dde1e8}
+.bmm .lg{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;color:#1f2a44;letter-spacing:-.5px}
+.bmm .lg small{font-weight:600;font-size:12px;color:#8a93a6;margin-left:2px}
+.bmm .me{margin-left:auto;display:flex;align-items:center;gap:12px}
+.bmm .me img{width:40px;height:40px;border-radius:50%;image-rendering:pixelated;background:#cfe0f7}
+.bmm .me .nm{font-size:12.5px;color:#596277;line-height:1.4}.bmm .me .nm b{color:#1f2430;font-size:14px}
+.bmm .pt{background:#1f2a44;color:#f3d9a4;border-radius:8px;padding:8px 14px;font-weight:800;font-size:16px}
+.bmm .pt small{display:block;font-size:10.5px;color:#aeb6c8;font-weight:600}
+.bmm .wrap{display:grid;grid-template-columns:170px minmax(0,1fr);gap:20px;padding:20px 24px}
+.bmm .cat{background:#fff;border:1px solid #dde1e8;border-radius:8px;padding:8px 0;align-self:start}
+.bmm .cat span{display:block;padding:9px 16px;color:#596277}.bmm .cat span.on{color:#1f2a44;font-weight:800;background:#f3f5f9;border-left:3px solid #1f2a44}
+.bmm .rule{background:#fff8e8;border:1px solid #efdfb8;border-radius:8px;padding:10px 14px;color:#7a6431;font-size:12.5px;margin-bottom:14px}
+.bmm h3{margin:0 0 12px;font-size:16px}
+.bmm .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.bmm .g{background:#fff;border:1px solid #dde1e8;border-radius:8px;padding:14px;display:flex;flex-direction:column}
+.bmm .g .im{height:120px;display:grid;place-items:center;background:#f3f5f9;border-radius:6px}.bmm .g .im img{width:85px;height:85px;image-rendering:pixelated}
+.bmm .g .c{font-size:11px;color:#8a93a6;margin-top:10px}
+.bmm .g .n{font-weight:700;margin-top:2px;line-height:1.35}
+.bmm .g .p{margin-top:6px;font-weight:900;font-size:16px;color:#1f2a44}.bmm .g .p small{font-size:12px;color:#8a93a6;font-weight:600;margin-left:4px}
+.bmm .g .lim{font-size:11.5px;color:#b0486a;margin-top:2px}
+.bmm .g .b{margin-top:auto;padding-top:10px}.bmm .g .b span{display:block;text-align:center;padding:8px;border-radius:6px;background:#1f2a44;color:#fff;font-weight:700;font-size:12.5px}
+.bmm .g.lock .b span{background:#c8cdd8;color:#596277}
+.bmm .ft{text-align:center;color:#8a93a6;font-size:11.5px;padding:10px 0 24px}
+.phone .bmm .wrap{grid-template-columns:minmax(0,1fr);padding:12px}.phone .bmm .cat{display:flex;overflow-x:auto;padding:0;scrollbar-width:none}.phone .bmm .cat span{white-space:nowrap;border-left:0}.phone .bmm .cat span.on{border-bottom:2px solid #1f2a44}
+.phone .bmm .gnb{display:none}.phone .bmm .hd{padding:0 12px;gap:10px}.phone .bmm .me .nm{display:none}.phone .bmm .lg small{display:none}.phone .bmm .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* ── 망상홈쇼핑 라이브 (시안 C) ── */
+.ds{background:#120a0c;color:#eee;min-height:100%;font-family:'Noto Sans KR',sans-serif}
+.ds .gnb{display:flex;align-items:center;gap:18px;background:linear-gradient(#c8102e,#8a0a1f);padding:0 18px;height:54px}
+.ds .gnb .lg{font:900 22px 'Noto Sans KR';color:#fff;letter-spacing:-1px}.ds .gnb .lg i{font-style:normal;color:#ffd400}
+.ds .gnb span{color:#ffe;font-size:14px;font-weight:600}.ds .gnb span.on{border-bottom:3px solid #ffd400;padding-bottom:4px}
+.ds .gnb .r{margin-left:auto;font:800 15px ui-monospace;color:#ffd400}
+.ds .bd{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;padding:14px 18px}
+.ds .tv{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#7b2233,#2a0c12 70%);border:1px solid #5a2a30}
+.ds .host{position:absolute;left:6%;bottom:0;width:22%;height:66%;border-radius:45% 45% 0 0;background:linear-gradient(#111,#000)}
+.ds .host:before{content:"";position:absolute;left:27%;top:-24%;width:46%;height:34%;border-radius:50%;background:#f4f2ee}
+.ds .host:after{content:"";position:absolute;left:37%;top:-14%;width:8%;height:7%;border-radius:50%;background:#000;box-shadow:16px 0 0 #000}
+.ds .prod{position:absolute;right:7%;top:18%;width:26%;aspect-ratio:1;background:#fff2;border-radius:12px;display:grid;place-items:center}.ds .prod img{width:82%;image-rendering:pixelated}
+.ds .sub{position:absolute;left:32%;top:15%;width:36%;background:#0009;font-size:13.5px;line-height:1.55;padding:8px 10px;border-left:3px solid #ff2e45}
+.ds .pnum{position:absolute;left:10px;top:10px;background:#ffd400;color:#000;font:900 13px sans-serif;padding:3px 8px}
+.ds .live{position:absolute;left:84px;top:10px;background:#e0263b;color:#fff;font:800 12px ui-monospace;padding:3px 7px}
+.ds .left{position:absolute;right:10px;bottom:62px;background:#000b;color:#ff5c6c;font:700 12px ui-monospace;padding:3px 8px}
+.ds .lower{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,#c8102e,#8a0a1f);padding:8px 14px}
+.ds .lower b{display:block;font-size:17px}.ds .lower small{font-size:12px}
+.ds .ord{display:flex;gap:8px;margin-top:10px}.ds .ord span{padding:10px 16px;border-radius:4px;font-weight:800;font-size:14px;border:1px solid #5a2a30;background:#1e1215}
+.ds .ord .call{background:#e0263b;border-color:#e0263b;color:#fff}.ds .ord .aud{border-color:#ffd400;color:#ffd400}
+.ds .chat{display:flex;flex-direction:column;border:1px solid #5a2a30;border-radius:6px;background:#0e0809}
+.ds .chat h5{margin:0;padding:9px 12px;font-size:13px;border-bottom:1px solid #3a1d22;color:#ccc}
+.ds .chat .l{flex:1;overflow:hidden;min-height:0;padding:8px 12px;font-size:13px;line-height:1.8}.ds .chat .l b{color:#ff9aa5;margin-right:6px}.ds .chat .l i{color:#bbb}
+.ds .chat .in{margin:8px;border:1px solid #3a1d22;border-radius:4px;padding:7px 10px;color:#777;font-size:12.5px}
+.ds .lineup{padding:0 18px 18px}.ds .lineup h4{margin:4px 0 8px;font-size:15px}.ds .lineup h4 small{color:#999;font-weight:400;margin-left:8px;font-size:12px}
+.ds .lu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ds .lu div{display:flex;gap:10px;align-items:center;background:#1e1215;border:1px solid #3a1d22;border-radius:6px;padding:8px;font-size:13px}
+.ds .lu div.on{border-color:#e0263b;box-shadow:0 0 0 1px #e0263b inset}.ds .lu img{width:52px;height:52px;image-rendering:pixelated;background:#2a171b;border-radius:4px}
+.ds .lu em{display:block;font-style:normal;color:#ffd400;font-size:12px}.ds .lu .t{color:#ff5c6c;font-size:11.5px}
+.phone .ds .gnb{gap:12px;height:48px}.phone .ds .gnb span:not(.on):not(.lg):not(.r){display:none}.phone .ds .gnb .lg{font-size:18px}.phone .ds .aud b{display:none}.phone .ds .gnb .r{font-size:12px}
+.phone .ds .bd{grid-template-columns:1fr;padding:10px}.phone .ds .sub{display:none}.phone .ds .chat{height:180px}
+.phone .ds .lower b{font-size:14px}.phone .ds .ord span{flex:1;text-align:center;padding:10px 0;font-size:13px}
+.phone .ds .lineup{padding:0 10px 14px}.phone .ds .lu{grid-template-columns:1fr 1fr}
+/* ── 우주 쇼핑몰: 1990년대 개인 홈페이지 ── */
+.cs{min-height:100%;color:#fff;font:13px 'Gulim','굴림','Noto Sans KR',sans-serif;background-color:#000;background-image:radial-gradient(1px 1px at 10% 20%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 70% 60%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 80%,#ff0 50%,transparent 51%),radial-gradient(1px 1px at 85% 15%,#0ff 50%,transparent 51%),radial-gradient(1px 1px at 30% 45%,#aaa 50%,transparent 51%);background-size:180px 140px,220px 190px,260px 230px,300px 210px,130px 120px}
+.cs a{color:#0ff;text-decoration:underline}
+.cs .fr{display:grid;grid-template-columns:170px minmax(0,1fr);min-height:100%}
+.cs .lf{border-right:4px ridge #888;background:#000040;padding:10px 8px;font-size:12px}
+.cs .lf .tit{text-align:center;font:bold 14px 'Comic Sans MS','Gulim';color:#ff0;margin-bottom:8px}
+.cs .lf .ufo{display:block;margin:0 auto 10px;width:64px;height:28px;position:relative}
+.cs .lf .ufo::before{content:'';position:absolute;left:18px;top:0;width:28px;height:16px;border-radius:14px 14px 0 0;background:#8ff}
+.cs .lf .ufo::after{content:'';position:absolute;left:0;top:12px;width:64px;height:14px;border-radius:50%;background:linear-gradient(#ccc,#666);box-shadow:inset 0 -3px #f0f}
+.cs .lf a{display:block;padding:4px 2px;color:#fff;text-decoration:none}
+.cs .lf a::before{content:'◈ ';color:#f0f}
+.cs .lf a.hot{color:#ff0}
+.cs .lf hr{border:0;height:2px;background:linear-gradient(90deg,red,orange,yellow,lime,cyan,blue,violet);margin:8px 0}
+.cs .lf .cnt{text-align:center;font-size:11px;line-height:1.7}
+.cs .lf .cnt span{display:inline-block;background:#000;border:1px solid #0f0;color:#0f0;font:bold 12px 'Courier New',monospace;padding:0 3px;letter-spacing:2px}
+.cs .lf .res{text-align:center;font-size:10px;color:#aaa;margin-top:8px}
+.cs .mn{padding:12px 16px}
+.cs .title{text-align:center;font:900 34px 'Comic Sans MS','Gulim',cursive;color:#ff0;text-shadow:2px 2px #f0f,4px 4px #00f}
+.cs .subt{text-align:center;color:#0ff;font-size:15px;margin:4px 0 8px}
+.cs hr.rb{border:0;height:4px;background:linear-gradient(90deg,red,orange,yellow,lime,cyan,blue,violet)}
+.cs .marq{border:2px inset #888;background:#000080;color:#fff;padding:3px 0;white-space:nowrap;overflow:hidden;margin:8px 0}
+.cs .marq span{display:inline-block;padding-left:100%;animation:mq 14s linear infinite;animation-delay:-6s}
+@keyframes mq{to{transform:translateX(-100%)}}
+.cs .wel{border:3px double #ff0;padding:8px 10px;color:#fff;line-height:1.7;background:#100030}
+.cs .wel b{color:#f0f}
+.cs .blink{color:#f00;font-weight:900;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.cs .uc{display:inline-block;background:#ff0;color:#000;font-weight:900;padding:0 6px;border:4px solid;border-image:repeating-linear-gradient(45deg,#000 0 5px,#ff0 5px 10px) 4;line-height:1.5}
+.cs .uc b{color:#c00}
+.cs h4{margin:14px 0 6px;color:#ff0;font-size:14px}
+.cs table.goods{width:100%;border:3px outset #c0c0c0;background:#c0c0c0;border-spacing:4px}
+.cs table.goods td{position:relative;padding-bottom:40px!important;background:#fff;color:#000;border:2px inset #c0c0c0;padding:8px;vertical-align:top;width:33%;font-size:12px;line-height:1.5}
+.cs table.goods img{width:80px;height:80px;image-rendering:pixelated;display:block;margin:0 auto 6px;background:#e0e0ff;border:1px solid #888}
+.cs table.goods b{color:#000080}
+.cs table.goods .cart{position:absolute;left:8px;bottom:8px}
+.cs .pr{color:#c00;font-weight:900}
+.cs .pr s{color:#888;font-weight:400}
+.cs .cart{display:inline-block;margin-top:4px;padding:1px 8px;border:2px outset #ddd;background:#c0c0c0;font-size:11px;color:#000}
+.cs .how{margin-top:12px;border:1px solid #0ff;padding:8px 10px;font-size:12px;line-height:1.8;background:#001a1a}
+.cs .how b{color:#0ff}
+.cs .ft{margin-top:12px;text-align:center;color:#aaa;font-size:11px;line-height:1.7}
+.cs .ft .nn{display:inline-block;border:1px solid #888;background:#c0c0c0;color:#000;font:bold 10px Arial;padding:2px 4px}
+.phone .cs .fr{grid-template-columns:minmax(0,1fr)}.phone .cs .lf{display:none}
+.phone .cs table.goods td{display:block;width:auto}.phone .cs .title{font-size:24px}
+.wk nav span{display:inline-flex;align-items:center;gap:5px}.ni{flex:none;vertical-align:-3px;margin-right:4px}.wk nav .ni{margin-right:0}
+.page{position:relative}
+.cs table.goods .qa{position:absolute;right:8px;bottom:8px;font-size:11px;color:#00e;text-decoration:underline;cursor:pointer}
+.cq{position:absolute;z-index:6;top:70px;right:28px;width:430px;background:#c0c0c0;border:2px outset #fff;box-shadow:3px 3px 0 #000;font:12px 'Gulim','굴림','Noto Sans KR',sans-serif;color:#000}
+.cq .q-tb{display:flex;align-items:center;gap:6px;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:700;padding:3px 4px 3px 6px}
+.cq .q-tb .q-tt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cq .q-tb i{display:inline-grid;place-items:center;width:16px;height:14px;background:#c0c0c0;color:#000;border:2px outset #fff;font:bold 10px Arial;font-style:normal}
+.cq .q-hd{padding:6px 8px;border-bottom:2px groove #fff;display:flex;align-items:center;gap:8px}
+.cq .q-hd .q-op{width:34px;height:26px;background:#000040;border:2px inset #fff;display:grid;place-items:center}
+.cq .q-hd b{color:#000080}.cq .q-hd small{display:block;color:#060}
+.cq .q-pc{margin:8px;display:flex;gap:8px;align-items:center;background:#fff;border:2px inset #c0c0c0;padding:6px;position:relative}
+.cq .q-pc img{width:48px;height:48px;image-rendering:pixelated;background:#e0e0ff;border:1px solid #888}
+.cq .q-pc b{color:#000080;display:block}.cq .q-pc .q-pr{color:#c00;font-weight:900}.cq .q-pc a{display:block;color:#00e;text-decoration:underline;font-size:11px}
+.cq .q-pc .q-x{position:absolute;right:4px;top:3px;color:#888;font-size:11px}
+.cq .q-pc.q-mini{margin:6px 0 0;padding:4px;background:#ffffe0}.cq .q-pc.q-mini img{width:36px;height:36px}
+.cq .q-lg{height:250px;overflow:auto;margin:0 8px;background:#fff;border:2px inset #c0c0c0;padding:8px;line-height:1.65}
+.cq .q-m{margin-bottom:10px}.cq .q-m .q-w{font-weight:700}.cq .q-m.q-me .q-w{color:#008}.cq .q-m.q-op .q-w{color:#a0a}.cq .q-m .q-w small{color:#888;font-weight:400;margin-left:4px}
+.cq .q-m.q-op .q-t{background:#f6f0ff;border:1px dashed #a0a;padding:4px 6px}
+.cq .q-ir{display:flex;gap:4px;padding:8px}
+.cq .q-ir .q-btn{border:2px outset #fff;background:#c0c0c0;padding:2px 8px;white-space:nowrap;display:flex;align-items:center}
+.cq .q-ir .q-in{flex:1;min-width:0;background:#fff;border:2px inset #c0c0c0;padding:3px 6px;color:#888}
+.cq .q-pk{position:absolute;left:8px;bottom:40px;width:250px;background:#fff;border:2px outset #fff;box-shadow:2px 2px 0 #000;z-index:2}
+.cq .q-pk h6{margin:0;padding:3px 6px;background:#000080;color:#fff;font-size:11px}
+.cq .q-pk .q-r{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px dotted #aaa}.cq .q-pk .q-r img{width:28px;height:28px;image-rendering:pixelated;background:#e0e0ff}
+.cq .q-pk .q-r span{flex:1}.cq .q-pk .q-r em{color:#c00;font-style:normal;font-weight:700;font-size:11px}.cq .q-pk .q-r.q-on{background:#000080;color:#fff}.cq .q-pk .q-r.q-on em{color:#ff0}
+.cq .q-lk{display:inline-flex;align-items:center;gap:4px;max-width:100%;margin-top:4px;padding:1px 6px 1px 2px;background:#ffffe0;border:1px solid #888;color:#00e;text-decoration:underline;vertical-align:middle}
+.cq .q-lk img{width:20px;height:20px;image-rendering:pixelated;background:#e0e0ff;flex:none}
+.cq .q-lk b{color:#00e;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cq .q-lk em{color:#c00;font-style:normal;font-weight:900;white-space:nowrap}
+.cq .q-at{display:flex;align-items:center;gap:6px;margin:6px 8px 0;padding:3px 6px;background:#fff;border:2px inset #c0c0c0}
+.cq .q-at .q-lk{margin:0;flex:0 1 auto;min-width:0}.cq .q-al{color:#555;font-size:11px;white-space:nowrap}.cq .q-at .q-x{margin-left:auto;color:#888;cursor:pointer}
+.cq .q-lg{margin-top:6px}
+.phone .cq{top:auto;left:0;right:0;bottom:0;width:auto;height:78%;display:flex;flex-direction:column;box-shadow:0 -3px 0 #000}
+.phone .cq .q-lg{flex:1;height:auto}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+<symbol id="back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+<symbol id="fwd" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></symbol>
+<symbol id="rel" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></symbol>
+<symbol id="star" viewBox="0 0 24 24"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></symbol>
+<symbol id="more" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
+<symbol id="tune" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></symbol>
+<symbol id="puz" viewBox="0 0 24 24"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+<symbol id="add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+<symbol id="dd" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></symbol>
+<symbol id="acct" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+<symbol id="fold" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+<symbol id="srch" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+<symbol id="L-gn" viewBox="0 0 24 24"><path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill="#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/></symbol>
+<symbol id="L-gal" viewBox="0 0 24 24"><path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/></symbol>
+<symbol id="L-wpf" viewBox="0 0 24 24"><circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/></symbol>
+<symbol id="L-sm" viewBox="0 0 32 20"><path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/></symbol>
+<symbol id="L-cos" viewBox="0 0 32 24"><circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/></symbol>
+<symbol id="L-ds" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#c8102e"/><rect x="3" y="5" width="18" height="12" rx="2" fill="#111"/><circle cx="12" cy="11" r="3.4" fill="#f4f2ee"/><circle cx="10.8" cy="10.6" r=".9" fill="#000"/><circle cx="13.2" cy="10.6" r=".9" fill="#000"/><rect x="8" y="19" width="8" height="2" fill="#ffd400"/></symbol>
+<symbol id="L-bm" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/></symbol>
+<symbol id="L-wk" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/></symbol>
+<symbol id="L-home" viewBox="0 0 24 24"><circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/></symbol>
+</svg>
+<div class="win">
+  <div class="head"><span class="logo">👻</span><b>인터넷</b></div>
+  <div class="main">
+    <div class="nav"><span>상황판</span><span>임무</span><span>괴담톡</span><span class="on">인터넷</span><span>위키</span><span>소지품</span><span>기록</span><span>설정</span></div>
+    <div class="cr">
+      <div class="tabs" id="tabs"></div>
+      <div class="tool">
+        <span class="tb pc"><svg class="i"><use href="#back"/></svg></span><span class="tb off pc"><svg class="i"><use href="#fwd"/></svg></span><span class="tb pc"><svg class="i"><use href="#rel"/></svg></span>
+        <span class="tb mo"><svg class="i"><use href="#home"/></svg></span>
+        <div class="omni" id="omni"></div>
+        <span class="prof" id="prof"></span>
+        <span class="tabn mo">2</span>
+        <span class="tb"><svg class="i"><use href="#more"/></svg></span>
+      </div>
+      <div class="bms" id="bms"></div>
+      <div class="page" id="page"></div>
+    </div>
+  </div>
+</div>
+<script>
+const I = (f) => `img/${f}`;
+const S = (id, c = 'i') => `<svg class="${c}"><use href="#${id}"/></svg>`;
+// [키, 즐겨찾기 이름, 탭 제목, 파비콘 색, 글자, 주소]
+const SITES = [
+  ['gn', '괴담넷', '괴담넷 - 자유게시판', '#0d9488', '괴', 'goedam.net', '/board/free'],
+  ['gal', '괴담 갤러리', '괴담 갤러리 - 괴담갤', '#3b4890', 'g', 'gall.goedam.co.kr', '/board/lists/?id=horror'],
+  ['wpf', '세정게', '::: 世界政治 게시판 :::', '#7a1010', 'W', 'www.wpf.or.kr', '/zboard/zboard.php?id=politics'],
+  ['sm', '연어 마켓', '연어 마켓 | 이면의 중고거래', '#f26c4f', '연', 'salmon-market.kr', '/'],
+  ['cos', '우주 쇼핑몰', '★우주 쇼핑몰★에 오는 것을 환영하는 것이다', '#5b1fd1', '★', 'cosmic-mall.alien', '/~shop/index.html'],
+  ['wk', '괴이위키', '세계정치 게시판 - 괴이위키', '#27685b', '괴', 'goei.wiki', '/w/세계정치 게시판'],
+  ['ds', '망상홈쇼핑', '● LIVE 망상홈쇼핑 - 금요일 밤 특집', '#c8102e', '망', 'live.mangsang.tv', '/onair'],
+  ['bm', '백일몽 포인트몰', '백일몽 포인트몰', '#1f2a44', '백', 'point.baekilmong.intra', '/mall/main'],
+];
+const fv = (s) => `<svg class="fv" viewBox="0 0 24 24"><use href="#L-${s[0]}"/></svg>`;
+const view = (location.hash.slice(1) || 'home').split('&');
+const site = view[0], sub = view[1] || '';
+if (document.documentElement.clientWidth < 600) document.body.classList.add('phone');
+const cur = SITES.find((x) => x[0] === site);
+const other = site === 'gn' ? SITES[3] : SITES[0];
+const tab = (s, on) => `<div class="tab${on ? ' on' : ''}">${s ? fv(s) : `<svg class="fv"><use href="#L-home"/></svg>`}<span class="t">${s ? (on && s[0] === 'wk' && (sub === 'main' || sub === 'mainlist') ? '괴이위키:대문 - 괴이위키' : on && s[0] === 'wk' && sub === 'search' ? '"관리" 검색 결과 - 괴이위키' : on && s[0] === 'wk' && (sub === 'none' || sub === 'busy') ? '달빛 타투샵 - 괴이위키' : on && s[0] === 'wk' && sub === 'new' ? '새 문서 만들기 - 괴이위키' : on && sub === 'post' ? '새벽 4시에 찍은 복도인데 이거 뭐로 보임?' : s[2]) : '새 탭'}</span>${S('x')}</div>`;
+document.getElementById('tabs').innerHTML = tab(cur, true) + tab(other, false) + `<span class="plus">${S('add', 'i s')}</span><span class="sp"></span><span class="dd">${S('dd', 'i s')}</span>`;
+const LOGGED = sub !== 'login';
+const FACE = 'face.png';
+document.getElementById('prof').innerHTML = LOGGED ? `<img src="${FACE}">` : S('acct');
+if (!LOGGED) document.querySelector('.cr').insertAdjacentHTML('beforeend', `<div class="lgn"><h4>로그인</h4><div class="fc" style="justify-content:center"><img src="${FACE}"></div><div class="in">닉네임</div><div class="b1">로그인</div><hr><div class="b2">로그인하지 않고 계속</div></div>`);
+document.getElementById('omni').innerHTML = cur
+  ? `<span class="ti">${S('tune')}</span><span class="u"><b>${cur[5]}</b>${sub === 'item' ? '/articles/1842' : sub === 'post' ? ({ gn: '/board/free/77120', gal: '/board/view/?id=horror&no=1846216', wpf: '/zboard.php?id=wpf&no=48213' })[site] : sub === 'search' ? '/Search?q=관리' : sub === 'none' || sub === 'busy' ? '/w/달빛 타투샵' : sub === 'new' ? '/NewPage' : sub === 'main' || sub === 'mainlist' ? '/w/괴이위키:대문' : cur[6] === '/' ? '' : cur[6]}</span>`
+  : `<span class="ti">${S('srch')}</span><span class="u">검색어 또는 URL 입력</span>`;
+document.getElementById('bms').innerHTML = SITES.map((s) => `<span class="bm">${fv(s)}${s[1]}</span>`).join('') ;
+
+const gnRows = [
+  ['목격', '야 코엑스 지하주차장 뭐 터졌냐? 경찰 쫙 깔림', 31, '익명', '3분 전', '2,180', 'anomaly_126.webp', 'hot'],
+  ['자유', '협회 영등포 로비 개판 났네 ㅋㅋㅋ 줄이 밖까지 섬', 12, '수수료도둑OUT', '9분 전', '4,120', ''],
+  ['질문', '은장도 축성은 아무 성당에서나 해줌?', 7, '초보사냥꾼', '14분 전', '388', 'weapon_186.webp'],
+  ['목격', '여주 방탈출 카페 실종사건 그 회사 개입했네', 24, '탈출전문가', '31분 전', '3,490', '', 'hot'],
+  ['정보', '부적 진짜/가짜 구별하는 법 정리함 (사진 많음)', 58, '부적모음', '1시간 전', '9,812', 'paper_074.webp'],
+  ['자유', '오늘자 편의점 폐기 레전드 뜸', 3, '민트초코단', '1시간 전', '1,850', ''],
+  ['썰', '할머니 집 괘종시계가 밤에만 가는 이유', 19, '잠못드는밤', '2시간 전', '2,764', 'anomaly_069.webp'],
+  ['질문', '요즘 검은 정장 입은 사람들 왜 이렇게 많음?', 44, 'ㅇㅇ', '2시간 전', '6,201', ''],
+];
+const galRows = [
+  ['1846215', '질문', '여기 처음인데 괴담 겪으면 어디다 신고함?', 0, '밤샘요원', '', '14:25', 3, 0, 'tx'],
+  ['1846214', '목격', '새벽 4시에 엘베가 13층에 계속 섬', 12, 'ㅇㅇ', '118.235', '14:21', 812, 4, 'tx'],
+  ['1846213', '일반', '편의점 알바하는데 손님이 거스름돈을 안 받아감', 3, '야간조', '', '14:19', 233, 0, 'tx'],
+  ['1846212', '목격', '한강 둔치 검은 정장 무리 봄 ㄷㄷ', 41, 'ㅇㅇ', '211.36', '14:02', 5310, 87, 'im'],
+  ['1846211', '질문', '이거 무슨 부적인지 아는 갤러 있음?', 7, '부적모음', '', '13:55', 402, 1, 'im'],
+  ['1846210', '썰', '귀신 본 썰 푼다 (스압)', 19, '잠못드는밤', '', '13:40', 1120, 15, 'tx'],
+  ['1846209', '일반', '괴담갤 눈팅 3년차 첫 글 써봄', 2, 'ㅇㅇ', '175.223', '13:38', 96, 0, 'tx'],
+  ['1846208', '목격', '[실시간] 신촌역 3번 출구 뭔가 이상함', 63, '신촌러', '', '13:31', 8840, 132, 'bt'],
+  ['1846207', '일반', '이 갤 요즘 왜 이렇게 조용하냐', 5, 'ㅇㅇ', '39.7', '13:22', 211, 0, 'tx'],
+  ['1846206', '질문', '혹시 백일몽이라는 회사 아는 사람', 28, '취준생', '', '13:10', 3022, 9, 'tx'],
+  ['1846205', '썰', '군대에서 겪은 일 2편', 34, '예비군7년차', '', '12:58', 4410, 51, 'tx'],
+  ['1846204', '일반', 'ㄹㅇ 무서운 거 추천 좀', 9, 'ㅇㅇ', '106.101', '12:47', 301, 0, 'tx'],
+];
+const wpRows = [
+  ['48212', '괴.담 겪.은 사.람 있.으.면 연.락 좀. 검.색.어 걸.리.면 안. 됨.', 14, '익명', '05/10', 341, 1],
+  ['48211', '뇌 기생충 대처법 정리 (구충제 말고 진짜 방법)', 52, '건강지킴이', '05/10', 2290, 1],
+  ['48210', '(부매니저에 의해 삭제된 글입니다)', 0, '-', '05/10', 0, 0, 'gone'],
+  ['48209', '대한민국 대통령은 건국 이래 줄곧 조종당하고 있다 (장문 분석)', 88, 'Truth_Seeker', '05/10', 8802, 0],
+  ['48208', '딥웹에서 구한 걸프전 UFO 영상 모음 (링크 곧 터짐)', 31, '진실추적자', '05/09', 5120, 0],
+  ['48207', '지금 이 글 읽고 있는 요원 놈들 보아라', 21, '감시당하는중', '05/09', 760, 0],
+  ['48206', '귀에 장치가 심어진 것 같습니다 도와주세요', 0, '익명', '05/09', 44, 0],
+  ['48205', '아이스커피 두 잔 시켰다는 그 형 소식 아는 사람', 17, '세정게고인물', '05/08', 1102, 0],
+  ['48204', '(부매니저에 의해 삭제된 글입니다)', 0, '-', '05/08', 0, 0, 'gone'],
+  ['48203', '로또 1등 번호 조작 증거 3탄', 40, '숫자의비밀', '05/08', 3311, 0],
+];
+const smItems = [
+  ['weapon_186.webp', '축성 은장도 + 성수 세트 (진품 보장)', '350,000원', '서울 중구 · 20분 전', '관심 14 · 채팅 3', '', 'cloth'],
+  ['paper_074.webp', '영험한 부적 묶음 (산신각 직송)', '30,000원', '경기 양평 · 1시간 전', '관심 6 · 채팅 2', '', 'news'],
+  ['anomaly_126.webp', '혼자 말하는 복화술 인형 팝니다', '120,000원', '인천 남동 · 3시간 전', '관심 31 · 채팅 8', '예약중', 'floor'],
+  ['anomaly_069.webp', '멈춘 회중시계 (밤에만 감)', '88,000원', '부산 수영 · 어제', '관심 9 · 채팅 2', '', 'wood'],
+  ['charm_084.webp', '수정 진자 / 다우징 입문용', '15,000원', '서울 마포 · 어제', '관심 4 · 채팅 1', '', 'desk'],
+  ['paper_074.webp', '[정보] 은평구 폐교 들어가는 길', '50,000원', '서울 은평 · 2일 전', '관심 22 · 채팅 5', '정보', 'news'],
+  ['food_374.webp', '출처 모를 통조림 일괄 (뜯지 마세요)', '나눔', '서울 성동 · 2일 전', '관심 40 · 채팅 12', '나눔', 'dark'],
+  ['', '라벨 없는 흰 스프레이 찾습니다', '가격 제안', '경기 성남 · 3일 전', '관심 2 · 채팅 0', '삽니다', 'want', '뿌리면 방금 일이 기억 안 나는 그거요. 반쯤 쓴 것도 괜찮아요.'],
+];
+
+const WKRW = `<div class="rwbox"><b>다시 쓰기</b><div class="ta">이 문서에만 덧붙일 지침 (내용·관점·분량)</div><p class="crq">공용 지침: 짧은 문단, 인터넷 커뮤니티 말투</p><div class="rr"><span>이전 문서 참고</span><span class="sg2"><b>ON</b><i>OFF</i></span><span class="sp"></span><span class="bt go">다시 쓰기</span><span class="bt">취소</span></div></div>`;
+const P = {
+  home: `<div class="ntp"><div class="lg"><span>G</span><span>o</span><span>e</span><span>i</span></div><div class="q">${S('srch')}검색어 또는 URL 입력</div><div class="sc">${SITES.map((s) => `<div class="s"><i>${fv(s)}</i>${s[1]}</div>`).join('')}</div></div>`,
+
+  gn: `<div class="gn ${sub ? 'v' + sub : ''}"><div class="hd"><span class="lg"><svg width="28" height="28" viewBox="0 0 24 24" style="flex:none"><use href="#L-gn"/></svg>괴담넷<small style="font-size:10px;color:#5d656c;font-weight:600;margin-left:2px;align-self:flex-end;margin-bottom:4px">.net</small></span><nav><b>커뮤니티</b><span>쪽지</span><span>랭킹</span></nav><span class="sr">${S('srch', 'i s')}괴담넷 검색</span></div>
+  <div class="wrap"><div class="side"><h6>게시판</h6><a class="on">자유게시판</a><a>목격담</a><a>질문</a><a>정보·자료</a><a>썰</a><h6>내 메뉴</h6><a>쪽지함 <b style="color:#2dd4bf">2</b></a><a>내가 쓴 글</a><a>스크랩</a></div>
+  <div class="gmain"><div class="bh"><h2>자유게시판</h2><span class="w">글쓰기</span></div><div class="sort"><b>최신</b><span>인기</span><span>댓글 많은</span></div>
+  ${gnRows.map(([c, t, n, a, d, v, img, h]) => `<div class="row"><div><span class="c ${h || ''}">${c}</span><span class="tt">${t}<em>${n}</em></span><small>${a} · ${d} · 조회 ${v}</small></div>${img ? `<span class="th"><img src="${I(img)}"></span>` : '<span></span>'}</div>`).join('')}
+  <div class="pg"><b>1</b><span>2</span><span>3</span><span>4</span><span>5</span><span>›</span></div></div>
+</div></div>`,
+
+  gal: `<div class="dc"><div class="hd"><span class="lg" style="display:flex;align-items:center;gap:8px"><svg width="28" height="28" viewBox="0 0 24 24" style="flex:none;background:#fff;border-radius:5px"><use href="#L-gal"/></svg><span>괴담 갤러리<small>무섭고 이상한 이야기</small></span></span><div class="sch"><span>갤러리 & 통합검색</span><b>${S('srch')}</b></div></div>
+  <div class="body"><div>
+    
+    <div class="lt"><span class="on">전체글</span><span>개념글</span><span>공지</span><span class="wr">글쓰기</span></div>
+    <div class="hds"><span class="on">전체</span><span>일반</span><span>목격</span><span>질문</span><span>썰</span><span>정보</span></div>
+    <table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
+    <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>
+    <tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">실명·주소·얼굴 올리면 바로 차단합니다 (필독)</td><td class="n">매니저<span class="fix"></span></td><td>05.01</td><td>-</td><td>-</td></tr>
+    <tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">개념글 추천 기준 안내</td><td class="n">매니저<span class="fix"></span></td><td>05.03</td><td>-</td><td>-</td></tr>
+    ${galRows.map(([n, h, t, c, w, ip, d, v, r, ic]) => `<tr><td>${n}</td><td>${h}</td><td class="t"><span class="ii ${ic}"></span>${t}<em>[${c}]</em></td><td class="n">${w}${ip ? ` <span class="ip">(${ip})</span>` : ''}</td><td>${d}</td><td>${v}</td><td>${r}</td></tr>`).join('')}
+    </table>
+    <div class="mlist"><div class="it ntc"><div class="t">실명·주소·얼굴 올리면 바로 차단합니다 (필독)</div><div class="m">매니저 · 05.01</div></div>${galRows.map(([n, h, t, c, w, ip, d, v, r]) => `<div class="it"><div class="t">[${h}] ${t}<em>[${c}]</em></div><div class="m">${w}${ip ? `(${ip})` : ''} · ${d} · 조회 ${v} · 추천 ${r}</div></div>`).join('')}</div>
+    <div class="bt2"><span>전체글</span><span class="wr">글쓰기</span></div>
+    <div class="pager"><b>1</b> 2 3 4 5 6 7 8 9 10 다음 끝</div>
+    <div class="bsch"><span>제목+내용 ▾</span><span class="in"></span><span class="go">검색</span></div>
+  </div>
+</div>
+  </div>`,
+
+  wpf: `<div class="wp"><div class="pg"><div class="ban"><b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small><svg style="position:absolute;right:18px;top:6px" width="74" height="74" viewBox="0 0 24 24"><use href="#L-wpf"/></svg></div>
+  <div class="bar"><a>HOME</a><a>자유토론</a><a>방명록</a></div>
+  <div class="cols"><div class="lm"><div class="t">MENU</div><a>공지사항</a><a>자유토론</a><a>방명록</a>
+    
+    <div class="poll"><b>[설문]</b> 검은 정장 본 적 있다?<br>· 있다 61%<br>· 없다 12%<br>· 대답하면 끌려감 27%<br><span style="color:#888">(새로 고칠 때마다 바뀜)</span></div></div>
+  <div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
+    <div class="tot"><span>Total : 48212 &nbsp; Page : 1/4018</span><span></span></div>
+    <table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>
+    <tr class="ntc"><td>공지</td><td class="t">게.시.판 이.용 수.칙 (사.진 올.리.지 마.세.요)</td><td>부매니저</td><td>01/01</td><td>9999</td></tr>
+    ${wpRows.map(([n, t, c, w, d, v, nw, g]) => `<tr><td>${n}</td><td class="t ${g || ''}"><a class="${g || ''}">${t}</a>${c ? ` <span class="cm">[${c}]</span>` : ''}${nw ? '<span class="nw">N</span>' : ''}</td><td>${w}</td><td>${d}</td><td>${v}</td></tr>`).join('')}
+    </table>
+    <div class="wml"><div class="it ntc"><div class="t">게.시.판 이.용 수.칙 (사.진 올.리.지 마.세.요)</div><div class="m">부매니저 · 01/01</div></div>${wpRows.map(([n, t, c, w, d, v, nw, g]) => `<div class="it ${g || ''}"><div class="t">${t}${c ? ` <span class="cm">[${c}]</span>` : ''}${nw ? '<span class="nw">N</span>' : ''}</div><div class="m">${g ? d : `${w} · ${d} · 조회 ${v}`}</div></div>`).join('')}</div>
+    <div class="pgn">[이전 10개] <b>1</b> <a>2</a> <a>3</a> <a>4</a> <a>5</a> <a>6</a> <a>7</a> <a>8</a> <a>9</a> <a>10</a> [다음 10개]</div>
+    <div class="nav2"><span><span class="bb">목록</span></span><span class="sch"><input type="checkbox" checked> 이름 <input type="checkbox" checked> 제목 <input type="checkbox"> 내용 <span class="in"></span> <span class="bb">검색</span></span><span class="bb">글쓰기</span></div>
+  </div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div></div></div>`,
+
+  sm: `<div class="sm"><div class="hd"><span class="lg"><svg width="40" height="26" viewBox="0 0 32 20"><use href="#L-sm"/></svg>연어 마켓</span><nav><b>중고거래</b><span>삽니다</span><span>오컬트 정보</span></nav><span class="sr">물건 이름으로 찾기</span><span class="wr">글쓰기</span><span class="ch">내 채팅<em>2</em></span></div>
+  <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>` + (sub === 'item'
+    ? `<div class="detail"><div class="ph cloth"><img src="${I('weapon_186.webp')}"></div><div><div class="seller"><i></i><div><b>지나가던사제</b><small>서울 중구 명동</small></div><div class="temp"><b>36.5°C</b><br><small>매너온도</small></div></div><h2>축성 은장도 + 성수 세트 (진품 보장)</h2><div class="mt2">무기·호신 · 20분 전</div><div class="price">350,000원</div><p class="body">명동성당에서 직접 축성 받은 은장도입니다.<br>흡혈귀·구울 처리용으로 인첸트까지 완료했어요.<br>성수는 500ml 두 병 같이 드립니다.<br><br>직거래는 성당 앞에서만 해요. 네고 사절.</p><div class="stat">관심 14 · 채팅 3 · 조회 211</div><div class="act"><span>♡</span><span class="chat">채팅하기</span><span class="back">‹ 목록으로</span></div></div></div>`
+    : `<div class="sec"><div class="bar2"><span class="loc">서울 중구 근처 매물</span><div class="cats"><span class="on">전체</span><span>부적·의식</span><span>무기·호신</span><span>골동품</span><span>정보</span><span>나눔</span><span>삽니다</span></div><span class="sort"><b>인기순</b> · 최신순</span></div>
+    <div class="grid">${smItems.map(([f, n, p, m, l, t, bg, w]) => `<div class="c"><div class="ph ${bg}">${bg === 'want' ? `<b>삽니다</b><p>${w}</p>` : `<img src="${I(f)}">`}${t && bg !== 'want' ? `<span class="tag${t === '나눔' ? ' g' : ''}">${t}</span>` : ''}</div><div><div class="nm">${n}</div><div class="pr">${p}</div><div class="mt">${m} · ${l}</div></div></div>`).join('')}</div></div>`) + `</div>`,
+
+  wk: `<div class="wk"><div class="top"><span class="lg"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#L-wk"/></svg>괴이위키</span><nav><span><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>최근 변경</span><span><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c1.6 0 2.8-1.6 3.8-3.5M13.2 9.5C14.2 8 15.4 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>임의 문서</span></nav><span class="sr">문서 제목 검색<i class="sg">${S('srch', 'i s')}</i></span></div>
+  <div class="wrap one"><div class="doc"><div class="h1r"><h1>세계정치 게시판</h1><div class="dbtn"><span class="${sub === 'rw' ? 'on' : ''}">✎ 다시 쓰기</span><span>🗑 삭제</span></div></div><div class="dm">최근 수정 시각: 오늘 · 분류: 인터넷 게시판</div>${sub === 'rw' ? WKRW : ''}<table class="ib"><caption>세계정치 게시판</caption><tr><th>약칭</th><td><b>세정게</b></td></tr><tr><th>분류</th><td>인터넷 게시판 겸 생존자 정보망</td></tr><tr><th>표면 주제</th><td>세계 정치 <s>라고 적혀 있다</s></td></tr><tr><th>실제 주제</th><td>딥스테이트, 외계인, 뇌 기생충, 로또 조작, 그리고 진짜 괴담</td></tr><tr><th>대외 평판</th><td>미친 사람들 모이는 곳</td></tr><tr><th>관리</th><td>부매니저 1인 (정체 불명)</td></tr><tr><th>감시자</th><td><b>관리국 두 곳 모두</b></td></tr><tr><th>고정닉 생존율</th><td>묻지 마라</td></tr></table>
+<div class="toc"><b>목차</b><div class="t1"><span class="no">1.</span> 개요</div><div class="t1"><span class="no">2.</span> 게시판 풍경</div><div class="t2"><span class="no">2.1.</span> 대표적인 글</div><div class="t2"><span class="no">2.2.</span> 실종 개그</div><div class="t1"><span class="no">3.</span> 이용자 구조</div><div class="t2"><span class="no">3.1.</span> 유동</div><div class="t2"><span class="no">3.2.</span> 고정닉</div><div class="t2"><span class="no">3.3.</span> 진짜 고인물</div><div class="t2"><span class="no">3.4.</span> 부매니저</div><div class="t1"><span class="no">4.</span> 생존자 모임</div><div class="t1"><span class="no">5.</span> 지오캐싱</div><div class="t1"><span class="no">6.</span> 감시</div><div class="t2"><span class="no">6.1.</span> 가짜 관리국</div><div class="t2"><span class="no">6.2.</span> 관리국</div><div class="t1"><span class="no">7.</span> 읽는 법</div><div class="t1"><span class="no">8.</span> 평판</div><div class="t1"><span class="no">9.</span> 여담</div></div>
+<h2 class="wh"><span class="no">1.</span> 개요</h2>
+<p>이름은 세계정치 게시판인데 세계 정치 이야기는 거의 없다. 대신 인터넷에서 손꼽히게 <b>음모론 밀도가 높은 곳</b>이다. 딥스테이트, 외계인, 뇌 기생충, 로또 조작 같은 글이 하루에도 수십 개씩 올라온다. 바깥세상의 평판은 한 줄로 요약된다. &quot;거기 미친 사람들 모이는 데잖아.&quot;</p>
+<p>그 평판이 숨기고 있는 사실이 있다. 거기 올라오는 글의 <b>상당 부분이 진짜</b>라는 것이다. 세정게 단골 중 상당수는 실제 괴담을 겪고 살아 나온 생존자들이고, 자기가 본 걸 여기에 털어놓는다. 문제는 진짜 증언과 지어낸 글이 거의 똑같이 생겼다는 것. 그래서 둘 다 똑같이 조롱받는다. 뇌 기생충 대처법 글 바로 아래에 진짜 괴담 생존기가 올라와 있고, 둘 다 댓글이 &quot;약 먹어라&quot;다. 진짜 생존자들이 굳이 이런 데 글을 쓰는 이유는 간단하다. 다른 데서는 아예 안 들어 주기 때문이다. 정신과 상담실에서 못 한 이야기를, 경찰서에서 비웃음당한 이야기를, 여기서는 최소한 끝까지 읽는 사람이 있다.<sup class="fn">[1]</sup></p>
+<p>그런데도 이면세계를 아는 사람들은 세정게를 꾸준히 본다. 진짜 현상에 대한 제보가 어느 조직이 공식적으로 인정하기 <b>몇 년 전에</b> 세정게에 먼저 올라오는 경우가 많기 때문이다. 미친 소리 사이에 섞인 진짜 경보를 걸러 내는 게 이 게시판을 읽는 기술이다.</p>
+<h2 class="wh"><span class="no">2.</span> 게시판 풍경</h2>
+<h3 class="wh"><span class="no">2.1.</span> 대표적인 글</h3>
+<p>세정게 첫 페이지를 열면 대충 이런 글들이 있다. 뇌 기생충 대처법. 대한민국 대통령은 건국 이래 줄곧 누군가에게 조종당하고 있다는 장문의 분석. 딥웹에서 구했다는 걸프전 UFO 영상 모음. 자동 검열을 피하려고 단어 중간중간에 마침표를 찍어 쓴 글. 도청하는 요원들에게 보내는 욕설. 그리고 귀에 장치가 심어졌다고 호소하는데 아무도 댓글을 안 다는 글.</p>
+<blockquote>괴.담 겪.은 사.람 있.으.면 연.락 좀. 검.색.어 걸.리.면 안. 됨.<cite>— 세정게에서 흔히 보이는 마침표 화법 게시글</cite></blockquote>
+<p>이 마침표 화법은 처음 보면 웃기다. 세정게를 좀 다녀 본 사람은 안 웃는다. 이유는 아래 감시 절을 보면 안다.<s>맞춤법 검사기는 웃는다</s></p>
+<h3 class="wh"><span class="no">2.2.</span> 실종 개그</h3>
+<p>세정게의 가장 오래된 농담은 <b>&quot;고정닉들이 자꾸 사라진다&quot;</b>는 것이다. 어제까지 글 쓰던 사람이 오늘부터 안 보인다. 처음엔 다들 탈퇴했겠거니 한다. 그다음엔 &quot;또 끌려갔냐&quot;는 댓글이 달린다. 이 농담이 문제인 건, 정확하기 때문이다.</p>
+<p>사라지는 경로는 대략 셋이다. 검은 정장들에게 끌려가거나, 지오캐싱을 하다 죽거나, 나머지는 이 바닥의 오래된 법칙을 따른다. <b>이상한 건 이상한 걸 끌어당긴다.</b> 한 번 괴담을 겪은 사람은 또 겪는다. 세정게 단골들은 이 법칙을 자기 경험으로 안다. 두 번째 괴담 생존기를 올리는 사람에게 축하와 애도가 동시에 달리는 곳은 아마 여기밖에 없을 것이다.<sup class="fn">[2]</sup></p>
+<h2 class="wh"><span class="no">3.</span> 이용자 구조</h2>
+<h3 class="wh"><span class="no">3.1.</span> 유동</h3>
+<p>익명의 대다수. 구경꾼, 비웃으러 온 사람, 그리고 딱 한 번 자기 경험을 털어놓고 다시는 언급하지 않는 일회성 생존자들. 이 일회성 글이 사실 세정게에서 가장 귀한 정보인 경우가 많은데, 정작 글쓴이는 그 뒤로 영영 돌아오지 않는다. 돌아오지 않는 이유가 평범하기를 다들 바란다.<sup class="fn">[3]</sup></p>
+<h3 class="wh"><span class="no">3.2.</span> 고정닉</h3>
+<p>고정 닉네임으로 활동하며 글 기록이 차곡차곡 쌓이는 사람들. 위험을 모르거나, 아니면 자기를 숨기는 데 아주 능숙하거나 둘 중 하나다. 세정게의 터줏대감 이미지를 만드는 건 이 사람들인데, 앞서 말한 실종 개그의 주인공도 대부분 이 사람들이다.</p>
+<h3 class="wh"><span class="no">3.3.</span> 진짜 고인물</h3>
+<p>게시판 닉네임은 그대로 두되, 실제 대화는 <b>초대제 비밀 메신저</b>에서 나누는 핵심층. 이 사람들은 전원이 최소 한 번은 진짜 괴담에서 살아 나왔다. 게시판에 남는 건 일부러 흘린 흔적뿐이고, 진짜 이야기는 다 메신저 안에 있다.</p>
+<p>이 핵심층에 닿는 방법에 대해서는 반쯤 전설 같은 소문이 돈다. 진짜 아는 사람만 쓸 수 있는 글을 올리고, 그 글이 지워지기를 기다리라는 것이다. 맞는 사람들의 눈에 들면 방명록에 수상한 링크 하나가 달린다고 한다. 다만 그 링크를 기다리다 엉뚱한 방문객을 먼저 맞은 사람이 더 많다는 말도 같이 돈다.</p>
+<h3 class="wh"><span class="no">3.4.</span> 부매니저</h3>
+<p>게시판의 눈에 보이는 관리자. 위험하게 노출된 글을 지우고, 모임을 대표해 협상에 나선다. 이름도, 방법도, 가진 정보의 양도 철저히 숨긴다. 세정게에서 제일 바쁜 사람이라는 평이 있다. 하루 종일 지우고, 지우고, 또 지운다. 쓸 만한 글일수록 몇 분 만에 사라지는데, 그게 다 이 사람 손을 거친다.<sup class="fn">[4]</sup></p>
+<h2 class="wh"><span class="no">4.</span> 생존자 모임</h2>
+<p>세정게의 진짜 주인은 게시판이 아니라 그 뒤에 있는 <b>생존자 모임</b>이다. 이 모임은 인터넷 게시판이 생기기 전부터 있었고, 지금은 세정게를 공개 집합 장소로 쓰고 있을 뿐이다. 게시판 개설보다 모임의 역사가 훨씬 길다는 이야기를 처음 들은 사람들은 대개 놀란다.</p>
+<p>모임의 원칙은 단순하다. <b>이면세계에 닿지 않은 사람은 아무것도 모르는 게 제일 안전하다. 하지만 이미 닿은 사람은 정보 없이는 죽는다.</b> 그래서 모임은 살아남기 위해 이면세계 정보를 모으고, 필요하면 그 정보로 거래한다. 회원끼리의 의리는 진짜다. 살아남는 데 꼭 필요한 정보를 얻은 사람은 그걸 모임에 넘긴다. 자기가 먼저 안전해지기 전에.</p>
+<p>바깥 사람과 거래할 때 모임이 원하는 건 대개 두 가지다. 특정 괴담의 해결, 그리고 실종된 회원의 회수. 대가는 모아 둔 정보다. 조건도 하나 있다. 회원이나 연락 경로를 추적하지 말 것. 이걸 어기거나 링크를 밖으로 흘리면 최소한 관계가 끝난다. 최소한.<s>최대한은 안 물어보는 게 좋다</s></p>
+<h2 class="wh"><span class="no">5.</span> 지오캐싱</h2>
+<p>모임의 상징이자 게시판보다 오래된 전통. 게시판 글이나 실제 장소에 <b>알쏭달쏭한 암호</b>가 남겨지고, 그걸 풀면 좌표가 나온다. 그 좌표에는 선배 회원들이 묻어 둔 기록, 이상한 물건, 게시판에 대놓고 올리기엔 너무 위험한 정보가 있다. 세정게 글 중에 아무 의미 없어 보이는 숫자 나열이 가끔 섞여 있는 이유가 이거다.</p>
+<p>그리고 이 전통은 <b>사람을 죽인다.</b> 좌표에서 기다리는 게 전부 보물 상자는 아니기 때문이다. 한번은 핵심층 팀 하나가 지오캐싱에 나섰다가 통째로 사라졌다. 나중에 수색대가 그 좌표에 갔을 때, 팀원들의 시신이 그 자리에 묻혀 있었고, 그 위로 기이한 공간이 닫혀 가고 있었다고 한다. 수색대는 간신히 빠져나왔다. 그 좌표가 어디였는지는 이제 모임 안에서도 입에 올리지 않는다.</p>
+<blockquote>좌표 찍힌 데 가 보니까 땅이 새로 덮여 있었어. 우리가 찾던 건 거기 있었어. 사람들이랑 같이.<cite>— 지오캐싱 수색대에 참여했던 회원</cite></blockquote>
+<p>그 뒤로도 지오캐싱은 멈추지 않았다. 묻힌 정보 중에 사람 목숨을 살리는 것들이 진짜로 있기 때문이다. 세정게의 수수께끼 같은 숫자 글에 함부로 덤비지 말라는 경고가 첫 페이지 공지에 박혀 있는데, 그 공지를 읽고 오히려 호기심이 생겼다는 사람이 매년 나온다.<sup class="fn">[5]</sup></p>
+<h2 class="wh"><span class="no">6.</span> 감시</h2>
+<h3 class="wh"><span class="no">6.1.</span> 가짜 관리국</h3>
+<p>세정게를 가장 위험하게 만드는 건 <a class="wl">가짜 관리국</a>이다. 저쪽은 이 게시판을 <b>모집 덫이자 유출 감지기</b>로 쓴다. 글쓴이만 보는 게 아니라 <b>읽는 사람까지</b> 본다. 괴이 영상을 올린 사람은 검색 기록으로 추적당하고, 며칠 안에 붙잡혀서 요원이 된다. 같은 키워드를 반복해서 검색하는 것만으로도 눈에 띌 수 있다. 세정게를 생각 없이 읽는 건 글을 쓰는 것만큼 위험하다. 앞서 말한 마침표 화법이 괜히 생긴 게 아니다.</p>
+<p>대표적인 사례가 핵심층 출신의 <a class="wl">김성진</a>이다. <a class="wl">한설인육공장</a>에서 살아 나온 생존자로 모임에 정보를 넘기던 고정닉이었는데, 영상을 올린 뒤 그대로 끌려갔다. 고등학생이었던 <a class="wl">송진섭</a>도 길에서 본 괴이를 올렸다가 며칠 만에 사라졌다. 두 사람이 나중에 검은 정장 차림으로 목격되면서 세정게 실종 게시판에 이상한 종류의 &#x27;생존 확인&#x27; 글이 올라왔다.<sup class="fn">[6]</sup></p>
+<h3 class="wh"><span class="no">6.2.</span> 관리국</h3>
+<p><a class="wl">관리국</a>도 세정게를 본다. 더 넓은 인터넷 순찰의 일부로, 지금은 <a class="wl">잼트리</a> 선배요원이 맡고 있다고 한다. 하루 종일 모니터 앞에서 뇌 기생충 글과 대통령 조종설 글을 넘기다가 진짜를 하나 건져 내는 일이다.<sup class="fn">[7]</sup> 글이 진짜 현상을 그럴듯하게 묘사하면 현장 대응이 출동한다. 이걸 아는 사람들은 일부러 구조 요청 글을 올려 요원을 특정 장소로 부르기도 한다.</p>
+<p>문제는 <b>두 관리국이 동시에 본다</b>는 것이다. 구조 요청 글을 올린 사람은 어느 쪽이 올지 고를 수 없다. 기다리던 검은 정장이 커피 이야기를 하는지 직급 이야기를 하는지는 문이 열리고 나서야 안다. 세정게 단골들은 이걸 <b>&quot;관리국 룰렛&quot;</b>이라고 부른다.<s>당첨 확률 50%. 꽝 상품: 취직</s></p>
+<h2 class="wh"><span class="no">7.</span> 읽는 법</h2>
+<p>세정게 고인물들이 신입에게 해 주는 조언은 대충 이렇다. 글의 말투로 진위를 판단하지 마라. 어처구니없이 들리는 글이 진짜일 수 있다. 쓸 만한 글은 몇 분 안에 지워지니까, 옛날 글을 검색하는 것보다 실시간으로 보는 게 중요하다. 그리고 검색창에 같은 단어를 반복해서 치지 마라.</p>
+<p>이 조언을 듣고 &quot;그럼 결국 다 믿으라는 거냐&quot;고 묻는 신입에게 돌아오는 답은 늘 같다. 다 믿지도 말고 다 무시하지도 말라. 그 사이 어딘가에서 살아남는 법을 배우는 곳이 세정게다. 실제로 오래 버틴 고인물들은 글을 읽을 때 내용보다 세부를 본다고 한다. 냄새, 소리, 시간, 그 자리에 있던 사람만 알 수 있는 쓸데없이 구체적인 디테일. 지어낸 글은 무섭게 쓰려고 애쓰고, 진짜 글은 이상하게 담담하다는 게 고인물들의 감별법이다. 대통령 조종설 글은 무시해도 된다는 말에, 그건 또 모른다는 대댓글이 달리는 게 세정게다.<sup class="fn">[8]</sup></p>
+<h2 class="wh"><span class="no">8.</span> 평판</h2>
+<p>바깥에서는 웃음거리다. 이면세계 안에서는 <b>조기 경보 시스템</b>이다. 둘 다 맞다. 세정게가 미친 사람들의 게시판이라는 평판은, 사실 세정게를 지키는 가장 좋은 위장이기도 하다. 너무 많은 미친 소리 속에 진짜가 숨어 있으니 아무도 진지하게 안 본다. 진지하게 보는 건 두 관리국과, 살아남고 싶은 사람들뿐이다.</p>
+<p>생존자 모임 사람들에게 세정게는 조금 더 무거운 의미다. 사라진 회원들의 마지막 글이 거기 남아 있다. 그 글에 지금도 가끔 &quot;잘 지내냐&quot;는 댓글이 달린다. 답글은 없다. 그래도 달린다. 세정게는 그런 곳이다.</p>
+<h2 class="wh"><span class="no">9.</span> 여담</h2>
+<ul><li>세정게 인기 글 1위는 수년째 &quot;뇌 기생충 자가 진단법&quot;이다. 2위가 진짜 괴담 생존기인데, 조회수 차이가 열 배다.</li></ul>
+<ul><li>&quot;도청하는 요원들 보고 있냐?&quot;라는 글이 정기적으로 올라온다. 실제로 보고 있다. 양쪽 다.</li></ul>
+<ul><li>귀에 장치가 심어졌다는 글은 아무도 댓글을 안 달지만, 핵심층 사람들은 가끔 그 글을 조용히 저장해 둔다는 소문이 있다.</li></ul>
+<ul><li>걸프전 UFO 영상 모음은 거의 다 합성이라는 결론이 났다. 거의.</li></ul>
+<ul><li>세정게 신입 환영 인사는 &quot;어서 와. 검색 기록부터 지워&quot;다.</li></ul>
+<ul><li>게시판 이름에 &#x27;세계정치&#x27;가 들어간 이유를 아는 사람은 이제 아무도 없다. 처음 만든 사람이 진짜로 정치 얘기를 하고 싶었을 거라는 추측이 있는데, 그 사람도 실종 개그의 첫 페이지를 장식했다는 카더라가 있다.</li></ul><div class="fns"><div><span class="no">[1]</span> 반대로 진짜 괴담 생존기에 &amp;quot;약 먹어라&amp;quot;를 단 사람이 몇 년 뒤 같은 괴담을 겪고 사과글을 올리는 일도 꽤 있다. 그 사과글의 댓글도 &amp;quot;약 먹어라&amp;quot;다.</div><div><span class="no">[2]</span> 세정게에는 &amp;quot;마지막 접속일&amp;quot; 정렬 기능을 쓰지 말라는 불문율이 있다. 써 보면 기분이 너무 안 좋아진다.</div><div><span class="no">[3]</span> 일회성 생존기 밑에 &amp;quot;후속 글 기다립니다&amp;quot;라는 댓글이 수십 개 달려 있는 걸 보면, 다들 사실 알고 있다는 게 느껴진다.</div><div><span class="no">[4]</span> 부매니저의 정체를 추적하려던 고정닉이 있었다는데, 그 고정닉이 그 뒤로 어떻게 됐는지는 실종 개그의 한 장을 차지한다.</div><div><span class="no">[5]</span> 공지를 쓴 사람은 &amp;quot;이걸 읽고 가는 놈은 말려도 간다&amp;quot;는 댓글을 스스로 달아 놨다.</div><div><span class="no">[6]</span> 실종 신고 글에 본인이 직접 &amp;quot;나 잘 있음ㅋㅋ&amp;quot;라는 댓글을 달았다는 카더라가 있다. 그 댓글은 부매니저가 3분 만에 지웠다.</div><div><span class="no">[7]</span> 세정게 글을 너무 많이 읽어서 가끔 사무실에서 마침표 화법으로 메시지를 보낸다는 카더라가 있다. 출처는 당연히 세정게다.</div><div><span class="no">[8]</span> 대통령 조종설 글쓴이는 십 년째 같은 글을 올리고 있다. 이 사람만은 아무도 안 끌어간다. 그게 오히려 진짜라는 증거라는 주장도 있다.</div></div><div class="rel"><b>관련 문서</b><a class="wl">관리국</a> · <a class="wl">가짜 관리국</a> · <a class="wl none">부매니저</a></div><details class="ref"><summary>참조 자료</summary><p>원본 충실 · 보통 · 메인 모델</p></details></div></div></div>`,
+  ds: `<div class="ds"><div class="gnb"><span class="lg">망상<i>홈쇼핑</i></span><span class="on">ON AIR</span><span>편성표</span><span>방송 상품</span><span>주문 조회</span><span>방청 신청</span><span class="r">☎ 080-404-0000</span></div>
+  <div class="bd"><div><div class="tv"><span class="pnum">상품 2</span><span class="live">● LIVE</span><div class="sub">고객님들, 잡지 속 이 모델 보이시죠? 눈부시지 않습니까? 오늘 소개할 신상품은 여러분도 똑같이 눈부시게…</div><div class="host"></div><div class="prod"><img src="${I('medical_124.webp')}"></div><span class="left">남은 수량 7</span><div class="lower"><b>미인 약 BB · 120캡슐 · 방송 특가</b><small>무이자 10회 할부 · 지금 전화 주문 시 사은품 증정 · 반품 불가</small></div></div>
+  <div class="ord"><span class="call">☎ 전화 주문</span><span>상품 스티커 보기</span><span class="aud">★ 방청 신청<b> (방청객 특가)</b></span></div></div>
+  <div class="chat"><h5>실시간 채팅 · 1,204명</h5><div class="l"><div><b>핑크곰</b>배송 언제와요??</div><div><b>ㅇㅇ</b>2번 재입고 되나요</div><div><b>민지맘</b>모델분 피부 진짜 실화냐</div><div><b>???</b><i>여기 안에 있어요</i></div><div><b>야식왕</b>저번에 산 무드등 아직 안 깸</div><div><b>???</b><i>나가는 길 아시는 분</i></div><div><b>하루</b>10회면 몇 번 불려가요?</div></div><div class="in">채팅 보내기</div></div></div>
+  <div class="lineup"><h4>오늘 편성<small>지난 상품은 다시 주문할 수 없음</small></h4><div class="lu">
+  <div><img src="${I('food_106.webp')}"><span>인투 더 배큠<em>무이자 6회</em></span></div>
+  <div class="on"><img src="${I('medical_124.webp')}"><span>미인 약 BB<em>무이자 10회</em><span class="t">● 방송 중</span></span></div>
+  <div><img src="${I('anomaly_224.webp')}"><span>불운 포스트잇<em>곧 방송</em></span></div>
+  <div><img src="${I('anomaly_253.webp')}"><span>계란무드등<em>곧 방송</em></span></div></div></div></div>`,
+  bm: `<div class="bmm"><div class="gnb"><b>백일몽 사내망</b><span>공지</span><span>결재</span><span>포인트몰</span><span class="r">보안 등급 C · 외부 반출 금지</span></div>
+  <div class="hd"><span class="lg"><svg width="34" height="34" viewBox="0 0 24 24"><use href="#L-bm"/></svg>백일몽 포인트몰<small>임직원 복지</small></span><div class="me"><div class="nm"><b>은하제</b> 대리<br>현장탐사팀 D조</div><img src="${FACE}"><div class="pt"><small>보유 포인트</small>12,400 P</div></div></div>
+  <div class="wrap"><div class="cat"><span class="on">전체</span><span>특가</span><span>생활·건강</span><span>가전</span><span>시약</span><span>독</span><span>회복</span><span>소원권</span></div>
+  <div><div class="rule">포인트는 현금으로 바꿀 수 없습니다. 괴담 등급에 따라 지급되며, 이 몰에서만 쓸 수 있습니다.</div><h3>전체 상품</h3><div class="grid"><div class="g "><div class="im"><img src="${I('consumable_029.webp')}"></div><div class="c">특가</div><div class="n">두루마리 휴지 30롤</div><div class="p">90<small>P</small></div><div class="b"><span>포인트로 구매</span></div></div><div class="g "><div class="im"><img src="${I('medical_040.webp')}"></div><div class="c">생활·건강</div><div class="n">탈모약 (6개월분)</div><div class="p">100<small>P</small></div><div class="b"><span>포인트로 구매</span></div></div><div class="g "><div class="im"><img src="${I('device_151.webp')}"></div><div class="c">가전</div><div class="n">진공청소기</div><div class="p">480<small>P</small></div><div class="b"><span>포인트로 구매</span></div></div><div class="g lock"><div class="im"><img src="${I('medical_016.webp')}"></div><div class="c">시약</div><div class="n">미공개 시약 (등급 무작위)</div><div class="p">1,000<small>P</small></div><div class="lim">주임 이상</div><div class="b"><span>주임 이상만 구매</span></div></div><div class="g "><div class="im"><img src="${I('medical_014.webp')}"></div><div class="c">회복</div><div class="n">재생 물약</div><div class="p">10,000<small>P</small></div><div class="b"><span>포인트로 구매</span></div></div><div class="g lock"><div class="im"><img src="${I('anomaly_246.webp')}"></div><div class="c">독</div><div class="n">사막방울뱀 독 물약</div><div class="p">170,000<small>P</small></div><div class="b"><span>포인트 부족</span></div></div><div class="g lock"><div class="im"><img src="${I('anomaly_269.webp')}"></div><div class="c">소원권</div><div class="n">소원권 물약</div><div class="p">500,000<small>P</small></div><div class="lim">연 1회</div><div class="b"><span>포인트 부족</span></div></div><div class="g "><div class="im"><img src="${I('food_018.webp')}"></div><div class="c">특가</div><div class="n">사내 자판기 커피 쿠폰 10장</div><div class="p">20<small>P</small></div><div class="b"><span>포인트로 구매</span></div></div></div></div></div>
+  <div class="ft">백일몽 주식회사 · 사내 전용</div></div>`,
+  cos: `<div class="cs"><div class="fr"><div class="lf"><div class="tit">★우주 쇼핑몰★</div><svg style="display:block;margin:0 auto 8px" width="80" height="60" viewBox="0 0 32 24"><use href="#L-cos"/></svg>
+    <a>처음의 곳</a><a class="hot">물건의 목록</a><a>짐수레 (0)</a><a>사는 방법</a><a class="${sub==='ask'||sub==='pick'?'hot':''}">운영자에게 질문</a>
+    <hr><div class="cnt">TODAY <span>003</span><br>TOTAL <span>000713</span></div><div class="res">800×600 해상도를<br>가장 좋아함 하였다</div></div>
+  <div class="mn"><div class="title"><svg class="pc" width="78" height="58" viewBox="0 0 32 24" style="vertical-align:-14px"><use href="#L-cos"/></svg> Cosmic Shopping Mall <svg width="78" height="58" viewBox="0 0 32 24" class="pc" style="vertical-align:-14px;transform:scaleX(-1)"><use href="#L-cos"/></svg></div><div class="subt">※외계에서 온 멋진 물건※~!!</div><hr class="rb">
+    <div class="marq"><span>★☆ 지구인 손님 당신을 환영한다 ☆★ 돈이 들어오는 즉시 공간을 찢어 물건을 던져 준다 ★☆ 돌려주는 돈은 존재 하지 않는다 ☆★ 가장 작은 주문은 ₩999,999 이다 ★☆</span></div>
+    <div class="wel">반가운 것이다 지구인 여러분들이여!! 우리들 <b>우주 쇼핑몰</b>은 매우 먼 별에서 온 귀중한 물건을 지구인 손님 당신에게 판매 해 주는 것이다. 모든 물건은 <b>진짜의 물건</b> 이다 그러나 효과는 <b>우리가 책임을 지는 것이 아니다</b>. 짐수레에 물건을 넣고 아래의 계좌에 돈을 넣는 것을 하면 된다. <span class="blink">NEW!!</span></div>
+    <h4>◈ 이번 달의 강하게 추천하는 물건 ◈</h4>
+    <table class="goods"><tr>
+    <td><img src="${I('food_374.webp')}"><b>꿈의 통조림</b><br>먹으면 꿈을 꾸는 것이다. 누구의 꿈 인지는 우리도 알지 않는다.<br><span class="blink">※할인!※</span> <span class="pr"><s>₩1,500,000</s> ₩999,999</span><br><span class="cart">짐수레에 넣는다</span><span class="qa">질문 한다</span></td>
+    <td><img src="${I('consumable_113.webp')}"><b>기억을 지우는 스푸레이</b><br>뿌리면 지워지는 것이다. 무엇이 지워지는 것인지 고르는 것은 할 수 없다.<br><span class="pr">₩2,400,000</span><br><span class="cart">짐수레에 넣는다</span><span class="qa">질문 한다</span></td>
+    <td><img src="${I('anomaly_050.webp')}"><b>끝까지 밝은 손의 전등</b><br>꺼지는 것을 하지 않는다. 진짜로 꺼지는 것을 하지 않는다.<br><span class="pr">₩1,200,000</span><br><span class="cart">짐수레에 넣는다</span><span class="qa">질문 한다</span></td>
+    </tr></table>
+    <div class="how"><b>◈ 사는 방법 ◈</b><br>1. 짐수레에 넣는다 &nbsp; 2. 아래의 계좌에 돈을 넣는다 (₩999,999 보다 적으면 받지 않는다) &nbsp; 3. 돈을 확인 하면 즉시 보내 주는 것이다<br>돈을 넣는 계좌 : <b>농협 352-1849-2706-13 (예금주 : 우주인)</b><br><span style="color:#f66">※ 돈을 돌려주는 것은 절대로 없다. 물건을 돌려받는 것도 없다. </span><br>궁금한 것은 <a>운영자에게 질문</a> 하는 것이다. 운영자는 우주 시간으로 24시간 깨어 있는 것이다.</div>
+    <div class="ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 집의 페이지는 <span class="nn">Netscape Now!</span> 에서 가장 좋게 보이는 것이다 · 거미줄의 주인 : 우주인</div>
+  </div></div></div>`,
+};
+
+const PHOTO = '../../../../../../home/user/goei-plugin/game-src/art/pixellab-test-20261028/bg_heolgap_768x300.png';
+// 첨부 한 개를 사이트 모양으로. k: image(실제 사진) photo(사진 설명) video file link
+const AX = (k, t) => k === 'image'
+  ? `<figure class="ax ax-img"><img src="${PHOTO}"><span class="zm">⤢</span>${t ? `<figcaption>${t}</figcaption>` : ''}</figure>`
+  : k === 'photo' ? `<figure class="ax ax-ph"><div class="fr"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><p>${t}</p></div></figure>`
+  : k === 'video' ? `<figure class="ax ax-vd"><div class="fr"><span class="pl">▶</span><p>${t}</p><div class="bar"><span>▶</span><i></i><span>0:00</span></div></div></figure>`
+  : '';
+const AFILES = (items, label) => `<div class="axf"><b>${label}</b>${items.map(([k, t]) => `<div class="r"><span class="ic">${k === 'file' ? '📎' : '🔗'}</span>${k === 'file' ? `<span>${t}</span>` : `<a>${t}</a>`}</div>`).join('')}</div>`;
+const POST = { t: '새벽 4시에 찍은 복도인데 이거 뭐로 보임?', a: '은하제', d: '05.10 04:12', v: 128, r: 6, c: 3 };
+const PBODY = (fl) => `<p>방금 화장실 가다가 찍음. 우리 층 복도 끝인데 원래 저기 문 없음.</p>${AX('image', '우리 층 복도 끝')}<p>찍고 나서 다시 보니까 없어짐. 혹시 몰라서 엘베 앞에서 영상도 찍었는데 이게 더 이상함.</p>${AX('video', '엘리베이터 문이 아무도 없는데 혼자 열렸다 닫히는 영상. 닫히기 직전에 안쪽 거울에 사람 그림자가 하나 비침.')}<p>아는 사람 있으면 알려 줘. 원본은 밑에 올려 둠.</p>${fl}`;
+const PFILES = [['file', '복도_원본_0412.jpg'], ['link', 'https://goei.wiki/w/명일 아파트']];
+const CMTS = [
+  ['야간조', '04:20', '복도 끝에 문 생기는 거 명일 아파트 얘기랑 똑같은데. 절대 열지 마셈', ''],
+  ['ㅇㅇ', '04:31', '나도 비슷한 거 찍음', '같은 모양 복도. 끝에 철문이 있고 문틈으로 빨간 불빛이 새어 나옴'],
+  ['부적모음', '04:45', '영상 마지막 거울 부분 소름이네.. 위치 쪽지로 줄 수 있음?', ''],
+];
+const GNPOST = `<div class="gn ${sub ? '' : ''}"><div class="hd"><span class="lg"><svg width="28" height="28" viewBox="0 0 24 24" style="flex:none"><use href="#L-gn"/></svg>괴담넷</span><nav><b>커뮤니티</b><span>쪽지</span></nav><span class="sr">${S('srch', 'i s')}괴담넷 검색</span></div>
+<div class="wrap"><div class="side"><h6>게시판</h6><a class="on">자유게시판</a><a>목격담</a><a>질문</a><a>정보·자료</a><a>썰</a><h6>내 메뉴</h6><a>쪽지함</a><a>내가 쓴 글</a><a>스크랩</a></div>
+<div class="gmain gpost"><div class="ph1"><span class="c">자유</span><h2>${POST.t}</h2><div class="mt"><b>${POST.a}</b> · ${POST.d} · 조회 ${POST.v} · 추천 ${POST.r}</div></div>
+<div class="pb">${PBODY(AFILES(PFILES, '첨부 2'))}</div>
+<div class="acts"><span class="up">▲ 추천 ${POST.r}</span><span>☆ 스크랩</span></div>
+<div class="cmh">댓글 <b>${POST.c}</b></div>${CMTS.map(([n, d, t, ph]) => `<div class="cm"><div class="ch"><b>${n}</b> <small>${d}</small></div><p>${t}</p>${ph ? AX('photo', ph) : ''}</div>`).join('')}
+<div class="cin">댓글을 입력하세요<span>등록</span></div>
+<div class="bt"><span>‹ 목록으로</span><span class="w">글쓰기</span></div></div></div></div>`;
+const GALPOST = `<div class="dc"><div class="hd"><span class="lg" style="display:flex;align-items:center;gap:8px"><svg width="28" height="28" viewBox="0 0 24 24" style="flex:none;background:#fff;border-radius:5px"><use href="#L-gal"/></svg><span>괴담 갤러리<small>무섭고 이상한 이야기</small></span></span><div class="sch"><span>갤러리 & 통합검색</span><b>${S('srch')}</b></div></div>
+<div class="body dpost"><div class="vt"><h3><span>[목격]</span> ${POST.t}</h3><div class="vm"><span><b>${POST.a}</b> <span class="ip">(118.235)</span> · ${POST.d}</span><span>조회 ${POST.v} · 추천 ${POST.r} · 댓글 ${POST.c}</span></div></div>
+<div class="att"><b>원본 첨부파일 2</b>${PFILES.map(([k, t]) => `<a>${k === 'file' ? '📎' : '🔗'} ${t}</a>`).join('')}</div>
+<div class="pb">${PBODY('')}</div>
+<div class="rec"><div class="b up"><b>${POST.r}</b><span>개념 추천</span></div><div class="b dn"><b>0</b><span>비추</span></div></div>
+<div class="cmh">전체 댓글 <b>${POST.c}</b>개</div>${CMTS.map(([n, d, t, ph], i) => `<div class="cm"><div class="ch"><b>${n}</b>${n === 'ㅇㅇ' ? ' <span class="ip">(39.7)</span>' : ''}</div><div class="cb"><p>${t}</p>${ph ? AX('photo', ph) : ''}</div><small>${d}</small></div>`).join('')}
+<div class="cin"><span class="nm">ㅇㅇ</span><span class="tx"></span><span class="go">등록</span></div>
+<div class="bt2"><span>전체글</span><span>‹ 목록으로</span><span class="wr">글쓰기</span></div></div></div>`;
+const WPPOST = `<div class="wp"><div class="pg"><div class="ban"><b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small><svg style="position:absolute;right:18px;top:6px" width="74" height="74" viewBox="0 0 24 24"><use href="#L-wpf"/></svg></div>
+<div class="bar"><a>HOME</a><a>자유토론</a><a>방명록</a></div><div class="ct wpost">
+<table class="vw"><tr><th>제 목</th><td class="tt" colspan="3">${POST.t}</td></tr><tr><th>글쓴이</th><td>${POST.a}</td><th>날 짜</th><td>05/10 04:12</td></tr><tr><th>조 회</th><td>${POST.v}</td><th>첨 부</th><td>${PFILES.map(([k, t]) => `<a>${t}</a>`).join('<br>')}</td></tr>
+<tr><td class="bd" colspan="4">${PBODY('')}</td></tr></table>
+<div class="cms">${CMTS.map(([n, d, t, ph]) => `<div class="cm"><b>${n === 'ㅇㅇ' ? '익명' : n}</b> : ${t} <small>(${d})</small>${ph ? AX('photo', ph) : ''}</div>`).join('')}
+<div class="cin">이름 <span class="in s"></span> 내용 <span class="in"></span> <span class="bb">쓰기</span></div></div>
+<div class="nav2"><span class="bb">목록</span><span class="bb">글쓰기</span></div></div><div class="ft">관리 : 부매니저</div></div></div>`;
+
+const WKTOP = (q = '문서 제목 검색') => `<div class="top"><span class="lg"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#L-wk"/></svg>괴이위키</span><nav><span><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>최근 변경</span><span><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c1.6 0 2.8-1.6 3.8-3.5M13.2 9.5C14.2 8 15.4 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>임의 문서</span></nav><span class="sr">${q}<i class="sg">${S('srch', 'i s')}</i></span></div>`;
+const WKSEARCH = `<div class="wk">${WKTOP('관리')}<div class="wrap one"><div class="doc"><h1>"관리" 검색 결과</h1><div class="dm">문서 5개</div>
+<div class="go1">→ <a class="wl"><b>관리</b></a> 문서가 없어요. <a class="wl new">이 제목으로 새 문서 만들기</a></div>
+<ul class="sres">${[['관리국', '인물·세력', '괴이와 이면을 감시하고 통제하는 기관. 요원들은 검은 정장 차림으로…'], ['가짜 관리국', '세력', '관리국을 사칭하는 무리. 진짜 관리국보다 친절하다는 평이…'], ['관리국 본부', '특수', '관리국 요원들이 드나드는 건물. 정확한 위치는…'], ['불이 꺼진 관리국', '괴이', '불이 꺼진 채 운영되는 관리국 지부. 안에서는…'], ['세계정치 게시판', '기타', '…관리는 부매니저 1인이 맡고 있다. 감시자는 관리국 두 곳 모두…']].map(([t, c, d]) => `<li><a class="wl t">${t}</a><small>${c}</small><p>${d}</p></li>`).join('')}</ul></div></div></div>`;
+const WKNONE = `<div class="wk">${WKTOP()}<div class="wrap one"><div class="doc"><h1>달빛 타투샵</h1><div class="dm">새 문서</div>
+<div class="nodoc"><p><b>해당 문서를 찾을 수 없습니다.</b></p><p class="src">같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요.</p>
+<div class="ta">이 문서에만 덧붙일 지침 (내용·관점·분량)</div><p class="crq">공용 지침: 짧은 문단, 인터넷 커뮤니티 말투</p>
+<div class="rr"><span class="sp"></span><span class="bt go">${sub === 'busy' ? '<i class="spin"></i>작성하는 중…' : '문서 작성'}</span></div>${sub === 'busy' ? '<p class="bz">창을 닫아도 계속 작성돼요.</p>' : ''}</div></div></div></div>`;
+const WKNEW = `<div class="wk">${WKTOP()}<div class="wrap one"><div class="doc"><h1>새 문서 만들기</h1><div class="dm">괴이위키</div>
+<div class="nodoc"><label>문서 제목</label><div class="in1">문서 제목</div><p class="src">명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요.</p><div class="rr"><span class="sp"></span><span class="bt go">다음</span></div></div></div></div></div>`;
+const WKMAIN = `<div class="wk nm"><div class="top"><span class="lg"><svg width="28" height="28" viewBox="0 0 24 24"><use href="#L-wk"/></svg>괴이위키</span><nav><span><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>최근 변경</span></nav><span class="rnd" title="임의 문서"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00a495" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c1.6 0 2.8-1.6 3.8-3.5M13.2 9.5C14.2 8 15.4 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3"/></svg></span><span class="sr" style="margin-left:-18px">여기에서 검색<i class="sg">${S('srch', 'i s')}</i></span></div>
+<div class="wrap"><div class="doc mainp"><div class="h1r"><h1>괴이위키:대문</h1></div><div class="dm" style="border:0;padding:0;margin:0 0 12px">최근 수정 시각: 오늘</div><div class="cat">분류: <a class="wl">괴이위키</a></div><hr class="hl">
+<div class="intro"><h3>여러분이 기록해 나가는 <span>괴담의 나무</span></h3><p><a class="wl">괴이위키</a>에 오신 것을 환영합니다!</p><p class="sm2">괴이위키는 누구나 기여할 수 있는 위키입니다.<br>검증되지 않았거나 편향된 내용이 있을 수 있습니다.</p><div class="bsr">여기에서 검색<span>검색</span></div></div><hr class="hl">
+<table class="irow"><tr><td class="ic"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M6 2h9l5 5v15H6z" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 11h8M9 15h8M9 19h5" stroke="#fff" stroke-width="2"/></svg></td><td><div class="tt">오늘의 문서 · 소라 랜드</div><div>최근 문을 연 테마파크이자, 이면세계 커뮤니티에서 <b>"광고에 낚이면 끝나는 곳"</b> 투표를 하면 매번 상위권에 들어가는 곳. <a class="wl">[더 보기]</a></div></td></tr><tr><td class="ic"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M12 22s-7-7-7-12a7 7 0 0 1 14 0c0 5-7 12-7 12z" fill="#fff"/><circle cx="12" cy="10" r="2.6" fill="#00a495"/></svg></td><td><div class="tt">괴담·장소 <small>91</small></div><div><a class="wl">소라 랜드</a> · <a class="wl">명일 아파트</a> · <a class="wl">금지된 비디오</a> · <a class="wl">강서 대학병원</a> · <a class="wl">인스피레이션 호텔</a> · <a class="wl">샛별 고시원</a> · <a class="wl">유계역</a> · <a class="wl">심연교통공사</a> · <a class="wl">룩키마트</a> · <a class="wl">[전체]</a></div></td></tr><tr><td class="ic"><svg viewBox="0 0 24 24" width="44" height="44"><circle cx="12" cy="8" r="4.5" fill="#fff"/><path d="M3 22c0-5 4-8 9-8s9 3 9 8z" fill="#fff"/></svg></td><td><div class="tt">인물 <small>52</small></div><div><a class="wl">에일린</a> · <a class="wl">잼트리</a> · <a class="wl">콘쥬스</a> · <a class="wl">쟈알디</a> · <a class="wl">스팡달</a> · <a class="wl">고르고디오</a> · <a class="wl">큐라스</a> · <a class="wl">로제몬</a> · <a class="wl">김성진</a> · <a class="wl">[전체]</a></div></td></tr><tr><td class="ic"><svg viewBox="0 0 24 24" width="44" height="44"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="#fff"/><path d="M3 21h18" stroke="#fff" stroke-width="2"/></svg></td><td><div class="tt">새 문서 요청</div><div>찾는 문서가 없으면 <a class="wl">문서 작성 요청</a>을 남겨 주세요.</div></td></tr></table>
+</div><div class="side"><div class="bx"><h5><svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>최근 변경</h5><div class="rc"><a>세계정치 게시판</a><small>2분 전</small></div><div class="rc"><a>관리국</a><small>15분 전</small></div><div class="rc"><a>소라 랜드</a><small>1시간 전</small></div><div class="rc"><a>인류의 신비전</a><small>3시간 전</small></div><div class="rc"><a>잼트리</a><small>어제</small></div></div></div></div></div>`;
+document.getElementById('page').innerHTML = sub === 'post' ? ({ gn: GNPOST, gal: GALPOST, wpf: WPPOST })[site] : site === 'wk' && (sub === 'main' || sub === 'mainlist') ? WKMAIN : site === 'wk' && sub === 'search' ? WKSEARCH : site === 'wk' && (sub === 'none' || sub === 'busy') ? WKNONE : site === 'wk' && sub === 'new' ? WKNEW : P[site];
+
+
+if (site === 'cos' && (sub === 'ask' || sub === 'pick')) {
+  const ufo = '<svg width="30" height="22" viewBox="0 0 32 24"><use href="#L-cos"/></svg>';
+  const card = sub === 'ask' ? `<div class="q-at"><span class="q-al">붙인 물건</span><a class="q-lk"><img src="${I('food_374.webp')}"><b>꿈의 통조림</b><em>₩999,999</em></a><span class="q-x">×</span></div>` : '';
+  const log = sub === 'ask'
+    ? `<div class="q-m q-me"><div class="q-w">나<small>오후 9:12</small></div><div class="q-t">이거 누구 꿈인지 정말 모르는 거예요? 한 개만 사도 돼요?</div></div>
+       <div class="q-m q-op"><div class="q-w">운영자 우주인<small>오후 9:12</small></div><div class="q-t">질문을 보내 준 것에 감사 하는 것이다 지구인 손님이여!! 누구의 꿈 인지는 우리도 진짜로 알지 않는 것이다. 지난 번의 손님은 바다 속에서 깨어났다고 한다. 한 개도 파는 것이 가능 하다. 그러나 ₩999,999 보다 적은 주문은 받지 않는 것이므로 이것과 함께 짐수레에 넣는 것을 강하게 추천 하는 것이다.
+       <a class="q-lk"><img src="${I('consumable_113.webp')}"><b>기억을 지우는 스푸레이</b><em>₩2,400,000</em></a></div></div>
+       <div class="q-m q-me"><div class="q-w">나<small>오후 9:13</small></div><div class="q-t">둘 다 사면 좀 깎아 줘요</div></div>
+       <div class="q-m q-op"><div class="q-w">운영자 우주인<small>오후 9:13</small></div><div class="q-t">깎는 것은… 우리의 별에는 없는 말 이다. 그러나 지구인 손님이 귀여운 것이므로 스푸레이를 <b>₩2,000,000</b> 으로 해 주는 것이다. 이 값은 오늘만 존재 한다.</div></div>`
+    : `<div class="q-m q-op"><div class="q-w">운영자 우주인<small>오후 9:20</small></div><div class="q-t">무엇이 궁금한 것이냐 지구인 손님이여!! 물건에 대하여 묻는 것이면 아래에서 물건을 붙이는 것을 하라.</div></div>`;
+  const pick = sub === 'pick' ? `<div class="q-pk"><h6>붙일 물건을 고르는 것이다</h6><div class="q-r"><b style="font-size:11px;color:#888">짐수레</b></div><div class="q-r q-on"><img src="${I('food_374.webp')}"><span>꿈의 통조림</span><em>₩999,999</em></div><div class="q-r"><b style="font-size:11px;color:#888">진열된 물건</b></div><div class="q-r"><img src="${I('consumable_113.webp')}"><span>기억을 지우는 스푸레이</span><em>₩2,400,000</em></div><div class="q-r"><img src="${I('anomaly_050.webp')}"><span>끝까지 밝은 손의 전등</span><em>₩1,200,000</em></div></div>` : '';
+  document.querySelector('.page').insertAdjacentHTML('beforeend', `<div class="cq"><div class="q-tb"><span class="q-tt">★ 운영자에게 질문 하는 창 ★ - Netscape</span><i>_</i><i>□</i><i>×</i></div>
+  <div class="q-hd"><span class="q-op">${ufo}</span><div><b>운영자 우주인</b><small>● 지금 깨어 있는 것이다</small></div></div>${card}<div class="q-lg">${log}</div>
+  <div class="q-ir" style="position:relative">${pick}<span class="q-btn">📎 물건을 붙인다</span><span class="q-in">질문을 쓰는 곳이다</span><span class="q-btn">보낸다</span></div></div>`);
+}
+if (site === 'wk') {
+  const open = sub === 'list' || sub === 'mainlist';
+  const wk = document.querySelector('#page .wk');
+  const grp = (k, rows) => `<h4>${k}<b>${rows.length}</b></h4>${rows.map(([t, d]) => `<a class="${t === '세계정치 게시판' ? 'on' : ''}"><span>${t}</span>${d ? '<i></i>' : ''}</a>`).join('')}`;
+  const panel = `<aside class="wdr${open ? ' open' : ''}"><div class="wsr">${S('srch', 'i s')}<span>이름·제목 검색</span></div>
+    <div class="wtabs"><span class="on">전체<small>143</small></span><span>이번 이야기<small>4</small></span><span>괴이<small>52</small></span><span>특수<small>39</small></span><span>인물<small>40</small></span><span>세력<small>8</small></span><span>기타<small>4</small></span></div>
+    <div class="wls">${grp('ㄱ', [['가짜 관리국', 1], ['강변'], ['강북 특설병원'], ['강서 대학병원'], ['게슈간'], ['고르고디오'], ['관리국', 1], ['광기로 점철된 성당'], ['교회'], ['금지된 비디오'], ['김성진']])}${grp('ㄴ', [['노기균'], ['눈먼 자들의 저택']])}${grp('ㅅ', [['세계정치 게시판', 1], ['소라 랜드']])}</div></aside>`;
+  const rail = `<button class="wgrab" aria-label="목록 ${open ? '접기' : '펼치기'}">${(open !== document.body.classList.contains('phone')) ? '‹' : '›'}<span>목록</span></button>`;
+  wk.classList.add('hasdr'); if (open) wk.classList.add('dr-open');
+  const first = wk.querySelector('.top .rnd') || wk.querySelector('.top .sr');
+  first.insertAdjacentHTML('beforebegin', `<span class="wlb${open ? ' on' : ''}" title="목록"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>`);
+  wk.insertAdjacentHTML('beforeend', rail + panel + (open ? '<div class="wscrim"></div>' : ''));
+}
+</script>
+</body></html>
