@@ -55,6 +55,8 @@ export interface Item {
   /** 상점: 값·가계부 거래 id */
   price?: number;
   walletId?: string;
+  /** 상점: 원이 아닌 값으로 치른 것 (그 가게의 결제 수단·흥정으로 정한 대가, 2026-11-08 사용자) */
+  paidWith?: string;
   /** 본문: 근거 인용 */
   quote?: string;
   /** 상점에 판 응답 키: 그 응답이 살아 있는 동안 목록에서 안 보인다 (다시 굴리면 판 돈과 함께 돌아온다) */
@@ -215,6 +217,7 @@ export interface ItemInput {
   anchor: string;
   price?: number;
   walletId?: string;
+  paidWith?: string;
   quote?: string;
   id?: string;
   at?: string;
@@ -245,6 +248,10 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
   return next;
 }
 
+/** 획득 기록의 값: 원 · 원이 아닌 대가 */
+const paidNote = (e: ItemInput): string =>
+  [Number.isSafeInteger(e.price) && (e.price! > 0 || !e.paidWith) ? `₩ ${e.price!.toLocaleString('en-US')}` : '', e.paidWith ? clean(e.paidWith, 60) : ''].filter(Boolean).join(' + ');
+
 /** 물건 더하기. 같은 이름이 살아 있으면 새 줄을 만들지 않고 설명·효과·판정만 갱신하고, 둘 다 소모성이면 횟수를 더한다.
  * 이름이 비면 그대로. 빈 설명은 있던 설명을 지우지 않는다 */
 export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
@@ -267,10 +274,11 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     id, name, desc, effect, use: false, state: 'ok', from: e.from, anchor: e.anchor, at: e.at ?? new Date().toISOString(),
     ...(Number.isSafeInteger(e.price) ? { price: e.price } : {}),
     ...(e.walletId ? { walletId: e.walletId } : {}),
+    ...(e.paidWith ? { paidWith: clean(e.paidWith, 60) } : {}),
     ...(quote ? { quote } : {}),
   }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
-  const got = addItemLog(it, { name, item: id, ...(row.icon ? { icon: row.icon } : {}), what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}), ...(Number.isSafeInteger(e.price) ? { note: `₩ ${e.price!.toLocaleString('en-US')}` } : {}), at: row.at });
+  const got = addItemLog(it, { name, item: id, ...(row.icon ? { icon: row.icon } : {}), what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}), ...(paidNote(e) ? { note: paidNote(e) } : {}), at: row.at });
   const out = { ...got, list: [...got.list, row].slice(-200) };
   return e.wear && row.equip ? equipItem(out, alive, id) : out;
 }
@@ -434,6 +442,9 @@ export function newlyBought(list: Item[], lastAnchor: string): Item[] {
   return list.filter((e) => e.from === 'store' && e.anchor === lastAnchor);
 }
 
+/** 본편에 넘기는 「새로 산 것」 이름: 원이 아닌 값으로 치렀으면 무엇으로 치렀는지 붙인다 (본편 모델이 몸·빚 같은 결과를 이야기로) */
+export const boughtLine = (e: Item): string => (e.paidWith ? `${e.name} (paid with ${e.paidWith}${e.price ? ` + ${e.price.toLocaleString('en-US')} won` : ''})` : e.name);
+
 /** 본편에 넘기는 물건 한 줄: 이름 — 설명 (효과) [장착] [남은 횟수] [상태] */
 export function itemLine(e: Item, left: number | undefined, equipped: boolean, detail: ItemDetail = 'full'): string {
   const tags = detail === 'name' ? [] : [
@@ -549,7 +560,7 @@ export function inventoryText(chat: Chat): string {
     if (!shopOn(vars)) return '';
     const it = readItems(vars);
     const live = liveItems(it, aliveAnchors(chat));
-    const bought = newlyBought(live, lastBotKey(chat)).map((e) => e.name);
+    const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
     const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...shopEvents(chat)];
     return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), shopGuide(vars)].join('\n');
   }
@@ -576,7 +587,7 @@ export function inventoryText(chat: Chat): string {
     limit: itemLimit(vars),
     left,
     use,
-    bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
+    bought: newlyBought(live, lastBotKey(chat)).map(boughtLine),
     events: [...(resumed ? [RESUMED_EVENT] : []), ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed,
     detail: itemDetail(vars),

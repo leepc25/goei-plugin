@@ -556,7 +556,7 @@ function unsentRow(): string {
   const p = cardPalette();
   unsentShown();
   return `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span>`
-    + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button>`;
+    + `<button type="button" data-goei-cancel="1" style="${cardButtonStyle()}">취소</button>`;
 }
 
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
@@ -587,16 +587,16 @@ function startCardHtml(body: string, unsent: boolean): string {
 
 /** 기록 카드 없이 놓인 메시지(시작 화면 직접 입력) 아래의 전송 대기 줄 */
 function unsentMarkHtml(): string {
-  return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
+  return `<div data-goei-card="unsent" style="${cardStyle()}">${unsentRow()}</div>`;
 }
 
 /** 시작 메시지로 시작한 첫 장면 아래: 첫 행동을 적어 보내라는 안내와 재선택 (host/openinghint.ts) */
 function openingHintHtml(): string {
   const p = cardPalette();
   openingShown();
-  return `<div data-goei-card="opening" style="${cardStyle()}display:flex;flex-wrap:wrap;margin-top:14px">`
+  return `<div data-goei-card="opening" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span>`
-    + `<button type="button" data-goei-repick="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">재선택</button></div>`;
+    + `<button type="button" data-goei-repick="1" style="${cardButtonStyle()}">재선택</button></div>`;
 }
 
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
@@ -621,7 +621,14 @@ function cardPalette() {
 }
 function cardStyle(): string {
   const p = cardPalette();
-  return `display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  // 채팅 속 카드는 전부 같은 폭 규칙: 왼쪽 정렬, 420px 안팎, 내용만큼 (2026-11-08 사용자: 입력창 위 상자 크기가 제각각, 첫 행동 상자가 너무 길다, 왼쪽 정렬)
+  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+}
+
+/** 카드 안 단추 (상점 카드 「상점 열기」와 같은 모양) */
+function cardButtonStyle(): string {
+  const p = cardPalette();
+  return `flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer`;
 }
 
 /** Lite에서만: 응답이 막 들어와 아직 정리되기 전에도 태그가 보이지 않게, 이동 지시문은 카드로 */

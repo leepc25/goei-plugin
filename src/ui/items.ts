@@ -161,6 +161,14 @@ export function setAvatarHtml(fn: (ctx: ChatContext) => string): void {
  * 칸 data-drop="equip:갈래:번호" — 끌어 온 물건이 그 갈래가 아니면 놓이지 않는다 (app.ts 끌기 처리)
  */
 export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): string {
+  const { av, slots } = equipParts(ctx, where, sel);
+  // 상점 팔기 (2026-11-08 사용자): 장착한 게 없어도 아바타와 빈 칸을 늘 보인다. 사용은 소지품 화면에서만 (사용자: 상점에서까지 쓰면 복잡)
+  if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}</div></section>`;
+  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
+}
+
+/** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 4). 상점 팔기(PC)는 이 둘을 소지품 격자와 한 상자에 엮는다 (ui/shop.ts pickHtml) */
+export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''): { av: string; slots: string } {
   const live = liveOf(ctx);
   const eq = equippedOf(live);
   const slot = (k: ItemEquip, i: number) => {
@@ -170,9 +178,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
     return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
   };
   const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
-  if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착">${slots}</section>`;
-  const av = avatarHtml(ctx);
-  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
+  return { av: avatarHtml(ctx), slots };
 }
 
 /** 「사용」칸 (장착 띠 오른쪽): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */

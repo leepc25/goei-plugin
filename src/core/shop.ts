@@ -162,7 +162,10 @@ export interface ShopItem {
   uses?: number;
   equip?: ItemEquip;
   icon?: string;
+  /** 원으로 내는 몫 (원이 아닌 값만 받으면 0) */
   price: number;
+  /** 원이 아닌 값 (2026-11-08 사용자: 그 가게의 결제 수단 — 신체·피·기억 등, 또는 흥정으로 정한 다른 대가). 글 그대로 */
+  pay?: string;
   /** 흥정 전 값 (깎였을 때만) */
   orig?: number;
   /** 진열 구분 (2026-11-07 사용자): 희귀 = 진열대에 단 하나, 특가 = 원래 값(was)에서 깎아 내놓은 것 */
@@ -373,6 +376,21 @@ function priceOf(s: string): number | null {
   return n !== null && n >= 0 ? n : null;
 }
 
+/** 값 칸: 원 숫자, 그 가게의 다른 대가(글), 또는 둘을 「+」로 섞은 것 → { 원 몫, 원이 아닌 대가 }. 비면 null */
+export function costOf(cell: string): { price: number; pay?: string } | null {
+  const parts = cell.split(/\s*[+＋]\s*/).map((x) => x.trim()).filter(Boolean);
+  if (!parts.length) return null;
+  let price = 0;
+  const text: string[] = [];
+  for (const part of parts) {
+    const won = /\d/.test(part) && /^[\s\d,.₩원억만천백\-−]+$/.test(part) ? priceOf(part) : null;
+    if (won !== null) price += won;
+    else text.push(part);
+  }
+  const pay = clean(text.join(' + '), 40);
+  return pay ? { price, pay } : { price };
+}
+
 /** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 무기·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -). 그림: 그림 찾기용 영어 낱말 */
 export const SHOP_LINE = '이름|값|쓰임|그림|설명|효과|구분';
 
@@ -381,12 +399,13 @@ function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const cells = line.replace(/^[-*•+]\s*/, '').split('|').map((c) => c.trim());
   if (cells.length < 2) return null;
   const name = clean(cells[0], 30);
-  const price = priceOf(cells[1] ?? '');
-  if (!name || price === null) return null;
-  const out: Omit<ShopItem, 'id'> = { name, price, ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3] }), desc: clean(cells[4], 120), effect: clean(cells[5], 60) };
+  const cost = costOf(cells[1] ?? '');
+  if (!name || !cost) return null;
+  const price = cost.price;
+  const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3] }), desc: clean(cells[4], 120), effect: clean(cells[5], 60) };
   const tag = (cells[6] ?? '').trim();
   if (/^(희귀|레어|rare)/i.test(tag)) out.tag = 'rare';
-  else if (/^(특가|할인|세일|sale)/i.test(tag)) {
+  else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
     const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ''));
     if (was !== null && was > price) Object.assign(out, { tag: 'sale', was });
   }
@@ -426,7 +445,7 @@ export interface TalkReply {
   owner: string;
   mode: TalkMode;
   add: Omit<ShopItem, 'id'>[];
-  reprice: { name: string; price: number }[];
+  reprice: { name: string; price: number; pay?: string }[];
   remove: string[];
   /** 전체 다시 짬 */
   all: Omit<ShopItem, 'id'>[];
@@ -465,8 +484,8 @@ export function parseTalk(raw: string): TalkReply {
         if (it) out.add.push(it);
       } else if (line.startsWith('~')) {
         const [name, price] = line.slice(1).split('|').map((c) => c.trim());
-        const n = priceOf(price ?? '');
-        if (name && n !== null) out.reprice.push({ name: clean(name, 30), price: n });
+        const c = costOf(price ?? '');
+        if (name && c) out.reprice.push({ name: clean(name, 30), ...c });
       } else if (line.startsWith('-')) {
         const name = clean(line.slice(1), 30);
         if (name) out.remove.push(name);
@@ -519,7 +538,12 @@ export function applyTalk(st: ShopState, r: TalkReply, kick = true): ShopState {
   } else if (r.mode === 'partial') {
     for (const n of r.remove) items = items.filter((x) => x.sold || !sameShopName(x.name, n));
     for (const p of r.reprice) {
-      items = items.map((x) => (!x.sold && sameShopName(x.name, p.name) && p.price !== x.price ? { ...x, price: p.price, orig: x.orig ?? x.price } : x));
+      // 흥정 (2026-11-08 사용자): 깎은 원 값, 또는 주인이 받아들인 다른 대가(pay). 대가가 붙으면 잔고가 모자라도 원 몫만 내고 산다
+      items = items.map((x) => {
+        if (x.sold || !sameShopName(x.name, p.name) || (p.price === x.price && (p.pay ?? '') === (x.pay ?? ''))) return x;
+        const { pay: _p, ...rest } = x;
+        return { ...rest, price: p.price, ...(p.pay ? { pay: p.pay } : {}), ...(x.pay ? {} : { orig: x.orig ?? x.price }) };
+      });
     }
     items = [...items, ...withIds(st, r.add, items)];
   }
@@ -530,7 +554,7 @@ export function applyTalk(st: ShopState, r: TalkReply, kick = true): ShopState {
     let price: number | null | undefined = r.offer;
     if (price === undefined) {
       const rp = r.reprice.find((p) => sameShopName(p.name, sell!.name));
-      if (rp) price = rp.price;
+      if (rp && !rp.pay) price = rp.price;
     }
     if (price !== undefined) {
       const first = sell.first ?? (typeof sell.price === 'number' && price !== null && price !== sell.price ? sell.price : undefined);
@@ -684,8 +708,8 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄). 지침 「상점」의 MAIN_TAG 절 */
 /** 상점이 열리는 자리 (설정): any(기본, 온라인몰·홈쇼핑·자판기·이면 쇼핑몰처럼 판매자가 없는 곳도) · shop(판매자가 있는 가게 장면만) */
 const WHERE: Record<ShopWhere, string> = {
-  any: 'This covers any way of buying: a store, stall or vendor in front of them, and also a shop with nobody at the counter, an online or in-app mall, TV or phone home shopping, a catalog, a vending machine, or an otherworldly mall — use that shop’s own name (the mall, channel or machine) as 가게 이름.',
-  shop: 'Only at a physical place of sale with a seller present (a store, stall, vendor, dealer); not for online malls, home shopping, catalogs or machines.',
+  any: 'Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.',
+  shop: 'Only a physical store or stall with a seller present; not online, broadcast, catalog or machine.',
 };
 export const shopGuide = (vars?: Vars): string => fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where] });
 

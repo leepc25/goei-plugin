@@ -132,7 +132,7 @@ export async function installIcon(charIndex: number, progress: Progress): Promis
   const cc = (Array.isArray(char.ccAssets) ? (char.ccAssets as CcAsset[]) : []).filter((a) => a && typeof a === 'object');
   const hasIcon = (uri: string) => cc.some((a) => a.type === 'icon' && a.uri === uri);
   if (prev && !hasIcon(prev)) cc.push({ type: 'icon', uri: prev, name: cc.some((a) => a.type === 'icon' && a.name === 'main') ? 'previous' : 'main', ext: extOf(prev) });
-  if (!hasIcon(path)) cc.push({ type: 'icon', uri: path, name: 'goei', ext: 'png' });
+  if (!hasIcon(path)) cc.push({ type: 'icon', uri: path, name: 'goei', ext: extOf(icon.file) });
   await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
 }
 

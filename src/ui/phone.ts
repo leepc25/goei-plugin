@@ -1083,15 +1083,17 @@ function settingsView(ctx: ChatContext): string {
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
+      ${group('괴담톡', [
+        row('자동 호출', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
+        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인 모델'], ['aux', '보조 모델']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
+        row('컨텍스트에 포함', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
+      ].join(''))}
       ${group('답장', [
-        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
-        row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
         row('말버릇 기록', onoff('habits'), '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요'),
         row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
       ].join(''))}
       ${group('새 메시지', [
-        row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
         row('단톡 수다', `<span class="ph-inline">${onoff('banter')}${pct('banter_chance')}</span>`, '새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요'),
@@ -1107,7 +1109,7 @@ function settingsView(ctx: ChatContext): string {
           row('등장인물 범위', seg('view_scope', vs.scope, [['0', '주요 인물'], ['1', '장면 안'], ['2', '장면 안 주요 인물'], ['3', '자율']])),
           row('방 크기', seg('view_size', vs.size, [['0', '자동'], ['1', '둘이서'], ['2', '여럿']])),
         ] : []),
-        row('만들기', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
+        row('자동 호출', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
       ].join(''))}
       ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'), '켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만')].join(''))}
       ${group('보관', [

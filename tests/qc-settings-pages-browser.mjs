@@ -14,7 +14,7 @@ const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'j
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['gnet', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
-const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|adv-reset-all|adv-reset-yes|adv-reset-no|man-|ip-|dir-|mk-|nav-|tab|close)/;
+const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close)/;
 const CHANGE_SKIP = /^(ed-|dir-|ip-|pp-diag-all|pp-backfill-turns|pp-reread-turns)/;
 
 /** 저장 상태 스냅샷 */
@@ -204,7 +204,7 @@ for (const vp of vps) {
         await page.waitForSelector('.gw .gw-setbody');
         if (p === 'update') continue;
         assert.equal(await page.$('.gw [data-action="set-scope"]'), null, `${vp} ${p}: 범위 칩 없음`);
-        assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, `${vp} ${p}: 창 머리의 기본값으로 저장·불러오기·초기값으로 (모든 페이지 같음)`);
+        assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 0, `${vp} ${p}: 창 머리에 저장 단추 없음 (2026-11-08 사용자: 바로 저장, 기본값은 점검 → 저장·불러오기)`);
         total += await sweepPage(page, p, mode, log);
         const a = await auditDom(page, '.gw');
         assert.deepEqual(a.missing, [], `${vp} ${p}/${mode}: 글자·aria-label 없는 단추`);
@@ -214,11 +214,13 @@ for (const vp of vps) {
     // 기본값으로 저장·불러오기: 요원 표시 인원을 3으로 두고 저장 → 기본값 3, 7로 바꾼 뒤 불러오기 → 3 (이 채팅 값만 바뀜)
     await goNode(page, 'set:board');
     const bar = async (what) => {
-      await page.evaluate((w) => document.querySelector(`.gw .gw-top [data-action="set-bar"][data-value="${w}"]`).click(), what);
+      await goNode(page, 'manage:backup');
+      await page.evaluate((w) => document.querySelector(`.gw [data-action="set-bar"][data-value="${w}"]`).click(), what);
       await page.waitForSelector(`.gw .gw-confirm [data-action="set-bar-yes"][data-value="${what}"]`);
       await page.evaluate((w) => document.querySelector(`.gw .gw-confirm [data-action="set-bar-yes"][data-value="${w}"]`).click(), what);
       await page.waitForFunction(() => !document.querySelector('.gw .gw-confirm'));
       await settle(page);
+      await goNode(page, 'set:board');
     };
     const setAgent = async (_mode, n) => {
       for (let i = 0; i < 30; i++) {

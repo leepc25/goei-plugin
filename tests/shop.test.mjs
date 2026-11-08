@@ -160,3 +160,28 @@ test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 �
   assert.equal(shopSettings({}).feature, true);
   assert.equal(shopSettings({ $sh_feature: '0' }).feature, false);
 });
+
+test('원이 아닌 값 (2026-11-08 사용자): 값 칸 글은 대가, 원과 섞으면 +, 흥정으로 다른 대가가 붙음, 다음 턴 「무엇으로 치르고 샀다」', async () => {
+  const { costOf, boughtLine } = await import('../dist-test/core.mjs');
+  assert.deepEqual(costOf('18000'), { price: 18000 });
+  assert.deepEqual(costOf('3만 원'), { price: 30000 });
+  assert.deepEqual(costOf('왼손 새끼손가락'), { price: 0, pay: '왼손 새끼손가락' });
+  assert.deepEqual(costOf('피 400ml'), { price: 0, pay: '피 400ml' }, '숫자가 섞인 글은 원으로 읽지 않음');
+  assert.deepEqual(costOf('5000 + 어제 기억'), { price: 5000, pay: '어제 기억' });
+  const r = parseShelf('<shop-identity>\nsells: 아무거나\nnever: -\nprices: 신체 부위만\n</shop-identity>\n<owner>띵동!</owner>\n<shelf>\n그림자 가위|허벅지 살 100g|무기|scissors|날붙이||희귀\n컵라면|머리카락 한 줌|소모1|cup noodle|매운맛||특가:5000\n</shelf>', null);
+  assert.equal(r.items[0].pay, '허벅지 살 100g');
+  assert.equal(r.items[0].price, 0);
+  assert.equal(r.items[1].tag, undefined, '원이 아닌 값에는 특가 딱지 없음');
+  // 흥정: 원 값 → 다른 대가
+  const st0 = applyShelf({ shop: '철물점', owner: '', key: 'c1', loaded: false, identity: { sells: '', never: '', prices: '' }, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] }, parseShelf(SHELF, null), shopSettings({}));
+  const t = parseTalk('<owner>돈 없으면 피라도 주쇼.</owner>\n<change mode="partial">\n~ 손전등|피 200ml\n</change>');
+  assert.deepEqual(t.reprice, [{ name: '손전등', price: 0, pay: '피 200ml' }]);
+  const st1 = applyTalk(st0, t);
+  const fl = st1.items.find((x) => x.name === '손전등');
+  assert.equal(fl.pay, '피 200ml');
+  assert.equal(fl.price, 0);
+  assert.equal(fl.orig, 18000, '흥정 표시');
+  assert.equal(boughtLine({ name: '손전등', paidWith: '피 200ml', price: 0 }), '손전등 (paid with 피 200ml)');
+  assert.equal(boughtLine({ name: '부적', paidWith: '어제 기억', price: 5000 }), '부적 (paid with 어제 기억 + 5,000 won)');
+  assert.equal(boughtLine({ name: '생수', price: 1500 }), '생수');
+});

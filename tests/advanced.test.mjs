@@ -8,7 +8,7 @@ import {
 
 import { REAL } from './realcard.mjs';
 const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return m.lorebook ?? m.module?.lorebook; })() : null;
-const { advValue, advChanged, applyAdvanced, refToggles, budgetFor, genSettings, advResetVars } = advanced;
+const { advValue, advChanged, applyAdvanced, refToggles, budgetFor, genSettings } = advanced;
 
 test('advanced: defaults match the original, invalid values fall back, changed keys are listed', () => {
   assert.equal(advValue({}, 'gn', 'dm_history'), '50');
@@ -19,8 +19,6 @@ test('advanced: defaults match the original, invalid values fall back, changed k
   assert.equal(advValue({ '$lb_cfg_lb-gn.incoming_chance': '35' }, 'gn', 'incoming_chance'), '35', '원래 있던 변수');
   assert.deepEqual(advChanged({ '$nw_adv_secondary': '0', '$nw_adv_ref_count': '20' }, 'nw'), ['secondary']);
   assert.deepEqual(refToggles({}, 'gn'), { description: true, authors: true, persona: true, active: true, related: false, secondary: false });
-  assert.equal(advResetVars('gn')['$lb_cfg_lb-gn.incoming_chance'], '100', '원래 변수는 비우지 않고 기본값');
-  assert.equal(advResetVars('gn')['$lb_cfg_lb-gn.adv_turns'], '');
   // 기능 상한이 0이면 공통 상한
   assert.equal(budgetFor({ '$gen_budget': '9000' }, 'ph'), 9000);
   assert.equal(budgetFor({ '$gen_budget': '9000', '$ph_adv_budget': '5000' }, 'ph'), 5000);

@@ -62,7 +62,7 @@ import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, dir
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { invOn, itemStartOn } from '../core/items';
-import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_MAX, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { isPhone, PHONE_MQ } from './media';
@@ -79,6 +79,8 @@ interface Draft {
   player?: string;
   /** 아바타 (페르소나로 시작할 때 필수): 고른 프리셋 번호 */
   look?: string;
+  /** 시작 잔고 (원). 비면 설정의 시작 잔고 기본값 (2026-11-08 사용자: 시작 패널에서 고쳐서 출발) */
+  wallet?: number;
 }
 
 type View =
@@ -287,6 +289,24 @@ function ensureRoot(): HTMLElement {
     grip.addEventListener('pointerup', up);
     grip.addEventListener('pointercancel', up);
   });
+  // 물건 설명 팝업 (2026-11-08 사용자: 특가 구획에서 잘리고, 진열대에서 스크롤바가 생겼다 사라지며 움찔거렸다).
+  // 칸 안의 .it-tip 은 내용만 들고, 보여 주기는 창 맨 위 층 하나(.it-tipfloat)가 맡는다. 칸 옆에 띄우고 화면 끝에 닿으면 반대쪽으로
+  root.addEventListener('pointerover', (ev) => {
+    if (ev.pointerType && ev.pointerType !== 'mouse') return;
+    const cell = (ev.target as HTMLElement | null)?.closest?.<HTMLElement>('.it-c:not(.empty), .it-slot:not(.empty)');
+    const tip = cell?.querySelector<HTMLElement>(':scope > .it-tip');
+    if (!cell || !tip) return;
+    if (tipFor === cell && tipLayer?.isConnected) return;
+    showTip(cell, tip);
+  });
+  root.addEventListener('pointerout', (ev) => {
+    if (!tipFor) return;
+    const to = ev.relatedTarget as Node | null;
+    if (to && tipFor.contains(to)) return;
+    hideTip();
+  });
+  root.addEventListener('scroll', hideTip, true);
+  root.addEventListener('pointerdown', hideTip, true);
   // 틀 크기 막대: 끄는 동안은 틀만 바꾸고, 놓으면 다시 그려 얼굴 사진을 새로 자른다
   root.addEventListener('change', (ev) => {
     if ((ev.target as HTMLElement).dataset?.input === 'dir-crop-size') render();
@@ -428,6 +448,42 @@ function ensureRoot(): HTMLElement {
 /** 패널의 change 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
 function panelChange(el: HTMLSelectElement): void {
   if (el?.dataset?.change) void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+}
+
+let tipLayer: HTMLElement | null = null;
+let tipFor: HTMLElement | null = null;
+/** 물건 설명 팝업을 창 맨 위 층에 띄운다 (칸 오른쪽, 넘치면 왼쪽, 위아래는 화면 안으로) */
+function showTip(cell: HTMLElement, tip: HTMLElement): void {
+  if (!root) return;
+  if (!tipLayer || !tipLayer.isConnected) {
+    tipLayer = document.createElement('div');
+    tipLayer.className = 'it-tipfloat';
+    tipLayer.setAttribute('aria-hidden', 'true');
+    root.appendChild(tipLayer);
+  }
+  tipFor = cell;
+  tipLayer.innerHTML = tip.innerHTML;
+  tipLayer.style.left = '0px';
+  tipLayer.style.top = '0px';
+  tipLayer.classList.add('on');
+  const r = cell.getBoundingClientRect();
+  const w = tipLayer.offsetWidth;
+  const h = tipLayer.offsetHeight;
+  const gap = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let x = r.right + gap;
+  if (x + w > vw - gap) x = r.left - gap - w;
+  if (x < gap) x = Math.max(gap, Math.min(vw - gap - w, r.left));
+  let y = r.top;
+  if (y + h > vh - gap) y = vh - gap - h;
+  y = Math.max(gap, y);
+  tipLayer.style.left = `${Math.round(x)}px`;
+  tipLayer.style.top = `${Math.round(y)}px`;
+}
+function hideTip(): void {
+  tipFor = null;
+  tipLayer?.classList.remove('on');
 }
 
 /** 패널의 input 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
@@ -916,6 +972,11 @@ async function handle(action: string, value?: string): Promise<void> {
     }
     case 'start':
       return start();
+    case 'start-wallet': {
+      const n = parseWon(value ?? '');
+      if (n !== null && n >= 0 && n <= WALLET_MAX) draft.wallet = n;
+      return renderPicker();
+    }
     case 'nav-tab':
     case 'tab':
       // PC 왼쪽 메뉴(nav-tab): 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일 아래 줄(tab)은 그대로)
@@ -1093,7 +1154,7 @@ async function start(): Promise<void> {
       return {
         ...next,
         // 아바타: 페르소나로 시작할 때만 (고유 인물은 그 인물 모습)
-        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}), [LOOK_KEY]: draft.player ? '' : (draft.look ?? '') },
+        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}), [LOOK_KEY]: draft.player ? '' : (draft.look ?? ''), ...(draft.wallet !== undefined ? walletVars({ start: draft.wallet, log: [] }) : {}) },
       };
     });
     if (!saved) throw new StartError('저장하지 못했어요.');
@@ -1247,7 +1308,9 @@ function render(): void {
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   // 카드에서 연 상점은 창 틀 없이 화면 위에 바로 (2026-11-07 사용자: 상황판과 별개, 높이는 화면 전체의 90%)
   const solo = view.kind === 'started' && shopUi.open && shopUi.solo;
-  const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  // 고르기 화면(시작 패널)은 태블릿 세로 비율 3:4 (2026-11-08 사용자: 세로가 짧다)
+  const pick = view.kind === 'picker' ? ' pick' : '';
+  const panel = `<div class="gx-panel${solo ? ' solo' : nav ? ' has-nav' : ` pre${pick}`}">${body()}</div>`;
   root.innerHTML = fr.kind === 'none' || solo ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {
@@ -1510,12 +1573,19 @@ function picker(): string {
   // 기존 인물로 시작하면 칸은 그대로 두고 그 인물의 성별·모습으로 잠근다 (2026-11-08 사용자)
   const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? '', playing ? (people.find((a) => a.id === draft.player)?.name ?? '') : '')}</section>` : '';
   const n0 = look ? 4 : 3;
+  // 시작 잔고 (2026-11-08 사용자): 첫 장면 다음. 설정의 기본값을 넣어 두고 고치면 이 채팅만 그 값으로. 가계부가 꺼져 있으면 칸 없음
+  const walletOn = colConfig(getPrefs().vars).wallet !== 'off';
+  const walletStep = f && walletOn
+    ? `<section><h2><i>${n0 + 1}</i>시작 잔고</h2><label class="gx-wallet-start"><input class="st-won" type="text" inputmode="numeric" value="${(draft.wallet ?? getPrefs().walletStart ?? WALLET_START_DEFAULT).toLocaleString('en-US')}" data-change="start-wallet" aria-label="시작 잔고"><span>원</span></label></section>`
+    : '';
+  const nLang = n0 + (walletStep ? 2 : 1);
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>주인공</h2>${who}</section>
     ${look}
     <section><h2><i>${n0}</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
-    <section><h2><i>${n0 + 1}</i>언어</h2><div class="gx-segs">${langs}</div></section>
+    ${walletStep}
+    <section><h2><i>${nLang}</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
     ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(list.indexOf(sc) + 1).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}

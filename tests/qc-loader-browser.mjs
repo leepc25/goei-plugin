@@ -39,7 +39,9 @@ const files = {};
   const wiki = JSON.parse(read('release/wiki-base.json'));
   files['wiki-base.json'] = JSON.stringify(wiki);
   for (const n of wiki.parts) files[n] = read(`release/${n}`);
-  files['icon.png'] = { b64: readFileSync(new URL('release/icon.png', root)).toString('base64') };
+  // 아이콘 파일 이름은 설치 자료(icon.json)를 따른다 (11-08 봇카드 이미지 WebP)
+  const iconFile = JSON.parse(read('src/data/install/icon.json')).file;
+  files[iconFile] = { b64: readFileSync(new URL(`release/${iconFile}`, root)).toString('base64') };
   const upd = JSON.parse(read('release/card-update.json'));
   files['card-update.json'] = JSON.stringify(upd);
   for (const n of upd.parts) files[n] = read(`release/${n}`);

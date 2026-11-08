@@ -29,7 +29,7 @@ import {
 } from '../core/shop';
 import { ICONS } from './icons';
 import { imageUrl } from './images';
-import { equipBox, itemPic } from './items';
+import { equipBox, equipParts, itemPic } from './items';
 
 /** 상품 그림: 소지품과 같은 PixelLab 그림 팩에서 그림 낱말·이름으로 (ui/items.ts itemPic, 표시 전용) */
 const pic = (name: string, icon?: string): string => itemPic({ name, icon });
@@ -86,6 +86,9 @@ function ownerFace(ctx: ChatContext, owner: string): string | null {
 
 const shell = (inner: string, cls: string, action: string, keep: string, label: string) =>
   `<div class="gx-agpop ${cls}" data-action="${action}" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card ${cls}-card" data-action="${keep}">${inner}</div></div>`;
+
+/** 값 표시: 원, 원이 아닌 대가, 또는 둘 다 (2026-11-08 사용자: 무엇이든 자판기 등 원으로 안 파는 가게) */
+const costText = (it: { price: number; pay?: string }) => (it.pay ? `${it.pay}${it.price ? ` + ${shortWon(it.price)}` : ''}` : shortWon(it.price));
 
 export function shopPopup(ctx: ChatContext): string {
   if (!shopUi.open) return '';
@@ -148,7 +151,7 @@ function bodyHtml(ctx: ChatContext, st: ShopState, bal: number): string {
 /** 희귀 진열장: 단 하나. 그림 2배(170px, 정수 확대)·이름·설명·효과·값을 다 펼쳐 보이고, 테두리에 빛이 돈다. 누르면 상세 */
 function rareHtml(it: ShopItem, bal: number, closed: boolean): string {
   const poor = it.price > bal;
-  return `<button class="sh-zone sh-rare${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="희귀 ${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
+  return `<button class="sh-zone sh-rare${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="희귀 ${esc(it.name)} ${esc(costText(it))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
     <span class="sh-rare-ring" aria-hidden="true"></span>
     <span class="sh-rare-pic"><span class="sh-rare-glow" aria-hidden="true"></span>${pic(it.name, it.icon)}</span>
     <span class="sh-rare-tx">
@@ -156,7 +159,7 @@ function rareHtml(it: ShopItem, bal: number, closed: boolean): string {
       <b class="sh-rare-nm">${esc(it.name)}</b>
       ${it.desc ? `<span class="sh-rare-ds">${esc(it.desc)}</span>` : ''}
       ${it.effect ? `<span class="sh-rare-ef">효과 · ${esc(it.effect)}</span>` : ''}
-      <span class="sh-rare-pr">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${esc(shortWon(it.price))}</span>
+      <span class="sh-rare-pr${it.pay ? ' pay' : ''}">${it.orig !== undefined ? '<i title="흥정으로 바꾼 값">▾</i>' : ''}${esc(costText(it))}</span>
     </span>
   </button>`;
 }
@@ -165,9 +168,9 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
   const poor = it.price > bal;
   const sale = it.tag === 'sale' && !!it.was && it.was > it.price;
   const off = sale ? Math.max(1, Math.round((1 - it.price / it.was!) * 100)) : 0;
-  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b>${traitsOf(it) ? `<small>${esc(traitsOf(it))}</small>` : ''}${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}<span class="sh-amt">${esc(shortWon(it.price))}</span></span>`;
-  return `<button class="it-c sh-c${sale ? ' sale' : ''}${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(shortWon(it.price))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
-    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ''}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band">${it.orig !== undefined ? '<i title="흥정으로 깎은 값">▾</i>' : ''}${sale ? `<s>${esc(shortWon(it.was!))}</s>` : ''}${esc(shortWon(it.price))}</span>${tip}</button>`;
+  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b>${traitsOf(it) ? `<small>${esc(traitsOf(it))}</small>` : ''}${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}<span class="sh-amt${it.pay ? ' pay' : ''}">${esc(costText(it))}</span></span>`;
+  return `<button class="it-c sh-c${sale ? ' sale' : ''}${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(costText(it))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
+    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ''}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band${it.pay ? ' pay' : ''}">${it.orig !== undefined ? '<i title="흥정으로 바꾼 값">▾</i>' : ''}${sale ? `<s>${esc(shortWon(it.was!))}</s>` : ''}${esc(costText(it))}</span>${tip}</button>`;
 }
 
 /** 팔 것 고르기: 진열대 자리에 「장착」 상자(장착한 것도 팔 수 있게, 2026-11-07 사용자) + 내 소지품 격자. 고르면 입력창에 「팔기: 이름」 칩 */
@@ -177,7 +180,13 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
   // 진열대와 같은 구획 상자 안에 (사용자 11-07: 배경에 늘어놓지 말고 상자 안에)
   const head = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ''}</small></header>`;
   const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join('')}</div>` : `<p class="gx-wt-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
-  return `<div class="sh-shelf sh-pick">${all.length > mine.length ? `<div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div>` : ''}<section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
+  if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx, 'sell', st.sell?.itemId ?? '')}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head}${inner}</section></div>`;
+  // PC (2026-11-08 사용자: 장착 띠를 따로 두면 소지품이 가려 안 보임): 상자 하나에 왼쪽 아바타(자르지 않음, 세로로 섬),
+  // 오른쪽 첫 줄 장착 6칸, 그 아래부터 소지품 격자. 소지품이 많으면 아바타 아래까지 전체 너비로 이어진다
+  const { av, slots } = equipParts(ctx, 'sell', st.sell?.itemId ?? '');
+  const cells = mine.map((it) => pickCell(it, st)).join('');
+  const empty = mine.length ? '' : `<p class="gx-wt-empty sh-sell-empty">${all.length ? '장착한 것 말고는 소지품이 없어요.' : '팔 만한 소지품이 없어요.'}</p>`;
+  return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells}${empty}</div></section></div>`;
 }
 
 function pickCell(it: Item, st: ShopState): string {
@@ -227,11 +236,12 @@ function detailHtml(ctx: ChatContext, st: ShopState, bal: number): string {
   const poor = left < 0;
   const money = `<div class="sh-money">
     <div><i>잔고</i><span class="sh-amt">${esc(shortWon(bal))}</span></div>
-    <div><i>값</i><span class="sh-amt">${it.orig !== undefined ? `<s>${esc(shortWon(it.orig))}</s> ` : ''}−${esc(shortWon(it.price))}</span></div>
+    ${it.pay && !it.price ? '' : `<div><i>값</i><span class="sh-amt">${it.orig !== undefined && !it.pay ? `<s>${esc(shortWon(it.orig))}</s> ` : ''}−${esc(shortWon(it.price))}</span></div>`}
+    ${it.pay ? `<div class="pay"><i>대가</i><span class="sh-amt">${esc(it.pay)}</span></div>` : ''}
     <div class="sum${poor ? ' bad' : ''}"><i>${poor ? '부족' : '잔액'}</i><span class="sh-amt">${esc(shortWon(poor ? -left : left))}</span></div>
   </div>`;
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.icon)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta">${it.tag === 'rare' ? `<span class="sh-tag rare">${ICONS.star}희귀</span>` : ''}${it.tag === 'sale' && it.was ? '<span class="sh-tag sale">특가</span>' : ''}${traitsOf(it) ? `<span class="sh-tag">${esc(traitsOf(it))}</span>` : ''}${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big">${it.tag === 'sale' && it.was ? `<s>${esc(shortWon(it.was))}</s> ` : ''}${esc(shortWon(it.price))}</span></div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.icon)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta">${it.tag === 'rare' ? `<span class="sh-tag rare">${ICONS.star}희귀</span>` : ''}${it.tag === 'sale' && it.was ? '<span class="sh-tag sale">특가</span>' : ''}${traitsOf(it) ? `<span class="sh-tag">${esc(traitsOf(it))}</span>` : ''}${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big${it.pay ? ' pay' : ''}">${it.tag === 'sale' && it.was ? `<s>${esc(shortWon(it.was))}</s> ` : ''}${esc(costText(it))}</span></div></div>
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}
     ${it.sold ? '' : money}
@@ -541,9 +551,10 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const alive = aliveAnchors(chat);
         const w0 = readWallet(chat.scriptstate, start);
         if (walletBalance(w0, alive) < target.price) return null;
-        const walletId = `st_${target.id}`;
-        const w = addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' });
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: 'store', anchor: now.key, price: target.price, walletId });
+        // 원 몫이 있을 때만 가계부에. 원이 아닌 대가는 물건에 적어 다음 턴 본편에 「무엇으로 치르고 샀다」로 넘긴다 (core/items.ts boughtLine)
+        const walletId = target.price > 0 ? `st_${target.id}` : '';
+        const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: 'store', anchor: now.key, price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) });
         bought = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
       });

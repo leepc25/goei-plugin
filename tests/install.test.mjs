@@ -9,7 +9,7 @@ const INSTALL_PICTURES = installData().pictures;
 const DEFAULT_DIRECTORY = installData().directory;
 
 test('설치 자료(팩): 빈 인사말 하나와 직접 입력 키 10개, 사진 목록, 기본 명부, 아이콘 정보', () => {
-  assert.equal(installData().icon.file, 'icon.png');
+  assert.match(installData().icon.file, /^icon\.(png|webp)$/, '아이콘 파일 (11-08 봇카드 이미지 WebP 로 바뀜)');
   // 첫 장면 글은 세계 팩(scenes)으로 옮겼다 (2026-11-05). 카드에는 직접 입력용 빈 인사말 하나만
   assert.equal(Object.keys(INSTALL_GREETINGS.index).length, 10, '키(세력×언어, 직접 입력) 10개');
   assert.deepEqual(INSTALL_GREETINGS.texts, ['']);

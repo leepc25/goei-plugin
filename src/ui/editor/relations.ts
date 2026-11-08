@@ -78,7 +78,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
     : `<section class="ps-group"><h3>${esc(sel)} → 다른 조직 <small>단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 설명 줄은 반대 방향.</small></h3><div class="ps-rows gw-rel-rows">${rows || '<p class="ps-note">관계도에 든 다른 조직이 없어요.</p>'}</div></section>`;
   const rules = `<section class="ps-group"><h3>공통 규칙 <small>쌍 관계가 아닌 세력 전체 규칙. Faction 지침 끝에 그대로. {A00} 같은 자리표는 그 코드 조직의 이름으로.</small></h3><div class="ps-rows">
       <div class="ps-row"><textarea class="gw-rules" data-input="ed-rules" rows="8">${esc(rel.common)}</textarea></div>
-      <div class="ps-row gw-rel-foot"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div>
+      <div class="ps-row gw-rel-foot"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>초기값으로</button></div>
     </div></section>`;
   return `<div class="gw-page split">
     <div class="gw-list-pane"><div class="gw-list-tools"><select class="gw-list-pick" data-change="ed-rel-pick" aria-label="조직 고르기">${all.map((o) => `<option value="${esc(o.name)}"${o.name === sel ? ' selected' : ''}>${esc(o.name)}${excluded.has(o.name) ? ' (제외)' : ''}</option>`).join('')}</select><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>

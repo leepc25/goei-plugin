@@ -96,7 +96,7 @@ export function installPage(ctx: ChatContext): string {
       <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy || instUi.setName ? 'disabled' : ''}>바꿈</button><button class="gx-seg${instUi.setName ? '' : ' on'}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy || !instUi.setName ? 'disabled' : ''}>그대로</button></div></div></div>
       ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy ? 'disabled' : ''}>이전 아이콘으로</button></div></div>` : ''}
     </div></section>
-    <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요. 받은 위키 문서·토크나이저는 「점검 → 설정 내보내기」의 저장소 사용량에서 지울 수 있어요.</p>
+    <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요. 받은 위키 문서·토크나이저는 「점검 → 저장·불러오기」의 저장소 사용량에서 지울 수 있어요.</p>
     </div>
   </div>`;
 }

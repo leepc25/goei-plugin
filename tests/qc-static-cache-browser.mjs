@@ -54,7 +54,6 @@ const systems = (req) => req.filter((m) => m.role === 'system').map((m) => m.con
     return true;
   }, MARK);
   assert.ok(ok, 'GNet 지침의 MAIN_CONTEXT 절 글칸');
-  await page.click('[data-action="ed-guide-save"][data-value="GNet"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').guides?.GNet);
   await page.click('.gw [data-action="ed-close"]');
   await page.click('[data-action="close"]');
