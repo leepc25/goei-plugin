@@ -58,7 +58,7 @@
 /* ── 본문 ── */
 .gw-body { grid-area: body; overflow: auto; min-width: 0; }
 .gw-page, .gw-detail { padding: 20px 24px 60px; min-width: 0; }
-.gw-page:not(.split) > *, .gw-detail > * { max-width: 920px; }
+/* 본문 폭 제한 없음: 오른쪽 여백을 왼쪽(24px)과 같게, 창에 꽉 차게 (2026-11-08 사용자) */
 /* 줄 높이를 창에 묶어야 목록(.gw-list)·상세(.gw-detail)가 따로 스크롤한다. 묶지 않으면 줄이 내용만큼 늘어 본문 전체가 같이 내려가 목록 도구·검색이 화면 밖으로 사라졌다 (2026-10-28 QC) */
 .gw-page.split { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); padding: 0; height: 100%; }
 .gw-detail { overflow: auto; }

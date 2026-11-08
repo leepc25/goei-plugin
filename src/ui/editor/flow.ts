@@ -95,7 +95,7 @@ interface Node {
   calls: string;
   /** 설정 페이지 */
   page?: string;
-  /** 그 페이지 안에서 갈 자리: '#요소 id' · 'g:블록 제목' · 'r:줄 이름' (2026-11-08 사용자: 「설정 →」이 페이지 맨 위가 아니라 그 블록으로) */
+  /** 그 페이지 안에서 갈 줄: 'r:줄 이름' (2026-11-08 사용자: 「설정 →」은 그 기능을 켜고 끄는 줄로, 강조도 그 줄에만) */
   to?: string;
   /** 턴마다 확실히 가는 보조 호출 수 */
   sure: number;
@@ -122,9 +122,9 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const updateOn = pp.on && pp.when === 'turn';
   const tidyOn = pp.on && pp.tidy === 'separate';
   const pre: Node[] = [
-    { name: '로어북 고름', sub: '다음 요청에 넣을 로어북 선택', kind: 'plain', on: true, calls: '호출 없음 (플러그인 코드 또는 Risu)', page: 'set:lore', to: 'g:다음 요청에 넣을 로어북', sure: 0, maybe: 0 },
-    { name: '인물 Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: routerOn ? ppModel('router') : undefined, calls: routerOn ? '보조 1회' : pp.on ? '호출 없음 (코드가 고름)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: '#pp-blk-router', sure: routerOn ? 1 : 0, maybe: 0 },
-    { name: '인물 Director', sub: '이번 턴 연기 지시', kind: 'aux', on: directorOn, model: directorOn ? ppModel('director') : undefined, calls: directorOn ? (pp.directorSearch ? '1회 (자료 부족 땐 2회)' : '1회') : pp.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', page: 'set:people', to: '#pp-blk-director', sure: directorOn ? 1 : 0, maybe: directorOn && pp.directorSearch ? 1 : 0 },
+    { name: '로어북 고름', sub: '다음 요청에 넣을 로어북 선택', kind: 'plain', on: true, calls: '호출 없음 (플러그인 코드 또는 Risu)', page: 'set:lore', to: 'r:로어북 보내기', sure: 0, maybe: 0 },
+    { name: '인물 Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: routerOn ? ppModel('router') : undefined, calls: routerOn ? '보조 1회' : pp.on ? '호출 없음 (코드가 고름)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:Router', sure: routerOn ? 1 : 0, maybe: 0 },
+    { name: '인물 Director', sub: '이번 턴 연기 지시', kind: 'aux', on: directorOn, model: directorOn ? ppModel('director') : undefined, calls: directorOn ? (pp.directorSearch ? '1회 (자료 부족 땐 2회)' : '1회') : pp.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', page: 'set:people', to: 'r:Director', sure: directorOn ? 1 : 0, maybe: directorOn && pp.directorSearch ? 1 : 0 },
   ];
   const main: Node = { name: '본편', sub: 'Risu 가 응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회', sure: 0, maybe: 0 };
   const assetOn = basic.assetOn && basic.assetModel === 'aux';
@@ -134,18 +134,18 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const wikiOn = nw.auto === 'turn';
   const wikiTitle = wikiOn && nw.autoTitle === 'model';
   const post: Node[] = [
-    { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: '#pp-blk-update', sure: updateOn ? 1 : 0, maybe: 0 },
-    { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: '#pp-blk-tidy', sure: 0, maybe: tidyOn ? 1 : 0 },
+    { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:갱신 시점', sure: updateOn ? 1 : 0, maybe: 0 },
+    { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', to: 'g:새 메시지', sure: ph.auto ? 1 : 0, maybe: 0 },
+    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:새 메시지 확인', sure: ph.auto ? 1 : 0, maybe: 0 },
     { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:새로고침', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'g:보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
-    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'g:자동 작성', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
+    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:만들기', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
+    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 작성', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
   ];
   const manual: Node[] = [
-    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'g:상점', sure: 0, maybe: 0 },
-    { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'g:문서 작성', sure: 0, maybe: 0 },
-    { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'g:답장', sure: 0, maybe: 0 },
+    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
+    { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
   const map = flowTok.map;

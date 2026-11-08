@@ -176,7 +176,7 @@ for (const vp of vps) {
   assert.ok((await page.textContent('.gx-head small')).includes('다시 고를 수 있어요'));
   // 시작 전(staged) 설정 창: 「이 채팅」 없음, 테마를 바꾸면 이 채팅에도 적힌다
   await openEditor(page, 'set:screen');
-  assert.equal(await page.$('.gw [data-action="set-bar"]'), null, '시작 전에는 기본값으로 저장·불러오기 없음 (기본값을 바로 고침)');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, '시작 전에도 기본값으로 저장·불러오기·초기값으로 (2026-11-08 사용자)');
   // 폰 배치(폰 세로·가로)는 본 창과 같은 상단바에 제목 「설정」만 (2026-10-29 사용자; 2026-11-06 폰 가로도 폰 배치)
   if (!isPhoneVp(vp)) assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
   await page.evaluate(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="light"]').click());

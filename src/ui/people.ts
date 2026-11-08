@@ -31,6 +31,9 @@ export interface PeopleEnv {
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+/** 도식 「설정 →」이 가는 줄 (블록 id → 그 단계를 켜고 끄는 줄 이름) */
+const PP_GOTO_ROW: Record<string, string> = { 'pp-blk-router': 'Router', 'pp-blk-director': 'Director', 'pp-blk-update': '갱신 시점', 'pp-blk-tidy': '정리 방식' };
+
 /** 화면 상태 (입력 중인 글은 다시 그려도 지킨다) */
 export const peopleUi = {
   notice: '',
@@ -976,17 +979,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
   }
   switch (action) {
     case 'pp-goto': {
-      // 호출 흐름 도식 → 그 단계의 설정 블록. 통합 검색과 같은 효과로 블록 상자를 잠깐 밝힌다 (2026-11-08 사용자)
+      // 호출 흐름 도식 → 그 단계를 켜고 끄는 줄로 가서 그 줄만 잠깐 밝힌다 (통합 검색과 같은 효과, 2026-11-08 사용자: 블록 전체 X)
       // 설정 창은 조작 뒤 늘 다시 그리므로 다시 그린 뒤에
       setTimeout(() => {
-        const g = document.getElementById(v);
-        const box = g?.querySelector<HTMLElement>(':scope > .ps-rows') ?? g;
-        if (!g || !box) return;
-        g.scrollIntoView({ block: 'start' });
-        box.classList.remove('gw-find-flash');
-        void box.offsetWidth;
-        box.classList.add('gw-find-flash');
-        setTimeout(() => box.classList.remove('gw-find-flash'), 2200);
+        const label = PP_GOTO_ROW[v];
+        const row = [...(document.getElementById(v)?.querySelectorAll<HTMLElement>('.ps-row') ?? [])].find((r) => r.querySelector('.ps-label > b')?.firstChild?.textContent?.trim() === label);
+        if (!row) return;
+        row.scrollIntoView({ block: 'center' });
+        row.classList.remove('gw-find-flash');
+        void row.offsetWidth;
+        row.classList.add('gw-find-flash');
+        setTimeout(() => row.classList.remove('gw-find-flash'), 2200);
       }, 30);
       return true;
     }

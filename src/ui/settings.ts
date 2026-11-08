@@ -582,7 +582,8 @@ export async function handleSettings(action: string, value: string | undefined, 
     settingsUi.confirm = '';
     if (what === 'save') {
       // 이 채팅의 설정 전부(캐릭터 이미지·상황판·괴이 발생·테마 + 기능 페이지·고급 변수)를 새 채팅 기본값으로 (2026-10-29: 한 번에)
-      const cur = current(ctx, 'chat');
+      // 시작 전에는 기본 설정(이미지·상황판·테마)을 새 채팅 기본값에 바로 고치므로 그 값을 그대로 둔다
+      const cur = current(ctx, settingsUi.scope === 'defaults' ? 'defaults' : 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
       if (!settingsUi.notice) await saveVarDefaults(ALL_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
       if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';

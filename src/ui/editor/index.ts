@@ -484,7 +484,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p>${calls}</header>`
     : `${calls}</header>`;
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
-    ${canChat ? mainDefaultsConfirm(ctx) : ''}
+    ${mainDefaultsConfirm(ctx)}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
@@ -569,24 +569,14 @@ function flashEl(el: HTMLElement, block: ScrollLogicalPosition): void {
   setTimeout(() => el.classList.remove('gw-find-flash'), 2200);
 }
 
-/** 호출 흐름 「설정 →」의 갈 자리 (flow.ts Node.to): '#id' · 'g:블록 제목' · 'r:줄 이름' */
+/** 호출 흐름 「설정 →」의 갈 줄 (flow.ts Node.to): 'r:줄 이름'. 블록 전체가 아니라 그 줄에만 강조 (2026-11-08 사용자) */
 export function flashSpot(to: string): void {
   const body = root?.querySelector<HTMLElement>('.gw-body');
-  if (!body || !to) return;
+  if (!body || !to.startsWith('r:')) return;
+  const label = to.slice(2);
   const head = (h: Element | null) => (h ? [...h.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? '').join('').trim() : '');
-  if (to.startsWith('r:')) {
-    const label = to.slice(2);
-    const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label);
-    if (row) flashEl(row, 'center');
-    return;
-  }
-  const group = to.startsWith('#')
-    ? body.querySelector<HTMLElement>(to)
-    : [...body.querySelectorAll<HTMLElement>('.ps-group')].find((g) => head(g.querySelector(':scope > h3')) === to.slice(2)) ?? null;
-  const target = group?.querySelector<HTMLElement>(':scope > .ps-rows') ?? group;
-  if (!group || !target) return;
-  group.scrollIntoView({ block: 'start' });
-  flashEl(target, 'nearest');
+  const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label);
+  if (row) flashEl(row, 'center');
 }
 
 function flashFound(hit: FindHit): void {
@@ -732,7 +722,8 @@ export function render(): void {
   // 폰(2026-10-29 사용자): 설정도 본 창의 한 화면처럼 — 머리는 본 창과 같은 모양(제목 「설정」만), 아래에 숨은 서랍(기능·세계·지침·점검)과 본 창의 하단 바
   const phone = isPhone();
   const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
-  const right = `${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
+  // 시작 전에도 보인다 (2026-11-08 사용자: 시작해야만 나왔다)
+  const right = `${tab === 'set' ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
   const top = phone
     ? `<header class="gw-top gx-head gw-phead">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
