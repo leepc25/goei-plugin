@@ -61,7 +61,7 @@ import { execSync as sh } from 'node:child_process';
 const git = (c) => { try { return sh(`git ${c}`, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
 // 빌드가 옛것인지: 마지막으로 src 를 바꾼 커밋 시각과, 커밋 안 한 채 고친 src 파일 시각 중 늦은 것보다 dist 가 먼저면 옛 빌드 (빌드가 만드는 src/data 파일은 git 이 안 잡으니 빠진다)
 const newestSrc = (() => { let m = Number(git('log -1 --format=%ct -- src')) * 1000 || 0; for (const l of git('status --porcelain -- src').split('\n').filter(Boolean)) { try { m = Math.max(m, statSync(resolve(ROOT, l.slice(3).trim())).mtimeMs); } catch {} } return m; })();
-let VERSION = { branch: (() => { const b = git('rev-parse --abbrev-ref HEAD'); if (b && b !== 'HEAD') return b; const n = git('branch -r --contains HEAD --format=%(refname:short)').split('\n').filter(Boolean)[0]; return n ? n.replace(/^origin\//, '') + '(분리된 판)' : 'HEAD(분리된 판)'; })(), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
+let VERSION = { branch: (() => { const b = git('rev-parse --abbrev-ref HEAD'); if (b && b !== 'HEAD') return b; const n = git("branch -r --contains HEAD --format='%(refname:short)'").split('\n').filter(Boolean)[0]; return n ? n.replace(/^origin\//, '') + '(분리된 판)' : 'HEAD(분리된 판)'; })(), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
 if (VERSION.distOld) console.warn('[click-audit] 경고: dist/ 가 src/ 보다 옛것이에요. npm run build 를 먼저 돌리세요 (옛 빌드를 누르게 됨)');
 const LOOKS = distPack('goei-data-looks');
 const ITEMS = (() => { try { return distPack('goei-data-items'); } catch { return null; } })();
@@ -478,7 +478,8 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     const queue = [];
     // 두 번째 시작 상태부터: 첫 화면의 메뉴 단추는 이미 눌렀어도 다시 눌러 들어간다 (물건 든 소지품·글 있는 괴담넷처럼
     // 한 번 들어가야 달라지는 화면을 보려고. 들어간 화면 꼴이 이미 본 것이면 거기서 멈춘다)
-    const NAV = /^(nav-tab|tab|cdr|br-site|ed-open|prefs-open)$/;
+    const NAV = /^(nav-tab|tab|cdr|br-site|br-go|br-tab|ed-open|prefs-open|rec-sub|items-sub|ph-sub)$/;
+    const NOCAP = /^(ed-node|ed-tab|nav-tab|tab|rec-sub|items-sub|ph-sub|br-go|br-site|wiki-tab|gn-sub|mall-page)$/;
     const enqueue = (path, list, revisit = false) => {
       for (const it of list) {
         if (done.has(it.key) && !(revisit && NAV.test(it.action || ''))) continue;
@@ -486,7 +487,8 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         if (it.behind) continue; // 다른 창 뒤: 그 창을 닫은 화면에서 누른다
         // 꺼진 단추는 기록만 하고 누른 것으로 치지 않는다 (다른 화면에서 켜지면 그때 누른다)
         if (it.disabled) { if (!offSeen.has(it.key)) { offSeen.add(it.key); results.push({ vp, start: startKind, path: path.map((p) => p.key), key: it.key, label: it.label, action: it.action, value: it.value, flags: ['꺼진 단추(누를 수 없음)'], disabled: true }); } continue; }
-        if (opt.perAction && it.action) { perAct[it.action] = (perAct[it.action] || 0) + 1; if (perAct[it.action] > opt.perAction) { skippedVals[it.action] = (skippedVals[it.action] || 0) + 1; continue; } }
+        // 화면을 옮기는 단추(설정 왼쪽 목록·탭)는 값마다 다른 화면이라 상한 없이 다 누른다
+        if (opt.perAction && it.action && !NOCAP.test(it.action)) { perAct[it.action] = (perAct[it.action] || 0) + 1; if (perAct[it.action] > opt.perAction) { skippedVals[it.action] = (skippedVals[it.action] || 0) + 1; continue; } }
         done.add(it.key);
         queue.push({ ...it, path });
       }
@@ -511,7 +513,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
           const step = { key: job.key, nth: job.nth };
           const path = [...job.path, step];
           states.push({ vp, start: startKind, path: path.map((p) => p.key), shot: rec.shots?.[2], audit: rec.audit });
-          enqueue(path, rec.newList);
+          enqueue(path, rec.newList, startKind !== opt.start[0]); // 뒤 시작 상태에서는 들어간 화면에서도 메뉴 단추를 다시 눌러 더 들어간다
         }
         if (rec.flags.length) log(`  ${vp} ${rec.key} → ${rec.flags.join(', ')}`);
       }
