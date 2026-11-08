@@ -48,7 +48,7 @@ import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
 import { startCctvFx, stopCctvFx } from './cctvfx';
-import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard, aimFlash } from './evcard';
+import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { boardMapUrl, field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
@@ -913,7 +913,6 @@ async function handle(action: string, value?: string): Promise<void> {
   if (action.startsWith('upd-') && (view.kind === 'started' || view.kind === 'picker') && (await handleUpdate(action, view.ctx, settingsEnv))) return;
   // 상황판(CCTV·일지·상세 창)에서 「선택」: 목표로 고르고 바로 임무 지도로, 그 자리를 고른 채로 (2026-10-21 사용자)
   if (action === 'pick-event' && view.kind === 'started' && tab !== 'map') {
-    await aimFlash(value ?? '');
     await handleField(action, value, view.ctx, env, false);
     if (field.target?.type === 'event' && field.target.key === value && showOnMap(view.ctx, value ?? '')) {
       tab = 'map';

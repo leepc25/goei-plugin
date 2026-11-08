@@ -3,6 +3,7 @@ import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joi
 import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
 import { savePrefs } from '../../host/prefs';
+import { copyBtn } from '../copy';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -39,7 +40,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
       const head = md
         ? `<input class="gw-gtitle" data-input="ed-guide-title" data-key="${name}|${i}" value="${esc(p.title)}" spellcheck="false" aria-label="절 제목">`
         : `<b>${esc(p.title)}</b>${fixed ? '<button class="gw-fhint" type="button" data-action="ed-hint" data-hint="이 이름은 플러그인이 요청마다 절을 골라 쓸 때 쓰는 이름표예요. 그래서 바꿀 수 없고, 본문만 고칠 수 있어요.">?</button>' : ''}`;
-      return `<div class="gw-field${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
+      return `<div class="gw-field gw-copyto${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span>${copyBtn()}</div>
       <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="${p.body.trim() ? 3 : 1}" spellcheck="false">\n${esc(p.body)}</textarea></div>`;
     })
     .join('');

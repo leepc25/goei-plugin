@@ -309,12 +309,7 @@ for (const vp of vps) {
     await setInput(page, budget, '1200000');
     await settle(page);
     assert.equal(await page.$eval(budget, (e) => e.value), '200000', '토큰 상한 200000 으로 자름');
-    // adv 되돌리기 단추: 바뀐 줄에만 보이고 누르면 기본값
-    assert.ok(await page.$('.gw [data-action="adv-reset"][data-value="gen:budget"]'), '바뀐 줄에 되돌리기');
-    await page.evaluate(() => document.querySelector('.gw [data-action="adv-reset"][data-value="gen:budget"]').click());
-    await settle(page);
-    assert.equal((await chatOf(page)).scriptstate['$gen_budget'], '', '되돌리기 → 빈 값');
-    assert.equal(await page.$('.gw [data-action="adv-reset"][data-value="gen:budget"]'), null, '기본값이면 되돌리기 없음');
+    assert.equal(await page.$('.gw [data-action="adv-reset"]'), null, '칸마다 되돌리기 단추 없음 (11-08 사용자: 초기화는 점검 한 곳)');
     // 화면 페이지: 창 폭 50~100 (PC) · 테마 3종이 창(.gx)·편집 창(.gw)에 적용 · 메뉴 위치 · 바깥 어둡기
     await goNode(page, 'set:screen');
     for (const w of ['60', '70', '80', '90', '100']) {

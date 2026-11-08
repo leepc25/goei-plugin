@@ -24,7 +24,7 @@ import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './ru
 import { callSummary } from './flow';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manageConfirmPopup, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
-import { featurePane, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { featurePane, mainDefaultsPopup, resetHooks, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
@@ -792,6 +792,14 @@ async function flushLater(): Promise<void> {
   for (const l of all) clearTimeout(l.t);
   await Promise.all(all.map((l) => Promise.resolve(l.fn()).catch(() => undefined)));
 }
+// 점검 「초기화」: 고친 세계도 버리고 플러그인 원래 값으로 (2026-11-08 사용자: 초기화는 전체 초기화)
+resetHooks.push(() => {
+  const ctx = host?.ctx();
+  if (ctx) overridesOf(ctx);
+  setOverrides({});
+  autoSaveWorld();
+});
+
 /** 세계(카드 명부) 고친 것을 카드에 바로 적는다 */
 function autoSaveWorld(): void {
   // 저장이 실패해 알림이 떠 있으면 되풀이하지 않는다 (다음 입력 때 다시)

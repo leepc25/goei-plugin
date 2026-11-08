@@ -22,10 +22,11 @@ export function minimalOverride(kind: WorldKind, name: string, full: WorldRecord
   }
   if (Object.keys(fields).length) out.fields = fields;
   if (!same(base.extra, full.extra)) out.extra = full.extra;
-  if (!same(base.order, full.order)) out.order = full.order ?? [];
+  // 순서는 실제로 보이는 순서로 비교한다 (위로·아래로 해서 기본 순서로 돌아오면 덧쓰기 없음)
+  if (!same(fieldOrder(kind, { ...full, order: base.order }), fieldOrder(kind, full))) out.order = full.order ?? [];
   if (!same(base.variants, full.variants)) out.variants = full.variants ?? {};
-  if (!same(base.keys, full.keys)) out.keys = full.keys ?? '';
-  if (!same(base.title, full.title)) out.title = full.title ?? '';
+  if ((base.keys ?? '') !== (full.keys ?? '')) out.keys = full.keys ?? '';
+  if ((base.title ?? '') !== (full.title ?? '')) out.title = full.title ?? '';
   if (!same(base.departments, full.departments)) out.departments = full.departments ?? {};
   if (!same(base.roster_notes, full.roster_notes)) out.roster_notes = full.roster_notes ?? [];
   if (!!base.noSummary !== !!full.noSummary) out.noSummary = !!full.noSummary;
@@ -55,7 +56,7 @@ export function removeRecord(over: WorldOverrides, kind: WorldKind, name: string
   return next;
 }
 
-/** 지운 기본 기록 되살리기 / 덧쓰기 전부 버리기 (기본으로) */
+/** 지운 기본 기록 되살리기 */
 export function resetRecord(over: WorldOverrides, kind: WorldKind, name: string): WorldOverrides {
   const next: WorldOverrides = { ...over, [kind]: { ...(over[kind] ?? {}) } };
   delete (next[kind] as Record<string, unknown>)[name];

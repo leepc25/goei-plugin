@@ -3,7 +3,7 @@ import { switchHtml } from '../controls';
 import type { Directory } from '../../core/world/directory';
 import { tokenizerName } from '../../core/tokenizer';
 import { emptyRecord, moveField, moveFieldTo, parseImport, putRecord, recordText, removeRecord, resetRecord, type ImportResult } from '../../core/world/draft';
-import { defaultRecord, fieldOrder, fieldValue, isDefaultRecord, PLACEHOLDER_ORGS, worldAnomalyNote, worldRecord, worldRecords, type ExtraField, type WorldOverrides, type WorldRecord } from '../../core/world/records';
+import { fieldOrder, fieldValue, isDefaultRecord, PLACEHOLDER_ORGS, worldAnomalyNote, worldRecord, worldRecords, type ExtraField, type WorldOverrides, type WorldRecord } from '../../core/world/records';
 import { ANOMALY_NOTE } from '../../core/world/schema';
 import { orgOf } from '../../core/world/directory';
 import { FIELDS, WORLD_KIND_LABEL, type FieldDef, type WorldKind } from '../../core/world/schema';
@@ -13,6 +13,7 @@ import { agentPanel, appendixPanel, directoryDraft, directoryExtList, dirUi, lor
 import { facePic } from '../../host/assets';
 import { picAvatar } from '../images';
 import { ICONS } from '../icons';
+import { copyBtn } from '../copy';
 import { agentSceneFields, agentSceneState } from './start';
 import { edUi, overridesOf, setOverrides } from './index';
 
@@ -113,9 +114,9 @@ function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string
     ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
     : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">\n${esc(v)}</textarea>`;
   // 끌기는 손잡이에만 건다: 줄 전체가 draggable 이면 글칸의 글을 긁어 고를 수 없다 (2026-11-05 사용자). 순서는 ▲▼ 단추로도 바꾼다
-  return `<div class="gw-field" data-field-row="${esc(def.id)}">
+  return `<div class="gw-field gw-copyto" data-field-row="${esc(def.id)}">
     <div class="gw-field-head"><span class="gw-grip" draggable="true" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<button type="button" class="gw-fhint" data-action="ed-hint" data-hint="${esc(def.hint)}" aria-label="설명">?</button>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
-      <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
+      <span class="gw-fmove">${copyBtn()}<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
     ${ctl}</div>`;
 }
 
@@ -126,9 +127,9 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
   const ctl = e.kind === 'line'
     ? `<input data-input="ed-extra" data-key="${esc(key)}" value="${esc(e.value)}" autocomplete="off">`
     : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">\n${esc(e.value)}</textarea>`;
-  return `<div class="gw-field extra" data-field-row="${esc(id)}">
+  return `<div class="gw-field extra gw-copyto" data-field-row="${esc(id)}">
     <div class="gw-field-head"><span class="gw-grip"${e.kind === 'block' ? ' draggable="true" title="끌어서 순서 바꾸기"' : ''}>${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
-      <span class="gw-fmove">${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
+      <span class="gw-fmove">${copyBtn()}${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
     ${ctl}</div>`;
 }
 
@@ -227,9 +228,8 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
-          ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">초기값으로</button>' : ''}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? '지우기' : '삭제'}</button></div></header>
-      ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
+      ${recUi.preview ? `<div class="gw-copyto gw-copybox"><pre class="gw-preview">${esc(text)}</pre>${copyBtn('조립 글 복사')}</div>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
       ${basicCard(ctx, kind, sel, d, rec)}
       ${kind === 'agent' ? sceneCard(sel, d) : ''}
@@ -239,7 +239,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
         ${lines ? `<h4 class="gw-sub">한 줄 추가 항목</h4><div class="gw-fields">${lines}</div>` : ''}
         <div class="gw-add-field"><input name="ed-extra-name" placeholder="새 칸 이름" data-enter="ed-extra-add" autocomplete="off">
           ${kind === 'agent' ? `<select name="ed-extra-kind"><option value="block">절 (글)</option><option value="identity">Identity 한 줄</option><option value="appearance">Appearance 한 줄</option></select>` : '<input type="hidden" name="ed-extra-kind" value="block">'}
-          <button class="gx-mini" data-action="ed-extra-add" data-take="ed-extra-name">${ICONS.plus}칸 추가</button><button class="gx-mini" data-action="ed-order-reset">기본 순서로</button></div>
+          <button class="gx-mini" data-action="ed-extra-add" data-take="ed-extra-name">${ICONS.plus}칸 추가</button></div>
       </section>
       ${readonly}
     </div>`;
@@ -264,14 +264,13 @@ function current(ctx: ChatContext, kind: WorldKind): { name: string; rec: WorldR
 }
 
 /** 입력칸: 칸 글·추가 칸 글·이름·가져오기 글 */
-/** 괴이 공통 머리말 (목록 위): 모든 괴이 앞에 한 번 들어가는 글. 카드에 저장, 기본으로 되돌리기 */
+/** 괴이 공통 머리말 (목록 위): 모든 괴이 앞에 한 번 들어가는 글. 카드에 저장 */
 function anomalyNoteBox(over: WorldOverrides): string {
   const note = worldAnomalyNote(over);
   const edited = over.anomalyNote !== undefined;
   return `<details class="gw-anote"${recUi.noteOpen ? ' open' : ''}><summary data-action="ed-anote-toggle"><b>괴이 공통 머리말</b><small>${edited ? '고침 · ' : ''}${tokenizerName() ? '' : '약 '}${tokens(note).toLocaleString()}토큰</small></summary>
     <p class="gx-muted">모든 괴이 로어 앞에 한 번만 들어가는 공통 지침이에요 (괴이마다 붙지 않아요).</p>
-    <textarea data-input="ed-anote" rows="5">${esc(note)}</textarea>
-    <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? '' : 'disabled'}>초기값으로</button></div></details>`;
+    <div class="gw-copyto gw-copybox"><textarea data-input="ed-anote" rows="5">${esc(note)}</textarea>${copyBtn()}</div></details>`;
 }
 
 export function recordInput(name: string, key: string, value: string, ctx: ChatContext): boolean {
@@ -346,12 +345,6 @@ export async function recordAction(action: string, value: string | undefined, ct
     case 'ed-anote-toggle':
       recUi.noteOpen = !recUi.noteOpen;
       return false;
-    case 'ed-anote-reset': {
-      const next: WorldOverrides = { ...overridesOf(ctx) };
-      delete next.anomalyNote;
-      setOverrides(next);
-      return true;
-    }
     case 'ed-preview':
       recUi.preview = !recUi.preview;
       return true;
@@ -412,6 +405,7 @@ export async function recordAction(action: string, value: string | undefined, ct
       return true;
     }
     case 'ed-restore': {
+      // 지운 기본 기록 되살리기
       const name = edUi.sel[kind] ?? '';
       if (name) setOverrides(resetRecord(over, kind, name));
       recUi.variant = '';
@@ -467,15 +461,6 @@ export async function recordAction(action: string, value: string | undefined, ct
       const [from, to] = (value ?? '').split('|');
       if (!cur || !from || !to) return true;
       cur.rec.order = moveFieldTo(kind, cur.rec, from, to);
-      setOverrides(putRecord(over, kind, cur.name, cur.rec));
-      return true;
-    }
-    case 'ed-order-reset': {
-      const cur = current(ctx, kind);
-      if (!cur) return true;
-      delete cur.rec.order;
-      const base = defaultRecord(kind, cur.name);
-      if (base?.order) cur.rec.order = [...base.order];
       setOverrides(putRecord(over, kind, cur.name, cur.rec));
       return true;
     }

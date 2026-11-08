@@ -56,6 +56,7 @@ export function resetSettings(): void {
 
 import { updateGroup } from './update';
 import { ALL_PREFIXES } from './defaults';
+import { imgUi } from './imgprompt';
 import { PP, ppValue } from '../core/people/settings';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
@@ -193,11 +194,14 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 
 // 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「덮어쓰기」「불러오기」 (전환보다 한 단계 작게). 설정에서는 새 채팅 기본값을,
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
+/** 점검 「초기화」 때 같이 되돌릴 것 (세계 편집기가 고친 세계를 비우고 카드에 적는다) */
+export const resetHooks: (() => void)[] = [];
+
 const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load' | 'reset', [string, string]>> = {
   chat: {
     save: ['지금 설정을 기본값으로 저장할까요? 저장해 둔 기본값을 덮어써서, 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', '기본값으로 저장'],
     load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 지금 채팅의 설정이 기본값으로 바뀌어요. 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
-    reset: ['지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 모두 버리고 플러그인 원래 값으로 초기화할까요? 상황판 켜기·끄기와 세계(카드 명부)는 그대로 둬요.', '초기화'],
+    reset: ['지금 채팅의 설정과 저장해 둔 기본값, 고친 지침과 세계를 모두 버리고 플러그인 원래 값으로 초기화할까요? 상황판 켜기·끄기는 그대로 둬요.', '초기화'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
@@ -678,10 +682,13 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 고친 지침도 원래 글로 (2026-11-08 사용자: 지침마다 있던 「기본으로」를 없애고 초기화 한 곳으로)
       if (!settingsUi.notice) {
         for (const g of GUIDE_NAMES) setGuideOverride(g, '');
-        await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {}, guides: undefined }));
+        await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {}, guides: undefined, imgPrompt: undefined, imgKeywords: undefined }));
+        imgUi.template = null;
+        imgUi.keywords = null;
+        for (const f of resetHooks) f();
       }
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
-      if (!settingsUi.notice) settingsUi.info = '지금 채팅 설정·기본값·지침을 플러그인 원래 값으로 초기화했어요.';
+      if (!settingsUi.notice) settingsUi.info = '지금 채팅 설정·기본값·지침·세계를 플러그인 원래 값으로 초기화했어요.';
       env.render();
     } else env.render();
     return true;

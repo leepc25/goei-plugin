@@ -20,6 +20,7 @@ import { gnet } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
 
+import { copyText } from '../copy';
 import { ICONS } from '../icons';
 import { mainDefaultsConfirm } from '../settings';
 
@@ -338,23 +339,7 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     case 'man-copy': {
       if (!ctx) return true;
       const json = exportJson(ctx, manUi.withChat && !!canChat);
-      // Risu 안에서는 navigator.clipboard 가 막혀 있을 때가 있다 → 임시 글칸을 골라 execCommand('copy') 로 한 번 더 시도 (2026-11-05 사용자)
-      let ok = false;
-      try {
-        await navigator.clipboard.writeText(json);
-        ok = true;
-      } catch { /* 아래 */ }
-      if (!ok && root) {
-        const ta = document.createElement('textarea');
-        ta.value = json;
-        ta.setAttribute('readonly', '');
-        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
-        root.appendChild(ta);
-        ta.focus();
-        ta.select();
-        try { ok = document.execCommand('copy'); } catch { ok = false; }
-        ta.remove();
-      }
+      const ok = await copyText(json);
       manUi.info = ok ? `복사했어요 (${kb(json.length)}).` : '이 환경에서는 복사가 막혀 있어요. 「내려받기」로 파일로 받으세요.';
       return true;
     }

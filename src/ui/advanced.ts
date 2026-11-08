@@ -5,7 +5,6 @@ import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { syncDecorators, type LoreMode } from '../core/lore';
-import { ICONS } from './icons';
 import { keepOpen } from './panels';
 
 const esc = (s: unknown) =>
@@ -38,11 +37,7 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);
   const changed = cur !== String(item.def);
-  // 되돌리기 자리는 늘 비워 둔다 (바꾼 줄만 칸이 밀리지 않게)
-  const reset = changed
-    ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item.key}" aria-label="${esc(item.label)} 초기값으로" title="초기값 ${esc(item.def)}">${ICONS.refresh}</button>`
-    : '<span class="adv-reset" aria-hidden="true"></span>';
-  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}${reset}</div></div>`;
+  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}</div></div>`;
 }
 
 function chips(f: AdvFeature, items: AdvItem[], state: State): string {
@@ -108,10 +103,6 @@ export async function handleAdvanced(action: string, value: string | undefined, 
   if (action === 'adv-set') {
     const hit = parse(v);
     if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
-  } else if (action === 'adv-reset') {
-    const [f, key] = v.split(':') as [AdvFeature, string];
-    const item = f in ADV ? advItem(f, key) : undefined;
-    if (item) vars = { [advVar(f, item)]: blank(item) };
   } else return false;
   if (!vars) {
     env.render();

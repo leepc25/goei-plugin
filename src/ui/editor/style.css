@@ -499,3 +499,13 @@
 @container (max-width: 600px) {
   .gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label' 'hint'; }
 }
+/* 글 복사 단추 (2026-11-08 사용자): 머리 줄에서는 토큰 수와 ▲▼ 사이, 글 상자에서는 안쪽 오른쪽 위(스크롤 막대 왼쪽) */
+.gw .gw-copy.done { color: var(--signal); border-color: var(--signal); }
+.gw .gw-copybox { position: relative; }
+.gw .gw-copybox > .gw-copy { position: absolute; top: 8px; right: 18px; z-index: 1; background: var(--panel); }
+.gw .gw-copybox > .gw-preview, .gw .gw-copybox > pre, .gw .gw-copybox > textarea { padding-right: 56px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  /* 복사 단추가 늘어 폰에서 ▲▼가 다음 줄로 밀리지 않게 머리 줄 간격만 줄인다 */
+  .gw .gw-field-head { column-gap: 6px; }
+  .gw .gw-fmove .gx-mini.icon { width: 36px; }
+}

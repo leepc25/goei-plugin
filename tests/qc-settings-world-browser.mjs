@@ -75,17 +75,18 @@ for (const vp of vps) {
     const firstKey = await page.$eval('.gw .gw-fields [data-input="ed-field"]', (e) => e.dataset.key);
     const fid = firstKey.split('|')[2];
     const sel = `.gw [data-input="ed-field"][data-key="${firstKey.replace(/"/g, '\\"')}"]`;
+    const orig = await page.$eval(sel, (e) => e.value);
     await setInput(page, sel, `qc ${kind} 글`, 'input');
     await page.waitForFunction(() => document.querySelector('.gw')?.hasAttribute('data-dirty'));
     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
     const dir = await dirOf(page);
     assert.equal(dir.세계?.[kind]?.[pick]?.fields?.[fid], `qc ${kind} 글`, `${kind}: 카드 명부 세계.${kind}.${pick}.${fid}`);
     assert.ok((await page.textContent(`.gw .gw-row[data-value="${pick}"]`)).includes('고침') || narrow, `${kind}: 고침 배지`);
-    // 기본으로 (ed-restore): 덧쓰기 지움 → 저장
-    await clickSel(page, '.gw [data-action="ed-restore"]');
+    // 원래 글로 고쳐 쓰면 덧쓰기가 저절로 지워진다 (칸마다 되돌리기 단추는 없음, 11-08 사용자)
+    await setInput(page, sel, orig, 'input');
     await page.waitForFunction(() => document.querySelector('.gw')?.hasAttribute('data-dirty'));
     await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
-    assert.equal((await dirOf(page)).세계?.[kind]?.[pick], undefined, `${kind}: 기본으로 → 덧쓰기 없음`);
+    assert.equal((await dirOf(page)).세계?.[kind]?.[pick], undefined, `${kind}: 원래 글 → 덧쓰기 없음`);
     // 지우기 (기본 세계 기록) → 지움 배지 → 되살리기
     await clickSel(page, '.gw [data-action="ed-delete"]');
     await page.waitForSelector('.gw [data-action="ed-restore"]');
@@ -170,9 +171,9 @@ for (const vp of vps) {
   await settle();
   const orderAfter = await page.$$eval('.gw .gw-fields [data-field-row]', (els) => els.map((e) => e.dataset.fieldRow));
   assert.equal(orderAfter.indexOf('x:취미'), orderBefore.indexOf('x:취미') - 1, '위로');
-  await clickSel(page, '.gw [data-action="ed-order-reset"]');
+  await clickSel(page, '.gw .gw-field.extra [data-action="ed-field-down"]');
   await settle();
-  assert.deepEqual(await page.$$eval('.gw .gw-fields [data-field-row]', (els) => els.map((e) => e.dataset.fieldRow)), orderBefore, '기본 순서로');
+  assert.deepEqual(await page.$$eval('.gw .gw-fields [data-field-row]', (els) => els.map((e) => e.dataset.fieldRow)), orderBefore, '아래로');
   await clickSel(page, '.gw .gw-field.extra [data-action="ed-extra-del"]');
   await settle();
   assert.equal(await page.$('.gw .gw-field.extra'), null, '칸 지우기');
@@ -196,6 +197,9 @@ for (const vp of vps) {
   await setInput(page, '.gw [data-input="ed-field"][data-key="org|극단|intro"]', 'B00 시점 소개', 'input');
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
   assert.equal((await dirOf(page)).세계.org['극단'].variants.B00.intro, 'B00 시점 소개', '세력별 글 저장');
+  // 지우기 → 되살리기로 기본 기록으로 (칸마다 되돌리기 단추는 없음)
+  await clickSel(page, '.gw [data-action="ed-delete"]');
+  await page.waitForSelector('.gw [data-action="ed-restore"]');
   await clickSel(page, '.gw [data-action="ed-restore"]');
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
 
@@ -225,6 +229,7 @@ for (const vp of vps) {
   await clickSel(page, '.gw [data-action="ed-rel-sym"]');
   await settle();
   await setInput(page, '.gw [data-input="ed-rel-memo"][data-key="극단>병원"]', '메모 글', 'input');
+  const rulesOrig = await page.$eval('.gw [data-input="ed-rules"]', (e) => e.value);
   await setInput(page, '.gw [data-input="ed-rules"]', '공통 규칙 글', 'input');
   await page.waitForFunction(() => document.querySelector('.gw')?.hasAttribute('data-dirty'));
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
@@ -235,9 +240,8 @@ for (const vp of vps) {
     assert.equal(d.세계.relations.pairs['병원>극단'].stage, 'wary');
     assert.equal(d.세계.relations.common, '공통 규칙 글');
   }
-  await clickSel(page, '.gw [data-action="ed-rules-reset"]');
+  await setInput(page, '.gw [data-input="ed-rules"]', rulesOrig, 'input');
   await settle();
-  assert.equal(await page.isDisabled('.gw [data-action="ed-rules-reset"]'), true, '공통 규칙 기본으로 → 단추 잠김');
   // 포함 스위치: 끄면 단계 줄이 사라지고 목록에 제외 배지
   await clickSel(page, '.gw [data-action="ed-rel-org"]');
   await settle();
@@ -299,16 +303,17 @@ for (const vp of vps) {
   assert.equal(await page.locator('.gw .gw-basepage .dir-row').count(), baseN, '지우기');
   await revertAll(page);
 
-  // 괴이 공통 머리말: 고치면 덧쓰기, 기본으로
+  // 괴이 공통 머리말: 고치면 덧쓰기, 원래 글로 쓰면 덧쓰기 없음
   await goNode(page, 'anomaly');
   await page.evaluate(() => { const d = document.querySelector('.gw .gw-anote'); if (d && !d.open) d.querySelector('summary').click(); });
   await settle();
+  const noteOrig = await page.$eval('.gw [data-input="ed-anote"]', (e) => e.value);
   await setInput(page, '.gw [data-input="ed-anote"]', '머리말 고침', 'input');
   await page.waitForFunction(() => document.querySelector('.gw')?.hasAttribute('data-dirty'));
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
   assert.equal((await dirOf(page)).세계.anomalyNote, '머리말 고침');
   await page.evaluate(() => { const d = document.querySelector('.gw .gw-anote'); if (d && !d.open) d.querySelector('summary').click(); });
-  await clickSel(page, '.gw [data-action="ed-anote-reset"]');
+  await setInput(page, '.gw [data-input="ed-anote"]', noteOrig, 'input');
   await settle();
   await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
   assert.equal((await dirOf(page)).세계?.anomalyNote, undefined);

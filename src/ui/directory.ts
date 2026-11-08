@@ -331,7 +331,6 @@ function cropBox(ctx: ChatContext, key: string, main: string): string {
   return `<div class="dir-crop">
     <div class="dir-crop-img" data-crop="${esc(key)}">${url ? `<img src="${esc(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ''}</div>
     <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc(key)}" aria-label="얼굴 틀 크기"></label>
-    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc(key)}">기본 틀로</button>
   </div>`;
 }
 
@@ -1330,10 +1329,6 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-crop':
       dirUi.crop = dirUi.crop === v ? '' : v;
       dirUi.pick = '';
-      break;
-    case 'dir-crop-reset':
-      picOf(d, v)?.set('crop', '');
-      dirUi.done = '';
       break;
     case 'dir-ext-close':
       dirUi.adding = false;

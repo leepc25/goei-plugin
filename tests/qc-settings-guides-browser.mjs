@@ -80,7 +80,8 @@ for (const vp of vps) {
   await clickSel(page, '.gw [data-action="ip-preview"]');
   await page.waitForSelector('.gw .ip-preview');
   assert.ok((await page.textContent('.gw .ip-preview')).startsWith('내 틀 '), '미리보기에 내 틀');
-  await clickSel(page, '.gw [data-action="ip-template-reset"]');
+  assert.equal(await page.$('.gw [data-action="ip-template-reset"]'), null, '되돌리기 단추 없음');
+  await setInput(page, '.gw [name="ip-template"]', '', 'input');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt === undefined);
   const firstName = await page.$eval('.gw .ip-names input[type="checkbox"]', (e) => e.dataset.key);
   await page.evaluate(() => { const c = document.querySelector('.gw .ip-names input[type="checkbox"]'); c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); });
@@ -98,7 +99,7 @@ for (const vp of vps) {
   await page.waitForFunction(() => !(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).length);
   await setInput(page, '.gw [name="ip-keywords"]', 'Smile, ANGRY,, sad', 'input');
   await page.waitForFunction(() => JSON.stringify(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords) === '["smile","angry","sad"]');
-  await clickSel(page, '.gw [data-action="ip-keywords-reset"]');
+  await setInput(page, '.gw [name="ip-keywords"]', '', 'input');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords === undefined);
 
   // ── 추가 규칙 ──

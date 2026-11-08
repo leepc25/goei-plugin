@@ -1539,8 +1539,8 @@ if (want('IP1')) {
   const req2 = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '안녕' }], 'model'));
   assert.ok(!req2.some((m) => /QC-TEMPLATE/.test(m.content)), '보조 모델 설정이면 지침 없음');
   await page.evaluate(() => { window.__chat.scriptstate.$st_asset_model = 'main'; });
-  // 기본값으로 되돌리기
-  await page.click('[data-action="ip-template-reset"]');
+  // 비우면 기본 틀
+  await page.fill('[data-input="ip-template"]', '');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt === undefined);
   const req3 = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '안녕' }], 'model'));
   assert.ok(req3.at(-1).content.startsWith('## Inserting Character Visual Images'), '기본 틀');

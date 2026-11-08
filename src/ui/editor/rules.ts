@@ -6,6 +6,7 @@ import { tokenizerName } from '../../core/tokenizer';
 import { savePrefs } from '../../host/prefs';
 import { switchHtml } from '../controls';
 import { ICONS } from '../icons';
+import { copyBtn } from '../copy';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -70,7 +71,7 @@ export function rulePage(node: string): string {
       <div class="ps-row"><div class="ps-label"><b>제목</b><small>규칙 글 위에 작은 제목으로 들어가요.</small></div><div class="ps-ctl"><input class="gw-rule-title" data-input="ed-rule-title" data-key="${esc(r.id)}" value="${esc(r.title)}" placeholder="예: 대사 길이" autocomplete="off" maxlength="${RULE_TITLE_MAX}"></div></div>
       <div class="ps-row"><div class="ps-label"><b>붙일 곳</b><small>본편 = RP 지침 끝 · 이동·임무 = COMMON 절 · 괴담넷 = 게시판 절 · 괴담톡·필드 = COMMON 절 · 위키 = 작성 안내 절</small></div><div class="ps-ctl"><div class="dir-chips">${chips}</div></div></div>
       <div class="ps-row"><div class="ps-label"><b>본문</b><small>모델에게 그대로 가요. 지침 언어(영어)와 맞추면 더 잘 따라요.</small></div>
-        <textarea data-input="ed-rule-text" data-key="${esc(r.id)}" rows="6" placeholder="규칙 글" maxlength="${RULE_TEXT_MAX}">${esc(r.text)}</textarea></div>
+        <div class="gw-copyto gw-copybox"><textarea data-input="ed-rule-text" data-key="${esc(r.id)}" rows="6" placeholder="규칙 글" maxlength="${RULE_TEXT_MAX}">${esc(r.text)}</textarea>${copyBtn()}</div></div>
     </div></section></div>
   </div>`;
 }

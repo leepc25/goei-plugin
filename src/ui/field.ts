@@ -813,6 +813,8 @@ export async function handleField(action: string, value: string | undefined, ctx
       if (typeof x === 'string') return true;
       const ev = activeEvents(x.world).find((e) => e.key === v);
       if (!ev) return true;
+      // 잠금·해제 효과를 다 보여 준 뒤에 화면을 바꾼다 (임무 탭 상세 창에서도. 11-08 사용자: 누르자마자 닫혀 효과를 볼 수 없다)
+      await aimFlash(ev.key);
       if (sameTarget(field.target, ev.key)) {
         field.target = null;
         field.confirmEnd = null;
@@ -872,6 +874,7 @@ export async function handleField(action: string, value: string | undefined, ctx
       const kind = (m?.[1] as MissionKind | undefined) ?? field.mkind;
       const name = m ? m[2] : v;
       if (isPC() && field.mname === name && field.mpick === kind && field.mopen !== `${kind}:${name}`) {
+        await aimFlash(v);
         field.mname = null;
         env.render();
         return true;
