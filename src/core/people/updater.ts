@@ -15,6 +15,7 @@ import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
+import { mentionsPoints, parsePoints } from '../points';
 import { cleanIcon, itemEquip, itemState, itemUses, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
@@ -77,6 +78,8 @@ export interface UpdateInput {
   turn: number;
   /** 가계부 켜짐 (상태창 잔고 칸 사용): 거래 절을 읽는다 */
   wallet: boolean;
+  /** 백일몽 포인트 장부 켜짐 (core/points.ts): 포인트 거래 절을 읽는다 */
+  points: boolean;
   /** 소지품 절 켜짐(설정 「보조 모델이 읽기」)이면 지금 목록의 이름들, 꺼져 있으면 null. update·gone 은 이 이름만 받는다 */
   items: string[] | null;
   /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
@@ -157,6 +160,8 @@ export interface BuildOpts {
   only?: string[];
   /** 장부 잔고 (원). 잔고 칸을 쓰지 않으면 null/없음 → 거래 절 없음 */
   wallet?: number | null;
+  /** 백일몽 포인트 잔고 (core/points.ts). 포인트를 쓰지 않으면 null/없음 → 포인트 거래 절 없음 */
+  points?: number | null;
   /** 모델 Router 가 본 미등록 이름 (힌트). 자료 name_hints */
   hints?: { name: string; aliases: string[]; quote: string }[];
   /** 하이파 요약 (리수폿 J-3). 자료 memory: 배경일 뿐 근거 아님 */
@@ -309,6 +314,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     span: span.map(({ index: _i, ...rest }) => rest),
     identity_known: store.identity ? { faction: store.identity.faction, rank: store.identity.rank } : null,
     wallet_now: typeof o.wallet === 'number' ? { balance: o.wallet, unit: 'KRW' } : undefined,
+    points_now: typeof o.points === 'number' ? { balance: o.points, unit: 'p' } : undefined,
     ...(sexualAnyOn(o.settings) ? { sexual_profile: { sexual_desire_enabled: sexualGlobal(o.settings).desire, paraphilia_enabled: sexualGlobal(o.settings).paraphilia, explicit_sexual_style_enabled: o.settings.explicitStyle, policy: 'sexual_context_only' } } : {}),
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
@@ -316,9 +322,9 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
       : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
-    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', items: !!o.items },
+    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', point_transactions: typeof o.points === 'number' || undefined, items: !!o.items },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
 }
 
 // ── 지침 조립 ──
@@ -389,6 +395,7 @@ export interface UpdateResult {
   faction_stance?: { faction: string; stage: string; m: string; quote: string; reason?: string }[];
   /** 가계부: 금액이 적힌 거래만 (원, 나가면 −) */
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
+  point_transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
   items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
@@ -412,7 +419,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'faction_stance', 'transactions', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'faction_stance', 'transactions', 'point_transactions', 'items', 'observations', 'axes_init', 'sexual_init', 'issues'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -430,6 +437,8 @@ export interface ApplyReport {
   issues: { code: string; who: string; reason: string }[];
   /** 받아들인 거래 (호출한 쪽이 장부 `$st_wallet` 에 적는다) */
   wallet: { anchor: string; amount: number; memo: string; quote: string }[];
+  /** 받아들인 포인트 거래 (호출한 쪽이 `$st_points` 에 적는다) */
+  points: { anchor: string; amount: number; memo: string; quote: string }[];
   /** 받아들인 소지품 변화 (호출한 쪽이 `$st_items` 에 적는다, core/items.ts). new 는 더하고, update 는 설명·효과·상태·남은 횟수 갱신, gone·destroyed 는 빼고 기록 */
   items: ItemChange[];
 }
@@ -466,6 +475,8 @@ export interface ApplyCtx {
   keepRead?: boolean;
   /** 가계부 켜짐: 거래를 받아 report.wallet 에 담는다 */
   wallet?: boolean;
+  /** 포인트 장부 켜짐: 포인트 거래를 받아 report.points 에 담는다 */
+  points?: boolean;
   /** 설정 「거래 읽는 기준」이 어림(loose): 인용에 금액 표기가 없어도 받는다 (금액은 모델 어림) */
   walletLoose?: boolean;
   /** 소지품 절 켜짐: 변화를 받아 report.items 에 담는다 (input.items 가 null 이면 아무것도 안 받는다) */
@@ -514,7 +525,7 @@ export function resolveName(who: string, store: PeopleStore, names: NameEntry[] 
 export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
   const list = msgs(chat);
   const live = liveness(chat);
-  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], items: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || 'note', who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [], points: [], items: [], issues: (Array.isArray(r.issues) ? r.issues : []).slice(0, 12).map((x) => ({ code: plain(x?.code, 40) || 'note', who: plain(x?.who, 40), reason: plain(x?.reason, 120) })) };
   const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
   const roleWords = ctx.roleWords ?? ROLE_WORDS;
   const seqs = new Map<string, number>();
@@ -1217,6 +1228,36 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       }
       seen.add(key);
       report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str(t.quote).slice(0, 120) });
+      report.applied.transactions++;
+    }
+  }
+
+  // 6c-1. 백일몽 포인트 거래 (2026-11-08): 가계부와 같은 규칙, 따로 된 장부. 인용에 포인트 양이 있어야 한다
+  if (ctx.points && input.points && !ctx.only?.length) {
+    const seen = new Set<string>();
+    for (const t of (r.point_transactions ?? []).slice(0, 6)) {
+      const amount = typeof t?.amount === 'number' ? Math.trunc(t.amount) : parsePoints(str(t?.amount));
+      if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
+        drop('points', t, '포인트를 읽을 수 없음');
+        continue;
+      }
+      const ev = evidence(str(t.m), str(t.quote));
+      if (typeof ev === 'string') {
+        drop('points', t, ev);
+        continue;
+      }
+      if (!mentionsPoints(str(t.quote)) && !/\d/.test(str(t.quote))) {
+        drop('points', t, '인용에 포인트가 없음');
+        continue;
+      }
+      const memo = plain(t.memo, 30) || (amount < 0 ? '사용' : '지급');
+      const key = `${ev.anchor}|${amount}|${memo}`;
+      if (seen.has(key)) {
+        drop('points', t, '같은 거래 중복');
+        continue;
+      }
+      seen.add(key);
+      report.points.push({ anchor: ev.anchor, amount, memo, quote: str(t.quote).slice(0, 120) });
       report.applied.transactions++;
     }
   }

@@ -427,6 +427,10 @@ The chat keeps a ledger of the user's character's cash; `wallet_now` gives the c
 - Exception for this chat: also return a transaction when money clearly changed hands but no amount is written (a meal, a taxi ride, a coffee, a fare). Estimate a typical present-day Seoul price as the `amount`, add 「(어림)」 to the end of `memo`, and quote the sentence where it happened. Still never record a price that is only mentioned, or another person's money.
 <<END:wallet_loose>>
 <<END:wallet>>
+<<SECTION:points>>
+## 15c. Baekilmong welfare points
+`points_now` is the user's Baekilmong welfare point balance — a separate ledger, never money; points and won never convert. Return `point_transactions` only for an explicit point amount the user's character received, spent or lost in the confirmed span (`500p`, `1,000포인트`, `1만 포인트`): `amount` signed integer points (negative = out), `memo` Korean ≤30, `m`, verbatim `quote` containing the amount. Points never go in `transactions`, won never goes in `point_transactions`. Never infer an unwritten amount.
+<<END:points>>
 <<SECTION:items>>
 ## 15d. Items — what the user's character carries
 
@@ -544,6 +548,9 @@ The object has these keys. Every key listed here is present; a key whose section
 <<SECTION:wallet>>
  "transactions":[{"amount":-50000,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],
 <<END:wallet>>
+<<SECTION:points>>
+ "point_transactions":[{"amount":500,"memo":"<Korean ≤30 chars>","m":"m2","quote":"<verbatim, containing the amount>"}],
+<<END:points>>
 <<SECTION:items>>
  "items":[{"name":"<Korean ≤30 chars>","action":"new|update|gone|destroyed","desc":"<Korean ≤80 chars>","usable":true,"uses":"<integer or null>","equip":"weapon|gear|none","condition":"ok|damaged|broken","icon":"<English name>","effect":"<Korean ≤60 chars or null>","m":"m2","quote":"<verbatim>"}],
 <<END:items>>

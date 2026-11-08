@@ -22,11 +22,12 @@ import { ICONS } from './icons';
 import { ITEM_ICON } from './itemIcons';
 import { isPhone } from './media';
 import { toast } from './toast';
-import { walletOn, walletPane, walletTools } from './wallet';
+import { walletOn, walletPane, walletTools, walletUi } from './wallet';
+import { pointsOn } from '../core/points';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export type ItemsSub = 'wallet' | 'items';
+export type ItemsSub = 'wallet' | 'points' | 'items';
 export interface ItemsNav { sub: ItemsSub; view: 'grid' | 'log'; open: string }
 
 /** 소지품 메뉴 상태 (채팅이 바뀌면 resetItems). open = 팝업에 띄운 물건 id, mode = 팝업 안 화면 */
@@ -47,7 +48,7 @@ export function resetItems(): void {
 }
 export const itemsNav = (): ItemsNav => ({ sub: itemsUi.sub, view: itemsUi.view, open: itemsUi.open });
 export function applyItemsNav(n: ItemsNav): void {
-  Object.assign(itemsUi, { sub: n.sub === 'wallet' ? 'wallet' : 'items', view: n.view === 'log' ? 'log' : 'grid', open: n.open ?? '', mode: 'view', notice: '' });
+  Object.assign(itemsUi, { sub: n.sub === 'wallet' || n.sub === 'points' ? n.sub : 'items', view: n.view === 'log' ? 'log' : 'grid', open: n.open ?? '', mode: 'view', notice: '' });
 }
 
 export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptstate);
@@ -106,15 +107,18 @@ const leftOf = (ctx: ChatContext, it: Item) => itemLeft(itemsOf(ctx), it, aliveA
 
 export function itemsTab(ctx: ChatContext): string {
   // 꺼진 쪽 하위 탭은 빼고(2026-11-07 사용자: 가계부·소지품 따로 켜고 끔), 지금 탭이 꺼졌으면 켜진 쪽으로
-  const SUBS = ([['wallet', '가계부'], ['items', '소지품']] as [ItemsSub, string][]).filter(([v]) => (v === 'wallet' ? walletOn(ctx) : invOn(ctx.chat.scriptstate)));
+  // 포인트 (2026-11-08 사용자 「탭을 늘려」): 신분이 백일몽일 때만, 가계부 옆 같은 높이의 탭 (core/points.ts)
+  const SUBS = ([['wallet', '가계부'], ['points', '포인트'], ['items', '소지품']] as [ItemsSub, string][]).filter(([v]) => (v === 'wallet' ? walletOn(ctx) : v === 'points' ? pointsOn(ctx.chat) : invOn(ctx.chat.scriptstate)));
   if (SUBS.length && !SUBS.some(([v]) => v === itemsUi.sub)) itemsUi.sub = SUBS[0][0];
   const tabs = `<div class="ph-subs gx-rec-tabs it-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${itemsUi.sub === v ? ' on' : ''}" data-action="items-sub" data-value="${v}" aria-selected="${itemsUi.sub === v}" aria-pressed="${itemsUi.sub === v}">${l}</button>`).join('')}</div>`;
   const note = toast('items', itemsUi.info, (t) => {
     if (itemsUi.info === t) itemsUi.info = '';
   });
-  if (itemsUi.sub === 'wallet') {
-    const drawer = isPhone() && walletOn(ctx) ? drawerBox(walletTools(ctx), 'gx-rdrawer') : '';
-    return `<main class="gx-body gx-records gx-items">${tabs}${walletPane(ctx)}${note}</main>${drawer}`;
+  if (itemsUi.sub === 'wallet' || itemsUi.sub === 'points') {
+    const kind = itemsUi.sub === 'points' ? 'p' : 'won';
+    walletUi.kind = kind;
+    const drawer = isPhone() && (kind === 'p' || walletOn(ctx)) ? drawerBox(walletTools(ctx), 'gx-rdrawer') : '';
+    return `<main class="gx-body gx-records gx-items">${tabs}${walletPane(ctx, kind)}${note}</main>${drawer}`;
   }
   const notice = itemsUi.notice ? `<div class="gx-err" role="alert">${esc(itemsUi.notice)}</div>` : '';
   // 폰: 직접 넣기·합치기는 아래 도구 줄 (하단 바 바로 위, 늘 보인다)
@@ -343,7 +347,8 @@ export async function itemsAction(action: string, value: string | undefined, ctx
   });
   switch (action) {
     case 'items-sub':
-      itemsUi.sub = value === 'wallet' ? 'wallet' : 'items';
+      itemsUi.sub = value === 'wallet' || value === 'points' ? value : 'items';
+      Object.assign(walletUi, { open: null, edit: false, notice: '' });
       itemsUi.open = '';
       itemsUi.mode = 'view';
       itemsUi.notice = '';

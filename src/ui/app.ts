@@ -64,6 +64,7 @@ import { colConfig } from '../core/world/statuscols';
 import { invOn, itemStartOn } from '../core/items';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_MAX, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
+import { parsePoints, pointsVars, readPoints } from '../core/points';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { isPhone, PHONE_MQ } from './media';
 
@@ -1055,6 +1056,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind !== 'started' || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
       const ctx = view.ctx;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        if (walletTabUi.kind === 'p') return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...pointsVars(removeWalletEntry(readPoints(chat.scriptstate), value ?? '')) } };
         const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(removeWalletEntry(w, value ?? '')) } };
       });
@@ -1062,13 +1064,15 @@ async function handle(action: string, value?: string): Promise<void> {
     }
     case 'wallet-adj': {
       if (view.kind !== 'started' || !walletEditable(view.ctx.chat.scriptstate)) return;
-      const n = parseWon(value ?? '');
-      if (n === null) {
-        walletTabUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
+      const pts = walletTabUi.kind === 'p';
+      const n = pts ? parsePoints(value ?? '') : parseWon(value ?? '');
+      if (n === null || (pts && Math.abs(n) > WALLET_MAX)) {
+        walletTabUi.notice = pts ? '포인트를 읽을 수 없어요. 숫자 또는 「1만」처럼 적어 주세요.' : '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
         return render();
       }
       const ctx = view.ctx;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        if (pts) return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...pointsVars(adjustWallet(readPoints(chat.scriptstate), aliveAnchors(chat), n, '포인트 수정')) } };
         const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
       });
