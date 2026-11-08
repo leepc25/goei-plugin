@@ -3628,3 +3628,85 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .gx-items .it-eqbox:not(.sell) { padding: 10px 12px 12px; }
   .gx-items .it-right { flex: 1; }
 }
+
+/* ── 인터넷 브라우저 (ui/browser.ts, 2026-11-08 사용자: 크롬 다크 모양, 창 테마를 따라가지 않음) ── */
+.br { --cf: #202124; --ct: #35363a; --cbox: #202124; --ctx: #e8eaed; --cic: #c4c7c5; --cdim: #9aa0a6;
+  flex: 1; min-height: 0; position: relative; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr);
+  background: var(--cf); font-family: 'Segoe UI', 'Noto Sans KR', system-ui, sans-serif; color: var(--ctx); }
+.br button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.br .br-i { width: 20px; height: 20px; fill: var(--cic); flex: none; }
+.br .br-i.s { width: 16px; height: 16px; }
+.br .br-fv { width: 16px; height: 16px; flex: none; }
+.br-tabs { display: flex; align-items: flex-end; height: 38px; padding: 0 8px; background: var(--cf); min-width: 0; }
+.br-tab { position: relative; height: 32px; flex: 0 1 230px; min-width: 60px; display: flex; align-items: center; border-radius: 8px 8px 0 0; color: var(--cdim); font-size: 12px; }
+.br-tab + .br-tab::before { content: ''; position: absolute; left: 0; top: 9px; height: 16px; width: 1px; background: #5f6368; }
+.br-tab.on { background: var(--ct); color: var(--ctx); }
+.br-tab.on::before, .br-tab.on + .br-tab::before { display: none; }
+.br-tabb { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 12px; text-align: left; }
+.br-tt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.br-tx { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.br-tx:hover, .br-plus:hover, .br-tb:hover:not(:disabled), .br-bm:hover { background: rgba(255, 255, 255, .08); }
+.br-plus { margin: 0 0 4px 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.br-tool { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; background: var(--ct); min-width: 0; }
+.br-tb { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.br-tb:disabled .br-i { fill: #5f6368; }
+.br-tb:disabled { cursor: default; }
+.br-omni { flex: 1; min-width: 0; height: 30px; border-radius: 15px; background: var(--cbox); display: flex; align-items: center; gap: 10px; padding: 0 12px 0 4px; margin: 0 6px; font-size: 14px; color: var(--cdim); white-space: nowrap; overflow: hidden; }
+.br-ti { width: 24px; height: 24px; border-radius: 50%; background: #303134; display: grid; place-items: center; flex: none; }
+.br-ti .br-i { width: 14px; height: 14px; }
+.br-u { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.br-u b { font-weight: 400; color: var(--ctx); }
+.br .br-prof { width: 28px; height: 28px; border-radius: 50%; background: #5f6368; display: grid; place-items: center; margin: 0 4px; overflow: hidden; flex: none; }
+.br-prof img { width: 100%; height: 100%; object-fit: cover; object-position: top; image-rendering: pixelated; background: #cfe0f7; }
+.br-prof b { font-size: 13px; }
+.br-prof .br-i { fill: #e8eaed; }
+.br .br-tabn { display: none; width: 22px; height: 22px; border: 2px solid var(--cic) !important; border-radius: 5px; place-items: center; font-size: 11px; font-weight: 700; color: var(--cic) !important; margin: 0 6px; flex: none; }
+.br .br-tb.mo { display: none; }
+.br-bms { display: flex; align-items: center; gap: 2px; height: 30px; padding: 0 8px; background: var(--ct); border-bottom: 1px solid #4a4c50; overflow-x: auto; scrollbar-width: none; }
+.br .br-bm { display: flex; align-items: center; gap: 7px; padding: 0 8px; height: 24px; border-radius: 12px; font-size: 12px; white-space: nowrap; flex: none; }
+.br-page { position: relative; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: #fff; color: #1d2320; }
+.br-page > .gx-body, .br-page > main, .br-page > div:only-child { flex: 1; min-height: 0; }
+.br-p-gn, .br-p-wk { background: var(--void); color: var(--text); }
+/* 로그인 창 (설명 문구 없음) */
+.br-lgn { position: absolute; right: 10px; top: 84px; width: 300px; z-index: 6; background: #292a2d; border-radius: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, .5); padding: 18px; color: #e8eaed; font: 13px 'Noto Sans KR', sans-serif; }
+.br-lgn h4 { margin: 0 0 10px; font-size: 15px; }
+.br-face { display: flex; justify-content: center; margin-bottom: 12px; }
+.br-face img, .br-face .br-i { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: top; image-rendering: pixelated; background: #cfe0f7; }
+.br-in { width: 100%; box-sizing: border-box; height: 36px; border: 1px solid #5f6368; border-radius: 6px; background: transparent; padding: 0 10px; color: #e8eaed; font: inherit; }
+.br-lgn .br-b1 { width: 100%; margin-top: 10px; height: 36px; border-radius: 18px; background: #8ab4f8; color: #202124; font-weight: 700; }
+.br-lgn hr { border: 0; border-top: 1px solid #3c4043; margin: 16px 0; }
+.br-lgn .br-b2 { width: 100%; height: 36px; border-radius: 18px; border: 1px solid #5f6368; color: #8ab4f8; font-weight: 600; }
+/* 새 탭 */
+.br-ntp { flex: 1; overflow: auto; background: #202124; color: var(--ctx); display: flex; flex-direction: column; align-items: center; padding: 90px 20px 40px; }
+.br-ntp-lg { font: 700 56px/1 'Segoe UI', sans-serif; letter-spacing: -2px; margin-bottom: 28px; }
+.br-ntp-lg span:nth-child(1) { color: #8ab4f8; } .br-ntp-lg span:nth-child(2) { color: #f28b82; } .br-ntp-lg span:nth-child(3) { color: #fdd663; } .br-ntp-lg span:nth-child(4) { color: #81c995; }
+.br-ntp-q { width: min(580px, 100%); height: 46px; border-radius: 23px; background: #303134; display: flex; align-items: center; gap: 14px; padding: 0 18px; color: var(--cdim); font-size: 15px; box-sizing: border-box; }
+.br-ntp-sc { display: grid; grid-template-columns: repeat(4, 112px); gap: 4px; margin-top: 34px; }
+.br .br-ntp-s { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 4px 12px; border-radius: 6px; font-size: 13px; }
+.br .br-ntp-s:hover { background: rgba(255, 255, 255, .06); }
+.br-ntp-s i { width: 48px; height: 48px; border-radius: 50%; background: #35363a; display: grid; place-items: center; }
+.br-ntp-s i .br-fv { width: 26px; height: 26px; }
+.br-soon { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #5f6368; }
+.br-soon-lg { width: 64px; height: 64px; }
+.br-soon b { font-size: 18px; color: #202124; }
+.br-soon p { margin: 0; }
+/* 폰 탭 목록 */
+.br-tlist { flex: 1; overflow: auto; background: #202124; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.br-tcard { display: flex; align-items: center; height: 48px; border-radius: 10px; background: #35363a; color: var(--ctx); font-size: 14px; }
+.br-tcard.on { outline: 2px solid #8ab4f8; }
+.br .br-tnew { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; border: 1px dashed #5f6368; color: var(--cic); }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .br { grid-template-rows: auto auto minmax(0, 1fr); }
+  .br-tabs, .br-tb.pc { display: none; }
+  .br .br-tb.mo, .br .br-tabn { display: grid; }
+  .br-tool { height: 56px; padding: 0 6px; }
+  .br-omni { height: 40px; border-radius: 20px; background: #3c3c3f; margin: 0 4px; font-size: 15px; }
+  .br-bms { height: 34px; }
+  .br-lgn { right: 8px; left: 8px; width: auto; top: 96px; }
+  .br-ntp { padding-top: 60px; }
+  .br-ntp-sc { grid-template-columns: repeat(4, 1fr); width: 100%; }
+  .br-ntp-lg { font-size: 44px; }
+  /* 폰 공용 서랍: 사이트 전부 + 설정, 두 줄 4개씩 (2026-11-08 사용자) */
+  .gx-cpanel.gx-cpanel2 { height: auto; display: grid; grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 2px; }
+  .gx-cpanel2 .gx-cdr-logo { width: 20px; height: 20px; }
+}

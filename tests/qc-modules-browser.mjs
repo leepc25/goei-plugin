@@ -174,6 +174,12 @@ async function reopen(page) {
 }
 // PC 메뉴는 보고 있는 탭을 한 번 더 누르면 상황판으로 간다 (사용자 2026-10-21) → 이미 그 탭이면 누르지 않는다
 const nav = async (page, id) => {
+  const bm = { gnet: 'gn', wiki: 'wk' }[id];
+  if (bm) {
+    if (!(await page.locator('.br-bms').count())) await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]');
+    await page.click(`.br-bm[data-value="${bm}"]`);
+    return;
+  }
   const sel = `.gx-nav .gx-nb:not(.mob)[data-value="${id}"]`;
   if (!(await page.locator(`${sel}.on`).count())) await page.click(sel);
 };
@@ -506,7 +512,7 @@ if (want('G5')) {
   assert.equal(await page.locator('.gn-pane .gn-c').count(), 2);
   // 모바일: 글은 목록 안에서 펼쳐지고 댓글 입력줄이 아래에 고정
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.click('.gx-nav .gx-nb.mob[data-value="gnet"]').catch(() => {});
+  await page.click('.br-bm[data-value="gn"]').catch(() => {});
   await page.waitForTimeout(200);
   if (!(await page.locator('.gn-inline').count())) await page.click('.gn-row-main[data-value="1846001"]');
   await page.waitForSelector('.gn-inline');
@@ -1075,7 +1081,7 @@ if (want('W3')) {
   await open(page);
   // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
   await page.tap('.gx-cgrip');
-  await page.tap('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
+  await page.tap('.gx-cdr.open .gx-cpanel [data-value="wk"]');
   await page.waitForSelector('.nw-home');
   await page.tap('.nw-edge');
   await page.waitForSelector('.nw-app.list-open');

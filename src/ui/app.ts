@@ -42,7 +42,8 @@ import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } fro
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
-import { gnetLabel } from '../core/gnet';
+import { GN_NICK } from '../core/gnet';
+import { br, chromeHtml, closeTab, curTab, focusSite, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -65,7 +66,7 @@ import { colConfig } from '../core/world/statuscols';
 import { invOn, itemStartOn } from '../core/items';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_MAX, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
-import { parsePoints, pointsVars, readPoints } from '../core/points';
+import { parsePoints, pointsOn, pointsVars, readPoints } from '../core/points';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { isPhone, PHONE_MQ } from './media';
 
@@ -109,9 +110,14 @@ let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
 /** records = 「기록」(일지·가계부·인물·세력, 2026-10-29 가계부 메뉴 자리). 가계부는 2026-11-05부터 기록의 하위 탭: 사원증 잔고 줄·폰 머리 칩·옛 「wallet」 탭 요청은 openWallet() 으로 */
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'items' | 'records' | 'settings';
+type Tab = 'board' | 'map' | 'mission' | 'net' | 'gnet' | 'phone' | 'wiki' | 'items' | 'records' | 'settings';
 /** items = 「소지품」(가계부|소지품, 2026-11-07 사용자: 가계부는 기록에서 소지품 메뉴로) */
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'items', 'records'];
+const TABS: Tab[] = ['board', 'map', 'mission', 'net', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'items', 'records'];
+/** 「인터넷」 브라우저 안 화면 (2026-11-08 사용자: 괴담넷·위키는 왼쪽 메뉴에서 빠지고 인터넷 안 사이트로). gnet·wiki 는 그 사이트를 띄운 탭 */
+const BR_TABS: Tab[] = ['net', 'gnet', 'wiki'];
+const inBrowser = () => BR_TABS.includes(tab);
+/** 사이트 → 그 화면을 그리는 탭 (괴담넷·괴이위키만 옛 화면이 있다, 나머지는 net) */
+const siteTab = (site: SiteId | ''): Tab => (site === 'gn' ? 'gnet' : site === 'wk' ? 'wiki' : 'net');
 /** 폰 공용 서랍(위키·괴담넷·설정) 펼침 (2026-11-07 사용자: 메뉴별 도구 줄은 늘 보이고, 서랍은 전 메뉴 공통) */
 let cdrOpen = false;
 let lastForm: HTMLFormElement | null = null;
@@ -998,6 +1004,9 @@ async function handle(action: string, value?: string): Promise<void> {
       // 다른 탭에서 소지품으로 들어오면 소지품 격자부터 (가계부는 잔고 단추로)
       if (value === 'items' && tab !== 'items') applyItemsNav({ sub: 'items', view: 'grid', open: '' });
       cdrOpen = false;
+      // 인터넷: 마지막으로 보던 탭 그대로. 괴담넷·위키(옛 메뉴 이름)는 그 사이트 탭으로
+      if (value === 'net') return openBrowserTab();
+      if (value === 'gnet' || value === 'wiki') return handle('br-site', value === 'gnet' ? 'gn' : 'wk');
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
@@ -1009,6 +1018,62 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
       if (view.kind === 'started' && tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
       return;
+    // ── 인터넷 브라우저 (ui/browser.ts) ──
+    case 'br-site':
+      // 폰 서랍: 그 사이트 탭이 있으면 그 탭으로, 없으면 지금 탭에서 (2026-11-08 사용자)
+      if (!value || !isSite(value)) return;
+      cdrOpen = false;
+      if (br.tabs.some((t) => t.site === value)) {
+        focusSite(value);
+        return openBrowserTab();
+      }
+      if (!inBrowser()) br.cur = br.tabs.findIndex((t) => !t.site) >= 0 ? br.tabs.findIndex((t) => !t.site) : (newTab(), br.cur);
+      return goSite(value);
+    case 'br-go':
+      if (value && isSite(value)) goSite(value);
+      return;
+    case 'br-home':
+      return goSite('');
+    case 'br-new':
+      newTab();
+      return goSite('');
+    case 'br-tab':
+      br.cur = Math.max(0, Math.min(br.tabs.length - 1, Number(value) || 0));
+      br.list = false;
+      br.login = false;
+      return openBrowserTab();
+    case 'br-close':
+      closeTab(Number(value) || 0);
+      return openBrowserTab();
+    case 'br-back':
+    case 'br-fwd': {
+      const s = tabGo<NavState>(action === 'br-back' ? -1 : 1);
+      if (s) applyNav(s);
+      return;
+    }
+    case 'br-reload':
+      // 새로 고침 = 그 사이트를 새로 받기 (괴담넷은 게시판 새로고침, 나머지는 다시 그리기)
+      if (view.kind === 'started' && curTab().site === 'gn' && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv))) return;
+      return render();
+    case 'br-list':
+      br.list = !br.list;
+      br.login = false;
+      return render();
+    case 'br-login':
+      br.login = !br.login;
+      return render();
+    case 'br-login-save':
+    case 'br-login-guest': {
+      if (view.kind !== 'started') return;
+      const nick = action === 'br-login-save' ? (value ?? '').trim().slice(0, 36) : '';
+      br.login = false;
+      const ctx = view.ctx;
+      const vars: Record<string, string> = { $br_login: nick ? '1' : '0', [GN_NICK]: nick };
+      if (nick) vars.$br_nick = nick;
+      const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
+      if (saved) ctx.chat = saved;
+      return render();
+    }
     case 'nav-back':
     case 'nav-fwd': {
       const run = navStep(action === 'nav-back' ? -1 : 1);
@@ -1108,8 +1173,9 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind === 'started') openCheck(view.ctx, phoneEnv);
       return;
     case 'wiki-goto':
-      // 지도·커스텀 임무 목록의 「위키」: 위키 탭으로 넘어가 그 제목을 연다 (없으면 작성 화면)
+      // 지도·커스텀 임무 목록의 「위키」: 인터넷의 괴이위키 탭으로 넘어가 그 제목을 연다 (없으면 작성 화면)
       if (view.kind !== 'started') return;
+      focusSite('wk');
       tab = 'wiki';
       resetWiki();
       gnet.compose = null;
@@ -1220,7 +1286,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', items: '소지품', records: '기록', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', net: '인터넷', gnet: '인터넷', phone: '괴담톡', wiki: '인터넷', items: '소지품', records: '기록', settings: '설정',
 };
 
 /** 시작 전 창 머리: 제목 + 작은 안내. 「괴이 ː ANOMALY」 표기는 상황판에서 뺐다 (사용자 2026-11-05) */
@@ -1235,7 +1301,7 @@ function header(title: string, extra = '', sub = ''): string {
  *  단추는 잔고·사원증·닫기만 (2026-11-07 사용자: 기록·설정은 하단 바·공용 서랍으로) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${walletHeadButton(ctx)}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
@@ -1373,6 +1439,7 @@ function render(): void {
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
+  if (view.kind === 'started' && inBrowser()) recordTab(navState());
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
   root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
@@ -1392,6 +1459,8 @@ interface NavState {
   d?: string;
   /** 상황판 사원증 창 (열려 있으면 요원 이름) */
   a?: string;
+  /** 인터넷: 지금 탭의 사이트 ('' 새 탭) */
+  b?: string;
 }
 const navHist = new NavHistory<NavState>();
 
@@ -1408,6 +1477,7 @@ function openWallet(): void {
 
 function navState(): NavState {
   const s: NavState = { tab };
+  if (inBrowser()) s.b = curTab().site;
   if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
   if (tab === 'records') s.r = recordsNav();
   if (tab === 'items') s.i = itemsNav();
@@ -1429,6 +1499,7 @@ function navHistBar(): string {
 
 function applyNav(s: NavState): void {
   tab = s.tab;
+  if (s.b !== undefined) curTab().site = isSite(s.b) ? s.b : '';
   notice = '';
   field.confirmEnd = null;
   if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list });
@@ -1473,10 +1544,10 @@ function startedBody(ctx: ChatContext): string {
       return mapTab(ctx, env, notice, busy);
     case 'mission':
       return missionTab(ctx, false, notice, busy);
+    case 'net':
     case 'wiki':
-      return wikiTab(ctx, wikiEnv);
     case 'gnet':
-      return gnetTab(ctx, gnetEnv);
+      return browserBody(ctx);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
     case 'records':
@@ -1609,7 +1680,7 @@ function picker(): string {
 
 function tabs(): string {
   const unreadPhone = view.kind === 'started' && phoneUnread(view.ctx);
-  const cur: Tab = tab === 'mission' ? 'map' : tab;
+  const cur: Tab = tab === 'mission' ? 'map' : inBrowser() ? 'net' : tab;
   const item = (id: Tab, label: string, icon: string, cls = '', badge = '') =>
     `<button class="gx-nb${cls ? ` ${cls}` : ''}${cur === id ? ' on' : ''}" data-action="${cls === 'mob' ? 'tab' : 'nav-tab'}" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
   const ctx = view.kind === 'started' ? view.ctx : null;
@@ -1619,8 +1690,7 @@ function tabs(): string {
     ${item('map', '임무', ICONS.map, 'desk')}
     ${item('map', '임무', ICONS.map, 'mob')}
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
-    ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
-    ${item('wiki', '위키', ICONS.wiki)}
+    ${item('net', '인터넷', ICONS.net)}
     ${!ctx || invMenuOn(ctx) ? item('items', '소지품', ICONS.bag, 'desk') : ''}
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
@@ -1646,14 +1716,80 @@ function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null,
   return drawer ? commonDrawer(ctx) + bar : bar;
 }
 
-/** 폰 공용 서랍: 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색). 누르면 위키·괴담넷·설정 한 줄이 메뉴별 도구 줄을 덮으며 올라온다 */
+/** 폰 공용 서랍: 바 위 가운데 납작한 손잡이(48×8, 바와 같은 색). 누르면 인터넷 사이트 전부와 설정이 두 줄(4개씩)로 올라온다
+ *  (2026-11-08 사용자: 인터넷 하나를 두지 말고 하위 사이트를 다 꺼내 둔다. 누르면 그 사이트 탭으로) */
 function commonDrawer(ctx: ChatContext | null): string {
-  const b = (id: string, label: string, icon: string, action = 'tab', value = id, badge = '') =>
-    `<button class="ph-tool${tab === id ? ' on' : ''}" data-action="${action}" data-value="${value}">${icon}<span class="ph-tool-l">${esc(label)}</span>${badge}</button>`;
+  const here = inBrowser() ? curTab().site : null;
+  const site = (id: SiteId) =>
+    `<button class="ph-tool${here === id ? ' on' : ''}" data-action="br-site" data-value="${id}">${siteLogo(id, 'gx-cdr-logo')}<span class="ph-tool-l">${esc(SITES.find((x) => x.id === id)!.name)}</span></button>`;
+  const set = `<button class="ph-tool${tab === 'settings' ? ' on' : ''}" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span class="ph-tool-l">설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>`;
   return `<div class="gx-cdr${cdrOpen ? ' open' : ''}">
-    <div class="gx-cpanel ph-tools">${b('wiki', '위키', ICONS.wiki)}${GNET_ON ? b('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}${b('settings', '설정', ICONS.settings, 'ed-open', 'set:screen', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}</div>
+    <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx).map(site).join('')}${set}</div>
     <button class="gx-cgrip" type="button" data-action="cdr" aria-label="서랍" aria-expanded="${cdrOpen}"><i></i></button>
   </div>`;
+}
+
+/** 즐겨찾기·새 탭·서랍에 보일 사이트: 백일몽 포인트몰은 백일몽 소속일 때만 */
+function browserSites(ctx: ChatContext | null): SiteId[] {
+  return SITES.map((x) => x.id).filter((id) => id !== 'bm' || (!!ctx && pointsOn(ctx.chat)));
+}
+
+/** 브라우저 틀에 넘길 값: 로그인 닉네임은 $br_login 이 1 일 때만 */
+function chromeOpts(ctx: ChatContext): ChromeOpts {
+  const vars = ctx.chat.scriptstate ?? {};
+  const t = curTab();
+  const wkTitle = t.site === 'wk' && wiki.view === 'doc' && wiki.title ? wiki.title : '';
+  return {
+    title: wkTitle ? `${wkTitle} - 괴이위키` : t.site === 'wk' ? '괴이위키:대문 - 괴이위키' : '',
+    path: wkTitle ? `/w/${wkTitle}` : '',
+    bookmarks: browserSites(ctx),
+    nick: String(vars['$br_login'] ?? '') === '1' ? String(vars['$br_nick'] ?? '') : '',
+    photo: userInfo().photo ?? '',
+    phone: isPhone(),
+  };
+}
+
+/** 인터넷 화면: 크롬 틀 + 지금 탭의 사이트 */
+function browserBody(ctx: ChatContext): string {
+  const t = curTab();
+  const o = chromeOpts(ctx);
+  const page = br.list && isPhone() ? tabListHtml(o)
+    : !t.site ? homeHtml(browserSites(ctx))
+    : t.site === 'gn' ? gnetTab(ctx, gnetEnv)
+    : t.site === 'wk' ? wikiTab(ctx, wikiEnv)
+    : soonHtml(t.site);
+  return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || 'home'}">${page}</div>${loginHtml(o)}</div>`;
+}
+
+/** 지금 브라우저 탭이 보던 화면으로 (기록이 없으면 그 사이트 첫 화면) */
+function openBrowserTab(): void {
+  notice = '';
+  field.confirmEnd = null;
+  resetSettings();
+  const s = tabState<NavState>();
+  if (s) return applyNav(s);
+  tab = siteTab(curTab().site);
+  render();
+  siteOpened();
+}
+
+/** 사이트를 처음 열 때: 「창을 열 때」 자동 호출 확인 */
+function siteOpened(): void {
+  if (view.kind !== 'started') return;
+  if (tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
+  if (tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
+}
+
+/** 지금 탭에서 사이트를 연다 (그 사이트 첫 화면부터) */
+function goSite(site: SiteId | ''): void {
+  curTab().site = site;
+  br.list = false;
+  br.login = false;
+  notice = '';
+  if (site === 'wk') resetWiki();
+  tab = siteTab(site);
+  render();
+  siteOpened();
 }
 
 /** 설정 창(폰)에 주는 하단 바: 본 창과 같은 항목, 지금 탭 표시 */

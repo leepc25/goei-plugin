@@ -114,7 +114,7 @@ for (const vp of ['pc', 'phone']) {
     await shot('records');
     await click('[data-action="cdr"]');
     await shot('drawer');
-    await click('.gx-cpanel [data-value="wiki"]');
+    await click('.gx-cpanel [data-value="wk"]');
     await shot('wiki');
   }
   errorsAll.push(...errors.map((e) => `[${vp}] ${e}`));

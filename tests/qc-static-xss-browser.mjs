@@ -210,7 +210,7 @@ async function seen(page, where) {
   const { page, errors } = await boot(fixture, chat);
   await open(page);
   await audit(page, errors, '상황판'); await seen(page, '상황판');
-  const tab = async (id) => { await page.click(`.gx-nav [data-action="nav-tab"][data-value="${id}"]`); await page.waitForFunction((id) => document.querySelector('.gx')?.dataset.tab === id, id); };
+  const tab = async (id) => { const bm = { gnet: 'gn', wiki: 'wk' }[id]; if (bm) { await page.click('.gx-nav [data-action="nav-tab"][data-value="net"]'); await page.click(`.br-bm[data-value="${bm}"]`); } else await page.click(`.gx-nav [data-action="nav-tab"][data-value="${id}"]`); await page.waitForFunction((id) => document.querySelector('.gx')?.dataset.tab === id, id); };
   await tab('map'); await audit(page, errors, '지도'); total++;
   // 커스텀 임무는 따로 메뉴가 없고 임무 화면의 전환 단추로 (2026-10-29 사용자)
   await page.click('.gx-mswap[data-value="mission"]'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'mission'); await audit(page, errors, '커스텀 임무'); total++;

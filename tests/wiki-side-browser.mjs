@@ -118,7 +118,7 @@ const box = (page, sel) => page.locator(sel).first().boundingBox();
   const { page, errors } = await boot(fixture, chat(), { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  await page.click('.gx-nav > .gx-nb[data-value="wiki"]');
+  await page.click('.gx-nav > .gx-nb[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-rail');
   let rail = await box(page, '.nw-rail'), main = await box(page, '.nw-main');
   assert.ok(rail.x > main.x, '기본은 오른쪽 (2026-10-29 사용자)');
@@ -148,7 +148,7 @@ const box = (page, sel) => page.locator(sel).first().boundingBox();
   await open(page);
   // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
   await page.click('.gx-cgrip');
-  await page.click('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
+  await page.click('.gx-cdr.open .gx-cpanel [data-value="wk"]');
   await page.waitForSelector('.nw-edge');
   const edge = await box(page, '.nw-edge');
   assert.ok(edge.x > 300, '모바일 책갈피는 오른쪽');

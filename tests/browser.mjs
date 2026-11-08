@@ -790,7 +790,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     if (name === 'pc') {
       // 위키 이름을 누르면 창이 그 위키 문서로
       await page.click('#msg .x-risu-gst-link');
-      await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 15000 });
+      await page.waitForSelector('.gx-nb.on[data-value="net"], .nw-doc, .nw-write', { timeout: 15000 });
       // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
       await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
       await edGo(page, 'set:status');
@@ -1088,7 +1088,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await pickCustom(page);
   const site = (await page.textContent('.gx-goal b')).trim();
   // 다른 탭에 다녀와도 고른 목표 유지
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await goMission(page);
   assert.equal((await page.textContent('.gx-goal b')).trim(), site, '탭 이동 뒤에도 목표 유지');
   if (shots) await page.screenshot({ path: `${shots}/12-mission-tab.png` });
@@ -1120,7 +1120,7 @@ if (fixture.globalLore.some(packed)) {
   await startedWithReply(page);
   {
     await open(page);
-    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
     await page.waitForSelector('.nw-rail');
     await page.click('.nw-grab');
     await page.fill('.nw .ph-search', '소라 랜드');
@@ -1159,7 +1159,7 @@ if (fixture.globalLore.some(packed)) {
     const scrollTop = () => page.evaluate(() => document.querySelector('.nw-doc').scrollTop);
     await startedWithReply(page);
     await open(page);
-    await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="wiki"]:visible').first().click();
+    await page.locator('.gx-cgrip').click(); await page.locator('.gx-cpanel2 [data-value="wk"]').click();
     await page.waitForSelector('.nw-home');
     // 창이 늦게 한 번 더 그려지면(사용자 사진 읽기 등) 입력이 사라질 수 있어 문서가 뜰 때까지 다시 친다
     for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
@@ -1199,7 +1199,7 @@ if (fixture.globalLore.some(packed)) {
 </lightboard-namuwiki>`;
   await page.evaluate((a) => { window.__llm = [{ type: 'success', result: a }]; }, article('아무 제목'));
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-rail');
   assert.equal(await page.locator('.gx-panel form').count(), 0, 'form을 쓰지 않음');
   // 첫 화면은 위키 메인, 목록은 접혀 있다가 세로바를 누르면 펼쳐진다
@@ -1373,7 +1373,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-board');
   // 폰 하단 바에는 위키가 없다 (11-07 사용자: 5탭 바). 바 위 손잡이로 공용 서랍을 열어 위키로
   await page.click('.gx-cgrip[data-action="cdr"]');
-  await page.click('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
+  await page.click('.gx-cdr.open .gx-cpanel [data-value="wk"]');
   await page.waitForSelector('.nw-main');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.click('.nw-rail [data-action="wiki-home"]');
@@ -1400,7 +1400,7 @@ if (fixture.globalLore.some(packed)) {
   ], incoming: [] };
   await page.evaluate((b) => { window.__llm = [{ type: 'success', result: '```json\n' + JSON.stringify(b) + '\n```' }]; }, board);
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="gn"]');
   await page.waitForSelector('.gn');
   assert.ok((await page.textContent('.gn')).includes('게시글이 없어요'));
   await page.click('[data-action="gn-refresh"]');
@@ -2010,7 +2010,7 @@ if (fixture.globalLore.some(packed)) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="gn"]');
   await page.waitForSelector('.gn');
   // 글쓰기 + 사진·링크 첨부: 모델에는 A번호와 ATTACHMENT DATA, 저장은 사용자 첨부 그대로
   await page.click('[data-action="gn-write"]');
@@ -2176,7 +2176,7 @@ if (fixture.globalLore.some(packed)) {
   if (shots) await page.screenshot({ path: `${shots}/19-photo-mobile.png` });
   await page.setViewportSize({ width: 1100, height: 900 });
   // 괴담넷 쪽지에도 사진
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="gn"]');
   await page.waitForSelector('.gn');
   // 괴담넷 새 글에도 클립보드 사진 붙여넣기
   await page.click('[data-action="gn-write"]');
@@ -2511,7 +2511,7 @@ if (fixture.globalLore.some(packed)) {
     window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'mod/ldh.png', 'png'], ['Management Bureau_default', 'mod/org.png', 'png']] }];
   });
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-home');
   for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
     await page.fill('.nw-home .gx-search', '관리국');
@@ -2580,7 +2580,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(book.괴이[first].photo, 'Lee Do-hyeong', '괴이 사진 저장');
   assert.ok(book.거점['시험 거점'], '거점도 저장');
   assert.equal(book.조직.관리국.english, 'Management Bureau');
-  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="wiki"] >> nth=0');
+  await page.click('.gx-nav > .gx-nb[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-rail');
   await page.click('.nw-grab');
   await page.fill('.nw .ph-search', '관리국');
@@ -2698,7 +2698,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-records .pp-pane');
   assert.ok((await page.textContent('.gx-records .pp-pane .ph-room-title')).includes('세력'));
   // 위키 홈: 「이 채팅의 기록」 섹션·타일 없음 (위키는 문서만)
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-home');
   assert.equal(await page.locator('.nw-tile.k-pp, [data-action="wiki-people"]').count(), 0, '위키 홈에 인물 타일 없음');
   assert.ok(!(await page.textContent('.nw-home')).includes('이 채팅의 기록'));
