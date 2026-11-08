@@ -16,7 +16,7 @@ import { messageKey } from './people/store';
 import { parseWon } from './wallet';
 import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
 import { genSettings } from './advanced';
-import { fillGuide, guideSections } from './guides';
+import { fillGuide, guideSections, type GuideName } from './guides';
 
 export const SHOP_VAR = '$st_shop';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars) */
@@ -305,7 +305,7 @@ export function readShop(vars: Vars): ShopState | null {
 export const shopVars = (st: ShopState | null): Record<string, string> => ({ [SHOP_VAR]: st ? JSON.stringify(st) : '' });
 
 /** 채팅의 마지막 봇 응답 (키·글) */
-function lastBot(chat: Chat): { key: string; text: string; index: number } | null {
+export function lastBot(chat: Chat): { key: string; text: string; index: number } | null {
   const list = chat.message ?? [];
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return { key: messageKey(list[i], i), text: typeof list[i].data === 'string' ? list[i].data : '', index: i };
   return null;
@@ -649,7 +649,7 @@ export interface ShopSource {
 }
 
 // 지침 글은 플러그인 내장 지침 「Shop」(src/data/guides/shop.txt, 설정 → 지침 → 상점에서 고침). 여기는 절을 골라 자리만 채운다 (2026-11-07 사용자: 지침은 전부 지침 메뉴에서)
-const G = () => guideSections('Shop');
+const G = (name: GuideName = 'Shop') => guideSections(name);
 
 const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState) => {
   const r = s.size;
@@ -687,9 +687,10 @@ function material(src: ShopSource, s: ShopSettings): string {
 const craft = (messages: CraftMessage[], s: ShopSettings, thoughts: string) => craftMessages(messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts });
 
 /** 첫 호출(정체 + 진열대 + 주인 첫 대사) 또는 새로고침(진열대 + 한마디) */
-export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
+/** guide: 지침 이름 (상점 Shop · 쇼핑몰 Cos·Bm) */
+export function shelfPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 'Shop'): CraftMessage[] {
   const first = !src.st.loaded;
-  const g = G();
+  const g = G(guide);
   const system = [
     fillGuide(g.COMMON, {}),
     SHELF_RULES(g, s, src.st),
@@ -703,12 +704,12 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 }
 
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
-export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
+export function talkPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 'Shop'): CraftMessage[] {
   const st = src.st;
   const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? '-'}|${x.weight ?? '-'}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}`).join('\n') || '(empty)';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
-  const g = G();
+  const g = G(guide);
   const v = { line: SHOP_LINE };
   const system = [
     fillGuide(g.COMMON, v),

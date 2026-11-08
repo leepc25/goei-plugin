@@ -38,6 +38,8 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
+import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
+import { isMallSite } from '../core/malls';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { isBoardSite, type BoardSite } from '../core/boards';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
@@ -547,6 +549,7 @@ function panelInput(el: HTMLInputElement): void {
   }
   if (el?.dataset?.input === 'items-q' && view.kind === 'started' && root) return itemsInput(root, view.ctx, el.value);
   if (el?.dataset?.input === 'shop-say') return shopInput(el.value);
+  if (el?.dataset?.input === 'mall-say') { const ms = curTab().site; if (isMallSite(ms)) mallInput(ms, el.value); return; }
   if (el?.dataset?.input === 'rec-q' && view.kind === 'started') {
     // 기록 › 일지 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
     recordsInput('rec-q', el.value);
@@ -767,6 +770,7 @@ async function refresh(): Promise<void> {
         resetItems();
         resetShop();
         resetGnet();
+        resetMalls();
         restoreTabs(ctx.chat.scriptstate?.[BR_TABS_VAR]);
         tabsSaved = tabsJson();
         resetPhone();
@@ -888,6 +892,11 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
+  if (featCtx && action.startsWith('ms-') && (await mallSettingsAction(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('mall-')) {
+    const ms = curTab().site;
+    if (isMallSite(ms) && (await mallAction(action, value, featCtx, wikiEnv, ms))) return;
+  }
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action)))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
@@ -1086,6 +1095,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'br-reload':
       // 새로 고침 = 그 사이트를 새로 받기 (괴담넷은 게시판 새로고침, 나머지는 다시 그리기)
       if (view.kind === 'started' && isBoardSite(curTab().site) && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv, tabBoard()))) return;
+      { const ms = curTab().site; if (view.kind === 'started' && isMallSite(ms) && (await mallAction('mall-refresh', '', view.ctx, wikiEnv, ms))) return; }
       return render();
     case 'br-list':
       br.list = !br.list;
@@ -1798,6 +1808,7 @@ function browserBody(ctx: ChatContext): string {
   const page = br.list && isPhone() ? tabListHtml(o)
     : !t.site ? homeHtml(browserSites(ctx))
     : isBoardSite(t.site) ? gnetTab(ctx, gnetEnv, t.site)
+    : isMallSite(t.site) ? mallTab(ctx, wikiEnv, t.site)
     : t.site === 'wk' ? wikiTab(ctx, wikiEnv)
     : soonHtml(t.site);
   return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || 'home'}">${page}</div>${loginHtml(o)}</div>`;
@@ -1820,6 +1831,8 @@ function siteOpened(): void {
   if (view.kind !== 'started') return;
   if (tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv, tabBoard());
   if (tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
+  const site = curTab().site;
+  if (tab === 'net' && isMallSite(site)) mallOpenCheck(view.ctx, wikiEnv, site);
 }
 
 /** 지금 탭에서 사이트를 연다 (그 사이트 첫 화면부터) */

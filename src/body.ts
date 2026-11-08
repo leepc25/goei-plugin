@@ -28,6 +28,8 @@ import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
 import { featureModel } from './core/craft';
 import { autoRefreshGnet } from './ui/gnet';
+import { autoRefreshMall } from './ui/malls';
+import { MALL_SITES, mallSettings } from './core/malls';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
@@ -552,7 +554,9 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     const otherBoards = BOARD_SITES.filter((site) => site !== 'gn' && gnetSettings(boardState(now!.scriptstate, site)).auto);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
-    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto) {
+    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
+    const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
+    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -563,6 +567,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
         const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
+        const mallFail = (error: unknown) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
         const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
         const model = phoneSettings(now!.scriptstate).model;
@@ -576,6 +581,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
           for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
           if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
           if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+          for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
           return;
         }
         if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
@@ -583,6 +589,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+        for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
       })();
     }
   } catch (error) {

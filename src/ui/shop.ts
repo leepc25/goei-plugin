@@ -300,10 +300,10 @@ export interface ShopEnv {
 
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
 
-function source(ctx: ChatContext, st: ShopState): ShopSource {
+/** 상점·쇼핑몰 요청 자료. sh: 쓸 설정 (쇼핑몰은 사이트 설정) */
+export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ctx.chat.scriptstate)): ShopSource {
   const src = playerSource({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() } as RefSource);
   const vars = ctx.chat.scriptstate ?? {};
-  const sh = shopSettings(vars);
   const story = storyText(recentTurns(ctx.chat, sh.turns, genSettings(vars).userMessages));
   // 참고: 봇 설명·활성 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서. 페르소나·작가 노트는 넘기지 않는다
   const doc = findDoc(ctx.chat, st.shop, ctx.char.globalLore);
@@ -334,7 +334,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
   shopUi.failRaw = '';
   env.render();
   try {
-    const src = source(ctx, st0);
+    const src = shopSource(ctx, st0);
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: kind === 'shelf' ? '상점 진열' : '상점 대화' };
     let next: ShopState;
@@ -602,5 +602,5 @@ export function shopInput(v: string): void {
 export function previewShopShelf(ctx: ChatContext): LlmMessage[] | null {
   const st = currentShop(ctx.chat);
   if (!st) return null;
-  return shelfPrompt(source(ctx, st), shopSettings(ctx.chat.scriptstate));
+  return shelfPrompt(shopSource(ctx, st), shopSettings(ctx.chat.scriptstate));
 }

@@ -3731,6 +3731,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .bs-new { color: var(--bs-ac); }
 .bs .bs-none { padding: 24px 0; text-align: center; color: var(--bs-dim); }
 .bs .bs-empty { padding: 60px 0; display: grid; justify-items: center; gap: 12px; color: var(--bs-dim); }
+.bs .bs-ebt { display: flex; gap: 8px; }
 .bs .bs-w { padding: 7px 14px; border-radius: 3px; background: var(--bs-ac); color: #fff; font-weight: 800; font-size: 13px; white-space: nowrap; }
 .bs .bs-w:disabled { opacity: .6; }
 .bs .bs-bb { border: 1px solid var(--bs-line); background: var(--bs-card); padding: 6px 12px; font-size: 13px; font-weight: 700; border-radius: 3px; white-space: nowrap; }
@@ -3928,3 +3929,179 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .gn-pane .gn-c { padding-left: calc(4px + var(--gn-depth, 0) * 22px); }
 .bs .gn-c-body { font-size: 13.5px; color: var(--bs-ink); }
 .gx-body.gn.bs > * { max-width: none; margin-left: 0; margin-right: 0; }
+
+/* ── 인터넷 쇼핑몰 (2026-11-08 사용자, 시안 pc_08_cos·pc_09_bm·pc_13_cos_ask) ── */
+.br-page > .ms { flex: 1; min-height: 0; overflow-y: auto; position: static; display: block; }
+/* 창(문의·입금)은 스크롤과 상관없이 보이는 화면 기준 (.br-page) */
+.ms button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.ms .ms-pic svg, .ms [class$="-pic"] svg { width: 56%; height: 56%; }
+/* 우주 쇼핑몰: 1990년대 개인 홈페이지 */
+.ms-cos { color: #fff; font: 13px 'Gulim', '굴림', 'Noto Sans KR', sans-serif; background-color: #000; background-image: radial-gradient(1px 1px at 10% 20%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 70% 60%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 40% 80%, #ff0 50%, transparent 51%), radial-gradient(1px 1px at 85% 15%, #0ff 50%, transparent 51%), radial-gradient(1px 1px at 30% 45%, #aaa 50%, transparent 51%); background-size: 180px 140px, 220px 190px, 260px 230px, 300px 210px, 130px 120px; }
+.ms-cos .cs-fr { display: grid; grid-template-columns: 170px minmax(0, 1fr); min-height: 100%; }
+.ms-cos .cs-lf { border-right: 4px ridge #888; background: #000040; padding: 10px 8px; font-size: 12px; display: flex; flex-direction: column; }
+.ms-cos .cs-lt { text-align: center; font: bold 14px 'Comic Sans MS', 'Gulim', sans-serif; color: #ff0; margin-bottom: 8px; }
+.ms-cos .cs-ufo { width: 40px; height: 30px; vertical-align: -8px; }
+.ms-cos .cs-ufo.cs-big { display: block; width: 80px; height: 60px; margin: 0 auto 8px; }
+.ms-cos .cs-ufo.cs-flip { transform: scaleX(-1); }
+.ms-cos .cs-lf > button { display: block; width: 100%; text-align: left; padding: 4px 2px; color: #fff; }
+.ms-cos .cs-lf > button.on { color: #ff0; }
+.ms-cos .cs-lf > button:hover { color: #0ff; }
+.ms-cos hr.cs-rb, .ms-cos .cs-lf hr { border: 0; height: 3px; background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, violet); margin: 8px 0; width: 100%; }
+.ms-cos .cs-cnt { text-align: center; font-size: 11px; }
+.ms-cos .cs-cnt span { display: inline-block; background: #000; border: 1px solid #0f0; color: #0f0; font: bold 12px 'Courier New', monospace; padding: 0 3px; letter-spacing: 2px; }
+.ms-cos .cs-lf small { text-align: center; font-size: 10px; color: #aaa; margin-top: 8px; }
+.ms-cos .cs-top { display: flex; flex-wrap: wrap; gap: 4px 10px; padding: 8px 12px; background: #000040; border-bottom: 3px ridge #888; }
+.ms-cos .cs-top button { color: #fff; font-size: 12.5px; }
+.ms-cos .cs-top button.on { color: #ff0; }
+.ms-cos .cs-mn { padding: 12px 16px 20px; min-width: 0; }
+.ms-cos .cs-title { text-align: center; font: 900 34px 'Comic Sans MS', 'Gulim', cursive; color: #ff0; text-shadow: 2px 2px #f0f, 4px 4px #00f; }
+.ms-cos .cs-subt { text-align: center; color: #0ff; font-size: 15px; margin: 4px 0 8px; }
+.ms-cos .cs-mq { border: 2px inset #888; background: #000080; color: #fff; padding: 3px 0; white-space: nowrap; overflow: hidden; margin: 8px 0; }
+.ms-cos .cs-mq span { display: inline-block; padding-left: 100%; animation: cs-mq 16s linear infinite; animation-delay: -7s; }
+@keyframes cs-mq { to { transform: translateX(-100%); } }
+.ms-cos .cs-wel { border: 3px double #ff0; padding: 8px 10px; line-height: 1.7; background: #100030; }
+.ms-cos .cs-wel b, .ms-cos .cs-op { color: #f0f; font-weight: 700; }
+.ms-cos .blink { color: #f00; font-weight: 900; animation: cs-bl 1s steps(1) infinite; }
+@keyframes cs-bl { 50% { opacity: 0; } }
+.ms-cos .cs-h { display: block; margin: 16px 0 6px; color: #ff0; font-size: 14px; white-space: nowrap; }
+.ms-cos .cs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px; border: 3px outset #c0c0c0; background: #c0c0c0; padding: 4px; }
+.ms-cos .cs-it { position: relative; background: #fff; color: #000; border: 2px inset #c0c0c0; padding: 8px; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; }
+.ms-cos .cs-bd { position: absolute; top: 4px; left: 4px; z-index: 1; background: #ff0; color: #c00; font-weight: 900; font-size: 11px; padding: 0 4px; border: 2px outset #ff8; }
+.ms-cos .cs-bds { background: #f00; color: #ff0; border-color: #f88; }
+.ms-cos .cs-it.on { outline: 3px dashed #f0f; outline-offset: -3px; }
+.ms-cos .cs-pic { display: grid; place-items: center; width: 88px; height: 88px; margin: 0 auto 6px; background: #e0e0ff; border: 1px solid #888; }
+.ms-cos .cs-pic img { width: 85px; height: 85px; image-rendering: pixelated; }
+.ms-cos .cs-nm { color: #000080; font-size: 13px; }
+.ms-cos .cs-it p { margin: 2px 0 4px; flex: 1; }
+.ms-cos .cs-it p i { color: #606; }
+.ms-cos .cs-pr { color: #c00; font-weight: 900; }
+.ms-cos .cs-pr em { font-style: normal; }
+.ms-cos .cs-pr s { color: #888; font-weight: 400; }
+.ms-cos .cs-pr small { color: #606; font-weight: 700; }
+.ms-cos .cs-bt { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; }
+.ms-cos .cs-btn { display: inline-block; padding: 2px 10px; border: 2px outset #eee; background: #c0c0c0; color: #000; font-size: 12px; }
+.ms-cos .cs-btn:active, .ms-cos .cs-btn.in { border-style: inset; background: #b0b0d0; }
+.ms-cos .cs-btn:disabled { color: #777; cursor: default; }
+.ms-cos .cs-btn.cs-go { font-weight: 700; }
+.ms-cos .cs-ln { color: #00e; text-decoration: underline; font-size: 12px; }
+.ms-cos .cs-wel .cs-ln, .ms-cos .q-lg .cs-ln, .ms-cos .cs-how .cs-ln { color: #0ff; }
+.ms-cos .q-lg .cs-ln, .ms-cos .q-card .cs-ln { display: inline; color: #00e; background: #ffffe0; border: 1px solid #888; padding: 0 4px; text-decoration: underline; text-align: left; }
+.ms-cos .cs-ln b { color: #c00; }
+.ms-cos .cs-box { margin-top: 14px; border: 3px outset #c0c0c0; background: #c0c0c0; color: #000; padding: 12px; display: grid; gap: 8px; justify-items: start; }
+.ms-cos .cs-box .cs-h { margin: 0; color: #000080; }
+.ms-cos .cs-box p { margin: 0; }
+.ms-cos .cs-wait { color: #0ff; }
+.ms-cos .cs-box.cs-wait { background: #000040; color: #0ff; border-color: #888; }
+.ms-cos .cs-tb { border-collapse: collapse; background: #fff; width: 100%; }
+.ms-cos .cs-tb td, .ms-cos .cs-tb th { border: 1px solid #888; padding: 4px 8px; text-align: left; }
+.ms-cos .cs-tb th { background: #000080; color: #fff; }
+.ms-cos .cs-sum td { font-weight: 700; background: #ffffe0; }
+.ms-cos .cs-sum b { color: #c00; }
+.ms-cos .cs-how { margin-top: 14px; border: 1px solid #0ff; padding: 8px 10px; font-size: 12px; line-height: 1.8; background: #001a1a; }
+.ms-cos .cs-how b { color: #0ff; }
+.ms-cos .cs-red { color: #f66; }
+.ms-cos .cs-info { margin-top: 10px; border: 2px solid #0f0; background: #002000; color: #0f0; padding: 6px 10px; }
+.ms-cos .cs-fail, .ms-cos .q-fail { margin-top: 10px; border: 2px solid #f00; background: #200; color: #f88; padding: 6px 10px; white-space: pre-wrap; }
+.ms-cos .q-fail { margin: 6px 8px 0; }
+.ms-cos .cs-fail button, .ms-cos .q-fail button { color: #ff0; text-decoration: underline; }
+.ms-cos .cs-ft { margin-top: 14px; text-align: center; color: #aaa; font-size: 11px; line-height: 1.7; }
+.ms-cos .cs-ft span { display: inline-block; border: 1px solid #888; background: #c0c0c0; color: #000; font: bold 10px Arial, sans-serif; padding: 2px 4px; }
+/* 넷스케이프 창 (질문·입금) */
+.ms-cos .cs-win { position: absolute; z-index: 6; background: #c0c0c0; border: 2px outset #fff; box-shadow: 3px 3px 0 #000; color: #000; font: 12px 'Gulim', '굴림', 'Noto Sans KR', sans-serif; }
+.ms-cos .cs-askwin { top: 16px; bottom: 16px; right: 24px; width: 440px; display: flex; flex-direction: column; }
+.ms-cos .cs-wt { display: flex; align-items: center; gap: 6px; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; padding: 3px 4px 3px 6px; }
+.ms-cos .cs-wt b { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-cos .cs-wt button { width: 18px; height: 16px; display: grid; place-items: center; background: #c0c0c0; color: #000; border: 2px outset #fff; font: bold 11px Arial, sans-serif; line-height: 1; }
+.ms-cos .q-hd { padding: 6px 8px; border-bottom: 2px groove #fff; display: flex; align-items: center; gap: 8px; }
+.ms-cos .q-hd .cs-ufo { width: 34px; height: 26px; background: #000040; border: 2px inset #fff; }
+.ms-cos .q-hd b { color: #000080; }
+.ms-cos .q-hd small { display: block; color: #060; }
+.ms-cos .q-card { display: flex; align-items: center; gap: 6px; margin: 6px 8px 0; padding: 3px 6px; background: #fff; border: 2px inset #c0c0c0; }
+.ms-cos .q-card > span { color: #555; font-size: 11px; white-space: nowrap; }
+.ms-cos .q-card .q-x { margin-left: auto; color: #888; }
+.ms-cos .q-lg { flex: 1; min-height: 120px; overflow: auto; margin: 6px 8px 0; background: #fff; border: 2px inset #c0c0c0; padding: 8px; line-height: 1.65; }
+.ms-cos .q-m { margin-bottom: 10px; }
+.ms-cos .q-m b { display: block; }
+.ms-cos .q-me b { color: #008; }
+.ms-cos .q-op b { color: #a0a; }
+.ms-cos .q-m p { margin: 2px 0 0; white-space: pre-wrap; }
+.ms-cos .q-op p { background: #f6f0ff; border: 1px dashed #a0a; padding: 4px 6px; }
+.ms-cos .q-wait p { color: #888; }
+.ms-cos .q-pick { margin: 6px 8px 0; max-height: 140px; overflow: auto; background: #fff; border: 2px outset #fff; }
+.ms-cos .q-pick button { display: block; width: 100%; text-align: left; padding: 4px 6px; border-bottom: 1px dotted #aaa; }
+.ms-cos .q-pick button:hover { background: #000080; color: #fff; }
+.ms-cos .q-pick b { color: #c00; }
+.ms-cos .q-pick p { margin: 0; padding: 6px; }
+.ms-cos .q-in { display: flex; gap: 4px; padding: 8px; }
+.ms-cos .q-in input { flex: 1; min-width: 0; background: #fff; border: 2px inset #c0c0c0; padding: 3px 6px; color: #000; font: inherit; outline: none; }
+.ms-cos .q-in .cs-btn { white-space: nowrap; }
+.ms-cos .cs-dim { position: absolute; inset: 0; z-index: 7; background: rgba(0, 0, 0, .45); display: grid; place-items: center; padding: 16px; }
+.ms-cos .cs-paywin { position: static; width: min(420px, 100%); }
+.ms-cos .cs-wb { padding: 12px; display: grid; gap: 8px; }
+.ms-cos .cs-wb p { margin: 0; }
+.ms-cos .cs-acc { background: #fff; border: 2px inset #c0c0c0; padding: 6px; font-weight: 700; color: #000080; }
+.ms-cos .cs-warn { color: #c00; }
+.ms-cos .cs-wbt { display: flex; gap: 6px; justify-content: flex-end; }
+.ms-cos.ms-m .cs-fr { grid-template-columns: minmax(0, 1fr); }
+.ms-cos.ms-m .cs-title { font-size: 22px; }
+.ms-cos.ms-m .cs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; }
+.ms-cos.ms-m .cs-it { padding: 6px; font-size: 11.5px; }
+.ms-cos.ms-m .cs-pic { width: 72px; height: 72px; }
+.ms-cos.ms-m .cs-pic img { width: 64px; height: 64px; }
+.ms-cos.ms-m .cs-bt { flex-wrap: wrap; }
+.ms-cos.ms-m .cs-askwin { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 78%; }
+/* 백일몽 포인트몰: 사내 쇼핑몰 */
+.ms-bm { background: #eef0f4; color: #1f2430; font: 13.5px 'Pretendard', 'Noto Sans KR', sans-serif; }
+.ms-bm .bp-gnb { background: #1f2a44; height: 34px; display: flex; align-items: center; gap: 16px; padding: 0 24px; color: #aeb6c8; font-size: 12px; }
+.ms-bm .bp-gnb b { color: #f3d9a4; }
+.ms-bm .bp-gnb .r { margin-left: auto; }
+.ms-bm .bp-hd { background: #fff; display: flex; align-items: center; gap: 16px; min-height: 66px; padding: 0 24px; border-bottom: 1px solid #dde1e8; }
+.ms-bm .bp-lg { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 20px; color: #1f2a44; letter-spacing: -.5px; white-space: nowrap; }
+.ms-bm .bp-lg small { font-weight: 600; font-size: 12px; color: #8a93a6; }
+.ms-bm .bp-logo { width: 34px; height: 34px; }
+.ms-bm .bp-me { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.ms-bm .bp-me > b { font-size: 14px; }
+.ms-bm .bp-pt { background: #1f2a44; color: #f3d9a4; border-radius: 8px; padding: 6px 14px; font-weight: 800; font-size: 16px; white-space: nowrap; }
+.ms-bm .bp-pt small { display: block; font-size: 10.5px; color: #aeb6c8; font-weight: 600; }
+.ms-bm .bp-login { margin-left: auto; padding: 8px 16px; border-radius: 6px; background: #1f2a44; color: #fff; font-weight: 700; }
+.ms-bm .bp-wrap { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 20px; padding: 20px 24px; }
+.ms-bm .bp-side { background: #fff; border: 1px solid #dde1e8; border-radius: 8px; padding: 8px 0; align-self: start; display: flex; flex-direction: column; }
+.ms-bm .bp-side button { text-align: left; padding: 9px 16px; color: #596277; border-left: 3px solid transparent; }
+.ms-bm .bp-side button.on { color: #1f2a44; font-weight: 800; background: #f3f5f9; border-left-color: #1f2a44; }
+.ms-bm .bp-ban { background: #fff8e8; border: 1px solid #efdfb8; border-radius: 8px; padding: 10px 14px; color: #7a6431; font-size: 12.5px; margin-bottom: 14px; line-height: 1.6; }
+.ms-bm .bp-info { background: #e8f4ec; border: 1px solid #b9dcc4; border-radius: 8px; padding: 10px 14px; color: #245a36; margin-bottom: 14px; }
+.ms-bm .bp-fail { background: #fdecec; border: 1px solid #f0c0c0; border-radius: 8px; padding: 10px 14px; color: #8a2a2a; margin-bottom: 14px; white-space: pre-wrap; }
+.ms-bm .bp-fail button { text-decoration: underline; }
+.ms-bm h2 { margin: 0 0 12px; font-size: 16px; }
+.ms-bm h2 small { font-size: 12px; color: #8a93a6; font-weight: 500; }
+.ms-bm .bp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.ms-bm .bp-it { position: relative; background: #fff; border: 1px solid #dde1e8; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; }
+.ms-bm .bp-it.on { border-color: #1f2a44; box-shadow: 0 0 0 2px #1f2a44 inset; }
+.ms-bm .bp-pic { height: 120px; display: grid; place-items: center; background: #f3f5f9; border-radius: 6px; }
+.ms-bm .bp-pic img { width: 85px; height: 85px; image-rendering: pixelated; }
+.ms-bm .bp-lim, .ms-bm .bp-sale { position: absolute; top: 20px; left: 20px; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+.ms-bm .bp-lim { background: #f3d9a4; color: #1f2a44; }
+.ms-bm .bp-sale { background: #b0486a; color: #fff; }
+.ms-bm .bp-nm { margin-top: 10px; line-height: 1.35; }
+.ms-bm .bp-ds { flex: 1; margin: 4px 0 0; font-size: 12px; color: #596277; line-height: 1.5; }
+.ms-bm .bp-ds i { color: #7a6431; font-style: normal; }
+.ms-bm .bp-pr { margin-top: 6px; font-size: 12px; color: #8a93a6; font-weight: 600; }
+.ms-bm .bp-pr b { font-weight: 900; font-size: 16px; color: #1f2a44; }
+.ms-bm .bp-pr s { color: #aab; }
+.ms-bm .bp-buy { margin-top: auto; display: block; width: 100%; text-align: center; padding: 8px; border-radius: 6px; background: #1f2a44; color: #fff; font-weight: 700; font-size: 12.5px; }
+.ms-bm .bp-it .bp-buy { margin-top: 12px; }
+.ms-bm .bp-buy:disabled { background: #c8cdd8; color: #596277; cursor: default; }
+.ms-bm .bp-box { margin: 24px; background: #fff; border: 1px solid #dde1e8; border-radius: 8px; padding: 24px; display: grid; gap: 10px; justify-items: center; text-align: center; color: #596277; }
+.ms-bm .bp-main .bp-box { margin: 0; }
+.ms-bm .bp-box p { margin: 0; }
+.ms-bm .bp-box .bp-buy { width: auto; padding: 8px 20px; }
+.ms-bm .bp-none { color: #8a93a6; }
+.ms-bm.ms-m .bp-gnb { padding: 0 12px; }
+.ms-bm.ms-m .bp-hd { padding: 8px 12px; gap: 10px; }
+.ms-bm.ms-m .bp-lg { font-size: 16px; }
+.ms-bm.ms-m .bp-lg small, .ms-bm.ms-m .bp-me > b { display: none; }
+.ms-bm.ms-m .bp-wrap { grid-template-columns: minmax(0, 1fr); padding: 12px; gap: 12px; }
+.ms-bm.ms-m .bp-side { flex-direction: row; overflow-x: auto; padding: 0; scrollbar-width: none; }
+.ms-bm.ms-m .bp-side button { white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent; }
+.ms-bm.ms-m .bp-side button.on { border-bottom-color: #1f2a44; }
+.ms-bm.ms-m .bp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }

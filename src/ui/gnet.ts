@@ -643,7 +643,8 @@ function catLinks(st: GState, unreadDm: number, chips = false): string {
   return `<h6>게시판</h6>${a('', '전체')}${tags}<h6>내 메뉴</h6>${dm}${a('@mine', '내가 쓴 글')}${a('@scrap', '스크랩')}`;
 }
 const writeBtn = (cls = 'bs-w') => `<button class="${cls}" data-action="gn-write">글쓰기</button>`;
-const emptyList = (busy: boolean, text: string) => `<div class="bs-empty"><p>${text}</p><button class="bs-w" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button></div>`;
+// 빈 게시판에서도 글은 쓸 수 있다
+const emptyList = (busy: boolean, text: string) => `<div class="bs-empty"><p>${text}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button>${writeBtn()}</div></div>`;
 
 /** 사이트 머리 */
 function siteHead(site: BoardSite, st: GState, unreadDm: number, mobile: boolean): string {

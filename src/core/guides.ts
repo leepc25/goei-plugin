@@ -12,9 +12,9 @@ import updater from '../data/guides/updater-detailed.txt';
 import updaterCompact from '../data/guides/updater-compact.txt';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext';
 
-export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)' };
+export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)' };
 
 /* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
    여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
@@ -66,6 +66,13 @@ function salmonGuide(): string {
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
 const SALMON_TOPICS = 'Each post is a listing: 팝니다 (selling) or 삽니다 (buying), with the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';
 
+// 쇼핑몰 (2026-11-08 사용자: 사이트마다 지침 따로). 상점 지침의 절을 그대로 쓰고 첫 절(COMMON)만 그 사이트 글로 바꾼다. 본편 표식 절은 뺀다
+const mallGuide = (common: string): string => shop.replace(/\r/g, '')
+  .replace(/@@SECTION COMMON\n[\s\S]*?\n@@END/, `@@SECTION COMMON\n${common}\n@@END`)
+  .replace(/\n*@@SECTION MAIN_TAG\n[\s\S]*?\n@@END\n*/, '\n');
+const COS_COMMON = "You run 우주 쇼핑몰 (cosmic-mall.alien), a 1990s-style personal homepage shop on the hidden side of the ongoing Korean urban-horror roleplay (서울의 이면, 괴이). It claims to sell goods from distant stars; whether that is true is never settled. Its operator signs as 우주인 and writes in heavily broken, machine-translated Korean (왈도체): stiff literal phrasing such as 「~하는 것이다」, 「강하게 추천 하는 것이다」, 「지구인 손님이여」, odd spacing and wrong particles. Make this strong in everything the operator writes and in every item 설명. You are the backend for the mall page, not the narrator: you only decide what is listed and what the operator writes. The \"owner\" is the operator 우주인. Buying is a bank transfer in Korean won to the mall's account; there are no refunds and no returns. Write in Korean. Prices are Korean won as plain integers. Never mention the player's money or inventory (you do not know them). Do not write anything outside the required blocks.";
+const BM_COMMON = "You run 백일몽 포인트몰 (point.baekilmong.intra), the in-house welfare point mall of 백일몽, inside an ongoing Korean urban-horror roleplay (서울의 이면, 괴이). Employees spend Baekilmong points here; each employee earns their own points through their own work and they cannot be exchanged for cash. The mall never hands out, grants or pays points. You are the backend for the mall page, not the narrator: you only decide what is listed. There is no shopkeeper or chat; the \"owner\" line is a short mall notice about the goods in plain corporate Korean (never about points being issued or granted), or empty. Sell what such a company mall would: everyday welfare goods, appliances, health goods, and supplies for anomaly fieldwork as the reference material allows. Write in Korean. Every price is a plain integer in points. Never mention the player's points or inventory (you do not know them). Do not write anything outside the required blocks.";
+
 const DEFAULTS: Record<GuideName, string> = {
   GNet: boardGuide('net'),
   Gal: boardGuide('gal'),
@@ -77,6 +84,8 @@ const DEFAULTS: Record<GuideName, string> = {
   RP: rp.replace(/\r/g, ''),
   Tag: tag.replace(/\r/g, ''),
   Shop: shop.replace(/\r/g, ''),
+  Cos: mallGuide(COS_COMMON),
+  Bm: mallGuide(BM_COMMON),
   Updater: updater.replace(/\r/g, ''),
   UpdaterCompact: updaterCompact.replace(/\r/g, ''),
   Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n`,

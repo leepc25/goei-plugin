@@ -1464,15 +1464,17 @@ if (fixture.globalLore.some(packed)) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: `${shots}/14-gnet-dm-mobile.png` });
     assert.equal(await page.locator('.gn-dm-inline').count(), 1, '모바일 쪽지는 목록 안에서 펼침');
-    await page.click('[data-action="gn-sub"][data-value="board"]');
+    // 모바일 글은 한 화면으로 연다 (사이트 화면, 2026-11-08)
+    await page.click('[data-action="gn-cat"][data-value=""]');
+    await page.click('.gn-row-main[data-value="1846002"]');
     await page.screenshot({ path: `${shots}/14-gnet-post-mobile0.png` });
-    await page.click('.gn-inline [data-action="gn-reply"] >> nth=0');
-    assert.equal(await page.locator('.gn-inline .gn-c-compose').count(), 1, '모바일 답글도 댓글 밑에서');
+    await page.click('.gn-post [data-action="gn-reply"] >> nth=0');
+    assert.equal(await page.locator('.gn-post .gn-c-compose').count(), 1, '모바일 답글도 댓글 밑에서');
     await page.screenshot({ path: `${shots}/14-gnet-post-mobile.png` });
     await page.click('[data-action="gn-cancel"]');
-    await page.click('.gn-row.on .gn-row-main');
+    await page.click('[data-action="gn-back"]');
     await page.screenshot({ path: `${shots}/14-gnet-board-mobile.png` });
-    assert.equal(await page.locator('.gn-inline').count(), 0, '다시 누르면 접힘');
+    assert.equal(await page.locator('.gn-post').count(), 0, '목록으로');
     await page.click('[data-action="gn-sub"][data-value="dm"]');
     await page.setViewportSize(vp);
   }
@@ -1481,7 +1483,8 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(retry[3].content.includes('Validation error!'));
   assert.ok(retry[0].content.includes('ROLE BINDING'));
   assert.ok(retry[1].content.includes('Original forum post #1846002'), '쪽지 출처 유지');
-  // 글쓰기
+  // 글쓰기 (글쓰기 단추는 게시판 목록에 있다)
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await page.click('[data-action="gn-write"]');
   await page.fill('[data-input="gn-draft"]', '관람차 본 사람 더 있음?');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ post: { title: '관람차 목격 모음', content: '나 말고 본 사람 손' }, comments: [{ author: 'ㅁㄴㅇㄹ', content: '손', parent: 0 }], incoming: [], activity: [] }) }]; });
@@ -1511,8 +1514,9 @@ if (fixture.globalLore.some(packed)) {
   const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.ok(!off.some((m) => String(m.content).includes('[MODULE_CONTEXT_BEGIN]')), '본편 반영 끔');
   // 내 글 삭제 (두 번 눌러야)
-  await featSet(page, 'set:gnet');
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await featSet(page, 'set:gnet'); // 설정 창 닫기
+  await page.waitForSelector('.gn');
+  if (!(await page.locator('[data-action="gn-del-post"]').count())) await page.click('.gn-row-main[data-value="1846003"]');
   await page.waitForSelector('[data-action="gn-del-post"]');
   await page.click('[data-action="gn-del-post"]');
   await page.click('[data-action="gn-del-post"]');
