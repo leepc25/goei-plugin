@@ -9,8 +9,8 @@
 //   --start board,picker  어느 화면에서 시작하나 (기본 board,picker,items,shop). board = 채팅 시작 뒤 상황판, picker = 시작 화면,
 //                         items = 상황판 + 소지품(장착·소모·손상·고장), shop = 그 상태로 채팅 속 가게 카드를 눌러 연 상점
 //   --depth n             누른 뒤 새로 열린 화면을 몇 단계까지 따라 들어가나 (기본 6)
-//   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 5, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
-//   --explore-values n    같은 data-action 중 몇 개의 값까지 눌러서 열린 화면 안으로 따라 들어가나 (기본 2. 같은 꼴 화면이 수백 번 반복되는 것 막기)
+//   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 25, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
+//   --explore-values n    같은 data-action 중 몇 개의 값까지 열린 화면 안으로 따라 들어가나 (기본 0 = 제한 없음). 같은 꼴 화면(보이는 동작 이름 묶음이 같음)은 늘 한 번만 들어간다
 //   --max-clicks n        화면 크기마다 최대로 누를 수 (기본 0 = 끝까지)
 //   --workers n           동시에 띄울 페이지 수 (기본 CPU 수)
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
@@ -27,7 +27,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: Math.max(2, os.cpus().length), out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 25, exploreValues: 0, maxClicks: 0, workers: Math.max(2, os.cpus().length), out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -58,8 +58,9 @@ const fx = loadFixture(resolve(ROOT, opt.fixture));
 // 어느 판으로 돌렸나: 브랜치·커밋·고친 채 안 올린 파일·빌드가 소스보다 옛것인지 (점검 중에도 코드는 계속 바뀐다, 11-08 사용자)
 import { execSync as sh } from 'node:child_process';
 const git = (c) => { try { return sh(`git ${c}`, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
-const newestSrc = (() => { let m = 0; const w = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); const st = statSync(p); if (st.isDirectory()) w(p); else if (st.mtimeMs > m) m = st.mtimeMs; } }; w(resolve(ROOT, 'src')); return m; })();
-const VERSION = { branch: git('rev-parse --abbrev-ref HEAD'), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
+// 빌드가 옛것인지: 마지막으로 src 를 바꾼 커밋 시각과, 커밋 안 한 채 고친 src 파일 시각 중 늦은 것보다 dist 가 먼저면 옛 빌드 (빌드가 만드는 src/data 파일은 git 이 안 잡으니 빠진다)
+const newestSrc = (() => { let m = Number(git('log -1 --format=%ct -- src')) * 1000 || 0; for (const l of git('status --porcelain -- src').split('\n').filter(Boolean)) { try { m = Math.max(m, statSync(resolve(ROOT, l.slice(3).trim())).mtimeMs); } catch {} } return m; })();
+let VERSION = { branch: git('rev-parse --abbrev-ref HEAD'), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
 if (VERSION.distOld) console.warn('[click-audit] 경고: dist/ 가 src/ 보다 옛것이에요. npm run build 를 먼저 돌리세요 (옛 빌드를 누르게 됨)');
 const LOOKS = distPack('goei-data-looks');
 const ITEMS = (() => { try { return distPack('goei-data-items'); } catch { return null; } })();
@@ -424,7 +425,7 @@ const skippedVals = {};
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
 if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.json'), 'utf8')); for (const r of j.results) if (r.watch) r.flags = [...r.flags.filter((x) => /재현 실패|못 찾음|가려져|꺼진|안 눌림|도구 오류/.test(x)), ...flagsOf(r)];
-  results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; }
+  results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; if (j.version) VERSION = j.version; if (j.minutes != null) opt.minutes = j.minutes; }
 const browser = opt.reportOnly ? null : await launch();
 for (const vp of opt.reportOnly ? [] : opt.vp) {
   // 누른 열쇠는 화면 크기마다 하나로 센다: 시작 화면에서 출발해 상황판에 들어가도 이미 누른 것은 다시 안 누른다
@@ -432,6 +433,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
   const perAct = {};
   const offSeen = new Set();
   const exploredVals = {};
+  const exploredSigs = new Set(); // 이미 들어가 본 화면 꼴 (보이는 동작 이름 묶음)
   for (const startKind of opt.start) {
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
@@ -467,7 +469,12 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         results.push(rec);
         n++;
         const ev = job.action ? (exploredVals[job.action] = (exploredVals[job.action] || 0) + 1) : 1;
-        if (rec.newList && job.path.length + 1 < opt.depth && (!opt.exploreValues || ev <= opt.exploreValues)) {
+        // 새로 열린 화면의 꼴(보이는 동작 이름 묶음, 값 빼고)이 이미 들어가 본 것이면 다시 안 들어간다:
+        // 지역 250곳·위키 항목처럼 값만 다른 같은 화면은 한 번만, 설정 페이지처럼 생김새가 다른 화면은 다 들어간다
+        const sigKey = rec.newList ? [...new Set(rec.newList.filter((x) => !x.behind).map((x) => x.action || x.tag + '.' + x.cls))].sort().join(' ') : '';
+        const seenSig = sigKey && exploredSigs.has(sigKey);
+        if (rec.newList && !seenSig && job.path.length + 1 < opt.depth && (!opt.exploreValues || ev <= opt.exploreValues)) {
+          exploredSigs.add(sigKey);
           const step = { key: job.key, nth: job.nth };
           const path = [...job.path, step];
           states.push({ vp, start: startKind, path: path.map((p) => p.key), shot: rec.shots?.[2], audit: rec.audit });
@@ -517,7 +524,7 @@ const never = [...srcActs].filter((a) => !pressedActs[a]).sort();
 // ---- 보고서 ------------------------------------------------------------------------------------------------------
 const L = [];
 const rel = (p) => relative(OUT, resolve(SHOTS, p));
-L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
+L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${opt.minutes ?? Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
 L.push('이 기록은 사실만 적는다. 이상한지·사용자 결정과 맞는지는 점검하는 Claude가 캡처를 열어 보고 판단한다 (docs/눌러보기_전수점검.md).', '');
 L.push('## 1. 이상 반응 (캡처 확인할 곳)', '');
 const flagged = results.filter((r) => r.flags.length && !r.disabled);
@@ -559,5 +566,5 @@ L.push(`- 코드에 있는 data-action ${srcActs.size}개 중 한 번도 못 누
 if (Object.keys(skippedVals).length) L.push(`- 같은 단추의 다른 값이라 안 누른 수 (--per-action ${opt.perAction}): ${Object.entries(skippedVals).sort((a, b) => b[1] - a[1]).map(([a, n]) => `\`${a}\` ${n}`).join(' · ')}`, '');
 for (const vp of opt.vp) for (const other of opt.vp) if (vp !== other) { const only = [...(keysBy[vp] || [])].filter((k) => !keysBy[other]?.has(k)); if (only.length) L.push(`- ${vp}에만 있고 ${other}에는 없는 것 ${only.length}개: ${only.slice(0, 40).map((x) => `\`${x}\``).join(' ')}${only.length > 40 ? ' …' : ''}`); }
 writeFileSync(resolve(OUT, 'report.md'), L.join('\n') + '\n');
-writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ version: VERSION, opt, results, states, incons, selLooks: Object.fromEntries(Object.entries(selLooks)), never }, null, 1));
+writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ version: VERSION, minutes: opt.minutes ?? Math.round((Date.now() - t0) / 60000), opt, results, states, incons, selLooks: Object.fromEntries(Object.entries(selLooks)), never }, null, 1));
 log(`끝: 누른 수 ${results.filter((r) => r.shots).length}, 이상 반응 ${flagged.length}, 못 누른 data-action ${never.length} · ${relative(ROOT, OUT)}/report.md`);
