@@ -17,15 +17,14 @@ COMBAT = set('1 3 3_0 4 5 5_1 7 9 10 11 12 13 14 15 16 16_1 17 18 18_1 18_2 18_3
 COMBAT |= set('2 28 29 32 35 116 142 143 144 145 147 157 168'.split())
 FACE = 64
 # 대전 배경으로 쓰는 필드 장면 (화장실·샤워실 빼고). 이름표는 src/ui/versus.ts VS_BG_NAMES
-VS_BGS = ['street', 'lobby', 'f2', 'f3', 'b1', 'b2', 'training', 'clinic', 'office', 'lounge', 'infirmary',
-          'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_b1',
-          'jr_entry']   # 중림 지하 셋(jr_b1·jr_alley·jr_b2)은 뺌 (11-08 사용자: 이음새 기둥이 3화면 무대에서 시야를 가린다)
+VS_BGS = ['street', 'f3', 'b2', 'training', 'clinic', 'by_street', 'by_f13', 'sdra_street',
+          'jr_entry']   # 관리국 2층·지하 1층·종합대응팀·협회 지하 1층(특색 없음), 휴게실·연구실·백일몽 로비·의무실·관리국 로비(무대 짧음)도 뺌 (11-08 사용자)   # 중림 지하 셋(jr_b1·jr_alley·jr_b2)은 뺌 (11-08 사용자: 이음새 기둥이 3화면 무대에서 시야를 가린다)
 # 무대 (11-08 사용자): 도트 1.4배에서 한 화면 = 월드 914. 무대는 2.5~3화면 → 월드 최대 2743 (배경이 짧으면 배경 전체)
 VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
 #   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
 #   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
-VS_CFG = {'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
+VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 0.97, 'yF': 760}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
           'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770}, 'office': {'yF': 826}}
 CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
 
@@ -82,19 +81,26 @@ def fit_stage(v, c):
     seg = min(b - a, VS_LEN / s)
     cx = min(max(c.get('cx', (a + b) / 2), a + seg / 2), b - seg / 2)
     x0, x1 = cx - seg / 2, cx + seg / 2
+    # 사용자 지정 (11-08): left=그림 폭 비율 지점부터 오른쪽으로, right=그 지점부터 왼쪽으로 잡고 반대쪽을 자름
+    if 'left' in c:
+        x0 = c['left'] * v['w']; x1 = min(v['w'], x0 + VS_LEN / s)
+    elif 'right' in c:
+        x1 = c['right'] * v['w']; x0 = max(c.get('leftmin', 0) * v['w'], x1 - VS_LEN / s)
     pF = persp(yF, v)
-    # 대기 자리: 무대 양 끝에서 안쪽으로 70·180(월드), 뒤쪽 줄에서 바닥 위인 가장 뒤 자리 (안 되면 조금씩 앞으로)
+    # 대기 자리: 무대 양 끝에서 안쪽으로 220·420(월드), 뒤쪽 줄에서 바닥 위인 가장 뒤 자리 (안 되면 조금씩 앞으로)
     spots = [[], []]
     for side in (0, 1):
-        for d in (70, 180):
-            xw = d if side == 0 else (x1 - x0) * s - d
-            xi = x0 + xw / s
-            for f in (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
-                y = L0 + f * (L1 - L0)
-                if y < yF - 10 and ok(xi, y):
-                    spots[side].append({'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)}); break
-            else:
-                spots[side].append({'x': round(xw), 'dy': -150, 'k': 0.72, 'off': True})
+        for d in (220, 420):  # 끝에서 떨어뜨리고 둘 사이도 띄움 (11-08 사용자)
+            got = None
+            for dd in range(d, d + 101, 10):  # 바닥이 아니면 안쪽으로 조금씩
+                xw = dd if side == 0 else (x1 - x0) * s - dd
+                xi = x0 + xw / s
+                for f in (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
+                    y = L0 + f * (L1 - L0)
+                    if y < yF - 10 and ok(xi, y):
+                        got = {'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)}; break
+                if got: break
+            spots[side].append(got or {'x': round(d if side == 0 else (x1 - x0) * s - d), 'dy': -150, 'k': 0.72, 'off': True})
     return yF, s, x0, x1, spots
 
 def persp(y, v):

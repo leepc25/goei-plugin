@@ -1629,7 +1629,7 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
     list.forEach((name, k) => {
       // 무대 양 끝에 겹치지 않게 나란히 (11-08 사용자), 싸우는 줄보다 뒤. 배경이 있으면 그 장면의 뒤 줄 높이·원근 (tools/build_vs_packs.py)
       // 배경 장면: tools/build_vs_packs.py fit_stage 가 필드 바닥·막힘 자료로 잡은 자리 (11-08 사용자: 배경 물건 무시하고 세우지 말 것)
-      const sp = view.vsBg?.bench.spots[side]?.[k], L = view.vsLen, d = 70 + k * 110;
+      const sp = view.vsBg?.bench.spots[side]?.[k], L = view.vsLen, d = 220 + k * 200;
       const x = sp ? sp.x : side === 0 ? d : L - d, y = VS_LINE + (sp ? sp.dy : -150), bk = sp ? sp.k : BENCH_K;
       const dir: 1 | -1 = side === 0 ? 1 : -1;
       const key = `${side}|${name}`;
