@@ -23,7 +23,9 @@ export const versus = {
   /** 서바이벌: 쓰러뜨린 수 */
   kills: 0,
   /** 판 끝 알림: 쓰러짐 뒤 잠깐, 이긴 쪽 */
-  ko: null as null | { side: Side; t: number; next: 'over' | 'next' },
+  ko: null as null | { side: Side; t: number; next: 'over' | 'next'; kind?: 'ko' | 'time' | 'perfect' },
+  /** 판 남은 시간 (초, 1:1·팀전). 0 이 되면 남은 체력 비율이 높은 쪽이 이긴다 */
+  clock: 99,
   /** 판 시작 알림 (ROUND n → FIGHT) 남은 초 */
   intro: 0,
   /** 경기 끝: 이긴 쪽, 남은 표시 초 */
@@ -40,6 +42,8 @@ export const WINS_TO_TAKE = 2;
 export const KO_SEC = 2.5;
 export const OVER_SEC = 3;
 export const INTRO_SEC = 1.6;
+/** 판 시간 (대전게임 관례 99초) */
+export const CLOCK_SEC = 99;
 
 /** 지금 나와 있는 1P·상대 이름 */
 export const fighterOf = (side: Side): string => versus.team[side][versus.cur[side]] ?? '';
@@ -56,6 +60,7 @@ export function newMatch(mode: VsMode, me: string[], foe: string[]): void {
   versus.ko = null;
   versus.over = null;
   versus.intro = INTRO_SEC;
+  versus.clock = CLOCK_SEC;
   versus.hold = false;
 }
 

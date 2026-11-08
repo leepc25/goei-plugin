@@ -343,6 +343,20 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
   if (row.dir === 'back') chair();
   return true;
 }
+/** 원근 없이 정한 배율로 한 장 그리기 (대전 고르기·VS 화면의 큰 전신). x,y = 발 가운데. 그림 없으면 false */
+export function drawCharFrame(c: CanvasRenderingContext2D, nameOrKey: string, id: string, f: number, x: number, y: number, dir: 1 | -1, k: number): boolean {
+  const a = charArt(nameOrKey), m = a?.A[id], im = a?.IMG[id];
+  if (!a || !m || !im) return false;
+  f = ((f % m.n) + m.n) % m.n;
+  const flip = (a.cfg.dir === 'W' || a.cfg.dir === 'SW') ? dir > 0 : dir < 0;
+  c.save();
+  c.imageSmoothingEnabled = false;
+  c.translate(Math.round(x), Math.round(y));
+  c.scale(flip ? -k : k, k);
+  c.drawImage(im, f * m.cw, 0, m.cw, m.ch, -Math.round(m.w / 2) + m.ox, -groundOf(id, m, f) + m.oy, m.cw, m.ch);
+  c.restore();
+  return true;
+}
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함) */
 export function charTop(nameOrKey: string): number {
   const a = charArt(nameOrKey), m = a?.A['1'];

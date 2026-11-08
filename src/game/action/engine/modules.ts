@@ -9,7 +9,7 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar, drawPixelCard, pixelText, PIXEL_CARD_W, type SkillIcon } from '../ui/pixelHud';
+import { drawGuardBar, drawPixelCard, PIXEL_CARD_W, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
 import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
@@ -36,7 +36,8 @@ import { FighterAi } from '../fighter/ai';
 import { charArt, charBody, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale, TICK_HZ } from './contract';
 import { mountTalk } from '../../talk';
-import { createGameAudio } from '../audio';
+import { createGameAudio, type SfxId } from '../audio';
+import { PIXEL_FONT } from '../ui/kit';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { hqMap } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
@@ -915,6 +916,7 @@ export interface Wiring {
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
   setHudItemIcon(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
+  vsSay = (id) => { if (view.clear) audio.play(id); };
   let game: Game | null = null;
   /** 필드 입장 판정. 막히면 이유를 보이고 「밖에 있어요」로 고칠 수 있다. 들어가도 되면 true */
   async function gate(): Promise<boolean> {
@@ -1615,6 +1617,57 @@ const VS_HP = 3;
  *  칸 아래: 1:1 은 이긴 판 표시 두 칸, 팀전은 남은 사람 칸, 서바이벌은 쓰러뜨린 수. 가운데: ROUND n → FIGHT, K.O., 승리/패배 */
 const vsSide = [{ trail: -1, last: -1, hurt: 0 }, { trail: -1, last: -1, hurt: 0 }];
 let vsT = 0;
+const vsBanner = { key: '', at: 0 };
+const vsCombo = { n: 0, at: 0 };
+let vsClockSay = -1;
+/** 알림 소리 (engineModules 가 audio 로 이어 둔다) */
+let vsSay: ((id: SfxId) => void) | null = null;
+/** 대전 글자: 도트 글꼴을 위→아래 두 색으로 칠하고 굵은 검은 테두리 + 아래 그림자 (본문 위에서도 읽히게) */
+const fgCache = new Map<string, HTMLCanvasElement>();
+function fgText(s: string, size: number, col: [string, string]): HTMLCanvasElement {
+  const key = `${s}|${size}|${col}`, hit = fgCache.get(key);
+  if (hit) return hit;
+  const f = `700 ${size}px "${PIXEL_FONT}", monospace`;
+  const r = Math.max(2, Math.round(size / 18)), sh = Math.max(2, Math.round(size / 14));
+  const m = document.createElement('canvas').getContext('2d')!;
+  m.font = f;
+  const tw = Math.ceil(m.measureText(s).width);
+  const W = tw + 2 * r + 2, H = size + 2 * r + sh + 4;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const g = cv.getContext('2d')!;
+  g.font = f; g.textBaseline = 'top'; g.fillStyle = '#fff';
+  g.fillText(s, r + 1, r + 1);
+  const d = g.getImageData(0, 0, W, H), px = d.data;
+  const on = new Uint8Array(W * H);
+  let y0 = H, y1 = 0;
+  for (let i = 0; i < on.length; i++) if (px[i * 4 + 3] > 110) { on[i] = 1; const y = (i / W) | 0; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const hex2 = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [a, b] = [hex2(col[0]), hex2(col[1])];
+  const near = (x: number, y: number, rr: number) => {
+    for (let dy = -rr; dy <= rr; dy++) for (let dx = -rr; dx <= rr; dx++) {
+      if (dx * dx + dy * dy > rr * rr + rr) continue;
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < W && ny < H && on[ny * W + nx]) return true;
+    }
+    return false;
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, o = i * 4;
+    if (on[i]) {
+      const t = y1 > y0 ? Math.min(1, Math.max(0, (y - y0) / (y1 - y0))) : 0;
+      // 윗줄 한 도트는 밝게 (빛 받는 테)
+      const lit = !on[i - W] ? 0.35 : 0;
+      for (let k = 0; k < 3; k++) px[o + k] = Math.min(255, Math.round(a[k] + (b[k] - a[k]) * t + (255 - a[k]) * lit));
+      px[o + 3] = 255;
+    } else if (near(x, y, r)) { px[o] = px[o + 1] = px[o + 2] = 0; px[o + 3] = 255; }
+    else if (y >= sh && near(x, y - sh, r)) { px[o] = 40; px[o + 1] = 10; px[o + 2] = 10; px[o + 3] = 200; }
+    else px[o + 3] = 0;
+  }
+  g.putImageData(d, 0, 0);
+  if (document.fonts?.check?.(f) !== false) fgCache.set(key, cv);
+  return cv;
+}
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const dt = 1 / 60;
   vsT += dt;
@@ -1657,27 +1710,77 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       if (on) { c.fillStyle = 'rgba(255,255,255,.55)'; c.fillRect(mx, my, sz, 3); }
     });
     if (versus.mode === 'survival' && i === 0) {
-      const t = pixelText(`웨이브 ${Math.max(1, surv.wave)} · ${versus.kills} 쓰러뜨림`, '#ffd35a', 22);
-      c.drawImage(t, Math.round(x + 90), Math.round(end + 6));
+      const t1 = fgText(`WAVE ${Math.max(1, surv.wave)}`, 22, ['#ffffff', '#ffc23a']), t2 = fgText(`${versus.kills} KO`, 18, ['#ffd0a0', '#ff5a2a']);
+      const bw = t1.width + t2.width + 22;
+      c.fillStyle = 'rgba(0,0,0,.6)'; c.fillRect(Math.round(x + 86), Math.round(end + 4), bw, t1.height + 4);
+      c.drawImage(t1, Math.round(x + 90), Math.round(end + 6));
+      c.drawImage(t2, Math.round(x + 98 + t1.width), Math.round(end + 6 + t1.height - t2.height));
     }
   };
   one(0, w.player, 16);
   one(1, foe, W - 16 - cardW);
   if (versus.mode === 'survival' && !foe) vsSide[1].last = -1;   // 다음에 나오는 상대 칸은 새로
-  // 가운데 알림
-  const banner = (text: string, color: string, size = 66) => {
-    const t = pixelText(text, color, size);
-    c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(top + (H - top) * 0.32 - t.height / 2));
-  };
-  if (versus.over && versus.mode === 'survival') banner(`웨이브 ${surv.wave} · ${versus.kills} 쓰러뜨림`, '#ffd35a', 66);
-  else if (versus.over) banner(versus.over.side === 0 ? '승리' : '패배', versus.over.side === 0 ? '#ffd35a' : '#e0503c', 88);
-  else if (versus.ko) banner('K.O.', '#ff6a4a', 88);
+  // 가운데 시간 (1:1·팀전): 두 칸 사이, 자리가 모자라면 칸 아래 가운데
+  if (versus.mode !== 'survival') {
+    const sec = Math.ceil(versus.clock), low = sec <= 10 && !versus.ko && !versus.over;
+    const t = fgText(String(sec).padStart(2, '0'), 40, low ? ['#ffb0a0', '#ff2a2a'] : ['#ffffff', '#ffc23a']);
+    const gap = W - 2 * (16 + cardW);
+    const bw = Math.max(t.width + 16, 64), bh = t.height + 14;
+    const bx = Math.round(W / 2 - bw / 2), by = gap >= bw + 8 ? top : top + 96;
+    c.fillStyle = 'rgba(0,0,0,.72)'; c.fillRect(bx, by, bw, bh);
+    c.fillStyle = '#ffc23a'; c.fillRect(bx, by, bw, 2); c.fillRect(bx, by + bh - 2, bw, 2);
+    if (!low || Math.floor(vsT * 4) % 2 === 0) c.drawImage(t, Math.round(W / 2 - t.width / 2), by + 7);
+    const tl = fgText('TIME', 11, ['#c9cfdf', '#8a93ad']);
+    c.drawImage(tl, Math.round(W / 2 - tl.width / 2), by + bh + 2);
+    if (low && sec !== vsClockSay && sec > 0) { vsClockSay = sec; vsSay?.('timerWarn'); }
+  }
+  // 연타 수 (1P): 두 번째 맞힘부터 왼쪽에 「N HIT」, 늘 때마다 튄다
+  const combo = (w.player as unknown as { combo?: number }).combo ?? 0;
+  if (combo !== vsCombo.n) { if (combo > vsCombo.n) vsCombo.at = vsT; vsCombo.n = combo; }
+  if (combo >= 2) {
+    const pop = Math.max(0, 1 - (vsT - vsCombo.at) / 0.12);
+    const num = fgText(String(combo), 64, ['#ffffff', '#ffb02a']), hit = fgText('HIT', 28, ['#ffe9a0', '#ff6a2a']);
+    const sc = 1 + pop * 0.5, nx = 22, ny = Math.round(top + (H - top) * 0.3);
+    c.drawImage(num, nx, Math.round(ny - (num.height * (sc - 1)) / 2), Math.round(num.width * sc), Math.round(num.height * sc));
+    c.drawImage(hit, nx + Math.round(num.width * sc) + 4, ny + num.height - hit.height - 4);
+  }
+  // 가운데 알림 (대전게임 관례: 띠 위에 큰 글자가 밀려 들어오거나 찍힌다)
+  let key = '', text = '', sub = '', col: [string, string] = ['#ffffff', '#ffc23a'], size = 72, anim: 'slide' | 'stamp' = 'stamp', say: SfxId | null = null;
+  if (versus.over && versus.mode === 'survival') { key = 'sover'; text = `WAVE ${surv.wave}`; sub = `${versus.kills}명 쓰러뜨림`; col = ['#ffffff', '#ffc23a']; say = 'down'; }
+  else if (versus.over) { const win = versus.over.side === 0; key = `over${win}`; text = win ? '승리' : '패배'; sub = win ? 'YOU WIN' : 'YOU LOSE'; col = win ? ['#fff6c0', '#ffb02a'] : ['#c0d0ff', '#4a6aff']; size = 88; say = win ? 'levelUp' : 'down'; }
+  else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; sub = k2 === 'perfect' ? 'PERFECT' : ''; col = ['#ffd0a0', '#ff2a1a']; size = k2 === 'time' ? 64 : 104; say = 'superHit'; }
   else if (versus.intro > 0) {
-    const label = versus.mode === 'survival' ? '서바이벌' : `ROUND ${versus.round}`;
-    banner(versus.intro > 0.6 ? label : 'FIGHT!', versus.intro > 0.6 ? '#e6e4dc' : '#ffd35a');
+    if (versus.intro > 0.6) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; col = ['#ffffff', '#c9d4ff']; size = 60; anim = 'slide'; say = 'ding'; }
+    else { key = 'fight'; text = 'FIGHT!'; col = ['#fff6c0', '#ff7a1a']; size = 92; say = 'superStart'; }
   } else if (versus.mode === 'survival' && surv.bannerT > 0) {
     const boss = waveOf(surv.wave).boss;
-    banner(`웨이브 ${surv.wave}${boss ? ' · 대장' : ''}`, boss ? '#ff8a5a' : '#e6e4dc');
+    key = `w${surv.wave}`; text = `WAVE ${surv.wave}`; sub = boss ? '대장 등장' : ''; col = boss ? ['#ffd0a0', '#ff3a1a'] : ['#ffffff', '#c9d4ff']; size = 60; anim = 'slide'; say = boss ? 'bossRoar' : 'enemySpawn';
+  }
+  if (key !== vsBanner.key) { vsBanner.key = key; vsBanner.at = vsT; if (say) vsSay?.(say); }
+  if (key) {
+    const e = vsT - vsBanner.at;
+    const t = fgText(text, size, col);
+    const cy = Math.round(top + (H - top) * 0.34);
+    // 띠: 가운데에서 양옆으로 펼쳐진다
+    const band = Math.min(1, e / 0.12), bh = t.height + 18 + (sub ? 26 : 0);
+    c.fillStyle = 'rgba(0,0,0,.55)';
+    c.fillRect(Math.round(W / 2 - (W / 2) * band), cy - Math.round(bh / 2), Math.round(W * band), bh);
+    c.fillStyle = col[1]; c.globalAlpha = 0.9;
+    c.fillRect(Math.round(W / 2 - (W / 2) * band), cy - Math.round(bh / 2), Math.round(W * band), 2);
+    c.fillRect(Math.round(W / 2 - (W / 2) * band), cy + Math.round(bh / 2) - 2, Math.round(W * band), 2);
+    c.globalAlpha = 1;
+    let sc = 1, dx = 0, dy = 0;
+    if (anim === 'slide') dx = Math.round((1 - Math.min(1, e / 0.18)) ** 2 * W * 0.6);
+    else { sc = 1 + Math.max(0, 1 - e / 0.14) * 1.6; if (e < 0.3 && key.startsWith('ko')) { dx = Math.round((Math.random() - 0.5) * 10); dy = Math.round((Math.random() - 0.5) * 8); } }
+    const tw = Math.round(t.width * sc), th = Math.round(t.height * sc);
+    const ty = cy - Math.round(bh / 2) + 9 + Math.round((t.height - th) / 2);
+    c.drawImage(t, Math.round(W / 2 - tw / 2) + dx, ty + dy, tw, th);
+    if (sub && e > 0.2) {
+      const st = fgText(sub, 22, ['#ffffff', '#ffd35a']);
+      c.drawImage(st, Math.round(W / 2 - st.width / 2), cy + Math.round(bh / 2) - st.height - 6);
+    }
+    // 찍히는 순간 번쩍
+    if (anim === 'stamp' && e < 0.08) { c.fillStyle = `rgba(255,255,255,${0.35 * (1 - e / 0.08)})`; c.fillRect(0, cy - bh, W, bh * 2); }
   }
   c.restore();
 }

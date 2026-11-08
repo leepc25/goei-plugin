@@ -3,7 +3,7 @@
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
 import { view } from './view';
-import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, type Side } from './versus';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -409,16 +409,22 @@ export class Game {
         if (view.clear) {
           // 서바이벌은 상대가 다 쓰러져도 판이 끝나지 않는다 (웨이브가 이어짐, engine/survival.ts)
         const foeDown = versus.mode !== 'survival' && w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
-          if (!versus.ko && ((w.ended && versus.mode !== 'survival') || foeDown || w.player.hp <= 0)) {
-            const side: Side = w.player.hp > 0 && foeDown ? 0 : 1;
-            const foe = w.bodies.find((b) => b.team === 'enemy');
+          // 판 시간 (서바이벌은 없음): 다 되면 남은 체력 비율이 높은 쪽 승 (같으면 1P)
+          if (!versus.ko && versus.mode !== 'survival') versus.clock = Math.max(0, versus.clock - 1 / TICK_HZ);
+          const timeUp = !versus.ko && versus.mode !== 'survival' && versus.clock <= 0;
+          if (!versus.ko && ((w.ended && versus.mode !== 'survival') || foeDown || w.player.hp <= 0 || timeUp)) {
+            const foe = w.bodies.find((b) => b.team === 'enemy' && b.alive && b.hp > 0) ?? w.bodies.find((b) => b.team === 'enemy');
             const ratio = (b: { hp: number; hpMax: number } | undefined) => (b && b.hpMax > 0 ? Math.max(0, b.hp / b.hpMax) : 0);
-            versus.ko = { side, t: KO_SEC, next: roundEnd(side, [ratio(w.player), ratio(foe)]) };
+            const rp = ratio(w.player), rf = ratio(foe);
+            const side: Side = timeUp && w.player.hp > 0 && !foeDown ? (rp >= rf ? 0 : 1) : w.player.hp > 0 && foeDown ? 0 : 1;
+            const win = side === 0 ? rp : rf;
+            const kind = timeUp && w.player.hp > 0 && !foeDown ? 'time' : win >= 0.999 ? 'perfect' : 'ko';
+            versus.ko = { side, t: KO_SEC, kind, next: roundEnd(side, [rp, rf]) };
           } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) <= 0) {
             const { side, next } = versus.ko;
             versus.ko = null;
             if (next === 'over') versus.over = { side, t: OVER_SEC };
-            else { versus.intro = INTRO_SEC; this.start_new(this.run?.stageId); }
+            else { versus.intro = INTRO_SEC; versus.clock = CLOCK_SEC; this.start_new(this.run?.stageId); }
           }
           return;
         }
