@@ -11,8 +11,8 @@ declare const __LOOKS_PACK__: string | undefined;
 export const LOOKS_PACK: PackSpec = { name: 'goei-data-looks', label: '인물 모습', expect: expectOf(typeof __LOOKS_PACK__ === 'string' ? __LOOKS_PACK__ : undefined) };
 
 export const LOOK_KEY = '$st_look';
-/** 대기 동작 한 장 길이 (필드 FIELD_CLIP idle 과 같은 0.6초) */
-export const LOOK_FRAME_SEC = 0.6;
+/** 대기 동작 한 장 길이. 필드 FIELD_CLIP idle(0.6초)의 1.5배 빠르기 (사용자 2026-11-08) */
+export const LOOK_FRAME_SEC = 0.4;
 
 export type LookGender = '남' | '여';
 export const LOOK_GENDERS: LookGender[] = ['남', '여'];
