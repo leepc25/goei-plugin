@@ -11,8 +11,8 @@ import { refreshUseBox } from '../host/usebox';
 import { itemIconStatus, itemIconUrl } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
-  addItem, addUse, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemLeft, itemSlots, itemUseVars, itemsVars, liveItems, mergeItems,
-  readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, unequipItem, updateItem,
+  addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
+  readItemUse, readItems, removeItem, searchItems, setItemLeft, STATE_LABEL, lineWeight, totalWeight, unequipItem, updateItem, weightText,
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
 import { findStatusTags } from '../core/world/status';
@@ -39,12 +39,14 @@ export const itemsUi = {
   q: '',
   open: '',
   mode: 'view' as 'view' | 'edit' | 'merge' | 'add' | 'drop',
+  /** 버리기 띠에 끌어다 놓아 연 확인창: 취소하면 물건 팝업으로 가지 않고 닫는다 (2026-11-08 사용자) */
+  dragDrop: false,
   notice: '',
   info: '',
 };
 
 export function resetItems(): void {
-  Object.assign(itemsUi, { sub: 'items', view: 'grid', q: '', open: '', mode: 'view', notice: '', info: '' });
+  Object.assign(itemsUi, { sub: 'items', view: 'grid', q: '', open: '', mode: 'view', dragDrop: false, notice: '', info: '' });
 }
 export const itemsNav = (): ItemsNav => ({ sub: itemsUi.sub, view: itemsUi.view, open: itemsUi.open });
 export function applyItemsNav(n: ItemsNav): void {
@@ -60,9 +62,9 @@ export function itemPic(it: { name: string; icon?: string }): string {
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 
-/** 판정 글: 「무기 · 사용 · 남은 3 · 손상」 */
+/** 판정 글: 「무기 · 사용 · 남은 3 · 1.2kg · 손상」 */
 export function traitsLine(it: Item, left: number | undefined): string {
-  return [it.equip ? EQUIP_LABEL[it.equip] : '', left !== undefined ? `남은 ${left}` : it.use ? '사용' : '', it.state !== 'ok' ? STATE_LABEL[it.state] : ''].filter(Boolean).join(' · ');
+  return [it.equip ? EQUIP_LABEL[it.equip] : '', left !== undefined ? `남은 ${left}` : it.use ? '사용' : '', it.weight !== undefined ? (it.uses !== undefined ? `${weightText(lineWeight(it, left)!)} (1개 ${weightText(it.weight)})` : weightText(it.weight)) : '', it.state !== 'ok' ? STATE_LABEL[it.state] : ''].filter(Boolean).join(' · ');
 }
 
 const FROM_NAME: Record<Item['from'], string> = { store: '상점', story: '본문', manual: '직접' };
@@ -123,33 +125,50 @@ export function itemsTab(ctx: ChatContext): string {
   const notice = itemsUi.notice ? `<div class="gx-err" role="alert">${esc(itemsUi.notice)}</div>` : '';
   // 폰: 직접 넣기·합치기는 아래 도구 줄 (하단 바 바로 위, 늘 보인다)
   const drawer = isPhone() ? drawerHtml(`${addButton('ph-tool')}${mergeButton(ctx, 'ph-tool')}`, '', 'gx-idrawer') : '';
-  return `<main class="gx-body gx-records gx-items">${tabs}${notice}${itemsPane(ctx)}${note}</main>${popup(ctx)}${drawer}`;
+  // PC 격자: 탭·도구 줄·장착 띠는 고정하고 격자만 스크롤 (it-fix, 2026-11-08 사용자)
+  const fix = !isPhone() && itemsUi.view === 'grid' ? ' it-fix' : '';
+  return `<main class="gx-body gx-records gx-items${fix}">${tabs}${notice}${itemsPane(ctx)}${note}</main>${popup(ctx)}${drawer}`;
 }
 
 const addButton = (cls: string) => `<button class="${cls} it-add" data-action="items-add" aria-label="직접 넣기">${ICONS.plus}<span class="${cls === 'ph-tool' ? 'ph-tool-l' : ''}">직접 넣기</span></button>`;
+/** 합칠 상대가 있는 물건 (둘 다 소모성 + 이름에 같은 낱말) */
+const mergeMates = (ctx: ChatContext, it: Item): Item[] => liveOf(ctx).filter((o) => canMerge(it, o));
 function mergeButton(ctx: ChatContext, cls: string): string {
-  const n = liveOf(ctx).length;
-  return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" ${n < 2 ? 'disabled' : ''}>${ICONS.refresh}<span class="${cls === 'ph-tool' ? 'ph-tool-l' : ''}">합치기</span></button>`;
+  const any = liveOf(ctx).some((it) => mergeMates(ctx, it).length);
+  return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any ? '' : 'disabled'}>${ICONS.refresh}<span class="${cls === 'ph-tool' ? 'ph-tool-l' : ''}">합치기</span></button>`;
 }
 
-function itemsPane(ctx: ChatContext): string {
-  const live = liveOf(ctx);
+/** 칸 수·넘침·무게 (장착 칸 위 한 줄). 모두 같은 꼴의 칸(.it-stat), 넘치면 붉은 칸 */
+function statsRow(ctx: ChatContext, live: Item[]): string {
   const carried = gridItems(live).length;
   const slots = itemSlots(ctx.chat.scriptstate);
   const over = Math.max(0, carried - slots);
+  return `<div class="it-stats"><span class="it-stat${over ? ' over' : ''}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ''}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ''}</span>${weightPill(ctx, live)}</div>`;
+}
+
+function itemsPane(ctx: ChatContext): string {
   const seg = (v: 'grid' | 'log', label: string) => `<button class="gx-seg${itemsUi.view === v ? ' on' : ''}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label}</button>`;
+  // 도구 줄 (2026-11-08 사용자): 왼쪽 물건|기록, 오른쪽 직접 넣기·합치기·찾기. 칸 수·넘침·무게는 장착 띠의 장착 칸 위로 (equipBox)
   const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
-    <span class="it-cnt" title="칸 ${carried} / ${slots}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small></span>
-    ${over ? `<span class="it-over">넘침 <b>${over}</b></span>` : ''}
     <div class="gx-segs gx-segs-sm it-segs">${seg('grid', '물건')}${seg('log', '기록')}</div>
-    ${isPhone() ? '' : `<span class="it-right">${addButton('it-act')}${mergeButton(ctx, 'it-act')}</span>`}
-    <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
+    <span class="it-right">${isPhone() ? '' : `${addButton('it-act')}${mergeButton(ctx, 'it-act')}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
   </div>`;
   // 그림 팩(host/itemicons.ts): 처음 열 때 받는다. 받는 동안·실패는 한 줄로만 알리고, 그림은 선 아이콘으로 대신한다
   const st = itemIconStatus();
   const picNote = st.loading ? `<p class="it-picnote">물건 그림 받는 중… ${esc(st.progress)}</p>` : st.failed ? `<p class="it-picnote">물건 그림을 받지 못해 기본 아이콘으로 보여요. (${esc(st.failed)})</p>` : '';
   if (itemsUi.view === 'log') return `${tools}${picNote}<div class="it-body">${logList(ctx)}</div>`;
-  return `${tools}${picNote}${equipBox(ctx, 'items')}<div class="it-body">${gridHtml(ctx)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div>`;
+  // 격자만 스크롤 (2026-11-08 사용자): 탭·도구 줄·장착 띠는 고정, .it-scroll 안에서만. 버리기 띠는 그 위에 뜬다 (격자 줄 수와 상관없이 같은 높이)
+  return `${tools}${picNote}${equipBox(ctx, 'items')}<div class="it-scrollwrap"><div class="it-body it-scroll">${gridHtml(ctx)}</div><div class="it-trash" data-drop="drop" aria-hidden="true">${ICONS.close}<span>여기에 놓으면 버려요</span></div></div>`;
+}
+
+/** 무게 합 알약 (2026-11-08 사용자): 장착한 것까지 전부 더한 무게 / 소지 한도. 넘으면 넘은 만큼 붉은색이 점점 진해진다 (막지 않음).
+ *  --ov: 0~1 = 넘은 무게 ÷ 한도 (한도의 두 배면 가장 진함) */
+function weightPill(ctx: ChatContext, live: Item[]): string {
+  const w = totalWeight(live, (e) => leftOf(ctx, e));
+  const cap = itemCarry(ctx.chat.scriptstate);
+  const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
+  const num = (n: number) => String(Number(n.toFixed(1)));
+  return `<span class="it-stat it-wgt${w > cap ? ' over' : ''}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ''} title="무게 ${num(w)}kg / 소지 한도 ${num(cap)}kg${w > cap ? ` (${num(w - cap)}kg 넘음)` : ''}">${ICONS.weight}<b>${num(w)}</b><small>/ ${num(cap)}kg</small></span>`;
 }
 
 /** 아바타 자리 (고른 아바타의 정면 대기 동작). 고르기 전·고유 인물이 아니면 빈 자리 */
@@ -168,7 +187,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   const { av, slots } = equipParts(ctx, where, sel);
   // 상점 팔기 (2026-11-08 사용자): 장착한 게 없어도 아바타와 빈 칸을 늘 보인다. 사용은 소지품 화면에서만 (사용자: 상점에서까지 쓰면 복잡)
   if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}</div></section>`;
-  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
+  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}<div class="it-eqcol">${statsRow(ctx, liveOf(ctx))}${slots}</div>${useBox(ctx)}</div></section>`;
 }
 
 /** 장착 띠 조각: 아바타 · 장착 칸(무기 2 → 장비 4). 상점 팔기(PC)는 이 둘을 소지품 격자와 한 상자에 엮는다 (ui/shop.ts pickHtml) */
@@ -179,7 +198,7 @@ export function equipParts(ctx: ChatContext, where: 'items' | 'sell', sel = ''):
     const it = eq[k][i];
     if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
     const act = where === 'sell' ? 'shop-sell-pick' : 'items-open';
-    return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
+    return `<button class="it-slot it-s-${k}${stateCls(it)}${(where === 'sell' ? sel : itemsUi.open) === it.id ? ' sel' : ''}" data-action="${act}" data-value="${esc(it.id)}" data-drop="equip:${k}:${i}"${where === 'items' && !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ''}` : ''} aria-label="${esc(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}${wtMark(it, leftOf(ctx, it))}</span>${marks(it, leftOf(ctx, it))}${tipOf(it, leftOf(ctx, it), whenOf(ctx))}</button>`;
   };
   const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
   return { av: avatarHtml(ctx), slots };
@@ -196,6 +215,11 @@ function useBox(ctx: ChatContext): string {
   return `<div class="it-usebox${q.length ? '' : ' empty'}" data-drop="use" aria-label="사용"><span class="it-ulab">사용</span><div class="it-uchips">${chips || `<p class="it-uhint">${isPhone() ? '물건을 눌러 「사용」을 고르면 여기에 모여요.' : '쓸 물건을 여기에 끌어다 놓으면 다음 메시지에 같이 보내요.'}</p>`}</div></div>`;
 }
 
+/** 무게 (2026-11-08 사용자): 그림 오른쪽 아래에 작게. 1개당 무게 × 남은 개수 */
+const wtMark = (it: Item, left: number | undefined) => {
+  const w = lineWeight(it, left);
+  return w !== undefined ? `<span class="it-wt" title="무게">${weightText(w)}</span>` : '';
+};
 const stateCls = (it: Item) => (it.state === 'broken' ? ' broken' : it.state === 'damaged' ? ' damaged' : '');
 /** 칸 위 표시: 남은 횟수 · 손상(노란 금) · 고장(붉은 표시) */
 function marks(it: Item, left: number | undefined): string {
@@ -225,7 +249,7 @@ function cell(ctx: ChatContext, it: Item, over: boolean, w: When, queued: number
   // 「사용 예정」: 소모성은 남은 횟수를 다 놓았을 때만 흐리게, 아니면 놓은 수만 표시
   const all = queued > 0 && (left === undefined || queued >= left);
   const drag = !isPhone() ? ` draggable="true" data-drag="${esc(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ''}${canUse(it) ? ' data-usable="1"' : ''}` : '';
-  return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}${all ? ' queued' : ''}${stateCls(it)}" data-action="items-open" data-value="${esc(it.id)}"${drag} aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}${queued ? ' (사용 예정)' : ''}"><span class="it-ic">${itemPic(it)}</span>${marks(it, left)}${queued ? `<span class="it-q8">사용 예정${queued > 1 ? ` ×${queued}` : ''}</span>` : ''}<b>${esc(it.name)}</b>${tipOf(it, left, w)}</button>`;
+  return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}${all ? ' queued' : ''}${stateCls(it)}" data-action="items-open" data-value="${esc(it.id)}"${drag} aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}${queued ? ' (사용 예정)' : ''}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued ? `<span class="it-q8">사용 예정${queued > 1 ? ` ×${queued}` : ''}</span>` : ''}<b>${esc(it.name)}</b>${tipOf(it, left, w)}</button>`;
 }
 
 const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖' };
@@ -277,7 +301,7 @@ function popup(ctx: ChatContext): string {
   if (!itemsUi.open) return '';
   const it = liveOf(ctx).find((x) => x.id === itemsUi.open);
   if (!it) return '';
-  if (itemsUi.mode === 'edit') return shell('고치기', form(it, leftOf(ctx, it)));
+  if (itemsUi.mode === 'edit' && itemEditOn(ctx.chat.scriptstate)) return shell('고치기', form(it, leftOf(ctx, it)));
   if (itemsUi.mode === 'merge') return shell('합치기', mergePick(ctx, it));
   const head = `<div class="it-ph"><span class="it-ic">${itemPic(it)}</span><div><b>${esc(it.name)}</b><small>${esc([traitsLine(it, leftOf(ctx, it)), sourceLine(it, whenOf(ctx))].filter(Boolean).join(' · '))}</small></div></div>`;
   if (itemsUi.mode === 'drop') {
@@ -296,8 +320,8 @@ function popup(ctx: ChatContext): string {
       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
       ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
       ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${equipped ? '장착 풀기' : '장착'}</button>` : ''}
-      <button class="gx-chip" data-action="items-edit">고치기</button>
-      <button class="gx-chip" data-action="items-merge" ${liveOf(ctx).length < 2 ? 'disabled' : ''}>합치기</button>
+      ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
+      ${it.uses !== undefined ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx, it).length ? '' : 'disabled'} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ''}
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc(it.id)}">버리기</button>
     </div>
     ${queued ? '<p class="dim">다음 메시지를 보낼 때 본편에 「이번 턴 사용」으로 넘어가요.</p>' : ''}`;
@@ -317,15 +341,16 @@ function form(it: Item | null, left?: number): string {
     <label><span>장착</span><select name="equip">${opt('', '없음')}${opt('weapon', '무기')}${opt('gear', '장비')}</select></label>
     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? ' checked' : ''}> 쓸 수 있음</span></label>
     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ''}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
+    <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ''}" placeholder="kg"></label>
     <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc(it?.id ?? '')}">${it ? '저장' : '넣기'}</button><button type="button" class="gx-chip" data-action="${it ? 'items-back' : 'items-close'}">취소</button></div>
   </div>`;
 }
 
-/** 합칠 상대 고르기: 지금 물건이 남고 고른 물건이 그 줄로 들어간다 (이름이 달라도 된다) */
+/** 합칠 상대 고르기: 지금 물건이 남고 고른 물건이 그 줄로 들어간다 (같은 소모품끼리만, canMerge) */
 function mergePick(ctx: ChatContext, keep: Item): string {
-  const others = liveOf(ctx).filter((x) => x.id !== keep.id);
+  const others = mergeMates(ctx, keep);
   const w = whenOf(ctx);
-  return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc(keep.name)}</b><small>이 물건에 합칠 상대를 고르세요. 상대 칸은 빠지고 설명은 뒤에 붙어요.</small></div></div>
+  return `<div class="it-ph"><span class="it-ic">${itemPic(keep)}</span><div><b>${esc(keep.name)}</b><small>합칠 상대를 고르세요. 이름·설명은 이 물건 그대로, 남은 횟수와 무게만 더해져요.</small></div></div>
     <ul class="it-pick">${others.map((o) => `<li><button class="it-pickrow" data-action="items-merge-to" data-value="${esc(o.id)}"><span class="it-ic">${itemPic(o)}</span><span><b>${esc(o.name)}</b><small>${esc(o.desc || sourceLine(o, w))}</small></span></button></li>`).join('')}</ul>
     <div class="it-btns"><button class="gx-chip" data-action="items-back">취소</button></div>`;
 }
@@ -372,10 +397,14 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     case 'items-close':
       itemsUi.open = '';
       itemsUi.mode = 'view';
+      itemsUi.dragDrop = false;
       env.render();
       return true;
     case 'items-back':
+      // 끌어다 놓아 연 버리기 확인을 취소하면 물건 팝업 없이 닫는다
+      if (itemsUi.mode === 'drop' && itemsUi.dragDrop) itemsUi.open = '';
       itemsUi.mode = 'view';
+      itemsUi.dragDrop = false;
       env.render();
       return true;
     case 'items-add':
@@ -384,6 +413,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       env.render();
       return true;
     case 'items-edit':
+      if (!itemEditOn(ctx.chat.scriptstate)) return true;
       itemsUi.mode = 'edit';
       env.render();
       return true;
@@ -392,8 +422,8 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       env.render();
       return true;
     case 'items-merge-start': {
-      // 도구 줄의 합치기: 먼저 남길 물건을 고르게 (첫 칸부터 팝업으로)
-      const first = liveOf(ctx)[0];
+      // 도구 줄의 합치기: 먼저 남길 물건을 고르게 (합칠 상대가 있는 첫 물건부터 팝업으로)
+      const first = liveOf(ctx).find((x) => mergeMates(ctx, x).length);
       if (!first) return true;
       itemsUi.open = first.id;
       itemsUi.mode = 'merge';
@@ -404,7 +434,9 @@ export async function itemsAction(action: string, value: string | undefined, ctx
     case 'items-merge-to': {
       const keep = itemsUi.open;
       if (!keep || !value) return true;
-      await write((it, alive) => mergeItems(it, alive, keep, value));
+      // 합친 기록은 마지막 응답에 묶어 다음 요청 「This turn」에 넘긴다 (core/items.ts mergedNow)
+      const anchor = lastBotKey(ctx.chat);
+      await write((it, alive) => mergeItems(it, alive, keep, value, anchor));
       itemsUi.mode = 'view';
       itemsUi.info = '합쳤어요.';
       await env.refresh();
@@ -414,6 +446,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       if (!value) return true;
       itemsUi.open = value;
       itemsUi.mode = 'drop';
+      itemsUi.dragDrop = false;
       env.render();
       return true;
     case 'items-drop': {
@@ -422,6 +455,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       await dropFromUse(ctx, value);
       itemsUi.open = '';
       itemsUi.mode = 'view';
+      itemsUi.dragDrop = false;
       itemsUi.info = '버렸어요. 기록에 남아요.';
       await env.refresh();
       return true;
@@ -439,7 +473,9 @@ export async function itemsAction(action: string, value: string | undefined, ctx
         env.render();
         return true;
       }
-      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip') };
+      const wRaw = get('weight');
+      const weight = wRaw ? itemWeight(wRaw) : undefined;
+      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip'), ...(weight !== undefined ? { weight } : {}) };
       if (value) {
         // 횟수 칸: 소모성이면 「지금 남은 횟수」로 맞춘다. 비소모 ↔ 소모성 바꿈도 여기서
         await write((it, alive) => {
@@ -507,6 +543,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       } else if (to === 'drop') {
         itemsUi.open = id;
         itemsUi.mode = 'drop';
+        itemsUi.dragDrop = true;
         env.render();
         return true;
       } else return true;

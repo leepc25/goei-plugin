@@ -2,6 +2,7 @@
 // 층: 게임 캔버스 → CRT 덮개 → 메뉴(1280×720 좌표) / 터치 버튼(상자 전체) / 세로 화면 안내
 import css from './ui.css';
 import { mountCrt, type Crt } from './crt';
+import { view } from '../engine/view';
 import { ensureKit } from './kit';
 
 export const W = 1280,
@@ -56,7 +57,8 @@ export function mountStage(box: HTMLElement): Stage {
   box.append(root);
   const stageEl = root.querySelector<HTMLElement>('.gs-stage')!;
   const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
-  const ctx = canvas.getContext('2d', { alpha: false })!;
+  // 투명 무대(기다리는 동안 대전)만 알파를 켠다. 평소엔 불투명이 빠르다
+  const ctx = canvas.getContext('2d', { alpha: view.clear })!;
   const ui = root.querySelector<HTMLElement>('.gs-ui')!;
   const touch = root.querySelector<HTMLElement>('.gs-touch')!;
   const rotate = root.querySelector<HTMLElement>('.gs-rotate')!;
@@ -157,9 +159,11 @@ export function mountStage(box: HTMLElement): Stage {
     const dpr = window.devicePixelRatio || 1;
     const fieldFill = byHeight && !portrait && bh >= 600;
     const k = fieldFill ? Math.max(1, Math.floor(dpr)) / dpr : 1;
-    const vh = fieldFill ? Math.round(bh / k) : H;
+    // 투명 무대(대전): 폭 1280에 맞추고 세로는 상자 높이 전체 (위로 솟는 이펙트가 16:9 윗선에서 잘리지 않게, 사용자 11-08)
+    const clearTall = view.clear && !portrait && bw > 0 && bh * W / bw > H;
+    const vh = clearTall ? Math.round((bh * W) / bw) : fieldFill ? Math.round(bh / k) : H;
     // 필드가 16:9 보다 긴 낮은 화면(가로 폰)이면 캔버스를 옆으로 넓혀 좌우 검은 띠 없이 꽉 채운다 (모바일 조작 설계: 가로 전체화면으로 꽉 차게)
-    const vw = fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
+    const vw = clearTall ? W : fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
     if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;
@@ -167,12 +171,13 @@ export function mountStage(box: HTMLElement): Stage {
       canvas.style.width = stageEl.style.width = `${vw}px`;
       canvas.style.height = stageEl.style.height = `${vh}px`;
     }
-    const scale = fieldFill ? k : Math.min(bw / vw, bh / H);
+    const scale = clearTall ? bw / W : fieldFill ? k : Math.min(bw / vw, bh / H);
     s.scale = scale;
     const w = s.vw * scale,
       h = vh * scale;
     // 세로 화면: 게임을 위에 붙이고 아래 빈 곳은 터치 버튼 자리
-    const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
+    // 투명 무대(대전): 바닥을 상자 아래(채팅 입력창 바로 위)에 붙인다
+    const top = portrait ? portraitTop(bh, h) : view.clear ? bh - h : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
     root.style.setProperty('--gs-scale', String(scale));
     root.style.setProperty('--gs-top', `${top}px`);

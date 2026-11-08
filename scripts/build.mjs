@@ -106,9 +106,7 @@ rmSync('dist/game', { recursive: true, force: true });
 let gameCode = '';
 let gameParts = [];
 let gamePacks = [];
-if (GAME) {
-// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
-// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
+// 큰 글을 바이트 기준 조각으로 (웹 Risu 프록시 요청당 약 1MB)
 const split = (str, max) => {
   const out = [];
   let buf = '';
@@ -122,6 +120,9 @@ const split = (str, max) => {
   if (buf) out.push(buf);
   return out;
 };
+if (GAME) {
+// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
+// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
 rmSync('dist/game', { recursive: true, force: true });
 mkdirSync('dist/game', { recursive: true });
 const gameOut = await build({ ...common, entryPoints: ['src/game/entry.ts'], format: 'iife' });
@@ -149,6 +150,37 @@ writeFileSync(
   'dist/game/index.json',
   JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
+}
+
+// 기다리는 동안 대전 자료 (11-08): tools/build_vs_packs.py 가 game-pack 에서 전투 줄·얼굴판만 골라 dist/vs-src/ 에 두면
+// 팩마다 묶어 dist/vs/ (index.json + <id>.<n>.bin). 게임 팩과 따로 받고 따로 둔다 (설치 정리가 goei:game:* 를 지우므로)
+if (GAME || process.env.GOEI_VS === '1') {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync('python3', ['tools/build_vs_packs.py'], { encoding: 'utf8', stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('build_vs_packs.py 실패');
+  rmSync('dist/vs', { recursive: true, force: true });
+  mkdirSync('dist/vs', { recursive: true });
+  // 대전 코드: 본체와 따로 받는다 (src/game/versus/entry.ts → globalThis.__goeiVersus)
+  const vsOut = await build({ ...common, entryPoints: ['src/game/versus/entry.ts'], format: 'iife', minify: true });
+  const vsCode = `// goei-vs ${pkg.version}\n` + vsOut.outputFiles[0].text;
+  writeFileSync('dist/vs/goei-vs.js', vsCode);
+  const vsParts = split(vsCode, 200_000).map((p, i) => {
+    const name = `goei-vs.${i + 1}.txt`;
+    writeFileSync(`dist/vs/${name}`, p);
+    return name;
+  });
+  const vsPacks = [];
+  for (const d of readdirSync('dist/vs-src').sort()) {
+    const p = buildGamePack(`dist/vs-src/${d}`);
+    const parts = [];
+    for (let at = 0, i = 1; at < p.bytes.length; at += 512 * 1024, i++) {
+      const name = `${p.id}.${i}.bin`;
+      writeFileSync(`dist/vs/${name}`, p.bytes.subarray(at, at + 512 * 1024));
+      parts.push(name);
+    }
+    vsPacks.push({ id: p.id, hash: p.hash, bytes: p.bytes.length, parts });
+  }
+  writeFileSync('dist/vs/index.json', JSON.stringify({ version: pkg.version, code: { parts: vsParts, length: vsCode.length }, packs: vsPacks }, null, 1) + '\n');
 }
 
 // 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
@@ -233,6 +265,10 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   const tr = await build({ ...common, entryPoints: ['src/game/action/fighter/testroom.ts'], format: 'esm', minify: true, write: false });
   const trCode = tr.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   writeFileSync('dist/goei-testroom.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인물 시험장</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${trCode}</script></body></html>`);
+  // 기다리는 동안 대전 시험판 (11-08, src/game/action/fighter/waitfight.ts): 투명 무대. 고르기 창 → VS → 경기. 자료는 dist/vs-src/ (tools/build_vs_packs.py)
+  const wf = await build({ ...common, entryPoints: ['src/game/action/fighter/waitfight.ts'], format: 'esm', minify: true, write: false });
+  const wfCode = wf.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  writeFileSync('dist/goei-waitfight.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>대전 시험판</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${wfCode}</script></body></html>`);
 }
 // 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
 {

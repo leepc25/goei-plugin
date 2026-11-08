@@ -31,7 +31,8 @@ const CSS = `
 
 import { HUD_ART } from './ui/pixelHudArt';
 
-export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () => void {
+/** opts.charPacks = 바깥(대전 vs-common)에서 이미 준비한 인물 팩을 그대로 쓴다. opts.hero = 주인공 이름 */
+export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>, opts: { charPacks?: boolean; hero?: string; onReady?: (g: Game) => void } = {}): () => void {
   const st = document.createElement('style');
   // 엘리베이터 층 단추 틀 = PixelLab 슬롯0 (사용자 2026-10-25)
   st.textContent = CSS + `.goei-engine-elev{--goei-btn:url(${HUD_ART.btn.src})}`;
@@ -46,15 +47,17 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   let offTouch: (() => void) | null = null;
   let dead = false;
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
-  const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
-  const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
-  const releaseField = prepareHqField(bridge?.assets ? (pack, f) => bridge.assets!.url(pack, f) : undefined);
+  // 대전(opts.charPacks)은 본부·필드 그림을 받지 않는다
+  const hqAssets = opts.charPacks ? undefined : bridge?.assets;
+  const releaseHqArt = prepareHqTextures(hqAssets ? f => hqAssets.url('hq-textures', f) : undefined);
+  const releaseDoorArt = prepareHqDoorRound2(hqAssets ? f => hqAssets.url('hq-door-round2', f) : undefined);
+  const releaseField = prepareHqField(hqAssets ? (pack, f) => hqAssets.url(pack, f) : undefined);
   // 통합 테스트룸 인물 팩(10-29): 공용 이펙트·의자·명단을 받고, 주인공(방문 요원, 없으면 에일린) 팩을 받는다. 옛 에일린 라이브판 팩·코드는 _old/에일린_라이브판_2026-10-29 에 보관(사용자 10-29)
-  const charPacks = prepareCharPacks(bridge?.assets);
+  const charPacks = opts.charPacks ? { ready: Promise.resolve(), dispose: () => {} } : prepareCharPacks(bridge?.assets);
   const heroArt = charPacks.ready.then(async () => {
     // 주인공: 방문 요원 → 주소 ?char=이름 (시연판·시험장) → 에일린
     const asked = (() => { try { return new URLSearchParams(location.search).get('char') ?? ''; } catch { return ''; } })();
-    const who = (await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => '')) || asked;
+    const who = opts.hero || (await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => '')) || asked;
     return (who && (await loadChar(who))) || loadChar('에일린');
   }).catch(() => null);
   void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), heroArt]).then(([art, hero]) => {
@@ -69,6 +72,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
     game.start();
     (globalThis as { __goeiEngine?: Game }).__goeiEngine = game;
+    opts.onReady?.(game);
   }).catch((e) => {
     console.error('[goei] 게임 시작 실패', e);
     if (dead) return;

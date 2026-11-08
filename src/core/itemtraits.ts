@@ -17,6 +17,14 @@ export const itemUses = (v: unknown): number | undefined => {
   return Number.isSafeInteger(n) && n >= 1 ? Math.min(999, n) : undefined;
 };
 
+/** 무게 kg (2026-11-08 사용자: 칸 수에 더해 무게도). 물건을 만드는 모델이 정한다. 0 이상, 소수 셋째 자리까지. 없으면 undefined */
+export const itemWeight = (v: unknown): number | undefined => {
+  const n = typeof v === 'string' ? Number(v.trim().replace(/,/g, '.').replace(/\s*(kg|킬로그램|킬로)$/i, '')) : typeof v === 'number' ? v : NaN;
+  return Number.isFinite(n) && n >= 0 ? Math.min(9999, Math.round(n * 1000) / 1000) : undefined;
+};
+/** 무게 글: 1kg 밑은 g, 그 위는 소수 한 자리 kg (「250g」「1.2kg」「12kg」) */
+export const weightText = (kg: number): string => (kg < 1 ? `${Math.max(1, Math.round(kg * 1000))}g` : `${Number(kg.toFixed(kg < 10 ? 1 : 0))}kg`);
+
 /** 판정 칸 (상점 줄·보조 모델·시작 소지품·직접 넣기가 같은 꼴로) */
 export interface ItemTraits {
   /** 사용 가능 (소모성이면 늘 참) */
@@ -26,11 +34,13 @@ export interface ItemTraits {
   equip?: ItemEquip;
   /** 그림 찾기용 낱말 (영어, 물건 만드는 모델이 적음) */
   icon?: string;
+  /** 무게 kg */
+  weight?: number;
 }
 
 /** 「쓰임」 칸 글 → 판정: 무기·장비·사용·소모N (「·」「,」「/」 띄어쓰기 어느 것으로 이어도). 모르는 말은 무시 */
-export function parseTraits(text: unknown): Omit<ItemTraits, 'icon'> {
-  const out: Omit<ItemTraits, 'icon'> = { use: false };
+export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> {
+  const out: Omit<ItemTraits, 'icon' | 'weight'> = { use: false };
   for (const t0 of String(text ?? '').split(/[\s,，/·+]+/)) {
     const t = t0.trim().toLowerCase();
     if (!t) continue;

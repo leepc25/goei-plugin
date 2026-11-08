@@ -29,12 +29,14 @@ export const ICONS = {
   send: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5.5M5.5 12 12 5.5 18.5 12"/></svg>',
   plus: stroke('<path d="M12 5v14M5 12h14"/>'),
   trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
+  weight: stroke('<circle cx="12" cy="5.5" r="2.5"/><path d="M7 9h10l2.5 11h-15Z"/>'),
   /** 기록 메뉴 (일지·보고서·인물·세력): 클립보드 */
   bag: stroke('<path d="M5 8h14l-1 12H6Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
   records: stroke('<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>'),
   book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
   back: stroke('<path d="m15 5-7 7 7 7"/>'),
   // 관찰형 게임 「관리국 순찰」: 게임패드
+  pad: stroke('<path d="M7.5 8h9a4.5 4.5 0 0 1 4.4 3.6l.9 4.6a2.4 2.4 0 0 1-4.1 2.1L15.6 16H8.4l-2.1 2.3a2.4 2.4 0 0 1-4.1-2.1l.9-4.6A4.5 4.5 0 0 1 7.5 8z"/><path d="M8 10.5v3M6.5 12h3"/><path d="M15.5 11.2h.01M17.3 13h.01"/>'),
   star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
   tag: stroke('<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3-8.7 8.7Z"/><circle cx="8" cy="8" r="1.4"/>'),
 
