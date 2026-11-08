@@ -5,7 +5,7 @@ import { mountCrt, type Crt } from './crt';
 import { view } from '../engine/view';
 import { ensureKit } from './kit';
 /** 대전 화면: 세로 960 (월드 480 × 2), 가로는 최대 무대 전체 2560 (월드 1280 × 2) */
-const VS_H = 960, VS_WMAX = 2560;
+const VS_H = 960, VS_WMAX = Math.round(1280 * VS_H / 600);   // 무대 전체 폭 (월드 1280 × 1.6)
 
 export const W = 1280,
   H = 720;

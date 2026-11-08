@@ -69,8 +69,8 @@ interface Scene {
 }
 
 /** 대전 화면 확대 (11-08 사용자 「캐릭터 픽셀 2배」): 무대 1280 중 절반이 보이고 화면이 두 사람을 따라간다 */
-/** 대전: 그림판 세로에 보이는 월드 높이 (960 그림판 = 도트 2배) */
-const VS_VIEW_H = 480;
+/** 대전: 그림판 세로에 보이는 월드 높이. 600 → 960 그림판에서 도트 1.6배 (11-08 사용자: 킹오파처럼 캐릭터 키 = 화면 절반쯤) */
+const VS_VIEW_H = 600;
 const NO_PAD: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
 
 export class Game {
