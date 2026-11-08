@@ -9,7 +9,7 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar, drawPixelCard, type SkillIcon } from '../ui/pixelHud';
+import { drawGuardBar, drawPixelCard, PIXEL_CARD_W, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
 import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
@@ -1608,7 +1608,7 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const dt = 1 / 60;
   vsT += dt;
   const foe = w.bodies.find((b) => b.team === 'enemy');
-  const k = 1.25, W = c.canvas.width / k, cardW = 84 + 244;
+  const k = 1.25, W = c.canvas.width / k, cardW = PIXEL_CARD_W;
   c.save();
   c.setTransform(k, 0, 0, k, 0, 0);
   const one = (i: number, b: Body | undefined, x: number) => {
@@ -1623,8 +1623,9 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     st.last = b.hp;
     st.hurt = Math.max(0, st.hurt - dt);
     const name = f.art?.cfg.name ?? (f.label ?? '').replace(/^AI /, '').replace(/ \d+$/, '');
-    const face = f.art ? charFace(f.art.key, 64, i === 1) : null;
-    drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT }, x, 14);
+    // 오른쪽 칸은 칸째 뒤집으므로 얼굴은 원래 방향으로 넘긴다 (뒤집혀 왼쪽을 본다)
+    const face = f.art ? charFace(f.art.key, 64, false) : null;
+    drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT, mirror: i === 1 }, x, 14);
   };
   one(0, w.player, 16);
   one(1, foe, W - 16 - cardW);
