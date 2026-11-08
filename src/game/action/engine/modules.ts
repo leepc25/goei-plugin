@@ -1028,9 +1028,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     id: 'versus',
     label: '대전',
     firstFloor: () => ({
-      id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity,
+      // 한 선(lane 위아래 같음): 위아래 이동 없이 좌우로만. 발은 화면 아래(입력창 바로 위)
+      id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity, lane: [VS_LINE, VS_LINE],
       banner: '',
-      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: foeName ? `ai-char:${foeName}` : 'ai-char', x: 900, y: 600 }]] }],
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: foeName ? `ai-char:${foeName}` : 'ai-char', x: 900, y: VS_LINE }]] }],
     }),
     nextFloor: () => null,
   };
@@ -1370,7 +1371,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
       const core = (w.player as { core?: { P: Record<string, any>; CH: Record<string, any>; has: (id: string) => boolean } }).core;
-      if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+      if (core && !view.clear && !shell.touchShown && !mods.blocking?.() && !shell.paused) { // 대전(투명 무대)은 단추를 띄우지 않는다
         const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
         const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
         const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
@@ -1467,6 +1468,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       npc.attach(w, { items, hq: false });
       if (run.stageId === 'itemroom') items.showcase();
       // 투명 무대(대전)는 바닥 물건(의자·화분 등)을 두지 않는다: 본문 위에 인물만
+      // 대전: 체력을 VS_HP 배로 (사용자 11-08 「체력이 너무 적다, 전체적으로 늘려야」). 몸이 처음 보일 때 한 번
+      if (view.clear) w.hooks.push(() => {
+        for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean })[]) {
+          if (b.vsHp || !b.hpMax) continue;
+          b.vsHp = true;
+          b.hpMax = Math.round(b.hpMax * VS_HP); b.hp = b.hpMax;
+          if (b.baseHp) b.baseHp = Math.round(b.baseHp * VS_HP);
+        }
+      });
       if (!view.clear) {
         w.hooks.push(() => items.tick());
         w.underlays.push((c, camX) => items.draw(c, camX));
@@ -1586,6 +1596,11 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
     }
   } catch { /* 팩이 없거나 깨졌으면 코드 효과만 */ }
 }
+
+/** 대전 한 선의 발 높이(월드 y, 화면 720 중) */
+const VS_LINE = 700;
+/** 대전 체력 배율 */
+const VS_HP = 3;
 
 /** 대전(투명 무대) 체력 막대: 위 왼쪽 주인공, 오른쪽 상대. 본문 글자 위라 막대에만 어두운 바탕 */
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {

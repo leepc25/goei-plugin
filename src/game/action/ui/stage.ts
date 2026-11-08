@@ -174,7 +174,8 @@ export function mountStage(box: HTMLElement): Stage {
     const w = s.vw * scale,
       h = vh * scale;
     // 세로 화면: 게임을 위에 붙이고 아래 빈 곳은 터치 버튼 자리
-    const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
+    // 투명 무대(대전): 바닥을 상자 아래(채팅 입력창 바로 위)에 붙인다
+    const top = portrait ? portraitTop(bh, h) : view.clear ? bh - h : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
     root.style.setProperty('--gs-scale', String(scale));
     root.style.setProperty('--gs-top', `${top}px`);
