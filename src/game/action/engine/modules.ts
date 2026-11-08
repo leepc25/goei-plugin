@@ -9,7 +9,7 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar, type SkillIcon } from '../ui/pixelHud';
+import { drawGuardBar, drawPixelCard, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
 import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
@@ -44,7 +44,6 @@ import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
-import { pfont } from '../ui/hud';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
@@ -1602,23 +1601,32 @@ const VS_LINE = 700;
 /** 대전 체력 배율 */
 const VS_HP = 3;
 
-/** 대전(투명 무대) 체력 막대: 위 왼쪽 주인공, 오른쪽 상대. 본문 글자 위라 막대에만 어두운 바탕 */
+/** 대전(투명 무대) HUD: 도트 HUD(pixelHud.ts, 10-25 PixelLab 틀) 칸 둘 — 왼쪽 주인공, 오른쪽 상대. 초상화·체력(깎인 만큼 흰 잔상)·필살 게이지 */
+const vsSide = [{ trail: -1, last: -1, hurt: 0 }, { trail: -1, last: -1, hurt: 0 }];
+let vsT = 0;
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
+  const dt = 1 / 60;
+  vsT += dt;
   const foe = w.bodies.find((b) => b.team === 'enemy');
-  const W = c.canvas.width, bw = Math.min(420, W * 0.36), y = 18, h = 16;
-  const bar = (x: number, b: { hp: number; hpMax: number } | undefined, name: string, right: boolean) => {
-    const k = b ? Math.max(0, Math.min(1, b.hp / b.hpMax)) : 0;
-    c.fillStyle = 'rgba(8,10,14,.78)'; c.fillRect(x - 3, y - 3, bw + 6, h + 6);
-    c.fillStyle = '#3a1418'; c.fillRect(x, y, bw, h);
-    c.fillStyle = k > 0.3 ? '#e8c45a' : '#e0503c';
-    if (right) c.fillRect(x + bw * (1 - k), y, bw * k, h); else c.fillRect(x, y, bw * k, h);
-    c.font = pfont(20).f; c.fillStyle = '#f2ead6'; c.textAlign = right ? 'right' : 'left';
-    c.lineWidth = 4; c.strokeStyle = '#000';
-    const tx = right ? x + bw : x, ty = y + h + 24;
-    c.strokeText(name, tx, ty); c.fillText(name, tx, ty);
-    c.textAlign = 'left';
+  const k = 1.25, W = c.canvas.width / k, cardW = 84 + 244;
+  c.save();
+  c.setTransform(k, 0, 0, k, 0, 0);
+  const one = (i: number, b: Body | undefined, x: number) => {
+    if (!b) return;
+    const f = b as Body & { label?: string; gauge?: number; art?: { key: string; cfg: { name: string } }; dir?: number };
+    const st = vsSide[i];
+    // 새 판(체력이 다시 차면)에는 잔상도 새로
+    if (st.last >= 0 && b.hp > st.last + 1) st.trail = -1;
+    if (st.last >= 0 && b.hp < st.last) st.hurt = 0.35;
+    if (st.trail < 0 || st.trail < b.hp) st.trail = b.hp;
+    else st.trail = Math.max(b.hp, st.trail - b.hpMax * dt * 0.6);
+    st.last = b.hp;
+    st.hurt = Math.max(0, st.hurt - dt);
+    const name = f.art?.cfg.name ?? (f.label ?? '').replace(/^AI /, '').replace(/ \d+$/, '');
+    const face = f.art ? charFace(f.art.key, 64, i === 1) : null;
+    drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT }, x, 14);
   };
-  const pl = w.player as Body & { label?: string };
-  bar(24, pl, pl.label ?? '', false);
-  bar(W - 24 - bw, foe, (foe as { label?: string } | undefined)?.label?.replace(/^AI /, '').replace(/ \d+$/, '') ?? '', true);
+  one(0, w.player, 16);
+  one(1, foe, W - 16 - cardW);
+  c.restore();
 }

@@ -522,7 +522,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         ctx.translate(-camX, 0);
         w.floor.drawForeground(ctx, camX, w);
         ctx.restore();
-      } else if (w.light < 1) {
+      } else if (w.light < 1 && !view.clear) { // 투명 무대는 어둡게 덮지 않는다
         ctx.fillStyle = `rgba(0,0,0,${(1 - w.light) * 0.9})`;
         ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
       }
