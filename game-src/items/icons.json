@@ -1430,7 +1430,7 @@
    "kind": "wear",
    "base": false,
    "name": "금빛 나비 가면",
-   "src": "game-src/items/raw/batch_10/10.png",
+   "src": "game-src/items/raw/batch_231/11.png",
    "head": [
     "가면",
     "mask"
@@ -1439,7 +1439,9 @@
     "나비",
     "금빛",
     "butterfly"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/10.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -3427,7 +3429,7 @@
    "kind": "wear",
    "base": false,
    "name": "금빛 청둥오리 가면",
-   "src": "game-src/items/raw/batch_10/09.png",
+   "src": "game-src/items/raw/batch_233/01.png",
    "head": [
     "가면",
     "mask"
@@ -3436,7 +3438,9 @@
     "청둥오리",
     "오리",
     "mallard"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/09.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -4416,12 +4420,14 @@
    "kind": "wear",
    "base": false,
    "name": "금빛 돌고래 가면",
-   "src": "game-src/items/raw/batch_211/13.png",
+   "src": "game-src/items/raw/batch_231/06.png",
    "head": [
     "금빛 돌고래 가면",
     "gold dolphin mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/13.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -21256,7 +21262,7 @@
    "kind": "wear",
    "base": false,
    "name": "도마뱀 가면",
-   "src": "game-src/items/raw/batch_10/11.png",
+   "src": "game-src/items/raw/batch_229/01.png",
    "head": [
     "가면",
     "mask"
@@ -21264,7 +21270,9 @@
    "feats": [
     "도마뱀",
     "lizard"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/11.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -21275,7 +21283,7 @@
    "kind": "wear",
    "base": false,
    "name": "오소리 가면",
-   "src": "game-src/items/raw/batch_10/12.png",
+   "src": "game-src/items/raw/batch_229/04.png",
    "head": [
     "가면",
     "mask"
@@ -21283,7 +21291,9 @@
    "feats": [
     "오소리",
     "badger"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/12.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -25189,6 +25199,25 @@
     "supply case"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "송골매 가면",
+    "falcon mask"
+   ],
+   "file": "wear_315.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "송골매 가면",
+   "src": "game-src/items/raw/batch_229/16.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "송골매",
+    "falcon"
+   ]
   },
   {
    "keywords": [
@@ -30323,7 +30352,7 @@
    "kind": "wear",
    "base": false,
    "name": "조랑말 가면",
-   "src": "game-src/items/raw/batch_10/14.png",
+   "src": "game-src/items/raw/batch_229/06.png",
    "head": [
     "가면",
     "mask"
@@ -30331,7 +30360,9 @@
    "feats": [
     "조랑말",
     "pony"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/14.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -30806,7 +30837,7 @@
    "kind": "wear",
    "base": false,
    "name": "산양 가면",
-   "src": "game-src/items/raw/batch_10/13.png",
+   "src": "game-src/items/raw/batch_229/08.png",
    "head": [
     "가면",
     "mask"
@@ -30814,7 +30845,9 @@
    "feats": [
     "산양",
     "goat"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/13.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -33914,12 +33947,14 @@
    "kind": "wear",
    "base": false,
    "name": "늑대 가면",
-   "src": "game-src/items/raw/batch_211/08.png",
+   "src": "game-src/items/raw/batch_229/14.png",
    "head": [
     "늑대 가면",
     "wolf mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/08.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -33962,12 +33997,14 @@
    "kind": "wear",
    "base": false,
    "name": "염소 가면",
-   "src": "game-src/items/raw/batch_211/11.png",
+   "src": "game-src/items/raw/batch_229/10.png",
    "head": [
     "염소 가면",
     "goat mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/11.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -37448,12 +37485,14 @@
    "kind": "wear",
    "base": false,
    "name": "소 가면",
-   "src": "game-src/items/raw/batch_211/12.png",
+   "src": "game-src/items/raw/batch_229/12.png",
    "head": [
     "소 가면",
     "cow mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/12.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
