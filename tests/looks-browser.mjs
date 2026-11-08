@@ -50,6 +50,9 @@ for (const vp of ['pc', 'phone']) {
   if (p1 === p2) fails.push(`[${vp}] 대기 동작이 안 움직임 (${p1})`);
   const own = looks.find((r) => r.name === '가짜관리국검사A').id;
   await click(`.gx-lookpop .gx-lookc[data-value="${own}"]`);
+  // 고른 칸을 잠깐 「고름」으로 보인 뒤 닫힌다 (11-08 눌러 보기 점검)
+  if (!(await page.$(`.gx-lookpop .gx-lookc.on[data-value="${own}"]`))) fails.push(`[${vp}] 고른 칸이 바로 고름으로 안 보임`);
+  await sleep(700);
   if (await page.$('.gx-lookpop')) fails.push(`[${vp}] 고른 뒤 팝업이 안 닫힘`);
   await page.evaluate(() => document.querySelector('.gx-lookchip')?.scrollIntoView({ block: 'center' }));
   await sleep(200);

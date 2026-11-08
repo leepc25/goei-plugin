@@ -361,9 +361,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const nodes: Node[] = [
     { name: '입력', sub: '유저 메시지', kind: 'plain', on: s.on, calls: '' },
     { name: 'Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: modelOf('router'), calls: routerOn ? '보조 1회' : '호출 없음 (코드가 고름)', control: seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), block: 'pp-blk-router' },
-    { name: 'Director', sub: '이번 턴 연기 지시', kind: 'aux', on: sceneOn, model: modelOf('director'), calls: sceneOn ? (s.directorSearch ? '보조 1회 (검색 땐 2회)' : '보조 1회') : s.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', control: seg('director', s.director, [['off', 'OFF'], ['note', '메모형'], ['facts', '사실형'], ['scene', '연출형']]), block: 'pp-blk-director' },
+    { name: 'Director', sub: '이번 턴 연기 지시', kind: 'aux', on: sceneOn, model: modelOf('director'), calls: sceneOn ? (s.directorSearch ? '보조 1회 (검색 땐 2회)' : '보조 1회') : s.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', control: seg('director', s.director, [['off', '사용 안 함'], ['note', '메모형'], ['facts', '사실형'], ['scene', '연출형']]), block: 'pp-blk-director' },
     { name: '본편', sub: '응답 생성', kind: 'main', on: true, model: '메인 모델', calls: '메인 1회' },
-    { name: '갱신', sub: '응답을 읽어 기록', kind: 'aux', on: updateOn, model: modelOf('update'), calls: updateOn ? `${s.model === 'main' ? '메인' : '보조'} 1회` : s.on ? '수동 (누를 때만)' : '호출 없음', control: seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), block: 'pp-blk-update' },
+    { name: '갱신', sub: '응답을 읽어 기록', kind: 'aux', on: updateOn, model: modelOf('update'), calls: updateOn ? `${s.model === 'main' ? '메인' : '보조'} 1회` : s.on ? '수동 (누를 때만)' : '호출 없음', control: seg('when', s.when, [['manual', '수동'], ['turn', '매 턴']]), block: 'pp-blk-update' },
     { name: '정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: modelOf('tidy'), calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', control: seg('tidy', s.tidy, [['same', 'OFF'], ['separate', 'ON']]), block: 'pp-blk-tidy' },
   ];
   const flowNode = (n: Node) => `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${n.name}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${n.sub}</small></div><span class="pp-fn-calls">${n.calls}</span><div class="pp-fn-ctl">${(n.control ?? '').replace('<button class="gx-switch" role="switch"', `<button class="gx-switch" role="switch" aria-label="${esc(n.name)}"`)}</div>${n.block ? `<button class="gx-mini pp-fn-go" data-action="pp-goto" data-value="${n.block}">설정 →</button>` : '<span></span>'}</div>`;
@@ -371,7 +371,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     <p class="pp-flow-sum">${s.on ? `턴마다 보조 호출: 본편 전 <b>${preCalls}회</b> · 본편 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? ' (+정리)' : ''}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : '인물 기록이 꺼져 있어 아무 호출도 하지 않아요.'} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
   const common = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
-    row('자동 호출', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동으로 읽어요. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
+    row('자동 호출', seg('when', s.when, [['manual', '수동'], ['turn', '매 턴']]), '수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만. 매 턴 = 응답이 들어올 때마다 자동으로 읽어요.'),
     row('컨텍스트에 포함', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '사용 안 함']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('호감 증가 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요'),
@@ -412,7 +412,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
   ].join('');
   const router = [
-    row('Router', seg('router', s.router, [['code', 'OFF (코드)'], ['model', 'ON (모델)']]), 'OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
+    row('Router', seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), 'OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
     ...(s.router === 'model' ? [
       stageModel('router', 'Router 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델'),
       row('시간 제한', seg('router_timeout', String(s.routerTimeout), [['30', '30초'], ['60', '60초'], ['120', '120초']]), '넘기면 이번 턴은 코드로 골라요.'),
@@ -420,7 +420,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ] : []),
   ].join('');
   const director = [
-    row('Director', seg('director', s.director, [['off', 'OFF'], ['note', '메모형(뒤)'], ['facts', '사실형(앞)'], ['scene', '연출형(앞)']]), '메모형 = 갱신 호출에 얹어 다음 턴 메모를 남겨요 (추가 호출 없음, 이번 입력은 못 봐요). 사실형 = 본편 보내기 전에 따로 불러 이번 입력까지 본 사실·지식 한계만 정리해요 (턴당 1회). 연출형 = 사실형 + 이번 턴 반응 방향 (턴당 1회, 2차 검색 때 1회 더).'),
+    row('Director', seg('director', s.director, [['off', '사용 안 함'], ['note', '메모형(뒤)'], ['facts', '사실형(앞)'], ['scene', '연출형(앞)']]), '메모형 = 갱신 호출에 얹어 다음 턴 메모를 남겨요 (추가 호출 없음, 이번 입력은 못 봐요). 사실형 = 본편 보내기 전에 따로 불러 이번 입력까지 본 사실·지식 한계만 정리해요 (턴당 1회). 연출형 = 사실형 + 이번 턴 반응 방향 (턴당 1회, 2차 검색 때 1회 더).'),
     ...(s.director === 'scene' || s.director === 'facts' ? [
       stageModel('director', 'Director 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델'),
       row('시간 제한', seg('director_timeout', String(s.directorTimeout), [['30', '30초'], ['90', '90초'], ['180', '180초']]), '넘기면 이번 턴은 메모 없이 보내요 (그 턴만).'),

@@ -188,6 +188,10 @@ function pin(action: string, value: string, label: string, x: number, y: number,
     <span class="gx-dot"></span><span class="gx-pname">${esc(label)}${count ? `<b>${count}</b>` : ''}</span></button>`;
 }
 
+/** 핀을 두 겹으로 (11-08 눌러 보기 점검: 서울 점이 경기북부 이름표 밑에 깔려 안 눌림). 같은 자리에 이름표만 먼저 다 그리고, 점만 그 위에 다시 그려
+ *  어느 점도 다른 핀 이름표에 가리지 않게 한다. 점 겹은 시험·셈에서 빼려고 gx-pdot */
+const layeredPins = (pins: string): string => pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-plab ') + pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-pdot ').replaceAll(' aria-label="', ' tabindex="-1" aria-hidden="true" aria-label="');
+
 function hotClass(list: WorldEvent[]): string {
   if (!list.length) return '';
   const kinds = new Set(list.map((e) => e.kind));
@@ -247,7 +251,7 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
   // 모바일: 지역·장소 검색은 하단 바 위 서랍으로 (v0.16.24, 사용자 설계. 필터 줄은 숫자 때문에 위에 그대로)
   return `${narrow() ? '' : mapBar(x)}
-    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
+    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${layeredPins(pins)}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
 }
 
 /** 지도 장소 검색: 시군구·거점 이름으로 찾아 그 지도로 바로 간다 (v0.16.21) */

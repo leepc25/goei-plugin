@@ -509,3 +509,5 @@
   .gw .gw-field-head { column-gap: 6px; }
   .gw .gw-fmove .gx-mini.icon { width: 36px; }
 }
+/* 맨 위로 단추가 맨 아래 줄(예: 인물 설정 전용 모델 ID 「저장」)을 덮지 않게 끝에 단추 높이만큼 여백 (11-08 눌러 보기 점검) */
+.gw-body:has(~ .gw-totop)::after { content: ''; display: block; height: 72px; }

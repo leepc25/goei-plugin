@@ -364,7 +364,7 @@ export async function recordAction(action: string, value: string | undefined, ct
       recUi.importOpen = false;
       recUi.importResult = null;
       recUi.importText = '';
-      edUi.info = '가져온 글을 칸에 넣었어요. 저장을 눌러야 카드에 남아요.';
+      edUi.info = '가져온 글을 칸에 넣었어요.';
       return true;
     }
     case 'ed-add-toggle':

@@ -886,8 +886,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
   await page.waitForSelector('.gx-canvas');
   await page.waitForFunction(() => document.querySelector('.gx-mapimg')?.naturalWidth > 0, null, { timeout: 5000 });
-  assert.equal(await page.locator('.gx-pin.nation').count(), 17);
-  assert.equal(await page.locator('.gx-pin.nation.hot').count() >= 1, true);
+  assert.equal(await page.locator('.gx-pin.nation.gx-plab').count(), 17);
+  assert.equal(await page.locator('.gx-pin.nation.gx-plab.hot').count() >= 1, true);
   if (shots) await page.screenshot({ path: `${shots}/11-map-nation.png` });
   // 상황 선택: 그 시도 지도로 바뀌고 목표가 채워진다
   await cardAction(page, preset.name, 'pick-event', '.gx-map');
@@ -938,7 +938,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.waitForSelector('.gx-canvas');
   await page.selectOption('.gx-select', '02');
-  await page.click('.gx-pin[data-value="02-0"]');
+  await page.click('.gx-pin.gx-plab[data-value="02-0"]');
   // 핀을 누른 뒤 목표 글이 다시 그려질 때까지 (2026-10-29: 느린 컨테이너에서 「미정」을 먼저 읽는 경쟁)
   await page.waitForFunction(() => document.querySelector('.gx-goal b')?.textContent.trim() !== '미정');
   const goal = (await page.textContent('.gx-goal b')).trim();
@@ -960,7 +960,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     await open(page);
     await page.waitForSelector('.gx-canvas');
     await page.selectOption('.gx-select', '02');
-    await page.click('.gx-pin[data-value="02-1"]');
+    await page.click('.gx-pin.gx-plab[data-value="02-1"]');
     await page.click('[data-action="depart"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
     await page.waitForFunction(() => window.__chat.message.at(-1).data.startsWith('%%SCENE_CARD:'));

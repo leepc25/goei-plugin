@@ -19,7 +19,7 @@ import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
 import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
-import { chatLookPopup, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
+import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
@@ -866,9 +866,12 @@ async function handle(action: string, value?: string): Promise<void> {
     if (lookCommon(action, value)) return;
     if (action === 'look' && value) {
       draft.look = value;
-      lookUi.open = false;
       notice = '';
-      return render();
+      flashPick(value, () => {
+        lookUi.open = false;
+        render();
+      });
+      return;
     }
     return;
   }

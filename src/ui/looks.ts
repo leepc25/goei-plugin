@@ -103,18 +103,35 @@ export function lookCommon(action: string, value: string | undefined): boolean {
   return false;
 }
 
+/** 고른 칸을 바로 「고름」으로 보이고 잠깐 뒤에 닫는다 (11-08 눌러 보기 점검: 바로 닫혀 고른 표시를 볼 틈이 없음) */
+export const LOOK_CLOSE_MS = 350;
+export function flashPick(value: string, then: () => void | Promise<void>): void {
+  document.querySelectorAll<HTMLElement>('.gx-lookc').forEach((b) => {
+    const on = b.dataset.value === value;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  setTimeout(() => void then(), LOOK_CLOSE_MS);
+}
+
 /** 시작한 뒤 팝업의 단추: 고르면 이 채팅에 바로 적고 닫는다. 처리했으면 true */
 export async function lookAction(action: string, value: string | undefined, ctx: ChatContext, refresh: () => Promise<void>): Promise<boolean> {
   if (lookCommon(action, value)) return true;
   if (action !== 'look' || !lookUi.open || !value) return false;
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => (String(chat.scriptstate?.[LOOK_KEY] ?? '') === value ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [LOOK_KEY]: value } })).catch((error) => {
+  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => (String(chat.scriptstate?.[LOOK_KEY] ?? '') === value ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [LOOK_KEY]: value } })).catch((error) => {
     lookUi.notice = error instanceof Error ? error.message : String(error);
     return null;
   });
-  if (saved !== null || !lookUi.notice) lookUi.open = false;
   // 마지막에 고른 아바타 = 다음 새 채팅 기본
   await savePrefs((p) => ({ ...p, look: value })).catch(() => {});
-  await refresh();
+  if (lookUi.notice) {
+    await refresh();
+    return true;
+  }
+  flashPick(value, async () => {
+    lookUi.open = false;
+    await refresh();
+  });
   return true;
 }
 

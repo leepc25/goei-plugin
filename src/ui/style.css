@@ -4577,3 +4577,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gal .body { width: auto; max-width: 1000px; padding: 10px 10px 0; box-sizing: border-box; }
 .bs-gal.bs-m .body { padding: 0; }
 .bs-gal.bs-m .dpost { padding: 10px 12px; }
+/* 지도 핀 두 겹 (ui/field.ts layeredPins): 아래 겹은 이름표만, 위 겹은 점만 — 점이 다른 핀 이름표에 깔리지 않게 */
+.gx-pin.gx-plab .gx-dot { visibility: hidden; }
+.gx-pin.gx-pdot { pointer-events: none; }
+.gx-pin.gx-pdot .gx-pname { visibility: hidden; }
+.gx-pin.gx-pdot .gx-dot { pointer-events: auto; cursor: pointer; }
