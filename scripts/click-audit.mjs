@@ -7,9 +7,10 @@
 // 사용법: node scripts/click-audit.mjs [옵션]          (npm run audit:click -- [옵션])
 //   --vp pc,phone,land    화면 크기 (기본 pc,phone)
 //   --start board,picker  어느 화면에서 시작하나 (기본 board,picker,items,shop). board = 채팅 시작 뒤 상황판, picker = 시작 화면,
-//                         items = 상황판 + 소지품(장착·소모·손상·고장), shop = 그 상태로 채팅 속 가게 카드를 눌러 연 상점
+//                         items = 상황판 + 소지품(장착·소모·손상·고장), shop = 그 상태로 채팅 속 가게 카드를 눌러 연 상점,
+//                         gnet = 괴담넷 글·댓글·쪽지가 있는 상태
 //   --depth n             누른 뒤 새로 열린 화면을 몇 단계까지 따라 들어가나 (기본 6)
-//   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 25, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
+//   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 8, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
 //   --explore-values n    같은 data-action 중 몇 개의 값까지 열린 화면 안으로 따라 들어가나 (기본 0 = 제한 없음). 같은 꼴 화면(보이는 동작 이름 묶음이 같음)은 늘 한 번만 들어간다
 //   --max-clicks n        화면 크기마다 최대로 누를 수 (기본 0 = 끝까지)
 //   --workers n           동시에 띄울 페이지 수 (기본 CPU 수)
@@ -27,7 +28,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 25, exploreValues: 0, maxClicks: 0, workers: Math.max(2, os.cpus().length), out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop', 'gnet'], depth: 6, perAction: 8, exploreValues: 0, maxClicks: 0, workers: Math.max(2, os.cpus().length + 1), out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -80,6 +81,11 @@ const START_ITEMS = [
   { id: 'i_card', name: '사원증', desc: '관리국 출입증', effect: '', use: false, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
   { id: 'i_phone', name: '고장 난 휴대폰', desc: '화면이 깨짐', effect: '', use: false, state: 'broken', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
 ];
+const GNET_BOARD = { posts: [
+  { author: 'abc92', id: 1846002, title: '소라 랜드 관람차 혼자 돎', time: '02:30', date: '2025.01.01 02:30', views: 4237, upvotes: 113, content: '어제 봤음\n진짜임', mine: false,
+    comments: [{ author: 'ㅇㅇ(118.235)', content: '사진 없으면 구라', parent: 0, mine: false }, { author: 'abc92', content: '찍으려다 폰 꺼짐', parent: 1, mine: false }] },
+  { author: '아직안잠', id: 1846001, title: '야간 편의점 고양이', time: '02:20', date: '2025.01.01 02:20', views: 941, upvotes: 27, content: '오늘도 출근함', mine: false, comments: [] },
+], incoming: [{ nick: '관람차덕후', body: '혹시 몇 시쯤이었음?' }] };
 const SHELF = `<shop-identity>
 sells: 공구, 소모품, 작업복, 호신 기기
 never: 식품, 약
@@ -149,6 +155,16 @@ async function makeBase(browser, vp, kind) {
   // 소지품이 든 상태: 장착 무기·장비, 소모성, 보통 물건, 손상된 것
   if (kind === 'items' || kind === 'shop') {
     await page.evaluate((items) => { window.__chat.scriptstate.$st_items = JSON.stringify({ list: items, log: [] }); }, START_ITEMS);
+  }
+  // 괴담넷 글이 있는 상태: 괴담넷을 열고 새로고침(가짜 보조 모델이 글 둘·댓글을 돌려줌)
+  if (kind === 'gnet') {
+    await openWin(page); await settle(page);
+    await page.evaluate((b) => { window.__llm = [{ type: 'success', result: '```json\n' + JSON.stringify(b) + '\n```' }]; }, GNET_BOARD);
+    await page.evaluate(() => document.querySelector('[data-action="nav-tab"][data-value="gnet"], [data-action="tab"][data-value="gnet"]')?.click());
+    await sleep(400);
+    await page.evaluate(() => document.querySelector('[data-action="gn-refresh"]')?.click());
+    await page.waitForSelector('.gn-row-main', { timeout: 8000 }).catch(() => log('괴담넷 글이 안 생김'));
+    await sleep(300);
   }
   // 가게가 열린 상태: 응답에 가게 표식 → 채팅 카드 「상점 열기」 → 진열대(가짜 보조 모델 응답). 진열대가 저장된 채팅을 떠 둔다
   let pre = null;
@@ -315,7 +331,7 @@ async function pressStep(page, step, touch) {
 
 
 // 화면이 0.4초 동안 안 바뀔 때까지 기다린다(최대 4초). 임무 고르기처럼 효과 1.5초 뒤 다음 화면으로 넘어가는 것을 앞 단계로 다시 누를 때 필요
-async function quiet(page, still = 300, max = 4000) {
+async function quiet(page, still = 300, max = 2500) {
   await page.evaluate(() => { if (window.__caQuiet) return; window.__caQuiet = { t: performance.now() }; new MutationObserver(() => { window.__caQuiet.t = performance.now(); }).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true }); });
   await page.evaluate(() => { window.__caQuiet.t = performance.now(); });
   const t0 = Date.now();
