@@ -3337,6 +3337,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .sh-off { position: absolute; top: -1px; left: -1px; z-index: 2; padding: 3px 7px 3px 6px; border-radius: 12px 0 10px 0; background: var(--danger); color: #fff; font: 800 11.5px/1 var(--mono); letter-spacing: .02em; box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .7); }
 .sh-c.sale .sh-band { color: var(--red); }
 .sh-band s { margin-right: 5px; color: var(--dim); font-weight: 500; font-size: 11.5px; }
+.sh-c.sale .sh-band s { display: block; margin: 0 0 2px; } /* 특가 칸: 원래 값 윗줄, 할인가 아랫줄 (PC·폰 같이, 11-08 — 한 줄이면 할인가가 잘림) */
 
 /* 희귀: 단 하나. 어두운 진열장 + 그림 뒤 금빛 후광 + 테두리를 도는 빛줄기. 그림은 원본 2배(170px, 정수 확대) */
 @property --sh-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -3486,7 +3487,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .sh-top > .sh-sale { flex: none; } /* 세로로 쌓을 땐 폭 계산이 높이가 되지 않게 */
   .sh-rare { flex: none; gap: 12px; padding: 12px; }
   .sh-rare-pic, .sh-rare-pic img { width: 85px; height: 85px; }
-  .sh-c.sale .sh-band s { display: block; margin: 0 0 2px; }
   .sh-ph .it-ic { width: 96px; height: 96px; }
   .sh-foot { display: flex; gap: 8px; flex: none; }
   .sh-foot .it-act { flex: 1; height: var(--h); justify-content: center; border-radius: var(--r); font-size: 13.5px; }
