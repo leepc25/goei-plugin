@@ -60,6 +60,7 @@ export const gnet: GnetUi = {
 export const GN_KINDS: UserKind[] = ['image', 'photo', 'video', 'file', 'link'];
 
 export function resetGnet() {
+  uiSaved.clear();
   Object.assign(gnet, { sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, notice: '', failure: null, settings: false, attachMenu: false });
 }
 

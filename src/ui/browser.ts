@@ -104,8 +104,15 @@ export function tabState<T>(i = br.cur): T | null {
   return t && t.at >= 0 ? (JSON.parse(t.hist[t.at]) as T) : null;
 }
 
-export function newTab(site: SiteId | '' = ''): void {
-  br.tabs.push({ id: seq++, site, hist: [], at: -1 });
+/* 사이트마다 탭은 하나 (2026-11-08 사용자: 같은 사이트 탭이 여럿이면 같은 기록을 서로 덮어쓴다). 빈 새 탭도 하나 */
+/** 새 탭: 빈 탭이 이미 있으면 그 탭으로 */
+export function newTab(): void {
+  const i = br.tabs.findIndex((t) => !t.site);
+  if (i >= 0) {
+    br.cur = i;
+    return;
+  }
+  br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   br.cur = br.tabs.length - 1;
 }
 /** 탭 닫기. 마지막 탭을 닫으면 새 탭 하나가 남는다 */
@@ -115,11 +122,52 @@ export function closeTab(i: number): void {
   if (br.cur >= i && br.cur > 0) br.cur--;
   br.cur = Math.min(br.cur, br.tabs.length - 1);
 }
-/** 폰 서랍: 그 사이트 탭이 있으면 그 탭으로, 없으면 지금 탭에서 연다 (2026-11-08 사용자) */
-export function focusSite(site: SiteId): void {
+/** 사이트 열기: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
+export function openSite(site: SiteId): 'tab' | 'here' {
   const i = br.tabs.findIndex((t) => t.site === site);
-  if (i >= 0) br.cur = i;
-  else curTab().site = site;
+  if (i < 0) {
+    curTab().site = site;
+    return 'here';
+  }
+  if (i !== br.cur) {
+    const id = br.tabs[i].id;
+    if (!curTab().site) closeTab(br.cur);
+    br.cur = br.tabs.findIndex((t) => t.id === id);
+  }
+  return 'tab';
+}
+/** 폰 서랍·위키 바로가기: openSite 와 같다 */
+export const focusSite = (site: SiteId): void => void openSite(site);
+
+/* 새로고침해도 탭이 남게 (2026-11-08 사용자): 열린 사이트·보던 탭·탭마다 최근 기록을 이 채팅에 */
+export const BR_TABS_VAR = '$br_tabs';
+const SAVE_HIST = 10;
+export function tabsJson(): string {
+  return JSON.stringify({ c: br.cur, t: br.tabs.map((t) => ({ s: t.site, h: t.hist.slice(-SAVE_HIST), a: Math.max(-1, t.at - Math.max(0, t.hist.length - SAVE_HIST)) })) });
+}
+/** 채팅에 적힌 탭으로 (없거나 깨졌으면 빈 새 탭 하나) */
+export function restoreTabs(raw: unknown): void {
+  br.login = false;
+  br.list = false;
+  br.tabs = [];
+  br.cur = 0;
+  try {
+    const v = JSON.parse(String(raw ?? ''));
+    const seen = new Set<string>();
+    for (const t of Array.isArray(v?.t) ? v.t : []) {
+      const site: SiteId | '' = isSite(String(t?.s)) ? (t.s as SiteId) : '';
+      if (seen.has(site)) continue;
+      seen.add(site);
+      const hist = Array.isArray(t?.h) ? t.h.filter((x: unknown) => typeof x === 'string').slice(-SAVE_HIST) : [];
+      const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t.a), hist.length - 1) : hist.length - 1;
+      br.tabs.push({ id: seq++, site, hist, at });
+    }
+    if (Number.isInteger(v?.c)) br.cur = v.c;
+  } catch {
+    /* 빈 탭으로 */
+  }
+  if (!br.tabs.length) br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
+  br.cur = Math.max(0, Math.min(br.cur, br.tabs.length - 1));
 }
 
 // ── 그리기 ──

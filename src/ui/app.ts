@@ -44,7 +44,7 @@ import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { GN_NICK } from '../core/gnet';
-import { br, chromeHtml, closeTab, curTab, focusSite, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
+import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -118,6 +118,21 @@ const TABS: Tab[] = ['board', 'map', 'mission', 'net', ...(GNET_ON ? (['gnet'] a
 const BR_TABS: Tab[] = ['net', 'gnet', 'wiki'];
 const inBrowser = () => BR_TABS.includes(tab);
 /** 사이트 → 그 화면을 그리는 탭 (괴담넷·괴이위키만 옛 화면이 있다, 나머지는 net) */
+/** 탭을 이 채팅에 적어 둔다 (새로고침 뒤 되살리기, 2026-11-08 사용자). 바뀌었을 때만, 1.5초 모아서 */
+let tabsSaved = '';
+let tabsTimer: ReturnType<typeof setTimeout> | null = null;
+function saveTabsSoon(): void {
+  if (view.kind !== 'started' || tabsJson() === tabsSaved) return;
+  if (tabsTimer) clearTimeout(tabsTimer);
+  const { charIndex, chatIndex } = view.ctx;
+  tabsTimer = setTimeout(() => {
+    tabsTimer = null;
+    const json = tabsJson();
+    if (json === tabsSaved || view.kind !== 'started' || view.ctx.charIndex !== charIndex || view.ctx.chatIndex !== chatIndex) return;
+    tabsSaved = json;
+    void updateChat(charIndex, chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [BR_TABS_VAR]: json } })).catch(() => {});
+  }, 1500);
+}
 const siteTab = (site: SiteId | ''): Tab => (isBoardSite(site) ? 'gnet' : site === 'wk' ? 'wiki' : 'net');
 /** 게시판 동작이 어느 사이트 것인지: 설정 값 단추는 열린 설정 페이지의 사이트, 나머지는 지금 브라우저 탭 */
 function gnActionSite(action: string): BoardSite {
@@ -752,6 +767,8 @@ async function refresh(): Promise<void> {
         resetItems();
         resetShop();
         resetGnet();
+        restoreTabs(ctx.chat.scriptstate?.[BR_TABS_VAR]);
+        tabsSaved = tabsJson();
         resetPhone();
         resetSettings();
         resetDirectory();
@@ -1034,19 +1051,24 @@ async function handle(action: string, value?: string): Promise<void> {
       if (!value || !isSite(value)) return;
       cdrOpen = false;
       if (br.tabs.some((t) => t.site === value)) {
-        focusSite(value);
+        openSite(value);
         return openBrowserTab();
       }
-      if (!inBrowser()) br.cur = br.tabs.findIndex((t) => !t.site) >= 0 ? br.tabs.findIndex((t) => !t.site) : (newTab(), br.cur);
+      if (!inBrowser()) newTab();
       return goSite(value);
     case 'br-go':
-      if (value && isSite(value)) goSite(value);
-      return;
+      // 사이트마다 탭은 하나: 이미 열린 사이트면 그 탭으로 (2026-11-08 사용자)
+      if (!value || !isSite(value)) return;
+      if (br.tabs.some((t, i) => t.site === value && i !== br.cur)) {
+        openSite(value);
+        return openBrowserTab();
+      }
+      return goSite(value);
     case 'br-home':
       return goSite('');
     case 'br-new':
       newTab();
-      return goSite('');
+      return curTab().at >= 0 ? openBrowserTab() : goSite('');
     case 'br-tab':
       br.cur = Math.max(0, Math.min(br.tabs.length - 1, Number(value) || 0));
       br.list = false;
@@ -1458,6 +1480,7 @@ function render(): void {
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
   if (view.kind === 'started' && inBrowser()) recordTab(navState());
+  saveTabsSoon();
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
   root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));

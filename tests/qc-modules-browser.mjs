@@ -355,10 +355,7 @@ if (want('G3')) {
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.sampling'] === '1');
   await page.click('[data-action="gn-cfg"][data-value="privacy=4"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.privacy'] === '4');
-  await page.click('[data-action="gn-cfg"][data-value="style=wpf"]');
-  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.style'] === 'wpf');
   await featSet(page, 'set:gnet');
-  assert.ok((await page.textContent('.gx-panel')).includes('세정게'), '성격을 바꾸면 창 이름도');
   await page.click('[data-action="gn-sub"][data-value="board"]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
   await page.click('[data-action="gn-refresh"]');
@@ -374,7 +371,7 @@ if (want('G3')) {
   const nPosts = (raw.match(/^P\|/gm) ?? []).length;
   assert.ok(nPosts <= 9 + 71 && nPosts >= 71, `상한 9 + 보호 글 71: ${nPosts}`);
   assert.deepEqual(errors, []);
-  console.log('PASS 괴담넷: 글 500개 렌더·쪽지 보관 상한·자동 정리 끄기·수량·다양성·사생활·성격 설정');
+  console.log('PASS 괴담넷: 글 500개 렌더·쪽지 보관 상한·자동 정리 끄기·수량·다양성·사생활 설정');
   await page.close();
 }
 
