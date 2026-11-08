@@ -235,7 +235,7 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
   openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
   rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬'],
-  faction_rep: ['세력 평판', '세력(관리국·가짜 관리국·백일몽·민간·협회…)이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 판단해요(인용 필수, 세력당 응답에 1건, 메시지당 ±10). 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요'],
+  faction_rep: ['세력 평판', '세력이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 본문 근거를 들어 판단해요. 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
 
@@ -374,7 +374,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('호감 증가 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요 (리수폿 increase)'),
-    row('호감 감소 속도', seg('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown), [['same', '증가와 같게'], ['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 내리는 계기 점수에 곱하는 배율이에요 (리수폿 decrease). 「증가와 같게」면 위 값을 써요'),
+    row('호감 감소 속도', seg('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown), [['same', '증가와 같게'], ['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 내리는 계기 점수에 곱하는 배율이에요. 「증가와 같게」면 위 값을 써요'),
     row('항상 포함할 인물', `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">`, '쉼표로 구분한 이름. 글에 이름이 안 나와도 매 턴 본편 기록·Director 자료에 넣고, 갱신기도 되짚어요 (리수폿 자동 추적). 기록에 있는 이름만 들어가요'),
     row('최근 글 범위', seg('recent_msgs', String(s.recentMsgs), [['2', '2개'], ['4', '4개'], ['6', '6개'], ['8', '8개']]), 'Router·Director 가 이번 입력과 함께 보는 최근 메시지 수 (리수폿 stageContext)'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
@@ -386,15 +386,15 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const registerRows = v('register') === '1' ? [
     row('말투의 다변화', seg('register_variety', s.registerVariety, [['off', '끔'], ['one', '1단계'], ['two', '2단계']]), '끔 = 기존대로 최소 말투 관리 (호칭과 말높임). 1단계 = 개성과 대상에 맞게 변경. 상대에 따라 달라지는 지점과 실제 대사에서 보인 말버릇을 함께 기록. 2단계 = 관계 변경이 생기면 말투가 바뀌는 빈도가 높음. 친분·신분·호감 변화의 조짐을 기록하고, 조짐이 쌓이면 말투를 변경'),
     ...(s.registerVariety === 'two' ? [
-      row('관계변화 조짐 횟수', seg('register_sign_limit', String(s.registerSignLimit), [['1', '1 (AI 판단)'], ['2', '2 (AI 판단)'], ['3', '3회'], ['4', '4회'], ['5', '5회'], ['7', '7회'], ['9', '9회']]), '같은 방향의 조짐이 이 횟수만큼 쌓이면 말투를 바꿔요. 반대 방향의 조짐이 나오면 처음부터 다시 세요. 기본 3회. 3 미만으로 두면 횟수를 세지 않고 AI가 알아서 판단해 바꿔요'),
+      row('관계변화 조짐 횟수', seg('register_sign_limit', String(s.registerSignLimit), [['1', '1 (AI 판단)'], ['2', '2 (AI 판단)'], ['3', '3회'], ['4', '4회'], ['5', '5회'], ['7', '7회'], ['9', '9회']]), '같은 방향의 조짐이 이 횟수만큼 쌓이면 말투를 바꿔요. 반대 방향의 조짐이 나오면 처음부터 다시 세요. 3 미만으로 두면 횟수를 세지 않고 AI가 알아서 판단해 바꿔요'),
       row('말투 변경 시', seg('register_change', s.registerChange, [['ask', '묻기'], ['auto', '자동 반영']]), s.registerSignLimit < 3 ? '조짐 횟수가 3 미만이라 AI가 바로 판단해 바꿔요. 이 설정은 쓰이지 않아요.' : s.registerChange === 'auto' ? '조짐이 다 쌓이면 다음 턴에 갱신기가 말투를 바꿔요.' : '조짐이 다 쌓이면 인물 화면의 말투 항목에 승인·거절 버튼이 떠요. 승인해야 바뀌어요.'),
     ] : []),
   ].join('') : '';
   // 성적 욕망·이상성욕·발정모드 (리수폿 원본 인물관계 기록 설정 3개, 2026-11-07). 성격 6축 기능 안의 칸
   const sexualRows = v('axes') === '1' ? [
-    row('성적 욕망 기록', onoff('sexual_desire'), '인물마다 「침대에서 무엇을 좋아하는지」 3~5문장을 기록해요. 처음 글은 갱신기가 한 번 쓰고, 그 뒤엔 실제 성적 장면의 관찰이 6회·4장면·확신 75 이상 쌓여 승인해야 바뀌어요. 본편엔 성적 상황에서만 쓰라는 규칙과 함께 넣어요. 끄면 저장값은 보존돼요'),
+    row('성적 욕망 기록', onoff('sexual_desire'), '인물마다 「침대에서 무엇을 좋아하는지」 3~5문장을 기록해요. 처음 글은 갱신기가 한 번 쓰고, 그 뒤엔 실제 성적 장면의 관찰이 충분히 쌓인 뒤 승인해야 바뀌어요. 본편엔 성적 상황에서만 쓰라는 규칙과 함께 넣어요. 끄면 저장값은 보존돼요'),
     row('이상성욕 기록', onoff('paraphilia'), '성인 합의 범위의 성향 목록(페티시·사디즘·마조히즘·노출·관음 등)에서 고르거나 미확인. 성적 욕망과 같은 규칙으로 기록·변경돼요'),
-    row('발정모드', onoff('explicit_style'), '켬 = 노골적인 한국어 비속어로 쓰게 해요(원본 0.10.9). 끔 = 직설적이되 강한 어휘를 강요하지 않아요(0.10.7). 인물 화면에서 인물별로 따로 정할 수 있고, 여기서 바꾸면 인물별 설정은 다시 전체를 따라요'),
+    row('발정모드', onoff('explicit_style'), '켬 = 노골적인 한국어 비속어로 쓰게 해요. 끔 = 직설적이되 강한 어휘를 강요하지 않아요. 인물 화면에서 인물별로 따로 정할 수 있고, 여기서 바꾸면 인물별 설정은 다시 전체를 따라요'),
   ].join('') : '';
   const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1]) + ((NUMERIC_FEATURES as string[]).includes(f) ? numRow(f as NumericFeature) : '') + (f === 'register' ? registerRows : '') + (f === 'axes' ? sexualRows : '')).join('');
   const newPeople = [
@@ -405,7 +405,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
     row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
     idBox('update', v('model_id_update')),
-    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3. 지침 글은 설정 「지침 → 인물 기록 지침」에서 고쳐요.'),
+    row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 규칙과 설명 전부. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3. 지침 글은 설정 「지침 → 인물 기록 지침」에서 고쳐요.'),
     // 11-07 사용자: 기록 항목(정량·정성 포함)은 「기록할 것」의 하위 항목 — 눈에 띄는 띠 제목 칸 안에, 기본 펼침. 새 인물도 같은 모양의 칸
     fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</p>${features}`, true),
     fold('pp-new', '새 인물', newPeople, true),
@@ -433,13 +433,13 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ...(s.director !== 'off' ? [`<div class="pp-rules one">${ruleBox('pp-director-rules', 'Director 메모에 덧붙일 지침', v('director_rules'), '본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.', 2000, '예: 메모는 한 문장으로, 다음 장면의 분위기만', 'pp-drules-save')}</div>`] : []),
   ].join('');
   const tidy = [
-    row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요.'),
+    row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요).'),
     row('정리 방식', seg('tidy', s.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']]), '같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음 (추가 호출 없음, 모델은 갱신 모델). 별도 = 갱신 뒤 그 인물만 정리 호출 1회.'),
     ...(s.tidy === 'separate' ? [stageModel('tidy', '별도 정리 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델')] : []),
   ].join('');
   const advanced = fold('pp-adv', '고급', [
     row('직전 쌍 포함', seg('prev_pairs', String(s.prevPairs), [['0', '0'], ['1', '1'], ['2', '2']]), '읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수'),
-    row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
+    row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요.'),
     row('응답 길이 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 응답 글자 수. 이걸 넘는 응답은 보내지 않고 거부해요(진단 기록에 남음). 맥락 구간만 중간을 접어요.'),
     row('다른 보조 호출과 병렬', onoff('parallel'), '끄면 이미지·괴담톡 같은 다른 보조 호출 앞에 차례로 돌아요.'),
     row('하이파 참조', onoff('hypa'), 'Risu 하이파 메모리(HypaMemory) 요약을 갱신기·Director 자료에 배경으로 넣어요. 이번 입력·최근 글·장면 인물 이름과 관련 있는 요약부터, 중요 표시한 요약은 먼저. 근거로는 안 써요. 토큰이 늘어요'),
@@ -490,7 +490,7 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
       row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
       ...(s.factionQual ? [] : [
         row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
-        row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
+        row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반이면 작은 일은 쌓이지 않아요. 명단 인물이 본 일은 늘 그대로 넣어요.'),
       ]),
     ] : []),
   ].join('');
