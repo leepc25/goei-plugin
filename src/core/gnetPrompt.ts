@@ -2,10 +2,12 @@
 // 지침 문장은 카드의 GNet 로어북 섹션(옛 카드는 LB Backend도)을 그대로 읽고, CBS는 직접 푼다.
 // 결과는 언제나 두 메시지: system(틀 + 작업 지침 + 출력 형식) / user(참고 자료 + 최근 본문 + 현재 작업).
 import { hasAttachment } from './attach';
+import { viewSite, type BoardSite } from './boards';
+import { GUIDE_LABEL, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
-  activityContext, consList, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
-  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField, styleSwitched, GN_STYLE_NAME, gnetStyle } from './gnet';
+  activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
+  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
@@ -20,6 +22,9 @@ const REQUIRED_GNET = [
 ];
 const REQUIRED_LB = ['SYSTEM', 'OUTPUT', 'JAILBREAK', 'JOB'];
 
+/** 사이트마다 따로 쓰는 지침 (2026-11-08 사용자: 공용 없이 전부 따로) */
+const SITE_GUIDE: Record<BoardSite, GuideName> = { gn: 'GNet', gal: 'Gal', wpf: 'Wpf', sm: 'Salmon' };
+
 export interface GnetBooks {
   read(name: string): string;
   /** 출력 언어 문장 (고급 설정 → 생성 언어) */
@@ -28,8 +33,9 @@ export interface GnetBooks {
 
 /** GNet 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다. 생성 틀(SYSTEM 등)은 옛 카드면 LB Backend에 있다 */
 export function gnetBooks(src: RefSource): GnetBooks {
-  const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, 'GNet') };
-  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
+  const name = SITE_GUIDE[viewSite(src.chat.scriptstate)];
+  const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, name) };
+  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`${GUIDE_LABEL[name]} 지침의 ${k} 섹션이 없어요.`);
   applyAdvanced(src.chat.scriptstate);
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
   return {
@@ -120,7 +126,7 @@ export function boardJson(posts: GPost[]): string {
   });
 }
 
-/** 주요 인물 닉네임 (write = 이번 응답에 갱신을 쓰게 함). 반응 그림 지침. 라이트보드 미니보드 (2026-11-06) */
+/** 주요 인물 닉네임 (write = 이번 응답에 갱신을 쓰게 함). 라이트보드 미니보드 (2026-11-06) */
 function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline: string; format: string } {
   const s = gnetSettings(src.chat.scriptstate);
   const parts: string[] = [];
@@ -133,7 +139,6 @@ function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline:
       format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
     }
   }
-  if (s.cons) parts.push(fill(b.read('CONS.GUIDELINE'), { CONS: consList(src.chat.scriptstate).map((c) => c.name).join(', ') }));
   return { guideline: parts.filter(Boolean).join('\n\n'), format };
 }
 
@@ -159,14 +164,12 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
       + `\n<x-output-seed-a>${seed()}</x-output-seed-a>\n<x-output-seed-b>${seed()}</x-output-seed-b>`;
   }
   const protectedIds: number[] = [];
-  // 성격(괴담갤·괴담넷·세정게…)이 바뀐 뒤 첫 새로고침: 옛 성격의 글을 참고로 주면 모델이 그 결을 이어 가서 바뀐 티가 안 난다 (11-07 사용자) → 보호 글만 주고, 다른 게시판이라고 못 박는다
-  const switched = styleSwitched(src.chat.scriptstate);
   const reference = st.posts.filter((p, i) => {
     const prot = protectedPost(s, p);
     if (prot) protectedIds.push(p.id);
-    return prot || (!switched && i < HISTORY.refresh);
+    return prot || i < HISTORY.refresh;
   });
-  const action = b.read('ACTION.REFRESH') + (switched ? ` The board's character has just changed to ${GN_STYLE_NAME[gnetStyle(src.chat.scriptstate)]}: start it as a different community. Any saved posts listed here come from the previous board and are kept only as protected user records; do not continue their topics, threads, handles or tone.` : '');
+  const action = b.read('ACTION.REFRESH');
   const extras = fill(b.read('EXTENSION.REQUEST'), {
     TIME: dateNow(src.chat), USER_NICK: nick, KEEP_OWN: String(s.keepOwn), KEEP_REPLIED: String(s.keepReplied), PROTECTED: protectedIds.join(','),
     POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: action, BOARD: boardJson(reference),
@@ -298,7 +301,7 @@ export function retryMessages(prompt: GnetPrompt, raw: string, error: string): C
 
 /** 본편 요청에 붙이는 기록 앞의 안내문 */
 export function mainContextRules(src: RefSource): string | null {
-  const g = policySections(src.char.globalLore, 'GNet');
+  const g = policySections(src.char.globalLore, SITE_GUIDE[viewSite(src.chat.scriptstate)]);
   return g.MAIN_CONTEXT?.trim() || null;
 }
 

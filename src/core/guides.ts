@@ -1,7 +1,7 @@
 // 플러그인 내장 지침 (docs/설계안_세계편집.md 3장, 사용자 2026-10-27): 카드 로어북 GNet·Phone·Wiki·Directive·Visit 과
 // 카드 description(RP 지침)을 플러그인이 들고 간다. 카드 로어북은 더 읽지 않는다 (우선 규칙 없음).
 // 글은 src/data/guides/*.txt (경량 카드 v0.16.65 에서 그대로 옮김). 사용자가 고친 글(기기 설정)은 setGuideOverride 로 덮는다.
-import gnet from '../data/guides/gnet.txt';
+import gnetBase from '../data/guides/gnet.txt';
 import phone from '../data/guides/phone.txt';
 import wiki from '../data/guides/wiki.txt';
 import directive from '../data/guides/directive.txt';
@@ -12,12 +12,65 @@ import updater from '../data/guides/updater-detailed.txt';
 import updaterCompact from '../data/guides/updater-compact.txt';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext';
 
-export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)' };
+export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)' };
+
+/* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
+   여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
+const STYLE_WHEN = /^\{\{#when \{\{(equal|notequal)::\{\{getvar::lb_cfg_lb-gn\.style\}\}::(\w+)\}\}\}\}$/;
+/** s[i]가 「{{#when」일 때 그 여는 표식이 끝난 자리 */
+function openEnd(s: string, i: number): number {
+  let depth = 0;
+  for (let j = i; j < s.length; ) {
+    if (s.startsWith('{{', j)) { depth++; j += 2; continue; }
+    if (s.startsWith('}}', j)) { depth--; j += 2; if (!depth) return j; continue; }
+    j++;
+  }
+  return s.length;
+}
+/** 여는 표식 뒤 j부터 짝이 되는 「{{/when}}」 자리 */
+function closeAt(s: string, j: number): number {
+  let depth = 1;
+  for (;;) {
+    const a = s.indexOf('{{#when', j);
+    const b = s.indexOf('{{/when}}', j);
+    if (b < 0) return s.length;
+    if (a >= 0 && a < b) { depth++; j = openEnd(s, a); continue; }
+    if (!--depth) return b;
+    j = b + 9;
+  }
+}
+function pickStyle(s: string, style: string): string {
+  let out = '';
+  let i = 0;
+  for (;;) {
+    const a = s.indexOf('{{#when', i);
+    if (a < 0) return out + s.slice(i);
+    const e = openEnd(s, a);
+    const m = STYLE_WHEN.exec(s.slice(a, e));
+    if (!m) { out += s.slice(i, e); i = e; continue; }
+    const c = closeAt(s, e);
+    const keep = m[1] === 'equal' ? style === m[2] : style !== m[2];
+    out += s.slice(i, a) + (keep ? pickStyle(s.slice(e, c), style) : '');
+    i = c + 9;
+  }
+}
+const boardGuide = (style: 'net' | 'gal' | 'wpf') => pickStyle(gnetBase.replace(/\r/g, ''), style);
+/** 연어 마켓: 괴담갤(일반인 이용자) 갈래에서 소개·주제만 거래 게시판으로 */
+function salmonGuide(): string {
+  return boardGuide('gal')
+    .replace(/^괴담갤 is an ordinary Korean[^\n]*$/m, SALMON_ABOUT)
+    .replace(/^Use scary stories, local rumors[^\n]*$/m, SALMON_TOPICS);
+}
+const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
+const SALMON_TOPICS = 'Each post is a listing: 팝니다 (selling) or 삽니다 (buying), with the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';
 
 const DEFAULTS: Record<GuideName, string> = {
-  GNet: gnet.replace(/\r/g, ''),
+  GNet: boardGuide('net'),
+  Gal: boardGuide('gal'),
+  Wpf: boardGuide('wpf'),
+  Salmon: salmonGuide(),
   Phone: phone.replace(/\r/g, ''),
   Wiki: wiki.replace(/\r/g, ''),
   Directive: directive.replace(/\r/g, ''),
@@ -99,9 +152,9 @@ export const joinGuide = (parts: GuidePart[]): string => parts.map((p) => p.head
 
 /* ── 내가 추가한 규칙 (2026-10-27 리수폿식 「프롬프트」 탭): 기기 설정에 두고, 붙일 지침의 늘 쓰이는 절 끝에 넣는다 ──
    본편(RP): 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
-export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Phone' | 'Wiki';
-export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Phone', 'Wiki'];
-export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키' };
+export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Phone' | 'Wiki';
+export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki'];
+export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '위키' };
 export interface UserRule {
   id: string;
   title: string;
@@ -109,7 +162,7 @@ export interface UserRule {
   to: RuleTarget[];
   on: boolean;
 }
-const RULE_SECTION: Record<RuleTarget, string | null> = { RP: null, Directive: 'COMMON', GNet: 'LB', Phone: 'COMMON', Wiki: 'NW.GUIDE' };
+const RULE_SECTION: Record<RuleTarget, string | null> = { RP: null, Directive: 'COMMON', GNet: 'LB', Gal: 'LB', Wpf: 'LB', Salmon: 'LB', Phone: 'COMMON', Wiki: 'NW.GUIDE' };
 
 let userRules: UserRule[] = [];
 export function setUserRules(rules: UserRule[] | undefined | null): void {

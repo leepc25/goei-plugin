@@ -38,7 +38,8 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
-import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
+import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { isBoardSite, type BoardSite } from '../core/boards';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
@@ -117,7 +118,16 @@ const TABS: Tab[] = ['board', 'map', 'mission', 'net', ...(GNET_ON ? (['gnet'] a
 const BR_TABS: Tab[] = ['net', 'gnet', 'wiki'];
 const inBrowser = () => BR_TABS.includes(tab);
 /** 사이트 → 그 화면을 그리는 탭 (괴담넷·괴이위키만 옛 화면이 있다, 나머지는 net) */
-const siteTab = (site: SiteId | ''): Tab => (site === 'gn' ? 'gnet' : site === 'wk' ? 'wiki' : 'net');
+const siteTab = (site: SiteId | ''): Tab => (isBoardSite(site) ? 'gnet' : site === 'wk' ? 'wiki' : 'net');
+/** 게시판 동작이 어느 사이트 것인지: 설정 값 단추는 열린 설정 페이지의 사이트, 나머지는 지금 브라우저 탭 */
+function gnActionSite(action: string): BoardSite {
+  const page = settingsUi.page;
+  const setting = /^gn-(cfg|text|keep|def-)/.test(action);
+  if (setting && (page === 'gnet' || page === 'gal' || page === 'wpf' || page === 'sm')) return page === 'gnet' ? 'gn' : page;
+  return tabBoard();
+}
+/** 지금 탭이 게시판 사이트면 그 사이트 (괴담넷·괴담갤·세정게·연어 마켓은 같은 게시판 화면) */
+const tabBoard = (): BoardSite => { const s = curTab().site; return isBoardSite(s) ? s : 'gn'; };
 /** 폰 공용 서랍(위키·괴담넷·설정) 펼침 (2026-11-07 사용자: 메뉴별 도구 줄은 늘 보이고, 서랍은 전 메뉴 공통) */
 let cdrOpen = false;
 let lastForm: HTMLFormElement | null = null;
@@ -861,7 +871,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
-  if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
+  if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action)))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
     document.querySelectorAll('.gx-agpop').forEach((b) => b.remove()); // 사원증 창이 설정 창 위에 남지 않게 (2026-11-05)
@@ -1015,7 +1025,7 @@ async function handle(action: string, value?: string): Promise<void> {
       render();
       // 「창을 열 때」 확인: 본편이 진행됐으면 이 탭을 열 때 한 번
       if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
-      if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
+      if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv, tabBoard());
       if (view.kind === 'started' && tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
       return;
     // ── 인터넷 브라우저 (ui/browser.ts) ──
@@ -1053,7 +1063,7 @@ async function handle(action: string, value?: string): Promise<void> {
     }
     case 'br-reload':
       // 새로 고침 = 그 사이트를 새로 받기 (괴담넷은 게시판 새로고침, 나머지는 다시 그리기)
-      if (view.kind === 'started' && curTab().site === 'gn' && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv))) return;
+      if (view.kind === 'started' && isBoardSite(curTab().site) && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv, tabBoard()))) return;
       return render();
     case 'br-list':
       br.list = !br.list;
@@ -1362,7 +1372,7 @@ function render(): void {
   const logRoom = root.dataset.room ?? '';
   const logKeep = log && logRoom === (phone.room ?? '') ? (log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop) : -1;
   // 괴담넷: 같은 글·쪽지를 보고 있으면 목록과 본문의 스크롤 자리를 지킨다 (답글을 누르면 맨 위로 튀던 문제)
-  const gnKey = `${gnet.sub}:${gnet.open}:${gnet.openDm}`;
+  const gnKey = `${curTab().site}:${gnet.sub}:${gnet.open}:${gnet.openDm}`;
   const gnKeep = tab === 'gnet' && root.dataset.tab === 'gnet' && root.dataset.gn === gnKey
     ? ['.gn .ph-content', '.gn-pane .gn-doc'].map((q) => root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0)
     : null;
@@ -1506,6 +1516,7 @@ function applyNav(s: NavState): void {
   if (s.r) applyRecordsNav(s.r);
   if (s.i) applyItemsNav(s.i);
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
+  if (s.g) useBoardSite(tabBoard());
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
   agUi.pop = s.a ?? '';
@@ -1755,7 +1766,7 @@ function browserBody(ctx: ChatContext): string {
   const o = chromeOpts(ctx);
   const page = br.list && isPhone() ? tabListHtml(o)
     : !t.site ? homeHtml(browserSites(ctx))
-    : t.site === 'gn' ? gnetTab(ctx, gnetEnv)
+    : isBoardSite(t.site) ? gnetTab(ctx, gnetEnv, t.site)
     : t.site === 'wk' ? wikiTab(ctx, wikiEnv)
     : soonHtml(t.site);
   return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || 'home'}">${page}</div>${loginHtml(o)}</div>`;
@@ -1776,7 +1787,7 @@ function openBrowserTab(): void {
 /** 사이트를 처음 열 때: 「창을 열 때」 자동 호출 확인 */
 function siteOpened(): void {
   if (view.kind !== 'started') return;
-  if (tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
+  if (tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv, tabBoard());
   if (tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
 }
 

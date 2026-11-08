@@ -6,11 +6,10 @@ import {
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
-  userNick, writeGnet, consList, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel, GN_BOARD_STYLE, gnetStyle, styleSwitched } from '../core/gnet';
+  userNick, writeGnet, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
-import { guideOverridden, guideText } from '../core/guides';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
@@ -28,6 +27,7 @@ import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
+import { boardView, boardWrite, type BoardSite } from '../core/boards';
 import { isPhone } from './media';
 
 type Compose =
@@ -71,7 +71,36 @@ export interface GnetEnv {
 
 /** 채팅마다 한 번에 하나 (원본 LB.exclusive) */
 const jobs = new Map<string, string>();
-const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIndex}:${ctx.chatIndex}`;
+const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIndex}:${ctx.chatIndex}:${siteOf(ctx)}`;
+
+/* ── 사이트 (2026-11-08): 괴담넷·괴담갤·세정게·연어 마켓은 같은 게시판 코드를 쓰고 변수만 따로 (core/boards.ts) ── */
+type SiteCtx = ChatContext & { site?: BoardSite };
+const siteOf = (ctx: object): BoardSite => (ctx as SiteCtx).site ?? 'gn';
+/** 그 사이트로 비춘 ctx (이미 비췄으면 그대로) */
+function siteCtx(ctx: ChatContext, site: BoardSite): SiteCtx {
+  if ((ctx as SiteCtx).site === site) return ctx;
+  return { ...ctx, chat: boardView(ctx.chat, site), site };
+}
+/** 비춘 채팅으로 고치고, 원래 채팅에 되돌려 저장. 돌려주는 것도 비춘 채팅 */
+async function upd(ctx: ChatContext, f: (chat: Chat) => Chat | null | undefined): Promise<Chat | null> {
+  const site = siteOf(ctx);
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    const r = f(boardView(chat, site));
+    return r ? boardWrite(chat, r, site) : null;
+  });
+  return saved ? boardView(saved, site) : null;
+}
+/** 사이트마다 따로 둔 화면 상태 (글 펼침·쓰던 글 등) */
+let uiSite: BoardSite = 'gn';
+const uiSaved = new Map<BoardSite, GnetUi>();
+const freshUi = (): GnetUi => ({ sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false });
+export function useBoardSite(site: BoardSite): void {
+  if (site === uiSite) return;
+  uiSaved.set(uiSite, { ...gnet });
+  Object.assign(gnet, uiSaved.get(site) ?? freshUi());
+  uiSite = site;
+}
+export const boardSiteNow = (): BoardSite => uiSite;
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -151,7 +180,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     const first = joint && ((m: LlmMessage[]) => joint.ask('gnet', m));
     const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx.chat), first });
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
         note = '채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.';
         return null;
@@ -160,7 +189,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
       const inc = saveIncoming(chat, res.st, (value as { incoming?: unknown }).incoming, plan);
       note = [res.notice, res.emptyComments ? '이번 게시판에는 댓글이 하나도 없어요.' : '', inc.note].filter(Boolean).join(' ');
       const figs = s.keyFigures ? mergeKeyFigures(chat.scriptstate, (value as { keyFigures?: unknown }).keyFigures) : null;
-      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}), [GN_BOARD_STYLE]: gnetStyle(chat.scriptstate) }), res.st, { ack: viewing() });
+      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing() });
     });
     if (!automatic) gnet.open = null;
     else if (gnet.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), gnet.open)) gnet.open = null;
@@ -192,7 +221,7 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     const draft = attachPostDraft(parsed, input);
     let note = '글을 올렸어요.';
     let newId = 0;
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
       newId = p.id;
@@ -229,7 +258,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
     const snapshot = postKey(target);
     const { value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(chat));
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+    await upd(ctx, (latest) => {
       const cur = readGnet(latest);
       const p = findPost(cur, postId);
       if (!p || postKey(p) !== snapshot) {
@@ -260,7 +289,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
   const nick = userNick(ctx.chat.scriptstate);
   let index = 0;
   // 내 댓글은 먼저 저장한다 (원본과 같음). 반응 생성이 실패해도 남는다
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
     index = addUserComment(st, postId, parent, nick, body, dateNow(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
@@ -285,7 +314,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
     }
     const snapshot = postKey(target);
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = findPost(cur, postId);
       if (!p || postKey(p) !== snapshot) {
@@ -317,7 +346,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     gnet.notice = '나에게는 쪽지를 보낼 수 없어요.';
     return env.render();
   }
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
     addOutgoingDm(st, nick, body, dateNow(chat), src);
     return writeGnet(chat, st);
@@ -340,7 +369,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
       // 원본과 같이 고쳐 달라고 다시 묻는다 (횟수·모델은 고급 설정 → 생성 공통)
       reply = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
     } catch (error) {
-      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+      await upd(ctx, (chat) => {
         const cur = readGnet(chat);
         let i = cur.dms.length - 1;
         while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === 'me')) i--;
@@ -351,7 +380,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
       if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
       throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       cur.dms.push({ nick, side: 'npc', body: reply, unread: true, date: dateNow(chat) });
       return writeGnet(chat, cur, { ack: viewing() });
@@ -361,7 +390,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
 }
 
 async function mutate(ctx: ChatContext, env: GnetEnv, f: (st: GState, chat: Chat) => boolean | void, vars: Record<string, string> = {}, reconcile = true) {
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  await upd(ctx, (chat) => {
     const st = readGnet(chat);
     if (f(st, chat) === false) return null;
     return writeGnet(withVars(chat, vars), st, { reconcile });
@@ -374,7 +403,7 @@ async function setVar(ctx: ChatContext, env: GnetEnv, key: string, value: string
 }
 
 async function setVars(ctx: ChatContext, env: GnetEnv, vars: Record<string, string>) {
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => withVars(chat, vars));
+  await upd(ctx, (chat) => withVars(chat, vars));
   await env.refresh();
 }
 
@@ -389,18 +418,7 @@ function seg(key: string, cur: string, items: [string, string][]): string {
     .join('')}</div>`;
 }
 
-/** 반응 그림 표 (라이트보드 미니콘, 2026-11-06). gnetTab이 그릴 때마다 채운다 */
-let consMap = new Map<string, string>();
-const CON_RE = /\[콘:([^\[\]:]{1,30})\]/g;
-/** 본문의 [콘:이름]을 그림으로 바꾼다. 목록에 없는 이름은 글자 그대로 둔다 */
-export function withCons(html: string, map: Map<string, string>): string {
-  if (!map.size) return html;
-  return html.replace(CON_RE, (m, name: string) => {
-    const src = map.get(name);
-    return src ? `<img class="gn-con" src="${src}" alt="${name}" title="${name}" loading="lazy">` : m;
-  });
-}
-const body = (text: string) => withCons(attachBody(text, true), consMap);
+const body = (text: string) => attachBody(text, true);
 
 function time(date: string): string {
   return /(\d\d:\d\d)/.exec(date)?.[1] ?? '';
@@ -626,17 +644,11 @@ function settingsView(ctx: ChatContext, back = true): string {
       ].join(''))}
       ${group('게시판', [
         row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
-        row('성격', seg('style', ['gal', 'wpf', 'diary', 'emotion'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게'], ['diary', '일기장'], ['emotion', '감정 게시판']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
-        ...(styleSwitched(ctx.chat.scriptstate) ? [`<p class="ps-note gn-style-note">성격이 바뀌었어요. 다음 새로고침은 지금 글을 참고하지 않고 새 게시판으로 시작해요 (내 글·답글 달린 글은 보호 설정대로 남아요).</p>`] : []),
-        ...(guideOverridden('GNet') && !guideText('GNet').includes('lb-gn.style') ? [`<p class="ps-note gx-err">지침 탭에서 고쳐 쓴 괴담넷 지침에 성격 분기(lb-gn.style)가 없어요. 그 지침을 쓰는 동안은 성격을 바꿔도 요청문이 같아요. 지침 탭 → 괴담넷 → 「원본으로」 뒤 다시 고쳐 쓰세요.</p>`] : []),
-        ...(['diary', 'emotion'].includes(v('style')) ? [row('누구', text('who', '비우면 주인공'), '일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요')] : []),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
         row('보호 대상', text('protagonist', '비우면 주인공'), '위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공'),
         row('주요 인물 닉네임', seg('keyfigures', v('keyfigures') === '0' ? '0' : '1', [['1', '보존'], ['0', '안 함']]), '주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요'),
-        row('반응 그림', seg('cons', v('cons') === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '디시콘처럼 댓글·글에 반응 그림을 붙여요. 아래 목록에 그림이 있어야 켜져요'),
-        ...(v('cons') === '1' ? [row('반응 그림 목록', `<textarea class="gx-search ps-text" rows="5" data-change="gn-text" data-key="cons_list" placeholder="한 줄에 하나씩: 이름 | 그림 주소(https)">${esc(v('cons_list'))}</textarea>`, '이름은 30자 안쪽, 대괄호·쌍점 없이')] : []),
         row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']]), '새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요'),
         row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']]), '내가 댓글을 단 남의 글도 새로고침 때 남길지예요'),
       ].join(''))}
@@ -656,10 +668,11 @@ function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): stri
   return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>${gnetLabel(ctx.chat.scriptstate)}</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
 }
 
-export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
+export function gnetTab(base: ChatContext, env?: GnetEnv, site: BoardSite = 'gn'): string {
   if (env) liveEnv = env;
+  useBoardSite(site);
+  const ctx = siteCtx(base, site);
   const st = readGnet(ctx.chat);
-  consMap = gnetSettings(ctx.chat.scriptstate).cons ? new Map(consList(ctx.chat.scriptstate).filter((c) => /^(https?:\/\/|data:image\/)/.test(c.src)).map((c) => [esc(c.name), esc(c.src)])) : new Map();
   const me = userNick(ctx.chat.scriptstate);
   const job = jobs.get(chatKey(ctx));
   const busy = !!job;
@@ -706,14 +719,16 @@ let liveEnv: GnetEnv | null = null;
 
 async function currentChat(ctx: ChatContext): Promise<Chat | null> {
   try {
-    return (await risuai.getChatFromIndex(ctx.charIndex, ctx.chatIndex)) as Chat | null;
+    const chat = (await risuai.getChatFromIndex(ctx.charIndex, ctx.chatIndex)) as Chat | null;
+    return chat ? boardView(chat, siteOf(ctx)) : null;
   } catch {
     return null;
   }
 }
 
 /** 채팅 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
-export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false, joint?: Joint): Promise<void> {
+export async function autoRefreshGnet(base: ChatContext, messageIndex: number, open = false, joint?: Joint, site: BoardSite = 'gn'): Promise<void> {
+  const ctx = siteCtx(base, site);
   const s = gnetSettings(ctx.chat.scriptstate);
   if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
@@ -722,7 +737,7 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
   for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
   const stamp = `${messageIndex}:${hash}`;
   if (String(ctx.chat.scriptstate?.[AUTO_LAST] ?? '') === stamp) return;
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
+  const saved = await upd(ctx, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
   if (!saved) return;
   const env = liveEnv ?? quietEnv;
   const showing = env.current();
@@ -734,12 +749,13 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
 }
 
 /** 괴담넷 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답에 맞춰 아직 새로고침하지 않았으면 한 번 */
-export function gnetOpenCheck(ctx: ChatContext, env: GnetEnv): void {
+export function gnetOpenCheck(base: ChatContext, env: GnetEnv, site: BoardSite = 'gn'): void {
   liveEnv = env;
+  const ctx = siteCtx(base, site);
   if (!gnetSettings(ctx.chat.scriptstate).autoOpen) return;
   const at = lastReply(ctx.chat);
   if (at < 0) return;
-  void autoRefreshGnet(ctx, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
+  void autoRefreshGnet(ctx, at, true, undefined, site).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 const LAZY_HINT: Record<string, string> = {
@@ -749,8 +765,11 @@ const LAZY_HINT: Record<string, string> = {
 };
 
 /** 괴담넷 탭 버튼. 처리했으면 true */
-export async function handleGnet(action: string, value: string | undefined, ctx: ChatContext, env: GnetEnv): Promise<boolean> {
+export async function handleGnet(action: string, value: string | undefined, base: ChatContext, env: GnetEnv, site: BoardSite = uiSite): Promise<boolean> {
+  if (!action.startsWith('gn-')) return false;
   liveEnv = env;
+  useBoardSite(site);
+  const ctx = siteCtx(base, site);
   const v = value ?? '';
   const [a, b] = v.split(':').map(Number);
   const st = () => readGnet(ctx.chat);
@@ -969,7 +988,7 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
     }
     case 'gn-text': {
       const [k, ...rest] = v.split('=');
-      if (['subject', 'mood', 'protagonist', 'who', 'cons_list'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
+      if (['subject', 'mood', 'protagonist'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
       return true;
     }
     default:
@@ -980,10 +999,14 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
 }
 
 /** 메인 설정 「기능별 설정」에서 연다 */
-export const gnetSettingsPane = (ctx: ChatContext): string => settingsView(ctx, true);
+export function gnetSettingsPane(ctx: ChatContext, site: BoardSite = 'gn'): string {
+  useBoardSite(site);
+  return settingsView(siteCtx(ctx, site), true);
+}
 
 /** 호출 흐름 미리 계산: 지금 설정으로 새로고침이 보낼 요청 (모델은 안 부름). 확률 계획은 Math.random 그대로라 매번 조금 다를 수 있다 */
-export function previewGnetRefresh(ctx: ChatContext): LlmMessage[] {
+export function previewGnetRefresh(base: ChatContext, site: BoardSite = 'gn'): LlmMessage[] {
+  const ctx = siteCtx(base, site);
   const before = readGnet(ctx.chat);
   const nick = userNick(ctx.chat.scriptstate);
   const s = gnetSettings(ctx.chat.scriptstate);

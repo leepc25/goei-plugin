@@ -13,6 +13,9 @@ export const GUIDE_MAX = 120000;
 
 const HELP: Record<GuideName, string> = {
   GNet: '괴담넷 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Gal: '괴담갤 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Wpf: '세정게 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Salmon: '연어 마켓 거래 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Phone: '괴담톡(연락처·문자) 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Wiki: '위키 문서 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Directive: '요원 이동·커스텀 임무 때 모델에 주는 장면 지시문. COMMON·OPENING·CONTINUATION·CONTEXT·FORMAT(JSON) 절.',

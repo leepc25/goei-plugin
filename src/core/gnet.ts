@@ -2,6 +2,7 @@
 // 원칙(원본과 같음): 사용자 글·댓글·쪽지는 앱이 소유한다. 모델은 NPC 글·댓글·쪽지와 조회·추천 증가만 보탤 수 있고,
 // 저장된 글의 본문·작성자·날짜는 절대 바꾸지 못한다. 글 번호는 줄지 않는다(1846000부터).
 import type { Chat } from './types';
+import { BOARD_NAME, viewSite } from './boards';
 import { exactTokens } from './tokenizer';
 import { readWorld } from './world/output';
 import { attachmentRecords, bodyParts as parts, describe, hasAttachment, stripForged } from './attach';
@@ -68,27 +69,12 @@ export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
   mode: '2', quantity: '1', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
-  /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
-  style: 'net',
-  /** 일기·감정 게시판의 주인 (비우면 주인공). 라이트보드 미니보드 사전설정 「생각·감정」 (2026-11-06) */
-  who: '',
   /** 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) */
   keyfigures: '1',
-  /** 반응 그림 (라이트보드 미니콘, 2026-11-06). cons_list = 「이름 | 그림 주소」 줄들 */
-  cons: '0', cons_list: '',
 };
 
-/** 게시판 성격. diary = 한 사람의 속마음 일기, emotion = 한 사람의 감정들이 쓰는 게시판 (라이트보드 미니보드 사전설정, 2026-11-06) */
-export type GnetStyle = 'gal' | 'net' | 'wpf' | 'diary' | 'emotion';
-export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게', diary: '일기장', emotion: '감정 게시판' };
-export function gnetStyle(state: Record<string, unknown> | undefined): GnetStyle {
-  const v = String(state?.[CFG('style')] ?? '');
-  return v === 'gal' || v === 'wpf' || v === 'diary' || v === 'emotion' ? v : 'net';
-}
-/** 일기·감정 게시판이면 혼자 쓰는 게시판이라 선쪽지·사생활 규칙이 뜻이 없다 */
-export const innerBoard = (state: Record<string, unknown> | undefined): boolean => ['diary', 'emotion'].includes(gnetStyle(state));
-/** 메뉴·창 머리에 쓰는 게시판 이름 (설정에 따라) */
-export const gnetLabel = (state: Record<string, unknown> | undefined): string => GN_STYLE_NAME[gnetStyle(state)];
+/** 메뉴·창 머리에 쓰는 게시판 이름 (지금 비춰 보는 사이트) */
+export const gnetLabel = (state: Record<string, unknown> | undefined): string => BOARD_NAME[viewSite(state)];
 /** 쪽지 보관 (원본 gnet_retention: 자동 정리 켬/끔, 상대별 상한) */
 export const GN_STORAGE_AUTO = '$gn_storage_auto_dm';
 export const GN_STORAGE_LIMIT = '$gn_storage_limit_dm';
@@ -130,7 +116,6 @@ export interface GnetSettings {
   incoming: boolean;
   incomingChance: number;
   keyFigures: boolean;
-  cons: boolean;
 }
 
 export function gnetVars(state: Record<string, unknown> | undefined): Record<string, unknown> {
@@ -162,20 +147,14 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
     keepOwn: s('keepown') === '1',
     keepReplied: s('keepreplied') === '1',
     context: s('context') === '0',
-    incoming: s('incoming') !== '0' && !innerBoard(state),
+    incoming: s('incoming') !== '0',
     incomingChance: Number.isFinite(chance) ? Math.max(0, Math.min(100, chance)) : 100,
     keyFigures: s('keyfigures') !== '0',
-    cons: s('cons') === '1' && consList(state).length > 0,
   };
 }
 
 // ── 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) ──
 export const GN_KEYFIG = '$gn_keyfigures';
-/** 지금 게시판 글이 어느 성격(괴담갤·괴담넷·세정게…)으로 만들어졌는지. 성격을 바꾸면 다음 새로고침은 옛 글을 참고로 주지 않는다 (11-07 사용자: 성격을 바꿔도 똑같이 나온다) */
-export const GN_BOARD_STYLE = '$gn_board_style';
-export const boardStyle = (state: Record<string, unknown> | undefined): string => String(state?.[GN_BOARD_STYLE] ?? '');
-/** 성격이 바뀌어 게시판을 새로 시작해야 하는가 (아직 한 번도 안 받았으면 아니오) */
-export const styleSwitched = (state: Record<string, unknown> | undefined): boolean => boardStyle(state) !== '' && boardStyle(state) !== gnetStyle(state);
 export interface KeyFigure { keyFigure: string; nickname: string; note: string }
 
 export function keyFigures(state: Record<string, unknown> | undefined): KeyFigure[] {
@@ -204,17 +183,6 @@ export function mergeKeyFigures(state: Record<string, unknown> | undefined, rows
     changed = true;
   }
   return changed ? { [GN_KEYFIG]: JSON.stringify(list.slice(-60)) } : null;
-}
-
-// ── 반응 그림 (라이트보드 미니콘, 2026-11-06). 글·댓글 안의 [콘:이름] 을 그림으로 ──
-export function consList(state: Record<string, unknown> | undefined): { name: string; src: string }[] {
-  const raw = String(state?.[CFG('cons_list')] ?? '');
-  const out: { name: string; src: string }[] = [];
-  for (const line of raw.split('\n')) {
-    const [name, src] = line.split('|').map((x) => x.trim());
-    if (name && src && /^[^\[\]:]{1,30}$/.test(name) && !out.some((c) => c.name === name)) out.push({ name, src });
-  }
-  return out.slice(0, 200);
 }
 
 export function userNick(state: Record<string, unknown> | undefined): string {

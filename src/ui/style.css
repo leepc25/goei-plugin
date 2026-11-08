@@ -561,7 +561,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-dot { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--danger); vertical-align: middle; }
 .gn-post-body p, .gn-c-body p { margin: 0 0 6px; }
 .gn-post-body p:last-child, .gn-c-body p:last-child { margin-bottom: 0; }
-.gn-con { display: block; width: 96px; height: 96px; object-fit: contain; margin: 4px 0; }
 .gn-att { display: flex; gap: 8px; align-items: baseline; margin: 6px 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 14px; }
 .gn-att b { color: var(--amber); flex: none; }
 /* 첨부 (원본 at-card·at-menu) */
@@ -3642,7 +3641,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br-tab + .br-tab::before { content: ''; position: absolute; left: 0; top: 9px; height: 16px; width: 1px; background: #5f6368; }
 .br-tab.on { background: var(--ct); color: var(--ctx); }
 .br-tab.on::before, .br-tab.on + .br-tab::before { display: none; }
-.br-tabb { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 12px; text-align: left; }
+.br .br-tabb { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 12px; text-align: left; }
 .br-tt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .br-tx { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tx:hover, .br-plus:hover, .br-tb:hover:not(:disabled), .br-bm:hover { background: rgba(255, 255, 255, .08); }

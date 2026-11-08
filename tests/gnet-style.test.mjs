@@ -2,18 +2,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { evaluate, GN_DEFAULTS, gnetLabel } from '../dist-test/core.mjs';
+import { evaluate, gnetLabel, guideDefault, boards } from '../dist-test/core.mjs';
 
 const patches = JSON.parse(readFileSync('card/gnet-style.json', 'utf8'));
 const pick = (label) => Object.values(patches).map((v) => [v.old, v.new]).find(([o]) => o.includes(label));
 const ev = (text, style) => evaluate(text, { vars: { '$lb_cfg_lb-gn.style': style } });
 
-test('설정: 기본 net(괴담넷), 이름 표', () => {
-  assert.equal(GN_DEFAULTS.style, 'net');
+test('사이트 이름 표, 사이트별 기본 지침에 성격 갈래가 남지 않는다 (2026-11-08)', () => {
   assert.equal(gnetLabel({}), '괴담넷');
-  assert.equal(gnetLabel({ '$lb_cfg_lb-gn.style': 'gal' }), '괴담갤');
-  assert.equal(gnetLabel({ '$lb_cfg_lb-gn.style': 'wpf' }), '세정게');
-  assert.equal(gnetLabel({ '$lb_cfg_lb-gn.style': 'zzz' }), '괴담넷');
+  assert.equal(gnetLabel(boards.boardState({}, 'gal')), '괴담갤');
+  assert.equal(gnetLabel(boards.boardState({}, 'wpf')), '세정게');
+  assert.equal(gnetLabel(boards.boardState({}, 'sm')), '연어 마켓');
+  for (const name of ['GNet', 'Gal', 'Wpf', 'Salmon']) assert.ok(!guideDefault(name).includes('lb-gn.style'), name);
+  assert.ok(guideDefault('GNet').includes('trade flavor') && !guideDefault('GNet').includes('World Politics Forum texture'));
+  assert.ok(guideDefault('Wpf').includes('World Politics Forum texture') && !guideDefault('Wpf').includes('trade flavor'));
+  assert.ok(guideDefault('Gal').includes('scary stories') && !guideDefault('Gal').includes('conspiracy threads'));
+  assert.ok(guideDefault('Salmon').includes('팝니다') && !guideDefault('Salmon').includes('괴담갤 is an ordinary'));
 });
 
 test('지침 패치: 성격마다 소개·말투·주제가 하나씩만 남는다', () => {

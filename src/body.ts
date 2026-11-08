@@ -6,6 +6,7 @@ import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MAR
 import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
+import { BOARD_SITES, boardState, boardView } from './core/boards';
 import { mainContextRules } from './core/gnetPrompt';
 import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
 import { guidePrompt, RP_HEAD } from './core/guides';
@@ -379,20 +380,22 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
  *  지침·명부는 요청마다 다시 읽는다 (캐릭터 번호로 캐시하면 지침·명부를 고쳐도 옛것이 남았다. 명부 읽기는 10ms 안쪽. QC 2026-10-28) */
 function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const ss = chat.scriptstate;
-  const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
+  // 게시판 사이트마다 따로 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08)
+  const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view }) => !!view.scriptstate?.[GN_RAW] && gnetSettings(view.scriptstate).context);
+  const wantGnet = boardsOn.length > 0;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
   const wantWiki = wikiContextOn(ss);
   if (!wantGnet && !wantPhone && !wantWiki) return [];
   applyAdvanced(ss);
   const src = { char: { globalLore: char.globalLore }, chat };
-  const rules = { gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
+  const rules = { phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
   const focus = makeFocus(scene, buildRegistry(char.globalLore));
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
-  if (wantGnet && rules.gnet) {
-    const st = readGnet(chat);
-    const own = GN_CONTEXT.tokens;
-    if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rules.gnet!, focus)) });
+  for (const { view } of boardsOn) {
+    const rule = mainContextRules({ char: src.char, chat: view });
+    const st = readGnet(view);
+    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus)) });
   }
   if (wantPhone && rules.phone) {
     try {
@@ -545,9 +548,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
     const gnetAuto = gnetSettings(now.scriptstate).auto;
+    // 괴담넷 말고 다른 게시판 사이트 중 매 턴인 곳 (각자 따로 부른다)
+    const otherBoards = BOARD_SITES.filter((site) => site !== 'gn' && gnetSettings(boardState(now!.scriptstate, site)).auto);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
-    if (phoneAuto || gnetAuto || viewAuto || wikiAuto) {
+    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -568,12 +573,14 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
             autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
             autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
           ]);
+          for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
           if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
           if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
           return;
         }
         if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
         if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
+        for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
       })();
