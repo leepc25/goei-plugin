@@ -3,7 +3,7 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부·필드 건물 지도 (hqMap)
 // 적(enemy/)·아이템(items/)·대사(story/)를 여기에 잇는다. 옛 차원 승강기 출동(층·임무·정산)은 2026-10-28에 지웠다.
-import { bigText, BIG_BLUE, BIG_GOLD, BIG_INK, BIG_RED, type BigPal } from '../ui/bigText';
+import { bigText, BIG_BLUE, BIG_FIRE, BIG_GOLD, BIG_INK, BIG_RED, type BigPal } from '../ui/bigText';
 import { vsVoice, setVoiceVolume, type VoiceId } from '../../versus/voice';
 import { vsEventSound, setVsVolumes } from '../../versus/sound';
 import { BASE_STATS } from '../../combat/baseStats.gen';
@@ -12,8 +12,7 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { dotText, drawGuardBar, HUD_DIM, HUD_INK, hudImg, type SkillIcon } from '../ui/pixelHud';
-import { HUD_ART } from '../ui/pixelHudArt';
+import { dotText, drawGuardBar, HUD_DIM, HUD_INK, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
 import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
@@ -1688,16 +1687,20 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   c.imageSmoothingEnabled = false;
   // 11-08 사용자 「격투게임처럼 화면 구성」: 위쪽 = 바깥 얼굴 · 안쪽으로 길게 뻗은 체력 막대 · 가운데 시간, 막대 아래 이름·판 표시,
   // 얼굴 아래 대기 캐릭터 이름(태그매치), 아래 구석 = 필살 게이지·쌓인 수. 상자·띠 없이 도트 틀만 (본문을 덮지 않는다)
-  const P = HUD_ART.portrait, face0 = 16, timerHalf = 46;
-  const barX0 = face0 + P.w + 6, barX1 = W / 2 - timerHalf, barW = Math.round(barX1 - barX0), barH = 18;
-  const barY = top + 10;
+  // 11-08 사용자 「킹오파 비율로」: 얼굴 칸 폭의 약 1/9, 막대 높이 약 1/36, 시간 숫자는 막대 두 배 넘게
+  const PS = 136, face0 = 12, timerHalf = 58;
+  const barX0 = face0 + PS + 4, barX1 = W / 2 - timerHalf, barW = Math.round(barX1 - barX0), barH = 28;
+  const barY = top + 8;
   // 그림판 바닥(경기 줄 아래 끝): 세계는 가로로 맞추고 세로 가운데 (render.ts)
   const floorY = Math.round(H) - 14;   // 그림판 맨 아래 구석 (발밑보다 아래, 대기 캐릭터와 겹치지 않게)
-  const bar = (x: number, y: number, w: number, h: number, mirror: boolean, parts: { r: number; col: (row: number, h: number) => string }[], ticks = 10) => {
+  const bar = (x: number, y: number, w: number, h: number, mirror: boolean, parts: { r: number; col: (row: number, h: number) => string }[], ticks = 0) => {
     x = Math.round(x); y = Math.round(y);
-    c.fillStyle = '#07090b'; c.fillRect(x - 2, y - 2, w + 4, h + 4);          // 검은 테
-    c.fillStyle = '#4a5058'; c.fillRect(x - 2, y - 2, w + 4, 1);              // 윗 테 밝은 줄
-    c.fillStyle = '#1a1e24'; c.fillRect(x, y, w, h);                          // 빈 속
+    c.fillStyle = '#07090b'; c.fillRect(x - 3, y - 3, w + 6, h + 6);          // 검은 테
+    c.fillStyle = '#8a9098'; c.fillRect(x - 2, y - 2, w + 4, 1);              // 윗 테 밝은 줄
+    c.fillStyle = '#3c4048'; c.fillRect(x - 2, y + h + 1, w + 4, 1);          // 아래 테 어두운 줄
+    // 빈 칸: 줄어든 만큼 늘 보인다 (11-08 사용자). 어두운 붉은 속 + 위 그림자 줄
+    c.fillStyle = '#3a1518'; c.fillRect(x, y, w, h);
+    c.fillStyle = '#22090b'; c.fillRect(x, y, w, Math.max(2, Math.round(h / 5)));
     for (const pt of parts) {
       const fw = Math.round(w * Math.max(0, Math.min(1, pt.r)));
       if (fw <= 0) continue;
@@ -1705,6 +1708,7 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       for (let row = 0; row < h; row++) { c.fillStyle = pt.col(row, h); c.fillRect(fx, y + row, fw, 1); }
     }
     c.fillStyle = 'rgba(7,9,11,.55)';
+    // 체력 막대는 눈금 없이 매끄럽게 (11-08 사용자 「구간이 안 보여야」), 게이지만 칸
     for (let t = 1; t < ticks; t++) c.fillRect(x + Math.round((w * t) / ticks), y + 2, 1, h - 4);   // 눈금
   };
   const one = (i: 0 | 1, b: Body | undefined) => {
@@ -1721,14 +1725,18 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     const name = f.art?.cfg.name ?? (f.label ?? '').replace(/^AI /, '').replace(/ \d+$/, '');
     const mir = i === 1;
     // 얼굴: 바깥 구석, 2P 는 거울 자리에서 안쪽을 본다
-    const px = mir ? W - face0 - P.w : face0, py = top;
+    const px = mir ? W - face0 - PS : face0, py = top;
+    // 얼굴 칸 (11-08 사용자 「기존 것 말고 격투게임처럼」): 검은 테 · 흰 줄 · 1P 파랑/2P 빨강 바탕에 얼굴을 두 배(정수배)로,
+    // 얼굴은 가운데(상대)를 본다. 바탕은 두 단(위 밝게) — 그라데이션 아님
     const face = f.art ? charFace(f.art.key, 64, mir) : null;
-    const [fx0, fy0, fx1, fy1] = P.inner;
-    c.fillStyle = 'rgba(12,15,19,0.6)'; c.fillRect(px + fx0, py + fy0, fx1 - fx0, fy1 - fy0);
-    if (face) c.drawImage(face, px + fx0, py + fy0, fx1 - fx0, fy1 - fy0);
-    if (st.hurt > 0) { c.fillStyle = `rgba(255,40,40,${Math.min(0.6, st.hurt * 1.6)})`; c.fillRect(px + fx0, py + fy0, fx1 - fx0, fy1 - fy0); }
-    const pim = hudImg('portrait');
-    if (pim) { if (mir) { c.save(); c.translate(px + P.w, py); c.scale(-1, 1); c.drawImage(pim, 0, 0); c.restore(); } else c.drawImage(pim, px, py); }
+    c.fillStyle = 'rgba(0,0,0,.5)'; c.fillRect(px + 3, py + 3, PS, PS);               // 오른쪽 아래 그림자
+    c.fillStyle = '#07090b'; c.fillRect(px, py, PS, PS);
+    c.fillStyle = '#f2efe6'; c.fillRect(px + 2, py + 2, PS - 4, PS - 4);
+    const ix = px + 4, iy = py + 4, iw = PS - 8;
+    c.fillStyle = mir ? '#c8362a' : '#2f5fd0'; c.fillRect(ix, iy, iw, iw);
+    c.fillStyle = mir ? '#e4583e' : '#4f86f0'; c.fillRect(ix, iy, iw, Math.round(iw * 0.4));
+    if (face) c.drawImage(face, ix, iy, iw, iw);
+    if (st.hurt > 0) { c.fillStyle = `rgba(255,40,40,${Math.min(0.6, st.hurt * 1.6)})`; c.fillRect(ix, iy, iw, iw); }
     // 체력 막대: 깎인 만큼 흰 띠가 늦게 따라온다, 4분의 1 아래면 깜빡
     const bx = mir ? W - barX0 - barW : barX0;
     const r = Math.max(0, b.hp) / b.hpMax, low = r < 0.25, blink = low && Math.sin(vsT * 10) > 0, hue = r > 0.5 ? 100 : r > 0.25 ? 48 : 4;
@@ -1737,13 +1745,13 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       { r, col: (row, h) => (row < 2 ? `hsl(${hue},75%,${blink ? 82 : 70}%)` : row >= h - 3 ? `hsl(${hue},70%,${blink ? 46 : 30}%)` : `hsl(${hue},68%,${blink ? 64 : 47}%)`) },
     ]);
     // 이름: 막대 아래 바깥쪽, 판 표시: 막대 아래 안쪽
-    const nt = dotText(name, HUD_INK, 2);
+    const nt = dotText(name, HUD_INK, 3);
     c.drawImage(nt, mir ? Math.round(bx + barW - nt.width) : Math.round(bx), barY + barH + 6);
     const marks = versus.mode === 'duel' ? Array.from({ length: 2 }, (_, n) => n < versus.wins[i])
       : versus.mode === 'team' ? versus.team[i].map((_, n) => n >= versus.cur[i]) : [];
-    const sz = 10, gap = 5;
+    const sz = 14, gap = 6;
     marks.forEach((on, n) => {
-      const mx = mir ? bx + n * (sz + gap) : bx + barW - sz - n * (sz + gap), my = barY + barH + 8;
+      const mx = mir ? bx + n * (sz + gap) : bx + barW - sz - n * (sz + gap), my = barY + barH + 10;
       c.fillStyle = '#07090b'; c.fillRect(mx - 2, my - 2, sz + 4, sz + 4);
       c.fillStyle = on ? (versus.mode === 'duel' ? '#ffd35a' : '#e6e4dc') : '#2a3036';
       c.fillRect(mx, my, sz, sz);
@@ -1752,13 +1760,13 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     // 얼굴 아래: 태그매치 대기 캐릭터 이름 (다음 차례부터)
     if (versus.mode === 'team') {
       versus.team[i].slice(versus.cur[i] + 1).forEach((n, j) => {
-        const t = dotText(n, HUD_DIM, 1);
-        c.drawImage(t, mir ? Math.round(px + P.w - t.width) : px, py + P.h + 4 + j * (t.height + 2));
+        const t = dotText(n, HUD_DIM, 2);
+        c.drawImage(t, mir ? Math.round(px + PS - t.width) : px, py + PS + 4 + j * (t.height + 2));
       });
     }
     // 아래 구석: 필살 게이지와 쌓인 수
     const g = Math.max(0, Math.min(100, f.gauge ?? 0)), full = g >= 100;
-    const gw = 180, gh = 10, num = bigText(full ? '1' : '0', full ? BIG_GOLD : BIG_INK, 3);
+    const gw = 300, gh = 16, num = bigText(full ? '1' : '0', full ? BIG_FIRE : BIG_INK, 5, { slant: false, bold: true });
     const gx = mir ? W - face0 - num.width - 6 - gw : face0 + num.width + 6, gy = floorY - gh;
     c.drawImage(num, mir ? W - face0 - num.width : face0, gy + gh - num.height + 6);
     const pulse = full ? 0.5 + 0.5 * Math.sin(vsT * 7) : 0;
@@ -1775,7 +1783,7 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   // 가운데 시간: 두 막대 사이, 큰 도트 숫자 (10초 아래면 빨갛게 깜빡)
   if (versus.mode !== 'survival') {
     const sec = Math.ceil(versus.clock), low = sec <= 10 && !versus.ko && !versus.over;
-    const t = bigText(String(Math.max(0, sec)).padStart(2, '0'), low ? BIG_RED : BIG_INK, 4);
+    const t = bigText(String(Math.max(0, sec)).padStart(2, '0'), low ? BIG_RED : BIG_FIRE, 6, { slant: false, bold: true, edge: 1 });
     if (!low || Math.floor(vsT * 4) % 2 === 0) c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(barY + barH / 2 - t.height / 2) + 2);
     if (low && sec !== vsClockSay && sec > 0) { vsClockSay = sec; vsSay?.('timerWarn'); }
   }

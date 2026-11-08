@@ -39,38 +39,44 @@ const G: Record<string, string[]> = {
 };
 const H = 9;
 
-export interface BigPal { light: string; mid: string; dark: string }
+export interface BigPal { light: string; mid: string; dark: string; /** 위→아래 계단 색 (그라데이션 아님, 도트 단) */ band?: string[] }
 export const BIG_GOLD: BigPal = { light: '#fff6c8', mid: '#ffcf4a', dark: '#c27a12' };
 export const BIG_BLUE: BigPal = { light: '#e4f0ff', mid: '#6fa8ff', dark: '#2a4fb0' };
 export const BIG_RED: BigPal = { light: '#ffe0d8', mid: '#ff6a4a', dark: '#a8261a' };
+/** 큰 알림(READY·GO)·시간 숫자: 노랑 → 주황 다섯 단 */
+export const BIG_FIRE: BigPal = { light: '#fff7c0', mid: '#ffc23a', dark: '#e0600e', band: ['#fff7c0', '#ffe066', '#ffc23a', '#ff9a1e', '#e0600e'] };
 export const BIG_INK: BigPal = { light: '#ffffff', mid: '#e6e4dc', dark: '#9a978c' };
 
 const cache = new Map<string, HTMLCanvasElement>();
 
+export interface BigOpt { /** 기울임 (기본 켬) */ slant?: boolean; /** 굵게: 획을 오른쪽으로 한 도트 넓힌다 */ bold?: boolean; /** 검은 테 두께(도트) */ edge?: number }
 /** 큰 글자 한 줄. U = 도트 한 칸 크기(px, 정수) */
-export function bigText(s: string, pal: BigPal = BIG_GOLD, U = 5): HTMLCanvasElement {
-  const key = `${s}|${pal.mid}|${U}`;
+export function bigText(s: string, pal: BigPal = BIG_GOLD, U = 5, opt: BigOpt = {}): HTMLCanvasElement {
+  const sl = opt.slant ?? true, bold = !!opt.bold, E = Math.max(1, opt.edge ?? 1);
+  const key = `${s}|${pal.mid}|${U}|${sl}|${bold}|${E}`;
   const hit = cache.get(key);
   if (hit) return hit;
   // 글자를 한 판(도트 격자)에 이어 붙인다: 글자 사이 1도트
   const rows: string[] = Array.from({ length: H }, () => '');
   for (const ch of s.toUpperCase()) {
     const g = G[ch] ?? G[' '];
-    for (let y = 0; y < H; y++) rows[y] += g[y] + '.';
+    for (let y = 0; y < H; y++) rows[y] += (bold ? [...g[y] + '.'].map((c, x, a) => (c === '#' || a[x - 1] === '#' ? '#' : '.')).join('') : g[y]) + '.';
   }
-  const slant = (y: number) => Math.floor((H - 1 - y) / 3);   // 위로 갈수록 오른쪽 (기울임)
+  const slant = (y: number) => (sl ? Math.floor((H - 1 - y) / 3) : 0);   // 위로 갈수록 오른쪽 (기울임)
   const gw = rows[0].length;
-  const W = gw + slant(0) + 4, HH = H + 4;
-  const on = (x: number, y: number) => { if (y < 0 || y >= H) return false; const gx = x - 1 - slant(y); return gx >= 0 && gx < gw && rows[y][gx] === '#'; };
-  const near = (x: number, y: number) => [-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)));
+  const W = gw + slant(0) + 2 * E + 2, HH = H + 2 * E + 2;
+  const on = (x: number, y: number) => { if (y < 0 || y >= H) return false; const gx = x - E - slant(y); return gx >= 0 && gx < gw && rows[y][gx] === '#'; };
+  const R = Array.from({ length: 2 * E + 1 }, (_, i) => i - E);
+  const near = (x: number, y: number) => R.some((dy) => R.some((dx) => on(x + dx, y + dy)));
   const cv = document.createElement('canvas');
   cv.width = W * U; cv.height = HH * U;
   const o = cv.getContext('2d')!;
-  const px = (x: number, y: number, c: string) => { o.fillStyle = c; o.fillRect(x * U, (y + 1) * U, U, U); };
+  const px = (x: number, y: number, c: string) => { o.fillStyle = c; o.fillRect(x * U, (y + E) * U, U, U); };
   // 그림자 → 검은 테 → 글자 (띠 세 단: 위 2줄 밝게, 아래 3줄 어둡게)
-  for (let y = -1; y < HH; y++) for (let x = 0; x < W; x++) if (!near(x, y) && near(x - 1, y - 1)) px(x, y, 'rgba(0,0,0,.5)');
-  for (let y = -1; y < HH; y++) for (let x = 0; x < W; x++) if (!on(x, y) && near(x, y)) px(x, y, '#07090b');
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (on(x, y)) px(x, y, y < 2 ? pal.light : y >= H - 3 ? pal.dark : pal.mid);
+  for (let y = -E; y < HH; y++) for (let x = 0; x < W; x++) if (!near(x, y) && near(x - 1, y - 1)) px(x, y, 'rgba(0,0,0,.5)');
+  for (let y = -E; y < HH; y++) for (let x = 0; x < W; x++) if (!on(x, y) && near(x, y)) px(x, y, '#07090b');
+  // 띠: 팔레트에 band 가 있으면 줄마다 그 색 (계단식 다섯 단), 없으면 세 단
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (on(x, y)) px(x, y, pal.band ? pal.band[Math.min(pal.band.length - 1, Math.floor((y * pal.band.length) / H))] : y < 2 ? pal.light : y >= H - 3 ? pal.dark : pal.mid);
   cache.set(key, cv);
   return cv;
 }
