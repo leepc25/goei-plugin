@@ -10,7 +10,7 @@ const VS_BG_NAMES: [string, string][] = [
   ['training', '훈련장'], ['clinic', '격리팀 사무실'], ['office', '종합대응팀'], ['lounge', '휴게실'], ['infirmary', '의무실'],
   ['by_street', '강남 거리'], ['by_lobby', '백일몽 1층 로비'], ['by_f13', '백일몽 13층'], ['by_lab', '연구1팀 연구실'],
   ['sdra_street', '영등포 거리'], ['sdra_b1', '협회 지하 1층'],
-  ['jr_entry', '중림 지하상가 입구'], ['jr_b1', '중림 지하상가 지하 1층'], ['jr_alley', '중림 뒷골목'], ['jr_b2', '중림 지하상가 지하 2층'],
+  ['jr_entry', '중림 지하상가 입구'],
 ];
 
 let rerender = () => {};

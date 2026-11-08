@@ -7,7 +7,7 @@ import { ensureKit } from './kit';
 /** 대전 화면: 세로 960 (월드 480 × 2), 가로는 최대 무대 전체 2560 (월드 1280 × 2) */
 const VS_H = 960;
 /** 가로 맞춤의 최대 폭 = 무대 전체 (월드 무대 길이 × 1.6) */
-const vsWMax = () => Math.round(view.vsLen * VS_H / 600);
+const vsWMax = () => Math.round(view.vsLen * VS_H / 686);
 
 export const W = 1280,
   H = 720;

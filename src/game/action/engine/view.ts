@@ -14,7 +14,7 @@ export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, n
   relayout: null as null | (() => void),
   vsBg: null as null | { img: CanvasImageSource; x: number; y: number; w: number; h: number; objs: { img: HTMLImageElement; x: number; y: number; w: number; h: number; front: boolean }[];
     /** 무대 길이(월드), 대기 캐릭터 자리 (뒤 줄까지 높이·원근 배율·무대 끝에서 거리) */
-    len: number; bench: { dy: number; k: number; dx?: [number, number] | null } },
+    len: number; bench: { spots: { x: number; dy: number; k: number }[][] } },
   /** 대전 무대 길이 (월드). 배경이 있으면 그 배경 구간 길이 (11-08 사용자: 2.5~3화면) */
   vsLen: 2000,
   /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */

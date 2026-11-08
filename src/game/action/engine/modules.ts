@@ -1616,8 +1616,6 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
 
 /** 태그매치 대기 인물 (11-08 사용자): 자기 편 뒤쪽 끝에 작게(원근) 서서 각자 동작. 판이 끝나면 이긴 편 환호·진 편 화내기 */
 const BENCH_K = 0.72;
-/** 배경 장면 원근 위에 더 곱하는 값 (대기 캐릭터는 그 장면 뒤 줄 크기 그대로) */
-const BENCH_SC = 1;
 const BENCH_CLIPS = ['rest', 'limber', 'phone', 'coffee', 'smoke', 'snack', 'browse', 'call', 'pushup', 'talk'];
 const benchT = new Map<string, { clip: string; since: number; until: number }>();
 function drawBench(c: CanvasRenderingContext2D, camX: number) {
@@ -1630,9 +1628,9 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
     const list = versus.team[side].slice(versus.cur[side] + 1);
     list.forEach((name, k) => {
       // 무대 양 끝에 겹치지 않게 나란히 (11-08 사용자), 싸우는 줄보다 뒤. 배경이 있으면 그 장면의 뒤 줄 높이·원근 (tools/build_vs_packs.py)
-      const bb = view.vsBg?.bench, L = view.vsLen;
-      const d = bb?.dx ? bb.dx[Math.min(k, 1)] / 2 + Math.max(0, k - 1) * 75 : 70 + k * 110;
-      const x = side === 0 ? d : L - d, y = VS_LINE + (bb ? bb.dy : -150), bk = bb ? bb.k * BENCH_SC : BENCH_K;
+      // 배경 장면: tools/build_vs_packs.py fit_stage 가 필드 바닥·막힘 자료로 잡은 자리 (11-08 사용자: 배경 물건 무시하고 세우지 말 것)
+      const sp = view.vsBg?.bench.spots[side]?.[k], L = view.vsLen, d = 70 + k * 110;
+      const x = sp ? sp.x : side === 0 ? d : L - d, y = VS_LINE + (sp ? sp.dy : -150), bk = sp ? sp.k : BENCH_K;
       const dir: 1 | -1 = side === 0 ? 1 : -1;
       const key = `${side}|${name}`;
       let clip: string, since: number;

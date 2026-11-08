@@ -19,9 +19,9 @@ FACE = 64
 # 대전 배경으로 쓰는 필드 장면 (화장실·샤워실 빼고). 이름표는 src/ui/versus.ts VS_BG_NAMES
 VS_BGS = ['street', 'lobby', 'f2', 'f3', 'b1', 'b2', 'training', 'clinic', 'office', 'lounge', 'infirmary',
           'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_b1',
-          'jr_entry', 'jr_b1', 'jr_alley', 'jr_b2']
-# 무대 (11-08 사용자): 도트 1.6배에서 한 화면 = 월드 800. 무대는 2.5~3화면 → 월드 최대 2400 (배경이 짧으면 배경 전체)
-VS_LEN = 2400
+          'jr_entry']   # 중림 지하 셋(jr_b1·jr_alley·jr_b2)은 뺌 (11-08 사용자: 이음새 기둥이 3화면 무대에서 시야를 가린다)
+# 무대 (11-08 사용자): 도트 1.4배에서 한 화면 = 월드 914. 무대는 2.5~3화면 → 월드 최대 2743 (배경이 짧으면 배경 전체)
+VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
 #   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
 #   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
@@ -39,6 +39,63 @@ def persp_of(y, lane, far, grow, sizes):
     a = lane[0]; b = grow if grow and grow > a else lane[1]
     t = max(0, min(1, (y - a) / (b - a))) if b > a else 1
     return far + (1 - far) * t
+
+def _inpoly(x, y, P):
+    c = False; j = len(P) - 1
+    for i in range(len(P)):
+        xi, yi = P[i]; xj, yj = P[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi: c = not c
+        j = i
+    return c
+
+def fit_stage(v, c):
+    """싸우는 줄·무대 구간·대기 자리를 필드 바닥(floor)·막힘(holes) 자료로 잡는다 (11-08 사용자: 배경 물건 무시하고 세우지 말 것).
+    싸우는 줄은 무대 전체 폭에서 발(좌우 ±14px)이 바닥 위·막힘 밖이어야 한다. 가장 긴 무대(최대 3화면)가 나오는 줄을 고르고, 같으면 앞줄에 가까운 쪽"""
+    fl = v['floor']; fl = json.loads(fl) if isinstance(fl, str) else fl
+    holes = [json.loads(h) if isinstance(h, str) else h for h in v['holes']]
+    # 장면 물건(탁자·볼라드·침대 등, 기둥 9999 빼고): 앞 바닥선(sortY) 바로 뒤 50px 줄은 물건이 서 있는 자리로 본다
+    things = [(o['x'], o['x'] + o['w'], o['sortY']) for o in v.get('objects') or [] if 0 < o.get('sortY', 0) < 9000]
+    def ok(x, y):
+        for d in (-14, 14):
+            if not _inpoly(x + d, y, fl) or any(_inpoly(x + d, y, h) for h in holes): return False
+            if any(a <= x + d <= b and s - 50 <= y <= s + 6 for a, b, s in things): return False
+        return True
+    L0, L1 = v['lane']; dotK = v.get('dotK', 1.4292)
+    best = None
+    ys = [c['yF']] if 'yF' in c else sorted({round(L1 - f * (L1 - L0)) for f in [i / 100 for i in range(8, 56, 2)]})
+    for yF in ys:
+        s = CHAR_K / (dotK * persp(yF, v))
+        xs = list(range(0, v['w'] + 1, 4))
+        run, a = None, None
+        for x in xs + [None]:
+            good = x is not None and ok(x, yF)
+            if good and a is None: a = x
+            if not good and a is not None:
+                b = xs[xs.index(x) - 1] if x is not None else xs[-1]
+                if run is None or b - a > run[1] - run[0]: run = (a, b)
+                a = None
+        if not run: continue
+        score = min((run[1] - run[0]) * s, VS_LEN)
+        if best is None or score > best[0] + 40: best = (score, yF, s, run)
+    if not best: return None
+    _, yF, s, (a, b) = best
+    seg = min(b - a, VS_LEN / s)
+    cx = min(max(c.get('cx', (a + b) / 2), a + seg / 2), b - seg / 2)
+    x0, x1 = cx - seg / 2, cx + seg / 2
+    pF = persp(yF, v)
+    # 대기 자리: 무대 양 끝에서 안쪽으로 70·180(월드), 뒤쪽 줄에서 바닥 위인 가장 뒤 자리 (안 되면 조금씩 앞으로)
+    spots = [[], []]
+    for side in (0, 1):
+        for d in (70, 180):
+            xw = d if side == 0 else (x1 - x0) * s - d
+            xi = x0 + xw / s
+            for f in (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
+                y = L0 + f * (L1 - L0)
+                if y < yF - 10 and ok(xi, y):
+                    spots[side].append({'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)}); break
+            else:
+                spots[side].append({'x': round(xw), 'dy': -150, 'k': 0.72, 'off': True})
+    return yF, s, x0, x1, spots
 
 def persp(y, v):
     """engine/view.ts perspFlat 와 같은 계산 (필드 원근)"""
@@ -119,11 +176,9 @@ def main():
         shutil.copy(src, os.path.join(com, f'bg-{sid}.webp'))
         # 장면 물건(기둥·상자 등, 필드에서 따로 그리는 조각): 앞줄보다 앞(sortY > 앞줄)이면 사람 앞에 그린다 (11-08 사용자: 중림 기둥으로 가려야 이어진다)
         c = VS_CFG.get(sid, {})
-        L0, L1 = v['lane']
-        yF = c.get('yF', L1 - 0.2 * (L1 - L0))      # 싸우는 줄: 앞줄보다 조금 뒤 (앞에 바닥이 남게)
-        yB = c.get('yB', L0 + 0.12 * (L1 - L0))     # 대기 줄: 뒤쪽
-        pF = persp(yF, v)
-        s = CHAR_K / (v.get('dotK', 1.4292) * pF)   # 그림 px → 월드 px (싸우는 줄의 사람이 CHAR_K 가 되게)
+        fit = fit_stage(v, c)
+        if not fit: print('대전 배경 뺌 (설 자리 없음):', sid); continue
+        yF, s, x0, x1, spots = fit
         # 장면 물건(기둥·상자 등): 깊이선(sortY)이 싸우는 줄보다 앞이면 사람 앞에 그린다 (11-08 사용자: 중림 기둥으로 가려야 이어진다)
         objs = []
         for o in v.get('objects') or []:
@@ -131,10 +186,8 @@ def main():
             if not os.path.exists(osrc): continue
             shutil.copy(osrc, os.path.join(com, f"bgo-{o['file']}.webp"))
             objs.append({'file': o['file'], 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'front': o.get('sortY', 0) > yF})
-        bgs[sid] = {'w': v['w'], 'h': v['h'], 's': s, 'yF': yF, 'len': min(VS_LEN, round(v['w'] * s)), 'cut': c.get('cx', v['w'] / 2),
-                    # 대기 캐릭터: 뒤 줄까지 올라간 높이(월드)와 원근 배율
-                    'bench': {'dy': round((yB - yF) * s), 'k': round(persp(yB, v) / pF, 3), 'dx': c.get('bdx')},
-                    'objs': objs}
+        # 무대 = 그림 x0~x1 (월드 0~len). 대기 캐릭터 자리 spots[편][번째] = 무대 x(월드)·뒤로 올라간 높이 dy(월드)·원근 배율 k
+        bgs[sid] = {'w': v['w'], 'h': v['h'], 's': s, 'yF': yF, 'len': round((x1 - x0) * s), 'cut': (x0 + x1) / 2, 'bench': {'spots': spots}, 'objs': objs}
     json.dump(bgs, open(os.path.join(com, 'bg.json'), 'w'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []

@@ -24,7 +24,7 @@ export interface VersusHandle {
 /** 대전 배경 (11-08 사용자): 필드 장면 그림을 사람 크기에 맞춰 깐다. 장면의 싸우는 줄(yF)이 발 줄(VS_LINE 700)에 오고, 무대 길이(len)만큼 한 구간(cut 가운데)을 쓴다 */
 interface BgMeta {
   w: number; h: number; s: number; yF: number; len: number; cut: number;
-  bench: { dy: number; k: number; dx?: [number, number] | null };
+  bench: { spots: { x: number; dy: number; k: number }[][] };
   objs?: { file: string; x: number; y: number; w: number; h: number; front: boolean }[];
 }
 let bgMeta: Promise<Record<string, BgMeta> | null> | null = null;
