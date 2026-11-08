@@ -530,6 +530,9 @@ export class World implements WorldView {
     if (a === p && p.moveKey === 'grabknee') p.keepHeld();
   }
 
+  /** 대전: 판 시작 표시(ROUND·GO) 동안에도 상대가 먼저 서 있게, 걸린 싸움을 바로 연다 (11-08 사용자 「둘이 중앙에 서 있어야」) */
+  openEncounter() { if (this.encActive < 0) this.stepEncounters(); }
+
   private stepEncounters() {
     const encs = this.floor.encounters;
     const p = this.player;

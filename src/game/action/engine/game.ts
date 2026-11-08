@@ -437,7 +437,7 @@ export class Game {
         if (view.clear && versus.trans) { this.vsTrans(w, p); return; }
         if (view.clear && (versus.intro > 0 || versus.over)) {
           const dt = 1 / TICK_HZ;
-          if (versus.intro > 0) versus.intro = Math.max(0, versus.intro - dt);
+          if (versus.intro > 0) { if (versus.mode !== 'survival') w.openEncounter(); versus.intro = Math.max(0, versus.intro - dt); aiHold.on = true; w.step(NO_PAD); }   // ROUND·GO 동안: 둘 다 제자리에 서서 대기 동작만 (손은 뗀 채)
           if (versus.over && (versus.over.t -= dt) <= 0) {
             const side = versus.over.side;
             versus.over = null;
@@ -448,6 +448,7 @@ export class Game {
         // 대전 K.O. 뒤에는 양쪽 다 손을 뗀다 (11-08 사용자): 1P 입력 비우고 AI 두뇌 멈춤. 쓰러지는 동작·승리 동작은 그대로
         aiHold.on = view.clear && !!versus.ko;
         w.step(view.clear && versus.ko ? NO_PAD : p);
+        if (view.clear) this.vsPushApart(w);
         if (view.clear && versus.mode !== 'survival') this.vsKeepOnScreen(w);
         // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
         if (view.clear) {
@@ -552,6 +553,21 @@ export class Game {
   }
 
   /** 대전(11-08 사용자 「화면을 벗어나면 안되지」): 두 사람이 늘 한 화면 안에. 벌어지면 이번 틱에 바깥으로 더 움직인 쪽을 붙잡는다 */
+  /** 대전 몸통 판정 (11-08 사용자 「몸으로 달려와 비비면서 공격」): 서 있는 캐릭터끼리는 겹치지 않고 서로 밀어낸다. 공중(점프로 넘기)·누운 몸은 빼고 */
+  private vsPushApart(w: World) {
+    const MIN = 72;
+    type B = { x: number; z: number; alive: boolean; team?: string; core?: { P: { mode: string } } };
+    const bs = ([w.player, ...w.bodies] as unknown as B[]).filter((b) => b.alive && b.team !== 'neutral' && b.z < 20 && !['down', 'belly', 'dead'].includes(b.core?.P.mode ?? ''));
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+      const a = bs[i], b = bs[j], d = b.x - a.x, ad = Math.abs(d);
+      if (ad >= MIN) continue;
+      const s = d === 0 ? (i % 2 ? 1 : -1) : Math.sign(d), half = (MIN - ad) / 2;
+      a.x -= s * half; b.x += s * half;
+    }
+    const L = view.vsLen;
+    for (const b of bs) b.x = Math.max(40, Math.min(L - 40, b.x));
+  }
+
   private vsKeepOnScreen(w: World) {
     const p = w.player as unknown as { x: number; px?: number }, foe = w.bodies.find((b) => b.team === 'enemy' && b.alive) as unknown as { x: number; px?: number } | undefined;
     if (!foe) return;

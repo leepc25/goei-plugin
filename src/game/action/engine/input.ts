@@ -28,7 +28,7 @@ export function useEileenKeys() {
  * ←→ 바로 달리기 · 방향 두 번 = 회피(앞 16-1·뒤 16) · 뒤 방향 누르기 = 막기 · ↑/Space 점프 (fighter/player.ts vsInput). 나머지 키는 대전에서 뺀다 */
 export function useVersusKeys() {
   for (const k of Object.keys(KEYMAP)) if (!['ArrowLeft', 'ArrowRight', 'Space', 'Escape'].includes(k)) delete KEYMAP[k];
-  Object.assign(KEYMAP, { ArrowUp: 'jump', KeyA: 'light', KeyS: 'heavy', KeyD: 'charge', KeyW: 'shoot', KeyE: 'skill', KeyZ: 'sit', KeyX: 'crouch' } as Record<string, Btn>);   // Z 주저앉기 · X 웅크리기 (사용자 11-08 「그렇게 넣고」)
+  Object.assign(KEYMAP, { ArrowUp: 'jump', KeyA: 'light', KeyS: 'heavy', KeyD: 'charge', KeyQ: 'shoot', KeyW: 'skill', KeyZ: 'sit', KeyX: 'crouch' } as Record<string, Btn>);   // Z 주저앉기 · X 웅크리기 (사용자 11-08 「그렇게 넣고」)
 }
 
 /** Shift를 이 틱 수 안에 떼면 회피, 넘게 누르면 달리기 (0.15초) */

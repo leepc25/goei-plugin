@@ -107,7 +107,7 @@ function atkSeq(id?: Json, heavy?: Json) {
   for (let f = 0; f < a.n; f++) {
     if (f < imp) s.push({ f, d: (f === 0 ? 0.04 : (heavy ? 0.06 : 0.045)) * k });
     else if (f === imp) s.push({ f, d: (heavy ? 0.13 : 0.08) * k, ev: heavy ? 'hitH' : 'hit' });
-    else s.push({ f, d: (heavy ? 0.06 : 0.05) * k, cancel: true });
+    else s.push({ f, d: (heavy ? 0.06 : 0.05) * k * (view.clear ? (heavy ? 2 : 1.5) : 1), cancel: true });   // 대전: 때린 뒤 빈틈(후딜) 약 1.5배·강 2배 (11-08 사용자 「딜레이가 너무 없다」). 콤보 잇기(cancel)는 그대로
   }
   return s;
 }
@@ -198,7 +198,9 @@ const dust = (x?: Json, y?: Json, n?: Json, s = 1) => { for (let i = 0; i < n; i
 // 총 쏠 때 불꽃은 그림에 그려진 것만 씀 — 코드는 탄피만
 function muzzleFlash(p?: Json, big?: Json) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
 
-function inReach(hx?: Json, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const l = proxies().filter(q => { const dk = K(q.y), hOk = wide ? P.z < q.z + 215 * dk && hh > q.z - 120 * dk : hh > q.z - 110 * dk && hh < q.z + 240 * dk; return Math.abs(q.y - P.y) < (wide ? 100 : 80) && (q.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(q.x - hx) < pad && hOk; }); if (l.length) { hitList = l; T = l[0]; } return l.length > 0; }
+// 대전(11-08 사용자 「닿지도 않았는데 다 맞아」): 손끝이 상대 몸 그림 폭(서 있는 줄 reach) 안에 들어와야 맞는다. 필드는 예전 여유(90/115) 그대로
+const bodyHalf = (q?: Json) => { const a = q?.body?.art?.A; const r = a && (a['1'] || a['3']); return (r && Math.min(...r.reach)) || 31; };
+function inReach(hx?: Json, pad = 60, hh = 100, wide = false) { const pad0 = pad; pad *= K(P.y); const l = proxies().filter(q => { const dk = K(q.y); const vsPad = view.clear ? (bodyHalf(q) + (wide ? 30 : pad0 >= 115 ? 16 : 8)) * dk : 0; const hOk = wide ? P.z < q.z + 215 * dk && hh > q.z - 120 * dk : hh > q.z - 110 * dk && hh < q.z + 240 * dk; return Math.abs(q.y - P.y) < (wide ? 100 : 80) && (q.x - P.x) * P.face > (wide ? -60 : -20) && (view.clear ? (hx - q.x) * P.face > -vsPad : Math.abs(q.x - hx) < pad) && hOk; }); if (l.length) { hitList = l; T = l[0]; } return l.length > 0; }
 // 고유기·충전·필살 동작 줄(피해 출처 「기술」 판정용: NPC 기술 배율)
 let skillClipSet: Set<string> | null = null;
 const skillClips = () => skillClipSet ??= new Set([CH.skills?.skill?.anim, CH.skills?.skill2?.anim, CH.skills?.charge?.hold, CH.skills?.charge?.release, CH.skills?.super?.anim, ...((CH.skills?.super?.steps || []) as Json[]).map((s: Json) => s.anim)].filter(Boolean).map(String));
@@ -671,7 +673,7 @@ const COMMON = {
 };
 
 // ── 흐름 ──
-function toIdle0() { P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; P.returning = false; P.useSrc = null; P.rangeMul = 1; }
+function toIdle0() { P.bq = []; P.vsLag = false; P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; P.returning = false; P.useSrc = null; P.rangeMul = 1; }
 // 동작이 끝나 대기로 갈 때: 끝 장과 대기 첫 장이 크게 다른 줄(빌드가 잰 seam ≥ 0.35)은 두 장을 거꾸로 짧게 되짚고 대기로(10-29 사용자: 동작 사이가 뚝뚝 끊김). 예약 입력이 있으면 바로
 function toIdle() {
   const prev = P.clip && P.clip.id;
@@ -692,7 +694,9 @@ function ensureArmed(then?: Json) {
   sfx('reload'); act('W', { seq: S(R(0, PK('weapon', 'W')), 0.04), onEnd: () => { P.armed = true; then(); } });
 }
 function afterBuf(fallback?: Json) {
-  const b = P.buf; P.buf = null;
+  // 대전: 특수기·충전기·필살기·원거리 동작이 끝나면 마지막 장으로 잠깐 굳는다(후딜 2배 몫, 11-08 사용자)
+  if (view.clear && P.clip && !P.vsLag && (skillClips().has(P.clip.id) || P.clip.id === '15')) { const id = P.clip.id, f = nOf(id) - 1; P.vsLag = true; P.mode = 'act'; play(id, { seq: [{ f, d: 0.22 }], onEnd: () => { P.vsLag = false; afterBuf(fallback); } }); return; }
+  const b = P.buf; P.buf = (P.bq && P.bq.shift()) || null;   // 두 칸: 약약강을 빨리 눌러도 순서대로 (11-08 사용자 「콤보 안 돼」)
   if (b === 'light') return light();
   if (b === 'heavy') return heavy();
   if (b === 'dodge') return dodge();
@@ -720,7 +724,7 @@ function heavy() {
   if (!has('12')) return light();
   const prev = P.combo || (P.t < (P.blowWin || 0) ? 3 : 0);
   const kind = prev === 2 ? 'launch' : prev >= 3 ? 'blow' : 'stun';
-  sfx('whiff', { strength: 2 }); P.combat = true; P.armed = false; P.combo = 0; pushP(140, 700);
+  sfx('whiff', { strength: 2 }); P.combat = true; P.armed = false; P.combo = 0; pushP(view.clear && prev >= 2 ? 300 : 140, 700);   // 대전: 콤보 끝 강은 한 걸음 더 들어가며 친다(약약약 밀림 뒤에도 닿게)
   act('12', { seq: atkSeq('12', true).map(e => e.ev ? { ...e, kind } : e) });
 }
 function chainExpire() { const id = P.clip!.id; P.combo = 0; reverseOut(id, R(A[id].n - 1, 0), 0.03); }
@@ -749,6 +753,7 @@ function dodge() {
 // 원거리: 반복 구간이 있으면 첫 장 = 발사, 끝 장에서 누르고 있으면 되돌아감. 없으면 그림 불꽃 장(또는 뻗은 장)마다 발사
 function shoot() {
   if (!has('15') || P.noShoot) return;
+  if (view.clear && (fx.some((e?: Json) => e.k === 'proj' && e.src === 'ranged' || e.k === 'bullet') || P.clip?.id === '15')) return;   // 대전: 내 탄이 화면에 남아 있는 동안은 못 쏜다(장풍처럼 한 발씩, 11-08 사용자 「무한 원거리 짤짤이」)
   if ((BAL().cd || {}).shot) { if ((P.cd.shot || 0) > P.t) { if ((BAL().cd.shot) >= 1) cdReady('shot'); return; } setCd('shot'); }   // 연사 무기 말고는 한 발씩 + 간격(1초 이상만 「쿨타임」 표시)
   const a = A['15'];
   if (P.overT > 0) return ensureArmed(() => act('15', { seq: [...S(R(0, Math.min(3, a.n - 1)), 0.035), { f: Math.min(3, a.n - 1), d: 0.25, fn: () => { sfx('empty'); const p = muzzle(); steam(p.x, p.y, 1); } }, ...S(R(Math.min(4, a.n - 1), a.n - 1), 0.05)] }));
@@ -878,6 +883,7 @@ function land() {
 
 // ── 피격·반응 ──
 function takeHit(kind?: Json) {
+  P.vsLag = false;
   if (P.mode === 'dead') return;
   if (P.mode === 'air') { P.airAtk = false; P.spin = 0; }
   if (P.scene === '샤워') P.scene = null;   // 샤워 중 맞음(11-02): 샤워 규칙 재생을 끊고 맨몸 피격으로
@@ -1112,10 +1118,10 @@ function onPress(a?: Json) {
       const id = P.clip ? P.clip.id : '';
       if (canCancel() && ['9', '10', '11', '12', '13', '16', '16_1', '7'].includes(id)) {
         if (id === '7') { if (a === 'jump') return jump(); }
-        else if (id === '9' || id === '10') { P.buf = a; return; }
+        else if (id === '9' || id === '10') { if (P.buf) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push(a); } else P.buf = a; return; }
         else { P.buf = null; return a === 'light' ? light() : a === 'heavy' ? heavy() : a === 'dodge' ? dodge() : jump(); }
       }
-      P.buf = a;
+      if (P.buf && P.clip && ['9', '10'].includes(P.clip.id)) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push(a); } else P.buf = a;
     }
     return;
   }
@@ -1263,7 +1269,7 @@ function update(dt?: Json) {
   switch (P.mode) {
     case 'ground': {
       if (down('flee') && has('36')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
-      if (down('back') && !has('37') && view.clear) { P.mode = 'back'; play('4', { fps: 9, loopFrom: 0 }); break; }   // 대전: 뒷걸음질 그림이 없으면 걷기 그림으로 물러난다
+      if (down('back') && view.clear && has('4')) { P.mode = 'back'; play('4', { seq: S(R(nOf('4') - 1, 0), 0.1), loopFrom: 0 }); break; }   // 대전: 상대를 본 채 걷기 그림을 거꾸로 돌려 물러난다 (37은 겁먹은 뒷걸음질이라 안 씀, 11-08 사용자)
       if (down('back') && has('37')) { P.mode = 'back'; play('37', { fps: 10, onEnd: () => { if (P.mode !== 'back') return; if (has('37_1')) { const n = nOf('37_1'), lp = LP('37_1') || R(Math.min(1, n - 1), n - 1); play('37_1', { seq: S(lp, 0.11), loopFrom: 0 }); } else { const n = nOf('37'); play('37', { seq: [{ f: n - 2, d: 0.17 }, { f: n - 1, d: 0.17 }], loopFrom: 0 }); } } }); break; }
       if (!(dx || dy)) P.runT = 0;
       if (dx || dy) {

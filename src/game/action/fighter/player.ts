@@ -30,6 +30,7 @@ const VS_CHIP = 0.2;
 /** 대전 뒤 방향 막기: 한 번 막으면 이만큼 막는 자세에 묶인다 (초) */
 const VS_BLOCK_STUN = 0.3;
 /** 대전: 맞으면 이만큼 손을 못 쓴다 (초). 약공격 이음 간격보다 길게 */
+const VS_CHAIN_DOWN = 6;   // 대전: 이만큼 이어 맞으면(막아도) 쓰러진다
 const VS_HITSTUN = 0.45;
 /** 대전 히트스톱 (초): 막음 · 약 · 강 · 띄우기·쓰러뜨리기 · 필살기 */
 const VS_FREEZE = [0.06, 0.09, 0.14, 0.18, 0.24];
@@ -339,6 +340,20 @@ export class FighterPlayer extends Player {
     if (this.phase === 'down') return { kind: 'immune' };
     const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
+    // 대전: 쉴 틈 없이 6대 넘게 맞거나 막으면(서바이벌 양쪽 끼임 등) 쓰러뜨려 빠져나오게 한다 (11-08 사용자 「영원히 조작도 안 되고 막기만 하다 죽어」)
+    if (view.clear && !lying) {
+      const now = performance.now();
+      this.vsChain = now - this.vsChainAt < 700 ? this.vsChain + 1 : 1; this.vsChainAt = now;
+      if (this.vsChain >= VS_CHAIN_DOWN) {
+        this.vsChain = 0; this.vsStunT = 0; this.vsBlockT = 0;
+        this.hp = Math.max(1, this.hp - Math.round(hit.dmg));
+        P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
+        if (P.mode === 'block') this.core.onRelease('block');
+        this.core.knock(); this.vsImpact(3); this.vsFly(1.3);
+        world.emit({ type: 'hurt', x: this.x, dmg: hit.dmg, hp: this.hp });
+        return { kind: 'hit' };
+      }
+    }
     // 대전: 상대 반대쪽을 누르고 있으면(뒷걸음질·서 있기) 맞는 순간 막는 자세로. 막는 동안은 못 움직이고 VS_BLOCK_STUN 초 묶인다
     if (view.clear && this.vsBack && front && !hit.unblock && (P.mode === 'back' || P.mode === 'ground' || P.mode === 'block') && !this.guardBroken && this.guard >= 8 && this.status.canBlock()) {
       if (P.mode !== 'block') this.core.onPress('block');
@@ -409,7 +424,9 @@ export class FighterPlayer extends Player {
       return { kind: 'hit', killed: true };
     }
     if (this.hp <= 0) {
+      if (view.clear && !lying) P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;   // 대전 K.O.: 때린 쪽을 본 채 뒤로 날아가 쓰러진다
       if (lying) this.core.takeHit('hit'); else this.core.knock();
+      if (view.clear && !lying) { this.vsImpact(4); this.vsFly(1.6); }
       this.phase = 'down';
       return { kind: 'hit', killed: true };
     }
@@ -419,9 +436,9 @@ export class FighterPlayer extends Player {
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
     // 공격 종류 → 피격 동작(10-25 결정): 약 = 맞기(18) · 강 = 맞기 하단(18_1) · 날리기 = 크게 밀려나기(18_2) · 띄우기 = 띄워지기(18_3) · 다운 = 쓰러지기(19). 그 줄이 없는 인물은 엔진이 18·19로 대신함
     const noKnock = this.perks.noKnock();   // 다운 무시·방어막: NPC 퍽도
-    const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
+    const kind = hit.blow ? (view.clear && !noKnock ? 'knock' : 'push') : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
     this.core.takeHit(kind);
-    if (view.clear) { this.vsStunT = VS_HITSTUN; this.vsImpact(hit.unblock ? 4 : strength); }
+    if (view.clear) { this.vsStunT = VS_HITSTUN; this.vsImpact(hit.unblock ? 4 : strength); this.vsFly(hit.blow ? 1.45 : kind === 'launch' ? 1.8 : kind === 'knock' ? 1.3 : kind === 'hit' ? 0.5 : 1); }   // 약공격 밀림은 조금만: 약약약 뒤 강이 닿게
     return { kind: 'hit' };
   }
 
@@ -562,6 +579,8 @@ export class FighterPlayer extends Player {
 
   /** 대전(11-08 사용자): 늘 상대를 보고 선다. 앞으로 = 바로 달리기(걷기 없음), 뒤로 = 상대를 본 채 뒷걸음질(37)·맞으면 막기 */
   private vsBack = false;
+  private vsChain = 0;
+  private vsChainAt = 0;
   private vsBlockT = 0;
   private vsStunT = 0;
   private vsTick = 0;
@@ -574,6 +593,8 @@ export class FighterPlayer extends Player {
     const P = this.core.P as unknown as { armorT: number; armorC: string };
     if (lv > 0) { P.armorT = 0.28; P.armorC = '#ffffff'; }
   }
+  /** 대전(11-08 사용자 「맞고 날아간다는 개념이 없어」): 띄우기·날리기·K.O.는 필드보다 멀리 밀려난다 (밀림 속도 배율, 거리는 제곱으로 늘어남) */
+  private vsFly(m: number) { const P = this.core.P as { pvx?: number }; if (m !== 1 && P.pvx) P.pvx *= m; }
   private vsInput(p: Pad, names: Set<string>) {
     const P = this.core.P;
     P.combat = true;

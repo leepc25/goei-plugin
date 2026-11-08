@@ -171,9 +171,9 @@ export class FighterBrain {
       return this.finish(out);
     }
     if (foe.attacking && dist < 190 && Math.abs(dy) < 50 && me.free && !this.script.length) {
-      if (this.chance(this.g.defend * this.d.defend)) {
+      if (this.chance(this.g.defend * this.d.defend * (this.duel ? 0.4 : 1))) {   // 대전: 사람처럼 가끔만 막는다 (11-08 사용자 「적이 무조건 막아」)
         this.tactic = '방어';
-        if (me.guard > 35 && this.kit.block && (this.chance(0.65) || !this.kit.dodge)) this.defendT = 8 + Math.floor(this.rng() * 10);
+        if (me.guard > 35 && this.kit.block && (this.chance(0.65) || !this.kit.dodge)) this.defendT = this.duel ? 5 + Math.floor(this.rng() * 5) : 8 + Math.floor(this.rng() * 10);
         else if (this.kit.dodge) out.press.push('dodge');
         return this.finish(out);
       }
