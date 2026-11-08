@@ -12,13 +12,14 @@
 //   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 5, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
 //   --explore-values n    같은 data-action 중 몇 개의 값까지 눌러서 열린 화면 안으로 따라 들어가나 (기본 2. 같은 꼴 화면이 수백 번 반복되는 것 막기)
 //   --max-clicks n        화면 크기마다 최대로 누를 수 (기본 0 = 끝까지)
-//   --workers n           동시에 띄울 페이지 수 (기본 4)
+//   --workers n           동시에 띄울 페이지 수 (기본 CPU 수)
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
 //   --fixture <경로>      시험 카드 (기본 .scratch/fixture/fixture.json, 없으면 `npm run test:browser -- --only install` 로 먼저 만든다)
 //   --only-scope <css>    이 선택자 안의 것만 누른다 (예: '.gx' 상황판 창만)
 //   --report-only         누르지 않고 --out 폴더의 report.json(끊긴 것도)으로 report.md 만 다시 만든다
 //   --from 'a|v>b|v'      시작 상태에서 이 열쇠들을 차례로 누른 화면부터 점검한다 (한 화면만 빨리 다시 볼 때. 열쇠는 report.md 의 `action|value`)
 // 빌드(dist/)가 있어야 한다: npm run build
+import os from 'node:os';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve, dirname, relative, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +27,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: Math.max(2, os.cpus().length), out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -54,6 +55,12 @@ mkdirSync(SHOTS, { recursive: true });
 if (!existsSync(resolve(ROOT, 'dist/goei-plugin.js'))) throw new Error('dist/ 가 없어요: npm run build 먼저');
 if (!existsSync(resolve(ROOT, opt.fixture))) throw new Error(`시험 카드가 없어요: ${opt.fixture} (npm run test:browser -- --only install 로 만들기)`);
 const fx = loadFixture(resolve(ROOT, opt.fixture));
+// 어느 판으로 돌렸나: 브랜치·커밋·고친 채 안 올린 파일·빌드가 소스보다 옛것인지 (점검 중에도 코드는 계속 바뀐다, 11-08 사용자)
+import { execSync as sh } from 'node:child_process';
+const git = (c) => { try { return sh(`git ${c}`, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
+const newestSrc = (() => { let m = 0; const w = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); const st = statSync(p); if (st.isDirectory()) w(p); else if (st.mtimeMs > m) m = st.mtimeMs; } }; w(resolve(ROOT, 'src')); return m; })();
+const VERSION = { branch: git('rev-parse --abbrev-ref HEAD'), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
+if (VERSION.distOld) console.warn('[click-audit] 경고: dist/ 가 src/ 보다 옛것이에요. npm run build 를 먼저 돌리세요 (옛 빌드를 누르게 됨)');
 const LOOKS = distPack('goei-data-looks');
 const ITEMS = (() => { try { return distPack('goei-data-items'); } catch { return null; } })();
 const log = (...m) => console.log('[click-audit]', ...m);
@@ -91,7 +98,7 @@ const KEEP_OUT = new Set(['p:goei:body', 'p:goei:data-world']); // hostScript �
 
 async function settle(page) {
   // 설치 안내로 설정 창이 저절로 열렸으면: 사람이 하듯 「설치」를 누르고 닫는다
-  await sleep(300);
+  await sleep(120);
   for (let i = 0; i < 3; i++) {
     const open = await page.evaluate(() => document.querySelector('.gw')?.hidden === false);
     if (!open) break;
@@ -159,12 +166,17 @@ async function makeBase(browser, vp, kind) {
   return base;
 }
 
+const T = (n) => { if (process.env.CA_TIME) { const t = Date.now(); log(`⏱ ${n} ${t - (T.t || t)}ms`); T.t = t; } };
 async function openFrom(browser, vp, base) {
+  T('시작');
   const { page, errors } = await boot(browser, { ...fx, fixture: base.char }, base.chat, vp, { store: base.store });
   page.on('dialog', (d) => { errors.push(`(대화상자 ${d.type()}) ${d.message()}`); d.accept().catch(() => {}); });
   page.on('filechooser', () => {});
+  T('boot');
   await openWin(page);
+  T('openWin');
   await settle(page);
+  T('settle');
   if (base.pre?.shopMsg) await openShop(page, base.pre, null);
   await page.waitForTimeout(200);
   return { page, errors };
@@ -220,7 +232,7 @@ window.__ca = (() => {
       const r = el.getBoundingClientRect();
       // 다른 창(설정 창 등) 뒤에 깔린 것은 지금 화면의 단추가 아니다 → behind. 눌리는 것끼리 겹쳐 가린 것은 문제이므로 그대로 둔다
       let behind = false;
-      if (r.top < innerHeight && r.bottom > 0) { const h = hit(el); if (!h.ok) { const top = document.elementFromPoint(h.x, h.y); const LAYER = '.gw, .gx-agpop, .gx-idpop, [role=dialog], [class*="pop"], [class*="drawer"], [class*="modal"], [class*="sheet"]'; const tl = top?.closest(LAYER); behind = !!top && ((!!tl && !tl.contains(el)) || !top.closest('[data-action], button, summary, [role=button], label, input, select, a')); } }
+      if (r.top < innerHeight && r.bottom > 0) { const h = hit(el); if (!h.ok) { const top = document.elementFromPoint(h.x, h.y); const LAYER = '.gx-cdr, .gw, .gx-agpop, .gx-idpop, [role=dialog], [class*="pop"], [class*="drawer"], [class*="modal"], [class*="sheet"]'; const tl = top?.closest(LAYER); const el2 = el.closest(LAYER); behind = !!top && ((!!tl && !tl.contains(el)) || (!!el2 && !el2.contains(top)) || !top.closest('[data-action], button, summary, [role=button], label, input, select, a')); } }
       return { key, nth, behind, action: el.dataset.action || '', value: el.dataset.value ?? '', tag: el.tagName.toLowerCase(), cls: cls1(el), label: label(el), disabled: !!el.disabled || el.getAttribute('aria-disabled') === 'true', rect: [r.left, r.top, r.width, r.height].map(Math.round) };
     });
   };
@@ -302,12 +314,12 @@ async function pressStep(page, step, touch) {
 
 
 // 화면이 0.4초 동안 안 바뀔 때까지 기다린다(최대 4초). 임무 고르기처럼 효과 1.5초 뒤 다음 화면으로 넘어가는 것을 앞 단계로 다시 누를 때 필요
-async function quiet(page, still = 400, max = 4000) {
+async function quiet(page, still = 300, max = 4000) {
   await page.evaluate(() => { if (window.__caQuiet) return; window.__caQuiet = { t: performance.now() }; new MutationObserver(() => { window.__caQuiet.t = performance.now(); }).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true }); });
   await page.evaluate(() => { window.__caQuiet.t = performance.now(); });
   const t0 = Date.now();
   await sleep(150);
-  while (Date.now() - t0 < max) { const idle = await page.evaluate(() => performance.now() - window.__caQuiet.t); if (idle >= still) return; await sleep(100); }
+  while (Date.now() - t0 < max) { const idle = await page.evaluate(() => { const anim = document.getAnimations().some((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations !== Infinity); return anim ? 0 : performance.now() - window.__caQuiet.t; }); if (idle >= still) return; await sleep(100); }
 }
 
 async function prepPage(browser, vp, base, path) {
@@ -351,9 +363,9 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
     await page.screenshot({ path: `${SHOTS}/${tag}_3뒤.png` });
     rec.shots = [`${tag}_1앞.png`, `${tag}_2직후.png`, `${tag}_3뒤.png`];
     // 1초 뒤에도 화면이 움직이면(효과·닫힘 애니메이션) 0.5초 동안 멈출 때까지(최대 5초) 기다려 「끝」을 한 장 더 찍는다
-    const still = async () => page.evaluate(() => { const r = window.__caWatch.rec; return r.lastMut ?? 0; });
+    const still = async () => page.evaluate(() => { const r = window.__caWatch.rec; const anim = document.getAnimations().some((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations !== Infinity); return anim ? 1e9 : (r.lastMut ?? 0); });
     let moved = false;
-    for (let t = 1040; t < 5000; t += 250) { const lm = await still(); if (lm < t - 500) break; moved = true; await sleep(250); }
+    for (let t = 1040; t < 3000; t += 200) { const lm = await still(); if (lm < t - 500) break; moved = true; await sleep(250); }
     if (moved) { await page.screenshot({ path: `${SHOTS}/${tag}_4끝.png` }); rec.shots.push(`${tag}_4끝.png`); }
     const w = await page.evaluate(() => window.__caWatch.stop());
     const after = await page.evaluate((sc) => window.__ca.sig(sc), opt.scope);
@@ -427,6 +439,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     const { page, fail: fromFail } = await prepPage(browser, vp, base, opt.from);
     if (fromFail) throw new Error(`--from 재현 실패: ${fromFail}`);
     const first = await page.evaluate((sc) => window.__ca.list(sc), opt.scope);
+    if (process.env.CA_MUT) log('저절로 바뀌는 곳', JSON.stringify(await page.evaluate(() => new Promise((res) => { const c = {}; const mo = new MutationObserver((ms) => { for (const m of ms) { const t = m.target.nodeType === 1 ? m.target : m.target.parentElement; const k = (t?.tagName || '').toLowerCase() + '.' + [...(t?.classList || [])].slice(0, 2).join('.') + ' ' + m.type + (m.attributeName ? ':' + m.attributeName : ''); c[k] = (c[k] || 0) + 1; } }); mo.observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true }); setTimeout(() => { mo.disconnect(); res(c); }, 3000); }))));
     const audit0 = await page.evaluate((sc) => window.__ca.audit(sc), opt.scope);
     const s0 = `${vp}_${startKind}_화면0.png`;
     await page.screenshot({ path: `${SHOTS}/${s0}`, fullPage: false });
@@ -504,7 +517,7 @@ const never = [...srcActs].filter((a) => !pressedActs[a]).sort();
 // ---- 보고서 ------------------------------------------------------------------------------------------------------
 const L = [];
 const rel = (p) => relative(OUT, resolve(SHOTS, p));
-L.push(`# 눌러 보기 전수점검 기록`, '', `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
+L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
 L.push('이 기록은 사실만 적는다. 이상한지·사용자 결정과 맞는지는 점검하는 Claude가 캡처를 열어 보고 판단한다 (docs/눌러보기_전수점검.md).', '');
 L.push('## 1. 이상 반응 (캡처 확인할 곳)', '');
 const flagged = results.filter((r) => r.flags.length && !r.disabled);
@@ -546,5 +559,5 @@ L.push(`- 코드에 있는 data-action ${srcActs.size}개 중 한 번도 못 누
 if (Object.keys(skippedVals).length) L.push(`- 같은 단추의 다른 값이라 안 누른 수 (--per-action ${opt.perAction}): ${Object.entries(skippedVals).sort((a, b) => b[1] - a[1]).map(([a, n]) => `\`${a}\` ${n}`).join(' · ')}`, '');
 for (const vp of opt.vp) for (const other of opt.vp) if (vp !== other) { const only = [...(keysBy[vp] || [])].filter((k) => !keysBy[other]?.has(k)); if (only.length) L.push(`- ${vp}에만 있고 ${other}에는 없는 것 ${only.length}개: ${only.slice(0, 40).map((x) => `\`${x}\``).join(' ')}${only.length > 40 ? ' …' : ''}`); }
 writeFileSync(resolve(OUT, 'report.md'), L.join('\n') + '\n');
-writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ opt, results, states, incons, selLooks: Object.fromEntries(Object.entries(selLooks)), never }, null, 1));
+writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ version: VERSION, opt, results, states, incons, selLooks: Object.fromEntries(Object.entries(selLooks)), never }, null, 1));
 log(`끝: 누른 수 ${results.filter((r) => r.shots).length}, 이상 반응 ${flagged.length}, 못 누른 data-action ${never.length} · ${relative(ROOT, OUT)}/report.md`);
