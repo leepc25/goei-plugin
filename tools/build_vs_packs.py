@@ -24,7 +24,7 @@ VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
 #   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
 #   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
-VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 1.0, 'yF': 760, 'benchD': [[220, 420], [120, 300]], 'benchBack': (0,)}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
+VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 1.0, 'yF': 760, 'benchD': [[220, 420], [232, 422]], 'benchYF': 645}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
           'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770}, 'office': {'yF': 826}}
 CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
 
@@ -87,21 +87,25 @@ def fit_stage(v, c):
     elif 'right' in c:
         x1 = c['right'] * v['w']; x0 = max(c.get('leftmin', 0) * v['w'], x1 - VS_LEN / s)
     pF = persp(yF, v)
-    # 대기 자리: 무대 양 끝에서 안쪽으로 220·420(월드), 뒤쪽 줄에서 바닥 위인 가장 뒤 자리 (안 되면 조금씩 앞으로)
-    spots = [[], []]
+    # 대기 자리: 무대 양 끝에서 안쪽으로 220·420(월드). 양쪽 네 자리는 같은 깊이 (11-08 사용자 「두 측이 깊이가 똑같아야지」):
+    # 뒤쪽 줄부터 네 자리가 모두 바닥 위·물건 밖인 가장 뒤 줄 하나를 고른다
+    xs = []
     for side in (0, 1):
-        for d in c.get('benchD', [[220, 420]] * 2)[side]:  # 끝에서 떨어뜨리고 둘 사이도 띄움 (11-08 사용자). 장면마다 따로 줄 수 있음
-            got = None
-            for dd in range(d, d + 101, 10) if 'benchD' not in c else [d]:  # 바닥이 아니면 안쪽으로 조금씩
-                xw = dd if side == 0 else (x1 - x0) * s - dd
-                xi = x0 + xw / s
-                for f in ((0.0, 0.05) if side in c.get('benchBack', ()) else ()) + (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
-                    y = L0 + f * (L1 - L0)
-                    if y < c.get('benchY', 0): continue  # 사용자 지정: 이보다 뒤에는 세우지 않음(필드 물건 자료 없는 장면)
-                    if y < yF - 10 and ok(xi, y):
-                        got = {'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)}; break
-                if got: break
-            spots[side].append(got or {'x': round(d if side == 0 else (x1 - x0) * s - d), 'dy': -150, 'k': 0.72, 'off': True})
+        for d in c.get('benchD', [[220, 420]] * 2)[side]:  # 끝에서 떨어뜨리고 둘 사이도 띄움. 장면마다 따로 줄 수 있음
+            xs.append((side, d if side == 0 else (x1 - x0) * s - d))
+    spots = [[], []]
+    if 'benchYF' in c:  # 사용자 지정 깊이 (그림 y). 필드 바닥 자료보다 눈으로 본 바닥이 넓은 장면 (11-08 사용자 「오른쪽은 더 올릴 수 있잖아」)
+        y = c['benchYF']
+        for side, xw in xs: spots[side].append({'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)})
+        return yF, s, x0, x1, spots
+    for f in (0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5):
+        y = L0 + f * (L1 - L0)
+        if y < c.get('benchY', 0) or y >= yF - 10: continue
+        if all(ok(x0 + xw / s, y) for _, xw in xs):
+            for side, xw in xs: spots[side].append({'x': round(xw), 'dy': round((y - yF) * s), 'k': round(persp(y, v) / pF, 3)})
+            break
+    else:
+        for side, xw in xs: spots[side].append({'x': round(xw), 'dy': -150, 'k': 0.72, 'off': True})
     return yF, s, x0, x1, spots
 
 def persp(y, v):
