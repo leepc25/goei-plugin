@@ -3,7 +3,8 @@
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
 import { view } from './view';
-import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, type Side } from './versus';
+import { aiHold } from '../fighter/ai';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, TRANS, TRANS_SEC, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -69,6 +70,7 @@ interface Scene {
 
 /** 대전 화면 확대 (11-08 사용자 「캐릭터 픽셀 2배」): 무대 1280 중 절반이 보이고 화면이 두 사람을 따라간다 */
 const VS_CAM = 2;
+const NO_PAD: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
 
 export class Game {
   readonly canvas: HTMLCanvasElement;
@@ -204,7 +206,11 @@ export class Game {
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
-        if (view.clear) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (view.clear) {
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          const f = this.vsFold();
+          this.canvas.style.transform = f < 1 ? `scaleY(${Math.max(0.001, f).toFixed(3)})` : '';
+        }
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
         this.ctx.translate(-view.crop, -view.cropY);
@@ -424,6 +430,7 @@ export class Game {
         if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
         // 대전(투명 무대): 판 시작(ROUND n → FIGHT)·경기 끝 표시 동안은 멈춘다
         if (view.clear && versus.hold) return;
+        if (view.clear && versus.trans) { this.vsTrans(w, p); return; }
         if (view.clear && (versus.intro > 0 || versus.over)) {
           const dt = 1 / TICK_HZ;
           if (versus.intro > 0) versus.intro = Math.max(0, versus.intro - dt);
@@ -434,7 +441,9 @@ export class Game {
           }
           return;
         }
-        w.step(p);
+        // 대전 K.O. 뒤에는 양쪽 다 손을 뗀다 (11-08 사용자): 1P 입력 비우고 AI 두뇌 멈춤. 쓰러지는 동작·승리 동작은 그대로
+        aiHold.on = view.clear && !!versus.ko;
+        w.step(view.clear && versus.ko ? NO_PAD : p);
         // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
         if (view.clear) {
           // 서바이벌은 상대가 다 쓰러져도 판이 끝나지 않는다 (웨이브가 이어짐, engine/survival.ts)
@@ -465,7 +474,7 @@ export class Game {
             const { side, next } = versus.ko;
             versus.ko = null;
             if (next === 'over') versus.over = { side, t: OVER_SEC };
-            else { versus.intro = INTRO_SEC; versus.clock = CLOCK_SEC; this.start_new(this.run?.stageId); }
+            else versus.trans = { t: 0, lose: (1 - side) as Side, placed: false };
           }
           return;
         }
@@ -484,6 +493,48 @@ export class Game {
         if (this.paused) this.drawMenu('일시정지', ['계속', w.showBoxes ? '판정 보기 끄기' : '판정 보기 켜기', '철수 (출동 끝내기)', '처음으로']);
       },
     };
+  }
+
+  /** 판 사이 넘어가기 (11-08 사용자). 접히는 동안 새 판을 차리고, 펴진 뒤 진 쪽 캐릭터가 화면 밖에서 점프해 자리로 들어온다 */
+  private vsTrans(w: World, p: Pad) {
+    const tr = versus.trans!;
+    tr.t += 1 / TICK_HZ;
+    const T0 = TRANS.fold;
+    if (tr.t >= T0 && !tr.placed && w === this.world) {
+      // 암전 동안 새 판: 화면은 가운데부터 다시 따라간다
+      versus.clock = CLOCK_SEC;
+      this.vsCam = -1;
+      tr.placed = true;
+      this.start_new(this.run?.stageId);
+      return;
+    }
+    if (!tr.placed) return;
+    // 새 판 첫 틱: 상대를 세우려고 한 번만 진행하고, 들어올 쪽을 화면 밖으로
+    const body = (tr.lose === 0 ? w.player : w.bodies.find((b) => b.team === 'enemy')) as unknown as { x: number; z: number; px?: number; pz?: number; homeX?: number } | undefined;
+    if (!body) { w.step(p); return; }
+    const home = body.homeX ?? (body.homeX = body.x);
+    const off = tr.lose === 0 ? home - 260 : home + 260;
+    const e = (tr.t - (TRANS.fold + TRANS.dark + TRANS.open)) / TRANS.enter;
+    const k = Math.max(0, Math.min(1, e));
+    body.x = off + (home - off) * k;
+    body.z = k > 0 && k < 1 ? Math.sin(k * Math.PI) * 150 : 0;
+    body.px = body.x; body.pz = body.z;
+    if (tr.t >= TRANS_SEC) {
+      body.x = home; body.z = 0; delete body.homeX;
+      versus.trans = null;
+      versus.intro = INTRO_SEC;
+    }
+  }
+
+  /** 판 사이 화면 접기·펴기 (그림판 세로 배율) */
+  private vsFold(): number {
+    const tr = versus.trans;
+    if (!tr) return 1;
+    const { fold, dark, open } = TRANS;
+    if (tr.t < fold) return 1 - tr.t / fold;
+    if (tr.t < fold + dark) return 0;
+    if (tr.t < fold + dark + open) return (tr.t - fold - dark) / open;
+    return 1;
   }
 
   private pauseMenu(p: Pad, w: World) {

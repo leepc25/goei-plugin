@@ -30,6 +30,8 @@ export const versus = {
   intro: 0,
   /** 경기 끝: 이긴 쪽, 남은 표시 초 */
   over: null as null | { side: Side; t: number },
+  /** 판 사이 넘어가기 (11-08 사용자): 화면이 위아래로 접히며 암전 → 가운데로 → 진 쪽 다음 캐릭터가 화면 밖에서 점프로 들어옴. t = 지난 초, lose = 들어올 쪽 */
+  trans: null as null | { t: number; lose: Side; placed: boolean },
   /** 멈춤 (고르기 창이 떠 있는 동안·창을 닫았을 때): 판을 진행하지 않는다 */
   hold: false,
   /** 경기가 끝나 표시까지 마쳤을 때 (고르기 창으로) */
@@ -44,6 +46,9 @@ export const OVER_SEC = 3;
 export const INTRO_SEC = 2.4;   // ROUND 1초 → READY 0.8초 → GO! 0.6초 (11-08 사용자)
 /** 판 시간 (대전게임 관례 99초) */
 export const CLOCK_SEC = 99;
+/** 판 사이: 접기 · 암전 · 펴기 · 점프해 들어오기 (초) */
+export const TRANS = { fold: 0.25, dark: 0.2, open: 0.25, enter: 0.7 };
+export const TRANS_SEC = TRANS.fold + TRANS.dark + TRANS.open + TRANS.enter;
 
 /** 지금 나와 있는 1P·상대 이름 */
 export const fighterOf = (side: Side): string => versus.team[side][versus.cur[side]] ?? '';
@@ -59,6 +64,7 @@ export function newMatch(mode: VsMode, me: string[], foe: string[]): void {
   versus.kills = 0;
   versus.ko = null;
   versus.over = null;
+  versus.trans = null;
   versus.intro = INTRO_SEC;
   versus.clock = CLOCK_SEC;
   versus.hold = false;

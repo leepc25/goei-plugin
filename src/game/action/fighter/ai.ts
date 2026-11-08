@@ -27,6 +27,9 @@ export function foeSense(b: Body): FoeSense {
   };
 }
 
+/** 모든 AI 손 떼기 (대전 K.O. 뒤, 11-08 사용자): 켜져 있으면 두뇌를 돌리지 않고 선 채로 동작만 이어 간다 */
+export const aiHold = { on: false };
+
 export class FighterAi extends FighterPlayer {
   readonly brain: FighterBrain;
   private pad: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
@@ -88,6 +91,12 @@ export class FighterAi extends FighterPlayer {
     if (this.passive && this.lastHp >= 0 && this.hp < this.lastHp) this.provoked = true;
     this.lastHp = this.hp;
     if (this.passive && !this.provoked) { this.passiveStep(world); return; }
+    if (aiHold.on) {
+      const q = this.pad;
+      q.pressed.clear(); q.released.clear(); q.held.clear(); q.mx = 0; q.my = 0; q.run = false; q.evade = false;
+      this.tick(world, q);
+      return;
+    }
     // 노릴 상대: 가장 가까운 상대 (적 편은 주인공·동행 중, 동행은 적 중)
     const t = this.foes().filter((b) => b.team !== this.team).sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) * 2 - (Math.abs(b.x - this.x) + Math.abs(b.y - this.y) * 2))[0];
     const p = this.pad;
