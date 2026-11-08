@@ -89,3 +89,15 @@ test('update: image tag regexes move to the plugin and are removed from old card
   const payload = { schema: 1, version: '0.16.40', minPlugin: '0.16.40', data: { globalLore: [{ comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.16.40"}' }], customscript: [] } };
   assert.deepEqual(planUpdate(char, payload).next.customscript.map((r) => r.comment), ['내 정규식']);
 });
+
+test('카드 업데이트: 새 카드 명부에만 있는 칸(시작 소지품 등)은 사용자 명부 빈 자리에 채우고, 고친 값은 그대로 (2026-11-08)', () => {
+  const mine = { schema: 1, 요원: { 살라딘: { affiliation: '내가 고친 소속' } } };
+  const def = { schema: 1, 요원: { 살라딘: { affiliation: '기본 소속', start_items: [{ name: '단검' }] }, 새요원: { affiliation: 'X' } } };
+  const char = { globalLore: [{ comment: 'Directory', content: JSON.stringify(mine) }], customscript: [] };
+  const payload = { schema: 1, version: '0.21.4', minPlugin: '0.21.0', data: { globalLore: [{ comment: 'Directory', content: JSON.stringify(def) }, { comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.21.4"}' }], customscript: [] } };
+  const plan = planUpdate(char, payload);
+  const got = JSON.parse(plan.next.globalLore.find((e) => e.comment === 'Directory').content);
+  assert.equal(got.요원.살라딘.affiliation, '내가 고친 소속');
+  assert.deepEqual(got.요원.살라딘.start_items, [{ name: '단검' }]);
+  assert.ok(got.요원.새요원, '새 요원 칸도 들어옴');
+});
