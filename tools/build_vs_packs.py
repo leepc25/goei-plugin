@@ -60,6 +60,11 @@ def main():
     for f in os.listdir(vdir):
         if f.endswith('.ogg'): shutil.copy(os.path.join(vdir, f), os.path.join(com, 'voice-' + f))
     shutil.copy(os.path.join(vdir, 'LICENSE.txt'), os.path.join(com, 'voice-LICENSE.txt'))
+    # 배경음악·타격음 (11-08 사용자 선택), 목록 sound.json, 출처 game-pack/vs-sound/LICENSE.txt
+    sdir = os.path.join(SRC, 'vs-sound')
+    for f in os.listdir(sdir):
+        if f.endswith('.ogg') or f == 'sound.json': shutil.copy(os.path.join(sdir, f), com)
+    shutil.copy(os.path.join(sdir, 'LICENSE.txt'), os.path.join(com, 'sound-LICENSE.txt'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []
     total = 0

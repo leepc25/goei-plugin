@@ -11,6 +11,7 @@ import type { Game } from '../action/engine/game';
 import type { GameAssets } from '../bridge';
 import { createGameAudio } from '../action/audio';
 import { vsVoice } from './voice';
+import { vsBgm, vsSoundPause, vsSoundWarm } from './sound';
 import { openSelect, showVs, type SelectResult, type VsSfx } from './select';
 
 export interface VersusHandle {
@@ -37,6 +38,7 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
   const select = () => {
     versus.hold = true;
     showGame(false);
+    vsBgm(false);
     vsVoice('choose');
     sel = openSelect(box, {
       last,
@@ -55,6 +57,8 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
     newMatch(r.mode, r.me, foe);
     resetSurvival();
     showGame(true);
+    vsSoundWarm();
+    vsBgm(true);
     if (!game) {
       unmount = mountGame(box, { assets } as never, {
         charPacks: true,
@@ -75,14 +79,15 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
   void packs.ready.then(() => { if (!dead) select(); });
 
   return {
-    pause: () => { versus.hold = true; box.style.visibility = 'hidden'; },
-    resume: () => { box.style.visibility = ''; if (!sel && game) versus.hold = false; },
+    pause: () => { versus.hold = true; box.style.visibility = 'hidden'; vsSoundPause(true); },
+    resume: () => { box.style.visibility = ''; vsSoundPause(false); if (!sel && game) versus.hold = false; },
     destroy: () => {
       dead = true;
       sel?.close();
       unmount?.();
       packs.dispose();
       audio.dispose();
+      vsBgm(false);
       versus.onMatchEnd = null;
     },
   };

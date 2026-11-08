@@ -1,0 +1,12 @@
+대전 배경음악·타격음 (11-08 사용자 선택). 모두 오락실 느낌으로 처리함(압축·표본율 낮춤·비트 깎기), 처리한 파일도 원래 조건 그대로.
+
+배경음악
+bgm-1  "Stage 1 - Streets" from Final Punch — maxstack — CC-BY-SA 3.0 — https://opengameart.org/content/final-punch
+bgm-2  "To the Wire" — congusbongus — CC-BY 4.0 — https://opengameart.org/content/to-the-wire
+bgm-3  "Sega Mega Drive/Genesis Electric Theme" — Spring Spring — CC-BY 4.0 — https://opengameart.org/content/sega-mega-drivegenesis-electric-theme
+bgm-4  "Chaos Factory" (medium loop) — Mega Pixel Music Lab — CC-BY 4.0 — https://opengameart.org/content/chaos-factory
+
+타격음
+hit-u*  맨손: "Punch, slap n kick" — CGEffex (freesound 98341), adapted — CC-BY 3.0 — https://opengameart.org/content/punch-slap-n-kick
+hit-u3-5, hit-b1-*, hit-guard-0: "Punches, hits, swords and squishes" — Socapex (tarfmagougou), CC-BY 3.0 sources listed in the pack — https://opengameart.org/content/punches-hits-swords-and-squishes
+hit-b2-*, hit-b3-*, hit-guard-1,2: "Fleshy Fight Sounds" — will_leamon — OGA-BY 3.0 — https://opengameart.org/content/fleshy-fight-sounds

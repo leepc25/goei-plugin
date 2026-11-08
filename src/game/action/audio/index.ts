@@ -59,6 +59,7 @@ export interface AudioEvent {
   floor?: { type?: string }; // enter:floor
   how?: string; // run:end
   name?: string; // custom
+  by?: string; // hit: 때린 인물 이름 (대전 칼 소리)
 }
 
 const SCENES = new Set<string>(['title', 'hq', 'lobby', 'chase', 'replica', 'trial', 'dark', 'silent', 'puzzle', 'service', 'boss']);
@@ -290,7 +291,10 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     return Math.max(-0.8, Math.min(0.8, (e.x - listener.x) / listener.half));
   }
 
+  /** 사건 가로채기 (대전: 녹음 소리로 바꿔 튼다). true 면 합성 소리는 내지 않는다 */
+  let hook: ((e: AudioEvent) => boolean) | null = null;
   function event(e: AudioEvent) {
+    if (hook?.(e)) return true;
     // 흐름 사건: 음악을 바꾼다
     switch (e.type) {
       case 'enter:floor':
@@ -408,6 +412,7 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
       applyVolumes();
     },
     setPaused(paused: boolean) { setPaused(paused); },
+    setHook(f: ((e: AudioEvent) => boolean) | null) { hook = f; },
     get unlocked() {
       return ctx?.state === 'running';
     },

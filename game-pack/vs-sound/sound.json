@@ -1,0 +1,55 @@
+{
+ "u1": [
+  "hit-u1-0.ogg",
+  "hit-u1-1.ogg",
+  "hit-u1-2.ogg",
+  "hit-u1-3.ogg",
+  "hit-u1-4.ogg"
+ ],
+ "u2": [
+  "hit-u2-0.ogg",
+  "hit-u2-1.ogg",
+  "hit-u2-2.ogg",
+  "hit-u2-3.ogg",
+  "hit-u2-4.ogg",
+  "hit-u2-5.ogg",
+  "hit-u2-6.ogg"
+ ],
+ "u3": [
+  "hit-u3-0.ogg",
+  "hit-u3-1.ogg",
+  "hit-u3-2.ogg",
+  "hit-u3-3.ogg",
+  "hit-u3-4.ogg",
+  "hit-u3-5.ogg"
+ ],
+ "b1": [
+  "hit-b1-0.ogg",
+  "hit-b1-1.ogg",
+  "hit-b1-2.ogg",
+  "hit-b1-3.ogg"
+ ],
+ "b2": [
+  "hit-b2-0.ogg",
+  "hit-b2-1.ogg",
+  "hit-b2-2.ogg",
+  "hit-b2-3.ogg"
+ ],
+ "b3": [
+  "hit-b3-0.ogg",
+  "hit-b3-1.ogg",
+  "hit-b3-2.ogg",
+  "hit-b3-3.ogg"
+ ],
+ "guard": [
+  "hit-guard-0.ogg",
+  "hit-guard-1.ogg",
+  "hit-guard-2.ogg"
+ ],
+ "bgm": [
+  "bgm-1.ogg",
+  "bgm-2.ogg",
+  "bgm-3.ogg",
+  "bgm-4.ogg"
+ ]
+}

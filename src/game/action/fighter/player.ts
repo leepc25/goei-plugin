@@ -117,7 +117,7 @@ export class FighterPlayer extends Player {
       A: art.A, IMG: art.IMG, CH: art.cfg, VFX: fx?.VFX ?? {}, CHAIR: fx?.CHAIR ?? {},
       held: this.heldNames,
       K: (y: number) => spr(y) * CHAR_K,
-      sfx: (type: string, extra: Record<string, unknown>) => fighterHooks.sfx({ type, ...extra }),
+      sfx: (type: string, extra: Record<string, unknown>) => fighterHooks.sfx({ type, by: art.cfg.name, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
       // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)

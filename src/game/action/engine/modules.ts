@@ -4,6 +4,7 @@
 //   hq/    본부·필드 건물 지도 (hqMap)
 // 적(enemy/)·아이템(items/)·대사(story/)를 여기에 잇는다. 옛 차원 승강기 출동(층·임무·정산)은 2026-10-28에 지웠다.
 import { vsVoice, setVoiceVolume, type VoiceId } from '../../versus/voice';
+import { vsEventSound, setVsVolumes } from '../../versus/sound';
 import { BASE_STATS } from '../../combat/baseStats.gen';
 import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
@@ -917,6 +918,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   setHudItemIcon(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   vsSay = (id) => { if (view.clear) audio.play(id); };
+  // 대전: 타격·막기는 녹음 소리로 (versus/sound.ts)
+  audio.setHook((e) => view.clear && vsEventSound(e));
   let game: Game | null = null;
   /** 필드 입장 판정. 막히면 이유를 보이고 「밖에 있어요」로 고칠 수 있다. 들어가도 되면 true */
   async function gate(): Promise<boolean> {
@@ -1115,6 +1118,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     audio.setVolume('amb', s.sfx * 0.8);
     audio.setVolume('ui', s.sfx * 0.7);
     setVoiceVolume(s.master * s.sfx);
+    setVsVolumes(s.master * s.sfx, s.master * s.music);
   };
   // 발소리: 엔진이 step 사건을 따로 내지 않으므로 땅 위에서 움직인 거리로 낸다 (보폭 걸음 55 / 달리기 75)
   let foot = { x: 0, y: 0, d: 0, w: null as unknown };
