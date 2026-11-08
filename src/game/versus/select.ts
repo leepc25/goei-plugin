@@ -6,7 +6,7 @@
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
 import { crt2d } from './crt2d';
 import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
-import { bigText, BIG_INK } from '../action/ui/bigText';
+import { bigText, BIG_FIRE } from '../action/ui/bigText';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
@@ -15,7 +15,7 @@ const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
   { id: 'survival', name: '서바이벌', picks: [1, 0] },
 ];
 const RANDOM = '__random';
-const CELL = 48;
+const CELL = 64;   // 11-08 사용자 「격투게임처럼」: 얼굴판 얼굴을 1:1 로 크게
 const TIME = 30;
 /** 1P 파랑·2P 빨강: 커서·이름 앞 표시·인물 외곽 빛에만 쓴다 */
 const P_COLOR = ['#5a9cff', '#ff5a5a'];
@@ -130,7 +130,7 @@ const CSS = `
 @keyframes vs-shine{0%{background-position:100% 0}60%,100%{background-position:0 0}}
 .vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:0 4px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-time.low{animation:vs-pulse .5s steps(2) infinite}
-.vs-fig{position:absolute;bottom:calc(var(--gh) + 50px);z-index:2;pointer-events:none}
+.vs-fig{position:absolute;bottom:58px;z-index:2;pointer-events:none}
 .vs-fig[data-s="0"]{left:3%}
 .vs-fig[data-s="1"]{right:3%}
 .vs-slot{position:absolute;bottom:0}
@@ -141,13 +141,16 @@ const CSS = `
 .vs-fig[data-s="1"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-fig.pick .vs-slot[data-k="0"] canvas:not(.sh){animation:vs-pick .3s steps(3)}
 .vs-fig .unk{position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center}
-.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
+.vs-nm{position:absolute;z-index:4;bottom:12px;display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-nm[data-s="0"]{left:3%}
 .vs-nm[data-s="1"]{right:3%;flex-direction:row-reverse}
 .vs-picks{display:flex;gap:3px;margin-bottom:2px}
 .vs-nm[data-s="1"] .vs-picks{flex-direction:row-reverse}
-.vs-gridw{position:absolute;z-index:3;left:50%;bottom:38px;transform:translateX(-50%);pointer-events:auto}
-.vs-grid{display:grid;gap:2px}
+.vs-gridw{position:absolute;z-index:3;left:50%;top:var(--gt);transform:translateX(-50%);pointer-events:auto}
+.vs-sel[data-st="char"] .vs-top{top:auto;bottom:62px}
+.vs-title{display:flex;flex-direction:column;align-items:center;gap:4px}
+.vs-sel[data-st="char"] .vs-title{padding:8px 14px}
+.vs-grid{display:grid;gap:3px}
 .vs-cell{position:relative;width:${CELL}px;height:${CELL}px;cursor:pointer}
 .vs-cell>canvas{position:absolute;left:0;top:0;filter:var(--shd);transition:transform .06s steps(2)}
 .vs-cell.cur>canvas{transform:translateY(-3px);filter:drop-shadow(3px 5px 0 rgba(0,0,0,.6))}
@@ -156,8 +159,9 @@ const CSS = `
 .vs-cell.taken.cur>canvas{filter:brightness(.8) drop-shadow(3px 5px 0 rgba(0,0,0,.6))}
 .vs-cur{position:absolute;left:0;top:-19px;z-index:2;animation:vs-pulse .4s steps(2) infinite}
 .vs-cur.c1{left:auto;right:0}
-.vs-say{position:absolute;z-index:4;left:0;right:0;bottom:calc(var(--gh) - 46px);display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
-.vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;display:flex;justify-content:center}
+.vs-say{position:absolute;z-index:4;left:0;right:0;bottom:170px;display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
+.vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;}
+.vs-sel[data-st="char"] .vs-help{bottom:auto;top:4px;display:flex;justify-content:center}
 .vs-say canvas,.vs-help canvas,.vs-load canvas,.vs-vteam canvas{filter:var(--shd)}
 .vs-say canvas,.vs-help canvas,.vs-load canvas{padding:0 4px;${frameCss(F_BASE)}}
 .vs-title{position:relative}
@@ -302,23 +306,24 @@ function troupe(_h: number, flip: boolean, n = 3) {
 }
 
 /** 얼굴 칸 (11-08 사용자): 상자와 같은 도트 틀(도트 한 칸 = 2px)에 얼굴판 얼굴을 1:1 로. 커서가 오면 1P·2P 색 틀로 빛나고 살짝 떠오른다 */
-const CELL_FRAME = 3 * 2, CELL_IN = CELL - CELL_FRAME * 2;
-const cellCol = (state: string): FrameCol =>
-  state === 'p0' ? { edge: '#07090b', light: '#cfe3ff', shadow: '#1d4f9a', accent: P_COLOR[0], fill: '#0f1216' }
-  : state === 'p1' ? { edge: '#07090b', light: '#ffd6d6', shadow: '#9a1d1d', accent: P_COLOR[1], fill: '#0f1216' }
-  : { ...F_BASE, fill: '#0f1216' };
 function drawCell(cv: HTMLCanvasElement, name: string, state = '') {
   const o = cv.getContext('2d')!;
   o.imageSmoothingEnabled = false;
   o.clearRect(0, 0, cv.width, cv.height);
-  framePixels(o, CELL / 2, cellCol(state), 2);
-  const at = CELL_FRAME;
-  if (name === RANDOM) { const q = dotText('?', HUD_INK, 2); o.drawImage(q, Math.round((CELL - q.width) / 2), Math.round((CELL - q.height) / 2)); }
-  else if (name) {
-    const f = charFace(name, 64, false);
-    if (f) o.drawImage(f, Math.round((64 - CELL_IN) / 2), 6, CELL_IN, CELL_IN, at, at, CELL_IN, CELL_IN);
-    // 커서 칸: 얼굴 위에 옅은 빛 한 줄 (위쪽 2도트)
-    if (state) { o.fillStyle = 'rgba(255,255,255,.18)'; o.fillRect(at, at, CELL_IN, 2); }
+  // 11-08 사용자 「격투게임처럼」: 검은 테 1 · 밝은 줄 2(커서면 1P 파랑/2P 빨강) · 따뜻한 두 단 바탕 · 얼굴 1:1
+  const ring = state === 'p0' ? P_COLOR[0] : state === 'p1' ? P_COLOR[1] : '#e8e4d8';
+  o.fillStyle = '#07090b'; o.fillRect(0, 0, CELL, CELL);
+  o.fillStyle = ring; o.fillRect(1, 1, CELL - 2, CELL - 2);
+  const at = 3, inn = CELL - 6;
+  if (name === RANDOM) {
+    o.fillStyle = '#1f3f8a'; o.fillRect(at, at, inn, inn);
+    const q = bigText('?', BIG_FIRE, 4, { slant: false, bold: true });
+    o.drawImage(q, Math.round((CELL - q.width) / 2), Math.round((CELL - q.height) / 2));
+  } else {
+    o.fillStyle = name ? '#a8642a' : '#1a1e24'; o.fillRect(at, at, inn, inn);
+    if (name) { o.fillStyle = '#c47e36'; o.fillRect(at, at, inn, Math.round(inn * 0.4)); }
+    const f = name ? charFace(name, 64, false) : null;
+    if (f) o.drawImage(f, 3, 4, inn, inn, at, at, inn, inn);
   }
   crt2d(cv);
 }
@@ -356,10 +361,12 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   // ── 판 짜기 (한 번만. 커서·이름은 아래 update 가 바꾼다). 배경판 없음: 본문이 그대로 보인다
   // 칸 줄 수: 본문 폭에 맞춰 (줄이 적을수록 인물이 크게 선다)
   // 11-08 사용자 「격투게임처럼」: 얼굴은 네 칸씩 묶음, 묶음 사이를 띄운다
-  const BLOCK = 4, BGAP = 10;
-  const COLS = Math.max(8, Math.min(16, Math.floor((box.clientWidth - 140) / (BLOCK * (CELL + 2) + BGAP)) * BLOCK));
-  const gridH = Math.ceil(names.length / COLS) * (CELL + 2) + 38 + 22 + 30;   // 판 + 아래 도움말 + 판 위 안내 한 줄
+  // 판은 위쪽(도움말 아래)에, 세 칸 묶음을 띄워 늘어놓는다. 아래는 양옆 전신과 가운데 PLAYER SELECT
+  const BLOCK = 3, BGAP = 14;
+  const COLS = Math.max(6, Math.min(15, Math.floor((box.clientWidth - 20) / (BLOCK * (CELL + 3) + BGAP)) * BLOCK));
+  const gridH = Math.ceil(names.length / COLS) * (CELL + 3);
   el.style.setProperty('--gh', `${gridH}px`);
+  el.style.setProperty('--gt', '40px');
   // 전신은 이름 줄 위에 선다: 위 제목 줄(약 90px)과 판 사이 높이
   const figH = FIG_H;
   el.innerHTML = `<div class="vs-top"><div class="vs-title"></div>
@@ -383,9 +390,12 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   let stage: 'mode' | 'char' = 'mode';
   const title = () => {
     const t = $('.vs-title');
-    const big = document.createElement('canvas'), src = bigText(stage === 'mode' ? 'MODE SELECT' : 'PLAYER SELECT', BIG_INK, 3);
-    big.width = src.width; big.height = src.height; big.getContext('2d')!.drawImage(src, 0, 0);
-    t.replaceChildren(crt2d(big));
+    const bigs = (stage === 'mode' ? ['MODE SELECT'] : ['PLAYER', 'SELECT']).map((line) => {
+      const big = document.createElement('canvas'), src = bigText(line, BIG_FIRE, stage === 'mode' ? 4 : 3, { slant: false, bold: true });
+      big.width = src.width; big.height = src.height; big.getContext('2d')!.drawImage(src, 0, 0);
+      return crt2d(big);
+    });
+    t.replaceChildren(...bigs);
     if (stage === 'char') { const sub = document.createElement('div'); sub.className = 'vs-tsub'; sub.appendChild(dot(mode.name, '#fff3c4', 1)); t.appendChild(sub); }
     put($('.vs-help'), dot(stage === 'mode' ? '↑↓ 움직이기 · Enter 고르기 · Esc 닫기' : '방향키 움직이기 · Enter 고르기 · Backspace 되돌리기 · Tab 모드 · Esc 닫기', HUD_DIM, 1));
   };
@@ -456,13 +466,13 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
       pk.replaceChildren();
       if (mode.picks[s] > 1) for (let i = 0; i < mode.picks[s]; i++) {
         const p = picks[s][i];
-        const c = cellCanvas(p ?? '', CELL);
+        const c = cellCanvas(p ?? '', CELL / 2);
         pk.appendChild(c);
       }
     }
     const who = t === 0 ? '1P' : '2P';
     if (done()) $('.vs-say').replaceChildren();
-    else put($('.vs-say'), dot(`${who} 캐릭터를 고르세요${mode.picks[t] > 1 ? ` (${picks[t].length + 1}/${mode.picks[t]})` : ''}`, HUD_INK, 2));
+    else put($('.vs-say'), dot(`${who} 캐릭터를 고르세요${mode.picks[t] > 1 ? ` (${picks[t].length + 1}/${mode.picks[t]})` : ''}`, HUD_INK, 1));
     if (t !== lastTurn) { lastTurn = t; time = TIME; timeAt = performance.now(); drawTime(TIME); }
   };
 

@@ -1691,8 +1691,6 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const PS = 136, face0 = 12, timerHalf = 58;
   const barX0 = face0 + PS + 4, barX1 = W / 2 - timerHalf, barW = Math.round(barX1 - barX0), barH = 28;
   const barY = top + 8;
-  // 그림판 바닥(경기 줄 아래 끝): 세계는 가로로 맞추고 세로 가운데 (render.ts)
-  const floorY = Math.round(H) - 14;   // 그림판 맨 아래 구석 (발밑보다 아래, 대기 캐릭터와 겹치지 않게)
   const bar = (x: number, y: number, w: number, h: number, mirror: boolean, parts: { r: number; col: (row: number, h: number) => string }[], ticks = 0) => {
     x = Math.round(x); y = Math.round(y);
     c.fillStyle = '#07090b'; c.fillRect(x - 3, y - 3, w + 6, h + 6);          // 검은 테
@@ -1745,13 +1743,20 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       { r, col: (row, h) => (row < 2 ? `hsl(${hue},75%,${blink ? 82 : 70}%)` : row >= h - 3 ? `hsl(${hue},70%,${blink ? 46 : 30}%)` : `hsl(${hue},68%,${blink ? 64 : 47}%)`) },
     ]);
     // 이름: 막대 아래 바깥쪽, 판 표시: 막대 아래 안쪽
+    // 필살 게이지: 체력 막대 바로 밑에 붙여 (11-08 사용자). 바깥쪽에서 안쪽으로 찬다, 다 차면 금색으로 빛난다
+    const g = Math.max(0, Math.min(100, f.gauge ?? 0)), full = g >= 100;
+    const gh = 8, gw = Math.round(barW * 0.7), gy = barY + barH + 3;
+    const gx = mir ? bx + barW - gw : bx;
+    const pulse = full ? 0.5 + 0.5 * Math.sin(vsT * 7) : 0;
+    bar(gx, gy, gw, gh, !mir, [{ r: g / 100, col: (row) => (full ? (row < 2 ? '#fff6d0' : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})`) : row < 2 ? '#e8f4ff' : row >= gh - 2 ? '#4f7fa0' : '#9fc6e0') }], 5);
+    const below = gy + gh + 6;
     const nt = dotText(name, HUD_INK, 3);
-    c.drawImage(nt, mir ? Math.round(bx + barW - nt.width) : Math.round(bx), barY + barH + 6);
+    c.drawImage(nt, mir ? Math.round(bx + barW - nt.width) : Math.round(bx), below);
     const marks = versus.mode === 'duel' ? Array.from({ length: 2 }, (_, n) => n < versus.wins[i])
       : versus.mode === 'team' ? versus.team[i].map((_, n) => n >= versus.cur[i]) : [];
     const sz = 14, gap = 6;
     marks.forEach((on, n) => {
-      const mx = mir ? bx + n * (sz + gap) : bx + barW - sz - n * (sz + gap), my = barY + barH + 10;
+      const mx = mir ? bx + n * (sz + gap) : bx + barW - sz - n * (sz + gap), my = below + 4;
       c.fillStyle = '#07090b'; c.fillRect(mx - 2, my - 2, sz + 4, sz + 4);
       c.fillStyle = on ? (versus.mode === 'duel' ? '#ffd35a' : '#e6e4dc') : '#2a3036';
       c.fillRect(mx, my, sz, sz);
@@ -1764,13 +1769,6 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
         c.drawImage(t, mir ? Math.round(px + PS - t.width) : px, py + PS + 4 + j * (t.height + 2));
       });
     }
-    // 아래 구석: 필살 게이지와 쌓인 수
-    const g = Math.max(0, Math.min(100, f.gauge ?? 0)), full = g >= 100;
-    const gw = 300, gh = 16, num = bigText(full ? '1' : '0', full ? BIG_FIRE : BIG_INK, 5, { slant: false, bold: true });
-    const gx = mir ? W - face0 - num.width - 6 - gw : face0 + num.width + 6, gy = floorY - gh;
-    c.drawImage(num, mir ? W - face0 - num.width : face0, gy + gh - num.height + 6);
-    const pulse = full ? 0.5 + 0.5 * Math.sin(vsT * 7) : 0;
-    bar(gx, gy, gw, gh, !mir, [{ r: g / 100, col: (row) => (full ? (row < 2 ? '#fff6d0' : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})`) : row < 2 ? '#e8f4ff' : row >= gh - 2 ? '#4f7fa0' : '#9fc6e0') }], 5);
     if (versus.mode === 'survival' && i === 0) {
       const t1 = dotText(`WAVE ${Math.max(1, surv.wave)}`, HUD_INK, 2), t2 = dotText(`${versus.kills} KO`, VS_GOLD, 2);
       const sx = Math.round(W / 2 - (t1.width + 10 + t2.width) / 2);
