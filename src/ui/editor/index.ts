@@ -34,10 +34,10 @@ import { isPhone } from '../media';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
+export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update' | 'versus';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'start' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update', 'versus'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
@@ -369,8 +369,8 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트', versus: '대전' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh, versus: ICONS.pad };
 /** [노드, 이름, 아이콘, 배지?, 하위 항목?]. 노드가 `label:…` 이면 누를 수 없는 소제목 줄 (설정 「기록」 아래 하위 메뉴, 2026-11-05 사용자) */
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
@@ -386,6 +386,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
       ...(['lore', 'adv'] as SetPage[]).map(setItem),
+      setItem('versus'),
     ] }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['start', '시작 화면', ICONS.idcard], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
@@ -461,6 +462,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'lore': body = sec('lore'); break;
     case 'adv': body = sec('adv'); break;
     case 'update': body = sec('update'); break;
+    case 'versus': body = sec('versus'); break;
   }
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   // 채팅 설정 페이지는 모두 같은 머리: 시작 뒤 「기본값으로 저장」「기본값 불러오기」(설정 전부 한 번에), 시작 전 「새 채팅 기본값 (시작 전)」.

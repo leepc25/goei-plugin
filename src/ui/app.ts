@@ -8,6 +8,7 @@ import { NavHistory, type RecordsNav } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, effectiveFaction, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
+import { handleVersus, setVsRender } from './versus';
 import type { Faction, FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, worldOn,
@@ -138,6 +139,7 @@ const wikiEnv: WikiEnv = {
 
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
+setVsRender(() => render());
 const peopleEnv: PeopleEnv = settingsEnv;
 const recordsEnv: RecordsEnv = settingsEnv;
 
@@ -642,6 +644,12 @@ export async function openShop(): Promise<void> {
   if (view.kind === 'started') await handle('shop-open');
 }
 
+/** 대전 자료가 없을 때 게임패드 단추: 설정 「대전」으로 (11-08 사용자) */
+export async function openVersusSettings(): Promise<void> {
+  await openApp({ quietIfNotLite: true });
+  if (view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening') await handle('ed-open', 'set:versus');
+}
+
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
@@ -830,6 +838,8 @@ async function handle(action: string, value?: string): Promise<void> {
     pickerPrefs = false;
     return render();
   }
+  // 설정 「대전」 (11-08): 이 기기 값·데이터 받기라 채팅 범위와 상관없다
+  if (action.startsWith('vs-') && (await handleVersus(action, value ?? '', () => render()))) return;
   if ((view.kind === 'started' || (view.kind === 'picker' && pickerPrefs)) && action.startsWith('dir-')) {
     if (action === 'dir-save' || action === 'dir-reset') settingsUi.confirm = '';
     await handleDirectory(action, value, view.ctx, settingsEnv);

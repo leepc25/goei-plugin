@@ -1,3 +1,4 @@
+import { view } from '../engine/view';
 // 게임 껍데기: 화면 틀 + 입력(키보드·터치·패드) + HUD + 효과 + 메뉴를 한 번에 붙인다.
 // 엔진 쪽 사용법은 docs/게임_모듈_연결.md 와 이 폴더 README.md.
 import { Fx } from './fx';
@@ -129,6 +130,8 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   };
   // 메뉴가 열려 있으면 모든 키를 메뉴가 먹는다. 패드 B(KeyE)는 뒤로
   input.capture = (code, down, src) => {
+    // 대전(투명 무대): 일시정지 메뉴·인물 창을 열지 않는다. Esc 는 플러그인이 받아 대전을 멈추고 닫는다 (host/vs.ts)
+    if (view.clear && (code === 'Escape' || code === 'Backquote')) return true;
     const cw = o.charWindow;
     if (!menu.isOpen && cw && shell.mode === 'play') {
       if (cw.isOpen()) {

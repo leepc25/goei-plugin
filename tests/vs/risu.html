@@ -1,0 +1,13 @@
+<!doctype html><meta charset=utf-8><title>가짜 Risu (대전 플러그인 시험)</title>
+<style>
+html,body{margin:0;height:100%;background:#1e1f26;color:#ddd;font:14px/1.7 sans-serif;overflow:hidden}
+#side{position:fixed;left:0;top:0;bottom:0;width:300px;background:#25262e}
+.default-chat-screen{position:fixed;left:310px;right:0;top:0;bottom:0;display:flex;flex-direction:column}
+#msgs{flex:1;overflow-y:auto;padding:0 40px}
+textarea{margin:10px 20px;height:40px;background:#22232b;border:1px solid #444;color:#ddd}
+body>iframe{position:fixed;border:0;display:none;background:#111}
+</style>
+<div id=side></div>
+<div class=default-chat-screen><div id=msgs></div><textarea></textarea></div>
+<iframe id=plug src="plugin.html" allowtransparency=true></iframe>
+<script>const m=document.getElementById('msgs');for(let i=0;i<80;i++)m.insertAdjacentHTML('beforeend','<p>살라딘은 물러서지 않았다. 총구에서 뿜어져 나온 불꽃이 좁은 현관을 대낮처럼 밝혔다. '+i+'</p>');</script>

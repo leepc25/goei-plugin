@@ -106,9 +106,7 @@ rmSync('dist/game', { recursive: true, force: true });
 let gameCode = '';
 let gameParts = [];
 let gamePacks = [];
-if (GAME) {
-// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
-// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
+// 큰 글을 바이트 기준 조각으로 (웹 Risu 프록시 요청당 약 1MB)
 const split = (str, max) => {
   const out = [];
   let buf = '';
@@ -122,6 +120,9 @@ const split = (str, max) => {
   if (buf) out.push(buf);
   return out;
 };
+if (GAME) {
+// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
+// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
 rmSync('dist/game', { recursive: true, force: true });
 mkdirSync('dist/game', { recursive: true });
 const gameOut = await build({ ...common, entryPoints: ['src/game/entry.ts'], format: 'iife' });
@@ -159,6 +160,15 @@ if (GAME || process.env.GOEI_VS === '1') {
   if (r.status !== 0) throw new Error('build_vs_packs.py 실패');
   rmSync('dist/vs', { recursive: true, force: true });
   mkdirSync('dist/vs', { recursive: true });
+  // 대전 코드: 본체와 따로 받는다 (src/game/versus/entry.ts → globalThis.__goeiVersus)
+  const vsOut = await build({ ...common, entryPoints: ['src/game/versus/entry.ts'], format: 'iife', minify: true });
+  const vsCode = `// goei-vs ${pkg.version}\n` + vsOut.outputFiles[0].text;
+  writeFileSync('dist/vs/goei-vs.js', vsCode);
+  const vsParts = split(vsCode, 200_000).map((p, i) => {
+    const name = `goei-vs.${i + 1}.txt`;
+    writeFileSync(`dist/vs/${name}`, p);
+    return name;
+  });
   const vsPacks = [];
   for (const d of readdirSync('dist/vs-src').sort()) {
     const p = buildGamePack(`dist/vs-src/${d}`);
@@ -170,7 +180,7 @@ if (GAME || process.env.GOEI_VS === '1') {
     }
     vsPacks.push({ id: p.id, hash: p.hash, bytes: p.bytes.length, parts });
   }
-  writeFileSync('dist/vs/index.json', JSON.stringify({ version: pkg.version, packs: vsPacks }, null, 1) + '\n');
+  writeFileSync('dist/vs/index.json', JSON.stringify({ version: pkg.version, code: { parts: vsParts, length: vsCode.length }, packs: vsPacks }, null, 1) + '\n');
 }
 
 // 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
