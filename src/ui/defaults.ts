@@ -19,7 +19,9 @@ const PREFIXES: Record<DefaultsPane, string[]> = {
 export const MAIN_PREFIXES = ['$gen_', '$pp_', '$it_'];
 /** 설정 창 머리의 「기본값으로 저장」「기본값 불러오기」가 한 번에 다루는 채팅 변수 접두어 전부 (2026-10-29 사용자: 「현재 모든 상태가 한방에」).
  *  화면·이미지·상황판·괴이 발생·테마는 settings.ts set-bar-yes 가 따로 더한다 */
-export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, ...Object.values(PREFIXES).flat()])];
+// 소지품 페이지(가계부 옵션 $st_wallet_*·상점 $sh_*)와 상태창 칸 구성($st_col_*)도 (11-08 전수점검: 「기본값으로 저장·불러오기」에서 빠져 있었다.
+// 「초기값으로」는 이미 다루고 있었음). 칸 구성 기록($st_col_log)은 채팅마다라 PREF_VAR 에서 빠진다
+export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, '$st_col_', '$st_wallet_', '$sh_', ...Object.values(PREFIXES).flat()])];
 const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', pp: '인물 기록', jr: '기록' };
 
 export const defaultsAsk = { pane: '' as DefaultsPane | '', what: '' as '' | 'save' | 'load' };

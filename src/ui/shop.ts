@@ -5,6 +5,7 @@
 // 팔기(11-07): 도구 줄 「팔기」 → 진열대 자리에 내 소지품 → 하나 고르면 입력창에 「팔기: 이름」 칩(값을 부르거나 그냥 보냄) → 주인이 값을 부르면 상세 창(잔고 / +값 / 잔액) [팔기][흥정][그만].
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
+import { refreshUseBox } from '../host/usebox';
 import { generate, type LlmMessage } from '../host/llm';
 import { facePic } from '../host/assets';
 import { personaText } from '../host/user';
@@ -13,12 +14,14 @@ import { genSettings } from '../core/advanced';
 import { collectRefs, limitRefs, recentTurns, refText, storyText, type RefSource } from '../core/refs';
 import { readDirectory } from '../core/world';
 import { findStatusTags } from '../core/world/status';
+import { rebuildStatusLine } from '../core/statusctx';
+import { colConfig, usedCols } from '../core/world/statuscols';
 import { findDoc, innerBody } from '../core/wiki';
 import { peopleStore } from '../core/people/store';
 import { peopleSettings } from '../core/people/settings';
 import { identityText } from '../core/people/identity';
 import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, removeItem, type Item } from '../core/items';
+import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
   applyShelf, applyTalk, cancelSell, closeSale, currentShop, markSold, parseShelf, parseTalk, readShop, sayToOwner, shelfItems, shelfPrompt, shopOn, shopSettings, shopVars, shortWon, startSell, talkPrompt,
@@ -296,6 +299,8 @@ function source(ctx: ChatContext, st: ShopState): ShopSource {
     const tags = findStatusTags(String(msgs[i].data ?? ''));
     if (tags.length) status = tags[tags.length - 1].raw.trim();
   }
+  // 잔고는 상점 모델에 넘기지 않는다 (설정 「넘기는 것·남는 것」): 상태창 줄에서 잔고 칸을 빼고 다시 만든다 (11-08 전수점검: 잔고 칸이 그대로 갔다)
+  if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet'));
   const situation = ['$an_report', '$in_report'].map((k) => String(vars[k] ?? '').trim()).filter(Boolean).join('\n').slice(0, 1500);
   const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx.chat).identity) : '';
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
@@ -449,10 +454,10 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const now = readShop(chat.scriptstate);
         if (!now || now.shop !== st.shop || now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
         const it0 = readItems(chat.scriptstate);
-        if (!it0.list.some((x) => x.id === o.itemId)) return null;
+        if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
         const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
-        // 팔면 장착 칸에서도 빠지고(목록에서 빠지니), 「사용」 자리에 놓여 있었으면 거기서도 뺀다
-        const items = removeItem(it0, o.itemId, 'sell', 'manual', now.key, { note: `${now.shop}에 팖` });
+        // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
+        const items = sellItem(it0, o.itemId, now.key, `${now.shop}에 팖`);
         const nextShop = closeSale(now);
         if (!nextShop) return null;
         sold = true;
@@ -463,6 +468,8 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       shopUi.detail = '';
       if (shopUi.chipKind === 'sell') { shopUi.chip = ''; shopUi.chipKind = ''; }
       shopUi.info = sold ? `「${o.name}」을 ${shortWon(o.price as number)}에 팔았어요.` : '팔 수 없는 상태예요 (물건이 없거나 값이 바뀌었어요).';
+      // 「사용」 자리에서 뺐으면 본 화면 상자도 다시 그린다 (소지품 버리기와 같이)
+      if (sold) void refreshUseBox(ctx.charIndex, ctx.chatIndex);
       await env.refresh();
       return true;
     }

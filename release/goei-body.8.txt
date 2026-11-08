@@ -1,4 +1,30 @@
-}
+ail" data-value="${esc14(it.id)}" aria-label="희귀 ${esc14(it.name)} ${esc14(shortWon(it.price))}${poor ? " (잔고 부족)" : ""}" ${closed ? "disabled" : ""}>
+    <span class="sh-rare-ring" aria-hidden="true"></span>
+    <span class="sh-rare-pic"><span class="sh-rare-glow" aria-hidden="true"></span>${pic(it.name, it.icon)}</span>
+    <span class="sh-rare-tx">
+      <span class="sh-rare-lb">${ICONS.star}<b>희귀</b><small>단 하나</small></span>
+      <b class="sh-rare-nm">${esc14(it.name)}</b>
+      ${it.desc ? `<span class="sh-rare-ds">${esc14(it.desc)}</span>` : ""}
+      ${it.effect ? `<span class="sh-rare-ef">효과 · ${esc14(it.effect)}</span>` : ""}
+      <span class="sh-rare-pr">${it.orig !== void 0 ? '<i title="흥정으로 깎은 값">▾</i>' : ""}${esc14(shortWon(it.price))}</span>
+    </span>
+  </button>`;
+  }
+  function cell2(it, bal, closed) {
+    const poor = it.price > bal;
+    const sale = it.tag === "sale" && !!it.was && it.was > it.price;
+    const off = sale ? Math.max(1, Math.round((1 - it.price / it.was) * 100)) : 0;
+    const tip2 = `<span class="it-tip" aria-hidden="true"><b>${esc14(it.name)}</b>${traitsOf2(it) ? `<small>${esc14(traitsOf2(it))}</small>` : ""}${it.desc ? `<p>${esc14(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc14(it.effect)}</p>` : ""}<span class="sh-amt">${esc14(shortWon(it.price))}</span></span>`;
+    return `<button class="it-c sh-c${sale ? " sale" : ""}${poor ? " poor" : ""}${shopUi.detail === it.id ? " sel" : ""}" data-action="shop-detail" data-value="${esc14(it.id)}" aria-label="${esc14(it.name)} ${esc14(shortWon(it.price))}${poor ? " (잔고 부족)" : ""}" ${closed ? "disabled" : ""}>
+    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ""}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc14(it.name)}</b></span><span class="sh-band">${it.orig !== void 0 ? '<i title="흥정으로 깎은 값">▾</i>' : ""}${sale ? `<s>${esc14(shortWon(it.was))}</s>` : ""}${esc14(shortWon(it.price))}</span>${tip2}</button>`;
+  }
+  function pickHtml(ctx2, st) {
+    const all = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat);
+    const mine = gridItems(all);
+    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ""}</small></header>`;
+    const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
+    return `<div class="sh-shelf sh-pick">${all.length > mine.length ? `<div class="sh-eq">${equipBox(ctx2, "sell", st.sell?.itemId ?? "")}</div>` : ""}<section class="sh-zone sh-main sh-mine" aria-label="소지품">${head3}${inner}</section></div>`;
+  }
   function pickCell(it, st) {
     const sel = st.sell?.itemId === it.id;
     const tr = traitsOf2(it);
@@ -92,12 +118,13 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
       const tags = findStatusTags(String(msgs4[i].data ?? ""));
       if (tags.length) status2 = tags[tags.length - 1].raw.trim();
     }
+    if (status2) status2 = rebuildStatusLine(status2, usedCols(colConfig(vars)).filter((c) => c !== "wallet"));
     const situation = ["$an_report", "$in_report"].map((k) => String(vars[k] ?? "").trim()).filter(Boolean).join("\n").slice(0, 1500);
     const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx2.chat).identity) : "";
     return { st, refs: refText(rows3), story, status: status2, situation, identity, language: genSettings(vars).language };
   }
   async function ask(ctx2, env3, kind, st0) {
-    const key2 = chatKey4(ctx2);
+    const key = chatKey4(ctx2);
     const s8 = shopSettings(ctx2.chat.scriptstate);
     shopUi.loading = kind;
     shopUi.notice = "";
@@ -116,7 +143,7 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
         next = applyTalk(st0, value, s8.kick);
       }
       const cur = env3.current();
-      if (!cur || chatKey4(cur) !== key2) return;
+      if (!cur || chatKey4(cur) !== key) return;
       await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
         const now = readShop(chat.scriptstate);
         if (!now || now.shop !== next.shop) return null;
@@ -132,7 +159,7 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
       }
     } catch (error) {
       const cur = env3.current();
-      if (!cur || chatKey4(cur) !== key2) return;
+      if (!cur || chatKey4(cur) !== key) return;
       shopUi.notice = error instanceof Error ? error.message : String(error);
       shopUi.failRaw = String(error.raw ?? "");
       if (kind === "talk") {
@@ -245,9 +272,9 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
           const now = readShop(chat.scriptstate);
           if (!now || now.shop !== st.shop || now.sell?.itemId !== o.itemId || typeof now.sell.price !== "number") return null;
           const it0 = readItems(chat.scriptstate);
-          if (!it0.list.some((x) => x.id === o.itemId)) return null;
+          if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
           const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: "store" });
-          const items = removeItem(it0, o.itemId, "sell", "manual", now.key, { note: `${now.shop}에 팖` });
+          const items = sellItem(it0, o.itemId, now.key, `${now.shop}에 팖`);
           const nextShop = closeSale(now);
           if (!nextShop) return null;
           sold = true;
@@ -261,6 +288,7 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
           shopUi.chipKind = "";
         }
         shopUi.info = sold ? `「${o.name}」을 ${shortWon(o.price)}에 팔았어요.` : "팔 수 없는 상태예요 (물건이 없거나 값이 바뀌었어요).";
+        if (sold) void refreshUseBox(ctx2.charIndex, ctx2.chatIndex);
         await env3.refresh();
         return true;
       }
@@ -327,12 +355,12 @@ ${shopUi.failRaw.slice(0, 1500)}`;
           const now = readShop(chat.scriptstate);
           const target = now?.items.find((x) => x.id === it.id && !x.sold);
           if (!now || !target) return null;
-          const alive2 = aliveAnchors(chat);
+          const alive = aliveAnchors(chat);
           const w0 = readWallet(chat.scriptstate, start3);
-          if (walletBalance(w0, alive2) < target.price) return null;
+          if (walletBalance(w0, alive) < target.price) return null;
           const walletId = `st_${target.id}`;
           const w = addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: "store" });
-          const items = addItem(readItems(chat.scriptstate), alive2, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: "store", anchor: now.key, price: target.price, walletId });
+          const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: "store", anchor: now.key, price: target.price, walletId });
           bought = true;
           return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(w), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
         });
@@ -388,10 +416,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     at = -1;
     /** 지금 화면 상태를 적는다 (방금 적은 것과 같으면 그대로) */
     record(state) {
-      const key2 = JSON.stringify(state);
-      if (this.list[this.at] === key2) return;
+      const key = JSON.stringify(state);
+      if (this.list[this.at] === key) return;
       this.list = this.list.slice(0, this.at + 1);
-      this.list.push(key2);
+      this.list.push(key);
       if (this.list.length > LIMIT) this.list.shift();
       this.at = this.list.length - 1;
     }
@@ -405,29 +433,11 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       this.at += dir2;
       return JSON.parse(this.list[this.at]);
     }
-    /** 지나온 화면들, 최근 것부터 (같은 화면은 한 번만) */
-    recent() {
-      return [...new Set(this.list.slice(0, this.at + 1).reverse())].map((k) => JSON.parse(k));
-    }
     clear() {
       this.list = [];
       this.at = -1;
     }
   };
-  function legacyWikiNav(view2, title2) {
-    switch (view2) {
-      case "people":
-        return { sub: "people", view: "list", id: "" };
-      case "person":
-        return { sub: "people", view: "person", id: title2 };
-      case "docs":
-        return { sub: "people", view: "docs", id: "" };
-      case "faction":
-        return { sub: "factions", view: "faction", id: title2 };
-      default:
-        return null;
-    }
-  }
 
   // src/host/picpack.ts
   var isRow5 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
@@ -586,15 +596,15 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     return saved;
   }
   async function installIcon(charIndex, progress3) {
-    const icon2 = installData().icon;
-    if (!icon2.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
+    const icon = installData().icon;
+    if (!icon.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
     const char = await risuai.getCharacterFromIndex(charIndex);
     if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
     progress3("아이콘 받는 중…");
-    const bytes = await getBytes(icon2.file);
-    if (icon2.bytes && bytes.length !== icon2.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
-    const d = icon2.digest ? await digest(bytes) : null;
-    if (d && d !== icon2.digest) throw new Error("받은 아이콘이 이 판의 아이콘과 달라요.");
+    const bytes = await getBytes(icon.file);
+    if (icon.bytes && bytes.length !== icon.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
+    const d = icon.digest ? await digest(bytes) : null;
+    if (d && d !== icon.digest) throw new Error("받은 아이콘이 이 판의 아이콘과 달라요.");
     const path = await risuai.saveAsset(bytes);
     if (typeof path !== "string" || !path) throw new Error("아이콘을 저장하지 못했어요.");
     const notes = await iconNotes();
@@ -1094,8 +1104,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     /** 묶음 지우기 확인 중인 코드 */
     confirm: ""
   };
-  var input = (key2, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc17(key2)}" value="${esc17(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
-  var area = (key2, value, label2, rows3 = 6, help = "") => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc17(key2)}" rows="${rows3}">${esc17(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
+  var input = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc17(key)}" value="${esc17(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
+  var area = (key, value, label2, rows3 = 6, help = "") => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc17(key)}" rows="${rows3}">${esc17(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
   var seg4 = (action, value, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc17(`1|${value}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc17(`0|${value}`)}">${b}</button></div>`;
   function slotRow(s8) {
     const open3 = stUi.sel === s8.code;
@@ -1237,9 +1247,9 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     } else if (dirUi.from !== lore) {
       const fresh = readDirectory(lore);
       const d = dirUi.draft;
-      const add = (have, next, key2) => {
-        const known = new Set(have.map(key2));
-        for (const r of next) if (!known.has(key2(r))) have.push(structuredClone(r));
+      const add = (have, next, key) => {
+        const known = new Set(have.map(key));
+        for (const r of next) if (!known.has(key(r))) have.push(structuredClone(r));
       };
       add(d.anomalies, fresh.anomalies, (r) => r.lore);
       add(d.sites, fresh.sites, (r) => r.lore);
@@ -1264,7 +1274,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     const a = r;
     return [a.lore, a.label, a.name, a.english, a.rank, a.department, ...a.aliases ?? []].some((t) => t && t.toLowerCase().includes(q));
   }
-  var input2 = (key2, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc18(key2)}" value="${esc18(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
+  var input2 = (key, value, label2, help = "") => `<label class="dir-in"><span>${label2}</span><input data-input="dir" data-key="${esc18(key)}" value="${esc18(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
   var chip2 = (action, value, label2, on2) => `<button class="gx-chip${on2 ? " on" : ""}" data-action="${action}" data-value="${esc18(value)}" aria-pressed="${on2}">${esc18(label2)}</button>`;
   var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o.spec.code);
   var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
@@ -1296,7 +1306,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     for (const o of draftExtras(d)) tabs2.push({ id: extraTabId(o.spec.code), name: tabName(o), visibleFor: [o.spec.code] });
     return tabs2;
   }
-  var area2 = (key2, value, label2, help = "", rows3 = 3) => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc18(key2)}" rows="${rows3}">${esc18(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
+  var area2 = (key, value, label2, help = "", rows3 = 3) => `<label class="dir-in"><span>${label2}</span><textarea data-input="dir" data-key="${esc18(key)}" rows="${rows3}">${esc18(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
   var SEP = /^\s*-{2,}\s*(.*?)\s*-{2,}\s*$/;
   var sourceCache = /* @__PURE__ */ new WeakMap();
   function loreSources(lore) {
@@ -1331,23 +1341,23 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     if (!list4.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
     return list4.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc18(name)}"><b>${esc18(name)}</b><small>${esc18(src)}</small><span>＋ 후보로</span></button>`).join("");
   }
-  function picOf(d, key2) {
+  function picOf(d, key) {
     const put = (o) => (slot2, v) => {
       const f = slot2 === "main" ? "photo" : slot2;
       if (v) o[f] = v;
       else delete o[f];
     };
-    if (key2.startsWith("org:")) {
-      const o = d.orgs.find((x) => x.name === key2.slice(4));
+    if (key.startsWith("org:")) {
+      const o = d.orgs.find((x) => x.name === key.slice(4));
       if (!o) return null;
       return { english: o.spec.english ?? "", photo: o.spec.photo, face: o.spec.face, crop: o.spec.crop, person: false, set: put(o.spec) };
     }
-    if (key2.startsWith("group:")) {
-      const g2 = d.startGroups.find((x) => x.code === key2.slice(6));
+    if (key.startsWith("group:")) {
+      const g2 = d.startGroups.find((x) => x.code === key.slice(6));
       if (!g2) return null;
       return { english: g2.english, photo: g2.photo, face: g2.face, crop: g2.crop, person: false, set: put(g2) };
     }
-    const r = findRow2(d, key2);
+    const r = findRow2(d, key);
     if (!r) return null;
     return { english: r.english, photo: r.photo, face: r.face, crop: r.crop, person: "rank" in r, set: put(r) };
   }
@@ -1355,42 +1365,42 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     const at = v.indexOf(">");
     return { slot: v.slice(0, at) === "face" ? "face" : "main", key: v.slice(at + 1) };
   };
-  function cropValue(key2) {
-    const p2 = dirUi.draft ? picOf(dirUi.draft, key2) : null;
+  function cropValue(key) {
+    const p2 = dirUi.draft ? picOf(dirUi.draft, key) : null;
     return p2 ? personCrop(p2) : parseCrop(DEFAULT_CROP);
   }
-  function setCrop(key2, crop) {
-    const p2 = dirUi.draft ? picOf(dirUi.draft, key2) : null;
+  function setCrop(key, crop) {
+    const p2 = dirUi.draft ? picOf(dirUi.draft, key) : null;
     if (!p2) return;
     p2.set("crop", crop.map((n2) => Math.round(n2)).join(","));
     dirUi.done = "";
   }
-  function photoBlock(key2, ctx2) {
-    const p2 = dirUi.draft ? picOf(dirUi.draft, key2) : null;
+  function photoBlock(key, ctx2) {
+    const p2 = dirUi.draft ? picOf(dirUi.draft, key) : null;
     if (!p2) return "";
     const main = mainPic(ctx2.char, p2);
     const face3 = facePic(ctx2.char, p2, p2.person);
     const cut3 = !!main && splitPic(face3).crop !== null;
     const line2 = (slot2, label2, pic2, picked, why, extra = "") => {
       const url = pic2 ? imageUrl(ctx2.char, pic2) : null;
-      const picking2 = dirUi.pick === `${slot2}>${key2}`;
+      const picking2 = dirUi.pick === `${slot2}>${key}`;
       return `<div class="dir-photo">
       <span class="dir-pic-img">${url ? `<img src="${esc18(url)}" alt="">` : ICONS.spook}</span>
       <span class="dir-photo-name"><b>${label2} · ${esc18(picked || "자동")}</b><small>${why}</small></span>
-      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc18(`|${slot2}>${key2}`)}">자동으로</button>` : ""}${extra}
-      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc18(`${slot2}>${key2}`)}">${picking2 ? "닫기" : "고르기"}</button>
+      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc18(`|${slot2}>${key}`)}">자동으로</button>` : ""}${extra}
+      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc18(`${slot2}>${key}`)}">${picking2 ? "닫기" : "고르기"}</button>
     </div>`;
     };
     const mainWhy = p2.photo ? "직접 고름" : main ? `자동: ${esc18(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
     const faceWhy = p2.face ? "직접 고름" : cut3 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc18(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
-    const cropping = cut3 && dirUi.crop === key2;
-    const cropBtn = cut3 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc18(key2)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
+    const cropping = cut3 && dirUi.crop === key;
+    const cropBtn = cut3 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc18(key)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
     const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const list4 = picking?.key === key2 ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc18(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
+    const list4 = picking?.key === key ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc18(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
     return `<div class="dir-in"><span>사진</span>
     ${line2("main", "대표", main, p2.photo, mainWhy)}
     ${line2("face", "얼굴", face3, p2.face, faceWhy, cropBtn)}
-    ${cropping ? cropBox(ctx2, key2, main) : ""}
+    ${cropping ? cropBox(ctx2, key, main) : ""}
     ${list4}
   </div>`;
   }
@@ -1400,17 +1410,17 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       const img = box2?.querySelector("img");
       if (!box2 || !img) return;
       ev.preventDefault();
-      const key2 = box2.dataset.crop ?? "";
+      const key = box2.dataset.crop ?? "";
       const frame = box2.querySelector(".dir-crop-frame");
       const move = (e) => {
         const r = img.getBoundingClientRect();
         if (!r.width || !r.height) return;
-        const w = cropValue(key2)[2];
+        const w = cropValue(key)[2];
         const half = w / 100 * r.width / 2;
         const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
         const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
         const c = [px / r.width * 100, py / r.height * 100, w];
-        setCrop(key2, c);
+        setCrop(key, c);
         if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
       };
       move(ev);
@@ -1426,13 +1436,13 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       box2.addEventListener("pointercancel", up);
     });
   }
-  function cropBox(ctx2, key2, main) {
+  function cropBox(ctx2, key, main) {
     const url = imageUrl(ctx2.char, main);
-    const [x, y, w] = cropValue(key2);
+    const [x, y, w] = cropValue(key);
     return `<div class="dir-crop">
-    <div class="dir-crop-img" data-crop="${esc18(key2)}">${url ? `<img src="${esc18(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
-    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc18(key2)}" aria-label="얼굴 틀 크기"></label>
-    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc18(key2)}">기본 틀로</button>
+    <div class="dir-crop-img" data-crop="${esc18(key)}">${url ? `<img src="${esc18(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
+    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc18(key)}" aria-label="얼굴 틀 크기"></label>
+    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc18(key)}">기본 틀로</button>
   </div>`;
   }
   function directoryPhotoList(ctx2) {
@@ -1693,7 +1703,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     }).join("")}`;
   }
   function searchAll(ctx2, d, q, names4) {
-    const jump = (kind, html) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key2) => `data-action="dir-jump" data-value="${kind}|${key2}"`);
+    const jump = (kind, html) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key) => `data-action="dir-jump" data-value="${kind}|${key}"`);
     const groups = [
       ["anomaly", "괴이", d.anomalies.filter((r) => matches3(r, q)).map((r) => jump("anomaly", placeRow(r, ctx2)))],
       ["site", "특수", d.sites.filter((r) => matches3(r, q)).map((r) => jump("site", placeRow(r, ctx2)))],
@@ -1729,11 +1739,11 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     }
     const rows3 = d.agents.filter((r) => matches3(r, q));
     if (!rows3.length) return '<p class="gx-muted dir-empty">맞는 사람이 없어요.</p>';
-    const key2 = (a) => a.affiliation ? orgName(d, names4, a.affiliation) : "";
+    const key = (a) => a.affiliation ? orgName(d, names4, a.affiliation) : "";
     const order = ["", ...d.orgs.map((o) => o.name)];
-    const groups = [...new Set(rows3.map(key2))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const groups = [...new Set(rows3.map(key))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
     return groups.map((g2) => {
-      const list4 = rows3.filter((r) => key2(r) === g2);
+      const list4 = rows3.filter((r) => key(r) === g2);
       const body5 = list4.map((r, i) => agentRow(r, ctx2, d, names4, q ? void 0 : { first: i === 0, last: i === list4.length - 1 })).join("");
       return `<h3 class="dir-group${g2 ? "" : " warn"}">${esc18(g2 || "소속 미정")}<small>${list4.length}</small></h3>${body5}`;
     }).join("");
@@ -1793,13 +1803,13 @@ ${shopUi.failRaw.slice(0, 1500)}`;
   }
   var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
   var splitList = (v) => v.split(",").map((t) => t.trim()).filter(Boolean);
-  function directoryInput(key2, value, bar) {
+  function directoryInput(key, value, bar) {
     const d = dirUi.draft;
     if (!d) return;
-    if (key2.startsWith("base:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(5, at2);
-      const b = d.bases.find((x) => x.name === key2.slice(at2 + 1));
+    if (key.startsWith("base:")) {
+      const at2 = key.indexOf("|");
+      const field5 = key.slice(5, at2);
+      const b = d.bases.find((x) => x.name === key.slice(at2 + 1));
       if (!b) return;
       if (field5 === "aliases") b.aliases = splitList(value);
       else if (field5 === "label" || field5 === "lore" || field5 === "english") b[field5] = value.trim();
@@ -1808,8 +1818,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("disp:") || key2.startsWith("ptab:") || key2.startsWith("seed:")) {
-      const [kind, rest] = [key2.slice(0, 4), key2.slice(5)];
+    if (key.startsWith("disp:") || key.startsWith("ptab:") || key.startsWith("seed:")) {
+      const [kind, rest] = [key.slice(0, 4), key.slice(5)];
       if (kind === "disp") {
         const [viewer, code2] = rest.split("|");
         const m = d.display[viewer] ??= {};
@@ -1827,10 +1837,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("app:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(4, at2);
-      const r = d.appendices.find((x) => x.lore === key2.slice(at2 + 1));
+    if (key.startsWith("app:")) {
+      const at2 = key.indexOf("|");
+      const field5 = key.slice(4, at2);
+      const r = d.appendices.find((x) => x.lore === key.slice(at2 + 1));
       if (!r) return;
       if (field5 === "parent") r.parent = value.trim();
       else if (field5 === "places" || field5 === "agents") r[field5] = splitList(value);
@@ -1840,10 +1850,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("group:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(6, at2);
-      const g2 = d.startGroups.find((x) => x.code === key2.slice(at2 + 1));
+    if (key.startsWith("group:")) {
+      const at2 = key.indexOf("|");
+      const field5 = key.slice(6, at2);
+      const g2 = d.startGroups.find((x) => x.code === key.slice(at2 + 1));
       if (!g2) return;
       if (field5 === "name") {
         const name = value.trim();
@@ -1854,8 +1864,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("scene:")) {
-      const [code2, fm, field5] = key2.slice(6).split("|");
+    if (key.startsWith("scene:")) {
+      const [code2, fm, field5] = key.slice(6).split("|");
       if (!code2 || !/^\d+$/.test(fm ?? "") || !(field5 === "label" || field5 === "ko" || field5 === "en")) return;
       const rows3 = (d.scenes.세력 ??= {})[code2] ??= {};
       const row10 = rows3[fm] ??= {};
@@ -1867,8 +1877,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("ascene:")) {
-      const [id2, field5] = key2.slice(7).split("|");
+    if (key.startsWith("ascene:")) {
+      const [id2, field5] = key.slice(7).split("|");
       if (!id2 || !(field5 === "ko" || field5 === "en" || field5 === "label" || field5 === "lore")) return;
       const rows3 = d.scenes.인물 ??= {};
       const row10 = rows3[id2] ??= {};
@@ -1887,10 +1897,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    if (key2.startsWith("org:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(4, at2);
-      const o = d.orgs.find((x) => x.name === key2.slice(at2 + 1));
+    if (key.startsWith("org:")) {
+      const at2 = key.indexOf("|");
+      const field5 = key.slice(4, at2);
+      const o = d.orgs.find((x) => x.name === key.slice(at2 + 1));
       if (!o) return;
       if (field5 === "seed") o.spec.seed = splitList(value);
       else if (field5 === "title" || field5 === "blurb" || field5 === "photo" || field5 === "english" || field5 === "gm_name" || field5 === "gm_desc" || field5 === "tab") o.spec[field5] = value.trim();
@@ -1899,9 +1909,9 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       if (bar) bar.innerHTML = directoryBar();
       return;
     }
-    const at = key2.indexOf("|");
-    const field4 = key2.slice(0, at);
-    const row9 = findRow2(d, key2.slice(at + 1));
+    const at = key.indexOf("|");
+    const field4 = key.slice(0, at);
+    const row9 = findRow2(d, key.slice(at + 1));
     if (!row9) return;
     if (field4 === "aliases") row9.aliases = splitList(value);
     else if (field4 === "items") {
@@ -2317,8 +2327,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         break;
       case "dir-photo-set": {
         const at = v.indexOf("|");
-        const { slot: slot2, key: key2 } = pickOf(v.slice(at + 1));
-        const p2 = picOf(d, key2);
+        const { slot: slot2, key } = pickOf(v.slice(at + 1));
+        const p2 = picOf(d, key);
         if (!p2) break;
         p2.set(slot2, at > 0 ? v.slice(0, at) : "");
         dirUi.pick = "";
@@ -2462,11 +2472,11 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         return true;
       case "ip-toggle": {
         const [name] = v.split("=");
-        const key2 = name.trim();
-        if (!key2) return true;
+        const key = name.trim();
+        if (!key) return true;
         await savePrefs((p2) => {
           const off = new Set((p2.imgNamesOff ?? []).map((n2) => n2.toLowerCase()));
-          const list4 = off.has(key2.toLowerCase()) ? (p2.imgNamesOff ?? []).filter((n2) => n2.toLowerCase() !== key2.toLowerCase()) : [...p2.imgNamesOff ?? [], key2];
+          const list4 = off.has(key.toLowerCase()) ? (p2.imgNamesOff ?? []).filter((n2) => n2.toLowerCase() !== key.toLowerCase()) : [...p2.imgNamesOff ?? [], key];
           return { ...p2, imgNamesOff: list4.length ? list4 : void 0 };
         });
         env3.render();
@@ -3131,10 +3141,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
   };
   function fieldRow(kind, rec2, def, name, auto = "") {
     const v = recUi.variant ? rec2.variants?.[recUi.variant]?.[def.id] ?? "" : rec2.fields[def.id] ?? "";
-    const key2 = `${kind}|${name}|${def.id}`;
+    const key = `${kind}|${name}|${def.id}`;
     const tok3 = tokens(v);
     const ph = recUi.variant ? "비우면 기본 글" : auto ? `자동: ${auto}` : "";
-    const ctl = def.type === "line" ? `<input data-input="ed-field" data-key="${esc20(key2)}" value="${esc20(v)}" autocomplete="off" placeholder="${esc20(ph)}">` : `<textarea data-input="ed-field" data-key="${esc20(key2)}" rows="3" placeholder="${esc20(ph)}">
+    const ctl = def.type === "line" ? `<input data-input="ed-field" data-key="${esc20(key)}" value="${esc20(v)}" autocomplete="off" placeholder="${esc20(ph)}">` : `<textarea data-input="ed-field" data-key="${esc20(key)}" rows="3" placeholder="${esc20(ph)}">
 ${esc20(v)}</textarea>`;
     return `<div class="gw-field" data-field-row="${esc20(def.id)}">
     <div class="gw-field-head"><span class="gw-grip" draggable="true" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc20(def.label)}</b><small class="gw-ftitle">${esc20(def.title)}</small>${def.hint ? `<button type="button" class="gw-fhint" data-action="ed-hint" data-hint="${esc20(def.hint)}" aria-label="설명">?</button>` : ""}<span class="gw-ftok">${tok3 ? `${tok3}토큰` : ""}</span>
@@ -3142,13 +3152,13 @@ ${esc20(v)}</textarea>`;
     ${ctl}</div>`;
   }
   function extraRow(kind, rec2, e, i, name) {
-    const key2 = `${kind}|${name}|${i}`;
+    const key = `${kind}|${name}|${i}`;
     const id2 = e.kind === "block" ? `x:${e.name}` : `xl:${i}`;
     const place3 = e.kind === "line" ? `<small class="gw-ftitle">${e.sec === "appearance" ? "Appearance" : "Identity"} 절 · 한 줄${e.at ? ` · ${esc20(e.at)} 뒤` : " · 맨 앞"}</small>` : '<small class="gw-ftitle">절</small>';
-    const ctl = e.kind === "line" ? `<input data-input="ed-extra" data-key="${esc20(key2)}" value="${esc20(e.value)}" autocomplete="off">` : `<textarea data-input="ed-extra" data-key="${esc20(key2)}" rows="3">
+    const ctl = e.kind === "line" ? `<input data-input="ed-extra" data-key="${esc20(key)}" value="${esc20(e.value)}" autocomplete="off">` : `<textarea data-input="ed-extra" data-key="${esc20(key)}" rows="3">
 ${esc20(e.value)}</textarea>`;
     return `<div class="gw-field extra" data-field-row="${esc20(id2)}">
-    <div class="gw-field-head"><span class="gw-grip"${e.kind === "block" ? ' draggable="true" title="끌어서 순서 바꾸기"' : ""}>${e.kind === "block" ? ICONS.grip : ""}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc20(key2)}" value="${esc20(e.name)}" aria-label="칸 이름">${place3}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ""}</span>
+    <div class="gw-field-head"><span class="gw-grip"${e.kind === "block" ? ' draggable="true" title="끌어서 순서 바꾸기"' : ""}>${e.kind === "block" ? ICONS.grip : ""}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc20(key)}" value="${esc20(e.name)}" aria-label="칸 이름">${place3}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ""}</span>
       <span class="gw-fmove">${e.kind === "block" ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc20(id2)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc20(id2)}" aria-label="아래로">${ICONS.down}</button>` : ""}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
     ${ctl}</div>`;
   }
@@ -3157,27 +3167,4 @@ ${esc20(e.value)}</textarea>`;
     const onoff = (action, on2) => switchHtml({ action, value: "", on: on2 });
     let first = "";
     if (rec2 && kind === "agent") first = `<div class="dir-line"><span>Roster 지침에 포함</span>${onoff("ed-roster-toggle", !rec2.rosterOff)}<small>${rec2.rosterOff ? "명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요." : "명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함."}</small></div>`;
-    if (rec2 && kind === "org") first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff("ed-rel-member-toggle", !rec2.relOff)}<small>${rec2.relOff ? "관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직)." : "Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요."}</small></div>`;
-    const body5 = panel ? first ? panel.replace('<div class="dir-panel">', `<div class="dir-panel">${first}`) : panel : `<div class="dir-panel"><p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p></div>`;
-    return `<section class="gw-sec gw-basic"><h3>기본 정보</h3>${body5}</section>`;
-  }
-  function keysRow(kind, sel, rec2) {
-    const ph = kind === "appendix" ? "비우면 키 없음 (다른 켜지는 조건만)" : "비우면 이름·영문명·별칭";
-    return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc20(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc20(`${kind}|${sel}|keys`)}" value="${esc20(rec2.keys ?? "")}" placeholder="${esc20(ph)}" autocomplete="off" aria-label="호출 단어"></div>`;
-  }
-  function sceneCard(sel, d) {
-    const a = d.agents.find((x) => x.lore === sel);
-    if (!a || !/^P\d{3,}$/.test(a.id)) return "";
-    return `<details class="gw-sec gw-fscene"><summary>첫 장면<small>${esc20(a.id)} · ${agentSceneState(a.id, d)}</small></summary><div class="dir-panel">${agentSceneFields(a.id, d)}</div></details>`;
-  }
-  function membersCard(ctx2, sel, d) {
-    const list4 = d.agents.filter((a) => a.affiliation === sel);
-    const items = list4.map((a) => {
-      const sub = [a.rank, a.department].filter(Boolean).join(" · ");
-      return `<button class="gw-member" data-action="ed-goto" data-value="agent|${esc20(a.lore)}" title="요원 기록으로">${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}<span class="gw-member-t"><b>${esc20(a.name)}</b><small>${esc20(a.english || "")}${sub ? ` · ${esc20(sub)}` : ""}</small></span></button>`;
-    }).join("");
-    return `<section class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
-  }
-  function recordPage(ctx2, kind, over, q, sel) {
-    const d = directoryDraft(ctx2);
-    const 
+    if (rec2 && kind === "org") first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff("ed-rel-member-toggle", !rec2.relOff)}<small>${rec2.relOff ? "관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직)." : "Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서

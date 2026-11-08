@@ -1,4 +1,4 @@
-\n\s*```\s*$/, "")));
+*$/, "")));
       return d.schema === 1 ? migrateRoster(d) : {};
     } catch {
       return {};
@@ -305,7 +305,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var score = (words, text4) => words.reduce((n2, w) => n2 + (hit(text4, w) ? w.length : 0), 0);
   function rank(table, name, text4, seed2) {
     const n2 = clean(name), t = clean(text4);
-    const scored = table.map(([key2, words], i) => ({ key: key2, i, score: score(words, n2) * 2 + score(words, t) }));
+    const scored = table.map(([key, words], i) => ({ key, i, score: score(words, n2) * 2 + score(words, t) }));
     const start3 = pick(seed2, table.length);
     const turn = (i) => (i - start3 + table.length) % table.length;
     return scored.sort((a, b) => b.score - a.score || turn(a.i) - turn(b.i)).map((x) => x.key);
@@ -317,20 +317,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (!k) return [];
     const table = kind === "an" ? PLACES_AN : kind === "in" ? PLACES_IN : KINDS_MS;
     const keys = rank(table, name, kind === "ms" ? "" : text4, name);
-    const out = kind === "an" ? [...new Set(keys.flatMap((key2) => [key2, ...FALLBACK[key2] ? [FALLBACK[key2]] : []]).flatMap((key2) => two(`Situation ${k} ${key2}`, name)))] : keys.map((key2) => `Situation ${k} ${key2}`);
+    const out = kind === "an" ? [...new Set(keys.flatMap((key) => [key, ...FALLBACK[key] ? [FALLBACK[key]] : []]).flatMap((key) => two(`Situation ${k} ${key}`, name)))] : keys.map((key) => `Situation ${k} ${key}`);
     if (kind === "ms") out.push("Situation Mystic Door");
     out.push(`Situation ${k}`);
     return out;
   }
   function baseShared(name, label2 = "") {
     const hay = clean(`${name} ${label2}`);
-    const hits = rank(KINDS_BASE, name, label2, name).filter((key2) => KINDS_BASE.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
+    const hits = rank(KINDS_BASE, name, label2, name).filter((key) => KINDS_BASE.find(([k]) => k === key)[1].some((w) => hit(hay, w)));
     return [...hits, "Shared Base Hideout", "Shared Base Office"].map((k) => k.startsWith("Shared") ? k : `Shared Base ${k}`);
   }
   function orgShared(name, type = "org", text4 = "") {
     const head3 = type === "civilian" ? ["Civilian"] : type === "freelancer" ? ["Freelancer"] : [];
     const hay = clean(`${name} ${text4}`);
-    const hits = rank(KINDS_ORG, name, text4, name).filter((key2) => KINDS_ORG.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
+    const hits = rank(KINDS_ORG, name, text4, name).filter((key) => KINDS_ORG.find(([k]) => k === key)[1].some((w) => hit(hay, w)));
     return [...head3, ...hits.map((k) => `Shared Org ${k}`), "Shared Org Office"];
   }
   var three = (prefix, seed2) => {
@@ -527,8 +527,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return f ? f.key : "";
   }
   function appendixMembers(lore) {
-    const key2 = appendixFolder(lore);
-    return key2 ? lore.filter((e) => !isFolder(e) && e.folder === key2 && s5(e.comment) && !SEPARATOR.test(s5(e.comment))) : [];
+    const key = appendixFolder(lore);
+    return key ? lore.filter((e) => !isFolder(e) && e.folder === key && s5(e.comment) && !SEPARATOR.test(s5(e.comment))) : [];
   }
   function guessParent(name, names4) {
     const m = DOT.exec(name);
@@ -1287,7 +1287,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
   }
   function withColLog(vars, messageCount, cols) {
-    const log = colLog(vars);
+    const seed2 = colLog(vars);
+    const prev = usedCols(colConfig(vars));
+    const log = !seed2.length && messageCount > 0 && prev.join() !== cols.join() ? [{ from: 0, cols: prev }] : seed2;
     const last2 = log.at(-1);
     if (last2 && last2.cols.join() === cols.join()) return JSON.stringify(log);
     const next = last2 && last2.from === messageCount ? [...log.slice(0, -1), { from: messageCount, cols }] : [...log, { from: messageCount, cols }];
@@ -1885,9 +1887,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function applyAgents(w, c, s8, faction, text4) {
     const roster = rosterFor(w, c, faction, s8.agent_limit);
     for (const t of scanAgents(text4)) {
-      const key2 = (/[A-Z]-?\d{3}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, "").toUpperCase();
+      const key = (/[A-Z]-?\d{3}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, "").toUpperCase();
       const who = t.who.trim().toLowerCase();
-      const p2 = roster.find((r) => r.id === key2) ?? roster.find((r) => r.name === t.who.trim() || !!r.english && r.english.toLowerCase() === who);
+      const p2 = roster.find((r) => r.id === key) ?? roster.find((r) => r.name === t.who.trim() || !!r.english && r.english.toLowerCase() === who);
       if (!p2) continue;
       const rec2 = agentRecord(w, p2.id);
       if (rec2.st !== t.state || rec2.since === null) rec2.since = w.minute;
@@ -2210,15 +2212,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function activeEvents(w) {
     const out = [];
-    const key2 = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
+    const key = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
     w.an.forEach((e, index) => {
-      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: e.situation ?? "" });
+      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key("an", e), grade: e.grade, people: e.deploy, report: e.situation ?? "" });
     });
     w.inc.forEach((e, index) => {
-      if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("in", e), grade: "", people: e.deploy ?? "", report: e.situation });
+      if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key("in", e), grade: "", people: e.deploy ?? "", report: e.situation });
     });
     w.ms.forEach((e, index) => {
-      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: e.situation ?? "" });
+      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key("ms", e), grade: "", people: e.visitors, report: e.situation ?? "" });
     });
     return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
   }
@@ -2226,8 +2228,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const live = (k, name) => (k === "an" ? w.an : k === "in" ? w.inc : w.ms).some((e) => e.name === name && e.state !== "발생대기");
     return (w.ended ?? []).filter((e) => e.until >= w.epoch && !(e.name && live(e.kind, e.name)));
   }
-  function endEvent(w, key2) {
-    const ev = activeEvents(w).find((e) => e.key === key2);
+  function endEvent(w, key) {
+    const ev = activeEvents(w).find((e) => e.key === key);
     if (!ev) return false;
     if (ev.kind === "an") endAn(w, w.an[ev.index], "manual");
     else if (ev.kind === "in") endIn(w, w.inc[ev.index], "manual");
@@ -2273,7 +2275,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var TRADES_MAX = 12;
 
   // src/core/journal/settings.ts
-  var JR = (key2) => `$jr_${key2}`;
+  var JR = (key) => `$jr_${key}`;
   var JR_DEFAULTS = {
     /** off / mine / all. 기본 mine (2026-11-05 사용자: 그대로 둔다) */
     chat_card: "mine",
@@ -2282,9 +2284,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   };
   var JR_JOURNAL_CAP = { min: 100, max: 2e3, step: 100 };
   var JR_REPORT_CAP = { min: 20, max: 300, step: 10 };
-  function jrValue(state, key2) {
-    const v = state?.[JR(key2)];
-    return v === void 0 || v === null || v === "" || v === "null" ? JR_DEFAULTS[key2] ?? "" : String(v);
+  function jrValue(state, key) {
+    const v = state?.[JR(key)];
+    return v === void 0 || v === null || v === "" || v === "null" ? JR_DEFAULTS[key] ?? "" : String(v);
   }
   function journalSettings(state) {
     const v = (k) => jrValue(state, k);
@@ -2641,9 +2643,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   // node_modules/js-tiktoken/dist/chunk-VL2OQCWN.js
   var import_base64_js = __toESM(require_base64_js(), 1);
   var __defProp2 = Object.defineProperty;
-  var __defNormalProp = (obj7, key2, value) => key2 in obj7 ? __defProp2(obj7, key2, { enumerable: true, configurable: true, writable: true, value }) : obj7[key2] = value;
-  var __publicField = (obj7, key2, value) => {
-    __defNormalProp(obj7, typeof key2 !== "symbol" ? key2 + "" : key2, value);
+  var __defNormalProp = (obj7, key, value) => key in obj7 ? __defProp2(obj7, key, { enumerable: true, configurable: true, writable: true, value }) : obj7[key] = value;
+  var __publicField = (obj7, key, value) => {
+    __defNormalProp(obj7, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
   function bytePairMerge(piece, ranks) {
@@ -2945,12 +2947,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
           a = { kind: kind.toLowerCase(), content: unescapeJson(body5 ?? "").trim() };
         }
         if (!a) return "[지원하지 않는 첨부]";
-        const key2 = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
-        let n2 = known.get(key2);
+        const key = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
+        let n2 = known.get(key);
         if (!n2) {
           list4.push(a);
           n2 = list4.length;
-          known.set(key2, n2);
+          known.set(key, n2);
         }
         return `[ATTACHMENT A${n2}]`;
       });
@@ -3427,7 +3429,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function aliasRules(books, dir2) {
     const low = (t) => t.trim().toLowerCase();
     const flat = (t) => low(t).replace(/[\s\-·]/g, "");
-    const who = (key2, lore) => lore ? `lore:${low(lore)}` : key2;
+    const who = (key, lore) => lore ? `lore:${low(lore)}` : key;
     const ownPart = (t, names4) => flat(t).length >= 2 && names4.some((n2) => n2 && flat(n2).includes(flat(t)));
     const rows3 = [
       ...dir2.anomalies.map((p2, i) => ({ key: who(`an${i}`, p2.lore), names: [p2.label, p2.lore, p2.english], aliases: p2.aliases })),
@@ -3441,7 +3443,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const r of rows3) for (const t of r.aliases) if (!ownPart(t, r.names)) users.set(low(t), (users.get(low(t)) ?? /* @__PURE__ */ new Set()).add(r.key));
     for (const [t, set2] of users) if (set2.size > 1) shared.add(t);
     const own = /* @__PURE__ */ new Map();
-    const claim = (t, key2) => t && !own.has(low(t)) && own.set(low(t), key2);
+    const claim = (t, key) => t && !own.has(low(t)) && own.set(low(t), key);
     dir2.anomalies.forEach((p2, i) => [p2.label, p2.lore, p2.english].forEach((t) => claim(t, who(`an${i}`, p2.lore))));
     dir2.sites.forEach((p2, i) => [p2.label, p2.lore, p2.english].forEach((t) => claim(t, who(`ms${i}`, p2.lore))));
     dir2.bases.forEach((b, i) => claim(b.name, `lm${i}`));
@@ -3450,8 +3452,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const [t, lore] of Object.entries(ALIAS_OWNER)) claim(t, who("", lore));
     const keyOf2 = /* @__PURE__ */ new Map();
     for (const r of rows3) if (!keyOf2.has(r.key)) keyOf2.set(r.key, r);
-    const aliasesOf = (list4, key2, lore = "") => {
-      const k = who(key2, lore);
+    const aliasesOf = (list4, key, lore = "") => {
+      const k = who(key, lore);
       const names4 = keyOf2.get(k)?.names ?? [];
       return list4.filter((t) => {
         if (COMMON_ALIAS.test(t.trim())) return false;
@@ -3465,9 +3467,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function buildRegistry(lore) {
     const books = lore ?? [];
     const entries2 = [];
-    const add = (key2, name, loreName2, terms) => {
+    const add = (key, name, loreName2, terms) => {
       const uniq = [...new Set([name, loreName2, ...terms].map((t) => t.trim()).filter(Boolean))];
-      entries2.push({ key: key2, name, lore: loreName2, terms: uniq });
+      entries2.push({ key, name, lore: loreName2, terms: uniq });
     };
     const dir2 = readDirectory(books);
     const { aliasesOf, own, low } = aliasRules(books, dir2);
@@ -3493,8 +3495,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { entries: entries2, byTerm, byLore };
   }
   function resolveName(r, name) {
-    const key2 = name.trim().toLowerCase();
-    return r.byLore.get(key2) ?? r.byTerm.get(key2) ?? [];
+    const key = name.trim().toLowerCase();
+    return r.byLore.get(key) ?? r.byTerm.get(key) ?? [];
   }
   var SUFFIXES = ["님께서는", "님께서", "님에게", "선배님", "선배", "에게서", "에게는", "에게", "한테", "에서는", "에서", "으로는", "으로", "이랑", "처럼", "보다", "까지", "부터", "마저", "조차", "밖에", "께서", "께", "이는", "이가", "이야", "은", "는", "가", "를", "을", "와", "과", "랑", "의", "씨", "님", "야", "아", "이", "도", "만", "에", "로"];
   var isWord = (c) => c !== "" && /[\p{L}\p{N}_]/u.test(c);
@@ -3591,7 +3593,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       this.raw = raw;
     }
   };
-  var CFG = (key2) => `$lb_cfg_lb-gn.${key2}`;
+  var CFG = (key) => `$lb_cfg_lb-gn.${key}`;
   var GN_DEFAULTS = {
     mode: "2",
     quantity: "1",
@@ -3753,18 +3755,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc39 = false;
+    let esc38 = false;
     for (const c of line2) {
-      if (esc39) {
+      if (esc38) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc39 = false;
-      } else if (c === "\\") esc39 = true;
+        esc38 = false;
+      } else if (c === "\\") esc38 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc39) cur += "\\";
+    if (esc38) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4535,7 +4537,7 @@ ${JSON.stringify({ feature: "gnet", records })}
       this.raw = raw;
     }
   };
-  var PH = (key2) => `$ph_${key2}`;
+  var PH = (key) => `$ph_${key}`;
   var PH_STATE = PH("state");
   var PH_CONTACTS = PH("contacts");
   var PH_BULLETINS = PH("bulletins");
@@ -4612,9 +4614,9 @@ ${JSON.stringify({ feature: "gnet", records })}
   }
   var cooldownTurns = (chat, k) => k === "announcement" ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k];
   var COOLDOWN_KEY = (k) => `$cooldown_received_${k}`;
-  function phoneValue(state, key2) {
-    const v = state?.[PH(key2)];
-    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key2] ?? "" : String(v);
+  function phoneValue(state, key) {
+    const v = state?.[PH(key)];
+    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key] ?? "" : String(v);
   }
   function phoneSettings(state) {
     const v = (k) => phoneValue(state, k);
@@ -4671,4 +4673,4 @@ ${JSON.stringify({ feature: "gnet", records })}
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
-      for (const e of entries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibl
+      for (const e of ent

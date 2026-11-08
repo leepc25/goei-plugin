@@ -854,6 +854,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const where = `${geo.sido[code]} ${geo.sigun[code][Number(idx)]}`;
   const reply = [`본문`, `[AN|${where}|${preset.name}|활성|A|P001]`, '[AG|P001|작전투입|현장]', '[AG|P002|휴게|사무실]', '[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]'].join('\n');
   await page.evaluate(async ({ reply, phoneAuto }) => {
+    // 장면 인물이 없어도 소지품 읽기가 켜져 있으면 갱신기가 돈다(11-08): 이 시험의 모델 호출 수에 끼지 않게 끈다
+    window.__chat.scriptstate.$it_auto = '0';
     // 괴담톡 자동 확인은 이 테스트(15)에서만 켠다 (다른 테스트의 모델 호출 순서를 지키려고)
     if (!phoneAuto) window.__chat.scriptstate.$ph_auto = '0';
     window.__chat.message.push({ role: 'user', data: '시작' }, { role: 'char', data: reply });

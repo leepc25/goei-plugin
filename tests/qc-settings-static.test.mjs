@@ -61,10 +61,8 @@ test('기기 설정(Prefs) 키는 설정 창 밖 어딘가에서 읽는다 (죽�
   assert.ok(start > 0 && end > start, 'Prefs 인터페이스를 찾지 못함');
   const keys = [...settingsSrc.slice(start, end).matchAll(/^\s+(\w+)\??:/gm)].map((m) => m[1]);
   assert.ok(keys.length >= 20, `Prefs 키가 너무 적음: ${keys.length}`);
-  // 내부 표시용 키(설정 파일 안에서만 읽고 쓰는 것)는 settings.ts 자체를 읽는 쪽으로 친다
-  const internal = new Set(['marksSeeded']);
   const readers = walk(root).filter((p) => p.endsWith('.ts') && !p.endsWith('ui/settings.ts') && (!p.endsWith('core/settings.ts')));
   const corpus = readers.map((p) => readFileSync(p, 'utf8')).join('\n');
-  const dead = keys.filter((k) => !internal.has(k) && !new RegExp(`\\.${k}\\b|\\b${k}\\s*[:,}]`).test(corpus));
+  const dead = keys.filter((k) => !new RegExp(`\\.${k}\\b|\\b${k}\\s*[:,}]`).test(corpus));
   assert.deepEqual(dead, [], '설정 창에만 있고 아무 데서도 읽지 않는 기기 설정 키');
 });

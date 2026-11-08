@@ -4,7 +4,7 @@ import { showWindow } from '../host/container';
 import { factionList, PLAYER_FM, playerScenario, scenesOf } from '../core/factions';
 import { agentScene } from '../core/scenes';
 import { setOpeningHint } from '../host/openinghint';
-import { legacyWikiNav, NavHistory, type RecordsNav } from '../core/navhist';
+import { NavHistory, type RecordsNav } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, effectiveFaction, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
@@ -27,9 +27,8 @@ import { frameHtml, frameState } from './frame';
 import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
-import { bindDrawer, closeDrawer } from './drawer';
+import { bindDrawer } from './drawer';
 import { applyItemsNav, itemsAction, itemsInput, itemsNav, itemsTab, itemsUi, resetItems, setAvatarHtml, type ItemsNav } from './items';
-import { addMark, markCandidates, markPop, marks, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
@@ -41,8 +40,8 @@ import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResul
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
-import { readPhone, roomLabel } from '../core/phone';
-import { findPost, gnetLabel, readGnet } from '../core/gnet';
+import { readPhone } from '../core/phone';
+import { gnetLabel } from '../core/gnet';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -60,12 +59,12 @@ import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEn
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
-import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
+import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { invOn, itemStartOn } from '../core/items';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
-import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
+import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { isPhone, PHONE_MQ } from './media';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
@@ -941,32 +940,9 @@ async function handle(action: string, value?: string): Promise<void> {
       return;
     case 'nav-back':
     case 'nav-fwd': {
-      markUi.pop = false;
       const run = navStep(action === 'nav-back' ? -1 : 1);
       return run ? run() : render();
     }
-    case 'mk-pop':
-      markUi.pop = !markUi.pop;
-      return render();
-    case 'mk-go': {
-      const m = marks()[Number(value)];
-      if (!m || view.kind !== 'started') return;
-      markUi.pop = false;
-      closeDrawer('gx-bdrawer');
-      // 「설정」 즐겨찾기는 설정 창을 연다 (판 안 설정 화면은 안 쓴다, 2026-10-29)
-      if (m.s.tab === 'settings') return handle('ed-open', 'set:screen');
-      return applyNav(openable(view.ctx, m.s as unknown as NavState));
-    }
-    case 'mk-here':
-    case 'mk-add': {
-      if (view.kind !== 'started') return;
-      const m = action === 'mk-here' ? currentMark() : markCandidates(recentMarks(), currentMark())[Number(value)];
-      if (m) await addMark(m);
-      return render();
-    }
-    case 'mk-del':
-      await removeMarkAt(Number(value));
-      return render();
     case 'feature-set':
       // 기능 설정은 설정 창의 그 페이지로 (2026-10-27)
       if (value === 'phone' || value === 'wiki' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) return handle('ed-open', `set:${value}`);
@@ -1314,7 +1290,7 @@ function render(): void {
   labelSwitches(root);
   bindMapZoom(root);
   bindMbar(root, () => void run('close'));
-  bindDrawer(root, () => void run('mk-pop'));
+  bindDrawer(root);
   bindWikiSide(root, (v) => void run('wiki-list', v));
   bindFootnotes(root);
   const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
@@ -1324,11 +1300,6 @@ function render(): void {
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
   root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
-}
-
-/** 모바일 상황판 하단 서랍(즐겨찾기 다섯 칸)은 2026-11-07 사용자 결정으로 없앴다. 즐겨찾기 자체도 뺌 (ui/marks.ts 는 남겨 둠) */
-function boardDrawer(): string {
-  return '';
 }
 
 /** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */
@@ -1373,74 +1344,11 @@ function navState(): NavState {
   return s;
 }
 
-/** 즐겨찾기로 적을 화면 상태: 쓰던 글·펼친 목록은 빼고 화면만 */
-function markState(s: NavState): NavState {
-  const o: NavState = JSON.parse(JSON.stringify(s));
-  if (o.w) o.w.list = false;
-  if (o.g) o.g.c = null;
-  if (o.p && o.p.view !== 'room' && o.p.view !== 'settings' && o.p.view !== 'notice') Object.assign(o.p, { view: 'list', room: null, n: null });
-  return o;
-}
-
-const PH_SUB: Record<string, string> = { contacts: '연락처', chats: '대화', notices: '공지' };
-
-/** 화면 상태 → 즐겨찾기 이름 (위키 문서 제목, 괴담톡 방 이름, 괴담넷 글 제목…) */
-function markOf(raw: NavState): Mark {
-  const s = markState(raw);
-  const ctx = view.kind === 'started' ? view.ctx : null;
-  let name = s.tab === 'gnet' ? gnetLabel(ctx?.chat.scriptstate) : TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : '위키 메인';
-  if (s.r) name = recordsMarkName(s.r, ctx?.chat ?? null);
-  if (s.p) {
-    const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
-    name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
-  }
-  if (s.g) {
-    const post = s.g.open !== null && ctx ? findPost(readGnet(ctx.chat), s.g.open) : undefined;
-    name = s.g.s ? `${gnetLabel(ctx?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx?.chat.scriptstate)} 글` : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
-  }
-  if (s.f === 'team') name = `${name} 편성`;
-  if (s.tab === 'settings' && s.d) name = '명부';
-  return { s: s as unknown as Mark['s'], name };
-}
-
-/** 맨 상황판(사원증 창 없이)은 즐겨찾기 대상이 아니다 — 서랍이 상황판 안에 있어 의미가 없다 (2026-11-05 사용자) */
-const plainBoard = (s: NavState) => s.tab === 'board' && !s.a;
-
-/** 지금 화면의 즐겨찾기 (없으면 null) */
-function currentMark(): Mark | null {
-  const s = navState();
-  return plainBoard(s) ? null : markOf(s);
-}
-
-/** 최근 본 화면 (설정·맨 상황판은 빼고) */
-function recentMarks(): Mark[] {
-  const seen = new Set<string>();
-  return navHist.recent().filter((s) => s.tab !== 'settings' && !plainBoard(s)).map(markOf).filter((m) => {
-    const k = JSON.stringify(m.s);
-    return !seen.has(k) && (seen.add(k), true);
-  });
-}
-
-/** 다른 채팅에서 넣은 즐겨찾기: 이 채팅에 없는 괴담톡 방은 목록으로 */
-function openable(ctx: ChatContext, s: NavState): NavState {
-  const o: NavState = JSON.parse(JSON.stringify(s));
-  // 옛 즐겨찾기: 위키 안 인물·개인 기록·기록 문서·세력 화면은 기록 탭으로 (2026-10-29)
-  const legacy = o.tab === 'wiki' && o.w ? legacyWikiNav(o.w.view, o.w.title) : null;
-  if (legacy) {
-    o.tab = 'records';
-    o.r = legacy;
-    delete o.w;
-  }
-  // 옛 「가계부」 탭·기록 › 가계부 → 소지품 › 가계부 (2026-11-07)
-  if ((o.tab as string) === 'wallet' || (o.tab === 'records' && o.r?.sub === 'wallet')) {
-    o.tab = 'items';
-    o.i = { sub: 'wallet', view: 'grid', open: '' };
-    delete o.r;
-  }
-  if (!TABS.includes(o.tab)) o.tab = 'board';
-  if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
-  return o;
+/** PC 메뉴 맨 아래: ‹ 뒤로 · 앞으로 › (모바일 쓸기와 같은 기록) */
+function navHistBar(): string {
+  return `<div class="gx-navhist">
+    <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
+    <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
 }
 
 function applyNav(s: NavState): void {
@@ -1502,9 +1410,7 @@ function startedBody(ctx: ChatContext): string {
       return invMenuOn(ctx) ? itemsTab(ctx) : board(ctx);
     case 'settings':
     {
-      // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
-      // 명부는 자기 검색 서랍이 있어 그대로
-      return settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope) + boardDrawer();
+      return settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
     }
     default:
       return board(ctx);
@@ -1526,7 +1432,7 @@ function body(): string {
     case 'started':
       evSeenReset();
       if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1636,7 +1542,7 @@ function tabs(): string {
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
-    ${ctx ? navHistBar(currentMark()) : ''}
+    ${ctx ? navHistBar() : ''}
     ${mobileBar(item, unreadPhone, ctx)}
   </nav>`;
 }
@@ -1748,8 +1654,7 @@ function board(ctx: ChatContext): string {
     return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
       ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
-      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>${boardDrawer()}`;
-    // ↑ 상황판을 끈 채팅도 폰 하단 즐겨찾기 서랍은 그대로 (2026-10-28 QC: 꺼 두면 서랍째 사라졌다)
+      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>`;
   }
   let catalog: Catalog;
   try {
@@ -1817,7 +1722,7 @@ function board(ctx: ChatContext): string {
   return `<main class="gx-body gx-board">
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
     ${agentPanel(agents, getPrefs().agents ?? 'wall', { total: roster.length, org: findFaction(faction, factionList(ctx.char.globalLore))?.affiliation ?? '', extra: promo, empty: limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.' })}
-  </main>${boardDrawer()}`;
+  </main>`;
 }
 
 /** 상황판 CCTV·상세 창 시각: 최근 상태 줄의 날짜·시각 */

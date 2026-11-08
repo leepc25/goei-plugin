@@ -2,7 +2,7 @@
 // 사용법: node tests/qc-modules-browser.mjs <fixture.json> [screenshot-dir]   (fixture: tests/make_fixture.py). ONLY=G1,P2 로 절만 골라 돌린다
 // 호스트 흉내(hostScript·boot·open)는 tests/browser.mjs 와 같다. 모델 응답은 window.__llm 큐에 넣어 흉내 낸다.
 import { createRequire } from 'node:module';
-import { distWorldPack } from './data-init.mjs';
+import { distPack, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -38,6 +38,8 @@ const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.j
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
 /** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
 const worldPack = distWorldPack();
+// 아바타 팩: 내 페르소나로 시작하려면 아바타가 있어야 출발 (2026-11-08 사용자). browser.mjs 와 같이 저장소에 미리 둔다
+const looksPack = distPack('goei-data-looks');
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -64,6 +66,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    if (!${noBody}) window.__store['p:goei:data-looks'] = ${JSON.stringify(looksPack)};
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -151,6 +154,8 @@ async function startedWithReply(page, { phoneAuto = false, gnetAuto = false } = 
   await page.evaluate(async ({ reply, phoneAuto, gnetAuto }) => {
     if (!phoneAuto) window.__chat.scriptstate.$ph_auto = '0';
     if (!gnetAuto) window.__chat.scriptstate['$lb_cfg_lb-gn.lazy'] = '1';
+    // 장면 인물이 없어도 소지품 읽기가 켜져 있으면 갱신기가 돈다(11-08): 이 시험의 모델 호출 수에 끼지 않게 끈다
+    window.__chat.scriptstate.$it_auto = '0';
     window.__chat.message.push({ role: 'user', data: '시작' }, { role: 'char', data: reply });
     const c = window.__chat;
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
@@ -209,17 +214,17 @@ if (want('G1')) {
   assert.ok((await page.textContent('.nw-fail')).includes('이건 JSON 아님'), '실패 원문 보관');
   assert.ok(await page.isEnabled('[data-action="gn-refresh"]'), '실패 뒤 새로고침 단추가 다시 눌린다');
   assert.ok((await page.textContent('.gn')).includes('게시글이 없어요'), '기존(빈) 게시판 유지');
-  // 1-b. 빈 응답 → LlmError, 재시도 없음
-  await llm(page, [ok('   '), ok('{"posts":[]}')]);
+  // 1-b. 빈 응답 → 일시 오류로 보고 같은 요청을 두 번까지 다시 보낸다 (host/llm.ts TRANSIENT, 2026-11-07 사용자). 끝까지 비면 실패 안내
+  await llm(page, [ok('   '), ok(' '), ok('  ')]);
   await page.click('[data-action="gn-refresh"]');
   await idle(page);
-  assert.equal(await llmCount(page), 3, '빈 응답은 연결 문제로 보고 다시 묻지 않는다');
+  assert.equal(await llmCount(page), 5, '빈 응답은 두 번까지 다시 보낸다');
   assert.ok((await page.textContent('.gx-toast, .gn')).includes('빈 응답'));
   // 1-c. 모델 실패 (type fail)
   await llm(page, [fail('Failed to fetch')]);
   await page.click('[data-action="gn-refresh"]');
   await idle(page);
-  assert.equal(await llmCount(page), 4);
+  assert.equal(await llmCount(page), 6);
   assert.ok((await page.textContent('.gn')).includes('모델 요청에 실패'));
   // 1-d. posts 가 비었거나 전부 사용자 명의 → 유지 + 안내
   await llm(page, [ok(JSON.stringify({ posts: [post(1, { author: '익명' })] }))]);
@@ -537,21 +542,21 @@ if (want('P1')) {
   assert.ok(retry[0].content.includes('The previous response was rejected'));
   assert.ok((await page.textContent('.nw-fail')).includes('설명문만'), '실패 원문');
   assert.ok(await page.isEnabled('[data-action="ph-refresh"]'));
-  // 1-b. 빈 응답·모델 실패: 재시도 없음
-  await llm(page, [ok('')]);
+  // 1-b. 빈 응답은 일시 오류로 두 번까지 다시 보내고(host/llm.ts TRANSIENT, 2026-11-07 사용자), 모델 실패는 재시도 없음
+  await llm(page, [ok(''), ok(''), ok('')]);
   await page.click('[data-action="ph-refresh"]');
   await idle(page);
-  assert.equal(await llmCount(page), 3);
+  assert.equal(await llmCount(page), 5);
   await llm(page, [fail('boom')]);
   await page.click('[data-action="ph-refresh"]');
   await idle(page);
-  assert.equal(await llmCount(page), 4);
+  assert.equal(await llmCount(page), 6);
   assert.ok((await page.textContent('.ph')).includes('모델 요청에 실패'));
   // 1-c. 틀린 방·틀린 공지·틀린 초대만 오면 「그것만 빼고」 → 전부 빠지면 실패로 안내
   await llm(page, [ok(JSON.stringify({ updates: [{ room: 'dm_없는방', patch: [msg('x', 'hi')] }], announcements: [{ issuer: '', category: '잡담', title: 't', text: 'x' }], invitations: [] }))]);
   await page.click('[data-action="ph-refresh"]');
   await idle(page);
-  assert.equal(await llmCount(page), 6, '검사 실패는 형식 오류라 한 번 더 묻는다');
+  assert.equal(await llmCount(page), 8, '검사 실패는 형식 오류라 한 번 더 묻는다');
   assert.ok((await page.textContent('.ph')).includes('허용되지 않은 대화방') || (await page.textContent('.ph')).includes('공지'));
   // 1-d. 선톡 확률 0 + 초대 끄기 → 후보 없음: 모델을 부르지 않고 안내
   await featSet(page, 'set:phone');
@@ -1068,7 +1073,9 @@ if (want('W3')) {
   const { page, errors } = await boot(packFixture(), { message: [], scriptstate: {} }, { width: 390, height: 844 }, { touch: true });
   await startedWithReply(page);
   await open(page);
-  await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="wiki"]:visible').first().click();
+  // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
+  await page.tap('.gx-cgrip');
+  await page.tap('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
   await page.waitForSelector('.nw-home');
   await page.tap('.nw-edge');
   await page.waitForSelector('.nw-app.list-open');
@@ -1263,7 +1270,7 @@ if (want('WL2')) {
   await page.tap('.gx-hwallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await page.locator('.gx-hwallet').count(), 1, '가계부 화면 안에서도 머리 단추 유지 (2026-11-05 사용자)');
-  assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.tab), 'records', '가계부는 기록 탭 안 (2026-11-05)');
+  assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.tab), 'items', '가계부는 소지품 탭 안 (2026-11-07 사용자: 가계부는 소지품 메뉴의 하위 탭)');
   await page.tap('.gx-nav .gx-nb.home[data-value="board"]');
   await page.tap('.gx-idbtn');
   await page.waitForSelector('.gx-idpop .gx-wallet');
@@ -1285,7 +1292,7 @@ if (want('WL2')) {
 // ═══════════ 인물 기록 ═══════════
 
 const upd = (o) => ok(JSON.stringify(o));
-// 갱신 요청의 메시지 번호 m 은 읽는 구간 안 순번: 직전 쌍 1(기본) → m1·m2 는 맥락(첫 응답), m3·m4 가 확정 구간(새 유저·응답)
+// 갱신 요청의 메시지 번호 m 은 읽는 구간 안 순번: 첫 장면 메시지 m1, 직전 쌍 1(기본) → m2·m3 은 맥락, m4·m5 가 확정 구간(새 유저·응답)
 
 // PP1) 매 턴 갱신: 장면 인물이 있으면 보조 모델 1회(직렬: 괴담톡보다 먼저), 같은 응답은 다시 안 읽음. 응답 정상/부분/깨짐/빈 → 반영·버림·실패가 진단에. 병렬 설정. 끔.
 if (want('PP1')) {
@@ -1293,7 +1300,7 @@ if (want('PP1')) {
   await startedWithReply(page);
   const n0 = await llmCount(page);
   // 응답에 쟈알디가 나오면 시트에서 시작값을 만들고 갱신 호출 1회
-  await llm(page, [upd({ entries: [{ who: '쟈알디', slot: 'state', op: 'add', text: '현장에서 보고를 받는 중', m: 'm4', quote: '쟈알디 부장이 보고를 받았다' }, { who: '없는사람', slot: 'state', op: 'add', text: 'x', m: 'm4', quote: '쟈알디' }, { who: '쟈알디', slot: 'scene', op: 'add', text: '인용 없음', m: 'm4', quote: '이 글은 원문에 없다' }], cues: [{ who: '쟈알디', cue: '도움', m: 'm4', quote: '보고를 받았다', reason: '보고' }], address: [{ who: '쟈알디', toUser: '자네', register: '반말', m: 'm4', quote: '자네, 수고했네' }] })]);
+  await llm(page, [upd({ entries: [{ who: '쟈알디', slot: 'state', op: 'add', text: '현장에서 보고를 받는 중', m: 'm5', quote: '쟈알디 부장이 보고를 받았다' }, { who: '없는사람', slot: 'state', op: 'add', text: 'x', m: 'm5', quote: '쟈알디' }, { who: '쟈알디', slot: 'scene', op: 'add', text: '인용 없음', m: 'm5', quote: '이 글은 원문에 없다' }], cues: [{ who: '쟈알디', cue: '도움', m: 'm5', quote: '보고를 받았다', reason: '보고' }], address: [{ who: '쟈알디', toUser: '자네', register: '반말', m: 'm5', quote: '자네, 수고했네' }] })]);
   await fireOutput(page, '쟈알디 부장이 보고를 받았다. "자네, 수고했네."');
   await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1, n0, { timeout: 8000 });
   await page.waitForFunction(() => window.__chat.goeiPeopleV1?.people?.['쟈알디']?.slots?.state?.length > 0, null, { timeout: 8000 });
@@ -1302,7 +1309,7 @@ if (want('PP1')) {
   assert.ok(call.messages[0].content.includes('cues') || call.messages[0].content.length > 1000, '갱신 지침');
   const data = JSON.parse(call.messages[1].content);
   assert.deepEqual(data.people.map((p) => p.name), ['쟈알디']);
-  assert.ok(data.span.some((s) => s.m === 'm4' && s.confirmed));
+  assert.ok(data.span.some((s) => s.m === 'm5' && s.confirmed));
   let store = await page.evaluate(() => window.__chat.goeiPeopleV1);
   assert.equal(store.people['쟈알디'].seeded.from, 'lore', '시트에서 시작값');
   assert.equal(store.people['쟈알디'].slots.state.filter((e) => e.src === 'story').length, 1);
@@ -1324,10 +1331,10 @@ if (want('PP1')) {
   let diag = JSON.parse(await page.evaluate(() => window.__store['p:goei-people-diag'] ?? '[]'));
   assert.ok(diag.at(-1).ok === false && diag.at(-1).stage === 'parse', `깨진 응답 진단: ${JSON.stringify(diag.at(-1).stage)}`);
   assert.ok(diag.at(-1).raw.includes('아님'), '원문 보관');
-  // 빈 응답 → 모델 실패
-  await llm(page, [ok('  ')]);
+  // 빈 응답 → 일시 오류로 두 번까지 다시 보내고(host/llm.ts TRANSIENT) 끝까지 비면 모델 실패
+  await llm(page, [ok('  '), ok(' '), ok(' ')]);
   await fireOutput(page, '쟈알디가 떠났다.');
-  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 4, n0, { timeout: 8000 });
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 6, n0, { timeout: 8000 });
   await wait(600);
   diag = JSON.parse(await page.evaluate(() => window.__store['p:goei-people-diag'] ?? '[]'));
   assert.equal(diag.at(-1).stage, 'model');
@@ -1335,7 +1342,7 @@ if (want('PP1')) {
   await page.evaluate(() => { window.__chat.scriptstate.$ph_auto = '1'; window.__chat.scriptstate.$cooldown_received_incoming = '-5'; });
   await llm(page, [upd({ entries: [] }), ok('{"updates":[],"announcements":[],"invitations":[]}')]);
   await fireOutput(page, '쟈알디가 돌아왔다.');
-  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 6, n0, { timeout: 8000 });
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 8, n0, { timeout: 8000 });
   await wait(400);
   const [c1, c2] = await page.evaluate(() => window.__calls.llm.slice(-2));
   assert.ok(JSON.parse(c1.messages[1].content).people !== undefined, '인물 갱신 먼저');
@@ -1344,12 +1351,12 @@ if (want('PP1')) {
   await page.evaluate(() => { window.__chat.scriptstate.$pp_parallel = '1'; });
   await llm(page, [upd({ entries: [] }), ok('{"updates":[],"announcements":[],"invitations":[]}')]);
   await fireOutput(page, '쟈알디가 앉았다.');
-  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 8, n0, { timeout: 8000 });
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 10, n0, { timeout: 8000 });
   // 끔: 호출 없음, 본편에도 안 들어감
   await page.evaluate(() => { window.__chat.scriptstate.$pp_on = '0'; window.__chat.scriptstate.$ph_auto = '0'; });
   await fireOutput(page, '쟈알디가 섰다.');
   await wait(600);
-  assert.equal(await llmCount(page), n0 + 8, '끄면 호출 없음');
+  assert.equal(await llmCount(page), n0 + 10, '끄면 호출 없음');
   const reqOff = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '쟈알디에게 간다' }], 'model'));
   assert.ok(!reqOff.some((m) => /\[People records\]/.test(m.content)), '끄면 본편 블록 없음');
   await page.evaluate(() => { window.__chat.scriptstate.$pp_on = '1'; });
@@ -1367,10 +1374,10 @@ if (want('PP2')) {
   await startedWithReply(page);
   const n0 = await llmCount(page);
   await llm(page, [upd({
-    entries: [{ who: '쟈알디', slot: 'state', op: 'add', text: '부상 (왼팔)', m: 'm4', quote: '왼팔을 다쳤다' }, { who: '쟈알디', slot: 'knowledge', op: 'add', text: '관람차 비밀을 안다', m: 'm4', quote: '관람차' }],
-    cues: [{ who: '쟈알디', cue: '큰도움', m: 'm4', quote: '왼팔을 다쳤다', reason: '구해줌' }, { who: '쟈알디', cue: '헌신', m: 'm4', quote: '관람차', reason: '두 번째' }],
-    faction_cues: [{ faction: '관리국', cue: '큰도움', m: 'm4', quote: '왼팔을 다쳤다', reason: '구조' }, { faction: '백일몽', cue: '파탄', m: 'm4', quote: '관람차', reason: '방해' }],
-    docs: [{ type: 'event', key: '관람차 사건', op: 'add', text: '관람차에서 쟈알디가 다침', m: 'm4', quote: '왼팔을 다쳤다' }],
+    entries: [{ who: '쟈알디', slot: 'state', op: 'add', text: '부상 (왼팔)', m: 'm5', quote: '왼팔을 다쳤다' }, { who: '쟈알디', slot: 'knowledge', op: 'add', text: '관람차 비밀을 안다', m: 'm5', quote: '관람차' }],
+    cues: [{ who: '쟈알디', cue: '큰도움', m: 'm5', quote: '왼팔을 다쳤다', reason: '구해줌' }, { who: '쟈알디', cue: '헌신', m: 'm5', quote: '관람차', reason: '두 번째' }],
+    faction_cues: [{ faction: '관리국', cue: '큰도움', m: 'm5', quote: '왼팔을 다쳤다', reason: '구조' }, { faction: '백일몽', cue: '파탄', m: 'm5', quote: '관람차', reason: '방해' }],
+    docs: [{ type: 'event', key: '관람차 사건', op: 'add', text: '관람차에서 쟈알디가 다침', m: 'm5', quote: '왼팔을 다쳤다' }],
   })]);
   await fireOutput(page, '쟈알디가 나를 구하다 왼팔을 다쳤다. 관람차 비밀을 알게 됐다.');
   await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1, n0, { timeout: 8000 });

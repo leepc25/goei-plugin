@@ -1,4 +1,48 @@
-onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
+e "rec-chron":
+        if (!(v in CHRON_KIND_LABEL)) return true;
+        rec.chronOff = rec.chronOff.includes(v) ? rec.chronOff.filter((k) => k !== v) : [...rec.chronOff, v];
+        break;
+      case "rec-open":
+      case "rec-chron-open":
+        closeToast();
+        if (!readReports(ctx2.chat).items.some((r) => r.id === v)) {
+          rec.notice = "이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.";
+          break;
+        }
+        Object.assign(rec, { sub: action === "rec-chron-open" ? "chronicle" : "journal", view: "report", id: v, notice: "" });
+        break;
+      case "rec-people":
+        Object.assign(rec, { sub: "people", view: "list", id: "", notice: "" });
+        resetPeopleUi();
+        break;
+      case "rec-person":
+        if (!v) return true;
+        Object.assign(rec, { sub: "people", view: "person", id: v, notice: "" });
+        resetPeopleUi();
+        break;
+      case "rec-docs":
+        Object.assign(rec, { sub: "people", view: "docs", id: "", notice: "" });
+        resetPeopleUi();
+        break;
+      case "rec-faction":
+        if (!v) return true;
+        Object.assign(rec, { sub: "factions", view: "faction", id: v, notice: "" });
+        resetPeopleUi();
+        break;
+      case "rec-back":
+        if (rec.view === "list") return false;
+        rec.notice = "";
+        if (rec.view === "report") Object.assign(rec, { sub: rec.sub === "chronicle" ? "chronicle" : "journal", view: "list", id: "" });
+        else if (rec.view === "faction") Object.assign(rec, { sub: "factions", view: "list", id: "" });
+        else Object.assign(rec, { sub: "people", view: "list", id: "" });
+        resetPeopleUi();
+        break;
+      case "rec-toast-x":
+        closeToast();
+        break;
+      case "rec-pin": {
+        if (rec.busy || !v) return true;
+        const on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
         rec.busy = true;
         try {
           await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...reportVars(pinReport(readReports(chat), v, on2)) } }));
@@ -60,14 +104,14 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
   }
   var CHAT_CARD = [["off", "안 띄움"], ["mine", "내가 출동한 사건만"], ["all", "전부"]];
   var row7 = (label2, control2, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  function seg7(key2, cur, items) {
-    const sw = onOffSwitch(items, cur, "jr-set", (v) => `${key2}=${v}`);
+  function seg7(key, cur, items) {
+    const sw = onOffSwitch(items, cur, "jr-set", (v) => `${key}=${v}`);
     if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="jr-set" data-value="${esc30(`${key2}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="jr-set" data-value="${esc30(`${key}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
-  function stepper(key2, shown3, canDown, canUp, label2) {
-    return `<div class="st-step"><button class="gx-step" data-action="jr-step" data-value="${key2}:-" ${!canDown || rec.busy ? "disabled" : ""} aria-label="${esc30(label2)} 줄이기">−</button>
-    <b>${esc30(shown3)}</b><button class="gx-step" data-action="jr-step" data-value="${key2}:+" ${!canUp || rec.busy ? "disabled" : ""} aria-label="${esc30(label2)} 늘리기">+</button></div>`;
+  function stepper(key, shown3, canDown, canUp, label2) {
+    return `<div class="st-step"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec.busy ? "disabled" : ""} aria-label="${esc30(label2)} 줄이기">−</button>
+    <b>${esc30(shown3)}</b><button class="gx-step" data-action="jr-step" data-value="${key}:+" ${!canUp || rec.busy ? "disabled" : ""} aria-label="${esc30(label2)} 늘리기">+</button></div>`;
   }
   function journalSettingsPane(ctx2, canChat = true) {
     const s8 = journalSettings(ctx2.chat.scriptstate);
@@ -108,12 +152,12 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
     if (action === "jr-set") {
       const i = v.indexOf("=");
       if (i < 0) return true;
-      const key2 = v.slice(0, i);
+      const key = v.slice(0, i);
       let val = v.slice(i + 1);
-      if (key2 === "chat_card") val = val === "off" || val === "all" ? val : "mine";
+      if (key === "chat_card") val = val === "off" || val === "all" ? val : "mine";
       else return true;
-      await setVars4(ctx2, env3, { [JR(key2)]: val });
-      if (key2 === "chat_card") {
+      await setVars4(ctx2, env3, { [JR(key)]: val });
+      if (key === "chat_card") {
         try {
           await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex);
           await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
@@ -123,15 +167,15 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       return true;
     }
     if (action === "jr-step") {
-      const [key2, op] = v.split(":");
+      const [key, op] = v.split(":");
       const s8 = journalSettings(ctx2.chat.scriptstate);
       const dir2 = op === "+" ? 1 : -1;
       let next;
-      if (key2 === "journal_cap") next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s8.journalCap + dir2 * JR_JOURNAL_CAP.step));
-      else if (key2 === "report_cap") next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s8.reportCap + dir2 * JR_REPORT_CAP.step));
+      if (key === "journal_cap") next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s8.journalCap + dir2 * JR_JOURNAL_CAP.step));
+      else if (key === "report_cap") next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s8.reportCap + dir2 * JR_REPORT_CAP.step));
       else return true;
-      if (String(next) === jrValue(ctx2.chat.scriptstate, key2)) return true;
-      await setVars4(ctx2, env3, { [JR(key2)]: String(next) });
+      if (String(next) === jrValue(ctx2.chat.scriptstate, key)) return true;
+      await setVars4(ctx2, env3, { [JR(key)]: String(next) });
       return true;
     }
     return false;
@@ -169,10 +213,10 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
   }
   var dimSlider = (n2, busy6) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n2}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy6 ? " disabled" : ""}><output>${n2}%</output></label>`;
   var pctSlider = (action, n2, r, label2, busy6) => `<label class="st-range"><input type="range" min="${r.min}" max="${r.max}" step="${r.step}" value="${n2}" data-input="pct" data-change="${action}" aria-label="${label2}"${busy6 ? " disabled" : ""}><output>${n2}%</output></label>`;
-  function recentControl(key2, v, label2, busy6) {
+  function recentControl(key, v, label2, busy6) {
     const n2 = v ?? IMG_RECENT.def;
     const all = n2 === 0;
-    return `<div class="st-recent">${seg8(`set-${key2}-mode`, all ? "all" : "recent", [["recent", "최근만"], ["all", "전부"]], busy6)}` + (all ? "" : `<label class="st-range"><input type="range" min="${IMG_RECENT.min}" max="${IMG_RECENT.max}" step="1" value="${n2}" data-input="count" data-change="set-${key2}" aria-label="${label2}"${busy6 ? " disabled" : ""}><output>${n2}개</output></label>`) + "</div>";
+    return `<div class="st-recent">${seg8(`set-${key}-mode`, all ? "all" : "recent", [["recent", "최근만"], ["all", "전부"]], busy6)}` + (all ? "" : `<label class="st-range"><input type="range" min="${IMG_RECENT.min}" max="${IMG_RECENT.max}" step="1" value="${n2}" data-input="count" data-change="set-${key}" aria-label="${label2}"${busy6 ? " disabled" : ""}><output>${n2}개</output></label>`) + "</div>";
   }
   var group4 = (title2, body5, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
   function statusColsTable(cfg, busy6) {
@@ -199,18 +243,18 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       theme: cur === "dark" || cur === "paper" ? cur : "light"
     };
   }
-  function stepper2(action, key2, shown3, canDown, canUp, label2, busy6) {
-    return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key2}:-" ${!canDown || busy6 ? "disabled" : ""} aria-label="${esc31(label2)} 줄이기">−</button>
-    <b>${esc31(shown3)}</b><button class="gx-step" data-action="${action}" data-value="${key2}:+" ${!canUp || busy6 ? "disabled" : ""} aria-label="${esc31(label2)} 늘리기">+</button></div>`;
+  function stepper2(action, key, shown3, canDown, canUp, label2, busy6) {
+    return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${!canDown || busy6 ? "disabled" : ""} aria-label="${esc31(label2)} 줄이기">−</button>
+    <b>${esc31(shown3)}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${!canUp || busy6 ? "disabled" : ""} aria-label="${esc31(label2)} 늘리기">+</button></div>`;
   }
-  function worldStep(key2) {
-    if (key2.endsWith("_p") || key2 === "landmark_share") return 10;
-    if (key2.endsWith("_ttl")) return 6;
+  function worldStep(key) {
+    if (key.endsWith("_p") || key === "landmark_share") return 10;
+    if (key.endsWith("_ttl")) return 6;
     return 1;
   }
-  function worldRow(w, key2, label2, unit, busy6) {
-    const f = WORLD_SPEC.find((x) => x.key === key2);
-    const v = w[key2];
+  function worldRow(w, key, label2, unit, busy6) {
+    const f = WORLD_SPEC.find((x) => x.key === key);
+    const v = w[key];
     const max = f.max ?? 99;
     const HINT = {
       cap: "같은 때에 살아 있을 수 있는 최대 개수예요. 이 수가 차면 더 생기지 않아요",
@@ -218,8 +262,8 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       ttl: "생긴 뒤 이야기 속 시간으로 이만큼 지나면 자동으로 끝나요. 모델이 먼저 끝내면 그때 끝나요",
       landmark_share: "사건이 생길 때 등록된 거점(본부·지사 같은 장소)에서 생길 비율이에요. 나머지는 지도의 아무 곳"
     };
-    const kind = key2 === "landmark_share" ? "landmark_share" : key2.replace(/^(preset|random|incident|mystic)_/, "");
-    return field2(esc31(label2), stepper2("set-world", key2, `${v}${unit}`, v > 0, v < max, label2, busy6), HINT[kind] ?? "");
+    const kind = key === "landmark_share" ? "landmark_share" : key.replace(/^(preset|random|incident|mystic)_/, "");
+    return field2(esc31(label2), stepper2("set-world", key, `${v}${unit}`, v > 0, v < max, label2, busy6), HINT[kind] ?? "");
   }
   function worldKind(w, k, name, busy6) {
     const expire2 = w[`${k}_expire`] === 1;
@@ -380,8 +424,8 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       items: group4("소지품", [
         field2("소지품", seg8("set-inv-on", invOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요."),
         ...!invOn(itVars) ? [] : [
-          field2("본편에 넘기기", seg8("set-items-push", itemPushOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요."),
-          field2("보조 모델이 읽기", seg8("set-items-auto", itemAutoOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 끄면 직접 넣기·상점으로만 바뀌어요."),
+          field2("본편에 넘기기", seg8("set-items-push", itemPushOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요. 끄면 물건 목록은 안 가고, 상점이 켜져 있으면 상점 표식 지침과 상점 사건만 [Shop] 글로 가요."),
+          field2("보조 모델이 읽기", seg8("set-items-auto", itemAutoOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만, 인물 기록이 켜져 있을 때). 끄면 직접 넣기·상점으로만 바뀌어요."),
           field2("칸 수", stepper2("set-items-slots", "n", `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, "칸 수", busy6), `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘치면 「17/16」처럼 보이고 그대로 본편에 넘겨요. 푸는 건 이야기 쪽이에요.`),
           field2("지닐 수 있는 한계", `<input class="st-text" type="text" maxlength="60" value="${esc31(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc31(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy6 ? " disabled" : ""}>`, "모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요."),
           field2("본편에 넘길 내용", seg8("set-items-detail", itemDetail(itVars), [["full", "전부"], ["state", "이름·판정"], ["name", "이름만"]], busy6), "[Inventory] 한 줄에 무엇을 넣을지예요. 전부 = 이름·설명·효과·장착·남은 횟수·상태, 이름·판정 = 설명·효과를 빼고, 이름만 = 이름뿐. 물건이 많을 때 줄이면 토큰이 덜 들어요."),
@@ -439,6 +483,18 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       return { ...chat, message: list4.map((m) => m.role === "char" && hasShopTag(String(m.data ?? "")) ? { ...m, data: stripShopTags(String(m.data)) } : m) };
     }).catch(() => null);
   }
+  function bulkSideVars(chat, prev, next) {
+    const vars = {};
+    const n2 = (chat.message ?? []).length;
+    const before = usedCols(colConfig(prev));
+    const after = usedCols(colConfig(next));
+    if (before.join() !== after.join()) vars[COL_LOG_VAR] = withColLog(prev, n2, after);
+    if (invOn(prev) && !invOn(next)) Object.assign(vars, { [ITEM_USE_VAR]: "", [ITEM_USE_AT_VAR]: "", [ITEM_RESUMED_VAR]: "" });
+    else if (!invOn(prev) && invOn(next)) vars[ITEM_RESUMED_VAR] = n2 ? String(n2) : "";
+    const shopOff = shopSettings(prev).on && !shopSettings(next).on;
+    if (shopOff) vars[SHOP_VAR] = "";
+    return { vars, shopOff };
+  }
   var itemsUiSpent = (vars) => vars?.[ITEM_SPENT_VAR] === "keep" ? "keep" : "remove";
   var INV_OPTS = {
     "set-items-start": { key: ITEM_START_VAR, values: ["1", "0"] },
@@ -492,8 +548,8 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
     return next === cur ? null : [def.id, next];
   }
   function nextWorld(w, v) {
-    const [key2, op] = v.split(":");
-    const f = WORLD_SPEC.find((x) => x.key === key2);
+    const [key, op] = v.split(":");
+    const f = WORLD_SPEC.find((x) => x.key === key);
     if (!f || op === void 0) return null;
     const cur = w[f.key];
     const step = worldStep(f.key);
@@ -529,20 +585,27 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       const u = settingsUi.undo;
       if (!u || u.charIndex !== ctx2.charIndex || u.chatIndex !== ctx2.chatIndex) return true;
       settingsUi.undo = null;
+      let shopOff = false;
       await save2(ctx2, env3, (chat) => {
+        const prev = chat.scriptstate;
         const vars = {};
         const drop = [];
         for (const [k, val] of Object.entries(u.before)) {
+          if (k === COL_LOG_VAR) continue;
           if (val === void 0) drop.push(k);
           else vars[k] = val;
         }
-        if (drop.length) {
-          const ss = { ...chat.scriptstate ?? {} };
-          for (const k of drop) delete ss[k];
-          chat.scriptstate = ss;
-        }
-        return vars;
+        const ss = { ...chat.scriptstate ?? {} };
+        for (const k of drop) delete ss[k];
+        const side = bulkSideVars(chat, prev, { ...ss, ...vars });
+        shopOff = side.shopOff;
+        if (drop.length) chat.scriptstate = ss;
+        return { ...vars, ...side.vars };
       });
+      if (shopOff) {
+        resetShop();
+        await dropShopTags(ctx2);
+      }
       if (!settingsUi.notice) settingsUi.info = "기본값을 불러오기 전 설정으로 되돌렸어요.";
       env3.render();
       return true;
@@ -559,6 +622,7 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       } else if (what === "load") {
         const d = current3(ctx2, "defaults");
         let before = null;
+        let shopOff = false;
         await save2(ctx2, env3, (chat) => {
           const vars = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
           for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
@@ -566,16 +630,25 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
             const ss = { ...chat.scriptstate ?? {}, ...vars };
             Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
           }
+          const side = bulkSideVars(chat, chat.scriptstate, { ...chat.scriptstate ?? {}, ...vars });
+          shopOff = side.shopOff;
+          Object.assign(vars, side.vars);
           before = {};
           for (const k of Object.keys(vars)) before[k] = chat.scriptstate?.[k];
           return vars;
         });
+        if (shopOff) {
+          resetShop();
+          await dropShopTags(ctx2);
+        }
         if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx2.charIndex, chatIndex: ctx2.chatIndex, before };
         if (!settingsUi.notice) settingsUi.info = "새 채팅 기본값을 지금 채팅에 불러왔어요.";
         env3.render();
       } else if (what === "reset") {
         let before = null;
+        let shopOff = false;
         await save2(ctx2, env3, (chat) => {
+          const prev = chat.scriptstate;
           const ss = { ...chat.scriptstate ?? {} };
           before = {};
           for (const k of Object.keys(ss)) {
@@ -583,8 +656,11 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
             before[k] = ss[k];
             delete ss[k];
           }
+          const side = bulkSideVars(chat, prev, ss);
+          shopOff = side.shopOff;
+          for (const k of Object.keys(side.vars)) if (!(k in before)) before[k] = prev?.[k];
           chat.scriptstate = ss;
-          const vars = {};
+          const vars = { ...side.vars };
           if (worldOn(chat)) {
             const wv = worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? ""));
             for (const k of Object.keys(wv)) if (!(k in before)) before[k] = ss[k];
@@ -592,6 +668,10 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
           }
           return vars;
         });
+        if (shopOff) {
+          resetShop();
+          await dropShopTags(ctx2);
+        }
         if (!settingsUi.notice) await saveDefaults(env3, (p2) => ({ ...p2, basic: {}, world: {}, theme: void 0, vars: {} }));
         if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx2.charIndex, chatIndex: ctx2.chatIndex, before };
         if (!settingsUi.notice) settingsUi.info = "이 채팅 설정과 새 채팅 기본값을 플러그인 초기값으로 되돌렸어요.";
@@ -623,10 +703,10 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       return true;
     }
     if (/^set-img-(show|send)(-mode)?$/.test(action)) {
-      const key2 = action.includes("show") ? "imgShow" : "imgSend";
-      const cur = getPrefs()[key2];
+      const key = action.includes("show") ? "imgShow" : "imgSend";
+      const cur = getPrefs()[key];
       const n2 = action.endsWith("-mode") ? v === "all" ? 0 : cur === 0 || cur === void 0 ? IMG_RECENT.def : cur : imgRecent(v);
-      if (n2 !== null) await saveDefaults(env3, (p2) => ({ ...p2, [key2]: n2 === IMG_RECENT.def ? void 0 : n2 }));
+      if (n2 !== null) await saveDefaults(env3, (p2) => ({ ...p2, [key]: n2 === IMG_RECENT.def ? void 0 : n2 }));
       return true;
     }
     if (action === "set-agents") {
@@ -662,10 +742,10 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
         if (/^n:[+-]$/.test(v)) next = String(Math.max(0, Math.min(simple.max, simple.num(vars) + (v.endsWith("+") ? 1 : -1))));
       } else if (simple.values.includes(v)) next = v;
       if (next === null) return true;
-      const key2 = simple.key;
+      const key = simple.key;
       const val = next;
-      if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key2]: val } }));
-      else await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key2] ?? "") === val ? null : { [key2]: val });
+      if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key]: val } }));
+      else await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key] ?? "") === val ? null : { [key]: val });
       return true;
     }
     if (action.startsWith("set-shop-")) {
@@ -683,22 +763,22 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       }
       const KEY3 = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, feature: SHOP_FEATURE_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR, where: SHOP_WHERE_VAR };
       const k = action.slice(9);
-      const key2 = KEY3[k];
-      if (!key2) return true;
+      const key = KEY3[k];
+      if (!key) return true;
       if ((k === "turns" || k === "refs") && /^n:[+-]$/.test(v)) {
         const cur = shopSettings(scope === "defaults" ? getPrefs().vars : ctx2.chat.scriptstate)[k];
         const [lo, hi] = k === "turns" ? [1, 8] : [0, 12];
         const nv = String(Math.max(lo, Math.min(hi, cur + (v.endsWith("+") ? 1 : -1))));
-        if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key2]: nv } }));
-        else await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key2] ?? "") === nv ? null : { [key2]: nv });
+        if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key]: nv } }));
+        else await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key] ?? "") === nv ? null : { [key]: nv });
         return true;
       }
       const ok = k === "price" ? true : k === "model" ? v === "main" || v === "aux" : k === "count" ? ["0", "1", "2"].includes(v) : k === "thoughts" ? ["off", "inner", "note"].includes(v) : k === "where" ? v === "any" || v === "shop" : k === "turns" ? /^[1-8]$/.test(v) : k === "refs" ? /^([0-9]|1[0-2])$/.test(v) : v === "1" || v === "0";
       if (!ok) return true;
       const next = k === "price" ? v.replace(/\s+/g, " ").trim().slice(0, 80) : v;
-      if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key2]: next } }));
+      if (scope === "defaults") await saveDefaults(env3, (p2) => ({ ...p2, vars: { ...p2.vars ?? {}, [key]: next } }));
       else {
-        await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key2] ?? "") === next ? null : { [key2]: next, ...k === "on" && next === "0" ? { [SHOP_VAR]: "" } : {} });
+        await save2(ctx2, env3, (chat) => String(chat.scriptstate?.[key] ?? "") === next ? null : { [key]: next, ...k === "on" && next === "0" ? { [SHOP_VAR]: "" } : {} });
         if (k === "on" && next === "0") {
           resetShop();
           await dropShopTags(ctx2);
@@ -792,13 +872,21 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
         await save2(ctx2, env3, (chat) => ppValue(chat.scriptstate, "on") === v ? null : { [PP("on")]: v });
         return true;
       case "set-col":
-        await save2(ctx2, env3, (chat) => {
-          const cfg = colConfig(chat.scriptstate);
-          const hit3 = nextColMode(cfg, v);
-          if (!hit3) return null;
-          const next = { ...cfg, [hit3[0]]: hit3[1] };
-          return { [colVar(hit3[0])]: hit3[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)) };
-        });
+        {
+          let walletOff = false;
+          await save2(ctx2, env3, (chat) => {
+            const cfg = colConfig(chat.scriptstate);
+            const hit3 = nextColMode(cfg, v);
+            if (!hit3) return null;
+            const next = { ...cfg, [hit3[0]]: hit3[1] };
+            walletOff = hit3[0] === "wallet" && hit3[1] === "off";
+            return { [colVar(hit3[0])]: hit3[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)), ...walletOff ? { [SHOP_VAR]: "" } : {} };
+          });
+          if (walletOff) {
+            resetShop();
+            await dropShopTags(ctx2);
+          }
+        }
         return true;
       case "set-wallet-start": {
         const n2 = parseWon(v);
@@ -845,8 +933,8 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       case "set-items-push":
       case "set-items-auto": {
         if (v !== "1" && v !== "0") return true;
-        const key2 = action === "set-items-push" ? ITEM_PUSH_VAR : ITEM_AUTO_VAR;
-        await save2(ctx2, env3, (chat) => (action === "set-items-push" ? itemPushOn(chat.scriptstate) : itemAutoOn(chat.scriptstate)) === (v === "1") ? null : { [key2]: v });
+        const key = action === "set-items-push" ? ITEM_PUSH_VAR : ITEM_AUTO_VAR;
+        await save2(ctx2, env3, (chat) => (action === "set-items-push" ? itemPushOn(chat.scriptstate) : itemAutoOn(chat.scriptstate)) === (v === "1") ? null : { [key]: v });
         return true;
       }
       case "set-items-slots":
@@ -1151,9 +1239,9 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
         return;
       }
       if (name === "dir-crop-size") {
-        const key2 = el.dataset.key ?? "";
-        const [x, y] = cropValue(key2);
-        setCrop(key2, [x, y, Number(el.value)]);
+        const key = el.dataset.key ?? "";
+        const [x, y] = cropValue(key);
+        setCrop(key, [x, y, Number(el.value)]);
         const frame = root?.querySelector("[data-crop] .dir-crop-frame");
         if (frame) frame.style.width = `${el.value}%`;
         return;
@@ -1168,8 +1256,8 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       if (ctx2 && relationsInput(name, el.dataset.key ?? "", el.value, ctx2)) return void touched();
       if (guideInput(name, el.dataset.key ?? "", el.value)) {
         touched();
-        const key2 = el.dataset.key ?? "";
-        const g2 = key2.includes("|") ? key2.slice(0, key2.lastIndexOf("|")) : key2;
+        const key = el.dataset.key ?? "";
+        const g2 = key.includes("|") ? key.slice(0, key.lastIndexOf("|")) : key;
         root?.querySelectorAll(`[data-action="ed-guide-save"][data-value="${g2}"], [data-action="ed-guide-reset"][data-value="${g2}"]`).forEach((b) => b.disabled = false);
         return;
       }
@@ -1532,7 +1620,7 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
   }
   function treeGroups(counts, on2) {
     return treeOf(tabOf(edUi.node)).map(
-      (g2) => `<div class="gw-tree-group"><h4>${g2.title}</h4>${g2.items.map(([id2, label2, icon2, badge3, sub]) => id2.startsWith("label:") ? `<div class="gw-tree-label">${icon2}<span>${esc32(label2)}</span></div>` : `<button class="gw-tree-item${sub ? " sub" : ""}${edUi.node === id2 ? " on" : ""}" data-action="ed-node" data-value="${id2}">${icon2}<span>${esc32(label2)}</span>${badge3 ?? (counts[id2] !== void 0 ? `<em>${counts[id2]}</em>` : on2[id2] !== void 0 ? `<i class="gw-tree-badge${on2[id2] ? "" : " off"}">${on2[id2] ? "켬" : "끔"}</i>` : "")}</button>`).join("")}</div>`
+      (g2) => `<div class="gw-tree-group"><h4>${g2.title}</h4>${g2.items.map(([id2, label2, icon, badge3, sub]) => id2.startsWith("label:") ? `<div class="gw-tree-label">${icon}<span>${esc32(label2)}</span></div>` : `<button class="gw-tree-item${sub ? " sub" : ""}${edUi.node === id2 ? " on" : ""}" data-action="ed-node" data-value="${id2}">${icon}<span>${esc32(label2)}</span>${badge3 ?? (counts[id2] !== void 0 ? `<em>${counts[id2]}</em>` : on2[id2] !== void 0 ? `<i class="gw-tree-badge${on2[id2] ? "" : " off"}">${on2[id2] ? "켬" : "끔"}</i>` : "")}</button>`).join("")}</div>`
     ).join("");
   }
   function guideNodePage(ctx2, n2) {
@@ -1585,7 +1673,7 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
         <div class="gx-row-btns"><button class="gx-mini danger" data-action="${edUi.confirm === "close" ? "ed-close-force" : "ed-revert-force"}">${edUi.confirm === "close" ? "저장 안 하고 닫기" : "고친 것 버리기"}</button><button class="gx-mini" data-action="ed-confirm-no">취소</button></div></div></div>` : tabOf(edUi.node) === "set" ? mainDefaultsPopup() : "";
     const tab2 = tabOf(edUi.node);
     edUi.last[tab2] = edUi.node;
-    const tabs2 = TABS2.map(([id2, label2, icon2]) => `<button class="gw-tab${tab2 === id2 ? " on" : ""}" role="tab" aria-selected="${tab2 === id2}" data-action="ed-tab" data-value="${id2}">${icon2}<span>${label2}</span></button>`).join("");
+    const tabs2 = TABS2.map(([id2, label2, icon]) => `<button class="gw-tab${tab2 === id2 ? " on" : ""}" role="tab" aria-selected="${tab2 === id2}" data-action="ed-tab" data-value="${id2}">${icon}<span>${label2}</span></button>`).join("");
     const dirty2 = anyDirty();
     const KEEP2 = [".gw-body", ".gw-tree", ".gw-list", ".nw-groups"];
     const sameNode = lastDrawn === edUi.node;
@@ -1607,7 +1695,7 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       ${noticeHtml}
       <div class="gw-top-right">${right}</div>
     </header>`;
-    const tabTools = TABS2.map(([id2, label2, icon2]) => `<button class="ph-tool" data-action="ed-tab" data-value="${id2}" aria-pressed="${tab2 === id2}" aria-label="${label2}" title="${label2}">${icon2}<span class="ph-tool-l">${label2}</span></button>`).join("");
+    const tabTools = TABS2.map(([id2, label2, icon]) => `<button class="ph-tool" data-action="ed-tab" data-value="${id2}" aria-pressed="${tab2 === id2}" aria-label="${label2}" title="${label2}">${icon}<span class="ph-tool-l">${label2}</span></button>`).join("");
     const foot = phone2 ? `${drawerHtml(tabTools, "", "gw-tabdrawer")}${host2.mobileNav?.() ?? ""}` : "";
     const html = `<div class="gw-win${edUi.drawer ? " drawer" : ""}${phone2 ? " phone" : ""}">
     ${top}
@@ -1949,9 +2037,9 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
     return `<i class="gx-evdep${cls ? ` ${cls}` : ""}${ours.length && others.length ? " mix" : ""}" title="${esc33(title2)}" aria-label="${esc33(title2)}">${ICONS.person}</i>`;
   }
   function artCard(c) {
-    const key2 = c.key ? esc33(c.key) : "";
+    const key = c.key ? esc33(c.key) : "";
     if (c.pop) seen.set(c.pop, c);
-    const act = c.pop ? ` data-action="ev-pop" data-value="${esc33(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key2}"` : "";
+    const act = c.pop ? ` data-action="ev-pop" data-value="${esc33(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : "";
     const line3 = (c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc33(c.art.desc)}</span>` : "")).replace(/^<span class="gx-evc-sit"([^>]*)>([^<]*)<\/span>$/, (_m, attr, t) => `<span class="gx-evc-sit gx-flow"${attr}><span data-t="${t}">${t}</span></span>`);
     return `<li class="gx-evc art${act ? " go" : ""}${c.selected ? " sel" : ""}${c.ended ? " wait ended" : c.key ? " live" : " wait"}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
@@ -1965,17 +2053,17 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       if (b) Object.assign(aimHit, { key: b.dataset.key ?? "", wasOn: b.classList.contains("on"), used: false });
     }, true);
   }
-  function aimMark(on2, action, value, key2 = value) {
+  function aimMark(on2, action, value, key = value) {
     const label2 = on2 ? "해제" : "선택";
-    const fx = !aimHit.used && aimHit.key === key2 && aimHit.wasOn !== on2;
+    const fx = !aimHit.used && aimHit.key === key && aimHit.wasOn !== on2;
     if (fx) aimHit.used = true;
-    return `<button class="gx-aim${on2 ? " on" : ""}${fx ? " fx" : ""}" data-action="${action}" data-value="${esc33(value)}" data-key="${esc33(key2)}" aria-pressed="${on2}" title="${label2}" aria-label="${label2}">
+    return `<button class="gx-aim${on2 ? " on" : ""}${fx ? " fx" : ""}" data-action="${action}" data-value="${esc33(value)}" data-key="${esc33(key)}" aria-pressed="${on2}" title="${label2}" aria-label="${label2}">
     <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst b1" cx="50" cy="50" r="34"/><circle class="burst b2" cx="50" cy="50" r="34"/><circle class="burst b3" cx="50" cy="50" r="34"/><circle class="ping" cx="50" cy="50" r="10"/><path class="sweep" d="M50 50L50 4A46 46 0 0 1 73 10.2Z"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg></button>`;
   }
   var AIM_LOCK_MS = 1500;
   var AIM_RELEASE_MS = 900;
-  async function aimFlash(key2) {
-    const b = [...document.querySelectorAll(".gx-aim")].find((x) => x.dataset.key === key2 && x.getBoundingClientRect().width > 0);
+  async function aimFlash(key) {
+    const b = [...document.querySelectorAll(".gx-aim")].find((x) => x.dataset.key === key && x.getBoundingClientRect().width > 0);
     if (!b || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const on2 = !b.classList.contains("on");
     b.classList.toggle("on", on2);
@@ -2006,11 +2094,11 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
     if (!c.key) {
       return `<li class="gx-evc">${mark2}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
     }
-    const key2 = esc33(c.key);
+    const key = esc33(c.key);
     const acts = `<span class="gx-evc-act">
       ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc33(c.name)}" title="위키" aria-label="${esc33(c.name)} 위키">${ICONS.wiki}</button>` : ""}
-      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key2}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key2}" title="상황 종료" aria-label="${esc33(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
-    const open3 = c.open ? ` data-action="${c.open}" data-value="${key2}"` : "";
+      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc33(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
+    const open3 = c.open ? ` data-action="${c.open}" data-value="${key}"` : "";
     return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open3}>${mark2}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
     <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
   }
@@ -2030,7 +2118,7 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
   }
   var camNo2 = (loc) => String(Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89 + 10).padStart(2, "0");
   function headSeg(action, cur, items) {
-    return `<span class="gx-hseg" role="tablist">${items.map(([v, label2, icon2]) => `<button role="tab" class="${cur === v ? "on" : ""}" data-action="${action}" data-value="${v}" aria-selected="${cur === v}" title="${label2}" aria-label="${label2}">${icon2}</button>`).join("")}</span>`;
+    return `<span class="gx-hseg" role="tablist">${items.map(([v, label2, icon]) => `<button role="tab" class="${cur === v ? "on" : ""}" data-action="${action}" data-value="${v}" aria-selected="${cur === v}" title="${label2}" aria-label="${label2}">${icon}</button>`).join("")}</span>`;
   }
   function whoLine(chips3 = "") {
     const items = chipItems(chips3).map((h) => {
@@ -2044,11 +2132,11 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
     return `<div class="gx-oposd"><span class="l1">${sig}<span class="cam">${cam}</span></span>${clock3 ? `<span class="ts">${esc33(clock3)}</span>` : ""}</div>`;
   }
   function evBtns(c) {
-    const key2 = c.key ? esc33(c.key) : "";
+    const key = c.key ? esc33(c.key) : "";
     const name = esc33(c.name);
     return `${c.rpt ? `<button class="gx-evbtn" data-action="rec-open" data-value="${esc33(c.rpt)}" title="보고서" aria-label="${name} 보고서">${ICONS.records}</button>` : ""}
     ${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
   }
   var STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
   var SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
@@ -2192,9 +2280,9 @@ onst on2 = !readReports(ctx2.chat).items.find((r) => r.id === v)?.pin;
       for (const box2 of root3.querySelectorAll(".gx-flow")) {
         const inner = box2.firstElementChild;
         if (!inner) continue;
-        const key2 = `${box2.clientWidth}|${inner.dataset.t ?? ""}`;
-        if (box2.dataset.fk === key2) continue;
-        box2.dataset.fk = key2;
+        const key = `${box2.clientWidth}|${inner.dataset.t ?? ""}`;
+        if (box2.dataset.fk === key) continue;
+        box2.dataset.fk = key;
         if (box2.classList.contains("gx-agrow-msg")) {
           box2.classList.remove("on");
           box2.classList.add("two");
@@ -2897,54 +2985,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-group small { font-family: var(--mono); font-size: 12px; color: var(--dim); font-weight: 500; }
 .dir-row { border-radius: 14px; border: 1px solid var(--line); background: var(--panel); overflow: hidden; }
 .dir-row.open { border-color: var(--accent-line); }
-.dir-head { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px; border: 0; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
-.dir-head .gx-ava { width: 40px; height: 40px; font-size: 15px; }
-.dir-headrow { display: flex; align-items: center; }
-.dir-headrow > .dir-head { flex: 1; min-width: 0; }
-/* 요원 순서: PC는 손잡이(끌기), 모바일은 ▲▼ */
-.dir-move { display: flex; align-items: center; gap: 2px; padding-right: 8px; flex: none; }
-.dir-grip { display: grid; place-items: center; width: 28px; height: 40px; border-radius: 8px; color: var(--dim); cursor: grab; touch-action: none; }
-.dir-grip:hover { color: var(--text); background: var(--panel2); }
-.dir-step { display: none; place-items: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel2); color: var(--sub); }
-.dir-step:disabled { opacity: .35; }
-.dir-step svg { width: 18px; height: 18px; }
-.dir-row.dragging { opacity: .45; }
-.dir-row.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
-.dir-row.drop-after { box-shadow: 0 3px 0 0 var(--signal); }
-.gx.dir-dragging, .gx.dir-dragging * { cursor: grabbing !important; user-select: none; }
-@media (max-width: 760px), (pointer: coarse) {
-  .dir-grip { display: none; }
-  .dir-step { display: grid; }
-}
-.dir-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.dir-name b { font-size: 16px; font-weight: 600; }
-.dir-name small { font-size: 13px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dir-panel { display: flex; flex-direction: column; gap: 10px; padding: 4px 14px 14px; border-top: 1px solid var(--panel2); }
-.dir-panel > .gx-muted { margin: -4px 0 0; font-size: 13px; }
-.dir-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 8px; }
-.dir-line > span { font-size: 14px; color: var(--sub); font-weight: 600; min-width: 9em; }
-.dir-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.dir-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
-.dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.dir-grid > * { min-width: 0; }
-.dir-grid input { width: 100%; box-sizing: border-box; }
-.dir-grid.names { grid-template-columns: repeat(3, 1fr); }
-.dir-in { display: flex; flex-direction: column; gap: 4px; }
-.dir-in > span { font-size: 13px; color: var(--sub); font-weight: 600; }
-.dir-in input { min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; }
-.dir-in small { font-size: 12px; color: var(--dim); }
-.dir-empty { padding: 16px 4px; }
-.dir-kinds .gx-seg { white-space: nowrap; padding: 0 6px; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .dir-grid { grid-template-columns: 1fr; }
-  .dir-grid.names { grid-template-columns: 1fr 1fr; }
-  .dir-kinds .long { display: none; }
-  /* 탭 6개: 모바일은 세 개씩 두 줄 */
-  .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
-  .dir-kinds .gx-seg { min-height: var(--ctl-sm); font-size: 14px; border-radius: 8px; }
-  .dir-line > span { min-width: 0; flex-basis: 100%; }
-}
-.dir-group.warn { color: var(--amber); }
-.dir-alert { width: 100%; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); background: var(--amber-bg); color: var(--amber); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
-.dir-add, .dir-rename { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
-.dir-add input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel
+.dir-head { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px; border: 0;

@@ -74,21 +74,10 @@ export function resetRecords(): void {
   closeToast();
 }
 
-/** 앞뒤 이동·즐겨찾기에 적는 위치 */
+/** 앞뒤 이동 기록에 적는 위치 */
 export const recordsNav = (): RecordsNav => ({ sub: rec.sub, view: rec.view, id: rec.id });
 export function applyRecordsNav(r: RecordsNav): void {
-  // 옛 즐겨찾기·이동 기록의 「보고서」 하위 탭은 일지로
-  const sub: RecSub = (r.sub as string) === 'reports' ? 'journal' : r.sub;
-  Object.assign(rec, { sub, view: r.view, id: r.id, notice: '' });
-}
-
-/** 즐겨찾기 이름 */
-export function recordsMarkName(r: RecordsNav, chat: Chat | null): string {
-  if (r.view === 'report') return `보고서 ${(chat && readReports(chat).items.find((x) => x.id === r.id)?.no) || ''}`.trim();
-  if (r.view === 'person') return `${r.id} 기록`;
-  if (r.view === 'docs') return '기록 문서';
-  if (r.view === 'faction') return `세력 ${r.id}`;
-  return r.sub === 'journal' ? '일지' : r.sub === 'chronicle' ? '연대기' : r.sub === 'wallet' ? '가계부' : r.sub === 'people' ? '이 채팅의 인물' : '세력';
+  Object.assign(rec, { sub: r.sub, view: r.view, id: r.id, notice: '' });
 }
 
 // ── 시각·글 도우미 ──
@@ -131,7 +120,7 @@ function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
 
 // ── 화면 ──
 
-/** 가계부는 2026-11-07부터 소지품 메뉴의 하위 탭 (ui/items.ts). 옛 이동 기록의 wallet 은 app.ts openable() 이 소지품으로 돌린다 */
+/** 가계부는 2026-11-07부터 소지품 메뉴의 하위 탭 (ui/items.ts). */
 const SUBS: [RecSub, string][] = [['journal', '일지'], ['chronicle', '연대기'], ['people', '인물'], ['factions', '세력']];
 
 export function recordsTab(ctx: ChatContext): string {

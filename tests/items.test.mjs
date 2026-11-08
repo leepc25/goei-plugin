@@ -146,7 +146,13 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.equal(out[2].role, 'system');
   assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
   assert.equal(withInventory(out, chat), out);
-  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } }).length, 3, '끄면 안 넣는다');
+  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_on: '0' } }).length, 3, '끄면 안 넣는다');
+  // 넘기기를 꺼도 상점이 켜져 있으면 물건 목록 없이 상점 지침만 ([Shop])
+  { const s = withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } });
+    assert.equal(s.length, 4);
+    assert.match(s[2].content, /^\[Shop\]\n[\s\S]*\[shop: 가게 이름\|주인 이름\]/);
+    assert.doesNotMatch(s[2].content, /소금 봉지|\[Inventory\]/);
+    assert.equal(withInventory(s, chat), s); }
   // 응답이 붙은 뒤: 사용 기록(id·횟수)이 응답에 묶이고, 다 써서 목록에서 빠진다
   chat.message.push({ role: 'char', data: '뿌렸다', chatId: 'b2' });
   const vars = settleItemUse(chat, 3);
@@ -167,4 +173,18 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   chat.message.push({ role: 'user', data: '다음', chatId: 'u3' }, { role: 'char', data: '응', chatId: 'b4' });
   assert.deepEqual(pendingItemUse(chat.scriptstate, 'u3'), []);
   assert.deepEqual(settleItemUse(chat, 5), { $st_item_use: '', [ITEM_USE_AT_VAR]: '' });
+});
+
+// 11-08 전수점검: 상점에 판 물건은 판 응답에 묶여 숨고, 그 응답이 사라지면 돌아온다
+test('팔기: 판 응답이 살아 있는 동안만 숨고 장착 칸에서 빠진다', async () => {
+  const { sellItem } = await import('../dist-test/core.mjs');
+  let it = addItem(empty, alive, { name: '단검', equip: 'weapon', from: 'manual', anchor: '', wear: true });
+  const id = it.list[0].id;
+  assert.equal(equippedOf(liveItems(it, alive)).weapon[0]?.id, id);
+  it = sellItem(it, id, 'c2', '철물점에 팖');
+  assert.equal(liveItems(it, alive).length, 0);
+  assert.equal(it.log.at(-1).what, 'sell');
+  const back = liveItems(it, new Set(['c1']));
+  assert.deepEqual(back.map((e) => e.name), ['단검']);
+  assert.equal(back[0].slot, undefined);
 });

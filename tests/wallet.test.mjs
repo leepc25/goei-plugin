@@ -81,3 +81,19 @@ test('필드 거래: 장면 이름·필드 시각을 같이 적는다 (길면 �
   const bare = withFieldTrade({ start: 0, log: [] }, 'c1', -1200, '삼각김밥', 'f_2');
   assert.equal('place' in bare.log[0], false);
 });
+
+// 11-08 전수점검: 상태창 잔고 맞춤은 마지막 응답만 보고, 그 응답 뒤 상점 거래(같은 응답의 store 줄)는 되돌리지 않는다
+test('상태창 잔고 맞춤: 마지막 응답만, 상점 거래는 남김', async () => {
+  const { syncWalletToStatus } = await import('../dist-test/core.mjs');
+  const tag = (n) => `본문\n[▣|2025.01.01|10:15 PM|🌫️|9°C|거리|없음|없음|대기|관리국/요원|${n}]`;
+  const c = { message: [{ role: 'user', data: 'a', chatId: 'u1' }, { role: 'char', data: tag(100000), chatId: 'c1' }] };
+  let w = syncWalletToStatus({ start: 50000, log: [] }, c);
+  assert.equal(walletBalance(w, aliveAnchors(c)), 100000);
+  // 그 응답 뒤 상점에서 30,000 원어치 산 뒤 다시 맞춰도(갱신기가 늦게 끝남) 산 값은 그대로
+  w = addWalletEntry(w, { id: 'st_1', anchor: 'c1', amount: -30000, memo: '손전등', src: 'store' });
+  const again = syncWalletToStatus(w, c);
+  assert.equal(walletBalance(again ?? w, aliveAnchors(c)), 70000);
+  // 다음 응답에 잔고 칸이 없으면 지난 응답 값으로 거슬러 맞추지 않는다
+  const c2 = { message: [...c.message, { role: 'user', data: 'b', chatId: 'u2' }, { role: 'char', data: '칸 없는 응답', chatId: 'c2' }] };
+  assert.equal(syncWalletToStatus(w, c2), null);
+});

@@ -146,7 +146,9 @@ const box = (page, sel) => page.locator(sel).first().boundingBox();
   const { page } = await boot(fixture, chat(), { width: 390, height: 844 });
   await page.evaluate(() => { window.__store['p:goei:prefs'] = JSON.stringify({ ...(JSON.parse(window.__store['p:goei:prefs'] || '{}')) }); });
   await open(page);
-  await page.locator('[data-value="wiki"]:visible').first().click();
+  // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
+  await page.click('.gx-cgrip');
+  await page.click('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
   await page.waitForSelector('.nw-edge');
   const edge = await box(page, '.nw-edge');
   assert.ok(edge.x > 300, '모바일 책갈피는 오른쪽');

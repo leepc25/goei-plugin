@@ -116,10 +116,6 @@ export interface Prefs {
   /** 이미지를 띄울 최근 메시지 수·요청에 이미지 태그를 남길 최근 메시지 수 (0이면 전부, 없으면 6) */
   imgShow?: number;
   imgSend?: number;
-  /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
-  marks?: Mark[];
-  /** 기본 즐겨찾기(DEFAULT_MARKS)를 이 기기에 한 번 채웠나. 채운 뒤에는 지워도 다시 넣지 않는다 (2026-10-29 사용자) */
-  marksSeeded?: boolean;
   /** 종료 알림(보고서가 기록에 저장됐어요)을 이미 띄운 보고서 id (최근 50). 2026-11-05 사용자: 한 번 본 알림이 다시 뜨지 않게 기기에 남긴다 */
   noticedReports?: string[];
   /** 마지막에 고른 아바타 (인물 팩 번호, 이 기기 공통). 새 채팅 시작 패널에서 기본으로 골라 둔다 (2026-11-08 사용자) */
@@ -143,19 +139,6 @@ export interface Prefs {
   frame?: 'none' | 'tablet' | 'tactical';
 }
 
-/** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
-export interface Mark {
-  s: { tab: string } & Record<string, unknown>;
-  name: string;
-}
-export const MARK_MAX = 5;
-/** 즐겨찾기 기본값 (2026-10-29 사용자; 2026-11-05 필드 제거로 「필드」 칸 뺌): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
-export const DEFAULT_MARKS: Mark[] = [
-  // 2026-11-05 사용자: 폰 상황판 서랍은 오른쪽부터 설정·기록, 왼쪽 세 칸은 비워 둔다 (가계부 기본 칸도 뺌)
-  { s: { tab: 'records' }, name: '기록' },
-  { s: { tab: 'settings' }, name: '설정' },
-];
-
 /** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
 export const DIM_DEFAULT = 50;
 export const DIM_STEPS = [0, 25, 50, 75, 100];
@@ -163,7 +146,7 @@ export const DIM_STEPS = [0, 25, 50, 75, 100];
 let prefs: Prefs = { basic: {}, world: {} };
 
 /** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
-export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -217,14 +200,6 @@ export function setPrefs(raw: unknown): Prefs {
   const imgFoldLock = o.imgFoldLock === true ? true : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
-  const savedMarks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
-    .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
-    .slice(0, MARK_MAX)
-    .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-  // 기본 즐겨찾기는 기기마다 한 번만: 이미 있는 것은 두고 빠진 기본 항목만 빈칸에 붙인다. 한 번 채운 뒤(marksSeeded)엔 손대지 않는다
-  const marks: Mark[] = o.marksSeeded === true
-    ? savedMarks
-    : [...savedMarks, ...DEFAULT_MARKS.filter((d) => !savedMarks.some((m) => JSON.stringify(m.s) === JSON.stringify(d.s)))].slice(0, MARK_MAX);
   const strList = (v: unknown, max: number, len: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : []);
   const imgPrompt = typeof o.imgPrompt === 'string' && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6000) : undefined;
   const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -249,7 +224,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}) };
   return prefs;
 }
 

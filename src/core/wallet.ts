@@ -144,9 +144,12 @@ export function syncWalletToStatus(w: Wallet, chat: Chat): Wallet | null {
   const msgs = chat.message ?? [];
   let anchor = '';
   let target: number | null = null;
-  for (let i = msgs.length - 1; i >= 0 && target === null; i--) {
+  // 마지막 응답의 상태창만 본다 (11-08 전수점검): 마지막 응답에 잔고 칸이 없을 때 지난 응답까지 거슬러 올라가 그 값으로 다시 맞추면,
+  // 그 뒤에 적힌 거래(상점에서 산 것 등)가 「상태창 잔고」 줄로 되돌려졌다. 칸이 없으면 이미 적힌 맞춤 줄을 그대로 둔다
+  let i = msgs.length - 1;
+  while (i >= 0 && msgs[i].role === 'user') i--;
+  if (i >= 0) {
     const m = msgs[i];
-    if (m.role === 'user') continue;
     const tags = findStatusTags(typeof m.data === 'string' ? m.data : '');
     for (let k = tags.length - 1; k >= 0; k--) {
       const n = tags[k].wallet ? Number(tags[k].wallet) : NaN;
@@ -160,7 +163,11 @@ export function syncWalletToStatus(w: Wallet, chat: Chat): Wallet | null {
   if (target === null) return null;
   const id = syncId(anchor);
   const base = removeWalletEntry(w, id);
-  const diff = target - walletBalance(base, aliveAnchors(chat));
+  // 그 응답 뒤 상점에서 사고판 거래(같은 응답에 묶인 store 줄)는 상태창이 쓰인 다음 일이라 맞춤 셈에서 뺀다 —
+  // 갱신기가 늦게 끝나 다시 맞출 때 방금 산 값이 「상태창 잔고」 줄로 되돌려지지 않게
+  const alive = aliveAnchors(chat);
+  const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
+  const diff = target - walletBalance(before, alive);
   const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: 'story' });
   return JSON.stringify(next) === JSON.stringify(w) ? null : next;
 }

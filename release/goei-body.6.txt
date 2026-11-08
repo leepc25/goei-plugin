@@ -1,4 +1,12 @@
-D = "%%/SCENE_CARD%%";
+turn { messages, changed: false };
+    const out = [];
+    for (let i = 0; i < messages.length; i++) {
+      const m = messages[i];
+      if (m?.role !== "user" || !hasSceneCard(m.content)) {
+        out.push(m);
+        continue;
+      }
+      const END = "%%/SCENE_CARD%%";
       const end = m.content.lastIndexOf(END);
       const tail2 = end >= 0 ? m.content.slice(end + END.length).trim() : "";
       let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
@@ -222,16 +230,16 @@ ${next.content.trim()}`;
   var hangul = (s8) => /[가-힣]/.test(s8);
   var syllables = (s8) => [...s8.replace(/\s+/g, "")].length;
   var escRe = (s8) => s8.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  function keyRegex(key2, en2, person = false) {
+  function keyRegex(key, en2, person = false) {
     if (en2) {
-      const words = key2.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
+      const words = key.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
       if (!words.length || words.every((w) => EN_STOP.has(w))) return null;
       const body6 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
       return new RegExp(`(?<![a-z0-9])${body6}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
     }
-    const parts = key2.split(/\s+/).filter(Boolean);
+    const parts = key.split(/\s+/).filter(Boolean);
     if (!parts.length) return null;
-    const gap = !person && syllables(key2) >= 3 ? "\\s*" : "";
+    const gap = !person && syllables(key) >= 3 ? "\\s*" : "";
     const word = (p2) => [...p2].map(escRe).join(gap);
     const body5 = parts.map((p2, i) => i < parts.length - 1 && p2.endsWith("의") && [...p2].length >= 3 ? `${word(p2.slice(0, -1))}(?:의)?` : word(p2)).join("\\s*");
     return new RegExp(`(?<![\\p{L}\\p{N}])${body5}`, "giu");
@@ -369,18 +377,18 @@ ${content}` };
     const lower = text4.toLowerCase();
     const hits = [];
     entries2.forEach((e, ei) => {
-      for (const key2 of e.keys) {
-        key2.re.lastIndex = 0;
-        for (const m of lower.matchAll(key2.re)) {
+      for (const key of e.keys) {
+        key.re.lastIndex = 0;
+        for (const m of lower.matchAll(key.re)) {
           const start3 = m.index ?? 0;
           const end = start3 + m[0].length;
-          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start3 - 16), start3)) } : rightOk(lower, end);
+          const r = key.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start3 - 16), start3)) } : rightOk(lower, end);
           if (!r.ok) continue;
           const tail2 = lower.slice(end).replace(/^\s+/, "");
           const quoted = OPEN.includes(lower[start3 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
           const before = lower.slice(Math.max(0, start3 - 20), start3).trimEnd();
           const marked = quoted || MARKERS2.some((w) => tail2.startsWith(w)) || e.groups.some((g2) => g2 && before.endsWith(g2.toLowerCase()));
-          hits.push({ entry: ei, key: key2, start: start3, end, marked, honor: r.honor, snippet: around(text4, start3, end) });
+          hits.push({ entry: ei, key, start: start3, end, marked, honor: r.honor, snippet: around(text4, start3, end) });
         }
       }
     });
@@ -430,10 +438,10 @@ ${content}` };
   function pickLore(entries2, messages, state, o, inputLast = false) {
     const window2 = messages.slice(-Math.max(1, o.depth));
     const picks = /* @__PURE__ */ new Map();
-    const add = (i, why, key2, snippet, score2) => {
+    const add = (i, why, key, snippet, score2) => {
       const p2 = picks.get(i) ?? { entry: entries2[i], score: 0, reasons: [] };
       p2.score += score2;
-      if (!p2.reasons.some((r) => r.why === why && r.key === key2)) p2.reasons.push({ why, key: key2, snippet });
+      if (!p2.reasons.some((r) => r.why === why && r.key === key)) p2.reasons.push({ why, key, snippet });
       picks.set(i, p2);
     };
     entries2.forEach((e, i) => {
@@ -517,8 +525,8 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
     for (const entry3 of entries2) {
       const reasons = [];
       for (const k of entry3.rawKeys) {
-        const key2 = squash5(k);
-        const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
+        const key = squash5(k);
+        const at = key ? window2.find((w) => w.flat.includes(key)) : void 0;
         if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
       }
       if (reasons.length) out.push({ entry: entry3, score: 0, reasons });
@@ -624,8 +632,8 @@ ${after}`);
 ${block3.trim()}` };
     const keys = (Array.isArray(firstChat) ? firstChat : [firstChat]).map((k) => (k ?? "").trim().slice(0, 80)).filter(Boolean);
     let at = -1;
-    for (const key2 of keys) {
-      at = messages.findIndex((m) => m?.role !== "system" && typeof m?.content === "string" && m.content.includes(key2));
+    for (const key of keys) {
+      at = messages.findIndex((m) => m?.role !== "system" && typeof m?.content === "string" && m.content.includes(key));
       if (at >= 0) break;
     }
     if (at < 0) at = messages.findIndex((m) => m?.role !== "system");
@@ -674,8 +682,8 @@ ${block3.trim()}` };
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc39 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc39}\\b` : esc39, "g");
+      const esc38 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc38}\\b` : esc38, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -1195,8 +1203,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
     if (!rows3 && !showMenu) return "";
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows3}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
-  function attachInput(items, key2, value) {
-    const row9 = items[Number(key2)];
+  function attachInput(items, key, value) {
+    const row9 = items[Number(key)];
     if (!row9) return false;
     row9.content = value;
     return true;
@@ -1253,15 +1261,15 @@ ${JSON.stringify(previousRoom ?? "")}`)
     box2.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
     const close3 = () => {
       box2.remove();
-      document.removeEventListener("keydown", key2, true);
+      document.removeEventListener("keydown", key, true);
     };
-    const key2 = (ev) => {
+    const key = (ev) => {
       if (ev.key !== "Escape") return;
       ev.stopPropagation();
       close3();
     };
     box2.addEventListener("click", close3);
-    document.addEventListener("keydown", key2, true);
+    document.addEventListener("keydown", key, true);
     document.body.appendChild(box2);
   }
   function card(kind, text4, asset) {
@@ -1429,13 +1437,13 @@ ${JSON.stringify(previousRoom ?? "")}`)
   function assetUrl(char, name) {
     const row9 = findRow(char, name);
     if (!row9) return Promise.resolve(null);
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row9[1]}`;
-    let hit3 = cache7.get(key2);
+    const key = `${String(char.chaId ?? char.name ?? "")}|${row9[1]}`;
+    let hit3 = cache7.get(key);
     if (!hit3) {
       hit3 = load(row9[1], String(row9[2] ?? row9[1].split(".").pop() ?? ""));
-      cache7.set(key2, hit3);
+      cache7.set(key, hit3);
       void hit3.then((url) => {
-        if (!url) cache7.delete(key2);
+        if (!url) cache7.delete(key);
       });
     }
     return hit3;
@@ -1495,14 +1503,14 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   function imageUrl(char, pic2) {
     if (!pic2) return null;
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic2}`;
-    const hit3 = urls.get(key2);
+    const key = `${String(char.chaId ?? char.name ?? "")}|${pic2}`;
+    const hit3 = urls.get(key);
     if (hit3 === void 0) {
-      urls.set(key2, "loading");
+      urls.set(key, "loading");
       const { name, crop, tall } = splitPic(pic2);
       void assetUrl(char, name).then(async (raw) => {
         const url = raw ? await shrink(raw, crop, tall) : null;
-        urls.set(key2, url);
+        urls.set(key, url);
         if (url) schedule();
       });
       return null;
@@ -1613,7 +1621,7 @@ ${JSON.stringify(previousRoom ?? "")}`)
     jr: ["$jr_"]
   };
   var MAIN_PREFIXES = ["$gen_", "$pp_", "$it_"];
-  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, ...Object.values(PREFIXES).flat()])];
+  var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, "$st_col_", "$st_wallet_", "$sh_", ...Object.values(PREFIXES).flat()])];
   var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", pp: "인물 기록", jr: "기록" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane2, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane2}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane2}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}기본값 불러오기</button></span>`;
@@ -1654,41 +1662,37 @@ ${JSON.stringify(previousRoom ?? "")}`)
   // src/ui/toast.ts
   var esc6 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var timers = /* @__PURE__ */ new Map();
-  function toast(key2, text4, clear) {
+  function toast(key, text4, clear) {
     if (!text4) return "";
-    const cur = timers.get(key2);
+    const cur = timers.get(key);
     if (!cur || cur.text !== text4) {
       if (cur) clearTimeout(cur.id);
       const ms = Math.min(8e3, 2500 + [...text4].length * 50);
       const id2 = setTimeout(() => {
-        timers.delete(key2);
+        timers.delete(key);
         clear(text4);
-        const el = document.querySelector(`.gx-toast[data-toast="${key2}"]`);
+        const el = document.querySelector(`.gx-toast[data-toast="${key}"]`);
         if (!el) return;
         el.classList.add("out");
         setTimeout(() => {
-          if (el.matches(`.gx-toast[data-toast="${key2}"]`)) el.remove();
+          if (el.matches(`.gx-toast[data-toast="${key}"]`)) el.remove();
         }, 300);
       }, ms);
-      timers.set(key2, { text: text4, id: id2 });
+      timers.set(key, { text: text4, id: id2 });
     }
-    return `<div class="gx-toast gn-notice" data-toast="${key2}" role="status">${esc6(text4)}</div>`;
+    return `<div class="gx-toast gn-notice" data-toast="${key}" role="status">${esc6(text4)}</div>`;
   }
 
   // src/ui/drawer.ts
   var opened = /* @__PURE__ */ new Map();
-  function shell(key2, cls, inner) {
-    return `<div class="ph-drawer open${cls ? ` ${cls}` : ""}" data-drawer="${key2}">${inner}</div>`;
+  function shell(key, cls, inner) {
+    return `<div class="ph-drawer open${cls ? ` ${cls}` : ""}" data-drawer="${key}">${inner}</div>`;
   }
-  function drawerHtml(tools, above = "", cls = "", key2 = cls || "tools") {
-    return shell(key2, cls, `${above}<div class="ph-tools">${tools}</div>`);
+  function drawerHtml(tools, above = "", cls = "", key = cls || "tools") {
+    return shell(key, cls, `${above}<div class="ph-tools">${tools}</div>`);
   }
-  function drawerBox(content, cls = "", after = "", key2 = cls || "box") {
-    return shell(key2, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
-  }
-  function closeDrawer(key2) {
-    if (key2 === void 0) opened.clear();
-    else opened.set(key2, false);
+  function drawerBox(content, cls = "", after = "", key = cls || "box") {
+    return shell(key, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
   }
   function set(box2, on2) {
     opened.set(box2.dataset.drawer ?? "tools", on2);
@@ -1697,24 +1701,20 @@ ${JSON.stringify(previousRoom ?? "")}`)
     grip?.setAttribute("aria-expanded", String(on2));
     grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
   }
-  function bindDrawer(root3, onSide) {
+  function bindDrawer(root3) {
     const box2 = root3.querySelector(".ph-drawer");
     const grip = box2?.querySelector(".ph-grip");
     if (!box2 || !grip) return;
     const open3 = () => box2.classList.contains("open");
     grip.addEventListener("click", () => set(box2, !open3()));
     let y0 = null;
-    let x0 = 0;
     box2.addEventListener("touchstart", (e) => {
       y0 = e.touches[0]?.clientY ?? null;
-      x0 = e.touches[0]?.clientX ?? 0;
     }, { passive: true });
     box2.addEventListener("touchend", (e) => {
       if (y0 === null) return;
       const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
-      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
       y0 = null;
-      if (onSide && open3() && box2.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
       if (dy < -24 && !open3()) set(box2, true);
       else if (dy > 24 && open3()) set(box2, false);
     }, { passive: true });
@@ -1990,13 +1990,13 @@ ${RETRY_ANALYZE}` }
 
   // src/ui/panels.ts
   var open2 = /* @__PURE__ */ new Set();
-  var keepOpen = (key2, fallback = false) => open2.has(key2) || fallback && !open2.has(`!${key2}`) ? " open" : "";
+  var keepOpen = (key, fallback = false) => open2.has(key) || fallback && !open2.has(`!${key}`) ? " open" : "";
   function rememberPanel(el) {
-    const key2 = el.dataset.keep;
-    if (!key2) return;
-    open2.delete(key2);
-    open2.delete(`!${key2}`);
-    open2.add(el.open ? key2 : `!${key2}`);
+    const key = el.dataset.keep;
+    if (!key) return;
+    open2.delete(key);
+    open2.delete(`!${key}`);
+    open2.add(el.open ? key : `!${key}`);
   }
 
   // src/ui/advanced.ts
@@ -2074,8 +2074,8 @@ ${RETRY_ANALYZE}` }
       const hit3 = parse2(v);
       if (hit3) vars = { [advVar(hit3[0], hit3[1])]: hit3[2] };
     } else if (action === "adv-reset") {
-      const [f, key2] = v.split(":");
-      const item2 = f in ADV ? advItem(f, key2) : void 0;
+      const [f, key] = v.split(":");
+      const item2 = f in ADV ? advItem(f, key) : void 0;
       if (item2) vars = { [advVar(f, item2)]: blank2(item2) };
     } else if (action === "adv-reset-yes") {
       advUi.confirm = "";
@@ -2201,13 +2201,13 @@ ${RETRY_ANALYZE}` }
   }
   var token = () => `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
   async function run(ctx2, env3, label2, work) {
-    const key2 = chatKey(ctx2);
-    if (jobs.has(key2)) {
-      phone.notice = `${jobs.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+    const key = chatKey(ctx2);
+    if (jobs.has(key)) {
+      phone.notice = `${jobs.get(key)} 끝난 뒤 다시 눌러 주세요.`;
       env3.render();
       return false;
     }
-    jobs.set(key2, label2);
+    jobs.set(key, label2);
     phone.notice = "";
     phone.failure = null;
     env3.render();
@@ -2219,7 +2219,7 @@ ${RETRY_ANALYZE}` }
       const raw = error.raw;
       if (raw) phone.failure = { label: label2, reason: msg, raw };
     } finally {
-      jobs.delete(key2);
+      jobs.delete(key);
       await env3.refresh();
     }
     return true;
@@ -2476,13 +2476,13 @@ ${RETRY_ANALYZE}` }
         received += commitInvitations(cur, result.invitations, time2);
         const b = readBulletins(chat);
         const notices = commitAnnouncements(b, cur, result.announcements, plan.announce, time2);
-        const marks3 = {
+        const marks2 = {
           ...unsolicitedGot ? cooldownMark(chat, "incoming") : {},
           ...result.invitations.length ? cooldownMark(chat, "invitation") : {},
           ...notices ? cooldownMark(chat, "announcement") : {}
         };
         note = received || result.invitations.length || notices ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.` : automatic ? "" : "새 메시지가 없어요.";
-        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks3, ...habitVars(chat, refreshRaw, [...plan.selected.values()]) });
+        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks2, ...habitVars(chat, refreshRaw, [...plan.selected.values()]) });
       });
       return note;
     });
@@ -2621,7 +2621,7 @@ ${RETRY_ANALYZE}` }
   function matches(c, q, fnames) {
     return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
   }
-  var tool = (action, icon2, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var tool = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var badge = (n2) => n2 > 0 ? `<span class="ph-badge">${n2 > 99 ? "99+" : n2}</span>` : "";
   function chips2(action, cur, items) {
     return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc8(t.id)}" aria-selected="${t.id === cur}">${esc8(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
@@ -2982,10 +2982,10 @@ ${RETRY_ANALYZE}` }
     open: "채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
     "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
   };
-  function seg(key2, cur, items) {
-    const sw = onOffSwitch(items, cur, "ph-cfg", (v) => `${key2}=${v}`);
+  function seg(key, cur, items) {
+    const sw = onOffSwitch(items, cur, "ph-cfg", (v) => `${key}=${v}`);
     if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var row2 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
   var group = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
@@ -3390,8 +3390,8 @@ ${RETRY_ANALYZE}` }
       return env3.render();
     }
     const d = dir(ctx2);
-    const key2 = name.toLowerCase();
-    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key2 || c.terms.some((t) => t.toLowerCase() === key2));
+    const key = name.toLowerCase();
+    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key || c.terms.some((t) => t.toLowerCase() === key));
     if (found.length > 1) {
       phone.notice = "같은 이름의 연락처가 여럿이에요. 정확한 이름을 적어 주세요.";
       return env3.render();
@@ -3426,13 +3426,13 @@ ${RETRY_ANALYZE}` }
     phone.notice = "연락처와 1:1 대화 기록을 지웠어요.";
     await env3.refresh();
   }
-  function phoneInput(name, value, key2) {
+  function phoneInput(name, value, key) {
     switch (name) {
       case "ph-draft":
         phone.draft = value;
         return true;
       case "ph-att":
-        return attachInput(phone.attach, key2, value);
+        return attachInput(phone.attach, key, value);
       case "ph-topic":
         phone.topic = value;
         return true;
@@ -3633,9 +3633,9 @@ ${RETRY_ANALYZE}` }
     return fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source2(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s8, catalogNames, registry(ctx2)));
   }
   async function generate3(ctx2, env3, title2, regenerate, docRequest = "", usePrevious) {
-    const key2 = chatKey2(ctx2);
-    if (jobs2.has(key2)) {
-      wiki.notice = `「${jobs2.get(key2).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
+    const key = chatKey2(ctx2);
+    if (jobs2.has(key)) {
+      wiki.notice = `「${jobs2.get(key).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
       env3.render();
       return;
     }
@@ -3645,7 +3645,7 @@ ${RETRY_ANALYZE}` }
     const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
     const previousDoc = regenerate ? usePrevious ?? s8.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
     const writingRequest = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    jobs2.set(key2, { title: title2, started: Date.now() });
+    jobs2.set(key, { title: title2, started: Date.now() });
     wiki.failure = null;
     wiki.notice = "";
     env3.render();
@@ -3673,13 +3673,13 @@ ${RETRY_ANALYZE}` }
       };
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body5));
       const cur = env3.current();
-      if (cur && chatKey2(cur) === key2 && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) Object.assign(wiki, { view: "doc", rewrite: null, docReq: "" });
+      if (cur && chatKey2(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) Object.assign(wiki, { view: "doc", rewrite: null, docReq: "" });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       wiki.notice = `「${title2}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
       if (!wiki.failure && !(error instanceof WikiError)) wiki.failure = { title: title2, reason: msg, raw: error.raw ?? "" };
     } finally {
-      jobs2.delete(key2);
+      jobs2.delete(key);
       await env3.refresh();
     }
   }
@@ -3742,8 +3742,8 @@ ${RETRY_ANALYZE}` }
     if (at < 0) return;
     void autoWriteWiki(ctx2, at, true).catch((error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`));
   }
-  async function setVar(ctx2, env3, key2, value) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [key2]: value } }));
+  async function setVar(ctx2, env3, key, value) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [key]: value } }));
     await env3.refresh();
   }
   var CAT_LABEL = { an: "괴이", ms: "특수", lm: "거점", ag: "인물", org: "조직" };
@@ -3829,7 +3829,7 @@ ${RETRY_ANALYZE}` }
     const job = jobs2.get(chatKey2(ctx2));
     return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc9(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
   }
-  var tool2 = (action, icon2, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var tool2 = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var blank4 = (text4) => `<div class="ph-blank"><p>${text4}</p></div>`;
   var when = (sec2) => new Date(sec2 * 1e3).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
   function row3(ctx2, e, title2, sub, dot = false) {
@@ -3873,4 +3873,5 @@ ${RETRY_ANALYZE}` }
       const known = saved.has(exact) || hits.some((e) => e.title === exact);
       const docPart = mine.length ? `<h4 class="ph-sec">문서<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => dated(d)).join("")}</ul>` : "";
       const rosterPart = hits.length ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row3(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "))).join("")}</ul>` : "";
-      const shownTitles = /* @__PURE__ */ new S
+      const shownTitles = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
+      const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).fil

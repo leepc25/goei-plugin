@@ -24,7 +24,7 @@ import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { addWalletEntry, aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { guideSections } from '../core/guides';
@@ -291,7 +291,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         console.log(`[goei] 인물 기록 갱신 거부: ${diag.error}`);
         continue;
       }
-      if (!input.people.length) {
+      // 장면 인물이 없어도 소지품·가계부는 이 갱신기가 읽는다 (11-08 전수점검: 혼자 있는 장면에서 얻은 물건·쓴 돈이 기록되지 않았다).
+      // 소지품 읽기가 켜져 있거나, 가계부가 켜져 있고 글에 금액이 있거나 어림도 받을 때만 부른다 (쓸데없는 호출은 그대로 안 함)
+      const moneyOrItems = itemsOn || (walletOn && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? ''))))));
+      if (!input.people.length && !moneyOrItems) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
         if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
           const s = peopleStore(cur);
@@ -350,7 +353,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           next = { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } };
         }
         // 거래를 적은 뒤 상태창 잔고 맞춤 줄을 다시 계산한다 (같은 거래를 두 번 세지 않게, core/wallet.ts syncWalletToStatus)
-        if (walletOn) {
+        // 설정 「상태창 잔고 따르기」가 꺼져 있으면 맞추지 않는다 (본편 응답 처리 body.ts 와 같은 조건, 11-08 전수점검)
+        if (walletOn && walletSyncOn(next.scriptstate)) {
           const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
           if (w) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...walletVars(w) } };
         }
