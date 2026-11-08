@@ -17,8 +17,8 @@ COMBAT = set('1 3 3_0 4 5 5_1 7 9 10 11 12 13 14 15 16 16_1 17 18 18_1 18_2 18_3
 COMBAT |= set('2 28 29 32 35 116 142 143 144 145 147 157 168'.split())
 FACE = 64
 # 대전 배경으로 쓰는 필드 장면 (화장실·샤워실 빼고). 이름표는 src/ui/versus.ts VS_BG_NAMES
-VS_BGS = ['street', 'f3', 'b2', 'training', 'clinic', 'by_street', 'by_f13', 'sdra_street',
-          'jr_entry']   # 관리국 2층·지하 1층·종합대응팀·협회 지하 1층(특색 없음), 휴게실·연구실·백일몽 로비·의무실·관리국 로비(무대 짧음)도 뺌 (11-08 사용자)   # 중림 지하 셋(jr_b1·jr_alley·jr_b2)은 뺌 (11-08 사용자: 이음새 기둥이 3화면 무대에서 시야를 가린다)
+VS_BGS = ['street', 'f3', 'b2', 'training', 'by_street', 'by_f13',
+          'jr_entry']   # 관리국 2층·지하 1층·종합대응팀·협회 지하 1층(특색 없음), 격리팀 사무실·영등포 거리, 휴게실·연구실·백일몽 로비·의무실·관리국 로비(무대 짧음)도 뺌 (11-08 사용자)   # 중림 지하 셋(jr_b1·jr_alley·jr_b2)은 뺌 (11-08 사용자: 이음새 기둥이 3화면 무대에서 시야를 가린다)
 # 무대 (11-08 사용자): 도트 1.4배에서 한 화면 = 월드 914. 무대는 2.5~3화면 → 월드 최대 2743 (배경이 짧으면 배경 전체)
 VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
@@ -28,13 +28,16 @@ VS_CFG = {'b2': {'yF': 750, 'benchYF': 705}, 'street': {'right': 0.91, 'leftmin'
           'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770, 'benchYF': 740}, 'office': {'yF': 826}}
 # 11-08 사용자 「파이팅선 적당히 내려서 통일, 배경선과 간격도 통일」: 장면마다 바닥 뒤(벽 밑)·앞(바닥 끝) 그림 y를 눈으로 재고,
 # 싸우는 줄 = 뒤 + FIGHT_AT × 깊이, 대기 줄 = 싸우는 줄 - BENCH_GAP(월드). 모든 배경 같은 비율·간격
-FIGHT_AT, BENCH_GAP = 0.7, 50
-FLOOR_BF = {'street': (604, 710), 'f3': (673, 828), 'b2': (668, 765), 'training': (692, 820), 'clinic': (610, 843),
-            'by_street': (612, 718), 'by_f13': (671, 832), 'sdra_street': (618, 726), 'jr_entry': (589, 707)}
+FIGHT_AT, BENCH_GAP = 0.85, 80   # 11-08 사용자 「전투랑 배경이 거의 같은 줄」 → 간격 50 → 80 (월드). 대기 줄은 벽 밑 바로 앞까지
+FLOOR_BF = {'street': (604, 710), 'f3': (673, 800), 'b2': (668, 765), 'training': (692, 785), 'clinic': (610, 843),
+            'by_street': (612, 718), 'by_f13': (671, 800), 'sdra_street': (618, 726), 'jr_entry': (589, 707)}
+_S = {'street': 1.16, 'f3': 0.974, 'b2': 0.924, 'training': 0.956, 'clinic': 0.943, 'by_street': 1.141, 'by_f13': 0.975, 'sdra_street': 1.324, 'jr_entry': 1.708}
 for _k, (_b, _f) in FLOOR_BF.items():
-    VS_CFG.setdefault(_k, {})['yF'] = round(_b + FIGHT_AT * (_f - _b))
+    # 싸우는 줄: 바닥 70% 지점. 대기 줄(= 싸우는 줄 - 간격)이 벽 밑 6px 앞보다 뒤로 가면 싸우는 줄을 그만큼 내림 (바닥 앞 끝 10%는 남김)
+    _y = max(_b + FIGHT_AT * (_f - _b), _b + 6 + BENCH_GAP / _S[_k])
+    VS_CFG.setdefault(_k, {})['yF'] = round(min(_y, _f - 0.08 * (_f - _b)))
 for _c in VS_CFG.values(): _c.pop('benchYF', None)
-VS_CFG['training']['benchD'] = [[220, 420], [75, 440]]   # 오른쪽: 사격 칸막이 피함
+VS_CFG['training'].update({'left': 0, 'benchD': [[330, 560], [60, 590]]})   # 11-08 사용자: 왼쪽 자르지 말 것. 대기 자리는 기구·사격 칸막이 피함
 VS_CFG['f3']['benchD'] = [[220, 420], [220, 500]]   # 오른쪽: 쓰레기통 피함
 CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
 

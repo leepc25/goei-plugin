@@ -6,11 +6,8 @@ import { downloadVsAll, vsDataState, type VsDataState } from '../host/vs';
 
 /** 대전 배경으로 고를 수 있는 필드 장면 (tools/build_vs_packs.py VS_BGS 와 같은 순서). 이름은 필드 지도(map.ts) 그대로 */
 const VS_BG_NAMES: [string, string][] = [
-  ['street', '종로 거리'], ['f3', '관리국 3층'], ['b2', '격리 구역'],
-  ['training', '훈련장'], ['clinic', '격리팀 사무실'], 
-  ['by_street', '강남 거리'], ['by_f13', '백일몽 13층'],
-  ['sdra_street', '영등포 거리'],
-  ['jr_entry', '중림 지하상가 입구'],
+  ['street', '종로 거리'], ['f3', '관리국 3층'], ['b2', '격리 구역'], ['training', '훈련장'],
+  ['by_street', '강남 거리'], ['by_f13', '백일몽 13층'], ['jr_entry', '중림 지하상가 입구'],
 ];
 
 let rerender = () => {};
