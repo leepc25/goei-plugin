@@ -8,7 +8,40 @@ import type { GameAssets } from '../../bridge';
 const q = new URLSearchParams(location.search);
 const base = new URL(q.get('packs') ?? './vs-src/', location.href).href.replace(/\/?$/, '/');
 const at = (pack: string, f: string) => `${base}${pack}/${f}`;
-const assets: GameAssets = {
+// ?bundle=<확장자> (시연판 공유용, 1이면 bin): 팩마다 낱개 파일 대신 한 파일(<팩>.<확장자> = 4바이트 머리 길이 + JSON 목록 + 자료)로 받는다.
+// 아티팩트는 bin 을 못 올려서 wasm 확장자로 올린다(내용은 같음)
+const bundleExt = q.get('bundle') === '1' ? 'bin' : q.get('bundle');
+const MIME: Record<string, string> = { webp: 'image/webp', png: 'image/png', json: 'application/json', mp3: 'audio/mpeg', ogg: 'audio/ogg', wav: 'audio/wav' };
+const bundles = new Map<string, Promise<Map<string, Uint8Array> | null>>();
+const bundle = (pack: string) => {
+  let b = bundles.get(pack);
+  if (!b) {
+    b = fetch(`${base}${pack}.${bundleExt}`).then(async (r) => {
+      if (!r.ok) return null;
+      const buf = new Uint8Array(await r.arrayBuffer()), n = new DataView(buf.buffer).getUint32(0, true);
+      const list = JSON.parse(new TextDecoder().decode(buf.subarray(4, 4 + n))) as [string, number, number][];
+      return new Map(list.map(([f, o, l]) => [f, buf.subarray(4 + n + o, 4 + n + o + l)]));
+    }).catch(() => null);
+    bundles.set(pack, b);
+  }
+  return b;
+};
+const blobUrls = new Map<string, string>();
+const assets: GameAssets = bundleExt ? {
+  ready: async (pack) => !!(await bundle(pack))?.has('pack.json'),
+  url: async (pack, f) => {
+    const k = `${pack}/${f}`, hit = blobUrls.get(k);
+    if (hit) return hit;
+    const d = (await bundle(pack))?.get(f);
+    if (!d) return null as never;
+    const u = URL.createObjectURL(new Blob([d as Uint8Array<ArrayBuffer>], { type: MIME[f.split('.').pop() ?? ''] ?? 'application/octet-stream' }));
+    blobUrls.set(k, u);
+    return u;
+  },
+  bytes: async (pack, f) => (await bundle(pack))?.get(f) ?? null,
+  atlas: async () => null,
+  list: async () => [],
+} : {
   ready: async (pack) => (await fetch(at(pack, 'pack.json')).catch(() => null))?.ok ?? false,
   url: async (pack, f) => at(pack, f),
   bytes: async (pack, f) => { const r = await fetch(at(pack, f)).catch(() => null); return r?.ok ? new Uint8Array(await r.arrayBuffer()) : null; },
