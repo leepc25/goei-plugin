@@ -8,7 +8,8 @@
 //   --vp pc,phone,land    화면 크기 (기본 pc,phone)
 //   --start board,picker  어느 화면에서 시작하나 (기본 board,picker). board = 채팅 시작 뒤 상황판, picker = 시작 화면
 //   --depth n             누른 뒤 새로 열린 화면을 몇 단계까지 따라 들어가나 (기본 6)
-//   --per-action n        같은 data-action 의 값(data-value)이 많을 때 값마다 누를 최대 수 (기본 0 = 전부)
+//   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 5, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
+//   --explore-values n    같은 data-action 중 몇 개의 값까지 눌러서 열린 화면 안으로 따라 들어가나 (기본 2. 같은 꼴 화면이 수백 번 반복되는 것 막기)
 //   --max-clicks n        화면 크기마다 최대로 누를 수 (기본 0 = 끝까지)
 //   --workers n           동시에 띄울 페이지 수 (기본 4)
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
@@ -24,7 +25,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perAction: 0, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -34,6 +35,7 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perActi
     else if (k === '--start') opt.start = list(v());
     else if (k === '--depth') opt.depth = Number(v());
     else if (k === '--per-action') opt.perAction = Number(v());
+    else if (k === '--explore-values') opt.exploreValues = Number(v());
     else if (k === '--max-clicks') opt.maxClicks = Number(v());
     else if (k === '--workers') opt.workers = Number(v());
     else if (k === '--out') opt.out = v();
@@ -335,6 +337,7 @@ function flagsOf(rec) {
 
 // ---- 돌리기 ------------------------------------------------------------------------------------------------------
 const results = [];
+const skippedVals = {};
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
 if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.json'), 'utf8')); for (const r of j.results) if (r.watch) r.flags = [...r.flags.filter((x) => /재현 실패|못 찾음|가려져|꺼진|안 눌림|도구 오류/.test(x)), ...flagsOf(r)];
@@ -356,6 +359,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     const done = new Set(); // 이 화면 크기에서 누른 열쇠
     const perAct = {};
     const offSeen = new Set();
+    const exploredVals = {};
     const queue = [];
     const enqueue = (path, list) => {
       for (const it of list) {
@@ -363,7 +367,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         if (it.behind) continue; // 다른 창 뒤: 그 창을 닫은 화면에서 누른다
         // 꺼진 단추는 기록만 하고 누른 것으로 치지 않는다 (다른 화면에서 켜지면 그때 누른다)
         if (it.disabled) { if (!offSeen.has(it.key)) { offSeen.add(it.key); results.push({ vp, start: startKind, path: path.map((p) => p.key), key: it.key, label: it.label, action: it.action, value: it.value, flags: ['꺼진 단추(누를 수 없음)'], disabled: true }); } continue; }
-        if (opt.perAction && it.action) { perAct[it.action] = (perAct[it.action] || 0) + 1; if (perAct[it.action] > opt.perAction) continue; }
+        if (opt.perAction && it.action) { perAct[it.action] = (perAct[it.action] || 0) + 1; if (perAct[it.action] > opt.perAction) { skippedVals[it.action] = (skippedVals[it.action] || 0) + 1; continue; } }
         done.add(it.key);
         queue.push({ ...it, path });
       }
@@ -377,7 +381,8 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         const rec = recs[i], job = batch[i];
         results.push(rec);
         n++;
-        if (rec.newList && job.path.length + 1 < opt.depth) {
+        const ev = job.action ? (exploredVals[job.action] = (exploredVals[job.action] || 0) + 1) : 1;
+        if (rec.newList && job.path.length + 1 < opt.depth && (!opt.exploreValues || ev <= opt.exploreValues)) {
           const step = { key: job.key, nth: job.nth };
           const path = [...job.path, step];
           states.push({ vp, start: startKind, path: path.map((p) => p.key), shot: rec.shots?.[2], audit: rec.audit });
@@ -387,7 +392,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
       }
       log(`${vp} · ${startKind}: ${n}번 누름, 남은 ${queue.length} (${Math.round((Date.now() - t0) / 1000)}초)`);
       if (opt.maxClicks && n >= opt.maxClicks) { log(`--max-clicks ${opt.maxClicks} 에서 멈춤, 남은 ${queue.length}개는 「안 눌림」`); for (const q of queue) results.push({ vp, start: startKind, path: q.path.map((p) => p.key), key: q.key, label: q.label, action: q.action, value: q.value, flags: ['안 눌림(상한)'] }); queue.length = 0; }
-      writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ opt, results, states }, null, 1));
+      writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ opt, results, states, skippedVals }, null, 1));
     }
   }
 }
@@ -466,6 +471,7 @@ const smalls = {}; for (const st of states) if (isPhoneVp(st.vp)) for (const [k,
 L.push(Object.entries(smalls).map(([k, s]) => `\`${k}\` ${s}`).join(' · ') || '없음', '');
 L.push('## 7. 못 누른 것', '');
 L.push(`- 코드에 있는 data-action ${srcActs.size}개 중 한 번도 못 누른 것 ${never.length}개 (이 시작 상태에서 화면에 안 나온 것. 다른 시작 상태·자료가 필요하면 docs 에 적힌 대로 시작 상태를 더한다):`, '', never.map((a) => `\`${a}\``).join(' '), '');
+if (Object.keys(skippedVals).length) L.push(`- 같은 단추의 다른 값이라 안 누른 수 (--per-action ${opt.perAction}): ${Object.entries(skippedVals).sort((a, b) => b[1] - a[1]).map(([a, n]) => `\`${a}\` ${n}`).join(' · ')}`, '');
 for (const vp of opt.vp) for (const other of opt.vp) if (vp !== other) { const only = [...(keysBy[vp] || [])].filter((k) => !keysBy[other]?.has(k)); if (only.length) L.push(`- ${vp}에만 있고 ${other}에는 없는 것 ${only.length}개: ${only.slice(0, 40).map((x) => `\`${x}\``).join(' ')}${only.length > 40 ? ' …' : ''}`); }
 writeFileSync(resolve(OUT, 'report.md'), L.join('\n') + '\n');
 writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ opt, results, states, incons, selLooks: Object.fromEntries(Object.entries(selLooks)), never }, null, 1));
