@@ -1,5 +1,4 @@
-et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-      const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shownTitles.has(t));
+ter((t) => !shownTitles.has(t));
       const nearPart = near.length ? `<h4 class="ph-sec">비슷한 문서<b>${near.length}</b></h4><ul class="ph-list">${near.map((t) => {
         const d = docs.find((x) => x.title === t);
         if (d) return dated(d);
@@ -583,13 +582,13 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     }
   }
   async function run2(ctx2, env3, label2, work) {
-    const key2 = chatKey3(ctx2);
-    if (jobs3.has(key2)) {
-      gnet.notice = `${jobs3.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+    const key = chatKey3(ctx2);
+    if (jobs3.has(key)) {
+      gnet.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
       env3.render();
       return;
     }
-    jobs3.set(key2, label2);
+    jobs3.set(key, label2);
     gnet.notice = "";
     gnet.failure = null;
     env3.render();
@@ -601,7 +600,7 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
       const raw = error.raw;
       if (raw) gnet.failure = { label: label2, reason: msg, raw };
     } finally {
-      jobs3.delete(key2);
+      jobs3.delete(key);
       await env3.refresh();
     }
   }
@@ -713,9 +712,9 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     });
   }
   async function writeComment(ctx2, env3, postId2, parent, body5) {
-    const key2 = chatKey3(ctx2);
-    if (jobs3.has(key2)) {
-      gnet.notice = `${jobs3.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+    const key = chatKey3(ctx2);
+    if (jobs3.has(key)) {
+      gnet.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
       return env3.render();
     }
     const nick = userNick(ctx2.chat.scriptstate);
@@ -765,9 +764,9 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     });
   }
   async function sendDm(ctx2, env3, nick, body5, src) {
-    const key2 = chatKey3(ctx2);
-    if (jobs3.has(key2)) {
-      gnet.notice = `${jobs3.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+    const key = chatKey3(ctx2);
+    if (jobs3.has(key)) {
+      gnet.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
       return env3.render();
     }
     const me = userNick(ctx2.chat.scriptstate);
@@ -823,17 +822,17 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     });
     await env3.refresh();
   }
-  async function setVar2(ctx2, env3, key2, value) {
-    await setVars2(ctx2, env3, { [key2]: value });
+  async function setVar2(ctx2, env3, key, value) {
+    await setVars2(ctx2, env3, { [key]: value });
   }
   async function setVars2(ctx2, env3, vars) {
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, vars));
     await env3.refresh();
   }
-  function seg3(key2, cur, items) {
-    const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key2}=${v}`);
+  function seg3(key, cur, items) {
+    const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key}=${v}`);
     if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var consMap = /* @__PURE__ */ new Map();
   var CON_RE = /\[콘:([^\[\]:]{1,30})\]/g;
@@ -848,7 +847,7 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
   function time(date) {
     return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
   }
-  var tool3 = (action, icon2, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var tool3 = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   function paneHead3(title2, sub, right = "", back = true) {
     return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
   }
@@ -1404,15 +1403,15 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     const parts = {};
     for (; ; ) {
       space();
-      const key2 = JSON.parse(quoted());
-      if (key2 !== "gnet" && key2 !== "phone" || key2 in parts) fail3(`알 수 없는 칸 ${key2}`);
+      const key = JSON.parse(quoted());
+      if (key !== "gnet" && key !== "phone" || key in parts) fail3(`알 수 없는 칸 ${key}`);
       space();
       if (s8[i++] !== ":") fail3("구분자");
       space();
       const first = i;
       if (s8.startsWith("null", i)) {
         i += 4;
-        parts[key2] = null;
+        parts[key] = null;
       } else {
         if (s8[i] !== "{") fail3("결과가 객체가 아님");
         const stack = ["}"];
@@ -1427,7 +1426,7 @@ et([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
           } else i++;
         }
         if (stack.length) fail3("중간에 잘림");
-        parts[key2] = s8.slice(first, i);
+        parts[key] = s8.slice(first, i);
       }
       space();
       const c = s8[i++];
@@ -1973,6 +1972,74 @@ ${themeVars("[x-goei-usebox]")}
     });
   }
 
+  // src/core/statusctx.ts
+  var STATUS_HEAD = "[Previous status]";
+  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
+  function lastStatusLine(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
+      const tags = findStatusTags(m.content);
+      if (tags.length) return tags[tags.length - 1].raw.trim();
+    }
+    return null;
+  }
+  function stripStatusLines(messages) {
+    return messages.map((m) => {
+      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
+      const tags = findStatusTags(m.content);
+      if (!tags.length) return m;
+      let c = m.content;
+      for (const t of tags) c = c.replace(t.raw, "");
+      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
+    });
+  }
+  function statusBlock(line2, cols) {
+    const fields3 = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(" | ")}
+` : "";
+    return `${STATUS_HEAD}
+${line2}
+${fields3}${NOTE}`;
+  }
+  function rebuildStatusLine(line2, cols, fill3 = {}) {
+    const t = findStatusTags(line2)[0];
+    if (!t || !t.date) return line2;
+    const values = {
+      date: t.date,
+      time: t.time,
+      weather: t.weather,
+      temp: t.temp,
+      place: t.place,
+      target: t.target,
+      companions: t.companions.join(","),
+      deployed: t.deployed ? "투입" : "",
+      identity: t.identity || fill3.identity || "",
+      wallet: fill3.wallet !== void 0 && fill3.wallet !== null ? walletCell(fill3.wallet) : t.wallet
+    };
+    return formatStatusLine(values, cols);
+  }
+  function withIdentity(line2, identity) {
+    if (!identity) return line2;
+    const tags = findStatusTags(line2);
+    const t = tags[0];
+    if (!t || t.identity) return line2;
+    const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
+    if (cols !== 8) return line2;
+    return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
+  }
+  function withStatusBlock(messages, identity = "", shape) {
+    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
+    const line0 = lastStatusLine(messages);
+    if (!line0) return messages;
+    const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
+    const out = stripStatusLines(messages);
+    const at = out.map((m) => m?.role).lastIndexOf("user");
+    const recent = (shape?.recent ?? []).filter(Boolean);
+    const block3 = { role: "system", content: `${statusBlock(line2, shape?.cols)}${recent.length ? `
+Recent cash transactions (oldest first): ${recent.join("; ")}` : ""}` };
+    return at < 0 ? [...out, block3] : [...out.slice(0, at), block3, ...out.slice(at)];
+  }
+
   // src/core/update.ts
   var UPDATE_SCHEMA = 1;
   var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
@@ -2059,8 +2126,8 @@ ${themeVars("[x-goei-usebox]")}
     const retired = (e) => RETIRED.includes(String(e.comment ?? "")) || String(e.comment ?? "").startsWith("📚Lore slot");
     return current5.filter((e) => !retired(e) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
   }
-  function keyPrint(key2) {
-    const norm3 = String(key2 ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
+  function keyPrint(key) {
+    const norm3 = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
     let h = 2166136261;
     for (const b of new TextEncoder().encode(norm3)) h = Math.imul(h ^ b, 16777619) >>> 0;
     return h.toString(16).padStart(8, "0");
@@ -2116,7 +2183,7 @@ ${themeVars("[x-goei-usebox]")}
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.2" : "0";
+  var PLUGIN_VERSION = true ? "0.21.3" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -2177,8 +2244,8 @@ ${themeVars("[x-goei-usebox]")}
   }
   function findFolder(lore, which) {
     const m = readManifest(lore);
-    const key2 = str7(m?.keys?.[which]);
-    const byKey = key2 ? lore.find((e) => isFolder2(e) && e.key === key2) : void 0;
+    const key = str7(m?.keys?.[which]);
+    const byKey = key ? lore.find((e) => isFolder2(e) && e.key === key) : void 0;
     if (byKey) return byKey;
     const name = which === "settings" ? SETTINGS_FOLDER_NAME : WIKI_FOLDER_NAME;
     return lore.find((e) => isFolder2(e) && str7(e.comment).trim() === name) ?? (which === "wiki" ? lore.find((e) => isFolder2(e) && e.key === WIKI_FOLDER_KEY) : void 0);
@@ -2230,7 +2297,7 @@ ${themeVars("[x-goei-usebox]")}
       if (!at.has(g2)) at.set(g2, n2);
     });
     const inst = installData();
-    for (const [key2, n2] of Object.entries(inst.greetings.index)) {
+    for (const [key, n2] of Object.entries(inst.greetings.index)) {
       const text4 = inst.greetings.texts[n2] ?? "";
       let hit3 = at.get(text4);
       if (hit3 === void 0) {
@@ -2238,7 +2305,7 @@ ${themeVars("[x-goei-usebox]")}
         out.push(text4);
         at.set(text4, hit3);
       }
-      index[key2] = hit3;
+      index[key] = hit3;
     }
     return { greetings: out, index };
   }
@@ -2255,7 +2322,7 @@ ${themeVars("[x-goei-usebox]")}
     };
   }
   var entry2 = (comment, content, folder, extra = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra });
-  var folderEntry = (comment, key2) => ({ key: key2, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
+  var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
   var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
   var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
   function fillDirectory(cur, def) {
@@ -2445,9 +2512,9 @@ ${themeVars("[x-goei-usebox]")}
       }
       return best && best.score >= ICON_MIN ? { file: best.file, score: best.score } : null;
     };
-    return (name, icon2) => {
+    return (name, icon) => {
       const qn = query(name);
-      const qi = query(icon2);
+      const qi = query(icon);
       return qi && pick3(qn, qi) || qn && pick3(qn, null) || null;
     };
   }
@@ -2532,12 +2599,12 @@ ${themeVars("[x-goei-usebox]")}
     const head3 = makeHeadIndex(rows3, reps);
     const frag = makeFragIndex(rows3, reps);
     const rank2 = (h) => !h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1;
-    return (name, icon2) => {
-      const hi = icon2 ? head3(icon2) : null;
+    return (name, icon) => {
+      const hi = icon ? head3(icon) : null;
       const hn = name ? head3(name) : null;
       const h = rank2(hn) > rank2(hi) || rank2(hn) === 3 ? hn : hi || hn;
       if (h) return { file: h.file, score: 1 };
-      return frag(name, icon2);
+      return frag(name, icon);
     };
   }
 
@@ -2613,7 +2680,7 @@ ${themeVars("[x-goei-usebox]")}
   }
   function makeIconFind(table, rep) {
     const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h] })), rep);
-    return (name, icon2) => m(name, icon2)?.file ?? null;
+    return (name, icon) => m(name, icon)?.file ?? null;
   }
   function applyItemsPack(text4) {
     let j;
@@ -2634,8 +2701,8 @@ ${themeVars("[x-goei-usebox]")}
     for (const r of table) if (r.base) base[r.kind] = r.f;
     return { table, rep, icons, base, find: makeIconFind(table, rep) };
   }
-  function matchItemIcon(pack4, itemName, icon2) {
-    return pack4.find(itemName, icon2) ?? pack4.base.misc ?? null;
+  function matchItemIcon(pack4, itemName, icon) {
+    return pack4.find(itemName, icon) ?? pack4.base.misc ?? null;
   }
 
   // src/core/fetchparts.ts
@@ -2858,12 +2925,12 @@ ${themeVars("[x-goei-usebox]")}
     })();
     return loading3;
   }
-  function itemIconUrl(name, icon2) {
+  function itemIconUrl(name, icon) {
     if (!pack3) {
       if (!failed) void ensureItemIcons();
       return null;
     }
-    const file = matchItemIcon(pack3, name, icon2);
+    const file = matchItemIcon(pack3, name, icon);
     if (!file) return null;
     let u = urls2.get(file);
     if (!u) {
@@ -3115,7 +3182,7 @@ ${themeVars("[x-goei-usebox]")}
       const it = eq[k][i];
       if (!it) return `<div class="it-slot it-s-${k} empty" data-drop="equip:${k}:${i}" aria-label="${EQUIP_LABEL[k]} 빈 칸" title="${EQUIP_LABEL[k]}"><span class="it-ic">${ICONS[k]}</span></div>`;
       const act = where2 === "sell" ? "shop-sell-pick" : "items-open";
-      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act}" data-value="${esc13(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc13(it.id)}" data-equip="${k}"` : ""} aria-label="${esc13(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx2, it))}${tipOf(it, leftOf(ctx2, it), whenOf(ctx2))}</button>`;
+      return `<button class="it-slot it-s-${k}${stateCls(it)}${(where2 === "sell" ? sel : itemsUi.open) === it.id ? " sel" : ""}" data-action="${act}" data-value="${esc13(it.id)}" data-drop="equip:${k}:${i}"${where2 === "items" && !isPhone() ? ` draggable="true" data-drag="${esc13(it.id)}" data-equip="${k}"${canUse(it) ? ' data-usable="1"' : ""}` : ""} aria-label="${esc13(it.name)} (${EQUIP_LABEL[k]})"><span class="it-ic">${itemPic(it)}</span>${marks(it, leftOf(ctx2, it))}${tipOf(it, leftOf(ctx2, it), whenOf(ctx2))}</button>`;
     };
     const slots = `<div class="it-eqslots">${["weapon", "gear"].flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot2(k, i))).join("")}</div>`;
     if (where2 === "sell") return `<section class="it-box it-eqbox sell" aria-label="장착">${slots}</section>`;
@@ -3310,7 +3377,7 @@ ${themeVars("[x-goei-usebox]")}
       case "items-merge-to": {
         const keep = itemsUi.open;
         if (!keep || !value) return true;
-        await write((it, alive2) => mergeItems(it, alive2, keep, value));
+        await write((it, alive) => mergeItems(it, alive, keep, value));
         itemsUi.mode = "view";
         itemsUi.info = "합쳤어요.";
         await env3.refresh();
@@ -3347,13 +3414,13 @@ ${themeVars("[x-goei-usebox]")}
         }
         const patch = { name, desc: get("desc"), effect: get("effect"), use, equip: get("equip") };
         if (value) {
-          await write((it, alive2) => {
+          await write((it, alive) => {
             const cur = it.list.find((x) => x.id === value);
             let next = updateItem(it, value, cur?.uses === void 0 || uses === void 0 ? { ...patch, uses: uses ?? "" } : patch);
-            if (cur?.uses !== void 0 && uses !== void 0) next = setItemLeft(next, alive2, value, uses);
+            if (cur?.uses !== void 0 && uses !== void 0) next = setItemLeft(next, alive, value, uses);
             return next;
           });
-        } else await write((it, alive2) => addItem(it, alive2, { ...patch, uses, from: "manual", anchor: "" }));
+        } else await write((it, alive) => addItem(it, alive, { ...patch, uses, from: "manual", anchor: "" }));
         itemsUi.mode = "view";
         itemsUi.notice = "";
         itemsUi.info = value ? "고쳤어요." : "넣었어요.";
@@ -3379,7 +3446,7 @@ ${themeVars("[x-goei-usebox]")}
       case "items-equip":
       case "items-unequip": {
         if (!value) return true;
-        await write((it2, alive2) => action === "items-equip" ? equipItem(it2, alive2, value) : unequipItem(it2, value));
+        await write((it2, alive) => action === "items-equip" ? equipItem(it2, alive, value) : unequipItem(it2, value));
         const it = liveOf(ctx2).find((x) => x.id === value);
         if (action === "items-equip" && it?.equip && !equippedOf(liveOf(ctx2))[it.equip].some((x) => !x || x.id === it.id)) itemsUi.info = `${EQUIP_LABEL[it.equip]} 칸이 다 찼어요. 칸에 있는 것을 먼저 풀거나, 칸으로 끌어다 바꾸세요.`;
         await env3.refresh();
@@ -3396,7 +3463,7 @@ ${themeVars("[x-goei-usebox]")}
             env3.render();
             return true;
           }
-          await write((x, alive2) => equipItem(x, alive2, id2, Number(n2)));
+          await write((x, alive) => equipItem(x, alive, id2, Number(n2)));
         } else if (to === "grid") {
           if (!isEquipped(it, liveOf(ctx2))) return true;
           await write((x) => unequipItem(x, id2));
@@ -3446,7 +3513,7 @@ ${themeVars("[x-goei-usebox]")}
   }
 
   // src/ui/shop.ts
-  var pic = (name, icon2) => itemPic({ name, icon: icon2 });
+  var pic = (name, icon) => itemPic({ name, icon });
   var traitsOf2 = (x) => [x.equip ? EQUIP_LABEL[x.equip] : "", x.uses ? `소모 ${x.uses}` : x.use ? "사용" : ""].filter(Boolean).join(" · ");
   var esc14 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var shopUi = {
@@ -3475,9 +3542,9 @@ ${themeVars("[x-goei-usebox]")}
   var balanceOf = (ctx2) => walletBalance(readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx2.chat));
   var OWNER_TALL = 2;
   function ownerFace(ctx2, owner) {
-    const key2 = owner.trim().toLowerCase();
-    if (!key2) return null;
-    const a = readDirectory(ctx2.char.globalLore).agents.find((x) => [x.name, x.english, ...x.aliases].some((n2) => n2 && n2.trim().toLowerCase() === key2));
+    const key = owner.trim().toLowerCase();
+    if (!key) return null;
+    const a = readDirectory(ctx2.char.globalLore).agents.find((x) => [x.name, x.english, ...x.aliases].some((n2) => n2 && n2.trim().toLowerCase() === key));
     if (!a) return null;
     const pic2 = facePic(ctx2.char, a, true);
     return pic2 ? imageUrl(ctx2.char, pic2.includes("#") ? `${pic2}~${OWNER_TALL}` : pic2) : null;
@@ -3540,30 +3607,4 @@ ${themeVars("[x-goei-usebox]")}
   }
   function rareHtml(it, bal, closed) {
     const poor = it.price > bal;
-    return `<button class="sh-zone sh-rare${poor ? " poor" : ""}${shopUi.detail === it.id ? " sel" : ""}" data-action="shop-detail" data-value="${esc14(it.id)}" aria-label="희귀 ${esc14(it.name)} ${esc14(shortWon(it.price))}${poor ? " (잔고 부족)" : ""}" ${closed ? "disabled" : ""}>
-    <span class="sh-rare-ring" aria-hidden="true"></span>
-    <span class="sh-rare-pic"><span class="sh-rare-glow" aria-hidden="true"></span>${pic(it.name, it.icon)}</span>
-    <span class="sh-rare-tx">
-      <span class="sh-rare-lb">${ICONS.star}<b>희귀</b><small>단 하나</small></span>
-      <b class="sh-rare-nm">${esc14(it.name)}</b>
-      ${it.desc ? `<span class="sh-rare-ds">${esc14(it.desc)}</span>` : ""}
-      ${it.effect ? `<span class="sh-rare-ef">효과 · ${esc14(it.effect)}</span>` : ""}
-      <span class="sh-rare-pr">${it.orig !== void 0 ? '<i title="흥정으로 깎은 값">▾</i>' : ""}${esc14(shortWon(it.price))}</span>
-    </span>
-  </button>`;
-  }
-  function cell2(it, bal, closed) {
-    const poor = it.price > bal;
-    const sale = it.tag === "sale" && !!it.was && it.was > it.price;
-    const off = sale ? Math.max(1, Math.round((1 - it.price / it.was) * 100)) : 0;
-    const tip2 = `<span class="it-tip" aria-hidden="true"><b>${esc14(it.name)}</b>${traitsOf2(it) ? `<small>${esc14(traitsOf2(it))}</small>` : ""}${it.desc ? `<p>${esc14(it.desc)}</p>` : ""}${it.effect ? `<p class="ef">효과: ${esc14(it.effect)}</p>` : ""}<span class="sh-amt">${esc14(shortWon(it.price))}</span></span>`;
-    return `<button class="it-c sh-c${sale ? " sale" : ""}${poor ? " poor" : ""}${shopUi.detail === it.id ? " sel" : ""}" data-action="shop-detail" data-value="${esc14(it.id)}" aria-label="${esc14(it.name)} ${esc14(shortWon(it.price))}${poor ? " (잔고 부족)" : ""}" ${closed ? "disabled" : ""}>
-    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ""}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc14(it.name)}</b></span><span class="sh-band">${it.orig !== void 0 ? '<i title="흥정으로 깎은 값">▾</i>' : ""}${sale ? `<s>${esc14(shortWon(it.was))}</s>` : ""}${esc14(shortWon(it.price))}</span>${tip2}</button>`;
-  }
-  function pickHtml(ctx2, st) {
-    const all = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat);
-    const mine = gridItems(all);
-    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ""}</small></header>`;
-    const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
-    return `<div class="sh-shelf sh-pick">${all.length > mine.length ? `<div class="sh-eq">${equipBox(ctx2, "sell", st.sell?.itemId ?? "")}</div>` : ""}<section class="sh-zone sh-main sh-mine" aria-label="소지품">${head3}${inner}</section></div>`;
-  
+    return `<button class="sh-zone sh-rare${poor ? " poor" : ""}${shopUi.detail === it.id ? " sel" : ""}" data-action="shop-det

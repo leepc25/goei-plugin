@@ -1,4 +1,27 @@
-pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf3(ctx2, kind, over).map((r) => `<option value="${esc20(r.name)}"${r.name === sel ? " selected" : ""}>${esc20(r.name)}${r.sub ? ` · ${esc20(r.sub)}` : ""}${r.state === "deleted" ? " (지움)" : r.state === "new" ? " (추가)" : r.state === "edited" ? " (고침)" : ""}</option>`).join("")}</select>`;
+도 켜고 끌 수 있어요."}</small></div>`;
+    const body5 = panel ? first ? panel.replace('<div class="dir-panel">', `<div class="dir-panel">${first}`) : panel : `<div class="dir-panel"><p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p></div>`;
+    return `<section class="gw-sec gw-basic"><h3>기본 정보</h3>${body5}</section>`;
+  }
+  function keysRow(kind, sel, rec2) {
+    const ph = kind === "appendix" ? "비우면 키 없음 (다른 켜지는 조건만)" : "비우면 이름·영문명·별칭";
+    return `<div class="gw-keys"><span>호출 단어<button type="button" class="gw-fhint" data-action="ed-hint" aria-label="설명" data-hint="이 말이 최근 대화에 나오면 로어북이 켜져요. 쉼표로 나눠 적어요. ${esc20(ph)}.">?</button></span><input data-input="ed-keys" data-key="${esc20(`${kind}|${sel}|keys`)}" value="${esc20(rec2.keys ?? "")}" placeholder="${esc20(ph)}" autocomplete="off" aria-label="호출 단어"></div>`;
+  }
+  function sceneCard(sel, d) {
+    const a = d.agents.find((x) => x.lore === sel);
+    if (!a || !/^P\d{3,}$/.test(a.id)) return "";
+    return `<details class="gw-sec gw-fscene"><summary>첫 장면<small>${esc20(a.id)} · ${agentSceneState(a.id, d)}</small></summary><div class="dir-panel">${agentSceneFields(a.id, d)}</div></details>`;
+  }
+  function membersCard(ctx2, sel, d) {
+    const list4 = d.agents.filter((a) => a.affiliation === sel);
+    const items = list4.map((a) => {
+      const sub = [a.rank, a.department].filter(Boolean).join(" · ");
+      return `<button class="gw-member" data-action="ed-goto" data-value="agent|${esc20(a.lore)}" title="요원 기록으로">${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}<span class="gw-member-t"><b>${esc20(a.name)}</b><small>${esc20(a.english || "")}${sub ? ` · ${esc20(sub)}` : ""}</small></span></button>`;
+    }).join("");
+    return `<section class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
+  }
+  function recordPage(ctx2, kind, over, q, sel) {
+    const d = directoryDraft(ctx2);
+    const pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf3(ctx2, kind, over).map((r) => `<option value="${esc20(r.name)}"${r.name === sel ? " selected" : ""}>${esc20(r.name)}${r.sub ? ` · ${esc20(r.sub)}` : ""}${r.state === "deleted" ? " (지움)" : r.state === "new" ? " (추가)" : r.state === "edited" ? " (고침)" : ""}</option>`).join("")}</select>`;
     const ext = kind === "anomaly" || kind === "site";
     const list4 = `<aside class="gw-list-pane">
     <div class="gw-list-tools">${pick3}<input class="dir-search" type="search" data-input="ed-q" value="${esc20(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
@@ -91,7 +114,7 @@ pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_K
     <textarea data-input="ed-anote" rows="5">${esc20(note)}</textarea>
     <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? "" : "disabled"}>기본으로</button></div></details>`;
   }
-  function recordInput(name, key2, value, ctx2) {
+  function recordInput(name, key, value, ctx2) {
     if (name === "ed-import") {
       recUi.importText = value;
       return true;
@@ -105,7 +128,7 @@ pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_K
       return true;
     }
     if (name !== "ed-field" && name !== "ed-extra" && name !== "ed-extra-name" && name !== "ed-keys") return false;
-    const [kind, recName, id2] = key2.split("|");
+    const [kind, recName, id2] = key.split("|");
     if (!(kind in FIELDS) || !recName) return false;
     const over = overridesOf(ctx2);
     const rec2 = structuredClone(worldRecord(kind, recName, over) ?? emptyRecord());
@@ -302,21 +325,21 @@ ${v}` : v;
   var esc21 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var relUi = { org: "", preview: false };
   var sym = () => getPrefs().relationsSym !== false;
-  function setCell(over, key2, cell3) {
+  function setCell(over, key, cell3) {
     const pairs = { ...over.relations?.pairs ?? {} };
-    const base = worldRelations().pairs[key2];
+    const base = worldRelations().pairs[key];
     if (cell3 === null) {
-      if (base) pairs[key2] = null;
-      else delete pairs[key2];
-    } else if (base && base.stage === cell3.stage && (base.memo ?? "") === (cell3.memo ?? "")) delete pairs[key2];
-    else pairs[key2] = cell3;
+      if (base) pairs[key] = null;
+      else delete pairs[key];
+    } else if (base && base.stage === cell3.stage && (base.memo ?? "") === (cell3.memo ?? "")) delete pairs[key];
+    else pairs[key] = cell3;
     const relations = { ...over.relations ?? {}, pairs };
     if (!Object.keys(pairs).length) delete relations.pairs;
     const next = { ...over, relations };
     if (!Object.keys(relations).length) delete next.relations;
     return next;
   }
-  var seg5 = (key2, cur) => `<div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s8) => `<button class="gx-seg${cur === s8 ? " on" : ""}" data-action="ed-rel-set" data-value="${esc21(`${key2}:${s8}`)}" aria-pressed="${cur === s8}">${RELATION_LABEL[s8]}</button>`).join("")}</div>`;
+  var seg5 = (key, cur) => `<div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s8) => `<button class="gx-seg${cur === s8 ? " on" : ""}" data-action="ed-rel-set" data-value="${esc21(`${key}:${s8}`)}" aria-pressed="${cur === s8}">${RELATION_LABEL[s8]}</button>`).join("")}</div>`;
   function relationsPage(ctx2, over, rulesOnly) {
     void rulesOnly;
     const d = directoryDraft(ctx2);
@@ -336,11 +359,11 @@ ${v}` : v;
       return `<div class="gw-rowbox${sel === o.name ? " on" : ""}"><button class="gw-row" data-action="ed-rel-pick" data-value="${esc21(o.name)}"><b>${esc21(o.name)}</b><small>${esc21(o.spec.english || "")}</small>${off ? '<span class="gw-badge">제외</span>' : n2 ? `<span class="gw-rel-n">${n2}</span>` : ""}</button></div>`;
     }).join("");
     const rows3 = included.filter((o) => o.name !== sel).map((o) => {
-      const key2 = `${sel}>${o.name}`;
+      const key = `${sel}>${o.name}`;
       const back = stageOf2(o.name, sel);
-      const memo = rel.pairs[key2]?.memo ?? "";
+      const memo = rel.pairs[key]?.memo ?? "";
       return `<div class="ps-row"><div class="ps-label"><b>${esc21(o.name)}</b><small>${esc21(o.name)} → ${esc21(sel)}: ${RELATION_LABEL[back]}</small></div>
-        <div class="ps-ctl">${seg5(key2, stageOf2(sel, o.name))}<input class="gw-rel-memo" data-input="ed-rel-memo" data-key="${esc21(key2)}" value="${esc21(memo)}" placeholder="메모 (선택)" autocomplete="off"></div></div>`;
+        <div class="ps-ctl">${seg5(key, stageOf2(sel, o.name))}<input class="gw-rel-memo" data-input="ed-rel-memo" data-key="${esc21(key)}" value="${esc21(memo)}" placeholder="메모 (선택)" autocomplete="off"></div></div>`;
     }).join("");
     const basic = `<section class="ps-group"><h3>기본</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>세력 관계도에 포함</b><small>${selOff ? "관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직)." : "Faction 지침의 관계 표에 들어가요. 조직 기록에서도 켜고 끌 수 있어요."}</small></div>
@@ -366,7 +389,7 @@ ${v}` : v;
     </div>
   </div>`;
   }
-  function relationsInput(name, key2, value, ctx2) {
+  function relationsInput(name, key, value, ctx2) {
     void ctx2;
     const over = edUi.over;
     if (name === "ed-rules") {
@@ -381,9 +404,9 @@ ${v}` : v;
     }
     if (name === "ed-rel-memo") {
       const rel = worldRelations(over);
-      const stage = rel.pairs[key2]?.stage ?? "neutral";
+      const stage = rel.pairs[key]?.stage ?? "neutral";
       const cell3 = stage === "neutral" && !value.trim() ? null : { stage, ...value.trim() ? { memo: value } : {} };
-      setOverrides(setCell(over, key2, cell3));
+      setOverrides(setCell(over, key, cell3));
       return true;
     }
     return false;
@@ -398,10 +421,10 @@ ${v}` : v;
       case "ed-rel-set": {
         const at = (value ?? "").lastIndexOf(":");
         if (at < 0) return true;
-        const key2 = value.slice(0, at);
+        const key = value.slice(0, at);
         const stage = value.slice(at + 1);
-        if (!key2.includes(">") || !RELATION_STAGES.includes(stage)) return true;
-        return setStage(over, key2, stage, worldRelations(over));
+        if (!key.includes(">") || !RELATION_STAGES.includes(stage)) return true;
+        return setStage(over, key, stage, worldRelations(over));
       }
       case "ed-rel-sym":
         await savePrefs((p2) => ({ ...p2, relationsSym: sym() ? false : void 0 }));
@@ -427,15 +450,15 @@ ${v}` : v;
     }
     return false;
   }
-  function setStage(over, key2, stage, rel) {
+  function setStage(over, key, stage, rel) {
     const apply = (o, k) => {
       const memo = rel.pairs[k]?.memo ?? "";
       const cell3 = stage === "neutral" && !memo ? null : { stage, ...memo ? { memo } : {} };
       return setCell(o, k, cell3);
     };
-    let next = apply(over, key2);
+    let next = apply(over, key);
     if (sym()) {
-      const [a, b] = key2.split(">");
+      const [a, b] = key.split(">");
       next = apply(next, `${b}>${a}`);
     }
     setOverrides(next);
@@ -489,11 +512,11 @@ ${esc22(p2.body)}</textarea></div>`;
     const tok3 = root3.querySelector(".gw-head .gw-tokens");
     if (tok3) tok3.textContent = `${tokenizerName() ? "" : "약 "}${tokens(text4).toLocaleString()}토큰`;
   }
-  function guideInput(input3, key2, value) {
+  function guideInput(input3, key, value) {
     if (input3 === "ed-guide-title") {
-      const at = key2.lastIndexOf("|");
-      const name = key2.slice(0, at);
-      const i = Number(key2.slice(at + 1));
+      const at = key.lastIndexOf("|");
+      const name = key.slice(0, at);
+      const i = Number(key.slice(at + 1));
       const parts = splitGuide(guideUi.draft[name] ?? guideText(name));
       const md = parts[i] && /^(#{2,3}) /.exec(parts[i].head);
       if (!md) return true;
@@ -505,9 +528,9 @@ ${esc22(p2.body)}</textarea></div>`;
       return true;
     }
     if (input3 === "ed-guide-sec") {
-      const at = key2.lastIndexOf("|");
-      const name = key2.slice(0, at);
-      const i = Number(key2.slice(at + 1));
+      const at = key.lastIndexOf("|");
+      const name = key.slice(0, at);
+      const i = Number(key.slice(at + 1));
       const parts = splitGuide(guideUi.draft[name] ?? guideText(name));
       if (!parts[i]) return true;
       parts[i] = { ...parts[i], body: value.replace(/\r/g, "") };
@@ -516,7 +539,7 @@ ${esc22(p2.body)}</textarea></div>`;
       return true;
     }
     if (input3 !== "ed-guide") return false;
-    guideUi.draft[key2] = value;
+    guideUi.draft[key] = value;
     guideUi.info = "";
     return true;
   }
@@ -612,9 +635,9 @@ ${esc22(p2.body)}</textarea></div>`;
     </div></section></div>
   </div>`;
   }
-  function ruleInput(name, key2, value) {
+  function ruleInput(name, key, value) {
     if (name !== "ed-rule-title" && name !== "ed-rule-text") return false;
-    const next = getUserRules().map((r) => r.id === key2 ? { ...r, [name === "ed-rule-title" ? "title" : "text"]: value } : r);
+    const next = getUserRules().map((r) => r.id === key ? { ...r, [name === "ed-rule-title" ? "title" : "text"]: value } : r);
     saveSoon(next);
     return true;
   }
@@ -1334,8 +1357,8 @@ ${body5}`;
     const system = [facts, ...s8.director === "scene" ? [scene] : [], ...guides, "", ...s8.directorSearch ? SYSTEM_SEARCH : [], OUTPUT, s8.directorRules.trim() ? `## User rules
 ${s8.directorRules.trim()}` : ""].join("\n").replace("{{LANG}}", s8.directorLang === "ko" ? "Korean" : "English").replace("{{LINES}}", s8.directorLen === "normal" ? "3" : "1");
     const data3 = { people: persons, ...rhythm.length ? { rhythm, rhythm_clock: rhythmClockLines(rhythmClock(store, chat, live)) } : {}, ...memory.length ? { memory } : {}, recent, input: input3.slice(0, 4e3) };
-    const key2 = hash(JSON.stringify({ people: persons.map((p2) => [p2.name, p2.affinity, p2.state, p2.threads, p2.unknown_to, p2.slots]), input: input3 }));
-    return { system, data: data3, key: key2, people, search: s8.directorSearch };
+    const key = hash(JSON.stringify({ people: persons.map((p2) => [p2.name, p2.affinity, p2.state, p2.threads, p2.unknown_to, p2.slots]), input: input3 }));
+    return { system, data: data3, key, people, search: s8.directorSearch };
   }
   function repairDirector(built, invalid, error) {
     const fix = `## Output repair
@@ -2382,17 +2405,17 @@ ${rules2}`;
           continue;
         }
       }
-      const key2 = plain(d.key, 40);
+      const key = plain(d.key, 40);
       const ev = norm(str9(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
-      if (!key2 || typeof ev === "string") {
+      if (!key || typeof ev === "string") {
         drop("doc", d, typeof ev === "string" ? ev : "이름 없음");
         continue;
       }
-      const doc2 = store.docs[`${type}:${key2}`];
+      const doc2 = store.docs[`${type}:${key}`];
       const cur = doc2 ? liveEntries(doc2.entries, live) : [];
       const text4 = plain(d.text, 200);
-      if (type === "rhythm" && text4 && !rhythmTextOk(key2, text4)) {
-        drop("doc", d, "리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])", key2);
+      if (type === "rhythm" && text4 && !rhythmTextOk(key, text4)) {
+        drop("doc", d, "리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])", key);
         continue;
       }
       let replaces;
@@ -2418,7 +2441,7 @@ ${rules2}`;
       }
       const seq = nextSeq2(ev.anchor);
       const body5 = d.op === "remove" ? `(해소) ${cur.find((x) => x.id === replaces).text}`.slice(0, 200) : text4;
-      if (putDoc(store, type, key2, { id: entryId(`${type}:${key2}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str9(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
+      if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, "doc", ev.anchor, seq, body5), text: body5, src: "story", anchor: ev.anchor, seq, ...norm(str9(d.quote)).length >= 3 ? { quote: d.quote } : {}, ...replaces ? { replaces } : {}, ...d.date ? { date: plain(d.date, 20) } : {}, ...d.place ? { place: plain(d.place, 40) } : {}, ...Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {} })) report.applied.docs++;
     }
     if (ctx2.settings.features.has("suspicion") && !ctx2.settings.qualitative.has("suspicion")) {
       for (const s8 of r.suspicion ?? []) {
@@ -2550,12 +2573,12 @@ ${rules2}`;
           continue;
         }
         const memo = plain(t.memo, 30) || (amount < 0 ? "지출" : "수입");
-        const key2 = `${ev.anchor}|${amount}|${memo}`;
-        if (seen2.has(key2)) {
+        const key = `${ev.anchor}|${amount}|${memo}`;
+        if (seen2.has(key)) {
           drop("wallet", t, "같은 거래 중복");
           continue;
         }
-        seen2.add(key2);
+        seen2.add(key);
         report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str9(t.quote).slice(0, 120) });
         report.applied.transactions++;
       }
@@ -2599,7 +2622,7 @@ ${rules2}`;
         const eq = t.equip === void 0 ? void 0 : t.equip === null || /^(none|null|-|)$/i.test(str9(t.equip).trim()) ? null : itemEquip(str9(t.equip).trim().toLowerCase());
         const uses = t.uses === void 0 || t.uses === null ? void 0 : str9(t.uses).trim() === "0" ? 0 : itemUses(t.uses);
         const cond = t.condition ? str9(t.condition).trim().toLowerCase() : "";
-        const icon2 = cleanIcon(t.icon);
+        const icon = cleanIcon(t.icon);
         report.items.push({
           anchor: ev.anchor,
           name: listed ?? name,
@@ -2611,7 +2634,7 @@ ${rules2}`;
           ...uses !== void 0 ? { uses } : {},
           ...eq !== void 0 ? { equip: eq ?? null } : {},
           ...cond === "ok" || cond === "damaged" || cond === "broken" ? { state: itemState(cond) } : {},
-          ...icon2 ? { icon: icon2 } : {}
+          ...icon ? { icon } : {}
         });
         report.applied.items++;
       }
@@ -2673,16 +2696,16 @@ ${rules2}`;
     const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns3);
     return bots.filter((i) => match(messageText(str9(list4[i].data))).length || list4[i - 1] && match(messageText(str9(list4[i - 1].data))).length);
   }
-  function rhythmTextOk(key2, text4) {
-    if (key2 === "scene") {
+  function rhythmTextOk(key, text4) {
+    if (key === "scene") {
       const m = /^\[phase:([a-z_]+)\]\s*\[engagement:([a-z_]+)\]/.exec(text4);
       return !!m && RHYTHM_PHASES.includes(m[1]) && RHYTHM_ENGAGEMENT.includes(m[2]);
     }
-    if (key2.startsWith("hook:")) {
+    if (key.startsWith("hook:")) {
       const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\](?:\s*\[ext\])?/.exec(text4);
       return !!m && RHYTHM_HOOK_STAGES.includes(m[1]) && RHYTHM_HOOK_TIERS.includes(m[2]);
     }
-    return key2 === "chapter" || key2 === "arc" || key2 === "pending";
+    return key === "chapter" || key === "arc" || key === "pending";
   }
   function latestNote(store, who, live) {
     const n2 = [...store.log].reverse().find((c) => c.kind === "note" && c.who === who && isAlive(c, live));
@@ -2812,8 +2835,8 @@ ${rules2}`;
     const system = [base.replace("{{MAX}}", String(max)), o.rules?.trim() ? `## User rules
 ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
     const data3 = { input: input3.slice(0, 4e3), recent, catalog };
-    const key2 = hash(JSON.stringify({ input: input3, recent: recent.map((r) => r.text.slice(0, 400)), names: catalog.map((c) => c.name), system: system.length }));
-    return { system, data: data3, key: key2, max };
+    const key = hash(JSON.stringify({ input: input3, recent: recent.map((r) => r.text.slice(0, 400)), names: catalog.map((c) => c.name), system: system.length }));
+    return { system, data: data3, key, max };
   }
   function parseRouter(raw, store, names4, max = ROUTER_MAX) {
     let t = raw.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").trim();
@@ -3138,7 +3161,8 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
           console.log(`[goei] 인물 기록 갱신 거부: ${diag.error}`);
           continue;
         }
-        if (!input3.people.length) {
+        const moneyOrItems = itemsOn || walletOn2 && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? "")))));
+        if (!input3.people.length && !moneyOrItems) {
           if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
             const s8 = peopleStore(cur);
             for (const i of input3.indexes) {
@@ -3193,7 +3217,7 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
             for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: "story" });
             next = { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } };
           }
-          if (walletOn2) {
+          if (walletOn2 && walletSyncOn(next.scriptstate)) {
             const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
             if (w) next = { ...next, scriptstate: { ...next.scriptstate ?? {}, ...walletVars(w) } };
           }
@@ -3309,48 +3333,4 @@ Return the JSON object.` }
         diag.stage = "save";
         diag.error = "저장 직전에 채팅이 달라져 버림";
         return { ok: false, message: diag.error };
-      }
-      diag.ok = true;
-      const r = diag.tidy;
-      const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ""}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ""}`;
-      return { ok: true, message: msg, report: r };
-    } catch (error) {
-      if (!diag.raw && error && typeof error === "object" && "raw" in error) diag.raw = String(error.raw ?? "");
-      diag.stage = error instanceof LlmError ? "model" : diag.raw ? "parse" : "build";
-      diag.error = error instanceof Error ? error.message : String(error);
-      return { ok: false, message: `정리 실패: ${diag.error}` };
-    } finally {
-      diag.ms = Date.now() - t0;
-      await pushDiag(diag, settings.keepRaw);
-      setStatus({ busy: false, label: "" });
-    }
-  }
-  async function hypaMemory(chat, char, query, s8, cap = s8.hypaCap) {
-    if (!s8.hypa) return [];
-    let plus;
-    if (s8.hypaPlus) {
-      const charId2 = String(char?.chaId ?? "").trim();
-      const chatKey5 = String(chat.id ?? "").trim();
-      if (charId2 && chatKey5) {
-        try {
-          plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId2}_${chatKey5}`);
-        } catch {
-          plus = void 0;
-        }
-      }
-    }
-    return hypaSummaries(chat, cap, query, { plus: plus ?? void 0, maxItems: s8.hypaItems });
-  }
-  var routerCache = null;
-  var routerHints = [];
-  var routerHintsNow = () => routerHints;
-  async function routerPeople(chat, store, input3, settings, exclude = [], identityOf) {
-    if (settings.router !== "model" || !Object.keys(store.people).length) return null;
-    const names4 = allNames();
-    const built = buildRouter(chat, store, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
-    if (routerCache?.key === built.key) return routerCache.selected;
-    const t0 = Date.now();
-    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
-    try {
-      const raw = await Promise.race([
-        runModel([{ role: "system", content: built.system }, { role: "user", content: JSON.stringify(built.data) }], settings.stageModel.rou
+ 

@@ -1,4 +1,4 @@
-eFor.add(f);
+ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibleFor.add(f);
       for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
     }
     const orders = {};
@@ -175,8 +175,8 @@ eFor.add(f);
       }
     }
     const rt = r.readThrough;
-    for (const key2 of [...senders.keys()].sort()) {
-      const row9 = senders.get(key2);
+    for (const key of [...senders.keys()].sort()) {
+      const row9 = senders.get(key);
       row9.lastMessageRead = rt !== void 0 && row9.lastRecordID !== void 0 ? row9.lastRecordID <= rt ? "read" : "unread" : "unknown";
       out.senders.push(row9);
     }
@@ -550,12 +550,12 @@ eFor.add(f);
           people[cid] = personOf(c);
         }
         if (!people[row9.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
-        const key2 = `${name}\0${sig(members)}`;
-        if (fresh.has(key2)) fail("같은 단톡방 초대가 중복됐어요.");
+        const key = `${name}\0${sig(members)}`;
+        if (fresh.has(key)) fail("같은 단톡방 초대가 중복됐어요.");
         for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
         const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row9.inviter };
         room.events = eventsFromPatch(row9.patch, room, false, dropped).events;
-        fresh.add(key2);
+        fresh.add(key);
         out.push(room);
       } catch (error) {
         dropped.push(error.message);
@@ -752,8 +752,8 @@ ${body5}
     return [...src.char.globalLore ?? [], ...local];
   }
   function readBook(books, name, env3) {
-    const key2 = name.trim().toLowerCase();
-    return books.filter((e) => String(e.comment ?? "").trim().toLowerCase() === key2 && allowedBook(e)).map((e) => stripModules(evaluate(String(e.content ?? ""), env3))).filter(Boolean);
+    const key = name.trim().toLowerCase();
+    return books.filter((e) => String(e.comment ?? "").trim().toLowerCase() === key && allowedBook(e)).map((e) => stripModules(evaluate(String(e.content ?? ""), env3))).filter(Boolean);
   }
   function bookText(src, name) {
     return name.trim() ? readBook(allBooks(src), name, cbsEnv(src)).join("\n\n") : "";
@@ -786,9 +786,9 @@ ${body5}
     if (o.persona !== false && src.persona?.trim()) add("base", PERSONA_SOURCE, stripModules(evaluate(src.persona, env3)));
     const seen2 = /* @__PURE__ */ new Set();
     const pull = (kind, name) => {
-      const key2 = name.trim().toLowerCase();
-      if (!key2 || seen2.has(key2)) return;
-      seen2.add(key2);
+      const key = name.trim().toLowerCase();
+      if (!key || seen2.has(key)) return;
+      seen2.add(key);
       for (const c of readBook(books, name, env3)) add(kind, name, c);
     };
     for (const n2 of o.primaryNames ?? []) pull("primary", n2);
@@ -1126,16 +1126,16 @@ ${c}`)]).join("\n\n");
   }
   function liveEntries(list4, live) {
     if (!list4?.length) return [];
-    const alive2 = new Set(list4.filter((e) => isAlive(e, live)).map((e) => e.id));
-    const replaced = new Set(list4.filter((e) => alive2.has(e.id)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
-    return list4.filter((e) => alive2.has(e.id) && !replaced.has(e.id));
+    const alive = new Set(list4.filter((e) => isAlive(e, live)).map((e) => e.id));
+    const replaced = new Set(list4.filter((e) => alive.has(e.id)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
+    return list4.filter((e) => alive.has(e.id) && !replaced.has(e.id));
   }
   function entryStates(list4, live) {
     const out = /* @__PURE__ */ new Map();
     if (!list4?.length) return out;
-    const alive2 = new Set(liveEntries(list4, live).map((e) => e.id));
+    const alive = new Set(liveEntries(list4, live).map((e) => e.id));
     const replaced = new Set(list4.filter((e) => isAlive(e, live)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
-    for (const e of list4) out.set(e.id, alive2.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
+    for (const e of list4) out.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
     return out;
   }
   function liveChanges(store, live) {
@@ -1152,9 +1152,9 @@ ${c}`)]).join("\n\n");
     list4.push({ ...entry3, text: plain(entry3.text, slot2 === "speech" ? 600 : 300), ...entry3.quote ? { quote: plain(entry3.quote, 60) } : {} });
     return true;
   }
-  function putDoc(store, type, key2, entry3) {
-    const k = `${type}:${key2}`;
-    const d = store.docs[k] ??= { type, key: key2, entries: [] };
+  function putDoc(store, type, key, entry3) {
+    const k = `${type}:${key}`;
+    const d = store.docs[k] ??= { type, key, entries: [] };
     if (d.entries.some((e) => e.id === entry3.id)) return false;
     d.entries.push({ ...entry3, text: plain(entry3.text) });
     return true;
@@ -1405,7 +1405,7 @@ ${c}`)]).join("\n\n");
   }
 
   // src/core/people/settings.ts
-  var PP = (key2) => `$pp_${key2}`;
+  var PP = (key) => `$pp_${key}`;
   var NUMERIC_FEATURES = ["affinity", "suspicion", "openness"];
   var FEATURES = ["axes", "affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "npc_emotion", "taste", "openness", "rhythm", "faction_rep"];
   var PP_DEFAULTS = {
@@ -1510,9 +1510,9 @@ ${c}`)]).join("\n\n");
     parallel: "0",
     keep_raw: "1"
   };
-  function ppValue(state, key2) {
-    const v = state?.[PP(key2)];
-    return v === void 0 || v === null || v === "" || v === "null" ? PP_DEFAULTS[key2] ?? "" : String(v);
+  function ppValue(state, key) {
+    const v = state?.[PP(key)];
+    return v === void 0 || v === null || v === "" || v === "null" ? PP_DEFAULTS[key] ?? "" : String(v);
   }
   function peopleSettings(state) {
     const v = (k) => ppValue(state, k);
@@ -1699,23 +1699,17 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     ["인시던트 RP 유지 시간", "incident_ttl", 8760, true],
     ["미스틱 사이트 RP 유지 시간", "mystic_ttl", 8760, true],
     ["인시던트 중 거점 비율", "landmark_share", 100, false]
-  ].map(([label2, key2, max, fraction]) => ({ key: key2, label: label2, max, fraction }));
-  var wgKey = (key2) => `$wg_${key2}`;
+  ].map(([label2, key, max, fraction]) => ({ key, label: label2, max, fraction }));
+  var wgKey = (key) => `$wg_${key}`;
   function worldValue(f, v) {
     const n2 = num2(v);
     if (n2 === null || n2 < 0 || f.max !== null && n2 > f.max || !f.fraction && !Number.isInteger(n2)) return null;
     return n2;
   }
   var cache4 = /* @__PURE__ */ new WeakMap();
-  var MARK_MAX = 5;
-  var DEFAULT_MARKS = [
-    // 2026-11-05 사용자: 폰 상황판 서랍은 오른쪽부터 설정·기록, 왼쪽 세 칸은 비워 둔다 (가계부 기본 칸도 뺌)
-    { s: { tab: "records" }, name: "기록" },
-    { s: { tab: "settings" }, name: "설정" }
-  ];
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -1763,8 +1757,6 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const imgFoldLock = o.imgFoldLock === true ? true : void 0;
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
-    const savedMarks = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    const marks3 = o.marksSeeded === true ? savedMarks : [...savedMarks, ...DEFAULT_MARKS.filter((d) => !savedMarks.some((m) => JSON.stringify(m.s) === JSON.stringify(d.s)))].slice(0, MARK_MAX);
     const strList = (v, max, len) => Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : [];
     const imgPrompt = typeof o.imgPrompt === "string" && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6e3) : void 0;
     const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -1789,7 +1781,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const relationsSym = o.relationsSym === false ? false : void 0;
     const frame = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks3.length ? { marks: marks3 } : {}, marksSeeded: true };
+    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -1916,9 +1908,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const n2 = Number(vars?.[WALLET_RECENT_VAR]);
     return Number.isInteger(n2) && n2 >= 0 ? Math.min(WALLET_RECENT_MAX, n2) : 0;
   };
-  function recentWalletLines(w, alive2, n2) {
+  function recentWalletLines(w, alive, n2) {
     if (n2 <= 0) return [];
-    return liveWallet(w, alive2).filter((e) => e.memo !== WALLET_SYNC_MEMO).slice(-n2).map((e) => `${e.amount > 0 ? "+" : ""}${e.amount.toLocaleString("en-US")} won ${e.memo}`);
+    return liveWallet(w, alive).filter((e) => e.memo !== WALLET_SYNC_MEMO).slice(-n2).map((e) => `${e.amount > 0 ? "+" : ""}${e.amount.toLocaleString("en-US")} won ${e.memo}`);
   }
   var walletEditable = (vars) => vars?.[WALLET_EDIT_VAR] === "1";
   var walletStarted = (chat) => (chat.message ?? []).some((m) => m.role === "user");
@@ -1942,11 +1934,11 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   function aliveAnchors(chat) {
     return new Set((chat.message ?? []).map((m, i) => messageKey(m, i)));
   }
-  function liveWallet(w, alive2) {
-    return w.log.filter((e) => !e.anchor || alive2.has(e.anchor));
+  function liveWallet(w, alive) {
+    return w.log.filter((e) => !e.anchor || alive.has(e.anchor));
   }
-  function walletBalance(w, alive2) {
-    return liveWallet(w, alive2).reduce((n2, e) => n2 + e.amount, w.start);
+  function walletBalance(w, alive) {
+    return liveWallet(w, alive).reduce((n2, e) => n2 + e.amount, w.start);
   }
   var hash2 = (text4) => {
     let h = 2166136261;
@@ -1966,8 +1958,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   function removeWalletEntry(w, id2) {
     return { ...w, log: w.log.filter((e) => e.id !== id2) };
   }
-  function adjustWallet(w, alive2, target, memo = "잔고 수정") {
-    const diff = Math.trunc(target) - walletBalance(w, alive2);
+  function adjustWallet(w, alive, target, memo = "잔고 수정") {
+    const diff = Math.trunc(target) - walletBalance(w, alive);
     if (!diff) return w;
     return addWalletEntry(w, { anchor: "", amount: diff, memo, src: "manual", id: `m_${Date.now().toString(36)}_${w.log.length}` });
   }
@@ -1977,9 +1969,10 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const msgs4 = chat.message ?? [];
     let anchor = "";
     let target = null;
-    for (let i = msgs4.length - 1; i >= 0 && target === null; i--) {
+    let i = msgs4.length - 1;
+    while (i >= 0 && msgs4[i].role === "user") i--;
+    if (i >= 0) {
       const m = msgs4[i];
-      if (m.role === "user") continue;
       const tags = findStatusTags(typeof m.data === "string" ? m.data : "");
       for (let k = tags.length - 1; k >= 0; k--) {
         const n2 = tags[k].wallet ? Number(tags[k].wallet) : NaN;
@@ -1993,7 +1986,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     if (target === null) return null;
     const id2 = syncId(anchor);
     const base = removeWalletEntry(w, id2);
-    const diff = target - walletBalance(base, aliveAnchors(chat));
+    const alive = aliveAnchors(chat);
+    const before = { ...base, log: base.log.filter((e) => !(e.src === "store" && e.anchor === anchor)) };
+    const diff = target - walletBalance(before, alive);
     const next = diff === 0 ? base : addWalletEntry(base, { id: id2, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: "story" });
     return JSON.stringify(next) === JSON.stringify(w) ? null : next;
   }
@@ -4794,4 +4789,19 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     [/가짜\s*관리국|fake/i, "B00"],
     [/관리국|management bureau|bureau/i, "A00"],
     [/백일몽|daydream/i, "C00"],
-    [/민간|civilian|시민/i,
+    [/민간|civilian|시민/i, "D00"],
+    [/프리랜서|freelancer|협회 등록/i, "E00"]
+  ];
+  function factionCode(org) {
+    const t = org.trim();
+    if (/^[A-Z]00$/.test(t)) return t;
+    for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
+    return "";
+  }
+  function rankLevel(faction, rank2) {
+    const r = rank2.replace(/\s+/g, "");
+    if (!r || /^(-|없음|미정)$/.test(r)) return null;
+    if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
+    if (faction === "A00") {
+      if (/부장|팀장|chief/i.test(r)) return 3;
+      if (/선임

@@ -1,4 +1,48 @@
-ter, settings.stageModelId.router || void 0, "라우터"),
+     }
+      diag.ok = true;
+      const r = diag.tidy;
+      const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ""}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ""}`;
+      return { ok: true, message: msg, report: r };
+    } catch (error) {
+      if (!diag.raw && error && typeof error === "object" && "raw" in error) diag.raw = String(error.raw ?? "");
+      diag.stage = error instanceof LlmError ? "model" : diag.raw ? "parse" : "build";
+      diag.error = error instanceof Error ? error.message : String(error);
+      return { ok: false, message: `정리 실패: ${diag.error}` };
+    } finally {
+      diag.ms = Date.now() - t0;
+      await pushDiag(diag, settings.keepRaw);
+      setStatus({ busy: false, label: "" });
+    }
+  }
+  async function hypaMemory(chat, char, query, s8, cap = s8.hypaCap) {
+    if (!s8.hypa) return [];
+    let plus;
+    if (s8.hypaPlus) {
+      const charId2 = String(char?.chaId ?? "").trim();
+      const chatKey5 = String(chat.id ?? "").trim();
+      if (charId2 && chatKey5) {
+        try {
+          plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId2}_${chatKey5}`);
+        } catch {
+          plus = void 0;
+        }
+      }
+    }
+    return hypaSummaries(chat, cap, query, { plus: plus ?? void 0, maxItems: s8.hypaItems });
+  }
+  var routerCache = null;
+  var routerHints = [];
+  var routerHintsNow = () => routerHints;
+  async function routerPeople(chat, store, input3, settings, exclude = [], identityOf) {
+    if (settings.router !== "model" || !Object.keys(store.people).length) return null;
+    const names4 = allNames();
+    const built = buildRouter(chat, store, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
+    if (routerCache?.key === built.key) return routerCache.selected;
+    const t0 = Date.now();
+    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+    try {
+      const raw = await Promise.race([
+        runModel([{ role: "system", content: built.system }, { role: "user", content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || void 0, "라우터"),
         new Promise((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.routerTimeout}초`)), settings.routerTimeout * 1e3))
       ]);
       diag.raw = raw;
@@ -219,13 +263,13 @@ ter, settings.stageModelId.router || void 0, "라우터"),
     return map;
   }
   function ensureFlow(ctx2, render3) {
-    const key2 = tokKey(ctx2);
-    if (flowTok.pending || flowTok.map && flowTok.key === key2) return;
+    const key = tokKey(ctx2);
+    if (flowTok.pending || flowTok.map && flowTok.key === key) return;
     flowTok.pending = true;
     flowTok.error = "";
     void computeTokens(ctx2).then((map) => {
       flowTok.map = map;
-      flowTok.key = key2;
+      flowTok.key = key;
     }).catch((e) => {
       flowTok.error = e instanceof Error ? e.message : String(e);
     }).finally(() => {
@@ -388,9 +432,9 @@ ter, settings.stageModelId.router || void 0, "라우터"),
     ["goei:game:code", "옛 게임 코드", "예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"],
     [GAME_PACKS, "옛 게임 자산 팩", "예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"]
   ];
-  async function sizeOf2(key2) {
+  async function sizeOf2(key) {
     try {
-      const raw = await risuai.pluginStorage.getItem(key2);
+      const raw = await risuai.pluginStorage.getItem(key);
       return typeof raw === "string" ? raw.length : raw ? JSON.stringify(raw).length : 0;
     } catch {
       return 0;
@@ -415,16 +459,16 @@ ter, settings.stageModelId.router || void 0, "라우터"),
   var rerender2 = null;
   async function refresh() {
     const sizes = {};
-    for (const [key2] of STORE) {
-      if (key2 === GAME_PACKS) {
+    for (const [key] of STORE) {
+      if (key === GAME_PACKS) {
         let total = 0;
         try {
           const keys = await risuai.pluginStorage.keys();
           for (const k of Array.isArray(keys) ? keys : []) if (typeof k === "string" && k.startsWith(GAME_PACK_PREFIX)) total += await sizeOf2(k);
         } catch {
         }
-        sizes[key2] = total;
-      } else sizes[key2] = await sizeOf2(key2);
+        sizes[key] = total;
+      } else sizes[key] = await sizeOf2(key);
     }
     manUi.sizes = sizes;
     try {
@@ -485,8 +529,8 @@ ter, settings.stageModelId.router || void 0, "라우터"),
     const json = exportJson(ctx2, withChat);
     const chatN = canChat ? Object.keys(chatSettingVars(ctx2.chat.scriptstate)).length : 0;
     const sizes = manUi.sizes;
-    const store = STORE.map(([key2, label2, help, drop]) => {
-      const n2 = sizes?.[key2] ?? 0;
+    const store = STORE.map(([key, label2, help, drop]) => {
+      const n2 = sizes?.[key] ?? 0;
       const ctl = `<span class="gw-tokens">${sizes ? n2 ? kb(n2) : "없음" : "…"}</span>${drop && n2 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
       return row5(label2, ctl, help);
     }).join("");
@@ -494,7 +538,7 @@ ter, settings.stageModelId.router || void 0, "라우터"),
       <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc27(manUi.importName)}</span>` : ""}</div>
       <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc27(manUi.importText)}</textarea></div>
     <div class="ps-row gw-rel-foot">${manUi.confirm === "import" ? `<span class="gx-muted">지금 설정을 덮어써요.</span><button class="gx-mini danger" data-action="man-import-yes">정말 적용</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? "" : "disabled"}>적용</button>`}</div>`;
-    return `<div class="gw-page gw-set">${head("이 기기 공통", "설정 내보내기", "설정을 글(JSON) 하나로 내보내고 가져와요. 들어가는 것: 화면·이미지 설정, 「기본값으로 저장」으로 둔 새 채팅 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침·즐겨찾기, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 한 번도 바꾸지 않아 기본값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.")}
+    return `<div class="gw-page gw-set">${head("이 기기 공통", "설정 내보내기", "설정을 글(JSON) 하나로 내보내고 가져와요. 들어가는 것: 화면·이미지 설정, 「기본값으로 저장」으로 둔 새 채팅 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 한 번도 바꾸지 않아 기본값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.")}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>기기 설정</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 범위의 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
@@ -1124,14 +1168,14 @@ ter, settings.stageModelId.router || void 0, "라우터"),
   var SEEDED_LABEL = { lore: "시트", dialogue: "대사", none: "빈 기록" };
   var SEEDED_HELP = { lore: "시작값: 로어북 시트(Identity·Character 절)에서 만들었어요", dialogue: "시작값: 필드 대사 자료에서 만들었어요", none: "시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요" };
   var seededOf = (p2) => p2.seeded.from === "lore" ? "lore" : p2.seeded.from === "dialogue" ? "dialogue" : "none";
-  function seg6(key2, cur, items, action = "pp-set") {
-    const sw = onOffSwitch(items, cur, action, (v) => `${key2}=${v}`);
+  function seg6(key, cur, items, action = "pp-set") {
+    const sw = onOffSwitch(items, cur, action, (v) => `${key}=${v}`);
     if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${esc29(`${key2}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${esc29(`${key}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var row6 = (label2, control2, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
   var group3 = (title2, body5, note = "") => `<section class="ps-group">${title2 ? `<h3>${title2}</h3>` : ""}${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
-  var fold = (key2, title2, body5, open3 = false) => `<details class="ps-adv-sub" data-keep="${key2}"${keepOpen(key2, open3)}><summary>${title2}</summary><div class="ps-rows">${body5}</div></details>`;
+  var fold = (key, title2, body5, open3 = false) => `<details class="ps-adv-sub" data-keep="${key}"${keepOpen(key, open3)}><summary>${title2}</summary><div class="ps-rows">${body5}</div></details>`;
   var srcIcon = (src) => `<i class="pp-src s-${src}" title="${esc29(SRC_HELP[src])}" aria-label="${SRC_LABEL[src]}">${SRC_ICON2[src]}</i>`;
   function msgNo(anchor, live) {
     const pos = live.at.get(anchor);
@@ -1438,8 +1482,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const facs = factionList(ctx2.char.globalLore);
     const groups = /* @__PURE__ */ new Map();
     for (const p2 of Object.values(store.people).sort((a, b) => a.name.localeCompare(b.name, "ko"))) {
-      const key2 = facs.some((f) => f.code === p2.faction) ? p2.faction : "";
-      (groups.get(key2) ?? groups.set(key2, []).get(key2)).push(p2);
+      const key = facs.some((f) => f.code === p2.faction) ? p2.faction : "";
+      (groups.get(key) ?? groups.set(key, []).get(key)).push(p2);
     }
     const order = [...facs.map((f) => f.code).filter((c) => groups.has(c)), ...groups.has("") ? [""] : []];
     const item2 = (p2) => {
@@ -1557,12 +1601,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     <div class="pp-cells" role="img" aria-label="호감 ${value}, ${esc29(st.label)}">${cells}</div>
     <div class="pp-aff-ends" aria-hidden="true"><span>${esc29(STAGES[0].label)}</span><span>${esc29(STAGES[STAGES.length - 1].label)}</span></div></div>`;
   }
-  function evidenceButton(key2, no) {
-    const open3 = peopleUi.evOpen.has(key2);
-    return `<button class="pp-no${open3 ? " on" : ""}" data-action="pp-jump" data-value="${esc29(key2)}" title="${no.slice(1)}번째 메시지에서 확인됨. 누르면 그 부분을 보여 줘요" aria-expanded="${open3}">근거 ${no}</button>`;
+  function evidenceButton(key, no) {
+    const open3 = peopleUi.evOpen.has(key);
+    return `<button class="pp-no${open3 ? " on" : ""}" data-action="pp-jump" data-value="${esc29(key)}" title="${no.slice(1)}번째 메시지에서 확인됨. 누르면 그 부분을 보여 줘요" aria-expanded="${open3}">근거 ${no}</button>`;
   }
-  function evidenceBox(ctx2, live, key2, anchor, quote) {
-    if (!peopleUi.evOpen.has(key2)) return "";
+  function evidenceBox(ctx2, live, key, anchor, quote) {
+    if (!peopleUi.evOpen.has(key)) return "";
     const pos = live.at.get(anchor);
     const msg = pos !== void 0 && pos >= 0 ? ctx2.chat.message[pos] : void 0;
     const text4 = msg ? messageText(String(msg.data ?? "")).replace(/\s+/g, " ").trim() : "";
@@ -1574,16 +1618,16 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   var REPLACED = '<span class="pp-old" title="뒤에 온 항목이 이 항목을 대체했어요. 그 항목이 취소되거나 사라지면 이 항목이 되살아나요">새 항목으로 바뀜</span>';
   var FOLDED = '<span class="pp-old" title="칸 상한을 넘어 오래된 항목들을 요약 한 줄로 합쳤어요 (되돌릴 수 없음)">요약에 합쳐짐</span>';
   var stateMark = (st) => st === "gone" ? GONE : st === "replaced" ? REPLACED : st === "folded" ? FOLDED : st === "void" ? VOIDED : "";
-  function slotList(all, live, key2, row9) {
+  function slotList(all, live, key, row9) {
     const states = entryStates(all, live);
     const pos = (e) => live.at.get(e.anchor) ?? -1;
     const sorted = [...all].sort((a, b) => pos(b) - pos(a) || b.seq - a.seq);
     const cur = sorted.filter((e) => states.get(e.id) === "alive");
     const old = sorted.filter((e) => states.get(e.id) !== "alive");
     const main = cur.length ? `<ul class="pp-entries">${cur.map((e) => row9(e, "alive")).join("")}</ul>` : '<p class="ps-note">살아 있는 항목이 없어요.</p>';
-    const showAll = peopleUi.oldAll.has(key2);
+    const showAll = peopleUi.oldAll.has(key);
     const shown3 = showAll ? old : old.slice(0, 20);
-    const rest = old.length ? `<details class="pp-oldbox" data-keep="${esc29(key2)}"${keepOpen(key2)}><summary title="새 항목으로 바뀌었거나 합쳐졌거나 취소된 항목. 전부 저장돼 있고 되살릴 수 있어요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${shown3.map((e) => row9(e, states.get(e.id))).join("")}</ul>${old.length > shown3.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc29(key2)}">${old.length - shown3.length}개 더 보기</button>` : ""}</details>` : "";
+    const rest = old.length ? `<details class="pp-oldbox" data-keep="${esc29(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 합쳐졌거나 취소된 항목. 전부 저장돼 있고 되살릴 수 있어요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${shown3.map((e) => row9(e, states.get(e.id))).join("")}</ul>${old.length > shown3.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc29(key)}">${old.length - shown3.length}개 더 보기</button>` : ""}</details>` : "";
     return main + rest;
   }
   var VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 본편에 넣지 않아요">취소됨</span>';
@@ -1591,13 +1635,13 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   function entryRow(ctx2, who, slot2, e, live, st) {
     const no = msgNo(e.anchor, live);
     const dead = st !== "alive" && !e.void;
-    const key2 = `${who}|${slot2}|${e.id}`;
-    const meta = [no ? evidenceButton(key2, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(e.quote)}</q>` : "", e.target && e.target !== "@user" ? `<span title="이 항목의 대상 인물">→ ${esc29(e.target)}</span>` : "", e.kind ? `<span title="의심의 종류">${esc29(e.kind)}</span>` : ""].filter(Boolean).join("");
+    const key = `${who}|${slot2}|${e.id}`;
+    const meta = [no ? evidenceButton(key, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(e.quote)}</q>` : "", e.target && e.target !== "@user" ? `<span title="이 항목의 대상 인물">→ ${esc29(e.target)}</span>` : "", e.kind ? `<span title="의심의 종류">${esc29(e.kind)}</span>` : ""].filter(Boolean).join("");
     return `<li class="pp-entry${dead ? " dead" : ""}${e.void ? " void" : ""}${e.pin ? " pinned" : ""}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc29(e.text)}</span></div>
     <div class="pp-entry-meta">${meta}${stateMark(st)}
-      <span class="pp-entry-btns">${slot2 === "speech" && st === "alive" && speechState(e.text) === "pending" ? `<button class="gx-mini pp-mini ps-save" data-action="pp-speech-approve" data-value="${esc29(key2)}" title="다음 턴 갱신기가 호칭·말투를 바꿀 수 있게 허락해요">말투 변경 승인</button><button class="gx-mini pp-mini" data-action="pp-speech-reject" data-value="${esc29(key2)}" title="쌓인 조짐을 지우고 지금 말투를 유지해요">거절</button>` : ""}<button class="gx-mini pp-mini${e.pin ? " on" : ""}" data-action="pp-pin" data-value="${esc29(key2)}" title="${e.pin ? "고정 풀기" : "고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요"}" aria-pressed="${!!e.pin}">${e.pin ? "고정됨" : "고정"}</button>${voidBtn("pp-void", key2, !!e.void)}</span></div>
-    ${evidenceBox(ctx2, live, key2, e.anchor, e.quote)}
+      <span class="pp-entry-btns">${slot2 === "speech" && st === "alive" && speechState(e.text) === "pending" ? `<button class="gx-mini pp-mini ps-save" data-action="pp-speech-approve" data-value="${esc29(key)}" title="다음 턴 갱신기가 호칭·말투를 바꿀 수 있게 허락해요">말투 변경 승인</button><button class="gx-mini pp-mini" data-action="pp-speech-reject" data-value="${esc29(key)}" title="쌓인 조짐을 지우고 지금 말투를 유지해요">거절</button>` : ""}<button class="gx-mini pp-mini${e.pin ? " on" : ""}" data-action="pp-pin" data-value="${esc29(key)}" title="${e.pin ? "고정 풀기" : "고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요"}" aria-pressed="${!!e.pin}">${e.pin ? "고정됨" : "고정"}</button>${voidBtn("pp-void", key, !!e.void)}</span></div>
+    ${evidenceBox(ctx2, live, key, e.anchor, e.quote)}
   </li>`;
   }
   function sexualCard(ctx2, p2) {
@@ -1609,11 +1653,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const style = `<div class="pp-addr"><button class="gx-mini pp-mini${explicit ? " on" : ""}" data-action="pp-sex-style" data-value="${esc29(p2.name)}" aria-pressed="${explicit}" title="이 인물의 발정 버전을 켜고 꺼요 (전체 설정보다 우선)">발정 버전 ${explicit ? "ON" : "OFF"}</button><small>${explicit ? "발정난 음란/이상성욕 (노골적 어휘)" : "적당한 음란/이상성욕"}${p2.sexual?.explicit === null || p2.sexual?.explicit === void 0 ? " · 전체 설정을 따름" : " · 이 인물만 따로 정함"}</small></div>`;
     const cards2 = fields3.map((f) => {
       const on2 = sexualFieldOn(p2, f, s8);
-      const key2 = `${p2.name}|${f}`;
+      const key = `${p2.name}|${f}`;
       const text4 = p2.sexual?.[f]?.text ?? "";
-      const editing = on2 && peopleUi.sexEdit === key2;
-      const body5 = !on2 ? '<p class="ps-note">이 인물에서는 사용하지 않아요. 저장된 내용은 보존돼요.</p>' : editing ? `<div class="pp-edit"><textarea class="gx-search nw-reqbox" name="pp-sex-text" data-input="pp-sex-text" rows="4" maxlength="${SEXUAL_CHARS}">${esc29(peopleUi.sexDraft)}</textarea><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-sex-save" data-value="${esc29(key2)}" data-take="pp-sex-text">저장</button><button class="gx-mini" data-action="pp-sex-cancel">취소</button></div></div>` : `<p class="pp-extra">${text4 ? esc29(text4) : '<span class="pp-addr-none">아직 글이 없어요 — 다음 갱신에서 모델이 한 번 써요</span>'}</p>${text4 && p2.sexual?.[f]?.manual ? '<small class="ps-note">사용자가 직접 쓴 글</small>' : ""}`;
-      const btns = `<span class="pp-entry-btns"><button class="gx-mini pp-mini${on2 ? " on" : ""}" data-action="pp-sex-on" data-value="${esc29(key2)}" aria-pressed="${on2}" title="이 인물에서 이 칸을 쓸지">${on2 ? "ON" : "OFF"}</button>${on2 && !editing ? `<button class="gx-mini pp-mini" data-action="pp-sex-edit" data-value="${esc29(key2)}">편집</button>${text4 ? `<button class="gx-mini pp-mini danger" data-action="pp-sex-clear" data-value="${esc29(key2)}" title="글을 지워요. 다음 갱신에서 모델이 다시 써요">삭제</button>` : ""}` : ""}</span>`;
+      const editing = on2 && peopleUi.sexEdit === key;
+      const body5 = !on2 ? '<p class="ps-note">이 인물에서는 사용하지 않아요. 저장된 내용은 보존돼요.</p>' : editing ? `<div class="pp-edit"><textarea class="gx-search nw-reqbox" name="pp-sex-text" data-input="pp-sex-text" rows="4" maxlength="${SEXUAL_CHARS}">${esc29(peopleUi.sexDraft)}</textarea><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-sex-save" data-value="${esc29(key)}" data-take="pp-sex-text">저장</button><button class="gx-mini" data-action="pp-sex-cancel">취소</button></div></div>` : `<p class="pp-extra">${text4 ? esc29(text4) : '<span class="pp-addr-none">아직 글이 없어요 — 다음 갱신에서 모델이 한 번 써요</span>'}</p>${text4 && p2.sexual?.[f]?.manual ? '<small class="ps-note">사용자가 직접 쓴 글</small>' : ""}`;
+      const btns = `<span class="pp-entry-btns"><button class="gx-mini pp-mini${on2 ? " on" : ""}" data-action="pp-sex-on" data-value="${esc29(key)}" aria-pressed="${on2}" title="이 인물에서 이 칸을 쓸지">${on2 ? "ON" : "OFF"}</button>${on2 && !editing ? `<button class="gx-mini pp-mini" data-action="pp-sex-edit" data-value="${esc29(key)}">편집</button>${text4 ? `<button class="gx-mini pp-mini danger" data-action="pp-sex-clear" data-value="${esc29(key)}" title="글을 지워요. 다음 갱신에서 모델이 다시 써요">삭제</button>` : ""}` : ""}</span>`;
       return `<section class="pp-slot"><h4>${SEXUAL_LABEL[f]}${btns}</h4>${body5}</section>`;
     }).join("");
     return `<section class="pp-card"><h4 title="리수폿 성적 프로필: 성적 상황에서만 쓰는 글. 변경은 실제 성적 장면의 관찰이 쌓여 승인해야 돼요">성적 욕망·이상성욕</h4><div class="pp-card-body">${style}${cards2}</div></section>`;
@@ -1654,15 +1698,15 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return out.join("");
   }
   function changeRow(ctx2, c, live) {
-    const alive2 = isAlive(c, live);
+    const alive = isAlive(c, live);
     const no = msgNo(c.anchor, live);
     const what = c.kind === "taste" ? `취향 띠 → ${(c.band ?? 0) > 0 ? "+" : ""}${c.band ?? 0}` : c.kind === "openness" ? typeof c.init === "number" ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? "+" : ""}${c.delta ?? 0}` : c.kind === "cue" ? c.pin !== void 0 ? c.who.startsWith("세력:") ? `평판 → ${factionStageLabel(ctx2, c.pin)}${peopleSettings(ctx2.chat.scriptstate).factionQual ? "" : ` (${c.pin})`}` : `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ""}` : c.kind === "address" ? `호칭 「${c.toUser ?? ""}」${c.register ? ` · ${c.register}` : ""}` : c.kind === "identity" ? `신분 ${[c.faction, c.rank].filter(Boolean).join(" ")}` : `메모 ${c.now ?? ""}`;
-    const key2 = `chg|${c.id}`;
-    return `<li class="pp-entry${!alive2 && !c.void ? " dead" : ""}${c.void ? " void" : ""}">
+    const key = `chg|${c.id}`;
+    return `<li class="pp-entry${!alive && !c.void ? " dead" : ""}${c.void ? " void" : ""}">
     <div class="pp-entry-main">${srcIcon(c.src)}<span class="pp-text"><b title="${esc29(KIND_HELP[c.kind])}">${esc29(KIND_LABEL2[c.kind])}</b> ${esc29(what)}${c.reason ? ` <small>— ${esc29(c.reason)}</small>` : ""}</span></div>
-    <div class="pp-entry-meta">${no ? evidenceButton(key2, no) : ""}${c.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(c.quote)}</q>` : ""}${!alive2 && !c.void ? GONE : ""}${c.void ? VOIDED : ""}
+    <div class="pp-entry-meta">${no ? evidenceButton(key, no) : ""}${c.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(c.quote)}</q>` : ""}${!alive && !c.void ? GONE : ""}${c.void ? VOIDED : ""}
       <span class="pp-entry-btns">${voidBtn("pp-change-void", c.id, !!c.void)}</span></div>
-    ${evidenceBox(ctx2, live, key2, c.anchor, c.quote)}
+    ${evidenceBox(ctx2, live, key, c.anchor, c.quote)}
   </li>`;
   }
   function personView(ctx2, name) {
@@ -1723,9 +1767,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     for (const d of Object.values(store.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)).push(d);
     const docEntry = (docKey, e, st) => {
       const no = msgNo(e.anchor, live);
-      const key2 = `doc|${docKey}|${e.id}`;
-      const meta = [e.date ? `<span title="일시">${esc29(e.date)}</span>` : "", e.place ? `<span title="장소">${esc29(e.place)}</span>` : "", e.who?.length ? `<span title="관련 인물">${esc29(e.who.join(", "))}</span>` : "", no ? evidenceButton(key2, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(e.quote)}</q>` : ""].filter(Boolean).join("");
-      return `<li class="pp-entry${st !== "alive" && !e.void ? " dead" : ""}${e.void ? " void" : ""}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc29(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}</div>${evidenceBox(ctx2, live, key2, e.anchor, e.quote)}</li>`;
+      const key = `doc|${docKey}|${e.id}`;
+      const meta = [e.date ? `<span title="일시">${esc29(e.date)}</span>` : "", e.place ? `<span title="장소">${esc29(e.place)}</span>` : "", e.who?.length ? `<span title="관련 인물">${esc29(e.who.join(", "))}</span>` : "", no ? evidenceButton(key, no) : "", e.quote ? `<q title="근거 메시지에서 따온 인용">${esc29(e.quote)}</q>` : ""].filter(Boolean).join("");
+      return `<li class="pp-entry${st !== "alive" && !e.void ? " dead" : ""}${e.void ? " void" : ""}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc29(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}</div>${evidenceBox(ctx2, live, key, e.anchor, e.quote)}</li>`;
     };
     const sections3 = DOC_TYPES.filter((t) => byType.has(t)).map((t) => {
       const docs = byType.get(t);
@@ -1753,8 +1797,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     peopleUi.busy = false;
     await env3.refresh();
   }
-  function findEntry(store, key2) {
-    const [who, slot2, id2] = key2.split("|");
+  function findEntry(store, key) {
+    const [who, slot2, id2] = key.split("|");
     const list4 = store.people[who]?.slots[slot2];
     return list4?.find((e) => e.id === id2) ?? null;
   }
@@ -1847,8 +1891,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       case "pp-rules-save":
       case "pp-drules-save":
       case "pp-rrules-save": {
-        const key2 = action === "pp-drules-save" ? "director_rules" : action === "pp-rrules-save" ? "router_rules" : "rules";
-        await setVars3(ctx2, env3, { [PP(key2)]: v.slice(0, key2 === "rules" ? 4e3 : 2e3) });
+        const key = action === "pp-drules-save" ? "director_rules" : action === "pp-rrules-save" ? "router_rules" : "rules";
+        await setVars3(ctx2, env3, { [PP(key)]: v.slice(0, key === "rules" ? 4e3 : 2e3) });
         peopleUi.info = "지침을 저장했어요.";
         env3.render();
         return true;
@@ -2327,15 +2371,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   var recordsNav = () => ({ sub: rec.sub, view: rec.view, id: rec.id });
   function applyRecordsNav(r) {
-    const sub = r.sub === "reports" ? "journal" : r.sub;
-    Object.assign(rec, { sub, view: r.view, id: r.id, notice: "" });
-  }
-  function recordsMarkName(r, chat) {
-    if (r.view === "report") return `보고서 ${chat && readReports(chat).items.find((x) => x.id === r.id)?.no || ""}`.trim();
-    if (r.view === "person") return `${r.id} 기록`;
-    if (r.view === "docs") return "기록 문서";
-    if (r.view === "faction") return `세력 ${r.id}`;
-    return r.sub === "journal" ? "일지" : r.sub === "chronicle" ? "연대기" : r.sub === "wallet" ? "가계부" : r.sub === "people" ? "이 채팅의 인물" : "세력";
+    Object.assign(rec, { sub: r.sub, view: r.view, id: r.id, notice: "" });
   }
   var two7 = (n2) => String(n2).padStart(2, "0");
   var WEEK5 = "일월화수목금토";
@@ -2568,10 +2604,10 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       break;
     }
     if (last2 < 0) return null;
-    const key2 = messageKey(list4[last2], last2);
+    const key = messageKey(list4[last2], last2);
     const at = anchorPositions(chat);
     const recent = (anchor) => {
-      if (anchor === key2) return true;
+      if (anchor === key) return true;
       const pos = at.get(anchor);
       return pos !== void 0 && pos >= last2;
     };
@@ -2632,48 +2668,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       case "rec-filter":
         if (FILTERS.some(([f]) => f === v)) rec.filter = v;
         break;
-      case "rec-chron":
-        if (!(v in CHRON_KIND_LABEL)) return true;
-        rec.chronOff = rec.chronOff.includes(v) ? rec.chronOff.filter((k) => k !== v) : [...rec.chronOff, v];
-        break;
-      case "rec-open":
-      case "rec-chron-open":
-        closeToast();
-        if (!readReports(ctx2.chat).items.some((r) => r.id === v)) {
-          rec.notice = "이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.";
-          break;
-        }
-        Object.assign(rec, { sub: action === "rec-chron-open" ? "chronicle" : "journal", view: "report", id: v, notice: "" });
-        break;
-      case "rec-people":
-        Object.assign(rec, { sub: "people", view: "list", id: "", notice: "" });
-        resetPeopleUi();
-        break;
-      case "rec-person":
-        if (!v) return true;
-        Object.assign(rec, { sub: "people", view: "person", id: v, notice: "" });
-        resetPeopleUi();
-        break;
-      case "rec-docs":
-        Object.assign(rec, { sub: "people", view: "docs", id: "", notice: "" });
-        resetPeopleUi();
-        break;
-      case "rec-faction":
-        if (!v) return true;
-        Object.assign(rec, { sub: "factions", view: "faction", id: v, notice: "" });
-        resetPeopleUi();
-        break;
-      case "rec-back":
-        if (rec.view === "list") return false;
-        rec.notice = "";
-        if (rec.view === "report") Object.assign(rec, { sub: rec.sub === "chronicle" ? "chronicle" : "journal", view: "list", id: "" });
-        else if (rec.view === "faction") Object.assign(rec, { sub: "factions", view: "list", id: "" });
-        else Object.assign(rec, { sub: "people", view: "list", id: "" });
-        resetPeopleUi();
-        break;
-      case "rec-toast-x":
-        closeToast();
-        break;
-      case "rec-pin": {
-        if (rec.busy || !v) return true;
-        c
+      cas

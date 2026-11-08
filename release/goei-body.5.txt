@@ -1,19 +1,4 @@
- "D00"],
-    [/프리랜서|freelancer|협회 등록/i, "E00"]
-  ];
-  function factionCode(org) {
-    const t = org.trim();
-    if (/^[A-Z]00$/.test(t)) return t;
-    for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
-    return "";
-  }
-  function rankLevel(faction, rank2) {
-    const r = rank2.replace(/\s+/g, "");
-    if (!r || /^(-|없음|미정)$/.test(r)) return null;
-    if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
-    if (faction === "A00") {
-      if (/부장|팀장|chief/i.test(r)) return 3;
-      if (/선임|책임자|senior|lead/i.test(r)) return 2;
+|책임자|senior|lead/i.test(r)) return 2;
       if (/요원|연구원|agent|researcher/i.test(r)) return 1;
       return null;
     }
@@ -347,14 +332,14 @@
     next.scriptstate[PREV_KEY] = JSON.stringify({ ...before, made });
     return next;
   }
-  function markStart(before, after, key2) {
+  function markStart(before, after, key) {
     const id2 = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
     const was = /* @__PURE__ */ new Set();
     for (const e of before.an) if (e.state === "활성") was.add(id2("an", e));
     for (const e of before.inc) if (e.state === "진행") was.add(id2("in", e));
     for (const e of before.ms) if (e.state === "출현") was.add(id2("ms", e));
     const mark2 = (kind, e, active3) => {
-      if (active3 && !e.startKey && !was.has(id2(kind, e))) e.startKey = key2;
+      if (active3 && !e.startKey && !was.has(id2(kind, e))) e.startKey = key;
     };
     for (const e of after.an) mark2("an", e, e.state === "활성");
     for (const e of after.inc) mark2("in", e, e.state === "진행");
@@ -642,8 +627,8 @@ ${ROSTER_INTRO}`];
       const rec2 = agents.get(a.lore);
       if (!rec2 || !fieldValue(rec2, "intro") || rec2.rosterOff) continue;
       const o = orgOf(dir2.orgs, a.affiliation);
-      const key2 = o?.name ?? a.affiliation ?? "";
-      (byOrg.get(key2) ?? byOrg.set(key2, []).get(key2)).push(a);
+      const key = o?.name ?? a.affiliation ?? "";
+      (byOrg.get(key) ?? byOrg.set(key, []).get(key)).push(a);
     }
     const orgOrder = [...dir2.orgs.map((o) => o.name), ...[...byOrg.keys()].filter((k) => !dir2.orgs.some((o) => o.name === k))];
     for (const name of orgOrder) {
@@ -714,9 +699,9 @@ ${ROSTER_INTRO}`];
     };
   }
   var keysOf2 = (rec2, fallback) => rec2.keys?.trim() ? rec2.keys.trim() : [...new Set(fallback.filter(Boolean))].join(", ");
-  function entry(kind, name, key2, content, folder, order) {
+  function entry(kind, name, key, content, folder, order) {
     return {
-      key: key2,
+      key,
       secondkey: "",
       comment: name,
       content: `@@dont_activate
@@ -752,14 +737,14 @@ ${content}
     };
     const folders = { org: "", agent: "", anomaly: "", site: "", appendix: "" };
     for (const kind of ["org", "site", "anomaly", "agent", "appendix"]) {
-      const { key: key2, make } = folderKey(base, kind);
-      folders[kind] = key2;
+      const { key, make } = folderKey(base, kind);
+      folders[kind] = key;
       const fresh = [...recs[kind].keys()].filter((n2) => !existing.has(n2) && !(kind === "org" && recs.org.get(n2)?.summaryOnly));
       if (!fresh.length) continue;
       if (make) out.push(make);
       for (const n2 of fresh) {
         names4[kind].push(n2);
-        out.push(entry(kind, n2, recs[kind].get(n2).keys?.trim() ?? "", "", key2, ORDER[kind]));
+        out.push(entry(kind, n2, recs[kind].get(n2).keys?.trim() ?? "", "", key, ORDER[kind]));
       }
     }
     const dir2 = readDirectory(out);
@@ -1507,8 +1492,8 @@ ${themeVars("[x-goei-fab]")}
   }
 
   // src/core/advanced.ts
-  var chip = (key2, label2, def, v) => ({ key: key2, label: label2, type: "bool", def: String(def), ...v ? { v } : {} });
-  var num3 = (key2, label2, def, min, max, unit, extra = {}) => ({ key: key2, label: label2, type: "num", def, min, max, unit, ...extra });
+  var chip = (key, label2, def, v) => ({ key, label: label2, type: "bool", def: String(def), ...v ? { v } : {} });
+  var num3 = (key, label2, def, min, max, unit, extra = {}) => ({ key, label: label2, type: "num", def, min, max, unit, ...extra });
   var TOK = "토큰";
   var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" });
   var turns = (def) => num3("turns", "채팅 참고", def, 0, 200, "턴", { zero: "안 봄" });
@@ -1645,7 +1630,7 @@ ${themeVars("[x-goei-fab]")}
   };
   var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", gen: "$gen_" };
   var advItems = (f) => ADV[f].flatMap((g2) => [...g2.chips ?? [], ...g2.items]);
-  var advItem = (f, key2) => advItems(f).find((i) => i.key === key2);
+  var advItem = (f, key) => advItems(f).find((i) => i.key === key);
   var advVar = (f, item2) => item2.v ?? `${PREFIX[f]}${item2.key}`;
   function advCheck(item2, raw) {
     if (raw === void 0 || raw === null) return null;
@@ -1657,13 +1642,13 @@ ${themeVars("[x-goei-fab]")}
     const n2 = Number(s8);
     return Number.isInteger(n2) && n2 >= (item2.min ?? 0) && n2 <= (item2.max ?? Infinity) ? String(n2) : null;
   }
-  function advValue(state, f, key2) {
-    const item2 = advItem(f, key2);
+  function advValue(state, f, key) {
+    const item2 = advItem(f, key);
     if (!item2) return "";
     return advCheck(item2, state?.[advVar(f, item2)]) ?? String(item2.def);
   }
-  var advNum = (state, f, key2) => Number(advValue(state, f, key2));
-  var advOn = (state, f, key2) => advValue(state, f, key2) === "1";
+  var advNum = (state, f, key) => Number(advValue(state, f, key));
+  var advOn = (state, f, key) => advValue(state, f, key) === "1";
   function advChanged(state, f) {
     return advItems(f).filter((i) => advValue(state, f, i.key) !== String(i.def)).map((i) => i.key);
   }
@@ -1744,13 +1729,13 @@ ${themeVars("[x-goei-fab]")}
   }
   var queues = /* @__PURE__ */ new Map();
   function updateChat(charIndex, chatIndex, mutate4) {
-    const key2 = `${charIndex}:${chatIndex}`;
-    const run5 = (queues.get(key2) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate4));
+    const key = `${charIndex}:${chatIndex}`;
+    const run5 = (queues.get(key) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate4));
     const tail2 = run5.catch(() => {
     });
-    queues.set(key2, tail2);
+    queues.set(key, tail2);
     void tail2.then(() => {
-      if (queues.get(key2) === tail2) queues.delete(key2);
+      if (queues.get(key) === tail2) queues.delete(key);
     });
     return run5;
   }
@@ -1977,10 +1962,10 @@ ${memo.job.trim()}
   var traitsOf = (x) => {
     const uses = itemUses(x.uses);
     const equip = itemEquip(x.equip);
-    const icon2 = cleanIcon(x.icon);
-    return { use: x.use === true || !!uses, ...uses ? { uses } : {}, ...equip ? { equip } : {}, ...icon2 ? { icon: icon2 } : {} };
+    const icon = cleanIcon(x.icon);
+    return { use: x.use === true || !!uses, ...uses ? { uses } : {}, ...equip ? { equip } : {}, ...icon ? { icon } : {} };
   };
-  var emptyShop = (tag, key2) => ({ shop: tag.shop, owner: tag.owner, key: key2, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
+  var emptyShop = (tag, key) => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
   var isItem = (e) => {
     const x = e;
     return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && Number.isSafeInteger(x.price);
@@ -2049,11 +2034,11 @@ ${memo.job.trim()}
     const text4 = typeof m.data === "string" ? m.data : "";
     const on2 = shopOn(chat.scriptstate);
     const tag = on2 ? findShopTag(text4) : null;
-    const key2 = messageKey(m, responseIndex);
+    const key = messageKey(m, responseIndex);
     const cur = readShop(chat.scriptstate);
     let next = null;
     if (tag) {
-      next = cur && cur.shop === tag.shop ? { ...cur, key: key2, owner: tag.owner || cur.owner } : emptyShop(tag, key2);
+      next = cur && cur.shop === tag.shop ? { ...cur, key, owner: tag.owner || cur.owner } : emptyShop(tag, key);
     }
     let message;
     for (let i = 0; i < list4.length; i++) {
@@ -2164,7 +2149,7 @@ ${memo.job.trim()}
     }
     return out;
   }
-  var itemId = (key2, name, n2) => `s_${hash3(`${key2}|${normName(name)}|${n2}`)}`;
+  var itemId = (key, name, n2) => `s_${hash3(`${key}|${normName(name)}|${n2}`)}`;
   function withIds(st, list4, exclude = []) {
     const out = [];
     let rare = exclude.some((x) => x.tag === "rare" && !x.sold);
@@ -2378,7 +2363,7 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     const uses = itemUses(u0);
     const equip = itemEquip(e0);
     const slot2 = equip && Number.isSafeInteger(s0) && s0 >= 0 && s0 < EQUIP_SLOTS[equip] ? s0 : void 0;
-    const icon2 = cleanIcon(i0);
+    const icon = cleanIcon(i0);
     return {
       ...rest,
       desc: clean3(x.desc, 80),
@@ -2388,7 +2373,7 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
       ...uses ? { uses } : {},
       ...equip ? { equip } : {},
       ...slot2 !== void 0 ? { slot: slot2 } : {},
-      ...icon2 ? { icon: icon2 } : {}
+      ...icon ? { icon } : {}
     };
   }
   function readItems(vars) {
@@ -2406,16 +2391,16 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     }
   }
   var itemsVars = (it) => ({ [ITEMS_VAR]: JSON.stringify({ list: it.list, log: it.log }) });
-  function itemUsed(it, id2, alive2) {
+  function itemUsed(it, id2, alive) {
     let n2 = 0;
-    for (const l of it.log) if (l.what === "use" && l.item === id2 && (!l.anchor || alive2.has(l.anchor))) n2 += l.n ?? 1;
+    for (const l of it.log) if (l.what === "use" && l.item === id2 && (!l.anchor || alive.has(l.anchor))) n2 += l.n ?? 1;
     return n2;
   }
-  function itemLeft(it, e, alive2) {
-    return e.uses === void 0 ? void 0 : Math.max(0, e.uses - itemUsed(it, e.id, alive2));
+  function itemLeft(it, e, alive) {
+    return e.uses === void 0 ? void 0 : Math.max(0, e.uses - itemUsed(it, e.id, alive));
   }
-  function liveItems(it, alive2) {
-    return it.list.filter((e) => (!e.anchor || alive2.has(e.anchor)) && (it.keep || e.uses === void 0 || (itemLeft(it, e, alive2) ?? 1) > 0));
+  function liveItems(it, alive) {
+    return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && (it.keep || e.uses === void 0 || (itemLeft(it, e, alive) ?? 1) > 0));
   }
   function equippedOf(list4) {
     const out = { weapon: Array(EQUIP_SLOTS.weapon).fill(void 0), gear: Array(EQUIP_SLOTS.gear).fill(void 0) };
@@ -2424,8 +2409,8 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   }
   var isEquipped = (e, list4) => !!e.equip && e.slot !== void 0 && equippedOf(list4)[e.equip][e.slot]?.id === e.id;
   var gridItems = (list4) => list4.filter((e) => !isEquipped(e, list4));
-  function equipItem(it, alive2, id2, slot2) {
-    const live = liveItems(it, alive2);
+  function equipItem(it, alive, id2, slot2) {
+    const live = liveItems(it, alive);
     const cur = live.find((x) => x.id === id2);
     if (!cur?.equip) return it;
     const occ = equippedOf(live)[cur.equip];
@@ -2485,13 +2470,13 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     }
     return next;
   }
-  function addItem(it, alive2, e) {
+  function addItem(it, alive, e) {
     const name = clean3(e.name, 30);
     if (!name) return it;
     const desc = clean3(e.desc, 80);
     const effect = clean3(e.effect, 60);
     const quote = e.quote ? clean3(e.quote, 120) : void 0;
-    const found = liveItems(it, alive2).find((x) => sameItemName(x.name, name));
+    const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
     if (found) {
       const addUses = itemUses(e.uses);
       const more = addUses && found.uses !== void 0 ? { uses: Math.min(999, found.uses + addUses) } : { uses: e.uses };
@@ -2517,7 +2502,7 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon });
     const got = addItemLog(it, { name, item: id2, ...row9.icon ? { icon: row9.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...Number.isSafeInteger(e.price) ? { note: `₩ ${e.price.toLocaleString("en-US")}` } : {}, at: row9.at });
     const out = { ...got, list: [...got.list, row9].slice(-200) };
-    return e.wear && row9.equip ? equipItem(out, alive2, id2) : out;
+    return e.wear && row9.equip ? equipItem(out, alive, id2) : out;
   }
   function updateItem(it, id2, patch) {
     const cur = it.list.find((x) => x.id === id2);
@@ -2530,10 +2515,10 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     };
     return { ...it, list: it.list.map((x) => x.id === id2 ? next : x) };
   }
-  function setItemLeft(it, alive2, id2, left) {
+  function setItemLeft(it, alive, id2, left) {
     const cur = it.list.find((x) => x.id === id2);
     if (!cur || cur.uses === void 0 || !Number.isSafeInteger(left) || left < 0) return it;
-    const uses = Math.min(999, left + itemUsed(it, id2, alive2));
+    const uses = Math.min(999, left + itemUsed(it, id2, alive));
     if (uses < 1 || uses === cur.uses) return it;
     return { ...it, list: it.list.map((x) => x.id === id2 ? { ...x, uses } : x) };
   }
@@ -2549,7 +2534,13 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     if (!cur) return it;
     return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id2) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what, by, anchor, ...extra });
   }
-  function mergeItems(it, alive2, keepId, otherId, name) {
+  function sellItem(it, id2, anchor, note) {
+    const cur = it.list.find((x) => x.id === id2);
+    if (!cur || !anchor) return it;
+    const { slot: _slot, ...rest } = cur;
+    return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? { ...rest, soldAt: anchor } : x) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what: "sell", by: "manual", anchor, ...note ? { note } : {} });
+  }
+  function mergeItems(it, alive, keepId, otherId, name) {
     const keep = it.list.find((x) => x.id === keepId);
     const other = it.list.find((x) => x.id === otherId);
     if (!keep || !other || keepId === otherId) return it;
@@ -2559,7 +2550,7 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
       name: clean3(name ?? keep.name, 30) || keep.name,
       desc,
       effect: keep.effect || other.effect,
-      ...keep.uses !== void 0 && other.uses !== void 0 ? { uses: Math.min(999, keep.uses + (itemLeft(it, other, alive2) ?? 0)) } : {},
+      ...keep.uses !== void 0 && other.uses !== void 0 ? { uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)) } : {},
       ...keep.quote || other.quote ? { quote: clean3([keep.quote, other.quote].filter(Boolean).join(" / "), 120) } : {},
       // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
       anchor: keep.anchor && other.anchor ? keep.anchor : "",
@@ -2658,16 +2649,17 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     if (events.length) out.push(`This turn: ${events.join("; ")}`);
     return out.join("\n");
   }
-  function searchItems(it, alive2, q) {
+  function searchItems(it, alive, q) {
     const k = q.trim().toLowerCase();
-    if (!k) return { items: liveItems(it, alive2), log: it.log.slice().reverse() };
+    if (!k) return { items: liveItems(it, alive), log: it.log.slice().reverse() };
     const hit3 = (...s8) => s8.some((x) => (x ?? "").toLowerCase().includes(k));
     return {
-      items: liveItems(it, alive2).filter((e) => hit3(e.name, e.desc, e.effect, e.quote, e.equip ? EQUIP_LABEL[e.equip] : "", e.state !== "ok" ? STATE_LABEL[e.state] : "")),
+      items: liveItems(it, alive).filter((e) => hit3(e.name, e.desc, e.effect, e.quote, e.equip ? EQUIP_LABEL[e.equip] : "", e.state !== "ok" ? STATE_LABEL[e.state] : "")),
       log: it.log.filter((l) => hit3(l.name, l.note, l.quote)).reverse()
     };
   }
   var INVENTORY_HEAD = "[Inventory]";
+  var SHOP_HEAD = "[Shop]";
   var INVENTORY_NOTE = 'What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back.';
   function lastUserKey(chat) {
     const list4 = chat.message ?? [];
@@ -2687,11 +2679,11 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
     for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return messageKey(list4[i], i);
     return "";
   }
-  function usedItemsAt(it, anchors, alive2) {
+  function usedItemsAt(it, anchors, alive) {
     const set2 = new Set(anchors.filter(Boolean));
     return it.log.filter((l) => l.what === "use" && l.by === "use" && set2.has(l.anchor)).map((l) => {
       const e = l.item ? it.list.find((x) => x.id === l.item) : void 0;
-      const left = e ? itemLeft(it, e, alive2) : void 0;
+      const left = e ? itemLeft(it, e, alive) : void 0;
       return { name: l.name, anchor: l.anchor, n: l.n ?? 1, ...left !== void 0 ? { left } : {} };
     });
   }
@@ -2701,12 +2693,19 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   }
   function inventoryText(chat) {
     const vars = chat.scriptstate;
-    if (!itemPushOn(vars)) return "";
+    if (!itemPushOn(vars)) {
+      if (!shopOn(vars)) return "";
+      const it2 = readItems(vars);
+      const live2 = liveItems(it2, aliveAnchors(chat));
+      const bought = newlyBought(live2, lastBotKey(chat)).map((e) => e.name);
+      const events = [...bought.length ? [`just bought ${bought.join(", ")}`] : [], ...shopEvents(chat)];
+      return [SHOP_HEAD, ...events.length ? [`This turn: ${events.join("; ")}`] : [], shopGuide(vars)].join("\n");
+    }
     const it = readItems(vars);
     const userKey = lastUserKey(chat);
-    const alive2 = aliveAnchors(chat);
+    const alive = aliveAnchors(chat);
     const reroll = typeof vars?.[ITEM_USE_AT_VAR] === "string" && vars[ITEM_USE_AT_VAR] === userKey && userKey;
-    const after = reroll ? new Set([...alive2].filter((k) => !it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === k && keyAfter(chat, k, userKey)))) : alive2;
+    const after = reroll ? new Set([...alive].filter((k) => !it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === k && keyAfter(chat, k, userKey)))) : alive;
     const live = liveItems(it, after);
     const left = (e) => itemLeft(it, e, after);
     const shop = shopOn(vars);
@@ -2737,14 +2736,14 @@ ${shopGuide(vars)}` : ""}` : "";
     const list4 = chat.message ?? [];
     let seen2 = false;
     for (let i = 0; i < list4.length; i++) {
-      const key2 = messageKey(list4[i], i);
-      if (key2 === userKey) seen2 = true;
-      else if (seen2 && key2 === k) return true;
+      const key = messageKey(list4[i], i);
+      if (key === userKey) seen2 = true;
+      else if (seen2 && key === k) return true;
     }
     return false;
   }
   function withInventory(messages, chat) {
-    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(INVENTORY_HEAD))) return messages;
+    if (messages.some((m) => typeof m?.content === "string" && (m.content.startsWith(INVENTORY_HEAD) || m.content.startsWith(SHOP_HEAD)))) return messages;
     const text4 = inventoryText(chat);
     if (!text4) return messages;
     const at = messages.map((m) => m?.role).lastIndexOf("user");
@@ -2764,12 +2763,12 @@ ${shopGuide(vars)}` : ""}` : "";
     const anchor = messageKey(m, responseIndex);
     const it0 = readItems(vars);
     let it = it0;
-    const alive2 = new Set([...aliveAnchors(chat)].filter((k) => k !== anchor));
+    const alive = new Set([...aliveAnchors(chat)].filter((k) => k !== anchor));
     for (const u of queue) {
       if (it.log.some((l) => l.what === "use" && l.anchor === anchor && l.item === u.id)) continue;
-      const item2 = liveItems(it0, alive2).find((e) => e.id === u.id);
+      const item2 = liveItems(it0, alive).find((e) => e.id === u.id);
       if (!item2 || !canUse(item2)) continue;
-      const left = itemLeft(it0, item2, alive2);
+      const left = itemLeft(it0, item2, alive);
       const n2 = left !== void 0 ? Math.min(u.n, left) : 1;
       if (n2 < 1) continue;
       it = addItemLog(it, { name: item2.name, item: item2.id, n: n2, ...item2.icon ? { icon: item2.icon } : {}, what: "use", by: "use", anchor, ...left !== void 0 && left - n2 <= 0 ? { note: "다 씀" } : {} });
@@ -2779,19 +2778,19 @@ ${shopGuide(vars)}` : ""}` : "";
   }
   function itemsNowOf(chat) {
     const it = readItems(chat.scriptstate);
-    const alive2 = aliveAnchors(chat);
-    const live = liveItems(it, alive2);
+    const alive = aliveAnchors(chat);
+    const live = liveItems(it, alive);
     return live.map((e) => {
-      const left = itemLeft(it, e, alive2);
+      const left = itemLeft(it, e, alive);
       return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {} };
     });
   }
-  function applyItemChanges(it0, alive2, changes, opts = {}) {
+  function applyItemChanges(it0, alive, changes, opts = {}) {
     let it = it0;
     const stateOn = opts.state !== false;
     for (const c0 of changes) {
       const c = stateOn ? c0 : { ...c0, state: void 0, ...c0.action === "destroyed" ? { action: "gone" } : {} };
-      const cur = liveItems(it, alive2).find((e) => e.name === c.name);
+      const cur = liveItems(it, alive).find((e) => e.name === c.name);
       if (c.action === "gone" || c.action === "destroyed") {
         if (cur) it = removeItem(it, cur.id, c.action === "gone" ? "gone" : "destroy", "story", c.anchor, { quote: c.quote, ...c.desc ? { note: c.desc } : {} });
       } else if (c.action === "update" && cur) {
@@ -2804,20 +2803,20 @@ ${shopGuide(vars)}` : ""}` : "";
           ...c.icon ? { icon: c.icon } : {}
         });
         if (c.uses !== void 0 && cur.uses !== void 0) {
-          it = setItemLeft(it, alive2, cur.id, c.uses);
+          it = setItemLeft(it, alive, cur.id, c.uses);
           if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, "gone", "story", c.anchor, { quote: c.quote, note: "다 씀" });
         }
       } else if (c.action === "new") {
-        it = addItem(it, alive2, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, from: "story", anchor: c.anchor, quote: c.quote });
+        it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, from: "story", anchor: c.anchor, quote: c.quote });
       }
     }
     return it;
   }
   function startItemsState(list4, at = (/* @__PURE__ */ new Date()).toISOString()) {
     let it = { list: [], log: [] };
-    const alive2 = /* @__PURE__ */ new Set();
+    const alive = /* @__PURE__ */ new Set();
     for (const e of list4) {
-      it = addItem(it, alive2, {
+      it = addItem(it, alive, {
         name: e.name,
         desc: e.desc,
         effect: e.effect,
@@ -3112,7 +3111,7 @@ ${shopGuide(vars)}` : ""}` : "";
   };
   function wikiSettings(state) {
     const s8 = state ?? {};
-    const pick3 = (key2, allowed, def) => allowed.includes(s8[key2]) ? s8[key2] : def;
+    const pick3 = (key, allowed, def) => allowed.includes(s8[key]) ? s8[key] : def;
     return {
       ...WIKI_DEFAULTS,
       mode: pick3("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
@@ -4133,12 +4132,4 @@ ${RETRY_ANALYZE}
     return { messages: out, changed };
   }
   function unwrapScenes(messages) {
-    if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) return { messages, changed: false };
-    const out = [];
-    for (let i = 0; i < messages.length; i++) {
-      const m = messages[i];
-      if (m?.role !== "user" || !hasSceneCard(m.content)) {
-        out.push(m);
-        continue;
-      }
-      const EN
+    if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) re

@@ -1,84 +1,5 @@
-de2];
-    return outside && name === outside ? factionNames(c, code2)[code2] ?? name : name;
-  }
-  function clock2(minute) {
-    if (minute === null) return "";
-    const d = new Date(minute * 6e4);
-    const p2 = (n2) => String(n2).padStart(2, "0");
-    return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
-  }
-  function board(ctx2) {
-    if (!worldOn(ctx2.chat)) {
-      return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
-      <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
-      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc37(notice)}</div>` : ""}
-      <button class="gx-start" data-action="world-on" ${busy4 ? "disabled" : ""}>${busy4 ? "켜는 중…" : "상황판 켜기"}</button></div>${boardDrawer()}`;
-    }
-    let catalog;
-    try {
-      catalog = parseCatalog(ctx2.char.globalLore);
-    } catch (error) {
-      return `<div class="gx-empty">${esc37(error instanceof Error ? error.message : String(error))}</div>`;
-    }
-    const w = readWorld(ctx2.chat);
-    const faction = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
-    const roster = rosterFor(w, catalog, faction, worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit);
-    const byName = new Map(roster.map((p2) => [p2.name, p2]));
-    const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
-    const display = factionNames(catalog, faction);
-    const ownName = display[faction] ?? "";
-    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n2) => n2.trim());
-    const chips3 = (codes) => peopleChips(ctx2.char, names4(codes), byName, ownName);
-    const cards2 = [];
-    const add = (kind, i, locCode, c) => {
-      const key2 = keys.get(`${kind}${i}`);
-      if (!key2) return;
-      cards2.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field3.confirmEnd === key2, selected: field3.target?.type === "event" && field3.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
-    };
-    const since = (m) => elapsedText(w.minute, m);
-    const sit = (t) => t ? `<span class="gx-evc-sit">${esc37(t)}</span>` : "";
-    const locText = (loc, m) => `${esc37(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
-    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
-    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', chips: chips3(e.deploy ?? ""), extra: sit(e.situation) }));
-    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc37(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
-    for (const e of endedShown(w)) {
-      const name = e.name || "이름 미확인";
-      const rp = endedReport(ctx2.chat, e.kind, e.name, e.loc);
-      cards2.push({ kind: e.kind, name, grade: e.grade, loc: esc37(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind), ...rp?.rpt ? { rpt: rp.rpt } : {}, ...rp?.mine ? { mine: true } : {} });
-    }
-    const sentTo = (codes, id2) => (codes ?? "").split(",").map((x) => x.trim()).includes(id2);
-    const deployedAt = (id2) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id2))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id2))?.name ?? "";
-    const dir2 = readDirectory(ctx2.char.globalLore ?? []).agents;
-    const agents = roster.map((p2) => {
-      const rec2 = w.agents[p2.id];
-      const st = rec2?.st ?? "미정";
-      const c = agentContact(ctx2, p2.id);
-      const big = p2.english ? mainPic(ctx2.char, dir2.find((x) => x.english === p2.english) ?? { english: p2.english }) : "";
-      return {
-        id: p2.id,
-        name: p2.name,
-        english: p2.english ?? "",
-        st: stLabel(st),
-        side: st === "작전투입" ? "op" : agentLocked(rec2) ? "lock" : "ok",
-        situation: rec2?.situation ?? "",
-        dept: p2.department ?? "",
-        rank: p2.rank ?? "",
-        face: avatar(ctx2.char, p2.english, p2.name, "sq"),
-        photo: big ? imageUrl(ctx2.char, big) : null,
-        deployed: st === "작전투입" ? deployedAt(p2.id) : "",
-        wiki: c ? c.wiki : null
-      };
-    });
-    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc37(w.promoted.join(", "))}</p>` : "";
-    const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
-    const cnt = (cls, label2, n2) => `<em class="${cls}">${label2}<i>${n2}</i></em>`;
-    const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
-    const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
-    const clock3 = boardClock(ctx2);
-    return `<main class="gx-body gx-board">
-    ${opsBoard(cards2, { mapUrl: boardMapUrl(ctx2, env2), clock: clock3, counts, empty: "지금 발생한 상황이 없어요." })}
-    ${agentPanel2(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
-  </main>${boardDrawer()}`;
+정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
+  </main>`;
   }
   function boardClock(ctx2) {
     const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
@@ -177,76 +98,8 @@ de2];
     root3.setAttribute("data-gl-done", "1");
   }
 
-  // src/core/statusctx.ts
-  var STATUS_HEAD = "[Previous status]";
-  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
-  function lastStatusLine(messages) {
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const m = messages[i];
-      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
-      const tags = findStatusTags(m.content);
-      if (tags.length) return tags[tags.length - 1].raw.trim();
-    }
-    return null;
-  }
-  function stripStatusLines(messages) {
-    return messages.map((m) => {
-      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
-      const tags = findStatusTags(m.content);
-      if (!tags.length) return m;
-      let c = m.content;
-      for (const t of tags) c = c.replace(t.raw, "");
-      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
-    });
-  }
-  function statusBlock(line2, cols) {
-    const fields3 = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(" | ")}
-` : "";
-    return `${STATUS_HEAD}
-${line2}
-${fields3}${NOTE}`;
-  }
-  function rebuildStatusLine(line2, cols, fill3 = {}) {
-    const t = findStatusTags(line2)[0];
-    if (!t || !t.date) return line2;
-    const values = {
-      date: t.date,
-      time: t.time,
-      weather: t.weather,
-      temp: t.temp,
-      place: t.place,
-      target: t.target,
-      companions: t.companions.join(","),
-      deployed: t.deployed ? "투입" : "",
-      identity: t.identity || fill3.identity || "",
-      wallet: fill3.wallet !== void 0 && fill3.wallet !== null ? walletCell(fill3.wallet) : t.wallet
-    };
-    return formatStatusLine(values, cols);
-  }
-  function withIdentity(line2, identity) {
-    if (!identity) return line2;
-    const tags = findStatusTags(line2);
-    const t = tags[0];
-    if (!t || t.identity) return line2;
-    const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
-    if (cols !== 8) return line2;
-    return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
-  }
-  function withStatusBlock(messages, identity = "", shape) {
-    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
-    const line0 = lastStatusLine(messages);
-    if (!line0) return messages;
-    const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
-    const out = stripStatusLines(messages);
-    const at = out.map((m) => m?.role).lastIndexOf("user");
-    const recent = (shape?.recent ?? []).filter(Boolean);
-    const block3 = { role: "system", content: `${statusBlock(line2, shape?.cols)}${recent.length ? `
-Recent cash transactions (oldest first): ${recent.join("; ")}` : ""}` };
-    return at < 0 ? [...out, block3] : [...out.slice(0, at), block3, ...out.slice(at)];
-  }
-
   // src/host/shopcard.ts
-  var esc38 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc37 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var opener2 = null;
   function setShopOpener(f) {
     opener2 = f;
@@ -256,7 +109,7 @@ Recent cash transactions (oldest first): ${recent.join("; ")}` : ""}` };
     if (!tag) return text4;
     armChatClick("shop");
     const p2 = cardPalette(currentTheme());
-    const card2 = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc38(tag.shop)}</b></span><button type="button" data-goei-shop="1" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">상점 열기</button></div>`;
+    const card2 = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc37(tag.shop)}</b></span><button type="button" data-goei-shop="1" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">상점 열기</button></div>`;
     return `${stripShopTags(text4)}
 ${card2}`;
   }
@@ -487,8 +340,8 @@ ${texts.anomaly}`;
     const vars = chat.scriptstate ?? {};
     const cfg = colConfig(vars);
     const w = cfg.wallet !== "off" ? readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT) : null;
-    const alive2 = aliveAnchors(chat);
-    return { cols: usedCols(cfg), wallet: w ? walletBalance(w, alive2) : null, ...w ? { recent: recentWalletLines(w, alive2, walletRecentN(vars)) } : {} };
+    const alive = aliveAnchors(chat);
+    return { cols: usedCols(cfg), wallet: w ? walletBalance(w, alive) : null, ...w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {} };
   }
   function knownIdentity({ chat }) {
     if (!peopleSettings(chat.scriptstate).on) return "";
@@ -557,13 +410,13 @@ ${texts.anomaly}`;
     if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
     return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
   }
-  function withCap(box2, key2, cap, run5) {
-    const keep = box2[key2];
-    box2[key2] = cap;
+  function withCap(box2, key, cap, run5) {
+    const keep = box2[key];
+    box2[key] = cap;
     try {
       return run5();
     } finally {
-      box2[key2] = keep;
+      box2[key] = keep;
     }
   }
   function stripHistoryTags(messages) {
@@ -914,5 +767,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.2", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.3", start: start2 };
 })();
