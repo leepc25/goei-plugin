@@ -6,6 +6,7 @@
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
 import { crt2d } from './crt2d';
 import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
+import { bigText, BIG_INK } from '../action/ui/bigText';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
@@ -114,7 +115,12 @@ const CSS = `
 .vs-sel canvas{image-rendering:pixelated;display:block}
 .vs-top{position:absolute;left:0;right:0;top:10px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5}
 .vs-title{padding:0 10px;filter:var(--shd);${frameCss(F_BASE)}}
-.vs-modes{display:flex;gap:30px;pointer-events:auto;padding:0 26px}
+.vs-modes{display:none}
+.vs-tsub{display:flex;justify-content:center;margin-top:2px}
+.vs-mlist{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:auto}
+.vs-mlist .vs-mode{width:280px;padding:6px 0}
+.vs-sel[data-st="mode"]>:not(.vs-top):not(.vs-mlist):not(.vs-help){display:none}
+.vs-sel[data-st="char"]>.vs-mlist{display:none}
 .vs-mode{position:relative;cursor:pointer;width:150px;display:flex;justify-content:center;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-mode.on{${frameCss(F_ON)}}
 .vs-mode.on:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 0 40%,rgba(255,255,255,.45) 40% 48%,transparent 48% 54%,rgba(255,255,255,.25) 54% 57%,transparent 57%);background-size:300% 100%;animation:vs-shine 1.6s steps(16) infinite}
@@ -349,13 +355,16 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
 
   // ── 판 짜기 (한 번만. 커서·이름은 아래 update 가 바꾼다). 배경판 없음: 본문이 그대로 보인다
   // 칸 줄 수: 본문 폭에 맞춰 (줄이 적을수록 인물이 크게 선다)
-  const COLS = Math.max(8, Math.min(16, Math.floor((box.clientWidth - 140) / (CELL + 2))));
+  // 11-08 사용자 「격투게임처럼」: 얼굴은 네 칸씩 묶음, 묶음 사이를 띄운다
+  const BLOCK = 4, BGAP = 10;
+  const COLS = Math.max(8, Math.min(16, Math.floor((box.clientWidth - 140) / (BLOCK * (CELL + 2) + BGAP)) * BLOCK));
   const gridH = Math.ceil(names.length / COLS) * (CELL + 2) + 38 + 22 + 30;   // 판 + 아래 도움말 + 판 위 안내 한 줄
   el.style.setProperty('--gh', `${gridH}px`);
   // 전신은 이름 줄 위에 선다: 위 제목 줄(약 90px)과 판 사이 높이
   const figH = FIG_H;
   el.innerHTML = `<div class="vs-top"><div class="vs-title"></div>
-      <div class="vs-modes">${MODES.map((m) => `<div class="vs-mode" data-m="${m.id}"></div>`).join('')}</div></div>
+      <div class="vs-modes"></div></div>
+    <div class="vs-mlist">${MODES.map((m) => `<div class="vs-mode" data-m="${m.id}"></div>`).join('')}</div>
     <div class="vs-time"></div>
     <div class="vs-fig" data-s="0"></div><div class="vs-fig" data-s="1"></div>
     <div class="vs-nm" data-s="0"><span class="p"></span><span class="n"></span><span class="vs-picks"></span></div>
@@ -364,9 +373,23 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     <div class="vs-gridw"><div class="vs-grid">${names.map((n, i) => `<div class="vs-cell" data-i="${i}"></div>`).join('')}</div></div>
     <div class="vs-help"></div>`;
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
-  $('.vs-grid').style.gridTemplateColumns = `repeat(${COLS},${CELL}px)`;
-  put($('.vs-title'), dot('캐릭터 선택', HUD_INK, 2));
-  put($('.vs-help'), dot('방향키 움직이기 · Enter 고르기 · Backspace 되돌리기 · Tab 모드 · Esc 닫기', HUD_DIM, 1));
+  $('.vs-grid').style.gridTemplateColumns = Array.from({ length: COLS / BLOCK }, () => `repeat(${BLOCK},${CELL}px)`).join(` ${BGAP - 4}px `);
+  el.querySelectorAll<HTMLElement>('.vs-cell').forEach((c, i) => {
+    const col = i % COLS;
+    c.style.gridColumn = String(col + 1 + Math.floor(col / BLOCK));
+    c.style.gridRow = String(Math.floor(i / COLS) + 1);
+  });
+  // 첫 단계 = 모드 고르기(큰 글자 세로 목록), 다음 = 캐릭터 고르기
+  let stage: 'mode' | 'char' = 'mode';
+  const title = () => {
+    const t = $('.vs-title');
+    const big = document.createElement('canvas'), src = bigText(stage === 'mode' ? 'MODE SELECT' : 'PLAYER SELECT', BIG_INK, 3);
+    big.width = src.width; big.height = src.height; big.getContext('2d')!.drawImage(src, 0, 0);
+    t.replaceChildren(crt2d(big));
+    if (stage === 'char') { const sub = document.createElement('div'); sub.className = 'vs-tsub'; sub.appendChild(dot(mode.name, '#fff3c4', 1)); t.appendChild(sub); }
+    put($('.vs-help'), dot(stage === 'mode' ? '↑↓ 움직이기 · Enter 고르기 · Esc 닫기' : '방향키 움직이기 · Enter 고르기 · Backspace 되돌리기 · Tab 모드 · Esc 닫기', HUD_DIM, 1));
+  };
+  const setStage = (st: 'mode' | 'char') => { stage = st; el.dataset.st = st; lastTurn = -1; title(); };
   for (const s of [0, 1] as const) put($(`.vs-nm[data-s="${s}"] .p`), dot(s ? '2P' : '1P', P_COLOR[s], 2));
   const cells = [...el.querySelectorAll<HTMLElement>('.vs-cell')];
   cells.forEach((c, i) => { c.appendChild(cellCanvas(names[i])); });
@@ -401,7 +424,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     el.querySelectorAll<HTMLElement>('.vs-mode').forEach((m) => {
       const on = m.dataset.m === mode.id;
       m.classList.toggle('on', on);
-      put(m, dot(MODES.find((x) => x.id === m.dataset.m)!.name, on ? '#fff3c4' : HUD_DIM, 2));
+      put(m, dot(MODES.find((x) => x.id === m.dataset.m)!.name, on ? '#fff3c4' : HUD_DIM, 3));
       if (on) { const l = arrowCanvas('#ffd35a', true), r = arrowCanvas('#ffd35a'); l.className = 'ar l'; r.className = 'ar r'; m.append(l, r); }
     });
     const taken = new Set([...picks[0], ...picks[1]]);
@@ -445,6 +468,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
 
   const flash = (s: 0 | 1) => { const f = $(`.vs-fig[data-s="${s}"]`); f.classList.remove('pick'); void f.offsetWidth; f.classList.add('pick'); };
   const pick = () => {
+    if (stage === 'mode') { sfx('ok'); setStage('char'); update(); return; }
     if (done()) return;
     const t = turn();
     const n = resolve(names[cur[t]], [...picks[0], ...picks[1]]);
@@ -459,13 +483,14 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   const undo = () => {
     if (done()) return;
     const t = picks[1].length ? 1 : 0;
-    if (!picks[t].length) return;
+    if (!picks[t].length) { if (stage === 'char') { sfx('back'); setStage('mode'); update(); } return; }
     picks[t].pop();
     sfx('back');
     update();
   };
-  const setMode = (m: (typeof MODES)[number]) => { if (m === mode) return; mode = m; picks[0] = []; picks[1] = []; lastTurn = -1; sfx('move'); update(); };
+  const setMode = (m: (typeof MODES)[number]) => { if (m === mode) return; mode = m; picks[0] = []; picks[1] = []; lastTurn = -1; sfx('move'); if (stage === 'char') title(); update(); };
   const move = (dx: number, dy: number) => {
+    if (stage === 'mode') { if (dy) setMode(MODES[(MODES.indexOf(mode) + dy + MODES.length) % MODES.length]); return; }
     if (done()) return;
     const t = turn();
     let i = cur[t];
@@ -492,17 +517,19 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     map[k]();
   };
   el.addEventListener('pointerover', (e) => {
+    const mo = (e.target as HTMLElement).closest<HTMLElement>('.vs-mode');
+    if (mo && stage === 'mode') { setMode(MODES.find((x) => x.id === mo.dataset.m)!); return; }
     const c = (e.target as HTMLElement).closest<HTMLElement>('.vs-cell');
-    if (!c || done()) return;
+    if (!c || done() || stage !== 'char') return;
     const i = +c.dataset.i!;
     if (cur[turn()] !== i) { cur[turn()] = i; sfx('move'); update(); }
   });
   el.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
     const m = t.closest<HTMLElement>('.vs-mode');
-    if (m) { setMode(MODES.find((x) => x.id === m.dataset.m)!); return; }
+    if (m) { setMode(MODES.find((x) => x.id === m.dataset.m)!); pick(); return; }
     const c = t.closest<HTMLElement>('.vs-cell');
-    if (c && !done()) { cur[turn()] = +c.dataset.i!; pick(); }
+    if (c && !done() && stage === 'char') { cur[turn()] = +c.dataset.i!; pick(); }
   });
   el.addEventListener('contextmenu', (e) => { e.preventDefault(); undo(); });
   window.addEventListener('keydown', onKey, true);
@@ -513,7 +540,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     if (closed) return;
     figs.forEach((f) => f.draw(now));
     // 틀 그림이 늦게 읽히면 한 번 다시
-    if (!done()) {
+    if (!done() && stage === 'char') {
       const left = Math.max(0, TIME - Math.floor((now - timeAt) / 1000));
       if (left !== time) {
         time = left;
@@ -532,6 +559,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     window.removeEventListener('keydown', onKey, true);
     el.remove(); st.remove();
   };
+  setStage('mode');
   update();
   raf = requestAnimationFrame(tick);
   return { close, el };
