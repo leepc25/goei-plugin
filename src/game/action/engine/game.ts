@@ -69,7 +69,8 @@ interface Scene {
 }
 
 /** 대전 화면 확대 (11-08 사용자 「캐릭터 픽셀 2배」): 무대 1280 중 절반이 보이고 화면이 두 사람을 따라간다 */
-const VS_CAM = 2;
+/** 대전: 그림판 세로에 보이는 월드 높이 (960 그림판 = 도트 2배) */
+const VS_VIEW_H = 480;
 const NO_PAD: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
 
 export class Game {
@@ -160,7 +161,7 @@ export class Game {
         // 11-02 사용자: 필드는 장면 세로를 창에 꽉 채우고(검은 띠 없음), 사람이 가장 큰 장면 기준으로 다른 장면은 더 키운다(view.sceneZoom ≥ 1, 위아래는 주인공을 따라 움직임). 10-27의 PC 1배 고정은 폐기.
         const H = this.inHub ? view.worldH : SCREEN_H;
         // 투명 무대(대전)는 그림판이 16:9보다 높다: 폭 기준으로 그리고 남는 위쪽은 비워 둔다
-        view.zoom = view.clear && !this.inHub ? (this.canvas.width / SCREEN_W) * VS_CAM : (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
+        view.zoom = view.clear && !this.inHub ? (this.canvas.height / VS_VIEW_H) : (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;

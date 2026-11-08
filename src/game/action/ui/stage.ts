@@ -4,6 +4,8 @@ import css from './ui.css';
 import { mountCrt, type Crt } from './crt';
 import { view } from '../engine/view';
 import { ensureKit } from './kit';
+/** 대전 화면: 세로 960 (월드 480 × 2), 가로는 최대 무대 전체 2560 (월드 1280 × 2) */
+const VS_H = 960, VS_WMAX = 2560;
 
 export const W = 1280,
   H = 720;
@@ -159,11 +161,13 @@ export function mountStage(box: HTMLElement): Stage {
     const dpr = window.devicePixelRatio || 1;
     const fieldFill = byHeight && !portrait && bh >= 600;
     const k = fieldFill ? Math.max(1, Math.floor(dpr)) / dpr : 1;
-    // 투명 무대(대전): 폭 1280에 맞추고 세로는 상자 높이 전체 (위로 솟는 이펙트가 16:9 윗선에서 잘리지 않게, 사용자 11-08)
-    const clearTall = view.clear && !portrait && bw > 0 && bh * W / bw > H;
-    const vh = clearTall ? Math.round((bh * W) / bw) : fieldFill ? Math.round(bh / k) : H;
+    // 투명 무대(대전, 11-08 사용자): 아케이드 4:3 1280×960 (도트 한 칸 = 2px). 상자가 작으면 같은 비율로 줄인다.
+    // 「가로 맞춤」이면 세로 960 은 그대로, 가로만 상자만큼 무대 끝(2560)까지
+    const vsSc = Math.min(1, bh / VS_H, bw / W);
+    const clearTall = view.clear && !portrait && bw > 0;
+    const vh = clearTall ? VS_H : fieldFill ? Math.round(bh / k) : H;
     // 필드가 16:9 보다 긴 낮은 화면(가로 폰)이면 캔버스를 옆으로 넓혀 좌우 검은 띠 없이 꽉 채운다 (모바일 조작 설계: 가로 전체화면으로 꽉 차게)
-    const vw = clearTall ? W : fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
+    const vw = clearTall ? (view.vsWide ? Math.min(VS_WMAX, Math.max(W, Math.floor(bw / vsSc))) : W) : fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
     if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;
@@ -171,7 +175,7 @@ export function mountStage(box: HTMLElement): Stage {
       canvas.style.width = stageEl.style.width = `${vw}px`;
       canvas.style.height = stageEl.style.height = `${vh}px`;
     }
-    const scale = clearTall ? bw / W : fieldFill ? k : Math.min(bw / vw, bh / H);
+    const scale = clearTall ? vsSc : fieldFill ? k : Math.min(bw / vw, bh / H);
     s.scale = scale;
     const w = s.vw * scale,
       h = vh * scale;
@@ -192,6 +196,7 @@ export function mountStage(box: HTMLElement): Stage {
     if (b.dataset.rot === 'turn') turn = true;
     layout();
   });
+  view.relayout = layout;
   const ro = new ResizeObserver(layout);
   ro.observe(root);
   ro.observe(box);

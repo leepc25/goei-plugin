@@ -8,6 +8,10 @@ export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, n
   /** 투명 무대 (11-08 기다리는 동안 대전): 배경·바닥을 그리지 않고 매 장 캔버스를 비운다. 본문 위에 인물만 보이게 */
   clear: false,
   /** 대전 배경 (설정에서 고른 필드 장면, 11-08 사용자). 월드 좌표에 놓을 자리. null 이면 투명 무대 그대로 */
+  /** 대전 화면 크기 (11-08 사용자, 설정 「화면 크기」): false = 1280×960 고정, true = 세로 960 고정·가로는 창만큼(무대 끝 2560까지). 작으면 같은 비율로 줄인다 */
+  vsWide: false,
+  /** 그림판 크기 다시 맞추기 (ui/stage.ts 가 넣는다) */
+  relayout: null as null | (() => void),
   vsBg: null as null | { img: HTMLImageElement; x: number; y: number; w: number; h: number; objs: { img: HTMLImageElement; x: number; y: number; w: number; h: number; front: boolean }[] },
   /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */
   charMul: 1,

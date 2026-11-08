@@ -37,7 +37,7 @@ function perkChips(p: FighterPlayer): { t: string; c: string; n?: number }[] {
 }
 import { FighterAi } from '../fighter/ai';
 import { charArt, charBody, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
-import { setPixelScale, TICK_HZ } from './contract';
+import { setPixelScale, SCREEN_W, TICK_HZ } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio, type SfxId } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
@@ -1686,12 +1686,14 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const foe = versus.mode === 'survival'
     ? live.find((b) => b.vsBoss) ?? live.sort((a, b) => Math.abs(a.x - w.player.x) - Math.abs(b.x - w.player.x))[0]
     : w.bodies.find((b) => b.team === 'enemy');
-  const k = 1.25, W = c.canvas.width / k, H = c.canvas.height / k;
+  // 11-08 사용자: 화면이 가로로 늘어나도 체력바 묶음은 가운데 1280 폭 그대로
+  const hudW = Math.min(c.canvas.width, SCREEN_W), hudX = Math.round((c.canvas.width - hudW) / 2);
+  const k = 1.25, W = hudW / k, H = c.canvas.height / k;
   // 칸 자리: 그림판이 16:9보다 높아도 예전처럼 16:9 윗선 근처 (사용자 11-08 「꼭대기면 눈에 안 들어온다」)
   // 11-08 사용자: 캐릭터를 두 배로 키워서 막대를 더 위로 (머리와 겹치지 않게). 그림판 맨 위에서 남는 높이의 1/4 지점
   const top = 14 + Math.max(0, c.canvas.height - 720) / k * 0.25;
   c.save();
-  c.setTransform(k, 0, 0, k, 0, 0);
+  c.setTransform(k, 0, 0, k, hudX, 0);
   c.imageSmoothingEnabled = false;
   // 11-08 사용자 「격투게임처럼 화면 구성」: 위쪽 = 바깥 얼굴 · 안쪽으로 길게 뻗은 체력 막대 · 가운데 시간, 막대 아래 이름·판 표시,
   // 얼굴 아래 대기 캐릭터 이름(태그매치), 아래 구석 = 필살 게이지·쌓인 수. 상자·띠 없이 도트 틀만 (본문을 덮지 않는다)

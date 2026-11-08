@@ -7,7 +7,7 @@ declare const __PLUGIN_VERSION__: string;
 
 export interface VersusModule {
   version: string;
-  start(box: HTMLElement, assets: GameAssets, opts?: { onClose?: () => void; bg?: () => string | undefined }): VersusHandle;
+  start(box: HTMLElement, assets: GameAssets, opts?: { onClose?: () => void; bg?: () => string | undefined; wide?: () => boolean }): VersusHandle;
 }
 
 // Risu 플러그인 iframe 은 localStorage 를 읽기만 해도 막힐 수 있다 (entry.ts 와 같은 대신 저장소)

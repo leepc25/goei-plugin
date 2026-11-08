@@ -25,5 +25,5 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 document.body.innerHTML = '<div id="box"></div>';
 // 시험: 주소 ?bg=장면 id 로 배경 (설정 「배경」 대신)
 const bgParam = new URLSearchParams(location.search).get('bg') ?? (() => { try { return new URLSearchParams(parent.location.search).get('bg'); } catch { return null; } })();
-const h = startVersus(document.getElementById('box')!, assets, { onClose: () => console.log('[vs] 닫기'), bg: () => bgParam ?? undefined });
+const h = startVersus(document.getElementById('box')!, assets, { onClose: () => console.log('[vs] 닫기'), bg: () => bgParam ?? undefined, wide: () => q.get('wide') === '1' });
 (globalThis as { __vs?: unknown }).__vs = h;

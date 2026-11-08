@@ -49,7 +49,7 @@ async function loadBg(id: string | undefined): Promise<typeof view.vsBg> {
   return { img, x, y, w, h, objs };
 }
 
-export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined } = {}): VersusHandle {
+export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined; wide?: () => boolean } = {}): VersusHandle {
   view.clear = true;
   const packs = prepareCharPacks(assets, 'vs-common');
   let game: Game | null = null;
@@ -88,6 +88,8 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
     vsSoundWarm();
     vsBgm(true);
     view.vsBg = await loadBg(opts.bg?.());
+    view.vsWide = opts.wide?.() ?? false;
+    view.relayout?.();
     if (dead) return;
     if (!game) {
       unmount = mountGame(box, { assets } as never, {
@@ -105,14 +107,28 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
     }
   };
 
+  // 창이 너무 작으면(모바일 크기, 11-08 사용자) 아예 숨기고 멈춘다. 다시 커지면 이어서
+  let tiny = false, paused = false;
+  const show = () => { box.style.visibility = tiny || paused ? 'hidden' : ''; };
+  const ro = new ResizeObserver(() => {
+    const t = box.clientWidth < 640 || box.clientHeight < 480;
+    if (t === tiny) return;
+    tiny = t;
+    show();
+    if (t) versus.hold = true;
+    else if (!paused && !sel && game) versus.hold = false;
+  });
+  ro.observe(box);
+
   versus.onMatchEnd = () => select();
   void packs.ready.then(() => { if (!dead) select(); });
 
   return {
-    pause: () => { versus.hold = true; box.style.visibility = 'hidden'; vsSoundPause(true); },
-    resume: () => { box.style.visibility = ''; vsSoundPause(false); if (!sel && game) versus.hold = false; },
+    pause: () => { paused = true; versus.hold = true; show(); vsSoundPause(true); },
+    resume: () => { paused = false; show(); vsSoundPause(false); if (!sel && game && !tiny) versus.hold = false; },
     destroy: () => {
       dead = true;
+      ro.disconnect();
       sel?.close();
       unmount?.();
       packs.dispose();

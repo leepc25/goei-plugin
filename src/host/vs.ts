@@ -251,7 +251,7 @@ export async function toggleVersus(key: string, goSettings: () => void): Promise
   }
   open = true;
   if (!handle) {
-    handle = m.start(box, store.assets, { onClose: () => void closeVersus(), bg: () => getPrefs().versusBg });
+    handle = m.start(box, store.assets, { onClose: () => void closeVersus(), bg: () => getPrefs().versusBg, wide: () => getPrefs().versusWide === true });
   } else handle.resume();
   // 고르기 창이 있으면 누르기를 받는다 (얼굴 누르기). 경기 중이면 통과
   const syncPass = () => void setPass(!box?.querySelector('.vs-sel'));

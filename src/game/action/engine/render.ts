@@ -543,9 +543,9 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (corePlayer(w.player)) {
         // 컷인·번쩍임·쓰러짐은 화면 기준 (화면 확대·세로 따라가기와 무관)
         ctx.save();
-        // 투명 무대(대전)는 그림판이 16:9보다 높다: 폭 기준 배율, 세로 가운데
-        const hz = view.clear ? ctx.canvas.width / SCREEN_W : ctx.canvas.height / SCREEN_H;
-        ctx.setTransform(hz, 0, 0, hz, 0, view.clear ? Math.round((ctx.canvas.height - SCREEN_H * hz) / 2) : 0);
+        // 투명 무대(대전)는 그림판이 1280×960 이상: 1배로 가운데
+        if (view.clear) ctx.setTransform(1, 0, 0, 1, Math.round((ctx.canvas.width - SCREEN_W) / 2), Math.round((ctx.canvas.height - SCREEN_H) / 2));
+        else { const hz = ctx.canvas.height / SCREEN_H; ctx.setTransform(hz, 0, 0, hz, 0, 0); }
         w.player.drawScreen(ctx);
         ctx.restore();
       }
