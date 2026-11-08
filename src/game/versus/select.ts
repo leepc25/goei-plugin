@@ -4,7 +4,7 @@
 // 인물 풀 = 이름 있는 인물만(NPC 빼기). 서바이벌 상대는 NPC 도 나온다 — 고르지 않고 웨이브가 낸다.
 // 키: 방향키 움직이기, Enter·Z 고르기, Backspace·X 되돌리기, Tab 모드 바꾸기, Esc 닫기. 마우스: 올리면 커서, 누르면 고르기, 오른쪽 단추 되돌리기.
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
-import { dotText, hudArt, hudImg, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
+import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
@@ -13,7 +13,7 @@ const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
   { id: 'survival', name: '서바이벌', picks: [1, 0] },
 ];
 const RANDOM = '__random';
-const CELL = 50;   // HUD 기술 칸 틀 그대로 1:1
+const CELL = 48;
 const TIME = 30;
 /** 1P 파랑·2P 빨강: 커서·이름 앞 표시·인물 외곽 빛에만 쓴다 */
 const P_COLOR = ['#5a9cff', '#ff5a5a'];
@@ -27,18 +27,16 @@ const CSS = `
 .vs-sel *{box-sizing:border-box}
 .vs-sel canvas{image-rendering:pixelated;display:block}
 .vs-top{position:absolute;left:0;right:0;top:10px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5}
-.vs-modes{display:flex;gap:18px;pointer-events:auto}
-.vs-mode{cursor:pointer;padding:2px 0}
-.vs-mode.on{border-bottom:3px solid ${HUD_INK}}
-.vs-time{position:absolute;top:10px;right:16px;z-index:6}
+.vs-title{padding:6px 14px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-modes{display:flex;gap:4px;pointer-events:auto}
+.vs-mode{cursor:pointer;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
+.vs-mode.on{box-shadow:inset 0 0 0 1px ${HUD_INK}}
+.vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:5px 8px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
 .vs-time.low{animation:vs-pulse .5s steps(2) infinite}
 .vs-fig{position:absolute;bottom:calc(var(--gh) + 50px);z-index:2;pointer-events:none}
 .vs-fig[data-s="0"]{left:3%}
 .vs-fig[data-s="1"]{right:3%}
 .vs-slot{position:absolute;bottom:0}
-.vs-slot[data-k="0"]{left:50%;transform:translateX(-50%);z-index:3}
-.vs-slot[data-k="1"]{left:0;bottom:5%;transform:scale(.8);transform-origin:bottom left;z-index:2}
-.vs-slot[data-k="2"]{right:0;bottom:5%;transform:scale(.8);transform-origin:bottom right;z-index:1}
 .vs-slot[data-k="1"] canvas,.vs-slot[data-k="2"] canvas{opacity:.85}
 .vs-slot.in{animation:vs-pop .2s steps(4)}
 @keyframes vs-pop{from{opacity:0;margin-bottom:-30px}}
@@ -46,7 +44,7 @@ const CSS = `
 .vs-fig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-fig.pick .vs-slot[data-k="0"] canvas{animation:vs-pick .3s steps(3)}
 .vs-fig .unk{position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center}
-.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:flex-end;gap:8px}
+.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
 .vs-nm[data-s="0"]{left:3%}
 .vs-nm[data-s="1"]{right:3%;flex-direction:row-reverse}
 .vs-picks{display:flex;gap:3px;margin-bottom:2px}
@@ -62,7 +60,8 @@ const CSS = `
 .vs-cur canvas+canvas{top:-14px;left:2px}
 .vs-cur.c1 canvas+canvas{left:${CELL - 12}px}
 .vs-say{position:absolute;z-index:4;left:0;right:0;bottom:calc(var(--gh) - 46px);display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
-.vs-help{position:absolute;z-index:4;left:0;right:0;bottom:4px;display:flex;justify-content:center}
+.vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;display:flex;justify-content:center}
+.vs-say canvas,.vs-help canvas,.vs-load canvas{padding:4px 8px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
 @keyframes vs-blink{50%{border-color:${HUD_INK}}}
 @keyframes vs-pulse{50%{opacity:.4}}
 @keyframes vs-inL{from{transform:translateX(-80px);opacity:0}}
@@ -73,7 +72,7 @@ const CSS = `
 .vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
 .vs-vfig[data-s="0"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
 .vs-vfig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
-.vs-vname{position:absolute;bottom:14px;display:flex;align-items:flex-end;gap:8px}
+.vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(15,18,22,.9);border:1px solid ${HUD_EDGE};box-shadow:inset 0 0 0 1px ${HUD_DIM}}
 .vs-vname[data-s="0"]{left:8%}
 .vs-vname[data-s="1"]{right:8%;flex-direction:row-reverse}
 .vs-vteam{position:absolute;top:14px;display:flex;gap:4px}
@@ -109,8 +108,9 @@ const STANCE = ['3', '1'];
 
 
 /** 크게 움직이는 전신. 인물 팩이 풀릴 때까지는 전신판 첫 장 */
-function figure(h: number, flip: boolean) {
-  const k = h / 256;
+function figure(h: number, flip: boolean, k = 1) {
+  // 11-08 사용자: 키우지 않는다. 앞사람은 도트 한 칸 = 1px, 뒤 사람만 원근으로 작게
+  h = Math.round(h * k);
   const cv = document.createElement('canvas');
   cv.width = Math.round(150 * k); cv.height = h;
   const o = cv.getContext('2d')!;
@@ -141,49 +141,56 @@ function figure(h: number, flip: boolean) {
   };
 }
 
-/** 대형: 앞 가운데 = 첫째(지금 나갈 사람), 뒤 양옆 = 둘째·셋째 (태그매치). 1:1 은 앞 한 명만 */
-function troupe(h: number, flip: boolean) {
-  const figs = [0, 1, 2].map(() => figure(h, flip));
+/** 대형 (태그매치, 11-08 사용자): 앞사람(첫째, 안쪽)에서 바깥쪽 뒤로 대각선 줄. 뒤로 갈수록 원근으로 작게, 조금 위에. 1:1 은 한 명 */
+const FIG_H = 256, PERSP = [1, 0.84, 0.7], DX = 64, DY = 26;
+function troupe(_h: number, flip: boolean, n = 3) {
+  const figs = Array.from({ length: n }, (_, k) => figure(FIG_H, flip, PERSP[k]));
   const el = document.createElement('div');
   const w = figs[0].cv.width;
-  el.style.cssText = `position:relative;width:${Math.round(w * 1.9)}px;height:${h}px`;
-  // 2P 는 거울: 둘째가 오른쪽(바깥) 뒤
-  const slots = figs.map((f, k) => { const d = document.createElement('div'); d.className = 'vs-slot'; d.dataset.k = String(flip && k ? 3 - k : k); d.appendChild(f.cv); el.appendChild(d); return d; });
-  const names = ['', '', ''];
+  el.style.cssText = `position:relative;width:${w + DX * (n - 1)}px;height:${FIG_H}px`;
+  // 1P 는 오른쪽이 안쪽(앞), 2P 는 왼쪽이 안쪽(앞). 뒤 사람 발은 앞사람보다 DY 씩 위
+  const slots = figs.map((f, k) => {
+    const d = document.createElement('div');
+    d.className = 'vs-slot'; d.dataset.k = String(k);
+    const cx = flip ? w / 2 + k * DX : w / 2 + (n - 1 - k) * DX;
+    d.style.left = `${Math.round(cx - f.cv.width / 2)}px`;
+    d.style.bottom = `${k * DY}px`;
+    d.style.zIndex = String(3 - k);
+    d.appendChild(f.cv); el.appendChild(d); return d;
+  });
+  const names = Array(n).fill('');
   return {
     el,
     draw: (now: number) => figs.forEach((f) => f.draw(now)),
     set(list: string[]) {
-      for (let k = 0; k < 3; k++) {
-        const n = list[k] ?? '';
-        if (n === names[k]) continue;
-        names[k] = n;
-        figs[k].set(n);
+      for (let k = 0; k < n; k++) {
+        const nm = list[k] ?? '';
+        if (nm === names[k]) continue;
+        names[k] = nm;
+        figs[k].set(nm);
         slots[k].querySelector('.unk')?.remove();
-        if (n === RANDOM) { const u = document.createElement('div'); u.className = 'unk'; u.appendChild(dot('?', HUD_INK, 8)); slots[k].appendChild(u); }
-        if (n) { slots[k].classList.remove('in'); void slots[k].offsetWidth; slots[k].classList.add('in'); }
+        if (nm === RANDOM) { const u = document.createElement('div'); u.className = 'unk'; u.appendChild(dot('?', HUD_INK, 8)); slots[k].appendChild(u); }
+        if (nm) { slots[k].classList.remove('in'); void slots[k].offsetWidth; slots[k].classList.add('in'); }
       }
     },
   };
 }
 
-/** 얼굴 칸: HUD 기술 칸 틀(PixelLab 도트 틀, 50×50)에 얼굴판 얼굴을 1:1 로 (줄이지 않고 가운데를 자른다) */
-const SLOT = hudArt.slot;
+/** 얼굴 칸 (11-08 사용자: 버튼 그림 말고 깔끔하게): 검은 1도트 테 + 회색 1도트 테, 안쪽에 얼굴판 얼굴을 1:1 로 (줄이지 않고 가운데를 자른다) */
+const CELL_IN = CELL - 4;
 function drawCell(cv: HTMLCanvasElement, name: string) {
   const o = cv.getContext('2d')!;
   o.imageSmoothingEnabled = false;
-  o.clearRect(0, 0, cv.width, cv.height);
-  const [x0, y0, x1, y1] = SLOT.inner, iw = x1 - x0, ih = y1 - y0;
-  // 틀 먼저, 그 안쪽에 얼굴 (틀 안쪽이 칠해져 있다)
-  const fr = hudImg('slot');
-  if (fr) o.drawImage(fr, 0, 0);
-  else { o.fillStyle = '#0f1216'; o.fillRect(x0, y0, iw, ih); }
-  if (name === RANDOM) { const q = dotText('?', HUD_INK, 2); o.drawImage(q, Math.round(x0 + (iw - q.width) / 2), Math.round(y0 + (ih - q.height) / 2)); }
-  else if (name) { const f = charFace(name, 64, false); if (f) o.drawImage(f, Math.round((64 - iw) / 2), 4, iw, ih, x0, y0, iw, ih); }
+  const n = cv.width;
+  o.fillStyle = HUD_EDGE; o.fillRect(0, 0, n, n);
+  o.fillStyle = HUD_DIM; o.fillRect(1, 1, n - 2, n - 2);
+  o.fillStyle = '#0f1216'; o.fillRect(2, 2, n - 4, n - 4);
+  if (name === RANDOM) { const q = dotText('?', HUD_INK, 2); o.drawImage(q, Math.round((n - q.width) / 2), Math.round((n - q.height) / 2)); }
+  else if (name) { const f = charFace(name, 64, false); if (f) o.drawImage(f, Math.round((64 - CELL_IN) / 2), 2, CELL_IN, CELL_IN, 2, 2, CELL_IN, CELL_IN); }
 }
 function cellCanvas(name: string, css = CELL): HTMLCanvasElement {
   const cv = document.createElement('canvas');
-  cv.width = SLOT.w; cv.height = SLOT.h;
+  cv.width = cv.height = CELL;
   cv.style.width = cv.style.height = `${css}px`;
   drawCell(cv, name);
   return cv;
@@ -233,7 +240,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   const gridH = Math.ceil(names.length / COLS) * (CELL + 2) + 24 + 22 + 30;   // 판 + 아래 도움말 + 판 위 안내 한 줄
   el.style.setProperty('--gh', `${gridH}px`);
   // 전신은 이름 줄 위에 선다: 위 제목 줄(약 90px)과 판 사이 높이
-  const figH = Math.max(180, Math.min(420, box.clientHeight - gridH - 50 - 90));
+  const figH = FIG_H;
   el.innerHTML = `<div class="vs-top"><div class="vs-title"></div>
       <div class="vs-modes">${MODES.map((m) => `<div class="vs-mode" data-m="${m.id}"></div>`).join('')}</div></div>
     <div class="vs-time"></div>
@@ -245,17 +252,23 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     <div class="vs-help"></div>`;
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
   $('.vs-grid').style.gridTemplateColumns = `repeat(${COLS},${CELL}px)`;
-  put($('.vs-title'), dot('인물 선택', HUD_INK, 3));
+  put($('.vs-title'), dot('인물 선택', HUD_INK, 2));
   put($('.vs-help'), dot('방향키 움직이기 · Enter 고르기 · Backspace 되돌리기 · Tab 모드 · Esc 닫기', HUD_DIM, 1));
   for (const s of [0, 1] as const) put($(`.vs-nm[data-s="${s}"] .p`), dot(s ? '2P' : '1P', P_COLOR[s], 2));
   const cells = [...el.querySelectorAll<HTMLElement>('.vs-cell')];
-  const cellCv = cells.map((c, i) => { const cv = cellCanvas(names[i]); c.appendChild(cv); return cv; });
-  let framed = false;
-  const figs = ([0, 1] as const).map((s) => {
-    const f = troupe(figH, s === 1);
-    $(`.vs-fig[data-s="${s}"]`).appendChild(f.el);
-    return f;
-  });
+  cells.forEach((c, i) => { c.appendChild(cellCanvas(names[i])); });
+  let figs: ReturnType<typeof troupe>[] = [];
+  let figN = 0;
+  const makeFigs = (n: number) => {
+    if (n === figN) return;
+    figN = n; shown[0] = shown[1] = '\u0000';
+    figs = ([0, 1] as const).map((s) => {
+      const f = troupe(figH, s === 1, n);
+      $(`.vs-fig[data-s="${s}"]`).querySelectorAll(':scope > div:not(.unk)').forEach((d) => d.remove());
+      $(`.vs-fig[data-s="${s}"]`).prepend(f.el);
+      return f;
+    });
+  };
   const curEl = ([0, 1] as const).map((s) => {
     const d = document.createElement('div');
     d.className = `vs-cur c${s}`;
@@ -264,12 +277,14 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   });
   const shown: [string, string] = ['', ''];
   let lastTurn = -1;
+  makeFigs(1);
   let time = TIME, timeAt = performance.now();
-  const drawTime = (left: number) => { const te = $('.vs-time'); put(te, dot(String(left).padStart(2, '0'), left <= 5 ? P_COLOR[1] : HUD_INK, 3)); te.classList.toggle('low', left <= 5); };
+  const drawTime = (left: number) => { const te = $('.vs-time'); put(te, dot(String(left).padStart(2, '0'), left <= 5 ? P_COLOR[1] : HUD_INK, 2)); te.classList.toggle('low', left <= 5); };
   drawTime(TIME);
 
   const update = () => {
     const t = turn();
+    makeFigs(mode.picks[0] > 1 ? 3 : 1);
     el.querySelectorAll<HTMLElement>('.vs-mode').forEach((m) => {
       const on = m.dataset.m === mode.id;
       m.classList.toggle('on', on);
@@ -293,12 +308,12 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
         fig.querySelector(':scope > .unk')?.remove();
         if (surv) { const u = document.createElement('div'); u.className = 'unk'; u.appendChild(dot('?', HUD_INK, 8)); fig.appendChild(u); }
       }
-      put($(`.vs-nm[data-s="${s}"] .n`), dot(surv ? '웨이브 서바이벌' : n === RANDOM ? '무작위' : n, HUD_INK, 3));
+      put($(`.vs-nm[data-s="${s}"] .n`), dot(surv ? '웨이브 서바이벌' : n === RANDOM ? '무작위' : n, HUD_INK, 2));
       const pk = $(`.vs-nm[data-s="${s}"] .vs-picks`);
       pk.replaceChildren();
       if (mode.picks[s] > 1) for (let i = 0; i < mode.picks[s]; i++) {
         const p = picks[s][i];
-        const c = cellCanvas(p ?? '', 50);
+        const c = cellCanvas(p ?? '', CELL);
         pk.appendChild(c);
       }
     }
@@ -378,7 +393,6 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     if (closed) return;
     figs.forEach((f) => f.draw(now));
     // 틀 그림이 늦게 읽히면 한 번 다시
-    if (!framed && hudImg('slot')) { framed = true; cellCv.forEach((cv, i) => drawCell(cv, names[i])); }
     if (!done()) {
       const left = Math.max(0, TIME - Math.floor((now - timeAt) / 1000));
       if (left !== time) {
@@ -410,7 +424,7 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
   const el = document.createElement('div');
   el.className = 'vs-sel';
   // 배경판 없음 (11-08 사용자): 본문 위에 인물(외곽 빛)·이름·얼굴 칸·VS 도트 글자만
-  const figH = Math.max(200, Math.min(420, box.clientHeight - 140));
+  const figH = FIG_H;
   const figs: ReturnType<typeof troupe>[] = [];
   for (const s of [0, 1] as const) {
     const list = s ? r.foe : r.me;
@@ -419,21 +433,21 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
     fw.className = 'vs-vfig';
     fw.dataset.s = String(s);
     if (surv) { fw.style.height = `${figH}px`; fw.style.display = 'flex'; fw.style.alignItems = 'center'; fw.appendChild(dot('?', HUD_INK, 10)); }
-    else { const f = troupe(figH, s === 1); f.set(list); figs.push(f); fw.appendChild(f.el); }
+    else { const f = troupe(figH, s === 1, Math.max(1, Math.min(3, list.length))); f.set(list); figs.push(f); fw.appendChild(f.el); }
     const nm = document.createElement('div');
     nm.className = 'vs-vname';
     nm.dataset.s = String(s);
-    nm.append(dot(s ? '2P' : '1P', P_COLOR[s], 2), dot(surv ? '웨이브 서바이벌' : list[0], HUD_INK, 3));   // 팀은 첫 사람 이름만, 셋은 위 얼굴 칸으로
+    nm.append(dot(s ? '2P' : '1P', P_COLOR[s], 2), dot(surv ? '웨이브 서바이벌' : list[0], HUD_INK, 2));   // 팀은 첫 사람 이름만, 셋은 위 얼굴 칸으로
     el.append(fw, nm);
     if (list.length > 1) {
       const tm = document.createElement('div');
       tm.className = 'vs-vteam';
       tm.dataset.s = String(s);
-      list.forEach((n) => tm.appendChild(cellCanvas(n, 50)));
+      list.forEach((n) => tm.appendChild(cellCanvas(n, CELL)));
       el.appendChild(tm);
     }
   }
-  const big = document.createElement('div'); big.className = 'vs-big'; big.appendChild(dot('VS', HUD_INK, 8));
+  const big = document.createElement('div'); big.className = 'vs-big'; big.appendChild(dot('VS', HUD_INK, 6));
   const ld = document.createElement('div'); ld.className = 'vs-load'; ld.appendChild(dot('불러오는 중', HUD_DIM, 1));
   el.append(big, ld);
   box.append(st, el);

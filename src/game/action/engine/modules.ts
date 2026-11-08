@@ -1608,6 +1608,7 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
 }
 
 /** 태그매치 대기 인물 (11-08 사용자): 자기 편 뒤쪽 끝에 작게(원근) 서서 각자 동작. 판이 끝나면 이긴 편 환호·진 편 화내기 */
+const BENCH_K = 0.72;
 const BENCH_CLIPS = ['rest', 'limber', 'phone', 'coffee', 'smoke', 'snack', 'browse', 'call', 'pushup', 'talk'];
 const benchT = new Map<string, { clip: string; since: number; until: number }>();
 function drawBench(c: CanvasRenderingContext2D, camX: number) {
@@ -1619,7 +1620,7 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
   for (const side of [0, 1] as const) {
     const list = versus.team[side].slice(versus.cur[side] + 1);
     list.forEach((name, k) => {
-      const x = side === 0 ? 60 + k * 95 : 1280 - 60 - k * 95, y = VS_LINE - 110 - k * 20;
+      const x = side === 0 ? 60 + k * 90 : 1280 - 60 - k * 90, y = VS_LINE - 150;   // 한 줄로 나란히, 싸우는 줄보다 뒤
       const dir: 1 | -1 = side === 0 ? 1 : -1;
       const key = `${side}|${name}`;
       let clip: string, since: number;
@@ -1637,7 +1638,10 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
         }
         clip = st.clip; since = st.since;
       }
+      // 원근: 대전 무대는 줄이 한 선이라 장면 원근이 거의 없다 → 뒤에 선 만큼 직접 작게 (발 기준)
+      c.save(); c.translate(x, y); c.scale(BENCH_K, BENCH_K); c.translate(-x, -y);
       drawCharClip(c, name, x, y, dir, now, clip, since);
+      c.restore();
     });
   }
   c.restore();

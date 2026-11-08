@@ -27,11 +27,11 @@ export const HUD_INK = INK, HUD_DIM = DIM, HUD_EDGE = EDGE;
 /* ───────── 글자 ───────── */
 const textCache = new Map<string, HTMLCanvasElement>();
 /** 도트 글자 그림: 이진화 + 1도트 테. size는 11의 배수에서 또렷하다 */
-export function pixelText(s: string, color = INK, size = 11, edge: string | null = EDGE): HTMLCanvasElement {
-  const key = `${s}|${color}|${size}|${edge}`;
+export function pixelText(s: string, color = INK, size = 11, edge: string | null = EDGE, weight = '700'): HTMLCanvasElement {
+  const key = `${s}|${color}|${size}|${edge}|${weight}`;
   const hit = textCache.get(key);
   if (hit) return hit;
-  const f = `700 ${size}px "${PIXEL_FONT}", monospace`;
+  const f = `${weight} ${size}px "${PIXEL_FONT}", monospace`;
   const cv = document.createElement('canvas');
   const g0 = cv.getContext('2d')!;
   g0.font = f;
@@ -60,14 +60,14 @@ export function pixelText(s: string, color = INK, size = 11, edge: string | null
   return cv;
 }
 
-/** 큰 도트 글자: 11px 도트 글자(1도트 테)를 정수배로 키운다. 도트 한 칸 = scale px (흐린 가장자리 없음) */
+/** 큰 도트 글자: 글꼴 원래 크기(12px, 보통 굵기 — 굵게 하면 한글이 뭉개진다, 11-08 사용자)에 1도트 테를 둘러 정수배로 키운다 */
 const dotCache = new Map<string, HTMLCanvasElement>();
 export function dotText(s: string, color = INK, scale = 2): HTMLCanvasElement {
-  const src = pixelText(s, color, 11);
+  const src = pixelText(s, color, 12, EDGE, '400');
   scale = Math.max(1, Math.round(scale));
   if (scale === 1) return src;
   const key = `${s}|${color}|${scale}`, hit = dotCache.get(key);
-  if (hit && textCache.has(`${s}|${color}|11|${EDGE}`)) return hit;
+  if (hit && textCache.has(`${s}|${color}|12|${EDGE}|400`)) return hit;
   const cv = document.createElement('canvas');
   cv.width = src.width * scale; cv.height = src.height * scale;
   const g = cv.getContext('2d')!;
