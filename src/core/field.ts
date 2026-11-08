@@ -1,5 +1,5 @@
-// 필드 장부 (docs/필드_기능_설계.md 8장): 필드에서 일어난 일을 사건으로 채팅에 쌓아 두고,
-// 본편 요청이 나갈 때 정제해서 끼운다 (core/interlude.ts). 모델은 부르지 않는다. 사건은 게임 코드만 만든다.
+// 필드 장부 (docs/필드_기능_설계.md 8장): 필드에서 일어난 일을 사건으로 채팅에 쌓아 둔다.
+// 모델은 부르지 않는다. 사건은 게임 코드만 만든다.
 import type { Chat } from './types';
 
 export const FIELD_KEY = 'goeiFieldV1';

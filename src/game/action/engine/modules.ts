@@ -185,7 +185,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     if (fieldWallet.won === null) return null;
     purse.push({ amount, memo });
     fieldWallet.won += amount;
-    // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 막간에서 한 줄로 묶인다 (core/interlude.ts)
+    // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 한 줄로 묶인다
     void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, ko: `${hm()}${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
     return fieldWallet.won;
   };
@@ -208,7 +208,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   (globalThis as { __goeiWallet?: unknown }).__goeiWallet = walletHook;
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
   const visitId = `v${Date.now().toString(36)}`;
-  // 방문 시작 표식 (10-31 사용자: 필드 방문 한 번 = 기록 메뉴 보고서 한 장). 모델 글에는 안 들어간다 (core/interlude.ts)
+  // 방문 시작 표식 (10-31 사용자: 필드 방문 한 번 = 기록 메뉴 보고서 한 장). 모델 글에는 안 들어간다
   if (b?.visit) void b.field?.record({ kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장', weight: 1, visit: visitId }).catch(() => {});
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
   // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
