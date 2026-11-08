@@ -1,0 +1,25 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "늑대 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wolf themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, grey fur texture with pointed wolf ears on the top corners. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "송골매 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a falcon themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, brown and white feather pattern with a small hooked beak at the center bridge. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소원권 물약",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a slender amphora-shaped glass potion bottle with a cork stopper, filled with glowing starry galaxy liquid in blue, purple and pink with tiny white stars, soft white glow around it. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "스마일 스티커",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of round yellow smiley face stickers in a clear plastic bag with a yellow header card at the top, the card is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, fully inside its square."
+  }
+ ]
+}
