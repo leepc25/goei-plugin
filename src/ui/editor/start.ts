@@ -1,6 +1,7 @@
 // 설정 창 세계 › 시작 화면 (2026-11-05 사용자 결정): 시작 화면 칸(기본 세력·플레이 조직·묶음)의 순서와 켜고 끄기, 묶음(조직 아님, 예: 중립)의
 // 이름·설명·사진·구성원, 칸마다 첫 장면 글(공용 장면 덧쓰기·새 장면, 묶음 구성원별 장면). 값은 명부 초안(ui/directory.ts dirUi.draft)에 들어가고
 // 세계 탭의 저장 줄로 저장된다. 동작은 directory.ts handleDirectory 의 dir-start-* · dir-group-* · dir-scene-*, 입력은 directoryInput 의 group: · scene: · ascene: 열쇠.
+import { keepOpen } from '../panels';
 import { BUILTIN } from '../../core/factions';
 import { SCENARIOS } from '../../core/scenarios';
 import { agentScene, agentSceneSaved, factionScenes } from '../../core/scenes';
@@ -46,7 +47,9 @@ function scenesBlock(code: string, d: Directory): string {
     .map((r) => {
       const k = (f: string) => `scene:${code}|${r.fm}|${f}`;
       // 11-07 사용자: 공용 장면 일곱 편이 한 번에 다 펼쳐져 보여 과함 → 구성원별 첫 장면처럼 접어 두고 제목만 보인다
-      return `<details class="st-scene${r.hidden ? ' off' : ''}"><summary><b>${esc(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}${r.hidden ? ' · 숨김' : ''}</small></summary>
+      // 펼침을 기억 (11-08 눌러 보기 점검: 펼친 장면에서 보임·숨김을 누르면 다시 그리며 접혔다)
+      const keep = `st-scene:${code}|${r.fm}`;
+      return `<details class="st-scene${r.hidden ? ' off' : ''}" data-keep="${esc(keep)}"${keepOpen(keep)}><summary><b>${esc(r.label || `장면 ${r.fm}`)}</b><small>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}${r.hidden ? ' · 숨김' : ''}</small></summary>
         <div class="dir-line"><span>${r.custom ? '새 장면' : '기본 장면'} ${r.fm}</span>
           <span class="gx-row-btns">${seg('dir-scene-show', `${code}|${r.fm}`, !r.hidden, '보임', '숨김')}${r.custom ? `<button class="gx-mini danger" data-action="dir-scene-del" data-value="${esc(`${code}|${r.fm}`)}">지우기</button>` : ''}</span></div>
         ${input(k('label'), r.label, '이름')}
@@ -88,7 +91,7 @@ function membersBlock(code: string, d: Directory): string {
     .map((a) => `<button class="gx-chip${a.rosterFor.includes(code) ? ' on' : ''}" data-action="dir-group-member" data-value="${esc(`${code}|${a.id}`)}" aria-pressed="${a.rosterFor.includes(code)}">${esc(a.name)}</button>`)
     .join('');
   const scenes = members
-    .map((a) => `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`)
+    .map((a) => `<details class="st-member" data-keep="${esc(`st-member:${a.id}`)}"${keepOpen(`st-member:${a.id}`)}><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${agentSceneState(a.id, d)}</small></summary>${agentSceneFields(a.id, d)}</details>`)
     .join('');
   return `<div class="dir-line"><span>구성원 ${members.length}명</span></div><div class="dir-chips">${chips}</div>
     <p class="gx-muted">묶음으로 시작하면 내 페르소나 없이 구성원 한 명을 골라 그 인물로 시작해요. 사원증·괴담톡 탭·소속은 그 인물의 원래 조직을 따르고, 묶음 이름은 모델에게 알리지 않아요.</p>
