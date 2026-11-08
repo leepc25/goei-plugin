@@ -6,7 +6,8 @@
 //
 // 사용법: node scripts/click-audit.mjs [옵션]          (npm run audit:click -- [옵션])
 //   --vp pc,phone,land    화면 크기 (기본 pc,phone)
-//   --start board,picker  어느 화면에서 시작하나 (기본 board,picker). board = 채팅 시작 뒤 상황판, picker = 시작 화면
+//   --start board,picker  어느 화면에서 시작하나 (기본 board,picker,items,shop). board = 채팅 시작 뒤 상황판, picker = 시작 화면,
+//                         items = 상황판 + 소지품(장착·소모·손상·고장), shop = 그 상태로 채팅 속 가게 카드를 눌러 연 상점
 //   --depth n             누른 뒤 새로 열린 화면을 몇 단계까지 따라 들어가나 (기본 6)
 //   --per-action n        같은 data-action 의 값(data-value)이 많을 때(지역 250곳·위키 항목 등) 누를 값 수 (기본 5, 0 = 전부). 못 누른 값 수는 보고서 7절에 적는다
 //   --explore-values n    같은 data-action 중 몇 개의 값까지 눌러서 열린 화면 안으로 따라 들어가나 (기본 2. 같은 꼴 화면이 수백 번 반복되는 것 막기)
@@ -25,7 +26,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop'], depth: 6, perAction: 5, exploreValues: 2, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -62,6 +63,30 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // 상황판: 시작 화면에서 실제로 소속·상황을 골라 출발하고, 괴이·사건이 생기는 응답 하나를 넣는다. 그 채팅·저장소를 그대로 떠 두고
 // 누를 때마다 새 페이지에 넣어 띄운다(앞에서 누른 것이 다음 누르기에 섞이지 않게).
 const STATUS = '[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
+
+const START_ITEMS = [
+  { id: 'i_bat', name: '알루미늄 야구방망이', desc: '손잡이에 테이프', effect: '둔기', use: true, equip: 'weapon', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+  { id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'damaged', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+  { id: 'i_salt', name: '굵은 소금', desc: '지퍼백 한 봉지', effect: '부정한 것을 물린다', use: true, uses: 5, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+  { id: 'i_light', name: '손전등', desc: 'LED', effect: '어두운 곳을 비춘다', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+  { id: 'i_card', name: '사원증', desc: '관리국 출입증', effect: '', use: false, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+  { id: 'i_phone', name: '고장 난 휴대폰', desc: '화면이 깨짐', effect: '', use: false, state: 'broken', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },
+];
+const SHELF = `<shop-identity>
+sells: 공구, 소모품, 작업복, 호신 기기
+never: 식품, 약
+prices: 동네 철물점 값
+price_range: 1000~200000
+</shop-identity>
+<owner>뭐 찾소. 값은 적힌 대로고.</owner>
+<shelf>
+손전등|18000|사용|flashlight|LED 손전등|어두운 곳을 비춘다
+공구 가방|42000|장비|tool bag|캔버스 가방|
+쇠파이프|7000|무기·사용|iron pipe|1m 길이|둔기로 쓸 수 있다
+호신용 최루 스프레이|15000|소모5|pepper spray|경찰 납품용|잠시 멈춘다
+작업용 장갑|9000|장비|work gloves|가죽 보강|
+철제 봉인 상자|120000|-|metal box|자물쇠 둘|
+</shelf>`;
 const KEEP_OUT = new Set(['p:goei:body', 'p:goei:data-world']); // hostScript 가 넣는다
 
 async function settle(page) {
@@ -89,7 +114,7 @@ async function makeBase(browser, vp, kind) {
     await sleep(1500);
   }
   await settle(page);
-  if (kind === 'board') {
+  if (kind !== 'picker') {
     await page.waitForSelector('.gx-fac');
     await page.evaluate(() => document.querySelector('.gx-fac[data-value="A00"]').click());
     await page.evaluate(() => document.querySelector('.gx-sc[data-value="2"]')?.click());
@@ -113,9 +138,24 @@ async function makeBase(browser, vp, kind) {
     });
     await sleep(300);
   }
+  // 소지품이 든 상태: 장착 무기·장비, 소모성, 보통 물건, 손상된 것
+  if (kind === 'items' || kind === 'shop') {
+    await page.evaluate((items) => { window.__chat.scriptstate.$st_items = JSON.stringify({ list: items, log: [] }); }, START_ITEMS);
+  }
+  // 가게가 열린 상태: 응답에 가게 표식 → 채팅 카드 「상점 열기」 → 진열대(가짜 보조 모델 응답). 진열대가 저장된 채팅을 떠 둔다
+  let pre = null;
+  if (kind === 'shop') {
+    const shopMsg = '철문을 밀자 기름 냄새와 쇠 냄새가 한꺼번에 밀려왔다.\n[▣|2025.01.01|02:47 PM|☀️|4°C|을지로 철물점|목표]\n[shop: 을지로 철물점|백사헌]';
+    await page.evaluate(async (m) => { window.__chat.message.push({ role: 'user', data: '철물점에 들어간다', chatId: 'u2' }, { role: 'char', data: m, chatId: 'c2' }); await window.__calls.listeners[0]({ char: window.__char, chat: window.__chat, characterIndex: 0, chatIndex: 0, messageIndex: window.__chat.message.length - 1 }); }, shopMsg);
+    await sleep(300);
+    pre = { shopMsg };
+    await openShop(page, pre, SHELF);
+    await page.waitForFunction(() => { try { return JSON.parse(window.__chat.scriptstate.$st_shop || 'null')?.loaded; } catch { return false; } }, null, { timeout: 8000 }).catch(() => log('가게 진열대가 안 채워짐'));
+  }
   const base = await page.evaluate((keep) => ({ chat: window.__chat, char: window.__char, store: Object.fromEntries(Object.entries(window.__store).filter(([k]) => !keep.includes(k))) }), [...KEEP_OUT]);
   await page.close();
   if (errors.length) log(`${vp}/${kind} 시작 상태 만들 때 오류`, errors);
+  base.pre = pre;
   return base;
 }
 
@@ -125,8 +165,25 @@ async function openFrom(browser, vp, base) {
   page.on('filechooser', () => {});
   await openWin(page);
   await settle(page);
+  if (base.pre?.shopMsg) await openShop(page, base.pre, null);
   await page.waitForTimeout(200);
   return { page, errors };
+}
+
+// 채팅 속 가게 카드의 「상점 열기」를 사람처럼 누른다 (상황판 창은 닫고, 카드는 채팅 자리에 그린다)
+async function openShop(page, pre, shelf) {
+  await page.evaluate(() => { const g = document.querySelector('.gx'); if (g && g.style.display !== 'none') document.querySelector('.gx [data-action="close"]')?.click(); });
+  await sleep(200);
+  const html = await page.evaluate((t) => window.__calls.handlers.display(t), pre.shopMsg);
+  if (process.env.CA_DEBUG) log('shop', JSON.stringify(await page.evaluate(() => window.__chat.scriptstate.$st_shop)).slice(0, 200), String(html).includes('data-goei-shop'), String(html).slice(-200));
+  await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'chat-card'; d.style.cssText = 'position:fixed;left:20px;top:20px;width:420px;z-index:1'; d.innerHTML = h; document.body.appendChild(d); }, html);
+  await page.evaluate((t) => window.__calls.handlers.display(t), pre.shopMsg);
+  if (shelf) await page.evaluate((t) => { window.__llm = [t]; }, shelf);
+  await page.click('#chat-card [data-goei-shop]', { timeout: 3000 }).catch((e) => log('상점 열기 못 누름', String(e).slice(0, 120)));
+  await page.evaluate(() => { const c = document.getElementById('chat-card'); if (c) c.style.visibility = 'hidden'; });
+  await page.waitForFunction(() => !!document.querySelector('.gx-solo'), null, { timeout: 8000 }).catch(() => {});
+  await page.waitForFunction(() => !document.querySelector('.sh-spin'), null, { timeout: 8000 }).catch(() => {});
+  await sleep(200);
 }
 
 // ---- 페이지 안에서 쓰는 것 --------------------------------------------------------------------------------------
