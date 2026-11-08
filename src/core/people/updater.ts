@@ -15,7 +15,7 @@ import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, stageMid, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
-import { cleanIcon, itemEquip, itemState, itemUses, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
+import { cleanIcon, itemEquip, itemState, itemUses, itemWeight, sameItemName, type ItemEquip, type ItemState, type UsedNow } from '../items';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -84,7 +84,7 @@ export interface UpdateInput {
 }
 
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
-export interface ItemNow { name: string; desc: string; use: boolean; left?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState }
+export interface ItemNow { name: string; desc: string; use: boolean; left?: number; weight?: number; equip?: ItemEquip; equipped?: boolean; state: ItemState }
 
 const CUE_MEANING: Record<Cue, string> = {
   작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
@@ -313,7 +313,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...(speechVariety(o.settings).level !== 'off' ? { speech_variety: { level: speechVariety(o.settings).level, counted: speechVariety(o.settings).level === 'two' && speechVariety(o.settings).counted, limit: speechVariety(o.settings).limit, mode: speechVariety(o.settings).mode } } : {}),
     // 소지품 (2026-11-07 core/items.ts): 지금 목록(판정·상태 포함). 켜져 있으면 비어도 넣는다 (새로 얻는 것을 읽어야 하니)
     items_now: o.items
-      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
+      ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
       : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', items: !!o.items },
@@ -390,7 +390,7 @@ export interface UpdateResult {
   /** 가계부: 금액이 적힌 거래만 (원, 나가면 −) */
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소지품: 본문에 분명히 적힌 얻음(new)·상태 바뀜(update)·없어짐(gone)만. update·gone 은 목록의 이름 그대로 */
-  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; m: string; quote: string }[];
+  items?: { name: string; action: string; desc?: string | null; effect?: string | null; usable?: boolean | null; uses?: number | string | null; equip?: string | null; condition?: string | null; icon?: string | null; weight?: number | string | null; m: string; quote: string }[];
   /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
   observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
   /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
@@ -447,6 +447,8 @@ export interface ItemChange {
   equip?: ItemEquip | null;
   state?: ItemState;
   icon?: string;
+  /** 무게 kg (new 에서 정하고, update 에서는 바뀌었을 때만) */
+  weight?: number;
 }
 
 export interface ApplyCtx {
@@ -1263,6 +1265,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       const uses = t.uses === undefined || t.uses === null ? undefined : str(t.uses).trim() === '0' ? 0 : itemUses(t.uses);
       const cond = t.condition ? str(t.condition).trim().toLowerCase() : '';
       const icon = cleanIcon(t.icon);
+      const weight = t.weight === undefined || t.weight === null ? undefined : itemWeight(t.weight);
       report.items.push({
         anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : (action as ItemChange['action']),
         desc: plain(t.desc, 80), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
@@ -1271,6 +1274,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         ...(eq !== undefined ? { equip: eq ?? null } : {}),
         ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
         ...(icon ? { icon } : {}),
+        ...(weight !== undefined ? { weight } : {}),
       });
       report.applied.items++;
     }

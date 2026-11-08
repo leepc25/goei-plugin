@@ -10,7 +10,7 @@
 //   플러그인은 숫자만 읽고 값은 거르지 않는다(11-07 사용자). 제안이 온 뒤에도 말하기로 흥정(제안 값 바뀜). 팔기 확정 = 가계부 수입 + 소지품에서 뺌(기록 sell).
 // - 잔고·소지품은 모델에 넘기지 않는다. PixelLab 그림은 표시용(이름 매칭)이라 모델과 무관하다.
 import type { Chat } from './types';
-import { cleanIcon, ITEM_ON_VAR, itemEquip, itemUses, parseTraits, traitsText, type ItemEquip } from './items';
+import { cleanIcon, ITEM_ON_VAR, itemEquip, itemUses, itemWeight, parseTraits, traitsText, type ItemEquip } from './items';
 import { colConfig } from './world/statuscols';
 import { messageKey } from './people/store';
 import { parseWon } from './wallet';
@@ -162,6 +162,8 @@ export interface ShopItem {
   uses?: number;
   equip?: ItemEquip;
   icon?: string;
+  /** 무게 kg */
+  weight?: number;
   /** 원으로 내는 몫 (원이 아닌 값만 받으면 0) */
   price: number;
   /** 원이 아닌 값 (2026-11-08 사용자: 그 가게의 결제 수단 — 신체·피·기억 등, 또는 흥정으로 정한 다른 대가). 글 그대로 */
@@ -235,11 +237,12 @@ export interface ShopState {
 const EMPTY_ID: ShopIdentity = { sells: '', never: '', prices: '' };
 
 /** 판정 칸 정리 (저장된 것·모델이 준 것 모두) */
-const traitsOf = (x: { use?: unknown; uses?: unknown; equip?: unknown; icon?: unknown }) => {
+const traitsOf = (x: { use?: unknown; uses?: unknown; equip?: unknown; icon?: unknown; weight?: unknown }) => {
   const uses = itemUses(x.uses);
   const equip = itemEquip(x.equip);
   const icon = cleanIcon(x.icon);
-  return { use: x.use === true || !!uses, ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(icon ? { icon } : {}) };
+  const weight = itemWeight(x.weight);
+  return { use: x.use === true || !!uses, ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(icon ? { icon } : {}), ...(weight !== undefined ? { weight } : {}) };
 };
 
 export const emptyShop = (tag: ShopTag, key: string): ShopState => ({ shop: tag.shop, owner: tag.owner, key, loaded: false, identity: EMPTY_ID, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] });
@@ -282,7 +285,7 @@ export function readShop(vars: Vars): ShopState | null {
         prices: clean(id.prices, 120),
       },
       items: (Array.isArray(o.items) ? o.items.filter(isItem) : []).map((x) => {
-        const { use: _u, uses: _n, equip: _e, icon: _i, ...rest } = x;
+        const { use: _u, uses: _n, equip: _e, icon: _i, weight: _w, ...rest } = x;
         return { ...rest, ...traitsOf(x), desc: clean(x.desc, 120), effect: clean(x.effect, 60) };
       }).slice(0, 40),
       talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').slice(-40),
@@ -391,10 +394,10 @@ export function costOf(cell: string): { price: number; pay?: string } | null {
   return pay ? { price, pay } : { price };
 }
 
-/** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 무기·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -). 그림: 그림 찾기용 영어 낱말 */
-export const SHOP_LINE = '이름|값|쓰임|그림|설명|효과|구분';
+/** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 무기·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -). 그림: 그림 찾기용 영어 낱말. 무게: kg 숫자 (2026-11-08) */
+export const SHOP_LINE = '이름|값|쓰임|그림|무게|설명|효과|구분';
 
-/** 「이름|값|쓰임|그림|설명|효과|구분」 한 줄 → 물건. 이름이나 값이 없으면 null. 구분: 비움 · 희귀 · 특가:원래값 */
+/** 「이름|값|쓰임|그림|무게|설명|효과|구분」 한 줄 → 물건. 이름이나 값이 없으면 null. 구분: 비움 · 희귀 · 특가:원래값 */
 function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const cells = line.replace(/^[-*•+]\s*/, '').split('|').map((c) => c.trim());
   if (cells.length < 2) return null;
@@ -402,8 +405,8 @@ function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   const cost = costOf(cells[1] ?? '');
   if (!name || !cost) return null;
   const price = cost.price;
-  const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3] }), desc: clean(cells[4], 120), effect: clean(cells[5], 60) };
-  const tag = (cells[6] ?? '').trim();
+  const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3], weight: cells[4] }), desc: clean(cells[5], 120), effect: clean(cells[6], 60) };
+  const tag = (cells[7] ?? '').trim();
   if (/^(희귀|레어|rare)/i.test(tag)) out.tag = 'rare';
   else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
     const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ''));
@@ -686,7 +689,7 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 /** 주인에게 말하기 (흥정·문의·요청·잡담). 대화는 이번 방문 것 전부 */
 export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const st = src.st;
-  const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? '-'}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}`).join('\n') || '(empty)';
+  const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? '-'}|${x.weight ?? '-'}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}`).join('\n') || '(empty)';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const g = G();

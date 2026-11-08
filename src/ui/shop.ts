@@ -554,7 +554,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         // 원 몫이 있을 때만 가계부에. 원이 아닌 대가는 물건에 적어 다음 턴 본편에 「무엇으로 치르고 샀다」로 넘긴다 (core/items.ts boughtLine)
         const walletId = target.price > 0 ? `st_${target.id}` : '';
         const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: 'store', anchor: now.key, price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', anchor: now.key, price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) });
         bought = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
       });
