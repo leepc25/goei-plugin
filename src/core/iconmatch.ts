@@ -124,7 +124,12 @@ const stem = (w: string) => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s
 interface Head { words: string[]; head: string; mods: string[]; ko: boolean; joined: string }
 interface Phrase extends Head { t: string; kw: boolean }
 interface Same { qPre: string; pPre: string; whole?: boolean }
-interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string }
+interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string }
+
+/** 물건이 무엇인지 말하지 않는 몸통 말 (그 앞말이 물건, 2026-11-08 사용자 「매칭 더 정교하게」): 이 말은 떼고 앞말로 찾고, 대표 그림은 쓰지 않는다 */
+const GENERIC = new Set(['키트', 'kit', '세트', 'set', '장치', 'device', '도구', 'tool', '기계', 'machine', '용품', 'supply', '물품', '물건', 'item', '패키지', 'package', '묶음', 'pack', '상자', 'box']);
+/** 장치·기계·도구 = 「~기」 (경보 장치 → 경보기, 탐지 장치 → 탐지기) */
+const MACHINE = new Set(['장치', '기계', '도구']);
 
 function headOf(s: string): Head | null {
   const words = normIcon(s).split(' ').filter(Boolean).map(stem);
@@ -173,8 +178,24 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>): (text: st
     if (h.qPre && !pm.includes(h.qPre) && !pj.includes(h.qPre)) qOnly += (HEAD_EXTRA / Q_EXTRA) * wt(h.qPre);
     return { s: hit - HEAD_EXTRA * pOnly - Q_EXTRA * qOnly, hit, plain: pm.length === 0 && p.kw };
   };
-  return (text) => {
+  const find = (text: string): Found | null => {
     const q = headOf(text);
+    if (q && GENERIC.has(q.head) && q.mods.length) {
+      // 표의 말과 똑같으면(구급 상자·선물 상자) 그것. 아니면 뒤에 붙은 그런 말을 다 떼고(낚시 도구 세트 → 낚시) 찾음
+      // (없으면 공통 그림 — 「도구 세트」만 맞아 해부 도구 세트로, 「키트」만 맞아 양초 키트로 가지 않게)
+      const whole = findIn(q, false);
+      if (whole && whole.s >= 1e6) return whole;
+      const words = [...q.words];
+      while (words.length > 1 && GENERIC.has(words[words.length - 1])) words.pop();
+      if (words.length === q.words.length || GENERIC.has(words[words.length - 1])) return null;
+      const rest = findIn(headOf(words.join(' ')), true);
+      if (rest && (rest.hit || rest.plain)) return rest;
+      if (MACHINE.has(q.head) && /[가-힣]$/.test(words[words.length - 1])) return { file: '', s: 0, hit: 0, plain: false, isRep: 0, name: 0, retry: [...words.slice(0, -1), words[words.length - 1] + '기'].join(' ') };
+      return null;
+    }
+    return findIn(q, true);
+  };
+  function findIn(q: Head | null, useRep: boolean): Found | null {
     if (!q) return null;
     const r = reps[q.words.join(' ')];
     if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0 };
@@ -196,10 +217,13 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>): (text: st
       const better = !best || top.s > best.s + 1e-9 || (Math.abs(top.s - best.s) <= 1e-9 && (isRep > best.isRep || (isRep === best.isRep && it.name < best.name)));
       if (better) best = { file: it.file, ...top, isRep, name: it.name };
     }
-    if (!best) return null;
-    if (!best.hit && !best.plain && q.mods.length + (best.qPre ? 1 : 0) > 0) return null;
+    // 꾸밈말이 하나도 안 맞았으면 몸통 말 하나로 된 그림일 때만 — 아니면 그 몸통 말의 대표 그림(생체 신호 은폐 패치 → 패치 대표), 대표도 없으면 쓰지 않음
+    const repOf = (): Found | null => (useRep && !GENERIC.has(q.head) && reps[q.head] ? { file: reps[q.head], s: 0, hit: 0, plain: true, isRep: 1, name: 0 } : null);
+    if (!best) return repOf();
+    if (!best.hit && !best.plain && q.mods.length + (best.qPre ? 1 : 0) > 0) return repOf();
     return best;
-  };
+  }
+  return find;
 }
 
 /** 표 → match(name, icon) → { file, score } | null (null 이면 공통 그림). rep: 몸통 말 → 대표 그림 */
@@ -209,11 +233,18 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {})
   const head = makeHeadIndex(rows, reps);
   const frag = makeFragIndex(rows, reps);
   const rank = (h: Found | null) => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
-  return (name, icon) => {
+  const match = (name: string, icon?: string): IconHit | null => {
     const hi = icon ? head(icon) : null;
     const hn = name ? head(name) : null;
+    // 장치·기계·도구를 떼고 「~기」로 다시 찾을 말 (경보 장치 → 경보기): 그 말로 처음부터 다시
+    if (hi?.retry || hn?.retry) {
+      const ok = (!hi?.retry && hi) || (!hn?.retry && hn);
+      if (ok) return { file: ok.file, score: 1 };
+      return (hn?.retry ? match(hn.retry, '') : null) || (hi?.retry ? match(hi.retry, '') : null) || frag(name, icon);
+    }
     const h = rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
     if (h) return { file: h.file, score: 1 };
     return frag(name, icon);
   };
+  return match;
 }

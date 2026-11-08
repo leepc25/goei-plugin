@@ -163,6 +163,23 @@ function makeHeadIndex(rows, reps) {
   /** q → { file, s, hit, plain } | null (몸통이 같은 줄 중 가장 나은 것) */
   return function find(text) {
     const q = headOf(text);
+    if (q && GENERIC.has(q.head) && q.mods.length) {
+      // 키트·세트·장치처럼 물건이 무엇인지를 말하지 않는 몸통: 통째로 맞는 그림이 있으면 그것, 없으면 앞말(향초 세트 → 향초)로. 대표 그림은 쓰지 않음
+      // 표의 말과 똑같으면(구급 상자·선물 상자) 그것. 아니면 뒤에 붙은 그런 말을 다 떼고(낚시 도구 세트 → 낚시) 찾고, 그래도 없으면 통째로 맞춘 것
+      const whole = findIn(q, false);
+      if (whole && whole.s >= 1e6) return whole;
+      const words = [...q.words];
+      while (words.length > 1 && GENERIC.has(words[words.length - 1])) words.pop();
+      if (words.length === q.words.length || GENERIC.has(words[words.length - 1])) return null;
+      const rest = findIn(headOf(words.join(' ')), true);
+      if (rest && (rest.hit || rest.plain)) return rest;
+      // 장치·기계·도구 = 「~기」 (경보 장치 → 경보기, 탐지 장치 → 탐지기)
+      if (MACHINE.has(q.head) && /[가-힣]$/.test(words[words.length - 1])) return { retry: [...words.slice(0, -1), words[words.length - 1] + '기'].join(' ') };
+      return null;
+    }
+    return findIn(q, true);
+  };
+  function findIn(q, useRep) {
     if (!q) return null;
     // 말 그 자체가 대표 그림의 몸통 말이면 대표 (방패 → 진압 방패, 거울 → 거울)
     const r = reps[q.words.join(' ')];
@@ -183,12 +200,16 @@ function makeHeadIndex(rows, reps) {
       const better = !best || top.s > best.s + 1e-9 || (Math.abs(top.s - best.s) <= 1e-9 && (isRep > best.isRep || (isRep === best.isRep && it.name < best.name)));
       if (better) best = { file: it.file, ...top, isRep, name: it.name };
     }
-    if (!best) return null;
-    // 꾸밈말이 하나도 안 맞았으면 몸통 말 하나로 된 그림(대표 포함)일 때만 — 아니면 다른 특수 물건이라 쓰지 않음
-    if (!best.hit && !best.plain && q.mods.length + (best.qPre ? 1 : 0) > 0) return null;
+    const repOf = () => (useRep && !GENERIC.has(q.head) && reps[q.head] ? { file: reps[q.head], s: 0, hit: 0, plain: true } : null);
+    if (!best) return repOf();
+    // 꾸밈말이 하나도 안 맞았으면 몸통 말 하나로 된 그림일 때만 — 아니면 그 몸통 말의 대표 그림, 대표도 없으면 쓰지 않음
+    if (!best.hit && !best.plain && q.mods.length + (best.qPre ? 1 : 0) > 0) return repOf();
     return best;
-  };
+  }
 }
+const MACHINE = new Set(['장치', '기계', '도구']);
+/** 물건이 무엇인지 말하지 않는 몸통 말 (그 앞말이 물건) */
+const GENERIC = new Set(['키트', 'kit', '세트', 'set', '장치', 'device', '도구', 'tool', '기계', 'machine', '용품', 'supply', '물품', '물건', 'item', '패키지', 'package', '묶음', 'pack', '상자', 'box']);
 
 /** rows: [{ keywords?, phrases, file }], rep: 몸통 말 → 대표 그림 → match(name, icon) → { file, score } | null */
 export function makeIconIndex(rows, rep = {}) {
@@ -197,6 +218,14 @@ export function makeIconIndex(rows, rep = {}) {
   const head = makeHeadIndex(rows, reps);
   const frag = makeFragIndex(rows, rep);
   return function match(name, icon) {
+    // 장치·기계·도구를 떼고 「~기」로 다시 찾을 말 (경보 장치 → 경보기): 그 말로 처음부터 다시
+    const again = (x) => (x?.retry ? match(x.retry, '') : null);
+    const ri = icon ? head(icon) : null, rn = name ? head(name) : null;
+    if (ri?.retry || rn?.retry) {
+      const hit = (!ri?.retry && ri) || (!rn?.retry && rn);
+      if (hit) return { file: hit.file, score: 1 };
+      return again(rn) || again(ri) || frag(name, icon);
+    }
     // 낱말·이름 둘 다 보고 더 확실한 쪽: 표의 말과 같음 > 꾸밈말까지 맞음 > 몸통만 맞음 (같으면 낱말). kukri knife 이 식칼로 가지 않고 이름 「쿠크리」로
     const rank = h => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
     const hi = icon ? head(icon) : null, hn = name ? head(name) : null;

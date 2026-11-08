@@ -81,6 +81,16 @@ test('몸통 말 먼저: 꾸밈말에 끌려가지 않음 (11-07 사용자 지�
   is('봉인 상자 2', '', '봉인 상자'); // 끝 번호는 몸통 아님
 });
 
+test('앞말이 안 맞으면 몸통 말 대표 그림, 키트·세트·장치는 떼고 앞말로 (11-08 사용자 「매칭 더 정교하게」)', () => {
+  is('생체 신호 은폐 패치', 'concealment patch', '파스');
+  is('방수 전술 랜턴', 'tactical lantern', '전기 랜턴');
+  is('향초 세트', 'candle set', '향초');
+  is('경보 장치', '', '가스 경보기'); // 장치 = ~기
+  is('탐지 장치', '', '금속 탐지기');
+  is('구급 상자', '', '구급상자'); // 표의 말 그대로면 그대로
+  for (const n of ['낚시 도구 세트', '괴이 탐지 장치']) assert.equal(matchItemIcon(pack, n), pack.base.misc, n); // 「도구 세트」만 맞아 해부 도구 세트로 가지 않음
+});
+
 test('흔한 조각만 맞거나 아무것도 안 맞으면 공통 그림', () => {
   for (const n of ['침술 키트', '녹슨 심령 침술 키트', '전혀 모르는 ㅁㄴㅇ', '리버레이터', '']) assert.equal(matchItemIcon(pack, n), pack.base.misc, n);
 });
@@ -89,5 +99,5 @@ test('game-src/items/match_icon.mjs 와 플러그인이 같은 답', () => {
   const m = makeMatcher(table);
   const probe = [...table.icons.filter((r) => !r.excluded_note).map((r) => r.name), '손목시계', '봉지라면', '확성기', '녹슨 심령 침술 키트', '피 묻은 곰인형', '가죽 장갑'];
   for (const n of probe) assert.equal(matchItemIcon(pack, n), m(n), n);
-  for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
+  for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box'], ['생체 신호 은폐 패치', 'concealment patch'], ['경보 장치', 'alarm device'], ['향초 세트', 'candle set'], ['낚시 도구 세트', 'fishing set']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
 });
