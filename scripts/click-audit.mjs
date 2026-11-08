@@ -474,9 +474,13 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     await page.close();
     states.push({ vp, start: startKind, path: opt.from.map((p) => p.key), shot: s0, audit: audit0 });
     const queue = [];
-    const enqueue = (path, list) => {
+    // 두 번째 시작 상태부터: 첫 화면의 메뉴 단추는 이미 눌렀어도 다시 눌러 들어간다 (물건 든 소지품·글 있는 괴담넷처럼
+    // 한 번 들어가야 달라지는 화면을 보려고. 들어간 화면 꼴이 이미 본 것이면 거기서 멈춘다)
+    const NAV = /^(nav-tab|tab|cdr|br-site|ed-open|prefs-open)$/;
+    const enqueue = (path, list, revisit = false) => {
       for (const it of list) {
-        if (done.has(it.key)) continue;
+        if (done.has(it.key) && !(revisit && NAV.test(it.action || ''))) continue;
+        if (done.has(it.key)) { queue.push({ ...it, path, revisit: true }); continue; }
         if (it.behind) continue; // 다른 창 뒤: 그 창을 닫은 화면에서 누른다
         // 꺼진 단추는 기록만 하고 누른 것으로 치지 않는다 (다른 화면에서 켜지면 그때 누른다)
         if (it.disabled) { if (!offSeen.has(it.key)) { offSeen.add(it.key); results.push({ vp, start: startKind, path: path.map((p) => p.key), key: it.key, label: it.label, action: it.action, value: it.value, flags: ['꺼진 단추(누를 수 없음)'], disabled: true }); } continue; }
@@ -485,13 +489,14 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         queue.push({ ...it, path });
       }
     };
-    enqueue(opt.from, first);
+    enqueue(opt.from, first, startKind !== opt.start[0]);
     let n = 0;
     while (queue.length) {
       const batch = queue.splice(0, opt.workers);
       const recs = await Promise.all(batch.map((job, i) => clickJob(browser, vp, startKind, base, job, results.length + i + 1)));
       for (let i = 0; i < recs.length; i++) {
         const rec = recs[i], job = batch[i];
+        if (job.revisit) rec.revisit = true;
         results.push(rec);
         n++;
         const ev = job.action ? (exploredVals[job.action] = (exploredVals[job.action] || 0) + 1) : 1;
@@ -554,7 +559,7 @@ const rel = (p) => relative(OUT, resolve(SHOTS, p));
 L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${opt.minutes ?? Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
 L.push('이 기록은 사실만 적는다. 이상한지·사용자 결정과 맞는지는 점검하는 Claude가 캡처를 열어 보고 판단한다 (docs/눌러보기_전수점검.md).', '');
 L.push('## 1. 이상 반응 (캡처 확인할 곳)', '');
-const flagged = results.filter((r) => r.flags.length && !r.disabled);
+const flagged = results.filter((r) => r.flags.length && !r.disabled && !r.revisit); // 다시 들어가려고 누른 메뉴는 앞에서 이미 적었다
 const byFlag = {};
 for (const r of flagged) for (const f of r.flags) (byFlag[f.replace(/\((효과 )?\d+(~\d+)?ms( → 사라짐 \d+ms)?\)/, '')] ||= []).push(r);
 for (const [f, rs] of Object.entries(byFlag)) {
