@@ -3557,22 +3557,19 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 
 /* ── 소지품 고침 (2026-11-08 사용자): 무게·격자만 스크롤·장착 띠 여백 ── */
 /* 도구 줄 (2026-11-08 사용자: 단추 모양 X, 깔끔하게): 왼쪽 물건|기록 글자 탭, 오른쪽 직접 넣기·합치기는 글자 단추, 찾기는 밑줄 칸. 테두리·바탕 없음 */
-.gx-items .it-tools { justify-content: space-between; align-items: center; gap: 16px; min-height: 32px; }
-.gx-items .it-tools .it-segs { display: inline-flex; align-items: center; gap: 4px; height: auto; padding: 0; border: 0; border-radius: 0; background: none; }
-.gx-items .it-tools .gx-seg { position: relative; min-width: 0; height: 32px; min-height: 32px; padding: 0 8px; border-radius: 0; background: none; color: var(--dim); font-size: 14px; }
-.gx-items .it-tools .gx-seg:hover { color: var(--sub); }
-.gx-items .it-tools .gx-seg.on { background: none; color: var(--text); }
-.gx-items .it-tools .gx-seg.on::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: 2px; height: 2px; border-radius: 1px; background: var(--signal); }
-.gx-items .it-tools .gx-seg + .gx-seg::before { content: ''; position: absolute; left: -3px; top: 50%; width: 1px; height: 12px; margin-top: -6px; background: var(--line2); }
+.gx-items .it-tools { justify-content: space-between; align-items: center; gap: 16px; min-height: 34px; }
+.gx-items .it-tools .it-segs { height: 34px; box-sizing: border-box; padding: 2px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); } /* 물건|기록은 단추 그대로 (사용자) */
+.gx-items .it-tools .gx-seg { height: 28px; min-height: 28px; border-radius: 8px; padding: 0 14px; font-size: 13px; }
 .gx-items .it-right { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; min-width: 0; }
 .gx-items .it-act { height: 32px; box-sizing: border-box; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--dim); font-size: 13px; }
 .gx-items .it-act:hover:not(:disabled) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
 .gx-items .it-tools .it-q { width: 200px; max-width: none; height: 32px; box-sizing: border-box; margin-left: 8px; padding: 0 2px; border: 0; border-bottom: 1px solid var(--line2); border-radius: 0; background: none; font-size: 13px; }
 .gx-items .it-tools .it-q:focus { outline: none; border-bottom-color: var(--signal); }
 /* 칸 수·넘침·무게 (장착 칸 위 한 줄): 단추 모양 X, 글자만 */
-.it-eqcol { flex: none; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; }
+.it-eqcol { flex: none; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; } /* 칸 수·무게는 위로, 장착 칸은 아래로 (사용자) */
 .it-eqcol .it-eqslots { align-content: end; }
-.it-stats { display: flex; align-items: center; gap: 18px; padding: 0 2px; }
+.it-stats { display: flex; align-items: center; gap: 0; padding: 2px 2px 0; }
+.it-stat + .it-stat { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line2); } /* 칸 수와 무게 사이 가는 세로줄 */
 .it-stat { display: inline-flex; align-items: center; gap: 6px; color: var(--sub); font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .it-stat svg { width: 14px; height: 14px; color: var(--dim); }
 .it-stat b { font-size: 14px; color: var(--text); }
@@ -3601,7 +3598,14 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .gx-items .it-eqin { gap: 10px; }
   .gx-items .it-av { flex: none; width: 128px; min-width: 0; height: 272px; }
   .gx-items .it-usebox { flex: 1 1 100%; }
-  .it-stats { flex-wrap: wrap; gap: 4px 12px; width: calc(2 * var(--slot) + 8px); }
+  .it-stats { flex-wrap: nowrap; width: calc(2 * var(--slot) + 8px); padding: 0; }
+  .it-stat { gap: 4px; }
+  .it-stat svg { width: 12px; height: 12px; }
+  .it-stat b { font-size: 13px; }
+  .it-stat small, .it-stat em { font-size: 11px; }
+  .it-stat + .it-stat { margin-left: 8px; padding-left: 8px; }
+  .it-eqcol { gap: 8px; }
+  .gx-items .it-eqbox:not(.sell) { padding: 10px 12px 12px; }
   .gx-items .it-tools .it-q { width: auto; flex: 1; }
   .gx-items .it-right { flex: 1; }
 }
