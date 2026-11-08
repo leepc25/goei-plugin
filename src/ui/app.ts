@@ -1424,6 +1424,14 @@ function render(): void {
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
   root.dataset.pk = pageKey();
   if (pageKeep.length) root.querySelectorAll<HTMLElement>(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
+  // 탭 줄이 넘치면 보고 있는 탭이 보이게 (2026-11-08 사용자)
+  const tabsRow = root.querySelector<HTMLElement>('.br-tabs');
+  const onTab = tabsRow?.querySelector<HTMLElement>('.br-tab.on');
+  if (tabsRow && onTab && tabsRow.scrollWidth > tabsRow.clientWidth) {
+    const l = onTab.offsetLeft - tabsRow.offsetLeft;
+    if (l < tabsRow.scrollLeft) tabsRow.scrollLeft = l;
+    else if (l + onTab.offsetWidth > tabsRow.scrollLeft + tabsRow.clientWidth) tabsRow.scrollLeft = l + onTab.offsetWidth - tabsRow.clientWidth + 40;
+  }
   const nlog = root.querySelector<HTMLElement>('.ph-log');
   root.dataset.room = phone.room ?? '';
   if (nlog) {

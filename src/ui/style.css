@@ -3636,8 +3636,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br .br-i { width: 20px; height: 20px; fill: var(--cic); flex: none; }
 .br .br-i.s { width: 16px; height: 16px; }
 .br .br-fv { width: 16px; height: 16px; flex: none; }
-.br-tabs { display: flex; align-items: flex-end; height: 38px; padding: 0 8px; background: var(--cf); min-width: 0; }
-.br-tab { position: relative; height: 32px; flex: 0 1 230px; min-width: 60px; display: flex; align-items: center; border-radius: 8px 8px 0 0; color: var(--cdim); font-size: 12px; }
+.br-tabs { display: flex; align-items: flex-end; height: 38px; padding: 0 8px; background: var(--cf); min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.br-tabs::-webkit-scrollbar { display: none; }
+/* 탭이 많아지면 (2026-11-08 사용자): 크롬처럼 고르게 줄고, 좁으면 아이콘만·✕는 보고 있는 탭만, 그래도 넘치면 탭 줄을 옆으로 민다 */
+.br-tab { position: relative; height: 32px; flex: 0 1 230px; min-width: 44px; display: flex; align-items: center; border-radius: 8px 8px 0 0; color: var(--cdim); font-size: 12px; container-type: inline-size; }
+@container (max-width: 110px) { .br-tab:not(.on) .br-tx { display: none; } }
+@container (max-width: 90px) { .br .br-tt { display: none; } .br .br-tabb { justify-content: center; padding: 0; } }
 .br-tab + .br-tab::before { content: ''; position: absolute; left: 0; top: 9px; height: 16px; width: 1px; background: #5f6368; }
 .br-tab.on { background: var(--ct); color: var(--ctx); }
 .br-tab.on::before, .br-tab.on + .br-tab::before { display: none; }
@@ -3645,7 +3649,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br-tt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .br-tx { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tx:hover, .br-plus:hover, .br-tb:hover:not(:disabled), .br-bm:hover { background: rgba(255, 255, 255, .08); }
-.br-plus { margin: 0 0 4px 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.br-plus { position: sticky; right: 0; box-shadow: -6px 0 0 var(--cf); background: var(--cf) !important; margin: 0 0 4px 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tool { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; background: var(--ct); min-width: 0; }
 .br-tb { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tb:disabled .br-i { fill: #5f6368; }
