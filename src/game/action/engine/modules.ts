@@ -44,6 +44,7 @@ import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
+import { pfont } from '../ui/hud';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
@@ -1021,6 +1022,18 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     }),
     nextFloor: () => null,
   };
+  // 기다리는 동안 대전 (11-08 사용자): 투명 무대에서 1:1 한 판. 상대는 ?foe=이름 (팩을 미리 받아 둔다), 없으면 주인공과 같은 인물
+  const foeName = (() => { try { return new URLSearchParams(location.search).get('foe') ?? ''; } catch { return ''; } })();
+  const versusStage: StageModule = {
+    id: 'versus',
+    label: '대전',
+    firstFloor: () => ({
+      id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity,
+      banner: '',
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: foeName ? `ai-char:${foeName}` : 'ai-char', x: 900, y: 600 }]] }],
+    }),
+    nextFloor: () => null,
+  };
   let squad = new Squad(DIFF[aiDiff].melee);
   let aiN = 0;
   let allyN = 0;
@@ -1291,7 +1304,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ];
   const mods: EngineModules = {
     frozen: () => ffx.frozen(),
-    stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage],
+    stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage, versusStage],
     enemyFactory,
     hq,
     hqLayer: () => shell.stage.ui,
@@ -1340,7 +1353,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.drawWorld(ctx);
       ffx.drawWorld(ctx);
       ctx.restore();
-      shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+      shell.fx.drawScreen(ctx, view.clear ? 1 : w.player.hp / w.player.hpMax); // 대전(투명 무대)은 체력 낮음 붉은 테두리 없이
       const hs = hudState(w, shell);
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
@@ -1378,7 +1391,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const caption = skillActive ? sk.skill?.name : superActive ? sk.super?.name : P.mode === 'charge' ? sk.charge?.name : undefined;
         cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots, ...(caption ? { caption } : {}) }, dt);
       }
-      if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
+      if (view.clear) drawVersusBars(ctx, w); // 대전: 시각·잔고·목표 띠 대신 양쪽 체력 막대만
+      else if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
       else if (!mods.blocking?.() && !shell.paused) {
         // 본부: 대사는 말하는 사람 머리 위 말풍선 (사용자 2026-10-25: 아래 검은 자막 상자 대신). 그 밖의 안내 한 줄은 주인공 머리 위
         const z = view.zoom, toX = (x: number) => (x - w.drawCamX - view.crop) * z, toY = (y: number) => (y - view.cropY) * z;
@@ -1452,8 +1466,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const items = linkItems(w, run);
       npc.attach(w, { items, hq: false });
       if (run.stageId === 'itemroom') items.showcase();
-      w.hooks.push(() => items.tick());
-      w.underlays.push((c, camX) => items.draw(c, camX));
+      // 투명 무대(대전)는 바닥 물건(의자·화분 등)을 두지 않는다: 본문 위에 인물만
+      if (!view.clear) {
+        w.hooks.push(() => items.tick());
+        w.underlays.push((c, camX) => items.draw(c, camX));
+      }
     },
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
@@ -1568,4 +1585,25 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
       }
     }
   } catch { /* 팩이 없거나 깨졌으면 코드 효과만 */ }
+}
+
+/** 대전(투명 무대) 체력 막대: 위 왼쪽 주인공, 오른쪽 상대. 본문 글자 위라 막대에만 어두운 바탕 */
+function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
+  const foe = w.bodies.find((b) => b.team === 'enemy');
+  const W = c.canvas.width, bw = Math.min(420, W * 0.36), y = 18, h = 16;
+  const bar = (x: number, b: { hp: number; hpMax: number } | undefined, name: string, right: boolean) => {
+    const k = b ? Math.max(0, Math.min(1, b.hp / b.hpMax)) : 0;
+    c.fillStyle = 'rgba(8,10,14,.78)'; c.fillRect(x - 3, y - 3, bw + 6, h + 6);
+    c.fillStyle = '#3a1418'; c.fillRect(x, y, bw, h);
+    c.fillStyle = k > 0.3 ? '#e8c45a' : '#e0503c';
+    if (right) c.fillRect(x + bw * (1 - k), y, bw * k, h); else c.fillRect(x, y, bw * k, h);
+    c.font = pfont(20).f; c.fillStyle = '#f2ead6'; c.textAlign = right ? 'right' : 'left';
+    c.lineWidth = 4; c.strokeStyle = '#000';
+    const tx = right ? x + bw : x, ty = y + h + 24;
+    c.strokeText(name, tx, ty); c.fillText(name, tx, ty);
+    c.textAlign = 'left';
+  };
+  const pl = w.player as Body & { label?: string };
+  bar(24, pl, pl.label ?? '', false);
+  bar(W - 24 - bw, foe, (foe as { label?: string } | undefined)?.label?.replace(/^AI /, '').replace(/ \d+$/, '') ?? '', true);
 }

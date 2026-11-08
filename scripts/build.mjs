@@ -233,6 +233,10 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   const tr = await build({ ...common, entryPoints: ['src/game/action/fighter/testroom.ts'], format: 'esm', minify: true, write: false });
   const trCode = tr.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   writeFileSync('dist/goei-testroom.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인물 시험장</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${trCode}</script></body></html>`);
+  // 기다리는 동안 대전 시험판 (11-08, src/game/action/fighter/waitfight.ts): 투명 무대 1:1. 시험장과 같이 game-pack/ 에서 인물 팩을 받는다
+  const wf = await build({ ...common, entryPoints: ['src/game/action/fighter/waitfight.ts'], format: 'esm', minify: true, write: false });
+  const wfCode = wf.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  writeFileSync('dist/goei-waitfight.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>대전 시험판</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${wfCode}</script></body></html>`);
 }
 // 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
 {

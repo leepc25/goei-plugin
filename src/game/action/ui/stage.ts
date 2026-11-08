@@ -2,6 +2,7 @@
 // 층: 게임 캔버스 → CRT 덮개 → 메뉴(1280×720 좌표) / 터치 버튼(상자 전체) / 세로 화면 안내
 import css from './ui.css';
 import { mountCrt, type Crt } from './crt';
+import { view } from '../engine/view';
 import { ensureKit } from './kit';
 
 export const W = 1280,
@@ -56,7 +57,8 @@ export function mountStage(box: HTMLElement): Stage {
   box.append(root);
   const stageEl = root.querySelector<HTMLElement>('.gs-stage')!;
   const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
-  const ctx = canvas.getContext('2d', { alpha: false })!;
+  // 투명 무대(기다리는 동안 대전)만 알파를 켠다. 평소엔 불투명이 빠르다
+  const ctx = canvas.getContext('2d', { alpha: view.clear })!;
   const ui = root.querySelector<HTMLElement>('.gs-ui')!;
   const touch = root.querySelector<HTMLElement>('.gs-touch')!;
   const rotate = root.querySelector<HTMLElement>('.gs-rotate')!;

@@ -180,6 +180,7 @@ export class Game {
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
+        if (view.clear) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
         this.ctx.translate(-view.crop, -view.cropY);
@@ -340,6 +341,9 @@ export class Game {
   }
 
   /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
+  /** 대전 판이 끝난 뒤 지난 틱 (투명 무대만) */
+  private koT = 0;
+
   endRun(how: RunResultCore['how']) {
     const w = this.world;
     if (!w || this.inHub) return;
@@ -390,6 +394,15 @@ export class Game {
         }
         if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
         w.step(p);
+        // 기다리는 동안 대전(투명 무대): 판이 끝나면(쓰러짐·상대 쓰러뜨림) 잠깐 뒤 같은 무대로 새 판. 본부·결과 화면으로 가지 않는다
+        if (view.clear) {
+          const foeDown = w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
+          if (w.ended || foeDown || w.player.hp <= 0) {
+            this.koT = (this.koT ?? 0) + 1;
+            if (this.koT > TICK_HZ * 2.5) { this.koT = 0; this.start_new(this.run?.stageId); }
+          } else this.koT = 0;
+          return;
+        }
         if (w.ended) {
           const how = w.ended;
           if (how === 'next') {
