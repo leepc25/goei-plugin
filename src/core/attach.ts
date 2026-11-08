@@ -121,7 +121,7 @@ export function describe(body: string, brief = false): string {
 /** 목록 미리보기 한 줄 */
 export function previewText(body: string): string {
   return bodyParts(body)
-    .map((p) => (p.kind === 'text' ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`))
+    .map((p) => (p.kind === 'text' ? p.text.replace(/\[사진:[^\]\n]{1,80}\]/g, `[${ATTACH_LABELS.photo}]`).trim() : `[${ATTACH_LABELS[p.kind]}]`))
     .join(' ');
 }
 

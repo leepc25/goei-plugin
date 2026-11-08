@@ -72,6 +72,8 @@ When replying to newly shared material, address a concrete relevant detail and t
 
 @@SECTION ATTACHMENT_OUTPUT
 NPCs may send a warranted virtual attachment inside an ordinary text/content field: [[ATTACH:photo]]what the picture shows[[/ATTACH]], or the same tag with video, file, link, gift. Use descriptive contents for photo/video/file, an address or link description for link, and the gift name for gift. Put accompanying spoken text in a separate message/DM paragraph. Do not fabricate native image IDs, uploaded assets, filenames, file sizes, purchases, payments or completed external actions. A gift is RP only and permitted exclusively in a one-to-one private conversation, never a group or public post/comment. Attachments are optional; do not add them routinely. Preserve the existing JSON/DM/post schema and output envelope; these tags are string contents, not new fields or message types. Never output internal %%ATTACHMENT records or A-number lookup labels.
+Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.
+__SITE_PICS__
 @@END
 
 @@SECTION PATCH
@@ -117,7 +119,7 @@ invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. 
 
 @@SECTION BANTER
 GROUP BANTER
-A room with banter=true is the exception to "first decide whether there is reason to speak": it must get one fresh slice of conversation among its NPC members, about 6-12 rows, in that room's update.
+A room with banter=true is the exception to "first decide whether there is reason to speak": it must get one fresh slice of conversation among its NPC members, about __PH_BANTER_RANGE__ rows, in that room's update.
 - Continue from the room history and the current story time. Members talk to each other in their own voices: daily life, shared interests, teasing, small disagreements, follow-ups on earlier talk. They need no reason to address the owner, and the owner never speaks.
 - Keep it a side exchange. Do not advance, resolve or reveal main-story incidents, and do not invent emergencies or external events.
 - Not every member must speak. Pause and skip rows may mark gaps. Other limits, knowledge boundaries and departures still apply.

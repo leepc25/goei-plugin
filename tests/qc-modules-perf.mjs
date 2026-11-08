@@ -151,7 +151,7 @@ for (const N of [20, 500]) {
   await page.waitForSelector('.gx-nav');
   lap(N, ['open'], t);
   t = Date.now();
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="gn"]');
   await page.waitForSelector('.gn-row-main');
   lap(N, ['nav gnet'], t);
   for (const sub of ['dm', 'board', 'dm', 'board']) {
@@ -165,7 +165,7 @@ for (const N of [20, 500]) {
   await page.waitForSelector('.gx-board, .gx-ops');
   lap(N, ['nav board'], t);
   t = Date.now();
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="gn"]');
   await page.waitForSelector('.gn-row-main');
   lap(N, ['nav gnet again'], t);
   await page.close();
