@@ -24,8 +24,18 @@ VS_LEN = 2743
 # 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
 #   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
 #   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
-VS_CFG = {'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 1.0, 'yF': 760, 'benchD': [[220, 420], [232, 422]], 'benchYF': 645, 'benchMore': {3: -30}}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
-          'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770}, 'office': {'yF': 826}}
+VS_CFG = {'b2': {'yF': 750, 'benchYF': 705}, 'street': {'right': 0.91, 'leftmin': 0.068}, 'f3': {'left': 0}, 'clinic': {'right': 1.0, 'yF': 760, 'benchD': [[220, 420], [232, 345]], 'benchYF': 645}, 'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
+          'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770, 'benchYF': 740}, 'office': {'yF': 826}}
+# 11-08 사용자 「파이팅선 적당히 내려서 통일, 배경선과 간격도 통일」: 장면마다 바닥 뒤(벽 밑)·앞(바닥 끝) 그림 y를 눈으로 재고,
+# 싸우는 줄 = 뒤 + FIGHT_AT × 깊이, 대기 줄 = 싸우는 줄 - BENCH_GAP(월드). 모든 배경 같은 비율·간격
+FIGHT_AT, BENCH_GAP = 0.7, 50
+FLOOR_BF = {'street': (604, 710), 'f3': (673, 828), 'b2': (668, 765), 'training': (692, 820), 'clinic': (610, 843),
+            'by_street': (612, 718), 'by_f13': (671, 832), 'sdra_street': (618, 726), 'jr_entry': (589, 707)}
+for _k, (_b, _f) in FLOOR_BF.items():
+    VS_CFG.setdefault(_k, {})['yF'] = round(_b + FIGHT_AT * (_f - _b))
+for _c in VS_CFG.values(): _c.pop('benchYF', None)
+VS_CFG['training']['benchD'] = [[220, 420], [75, 440]]   # 오른쪽: 사격 칸막이 피함
+VS_CFG['f3']['benchD'] = [[220, 420], [220, 500]]   # 오른쪽: 쓰레기통 피함
 CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
 
 def persp_of(y, lane, far, grow, sizes):
@@ -94,6 +104,10 @@ def fit_stage(v, c):
         for d in c.get('benchD', [[220, 420]] * 2)[side]:  # 끝에서 떨어뜨리고 둘 사이도 띄움. 장면마다 따로 줄 수 있음
             xs.append((side, d if side == 0 else (x1 - x0) * s - d))
     spots = [[], []]
+    if True:  # 대기 줄 = 싸우는 줄 - BENCH_GAP (월드), 모든 배경 같은 간격
+        y = yF - BENCH_GAP / s
+        for side, xw in xs: spots[side].append({'x': round(xw), 'dy': -BENCH_GAP, 'k': round(persp(y, v) / pF, 3)})
+        return yF, s, x0, x1, spots
     if 'benchYF' in c:  # 사용자 지정 깊이 (그림 y). 필드 바닥 자료보다 눈으로 본 바닥이 넓은 장면 (11-08 사용자 「오른쪽은 더 올릴 수 있잖아」)
         y = c['benchYF']
         for i, (side, xw) in enumerate(xs):
