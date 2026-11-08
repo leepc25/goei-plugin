@@ -187,6 +187,7 @@ export class Game {
           const camDraw = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a);
           view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - camDraw;
           view.vsX0 = this.vsCam;
+          view.vsW = vw;
         } else if (vw < SCREEN_W && w) {
           const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
@@ -212,6 +213,7 @@ export class Game {
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
+        if (view.clear) { view.vsY0 = view.cropY; view.vsH = vh; }
         if (view.clear) {
           this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
           const f = this.vsFold();

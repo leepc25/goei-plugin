@@ -38,7 +38,7 @@ export interface FighterEnv {
 }
 export function createFighterCore(env: FighterEnv) {
   const VFX = env.VFX || {}, CHAIR = env.CHAIR || {};
-  let VX0 = 0, W = 1280, H = 720, FLOOR0 = 440, FLOOR1 = 669;
+  let VX0 = 0, W = 1280, H = 720, FLOOR0 = 440, FLOOR1 = 669, VW = 1280, VY0 = 0, VH = 720;   // VW·VY0·VH: 보이는 화면 폭·위 끝·높이 (대전은 화면이 무대를 따라가며 크기가 다름)
   const down = (n?: Json) => env.held.has(n);
   let ctx: CanvasRenderingContext2D = null as unknown as CanvasRenderingContext2D;
   const K = (y?: Json) => env.K(y);
@@ -425,7 +425,7 @@ const FX = {
     const v = VFX[s.vfx]; if (!v) return;
     const fh = v.frames[0][3], fw = v.frames[0][2], gx = !!T ? T.x : P.x + P.face * 380, gy = !!T ? T.y : P.y;
     const sc = (s.h || 460) / fh;
-    if (fw * sc > W * 1.1) { vfx(s.vfx, W / 2, (FLOOR0 + FLOOR1) / 2 + 40, W * 1.05 / fw, { bottom: true, flip: P.face < 0 }); }
+    if (fw * sc > VW * 1.1) { vfx(s.vfx, (VX0 + VW / 2), (FLOOR0 + FLOOR1) / 2 + 40, VW * 1.05 / fw, { bottom: true, flip: P.face < 0 }); }
     else vfx(s.vfx, gx, gy + 10, sc, { bottom: true, flip: P.face < 0 });
     flash = Math.max(flash, 0.12); shake = Math.max(shake, 12); boomSnd(3, gx);
   },
@@ -471,7 +471,7 @@ const FX = {
   // 화면 전체: 표적 + 무작위 자리 spots곳에 each 부품을 차례로
   screen(s?: Json, c?: Json) {
     const spots: Json[] = [];
-    for (let i = 0; i < (s.spots ?? 5); i++) spots.push({ x: 90 + Math.random() * (W - 180), y: FLOOR0 + 40 + Math.random() * (FLOOR1 - FLOOR0 - 50), z: 0 });
+    for (let i = 0; i < (s.spots ?? 5); i++) spots.push({ x: VX0 + 90 + Math.random() * (VW - 180), y: FLOOR0 + 40 + Math.random() * (FLOOR1 - FLOOR0 - 50), z: 0 });
     if (!!T) spots.splice(Math.random() * (spots.length + 1) | 0, 0, { x: T.x, y: T.y, z: T.z, onT: true });
     spots.forEach((pt, i) => later(i * (s.every ?? 0.11), () => runFx((s.each || []).map((e?: Json) => ({ ...e, at: e.at === 'self' ? 'self' : 'target', hit: pt.onT ? e.hit : null })), { ...c, pt: pt.onT ? { x: T.x, y: T.y, z: T.z, onT: true } : pt })));
   },
@@ -482,7 +482,7 @@ const FX = {
     if ((s.kind || 'orb') === 'bullet') {
       muzzleFlash(p, s.big); sfx('shot');
       const hitD = !!T && Math.abs(T.y - P.y) < 60 && (T.x - P.x) * dir > 0;
-      const endX = hitD ? T.x - dir * 14 : (dir > 0 ? W + 20 : -20);
+      const endX = hitD ? T.x - dir * 14 : (dir > 0 ? W + 20 : VX0 - 20);
       const tt = Math.abs(endX - p.x) / 3400, g = Math.max(-0.1, Math.min(0.1, mzAng())) + (s.spread ? (Math.random() - 0.5) * s.spread : 0),   // 반동으로 총구가 들린 장도 탄은 앞으로(10-28 데드폴 한 발이 허공으로)
       gp = MZ_GAP * K(P.y), sx = p.x + dir * Math.cos(g) * gp, sy = p.hy + Math.sin(g) * gp;
       fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 20, t: tt, t0: tt });
@@ -563,9 +563,9 @@ const FX = {
   // 같은 효과를 대상 둘레에 여러 번(큐라스 지속 포격)
   barrage(s?: Json, c?: Json) { for (let i = 0; i < (s.n || 10); i++) later(i * (s.every || 0.1), () => { const q = c.pt || (!!T ? { x: T.x, y: T.y, z: T.z, onT: true } : { x: P.x + P.face * 300, y: P.y }); runFx((s.each || []).map((e?: Json) => ({ ...e, at: 'target', hit: q.onT ? e.hit : null })), { ...c, pt: { x: q.x + (Math.random() - 0.5) * (s.jitter || 50), y: q.y + (Math.random() - 0.5) * 14, z: q.z, onT: q.onT } }); }); },
   // 불 벽: 그 자리에 time초 동안 불이 솟고, 안에 있으면 맞음
-  firewall(s?: Json, c?: Json) { const p = s.at === 'screen' ? { x: W / 2, gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? W : (s.w || 160) * p.k; fx.push({ k: 'firewall', x: p.x, y: p.gy, w, t: s.time || 3, t0: s.time || 3 }); if (s.at === 'screen' ? allT() : near(p.x, p.gy, w / 2 + 20, 60)) strike(s.hit); },
+  firewall(s?: Json, c?: Json) { const p = s.at === 'screen' ? { x: (VX0 + VW / 2), gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? VW : (s.w || 160) * p.k; fx.push({ k: 'firewall', x: p.x, y: p.gy, w, t: s.time || 3, t0: s.time || 3 }); if (s.at === 'screen' ? allT() : near(p.x, p.gy, w / 2 + 20, 60)) strike(s.hit); },
   // 큰 괴이 그림자가 화면을 휩쓸며 n번 물어뜯음(고그니쟈)
-  sweep(s?: Json) { const dir = P.face, T = s.time || 2; fx.push({ k: 'sweep', x0: dir > 0 ? -260 : W + 260, x1: dir > 0 ? W + 260 : -260, y: (FLOOR0 + FLOOR1) / 2 + 30, dir, c: s.color || '#140c18', t: T, t0: T }); sfx('super'); if (allT() && s.hit) { const n = s.hit.n || 5; for (let i = 0; i < n; i++) later(T * (0.3 + 0.4 * i / n), () => strike({ ...s.hit, n: 1, kind: i === n - 1 ? (s.hit.kind || 'launch') : 'heavy' })); } },
+  sweep(s?: Json) { const dir = P.face, T = s.time || 2; fx.push({ k: 'sweep', x0: dir > 0 ? VX0 - 260 : W + 260, x1: dir > 0 ? W + 260 : VX0 - 260, y: (FLOOR0 + FLOOR1) / 2 + 30, dir, c: s.color || '#140c18', t: T, t0: T }); sfx('super'); if (allT() && s.hit) { const n = s.hit.n || 5; for (let i = 0; i < n; i++) later(T * (0.3 + 0.4 * i / n), () => strike({ ...s.hit, n: 1, kind: i === n - 1 ? (s.hit.kind || 'launch') : 'heavy' })); } },
   // 잔해 파도(콘쥬스): 상자 더미가 앞으로 밀려가며 표적을 쓸어냄
   wave(s?: Json) { fx.push({ k: 'wave', style: s.style, c: s.color, x: P.x + P.face * 60, dir: P.face, v: s.speed || 900, y: P.y, hit: s.hit, done: false, t: 3, t0: 3 }); sfx('whiff', { strength: 3 }); },
   ring(s?: Json, c?: Json) { const p = posOf({ at: 'self', ...s }, c); ring(p.x, s.air ? p.hy : p.gy, (s.r || 120) * p.k, s.time || 0.5, s.color || CH.color, s.w || 5, s.air ? 1 : 0.3); },
@@ -584,11 +584,11 @@ const FX = {
     const meta = VFX[s.vfx]; if (!meta) return;
     const fw = meta.frames[0][2], fh = meta.frames[0][3], md = s.mode || meta.mode || 'center';
     let p;
-    if (s.at === 'screen') p = { x: W / 2 + P.face * (s.dx || 0), gy: (FLOOR0 + FLOOR1) / 2 + 40 + (s.dy || 0), hy: H / 2 + (s.dy || 0), k: 1 };
+    if (s.at === 'screen') p = { x: (VX0 + VW / 2) + P.face * (s.dx || 0), gy: (FLOOR0 + FLOOR1) / 2 + 40 + (s.dy || 0), hy: view.clear ? P.y - (205 - (s.dy || 0)) * K(P.y) / 1.184 : (VY0 + VH / 2) + (s.dy || 0), k: 1 };   // 대전: 화면이 인물을 바짝 따라가 화면 가운데가 머리 위로 뜬다 → 필드에서 화면 가운데가 서 있는 인물과 이루던 높이(발밑 205 위, K 1.184)를 그대로
     else if (s.at === 'body') { const k = K(P.y); p = { x: P.x + P.face * (s.dx || 0) * k, gy: P.y, hy: P.y - P.z - (s.h ?? 110) * k + (s.dy || 0) * k, k }; }
     else { p = posOf({ at: 'front', ...s }, c); if (s.dy) { p.gy += s.dy * p.k; p.hy += s.dy * p.k; } }
     let sc = (s.scale || 1) * (s.at === 'screen' ? 1 : p.k);
-    if (s.w) sc = W * s.w / fw;
+    if (s.w) sc = VW * s.w / fw;
     const flip = s.flip === false ? false : P.face < 0;
     const o = { [md === 'bottom' ? 'bottom' : 'center']: true, flip };   // 빈 값은 넣지 않음(undefined가 그림 시간 t를 덮어써 바로 지워지던 버그)
     for (const [k, v] of Object.entries({ under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: s.loop ? true : undefined, t: s.loop || undefined, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : undefined })) if (v !== undefined) o[k] = v;
@@ -612,7 +612,7 @@ const FX = {
   scan(s?: Json) { fx.push({ k: s.style === 'grid' ? 'grid' : 'scan', x: P.x, y: P.y - 190 * K(P.y), dir: P.face, c: s.color || CH.color, t: s.time || 0.6, t0: s.time || 0.6 }); sfx('ability'); },
   // 베기 궤적: x(엑스) | arc(초승달)
   slash(s?: Json, c?: Json) {
-    const p = s.at === 'center' ? { x: W / 2, gy: (FLOOR0 + FLOOR1) / 2, hy: H / 2, k: 1 } : posOf({ at: 'front', ...s }, c);
+    const p = s.at === 'center' ? { x: (VX0 + VW / 2), gy: (FLOOR0 + FLOOR1) / 2, hy: (VY0 + VH / 2), k: 1 } : posOf({ at: 'front', ...s }, c);
     fx.push({ k: s.dark ? 'slashD' : 'slash', style: s.style || 'arc', x: p.x, y: p.hy, r: (s.size || 160) * (s.at === 'center' ? 1 : p.k), dir: P.face, c: s.color || CH.color, t: 0.3, t0: 0.3 });
     sfx('whiff', { strength: 2 });
     if (s.at === 'center' ? allT() : near(p.x, p.gy, (s.size || 160) * p.k, 70)) strike(s.hit);
@@ -637,7 +637,7 @@ const FX = {
   // 에일린: 판독 표적 → 포격
   artillery(s?: Json) {
     const spots: Json[] = [];
-    for (let k = 0; k < (s.n || 12); k++) spots.push({ x: 60 + Math.random() * (W - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
+    for (let k = 0; k < (s.n || 12); k++) spots.push({ x: VX0 + 60 + Math.random() * (VW - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
     if (!!T) spots.splice(Math.random() * spots.length | 0, 0, { x: T.x, y: T.y, onT: true });
     const marks = spots.map(sp => ({ k: 'target', x: sp.x, y: sp.y, t: 8, onT: sp.onT }));
     [0, 1, 2].forEach(g => later(g * 0.38, () => { marks.forEach((m, n) => { if (n % 3 === g) fx.push(m); }); sfx('ui'); }));
@@ -668,7 +668,7 @@ const COMMON = {
   puddle(s?: Json, c?: Json) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'self', ...s }, c); vfx('fx-shadow', p.x, p.gy + 8 * p.k, (s.r || 70) * p.k / 40, { bottom: true, under: true }); },
   spikes(s?: Json, c?: Json, n0?: Json) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c); dropNew(n0, ['spikeG']); for (let i = 0; i < 3; i++) later(i * 0.05, () => vfx('fx-shadow', p.x + (i - 1) * 60 * p.k, p.gy + 8 * p.k, 2.2 * p.k, { bottom: true })); },
   grid(s?: Json, c?: Json, n0?: Json) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c), w = (s.w || 300) * p.k; for (let i = 0; i < 5; i++) later(i * 0.04, () => vfx('fx-shadow', p.x + (i - 2) * w / 5, p.gy + 8 * p.k, 2 * p.k, { bottom: true })); },
-  firewall(s?: Json, c?: Json) { if (!VFX['fx-fire']) return; const p = s.at === 'screen' ? { x: W / 2, gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? W : (s.w || 160) * p.k, n = Math.max(1, Math.round(w / 220)); for (let i = 0; i < n; i++) vfx('fx-fire', p.x + (i - (n - 1) / 2) * w / n, p.gy + 6, 1.8 * p.k, { bottom: true, t: s.time || 3, loop: true }); },
+  firewall(s?: Json, c?: Json) { if (!VFX['fx-fire']) return; const p = s.at === 'screen' ? { x: (VX0 + VW / 2), gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? VW : (s.w || 160) * p.k, n = Math.max(1, Math.round(w / 220)); for (let i = 0; i < n; i++) vfx('fx-fire', p.x + (i - (n - 1) / 2) * w / n, p.gy + 6, 1.8 * p.k, { bottom: true, t: s.time || 3, loop: true }); },
   flame(s?: Json) { if (!VFX['fx-fire']) return; const k = K(P.y), len = (s.len || 300); for (let i = 0; i < 3; i++) later(i * 0.08, () => { const m = muzzle(); vfx('fx-fire', m.x + P.face * (len * (i + 1) / 4) * k, m.y, (0.6 + i * 0.2) * k, { center: true, flip: P.face < 0 }); }); },   // 총구 높이에서 사거리(len) 안에만(10-28 윤병수: 바닥에 깔리고 사거리 밖까지 보였음)
   pillar(s?: Json, c?: Json) { if (s.vfx || !VFX['fx-pillar']) return; const p = posOf({ at: 'target', ...s }, c); vfx('fx-pillar', p.x, p.gy + 6 * p.k, 3 * p.k, { bottom: true, tint: colOf(s) }); },
 };
@@ -1511,7 +1511,7 @@ function drawFx(glow?: Json) {
     const k = e.t0 ? e.t / e.t0 : 1;
     if (e.k === 'spark') { ctx.strokeStyle = e.c; ctx.lineWidth = e.s; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x - e.vx * 0.035, e.y - e.vy * 0.035); ctx.stroke(); }
     else if (e.k === 'ring') { ctx.strokeStyle = e.c; ctx.globalAlpha = k; ctx.lineWidth = e.w * k + 1; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r0 + (e.r - e.r0) * (1 - k), (e.r0 + (e.r - e.r0) * (1 - k)) * e.sy, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
-    else if (e.k === 'num') { ctx.fillStyle = typeof e.v === 'string' ? '#9fd0ff' : e.crit ? '#ffe94a' : e.big ? '#ffcf4a' : '#fff'; ctx.font = `bold ${e.crit ? 42 : e.big ? 30 : 22}px sans-serif`; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(e.v, e.x - 14, e.y); ctx.fillText(e.v, e.x - 14, e.y); }
+    else if (e.k === 'num') { if (view.clear) continue; ctx.fillStyle = typeof e.v === 'string' ? '#9fd0ff' : e.crit ? '#ffe94a' : e.big ? '#ffcf4a' : '#fff'; ctx.font = `bold ${e.crit ? 42 : e.big ? 30 : 22}px sans-serif`; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(e.v, e.x - 14, e.y); ctx.fillText(e.v, e.x - 14, e.y); }
     else if (e.k === 'blood') { ctx.fillStyle = `rgba(150,10,16,${Math.min(1, e.t)})`; if (e.landed) { ctx.beginPath(); ctx.ellipse(e.x, e.y, e.s * 2.2, e.s * 0.8, 0, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s); }
     else if (e.k === 'mortar') {
       const p = 1 - k, y = -80 + (e.y - 30 + 80) * p, x = e.x + (1 - p) * 140, ang = Math.atan2(e.y + 50, -140);
@@ -1550,7 +1550,7 @@ function drawFx(glow?: Json) {
       for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2; ctx.beginPath(); ctx.moveTo(e.x + Math.cos(a) * r * 0.5, e.y + Math.sin(a) * r * 0.2); ctx.lineTo(e.x + Math.cos(a) * r, e.y + Math.sin(a) * r * 0.4); ctx.stroke(); }
     }
     else if (e.k === 'scan') {
-      const p = 1 - k, x = e.dir > 0 ? e.x + p * (W - e.x) : e.x - p * e.x;
+      const p = 1 - k, x = e.dir > 0 ? e.x + p * (W - e.x) : e.x - p * (e.x - VX0);
       ctx.strokeStyle = e.c; ctx.globalAlpha = 0.85; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(x, FLOOR0 - 40); ctx.lineTo(x, H); ctx.stroke();
       ctx.globalAlpha = 0.1; ctx.fillStyle = e.c; ctx.fillRect(Math.min(e.x, x), 0, Math.abs(x - e.x), H); ctx.globalAlpha = 1;
     }
@@ -1564,7 +1564,7 @@ function drawFx(glow?: Json) {
     else if (e.k === 'slash' || e.k === 'slashD') {
       const p = 1 - k, r = e.r, lw = 10 * k + 2;
       ctx.strokeStyle = e.c; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.globalAlpha = Math.min(1, k * 2);
-      if (e.style === 'h') { const L = W * Math.min(1, p * 5); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.dir > 0 ? 0 : W, e.y); ctx.lineTo(e.dir > 0 ? L : W - L, e.y); ctx.stroke(); }
+      if (e.style === 'h') { const L = VW * Math.min(1, p * 5); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.dir > 0 ? VX0 : W, e.y); ctx.lineTo(e.dir > 0 ? VX0 + L : W - L, e.y); ctx.stroke(); }
       else if (e.style === 'x') { const L = r * Math.min(1, p * 4); for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(e.x - s * r, e.y - r); ctx.lineTo(e.x - s * r + s * 2 * L, e.y - r + 2 * L); ctx.stroke(); } ctx.strokeStyle = '#fff'; ctx.lineWidth = lw * 0.35; for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(e.x - s * r, e.y - r); ctx.lineTo(e.x - s * r + s * 2 * L, e.y - r + 2 * L); ctx.stroke(); } }
       else { ctx.beginPath(); ctx.arc(e.x - e.dir * r * 0.3, e.y, r, -Math.PI / 2.4, Math.PI / 2.4 * Math.min(1, p * 4) * 2 - Math.PI / 2.4, e.dir < 0); ctx.stroke(); }
       ctx.globalAlpha = 1;
@@ -1657,7 +1657,7 @@ function drawCut() {
   ctx.restore();
 }
   // ── 게임 쪽 그리기 ──
-  function frameView(v?: Json) { VX0 = v.x0; W = v.x0 + 1280; FLOOR0 = v.lane[0]; FLOOR1 = v.lane[1]; }
+  function frameView(v?: Json) { VX0 = v.x0; VW = v.w || 1280; VY0 = v.y0 || 0; VH = v.h || 720; W = v.x0 + VW; FLOOR0 = v.lane[0]; FLOOR1 = v.lane[1]; }
   /** 바닥 층 (사람보다 먼저): 어두워짐·표적·그을음·먼지·잔상·바닥 그림 이펙트 */
   function drawUnder(c: CanvasRenderingContext2D) {
     ctx = c;

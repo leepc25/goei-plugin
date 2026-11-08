@@ -28,6 +28,7 @@ import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 const vsX0 = (c: number) => (view.clear && view.vsX0 >= 0 ? view.vsX0 : c);
 /** 대전: 필살기 피해 배율 (필드 값 그대로면 필살기 한 번에 체력 전부가 날아감) */
 const VS_SUPER_DMG = 0.35;
+const vsBox = () => (view.clear && view.vsX0 >= 0 ? { w: view.vsW, y0: view.vsY0, h: view.vsH } : {});
 const VS_SP = 0.4;
 /** 대전 깎기 피해: 특수기·원거리·충전기를 막았을 때 받는 피해 비율 */
 const VS_CHIP = 0.2;
@@ -636,11 +637,11 @@ export class FighterPlayer extends Player {
     this.statusStep(world, 1 / 30);
     this.coreSeatStep(p);
     this.coreShowerStep(p);
-    if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane }); this.sync(); return; } // 샤워 중엔 그만두기만
-    if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
+    if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane, ...vsBox() }); this.sync(); return; } // 샤워 중엔 그만두기만
+    if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane, ...vsBox() }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
     if (this.auto) p = this.auto.apply(this, world, p);   // 자동전투: 앉기·샤워 중(위에서 돌아감)에는 안 섞는다
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
-    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane });
+    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane, ...vsBox() });
     this.sync();
   }
 
@@ -655,7 +656,7 @@ export class FighterPlayer extends Player {
     const w = this.world as WorldView & { camX: number };
     const P = this.core.P;
     P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; // 틱 뒤 막힘·끝 보정
-    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane });
+    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane, ...vsBox() });
     this.perkSync(dt);
     if (view.clear && this.vsFreeze > 0) { this.vsFreeze -= dt; this.sync(); return; }   // 대전 히트스톱: 맞은 쪽 그림을 멈춘다
     this.core.update(dt);
@@ -762,7 +763,7 @@ export class FighterPlayer extends Player {
   /* ───────── 그리기 (render.ts가 부른다) ───────── */
 
   private drawUnder(ctx: CanvasRenderingContext2D, camX: number) {
-    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669] });
+    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669], ...vsBox() });
     ctx.save(); ctx.translate(-camX, 0); this.core.drawUnder(ctx); this.drawReward(ctx); ctx.restore();
   }
   /** 바닥 보상 카드 (코드 그림: 도트 카드 + 테두리 등급 색 + 빛, 반짝임은 공용 이펙트 item_sparkle). PixelLab 카드 그림이 생기면 여기만 바꾼다 */
@@ -792,7 +793,7 @@ export class FighterPlayer extends Player {
     ctx.save(); ctx.translate(-camX + jit, 0); ctx.imageSmoothingEnabled = false; this.core.drawBody(ctx); ctx.restore();
   }
   drawFxLayer(ctx: CanvasRenderingContext2D, camX: number) {
-    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669] });
+    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669], ...vsBox() });
     ctx.save(); ctx.translate(-camX, 0); ctx.imageSmoothingEnabled = false; this.core.drawFxLayer(ctx); ctx.restore();
   }
   drawScreen(ctx: CanvasRenderingContext2D) {
