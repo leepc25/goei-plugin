@@ -4,7 +4,7 @@
 import { pfont } from './pxfont';
 import { view } from './view';
 import { aiHold } from '../fighter/ai';
-import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, TRANS, TRANS_SEC, VS_RAISE, type Side } from './versus';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, TRANS, VS_RAISE, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -511,17 +511,37 @@ export class Game {
     }
     if (!tr.placed) return;
     // 새 판 첫 틱: 상대를 세우려고 한 번만 진행하고, 들어올 쪽을 화면 밖으로
-    const body = (tr.lose === 0 ? w.player : w.bodies.find((b) => b.team === 'enemy')) as unknown as { x: number; z: number; px?: number; pz?: number; homeX?: number } | undefined;
+    const body = (tr.lose === 0 ? w.player : w.bodies.find((b) => b.team === 'enemy')) as unknown as { x: number; y: number; z: number; px?: number; py?: number; pz?: number; homeX?: number; homeY?: number } | undefined;
     if (!body) { w.step(p); return; }
-    const home = body.homeX ?? (body.homeX = body.x);
-    const off = tr.lose === 0 ? home - 260 : home + 260;
-    const e = (tr.t - (TRANS.fold + TRANS.dark + TRANS.open)) / TRANS.enter;
+    const home = body.homeX ?? (body.homeX = body.x), homeY = body.homeY ?? (body.homeY = body.y);
+    // 태그매치 (11-08 사용자): 다음 캐릭터는 자기 대기 자리(뒤 줄)에서 길게 한 번 뛰어 시작 자리로. 멀수록 오래·높이
+    // 1:1 은 진 쪽이 화면 밖에서 점프로 들어온다
+    let off = tr.lose === 0 ? home - 260 : home + 260, offY = homeY, enter = TRANS.enter, high = 150;
+    if (versus.mode === 'team') {
+      const sp = view.vsBg?.bench.spots[tr.lose]?.[0], L = view.vsLen;
+      off = sp ? sp.x : tr.lose === 0 ? 220 : L - 220;
+      offY = homeY + (sp ? sp.dy : -150);
+      const d = Math.abs(home - off);
+      enter = 0.5 + d / 1500; high = 150 + d * 0.1;
+    }
+    const e = (tr.t - (TRANS.fold + TRANS.dark + TRANS.open)) / enter;
     const k = Math.max(0, Math.min(1, e));
     body.x = off + (home - off) * k;
-    body.z = k > 0 && k < 1 ? Math.sin(k * Math.PI) * 150 : 0;
-    body.px = body.x; body.pz = body.z;
-    if (tr.t >= TRANS_SEC) {
-      body.x = home; body.z = 0; delete body.homeX;
+    body.y = offY + (homeY - offY) * k;
+    body.z = k > 0 && k < 1 ? Math.sin(k * Math.PI) * high : 0;
+    body.px = body.x; body.py = body.y; body.pz = body.z;
+    // 엔진 틱이 멈춘 동안이라 캐릭터 그림(코어)이 몸을 따라오지 않는다 → 직접 맞춘다 (그림자만 날아가던 문제)
+    const core = (body as { core?: { P: Record<string, any>; A: Record<string, { n: number } | undefined> }; synced?: { x: number; y: number }; started?: boolean });
+    if (core.core) {
+      const P = core.core.P, n = core.core.A['7']?.n ?? 0;
+      P.x = body.x; P.y = body.y; P.z = body.z; P.face = tr.lose === 0 ? 1 : -1; core.started = true;
+      if (core.synced) { core.synced.x = body.x; core.synced.y = body.y; }
+      // 뛰는 동안은 점프 그림(7번 줄)을 날아가는 정도에 맞춰, 내려앉으면 대기로
+      if (k > 0 && k < 1 && n) { P.mode = 'air'; P.clip = { id: '7', seq: [{ f: Math.min(n - 1, Math.floor(k * n)), d: 9 }], i: 0, t: 0, loopFrom: 0, done: false, onEnd: null, paused: false }; }
+      else if (P.mode === 'air') { P.mode = 'ground'; P.clip = null; }
+    }
+    if (e >= 1) {
+      body.x = home; body.y = homeY; body.z = 0; delete body.homeX; delete body.homeY;
       versus.trans = null;
       versus.intro = INTRO_SEC;
     }
