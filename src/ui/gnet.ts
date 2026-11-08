@@ -4,7 +4,7 @@ import { onOffSwitch } from './controls';
 import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
-  GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
+  GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, COUNT_RANGE, type CountKey,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
   userNick, writeGnet, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
@@ -418,6 +418,15 @@ async function setVars(ctx: ChatContext, env: GnetEnv, vars: Record<string, stri
 
 // ── 화면 ──
 
+/** 개수 최소·최대 (−/+) */
+function countRow(ctx: ChatContext, k: CountKey, unit: string): string {
+  const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];
+  const [lo, hi] = COUNT_RANGE[k];
+  const step = (side: 'min' | 'max', n: number, label: string) =>
+    `<div class="st-step"><button class="gx-step" data-action="gn-step" data-value="${k}_${side}:-" ${n > lo ? '' : 'disabled'} aria-label="${label} 줄이기">−</button><b>${n}${unit}</b><button class="gx-step" data-action="gn-step" data-value="${k}_${side}:+" ${n < hi ? '' : 'disabled'} aria-label="${label} 늘리기">+</button></div>`;
+  return `<div class="st-range"><span>최소</span>${step('min', a, '최소')}<span>최대</span>${step('max', b, '최대')}</div>`;
+}
+
 function seg(key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'gn-cfg', (v) => `${key}=${v}`);
   if (sw) return sw;
@@ -580,7 +589,8 @@ function settingsView(ctx: ChatContext, back = true): string {
         row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요'),
       ].join(''))}
       ${group('게시판', [
-        row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
+        row('게시글 수', countRow(ctx, 'post', '개'), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
+        row('새 글 댓글 수', countRow(ctx, 'cmt', '개'), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
@@ -1051,6 +1061,20 @@ export async function handleGnet(action: string, value: string | undefined, base
         return true;
       }
       if (k in GN_DEFAULTS) await setVar(ctx, env, CFG(k), val);
+      return true;
+    }
+    case 'gn-step': {
+      // 개수 최소·최대: 최소가 최대를 넘으면 같이 맞춘다
+      const m = /^(post|cmt)_(min|max):([+-])$/.exec(v);
+      if (!m) return true;
+      const k = m[1] as CountKey;
+      const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];
+      const [lo, hi] = COUNT_RANGE[k];
+      const n = Math.max(lo, Math.min(hi, (m[2] === 'min' ? a : b) + (m[3] === '+' ? 1 : -1)));
+      const vars: Record<string, string> = { [CFG(`${k}_${m[2]}`)]: String(n) };
+      if (m[2] === 'min' && n > b) vars[CFG(`${k}_max`)] = String(n);
+      if (m[2] === 'max' && n < a) vars[CFG(`${k}_min`)] = String(n);
+      await setVars(ctx, env, vars);
       return true;
     }
     case 'gn-keep': {

@@ -71,7 +71,7 @@ export class GnetError extends Error {
 
 export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
-  mode: '2', quantity: '1', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
+  mode: '2', post_min: '5', post_max: '7', cmt_min: '0', cmt_max: '6', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
   /** 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) */
   keyfigures: '1',
@@ -90,15 +90,15 @@ export function gnetRetention(state: Record<string, unknown> | undefined): { aut
   const limit = Number.isInteger(n) && n >= 1 && n <= STORAGE_MAX ? n : HISTORY.dmKeep;
   return { auto: flag !== '0', limit };
 }
-export const LIMITS = { replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
+export const LIMITS = { replies_min: 0, replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
 export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 50, turns: 8, dmKeep: 40, cooldown: 2 };
 export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 3000, includePosts: true, includeDms: true, ownOnly: false, focus: true, recentPosts: 1, recentDms: 5 };
-export const QUANTITY: Record<string, { range: string; max: number; label: string }> = {
-  '0': { range: '4-6', max: 6, label: '4~6' },
-  '1': { range: '5-7', max: 7, label: '5~7' },
-  '2': { range: '6-8', max: 8, label: '6~8' },
-  '3': { range: '7-9', max: 9, label: '7~9' },
-};
+/** 개수 설정 (2026-11-08 사용자: 단계 고르기 대신 최소·최대 직접). 새로고침 글 수, 새 글마다 댓글 수. 내 글·댓글에 달릴 새 답글 수는 고급 설정(replies_min·replies) */
+export const COUNT_RANGE = { post: [1, 20], cmt: [0, 20] } as const;
+export type CountKey = keyof typeof COUNT_RANGE;
+export const COUNT_KEYS: CountKey[] = ['post', 'cmt'];
+/** 지침 속 개수 자리: 최소=최대면 그 수 하나, 아니면 「최소–최대」 */
+export const countText = ([a, b]: [number, number]): string => (a === b ? String(a) : `${a}-${b}`);
 
 export interface GnetSettings {
   /** 늘 true. 원본 mode 0(끄기)은 없앴다 (2026-11-05 사용자: 괴담톡·위키처럼 끄기 없음, 새로고침 수동이면 부르지 않는다). 옛 채팅의 mode 0 은 보조로 본다 */
@@ -108,7 +108,8 @@ export interface GnetSettings {
   /** 괴담넷 탭을 열 때, 본편이 진행됐으면 새로고침 (lazy 'open', v0.16.27) */
   autoOpen: boolean;
   model: 'main' | 'aux';
-  quantity: string;
+  /** 개수 [최소, 최대] */
+  counts: Record<CountKey, [number, number]>;
   subject: string;
   mood: string;
   privacy: string;
@@ -135,14 +136,22 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
   const v = gnetVars(state);
   const s = (k: string) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
   const clean = (k: string) => (s(k) === '-' ? '' : s(k));
-  const q = QUANTITY[s('quantity')] ? s('quantity') : '1';
+ const num = (k: string, lo: number, hi: number) => {
+    const n = Math.round(Number(s(k)));
+    return Number.isFinite(n) && s(k) !== '' ? Math.max(lo, Math.min(hi, n)) : Math.max(lo, Math.min(hi, Number(GN_DEFAULTS[k])));
+  };
+  const counts = Object.fromEntries(COUNT_KEYS.map((k) => {
+    const [lo, hi] = COUNT_RANGE[k];
+    const a = num(`${k}_min`, lo, hi);
+    return [k, [a, Math.max(a, num(`${k}_max`, lo, hi))]];
+  })) as Record<CountKey, [number, number]>;
   const chance = Number(s('incoming_chance'));
   return {
     enabled: true,
     auto: s('lazy') === '0',
     autoOpen: s('lazy') === 'open',
     model: s('mode') === '1' ? 'main' : 'aux',
-    quantity: q,
+    counts,
     subject: clean('subject'),
     mood: clean('mood'),
     privacy: ['0', '1', '2', '3', '4'].includes(s('privacy')) ? s('privacy') : '1',
@@ -356,7 +365,7 @@ export function storyTurns(chat: Chat): number {
 // ── 게시판 규칙 ──
 
 export function postLimit(s: GnetSettings): number {
-  return QUANTITY[s.quantity]?.max ?? 7;
+  return s.counts.post[1];
 }
 
 export function protectedPost(s: GnetSettings, p: GPost): boolean {

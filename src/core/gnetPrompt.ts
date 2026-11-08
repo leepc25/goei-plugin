@@ -6,7 +6,7 @@ import { viewSite, type BoardSite } from './boards';
 import { GUIDE_LABEL, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
-  activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
+  activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
   type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
@@ -38,11 +38,15 @@ export function gnetBooks(src: RefSource): GnetBooks {
   for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`${GUIDE_LABEL[name]} 지침의 ${k} 섹션이 없어요.`);
   applyAdvanced(src.chat.scriptstate);
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
+  const cs = gnetSettings(src.chat.scriptstate).counts;
   return {
     language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
+        .replace(/__GN_POST_RANGE__/g, countText(cs.post))
+        .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
+        .replace(/__GN_REPLY_RANGE__/g, countText([Math.min(LIMITS.replies_min, LIMITS.replies), LIMITS.replies]))
         .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
         .replace(/<!--[\s\S]*?-->/g, '')
         .trim();
@@ -152,10 +156,9 @@ const seed = () => Math.floor(Math.random() * 2147483647).toString(36);
 export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, nick: string, factionNames: Record<string, string>): GnetPrompt {
   const s = gnetSettings(src.chat.scriptstate);
   const b = gnetBooks(src);
-  const range = QUANTITY[s.quantity]?.range ?? '5-7';
   const guideline = [
     `${b.read('LB')}\n\n${b.read('BOARD.GUIDELINE')}`,
-    b.read('AUTO.GUIDELINE').replace(/__GN_POST_RANGE__/g, range),
+    b.read('AUTO.GUIDELINE'),
     `${b.read('ATTACHMENTS')}\n${incomingRules(b, plan)}`,
   ];
   const ex = boardExtras(src, b, true);

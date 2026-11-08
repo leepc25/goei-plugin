@@ -71,6 +71,8 @@ test('괴담톡: 단톡 수다를 켜면 단톡방 하나에 수다 표시가 �
   const body = JSON.parse(plan.prompt.messages[1].content);
   assert.equal(body.rooms[0].banter, true);
   assert.match(plan.prompt.messages[0].content, /GROUP BANTER/);
+  assert.match(plan.prompt.messages[0].content, /about 6-12 rows/, '수다 줄 수 기본 6~12');
+  assert.match(PP.refreshPrompt(src({ ...vars, '$ph_banter_min': '3', '$ph_banter_max': '4' }), st, dir, {}, () => 0).prompt.messages[0].content, /about 3-4 rows/, '설정한 줄 수');
   assert.deepEqual(body.textingHabits, [{ sender: 'c_1', note: '짧게 씀' }]);
   assert.match(plan.prompt.messages[0].content, /TEXTING HABITS/);
   const off = PP.refreshPrompt(src({ ...vars, '$ph_banter': '0', '$ph_habits': '0' }), st, dir, {}, () => 0);

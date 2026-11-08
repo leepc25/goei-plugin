@@ -94,7 +94,8 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
   // 말버릇 기록 (라이트보드 미니톡, 2026-11-06). 출력 계약 뒤에 붙는 유일한 예외 칸이라 맨 끝에 둔다
   if ((direct || group) && phoneSettings(src.chat.scriptstate).habits && p.HABITS !== undefined) keys.push('HABITS');
-  return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  const br = phoneSettings(src.chat.scriptstate).banterRows;
+  return [...keys.map((k) => section(p, k).replace(/__PH_BANTER_RANGE__/g, br[0] === br[1] ? String(br[0]) : `${br[0]}-${br[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
 }
 
 // ── 자료 ──

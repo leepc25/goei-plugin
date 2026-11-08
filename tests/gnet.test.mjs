@@ -167,7 +167,7 @@ test('prompts from the real card: frame, CBS settled, privacy branch, references
   assert.ok(sys.includes('조용한 아저씨 말투'));
   assert.ok(sys.includes('Do not discuss the protagonist or partners themselves'), '사생활 4단계 문장');
   assert.ok(!sys.includes('Users may discuss the protagonist'), '다른 단계 문장은 빠짐');
-  assert.ok(sys.includes('Target 5-7 posts'));
+  assert.ok(sys.includes('Target 5-7 posts, with 0-6 comments per new NPC post'), '개수 기본값');
   assert.ok(sys.endsWith('Use the language of the actual conversation; default to Korean.'));
   assert.ok(sys.includes('incomingAllowed=true permits'));
   assert.ok(user.startsWith('[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n'));

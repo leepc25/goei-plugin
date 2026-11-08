@@ -116,7 +116,7 @@ Generate a fresh board according to the configured quantity, topic, mood, privac
 
 @@SECTION AUTO.GUIDELINE
 For manual, standalone or joint automatic refresh, return a complete board as native JSON posts. New IDs are distinct integers over 100000 and above the highest saved ID in extension context. Use irregular integer views/upvotes and varied credible posting times, recent first.
-Target __GN_POST_RANGE__ posts, with 0–6 comments per new NPC post including nested replies, subject to extension maximum/protection rules. Protected records may exceed the maximum; preserve their IDs, authors, titles, bodies, dates, ownership and comment ancestry verbatim. Replace unprotected NPC posts with new topics, not recycled filler. Invent no user actions/ownership.
+Target __GN_POST_RANGE__ posts, with __GN_CMT_RANGE__ comments per new NPC post including nested replies, subject to extension maximum/protection rules. Protected records may exceed the maximum; preserve their IDs, authors, titles, bodies, dates, ownership and comment ancestry verbatim. Replace unprotected NPC posts with new topics, not recycled filler. Invent no user actions/ownership.
 Vary reception by topic across each candidate: active discussions have multiple relevant comments and nested replies; individual quiet threads may have none. Preserve discussion when shortening output; do not default the entire board to empty comments arrays. On retained posts, keep all saved comments in order and append plausible NEW NPC comments; view/vote increases follow elapsed time and readership. Never edit or delete saved text. Retained comment totals may exceed six; the initial new-post comment range is not a retention cap.
 Each post has its own comments array: parent=0 or an earlier comment's 1-based index. Every new post/comment is NPC-authored: mine=false and an author different from User handle, including when that handle is 익명. Never reuse a user record under a new ID or rewrite it as an NPC; preserved records keep their supplied IDs/text/ownership. Literal Korean and ordinary JSON string escapes; no markup, process blocks or text outside the object.
 @@END
@@ -129,7 +129,7 @@ Use current dates, valid new IDs and actual Korean content. These two posts illu
 @@END
 
 @@SECTION REACT.GUIDELINE
-Generate 0–__LIMIT_replies__ NEW NPC replies to the actual new post/comment, each at most __LIMIT_comment_tokens__ tokens. Vary reception; zero is valid, with no filler. Respond concretely in each account's established voice and knowledge. Do not copy user text, invent user actions, repeat saved comments or return/edit existing records.
+Generate __GN_REPLY_RANGE__ NEW NPC replies to the actual new post/comment, each at most __LIMIT_comment_tokens__ tokens. Vary reception; zero is valid, with no filler. Respond concretely in each account's established voice and knowledge. Do not copy user text, invent user actions, repeat saved comments or return/edit existing records.
 Use the supplied saved indices. For a reply, parent is replyTo or an earlier NEW reply beneath it; otherwise parent=0, a supplied existing index or an earlier NEW index. New indices start at commentCount+1; parent must precede child within the same thread. For a newly drafted post, commentCount=0. Discussion cannot execute or resolve the main scene.
 @@END
 
@@ -210,7 +210,7 @@ All posts should focus on this subject: {{getvar::lb_cfg_lb-gn.subject}}
 Center the newly generated board on the protagonist and partners; include at least one post about them within the public-knowledge rules.
 {{/when}}
 ### New-post reception
-Use 0–6 comments per new NPC post, including nested replies. Hot, controversial, useful or funny posts attract several distinct reactions and discussion; mundane posts receive fewer comments and votes. Simulate that difference across the board: questions receive concrete answers, claims invite skepticism, jokes invite banter, and authors or readers may reply to earlier comments. Zero comments is valid for an individual quiet post, not a default for every topic. Choose reception from each topic and its readership, not from a desire to minimize output. Use concise, natural comments rather than dropping discussions to save space. There is no per-post minimum. Saved threads are not capped at six; user-action reactions follow their separate contract.
+Use __GN_CMT_RANGE__ comments per new NPC post, including nested replies. Hot, controversial, useful or funny posts attract several distinct reactions and discussion; mundane posts receive fewer comments and votes. Simulate that difference across the board: questions receive concrete answers, claims invite skepticism, jokes invite banter, and authors or readers may reply to earlier comments. Zero comments is valid for an individual quiet post, not a default for every topic. Choose reception from each topic and its readership, not from a desire to minimize output. Use concise, natural comments rather than dropping discussions to save space. There is no per-post minimum. Saved threads are not capped at six; user-action reactions follow their separate contract.
 @@END
 
 @@SECTION ATTACHMENTS

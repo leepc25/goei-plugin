@@ -353,8 +353,9 @@ if (want('G3')) {
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_auto_dm === '0');
   assert.equal(await page.locator('[data-change="gn-keep"]').count(), 0, '끄면 상한 칸이 사라진다');
   // 설정: 수량·사생활·다양성·주제가 요청문에 들어간다
-  await page.click('[data-action="gn-cfg"][data-value="quantity=3"]');
-  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.quantity'] === '3');
+  // 게시글 수 최소·최대 (−/+): 최대 7→9, 최소 5→7
+  for (const k of ['post_max:+', 'post_max:+', 'post_min:+', 'post_min:+']) await page.click(`[data-action="gn-step"][data-value="${k}"]`);
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '7' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '9');
   await page.click('[data-action="gn-cfg"][data-value="sampling=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.sampling'] === '1');
   await page.click('[data-action="gn-cfg"][data-value="privacy=4"]');
@@ -366,7 +367,7 @@ if (want('G3')) {
   await idle(page);
   const sys = await page.evaluate(() => window.__calls.llm.at(-1).messages[0].content);
   const usr = await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content);
-  assert.ok(sys.includes('7-9') || usr.includes('7-9'), '수량 3 = 7~9개');
+  assert.ok(sys.includes('7-9') || usr.includes('7-9'), '게시글 수 7~9개');
   assert.ok(sys.includes('Diversity sampling is ON'), '다양성 강화');
   assert.ok(usr.includes('"POST_LIMIT":"9"') || usr.includes('9'), '상한');
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('|대안|'), '다양성 켜면 alternativePosts 를 쓴다');

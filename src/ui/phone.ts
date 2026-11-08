@@ -9,6 +9,7 @@ import {
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
   chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  BANTER_ROWS,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt, viewPrompt } from '../core/phonePrompt';
 import { parseView, PH_VIEW_LAST, readViews, VIEW_HISTORY, VIEW_PRESETS, viewSettings, viewUnread, writeViews, type ViewRoom } from '../core/phoneView';
@@ -1097,6 +1098,7 @@ function settingsView(ctx: ChatContext): string {
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
         row('단톡 수다', `<span class="ph-inline">${onoff('banter')}${pct('banter_chance')}</span>`, '새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요'),
+        row('단톡 수다 줄 수', `<span class="ph-inline"><span>최소</span>${num('banter_min', phoneSettings(ctx.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}<span>최대</span>${num('banter_max', phoneSettings(ctx.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
         row('소속 공지 받기', onoff('announcements'), '내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요'),
         row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴'), '공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요'),
         row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개'), '새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요'),
@@ -1452,7 +1454,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
     case 'ph-num': {
       const [k, val] = v.split('=');
       const range: Record<string, [number, number]> = {
-        incoming_chance: [0, 100], group_invite_chance: [0, 100], banter_chance: [0, 100], announcement_gap: [1, 100], announcement_history: [1, 50],
+        incoming_chance: [0, 100], group_invite_chance: [0, 100], banter_chance: [0, 100], banter_min: BANTER_ROWS, banter_max: BANTER_ROWS, announcement_gap: [1, 100], announcement_history: [1, 50],
         storage_limit_dm: [1, STORAGE_MAX], storage_limit_group: [1, STORAGE_MAX], storage_limit_notice: [1, STORAGE_MAX],
       };
       const r = range[k];

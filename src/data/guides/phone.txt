@@ -117,7 +117,7 @@ invitations: use GROUP_INVITES only when invitationCheck.allowed; otherwise []. 
 
 @@SECTION BANTER
 GROUP BANTER
-A room with banter=true is the exception to "first decide whether there is reason to speak": it must get one fresh slice of conversation among its NPC members, about 6-12 rows, in that room's update.
+A room with banter=true is the exception to "first decide whether there is reason to speak": it must get one fresh slice of conversation among its NPC members, about __PH_BANTER_RANGE__ rows, in that room's update.
 - Continue from the room history and the current story time. Members talk to each other in their own voices: daily life, shared interests, teasing, small disagreements, follow-ups on earlier talk. They need no reason to address the owner, and the owner never speaks.
 - Keep it a side exchange. Do not advance, resolve or reveal main-story incidents, and do not invent emergencies or external events.
 - Not every member must speak. Pause and skip rows may mark gaps. Other limits, knowledge boundaries and departures still apply.
