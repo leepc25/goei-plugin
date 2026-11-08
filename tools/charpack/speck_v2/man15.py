@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage as nd
 S=os.path.dirname(os.path.abspath(__file__))
-PICK={'8':[786,709],'43':[217,383,359,407,372,244],'44':[545,898,1140]}
+PICK={'8':[786,709],'44':[545,898,1140]}   # 누운 채 움찔 다리 밑 판은 가운이라 둠(사용자 11-08)
 r=json.load(open(f'{S}/flood.json')); log={}
 for b,ids in PICK.items():
     p=f'{S}/final2/char-1.5/{b}.webp.png'; a=np.array(Image.open(p).convert('RGBA'))
