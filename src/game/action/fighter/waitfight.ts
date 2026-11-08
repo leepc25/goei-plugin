@@ -58,5 +58,8 @@ html,body{margin:0;height:100%;background:transparent!important;overflow:hidden}
 document.body.innerHTML = '<div id="box"></div>';
 // 시험: 주소 ?bg=장면 id 로 배경 (설정 「배경」 대신)
 const bgParam = new URLSearchParams(location.search).get('bg') ?? (() => { try { return new URLSearchParams(parent.location.search).get('bg'); } catch { return null; } })();
-const h = startVersus(document.getElementById('box')!, assets, { onClose: () => console.log('[vs] 닫기'), bg: () => bgParam ?? undefined, wide: () => q.get('wide') === '1' });
+// 시험: ?pick=1P,2P(쉼표, 태그는 1P|1P|1P,2P|2P|2P)&mode=duel|team|survival&auto=1 (1P 도 AI) 로 고르기 창 건너뛰기
+const pickQ = q.get('pick');
+const test = pickQ ? { pick: { mode: (q.get('mode') ?? 'duel') as never, me: pickQ.split(',')[0].split('|'), foe: (pickQ.split(',')[1] ?? '').split('|').filter(Boolean) }, auto: q.get('auto') === '1' } : undefined;
+const h = startVersus(document.getElementById('box')!, assets, { onClose: () => console.log('[vs] 닫기'), bg: () => bgParam ?? undefined, wide: () => q.get('wide') === '1', test });
 (globalThis as { __vs?: unknown }).__vs = h;

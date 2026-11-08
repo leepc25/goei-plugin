@@ -1,14 +1,11 @@
 // 대전 (11-08 사용자 「기다리는 동안 대전」): 고르기 창 → VS 화면(고른 인물만 받기) → 경기 → 끝나면 고르기 창(직전 쌍에 커서).
 // 시험판(fighter/waitfight.ts)과 플러그인이 같이 쓴다. 자료는 대전 공용 팩 vs-common + 인물 팩 vs-<번호> (tools/build_vs_packs.py).
-import { mountGame } from '../action/main';
-import { prepareCharPacks, loadChar, charArt, commonUrl } from '../action/art/charPacks';
-import { playerFactory } from '../action/engine/player';
-import { FighterPlayer } from '../action/fighter/player';
+// 경기는 대전 전용 새 코드(fight/match.ts, 11-08 새로 짬)가 돈다. 필드 게임 엔진은 쓰지 않는다.
+import { prepareCharPacks, loadChar, commonUrl } from '../action/art/charPacks';
 import { view } from '../action/engine/view';
-import { useVersusKeys } from '../action/engine/input';
-import { versus, newMatch, fighterOf, VS_RAISE, VS_LEN } from '../action/engine/versus';
+import { versus, newMatch, VS_RAISE, VS_LEN } from '../action/engine/versus';
 import { resetSurvival } from '../action/engine/survival';
-import type { Game } from '../action/engine/game';
+import { Match } from './fight/match';
 import type { GameAssets } from '../bridge';
 import { createGameAudio } from '../action/audio';
 import { vsVoice } from './voice';
@@ -67,11 +64,10 @@ async function loadBg(id: string | undefined): Promise<typeof view.vsBg> {
   return { img, x, y, w, h, objs, len, bench: m.bench };
 }
 
-export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined; wide?: () => boolean } = {}): VersusHandle {
+export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClose?: () => void; bg?: () => string | undefined; wide?: () => boolean; test?: { pick?: SelectResult; auto?: boolean } } = {}): VersusHandle {
   view.clear = true;
   const packs = prepareCharPacks(assets, 'vs-common');
-  let game: Game | null = null;
-  let unmount: (() => void) | null = null;
+  let game: Match | null = null;
   let sel: { close(): void } | null = null;
   let last: SelectResult | null = null;
   let dead = false;
@@ -111,20 +107,11 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
     view.relayout?.();
     if (dead) return;
     if (!game) {
-      unmount = mountGame(box, { assets } as never, {
-        charPacks: true,
-        hero: fighterOf(0),
-        onReady: (g) => {
-          game = g;
-          useVersusKeys();
-          playerFactory.make = (clips) => new FighterPlayer(clips, charArt(fighterOf(0))!);
-          g.start_new('versus');
-        },
-      });
-    } else {
-      playerFactory.make = (clips) => new FighterPlayer(clips, charArt(fighterOf(0))!);
-      game.start_new('versus');
+      game = new Match(box, { say: (id) => { try { audio.play(id); } catch { /* 소리 없음 */ } }, auto: opts.test?.auto });
+      (globalThis as { __vsFight?: Match; __vsState?: unknown }).__vsFight = game;
+      if (opts.test) (globalThis as { __vsState?: unknown }).__vsState = versus;
     }
+    game.begin();
   };
 
   // 창이 너무 작으면(모바일 크기, 11-08 사용자) 아예 숨기고 멈춘다. 다시 커지면 이어서
@@ -141,7 +128,7 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
   ro.observe(box);
 
   versus.onMatchEnd = () => select();
-  void packs.ready.then(() => { if (!dead) select(); });
+  void packs.ready.then(() => { if (dead) return; if (opts.test?.pick) void play(opts.test.pick); else select(); });
 
   return {
     pause: () => { paused = true; versus.hold = true; show(); vsSoundPause(true); },
@@ -150,7 +137,7 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
       dead = true;
       ro.disconnect();
       sel?.close();
-      unmount?.();
+      game?.destroy();
       packs.dispose();
       audio.dispose();
       vsBgm(false);

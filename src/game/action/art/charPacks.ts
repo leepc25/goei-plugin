@@ -277,7 +277,7 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
 const FLAT_IDS = new Set(['19', '20', '38', '38_1', '43', '45']);
 const LIE_IDS = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45', 'SH_S4', 'SH_S5', 'SH_H4', 'SH_H5']);   // 맨몸 누운 채 맞기·일어나기(11-01)
 const FALL_IDS = new Set(['18_3', '44', '75', '76', '77', '169', 'SH_S3', 'SH_H3']);   // 맨몸 날아가 쓰러지기(11-01)
-function groundOf(id: string, m: LineMeta, f: number): number {
+export function groundOf(id: string, m: LineMeta, f: number): number {
   const BASE = Math.min(m.h - 4, m.floor);
   const bot = m.bot[f] ?? m.floor;
   if (SEAT_IDS.has(id)) return Math.min(BASE, bot);
