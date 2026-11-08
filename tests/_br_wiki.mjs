@@ -8,9 +8,9 @@ const fx = loadFixture(new URL('../.scratch/fixture/fixture.json', import.meta.u
 mkdirSync(OUT, { recursive: true });
 const browser = await launch();
 const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
-for (const vp of ['pc', 'phone']) {
+for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
   const chat = { message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $nw_auto: '0' } };
-  const { page, errors } = await boot(browser, fx, chat, vp);
+  const { page, errors } = await boot(browser, fx, chat, size);
   let n = 0;
   const shot = async (tag) => { await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/${vp}-${String(++n).padStart(2, '0')}-${tag}.png` }); };
   const click = (sel) => page.evaluate((s) => { const els = [...document.querySelectorAll(s)]; const el = els.find((e) => e.getBoundingClientRect().width > 0) || els[0]; if (!el) return false; el.click(); return true; }, sel);
@@ -30,37 +30,49 @@ for (const vp of ['pc', 'phone']) {
 [List]관람차가 혼자 돈다
 [Quote]돌아가|Source:경비원
 </lightboard-namuwiki>`;
-  const q = page.locator('[data-input="wiki-query"]:visible, [data-input="wiki-home-query"]:visible').first();
-  await q.fill('소라 랜드');
-  await q.press('Enter');
-  await page.waitForTimeout(400);
-  await shot('search-known');
-  await click('[data-action="wiki-write"][data-value="소라 랜드"]');
-  await page.waitForTimeout(300);
-  await shot('compose');
-  await page.evaluate((a) => { window.__llm = [{ type: 'success', result: a }]; }, article('소라 랜드'));
+  // 시안 상태 순서대로: 대문 → 검색 → 없는 문서(로어북 있음) → 작성 중 → 문서 → 다시 쓰기 → 목록 → 새 문서 → 대문+목록
+  await page.fill('[data-input="wiki-query"]', '관리');
+  await page.press('[data-input="wiki-query"]', 'Enter');
+  await page.waitForSelector('.wk-find', { timeout: 4000 });
+  assert.equal(await page.locator('.wk-find .sres li').count() > 0, true, '검색 결과');
+  await shot('search');
+  await page.fill('[data-input="wiki-query"]', '소라 랜드');
+  await page.press('[data-input="wiki-query"]', 'Enter');
+  await page.waitForSelector('.wk-compose', { timeout: 4000 });
+  await shot('none');
+  // 작성 중 화면을 찍을 수 있게 응답을 붙잡아 둔다
+  await page.evaluate((a) => { window.__llm = { shift: () => new Promise((r) => { window.__llmGo = () => r({ type: 'success', result: a }); }) }; }, article('소라 랜드'));
   await click('[data-action="wiki-start"]');
+  await page.waitForFunction(() => typeof window.__llmGo === 'function');
+  await shot('busy');
+  assert.ok((await page.textContent('.wk-compose')).includes('작성하는 중'), '작성 중');
+  await page.evaluate(() => window.__llmGo());
   await page.waitForSelector('.nw-doc', { timeout: 8000 });
   await shot('doc');
   await click('[data-action="wiki-rewrite"]');
-  await shot('rewrite');
+  await shot('rw');
   await click('[data-action="wiki-rw-cancel"]');
-  await click('[data-action="wiki-list"]');
+  if (vp === 'pc') await click('.wk .wlb'); else await click('.wk .wgrab');
+  await page.waitForSelector('.wk .wdr.open');
   await shot('list');
-  await click('[data-action="wiki-list"][data-value="close"]');
-  // 없는 제목 검색 → 검색 화면 (없어요 · 작성하기)
-  const top = page.locator('.wk-in');
-  await top.fill('소라');
-  await page.waitForSelector('.wk-ac .ph-sec');
-  await shot('typing');
-  await top.fill('없는문서제목');
-  await top.press('Enter');
-  await page.waitForSelector('.wk-find', { timeout: 4000 });
-  assert.equal(await page.locator('.wk-find [data-action="wiki-write"]').count(), 1, '작성하기');
-  await shot('search');
+  await page.fill('[data-input="wiki-filter"]', '소라');
+  await page.waitForTimeout(200);
+  assert.ok((await page.textContent('.wk .wlist')).includes('소라 랜드'), '서랍 검색');
+  await shot('list-filter');
+  await page.fill('[data-input="wiki-filter"]', '');
+  await page.evaluate(() => document.querySelector('[data-input="wiki-filter"]').dispatchEvent(new Event('input', { bubbles: true })));
+  await click('.wk .wscrim');
+  await click('[data-action="wiki-random"]');
+  await page.waitForTimeout(200);
   await click('[data-action="wiki-home"]');
-  await page.waitForTimeout(300);
+  await click('[data-action="wiki-new"]');
+  await page.waitForSelector('.wk .in1');
+  await shot('new');
+  await click('[data-action="wiki-home"]');
+  await page.waitForTimeout(200);
   await shot('home2');
+  if (vp === 'pc') await click('.wk .wlb'); else await click('.wk .wgrab');
+  await shot('mainlist');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, '가로 넘침 없음');
   if (errors.length) console.log(vp, 'page errors:', errors.slice(0, 5));
   assert.deepEqual(errors, []);

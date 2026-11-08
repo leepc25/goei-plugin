@@ -17,12 +17,12 @@ const raw = (title, tags = ['자유']) => {
 };
 const browser = await launch();
 const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
-for (const vp of ['pc', 'phone']) {
+for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
   const chat = {
     message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }],
     scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $gn_raw: raw('괴담넷 글', ['자유', '목격', '질문', '정보']), $gal_raw: raw('괴담갤 글', ['일반', '목격', '질문']), $wpf_raw: raw('세정게 글', ['정치', '음모']), $sm_raw: raw('연어 글', ['팝니다', '삽니다']) },
   };
-  const { page, errors } = await boot(browser, fx, chat, vp);
+  const { page, errors } = await boot(browser, fx, chat, size);
   let n = 0;
   const shot = async (tag) => { await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/${vp}-${String(++n).padStart(2, '0')}-${tag}.png` }); };
   const click = (sel) => page.evaluate((s) => { const els = [...document.querySelectorAll(s)]; const el = els.find((e) => e.getBoundingClientRect().width > 0) || els[0]; if (!el) return false; el.click(); return true; }, sel);

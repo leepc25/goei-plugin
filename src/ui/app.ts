@@ -37,7 +37,7 @@ import { setItemIconRedraw } from '../host/itemicons';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiOpenCheck, wikiSuggest, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
@@ -559,13 +559,18 @@ function panelInput(el: HTMLInputElement): void {
   }
   if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
     wiki.query = el.value;
-    const box = root?.querySelector('.wk-ac');
-    if (box) box.innerHTML = wikiSuggest(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'wiki-filter' && view.kind === 'started') {
+    // 위키 목록 서랍 검색칸: 목록만 다시 그린다 (입력칸 포커스 유지)
+    wiki.filter = el.value;
+    const box = root?.querySelector('.wk .wlist');
+    if (box) box.innerHTML = wikiList(view.ctx);
     return;
   }
   if (el?.dataset?.input === 'wiki-home-query' && view.kind === 'started') {
     wiki.homeQuery = el.value;
-    const box = root?.querySelector('.nw-hero-res');
+    const box = root?.querySelector('.wk .hres');
     if (box) box.innerHTML = wikiHomeResults(view.ctx);
     return;
   }
@@ -1499,7 +1504,7 @@ function render(): void {
 /** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */
 interface NavState {
   tab: Tab;
-  w?: { view: string; title: string; list: boolean };
+  w?: { view: string; title: string; list: boolean; q?: string };
   /** 기록 탭: 하위 탭·화면·대상 */
   r?: RecordsNav;
   /** 소지품 탭: 가계부|소지품·물건|기록·팝업 */
@@ -1529,7 +1534,7 @@ function openWallet(): void {
 function navState(): NavState {
   const s: NavState = { tab };
   if (inBrowser()) s.b = curTab().site;
-  if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
+  if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen, q: wiki.query };
   if (tab === 'records') s.r = recordsNav();
   if (tab === 'items') s.i = itemsNav();
   if (tab === 'phone') s.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
@@ -1553,7 +1558,7 @@ function applyNav(s: NavState): void {
   if (s.b !== undefined) curTab().site = isSite(s.b) ? s.b : '';
   notice = '';
   field.confirmEnd = null;
-  if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list });
+  if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list }, s.w.view === 'find' ? { query: s.w.q ?? '' } : {});
   if (s.r) applyRecordsNav(s.r);
   if (s.i) applyItemsNav(s.i);
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
@@ -1790,10 +1795,15 @@ function browserSites(ctx: ChatContext | null): SiteId[] {
 function chromeOpts(ctx: ChatContext): ChromeOpts {
   const vars = ctx.chat.scriptstate ?? {};
   const t = curTab();
-  const wkTitle = t.site === 'wk' && wiki.view === 'doc' && wiki.title ? wiki.title : '';
+  // 괴이위키 탭 제목·주소 (시안: 문서는 /w/제목, 검색은 /Search?q=)
+  const wk = t.site !== 'wk' ? null
+    : (wiki.view === 'doc' || wiki.view === 'compose') && wiki.title ? { title: wiki.title, path: `/w/${wiki.title}` }
+    : wiki.view === 'find' ? { title: `"${wiki.query}" 검색 결과`, path: `/Search?q=${wiki.query}` }
+    : wiki.view === 'new' ? { title: '새 문서 만들기', path: '/NewDocument' }
+    : { title: '괴이위키:대문', path: '' };
   return {
-    title: wkTitle ? `${wkTitle} - 괴이위키` : t.site === 'wk' ? '괴이위키:대문 - 괴이위키' : '',
-    path: wkTitle ? `/w/${wkTitle}` : '',
+    title: wk ? `${wk.title} - 괴이위키` : '',
+    path: wk?.path ?? '',
     bookmarks: browserSites(ctx),
     nick: String(vars['$br_login'] ?? '') === '1' ? String(vars['$br_nick'] ?? '') : '',
     photo: userInfo().photo ?? '',

@@ -469,6 +469,10 @@ function mseg(site: MallSite, key: string, cur: string, items: [string, string][
 const step = (site: MallSite, key: string, shown: string, down: boolean, up: boolean, label: string) =>
   `<div class="st-step"><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:-" ${down ? '' : 'disabled'} aria-label="${esc(label)} 줄이기">−</button><b>${esc(shown)}</b><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:+" ${up ? '' : 'disabled'} aria-label="${esc(label)} 늘리기">+</button></div>`;
 
+/** 숫자 직접 입력 칸 (개수 최소·최대) */
+const numBox = (site: MallSite, key: string, cur: number, unit: string, label: string) =>
+  `<input class="gx-search ph-pct" type="number" min="${MS_RANGE[key][0]}" max="${MS_RANGE[key][1]}" data-change="ms-num" data-key="${site}:${key}" value="${cur}" aria-label="${esc(label)}"><span>${unit}</span>`;
+
 /** 상점 설정 이름 (사이트 앞붙이 없이) */
 const MS_KEY: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', feature: '$sh_feature', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const MS_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
@@ -481,7 +485,7 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
     row('자동 호출', mseg(site, 'auto', s.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), s.auto === 'manual' ? '새로 고침을 눌렀을 때만 물건 목록을 새로 받아요.' : s.auto === 'open' ? '사이트를 열 때, 지난번에 받은 뒤로 본편이 진행됐으면 한 번 새로 받아요.' : '본편 응답마다 물건 목록을 새로 받아요(모델 호출 +1).'),
     row('모델', mseg(site, 'model', s.model, [['main', '메인 모델'], ['aux', '보조 모델']]), `물건 목록${site === 'cos' ? '과 운영자 답' : ''}을 지을 모델이에요.`),
     row('컨텍스트에 포함', mseg(site, 'ctx', s.context ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'),
-    row('상품 수', `<div class="st-range"><span>최소</span>${step(site, 'min', `${s.size[0]}개`, s.size[0] > SHOP_SIZE_LO, s.size[0] < SHOP_SIZE_HI, '최소')}<span>최대</span>${step(site, 'max', `${s.size[1]}개`, s.size[1] > SHOP_SIZE_LO, s.size[1] < SHOP_SIZE_HI, '최대')}</div>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
+    row('상품 수', `<span class="ph-inline"><span>최소</span>${numBox(site, 'min', s.size[0], '개', '상품 수 최소')}<span>최대</span>${numBox(site, 'max', s.size[1], '개', '상품 수 최대')}</span>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
     row(site === 'cos' ? '추천·할인 구획' : '한정·특가 구획', mseg(site, 'feature', s.feature ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), site === 'cos' ? '켜면 「강하게 추천」 물건 하나와 ※할인!※ 물건을 받아 같은 목록 칸에 딱지로 표시해요.' : '켜면 「이달의 한정」 하나와 특가 상품을 따로 받아 분류에 보여 줘요.'),
     row('값 기준', `<input class="gx-search ps-text" data-change="ms-text" data-key="${site}:price" value="${esc(s.price)}" maxlength="80" placeholder="비우면 사이트에 어울리는 값">`),
     row('다양성 강화', mseg(site, 'diverse', s.diverse ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
@@ -493,14 +497,21 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
-/** 설정 값 바꾸기: ms-cfg 「사이트:키=값」 · ms-step 「사이트:키:±」 · ms-text (값 기준) */
+/** 설정 값 바꾸기: ms-cfg 「사이트:키=값」 · ms-step 「사이트:키:±」 · ms-num 「사이트:키=숫자」(상품 수) · ms-text (값 기준) */
 export async function mallSettingsAction(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv): Promise<boolean> {
-  if (action !== 'ms-cfg' && action !== 'ms-step' && action !== 'ms-text') return false;
+  if (action !== 'ms-cfg' && action !== 'ms-step' && action !== 'ms-text' && action !== 'ms-num') return false;
   let site = '';
   let k = '';
   let v = '';
   if (action === 'ms-cfg' || action === 'ms-text') [, site, k, v] = /^(\w+):(\w+)=([\s\S]*)$/.exec(value ?? '') ?? [];
   if (action === 'ms-text') v = String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, 80);
+  else if (action === 'ms-num') {
+    [, site, k, v] = /^(\w+):(\w+)=(.*)$/.exec(value ?? '') ?? [];
+    const n = Math.floor(Number(v));
+    const r = MS_RANGE[k];
+    if (!r || !Number.isFinite(n) || String(v).trim() === '') return env.render(), true;
+    v = String(Math.max(r[0], Math.min(r[1], n)));
+  }
   else if (action === 'ms-step') {
     const m = /^(\w+):(\w+):([+-])$/.exec(value ?? '');
     if (!m) return true;
@@ -515,7 +526,7 @@ export async function mallSettingsAction(action: string, value: string | undefin
   if (!varName) return true;
   const extra: Record<string, string> = {};
   // 최소가 최대를 넘으면 같이 맞춘다
-  if (action === 'ms-step' && (k === 'min' || k === 'max')) {
+  if ((action === 'ms-step' || action === 'ms-num') && (k === 'min' || k === 'max')) {
     const s = mallSettings(ctx.chat.scriptstate, site);
     const n = Number(v);
     if (k === 'min' && n > s.size[1]) extra[mallKey('$sh_max', site)] = v;

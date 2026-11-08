@@ -41,12 +41,12 @@ currency: points
 </shelf>`;
 const browser = await launch();
 const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
-for (const vp of ['pc', 'phone']) {
+for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
   const chat = {
     message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }],
     scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_wallet: JSON.stringify({ start: 5000000, log: [] }), $st_points: JSON.stringify({ start: 12400, log: [{ id: 'p0', anchor: '', amount: 0, memo: '지급', src: 'manual', at: '2025-01-01T00:00:00Z' }] }) },
   };
-  const { page, errors } = await boot(browser, fx, chat, vp);
+  const { page, errors } = await boot(browser, fx, chat, size);
   let n = 0;
   const shot = async (tag) => { await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/${vp}-${String(++n).padStart(2, '0')}-${tag}.png` }); };
   const click = (sel) => page.evaluate((s) => { const els = [...document.querySelectorAll(s)]; const el = els.find((e) => e.getBoundingClientRect().width > 0) || els[0]; if (!el) return false; el.click(); return true; }, sel);
@@ -120,12 +120,13 @@ for (const vp of ['pc', 'phone']) {
   // 설정: 사이트마다 값 따로
   await openEditor(page, 'set:cos'); await shot('set-cos');
   await click('.gw [data-action="ms-cfg"][data-value="cos:auto=manual"]');
-  await click('.gw [data-action="ms-step"][data-value="cos:max:+"]');
+  await page.fill('.gw [data-change="ms-num"][data-key="cos:max"]', '15');
+  await page.dispatchEvent('.gw [data-change="ms-num"][data-key="cos:max"]', 'change');
   await page.waitForTimeout(400);
   const st2 = await ss();
   assert.equal(st2.$cos_sh_auto, 'manual');
   assert.equal(st2.$bm_sh_auto, undefined);
-  assert.ok(st2.$cos_sh_max, '상품 수 최대');
+  assert.equal(st2.$cos_sh_max, '15', '상품 수 최대');
   await goNode(page, 'set:bm'); await shot('set-bm');
   await goNode(page, 'guide:Cos'); await shot('guide-cos');
   if (errors.length) console.log(vp, 'page errors:', errors.slice(0, 5));

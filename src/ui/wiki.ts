@@ -6,7 +6,7 @@ import { buildRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
   type WikiDoc, acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
-  type WikiMeta, type WikiSettings, wikiContextOn, portraitMood, wikiTitlePrompt, acceptTitle,
+  type WikiMeta, type WikiSettings, wikiContextOn, docSummary, portraitMood, wikiTitlePrompt, acceptTitle,
 } from '../core/wiki';
 import { lastReply } from '../core/phone';
 import { playerAgent } from '../core/player';
@@ -17,16 +17,14 @@ import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { GHOST_ICON, ICONS } from './icons';
+import { ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { imageUrl } from './images';
 import { baseLink, basePic as baseArt } from './evpic';
 import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
 import { assetNames, facePic, hasAsset, mainPic, moduleAssetStamp } from '../host/assets';
-import { readWorld, worldOn } from '../core/world/output';
-import { activeEvents } from '../core/world/engine';
-import { lastStatusFields } from '../core/world/tags';
+import { readWorld } from '../core/world/output';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -60,6 +58,8 @@ interface WikiState {
   listOpen: boolean;
   /** 서랍 목록 탭: 전체·이번 이야기·분류·기타 */
   tab: Tab;
+  /** 서랍 검색칸 */
+  filter: string;
   newTitle: string;
   /** 작성·다시 쓰기 화면의 「이 문서 지침」 */
   docReq: string;
@@ -69,7 +69,7 @@ interface WikiState {
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', newTitle: '', docReq: '', rewrite: null, rewritePrev: true,
+  view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', filter: '', newTitle: '', docReq: '', rewrite: null, rewritePrev: true,
 };
 
 export function resetWiki() {
@@ -431,17 +431,8 @@ function busyLine(ctx: ChatContext): string {
   return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : '';
 }
 
-const blank = (text: string) => `<div class="ph-blank"><p>${text}</p></div>`;
 
-const when = (sec: number) => new Date(sec * 1000).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
 
-/** 목록 한 줄: 사진, 이름·부제 */
-function row(ctx: ChatContext, e: Entry | undefined, title: string, sub?: string, dot = false): string {
-  const on = (wiki.view === 'doc' || wiki.view === 'compose') && wiki.title === title;
-  const small = sub ?? (e ? [e.title !== e.name ? e.title : '', e.sub].filter(Boolean).join(' · ') : '');
-  return `<li class="ph-row"><button class="ph-main nw-row${on ? ' on' : ''}" data-action="wiki-pick" data-value="${esc(title)}">${face(ctx, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc(e?.name ?? title)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ''}</span>${small ? `<small>${esc(small)}</small>` : ''}</span></button></li>`;
-}
 
 // 가나다 (된소리는 예사소리 묶음에, 로마자는 A, 나머지는 #)
 const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
@@ -466,77 +457,99 @@ function sortedDocs(ctx: ChatContext) {
     .map((x) => x.d);
 }
 
-/** 메인 검색칸 결과: 입력하는 대로 바로 바뀐다 (서랍 검색과 같은 목록) */
-export function wikiHomeResults(ctx: ChatContext): string {
-  return wiki.homeQuery.trim() ? wikiList(ctx, wiki.homeQuery) : '';
+// ── 괴이위키 화면 (2026-11-08 사용자 확정 시안: 작업_1108/브라우저_시안3/mock3.html 의 .wk 마크업 그대로) ──
+
+const ni = (d: string) => `<svg class="ni" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const CLOCK = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>';
+const SHUFFLE = '<path d="M3 7h4c4 0 6 10 10 10h4M3 17h4c1.6 0 2.8-1.6 3.8-3.5M13.2 9.5C14.2 8 15.4 7 17 7h4M18 4l3 3-3 3M18 14l3 3-3 3"/>';
+const SRCH = '<svg class="i s" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+const LOGO = '<svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/></svg>';
+const LIST_ICO = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const IROW_ICO = {
+  doc: '<svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M6 2h9l5 5v15H6z" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 11h8M9 15h8M9 19h5" stroke="#fff" stroke-width="2"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M12 22s-7-7-7-12a7 7 0 0 1 14 0c0 5-7 12-7 12z" fill="#fff"/><circle cx="12" cy="10" r="2.6" fill="#00a495"/></svg>',
+  person: '<svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><circle cx="12" cy="8" r="4.5" fill="#fff"/><path d="M3 22c0-5 4-8 9-8s9 3 9 8z" fill="#fff"/></svg>',
+  pen: '<svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="#fff"/><path d="M3 21h18" stroke="#fff" stroke-width="2"/></svg>',
+};
+
+/** 몇 분 전·몇 시간 전·어제 (대문 「최근 변경」) */
+function ago(sec: number): string {
+  const d = Math.max(0, Math.floor(Date.now() / 1000) - sec);
+  if (d < 60) return '방금';
+  if (d < 3600) return `${Math.floor(d / 60)}분 전`;
+  if (d < 86400) return `${Math.floor(d / 3600)}시간 전`;
+  if (d < 172800) return '어제';
+  return `${Math.floor(d / 86400)}일 전`;
+}
+/** 「오늘」 또는 날짜 (문서 머리의 최근 수정 시각) */
+function dayOf(sec: number): string {
+  const t = new Date(sec * 1000);
+  const n = new Date();
+  if (t.toDateString() === n.toDateString()) return '오늘';
+  return `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')}`;
 }
 
-/** 머리줄 검색칸 아래 결과 (입력하는 대로, 검색칸에 커서가 있을 때만 보인다) */
-export function wikiSuggest(ctx: ChatContext): string {
-  return wiki.query.trim() ? wikiList(ctx, wiki.query) : '';
+/** 문서의 분류 이름 (탭 이름과 같음) */
+const catName = (ctx: ChatContext, d: WikiDoc) => TABS.find(([t]) => t === docCat(ctx, d))?.[1] ?? '기타';
+
+/** 서랍·대문 검색 결과 한 줄: 이름, 이번 이야기에서 쓴 문서면 점, 없는 문서면 빨간 글자 */
+function linkRow(ctx: ChatContext, title: string, o: { dot?: boolean; none?: boolean; name?: string } = {}): string {
+  const on = (wiki.view === 'doc' || wiki.view === 'compose') && wiki.title === title;
+  return `<button type="button" class="it${on ? ' on' : ''}${o.none ? ' none' : ''}" data-action="wiki-pick" data-value="${esc(title)}"><span>${esc(o.name ?? shownName(ctx, title))}</span>${o.dot ? '<i title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></i>' : ''}</button>`;
 }
 
-/** 목록 (검색어가 있으면 걸러서) */
-export function wikiList(ctx: ChatContext, query = wiki.query): string {
+/** 검색어로 걸러 낸 목록 (서랍 검색칸·대문 검색칸): 문서, 명부, 비슷한 문서, 새로 만들기 */
+function searchRows(ctx: ChatContext, q: string): string {
   const docs = sortedDocs(ctx);
   const saved = new Set(docs.map((d) => d.title));
-  const q = query.trim();
-  // 이번 이야기에서 쓰거나 새로고침한 문서는 이름 옆 점
-  const dated = (d: (typeof docs)[number], dot = true) => {
-    const e = entryFor(ctx, d.title);
-    return row(ctx, e, d.title, e ? undefined : d.meta?.created ? when(d.meta.created) : '', dot && !d.base);
-  };
-  if (q) {
-    const lower = q.toLowerCase();
-    const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
-    const hits = matches(ctx, q).filter((e) => !saved.has(e.title));
-    const exact = canon(ctx)(q);
-    // 검색과 작성은 하나 (v0.16.24, 사용자 설계): 결과가 없으면 「없어요 + 작성」, 있는데 딱 맞는 제목이 없으면 끝에 작성 줄
-    const known = saved.has(exact) || hits.some((e) => e.title === exact);
-    const docPart = mine.length ? `<h4 class="ph-sec">문서<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => dated(d)).join('')}</ul>` : '';
-    const rosterPart = hits.length
-      ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row(ctx, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(' · '))).join('')}</ul>`
-      : '';
-    // 띄어쓰기가 다르거나 조금 틀린 제목은 「비슷한 문서」로 먼저 제안 (예: 소라랜드 → 소라 랜드)
-    const shownTitles = new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx).map((e) => e.title)]).filter((t) => !shownTitles.has(t));
-    const nearPart = near.length
-      ? `<h4 class="ph-sec">비슷한 문서<b>${near.length}</b></h4><ul class="ph-list">${near.map((t) => {
-          const d = docs.find((x) => x.title === t);
-          if (d) return dated(d);
-          const e = entries(ctx).find((x) => x.title === t)!;
-          return row(ctx, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(' · '));
-        }).join('')}</ul>`
-      : '';
-    if (!docPart && !rosterPart && !nearPart) {
-      return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc(q)}">${ICONS.pen}작성하기</button></div></div>`;
-    }
-    const fresh = known
-      ? ''
-      : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
-    const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : '';
-    return `<div class="nw-groups">${lead}${docPart}${rosterPart}${nearPart}${fresh}</div>`;
-  }
-  if (!docs.length) return `<div class="nw-groups">${blank('아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.')}</div>`;
+  const lower = q.toLowerCase();
+  const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+  // 같은 문서로 이어지는 명부 항목(거점 「관리국」·조직 「관리국」)은 하나만
+  const hits = matches(ctx, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
+  const exact = canon(ctx)(q);
+  const known = saved.has(exact) || hits.some((e) => e.title === exact);
+  const shown = new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
+  // 띄어쓰기가 다르거나 조금 틀린 제목 (예: 소라랜드 → 소라 랜드)
+  const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx).map((e) => e.title)]).filter((t) => !shown.has(t));
+  const grp = (label: string, rows: string[]) => (rows.length ? `<h4>${label}<b>${rows.length}</b></h4>${rows.join('')}` : '');
+  const fresh = known ? '' : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc(q)}"><span>「${esc(q)}」 새 문서 만들기</span></button>`;
+  const body = grp('문서', mine.map((d) => linkRow(ctx, d.title, { dot: !d.base })))
+    + grp('명부', hits.map((e) => linkRow(ctx, e.title, { none: true, name: e.name })))
+    + grp('비슷한 문서', near.map((t) => linkRow(ctx, t, { none: !saved.has(t) })));
+  return body ? body + fresh : `<p class="wnone">「${esc(q)}」 문서가 없어요.</p>${fresh}`;
+}
+
+/** 대문 검색칸 아래 결과: 입력하는 대로 바뀐다 */
+export function wikiHomeResults(ctx: ChatContext): string {
+  const q = wiki.homeQuery.trim();
+  return q ? `<div class="wls">${searchRows(ctx, q)}</div>` : '';
+}
+
+/** 서랍 목록: 검색칸에 글이 있으면 걸러서, 없으면 분류 탭 + 가나다 묶음 */
+export function wikiList(ctx: ChatContext): string {
+  const q = wiki.filter.trim();
+  if (q) return `<div class="wls">${searchRows(ctx, q)}</div>`;
+  const docs = sortedDocs(ctx);
+  if (!docs.length) return `<div class="wls"><p class="wnone">아직 작성한 문서가 없어요.</p></div>`;
   const count = (t: Tab) => docs.filter((d) => inTab(ctx, d, t)).length;
   const tabs = TABS.filter(([t]) => t === 'all' || count(t));
   const tab = tabs.some(([t]) => t === wiki.tab) ? wiki.tab : 'all';
   const shown = docs.filter((d) => inTab(ctx, d, tab));
-  const chips = `<div class="ph-tabs nw-tabs" role="tablist">${tabs
-    .map(([t, label]) => `<button class="ph-tab${t === tab ? ' on' : ''}" data-action="wiki-tab" data-value="${t}" aria-selected="${t === tab}">${label}<small>${count(t)}</small></button>`)
+  const chips = `<div class="wtabs" role="tablist">${tabs
+    .map(([t, label]) => `<button type="button" class="${t === tab ? 'on' : ''}" data-action="wiki-tab" data-value="${t}" role="tab" aria-selected="${t === tab}">${label}<small>${count(t)}</small></button>`)
     .join('')}</div>`;
-  const keyOfDoc = (d: (typeof docs)[number]) => keyOf(shownName(ctx, d.title));
+  const keyOfDoc = (d: WikiDoc) => keyOf(shownName(ctx, d.title));
   const keys = KEYS.filter((k) => shown.some((d) => keyOfDoc(d) === k));
   const groups = keys.map((k) => {
     const rows = shown.filter((d) => keyOfDoc(d) === k);
-    const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
-    return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab !== 'story')).join('')}</ul>`;
+    // 자음 제목을 누르면 자음판 (v0.16.25, 휴대폰 연락처처럼)
+    const head = keys.length > 1 ? `<button type="button" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
+    return `<h4 data-ksec="${k}">${head}</h4>${rows.map((d) => linkRow(ctx, d.title, { dot: tab !== 'story' && !d.base })).join('')}`;
   }).join('');
-  // 자음 제목을 누르면 자음판 (v0.16.25, 휴대폰 연락처처럼): 문서가 있는 자음만 켜진다
   const index = keys.length > 1
     ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? '' : 'disabled'}>${k}</button>`).join('')}</div></div>`
     : '';
-  return `${chips}<div class="nw-groups">${groups}</div>${index}`;
+  return `${chips}<div class="wls">${groups}</div>${index}`;
 }
 
 /** 문서의 분류: 명부 항목이면 그 분류, 아니면 사람 문서는 인물, 나머지는 기타 */
@@ -547,87 +560,48 @@ function docCat(ctx: ChatContext, d: WikiDoc): Exclude<Tab, 'all' | 'story'> {
 }
 const inTab = (ctx: ChatContext, d: WikiDoc, t: Tab) => (t === 'all' ? true : t === 'story' ? !d.base : docCat(ctx, d) === t);
 
-/** 위쪽 머리줄 (나무위키 모양, 2026-11-08): 로고(대문), 검색칸, 그 옆 ☰ 목록 서랍 */
-function topBar(ctx: ChatContext): string {
+/** 머리줄 (시안 WKTOP·WKMAIN): 로고, 최근 변경·임의 문서, 목록 단추, (대문은 임의 문서 단추) 검색칸 */
+function topBar(main: boolean): string {
   const open = wiki.listOpen;
-  const label = open ? '목록 접기' : '목록 펼치기';
-  return `<header class="wk-top">
-    <button class="wk-logo" type="button" data-action="wiki-home" aria-label="괴이위키 대문">${GHOST_ICON}<b>괴이위키</b></button>
-    <div class="wk-qw"><div class="wk-q"><input class="wk-in" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="wk-go" type="button" data-action="wiki-search" data-take="wiki-q" aria-label="검색">${ICONS.search}</button></div>
-      <div class="wk-ac">${wikiSuggest(ctx)}</div></div>
-    <button class="wk-menu" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}">${ICONS.list}</button>
-  </header>`;
+  const wlb = `<button type="button" class="wlb wk-menu${open ? ' on' : ''}" data-action="wiki-list" aria-expanded="${open}" aria-label="${open ? '목록 접기' : '목록 펼치기'}" title="목록">${LIST_ICO}</button>`;
+  const nav = main
+    ? `<nav><button type="button" data-action="wiki-recent">${ni(CLOCK)}최근 변경</button></nav>`
+    : `<nav><button type="button" data-action="wiki-recent">${ni(CLOCK)}최근 변경</button><button type="button" data-action="wiki-random">${ni(SHUFFLE)}임의 문서</button></nav>`;
+  const rnd = main ? `<button type="button" class="rnd" data-action="wiki-random" title="임의 문서" aria-label="임의 문서"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00a495" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SHUFFLE}</svg></button>` : '';
+  const sr = `<label class="sr"><input class="wk-in" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="${main ? '여기에서 검색' : '문서 제목 검색'}" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button type="button" class="sg" data-action="wiki-search" data-take="wiki-q" aria-label="검색">${SRCH}</button></label>`;
+  return `<div class="top wk-top"><button type="button" class="lg wk-logo" data-action="wiki-home" aria-label="괴이위키 대문">${LOGO}괴이위키</button>${nav}${wlb}${rnd}${sr}</div>`;
 }
 
-/** 문서 머리 (나무위키 모양): 큰 제목, 오른쪽 도구 단추, 아래 분류·시각 한 줄 */
-function docHead(title: string, meta: string, tools = '', sub = ''): string {
-  const back = wiki.history.some((h) => h.view !== 'home') ? `<button class="wk-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : '';
-  return `<header class="wk-head"><div class="wk-hrow">${back}<h1 class="wk-h1">${esc(title)}</h1>${tools ? `<span class="wk-tools">${tools}</span>` : ''}</div>
-    ${sub ? `<p class="wk-sub">${esc(sub)}</p>` : ''}${meta ? `<p class="wk-meta">${meta}</p>` : ''}</header>`;
+/** 오늘의 문서: 날마다 바뀌는 저장 문서 하나 (첫 문단이 있는 것) */
+function todayDoc(ctx: ChatContext, docs: WikiDoc[]): { doc: WikiDoc; text: string } | null {
+  const list = docs.map((d) => ({ doc: d, text: docSummary(d.body, 120) })).filter((x) => x.text);
+  if (!list.length) return null;
+  const day = Math.floor((Date.now() + 9 * 3600e3) / 86400e3);
+  return list[day % list.length];
 }
-const wkBtn = (action: string, label: string, attrs = '') => `<button class="wk-btn" type="button" data-action="${action}" ${attrs}>${label}</button>`;
 
-/** 위키 메인: 검색, 지금 얽힌 문서, 이번 이야기에서 쓴 문서, 분류 */
+/** 위키 대문 (시안 WKMAIN) */
 function homeView(ctx: ChatContext): string {
-  const docs = listDocs(ctx.chat, ctx.char.globalLore);
-  const saved = new Set(docs.map((d) => d.title));
-  const c = canon(ctx);
-  const card = (title: string, sub: string) => {
-    const e = entryFor(ctx, title);
-    const url = e?.face ? imageUrl(ctx.char, e.face) : null;
-    const none = !saved.has(title);
-    return `<button class="nw-card${none ? ' none' : ''}" data-action="wiki-pick" data-value="${esc(title)}">
-      <span class="nw-card-img${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
-      <b>${esc(e?.name ?? title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</button>`;
-  };
-  // 지금 얽힌 문서: 상황판은 배경일 뿐이라, 유저가 지금 들어가 있는 곳만 본다.
-  // 상태창 마지막 칸(지금 다루는 괴이·특수·사건)과 거기 투입된 요원, 작전투입 요원, 상태창 위치
-  const live: [string, string][] = [];
-  const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
-  const target = st?.target.trim() ?? '';
-  if (worldOn(ctx.chat)) {
-    const w = readWorld(ctx.chat);
-    const kind = { an: '괴이', in: '사건', ms: '특수' } as const;
-    const here = activeEvents(w).filter((ev) => ev.name && (ev.name.trim() === target || w.an.some((a) => a.exploring && a.name === ev.name)));
-    for (const ev of here) live.push([c(ev.name), `${kind[ev.kind]} · 탐사 중`]);
-    const deploy = here.map((ev) => ev.people ?? '').join(' ');
-    for (const a of readDirectory(ctx.char.globalLore).agents) {
-      const s = w.agents[a.id]?.st;
-      const sent = deploy && (deploy.includes(a.id) || (a.name && deploy.includes(a.name)));
-      if (sent || s === '작전투입') live.push([c(a.lore || a.name), '인물 · 작전투입']);
-    }
-  } else if (target) live.push([c(target), '탐사 중']);
-  if (st?.place && entryFor(ctx, c(st.place))) live.push([c(st.place), '현재 위치']);
-  const seen = new Set<string>();
-  const liveCards = live.filter(([t]) => (seen.has(t) ? false : (seen.add(t), true))).slice(0, 8).map(([t, sub]) => card(t, sub)).join('');
+  const docs = sortedDocs(ctx);
+  const pick = (t: string) => `<button type="button" class="wl" data-action="wiki-pick" data-value="${esc(t)}">${esc(shownName(ctx, t))}</button>`;
+  const links = (list: WikiDoc[], tab: Tab) => [...list.slice(0, 9).map((d) => pick(d.title)), `<button type="button" class="wl" data-action="wiki-browse" data-value="${tab}">[전체]</button>`].join(' · ');
+  const places = docs.filter((d) => ['an', 'ms'].includes(docCat(ctx, d)));
+  const people = docs.filter((d) => docCat(ctx, d) === 'ag');
+  const today = todayDoc(ctx, docs);
+  const rows = [
+    today ? [IROW_ICO.doc, `오늘의 문서 · ${esc(shownName(ctx, today.doc.title))}`, `${esc(today.text)} <button type="button" class="wl" data-action="wiki-pick" data-value="${esc(today.doc.title)}">[더 보기]</button>`] : null,
+    places.length ? [IROW_ICO.pin, `괴담·장소 <small>${places.length}</small>`, links(places, 'an')] : null,
+    people.length ? [IROW_ICO.person, `인물 <small>${people.length}</small>`, links(people, 'ag')] : null,
+    [IROW_ICO.pen, '새 문서 요청', '찾는 문서가 없으면 <button type="button" class="wl" data-action="wiki-new">문서 작성 요청</button>을 남겨 주세요.'],
+  ].filter((r): r is string[] => !!r);
   const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
-  // 분류: 사진 몇 장 + 개수, 누르면 서랍이 그 탭으로
-  const tiles = TABS.filter(([t]) => t !== 'all' && t !== 'story')
-    .map(([t, label]) => {
-      const list = docs.filter((d) => inTab(ctx, d, t));
-      if (!list.length) return '';
-      const pics = list.map((d) => entryFor(ctx, d.title)?.face).filter((x): x is string => !!x).slice(0, 4)
-        .map((ph) => imageUrl(ctx.char, ph)).filter(Boolean)
-        .map((u) => `<img src="${esc(u!)}" alt="" loading="lazy">`).join('');
-      return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === 'an' ? CAT_ICON.an : t === 'ms' ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list.length}개</small></button>`;
-    }).join('');
-  const sec = (title: string, n: number, inner: string) => `<section class="nw-hsec"><h3>${title}${n ? `<b>${n}</b>` : ''}</h3>${inner}</section>`;
-  // 최근 변경 (대문에만): 이번 이야기에서 쓰거나 다시 쓴 문서, 새것부터
-  const recent = story.slice(0, 10).map((d) => {
-    const e = entryFor(ctx, d.title);
-    return `<li><button type="button" data-action="wiki-pick" data-value="${esc(d.title)}">${esc(e?.name ?? d.title)}</button>${d.meta?.created ? `<time>${esc(when(d.meta.created))}</time>` : ''}</li>`;
-  }).join('');
-  const side = `<aside class="wk-side"><h3>최근 변경</h3>${recent ? `<ul class="wk-recent">${recent}</ul>` : '<p class="nw-hnone">아직 바뀐 문서가 없어요.</p>'}${story.length > 10 ? `<button class="wk-more" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}</aside>`;
-  return `<div class="wk-home"><div class="wk-card nw-home">
-    ${docHead('괴이위키:대문', `문서 ${docs.length}개`)}
-    <section class="nw-hero">
-      <p class="wk-wel"><span class="nw-hero-ico">${GHOST_ICON}</span><b>괴이위키</b>에 오신 것을 환영합니다.</p>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button class="wk-btn wk-btn-go" type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
-      <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
-    </section>
-    ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
-    ${sec('분류', 0, tiles ? `<div class="nw-tiles">${tiles}</div>` : '<p class="nw-hnone">아직 문서가 없어요.</p>')}
-  </div>${side}</div>`;
+  const recent = story.slice(0, 10).map((d) => `<div class="rc">${pick(d.title)}${d.meta?.created ? `<small>${ago(d.meta.created)}</small>` : ''}</div>`).join('');
+  return `<div class="wrap"><div class="doc mainp"><div class="h1r"><h1 class="wk-h1">괴이위키:대문</h1></div><div class="dm dm0">최근 수정 시각: 오늘</div><div class="cat">분류: <button type="button" class="wl" data-action="wiki-home">괴이위키</button></div><hr class="hl">
+    <div class="intro"><h3>여러분이 기록해 나가는 <span>괴담의 나무</span></h3><p><button type="button" class="wl" data-action="wiki-home">괴이위키</button>에 오신 것을 환영합니다!</p><p class="sm2">괴이위키는 누구나 기여할 수 있는 위키입니다.<br>검증되지 않았거나 편향된 내용이 있을 수 있습니다.</p>
+      <div class="bsr"><input type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
+      <div class="hres">${wikiHomeResults(ctx)}</div></div><hr class="hl">
+    <table class="irow">${rows.map(([ic, tt, body]) => `<tr><td class="ic">${ic}</td><td><div class="tt">${tt}</div><div>${body}</div></td></tr>`).join('')}</table>
+  </div><div class="side wk-side"><div class="bx"><h5>${ni(CLOCK)}최근 변경</h5>${recent || '<p class="rc0">아직 바뀐 문서가 없어요.</p>'}${story.length > 10 ? `<button type="button" class="more" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}</div></div></div>`;
 }
 
 function paneHead(ctx: ChatContext, title: string, sub: string, right = '', e?: Entry): string {
@@ -664,40 +638,33 @@ function settingsView(ctx: ChatContext): string {
   </div>`;
 }
 
-/** 새 문서: 제목을 적고 작성 화면으로 */
-function newView(ctx: ChatContext): string {
-  return `<div class="wk-card ph-form">${docHead('새 문서', '')}
-    <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
-      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
+/** 새 문서 (시안 WKNEW) */
+function newView(): string {
+  return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">새 문서 만들기</h1><div class="dm">괴이위키</div>
+    <div class="nodoc"><label for="wk-new">문서 제목</label><input id="wk-new" class="in1" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"><p class="src">명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요.</p><div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-write" data-take="wiki-new">다음</button></div></div></div></div>`;
 }
 
-/** 작성·다시 쓰기의 지침 칸: 공용 지침은 보여 주기만, 이 문서 지침은 여기서 적는다 (칸 위 제목 글자는 뺐다, 사용자 2026-10-23) */
+/** 작성·다시 쓰기의 지침 칸: 공용 지침은 보여 주기만, 이 문서 지침은 여기서 적는다 */
 function docReqBox(shared: string): string {
-  return `<label class="nw-reqlabel"><textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc(wiki.docReq)}</textarea></label>
-      ${shared ? `<p class="nw-creq">공용 지침: ${esc(shared)}</p>` : ''}`;
+  return `<textarea class="ta" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc(wiki.docReq)}</textarea>
+      ${shared ? `<p class="crq">공용 지침: ${esc(shared)}</p>` : ''}`;
 }
 
-/** 아직 없는 문서: 원본 자료 안내와 작성 시작 하나 */
+/** 아직 없는 문서 (시안 WKNONE): 원본 자료 안내, 지침 칸, 문서 작성 */
 function compose(ctx: ChatContext): string {
   const job = jobs.get(chatKey(ctx));
   const mine = job?.title === wiki.title;
   const lore = hasBook(source(ctx), wiki.title);
-  const e = entryFor(ctx, wiki.title);
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   const src = lore
     ? '같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요.'
     : wiki.inherited.length
       ? `로어북이 없어서 「${esc(wiki.previousTitle ?? '')}」 문서의 원본 자료(${esc(wiki.inherited.join(', '))})를 이어받아 작성해요.`
       : '같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.';
-  return `<div class="wk-card ph-form">${docHead(wiki.title, e ? CAT_LABEL[e.cat] : '새 문서')}
-    <div class="ph-form-body"><section class="nw-compose">
-      ${face(ctx, e, ' lg')}
-      <p class="nw-cmsg">이 문서는 아직 없어요.</p>
-      <p class="gx-muted">${src}</p>
+  return `<div class="wrap one"><div class="doc"><h1 class="wk-h1">${esc(wiki.title)}</h1><div class="dm">새 문서</div>
+    <div class="nodoc wk-compose"><p><b>해당 문서를 찾을 수 없습니다.</b></p><p class="src">${src}</p>
       ${docReqBox(req)}
-    </section></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '작성하는 중…' : '작성 시작'}</button></div></div>`;
+      <div class="rr"><span class="sp"></span><button type="button" class="bt go" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '<i class="spin"></i>작성하는 중…' : '문서 작성'}</button></div>${mine ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ''}</div></div></div>`;
 }
 
 /** 괴이 문서의 정답 문단을 접을지: 이 채팅에서 그 괴이를 클리어했으면 처음부터 펼친다 */
@@ -707,6 +674,7 @@ function spoilerFold(ctx: ChatContext, title: string, e: Entry | undefined): boo
   return ![title, e.name, e.title].some((n) => cleared.has(n));
 }
 
+/** 문서 보기 (시안 wk·wk_rw) */
 function docView(ctx: ChatContext): string {
   const doc = findDoc(ctx.chat, wiki.title, ctx.char.globalLore);
   if (!doc) {
@@ -727,17 +695,14 @@ function docView(ctx: ChatContext): string {
     image: s.images === 'body' ? (name) => (hasAsset(ctx.char, name) ? imageUrl(ctx.char, name) : null) : undefined,
   });
   const job = jobs.get(chatKey(ctx));
-  // 상세·관련 문서: 사진이 붙은 칩, 아직 없는 문서는 흐리게
-  const links = (label: string, list: string[]) =>
+  // 상세·관련 문서: 아직 없는 문서는 빨간 글자
+  const rel = (label: string, list: string[]) =>
     list.length
-      ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list.map((t) => {
-          const le = entryFor(ctx, t);
-          return `<button class="nw-chip${saved.has(t) ? '' : ' none'}" data-action="wiki-open" data-value="${esc(t)}">${face(ctx, le, ' xs')}<span>${esc(le?.name ?? t)}</span></button>`;
-        }).join('')}</div></div>`
+      ? `<div class="rel"><b>${label}</b>${list.map((t) => `<button type="button" class="wl${saved.has(t) ? '' : ' none'}" data-action="wiki-open" data-value="${esc(t)}">${esc(entryFor(ctx, t)?.name ?? t)}</button>`).join(' · ')}</div>`
       : '';
   const m = doc.meta;
   const info = m
-    ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === 'faithful' ? '원본 충실' : '확장'} · ${({ short: '짧게', standard: '보통', detailed: '상세' } as Record<string, string>)[m.length] ?? m.length} · ${m.model === 'aux' ? '보조 모델' : '메인 모델'}</p>
+    ? `<details class="ref"><summary>참조 자료</summary><p>${m.mode === 'faithful' ? '원본 충실' : '확장'} · ${({ short: '짧게', standard: '보통', detailed: '상세' } as Record<string, string>)[m.length] ?? m.length} · ${m.model === 'aux' ? '보조 모델' : '메인 모델'}</p>
        ${m.sources.length ? `<p>${esc(m.sources.join(', '))}</p>` : ''}${m.writingRequest ? `<p>공용 지침: ${esc(m.writingRequest)}</p>` : ''}${m.docRequest ? `<p>이 문서 지침: ${esc(m.docRequest)}</p>` : ''}</details>`
     : '';
   const confirm = wiki.confirmDelete === doc.title;
@@ -745,36 +710,57 @@ function docView(ctx: ChatContext): string {
   const hasBase = baseDocs(ctx.char.globalLore).some((d) => d.title === doc.title);
   const del = doc.base
     ? ''
-    : confirm
-      ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">${hasBase ? '되돌리기' : '정말 삭제'}</button>`
-      : wkBtn('wiki-delete', `${ICONS.trash}${hasBase ? '되돌리기' : '삭제'}`, `data-value="${esc(doc.title)}"`);
+    : `<button type="button" class="${confirm ? 'danger' : ''}" data-action="wiki-delete" data-value="${esc(doc.title)}">${confirm ? (hasBase ? '정말 되돌리기' : '정말 삭제') : hasBase ? '↺ 되돌리기' : '🗑 삭제'}</button>`;
   const open = wiki.rewrite === doc.title;
-  const right = `${wkBtn('wiki-rewrite', `${ICONS.pen}${job?.title === doc.title ? '작성하는 중' : '다시 쓰기'}`, `data-value="${esc(doc.title)}" ${open ? 'aria-pressed="true"' : ''} ${job ? 'disabled' : ''}`)}${del}`;
+  const busy = job?.title === doc.title;
+  const tools = `<div class="dbtn"><button type="button" class="${open ? 'on' : ''}" data-action="wiki-rewrite" data-value="${esc(doc.title)}" aria-pressed="${open}" ${job ? 'disabled' : ''}>${busy ? '✎ 작성하는 중' : '✎ 다시 쓰기'}</button>${del}</div>`;
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   const rewrite = open
-    ? `<section class="nw-rewrite">${docReqBox(req)}
-        <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${([['1', 'ON'], ['0', 'OFF']] as const).map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? '1' : '0') === v ? ' on' : ''}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>
-        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${job?.title === doc.title ? '작성하는 중…' : '다시 쓰기'}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>`
+    ? `<div class="rwbox wk-rewrite"><b>다시 쓰기</b>${docReqBox(req)}
+        <div class="rr"><span>이전 문서 참고</span><span class="sg2">${([['1', 'ON'], ['0', 'OFF']] as const).map(([v, l]) => `<button type="button" class="${(wiki.rewritePrev ? '1' : '0') === v ? 'on' : ''}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? '1' : '0') === v}">${l}</button>`).join('')}</span><span class="sp"></span><button type="button" class="bt go" data-action="wiki-rw-go" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${busy ? '<i class="spin"></i>작성하는 중…' : '다시 쓰기'}</button><button type="button" class="bt" data-action="wiki-rw-cancel">취소</button></div>${busy ? '<p class="bz nw-busy" role="status">창을 닫아도 계속 작성돼요.</p>' : ''}</div>`
     : '';
-  const sub = [e ? CAT_LABEL[e.cat] : '', doc.base ? '기본 문서' : m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
-  return `<div class="wk-card nw-pane">${docHead(doc.title, esc(sub), right, e && e.sub && e.cat !== 'lm' ? e.sub : '')}
-    <article class="nw-doc">
-      ${rewrite}
-      <div class="nw-body">${r.html}</div>
-      ${links('상세 문서', r.related)}${links('관련 문서', r.recent)}${info}
-    </article></div>`;
+  const dm = [doc.base ? '' : m?.created ? `최근 수정 시각: ${dayOf(m.created)}` : '', `분류: ${catName(ctx, doc)}`, e && e.sub && e.cat !== 'lm' ? e.sub : ''].filter(Boolean).join(' · ');
+  return `<div class="wrap one"><div class="doc wk-docp"><div class="h1r wk-head"><h1 class="wk-h1">${esc(doc.title)}</h1>${tools}</div><div class="dm">${esc(dm)}</div>
+    ${rewrite}<article class="nw-doc"><div class="nw-body">${r.html}</div></article>
+    ${rel('상세 문서', r.related)}${rel('관련 문서', r.recent)}${info}</div></div>`;
 }
 
-/** 검색: 딱 맞는 문서가 없을 때. 걸린 문서·명부·비슷한 문서, 없으면 작성하기 */
+/** 검색 결과 (시안 WKSEARCH): 딱 맞는 문서가 없을 때. 걸린 문서·명부·비슷한 문서, 맨 위에 새 문서 만들기 */
 function findView(ctx: ChatContext): string {
-  return `<div class="wk-card wk-find">${docHead('검색', wiki.query ? `「${esc(wiki.query)}」` : '')}<div class="wk-res">${wikiList(ctx, wiki.query)}</div></div>`;
+  const q = wiki.query.trim();
+  const docs = sortedDocs(ctx);
+  const saved = new Set(docs.map((d) => d.title));
+  const lower = q.toLowerCase();
+  const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
+  // 같은 문서로 이어지는 명부 항목(거점 「관리국」·조직 「관리국」)은 하나만
+  const hits = matches(ctx, q).filter((e, i, all) => !saved.has(e.title) && all.findIndex((x) => x.title === e.title) === i);
+  const shown = new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
+  const near = similar(q, [...docs.map((d) => d.title), ...entries(ctx).map((e) => e.title)]).filter((t) => !shown.has(t));
+  const item = (title: string, cat: string, text: string, none: boolean) =>
+    `<li><button type="button" class="wl t${none ? ' none' : ''}" data-action="wiki-pick" data-value="${esc(title)}">${esc(shownName(ctx, title))}</button><small>${esc(cat)}</small>${text ? `<p>${esc(text)}</p>` : ''}</li>`;
+  const ofDoc = (d: WikiDoc) => item(d.title, catName(ctx, d), docSummary(d.body, 90), false);
+  const ofEntry = (e: Entry) => item(e.title, CAT_LABEL[entryFor(ctx, e.title)?.cat ?? e.cat], [e.sub, '아직 없는 문서'].filter(Boolean).join(' · '), true);
+  const list = [
+    ...mine.map(ofDoc),
+    ...hits.map(ofEntry),
+    ...near.map((t) => {
+      const d = docs.find((x) => x.title === t);
+      if (d) return ofDoc(d);
+      const e = entries(ctx).find((x) => x.title === t);
+      return e ? ofEntry(e) : '';
+    }),
+  ].filter(Boolean);
+  const exact = saved.has(canon(ctx)(q));
+  const go1 = exact ? '' : `<div class="go1 wk-nohit">→ <button type="button" class="wl" data-action="wiki-write" data-value="${esc(q)}"><b>${esc(q)}</b></button> 문서가 없어요. <button type="button" class="wl new" data-action="wiki-write" data-value="${esc(q)}">이 제목으로 새 문서 만들기</button></div>`;
+  return `<div class="wrap one"><div class="doc wk-find"><h1 class="wk-h1">"${esc(q)}" 검색 결과</h1><div class="dm">문서 ${list.length}개</div>
+    ${go1}${list.length ? `<ul class="sres">${list.join('')}</ul>` : ''}</div></div>`;
 }
 
 function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'doc') return docView(ctx);
   if (wiki.view === 'compose') return compose(ctx);
-  if (wiki.view === 'settings') return settingsView(ctx);
-  if (wiki.view === 'new') return newView(ctx);
+  if (wiki.view === 'settings') return `<div class="wrap one"><div class="doc">${settingsView(ctx)}</div></div>`;
+  if (wiki.view === 'new') return newView();
   if (wiki.view === 'find') return findView(ctx);
   return homeView(ctx);
 }
@@ -787,20 +773,22 @@ export function wikiTab(ctx: ChatContext, env?: WikiEnv): string {
   const note = toast('nw', wiki.info, (t) => {
     if (wiki.info === t) wiki.info = '';
   });
-  const status = `${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}`;
+  const job = jobs.get(chatKey(ctx));
+  // 작성 화면·다시 쓰기 칸에서는 단추가 작성 중을 보여 주므로, 다른 화면에서만 한 줄로
+  const showBusy = job && !(wiki.title === job.title && (wiki.view === 'compose' || (wiki.view === 'doc' && wiki.rewrite === job.title)));
+  const status = `${showBusy ? busyLine(ctx) : ''}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}`;
   const open = wiki.listOpen;
-  // 나무위키 모양 (2026-11-08): 위 머리줄(로고·검색·☰), 본문 카드, 목록 서랍은 설정한 쪽(기본 오른쪽)에서. 폰은 오른쪽 아래 「목록」 책갈피
-  return `<main class="gx-body ph-app nw nw-app wk${open ? ' list-open' : ''}">
-    ${topBar(ctx)}
-    <div class="wk-stage">
-      <aside class="nw-panel" aria-label="위키 목록"${open ? '' : ' inert'}><div class="nw-pin">
-        <div class="ph-content nw-list">${wikiList(ctx, '')}</div>
-        ${fail}
-      </div></aside>
-      <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-      <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
-      <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
-    </div>
+  const main = wiki.view === 'home';
+  // 목록 서랍 (시안 wk_list): 머리줄 아래 설정한 쪽(기본 오른쪽)에서. 폰은 오른쪽 아래 「목록」 책갈피
+  const drawer = `<aside class="wdr${open ? ' open' : ''}" aria-label="위키 목록"${open ? '' : ' inert'}>
+      <label class="wsr">${SRCH}<input type="search" name="wiki-filter" data-input="wiki-filter" placeholder="이름·제목 검색" value="${esc(wiki.filter)}" aria-label="이름·제목 검색" autocomplete="off"></label>
+      <div class="wlist">${wikiList(ctx)}</div>${fail}</aside>`;
+  const grab = `<button type="button" class="wgrab" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">‹<span>목록</span></button>`;
+  const scrim = open ? '<button type="button" class="wscrim" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>' : '';
+  return `<main class="gx-body wk hasdr${main ? ' nm' : ''}${open ? ' dr-open' : ''}">
+    ${topBar(main)}
+    <div class="wsc">${status ? `<div class="wst nw-status">${status}</div>` : ''}${paneHtml(ctx)}</div>
+    ${grab}${drawer}${scrim}
     ${note}
   </main>`;
 }
@@ -871,12 +859,12 @@ export function bindFootnotes(root: HTMLElement): void {
     li.classList.add('hit');
   });
   doc.addEventListener('scroll', () => !hover && hide(), { passive: true });
-  doc.closest('.nw-main')?.addEventListener('scroll', () => !hover && hide(), { passive: true });
+  doc.closest('.wsc')?.addEventListener('scroll', () => !hover && hide(), { passive: true });
 }
 
 export function bindWikiSide(root: HTMLElement, act: (value: string) => void): void {
   const bar = root.querySelector<HTMLElement>('.nw-rail');
-  const panel = root.querySelector<HTMLElement>('.nw-panel');
+  const panel = root.querySelector<HTMLElement>('.wk .wdr');
   if (!panel) return;
   let x0: number | null = null;
   let dragged = false;
@@ -915,7 +903,7 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     }
     const k = t.closest<HTMLElement>('.nw-kgrid [data-k]')?.dataset.k;
     if (k) {
-      const box = panel.querySelector<HTMLElement>('.nw-groups');
+      const box = panel.querySelector<HTMLElement>('.wls');
       const sec = box?.querySelector<HTMLElement>(`[data-ksec="${k}"]`);
       if (box && sec) box.scrollTop = sec.offsetTop;
       grid.hidden = true;
@@ -936,7 +924,7 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
   }, { passive: true });
   // 모바일 책갈피를 안쪽으로 끌어도 열린다 (오른쪽 책갈피는 왼쪽으로, 왼쪽 책갈피는 오른쪽으로)
-  const edge = root.querySelector<HTMLElement>('.nw-edge');
+  const edge = root.querySelector<HTMLElement>('.wk .wgrab');
   let e0: number | null = null;
   edge?.addEventListener('touchstart', (e) => (e0 = e.touches[0]?.clientX ?? null), { passive: true });
   edge?.addEventListener('touchend', (e) => {
@@ -981,6 +969,21 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.listOpen = v === 'open' ? true : v === 'close' ? false : !wiki.listOpen;
       env.render();
       return true;
+    case 'wiki-recent':
+      // 최근 변경은 대문 오른쪽 칸에 있다
+      go('home', '', '');
+      wiki.history = [];
+      wiki.listOpen = false;
+      break;
+    case 'wiki-random': {
+      const docs = listDocs(ctx.chat, ctx.char.globalLore);
+      if (!docs.length) break;
+      const d = docs[Math.floor(Math.random() * docs.length)];
+      wiki.history = [];
+      go('doc', d.title, '');
+      wiki.listOpen = false;
+      break;
+    }
     case 'wiki-find':
       // 검색칸에 바로 커서
       wiki.listOpen = false;
@@ -992,7 +995,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       break;
     case 'wiki-browse':
       // 메인의 분류 칸: 서랍을 그 탭으로 연다
-      Object.assign(wiki, { tab: (TABS.some(([t]) => t === v) ? v : 'all') as Tab, listOpen: true, query: '' });
+      Object.assign(wiki, { tab: (TABS.some(([t]) => t === v) ? v : 'all') as Tab, listOpen: true, query: '', filter: '' });
       break;
     case 'wiki-search': {
       wiki.homeQuery = '';
@@ -1106,6 +1109,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
 export function wikiInput(name: string, value: string): boolean {
   if (name === 'wiki-new') return void (wiki.newTitle = value), true;
   if (name === 'wiki-docreq') return void (wiki.docReq = value), true;
+  if (name === 'wiki-filter') return void (wiki.filter = value), true;
   return false;
 }
 

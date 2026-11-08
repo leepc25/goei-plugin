@@ -476,7 +476,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
         break;
       }
       case 'Toc':
-        if (headings.length) out.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}">${h.id}. ${inline(h.title)}</a>`).join('')}</nav>`);
+        if (headings.length) out.push(`<nav class="nw-toc"><b>목차</b>${headings.map((h) => `<a class="l${h.level}" data-action="wiki-jump" data-value="nw-h-${h.id}"><span class="no">${h.id}.</span> ${inline(h.title)}</a>`).join('')}</nav>`);
         break;
       case 'Heading': {
         const h = headings[hi++];

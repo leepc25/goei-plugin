@@ -353,8 +353,14 @@ if (want('G3')) {
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_auto_dm === '0');
   assert.equal(await page.locator('[data-change="gn-keep"]').count(), 0, '끄면 상한 칸이 사라진다');
   // 설정: 수량·사생활·다양성·주제가 요청문에 들어간다
-  // 게시글 수 최소·최대 (−/+): 최대 7→9, 최소 5→7
-  for (const k of ['post_max:+', 'post_max:+', 'post_min:+', 'post_min:+']) await page.click(`[data-action="gn-step"][data-value="${k}"]`);
+  // 게시글 수 최소·최대 (직접 입력): 최소 12 → 최대도 12, 최대 30 → 범위 끝 20, 최소 7
+  const setCount = async (key, val) => { await page.fill(`[data-change="gn-count"][data-key="${key}"]`, val); await page.dispatchEvent(`[data-change="gn-count"][data-key="${key}"]`, 'change'); };
+  await setCount('post_min', '12');
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '12' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '12');
+  await setCount('post_max', '30');
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '20');
+  await setCount('post_min', '7');
+  await setCount('post_max', '9');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '7' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '9');
   await page.click('[data-action="gn-cfg"][data-value="sampling=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.sampling'] === '1');
@@ -911,15 +917,15 @@ if (want('W1')) {
   await startedWithReply(page);
   await open(page);
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
+  await page.waitForSelector('.wk .mainp');
   assert.ok((await page.textContent('.wk-side')).includes('아직 바뀐 문서가 없어요'));
   await page.click('.wk-menu');
-  assert.ok((await page.textContent('.nw-list')).includes('아직 작성한 문서가 없어요'), '팩 없음 → 목록 비어 있음');
+  assert.ok((await page.textContent('.wk .wlist')).includes('아직 작성한 문서가 없어요'), '팩 없음 → 목록 비어 있음');
   // 검색: 명부 항목이면 작성 화면
   await page.fill('.wk-in', '소라 랜드');
   await page.press('.wk-in', 'Enter');
-  await page.waitForSelector('.nw-compose');
-  assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
+  await page.waitForSelector('.wk-compose');
+  assert.ok((await page.textContent('.wk-compose')).includes('같은 이름의 로어북이 있어요'));
   // 설정: 원본 충실·짧게·보조·이전 문서 참고 OFF·채팅 반영 ON·공용 지침
   await featSet(page, 'set:wiki');
   await page.click('.gw [data-action="wiki-mode"][data-value="faithful"]');
@@ -936,7 +942,7 @@ if (want('W1')) {
   await featSet(page, 'set:wiki');
   await page.fill('.wk-in', '소라 랜드');
   await page.press('.wk-in', 'Enter');
-  await page.waitForSelector('.nw-compose');
+  await page.waitForSelector('.wk-compose');
   await page.fill('[data-input="wiki-docreq"]', '출구를 자세히');
   // 실패: 닫는 태그 없음 → 안내 + 원문, 재시도 1회
   await llm(page, [ok('<lightboard-namuwiki doc_title="소라 랜드">[Paragraph]끊김'), ok('그냥 글')]);
@@ -962,11 +968,11 @@ if (want('W1')) {
   await featSet(page, 'set:wiki');
   await page.fill('.wk-in', '소라 랜드');
   await page.press('.wk-in', 'Enter');
-  await page.waitForSelector('.nw-compose');
+  await page.waitForSelector('.wk-compose');
   const evil = '<img src=x onerror="window.__xss=1">';
   await llm(page, [ok(article('소라 랜드', `관람차 ${evil} {{user}} 가 본다. ❗강조❗ ➡️${evil}➡️`, ' main_color="url(javascript:1)"'))]);
   await page.click('[data-action="wiki-start"]');
-  await page.waitForSelector('.nw-pane .wk-head', { timeout: 8000 });
+  await page.waitForSelector('.wk-docp .wk-head', { timeout: 8000 });
   assert.equal(await page.evaluate(() => window.__xss), undefined, '문서 본문 escape');
   assert.ok((await page.textContent('.nw-body')).includes('<img src=x'));
   assert.ok(!(await page.innerHTML('.nw-body')).includes('javascript:'), 'main_color 검사');
@@ -988,19 +994,19 @@ if (want('W1')) {
   assert.ok(await page.locator('.nw-body details.nw-spoil:not([open]) .nw-link[data-value="없는 문서"]').count(), '정답 문단 접기');
   await page.click('.nw-body details.nw-spoil:has(.nw-link[data-value="없는 문서"]) > summary');
   await page.click('.nw-body .nw-link[data-value="없는 문서"]');
-  await page.waitForSelector('.nw-compose');
-  assert.ok((await page.textContent('.nw-compose')).includes('이어받아 작성해요') || (await page.textContent('.nw-compose')).includes('로어북이 없어요'));
-  await page.click('[data-action="wiki-back"]');
-  await page.waitForSelector('.nw-pane .wk-head');
-  assert.equal((await page.textContent('.nw-pane .wk-h1')).trim(), '소라 랜드');
+  await page.waitForSelector('.wk-compose');
+  assert.ok((await page.textContent('.wk-compose')).includes('이어받아 작성해요') || (await page.textContent('.wk-compose')).includes('로어북이 없어요'));
+  await page.click('.br [data-action="br-back"]');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal((await page.textContent('.wk-docp .wk-h1')).trim(), '소라 랜드');
   // 다시 쓰기: 이전 문서 참고 ON → [이전 위키], OFF → 없음
-  await page.click('.nw-pane .wk-head [data-action="wiki-rewrite"]');
-  await page.waitForSelector('.nw-rewrite');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
+  await page.waitForSelector('.wk-rewrite');
   await llm(page, [ok(article('소라 랜드', '다시 쓴 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('다시 쓴 본문'), null, { timeout: 8000 });
   assert.ok((await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content)).includes('[이전 위키'), '이전 문서 참고 ON');
-  await page.click('.nw-pane .wk-head [data-action="wiki-rewrite"]');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
   await page.click('[data-action="wiki-rw-prev"][data-value="0"]');
   await llm(page, [ok(article('소라 랜드', '세 번째 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
@@ -1013,16 +1019,16 @@ if (want('W1')) {
   });
   await page.fill('.wk-in', '느림');
   await page.press('.wk-in', 'Enter');
-  await page.waitForSelector('.nw-nohit');
-  await page.click('.nw-nohit [data-action="wiki-write"]');
-  await page.waitForSelector('.nw-compose');
+  await page.waitForSelector('.wk-nohit');
+  await page.click('.wk-nohit [data-action="wiki-write"]');
+  await page.waitForSelector('.wk-compose');
   const n1 = await llmCount(page);
   await page.click('[data-action="wiki-start"]');
   await page.waitForSelector('.nw-busy');
   await page.fill('.wk-in', '둘째');
   await page.press('.wk-in', 'Enter');
-  await page.click('.nw-nohit [data-action="wiki-write"]');
-  await page.waitForSelector('.nw-compose');
+  await page.click('.wk-nohit [data-action="wiki-write"]');
+  await page.waitForSelector('.wk-compose');
   assert.ok(await page.isDisabled('[data-action="wiki-start"]'), '생성 중엔 작성 시작이 잠긴다');
   await page.waitForFunction(() => !document.querySelector('.nw-busy'), null, { timeout: 8000 });
   assert.equal(await llmCount(page), n1 + 1);
@@ -1038,36 +1044,35 @@ if (want('W2')) {
   await startedWithReply(page);
   await open(page);
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
-  assert.ok((await page.textContent('.nw-home .wk-meta')).includes('문서 2개'));
+  await page.waitForSelector('.wk .mainp');
   await page.click('.wk-menu');
-  await page.waitForSelector('.nw-tabs');
-  assert.equal(await page.locator('.nw-list .ph-row').count(), 2, '기본 문서 2개가 목록에');
-  await page.click('.nw-list [data-action="wiki-pick"][data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-pane .wk-head');
+  await page.waitForSelector('.wk .wtabs');
+  assert.equal(await page.locator('.wk .wlist .it').count(), 2, '기본 문서 2개가 목록에');
+  await page.click('.wk .wlist [data-action="wiki-pick"][data-value="소라 랜드"]');
+  await page.waitForSelector('.wk-docp .wk-head');
   assert.equal(await llmCount(page), 0, '기본 문서는 생성하지 않음');
   assert.ok((await page.textContent('.nw-body')).includes('기본 문서 본문'));
   assert.equal(await page.locator('.nw-spoil:not(.fn)').count(), 1, '괴이 문서의 정답 문단은 접힘');
   assert.equal(await page.locator('.nw-notes .nw-spoil.fn').count(), 1, '접은 문단 속 각주는 각주 목록에서도 가림');
-  assert.equal(await page.locator('.nw-pane .wk-head [data-action="wiki-delete"]').count(), 0, '기본 문서는 지울 수 없음');
+  assert.equal(await page.locator('.wk-docp .wk-head [data-action="wiki-delete"]').count(), 0, '기본 문서는 지울 수 없음');
   // 덮어쓰기(다시 쓰기) → 채팅 문서가 이김 → 지우면 「되돌리기」 → 기본 문서로
-  await page.click('.nw-pane .wk-head [data-action="wiki-rewrite"]');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
   await llm(page, [ok(article('소라 랜드', '채팅에서 새로 쓴 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('채팅에서 새로 쓴 본문'), null, { timeout: 8000 });
-  assert.ok((await page.textContent('.nw-list')).includes('소라 랜드'));
-  await page.click('.nw-pane .wk-head [data-action="wiki-delete"]');
-  assert.equal((await page.textContent('.nw-pane .wk-head .gx-mini.danger')).trim(), '되돌리기');
-  await page.click('.nw-pane .wk-head .gx-mini.danger');
+  assert.ok((await page.textContent('.wk .wlist')).includes('소라 랜드'));
+  await page.click('.wk-docp .wk-head [data-action="wiki-delete"]');
+  assert.equal((await page.textContent('.wk-docp .wk-head .dbtn .danger')).trim(), '정말 되돌리기');
+  await page.click('.wk-docp .wk-head .dbtn .danger');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('기본 문서 본문'), null, { timeout: 4000 });
   // 검색: 비슷한 제목 제안 (띄어쓰기 다름)
   await page.fill('.wk-in', '소라랜드');
   await page.press('.wk-in', 'Enter');
   await page.waitForSelector('.wk-find');
-  assert.ok((await page.textContent('.wk-find')).includes('비슷한 문서'), '띄어쓰기 다른 제목은 비슷한 문서로 제안');
+  assert.equal(await page.locator('.wk-find .sres [data-value="소라 랜드"]').count(), 1, '띄어쓰기 다른 제목은 비슷한 문서로 제안');
   await page.click('.wk-find [data-action="wiki-pick"][data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-pane .wk-head');
-  assert.equal((await page.textContent('.nw-pane .wk-h1')).trim(), '소라 랜드');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal((await page.textContent('.wk-docp .wk-h1')).trim(), '소라 랜드');
   // 상태창의 위키 이름을 누르면 창이 그 문서로 (setWikiOpener)
   await page.click('[data-action="close"]').catch(() => {});
   const rendered = await page.evaluate(() => window.__calls.handlers.display('[▣|2025.01.01|03:00 AM|☀️|4°C|소라 랜드 정문|기본만]'));
@@ -1085,12 +1090,12 @@ if (want('W3')) {
   // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
   await page.tap('.gx-cgrip');
   await page.tap('.gx-cdr.open .gx-cpanel [data-value="wk"]');
-  await page.waitForSelector('.nw-home');
-  await page.tap('.nw-edge');
-  await page.waitForSelector('.nw-app.list-open');
-  await page.tap('.nw-list [data-action="wiki-pick"][data-value="기본만"]');
-  await page.waitForSelector('.nw-pane .wk-head');
-  assert.equal(await page.locator('.nw-app.list-open').count(), 0, '고르면 목록이 접힘');
+  await page.waitForSelector('.wk .mainp');
+  await page.tap('.wk .wgrab');
+  await page.waitForSelector('.wk.dr-open');
+  await page.tap('.wk .wlist [data-action="wiki-pick"][data-value="기본만"]');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal(await page.locator('.wk.dr-open').count(), 0, '고르면 목록이 접힘');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   await page.tap('.nw-body .nw-link').catch(() => {});
   assert.deepEqual(errors, []);
@@ -1394,7 +1399,7 @@ if (want('PP2')) {
   await open(page);
   // 2026-10-29: 인물 기록 화면은 위키가 아니라 왼쪽 메뉴 「기록」 › 인물 (위키 홈에 타일 없음)
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
+  await page.waitForSelector('.wk .mainp');
   assert.equal(await page.locator('.nw-tile.k-pp').count(), 0, '위키 홈에 인물 타일 없음');
   await nav(page, 'records');
   await page.click('[data-action="rec-sub"][data-value="people"]');
