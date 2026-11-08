@@ -3431,6 +3431,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 팔 것 고르기 머리 줄 */
 .sh-shelf.sh-pick { min-height: inherit; } /* 판매로 바꿔도 창 높이 그대로: 소지품 상자가 그 높이를 채움 */
 .sh-pick > .sh-mine { flex: 1 1 auto; }
+/* 상점 팔기 PC (2026-11-08 사용자): [아바타(세로, 2줄 높이) | 첫 줄 장착 6칸 / 아래로 소지품]. 아바타 아래 칸들은 첫 열(128)에서도 같은 칸 크기 */
+.sh-sellgrid { display: grid; grid-template-columns: 128px repeat(auto-fill, var(--shc)); grid-auto-rows: auto; gap: 8px; align-items: start; }
+.sh-sellgrid > .it-av { grid-column: 1; grid-row: 1 / span 2; width: 128px; height: 256px; align-self: start; }
+.sh-body .sh-sellgrid > .sh-eqrow { grid-column: 2 / -1; grid-row: 1; padding: 0; border: 0; border-radius: 0; background: none; }
+.sh-sellgrid > .sh-eqrow .it-eqslots { --slot: var(--shc); grid-template-columns: repeat(6, var(--slot)); }
+.sh-sellgrid > .it-c { width: var(--shc); justify-self: center; }
+.sh-sellgrid > .sh-sell-empty { grid-column: 2 / -1; margin: 0; }
 .sh-pick-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-size: 13.5px; color: var(--sub); }
 .sh-pick-head .gx-chip { min-height: 28px; font-size: 12.5px; }
 /* 진열대 설명창: 칸 안에서 열어 창 밖으로 안 나가게 — 왼쪽 3칸은 오른쪽으로, 오른쪽 3칸은 왼쪽으로 펼친다 (가로 스크롤 방지, 2026-11-07 사용자) */
