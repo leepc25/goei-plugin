@@ -10,3 +10,8 @@ bgm-4  "Chaos Factory" (medium loop) — Mega Pixel Music Lab — CC-BY 4.0 — 
 hit-u*  맨손: "Punch, slap n kick" — CGEffex (freesound 98341), adapted — CC-BY 3.0 — https://opengameart.org/content/punch-slap-n-kick
 hit-u3-5, hit-b1-*, hit-guard-0: "Punches, hits, swords and squishes" — Socapex (tarfmagougou), CC-BY 3.0 sources listed in the pack — https://opengameart.org/content/punches-hits-swords-and-squishes
 hit-b2-*, hit-b3-*, hit-guard-1,2: "Fleshy Fight Sounds" — will_leamon — OGA-BY 3.0 — https://opengameart.org/content/fleshy-fight-sounds
+
+움직임 소리
+mv-cloth-*  "Cloth swing sounds" — Vinrax — CC-BY 3.0 — https://opengameart.org/content/cloth-swing-sounds (한 파일을 9개로 잘랐음)
+mv-swing-0,1  "3 Melee sounds" — remaxim — CC0 — https://opengameart.org/content/3-melee-sounds
+mv-swing-2, mv-jump-0, mv-land-0, mv-dash-0  "12 Player Movement SFX" — leohpaz — CC-BY 4.0 — https://opengameart.org/content/12-player-movement-sfx

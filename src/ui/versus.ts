@@ -32,7 +32,7 @@ export function versusGroup(seg: (action: string, cur: string, items: [string, s
   rows.push(row('대전 데이터', `<span class="upd-ver">${esc(st)}</span>${s && s.state !== 'ready' ? btn('vs-get', busy ? vsUi.progress || '받는 중…' : `${s.state === 'partial' ? '이어 받기' : '받기'} (${mb(s.bytes)})`, true) : ''}`,
     '대전 코드·이펙트·인물 얼굴판과 인물 126명(이름 있는 인물 55명, NPC 71명)의 전투 동작이에요. 한 번 받으면 이 기기에 저장돼요. 다 받아야 대전을 열 수 있어요.'));
   // 출처 (CC-BY-SA 4.0 은 출처를 보이게 적어야 한다): game-pack/vs-voice/LICENSE.txt
-  rows.push(row('출처', '', '아나운서 목소리: MR. HAPPY · DRAGON (VoiceBosch, SoundBiter SFX library), CC-BY-SA 4.0. 배경음악: Final Punch (maxstack, CC-BY-SA 3.0), To the Wire (congusbongus, CC-BY 4.0), Electric Theme (Spring Spring, CC-BY 4.0), Chaos Factory (Mega Pixel Music Lab, CC-BY 4.0). 타격음: CGEffex (CC-BY 3.0), Socapex (CC-BY 3.0), will_leamon (OGA-BY 3.0). 모두 OpenGameArt.org. 처리한 소리도 원래 조건 그대로예요.'));
+  rows.push(row('출처', '', '아나운서 목소리: MR. HAPPY · DRAGON (VoiceBosch, SoundBiter SFX library), CC-BY-SA 4.0. 배경음악: Final Punch (maxstack, CC-BY-SA 3.0), To the Wire (congusbongus, CC-BY 4.0), Electric Theme (Spring Spring, CC-BY 4.0), Chaos Factory (Mega Pixel Music Lab, CC-BY 4.0). 타격음: CGEffex (CC-BY 3.0), Socapex (CC-BY 3.0), will_leamon (OGA-BY 3.0). 움직임 소리: Vinrax (CC-BY 3.0), remaxim (CC0), leohpaz (CC-BY 4.0). 모두 OpenGameArt.org. 처리한 소리도 원래 조건 그대로예요.'));
   if (vsUi.err) rows.push(`<div class="gx-err" role="alert">${esc(vsUi.err)}</div>`);
   return `<section class="ps-group"><h3>대전</h3><div class="ps-rows">${rows.join('')}</div></section>`;
 }

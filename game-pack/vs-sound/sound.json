@@ -51,5 +51,30 @@
   "bgm-2.ogg",
   "bgm-3.ogg",
   "bgm-4.ogg"
+ ],
+ "cloth": [
+  "mv-cloth-0.ogg",
+  "mv-cloth-1.ogg",
+  "mv-cloth-2.ogg",
+  "mv-cloth-3.ogg",
+  "mv-cloth-4.ogg",
+  "mv-cloth-5.ogg",
+  "mv-cloth-6.ogg",
+  "mv-cloth-7.ogg",
+  "mv-cloth-8.ogg"
+ ],
+ "swing": [
+  "mv-swing-0.ogg",
+  "mv-swing-1.ogg",
+  "mv-swing-2.ogg"
+ ],
+ "jump": [
+  "mv-jump-0.ogg"
+ ],
+ "land": [
+  "mv-land-0.ogg"
+ ],
+ "dash": [
+  "mv-dash-0.ogg"
  ]
 }

@@ -3,7 +3,7 @@
 // 파일은 대전 공용 팩(vs-common)의 sound.json 목록 (game-pack/vs-sound, 출처는 LICENSE.txt). 소리 크기는 게임 음량을 따른다
 import { commonUrl } from '../action/art/charPacks';
 
-type Group = 'u1' | 'u2' | 'u3' | 'b1' | 'b2' | 'b3' | 'guard';
+type Group = 'u1' | 'u2' | 'u3' | 'b1' | 'b2' | 'b3' | 'guard' | 'cloth' | 'swing' | 'jump' | 'land' | 'dash';
 interface Manifest { bgm: string[]; [g: string]: string[] }
 
 /** 기본 공격에 칼을 휘두르는 캐릭터 (11-08, 사용자 확인 전 초안: 칼만 던지거나 기술에서만 쓰는 캐릭터는 맨손) */
@@ -84,6 +84,11 @@ export function vsEventSound(e: { type: string; strength?: number; kind?: string
     return true;
   }
   if (e.type === 'guard') { playGroup('guard', e.pan ?? 0, 0.8); return true; }
+  // 움직임 (11-08 사용자: 옷자락 휘날림·점프·착지·대시)
+  if (e.type === 'jump') { playGroup('jump', e.pan ?? 0, 0.7); playGroup('cloth', e.pan ?? 0, 0.55); return true; }
+  if (e.type === 'land') { playGroup('land', e.pan ?? 0, 0.7); return true; }
+  if (e.type === 'evade') { playGroup('dash', e.pan ?? 0, 0.7); playGroup('cloth', e.pan ?? 0, 0.6); return true; }
+  if (e.type === 'whiff') { playGroup((e.strength ?? 1) >= 3 ? 'swing' : 'cloth', e.pan ?? 0, 0.75); return true; }
   return false;
 }
 
