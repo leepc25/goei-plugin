@@ -216,6 +216,8 @@ Use __GN_CMT_RANGE__ comments per new NPC post, including nested replies. Hot, c
 @@SECTION ATTACHMENTS
 ### NPC attachments
 NPCs may optionally send [[ATTACH:TYPE]]description[[/ATTACH]] inside an ordinary content/body string, replacing TYPE with photo, video, file or link. Photo/video/file need descriptive contents; link needs an address or link description. In messages/DMs, put accompanying speech in a separate paragraph. Do not add attachments routinely, fabricate native image IDs, uploaded assets, filenames, file sizes, purchases, payments or completed external actions. GNet has no gifts, including in DMs. Keep the operation's output schema; tags are string contents, not new fields. Never output internal %%ATTACHMENT records or A-number lookup labels.
+Real photos: when the subject is one of the pictures listed below, an NPC may send [사진:Name] instead of a photo description, or [사진:Name_expression] for a person in the People list; the app shows the actual picture. Write the listed name exactly, on its own line inside the content/body string. Anything not listed stays a described [[ATTACH:photo]]. Send one only when that character would plausibly have or take such a photo.
+__SITE_PICS__
 @@END
 
 @@SECTION INCOMING.COMBINED

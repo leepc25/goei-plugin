@@ -1,5 +1,6 @@
 // 카드에 들어 있는 이미지(지도 map01~map18)를 플러그인 창에서 쓸 수 있는 blob URL로 바꾼다.
 // 캐릭터 에셋은 char.additionalAssets = [이름, 저장 경로, 확장자]. 한 번 읽은 것은 캐릭터별로 기억한다.
+import { setAssetCheck } from '../core/sitepics';
 import type { CharacterSnapshot } from './risu';
 
 const MIME: Record<string, string> = { avif: 'image/avif', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
@@ -201,3 +202,6 @@ export function assetUrl(char: CharacterSnapshot, name: string): Promise<string 
   }
   return hit;
 }
+
+// 에셋 사진 보내기(core/sitepics): 목록에 그림이 있는 것만 넣게
+setAssetCheck(hasAsset);

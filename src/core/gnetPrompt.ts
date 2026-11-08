@@ -1,6 +1,7 @@
 // 괴담넷 요청문 만들기 (원본 RC.gnetPrompt + LB makeIntro/makeOutro).
 // 지침 문장은 카드의 GNet 로어북 섹션(옛 카드는 LB Backend도)을 그대로 읽고, CBS는 직접 푼다.
 // 결과는 언제나 두 메시지: system(틀 + 작업 지침 + 출력 형식) / user(참고 자료 + 최근 본문 + 현재 작업).
+import { sitePicList } from './sitepics';
 import { hasAttachment } from './attach';
 import { viewSite, type BoardSite } from './boards';
 import { GUIDE_LABEL, type GuideName } from './guides';
@@ -44,6 +45,7 @@ export function gnetBooks(src: RefSource): GnetBooks {
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
+        .replace(/__SITE_PICS__/g, () => sitePicList(src.char))
         .replace(/__GN_POST_RANGE__/g, countText(cs.post))
         .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
         .replace(/__GN_ACT_RANGE__/g, countText(cs.act))
