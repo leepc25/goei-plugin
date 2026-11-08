@@ -142,7 +142,10 @@ export function stepProj(st: Stage, p: Proj): boolean {
     if (xb < b.x0 || xa > b.x1 || z < b.z0 - hitR - 20 || z > b.z1 + hitR) continue;
     p.done.add(o);
     const hx = p.dir > 0 ? Math.max(b.x0, Math.min(b.x1, p.x)) : Math.min(b.x1, Math.max(b.x0, p.x));
-    const r = o.receive(p.owner, { use: p.use, kind: kindOf(p.hit?.kind, 'light'), at: { x: hx, y: p.y }, noVfx: p.kind === 'bullet' });
+    const hn = Math.max(1, p.hit?.n || 1), hk = (i: number) => kindOf(i === hn - 1 ? p.hit?.kind : p.hit?.mid || 'light', 'light');
+    const r = o.receive(p.owner, { use: p.use, kind: hk(0), at: { x: hx, y: p.y }, noVfx: p.kind === 'bullet' });
+    // 탄 한 발이 여러 대 (hit.n): 맞은 상대에게 나머지를 이어서 (11-08 세크리엠 피의 칼날)
+    if (r === 'hit' && hn > 1) for (let i = 1; i < hn; i++) later(st, i * (p.hit?.every || 0.08), () => o.receive(p.owner, { use: p.use, kind: hk(i), at: { x: o.x - p.dir * 14, y: p.y } }));
     if (r === 'hit' && p.kind === 'bullet') { if (!sheet(st, 'bullet_hit_body', hx, p.y, 2, { anchor: 'pivot', flip: p.dir < 0 })) spark(st, hx, p.y, 5, '#fff6d0'); }
     if (r !== 'miss' && p.end) runFx(p.owner, p.end, { use: p.use, pt: { x: hx, z: LINE - p.y, onT: true } });
     if (!p.pierce && r !== 'miss') return true;
@@ -174,6 +177,8 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
       if (s.boom) boomSnd(me, p.x);
     };
     go();
+    // 그림이 끝난 뒤 이어지는 부품 (11-08 청달래 충전 끝 불길). target 은 그때 상대 자리 (앞 대에 날아간 상대를 따라감)
+    if (s.after) later(me.st, durOf(s.vfx) + (s.hold || 0), () => runFx(me, s.after, { ...c, pt: undefined }));
     if (s.hit) {
       const r = Math.min(260, (s.r ?? fw * 0.4) * sc), hy = md === 'bottom' ? p.gy - Math.min(fh * sc * 0.5, 110 * K) : p.hy;
       const hitAt = (t: number) => later(me.st, t, () => strike(me, c, t > (s.delay || 0) ? (s.tickHit || s.hit) : s.hit, scr ? { x: 0, r: 0, all: true } : { x: p.x, r: r + 20 }, scr ? undefined : { x: p.x, y: hy }));
