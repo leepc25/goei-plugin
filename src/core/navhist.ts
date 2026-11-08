@@ -28,11 +28,6 @@ export class NavHistory<T> {
     return JSON.parse(this.list[this.at]) as T;
   }
 
-  /** 지나온 화면들, 최근 것부터 (같은 화면은 한 번만) */
-  recent(): T[] {
-    return [...new Set(this.list.slice(0, this.at + 1).reverse())].map((k) => JSON.parse(k) as T);
-  }
-
   clear(): void {
     this.list = [];
     this.at = -1;
@@ -45,18 +40,4 @@ export interface RecordsNav {
   sub: 'journal' | 'chronicle' | 'wallet' | 'people' | 'factions';
   view: 'list' | 'report' | 'person' | 'docs' | 'faction';
   id: string;
-}
-
-/**
- * 옛 즐겨찾기·이동 기록 호환 (2026-10-29): 위키 탭 안에 있던 인물 목록·개인 기록·기록 문서·세력 화면이 「기록」 메뉴로 옮겨졌다.
- * 옛 `{tab:'wiki', w:{view:'people'|'person'|'docs'|'faction', title}}` 를 기록 메뉴 위치로 바꾼다. 위키 문서 화면이면 null
- */
-export function legacyWikiNav(view: string, title: string): RecordsNav | null {
-  switch (view) {
-    case 'people': return { sub: 'people', view: 'list', id: '' };
-    case 'person': return { sub: 'people', view: 'person', id: title };
-    case 'docs': return { sub: 'people', view: 'docs', id: '' };
-    case 'faction': return { sub: 'factions', view: 'faction', id: title };
-    default: return null;
-  }
 }
