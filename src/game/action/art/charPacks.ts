@@ -344,14 +344,25 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
   return true;
 }
 /** 원근 없이 정한 배율로 한 장 그리기 (대전 고르기·VS 화면의 큰 전신). x,y = 발 가운데. 그림 없으면 false */
-export function drawCharFrame(c: CanvasRenderingContext2D, nameOrKey: string, id: string, f: number, x: number, y: number, dir: 1 | -1, k: number): boolean {
+export function drawCharFrame(c: CanvasRenderingContext2D, nameOrKey: string, id: string, f: number, x: number, y: number, dir: 1 | -1, k: number, sh: CanvasRenderingContext2D = c): boolean {
   const a = charArt(nameOrKey), m = a?.A[id], im = a?.IMG[id];
   if (!a || !m || !im) return false;
   f = ((f % m.n) + m.n) % m.n;
   // 11-08 사용자: 대전 그림은 모두 오른쪽 보기로 그려져 있다(cfg.dir 무시, 전투 코어와 같이). dir 1 = 오른쪽
   const flip = dir < 0;
+  // 그림자 (11-08 사용자 「필드 것 그대로」): fighter/core.ts drawPlayer·shadow 와 같은 식. 장마다 잰 발(foot = [x, 폭, 닿는 높이, 두께])
+  const ft = m.foot[f] ?? [0, 40, 0, 0];
+  const lift = Math.max(0, Math.min(m.h - 4, m.floor) - m.bot[f] - 6) * k;
+  const up = groundOf(id, m, f) - (m.bot[f] - (ft[2] || 0));
+  const sk = Math.max(0.3, 1 - lift / 380) * k;
+  sh.fillStyle = `rgba(0,0,0,${0.42 * sk})`;
+  sh.beginPath();
+  sh.ellipse(x + (flip ? -ft[0] : ft[0]) * k, y - up * k - 2 * sk, Math.max(16, Math.min(80, ft[1])) * 0.58 * sk, (5 + Math.min(10, ft[3] || 0)) * sk, 0, 0, Math.PI * 2);
+  sh.fill();
   c.save();
-  c.imageSmoothingEnabled = false;
+  // 11-08 사용자 「자글자글 깨진다」: 정수 배율이 아니면(원근으로 줄인 뒷사람) 가장 가까운 점으로 뽑지 않고 고르게 줄인다
+  c.imageSmoothingEnabled = k % 1 !== 0;
+  c.imageSmoothingQuality = 'high';
   c.translate(Math.round(x), Math.round(y));
   c.scale(flip ? -k : k, k);
   c.drawImage(im, f * m.cw, 0, m.cw, m.ch, -Math.round(m.w / 2) + m.ox, -groundOf(id, m, f) + m.oy, m.cw, m.ch);

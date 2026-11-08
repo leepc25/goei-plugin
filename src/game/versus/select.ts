@@ -4,7 +4,8 @@
 // 인물 풀 = 이름 있는 인물만(NPC 빼기). 서바이벌 상대는 NPC 도 나온다 — 고르지 않고 웨이브가 낸다.
 // 키: 방향키 움직이기, Enter·Z 고르기, Backspace·X 되돌리기, Tab 모드 바꾸기, Esc 닫기. 마우스: 올리면 커서, 누르면 고르기, 오른쪽 단추 되돌리기.
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
-import { dotText, HUD_DIM, HUD_INK } from '../action/ui/pixelHud';
+import { crt2d } from './crt2d';
+import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
@@ -55,19 +56,56 @@ function frameUrl(c: FrameCol): string {
 const F_BASE: FrameCol = { edge: '#07090b', light: '#6a717c', shadow: '#272b31', accent: '#1a1e24', fill: 'rgba(15,18,22,.92)' };
 const F_ON: FrameCol = { edge: '#07090b', light: '#fff3c4', shadow: '#8a6a1c', accent: '#d9a72e', fill: 'rgba(40,32,14,.94)' };
 const frameCss = (c: FrameCol) => `border:8px solid transparent;border-image:url(${frameUrl(c)}) 4 fill / 8px stretch;image-rendering:pixelated;background:none`;
+/** VS 도장 (11-08 사용자 「VS 퀄리티」): 글꼴을 키우지 않고 도트로 그린 글자. 굵기 3도트, 오른쪽으로 살짝 기울임,
+ *  검은 테 · 윗줄 밝게 · 아랫줄 어둡게(띠 세 단, 그라데이션 아님) · 오른쪽 아래 그림자. 도트 한 칸 = 4px (정수배) */
+const VS_GLYPH = [
+  '###.......###...########..',
+  '###.......###..##########.',
+  '###.......###.####....####',
+  '###.......###.###......###',
+  '###.......###.###.........',
+  '.###.....###..####........',
+  '.###.....###...########...',
+  '.###.....###....########..',
+  '..###...###.........#####.',
+  '..###...###...........###.',
+  '...###.###....###.....###.',
+  '...###.###....####...####.',
+  '....#####......#########..',
+  '....#####.......#######...',
+  '.....###..................',
+];
+function vsMark(): HTMLCanvasElement {
+  const H = VS_GLYPH.length, slant = (y: number) => Math.floor((H - 1 - y) / 4);
+  const W = VS_GLYPH[0].length + slant(0) + 4, HH = H + 4, U = 4;
+  const on = (x: number, y: number) => { if (y < 0 || y >= H) return false; const gx = x - 1 - slant(y); return gx >= 0 && gx < VS_GLYPH[y].length && VS_GLYPH[y][gx] === '#'; };
+  const cv = document.createElement('canvas');
+  cv.width = W * U; cv.height = HH * U;
+  const o = cv.getContext('2d')!;
+  const px = (x: number, y: number, c: string) => { o.fillStyle = c; o.fillRect(x * U, y * U, U, U); };
+  const near = (x: number, y: number) => [-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)));
+  // 그림자(오른쪽 아래 1도트) → 검은 테 → 글자
+  for (let y = 0; y < HH; y++) for (let x = 0; x < W; x++) if (!near(x, y) && near(x - 1, y - 1)) px(x, y + 1, 'rgba(0,0,0,.55)');
+  for (let y = -1; y < HH; y++) for (let x = 0; x < W; x++) if (!on(x, y) && near(x, y)) px(x, y + 1, HUD_EDGE);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (on(x, y)) {
+    const c = !on(x, y - 1) ? '#ffffff' : y >= H - 4 || !on(x, y + 1) ? '#a9a598' : HUD_INK;
+    px(x, y + 1, c);
+  }
+  return crt2d(cv);
+}
+
 /** 깜빡이는 도트 화살표 ▶ (5×7, 검은 테) */
 function arrowCanvas(color: string, flip = false): HTMLCanvasElement {
   const rows = ['#....', '##...', '###..', '####.', '###..', '##...', '#....'];
   const cv = document.createElement('canvas');
-  cv.width = 7; cv.height = 9;
+  cv.width = 14; cv.height = 18;
   const o = cv.getContext('2d')!;
   const on = (x: number, y: number) => y >= 0 && y < 7 && x >= 0 && x < 5 && rows[y][flip ? 4 - x : x] === '#';
   for (let y = -1; y <= 7; y++) for (let x = -1; x <= 5; x++) {
-    if (on(x, y)) { o.fillStyle = color; o.fillRect(x + 1, y + 1, 1, 1); }
-    else if ([-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)))) { o.fillStyle = '#07090b'; o.fillRect(x + 1, y + 1, 1, 1); }
+    if (on(x, y)) { o.fillStyle = color; o.fillRect((x + 1) * 2, (y + 1) * 2, 2, 2); }
+    else if ([-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)))) { o.fillStyle = '#07090b'; o.fillRect((x + 1) * 2, (y + 1) * 2, 2, 2); }
   }
-  cv.style.width = '14px'; cv.style.height = '18px';
-  return cv;
+  return crt2d(cv);
 }
 
 const CSS = `
@@ -90,12 +128,12 @@ const CSS = `
 .vs-fig[data-s="0"]{left:3%}
 .vs-fig[data-s="1"]{right:3%}
 .vs-slot{position:absolute;bottom:0}
-.vs-slot[data-k="1"] canvas,.vs-slot[data-k="2"] canvas{opacity:.85}
+.vs-slot[data-k="1"] canvas:not(.sh),.vs-slot[data-k="2"] canvas:not(.sh){opacity:.85}
 .vs-slot.in{animation:vs-pop .2s steps(4)}
 @keyframes vs-pop{from{opacity:0;margin-bottom:-30px}}
-.vs-fig[data-s="0"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
-.vs-fig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
-.vs-fig.pick .vs-slot[data-k="0"] canvas{animation:vs-pick .3s steps(3)}
+.vs-fig[data-s="0"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
+.vs-fig[data-s="1"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
+.vs-fig.pick .vs-slot[data-k="0"] canvas:not(.sh){animation:vs-pick .3s steps(3)}
 .vs-fig .unk{position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center}
 .vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-nm[data-s="0"]{left:3%}
@@ -116,6 +154,8 @@ const CSS = `
 .vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;display:flex;justify-content:center}
 .vs-say canvas,.vs-help canvas,.vs-load canvas,.vs-vteam canvas{filter:var(--shd)}
 .vs-say canvas,.vs-help canvas,.vs-load canvas{padding:0 4px;${frameCss(F_BASE)}}
+.vs-title{position:relative}
+.vs-title:before,.vs-mode:before,.vs-time:before,.vs-nm:before,.vs-vname:before{content:'';position:absolute;inset:-6px;z-index:-1;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.3) 0 1px,transparent 1px 2px),repeating-linear-gradient(to right,rgba(255,60,60,.07) 0 1px,rgba(60,255,60,.07) 1px 2px,rgba(60,60,255,.07) 2px 3px)}
 @keyframes vs-blink{50%{border-color:${HUD_INK}}}
 @keyframes vs-pulse{50%{opacity:.4}}
 @keyframes vs-inL{from{transform:translateX(-80px);opacity:0}}
@@ -124,8 +164,8 @@ const CSS = `
 .vs-vfig{position:absolute;bottom:56px}
 .vs-vfig[data-s="0"]{left:8%;animation:vs-inL .3s steps(5) backwards}
 .vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
-.vs-vfig[data-s="0"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
-.vs-vfig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
+.vs-vfig[data-s="0"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
+.vs-vfig[data-s="1"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-vname[data-s="0"]{left:8%}
 .vs-vname[data-s="1"]{right:8%;flex-direction:row-reverse}
@@ -143,7 +183,7 @@ function dot(s: string, color = HUD_INK, scale = 2): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = src.width; c.height = src.height;
   c.getContext('2d')!.drawImage(src, 0, 0);
-  return c;
+  return crt2d(c);
 }
 const put = (el: Element, ...cs: HTMLCanvasElement[]) => { el.replaceChildren(...cs); };
 
@@ -165,31 +205,56 @@ const STANCE = ['3', '1'];
 function figure(h: number, flip: boolean, k = 1) {
   // 11-08 사용자: 키우지 않는다. 앞사람은 도트 한 칸 = 1px, 뒤 사람만 원근으로 작게
   h = Math.round(h * k);
-  const cv = document.createElement('canvas');
-  cv.width = Math.round(150 * k); cv.height = h;
-  const o = cv.getContext('2d')!;
-  let name = '';
+  // 그림자는 따로 (외곽 빛이 그림자에 번지지 않게), 발 아래로 PAD 만큼 더
+  const PAD = 16;
+  const cv = document.createElement('canvas'), sc = document.createElement('canvas');
+  cv.width = sc.width = Math.round(150 * k); cv.height = sc.height = h + PAD;
+  cv.style.marginBottom = `-${PAD}px`;
+  sc.className = 'sh';
+  sc.style.cssText = `position:absolute;left:0;bottom:-${PAD}px`;
+  const o = cv.getContext('2d')!, so = sc.getContext('2d')!;
+  let name = '', shown = '';
+  // 브라운관을 입힌 장 (이름·줄·장마다 한 번만 만든다)
+  const done = new Map<string, HTMLCanvasElement>();
   const draw = (now: number) => {
-    o.clearRect(0, 0, cv.width, cv.height);
-    if (!name || name === RANDOM) return;
+    if (!name || name === RANDOM) { if (shown) { o.clearRect(0, 0, cv.width, cv.height); so.clearRect(0, 0, sc.width, sc.height); shown = ''; } return; }
     const a = charArt(name);
     const id = STANCE.find((i) => a?.A[i] && a.IMG[i]);
     if (a && id) {
       // 전투 자세는 모든 장을 8fps, 평상 대기는 앞 두 장만 (테스트룸 규칙)
-      const f = id === '3' ? Math.floor(now / 125) : Math.floor(now / 600) % 2;
-      drawCharFrame(o, name, id, f, cv.width / 2, cv.height - 4 * k, flip ? -1 : 1, k);
+      const n = a.A[id].n;
+      const f = (id === '3' ? Math.floor(now / 125) : Math.floor(now / 600) % 2) % n;
+      const key = `${name}|${id}|${f}`;
+      if (key === shown) return;
+      shown = key;
+      o.clearRect(0, 0, cv.width, cv.height);
+      so.clearRect(0, 0, sc.width, sc.height);
+      let fr = done.get(key);
+      if (!fr) {
+        fr = document.createElement('canvas');
+        fr.width = cv.width; fr.height = cv.height;
+        drawCharFrame(fr.getContext('2d')!, name, id, f, cv.width / 2, h - 4 * k, flip ? -1 : 1, k, so);
+        done.set(key, crt2d(fr));
+      } else drawCharFrame(document.createElement('canvas').getContext('2d')!, name, id, f, cv.width / 2, h - 4 * k, flip ? -1 : 1, k, so);
+      o.drawImage(fr, 0, 0);
       return;
     }
+    if (shown === `${name}|body`) return;
+    shown = `${name}|body`;
+    o.clearRect(0, 0, cv.width, cv.height);
+    so.clearRect(0, 0, sc.width, sc.height);
     const b = sheetBody(name);
-    if (!b) return;
+    if (!b) { shown = ''; return; }
     o.save();
     o.imageSmoothingEnabled = false;
     if (flip) { o.translate(cv.width, 0); o.scale(-1, 1); }
-    o.drawImage(b.img, b.x, b.y, b.w, b.h, Math.round(cv.width / 2 - (b.w * k) / 2), Math.round(cv.height - 4 * k - b.h * k), Math.round(b.w * k), Math.round(b.h * k));
+    o.drawImage(b.img, b.x, b.y, b.w, b.h, Math.round(cv.width / 2 - (b.w * k) / 2), Math.round(h - 4 * k - b.h * k), Math.round(b.w * k), Math.round(b.h * k));
     o.restore();
+    crt2d(cv);
   };
   return {
     cv,
+    sc,
     draw,
     set(n: string) { name = n; if (n && n !== RANDOM && !charArt(n)) void loadChar(n); },
   };
@@ -210,7 +275,7 @@ function troupe(_h: number, flip: boolean, n = 3) {
     d.style.left = `${Math.round(cx - f.cv.width / 2)}px`;
     d.style.bottom = `${k * DY}px`;
     d.style.zIndex = String(3 - k);
-    d.appendChild(f.cv); el.appendChild(d); return d;
+    d.append(f.sc, f.cv); el.appendChild(d); return d;
   });
   const names = Array(n).fill('');
   return {
@@ -249,6 +314,7 @@ function drawCell(cv: HTMLCanvasElement, name: string, state = '') {
     // 커서 칸: 얼굴 위에 옅은 빛 한 줄 (위쪽 2도트)
     if (state) { o.fillStyle = 'rgba(255,255,255,.18)'; o.fillRect(at, at, CELL_IN, 2); }
   }
+  crt2d(cv);
 }
 function cellCanvas(name: string, css = CELL): HTMLCanvasElement {
   const cv = document.createElement('canvas');
@@ -498,12 +564,15 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
       tm.className = 'vs-vteam';
       tm.dataset.s = String(s);
       // 11-08 사용자: 얼굴 칸은 경기 체력 칸 자리(modules.ts drawVersusBars: 1.25배, 위 14 + 16:9 넘는 높이, 옆 16)
-      tm.style.top = `${Math.round(14 * 1.25 + Math.max(0, box.clientHeight - 720))}px`;
+      // 경기 그림판은 폭 1280 을 본문 폭에 맞춰 줄이고, 칸은 그 그림판의 (14 + 16:9 넘는 높이/1.25)×1.25 자리
+      const z = box.clientWidth / 1280;
+      tm.style.top = `${Math.round(z * (14 * 1.25 + Math.max(0, box.clientHeight / z - 720)))}px`;
+      tm.style[s ? 'right' : 'left'] = `${Math.round(16 * 1.25 * z)}px`;
       list.forEach((n) => tm.appendChild(cellCanvas(n, CELL)));
       el.appendChild(tm);
     }
   }
-  const big = document.createElement('div'); big.className = 'vs-big'; big.appendChild(dot('VS', HUD_INK, 6));
+  const big = document.createElement('div'); big.className = 'vs-big'; big.appendChild(vsMark());
   const ld = document.createElement('div'); ld.className = 'vs-load'; ld.appendChild(dot('불러오는 중', HUD_DIM, 1));
   el.append(big, ld);
   box.append(st, el);
