@@ -181,7 +181,10 @@ function ensureRoot(): HTMLElement {
     const b = (ev.target as HTMLElement).closest<HTMLElement>('.gw-fhint');
     if (b && b === hintFor && !(ev.relatedTarget instanceof Node && b.contains(ev.relatedTarget))) hideHint();
   });
-  root.addEventListener('scroll', () => { if (Date.now() - hintAt > 400) hideHint(); }, true); // 막 띄운 직후의 스크롤(scrollIntoView)로는 안 닫는다
+  root.addEventListener('scroll', (ev) => {
+    if ((ev.target as HTMLElement)?.classList?.contains('gw-body')) syncTop();
+    if (Date.now() - hintAt > 400) hideHint();
+  }, true); // 막 띄운 직후의 스크롤(scrollIntoView)로는 안 닫는다
   root.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement | HTMLTextAreaElement;
     const name = el?.dataset?.input;
@@ -421,7 +424,8 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   people: { desc: '본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청이 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요.' },
   // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
   journal: { desc: '사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요.' },
-  items: { desc: '가계부·소지품·상점을 한곳에서 정해요. 셋은 따로 켜고 끄고, 상점은 소지품과 가계부가 둘 다 켜져 있어야 써요. 소지품은 지금 가진 물건·한계·이번 턴 사건을 본편 요청에 [Inventory] 글로 넣어 모델이 응답에 반영하게 해요.', example: '[Inventory] 3/16 · 소금 봉지 — 두 봉지 (괴이를 늦춤) · This turn: uses 소금 봉지' },
+  // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
+  items: { desc: '가계부·소지품·상점을 여기서 정해요. 상점은 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 아래 「로어북 확인」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
@@ -474,8 +478,8 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
   if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
-  // 인물 페이지는 맨 위에 자기 도식이 있으니 한 줄 요약은 겹친다
-  const calls = page === 'people' ? '' : callSummary(ctx, page);
+  // 인물 페이지는 맨 위에 자기 도식이 있으니 「호출 흐름 →」 단추만 (callSummary 안에서)
+  const calls = callSummary(ctx, page);
   const lead = info
     ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p>${calls}</header>`
     : `${calls}</header>`;
@@ -554,18 +558,44 @@ function findResults(ctx: ChatContext | null): string {
     .join('')}</div>`;
 }
 /** 찾은 줄로 간 뒤: 그 줄을 화면 가운데로 옮기고 잠깐 비춘다 */
+/** 찾은 자리로 가서 잠깐 밝힌다 (통합 검색과 같은 효과). 줄이면 그 줄, 블록이면 그 블록 상자 */
+function flashEl(el: HTMLElement, block: ScrollLogicalPosition): void {
+  const box = el.closest('details');
+  if (box && !box.open) box.open = true;
+  el.scrollIntoView({ block });
+  el.classList.remove('gw-find-flash');
+  void el.offsetWidth; // 같은 자리를 다시 눌러도 효과가 처음부터
+  el.classList.add('gw-find-flash');
+  setTimeout(() => el.classList.remove('gw-find-flash'), 2200);
+}
+
+/** 호출 흐름 「설정 →」의 갈 자리 (flow.ts Node.to): '#id' · 'g:블록 제목' · 'r:줄 이름' */
+export function flashSpot(to: string): void {
+  const body = root?.querySelector<HTMLElement>('.gw-body');
+  if (!body || !to) return;
+  const head = (h: Element | null) => (h ? [...h.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? '').join('').trim() : '');
+  if (to.startsWith('r:')) {
+    const label = to.slice(2);
+    const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label);
+    if (row) flashEl(row, 'center');
+    return;
+  }
+  const group = to.startsWith('#')
+    ? body.querySelector<HTMLElement>(to)
+    : [...body.querySelectorAll<HTMLElement>('.ps-group')].find((g) => head(g.querySelector(':scope > h3')) === to.slice(2)) ?? null;
+  const target = group?.querySelector<HTMLElement>(':scope > .ps-rows') ?? group;
+  if (!group || !target) return;
+  group.scrollIntoView({ block: 'start' });
+  flashEl(target, 'nearest');
+}
+
 function flashFound(hit: FindHit): void {
   const rows = [...(root?.querySelectorAll<HTMLElement>('.gw-body .ps-row') ?? [])];
   const row = rows.find((r) => {
     const b = r.querySelector<HTMLElement>('.ps-label > b');
     return b && [...b.childNodes].filter((n) => !(n instanceof HTMLElement && n.tagName === 'I')).map((n) => n.textContent ?? '').join('').trim() === hit.label;
   });
-  if (!row) return;
-  const box = row.closest('details');
-  if (box && !box.open) box.open = true;
-  row.scrollIntoView({ block: 'center' });
-  row.classList.add('gw-find-flash');
-  setTimeout(() => row.classList.remove('gw-find-flash'), 2200);
+  if (row) flashEl(row, 'center');
 }
 
 /* 세계 통합 검색 (2026-11-07 사용자): 세계 탭 왼쪽 목록 위 칸 하나. 요원·조직·괴이·파밍·부록 이름·부제를 한꺼번에 찾고, 누르면 그 종류 화면에서 그 기록을 연다 */
@@ -721,6 +751,7 @@ export function render(): void {
     ${top}
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
+    ${tab === 'set' ? `<button class="gw-totop" data-action="ed-top" aria-label="맨 위로" title="맨 위로">${ICONS.up}</button>` : ''}
     ${foot}
     ${confirm}
   </div>`;
@@ -736,6 +767,7 @@ export function render(): void {
     if (bar && !boundOnce.has(bar)) { boundOnce.add(bar); bindMbar(root, () => void run('ed-close')); }
   }
   if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
+  syncTop();
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
     if (el) {
@@ -743,6 +775,12 @@ export function render(): void {
       if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
     }
   }
+}
+
+/** 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 조금 내려갔을 때만 보인다 */
+function syncTop(): void {
+  const b = root?.querySelector<HTMLElement>('.gw-totop');
+  if (b) b.classList.toggle('show', (root?.querySelector<HTMLElement>('.gw-body')?.scrollTop ?? 0) > 240);
 }
 
 const boundOnce = new WeakSet<HTMLElement>();
@@ -866,6 +904,17 @@ export async function handle(action: string, value?: string): Promise<void> {
         instUi.forChar = -1; // 열 때마다 다시 점검
       }
       return render();
+    case 'ed-flow-go': {
+      // 호출 흐름 「설정 →」: 그 페이지의 그 블록으로 가서 밝힌다 (2026-11-08 사용자)
+      const [pg, to = ''] = (value ?? '').split('|');
+      if (!pg) return;
+      await handle('ed-node', pg);
+      flashSpot(to);
+      return;
+    }
+    case 'ed-top':
+      root?.querySelector('.gw-body')?.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     case 'ed-find-go': {
       const hit = findIndex?.[Number(value)];
       if (!hit) return;

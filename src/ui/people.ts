@@ -33,8 +33,6 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 
 /** 화면 상태 (입력 중인 글은 다시 그려도 지킨다) */
 export const peopleUi = {
-  /** 호출 흐름 도식에서 방금 「설정 ↓」로 간 블록 (잠깐 테두리를 밝힌다) */
-  hit: '',
   notice: '',
   info: '',
   busy: false,
@@ -347,7 +345,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
   // 2026-11-07 사용자: 어떤 게 보조 모델을 부르고 무엇을 하는지 알 수 없었다 → 맨 위에 호출 흐름 도식(켜고 끄기·블록으로 바로가기),
   // 그 아래 공통 설정, 그 아래 호출 단계(갱신·Router·Director·정리)마다 한 블록. 꺼진 단계의 세부 칸은 숨긴다
-  const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk${peopleUi.hit === id ? ' pp-blk-hit' : ''}" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
+  const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
   const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인' : '보조');
   const stageModel = (st: Exclude<Stage, 'update'>, help: string) =>
     row('모델', seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['aux', '보조'], ['main', '메인']]), help) + idBox(st, v(`model_id_${st}`));
@@ -978,12 +976,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
   }
   switch (action) {
     case 'pp-goto': {
-      // 호출 흐름 도식 → 그 단계의 설정 블록 (접힌 칸은 펼치고, 잠깐 테두리를 밝힌다). 화면은 다시 그리지 않는다
-      // 설정 창은 조작 뒤 늘 다시 그리므로, 표시는 상태로 넣고 스크롤은 다시 그린 뒤에
-      peopleUi.hit = v;
+      // 호출 흐름 도식 → 그 단계의 설정 블록. 통합 검색과 같은 효과로 블록 상자를 잠깐 밝힌다 (2026-11-08 사용자)
+      // 설정 창은 조작 뒤 늘 다시 그리므로 다시 그린 뒤에
       setTimeout(() => {
-        document.getElementById(v)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        peopleUi.hit = '';
+        const g = document.getElementById(v);
+        const box = g?.querySelector<HTMLElement>(':scope > .ps-rows') ?? g;
+        if (!g || !box) return;
+        g.scrollIntoView({ block: 'start' });
+        box.classList.remove('gw-find-flash');
+        void box.offsetWidth;
+        box.classList.add('gw-find-flash');
+        setTimeout(() => box.classList.remove('gw-find-flash'), 2200);
       }, 30);
       return true;
     }

@@ -12,9 +12,17 @@ export function markCommitted(el: Element | null): void {
   committed = el;
 }
 
+/** 스크립트가 잠깐 붙이는 클래스: 다시 그려도 지우지 않는다 (2026-11-08: 「설정 →」으로 간 블록의 강조가 곧바로 다시 그려지며 사라졌다) */
+const TRANSIENT = ['gw-find-flash'];
+
 function syncAttrs(a: Element, b: Element): void {
-  for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
-  for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
+  const keep = TRANSIENT.filter((c) => a.classList.contains(c));
+  for (const { name } of [...a.attributes]) if (!b.hasAttribute(name) && !(name === 'class' && keep.length)) a.removeAttribute(name);
+  for (const { name, value } of [...b.attributes]) {
+    const want = name === 'class' && keep.length ? [value, ...keep.filter((c) => !value.split(/\s+/).includes(c))].filter(Boolean).join(' ') : value;
+    if (a.getAttribute(name) !== want) a.setAttribute(name, want);
+  }
+  if (keep.length && !b.hasAttribute('class')) a.setAttribute('class', keep.join(' '));
 }
 
 /** 입력칸의 「지금 값」을 새 HTML 의 값으로 (속성만 맞추면 한 번 손댄 칸은 화면이 안 바뀐다) */

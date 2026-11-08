@@ -471,9 +471,27 @@
 .gw-find-hit b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gw-find-hit small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gw-find-none { margin: 14px 12px; font-size: 13px; color: var(--dim); }
-.ps-row.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
+.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
 @keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
-@media (prefers-reduced-motion: reduce) { .ps-row.gw-find-flash { animation: none; background: var(--accent-bg); } }
+@media (prefers-reduced-motion: reduce) { .gw-find-flash { animation: none; background: var(--accent-bg); } }
 /* 인물 설정 전용 모델 ID 줄: 입력칸과 저장이 한 줄 (2026-11-07 사용자: 폰에서 저장이 아래로 떨어졌다) */
 .gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
 .gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }
+
+/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 글과 「다시 세기」를 한 줄에, 상자 안 위·아래 여백 같게 */
+.gw .pp-flow-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap) 14px; padding: 12px var(--pad); }
+.gw .pp-flow-head > p { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .pp-flow-head b { color: var(--text); }
+.gw .pp-flow-head > .gx-mini { flex: none; }
+/* 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
+.gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
+.gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }
+.gw-totop:hover { background: var(--accent-bg); }
+.gw-totop svg { width: 20px; height: 20px; }
+/* 조작 없이 설명만 있는 줄 (2026-11-08 사용자: 소지품 「넘기는 것·남는 것」 글 위 쓸데없는 여백) — 빈 조작 칸(높이 34)을 접고 설명을 이름 옆 첫 줄부터 */
+.gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label hint'; }
+.gw .ps-row:has(> .ps-ctl:empty) > .ps-ctl { display: none; }
+.gw .ps-row:has(> .ps-ctl:empty) > .ps-label > b { min-height: 0; }
+@container (max-width: 600px) {
+  .gw .ps-row:has(> .ps-ctl:empty) { grid-template-areas: 'label' 'hint'; }
+}
