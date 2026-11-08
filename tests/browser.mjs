@@ -118,7 +118,7 @@ async function boot(char, chat, viewport = process.env.VP ? { width: +process.en
 // 플로팅 버튼이 뜰 때까지 기다렸다가(접속 효과 포함) 누른다
 async function open(page) {
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
-  await page.click('[x-goei-fab] button');
+  await page.click('[x-goei-fab] button:not([data-vs])');
 }
 // 상황 그림 카드: 띠를 눌러 상세 창을 열고, 창 안의 버튼(지도·목표로 고르기·종료 등)을 누른다
 // 상황판(관제실): 일지 행을 눌러 큰 보기로 띄우고, 큰 보기의 버튼을 누른다
@@ -500,7 +500,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.waitForTimeout(300);
   assert.equal(await page.evaluate(() => window.__calls.show.length), 0, '다른 곳 클릭으로 열리면 안 됨');
   if (shots) await page.screenshot({ path: `${shots}/6-fab.png` });
-  await page.click('[x-goei-fab] button');
+  await page.click('[x-goei-fab] button:not([data-vs])');
   await page.waitForFunction(() => window.__calls.show.length === 1);
   await page.evaluate(() => { { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; } });
   // 설정 화면으로 가면(채팅 화면 사라짐) 숨김, 돌아오면 효과와 함께 다시 표시
@@ -519,28 +519,28 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   console.log('PASS 플로팅 버튼: Lite 채팅 화면에서만, 들어올 때마다 효과, 버튼 클릭만 반응');
 
   // 끌어서 옮기기: 열리지 않고, 위치가 저장된다
-  const box0 = await page.locator('[x-goei-fab] button').boundingBox();
+  const box0 = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   const cx = box0.x + box0.width / 2, cy = box0.y + box0.height / 2;
   await page.mouse.move(cx, cy);
   await page.waitForTimeout(300); // 마우스오버 효과(살짝 커짐)가 끝난 뒤 크기로 비교
-  const box = await page.locator('[x-goei-fab] button').boundingBox();
+  const box = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   await page.mouse.down();
   for (let i = 1; i <= 10; i++) { await page.mouse.move(cx - i * 20, cy - i * 15); await page.waitForTimeout(30); }
   await page.mouse.up();
   await page.waitForTimeout(400);
-  const moved = await page.locator('[x-goei-fab] button').boundingBox();
+  const moved = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   assert.ok(Math.abs(moved.x - (box.x - 200)) <= 4 && Math.abs(moved.y - (box.y - 150)) <= 4, `moved to ${moved.x},${moved.y}`);
   assert.equal(await page.evaluate(() => window.__calls.show.length), 1, '끌기 후 창이 열리면 안 됨');
   const savedPos = JSON.parse(await page.evaluate(() => window.__store['goei-plugin:fab-pos']));
   assert.deepEqual(savedPos, { right: 216, bottom: 246 });
   // 옮긴 자리에서 클릭하면 열림
   await page.waitForTimeout(450);
-  await page.click('[x-goei-fab] button');
+  await page.click('[x-goei-fab] button:not([data-vs])');
   await page.waitForFunction(() => window.__calls.show.length === 2);
   console.log('PASS 플로팅 버튼 끌어서 옮기기 + 위치 저장');
 
   // 손을 떼는 이벤트를 놓치거나(pointercancel) 끊겨도 버튼이 굳지 않는다
-  const b2 = await page.locator('[x-goei-fab] button').boundingBox();
+  const b2 = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   const bx = b2.x + 24, by = b2.y + 24;
   await page.evaluate(([x, y]) => {
     const fire = (type, o) => document.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, bubbles: true, ...o }));
@@ -554,14 +554,14 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     document.dispatchEvent(new PointerEvent('pointermove', { clientX: x - 30, clientY: y, buttons: 0, bubbles: true }));
   }, [bx - 40, by]);
   await page.waitForTimeout(300);
-  await page.click('[x-goei-fab] button');
+  await page.click('[x-goei-fab] button:not([data-vs])');
   await page.waitForFunction(() => window.__calls.show.length === 3, null, { timeout: 3000 });
   await page.evaluate(() => { { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; } });
-  const b3 = await page.locator('[x-goei-fab] button').boundingBox();
+  const b3 = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   await page.mouse.move(b3.x + 24, b3.y + 24); await page.mouse.down();
   for (let i = 1; i <= 5; i++) { await page.mouse.move(b3.x + 24 + i * 10, b3.y + 24); await page.waitForTimeout(30); }
   await page.mouse.up(); await page.waitForTimeout(400);
-  const b4 = await page.locator('[x-goei-fab] button').boundingBox();
+  const b4 = await page.locator('[x-goei-fab] button:not([data-vs])').boundingBox();
   assert.ok(Math.abs(b4.x - (b3.x + 50)) <= 4, `drag after cancel: ${b3.x} -> ${b4.x}`);
   assert.equal(await page.evaluate(() => window.__calls.show.length), 3);
   console.log('PASS 끌기 도중 끊겨도 버튼이 굳지 않음');
@@ -2404,7 +2404,7 @@ if (fixture.globalLore.some(packed)) {
   assert.match(await frame.evaluate(() => window.__store['p:goei:body'].slice(0, 40)), /^\/\/ goei-body /);
   assert.equal(await frame.evaluate(() => window.__store['p:goei:data-world']?.length ?? 0), worldPack.length, '본체가 세계 자료 팩을 받아 저장');
   assert.ok((await frame.evaluate(() => window.__calls.fetch.map((u) => u.split('?')[0].split('/').pop()))).includes('goei-data-world.json'), '세계 자료 목록을 받음');
-  await frame.click('[x-goei-fab] button');
+  await frame.click('[x-goei-fab] button:not([data-vs])');
   await frame.waitForSelector('.gx-fac');
   // 시작 카드 표시도 본체가 맡는다
   assert.match(await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">ANOMALY SIMULATION</div>')), /landing/);
@@ -2417,7 +2417,7 @@ if (fixture.globalLore.some(packed)) {
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
-  await page.click('[x-goei-fab] button');
+  await page.click('[x-goei-fab] button:not([data-vs])');
   await page.waitForSelector('.gx-nav');
   assert.equal(await page.locator('[data-value="field"], .gx-fieldbtn, .gx-game').count(), 0, '필드 버튼·게임 창 없음');
   assert.deepEqual(errors, []);
