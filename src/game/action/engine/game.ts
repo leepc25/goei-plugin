@@ -177,7 +177,8 @@ export class Game {
           const at = (b: { x: number; px?: number }) => (b.px ?? b.x) + (b.x - (b.px ?? b.x)) * a;
           const p = w.player, foes = w.bodies.filter((b) => b.team === 'enemy' && b.alive);
           const foe = foes.sort((m, n) => Math.abs(m.x - p.x) - Math.abs(n.x - p.x))[0];
-          const mid = foe ? (at(p) + at(foe)) / 2 : at(p);
+          // 판 사이(태그매치 11-08 사용자): 암전 뒤 화면은 무대 가운데에 고정하고, 다음 캐릭터만 날아 들어온다 (날아오는 캐릭터를 따라가지 않게)
+          const mid = versus.trans?.placed ? view.vsLen / 2 : foe ? (at(p) + at(foe)) / 2 : at(p);
           const want = Math.max(0, Math.min(view.vsLen - vw, mid - vw / 2));
           // 부드럽게 따라가기 (한 장에 남은 거리의 12%)
           this.vsCam = this.vsCam < 0 ? want : this.vsCam + (want - this.vsCam) * (frozen ? 0 : 0.12);
@@ -447,6 +448,7 @@ export class Game {
         // 대전 K.O. 뒤에는 양쪽 다 손을 뗀다 (11-08 사용자): 1P 입력 비우고 AI 두뇌 멈춤. 쓰러지는 동작·승리 동작은 그대로
         aiHold.on = view.clear && !!versus.ko;
         w.step(view.clear && versus.ko ? NO_PAD : p);
+        if (view.clear && versus.mode !== 'survival') this.vsKeepOnScreen(w);
         // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
         if (view.clear) {
           // 서바이벌은 상대가 다 쓰러져도 판이 끝나지 않는다 (웨이브가 이어짐, engine/survival.ts)
@@ -547,6 +549,18 @@ export class Game {
       versus.trans = null;
       versus.intro = INTRO_SEC;
     }
+  }
+
+  /** 대전(11-08 사용자 「화면을 벗어나면 안되지」): 두 사람이 늘 한 화면 안에. 벌어지면 이번 틱에 바깥으로 더 움직인 쪽을 붙잡는다 */
+  private vsKeepOnScreen(w: World) {
+    const p = w.player as unknown as { x: number; px?: number }, foe = w.bodies.find((b) => b.team === 'enemy' && b.alive) as unknown as { x: number; px?: number } | undefined;
+    if (!foe) return;
+    const maxD = this.canvas.width / view.zoom - 160;
+    const d = Math.abs(foe.x - p.x);
+    if (d <= maxD) return;
+    const ex = d - maxD, s = Math.sign(foe.x - p.x) || 1;
+    const outP = -s * (p.x - (p.px ?? p.x)), outF = s * (foe.x - (foe.px ?? foe.x));
+    if (outF >= outP) foe.x -= s * ex; else p.x += s * ex;
   }
 
   /** 판 사이 화면 접기·펴기 (그림판 세로 배율) */

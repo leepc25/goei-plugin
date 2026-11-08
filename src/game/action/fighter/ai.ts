@@ -4,6 +4,7 @@ import { STATUS } from '../../combat/status';
 import { perkDecoy, perkWorld } from '../../perks/runtime';
 import { drawAilments } from '../ui/ailments';
 import type { Body, WorldView } from '../engine/contract';
+import { view } from '../engine/view';
 import type { Btn as PadBtn, Pad } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { FighterPlayer } from './player';
@@ -113,6 +114,7 @@ export class FighterAi extends FighterPlayer {
     const foe = foeSense(t);
     // 미끼 잔상(플레이어 퍽): 주인공을 노릴 때 남아 있는 동안 그 자리를 노린다
     if (t === (world.player as unknown as Body) && perkDecoy.until > performance.now()) { foe.x = perkDecoy.x; foe.y = perkDecoy.y; foe.attacking = false; }
+    this.brain.duel = view.clear;
     const d = this.brain.tick(self, foe);
     p.pressed.clear();
     p.released.clear();
@@ -164,7 +166,7 @@ export class FighterAi extends FighterPlayer {
     }
     if (this.lieLag < 0) this.lieLag = 0.2 + Math.random() * 0.7;
     if (P.t - (P.downAt ?? -9) < P.wakeDelay + (P.wakeExtra ?? 0) + this.lieLag) return;
-    if (!this.crawled && this.core.has('38') && this.hp / this.hpMax < 0.35 && this.brain.persona.courage < 0.5) {
+    if (!view.clear && !this.crawled && this.core.has('38') && this.hp / this.hpMax < 0.35 && this.brain.persona.courage < 0.5) {
       this.crawled = true;
       this.crawlT = 1.5 + Math.random() * 2;
       p.pressed.add(away);

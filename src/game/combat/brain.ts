@@ -112,6 +112,10 @@ export class FighterBrain {
   private defendT = 0;
   /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
   private habit = { jump: 0, attack: 0 };
+  /** 1:1 대전 (11-08 사용자 「AI가 전체적으로 엉망」 「내가 가만히 있으면 상대도 가만히」): 도망·쉬기 없음, 상대가 가만히 있으면 먼저 들어간다 */
+  duel = false;
+  /** 상대가 공격하지 않은 틱 수 */
+  private calm = 0;
   private lastFoe: FoeSense | null = null;
   /** 누운 뒤 일어나기까지 남은 틱 (8-2: 바로 / 늦게 +10~20틱). null = 아직 안 고름 */
   private wakeT: number | null = null;
@@ -138,6 +142,7 @@ export class FighterBrain {
     if (this.hist.length > 40) this.hist.shift();
     const foe = this.hist[Math.max(0, this.hist.length - 1 - this.reactTicks)];
     this.learn(foeNow);
+    this.calm = foeNow.attacking ? 0 : this.calm + 1;
     this.gap = me.gap ?? 1;
     const out: Decision = { hold: new Set(), press: [], release: [] };
     if (me.stunned) {
@@ -179,7 +184,8 @@ export class FighterBrain {
       this.align(out, dy, dist);
       return this.finish(out);
     }
-    this.tacT = Math.round((this.g.tactic + Math.floor(this.rng() * 4)) * this.gap);
+    this.tacT = Math.round((this.g.tactic + Math.floor(this.rng() * 4)) * this.gap * (this.duel ? 0.5 : 1));
+    if (this.duel && this.calm > 45 && this.strategy !== 'press') { this.strategy = 'press'; this.stratT = 60; }
     this.chooseTactic(me, foe, dist, dy, toward, away, out);
     return this.finish(out);
   }
@@ -201,6 +207,7 @@ export class FighterBrain {
       rest: 0,
       flee: 160 * (1 - p.courage) * (1 - me.hp) - 20,   // 10-30: 용기가 낮을수록 체력이 덜 줄어도 기세가 꺾여 달아남(몹은 실제 성격 값)
     };
+    if (this.duel) { s.flee = -999; s.rest = -999; if (this.calm > 45) s.press += 60; }
     if (this.picked) s[this.strategy] += 15; // 자꾸 바뀌지 않게 (첫 판단엔 없음)
     this.picked = true;
     return (Object.entries(s) as [Strategy, number][]).sort((a, b) => b[1] - a[1])[0][0];
@@ -267,9 +274,10 @@ export class FighterBrain {
       if (this.attackOk('heavy')) return this.plan([{ press: 'heavy', ticks: 12 }], '대공');
     }
     // 다운된 상대: 신중하면 물러서 기다리고, 공세면 일어날 자리에 붙는다
+    // 다운된 상대도 때린다 (11-08 사용자 「쓰러진 상대도 당연히 때려야지」): 붙어서 누운 몸을 친다 (맞으면 움찔 43)
     if (foe.down) {
-      if (this.strategy === 'careful') return this.plan([{ hold: [away], ticks: 10 }, { ticks: 12 }], '기상 기다림');
-      return this.plan([{ hold: [toward], ticks: Math.max(4, Math.ceil((dist - 120) / 8)) }, { ticks: 6 }], '기상 압박');
+      if (dist > 120 || !sameLane) return this.plan([{ hold: [toward, 'run'], ticks: Math.max(4, Math.ceil((dist - 100) / 14)) }], '다운 추격');
+      if (this.attackOk('light')) return this.plan([{ press: 'light', ticks: 8 }, { press: this.kit.heavy ? 'heavy' : 'light', ticks: 12 }], '다운 공격');
     }
     // 가까움: 콤보 / 찌르기
     if (dist < 135 && sameLane) {
@@ -293,7 +301,7 @@ export class FighterBrain {
       if (sameLane && this.kit.shoot) return this.plan([{ press: 'shoot', ticks: 14 }], '사격 견제');
     }
     // 신중: 상대 사거리 바로 밖에서 서성
-    if (this.strategy === 'careful' && dist < 230) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], '거리 재기');
+    if (this.strategy === 'careful' && dist < 230 && !(this.duel && this.calm > 30)) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], '거리 재기');
     // 기본: 다가간다 (멀면 달린다)
     this.plan([{ hold: dist > 500 ? [toward, 'run'] : [toward], ticks: 10 }], '접근');
   }

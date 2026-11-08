@@ -248,7 +248,7 @@ function damageTarget(dmg?: Json, kind?: Json): { killed?: boolean; guard?: bool
   else if (kind === 'turn') { T.turnT = 0.6; T.turnDir = dir; T.vx = 0; T.stag = 0.15; }   // 홱 뒤돌아 등을 보인 채 2m 밀려 걸어감(로제몬 D)
   else if (air) { T.juggle++; T.vz = Math.max(T.vz, (big ? 560 : 420) * Math.max(0.3, 1 - T.juggle * 0.12)); T.vx = dir * (big ? 160 : 70); }
   else T.vx = dir * (big ? 460 : 55);
-  if (dmg > 0) fx.push({ k: 'num', x: T.x + (Math.random() - 0.5) * 30, y: T.y - 200 - T.z, v: dmg, t: crit ? 0.9 : 0.7, big, crit });
+  if (dmg > 0 && !view.clear) fx.push({ k: 'num', x: T.x + (Math.random() - 0.5) * 30, y: T.y - 200 - T.z, v: dmg, t: crit ? 0.9 : 0.7, big, crit });
   // 부가효과 중 표식·묶기는 코어 반응(받는 피해 ×1.5 / 못 움직임)으로, 나머지는 상대 상태 이상으로(player.ts)
   const db = curLast ? curHit?.debuff : undefined;
   if (db?.k === 'mark') markT(T, db.s || 6);
@@ -1315,7 +1315,7 @@ function update(dt?: Json) {
     case 'belly': { const go = dx !== 0, looping = P.clip!.id === '38_1' || P.clip!.i >= 4; if (go) P.face = CH.crawlRev ? -dx : dx; P.clip!.paused = !go && looping; if (go && looping) P.x += dx * 55 * dt; break; }
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
-    case 'back': { if (!down('back')) { toIdle(); break; } if (P.clip && P.clip.id === '37_1') P.x -= P.face * 80 * dt; P.y += dy * 60 * dt; break; }
+    case 'back': { if (!down('back')) { toIdle(); break; } if (view.clear) P.x -= P.face * 230 * dt; else if (P.clip && P.clip.id === '37_1') P.x -= P.face * 80 * dt; P.y += dy * 60 * dt; break; }   // 대전: 상대를 본 채 바로 물러난다(11-08)
     case 'sit': break;   // 주저앉아 뒤로 기기(40)는 사용자 2026-10-25 결정으로 전원 삭제 — 앉은 채 뒤로 가지 않음
     case 'crouch': if (P.clip && P.clip.i >= crLp()[0] && dx && has('42')) { P.face = dx; P.mode = 'crawl4'; const c4 = PK('crawl4', '42'); if (has('42_1')) play('42', { seq: S(R(0, c4), 0.08), onEnd: () => { if (P.mode === 'crawl4') { const n = nOf('42_1'), lp = LP('42_1') || R(Math.min(1, n - 1), n - 1); play('42_1', { seq: S(lp, 0.1), loopFrom: 0 }); } } }); else { const lp = LP('42') || R(Math.min(4, nOf('42') - 1), nOf('42') - 1); play('42', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.085)], loopFrom: lp[0] }); } } break;
     case 'crawl4': { const go = dx !== 0, looping = P.clip!.id === '42_1' || P.clip!.i >= 4; if (go) P.face = dx; P.clip!.paused = !go && looping; if (go && looping) P.x += dx * 85 * dt; break; }

@@ -9,7 +9,8 @@ type HurtOpt = { push?: number; src?: 'ranged' | 'blast' | 'skill' | null; form?
 import { Player } from '../engine/player';
 import { Fighter } from '../engine/fighter';
 import { newAttackId } from '../engine/ids';
-import { spr } from '../engine/view';
+import { spr, view } from '../engine/view';
+import { versus } from '../engine/versus';
 import { pfont } from '../engine/pxfont';
 import { CHAR_K, charFx, type CharArt } from '../art/charPacks';
 import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/contract';
@@ -22,6 +23,12 @@ import { PerkRun, perkWorld, type PerkHost } from '../../perks/runtime';
 import { draft, kitOf, type Offer } from '../../perks/rules';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 
+/** 대전(11-08 사용자 「막기 게이지 너무 빨리 닳고 필살기 게이지는 너무 빨리 차」): 막을 때 닳는 양·필살 게이지 차는 양 배율 */
+const VS_GUARD = 0.4, VS_SP = 0.4;
+/** 대전 뒤 방향 막기: 한 번 막으면 이만큼 막는 자세에 묶인다 (초) */
+const VS_BLOCK_STUN = 0.3;
+/** 대전: 맞으면 이만큼 손을 못 쓴다 (초). 약공격 이음 간격보다 길게 */
+const VS_HITSTUN = 0.45;
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
@@ -258,7 +265,7 @@ export class FighterPlayer extends Player {
   }
   /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
   protected spMul(): number {
-    return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1) * this.perks.spMul();
+    return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1) * this.perks.spMul() * (view.clear ? VS_SP : 1);
   }
   /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
   status = new StatusSet();
@@ -312,6 +319,8 @@ export class FighterPlayer extends Player {
 
   applyHit(hit: Hit, world: WorldView): HitResult {
     const P = this.core.P;
+    // 대전: K.O. 뒤에는 아무것도 맞지 않는다 (11-08 사용자 「게임 끝났는데도 계속 때려」)
+    if (view.clear && (versus.ko || versus.trans || versus.over)) return { kind: 'immune' };
     if (P.inv > 0 || this.invuln > 0) {
       this.core.takeHit('hit');
       // 빈틈 없음(퍽): 회피 무적 중에 닿은 투사체도 되돌린다
@@ -323,11 +332,16 @@ export class FighterPlayer extends Player {
     if (this.phase === 'down') return { kind: 'immune' };
     const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
+    // 대전: 상대 반대쪽을 누르고 있으면(뒷걸음질·서 있기) 맞는 순간 막는 자세로. 막는 동안은 못 움직이고 VS_BLOCK_STUN 초 묶인다
+    if (view.clear && this.vsBack && front && (P.mode === 'back' || P.mode === 'ground' || P.mode === 'block') && !this.guardBroken && this.guard >= 8 && this.status.canBlock()) {
+      if (P.mode !== 'block') this.core.onPress('block');
+      this.vsBlockT = VS_BLOCK_STUN;
+    }
     if (P.mode === 'block' && front) {
       // 퍽: 막기 사건(가시 방패·혼쭐·금품 수수 불가·쌓인 울분·탄 되받기·맨손으로 쳐낸다·가드 강화·완전 방어)
       const attacker = this.attackerOf(hit);
       const pr = this.perks.blocked({ melee: !!attacker, attacker, dmg: hit.dmg });
-      if (!pr.noDrain) this.spendGuard((14 + hit.dmg * 0.6) / this.perks.guardMul());
+      if (!pr.noDrain) this.spendGuard((14 + hit.dmg * 0.6) / this.perks.guardMul() * (view.clear ? VS_GUARD : 1));
       if (pr.reflect) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
       if (this.guardBroken && this.perks.guardBreak()) { this.core.onRelease('block'); world.emit({ type: 'guard', x: this.x }); return { kind: 'guard' }; }
       if (this.guardBroken) {
@@ -399,6 +413,7 @@ export class FighterPlayer extends Player {
     const noKnock = this.perks.noKnock();   // 다운 무시·방어막: NPC 퍽도
     const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
     this.core.takeHit(kind);
+    if (view.clear) this.vsStunT = VS_HITSTUN;
     return { kind: 'hit' };
   }
 
@@ -497,11 +512,14 @@ export class FighterPlayer extends Player {
   private input(p: Pad) {
     const names = this.heldNames;
     names.clear();
+    // 대전 경직(11-08 사용자 「콤보가 엉망」): 맞은 뒤 VS_HITSTUN 초는 아무것도 못 한다 → 약약강·약약약강이 끊기지 않고 들어간다
+    if (view.clear && this.vsStunT > 0) { this.vsStunT -= 1 / 30; this.vsBlockT = Math.max(0, this.vsBlockT - 1 / 30); if (this.vsBlockT > 0) names.add('block'); return; }
     // 혼란: 좌우가 뒤집힌다
     const flip = this.status.flipped();
     const nameOf = (n: string) => (flip && n === 'left' ? 'right' : flip && n === 'right' ? 'left' : n);
     for (const [b, n] of PRESS) if (p.held.has(b)) names.add(nameOf(n));
     if (p.run) names.add('run');
+    if (view.clear) this.vsInput(p, names);
     // 공포: 막지 못한다. 침묵: 기술·필살을 못 쓴다
     if (!this.status.canBlock()) names.delete('block');
     const silenced = !this.status.canSkill();
@@ -517,6 +535,28 @@ export class FighterPlayer extends Player {
     }
     if (p.evade) this.core.onPress('dodge');
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
+  }
+
+  /** 대전(11-08 사용자): 늘 상대를 보고 선다. 앞으로 = 바로 달리기(걷기 없음), 뒤로 = 상대를 본 채 뒷걸음질(37)·맞으면 막기 */
+  private vsBack = false;
+  private vsBlockT = 0;
+  private vsStunT = 0;
+  private vsInput(p: Pad, names: Set<string>) {
+    const P = this.core.P;
+    P.combat = true;
+    const foe = (this.world ? [this.world.player as unknown as Body, ...this.world.bodies] : []).filter((b) => b !== (this as unknown as Body) && b.team !== this.team && b.team !== 'neutral' && b.alive).sort((a, b) => Math.abs(a.x - this.x) - Math.abs(b.x - this.x))[0];
+    const s = foe ? (foe.x >= this.x ? 1 : -1) : P.face;
+    const flip = this.status.flipped();
+    const mx = flip ? -p.mx : p.mx;
+    if (P.mode === 'ground' && P.face !== s && mx !== s) P.face = s;   // 서 있거나 뒤로 갈 때 상대 쪽으로 돈다
+    this.vsBack = mx === -s && mx !== 0;
+    if (mx === s) names.add('run');
+    if (this.vsBack && this.core.has('37') && (P.mode === 'ground' || P.mode === 'back')) { names.delete('left'); names.delete('right'); names.add('back'); }
+    if (this.vsBlockT > 0) {
+      this.vsBlockT -= 1 / 30;
+      if (this.vsBlockT > 0) { names.add('block'); names.delete('back'); }
+      else if (P.mode === 'block') this.core.onRelease('block');
+    }
   }
 
   tick(world: WorldView, p: Pad) {

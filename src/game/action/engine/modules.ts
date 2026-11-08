@@ -1076,7 +1076,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
       // NPC 퍽: 필드 몹은 행위자의 퍽을 combatStep 이 붙인다(npcPerks 표시). 그 밖(괴이·시험장)의 이름 없는 인물은 전투 NPC 퍽을 굴림
       // 이름 있는 인물(55명)은 스탯 뻥튀기·체력 뻥튀기 (10-31 사용자)
-      if (!(spec as { npcPerks?: string[] }).npcPerks) applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
+      // 대전 1:1·태그(11-08 사용자 「스탯 뻥튀기 체력 뻥튀기 이건 뭐지」): 양쪽 조건을 같게, NPC 퍽을 붙이지 않는다
+      if (!(spec as { npcPerks?: string[] }).npcPerks && !(view.clear && versus.mode !== 'survival')) applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
       return ai as never;
     }
     if (DEF_BY_KIND[spec.kind]) {
@@ -1152,6 +1153,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft,
           oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
         const p = world.player;
+        // 대전(11-08 사용자 「말풍선도 따라 움직여야지」): 확대·자르기(view.zoom·crop·cropY)를 넣어 머리 위에 붙인다. 화면 폭은 그림판 폭
+        if (view.clear) {
+          const z = view.zoom, sx = (p.x - world.drawCamX - view.crop) * z, sy = (p.y - p.z + heroTop(p) * persp(p.y) - view.cropY) * z;
+          // 그림판이 화면에 실제로 놓인 자리·크기로 바꾼다 (대전 그림판은 CSS 크기가 픽셀 크기와 다르다)
+          const cr = shell.canvas.getBoundingClientRect(), rr = storyRoot.getBoundingClientRect(), cx = cr.width / shell.canvas.width, cy = cr.height / shell.canvas.height;
+          storyRoot.style.visibility = '';
+          return { x: cr.left - rr.left + sx * cx, y: cr.top - rr.top + Math.max(40, sy - 16) * cy, minX: cr.left - rr.left, maxX: cr.right - rr.left };
+        }
         // 말풍선은 머리 위, 화면 가장자리(터치 버튼 띠) 안쪽으로
         const gx = Math.max(200, Math.min(1000, p.x - world.camX));
         // 보이는 터치 버튼(오른쪽 묶음)의 왼쪽 끝을 넘지 않게. 버튼 위치는 배치 좌표 translate라 회전과 무관
@@ -1660,7 +1669,7 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
 /** 대전 한 선의 발 높이(월드 y, 화면 720 중) */
 const VS_LINE = 700;
 /** 대전 체력 배율 */
-const VS_HP = 3;
+const VS_HP = 2;   // 11-08 3배 → 한 판이 너무 길다(사용자) → 2배
 
 /** 대전(투명 무대) HUD: 도트 HUD(pixelHud.ts, 10-25 PixelLab 틀) 칸 둘 — 왼쪽 1P, 오른쪽 상대(좌우 뒤집음). 초상화·체력(깎인 만큼 흰 잔상)·필살 게이지.
  *  칸 아래: 1:1 은 이긴 판 표시 두 칸, 팀전은 남은 사람 칸, 서바이벌은 쓰러뜨린 수. 가운데: ROUND n → FIGHT, K.O., 승리/패배 */

@@ -24,6 +24,13 @@ export function useEileenKeys() {
   Object.assign(KEYMAP, { KeyQ: 'light', KeyW: 'heavy', KeyC: 'block', KeyA: 'shoot', KeyS: 'charge', KeyD: 'skill', KeyF: 'super', Tab: 'weapon', KeyR: 'combat', KeyZ: 'sit', KeyX: 'crouch', KeyV: 'flee', KeyB: 'back', KeyM: 'map', KeyO: 'auto' } as Record<string, Btn>);
 }
 
+/** 대전 키 배치 (사용자 11-08 「대전액션에 맞지 않아」): ←→ 바로 달리기 · ↑/Space 점프 · Shift 회피 · A 약 · S 강 · D 기술 · F 필살기 · W 원거리 · E 충전.
+ * 막기는 키가 없고 상대 반대쪽 방향을 누르고 있으면 막는다(fighter/player.ts). 앉기·웅크리기·도망·뒷걸음질·무기·전투 자세·지도·아이템·자동은 뺀다 */
+export function useVersusKeys() {
+  for (const k of Object.keys(KEYMAP)) if (!['ArrowLeft', 'ArrowRight', 'Space', 'ShiftLeft', 'ShiftRight', 'Escape'].includes(k)) delete KEYMAP[k];
+  Object.assign(KEYMAP, { ArrowUp: 'jump', KeyA: 'light', KeyS: 'heavy', KeyD: 'skill', KeyF: 'super', KeyW: 'shoot', KeyE: 'charge' } as Record<string, Btn>);
+}
+
 /** Shift를 이 틱 수 안에 떼면 회피, 넘게 누르면 달리기 (0.15초) */
 export const SHIFT_TAP = 5;
 /** 같은 방향 두 번 = 달리기 (틱) */

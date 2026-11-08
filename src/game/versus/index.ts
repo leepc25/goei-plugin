@@ -5,6 +5,7 @@ import { prepareCharPacks, loadChar, charArt, commonUrl } from '../action/art/ch
 import { playerFactory } from '../action/engine/player';
 import { FighterPlayer } from '../action/fighter/player';
 import { view } from '../action/engine/view';
+import { useVersusKeys } from '../action/engine/input';
 import { versus, newMatch, fighterOf, VS_RAISE, VS_LEN } from '../action/engine/versus';
 import { resetSurvival } from '../action/engine/survival';
 import type { Game } from '../action/engine/game';
@@ -115,6 +116,7 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
         hero: fighterOf(0),
         onReady: (g) => {
           game = g;
+          useVersusKeys();
           playerFactory.make = (clips) => new FighterPlayer(clips, charArt(fighterOf(0))!);
           g.start_new('versus');
         },
