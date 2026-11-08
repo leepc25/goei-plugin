@@ -10,6 +10,7 @@ import { resetSurvival } from '../action/engine/survival';
 import type { Game } from '../action/engine/game';
 import type { GameAssets } from '../bridge';
 import { createGameAudio } from '../action/audio';
+import { vsVoice } from './voice';
 import { openSelect, showVs, type SelectResult, type VsSfx } from './select';
 
 export interface VersusHandle {
@@ -36,6 +37,7 @@ export function startVersus(box: HTMLElement, assets: GameAssets, opts: { onClos
   const select = () => {
     versus.hold = true;
     showGame(false);
+    vsVoice('choose');
     sel = openSelect(box, {
       last,
       sfx,

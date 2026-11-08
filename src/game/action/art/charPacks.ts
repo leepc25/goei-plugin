@@ -49,7 +49,14 @@ async function json<T>(pack: string, file: string): Promise<T | null> {
 }
 
 /** 시작: 공용 이펙트·의자·명단(action-fx 팩, 대전은 vs-common). 인물은 고를 때 받는다 */
+let commonPack = 'action-fx';
+/** 공용 팩 안 파일 주소 (대전 아나운서 목소리 등). 팩이 없으면 null */
+export async function commonUrl(file: string): Promise<string | null> {
+  if (!io) return null;
+  try { return await io.urlOf(commonPack, file); } catch { return null; }
+}
 export function prepareCharPacks(assets?: { ready(p: string): Promise<boolean>; url: UrlOf; bytes: BytesOf }, common = 'action-fx') {
+  commonPack = common;
   const own = ++revision;
   fx = null; chars.clear(); loading.clear(); faces.clear();
   if (!assets) return { ready: Promise.resolve(), dispose: () => {} };

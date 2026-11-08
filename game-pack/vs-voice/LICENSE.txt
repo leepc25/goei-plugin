@@ -1,0 +1,10 @@
+대전 아나운서 목소리 (11-08 사용자 결정: MR. HAPPY 기본, K.O.·녹아웃·서든데스는 DRAGON)
+
+MR. HAPPY — Video Game Announcer, DRAGON — Announcer Audio Pack
+SoundBiter SFX library, recorded and produced by VoiceBosch
+https://opengameart.org/content/mr-happy-video-game-announcer
+https://opengameart.org/content/dragon-announcer-audio-pack
+License: CC-BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+
+Changes: trimmed silence, high-pass, compression, sample-rate reduction (12 kHz), short echo, limiter; mono 22 kHz Ogg Vorbis.
+These modified files are also released under CC-BY-SA 4.0.

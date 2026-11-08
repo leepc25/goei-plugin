@@ -55,6 +55,11 @@ def main():
     for f in os.listdir(os.path.join(SRC, 'action-fx')):
         if f.startswith('chair') or f in ('pack.json', 'roster.json'): continue
         shutil.copy(os.path.join(SRC, 'action-fx', f), com)
+    # 아나운서 목소리 (11-08 사용자: MR. HAPPY 오락실 처리 + DRAGON 의 K.O.), 출처는 game-pack/vs-voice/LICENSE.txt
+    vdir = os.path.join(SRC, 'vs-voice')
+    for f in os.listdir(vdir):
+        if f.endswith('.ogg'): shutil.copy(os.path.join(vdir, f), os.path.join(com, 'voice-' + f))
+    shutil.copy(os.path.join(vdir, 'LICENSE.txt'), os.path.join(com, 'voice-LICENSE.txt'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []
     total = 0

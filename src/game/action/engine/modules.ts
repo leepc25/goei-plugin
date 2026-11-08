@@ -3,6 +3,7 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부·필드 건물 지도 (hqMap)
 // 적(enemy/)·아이템(items/)·대사(story/)를 여기에 잇는다. 옛 차원 승강기 출동(층·임무·정산)은 2026-10-28에 지웠다.
+import { vsVoice, setVoiceVolume, type VoiceId } from '../../versus/voice';
 import { BASE_STATS } from '../../combat/baseStats.gen';
 import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
@@ -1113,6 +1114,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     audio.setVolume('sfx', s.sfx);
     audio.setVolume('amb', s.sfx * 0.8);
     audio.setVolume('ui', s.sfx * 0.7);
+    setVoiceVolume(s.master * s.sfx);
   };
   // 발소리: 엔진이 step 사건을 따로 내지 않으므로 땅 위에서 움직인 거리로 낸다 (보폭 걸음 55 / 달리기 75)
   let foot = { x: 0, y: 0, d: 0, w: null as unknown };
@@ -1661,6 +1663,8 @@ const vsCombo = { n: 0, at: 0 };
 let vsClockSay = -1;
 /** 알림 소리 (engineModules 가 audio 로 이어 둔다) */
 let vsSay: ((id: SfxId) => void) | null = null;
+/** 아나운서 (투명 무대만) */
+const vsCall = (id: VoiceId) => { if (view.clear) vsVoice(id); };
 const VS_GOLD = '#ffd35a', VS_RED = '#e0503c';
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const dt = 1 / 60;
@@ -1732,18 +1736,19 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     c.drawImage(hit, nx + num.width + 4, ny + num.height - hit.height - 4);
   }
   // 가운데 알림: 띠·번쩍임 없이 도트 글자만 (11-08 사용자: 본문을 덮지 않는다). 커졌다 줄 때도 정수배로만
-  let key = '', text = '', sub = '', color = HUD_INK, scale = 5, anim: 'slide' | 'stamp' = 'stamp', say: SfxId | null = null;
-  if (versus.over && versus.mode === 'survival') { key = 'sover'; text = `WAVE ${surv.wave}`; sub = `${versus.kills} KO`; say = 'down'; }
-  else if (versus.over) { const win = versus.over.side === 0; key = `over${win}`; text = win ? '승리' : '패배'; color = win ? VS_GOLD : VS_RED; scale = 7; say = win ? 'levelUp' : 'down'; }
-  else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; sub = k2 === 'perfect' ? 'PERFECT' : ''; color = VS_RED; scale = k2 === 'time' ? 5 : 8; say = 'superHit'; }
+  let key = '', text = '', sub = '', color = HUD_INK, scale = 5, anim: 'slide' | 'stamp' = 'stamp', say: SfxId | null = null, call: VoiceId | null = null;
+  if (versus.over && versus.mode === 'survival') { key = 'sover'; text = `WAVE ${surv.wave}`; sub = `${versus.kills} KO`; say = 'down'; call = 'gameover'; }
+  else if (versus.over) { const win = versus.over.side === 0; key = `over${win}`; text = win ? '승리' : '패배'; color = win ? VS_GOLD : VS_RED; scale = 7; say = win ? 'levelUp' : 'down'; call = win ? 'youwin' : 'youlose'; }
+  else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; sub = k2 === 'perfect' ? 'PERFECT' : ''; color = VS_RED; scale = k2 === 'time' ? 5 : 8; say = 'superHit'; call = k2 === 'time' ? 'time' : 'ko'; }
   else if (versus.intro > 0) {
-    if (versus.intro > 0.6) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; anim = 'slide'; say = 'ding'; }
-    else { key = 'fight'; text = 'FIGHT!'; color = VS_GOLD; scale = 7; say = 'superStart'; }
+    if (versus.intro > 0.6) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; anim = 'slide'; say = 'ding';
+      call = versus.mode === 'survival' ? null : text === 'FINAL ROUND' ? 'final' : versus.round <= 3 ? (`round${versus.round}` as VoiceId) : 'final'; }
+    else { key = 'fight'; text = 'FIGHT!'; color = VS_GOLD; scale = 7; say = 'superStart'; call = 'fight'; }
   } else if (versus.mode === 'survival' && surv.bannerT > 0) {
     const boss = waveOf(surv.wave).boss;
     key = `w${surv.wave}`; text = `WAVE ${surv.wave}`; sub = boss ? '대장 등장' : ''; color = boss ? VS_RED : HUD_INK; anim = 'slide'; say = boss ? 'bossRoar' : 'enemySpawn';
   }
-  if (key !== vsBanner.key) { vsBanner.key = key; vsBanner.at = vsT; if (say) vsSay?.(say); }
+  if (key !== vsBanner.key) { vsBanner.key = key; vsBanner.at = vsT; if (say) vsSay?.(say); if (call) vsCall(call); }
   if (key) {
     const e = vsT - vsBanner.at;
     // 찍히기: 처음 몇 장은 정수배로 크게 (+2, +1) → 제 크기

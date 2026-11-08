@@ -31,6 +31,8 @@ export function versusGroup(seg: (action: string, cur: string, items: [string, s
   const st = !s ? (vsUi.loading ? '확인 중…' : '—') : s.state === 'ready' ? '받음' : s.state === 'partial' ? `${s.done}/${s.total}` : '없음';
   rows.push(row('대전 데이터', `<span class="upd-ver">${esc(st)}</span>${s && s.state !== 'ready' ? btn('vs-get', busy ? vsUi.progress || '받는 중…' : `${s.state === 'partial' ? '이어 받기' : '받기'} (${mb(s.bytes)})`, true) : ''}`,
     '대전 코드·이펙트·인물 얼굴판과 인물 126명(이름 있는 인물 55명, NPC 71명)의 전투 동작이에요. 한 번 받으면 이 기기에 저장돼요. 다 받아야 대전을 열 수 있어요.'));
+  // 출처 (CC-BY-SA 4.0 은 출처를 보이게 적어야 한다): game-pack/vs-voice/LICENSE.txt
+  rows.push(row('출처', '', '아나운서 목소리: MR. HAPPY · DRAGON (VoiceBosch, SoundBiter SFX library), CC-BY-SA 4.0. 처리한 소리도 같은 조건이에요.'));
   if (vsUi.err) rows.push(`<div class="gx-err" role="alert">${esc(vsUi.err)}</div>`);
   return `<section class="ps-group"><h3>대전</h3><div class="ps-rows">${rows.join('')}</div></section>`;
 }
