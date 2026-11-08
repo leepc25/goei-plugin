@@ -186,6 +186,12 @@ def main():
     for f in os.listdir(os.path.join(SRC, 'action-fx')):
         if f.startswith('chair') or f in ('pack.json', 'roster.json'): continue
         shutil.copy(os.path.join(SRC, 'action-fx', f), com)
+    # 기본 이펙트 그림(맞음 불꽃·충전 광선·총구 불꽃 등)은 그림 파일만 있고 칸 정보가 vfx.json 에 없다 → 대전 팩에만 칸 정보를 더한다
+    # (칸 정보 출처: game-src/action/testroom3/out_npc/vfx.js. 필드 action-fx 는 그대로 둔다)
+    vm = json.load(open(os.path.join(com, 'vfx.json'), encoding='utf8'))
+    for k, v in json.load(open(os.path.join(ROOT, 'tools', 'vs_base_vfx.json'), encoding='utf8')).items():
+        if k not in vm and os.path.exists(os.path.join(com, v['file'])): vm[k] = v
+    json.dump(vm, open(os.path.join(com, 'vfx.json'), 'w', encoding='utf8'), ensure_ascii=False)
     # 아나운서 목소리 (11-08 사용자: MR. HAPPY 오락실 처리 + DRAGON 의 K.O.), 출처는 game-pack/vs-voice/LICENSE.txt
     vdir = os.path.join(SRC, 'vs-voice')
     for f in os.listdir(vdir):

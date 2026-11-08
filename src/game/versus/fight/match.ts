@@ -480,6 +480,7 @@ export class Match {
     const k = 1 - e.t / e.t0;
     switch (e.k) {
       case 'sheet': {
+        if (e.dur == null) { const v = vfxOf(e.name); e.dur = v ? vfxDur(v) : 0.3; }
         if (e.el > e.dur && !e.loop && !e.hold) { e.t = 0; return; }
         const el = e.loop ? e.el : Math.min(e.el, e.dur - 0.001);
         const alpha = e.fade && e.t < e.fade ? e.t / e.fade : 1;

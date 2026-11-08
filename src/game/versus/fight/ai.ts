@@ -20,6 +20,9 @@ export class Brain {
   private combo: Btn[] = [];
   private comboNext = 0;
   private prevHeld = new Set<Btn>();
+  /** 공격을 마친 뒤 쉬는 끝 (쉬지 않고 계속 치지 않게: 사람이 끼어들 틈) */
+  private rest = 0;
+  private wasAtk = false;
   /** 동시 공격 허락 (서바이벌: 한꺼번에 둘까지) */
   canAttack: () => boolean = () => true;
   /** 멈춤 (판 시작 전·K.O. 뒤) */
@@ -43,6 +46,8 @@ export class Brain {
     const tw: Btn = !o || o.x >= me.x ? 'right' : 'left', away: Btn = tw === 'right' ? 'left' : 'right';
     const gap = o ? Math.abs(o.x - me.x) - (o.half() + me.half()) : 9999;
     const reach = this.reach();
+    if (this.wasAtk && me.state !== 'atk') this.rest = t + (0.3 + R() * 0.5) * (0.6 + this.p.patience);
+    this.wasAtk = me.state === 'atk';
     const busy = me.state === 'atk' || me.state === 'hit' || me.state === 'air' || me.state === 'down' || me.state === 'getup' || me.state === 'dash';
 
     // 콤보 잇기: 앞 공격이 맞았을 때만 다음 단추
@@ -73,6 +78,10 @@ export class Brain {
         } else if (gap < -10 && R() < 0.5) {
           // 붙으면 떨어지기 (몸 비비며 치지 않게)
           this.plan = { kind: 'retreat', until: t + 0.25 + R() * 0.2 };
+        } else if (gap < reach - 6 && !foeDown && this.canAttack() && t < this.rest) {
+          // 쉬는 중: 거리 두거나 지켜보기 (가끔 막기 자세)
+          const r = R();
+          this.plan = r < 0.45 ? { kind: 'retreat', until: t + 0.2 + R() * 0.2 } : r < 0.45 + this.p.guard * 0.5 ? { kind: 'guard', until: t + 0.25 } : { kind: 'idle', until: t + 0.15 };
         } else if (gap < reach - 6 && !foeDown && this.canAttack()) {
           const r = R();
           if (r < 0.42) this.startCombo(['light', 'light', 'light', 'heavy']);

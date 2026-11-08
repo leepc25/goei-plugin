@@ -198,7 +198,7 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
       tt += DT;
       if (me.state !== 'atk') return;
       me.vx = me.face * v;
-      if (!done && s.hit && tt >= (s.delay || 0)) for (const o of me.foes()) { const b = o.hurt(); if (me.x + me.half() > b.x0 && me.x - me.half() < b.x1) { done = true; strike(me, c, s.hit, { x: o.x, r: 10 }); if (s.stop) tt = T; } }
+      if (!done && s.hit && tt >= (s.delay || 0)) for (const o of me.foes()) { const b = o.hurt(), x0 = me.x - me.half() - 10, x1 = me.x + me.half() + 10, fr = me.face > 0 ? x1 + 30 : x0 - 30; if (Math.min(x0, x1, fr) <= b.x1 && Math.max(x0, x1, fr) >= b.x0) { done = true; strike(me, c, s.hit, { x: o.x, r: 10 }); if (s.stop) tt = T; } }
       if (tt < T) later(me.st, DT, tick); else me.vx = 0;
     };
     tick();
