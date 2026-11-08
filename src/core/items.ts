@@ -276,9 +276,8 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     const addUses = itemUses(e.uses);
     const stack = !!addUses && found.uses !== undefined;
     const more = stack ? { uses: Math.min(999, found.uses! + addUses!) } : { uses: e.uses };
-    // 같은 소모품이 더 들어오면 무게도 더한다 (한 묶음이 늘어난 것)
-    const addW = itemWeight(e.weight);
-    const weight = stack && addW !== undefined ? (found.weight ?? 0) + addW : e.weight;
+    // 무게는 1개당 (2026-11-08 사용자): 같은 소모품이 더 들어와도 1개당 무게는 그대로, 합은 개수만큼 곱해진다
+    const weight = found.weight !== undefined ? undefined : e.weight;
     const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(quote ? { quote } : {}) };
     if (JSON.stringify(next) === JSON.stringify(found)) return it;
     return { ...it, list: it.list.map((x) => (x.id === found.id ? next : x)) };
@@ -353,13 +352,13 @@ export function canMerge(a: Item, b: Item): boolean {
   return words(b.name).some((w) => wa.has(w));
 }
 
-/** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 이름·설명은 남는 쪽 그대로, 남은 횟수와 무게만 더한다 (2026-11-08 사용자).
+/** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 이름·설명은 남는 쪽 그대로, 남은 횟수만 더한다 (2026-11-08 사용자, 무게는 1개당이라 그대로).
  * 기록은 마지막 응답에 묶어 다음 요청의 「This turn」으로 본편에 넘긴다 (mergedNow) */
 export function mergeItems(it: Items, alive: Set<string>, keepId: string, otherId: string, anchor = ''): Items {
   const keep = it.list.find((x) => x.id === keepId);
   const other = it.list.find((x) => x.id === otherId);
   if (!keep || !other || !canMerge(keep, other)) return it;
-  const weight = keep.weight !== undefined || other.weight !== undefined ? Math.round(((keep.weight ?? 0) + (other.weight ?? 0)) * 1000) / 1000 : undefined;
+  const weight = keep.weight ?? other.weight; // 1개당 무게 (합은 남은 개수만큼 곱해진다)
   const merged: Item = {
     ...keep,
     uses: Math.min(999, keep.uses! + (itemLeft(it, other, alive) ?? 0)),
@@ -383,8 +382,10 @@ export function itemCarry(vars: Record<string, unknown> | undefined): number {
   const pc = itemWeight(vars?.[ITEM_CARRY_PC_VAR]);
   return pc !== undefined && pc > 0 ? pc : itemCarrySetting(vars);
 }
+/** 물건 한 줄의 무게 kg: 무게는 1개당이고 소모품은 남은 개수만큼 곱한다 (2026-11-08 사용자). left = 남은 개수(비소모는 undefined) */
+export const lineWeight = (e: Item, left: number | undefined): number | undefined => (e.weight === undefined ? undefined : Math.round(e.weight * (e.uses !== undefined ? left ?? e.uses : 1) * 1000) / 1000);
 /** 무게 합 kg (장착한 것까지 전부, 무게 없는 물건은 0) */
-export const totalWeight = (list: Item[]): number => Math.round(list.reduce((n, e) => n + (e.weight ?? 0), 0) * 1000) / 1000;
+export const totalWeight = (list: Item[], left?: (e: Item) => number | undefined): number => Math.round(list.reduce((n, e) => n + (lineWeight(e, left?.(e)) ?? 0), 0) * 1000) / 1000;
 /** 본편에 넘기는 무게 숫자 (kg, 소수 한 자리까지) */
 const kgText = (n: number) => `${Number(n.toFixed(1))} kg`;
 
@@ -512,7 +513,7 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; c
   const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? ' (over the limit)' : ''}`, ...(lines.length ? lines : ['- (nothing)'])];
   // 무게 (2026-11-08 사용자): 「무겁다」 같은 말 없이 지금 상황만 — 합계·한도, 넘었으면 얼마나
   if (opts.carry) {
-    const w = totalWeight(list);
+    const w = totalWeight(list, opts.left);
     out.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ''}`);
   }
   out.push(`Carry limit: ${opts.limit}`);

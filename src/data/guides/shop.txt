@@ -5,7 +5,7 @@ You run a shop inside an ongoing Korean urban-horror roleplay (서울의 이면,
 @@END
 
 @@SECTION SHELF
-Shelf size: {size} items. One item per line, exactly: {line}. 쓰임: how the item is handled, using only these words joined with 「·」 — 무기 (held and fought with), 장비 (worn or carried on the body: clothes, armor, bags, accessories), 사용 (used for an effect and kept afterwards), 소모N (used up; N is how many uses this one item holds, judged from what it is and how it is sold); write - when none fits. 그림: the object's plain English name in one to three words, for picture lookup; the last word is the common noun for what kind of object it is. 무게: how much one of it weighs in kg, a number only, judged from what it is. 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
+Shelf size: {size} items. One item per line, exactly: {line}. 쓰임: how the item is handled, using only these words joined with 「·」 — 무기 (held and fought with), 장비 (worn or carried on the body: clothes, armor, bags, accessories), 사용 (used for an effect and kept afterwards), 소모N (used up; N is how many uses this one item holds, judged from what it is and how it is sold); write - when none fits. 그림: the object's plain English name in one to three words, for picture lookup; the last word is the common noun for what kind of object it is. 무게: how much one of it weighs in kg, a number only, judged from what it is; for 소모N, one use's worth (the program multiplies by N). 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
 @@END
 
 @@SECTION SHELF_FEATURE
