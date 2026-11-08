@@ -14,6 +14,7 @@
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
 //   --fixture <경로>      시험 카드 (기본 .scratch/fixture/fixture.json, 없으면 `npm run test:browser -- --only install` 로 먼저 만든다)
 //   --only-scope <css>    이 선택자 안의 것만 누른다 (예: '.gx' 상황판 창만)
+//   --report-only         누르지 않고 --out 폴더의 report.json(끊긴 것도)으로 report.md 만 다시 만든다
 //   --from 'a|v>b|v'      시작 상태에서 이 열쇠들을 차례로 누른 화면부터 점검한다 (한 화면만 빨리 다시 볼 때. 열쇠는 report.md 의 `action|value`)
 // 빌드(dist/)가 있어야 한다: npm run build
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -37,6 +38,7 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perActi
     else if (k === '--workers') opt.workers = Number(v());
     else if (k === '--out') opt.out = v();
     else if (k === '--fixture') opt.fixture = v();
+    else if (k === '--report-only') opt.reportOnly = true;
     else if (k === '--only-scope') opt.scope = v();
     else if (k === '--from') opt.from = v().split('>').map((x) => x.trim()).filter(Boolean).map((key) => ({ key, nth: 0 }));
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
@@ -157,7 +159,10 @@ window.__ca = (() => {
     return clickables(scope).filter(vis).map((el) => {
       const key = keyOf(el); const nth = (seen[key] = (seen[key] ?? -1) + 1);
       const r = el.getBoundingClientRect();
-      return { key, nth, action: el.dataset.action || '', value: el.dataset.value ?? '', tag: el.tagName.toLowerCase(), cls: cls1(el), label: label(el), disabled: !!el.disabled || el.getAttribute('aria-disabled') === 'true', rect: [r.left, r.top, r.width, r.height].map(Math.round) };
+      // 다른 창(설정 창 등) 뒤에 깔린 것은 지금 화면의 단추가 아니다 → behind. 눌리는 것끼리 겹쳐 가린 것은 문제이므로 그대로 둔다
+      let behind = false;
+      if (r.top < innerHeight && r.bottom > 0) { const h = hit(el); if (!h.ok) { const top = document.elementFromPoint(h.x, h.y); const LAYER = '.gw, .gx-agpop, .gx-idpop, [role=dialog], [class*="pop"], [class*="drawer"], [class*="modal"], [class*="sheet"]'; const tl = top?.closest(LAYER); behind = !!top && ((!!tl && !tl.contains(el)) || !top.closest('[data-action], button, summary, [role=button], label, input, select, a')); } }
+      return { key, nth, behind, action: el.dataset.action || '', value: el.dataset.value ?? '', tag: el.tagName.toLowerCase(), cls: cls1(el), label: label(el), disabled: !!el.disabled || el.getAttribute('aria-disabled') === 'true', rect: [r.left, r.top, r.width, r.height].map(Math.round) };
     });
   };
   const find = (key, nth, scope) => { const seen = {}; for (const el of clickables(scope)) { if (!vis(el)) continue; const k = keyOf(el); const i = (seen[k] = (seen[k] ?? -1) + 1); if (k === key && i === nth) return el; } return null; };
@@ -228,7 +233,7 @@ window.__ca = (() => {
 // ---- 한 번 누르기 ------------------------------------------------------------------------------------------------
 // 새 페이지 → 시작 상태 → path(앞서 누른 것들)를 다시 누름 → target 을 누르고 기록
 async function pressStep(page, step, touch) {
-  const info = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return null; el.scrollIntoView({ block: 'nearest', inline: 'nearest' }); const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return { x: r.left + r.width / 2, y: r.top + r.height / 2, disabled: !!el.disabled, pe: s.pointerEvents }; }, [step.key, step.nth, opt.scope]);
+  const info = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return null; el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }); const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return { x: r.left + r.width / 2, y: r.top + r.height / 2, disabled: !!el.disabled, pe: s.pointerEvents }; }, [step.key, step.nth, opt.scope]);
   if (!info) return { ok: false, why: '못 찾음' };
   const h = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); const r = el.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 1), innerWidth - 2), y = Math.min(Math.max(r.top + r.height / 2, 1), innerHeight - 2); const top = document.elementFromPoint(x, y); return { x, y, ok: !!top && (top === el || el.contains(top) || (el.tagName === 'INPUT' && top.closest('label')?.contains(el))), top: top ? top.tagName.toLowerCase() + '.' + [...top.classList].slice(0, 2).join('.') + (top.dataset?.action ? '[' + top.dataset.action + ']' : '') : '' }; }, [step.key, step.nth, opt.scope]);
   if (!h.ok) return { ok: false, why: `가려짐(위에 ${h.top})`, x: h.x, y: h.y };
@@ -259,7 +264,7 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
     const before = await page.evaluate((sc) => window.__ca.sig(sc), opt.scope);
     const store0 = await page.evaluate(() => ({ setChat: window.__calls.setChat.length, setStore: (window.__calls.setStore || []).length, llm: (window.__calls.llm || []).length, send: (window.__calls.send || []).length, hide: window.__calls.hide }));
     const tag = `${vp}_${String(idx).padStart(4, '0')}_${fname(job.key)}`;
-    const ok = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return false; el.scrollIntoView({ block: 'nearest' }); window.__ca.mark(el); return true; }, [job.key, job.nth, opt.scope]);
+    const ok = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return false; el.scrollIntoView({ block: 'center', behavior: 'instant' }); window.__ca.mark(el); return true; }, [job.key, job.nth, opt.scope]);
     if (!ok) { rec.flags.push('못 찾음'); return rec; }
     await page.screenshot({ path: `${SHOTS}/${tag}_1앞.png` });
     await page.evaluate(() => window.__ca.unmark());
@@ -314,11 +319,12 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
 }
 
 // ---- 돌리기 ------------------------------------------------------------------------------------------------------
-const browser = await launch();
 const results = [];
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
-for (const vp of opt.vp) {
+if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.json'), 'utf8')); results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; }
+const browser = opt.reportOnly ? null : await launch();
+for (const vp of opt.reportOnly ? [] : opt.vp) {
   for (const startKind of opt.start) {
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
@@ -338,6 +344,7 @@ for (const vp of opt.vp) {
     const enqueue = (path, list) => {
       for (const it of list) {
         if (done.has(it.key)) continue;
+        if (it.behind) continue; // 다른 창 뒤: 그 창을 닫은 화면에서 누른다
         // 꺼진 단추는 기록만 하고 누른 것으로 치지 않는다 (다른 화면에서 켜지면 그때 누른다)
         if (it.disabled) { if (!offSeen.has(it.key)) { offSeen.add(it.key); results.push({ vp, start: startKind, path: path.map((p) => p.key), key: it.key, label: it.label, action: it.action, value: it.value, flags: ['꺼진 단추(누를 수 없음)'], disabled: true }); } continue; }
         if (opt.perAction && it.action) { perAct[it.action] = (perAct[it.action] || 0) + 1; if (perAct[it.action] > opt.perAction) continue; }
@@ -368,7 +375,7 @@ for (const vp of opt.vp) {
     }
   }
 }
-await browser.close();
+await browser?.close();
 
 // ---- 통일성 ------------------------------------------------------------------------------------------------------
 // 같은 종류(태그.첫클래스) 끼리 크기·글씨·색·테두리·모서리·안쪽 여백이 몇 가지로 갈리는지. 선택된 것과 아닌 것은 따로 본다.
@@ -376,13 +383,14 @@ const PROPS = ['h', 'font', 'weight', 'family', 'color', 'bg', 'border', 'radius
 const groups = {};
 for (const st of states) for (const s of st.audit?.styles || []) {
   const g = (groups[`${st.vp}|${s.kind}|${s.sel ? '선택됨' : '보통'}`] ||= { n: 0, props: {} });
-  g.n++;
-  for (const p of PROPS) { const v = s.s[p]; ((g.props[p] ||= {})[v] ||= new Set()).add(`${s.key} @${st.path.at(-1) || st.start}`); }
+  // 같은 단추가 여러 화면에 나와도 한 번으로 센다 (어느 화면에서 처음 봤는지만 붙인다)
+  (g.keys ||= new Set()).add(s.key);
+  for (const p of PROPS) { const v = s.s[p]; const m = ((g.props[p] ||= {})[v] ||= new Map()); if (!m.has(s.key)) m.set(s.key, st.path.at(-1) || st.start); }
 }
 const incons = [];
 for (const [k, g] of Object.entries(groups)) {
   const diff = Object.entries(g.props).filter(([, vs]) => Object.keys(vs).length > 1);
-  if (diff.length) incons.push({ group: k, n: g.n, diff: diff.map(([p, vs]) => ({ prop: p, values: Object.entries(vs).map(([v, set]) => ({ v, n: set.size, ex: [...set].slice(0, 4) })).sort((a, b) => b.n - a.n) })) });
+  if (diff.length) incons.push({ group: k, n: g.keys.size, diff: diff.map(([p, vs]) => ({ prop: p, values: Object.entries(vs).map(([v, m]) => ({ v, n: m.size, ex: [...m].slice(0, 4).map(([key, at]) => `${key} @${at}`) })).sort((a, b) => b.n - a.n) })) });
 }
 // 선택 표시: 눌렀을 때 선택 상태가 생긴 것들의 모양을 모은다 (테두리·바탕·그림자·외곽선)
 const selLooks = {};
