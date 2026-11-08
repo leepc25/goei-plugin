@@ -42,10 +42,10 @@ const turns = (def: number) => num('turns', '채팅 참고', def, 0, 200, '턴',
 const craftGroup = (): AdvGroup => ({
   title: '생성 방식',
   items: [
-    { key: 'thoughts', label: '생각 단계', type: 'pick', def: 'off', opts: [['off', '안 함'], ['inner', '속으로만'], ['note', '적고 지움']], hint: '모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요' },
+    { key: 'thoughts', label: '생각 단계', type: 'pick', def: 'off', opts: [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']], hint: '모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요' },
     { key: 'memo', label: '비망록', type: 'pick', def: '0', opts: [['0', '끔'], ['1', '켬']], hint: '모델 거부를 줄이는 긴 앞글이에요. 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요' },
     num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '공통', hint: '0이면 생성 공통 값을 따라요' }),
-    { key: 'model_id', label: '전용 모델', type: 'text', def: '', hint: 'Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인·보조) 설정' },
+    { key: 'model_id', label: '전용 모델', type: 'text', def: '', hint: 'Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인 모델·보조 모델) 설정' },
   ],
 });
 
@@ -56,9 +56,9 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       items: [
         { key: 'lang', label: '생성 언어', type: 'pick', def: 'auto', opts: [['auto', '대화 언어'], ['ko', '한국어'], ['en', '영어'], ['ja', '일본어']], hint: '괴담넷·괴담톡·위키가 쓸 언어' },
         num('retries', '형식 오류 재시도', 1, 0, 3, '회'),
-        { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인'], ['aux', '보조']] },
+        { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인 모델'], ['aux', '보조 모델']] },
         num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요' }),
-        num('ctx_total', '채팅 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
+        num('ctx_total', '컨텍스트 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요' }),
         // 라이트보드 5.0.0에서 옮김 (2026-11-06 사용자 「전부 넣어야지」)
         num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '안 함', hint: '첫 응답을 받은 뒤 「지침과 형식을 빠짐없이 지켰나 다시 읽고, 괜찮으면 그대로, 아니면 고쳐서」를 이만큼 더 물어요. 형식·규칙을 더 잘 지키지만 한 번마다 호출이 하나 늘어요. 기능마다 따로 정할 수도 있어요' }),
         { key: 'user_msgs', label: '유저 메시지', type: 'pick', def: '1', opts: [['1', '포함'], ['0', '빼기']], hint: '괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 본편에 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요' },
@@ -86,13 +86,13 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       ],
     },
     {
-      title: '채팅 반영',
+      title: '컨텍스트에 포함',
       chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_posts', '게시글·댓글', 1), chip('ctx_dms', '쪽지', 1), chip('ctx_own', '내가 쓴 것만', 0)],
       items: [
         num('ctx_post_count', '넣을 게시글', 5, 1, 200, '개'),
         num('ctx_comment_count', '글당 댓글', 10, 0, 1000, '개'),
         num('ctx_dm_count', '넣을 쪽지', 30, 1, 200, '통'),
-        num('ctx_tokens', '반영 토큰 상한', 3000, 0, 200000, TOK, { zero: '제한 없음' }),
+        num('ctx_tokens', '컨텍스트 토큰 상한', 3000, 0, 200000, TOK, { zero: '제한 없음' }),
       ],
     },
     {
@@ -125,12 +125,12 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       items: [turns(8), num('room_history', '방마다 참고할 말풍선', 100, 10, 1000, '개'), budget],
     },
     {
-      title: '채팅 반영',
+      title: '컨텍스트에 포함',
       chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
       items: [
         num('ctx_history', '넣을 말풍선', 200, 1, 1000, '개'),
         num('ctx_notices', '넣을 공지', 1, 0, 50, '개'),
-        num('ctx_tokens', '반영 토큰 상한', 4000, 0, 200000, TOK, { zero: '제한 없음' }),
+        num('ctx_tokens', '컨텍스트 토큰 상한', 4000, 0, 200000, TOK, { zero: '제한 없음' }),
       ],
     },
     {
@@ -165,9 +165,9 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       items: [turns(8), num('ref_count', '관련·2차 참조 최대', 20, 1, 200, '개'), { ...budget, hint: '넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요' }],
     },
     {
-      title: '채팅 반영',
+      title: '컨텍스트에 포함',
       chips: [chip('ctx_focus', '채팅에 나온 문서만', 1), chip('ctx_lore', '로어북 있는 문서', 0), chip('ctx_created', '창작 문서', 1)],
-      items: [num('ctx_count', '넣을 문서', 2, 1, 50, '개'), num('ctx_tokens', '반영 토큰 상한', 8000, 0, 200000, TOK, { zero: '제한 없음' })],
+      items: [num('ctx_count', '넣을 문서', 2, 1, 50, '개'), num('ctx_tokens', '컨텍스트 토큰 상한', 8000, 0, 200000, TOK, { zero: '제한 없음' })],
     },
   ],
 };

@@ -32,7 +32,7 @@ export interface PeopleEnv {
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 /** 도식 「설정 →」이 가는 줄 (블록 id → 그 단계를 켜고 끄는 줄 이름) */
-const PP_GOTO_ROW: Record<string, string> = { 'pp-blk-router': 'Router', 'pp-blk-director': 'Director', 'pp-blk-update': '갱신 시점', 'pp-blk-tidy': '정리 방식' };
+const PP_GOTO_ROW: Record<string, string> = { 'pp-blk-router': 'Router', 'pp-blk-director': 'Director', 'pp-blk-update': '자동 호출', 'pp-blk-tidy': '정리 방식' };
 
 /** 화면 상태 (입력 중인 글은 다시 그려도 지킨다) */
 export const peopleUi = {
@@ -293,7 +293,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): { toggle: string; body: 
           <div class="gx-row-btns">
             ${keepRaw && r.system ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc(`${id}:prompt`)}">보낸 프롬프트 보기</button>` : ''}
             ${r.raw ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc(`${id}:raw`)}">응답 원문 보기</button>` : ''}
-            ${!keepRaw ? '<small class="ps-note">원문은 고급 → 「원문 보관」을 켰을 때만 남아요.</small>' : ''}
+            ${!keepRaw ? '<small class="ps-note">원문은 인물 설정 고급 → 「원문 보관」을 켰을 때만 남아요.</small>' : ''}
           </div>
           ${peopleUi.diagShow === `${id}:prompt` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc(`${r.system ?? ''}\n\n---\n\n${prettyJson(r.data ?? '')}`)}</textarea>` : ''}
           ${peopleUi.diagShow === `${id}:raw` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc(r.raw ?? '')}</textarea>` : ''}
@@ -349,9 +349,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   // 2026-11-07 사용자: 어떤 게 보조 모델을 부르고 무엇을 하는지 알 수 없었다 → 맨 위에 호출 흐름 도식(켜고 끄기·블록으로 바로가기),
   // 그 아래 공통 설정, 그 아래 호출 단계(갱신·Router·Director·정리)마다 한 블록. 꺼진 단계의 세부 칸은 숨긴다
   const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
-  const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인' : '보조');
+  const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인 모델' : '보조 모델');
   const stageModel = (st: Exclude<Stage, 'update'>, help: string) =>
-    row('모델', seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['aux', '보조'], ['main', '메인']]), help) + idBox(st, v(`model_id_${st}`));
+    row('모델', seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['aux', '보조 모델'], ['main', '메인 모델']]), help) + idBox(st, v(`model_id_${st}`));
   const routerOn = s.on && s.router === 'model';
   const sceneOn = s.on && (s.director === 'scene' || s.director === 'facts');
   const updateOn = s.on && s.when === 'turn';
@@ -362,7 +362,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     { name: '입력', sub: '유저 메시지', kind: 'plain', on: s.on, calls: '' },
     { name: 'Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: modelOf('router'), calls: routerOn ? '보조 1회' : '호출 없음 (코드가 고름)', control: seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), block: 'pp-blk-router' },
     { name: 'Director', sub: '이번 턴 연기 지시', kind: 'aux', on: sceneOn, model: modelOf('director'), calls: sceneOn ? (s.directorSearch ? '보조 1회 (검색 땐 2회)' : '보조 1회') : s.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', control: seg('director', s.director, [['off', 'OFF'], ['note', '메모형'], ['facts', '사실형'], ['scene', '연출형']]), block: 'pp-blk-director' },
-    { name: '본편', sub: '응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회' },
+    { name: '본편', sub: '응답 생성', kind: 'main', on: true, model: '메인 모델', calls: '메인 1회' },
     { name: '갱신', sub: '응답을 읽어 기록', kind: 'aux', on: updateOn, model: modelOf('update'), calls: updateOn ? `${s.model === 'main' ? '메인' : '보조'} 1회` : s.on ? '수동 (누를 때만)' : '호출 없음', control: seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), block: 'pp-blk-update' },
     { name: '정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: modelOf('tidy'), calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', control: seg('tidy', s.tidy, [['same', 'OFF'], ['separate', 'ON']]), block: 'pp-blk-tidy' },
   ];
@@ -371,12 +371,13 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     <p class="pp-flow-sum">${s.on ? `턴마다 보조 호출: 본편 전 <b>${preCalls}회</b> · 본편 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? ' (+정리)' : ''}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : '인물 기록이 꺼져 있어 아무 호출도 하지 않아요.'} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
   const common = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
-    row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
+    row('자동 호출', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동으로 읽어요. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
+    row('컨텍스트에 포함', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '사용 안 함']]), '본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
-    row('호감 증가 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요 (리수폿 increase)'),
+    row('호감 증가 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요'),
     row('호감 감소 속도', seg('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown), [['same', '증가와 같게'], ['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 내리는 계기 점수에 곱하는 배율이에요. 「증가와 같게」면 위 값을 써요'),
     row('항상 포함할 인물', `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">`, '쉼표로 구분한 이름. 글에 이름이 안 나와도 매 턴 본편 기록·Director 자료에 넣고, 갱신기도 되짚어요 (리수폿 자동 추적). 기록에 있는 이름만 들어가요'),
-    row('최근 글 범위', seg('recent_msgs', String(s.recentMsgs), [['2', '2개'], ['4', '4개'], ['6', '6개'], ['8', '8개']]), 'Router·Director 가 이번 입력과 함께 보는 최근 메시지 수 (리수폿 stageContext)'),
+    row('최근 글 범위', seg('recent_msgs', String(s.recentMsgs), [['2', '2개'], ['4', '4개'], ['6', '6개'], ['8', '8개']]), 'Router·Director 가 이번 입력과 함께 보는 최근 메시지 수'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
   // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
@@ -402,12 +403,11 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
   ].join('');
   const update = [
-    row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '매 턴 = 응답이 들어올 때마다 자동. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만.'),
-    row('모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
+    row('모델', seg('model', s.model, [['aux', '보조 모델'], ['main', '메인 모델']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
     idBox('update', v('model_id_update')),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 규칙과 설명 전부. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3. 지침 글은 설정 「지침 → 인물 기록 지침」에서 고쳐요.'),
     // 11-07 사용자: 기록 항목(정량·정성 포함)은 「기록할 것」의 하위 항목 — 눈에 띄는 띠 제목 칸 안에, 기본 펼침. 새 인물도 같은 모양의 칸
-    fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 본편 주입도 안 해요.</p>${features}`, true),
+    fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 컨텍스트 포함도 안 해요.</p>${features}`, true),
     fold('pp-new', '새 인물', newPeople, true),
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
   ].join('');
@@ -448,14 +448,6 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     s.hypa ? row('하이파 플러스도 읽기', onoff('hypa_plus'), 'HypaPlus 플러그인이 저장한 기억·사실 노드도 같이 넣어요') : '',
     row('원문 보관', onoff('keep_raw'), '진단에 보낸 프롬프트·응답 원문을 남겨요 (이 기기 플러그인 저장소).'),
   ].join(''));
-  // 진단 묶음도 다른 묶음처럼 줄(이름 + 조작 + 설명)로 (2026-11-05 사용자)
-  const dg = diagTable(ctx, s.keepRaw);
-  const diag = group('진단', [
-    row('새 응답 읽기', updateBar(ctx, canChat), '마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요. 그 앞에 안 읽은 응답이 있으면 범위를 골라 읽을 수 있어요.'),
-    dg.toggle ? row('모든 채팅 보기', dg.toggle, '끄면 이 채팅의 갱신 기록만 보여요.') : '',
-    `<div class="ps-row wide"><div class="ps-label"><b>갱신 기록</b><small>${esc('최근 갱신의 입력 크기·결과·실패 이유예요. 이 기기 플러그인 저장소에 성공 10건·실패 30건까지 두고 오래된 것부터 지워요. 토큰은 한글 1자=1, 그 외 0.3으로 어림했어요.')}</small></div><div class="ps-ctl">${dg.body}</div></div>`,
-    row('진단 지우기', `<button class="gx-mini danger" data-action="pp-diag-clear" ${peopleUi.diag?.length ? '' : 'disabled'}>진단 지우기</button>`, '이 기기에 저장된 갱신 기록을 모두 지워요.'),
-  ].join(''));
   return `<div class="ph-form pp-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>인물 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('pp')}</span></header>${defaultsConfirm('pp')}
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
@@ -468,12 +460,24 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
       ${blk('pp-blk-update', '갱신 (본편 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
       ${blk('pp-blk-tidy', '정리', tidy, '한 인물의 기록이 저장 상한을 넘으면 옛 항목을 합쳐 줄여요.')}
       ${advanced}
-      ${diag}
     </div>
     ${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
     })}
   </div>`;
+}
+
+/** 점검 → 인물 진단 (2026-11-08 사용자: 인물 설정 맨 아래 「진단」 묶음을 점검의 따로 된 메뉴로). 새 응답 읽기·모든 채팅 보기·갱신 기록·진단 지우기 */
+export function peopleDiagPane(ctx: ChatContext, canChat = true): string {
+  const s = peopleSettings(ctx.chat.scriptstate);
+  // 진단 묶음도 다른 묶음처럼 줄(이름 + 조작 + 설명)로 (2026-11-05 사용자)
+  const dg = diagTable(ctx, s.keepRaw);
+  return group('진단', [
+    row('새 응답 읽기', updateBar(ctx, canChat), '마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요. 그 앞에 안 읽은 응답이 있으면 범위를 골라 읽을 수 있어요.'),
+    dg.toggle ? row('모든 채팅 보기', dg.toggle, '끄면 이 채팅의 갱신 기록만 보여요.') : '',
+    `<div class="ps-row wide"><div class="ps-label"><b>갱신 기록</b><small>${esc('최근 갱신의 입력 크기·결과·실패 이유예요. 이 기기 플러그인 저장소에 성공 10건·실패 30건까지 두고 오래된 것부터 지워요. 토큰은 한글 1자=1, 그 외 0.3으로 어림했어요.')}</small></div><div class="ps-ctl">${dg.body}</div></div>`,
+    row('진단 지우기', `<button class="gx-mini danger" data-action="pp-diag-clear" ${peopleUi.diag?.length ? '' : 'disabled'}>진단 지우기</button>`, '이 기기에 저장된 갱신 기록을 모두 지워요.'),
+  ].join(''));
 }
 
 /** 설정 「기록 → 세력」: 세력 평판 켬·끔과 그 세부 (인물 설정에서 뺀 것, 2026-11-05 사용자) */
@@ -487,7 +491,7 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
     ...(s.features.has('faction_rep') ? [
       // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
       row('세력 평판 수치', onoff('num_faction_rep'), 'OFF = 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가고, 필드 몹 반응은 단계로 정해져요. 구간 경계·몹 목격 무게는 안 써요.'),
-      row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
+      row('세력 평판 컨텍스트에 포함', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
       ...(s.factionQual ? [] : [
         row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
         row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반이면 작은 일은 쌓이지 않아요. 명단 인물이 본 일은 늘 그대로 넣어요.'),

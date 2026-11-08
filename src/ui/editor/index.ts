@@ -406,7 +406,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image', 'Shop'] as (GuideName | 'Image')[]).map(guideItem) },
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:people', '인물 진단', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -566,9 +566,10 @@ function flashEl(el: HTMLElement, block: ScrollLogicalPosition): void {
 export function flashSpot(to: string): void {
   const body = root?.querySelector<HTMLElement>('.gw-body');
   if (!body || !to.startsWith('r:')) return;
-  const label = to.slice(2);
+  // 'r:줄 이름@묶음 제목': 같은 이름의 줄이 여럿이면 그 묶음 안의 줄 (괴담톡 「자동 호출」·보기 전용 방 「자동 호출」)
+  const [label, grp] = to.slice(2).split('@');
   const head = (h: Element | null) => (h ? [...h.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? '').join('').trim() : '');
-  const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label);
+  const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label && (!grp || r.closest('.ps-group')?.querySelector('h3')?.textContent?.trim() === grp));
   if (row) flashEl(row, 'center');
 }
 

@@ -9,6 +9,7 @@ import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
 import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
+import { peopleDiagPane } from '../people';
 import { clearTrace, loadTrace } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
 import { ensureFlow, flowPage, flowRecount } from './flow';
@@ -33,8 +34,8 @@ const localWhen = (iso: string): string => {
 };
 const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `${Math.round(n / 1e3)}KB` : `${n}B`);
 
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow';
-export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow';
+export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
+export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
 
 /** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
 const GAME_PACK_PREFIX = 'goei:game:pack:';
@@ -262,6 +263,10 @@ export function manageConfirmPopup(): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
+  if (node === 'manage:people') {
+    return `<div class="gw-page gw-set">${head('', '인물 진단', '인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.')}
+    <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx, canChat)}</div></div></div>`;
+  }
   if (node === 'manage:flow') {
     ensureFlow(ctx, () => rerender?.());
     return flowPage(ctx, head);

@@ -215,7 +215,13 @@ async function leaveField(page) {
   // 2026-10-29: 상태창 칸·배색은 「상태창」 페이지. 상태창 칸 표는 접힘(summary) 없이 「상태창 칸」 묶음 안에, 괴이 발생도 접힘 없이 묶음
   await page.waitForSelector('.st-cols .st-col-row');
   // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
-  assert.equal(await page.locator('.st-col-row').count(), 10, '상태창 칸 10개');
+  assert.equal(await page.locator('.st-col-row:not(.st-col-all)').count(), 10, '상태창 칸 10개');
+  // 모든 칸 표시·숨김 (2026-11-08 사용자): 사용 중인 칸이 한 번에 숨김 → 다시 전부 표시
+  await page.click('[data-action="set-col"][data-value="all:show:0"]');
+  await page.waitForSelector('.st-col-all [data-value="all:show:0"].on');
+  assert.equal(await page.locator('[data-action="set-col"][data-value$=":show:0"].on:not([data-value^="all"])').count(), 10, '모든 칸 숨김');
+  await page.click('[data-action="set-col"][data-value="all:show:1"]');
+  await page.waitForSelector('.st-col-all [data-value="all:show:1"].on');
   assert.equal(await page.isDisabled('[data-action="set-col"][data-value="date:use:0"]'), true, '날짜는 사용을 끌 수 없음');
   await page.click('[data-action="set-col"][data-value="weather:use:0"]');
   await page.waitForSelector('.st-col-row.off');

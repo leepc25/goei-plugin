@@ -627,19 +627,20 @@ function settingsView(ctx: ChatContext): string {
   const line = (label: string, control: string, hint = '') =>
     `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
   return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '', defaultsButtons('wiki'))}${defaultsConfirm('wiki')}
-    <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
-      ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
-      ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
-      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]))}
-      ${line('채팅에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
-      ${line('주석', seg('wiki-footnotes', s.footnotes, [['pop', '뜨는 창'], ['inline', '펼치기']]), '펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요')}
-      ${line('그림', seg('wiki-images', s.images, [['off', '끔'], ['infobox', '정보칸만'], ['body', '본문까지']]), '본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요')}
-    </div></section>
+    <div class="ph-form-body ps">
     <section class="ps-group"><h3>자동 작성</h3><div class="ps-rows">
-      ${line('자동 작성', seg('wiki-auto', s.auto, [['0', '끔'], ['open', '창을 열 때'], ['turn', '매 턴']]), '채팅이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요')}
+      ${line('자동 호출', seg('wiki-auto', s.auto, [['0', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '채팅이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요')}
       ${line('제목', seg('wiki-auto_title', s.autoTitle, [['model', '모델이 고름'], ['input', '직접 입력']]), '모델이 고름 = 명부 항목 중 이번 이야기에 맞는 것')}
       ${s.autoTitle === 'input' ? line('직접 입력', `<input class="gx-search ps-text" data-change="wiki-auto_query" value="${esc(s.autoQuery)}" placeholder="문서 제목">`) : ''}
+    </div></section>
+    <section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
+      ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
+      ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
+      ${line('모델', seg('wiki-model', s.model, [['main', '메인 모델'], ['aux', '보조 모델']]))}
+      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]))}
+      ${line('컨텍스트에 포함', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
+      ${line('주석', seg('wiki-footnotes', s.footnotes, [['pop', '뜨는 창'], ['inline', '펼치기']]), '펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요')}
+      ${line('그림', seg('wiki-images', s.images, [['off', '끔'], ['infobox', '정보칸만'], ['body', '본문까지']]), '본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요')}
     </div></section>
     <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
