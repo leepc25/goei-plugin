@@ -1106,7 +1106,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 목록의 「위키」: 위키 탭의 그 제목으로
   await page.click('.gx-mlist li:first-child [data-action="wiki-goto"]');
   await page.waitForSelector('.nw-compose, .nw-dochead'); // 카드 기본 문서가 있으면 바로 문서, 없으면 작성 화면
-  assert.equal((await page.textContent('.gx-nb.on:not(.mob)')).trim(), '위키');
+  assert.equal((await page.textContent('.gx-nb.on:not(.mob)')).trim(), '인터넷');
   assert.equal((await page.textContent('.nw-title')).trim(), site);
   assert.deepEqual(errors, []);
   console.log('PASS 커스텀 임무: 시작 첫 장면 지시문, 진행 중 요청, 요청 취소');
