@@ -24,7 +24,7 @@ export interface FighterEnv {
   A: Record<string, Json>; IMG: Record<string, HTMLImageElement>; CH: Json; VFX?: Record<string, Json>; CHAIR?: Record<string, HTMLImageElement>;
   held: Set<string>; K(y: number): number; sfx(type: string, extra?: Json): void; font?(n: number): string;
   targets(): { body: Json; x: number; y: number; z: number }[];
-  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null; form?: string; el?: string; debuff?: Json; crit?: boolean }): { killed?: boolean; guard?: boolean } | void;
+  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null; form?: string; el?: string; debuff?: Json; crit?: boolean; use?: string; full?: boolean }): { killed?: boolean; guard?: boolean } | void;
   clamp(P: PState): void; ground(x: number, y: number): number; mod?: { speed(): number; sp(): number; cd?(): number }; heal?(v: number): void;
   /** 치명 굴림·치명 피해 배율 (없으면 치명 없음) */
   crit?(): boolean; critDmg?(): number;
@@ -256,7 +256,7 @@ function damageTarget(dmg?: Json, kind?: Json): { killed?: boolean; guard?: bool
   else if (db?.k === 'bind') bindT(T, db.s || 1.5);
   const src = curSrc === 'perk' ? 'blast' : curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' || curUse ? 'skill' : null);
   let res: { killed?: boolean; guard?: boolean } | void = undefined;
-  if (T.body) res = env.hurt(T, dmg, kind, P.face, hitstop, { src, form: curSrc === 'perk' ? undefined : curHit?.form ?? (src === 'ranged' ? 'gun' : undefined), el: curHit?.el, debuff: db && db.k !== 'mark' && db.k !== 'bind' ? db : undefined, crit });
+  if (T.body) res = env.hurt(T, dmg, kind, P.face, hitstop, { src, form: curSrc === 'perk' ? undefined : curHit?.form ?? (src === 'ranged' ? 'gun' : undefined), el: curHit?.el, debuff: db && db.k !== 'mark' && db.k !== 'bind' ? db : undefined, crit, use: srcNow(), full: srcNow() === 'charge' && P.chargeLv >= chLevels().length });
   if (pk && c) { c.crit = crit; c.dmg = dmg; c.killed = !!res?.killed; c.guarded = !!res?.guard; pk.post(c); }
   return res;
 }

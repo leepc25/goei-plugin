@@ -5,7 +5,7 @@
 import { baseOf, derive, type BaseStats, type Derived } from '../../combat/stats';
 import type { DebuffKind } from '../../combat/status';
 /** 코어가 타격마다 넘기는 꼬리표 */
-type HurtOpt = { push?: number; src?: 'ranged' | 'blast' | 'skill' | null; form?: 'body' | 'gun' | 'psi'; el?: string; debuff?: { k: DebuffKind; s: number }; crit?: boolean };
+type HurtOpt = { push?: number; src?: 'ranged' | 'blast' | 'skill' | null; form?: 'body' | 'gun' | 'psi'; el?: string; debuff?: { k: DebuffKind; s: number }; crit?: boolean; use?: string; full?: boolean };
 import { Player } from '../engine/player';
 import { Fighter } from '../engine/fighter';
 import { newAttackId } from '../engine/ids';
@@ -25,10 +25,14 @@ import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 
 /** 대전(11-08 사용자 「필살기 게이지는 너무 빨리 차」): 필살 게이지 차는 양 배율 */
 const VS_SP = 0.4;
+/** 대전 깎기 피해: 특수기·원거리·충전기를 막았을 때 받는 피해 비율 */
+const VS_CHIP = 0.2;
 /** 대전 뒤 방향 막기: 한 번 막으면 이만큼 막는 자세에 묶인다 (초) */
 const VS_BLOCK_STUN = 0.3;
 /** 대전: 맞으면 이만큼 손을 못 쓴다 (초). 약공격 이음 간격보다 길게 */
 const VS_HITSTUN = 0.45;
+/** 대전 히트스톱 (초): 막음 · 약 · 강 · 띄우기·쓰러뜨리기 · 필살기 */
+const VS_FREEZE = [0.06, 0.09, 0.14, 0.18, 0.24];
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
@@ -288,7 +292,10 @@ export class FighterPlayer extends Player {
       scale *= 2;
       w.say('치명!', 0.8);
     }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow', lethal: !!o.src && ['skill', 'ranged', 'blast'].includes(o.src) || form !== 'body' || !!this.core.P.armed };
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow',
+      // 대전(11-08 사용자 「그래 넣어」): 필살기·끝까지 모은 충전기는 막기 불가, 특수기·원거리·충전기는 막아도 깎인다
+      ...(view.clear ? { unblock: o.use === 'super' || !!o.full, chip: ['skill', 'shot', 'charge', 'super'].includes(o.use ?? '') ? VS_CHIP : 0 } : {}),
+      lethal: !!o.src && ['skill', 'ranged', 'blast'].includes(o.src) || form !== 'body' || !!this.core.P.armed };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦. 퍽: 지속 연장·깊은 상처
@@ -333,11 +340,11 @@ export class FighterPlayer extends Player {
     const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
     // 대전: 상대 반대쪽을 누르고 있으면(뒷걸음질·서 있기) 맞는 순간 막는 자세로. 막는 동안은 못 움직이고 VS_BLOCK_STUN 초 묶인다
-    if (view.clear && this.vsBack && front && (P.mode === 'back' || P.mode === 'ground' || P.mode === 'block') && !this.guardBroken && this.guard >= 8 && this.status.canBlock()) {
+    if (view.clear && this.vsBack && front && !hit.unblock && (P.mode === 'back' || P.mode === 'ground' || P.mode === 'block') && !this.guardBroken && this.guard >= 8 && this.status.canBlock()) {
       if (P.mode !== 'block') this.core.onPress('block');
       this.vsBlockT = VS_BLOCK_STUN;
     }
-    if (P.mode === 'block' && front) {
+    if (P.mode === 'block' && front && !hit.unblock) {
       // 퍽: 막기 사건(가시 방패·혼쭐·금품 수수 불가·쌓인 울분·탄 되받기·맨손으로 쳐낸다·가드 강화·완전 방어)
       const attacker = this.attackerOf(hit);
       const pr = this.perks.blocked({ melee: !!attacker, attacker, dmg: hit.dmg });
@@ -353,7 +360,8 @@ export class FighterPlayer extends Player {
         return { kind: 'hit' };
       }
       this.core.takeHit('hit');
-      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * this.perks.blockChip()));   // 완전 방어: 주인공·NPC(경비 퍽) 모두
+      if (view.clear) this.vsImpact(0);
+      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * (this.perks.blockChip() + (hit.chip ?? 0))));   // 완전 방어: 주인공·NPC(경비 퍽) 모두
       world.emit({ type: 'guard', x: this.x });
       return { kind: 'guard' };
     }
@@ -413,7 +421,7 @@ export class FighterPlayer extends Player {
     const noKnock = this.perks.noKnock();   // 다운 무시·방어막: NPC 퍽도
     const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
     this.core.takeHit(kind);
-    if (view.clear) this.vsStunT = VS_HITSTUN;
+    if (view.clear) { this.vsStunT = VS_HITSTUN; this.vsImpact(hit.unblock ? 4 : strength); }
     return { kind: 'hit' };
   }
 
@@ -558,6 +566,14 @@ export class FighterPlayer extends Player {
   private vsStunT = 0;
   private vsTick = 0;
   private vsTapAt = { light: -99, heavy: -199 };
+  /** 대전 타격감 (11-08 사용자 「대전액션만큼 타격감이 없다」): 맞은 쪽도 그 자리에 멈추고(히트스톱), 멈춘 동안 좌우로 떨리고, 첫 장에 하얗게 번쩍인다.
+   * 세기: 0 막음 · 1 약 · 2 강 · 3 띄우기·쓰러뜨리기 · 4 필살기 */
+  vsFreeze = 0;
+  private vsImpact(lv: number) {
+    this.vsFreeze = Math.max(this.vsFreeze, VS_FREEZE[Math.max(0, Math.min(4, lv))]);
+    const P = this.core.P as unknown as { armorT: number; armorC: string };
+    if (lv > 0) { P.armorT = 0.28; P.armorC = '#ffffff'; }
+  }
   private vsInput(p: Pad, names: Set<string>) {
     const P = this.core.P;
     P.combat = true;
@@ -616,6 +632,7 @@ export class FighterPlayer extends Player {
     P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; // 틱 뒤 막힘·끝 보정
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.perkSync(dt);
+    if (view.clear && this.vsFreeze > 0) { this.vsFreeze -= dt; this.sync(); return; }   // 대전 히트스톱: 맞은 쪽 그림을 멈춘다
     this.core.update(dt);
     this.guardStep(dt);
     this.calmStep(dt);
@@ -746,7 +763,8 @@ export class FighterPlayer extends Player {
   }
   /** 몸 (x,y = 화면 좌표 발 자리: 보간된 값이라 테스트룸 P 대신 이것을 쓴다) */
   drawSelf(ctx: CanvasRenderingContext2D, camX: number) {
-    ctx.save(); ctx.translate(-camX, 0); ctx.imageSmoothingEnabled = false; this.core.drawBody(ctx); ctx.restore();
+    const jit = view.clear && this.vsFreeze > 0 ? (Math.floor(performance.now() / 33) % 2 ? 4 : -4) : 0;   // 히트스톱 동안 좌우 떨림
+    ctx.save(); ctx.translate(-camX + jit, 0); ctx.imageSmoothingEnabled = false; this.core.drawBody(ctx); ctx.restore();
   }
   drawFxLayer(ctx: CanvasRenderingContext2D, camX: number) {
     this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });

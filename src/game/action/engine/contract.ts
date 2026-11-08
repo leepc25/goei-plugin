@@ -38,6 +38,10 @@ export interface Hit extends WBox {
   low?: boolean;
   /** 크게 날리는 한 방(테스트룸 blow): 맞은 쪽은 크게 밀려나기(18_2) */
   blow?: boolean;
+  /** 막기 불가 (대전: 필살기·끝까지 모은 충전기) */
+  unblock?: boolean;
+  /** 막았을 때 받는 피해 비율 (대전 깎기 피해) */
+  chip?: number;
   /** 무기 쪽 공격(칼·총·투척·이능·기술·폭발, 무기 든 근접): 살해 허용일 때 기절한 몸을 죽일 수 있다. 맨손은 기절까지만 */
   lethal?: boolean;
   grab?: boolean;

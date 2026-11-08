@@ -97,6 +97,22 @@ function vsMark(): HTMLCanvasElement {
 }
 
 
+/** 고르기·VS 화면을 경기 그림판과 같은 틀에 넣는다 (11-08 사용자 「화면 구성이 이상한데」): 1280×960 을 경기와 같은 배율로 줄여(키우지 않음) 상자 아래 가운데에.
+ * ui/stage.ts 투명 무대와 같은 식: 배율 = min(1, 높이/960, 폭/1280), 바닥을 상자 아래에 붙인다 */
+const STAGE_W = 1280, STAGE_H = 960;
+/** 전신 확대: 경기 화면처럼 도트 한 칸 = 2px (11-08 사용자 「캐릭터는 확대 적용 안되서 좃만하게」) */
+const FIG_ZOOM = 1.6;
+function fitStage(el: HTMLElement, box: HTMLElement): void {
+  const fit = () => {
+    if (!el.isConnected) { ro.disconnect(); return; }
+    const bw = box.clientWidth, bh = box.clientHeight, sc = Math.min(1, bh / STAGE_H, bw / STAGE_W);
+    Object.assign(el.style, { inset: 'auto', left: `${Math.round((bw - STAGE_W * sc) / 2)}px`, top: `${Math.round(bh - STAGE_H * sc)}px`, width: `${STAGE_W}px`, height: `${STAGE_H}px`, transformOrigin: '0 0', transform: `scale(${sc})` });
+  };
+  const ro = new ResizeObserver(fit);
+  ro.observe(box);
+  fit();
+}
+
 const CSS = `
 .vs-sel{--shd:drop-shadow(3px 3px 0 rgba(0,0,0,.6));position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:40;user-select:none}
 .vs-sel *{box-sizing:border-box}
@@ -125,8 +141,8 @@ const CSS = `
 .vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:0 4px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-time.low{animation:vs-pulse .5s steps(2) infinite}
 .vs-fig{position:absolute;bottom:58px;z-index:2;pointer-events:none}
-.vs-fig[data-s="0"]{left:3%}
-.vs-fig[data-s="1"]{right:3%}
+.vs-fig[data-s="0"]{left:0;transform:scale(${FIG_ZOOM});transform-origin:left bottom}
+.vs-fig[data-s="1"]{right:0;transform:scale(${FIG_ZOOM});transform-origin:right bottom}
 .vs-slot{position:absolute;bottom:0}
 .vs-slot[data-k="1"] canvas:not(.sh),.vs-slot[data-k="2"] canvas:not(.sh){opacity:.85}
 .vs-slot.in{animation:vs-pop .2s steps(4)}
@@ -141,7 +157,7 @@ const CSS = `
 .vs-picks{display:flex;gap:3px;margin-bottom:2px}
 .vs-nm[data-s="1"] .vs-picks{flex-direction:row-reverse}
 .vs-gridw{position:absolute;z-index:3;left:50%;top:var(--gt);transform:translateX(-50%);pointer-events:auto}
-.vs-sel[data-st="char"] .vs-top{top:auto;bottom:62px}
+.vs-sel[data-st="char"] .vs-top{top:34px}
 .vs-title{display:flex;flex-direction:column;align-items:center;gap:4px}
 .vs-sel[data-st="char"] .vs-title{padding:8px 14px}
 .vs-grid{display:grid;gap:3px}
@@ -155,19 +171,20 @@ const CSS = `
 .vs-cur.c1{left:auto;right:0}
 .vs-say{position:absolute;z-index:4;left:0;right:0;bottom:170px;display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
 .vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;}
-.vs-sel[data-st="char"] .vs-help{bottom:auto;top:4px;display:flex;justify-content:center}
+.vs-sel[data-st="char"] .vs-help{display:flex;justify-content:center}
 .vs-say canvas,.vs-help canvas,.vs-load canvas,.vs-vteam canvas{filter:var(--shd)}
 .vs-say canvas,.vs-help canvas,.vs-load canvas{padding:0 4px;${frameCss(F_BASE)}}
 .vs-title{position:relative}
 .vs-title:before,.vs-mode:before,.vs-time:before,.vs-nm:before,.vs-vname:before{content:'';position:absolute;inset:-6px;z-index:-1;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.3) 0 1px,transparent 1px 2px),repeating-linear-gradient(to right,rgba(255,60,60,.07) 0 1px,rgba(60,255,60,.07) 1px 2px,rgba(60,60,255,.07) 2px 3px)}
 @keyframes vs-blink{50%{border-color:${HUD_INK}}}
 @keyframes vs-pulse{50%{opacity:.4}}
-@keyframes vs-inL{from{transform:translateX(-80px);opacity:0}}
-@keyframes vs-inR{from{transform:translateX(80px);opacity:0}}
+@keyframes vs-inL{from{transform:translateX(-80px) scale(${FIG_ZOOM});opacity:0}}
+@keyframes vs-inR{from{transform:translateX(80px) scale(${FIG_ZOOM});opacity:0}}
 @keyframes vs-pick{0%{filter:brightness(3)}}
 .vs-vfig{position:absolute;bottom:56px}
-.vs-vfig[data-s="0"]{left:8%;animation:vs-inL .3s steps(5) backwards}
-.vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
+.vs-vfig{transform:scale(${FIG_ZOOM})}
+.vs-vfig[data-s="0"]{transform-origin:left bottom;left:0;animation:vs-inL .3s steps(5) backwards}
+.vs-vfig[data-s="1"]{transform-origin:right bottom;right:0;animation:vs-inR .3s steps(5) backwards}
 .vs-vfig[data-s="0"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
 .vs-vfig[data-s="1"] canvas:not(.sh){filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-vnm{position:absolute;z-index:5;bottom:184px;transform:translateY(50%);display:flex;flex-direction:column;gap:6px}
@@ -303,7 +320,7 @@ function figure(h: number, flip: boolean, k = 1) {
 }
 
 /** 대형 (태그매치, 11-08 사용자): 1P 「/」, 2P 「\」 대각선 줄. 뒤로 갈수록 원근으로 작게, 조금 위에. 1:1 은 한 명 */
-const FIG_H = 256, PERSP = [1, 0.93, 0.86], DX = 50, DY = 14;   // 살짝 겹치게, 원근은 적게 (11-08 사용자)
+const FIG_H = 256, PERSP = [1, 0.93, 0.86], DX = 34, DY = 12;   // 살짝 겹치게, 원근은 적게 (11-08 사용자)
 function troupe(_h: number, flip: boolean, n = 3) {
   const figs = Array.from({ length: n }, (_, k) => figure(FIG_H, flip, PERSP[k]));
   const el = document.createElement('div');
@@ -375,6 +392,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   el.className = 'vs-sel';
   el.tabIndex = -1;
   box.append(st, el);
+  fitStage(el, box);
   const rows = pool();
   const names = [...rows.map((r) => r.name), RANDOM];
   let mode = MODES.find((m) => m.id === (opts.last?.mode ?? opts.mode)) ?? MODES[0];
@@ -395,10 +413,10 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   // 11-08 사용자 「격투게임처럼」: 얼굴은 네 칸씩 묶음, 묶음 사이를 띄운다
   // 판은 위쪽(도움말 아래)에, 세 칸 묶음을 띄워 늘어놓는다. 아래는 양옆 전신과 가운데 PLAYER SELECT
   const BLOCK = 3, BGAP = 14;
-  const COLS = Math.max(6, Math.min(15, Math.floor((box.clientWidth - 20) / (BLOCK * (CELL + 3) + BGAP)) * BLOCK));
+  const COLS = 9;   // 1280 틀 가운데 세 묶음, 양옆에 큰 전신 (11-08 사용자 「캐릭터칸은 저 위에 붙어있고」)
   const gridH = Math.ceil(names.length / COLS) * (CELL + 3);
   el.style.setProperty('--gh', `${gridH}px`);
-  el.style.setProperty('--gt', '40px');
+  el.style.setProperty('--gt', `${Math.max(120, Math.round((STAGE_H - gridH) / 2 - 10))}px`);
   // 전신은 이름 줄 위에 선다: 위 제목 줄(약 90px)과 판 사이 높이
   const figH = FIG_H;
   el.innerHTML = `<div class="vs-top"><div class="vs-title"></div>
@@ -636,9 +654,8 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
       tm.dataset.s = String(s);
       // 11-08 사용자: 얼굴 칸은 경기 체력 칸 자리(modules.ts drawVersusBars: 1.25배, 위 14 + 16:9 넘는 높이, 옆 16)
       // 경기 그림판은 폭 1280 을 본문 폭에 맞춰 줄이고, 칸은 그 그림판의 (14 + 16:9 넘는 높이/1.25)×1.25 자리
-      const z = box.clientWidth / 1280;
-      tm.style.top = `${Math.round(z * (14 * 1.25 + Math.max(0, box.clientHeight / z - 720)))}px`;
-      tm.style[s ? 'right' : 'left'] = `${Math.round(16 * 1.25 * z)}px`;
+      tm.style.top = `${Math.round(1.25 * (14 + (STAGE_H - 720) / 1.25 * 0.25))}px`;   // 틀 안 좌표 = 그림판 좌표
+      tm.style[s ? 'right' : 'left'] = `${Math.round(16 * 1.25)}px`;
       list.forEach((n) => tm.appendChild(cellCanvas(n, CELL)));
       el.appendChild(tm);
     }
@@ -647,6 +664,7 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
   const ld = document.createElement('div'); ld.className = 'vs-load'; ld.appendChild(dot('불러오는 중', HUD_DIM, 1));
   el.append(big, ld);
   box.append(st, el);
+  fitStage(el, box);
   let raf = 0;
   const tick = (now: number) => { figs.forEach((f) => f.draw(now)); raf = requestAnimationFrame(tick); };
   raf = requestAnimationFrame(tick);
