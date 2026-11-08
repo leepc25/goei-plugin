@@ -436,6 +436,13 @@ export class Fighter {
     this.st.sfx({ type: 'whiff', strength: n === 'heavy' ? 3 : 1, x: this.x });
     const s = normalSeq(this.art, id, n === 'heavy');
     const pre = s.filter((e) => !e.act && !e.cancel).reduce((a, e) => a + e.d, 0);
+    // 이어치기: 앞 타에 밀려난 상대(맞는 중·막는 중)에게 이번 타가 닿도록 그만큼 더 다가간다 (11-08: 3타가 밀려난 상대에게 헛나감)
+    const o = this.foe(), imp = s.find((e) => e.act);
+    if (o && imp && pre > 0 && (o.state === 'hit' || (o.state === 'guard' && o.stun > 0))) {
+      const m = this.art.A[id], tip = (Math.max(m.reach[imp.f], MIN_TIP) + TIP.front - 12) * K;
+      const need = Math.abs(o.x - this.x) - o.half() - tip + o.stun * Math.abs(o.vx) * 0.5;
+      if (need > 0) lunge = Math.max(lunge, Math.min(1100, need / pre));
+    }
     this.vx = this.face * lunge;
     later(this.st, pre, () => { if (this.atk?.use === use && this.state === 'atk') this.vx = 0; });
     this.play(id, s, { onEnd: () => { if (n === 'light') this.lightEnd = this.st.t; this.vx = 0; this.toIdle(); } });
@@ -621,7 +628,8 @@ export class Fighter {
       if (multi) use.sc = k;
       dmg = this.scaleDmg(use, h, k);
     }
-    dmg = Math.max(1, Math.round(dmg));
+    // 기술 전체 피해를 다 쓴 뒤의 대는 피해 없이 맞는 모습만
+    dmg = multi && use.dealt >= use.budget ? 0 : Math.max(1, Math.round(dmg));
     this.takeDmg(by, use, dmg, 1);
     this.comboTaken++;
     by.combo = this.comboTaken;

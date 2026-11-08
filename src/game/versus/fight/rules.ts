@@ -127,4 +127,4 @@ export const TIP = { front: 10, back: 46 };
 export const WALL = 60;
 
 /** 기술 피해를 나눌 최대 맞는 수 (이보다 많이 맞는 기술은 앞쪽 이만큼에서 전체 피해가 다 들어가고, 나머지는 1씩) */
-export const HIT_CAP = { skill: 5, charge: 5, super: 8 };
+export const HIT_CAP = { skill: 3, charge: 2, super: 4 };

@@ -246,7 +246,8 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
     if (o) spots.splice(Math.floor(Math.random() * (spots.length + 1)), 0, { x: o.x, z: o.z, onT: true });
     spots.forEach((pt, i) => later(st, i * (s.every ?? 0.11), () => runFx(me, (s.each || []).map((e: Json) => ({ ...e, at: e.at === 'self' ? 'self' : 'target', hit: pt.onT ? e.hit : null })), { ...c, pt: pt.onT && o ? { x: o.x, z: o.z, onT: true } : pt })));
   },
-  later(me, s, c) { later(me.st, s.in || 0.5, () => { if (me.state === 'atk' || me.inSuper) runFx(me, s.fx, c); }); },
+  // 늦게 나오는 부품: 동작이 끝난 뒤라도 나온다. 그 사이 내가 맞아 끊겼으면(맞는 중·뜬 채·쓰러짐) 안 나온다 (11-08: 박민성 충전 끝 내려찍기가 안 나옴)
+  later(me, s, c) { later(me.st, s.in || 0.5, () => { if (me.inSuper || !(me.state === 'hit' || me.state === 'air' || me.state === 'down' || me.state === 'getup' || me.state === 'ko')) runFx(me, s.fx, c); }); },
   repeat(me, s, c) { for (let i = 0; i < (s.n || 3); i++) later(me.st, i * (s.every || 0.1), () => runFx(me, s.fx, c)); },
   chance(me, s, c) { runFx(me, Math.random() < (s.p ?? 0.5) ? s.yes : s.no, c); },
   barrage(me, s, c) {
