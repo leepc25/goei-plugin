@@ -211,30 +211,30 @@ if (want('G1')) {
   await page.waitForSelector('.gn');
   // 1-a. 깨진 JSON → 설정 재시도(기본 1회)로 한 번 더 묻고, 그것도 깨지면 실패 + 원문
   await llm(page, [ok('{"posts": [ {"author": "a", "id": 1846001, "title": "t"'), ok('이건 JSON 아님')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   await idle(page);
   assert.equal(await llmCount(page), 2, '형식 오류는 설정 횟수(1)만큼 다시 묻는다');
   const retryMsgs = await page.evaluate(() => window.__calls.llm[1].messages);
   assert.ok(retryMsgs.at(-1).content.includes('Validation error'), '다시 물을 때 오류 안내');
   assert.ok((await page.textContent('.nw-fail')).includes('이건 JSON 아님'), '실패 원문 보관');
-  assert.ok(await page.isEnabled('[data-action="gn-refresh"]'), '실패 뒤 새로고침 단추가 다시 눌린다');
+  assert.ok(await page.isEnabled('[data-action="br-reload"]'), '실패 뒤 새로고침 단추가 다시 눌린다');
   assert.ok((await page.textContent('.gn')).includes('게시글이 없어요'), '기존(빈) 게시판 유지');
   // 1-b. 빈 응답 → 일시 오류로 보고 같은 요청을 두 번까지 다시 보낸다 (host/llm.ts TRANSIENT, 2026-11-07 사용자). 끝까지 비면 실패 안내
   await llm(page, [ok('   '), ok(' '), ok('  ')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await llmCount(page), 5, '빈 응답은 두 번까지 다시 보낸다');
   assert.ok((await page.textContent('.gx-toast, .gn')).includes('빈 응답'));
   // 1-c. 모델 실패 (type fail)
   await llm(page, [fail('Failed to fetch')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await llmCount(page), 6);
   assert.ok((await page.textContent('.gn')).includes('모델 요청에 실패'));
   // 1-d. posts 가 비었거나 전부 사용자 명의 → 유지 + 안내
   await llm(page, [ok(JSON.stringify({ posts: [post(1, { author: '익명' })] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.ok((await page.textContent('.gn')).includes('기존 게시판을 유지'), '사용자 명의 글만 오면 유지');
   // 1-e. 정상 응답 뒤 두 번 연달아 누르기: 두 번째는 「끝난 뒤 다시」 안내만, 모델 호출 없음
@@ -244,10 +244,10 @@ if (want('G1')) {
     const orig = window.risuai.runLLMModel;
     window.risuai.runLLMModel = async (o) => { window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 800)); window.risuai.runLLMModel = orig; return { type: 'success', result: b }; };
   }, JSON.stringify({ posts: [post(1), post(2)] }));
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   await page.evaluate(() => document.querySelector('[data-action="gn-refresh"]').removeAttribute('disabled'));
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   assert.ok((await page.textContent('.gn')).includes('끝난 뒤 다시'), '생성 중 안내');
   await idle(page);
   assert.equal(await llmCount(page), n0 + 1, '겹쳐 누르면 한 번만 부른다');
@@ -269,7 +269,7 @@ if (want('G2')) {
     post(2, { author: `"><b onclick="window.__xss=3">x`, title: `제목 ${evil}`, content: `본문 ${evil}`, comments: [{ author: `c${evil}`, content: `댓글 ${evil}`, parent: 0, mine: false }] }),
   ], incoming: [{ nick: `쪽${evil}`, body: `쪽지 ${evil}` }] };
   await llm(page, [ok(JSON.stringify(board))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   await page.waitForSelector('.gn-row-main[data-value="1846002"]', { timeout: 5000 }).catch(async () => { throw new Error(`글이 안 보임: ${await page.textContent('.gn')}`); });
   await page.click('.gn-row-main[data-value="1846002"]');
@@ -283,12 +283,13 @@ if (want('G2')) {
   await page.waitForSelector('.gn-pane .ph-msg');
   assert.equal(await page.evaluate(() => window.__xss), undefined);
   // 사용자 입력: 닉네임·주제 설정
-  await page.click('[data-action="gn-nick"]');
-  await page.fill('input[name="gn-nick"]', `닉${evil}`);
-  await page.click('[data-action="gn-nick-save"]');
+  // 닉네임은 인터넷 로그인 하나 (2026-11-08)
+  await page.click('[data-action="br-login"]');
+  await page.fill('input[name="br-nick"]', `닉${evil}`);
+  await page.click('[data-action="br-login-save"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_nick ?? '').startsWith('닉<img'));
   assert.equal(await page.evaluate(() => window.__xss), undefined, '닉네임도 글자로');
-  assert.ok((await page.textContent('.gn-mynick')).includes('<img src=x'));
+  assert.equal(await page.locator('.br img[src="x"]').count(), 0, '닉네임 img 태그가 글자로만');
   await featSet(page, 'set:gnet');
   await page.fill('[data-change="gn-text"][data-key="subject"]', `주제 "${evil}`);
   await page.dispatchEvent('[data-change="gn-text"][data-key="subject"]', 'change');
@@ -318,14 +319,17 @@ if (want('G3')) {
   await nav(page, 'gnet');
   await page.waitForSelector('.gn-row-main');
   const dt = Date.now() - t0;
-  assert.equal(await page.locator('.gn-row').count(), 500);
+  assert.equal(await page.locator('.gn-row').count(), 20, '한 쪽 20개');
+  assert.equal(await page.locator('[data-action="gn-page"]').count(), 24, '쪽 넘김 25쪽');
   assert.ok(dt < 5000, `글 500개 첫 그리기 ${dt}ms`);
   const t2 = Date.now();
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.waitForSelector('.gn-dmrow');
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await page.waitForSelector('.gn-row-main');
   assert.ok(Date.now() - t2 < 2500, `글 500개 다시 그리기 ${Date.now() - t2}ms`);
+  await page.click('[data-action="gn-page"][data-value="13"]');
+  await page.waitForSelector('.gn-row-main[data-value="' + (B + 250) + '"]');
   const t1 = Date.now();
   await page.click('.gn-row-main[data-value="' + (B + 250) + '"]');
   await page.waitForSelector('.gn-post');
@@ -356,9 +360,9 @@ if (want('G3')) {
   await page.click('[data-action="gn-cfg"][data-value="privacy=4"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.privacy'] === '4');
   await featSet(page, 'set:gnet');
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   const sys = await page.evaluate(() => window.__calls.llm.at(-1).messages[0].content);
   const usr = await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content);
@@ -435,7 +439,7 @@ if (want('G4')) {
     window.risuai.runLLMModel = async (o) => { window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 1200)); return { type: 'success', result: JSON.stringify({ posts: [{ author: 'z', id: 1846990, title: '느린 결과', time: '01:00', date: '2025.01.01 01:00', views: 1, upvotes: 0, content: 'x', mine: false, comments: [] }], incoming: [] }) }; };
     window.__restoreLlm = () => { window.risuai.runLLMModel = orig; };
   });
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   // 생성 중 사용자가 설정에서 닉네임을 바꾼다 (게시판 자체는 안 바뀜 → 결과 적용됨), 그리고 글을 지우면 → 결과 버림
   // 게시판의 글 하나를 통째로 지운다 (마지막 줄이면 줄바꿈이 없다)
@@ -458,18 +462,19 @@ if (want('G5')) {
   await open(page);
   await nav(page, 'gnet');
   await page.waitForSelector('.gn');
-  await page.click('[data-action="gn-nick"]');
-  await page.fill('input[name="gn-nick"]', '야간순찰');
-  await page.press('input[name="gn-nick"]', 'Enter');
+  await page.click('[data-action="br-login"]');
+  await page.fill('input[name="br-nick"]', '야간순찰');
+  await page.press('input[name="br-nick"]', 'Enter');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_nick === '야간순찰');
-  assert.ok((await page.textContent('.gn-mynick')).includes('야간순찰'), 'Enter 로도 저장(data-enter)');
+  assert.equal(await page.locator('.br-prof.in').count(), 1, 'Enter 로도 저장(data-enter)');
   // 새로고침: 내 별명 명의 글·댓글은 뺀다
   await llm(page, [ok(JSON.stringify({ posts: [post(1, { comments: [{ author: '야간순찰', content: '사칭', parent: 0 }, { author: 'b', content: '진짜', parent: 0 }] }), post(2, { author: '야간순찰' })], incoming: [] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await page.locator('.gn-row').count(), 1, '내 명의 글은 뺌');
   assert.ok((await page.textContent('.gx-toast')).includes('새 글 1개와 댓글·연결 답글 1개'), '뺀 것 안내');
   // 새 쪽지: 받는 사람을 직접 적는다 (쪽지 상대는 공개 글이 하나뿐이면 출처가 붙는다)
+  await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.click('[data-action="gn-newdm"]');
   await page.waitForSelector('[data-input="gn-to"]');
   await page.click('[data-action="gn-send"]');
@@ -485,6 +490,7 @@ if (want('G5')) {
   assert.ok(Array.isArray(dmReq));
   assert.ok((await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content)).includes('Original forum post #1846001'), '공개 글이 하나뿐이면 출처가 붙는다');
   // 나에게는 못 보냄
+  await page.click('[data-action="gn-back"]');
   await page.click('[data-action="gn-newdm"]');
   await page.fill('[data-input="gn-to"]', '야간순찰');
   await page.fill('[data-input="gn-draft"]', '나');
@@ -497,7 +503,7 @@ if (want('G5')) {
   await page.waitForFunction(() => !/^D\|n1/m.test(window.__chat.scriptstate.$gn_raw));
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('T|n1'), '출처도 지움');
   // 댓글 달기 → 답글 → 내 댓글 삭제하면 뒤 번호가 당겨지고 답글은 부모를 잃어 글에 붙는다
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await page.click('.gn-row-main[data-value="1846001"]');
   await page.fill('[data-input="gn-draft"]', '내 댓글');
   await llm(page, [ok(JSON.stringify({ comments: [{ author: 'b', content: '답', parent: 2 }], incoming: [], activity: [] }))]);
@@ -507,12 +513,13 @@ if (want('G5')) {
   await page.click('[data-action="gn-del-comment"][data-value="1846001:2"]');
   await page.waitForFunction(() => /C\|1846001\|0\|b\|답\|0/.test(window.__chat.scriptstate.$gn_raw), null, { timeout: 4000 });
   assert.equal(await page.locator('.gn-pane .gn-c').count(), 2);
-  // 모바일: 글은 목록 안에서 펼쳐지고 댓글 입력줄이 아래에 고정
+  // 모바일: 글은 한 화면으로 열리고 댓글 입력줄이 아래에 있다
   await page.setViewportSize({ width: 390, height: 844 });
   await page.click('.br-bm[data-value="gn"]').catch(() => {});
   await page.waitForTimeout(200);
-  if (!(await page.locator('.gn-inline').count())) await page.click('.gn-row-main[data-value="1846001"]');
-  await page.waitForSelector('.gn-inline');
+  // 모바일은 글을 한 화면으로 연다 (사이트 화면, 2026-11-08)
+  if (!(await page.locator('.gn-post').count())) await page.click('.gn-row-main[data-value="1846001"]');
+  await page.waitForSelector('.gn-post');
   assert.equal(await page.locator('.gn-composer [data-input="gn-draft"]').count(), 1, '모바일 입력줄');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   assert.deepEqual(errors, []);

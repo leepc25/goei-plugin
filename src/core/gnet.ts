@@ -33,6 +33,10 @@ export interface GPost {
   body: string;
   mine: boolean;
   comments: GComment[];
+  /** 분류 (모델이 글마다 붙이는 말머리, 2026-11-08). 옛 글은 없음 */
+  tag?: string;
+  /** 내가 스크랩한 글 (스크랩한 글은 새로고침에도 남는다) */
+  scrap?: boolean;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -269,6 +273,7 @@ export function decode(raw: unknown): GState {
         const post: GPost = {
           id, date: validDate(p[2]), nick: cut(p[3], 80), title: p[4], views: Math.max(0, Math.floor(Number(p[5]) || 0)),
           votes: Math.max(0, Math.floor(Number(p[6]) || 0)), body: p[7], mine: p[8] === '1', comments: [],
+          ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
         };
         st.posts.push(post);
         map.set(id, post);
@@ -293,7 +298,7 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0'].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0'].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const [nick, s] of Object.entries(st.sources)) out.push(['T', en(nick), s.postid || 0, en(s.title), en(s.body), en(s.author), en(s.quote), en(s.quoteAuthor)].join('|'));
@@ -355,6 +360,7 @@ export function postLimit(s: GnetSettings): number {
 }
 
 export function protectedPost(s: GnetSettings, p: GPost): boolean {
+  if (p.scrap) return true;
   if (p.mine) return s.keepOwn;
   return s.keepReplied && p.comments.some((c) => c.mine);
 }
@@ -673,12 +679,15 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
     const q: GPost = {
       id: pid, nick: cut(author || 'ㅇㅇ', 80), title: str(raw.title), body: stripForged(str(raw.content)), date,
       views: Math.max(0, int(raw.views) ?? 0), votes: Math.max(0, int(raw.upvotes) ?? 0), mine: prev?.mine ?? false, comments: [],
+      ...(cleanTag(raw.tag) ? { tag: cleanTag(raw.tag) } : {}),
     };
     // 저장된 기록의 작성자·제목·본문·날짜가 이긴다. 모델은 NPC 댓글과 조회·추천만 보탠다
     const sigs = new Map<string, number>();
     const remap = new Map<number, number | false>([[0, 0]]);
     if (prev) {
       Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+      if (prev.tag) q.tag = prev.tag;
+      if (prev.scrap) q.scrap = true;
       for (const c of prev.comments) {
         q.comments.push(c);
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
@@ -880,19 +889,23 @@ export function pushComments(p: GPost, rows: NewComment[], now: string): void {
   stampComments(p, from, rows.map((c) => c.time ?? ''), now);
 }
 
-export function parsePostDraft(value: unknown): { title: string; content: string } {
+/** 분류 글자: 한 줄, 12자 안쪽 */
+export const cleanTag = (v: unknown): string => cut(str(v).split(/\r?\n/)[0].replace(/[\[\]【】]/g, '').trim(), 12);
+
+export function parsePostDraft(value: unknown): { title: string; content: string; tag?: string } {
   if (!isObj(value) || !isObj(value.post)) throw new GnetError('응답에 post.title과 post.content가 없어요.');
   const title = str(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? '';
   const content = str(value.post.content).trim();
   if (!title || !content) throw new GnetError('게시글 제목이나 본문이 비어 있어요.');
-  return { title: trimTokens(title, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
+  const tag = cleanTag(value.post.tag);
+  return { title: trimTokens(title, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens), ...(tag ? { tag } : {}) };
 }
 
 /**
  * 첨부가 있는 글: 모델이 다듬은 본문에서 첨부 기록과 "(첨부파일: …)" 같은 중복 설명 줄을 빼고, 사용자가 붙인 첨부를 그대로 뒤에 붙인다
  * (원본 AT.cleanPostDraft). 사용자 첨부는 앱이 소유하므로 모델이 바꾸지 못한다.
  */
-export function attachPostDraft(draft: { title: string; content: string }, input: string): { title: string; content: string } {
+export function attachPostDraft<D extends { title: string; content: string }>(draft: D, input: string): D {
   if (!hasAttachment(input)) return draft;
   const literal = new Set<string>();
   for (const p of parts(input)) if (p.kind === 'text') for (const line of p.text.split('\n')) literal.add(line.trim());
@@ -906,7 +919,7 @@ export function attachPostDraft(draft: { title: string; content: string }, input
   });
   const records = attachmentRecords(input).map((r) => r.text);
   const content = [kept.join('\n').trim(), ...records].filter(Boolean).join('\n');
-  return { title: draft.title, content };
+  return { ...draft, content };
 }
 
 // ── 다른 글 활동 (조회·추천 증가 + 새 댓글) ──

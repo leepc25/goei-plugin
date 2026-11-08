@@ -110,6 +110,9 @@ function activityRules(b: GnetBooks, posts: ActivityPost[]): string {
  * 댓글 시각 (v0.16.32): 새 댓글마다 모델이 「HH:MM」을 쓴다. 앱이 글 시각·부모 댓글·지금 사이로 맞추므로(gnet.ts stampComments)
  * 형식만 알려 준다. 옛 카드 지침에는 time 칸이 없어서 코드에서 붙인다.
  */
+/** 분류 (2026-11-08): 글마다 그 게시판식 말머리를 하나. 옛 지침에는 tag 칸이 없어서 코드에서 붙인다 */
+export const TAG_RULE = 'Post category: every post (new or retained) also has "tag": one short category label in Korean, the way this board sorts its posts (a 말머리). Reuse labels already used on the board when they fit; supplied tags on retained posts are records, never change them.';
+
 export function commentTimeRule(now: string): string {
   return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. `
     + `It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ''}. `
@@ -120,7 +123,7 @@ export function commentTimeRule(now: string): string {
 export function boardJson(posts: GPost[]): string {
   return JSON.stringify({
     posts: posts.map((p) => ({
-      author: p.nick, id: p.id, title: p.title, time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? '', date: p.date, views: p.views, upvotes: p.votes,
+      author: p.nick, id: p.id, ...(p.tag ? { tag: p.tag } : {}), title: p.title, time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? '', date: p.date, views: p.views, upvotes: p.votes,
       content: p.body, mine: p.mine, comments: p.comments.map((c) => ({ author: c.nick, ...whenField(p, c), content: c.body, parent: c.parent, mine: c.mine })),
     })),
   });
@@ -157,7 +160,7 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
   ];
   const ex = boardExtras(src, b, true);
   if (ex.guideline) guideline.push(ex.guideline);
-  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}${ex.format}`;
+  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\n${TAG_RULE}${ex.format}`;
   if (s.sampling) {
     // 원본 미니보드 5.0.0: 두 벌 각각 확률을 적게 하고, 요청마다 무작위 씨앗 둘을 넣는다
     format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.'
@@ -187,7 +190,7 @@ export function postPrompt(src: RefSource, st: GState, input: string, plan: Inco
   const activity = activityContext(st, null);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity };
+  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\nAlso give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras, factionNames), activity };
 }
 
 export interface CommentPrompt extends PublicPrompt {
