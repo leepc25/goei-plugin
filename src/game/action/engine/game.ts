@@ -393,6 +393,7 @@ export class Game {
         }
         if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
         // 대전(투명 무대): 판 시작(ROUND n → FIGHT)·경기 끝 표시 동안은 멈춘다
+        if (view.clear && versus.hold) return;
         if (view.clear && (versus.intro > 0 || versus.over)) {
           const dt = 1 / TICK_HZ;
           if (versus.intro > 0) versus.intro = Math.max(0, versus.intro - dt);

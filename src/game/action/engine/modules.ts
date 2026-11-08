@@ -1470,6 +1470,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 대전: 체력을 VS_HP 배로 (사용자 11-08 「체력이 너무 적다, 전체적으로 늘려야」). 몸이 처음 보일 때 한 번
       if (view.clear) w.hooks.push(() => {
         for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean })[]) {
+          if (b.vsHp && b.hp > b.hpMax) b.hp = b.hpMax;   // 능력치를 다시 세어 최대가 줄면 맞춘다
           if (b.vsHp || !b.hpMax) continue;
           b.vsHp = true;
           b.hpMax = Math.round(b.hpMax * VS_HP); b.hp = b.hpMax;

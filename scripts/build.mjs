@@ -151,6 +151,28 @@ writeFileSync(
 );
 }
 
+// 기다리는 동안 대전 자료 (11-08): tools/build_vs_packs.py 가 game-pack 에서 전투 줄·얼굴판만 골라 dist/vs-src/ 에 두면
+// 팩마다 묶어 dist/vs/ (index.json + <id>.<n>.bin). 게임 팩과 따로 받고 따로 둔다 (설치 정리가 goei:game:* 를 지우므로)
+if (GAME || process.env.GOEI_VS === '1') {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync('python3', ['tools/build_vs_packs.py'], { encoding: 'utf8', stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('build_vs_packs.py 실패');
+  rmSync('dist/vs', { recursive: true, force: true });
+  mkdirSync('dist/vs', { recursive: true });
+  const vsPacks = [];
+  for (const d of readdirSync('dist/vs-src').sort()) {
+    const p = buildGamePack(`dist/vs-src/${d}`);
+    const parts = [];
+    for (let at = 0, i = 1; at < p.bytes.length; at += 512 * 1024, i++) {
+      const name = `${p.id}.${i}.bin`;
+      writeFileSync(`dist/vs/${name}`, p.bytes.subarray(at, at + 512 * 1024));
+      parts.push(name);
+    }
+    vsPacks.push({ id: p.id, hash: p.hash, bytes: p.bytes.length, parts });
+  }
+  writeFileSync('dist/vs/index.json', JSON.stringify({ version: pkg.version, packs: vsPacks }, null, 1) + '\n');
+}
+
 // 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
 await build({
   define,
@@ -233,7 +255,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   const tr = await build({ ...common, entryPoints: ['src/game/action/fighter/testroom.ts'], format: 'esm', minify: true, write: false });
   const trCode = tr.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   writeFileSync('dist/goei-testroom.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인물 시험장</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${trCode}</script></body></html>`);
-  // 기다리는 동안 대전 시험판 (11-08, src/game/action/fighter/waitfight.ts): 투명 무대 1:1. 시험장과 같이 game-pack/ 에서 인물 팩을 받는다
+  // 기다리는 동안 대전 시험판 (11-08, src/game/action/fighter/waitfight.ts): 투명 무대. 고르기 창 → VS → 경기. 자료는 dist/vs-src/ (tools/build_vs_packs.py)
   const wf = await build({ ...common, entryPoints: ['src/game/action/fighter/waitfight.ts'], format: 'esm', minify: true, write: false });
   const wfCode = wf.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
   writeFileSync('dist/goei-waitfight.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>대전 시험판</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${wfCode}</script></body></html>`);

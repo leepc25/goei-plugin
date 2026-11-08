@@ -28,6 +28,8 @@ export const versus = {
   intro: 0,
   /** 경기 끝: 이긴 쪽, 남은 표시 초 */
   over: null as null | { side: Side; t: number },
+  /** 멈춤 (고르기 창이 떠 있는 동안·창을 닫았을 때): 판을 진행하지 않는다 */
+  hold: false,
   /** 경기가 끝나 표시까지 마쳤을 때 (고르기 창으로) */
   onMatchEnd: null as null | ((winner: Side) => void),
   /** 서바이벌 다음 상대 뽑기 (고르기 창이 이름 있는 인물 명단으로 정한다) */
@@ -58,6 +60,7 @@ export function newMatch(mode: VsMode, me: string[], foe: string[]): void {
   versus.ko = null;
   versus.over = null;
   versus.intro = INTRO_SEC;
+  versus.hold = false;
 }
 
 /**
