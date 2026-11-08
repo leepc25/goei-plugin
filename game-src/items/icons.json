@@ -25400,6 +25400,27 @@
   },
   {
    "keywords": [
+    "소원권 물약",
+    "소원 물약",
+    "wish potion"
+   ],
+   "file": "anomaly_269.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "소원권 물약",
+   "src": "game-src/items/raw/batch_227/13.png",
+   "head": [
+    "물약",
+    "potion"
+   ],
+   "feats": [
+    "소원권",
+    "소원",
+    "wish"
+   ]
+  },
+  {
+   "keywords": [
     "테마파크 입장 팔찌",
     "wristband"
    ],
