@@ -193,10 +193,14 @@ function watch(): void {
   void tick();
 }
 
+// 리수 햄버거 메뉴 단추 모양: 옆 단추(Risu lucide 선 아이콘)와 같은 흰 선 유령 (사용자 2026-11-08: 이모지 👻는 톤이 안 맞음)
+const MENU_GHOST =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.4 1.4 22.8 21.8" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5C7.8 2.5 5.5 5.2 5.5 8.8V10.3L3.9 9.1C2.2 7.9 .6 10.1 2 11.5L5.5 15C5.8 19.5 9.3 22 13.7 22C18.1 22 21 19.6 22 16.8C19.4 18.3 17.5 17.8 17.5 15.5V15L21 11.5C22.4 10.1 20.8 7.9 19.1 9.1L17.5 10.3V8.5C17.5 5 15.1 2.5 11.5 2.5Z"/><g fill="currentColor" stroke="none"><ellipse cx="9" cy="9.2" rx="1.4" ry="1.9"/><ellipse cx="14" cy="9.2" rx="1.4" ry="1.9"/><ellipse cx="11.5" cy="13.6" rx="1.1" ry="1.6"/></g></svg>';
+
 // 깡통봇 설치 (설계안 9절): 아무 봇에서나 햄버거 메뉴의 「괴이: ANOMALY 설치·점검」 으로 본체를 꺼내 설치 화면을 연다.
 // 괴이 카드에서는 같은 단추가 점검 화면을 연다
 void risuai
-  .registerButton({ name: '괴이: ANOMALY 설치·점검', icon: '👻', iconType: 'html', location: 'hamburger', id: 'goei-plugin-install' }, () => {
+  .registerButton({ name: '괴이: ANOMALY 설치·점검', icon: MENU_GHOST, iconType: 'html', location: 'hamburger', id: 'goei-plugin-install' }, () => {
     void ensure(true).then((b) => b?.install());
   })
   .catch((error: unknown) => console.log(`[goei] 설치 단추를 두지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
