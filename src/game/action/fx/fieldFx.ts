@@ -306,7 +306,8 @@ export class FieldFx {
     const t = k.t;
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
-    c.scale(c.canvas.width / 1280, c.canvas.height / 720);
+    if (view.clear) { const z = c.canvas.width / 1280; c.translate(0, Math.round((c.canvas.height - 720 * z) / 2)); c.scale(z, z); } // 투명 무대: 높은 그림판 가운데
+    else c.scale(c.canvas.width / 1280, c.canvas.height / 720);
     c.imageSmoothingEnabled = false;
     // 1. 암전 70% (끝 0.3초 동안 걷힌다)
     const dark = t > CUT.out[1] ? 0.7 * (1 - (t - CUT.out[1]) / (CUT.total - CUT.out[1])) : 0.7;

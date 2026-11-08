@@ -1625,7 +1625,8 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     const name = f.art?.cfg.name ?? (f.label ?? '').replace(/^AI /, '').replace(/ \d+$/, '');
     // 오른쪽 칸은 칸째 뒤집으므로 얼굴은 원래 방향으로 넘긴다 (뒤집혀 왼쪽을 본다)
     const face = f.art ? charFace(f.art.key, 64, false) : null;
-    drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT, mirror: i === 1 }, x, 14);
+    // 칸 자리: 그림판이 16:9보다 높아도 예전처럼 16:9 윗선 근처 (사용자 11-08 「꼭대기면 눈에 안 들어온다」)
+    drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT, mirror: i === 1 }, x, 14 + Math.max(0, c.canvas.height - 720) / k);
   };
   one(0, w.player, 16);
   one(1, foe, W - 16 - cardW);
