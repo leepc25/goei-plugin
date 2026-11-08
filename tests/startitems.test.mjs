@@ -6,10 +6,10 @@ import { readStartItems, parseStartItems, startItemsText, startItemsState, start
 const install = JSON.parse(readFileSync(new URL('../src/data/install/directory.json', import.meta.url), 'utf8'));
 const of = (name) => readStartItems(install.요원[name].start_items);
 
-test('기본 명부: 45명에 116줄', () => {
+test('기본 명부: 45명에 124줄 (11-08 가면 둘·꿈결 수집기 10 더함, 곽성주 넷 뺌)', () => {
   const rows = Object.values(install.요원).filter((a) => a.start_items?.length);
   assert.equal(rows.length, 45);
-  assert.equal(rows.reduce((n, a) => n + a.start_items.length, 0), 116);
+  assert.equal(rows.reduce((n, a) => n + a.start_items.length, 0), 124);
   for (const a of rows) assert.deepEqual(readStartItems(a.start_items), a.start_items, '저장 모양 그대로 읽힌다');
 });
 
@@ -32,8 +32,10 @@ test('시작하면 무기·장비는 빈 칸에 차례로 끼우고, 넘치거�
   const b = liveItems(startItemsState(of('블라렛')), alive);
   assert.deepEqual(equippedOf(b).weapon.map((e) => e?.name), ['은탄 쌍권총', '은 말뚝']);
   assert.ok(gridItems(b).some((e) => e.name === '손바닥만 한 십자가'));
-  // 곽성주: 중기관총 두 정은 이름이 달라 둘 다 무기 칸
-  assert.deepEqual(equippedOf(liveItems(startItemsState(of('곽성주')), alive)).weapon.map((e) => e?.name), ['오른손 중기관총', '왼손 중기관총']);
+  // 곽성주 (11-08 사용자): 중기관총 하나·판금 갑옷만
+  const k = equippedOf(liveItems(startItemsState(of('곽성주')), alive));
+  assert.deepEqual(k.weapon.map((e) => e?.name), ['중기관총', undefined]);
+  assert.equal(k.gear[0]?.name, '강철 판금 갑옷');
 });
 
 test('편집 칸 글 ↔ 줄, 소모 띄어쓰기·「-」 빈칸', () => {
