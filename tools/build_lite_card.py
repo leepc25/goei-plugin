@@ -939,6 +939,8 @@ def main(src, dst):
     risu.pop('customScripts', None)
     if data.get('character_book'):
         data['character_book']['entries'] = [to_ccv3(e) for e in lore]
+        # 봇 로어북 설정: 깡통봇 설치와 같은 값 (검색 깊이 10 · 토큰 예산 99999, 사용자 2026-10-27·11-08). 원본 카드의 90000 을 맞춘다
+        data['character_book'].update({'scan_depth': 10, 'token_budget': 99999})
 
     lite_module = {
         'name': f"{data['name']} Module",
