@@ -5,7 +5,9 @@ import { mountCrt, type Crt } from './crt';
 import { view } from '../engine/view';
 import { ensureKit } from './kit';
 /** 대전 화면: 세로 960 (월드 480 × 2), 가로는 최대 무대 전체 2560 (월드 1280 × 2) */
-const VS_H = 960, VS_WMAX = Math.round(1280 * VS_H / 600);   // 무대 전체 폭 (월드 1280 × 1.6)
+const VS_H = 960;
+/** 가로 맞춤의 최대 폭 = 무대 전체 (월드 무대 길이 × 1.6) */
+const vsWMax = () => Math.round(view.vsLen * VS_H / 600);
 
 export const W = 1280,
   H = 720;
@@ -167,7 +169,7 @@ export function mountStage(box: HTMLElement): Stage {
     const clearTall = view.clear && !portrait && bw > 0;
     const vh = clearTall ? VS_H : fieldFill ? Math.round(bh / k) : H;
     // 필드가 16:9 보다 긴 낮은 화면(가로 폰)이면 캔버스를 옆으로 넓혀 좌우 검은 띠 없이 꽉 채운다 (모바일 조작 설계: 가로 전체화면으로 꽉 차게)
-    const vw = clearTall ? (view.vsWide ? Math.min(VS_WMAX, Math.max(W, Math.floor(bw / vsSc))) : W) : fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
+    const vw = clearTall ? (view.vsWide ? Math.min(vsWMax(), Math.max(W, Math.floor(bw / vsSc))) : W) : fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
     if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;

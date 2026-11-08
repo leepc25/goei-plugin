@@ -3,7 +3,7 @@
 #   vs-<번호>  : 인물 한 명의 전투 줄만 (char.json 의 A 도 그 줄만)
 # 얼굴판이 있어야 고르기 창이 인물 팩을 하나도 받지 않고 얼굴을 다 보여 줄 수 있다.
 # 쓰기: python3 tools/build_vs_packs.py  (scripts/build.mjs 가 dist/vs-src → dist/vs/*.pack 으로 묶는다)
-import json, os, shutil, sys
+import json, math, os, shutil, sys
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,9 +20,35 @@ FACE = 64
 VS_BGS = ['street', 'lobby', 'f2', 'f3', 'b1', 'b2', 'training', 'clinic', 'office', 'lounge', 'infirmary',
           'by_street', 'by_lobby', 'by_f13', 'by_lab', 'sdra_street', 'sdra_b1',
           'jr_entry', 'jr_b1', 'jr_alley', 'jr_b2']
-# 무대는 2화면 (11-08 사용자 「일단 2화면으로 해보고 나중에 필요하면 늘리면 되니까」): 2화면이 안 되는 장면은 뺐고, 긴 장면은 한 구간만 쓴다.
-# 구간 가운데 (장면 그림 x). 없으면 그림 가운데. 중림 기둥 장면은 기둥 둘 사이 가게 한 칸 (양 끝에 기둥)
-VS_CUT = {'jr_b1': 1896, 'jr_alley': 1896, 'jr_b2': 1896}
+# 무대 (11-08 사용자): 도트 1.6배에서 한 화면 = 월드 800. 무대는 2.5~3화면 → 월드 최대 2400 (배경이 짧으면 배경 전체)
+VS_LEN = 2400
+# 장면마다 손본 값 (사용자에게 보인 미리보기 /mnt/project-files/vs-design/v10 그대로):
+#   cx 구간 가운데(그림 x), yF 싸우는 줄(그림 y), yB 대기 줄, bdx 대기 캐릭터 무대 끝에서 떨어진 거리(화면 px, 2배 기준)
+#   중림은 가게 한 칸 가운데 (11-08 사용자: 이음새 기둥이 앞을 가려야 이어진다)
+VS_CFG = {'jr_b1': {'cx': 4424}, 'jr_alley': {'cx': 3160}, 'jr_b2': {'cx': 1896},
+          'infirmary': {'yF': 700, 'yB': 600, 'cx': 676}, 'training': {'cx': 1350, 'yF': 770}, 'office': {'yF': 826}}
+CHAR_K = 1.28   # src/game/action/art/charPacks.ts CHAR_K
+
+def persp_of(y, lane, far, grow, sizes):
+    if sizes:
+        if y <= sizes[0][0]: return sizes[0][1]
+        for i in range(1, len(sizes)):
+            if y <= sizes[i][0]:
+                y0, k0 = sizes[i - 1]; y1, k1 = sizes[i]; return k0 + (k1 - k0) * (y - y0) / (y1 - y0)
+        return sizes[-1][1]
+    a = lane[0]; b = grow if grow and grow > a else lane[1]
+    t = max(0, min(1, (y - a) / (b - a))) if b > a else 1
+    return far + (1 - far) * t
+
+def persp(y, v):
+    """engine/view.ts perspFlat 와 같은 계산 (필드 원근)"""
+    lane, far, grow, sizes = v['lane'], v.get('far') or 0.85, v.get('grow') or 0, v.get('sizes') or []
+    p = persp_of(y, lane, far, grow, sizes)
+    pb, pf = persp_of(lane[0], lane, far, grow, sizes), persp_of(lane[1], lane, far, grow, sizes)
+    if not pb > 0 or pf / pb <= 1.4: return p
+    pm = persp_of((lane[0] + lane[1]) / 2, lane, far, grow, sizes)
+    if p >= pm: return pm * (p / pm) ** (math.log(1.12) / math.log(pf / pm)) if pf > pm else p
+    return pm * (p / pm) ** (math.log(0.8) / math.log(pb / pm)) if pb < pm else p
 
 def mapedit_scenes():
     t = open(os.path.join(ROOT, 'src', 'game', 'action', 'hq', 'mapedit.gen.ts'), encoding='utf8').read()
@@ -92,13 +118,23 @@ def main():
         if not v or not os.path.exists(src): continue
         shutil.copy(src, os.path.join(com, f'bg-{sid}.webp'))
         # 장면 물건(기둥·상자 등, 필드에서 따로 그리는 조각): 앞줄보다 앞(sortY > 앞줄)이면 사람 앞에 그린다 (11-08 사용자: 중림 기둥으로 가려야 이어진다)
+        c = VS_CFG.get(sid, {})
+        L0, L1 = v['lane']
+        yF = c.get('yF', L1 - 0.2 * (L1 - L0))      # 싸우는 줄: 앞줄보다 조금 뒤 (앞에 바닥이 남게)
+        yB = c.get('yB', L0 + 0.12 * (L1 - L0))     # 대기 줄: 뒤쪽
+        pF = persp(yF, v)
+        s = CHAR_K / (v.get('dotK', 1.4292) * pF)   # 그림 px → 월드 px (싸우는 줄의 사람이 CHAR_K 가 되게)
+        # 장면 물건(기둥·상자 등): 깊이선(sortY)이 싸우는 줄보다 앞이면 사람 앞에 그린다 (11-08 사용자: 중림 기둥으로 가려야 이어진다)
         objs = []
         for o in v.get('objects') or []:
             osrc = os.path.join(SRC, 'jr-field', o['file'] + '.webp')
             if not os.path.exists(osrc): continue
             shutil.copy(osrc, os.path.join(com, f"bgo-{o['file']}.webp"))
-            objs.append({'file': o['file'], 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'front': o.get('sortY', 0) > v['lane'][1]})
-        bgs[sid] = {'w': v['w'], 'h': v['h'], 'dotK': v.get('dotK', 1.4292), 'lane': v['lane'], 'cut': VS_CUT.get(sid, v['w'] / 2), 'objs': objs}
+            objs.append({'file': o['file'], 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'front': o.get('sortY', 0) > yF})
+        bgs[sid] = {'w': v['w'], 'h': v['h'], 's': s, 'yF': yF, 'len': min(VS_LEN, round(v['w'] * s)), 'cut': c.get('cx', v['w'] / 2),
+                    # 대기 캐릭터: 뒤 줄까지 올라간 높이(월드)와 원근 배율
+                    'bench': {'dy': round((yB - yF) * s), 'k': round(persp(yB, v) / pF, 3), 'dx': c.get('bdx')},
+                    'objs': objs}
     json.dump(bgs, open(os.path.join(com, 'bg.json'), 'w'))
     json.dump({'id': 'vs-common', 'required': False}, open(os.path.join(com, 'pack.json'), 'w'))
     faces, bodies, rows = [], [], []

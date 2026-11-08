@@ -44,6 +44,10 @@ export const WINS_TO_TAKE = 2;
 export const KO_SEC = 4;   // K.O. 1.4초(슬로 포함) → WINNER·승리 동작 2.6초
 export const OVER_SEC = 3;
 export const INTRO_SEC = 2.4;   // ROUND 1초 → READY 0.8초 → GO! 0.6초 (11-08 사용자)
+/** 무대 길이 (월드, 배경 없을 때). 도트 1.6배에서 한 화면 = 월드 800 → 2.5화면 (11-08 사용자 「무대는 2.5~3화면」). 배경이 있으면 tools/build_vs_packs.py VS_LEN(2400)까지 */
+export const VS_LEN = 2000;
+/** 발 줄을 화면 아래에서 띄우는 높이 (월드). 11-08 사용자 「캐릭터가 너무 밑에」 */
+export const VS_RAISE = 56;
 /** 판 시간 (대전게임 관례 99초) */
 export const CLOCK_SEC = 99;
 /** 판 사이: 접기 · 암전 · 펴기 · 점프해 들어오기 (초) */

@@ -1035,10 +1035,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     label: '대전',
     firstFloor: () => ({
       // 한 선(lane 위아래 같음): 위아래 이동 없이 좌우로만. 발은 화면 아래(입력창 바로 위)
-      id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity, lane: [VS_LINE, VS_LINE],
+      id: 'versus-room', title: '대전', length: view.vsLen, startX: view.vsLen / 2 - 260, exitX: Infinity, lane: [VS_LINE, VS_LINE],
       banner: '',
       // 서바이벌은 웨이브를 engine/survival.ts 가 낸다
-      encounters: versus.mode === 'survival' ? [] : [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: fighterOf(1) ? `ai-char:${fighterOf(1)}` : 'ai-char', x: 900, y: VS_LINE }]] }],
+      encounters: versus.mode === 'survival' ? [] : [{ triggerX: 0, lockFrom: 0, lockTo: view.vsLen, waves: [[{ kind: fighterOf(1) ? `ai-char:${fighterOf(1)}` : 'ai-char', x: view.vsLen / 2 + 260, y: VS_LINE }]] }],
     }),
     nextFloor: () => null,
   };
@@ -1481,7 +1481,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 투명 무대(대전)는 바닥 물건(의자·화분 등)을 두지 않는다: 본문 위에 인물만
       // 대전: 체력을 VS_HP 배로 (사용자 11-08 「체력이 너무 적다, 전체적으로 늘려야」). 몸이 처음 보일 때 한 번
       if (view.clear) w.hooks.push(() => {
-        if (versus.mode === 'survival') survivalTick(1 / TICK_HZ, w.bodies, w.player as Body & { hp: number; hpMax: number }, (spec) => w.spawn(spec as never), VS_LINE, 1280);
+        if (versus.mode === 'survival') survivalTick(1 / TICK_HZ, w.bodies, w.player as Body & { hp: number; hpMax: number }, (spec) => w.spawn(spec as never), VS_LINE, view.vsLen);
         for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean; vsHpMul?: number })[]) {
           if (b.vsHp && b.hp > b.hpMax) b.hp = b.hpMax;   // 능력치를 다시 세어 최대가 줄면 맞춘다
           if (b.vsHp || !b.hpMax) continue;
@@ -1616,6 +1616,8 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
 
 /** 태그매치 대기 인물 (11-08 사용자): 자기 편 뒤쪽 끝에 작게(원근) 서서 각자 동작. 판이 끝나면 이긴 편 환호·진 편 화내기 */
 const BENCH_K = 0.72;
+/** 배경 장면 원근 위에 더 곱하는 값 (대기 캐릭터는 그 장면 뒤 줄 크기 그대로) */
+const BENCH_SC = 1;
 const BENCH_CLIPS = ['rest', 'limber', 'phone', 'coffee', 'smoke', 'snack', 'browse', 'call', 'pushup', 'talk'];
 const benchT = new Map<string, { clip: string; since: number; until: number }>();
 function drawBench(c: CanvasRenderingContext2D, camX: number) {
@@ -1627,7 +1629,10 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
   for (const side of [0, 1] as const) {
     const list = versus.team[side].slice(versus.cur[side] + 1);
     list.forEach((name, k) => {
-      const x = side === 0 ? 70 + k * 150 : 1280 - 70 - k * 150, y = VS_LINE - 150;   // 무대 양 끝에 겹치지 않게 나란히 (11-08 사용자), 싸우는 줄보다 뒤
+      // 무대 양 끝에 겹치지 않게 나란히 (11-08 사용자), 싸우는 줄보다 뒤. 배경이 있으면 그 장면의 뒤 줄 높이·원근 (tools/build_vs_packs.py)
+      const bb = view.vsBg?.bench, L = view.vsLen;
+      const d = bb?.dx ? bb.dx[Math.min(k, 1)] / 2 + Math.max(0, k - 1) * 75 : 70 + k * 110;
+      const x = side === 0 ? d : L - d, y = VS_LINE + (bb ? bb.dy : -150), bk = bb ? bb.k * BENCH_SC : BENCH_K;
       const dir: 1 | -1 = side === 0 ? 1 : -1;
       const key = `${side}|${name}`;
       let clip: string, since: number;
@@ -1646,7 +1651,7 @@ function drawBench(c: CanvasRenderingContext2D, camX: number) {
         clip = st.clip; since = st.since;
       }
       // 원근: 대전 무대는 줄이 한 선이라 장면 원근이 거의 없다 → 뒤에 선 만큼 직접 작게 (발 기준)
-      c.save(); c.translate(x, y); c.scale(BENCH_K, BENCH_K); c.translate(-x, -y);
+      c.save(); c.translate(x, y); c.scale(bk, bk); c.translate(-x, -y);
       drawCharClip(c, name, x, y, dir, now, clip, since);
       c.restore();
     });

@@ -4,7 +4,7 @@
 import { pfont } from './pxfont';
 import { view } from './view';
 import { aiHold } from '../fighter/ai';
-import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, TRANS, TRANS_SEC, type Side } from './versus';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, CLOCK_SEC, TRANS, TRANS_SEC, VS_RAISE, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -171,14 +171,14 @@ export class Game {
         view.crop = 0;
         // 렌더러와 같은 보간값: 층 단추·대화창·본부 창이 떠서 월드가 멈춘 동안 여기만 틱 진행률로 움직이면 화면이 매 장 좌우로 떨린다 (리스 좁은 창)
         const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
-        if (view.clear && !this.inHub && w && vw < SCREEN_W) {
+        if (view.clear && !this.inHub && w && vw < view.vsLen) {
           // 대전 (11-08 사용자 「무대는 길고 화면이 왔다 갔다」): 두 사람 가운데를 따라간다. 무대 끝(대기 인물 자리)은 그쪽으로 가야 보인다
           const a = frozen ? 1 : this.acc / T;
           const at = (b: { x: number; px?: number }) => (b.px ?? b.x) + (b.x - (b.px ?? b.x)) * a;
           const p = w.player, foes = w.bodies.filter((b) => b.team === 'enemy' && b.alive);
           const foe = foes.sort((m, n) => Math.abs(m.x - p.x) - Math.abs(n.x - p.x))[0];
           const mid = foe ? (at(p) + at(foe)) / 2 : at(p);
-          const want = Math.max(0, Math.min(SCREEN_W - vw, mid - vw / 2));
+          const want = Math.max(0, Math.min(view.vsLen - vw, mid - vw / 2));
           // 부드럽게 따라가기 (한 장에 남은 거리의 12%)
           this.vsCam = this.vsCam < 0 ? want : this.vsCam + (want - this.vsCam) * (frozen ? 0 : 0.12);
           view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - w.camX;
@@ -201,7 +201,7 @@ export class Game {
           // 장면이 화면보다 짧다: 가운데 두고 위아래는 검게
           view.cropY = -Math.round(((vh - H) / (view.clear ? 1 : 2)) * view.zoom) / view.zoom; // 투명 무대는 바닥을 아래에 붙인다
         } else if (view.clear && !this.inHub) {
-          view.cropY = H - vh;   // 대전: 발밑 줄을 아래에 붙인다
+          view.cropY = H - vh + VS_RAISE;   // 대전: 발 줄을 화면 아래에서 조금 띄운다 (11-08 사용자 「캐릭터가 너무 밑에」)
         } else if (vh < H - 0.5 && w) {
           const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
