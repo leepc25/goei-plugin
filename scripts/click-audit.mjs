@@ -101,6 +101,7 @@ price_range: 1000~200000
 작업용 장갑|9000|장비|work gloves|가죽 보강|
 철제 봉인 상자|120000|-|metal box|자물쇠 둘|
 </shelf>`;
+const WIKI_FILES = (() => { try { const idx = JSON.parse(readFileSync(resolve(ROOT, 'release/wiki-base.json'), 'utf8')); const f = { 'wiki-base.json': JSON.stringify(idx) }; for (const n of idx.parts) f[n] = readFileSync(resolve(ROOT, 'release', n), 'utf8'); return f; } catch { return null; } })();
 const KEEP_OUT = new Set(['p:goei:body', 'p:goei:data-world']); // hostScript 가 넣는다
 
 async function settle(page) {
@@ -117,6 +118,8 @@ async function settle(page) {
 async function makeBase(browser, vp, kind) {
   const store0 = { 'p:goei:data-looks': LOOKS, ...(ITEMS ? { 'p:goei:data-items': ITEMS } : {}) };
   const { page, errors } = await boot(browser, fx, { message: [], scriptstate: {} }, vp, { store: store0 });
+  // 설치 「빠진 것 전부 채우기」가 받는 위키 기본 문서를 저장소 판(release/)에서 내준다 → 위키 문서 화면까지 누른다
+  if (WIKI_FILES) await page.evaluate((f) => Object.assign(window.__files, f), WIKI_FILES);
   await openWin(page);
   // 첫 실행 설치: 「설치」 단추를 눌러 둔다 (실제 사용자는 설치하고 쓴다)
   await sleep(300);
@@ -156,6 +159,12 @@ async function makeBase(browser, vp, kind) {
   if (kind === 'items' || kind === 'shop') {
     await page.evaluate((items) => { window.__chat.scriptstate.$st_items = JSON.stringify({ list: items, log: [] }); }, START_ITEMS);
   }
+  // 일지 항목이 있는 상태: 상황판에서 사건 하나를 종료(휴지통 두 번)해 일지·보고서 줄을 만든다 → 기록 화면 항목 열기까지
+  if (kind === 'items') {
+    await openWin(page).catch(() => {}); await settle(page);
+    for (let i = 0; i < 2; i++) { await page.click('.gx [data-action="end-event"]', { timeout: 3000 }).catch(() => log('사건 종료 못 누름')); await sleep(500); }
+    await page.waitForFunction(() => String(window.__chat.scriptstate.$goei_journal || '').includes('"id"'), null, { timeout: 5000 }).catch(() => log('일지 줄이 안 생김'));
+  }
   // 괴담넷 글이 있는 상태: 괴담넷을 열고 새로고침(가짜 보조 모델이 글 둘·댓글을 돌려줌)
   if (kind === 'gnet') {
     await openWin(page); await settle(page);
@@ -183,6 +192,11 @@ async function makeBase(browser, vp, kind) {
     pre = { shopMsg };
     await openShop(page, pre, SHELF);
     await page.waitForFunction(() => { try { return JSON.parse(window.__chat.scriptstate.$st_shop || 'null')?.loaded; } catch { return false; } }, null, { timeout: 8000 }).catch(() => log('가게 진열대가 안 채워짐'));
+    // 하나 사 둔다: 가계부 항목·산 물건이 있는 상태 (가계부 항목 열기·고치기, 산 물건 화면까지 누르게)
+    await page.click('[data-action="shop-detail"]', { timeout: 3000 }).catch(() => log('가게 물건 못 엶'));
+    await sleep(300);
+    await page.click('[data-action="shop-buy"]', { timeout: 3000 }).catch(() => log('가게 구입 못 누름'));
+    await sleep(600);
   }
   const base = await page.evaluate((keep) => ({ chat: window.__chat, char: window.__char, store: Object.fromEntries(Object.entries(window.__store).filter(([k]) => !keep.includes(k))) }), [...KEEP_OUT]);
   await page.close();
@@ -466,6 +480,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
   const exploredVals = {};
   const exploredSigs = new Set(); // 이미 들어가 본 화면 꼴 (보이는 동작 이름 묶음)
   for (const startKind of opt.start) {
+    const revisitSigs = new Set();
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
     // 첫 화면
@@ -517,6 +532,10 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
           const path = [...job.path, step];
           states.push({ vp, start: startKind, path: path.map((p) => p.key), shot: rec.shots?.[2], audit: rec.audit });
           enqueue(path, rec.newList, startKind !== opt.start[0]); // 뒤 시작 상태에서는 들어간 화면에서도 메뉴 단추를 다시 눌러 더 들어간다
+        } else if (rec.newList && seenSig && job.revisit && job.path.length + 1 < opt.depth && !revisitSigs.has(sigKey)) {
+          // 뒤 시작 상태: 이미 본 꼴의 화면이라도 메뉴 단추만은 한 번 더 따라간다 (인터넷 새 탭 → 괴담넷 글 목록처럼 한 겹 더 들어가야 달라지는 곳)
+          revisitSigs.add(sigKey);
+          enqueue([...job.path, { key: job.key, nth: job.nth }], rec.newList.filter((x) => NAV.test(x.action || '')), true);
         }
         if (rec.flags.length) log(`  ${vp} ${rec.key} → ${rec.flags.join(', ')}`);
       }
