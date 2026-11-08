@@ -4,7 +4,7 @@ import { agentScene, factionScenes, sceneText } from './scenes';
 import { hasSceneCard, isSceneMessage, sceneMessage, UNSENT_MARK } from './dispatch';
 import { buildSeed } from './seed';
 import { readDirectory } from './world/directory';
-import { startItemsVars } from './items';
+import { startCarryVars, startItemsVars } from './items';
 import type { Chat, ChatMessage, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
 import { manifestEntry } from './lorebooks';
@@ -148,6 +148,8 @@ export function planStart(
       $goei_last: '',
       // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
       ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
+      // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
+      ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : undefined),
       ...factionVars(lore),
       ...(world ?? {}),
     },

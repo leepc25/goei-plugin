@@ -10,7 +10,7 @@ import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
 import type { ItemChange, ItemNow } from './people/updater';
 import { shopEvents, shopOn, shopGuide } from './shop';
-import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, type ItemEquip, type ItemState } from './itemtraits';
+import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
 
@@ -28,6 +28,15 @@ export const ITEM_SLOTS_DEFAULT = 16;
 export const ITEM_SLOTS_MIN = 8;
 export const ITEM_SLOTS_MAX = 40;
 export const ITEM_LIMIT_DEFAULT = '가방 하나와 주머니, 두 손';
+/** 소지 한도 kg (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」를 시작할 때 $it_carry_pc 에 적고, 그 값이 없으면(페르소나·아바타) 설정 값 */
+export const ITEM_CARRY_VAR = '$it_carry';
+export const ITEM_CARRY_PC_VAR = '$it_carry_pc';
+export const ITEM_CARRY_DEFAULT = 25;
+export const ITEM_CARRY_MIN = 1;
+export const ITEM_CARRY_MAX = 300;
+/** 고치기 (2026-11-08 사용자: 손으로 물건을 고치는 건 말이 안 됨 → 켜야만 단추가 보임, 기본 끔) */
+export const ITEM_EDIT_VAR = '$it_edit';
+export const itemEditOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_EDIT_VAR] === '1';
 
 export type ItemFrom = 'store' | 'story' | 'manual';
 
@@ -49,6 +58,8 @@ export interface Item {
   state: ItemState;
   /** 그림 찾기용 낱말 */
   icon?: string;
+  /** 무게 kg (물건을 만드는 모델이 정함). 없으면 0 으로 센다 */
+  weight?: number;
   from: ItemFrom;
   /** 기준 메시지 키 (messageKey). 직접 넣은 건 빈 문자열 (늘 산다) */
   anchor: string;
@@ -102,14 +113,15 @@ const isLog = (e: unknown): e is ItemLog => {
 const clean = (s: unknown, max: number) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 
 function normItem(x: Item): Item {
-  const { uses: u0, equip: e0, slot: s0, icon: i0, ...rest } = x;
+  const { uses: u0, equip: e0, slot: s0, icon: i0, weight: w0, ...rest } = x;
   const uses = itemUses(u0);
+  const weight = itemWeight(w0);
   const equip = itemEquip(e0);
   const slot = equip && Number.isSafeInteger(s0) && (s0 as number) >= 0 && (s0 as number) < EQUIP_SLOTS[equip] ? s0 : undefined;
   const icon = cleanIcon(i0);
   return {
     ...rest, desc: clean(x.desc, 80), effect: clean(x.effect, 60), use: x.use === true || !!uses, state: itemState(x.state),
-    ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(slot !== undefined ? { slot } : {}), ...(icon ? { icon } : {}),
+    ...(uses ? { uses } : {}), ...(equip ? { equip } : {}), ...(slot !== undefined ? { slot } : {}), ...(icon ? { icon } : {}), ...(weight !== undefined ? { weight } : {}),
   };
 }
 
@@ -209,6 +221,8 @@ export interface ItemInput {
   equip?: unknown;
   state?: unknown;
   icon?: unknown;
+  /** 무게 kg */
+  weight?: unknown;
   /** 넣자마자 장착 (시작 소지품) */
   wear?: boolean;
   from: ItemFrom;
@@ -221,7 +235,7 @@ export interface ItemInput {
 }
 
 /** 판정 고치기 (patch 에 있는 칸만). 소모성이면 사용 가능. 장착 갈래가 바뀌거나 없어지면 칸에서 내린다 */
-function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unknown; state?: unknown; icon?: unknown }): Item {
+function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unknown; state?: unknown; icon?: unknown; weight?: unknown }): Item {
   const next: Item = { ...cur };
   if (p.uses !== undefined) {
     const u = itemUses(p.uses);
@@ -242,6 +256,10 @@ function withTraits(cur: Item, p: { use?: boolean; uses?: unknown; equip?: unkno
     if (ic) next.icon = ic;
     else delete next.icon;
   }
+  if (p.weight !== undefined && p.weight !== null && p.weight !== '') {
+    const w = itemWeight(p.weight);
+    if (w !== undefined) next.weight = w;
+  }
   return next;
 }
 
@@ -256,8 +274,12 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
   if (found) {
     const addUses = itemUses(e.uses);
-    const more = addUses && found.uses !== undefined ? { uses: Math.min(999, found.uses + addUses) } : { uses: e.uses };
-    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon }), desc: desc || found.desc, effect: effect || found.effect, ...(quote ? { quote } : {}) };
+    const stack = !!addUses && found.uses !== undefined;
+    const more = stack ? { uses: Math.min(999, found.uses! + addUses!) } : { uses: e.uses };
+    // 같은 소모품이 더 들어오면 무게도 더한다 (한 묶음이 늘어난 것)
+    const addW = itemWeight(e.weight);
+    const weight = stack && addW !== undefined ? (found.weight ?? 0) + addW : e.weight;
+    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(quote ? { quote } : {}) };
     if (JSON.stringify(next) === JSON.stringify(found)) return it;
     return { ...it, list: it.list.map((x) => (x.id === found.id ? next : x)) };
   }
@@ -268,7 +290,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(Number.isSafeInteger(e.price) ? { price: e.price } : {}),
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(quote ? { quote } : {}),
-  }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon });
+  }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
   const got = addItemLog(it, { name, item: id, ...(row.icon ? { icon: row.icon } : {}), what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}), ...(Number.isSafeInteger(e.price) ? { note: `₩ ${e.price!.toLocaleString('en-US')}` } : {}), at: row.at });
   const out = { ...got, list: [...got.list, row].slice(-200) };
@@ -276,7 +298,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
 }
 
 /** 이름·설명·효과·판정·상태 고치기. 상태는 보조 모델만 (화면엔 고치는 칸 없음) */
-export function updateItem(it: Items, id: string, patch: { name?: string; desc?: string; effect?: string; use?: boolean; uses?: unknown; equip?: unknown; state?: unknown; icon?: unknown }): Items {
+export function updateItem(it: Items, id: string, patch: { name?: string; desc?: string; effect?: string; use?: boolean; uses?: unknown; equip?: unknown; state?: unknown; icon?: unknown; weight?: unknown }): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;
   const next: Item = {
@@ -323,27 +345,48 @@ export function sellItem(it: Items, id: string, anchor: string, note?: string): 
   return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? { ...rest, soldAt: anchor } : x)) }, { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'sell', by: 'manual', anchor, ...(note ? { note } : {}) });
 }
 
-/** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 설명은 「남는 설명 / 상대 설명」, 근거는 둘 다. 둘 다 소모성이면 상대의 남은 횟수를 더한다.
- * 이름이 달라도 된다 — 애초에 이름이 다른 두 칸을 하나로 만들려고 있는 기능 (사용자 06:41) */
-export function mergeItems(it: Items, alive: Set<string>, keepId: string, otherId: string, name?: string): Items {
+/** 합칠 수 있나 (2026-11-08 사용자): 둘 다 소모성이고 이름에 같은 낱말이 있을 때만 — 같은 소모품이 두 칸으로 갈라진 것을 한 묶음으로 */
+export function canMerge(a: Item, b: Item): boolean {
+  if (a.id === b.id || a.uses === undefined || b.uses === undefined) return false;
+  const words = (n: string) => clean(n, 30).toLowerCase().split(/[\s·.,'"「」()\-_/]+/).filter((w) => w.length >= 1);
+  const wa = new Set(words(a.name));
+  return words(b.name).some((w) => wa.has(w));
+}
+
+/** 두 줄을 하나로 (직접). keep 가 남고 other 는 빠진다. 이름·설명은 남는 쪽 그대로, 남은 횟수와 무게만 더한다 (2026-11-08 사용자).
+ * 기록은 마지막 응답에 묶어 다음 요청의 「This turn」으로 본편에 넘긴다 (mergedNow) */
+export function mergeItems(it: Items, alive: Set<string>, keepId: string, otherId: string, anchor = ''): Items {
   const keep = it.list.find((x) => x.id === keepId);
   const other = it.list.find((x) => x.id === otherId);
-  if (!keep || !other || keepId === otherId) return it;
-  const desc = clean([keep.desc, other.desc].filter(Boolean).join(' / '), 80);
+  if (!keep || !other || !canMerge(keep, other)) return it;
+  const weight = keep.weight !== undefined || other.weight !== undefined ? Math.round(((keep.weight ?? 0) + (other.weight ?? 0)) * 1000) / 1000 : undefined;
   const merged: Item = {
     ...keep,
-    name: clean(name ?? keep.name, 30) || keep.name,
-    desc,
-    effect: keep.effect || other.effect,
-    ...(keep.uses !== undefined && other.uses !== undefined ? { uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)) } : {}),
-    ...(keep.quote || other.quote ? { quote: clean([keep.quote, other.quote].filter(Boolean).join(' / '), 120) } : {}),
+    uses: Math.min(999, keep.uses! + (itemLeft(it, other, alive) ?? 0)),
+    ...(weight !== undefined ? { weight } : {}),
     // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
     anchor: keep.anchor && other.anchor ? keep.anchor : '',
     from: keep.anchor && other.anchor ? keep.from : 'manual',
   };
   const list = it.list.filter((x) => x.id !== otherId).map((x) => (x.id === keepId ? merged : x));
-  return addItemLog({ ...it, list }, { name: other.name, item: other.id, ...(other.icon ? { icon: other.icon } : {}), what: 'merge', by: 'manual', anchor: '', note: `${merged.name}와 합침` });
+  return addItemLog({ ...it, list }, { name: other.name, item: other.id, ...(other.icon ? { icon: other.icon } : {}), what: 'merge', by: 'manual', anchor, note: `${merged.name}와 합침` });
 }
+
+/** 설정의 소지 한도 (1~300kg, 기본 25) */
+export function itemCarrySetting(vars: Record<string, unknown> | undefined): number {
+  const n = Number(vars?.[ITEM_CARRY_VAR]);
+  if (!Number.isSafeInteger(n)) return ITEM_CARRY_DEFAULT;
+  return Math.min(ITEM_CARRY_MAX, Math.max(ITEM_CARRY_MIN, n));
+}
+/** 이 채팅 주인공의 소지 한도 kg: 고유 인물로 시작했으면 명부 값, 아니면 설정 값 */
+export function itemCarry(vars: Record<string, unknown> | undefined): number {
+  const pc = itemWeight(vars?.[ITEM_CARRY_PC_VAR]);
+  return pc !== undefined && pc > 0 ? pc : itemCarrySetting(vars);
+}
+/** 무게 합 kg (장착한 것까지 전부, 무게 없는 물건은 0) */
+export const totalWeight = (list: Item[]): number => Math.round(list.reduce((n, e) => n + (e.weight ?? 0), 0) * 1000) / 1000;
+/** 본편에 넘기는 무게 숫자 (kg, 소수 한 자리까지) */
+const kgText = (n: number) => `${Number(n.toFixed(1))} kg`;
 
 /** 칸 수 설정 (8~40, 기본 16) */
 export function itemSlots(vars: Record<string, unknown> | undefined): number {
@@ -429,6 +472,12 @@ export function addUse(list: ItemUse[], e: Item, left: number | undefined): Item
 /** 「사용」 자리에서 빼기 */
 export const dropUse = (list: ItemUse[], id: string): ItemUse[] => list.filter((u) => u.id !== id);
 
+/** 마지막 응답 뒤에 직접 합친 것 → 「This turn」 사건 (2026-11-08 사용자: 합쳐도 본편이 몰랐다) */
+export function mergedNow(it: Items, lastAnchor: string): string[] {
+  if (!lastAnchor) return [];
+  return it.log.filter((l) => l.what === 'merge' && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? '').replace(/와 합침$/, '')}`);
+}
+
 /** 이번 턴에 새로 산 것 (상점): 마지막 응답 뒤에 들어온 store 줄 — 아직 본편이 모르는 것 */
 export function newlyBought(list: Item[], lastAnchor: string): Item[] {
   return list.filter((e) => e.from === 'store' && e.anchor === lastAnchor);
@@ -453,7 +502,7 @@ export interface BlockUse {
 }
 
 /** 본편에 넘기는 글. 비면 빈 문자열 (붙이지 않는다). 전부 넘김 — 자르지 않는다. 칸 수는 소지품 격자만 센다 (장착 칸에 놓인 건 빼고) */
-export function itemsBlock(list: Item[], opts: { slots: number; limit: string; left?: (e: Item) => number | undefined; use?: BlockUse[]; bought?: string[]; events?: string[]; always?: boolean; detail?: ItemDetail; recent?: string[] }): string {
+export function itemsBlock(list: Item[], opts: { slots: number; limit: string; carry?: number; left?: (e: Item) => number | undefined; use?: BlockUse[]; bought?: string[]; events?: string[]; always?: boolean; detail?: ItemDetail; recent?: string[] }): string {
   const lines = list.map((e) => itemLine(e, opts.left?.(e), isEquipped(e, list), opts.detail));
   const use = (opts.use ?? []).filter((u) => u.name);
   const bought = (opts.bought ?? []).filter(Boolean);
@@ -461,6 +510,11 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; l
   if (!lines.length && !use.length && !bought.length && !extra.length && !opts.always) return '';
   const carried = gridItems(list).length;
   const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? ' (over the limit)' : ''}`, ...(lines.length ? lines : ['- (nothing)'])];
+  // 무게 (2026-11-08 사용자): 「무겁다」 같은 말 없이 지금 상황만 — 합계·한도, 넘었으면 얼마나
+  if (opts.carry) {
+    const w = totalWeight(list);
+    out.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ''}`);
+  }
   out.push(`Carry limit: ${opts.limit}`);
   const recent = (opts.recent ?? []).filter(Boolean);
   if (recent.length) out.push(`Recently: ${recent.join('; ')}`);
@@ -574,10 +628,11 @@ export function inventoryText(chat: Chat): string {
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),
+    carry: itemCarry(vars),
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).map((e) => e.name),
-    events: [...(resumed ? [RESUMED_EVENT] : []), ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
@@ -651,7 +706,7 @@ export function itemsNowOf(chat: Chat): ItemNow[] {
   const live = liveItems(it, alive);
   return live.map((e) => {
     const left = itemLeft(it, e, alive);
-    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}) };
+    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.weight !== undefined ? { weight: e.weight } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}) };
   });
 }
 
@@ -668,7 +723,7 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
     } else if (c.action === 'update' && cur) {
       it = updateItem(it, cur.id, {
         desc: c.desc || cur.desc, effect: c.effect || cur.effect,
-        ...(c.use !== undefined ? { use: c.use } : {}), ...(c.equip !== undefined ? { equip: c.equip ?? '' } : {}), ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}),
+        ...(c.use !== undefined ? { use: c.use } : {}), ...(c.equip !== undefined ? { equip: c.equip ?? '' } : {}), ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}), ...(c.weight !== undefined ? { weight: c.weight } : {}),
       });
       if (c.uses !== undefined && cur.uses !== undefined) {
         it = setItemLeft(it, alive, cur.id, c.uses);
@@ -676,7 +731,7 @@ export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemCh
         if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀' });
       }
     } else if (c.action === 'new') {
-      it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? undefined, state: c.state, icon: c.icon, from: 'story', anchor: c.anchor, quote: c.quote });
+      it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? undefined, state: c.state, icon: c.icon, weight: c.weight, from: 'story', anchor: c.anchor, quote: c.quote });
     }
   }
   return it;
@@ -689,7 +744,7 @@ export function startItemsState(list: StartItem[], at = new Date().toISOString()
   const alive = new Set<string>();
   for (const e of list) {
     it = addItem(it, alive, {
-      name: e.name, desc: e.desc, effect: e.effect, use: !!e.use, uses: e.uses, equip: e.equip, icon: e.icon,
+      name: e.name, desc: e.desc, effect: e.effect, use: !!e.use, uses: e.uses, equip: e.equip, icon: e.icon, weight: e.weight,
       wear: e.wear !== false, from: 'manual', anchor: '', at,
     });
   }
@@ -698,3 +753,5 @@ export function startItemsState(list: StartItem[], at = new Date().toISOString()
 
 /** 시작 변수: 줄이 없으면 빈 소지품 */
 export const startItemsVars = (list: StartItem[]): Record<string, string> => (list.length ? itemsVars(startItemsState(list)) : { [ITEMS_VAR]: '' });
+/** 시작 소지 한도: 고유 인물의 명부 값 (없으면 빈 칸 → 설정 값을 쓴다) */
+export const startCarryVars = (carry: number | undefined): Record<string, string> => ({ [ITEM_CARRY_PC_VAR]: carry && carry > 0 ? String(carry) : '' });

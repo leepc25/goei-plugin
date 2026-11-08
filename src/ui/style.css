@@ -3273,7 +3273,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-over-ok { outline: 2px solid var(--signal); outline-offset: 2px; }
 .it-usebox.it-over-ok, .it-grid.it-over-ok { outline-offset: 4px; border-radius: 12px; }
 .it-trash { display: none; }
-.it-dragging .it-trash { position: sticky; bottom: 8px; z-index: 7; display: flex; align-items: center; justify-content: center; gap: 8px; height: 104px; border: 1px dashed color-mix(in srgb, var(--danger) 70%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--danger) 16%, var(--void)); color: color-mix(in srgb, var(--danger) 75%, var(--text)); font-size: 13.5px; font-weight: 700; }
+.it-scrollwrap { position: relative; min-width: 0; }
+/* 버리기 띠: 격자 위에 뜬다 — 격자 줄 수와 상관없이 같은 높이, 아래 줄 칸을 집기 어렵지 않게 적당히 (2026-11-08 사용자) */
+.it-dragging .it-trash { position: absolute; left: 4px; right: 4px; bottom: 8px; z-index: 7; display: flex; align-items: center; justify-content: center; gap: 8px; height: 72px; box-sizing: border-box; border: 1px dashed color-mix(in srgb, var(--danger) 70%, transparent); border-radius: 14px; background: color-mix(in srgb, var(--danger) 16%, var(--void)); color: color-mix(in srgb, var(--danger) 75%, var(--text)); font-size: 13.5px; font-weight: 700; }
 .it-dragging .it-trash svg { width: 16px; height: 16px; }
 .it-dragging .it-trash.it-over-ok { outline: 0; background: color-mix(in srgb, var(--danger) 30%, var(--void)); border-style: solid; }
 .it-card p.bad { color: var(--danger); font-size: 12.5px; }
@@ -3554,3 +3556,32 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 설정 한 줄에 최소·최대 두 칸 (상점 진열대 분량) */
 .st-range { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .st-range > span { font-size: 13px; color: var(--dim); }
+
+/* ── 소지품 고침 (2026-11-08 사용자): 무게·격자만 스크롤·장착 띠 여백 ── */
+/* 무게 합 알약: 칸 수 알약과 같은 꼴. 한도를 넘으면 넘은 만큼(--ov 0~1) 붉은색이 진해진다 */
+.it-wgt { display: inline-flex; align-items: center; gap: 6px; height: 34px; box-sizing: border-box; padding: 0 12px 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--sub); font-family: var(--mono); white-space: nowrap; }
+.it-wgt svg { width: 16px; height: 16px; color: var(--signal); }
+.it-wgt b { font-size: 15px; color: var(--text); }
+.it-wgt small { font-size: 12px; color: var(--dim); }
+.it-wgt.over { --ov: 0; border-color: color-mix(in srgb, var(--danger) calc(40% + var(--ov) * 60%), transparent); background: color-mix(in srgb, var(--danger) calc(10% + var(--ov) * 50%), var(--panel)); }
+.it-wgt.over svg, .it-wgt.over b { color: color-mix(in srgb, var(--danger) calc(70% - var(--ov) * 40%), #fff); }
+.it-wgt.over small { color: color-mix(in srgb, var(--danger) 30%, var(--sub)); }
+/* 물건 무게: 그림 오른쪽 아래에 작게 */
+.it-c .it-ic, .it-slot .it-ic { position: relative; }
+.it-wt { position: absolute; right: 3px; bottom: 3px; padding: 0 4px; border-radius: 5px; background: color-mix(in srgb, var(--void) 72%, transparent); color: var(--sub); font: 600 10px/15px var(--mono); font-variant-numeric: tabular-nums; pointer-events: none; }
+.it-form input[name="weight"] { -moz-appearance: textfield; }
+/* PC 격자: 탭·도구 줄·장착 띠는 고정, 격자(.it-scroll)만 스크롤 */
+.gx-items.it-fix { overflow: hidden; min-height: 0; }
+.gx-items.it-fix > * { flex: none; }
+.gx-items.it-fix > .it-scrollwrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.gx-items.it-fix .it-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 4px 4px 8px; margin: -4px; }
+/* 장착 띠 여백: 아바타 위·좌우를 넉넉히, 사용칸은 줄이고 칸 사이를 띄운다 */
+.gx-items .it-eqbox:not(.sell) { padding: 16px 16px; }
+.gx-items .it-eqin { gap: 28px; }
+.gx-items .it-av { width: auto; min-width: 168px; flex: 1 1 0; max-width: 300px; height: 280px; }
+.gx-items .it-usebox { flex: 0 1 300px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx-items .it-eqin { gap: 10px; }
+  .gx-items .it-av { flex: none; width: 128px; min-width: 0; height: 272px; }
+  .gx-items .it-usebox { flex: 1 1 100%; }
+}

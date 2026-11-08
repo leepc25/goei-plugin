@@ -40,6 +40,8 @@ test('편집 칸 글 ↔ 줄, 소모 띄어쓰기·「-」 빈칸', () => {
   const list = of('살라딘');
   assert.deepEqual(parseStartItems(startItemsText(list)), list);
   assert.deepEqual(parseStartItems('담배 | 소모 20 | 소지품 | 한 갑 | - | cigarette\n\n | 사용'), [{ name: '담배', use: true, uses: 20, desc: '한 갑', icon: 'cigarette' }]);
+  assert.deepEqual(parseStartItems('권총 | 무기·사용 | 무기 칸 | 제식 | - | pistol | 0.9'), [{ name: '권총', use: true, equip: 'weapon', desc: '제식', icon: 'pistol', weight: 0.9 }], '무게 칸 (11-08)');
+  assert.deepEqual(readStartItems([{ name: '칼', weight: '0.3' }]), [{ name: '칼', weight: 0.3 }]);
 });
 
 test('시작 변수: 줄이 없으면 빈 소지품', () => {
