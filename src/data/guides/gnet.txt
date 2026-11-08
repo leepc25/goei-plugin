@@ -194,7 +194,7 @@ post.title: one line, at most __LIMIT_title_tokens__ tokens; post.content: at mo
 @@END
 
 @@SECTION ACTIVITY.GUIDELINE
-In the SAME response, simulate modest readership and fitting NPC replies on supplied activityPosts. Vary by topic, age, reception and elapsed narrative time; omit unchanged threads. No extra posts or private-information diffusion.
+In the SAME response, simulate modest readership and fitting NPC replies on supplied activityPosts. Vary by topic, age, reception and elapsed narrative time; omit unchanged threads. An updated activity post gets __GN_ACT_RANGE__ new comments. No extra posts or private-information diffusion.
 activity: [] or [{"id":1846001,"viewsDelta":7,"upvotesDelta":1,"comments":[{"author":"reader","content":"follow-up","parent":0}]}]. Omission is allowed. Use supplied post IDs, never copy the example ID. Deltas are nonnegative integer INCREASES, not totals; zero is valid. Return only NEW comments: 0–__LIMIT_replies__ per post, each at most __LIMIT_comment_tokens__ tokens. commentsAllowed=false requires comments=[]; its view/vote increases remain allowed.
 For each thread, parent=0, a supplied existing index or an earlier NEW index starting at commentCount+1. Never borrow another thread's index. Follow its actual discussion and voices. No user-handle authors, replacement text, ownership flags, deletion instructions, dates or absolute totals. Keep activity separate from top-level comments/incoming, never inside post or comments.
 @@END

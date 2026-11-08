@@ -235,7 +235,7 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
       pushComments(p, got.comments, dateNow(chat));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       trimBoard(cur, s);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       if (!got.comments.length) note = '글을 올렸어요. 아직 댓글은 없어요.';
@@ -278,7 +278,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
       const n = got.comments.length;
       p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
       p.votes += Math.floor(Math.random() * (n + 2));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest), gnetSettings(latest.scriptstate).counts.act[1]);
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
       if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
@@ -331,7 +331,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(chat));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? '' : '등록했어요. 추가 답글은 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
@@ -591,6 +591,7 @@ function settingsView(ctx: ChatContext, back = true): string {
       ${group('게시판', [
         row('게시글 수', countRow(ctx, 'post', '개'), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
         row('새 글 댓글 수', countRow(ctx, 'cmt', '개'), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
+        row('활동 댓글 수', countRow(ctx, 'act', '개'), `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요`),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
@@ -1065,7 +1066,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     }
     case 'gn-step': {
       // 개수 최소·최대: 최소가 최대를 넘으면 같이 맞춘다
-      const m = /^(post|cmt)_(min|max):([+-])$/.exec(v);
+      const m = /^(post|cmt|act)_(min|max):([+-])$/.exec(v);
       if (!m) return true;
       const k = m[1] as CountKey;
       const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];

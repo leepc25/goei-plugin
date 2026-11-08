@@ -71,7 +71,7 @@ export class GnetError extends Error {
 
 export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
-  mode: '2', post_min: '5', post_max: '7', cmt_min: '0', cmt_max: '6', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
+  mode: '2', post_min: '5', post_max: '7', cmt_min: '0', cmt_max: '6', act_min: '0', act_max: '4', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
   /** 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) */
   keyfigures: '1',
@@ -93,10 +93,10 @@ export function gnetRetention(state: Record<string, unknown> | undefined): { aut
 export const LIMITS = { replies_min: 0, replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
 export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 50, turns: 8, dmKeep: 40, cooldown: 2 };
 export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 3000, includePosts: true, includeDms: true, ownOnly: false, focus: true, recentPosts: 1, recentDms: 5 };
-/** 개수 설정 (2026-11-08 사용자: 단계 고르기 대신 최소·최대 직접). 새로고침 글 수, 새 글마다 댓글 수. 내 글·댓글에 달릴 새 답글 수는 고급 설정(replies_min·replies) */
-export const COUNT_RANGE = { post: [1, 20], cmt: [0, 20] } as const;
+/** 개수 설정 (2026-11-08 사용자: 단계 고르기 대신 최소·최대 직접). 새로고침 글 수, 새 글마다 댓글 수, 지난 글에 새로 붙는 활동 댓글 수. 내 글·댓글에 달릴 새 답글 수는 고급 설정(replies_min·replies) */
+export const COUNT_RANGE = { post: [1, 20], cmt: [0, 20], act: [0, 20] } as const;
 export type CountKey = keyof typeof COUNT_RANGE;
-export const COUNT_KEYS: CountKey[] = ['post', 'cmt'];
+export const COUNT_KEYS: CountKey[] = ['post', 'cmt', 'act'];
 /** 지침 속 개수 자리: 최소=최대면 그 수 하나, 아니면 「최소–최대」 */
 export const countText = ([a, b]: [number, number]): string => (a === b ? String(a) : `${a}-${b}`);
 
@@ -748,10 +748,10 @@ export interface CommentTarget {
 
 /** 모델이 쓴 새 댓글 검사 (원본 react onValidate + filterOwnerComments). 잘못된 것은 하나씩 버린다 */
 export function acceptComments(
-  rows: unknown, existing: GComment[], t: CommentTarget, nick: string, base = t.total,
+  rows: unknown, existing: GComment[], t: CommentTarget, nick: string, base = t.total, cap = LIMITS.replies,
 ): { comments: NewComment[]; dropped: number } {
-  const list = Array.isArray(rows) ? rows.slice(0, LIMITS.replies) : [];
-  let dropped = Array.isArray(rows) ? Math.max(0, rows.length - LIMITS.replies) : 0;
+  const list = Array.isArray(rows) ? rows.slice(0, cap) : [];
+  let dropped = Array.isArray(rows) ? Math.max(0, rows.length - cap) : 0;
   const out: NewComment[] = [];
   const map = new Map<number, number | false>();
   const seen = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
@@ -979,7 +979,7 @@ export function activityContext(st: GState, targetId: number | null): { posts: A
 }
 
 /** 줄마다 따로 검사해서 맞는 것만 반영. [바뀌었는지, 버린 줄 수] */
-export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string, now = ''): [boolean, number] {
+export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string, now = '', cap = LIMITS.replies): [boolean, number] {
   if (rows === undefined || rows === null) return [false, 0];
   if (!Array.isArray(rows)) return [false, 1];
   let changed = false;
@@ -1004,7 +1004,7 @@ export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, 
       skipped++;
       continue;
     }
-    const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
+    const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length, cap);
     p.views += delta(u.viewsDelta);
     p.votes += delta(u.upvotesDelta);
     pushComments(p, got.comments, now);

@@ -46,6 +46,7 @@ export function gnetBooks(src: RefSource): GnetBooks {
       return evaluate(raw, env)
         .replace(/__GN_POST_RANGE__/g, countText(cs.post))
         .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
+        .replace(/__GN_ACT_RANGE__/g, countText(cs.act))
         .replace(/__GN_REPLY_RANGE__/g, countText([Math.min(LIMITS.replies_min, LIMITS.replies), LIMITS.replies]))
         .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
         .replace(/<!--[\s\S]*?-->/g, '')
