@@ -6,13 +6,14 @@
 import { charArt, charFace, charRoster, drawCharFrame, loadChar, sheetBody, type RosterRow } from '../action/art/charPacks';
 import { crt2d } from './crt2d';
 import { dotText, HUD_DIM, HUD_EDGE, HUD_INK } from '../action/ui/pixelHud';
-import { bigText, BIG_FIRE } from '../action/ui/bigText';
+import { bigText, BIG_FIRE, BIG_INK } from '../action/ui/bigText';
 import type { VsMode } from '../action/engine/versus';
 
-const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
-  { id: 'duel', name: '1 VS 1', picks: [1, 1] },
-  { id: 'team', name: '태그매치', picks: [3, 3] },
-  { id: 'survival', name: '서바이벌', picks: [1, 0] },
+/** big = 모드 고르기 큰 글자 (도트 한글은 크게 키우면 획이 뭉개져서 영문 큰 글자, 11-08) */
+const MODES: { id: VsMode; name: string; big: string; picks: [number, number] }[] = [
+  { id: 'duel', name: '1 VS 1', big: '1 VS 1', picks: [1, 1] },
+  { id: 'team', name: '태그매치', big: 'TAG MATCH', picks: [3, 3] },
+  { id: 'survival', name: '서바이벌', big: 'SURVIVAL', picks: [1, 0] },
 ];
 const RANDOM = '__random';
 const CELL = 64;   // 11-08 사용자 「격투게임처럼」: 얼굴판 얼굴을 1:1 로 크게
@@ -95,19 +96,6 @@ function vsMark(): HTMLCanvasElement {
   return crt2d(cv);
 }
 
-/** 깜빡이는 도트 화살표 ▶ (5×7, 검은 테) */
-function arrowCanvas(color: string, flip = false): HTMLCanvasElement {
-  const rows = ['#....', '##...', '###..', '####.', '###..', '##...', '#....'];
-  const cv = document.createElement('canvas');
-  cv.width = 14; cv.height = 18;
-  const o = cv.getContext('2d')!;
-  const on = (x: number, y: number) => y >= 0 && y < 7 && x >= 0 && x < 5 && rows[y][flip ? 4 - x : x] === '#';
-  for (let y = -1; y <= 7; y++) for (let x = -1; x <= 5; x++) {
-    if (on(x, y)) { o.fillStyle = color; o.fillRect((x + 1) * 2, (y + 1) * 2, 2, 2); }
-    else if ([-1, 0, 1].some((dy) => [-1, 0, 1].some((dx) => on(x + dx, y + dy)))) { o.fillStyle = '#07090b'; o.fillRect((x + 1) * 2, (y + 1) * 2, 2, 2); }
-  }
-  return crt2d(cv);
-}
 
 const CSS = `
 .vs-sel{--shd:drop-shadow(3px 3px 0 rgba(0,0,0,.6));position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:40;user-select:none}
@@ -118,7 +106,13 @@ const CSS = `
 .vs-modes{display:none}
 .vs-tsub{display:flex;justify-content:center;margin-top:2px}
 .vs-mlist{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:auto}
-.vs-mlist .vs-mode{width:280px;padding:6px 0}
+.vs-mlist{gap:10px}
+.vs-mlist .vs-mode{width:auto;padding:0;border:0;border-image:none;background:none;filter:none}
+.vs-mlist .vs-mode:before,.vs-mlist .vs-mode:after{display:none}
+.vs-mlist .vs-mode.on{animation:none;border:0;border-image:none;background:none}
+.vs-sel[data-st="mode"] .vs-title{border:0;border-image:none;background:none;padding:0;filter:none}
+.vs-sel[data-st="mode"] .vs-title:before{display:none}
+.vs-sel[data-st="mode"] .vs-top{top:40px}
 .vs-sel[data-st="mode"]>:not(.vs-top):not(.vs-mlist):not(.vs-help){display:none}
 .vs-sel[data-st="char"]>.vs-mlist{display:none}
 .vs-mode{position:relative;cursor:pointer;width:150px;display:flex;justify-content:center;filter:var(--shd);${frameCss(F_BASE)}}
@@ -186,6 +180,15 @@ const CSS = `
 .vs-load{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:center;animation:vs-pulse .8s steps(2) infinite}
 @keyframes vs-stamp{from{transform:translate(-50%,50%) scale(3);opacity:0}}
 `;
+
+/** 모드 고르기 줄 (11-08 사용자 「격투게임 모드 고르기처럼」): 상자 없이 큰 글자, 고른 줄은 [ ] 로 감싸고 노랑→주황, 나머지는 흰→회색 */
+function bigMode(text: string, on: boolean): HTMLCanvasElement {
+  const src = bigText(on ? `[ ${text} ]` : text, on ? BIG_FIRE : BIG_INK, 5, { slant: false, bold: true });
+  const cv = document.createElement('canvas');
+  cv.width = src.width; cv.height = src.height;
+  cv.getContext('2d')!.drawImage(src, 0, 0);
+  return crt2d(cv);
+}
 
 /** 도트 글자 한 장 (DOM 에 넣을 새 canvas) */
 function dot(s: string, color = HUD_INK, scale = 2): HTMLCanvasElement {
@@ -434,8 +437,8 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     el.querySelectorAll<HTMLElement>('.vs-mode').forEach((m) => {
       const on = m.dataset.m === mode.id;
       m.classList.toggle('on', on);
-      put(m, dot(MODES.find((x) => x.id === m.dataset.m)!.name, on ? '#fff3c4' : HUD_DIM, 3));
-      if (on) { const l = arrowCanvas('#ffd35a', true), r = arrowCanvas('#ffd35a'); l.className = 'ar l'; r.className = 'ar r'; m.append(l, r); }
+      // 11-08 사용자 「격투게임 모드 고르기처럼」: 상자 없이 큰 글자 줄, 고른 줄은 [ ] 로 감싸고 노랑→주황
+      put(m, bigMode(MODES.find((x) => x.id === m.dataset.m)!.big, on));
     });
     const taken = new Set([...picks[0], ...picks[1]]);
     cells.forEach((c, i) => c.classList.toggle('taken', taken.has(names[i])));
