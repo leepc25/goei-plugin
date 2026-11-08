@@ -9,6 +9,7 @@
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node scripts/test-browser.mjs",
     "test:quick": "node scripts/test-browser.mjs --fast --no-build",
+    "audit:click": "node scripts/click-audit.mjs",
     "release:prep": "node scripts/release-prep.mjs"
   },
   "devDependencies": {
