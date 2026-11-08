@@ -574,6 +574,167 @@
   },
   {
    "keywords": [
+    "꿈결 수집기 F등급",
+    "F등급 꿈결 수집기",
+    "꿈결 수집기 F",
+    "dream collector F",
+    "F-rank dream collector",
+    "F rank dream collector"
+   ],
+   "file": "anomaly_262.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 F등급",
+   "src": "game-src/items/raw/batch_228/04.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "F등급",
+    "F"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 E등급",
+    "E등급 꿈결 수집기",
+    "꿈결 수집기 E",
+    "dream collector E",
+    "E-rank dream collector",
+    "E rank dream collector"
+   ],
+   "file": "anomaly_263.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 E등급",
+   "src": "game-src/items/raw/batch_228/05.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "E등급",
+    "E"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 D등급",
+    "D등급 꿈결 수집기",
+    "꿈결 수집기 D",
+    "dream collector D",
+    "D-rank dream collector",
+    "D rank dream collector"
+   ],
+   "file": "anomaly_264.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 D등급",
+   "src": "game-src/items/raw/batch_228/07.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "D등급",
+    "D"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 C등급",
+    "C등급 꿈결 수집기",
+    "꿈결 수집기 C",
+    "dream collector C",
+    "C-rank dream collector",
+    "C rank dream collector"
+   ],
+   "file": "anomaly_265.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 C등급",
+   "src": "game-src/items/raw/batch_228/09.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "C등급",
+    "C"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 B등급",
+    "B등급 꿈결 수집기",
+    "꿈결 수집기 B",
+    "dream collector B",
+    "B-rank dream collector",
+    "B rank dream collector"
+   ],
+   "file": "anomaly_266.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 B등급",
+   "src": "game-src/items/raw/batch_228/11.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "B등급",
+    "B"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 A등급",
+    "A등급 꿈결 수집기",
+    "꿈결 수집기 A",
+    "dream collector A",
+    "A-rank dream collector",
+    "A rank dream collector"
+   ],
+   "file": "anomaly_267.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 A등급",
+   "src": "game-src/items/raw/batch_228/14.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "A등급",
+    "A"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 S등급",
+    "S등급 꿈결 수집기",
+    "꿈결 수집기 S",
+    "dream collector S",
+    "S-rank dream collector",
+    "S rank dream collector"
+   ],
+   "file": "anomaly_268.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 S등급",
+   "src": "game-src/items/raw/batch_228/16.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "S등급",
+    "S"
+   ]
+  },
+  {
+   "keywords": [
     "이름표 떨어진 조끼",
     "vest without name tag"
    ],
@@ -895,6 +1056,24 @@
    "head": [
     "가죽 팔찌",
     "leather cuff bracelet"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
+    "빈 꿈결 수집기",
+    "꿈결 수집기",
+    "empty dream collector",
+    "dream collector"
+   ],
+   "file": "anomaly_261.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "빈 꿈결 수집기",
+   "src": "game-src/items/raw/batch_228/02.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
    ],
    "feats": []
   },
@@ -53371,6 +53550,8 @@
   "물약병": "seal_019.webp",
   "potion bottle": "seal_019.webp",
   "표본 채취병": "seal_018.webp",
-  "sample collection bottle": "seal_018.webp"
+  "sample collection bottle": "seal_018.webp",
+  "꿈결 수집기": "anomaly_261.webp",
+  "dream collector": "anomaly_261.webp"
  }
 }
