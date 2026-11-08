@@ -142,6 +142,7 @@ export class Game {
       // 대전 K.O. 순간 슬로 모션 (11-08 사용자): 쓰러지기 시작한 판 시간 0.6초를 실제로는 약 2초에 걸쳐
       const slow = view.clear && versus.ko && versus.ko.t > KO_SEC - 0.6 ? 0.3 : 1;
       this.acc += dt * slow;
+      view.vsSlow = slow;
       const T = 1 / TICK_HZ;
       while (this.acc >= T) {
         this.acc -= T;
@@ -185,6 +186,7 @@ export class Game {
           // 렌더러는 월드 카메라를 보간·반올림한 값(drawCamX)으로 옮긴다 → 같은 값을 빼야 한다 (w.camX 를 빼면 달릴 때 장마다 앞뒤로 떨린다, 11-08 사용자 「화면이 달달거려」)
           const camDraw = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a);
           view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - camDraw;
+          view.vsX0 = this.vsCam;
         } else if (vw < SCREEN_W && w) {
           const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
@@ -221,7 +223,12 @@ export class Game {
         this.scene.draw(paused ? 1 : this.acc / T);
         this.ctx.restore();
         // K.O. 순간 붉게 한 번 깜빡 (11-08 사용자): 그려진 캐릭터 위에만 (빈 곳=본문은 칠하지 않는다)
-        if (view.clear && versus.ko && versus.ko.t > KO_SEC - 0.1) {
+        // K.O. 순간 화면 번쩍 (11-08 사용자 「슬로로 날아가면서 화면 빛나는 효과」): 배경이 있는 무대만 (투명 무대는 본문을 덮지 않게 캐릭터 색만)
+        if (view.clear && view.vsBg && versus.ko && versus.ko.t > KO_SEC - 0.12) {
+          this.ctx.fillStyle = `rgba(255,255,255,${(0.75 * (versus.ko.t - (KO_SEC - 0.12)) / 0.12).toFixed(3)})`;
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        if (view.clear && !view.vsBg && versus.ko && versus.ko.t > KO_SEC - 0.1) {   // 배경이 있으면 그림판 전체가 붉어지므로 캐릭터 색 입히기로 (아래 vsReact)
           this.ctx.save();
           this.ctx.globalCompositeOperation = 'source-atop';
           this.ctx.fillStyle = 'rgba(255,30,20,.75)';
@@ -466,6 +473,7 @@ export class Game {
             const kind = timeUp && w.player.hp > 0 && !foeDown ? 'time' : win >= 0.999 ? 'perfect' : 'ko';
             versus.ko = { side, t: KO_SEC, kind, next: roundEnd(side, [rp, rf]) };
             this.vsReact = { win: side === 0 ? w.player : foe, lose: side === 0 ? foe : w.player };
+            for (const b of [w.player, foe] as unknown as { core?: { P: { armorT: number; armorC?: string } } }[]) if (b?.core) { b.core.P.armorT = 0.28; b.core.P.armorC = '#ff2a2a'; }   // K.O. 순간 캐릭터만 붉게
           } else if (versus.ko && versus.ko.t > KO_SEC - 1.4) {
             versus.ko.t -= 1 / TICK_HZ;   // 쓰러지는 걸 잠깐 보고
           } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) > 0) {

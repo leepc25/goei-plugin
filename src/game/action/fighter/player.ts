@@ -24,6 +24,10 @@ import { draft, kitOf, type Offer } from '../../perks/rules';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 
 /** 대전(11-08 사용자 「필살기 게이지는 너무 빨리 차」): 필살 게이지 차는 양 배율 */
+/** 대전: 기술·이펙트의 「보이는 화면」 왼쪽 끝 = 실제 화면(두 사람을 따라가는 대전 화면). 필드는 월드 카메라 그대로 */
+const vsX0 = (c: number) => (view.clear && view.vsX0 >= 0 ? view.vsX0 : c);
+/** 대전: 필살기 피해 배율 (필드 값 그대로면 필살기 한 번에 체력 전부가 날아감) */
+const VS_SUPER_DMG = 0.35;
 const VS_SP = 0.4;
 /** 대전 깎기 피해: 특수기·원거리·충전기를 막았을 때 받는 피해 비율 */
 const VS_CHIP = 0.2;
@@ -293,7 +297,7 @@ export class FighterPlayer extends Player {
       scale *= 2;
       w.say('치명!', 0.8);
     }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow',
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1) * (view.clear && o.use === 'super' ? VS_SUPER_DMG : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow',
       // 대전(11-08 사용자 「그래 넣어」): 필살기·끝까지 모은 충전기는 막기 불가, 특수기·원거리·충전기는 막아도 깎인다
       ...(view.clear ? { unblock: o.use === 'super' || !!o.full, chip: ['skill', 'shot', 'charge', 'super'].includes(o.use ?? '') ? VS_CHIP : 0 } : {}),
       lethal: !!o.src && ['skill', 'ranged', 'blast'].includes(o.src) || form !== 'body' || !!this.core.P.armed };
@@ -419,7 +423,7 @@ export class FighterPlayer extends Player {
       world.emit({ type: 'hp:low' });
     }
     // 주인공: 설정 「내가 죽으면」이 영구 사망이면 사망(44·45) → 출동 결과 「사망」, 패퇴면 쓰러져 후송
-    if (this.hp <= 0 && this.team === 'player' && !this.allySide && (fighterHooks.permaDeath?.() ?? false)) {
+    if (this.hp <= 0 && !view.clear && this.team === 'player' && !this.allySide && (fighterHooks.permaDeath?.() ?? false)) {   // 대전은 사망 동작(제자리 풀썩) 없이 날아가 쓰러진다 (11-08 사용자)
       this.dieNow(lying);
       return { kind: 'hit', killed: true };
     }
@@ -632,11 +636,11 @@ export class FighterPlayer extends Player {
     this.statusStep(world, 1 / 30);
     this.coreSeatStep(p);
     this.coreShowerStep(p);
-    if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 샤워 중엔 그만두기만
-    if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
+    if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane }); this.sync(); return; } // 샤워 중엔 그만두기만
+    if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: vsX0(w.camX), lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
     if (this.auto) p = this.auto.apply(this, world, p);   // 자동전투: 앉기·샤워 중(위에서 돌아감)에는 안 섞는다
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
-    this.core.frameView({ x0: w.camX, lane: w.lane });
+    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane });
     this.sync();
   }
 
@@ -644,14 +648,14 @@ export class FighterPlayer extends Player {
    * 엔진 틱(30Hz)에서 1/30초씩 돌리면 0.04초짜리 장이 0.067초로 늘고 움직임이 30장으로 끊긴다 (사용자: 테스트룸보다 프레임이 떨어져 보임) */
   frameStep() {
     const now = performance.now();
-    const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1000);
+    const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1000) * (view.clear ? view.vsSlow : 1);   // 대전 K.O. 슬로: 그림·날아가기도 같이 느리게
     this.lastFrameAt = now;
     // 월드가 멈춰 있으면(메뉴·대화창) 같이 멈춘다
-    if (!this.world || this.seat || now - this.lastTickAt > 120 || dt <= 0) return;
+    if (!this.world || this.seat || now - this.lastTickAt > (view.clear ? 400 : 120) || dt <= 0) return;
     const w = this.world as WorldView & { camX: number };
     const P = this.core.P;
     P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; // 틱 뒤 막힘·끝 보정
-    this.core.frameView({ x0: w.camX, lane: w.lane });
+    this.core.frameView({ x0: vsX0(w.camX), lane: w.lane });
     this.perkSync(dt);
     if (view.clear && this.vsFreeze > 0) { this.vsFreeze -= dt; this.sync(); return; }   // 대전 히트스톱: 맞은 쪽 그림을 멈춘다
     this.core.update(dt);
@@ -758,7 +762,7 @@ export class FighterPlayer extends Player {
   /* ───────── 그리기 (render.ts가 부른다) ───────── */
 
   private drawUnder(ctx: CanvasRenderingContext2D, camX: number) {
-    this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
+    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669] });
     ctx.save(); ctx.translate(-camX, 0); this.core.drawUnder(ctx); this.drawReward(ctx); ctx.restore();
   }
   /** 바닥 보상 카드 (코드 그림: 도트 카드 + 테두리 등급 색 + 빛, 반짝임은 공용 이펙트 item_sparkle). PixelLab 카드 그림이 생기면 여기만 바꾼다 */
@@ -788,7 +792,7 @@ export class FighterPlayer extends Player {
     ctx.save(); ctx.translate(-camX + jit, 0); ctx.imageSmoothingEnabled = false; this.core.drawBody(ctx); ctx.restore();
   }
   drawFxLayer(ctx: CanvasRenderingContext2D, camX: number) {
-    this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
+    this.core.frameView({ x0: vsX0(camX), lane: this.world?.lane ?? [440, 669] });
     ctx.save(); ctx.translate(-camX, 0); ctx.imageSmoothingEnabled = false; this.core.drawFxLayer(ctx); ctx.restore();
   }
   drawScreen(ctx: CanvasRenderingContext2D) {

@@ -32,6 +32,10 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(bg.img, Math.round(bg.x - camX), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h));
         for (const o of bg.objs) if (!o.front) ctx.drawImage(o.img, Math.round(o.x - camX), Math.round(o.y), Math.round(o.w), Math.round(o.h));
+        // 필살기·암전 기술 (11-08 사용자 「대전게임 필살기 화면 이펙트」): 배경 그림만 어둡게, 캐릭터는 그 위에 그대로
+        let dk = 0;
+        for (const b of [w.player, ...w.bodies] as unknown as { core?: { dark?: number } }[]) dk = Math.max(dk, b.core?.dark ?? 0);
+        if (dk > 0) { ctx.fillStyle = `rgba(0,0,0,${Math.min(0.65, dk * 0.6).toFixed(3)})`; ctx.fillRect(Math.round(bg.x - camX), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
       }
       return;
     }

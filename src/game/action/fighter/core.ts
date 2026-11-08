@@ -4,6 +4,7 @@
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { view } from '../engine/view';
+import { dotText } from '../ui/pixelHud';
 import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit, seatFitAt } from './seats';
 import { showerPlan, UNDRESS_D, DRESS_D } from './shower';
 import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
@@ -695,8 +696,9 @@ function ensureArmed(then?: Json) {
 }
 function afterBuf(fallback?: Json) {
   // 대전: 특수기·충전기·필살기·원거리 동작이 끝나면 마지막 장으로 잠깐 굳는다(후딜 2배 몫, 11-08 사용자)
-  if (view.clear && P.clip && !P.vsLag && (skillClips().has(P.clip.id) || P.clip.id === '15')) { const id = P.clip.id, f = nOf(id) - 1; P.vsLag = true; P.mode = 'act'; play(id, { seq: [{ f, d: 0.22 }], onEnd: () => { P.vsLag = false; afterBuf(fallback); } }); return; }
-  const b = P.buf; P.buf = (P.bq && P.bq.shift()) || null;   // 두 칸: 약약강을 빨리 눌러도 순서대로 (11-08 사용자 「콤보 안 돼」)
+  if (view.clear && P.clip && !P.vsLag && (skillClips().has(P.clip.id) || P.clip.id === '15')) { const id = P.clip.id, f = nOf(id) - 1; P.vsLag = true; P.mode = 'act'; play(id, { seq: [{ f, d: 0.22 }], onEnd: () => { afterBuf(fallback); P.vsLag = false; } }); return; }
+  let b = P.buf; const bt = P.bufT || 0, nx = P.bq && P.bq.shift(); P.buf = nx ? nx.a : null; P.bufT = nx ? nx.t : 0;   // 여러 칸: 약약강을 빨리 눌러도 순서대로 (11-08 사용자 「콤보 안 돼」)
+  if (view.clear && b && P.t - bt > 0.4) { b = null; P.buf = null; P.bq = []; }   // 대전: 0.4초 넘게 묵은 입력은 버린다(마구 누른 공격이 나중에 나가지 않게, 11-08 사용자)
   if (b === 'light') return light();
   if (b === 'heavy') return heavy();
   if (b === 'dodge') return dodge();
@@ -816,12 +818,15 @@ function skill() {
   runSkill(use);
 }
 function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); P.useSrc = 'skill'; env.perk?.skillUse(); runSkill(CH.skills.skill2); }
+let vsSuperName: { text: string; t: number } | null = null;
 function superMove() {
   const sp = CH.skills.super; if (!sp) return;
   if (!spReady()) return;
   P.inSuper = true; P.noGain = P.t + 8; P.hitVfx = null; env.perk?.superUse();
   // 컷인: 화면 정지 + 요원 색 띠 + 기술명
   sfx('super'); cut = 1.1; dark = 1.6; flash = 0.12; hitstop = 0.9;
+  // 대전(11-08 사용자): 띠·대사 오버레이 대신 대전게임식 — 배경만 어두워지고(render.ts) 캐릭터가 하얗게 번쩍·둘레 빛, 기술 이름 도트 글자
+  if (view.clear) { cut = 0; P.armorT = 0.28; P.armorC = '#ffffff'; ring(P.x, P.y - 120 * K(P.y), 260 * K(P.y), 0.6, CH.color || '#fff', 8); ring(P.x, P.y - 120 * K(P.y), 160 * K(P.y), 0.45, '#ffffff', 5); vsSuperName = { text: sp.name || '필살기', t: 0.9 }; }
   const steps = sp.steps || [sp];
   const run = (i?: Json) => { if (i >= steps.length) { P.inSuper = false; P.inv = 0; env.perk?.superEnd(); return afterBuf(toIdle); } doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1)); };
   P.inv = 30; later(0.85, () => run(0));   // 컷인이 걷힌 뒤 몸동작·효과
@@ -1118,10 +1123,10 @@ function onPress(a?: Json) {
       const id = P.clip ? P.clip.id : '';
       if (canCancel() && ['9', '10', '11', '12', '13', '16', '16_1', '7'].includes(id)) {
         if (id === '7') { if (a === 'jump') return jump(); }
-        else if (id === '9' || id === '10') { if (P.buf) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push(a); } else P.buf = a; return; }
+        else if (id === '9' || id === '10') { if (P.buf) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push({ a, t: P.t }); } else { P.buf = a; P.bufT = P.t; } return; }
         else { P.buf = null; return a === 'light' ? light() : a === 'heavy' ? heavy() : a === 'dodge' ? dodge() : jump(); }
       }
-      if (P.buf && P.clip && ['9', '10'].includes(P.clip.id)) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push(a); } else P.buf = a;
+      if (P.buf && P.clip && ['9', '10'].includes(P.clip.id)) { P.bq = P.bq || []; if (P.bq.length < 3) P.bq.push({ a, t: P.t }); } else { P.buf = a; P.bufT = P.t; }
     }
     return;
   }
@@ -1233,7 +1238,7 @@ function updateFx(dt?: Json) {
 function update(dt?: Json) {
   P.t += dt;
   updateFx(dt);
-  grayT = Math.max(0, grayT - dt); shake = Math.max(0, shake - 70 * dt); zoom = Math.max(0, zoom - 0.5 * dt); flash = Math.max(0, flash - dt); cut = Math.max(0, cut - dt); dark = Math.max(0, dark - dt);
+  grayT = Math.max(0, grayT - dt); shake = Math.max(0, shake - 70 * dt); zoom = Math.max(0, zoom - 0.5 * dt); flash = Math.max(0, flash - dt); cut = Math.max(0, cut - dt); dark = Math.max(0, dark - dt); if (vsSuperName) { vsSuperName.t -= dt; if (vsSuperName.t <= 0) vsSuperName = null; }
   P.armorT = Math.max(0, P.armorT - dt); P.healT = Math.max(0, (P.healT || 0) - dt); P.buffT = Math.max(0, P.buffT - dt);
   if (P.vanish) { P.vanish.t += dt; if (P.vanish.mode === 'in' && P.vanish.t >= P.vanish.dur) P.vanish = null; }
   if (!CK) return;
@@ -1296,7 +1301,8 @@ function update(dt?: Json) {
       }
       break;
     }
-    case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) { P.mode = 'down'; P.downAt = P.t; } } break;
+    case 'act': if (view.clear && P.buf && P.connected && P.clip && ['9', '10', '11', '12'].includes(P.clip.id) && canCancel()) { afterBuf(toIdle); break; }   // 대전: 맞힌 직후(빈틈 장)에 눌러 둔 다음 공격으로 바로 잇는다. 헛치면 끝까지 빈틈
+      if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) { P.mode = 'down'; P.downAt = P.t; } } break;
     case 'chain': P.chainT -= dt; if (P.chainT <= 0) chainExpire(); break;
     case 'air': {
       if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = 1180; dust(P.x, P.y, 3, 0.7); } else break; }
@@ -1673,6 +1679,7 @@ function drawCut() {
     ctx.drawImage(fxNc, VX0, 0, 1280, H);
     drawSheets();
     ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(fxLc, VX0, 0, 1280, H); ctx.globalCompositeOperation = 'source-over';
+    if (vsSuperName) { const im = dotText(vsSuperName.text, '#ffffff', 2), k = K(P.y); ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = Math.min(1, vsSuperName.t * 4); ctx.drawImage(im, Math.round(P.x - im.width / 2), Math.round(P.y - P.z - 300 * k - im.height)); ctx.restore(); }   // 대전 필살기 이름(머리 위 도트 글자)
   }
   /** 화면 전체: 빈사 테두리·번쩍임·필살기 컷인 (화면 좌표) */
   function drawScreen(c: CanvasRenderingContext2D) {
@@ -1683,7 +1690,7 @@ function drawCut() {
   }
   return {
     P, A, CH, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
-    get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
+    get hitstop() { return hitstop; }, get dark() { return dark; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, runShower, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
     /** 샤워 규칙 재생 중인가 (fighter/player.ts 샤워 자리) */
     get showering() { return P.scene === '샤워'; },
