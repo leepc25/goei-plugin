@@ -229,7 +229,7 @@ async function openShop(page, pre, shelf) {
 const PAGE_LIB = `
 window.__ca = (() => {
   const SKIP = '#other, .default-chat-screen > #other';
-  const vis = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; if (el.checkVisibility && !el.checkVisibility({ contentVisibilityAuto: true })) return false; const dt = el.closest('details:not([open])'); if (dt && !el.closest('summary')?.parentElement?.isSameNode(dt)) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0.01; };
+  const vis = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; if (el.checkVisibility && !el.checkVisibility({ contentVisibilityAuto: true, opacityProperty: true, visibilityProperty: true })) return false; const dt = el.closest('details:not([open])'); if (dt && !el.closest('summary')?.parentElement?.isSameNode(dt)) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0.01; };
   const label = (el) => (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || el.querySelector?.('img')?.alt || '').replace(/\\s+/g, ' ').trim().slice(0, 40);
   const cls1 = (el) => [...el.classList].filter((c) => !/^(on|sel|active|open|primary|danger|has-|k-|none$)/.test(c))[0] || '';
   const keyOf = (el) => el.dataset.action ? el.dataset.action + '|' + (el.dataset.value ?? '') : el.tagName.toLowerCase() + '.' + cls1(el) + '|' + label(el);
@@ -272,7 +272,7 @@ window.__ca = (() => {
     const box = containerOf(el);
     const rec = { boxPath: pathOf(box), elGone: null, boxGone: null, elClass: [], boxClass: [], mutations: 0, firstMut: null, before: { elCls: el.className, aria: el.getAttribute('aria-pressed') ?? el.getAttribute('aria-selected') ?? el.getAttribute('aria-expanded') } };
     // 다시 그리기(innerHTML 바꿈)로 같은 창이 새 노드가 되는 건 닫힘이 아니다 → 창은 선택자로, 누른 것은 열쇠로 찾는다
-    const boxSel = box === document.body ? 'body' : box.tagName.toLowerCase() + [...box.classList].filter((c) => !/^(on|sel|active|open|show|in|out|closing)$/.test(c)).map((c) => '.' + CSS.escape(c)).join('');
+    const boxSel = box === document.body ? 'body' : box.tagName.toLowerCase() + [...box.classList].filter((c) => !/^(on|sel|active|open|show|in|out|closing)$/.test(c)).slice(0, 1).map((c) => '.' + CSS.escape(c)).join(''); // 첫 class 만: 확인·대기 등 상태 class 가 빠져도 같은 창
     const elKey = keyOf(el);
     const goneBox = () => ![...document.querySelectorAll(boxSel)].some(vis);
     const goneEl = () => ![...document.querySelectorAll(el.dataset.action ? '[data-action="' + CSS.escape(el.dataset.action) + '"]' : el.tagName)].some((e) => vis(e) && keyOf(e) === elKey);
@@ -536,7 +536,8 @@ const selLooks = {};
 for (const r of results) if (r.selChanged && r.selStyle) { const s = r.selStyle; const look = `테두리 ${s.border} · 바탕 ${s.bg} · 그림자 ${s.shadow} · 외곽선 ${s.outline}`; (selLooks[`${r.vp}|${look}`] ||= []).push(r.key); }
 // 이름: 같은 data-action 인데 글자가 다른 것 / 같은 글자인데 data-action 이 다른 것
 const byAct = {}, byLabel = {};
-for (const r of results) { if (r.action && r.label) (byAct[r.action] ||= new Set()).add(r.label); if (r.label && r.action) (byLabel[r.label] ||= new Set()).add(r.action); }
+// 같은 단추(동작+값)인데 글자가 다른 것만: 값마다 글자가 다른 것(탭 이름 등)은 당연하므로 뺀다
+for (const r of results) { if (r.action && r.label) (byAct[r.key.replace(/#\d+$/, '')] ||= new Set()).add(r.label.replace(/\s+/g, ' ').trim().slice(0, 40)); if (r.label && r.action) (byLabel[r.label] ||= new Set()).add(r.action); }
 // PC·폰 차이: 한쪽에서만 보인 열쇠
 const keysBy = {}; for (const r of results) (keysBy[r.vp] ||= new Set()).add(r.key);
 
@@ -570,7 +571,7 @@ for (const g of incons.sort((a, b) => b.n - a.n)) {
   L.push('');
 }
 L.push('## 4. 이름', '');
-for (const [a, ls] of Object.entries(byAct)) if (ls.size > 1 && ls.size < 6) L.push(`- 같은 동작 다른 글자: \`${a}\` → ${[...ls].map((x) => `「${x}」`).join(' ')}`);
+for (const [a, ls] of Object.entries(byAct)) if (ls.size > 1 && ls.size < 6) L.push(`- 같은 단추 다른 글자: \`${a}\` → ${[...ls].map((x) => `「${x}」`).join(' ')}`);
 for (const [l, as] of Object.entries(byLabel)) if (as.size > 1) L.push(`- 같은 글자 다른 동작: 「${l}」 → ${[...as].map((x) => `\`${x}\``).join(' ')}`);
 L.push('', '## 5. 화면마다 잰 것', '');
 for (const st of states) {
