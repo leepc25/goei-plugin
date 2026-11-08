@@ -3147,7 +3147,7 @@ button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; to
 }
 
 /* ── 소지품 메뉴 (2026-11-07, docs/인계/소지품_1107/초안/mock2.mjs) ── */
-.it-tabs.gx-rec-tabs { grid-template-columns: repeat(2, 1fr); }
+.it-tabs.gx-rec-tabs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; } /* 가계부 · 포인트(백일몽) · 소지품: 있는 탭 수만큼 한 줄 */
 .it-tools { gap: 8px; flex-wrap: nowrap; }
 .it-cnt { display: inline-flex; align-items: center; gap: 6px; height: 34px; box-sizing: border-box; padding: 0 12px 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--sub); font-family: var(--mono); white-space: nowrap; }
 .it-cnt svg { width: 16px; height: 16px; color: var(--signal); }
