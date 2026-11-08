@@ -579,7 +579,9 @@
     "꿈결 수집기 F",
     "dream collector F",
     "F-rank dream collector",
-    "F rank dream collector"
+    "F rank dream collector",
+    "F급 꿈결 수집기",
+    "꿈결 수집기 F급"
    ],
    "file": "anomaly_262.webp",
    "kind": "anomaly",
@@ -602,7 +604,9 @@
     "꿈결 수집기 E",
     "dream collector E",
     "E-rank dream collector",
-    "E rank dream collector"
+    "E rank dream collector",
+    "E급 꿈결 수집기",
+    "꿈결 수집기 E급"
    ],
    "file": "anomaly_263.webp",
    "kind": "anomaly",
@@ -625,7 +629,9 @@
     "꿈결 수집기 D",
     "dream collector D",
     "D-rank dream collector",
-    "D rank dream collector"
+    "D rank dream collector",
+    "D급 꿈결 수집기",
+    "꿈결 수집기 D급"
    ],
    "file": "anomaly_264.webp",
    "kind": "anomaly",
@@ -648,7 +654,9 @@
     "꿈결 수집기 C",
     "dream collector C",
     "C-rank dream collector",
-    "C rank dream collector"
+    "C rank dream collector",
+    "C급 꿈결 수집기",
+    "꿈결 수집기 C급"
    ],
    "file": "anomaly_265.webp",
    "kind": "anomaly",
@@ -671,7 +679,9 @@
     "꿈결 수집기 B",
     "dream collector B",
     "B-rank dream collector",
-    "B rank dream collector"
+    "B rank dream collector",
+    "B급 꿈결 수집기",
+    "꿈결 수집기 B급"
    ],
    "file": "anomaly_266.webp",
    "kind": "anomaly",
@@ -694,7 +704,9 @@
     "꿈결 수집기 A",
     "dream collector A",
     "A-rank dream collector",
-    "A rank dream collector"
+    "A rank dream collector",
+    "A급 꿈결 수집기",
+    "꿈결 수집기 A급"
    ],
    "file": "anomaly_267.webp",
    "kind": "anomaly",
@@ -717,7 +729,9 @@
     "꿈결 수집기 S",
     "dream collector S",
     "S-rank dream collector",
-    "S rank dream collector"
+    "S rank dream collector",
+    "S급 꿈결 수집기",
+    "꿈결 수집기 S급"
    ],
    "file": "anomaly_268.webp",
    "kind": "anomaly",
@@ -1603,7 +1617,11 @@
   {
    "keywords": [
     "금빛 나비 가면",
-    "gold butterfly mask"
+    "gold butterfly mask",
+    "백일몽 나비 가면",
+    "나비 반가면",
+    "백일몽 금빛 나비 가면",
+    "금빛 나비 반가면"
    ],
    "file": "wear_025.webp",
    "kind": "wear",
@@ -3578,6 +3596,26 @@
   },
   {
    "keywords": [
+    "소원권 물약",
+    "wish ticket potion"
+   ],
+   "file": "anomaly_269.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "소원권 물약",
+   "src": "game-src/items/raw/batch_227/13.png",
+   "head": [
+    "물약",
+    "potion"
+   ],
+   "feats": [
+    "소원권",
+    "소원",
+    "wish"
+   ]
+  },
+  {
+   "keywords": [
     "머리카락 자라는 인형",
     "hair growing doll"
    ],
@@ -3602,7 +3640,11 @@
     "gold mallard mask",
     "황금 청둥오리 가면",
     "duck mask",
-    "mallard mask"
+    "mallard mask",
+    "백일몽 청둥오리 가면",
+    "청둥오리 반가면",
+    "백일몽 금빛 청둥오리 가면",
+    "금빛 청둥오리 반가면"
    ],
    "file": "wear_024.webp",
    "kind": "wear",
@@ -4593,7 +4635,11 @@
   {
    "keywords": [
     "금빛 돌고래 가면",
-    "gold dolphin mask"
+    "gold dolphin mask",
+    "백일몽 돌고래 가면",
+    "돌고래 반가면",
+    "백일몽 금빛 돌고래 가면",
+    "금빛 돌고래 반가면"
    ],
    "file": "wear_225.webp",
    "kind": "wear",
@@ -21435,7 +21481,9 @@
   {
    "keywords": [
     "도마뱀 가면",
-    "lizard mask"
+    "lizard mask",
+    "백일몽 도마뱀 가면",
+    "도마뱀 반가면"
    ],
    "file": "wear_026.webp",
    "kind": "wear",
@@ -21456,7 +21504,9 @@
   {
    "keywords": [
     "오소리 가면",
-    "badger mask"
+    "badger mask",
+    "백일몽 오소리 가면",
+    "오소리 반가면"
    ],
    "file": "wear_027.webp",
    "kind": "wear",
@@ -25382,7 +25432,9 @@
   {
    "keywords": [
     "송골매 가면",
-    "falcon mask"
+    "falcon mask",
+    "백일몽 송골매 가면",
+    "송골매 반가면"
    ],
    "file": "wear_315.webp",
    "kind": "wear",
@@ -25396,27 +25448,6 @@
    "feats": [
     "송골매",
     "falcon"
-   ]
-  },
-  {
-   "keywords": [
-    "소원권 물약",
-    "소원 물약",
-    "wish potion"
-   ],
-   "file": "anomaly_269.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "소원권 물약",
-   "src": "game-src/items/raw/batch_227/13.png",
-   "head": [
-    "물약",
-    "potion"
-   ],
-   "feats": [
-    "소원권",
-    "소원",
-    "wish"
    ]
   },
   {
@@ -30007,6 +30038,29 @@
   },
   {
    "keywords": [
+    "조랑말 가면",
+    "pony mask",
+    "백일몽 조랑말 가면",
+    "조랑말 반가면"
+   ],
+   "file": "wear_029.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "조랑말 가면",
+   "src": "game-src/items/raw/batch_229/06.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "조랑말",
+    "pony"
+   ],
+   "old_src": "game-src/items/raw/batch_10/14.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
+  },
+  {
+   "keywords": [
     "브라운관 텔레비전",
     "브라운관 TV",
     "crt tv"
@@ -30545,27 +30599,6 @@
   },
   {
    "keywords": [
-    "조랑말 가면",
-    "pony mask"
-   ],
-   "file": "wear_029.webp",
-   "kind": "wear",
-   "base": false,
-   "name": "조랑말 가면",
-   "src": "game-src/items/raw/batch_229/06.png",
-   "head": [
-    "가면",
-    "mask"
-   ],
-   "feats": [
-    "조랑말",
-    "pony"
-   ],
-   "old_src": "game-src/items/raw/batch_10/14.png",
-   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
-  },
-  {
-   "keywords": [
     "무릎 보호대",
     "knee pads"
    ],
@@ -31031,7 +31064,9 @@
   {
    "keywords": [
     "산양 가면",
-    "goat mask"
+    "goat mask",
+    "백일몽 산양 가면",
+    "산양 반가면"
    ],
    "file": "wear_028.webp",
    "kind": "wear",
@@ -34141,7 +34176,9 @@
   {
    "keywords": [
     "늑대 가면",
-    "wolf mask"
+    "wolf mask",
+    "백일몽 늑대 가면",
+    "늑대 반가면"
    ],
    "file": "wear_220.webp",
    "kind": "wear",
@@ -34191,7 +34228,9 @@
   {
    "keywords": [
     "염소 가면",
-    "goat mask"
+    "goat mask",
+    "백일몽 염소 가면",
+    "염소 반가면"
    ],
    "file": "wear_223.webp",
    "kind": "wear",
@@ -37679,7 +37718,9 @@
   {
    "keywords": [
     "소 가면",
-    "cow mask"
+    "cow mask",
+    "백일몽 소 가면",
+    "소 반가면"
    ],
    "file": "wear_224.webp",
    "kind": "wear",
