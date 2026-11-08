@@ -8,6 +8,7 @@ import { later, type Stage, type Use } from './stage';
 import {
   K, LINE, DT, GRAV, HP, DMG, SCALE, JUGGLE_MUL, OTG_MUL, CHIP, GAUGE, STUN, FREEZE, PUSH, FRICTION, CHAIN_DOWN, CHAIN_GAP,
   JUGGLE_MAX, OTG_MAX, LIE_SEC, MOVE, ATK, CHAIN_WINDOW, BUFFER, SPECIAL_LAG, BODY_HALF, TIP, WALL,
+  HIT_CAP,
 } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -214,7 +215,9 @@ export class Fighter {
 
   /** 판정·피해 기록 하나 */
   newUse(kind: Use['kind'], budget: number, hits: number, o: Partial<Use> = {}): Use {
-    return { id: this.st.nextId(), kind, budget, per: Math.max(1, Math.round(budget / Math.max(1, hits))), dealt: 0, unblock: false, special: kind === 'ranged' || kind === 'skill' || kind === 'charge' || kind === 'super', ...o };
+    // 맞는 수가 많은 기술은 앞쪽 몇 대(HIT_CAP)로 전체 피해가 차게: 그림이 헛나가는 대가 많아도 기술 피해가 고르게
+    const cap = (HIT_CAP as Record<string, number>)[kind] ?? hits;
+    return { id: this.st.nextId(), kind, budget, per: Math.max(1, Math.round(budget / Math.max(1, Math.min(hits, cap)))), dealt: 0, unblock: false, special: kind === 'ranged' || kind === 'skill' || kind === 'charge' || kind === 'super', ...o };
   }
 
   // ───────── 한 틱 ─────────
@@ -576,7 +579,6 @@ export class Fighter {
     if (!this.alive || this.state === 'ko' || this.deadT >= 0) return 'miss';
     if (this.inv > 0 || (this.vanish && this.vanish.out)) return 'miss';
     const use = h.use;
-    if (use.dealt >= use.budget && use.kind !== 'light' && use.kind !== 'heavy') return 'miss';
     if (this.gotIds.has(use.id) && h.normal) return 'miss';
     if (h.normal) this.gotIds.add(use.id);
     if (this.gotIds.size > 200) this.gotIds.clear();

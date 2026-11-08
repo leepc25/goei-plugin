@@ -100,8 +100,9 @@ export const MOVE = {
 
 /** 평타 장 길이 (초): 준비 장 · 때리는 장 · 마무리 장. 후딜은 필드의 약 1.5배·강 2배 (11-08 사용자) */
 export const ATK = {
-  light: { pre: 0.045, first: 0.04, hit: 0.08, post: 0.075 },
-  heavy: { pre: 0.06, first: 0.05, hit: 0.13, post: 0.12 },
+  /** startMax = 누르고 때리는 장까지 최대 (초) */
+  light: { pre: 0.045, first: 0.04, hit: 0.08, post: 0.075, startMax: 0.15 },
+  heavy: { pre: 0.06, first: 0.05, hit: 0.13, post: 0.12, startMax: 0.24 },
   /** 공격하며 앞으로 나가는 속도 (준비 장 동안) */
   lungeLight: 160,
   lungeHeavy: 260,
@@ -124,3 +125,6 @@ export const TIP = { front: 10, back: 46 };
 
 /** 무대 양 끝 여유 (월드) */
 export const WALL = 60;
+
+/** 기술 피해를 나눌 최대 맞는 수 (이보다 많이 맞는 기술은 앞쪽 이만큼에서 전체 피해가 다 들어가고, 나머지는 1씩) */
+export const HIT_CAP = { skill: 5, charge: 5, super: 8 };

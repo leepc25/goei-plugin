@@ -21,11 +21,15 @@ export function impactOf(art: CharArt, id: string): number {
 export function normalSeq(art: CharArt, id: string, heavy: boolean): Step[] {
   const m = art.A[id], imp = impactOf(art, id), T = heavy ? ATK.heavy : ATK.light;
   const s: Step[] = [];
+  // 준비 장이 많은 그림도 때리기까지 걸리는 시간은 넘지 않게 (11-08: 장이 많은 2·3타가 앞 타의 경직이 풀린 뒤에 닿아 콤보가 끊김)
+  const pre = imp > 1 ? Math.min(T.pre, (T.startMax - T.first) / (imp - 1)) : T.pre;
   for (let f = 0; f < m.n; f++) {
-    if (f < imp) s.push({ f, d: f === 0 ? T.first : T.pre });
+    if (f < imp) s.push({ f, d: f === 0 ? T.first : pre });
     else if (f === imp) s.push({ f, d: T.hit, act: true });
     else s.push({ f, d: T.post, cancel: true, act: f === imp + 1 && m.reach[f] >= m.reach[imp] - 6 });
   }
+  // 때리는 장이 마지막 장이면 그 장을 조금 더 잡고 그동안 다음 타로 이을 수 있게 (11-08: 사장·이기석 등 2타가 안 나감)
+  if (imp >= m.n - 1) s.push({ f: imp, d: T.post * 2, cancel: true });
   return s;
 }
 
