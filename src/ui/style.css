@@ -4105,3 +4105,118 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-bm.ms-m .bp-side button { white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent; }
 .ms-bm.ms-m .bp-side button.on { border-bottom-color: #1f2a44; }
 .ms-bm.ms-m .bp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+/* ── 괴이위키 나무위키 모양 (2026-11-08) ─────────────────────────────
+   위 초록 머리줄(로고·검색·☰), 회색 바탕에 흰 카드, 대문만 오른쪽 「최근 변경」.
+   목록 서랍은 설정한 쪽(기본 오른쪽)에서 머리줄 아래로 열린다. 폰은 오른쪽 아래 「목록」 책갈피 */
+.gx-body.nw-app.wk {
+  --void: #FFFFFF; --sunk: #F0F2F1; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #CCD5D2; --line2: #A3B3AE;
+  --text: #1E2523; --sub: #3B4B47; --dim: #6A7A76; --mint: #4F625E; --signal: #0B8F7F; --on-signal: #FFFFFF;
+  --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
+  --blue: #2F6FB5; --violet: #7A4FC4; --wk: #0B8F7F; color-scheme: light;
+  display: flex; flex-direction: column; gap: 0; padding: 0; overflow: hidden; scrollbar-gutter: auto; background: var(--sunk); color: var(--text);
+}
+.wk .wk-top { flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 16px; background: var(--wk); color: #fff; }
+.wk .wk-logo { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 8px 0 2px; border: 0; border-radius: 6px; background: none; color: #fff; font: inherit; font-size: 19px; font-weight: 800; letter-spacing: -.02em; cursor: pointer; }
+.wk .wk-logo svg { width: 28px; height: 28px; }
+.wk .wk-logo:hover { background: rgba(255, 255, 255, .12); }
+.wk .wk-q { flex: 1; display: flex; max-width: 420px; margin-left: auto; height: 36px; border-radius: 6px; background: #fff; overflow: hidden; }
+.wk .wk-in::-webkit-search-cancel-button { display: none; }
+.wk .wk-in { flex: 1; min-width: 0; height: 100%; padding: 0 12px; border: 0; outline: 0; background: none; color: #1E2523; font: inherit; font-size: 14px; }
+.wk .wk-go { flex: none; display: grid; place-items: center; width: 40px; border: 0; border-left: 1px solid #E3E8E6; background: #fff; color: var(--wk); cursor: pointer; }
+.wk .wk-go svg, .wk-menu svg { width: 20px; height: 20px; }
+.wk .wk-menu { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 6px; background: none; color: #fff; cursor: pointer; }
+.wk .wk-menu:hover, .wk-menu[aria-expanded="true"] { background: rgba(255, 255, 255, .18); }
+.wk .wk-stage { position: relative; flex: 1; min-height: 0; display: flex; }
+.wk .nw-main { flex: 1; min-width: 0; overflow-y: auto; overscroll-behavior: contain; display: block; padding: 16px; background: var(--sunk); }
+.wk .nw-status { padding: 0 0 10px; max-width: 1100px; margin: 0 auto; }
+.wk .wk-card { display: block; max-width: 1100px; margin: 0 auto; padding: 20px 24px 24px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+/* 카드 안 칸들은 스스로 넘기지 않는다 (본문 전체가 한 번에 넘어감) */
+.wk .wk-card.ph-form, .wk .wk-card.nw-pane, .wk .wk-card.nw-home { flex: none; min-height: 0; overflow: visible; }
+.wk .wk-card .ph-form-body, .wk .nw-pane .nw-doc { flex: none; min-height: 0; overflow: visible; padding: 0; }
+.wk .wk-card .ph-form-foot { padding: 14px 0 0; border-top: 0; background: none; justify-content: center; }
+.wk .nw-main .nw-doc > * { max-width: none; }
+.wk .wk-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.wk .wk-hrow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.wk .wk-h1 { flex: 1; min-width: 0; margin: 0; font-size: 28px; font-weight: 800; line-height: 1.3; letter-spacing: -.02em; color: var(--text); overflow-wrap: anywhere; }
+.wk .wk-sub { margin: 0; color: var(--dim); font-size: 14px; }
+.wk .wk-meta { margin: 0; color: var(--dim); font-size: 13px; }
+.wk .wk-back { flex: none; display: grid; place-items: center; width: 34px; height: 34px; margin-left: -6px; border: 0; border-radius: 6px; background: none; color: var(--dim); cursor: pointer; }
+.wk .wk-back:hover { background: var(--panel2); color: var(--text); }
+.wk .wk-back svg { width: 20px; height: 20px; }
+.wk .wk-tools { flex: none; display: inline-flex; gap: 0; }
+.wk .wk-btn { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border: 1px solid var(--line); background: #fff; color: var(--text); font: inherit; font-size: 13.5px; cursor: pointer; white-space: nowrap; }
+.wk .wk-tools .wk-btn + .wk-btn { margin-left: -1px; }
+.wk .wk-tools .wk-btn:first-child { border-radius: 5px 0 0 5px; }
+.wk .wk-tools .wk-btn:last-child { border-radius: 0 5px 5px 0; }
+.wk .wk-tools .wk-btn:only-child { border-radius: 5px; }
+.wk .wk-btn svg { width: 15px; height: 15px; }
+.wk .wk-btn:hover:not(:disabled), .wk-btn[aria-pressed="true"] { background: var(--panel2); }
+.wk .wk-btn:disabled { opacity: .5; cursor: default; }
+.wk .wk-tools .gx-mini.danger { height: 34px; border-radius: 0 5px 5px 0; }
+/* 대문 */
+.wk .wk-home { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 16px; align-items: start; max-width: 1300px; margin: 0 auto; }
+.wk .wk-home > .wk-card { margin: 0; max-width: none; display: flex; flex-direction: column; gap: 22px; }
+.wk .wk-home > .wk-card > .wk-head { margin-bottom: -6px; }
+.wk .nw-home .nw-hero { gap: 12px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel2); }
+.wk .wk-wel { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; font-size: 16px; }
+.wk .wk-wel .nw-hero-ico { width: 30px; height: 30px; color: var(--wk); }
+.wk .wk-wel .nw-hero-ico svg { width: 26px; height: 26px; }
+.wk .nw-hero-q { width: 100%; max-width: 560px; margin: 0 auto; gap: 0; }
+.wk .nw-hero-q .gx-search { height: 40px; border-radius: 6px 0 0 6px; background: #fff; }
+.wk .nw-hero-q .wk-btn-go { height: 40px; margin-left: -1px; border-radius: 0 6px 6px 0; background: var(--wk); border-color: var(--wk); color: #fff; font-weight: 700; padding: 0 18px; }
+.wk .nw-hero-q .wk-btn-go:hover { background: #087B6D; }
+.wk .nw-hero-res { width: 100%; max-width: 560px; margin: 0 auto; border-radius: 6px; background: #fff; }
+.wk .nw-hsec h3 { padding: 0 0 6px; border-bottom: 2px solid var(--wk); font-size: 17px; }
+.wk .nw-card { border-radius: 6px; background: #fff; }
+.wk .nw-tile { border-radius: 6px; background: #fff; }
+.wk .wk-side { position: sticky; top: 0; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.wk .wk-side h3 { margin: 0 0 8px; padding-bottom: 8px; border-bottom: 2px solid var(--wk); font-size: 15px; }
+.wk .wk-recent { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.wk .wk-recent li { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+.wk .wk-recent li:last-child { border-bottom: 0; }
+.wk .wk-recent button { flex: 1; min-width: 0; padding: 0; border: 0; background: none; color: var(--wk); font: inherit; text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wk .wk-recent button:hover { text-decoration: underline; }
+.wk .wk-recent time { flex: none; color: var(--dim); font-size: 12px; }
+.wk .wk-more { margin-top: 8px; padding: 0; border: 0; background: none; color: var(--wk); font: inherit; font-size: 13px; cursor: pointer; }
+.wk .wk-side .nw-hnone { padding: 10px 0; text-align: left; font-size: 13px; }
+/* 검색·없는 문서 */
+.wk .wk-res .nw-groups { overflow: visible; padding: 0; }
+.wk .wk-res .ph-sec { margin: 14px 0 6px; padding: 0 0 6px; border-bottom: 2px solid var(--wk); }
+.wk .nw-nohit { padding: 30px 0 10px; }
+.wk .nw-compose { padding: 20px 0 6px; }
+.wk .gx-start { background: var(--wk); border-color: var(--wk); color: #fff; border-radius: 6px; }
+/* 목록 서랍: 머리줄 아래, 기본 오른쪽 */
+.gx[data-wiki-side] .wk .nw-panel { top: 0; bottom: 0; left: auto; right: 0; width: 320px; max-width: calc(100% - 40px); border-right: 0; border-left: 1px solid var(--line); background: #fff; box-shadow: -10px 0 28px rgba(0, 0, 0, .18); transform: translateX(100%); }
+.gx[data-wiki-side="left"] .wk .nw-panel { left: 0; right: auto; border-left: 0; border-right: 1px solid var(--line); box-shadow: 10px 0 28px rgba(0, 0, 0, .18); transform: translateX(-100%); }
+.gx[data-wiki-side] .wk.list-open .nw-panel { transform: none; }
+.gx[data-wiki-side] .wk.list-open .nw-scrim { inset: 0; background: rgba(0, 0, 0, .18); }
+.wk .nw-pin { padding-top: 6px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gx-body.nw-app.wk { display: flex; }
+  .wk .wk-top { gap: 6px; height: 50px; padding: 0 10px; }
+  .wk .wk-logo { font-size: 17px; padding: 0 4px 0 0; }
+  .wk .wk-logo svg { width: 24px; height: 24px; }
+  .wk .wk-q { max-width: none; }
+  .wk .wk-menu { display: none; }
+  .wk .nw-main { padding: 10px 8px 16px; }
+  .wk .wk-card { padding: 16px 14px 18px; }
+  .wk .wk-h1 { font-size: 23px; }
+  .wk .wk-home { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .wk .wk-side { position: static; }
+  .wk .nw-edge { bottom: 110px; }
+  .wk .wk-tools .wk-btn { padding: 0 9px; }
+}
+/* 목록 서랍 분류 칩 (브라우저 단추 초기화를 되돌림) */
+.wk .nw-panel .ph-tab { min-height: var(--ctl-sm); padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); font-size: 13px; font-weight: 600; }
+.wk .nw-panel .ph-tab.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+.wk .nw-panel .nw-tabs { padding: 4px 12px 0; }
+/* 머리줄 검색 결과 (커서가 있을 때만) */
+.wk .wk-qw { position: relative; flex: 1; max-width: 420px; margin-left: auto; display: flex; }
+.wk .wk-qw .wk-q { max-width: none; margin-left: 0; }
+.wk .wk-ac { display: none; position: absolute; z-index: 6; top: calc(100% + 4px); left: 0; right: 0; max-height: 360px; overflow-y: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--text); box-shadow: 0 10px 24px rgba(0, 0, 0, .18); }
+.wk .wk-qw:focus-within .wk-ac:not(:empty) { display: block; }
+.wk .wk-ac .nw-groups { overflow: visible; padding: 4px 4px 8px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .wk .wk-qw { max-width: none; }
+}

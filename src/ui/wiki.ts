@@ -20,7 +20,6 @@ import { playerSource } from '../core/player';
 import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
-import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
 import { baseLink, basePic as baseArt } from './evpic';
 import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
@@ -34,7 +33,7 @@ import { updateChat, type ChatContext } from '../host/risu';
 import { isPhone } from './media';
 
 /** 위키는 문서만 (2026-10-29: 이 채팅의 인물·개인 기록·세력·기록 문서 화면은 왼쪽 메뉴 「기록」으로 옮겼다, ui/records.ts) */
-type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new';
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'find';
 /** 명부 항목 분류: 괴이·특수·거점·인물·조직 */
 type Cat = 'an' | 'ms' | 'lm' | 'ag' | 'org';
 /** 서랍 탭. 세력은 거점과 조직을 함께, 명부에 없는 새 주제는 기타 (사람 문서면 인물) */
@@ -157,9 +156,9 @@ function search(ctx: ChatContext, q: string): boolean {
   const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query), true;
   if (c.known) return openTitle(ctx, c.title, 'direct'), true;
-  // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)
-  wiki.listOpen = true;
-  return false;
+  // 여러 개가 걸리면 검색 화면에서 고르게. 하나도 없으면 「없어요 · 작성하기」 (바로 작성 화면으로 가지 않는다)
+  go('find', '', query);
+  return true;
 }
 
 
@@ -432,9 +431,6 @@ function busyLine(ctx: ChatContext): string {
   return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : '';
 }
 
-const tool = (action: string, icon: string, label: string, extra = '', short = '') =>
-  `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ''}</button>`;
-
 const blank = (text: string) => `<div class="ph-blank"><p>${text}</p></div>`;
 
 const when = (sec: number) => new Date(sec * 1000).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
@@ -475,7 +471,12 @@ export function wikiHomeResults(ctx: ChatContext): string {
   return wiki.homeQuery.trim() ? wikiList(ctx, wiki.homeQuery) : '';
 }
 
-/** 왼쪽 목록 (검색어를 바꾸면 이것만 다시 그린다) */
+/** 머리줄 검색칸 아래 결과 (입력하는 대로, 검색칸에 커서가 있을 때만 보인다) */
+export function wikiSuggest(ctx: ChatContext): string {
+  return wiki.query.trim() ? wikiList(ctx, wiki.query) : '';
+}
+
+/** 목록 (검색어가 있으면 걸러서) */
 export function wikiList(ctx: ChatContext, query = wiki.query): string {
   const docs = sortedDocs(ctx);
   const saved = new Set(docs.map((d) => d.title));
@@ -546,15 +547,25 @@ function docCat(ctx: ChatContext, d: WikiDoc): Exclude<Tab, 'all' | 'story'> {
 }
 const inTab = (ctx: ChatContext, d: WikiDoc, t: Tab) => (t === 'all' ? true : t === 'story' ? !d.base : docCat(ctx, d) === t);
 
-/** 왼쪽 세로바: 위키 메인·새 문서·설정, 남은 자리는 목록 펼치기 (누르거나 옆으로 밀기) */
-function rail(): string {
+/** 위쪽 머리줄 (나무위키 모양, 2026-11-08): 로고(대문), 검색칸, 그 옆 ☰ 목록 서랍 */
+function topBar(ctx: ChatContext): string {
   const open = wiki.listOpen;
   const label = open ? '목록 접기' : '목록 펼치기';
-  return `<nav class="nw-rail" aria-label="위키 메뉴">
-    ${tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '')}
-    <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open ? '' : ' flip'}">${ICONS.back}</span></button>
-  </nav>`;
+  return `<header class="wk-top">
+    <button class="wk-logo" type="button" data-action="wiki-home" aria-label="괴이위키 대문">${GHOST_ICON}<b>괴이위키</b></button>
+    <div class="wk-qw"><div class="wk-q"><input class="wk-in" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="여기에서 검색" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="wk-go" type="button" data-action="wiki-search" data-take="wiki-q" aria-label="검색">${ICONS.search}</button></div>
+      <div class="wk-ac">${wikiSuggest(ctx)}</div></div>
+    <button class="wk-menu" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}">${ICONS.list}</button>
+  </header>`;
 }
+
+/** 문서 머리 (나무위키 모양): 큰 제목, 오른쪽 도구 단추, 아래 분류·시각 한 줄 */
+function docHead(title: string, meta: string, tools = '', sub = ''): string {
+  const back = wiki.history.some((h) => h.view !== 'home') ? `<button class="wk-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : '';
+  return `<header class="wk-head"><div class="wk-hrow">${back}<h1 class="wk-h1">${esc(title)}</h1>${tools ? `<span class="wk-tools">${tools}</span>` : ''}</div>
+    ${sub ? `<p class="wk-sub">${esc(sub)}</p>` : ''}${meta ? `<p class="wk-meta">${meta}</p>` : ''}</header>`;
+}
+const wkBtn = (action: string, label: string, attrs = '') => `<button class="wk-btn" type="button" data-action="${action}" ${attrs}>${label}</button>`;
 
 /** 위키 메인: 검색, 지금 얽힌 문서, 이번 이야기에서 쓴 문서, 분류 */
 function homeView(ctx: ChatContext): string {
@@ -590,7 +601,6 @@ function homeView(ctx: ChatContext): string {
   const seen = new Set<string>();
   const liveCards = live.filter(([t]) => (seen.has(t) ? false : (seen.add(t), true))).slice(0, 8).map(([t, sub]) => card(t, sub)).join('');
   const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
-  const storyCards = story.slice(0, 8).map((d) => card(d.title, d.meta?.created ? when(d.meta.created) : '')).join('');
   // 분류: 사진 몇 장 + 개수, 누르면 서랍이 그 탭으로
   const tiles = TABS.filter(([t]) => t !== 'all' && t !== 'story')
     .map(([t, label]) => {
@@ -602,16 +612,22 @@ function homeView(ctx: ChatContext): string {
       return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === 'an' ? CAT_ICON.an : t === 'ms' ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list.length}개</small></button>`;
     }).join('');
   const sec = (title: string, n: number, inner: string) => `<section class="nw-hsec"><h3>${title}${n ? `<b>${n}</b>` : ''}</h3>${inner}</section>`;
-  return `<div class="nw-home">
+  // 최근 변경 (대문에만): 이번 이야기에서 쓰거나 다시 쓴 문서, 새것부터
+  const recent = story.slice(0, 10).map((d) => {
+    const e = entryFor(ctx, d.title);
+    return `<li><button type="button" data-action="wiki-pick" data-value="${esc(d.title)}">${esc(e?.name ?? d.title)}</button>${d.meta?.created ? `<time>${esc(when(d.meta.created))}</time>` : ''}</li>`;
+  }).join('');
+  const side = `<aside class="wk-side"><h3>최근 변경</h3>${recent ? `<ul class="wk-recent">${recent}</ul>` : '<p class="nw-hnone">아직 바뀐 문서가 없어요.</p>'}${story.length > 10 ? `<button class="wk-more" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}</aside>`;
+  return `<div class="wk-home"><div class="wk-card nw-home">
+    ${docHead('괴이위키:대문', `문서 ${docs.length}개`)}
     <section class="nw-hero">
-      <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
+      <p class="wk-wel"><span class="nw-hero-ico">${GHOST_ICON}</span><b>괴이위키</b>에 오신 것을 환영합니다.</p>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"><button class="wk-btn wk-btn-go" type="button" data-action="wiki-search" data-take="wiki-home-q">검색</button></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
     </section>
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
-    ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
-    ${sec('분류', 0, `<div class="nw-tiles">${tiles}</div>`)}
-  </div>`;
+    ${sec('분류', 0, tiles ? `<div class="nw-tiles">${tiles}</div>` : '<p class="nw-hnone">아직 문서가 없어요.</p>')}
+  </div>${side}</div>`;
 }
 
 function paneHead(ctx: ChatContext, title: string, sub: string, right = '', e?: Entry): string {
@@ -650,7 +666,7 @@ function settingsView(ctx: ChatContext): string {
 
 /** 새 문서: 제목을 적고 작성 화면으로 */
 function newView(ctx: ChatContext): string {
-  return `<div class="ph-form">${paneHead(ctx, '새 문서', '')}
+  return `<div class="wk-card ph-form">${docHead('새 문서', '')}
     <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
       <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
@@ -674,10 +690,9 @@ function compose(ctx: ChatContext): string {
     : wiki.inherited.length
       ? `로어북이 없어서 「${esc(wiki.previousTitle ?? '')}」 문서의 원본 자료(${esc(wiki.inherited.join(', '))})를 이어받아 작성해요.`
       : '같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.';
-  return `<div class="ph-form">${paneHead(ctx, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : '새 문서', '', e)}
+  return `<div class="wk-card ph-form">${docHead(wiki.title, e ? CAT_LABEL[e.cat] : '새 문서')}
     <div class="ph-form-body"><section class="nw-compose">
       ${face(ctx, e, ' lg')}
-      <h2 class="nw-title">${esc(wiki.title)}</h2>
       <p class="nw-cmsg">이 문서는 아직 없어요.</p>
       <p class="gx-muted">${src}</p>
       ${docReqBox(req)}
@@ -732,9 +747,9 @@ function docView(ctx: ChatContext): string {
     ? ''
     : confirm
       ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">${hasBase ? '되돌리기' : '정말 삭제'}</button>`
-      : tool('wiki-delete', ICONS.trash, hasBase ? '기본 문서로 되돌리기' : '문서 삭제', `data-value="${esc(doc.title)}"`);
+      : wkBtn('wiki-delete', `${ICONS.trash}${hasBase ? '되돌리기' : '삭제'}`, `data-value="${esc(doc.title)}"`);
   const open = wiki.rewrite === doc.title;
-  const right = `${tool('wiki-rewrite', ICONS.pen, job?.title === doc.title ? '작성하는 중' : '다시 쓰기', `data-value="${esc(doc.title)}" ${open ? 'aria-pressed="true"' : ''} ${job ? 'disabled' : ''}`)}${del}`;
+  const right = `${wkBtn('wiki-rewrite', `${ICONS.pen}${job?.title === doc.title ? '작성하는 중' : '다시 쓰기'}`, `data-value="${esc(doc.title)}" ${open ? 'aria-pressed="true"' : ''} ${job ? 'disabled' : ''}`)}${del}`;
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   const rewrite = open
     ? `<section class="nw-rewrite">${docReqBox(req)}
@@ -742,12 +757,17 @@ function docView(ctx: ChatContext): string {
         <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${job?.title === doc.title ? '작성하는 중…' : '다시 쓰기'}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>`
     : '';
   const sub = [e ? CAT_LABEL[e.cat] : '', doc.base ? '기본 문서' : m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
-  return `<div class="ph-room nw-pane">${paneHead(ctx, e?.name ?? doc.title, sub, right, e)}
+  return `<div class="wk-card nw-pane">${docHead(doc.title, esc(sub), right, e && e.sub && e.cat !== 'lm' ? e.sub : '')}
     <article class="nw-doc">
-      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>${e && e.sub && e.cat !== 'lm' ? `<small>${esc(e.sub)}</small>` : ''}</header>
+      ${rewrite}
       <div class="nw-body">${r.html}</div>
       ${links('상세 문서', r.related)}${links('관련 문서', r.recent)}${info}
     </article></div>`;
+}
+
+/** 검색: 딱 맞는 문서가 없을 때. 걸린 문서·명부·비슷한 문서, 없으면 작성하기 */
+function findView(ctx: ChatContext): string {
+  return `<div class="wk-card wk-find">${docHead('검색', wiki.query ? `「${esc(wiki.query)}」` : '')}<div class="wk-res">${wikiList(ctx, wiki.query)}</div></div>`;
 }
 
 function paneHtml(ctx: ChatContext): string {
@@ -755,6 +775,7 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'compose') return compose(ctx);
   if (wiki.view === 'settings') return settingsView(ctx);
   if (wiki.view === 'new') return newView(ctx);
+  if (wiki.view === 'find') return findView(ctx);
   return homeView(ctx);
 }
 
@@ -768,21 +789,18 @@ export function wikiTab(ctx: ChatContext, env?: WikiEnv): string {
   });
   const status = `${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}`;
   const open = wiki.listOpen;
-  return `<main class="gx-body ph-app nw nw-app${open ? ' list-open' : ''}">
-    ${rail()}
-    <aside class="nw-panel" aria-label="위키 목록"${open ? '' : ' inert'}><div class="nw-pin">
-        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
-        <div class="ph-content nw-list">${wikiList(ctx)}</div>
+  // 나무위키 모양 (2026-11-08): 위 머리줄(로고·검색·☰), 본문 카드, 목록 서랍은 설정한 쪽(기본 오른쪽)에서. 폰은 오른쪽 아래 「목록」 책갈피
+  return `<main class="gx-body ph-app nw nw-app wk${open ? ' list-open' : ''}">
+    ${topBar(ctx)}
+    <div class="wk-stage">
+      <aside class="nw-panel" aria-label="위키 목록"${open ? '' : ' inert'}><div class="nw-pin">
+        <div class="ph-content nw-list">${wikiList(ctx, '')}</div>
         ${fail}
       </div></aside>
-    <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
-    <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
-    ${drawerHtml([
-      tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
-      tool('wiki-find', ICONS.search, '위키 검색', '', '검색'),
-      tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
-    ].join(''), '', '', 'wiki')}
+      <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
+      <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
+      <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
+    </div>
     ${note}
   </main>`;
 }
@@ -853,12 +871,13 @@ export function bindFootnotes(root: HTMLElement): void {
     li.classList.add('hit');
   });
   doc.addEventListener('scroll', () => !hover && hide(), { passive: true });
+  doc.closest('.nw-main')?.addEventListener('scroll', () => !hover && hide(), { passive: true });
 }
 
 export function bindWikiSide(root: HTMLElement, act: (value: string) => void): void {
   const bar = root.querySelector<HTMLElement>('.nw-rail');
   const panel = root.querySelector<HTMLElement>('.nw-panel');
-  if (!bar || !panel) return;
+  if (!panel) return;
   let x0: number | null = null;
   let dragged = false;
   // 손가락·마우스가 세로바 밖에서 떨어져도 알 수 있게 창 전체에서 받는다
@@ -873,13 +892,13 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (d > 0 && !wiki.listOpen) act('open');
     else if (d < 0 && wiki.listOpen) act('close');
   };
-  bar.addEventListener('pointerdown', (e) => {
+  bar?.addEventListener('pointerdown', (e) => {
     x0 = e.clientX;
     dragged = false;
     window.addEventListener('pointerup', up, { once: true });
   });
   // 끈 다음에 따라오는 누르기는 무시
-  bar.addEventListener('click', (e) => {
+  bar?.addEventListener('click', (e) => {
     if (!dragged) return;
     dragged = false;
     e.stopPropagation();
@@ -947,7 +966,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
   }
   switch (action) {
     case 'wiki-home':
-      go('home');
+      go('home', '', '');
       wiki.history = [];
       wiki.listOpen = false;
       break;
@@ -961,13 +980,12 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-list':
       wiki.listOpen = v === 'open' ? true : v === 'close' ? false : !wiki.listOpen;
       env.render();
-      if (wiki.listOpen && wide() && !v) document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
       return true;
     case 'wiki-find':
-      // 모바일 하단 서랍의 검색: 목록을 펼치고 검색칸에 바로 커서 (위까지 손을 올리지 않게)
-      wiki.listOpen = true;
+      // 검색칸에 바로 커서
+      wiki.listOpen = false;
       env.render();
-      document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
+      document.querySelector<HTMLInputElement>('.wk-in')?.focus();
       return true;
     case 'wiki-tab':
       wiki.tab = (TABS.some(([t]) => t === v) ? v : 'all') as Tab;
@@ -980,7 +998,9 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.homeQuery = '';
       // 검색으로 문서·작성 화면에 갔을 때만 목록을 접는다. 못 찾으면 search 가 목록을 펼쳐 「없어요 · 작성하기」를 보이는데,
       // 예전엔 문서를 보던 중이면 곧바로 다시 접혀 검색이 아무 반응 없는 것처럼 보였다 (QC 2026-10-28)
-      if (search(ctx, v) && (wiki.view === 'compose' || wiki.view === 'doc')) wiki.listOpen = false;
+      if (search(ctx, v)) wiki.listOpen = false;
+      // 문서·작성 화면으로 갔으면 검색칸을 비운다 (검색 화면에서는 그대로)
+      if (wiki.view !== 'find') wiki.query = '';
       break;
     }
     case 'wiki-pick':

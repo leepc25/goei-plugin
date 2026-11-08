@@ -1105,9 +1105,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로
   await page.click('.gx-mlist li:first-child [data-action="wiki-goto"]');
-  await page.waitForSelector('.nw-compose, .nw-dochead'); // 카드 기본 문서가 있으면 바로 문서, 없으면 작성 화면
+  await page.waitForSelector('.nw-compose, .nw-pane .wk-head'); // 카드 기본 문서가 있으면 바로 문서, 없으면 작성 화면
   assert.equal((await page.textContent('.gx-nb.on:not(.mob)')).trim(), '인터넷');
-  assert.equal((await page.textContent('.nw-title')).trim(), site);
+  assert.equal((await page.textContent('.wk-h1')).trim(), site);
   assert.deepEqual(errors, []);
   console.log('PASS 커스텀 임무: 시작 첫 장면 지시문, 진행 중 요청, 요청 취소');
   await page.close();
@@ -1121,12 +1121,11 @@ if (fixture.globalLore.some(packed)) {
   {
     await open(page);
     await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
-    await page.waitForSelector('.nw-rail');
-    await page.click('.nw-grab');
-    await page.fill('.nw .ph-search', '소라 랜드');
-    await page.press('.nw .ph-search', 'Enter');
-    await page.waitForSelector('.nw-dochead');
-    assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드');
+    await page.waitForSelector('.wk-top');
+    await page.fill('.wk-in', '소라 랜드');
+    await page.press('.wk-in', 'Enter');
+    await page.waitForSelector('.nw-pane .wk-head');
+    assert.equal((await page.textContent('.wk-h1')).trim(), '소라 랜드');
     assert.ok(await page.locator('.nw-body .nw-fn').count() >= 8, '각주');
     const under = await page.evaluate(() => {
       const ib = document.querySelector('.nw-infobox')?.getBoundingClientRect();
@@ -1162,12 +1161,12 @@ if (fixture.globalLore.some(packed)) {
     await page.locator('.gx-cgrip').click(); await page.locator('.gx-cpanel2 [data-value="wk"]').click();
     await page.waitForSelector('.nw-home');
     // 창이 늦게 한 번 더 그려지면(사용자 사진 읽기 등) 입력이 사라질 수 있어 문서가 뜰 때까지 다시 친다
-    for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
+    for (let i = 0; i < 3 && !(await page.locator('.nw-pane .wk-head').count()); i++) {
       await page.fill('.nw-home .gx-search', '소라 랜드');
       await page.press('.nw-home .gx-search', 'Enter');
-      await page.waitForSelector('.nw-dochead', { timeout: 4000 }).catch(() => {});
+      await page.waitForSelector('.nw-pane .wk-head', { timeout: 4000 }).catch(() => {});
     }
-    await page.waitForSelector('.nw-dochead');
+    await page.waitForSelector('.nw-pane .wk-head');
     await page.locator('.nw-body .nw-fn[data-fn="1"]').scrollIntoViewIfNeeded();
     const top0 = await scrollTop();
     await page.tap('.nw-body .nw-fn[data-fn="1"]');
@@ -1200,7 +1199,7 @@ if (fixture.globalLore.some(packed)) {
   await page.evaluate((a) => { window.__llm = [{ type: 'success', result: a }]; }, article('아무 제목'));
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
-  await page.waitForSelector('.nw-rail');
+  await page.waitForSelector('.wk-top');
   assert.equal(await page.locator('.gx-panel form').count(), 0, 'form을 쓰지 않음');
   // 첫 화면은 위키 메인, 목록은 접혀 있다가 세로바를 누르면 펼쳐진다
   await page.waitForSelector('.nw-home .nw-hero');
@@ -1217,15 +1216,15 @@ if (fixture.globalLore.some(packed)) {
   if (shots) await page.screenshot({ path: `${shots}/13-hero-search.png` });
   await page.fill('.nw-hero-q .gx-search', '');
   assert.equal(await page.locator('.nw-hero-res .ph-sec').count(), 0);
-  await page.click('.nw-grab');
+  await page.click('.wk-menu');
   await page.waitForSelector('.nw-app.list-open');
-  await page.fill('.nw .ph-search', '소라');
-  await page.waitForSelector('.nw .ph-content .ph-sec');
-  assert.ok((await page.textContent('.nw .ph-content')).includes('소라 랜드'), '입력하는 동안 명부 전체에서 걸러 보인다');
-  await page.fill('.nw .ph-search', 'Sora Land');
-  await page.press('.nw .ph-search', 'Enter');
+  await page.fill('.wk-in', '소라');
+  await page.waitForSelector('.wk-ac .ph-sec');
+  assert.ok((await page.textContent('.wk-ac')).includes('소라 랜드'), '입력하는 동안 명부 전체에서 걸러 보인다');
+  await page.fill('.wk-in', 'Sora Land');
+  await page.press('.wk-in', 'Enter');
   await page.waitForSelector('.nw-compose');
-  assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드', '별칭이 정식 이름으로');
+  assert.equal((await page.textContent('.wk-h1')).trim(), '소라 랜드', '별칭이 정식 이름으로');
   assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
   assert.equal(await page.evaluate(() => (window.__calls.llm || []).length), 0, '여는 것만으로는 생성하지 않음');
   await page.fill('[data-input="wiki-docreq"]', '폐장 이유 위주로');
@@ -1249,13 +1248,13 @@ if (fixture.globalLore.some(packed)) {
   // 문서 안 링크: 없는 문서 → 작성 화면 (부모 원본 자료를 물려받음)
   await page.click('.nw-body .nw-link');
   await page.waitForSelector('.nw-compose');
-  assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드 괴담');
+  assert.equal((await page.textContent('.wk-h1')).trim(), '소라 랜드 괴담');
   assert.ok((await page.textContent('.nw-compose')).includes('원본 자료(소라 랜드)'));
   await page.click('[data-action="wiki-back"]');
   await page.waitForSelector('.nw-doc');
   // 새로고침 실패: 기존 문서 유지, 원문 보관
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '형식이 틀린 응답' }]; });
-  await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
+  await page.click('.nw-pane .wk-head [data-action="wiki-rewrite"]');
   await page.waitForSelector('.nw-rewrite');
   assert.equal(await page.inputValue('.nw-rewrite [data-input="wiki-docreq"]'), '폐장 이유 위주로', '지난 지침을 채워 둔다');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-rewrite.png` });
@@ -1282,28 +1281,22 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'detailed');
   await featSet(page, 'set:wiki');
   // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
-  await page.click('.nw-rail [data-action="wiki-home"]');
-  await page.waitForSelector('.nw-home .nw-card');
+  await page.click('.wk-logo');
+  await page.waitForSelector('.wk-side .wk-recent');
   assert.equal(await page.locator('[data-action="wiki-random"]').count(), 0);
-  assert.ok((await page.textContent('.nw-home')).includes('이번 이야기에서 쓴 문서'));
+  assert.ok((await page.textContent('.wk-side')).includes('최근 변경'));
   assert.ok(await page.locator('.nw-tile[data-value="an"]').count(), '분류 칸');
-  assert.ok((await page.textContent('.nw-hero h2')).includes('괴이위키'));
+  assert.ok((await page.textContent('.nw-home .wk-h1')).includes('괴이위키'));
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-main.png` });
-  await page.click('.nw-card[data-value="소라 랜드"]');
+  await page.click('.wk-recent [data-value="소라 랜드"]');
   await page.waitForSelector('.nw-doc');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-wide.png` });
   // 세로바를 옆으로 끌면 목록이 본문 위로 펼쳐진다 (본문 칸 너비는 그대로)
   const paneW = await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width);
-  const g = await page.locator('.nw-grab').boundingBox();
-  // 2026-10-29: 목록 위치 기본이 오른쪽이라 세로바를 왼쪽(안쪽)으로 끈다
-  await page.mouse.move(g.x + g.width - 10, g.y + 100);
-  await page.mouse.down();
-  await page.mouse.move(g.x + g.width - 120, g.y + 100, { steps: 4 });
-  await page.mouse.up();
+  // ☰ 를 누르면 목록이 본문 위로 펼쳐진다 (본문 칸 너비는 그대로)
+  await page.click('.wk-menu');
   await page.waitForSelector('.nw-app.list-open');
   assert.equal(await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width), paneW);
-  await page.fill('.nw .ph-search', '');
-  await page.dispatchEvent('.nw .ph-search', 'input');
   await page.waitForSelector('.nw .nw-list .nw-ksec');
   assert.equal((await page.textContent('.nw-ksec')).replace(/\d+/g, ''), 'ㅅ');
   await page.waitForTimeout(300);
@@ -1315,19 +1308,18 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.nw-app:not(.list-open)');
   await page.waitForTimeout(300);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
-  // 모바일: 세로바 없이 하단 서랍에 메인·목록·설정
-  assert.equal(await page.locator('.nw-rail').isVisible(), false);
-  if (!(await page.locator('.nw-app > .ph-drawer.open').count())) await page.click('.nw-app > .ph-drawer .ph-grip');
-  await page.click('.ph-drawer [data-action="wiki-home"]');
+  // 모바일: ☰ 없이 오른쪽 아래 「목록」 책갈피, 로고가 대문
+  assert.equal(await page.locator('.wk-menu').isVisible(), false);
+  await page.click('.wk-logo');
   await page.waitForSelector('.nw-home');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-main-mobile.png` });
   // 검색과 작성은 하나: 결과가 없으면 「작성하기」
-  await page.click('.ph-drawer [data-action="wiki-list"]');
+  await page.click('.nw-edge');
   await page.waitForSelector('.nw-app.list-open');
-  await page.fill('.nw .ph-search', '아무도모르는괴담');
-  await page.waitForSelector('.nw-nohit');
+  await page.fill('.wk-in', '아무도모르는괴담');
+  await page.waitForSelector('.wk-ac .nw-nohit');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-nohit-mobile.png` });
-  await page.fill('.nw .ph-search', '');
+  await page.fill('.wk-in', '');
   // 모바일: 오른쪽에서 열린 목록을 오른쪽으로 밀면 접힘
   await page.evaluate(() => {
     const el = document.querySelector('.nw-list');
@@ -1348,27 +1340,27 @@ if (fixture.globalLore.some(packed)) {
   }, [sel, dir]);
   const swipeRight = (sel) => swipe(sel, 1);
   const swipeLeft = (sel) => swipe(sel, -1);
-  await page.click('.nw-card[data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-pane .nw-title');
+  await page.click('.wk-recent [data-value="소라 랜드"]');
+  await page.waitForSelector('.nw-pane .wk-h1');
   await swipeRight('.nw-main');
   await page.waitForSelector('.nw-home');
   await swipeLeft('.nw-main');
-  await page.waitForSelector('.nw-pane .nw-title');
+  await page.waitForSelector('.nw-pane .wk-h1');
   await page.click('.gx-mbar .gx-nb[data-value="board"]');
   await page.waitForSelector('.gx-board');
   await swipeRight('.gx-board');
-  await page.waitForSelector('.nw-pane .nw-title');
+  await page.waitForSelector('.nw-pane .wk-h1');
   await swipeLeft('.nw-main');
   await page.waitForSelector('.gx-board');
   await swipeRight('.gx-board');
-  await page.waitForSelector('.nw-pane .nw-title');
+  await page.waitForSelector('.nw-pane .wk-h1');
   await swipeRight('.nw-main');
   await page.waitForSelector('.nw-home');
   // 상황판 카드의 위키 단추로 문서를 연 뒤 뒤로 쓸면 상황판으로 (위키 메인이 아니라)
   await page.click('.gx-mbar .gx-nb[data-value="board"]');
   await page.waitForSelector('.gx-board');
   await page.click('.gx-board [data-action="wiki-goto"]');
-  await page.waitForSelector('.nw-pane .nw-title, .nw-compose');
+  await page.waitForSelector('.nw-pane .wk-h1, .nw-compose');
   await swipeRight('.nw-main');
   await page.waitForSelector('.gx-board');
   // 폰 하단 바에는 위키가 없다 (11-07 사용자: 5탭 바). 바 위 손잡이로 공용 서랍을 열어 위키로
@@ -1376,9 +1368,9 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-cdr.open .gx-cpanel [data-value="wk"]');
   await page.waitForSelector('.nw-main');
   await page.setViewportSize({ width: 1100, height: 900 });
-  await page.click('.nw-rail [data-action="wiki-home"]');
+  await page.click('.wk-logo');
   await page.waitForSelector('.nw-home');
-  await page.click('.nw-card[data-value="소라 랜드"]');
+  await page.click('.wk-recent [data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.waitForFunction(() => window.__chat.localLore.length === 0);
@@ -2065,6 +2057,8 @@ if (fixture.globalLore.some(packed)) {
   const auto = await page.evaluate((n) => window.__calls.llm[n], n0);
   assert.equal(auto.mode, 'model', '켜면서 돌려놓은 메인 모델');
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('관람차 사진'), '내 글은 유지');
+  // 글은 새 화면으로 열리므로 목록으로 돌아가서 본다
+  if (await page.locator('.bs-acts [data-action="gn-back"]').count()) await page.click('.bs-acts [data-action="gn-back"]');
   await page.waitForSelector('.gn-row-main >> text=자동으로 온 글');
   // 괴담톡: 1:1은 선물까지, 첨부는 따로 한 말풍선, 함께 쓴 글은 그 뒤
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="phone"]');
@@ -2517,10 +2511,10 @@ if (fixture.globalLore.some(packed)) {
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
   await page.waitForSelector('.nw-home');
-  for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
+  for (let i = 0; i < 3 && !(await page.locator('.nw-pane .wk-head').count()); i++) {
     await page.fill('.nw-home .gx-search', '관리국');
     await page.press('.nw-home .gx-search', 'Enter');
-    await page.waitForSelector('.nw-dochead', { timeout: 4000 }).catch(() => {});
+    await page.waitForSelector('.nw-pane .wk-head', { timeout: 4000 }).catch(() => {});
   }
   await page.waitForSelector('.nw-ibphoto img');
   // 요원 기본 그림은 이제 카드에 있다 (v0.16.33). 모듈에서 찾기는 카드에 없는 「관리국」 대표 그림으로 본다
@@ -2585,11 +2579,10 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(book.거점['시험 거점'], '거점도 저장');
   assert.equal(book.조직.관리국.english, 'Management Bureau');
   await page.click('.gx-nav > .gx-nb[data-value="net"]'); await page.click('.br-bm[data-value="wk"]');
-  await page.waitForSelector('.nw-rail');
-  await page.click('.nw-grab');
-  await page.fill('.nw .ph-search', '관리국');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-dochead');
+  await page.waitForSelector('.wk-top');
+  await page.fill('.wk-in', '관리국');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.nw-pane .wk-head');
   await page.waitForFunction(() => window.__calls.read.includes('mod/org.png'));
   assert.deepEqual(errors, []);
   await page.close();

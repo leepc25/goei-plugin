@@ -37,7 +37,7 @@ import { setItemIconRedraw } from '../host/itemicons';
 import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiOpenCheck, wikiSuggest, wikiTab, type WikiEnv } from './wiki';
 import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
@@ -559,8 +559,8 @@ function panelInput(el: HTMLInputElement): void {
   }
   if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
     wiki.query = el.value;
-    const box = root?.querySelector('.nw .ph-content');
-    if (box) box.innerHTML = wikiList(view.ctx);
+    const box = root?.querySelector('.wk-ac');
+    if (box) box.innerHTML = wikiSuggest(view.ctx);
     return;
   }
   if (el?.dataset?.input === 'wiki-home-query' && view.kind === 'started') {
