@@ -181,7 +181,9 @@ export class Game {
           const want = Math.max(0, Math.min(view.vsLen - vw, mid - vw / 2));
           // 부드럽게 따라가기 (한 장에 남은 거리의 12%)
           this.vsCam = this.vsCam < 0 ? want : this.vsCam + (want - this.vsCam) * (frozen ? 0 : 0.12);
-          view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - w.camX;
+          // 렌더러는 월드 카메라를 보간·반올림한 값(drawCamX)으로 옮긴다 → 같은 값을 빼야 한다 (w.camX 를 빼면 달릴 때 장마다 앞뒤로 떨린다, 11-08 사용자 「화면이 달달거려」)
+          const camDraw = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a);
+          view.crop = Math.round(this.vsCam * view.zoom) / view.zoom - camDraw;
         } else if (vw < SCREEN_W && w) {
           const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
