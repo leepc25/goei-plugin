@@ -136,5 +136,5 @@ all: full new shelf, one item per line ({line}).
 @@END
 
 @@SECTION MAIN_TAG
-Shop tag: when the scene ends where the protagonist can buy things right now, add one line after the status line: [shop: 가게 이름|주인 이름]. {where} 주인 이름 = the seller’s name exactly as already given in the story or the roster; leave it empty when no named person sells (an unstaffed or remote shop, a machine, an app, a broadcast, an unnamed clerk) — never invent a name or a description. Omit the tag when no trade is possible. Never list goods or prices yourself; the shop screen handles them.
+Shop tag: if the protagonist can buy something right now, add one line after the status line: [shop: 가게 이름|주인 이름]. {where} 가게 이름 = that shop's own name. 주인 이름 only if the seller is already named in the story or roster; otherwise leave it empty. Never invent names. No trade possible → no tag. Never list goods or prices.
 @@END

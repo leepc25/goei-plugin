@@ -708,8 +708,8 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
 /** 본편 [Inventory] 안내에 붙는 표식 지침 (설정 「상점」 켬일 때, 1~2줄). 지침 「상점」의 MAIN_TAG 절 */
 /** 상점이 열리는 자리 (설정): any(기본, 온라인몰·홈쇼핑·자판기·이면 쇼핑몰처럼 판매자가 없는 곳도) · shop(판매자가 있는 가게 장면만) */
 const WHERE: Record<ShopWhere, string> = {
-  any: 'This covers any way of buying: a store, stall or vendor in front of them, and also a shop with nobody at the counter, an online or in-app mall, TV or phone home shopping, a catalog, a vending machine, or an otherworldly mall — use that shop’s own name (the mall, channel or machine) as 가게 이름.',
-  shop: 'Only at a physical place of sale with a seller present (a store, stall, vendor, dealer); not for online malls, home shopping, catalogs or machines.',
+  any: 'Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.',
+  shop: 'Only a physical store or stall with a seller present; not online, broadcast, catalog or machine.',
 };
 export const shopGuide = (vars?: Vars): string => fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where] });
 
