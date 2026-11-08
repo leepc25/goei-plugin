@@ -4582,3 +4582,5 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gx-pin.gx-pdot { pointer-events: none; }
 .gx-pin.gx-pdot .gx-pname { visibility: hidden; }
 .gx-pin.gx-pdot .gx-dot { pointer-events: auto; cursor: pointer; }
+/* 폼·기록 머리의 설명 줄은 말줄임 없이 접어 보인다 (11-08 눌러 보기 점검: 폰에서 「전화 걸기」 안내·인물 기록 머리가 잘림). 방 머리(인원 수 등)는 그대로 한 줄 */
+.ph-wrapsub .ph-room-title small { white-space: normal; overflow: visible; text-overflow: clip; }

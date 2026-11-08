@@ -909,7 +909,7 @@ function pickTabOf(d: Directory): string {
 }
 
 function paneHead(title: string, sub: string, right = ''): string {
-  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</div>${right}</header>`;
+  return `<header class="ph-room-head ph-wrapsub"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</div>${right}</header>`;
 }
 
 function groupView(ctx: ChatContext, st: PState, d: Directory): string {

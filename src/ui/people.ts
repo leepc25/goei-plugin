@@ -522,7 +522,7 @@ export function peopleHomeTile(ctx: ChatContext): string {
 }
 
 function head(title: string, sub: string, right = '', back = true): string {
-  return `<header class="ph-room-head${back ? '' : ' nw-noback'}">${back ? `<button class="ph-tool ph-back" data-action="rec-back" aria-label="뒤로">${ICONS.back}</button>` : ''}<div class="ph-room-title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
+  return `<header class="ph-room-head ph-wrapsub${back ? '' : ' nw-noback'}">${back ? `<button class="ph-tool ph-back" data-action="rec-back" aria-label="뒤로">${ICONS.back}</button>` : ''}<div class="ph-room-title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
 }
 
 const stageRange = (i: number) => `${i ? STAGES[i - 1].max + 1 : AFF_MIN}~${STAGES[i].max}`;
