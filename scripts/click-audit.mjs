@@ -14,6 +14,7 @@
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
 //   --fixture <경로>      시험 카드 (기본 .scratch/fixture/fixture.json, 없으면 `npm run test:browser -- --only install` 로 먼저 만든다)
 //   --only-scope <css>    이 선택자 안의 것만 누른다 (예: '.gx' 상황판 창만)
+//   --from 'a|v>b|v'      시작 상태에서 이 열쇠들을 차례로 누른 화면부터 점검한다 (한 화면만 빨리 다시 볼 때. 열쇠는 report.md 의 `action|value`)
 // 빌드(dist/)가 있어야 한다: npm run build
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve, dirname, relative, join } from 'node:path';
@@ -22,7 +23,7 @@ import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp }
 import { distPack } from '../tests/data-init.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perAction: 0, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '' };
+const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perAction: 0, maxClicks: 0, workers: 4, out: '.scratch/click-audit', fixture: '.scratch/fixture/fixture.json', scope: '', from: [] };
 {
   const a = process.argv.slice(2);
   const list = (s) => String(s).split(',').map((x) => x.trim()).filter(Boolean);
@@ -37,6 +38,7 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker'], depth: 6, perActi
     else if (k === '--out') opt.out = v();
     else if (k === '--fixture') opt.fixture = v();
     else if (k === '--only-scope') opt.scope = v();
+    else if (k === '--from') opt.from = v().split('>').map((x) => x.trim()).filter(Boolean).map((key) => ({ key, nth: 0 }));
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
     else throw new Error(`모르는 옵션: ${k}`);
   }
@@ -176,7 +178,7 @@ window.__ca = (() => {
     const gone = (n) => n === box ? goneBox() : goneEl();
     const mo = new MutationObserver((ms) => {
       const t = Math.round(performance.now() - t0);
-      rec.mutations += ms.length; if (rec.firstMut == null) rec.firstMut = t;
+      rec.mutations += ms.length; if (rec.firstMut == null) rec.firstMut = t; rec.lastMut = t;
       for (const m of ms) {
         if (m.type === 'attributes' && m.target === el) rec.elClass.push([t, m.attributeName, el.getAttribute(m.attributeName)]);
         if (m.type === 'attributes' && m.target === box) rec.boxClass.push([t, m.attributeName, String(box.getAttribute(m.attributeName)).slice(0, 80)]);
@@ -270,6 +272,11 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
     await sleep(900);
     await page.screenshot({ path: `${SHOTS}/${tag}_3뒤.png` });
     rec.shots = [`${tag}_1앞.png`, `${tag}_2직후.png`, `${tag}_3뒤.png`];
+    // 1초 뒤에도 화면이 움직이면(효과·닫힘 애니메이션) 0.5초 동안 멈출 때까지(최대 5초) 기다려 「끝」을 한 장 더 찍는다
+    const still = async () => page.evaluate(() => { const r = window.__caWatch.rec; return r.lastMut ?? 0; });
+    let moved = false;
+    for (let t = 1040; t < 5000; t += 250) { const lm = await still(); if (lm < t - 500) break; moved = true; await sleep(250); }
+    if (moved) { await page.screenshot({ path: `${SHOTS}/${tag}_4끝.png` }); rec.shots.push(`${tag}_4끝.png`); }
     const w = await page.evaluate(() => window.__caWatch.stop());
     const after = await page.evaluate((sc) => window.__ca.sig(sc), opt.scope);
     const store1 = await page.evaluate(() => ({ setChat: window.__calls.setChat.length, setStore: (window.__calls.setStore || []).length, llm: (window.__calls.llm || []).length, send: (window.__calls.send || []).length, hide: window.__calls.hide }));
@@ -316,13 +323,14 @@ for (const vp of opt.vp) {
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
     // 첫 화면
-    const { page } = await prepPage(browser, vp, base, []);
+    const { page, fail: fromFail } = await prepPage(browser, vp, base, opt.from);
+    if (fromFail) throw new Error(`--from 재현 실패: ${fromFail}`);
     const first = await page.evaluate((sc) => window.__ca.list(sc), opt.scope);
     const audit0 = await page.evaluate((sc) => window.__ca.audit(sc), opt.scope);
     const s0 = `${vp}_${startKind}_화면0.png`;
     await page.screenshot({ path: `${SHOTS}/${s0}`, fullPage: false });
     await page.close();
-    states.push({ vp, start: startKind, path: [], shot: s0, audit: audit0 });
+    states.push({ vp, start: startKind, path: opt.from.map((p) => p.key), shot: s0, audit: audit0 });
     const done = new Set(); // 이 화면 크기에서 누른 열쇠
     const perAct = {};
     const offSeen = new Set();
@@ -337,7 +345,7 @@ for (const vp of opt.vp) {
         queue.push({ ...it, path });
       }
     };
-    enqueue([], first);
+    enqueue(opt.from, first);
     let n = 0;
     while (queue.length) {
       const batch = queue.splice(0, opt.workers);
