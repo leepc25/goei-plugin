@@ -331,13 +331,13 @@ function updateBar(ctx: ChatContext, canChat = true): string {
   return `<div class="pp-upbar">${now}${back}</div>`;
 }
 
-/** 추가 지침 한 칸: 이름 · 입력칸 · 바로 밑 설명 · 저장 */
+/** 추가 지침 한 칸: 이름 · 입력칸 · 바로 밑 설명. 바로 저장 (2026-11-08 사용자) */
 /** 단계별 전용 모델 ID (리수폿 J-2). 비우면 메인·보조 선택을 따른다. 다른 줄과 같은 「이름 · 조작 · 설명」 줄로 (2026-11-07 사용자: 여백 없이 붙어 있었다) */
 function idBox(stage: Stage, value: string): string {
   return `<div class="ps-row pp-mid"><div class="ps-label"><b>전용 모델 ID</b><small>Risu 모델 ID를 적으면 이 호출만 그 모델로 불러요. 비우면 위 모델 선택대로</small></div><div class="ps-ctl pp-mid-ctl"><input class="gx-search" name="pp-mid-${stage}" data-input="pp-mid-${stage}" maxlength="120" placeholder="예: openai::gpt-x" value="${esc(value)}" aria-label="전용 모델 ID"><button class="gx-mini ps-save" data-action="pp-mid-save-${stage}" data-take="pp-mid-${stage}">저장</button></div></div>`;
 }
 function ruleBox(name: string, label: string, value: string, help: string, max: number, placeholder: string, saveAction: string): string {
-  return `<div class="pp-rule"><b>${label}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" rows="4" maxlength="${max}" placeholder="${esc(placeholder)}">${esc(value)}</textarea><small>${help}</small><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="${saveAction}" data-take="${name}">저장</button></div></div>`;
+  return `<div class="pp-rule"><b>${label}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" data-autosave="${saveAction}" rows="4" maxlength="${max}" placeholder="${esc(placeholder)}">${esc(value)}</textarea><small>${help}</small></div>`;
 }
 
 /** 설정 → 기능별 설정 → 인물 기록. canChat=false 는 시작 전(시작 패널의 설정) */
@@ -1021,9 +1021,8 @@ export async function handlePeople(action: string, value: string | undefined, ct
     case 'pp-rrules-save': {
       // data-take 로 입력칸 글이 value 로 온다
       const key = action === 'pp-drules-save' ? 'director_rules' : action === 'pp-rrules-save' ? 'router_rules' : 'rules';
+      // 바로 저장 (2026-11-08 사용자): 글칸이 손을 뗀 뒤 부른다. 알림은 띄우지 않는다
       await setVars(ctx, env, { [PP(key)]: v.slice(0, key === 'rules' ? 4000 : 2000) });
-      peopleUi.info = '지침을 저장했어요.';
-      env.render();
       return true;
     }
     case 'pp-update': {

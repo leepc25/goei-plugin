@@ -20,6 +20,7 @@ import { phone } from '../phone';
 import { wiki } from '../wiki';
 
 import { ICONS } from '../icons';
+import { mainDefaultsConfirm } from '../settings';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -175,11 +176,20 @@ function backupPage(ctx: ChatContext, canChat: boolean): string {
   const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
       <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc(manUi.importName)}</span>` : ''}</div>
       <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc(manUi.importText)}</textarea></div>
-    <div class="ps-row gw-rel-foot">${manUi.confirm === 'import' ? `<span class="gx-muted">지금 설정을 덮어써요.</span><button class="gx-mini danger" data-action="man-import-yes">정말 적용</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? '' : 'disabled'}>적용</button>`}</div>`;
-  return `<div class="gw-page gw-set">${head('이 기기 공통', '설정 내보내기', '설정을 글(JSON) 하나로 내보내고 가져와요. 들어가는 것: 화면·이미지 설정, 「기본값으로 저장」으로 둔 새 채팅 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 한 번도 바꾸지 않아 기본값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.')}
+    <div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? '' : 'disabled'}>적용</button></div>`;
+  // 기본값 셋 (2026-11-08 사용자): 모든 설정은 바로 저장되고, 기본값 저장·불러오기·초기화는 여기 한 곳. 셋 다 누르면 확인 팝업
+  const defRow = (label: string, help: string, what: 'save' | 'load' | 'reset', btn: string, off = false) =>
+    row(label, `<button class="gx-mini${what === 'reset' ? ' danger' : ''}" data-action="set-bar" data-value="${what}" ${off ? 'disabled' : ''}>${btn}</button>`, help);
+  const defaults = `<section class="ps-group"><h3>기본값</h3><div class="ps-rows">
+      ${defRow('기본값으로 저장', '지금 설정을 기본값으로 저장해요. 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', 'save', '기본값으로 저장')}
+      ${defRow('기본값 불러오기', canChat ? '저장해 둔 기본값을 지금 채팅에 가져와요.' : '채팅을 시작한 뒤에 쓸 수 있어요. 새 채팅은 기본값으로 시작해요.', 'load', '불러오기', !canChat)}
+      ${defRow('초기화', '지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 플러그인 원래 값으로 되돌려요. 세계(카드 명부)는 그대로 둬요.', 'reset', '초기화', !canChat)}
+    </div></section>${mainDefaultsConfirm(ctx)}`;
+  return `<div class="gw-page gw-set">${head('', '저장·불러오기', '설정은 고치는 즉시 저장돼요. 여기서는 기본값을 저장·불러오기·초기화하고, 설정을 글(JSON)로 내보내고 가져와요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>기기 설정</h3><div class="ps-rows">
-      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 범위의 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
+    ${defaults}
+    <section class="ps-group"><h3>내보내기·가져오기</h3><p class="ps-note">들어가는 것: 화면·이미지 설정, 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 바꾸지 않아 원래 값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.</p><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
         <div class="ps-ctl"><span class="gw-tokens">${kb(json.length)}</span><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
       ${canChat ? `<div class="ps-row"><div class="ps-label"><b>지금 채팅 값도 넣기</b><small>이 채팅에서 바꾼 설정 값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·생성 공통) ${chatN}개를 「chat」으로 같이 넣어요. 가져올 때 채팅이 열려 있으면 그 채팅에 적혀요. 기록(상황판 내용·인물 기록·일지)은 안 들어가요.</small></div>
         <div class="ps-ctl"><label class="pp-check"><input type="checkbox" data-change="man-with-chat" ${withChat ? 'checked' : ''}> 넣기</label></div></div>` : ''}
@@ -241,6 +251,12 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
     <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ''}</div></section>
     <section class="ps-group"><h3>인물 기록 갱신 <small>최근 ${diag?.length ?? 0}건</small></h3><div class="ps-rows">${runs}${diag?.length ? `<div class="ps-row gw-rel-foot">${manUi.confirm === 'drop-diag' ? `<button class="gx-mini danger" data-action="man-drop-diag-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-diag">${ICONS.trash}기록 지우기</button>`}</div>` : ''}</div></section>
     </div></div>`;
+}
+
+/** 가져오기 확인 팝업 (2026-11-08 사용자: 저장·불러오기의 확인은 전부 팝업) */
+export function manageConfirmPopup(): string {
+  if (manUi.confirm !== 'import') return '';
+  return `<div class="gw-confirm"><div class="gw-confirm-box"><p>가져온 설정으로 지금 기기 설정(과 세계 편집)을 통째로 덮어쓸까요? 덮어쓴 설정은 되돌릴 수 없어요.</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="man-import-yes">적용</button><button class="gx-mini" data-action="man-no">취소</button></div></div></div>`;
 }
 
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {

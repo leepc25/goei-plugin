@@ -70,7 +70,7 @@ process.on('uncaughtException', async (e) => {
   console.error('FAIL', e?.message ?? e);
   try {
     console.error('page errors:', errors);
-    console.error('save bar:', await page.evaluate(() => document.querySelector('.gw-save')?.outerHTML ?? '(none)'));
+    console.error('dirty:', await page.evaluate(() => document.querySelector('.gw')?.hasAttribute('data-dirty')));
     console.error('detail head:', await page.evaluate(() => document.querySelector('.gw-detail h2')?.textContent ?? '(none)'));
     console.error('notice:', await page.evaluate(() => document.querySelector('.gw-notice')?.textContent ?? '(none)'));
     console.error('node:', await page.evaluate(() => document.querySelector('.gw-tree-item.on')?.textContent ?? '(none)'));
@@ -115,7 +115,7 @@ assert.ok((await page.textContent('.gw-detail h2')).includes('쟈알디'));
 assert.match(await page.textContent('.gw-tokens'), /토큰/);
 // 칸 고치기 → 저장 상태가 바뀜 → 조립 글 보기
 await page.fill('.gw-field textarea[data-key="agent|쟈알디|voice"]', '- 낮고 짧게.');
-await page.waitForFunction(() => document.querySelector('.gw-save')?.classList.contains('dirty'));
+await page.waitForFunction(() => document.querySelector('.gw')?.hasAttribute('data-dirty'));
 await page.click('[data-action="ed-preview"]');
 await page.waitForSelector('.gw-preview');
 assert.match(await page.textContent('.gw-preview'), /#### Voice\n- 낮고 짧게\./);
@@ -176,16 +176,16 @@ await page.click('.gw-set [data-action="set-editor-width"][data-value="70"]');
 await page.waitForFunction(() => Math.abs(document.querySelector('.gw-win').getBoundingClientRect().width - 980) < 4, null, { timeout: 5000 });
 await page.click('.gw-set [data-action="set-editor-width"][data-value="90"]');
 await page.waitForFunction(() => Math.abs(document.querySelector('.gw-win').getBoundingClientRect().width - 1260) < 4, null, { timeout: 5000 });
-// 저장 → 카드 명부에 세계 덧쓰기
-await page.click('[data-action="ed-save"]');
-await page.waitForFunction(() => window.__calls.setChar >= 1);
+// 바로 저장 (2026-11-08 사용자) → 카드 명부에 세계 덧쓰기
+await page.waitForTimeout(50);
+await page.waitForFunction(() => window.__calls.setChar >= 1 && !document.querySelector('.gw')?.hasAttribute('data-dirty') && !document.querySelector('.gw-top .gw-save-state'), null, { timeout: 15000 });
 const dir = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
 assert.equal(dir.세계.agent['쟈알디'].fields.voice, '- 낮고 짧게.');
 assert.ok(dir.세계.agent['쟈알디'].fields.character.includes('장난스럽다'));
 assert.ok(dir.세계.agent['쟈알디'].extra.some((e) => e.name === '취미') && dir.세계.agent['쟈알디'].extra.some((e) => e.name === 'Weapons'));
 assert.equal(dir.세계.relations.pairs['극단>병원'].stage, 'hostile');
 assert.equal(dir.세계.relations.pairs['극단>병원'].memo, '피의 원수');
-await page.waitForFunction(() => !document.querySelector('.gw-save')?.classList.contains('dirty'));
+await page.waitForFunction(() => !document.querySelector('.gw')?.hasAttribute('data-dirty'));
 // 다시 읽어도 가상 로어북에 고친 글이 들어간다
 const voice = await page.evaluate(async () => {
   const c = await window.risuai.getCharacterFromIndex(0);

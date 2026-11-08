@@ -1,7 +1,6 @@
 // 세계 편집 창 (docs/설계안_세계편집.md 5장): 패널과 별도의 창. 왼쪽 트리 + 오른쪽 편집기.
 // 저장은 전부 카드 명부(Directory)로: 명부 줄(기존 dirUi 초안)과 세계 덧쓰기(edUi.over)를 한 번에 쓴다.
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
-import { overrideCount } from '../../core/world/draft';
 import type { WorldOverrides } from '../../core/world/records';
 import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
 import { GUIDE_LABEL, type GuideName } from '../../core/guides';
@@ -23,9 +22,9 @@ import { startPage } from './start';
 import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
 import { callSummary } from './flow';
-import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode, manageFile } from './manage';
+import { ensureManage, isManageNode, manageAction, manageInput, managePage, manageConfirmPopup, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
-import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { featurePane, mainDefaultsPopup, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
@@ -77,7 +76,7 @@ export const edUi = {
   notice: '',
   info: '',
   drawer: false,
-  confirm: '' as '' | 'close' | 'reset',
+  confirm: '' as '' | 'close',
   /** 탭마다 마지막으로 보던 페이지 */
   last: {} as Partial<Record<Tab, EditorNode>>,
   /** 기능 탭 「설정 찾기」 칸에 적은 말 (2026-11-06 사용자 승인, 전수점검 8-10) */
@@ -187,6 +186,15 @@ function ensureRoot(): HTMLElement {
   }, true); // 막 띄운 직후의 스크롤(scrollIntoView)로는 안 닫는다
   root.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement | HTMLTextAreaElement;
+    // 글칸 바로 저장 (2026-11-08 사용자): data-autosave 동작을 손을 뗀 뒤 그 칸 값으로 부른다 (예전 [저장] 단추가 하던 일)
+    const auto = el?.dataset?.autosave;
+    if (auto) {
+      const field = el.getAttribute('name') ?? auto;
+      later(`auto:${field}`, () => {
+        const cur = root?.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${CSS.escape(field)}"]`);
+        void run(auto, cur?.value ?? el.value);
+      });
+    }
     const name = el?.dataset?.input;
     if (!name) return;
     const ctx = host?.ctx();
@@ -239,10 +247,10 @@ function ensureRoot(): HTMLElement {
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (guideInput(name, el.dataset.key ?? '', el.value)) {
       touched();
-      // 지침 페이지의 「지침 저장」·「기본으로」는 그릴 때 disabled 가 정해져서, 글칸에 적어도 다시 그리기 전엔 눌리지 않았다 (QC 2026-10-28: 키보드로 고친 지침을 저장할 길이 없었다)
+      // 바로 저장 (2026-11-08 사용자: 지침도). 손을 뗀 뒤 한 번
       const key = el.dataset.key ?? '';
       const g = key.includes('|') ? key.slice(0, key.lastIndexOf('|')) : key;
-      root?.querySelectorAll<HTMLButtonElement>(`[data-action="ed-guide-save"][data-value="${g}"], [data-action="ed-guide-reset"][data-value="${g}"]`).forEach((b) => (b.disabled = false));
+      later(`guide:${g}`, () => void guideAction('ed-guide-save', g).then(() => guideUi.info && render()));
       return;
     }
     if (ruleInput(name, el.dataset.key ?? '', el.value)) return;
@@ -361,8 +369,9 @@ function ensureRoot(): HTMLElement {
 
 /** 입력이 있었다: 저장 상태 줄만 다시 그린다 (글칸을 다시 그리면 커서가 날아간다) */
 function touched(): void {
-  const bar = root?.querySelector('.gw-save');
-  if (bar) bar.outerHTML = saveBar();
+  if (edUi.notice.startsWith('저장하지 못했어요')) edUi.notice = '';
+  autoSaveWorld();
+  root?.toggleAttribute('data-dirty', anyDirty());
   if (root && isGuideNode(edUi.node)) guideBarSync(root, edUi.node.slice(6));
 
   const tok = root?.querySelector('.gw-tokens');
@@ -397,7 +406,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Image', 'Shop'] as (GuideName | 'Image')[]).map(guideItem) },
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -484,26 +493,10 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p>${calls}</header>`
     : `${calls}</header>`;
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
-    ${mainDefaultsConfirm(ctx)}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
 
-function saveBar(): string {
-  const n = (() => {
-    try {
-      return overrideCount(edUi.over);
-    } catch {
-      return 0;
-    }
-  })();
-  const dirty = anyDirty();
-  return `<div class="gw-save${dirty ? ' dirty' : ''}">
-    <span class="gw-save-state">${edUi.busy ? '저장하는 중…' : dirty ? `고친 것 있음 · 덧쓰기 ${n}건` : `저장됨 · 덧쓰기 ${n}건`}</span>
-    <button class="gx-mini" data-action="ed-save" ${dirty && !edUi.busy ? '' : 'disabled'}>${ICONS.pen}저장</button>
-    ${dirty ? `<button class="gx-mini" data-action="ed-revert" ${edUi.busy ? 'disabled' : ''}>고친 것 버리기</button>` : ''}
-  </div>`;
-}
 
 /** 왼쪽 메뉴의 개수: 기록 종류마다 지금 기록 수(지운 것 제외), 거점 수 */
 function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>> {
@@ -698,16 +691,17 @@ export function render(): void {
   if (ctx) overridesOf(ctx); // 저장·새로 읽기 뒤 덧쓰기 초안을 카드 값으로 맞춘다 (지침 화면처럼 초안을 안 쓰는 화면에서도)
   root.hidden = false;
   root.dataset.theme = host.theme();
+  root.toggleAttribute('data-dirty', anyDirty());
   const width = getPrefs().editorWidth ?? 90;
   root.style.setProperty('--gw-width', `${width}%`);
   const confirm = edUi.confirm
-    ? `<div class="gw-confirm"><div class="gw-confirm-box"><p>${edUi.confirm === 'close' ? '고친 것이 저장되지 않았어요. 저장하지 않고 닫을까요?' : '고친 것을 전부 버리고 카드에 저장된 값으로 되돌릴까요?'}</p>
-        <div class="gx-row-btns"><button class="gx-mini danger" data-action="${edUi.confirm === 'close' ? 'ed-close-force' : 'ed-revert-force'}">${edUi.confirm === 'close' ? '저장 안 하고 닫기' : '고친 것 버리기'}</button><button class="gx-mini" data-action="ed-confirm-no">취소</button></div></div></div>`
-    : tabOf(edUi.node) === 'set' ? mainDefaultsPopup() : '';
+    ? `<div class="gw-confirm"><div class="gw-confirm-box"><p>고친 것을 카드에 저장하지 못했어요${edUi.notice ? ` (${esc(edUi.notice)})` : ''}. 저장하지 않고 닫을까요?</p>
+        <div class="gx-row-btns"><button class="gx-mini danger" data-action="ed-close-force">저장 안 하고 닫기</button><button class="gx-mini" data-action="ed-confirm-no">취소</button></div></div></div>`
+    : tabOf(edUi.node) === 'set' || tabOf(edUi.node) === 'manage' ? mainDefaultsPopup() || manageConfirmPopup() : '';
   const tab = tabOf(edUi.node);
   edUi.last[tab] = edUi.node;
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
-  const dirty = anyDirty();
+  autoSaveWorld();
   // 머리는 유령 아이콘 + 「설정」만 (2026-10-29 사용자: 봇 이름·현재 채팅·「바꾸면 바로 저장」 글귀는 지저분함)
   // 다시 그려도 보던 자리를 지킨다 (2026-10-29 사용자: 값 하나 바꿀 때마다 맨 위로 튕겼다). 같은 화면(노드)일 때만 — 다른 화면으로 가면 맨 위부터
   const KEEP = ['.gw-body', '.gw-tree', '.gw-list', '.nw-groups'];
@@ -722,8 +716,8 @@ export function render(): void {
   // 폰(2026-10-29 사용자): 설정도 본 창의 한 화면처럼 — 머리는 본 창과 같은 모양(제목 「설정」만), 아래에 숨은 서랍(기능·세계·지침·점검)과 본 창의 하단 바
   const phone = isPhone();
   const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
-  // 시작 전에도 보인다 (2026-11-08 사용자: 시작해야만 나왔다)
-  const right = `${tab === 'set' ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
+  // 상단바에는 저장 단추를 두지 않는다 (2026-11-08 사용자: 모든 메뉴·항목은 바로 저장. 기본값 저장·불러오기·초기화·내보내기는 점검 → 저장·불러오기 한 곳)
+  const right = `${edUi.busy ? '<span class="gw-save-state">저장하는 중…</span>' : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
   const top = phone
     ? `<header class="gw-top gx-head gw-phead">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
@@ -778,11 +772,39 @@ const boundOnce = new WeakSet<HTMLElement>();
 
 const env = { render: () => render(), refresh: async () => { await host?.refresh(); render(); } };
 
+/** 바로 저장 (2026-11-08 사용자: 모든 메뉴·항목의 기본은 바로 저장, 지침이든 뭐든). 글을 치는 동안은 손을 뗀 뒤 한 번만 적는다 */
+const AUTO_MS = 700;
+const laters = new Map<string, { t: ReturnType<typeof setTimeout>; fn: () => unknown }>();
+function later(key: string, fn: () => unknown, ms = AUTO_MS): void {
+  const old = laters.get(key);
+  if (old) clearTimeout(old.t);
+  const t = setTimeout(() => {
+    laters.delete(key);
+    fn();
+  }, ms);
+  laters.set(key, { t, fn });
+}
+/** 기다리던 저장을 지금 바로 (창을 닫을 때) */
+async function flushLater(): Promise<void> {
+  const all = [...laters.values()];
+  laters.clear();
+  for (const l of all) clearTimeout(l.t);
+  await Promise.all(all.map((l) => Promise.resolve(l.fn()).catch(() => undefined)));
+}
+/** 세계(카드 명부) 고친 것을 카드에 바로 적는다 */
+function autoSaveWorld(): void {
+  // 저장이 실패해 알림이 떠 있으면 되풀이하지 않는다 (다음 입력 때 다시)
+  if (!anyDirty() || (edUi.notice && edUi.notice.startsWith('저장하지 못했어요'))) return;
+  later('world', () => {
+    const ctx = host?.ctx();
+    return ctx && anyDirty() ? save(ctx) : undefined;
+  });
+}
+
 async function save(ctx: ChatContext): Promise<void> {
   if (edUi.busy) return;
   edUi.busy = true;
   edUi.notice = '';
-  render();
   try {
     const d: Directory = directoryDraft(ctx);
     const over = overridesOf(ctx);
@@ -790,7 +812,6 @@ async function save(ctx: ChatContext): Promise<void> {
     await updateCharacterLore(ctx.charIndex, (lore) => withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ''))));
     dirUi.draft = null;
     edUi.from = null;
-    edUi.info = '카드에 저장했어요';
     await host?.refresh();
   } catch (error) {
     edUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
@@ -840,6 +861,10 @@ export async function handle(action: string, value?: string): Promise<void> {
   const ctx = host?.ctx() ?? null;
   switch (action) {
     case 'ed-close':
+      // 바로 저장 (2026-11-08 사용자): 아직 안 적힌 것이 있으면 적고 닫는다
+      await flushLater();
+      if (anyDirty() && ctx) await save(ctx);
+      // 저장이 실패했을 때만 묻는다
       if (anyDirty()) {
         edUi.confirm = 'close';
         return render();
@@ -852,18 +877,6 @@ export async function handle(action: string, value?: string): Promise<void> {
     case 'ed-confirm-no':
       edUi.confirm = '';
       return render();
-    case 'ed-revert':
-      edUi.confirm = 'reset';
-      return render();
-    case 'ed-revert-force':
-      edUi.confirm = '';
-      dirUi.draft = null;
-      edUi.from = null;
-      edUi.info = '카드 값으로 되돌렸어요';
-      return render();
-    case 'ed-save':
-      if (ctx) await save(ctx);
-      return;
     case 'ed-drawer':
       edUi.drawer = !edUi.drawer;
       return render();

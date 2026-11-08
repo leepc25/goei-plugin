@@ -1,5 +1,6 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
+import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
 import { onOffSwitch } from './controls';
 import { repaintTheme } from './theme';
 import {
@@ -184,9 +185,9 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
 const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load' | 'reset', [string, string]>> = {
   chat: {
-    save: ['이 채팅의 설정 전부(캐릭터 이미지·상황판·괴담넷·괴담톡·위키·필드·인물 기록·고급)를 새 채팅 기본값으로 저장할까요? 앞으로 새로 시작하는 채팅이 이 값으로 시작해요.', '저장'],
-    load: ['저장해 둔 새 채팅 기본값 전부를 이 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
-    reset: ['이 채팅의 설정 전부와 저장해 둔 새 채팅 기본값을 버리고 플러그인 초기값으로 되돌릴까요? 상황판 켜기·끄기는 그대로 둬요. 되돌리기 띠로 한 번 되돌릴 수 있어요.', '초기값으로'],
+    save: ['지금 설정을 기본값으로 저장할까요? 저장해 둔 기본값을 덮어써서, 앞으로 새로 시작하는 모든 채팅이 이 값으로 시작해요. 덮어쓴 기본값은 되돌릴 수 없어요.', '기본값으로 저장'],
+    load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 지금 채팅의 설정이 기본값으로 바뀌어요. 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
+    reset: ['지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 모두 버리고 플러그인 원래 값으로 초기화할까요? 상황판 켜기·끄기와 세계(카드 명부)는 그대로 둬요.', '초기화'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
@@ -212,18 +213,11 @@ function scopeBar(scope: SettingsScope, canChat: boolean, ctx?: ChatContext): st
   return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
-/** 설정 창 모든 채팅 설정 페이지 머리의 「기본값으로 저장」「기본값 불러오기」 (가3 → 2026-10-29 사용자 1번 결정: 범위 칩 없음, 값은 늘 이 채팅,
- *  저장 = 이 채팅의 설정 전부(이미지·상황판·괴이 발생·테마·기능 페이지 변수·고급)를 한 번에 새 채팅 기본값으로, 불러오기 = 그 반대 한 번에).
- *  처리는 set-bar / set-bar-yes / set-bar-no */
-export const mainDefaultsButtons = (): string => {
-  const off = settingsUi.busy ? 'disabled' : '';
-  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button><button class="st-act" data-action="set-bar" data-value="reset" title="플러그인 초기값으로" aria-label="플러그인 초기값으로" ${off}>${ICONS.back}<span>초기값으로</span></button></span>`;
-};
 /** 불러오기 뒤의 「되돌리기」 띠: 보관해 둔 값이 이 채팅 것일 때만 */
 export function undoBar(ctx: ChatContext): string {
   const u = settingsUi.undo;
   if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex || settingsUi.confirm) return '';
-  return `<div class="st-confirm st-undobar ps-defconfirm"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? 'disabled' : ''}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
+  return `<div class="st-confirm st-undobar ps-defconfirm"><p>불러오기·초기화 전 채팅 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요. (기본값·지침은 되돌아오지 않아요)</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? 'disabled' : ''}>${ICONS.back}그 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
 }
 /** 페이지 안: 되돌리기 띠만. 확인은 팝업(mainDefaultsPopup) — 11-07 사용자: 전체 설정에 관한 확인이 괴담넷 같은 한 페이지 안에 뜨면 안 된다 */
 export function mainDefaultsConfirm(ctx?: ChatContext): string {
@@ -586,7 +580,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       const cur = current(ctx, settingsUi.scope === 'defaults' ? 'defaults' : 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
       if (!settingsUi.notice) await saveVarDefaults(ALL_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
-      if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
+      if (!settingsUi.notice) settingsUi.info = '지금 설정을 기본값으로 저장했어요.';
       env.render();
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
@@ -613,7 +607,7 @@ export async function handleSettings(action: string, value: string | undefined, 
         await dropShopTags(ctx);
       }
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
-      if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
+      if (!settingsUi.notice) settingsUi.info = '기본값을 지금 채팅에 불러왔어요.';
       env.render();
     } else if (what === 'reset') {
       // 플러그인 초기값으로 (11-07 사용자: 「기본값으로 저장·불러오기」만 있고 초기값 롤백이 없다): 이 채팅의 설정 변수를 전부 지워 코드 기본값으로,
@@ -645,9 +639,13 @@ export async function handleSettings(action: string, value: string | undefined, 
         resetShop();
         await dropShopTags(ctx);
       }
-      if (!settingsUi.notice) await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {} }));
+      // 고친 지침도 원래 글로 (2026-11-08 사용자: 지침마다 있던 「기본으로」를 없애고 초기화 한 곳으로)
+      if (!settingsUi.notice) {
+        for (const g of GUIDE_NAMES) setGuideOverride(g, '');
+        await saveDefaults(env, (p) => ({ ...p, basic: {}, world: {}, theme: undefined, vars: {}, guides: undefined }));
+      }
       if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
-      if (!settingsUi.notice) settingsUi.info = '이 채팅 설정과 새 채팅 기본값을 플러그인 초기값으로 되돌렸어요.';
+      if (!settingsUi.notice) settingsUi.info = '지금 채팅 설정·기본값·지침을 플러그인 원래 값으로 초기화했어요.';
       env.render();
     } else env.render();
     return true;

@@ -1509,7 +1509,6 @@ if (want('IP1')) {
   const evil = '<img src=x onerror="window.__xss=1">';
   // 지침 틀: 자리표가 채워지고, 꺾쇠가 든 틀도 화면(미리보기)에서는 글자로
   await page.fill('[data-input="ip-template"]', `QC-TEMPLATE ${evil}\nchars: {characters}\nkw: {keywords}\n{user_rule}끝`);
-  await page.click('[data-action="ip-template-save"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt ?? '').startsWith('QC-TEMPLATE'));
   // 임의 추가: 꺾쇠·밑줄·중괄호는 걸러진다. $& 는 replace 특수 문자로 풀리지 않는다
   await page.fill('[data-input="ip-extra"]', 'Ave_n<sha>$&');
@@ -1523,7 +1522,6 @@ if (want('IP1')) {
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesOff ?? []).includes('Jyaldi'));
   // 표정 세트: 대문자·줄바꿈 정리
   await page.fill('[data-input="ip-keywords"]', 'Smile, CRY\nangry');
-  await page.click('[data-action="ip-keywords-save"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords ?? []).join(',') === 'smile,cry,angry');
   await page.click('[data-action="ip-preview"]');
   await page.waitForSelector('.ip-preview');

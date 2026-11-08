@@ -5,7 +5,7 @@ import { distPack } from './data-init.mjs';
 import { sceneOf } from './qc-host.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { boot, chatOf, closeWin, launch, loadFixture, openEditor, closeEditor, openWin, setChat, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
+import { boot, chatOf, closeWin, goNode, launch, loadFixture, openEditor, closeEditor, openWin, setChat, sleep, isPhoneVp, VIEWPORTS } from './qc-settings-harness.mjs';
 
 const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
@@ -176,7 +176,11 @@ for (const vp of vps) {
   assert.ok((await page.textContent('.gx-head small')).includes('다시 고를 수 있어요'));
   // 시작 전(staged) 설정 창: 「이 채팅」 없음, 테마를 바꾸면 이 채팅에도 적힌다
   await openEditor(page, 'set:screen');
-  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 3, '시작 전에도 기본값으로 저장·불러오기·초기값으로 (2026-11-08 사용자)');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 0, '머리에 저장 단추 없음 (2026-11-08 사용자: 바로 저장)');
+  await goNode(page, 'manage:backup');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 3, '시작 전에도 저장·불러오기 페이지에 기본값 셋 (불러오기·초기화는 잠김)');
+  assert.equal(await page.isDisabled('.gw [data-action="set-bar"][data-value="load"]'), true, '시작 전 불러오기 잠김');
+  await goNode(page, 'set:screen');
   // 폰 배치(폰 세로·가로)는 본 창과 같은 상단바에 제목 「설정」만 (2026-10-29 사용자; 2026-11-06 폰 가로도 폰 배치)
   if (!isPhoneVp(vp)) assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
   await page.evaluate(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="light"]').click());
@@ -202,7 +206,9 @@ for (const vp of vps) {
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'set:board');
   assert.equal(await page.$('.gw-set [data-action="set-scope"]'), null, '범위 칩 없음');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 3, '시작 뒤 기본값으로 저장·불러오기·초기값으로');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 0, '시작 뒤에도 기능 페이지엔 기본값 단추 없음');
+  await goNode(page, 'manage:backup');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]:not([disabled])').count(), 3, '시작 뒤 저장·불러오기 페이지: 기본값 셋 모두 쓸 수 있음');
   await closeEditor(page);
   await closeWin(page);
 
