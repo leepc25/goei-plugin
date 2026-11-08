@@ -109,7 +109,8 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   if (o.fill) stage.setFit('fill');
   else if (o.field) stage.setFit('height');
   const apply = () => {
-    stage.setCrt(settings.crt);
+    // 대전(투명 무대, 11-08 사용자): 브라운관 효과는 그림이 있는 곳(인물·이펙트·HUD)에만, 늘 켬
+    stage.setCrt(view.clear ? 'screen' : settings.crt);
     stage.setBright(settings.bright);
     stage.setPixel(settings.pixel);
     charSize.k = settings.charSize;

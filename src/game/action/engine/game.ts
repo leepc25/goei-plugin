@@ -72,6 +72,8 @@ export class Game {
   readonly ctx: CanvasRenderingContext2D;
   readonly input = new Input();
   world: World | null = null;
+  /** 대전 판 끝 반응할 몸 (이긴 쪽·진 쪽) */
+  private vsReact: { win: unknown; lose: unknown } | null = null;
   scene: Scene;
   paused = false;
   private ownCanvas: boolean;
@@ -420,7 +422,18 @@ export class Game {
             const win = side === 0 ? rp : rf;
             const kind = timeUp && w.player.hp > 0 && !foeDown ? 'time' : win >= 0.999 ? 'perfect' : 'ko';
             versus.ko = { side, t: KO_SEC, kind, next: roundEnd(side, [rp, rf]) };
-          } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) <= 0) {
+            this.vsReact = { win: side === 0 ? w.player : foe, lose: side === 0 ? foe : w.player };
+          } else if (versus.ko && versus.ko.t > KO_SEC - 0.6) {
+            versus.ko.t -= 1 / TICK_HZ;   // 쓰러지는 걸 잠깐 보고
+          } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) > 0) {
+            // 판 끝 반응 (11-08 사용자): 이긴 쪽 기뻐하기(35), 서 있는 진 쪽(시간 끝) 화내기(32). 하던 동작이 끝나면 다시
+            const emo = (b: unknown, id: string) => {
+              const core = (b as { core?: { has(i: string): boolean; emote(i: string, fps: number): void; P: { mode: string } } } | undefined)?.core;
+              if (core?.has(id) && core.P.mode !== 'act' && (b as { hp: number }).hp > 0) core.emote(id, 8);
+            };
+            emo(this.vsReact?.win, '35');
+            emo(this.vsReact?.lose, '32');
+          } else if (versus.ko && versus.ko.t <= 0) {
             const { side, next } = versus.ko;
             versus.ko = null;
             if (next === 'over') versus.over = { side, t: OVER_SEC };

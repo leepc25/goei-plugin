@@ -12,12 +12,17 @@ function img(k: Key): HTMLImageElement | null {
   if (!im) { im = new Image(); im.src = HUD_ART[k].src; imgs[k] = im; }
   return im.complete && im.naturalWidth ? im : null;
 }
+/** 틀 그림 (대전 고르기 칸도 같은 틀을 쓴다). 아직 안 읽혔으면 null */
+export const hudImg = (k: Key): HTMLImageElement | null => img(k);
+export const hudArt = HUD_ART;
 /** 틀 그림이 다 읽혔나 (아니면 옛 HUD로 그린다) */
 export function pixelHudReady(): boolean {
   return (['slot', 'item', 'portrait', 'hp', 'gauge'] as Key[]).every((k) => img(k));
 }
 
 const INK = '#e6e4dc', DIM = '#5c6268', EDGE = '#07090b', HOLLOW = '#0f1216';
+/** HUD 글자 색 (대전 고르기·알림도 같은 색을 쓴다) */
+export const HUD_INK = INK, HUD_DIM = DIM, HUD_EDGE = EDGE;
 
 /* ───────── 글자 ───────── */
 const textCache = new Map<string, HTMLCanvasElement>();
@@ -52,6 +57,23 @@ export function pixelText(s: string, color = INK, size = 11, edge: string | null
   g.putImageData(d, 0, 0);
   // 글꼴이 아직 안 읽혔으면 다음에 다시 만든다
   if (document.fonts?.check?.(f) !== false) textCache.set(key, cv);
+  return cv;
+}
+
+/** 큰 도트 글자: 11px 도트 글자(1도트 테)를 정수배로 키운다. 도트 한 칸 = scale px (흐린 가장자리 없음) */
+const dotCache = new Map<string, HTMLCanvasElement>();
+export function dotText(s: string, color = INK, scale = 2): HTMLCanvasElement {
+  const src = pixelText(s, color, 11);
+  scale = Math.max(1, Math.round(scale));
+  if (scale === 1) return src;
+  const key = `${s}|${color}|${scale}`, hit = dotCache.get(key);
+  if (hit && textCache.has(`${s}|${color}|11|${EDGE}`)) return hit;
+  const cv = document.createElement('canvas');
+  cv.width = src.width * scale; cv.height = src.height * scale;
+  const g = cv.getContext('2d')!;
+  g.imageSmoothingEnabled = false;
+  g.drawImage(src, 0, 0, cv.width, cv.height);
+  dotCache.set(key, cv);
   return cv;
 }
 function hex(c: string): [number, number, number] {

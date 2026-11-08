@@ -39,7 +39,7 @@ export const versus = {
 /** duel 에서 경기를 가져가는 승 수 */
 export const WINS_TO_TAKE = 2;
 /** 판 끝(KO) 표시 초, 경기 끝(승리/패배) 표시 초, 판 시작 표시 초 */
-export const KO_SEC = 2.5;
+export const KO_SEC = 3.2;
 export const OVER_SEC = 3;
 export const INTRO_SEC = 1.6;
 /** 판 시간 (대전게임 관례 99초) */
