@@ -2,6 +2,51 @@
  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
  "items": [
   {
+   "ko": "금빛 청둥오리 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden mallard duck themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, gold with feather engraving and a small flat duck bill at the center bridge. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금빛 돌고래 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden dolphin themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, gold with wave engraving and a small dolphin fin rising at the top center. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "금빛 나비 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden butterfly themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, gold with delicate butterfly wing patterns engraved on both sides. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "도마뱀 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lizard themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, green scaly texture with a small spiky crest along the top edge. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "오소리 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a badger themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, black with white stripes running up from the eyes. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "조랑말 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pony themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, brown with small pony ears on the top corners and a short mane fringe. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "산양 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a mountain goat themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, cream colored with two long curved horns sweeping back from the top edge. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "염소 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a goat themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, dark grey with two short horns and small pointed ears. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "소 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cow themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, white with black cow patches, small horns and ears. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
    "ko": "늑대 가면",
    "kind": "wear",
    "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a wolf themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, grey fur texture with pointed wolf ears on the top corners. Only this item, nothing else beside it, no text, fully inside its square."
@@ -20,6 +65,21 @@
    "ko": "스마일 스티커",
    "kind": "misc",
    "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a pack of round yellow smiley face stickers in a clear plastic bag with a yellow header card at the top, the card is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "탐사 매뉴얼",
+   "kind": "paper",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a thin worn field manual booklet with a plain grey cover, ring bound, some pages bookmarked with sticky tabs, three-quarter view, the cover is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "락카 스프레이",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a red spray paint can with a white nozzle cap, plain unlabeled can, side view. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
+   "ko": "형광 마킹 테이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a roll of bright fluorescent green marking tape, glowing slightly, three-quarter view. Only this item, nothing else beside it, no text, fully inside its square."
   }
  ]
 }

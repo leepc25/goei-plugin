@@ -52,6 +52,11 @@
    "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden dolphin themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, gold with wave engraving and a small dolphin fin rising at the top center. Only this item, nothing else beside it, no text, fully inside its square."
   },
   {
+   "ko": "금빛 나비 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a golden butterfly themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, gold with delicate butterfly wing patterns engraved on both sides. Only this item, nothing else beside it, no text, fully inside its square."
+  },
+  {
    "ko": "도마뱀 가면",
    "kind": "wear",
    "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a lizard themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, green scaly texture with a small spiky crest along the top edge. Only this item, nothing else beside it, no text, fully inside its square."
@@ -75,11 +80,6 @@
    "ko": "염소 가면",
    "kind": "wear",
    "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a goat themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, dark grey with two short horns and small pointed ears. Only this item, nothing else beside it, no text, fully inside its square."
-  },
-  {
-   "ko": "소 가면",
-   "kind": "wear",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. a cow themed half eye mask that covers only the eyes, domino mask shape with pointed upper corners and a dipping center bridge, two almond-shaped eye holes, front view, white with black cow patches, small horns and ears. Only this item, nothing else beside it, no text, fully inside its square."
   }
  ]
 }
