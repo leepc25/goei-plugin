@@ -61,7 +61,7 @@ import { execSync as sh } from 'node:child_process';
 const git = (c) => { try { return sh(`git ${c}`, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
 // 빌드가 옛것인지: 마지막으로 src 를 바꾼 커밋 시각과, 커밋 안 한 채 고친 src 파일 시각 중 늦은 것보다 dist 가 먼저면 옛 빌드 (빌드가 만드는 src/data 파일은 git 이 안 잡으니 빠진다)
 const newestSrc = (() => { let m = Number(git('log -1 --format=%ct -- src')) * 1000 || 0; for (const l of git('status --porcelain -- src').split('\n').filter(Boolean)) { try { m = Math.max(m, statSync(resolve(ROOT, l.slice(3).trim())).mtimeMs); } catch {} } return m; })();
-let VERSION = { branch: git('rev-parse --abbrev-ref HEAD'), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
+let VERSION = { branch: (() => { const b = git('rev-parse --abbrev-ref HEAD'); if (b && b !== 'HEAD') return b; const n = git('branch -r --contains HEAD --format=%(refname:short)').split('\n').filter(Boolean)[0]; return n ? n.replace(/^origin\//, '') + '(분리된 판)' : 'HEAD(분리된 판)'; })(), commit: git('log -1 --format=%h·%cd --date=format:%m-%d_%H:%M'), dirty: git('status --porcelain -- src').split('\n').filter(Boolean).length, distOld: statSync(resolve(ROOT, 'dist/goei-plugin.js')).mtimeMs < newestSrc, card: (() => { try { return JSON.parse(readFileSync(resolve(ROOT, 'release/version.json'), 'utf8')).plugin; } catch { return ''; } })() };
 if (VERSION.distOld) console.warn('[click-audit] 경고: dist/ 가 src/ 보다 옛것이에요. npm run build 를 먼저 돌리세요 (옛 빌드를 누르게 됨)');
 const LOOKS = distPack('goei-data-looks');
 const ITEMS = (() => { try { return distPack('goei-data-items'); } catch { return null; } })();
@@ -160,7 +160,15 @@ async function makeBase(browser, vp, kind) {
   if (kind === 'gnet') {
     await openWin(page); await settle(page);
     await page.evaluate((b) => { window.__llm = [{ type: 'success', result: '```json\n' + JSON.stringify(b) + '\n```' }]; }, GNET_BOARD);
-    await page.evaluate(() => document.querySelector('[data-action="nav-tab"][data-value="gnet"], [data-action="tab"][data-value="gnet"]')?.click());
+    // 옛 판: 괴담넷 탭. 0.21.4~: 인터넷 → (로그인 묻기면 로그인 없이) → 괴담넷 사이트
+    const old = await page.evaluate(() => { const b = document.querySelector('[data-action="nav-tab"][data-value="gnet"], [data-action="tab"][data-value="gnet"]'); b?.click(); return !!b; });
+    if (!old) {
+      await page.evaluate(() => document.querySelector('[data-action="nav-tab"][data-value="net"], [data-action="tab"][data-value="net"]')?.click());
+      await sleep(400);
+      await page.evaluate(() => document.querySelector('[data-action="br-login-guest"]')?.click());
+      await sleep(300);
+      await page.evaluate(() => document.querySelector('[data-action="br-go"][data-value="gn"], [data-action="br-site"][data-value="gn"]')?.click());
+    }
     await sleep(400);
     await page.evaluate(() => document.querySelector('[data-action="gn-refresh"]')?.click());
     await page.waitForSelector('.gn-row-main', { timeout: 8000 }).catch(() => log('괴담넷 글이 안 생김'));
@@ -221,7 +229,7 @@ async function openShop(page, pre, shelf) {
 const PAGE_LIB = `
 window.__ca = (() => {
   const SKIP = '#other, .default-chat-screen > #other';
-  const vis = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0.01; };
+  const vis = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; if (el.checkVisibility && !el.checkVisibility({ contentVisibilityAuto: true })) return false; const dt = el.closest('details:not([open])'); if (dt && !el.closest('summary')?.parentElement?.isSameNode(dt)) return false; const s = getComputedStyle(el); return s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0.01; };
   const label = (el) => (el.getAttribute('aria-label') || el.getAttribute('title') || el.textContent || el.querySelector?.('img')?.alt || '').replace(/\\s+/g, ' ').trim().slice(0, 40);
   const cls1 = (el) => [...el.classList].filter((c) => !/^(on|sel|active|open|primary|danger|has-|k-|none$)/.test(c))[0] || '';
   const keyOf = (el) => el.dataset.action ? el.dataset.action + '|' + (el.dataset.value ?? '') : el.tagName.toLowerCase() + '.' + cls1(el) + '|' + label(el);
@@ -427,7 +435,9 @@ function flagsOf(rec) {
   // 누른 것에 표시(선택·효과)가 붙었는데 그것이 보일 틈 없이(0.3초 안에) 사라지거나 창이 닫힘 — 2026-11-08 임무 고르기·해제 문제의 꼴
   if (w.elClass?.length) {
     const firstFx = w.elClass[0][0];
-    const goneAt = Math.min(w.elGone ?? Infinity, w.boxGone ?? Infinity);
+    // 값만 바뀌어 같은 동작 단추로 다시 그려진 것(켬↔끔 등)은 사라진 게 아니다
+    const redrawn = w.boxGone == null && (rec.appeared || []).some((k) => k.split('|')[0] === rec.action);
+    const goneAt = redrawn ? Infinity : Math.min(w.elGone ?? Infinity, w.boxGone ?? Infinity);
     if (goneAt !== Infinity && goneAt - firstFx < 300) f.push(`효과가 보일 틈 없이 사라짐(효과 ${firstFx}ms → 사라짐 ${goneAt}ms)`);
     const last = w.elClass.at(-1);
     if (w.after && w.after.elCls === w.before.elCls && w.after.aria === w.before.aria && w.elClass.length >= 2) f.push(`표시가 잠깐 바뀌었다 돌아감(${firstFx}~${last[0]}ms)`);
@@ -545,7 +555,7 @@ L.push('이 기록은 사실만 적는다. 이상한지·사용자 결정과 맞
 L.push('## 1. 이상 반응 (캡처 확인할 곳)', '');
 const flagged = results.filter((r) => r.flags.length && !r.disabled);
 const byFlag = {};
-for (const r of flagged) for (const f of r.flags) (byFlag[f.replace(/\(\d+ms\)|\(\d+~\d+ms\)/, '')] ||= []).push(r);
+for (const r of flagged) for (const f of r.flags) (byFlag[f.replace(/\((효과 )?\d+(~\d+)?ms( → 사라짐 \d+ms)?\)/, '')] ||= []).push(r);
 for (const [f, rs] of Object.entries(byFlag)) {
   L.push(`### ${f} (${rs.length})`, '');
   for (const r of rs) L.push(`- [${r.vp}] \`${r.key}\` 「${r.label}」 · 길: ${r.path.length ? r.path.join(' → ') : r.start}${r.flags.length > 1 ? ' · 함께: ' + r.flags.filter((x) => !x.startsWith(f)).join(', ') : ''}${r.errors?.length ? '\n  - 오류: ' + r.errors.slice(0, 3).join(' / ').slice(0, 300) : ''}${r.note ? '\n  - ' + r.note : ''}${r.shots ? '\n  - 캡처: ' + r.shots.map(rel).join(' · ') : ''}`);
