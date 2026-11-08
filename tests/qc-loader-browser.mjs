@@ -520,7 +520,7 @@ if (!skip()) {
   await frame.evaluate(() => window.__buttons['goei-plugin-install'].cb());
   await frame.waitForSelector('.gw-install', { timeout: 10000 });
   assert.match(await frame.textContent('.gw-install'), /아직 괴이 ː ANOMALY 카드가 아니에요/);
-  assert.equal(await frame.locator('.gw-inst-no').count(), 6, '점검 6줄 전부 없음');
+  assert.equal(await frame.locator('.gw-inst-no').count(), 8, '점검 8줄 전부 없음');
   const t0 = Date.now();
   await frame.click('[data-action="ed-inst-all"]');
   await frame.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 180000 });
@@ -531,7 +531,9 @@ if (!skip()) {
   const ch = await frame.evaluate(() => window.__chars[0]);
   assert.equal(ch.name, '괴이 ː ANOMALY');
   assert.equal(ch.alternateGreetings.length, 1 + 1, '기존 인사말 + 빈 인사말 하나');
-  assert.deepEqual(ch.globalLore.map((e) => e.comment), ['⚙️설정', 'Directory', '📖위키', 'Plugin manifest']);
+  assert.deepEqual(ch.globalLore.map((e) => e.comment), ['⚙️설정', 'Directory', 'Plugin manifest'], '위키 폴더는 만들지 않음 (2026-11-08)');
+  assert.match(ch.firstMessage, /data-goei="landing"/, '첫 메시지 = 시작 안내');
+  assert.deepEqual(ch.loreSettings, { tokenBudget: 99999, scanDepth: 10, recursiveScanning: false }, '로어북 설정 (글로벌 설정 사용 X)');
   assert.equal(ch.additionalAssets.length, manifest.pictures.length, '카드 사진 전부');
   assert.match(ch.image, /^assets\//, '아이콘이 메인');
   assert.deepEqual(ch.ccAssets.map((a) => [a.type, a.name]), [['icon', 'main'], ['icon', 'goei']], '이전 아이콘은 목록에 남김');
@@ -572,13 +574,13 @@ if (!skip()) {
   ok('깡통봇 설치 전체 → 점검 ✓ → 저장소 사용량 → 이전 아이콘 → 플로팅 버튼');
 }
 
-// ── 11) 설치 부분 실패: 사진 일부 404 → 그 100장 묶음은 통째로 안 넣음(카드 그대로), 다음 단계는 계속, 다시 누르면 이어서. 지문 불일치도 실패
+// ── 11) 설치 부분 실패: 사진 일부 404 → 그때까지 저장한 사진만 카드에 적고 멈춤, 다음 단계는 계속, 다시 누르면 이어서. 지문 불일치도 실패
 if (!skip()) {
   const { page, frame, errors } = await boot([emptyBot], 0, emptyChat(), { body: bodyCode });
   await serve(frame);
   const digests = manifest.pictures.map((p) => `${p[1]}.${p[2]}`);
   await frame.evaluate((d) => {
-    const bad = new Set(d.slice(150, 160)); // 두 번째 묶음(100~199)에 404 열 장
+    const bad = new Set(d.slice(150, 160)); // 150~159번째에 404 열 장
     window.__fetchHook = (n, u) => (u.includes('/pic/') ? (bad.has(n) ? null : new Uint8Array([1, 2, 3])) : undefined);
   }, digests);
   await frame.waitForFunction(() => window.__buttons['goei-plugin-install']);
@@ -590,20 +592,21 @@ if (!skip()) {
   const err1 = await frame.textContent('.gw-install .gx-err');
   // crypto.subtle 이 살아 있으니 가짜 바이트는 지문이 달라 첫 묶음부터 실패한다
   assert.match(err1, /사진: 사진 「.+」을 받지 못했어요/, err1);
-  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 0, '한 장이라도 못 받은 묶음은 카드에 안 넣음');
+  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 0, '받은 사진이 없으면 카드 그대로');
   assert.match(await frame.textContent('.gw-install .gx-hint'), /아이콘 · 위키 기본 문서 · 토크나이저 — 끝났어요/, '다른 단계는 계속');
-  // 지문 계산을 끄면 두 번째 묶음에서만 막힌다: 첫 100장은 저장되고 100/1751 로 멈춘다
+  // 지문 계산을 끄면 404 에서만 막힌다: 그때까지 저장한 사진(150장 안팎, 일꾼 여럿이라 정확한 수는 다름)은 카드에 적고 멈춘다
   await frame.evaluate(() => { Object.defineProperty(Crypto.prototype, 'subtle', { get: () => undefined }); });
   await frame.click('[data-action="ed-inst-all"]');
   await frame.waitForFunction(() => /안 된 것/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
   const err2 = await frame.textContent('.gw-install .gx-err');
-  assert.match(err2, /100\/2522장까지 받았어요/, err2);
-  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 100, '받은 묶음까지만 저장');
-  assert.match(await frame.textContent('.gw-install'), /100\/2522장/, '점검표에 남은 수');
+  const part = Number(/(\d+)\/2522장까지 받았어요/.exec(err2)?.[1]);
+  assert.ok(part >= 150 && part < 170, err2);
+  assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), part, '저장한 사진만 카드에');
+  assert.match(await frame.textContent('.gw-install'), new RegExp(`${part}/2522장`), '점검표에 남은 수');
   // 404 를 고치고 다시 누르면 이어서 받는다
   await frame.evaluate(() => { window.__fetchHook = (n, u) => (u.includes('/pic/') ? new Uint8Array([1, 2, 3]) : undefined); });
   await frame.click('[data-action="ed-inst-all"]');
-  await frame.waitForFunction(() => /사진 2422장/.test(document.querySelector('.gw-install')?.textContent ?? ''), null, { timeout: 180000 });
+  await frame.waitForFunction((n) => new RegExp(`사진 ${n}장`).test(document.querySelector('.gw-install')?.textContent ?? ''), 2522 - part, { timeout: 180000 });
   assert.equal(await frame.evaluate(() => window.__chars[0].additionalAssets.length), 2522);
   assert.equal(await frame.locator('.gw-inst-no').count(), 0);
   await closeOf(page, errors);
