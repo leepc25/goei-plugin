@@ -37,6 +37,9 @@ export interface GPost {
   tag?: string;
   /** 내가 스크랩한 글 (스크랩한 글은 새로고침에도 남는다) */
   scrap?: boolean;
+  /** 내가 누른 추천·비추 (2026-11-08 시안: 글마다 추천 단추) */
+  voted?: boolean;
+  down?: boolean;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -283,6 +286,7 @@ export function decode(raw: unknown): GState {
           id, date: validDate(p[2]), nick: cut(p[3], 80), title: p[4], views: Math.max(0, Math.floor(Number(p[5]) || 0)),
           votes: Math.max(0, Math.floor(Number(p[6]) || 0)), body: p[7], mine: p[8] === '1', comments: [],
           ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
+          ...(p[11] === '1' ? { voted: true } : {}), ...(p[12] === '1' ? { down: true } : {}),
         };
         st.posts.push(post);
         map.set(id, post);
@@ -307,7 +311,7 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0'].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0'].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const [nick, s] of Object.entries(st.sources)) out.push(['T', en(nick), s.postid || 0, en(s.title), en(s.body), en(s.author), en(s.quote), en(s.quoteAuthor)].join('|'));
@@ -697,6 +701,8 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
       Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
       if (prev.tag) q.tag = prev.tag;
       if (prev.scrap) q.scrap = true;
+      if (prev.voted) q.voted = true;
+      if (prev.down) q.down = true;
       for (const c of prev.comments) {
         q.comments.push(c);
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);

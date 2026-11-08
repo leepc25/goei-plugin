@@ -150,15 +150,77 @@ function card(kind: Exclude<PartKind, 'text'>, text: string, asset?: string): st
   return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label}</small><span>${esc(text).replace(/\n/g, '<br>')}</span></div></div>`;
 }
 
-/** 말풍선·댓글 본문. board: 글·쪽지처럼 파일·링크를 아래 문서 목록으로 모은다 (원본 AT.gnetRender) */
-export function attachBody(text: string, board = false): string {
+// ── 실제 사진 [사진:이름] (2026-11-08 사용자: 인물이 에셋 사진을 보낸다). 지금 화면의 봇에서 그림 주소를 찾는 함수 ──
+let sitePic: ((raw: string) => string | null) | null = null;
+/** 게시판·괴담톡을 그리기 전에 그 봇의 그림 찾기를 넣는다 */
+export function setSitePicSource(fn: ((raw: string) => string | null) | null): void {
+  sitePic = fn;
+}
+const SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
+
+/** 게시판 첨부 (시안 「첨부 공통」 .ax): 실제 사진은 그림, 사진 설명은 빗금 틀, 영상은 검은 틀 */
+const camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+function boardCard(kind: Exclude<PartKind, 'text'>, text: string, asset?: string, url?: string): string {
+  if (kind === 'image' || url) {
+    const src = url ?? (asset ? photos.get(asset) : null);
+    const data = url ? '' : ` data-asset="${esc(asset ?? '')}"`;
+    return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? ' broken' : ''}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc(src ?? '')}"${data} alt="${esc(text)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === 'image' && text.trim() ? `<figcaption>${esc(text)}</figcaption>` : ''}</figure>`;
+  }
+  if (kind === 'photo') return `<figure class="ax ax-ph"><div class="fr">${camera}<p>${esc(text).replace(/\n/g, '<br>')}</p></div></figure>`;
+  if (kind === 'video') return `<figure class="ax ax-vd"><div class="fr"><span class="pl" aria-hidden="true">▶</span><p>${esc(text).replace(/\n/g, '<br>')}</p><div class="bar" aria-hidden="true"><span>▶</span><i></i><span>0:00</span></div></div></figure>`;
+  return card(kind, text, asset);
+}
+
+/** 글 조각 안의 [사진:이름]을 그림으로 (목록에 없는 이름은 사진 설명 틀) */
+function textWithPics(text: string, board: boolean): string[] {
+  const out: string[] = [];
+  let last = 0;
+  const para = (t: string) => (t.trim() ? out.push(`<p>${esc(t.trim()).replace(/\n/g, '<br>')}</p>`) : 0);
+  for (const m of text.matchAll(SITE_PIC)) {
+    para(text.slice(last, m.index));
+    const url = sitePic?.(m[1]) ?? null;
+    out.push(url ? (board ? boardCard('image', '', undefined, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc(url)}" alt="" loading="lazy"></button></figure>`) : board ? boardCard('photo', m[1].replace(/_[a-z ]+$/i, '')) : card('photo', m[1]));
+    last = m.index! + m[0].length;
+  }
+  para(text.slice(last));
+  return out;
+}
+
+/** 게시판 글의 파일·링크 (시안: 괴담넷은 본문 아래 「첨부 N」, 괴담갤은 오른쪽 「원본 첨부파일」, 세정게는 「첨 부」 칸) */
+export type BoardFile = { kind: 'file' | 'link'; text: string; url: string | null };
+export function boardFiles(text: string): BoardFile[] {
+  return bodyParts(text).filter((p) => p.kind === 'file' || p.kind === 'link').map((p) => ({ kind: p.kind as 'file' | 'link', text: p.text, url: p.kind === 'link' ? attachUrl(p.text) : null }));
+}
+/** 목록 작은 그림: 실제 사진이면 주소, 사진 설명뿐이면 photo */
+export function boardThumb(text: string): { url: string | null } | null {
+  let desc = false;
+  for (const p of bodyParts(text)) {
+    if (p.kind === 'image' && p.asset && photos.get(p.asset)) return { url: photos.get(p.asset)! };
+    if (p.kind === 'text') {
+      for (const m of p.text.matchAll(SITE_PIC)) {
+        const url = sitePic?.(m[1]) ?? null;
+        if (url) return { url };
+        desc = true;
+      }
+    }
+    if (p.kind === 'photo' || p.kind === 'image') desc = true;
+  }
+  return desc ? { url: null } : null;
+}
+
+/** 말풍선·댓글 본문. board: 글·쪽지처럼 파일·링크를 아래 「첨부 N」 목록으로 모은다 (원본 AT.gnetRender, 시안 .axf). noFiles: 파일·링크는 따로 그린다 */
+export function attachBody(text: string, board = false, noFiles = false): string {
   const out: string[] = [];
   const files: string[] = [];
   for (const p of bodyParts(text)) {
-    if (p.kind === 'text') out.push(`<p>${esc(p.text.trim()).replace(/\n/g, '<br>')}</p>`);
-    else if (board && (p.kind === 'file' || p.kind === 'link')) files.push(card(p.kind, p.text));
-    else out.push(card(p.kind, p.text, p.asset));
+    if (p.kind === 'text') out.push(...textWithPics(p.text, board));
+    else if (board && (p.kind === 'file' || p.kind === 'link')) {
+      if (noFiles) continue;
+      const url = p.kind === 'link' ? attachUrl(p.text) : null;
+      files.push(`<div class="r"><span class="ic" aria-hidden="true">${p.kind === 'file' ? '📎' : '🔗'}</span>${url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(p.text)}</a>` : `<span>${esc(p.text)}</span>`}</div>`);
+    } else out.push(board ? boardCard(p.kind, p.text, p.asset) : card(p.kind, p.text, p.asset));
   }
-  if (files.length) out.push(`<div class="at-files">${files.join('')}</div>`);
+  if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join('')}</div>`);
   return out.join('');
 }

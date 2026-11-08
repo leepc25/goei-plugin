@@ -320,7 +320,7 @@ if (want('G3')) {
   await page.waitForSelector('.gn-row-main');
   const dt = Date.now() - t0;
   assert.equal(await page.locator('.gn-row').count(), 20, '한 쪽 20개');
-  assert.equal(await page.locator('[data-action="gn-page"]').count(), 24, '쪽 넘김 25쪽');
+  assert.equal(await page.locator('[data-action="gn-page"]').count(), 25, '쪽 넘김 25쪽 (24 + 다음 ›)');
   assert.ok(dt < 5000, `글 500개 첫 그리기 ${dt}ms`);
   const t2 = Date.now();
   await page.click('[data-action="gn-sub"][data-value="dm"]');
@@ -334,7 +334,7 @@ if (want('G3')) {
   await page.click('.gn-row-main[data-value="' + (B + 250) + '"]');
   await page.waitForSelector('.gn-post');
   assert.ok(Date.now() - t1 < 3000, '글 열기');
-  assert.equal(await page.locator('.gn-pane .gn-c').count(), 4);
+  assert.equal(await page.locator('.gn-post .gn-c').count(), 4);
   // 쪽지함: 상대 3명, 각 20통 (기본 상한 40 안) → 자동 정리 상한을 5로 내리면 저장 때 5통만
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   assert.equal(await page.locator('.gn-dmrow').count(), 3);
@@ -519,7 +519,7 @@ if (want('G5')) {
   await page.click('[data-action="gn-del-comment"][data-value="1846001:2"]');
   await page.click('[data-action="gn-del-comment"][data-value="1846001:2"]');
   await page.waitForFunction(() => /C\|1846001\|0\|b\|답\|0/.test(window.__chat.scriptstate.$gn_raw), null, { timeout: 4000 });
-  assert.equal(await page.locator('.gn-pane .gn-c').count(), 2);
+  assert.equal(await page.locator('.gn-post .gn-c').count(), 2);
   // 모바일: 글은 한 화면으로 열리고 댓글 입력줄이 아래에 있다
   await page.setViewportSize({ width: 390, height: 844 });
   await page.click('.br-bm[data-value="gn"]').catch(() => {});

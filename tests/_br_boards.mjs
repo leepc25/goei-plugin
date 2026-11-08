@@ -13,6 +13,14 @@ const raw = (title, tags = ['자유']) => {
   const titles = ['야 코엑스 지하주차장 뭐 터졌냐? 경찰 쫙 깔림', '은장도 축성은 아무 성당에서나 해줌?', '부적 진짜/가짜 구별하는 법 정리함', '할머니 집 괘종시계가 밤에만 가는 이유', '요즘 검은 정장 입은 사람들 왜 이렇게 많음?'];
   titles.forEach((t, i) => posts.push({ ...post(1846002 + i, t), tag: tags[i % tags.length], views: 300 * (i + 1), votes: i * 3, comments: Array.from({ length: i * 2 }, (_, k) => ({ parent: 0, nick: `ㅇㅇ${k}`, body: `댓글 ${k}`, mine: false, unread: false, time: '2025.01.01 02:45' })) }));
   posts[0].tag = tags[0];
+  // 맨 위 글: 시안 글 화면처럼 사진 설명·영상·파일·링크·댓글(사진 포함)
+  const top = posts.at(-1);
+  top.body = '방금 화장실 가다가 찍음. 우리 층 복도 끝인데 원래 저기 문 없음.\n[[ATTACH:photo]]우리 층 복도 끝. 끝에 철문이 하나 있음[[/ATTACH]]\n찍고 나서 다시 보니까 없어짐.\n[[ATTACH:video]]엘리베이터 문이 아무도 없는데 혼자 열렸다 닫히는 영상[[/ATTACH]]\n아는 사람 있으면 알려 줘.\n[[ATTACH:file]]복도_원본_0412.jpg[[/ATTACH]]\n[[ATTACH:link]]https://goei.wiki/w/명일 아파트[[/ATTACH]]';
+  top.comments = [
+    { parent: 0, nick: '야간조', body: '복도 끝에 문 생기는 거 명일 아파트 얘기랑 똑같은데. 절대 열지 마셈', mine: false, unread: false, time: '2025.01.01 02:41' },
+    { parent: 0, nick: 'ㅇㅇ', body: '나도 비슷한 거 찍음\n[[ATTACH:photo]]같은 모양 복도. 문틈으로 빨간 불빛[[/ATTACH]]', mine: false, unread: false, time: '2025.01.01 02:43' },
+    { parent: 1, nick: '나', body: '위치 어디임?', mine: true, unread: false, time: '2025.01.01 02:45' },
+  ];
   return encode({ posts: posts.reverse(), dms: [{ nick: '익명', side: 'npc', body: '그 글 봤어요', unread: true, date: '2025.01.01 02:44' }], sources: {}, seq: 1846010 });
 };
 const browser = await launch();
@@ -26,7 +34,7 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   let n = 0;
   const shot = async (tag) => { await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/${vp}-${String(++n).padStart(2, '0')}-${tag}.png` }); };
   const click = (sel) => page.evaluate((s) => { const els = [...document.querySelectorAll(s)]; const el = els.find((e) => e.getBoundingClientRect().width > 0) || els[0]; if (!el) return false; el.click(); return true; }, sel);
-  const list = () => page.evaluate(() => [...document.querySelectorAll('.gn-row-main')].filter((e) => e.getBoundingClientRect().width > 0).map((e) => { const c = (e.querySelector('.bs-t, .bs-nm') ?? e).cloneNode(true); c.querySelectorAll('.bs-tag, .bs-cn').forEach((x) => x.remove()); return c.textContent.replace(/^\[[^\]]*\] /, '').trim(); }));
+  const list = () => page.evaluate(() => [...document.querySelectorAll('.gn-row-main')].filter((e) => e.getBoundingClientRect().width > 0).map((e) => { const c = (e.querySelector('.tt, .t, .nm') ?? e).cloneNode(true); c.querySelectorAll('em, .cm, .nw, .ii, .gn-dot').forEach((x) => x.remove()); return c.textContent.replace(/^\[[^\]]*\] /, '').trim(); }));
   await openWin(page); await page.waitForTimeout(300);
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
   await page.waitForTimeout(300);
@@ -36,9 +44,11 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
     await page.waitForTimeout(300);
   };
   await go('gn'); await shot('gn'); assert.equal((await list()).at(-1), '괴담넷 글');
-  await click('.gn-row-main'); await shot('gn-post'); await click('[data-action="gn-back"]');
+  await click('.gn-row-main'); await shot('gn-post'); await page.evaluate(() => document.querySelector('.br-page > .bs').scrollTo(0, 99999)); await shot('gn-post-end'); await click('[data-action="gn-back"]');
   await go('gal'); await shot('gal'); assert.equal((await list()).at(-1), '괴담갤 글');
   await click('.gn-row-main'); await shot('gal-post'); await click('[data-action="gn-back"]');
+  await go('wpf'); await click('.gn-row-main'); await shot('wpf-post'); await click('[data-action="gn-back"]');
+  await go('sm'); await click('.gn-row-main'); await shot('sm-item'); await click('[data-action="gn-back"]');
   await go('wpf'); assert.equal((await list()).at(-1), '세정게 글'); await shot('wpf');
   await go('sm'); assert.equal((await list()).at(-1), '연어 글'); await shot('sm');
   await go('gn'); assert.equal((await list()).at(-1), '괴담넷 글');

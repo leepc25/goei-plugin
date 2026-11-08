@@ -40,7 +40,7 @@ import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
-import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { boardChrome, gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { isBoardSite, type BoardSite } from '../core/boards';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -1801,9 +1801,10 @@ function chromeOpts(ctx: ChatContext): ChromeOpts {
     : wiki.view === 'find' ? { title: `"${wiki.query}" 검색 결과`, path: `/Search?q=${wiki.query}` }
     : wiki.view === 'new' ? { title: '새 문서 만들기', path: '/NewDocument' }
     : { title: '괴이위키:대문', path: '' };
+  const bd = t.site === 'gn' || t.site === 'gal' || t.site === 'wpf' || t.site === 'sm' ? boardChrome(ctx, t.site) : null;
   return {
-    title: wk ? `${wk.title} - 괴이위키` : '',
-    path: wk?.path ?? '',
+    title: wk ? `${wk.title} - 괴이위키` : bd?.title ?? '',
+    path: wk?.path ?? bd?.path ?? '',
     bookmarks: browserSites(ctx),
     nick: String(vars['$br_login'] ?? '') === '1' ? String(vars['$br_nick'] ?? '') : '',
     photo: userInfo().photo ?? '',

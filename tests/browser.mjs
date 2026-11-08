@@ -1343,8 +1343,12 @@ if (fixture.globalLore.some(packed)) {
   }, [sel, dir]);
   const swipeRight = (sel) => swipe(sel, 1);
   const swipeLeft = (sel) => swipe(sel, -1);
-  await page.click('.wk-side .rc [data-value="소라 랜드"]');
+  // 모바일은 옆 상자가 없다: 목록 서랍에서 문서를 연다
+  await page.click('.wk .wgrab');
+  await page.waitForSelector('.wk.dr-open');
+  await page.click('.wk .wlist .it[data-value="소라 랜드"]');
   await page.waitForSelector('.wk-docp .wk-h1');
+  if (await page.evaluate(() => !!document.querySelector('.wk.dr-open'))) await page.click('.wk .wscrim', { position: { x: 20, y: 400 } });
   await swipeRight('.wk .wsc');
   await page.waitForSelector('.wk .mainp');
   await swipeLeft('.wk .wsc');
@@ -1432,7 +1436,7 @@ if (fixture.globalLore.some(packed)) {
   // 글 하나만 새로고침: 그 글에 새 댓글, 조회 증가, 다른 글은 그대로 (v0.16.26)
   const views0 = Number(/P\|1846002\|[^|]*\|[^|]*\|[^|]*\|(\d+)/.exec(raw)[1]);
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ comments: [{ author: '지나가던사람', content: '이 글 아직 살아있네', parent: 0 }, { author: '익명', content: '주인공 흉내', parent: 0 }], activity: [] }) }]; });
-  await page.click('.gn-pane [data-action="gn-post-refresh"]');
+  await page.click('.gn-post [data-action="gn-post-refresh"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('이 글 아직 살아있네'), null, { timeout: 5000 });
   const raw2 = await page.evaluate(() => window.__chat.scriptstate.$gn_raw);
   assert.ok(!raw2.includes('주인공 흉내'), '주인공 닉네임 댓글은 뺌');
@@ -2031,8 +2035,8 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(pc[1].content.includes('[ATTACHMENT A1]') && pc[1].content.includes('[ATTACHMENT A2]') && !pc[1].content.includes('[[ATTACH:'));
   assert.ok(pc[2].content.startsWith('ATTACHMENT DATA:') && pc[2].content.includes('A2 {"kind":"link","content":"https://example.com/sora"}'));
   assert.ok(pc[0].content.includes('Reading shared material'), '첨부 읽기 지침');
-  await page.waitForSelector('.gn-post .at-card-photo');
-  assert.equal(await page.locator('.gn-post .at-files .at-card-link a.at-go').count(), 1, '링크는 문서 목록, 주소면 누를 수 있음');
+  await page.waitForSelector('.gn-post .ax-ph');
+  assert.equal(await page.locator('.gn-post .axf a[href="https://example.com/sora"]').count(), 1, '링크는 「첨부 N」 목록, 주소면 누를 수 있음');
   if (shots) await page.screenshot({ path: `${shots}/18-gnet-attach.png` });
   // 괴담넷에 끄기는 없다 (2026-11-05 사용자: 괴담톡·위키와 같게) → 모델은 메인·보조만, 「게시판 사용」 단추 없음
   await featSet(page, 'set:gnet');
@@ -2061,7 +2065,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(auto.mode, 'model', '켜면서 돌려놓은 메인 모델');
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('관람차 사진'), '내 글은 유지');
   // 글은 새 화면으로 열리므로 목록으로 돌아가서 본다
-  if (await page.locator('.bs-acts [data-action="gn-back"]').count()) await page.click('.bs-acts [data-action="gn-back"]');
+  if (await page.locator('.gn-post [data-action="gn-back"]').count()) await page.click('.gn-post [data-action="gn-back"]:not(.ph-back2) >> nth=0');
   await page.waitForSelector('.gn-row-main >> text=자동으로 온 글');
   // 괴담톡: 1:1은 선물까지, 첨부는 따로 한 말풍선, 함께 쓴 글은 그 뒤
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="phone"]');

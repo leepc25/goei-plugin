@@ -3,7 +3,8 @@
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
-import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
+import { resolveSitePic } from '../core/sitepics';
+import { setSitePicSource, attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
@@ -1152,6 +1153,7 @@ export function phoneContent(ctx: ChatContext, query: string): string {
 }
 
 export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
+  sitePicFor(ctx);
   liveEnv = env;
   let st: PState;
   let d: Directory;
@@ -1583,4 +1585,12 @@ export function previewPhoneRefresh(ctx: ChatContext): LlmMessage[] | null {
 /** 호출 흐름 미리 계산: 관전(보기 전용 방) 요청 */
 export function previewPhoneView(ctx: ChatContext): LlmMessage[] {
   return fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
+}
+
+/** [사진:이름] 을 이 봇의 그림으로 (그리기 전에) */
+function sitePicFor(ctx: ChatContext): void {
+  setSitePicSource((raw) => {
+    const name = resolveSitePic(ctx.char as never, raw);
+    return name ? imageUrl(ctx.char, name) : null;
+  });
 }
