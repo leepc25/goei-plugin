@@ -3,6 +3,7 @@
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
 import { view } from './view';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -342,9 +343,6 @@ export class Game {
   }
 
   /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
-  /** 대전 판이 끝난 뒤 지난 틱 (투명 무대만) */
-  private koT = 0;
-
   endRun(how: RunResultCore['how']) {
     const w = this.world;
     if (!w || this.inHub) return;
@@ -394,14 +392,32 @@ export class Game {
           if (open) return;
         }
         if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
+        // 대전(투명 무대): 판 시작(ROUND n → FIGHT)·경기 끝 표시 동안은 멈춘다
+        if (view.clear && (versus.intro > 0 || versus.over)) {
+          const dt = 1 / TICK_HZ;
+          if (versus.intro > 0) versus.intro = Math.max(0, versus.intro - dt);
+          if (versus.over && (versus.over.t -= dt) <= 0) {
+            const side = versus.over.side;
+            versus.over = null;
+            versus.onMatchEnd?.(side);
+          }
+          return;
+        }
         w.step(p);
-        // 기다리는 동안 대전(투명 무대): 판이 끝나면(쓰러짐·상대 쓰러뜨림) 잠깐 뒤 같은 무대로 새 판. 본부·결과 화면으로 가지 않는다
+        // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
         if (view.clear) {
           const foeDown = w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
-          if (w.ended || foeDown || w.player.hp <= 0) {
-            this.koT = (this.koT ?? 0) + 1;
-            if (this.koT > TICK_HZ * 2.5) { this.koT = 0; this.start_new(this.run?.stageId); }
-          } else this.koT = 0;
+          if (!versus.ko && (w.ended || foeDown || w.player.hp <= 0)) {
+            const side: Side = w.player.hp > 0 && foeDown ? 0 : 1;
+            const foe = w.bodies.find((b) => b.team === 'enemy');
+            const ratio = (b: { hp: number; hpMax: number } | undefined) => (b && b.hpMax > 0 ? Math.max(0, b.hp / b.hpMax) : 0);
+            versus.ko = { side, t: KO_SEC, next: roundEnd(side, [ratio(w.player), ratio(foe)]) };
+          } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) <= 0) {
+            const { side, next } = versus.ko;
+            versus.ko = null;
+            if (next === 'over') versus.over = { side, t: OVER_SEC };
+            else { versus.intro = INTRO_SEC; this.start_new(this.run?.stageId); }
+          }
           return;
         }
         if (w.ended) {
