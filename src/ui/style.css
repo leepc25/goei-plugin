@@ -209,6 +209,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
   .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err)) { margin-top: 0; padding-top: 0; }
+  /* 괴담톡·괴담넷처럼 두 칸으로 나뉜 화면은 머리 바로 밑부터 끝까지 붙인다: 위 여백·오른쪽 스크롤 자리 때문에 가운데 세로선과 오른쪽 머리 밑줄이 중간에 끊겼다 (11-08 사용자) */
+  .gx-panel.has-nav .gx-content > .gx-body.ph-app { padding-top: 0; scrollbar-gutter: auto; }
+  .gx-panel.has-nav .gx-content > .gx-body.ph-app > .ph-side { padding-top: 18px; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err) { margin-top: 0; }
   .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
 }
