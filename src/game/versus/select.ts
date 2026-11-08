@@ -8,7 +8,7 @@ import { dotText, HUD_DIM, HUD_INK } from '../action/ui/pixelHud';
 import type { VsMode } from '../action/engine/versus';
 
 const MODES: { id: VsMode; name: string; picks: [number, number] }[] = [
-  { id: 'duel', name: '1:1', picks: [1, 1] },
+  { id: 'duel', name: '1 VS 1', picks: [1, 1] },
   { id: 'team', name: '태그매치', picks: [3, 3] },
   { id: 'survival', name: '서바이벌', picks: [1, 0] },
 ];
@@ -71,20 +71,20 @@ function arrowCanvas(color: string, flip = false): HTMLCanvasElement {
 }
 
 const CSS = `
-.vs-sel{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:40;user-select:none}
+.vs-sel{--shd:drop-shadow(3px 3px 0 rgba(0,0,0,.6));position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:40;user-select:none}
 .vs-sel *{box-sizing:border-box}
 .vs-sel canvas{image-rendering:pixelated;display:block}
 .vs-top{position:absolute;left:0;right:0;top:10px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5}
-.vs-title{padding:0 10px;${frameCss(F_BASE)}}
+.vs-title{padding:0 10px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-modes{display:flex;gap:30px;pointer-events:auto;padding:0 26px}
-.vs-mode{position:relative;cursor:pointer;padding:0 6px;${frameCss(F_BASE)}}
+.vs-mode{position:relative;cursor:pointer;width:150px;display:flex;justify-content:center;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-mode.on{${frameCss(F_ON)}}
 .vs-mode.on:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 0 40%,rgba(255,255,255,.45) 40% 48%,transparent 48% 54%,rgba(255,255,255,.25) 54% 57%,transparent 57%);background-size:300% 100%;animation:vs-shine 1.6s steps(16) infinite}
 .vs-mode .ar{position:absolute;top:50%;margin-top:-9px;animation:vs-pulse .5s steps(2) infinite}
 .vs-mode .ar.l{left:-24px}
 .vs-mode .ar.r{right:-24px}
 @keyframes vs-shine{0%{background-position:100% 0}60%,100%{background-position:0 0}}
-.vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:0 4px;${frameCss(F_BASE)}}
+.vs-time{position:absolute;top:10px;right:16px;z-index:6;padding:0 4px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-time.low{animation:vs-pulse .5s steps(2) infinite}
 .vs-fig{position:absolute;bottom:calc(var(--gh) + 50px);z-index:2;pointer-events:none}
 .vs-fig[data-s="0"]{left:3%}
@@ -97,23 +97,24 @@ const CSS = `
 .vs-fig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
 .vs-fig.pick .vs-slot[data-k="0"] canvas{animation:vs-pick .3s steps(3)}
 .vs-fig .unk{position:absolute;left:0;right:0;bottom:30%;display:flex;justify-content:center}
-.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:0 6px;${frameCss(F_BASE)}}
+.vs-nm{position:absolute;z-index:4;bottom:calc(var(--gh) + 12px);display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-nm[data-s="0"]{left:3%}
 .vs-nm[data-s="1"]{right:3%;flex-direction:row-reverse}
 .vs-picks{display:flex;gap:3px;margin-bottom:2px}
 .vs-nm[data-s="1"] .vs-picks{flex-direction:row-reverse}
-.vs-gridw{position:absolute;z-index:3;left:50%;bottom:24px;transform:translateX(-50%);pointer-events:auto}
+.vs-gridw{position:absolute;z-index:3;left:50%;bottom:38px;transform:translateX(-50%);pointer-events:auto}
 .vs-grid{display:grid;gap:2px}
 .vs-cell{position:relative;width:${CELL}px;height:${CELL}px;cursor:pointer}
-.vs-cell>canvas{position:absolute;left:0;top:0;transition:transform .06s steps(2)}
-.vs-cell.cur>canvas{transform:translateY(-3px)}
+.vs-cell>canvas{position:absolute;left:0;top:0;filter:var(--shd);transition:transform .06s steps(2)}
+.vs-cell.cur>canvas{transform:translateY(-3px);filter:drop-shadow(3px 5px 0 rgba(0,0,0,.6))}
 .vs-cell.rand{display:flex;align-items:center;justify-content:center}
-.vs-cell.taken:not(.cur)>canvas{filter:grayscale(1) brightness(.45)}
-.vs-cell.taken.cur>canvas{filter:brightness(.8)}
+.vs-cell.taken:not(.cur)>canvas{filter:grayscale(1) brightness(.45) var(--shd)}
+.vs-cell.taken.cur>canvas{filter:brightness(.8) drop-shadow(3px 5px 0 rgba(0,0,0,.6))}
 .vs-cur{position:absolute;left:0;top:-19px;z-index:2;animation:vs-pulse .4s steps(2) infinite}
 .vs-cur.c1{left:auto;right:0}
 .vs-say{position:absolute;z-index:4;left:0;right:0;bottom:calc(var(--gh) - 46px);display:flex;justify-content:center;animation:vs-pulse 1s steps(2) infinite}
 .vs-help{position:absolute;z-index:4;left:0;right:0;bottom:2px;display:flex;justify-content:center}
+.vs-say canvas,.vs-help canvas,.vs-load canvas,.vs-vteam canvas{filter:var(--shd)}
 .vs-say canvas,.vs-help canvas,.vs-load canvas{padding:0 4px;${frameCss(F_BASE)}}
 @keyframes vs-blink{50%{border-color:${HUD_INK}}}
 @keyframes vs-pulse{50%{opacity:.4}}
@@ -125,15 +126,15 @@ const CSS = `
 .vs-vfig[data-s="1"]{right:8%;animation:vs-inR .3s steps(5) backwards}
 .vs-vfig[data-s="0"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[0]}) drop-shadow(0 0 8px ${P_COLOR[0]}aa)}
 .vs-vfig[data-s="1"] canvas{filter:drop-shadow(0 0 3px ${P_COLOR[1]}) drop-shadow(0 0 8px ${P_COLOR[1]}aa)}
-.vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:0 6px;${frameCss(F_BASE)}}
+.vs-vname{position:absolute;bottom:14px;display:flex;align-items:center;gap:8px;padding:0 6px;filter:var(--shd);${frameCss(F_BASE)}}
 .vs-vname[data-s="0"]{left:8%}
 .vs-vname[data-s="1"]{right:8%;flex-direction:row-reverse}
-.vs-vteam{position:absolute;top:14px;display:flex;gap:4px}
-.vs-vteam[data-s="0"]{left:8%}
-.vs-vteam[data-s="1"]{right:8%;flex-direction:row-reverse}
-.vs-big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:5;animation:vs-stamp .25s .4s steps(4) backwards}
+.vs-vteam{position:absolute;display:flex;gap:4px}
+.vs-vteam[data-s="0"]{left:20px}
+.vs-vteam[data-s="1"]{right:20px;flex-direction:row-reverse}
+.vs-big{position:absolute;left:50%;bottom:184px;transform:translate(-50%,50%);z-index:5;animation:vs-stamp .25s .4s steps(4) backwards}
 .vs-load{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:center;animation:vs-pulse .8s steps(2) infinite}
-@keyframes vs-stamp{from{transform:translate(-50%,-50%) scale(3);opacity:0}}
+@keyframes vs-stamp{from{transform:translate(-50%,50%) scale(3);opacity:0}}
 `;
 
 /** 도트 글자 한 장 (DOM 에 넣을 새 canvas) */
@@ -283,7 +284,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
   // ── 판 짜기 (한 번만. 커서·이름은 아래 update 가 바꾼다). 배경판 없음: 본문이 그대로 보인다
   // 칸 줄 수: 본문 폭에 맞춰 (줄이 적을수록 인물이 크게 선다)
   const COLS = Math.max(8, Math.min(16, Math.floor((box.clientWidth - 140) / (CELL + 2))));
-  const gridH = Math.ceil(names.length / COLS) * (CELL + 2) + 24 + 22 + 30;   // 판 + 아래 도움말 + 판 위 안내 한 줄
+  const gridH = Math.ceil(names.length / COLS) * (CELL + 2) + 38 + 22 + 30;   // 판 + 아래 도움말 + 판 위 안내 한 줄
   el.style.setProperty('--gh', `${gridH}px`);
   // 전신은 이름 줄 위에 선다: 위 제목 줄(약 90px)과 판 사이 높이
   const figH = FIG_H;
@@ -298,7 +299,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     <div class="vs-help"></div>`;
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
   $('.vs-grid').style.gridTemplateColumns = `repeat(${COLS},${CELL}px)`;
-  put($('.vs-title'), dot('인물 선택', HUD_INK, 2));
+  put($('.vs-title'), dot('캐릭터 선택', HUD_INK, 2));
   put($('.vs-help'), dot('방향키 움직이기 · Enter 고르기 · Backspace 되돌리기 · Tab 모드 · Esc 닫기', HUD_DIM, 1));
   for (const s of [0, 1] as const) put($(`.vs-nm[data-s="${s}"] .p`), dot(s ? '2P' : '1P', P_COLOR[s], 2));
   const cells = [...el.querySelectorAll<HTMLElement>('.vs-cell')];
@@ -372,7 +373,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     }
     const who = t === 0 ? '1P' : '2P';
     if (done()) $('.vs-say').replaceChildren();
-    else put($('.vs-say'), dot(`${who} 인물을 고르세요${mode.picks[t] > 1 ? ` (${picks[t].length + 1}/${mode.picks[t]})` : ''}`, HUD_INK, 2));
+    else put($('.vs-say'), dot(`${who} 캐릭터를 고르세요${mode.picks[t] > 1 ? ` (${picks[t].length + 1}/${mode.picks[t]})` : ''}`, HUD_INK, 2));
     if (t !== lastTurn) { lastTurn = t; time = TIME; timeAt = performance.now(); drawTime(TIME); }
   };
 
@@ -496,6 +497,8 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
       const tm = document.createElement('div');
       tm.className = 'vs-vteam';
       tm.dataset.s = String(s);
+      // 11-08 사용자: 얼굴 칸은 경기 체력 칸 자리(modules.ts drawVersusBars: 1.25배, 위 14 + 16:9 넘는 높이, 옆 16)
+      tm.style.top = `${Math.round(14 * 1.25 + Math.max(0, box.clientHeight - 720))}px`;
       list.forEach((n) => tm.appendChild(cellCanvas(n, CELL)));
       el.appendChild(tm);
     }

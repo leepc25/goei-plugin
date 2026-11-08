@@ -348,7 +348,8 @@ export function drawCharFrame(c: CanvasRenderingContext2D, nameOrKey: string, id
   const a = charArt(nameOrKey), m = a?.A[id], im = a?.IMG[id];
   if (!a || !m || !im) return false;
   f = ((f % m.n) + m.n) % m.n;
-  const flip = (a.cfg.dir === 'W' || a.cfg.dir === 'SW') ? dir > 0 : dir < 0;
+  // 11-08 사용자: 대전 그림은 모두 오른쪽 보기로 그려져 있다(cfg.dir 무시, 전투 코어와 같이). dir 1 = 오른쪽
+  const flip = dir < 0;
   c.save();
   c.imageSmoothingEnabled = false;
   c.translate(Math.round(x), Math.round(y));
