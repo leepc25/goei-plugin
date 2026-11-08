@@ -3563,8 +3563,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gx-items .it-right { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; min-width: 0; }
 .gx-items .it-act { height: 32px; box-sizing: border-box; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--dim); font-size: 13px; }
 .gx-items .it-act:hover:not(:disabled) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
-.gx-items .it-tools .it-q { width: 200px; max-width: none; height: 32px; box-sizing: border-box; margin-left: 8px; padding: 0 2px; border: 0; border-bottom: 1px solid var(--line2); border-radius: 0; background: none; font-size: 13px; }
-.gx-items .it-tools .it-q:focus { outline: none; border-bottom-color: var(--signal); }
 /* 칸 수·넘침·무게 (장착 칸 위 한 줄): 단추 모양 X, 글자만 */
 .it-eqcol { flex: none; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; } /* 칸 수·무게는 위로, 장착 칸은 아래로 (사용자) */
 .it-eqcol .it-eqslots { align-content: end; }
@@ -3604,8 +3602,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .it-stat b { font-size: 13px; }
   .it-stat small, .it-stat em { font-size: 11px; }
   .it-stat + .it-stat { margin-left: 8px; padding-left: 8px; }
-  .it-eqcol { gap: 8px; }
+  /* 폰 (사용자 11-08): 칸 수·무게 한 줄을 아바타 머리 위까지 띠 맨 위 한 줄로, 그 아래 아바타 | 장착 칸 */
+  .gx-items .it-eqcol { display: contents; }
+  .gx-items .it-stats { order: -1; flex: 1 1 100%; width: auto; justify-content: center; padding: 0 0 8px; border-bottom: 1px solid var(--line); }
+  .gx-items .it-av { height: auto; min-height: 0; align-self: stretch; }
   .gx-items .it-eqbox:not(.sell) { padding: 10px 12px 12px; }
-  .gx-items .it-tools .it-q { width: auto; flex: 1; }
   .gx-items .it-right { flex: 1; }
 }
