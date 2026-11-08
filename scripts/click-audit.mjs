@@ -200,6 +200,9 @@ async function openFrom(browser, vp, base) {
   T('boot');
   // 가짜 모델: 따로 넣은 답이 없을 때 진열대 요청(상점·쇼핑몰)에는 진열대를 돌려준다 → 쇼핑몰 물건이 깔린 뒤 화면까지 누른다
   await page.evaluate((shelf) => { const q = []; window.__llm = new Proxy(q, { get(t, p) { if (p === 'shift') return () => { if (t.length) return t.shift(); const s = JSON.stringify((window.__calls.llm || []).at(-1) || '').slice(-80000); return /<shelf>/.test(s) ? { type: 'success', result: shelf } : undefined; }; return Reflect.get(t, p); } }); }, SHELF);
+  // 실제 Risu 에선 플러그인 창이 따로 띄운 틀(iframe, z 49~1000)이라 둥근 괴이 단추(본 문서 z 45)가 창 밑에 깔린다.
+  // 시험 틀은 한 문서에 그리므로, 창이 열려 있으면 둥근 단추를 숨겨 실제와 맞춘다 (11-09 릴리스 스레드 확인)
+  await page.addStyleTag({ content: 'body:has(.gx:not([style*="display: none"])) [x-goei-fab], body:has(.gw:not([hidden])) [x-goei-fab] { visibility: hidden !important; }' });
   await openWin(page);
   T('openWin');
   await settle(page);
