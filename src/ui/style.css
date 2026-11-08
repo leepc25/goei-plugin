@@ -3567,7 +3567,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-eqcol { flex: none; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; } /* 칸 수·무게는 위로, 장착 칸은 아래로 (사용자) */
 .it-eqcol .it-eqslots { align-content: end; }
 .it-stats { display: flex; align-items: center; gap: 0; padding: 2px 2px 0; }
-.it-stat + .it-stat { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line2); } /* 칸 수와 무게 사이 가는 세로줄 */
+.it-stat + .it-stat { margin-left: 14px; padding-left: 14px; border-left: 1px solid var(--line2); } /* 칸 수와 무게 사이 가는 세로줄 (PC) */
 .it-stat { display: inline-flex; align-items: center; gap: 6px; color: var(--sub); font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .it-stat svg { width: 14px; height: 14px; color: var(--dim); }
 .it-stat b { font-size: 14px; color: var(--text); }
@@ -3601,10 +3601,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .it-stat svg { width: 12px; height: 12px; }
   .it-stat b { font-size: 13px; }
   .it-stat small, .it-stat em { font-size: 11px; }
-  .it-stat + .it-stat { margin-left: 8px; padding-left: 8px; }
+  .it-stat + .it-stat { margin-left: 18px; padding-left: 0; border-left: 0; } /* 폰은 구분선 없이 띄우기만 (사용자) */
   /* 폰 (사용자 11-08): 칸 수·무게 한 줄을 아바타 머리 위까지 띠 맨 위 한 줄로, 그 아래 아바타 | 장착 칸 */
   .gx-items .it-eqcol { display: contents; }
-  .gx-items .it-stats { order: -1; flex: 1 1 100%; width: auto; justify-content: center; padding: 0 0 8px; border-bottom: 1px solid var(--line); }
+  .gx-items .it-stats { order: -1; flex: 1 1 100%; width: auto; justify-content: center; padding: 0 0 4px; }
   .gx-items .it-av { height: auto; min-height: 0; align-self: stretch; }
   .gx-items .it-eqbox:not(.sell) { padding: 10px 12px 12px; }
   .gx-items .it-right { flex: 1; }
