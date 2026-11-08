@@ -606,10 +606,18 @@ export class Fighter {
     }
     // 맞음
     const lying = this.state === 'down' || this.state === 'getup';
-    if (lying && this.otg >= OTG_MAX) return 'miss';
-    let dmg = this.scaleDmg(use, h);
-    if (lying) dmg *= OTG_MUL;
-    else if (this.z > 0 || this.state === 'air') dmg *= JUGGLE_MUL;
+    const multi = use.kind !== 'light' && use.kind !== 'heavy' && use.kind !== 'launch' && use.kind !== 'blow' && use.kind !== 'jump';
+    // 여러 대 맞는 기술은 처음 맞힌 때의 배율로 끝까지 (기술 안에서 콤보 줄임·누운 상대 한도에 걸려 피해가 사라지지 않게)
+    if (lying && this.otg >= OTG_MAX && !(multi && use.sc != null)) return 'miss';
+    let dmg: number;
+    if (multi && use.sc != null) dmg = this.scaleDmg(use, h, use.sc);
+    else {
+      let k = Math.max(SCALE.min, 1 - SCALE.step * this.comboTaken);
+      if (lying) k *= OTG_MUL;
+      else if (this.z > 0 || this.state === 'air') k *= JUGGLE_MUL;
+      if (multi) use.sc = k;
+      dmg = this.scaleDmg(use, h, k);
+    }
     dmg = Math.max(1, Math.round(dmg));
     this.takeDmg(by, use, dmg, 1);
     this.comboTaken++;
@@ -624,7 +632,7 @@ export class Fighter {
     if (!h.noVfx) this.hitVfx(by, h, at, big);
     if (this.hp <= 0) { this.koFly(dir); return 'hit'; }
     if (lying) {
-      this.otg++;
+      if (!(multi && use.sc != null && this.otg >= OTG_MAX)) this.otg++;
       this.lieT = Math.min(this.lieT, LIE_SEC * 0.6);
       if (this.has('43')) { const n = nOf(this.art, '43'); this.play('43', steps(range(0, n - 1), 0.05), { onEnd: () => this.lie() }); }
       return 'hit';
@@ -650,11 +658,10 @@ export class Fighter {
     return 'hit';
   }
   /** 이어 맞을수록 줄이기 + 기술 전체 피해 한도 */
-  private scaleDmg(use: Use, h: HitSpec): number {
+  private scaleDmg(use: Use, h: HitSpec, k = Math.max(SCALE.min, 1 - SCALE.step * this.comboTaken)): number {
     const base = use.kind === 'light' || use.kind === 'heavy' || use.kind === 'launch' || use.kind === 'blow' || use.kind === 'jump' ? use.budget : Math.min(use.per, Math.max(0, use.budget - use.dealt));
-    const n = this.comboTaken;
     void h;
-    return base * Math.max(SCALE.min, 1 - SCALE.step * n);
+    return base * k;
   }
   private takeDmg(by: Fighter, use: Use, dmg: number, gain: number): void {
     use.dealt += use.kind === 'light' || use.kind === 'heavy' || use.kind === 'launch' || use.kind === 'blow' || use.kind === 'jump' ? 0 : Math.max(1, use.per);

@@ -20,6 +20,8 @@ export interface Use {
   hitVfx?: { n: string; s: number } | null;
   /** 충전 단계 */
   lv?: number;
+  /** 기술: 처음 맞힌 때의 줄임 배율 (같은 기술 안에서는 더 줄이지 않는다) */
+  sc?: number;
 }
 
 /** 탄 하나 */

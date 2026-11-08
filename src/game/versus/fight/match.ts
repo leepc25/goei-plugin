@@ -61,6 +61,10 @@ export class Match {
   log: { t: number; by: string; to: string; kind: string; clip?: string; id: number; dmg: number; guard: boolean }[] = [];
   /** 시험: 기록 켜기 */
   logOn = false;
+  /** 시험: 멈춤 (그리기만) */
+  paused = false;
+  /** 시험: 맞는 칸(초록)·공격 칸(빨강)·총구(노랑) 표시 */
+  debug = false;
 
   constructor(readonly box: HTMLElement, readonly opts: FightOpts = {}) {
     view.clear = true;
@@ -363,7 +367,7 @@ export class Match {
     const slow = versus.ko && versus.ko.t > KO_SEC - 0.6 ? 0.3 : 1;
     this.acc += dt * slow;
     let n = 0;
-    while (this.acc >= DT && n++ < 30) { this.acc -= DT; this.step(); }
+    while (this.acc >= DT && n++ < 30) { this.acc -= DT; if (!this.paused) this.step(); }
     this.draw();
   };
 
@@ -414,6 +418,7 @@ export class Match {
     for (const fi of order) fi.draw(c, { red: koRed });
     this.drawProj(c);
     this.drawFx(c, false);
+    if (this.debug) this.drawDebug(c);
     if (bg) for (const o of bg.objs) if (o.front) c.drawImage(o.img, Math.round(o.x), Math.round(o.y), Math.round(o.w), Math.round(o.h));
     if (this.superName) {
       const by = this.superName.by, im = dotText(this.superName.text, '#ffffff', 2);
@@ -425,6 +430,16 @@ export class Match {
     // K.O. 순간 화면 번쩍 (배경이 있을 때만: 투명 무대는 본문을 덮지 않게)
     if (bg && versus.ko && versus.ko.t > KO_SEC - 0.12) { c.fillStyle = `rgba(255,255,255,${(0.75 * (versus.ko.t - (KO_SEC - 0.12)) / 0.12).toFixed(3)})`; c.fillRect(0, 0, cv.width, cv.height); }
     drawVersusBars(c, p, st.fighters.filter((x) => x.team === 1));
+  }
+
+  private drawDebug(c: CanvasRenderingContext2D): void {
+    const box = (b: { x0: number; x1: number; z0: number; z1: number }, col: string) => { c.strokeStyle = col; c.lineWidth = 2; c.strokeRect(b.x0, LINE - b.z1, b.x1 - b.x0, b.z1 - b.z0); };
+    for (const f of this.st.fighters) {
+      box(f.hurt(), '#3f3');
+      if (f.state === 'atk' && f.atk?.normal) { const h = f.hitBox(); if (h) box(h, '#f33'); }
+      const m = f.muzzle(); c.fillStyle = '#ff0'; c.fillRect(m.x - 4, m.y - 4, 8, 8);
+    }
+    for (const p of this.st.proj) { c.strokeStyle = '#0ff'; c.strokeRect(p.x - p.size, p.y - p.size, p.size * 2, p.size * 2); }
   }
 
   private drawProj(c: CanvasRenderingContext2D): void {

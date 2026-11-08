@@ -1,0 +1,26 @@
+// 손에서 뻗어 나가는 그림(광선·부채꼴 총탄 등)의 시작점: 첫 장에 그림이 처음 나오는 x (그림 폭 비율).
+// 그림 가운데를 손에 두면 시작점이 몸 뒤로 간다(11-08 김성진 필살기 총탄이 몸 뒤에서 나옴). 그림 자료에서 뽑음 (첫 장 가운데가 0.35 보다 왼쪽인 것만)
+export const VFX_ORG: Record<string, number> = {
+  'x3-1.1-D-palm-blast': 0.199,
+  'x3-2.11-S-sound-pressure': 0.029,
+  'x3-2.13-D-triple-tracer': 0.022,
+  'x3-2.13-F-bullet-fan': 0.024,
+  'x3-2.14-D-headshot': 0.013,
+  'x3-2.14-S-pulse-band': 0.056,
+  'x3-2.3-S2-sonic-waves': 0.067,
+  'x3-3.1-S0-fire-tongue': 0.043,
+  'x3-3.1-S1-fire-beam': 0.09,
+  'x3-3.3-S2-v-blade': 0.11,
+  'x3-3.4-D-thread-yank': 0.016,
+  'x3-3.6-S1-white-shock-pillar': 0.027,
+  'x3-4.1-D-crimson-thrust': 0.008,
+  'x3-4.1-F-crimson-light-line': 0.303,
+  'x3-4.2-S1-bracket-trail': 0.026,
+  'x3-4.8-S2-holy-fire': 0.05,
+  'x3-4.9-D-blade-volley': 0.012,
+  'x3-5.2-S2-broadcast-band': 0.023,
+  'x3-c-air-ring': 0.105,
+  'x3-c-liquid-splash': 0.011,
+  'x3-c-slash-arc': 0.031,
+  'x3-npc-pierce-shot': 0.019,
+};

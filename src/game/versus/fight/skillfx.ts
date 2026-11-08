@@ -3,6 +3,7 @@
 //   hand = 지금 장의 총구·손끝, front = 몸 앞 바닥(dx), self = 발밑, body = 몸 가운데, target = 상대 자리,
 //   screen = 두 사람 사이 가운데 (필드의 「화면 가운데」 대신. 크기는 필드에서 캐릭터와 이루던 비율 그대로)
 // 피해 값은 부품의 dmg 를 쓰지 않는다: 그 기술 한 번의 전체 피해(rules DMG)를 맞는 횟수로 나눈 값 (Use.per)
+import { VFX_ORG } from './vfxorg';
 import { vfxOf, vfxDur, muzzleOf, framePt } from './art';
 import { later, type Stage, type Use, type Proj } from './stage';
 import type { Fighter, HitKind } from './fighter';
@@ -158,6 +159,9 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
     const p = s.at === 'body' ? posOf(me, s, c) : scr ? posOf(me, s, c) : (() => { const q = posOf(me, { at: 'front', ...s, dy: 0 }, c); if (s.dy) { q.gy += s.dy * q.k; q.hy += s.dy * q.k; } return q; })();
     let sc = (s.scale || 1) * p.k;
     if (s.w) sc = (1280 * s.w / fw) * REL;
+    // 손에서 뻗는 그림: 시작점이 손에 오게 (자료의 dx 가 이미 반 폭만큼 밀어 둔 것은 그대로)
+    const org = VFX_ORG[s.vfx];
+    if (s.at === 'hand' && org != null) { const half = (0.5 - org) * fw * sc, dxw = (s.dx || 0) * K; if (half > 100 * K && dxw < half * 0.5) p.x += me.face * (half - dxw); }
     const flip = s.flip === false ? false : me.face < 0;
     const y = md === 'bottom' ? p.gy : p.hy;
     const o: Json = { anchor: md === 'bottom' ? 'bottom' : 'center', flip };
