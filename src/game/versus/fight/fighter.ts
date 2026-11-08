@@ -2,7 +2,7 @@
 // 판정은 장 단위: 공격 칸 = 그 장의 손발 끝(reach), 맞는 칸 = 그 장의 몸 그림(몸통 + 뻗은 손발). 피해·경직·밀림은 rules.ts 표 하나
 import { drawSprite, framePt, muzzleOf, drawVfx, baseOf, type CharArt } from './art';
 import { Anim, has, nOf, loopOf, range, steps, type Step } from './anim';
-import { normalSeq, rangedSeq, skillSteps, stepsOf, countSkill, countSteps } from './moves';
+import { normalSeq, rangedSeq, skillSteps, stepsOf, countSkill, countSteps, MIN_TIP } from './moves';
 import { runFx, type FxCtx } from './skillfx';
 import { later, type Stage, type Use } from './stage';
 import {
@@ -161,7 +161,8 @@ export class Fighter {
   hitBox(): Box | null {
     const { id, f, air } = this.pose(), m = this.art.A[id];
     if (!m) return null;
-    const tip = m.reach[f];
+    // 짧은 손발도 몸끼리 붙어 선 상대에게는 닿게 (밀어내기 간격보다 조금 더)
+    const tip = Math.max(m.reach[f], MIN_TIP);
     const xa = this.x + this.face * (tip - TIP.back) * K, xb = this.x + this.face * (tip + TIP.front) * K;
     const b = baseOf(id, m, f, air);
     return { x0: Math.min(xa, xb), x1: Math.max(xa, xb), z0: this.z + (b - m.bot[f]) * K + 24, z1: this.z + (b - m.top[f]) * K };
@@ -763,7 +764,8 @@ export class Fighter {
   private downTick(): void {
     this.vx *= 0.9;
     if (this.state === 'ko') return;
-    this.lieT -= DT;
+    // 상대 필살기 중에는 누운 채 (일어나며 무적이 되어 필살기 나머지가 헛나가지 않게)
+    if (!this.foes().some((f) => f.inSuper)) this.lieT -= DT;
     if (this.lieT <= 0 && (this.anim?.id === '19')) this.getUp();
   }
   private getUp(): void {

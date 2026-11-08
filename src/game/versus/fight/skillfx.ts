@@ -67,10 +67,12 @@ function useOf(me: Fighter, c: FxCtx): Use { return c.use ?? me.newUse('skill', 
 function strike(me: Fighter, c: FxCtx, h: Json, area: { x: number; r: number; y?: number; all?: boolean; front?: boolean } | null, at?: { x: number; y: number }) {
   if (!h) return;
   const n = Math.max(1, h.n || 1), use = useOf(me, c);
+  // 여러 대로 나눠 맞는 것: 첫 대에 맞은 상대는 밀려나도 나머지를 다 맞는다 (11-08: 돌진 2타 등이 첫 대 넉백으로 헛나감)
+  const victims = new Set<Fighter>();
   const one = (i: number) => {
     const kind = i === n - 1 ? kindOf(h.kind, 'heavy') : kindOf(h.mid, 'light');
-    for (const o of me.foes()) {
-      if (area && !area.all) {
+    for (const o of i > 0 && victims.size ? [...victims] : me.foes()) {
+      if (area && !area.all && !(i > 0 && victims.size)) {
         const b = o.hurt();
         if (area.x + area.r < b.x0 || area.x - area.r > b.x1) continue;
         if (area.front && (o.x - me.x) * me.face < -30) continue;
@@ -79,7 +81,8 @@ function strike(me: Fighter, c: FxCtx, h: Json, area: { x: number; r: number; y?
       const b = o.hurt();
       const hx = at?.x != null ? Math.max(b.x0, Math.min(b.x1, at.x)) : area && !area.all ? Math.max(b.x0, Math.min(b.x1, area.x)) : o.x - me.face * 14;
       const hy = at?.y != null ? Math.max(LINE - b.z1 + 20, Math.min(LINE - b.z0 - 20, at.y)) : area?.y != null ? area.y : LINE - (b.z0 + b.z1) / 2;
-      o.receive(me, { use, kind, at: { x: hx, y: hy }, noVfx: !!h.noVfx, vfx: h.vfx && vfxOf(h.vfx) ? h.vfx : undefined, vs: h.vs, tint: h.tint, sound: h.sfx });
+      const got = o.receive(me, { use, kind, at: { x: hx, y: hy }, noVfx: !!h.noVfx, vfx: h.vfx && vfxOf(h.vfx) ? h.vfx : undefined, vs: h.vs, tint: h.tint, sound: h.sfx });
+      if (i === 0 && got !== 'miss') victims.add(o);
     }
   };
   for (let i = 0; i < n; i++) i ? later(me.st, i * (h.every || 0.1), () => one(i)) : one(0);
@@ -196,9 +199,10 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
     let tt = 0, done = false;
     const tick = () => {
       tt += DT;
-      if (me.state !== 'atk') return;
+      if (me.state === 'hit' || me.state === 'air' || me.state === 'down' || me.state === 'ko') return;
       me.vx = me.face * v;
-      if (!done && s.hit && tt >= (s.delay || 0)) for (const o of me.foes()) { const b = o.hurt(), x0 = me.x - me.half() - 10, x1 = me.x + me.half() + 10, fr = me.face > 0 ? x1 + 30 : x0 - 30; if (Math.min(x0, x1, fr) <= b.x1 && Math.max(x0, x1, fr) >= b.x0) { done = true; strike(me, c, s.hit, { x: o.x, r: 10 }); if (s.stop) tt = T; } }
+      // delay = 닿은 뒤 늦게 베이는 시간 (필드와 같게: 닿는 판정은 바로, 맞음만 늦게)
+      if (!done && s.hit) for (const o of me.foes()) { const b = o.hurt(), x0 = me.x - me.half() - 10, x1 = me.x + me.half() + 10, fr = me.face > 0 ? x1 + 30 : x0 - 30; if (Math.min(x0, x1, fr) <= b.x1 && Math.max(x0, x1, fr) >= b.x0) { done = true; const ox = o.x; if (s.delay) later(me.st, s.delay, () => strike(me, c, s.hit, { x: o.x, r: Math.abs(o.x - ox) + 60 })); else strike(me, c, s.hit, { x: o.x, r: 10 }); if (s.stop) tt = T; } }
       if (tt < T) later(me.st, DT, tick); else me.vx = 0;
     };
     tick();
@@ -374,10 +378,19 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
   summon(me, s, c) {
     const p = posOf(me, { at: 'front', ...s }, c);
     const T = Math.min(5, s.time || 4);
-    const o = { k: 'obj', anim: s.anim, vfx: s.vfx, alpha: s.alpha, icon: s.icon || 'box', x: p.x, y: s.at === 'hand' ? p.hy : p.gy, ground: s.at !== 'hand', c: s.color || me.color, t: T, t0: T, s: p.k, face: me.face };
+    // 분신(decoy): 내 그림을 반투명하게 그 자리에 (11-08: 네모로 나오던 것)
+    const decoy = s.icon === 'decoy';
+    const did = decoy ? (s.anim && me.art.A[s.anim] ? s.anim : me.idleId()) : undefined;
+    const o = { k: 'obj', anim: s.anim, did, by: decoy ? me : undefined, over: s.over ?? 0.55, vfx: s.vfx, alpha: s.alpha, icon: s.icon || 'box', x: p.x, y: s.at === 'hand' ? p.hy : p.gy, ground: s.at !== 'hand', c: s.color || me.color, t: T, t0: T, s: p.k, face: me.face };
     me.st.fx.push(o);
     if (o.ground) sheet(me.st, 'fx-summon', o.x, o.y + 8 * o.s, 1.6 * o.s, { anchor: 'bottom', tint: colOf(me, s) });
-    if (s.tick) { const n = Math.floor(T / (s.tick.every || 1)); for (let i = 1; i <= n; i++) later(me.st, i * s.tick.every, () => runFx(me, s.tick.fx, { ...c, o: { x: o.x, y: o.y - 40 * o.s }, pt: { x: o.x, z: 0, onT: false } })); }
+    // 분신이 쏘는 것은 분신 그림의 총구에서
+    const hand = () => {
+      if (!did) return { x: o.x, y: o.y - 40 * o.s };
+      const m = me.art.A[did], f = Math.floor(me.st.t * 6) % m.n, [px, py] = muzzleOf(me.art, did, f);
+      return framePt(o.x, 0, o.face, did, m, f, false, px, py);
+    };
+    if (s.tick) { const n = Math.floor(T / (s.tick.every || 1)); for (let i = 1; i <= n; i++) later(me.st, i * s.tick.every, () => runFx(me, s.tick.fx, { ...c, o: hand(), pt: { x: o.x, z: 0, onT: false } })); }
   },
   self(me, s, c) {
     const k = K * (s.scale || 1), x0 = me.x, f = me.face;

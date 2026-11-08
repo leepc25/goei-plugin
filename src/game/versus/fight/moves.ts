@@ -8,10 +8,13 @@ import { has, nOf, loopOf, range, type Step } from './anim';
 type Json = any;
 
 /** 때리는 장: 설정 hit(1부터) 있으면 그 장, 없으면 손발이 가장 앞으로 뻗은 장 */
+/** 평타 손발 끝 최소 (그림 측정 px, 몸 가운데부터) */
+export const MIN_TIP = 80;
 export function impactOf(art: CharArt, id: string): number {
   const m = art.A[id];
   const set = (art.cfg.hit as Record<string, number> | undefined)?.[id];
-  if (set) return Math.max(0, Math.min(m.n - 1, set - 1));
+  // 정해 둔 때리는 장의 손발이 몸 밖으로 거의 안 나가면(그림 측정상 닿을 수 없음) 가장 멀리 뻗은 장을 쓴다 (11-08 이도형 2타)
+  if (set) { const f = Math.max(0, Math.min(m.n - 1, set - 1)); if (m.reach[f] >= MIN_TIP) return f; }
   let imp = 1;
   for (let f = 1; f < m.n; f++) if (m.reach[f] > m.reach[imp]) imp = f;
   return Math.min(imp, m.n - 1);

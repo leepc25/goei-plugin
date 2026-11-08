@@ -12,7 +12,7 @@ import type { SfxId } from '../../action/audio';
 import { Fighter, emptyCtl, type Btn, type Ctl } from './fighter';
 import { Brain, PERSONAS } from './ai';
 import { stepProj, carryPt } from './skillfx';
-import { drawVfx, vfxOf, vfxDur } from './art';
+import { drawVfx, drawSprite, vfxOf, vfxDur } from './art';
 import { drawVersusBars, drawBench, setVsSay } from './hud';
 import type { Stage, Fx, Proj } from './stage';
 import { K, LINE, DT, HP, WALL } from './rules';
@@ -561,6 +561,11 @@ export class Match {
       }
       case 'obj': {
         const a = e.alpha ?? 1, s = e.s ?? K;
+        if (e.by && e.did) {
+          const by = e.by as Fighter, n = by.art.A[e.did]?.n ?? 1;
+          drawSprite(c, by.art, e.did, Math.floor(this.st.t * 6) % n, e.x, 0, e.face, false, { alpha: (e.alpha ?? 0.45) * Math.min(1, (e.t / e.t0) * 4), over: { c: e.c, a: e.over } });
+          return;
+        }
         if (e.vfx && drawVfx(c, e.vfx, e.t0 - e.t, e.x, e.y, s, { anchor: e.ground ? 'bottom' : 'center', flip: e.face < 0, loop: true, alpha: a })) return;
         c.save(); c.globalAlpha = a * Math.min(1, e.t * 3);
         const w = Math.round(28 * s), h = Math.round(28 * s), y = e.ground ? e.y - h : e.y - h / 2;
