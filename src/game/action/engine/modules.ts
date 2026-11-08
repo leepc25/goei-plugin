@@ -1829,6 +1829,8 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
     key = `w${surv.wave}`; text = `WAVE ${surv.wave}`; sub = boss ? '대장 등장' : ''; pal = boss ? BIG_RED : BIG_BLUE; say = boss ? 'bossRoar' : 'enemySpawn';
   }
   const cy = Math.round(top + (H - top) * 0.34);
+  // 판 사이 넘어가기 동안은 앞 판 글자(WINNER 등)를 남기지 않는다 (11-08 사용자 「지워져야지」)
+  if (versus.trans) { vsBanner.key = ''; vsBanner.img = null; vsBanner.out = null; c.restore(); return; }
   if (key !== vsBanner.key) {
     // 앞 글자는 접히며 흘러 나간다
     // 앞 글자가 다 접혀 나간 뒤에 새 글자를 편다 (겹치지 않게)
