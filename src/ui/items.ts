@@ -134,19 +134,20 @@ function mergeButton(ctx: ChatContext, cls: string): string {
   return `<button class="${cls} it-merge" data-action="items-merge-start" aria-label="합치기" title="같은 소모품끼리 합쳐요 (이름에 같은 낱말)" ${any ? '' : 'disabled'}>${ICONS.refresh}<span class="${cls === 'ph-tool' ? 'ph-tool-l' : ''}">합치기</span></button>`;
 }
 
-function itemsPane(ctx: ChatContext): string {
-  const live = liveOf(ctx);
+/** 칸 수·넘침·무게 (장착 칸 위 한 줄). 모두 같은 꼴의 칸(.it-stat), 넘치면 붉은 칸 */
+function statsRow(ctx: ChatContext, live: Item[]): string {
   const carried = gridItems(live).length;
   const slots = itemSlots(ctx.chat.scriptstate);
   const over = Math.max(0, carried - slots);
+  return `<div class="it-stats"><span class="it-stat${over ? ' over' : ''}" title="칸 ${carried} / ${slots}${over ? ` (${over}칸 넘침)` : ''}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small>${over ? `<em>+${over}</em>` : ''}</span>${weightPill(ctx, live)}</div>`;
+}
+
+function itemsPane(ctx: ChatContext): string {
   const seg = (v: 'grid' | 'log', label: string) => `<button class="gx-seg${itemsUi.view === v ? ' on' : ''}" data-action="items-view" data-value="${v}" aria-pressed="${itemsUi.view === v}">${label}</button>`;
+  // 도구 줄 (2026-11-08 사용자): 왼쪽 물건|기록, 오른쪽 직접 넣기·합치기·찾기. 칸 수·넘침·무게는 장착 띠의 장착 칸 위로 (equipBox)
   const tools = `<div class="gx-rec-tools gx-wt-tools it-tools">
-    <span class="it-cnt" title="칸 ${carried} / ${slots}">${ICONS.bag}<b>${carried}</b><small>/ ${slots}</small></span>
-    ${over ? `<span class="it-over">넘침 <b>${over}</b></span>` : ''}
-    ${weightPill(ctx, live)}
     <div class="gx-segs gx-segs-sm it-segs">${seg('grid', '물건')}${seg('log', '기록')}</div>
-    ${isPhone() ? '' : `<span class="it-right">${addButton('it-act')}${mergeButton(ctx, 'it-act')}</span>`}
-    <input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기">
+    <span class="it-right">${isPhone() ? '' : `${addButton('it-act')}${mergeButton(ctx, 'it-act')}`}<input class="gx-wt-q it-q" type="search" data-input="items-q" value="${esc(itemsUi.q)}" placeholder="찾기: 물건·기록" aria-label="물건·기록 찾기"></span>
   </div>`;
   // 그림 팩(host/itemicons.ts): 처음 열 때 받는다. 받는 동안·실패는 한 줄로만 알리고, 그림은 선 아이콘으로 대신한다
   const st = itemIconStatus();
@@ -163,7 +164,7 @@ function weightPill(ctx: ChatContext, live: Item[]): string {
   const cap = itemCarry(ctx.chat.scriptstate);
   const ov = w > cap ? Math.min(1, (w - cap) / cap) : 0;
   const num = (n: number) => String(Number(n.toFixed(1)));
-  return `<span class="it-wgt${w > cap ? ' over' : ''}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ''} title="무게 ${num(w)}kg / 소지 한도 ${num(cap)}kg${w > cap ? ` (${num(w - cap)}kg 넘음)` : ''}">${ICONS.weight}<b>${num(w)}</b><small>/ ${num(cap)}kg</small></span>`;
+  return `<span class="it-stat it-wgt${w > cap ? ' over' : ''}"${w > cap ? ` style="--ov:${ov.toFixed(3)}"` : ''} title="무게 ${num(w)}kg / 소지 한도 ${num(cap)}kg${w > cap ? ` (${num(w - cap)}kg 넘음)` : ''}">${ICONS.weight}<b>${num(w)}</b><small>/ ${num(cap)}kg</small></span>`;
 }
 
 /** 아바타 자리 (고른 아바타의 정면 대기 동작). 고르기 전·고유 인물이 아니면 빈 자리 */
@@ -190,7 +191,7 @@ export function equipBox(ctx: ChatContext, where: 'items' | 'sell', sel = ''): s
   const slots = `<div class="it-eqslots">${(['weapon', 'gear'] as const).flatMap((k) => Array.from({ length: EQUIP_SLOTS[k] }, (_, i) => slot(k, i))).join('')}</div>`;
   if (where === 'sell') return `<section class="it-box it-eqbox sell" aria-label="장착">${slots}</section>`;
   const av = avatarHtml(ctx);
-  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}${slots}${useBox(ctx)}</div></section>`;
+  return `<section class="it-box it-eqbox" aria-label="장착"><div class="it-eqin">${av ? `<div class="it-av">${av}</div>` : ''}<div class="it-eqcol">${statsRow(ctx, live)}${slots}</div>${useBox(ctx)}</div></section>`;
 }
 
 /** 「사용」칸 (장착 띠 오른쪽): 다음 메시지에 같이 보낼 물건 (칸 수 정하지 않음, 같은 물건 또 놓으면 ×2). 비면 안내 한 줄 */
