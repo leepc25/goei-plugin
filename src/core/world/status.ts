@@ -21,6 +21,8 @@ export interface StatusTag {
   identity: string;
   /** 잔고 칸 (10칸, 2026-10-27): 숫자만 남긴 글 ('1230000'). 칸이 없거나 못 읽으면 빈 문자열 */
   wallet: string;
+  /** 포인트 칸 (11칸, 2026-11-08 백일몽): 숫자만 남긴 글. 칸이 없거나 못 읽으면 빈 문자열 */
+  points: string;
 }
 
 // 여는 기호: [▣ 【▣ ［▣ (▣ 앞 공백 허용). 닫는 기호가 없으면 줄 끝까지
@@ -39,20 +41,22 @@ const walletText = (t: string) => {
   const n = none(t) ? null : parseWalletCell(t);
   return n === null ? '' : String(n);
 };
+/** 포인트 칸: 「900」「900p」「1,200 포인트」 → 숫자 글 */
+const pointsText = (t: string) => walletText(String(t ?? '').replace(/\s*(?:p|P|포인트|points?)$/i, ''));
 
 /** 동행·투입·신분·잔고 칸 (뒤 칸들). 비어 있으면 옛 상태창 */
-function extras(x: string[]): { companions: string[]; deployed: boolean | null; identity: string; wallet: string } {
+function extras(x: string[]): { companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
   const d = (x[1] ?? '').trim();
   const id = (x[2] ?? '').trim();
-  return { companions: splitNames(x[0] ?? ''), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? '' : id, wallet: walletText(x[3] ?? '') };
+  return { companions: splitNames(x[0] ?? ''), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? '' : id, wallet: walletText(x[3] ?? ''), points: pointsText(x[4] ?? '') };
 }
 
 /** 위치 뒤 칸들: 목표(괴이), 동행, 투입, 신분, 잔고. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string } {
+function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string; points: string } {
   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
   const after = rest.slice(1);
   if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
-  return { target: clean(after[0]), ...extras(after.slice(1, 5)) };
+  return { target: clean(after[0]), ...extras(after.slice(1, 6)) };
 }
 
 /** 칸 구성대로 이름 붙이기 (구성에 없는 칸은 빈 값, 투입 칸이 없으면 null) */
@@ -74,6 +78,7 @@ function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
     deployed: shape.includes('deployed') ? (none(d) ? false : /투입|deployed/i.test(d)) : null,
     identity: clean(get('identity')),
     wallet: walletText(get('wallet')),
+    points: pointsText(get('points')),
   };
 }
 
@@ -183,6 +188,8 @@ export interface StatusTimeline {
   prevWallet: Map<string, number>;
   /** 마지막으로 읽힌 잔고 */
   lastWallet: number | null;
+  /** 상태창 원문 → 바로 앞 상태창의 포인트 (둘 다 읽혔을 때만) */
+  prevPoints: Map<string, number>;
 }
 
 /** 채팅 응답들의 상태창 시각을 차례로 모아 「지난 장면」을 찾는다 */
@@ -193,6 +200,8 @@ export function statusTimeline(texts: string[]): StatusTimeline {
   let start: number | null = null;
   let last: { raw: string; minute: number } | null = null;
   let lastWallet: number | null = null;
+  const prevPoints = new Map<string, number>();
+  let lastPoints: number | null = null;
   for (const t of texts) {
     for (const tag of findStatusTags(t)) {
       const m = statusMinute(tag.date, tag.time);
@@ -200,11 +209,14 @@ export function statusTimeline(texts: string[]): StatusTimeline {
       const w = tag.wallet ? Number(tag.wallet) : null;
       if (w !== null && lastWallet !== null && !prevWallet.has(tag.raw.trim())) prevWallet.set(tag.raw.trim(), lastWallet);
       if (w !== null) lastWallet = w;
+      const p = tag.points ? Number(tag.points) : null;
+      if (p !== null && lastPoints !== null && !prevPoints.has(tag.raw.trim())) prevPoints.set(tag.raw.trim(), lastPoints);
+      if (p !== null) lastPoints = p;
       if (m === null) continue;
       if (start === null) start = m;
       if (last !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last.minute);
       last = { raw: tag.raw.trim(), minute: m };
     }
   }
-  return { prev, start, last, seen, prevWallet, lastWallet };
+  return { prev, start, last, seen, prevWallet, lastWallet, prevPoints };
 }

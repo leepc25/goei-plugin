@@ -185,3 +185,18 @@ test('원이 아닌 값 (2026-11-08 사용자): 값 칸 글은 대가, 원과 �
   assert.equal(boughtLine({ name: '부적', paidWith: '어제 기억', price: 5000 }), '부적 (paid with 어제 기억 + 5,000 won)');
   assert.equal(boughtLine({ name: '생수', price: 1500 }), '생수');
 });
+
+// 백일몽 포인트 상점 (2026-11-08 사용자: 포인트는 포인트 상점에서만): 정체 currency 줄, 값은 포인트, 「900p」도 값으로
+test('포인트 상점: currency points 면 정체에 표시, 「900p」 값도 포인트 숫자로', () => {
+  const raw = '<shop-identity>\nsells: 복지 물품\nnever: 현금 거래\nprices: 포인트만\ncurrency: points\n</shop-identity>\n<owner>어서 오세요.</owner>\n<shelf>\n탈모약|100|사용|pill bottle|복지몰 인기 상품||\n재생 물약|10000p|소모1|potion|상처를 되돌린다|회복|\n</shelf>';
+  const r = parseShelf(raw, null);
+  assert.equal(r.identity.points, true);
+  assert.deepEqual(r.items.map((x) => [x.name, x.price, x.pay]), [['탈모약', 100, undefined], ['재생 물약', 10000, undefined]]);
+  const won = parseShelf(raw.replace('currency: points', 'currency: won'), null);
+  assert.equal(won.identity.points, undefined);
+  assert.equal(won.items[1].pay, '10000p', '원 상점에서는 포인트 값을 원으로 바꾸지 않음');
+  const st = applyShelf(readShop(settleShop(chat('x\n[shop: 임직원 복지몰]'), 3).vars), r, shopSettings({}));
+  assert.equal(readShop(shopVars(st)).identity.points, true, '저장했다 읽어도 포인트 상점');
+  const sys = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({}))[0].content;
+  assert.ok(sys.includes("Baekilmong's point shop"), '포인트 상점 절');
+});

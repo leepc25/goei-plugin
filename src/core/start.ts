@@ -1,4 +1,5 @@
 import { BUILTIN, factionList, factionVars, PLAYER_FM, scenesOf } from './factions';
+import { isPointsOrg, POINTS_ON_VAR } from './world/statuscols';
 import { findFaction, findScenario, greetingKey, isFaction, isLang, SCENARIOS } from './scenarios';
 import { agentScene, factionScenes, sceneText } from './scenes';
 import { hasSceneCard, isSceneMessage, sceneMessage, UNSENT_MARK } from './dispatch';
@@ -138,6 +139,8 @@ export function planStart(
       $st_lang_pick: choice.lang,
       $st_fm_pick: String(choice.fm),
       $ib_affiliation: faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation,
+      // 백일몽 포인트 칸 「자동」: 백일몽 소속으로 시작하면 첫 응답부터 상태창에 포인트 칸 (core/world/statuscols.ts)
+      [POINTS_ON_VAR]: isPointsOrg(faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation) ? '1' : '0',
       $st_anomaly_on: '0',
       $an_report: '',
       $in_report: '',

@@ -30,9 +30,15 @@ const chat = (id) => ({
   ].map(([role, data, chatId]) => ({ role, data, chatId })),
 });
 
-test('켜짐: 신분이 백일몽이면, 아니면 지난 포인트 기록이 있을 때만', () => {
+test('켜짐: 포인트 칸이 쓰이면(자동이면 신분이 백일몽), 아니면 지난 포인트 기록이 있을 때만', () => {
   assert.equal(Pt.lastIdentity(chat('백일몽/사원')), '백일몽/사원');
-  assert.equal(Pt.pointsOn(chat('백일몽/사원')), true);
+  assert.equal(Pt.pointsFlagFor(chat('백일몽/사원')), '1', '자동 켜짐 표시를 마지막 신분에 맞춤');
+  assert.equal(Pt.pointsFlagFor(chat('관리국/요원')), '0');
+  assert.equal(Pt.pointsFlagFor({ scriptstate: { $st_points_on: '1' }, message: [] }, true), null, '신분 칸이 없으면 시작 소속, 같으면 그대로');
+  assert.equal(Pt.isPointsOrg('백일몽 주식회사'), true);
+  const on = chat('백일몽/사원');
+  on.scriptstate = { $st_points_on: '1' };
+  assert.equal(Pt.pointsOn(on), true);
   assert.equal(Pt.pointsOn(chat('관리국/요원')), false);
   const c = chat('관리국/요원');
   c.scriptstate = Pt.pointsVars({ start: 0, log: [{ id: 'x', anchor: 'c1', amount: 10, memo: 'm', src: 'story', at: '' }] });

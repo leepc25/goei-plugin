@@ -14,7 +14,8 @@ import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
-import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
+import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON_VAR, pointsAuto, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
+import { pointsFlagFor } from '../core/points';
 import { invOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots } from '../core/items';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
@@ -102,12 +103,16 @@ const group = (title: string, body: string, note = '') =>
   `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
 
 /** 상태창 칸 표 (설계안 7절): 칸마다 사용·표시. 날짜·시각·위치는 사용을 끌 수 없다. 플러그인이 쓰는 칸은 끄면 그 기능도 꺼진다고 알린다 */
-function statusColsTable(cfg: ColConfig, busy: boolean): string {
+function statusColsTable(cfg: ColConfig, busy: boolean, vars: Record<string, unknown> | undefined): string {
   const rows = STATUS_COLS.map((c) => {
     const m = cfg[c.id];
-    const use = seg('set-col', m === 'off' ? '0' : '1', [['1', '사용'], ['0', '사용 안 함']], busy || c.locked).replace(/data-value="(\d)"/g, `data-value="${c.id}:use:$1"`);
-    const show = seg('set-col', m === 'on' ? '1' : '0', [['1', '표시'], ['0', '숨김']], busy || m === 'off').replace(/data-value="(\d)"/g, `data-value="${c.id}:show:$1"`);
-    const hint = c.locked ? '늘 사용' : c.feature ? `끄면 ${c.feature}도 꺼져요` : '';
+    // 포인트 칸은 「자동」(기본): 신분이 백일몽일 때만 사용 (2026-11-08 사용자)
+    const auto = c.id === 'points' && pointsAuto(vars);
+    const useOpts: [string, string][] = c.id === 'points' ? [['a', '자동'], ['1', '사용'], ['0', '사용 안 함']] : [['1', '사용'], ['0', '사용 안 함']];
+    const use = seg('set-col', auto ? 'a' : m === 'off' ? '0' : '1', useOpts, busy || c.locked).replace(/data-value="([a\d])"/g, `data-value="${c.id}:use:$1"`);
+    const showOn = auto ? vars?.[colVar('points')] !== AUTO_HIDE : m === 'on';
+    const show = seg('set-col', showOn ? '1' : '0', [['1', '표시'], ['0', '숨김']], busy || (m === 'off' && !auto)).replace(/data-value="(\d)"/g, `data-value="${c.id}:show:$1"`);
+    const hint = c.locked ? '늘 사용' : c.id === 'points' ? '자동: 신분이 백일몽일 때만 사용' : c.feature ? `끄면 ${c.feature}도 꺼져요` : '';
     return `<div class="st-col-row${m === 'off' ? ' off' : ''}"><div class="st-col-name"><b>${c.label}</b>${hint ? `<small>${hint}</small>` : ''}</div>${use}${show}</div>`;
   });
   // 사용 중인 칸 전부 표시·숨김 (2026-11-08 사용자: 칸별 표시에 더해 일괄)
@@ -351,7 +356,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     status: `${group('상태창', [
       field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.', 'device'),
     ].join(''))}
-    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, statusColsTable(colCfg, busy),
+    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, statusColsTable(colCfg, busy, scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars),
       `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
 `,
     // 가계부(시작 잔고·잔고 직접 수정): 설정 「기록」 페이지 안의 묶음 (2026-11-05 사용자: 가계부가 기록 하위 탭이니 상태창에는 잔고 칸 표시만)
@@ -498,11 +503,30 @@ async function saveDefaults(env: SettingsEnv, change: (p: Prefs) => Prefs): Prom
 const basicPatch = (env: SettingsEnv, patch: Partial<BasicSettings>) => saveDefaults(env, (p) => ({ ...p, basic: { ...p.basic, ...patch } }));
 
 /** "칸:use:1|0" / "칸:show:1|0" → [칸, 새 모드]. 바뀌는 게 없거나 잠긴 칸을 끄려 하면 null */
-/** 「모든 칸」 표시·숨김 (v = all:show:1|0): 사용 중인 칸 가운데 바뀌는 것만 {변수: 값} */
-function allShowVars(cfg: ColConfig, v: string): Record<string, string> | null {
+/** 「모든 칸」 표시·숨김 (v = all:show:1|0): 사용 중인 칸 가운데 바뀌는 것만 {변수: 값}. 포인트 칸이 자동이면 자동은 그대로 두고 표시만 */
+function allShowVars(cfg: ColConfig, v: string, vars?: Record<string, unknown>): Record<string, string> | null {
   if (v !== 'all:show:1' && v !== 'all:show:0') return null;
   const to: ColMode = v.endsWith('1') ? 'on' : 'hide';
-  return Object.fromEntries(STATUS_COLS.filter((c) => cfg[c.id] !== 'off' && cfg[c.id] !== to).map((c) => [colVar(c.id), to]));
+  const out: Record<string, string> = Object.fromEntries(STATUS_COLS.filter((c) => !(c.id === 'points' && pointsAuto(vars)) && cfg[c.id] !== 'off' && cfg[c.id] !== to).map((c) => [colVar(c.id), to]));
+  if (pointsAuto(vars)) {
+    const want = to === 'on' ? AUTO : AUTO_HIDE;
+    if ((vars?.[colVar('points')] === AUTO_HIDE ? AUTO_HIDE : AUTO) !== want) out[colVar('points')] = want;
+  }
+  return out;
+}
+
+/** 포인트 칸 (v = points:use:a|1|0 / points:show:1|0) → 새 변수 값. 자동이면 표시·숨김도 자동 안에서. 바뀔 게 없으면 null */
+function pointsColVar(vars: Record<string, unknown> | undefined, v: string): string | null {
+  const [id, what, val] = v.split(':');
+  if (id !== 'points') return null;
+  const raw = vars?.[colVar('points')];
+  const auto = pointsAuto(vars);
+  const hidden = auto ? raw === AUTO_HIDE : raw === 'hide';
+  let next: string | null = null;
+  if (what === 'use') next = val === 'a' ? (hidden ? AUTO_HIDE : AUTO) : val === '1' ? (hidden ? 'hide' : 'on') : val === '0' ? 'off' : null;
+  else if (what === 'show' && (val === '1' || val === '0')) next = auto ? (val === '1' ? AUTO : AUTO_HIDE) : raw === 'off' ? null : val === '1' ? 'on' : 'hide';
+  const cur = typeof raw === 'string' && raw ? raw : AUTO;
+  return next === null || next === cur ? null : next;
 }
 
 function nextColMode(cfg: ColConfig, v: string): [ColId, ColMode] | null {
@@ -787,9 +811,14 @@ export async function handleSettings(action: string, value: string | undefined, 
         return true;
       case 'set-col': {
         // 새 채팅 기본값의 상태창 칸 구성 ($st_col_<id>)
-        const all = allShowVars(colConfig(getPrefs().vars), v);
+        const all = allShowVars(colConfig(getPrefs().vars), v, getPrefs().vars);
         if (all) {
           if (Object.keys(all).length) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), ...all } }));
+          return true;
+        }
+        if (v.startsWith('points:')) {
+          const pv = pointsColVar(getPrefs().vars, v);
+          if (pv) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [colVar('points')]: pv } }));
           return true;
         }
         const hit = nextColMode(colConfig(getPrefs().vars), v);
@@ -877,8 +906,16 @@ export async function handleSettings(action: string, value: string | undefined, 
         let walletOff = false;
         await save(ctx, env, (chat) => {
           const cfg = colConfig(chat.scriptstate);
-          const all = allShowVars(cfg, v);
+          const all = allShowVars(cfg, v, chat.scriptstate);
           if (all) return Object.keys(all).length ? all : null;
+          if (v.startsWith('points:')) {
+            const pv = pointsColVar(chat.scriptstate, v);
+            if (!pv) return null;
+            // 자동으로 돌리면 켜짐 표시를 지금 신분(없으면 시작 소속)에 바로 맞춘다
+            const flag = pv === AUTO || pv === AUTO_HIDE ? pointsFlagFor(chat, isPointsOrg(String(chat.scriptstate?.['$ib_affiliation'] ?? ''))) : null;
+            const vars = { ...(chat.scriptstate ?? {}), [colVar('points')]: pv, ...(flag ? { [POINTS_ON_VAR]: flag } : {}) };
+            return { [colVar('points')]: pv, ...(flag ? { [POINTS_ON_VAR]: flag } : {}), [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(colConfig(vars))) };
+          }
           const hit = nextColMode(cfg, v);
           if (!hit) return null;
           const next = { ...cfg, [hit[0]]: hit[1] };

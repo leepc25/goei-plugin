@@ -20,7 +20,8 @@ import { findDoc, innerBody } from '../core/wiki';
 import { peopleStore } from '../core/people/store';
 import { peopleSettings } from '../core/people/settings';
 import { identityText } from '../core/people/identity';
-import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT, type Wallet } from '../core/wallet';
+import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
 import {
@@ -66,7 +67,14 @@ export function resetShop(): void {
   Object.assign(shopUi, { open: false, solo: false, loading: '', detail: '', drawer: false, chip: '', chipKind: '', pick: false, lockH: 0, input: '', notice: '', info: '', failRaw: '' });
 }
 
-const balanceOf = (ctx: ChatContext) => walletBalance(readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(ctx.chat));
+/** 지금 상점이 백일몽 포인트 상점인가 (2026-11-08 사용자: 포인트는 포인트 상점에서만). 그리기·동작 첫머리에서 맞춘다 */
+let pts = false;
+/** 값 짧은 표기: 원 상점은 원, 포인트 상점은 p */
+const amt = (n: number): string => (pts ? `${n < 0 ? '−' : ''}${Math.abs(Math.trunc(n)).toLocaleString('en-US')}p` : shortWon(n));
+/** 이 상점의 장부: 원 상점은 가계부, 포인트 상점은 포인트 장부 */
+const ledgerOf = (vars: Record<string, unknown> | undefined, p: boolean) => (p ? readPoints(vars) : readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT));
+const ledgerVars = (w: Wallet, p: boolean) => (p ? pointsVars(w) : walletVars(w));
+const balanceOf = (ctx: ChatContext) => walletBalance(ledgerOf(ctx.chat.scriptstate, pts), aliveAnchors(ctx.chat));
 
 /** 주인 얼굴: 명부 인물(이름·별칭·영문명)이면 그 얼굴 사진, 아니면 빈 얼굴 칸 */
 /** 주인 사진을 자를 세로/가로 비율 (칸 150 × 약 270 보다 조금 길게, 넘치는 아래는 칸이 가린다) */
@@ -88,11 +96,12 @@ const shell = (inner: string, cls: string, action: string, keep: string, label: 
   `<div class="gx-agpop ${cls}" data-action="${action}" role="dialog" aria-label="${esc(label)}"><div class="gx-agpop-card it-card ${cls}-card" data-action="${keep}">${inner}</div></div>`;
 
 /** 값 표시: 원, 원이 아닌 대가, 또는 둘 다 (2026-11-08 사용자: 무엇이든 자판기 등 원으로 안 파는 가게) */
-const costText = (it: { price: number; pay?: string }) => (it.pay ? `${it.pay}${it.price ? ` + ${shortWon(it.price)}` : ''}` : shortWon(it.price));
+const costText = (it: { price: number; pay?: string }) => (it.pay ? `${it.pay}${it.price ? ` + ${amt(it.price)}` : ''}` : amt(it.price));
 
 export function shopPopup(ctx: ChatContext): string {
   if (!shopUi.open) return '';
   const st = currentShop(ctx.chat);
+  pts = !!st?.identity.points;
   const phone = isPhone();
   if (!st) {
     return shell(`<p class="sh-none">지금 열 수 있는 상점이 없어요. 가게 장면에서 응답 아래 「상점 열기」가 뜰 때 열 수 있어요.</p><div class="it-btns"><button class="gx-chip" data-action="shop-close">닫기</button></div>`, 'sh-wrap', 'shop-close', 'shop-keep', '상점');
@@ -100,7 +109,7 @@ export function shopPopup(ctx: ChatContext): string {
   const bal = balanceOf(ctx);
   const tools = `<div class="gx-rec-tools gx-wt-tools it-tools sh-tools">
     <span class="sh-name">${ICONS.bag}<b>${esc(st.shop)}</b></span>
-    <span class="it-cnt sh-bal" title="잔고">${esc(formatWon(bal))}</span>
+    <span class="it-cnt sh-bal" title="${pts ? '포인트' : '잔고'}">${esc(pts ? amt(bal) : formatWon(bal))}</span>
     <span class="it-right">
       ${phone ? '' : `<button class="it-act" data-action="shop-pick" ${st.closed || !st.loaded ? 'disabled' : ''} aria-label="${shopUi.pick ? '구매' : '판매'}">${ICONS.swap}<span>${shopUi.pick ? '구매' : '판매'}</span></button>`}
       <button class="it-act" data-action="shop-refresh" ${shopUi.loading || st.closed ? 'disabled' : ''} aria-label="새로고침">${ICONS.refresh}<span>새로고침</span></button>
@@ -151,7 +160,7 @@ function bodyHtml(ctx: ChatContext, st: ShopState, bal: number): string {
 /** 희귀 진열장: 단 하나. 그림 2배(170px, 정수 확대)·이름·설명·효과·값을 다 펼쳐 보이고, 테두리에 빛이 돈다. 누르면 상세 */
 function rareHtml(it: ShopItem, bal: number, closed: boolean): string {
   const poor = it.price > bal;
-  return `<button class="sh-zone sh-rare${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="희귀 ${esc(it.name)} ${esc(costText(it))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
+  return `<button class="sh-zone sh-rare${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="희귀 ${esc(it.name)} ${esc(costText(it))}${poor ? (pts ? ' (포인트 부족)' : ' (잔고 부족)') : ''}" ${closed ? 'disabled' : ''}>
     <span class="sh-rare-ring" aria-hidden="true"></span>
     <span class="sh-rare-pic"><span class="sh-rare-glow" aria-hidden="true"></span>${pic(it.name, it.icon)}</span>
     <span class="sh-rare-tx">
@@ -169,8 +178,8 @@ function cell(it: ShopItem, bal: number, closed: boolean): string {
   const sale = it.tag === 'sale' && !!it.was && it.was > it.price;
   const off = sale ? Math.max(1, Math.round((1 - it.price / it.was!) * 100)) : 0;
   const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b>${traitsOf(it) ? `<small>${esc(traitsOf(it))}</small>` : ''}${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}<span class="sh-amt${it.pay ? ' pay' : ''}">${esc(costText(it))}</span></span>`;
-  return `<button class="it-c sh-c${sale ? ' sale' : ''}${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(costText(it))}${poor ? ' (잔고 부족)' : ''}" ${closed ? 'disabled' : ''}>
-    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ''}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band${it.pay ? ' pay' : ''}">${it.orig !== undefined ? '<i title="흥정으로 바꾼 값">▾</i>' : ''}${sale ? `<s>${esc(shortWon(it.was!))}</s>` : ''}${esc(costText(it))}</span>${tip}</button>`;
+  return `<button class="it-c sh-c${sale ? ' sale' : ''}${poor ? ' poor' : ''}${shopUi.detail === it.id ? ' sel' : ''}" data-action="shop-detail" data-value="${esc(it.id)}" aria-label="${esc(it.name)} ${esc(costText(it))}${poor ? (pts ? ' (포인트 부족)' : ' (잔고 부족)') : ''}" ${closed ? 'disabled' : ''}>
+    ${sale ? `<span class="sh-off" aria-hidden="true">-${off}%</span>` : ''}<span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band${it.pay ? ' pay' : ''}">${it.orig !== undefined ? '<i title="흥정으로 바꾼 값">▾</i>' : ''}${sale ? `<s>${esc(amt(it.was!))}</s>` : ''}${esc(costText(it))}</span>${tip}</button>`;
 }
 
 /** 팔 것 고르기: 진열대 자리에 「장착」 상자(장착한 것도 팔 수 있게, 2026-11-07 사용자) + 내 소지품 격자. 고르면 입력창에 「팔기: 이름」 칩 */
@@ -192,9 +201,9 @@ function pickHtml(ctx: ChatContext, st: ShopState): string {
 function pickCell(it: Item, st: ShopState): string {
   const sel = st.sell?.itemId === it.id;
   const tr = traitsOf(it);
-  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b>${tr ? `<small>${esc(tr)}</small>` : ''}${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}${Number.isSafeInteger(it.price) ? `<span class="sh-amt">산 값 ${esc(shortWon(it.price!))}</span>` : ''}</span>`;
+  const tip = `<span class="it-tip" aria-hidden="true"><b>${esc(it.name)}</b>${tr ? `<small>${esc(tr)}</small>` : ''}${it.desc ? `<p>${esc(it.desc)}</p>` : ''}${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}${Number.isSafeInteger(it.price) ? `<span class="sh-amt">산 값 ${esc(amt(it.price!))}</span>` : ''}</span>`;
   return `<button class="it-c sh-c${sel ? ' sel' : ''}" data-action="shop-sell-pick" data-value="${esc(it.id)}" aria-label="${esc(it.name)} 판매" ${shopUi.loading ? 'disabled' : ''}>
-    <span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(shortWon(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(shortWon(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
+    <span class="it-ic">${pic(it.name, it.icon)}</span><span class="sh-nm"><b>${esc(it.name)}</b></span><span class="sh-band dim">${sel && typeof st.sell?.price === 'number' ? `<i>▴</i>${esc(amt(st.sell.price))}` : Number.isSafeInteger(it.price) ? esc(amt(it.price!)) : '&nbsp;'}</span>${tip}</button>`;
 }
 
 /** 주인 사진이 없을 때 기본 얼굴: 어둠 속 역광 그림자 (사용자 11-07, 후보 C). 성별·옷·얼굴을 알 수 없는 형체만 */
@@ -235,13 +244,13 @@ function detailHtml(ctx: ChatContext, st: ShopState, bal: number): string {
   const left = bal - it.price;
   const poor = left < 0;
   const money = `<div class="sh-money">
-    <div><i>잔고</i><span class="sh-amt">${esc(shortWon(bal))}</span></div>
-    ${it.pay && !it.price ? '' : `<div><i>값</i><span class="sh-amt">${it.orig !== undefined && !it.pay ? `<s>${esc(shortWon(it.orig))}</s> ` : ''}−${esc(shortWon(it.price))}</span></div>`}
+    <div><i>${pts ? '포인트' : '잔고'}</i><span class="sh-amt">${esc(amt(bal))}</span></div>
+    ${it.pay && !it.price ? '' : `<div><i>값</i><span class="sh-amt">${it.orig !== undefined && !it.pay ? `<s>${esc(amt(it.orig))}</s> ` : ''}−${esc(amt(it.price))}</span></div>`}
     ${it.pay ? `<div class="pay"><i>대가</i><span class="sh-amt">${esc(it.pay)}</span></div>` : ''}
-    <div class="sum${poor ? ' bad' : ''}"><i>${poor ? '부족' : '잔액'}</i><span class="sh-amt">${esc(shortWon(poor ? -left : left))}</span></div>
+    <div class="sum${poor ? ' bad' : ''}"><i>${poor ? '부족' : '잔액'}</i><span class="sh-amt">${esc(amt(poor ? -left : left))}</span></div>
   </div>`;
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.icon)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta">${it.tag === 'rare' ? `<span class="sh-tag rare">${ICONS.star}희귀</span>` : ''}${it.tag === 'sale' && it.was ? '<span class="sh-tag sale">특가</span>' : ''}${traitsOf(it) ? `<span class="sh-tag">${esc(traitsOf(it))}</span>` : ''}${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big${it.pay ? ' pay' : ''}">${it.tag === 'sale' && it.was ? `<s>${esc(shortWon(it.was))}</s> ` : ''}${esc(costText(it))}</span></div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(it.name, it.icon)}</span><div class="sh-phtx"><b>${esc(it.name)}</b><span class="sh-meta">${it.tag === 'rare' ? `<span class="sh-tag rare">${ICONS.star}희귀</span>` : ''}${it.tag === 'sale' && it.was ? '<span class="sh-tag sale">특가</span>' : ''}${traitsOf(it) ? `<span class="sh-tag">${esc(traitsOf(it))}</span>` : ''}${it.sold ? '<span>산 물건</span>' : ''}</span><span class="sh-amt big${it.pay ? ' pay' : ''}">${it.tag === 'sale' && it.was ? `<s>${esc(amt(it.was))}</s> ` : ''}${esc(costText(it))}</span></div></div>
     ${it.desc ? `<p>${esc(it.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${it.effect ? `<p class="ef">효과: ${esc(it.effect)}</p>` : ''}
     ${it.sold ? '' : money}
@@ -260,13 +269,13 @@ function sellHtml(st: ShopState, bal: number): string {
   const refused = o.price === null;
   const money = offered
     ? `<div class="sh-money">
-    <div><i>잔고</i><span class="sh-amt">${esc(shortWon(bal))}</span></div>
-    <div><i>주인이 부른 값</i><span class="sh-amt">${o.first !== undefined ? `<s>${esc(shortWon(o.first))}</s> ` : ''}+${esc(shortWon(o.price as number))}</span></div>
-    <div class="sum"><i>잔액</i><span class="sh-amt">${esc(shortWon(bal + (o.price as number)))}</span></div>
+    <div><i>${pts ? '포인트' : '잔고'}</i><span class="sh-amt">${esc(amt(bal))}</span></div>
+    <div><i>주인이 부른 값</i><span class="sh-amt">${o.first !== undefined ? `<s>${esc(amt(o.first))}</s> ` : ''}+${esc(amt(o.price as number))}</span></div>
+    <div class="sum"><i>잔액</i><span class="sh-amt">${esc(amt(bal + (o.price as number)))}</span></div>
   </div>`
     : refused ? '<p class="dim">주인이 이 물건은 사지 않겠대요.</p>' : '<p class="dim">아직 값을 묻지 않았어요.</p>';
   const inner = `<button class="gx-agpop-x" data-action="shop-detail-close" aria-label="닫기">${ICONS.close}</button>
-    <div class="it-ph sh-ph"><span class="it-ic">${pic(o.name, o.icon)}</span><div class="sh-phtx"><b>${esc(o.name)}</b><span class="sh-meta">${traitsOf(o) ? `<span class="sh-tag">${esc(traitsOf(o))}</span>` : ''}<span>내 물건</span>${o.paid !== undefined ? `<span>산 값 ${esc(shortWon(o.paid))}</span>` : ''}</span>${offered ? `<span class="sh-amt big">+${esc(shortWon(o.price as number))}</span>` : ''}</div></div>
+    <div class="it-ph sh-ph"><span class="it-ic">${pic(o.name, o.icon)}</span><div class="sh-phtx"><b>${esc(o.name)}</b><span class="sh-meta">${traitsOf(o) ? `<span class="sh-tag">${esc(traitsOf(o))}</span>` : ''}<span>내 물건</span>${o.paid !== undefined ? `<span>산 값 ${esc(amt(o.paid))}</span>` : ''}</span>${offered ? `<span class="sh-amt big">+${esc(amt(o.price as number))}</span>` : ''}</div></div>
     ${o.desc ? `<p>${esc(o.desc)}</p>` : '<p class="dim">설명 없음</p>'}
     ${o.effect ? `<p class="ef">효과: ${esc(o.effect)}</p>` : ''}
     ${money}
@@ -310,7 +319,7 @@ function source(ctx: ChatContext, st: ShopState): ShopSource {
     if (tags.length) status = tags[tags.length - 1].raw.trim();
   }
   // 잔고는 상점 모델에 넘기지 않는다 (설정 「넘기는 것·남는 것」): 상태창 줄에서 잔고 칸을 빼고 다시 만든다 (11-08 전수점검: 잔고 칸이 그대로 갔다)
-  if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet'));
+  if (status) status = rebuildStatusLine(status, usedCols(colConfig(vars)).filter((c) => c !== 'wallet' && c !== 'points'));
   const situation = ['$an_report', '$in_report'].map((k) => String(vars[k] ?? '').trim()).filter(Boolean).join('\n').slice(0, 1500);
   const identity = peopleSettings(vars).on ? identityText(peopleStore(ctx.chat).identity) : '';
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
@@ -371,6 +380,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
 /** 상점 팝업의 data-action. 처리했으면 true. 'shop-say' 의 value 는 입력칸 글 */
 export async function shopAction(action: string, value: string | undefined, ctx: ChatContext, env: ShopEnv): Promise<boolean> {
   const st = currentShop(ctx.chat);
+  pts = !!st?.identity.points;
   switch (action) {
     case 'shop-open': {
       // 꺼져 있거나(설정에서 끔) 방문이 없으면 열지 않는다
@@ -465,7 +475,8 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         if (!now || now.shop !== st.shop || now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
         const it0 = readItems(chat.scriptstate);
         if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
-        const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
+        const p = !!now.identity.points;
+        const w = addWalletEntry(ledgerOf(chat.scriptstate, p), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
         // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
         const items = sellItem(it0, o.itemId, now.key, `${now.shop}에 팖`);
         const nextShop = closeSale(now);
@@ -473,11 +484,11 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         sold = true;
         const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
         const use = q && q.some((u) => u.id === o.itemId) ? itemUseVars(dropUse(q, o.itemId)) : {};
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...shopVars(nextShop), ...use } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...ledgerVars(w, p), ...itemsVars(items), ...shopVars(nextShop), ...use } };
       });
       shopUi.detail = '';
       if (shopUi.chipKind === 'sell') { shopUi.chip = ''; shopUi.chipKind = ''; }
-      shopUi.info = sold ? `「${o.name}」을 ${shortWon(o.price as number)}에 팔았어요.` : '팔 수 없는 상태예요 (물건이 없거나 값이 바뀌었어요).';
+      shopUi.info = sold ? `「${o.name}」을 ${amt(o.price as number)}에 팔았어요.` : '팔 수 없는 상태예요 (물건이 없거나 값이 바뀌었어요).';
       // 「사용」 자리에서 뺐으면 본 화면 상자도 다시 그린다 (소지품 버리기와 같이)
       if (sold) void refreshUseBox(ctx.charIndex, ctx.chatIndex);
       await env.refresh();
@@ -549,17 +560,21 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const target = now?.items.find((x) => x.id === it.id && !x.sold);
         if (!now || !target) return null;
         const alive = aliveAnchors(chat);
-        const w0 = readWallet(chat.scriptstate, start);
+        // 포인트 상점은 포인트 장부에서 (원 가계부는 건드리지 않음)
+        const p = !!now.identity.points;
+        const w0 = p ? readPoints(chat.scriptstate) : readWallet(chat.scriptstate, start);
         if (walletBalance(w0, alive) < target.price) return null;
         // 원 몫이 있을 때만 가계부에. 원이 아닌 대가는 물건에 적어 다음 턴 본편에 「무엇으로 치르고 샀다」로 넘긴다 (core/items.ts boughtLine)
-        const walletId = target.price > 0 ? `st_${target.id}` : '';
+        const walletId = target.price > 0 ? `${p ? 'sp' : 'st'}_${target.id}` : '';
         const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: 'store', anchor: now.key, price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) });
+        // 포인트로 산 것은 원 값 없이 「N 포인트」 대가로 적는다 (본편에 「paid with N points」)
+        const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, from: 'store', anchor: now.key, ...paid });
         bought = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
       });
       shopUi.detail = '';
-      shopUi.info = bought ? `「${it.name}」을 샀어요. 소지품에 들어갔어요.` : '잔고가 모자라거나 이미 팔린 물건이에요.';
+      shopUi.info = bought ? `「${it.name}」을 샀어요. 소지품에 들어갔어요.` : pts ? '포인트가 모자라거나 이미 팔린 물건이에요.' : '잔고가 모자라거나 이미 팔린 물건이에요.';
       await env.refresh();
       return true;
     }

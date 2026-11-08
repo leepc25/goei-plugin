@@ -183,6 +183,8 @@ export interface ShopIdentity {
   never: string;
   /** 값 성격 (한 줄, 말로). 값대 숫자는 받지 않음 (사용자 11-07: 모델이 구간을 의식해 묶임) */
   prices: string;
+  /** 백일몽 포인트 상점 (2026-11-08 사용자: 포인트는 포인트 상점에서만): 값·사고팔기가 전부 포인트, 장부는 $st_points */
+  points?: boolean;
 }
 
 export interface ShopLine {
@@ -280,6 +282,7 @@ export function readShop(vars: Vars): ShopState | null {
         sells: clean(id.sells, 120),
         never: clean(id.never, 120),
         prices: clean(id.prices, 120),
+        ...(id.points ? { points: true } : {}),
       },
       items: (Array.isArray(o.items) ? o.items.filter(isItem) : []).map((x) => {
         const { use: _u, uses: _n, equip: _e, icon: _i, ...rest } = x;
@@ -434,10 +437,20 @@ export function parseShelf(raw: string, known: ShopIdentity | null): ShelfReply 
   if (!known) {
     if (!idText) throw new ShopError('응답에 <shop-identity> 블록이 없어요.');
     const get = (k: string) => (new RegExp(`^\\s*${k}\\s*[:：]\\s*(.*)$`, 'im').exec(idText)?.[1] ?? '').trim();
-    identity = { sells: clean(get('sells'), 120), never: clean(get('never'), 120), prices: clean(get('prices'), 120) };
+    identity = { sells: clean(get('sells'), 120), never: clean(get('never'), 120), prices: clean(get('prices'), 120), ...(/point|포인트/i.test(get('currency')) ? { points: true } : {}) };
     if (!identity.sells) throw new ShopError('<shop-identity> 에 sells 줄이 없어요.');
   }
-  return { identity, owner: clean(block(raw, 'owner'), 300), items };
+  return { identity, owner: clean(block(raw, 'owner'), 300), items: identity.points ? items.map(pointPrice) : items };
+}
+
+/** 포인트 상점: 값 칸에 「900p」「900포인트」로 적힌 것도 포인트 값으로 (원이 아닌 대가 글로 두지 않게) */
+export function pointPrice<T extends { price: number; pay?: string }>(x: T): T {
+  const m = x.pay && /^([\d,]+)\s*(?:p|P|포인트|points?)$/i.exec(x.pay.trim());
+  if (!m) return x;
+  const n = Number(m[1].replace(/,/g, ''));
+  if (!Number.isSafeInteger(n)) return x;
+  const { pay: _p, ...rest } = x;
+  return { ...rest, price: x.price + n } as T;
 }
 
 export type TalkMode = 'none' | 'partial' | 'all';
@@ -530,7 +543,9 @@ export function applyShelf(st: ShopState, r: ShelfReply, s: ShopSettings): ShopS
 }
 
 /** 주인에게 말한 결과를 상태에 (내 말은 부르는 쪽이 먼저 적는다) */
-export function applyTalk(st: ShopState, r: TalkReply, kick = true): ShopState {
+export function applyTalk(st: ShopState, r0: TalkReply, kick = true): ShopState {
+  // 포인트 상점: 「900p」로 적은 값도 포인트 값으로
+  const r = st.identity.points ? { ...r0, all: r0.all.map(pointPrice), add: r0.add.map(pointPrice), reprice: r0.reprice.map(pointPrice) } : r0;
   let items = st.items.slice();
   if (r.mode === 'all') {
     const fresh = withIds(st, r.all, items.filter((x) => x.sold));
@@ -601,7 +616,7 @@ export function shopEvents(chat: Chat): string[] {
   const out: string[] = [];
   const lastOwner = [...st.talk].reverse().find((l) => l.who === 'owner');
   const spoke = st.talk.some((l) => l.who === 'me');
-  if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} won)`).join(', ')} to the owner of ${st.shop}`);
+  if (st.sales.length) out.push(`just sold ${st.sales.map((x) => `${x.name} (${x.price.toLocaleString('en-US')} ${st.identity.points ? 'Baekilmong points' : 'won'})`).join(', ')} to the owner of ${st.shop}`);
   if (st.closed) out.push(`was refused service and sent out of ${st.shop}${lastOwner ? ` ("${lastOwner.text.slice(0, 80)}")` : ''}`);
   else if (spoke && lastOwner) {
     // 주인과 나눈 말: 이번 방문 대화 전부 (2026-11-07 사용자: 6줄이 아니라 전부). 그 턴 한 번만 넘어가고, 다음 응답에 표식이 없으면 상점 상태와 함께 비운다
@@ -654,7 +669,7 @@ function material(src: ShopSource, s: ShopSettings): string {
   const parts = [`[가게]\n${src.st.shop}${src.st.owner ? ` / 주인: ${src.st.owner}` : ''}`];
   if (src.st.loaded) {
     const id = src.st.identity;
-    parts.push(`[가게 정체 — 고정]\nsells: ${id.sells || '-'}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}`);
+    parts.push(`[가게 정체 — 고정]\nsells: ${id.sells || '-'}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}\ncurrency: ${id.points ? 'points' : 'won'}`);
   }
   if (src.refs) parts.push(`[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${src.refs}`);
   if (s.context) {
@@ -675,6 +690,7 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
   const system = [
     fillGuide(g.COMMON, {}),
     SHELF_RULES(g, s, src.st),
+    src.st.identity.points ? fillGuide(g.POINT_SHOP, {}) : '',
     fillGuide(first ? g.FIRST : g.RESTOCK, { line: SHOP_LINE }),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
@@ -695,13 +711,14 @@ export function talkPrompt(src: ShopSource, s: ShopSettings): CraftMessage[] {
     fillGuide(g.COMMON, v),
     [fillGuide(g.TALK, v), fillGuide(s.feature ? g.TALK_FEATURE : g.TALK_PLAIN, v), fillGuide(s.kick ? g.KICK_ON : g.KICK_OFF, v)].filter(Boolean).join(' '),
     o ? fillGuide(g.SELL, v) : '',
+    st.identity.points ? fillGuide(g.POINT_SHOP, v) : '',
     [fillGuide(g.TALK_OUTPUT, v), o ? fillGuide(g.TALK_OUTPUT_OFFER, v) : '', fillGuide(g.TALK_OUTPUT_END, v)].filter(Boolean).join('\n'),
     SHELF_RULES(g, s, st),
     src.language ?? '',
   ].filter(Boolean).join('\n\n');
   const talk = st.talk.map((l) => `${l.who === 'me' ? '[주인공]' : '[주인]'} ${l.text}`).join('\n');
   const sales = st.sales.map((x) => `${x.name} (${x.price})`).join(', ');
-  const selling = o ? `\n\n[팔려는 물건 — 주인공이 내민 것]\n${o.name}|${traitsText(o)}|${o.desc || '-'}|${o.effect || '-'}${o.paid !== undefined ? `\n(bought earlier for ${o.paid} won)` : ''}${typeof o.price === 'number' ? `\n(your last offer: ${o.price} won)` : ''}` : '';
+  const selling = o ? `\n\n[팔려는 물건 — 주인공이 내민 것]\n${o.name}|${traitsText(o)}|${o.desc || '-'}|${o.effect || '-'}${o.paid !== undefined ? `\n(bought earlier for ${o.paid} won)` : ''}${typeof o.price === 'number' ? `\n(your last offer: ${o.price} ${st.identity.points ? 'points' : 'won'})` : ''}` : '';
   return craft([{ role: 'system', content: system }, { role: 'user', content: `${material(src, s)}\n\n[지금 진열대]\n${shelf}${sold ? `\n\n[이번 방문에 산 것]\n${sold}` : ''}${sales ? `\n\n[이번 방문에 주인이 산 것]\n${sales}` : ''}${selling}\n\n[이번 방문 대화 — 마지막 줄이 지금 한 말]\n${talk}` }], s, fillGuide(o ? g.THOUGHTS_SELL : g.THOUGHTS_TALK, v));
 }
 

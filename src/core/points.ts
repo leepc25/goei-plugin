@@ -3,11 +3,12 @@
 // 시작 포인트는 0 (등급별 지급은 본문에 적힌 대로 갱신기가 거래로 적는다).
 import type { Chat } from './types';
 import { findStatusTags } from './world/status';
-import type { Wallet } from './wallet';
+import { addWalletEntry, aliveAnchors, liveWallet, removeWalletEntry, walletBalance, WALLET_MAX, type Wallet } from './wallet';
+import { messageKey } from './people/store';
+import { colConfig, isPointsOrg, POINTS_ON_VAR } from './world/statuscols';
+export { isPointsOrg, POINTS_ORG } from './world/statuscols';
 
 export const POINTS_VAR = '$st_points';
-/** 포인트를 쓰는 조직 (상태창 신분 칸 「조직/직급」의 조직) */
-export const POINTS_ORG = '백일몽';
 
 export function readPoints(vars: Record<string, unknown> | undefined): Wallet {
   const raw = vars?.[POINTS_VAR];
@@ -34,10 +35,54 @@ export function lastIdentity(chat: Chat): string {
   return '';
 }
 
-/** 포인트 장부를 쓰나: 지금 신분이 백일몽이거나, 이미 포인트 거래가 있으면 (백일몽을 나와도 지난 기록은 보인다) */
+
+/** 포인트 칸 「자동」 켜짐 표시 (POINTS_ON_VAR) 를 마지막 신분에 맞춘 값. 신분 칸이 아직 없으면 fallback(시작 세력 등)을 따른다. 바뀔 게 없으면 null */
+export function pointsFlagFor(chat: Chat, fallback = false): '1' | '0' | null {
+  const id = lastIdentity(chat);
+  const on = id ? isPointsOrg(id) : fallback;
+  const want = on ? '1' : '0';
+  return chat.scriptstate?.[POINTS_ON_VAR] === want ? null : want;
+}
+
+/** 포인트 장부를 쓰나: 포인트 칸이 사용 중이거나(자동이면 신분이 백일몽), 이미 포인트 거래가 있으면 (백일몽을 나와도 지난 기록은 보인다) */
 export function pointsOn(chat: Chat): boolean {
-  const org = lastIdentity(chat).split(/[/／]/)[0].trim();
-  return org === POINTS_ORG || readPoints(chat.scriptstate).log.length > 0;
+  return colConfig(chat.scriptstate).points !== 'off' || readPoints(chat.scriptstate).log.length > 0;
+}
+
+/** 최근 포인트 거래 n줄 (영어 한 줄: 「-100 p 탈모약」). 상태창 맞춤 줄은 뺀다 */
+export function recentPointLines(w: Wallet, alive: Set<string>, n: number): string[] {
+  if (n <= 0) return [];
+  return liveWallet(w, alive).filter((e) => e.memo !== POINTS_SYNC_MEMO).slice(-n).map((e) => `${e.amount > 0 ? '+' : ''}${e.amount.toLocaleString('en-US')} p ${e.memo}`);
+}
+
+export const POINTS_SYNC_MEMO = '상태창 포인트';
+
+/** 마지막 응답의 상태창 포인트 칸에 장부를 맞춘다 (가계부 syncWalletToStatus 와 같은 방식). 바뀐 게 없으면 null */
+export function syncPointsToStatus(w: Wallet, chat: Chat): Wallet | null {
+  const msgs = chat.message ?? [];
+  let i = msgs.length - 1;
+  while (i >= 0 && msgs[i].role === 'user') i--;
+  if (i < 0) return null;
+  const m = msgs[i];
+  const tags = findStatusTags(typeof m.data === 'string' ? m.data : '');
+  let target: number | null = null;
+  for (let k = tags.length - 1; k >= 0; k--) {
+    const n = tags[k].points ? Number(tags[k].points) : NaN;
+    if (Number.isSafeInteger(n) && Math.abs(n) <= WALLET_MAX) {
+      target = n;
+      break;
+    }
+  }
+  if (target === null) return null;
+  const anchor = messageKey(m, i);
+  const id = `ps_${anchor}`;
+  const base = removeWalletEntry(w, id);
+  const alive = aliveAnchors(chat);
+  // 그 응답에 묶인 상점 거래는 상태창 다음 일이라 맞춤 셈에서 뺀다 (가계부와 같음)
+  const before = { ...base, log: base.log.filter((e) => !(e.src === 'store' && e.anchor === anchor)) };
+  const diff = target - walletBalance(before, alive);
+  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: 'story' });
+  return JSON.stringify(next) === JSON.stringify(w) ? null : next;
 }
 
 /** 「1,200 p」. 음수는 「−1,200 p」 */

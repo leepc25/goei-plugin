@@ -63,7 +63,8 @@ import { settleItemUse, withInventory } from './core/items';
 import { hasShopTag, settleShop } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
-import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
+import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
+import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, recentWalletLines, syncWalletToStatus, walletBalance, walletRecentN, walletSyncOn, walletVars, WALLET_START_DEFAULT } from './core/wallet';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
@@ -314,7 +315,14 @@ function statusShape({ chat }: ChatContext): StatusShape {
   const cfg = colConfig(vars);
   const w = cfg.wallet !== 'off' ? readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT) : null;
   const alive = aliveAnchors(chat);
-  return { cols: usedCols(cfg), wallet: w ? walletBalance(w, alive) : null, ...(w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {}) };
+  // 백일몽 포인트 칸 (core/points.ts): 쓸 때만 장부 값으로 덮고, 최근 거래 줄 수는 가계부 설정과 같게
+  const p = cfg.points !== 'off' ? readPoints(vars) : null;
+  return {
+    cols: usedCols(cfg),
+    wallet: w ? walletBalance(w, alive) : null,
+    ...(w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {}),
+    ...(p ? { points: walletBalance(p, alive), recentPoints: recentPointLines(p, alive, walletRecentN(vars)) } : {}),
+  };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
@@ -460,6 +468,31 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
         return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
       }).catch(() => null)) ?? latest;
+    }
+    // 백일몽 포인트 (2026-11-08): ① 포인트 칸 「자동」이면 이 응답의 신분에 맞춰 켜고 끈다(칸 구성 기록도 남겨 옛 응답을 옛 모양으로 읽게)
+    // ② 포인트 칸을 쓰면 상태창 포인트 칸에 장부를 맞춘다 (가계부와 같은 「상태창 잔고 따르기」 설정)
+    {
+      const cur0 = latest ?? chat;
+      const flag = pointsAuto(cur0.scriptstate) ? pointsFlagFor(cur0, isPointsOrg(String(cur0.scriptstate?.['$ib_affiliation'] ?? ''))) : null;
+      const needSync = colConfig(cur0.scriptstate).points !== 'off' && walletSyncOn(cur0.scriptstate) && !!syncPointsToStatus(readPoints(cur0.scriptstate), cur0);
+      if (flag || needSync) {
+        latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const add: Record<string, string> = {};
+          const f = pointsAuto(cur.scriptstate) ? pointsFlagFor(cur, isPointsOrg(String(cur.scriptstate?.['$ib_affiliation'] ?? ''))) : null;
+          if (f) {
+            const vars = { ...(cur.scriptstate ?? {}), [POINTS_ON_VAR]: f };
+            // 칸 구성 기록: 이 응답 다음부터 새 구성 (이 응답은 이미 옛 구성으로 쓰였다)
+            add[POINTS_ON_VAR] = f;
+            add[COL_LOG_VAR] = withColLog(cur.scriptstate, (cur.message ?? []).length, usedCols(colConfig(vars)));
+          }
+          const s = { ...(cur.scriptstate ?? {}), ...add };
+          if (colConfig(s).points !== 'off' && walletSyncOn(s)) {
+            const p = syncPointsToStatus(readPoints(s), { ...cur, scriptstate: s });
+            if (p) Object.assign(add, pointsVars(p));
+          }
+          return Object.keys(add).length ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...add } } : null;
+        }).catch(() => null)) ?? latest;
+      }
     }
     // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
     if (settleItemUse(latest ?? chat, arg.messageIndex)) {

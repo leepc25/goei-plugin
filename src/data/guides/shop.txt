@@ -47,6 +47,7 @@ Output, in this order:
 sells: what this shop sells, in one line
 never: what this shop does not and will not sell (one line)
 prices: how this shop is paid (money, or what the reference material says it takes) and its price character, in one line, from who runs it and what the place is
+currency: points only if this is Baekilmong's company point shop (the Welfare Mall), paid only in Baekilmong welfare points — then every 값 is a plain integer in points; otherwise won. Any other shop never accepts Baekilmong points.
 </shop-identity>
 <owner>
 the owner's first line to the protagonist, in character, 1–3 sentences, Korean, no stage directions
@@ -74,6 +75,10 @@ one short line from the owner about the new goods (or empty)
 2. What would really be on its shelf right now (season, district, events going on)?
 3. Which of those fit what this shop sells; pick a varied set within the size limit.
 4. Owner's first line: in character, short, no exposition.
+@@END
+
+@@SECTION POINT_SHOP
+This is Baekilmong's point shop: every price and every offer is a plain integer in Baekilmong welfare points, never won, and it takes nothing else. Points and won never convert.
 @@END
 
 @@SECTION TALK
