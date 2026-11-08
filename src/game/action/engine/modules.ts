@@ -34,7 +34,7 @@ function perkChips(p: FighterPlayer): { t: string; c: string; n?: number }[] {
 }
 import { FighterAi } from '../fighter/ai';
 import { charArt, charBody, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
-import { setPixelScale } from './contract';
+import { setPixelScale, TICK_HZ } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
@@ -45,6 +45,7 @@ import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
 import { versus, fighterOf } from './versus';
+import { surv, survivalTick, waveOf } from './survival';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
@@ -1030,7 +1031,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 한 선(lane 위아래 같음): 위아래 이동 없이 좌우로만. 발은 화면 아래(입력창 바로 위)
       id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity, lane: [VS_LINE, VS_LINE],
       banner: '',
-      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: fighterOf(1) ? `ai-char:${fighterOf(1)}` : 'ai-char', x: 900, y: VS_LINE }]] }],
+      // 서바이벌은 웨이브를 engine/survival.ts 가 낸다
+      encounters: versus.mode === 'survival' ? [] : [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: fighterOf(1) ? `ai-char:${fighterOf(1)}` : 'ai-char', x: 900, y: VS_LINE }]] }],
     }),
     nextFloor: () => null,
   };
@@ -1060,7 +1062,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
       const n = ++aiN;
       const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
-      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
+      // 대전 서바이벌(engine/survival.ts): 졸개는 등급을 낮추고, 동시 공격은 서바이벌 묶음(Squad)으로
+      const vs = spec as { grade?: 'B' | 'D'; squad?: Squad };
+      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: vs.grade ?? 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad: vs.squad ?? squad, label: `AI ${art.cfg.name} ${n}` });
       ai.x = spec.x; ai.y = spec.y;
       // 힘민체지정만으로(10-30 사용자): 이름 있는 55명은 표, 그 밖의 NPC는 한 명마다 합 25를 무작위로 나눔. 보정은 퍽
       if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
@@ -1469,12 +1473,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 투명 무대(대전)는 바닥 물건(의자·화분 등)을 두지 않는다: 본문 위에 인물만
       // 대전: 체력을 VS_HP 배로 (사용자 11-08 「체력이 너무 적다, 전체적으로 늘려야」). 몸이 처음 보일 때 한 번
       if (view.clear) w.hooks.push(() => {
-        for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean })[]) {
+        if (versus.mode === 'survival') survivalTick(1 / TICK_HZ, w.bodies, w.player as Body & { hp: number; hpMax: number }, (spec) => w.spawn(spec as never), VS_LINE, 1280);
+        for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean; vsHpMul?: number })[]) {
           if (b.vsHp && b.hp > b.hpMax) b.hp = b.hpMax;   // 능력치를 다시 세어 최대가 줄면 맞춘다
           if (b.vsHp || !b.hpMax) continue;
           b.vsHp = true;
-          b.hpMax = Math.round(b.hpMax * VS_HP); b.hp = b.hpMax;
-          if (b.baseHp) b.baseHp = Math.round(b.baseHp * VS_HP);
+          const mul = b.vsHpMul ?? VS_HP;   // 서바이벌 졸개는 1배(묶음 배수만), 대장은 3배
+          b.hpMax = Math.round(b.hpMax * mul); b.hp = b.hpMax;
+          if (b.baseHp) b.baseHp = Math.round(b.baseHp * mul);
           // 팀전·서바이벌: 앞 판에서 남은 체력을 이어 받는다
           const carry = versus.carry[b === w.player ? 0 : 1];
           if (carry != null) b.hp = Math.max(1, Math.round(b.hpMax * carry));
@@ -1612,7 +1618,11 @@ let vsT = 0;
 function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
   const dt = 1 / 60;
   vsT += dt;
-  const foe = w.bodies.find((b) => b.team === 'enemy');
+  // 오른쪽 칸: 1:1·팀전은 지금 상대, 서바이벌은 살아 있는 대장 → 주인공에게 가장 가까운 상대
+  const live = w.bodies.filter((b) => b.team === 'enemy' && b.alive && b.hp > 0) as (Body & { vsBoss?: boolean })[];
+  const foe = versus.mode === 'survival'
+    ? live.find((b) => b.vsBoss) ?? live.sort((a, b) => Math.abs(a.x - w.player.x) - Math.abs(b.x - w.player.x))[0]
+    : w.bodies.find((b) => b.team === 'enemy');
   const k = 1.25, W = c.canvas.width / k, H = c.canvas.height / k, cardW = PIXEL_CARD_W;
   // 칸 자리: 그림판이 16:9보다 높아도 예전처럼 16:9 윗선 근처 (사용자 11-08 「꼭대기면 눈에 안 들어온다」)
   const top = 14 + Math.max(0, c.canvas.height - 720) / k;
@@ -1646,23 +1656,28 @@ function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
       c.fillRect(mx, my, sz, sz);
       if (on) { c.fillStyle = 'rgba(255,255,255,.55)'; c.fillRect(mx, my, sz, 3); }
     });
-    if (versus.mode === 'survival' && i === 1) {
-      const t = pixelText(`${versus.kills} 쓰러뜨림`, '#ffd35a', 22);
-      c.drawImage(t, Math.round(x + cardW - 90 - t.width), Math.round(end + 6));
+    if (versus.mode === 'survival' && i === 0) {
+      const t = pixelText(`웨이브 ${Math.max(1, surv.wave)} · ${versus.kills} 쓰러뜨림`, '#ffd35a', 22);
+      c.drawImage(t, Math.round(x + 90), Math.round(end + 6));
     }
   };
   one(0, w.player, 16);
   one(1, foe, W - 16 - cardW);
+  if (versus.mode === 'survival' && !foe) vsSide[1].last = -1;   // 다음에 나오는 상대 칸은 새로
   // 가운데 알림
   const banner = (text: string, color: string, size = 66) => {
     const t = pixelText(text, color, size);
     c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(top + (H - top) * 0.32 - t.height / 2));
   };
-  if (versus.over) banner(versus.over.side === 0 ? '승리' : '패배', versus.over.side === 0 ? '#ffd35a' : '#e0503c', 88);
+  if (versus.over && versus.mode === 'survival') banner(`웨이브 ${surv.wave} · ${versus.kills} 쓰러뜨림`, '#ffd35a', 66);
+  else if (versus.over) banner(versus.over.side === 0 ? '승리' : '패배', versus.over.side === 0 ? '#ffd35a' : '#e0503c', 88);
   else if (versus.ko) banner('K.O.', '#ff6a4a', 88);
   else if (versus.intro > 0) {
-    const label = versus.mode === 'survival' ? `${versus.kills + 1}번째 상대` : `ROUND ${versus.round}`;
+    const label = versus.mode === 'survival' ? '서바이벌' : `ROUND ${versus.round}`;
     banner(versus.intro > 0.6 ? label : 'FIGHT!', versus.intro > 0.6 ? '#e6e4dc' : '#ffd35a');
+  } else if (versus.mode === 'survival' && surv.bannerT > 0) {
+    const boss = waveOf(surv.wave).boss;
+    banner(`웨이브 ${surv.wave}${boss ? ' · 대장' : ''}`, boss ? '#ff8a5a' : '#e6e4dc');
   }
   c.restore();
 }

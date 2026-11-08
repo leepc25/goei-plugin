@@ -188,7 +188,9 @@ export function createPackStore(cfg: { key: (id: string) => string; index: () =>
     },
   };
 
-  return { assets, installGamePack, downloadGamePack, packStateOf, missingPacks, releaseAll, liveUrls };
+  /** 읽어 둔 팩 내용만 잊는다 (많이 받을 때 메모리에 쌓이지 않게). 만든 주소는 그대로 */
+  const forget = (id: string) => void memo.delete(id);
+  return { assets, installGamePack, downloadGamePack, packStateOf, missingPacks, releaseAll, liveUrls, forget };
 }
 
 const game = createPackStore({ key: (id) => `goei:game:pack:${id}`, index: gameIndex, base: GAME_BASE });

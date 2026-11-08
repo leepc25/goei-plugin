@@ -2,7 +2,7 @@
 // 모드 (11-08 사용자: 1:1 먼저, 3인 팀전·서바이벌도 같은 틀에서):
 //   duel     1:1 3판 2선승. 판마다 둘 다 체력을 다시 채운다
 //   team     3인 팀전. 쓰러진 쪽만 다음 사람이 나오고, 이긴 사람은 남은 체력 그대로 다음 상대를 맞는다. 한 팀 셋이 다 쓰러지면 끝
-//   survival 서바이벌. 내 한 명으로 계속 나오는 상대를 몇 명까지 쓰러뜨리나. 내 체력은 이어지고 상대를 쓰러뜨리면 조금 회복
+//   survival 서바이벌. 내 한 명으로 웨이브로 몰려오는 상대를 버틴다. 판을 끊지 않고 내가 쓰러지면 끝 (engine/survival.ts)
 // 판 끝 판정은 game.ts 가, 그리기는 modules.ts drawVersusBars 가 한다. 경기가 끝나면 onMatchEnd 로 고르기 창에 돌려준다.
 
 export type Side = 0 | 1;
@@ -32,8 +32,6 @@ export const versus = {
   hold: false,
   /** 경기가 끝나 표시까지 마쳤을 때 (고르기 창으로) */
   onMatchEnd: null as null | ((winner: Side) => void),
-  /** 서바이벌 다음 상대 뽑기 (고르기 창이 이름 있는 인물 명단으로 정한다) */
-  nextFoe: null as null | (() => string),
 };
 
 /** duel 에서 경기를 가져가는 승 수 */
@@ -42,8 +40,6 @@ export const WINS_TO_TAKE = 2;
 export const KO_SEC = 2.5;
 export const OVER_SEC = 3;
 export const INTRO_SEC = 1.6;
-/** 서바이벌: 상대를 쓰러뜨릴 때 회복하는 최대 체력 비율 */
-export const SURVIVAL_HEAL = 0.2;
 
 /** 지금 나와 있는 1P·상대 이름 */
 export const fighterOf = (side: Side): string => versus.team[side][versus.cur[side]] ?? '';
@@ -82,12 +78,6 @@ export function roundEnd(side: Side, hp: [number, number]): 'over' | 'next' {
     versus.carry[side] = Math.max(0.05, hp[side]);
     return versus.cur[lose] >= versus.team[lose].length ? 'over' : 'next';
   }
-  // survival: 내가 쓰러지면 끝. 이기면 다음 상대
-  if (side === 1) return 'over';
-  versus.kills++;
-  versus.carry = [Math.min(1, hp[0] + SURVIVAL_HEAL), null];
-  const next = versus.nextFoe?.() ?? versus.team[1][versus.cur[1]];
-  versus.team[1].push(next);
-  versus.cur[1] = versus.team[1].length - 1;
-  return 'next';
+  // survival: 판이 하나뿐이라 여기 오는 건 내가 쓰러졌을 때 (웨이브는 engine/survival.ts)
+  return 'over';
 }

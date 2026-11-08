@@ -407,8 +407,9 @@ export class Game {
         w.step(p);
         // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
         if (view.clear) {
-          const foeDown = w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
-          if (!versus.ko && (w.ended || foeDown || w.player.hp <= 0)) {
+          // 서바이벌은 상대가 다 쓰러져도 판이 끝나지 않는다 (웨이브가 이어짐, engine/survival.ts)
+        const foeDown = versus.mode !== 'survival' && w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
+          if (!versus.ko && ((w.ended && versus.mode !== 'survival') || foeDown || w.player.hp <= 0)) {
             const side: Side = w.player.hp > 0 && foeDown ? 0 : 1;
             const foe = w.bodies.find((b) => b.team === 'enemy');
             const ratio = (b: { hp: number; hpMax: number } | undefined) => (b && b.hpMax > 0 ? Math.max(0, b.hp / b.hpMax) : 0);

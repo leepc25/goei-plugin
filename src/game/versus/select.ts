@@ -122,7 +122,7 @@ export function openSelect(box: HTMLElement, opts: SelectOpts): { close(): void;
     for (const s of [0, 1] as const) {
       const side = el.querySelector<HTMLElement>(`.vs-side[data-s="${s}"]`)!;
       if (s === 1 && mode.id === 'survival') {
-        side.querySelector('.vs-name')!.textContent = '계속 나와요';
+        side.querySelector('.vs-name')!.textContent = '웨이브로 몰려와요';
         continue;
       }
       // 커서가 그 쪽 차례면 커서 인물, 아니면 마지막으로 고른 인물
@@ -219,7 +219,7 @@ export async function showVs(box: HTMLElement, r: SelectResult, load: () => Prom
   panel.className = 'vs-vs';
   panel.append(team(r.me, false));
   panel.insertAdjacentHTML('beforeend', '<div class="big">VS</div>');
-  if (r.mode === 'survival') panel.insertAdjacentHTML('beforeend', '<div class="team"><div style="font-size:28px">?</div><div>계속 나와요</div></div>');
+  if (r.mode === 'survival') panel.insertAdjacentHTML('beforeend', '<div class="team"><div style="font-size:28px">?</div><div>웨이브로 몰려와요</div></div>');
   else panel.append(team(r.foe, true));
   panel.insertAdjacentHTML('beforeend', '<div class="load">불러오는 중…</div>');
   el.appendChild(panel);

@@ -482,6 +482,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       const sy = (b: Body) => (b as { sortY?: number }).sortY ?? b.y;
       all.sort((a, b) => sy(a) - sy(b));
       for (const b of all) {
+        if ((b as { vsBlink?: boolean }).vsBlink) continue;   // 대전 서바이벌: 사라지기 전 깜빡이는 시체
         const q = pos(b);
         propsUpTo(b === w.player ? sy(b) : q.y);
         const jitter = b.stop > 0 && b !== w.player ? (w.tick % 2 ? 3 : -3) : 0;

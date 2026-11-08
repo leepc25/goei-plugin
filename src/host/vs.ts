@@ -1,12 +1,11 @@
 // 기다리는 동안 대전 (11-08 사용자): 플러그인 창(iframe)을 채팅 본문 칸 위로 옮겨 투명하게 깔고 대전을 띄운다.
 // - 자료: release/vs/ (index.json · goei-vs.N.txt 코드 · vs-common · vs-<번호> 팩). 저장은 goei:vs:* (설치 정리가 goei:game:* 를 지우므로 따로)
-// - 공용 자료(코드·이펙트·얼굴판·명단, 약 6MB)는 설정 「대전」에서 한 번 받는다. 인물은 VS 화면에서 고른 인물만 받아 둔다
+// - 데이터(코드·이펙트·얼굴판·명단·인물 126명 전투 동작, 약 100MB)는 설정 「대전」에서 한 번에 미리 받는다 (11-08 사용자)
 // - 싸우는 동안 창은 누르기를 통과시켜(pointer-events:none) 본문 스크롤·읽기가 그대로 되고, 키는 창이 초점을 가져 받는다
 // - 닫으면(게임패드 단추를 다시 누르거나 Esc) 멈추고 숨긴다. 다시 열면 이어서 (채팅마다)
 import { UPDATE_BASE } from '../core/update';
-import { GameFileError, getParts } from './game/fetch';
-import { createPackStore, type PackState } from './game/packs';
-import type { PackEntry } from './game/fetch';
+import { GameFileError, getParts, type PackEntry } from './game/fetch';
+import { createPackStore } from './game/packs';
 import type { VersusModule } from '../game/versus/entry';
 import type { VersusHandle } from '../game/versus/index';
 
@@ -48,72 +47,72 @@ async function savedCode(): Promise<string | null> {
   }
 }
 
-export interface VsDataState {
-  /** 공용 자료(코드·vs-common)가 이 판으로 있나 */
-  common: PackState;
-  /** 받아 둔 인물 수 / 전체 (이름 있는 · NPC) */
-  named: [number, number];
-  npc: [number, number];
-  /** 공용 자료 크기, 인물 전부 크기 (바이트) */
-  commonBytes: number;
-  namedBytes: number;
-  npcBytes: number;
+/** 받은 목록 (작은 값): 팩마다 지문. 상태를 볼 때 큰 팩을 읽지 않으려고 따로 둔다 */
+const HAVE_KEY = 'goei:vs:have';
+async function have(): Promise<Record<string, string>> {
+  try {
+    const v: unknown = await risuai.pluginStorage.getItem(HAVE_KEY);
+    const o = typeof v === 'string' ? (JSON.parse(v) as unknown) : null;
+    return o && typeof o === 'object' ? (o as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
 }
 
-/** 인물 팩 id 가 NPC 인지 (vs-common 명단에서) */
-async function npcIds(): Promise<Set<string>> {
-  try {
-    const b = await store.assets.bytes(COMMON, 'roster.json');
-    const r = b ? (JSON.parse(new TextDecoder().decode(b)) as { chars: { pack: string; npc: boolean }[] }) : null;
-    return new Set((r?.chars ?? []).filter((c) => c.npc).map((c) => c.pack));
-  } catch {
-    return new Set();
-  }
+export interface VsDataState {
+  /** 다 받았나 / 일부(옛 판 포함) / 없음 */
+  state: 'ready' | 'partial' | 'none';
+  /** 받은 팩 수 / 전체 팩 수 (공용 1 + 인물 126) */
+  done: number;
+  total: number;
+  /** 전부 크기 (바이트) */
+  bytes: number;
 }
 
 export async function vsDataState(): Promise<VsDataState> {
   const idx = await vsIndex();
-  const common = idx.packs.find((p) => p.id === COMMON);
+  const h = await have();
   const code = await savedCode();
-  let st: PackState = common ? await store.packStateOf(common) : 'none';
-  if (st === 'ready' && !code) st = 'old';
-  const npc = st === 'ready' ? await npcIds() : new Set<string>();
-  const out: VsDataState = { common: st, named: [0, 0], npc: [0, 0], commonBytes: (common?.bytes ?? 0) + (idx.code.length ?? 0), namedBytes: 0, npcBytes: 0 };
-  for (const p of idx.packs) {
-    if (p.id === COMMON) continue;
-    const k = npc.has(p.id) ? 'npc' : 'named';
-    out[k][1]++;
-    out[k === 'npc' ? 'npcBytes' : 'namedBytes'] += p.bytes;
-    if ((await store.packStateOf(p)) === 'ready') out[k][0]++;
+  const done = idx.packs.filter((p) => h[p.id] === p.hash).length;
+  const bytes = idx.packs.reduce((n, p) => n + p.bytes, 0) + idx.code.length;
+  const all = done === idx.packs.length && !!code;
+  return { state: all ? 'ready' : done || code ? 'partial' : 'none', done, total: idx.packs.length, bytes };
+}
+
+/** 다 받아 두었나 (게임패드 단추: 목록을 받지 않고 이 기기에 적힌 것만 본다) */
+async function vsReady(): Promise<boolean> {
+  const h = await have();
+  return !!(await savedCode()) && h.__complete === VERSION;
+}
+
+/** 전부 받기 (11-08 사용자: 데이터는 미리 받아 둔다): 코드 + 공용 + 인물 126명. 받은 팩은 건너뛴다 */
+export async function downloadVsAll(onProgress?: (done: number, total: number) => void): Promise<void> {
+  const idx = await vsIndex();
+  if (idx.version !== VERSION) throw new GameFileError('아직 이 판의 대전 데이터가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');
+  const h = await have();
+  const todo = idx.packs.filter((p) => h[p.id] !== p.hash);
+  const needCode = !(await savedCode());
+  const total = todo.length + (needCode ? 1 : 0);
+  let done = 0;
+  onProgress?.(done, total);
+  if (needCode) {
+    const code = new TextDecoder().decode(await getParts(idx.code.parts, undefined, VS_BASE));
+    if (code.length !== idx.code.length || codeVersion(code) !== VERSION) throw new GameFileError('대전 코드를 끝까지 받지 못했어요.');
+    await risuai.pluginStorage.setItem(CODE_KEY, code);
+    mod = null;
+    onProgress?.(++done, total);
   }
-  return out;
-}
-
-/** 공용 자료 받기: 코드 + vs-common */
-export async function downloadVsCommon(onProgress?: (done: number, total: number) => void): Promise<void> {
-  const idx = await vsIndex();
-  if (idx.version !== VERSION) throw new GameFileError('아직 이 판의 대전 자료가 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.');
-  const common = idx.packs.find((p) => p.id === COMMON);
-  if (!common) throw new GameFileError('대전 공용 자료가 목록에 없어요.');
-  const total = idx.code.parts.length + common.parts.length;
-  const code = new TextDecoder().decode(await getParts(idx.code.parts, (d) => onProgress?.(d, total), VS_BASE));
-  if (code.length !== idx.code.length || codeVersion(code) !== VERSION) throw new GameFileError('대전 코드를 끝까지 받지 못했어요.');
-  await risuai.pluginStorage.setItem(CODE_KEY, code);
-  mod = null;
-  await store.downloadGamePack(common, (d) => onProgress?.(idx.code.parts.length + d, total));
-}
-
-/** 인물 전부 받기 (which: 이름 있는 인물만 / NPC 까지) */
-export async function downloadVsChars(which: 'named' | 'all', onProgress?: (done: number, total: number) => void): Promise<void> {
-  const idx = await vsIndex();
-  const npc = await npcIds();
-  const want = idx.packs.filter((p) => p.id !== COMMON && (which === 'all' || !npc.has(p.id)));
-  const todo: PackEntry[] = [];
-  for (const p of want) if ((await store.packStateOf(p)) !== 'ready') todo.push(p);
-  for (const [i, p] of todo.entries()) {
+  // 공용 먼저, 그다음 인물
+  todo.sort((x, y) => (x.id === COMMON ? -1 : y.id === COMMON ? 1 : 0));
+  for (const p of todo) {
     await store.downloadGamePack(p);
-    onProgress?.(i + 1, todo.length);
+    if (p.id !== COMMON) store.forget(p.id);
+    h[p.id] = p.hash;
+    await risuai.pluginStorage.setItem(HAVE_KEY, JSON.stringify(h));
+    onProgress?.(++done, total);
   }
+  h.__complete = VERSION;
+  await risuai.pluginStorage.setItem(HAVE_KEY, JSON.stringify(h));
 }
 
 /* ───────── 코드 실행 ───────── */
@@ -218,7 +217,7 @@ async function setPass(pass: boolean) {
  */
 export async function toggleVersus(key: string, goSettings: () => void): Promise<void> {
   if (open) return closeVersus();
-  if ((await savedCode()) === null || (await store.assets.ready(COMMON).catch(() => false)) === false) { goSettings(); return; }
+  if (!(await vsReady())) { goSettings(); return; }
   const doc = await rootDoc();
   if (!doc) { goSettings(); return; }
   let m: VersusModule;
