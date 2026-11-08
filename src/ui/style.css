@@ -2752,7 +2752,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .st-col-row:last-child { border-bottom: 0; }
 .st-col-row.off .st-col-name b { color: var(--dim); }
 .st-col-all { border-bottom-width: 2px; }
-.st-col-all > .gx-segs { grid-column: 2 / -1; justify-self: end; }
+.st-col-all > .gx-segs { grid-column: 2 / -1; justify-self: start; }
 .st-col-name { display: flex; flex-direction: column; min-width: 0; }
 .st-col-name b { font-size: 13px; }
 .st-col-name small { font-size: 11px; color: var(--dim); }

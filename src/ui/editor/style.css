@@ -130,7 +130,8 @@
 .gw .st-col-row { grid-template-columns: var(--label) auto auto minmax(0, 1fr); grid-template-areas: 'label use show .' 'label hint hint hint'; column-gap: var(--gap); }
 .gw .st-col-row > .st-col-name > b { margin-right: 8px; }
 .gw .st-col-row > .gx-segs:nth-of-type(1) { grid-area: use; } .gw .st-col-row > .gx-segs:nth-of-type(2) { grid-area: show; }
-.gw .st-col-all > .gx-segs { grid-area: use; grid-column: auto; justify-self: start; }
+/* 「모든 칸」 줄: 조작 하나를 다른 줄의 첫 조작(왼쪽)과 같은 자리에. st-col-name 도 div 라 nth-of-type 으로는 못 고른다 */
+.gw .st-col-row.st-col-all > .gx-segs { grid-area: auto; grid-column: 2 / -1; grid-row: 1; justify-self: start; }
 .gw .gw-setbody .st-cols.ps-row-block { padding: 0; }
 /* 이름 바꾸기 줄: 이름 · 입력칸 · 단추들 */
 .gw .dir-rename { grid-template-columns: var(--label) minmax(120px, var(--ctl)) auto auto; grid-template-areas: none; column-gap: var(--gap); justify-content: start; align-items: center; }
@@ -338,6 +339,7 @@
 @container (max-width: 600px) {
   .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }
   .gw .st-col-row { grid-template-areas: 'label label' 'use show' 'hint hint'; grid-template-columns: auto auto; justify-content: start; }
+  .gw .st-col-row.st-col-all > .gx-segs { grid-column: 1 / -1; grid-row: 2; }
   .gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .st-col-name > b { min-height: 0; }
   .gw .ps-ctl > input, .gw .ps-ctl > select, .gw .dir-in > input, .gw .dir-in > select, .gw .st-range { width: 100%; }
   /* 목록 + 상세 두 칸 페이지(세계 기록·세력 관계)도 폰처럼 목록 대신 드롭다운 한 줄 */
@@ -388,6 +390,7 @@
   .gw-save-state { display: none; }
   .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }
   .gw .st-col-row { grid-template-areas: 'label label' 'use show' 'hint hint'; grid-template-columns: auto auto; justify-content: start; }
+  .gw .st-col-row.st-col-all > .gx-segs { grid-column: 1 / -1; grid-row: 2; }
   .gw .ps-label > b, .gw .dir-line > span:first-child, .gw .dir-in > span:first-child, .gw .st-col-name > b { min-height: 0; }
   .gw .dir-rename { grid-template-columns: minmax(0, 1fr) auto auto; }
   .gw .dir-rename > .dir-in > span:first-child { grid-column: 1 / -1; }
