@@ -292,19 +292,8 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
     rec.vanished = [...bk].filter((k) => !ak.has(k));
     rec.saved = { chat: store1.setChat - store0.setChat, store: store1.setStore - store0.setStore, model: store1.llm - store0.llm, send: store1.send - store0.send };
     rec.win = { before: { gx: before.gx, gw: before.gw }, after: { gx: after.gx, gw: after.gw } };
-    // 이상 반응 표시 (판단 아님, 점검하는 Claude가 캡처로 확인할 곳)
-    if (rec.errors.length) rec.flags.push('오류');
-    const closeish = /(^|-)(close|x|cancel|back|no|hide|skip|drop|del|delete|keep)(-|$)|^close$|^game-close$/.test(job.action) || /닫기|취소|뒤로|접기|×|✕/.test(job.label);
-    const changed = rec.appeared.length || rec.vanished.length || before.html !== after.html || w.mutations > 0 || rec.saved.chat || rec.saved.store || rec.saved.model || rec.saved.send;
-    if (!changed) rec.flags.push('반응 없음');
-    if (w.boxGone != null && !closeish) rec.flags.push(`누르자 창이 닫힘(${w.boxGone}ms)`);
-    else if (w.elGone != null && w.elGone < 400 && !closeish && !rec.appeared.length) rec.flags.push(`누른 것이 바로 사라짐(${w.elGone}ms)`);
-    if ((before.gx && !after.gx) && !closeish) rec.flags.push('상황판 창이 닫힘');
-    if ((before.gw && !after.gw) && !closeish) rec.flags.push('설정 창이 닫힘');
-    if (w.elClass.length) {
-      const first = w.elClass[0][0], last = w.elClass.at(-1);
-      if (w.after.elCls === w.before.elCls && w.after.aria === w.before.aria && w.elClass.length >= 2) rec.flags.push(`표시가 잠깐 바뀌었다 돌아감(${first}~${last[0]}ms)`);
-    }
+    rec.before = { gx: before.gx, gw: before.gw, html: before.html }; rec.after = { gx: after.gx, gw: after.gw, html: after.html };
+    rec.flags.push(...flagsOf(rec));
     rec.selStyle = w.after?.style || null;
     rec.selChanged = w.after && (w.after.elCls !== w.before.elCls || w.after.aria !== w.before.aria) ? { from: [w.before.elCls, w.before.aria], to: [w.after.elCls, w.after.aria] } : null;
     // 새로 열린 화면이면 그 안을 따라 들어간다
@@ -318,11 +307,38 @@ async function clickJob(browser, vp, startKind, base, job, idx) {
   return rec;
 }
 
+
+// 이상 반응 표시 (판단 아님, 점검하는 Claude가 캡처로 확인할 곳). --report-only 때도 기록(watch)으로 다시 계산한다
+function flagsOf(rec) {
+  const f = [], w = rec.watch; if (!w) return f;
+  const label = rec.label || '';
+  if (rec.errors?.length) f.push('오류');
+  const closeish = /(^|-)(close|x|cancel|back|no|hide|skip|drop|del|delete|keep)(-|$)|^close$|^game-close$/.test(rec.action || '') || /닫기|취소|뒤로|접기|×|✕/.test(label);
+  const s = rec.saved || {};
+  const changed = rec.appeared?.length || rec.vanished?.length || rec.before?.html !== rec.after?.html || w.mutations > 0 || s.chat || s.store || s.model || s.send;
+  if (!changed) f.push('반응 없음');
+  const moved = (rec.appeared?.length ?? 0) > 0; // 다른 화면으로 넘어감
+  if (rec.before?.gx && !rec.after?.gx && !closeish) f.push('상황판 창이 닫힘');
+  else if (rec.before?.gw && !rec.after?.gw && !closeish) f.push('설정 창이 닫힘');
+  else if (w.boxGone != null && !closeish && !moved) f.push(`누르자 창이 닫힘(${w.boxGone}ms)`);
+  else if (w.elGone != null && w.elGone < 400 && !closeish && !moved) f.push(`누른 것이 바로 사라짐(${w.elGone}ms)`);
+  // 누른 것에 표시(선택·효과)가 붙었는데 그것이 보일 틈 없이(0.3초 안에) 사라지거나 창이 닫힘 — 2026-11-08 임무 고르기·해제 문제의 꼴
+  if (w.elClass?.length) {
+    const firstFx = w.elClass[0][0];
+    const goneAt = Math.min(w.elGone ?? Infinity, w.boxGone ?? Infinity);
+    if (goneAt !== Infinity && goneAt - firstFx < 300) f.push(`효과가 보일 틈 없이 사라짐(효과 ${firstFx}ms → 사라짐 ${goneAt}ms)`);
+    const last = w.elClass.at(-1);
+    if (w.after && w.after.elCls === w.before.elCls && w.after.aria === w.before.aria && w.elClass.length >= 2) f.push(`표시가 잠깐 바뀌었다 돌아감(${firstFx}~${last[0]}ms)`);
+  }
+  return f;
+}
+
 // ---- 돌리기 ------------------------------------------------------------------------------------------------------
 const results = [];
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
-if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.json'), 'utf8')); results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; }
+if (opt.reportOnly) { const j = JSON.parse(readFileSync(resolve(OUT, 'report.json'), 'utf8')); for (const r of j.results) if (r.watch) r.flags = [...r.flags.filter((x) => /재현 실패|못 찾음|가려져|꺼진|안 눌림|도구 오류/.test(x)), ...flagsOf(r)];
+  results.push(...j.results); states.push(...j.states); opt.vp = j.opt.vp; opt.start = j.opt.start; opt.depth = j.opt.depth; }
 const browser = opt.reportOnly ? null : await launch();
 for (const vp of opt.reportOnly ? [] : opt.vp) {
   for (const startKind of opt.start) {
