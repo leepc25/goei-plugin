@@ -24,11 +24,11 @@ export function useEileenKeys() {
   Object.assign(KEYMAP, { KeyQ: 'light', KeyW: 'heavy', KeyC: 'block', KeyA: 'shoot', KeyS: 'charge', KeyD: 'skill', KeyF: 'super', Tab: 'weapon', KeyR: 'combat', KeyZ: 'sit', KeyX: 'crouch', KeyV: 'flee', KeyB: 'back', KeyM: 'map', KeyO: 'auto' } as Record<string, Btn>);
 }
 
-/** 대전 키 배치 (사용자 11-08 「대전액션에 맞지 않아」): ←→ 바로 달리기 · ↑/Space 점프 · Shift 회피 · A 약 · S 강 · D 기술 · F 필살기 · W 원거리 · E 충전.
- * 막기는 키가 없고 상대 반대쪽 방향을 누르고 있으면 막는다(fighter/player.ts). 앉기·웅크리기·도망·뒷걸음질·무기·전투 자세·지도·아이템·자동은 뺀다 */
+/** 대전 키 배치 (사용자 11-08 「두 줄로」): 아랫줄 A 약 · S 강 · D 충전(누른 채) / 윗줄 W 원거리 · E 특수기. 필살기 = A+S 동시.
+ * ←→ 바로 달리기 · 방향 두 번 = 회피(앞 16-1·뒤 16) · 뒤 방향 누르기 = 막기 · ↑/Space 점프 (fighter/player.ts vsInput). 나머지 키는 대전에서 뺀다 */
 export function useVersusKeys() {
-  for (const k of Object.keys(KEYMAP)) if (!['ArrowLeft', 'ArrowRight', 'Space', 'ShiftLeft', 'ShiftRight', 'Escape'].includes(k)) delete KEYMAP[k];
-  Object.assign(KEYMAP, { ArrowUp: 'jump', KeyA: 'light', KeyS: 'heavy', KeyD: 'skill', KeyF: 'super', KeyW: 'shoot', KeyE: 'charge' } as Record<string, Btn>);
+  for (const k of Object.keys(KEYMAP)) if (!['ArrowLeft', 'ArrowRight', 'Space', 'Escape'].includes(k)) delete KEYMAP[k];
+  Object.assign(KEYMAP, { ArrowUp: 'jump', KeyA: 'light', KeyS: 'heavy', KeyD: 'charge', KeyW: 'shoot', KeyE: 'skill', KeyZ: 'sit', KeyX: 'crouch' } as Record<string, Btn>);   // Z 주저앉기 · X 웅크리기 (사용자 11-08 「그렇게 넣고」)
 }
 
 /** Shift를 이 틱 수 안에 떼면 회피, 넘게 누르면 달리기 (0.15초) */
@@ -49,6 +49,8 @@ export interface Pad {
   run: boolean;
   /** ↓ 두 번 */
   downDouble: boolean;
+  /** 이 틱에 좌우 방향을 두 번 눌렀다 (-1/1, 아니면 0). 대전 회피 */
+  tap2?: number;
 }
 
 export class Input {
@@ -130,10 +132,11 @@ export class Input {
       this.shiftTicks = -1;
     }
     // 같은 방향 두 번
+    let tap2 = 0;
     for (const d of ['left', 'right'] as const) {
       if (pressed.has(d)) {
         const dir = d === 'right' ? 1 : -1;
-        if (this.tick - (this.lastTap[d] ?? -99) <= DOUBLE_TAP) this.dashDir = dir;
+        if (this.tick - (this.lastTap[d] ?? -99) <= DOUBLE_TAP) { this.dashDir = dir; tap2 = dir; }
         this.lastTap[d] = this.tick;
       }
     }
@@ -144,6 +147,6 @@ export class Input {
       this.lastTap.down = this.tick;
     }
     const run = (held.has('shift') && this.shiftTicks >= SHIFT_TAP && mx !== 0) || (this.dashDir !== 0 && mx === this.dashDir);
-    return { held, pressed, released, mx, my, evade, run, downDouble };
+    return { held, pressed, released, mx, my, evade, run, downDouble, tap2 };
   }
 }

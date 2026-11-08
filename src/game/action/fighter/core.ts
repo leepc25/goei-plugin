@@ -125,7 +125,8 @@ let freeSuper = false, showArmor = true, grayT = 0;
 // 계산 근거·표: docs/밸런스_설계.md, 값은 game-src/action/testroom3/balance.py 가 넣음
 const BAL = () => CH.bal || {};
 const isHot = () => !!(CH.ranged && CH.ranged.heat) || BAL().gun === 'rapid';
-function cdReady(k?: Json) { const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
+function cdReady(k?: Json) { if (view.clear) return true;   // 대전: 쿨타임 없음 (11-08 사용자)
+  const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
 function setCd(k?: Json) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v * (k === 'shot' ? (P.shotMul || 1) : (env.mod?.cd?.() ?? 1) * (k === 'skill' || k === 'skill2' ? (P.skillCdMul || 1) : 1)); }   // 기술 쿨 × 능력치(지) × 퍽. 사격 간격은 퍽만
 const atkDmg = (id?: Json, big?: Json) => { const a = BAL().atk || {}; const v = a[id] ?? (big ? 34 : 12); return id === '14' && big ? Math.round(v * 1.8) : v; };   // 점프 강공격(내려찍기)은 약의 1.8배(10-28 「점프 강·약 피해 같음」)
 function gainSp(v?: Json) { if (P.noGain > P.t) return; v *= env.mod ? env.mod.sp() : 1; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
@@ -1262,6 +1263,7 @@ function update(dt?: Json) {
   switch (P.mode) {
     case 'ground': {
       if (down('flee') && has('36')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
+      if (down('back') && !has('37') && view.clear) { P.mode = 'back'; play('4', { fps: 9, loopFrom: 0 }); break; }   // 대전: 뒷걸음질 그림이 없으면 걷기 그림으로 물러난다
       if (down('back') && has('37')) { P.mode = 'back'; play('37', { fps: 10, onEnd: () => { if (P.mode !== 'back') return; if (has('37_1')) { const n = nOf('37_1'), lp = LP('37_1') || R(Math.min(1, n - 1), n - 1); play('37_1', { seq: S(lp, 0.11), loopFrom: 0 }); } else { const n = nOf('37'); play('37', { seq: [{ f: n - 2, d: 0.17 }, { f: n - 1, d: 0.17 }], loopFrom: 0 }); } } }); break; }
       if (!(dx || dy)) P.runT = 0;
       if (dx || dy) {

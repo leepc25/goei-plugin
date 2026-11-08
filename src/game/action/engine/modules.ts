@@ -1319,7 +1319,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.event(e as never);
       if (game?.inHub && (e.type === 'enter:floor' || e.type === 'custom')) return; // 본부: 승강기 안내·층 제목 없음
       shell.fx.onGameEvent(e as never);
-      story.event(e.type, e as never);
+      if (!view.clear) story.event(e.type, e as never);   // 대전: 필드 요원 대사 끔 (11-08 사용자 「꺼」)
       if (e.type === 'run:end') saveFlags();
     },
   ];
@@ -1426,7 +1426,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
       const ep = w.player instanceof FighterPlayer ? w.player : null;
-      if (ep && !mods.blocking?.() && !shell.paused) {
+      if (ep && !view.clear && !mods.blocking?.() && !shell.paused) {   // 대전: 방어 게이지 막대 없음
         const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
         guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
         const z = view.zoom, head = heroTop(ep) * persp(ep.y);

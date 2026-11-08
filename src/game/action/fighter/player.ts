@@ -23,8 +23,8 @@ import { PerkRun, perkWorld, type PerkHost } from '../../perks/runtime';
 import { draft, kitOf, type Offer } from '../../perks/rules';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 
-/** 대전(11-08 사용자 「막기 게이지 너무 빨리 닳고 필살기 게이지는 너무 빨리 차」): 막을 때 닳는 양·필살 게이지 차는 양 배율 */
-const VS_GUARD = 0.4, VS_SP = 0.4;
+/** 대전(11-08 사용자 「필살기 게이지는 너무 빨리 차」): 필살 게이지 차는 양 배율 */
+const VS_SP = 0.4;
 /** 대전 뒤 방향 막기: 한 번 막으면 이만큼 막는 자세에 묶인다 (초) */
 const VS_BLOCK_STUN = 0.3;
 /** 대전: 맞으면 이만큼 손을 못 쓴다 (초). 약공격 이음 간격보다 길게 */
@@ -341,7 +341,7 @@ export class FighterPlayer extends Player {
       // 퍽: 막기 사건(가시 방패·혼쭐·금품 수수 불가·쌓인 울분·탄 되받기·맨손으로 쳐낸다·가드 강화·완전 방어)
       const attacker = this.attackerOf(hit);
       const pr = this.perks.blocked({ melee: !!attacker, attacker, dmg: hit.dmg });
-      if (!pr.noDrain) this.spendGuard((14 + hit.dmg * 0.6) / this.perks.guardMul() * (view.clear ? VS_GUARD : 1));
+      if (!pr.noDrain && !view.clear) this.spendGuard((14 + hit.dmg * 0.6) / this.perks.guardMul());   // 대전: 방어 게이지 없음 (11-08 사용자 「방어 게이지 같은 거 보통 대전액션에 없잖아」)
       if (pr.reflect) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
       if (this.guardBroken && this.perks.guardBreak()) { this.core.onRelease('block'); world.emit({ type: 'guard', x: this.x }); return { kind: 'guard' }; }
       if (this.guardBroken) {
@@ -528,9 +528,24 @@ export class FighterPlayer extends Player {
     if (this.guardBroken || this.guard < 8) names.delete('block');
     // 방향키는 쓰러짐·웅크림·주저앉음일 때만 테스트룸에 넘긴다 (좌우 = 기기, 위 = 일어나기)
     const lying = ['down', 'belly', 'sit', 'scoot', 'crouch', 'crawl4'].includes(this.core.P.mode);
+    // 대전: A+S 동시(3틱 안) = 필살기, 방향 두 번 = 회피 (11-08 사용자)
+    let vsSuper = false;
+    if (view.clear) {
+      for (const k of ['light', 'heavy'] as const) if (p.pressed.has(k)) this.vsTapAt[k] = this.vsTick;
+      this.vsTick++;
+      if ((p.pressed.has('light') || p.pressed.has('heavy')) && Math.abs(this.vsTapAt.light - this.vsTapAt.heavy) <= 3 && !silenced) {
+        vsSuper = true; this.vsTapAt.light = -99; this.vsTapAt.heavy = -199;
+        // 먼저 눌린 약·강이 막 나갔으면 거두고 필살기로
+        const P = this.core.P;
+        if (P.mode === 'act' && P.clip && ['9', '12'].includes(P.clip.id)) this.core.toIdle();   // 3틱 안에 같이 눌렀으니 막 나간 약·강이다
+        this.core.onPress('super');
+      }
+      if (p.tap2) this.core.onPress('dodge');
+    }
     for (const [b, n0] of PRESS) {
       const n = nameOf(n0);
       if (!p.pressed.has(b) || (silenced && (n === 'skill' || n === 'super'))) continue;
+      if (vsSuper && (n === 'light' || n === 'heavy')) continue;
       if ((lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
     }
     if (p.evade) this.core.onPress('dodge');
@@ -541,6 +556,8 @@ export class FighterPlayer extends Player {
   private vsBack = false;
   private vsBlockT = 0;
   private vsStunT = 0;
+  private vsTick = 0;
+  private vsTapAt = { light: -99, heavy: -199 };
   private vsInput(p: Pad, names: Set<string>) {
     const P = this.core.P;
     P.combat = true;
@@ -551,7 +568,7 @@ export class FighterPlayer extends Player {
     if (P.mode === 'ground' && P.face !== s && mx !== s) P.face = s;   // 서 있거나 뒤로 갈 때 상대 쪽으로 돈다
     this.vsBack = mx === -s && mx !== 0;
     if (mx === s) names.add('run');
-    if (this.vsBack && this.core.has('37') && (P.mode === 'ground' || P.mode === 'back')) { names.delete('left'); names.delete('right'); names.add('back'); }
+    if (this.vsBack && (P.mode === 'ground' || P.mode === 'back')) { names.delete('left'); names.delete('right'); names.add('back'); }
     if (this.vsBlockT > 0) {
       this.vsBlockT -= 1 / 30;
       if (this.vsBlockT > 0) { names.add('block'); names.delete('back'); }
