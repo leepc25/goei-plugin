@@ -258,8 +258,12 @@ async function prepPage(browser, vp, base, path) {
 const fname = (s) => s.replace(/[^\p{L}\p{N}_-]+/gu, '_').slice(0, 60);
 
 async function clickJob(browser, vp, startKind, base, job, idx) {
-  const { page, errors, fail } = await prepPage(browser, vp, base, job.path);
   const rec = { vp, start: startKind, path: job.path.map((p) => p.key + (p.nth ? '#' + p.nth : '')), key: job.key, nth: job.nth, label: job.label, action: job.action, value: job.value, flags: [] };
+  // 띄우기가 (부하로) 실패하면 한 번 더. 그래도 안 되면 기록만 하고 넘어간다 (한 건 때문에 전체가 멈추지 않게)
+  let prep = null;
+  for (let tries = 0; tries < 2 && !prep; tries++) { try { prep = await prepPage(browser, vp, base, job.path); } catch (e) { rec.note = '띄우기 실패: ' + String(e?.message || e).trim().slice(0, 200); } }
+  if (!prep) { rec.flags.push('도구 오류'); return rec; }
+  const { page, errors, fail } = prep;
   try {
     if (fail) { rec.flags.push('재현 실패'); rec.note = fail; return rec; }
     const touch = !!VIEWPORTS[vp].touch;
