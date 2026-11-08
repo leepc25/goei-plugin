@@ -295,20 +295,15 @@ def migrate_directory(entries):
 
 
 WIKI_FOLDER_KEY = '\uf000folder:6f1c2a7e-wiki-0000-0000-goeiwiki0001'
-WIKI_FOLDER_NAME = '📖위키'
-
-
 WIKI_PACK_COMMENT = '📖위키 기본 문서'
 WIKI_PACK_HEAD = 'GOEIWIKI1:'  # core/wiki.ts WIKI_PACK_HEAD와 같게
 
 
-def add_wiki_base(entries):
-    """「📖위키」 폴더(사용자 문서 자리)만 카드에 둔다. 기본 문서 묶음은 2026-10-27부터 카드 밖(release/wiki-base.N.txt)에서 플러그인이 받아
-    저장소(pluginStorage)에 둔다 (core/wiki.ts prepareBaseDocs · host/install.ts). 옛 카드의 「📖위키 기본 문서」 항목은 뺀다"""
-    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY and e.get('comment') != WIKI_PACK_COMMENT]
-    entries.append({'key': WIKI_FOLDER_KEY, 'comment': WIKI_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
-                    'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
-    return entries
+def drop_wiki_lore(entries):
+    """위키는 카드 로어북에 두지 않는다. 기본 문서 묶음은 2026-10-27부터 카드 밖(release/wiki-base.N.txt)에서 플러그인이 받아
+    저장소(pluginStorage)에 두고(core/wiki.ts prepareBaseDocs · host/install.ts), 채팅에서 쓴 문서는 채팅 로어북에 들어간다.
+    그래서 「📖위키」 폴더도 쓰는 곳이 없어 뺀다 (사용자 2026-11-08). 원본 카드의 위키 폴더·묶음 항목을 뺀다"""
+    return [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY and e.get('comment') != WIKI_PACK_COMMENT]
 
 
 WIKI_PACK_FILE = 'wiki-base.json'
@@ -357,12 +352,12 @@ INSTALL_DIR = ROOT / 'src' / 'data' / 'install'
 CARD_ICON = ROOT / 'card' / '봇카드.webp'
 
 
-def write_install_data(greetings, greeting_index, pictures, lore, icon, icon_name='icon.png'):
-    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 빈 인사말 하나와 직접 입력 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
+def write_install_data(greetings, greeting_index, first, pictures, lore, icon, icon_name='icon.png'):
+    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 빈 인사말 하나와 직접 입력 키→번호, 첫 메시지(시작 안내), 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
     INSTALL_DIR.mkdir(parents=True, exist_ok=True)
     directory = json.loads(next(e for e in lore if e.get('comment') == 'Directory')['content'])
     dump = lambda name, obj: (INSTALL_DIR / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    dump('greetings.json', {'index': greeting_index, 'texts': greetings})
+    dump('greetings.json', {'index': greeting_index, 'texts': greetings, 'first': first})
     dump('pictures.json', pictures)
     dump('directory.json', directory)
     dump('icon.json', {'file': icon_name, 'digest': hashlib.sha1(icon).hexdigest()[:12], 'bytes': len(icon)} if icon else {})
@@ -916,12 +911,12 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 글 로어북은 Directory·매니페스트·위키 기본 문서
-    lore = drop_plugin_lore(add_wiki_base(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore))))))))
+    # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 로어북은 ⚙️설정 폴더·Directory·매니페스트
+    lore = drop_plugin_lore(drop_wiki_lore(add_start_items(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore))))))))
     lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)
-    manifest['keys'] = {'settings': settings['key'], 'wiki': WIKI_FOLDER_KEY}
+    manifest['keys'] = {'settings': settings['key']}
     pack = wiki_pack()
     if pack:
         manifest['wiki'] = {'digest': hashlib.sha1(pack.encode('utf-8')).hexdigest()[:12], 'length': len(pack.encode('utf-16-le')) // 2}
@@ -948,6 +943,8 @@ def main(src, dst):
     risu.pop('customScripts', None)
     if data.get('character_book'):
         data['character_book']['entries'] = [to_ccv3(e) for e in lore]
+        # 봇 로어북 설정: 깡통봇 설치와 같은 값 (검색 깊이 10 · 토큰 예산 99999, 사용자 2026-10-27·11-08). 원본 카드의 90000 을 맞춘다
+        data['character_book'].update({'scan_depth': 10, 'token_budget': 99999})
 
     # 봇카드 이미지 바꾸기: 카드 속 아이콘 자산을 확정 그림(card/봇카드.webp)으로
     if CARD_ICON.exists():
@@ -982,7 +979,7 @@ def main(src, dst):
     icon_name = f"icon.{icon_asset.get('ext') or 'png'}" if icon_asset else 'icon.png'
     if icon:
         (Path(dst).parent / icon_name).write_bytes(icon)
-    write_install_data(greetings, greeting_index, pictures, lore, icon, icon_name)
+    write_install_data(greetings, greeting_index, LANDING, pictures, lore, icon, icon_name)
     (ROOT / 'src' / 'data' / 'world' / 'greetings.json').write_text(json.dumps({'index': scene_index, 'texts': scene_texts}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(

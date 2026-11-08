@@ -1,4 +1,4 @@
-// GPT가 쓴 위키 기본 문서(result_*.txt)를 검사해서 card/wiki-base.json에 모은다. 경량 카드 빌드가 이 파일을 카드 로어북 「📖위키」 폴더로 넣는다.
+// GPT가 쓴 위키 기본 문서(result_*.txt)를 검사해서 card/wiki-base.json에 모은다. 경량 카드 빌드가 이 파일을 묶어 release/wiki-base 로 내고, 플러그인이 받아 저장소에 둔다.
 // 사용법: node scripts/wiki-import.mjs <카드 로어북.json> <result 파일...>   (먼저 npm run build)
 // 같은 제목이 다시 오면 새 것으로 바꾼다. 검사에 걸린 문서는 넣지 않고 이유를 보여 준다.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';

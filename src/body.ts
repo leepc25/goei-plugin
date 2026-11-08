@@ -45,7 +45,7 @@ import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
 import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
-import { isGoeiLore } from './core/install';
+import { isGoeiLore, isLanding } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
 import { showWorldDataPanel } from './host/datapanel';
@@ -638,11 +638,6 @@ function callCardHtml(target: string): string {
   const p = cardPalette();
   return `<div data-goei-card="call" style="${cardStyle()}">`
     + `<span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
-}
-
-/** Lite 카드의 첫 안내(first_mes). 카드에는 고정색으로 들어 있어 플러그인이 테마 색으로 다시 그린다. 옛 카드 문구도 알아본다 */
-function isLanding(text: string): boolean {
-  return text.includes('data-goei="landing"') || (text.includes('ANOMALY SIMULATION') && text.includes('버튼을 눌러 시작하세요'));
 }
 
 function landingHtml(): string {

@@ -80,11 +80,11 @@ export function applyInstallPack(text: string): void {
   }
   if (!obj(j) || j.schema !== 1 || j.kind !== 'install') throw new Error('설치 자료 팩 형식이 달라요 (schema·kind).');
   const g = j.greetings;
-  if (!obj(g) || !obj(g.index) || !Array.isArray(g.texts)) throw new Error('설치 자료 팩 형식이 달라요 (greetings).');
+  if (!obj(g) || !obj(g.index) || !Array.isArray(g.texts) || typeof g.first !== 'string') throw new Error('설치 자료 팩 형식이 달라요 (greetings).');
   if (!Array.isArray(j.pictures)) throw new Error('설치 자료 팩 형식이 달라요 (pictures).');
   if (!obj(j.directory)) throw new Error('설치 자료 팩 형식이 달라요 (directory).');
   if (!obj(j.icon)) throw new Error('설치 자료 팩 형식이 달라요 (icon).');
-  setInstallData({ greetings: { index: g.index as never, texts: g.texts.map(String) }, pictures: j.pictures as never, directory: j.directory, icon: j.icon as never });
+  setInstallData({ greetings: { index: g.index as never, texts: g.texts.map(String), first: g.first }, pictures: j.pictures as never, directory: j.directory, icon: j.icon as never });
 }
 
 // ── 소지품 그림 팩 (scripts/data-pack.mjs itemsPackText 와 같은 모양, 매칭은 game-src/items/match_icon.mjs 와 같은 규칙 — 시험이 둘을 맞대 봄) ──
