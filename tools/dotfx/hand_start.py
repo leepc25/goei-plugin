@@ -27,11 +27,24 @@ def save(name, frames, dur):
 
 
 def orb():
-    halo = Image.open(OUT / "dot-halo.png").crop((0, 0, 256, 256))
-    S = 256; frames = [Image.new("RGBA", (S, S)) for _ in range(4)]
-    for sc in (1.0, 0.93, 0.86, 0.79, 0.72, 0.65, 0.58, 0.5):
-        n = max(2, int(S * sc) // 2 * 2); f = Image.new("RGBA", (S, S))
-        f.paste(halo.resize((n, n), Image.NEAREST), ((S - n) // 2, (S - n) // 2))
+    """킹오파98 구조(화면 메모리에서 봄): 층진 둥근 빛은 그림 한 장(15단 띠 번호)이고, 매 게임장 팔레트를 한 칸씩 밀어
+    바깥 띠부터 꺼지게 해서 줄어 보이게 한다. 우리는 띠 번호 그림 1장을 그리고, 색표를 한 칸씩 민 13장을 굽는다(색은 우리 금빛)."""
+    S = 160; c = S / 2; NB = 15
+    # 우리 색표: 0 투명, 1 바깥 가장 어두움 → 15 가운데 흰빛
+    # 킹오파처럼 바깥 7단만 어둠→밝음이고 안쪽 8단은 흰빛: 밀어도 가운데 흰빛은 끝까지 남음
+    RAMP = [None, (52, 18, 4), (104, 40, 10), (166, 74, 14), (222, 122, 28), (250, 168, 56), (255, 210, 110), (255, 238, 176)] + [(255, 252, 236)] * 2 + [(255, 255, 255)] * 6
+    band = [[0] * S for _ in range(S)]
+    for y in range(S):
+        for x in range(S):
+            r = math.hypot(x + 0.5 - c, y + 0.5 - c) / (S / 2)
+            if r <= 1: band[y][x] = max(1, NB - int(r * NB))
+    frames = [Image.new("RGBA", (S, S)) for _ in range(4)]
+    for k in range(13):
+        f = Image.new("RGBA", (S, S)); px = f.load()
+        for y in range(S):
+            for x in range(S):
+                b = band[y][x] - round(k * 0.77)   # 킹오파 마지막 장에 띠 5단쯤 남음
+                if b >= 1: px[x, y] = RAMP[min(15, b + (15 - NB))] + (255,)
         frames.append(f)
     save("dot-hand-orb", frames, F)
 

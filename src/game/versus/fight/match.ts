@@ -172,7 +172,7 @@ export class Match {
       this.blackT = 0.7;   // 킹오파: 빛살이 사라지면 배경이 바로 돌아옴(약 40게임장)
       this.bgWhiteT = 4 / 60;
       const y = LINE - by.z - 125 * K;
-      this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x + by.face * 12 * K, y, s: 1.15 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
+      this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x + by.face * 12 * K, y, s: 2 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
       this.st.fx.push({ k: 'sheet', name: 'dot-hand-rise', x: by.x + by.face * 24 * K, y, s: 2 * K, anchor: 'center', live: true, t: 9, t0: 9, el: 0 });
     } else if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
     else {
@@ -448,10 +448,11 @@ export class Match {
     c.clearRect(0, 0, cv.width, cv.height);
     const f = this.fold();
     cv.style.transform = f < 1 ? `scaleY(${Math.max(0.001, f).toFixed(3)})` : '';
-    const sh = this.shakeV > 0 ? (Math.random() - 0.5) * this.shakeV : 0;
+    // 흔들림 (11-09, 킹오파98 화면 메모리에서 봄): 화면 전체가 위아래로 2게임장마다 번갈아 한 칸(캐릭터 점 4개쯤) 들썩임. 세기는 들썩이는 폭만 바꿈
+    const shY = this.shakeV > 0 ? (Math.floor(this.st.t * 30) % 2 ? 1 : -1) * Math.min(10 * K, 4 + this.shakeV * 0.35) : 0;
     c.save();
     c.scale(zoom, zoom);
-    c.translate(-Math.round(this.cam * zoom) / zoom + sh, -cropY);
+    c.translate(-Math.round(this.cam * zoom) / zoom, -cropY + shY);
     c.imageSmoothingEnabled = false;
     const bg = view.vsBg;
     if (bg) {
