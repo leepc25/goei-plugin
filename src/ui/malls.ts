@@ -554,7 +554,7 @@ async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st
     await saveDesk(cur, next);
   } catch (error) {
     v.notice = error instanceof Error ? error.message : String(error);
-    v.failRaw = String((error as { raw?: string }).raw ?? '');
+    v.failRaw = deskRawSafe(String((error as { raw?: string }).raw ?? ''));
     if (kind === 'talk') {
       // 내 말은 적어 뒀으니 답이 안 왔으면 되돌리고 입력칸에 돌려준다
       const cur = env.current();
