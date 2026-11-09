@@ -4,6 +4,7 @@ import { checkInstall, installIcon, installLoreAndGreetings, installPictures, in
 import type { ChatContext } from '../../host/risu';
 import { notifyInstalled } from '../../host/hooks';
 import { BRAND } from '../brand';
+import { updateGroup } from '../update';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const mb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`);
@@ -72,7 +73,7 @@ export function installPage(ctx: ChatContext): string {
   if (!s || instUi.forChar !== ctx.charIndex) {
     // 점검 전: 설치 자료 받는 진행 글, 또는 실패 까닭 + 다시 점검 (설치 자료 받기 실패는 여기로 온다)
     const failed = !instUi.pending && instUi.notice;
-    return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 점검</h2>${failed ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ''}</header>
+    return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 업데이트</h2>${failed ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ''}</header>
       ${failed ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : `<p class="gx-muted">${esc(instUi.progress || '점검하는 중…')}</p>`}</div>`;
   }
   const missing = installSummary(s);
@@ -88,11 +89,12 @@ export function installPage(ctx: ChatContext): string {
     : allDone
       ? `<button class="gx-mini" data-action="ed-inst-all">다시 점검·맞추기</button>`
       : `<button class="gx-mini primary" data-action="ed-inst-all">${s.goei ? '빠진 것 전부 채우기' : `${esc(BRAND.name)} 설치`}</button>`;
-  return `<div class="gw-page gw-set gw-install"><header class="gw-head"><h2>설치 · 점검</h2><div class="gw-head-act">${main}</div>
+  return `<div class="gw-page gw-set gw-install"><header class="gw-head"><h2>설치 · 업데이트</h2><div class="gw-head-act">${main}</div>
       <p class="gx-muted">${head} 기존 로어북·인사말·에셋은 그대로 두고 덧붙여요. 원래 첫 메시지는 추가 인사말 끝으로 옮겨요. 사진은 받다 끊겨도 받은 만큼 저장되니 다시 누르면 이어서 받아요.</p></header>
     ${instUi.notice ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : ''}
     ${instUi.info ? `<p class="gx-hint">${esc(instUi.info)}</p>` : ''}
     <div class="gx-settings gw-setbody">
+    ${updateGroup(ctx)}
     ${statusList(s)}
     <section class="ps-group"><h3>세부 선택</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy || instUi.setName ? 'disabled' : ''}>바꿈</button><button class="gx-seg${instUi.setName ? '' : ' on'}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy || !instUi.setName ? 'disabled' : ''}>그대로</button></div></div></div>

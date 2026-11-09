@@ -515,3 +515,7 @@
 /* 세력 관계 줄: 상세 칸이 좁아 5단계 고르기가 오른쪽 밖으로 넘쳤다 (11-09 점검 21) → 이름·설명 아래에 고르기·메모 */
 .gw .gw-rel-rows .ps-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'hint' 'ctl'; }
 .gw .gw-rel-rows .ps-row > .ps-ctl { margin-top: 4px; }
+
+/* 추가 규칙: 규칙마다 접는 칸 한 페이지 (11-09) */
+.gw-rule { margin-bottom: 8px; }
+.gw-rule > summary.ps-adv-sum .gw-state { margin-left: 8px; }

@@ -11,3 +11,9 @@ export function rememberPanel(el: HTMLDetailsElement): void {
   open.delete(`!${key}`);
   open.add(el.open ? key : `!${key}`);
 }
+
+/** 코드가 칸을 열어 두기 (예: 새로 만든 규칙 칸) */
+export function markOpen(key: string): void {
+  open.delete(`!${key}`);
+  open.add(key);
+}

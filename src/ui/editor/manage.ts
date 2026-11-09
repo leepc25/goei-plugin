@@ -26,17 +26,10 @@ import { mainDefaultsConfirm } from '../settings';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-/** 저장된 ISO(UTC) 시각을 기기 시간대(한국)로 「YYYY.MM.DD HH:mm:ss」 (11-07 사용자: 모든 시각은 한국 시간 기준. UTC 그대로 보여 주니 새벽으로 오해) */
-const localWhen = (iso: string): string => {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const p = (x: number) => String(x).padStart(2, '0');
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-};
 const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `${Math.round(n / 1e3)}KB` : `${n}B`);
 
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
-export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
+export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:lore' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
+export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:lore' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
 
 /** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
 const GAME_PACK_PREFIX = 'goei:game:pack:';
@@ -243,8 +236,7 @@ function diagPage(ctx: ChatContext, canChat: boolean): string {
   const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : '', phone.failure ? `괴담톡: ${phone.failure.reason}` : '', wiki.failure ? `위키: ${wiki.failure.reason}` : ''].filter(Boolean);
   return `<div class="gw-page gw-set">${head('', '상태 점검', '플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows}${row('최근 실패', fails.length ? badge(false, `${fails.length}건`) : badge(true, '없음'), fails.length ? '요청 기록에서 원문을 볼 수 있어요' : '괴담넷·괴담톡·위키 요청이 실패한 적이 없어요')}</div></section>
-    ${canChat ? loreCheckBox(ctx) : ''}
+    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows}${row('최근 실패', fails.length ? badge(false, `${fails.length}건`) : badge(true, '없음'), fails.length ? '「실패 기록」에서 원문을 볼 수 있어요' : '괴담넷·괴담톡·위키 요청이 실패한 적이 없어요')}</div></section>
     </div></div>`;
 }
 
@@ -252,18 +244,11 @@ function logPage(ctx: ChatContext, canChat: boolean): string {
   const fail = (name: string, f: { reason: string; raw: string } | null) =>
     f ? `<div class="ps-row"><div class="ps-label"><b>${esc(name)}</b><small>${esc(f.reason)}</small></div><textarea readonly rows="4">${esc(f.raw)}</textarea></div>` : '';
   const fails = fail('괴담넷', gnet.failure) + fail('괴담톡', phone.failure) + fail('위키', wiki.failure);
-  const diag = manUi.diag;
-  const runs = diag
-    ? diag.length
-      ? diag.map((r) => row(`${esc(localWhen(r.at))} · ${esc(r.reason)}`, badge(r.ok, r.ok ? '성공' : `실패${r.stage ? ` · ${r.stage}` : ''}`), `${r.model} · ${r.people.join(', ') || '대상 없음'} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc(r.error)}` : ''}`)).join('')
-      : '<p class="ps-note">아직 갱신 기록이 없어요.</p>'
-    : '<p class="ps-note">읽는 중…</p>';
   const bundle = diagBundle(ctx, canChat);
-  return `<div class="gw-page gw-set">${head('', '실패·갱신 진단', '괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.')}
+  return `<div class="gw-page gw-set">${head('', '실패 기록', '괴담넷·괴담톡·위키 요청이 실패했을 때 모델이 보낸 원문이에요. 인물 기록 갱신의 결과는 「인물 기록 점검」에 있어요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>진단 묶음</h3><div class="ps-rows">${row('내려받기', `<span class="gw-tokens">${kb(bundle.length)}</span><button class="gx-mini" data-action="man-diag-download">${ICONS.list}파일 하나로</button>`, '판 번호·설정·최근 실패 원문·인물 기록 갱신 10회를 JSON 하나로. 대화 본문은 안 들어가요. 문제를 알릴 때 이 파일만 보내면 돼요.')}</div></section>
     <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ''}</div></section>
-    <section class="ps-group"><h3>인물 기록 갱신 <small>최근 ${diag?.length ?? 0}건</small></h3><div class="ps-rows">${runs}${diag?.length ? `<div class="ps-row gw-rel-foot">${manUi.confirm === 'drop-diag' ? `<button class="gx-mini danger" data-action="man-drop-diag-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-diag">${ICONS.trash}기록 지우기</button>`}</div>` : ''}</div></section>
     </div></div>`;
 }
 
@@ -276,8 +261,13 @@ export function manageConfirmPopup(): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
+  if (node === 'manage:lore') {
+    // 11-09 사용자: 「로어북 확인」은 상태 점검 안에 접혀 있을 게 아니라 따로, 펼친 채로. 이름도 무엇인지 바로 알게
+    return `<div class="gw-page gw-set">${head('', '다음 호출 로어북', '다음 본편 요청에 어떤 로어북이 들어가는지 미리 봐요. 로어북을 누가 고를지는 기능 → 로어북 호출에서 정해요.')}
+    <div class="gx-settings gw-setbody">${canChat ? loreCheckBox(ctx, true) : '<p class="ps-note">채팅을 시작하면 볼 수 있어요.</p>'}</div></div>`;
+  }
   if (node === 'manage:people') {
-    return `<div class="gw-page gw-set">${head('', '인물 진단', '인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.')}
+    return `<div class="gw-page gw-set">${head('', '인물 기록 점검', '인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.')}
     <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx, canChat)}</div></div></div>`;
   }
   if (node === 'manage:flow') {
