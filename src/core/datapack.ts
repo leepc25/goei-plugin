@@ -107,11 +107,11 @@ export interface ItemIconPack {
   find: (name: string, icon?: string) => string | null;
 }
 
-export { normIcon } from './iconmatch';
+export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, splitIconWord } from './iconmatch';
 
 /** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
-function makeIconFind(table: ItemIconRow[], rep: Record<string, string>): (name: string, icon?: string) => string | null {
-  const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h] })), rep);
+function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>): (name: string, icon?: string) => string | null {
+  const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind })), rep, { base });
   return (name, icon) => m(name, icon)?.file ?? null;
 }
 
@@ -133,7 +133,7 @@ export function applyItemsPack(text: string): ItemIconPack {
   if (obj(j.rep)) for (const [k, f] of Object.entries(j.rep)) if (typeof f === 'string' && typeof icons[f] === 'string') rep[normIcon(k)] = f;
   const base: Record<string, string> = {};
   for (const r of table) if (r.base) base[r.kind] = r.f;
-  return { table, rep, icons, base, find: makeIconFind(table, rep) };
+  return { table, rep, icons, base, find: makeIconFind(table, rep, base) };
 }
 
 /** 이름(+모델이 쓴 그림 찾기 낱말) → 그림 파일 (표시 전용). 맞는 게 없으면 공통 그림(base.misc), 그것도 없으면 null */
