@@ -94,7 +94,7 @@ export function tracePage(head: (crumb: string, title: string, desc: string) => 
     : '<section class="ps-group"><div class="ps-rows"><p class="ps-note">읽는 중…</p></div></section>';
   return `<div class="gw-page gw-set">${head('', '호출 기록', '최근 턴마다 플러그인이 모델을 어떤 순서로 불렀는지. 본편 요청 조립 → 본편 전 보조 호출(라우터·디렉터) → 본편 응답 → 본편 뒤 보조 호출(갱신기·괴담넷·괴담톡·위키…). 칸을 펼치면 요청과 받은 값 원문이에요(긴 글은 가운데를 줄여요). 시각은 이 기기 시간.')}
     <div class="gx-settings gw-setbody">
-    <div class="ps-row gw-rel-foot gw-flow-tools"><button class="gx-mini" data-action="man-trace-refresh">${ICONS.refresh}다시 읽기</button>${list?.length ? confirmRow : ''}</div>
+    <div class="ps-row gw-rel-foot gw-flow-tools">${list?.length ? confirmRow : ''}</div>
     ${body}
     </div></div>`;
 }

@@ -84,7 +84,24 @@ async function load(): Promise<TraceTurn[]> {
   return loading;
 }
 
+/** 기록이 바뀔 때 알림 (11-09 사용자: 열어 둔 호출 기록 페이지가 저절로 갱신되게 — 「다시 읽기」 단추 대신) */
+const listeners = new Set<() => void>();
+export function onTraceChange(f: () => void): () => void {
+  listeners.add(f);
+  return () => listeners.delete(f);
+}
+const notify = () => {
+  for (const f of listeners) {
+    try {
+      f();
+    } catch {
+      /* 화면 쪽 오류는 기록을 막지 않는다 */
+    }
+  }
+};
+
 function save(): void {
+  notify();
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveTimer = null;
@@ -108,6 +125,7 @@ export async function clearTrace(): Promise<void> {
   turns = [];
   open = null;
   replied = false;
+  notify();
   try {
     await risuai.pluginStorage.setItem(KEY, '[]');
   } catch {

@@ -10,7 +10,7 @@ import { advValue } from '../../core/advanced';
 import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { peopleDiagPane } from '../people';
-import { clearTrace, loadTrace } from '../../host/trace';
+import { clearTrace, loadTrace, onTraceChange } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
 import { ensureFlow, flowPage } from './flow';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
@@ -113,8 +113,20 @@ async function refresh(): Promise<void> {
 }
 
 /** 처음 열 때 저장소 크기·기록을 읽고 다시 그린다 */
+let traceWatch = false;
 export function ensureManage(render: () => void): void {
   rerender = render;
+  if (!traceWatch) {
+    traceWatch = true;
+    // 호출이 끝날 때마다 열려 있는 「호출 기록」 페이지만 다시 읽어 그린다 (다른 페이지에서 글을 쓰는 중이면 건드리지 않음)
+    onTraceChange(() => {
+      if (!document.querySelector('[data-action="man-drop-trace"], [data-action="man-drop-trace-yes"]')) return;
+      void loadTrace().then((t) => {
+        traceUi.turns = t;
+        rerender?.();
+      }).catch(() => {});
+    });
+  }
   if (manUi.sizes || manUi.pending) return;
   manUi.pending = true;
   void refresh().finally(() => {
@@ -316,9 +328,6 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     case 'man-trace-toggle':
       if (traceUi.open.has(value)) traceUi.open.delete(value);
       else traceUi.open.add(value);
-      return true;
-    case 'man-trace-refresh':
-      traceUi.turns = await loadTrace().catch(() => []);
       return true;
     case 'man-drop-trace':
       traceUi.confirm = true;
