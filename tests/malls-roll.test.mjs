@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, SHOP_LINE, SECRET_LINE, lineOf } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
+const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, SHOP_LINE, SECRET_LINE, lineOf, TRUTH_RULE } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 
 /** 정해진 수열을 내는 난수 (시험용) */
@@ -86,4 +86,11 @@ test('숨긴 진짜 효과: 우주몰 줄 끝 「진실」 칸은 저장되고 �
   assert.equal(r.items[0].truth, '쥐면 주변 전등이 전부 꺼진다');
   assert.equal(r.items[0].effect, '어둠을 밝힌다');
   assert.equal(r.items[1].truth, undefined, '비우면 없음');
+});
+
+test('진실 섞기: ? 는 「아무도 모름」, 설정 기본은 섞음, 시그니처 빈 진실은 ? (11-09 사용자: 두 개를 섞는 게 낫다)', () => {
+  const r = M.parseShelf('<shelf>\n돌|999999|-|stone|0.3|돌|???||?\n</shelf>', { sells: 'x', never: '', prices: '' });
+  assert.equal(r.items[0].truth, '?');
+  assert.equal(M.cosTruthMode({}), 'mix'); assert.equal(M.cosTruthMode({ $cos_truth: 'none' }), 'none');
+  assert.ok(M.TRUTH_RULE.mix.includes('MIX') && M.TRUTH_RULE.none.includes('EVERY'));
 });

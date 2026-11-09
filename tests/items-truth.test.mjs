@@ -19,3 +19,8 @@ test('truth: addItem 저장, itemLine 에 「truly」, updateItem 이 지우지 
   const up = I.updateItem(it, e.id, { desc: '둥근 돌 (금이 감)' });
   assert.equal(up.list[0].truth, e.truth, '설명을 고쳐도 진짜 효과는 남는다');
 });
+
+test('truth ? : 본편 줄에 「unknown … decide then」', () => {
+  const it = I.addItem({ list: [], log: [] }, new Set(['a1']), { name: '돌', effect: '???', truth: '?', from: 'store', anchor: 'a1' });
+  assert.ok(I.itemLine(it.list[0], undefined, false).includes('truly: unknown'));
+});

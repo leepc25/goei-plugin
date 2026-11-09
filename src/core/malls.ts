@@ -2,7 +2,7 @@
 // 진열·문의는 상점(core/shop.ts)의 요청문·해석을 그대로 쓰고, 지침만 사이트마다 따로(Cos·Bm), 설정 값도 사이트마다 따로($cos_sh_*, $bm_sh_*).
 // 상점과 달리 본편 표식 없이 브라우저에서 언제든 연다. 우주몰은 운영자 문의 창이 있고, 포인트몰은 운영자가 없다(정가 구매만, 로그인해야 씀).
 import type { Chat } from './types';
-import { emptyShop, readShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
+import { type TruthMode, emptyShop, readShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
 import type { GuideName } from './guides';
 
 export type MallSite = 'cos' | 'bm';
@@ -181,6 +181,9 @@ export interface CosFixed {
   /** 숨긴 진짜 효과 (비우면 본편 모델이 그 자리에서 정함) */
   truth: string;
 }
+/** 진실 미리 정하기 (11-09 사용자: 섞는 게 낫다 → 기본 mix) */
+export const COS_TRUTH_KEY = '$cos_truth';
+export const cosTruthMode = (vars: Vars): TruthMode => { const v = String(vars?.[COS_TRUTH_KEY] ?? ''); return v === 'all' || v === 'none' ? v : 'mix'; };
 export const COS_FIXED_KEY = '$cos_fixed';
 export const COS_FIXED_MAX = 12;
 export const COS_FIXED_DEFAULT: CosFixed[] = [

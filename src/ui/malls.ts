@@ -14,7 +14,7 @@ import { addItem, itemsVars, readItems } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { appendItems, applyShelf, applyTalk, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
-import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
+import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
@@ -88,7 +88,7 @@ const jobs = new Set<string>();
 
 /** 진열대 짜기 / 운영자에게 묻기. 같은 채팅을 보고 있을 때만 저장 */
 /** 시그니처 상품 → 진열 물건 (할인 전 값이 더 크면 ※할인!※ 딱지) */
-const fixedItem = (f: CosFixed): Omit<ShopItem, 'id'> => ({ name: f.name.trim(), desc: f.desc, effect: f.effect, use: false, price: f.price, ...(f.truth.trim() ? { truth: f.truth.trim() } : {}), ...(f.was && f.was > f.price ? { tag: 'sale' as const, was: f.was } : {}) });
+const fixedItem = (f: CosFixed): Omit<ShopItem, 'id'> => ({ name: f.name.trim(), desc: f.desc, effect: f.effect, use: false, price: f.price, truth: f.truth.trim() || '?', ...(f.was && f.was > f.price ? { tag: 'sale' as const, was: f.was } : {}) });
 
 async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf' | 'talk', st0: ShopState): Promise<void> {
   const job = `${chatKey(ctx)}:${site}`;
@@ -103,7 +103,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
   try {
     const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s);
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
-    if (site === 'cos' && kind === 'shelf') src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, cosRoll(ctx.chat.scriptstate));
+    if (site === 'cos' && kind === 'shelf') { src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, cosRoll(ctx.chat.scriptstate)); src.truthMode = cosTruthMode(ctx.chat.scriptstate); }
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${MALL_NAME[site]} ${kind === 'shelf' ? '진열' : '문의'}` };
     let next: ShopState;
@@ -189,7 +189,7 @@ export function previewMallShelf(ctx: ChatContext, site: MallSite): LlmMessage[]
   if (!s.on) return null;
   const st = readMall(ctx.chat.scriptstate, site);
   const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s);
-  if (site === 'cos') src.assign = cosAssignment(s.size[1], s.context, cosRoll(ctx.chat.scriptstate));
+  if (site === 'cos') { src.assign = cosAssignment(s.size[1], s.context, cosRoll(ctx.chat.scriptstate)); src.truthMode = cosTruthMode(ctx.chat.scriptstate); }
   return shelfPrompt(src, s, MALL_GUIDE[site]);
 }
 
@@ -519,7 +519,7 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
     row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
     row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
     row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${site === 'cos' ? cosRollGroup(ctx) + cosFixedGroup(ctx) : ''}`;
+  ].join(''))}${site === 'cos' ? cosRollGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : ''}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -546,6 +546,13 @@ function cosRollGroup(ctx: ChatContext): string {
   ].join('') + reset);
 }
 
+/** 진짜 효과 (11-09 사용자: 보이는 효과는 광고 문구, 진짜는 숨김 · 미리 정한 것과 「아무도 모름」을 섞음) */
+function cosTruthGroup(ctx: ChatContext): string {
+  const m = cosTruthMode(ctx.chat.scriptstate);
+  return group('진짜 효과', `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 본편 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row('진실 미리 정하기', mseg('cos', 'truth', m, [['all', '전부'], ['mix', '섞음'], ['none', '안 함']]),
+    m === 'all' ? '우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과.' : m === 'mix' ? '절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 본편 모델이 정해요.' : '전부 「아무도 모름」. 처음 쓸 때 본편 모델이 그 자리에서 정해요.'));
+}
+
 /** 시그니처 상품 (11-09 사용자: 구버전 「우리가 도움!」·「착한 친구」를 직접 넣고 고치게) */
 function cosFixedGroup(ctx: ChatContext): string {
   const vars = ctx.chat.scriptstate;
@@ -559,7 +566,7 @@ function cosFixedGroup(ctx: ChatContext): string {
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num(f.id, 'price', f.price, '999999', '값')}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num(f.id, 'was', f.was, '비우면 할인 없음', '할인 전 값')}<span>원</span></span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text(f.id, 'desc', f.desc, '겉보기 설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)', '보이는 효과', 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 쓸 때 모델이 정해요', '진짜 효과', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 「아무도 모름」', '진짜 효과', 200)}</span></div>
     </div>`).join('');
   const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>추가</button></div>`;
   return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
@@ -637,12 +644,13 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   };
   const list = () => cosFixed(ctx.chat.scriptstate);
   if (action === 'ms-cfg') {
-    const m = /^cos:(roll_on|roll_useful|roll_gmode|roll_tmode|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^cos:(roll_on|roll_useful|roll_gmode|roll_tmode|truth|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return false;
     if (m[1] === 'roll_on') return set({ [COS_ROLL_KEY.on]: m[2] === '0' ? '0' : '' });
     if (m[1] === 'roll_useful') return set({ [COS_ROLL_KEY.useful]: m[2] === 'auto' ? '' : m[2] });
     if (m[1] === 'roll_gmode') return set({ [COS_ROLL_KEY.gmode]: m[2] === 'uniq' ? '' : m[2] });
     if (m[1] === 'roll_tmode') return set({ [COS_ROLL_KEY.tmode]: m[2] === 'weight' ? '' : m[2] });
+    if (m[1] === 'truth') return set({ [COS_TRUTH_KEY]: m[2] === 'mix' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
   }

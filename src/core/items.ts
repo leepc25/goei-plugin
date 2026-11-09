@@ -509,7 +509,8 @@ export function itemLine(e: Item, left: number | undefined, equipped: boolean, d
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
   // 숨긴 진짜 효과가 있으면: 주인공이 아는 건 광고 문구뿐, 실제로 일어나는 일은 진짜 쪽
-  const fx = e.truth ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: ${e.truth} — the protagonist does not know this)` : e.effect ? ` (${e.effect})` : '';
+  const fx = e.truth === '?' ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: unknown — nobody knows what it really does until it is used; decide then, and keep it consistent afterwards)`
+    : e.truth ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: ${e.truth} — the protagonist does not know this)` : e.effect ? ` (${e.effect})` : '';
   const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${fx}` : '';
   return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }

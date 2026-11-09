@@ -403,6 +403,13 @@ export function costOf(cell: string): { price: number; pay?: string } | null {
 
 /** 물건 한 줄 꼴 (모델에 주는 것과 읽는 것이 같게). 쓰임: 무기·장비·사용·소모N 중 맞는 것을 「·」로 (없으면 -). 그림: 그림 찾기용 영어 낱말. 무게: kg 숫자 (2026-11-08) */
 export const SHOP_LINE = '이름|값|쓰임|그림|무게|설명|효과|구분';
+/** 진실 미리 정하기 (11-09 사용자: 「두개를 섞는게 낫지 않나」 — 기본 섞음) */
+export type TruthMode = 'all' | 'mix' | 'none';
+export const TRUTH_RULE: Record<TruthMode, string> = {
+  all: 'Give EVERY item a concrete 진실 (never ?). Make sure at least one item genuinely does what it claims and at least one does something else entirely.',
+  mix: 'MIX the two: give roughly half the items a concrete 진실 and write ? for the rest, varying which ones. Among the concrete ones, at least one genuinely does what it claims and at least one does something else entirely.',
+  none: 'Write ? for EVERY 진실: nothing is decided until it is used.',
+};
 /** 우주몰 줄 꼴: 끝에 숨긴 진짜 효과 (11-09 사용자) */
 export const SECRET_LINE = `${SHOP_LINE}|진실`;
 export const lineOf = (guide: GuideName): string => (guide === 'Cos' ? SECRET_LINE : SHOP_LINE);
@@ -416,8 +423,10 @@ function parseLine(line: string): Omit<ShopItem, 'id'> | null {
   if (!name || !cost) return null;
   const price = cost.price;
   const out: Omit<ShopItem, 'id'> = { name, price, ...(cost.pay ? { pay: cost.pay } : {}), ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3], weight: cells[4] }), desc: clean(cells[5], 120), effect: clean(cells[6], 60) };
+  // 진실: 글이면 숨긴 진짜 효과, ?·모름이면 「아무도 모름」(쓸 때 본편이 정함) → '?'
   const truth = clean(cells[8], 60);
-  if (truth && truth !== '-') out.truth = truth;
+  if (/^(\?+|모름|unknown|미정)$/i.test(truth)) out.truth = '?';
+  else if (truth && truth !== '-') out.truth = truth;
   const tag = (cells[7] ?? '').trim();
   if (/^(희귀|레어|rare)/i.test(tag)) out.tag = 'rare';
   else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
@@ -668,14 +677,16 @@ export interface ShopSource {
   language: string | null;
   /** 이번 진열 배정 (쇼핑몰이 칸마다 장르·값 등급을 굴려 넣는다, core/malls.ts cosAssignment). 없으면 생략 */
   assign?: string;
+  /** 우주몰: 진실을 얼마나 미리 정할지 (all 전부 · mix 섞음 · none 전부 ?) */
+  truthMode?: TruthMode;
 }
 
 // 지침 글은 플러그인 내장 지침 「Shop」(src/data/guides/shop.txt, 설정 → 지침 → 상점에서 고침). 여기는 절을 골라 자리만 채운다 (2026-11-07 사용자: 지침은 전부 지침 메뉴에서)
 const G = (name: GuideName = 'Shop') => guideSections(name);
 
-const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState, guide: GuideName = 'Shop') => {
+const SHELF_RULES = (g: Record<string, string>, s: ShopSettings, st: ShopState, guide: GuideName = 'Shop', truthMode: TruthMode = 'mix') => {
   const r = s.size;
-  const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: lineOf(guide), price: s.price, prev: st.prev.join(', ') };
+  const v = { size: r[0] === r[1] ? `exactly ${r[0]}` : `${r[0]} to ${r[1]}`, line: lineOf(guide), price: s.price, prev: st.prev.join(', '), truth_rule: TRUTH_RULE[truthMode] };
   return [
     fillGuide(g.SHELF, v),
     guide === 'Cos' ? fillGuide(g.SHELF_SECRET, v) : '',
@@ -717,7 +728,7 @@ export function shelfPrompt(src: ShopSource, s: ShopSettings, guide: GuideName =
   const g = G(guide);
   const system = [
     fillGuide(g.COMMON, {}),
-    SHELF_RULES(g, s, src.st, guide),
+    SHELF_RULES(g, s, src.st, guide, src.truthMode ?? 'mix'),
     src.st.identity.points ? fillGuide(g.POINT_SHOP, {}) : '',
     fillGuide(first ? g.FIRST : g.RESTOCK, { line: lineOf(guide) }),
     src.language ?? '',
@@ -733,7 +744,7 @@ export function talkPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 
   // 우주몰: 숨긴 진짜 효과를 운영자만 안다 — 답에서 밝히지 않고 비켜 간다 (11-09 사용자)
   const secret = guide === 'Cos' && shelfItems(st).some((x) => x.truth);
   const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? '-'}|${x.weight ?? '-'}|${x.desc}|${x.effect}|${x.tag === 'rare' ? '희귀' : x.tag === 'sale' && x.was ? `특가:${x.was}` : ''}${secret ? `|${x.truth ?? '-'}` : ''}`).join('\n') || '(empty)';
-  const secretNote = secret ? '\n(last column = what each item REALLY does. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)' : '';
+  const secretNote = secret ? '\n(last column = what each item REALLY does; ? means not even the catalogue knows. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)' : '';
   const sold = soldItems(st).map((x) => x.name).join(', ');
   const o = st.sell;
   const g = G(guide);
