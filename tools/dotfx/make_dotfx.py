@@ -11,7 +11,10 @@ PAL = {1: (255, 255, 255), 2: (255, 246, 168), 3: (255, 206, 64), 4: (255, 132, 
        7: (70, 60, 62), 8: (112, 100, 98), 9: (160, 150, 144), 10: (40, 32, 34),
        # 먹물 튐(짙은 갈색) · 푸른 기운 (11-09 킹오파식 큰 효과)
        11: (46, 22, 12), 12: (96, 46, 18), 13: (150, 78, 26),
-       14: (240, 250, 255), 15: (176, 220, 255), 16: (96, 156, 230), 17: (40, 70, 150), 18: (20, 30, 70)}
+       14: (240, 250, 255), 15: (176, 220, 255), 16: (96, 156, 230), 17: (40, 70, 150), 18: (20, 30, 70),
+       # 킹오파 참고 불빛 단계 (11-09 3판): 흰 → 연노랑 → 노랑 → 귤색 → 주황 → 짙은 주황 → 적갈 → 고동
+       19: (255, 250, 214), 20: (255, 226, 120), 21: (255, 186, 52), 22: (246, 140, 26), 23: (214, 92, 18), 24: (150, 52, 14), 25: (84, 26, 10),
+       26: (34, 14, 8), 27: (64, 30, 14)}
 
 
 def hsh(x, y, s=0):
@@ -589,9 +592,176 @@ def swirl2():
     return save("dot-swirl", out, [45, 45, 50, 50, 55, 55, 60, 60, 65, 70])
 
 
+# ── 11-09 3판: 킹오파98 장면 보고 다시 (사용자 「뭉개 그려서 캐릭터 다 가림·프레임·정교함 없음」) ──
+# 캐릭터와 같은 도트 크기(배율 K 그대로)로 그린다. 잡음으로 뭉개지 않고 원·가시·불혀 같은 또렷한 모양을 장마다 따로 찍는다.
+
+def halo():
+    """필살기 시작 뒤쪽 둥근 빛(킹오파 헤비D 장면): 테두리 반듯한 동심원 8겹, 가운데 흰빛 → 바깥 어둠. 겹 경계가 바깥으로 흘러 나감(반복)"""
+    S = 256; c = S / 2; out = []; N = 8
+    cols = [1, 19, 20, 21, 22, 23, 24, 25, 26]
+    edges = [0.10, 0.20, 0.31, 0.43, 0.56, 0.69, 0.82, 0.92, 1.0]
+    for k in range(N):
+        f = F(S, S); ph = k / N
+        R = 118
+        for y in range(S):
+            for x in range(S):
+                r = math.hypot(x + 0.5 - c, y + 0.5 - c) / R
+                if r > 1: continue
+                # 경계가 한 장마다 조금씩 바깥으로 (가장 안 흰빛은 고정)
+                q = r - 0.045 * math.sin(2 * math.pi * ph) * (r > 0.1)
+                i = 0
+                while i < len(edges) - 1 and q > edges[i]: i += 1
+                f.put(x, y, cols[i])
+        out.append(f)
+    return save("dot-halo", out, 60)
+
+
+def spark():
+    """연타 한 대 (킹오파 베니마루 장면): 흰 불덩이에 귤색 테 + 가는 점선 빛살. 머리만 한 크기, 9장"""
+    S = 112; c = S / 2; out = []
+    R = [6, 13, 19, 23, 25, 0, 0, 0, 0]
+    rays = [(hsh(i, 1, 41) * 2 * math.pi, 0.6 + hsh(i, 2, 41) * 0.6) for i in range(12)]
+    for k in range(9):
+        f = F(S, S)
+        # 빛살: 2~6장, 가는 점선이 바깥으로 밀려 나감
+        if 1 <= k <= 6:
+            for i, (a, ln) in enumerate(rays):
+                r0 = 10 + k * 7; r1 = r0 + 18 * ln + (8 if k < 3 else 0)
+                for q in range(int(r0), int(r1)):
+                    if k >= 3 and (q + i) % 4 == 3: continue
+                    col = 19 if q - r0 < 4 and k < 4 else 20 if k < 4 else 21 if k < 6 else 22
+                    f.put(c + math.cos(a) * q, c + math.sin(a) * q, col)
+        if R[k]:
+            rr = R[k]
+            # 흰 속, 연노랑, 귤색 테 (테가 점점 두꺼워짐)
+            th = [1, 2, 3, 4, 6][k]
+            disc(f, c, c, rr + 1, 23)
+            disc(f, c, c, rr, 22)
+            disc(f, c, c, rr - th * 0.5, 21)
+            disc(f, c, c, rr - th, 20)
+            disc(f, c, c, max(1, rr - th - 3), 19)
+            disc(f, c - rr * 0.18, c - rr * 0.18, max(1, rr - th - 6), 1)
+            if k == 0:
+                for a in range(4): ray(f, c, c, a * math.pi / 2, 3, 16, 1.4, [1, 19])
+        else:
+            # 5~8장: 테가 조각나 바깥으로 흩어짐 (8조각 → 작은 불똥)
+            rr = 25 + (k - 4) * 6
+            for i in range(8):
+                a0 = i * math.pi / 4 + 0.2 + hsh(i, k, 7) * 0.2
+                span = 0.42 - (k - 5) * 0.09
+                th = max(1, 5 - (k - 5) * 1.3)
+                cl = [22, 23, 24, 25][k - 5]
+                n = int(rr * span * 2) + 1
+                for j in range(n):
+                    a = a0 + span * (j / n - 0.5)
+                    for t_ in range(int(th)):
+                        f.put(c + math.cos(a) * (rr + t_), c + math.sin(a) * (rr + t_), cl)
+                if k < 7: f.put(c + math.cos(a0) * (rr - 3), c + math.sin(a0) * (rr - 3), 20)
+        out.append(f)
+    return save("dot-spark", out, [30, 30, 35, 35, 40, 40, 45, 45, 50])
+
+
+def ink():
+    """큰 한 방 (킹오파 장면 먹물 튐): 가운데 고동색 가시별(굵기·길이 제각각) + 뒤로 귤색 불덩이 꽃잎(크기 제각각) + 흰 빛살 + 튀는 먹물 방울. 10장"""
+    S = 176; c = S / 2; out = []
+    spikes = [(i * 2 * math.pi / 10 + (hsh(i, 1, 52) - 0.5) * 0.5, 0.35 + hsh(i, 2, 52) * 0.65, 2 + hsh(i, 3, 52) * 4.5) for i in range(10)]
+    thin = [(hsh(i, 8, 52) * 2 * math.pi, 0.5 + hsh(i, 9, 52) * 0.5) for i in range(8)]
+    petals = [(i * 2 * math.pi / 6 + (hsh(i, 4, 52) - 0.5) * 0.6, 0.7 + hsh(i, 5, 52) * 0.5, 0.8 + hsh(i, 10, 52) * 0.4) for i in range(6)]
+    drops = [(hsh(i, 5, 53) * 2 * math.pi, 0.6 + hsh(i, 6, 53) * 0.6, 1 + int(hsh(i, 7, 53) * 3)) for i in range(16)]
+    for k in range(10):
+        f = F(S, S)
+        if k == 0:
+            disc(f, c, c, 12, 19); disc(f, c, c, 8, 1)
+            for a in range(8): ray(f, c, c, a * math.pi / 4 + 0.3, 6, 30 if a % 2 == 0 else 18, 2, [1, 19, 20])
+            out.append(f); continue
+        # 꽃잎 불덩이: 1~3장 커짐, 4장부터 바깥으로 밀려나며 작아지고 색이 짙어짐
+        g = [0.55, 0.85, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0][k - 1]
+        out_ = [0, 0, 0, 3, 6, 9, 12, 15, 18][k - 1]
+        shr = [1, 1, 1, 0.9, 0.75, 0.58, 0.42, 0.28, 0.15][k - 1]
+        dk = 0 if k < 5 else 1 if k < 7 else 2
+        for i, (a, sz, dd) in enumerate(petals):
+            pr = 24 * sz * g * shr; pd = 28 * dd * g + out_
+            if pr < 1.2: continue
+            px, py = c + math.cos(a) * pd, c + math.sin(a) * pd
+            for y in range(int(py - pr - 2), int(py + pr + 3)):
+                for x in range(int(px - pr - 2), int(px + pr + 3)):
+                    d = math.hypot(x - px, y - py) / pr
+                    if d > 1: continue
+                    lit = ((x - px) + (y - py)) / pr
+                    col = (23 if d > 0.84 else 21 if lit < -0.4 else 22) + dk
+                    if d < 0.28 and lit < -0.1 and k < 5: col = 19
+                    f.put(x, y, min(col, 25), over=False)
+        # 흰 빛살 (1~4장): 꽃잎 사이로 가늘게
+        if k <= 4:
+            for a, ln in thin:
+                ray(f, c, c, a, 10, 30 + 46 * ln * [0.6, 1, 1, 0.8][k - 1], 1.2, [1, 19, 20] if k < 3 else [19, 20, 21])
+        # 가시별 먹물 (1~7장): 몸통은 울퉁불퉁, 가시는 굵기·길이 제각각
+        sc = [0.5, 0.9, 1.0, 1.0, 0.95, 0.8, 0.55, 0, 0][k - 1]
+        if sc:
+            for y in range(int(c - 26), int(c + 27)):
+                for x in range(int(c - 26), int(c + 27)):
+                    a = math.atan2(y - c, x - c)
+                    rr = (13 + 3 * math.sin(a * 3 + 1) + 2 * math.sin(a * 5 + 2)) * sc
+                    if math.hypot(x - c, y - c) <= rr: f.put(x, y, 26)
+            for a, ln, wb in spikes:
+                ray(f, c, c, a, 8 * sc, (16 + 52 * ln) * sc, wb * sc, [26, 26, 26, 26, 27])
+        # 튀는 방울 (3~9장): 바깥으로 날아가며 조금씩 떨어짐
+        if k >= 3:
+            for a, sp, sz in drops:
+                r = 34 + (k - 3) * 10 * sp
+                x, y = c + math.cos(a) * r, c + math.sin(a) * r + (k - 3) ** 2 * 0.7
+                if not (3 < x < S - 3 and 3 < y < S - 3): continue
+                s_ = max(1, sz - (k - 3) // 3)
+                disc(f, x, y, s_, 26 if k < 7 else 27)
+        out.append(f)
+    return save("dot-ink", out, [30, 35, 35, 40, 45, 45, 50, 55, 60, 60])
+
+
+def flame():
+    """불기둥 (킹오파 럭키 장면): 세로 불혀 여러 줄이 겹쳐 솟음, 가운데 흰 속, 끝은 뾰족, 장마다 높이가 일렁임. 12장"""
+    W, H = 112, 400; out = []
+    tongues = []  # (x 가운데, 반폭, 키 비율, 색 줄)
+    lay = [(-34, 9, 0.62, [24, 23]), (34, 9, 0.66, [24, 23]), (-24, 11, 0.8, [23, 22]), (24, 11, 0.78, [23, 22]),
+           (-12, 12, 0.92, [22, 21]), (13, 12, 0.9, [22, 21]), (-5, 10, 1.0, [21, 20]), (6, 9, 0.97, [20, 19]), (0, 6, 1.0, [19, 1])]
+    for k in range(12):
+        f = F(W, H)
+        rise = [0.25, 0.55, 0.85, 1, 1, 1, 1, 1, 1, 0.95, 0.85, 0.7][k]
+        thin = [1, 1, 1, 1, 1, 1, 1, 0.9, 0.75, 0.6, 0.45, 0.3][k]
+        lift = [0, 0, 0, 0, 0, 0, 0, 0, 10, 30, 60, 100][k]       # 끝날 때 밑동부터 떨어져 위로
+        for i, (x0, hw, hk, cl) in enumerate(lay):
+            hh = (H - 8) * hk * rise * (0.9 + 0.1 * math.sin(k * 1.7 + i * 2.1))
+            hw2 = hw * thin
+            if hw2 < 1: continue
+            for y in range(H):
+                u = (H - 1 - y)                     # 밑에서 위로
+                if u < lift or u > hh: continue
+                t = (u - lift) / max(1, hh - lift)
+                sway = math.sin(t * 5 + k * 0.9 + i) * 3 * t
+                w = hw2 * (1 - t ** 2.2) + 0.6     # 위로 갈수록 뾰족
+                if u < lift + 6: w *= (u - lift + 1) / 7 + 0.3
+                cx = W / 2 + x0 * (1 - t * 0.35) + sway
+                for x in range(int(cx - w - 1), int(cx + w + 2)):
+                    d = abs(x + 0.5 - cx)
+                    if d > w: continue
+                    f.put(x, y, cl[1] if d < w * 0.55 else cl[0])
+        # 밑동 불꽃 퍼짐
+        if k < 9:
+            bw = 48 * min(1, (k + 1) / 3) * thin
+            disc(f, W / 2, H - 4, bw, 23, ry=6, over=False)
+            disc(f, W / 2, H - 4, bw * 0.7, 21, ry=4)
+            disc(f, W / 2, H - 4, bw * 0.35, 19, ry=2)
+        # 솟는 불똥
+        for i in range(10):
+            yy = H - 30 - ((hsh(i, 1, 61) * 300 + k * 26) % 340)
+            xx = W / 2 + (hsh(i, 2, 61) - 0.5) * 80
+            if rise > 0.5: f.put(xx, yy, 20 if i % 2 else 21); f.put(xx, yy + 1, 22)
+        out.append(f)
+    return save("dot-flame", out, [30, 30, 35, 40, 40, 45, 45, 45, 50, 50, 55, 60], pivot=(0.5, 1.0))
+
+
 if __name__ == "__main__":
     import sys
     pick = sys.argv[1:]
-    for fn in (impact, boom, burst, nova, blast, swirl, blast2, hitball, wall, swirl2, aura):
+    for fn in (impact, boom, burst, nova, blast, swirl, blast2, hitball, wall, swirl2, aura, halo, spark, ink, flame):
         if pick and fn.__name__ not in pick: continue
         sh = fn(); print(fn.__name__, sh.size)

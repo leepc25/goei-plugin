@@ -167,8 +167,9 @@ export class Match {
     if (RUSH_SUPER.has(by.name)) {
       // 킹오파식 시작 (11-09): 배경 완전 암전 · 뒤에 층층이 번지는 큰 기운 · 사방에서 모여드는 금빛 줄기
       this.blackT = 1.5;
-      const y = LINE - by.z - 130 * K;
-      this.st.fx.push({ k: 'sheet', name: 'dot-aura', x: by.x - by.face * 10, y, s: 2.2 * K, anchor: 'center', loop: true, fade: 0.2, under: true, live: true, t: 0.8, t0: 0.8, el: 0 });
+      // 둥근 빛은 캐릭터 키만 하게, 캐릭터와 같은 도트 크기로 (11-09 3판, 킹오파 헤비D 장면 참고)
+      const y = LINE - by.z - 140 * K;
+      this.st.fx.push({ k: 'sheet', name: 'dot-halo', x: by.x - by.face * 6, y, s: K, anchor: 'center', loop: true, under: true, live: true, t: 0.6, t0: 0.6, el: 0 });
       this.st.fx.push({ k: 'streak', x: by.x, y, t: 0.6, t0: 0.6, live: true, seed: Math.random() * 99 });
       this.st.whiteFlash?.(0.08);
     } else if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });

@@ -636,11 +636,11 @@ export class Fighter {
     };
     const foeOk = () => !!o0 && o0.alive && o0.deadT < 0 && o0.state !== 'ko';
     let hitN = 0;
-    /** 맞는 자리 큰 효과 (11-09 「상반신만 한 불꽃」): 대마다 불꽃 덩이, 네 대마다 먹물 튀는 큰 폭발 */
+    /** 맞는 자리 효과 (11-09 3판, 킹오파 참고): 캐릭터와 같은 도트 크기. 대마다 머리만 한 불꽃, 큰 한 방은 먹물 가시별 + 귤색 불덩이 */
     const bigFx = (x: number, y: number, big: boolean) => {
       const flip = this.face < 0;
-      if (big) this.st.fx.push({ k: 'sheet', name: 'dot-blast', x, y, s: 1.9 * K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
-      else this.st.fx.push({ k: 'sheet', name: 'dot-hitball', x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 40, s: 2.3 * K, flip: Math.random() < 0.5, anchor: 'center', t: 9, t0: 9, el: 0 });
+      if (big) this.st.fx.push({ k: 'sheet', name: 'dot-ink', x, y, s: K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
+      else this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x + (Math.random() - 0.5) * 24, y: y + (Math.random() - 0.5) * 30, s: K, flip: Math.random() < 0.5, anchor: 'center', t: 9, t0: 9, el: 0 });
     };
     const hit = (kind: HitKind, o: Partial<HitSpec> = {}) => {
       if (!foeOk() || !o0) return;
@@ -675,9 +675,8 @@ export class Fighter {
       beat(H, true, 0.7, () => {
         hit('launch', { stop: 0.16 });
         if (o0) {
-          // 띄우기: 발밑에서 불기둥이 치솟고 기운이 휘감는다
-          this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x: o0.x, y: LINE + 6, s: 1.5 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 });
-          this.st.fx.push({ k: 'sheet', name: 'dot-swirl', x: o0.x, y: o0.midY(), s: 1.8 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+          // 띄우기: 상대 발밑에서 불기둥이 솟는다. 캐릭터 뒤에 깔아 몸을 가리지 않음
+          this.st.fx.push({ k: 'sheet', name: 'dot-flame', x: o0.x, y: LINE + 4, s: K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
         }
         this.st.shake(16);
       }, () => jumpUp());
@@ -723,14 +722,12 @@ export class Fighter {
         if (!foeOk() || o0.z <= 0 || o0.state === 'down' || o0.state === 'ko') {
           phase = 'done';
           const x = o0.x;
-          // 마무리 (11-09 킹오파식): 화면 하얗게 → 불기둥 셋이 치솟고 큰 폭발이 겹겹이 → 에너지 구
+          // 마무리 (11-09 3판, 킹오파 참고): 화면 하얗게 → 쓰러진 상대 뒤로 큰 불기둥 + 몸 위 먹물 가시별
           this.st.whiteFlash?.(0.3);
-          this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x, y: LINE + 8, s: 2.4 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 });
-          for (const [i, dx] of [[1, -110], [2, 120]] as const) later(this.st, 0.08 * i, () => this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x: x + dx, y: LINE + 8, s: 1.7 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 }));
-          this.st.fx.push({ k: 'sheet', name: 'dot-blast', x, y: LINE - 110 * K, s: 2.8 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
-          later(this.st, 0.12, () => this.st.fx.push({ k: 'sheet', name: 'dot-blast', x: x - 90, y: LINE - 200 * K, s: 2.0 * K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
-          later(this.st, 0.22, () => this.st.fx.push({ k: 'sheet', name: 'dot-blast', x: x + 100, y: LINE - 160 * K, s: 2.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
-          later(this.st, 0.3, () => this.st.fx.push({ k: 'sheet', name: 'dot-nova', x, y: LINE - 90 * K, s: 3.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          this.st.fx.push({ k: 'sheet', name: 'dot-flame', x, y: LINE + 6, s: 1.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-ink', x, y: LINE - 50 * K, s: 1.2 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
+          later(this.st, 0.1, () => this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x - 30, y: LINE - 90 * K, s: K, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          later(this.st, 0.18, () => this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x + 40, y: LINE - 40 * K, s: K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
           this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
           later(this.st, 0.22, () => this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x }));
           this.st.shake(24);
@@ -803,6 +800,8 @@ export class Fighter {
     this.st.shake(h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' || use.kind === 'super' ? 12 : big ? 9 : 4);
     // 맞은 쪽만 잠깐 하얗게 (11-09 묵직함)
     this.whiteT = big ? 0.07 : 0.05;
+    // 돌진 필살기 연타는 하얗게 덮지 않음 (11-09 3판: 맞는 몸이 내내 흰 덩어리로 보임)
+    if (h.noVfx) { this.whiteT = 0; this.hurtT = 0.04; }
     this.st.sfx({ type: 'hit', strength: big ? 3 : 1, kind: use.kind === 'super' ? 'super' : (this.cfg.kick || []).includes(by.anim?.id) ? 'kick' : undefined, by: by.name, x: this.x });
     if (!h.noVfx) this.hitVfx(by, h, at, big);
     if (this.hp <= 0) { this.koFly(dir); return 'hit'; }
@@ -998,9 +997,9 @@ export class Fighter {
     const jit = this.freeze > 0 && this.hurtT > 0 ? (Math.floor(performance.now() / 33) % 2 ? 3 : -3) : 0;
     const over = look.red ? { c: '#ff2a1a', a: look.red } : this.whiteT > 0 ? { c: '#ffffff', a: 0.85 } : this.flashT > 0 ? { c: this.flashC, a: Math.min(0.85, this.flashT * 3) } : this.hurtT > 0 ? { c: '#ffffff', a: this.hurtT * 3 } : undefined;
     // 잔상 (캐릭터 기운색, 오래된 것일수록 옅게)
-    this.trail.forEach((g, i) => drawSprite(c, this.art, g.id, g.f, g.x, g.z, g.face, g.air, { over: { c: '#ffc040', a: 1 }, alpha: 0.2 + 0.1 * i }));
+    this.trail.forEach((g, i) => { if (i % 2) drawSprite(c, this.art, g.id, g.f, g.x, g.z, g.face, g.air, { over: { c: '#ff9a28', a: 0.85 }, alpha: 0.18 + 0.08 * i }); });
     // 돌진 난무 중엔 몸 전체를 기운색으로 물들임 (11-09 킹오파식)
-    const tint = !over && this.rush ? { c: '#ffa830', a: 0.55 } : over;
+    const tint = !over && this.rush ? { c: '#ff9a28', a: 0.28 } : over;
     drawSprite(c, this.art, id, f, this.x + jit, this.z, this.face, air, { over: tint, alpha });
     if (this.state === 'charge') {
       const m = this.muzzle(), lv = this.chargeLv();
