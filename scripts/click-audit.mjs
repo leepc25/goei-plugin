@@ -560,6 +560,9 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
   }
   for (const startKind of opt.start) {
     const revisitSigs = new Set();
+    // 메뉴 다시 들어가기는 처음 돌 때 한 번이면 된다. 이어 돌릴 때 또 하면 이미 본 화면을 메뉴마다 다시 돌며 몇백 번 헛누른다 (11-09)
+    // 지난번 다시 들어가 본 화면의 안 누른 단추는 아래 「지난번에 들어가 본 화면」에서 그 길로 이어 누른다
+    const rv = startKind !== opt.start[0] && !prior.some((r) => r.start === startKind);
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
     const base = await makeBase(browser, vp, startKind);
     // 첫 화면
@@ -590,7 +593,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
         queue.push({ ...it, path });
       }
     };
-    enqueue(opt.from, first, startKind !== opt.start[0]);
+    enqueue(opt.from, first, rv);
     // 이어 돌리기: 지난번에 들어가 본 화면들에서 아직 안 누른 것만 이어서 누른다
     for (const r of prior) if (r.start === startKind && r.newList && r.path.length + 1 < opt.depth) enqueue([...r.path.map((key) => ({ key, nth: 0 })), { key: r.key, nth: r.nth ?? 0 }], r.newList);
     let n = 0;
@@ -612,7 +615,7 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
           const step = { key: job.key, nth: job.nth };
           const path = [...job.path, step];
           states.push({ vp, start: startKind, path: path.map((p) => p.key), shot: rec.shots?.[2], audit: rec.audit });
-          enqueue(path, rec.newList, startKind !== opt.start[0]); // 뒤 시작 상태에서는 들어간 화면에서도 메뉴 단추를 다시 눌러 더 들어간다
+          enqueue(path, rec.newList, rv); // 뒤 시작 상태에서는 들어간 화면에서도 메뉴 단추를 다시 눌러 더 들어간다
         } else if (rec.newList && seenSig && job.revisit && job.path.length + 1 < opt.depth && !revisitSigs.has(sigKey)) {
           // 뒤 시작 상태: 이미 본 꼴의 화면이라도 메뉴 단추만은 한 번 더 따라간다 (인터넷 새 탭 → 괴담넷 글 목록처럼 한 겹 더 들어가야 달라지는 곳)
           revisitSigs.add(sigKey);
