@@ -61,32 +61,111 @@ export const mallTurnRefresh = (chat: Chat, site: MallSite): boolean => mallSett
 /** 우주몰 입금 계좌 (사이트 글) */
 export const COS_ACCOUNT = '농협 352-1849-2706-13 (예금주 : 어서오세요)';
 
-// ── 우주몰 진열 배정 (구버전 Lua cosBuildRefreshPrompt 에서 가져옴, 11-09 사용자: 새로고침해도 같은 물건이 나온다) ──
-// 칸마다 장르(겹치지 않게 섞음)×값 등급(5단계, ₩구간)을 코드가 굴려 요청에 박는다. 같은 입력이 반복돼도 모델이 같은 진열을 내지 못하게.
-const COS_GENRES = [
+// ── 우주몰 진열 배정 (구버전 Lua cosBuildRefreshPrompt 방식, 11-09 사용자: 새로고침해도 같은 물건) ──
+// 칸마다 장르(겹치지 않게 섞음)×값 등급(₩구간)을 코드가 굴려 요청에 박는다. 같은 입력이 반복돼도 모델이 같은 진열을 내지 못하게.
+// 11-09 사용자: 하드코딩 금지 — 사용 여부·장르 목록·값 등급·상황용 칸 수를 전부 설정에서 고친다 ($cos_roll_*). 기본값만 여기.
+export const COS_GENRES_DEFAULT = [
   'classical martial arts', 'sci-fi', 'fantasy', 'cyberpunk', 'steampunk',
   'ancient', 'occult', 'cosmic horror', 'creature', 'mythology',
   'religious/sacred', 'post-apocalyptic', 'alien', 'folktale', 'fairy tale',
   'alchemy', 'military', 'fiction', 'SCP', 'Cthulhu mythos',
 ];
-/** 값 등급: 이름 · 등급 설명 · 하한 · 상한 (구간 연속). 물건은 등급에 맞춰 만들고 값은 그 가치를 따른다 */
-export const COS_TIERS: [string, string, number, number][] = [
-  ['최저가', 'mundane, trivial — a curiosity or minor utility', 999_999, 2_499_999],
-  ['저가', 'common — modestly useful, low stakes', 2_500_000, 4_999_999],
-  ['중가', 'notable, uncommon — genuinely useful or potent', 5_000_000, 9_999_999],
-  ['고가', 'potent, rare — strong effect, sought-after', 10_000_000, 19_999_999],
-  ['최고가', 'powerful, coveted — a high-value artifact', 20_000_000, 49_999_999],
+export interface CosTier { name: string; desc: string; lo: number; hi: number }
+/** 값 등급 기본: 이름 · 등급 설명 · 하한 · 상한 (구간 연속). 물건은 등급에 맞춰 만들고 값은 그 가치를 따른다 */
+export const COS_TIERS_DEFAULT: CosTier[] = [
+  { name: '최저가', desc: 'mundane, trivial — a curiosity or minor utility', lo: 999_999, hi: 2_499_999 },
+  { name: '저가', desc: 'common — modestly useful, low stakes', lo: 2_500_000, hi: 4_999_999 },
+  { name: '중가', desc: 'notable, uncommon — genuinely useful or potent', lo: 5_000_000, hi: 9_999_999 },
+  { name: '고가', desc: 'potent, rare — strong effect, sought-after', lo: 10_000_000, hi: 19_999_999 },
+  { name: '최고가', desc: 'powerful, coveted — a high-value artifact', lo: 20_000_000, hi: 49_999_999 },
 ];
-/** 이번 진열 배정 글. count 칸, context 가 켜져 있으면 1~2칸은 지금 상황에 쓸모 있는 것으로 */
-export function cosAssignment(count: number, context: boolean, rnd: () => number = Math.random): string {
-  const n = Math.max(1, Math.min(COS_GENRES.length, Math.trunc(count)));
-  const g = [...COS_GENRES];
+export type CosUseful = 'auto' | '0' | '1' | '2';
+export interface CosRoll { on: boolean; genres: string[]; tiers: CosTier[]; useful: CosUseful }
+export const COS_ROLL_KEY = { on: '$cos_roll_on', genres: '$cos_roll_genres', tiers: '$cos_roll_tiers', useful: '$cos_roll_useful' } as const;
+
+/** 값 등급 ↔ 글 (한 줄에 「이름|설명|하한|상한」). 설정 칸에서 그대로 고친다 */
+export const tiersText = (t: CosTier[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}`).join('\n');
+export function parseTiers(text: string): CosTier[] {
+  const out: CosTier[] = [];
+  for (const line of String(text ?? '').split(/\r?\n/)) {
+    const [name = '', desc = '', lo = '', hi = ''] = line.split('|').map((x) => x.trim());
+    const a = Number(lo.replace(/[^\d]/g, '')); const b = Number(hi.replace(/[^\d]/g, ''));
+    if (!name || !Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b < a) continue;
+    out.push({ name: name.slice(0, 20), desc: desc.slice(0, 120), lo: a, hi: b });
+  }
+  return out;
+}
+export const genresText = (g: string[]): string => g.join(', ');
+export const parseGenres = (text: string): string[] => [...new Set(String(text ?? '').split(/[,\n]/).map((x) => x.trim().slice(0, 40)).filter(Boolean))];
+
+/** 진열 배정 설정. 변수가 없으면 기본값, 빈 글이면 그 항목은 기본값으로 */
+export function cosRoll(vars: Vars): CosRoll {
+  const on = String(vars?.[COS_ROLL_KEY.on] ?? '') !== '0';
+  const g = parseGenres(String(vars?.[COS_ROLL_KEY.genres] ?? ''));
+  const t = parseTiers(String(vars?.[COS_ROLL_KEY.tiers] ?? ''));
+  const u = String(vars?.[COS_ROLL_KEY.useful] ?? '');
+  return { on, genres: g.length ? g : COS_GENRES_DEFAULT, tiers: t.length ? t : COS_TIERS_DEFAULT, useful: u === '0' || u === '1' || u === '2' ? u : 'auto' };
+}
+/** 변수가 기본값에서 벗어났나 (설정 「기본값으로」 단추 표시용) */
+export const cosRollChanged = (vars: Vars): boolean => Object.values(COS_ROLL_KEY).some((k) => String(vars?.[k] ?? '') !== '');
+
+/** 이번 진열 배정 글. count 칸. 끄면 빈 글 */
+export function cosAssignment(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random): string {
+  if (!roll.on) return '';
+  const n = Math.max(1, Math.trunc(count));
+  const g = [...roll.genres];
   for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; }
   const useful = new Set<number>();
-  if (context && n >= 3) { const k = n >= 6 ? 2 : 1; while (useful.size < k) useful.add(Math.floor(rnd() * n)); }
+  const want = roll.useful === 'auto' ? (context && n >= 3 ? (n >= 6 ? 2 : 1) : 0) : Math.min(n, Number(roll.useful));
+  while (useful.size < want) useful.add(Math.floor(rnd() * n));
   const lines = Array.from({ length: n }, (_, i) => {
-    const t = COS_TIERS[Math.floor(rnd() * COS_TIERS.length)];
-    return `Item ${i + 1} — GENRE: ${g[i]} | VALUE TIER: ${t[0]} (${t[1]}), price ₩${t[2].toLocaleString('en-US')}-${t[3].toLocaleString('en-US')}${useful.has(i) ? ' | ROLE: useful for the protagonist\'s current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)' : context && n >= 3 ? ' | ROLE: broad stock, unrelated to the current scene' : ''}`;
+    const t = roll.tiers[Math.floor(rnd() * roll.tiers.length)];
+    const genre = g[i % g.length];
+    const role = useful.has(i) ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
+    return `Item ${i + 1} — GENRE: ${genre} | VALUE TIER: ${t.name} (${t.desc}), price ₩${t.lo.toLocaleString('en-US')}-${t.hi.toLocaleString('en-US')}${role}`;
   });
   return `${lines.join('\n')}\nBuild each item to its assigned GENRE and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. Genres differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
 }
+
+// ── 우주몰 시그니처 상품 (구버전 Lua: 「우리가 도움!」·「착한 친구」를 코드가 확률로 끼움, 모델 생성 아님) ──
+// 11-09 사용자: 박아 두지 말고 설정에서 직접 넣고 고치게 ($cos_fixed, JSON). 기본값은 구버전 둘. 모델에게는 이름을 알리지 않고, 응답에 같은 이름이 오면 버린다.
+export interface CosFixed {
+  id: string;
+  on: boolean;
+  /** 새로고침마다 끼울 확률 % (0~100) */
+  pct: number;
+  name: string;
+  price: number;
+  /** 할인 전 값 (값보다 클 때만 ※할인!※) */
+  was?: number;
+  desc: string;
+  effect: string;
+}
+export const COS_FIXED_KEY = '$cos_fixed';
+export const COS_FIXED_MAX = 12;
+export const COS_FIXED_DEFAULT: CosFixed[] = [
+  { id: 'f_wehelp', on: true, pct: 25, name: '우리가 도움!', price: 66_666_666, desc: '???', effect: '???' },
+  { id: 'f_friend', on: true, pct: 25, name: '착한 친구', price: 44_444, was: 44_444_444, desc: '아주 귀여운 짐승 모양의 인형 열쇠고리이다. 친구를 부르는 종이가 함께 온다. 동봉된 종이의 지시를 그대로 따르라.', effect: '인형을 통해 말하는 존재가 너의 단짝이 된다. 다만 누가 응답할지는 부른 자도 미리 알 수 없다. 주의사항: 검열됨' },
+];
+/** 저장된 목록. 변수가 없으면 기본값, 「[]」이면 없음 */
+export function cosFixed(vars: Vars): CosFixed[] {
+  const raw = String(vars?.[COS_FIXED_KEY] ?? '');
+  if (!raw) return COS_FIXED_DEFAULT;
+  try {
+    const arr: unknown = JSON.parse(raw);
+    if (!Array.isArray(arr)) return COS_FIXED_DEFAULT;
+    return arr.map((o): CosFixed | null => {
+      if (!o || typeof o !== 'object') return null;
+      const x = o as Record<string, unknown>;
+      const num = (v: unknown) => (Number.isFinite(Number(v)) ? Math.max(0, Math.trunc(Number(v))) : 0);
+      const was = num(x.was);
+      return { id: String(x.id ?? '').slice(0, 24) || `f${Math.random().toString(36).slice(2, 8)}`, on: x.on !== false, pct: Math.max(0, Math.min(100, num(x.pct))), name: String(x.name ?? '').slice(0, 40), price: num(x.price), ...(was ? { was } : {}), desc: String(x.desc ?? '').slice(0, 200), effect: String(x.effect ?? '').slice(0, 200) };
+    }).filter((x): x is CosFixed => !!x).slice(0, COS_FIXED_MAX);
+  } catch {
+    return COS_FIXED_DEFAULT;
+  }
+}
+export const cosFixedVars = (list: CosFixed[]): Record<string, string> => ({ [COS_FIXED_KEY]: JSON.stringify(list) });
+export const newCosFixed = (): CosFixed => ({ id: `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, on: true, pct: 25, name: '', price: 999_999, desc: '', effect: '' });
+/** 이번 새로고침에 끼울 것 (켜진 것만, 이름 있는 것만, 확률 굴림) */
+export const cosFixedRoll = (list: CosFixed[], rnd: () => number = Math.random): CosFixed[] => list.filter((x) => x.on && x.name.trim() && x.price > 0 && rnd() * 100 < x.pct);

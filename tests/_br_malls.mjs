@@ -44,7 +44,7 @@ const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴�
 for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
   const chat = {
     message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }],
-    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_wallet: JSON.stringify({ start: 5000000, log: [] }), $st_points: JSON.stringify({ start: 12400, log: [{ id: 'p0', anchor: '', amount: 0, memo: '지급', src: 'manual', at: '2025-01-01T00:00:00Z' }] }) },
+    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $cos_fixed: '[]', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_wallet: JSON.stringify({ start: 5000000, log: [] }), $st_points: JSON.stringify({ start: 12400, log: [{ id: 'p0', anchor: '', amount: 0, memo: '지급', src: 'manual', at: '2025-01-01T00:00:00Z' }] }) },
   };
   const { page, errors } = await boot(browser, fx, chat, size);
   let n = 0;

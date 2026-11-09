@@ -545,6 +545,17 @@ export function applyShelf(st: ShopState, r: ShelfReply, s: ShopSettings): ShopS
   return { ...base, items: [...st.items.filter((x) => x.sold), ...items], talk: talk.slice(-40), prev, closed: false };
 }
 
+/** 코드가 넣는 물건 (쇼핑몰 시그니처 상품): 이미 진열돼 있거나 팔린 것과 같은 이름은 건너뛴다. 지난 목록(prev)에는 넣지 않는다 */
+export function appendItems(st: ShopState, list: Omit<ShopItem, 'id'>[]): ShopState {
+  const items = withIds(st, list, st.items);
+  return items.length ? { ...st, items: [...st.items, ...items] } : st;
+}
+/** 모델이 낸 물건 가운데 이름이 겹치는 것을 뺀다 (코드가 넣는 시그니처 상품 이름은 모델이 만들지 못하게) */
+export function dropItemsNamed(st: ShopState, names: string[]): ShopState {
+  if (!names.length) return st;
+  return { ...st, items: st.items.filter((x) => x.sold || !names.some((n) => sameShopName(n, x.name))), prev: st.prev.filter((p) => !names.some((n) => sameShopName(n, p))) };
+}
+
 /** 주인에게 말한 결과를 상태에 (내 말은 부르는 쪽이 먼저 적는다) */
 export function applyTalk(st: ShopState, r0: TalkReply, kick = true): ShopState {
   // 포인트 상점: 「900p」로 적은 값도 포인트 값으로
