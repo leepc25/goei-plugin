@@ -10,7 +10,7 @@ export const MALL_SITES: MallSite[] = ['cos', 'bm'];
 export const isMallSite = (v: unknown): v is MallSite => v === 'cos' || v === 'bm';
 export const MALL_NAME: Record<MallSite, string> = { cos: '우주 쇼핑몰', bm: '백일몽 포인트몰' };
 /** 진열·문의에서 「주인」 자리 (포인트몰은 운영자 없음) */
-export const MALL_OWNER: Record<MallSite, string> = { cos: '우주인', bm: '' };
+export const MALL_OWNER: Record<MallSite, string> = { cos: '운영자', bm: '' };
 export const MALL_GUIDE: Record<MallSite, GuideName> = { cos: 'Cos', bm: 'Bm' };
 /** 사이트 상태 (진열대·문의 대화). 상점 상태와 같은 꼴 */
 export const MALL_VAR: Record<MallSite, string> = { cos: '$cos_shop', bm: '$bm_shop' };
@@ -59,4 +59,4 @@ export const mallNote = (vars: Vars, site: MallSite): string => String(vars?.[ma
 export const mallTurnRefresh = (chat: Chat, site: MallSite): boolean => mallSettings(chat.scriptstate, site).on && mallSettings(chat.scriptstate, site).auto === 'turn' && readMall(chat.scriptstate, site).loaded;
 
 /** 우주몰 입금 계좌 (사이트 글) */
-export const COS_ACCOUNT = '농협 352-1849-2706-13 (예금주 : 우주인)';
+export const COS_ACCOUNT = '농협 352-1849-2706-13 (예금주 : 어서오세요)';

@@ -1,5 +1,5 @@
 // 인터넷 쇼핑몰 화면 (2026-11-08 사용자, 시안 /mnt/project-files/작업_1108/브라우저_시안3/ pc_08_cos·pc_09_bm·pc_13_cos_ask).
-// 우주 쇼핑몰: 1990년대 개인 홈페이지, 왈도체. 장바구니 → 주문하기 → 입금 창(계좌) → 이체(가계부에서 빠짐) → 소지품. 돌려주는 것 없음.
+// 우주 쇼핑몰: 1990년대 개인 홈페이지, 번역기 돌린 듯한 어색한 한국어(왈도체). 우주인·외계를 드러내지 않는다(11-09 사용자: 이름과 UFO 간판이 전부, 로어북 노출 금지). 장바구니 → 주문하기 → 입금 창(계좌) → 이체(가계부에서 빠짐) → 소지품. 돌려주는 것 없음.
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
@@ -241,8 +241,8 @@ export async function mallAction(action: string, value: string | undefined, ctx:
         v.cart = [];
         v.pay = false;
         v.page = '';
-        v.info = `돈이 들어온 것을 확인 하였다!! ${names.map((n) => `「${n}」`).join(' ')}을 지구인 손님의 소지품에 즉시 보내 준 것이다.`;
-      } else v.info = '돈이 모자라는 것이다. 또는 이미 팔린 물건이다. 돈을 넣지 않은 것이다.';
+        v.info = `입금이 확인 되었습니다!! ${names.map((n) => `「${n}」`).join(' ')}은(는) 당신의 소지품으로 즉시 발송 되었습니다.`;
+      } else v.info = '잔고가 충분 하지 않거나 상품이 이미 품절 되었습니다. 입금은 수행 되지 않았습니다.';
       await env.refresh();
       return true;
     }
@@ -335,31 +335,31 @@ function opText(text: string, st: ShopState): string {
 function cosCard(it: ShopItem, v: View): string {
   const sale = it.tag === 'sale' && !!it.was && it.was > it.price;
   const inCart = v.cart.includes(it.id);
-  const badge = it.tag === 'rare' ? '<span class="cs-bd">★강하게 추천★</span>' : sale ? '<span class="cs-bd cs-bds">※할인!※</span>' : '';
+  const badge = it.tag === 'rare' ? '<span class="cs-bd">★굉장한 상품★</span>' : sale ? '<span class="cs-bd cs-bds">※세일※</span>' : '';
   return `<div class="cs-it${v.focus === it.id ? ' on' : ''}" data-item="${esc(it.id)}">${badge}<span class="cs-pic">${pic(it)}</span>
     <b class="cs-nm">${esc(it.name)}</b><p>${esc(it.desc)}${it.effect ? `<br><i>※ ${esc(it.effect)}</i>` : ''}</p>
     <div class="cs-pr">${sale ? `<s>${won(it.was!)}</s> ` : ''}<b>${won(it.price)}</b>${it.pay ? ` <small>+ ${esc(it.pay)}</small>` : ''}</div>
-    <div class="cs-bt"><button class="cs-btn${inCart ? ' in' : ''}" data-action="mall-cart" data-value="${esc(it.id)}" aria-pressed="${inCart}">${inCart ? '장바구니에서 뺀다' : '장바구니에 넣는다'}</button><button class="cs-ln" data-action="mall-ask" data-value="${esc(it.id)}">질문 한다</button></div></div>`;
+    <div class="cs-bt"><button class="cs-btn${inCart ? ' in' : ''}" data-action="mall-cart" data-value="${esc(it.id)}" aria-pressed="${inCart}">${inCart ? '장바구니에서 제거' : '장바구니에 담기'}</button><button class="cs-ln" data-action="mall-ask" data-value="${esc(it.id)}">질문 하기</button></div></div>`;
 }
 
 function cosCart(st: ShopState, v: View, bal: number): string {
   const list = v.cart.map((id) => st.items.find((x) => x.id === id)).filter((x): x is ShopItem => !!x);
-  if (!list.length) return `<div class="cs-box"><b class="cs-h">◈ 장바구니 ◈</b><p>장바구니는 비어 있는 것이다. 물건을 넣는 것을 하라.</p><button class="cs-btn" data-action="mall-page" data-value="">물건의 목록으로</button></div>`;
+  if (!list.length) return `<div class="cs-box"><b class="cs-h">◈ 장바구니 ◈</b><p>장바구니는 비어 있습니다. 상품을 담아 주십시오.</p><button class="cs-btn" data-action="mall-page" data-value="">상품 목록으로</button></div>`;
   const total = list.reduce((a, x) => a + x.price, 0);
-  return `<div class="cs-box"><b class="cs-h">◈ 장바구니 ◈</b><table class="cs-tb"><tr><th>물건</th><th>값</th><th></th></tr>${list.map((x) => `<tr><td>${esc(x.name)}</td><td>${won(x.price)}</td><td><button class="cs-ln" data-action="mall-cart" data-value="${esc(x.id)}">뺀다</button></td></tr>`).join('')}
-    <tr class="cs-sum"><td>모두 합하여</td><td colspan="2"><b>${won(total)}</b></td></tr></table>
-    <p class="cs-bal">지구인 손님의 잔고 : ${formatWon(bal)}</p><button class="cs-btn cs-go" data-action="mall-order">주문 하기</button></div>`;
+  return `<div class="cs-box"><b class="cs-h">◈ 장바구니 ◈</b><table class="cs-tb"><tr><th>상품</th><th>가격</th><th></th></tr>${list.map((x) => `<tr><td>${esc(x.name)}</td><td>${won(x.price)}</td><td><button class="cs-ln" data-action="mall-cart" data-value="${esc(x.id)}">제거</button></td></tr>`).join('')}
+    <tr class="cs-sum"><td>합계</td><td colspan="2"><b>${won(total)}</b></td></tr></table>
+    <p class="cs-bal">당신의 잔고 : ${formatWon(bal)}</p><button class="cs-btn cs-go" data-action="mall-order">주문 하기</button></div>`;
 }
 
 function cosPay(st: ShopState, v: View, bal: number): string {
   const list = v.cart.map((id) => st.items.find((x) => x.id === id)).filter((x): x is ShopItem => !!x);
   const total = list.reduce((a, x) => a + x.price, 0);
   const poor = bal < total;
-  return `<div class="cs-dim"><div class="cs-win cs-paywin" role="dialog" aria-label="돈을 넣는 창"><div class="cs-wt"><b>★ 돈을 넣는 창 ★ - Netscape</b><button data-action="mall-pay-close" aria-label="닫기">×</button></div>
-    <div class="cs-wb"><p>아래의 계좌에 돈을 넣는 것을 하라.</p><p class="cs-acc">${esc(COS_ACCOUNT)}</p>
-    <table class="cs-tb"><tr><td>보내는 돈</td><td><b>${won(total)}</b></td></tr><tr><td>지금 잔고</td><td>${formatWon(bal)}</td></tr><tr><td>보낸 뒤</td><td>${formatWon(bal - total)}</td></tr></table>
-    <p class="cs-warn">※ 돈을 돌려주는 것은 절대로 없다. 물건을 돌려받는 것도 없다.</p>
-    <div class="cs-wbt"><button class="cs-btn cs-go" data-action="mall-pay" ${poor ? 'disabled' : ''}>${poor ? '잔고가 모자라다' : '이체 한다'}</button><button class="cs-btn" data-action="mall-pay-close">그만 둔다</button></div></div></div></div>`;
+  return `<div class="cs-dim"><div class="cs-win cs-paywin" role="dialog" aria-label="입금 안내"><div class="cs-wt"><b>★ 입금 안내 ★ - Netscape</b><button data-action="mall-pay-close" aria-label="닫기">×</button></div>
+    <div class="cs-wb"><p>아래의 계좌로 입금 하십시오. 입금은 확인 됩니다.</p><p class="cs-acc">${esc(COS_ACCOUNT)}</p>
+    <table class="cs-tb"><tr><td>입금 금액</td><td><b>${won(total)}</b></td></tr><tr><td>현재 잔고</td><td>${formatWon(bal)}</td></tr><tr><td>입금 후</td><td>${formatWon(bal - total)}</td></tr></table>
+    <p class="cs-warn">※ 환불의 존재는 없습니다. 반품 또한 그렇습니다.</p>
+    <div class="cs-wbt"><button class="cs-btn cs-go" data-action="mall-pay" ${poor ? 'disabled' : ''}>${poor ? '잔고가 충분 하지 않습니다' : '입금 한다'}</button><button class="cs-btn" data-action="mall-pay-close">취소</button></div></div></div></div>`;
 }
 
 function cosAsk(st: ShopState, v: View, mobile: boolean): string {
@@ -367,15 +367,15 @@ function cosAsk(st: ShopState, v: View, mobile: boolean): string {
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
   const log = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자 우주인</b><p>${opText(l.text, st)}</p></div>`)).join('')
-    : '<div class="q-m q-op"><b>운영자 우주인</b><p>무엇이 궁금한 것이냐 지구인 손님이여!! 물건에 대하여 묻는 것이면 물건을 붙이는 것을 하라.</p></div>';
-  const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자 우주인</b><p>답을 쓰는 중 인 것이다…</p></div>' : '';
-  const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 물건이 없는 것이다.</p>'}</div>` : '';
-  return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문 하는 창"${at}><div class="cs-wt"><b>★ 운영자에게 질문 하는 창 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
-    <div class="q-hd">${ufo}<div><b>운영자 우주인</b><small>● 지금 깨어 있는 것이다</small></div></div>
-    ${chip ? `<div class="q-card"><span>붙인 물건</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="물건 떼기">×</button></div>` : ''}
+    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p></div>`)).join('')
+    : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
+  const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력 중 입니다…</p></div>' : '';
+  const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';
+  return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문"${at}><div class="cs-wt"><b>★ 운영자에게 질문 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
+    <div class="q-hd">${ufo}<div><b>운영자</b><small>● 운영자는 여기에 있습니다</small></div></div>
+    ${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
     <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}
-    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">물건을 붙인다</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 쓰는 것이다" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>보낸다</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
+    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 입력 하십시오" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
 function cosHtml(ctx: ChatContext, mobile: boolean): string {
@@ -389,26 +389,26 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const sale = s.feature ? list.filter((x) => x.tag === 'sale' && x.was) : [];
   const rest = list.filter((x) => !rare.includes(x) && !sale.includes(x));
   const ufo = siteLogo('cos', 'cs-ufo');
-  const menu = [['', '처음의 곳'], ['cart', `장바구니 (${v.cart.length})`]].map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}">◈ ${l}</button>`).join('')
+  const menu = [['', '처음 화면'], ['cart', `장바구니 (${v.cart.length})`]].map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}">◈ ${l}</button>`).join('')
     + '<button data-action="mall-ask" data-value="">◈ 운영자에게 질문</button>';
   const note = mallNote(ctx.chat.scriptstate, site);
   const grid = (xs: ShopItem[]) => `<div class="cs-grid">${xs.map((x) => cosCard(x, v)).join('')}</div>`;
   let main: string;
-  if (!s.on) main = '<div class="cs-box"><p>지금은 문을 닫은 것이다. (소지품·가계부가 꺼져 있어요)</p></div>';
+  if (!s.on) main = '<div class="cs-box"><p>현재 영업 하지 않습니다. (소지품·가계부가 꺼져 있어요)</p></div>';
   else if (v.page === 'cart') main = cosCart(st, v, bal);
-  else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>먼 별에서 물건을 가져오는 중 인 것이다… <span class="blink">★</span></p></div>';
-  else if (!list.length) main = `<div class="cs-box"><p>${st.loaded ? '물건이 모두 팔린 것이다.' : '아직 물건을 진열 하지 않은 것이다.'}</p><button class="cs-btn" data-action="mall-refresh" ${v.loading ? 'disabled' : ''}>물건을 가져온다</button></div>`;
+  else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>상품을 진열 하는 중 입니다… <span class="blink">★</span></p></div>';
+  else if (!list.length) main = `<div class="cs-box"><p>${st.loaded ? '모든 상품이 품절 되었습니다.' : '상품이 아직 진열 되지 않았습니다.'}</p><button class="cs-btn" data-action="mall-refresh" ${v.loading ? 'disabled' : ''}>상품 가져오기</button></div>`;
   // 추천·할인·일반 모두 한 격자, 같은 배열 (2026-11-08 사용자: 구획으로 흐트러뜨리지 말 것). 추천·할인은 칸 안 딱지로만
-  else main = `<b class="cs-h">◈ 물건의 목록 ◈</b>${grid([...rare, ...sale, ...rest])}${v.loading === 'shelf' ? '<p class="cs-wait">새 물건을 가져오는 중 인 것이다…</p>' : ''}`;
-  const how = `<div class="cs-how"><b>◈ 사는 방법 ◈</b><br>1. 장바구니에 넣는다 &nbsp; 2. 아래의 계좌에 돈을 넣는다 &nbsp; 3. 돈을 확인 하면 즉시 보내 주는 것이다<br>돈을 넣는 계좌 : <b>${esc(COS_ACCOUNT)}</b><br><span class="cs-red">※ 돈을 돌려주는 것은 절대로 없다. 물건을 돌려받는 것도 없다.</span><br>궁금한 것은 <button class="cs-ln" data-action="mall-ask" data-value="">운영자에게 질문</button> 하는 것이다.</div>`;
-  const head = `<div class="cs-title">${mobile ? '' : ufo} Cosmic Shopping Mall ${mobile ? '' : ufo.replace('cs-ufo', 'cs-ufo cs-flip')}</div><div class="cs-subt">※외계에서 온 멋진 물건※~!!</div><hr class="cs-rb">
-    <div class="cs-mq"><span>☆ 지구인 손님 당신을 환영한다 ☆★ 돈이 들어오는 즉시 공간을 찢어 물건을 던져 준다 ★☆ 돌려주는 돈은 존재 하지 않는다 ☆</span></div>
-    <div class="cs-wel">반가운 것이다 지구인 여러분들이여!! 우리들 <b>우주 쇼핑몰</b>은 매우 먼 별에서 온 귀중한 물건을 지구인 손님 당신에게 판매 해 주는 것이다. 모든 물건은 <b>진짜의 물건</b> 이다 그러나 효과는 <b>우리가 책임을 지는 것이 아니다</b>.${note ? `<br><br><span class="cs-op">운영자 우주인 :</span> ${opText(note, st)}` : ''} <span class="blink">NEW!!</span></div>`;
+  else main = `<b class="cs-h">◈ 상품 목록 ◈</b>${grid([...rare, ...sale, ...rest])}${v.loading === 'shelf' ? '<p class="cs-wait">새로운 상품을 진열 하는 중 입니다…</p>' : ''}`;
+  const how = `<div class="cs-how"><b>◈ 구매의 방법 ◈</b><br>1. 상품을 장바구니에 담습니다 &nbsp; 2. 아래의 계좌로 입금 합니다 &nbsp; 3. 입금이 확인 되면 상품은 즉시 발송 됩니다<br>입금 계좌 : <b>${esc(COS_ACCOUNT)}</b><br><span class="cs-red">※ 환불의 존재는 없습니다. 반품 또한 그렇습니다.</span><br>질문이 있는 경우 <button class="cs-ln" data-action="mall-ask" data-value="">운영자에게 질문</button> 하십시오.</div>`;
+  const head = `<div class="cs-title">${mobile ? '' : ufo} Cosmic Shopping Mall ${mobile ? '' : ufo.replace('cs-ufo', 'cs-ufo cs-flip')}</div><div class="cs-subt">※우주에서 온 굉장한 상품※</div><hr class="cs-rb">
+    <div class="cs-mq"><span>☆ 어서 오세요 ☆★ 물건을 보겠습니다 ★☆ 입금이 확인 되면 상품은 즉시 발송 됩니다 ★☆ 환불은 다음 기회에 ☆</span></div>
+    <div class="cs-wel">방문을 환영 합니다!! <b>우주 쇼핑몰</b>은 굉장한 상품을 당신에게 제공 합니다. 모든 상품은 <b>진짜 입니다</b>. 그러나 사용의 결과에 대하여 본 쇼핑몰은 <b>책임을 가지지 않습니다</b>.${note ? `<br><br><span class="cs-op">운영자 :</span> ${opText(note, st)}` : ''} <span class="blink">NEW!!</span></div>`;
   const info = v.info ? `<div class="cs-info" role="status">${esc(v.info)}</div>` : '';
   const side = mobile
     ? `<nav class="cs-top">${menu}</nav>`
-    : `<nav class="cs-lf"><div class="cs-lt">★우주 쇼핑몰★</div>${ufo.replace('cs-ufo', 'cs-ufo cs-big')}${menu}<hr class="cs-rb"><div class="cs-cnt">TOTAL <span>${String(st.items.length + st.talk.length + 700).padStart(6, '0')}</span></div><small>800×600 해상도를<br>가장 좋아함 하였다</small></nav>`;
-  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 집의 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보이는 것이다 · 거미줄의 주인 : 우주인</div></div></div>${v.ask ? cosAsk(st, v, mobile) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
+    : `<nav class="cs-lf"><div class="cs-lt">★우주 쇼핑몰★</div>${ufo.replace('cs-ufo', 'cs-ufo cs-big')}${menu}<hr class="cs-rb"><div class="cs-cnt">TOTAL <span>${String(st.items.length + st.talk.length + 700).padStart(6, '0')}</span></div><small>800×600 해상도를<br>권장 합니다</small></nav>`;
+  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보입니다 · 웹 관리자 : 운영자</div></div></div>${v.ask ? cosAsk(st, v, mobile) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
 }
 
 /* 백일몽 포인트몰 */
