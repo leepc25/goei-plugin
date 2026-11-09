@@ -14,6 +14,7 @@ import { toast } from './toast';
 import { imageUrl } from './images';
 import { resolveSitePic } from '../core/sitepics';
 import { boardFiles, boardThumb, setSitePicSource, attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
+import { itemIconUrl } from '../host/itemicons';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
 import { lastReply } from '../core/phone';
@@ -618,6 +619,7 @@ const pageOf = <T,>(list: T[]): T[] => list.slice((Math.max(1, gnet.page) - 1) *
 const pages = (total: number) => Math.max(1, Math.ceil(total / PAGE));
 /** 쪽 번호 (사이트마다 모양만 다름) */
 function pager(total: number, cls: string, prev = '', next = ''): string {
+  if (!total) return ''; // 글이 없으면 쪽 번호 「1」도 없다 (11-09 사용자)
   const n = pages(total);
   const cur = Math.min(gnet.page, n);
   const nums = Array.from({ length: n }, (_, i) => i + 1).map((k) => (k === cur ? `<b>${k}</b>` : `<button data-action="gn-page" data-value="${k}">${k}</button>`)).join(' ');
@@ -649,6 +651,18 @@ function priceOf(p: GPost): string {
   if (p.tag === '나눔' || /나눔/.test(s)) return '나눔';
   if (p.tag === '삽니다') return '가격 제안';
   return '';
+}
+/** 연어 마켓 매물 그림: 본문 [사진:…]이 있으면 그것, 없으면 제목의 물건 이름으로 소지품 그림 팩(host/itemicons.ts)에서 (11-09 사용자: 매칭이 전혀 안 됐다).
+ *  제목 앞 「[직거래/계양]」 같은 꼬리표를 떼고, 「및·,·/·+」로 이어진 것은 첫 물건만 본다 */
+function smItemName(p: GPost): string {
+  const t = p.title.replace(/^\s*(?:\[[^\]]*\]\s*)+/, '').replace(/\s*(?:팝니다|삽니다|나눔|급처|급매|판매|구합니다|구매)\s*$/u, '');
+  return t.split(/\s*(?:\s및\s|,|\/|\+|·|~)\s*/)[0].trim();
+}
+function smPicUrl(p: GPost): string | null {
+  const t = boardThumb(p.body);
+  if (t?.url) return t.url;
+  const name = smItemName(p);
+  return name ? itemIconUrl(name) : null;
 }
 const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];
@@ -713,8 +727,8 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
     case 'sm': {
       const cards = list.map((p) => {
         const want = p.tag === '삽니다';
-        const t = boardThumb(p.body);
-        const img = t?.url ? `<img src="${esc(t.url)}" alt="">` : ICONS.bag;
+        const u = smPicUrl(p);
+        const img = u ? `<img src="${esc(u)}" alt="">` : ICONS.bag;
         const ph = want
           ? `<div class="ph want"><b>삽니다</b><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
           : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${img}${p.tag ? `<span class="tag${p.tag === '나눔' ? ' g' : ''}">${esc(p.tag)}</span>` : ''}</div>`;
@@ -809,9 +823,9 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
         <div class="nav2">${back('bb', '목록')}<span>${scrap('bb', '스크랩됨', '스크랩')} ${more('bb')} ${del('bb')}</span>${writeBtn('bb')}</div></article>`;
     }
     case 'sm': {
-      const t = boardThumb(p.body);
+      const u = smPicUrl(p);
       const price = priceOf(p);
-      return `<article class="detail gn-post"><div class="ph ${SM_BG[p.id % SM_BG.length]}">${t?.url ? `<img src="${esc(t.url)}" alt="">` : ICONS.bag}</div><div>
+      return `<article class="detail gn-post"><div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div><div>
         <div class="seller"><i></i><div>${who}</div></div>
         <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
         <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 채팅 ${p.comments.length} · 조회 ${p.views}</div>
