@@ -117,8 +117,15 @@ const stem = w => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s') && !w.e
 /** 말 → { words, head, mods, ko, joined } (영어는 끝 s 뗌) */
 function headOf(s) {
   const words = normIcon(s).split(' ').filter(Boolean).map(stem);
-  // 끝에 붙은 번호(봉인 상자 1, 2)는 몸통이 아님
-  while (words.length > 1 && /^\d+$/.test(words[words.length - 1])) words.pop();
+  // 끝에 붙은 번호·용량(봉인 상자 1, 앰플 30ml, 생수 2L)은 몸통이 아님 → 뗌. 등급(C급·S등급·F)은 꾸밈말로 앞에 둠 (2026-11-09)
+  const grade = [];
+  while (words.length > 1) {
+    const w = words[words.length - 1];
+    if (/^\d+$/.test(w) || /^\d+[a-z]+$/.test(w)) words.pop();
+    else if (/^(?:[a-z]|\d+)(?:등급|급)?$/.test(w)) grade.unshift(words.pop());
+    else break;
+  }
+  words.unshift(...grade);
   if (!words.length) return null;
   return { words, head: words[words.length - 1], mods: words.slice(0, -1), ko: /[가-힣]/.test(words[words.length - 1]), joined: words.join('') };
 }

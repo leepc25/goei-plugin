@@ -101,6 +101,15 @@ test('꾸밈말이 안 맞아도 몸통 말이 같으면 같은 종류 그림 (1
   assert.equal(matchItemIcon(pack, '기본 지급품'), pack.base.misc, '몸통 말이 표에 없으면 공통 그림');
 });
 
+test('끝에 붙은 용량·등급은 몸통이 아님 (11-09 사용자: 「앰플 30ml」「앰플 (C급)」이 단지·상자로 나옴)', () => {
+  is('백일몽 탈모 완화 앰플 30ml', '', '앰플');
+  is('백일몽 신체 재생 앰플 (C급)', '', '앰플');
+  is('생수 500ml', '', '생수 2L');
+  is('꿈결 수집기 (S급)', '', '꿈결 수집기 S등급'); // 등급은 꾸밈말로 남아 등급별 그림을 가른다
+  is('꿈결 수집기 F', '', '꿈결 수집기 F등급');
+  is('소원권', '', '소원권');
+});
+
 test('흔한 조각만 맞거나 아무것도 안 맞으면 공통 그림', () => {
   for (const n of ['침술 키트', '녹슨 심령 침술 키트', '전혀 모르는 ㅁㄴㅇ', '리버레이터', '']) assert.equal(matchItemIcon(pack, n), pack.base.misc, n);
 });
@@ -109,5 +118,5 @@ test('game-src/items/match_icon.mjs 와 플러그인이 같은 답', () => {
   const m = makeMatcher(table);
   const probe = [...table.icons.filter((r) => !r.excluded_note).map((r) => r.name), '손목시계', '봉지라면', '확성기', '녹슨 심령 침술 키트', '피 묻은 곰인형', '가죽 장갑'];
   for (const n of probe) assert.equal(matchItemIcon(pack, n), m(n), n);
-  for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box'], ['생체 신호 은폐 패치', 'concealment patch'], ['경보 장치', 'alarm device'], ['향초 세트', 'candle set'], ['낚시 도구 세트', 'fishing set']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
+  for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box'], ['생체 신호 은폐 패치', 'concealment patch'], ['경보 장치', 'alarm device'], ['향초 세트', 'candle set'], ['낚시 도구 세트', 'fishing set'], ['백일몽 신체 재생 앰플 (C급)', 'ampoule'], ['탈모 완화 앰플 30ml', '']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
 });

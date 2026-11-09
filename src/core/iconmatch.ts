@@ -133,7 +133,15 @@ const MACHINE = new Set(['장치', '기계', '도구']);
 
 function headOf(s: string): Head | null {
   const words = normIcon(s).split(' ').filter(Boolean).map(stem);
-  while (words.length > 1 && /^\d+$/.test(words[words.length - 1])) words.pop(); // 끝 번호(봉인 상자 1)는 몸통이 아님
+  // 끝에 붙은 번호·용량(봉인 상자 1, 앰플 30ml, 생수 2L)은 몸통이 아님 → 뗌. 등급(C급·S등급·F)은 꾸밈말로 앞에 둠 (2026-11-09 사용자: 「앰플 (C급)」이 상자로 나옴)
+  const grade: string[] = [];
+  while (words.length > 1) {
+    const w = words[words.length - 1];
+    if (/^\d+$/.test(w) || /^\d+[a-z]+$/.test(w)) words.pop();
+    else if (/^(?:[a-z]|\d+)(?:등급|급)?$/.test(w)) grade.unshift(words.pop() as string);
+    else break;
+  }
+  words.unshift(...grade);
   if (!words.length) return null;
   const head = words[words.length - 1];
   return { words, head, mods: words.slice(0, -1), ko: /[가-힣]/.test(head), joined: words.join('') };
