@@ -18,6 +18,8 @@
 //   --fixture <경로>      시험 카드 (기본 .scratch/fixture/fixture.json, 없으면 `npm run test:browser -- --only install` 로 먼저 만든다)
 //   --only-scope <css>    이 선택자 안의 것만 누른다 (예: '.gx' 상황판 창만)
 //   --report-only         누르지 않고 --out 폴더의 report.json(끊긴 것도)으로 report.md 만 다시 만든다
+//   --resume <폴더,…>     같은 판(커밋)의 지난 기록(report.json)을 읽어, 이미 누른 단추는 건너뛰고 못 누른 곳만 이어서 누른다.
+//                         지난 결과도 이번 보고서에 합친다(캡처는 지난 폴더 것을 가리킴). 판이 다르면 멈춘다 (11-09 사용자: 통과한 것을 왜 또 하냐)
 //   --from 'a|v>b|v'      시작 상태에서 이 열쇠들을 차례로 누른 화면부터 점검한다 (한 화면만 빨리 다시 볼 때. 열쇠는 report.md 의 `action|value`)
 // 빌드(dist/)가 있어야 한다: npm run build
 import os from 'node:os';
@@ -44,6 +46,7 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop', '
     else if (k === '--out') opt.out = v();
     else if (k === '--fixture') opt.fixture = v();
     else if (k === '--report-only') opt.reportOnly = true;
+    else if (k === '--resume') opt.resume = list(v());
     else if (k === '--only-scope') opt.scope = v();
     else if (k === '--from') opt.from = v().split('>').map((x) => x.trim()).filter(Boolean).map((key) => ({ key, nth: 0 }));
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
@@ -466,6 +469,18 @@ function flagsOf(rec) {
 
 // ---- 돌리기 ------------------------------------------------------------------------------------------------------
 const results = [];
+// 이어 돌리기: 지난 기록을 읽어 둔다 (같은 판만)
+const PRIOR = { results: [], states: [] };
+for (const dir of opt.resume || []) {
+  const d = resolve(ROOT, dir);
+  const j = JSON.parse(readFileSync(resolve(d, 'report.json'), 'utf8'));
+  const c0 = String(j.version?.commit || '').split('·')[0], c1 = String(VERSION.commit).split('·')[0];
+  if (!c0 || c0 !== c1) throw new Error(`--resume ${dir}: 판이 달라요 (지난 ${c0 || '모름'}, 지금 ${c1}). 판이 바뀌면 처음부터 다시 돌린다`);
+  const abs = (n) => (n ? resolve(d, 'shots', n) : n);
+  for (const r of j.results) PRIOR.results.push({ ...r, shots: r.shots?.map(abs), prior: dir });
+  for (const st of j.states) PRIOR.states.push({ ...st, shot: abs(st.shot) });
+}
+if (opt.resume) log(`이어 돌리기: 지난 기록 ${PRIOR.results.length}개 (${opt.resume.join(', ')})`);
 const skippedVals = {};
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
@@ -479,6 +494,15 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
   const offSeen = new Set();
   const exploredVals = {};
   const exploredSigs = new Set(); // 이미 들어가 본 화면 꼴 (보이는 동작 이름 묶음)
+  const sigOf = (list) => [...new Set(list.filter((x) => !x.behind).map((x) => x.action || x.tag + '.' + x.cls))].sort().join(' ');
+  // 이어 돌리기: 지난 기록에서 누른 단추·들어가 본 화면은 건너뛴다 (도구 오류·재현 실패·못 찾음은 다시 누른다)
+  const prior = PRIOR.results.filter((r) => r.vp === vp);
+  for (const r of prior) {
+    if (r.disabled) { offSeen.add(r.key); continue; }
+    if (r.revisit || r.flags?.some((f) => /도구 오류|재현 실패|못 찾음|안 눌림/.test(f))) continue;
+    if (!done.has(r.key)) { done.add(r.key); if (r.action) perAct[r.action] = (perAct[r.action] || 0) + 1; }
+    if (r.newList) exploredSigs.add(sigOf(r.newList));
+  }
   for (const startKind of opt.start) {
     const revisitSigs = new Set();
     log(`${vp} · ${startKind} 시작 상태 만드는 중`);
@@ -512,6 +536,8 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
       }
     };
     enqueue(opt.from, first, startKind !== opt.start[0]);
+    // 이어 돌리기: 지난번에 들어가 본 화면들에서 아직 안 누른 것만 이어서 누른다
+    for (const r of prior) if (r.start === startKind && r.newList && r.path.length + 1 < opt.depth) enqueue([...r.path.map((key) => ({ key, nth: 0 })), { key: r.key, nth: r.nth ?? 0 }], r.newList);
     let n = 0;
     while (queue.length) {
       const batch = queue.splice(0, opt.workers);
@@ -541,11 +567,12 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
       }
       log(`${vp} · ${startKind}: ${n}번 누름, 남은 ${queue.length} (${Math.round((Date.now() - t0) / 1000)}초)`);
       if (opt.maxClicks && n >= opt.maxClicks) { log(`--max-clicks ${opt.maxClicks} 에서 멈춤, 남은 ${queue.length}개는 「안 눌림」`); for (const q of queue) results.push({ vp, start: startKind, path: q.path.map((p) => p.key), key: q.key, label: q.label, action: q.action, value: q.value, flags: ['안 눌림(상한)'] }); queue.length = 0; }
-      writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ opt, results, states, skippedVals }, null, 1));
+      writeFileSync(resolve(OUT, 'report.json'), JSON.stringify({ version: VERSION, opt, results, states, skippedVals }, null, 1)); // 끊겨도 이어 돌리기가 판을 확인하게
     }
   }
 }
 await browser?.close();
+if (PRIOR.results.length) { results.unshift(...PRIOR.results); states.unshift(...PRIOR.states); }
 
 // ---- 통일성 ------------------------------------------------------------------------------------------------------
 // 같은 종류(태그.첫클래스) 끼리 크기·글씨·색·테두리·모서리·안쪽 여백이 몇 가지로 갈리는지. 선택된 것과 아닌 것은 따로 본다.
