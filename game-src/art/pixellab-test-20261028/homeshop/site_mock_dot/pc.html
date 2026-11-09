@@ -1,0 +1,97 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:dgm;src:url(neodgm.ttf)}
+:root{--ink:#0b0513;--night:#151320;--iron:#3a3842;--wine:#60131b;--red:#b33031;--hot:#d35544;--gold:#eeb76c;--cream:#f4e6c8;--brown:#311d24;--yel:#ffd23e;--dim:#8a7f88}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);font:16px/16px dgm;color:var(--cream);-webkit-font-smoothing:none;font-smooth:never}
+img{image-rendering:pixelated;display:block}
+.win{width:880px;padding:8px;background:var(--ink)}
+/* pixel bevel box */
+.px{background:var(--night);border:2px solid var(--ink);box-shadow:inset 2px 2px 0 var(--iron),inset -2px -2px 0 #000,0 0 0 2px var(--gold)}
+.dither{background-image:repeating-conic-gradient(var(--wine) 0 25%,var(--brown) 0 50%);background-size:2px 2px}
+/* header */
+.hd{height:40px;display:flex;align-items:center;gap:24px;padding:0 12px;margin-bottom:10px}
+.logo{font-size:32px;line-height:32px;color:var(--gold);text-shadow:2px 2px 0 #000}
+.menu{display:flex;gap:4px;flex:1}
+.menu a{padding:4px 10px;color:var(--cream);border:2px solid transparent}
+.menu a.on{background:var(--red);border-color:var(--gold);color:#fff;box-shadow:inset -2px -2px 0 var(--wine)}
+.tel{color:var(--yel)}
+/* main */
+.row{display:flex;gap:12px}
+.tv{padding:8px;background:var(--iron);border:2px solid #000;box-shadow:inset 2px 2px 0 #5a5864,inset -2px -2px 0 #1c1b22}
+.scr{position:relative;width:512px;height:384px;overflow:hidden;border:2px solid #000}
+.scr>img{position:absolute;left:0;top:0}
+.scan{position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 1px,rgba(0,0,0,.18) 1px 2px);pointer-events:none}
+.cg{position:absolute}
+.lg{left:8px;top:8px;display:flex}
+.lg b{background:var(--wine);color:var(--gold);padding:4px 6px;border:2px solid var(--gold);font-weight:normal}
+.lg i{background:var(--gold);color:var(--ink);padding:4px 6px;border:2px solid var(--gold);font-style:normal}
+.live{right:8px;top:8px;background:var(--red);color:#fff;padding:4px 6px 4px 18px;border:2px solid #fff}
+.live:before{content:"";position:absolute;left:6px;top:8px;width:6px;height:6px;background:#fff}
+.soon{right:8px;top:40px;background:var(--yel);color:var(--ink);padding:4px 6px;border:2px solid var(--ink);box-shadow:2px 2px 0 #000}
+.left{right:8px;top:68px;background:var(--ink);color:var(--yel);padding:4px 6px;border:2px solid var(--yel)}
+.board{left:177px;top:130px;width:160px;height:85px;background:var(--wine);border:2px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.board .big{font-size:32px;line-height:32px;color:var(--yel);text-shadow:2px 2px 0 #000}
+.board .sm{color:var(--cream)}
+.l3{left:8px;right:8px;bottom:8px;display:flex;gap:6px;align-items:flex-end}
+.l3 .nm{flex:1;background:var(--cream);color:var(--ink);border:2px solid var(--ink);box-shadow:2px 2px 0 #000;position:relative;padding:20px 8px 6px}
+.l3 .tag{position:absolute;left:-2px;top:-14px;background:var(--red);color:#fff;padding:3px 6px;border:2px solid var(--ink)}
+.l3 .nm .p{color:var(--red)}
+.l3 .nm .n{margin-bottom:4px}
+.l3 .ph{background:var(--ink);border:2px solid var(--yel);padding:6px 8px;box-shadow:2px 2px 0 #000;text-align:right}
+.l3 .ph small{display:block;font-size:16px;color:var(--yel);margin-bottom:4px}
+.l3 .ph b{font-size:32px;line-height:32px;color:#fff;font-weight:normal}
+/* chat */
+.chat{width:324px;height:404px;display:flex;flex-direction:column}
+.ch-h{padding:8px;border-bottom:2px solid var(--iron);display:flex;justify-content:space-between;color:var(--gold)}
+.ch-b{flex:1;padding:6px 8px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.ch-b p{display:flex;gap:8px}.ch-b p span{flex:none;width:64px;color:var(--hot)}
+.ch-b p.q span{color:var(--dim)}.ch-b p.q{color:var(--dim)}
+.ch-b p.host span{color:var(--yel)}.ch-b p.host{color:var(--yel)}
+.ch-i{margin:6px;padding:6px;border:2px solid var(--iron);background:var(--ink);color:var(--dim)}
+/* on-air box */
+.oa{margin-top:14px;display:flex;gap:12px;padding:10px;align-items:center}
+.icon{position:relative;width:96px;height:96px;background:var(--ink);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center}
+.stk{position:absolute;right:-8px;top:-8px;width:30px;height:30px;background:var(--yel);color:var(--ink);border:2px solid var(--ink);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);display:flex;align-items:center;justify-content:center;font-size:16px}
+.oa .t{flex:1}.oa .k{color:var(--gold);margin-bottom:6px}.oa .nm2{font-size:32px;line-height:32px;margin-bottom:8px}.oa .d{color:var(--cream)}
+.btn{display:block;padding:10px 16px;background:var(--red);color:#fff;border:2px solid #000;box-shadow:inset 2px 2px 0 var(--hot),inset -2px -2px 0 var(--wine),2px 2px 0 #000;text-align:center;width:180px}
+/* schedule */
+.sc{margin-top:14px;display:flex;gap:8px}
+.sl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;padding:8px;border:2px solid var(--iron);background:var(--night);position:relative;height:56px}
+.sl .b{color:var(--gold);margin-bottom:8px}
+.sl.past{color:var(--dim)}.sl.past .b{color:var(--dim)}
+.sl.past:after{content:"매진";position:absolute;right:6px;top:6px;color:var(--red);border:2px solid var(--red);padding:2px 4px;background:var(--night)}
+.sl.now{border-color:var(--gold);background:var(--wine)}
+.sl.now .b{color:var(--yel)}
+.sl.q{color:var(--dim)}
+.sch{display:flex;justify-content:space-between;margin-top:14px;color:var(--gold)}
+</style></head><body><div class="win">
+<div class="hd px"><span class="logo">망상홈쇼핑</span><nav class="menu"><a class="on">ON AIR</a><a>편성표</a><a>주문 조회</a><a>방청 신청</a></nav><span class="tel">☎ 080-404-0000</span></div>
+<div class="row">
+ <div class="tv"><div class="scr"><img src="frame.png" width="512" height="384">
+  <div class="cg board"><span><span class="sm">무이자 </span><span class="big">6회</span></span><span class="sm">오늘 방송에서만</span></div>
+  <div class="cg lg"><b>망상홈쇼핑</b><i>2부</i></div>
+  <div class="cg live">LIVE</div>
+  <div class="cg soon">매진 임박</div>
+  <div class="cg left">남은 수량 7</div>
+  <div class="cg l3"><div class="nm"><span class="tag">주문 폭주</span><div class="n">예시) 행운의 무전기</div><div>무이자 할부 <span class="p">6회</span> · 맞교환 가능</div></div><div class="ph"><small>☎ 전화 주문</small><b>0000-0000</b></div></div>
+  <div class="scan"></div></div></div>
+ <div class="chat px"><div class="ch-h"><span>실시간 채팅</span><span>1,204명</span></div>
+  <div class="ch-b">
+   <p><span>ㅇㅇ</span>2번 재입고 되나요</p>
+   <p class="q"><span>???</span>여기 안에 있어요</p>
+   <p><span>민지맘</span>저거 진짜 들려요?</p>
+   <p><span>야식왕</span>지난주 산 거 아직 안 깸</p>
+   <p class="host"><span>진행자</span>고객님들, 지금 바로!</p>
+   <p class="q"><span>???</span>나가는 길 아시는 분</p>
+   <p><span>하루</span>6회면 몇 번 불려가요?</p>
+   <p><span>rose</span>진행자 눈 왜저럼</p>
+   <p><span>익명</span>방청 신청했는데 답이 없어요</p>
+  </div><div class="ch-i">채팅 보내기…</div></div>
+</div>
+<div class="oa px"><div class="icon"><img src="prod.png" width="31" height="76"><span class="stk">!</span></div>
+ <div class="t"><div class="k">지금 방송 중 · 2부</div><div class="nm2">예시) 행운의 무전기</div><div class="d">무이자 할부 6회 · 맞교환 가능 · 남은 수량 7</div></div>
+ <a class="btn">☎ 전화 주문</a></div>
+<div class="sch"><span>오늘 편성</span><span style="color:var(--dim)">지난 부는 다시 못 삽니다 · 다음 상품은 방송에서 공개</span></div>
+<div class="sc"><div class="sl past"><div class="b">1부</div>예시) 인두</div><div class="sl now"><div class="b">2부 · 방송 중</div>예시) 행운의 무전기</div><div class="sl q"><div class="b">3부</div>???</div><div class="sl q"><div class="b">4부</div>???</div><div class="sl q"><div class="b">5부</div>???</div></div>
+</div></body></html>
