@@ -4685,3 +4685,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-fx-head > input:first-child { flex: 1; min-width: 140px; }
 .ms-fx .ph-inline .ms-num { width: 110px; }
 .ms-fx-head .ms-num { width: 64px; }
+.ms-fx-wide { flex: 1; min-width: 0; }
+.ms-fx-wide > input { flex: 1; min-width: 0; }
+.ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
+.ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
+.ms-sample i { color: var(--accent); font-style: normal; }

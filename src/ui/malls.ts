@@ -1,5 +1,5 @@
 // 인터넷 쇼핑몰 화면 (2026-11-08 사용자, 시안 /mnt/project-files/작업_1108/브라우저_시안3/ pc_08_cos·pc_09_bm·pc_13_cos_ask).
-// 우주 쇼핑몰: 1990년대 개인 홈페이지, 번역기 돌린 듯한 어색한 한국어(왈도체). 우주인·외계를 드러내지 않는다(11-09 사용자: 이름과 UFO 간판이 전부, 로어북 노출 금지). 장바구니 → 주문하기 → 입금 창(계좌) → 이체(가계부에서 빠짐) → 소지품. 돌려주는 것 없음.
+// 우주 쇼핑몰: 1990년대 개인 홈페이지, 가볍게 어색한 번역투(왈도체, 반말, 1인칭 「우리」 — 11-09 사용자: 구버전 톤). 우주인·외계를 드러내지 않는다(11-09 사용자: 이름과 UFO 간판이 전부, 로어북 노출 금지). 장바구니 → 주문하기 → 입금 창(계좌) → 이체(가계부에서 빠짐) → 소지품. 돌려주는 것 없음.
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
@@ -14,7 +14,7 @@ import { addItem, itemsVars, readItems } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { appendItems, applyShelf, applyTalk, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
-import { COS_ACCOUNT, COS_FIXED_KEY, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, cosAssignment, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
+import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
@@ -378,9 +378,9 @@ function cosPay(st: ShopState, v: View, bal: number): string {
   const total = list.reduce((a, x) => a + x.price, 0);
   const poor = bal < total;
   return `<div class="cs-dim"><div class="cs-win cs-paywin" role="dialog" aria-label="입금 안내"><div class="cs-wt"><b>★ 입금 안내 ★ - Netscape</b><button data-action="mall-pay-close" aria-label="닫기">×</button></div>
-    <div class="cs-wb"><p>아래의 계좌로 입금 하십시오. 입금은 확인 됩니다.</p><p class="cs-acc">${esc(COS_ACCOUNT)}</p>
+    <div class="cs-wb"><p>아래 계좌로 입금해라. 우리는 입금을 확인한다.</p><p class="cs-acc">${esc(COS_ACCOUNT)}</p>
     <table class="cs-tb"><tr><td>입금 금액</td><td><b>${won(total)}</b></td></tr><tr><td>현재 잔고</td><td>${formatWon(bal)}</td></tr><tr><td>입금 후</td><td>${formatWon(bal - total)}</td></tr></table>
-    <p class="cs-warn">※ 환불의 존재는 없습니다. 반품 또한 그렇습니다.</p>
+    <p class="cs-warn">※ 환불의 존재는 없다. 반품 또한 그렇다.</p>
     <div class="cs-wbt"><button class="cs-btn cs-go" data-action="mall-pay" ${poor ? 'disabled' : ''}>${poor ? '잔고가 충분 하지 않습니다' : '입금 한다'}</button><button class="cs-btn" data-action="mall-pay-close">취소</button></div></div></div></div>`;
 }
 
@@ -391,13 +391,13 @@ function cosAsk(st: ShopState, v: View, mobile: boolean): string {
   const log = st.talk.length
     ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p></div>`)).join('')
     : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
-  const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력 중 입니다…</p></div>' : '';
+  const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';
   return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문"${at}><div class="cs-wt"><b>★ 운영자에게 질문 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
     <div class="q-hd">${ufo}<div><b>운영자</b><small>● 운영자는 여기에 있습니다</small></div></div>
     ${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
     <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}
-    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 입력 하십시오" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
+    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 여기에 넣어라" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
 function cosHtml(ctx: ChatContext, mobile: boolean): string {
@@ -418,14 +418,14 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   let main: string;
   if (!s.on) main = '<div class="cs-box"><p>현재 영업 하지 않습니다. (소지품·가계부가 꺼져 있어요)</p></div>';
   else if (v.page === 'cart') main = cosCart(st, v, bal);
-  else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>상품을 진열 하는 중 입니다… <span class="blink">★</span></p></div>';
+  else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>우리는 상품을 진열하는 중… <span class="blink">★</span></p></div>';
   else if (!list.length) main = `<div class="cs-box"><p>${st.loaded ? '모든 상품이 품절 되었습니다.' : '상품이 아직 진열 되지 않았습니다.'}</p><button class="cs-btn" data-action="mall-refresh" ${v.loading ? 'disabled' : ''}>상품 가져오기</button></div>`;
   // 추천·할인·일반 모두 한 격자, 같은 배열 (2026-11-08 사용자: 구획으로 흐트러뜨리지 말 것). 추천·할인은 칸 안 딱지로만
-  else main = `<b class="cs-h">◈ 상품 목록 ◈</b>${grid([...rare, ...sale, ...rest])}${v.loading === 'shelf' ? '<p class="cs-wait">새로운 상품을 진열 하는 중 입니다…</p>' : ''}`;
-  const how = `<div class="cs-how"><b>◈ 구매의 방법 ◈</b><br>1. 상품을 장바구니에 담습니다 &nbsp; 2. 아래의 계좌로 입금 합니다 &nbsp; 3. 입금이 확인 되면 상품은 즉시 발송 됩니다<br>입금 계좌 : <b>${esc(COS_ACCOUNT)}</b><br><span class="cs-red">※ 환불의 존재는 없습니다. 반품 또한 그렇습니다.</span><br>질문이 있는 경우 <button class="cs-ln" data-action="mall-ask" data-value="">운영자에게 질문</button> 하십시오.</div>`;
+  else main = `<b class="cs-h">◈ 상품 목록 ◈</b>${grid([...rare, ...sale, ...rest])}${v.loading === 'shelf' ? '<p class="cs-wait">새로운 상품을 진열하는 중…</p>' : ''}`;
+  const how = `<div class="cs-how"><b>◈ 구매의 방법 ◈</b><br>1. 상품을 장바구니에 담는다 &nbsp; 2. 아래 계좌로 입금한다 &nbsp; 3. 입금이 확인되면 상품은 즉시 간다<br>입금 계좌 : <b>${esc(COS_ACCOUNT)}</b><br><span class="cs-red">※ 환불의 존재는 없다. 반품 또한 그렇다.</span><br>질문이 있으면 <button class="cs-ln" data-action="mall-ask" data-value="">운영자에게 질문</button> 해라.</div>`;
   const head = `<div class="cs-title">${mobile ? '' : ufo} Cosmic Shopping Mall ${mobile ? '' : ufo.replace('cs-ufo', 'cs-ufo cs-flip')}</div><div class="cs-subt">※우주에서 온 굉장한 상품※</div><hr class="cs-rb">
-    <div class="cs-mq"><span>☆ 어서 오세요 ☆★ 물건을 보겠습니다 ★☆ 입금이 확인 되면 상품은 즉시 발송 됩니다 ★☆ 환불은 다음 기회에 ☆</span></div>
-    <div class="cs-wel">방문을 환영 합니다!! <b>우주 쇼핑몰</b>은 굉장한 상품을 당신에게 제공 합니다. 모든 상품은 <b>진짜 입니다</b>. 그러나 사용의 결과에 대하여 본 쇼핑몰은 <b>책임을 가지지 않습니다</b>.${note ? `<br><br><span class="cs-op">운영자 :</span> ${opText(note, st)}` : ''} <span class="blink">NEW!!</span></div>`;
+    <div class="cs-mq"><span>☆ 어서 와라 ☆★ 물건을 보겠습니다 ★☆ 입금이 확인되면 상품은 즉시 간다 ★☆ 환불은 다음 기회에 ☆</span></div>
+    <div class="cs-wel">방문을 환영한다!! <b>우주 쇼핑몰</b>은 굉장한 상품을 너에게 제공한다. 모든 상품은 <b>진짜다</b>. 그러나 사용의 결과에 대하여 우리는 <b>책임을 가지지 않는다</b>.${note ? `<br><br><span class="cs-op">운영자 :</span> ${opText(note, st)}` : ''} <span class="blink">NEW!!</span></div>`;
   const info = v.info ? `<div class="cs-info" role="status">${esc(v.info)}</div>` : '';
   const side = mobile
     ? `<nav class="cs-top">${menu}</nav>`
@@ -523,18 +523,26 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
-/** 진열 배정 (11-09 사용자: 하드코딩 말고 전부 설정에서) */
+/** 진열 배정 (11-09 사용자: 하드코딩 말고 전부 설정에서 · 추첨 방식도 보이고 고치게) */
 function cosRollGroup(ctx: ChatContext): string {
   const vars = ctx.chat.scriptstate;
   const r = cosRoll(vars);
+  const s = mallSettings(vars, 'cos');
   const reset = cosRollChanged(vars) ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset">기본값으로</button></div>` : '';
   const gSet = String(vars?.[COS_ROLL_KEY.genres] ?? '') !== '';
   const tSet = String(vars?.[COS_ROLL_KEY.tiers] ?? '') !== '';
-  return group('진열 배정', [
-    row('사용', mseg('cos', 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '새로 받을 때마다 칸마다 장르와 값 등급을 뽑아 요청에 적어요. 같은 요청에 같은 물건이 나오는 걸 막아요. 끄면 모델이 알아서 골라요.'),
-    row('장르 목록', `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="genres" placeholder="${esc(genresText(COS_GENRES_DEFAULT))}">${esc(gSet ? genresText(r.genres) : '')}</textarea>`, '쉼표로 나눠요. 칸마다 하나씩 겹치지 않게 배정해요. 비우면 기본 20종(회색 글).'),
-    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="tiers" placeholder="${esc(tiersText(COS_TIERS_DEFAULT))}">${esc(tSet ? tiersText(r.tiers) : '')}</textarea>`, '한 줄에 「이름|설명(영어)|하한|상한」. 칸마다 하나를 뽑아 그 구간 안에서 값을 매기게 해요. 비우면 기본 5단계(₩999,999~49,999,999).'),
-    row('상황용 칸', mseg('cos', 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸.'),
+  // 지금 설정으로 한 번 뽑아 본 예 (열 때마다 달라짐)
+  const n = Math.round((s.size[0] + s.size[1]) / 2);
+  const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ₩${x.tier.lo.toLocaleString('ko-KR')}~${x.tier.hi.toLocaleString('ko-KR')}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
+  const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 장르를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — GENRE · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, 장르·등급을 바꾸지 못해요.</p>`;
+  return group('진열 배정', how + [
+    row('사용', mseg('cos', 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
+    row('장르 목록', `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="genres" placeholder="${esc(genresText(COS_GENRES_DEFAULT))}">${esc(gSet ? genresText(r.genres) : '')}</textarea>`, '쉼표로 나눠요. 비우면 기본 20종(회색 글).'),
+    row('장르 뽑기', mseg('cos', 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', '한 장르로']]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? '칸마다 따로 무작위. 같은 장르가 여러 칸에 나올 수 있어요.' : '한 판에 장르 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).'),
+    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="tiers" placeholder="${esc(tiersText(COS_TIERS_DEFAULT))}">${esc(tSet ? tiersText(r.tiers) : '')}</textarea>`, '한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(₩999,999~49,999,999, 모두 1).'),
+    row('등급 뽑기', mseg('cos', 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
+    row('상황용 칸', mseg('cos', 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위.'),
+    r.on ? row('뽑기 예', `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : '',
   ].join('') + reset);
 }
 
@@ -549,10 +557,10 @@ function cosFixedGroup(ctx: ChatContext): string {
   const items = list.map((f) => `<div class="ms-fx${f.on ? '' : ' off'}">
       <div class="ms-fx-head">${text(f.id, 'name', f.name, '상품 이름', '이름', 40)}<span class="ph-inline"><span>확률</span>${num(f.id, 'pct', f.pct, '25', '확률', 100)}<span>%</span></span>${mseg('cos', `fx_on:${f.id}`, f.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}<button class="gx-mini danger" data-action="ms-fx-del" data-value="${esc(f.id)}" aria-label="지우기">×</button></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num(f.id, 'price', f.price, '999999', '값')}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num(f.id, 'was', f.was, '비우면 할인 없음', '할인 전 값')}<span>원</span></span></div>
-      ${text(f.id, 'desc', f.desc, '설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}
-      ${text(f.id, 'effect', f.effect, '효과', '효과', 200)}
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text(f.id, 'desc', f.desc, '겉보기 설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '쓰면 무슨 일이 나는지', '효과', 200)}</span></div>
     </div>`).join('');
-  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>추가</button><button class="gx-mini" data-action="ms-fx-reset">구버전 기본값으로</button></div>`;
+  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>추가</button></div>`;
   return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
 }
 
@@ -619,7 +627,7 @@ export const mallWinSpec: PopSpec = {
   },
 };
 
-/** 진열 배정·시그니처 상품 설정 (우주몰만). ms-cfg 「cos:roll_on=1」·「cos:roll_useful=auto」·「cos:fx_on:ID=1」 · ms-roll 「genres=글」 · ms-fx 「ID:키=값」 · ms-fx-add/del/reset · ms-roll-reset */
+/** 진열 배정·시그니처 상품 설정 (우주몰만). ms-cfg 「cos:roll_on=1」·「cos:roll_useful=auto」·「cos:fx_on:ID=1」 · ms-roll 「genres=글」 · ms-fx 「ID:키=값」 · ms-fx-add/del · ms-roll-reset */
 async function cosExtraAction(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv): Promise<boolean> {
   const set = async (vars: Record<string, string>) => {
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
@@ -628,10 +636,12 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   };
   const list = () => cosFixed(ctx.chat.scriptstate);
   if (action === 'ms-cfg') {
-    const m = /^cos:(roll_on|roll_useful|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^cos:(roll_on|roll_useful|roll_gmode|roll_tmode|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return false;
     if (m[1] === 'roll_on') return set({ [COS_ROLL_KEY.on]: m[2] === '0' ? '0' : '' });
     if (m[1] === 'roll_useful') return set({ [COS_ROLL_KEY.useful]: m[2] === 'auto' ? '' : m[2] });
+    if (m[1] === 'roll_gmode') return set({ [COS_ROLL_KEY.gmode]: m[2] === 'uniq' ? '' : m[2] });
+    if (m[1] === 'roll_tmode') return set({ [COS_ROLL_KEY.tmode]: m[2] === 'weight' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
   }
@@ -640,7 +650,7 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     if (!m) return true;
     return set({ [m[1] === 'genres' ? COS_ROLL_KEY.genres : COS_ROLL_KEY.tiers]: m[2].trim().slice(0, 4000) });
   }
-  if (action === 'ms-roll-reset') return set({ [COS_ROLL_KEY.on]: '', [COS_ROLL_KEY.genres]: '', [COS_ROLL_KEY.tiers]: '', [COS_ROLL_KEY.useful]: '' });
+  if (action === 'ms-roll-reset') return set(Object.fromEntries(Object.values(COS_ROLL_KEY).map((k) => [k, ''])));
   if (action === 'ms-fx') {
     const m = /^(\w+):(name|pct|price|was|desc|effect)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return true;
@@ -656,6 +666,5 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   }
   if (action === 'ms-fx-add') { const cur = list(); return cur.length >= COS_FIXED_MAX ? true : set(cosFixedVars([...cur, newCosFixed()])); }
   if (action === 'ms-fx-del') return set(cosFixedVars(list().filter((f) => f.id !== value)));
-  if (action === 'ms-fx-reset') return set({ [COS_FIXED_KEY]: '' });
   return false;
 }

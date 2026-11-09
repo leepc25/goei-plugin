@@ -61,3 +61,20 @@ test('시그니처 상품: 기본값은 구버전 둘, 글로 저장·읽기, �
   const again = M.appendItems(st, [{ name: '은화 뱀', desc: '', effect: '', use: false, price: 3_000_000 }]);
   assert.equal(again.items.length, 2, '이미 있으면 또 안 붙는다');
 });
+
+test('추첨 방식: 장르 겹침·통일, 등급 가중치·골고루·통일, 가중치 0은 안 뽑힌다 (11-09 사용자: 추첨 방식도 설정에서)', () => {
+  const base = { $cos_roll_genres: 'a,b,c', $cos_roll_tiers: 'L|low|1|2|1\nH|high|3|4|0' };
+  const one = M.cosRoll({ ...base, $cos_roll_gmode: 'one', $cos_roll_tmode: 'same' });
+  assert.equal(one.gmode, 'one'); assert.equal(one.tmode, 'same');
+  const d1 = M.cosDraw(4, false, one);
+  assert.equal(new Set(d1.map((s) => s.genre)).size, 1, '한 장르로');
+  assert.ok(d1.every((s) => s.tier.name === 'L'), '가중치 0 등급은 안 뽑히고, 한 등급으로');
+  const any = M.cosRoll({ ...base, $cos_roll_gmode: 'any' });
+  assert.equal(M.cosDraw(3, false, any, seq(0.1, 0.1, 0.1, 0.1, 0.1, 0.1)).filter((s) => s.genre === 'a').length, 3, '겹쳐도 됨 → 같은 장르 셋');
+  const even = M.cosRoll({ $cos_roll_tmode: 'even' });
+  const d3 = M.cosDraw(5, false, even);
+  assert.equal(new Set(d3.map((s) => s.tier.name)).size, 5, '골고루 → 5칸에 5등급 전부');
+  assert.equal(M.cosRoll({}).gmode, 'uniq'); assert.equal(M.cosRoll({}).tmode, 'weight');
+  assert.equal(M.parseTiers('x|y|1|2')[0].w, 1, '가중치 비우면 1');
+  assert.ok(M.tiersText(M.COS_TIERS_DEFAULT).endsWith('|1'), '글에 가중치가 붙는다');
+});

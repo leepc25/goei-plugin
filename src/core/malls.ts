@@ -70,28 +70,33 @@ export const COS_GENRES_DEFAULT = [
   'religious/sacred', 'post-apocalyptic', 'alien', 'folktale', 'fairy tale',
   'alchemy', 'military', 'fiction', 'SCP', 'Cthulhu mythos',
 ];
-export interface CosTier { name: string; desc: string; lo: number; hi: number }
+export interface CosTier { name: string; desc: string; lo: number; hi: number; /** 뽑힐 가중치 (기본 1) */ w: number }
 /** 값 등급 기본: 이름 · 등급 설명 · 하한 · 상한 (구간 연속). 물건은 등급에 맞춰 만들고 값은 그 가치를 따른다 */
 export const COS_TIERS_DEFAULT: CosTier[] = [
-  { name: '최저가', desc: 'mundane, trivial — a curiosity or minor utility', lo: 999_999, hi: 2_499_999 },
-  { name: '저가', desc: 'common — modestly useful, low stakes', lo: 2_500_000, hi: 4_999_999 },
-  { name: '중가', desc: 'notable, uncommon — genuinely useful or potent', lo: 5_000_000, hi: 9_999_999 },
-  { name: '고가', desc: 'potent, rare — strong effect, sought-after', lo: 10_000_000, hi: 19_999_999 },
-  { name: '최고가', desc: 'powerful, coveted — a high-value artifact', lo: 20_000_000, hi: 49_999_999 },
+  { name: '최저가', desc: 'mundane, trivial — a curiosity or minor utility', lo: 999_999, hi: 2_499_999, w: 1 },
+  { name: '저가', desc: 'common — modestly useful, low stakes', lo: 2_500_000, hi: 4_999_999, w: 1 },
+  { name: '중가', desc: 'notable, uncommon — genuinely useful or potent', lo: 5_000_000, hi: 9_999_999, w: 1 },
+  { name: '고가', desc: 'potent, rare — strong effect, sought-after', lo: 10_000_000, hi: 19_999_999, w: 1 },
+  { name: '최고가', desc: 'powerful, coveted — a high-value artifact', lo: 20_000_000, hi: 49_999_999, w: 1 },
 ];
 export type CosUseful = 'auto' | '0' | '1' | '2';
-export interface CosRoll { on: boolean; genres: string[]; tiers: CosTier[]; useful: CosUseful }
-export const COS_ROLL_KEY = { on: '$cos_roll_on', genres: '$cos_roll_genres', tiers: '$cos_roll_tiers', useful: '$cos_roll_useful' } as const;
+/** 장르 뽑기: uniq = 칸마다 다르게(목록을 섞어 앞에서부터) · any = 칸마다 따로 무작위(겹쳐도 됨) · one = 이번 판은 한 장르로 통일 */
+export type CosGenreMode = 'uniq' | 'any' | 'one';
+/** 등급 뽑기: weight = 칸마다 가중치대로 무작위 · even = 등급을 칸에 골고루 나눈 뒤 섞음 · same = 이번 판은 한 등급으로 통일(가중치대로 하나 뽑음) */
+export type CosTierMode = 'weight' | 'even' | 'same';
+export interface CosRoll { on: boolean; genres: string[]; tiers: CosTier[]; useful: CosUseful; gmode: CosGenreMode; tmode: CosTierMode }
+export const COS_ROLL_KEY = { on: '$cos_roll_on', genres: '$cos_roll_genres', tiers: '$cos_roll_tiers', useful: '$cos_roll_useful', gmode: '$cos_roll_gmode', tmode: '$cos_roll_tmode' } as const;
 
 /** 값 등급 ↔ 글 (한 줄에 「이름|설명|하한|상한」). 설정 칸에서 그대로 고친다 */
-export const tiersText = (t: CosTier[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}`).join('\n');
+export const tiersText = (t: CosTier[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join('\n');
 export function parseTiers(text: string): CosTier[] {
   const out: CosTier[] = [];
   for (const line of String(text ?? '').split(/\r?\n/)) {
-    const [name = '', desc = '', lo = '', hi = ''] = line.split('|').map((x) => x.trim());
+    const [name = '', desc = '', lo = '', hi = '', w = ''] = line.split('|').map((x) => x.trim());
     const a = Number(lo.replace(/[^\d]/g, '')); const b = Number(hi.replace(/[^\d]/g, ''));
     if (!name || !Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b < a) continue;
-    out.push({ name: name.slice(0, 20), desc: desc.slice(0, 120), lo: a, hi: b });
+    const wn = Number(w); // 비우면 1, 0 이면 안 뽑힘
+    out.push({ name: name.slice(0, 20), desc: desc.slice(0, 120), lo: a, hi: b, w: w === '' || !Number.isFinite(wn) || wn < 0 ? 1 : Math.min(99, wn) });
   }
   return out;
 }
@@ -104,25 +109,57 @@ export function cosRoll(vars: Vars): CosRoll {
   const g = parseGenres(String(vars?.[COS_ROLL_KEY.genres] ?? ''));
   const t = parseTiers(String(vars?.[COS_ROLL_KEY.tiers] ?? ''));
   const u = String(vars?.[COS_ROLL_KEY.useful] ?? '');
-  return { on, genres: g.length ? g : COS_GENRES_DEFAULT, tiers: t.length ? t : COS_TIERS_DEFAULT, useful: u === '0' || u === '1' || u === '2' ? u : 'auto' };
+  const gm = String(vars?.[COS_ROLL_KEY.gmode] ?? ''); const tm = String(vars?.[COS_ROLL_KEY.tmode] ?? '');
+  const tiers = t.length ? t : COS_TIERS_DEFAULT;
+  return {
+    on, genres: g.length ? g : COS_GENRES_DEFAULT, tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
+    useful: u === '0' || u === '1' || u === '2' ? u : 'auto', gmode: gm === 'any' || gm === 'one' ? gm : 'uniq', tmode: tm === 'even' || tm === 'same' ? tm : 'weight',
+  };
 }
 /** 변수가 기본값에서 벗어났나 (설정 「기본값으로」 단추 표시용) */
 export const cosRollChanged = (vars: Vars): boolean => Object.values(COS_ROLL_KEY).some((k) => String(vars?.[k] ?? '') !== '');
 
-/** 이번 진열 배정 글. count 칸. 끄면 빈 글 */
-export function cosAssignment(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random): string {
-  if (!roll.on) return '';
+/** 한 칸의 배정 */
+export interface CosSlot { genre: string; tier: CosTier; useful: boolean }
+/** 가중치대로 하나 뽑기 */
+const pickTier = (tiers: CosTier[], rnd: () => number): CosTier => {
+  const total = tiers.reduce((a, t) => a + t.w, 0);
+  let x = rnd() * total;
+  for (const t of tiers) { x -= t.w; if (x < 0) return t; }
+  return tiers[tiers.length - 1];
+};
+const shuffle = <T>(xs: T[], rnd: () => number): T[] => { const g = [...xs]; for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } return g; };
+
+/** 이번 진열 배정 (칸마다 장르·등급·상황용). 설정의 뽑기 방식대로. 끄면 빈 목록 */
+export function cosDraw(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random): CosSlot[] {
+  if (!roll.on) return [];
   const n = Math.max(1, Math.trunc(count));
-  const g = [...roll.genres];
-  for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; }
+  // 장르
+  let genres: string[];
+  if (roll.gmode === 'one') { const g = roll.genres[Math.floor(rnd() * roll.genres.length)]; genres = Array.from({ length: n }, () => g); }
+  else if (roll.gmode === 'any') genres = Array.from({ length: n }, () => roll.genres[Math.floor(rnd() * roll.genres.length)]);
+  else { const g = shuffle(roll.genres, rnd); genres = Array.from({ length: n }, (_, i) => g[i % g.length]); }
+  // 등급
+  const live = roll.tiers.filter((t) => t.w > 0);
+  let tiers: CosTier[];
+  if (roll.tmode === 'same') { const t = pickTier(live, rnd); tiers = Array.from({ length: n }, () => t); }
+  else if (roll.tmode === 'even') tiers = shuffle(Array.from({ length: n }, (_, i) => live[i % live.length]), rnd);
+  else tiers = Array.from({ length: n }, () => pickTier(live, rnd));
+  // 상황용 칸
   const useful = new Set<number>();
   const want = roll.useful === 'auto' ? (context && n >= 3 ? (n >= 6 ? 2 : 1) : 0) : Math.min(n, Number(roll.useful));
   while (useful.size < want) useful.add(Math.floor(rnd() * n));
-  const lines = Array.from({ length: n }, (_, i) => {
-    const t = roll.tiers[Math.floor(rnd() * roll.tiers.length)];
-    const genre = g[i % g.length];
-    const role = useful.has(i) ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
-    return `Item ${i + 1} — GENRE: ${genre} | VALUE TIER: ${t.name} (${t.desc}), price ₩${t.lo.toLocaleString('en-US')}-${t.hi.toLocaleString('en-US')}${role}`;
+  return genres.map((genre, i) => ({ genre, tier: tiers[i], useful: useful.has(i) }));
+}
+
+/** 이번 진열 배정 글 (요청문에 붙는 꼴). 끄면 빈 글 */
+export function cosAssignment(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random): string {
+  const slots = cosDraw(count, context, roll, rnd);
+  if (!slots.length) return '';
+  const want = slots.some((s) => s.useful);
+  const lines = slots.map((s, i) => {
+    const role = s.useful ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
+    return `Item ${i + 1} — GENRE: ${s.genre} | VALUE TIER: ${s.tier.name} (${s.tier.desc}), price ₩${s.tier.lo.toLocaleString('en-US')}-${s.tier.hi.toLocaleString('en-US')}${role}`;
   });
   return `${lines.join('\n')}\nBuild each item to its assigned GENRE and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. Genres differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
 }
