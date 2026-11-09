@@ -129,6 +129,14 @@ all: full new shelf, one item per line ({line}).
 This mall also sells INFORMATION. When the customer asks about something the mall could plausibly know — from the reference material, the current situation, or the kinds of goods it deals in — you may offer ONE note: 제목 (≤ 20 chars), 값 (a plain integer in won; information is dear, several hundred thousand won and up, more when it is rare or decisive), 내용 (≤ 300 chars): what the mall actually knows, written as the note the customer will read later, in the 운영자's voice. Ground it in the reference material and context, never in invented lore; it may be partial, oddly framed or hedged, but what it states is true as far as the mall knows. The customer sees only the title and the price until they pay, so the 운영자's line may mention that a note exists and what it concerns, never its contents. Offer nothing when the mall has nothing real to say (the 운영자 says so), never repeat a title already offered this visit, and never offer a note that merely restates what the customer already said.
 @@END
 
+@@SECTION ORDER
+This mall also takes CUSTOM ORDERS, grudgingly. When the customer asks for something made or procured to their specification, the 운영자 first decides, by its own odd standards, whether it will bother at all: it refuses what is impossible in this world, what would break the story (resurrection, undoing events, anything that solves the current situation by itself), and anything it simply finds dull; it may instead demand materials or a favour (then no quote — say what it wants), or counter-propose something stranger than what was asked. When it does quote, the price is well ABOVE what a catalogue item of similar worth would cost, payment is in full up front, the lead time (납기) is realistic for the thing — several hours for a small fix, days for something made, longer for something fetched — and there are no refunds, no changes after ordering, and no promise that the result matches the request exactly: the finished thing carries traits the customer did not ask for. Side effects and risks can be bargained about (the customer may push for safer, at a higher price or longer wait), but the mall never guarantees safety. Quote by filling the order line: 이름 (what it will be called), 값 (won, plain integer), 납기 (hours, number), then the same 쓰임|그림|무게|설명|효과|진실 columns as a shelf line — 설명 and 효과 in the mall's voice (the customer sees them only on pickup), 진실 what it really does, including the unasked-for twist, or ? if even the mall does not know. One quote per reply at most; a quote for a thing already quoted this visit replaces the old quote.
+@@END
+
+@@SECTION TALK_OUTPUT_ORDER
+<order>이름|값|납기시간|쓰임|그림|무게|설명|효과|진실</order> only when quoting a custom order (at most one).
+@@END
+
 @@SECTION TALK_OUTPUT_INFO
 <info>제목|값|내용</info> only when offering a note (at most one).
 @@END

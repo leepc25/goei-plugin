@@ -13,7 +13,8 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { minuteText, orderDue, orderReady, ordersText, ordersVars, readOrders, worldMinute, type CosOrder } from '../core/orders';
+import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
@@ -107,6 +108,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s);
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
     if (site === 'cos' && kind === 'shelf') { src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, cosRoll(ctx.chat.scriptstate)); src.truthMode = cosTruthMode(ctx.chat.scriptstate); }
+    if (site === 'cos') { const od = ordersText(readOrders(ctx.chat.scriptstate), worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? ''); if (od) src.orders = od; }
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${MALL_NAME[site]} ${kind === 'shelf' ? '진열' : '문의'}` };
     let next: ShopState;
@@ -337,6 +339,48 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       await env.refresh();
       return true;
     }
+    case 'mall-quote-accept': {
+      // 맞춤 주문: 견적을 선납하고 주문 목록에 넣는다. 완성품은 「주문 조회」에서 납기 뒤에 받는다
+      const q = (st.quotes ?? []).find((x) => x.id === value && !x.accepted);
+      if (site !== 'cos' || !q || v.loading) return true;
+      let ok = false; let short = false;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const now = readMall(chat.scriptstate, site);
+        const nextShop = acceptQuote(now, q.id);
+        if (!nextShop) return null;
+        const alive = aliveAnchors(chat);
+        let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        if (walletBalance(w, alive) < q.price) { short = true; return null; }
+        const anchor = lastBot(chat)?.key ?? '';
+        w = addWalletEntry(w, { id: `${site}_ord_${q.id}`, anchor, amount: -q.price, memo: `맞춤 주문 선납: ${q.item.name} (${MALL_NAME[site]})`, src: 'store' });
+        const { sold: _s, tag: _t, was: _w, orig: _o, pay: _p, ...item } = q.item;
+        const order: CosOrder = { id: q.id, anchor, price: q.price, hours: q.hours, orderedAt: worldMinute(chat), orderedKey: anchor, item };
+        ok = true;
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...ordersVars([...readOrders(chat.scriptstate), order]), ...mallVarsOf(site, nextShop) } };
+      });
+      v.info = ok ? `「${q.item.name}」 주문이 접수 되었다. 선납 완료. 완성되면 「주문 조회」에서 받아라.` : short ? '잔고가 모자란다. 입금이 필요하다.' : '주문할 수 없는 상태다.';
+      await env.refresh();
+      return true;
+    }
+    case 'mall-custom-take': {
+      // 완성품 받기: 납기가 지났을 때만. 그제야 설명·효과가 보이고(진실은 숨긴 채) 소지품에 들어간다
+      const o = readOrders(ctx.chat.scriptstate).find((x) => x.id === value);
+      if (site !== 'cos' || !o || !orderReady(o, worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? '')) return true;
+      let ok = false;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const list = readOrders(chat.scriptstate);
+        const cur = list.find((x) => x.id === o.id);
+        if (!cur || cur.taken) return null;
+        const anchor = lastBot(chat)?.key ?? '';
+        const it = cur.item;
+        const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
+        ok = true;
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true } : x))) } };
+      });
+      v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : '받을 수 없는 상태다.';
+      await env.refresh();
+      return true;
+    }
     case 'mall-sell-cancel':
       if (st.sell) await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, cancelSell(readMall(chat.scriptstate, site))) } }));
       await env.refresh();
@@ -425,6 +469,29 @@ function noteCard(st: ShopState, id: string | undefined, v: View): string {
   return `<div class="q-note${n.bought ? ' done' : ''}"><span>📄 쪽지</span><b>${esc(n.title)}</b><em>${won(n.price)}</em>${n.bought ? '<small>구매 완료 — 소지품에서 읽어라</small>' : `<button class="cs-btn" data-action="mall-note-buy" data-value="${esc(n.id)}"${v.loading ? ' disabled' : ''}>구매</button>`}</div>`;
 }
 
+/** 맞춤 주문 견적 카드: 이름·값·납기만 (설명·효과는 받을 때 본다). 선납하면 주문 */
+function quoteCard(st: ShopState, id: string | undefined, v: View): string {
+  const q = id ? (st.quotes ?? []).find((x) => x.id === id) : null;
+  if (!q) return '';
+  const h = q.hours >= 24 ? `${Math.round((q.hours / 24) * 10) / 10}일` : `${q.hours}시간`;
+  return `<div class="q-note q-quote${q.accepted ? ' done' : ''}"><span>🛠 맞춤 주문 견적</span><b>${esc(q.item.name)}</b><em>${won(q.price)}</em><small>납기 ${h}</small>${q.accepted ? '<small class="ok">선납 완료 — 주문 조회에서 받아라</small>' : `<button class="cs-btn" data-action="mall-quote-accept" data-value="${esc(q.id)}"${v.loading ? ' disabled' : ''}>선납하고 주문</button>`}</div>`;
+}
+
+/** 「주문 조회」: 진행 중·받을 수 있음·받음 (11-09 사용자: 맞춤 상품이 진열되는 건 이상하다 → 따로 받는 창) */
+function cosOrders(ctx: ChatContext): string {
+  const list = readOrders(ctx.chat.scriptstate);
+  const nowMin = worldMinute(ctx.chat);
+  const lastKey = lastBot(ctx.chat)?.key ?? '';
+  if (!list.length) return '<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><p>주문의 존재는 없다. 운영자에게 질문에서 맞춤 주문을 말해라.</p></div>';
+  const rows = [...list].reverse().map((o) => {
+    const ready = orderReady(o, nowMin, lastKey);
+    const due = orderDue(o);
+    const when = o.taken ? '받음' : ready ? '<b class="cs-red">완성 — 받을 수 있다</b>' : due !== null ? `제작 중 · 납기 ${esc(minuteText(due))}${nowMin !== null ? ` (${Math.max(1, Math.ceil((due - nowMin) / 60))}시간 남음)` : ''}` : `제작 중 · 납기 ${o.hours}시간 (다음 응답 뒤)`;
+    return `<tr class="${o.taken ? 'done' : ''}"><td>${esc(o.item.name)}</td><td>${won(o.price)}</td><td>${when}</td><td>${ready ? `<button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>` : ''}</td></tr>`;
+  }).join('');
+  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th><th></th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
+}
+
 function opText(text: string, st: ShopState): string {
   let html = esc(text);
   for (const it of onShelf(st).slice().sort((a, b) => b.name.length - a.name.length)) {
@@ -470,7 +537,7 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
   const log = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}</div>`)).join('')
+    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}${quoteCard(st, l.quote, v)}</div>`)).join('')
     : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
   const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';
@@ -498,13 +565,15 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const sale = s.feature ? list.filter((x) => x.tag === 'sale' && x.was) : [];
   const rest = list.filter((x) => !rare.includes(x) && !sale.includes(x));
   const ufo = siteLogo('cos', 'cs-ufo');
-  const menu = [['', '처음 화면'], ['cart', `장바구니 (${v.cart.length})`]].map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}">◈ ${l}</button>`).join('')
+  const pending = readOrders(ctx.chat.scriptstate).filter((o) => !o.taken).length;
+  const menu = [['', '처음 화면'], ['cart', `장바구니 (${v.cart.length})`], ['orders', `주문 조회${pending ? ` (${pending})` : ''}`]].map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}">◈ ${l}</button>`).join('')
     + '<button data-action="mall-ask" data-value="">◈ 운영자에게 질문</button>';
   const note = mallNote(ctx.chat.scriptstate, site);
   const grid = (xs: ShopItem[]) => `<div class="cs-grid">${xs.map((x) => cosCard(x, v)).join('')}</div>`;
   let main: string;
   if (!s.on) main = '<div class="cs-box"><p>현재 영업 하지 않습니다. (소지품·가계부가 꺼져 있어요)</p></div>';
   else if (v.page === 'cart') main = cosCart(st, v, bal);
+  else if (v.page === 'orders') main = cosOrders(ctx);
   else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>우리는 상품을 진열하는 중… <span class="blink">★</span></p></div>';
   else if (!list.length) main = `<div class="cs-box"><p>${st.loaded ? '모든 상품이 품절 되었습니다.' : '상품이 아직 진열 되지 않았습니다.'}</p><button class="cs-btn" data-action="mall-refresh" ${v.loading ? 'disabled' : ''}>상품 가져오기</button></div>`;
   // 추천·할인·일반 모두 한 격자, 같은 배열 (2026-11-08 사용자: 구획으로 흐트러뜨리지 말 것). 추천·할인은 칸 안 딱지로만
