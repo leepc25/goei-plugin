@@ -508,10 +508,8 @@ export function itemLine(e: Item, left: number | undefined, equipped: boolean, d
     left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
-  // 숨긴 진짜 효과가 있으면: 주인공이 아는 건 광고 문구뿐, 실제로 일어나는 일은 진짜 쪽
-  const fx = e.truth === '?' ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: unknown — nobody knows what it really does until it is used; decide then, and keep it consistent afterwards)`
-    : e.truth ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: ${e.truth} — the protagonist does not know this)` : e.effect ? ` (${e.effect})` : '';
-  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${fx}` : '';
+  // 숨긴 진짜 효과(truth)는 여기 안 적는다 — 평소엔 광고 문구(effect)만. 쓰는 턴에만 itemsBlock 이 「Really:」로 넘긴다 (11-09 사용자: 매 턴 보내면 모델이 아는 척한다)
+  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}` : '';
   return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }
 
@@ -545,6 +543,12 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; c
   events.push(...extra);
   if (carried > opts.slots) events.push('carrying more than the limit');
   if (events.length) out.push(`This turn: ${events.join('; ')}`);
+  // 숨긴 진짜 효과: 이번 턴에 쓰는 물건, 몸에 걸친 장비만 (11-09 사용자: 평소엔 광고 문구만 가고, 쓰는 순간에 「이번에 일어나는 일」로 받는다)
+  const reveal = list.filter((e) => e.truth && (use.some((u) => u.name === e.name) || isEquipped(e, list)));
+  if (reveal.length) {
+    out.push('Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):');
+    for (const e of reveal) out.push(e.truth === '?' ? `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ''} — decide what it really does now, then keep it the same from here on.` : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ''}`);
+  }
   return out.join('\n');
 }
 
@@ -564,9 +568,9 @@ export function searchItems(it: Items, alive: Set<string>, q: string): { items: 
 export const INVENTORY_HEAD = '[Inventory]';
 /** 본편에 넘기기가 꺼지고 상점만 켜졌을 때의 글 머리 */
 export const SHOP_HEAD = '[Shop]';
-const INVENTORY_NOTE =
+export const INVENTORY_NOTE =
   'What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: ' +
-  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. An item with a "truly:" note has a hidden real effect: when it is used, what happens follows the "truly" part, never the label, and the protagonist learns it only through what happens. Never print this list back.';
+  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. If a "Really" list follows, those items\' real effects differ from or go beyond their labels: what happens follows the Really line, nobody knew it beforehand, and the protagonist learns it only through what happens. Never print this list back.';
 
 /** 채팅의 마지막 유저 메시지 키 (없으면 '') */
 export function lastUserKey(chat: Chat): string {
