@@ -1,6 +1,7 @@
 // 상황판 「인터넷」 = 크롬(다크) 모양 브라우저 (2026-11-08 사용자 결정, 시안 /mnt/project-files/작업_1108/브라우저_시안3/).
 // 탭은 실제로 열고 닫히고(+·×), 탭마다 앞뒤 기록을 따로 가진다. 즐겨찾기 줄의 사이트만 열 수 있다(광고·☆·확장 없음).
 // 사이트마다 로고·디자인이 다르고 창 테마를 따라가지 않는다. 사이트 화면은 app.ts 가 그리고, 여기서는 틀(탭·주소창·즐겨찾기·로그인)만.
+import { needAttr } from './needfill';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export type SiteId = 'gn' | 'gal' | 'wpf' | 'sm' | 'cos' | 'wk' | 'bm';
@@ -223,7 +224,7 @@ export function loginHtml(o: ChromeOpts): string {
   const face = o.photo ? `<img src="${esc(o.photo)}" alt="">` : ic(IC.acct);
   return `<div class="br-lgn" role="dialog" aria-label="로그인"><h4>로그인</h4><div class="br-face">${face}</div>
     <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc(o.nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
-    <button class="br-b1" data-action="br-login-save" data-take="br-nick">로그인</button><hr>
+    <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr('br-nick', o.nick)}>로그인</button><hr>
     <button class="br-b2" data-action="br-login-guest">로그인하지 않고 계속</button></div>`;
 }
 

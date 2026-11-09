@@ -1528,9 +1528,8 @@ if (want('IP1')) {
   await page.fill('[data-input="ip-extra"]', 'Ave_n<sha>$&');
   await page.click('[data-action="ip-extra-add"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).includes('Avensha$&'));
-  // 빈 이름은 안내
-  await page.click('[data-action="ip-extra-add"]');
-  assert.ok((await page.textContent('.ip-pane')).includes('영문명을 적어'));
+  // 빈 칸이면 추가 단추가 흐려진다 (2026-11-09 사용자)
+  assert.ok(await page.$('[data-action="ip-extra-add"][disabled]'), '빈 이름 → 추가 단추 흐림');
   // 명부 인물 끄기 (Jyaldi)
   await page.uncheck('[data-change="ip-toggle"][data-key="Jyaldi"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesOff ?? []).includes('Jyaldi'));

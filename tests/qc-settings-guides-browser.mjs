@@ -11,9 +11,15 @@ const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router']; // Visit(필드)는 2026-11-04 제거
 const settle = () => sleep(150);
+// core/guides.ts pickStyle 과 같은 셈 (사이트 갈래 {{#when …lb_cfg_lb-gn.style…}} 만 골라 남김)
+const STYLE_WHEN = /^\{\{#when \{\{(equal|notequal)::\{\{getvar::lb_cfg_lb-gn\.style\}\}::(\w+)\}\}\}\}$/;
+function openEnd(s, i) { let d = 0; for (let j = i; j < s.length; ) { if (s.startsWith('{{', j)) { d++; j += 2; continue; } if (s.startsWith('}}', j)) { d--; j += 2; if (!d) return j; continue; } j++; } return s.length; }
+function closeAt(s, j) { let d = 1; for (;;) { const a = s.indexOf('{{#when', j); const b = s.indexOf('{{/when}}', j); if (b < 0) return s.length; if (a >= 0 && a < b) { d++; j = openEnd(s, a); continue; } if (!--d) return b; j = b + 9; } }
+function pickStyle(s, style) { let out = ''; let i = 0; for (;;) { const a = s.indexOf('{{#when', i); if (a < 0) return out + s.slice(i); const e = openEnd(s, a); const m = STYLE_WHEN.exec(s.slice(a, e)); if (!m) { out += s.slice(i, e); i = e; continue; } const c = closeAt(s, e); const keep = m[1] === 'equal' ? style === m[2] : style !== m[2]; out += s.slice(i, a) + (keep ? pickStyle(s.slice(e, c), style) : ''); i = c + 9; } }
 // 기본 지침 원문 (플러그인에 내장된 것과 같은 파일)
 const defaults = {
-  GNet: readFileSync(new URL('../src/data/guides/gnet.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  // 괴담넷 = gnet.txt 에서 괴담넷 갈래만 남긴 글 (2026-11-08 사이트별 지침, core/guides.ts boardGuide('net') 와 같은 셈)
+  GNet: pickStyle(readFileSync(new URL('../src/data/guides/gnet.txt', import.meta.url), 'utf8').replace(/\r/g, ''), 'net'),
   Phone: readFileSync(new URL('../src/data/guides/phone.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Wiki: readFileSync(new URL('../src/data/guides/wiki.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Directive: readFileSync(new URL('../src/data/guides/directive.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
@@ -89,9 +95,7 @@ for (const vp of vps) {
   assert.ok(await page.$(`.gw .ip-name.off`), '끈 이름 표시');
   await page.evaluate(() => { const c = document.querySelector('.gw .ip-names input[type="checkbox"]'); c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.waitForFunction((n) => !(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesOff ?? []).includes(n), firstName);
-  await clickSel(page, '.gw [data-action="ip-extra-add"]');
-  await settle();
-  assert.ok((await page.textContent('.gw .ip-pane')).includes('영문명을 적어 주세요'), '빈 이름 → 안내');
+  assert.ok(await page.$('.gw [data-action="ip-extra-add"][disabled]'), '빈 이름 → 추가 단추 흐림 (2026-11-09 사용자)');
   await setInput(page, '.gw [name="ip-extra"]', 'Qc<Name>_x', 'input');
   await clickSel(page, '.gw [data-action="ip-extra-add"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).includes('QcNamex'));

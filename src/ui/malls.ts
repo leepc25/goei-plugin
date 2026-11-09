@@ -3,6 +3,7 @@
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
+import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate } from '../host/llm';
@@ -371,7 +372,7 @@ function cosAsk(st: ShopState, v: View): string {
     <div class="q-hd">${ufo}<div><b>운영자 우주인</b><small>● 지금 깨어 있는 것이다</small></div></div>
     ${chip ? `<div class="q-card"><span>붙인 물건</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="물건 떼기">×</button></div>` : ''}
     <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}
-    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">물건을 붙인다</button><input data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 쓰는 것이다" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say" ${v.loading || !st.loaded ? 'disabled' : ''}>보낸다</button></div></div>`;
+    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">물건을 붙인다</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 쓰는 것이다" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>보낸다</button></div></div>`;
 }
 
 function cosHtml(ctx: ChatContext, mobile: boolean): string {

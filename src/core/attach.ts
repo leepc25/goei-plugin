@@ -29,7 +29,8 @@ export interface BodyPart {
   asset?: string;
 }
 
-const TAG = String.raw`\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]`;
+// 몸통은 다음 「[[ATTACH:」를 넘지 않는다: 닫는 표식 없는 예시 한 줄이 뒤의 다른 첨부 끝까지 먹어(통합 요청에서 괴담톡 몫이 통째로 사라짐) 버리지 않게
+const TAG = String.raw`\[\[ATTACH:(\w+)\]\]((?:(?!\[\[ATTACH:)[\s\S])*?)\[\[\/ATTACH\]\]`;
 const HEX = String.raw`%%ATTACHMENT:([0-9a-fA-F]+)%%`;
 const ANY = () => new RegExp(`${TAG}|${HEX}`, 'g');
 

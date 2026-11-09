@@ -1,5 +1,6 @@
 // 세계 편집 창 (docs/설계안_세계편집.md 5장): 패널과 별도의 창. 왼쪽 트리 + 오른쪽 편집기.
 // 저장은 전부 카드 명부(Directory)로: 명부 줄(기존 dirUi 초안)과 세계 덧쓰기(edUi.over)를 한 번에 쓴다.
+import { bindNeedFill } from '../needfill';
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
 import type { WorldOverrides } from '../../core/world/records';
 import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
@@ -150,6 +151,7 @@ function ensureRoot(): HTMLElement {
   root = document.createElement('div');
   root.className = 'gw';
   document.body.appendChild(root);
+  bindNeedFill();
   // 접는 칸(details data-keep)의 펼침을 기억한다: 조작 뒤 창을 다시 그려도 접히지 않게 (2026-10-28 QC: 패널만 기억하고 편집 창은 안 했다)
   root.addEventListener('toggle', (ev) => rememberPanel(ev.target as HTMLDetailsElement), true);
   // 명부 얼굴 틀 끌기: 본 창과 같은 처리기 (2026-11-05: 설정 창에선 크기만 바뀌고 위치를 못 옮기던 문제)

@@ -728,7 +728,7 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
     default: {
       const rows = list.map((p) => openBtn(p, `<div>${p.tag ? `<span class="c${p.tag === '목격' ? ' hot' : ''}">${esc(p.tag)}</span>` : ''}<span class="tt">${esc(p.title)}${p.comments.length ? `<em>${p.comments.length}</em>` : ''}${dot(p)}</span><small>${esc(p.nick)} · ${esc(ago(p, now))} · 조회 ${p.views.toLocaleString()}</small></div>${thumb(p)}`, `row${p.mine ? ' mine' : ''}`)).join('');
       const title = gnet.cat === '@mine' ? '내가 쓴 글' : gnet.cat === '@scrap' ? '스크랩' : gnet.cat || (gnet.sort === 'hot' ? '랭킹' : '전체');
-      const sort = `<div class="sort">${([['new', '최신'], ['hot', '인기'], ['cmt', '댓글 많은']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join('')}</div>`;
+      const sort = `<div class="sort">${([['new', '최신'], ['hot', '랭킹'], ['cmt', '댓글 많은']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join('')}</div>`;
       const chips = `<div class="mchips">${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
       return `<div class="gmain"><div class="bh"><h2>${esc(title)}</h2>${writeBtn('w')}</div>${chips}${sort}${empty || `${rows}${none(list)}`}${pages(all.length) > 1 ? pager(all.length, 'pg', '', '›') : ''}</div>`;
     }

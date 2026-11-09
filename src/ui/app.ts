@@ -19,6 +19,7 @@ import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { defaultLook, LOOK_KEY, lookId } from '../core/looks';
 import { idleLook, lookRows, looksStatus, onLooksReady } from '../host/looks';
+import { bindNeedFill } from './needfill';
 import { chatLookPopup, flashPick, LOOK_CSS, lookAction, lookCommon, lookPopup, lookSprite, lookStep, lookUi, setLookRender } from './looks';
 import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
@@ -229,6 +230,7 @@ function ensureRoot(): HTMLElement {
   root = document.createElement('div');
   root.className = 'gx';
   document.body.appendChild(root);
+  bindNeedFill();
   root.addEventListener('toggle', (ev) => rememberPanel(ev.target as HTMLDetailsElement), true);
   // 실제 사진: 파일 고르기 창은 클릭 안에서 바로 열어야 해서 handle()을 거치지 않는다
   const picker = document.createElement('input');
@@ -1116,6 +1118,8 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'br-login-guest': {
       if (view.kind !== 'started') return;
       const nick = action === 'br-login-save' ? (value ?? '').trim().slice(0, 36) : '';
+      // 닉네임 없이 「로그인」(엔터 포함)은 받지 않는다 — 손님은 「로그인하지 않고 계속」만 (2026-11-09 사용자)
+      if (action === 'br-login-save' && !nick) return;
       br.login = false;
       const ctx = view.ctx;
       const vars: Record<string, string> = { $br_login: nick ? '1' : '0', [GN_NICK]: nick };

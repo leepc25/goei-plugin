@@ -355,7 +355,7 @@ function situations(x: Ctx, events: WorldEvent[]): string {
 
 /** 선택 취소 칩: 고른 것이 없으면 꺼져 있다 */
 function cancelChip(action: string, on: boolean): string {
-  return `<button class="gx-chip gx-unplace" data-action="${action}" ${on ? 'title="선택 풀기"' : 'disabled'}>취소</button>`;
+  return `<button class="gx-chip gx-unplace" data-action="${action}" ${on ? '' : 'disabled'}>취소</button>`;
 }
 
 // ── 편성 ──
