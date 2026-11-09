@@ -49,6 +49,8 @@ export class Match {
   private darkT = 0;
   /** 돌진 난무 필살기: 배경 완전 암전 (초) · 화면 하얀 번쩍 (초) */
   private blackT = 0;
+  /** 배경만 하얗게 (캐릭터는 그대로 보임, 킹오파 큰 한 방의 흰 화면) */
+  private bgWhiteT = 0;
   private whiteT = 0;
   private whiteT0 = 0.3;
   private brains = new Map<Fighter, Brain>();
@@ -80,6 +82,7 @@ export class Match {
     this.st = {
       t: 0, L: view.vsLen, fighters: [], fx: [], proj: [], timers: [], viewX0: 0, viewW: 914,
       shake: (v) => { self.shakeV = Math.max(self.shakeV, v); },
+      bgWhite: (sec) => { self.bgWhiteT = Math.max(self.bgWhiteT, sec); },
       whiteFlash: (sec) => { self.whiteT = Math.max(self.whiteT, sec); self.whiteT0 = Math.max(0.05, sec); },
       sfx: (e) => { if (!vsEventSound(e as never)) opts.sfx?.(e); },
       superFlash: (by, name) => self.superFlash(by, name),
@@ -138,7 +141,7 @@ export class Match {
   private newRound(first: boolean): void {
     const st = this.st, L = st.L;
     st.fx = []; st.proj = []; st.timers = [];
-    this.superT = 0; this.superName = null; this.darkT = 0; this.blackT = 0; this.whiteT = 0;
+    this.superT = 0; this.superName = null; this.darkT = 0; this.blackT = 0; this.whiteT = 0; this.bgWhiteT = 0;
     const keep = st.fighters.slice();
     st.fighters = [];
     this.brains.clear();
@@ -165,13 +168,12 @@ export class Match {
     this.superName = { text: name, t: 0.9, by };
     for (const f of this.st.fighters) f.hold = Math.max(f.hold, 0.6);
     if (RUSH_SUPER.has(by.name)) {
-      // 킹오파식 시작 (11-09): 배경 완전 암전 · 뒤에 층층이 번지는 큰 기운 · 사방에서 모여드는 금빛 줄기
+      // 킹오파식 시작 (11-09 5판, 롬에서 잰 순서): 배경만 흰색 4장 → 검은 배경 + 뒤 층진 빛 8장 줄어듦 → 가슴 앞 빛덩이 8장 → 빛살 8장. 1장 = 1게임장
       this.blackT = 1.5;
-      // 둥근 빛은 캐릭터 키만 하게, 캐릭터와 같은 도트 크기로 (11-09 3판, 킹오파 헤비D 장면 참고)
-      const y = LINE - by.z - 140 * K;
-      this.st.fx.push({ k: 'sheet', name: 'dot-halo', x: by.x - by.face * 6, y, s: K, anchor: 'center', loop: true, under: true, live: true, t: 0.6, t0: 0.6, el: 0 });
-      this.st.fx.push({ k: 'streak', x: by.x, y, t: 0.6, t0: 0.6, live: true, seed: Math.random() * 99 });
-      this.st.whiteFlash?.(0.08);
+      this.bgWhiteT = 4 / 60;
+      const y = LINE - by.z - 125 * K;
+      this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x - by.face * 6, y, s: 1.15 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
+      this.st.fx.push({ k: 'sheet', name: 'dot-hand-rise', x: by.x + by.face * 24 * K, y, s: 2 * K, anchor: 'center', live: true, t: 9, t0: 9, el: 0 });
     } else if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
     else {
     this.st.fx.push({ k: 'ring', x: by.x, y: LINE - by.z - 120 * K, r: 260 * K, t: 0.6, t0: 0.6, c: by.color, w: 8, sy: 1 });
@@ -383,6 +385,7 @@ export class Match {
   private updateFx(frozen = false): void {
     const st = this.st;
     this.whiteT = Math.max(0, this.whiteT - DT);
+    this.bgWhiteT = Math.max(0, this.bgWhiteT - DT);
     // 필살기 시작 멈춤 동안에도 도는 것 (모여드는 줄기·뒤쪽 기운)
     if (frozen) { for (const e of st.fx) if (e.live) { e.t -= DT; if (e.el != null) e.el += DT; } st.fx = st.fx.filter((e) => e.t > 0); return; }
     for (const e of st.fx) {
@@ -455,7 +458,8 @@ export class Match {
       c.drawImage(bg.img, Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h));
       for (const o of bg.objs) if (!o.front) c.drawImage(o.img, Math.round(o.x), Math.round(o.y), Math.round(o.w), Math.round(o.h));
       // 필살기: 배경 그림만 어둡게, 캐릭터는 그 위에 그대로
-      if (this.blackT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(1, this.blackT * 2.5).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      if (this.bgWhiteT > 0) { c.fillStyle = '#fff'; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      else if (this.blackT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(1, this.blackT * 2.5).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
       else if (this.darkT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(0.65, this.darkT * 0.6).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
     }
     drawBench(c, 0);

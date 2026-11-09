@@ -645,11 +645,9 @@ export class Fighter {
         if (dl) later(this.st, dl, go); else go();
       };
       if (big) {
-        // 손도트 조각(불혀·연기)을 겹친 큰 불길, 맞은 자리에서 앞·위로 번짐
-        this.st.fx.push({ k: 'sheet', name: hitN % 8 === 0 ? 'dot-hand-burst2' : 'dot-hand-burst', x, y: y + 40, s: 2.8 * K, flip, anchor: 'pivot', t: 9, t0: 9, el: 0 });
-        put('dot-hand-b', 0, 0, 3 * K);
-        put('dot-hand-a', 30, j() * 40, 3 * K, flip, 0.03);
-        put('dot-hand-c', -10, j() * 50, 3.2 * K, Math.random() < 0.5, 0.06);
+        // 큰 한 방 (11-09 5판, 킹오파98 롬에서 잰 순서): 흰 화면 2장 → 검은 별 → 흰 별 → 빛살 → 주황 가시 → 조각. 48칸 손도트, 한 칸 = 캐릭터 점 2.4개(캐릭터 키 절반)
+        this.st.bgWhite?.(0.05);
+        put('dot-hand-big2', 0, 0, 2.4 * K, hitN % 2 ? !flip : flip);
       } else {
         put(HAND[hitN % HAND.length], j() * 20, j() * 40, 3 * K, hitN % 3 === 2 ? !flip : flip);
         if (hitN % 2) put('dot-hand-c', j() * 30, j() * 50, 2.4 * K, Math.random() < 0.5, 0.04);
@@ -681,7 +679,7 @@ export class Fighter {
       if (!foeOk()) return end();
       if (i >= beats.length) return launch();
       const id = beats[i], heavy = id === H;
-      beat(id, heavy, heavy ? 0.5 : 0.45, () => hit(heavy ? 'heavy' : 'light', { lock: 0.9, stop: heavy ? 0.07 : 0.04 }), () => runBeats(i + 1));
+      beat(id, heavy, heavy ? 0.5 : 0.45, () => hit(heavy ? 'heavy' : 'light', { lock: 0.9, stop: heavy ? 0.2 : 0.04 }), () => runBeats(i + 1));
     };
     const launch = () => {
       phase = 'launch';
@@ -690,7 +688,6 @@ export class Fighter {
         if (o0) {
           // 띄우기: 상대 발밑에서 불기둥이 솟는다. 캐릭터 뒤에 깔아 몸을 가리지 않음
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-pillar', x: o0.x, y: LINE + 6, s: 2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
-          this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: o0.x - this.face * 30, y: o0.midY() + 30, s: 2 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
         }
         this.st.shake(16);
       }, () => jumpUp());
@@ -736,14 +733,11 @@ export class Fighter {
         if (!foeOk() || o0.z <= 0 || o0.state === 'down' || o0.state === 'ko') {
           phase = 'done';
           const x = o0.x;
-          // 마무리 (11-09 3판, 킹오파 참고): 화면 하얗게 → 쓰러진 상대 뒤로 큰 불기둥 + 몸 위 먹물 가시별
-          this.st.whiteFlash?.(0.3);
+          // 마무리 (11-09 5판): 배경만 하얗게 → 쓰러진 상대 뒤 불기둥 + 몸 위 큰 한 방(크게), 조금 뒤 하나 더
+          this.st.bgWhite?.(4 / 60);
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-pillar', x, y: LINE + 6, s: 2.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
-          this.st.fx.push({ k: 'sheet', name: 'dot-hand-b', x, y: LINE - 50 * K, s: 3.4 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
-          this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst', x: x - 40, y: LINE - 10, s: 2.4 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
-          later(this.st, 0.12, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: x + 30, y: LINE - 10, s: 2.4 * K, flip: this.face > 0, anchor: 'pivot', t: 9, t0: 9, el: 0 }));
-          later(this.st, 0.1, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-a', x: x - 30, y: LINE - 90 * K, s: 2.4 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
-          later(this.st, 0.18, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-c', x: x + 40, y: LINE - 40 * K, s: 2.4 * K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-big2', x, y: LINE - 60 * K, s: 3.2 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
+          later(this.st, 0.2, () => { this.st.bgWhite?.(2 / 60); this.st.fx.push({ k: 'sheet', name: 'dot-hand-big2', x: x + this.face * 50, y: LINE - 110 * K, s: 2.6 * K, flip: this.face > 0, anchor: 'center', t: 9, t0: 9, el: 0 }); });
           this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
           later(this.st, 0.22, () => this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x }));
           this.st.shake(24);

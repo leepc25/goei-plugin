@@ -66,6 +66,8 @@ export interface Stage {
   shake(v: number): void;
   /** 화면 전체 하얀 번쩍 (초) */
   whiteFlash?(sec: number): void;
+  /** 배경만 하얗게 칠함(캐릭터·효과는 위에 그대로) */
+  bgWhite?(sec: number): void;
   /** 소리 사건 */
   sfx(e: { type: string; strength?: number; kind?: string; by?: string; x?: number }): void;
   /** 필살기 시작 (모두 멈추고 연출) */
