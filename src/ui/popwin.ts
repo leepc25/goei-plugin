@@ -30,6 +30,8 @@ export const winStyle = (b: WinBox | null | undefined): string => (b ? ` style="
 
 export function bindPopWins(root: HTMLElement, render: () => void, specs: PopSpec[]): void {
   root.addEventListener('pointerdown', (ev) => {
+    // 왼쪽 단추만 (오른쪽 단추는 마우스 제스처·메뉴 — 11-09 점검: 오른쪽 클릭에 창이 닫히던 것)
+    if (ev.button !== 0) return;
     const t = ev.target as HTMLElement;
     for (const sp of specs) {
       const host = t.closest<HTMLElement>(sp.host);

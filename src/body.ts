@@ -31,6 +31,8 @@ import { autoRefreshGnet } from './ui/gnet';
 import { autoRefreshMall } from './ui/malls';
 import { MALL_SITES, mallSettings } from './core/malls';
 import { Joint } from './host/joint';
+import { autoTasks, jointGroups } from './core/netjoint';
+import { BOARD_NAME } from './core/boards';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
 import type { Chat, LoreEntry } from './core/types';
@@ -548,15 +550,13 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
-    const phoneAuto = phoneSettings(now.scriptstate).auto;
-    const gnetAuto = gnetSettings(now.scriptstate).auto;
-    // 괴담넷 말고 다른 게시판 사이트 중 매 턴인 곳 (각자 따로 부른다)
-    const otherBoards = BOARD_SITES.filter((site) => site !== 'gn' && gnetSettings(boardState(now!.scriptstate, site)).auto);
+    // 인터넷 자동 호출(괴담톡·게시판 넷) 가운데 매 턴인 것 (core/netjoint.ts). 같은 모델끼리 한 요청으로 묶는다 (11-09 사용자 결정, 스위치 $net_joint)
+    const netTasks = autoTasks(now.scriptstate);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
     // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
     const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
-    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto || malls.length) {
+    if (netTasks.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -568,25 +568,21 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
         const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
         const mallFail = (error: unknown) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
-        const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
-        // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
-        const model = phoneSettings(now!.scriptstate).model;
-        const fixed = featureModel(now!.scriptstate, 'ph');
-        if (phoneAuto && gnetAuto && gnetSettings(now!.scriptstate).model === model && featureModel(now!.scriptstate, 'gn') === fixed) {
-          const joint = new Joint(model, fixed);
-          await Promise.all([
-            autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
-            autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
-          ]);
-          for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
-          if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
-          if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
-          for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
-          return;
+        const gnetFail = (site: string) => (error: unknown) => console.log(`[goei] ${BOARD_NAME[site as keyof typeof BOARD_NAME] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+        // 덩어리마다: 둘 이상이면 Joint 로 한 요청(각 작업은 요청문을 만들어 맡기고, 다 모이면 한 번에 보냄), 하나면 그냥. 덩어리끼리는 차례로
+        for (const group of jointGroups(now!.scriptstate)) {
+          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind)) : undefined;
+          await Promise.all(group.map(async (t) => {
+            try {
+              if (t.kind === 'phone') await autoRefresh(await fresh(), arg.messageIndex, undefined, joint);
+              else await autoRefreshGnet(await fresh(), arg.messageIndex, false, joint, t.kind);
+            } catch (error) {
+              (t.kind === 'phone' ? phoneFail : gnetFail(t.kind))(error);
+            } finally {
+              joint?.done(t.kind);
+            }
+          }));
         }
-        if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
-        if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
-        for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
         for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);

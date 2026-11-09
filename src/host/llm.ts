@@ -179,7 +179,8 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
     let raw = '';
     try {
       try {
-        raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label)));
+        // 통합 요청(first = Joint.ask)은 동시 요청 칸 밖에서: 칸이 1이면 한쪽이 칸을 잡고 다른 쪽을 기다려 둘 다 멈췄다 (11-09 점검)
+        raw = attempt === 0 && o.first ? await o.first(ask) : await slot(o.concurrent, () => runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label));
       } catch (error) {
         // 모델 쪽 일시 오류면 형식 재시도 횟수와 무관하게 같은 요청을 다시 (최대 2회)
         if (!transient(error) || transientLeft <= 0) throw error;

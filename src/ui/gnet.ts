@@ -29,7 +29,8 @@ import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
-import { boardView, boardWrite, type BoardSite } from '../core/boards';
+import { BOARD_NAME, BOARD_SITE_VAR, boardView, boardWrite, isBoardSite, type BoardSite } from '../core/boards';
+import { JOINT_VAR, jointOn } from '../core/netjoint';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
 import { winStyle, type PopSpec, type WinBox } from './popwin';
@@ -114,11 +115,21 @@ export function useBoardSite(site: BoardSite): void {
   uiSite = site;
 }
 export const boardSiteNow = (): BoardSite => uiSite;
+/** 그 사이트의 화면 상태: 지금 보고 있는 사이트면 gnet, 아니면 저장해 둔 것 (11-09 점검: 다른 사이트 자동 새로고침이 보고 있던 괴담넷 글을 닫고 읽음 처리하던 것) */
+function uiFor(site: BoardSite): GnetUi {
+  if (site === uiSite) return gnet;
+  let u = uiSaved.get(site);
+  if (!u) uiSaved.set(site, (u = freshUi()));
+  return u;
+}
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, 'gn').reiterate, staticModel: featureModel(chat.scriptstate, 'gn'), state: chat.scriptstate, label: '괴담넷' });
+const retry = (chat: Chat): RetryOptions => {
+  const site = chat.scriptstate?.[BOARD_SITE_VAR];
+  return { ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, 'gn').reiterate, staticModel: featureModel(chat.scriptstate, 'gn'), state: chat.scriptstate, label: BOARD_NAME[isBoardSite(site) ? site : 'gn'] };
+};
 const source = (ctx: ChatContext, chat = ctx.chat): RefSource => playerSource({ char: ctx.char as RefSource['char'], chat, persona: personaText() } as RefSource);
 
 function names(ctx: ChatContext): Record<string, string> {
@@ -155,22 +166,23 @@ function saveIncoming(chat: Chat, st: GState, rows: unknown, plan: IncomingPlan,
 
 async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Promise<string>): Promise<void> {
   const key = chatKey(ctx);
+  const u = uiFor(siteOf(ctx));
   if (jobs.has(key)) {
-    gnet.notice = `${jobs.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+    u.notice = `${jobs.get(key)} 끝난 뒤 다시 눌러 주세요.`;
     env.render();
     return;
   }
   jobs.set(key, label);
-  gnet.notice = '';
-  gnet.failure = null;
+  u.notice = '';
+  u.failure = null;
   env.render();
   try {
-    gnet.notice = await work();
+    u.notice = await work();
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    gnet.notice = msg;
+    u.notice = msg;
     const raw = (error as { raw?: string }).raw;
-    if (raw) gnet.failure = { label, reason: msg, raw };
+    if (raw) u.failure = { label, reason: msg, raw };
   } finally {
     jobs.delete(key);
     await env.refresh();
@@ -178,7 +190,7 @@ async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Pr
 }
 
 /** 창에서 지금 펼쳐 보고 있는 글·쪽지 (생성 결과를 저장할 때 바로 읽음 처리) */
-const viewing = () => ({ post: gnet.sub === 'board' ? gnet.open : null, nick: gnet.sub === 'dm' ? gnet.openDm : null });
+const viewing = (site: BoardSite) => { const u = uiFor(site); return { post: u.sub === 'board' ? u.open : null, nick: u.sub === 'dm' ? u.openDm : null }; };
 
 // ── 작업 ──
 
@@ -190,7 +202,8 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     const s = gnetSettings(ctx.chat.scriptstate);
     const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx)));
-    const first = joint && ((m: LlmMessage[]) => joint.ask('gnet', m));
+    const site = siteOf(ctx);
+    const first = joint && ((m: LlmMessage[]) => joint.ask(site, m));
     const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx.chat), first });
     let note = '';
     await upd(ctx, (chat) => {
@@ -202,10 +215,11 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
       const inc = saveIncoming(chat, res.st, (value as { incoming?: unknown }).incoming, plan);
       note = [res.notice, res.emptyComments ? '이번 게시판에는 댓글이 하나도 없어요.' : '', inc.note].filter(Boolean).join(' ');
       const figs = s.keyFigures ? mergeKeyFigures(chat.scriptstate, (value as { keyFigures?: unknown }).keyFigures) : null;
-      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing() });
+      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing(site) });
     });
-    if (!automatic) gnet.open = null;
-    else if (gnet.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), gnet.open)) gnet.open = null;
+    const u = uiFor(site);
+    if (!automatic) u.open = null;
+    else if (u.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), u.open)) u.open = null;
     return note;
   });
 }
@@ -554,6 +568,7 @@ function settingsView(ctx: ChatContext, back = true): string {
   // 「게시판 사용」 켬·끔은 없다 (2026-11-05 사용자: 괴담톡·위키와 같게. 새로고침 수동이면 모델을 부르지 않는다)
   const rows = `${group(gnetLabel(ctx.chat.scriptstate), [
         row('자동 호출', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
+        row('한 번에 요청', seg('joint', jointOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요.'),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인 모델'], ['2', '보조 모델']]), '게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
         row('컨텍스트에 포함', seg('context', v('context') === '1' ? '1' : '0', [['0', 'ON'], ['1', 'OFF']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
         row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요'),
@@ -1257,6 +1272,10 @@ export async function handleGnet(action: string, value: string | undefined, base
       const [k, val] = v.split('=');
       if (k === 'storage') {
         await setVar(ctx, env, GN_STORAGE_AUTO, val === '0' ? '0' : '1');
+        return true;
+      }
+      if (k === 'joint') {
+        await setVar(ctx, env, JOINT_VAR, val === '0' ? '0' : '1');
         return true;
       }
       if (k in GN_DEFAULTS) await setVar(ctx, env, CFG(k), val);
