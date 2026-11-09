@@ -176,12 +176,12 @@ const RULE: Record<ColId, string> = {
   companions: 'Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.',
   deployed: 'Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.',
   identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
-  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `900`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Copy it from `[Previous status]` and change it only by point amounts the story states explicitly.",
+  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Every employee starts at 0: there is no sign-up, orientation, welcome or basic grant, and no balance exists before the story awards one. Copy it from `[Previous status]` and change it only by point amounts the story states explicitly (a per-grade clear reward, a purchase); when nothing has been awarded yet it stays 0.",
   wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it.",
 };
 
-const EXAMPLE_A: Record<ColId, string> = { date: '2025.01.01', time: '02:47 AM', weather: '☀️', temp: '4°C', place: '서울 종로구 거리', target: NONE, companions: NONE, deployed: NONE, identity: '관리국/신입', wallet: '1230000', points: '900' };
-const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM', weather: '🌫️', temp: '9°C', place: '명일 아파트 3층 복도', target: '명일 아파트', companions: '쟈알디,에일린', deployed: '투입', identity: '관리국/요원', wallet: '1180000', points: '900' };
+const EXAMPLE_A: Record<ColId, string> = { date: '2025.01.01', time: '02:47 AM', weather: '☀️', temp: '4°C', place: '서울 종로구 거리', target: NONE, companions: NONE, deployed: NONE, identity: '관리국/신입', wallet: '1230000', points: '0' };
+const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM', weather: '🌫️', temp: '9°C', place: '명일 아파트 3층 복도', target: '명일 아파트', companions: '쟈알디,에일린', deployed: '투입', identity: '관리국/요원', wallet: '1180000', points: '250' };
 
 /** 🏷️Tag 지침의 상태창 절: 칸 구성에서 형식 줄·규칙·예시를 만든다 */
 export function statusSection(cols: ColId[]): string {

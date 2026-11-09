@@ -4306,7 +4306,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .q-note.done { opacity: .85; }
 .ms-cos .q-note small.ok { color: #080; }
 .ms-cos .cs-ord tr.done td { color: #777; }
-.ms-cos .cs-gotgrid { margin-bottom: 8px; }
+.ms-cos .cs-gotgrid { display: flex; flex-wrap: wrap; justify-content: center; justify-self: stretch; width: 100%; gap: 8px; margin: 0 0 8px; } /* 완성 카드: 회색 틀 없이 가운데, 받기 전후 같은 크기 (11-09 사용자: 상자 여백이 뭐냐) */
+.ms-cos .cs-gotgrid .cs-it { width: 240px; min-height: 236px; box-sizing: border-box; }
+.ms-cos.ms-m .cs-gotgrid .cs-it { width: 100%; min-height: 0; }
 .ms-cos .cs-got .cs-bd { background: #080; color: #fff; }
 .ms-cos .cs-ord .cs-btn { padding: 1px 8px; }
 .it-note { margin: 8px 0; padding: 8px 10px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 8px; white-space: pre-wrap; font-size: 13px; line-height: 1.6; }

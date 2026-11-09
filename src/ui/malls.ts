@@ -501,7 +501,7 @@ function cosOrders(ctx: ChatContext, v: View): string {
     <div class="cs-pr"><b>${won(o.price)}</b> <small>선납 완료</small></div>
     <div class="cs-bt">${got ? '<small>소지품에 들어갔다</small>' : `<button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>`}</div></div>`;
   }).join('');
-  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b>${cards ? `<div class="cs-grid cs-gotgrid">${cards}</div>` : ''}<table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
+  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b>${cards ? `<div class="cs-gotgrid">${cards}</div>` : ''}<table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
 }
 
 function opText(text: string, st: ShopState): string {

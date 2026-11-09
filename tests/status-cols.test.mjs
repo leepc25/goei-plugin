@@ -128,7 +128,7 @@ test('포인트 칸: 자동(신분이 백일몽일 때만), 직접 고르면 그
 test('포인트 칸: 지침 절·파서·직전 상태 줄', () => {
   const s = statusSection(COL_IDS);
   assert.ok(s.includes('|identity|balance|points]') && s.includes('Points ='));
-  assert.ok(s.includes('|백일몽/사원|1230000|900]'), '포인트 칸이 있으면 예시 신분도 백일몽');
+  assert.ok(s.includes('|백일몽/사원|1230000|0]'), '포인트 칸이 있으면 예시 신분도 백일몽');
   setStatusColumns({ [POINTS_ON_VAR]: '1' });
   const [t] = findStatusTags('[▣|2025.01.01|10:15 PM|🌫️|9°C|백일몽 본사|없음|없음|없음|백일몽/사원|1180000|900p]');
   assert.equal(t.identity, '백일몽/사원');
