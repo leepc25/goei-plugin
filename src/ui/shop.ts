@@ -20,7 +20,7 @@ import { findDoc, innerBody } from '../core/wiki';
 import { peopleStore } from '../core/people/store';
 import { peopleSettings } from '../core/people/settings';
 import { identityText } from '../core/people/identity';
-import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT, type Wallet } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, freshWalletId, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT, type Wallet } from '../core/wallet';
 import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, EQUIP_LABEL, gridItems, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { getPrefs } from '../core/settings';
@@ -476,7 +476,8 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const it0 = readItems(chat.scriptstate);
         if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
         const p = !!now.identity.points;
-        const w = addWalletEntry(ledgerOf(chat.scriptstate, p), { id: `sl_${o.itemId}_${now.sales.length}`, anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
+        const l0 = ledgerOf(chat.scriptstate, p);
+        const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${o.itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
         // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
         const items = sellItem(it0, o.itemId, now.key, `${now.shop}에 팖`);
         const nextShop = closeSale(now);
@@ -565,7 +566,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const w0 = p ? readPoints(chat.scriptstate) : readWallet(chat.scriptstate, start);
         if (walletBalance(w0, alive) < target.price) return null;
         // 원 몫이 있을 때만 가계부에. 원이 아닌 대가는 물건에 적어 다음 턴 본편에 「무엇으로 치르고 샀다」로 넘긴다 (core/items.ts boughtLine)
-        const walletId = target.price > 0 ? `${p ? 'sp' : 'st'}_${target.id}` : '';
+        const walletId = target.price > 0 ? freshWalletId(w0, `${p ? 'sp' : 'st'}_${target.id}`, now.key) : '';
         const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
         // 포인트로 산 것은 원 값 없이 「N 포인트」 대가로 적는다 (본편에 「paid with N points」)
         const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };

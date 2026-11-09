@@ -23,6 +23,8 @@ export interface CosOrder {
   /** 주문 때 마지막 응답 키 (orderedAt 이 null 일 때 「다음 응답」 판정용) */
   orderedKey: string;
   item: Omit<ShopItem, 'id' | 'price' | 'sold' | 'tag' | 'was' | 'orig' | 'pay'>;
+  /** 선납 거래 id (받을 때 소지품에 같은 id 로 남긴다) */
+  walletId?: string;
   /** 받은 뒤 */
   taken?: boolean;
 }

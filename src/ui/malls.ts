@@ -8,7 +8,7 @@ import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
-import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, freshWalletId, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
@@ -225,7 +225,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
     let items = readItems(chat.scriptstate);
     let st = now;
     for (const it of list) {
-      const walletId = it.price > 0 ? `${site}_${it.id}` : '';
+      const walletId = it.price > 0 ? freshWalletId(w, `${site}_${it.id}`, anchor) : '';
       if (walletId) w = addWalletEntry(w, { id: walletId, anchor, amount: -it.price, memo: `${it.name} (${MALL_NAME[site]})`, src: 'store' });
       // 흥정으로 붙은 다른 대가(it.pay)도 기록에 남긴다 (일반 상점 ui/shop.ts 와 같게, 릴리스 점검 11-09)
       const extra = it.pay ? ` + ${it.pay}` : '';
@@ -357,7 +357,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         if (walletBalance(w, alive) < n.price) { short = true; return null; }
         const anchor = lastBot(chat)?.key ?? '';
-        const walletId = `${site}_note_${n.id}`;
+        const walletId = freshWalletId(w, `${site}_note_${n.id}`, anchor);
         w = addWalletEntry(w, { id: walletId, anchor, amount: -n.price, memo: `쪽지: ${n.title} (${MALL_NAME[site]})`, src: 'store' });
         const items = addItem(readItems(chat.scriptstate), alive, { name: `쪽지: ${n.title}`, desc: `${MALL_NAME[site]} 운영자가 보낸 쪽지`, text: n.body, use: false, icon: 'note paper', weight: 0.01, from: 'store', anchor, price: n.price, walletId, paidWith: `bank transfer to ${MALL_NAME[site]}` });
         ok = true;
@@ -381,9 +381,10 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         if (walletBalance(w, alive) < q.price) { short = true; return null; }
         const anchor = lastBot(chat)?.key ?? '';
-        w = addWalletEntry(w, { id: `${site}_ord_${q.id}`, anchor, amount: -q.price, memo: `맞춤 주문 선납: ${q.item.name} (${MALL_NAME[site]})`, src: 'store' });
+        const walletId = freshWalletId(w, `${site}_ord_${q.id}`, anchor);
+        w = addWalletEntry(w, { id: walletId, anchor, amount: -q.price, memo: `맞춤 주문 선납: ${q.item.name} (${MALL_NAME[site]})`, src: 'store' });
         const { sold: _s, tag: _t, was: _w, orig: _o, pay: _p, ...item } = q.item;
-        const order: CosOrder = { id: q.id, anchor, price: q.price, hours: q.hours, orderedAt: worldMinute(chat), orderedKey: anchor, item };
+        const order: CosOrder = { id: q.id, anchor, price: q.price, hours: q.hours, orderedAt: worldMinute(chat), orderedKey: anchor, walletId, item };
         ok = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...ordersVars([...liveOrders(chat.scriptstate, aliveAnchors(chat)), order]), ...mallVarsOf(site, nextShop) } };
       });
@@ -402,7 +403,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         if (!cur || cur.taken) return null;
         const anchor = lastBot(chat)?.key ?? '';
         const it = cur.item;
-        const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
+        const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
         ok = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true } : x))) } };
       });
@@ -426,7 +427,8 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         const it0 = readItems(chat.scriptstate);
         if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
         const anchor = lastBot(chat)?.key ?? '';
-        const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `${site}_sl_${o.itemId}_${now.sales.length}`, anchor, amount: now.sell.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
+        const w0 = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        const w = addWalletEntry(w0, { id: freshWalletId(w0, `${site}_sl_${o.itemId}_${now.sales.length}`, anchor), anchor, amount: now.sell.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
         const items = sellItem(it0, o.itemId, anchor, `${MALL_NAME[site]}에 팖`);
         const nextShop = closeSale(now);
         if (!nextShop) return null;
