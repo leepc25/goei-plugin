@@ -240,9 +240,9 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
 };
 
 const NUMERIC_HELP: Record<NumericFeature, string> = {
-  affinity: 'OFF = 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 본편에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)',
-  suspicion: 'OFF = 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만',
-  openness: 'OFF = 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만',
+  affinity: '끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 본편에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)',
+  suspicion: '끄면 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만',
+  openness: '끄면 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만',
 };
 
 const n = (v: number) => v.toLocaleString();
@@ -412,7 +412,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
   ].join('');
   const router = [
-    row('Router', seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), 'OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
+    row('Router', seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), '끄면 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). 켜면 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로'),
     ...(s.router === 'model' ? [
       stageModel('router', 'Router 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델'),
       row('시간 제한', seg('router_timeout', String(s.routerTimeout), [['30', '30초'], ['60', '60초'], ['120', '120초']]), '넘기면 이번 턴은 코드로 골라요.'),
@@ -490,7 +490,7 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
     row(FEATURE_HELP.faction_rep[0], onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
     ...(s.features.has('faction_rep') ? [
       // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
-      row('세력 평판 수치', onoff('num_faction_rep'), 'OFF = 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가고, 필드 몹 반응은 단계로 정해져요. 구간 경계·몹 목격 무게는 안 써요.'),
+      row('세력 평판 수치', onoff('num_faction_rep'), '끄면 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가고, 필드 몹 반응은 단계로 정해져요. 구간 경계·몹 목격 무게는 안 써요.'),
       row('세력 평판 컨텍스트에 포함', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
       ...(s.factionQual ? [] : [
         row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),

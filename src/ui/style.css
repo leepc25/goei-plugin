@@ -4584,3 +4584,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gx-pin.gx-pdot .gx-dot { pointer-events: auto; cursor: pointer; }
 /* 폼·기록 머리의 설명 줄은 말줄임 없이 접어 보인다 (11-08 눌러 보기 점검: 폰에서 「전화 걸기」 안내·인물 기록 머리가 잘림). 방 머리(인원 수 등)는 그대로 한 줄 */
 .ph-wrapsub .ph-room-title small { white-space: normal; overflow: visible; text-overflow: clip; }
+/* 겹친 이름표는 위·옆으로 옮기고, 자리가 없으면 숨기고 점만 (mapzoom.ts declutter) */
+.gx-mapzoom .gx-pin.gx-plab { transform: translate(calc(-50% + var(--lx, 0px)), calc(-50% + var(--ly, 0px))) scale(var(--pz, 1)); }
+.gx-pin.gx-plab.lab-off { visibility: hidden; }

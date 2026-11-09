@@ -2,7 +2,7 @@
 // 자료는 각 기능의 설정(인물 기록·이미지·괴담톡·괴담넷·관전·위키·보고서). 모양은 인물 설정 도식(.pp-flow/.pp-fn)을 그대로 쓴다.
 // 실제로 간 호출의 원문은 「호출 흐름」(trace.ts)에서 본다.
 import type { ChatContext } from '../../host/risu';
-import { basicSettings } from '../../core/settings';
+import { basicSettings, getPrefs } from '../../core/settings';
 import { featureModel } from '../../core/craft';
 import { peopleSettings, type Stage } from '../../core/people/settings';
 import { phoneSettings } from '../../core/phone';
@@ -24,7 +24,21 @@ import { traceUi } from './trace';
 // 각 기능의 preview* 가 모델을 부르지 않고 요청만 조립한다. 채팅·설정이 바뀌면 다시 센다. 본편은 플러그인이 조립하지 않으니 마지막 「호출 기록」 실측
 type TokMap = Record<string, number | null | undefined>;
 const flowTok = { key: '', map: null as TokMap | null, pending: false, error: '' };
-const tokKey = (ctx: ChatContext) => `${ctx.chatIndex}:${ctx.chat.message?.length ?? 0}:${JSON.stringify(ctx.chat.scriptstate ?? {}).length}`;
+/** 요청을 바꿀 수 있는 것 전부(채팅 글·상태값·로어북·기기 설정과 지침)의 지문. 하나라도 바뀌면 다시 센다
+ *  (11-09 사용자: 다른 데서 바꾸면 바로 반영돼야 한다 → 「다시 세기」 단추 없앰. 예전엔 글 수·상태값 길이만 봐서 같은 길이로 바뀐 값·지침·로어북·마지막 글 수정을 놓쳤다) */
+function tokKey(ctx: ChatContext): string {
+  let h = 0x811c9dc5;
+  const feed = (s: string) => {
+    for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+    h = Math.imul(h ^ 0xff, 0x01000193);
+  };
+  feed(String(ctx.chatIndex));
+  for (const m of ctx.chat.message ?? []) feed(`${m.role}\u0000${m.data ?? ''}`);
+  feed(JSON.stringify(ctx.chat.scriptstate ?? {}));
+  for (const e of ctx.char.globalLore ?? []) feed(`${e.comment ?? ''}\u0000${e.key ?? ''}\u0000${e.content ?? ''}`);
+  feed(JSON.stringify(getPrefs()));
+  return (h >>> 0).toString(36);
+}
 const count = (m: LlmMessage[] | null | undefined): number | null => (m ? promptTokens({ messages: m }) : null);
 
 async function computeTokens(ctx: ChatContext): Promise<TokMap> {
@@ -72,12 +86,6 @@ export function ensureFlow(ctx: ChatContext, render: () => void): void {
       flowTok.pending = false;
       render();
     });
-}
-
-/** 「다시 세기」 단추 */
-export function flowRecount(): void {
-  flowTok.map = null;
-  flowTok.key = '';
 }
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -187,7 +195,7 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
   const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
   return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p>${flowTok.map && !flowTok.pending && !flowTok.error ? '<button class="gx-mini" data-action="man-flow-recount">다시 세기</button>' : ''}</div></div></section>
+    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
     ${group('본편', '', [main])}
     ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)', post)}

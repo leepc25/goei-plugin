@@ -482,11 +482,10 @@
 .gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
 .gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }
 
-/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 글과 「다시 세기」를 한 줄에, 상자 안 위·아래 여백 같게 */
+/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 상자 안 위·아래 여백 같게 */
 .gw .pp-flow-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap) 14px; padding: 12px var(--pad); }
 .gw .pp-flow-head > p { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
 .gw .pp-flow-head b { color: var(--text); }
-.gw .pp-flow-head > .gx-mini { flex: none; }
 /* 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
 .gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
 .gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }

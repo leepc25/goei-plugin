@@ -12,7 +12,7 @@ import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { peopleDiagPane } from '../people';
 import { clearTrace, loadTrace } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
-import { ensureFlow, flowPage, flowRecount } from './flow';
+import { ensureFlow, flowPage } from './flow';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
@@ -319,9 +319,6 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
       return true;
     case 'man-trace-refresh':
       traceUi.turns = await loadTrace().catch(() => []);
-      return true;
-    case 'man-flow-recount':
-      flowRecount();
       return true;
     case 'man-drop-trace':
       traceUi.confirm = true;
