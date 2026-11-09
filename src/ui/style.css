@@ -4593,3 +4593,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 겹친 이름표는 위·옆으로 옮기고, 자리가 없으면 숨기고 점만 (mapzoom.ts declutter) */
 .gx-mapzoom .gx-pin.gx-plab { transform: translate(calc(-50% + var(--lx, 0px)), calc(-50% + var(--ly, 0px))) scale(var(--pz, 1)); }
 .gx-pin.gx-plab.lab-off { visibility: hidden; }
+/* 뒤로 단추는 어디서나 36 (11-09 점검 17: 폰은 40이었다). 인터넷 사이트(.bs) 안은 사이트 모양 그대로 */
+.ph-room-head > .ph-tool.ph-back { width: 36px; height: 36px; }
+.bs .ph-room-head > .ph-tool.ph-back { width: 34px; height: 34px; }

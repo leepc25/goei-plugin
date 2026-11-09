@@ -1,4 +1,6 @@
-facs) : void 0;
+r ?? draft.player ?? "", look: lookId(ctx2.chat.scriptstate) || draft.look || "" };
+          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
+          const fsel = draft.faction ? findFaction(draft.faction, facs) : void 0;
           if (fsel) {
             const list4 = scenariosFor(fsel, draft.player, ctx2.char.globalLore);
             if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm ?? defaultScenario(fsel.code, facs);

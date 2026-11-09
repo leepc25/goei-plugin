@@ -1288,6 +1288,9 @@ ansparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
 /* 겹친 이름표는 위·옆으로 옮기고, 자리가 없으면 숨기고 점만 (mapzoom.ts declutter) */
 .gx-mapzoom .gx-pin.gx-plab { transform: translate(calc(-50% + var(--lx, 0px)), calc(-50% + var(--ly, 0px))) scale(var(--pz, 1)); }
 .gx-pin.gx-plab.lab-off { visibility: hidden; }
+/* 뒤로 단추는 어디서나 36 (11-09 점검 17: 폰은 40이었다). 인터넷 사이트(.bs) 안은 사이트 모양 그대로 */
+.ph-room-head > .ph-tool.ph-back { width: 36px; height: 36px; }
+.bs .ph-room-head > .ph-tool.ph-back { width: 34px; height: 34px; }
 `;
 
   // src/ui/frame.ts
@@ -2980,6 +2983,4 @@ ${note.trim()}` : card2;
         else if (presetStaged && !repick) view = { kind: "opening", ctx: ctx2 };
         else {
           view = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
-          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "", look: lookId(ctx2.chat.scriptstate) || draft.look || "" };
-          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
-          const fsel = draft.faction ? findFaction(draft.faction, 
+          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.playe
