@@ -16,7 +16,7 @@ import { getPrefs } from '../core/settings';
 import { minuteText, orderDue, orderReady, ordersText, ordersVars, readOrders, worldMinute, type CosOrder } from '../core/orders';
 import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
-import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
+import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
@@ -109,7 +109,8 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
   try {
     const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s);
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
-    if (site === 'cos' && kind === 'shelf') { src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, cosRoll(ctx.chat.scriptstate)); src.truthMode = cosTruthMode(ctx.chat.scriptstate); }
+    if (kind === 'shelf') src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site); // 포인트몰도 (11-09 사용자)
+    if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
     if (site === 'cos') { const od = ordersText(readOrders(ctx.chat.scriptstate), worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? ''); if (od) src.orders = od; }
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${MALL_NAME[site]} ${kind === 'shelf' ? '진열' : '문의'}` };
@@ -196,7 +197,8 @@ export function previewMallShelf(ctx: ChatContext, site: MallSite): LlmMessage[]
   if (!s.on) return null;
   const st = readMall(ctx.chat.scriptstate, site);
   const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s);
-  if (site === 'cos') { src.assign = cosAssignment(s.size[1], s.context, cosRoll(ctx.chat.scriptstate)); src.truthMode = cosTruthMode(ctx.chat.scriptstate); }
+  src.assign = cosAssignment(s.size[1], s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site);
+  if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
   return shelfPrompt(src, s, MALL_GUIDE[site]);
 }
 
@@ -687,29 +689,35 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
     row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
     row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
     row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${site === 'cos' ? cosRollGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : ''}`;
+  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosTruthGroup(ctx) + cosFixedGroup(ctx) : ''}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
-/** 진열 배정 (11-09 사용자: 하드코딩 말고 전부 설정에서 · 추첨 방식도 보이고 고치게) */
-function cosRollGroup(ctx: ChatContext): string {
+/** 진열 배정 (11-09 사용자: 하드코딩 말고 전부 설정에서 · 추첨 방식도 보이고 고치게 · 포인트몰에도 같은 틀, 켜고 끄기 따로) */
+function cosRollGroup(ctx: ChatContext, site: MallSite): string {
   const vars = ctx.chat.scriptstate;
-  const r = cosRoll(vars);
-  const s = mallSettings(vars, 'cos');
-  const reset = cosRollChanged(vars) ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset">기본값으로</button></div>` : '';
-  const gSet = String(vars?.[COS_ROLL_KEY.genres] ?? '') !== '';
-  const tSet = String(vars?.[COS_ROLL_KEY.tiers] ?? '') !== '';
+  const r = mallRoll(vars, site);
+  const s = mallSettings(vars, site);
+  const K = rollKeys(site);
+  const D = rollDefaults(site);
+  const bm = site === 'bm';
+  const reset = rollChanged(vars, site) ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-roll-reset" data-value="${site}">기본값으로</button></div>` : '';
+  const gSet = String(vars?.[K.genres] ?? '') !== '';
+  const tSet = String(vars?.[K.tiers] ?? '') !== '';
   // 지금 설정으로 한 번 뽑아 본 예 (열 때마다 달라짐)
   const n = Math.round((s.size[0] + s.size[1]) / 2);
-  const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ₩${x.tier.lo.toLocaleString('ko-KR')}~${x.tier.hi.toLocaleString('ko-KR')}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
-  const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 장르를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — GENRE · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, 장르·등급을 바꾸지 못해요.</p>`;
+  const money = (x: CosTier) => (bm ? `${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}p` : `₩${x.lo.toLocaleString('ko-KR')}~${x.hi.toLocaleString('ko-KR')}`);
+  const sample = r.on ? cosDraw(n, s.context, r).map((x, i) => `<li><b>${i + 1}칸</b> ${esc(x.genre)} · ${esc(x.tier.name)} ${money(x.tier)}${x.useful ? ' · <i>상황용</i>' : ''}</li>`).join('') : '';
+  const word = bm ? '분류' : '장르';
+  const how = `<p class="ps-note">새로 받을 때마다 코드가 ① 칸 수만큼 ${word}를 뽑고 ② 칸마다 값 등급을 뽑고 ③ 상황용 칸을 정한 뒤, 요청문에 「Item n — ${bm ? 'CATEGORY' : 'GENRE'} · VALUE TIER · ROLE」로 적어요. 모델은 그 칸에 맞는 물건만 짓고, ${word}·등급을 바꾸지 못해요.${bm ? ' 로어북의 가격 예시 물건을 그대로 되풀이하기 어렵게 하는 장치예요.' : ''}</p>`;
+  const tierHelp = bm ? `한 줄에 「이름|설명(영어)|하한|상한|가중치」(포인트). 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(30~9,999p, 싼 쪽에 가중치).` : '한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(₩999,999~49,999,999, 모두 1).';
   return group('진열 배정', how + [
-    row('사용', mseg('cos', 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
-    row('장르 목록', `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="genres" placeholder="${esc(genresText(COS_GENRES_DEFAULT))}">${esc(gSet ? genresText(r.genres) : '')}</textarea>`, '쉼표로 나눠요. 비우면 기본 20종(회색 글).'),
-    row('장르 뽑기', mseg('cos', 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', '한 장르로']]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? '칸마다 따로 무작위. 같은 장르가 여러 칸에 나올 수 있어요.' : '한 판에 장르 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).'),
-    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="tiers" placeholder="${esc(tiersText(COS_TIERS_DEFAULT))}">${esc(tSet ? tiersText(r.tiers) : '')}</textarea>`, '한 줄에 「이름|설명(영어)|하한|상한|가중치」. 가중치는 뽑힐 비율(비우면 1, 0이면 안 뽑혀요). 비우면 기본 5단계(₩999,999~49,999,999, 모두 1).'),
-    row('등급 뽑기', mseg('cos', 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
-    row('상황용 칸', mseg('cos', 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위.'),
+    row('사용', mseg(site, 'roll_on', r.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 배정 없이 모델이 알아서 골라요(같은 물건이 되풀이될 수 있어요).'),
+    row(`${word} 목록`, `<textarea class="gx-search ms-area" rows="3" data-change="ms-roll" data-key="${site}:genres" placeholder="${esc(genresText(D.genres))}">${esc(gSet ? genresText(r.genres) : '')}</textarea>`, `쉼표로 나눠요. 비우면 기본 ${D.genres.length}종(회색 글).`),
+    row(`${word} 뽑기`, mseg(site, 'roll_gmode', r.gmode, [['uniq', '칸마다 다르게'], ['any', '겹쳐도 됨'], ['one', `한 ${word}로`]]), r.gmode === 'uniq' ? '목록을 섞어 앞에서부터 한 칸에 하나씩. 칸이 목록보다 많으면 처음부터 다시.' : r.gmode === 'any' ? `칸마다 따로 무작위. 같은 ${word}가 여러 칸에 나올 수 있어요.` : `한 판에 ${word} 하나를 뽑아 모든 칸에 같이 써요(기획전처럼).`),
+    row('값 등급', `<textarea class="gx-search ms-area" rows="5" data-change="ms-roll" data-key="${site}:tiers" placeholder="${esc(tiersText(D.tiers))}">${esc(tSet ? tiersText(r.tiers) : '')}</textarea>`, tierHelp),
+    row('등급 뽑기', mseg(site, 'roll_tmode', r.tmode, [['weight', '가중치대로'], ['even', '골고루'], ['same', '한 등급으로']]), r.tmode === 'weight' ? '칸마다 따로, 가중치 비율대로 뽑아요. 같은 등급이 몰릴 수 있어요.' : r.tmode === 'even' ? '등급을 칸에 순서대로 고르게 나눈 뒤 자리를 섞어요. 가중치는 안 봐요.' : '한 판에 등급 하나를 가중치대로 뽑아 모든 칸에 같이 써요.'),
+    row('상황용 칸', mseg(site, 'roll_useful', r.useful, [['auto', '자동'], ['0', '없음'], ['1', '1칸'], ['2', '2칸']]), '「지금 상황에 쓸모 있는 것」으로 배정할 칸 수. 자동 = 컨텍스트에 포함이 켜져 있고 3칸 이상이면 1~2칸(6칸 이상). 어느 칸인지는 무작위.'),
     r.on ? row('뽑기 예', `<ul class="ms-sample">${sample}</ul>`, `지금 설정으로 ${n}칸을 한 번 뽑아 본 거예요. 열 때마다 달라져요.`) : '',
   ].join('') + reset);
 }
@@ -812,22 +820,25 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   };
   const list = () => cosFixed(ctx.chat.scriptstate);
   if (action === 'ms-cfg') {
-    const m = /^cos:(roll_on|roll_useful|roll_gmode|roll_tmode|truth|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^(cos|bm):(roll_on|roll_useful|roll_gmode|roll_tmode|truth|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return false;
-    if (m[1] === 'roll_on') return set({ [COS_ROLL_KEY.on]: m[2] === '0' ? '0' : '' });
-    if (m[1] === 'roll_useful') return set({ [COS_ROLL_KEY.useful]: m[2] === 'auto' ? '' : m[2] });
-    if (m[1] === 'roll_gmode') return set({ [COS_ROLL_KEY.gmode]: m[2] === 'uniq' ? '' : m[2] });
-    if (m[1] === 'roll_tmode') return set({ [COS_ROLL_KEY.tmode]: m[2] === 'weight' ? '' : m[2] });
+    const K = rollKeys(m[1] as MallSite);
+    if (m[2] === 'roll_on') return set({ [K.on]: m[3] === '0' ? '0' : '' });
+    if (m[2] === 'roll_useful') return set({ [K.useful]: m[3] === 'auto' ? '' : m[3] });
+    if (m[2] === 'roll_gmode') return set({ [K.gmode]: m[3] === 'uniq' ? '' : m[3] });
+    if (m[2] === 'roll_tmode') return set({ [K.tmode]: m[3] === 'weight' ? '' : m[3] });
+    m.splice(1, 1); // 아래는 우주몰 전용 (truth·fx_on)
     if (m[1] === 'truth') return set({ [COS_TRUTH_KEY]: m[2] === 'mix' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));
   }
   if (action === 'ms-roll') {
-    const m = /^(genres|tiers)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^(?:(cos|bm):)?(genres|tiers)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return true;
-    return set({ [m[1] === 'genres' ? COS_ROLL_KEY.genres : COS_ROLL_KEY.tiers]: m[2].trim().slice(0, 4000) });
+    const K = rollKeys((m[1] ?? 'cos') as MallSite);
+    return set({ [m[2] === 'genres' ? K.genres : K.tiers]: m[3].trim().slice(0, 4000) });
   }
-  if (action === 'ms-roll-reset') return set(Object.fromEntries(Object.values(COS_ROLL_KEY).map((k) => [k, ''])));
+  if (action === 'ms-roll-reset') return set(Object.fromEntries(Object.values(rollKeys(value === 'bm' ? 'bm' : 'cos')).map((k) => [k, ''])));
   if (action === 'ms-fx') {
     const m = /^(\w+):(name|pct|price|was|desc|effect|truth)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return true;

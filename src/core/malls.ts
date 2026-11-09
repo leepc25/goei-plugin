@@ -86,6 +86,19 @@ export type CosGenreMode = 'uniq' | 'any' | 'one';
 export type CosTierMode = 'weight' | 'even' | 'same';
 export interface CosRoll { on: boolean; genres: string[]; tiers: CosTier[]; useful: CosUseful; gmode: CosGenreMode; tmode: CosTierMode }
 export const COS_ROLL_KEY = { on: '$cos_roll_on', genres: '$cos_roll_genres', tiers: '$cos_roll_tiers', useful: '$cos_roll_useful', gmode: '$cos_roll_gmode', tmode: '$cos_roll_tmode' } as const;
+/** 몰별 진열 배정 변수 (2026-11-09 사용자 「1번은 해」: 포인트몰에도 같은 진열 배정, 켜고 끄기 따로). bm: $bm_roll_* */
+export const rollKeys = (site: MallSite): typeof COS_ROLL_KEY => (site === 'cos' ? COS_ROLL_KEY : ({ on: '$bm_roll_on', genres: '$bm_roll_genres', tiers: '$bm_roll_tiers', useful: '$bm_roll_useful', gmode: '$bm_roll_gmode', tmode: '$bm_roll_tmode' } as unknown as typeof COS_ROLL_KEY));
+/** 포인트몰 기본 분류 (복지몰답게 일상 물건부터 현장 장비까지; 설정에서 고친다) */
+export const BM_GENRES_DEFAULT = ['생활용품', '가전', '건강·의약품', '식품·음료', '의류·보호구', '현장 탐사 장비', '괴담 대응 소모품', '사무·문구', '취미·여가', '사내 서비스·이용권'];
+/** 포인트몰 기본 값 등급 (포인트). 위키: 괴담 등급별 클리어 보상 수백~수천 포인트 → 생활용품 수십 p 부터 최상급 수천 p 까지 */
+export const BM_TIERS_DEFAULT: CosTier[] = [
+  { name: '저가', desc: 'everyday welfare goods — small, cheap, practical', lo: 30, hi: 149, w: 3 },
+  { name: '중저가', desc: 'common supplies and basic field items', lo: 150, hi: 399, w: 3 },
+  { name: '중가', desc: 'solid equipment or medicine with a clear use', lo: 400, hi: 999, w: 2 },
+  { name: '고가', desc: 'rare company product — strong, regulated, limited', lo: 1000, hi: 2999, w: 1 },
+  { name: '최고가', desc: 'top-grade company asset — life-saving or coveted', lo: 3000, hi: 9999, w: 1 },
+];
+export const rollDefaults = (site: MallSite): { genres: string[]; tiers: CosTier[] } => (site === 'cos' ? { genres: COS_GENRES_DEFAULT, tiers: COS_TIERS_DEFAULT } : { genres: BM_GENRES_DEFAULT, tiers: BM_TIERS_DEFAULT });
 
 /** 값 등급 ↔ 글 (한 줄에 「이름|설명|하한|상한」). 설정 칸에서 그대로 고친다 */
 export const tiersText = (t: CosTier[]): string => t.map((x) => `${x.name}|${x.desc}|${x.lo}|${x.hi}|${x.w}`).join('\n');
@@ -103,21 +116,27 @@ export function parseTiers(text: string): CosTier[] {
 export const genresText = (g: string[]): string => g.join(', ');
 export const parseGenres = (text: string): string[] => [...new Set(String(text ?? '').split(/[,\n]/).map((x) => x.trim().slice(0, 40)).filter(Boolean))];
 
-/** 진열 배정 설정. 변수가 없으면 기본값, 빈 글이면 그 항목은 기본값으로 */
-export function cosRoll(vars: Vars): CosRoll {
-  const on = String(vars?.[COS_ROLL_KEY.on] ?? '') !== '0';
-  const g = parseGenres(String(vars?.[COS_ROLL_KEY.genres] ?? ''));
-  const t = parseTiers(String(vars?.[COS_ROLL_KEY.tiers] ?? ''));
-  const u = String(vars?.[COS_ROLL_KEY.useful] ?? '');
-  const gm = String(vars?.[COS_ROLL_KEY.gmode] ?? ''); const tm = String(vars?.[COS_ROLL_KEY.tmode] ?? '');
-  const tiers = t.length ? t : COS_TIERS_DEFAULT;
+/** 진열 배정 설정 (몰별). 변수가 없으면 기본값, 빈 글이면 그 항목은 기본값으로 */
+export function mallRoll(vars: Vars, site: MallSite): CosRoll {
+  const K = rollKeys(site);
+  const D = rollDefaults(site);
+  const on = String(vars?.[K.on] ?? '') !== '0';
+  const g = parseGenres(String(vars?.[K.genres] ?? ''));
+  const t = parseTiers(String(vars?.[K.tiers] ?? ''));
+  const u = String(vars?.[K.useful] ?? '');
+  const gm = String(vars?.[K.gmode] ?? ''); const tm = String(vars?.[K.tmode] ?? '');
+  const tiers = t.length ? t : D.tiers;
   return {
-    on, genres: g.length ? g : COS_GENRES_DEFAULT, tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
+    on, genres: g.length ? g : D.genres, tiers: tiers.some((x) => x.w > 0) ? tiers : tiers.map((x) => ({ ...x, w: 1 })),
     useful: u === '0' || u === '1' || u === '2' ? u : 'auto', gmode: gm === 'any' || gm === 'one' ? gm : 'uniq', tmode: tm === 'even' || tm === 'same' ? tm : 'weight',
   };
 }
+export const cosRoll = (vars: Vars): CosRoll => mallRoll(vars, 'cos');
 /** 변수가 기본값에서 벗어났나 (설정 「기본값으로」 단추 표시용) */
-export const cosRollChanged = (vars: Vars): boolean => Object.values(COS_ROLL_KEY).some((k) => String(vars?.[k] ?? '') !== '');
+export const rollChanged = (vars: Vars, site: MallSite): boolean => Object.values(rollKeys(site)).some((k) => String(vars?.[k] ?? '') !== '');
+export const cosRollChanged = (vars: Vars): boolean => rollChanged(vars, 'cos');
+/** 값 구간 표기 (요청문·설정 예): 우주몰 ₩, 포인트몰 p */
+export const rollPrice = (site: MallSite, lo: number, hi: number): string => (site === 'bm' ? `${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')} p` : `₩${lo.toLocaleString('en-US')}-${hi.toLocaleString('en-US')}`);
 
 /** 한 칸의 배정 */
 export interface CosSlot { genre: string; tier: CosTier; useful: boolean }
@@ -153,15 +172,16 @@ export function cosDraw(count: number, context: boolean, roll: CosRoll, rnd: () 
 }
 
 /** 이번 진열 배정 글 (요청문에 붙는 꼴). 끄면 빈 글 */
-export function cosAssignment(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random): string {
+export function cosAssignment(count: number, context: boolean, roll: CosRoll, rnd: () => number = Math.random, site: MallSite = 'cos'): string {
   const slots = cosDraw(count, context, roll, rnd);
   if (!slots.length) return '';
   const want = slots.some((s) => s.useful);
+  const G = site === 'bm' ? 'CATEGORY' : 'GENRE'; // 포인트몰은 장르가 아니라 상품 분류
   const lines = slots.map((s, i) => {
     const role = s.useful ? " | ROLE: useful for the protagonist's current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)" : want ? ' | ROLE: broad stock, unrelated to the current scene' : '';
-    return `Item ${i + 1} — GENRE: ${s.genre} | VALUE TIER: ${s.tier.name} (${s.tier.desc}), price ₩${s.tier.lo.toLocaleString('en-US')}-${s.tier.hi.toLocaleString('en-US')}${role}`;
+    return `Item ${i + 1} — ${G}: ${s.genre} | VALUE TIER: ${s.tier.name} (${s.tier.desc}), price ${rollPrice(site, s.tier.lo, s.tier.hi)}${role}`;
   });
-  return `${lines.join('\n')}\nBuild each item to its assigned GENRE and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. Genres differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
+  return `${lines.join('\n')}\nBuild each item to its assigned ${G} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G === 'GENRE' ? 'Genres' : 'Categories'} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
 }
 
 // ── 우주몰 시그니처 상품 (구버전 Lua: 「우리가 도움!」·「착한 친구」를 코드가 확률로 끼움, 모델 생성 아님) ──

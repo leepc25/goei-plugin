@@ -11,7 +11,9 @@ test('장부는 0에서 시작하고 첫 상태창의 포인트를 따른다', (
   const w = syncPointsToStatus(readPoints({}), chat('900'));
   assert.ok(w && w.log.length === 1 && w.log[0].amount === 900);
 });
-test('같은 값이면 바뀔 게 없다', () => {
+test('같은 값이면 잔액이 그대로 (거래 한 줄만)', () => {
   const w = syncPointsToStatus(readPoints({}), chat('900'));
-  assert.equal(syncPointsToStatus(w, chat('900')), null);
+  const w2 = syncPointsToStatus(w, chat('900')) ?? w;
+  assert.equal(w2.log.length, 1);
+  assert.equal(w2.log.reduce((a, e) => a + e.amount, 0), 900);
 });

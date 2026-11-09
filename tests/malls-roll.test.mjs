@@ -107,3 +107,13 @@ test('정보 쪽지: <info>제목|값|내용</info> → 대사에 붙은 쪽지,
   assert.equal(b.notes[0].bought, true); assert.equal(M.buyNote(b, st.notes[0].id), null, '두 번 못 산다');
   assert.equal(M.parseTalk('<owner>모른다.</owner>').info, undefined);
 });
+
+test('포인트몰 진열 배정 (11-09 사용자 「1번은 해」): $bm_roll_* 따로, 분류·포인트 구간', () => {
+  const r = M.mallRoll({}, 'bm');
+  assert.ok(r.on && r.genres.includes('가전') && r.tiers.length === 5 && r.tiers[0].lo === 30, '포인트몰 기본값');
+  const t = M.cosAssignment(3, false, r, () => 0.1, 'bm');
+  assert.ok(t.includes('CATEGORY:') && / p( \||$)/m.test(t) && !t.includes('₩'), `포인트 표기: ${t.split('\n')[0]}`);
+  assert.equal(M.cosAssignment(3, false, M.mallRoll({ $bm_roll_on: '0' }, 'bm'), Math.random, 'bm'), '', '포인트몰만 끔');
+  assert.ok(M.mallRoll({ $bm_roll_on: '0' }, 'cos').on, '우주몰은 그대로');
+  assert.ok(M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'bm') && !M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'cos'));
+});
