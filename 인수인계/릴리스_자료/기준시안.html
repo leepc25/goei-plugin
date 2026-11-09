@@ -1,0 +1,72 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><title>UI 기준 시안</title>
+<style>
+:root{--void:#1A2226;--panel:#232D32;--panel2:#2C383E;--line:#37464D;--line2:#46565D;--text:#E9F0EE;--sub:#BECBC8;--dim:#97A9A5;--signal:#5EEAD4;--on-signal:#052A25;--accent-bg:#1D403A;--accent-line:#3F8879;--danger:#FF7A6B}
+*{box-sizing:border-box}body{margin:0;background:var(--void);color:var(--text);font:14px/1.45 "Pretendard","Noto Sans KR",system-ui,sans-serif;padding:20px}
+h1{font-size:18px;margin:0 0 4px}p.lead{margin:0 0 16px;color:var(--dim);font-size:13px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle;text-align:left}
+th{font-size:12.5px;color:var(--dim);font-weight:700;border-top:0;background:var(--panel2)}
+td.k{width:150px;font-weight:700;font-size:13px}td.k small{display:block;color:var(--dim);font-weight:400;font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cap{display:block;font-size:11px;color:var(--dim);margin-top:4px;text-align:center}
+.v{display:inline-flex;flex-direction:column;align-items:center}
+button{font:inherit;color:var(--text);cursor:pointer}
+/* 기준 */
+.s{height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.s.on{background:var(--accent-bg);border-color:var(--accent-line);color:var(--text)}
+.s.pri{background:var(--signal);border-color:var(--signal);color:var(--on-signal);font-weight:600}
+.s.dan{color:var(--danger)}
+.segs{display:inline-flex;gap:2px;padding:2px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--void)}
+.segs b{display:inline-flex;align-items:center;padding:0 12px;border-radius:6px;font-size:13px;font-weight:600;color:var(--dim);border:1px solid transparent}
+.segs b.on{background:var(--accent-bg);border-color:var(--accent-line);color:var(--text)}
+.x{width:36px;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:18px;color:var(--sub);display:grid;place-items:center}
+.step{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);font-size:16px;display:grid;place-items:center}
+.sel{height:34px;padding:0 28px 0 12px;border:1px solid var(--line);border-radius:8px;background:var(--void);font-size:13px;display:inline-flex;align-items:center;position:relative}
+.sel:after{content:"▾";position:absolute;right:10px;color:var(--dim);font-size:11px}
+.card{width:120px;height:64px;border:1px solid var(--line);border-radius:10px;background:var(--panel);display:grid;place-items:center;font-size:13px}
+.card.on{background:var(--accent-bg);border-color:var(--accent-line)}
+.nav{width:150px;border:1px solid var(--line);border-radius:10px;padding:6px;background:var(--panel)}
+.nav i{display:block;font-style:normal;padding:6px 10px;border-radius:8px;font-size:14px;color:var(--sub);border:1px solid transparent}
+.nav i.sub{padding-left:24px}.nav i.on{background:var(--accent-bg);border-color:var(--accent-line);color:var(--text)}
+/* 지금 (실측 갈래) */
+.o{border:1px solid var(--line);background:var(--panel2);font-size:13px;display:inline-flex;align-items:center;padding:0 12px}
+</style>
+<h1>단추 크기·고른 상태 기준 (시안)</h1>
+<p class="lead">왼쪽은 점검에서 잰 지금 모양, 오른쪽이 맞출 기준이에요. 설정 창이 쓰는 값(높이 34 · 모서리 8 · 글자 13)을 플러그인 화면 전체에 같이 써요. 고른 상태는 어디서나 「옅은 강조색 바탕 + 강조색 테두리」 하나로.</p>
+<table>
+<tr><th>종류</th><th>지금</th><th>기준</th></tr>
+<tr><td class="k">작은 단추</td><td><div class="row">
+ <span class="v"><span class="o" style="height:34px;border-radius:8px;font-weight:700">저장</span><span class="cap">설정 34·굵게</span></span>
+ <span class="v"><span class="o" style="height:32px;border-radius:8px;background:var(--void)">저장</span><span class="cap">인물 기록 32·어두움</span></span>
+</div></td><td><div class="row"><button class="s">저장</button><button class="s pri">보내기</button><button class="s dan">지우기</button></div><span class="cap" style="text-align:left">34 · 모서리 8 · 글자 13 보통 · 밝은 바탕</span></td></tr>
+<tr><td class="k">칩</td><td><div class="row">
+ <span class="v"><span class="o" style="height:32px;border-radius:8px">괴이</span><span class="cap">32</span></span>
+ <span class="v"><span class="o" style="height:34px;border-radius:8px">괴이</span><span class="cap">34</span></span>
+ <span class="v"><span class="o" style="height:36px;border-radius:10px">사용</span><span class="cap">36·모서리10 (소지품)</span></span>
+</div></td><td><div class="row"><button class="s">전체 0</button><button class="s on">괴이 2</button><button class="s">사건 1</button></div><span class="cap" style="text-align:left">작은 단추와 같은 틀 · 고르면 기준 고른 상태</span></td></tr>
+<tr><td class="k">두세 개 중 고르기</td><td><div class="row">
+ <span class="v"><span class="o" style="height:28px;border-radius:5px">4개</span><span class="cap">설정 28·모서리5</span></span>
+ <span class="v"><span class="o" style="height:32px;border-radius:7px">남</span><span class="cap">아바타 32·7</span></span>
+ <span class="v"><span class="o" style="height:34px;border-radius:8px;font-size:14px">말투</span><span class="cap">인물 34·글자14</span></span>
+</div></td><td><div class="segs"><b>2개</b><b class="on">4개</b><b>6개</b><b>8개</b></div><span class="cap" style="text-align:left">겉틀 34 · 안 칸 모서리 6 · 글자 13</span></td></tr>
+<tr><td class="k">− / +</td><td><div class="row">
+ <span class="v"><span class="o" style="height:34px;width:34px;justify-content:center;border:0;border-radius:0">−</span><span class="cap">설정 각짐·테두리 없음</span></span>
+ <span class="v"><span class="o" style="height:36px;width:36px;justify-content:center;border-radius:9px;background:var(--void)">−</span><span class="cap">편성 둥근9·테두리</span></span>
+</div></td><td><div class="row"><span class="step">−</span><span style="min-width:30px;text-align:center">3</span><span class="step">+</span></div><span class="cap" style="text-align:left">34 정사각 · 모서리 8 · 테두리</span></td></tr>
+<tr><td class="k">닫기 ×</td><td><div class="row">
+ <span class="v"><span class="o" style="height:34px;width:34px;justify-content:center;font-size:16px">×</span><span class="cap">설정 34·16</span></span>
+ <span class="v"><span class="o" style="height:36px;width:36px;justify-content:center;font-size:18px">×</span><span class="cap">나머지 36·18</span></span>
+</div></td><td><span class="x">×</span><span class="cap" style="text-align:left">어디서나 36 · 글자 18</span></td></tr>
+<tr><td class="k">선택칸</td><td><div class="row">
+ <span class="v"><span class="o" style="height:36px;border-radius:8px">전국 ▾</span><span class="cap">지도 36</span></span>
+ <span class="v"><span class="o" style="height:32px;border-radius:8px;font-size:12.5px">최근 20 ▾</span><span class="cap">인물 기록 32·12.5</span></span>
+</div></td><td><span class="sel">전국</span><span class="cap" style="text-align:left">34 · 글자 13</span></td></tr>
+<tr><td class="k">고른 카드<small>요원 편성 등</small></td><td><div class="row">
+ <span class="v"><span class="card" style="border-color:var(--line2);box-shadow:inset 0 0 0 2px var(--accent-line)">요원</span><span class="cap">PC 회색 테두리+안쪽 녹색</span></span>
+ <span class="v"><span class="card" style="border:2px solid var(--signal)">요원</span><span class="cap">폰 녹색 테두리</span></span>
+</div></td><td><div class="row"><span class="card">요원</span><span class="card on">요원 (고름)</span></div><span class="cap" style="text-align:left">PC·폰 같음</span></td></tr>
+<tr><td class="k">고른 상태<small>모든 단추·칸</small></td><td style="font-size:12.5px;color:var(--dim)">바탕만 / 1px 테두리+바탕 / 안쪽 선만 / 글자색만 / 2px+번짐 / 빨강 등 15가지 넘게</td><td><div class="row"><button class="s on">고름</button><span class="segs"><b class="on">고름</b><b>안 고름</b></span></div><span class="cap" style="text-align:left">옅은 강조색 바탕 + 강조색 테두리 + 밝은 글자. 빨강은 지우기·위험에만</span></td></tr>
+<tr><td class="k">설정 왼쪽 목록</td><td style="font-size:12.5px;color:var(--dim)">「기록」 아래 일지·인물·세력만 13px, 나머지 14px</td><td><div class="nav"><i>위키</i><i>기록</i><i class="sub on">인물</i><i class="sub">세력</i></div><span class="cap" style="text-align:left">전부 14</span></td></tr>
+</table>
+<p class="lead" style="margin-top:12px">바꾸지 않는 것: 큰 단추(출발·보내기 같은 화면 맨 아래 넓은 단추), 화면 탭, 지도 핀, 색 테마. 폰도 같은 값(34)을 써요.</p>
+</html>
