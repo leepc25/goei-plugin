@@ -1,10 +1,11 @@
 import { BUILTIN, factionList, factionVars, PLAYER_FM, scenesOf } from './factions';
+import { isPointsOrg, POINTS_ON_VAR } from './world/statuscols';
 import { findFaction, findScenario, greetingKey, isFaction, isLang, SCENARIOS } from './scenarios';
 import { agentScene, factionScenes, sceneText } from './scenes';
 import { hasSceneCard, isSceneMessage, sceneMessage, UNSENT_MARK } from './dispatch';
 import { buildSeed } from './seed';
 import { readDirectory } from './world/directory';
-import { startItemsVars } from './items';
+import { startCarryVars, startItemsVars } from './items';
 import type { Chat, ChatMessage, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
 import { manifestEntry } from './lorebooks';
@@ -138,6 +139,8 @@ export function planStart(
       $st_lang_pick: choice.lang,
       $st_fm_pick: String(choice.fm),
       $ib_affiliation: faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation,
+      // 백일몽 포인트 칸 「자동」: 백일몽 소속으로 시작하면 첫 응답부터 상태창에 포인트 칸 (core/world/statuscols.ts)
+      [POINTS_ON_VAR]: isPointsOrg(faction.group && choice.player ? memberAffiliation(lore, choice.player, faction.affiliation) : faction.affiliation) ? '1' : '0',
       $st_anomaly_on: '0',
       $an_report: '',
       $in_report: '',
@@ -148,6 +151,8 @@ export function planStart(
       $goei_last: '',
       // 고유 인물로 시작하면 명부의 「시작 소지품」을 넣고 무기·장비는 장착 (모델 호출 없음, 11-07 사용자). 페르소나는 빈 소지품
       ...startItemsVars(startItems && choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.startItems ?? [] : []),
+      // 소지 한도 (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」, 페르소나·값 없는 인물은 설정 값
+      ...startCarryVars(choice.player ? readDirectory(lore).agents.find((x) => x.id === choice.player)?.carry : undefined),
       ...factionVars(lore),
       ...(world ?? {}),
     },

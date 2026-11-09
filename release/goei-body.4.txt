@@ -1,4 +1,297 @@
-ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibleFor.add(f);
+post) {
+      for (const p2 of st.posts) {
+        if (p2.mine) {
+          post = p2;
+          break;
+        }
+        for (let i = p2.comments.length; i >= 1; i--) {
+          if (p2.comments[i - 1].mine) {
+            post = p2;
+            ci = i;
+            break;
+          }
+        }
+        if (post) break;
+      }
+    }
+    const comment = post && ci ? post.comments[ci - 1] : void 0;
+    if (!post || ci && (!comment || !comment.mine) || !comment && !post.mine) return plan;
+    if (s8.incomingChance <= 0 || s8.incomingChance < 100 && Math.floor(rand() * 100) + 1 > s8.incomingChance) return plan;
+    return { ...plan, allowed: true, post, comment, commentIndex: ci };
+  }
+  function incomingTask(plan, activityPosts) {
+    const body5 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
+    if (plan.allowed && plan.post) {
+      body5.incomingOrigin = {
+        title: plan.post.title,
+        author: plan.post.nick,
+        content: plan.post.body,
+        ...plan.comment ? { comment: { author: plan.comment.nick, content: plan.comment.body } } : {}
+      };
+      body5.previousIncoming = plan.history;
+    }
+    if (activityPosts) body5.activityPosts = activityPosts;
+    return `
+COMBINED OUTPUT OPTIONS:
+${JSON.stringify(body5)}`;
+  }
+  function commitIncoming(st, rows3, plan, date, postOverride) {
+    if (!plan.allowed || !plan.post) return false;
+    if (rows3 === void 0 || rows3 === null) return false;
+    if (typeof rows3 === "string") {
+      if (rows3.trim() === "D|__NONE__|__NONE__" || !rows3.trim()) return false;
+      throw new GnetError("선쪽지 형식이 올바르지 않아요.");
+    }
+    const list4 = Array.isArray(rows3) ? rows3 : isObj(rows3) ? [rows3] : null;
+    if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
+    let pick3 = null;
+    const reasons = [];
+    let quiet = 0;
+    list4.forEach((c, i) => {
+      if (pick3) return;
+      if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
+      const nick = str2(c.nick).trim();
+      const body5 = trimTokens(stripForged(str2(c.body)).trim(), LIMITS.dm_tokens);
+      if (nick === "__NONE__") return void quiet++;
+      if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
+      if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
+      if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
+      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
+      pick3 = { nick, body: body5 };
+    });
+    if (!pick3) {
+      if (!reasons.length) return false;
+      throw new GnetError(`선쪽지 형식을 확인해 주세요 (${reasons.join("; ")}).`);
+    }
+    const chosen = pick3;
+    const post = postOverride ? findPost(st, postOverride.id) : findPost(st, plan.post.id);
+    if (!post) return false;
+    const comment = plan.commentIndex ? post.comments[plan.commentIndex - 1] : void 0;
+    if (plan.commentIndex && (!comment || !comment.mine || comment.body !== plan.comment?.body)) return false;
+    if (!plan.commentIndex && !post.mine) return false;
+    st.sources[chosen.nick] = sourceFor(post, plan.commentIndex ?? 0);
+    st.dms.push({ nick: chosen.nick, side: "npc", body: chosen.body, unread: true, date });
+    return true;
+  }
+  function parseDmBody(raw) {
+    let value;
+    try {
+      value = parseJsonPayload(raw);
+    } catch {
+      throw new GnetError('Expected {"body":"reply text"}.', raw);
+    }
+    const body5 = isObj(value) ? stripForged(str2(value.body)).trim() : "";
+    if (!body5) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
+    return trimTokens(body5, LIMITS.dm_tokens);
+  }
+  function mainContext(st, nick, rules2, focus) {
+    const posts = [];
+    for (const p2 of CONTEXT.includePosts ? st.posts : []) {
+      if (CONTEXT.ownOnly && !p2.mine && !p2.comments.some((c) => c.mine)) continue;
+      const wanted = /* @__PURE__ */ new Set();
+      const include = (n2) => {
+        if (n2 <= 0 || wanted.has(n2) || !p2.comments[n2 - 1]) return;
+        wanted.add(n2);
+        include(p2.comments[n2 - 1].parent);
+      };
+      let selected = 0;
+      for (let j = p2.comments.length; j >= 1 && selected < CONTEXT.comments; j--) {
+        if (CONTEXT.ownOnly && !p2.mine && !p2.comments[j - 1].mine) continue;
+        include(j);
+        selected++;
+      }
+      const comments = p2.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
+      posts.push({
+        order: p2.id,
+        related: related(focus, [p2.nick, p2.title, ...comments.map((c) => c.author)], `${p2.title}
+${p2.body}
+${comments.map((c) => c.content).join("\n")}`),
+        data: { kind: "public_post", title: p2.title, date: p2.date, author: p2.nick, content: describe(p2.body), comments, access: "publicly accessible; reading by each character is not established" }
+      });
+    }
+    const dms = [];
+    for (let i = 0; CONTEXT.includeDms && i < st.dms.length; i++) {
+      const d = st.dms[i];
+      dms.push({
+        order: i + 1,
+        related: related(focus, [d.nick], d.body),
+        data: {
+          kind: "private_message",
+          sender: d.side === "me" ? nick : d.nick,
+          recipient: d.side === "me" ? d.nick : nick,
+          content: describe(d.body),
+          ...d.date ? { date: d.date } : {},
+          order: i + 1,
+          access: "sender and recipient only"
+        }
+      });
+    }
+    const payload = (records) => `[MODULE_CONTEXT_BEGIN]
+${rules2}
+${JSON.stringify({ feature: "gnet", records })}
+[MODULE_CONTEXT_END]`;
+    const fits = (records) => !(CONTEXT.tokens > 0 && tokens(payload(records)) > CONTEXT.tokens);
+    const keptPosts = pickRecords(posts, { focus: CONTEXT.focus, recent: CONTEXT.recentPosts, max: CONTEXT.posts, fits });
+    const keptDms = pickRecords(dms, { focus: CONTEXT.focus, recent: CONTEXT.recentDms, max: CONTEXT.dms, fits: (k) => fits([...keptPosts, ...k]) });
+    const kept = [...keptPosts, ...keptDms];
+    return kept.length ? payload(kept) : "";
+  }
+
+  // src/core/phone.ts
+  var PhoneError = class extends Error {
+    constructor(message, raw = "") {
+      super(message);
+      this.raw = raw;
+    }
+  };
+  var PH = (key) => `$ph_${key}`;
+  var PH_STATE = PH("state");
+  var PH_CONTACTS = PH("contacts");
+  var PH_BULLETINS = PH("bulletins");
+  var PH_AUTO_LAST = PH("auto_last");
+  var PH_UNREAD = "$st_unread_phone";
+  var BANTER_ROWS = [1, 40];
+  var PH_DEFAULTS = {
+    model: "aux",
+    auto: "0",
+    status: "1",
+    announcements: "1",
+    all_contacts: "0",
+    anomaly_contacts: "0",
+    incoming: "1",
+    group_invites: "1",
+    incoming_chance: "100",
+    group_invite_chance: "100",
+    context: "1",
+    context_messages: "1",
+    context_announcements: "1",
+    related: "0",
+    /** 이모지 반응 (라이트보드 미니톡, 2026-11-06) */
+    reactions: "1",
+    /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
+    habits: "1",
+    /** 단톡 수다: 확인할 때 내 단톡방 하나에서 NPC끼리 대화 한 조각 (라이트보드 미니톡 기본 동작, 2026-11-06) */
+    banter: "0",
+    banter_chance: "30",
+    banter_min: "6",
+    banter_max: "12",
+    /** 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06). core/phoneView.ts */
+    view_preset: "side",
+    view_pov: "",
+    view_speak: "0",
+    view_scope: "0",
+    view_size: "0",
+    view_auto: "manual"
+  };
+  var LIMITS2 = {
+    events: 12,
+    reply_tokens: 1500,
+    input_tokens: 4e3,
+    pause_tokens: 200,
+    topic_tokens: 2e3,
+    memo_tokens: 2e3,
+    notices: 1,
+    invitations: 1,
+    members: 9,
+    room_name: 60,
+    notice_title: 80,
+    notice_issuer: 60,
+    notice_tokens: 1200
+  };
+  var HISTORY2 = { room: 100, announcement: 10, context: 200, contextNotices: 1, contextTokens: 4e3, turns: 8, focus: true, contextRecent: 8 };
+  var STORAGE = { dm: 40, group: 100, notice: 20 };
+  var STORAGE_MAX2 = 2e4;
+  var COOLDOWN = { incoming: 1, invitation: 3, announcement: 3 };
+  function phoneStorage(state, k) {
+    const n2 = Number(state?.[PH(`storage_limit_${k}`)]);
+    return {
+      auto: String(state?.[PH(`storage_auto_${k}`)] ?? "") !== "0",
+      limit: Number.isInteger(n2) && n2 >= 1 && n2 <= STORAGE_MAX2 ? n2 : STORAGE[k]
+    };
+  }
+  var storageCap = (state, k) => {
+    const s8 = phoneStorage(state, k);
+    return s8.auto ? s8.limit : Infinity;
+  };
+  var NOTICE_PAGE_SIZES = [20, 30, 40, 50, 60];
+  function noticeSettings(state) {
+    const num5 = (k, lo, hi, d) => {
+      const n2 = Number(state?.[PH(k)]);
+      return Number.isInteger(n2) && n2 >= lo && n2 <= hi ? n2 : d;
+    };
+    const page = num5("announcement_page_size", 20, 60, 30);
+    return { gap: num5("announcement_gap", 1, 100, COOLDOWN.announcement), history: num5("announcement_history", 1, 50, HISTORY2.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
+  }
+  var cooldownTurns = (chat, k) => k === "announcement" ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k];
+  var COOLDOWN_KEY = (k) => `$cooldown_received_${k}`;
+  function phoneValue(state, key) {
+    const v = state?.[PH(key)];
+    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key] ?? "" : String(v);
+  }
+  function phoneSettings(state) {
+    const v = (k) => phoneValue(state, k);
+    const pct2 = (k) => {
+      const n2 = Number(v(k));
+      return Number.isFinite(n2) ? Math.max(0, Math.min(100, Math.floor(n2))) : 100;
+    };
+    return {
+      model: v("model") === "main" ? "main" : "aux",
+      auto: v("auto") === "1",
+      autoOpen: v("auto") === "open",
+      status: v("status") !== "0",
+      announcements: v("announcements") !== "0",
+      allContacts: v("all_contacts") === "1",
+      anomalyContacts: v("anomaly_contacts") === "1",
+      incoming: v("incoming") !== "0",
+      invites: v("group_invites") !== "0",
+      incomingChance: pct2("incoming_chance"),
+      inviteChance: pct2("group_invite_chance"),
+      context: v("context") !== "0",
+      contextMessages: v("context_messages") !== "0",
+      contextAnnouncements: v("context_announcements") !== "0",
+      related: v("related") === "1",
+      reactions: v("reactions") !== "0",
+      habits: v("habits") !== "0",
+      banter: v("banter") === "1",
+      banterChance: pct2("banter_chance"),
+      banterRows: (() => {
+        const n2 = (k) => {
+          const x = Math.floor(Number(v(k)));
+          return Number.isFinite(x) && v(k) !== "" ? Math.max(BANTER_ROWS[0], Math.min(BANTER_ROWS[1], x)) : Number(PH_DEFAULTS[k]);
+        };
+        const a = n2("banter_min");
+        return [a, Math.max(a, n2("banter_max"))];
+      })()
+    };
+  }
+  function cooldownReady(chat, k) {
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    const now = storyTurns(chat);
+    return !Number.isFinite(last2) || String(chat.scriptstate?.[COOLDOWN_KEY(k)] ?? "") === "" || now < last2 || now - last2 >= cooldownTurns(chat, k);
+  }
+  function cooldownLeft(chat, k) {
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    return Number.isFinite(last2) ? Math.max(0, cooldownTurns(chat, k) - (storyTurns(chat) - last2)) : 0;
+  }
+  var cooldownMark = (chat, k) => ({ [COOLDOWN_KEY(k)]: String(storyTurns(chat)) });
+  function chancePassed(n2, rng) {
+    return n2 >= 100 || n2 > 0 && Math.floor(rng() * 100) + 1 <= n2;
+  }
+  var hex2 = (s8) => Array.from(new TextEncoder().encode(s8), (b) => b.toString(16).padStart(2, "0")).join("");
+  var contactId = (agentId) => `c_${hex2(agentId)}`;
+  var s6 = (v) => typeof v === "string" ? v.trim() : "";
+  var list3 = (v) => Array.isArray(v) ? v.map(s6).filter(Boolean) : [];
+  function tabCatalog(lore) {
+    const data3 = phoneTabsSection(lore);
+    if (!data3.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
+    const entries2 = [];
+    for (const row10 of data3.tabs) {
+      if (entries2.some((e) => e.id === row10.id)) continue;
+      entries2.push({ id: row10.id, name: row10.name || row10.id, names: { ...row10.name_by_faction }, visibleFor: new Set(row10.visible_for) });
+    }
+    const extra = extraFactions(lore).map((f) => f.code);
+    if (extra.length) {
+      for (const e of entries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibleFor.add(f);
       for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
     }
     const orders = {};
@@ -34,29 +327,29 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     const roster = { characters: rosterOf(readDirectory(books)) };
     const map = /* @__PURE__ */ new Map();
     const contacts = [];
-    for (const row9 of roster.characters ?? []) {
-      const agentId = s6(row9?.id);
-      if (!/^P\d{3,}$/.test(agentId) || !s6(row9.name)) continue;
+    for (const row10 of roster.characters ?? []) {
+      const agentId = s6(row10?.id);
+      if (!/^P\d{3,}$/.test(agentId) || !s6(row10.name)) continue;
       if (agentId === String(chat.scriptstate?.["$st_player"] ?? "")) continue;
-      const english = s6(row9.english);
+      const english = s6(row10.english);
       const c = {
         id: contactId(agentId),
         agentId,
-        name: s6(row9.name),
+        name: s6(row10.name),
         english,
-        lore: s6(row9.lore),
-        group: s6(row9.affiliation),
-        rank: s6(row9.rank),
-        department: s6(row9.department),
-        tabs: list3(row9.phone_tabs),
-        terms: [s6(row9.name), english, s6(row9.lore), ...list3(row9.aliases), ...list3(row9.legacy_english)].filter(Boolean),
+        lore: s6(row10.lore),
+        group: s6(row10.affiliation),
+        rank: s6(row10.rank),
+        department: s6(row10.department),
+        tabs: list3(row10.phone_tabs),
+        terms: [s6(row10.name), english, s6(row10.lore), ...list3(row10.aliases), ...list3(row10.legacy_english)].filter(Boolean),
         visible: false,
         saved: false
       };
       c.visible = c.tabs.some((t) => visible2.has(t));
       map.set(c.id, c);
       if (c.visible) contacts.push(c);
-      for (const name of [english, ...list3(row9.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
+      for (const name of [english, ...list3(row10.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
     }
     for (const entry3 of readCustom(chat).items) {
       let c = map.get(entry3.id);
@@ -152,7 +445,7 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     let senders = /* @__PURE__ */ new Map();
     if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
       out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row9 of out.senders ?? []) senders.set(row9.sender, row9);
+      for (const row10 of out.senders ?? []) senders.set(row10.sender, row10);
       out.senders = [];
     }
     for (const m of r.messages) {
@@ -167,18 +460,18 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
         senders = /* @__PURE__ */ new Map();
       } else {
         out.npcMessagesSinceOwner++;
-        const row9 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
-        row9.messagesSinceOwner++;
-        row9.lastMessageTime = m.time || "";
-        row9.lastRecordID = m.id;
-        senders.set(m.sender, row9);
+        const row10 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
+        row10.messagesSinceOwner++;
+        row10.lastMessageTime = m.time || "";
+        row10.lastRecordID = m.id;
+        senders.set(m.sender, row10);
       }
     }
     const rt = r.readThrough;
     for (const key of [...senders.keys()].sort()) {
-      const row9 = senders.get(key);
-      row9.lastMessageRead = rt !== void 0 && row9.lastRecordID !== void 0 ? row9.lastRecordID <= rt ? "read" : "unread" : "unknown";
-      out.senders.push(row9);
+      const row10 = senders.get(key);
+      row10.lastMessageRead = rt !== void 0 && row10.lastRecordID !== void 0 ? row10.lastRecordID <= rt ? "read" : "unread" : "unknown";
+      out.senders.push(row10);
     }
     out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
     out.ownerReadThroughRecordID = rt;
@@ -285,10 +578,10 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
       const note = String(r?.note ?? "").trim().slice(0, 300);
       if (!ids.has(id2) || !note) continue;
       const i = list4.findIndex((x) => x.id === id2);
-      const row9 = { id: id2, name: ids.get(id2), note };
+      const row10 = { id: id2, name: ids.get(id2), note };
       if (i >= 0 && list4[i].note === note) continue;
       if (i >= 0) list4.splice(i, 1);
-      list4.push(row9);
+      list4.push(row10);
       changed = true;
     }
     return changed ? { [PH_HABITS]: JSON.stringify(list4.slice(-80)) } : null;
@@ -300,11 +593,11 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
       if (!token2 || token2 === "-") continue;
       const m = /^(.*?)(\d+)$/.exec(token2);
       const emoji = (m ? m[1] : token2).trim();
-      const count2 = m ? Number(m[2]) : 1;
-      if (!emoji || /[\p{L}\p{N}]/u.test(emoji) || [...emoji].length > 8 || count2 < 1) continue;
+      const count3 = m ? Number(m[2]) : 1;
+      if (!emoji || /[\p{L}\p{N}]/u.test(emoji) || [...emoji].length > 8 || count3 < 1) continue;
       const old = out.find((r) => r.emoji === emoji);
-      if (old) old.count = Math.max(old.count, count2);
-      else out.push({ emoji, count: count2 });
+      if (old) old.count = Math.max(old.count, count3);
+      else out.push({ emoji, count: count3 });
     }
     return out.slice(0, 6);
   }
@@ -409,7 +702,7 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     }
   }
   function applyEvents(st, r, events, time2) {
-    let count2 = 0;
+    let count3 = 0;
     const before = r.messages.length;
     const waiting2 = r.kind === "dm" && conversationState(r).ownerHasNotReplied;
     for (const e of events) {
@@ -417,7 +710,7 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
         let last2;
         for (const rec2 of splitRecords(stripForged(e.text))) {
           last2 = push(st, r, e.sender, rec2, time2);
-          count2++;
+          count3++;
         }
         const rx = last2 && e.reactions ? clampReactions(e.reactions, reactionCap(last2)) : "";
         if (last2 && rx) last2.reactions = rx;
@@ -434,10 +727,10 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
         }
       } else membership(st, r, "exit", e.participant, time2);
     }
-    r.unread = (r.unread || 0) + count2;
+    r.unread = (r.unread || 0) + count3;
     r.silent = r.messages.length === before;
-    if (r.kind === "dm" && count2 > 0) r.followupSent = !!waiting2;
-    return count2;
+    if (r.kind === "dm" && count3 > 0) r.followupSent = !!waiting2;
+    return count3;
   }
   function readBulletins(chat) {
     const raw = String(chat.scriptstate?.[PH_BULLETINS] ?? "");
@@ -445,7 +738,7 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     try {
       const v = JSON.parse(raw);
       if (v && Array.isArray(v.items)) {
-        for (const row9 of v.items) if (row9.read === void 0) row9.read = true;
+        for (const row10 of v.items) if (row10.read === void 0) row10.read = true;
         return { version: 2, seq: Number(v.seq) || 0, items: v.items, checks: v.checks ?? {}, seen: v.seen ?? {}, lastIssuedTurns: v.lastIssuedTurns };
       }
     } catch {
@@ -453,12 +746,12 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     throw new PhoneError("공지 기록을 읽지 못했어요. 원본 기록은 그대로 둬요.");
   }
   var bulletinUnread = (b) => b.items.some((r) => r.read === false);
-  var signature = (row9) => JSON.stringify([row9.channel, row9.title.trim(), row9.text.trim()]);
+  var signature = (row10) => JSON.stringify([row10.channel, row10.title.trim(), row10.text.trim()]);
   function trimBulletins(b, cap = STORAGE.notice) {
     const n2 = Math.max(0, b.items.length - cap);
     b.items = b.items.slice(n2);
     b.seen = {};
-    for (const row9 of b.items) b.seen[signature(row9)] = true;
+    for (const row10 of b.items) b.seen[signature(row10)] = true;
   }
   function noticeChannel(chat) {
     const code2 = String(chat.scriptstate?.["$st_faction"] ?? "");
@@ -487,31 +780,31 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
   function validateAnnouncements(rows3, packet, dropped = []) {
     if (rows3 != null && !Array.isArray(rows3)) fail("공지 목록이 배열이 아니에요.");
     const out = [];
-    for (const row9 of rows3 ?? []) {
-      const why = noticeProblem(row9);
+    for (const row10 of rows3 ?? []) {
+      const why = noticeProblem(row10);
       if (why) dropped.push(why);
       else if (out.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
-      else out.push(row9);
+      else out.push(row10);
     }
     return out;
   }
-  function noticeProblem(row9) {
-    if (!row9 || typeof row9.issuer !== "string" || typeof row9.category !== "string" || typeof row9.title !== "string" || typeof row9.text !== "string") return "공지 형식이 잘못됐어요.";
-    if (!CATEGORIES.has(row9.category)) return "공지 분류가 올바르지 않아요.";
-    if (!row9.issuer.trim() || [...row9.issuer].length > LIMITS2.notice_issuer || !row9.title.trim() || [...row9.title].length > LIMITS2.notice_title || !row9.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
-    if (tokens(row9.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
+  function noticeProblem(row10) {
+    if (!row10 || typeof row10.issuer !== "string" || typeof row10.category !== "string" || typeof row10.title !== "string" || typeof row10.text !== "string") return "공지 형식이 잘못됐어요.";
+    if (!CATEGORIES.has(row10.category)) return "공지 분류가 올바르지 않아요.";
+    if (!row10.issuer.trim() || [...row10.issuer].length > LIMITS2.notice_issuer || !row10.title.trim() || [...row10.title].length > LIMITS2.notice_title || !row10.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
+    if (tokens(row10.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
     return null;
   }
   function commitAnnouncements(b, st, rows3, packet, time2) {
     let added = 0;
-    for (const row9 of rows3) {
-      const rec2 = { channel: packet.channel, title: row9.title.trim(), text: row9.text.trim() };
+    for (const row10 of rows3) {
+      const rec2 = { channel: packet.channel, title: row10.title.trim(), text: row10.text.trim() };
       const sig = signature(rec2);
       if (b.seen[sig]) continue;
       b.seen[sig] = true;
       b.seq += 1;
       st.mid += 1;
-      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row9.issuer.trim(), category: row9.category, title: rec2.title, text: rec2.text, time: time2 });
+      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row10.issuer.trim(), category: row10.category, title: rec2.title, text: rec2.text, time: time2 });
       added++;
     }
     if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -531,17 +824,17 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
     const allowed = new Set(packet?.candidates ?? []);
     const sig = (m) => [...m].sort().join(",");
     const out = [];
-    const fresh = /* @__PURE__ */ new Set();
-    for (const row9 of rows3 ?? []) {
+    const fresh2 = /* @__PURE__ */ new Set();
+    for (const row10 of rows3 ?? []) {
       if (out.length >= (packet?.maxNew ?? 0)) {
         dropped.push("한 번에 받을 단톡방 초대 수를 넘었어요.");
         continue;
       }
       try {
-        if (!row9 || typeof row9.inviter !== "string" || !Array.isArray(row9.members) || typeof row9.name !== "string" || !Array.isArray(row9.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
-        const name = row9.name.trim();
+        if (!row10 || typeof row10.inviter !== "string" || !Array.isArray(row10.members) || typeof row10.name !== "string" || !Array.isArray(row10.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
+        const name = row10.name.trim();
         if (!name || [...name].length > LIMITS2.room_name) fail("초대할 단톡방 이름이 길이 제한을 넘었어요.");
-        const members = row9.members;
+        const members = row10.members;
         if (members.length < 2 || members.length > LIMITS2.members) fail("단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.");
         const people = {};
         for (const cid of members) {
@@ -549,13 +842,13 @@ ries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.v
           if (typeof cid !== "string" || !allowed.has(cid) || !c || people[cid]) fail("단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.");
           people[cid] = personOf(c);
         }
-        if (!people[row9.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
+        if (!people[row10.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
         const key = `${name}\0${sig(members)}`;
-        if (fresh.has(key)) fail("같은 단톡방 초대가 중복됐어요.");
+        if (fresh2.has(key)) fail("같은 단톡방 초대가 중복됐어요.");
         for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
-        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row9.inviter };
-        room.events = eventsFromPatch(row9.patch, room, false, dropped).events;
-        fresh.add(key);
+        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row10.inviter };
+        room.events = eventsFromPatch(row10.patch, room, false, dropped).events;
+        fresh2.add(key);
         out.push(room);
       } catch (error) {
         dropped.push(error.message);
@@ -766,18 +1059,18 @@ ${body5}
     const books = allBooks(src);
     const registry2 = o.registry ?? buildRegistry(src.char.globalLore);
     const rows3 = [];
-    const add = (kind, source5, content) => {
+    const add = (kind, source4, content) => {
       const text4 = content.trim();
       if (!text4) return;
-      const rank2 = ["base", "primary", "active", "direct", "secondary"];
+      const rank3 = ["base", "primary", "active", "direct", "secondary"];
       const same4 = rows3.find((r) => r.content === text4);
       if (same4) {
-        if (!same4.sources.includes(source5)) same4.sources.push(source5);
-        if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same4.kind)) same4.kind = kind;
+        if (!same4.sources.includes(source4)) same4.sources.push(source4);
+        if (o.scope === "wiki" && rank3.indexOf(kind) < rank3.indexOf(same4.kind)) same4.kind = kind;
         same4.required = same4.required || required(kind);
         return;
       }
-      rows3.push({ kind, sources: [source5], content: text4, required: required(kind) });
+      rows3.push({ kind, sources: [source4], content: text4, required: required(kind) });
     };
     const required = (kind) => o.scope === "wiki" ? kind === "base" || kind === "primary" || kind === "active" : kind === "base" || kind === "direct";
     if (o.description !== false && src.char.desc) add("base", "봇 설명", stripModules(evaluate(src.char.desc, env3)));
@@ -1094,7 +1387,7 @@ ${c}`)]).join("\n\n");
     }
     return out;
   }
-  var withPeople = (chat, store) => ({ ...chat, [PEOPLE_KEY]: store });
+  var withPeople = (chat, store2) => ({ ...chat, [PEOPLE_KEY]: store2 });
   var msgs = (chat) => Array.isArray(chat.message) ? chat.message : [];
   function anchorPositions(chat) {
     const at = /* @__PURE__ */ new Map();
@@ -1138,40 +1431,40 @@ ${c}`)]).join("\n\n");
     for (const e of list4) out.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
     return out;
   }
-  function liveChanges(store, live) {
-    return store.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
+  function liveChanges(store2, live) {
+    return store2.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
   }
-  var entryId = (who, slot2, anchor, seq, text4) => `e${hash(`${who}|${slot2}|${anchor}|${seq}|${text4}`)}`;
-  var changeId = (who, kind, anchor, seq, text4) => `c${hash(`${who}|${kind}|${anchor}|${seq}|${text4}`)}`;
+  var entryId = (who, slot2, anchor, seq2, text4) => `e${hash(`${who}|${slot2}|${anchor}|${seq2}|${text4}`)}`;
+  var changeId = (who, kind, anchor, seq2, text4) => `c${hash(`${who}|${kind}|${anchor}|${seq2}|${text4}`)}`;
   var plain = (s8, max = 200) => String(s8 ?? "").replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％").replace(/\s+/g, " ").trim().slice(0, max);
-  function putEntry(store, who, slot2, entry3) {
-    const p2 = store.people[who];
+  function putEntry(store2, who, slot2, entry3) {
+    const p2 = store2.people[who];
     if (!p2) return false;
     const list4 = p2.slots[slot2] ??= [];
     if (list4.some((e) => e.id === entry3.id)) return false;
     list4.push({ ...entry3, text: plain(entry3.text, slot2 === "speech" ? 600 : 300), ...entry3.quote ? { quote: plain(entry3.quote, 60) } : {} });
     return true;
   }
-  function putDoc(store, type, key, entry3) {
+  function putDoc(store2, type, key, entry3) {
     const k = `${type}:${key}`;
-    const d = store.docs[k] ??= { type, key, entries: [] };
+    const d = store2.docs[k] ??= { type, key, entries: [] };
     if (d.entries.some((e) => e.id === entry3.id)) return false;
     d.entries.push({ ...entry3, text: plain(entry3.text) });
     return true;
   }
-  function snapshotRun(store) {
+  function snapshotRun(store2) {
     const entries2 = /* @__PURE__ */ new Set();
     const observations = /* @__PURE__ */ new Set();
-    for (const p2 of Object.values(store.people)) {
+    for (const p2 of Object.values(store2.people)) {
       for (const [slot2, list4] of Object.entries(p2.slots)) for (const e of list4 ?? []) entries2.add(`${p2.name}|${slot2}|${e.id}`);
       for (const c of Object.values(p2.candidates ?? {})) for (const o of c.evidence) observations.add(`${p2.name}|${c.id}|${o.id}`);
     }
     const docs = /* @__PURE__ */ new Set();
-    for (const d of Object.values(store.docs)) for (const e of d.entries) docs.add(`${d.key}|${e.id}`);
-    return { entries: entries2, docs, changes: new Set(store.log.map((c) => c.id)), observations, people: new Set(Object.keys(store.people)) };
+    for (const d of Object.values(store2.docs)) for (const e of d.entries) docs.add(`${d.key}|${e.id}`);
+    return { entries: entries2, docs, changes: new Set(store2.log.map((c) => c.id)), observations, people: new Set(Object.keys(store2.people)) };
   }
-  function recordRun(store, before, at) {
-    const after = snapshotRun(store);
+  function recordRun(store2, before, at) {
+    const after = snapshotRun(store2);
     const diff = (a, b) => [...b].filter((x) => !a.has(x));
     const run5 = {
       at,
@@ -1191,84 +1484,84 @@ ${c}`)]).join("\n\n");
       newPeople: diff(before.people, after.people)
     };
     const n2 = run5.entries.length + run5.docs.length + run5.changes.length + run5.observations.length + run5.newPeople.length;
-    if (n2) store.lastRun = run5;
-    else delete store.lastRun;
-    return store.lastRun;
+    if (n2) store2.lastRun = run5;
+    else delete store2.lastRun;
+    return store2.lastRun;
   }
-  function undoLastRun(store) {
-    const run5 = store.lastRun;
+  function undoLastRun(store2) {
+    const run5 = store2.lastRun;
     if (!run5) return 0;
     let n2 = 0;
     for (const x of run5.entries) {
-      const e = store.people[x.who]?.slots[x.slot]?.find((e2) => e2.id === x.id);
+      const e = store2.people[x.who]?.slots[x.slot]?.find((e2) => e2.id === x.id);
       if (e && !e.void) {
         e.void = true;
         n2++;
       }
     }
     for (const x of run5.docs) {
-      const e = Object.values(store.docs).find((d) => d.key === x.key)?.entries.find((e2) => e2.id === x.id);
+      const e = Object.values(store2.docs).find((d) => d.key === x.key)?.entries.find((e2) => e2.id === x.id);
       if (e && !e.void) {
         e.void = true;
         n2++;
       }
     }
     for (const id2 of run5.changes) {
-      const c = store.log.find((c2) => c2.id === id2);
+      const c = store2.log.find((c2) => c2.id === id2);
       if (c && !c.void) {
         c.void = true;
         n2++;
       }
     }
     for (const x of run5.observations) {
-      const o = store.people[x.who]?.candidates?.[x.cand]?.evidence.find((o2) => o2.id === x.id);
+      const o = store2.people[x.who]?.candidates?.[x.cand]?.evidence.find((o2) => o2.id === x.id);
       if (o && !o.void) {
         o.void = true;
         n2++;
       }
     }
-    for (const name of run5.newPeople) if (store.people[name]) {
-      delete store.people[name];
+    for (const name of run5.newPeople) if (store2.people[name]) {
+      delete store2.people[name];
       n2++;
     }
-    delete store.lastRun;
+    delete store2.lastRun;
     return n2;
   }
-  function putChange(store, c) {
-    if (store.log.some((x) => x.id === c.id)) return false;
-    store.log.push({ ...c, reason: plain(c.reason, 80), ...c.quote ? { quote: plain(c.quote, 60) } : {} });
+  function putChange(store2, c) {
+    if (store2.log.some((x) => x.id === c.id)) return false;
+    store2.log.push({ ...c, reason: plain(c.reason, 80), ...c.quote ? { quote: plain(c.quote, 60) } : {} });
     return true;
   }
-  var messageKey = (m, index) => {
+  var messageKey = (m, index3) => {
     const id2 = m.chatId;
-    return typeof id2 === "string" && id2 ? id2 : `#${index + 1}`;
+    return typeof id2 === "string" && id2 ? id2 : `#${index3 + 1}`;
   };
   var messageHash = (m) => hash(
     messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\s+/g, " ").trim()
   );
-  function unreadIndexes(chat, store) {
+  function unreadIndexes(chat, store2) {
     const out = [];
     msgs(chat).forEach((m, i) => {
       if (m.role !== "char") return;
-      if (store.read[messageKey(m, i)] !== messageHash(m)) out.push(i);
+      if (store2.read[messageKey(m, i)] !== messageHash(m)) out.push(i);
     });
     return out;
   }
-  function splitUnread(chat, store) {
-    const all = unreadIndexes(chat, store);
+  function splitUnread(chat, store2) {
+    const all = unreadIndexes(chat, store2);
     const list4 = msgs(chat);
-    const lastRead = Math.max(-1, ...list4.map((m, i) => store.read[messageKey(m, i)] !== void 0 ? i : -1));
+    const lastRead = Math.max(-1, ...list4.map((m, i) => store2.read[messageKey(m, i)] !== void 0 ? i : -1));
     const newer = lastRead < 0 ? all.slice(-1) : all.filter((i) => i > lastRead);
     return { newer, older: all.filter((i) => !newer.includes(i)) };
   }
-  function markRead(store, chat, indexes) {
+  function markRead(store2, chat, indexes) {
     const list4 = msgs(chat);
     for (const i of indexes) {
       const m = list4[i];
-      if (m) store.read[messageKey(m, i)] = messageHash(m);
+      if (m) store2.read[messageKey(m, i)] = messageHash(m);
     }
     const keep = new Set(list4.map((m, i) => messageKey(m, i)));
-    for (const k of Object.keys(store.read)) if (!keep.has(k)) delete store.read[k];
+    for (const k of Object.keys(store2.read)) if (!keep.has(k)) delete store2.read[k];
   }
 
   // src/core/journal/mine.ts
@@ -1278,7 +1571,7 @@ ${c}`)]).join("\n\n");
   function mineReasons(chat, from, to, s8) {
     const out = /* @__PURE__ */ new Set();
     const names4 = [s8.name, s8.presetName ?? ""].filter(Boolean);
-    const hit3 = (t) => names4.some((n2) => same(t, n2));
+    const hit4 = (t) => names4.some((n2) => same(t, n2));
     const list4 = msgs2(chat);
     const lo = Math.max(0, Math.min(from, to));
     const hi = Math.min(list4.length - 1, Math.max(from, to));
@@ -1289,13 +1582,13 @@ ${c}`)]).join("\n\n");
       const t = text(m);
       if (m.role === "user") {
         const scene = readScene(t);
-        if (scene && hit3(scene.target)) out.add("scene");
+        if (scene && hit4(scene.target)) out.add("scene");
         continue;
       }
       if (m.role !== "char" || i < lo) continue;
       for (const tag of findStatusTags(t)) {
         if (tag.deployed !== null) hasDeployCol = true;
-        if (tag.deployed === true && hit3(tag.target)) out.add("deployed");
+        if (tag.deployed === true && hit4(tag.target)) out.add("deployed");
         if (s8.agentNames.length && tag.companions.some((c) => s8.agentNames.some((a) => same(c, a)))) out.add("companion");
       }
     }
@@ -1303,9 +1596,9 @@ ${c}`)]).join("\n\n");
     return [...out];
   }
   var isMine = (chat, from, to, s8) => mineReasons(chat, from, to, s8).length > 0;
-  function periodOf(chat, index, e) {
+  function periodOf(chat, index3, e) {
     const list4 = msgs2(chat);
-    const to = Math.max(0, Math.min(index, list4.length - 1));
+    const to = Math.max(0, Math.min(index3, list4.length - 1));
     let from = e.startKey ? anchorPositions(chat).get(e.startKey) : void 0;
     if (from === void 0 && e.since !== null) {
       for (let i = 0; i <= to; i++) {
@@ -1618,10 +1911,10 @@ ${c}`)]).join("\n\n");
       const name = tagName(who, expr, pick3, self);
       if (!name || name !== SELF && /[{}'"<>\\]/.test(name)) return "\n\n";
       const url = name === SELF ? SELF : `{{raw::${name}}}`;
-      const box2 = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
+      const box4 = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
       return `
 
-${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box2}{{/when}}` : box2}
+${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box4}{{/when}}` : box4}
 
 `;
     });
@@ -1655,9 +1948,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   function imgCss(size = IMG_SIZE.def, fold2 = IMG_FOLD.def, hidden = false, lock = false) {
     const g2 = ":is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)";
     if (hidden) return `${g2}{display:none!important}`;
-    const open3 = fold2 >= 100;
-    const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold2) / 100}`;
-    return `${g2}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 || lock ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 || lock ? "" : `${g2}:hover,${g2}:focus{aspect-ratio:${W}/${H}!important}`);
+    const open4 = fold2 >= 100;
+    const folded = open4 ? `${W}/${H}` : `${W}/${Math.round(H * fold2) / 100}`;
+    return `${g2}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open4 || lock ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open4 || lock ? "" : `${g2}:hover,${g2}:focus{aspect-ratio:${W}/${H}!important}`);
   }
   var hiddenNow = false;
   var imgHidden = () => hiddenNow;
@@ -1709,7 +2002,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var cache4 = /* @__PURE__ */ new WeakMap();
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-(gn|gal|wpf|sm)\.[a-z_]+|\$(gn|gal|wpf|sm)_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet|points)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -1779,15 +2072,15 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     }
     setUserRules(rules2);
     const relationsSym = o.relationsSym === false ? false : void 0;
-    const frame = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
+    const frame2 = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
+    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame2 ? { frame: frame2 } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...o.versus === true ? { versus: true } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
     const list4 = lore ?? [];
-    const hit3 = cache4.get(list4);
-    if (hit3) return hit3;
+    const hit4 = cache4.get(list4);
+    if (hit4) return hit4;
     let out = { basic: {}, world: {} };
     for (const name of ["Settings", "통합설정"]) {
       const books = list4.filter((e) => e.comment === name && typeof e.content === "string" && e.content.trim());
@@ -2042,10 +2335,10 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return Number.isFinite(d.getTime()) ? `${two2(d.getUTCMonth() + 1)}${two2(d.getUTCDate())}` : "0000";
   }
   function peopleDelta(chat, from, to) {
-    const store = peopleStore(chat);
-    if (!store.log.length) return [];
+    const store2 = peopleStore(chat);
+    if (!store2.log.length) return [];
     const live = liveness(chat);
-    const all = liveChanges(store, live);
+    const all = liveChanges(store2, live);
     const ps = peopleSettings(chat.scriptstate);
     const o = { speed: ps.speed, turnCap: ps.turnCap };
     const pos = (c) => live.at.get(c.anchor) ?? -1;
@@ -2057,8 +2350,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       const delta = sumCues(who, 0, list4, 0, -1e9, 1e9, o);
       if (!delta) continue;
       const top = [...list4].sort((a, b) => Math.abs(cueDelta(b, o)) - Math.abs(cueDelta(a, o)))[0];
-      const person = store.people[who];
-      const stage = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store.folded[who] ?? 0, o)).label : void 0;
+      const person = store2.people[who];
+      const stage = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store2.folded[who] ?? 0, o)).label : void 0;
       out.push({ who, delta, ...top?.cue ? { cue: top.cue } : {}, ...top?.quote || top?.reason ? { quote: cut2(top.quote || top.reason, 60) } : {}, ...stage ? { stage } : {} });
     }
     return out.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, PEOPLE_MAX);
@@ -2073,7 +2366,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return { trades, balance };
   }
   function snapshot(input3, ev, anchor, now) {
-    const { chat, index, world: world2, catalog, faction } = input3;
+    const { chat, index: index3, world: world2, catalog, faction } = input3;
     const e = ev.entry;
     const an = ev.kind === "an" ? e : null;
     const name = (an ? an.presetName || an.name : e.name) || "이름 미확인";
@@ -2083,14 +2376,14 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const lastText = trail.length ? trail[trail.length - 1].text : "";
     const prefix = ev.cleared ? "클리어 · " : "";
     const result = prefix + (lastText || "처리 완료");
-    const { from, to } = periodOf(chat, index, e);
+    const { from, to } = periodOf(chat, index3, e);
     const mine = isMine(chat, from, to, { name, presetName: an?.presetName || void 0, agentNames: agents.map((a) => a.name), touched: e.touched });
     const id2 = journalHash(`${ev.kind}|${name}|${e.loc}|${e.born ?? ""}|${ev.epoch}`);
-    const tags = findStatusTags(text2(chat.message?.[index]));
+    const tags = findStatusTags(text2(chat.message?.[index3]));
     const last2 = tags[tags.length - 1];
     const at = ev.minute;
     const grade = an?.grade || void 0;
-    const row9 = {
+    const row10 = {
       id: `j${id2}`,
       kind: ev.kind,
       name,
@@ -2099,7 +2392,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       at,
       since: e.since,
       born: e.born,
-      idx: index,
+      idx: index3,
       anchor,
       mine,
       cause: ev.cause,
@@ -2119,7 +2412,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       trail,
       agents,
       result: cut2(result, RESULT_REPORT_MAX),
-      idx: index,
+      idx: index3,
       anchor,
       ...last2 ? { statusKey: last2.raw.trim() } : {},
       savedAt: now
@@ -2130,27 +2423,27 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       report.wallet = w.trades;
       report.balance = w.balance;
     }
-    return { row: row9, report };
+    return { row: row10, report };
   }
   function buildClosures(input3) {
-    const { chat, index, closed, settings } = input3;
+    const { chat, index: index3, closed, settings } = input3;
     const now = input3.now ?? (/* @__PURE__ */ new Date()).toISOString();
     const list4 = Array.isArray(chat.message) ? chat.message : [];
-    const m = list4[index];
-    const anchor = m ? messageKey(m, index) : `#${index + 1}`;
+    const m = list4[index3];
+    const anchor = m ? messageKey(m, index3) : `#${index3 + 1}`;
     let journal = readJournal(chat);
     let reports2 = readReports(chat);
     const rows3 = [];
     const added = [];
     const have = new Set(journal.rows.map((r) => r.id));
     for (const ev of closed) {
-      const { row: row9, report } = snapshot(input3, ev, anchor, now);
-      if (have.has(row9.id)) continue;
-      have.add(row9.id);
+      const { row: row10, report } = snapshot(input3, ev, anchor, now);
+      if (have.has(row10.id)) continue;
+      have.add(row10.id);
       const day = mmdd(report.head.at, now);
       const n2 = reports2.items.filter((r) => r.no.startsWith(`RPT-${day}-`)).length + added.filter((r) => r.no.startsWith(`RPT-${day}-`)).length + 1;
       report.no = `RPT-${day}-${two2(n2)}`;
-      rows3.push(row9);
+      rows3.push(row10);
       added.push(report);
     }
     if (!rows3.length) return { journal, reports: reports2, rows: rows3, added };
@@ -2379,10 +2672,10 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
         let rows3 = 0;
         r.agents.slice(0, 8).forEach((a, i) => {
           const col = i % cols;
-          const row9 = Math.floor(i / cols);
-          const yy = y + row9 * 44;
+          const row10 = Math.floor(i / cols);
+          const yy = y + row10 * 44;
           if (yy + 36 > limit) return;
-          rows3 = row9 + 1;
+          rows3 = row10 + 1;
           const x = PAD + col * (cw + gap);
           box(g2, c, x, yy, cw, 36, 10);
           roundRect(g2, x + 8, yy + 8, 20, 20, 10);
@@ -4220,588 +4513,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       수녀님: [
         "블라렛"
       ],
-      실장: [
-        "고그니쟈"
-      ],
-      심문관: [
-        "김조학"
-      ],
-      언니: [
-        "문혜란",
-        "잼트리"
-      ],
-      "연구 책임자": [
-        "고그니쟈"
-      ],
-      연구원: [
-        "데쥬레"
-      ],
-      요원: [
-        "게슈간",
-        "데드폴",
-        "로제몬",
-        "콘쥬스"
-      ],
-      원장: [
-        "고연지"
-      ],
-      원장님: [
-        "고연지"
-      ],
-      의사: [
-        "고연지"
-      ],
-      이사: [
-        "호유원"
-      ],
-      이사님: [
-        "호유원"
-      ],
-      적합자: [
-        "고르고디오"
-      ],
-      전무: [
-        "청달래"
-      ],
-      전무님: [
-        "청달래"
-      ],
-      조수: [
-        "윤지아"
-      ],
-      조장: [
-        "백석주",
-        "이자헌"
-      ],
-      조장님: [
-        "백석주",
-        "이자헌"
-      ],
-      조정관: [
-        "서윤지",
-        "차여진"
-      ],
-      주인: [
-        "마덕희"
-      ],
-      주임: [
-        "박민성",
-        "이성해"
-      ],
-      진행자: [
-        "브라우니"
-      ],
-      차장: [
-        "고영훈"
-      ],
-      책임자: [
-        "고그니쟈"
-      ],
-      팀장: [
-        "윤병수",
-        "쟈알디"
-      ],
-      형님: [
-        "고르고디오",
-        "노기균",
-        "살라딘"
-      ]
-    }
-  };
-
-  // game-src/dialogue/address.json
-  var address_default = {
-    version: 1,
-    names: {
-      강이학: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기님",
-        down: "신입님",
-        outsider: "고객님"
-      },
-      게슈간: {
-        level: 1,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "너",
-        down: "신입",
-        outsider: "너"
-      },
-      고그니쟈: {
-        level: 2,
-        register: "하게체",
-        self: "나",
-        up: "부장",
-        peer: "자네",
-        down: "신입",
-        outsider: "손님"
-      },
-      고르고디오: {
-        level: 2,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "막내",
-        outsider: "거기"
-      },
-      고연지: {
-        level: null,
-        register: "혼합",
-        self: "",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "환자분"
-      },
-      고영은: {
-        level: 1,
-        register: "반말",
-        self: "저",
-        up: "선배님",
-        peer: "동기",
-        down: "신입 씨",
-        outsider: "그쪽"
-      },
-      고영훈: {
-        level: 5,
-        register: "존댓말",
-        self: "나",
-        up: "부장님",
-        peer: "차장",
-        down: "대원",
-        outsider: "외부인"
-      },
-      곽성주: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "부장님",
-        peer: "과장",
-        down: "이놈아",
-        outsider: "거기"
-      },
-      곽제강: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      김성진: {
-        level: 1,
-        register: "반말",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      김조학: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "차장님",
-        peer: "과장",
-        down: "야",
-        outsider: "너"
-      },
-      노기균: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "신입",
-        outsider: "너"
-      },
-      데드폴: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "요원님",
-        down: "신입 요원님",
-        outsider: "그쪽 분"
-      },
-      데쥬레: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "요원님",
-        down: "신입 요원님",
-        outsider: "외부 분"
-      },
-      도필헌: {
-        level: 7,
-        register: "하게체",
-        self: "나",
-        up: "사장님",
-        peer: "국장",
-        down: "자네",
-        outsider: "손님"
-      },
-      로제몬: {
-        level: 1,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "너",
-        down: "신입",
-        outsider: "거기"
-      },
-      마덕희: {
-        level: null,
-        register: "존댓말",
-        self: "",
-        up: "사장님",
-        peer: "자기",
-        down: "자기",
-        outsider: "자기"
-      },
-      문혜란: {
-        level: null,
-        register: "반말",
-        self: "언니",
-        up: "사장님",
-        peer: "친구",
-        down: "친구",
-        outsider: "친구"
-      },
-      박민성: {
-        level: 2,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "그쪽"
-      },
-      백사헌: {
-        level: 1,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기님",
-        down: "신입",
-        outsider: "그쪽"
-      },
-      백석주: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "막내",
-        outsider: "그쪽"
-      },
-      브라우니: {
-        level: null,
-        register: "존댓말",
-        self: "",
-        up: "친구",
-        peer: "친구",
-        down: "친구",
-        outsider: "친구"
-      },
-      블라렛: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "신부님",
-        peer: "자매님",
-        down: "어린 양",
-        outsider: "손님"
-      },
-      사장: {
-        level: 9,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "그쪽",
-        down: "당신",
-        outsider: "당신"
-      },
-      살라딘: {
-        level: null,
-        register: "하오체",
-        self: "나",
-        up: "형제",
-        peer: "형제",
-        down: "형제",
-        outsider: "그대"
-      },
-      서윤지: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선임 조정관님",
-        peer: "조정관님",
-        down: "신입 조정관님",
-        outsider: "방문자님"
-      },
-      송주익: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "과장님",
-        peer: "선배님",
-        down: "신입",
-        outsider: "너"
-      },
-      송진섭: {
-        level: 1,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "형",
-        down: "후배",
-        outsider: "그쪽"
-      },
-      스팡달: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      신유리: {
-        level: null,
-        register: "반말",
-        self: "",
-        up: "사장",
-        peer: "너",
-        down: "너",
-        outsider: "너"
-      },
-      에일린: {
-        level: 2,
-        register: "반말",
-        self: "",
-        up: "부장",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      윤병수: {
-        level: 3,
-        register: "반말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "너",
-        outsider: "너"
-      },
-      윤지아: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "손님"
-      },
-      은하제: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "댁"
-      },
-      이기석: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "차장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      이길환: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "선생님"
-      },
-      이도형: {
-        level: 6,
-        register: "반말",
-        self: "나",
-        up: "국장님",
-        peer: "부장",
-        down: "거기",
-        outsider: "너"
-      },
-      이병진: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "자네",
-        outsider: "그쪽 분"
-      },
-      이성해: {
-        level: 2,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입님",
-        outsider: "손님"
-      },
-      이연화: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "선생님",
-        down: "신입 씨",
-        outsider: "그쪽 분"
-      },
-      이자헌: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "조장님",
-        down: "신입 님",
-        outsider: "손님"
-      },
-      장허운: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기분",
-        down: "후배님",
-        outsider: "선생님"
-      },
-      잼트리: {
-        level: 2,
-        register: "존댓말",
-        self: "언니",
-        up: "부장님",
-        peer: "동기",
-        down: "후배",
-        outsider: "손님"
-      },
-      쟈알디: {
-        level: 3,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자네",
-        down: "요원",
-        outsider: "그쪽"
-      },
-      제이: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "높으신 분",
-        peer: "직원분",
-        down: "신입분",
-        outsider: "손님"
-      },
-      조성춘: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "부장님",
-        peer: "과장",
-        down: "이 자식아",
-        outsider: "너"
-      },
-      진나솔: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "너",
-        down: "신입",
-        outsider: "거기"
-      },
-      차여진: {
-        level: null,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자기",
-        down: "신입",
-        outsider: "손님"
-      },
-      청달래: {
-        level: 8,
-        register: "하게체",
-        self: "",
-        up: "자네",
-        peer: "자네",
-        down: "자네",
-        outsider: "자네"
-      },
-      콘쥬스: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입 선배님",
-        outsider: "아저씨"
-      },
-      큐라스: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      호유원: {
-        level: 7,
-        register: "존댓말",
-        self: "저",
-        up: "전무님",
-        peer: "이사님",
-        down: "직원님",
-        outsider: "손님"
-      }
-    }
-  };
-
-  // src/core/people/identity.ts
-  var ORG_CODES = [
-    [/가짜\s*관리국|fake/i, "B00"],
-    [/관리국|management bureau|bureau/i, "A00"],
-    [/백일몽|daydream/i, "C00"],
-    [/민간|civilian|시민/i, "D00"],
-    [/프리랜서|freelancer|협회 등록/i, "E00"]
-  ];
-  function factionCode(org) {
-    const t = org.trim();
-    if (/^[A-Z]00$/.test(t)) return t;
-    for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
-    return "";
-  }
-  function rankLevel(faction, rank2) {
-    const r = rank2.replace(/\s+/g, "");
-    if (!r || /^(-|없음|미정)$/.test(r)) return null;
-    if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
-    if (faction === "A00") {
-      if (/부장|팀장|chief/i.test(r)) return 3;
-      if (/선임
+      실장

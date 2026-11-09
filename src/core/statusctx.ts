@@ -13,6 +13,10 @@ export interface StatusShape {
   wallet?: number | null;
   /** 설정 「최근 거래 넘기기」: 블록 끝에 붙일 최근 거래 줄 (core/wallet.ts recentWalletLines) */
   recent?: string[];
+  /** 포인트 장부 잔고 (포인트 칸을 쓸 때, core/points.ts) */
+  points?: number | null;
+  /** 최근 포인트 거래 줄 (「최근 거래 넘기기」와 같은 줄 수) */
+  recentPoints?: string[];
 }
 
 export const STATUS_HEAD = '[Previous status]';
@@ -52,7 +56,7 @@ export function statusBlock(line: string, cols?: ColId[]): string {
  * 마지막 줄을 지금 칸 구성대로 다시 만든다 (2026-10-27): 끈 칸은 빼고, 새로 켠 칸은 없음으로, 신분은 아는 값으로,
  * 잔고는 장부 값으로 덮어쓴다 (모델이 잘못 더하고 뺀 것을 매 턴 바로잡는다). 읽지 못하는 줄은 그대로
  */
-export function rebuildStatusLine(line: string, cols: ColId[], fill: { identity?: string; wallet?: number | null } = {}): string {
+export function rebuildStatusLine(line: string, cols: ColId[], fill: { identity?: string; wallet?: number | null; points?: number | null } = {}): string {
   const t = findStatusTags(line)[0];
   if (!t || !t.date) return line;
   const values: Partial<Record<ColId, string>> = {
@@ -66,6 +70,7 @@ export function rebuildStatusLine(line: string, cols: ColId[], fill: { identity?
     deployed: t.deployed ? '투입' : '',
     identity: t.identity || fill.identity || '',
     wallet: fill.wallet !== undefined && fill.wallet !== null ? walletCell(fill.wallet) : t.wallet,
+    points: fill.points !== undefined && fill.points !== null ? walletCell(fill.points) : t.points,
   };
   return formatStatusLine(values, cols);
 }
@@ -86,10 +91,11 @@ export function withStatusBlock<M extends PromptMessage>(messages: M[], identity
   if (messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(STATUS_HEAD))) return messages;
   const line0 = lastStatusLine(messages);
   if (!line0) return messages;
-  const line = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
+  const line = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet, points: shape.points }) : withIdentity(line0, identity);
   const out = stripStatusLines(messages);
   const at = out.map((m) => m?.role).lastIndexOf('user');
   const recent = (shape?.recent ?? []).filter(Boolean);
-  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${recent.length ? `\nRecent cash transactions (oldest first): ${recent.join('; ')}` : ''}` } as M;
+  const recentP = (shape?.recentPoints ?? []).filter(Boolean);
+  const block = { role: 'system', content: `${statusBlock(line, shape?.cols)}${recent.length ? `\nRecent cash transactions (oldest first): ${recent.join('; ')}` : ''}${recentP.length ? `\nRecent Baekilmong point transactions (oldest first): ${recentP.join('; ')}` : ''}` } as M;
   return at < 0 ? [...out, block] : [...out.slice(0, at), block, ...out.slice(at)];
 }

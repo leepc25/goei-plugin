@@ -4,6 +4,8 @@
 // PC는 왼쪽 메뉴, 모바일은 머리 잔고 단추·ID카드 잔고 칩으로 들어온다 (모바일 아래 바는 다섯 칸이 꽉 차 있음).
 import type { ChatContext } from '../host/risu';
 import { aliveAnchors, formatDelta, formatWon, liveWallet, readWallet, walletBalance, walletEditable, WALLET_START_DEFAULT, type WalletEntry } from '../core/wallet';
+import { formatPoints, readPoints } from '../core/points';
+import type { Wallet } from '../core/wallet';
 import { colConfig } from '../core/world/statuscols';
 import { findStatusTags } from '../core/world/status';
 import { getPrefs } from '../core/settings';
@@ -13,12 +15,16 @@ import { isPhone } from './media';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export const walletUi: { filter: 'all' | 'in' | 'out'; q: string; open: string | null; edit: boolean; notice: string } = { filter: 'all', q: '', open: null, edit: false, notice: '' };
+/** kind: 지금 보는 장부 — won 가계부 · p 백일몽 포인트 (2026-11-08, core/points.ts). 두 장부는 섞이지 않고 화면 짜임만 같다 */
+export const walletUi: { filter: 'all' | 'in' | 'out'; q: string; open: string | null; edit: boolean; notice: string; kind: 'won' | 'p' } = { filter: 'all', q: '', open: null, edit: false, notice: '', kind: 'won' };
 
 /** 이 채팅이 잔고 칸을 쓰나 (끄면 가계부 메뉴·잔고 단추도 숨김) */
 export const walletOn = (ctx: ChatContext) => colConfig(ctx.chat.scriptstate).wallet !== 'off';
 
 export const walletOf = (ctx: ChatContext) => readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+/** 지금 보는 장부 (가계부 또는 포인트) */
+const ledgerOf = (ctx: ChatContext): Wallet => (walletUi.kind === 'p' ? readPoints(ctx.chat.scriptstate) : walletOf(ctx));
+const money = (n: number) => (walletUi.kind === 'p' ? formatPoints(n) : formatWon(n));
 
 export function balanceText(ctx: ChatContext): string {
   return formatWon(walletBalance(walletOf(ctx), aliveAnchors(ctx.chat)));
@@ -69,7 +75,7 @@ function monthLine(month: string, rows: Row[]): string {
 }
 
 function rowsOf(ctx: ChatContext): { rows: Row[]; today: string; start: number } {
-  const w = walletOf(ctx);
+  const w = ledgerOf(ctx);
   const live = liveWallet(w, aliveAnchors(ctx.chat));
   const { at, today } = datesOf(ctx);
   let bal = w.start;
@@ -101,7 +107,7 @@ export function walletList(ctx: ChatContext): string {
     .filter(({ e }) => (walletUi.filter === 'in' ? e.amount > 0 : walletUi.filter === 'out' ? e.amount < 0 : true))
     .filter(({ e }) => !q || `${e.memo} ${e.quote ?? ''} ${e.place ?? ''}`.toLowerCase().includes(q))
     .reverse();
-  if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 거래가 없어요.' : '아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요.'}</p>`;
+  if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 거래가 없어요.' : walletUi.kind === 'p' ? '아직 포인트 거래가 없어요. 본문에 적힌 포인트 지급·사용이 여기에 쌓여요.' : '아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요.'}</p>`;
   const groups: { date: string; rows: Row[] }[] = [];
   for (const r of shown) {
     const g = groups[groups.length - 1];
@@ -133,14 +139,15 @@ export function walletList(ctx: ChatContext): string {
 
 /** 전체·수입·지출 칩 + 찾기 줄. PC는 목록 위, 폰은 기록 서랍 위칸(2026-11-05 사용자: 손이 닿는 자리) */
 export function walletTools(ctx: ChatContext): string {
-  if (!walletOn(ctx)) return '';
+  if (walletUi.kind === 'won' && !walletOn(ctx)) return '';
   const chip = (v: typeof walletUi.filter, label: string) => `<button class="gx-chip${walletUi.filter === v ? ' on' : ''}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label}</button>`;
   return `<div class="gx-rec-tools gx-wt-tools">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}<input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div>`;
 }
 
 /** 가계부 화면 (2026-11-05 사용자: 따로 탭이 아니라 기록 › 가계부 하위 탭. 잔고 칩·사원증 잔고 줄은 여기로 온다) */
-export function walletPane(ctx: ChatContext): string {
-  if (!walletOn(ctx)) {
+export function walletPane(ctx: ChatContext, kind: 'won' | 'p' = 'won'): string {
+  walletUi.kind = kind;
+  if (kind === 'won' && !walletOn(ctx)) {
     return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></div>`;
   }
   const { rows, today, start } = rowsOf(ctx);
@@ -156,13 +163,13 @@ export function walletPane(ctx: ChatContext): string {
   const balance = rows.length ? rows[rows.length - 1].after : start;
   const editable = walletEditable(ctx.chat.scriptstate);
   const edit = editable && walletUi.edit
-    ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
+    ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="${kind === 'p' ? '예: 1,000 또는 1만' : '예: 1,200,000 또는 120만'}" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
     : '';
   return `<div class="gx-wallettab">
     <section class="gx-mon gx-wt-tiles">
-      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>가계부</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
+      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>${kind === 'p' ? '포인트' : '가계부'}</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
       <div class="gx-mon-cells">
-        <div class="gx-mon-cell gx-wt-tile bal"><small>잔고</small><div class="gx-wt-balrow"><b class="mint">${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>${edit}<span>시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile bal"><small>잔고</small><div class="gx-wt-balrow"><b class="mint">${esc(money(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>${edit}<span>시작 ${esc(money(start))} · 거래 ${rows.length}건</span></div>
         <div class="gx-mon-cell gx-wt-tile"><small>수입</small><b class="mint">+${esc(income.toLocaleString('en-US'))}</b><span>${inN}건</span></div>
         <div class="gx-mon-cell gx-wt-tile"><small>지출</small><b class="red">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span>${outN}건</span></div>
         <div class="gx-mon-cell gx-wt-tile"><small>오늘</small><b class="${todayNet < 0 ? 'red' : todayNet > 0 ? 'mint' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span>${todayRows.length}건</span></div>

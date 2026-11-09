@@ -2,6 +2,7 @@
 // 원칙(원본과 같음): 사용자 글·댓글·쪽지는 앱이 소유한다. 모델은 NPC 글·댓글·쪽지와 조회·추천 증가만 보탤 수 있고,
 // 저장된 글의 본문·작성자·날짜는 절대 바꾸지 못한다. 글 번호는 줄지 않는다(1846000부터).
 import type { Chat } from './types';
+import { BOARD_NAME, viewSite } from './boards';
 import { exactTokens } from './tokenizer';
 import { readWorld } from './world/output';
 import { attachmentRecords, bodyParts as parts, describe, hasAttachment, stripForged } from './attach';
@@ -32,6 +33,13 @@ export interface GPost {
   body: string;
   mine: boolean;
   comments: GComment[];
+  /** 분류 (모델이 글마다 붙이는 말머리, 2026-11-08). 옛 글은 없음 */
+  tag?: string;
+  /** 내가 스크랩한 글 (스크랩한 글은 새로고침에도 남는다) */
+  scrap?: boolean;
+  /** 내가 누른 추천·비추 (2026-11-08 시안: 글마다 추천 단추) */
+  voted?: boolean;
+  down?: boolean;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -66,29 +74,14 @@ export class GnetError extends Error {
 
 export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
-  mode: '2', quantity: '1', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
+  mode: '2', post_min: '5', post_max: '7', cmt_min: '0', cmt_max: '6', act_min: '0', act_max: '4', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
-  /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
-  style: 'net',
-  /** 일기·감정 게시판의 주인 (비우면 주인공). 라이트보드 미니보드 사전설정 「생각·감정」 (2026-11-06) */
-  who: '',
   /** 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) */
   keyfigures: '1',
-  /** 반응 그림 (라이트보드 미니콘, 2026-11-06). cons_list = 「이름 | 그림 주소」 줄들 */
-  cons: '0', cons_list: '',
 };
 
-/** 게시판 성격. diary = 한 사람의 속마음 일기, emotion = 한 사람의 감정들이 쓰는 게시판 (라이트보드 미니보드 사전설정, 2026-11-06) */
-export type GnetStyle = 'gal' | 'net' | 'wpf' | 'diary' | 'emotion';
-export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게', diary: '일기장', emotion: '감정 게시판' };
-export function gnetStyle(state: Record<string, unknown> | undefined): GnetStyle {
-  const v = String(state?.[CFG('style')] ?? '');
-  return v === 'gal' || v === 'wpf' || v === 'diary' || v === 'emotion' ? v : 'net';
-}
-/** 일기·감정 게시판이면 혼자 쓰는 게시판이라 선쪽지·사생활 규칙이 뜻이 없다 */
-export const innerBoard = (state: Record<string, unknown> | undefined): boolean => ['diary', 'emotion'].includes(gnetStyle(state));
-/** 메뉴·창 머리에 쓰는 게시판 이름 (설정에 따라) */
-export const gnetLabel = (state: Record<string, unknown> | undefined): string => GN_STYLE_NAME[gnetStyle(state)];
+/** 메뉴·창 머리에 쓰는 게시판 이름 (지금 비춰 보는 사이트) */
+export const gnetLabel = (state: Record<string, unknown> | undefined): string => BOARD_NAME[viewSite(state)];
 /** 쪽지 보관 (원본 gnet_retention: 자동 정리 켬/끔, 상대별 상한) */
 export const GN_STORAGE_AUTO = '$gn_storage_auto_dm';
 export const GN_STORAGE_LIMIT = '$gn_storage_limit_dm';
@@ -100,15 +93,15 @@ export function gnetRetention(state: Record<string, unknown> | undefined): { aut
   const limit = Number.isInteger(n) && n >= 1 && n <= STORAGE_MAX ? n : HISTORY.dmKeep;
   return { auto: flag !== '0', limit };
 }
-export const LIMITS = { replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
+export const LIMITS = { replies_min: 0, replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
 export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 50, turns: 8, dmKeep: 40, cooldown: 2 };
 export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 3000, includePosts: true, includeDms: true, ownOnly: false, focus: true, recentPosts: 1, recentDms: 5 };
-export const QUANTITY: Record<string, { range: string; max: number; label: string }> = {
-  '0': { range: '4-6', max: 6, label: '4~6' },
-  '1': { range: '5-7', max: 7, label: '5~7' },
-  '2': { range: '6-8', max: 8, label: '6~8' },
-  '3': { range: '7-9', max: 9, label: '7~9' },
-};
+/** 개수 설정 (2026-11-08 사용자: 단계 고르기 대신 최소·최대 직접). 새로고침 글 수, 새 글마다 댓글 수, 지난 글에 새로 붙는 활동 댓글 수. 내 글·댓글에 달릴 새 답글 수는 고급 설정(replies_min·replies) */
+export const COUNT_RANGE = { post: [1, 20], cmt: [0, 20], act: [0, 20] } as const;
+export type CountKey = keyof typeof COUNT_RANGE;
+export const COUNT_KEYS: CountKey[] = ['post', 'cmt', 'act'];
+/** 지침 속 개수 자리: 최소=최대면 그 수 하나, 아니면 「최소–최대」 */
+export const countText = ([a, b]: [number, number]): string => (a === b ? String(a) : `${a}-${b}`);
 
 export interface GnetSettings {
   /** 늘 true. 원본 mode 0(끄기)은 없앴다 (2026-11-05 사용자: 괴담톡·위키처럼 끄기 없음, 새로고침 수동이면 부르지 않는다). 옛 채팅의 mode 0 은 보조로 본다 */
@@ -118,7 +111,8 @@ export interface GnetSettings {
   /** 괴담넷 탭을 열 때, 본편이 진행됐으면 새로고침 (lazy 'open', v0.16.27) */
   autoOpen: boolean;
   model: 'main' | 'aux';
-  quantity: string;
+  /** 개수 [최소, 최대] */
+  counts: Record<CountKey, [number, number]>;
   subject: string;
   mood: string;
   privacy: string;
@@ -130,7 +124,6 @@ export interface GnetSettings {
   incoming: boolean;
   incomingChance: number;
   keyFigures: boolean;
-  cons: boolean;
 }
 
 export function gnetVars(state: Record<string, unknown> | undefined): Record<string, unknown> {
@@ -146,14 +139,22 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
   const v = gnetVars(state);
   const s = (k: string) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
   const clean = (k: string) => (s(k) === '-' ? '' : s(k));
-  const q = QUANTITY[s('quantity')] ? s('quantity') : '1';
+ const num = (k: string, lo: number, hi: number) => {
+    const n = Math.round(Number(s(k)));
+    return Number.isFinite(n) && s(k) !== '' ? Math.max(lo, Math.min(hi, n)) : Math.max(lo, Math.min(hi, Number(GN_DEFAULTS[k])));
+  };
+  const counts = Object.fromEntries(COUNT_KEYS.map((k) => {
+    const [lo, hi] = COUNT_RANGE[k];
+    const a = num(`${k}_min`, lo, hi);
+    return [k, [a, Math.max(a, num(`${k}_max`, lo, hi))]];
+  })) as Record<CountKey, [number, number]>;
   const chance = Number(s('incoming_chance'));
   return {
     enabled: true,
     auto: s('lazy') === '0',
     autoOpen: s('lazy') === 'open',
     model: s('mode') === '1' ? 'main' : 'aux',
-    quantity: q,
+    counts,
     subject: clean('subject'),
     mood: clean('mood'),
     privacy: ['0', '1', '2', '3', '4'].includes(s('privacy')) ? s('privacy') : '1',
@@ -162,20 +163,14 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
     keepOwn: s('keepown') === '1',
     keepReplied: s('keepreplied') === '1',
     context: s('context') === '0',
-    incoming: s('incoming') !== '0' && !innerBoard(state),
+    incoming: s('incoming') !== '0',
     incomingChance: Number.isFinite(chance) ? Math.max(0, Math.min(100, chance)) : 100,
     keyFigures: s('keyfigures') !== '0',
-    cons: s('cons') === '1' && consList(state).length > 0,
   };
 }
 
 // ── 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) ──
 export const GN_KEYFIG = '$gn_keyfigures';
-/** 지금 게시판 글이 어느 성격(괴담갤·괴담넷·세정게…)으로 만들어졌는지. 성격을 바꾸면 다음 새로고침은 옛 글을 참고로 주지 않는다 (11-07 사용자: 성격을 바꿔도 똑같이 나온다) */
-export const GN_BOARD_STYLE = '$gn_board_style';
-export const boardStyle = (state: Record<string, unknown> | undefined): string => String(state?.[GN_BOARD_STYLE] ?? '');
-/** 성격이 바뀌어 게시판을 새로 시작해야 하는가 (아직 한 번도 안 받았으면 아니오) */
-export const styleSwitched = (state: Record<string, unknown> | undefined): boolean => boardStyle(state) !== '' && boardStyle(state) !== gnetStyle(state);
 export interface KeyFigure { keyFigure: string; nickname: string; note: string }
 
 export function keyFigures(state: Record<string, unknown> | undefined): KeyFigure[] {
@@ -204,17 +199,6 @@ export function mergeKeyFigures(state: Record<string, unknown> | undefined, rows
     changed = true;
   }
   return changed ? { [GN_KEYFIG]: JSON.stringify(list.slice(-60)) } : null;
-}
-
-// ── 반응 그림 (라이트보드 미니콘, 2026-11-06). 글·댓글 안의 [콘:이름] 을 그림으로 ──
-export function consList(state: Record<string, unknown> | undefined): { name: string; src: string }[] {
-  const raw = String(state?.[CFG('cons_list')] ?? '');
-  const out: { name: string; src: string }[] = [];
-  for (const line of raw.split('\n')) {
-    const [name, src] = line.split('|').map((x) => x.trim());
-    if (name && src && /^[^\[\]:]{1,30}$/.test(name) && !out.some((c) => c.name === name)) out.push({ name, src });
-  }
-  return out.slice(0, 200);
 }
 
 export function userNick(state: Record<string, unknown> | undefined): string {
@@ -301,6 +285,8 @@ export function decode(raw: unknown): GState {
         const post: GPost = {
           id, date: validDate(p[2]), nick: cut(p[3], 80), title: p[4], views: Math.max(0, Math.floor(Number(p[5]) || 0)),
           votes: Math.max(0, Math.floor(Number(p[6]) || 0)), body: p[7], mine: p[8] === '1', comments: [],
+          ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
+          ...(p[11] === '1' ? { voted: true } : {}), ...(p[12] === '1' ? { down: true } : {}),
         };
         st.posts.push(post);
         map.set(id, post);
@@ -325,7 +311,7 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0'].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0'].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const [nick, s] of Object.entries(st.sources)) out.push(['T', en(nick), s.postid || 0, en(s.title), en(s.body), en(s.author), en(s.quote), en(s.quoteAuthor)].join('|'));
@@ -383,10 +369,11 @@ export function storyTurns(chat: Chat): number {
 // ── 게시판 규칙 ──
 
 export function postLimit(s: GnetSettings): number {
-  return QUANTITY[s.quantity]?.max ?? 7;
+  return s.counts.post[1];
 }
 
 export function protectedPost(s: GnetSettings, p: GPost): boolean {
+  if (p.scrap) return true;
   if (p.mine) return s.keepOwn;
   return s.keepReplied && p.comments.some((c) => c.mine);
 }
@@ -705,12 +692,17 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
     const q: GPost = {
       id: pid, nick: cut(author || 'ㅇㅇ', 80), title: str(raw.title), body: stripForged(str(raw.content)), date,
       views: Math.max(0, int(raw.views) ?? 0), votes: Math.max(0, int(raw.upvotes) ?? 0), mine: prev?.mine ?? false, comments: [],
+      ...(cleanTag(raw.tag) ? { tag: cleanTag(raw.tag) } : {}),
     };
     // 저장된 기록의 작성자·제목·본문·날짜가 이긴다. 모델은 NPC 댓글과 조회·추천만 보탠다
     const sigs = new Map<string, number>();
     const remap = new Map<number, number | false>([[0, 0]]);
     if (prev) {
       Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+      if (prev.tag) q.tag = prev.tag;
+      if (prev.scrap) q.scrap = true;
+      if (prev.voted) q.voted = true;
+      if (prev.down) q.down = true;
       for (const c of prev.comments) {
         q.comments.push(c);
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
@@ -762,10 +754,10 @@ export interface CommentTarget {
 
 /** 모델이 쓴 새 댓글 검사 (원본 react onValidate + filterOwnerComments). 잘못된 것은 하나씩 버린다 */
 export function acceptComments(
-  rows: unknown, existing: GComment[], t: CommentTarget, nick: string, base = t.total,
+  rows: unknown, existing: GComment[], t: CommentTarget, nick: string, base = t.total, cap = LIMITS.replies,
 ): { comments: NewComment[]; dropped: number } {
-  const list = Array.isArray(rows) ? rows.slice(0, LIMITS.replies) : [];
-  let dropped = Array.isArray(rows) ? Math.max(0, rows.length - LIMITS.replies) : 0;
+  const list = Array.isArray(rows) ? rows.slice(0, cap) : [];
+  let dropped = Array.isArray(rows) ? Math.max(0, rows.length - cap) : 0;
   const out: NewComment[] = [];
   const map = new Map<number, number | false>();
   const seen = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
@@ -912,19 +904,23 @@ export function pushComments(p: GPost, rows: NewComment[], now: string): void {
   stampComments(p, from, rows.map((c) => c.time ?? ''), now);
 }
 
-export function parsePostDraft(value: unknown): { title: string; content: string } {
+/** 분류 글자: 한 줄, 12자 안쪽 */
+export const cleanTag = (v: unknown): string => cut(str(v).split(/\r?\n/)[0].replace(/[\[\]【】]/g, '').trim(), 12);
+
+export function parsePostDraft(value: unknown): { title: string; content: string; tag?: string } {
   if (!isObj(value) || !isObj(value.post)) throw new GnetError('응답에 post.title과 post.content가 없어요.');
   const title = str(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? '';
   const content = str(value.post.content).trim();
   if (!title || !content) throw new GnetError('게시글 제목이나 본문이 비어 있어요.');
-  return { title: trimTokens(title, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
+  const tag = cleanTag(value.post.tag);
+  return { title: trimTokens(title, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens), ...(tag ? { tag } : {}) };
 }
 
 /**
  * 첨부가 있는 글: 모델이 다듬은 본문에서 첨부 기록과 "(첨부파일: …)" 같은 중복 설명 줄을 빼고, 사용자가 붙인 첨부를 그대로 뒤에 붙인다
  * (원본 AT.cleanPostDraft). 사용자 첨부는 앱이 소유하므로 모델이 바꾸지 못한다.
  */
-export function attachPostDraft(draft: { title: string; content: string }, input: string): { title: string; content: string } {
+export function attachPostDraft<D extends { title: string; content: string }>(draft: D, input: string): D {
   if (!hasAttachment(input)) return draft;
   const literal = new Set<string>();
   for (const p of parts(input)) if (p.kind === 'text') for (const line of p.text.split('\n')) literal.add(line.trim());
@@ -938,7 +934,7 @@ export function attachPostDraft(draft: { title: string; content: string }, input
   });
   const records = attachmentRecords(input).map((r) => r.text);
   const content = [kept.join('\n').trim(), ...records].filter(Boolean).join('\n');
-  return { title: draft.title, content };
+  return { ...draft, content };
 }
 
 // ── 다른 글 활동 (조회·추천 증가 + 새 댓글) ──
@@ -989,7 +985,7 @@ export function activityContext(st: GState, targetId: number | null): { posts: A
 }
 
 /** 줄마다 따로 검사해서 맞는 것만 반영. [바뀌었는지, 버린 줄 수] */
-export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string, now = ''): [boolean, number] {
+export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string, now = '', cap = LIMITS.replies): [boolean, number] {
   if (rows === undefined || rows === null) return [false, 0];
   if (!Array.isArray(rows)) return [false, 1];
   let changed = false;
@@ -1014,7 +1010,7 @@ export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, 
       skipped++;
       continue;
     }
-    const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
+    const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length, cap);
     p.views += delta(u.viewsDelta);
     p.votes += delta(u.upvotesDelta);
     pushComments(p, got.comments, now);

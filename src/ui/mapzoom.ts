@@ -28,6 +28,55 @@ function clamp(v: View, cw: number, ch: number, lw: number, lh: number): View {
   return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
 }
 
+type Box = { l: number; t: number; r: number; b: number };
+const hit = (a: Box, b: Box) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+const box = (el: Element): Box => { const r = el.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
+const rank = (el: Element) => (el.classList.contains('sel') ? 0 : /\bhot/.test(el.className) ? 1 : 2);
+
+/** 이름표끼리 겹치거나 남의 점을 덮으면 그 이름표를 점 위·오른쪽·왼쪽·귀퉁이로 옮겨 보고, 어디에도 자리가 없을 때만 숨기고 점만 남긴다
+ *  (11-09 점검 13: 서울 이름표를 인천이 덮어 안 눌림). 앞선 핀(고른 곳 → 사건 난 곳 → 원래 순서)이 먼저 자리를 잡는다.
+ *  확대해 자리가 나면 제자리로 돌아온다. 점은 따로 그린 겹(gx-pdot)이라 이름표를 옮겨도 그대로. 숨긴 핀은 점 쪽이 대신 눌리고 읽힌다 */
+function declutter(layer: HTMLElement, frame: HTMLElement, z: number): void {
+  const labs = [...layer.querySelectorAll<HTMLElement>('.gx-pin.gx-plab')];
+  const dots = [...layer.querySelectorAll<HTMLElement>('.gx-pin.gx-pdot')];
+  if (!labs.length) return;
+  for (const el of labs) el.style.removeProperty('--lx'), el.style.removeProperty('--ly');
+  const F = box(frame);
+  const inFrame = (r: Box) => r.l >= F.l && r.r <= F.r && r.t >= F.t && r.b <= F.b;
+  const dotBox = dots.map((d) => { const dot = d.querySelector('.gx-dot'); return dot ? box(dot) : null; });
+  const order = labs.map((el, i) => ({ el, i })).sort((a, b) => rank(a.el) - rank(b.el) || a.i - b.i);
+  // 확대 단추 밑에도 이름표를 두지 않는다
+  const placed: Box[] = [...frame.querySelectorAll('.gx-zbtn')].map(box);
+  for (const { el, i } of order) {
+    const name = el.querySelector('.gx-pname');
+    const D = dotBox[i];
+    if (!name || !D) continue;
+    const N = box(name);
+    const w = N.r - N.l, h = N.b - N.t, my = (D.t + D.b) / 2 - h / 2;
+    // 아래(제자리) → 위 → 오른쪽 → 왼쪽 → 네 귀퉁이
+    const up = D.t - 2 - h, dn = D.b + 2, rt = D.r + 1, lt = D.l - 1 - w;
+    const spots: [number, number][] = [[N.l, N.t], [N.l, up], [D.r + 3, my], [D.l - 3 - w, my], [rt, up], [lt, up], [rt, dn], [lt, dn]];
+    const free = (r: Box) => !placed.some((p) => hit(p, r)) && !dotBox.some((d, j) => j !== i && d && hit(d, r));
+    let at = -1;
+    spots.some(([l, t], k) => {
+      const r = { l, t, r: l + w, b: t + h };
+      if ((k === 0 || inFrame(r)) && (rank(el) === 0 && k === 0 || free(r))) return (at = k), placed.push(r), true;
+      return false;
+    });
+    const blocked = at < 0;
+    el.classList.toggle('lab-off', blocked);
+    if (at > 0) {
+      el.style.setProperty('--lx', `${(spots[at][0] - N.l) / z}px`);
+      el.style.setProperty('--ly', `${(spots[at][1] - N.t) / z}px`);
+    }
+    const d = dots[i];
+    d.toggleAttribute('title', blocked);
+    if (blocked) d.title = el.getAttribute('aria-label') ?? '';
+    d.tabIndex = blocked ? 0 : -1;
+    d.setAttribute('aria-hidden', String(!blocked));
+  }
+}
+
 /** render() 뒤에 부른다. 지도 칸이 없으면 아무것도 안 한다 */
 export function bindMapZoom(root: HTMLElement): void {
   const canvas = root.querySelector<HTMLElement>('.gx-canvas[data-map]');
@@ -46,6 +95,7 @@ export function bindMapZoom(root: HTMLElement): void {
     layer.style.setProperty('--pz', String(Math.pow(v.z, 0.25) / v.z));
     canvas.classList.toggle('zoomed', v.z > 1);
     canvas.classList.toggle('pan', canPan());
+    declutter(layer, canvas, v.z);
   };
   /** 칸 안의 한 점(px)을 붙잡은 채 배율을 바꾼다 */
   const zoomAt = (z: number, cx: number, cy: number) => {

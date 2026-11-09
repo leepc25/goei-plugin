@@ -79,7 +79,7 @@ for (const vp of ['pc', 'phone']) {
   await page.evaluate(async () => { window.__chat.scriptstate.$st_item_use = JSON.stringify([{ id: 'i_salt', n: 1 }]); window.__chat.message[1].data += '\n[shop: 을지로 철물점|백사헌]'; await window.__calls.listeners[0]({ char: window.__char, chat: window.__chat, characterIndex: 0, chatIndex: 0, messageIndex: 1 }); });
   await sleep(300);
   await openWin(page); await sleep(300);
-  await openEditor(page, 'set:items');
+  await openEditor(page, 'manage:backup'); // 2026-11-08 사용자: 기본값 불러오기는 점검 → 저장·불러오기
   await flip('set-bar', 'load');
   await flip('set-bar-yes');
   s = await ss();

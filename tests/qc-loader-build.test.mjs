@@ -68,9 +68,10 @@ test('자료 팩 조각: 이어 붙이면 팩 글, 지문이 본체에 박혀 �
   assert.deepEqual([w.schema, w.kind], [1, 'world']);
   assert.deepEqual([Object.keys(w.agent).length, Object.keys(w.org).length, Object.keys(w.anomaly).length, Object.keys(w.site).length, Object.keys(w.appendix).length, Object.keys(w.relations.pairs).length], [55, 17, 63, 11, 4, 78]);
   const i = JSON.parse(installPackText());
-  assert.deepEqual([i.schema, i.kind, i.greetings.texts.length, i.icon.file], [1, 'install', 1, 'icon.png']);
+  assert.deepEqual([i.schema, i.kind, i.greetings.texts.length], [1, 'install', 1]);
+  assert.match(i.icon.file, /^icon\.(png|webp)$/);
   // 본체 크기: 자료를 뺀 뒤 (개선 나1 전 3.42MB · 18조각)
-  assert.ok(Buffer.byteLength(body) < 2_800_000, `본체 ${Buffer.byteLength(body)} 바이트 < 2.8MB`); // 소지품·상점(11-07) 뒤 2.51MB
+  assert.ok(Buffer.byteLength(body) < 3_000_000, `본체 ${Buffer.byteLength(body)} 바이트 < 3.0MB`); // 소지품·상점(11-07) 뒤 2.51MB, 인터넷 사이트 화면·쇼핑몰(11-08) 뒤 2.82MB
   // 세계 자료 한 파일(goei-data-world.txt, 릴리스 zip 에 넣어 받기 창의 「파일로 넣기」로): 조각을 이은 글과 같다
   assert.equal(read('dist/goei-data-world.txt'), worldPackText(), 'goei-data-world.txt = 팩 글 전체');
   // 시험용 예외 주입(src/body.ts faultOn 의 GOEI_TEST 블록)은 배포 본체에 없고 시험 본체(dist-test/goei-body.js)에만 있다

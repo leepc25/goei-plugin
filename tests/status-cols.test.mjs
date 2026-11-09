@@ -1,17 +1,20 @@
 // 상태창 칸 정의 (설계안 7절): 칸 구성 읽기, 사용·표시, 구성 기록, 지침 절 조립, 칸 구성에 따른 파서
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { colConfig, usedCols, hiddenCols, colLog, withColLog, setStatusColumns, shapeFor, formatStatusLine, statusSection, fillStatusSection, parseWalletCell, findStatusTags, rebuildStatusLine, withStatusBlock, STATUS_HEAD, COL_IDS } from '../dist-test/core.mjs';
+import { POINTS_ON_VAR, colConfig, usedCols, hiddenCols, colLog, withColLog, setStatusColumns, shapeFor, formatStatusLine, statusSection, fillStatusSection, parseWalletCell, findStatusTags, rebuildStatusLine, withStatusBlock, STATUS_HEAD, COL_IDS } from '../dist-test/core.mjs';
+
+// 포인트 칸(11번째, 2026-11-08)은 기본 「자동」이라 신분이 백일몽이 아니면 빠진다. 나머지 열 칸
+const TEN = COL_IDS.filter((c) => c !== 'points');
 
 test('칸 구성: 없으면 모두 on, 잠긴 칸(날짜·시각·위치)은 off 가 될 수 없다', () => {
   const cfg = colConfig({});
-  assert.deepEqual(usedCols(cfg), COL_IDS);
-  assert.equal(hiddenCols(cfg).size, 0);
+  assert.deepEqual(usedCols(cfg), TEN);
+  assert.deepEqual([...hiddenCols(cfg)], ['points'], '안 쓰는 포인트 칸만');
   const c2 = colConfig({ $st_col_date: 'off', $st_col_weather: 'off', $st_col_temp: 'hide', $st_col_wallet: 'bogus' });
   assert.equal(c2.date, 'hide', '잠긴 칸을 끄면 숨김으로');
   assert.equal(c2.weather, 'off');
-  assert.deepEqual(usedCols(c2), COL_IDS.filter((c) => c !== 'weather'));
-  assert.deepEqual([...hiddenCols(c2)].sort(), ['date', 'temp', 'weather'], '안 쓰는 칸도 상자에서 숨김');
+  assert.deepEqual(usedCols(c2), TEN.filter((c) => c !== 'weather'));
+  assert.deepEqual([...hiddenCols(c2)].sort(), ['date', 'points', 'temp', 'weather'], '안 쓰는 칸도 상자에서 숨김');
   assert.equal(c2.wallet, 'on');
 });
 
@@ -32,7 +35,7 @@ test('줄 만들기: 빈 값은 없음, | 와 ] 는 치운다', () => {
 });
 
 test('지침 절: 칸 구성대로 형식 줄·규칙·예시', () => {
-  const full = statusSection(COL_IDS);
+  const full = statusSection(TEN);
   assert.ok(full.includes('[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed|identity|balance]'));
   assert.ok(full.includes('Balance =') && full.includes('Identity =') && full.includes('Companions ='));
   assert.ok(full.includes('[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입|관리국/요원|1180000]'));
@@ -86,9 +89,9 @@ test('직전 상태 줄 다시 만들기: 끈 칸은 빼고, 새 칸은 없음, 
   setStatusColumns({});
   const line = '[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|쟈알디|없음]';
   assert.equal(rebuildStatusLine(line, ['date', 'time', 'place', 'companions', 'identity', 'wallet'], { identity: '관리국/신입', wallet: 1230000 }), '[▣|2025.01.01|02:47 AM|서울 종로구 거리|쟈알디|관리국/신입|1230000]');
-  assert.equal(rebuildStatusLine(line, COL_IDS, { wallet: null }), '[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|쟈알디|없음|없음|없음]');
+  assert.equal(rebuildStatusLine(line, TEN, { wallet: null }), '[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|쟈알디|없음|없음|없음]');
   const ten = '[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음|관리국/요원|5000]';
-  assert.equal(rebuildStatusLine(ten, COL_IDS, { wallet: 7000 }), ten.replace('5000', '7000'), '잔고는 장부 값이 이긴다');
+  assert.equal(rebuildStatusLine(ten, TEN, { wallet: 7000 }), ten.replace('5000', '7000'), '잔고는 장부 값이 이긴다');
   assert.equal(rebuildStatusLine('[▣|이상한 줄]', COL_IDS, {}), '[▣|이상한 줄]', '읽지 못하면 그대로');
 });
 
@@ -104,10 +107,37 @@ test('직전 상태 블록: 모양이 주어지면 그 칸 구성과 칸 이름�
 test('구성 기록: 비어 있으면 바뀌기 전 구성을 먼저 남김, $st_col_log 는 설정 변수 아님', async () => {
   const { settings } = await import('../dist-test/core.mjs');
   const prev = { $st_col_weather: 'off' };
-  const log = colLog({ $st_col_log: withColLog(prev, 4, COL_IDS) });
+  const log = colLog({ $st_col_log: withColLog(prev, 4, TEN) });
   assert.deepEqual(log.map((e) => e.from), [0, 4]);
-  assert.deepEqual(log[0].cols, COL_IDS.filter((c) => c !== 'weather'));
+  assert.deepEqual(log[0].cols, TEN.filter((c) => c !== 'weather'));
   assert.equal(colLog({ $st_col_log: withColLog({}, 0, ['date', 'time', 'place']) }).length, 1, '메시지가 없으면 그대로');
   assert.equal(settings.isChatSettingVar('$st_col_log'), false);
   assert.equal(settings.isChatSettingVar('$st_col_wallet'), true);
+});
+
+// 백일몽 포인트 칸 (2026-11-08 사용자: 백일몽이면 자동으로 켜지고, 아니면 칸 자체가 빠진다)
+test('포인트 칸: 자동(신분이 백일몽일 때만), 직접 고르면 그 값, 자동+숨김', () => {
+  assert.equal(colConfig({}).points, 'off');
+  assert.equal(colConfig({ [POINTS_ON_VAR]: '1' }).points, 'on');
+  assert.deepEqual(usedCols(colConfig({ [POINTS_ON_VAR]: '1' })), COL_IDS);
+  assert.equal(colConfig({ [POINTS_ON_VAR]: '1', $st_col_points: 'autohide' }).points, 'hide');
+  assert.equal(colConfig({ [POINTS_ON_VAR]: '0', $st_col_points: 'on' }).points, 'on', '직접 「사용」');
+  assert.equal(colConfig({ [POINTS_ON_VAR]: '1', $st_col_points: 'off' }).points, 'off', '직접 「사용 안 함」');
+});
+
+test('포인트 칸: 지침 절·파서·직전 상태 줄', () => {
+  const s = statusSection(COL_IDS);
+  assert.ok(s.includes('|identity|balance|points]') && s.includes('Points ='));
+  assert.ok(s.includes('|백일몽/사원|1230000|900]'), '포인트 칸이 있으면 예시 신분도 백일몽');
+  setStatusColumns({ [POINTS_ON_VAR]: '1' });
+  const [t] = findStatusTags('[▣|2025.01.01|10:15 PM|🌫️|9°C|백일몽 본사|없음|없음|없음|백일몽/사원|1180000|900p]');
+  assert.equal(t.identity, '백일몽/사원');
+  assert.equal(t.wallet, '1180000');
+  assert.equal(t.points, '900');
+  setStatusColumns({});
+  const [k] = findStatusTags('[▣|2025.01.01|10:15 PM|🌫️|9°C|백일몽 본사|없음|없음|없음|백일몽/사원|1180000|1,200 포인트]');
+  assert.equal(k.points, '1200', '알려진 11칸 모양');
+  const line = '[▣|2025.01.01|10:15 PM|🌫️|9°C|백일몽 본사|없음|없음|없음|백일몽/사원|1180000|900]';
+  assert.equal(rebuildStatusLine(line, COL_IDS, { wallet: 1180000, points: 800 }), line.replace('|900]', '|800]'), '포인트는 장부 값이 이긴다');
+  assert.equal(rebuildStatusLine(line, TEN, { wallet: 1180000 }), line.replace('|900]', ']'), '칸이 빠지면 줄에서도 빠짐');
 });

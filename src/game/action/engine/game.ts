@@ -3,6 +3,7 @@
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
 import { view } from './view';
+import { versus, roundEnd, KO_SEC, OVER_SEC, INTRO_SEC, type Side } from './versus';
 import { charSize } from '../charSize';
 
 /** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
@@ -147,7 +148,8 @@ export class Game {
         // 폰처럼 낮은 창(CSS 600px 미만)과 필드 밖은 예전처럼 장면 세로가 창에 꽉 (그림 700, 그 밖 720)
         // 11-02 사용자: 필드는 장면 세로를 창에 꽉 채우고(검은 띠 없음), 사람이 가장 큰 장면 기준으로 다른 장면은 더 키운다(view.sceneZoom ≥ 1, 위아래는 주인공을 따라 움직임). 10-27의 PC 1배 고정은 폐기.
         const H = this.inHub ? view.worldH : SCREEN_H;
-        view.zoom = (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
+        // 투명 무대(대전)는 그림판이 16:9보다 높다: 폭 기준으로 그리고 남는 위쪽은 비워 둔다
+        view.zoom = view.clear && !this.inHub ? this.canvas.width / SCREEN_W : (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
@@ -174,12 +176,13 @@ export class Game {
         }
         if (vh > H + 0.5) {
           // 장면이 화면보다 짧다: 가운데 두고 위아래는 검게
-          view.cropY = -Math.round(((vh - H) / 2) * view.zoom) / view.zoom;
+          view.cropY = -Math.round(((vh - H) / (view.clear ? 1 : 2)) * view.zoom) / view.zoom; // 투명 무대는 바닥을 아래에 붙인다
         } else if (vh < H - 0.5 && w) {
           const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
+        if (view.clear) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
         this.ctx.translate(-view.crop, -view.cropY);
@@ -389,7 +392,35 @@ export class Game {
           if (open) return;
         }
         if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
+        // 대전(투명 무대): 판 시작(ROUND n → FIGHT)·경기 끝 표시 동안은 멈춘다
+        if (view.clear && versus.hold) return;
+        if (view.clear && (versus.intro > 0 || versus.over)) {
+          const dt = 1 / TICK_HZ;
+          if (versus.intro > 0) versus.intro = Math.max(0, versus.intro - dt);
+          if (versus.over && (versus.over.t -= dt) <= 0) {
+            const side = versus.over.side;
+            versus.over = null;
+            versus.onMatchEnd?.(side);
+          }
+          return;
+        }
         w.step(p);
+        // 대전: 쓰러지면 KO 표시 → 3판 2선승이면 경기 끝, 아니면 같은 무대로 다음 판. 본부·결과 화면으로 가지 않는다
+        if (view.clear) {
+          const foeDown = w.bodies.some((b) => b.team === 'enemy') && !w.bodies.some((b) => b.team === 'enemy' && b.alive && b.hp > 0);
+          if (!versus.ko && (w.ended || foeDown || w.player.hp <= 0)) {
+            const side: Side = w.player.hp > 0 && foeDown ? 0 : 1;
+            const foe = w.bodies.find((b) => b.team === 'enemy');
+            const ratio = (b: { hp: number; hpMax: number } | undefined) => (b && b.hpMax > 0 ? Math.max(0, b.hp / b.hpMax) : 0);
+            versus.ko = { side, t: KO_SEC, next: roundEnd(side, [ratio(w.player), ratio(foe)]) };
+          } else if (versus.ko && (versus.ko.t -= 1 / TICK_HZ) <= 0) {
+            const { side, next } = versus.ko;
+            versus.ko = null;
+            if (next === 'over') versus.over = { side, t: OVER_SEC };
+            else { versus.intro = INTRO_SEC; this.start_new(this.run?.stageId); }
+          }
+          return;
+        }
         if (w.ended) {
           const how = w.ended;
           if (how === 'next') {

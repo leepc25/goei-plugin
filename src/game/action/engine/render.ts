@@ -26,6 +26,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function background(w: World, camX: number) {
     const f = w.floor;
     const pal = f.palette ?? { wall: '#2b343a', floor: '#3a4247', accent: '#5b6a72' };
+    if (view.clear) return;
     const [top] = w.lane;
     // 필드는 엔진(game.ts)이 이미 화면 전체를 검게 칠했다: 장면 밖에 1280×720 회색 판이 남지 않게
     if (!view.hub) {
@@ -521,7 +522,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         ctx.translate(-camX, 0);
         w.floor.drawForeground(ctx, camX, w);
         ctx.restore();
-      } else if (w.light < 1) {
+      } else if (w.light < 1 && !view.clear) { // 투명 무대는 어둡게 덮지 않는다
         ctx.fillStyle = `rgba(0,0,0,${(1 - w.light) * 0.9})`;
         ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
       }
@@ -531,8 +532,9 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (corePlayer(w.player)) {
         // 컷인·번쩍임·쓰러짐은 화면 기준 (화면 확대·세로 따라가기와 무관)
         ctx.save();
-        const hz = ctx.canvas.height / SCREEN_H;
-        ctx.setTransform(hz, 0, 0, hz, 0, 0);
+        // 투명 무대(대전)는 그림판이 16:9보다 높다: 폭 기준 배율, 세로 가운데
+        const hz = view.clear ? ctx.canvas.width / SCREEN_W : ctx.canvas.height / SCREEN_H;
+        ctx.setTransform(hz, 0, 0, hz, 0, view.clear ? Math.round((ctx.canvas.height - SCREEN_H * hz) / 2) : 0);
         w.player.drawScreen(ctx);
         ctx.restore();
       }

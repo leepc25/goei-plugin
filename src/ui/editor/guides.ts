@@ -3,7 +3,7 @@ import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joi
 import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
 import { savePrefs } from '../../host/prefs';
-import { ICONS } from '../icons';
+import { copyBtn } from '../copy';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -13,6 +13,11 @@ export const GUIDE_MAX = 120000;
 
 const HELP: Record<GuideName, string> = {
   GNet: '괴담넷 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Gal: '괴담갤 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Wpf: '세정게 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Salmon: '연어 마켓 거래 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
+  Cos: '우주 쇼핑몰 지침: 물건 목록 짜기·운영자 문의 답. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요.',
+  Bm: '백일몽 포인트몰 지침: 물건 목록 짜기. 절마다 플러그인이 요청에 따라 골라 써요. {size}·{line}·{price}·{prev} 자리는 플러그인이 채워요.',
   Phone: '괴담톡(연락처·문자) 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Wiki: '위키 문서 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Directive: '요원 이동·커스텀 임무 때 모델에 주는 장면 지시문. COMMON·OPENING·CONTINUATION·CONTEXT·FORMAT(JSON) 절.',
@@ -27,7 +32,6 @@ const HELP: Record<GuideName, string> = {
 
 export function guidePage(name: GuideName, crumb = ''): string {
   const text = guideUi.draft[name] ?? guideText(name);
-  const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
   // 절 단위 글칸 (2026-10-27 사용자): 구분 줄(@@SECTION·===·##)은 플러그인이 들고, 사용자는 절 본문만 고친다
   // 글칸 첫 줄바꿈 하나는 HTML 이 떼어 버리므로(<textarea>\n…) 하나를 더 넣어 본문이 줄바꿈으로 시작해도 그대로 보이게 (2026-10-28 QC: 제목 뒤 빈 줄이 사라졌다)
   const parts = splitGuide(text);
@@ -41,7 +45,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
       const head = md
         ? `<input class="gw-gtitle" data-input="ed-guide-title" data-key="${name}|${i}" value="${esc(p.title)}" spellcheck="false" aria-label="절 제목">`
         : `<b>${esc(p.title)}</b>${fixed ? '<button class="gw-fhint" type="button" data-action="ed-hint" data-hint="이 이름은 플러그인이 요청마다 절을 골라 쓸 때 쓰는 이름표예요. 그래서 바꿀 수 없고, 본문만 고칠 수 있어요.">?</button>' : ''}`;
-      return `<div class="gw-field${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
+      return `<div class="gw-field gw-copyto${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span>${copyBtn()}</div>
       <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="${p.body.trim() ? 3 : 1}" spellcheck="false">\n${esc(p.body)}</textarea></div>`;
     })
     .join('');
@@ -49,21 +53,16 @@ export function guidePage(name: GuideName, crumb = ''): string {
     ? `<h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
     : `<h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h3>`;
   return `<div class="gw-page${crumb ? ' gw-set' : ''}"><header class="gw-head">${title}
-      <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span>
-        <button class="gx-mini" data-action="ed-guide-save" data-value="${name}" ${dirty ? '' : 'disabled'}>${ICONS.pen}지침 저장</button>
-        <button class="gx-mini" data-action="ed-guide-reset" data-value="${name}" ${guideOverridden(name) || dirty ? '' : 'disabled'}>기본으로</button></div>
+      <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span></div>
       <p class="gx-muted">${esc(HELP[name])}</p>${guideUi.info ? `<p class="gx-hint">${esc(guideUi.info)}</p>` : ''}</header>
     <div class="gw-fields gw-guide-secs">${rows}</div>
   </div>`;
 }
 
-/** 입력 중 머리의 「지침 저장」「기본으로」 잠금과 토큰 수만 맞춘다 (창 전체를 다시 그리면 커서가 날아간다, 2026-10-28 QC: 입력해도 저장 단추가 잠긴 채였다) */
+/** 입력 중 머리의 토큰 수만 맞춘다 (창 전체를 다시 그리면 커서가 날아간다) */
 export function guideBarSync(root: ParentNode, name: string): void {
   if (!isGuideName(name)) return;
   const text = guideUi.draft[name] ?? guideText(name);
-  const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
-  root.querySelector(`[data-action="ed-guide-save"][data-value="${name}"]`)?.toggleAttribute('disabled', !dirty);
-  root.querySelector(`[data-action="ed-guide-reset"][data-value="${name}"]`)?.toggleAttribute('disabled', !(guideOverridden(name) || dirty));
   const tok = root.querySelector('.gw-head .gw-tokens');
   if (tok) tok.textContent = `${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰`;
 }
@@ -119,18 +118,7 @@ export async function guideAction(action: string, value: string | undefined): Pr
       return { ...p, guides };
     });
     delete guideUi.draft[name];
-    guideUi.info = isDefault ? '기본 글과 같아서 기본으로 저장했어요.' : '지침을 저장했어요. 다음 요청부터 쓰여요.';
-    return true;
-  }
-  if (action === 'ed-guide-reset') {
-    setGuideOverride(name, '');
-    await savePrefs((p) => {
-      const guides = { ...(p.guides ?? {}) };
-      delete guides[name];
-      return { ...p, guides };
-    });
-    delete guideUi.draft[name];
-    guideUi.info = '기본 지침으로 되돌렸어요.';
+    // 바로 저장이라 저장 알림은 띄우지 않는다 (2026-11-08 사용자)
     return true;
   }
   return false;

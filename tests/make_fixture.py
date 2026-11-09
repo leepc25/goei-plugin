@@ -18,7 +18,12 @@ for a in card.get('assets', []):
     path = f"assets/{a['name']}.{a['ext']}"
     (out.parent / path).write_bytes(z.read(src))
     assets.append([a['name'], path, a['ext']])
+# Risu 가 카드를 가져올 때처럼: character_book 에 재귀·깊이·예산이 다 있으면 봇 로어북 설정으로 (없으면 「글로벌 설정 사용」)
+book = card.get('character_book') or {}
+lore_settings = ({'tokenBudget': book['token_budget'], 'scanDepth': book['scan_depth'], 'recursiveScanning': book['recursive_scanning']}
+                 if all(book.get(k) is not None for k in ('token_budget', 'scan_depth', 'recursive_scanning')) else None)
 out.write_text(json.dumps({
     'name': card['name'], 'type': 'character', 'firstMessage': card['first_mes'],
+    **({'loreSettings': lore_settings} if lore_settings else {}),
     'alternateGreetings': card['alternate_greetings'], 'globalLore': mod['lorebook'], 'additionalAssets': assets,
 }, ensure_ascii=False))

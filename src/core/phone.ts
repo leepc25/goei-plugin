@@ -25,6 +25,9 @@ export const PH_BULLETINS = PH('bulletins');
 export const PH_AUTO_LAST = PH('auto_last');
 export const PH_UNREAD = '$st_unread_phone';
 
+/** 단톡 수다 줄 수 범위 */
+export const BANTER_ROWS: [number, number] = [1, 40];
+
 export const PH_DEFAULTS: Record<string, string> = {
   model: 'aux', auto: '0', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
   incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
@@ -33,7 +36,7 @@ export const PH_DEFAULTS: Record<string, string> = {
   /** 연락처 말버릇 기록 (라이트보드 미니톡 keyFigures, 2026-11-06) */
   habits: '1',
   /** 단톡 수다: 확인할 때 내 단톡방 하나에서 NPC끼리 대화 한 조각 (라이트보드 미니톡 기본 동작, 2026-11-06) */
-  banter: '0', banter_chance: '30',
+  banter: '0', banter_chance: '30', banter_min: '6', banter_max: '12',
   /** 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06). core/phoneView.ts */
   view_preset: 'side', view_pov: '', view_speak: '0', view_scope: '0', view_size: '0', view_auto: 'manual',
 };
@@ -95,6 +98,8 @@ export interface PhoneSettings {
   habits: boolean;
   banter: boolean;
   banterChance: number;
+  /** 단톡 수다 줄 수 [최소, 최대] (2026-11-08 사용자: 개수는 최소·최대 직접) */
+  banterRows: [number, number];
 }
 
 export function phoneValue(state: Record<string, unknown> | undefined, key: string): string {
@@ -128,6 +133,11 @@ export function phoneSettings(state: Record<string, unknown> | undefined): Phone
     habits: v('habits') !== '0',
     banter: v('banter') === '1',
     banterChance: pct('banter_chance'),
+    banterRows: (() => {
+      const n = (k: string) => { const x = Math.floor(Number(v(k))); return Number.isFinite(x) && v(k) !== '' ? Math.max(BANTER_ROWS[0], Math.min(BANTER_ROWS[1], x)) : Number(PH_DEFAULTS[k]); };
+      const a = n('banter_min');
+      return [a, Math.max(a, n('banter_max'))] as [number, number];
+    })(),
   };
 }
 

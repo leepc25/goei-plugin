@@ -9,7 +9,7 @@ const chat = (last, extra = {}) => ({
   message: [{ role: 'user', data: '들어간다', chatId: 'u1' }, { role: 'char', data: '옛 응답\n[shop: 옛 가게|아무개]', chatId: 'c0' }, { role: 'user', data: '둘러본다', chatId: 'u2' }, { role: 'char', data: last, chatId: 'c1' }],
   scriptstate: { ...extra },
 });
-const SHELF = '<shop-identity>\nsells: 공구, 소모품\nnever: 음식\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>뭐 찾소.</owner>\n<shelf>\n손전등|18000|사용|flashlight|LED|비춘다\n부적|30000|소모3|talisman|종이|\n쇠파이프|9000|무기·사용|iron pipe||\n생수|1500|소모1|water bottle|500ml|\n</shelf>';
+const SHELF = '<shop-identity>\nsells: 공구, 소모품\nnever: 음식\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>뭐 찾소.</owner>\n<shelf>\n손전등|18000|사용|flashlight|0.5|LED|비춘다\n부적|30000|소모3|talisman|0.5|종이|\n쇠파이프|9000|무기·사용|iron pipe|0.5||\n생수|1500|소모1|water bottle|0.5|500ml|\n</shelf>';
 
 test('표식: 마지막 것, 주인 생략 가능, 지우면 줄째', () => {
   assert.deepEqual(findShopTag('글\n[shop: 을지로 철물점|백사헌]'), { raw: '[shop: 을지로 철물점|백사헌]', shop: '을지로 철물점', owner: '백사헌' });
@@ -43,6 +43,7 @@ test('응답 처리: 새 가게는 새 판, 같은 가게는 그대로, 표식 �
 
 test('진열대 응답: 정체 블록·주인 대사·물건 줄(쓰임·그림 칸). 값은 거르지 않음', () => {
   const r = parseShelf(SHELF, null);
+  assert.equal(r.items[0].weight, 0.5, '무게 칸 (11-08)');
   assert.equal(r.identity.sells, '공구, 소모품');
   assert.equal(r.identity.prices, '싸다');
   assert.equal('min' in r.identity || 'max' in r.identity, false, '값대 숫자는 받지 않음(옛 응답에 price_range 줄이 있어도 무시)');
@@ -56,9 +57,9 @@ test('진열대 응답: 정체 블록·주인 대사·물건 줄(쓰임·그림 
   assert.deepEqual([by('쇠파이프').equip, by('쇠파이프').use], ['weapon', true]);
   assert.equal(st.talk[0].text, '뭐 찾소.');
   assert.throws(() => parseShelf('<shelf>\n이름만\n</shelf>', null), /물건 줄/);
-  assert.throws(() => parseShelf('<owner>a</owner>\n<shelf>\n손전등|1000|사용|||\n</shelf>', null), /shop-identity/);
+  assert.throws(() => parseShelf('<owner>a</owner>\n<shelf>\n손전등|1000|사용||0.5||\n</shelf>', null), /shop-identity/);
   // 새로고침: 정체는 그대로, 지난 진열대는 prev 로
-  const r2 = parseShelf('<owner></owner>\n<shelf>\n밧줄|5000|사용|rope||\n손전등|18000|사용|||\n</shelf>', st.identity);
+  const r2 = parseShelf('<owner></owner>\n<shelf>\n밧줄|5000|사용|rope|0.5||\n손전등|18000|사용||0.5||\n</shelf>', st.identity);
   const st2 = applyShelf(st, r2, shopSettings({}));
   assert.deepEqual(shelfItems(st2).map((x) => x.name), ['밧줄', '손전등']);
   assert.ok(st2.prev.includes('생수'));
@@ -68,14 +69,14 @@ test('말하기 응답: 변경 없음 / 일부(추가·값·빼기) / 전체, �
   const st0 = applyShelf(readShop(settleShop(chat('x\n[shop: 철물점|주인]'), 3).vars), parseShelf(SHELF, null), shopSettings({}));
   const none = parseTalk('<owner>그건 없소.</owner>\n<change mode="none">\n</change>');
   assert.equal(none.mode, 'none');
-  const part = parseTalk('<owner>천 원 빼 주지. 밧줄도 있고.</owner>\n<change mode="partial">\n~ 손전등|17000\n+ 밧줄|5000|사용|rope|10m|\n- 생수\n- 부적\n- 쇠파이프\n</change>');
+  const part = parseTalk('<owner>천 원 빼 주지. 밧줄도 있고.</owner>\n<change mode="partial">\n~ 손전등|17000\n+ 밧줄|5000|사용|rope|0.5|10m|\n- 생수\n- 부적\n- 쇠파이프\n</change>');
   const st1 = applyTalk(sayToOwner(st0, '깎아 줘'), part);
   const fl = shelfItems(st1).find((x) => x.name === '손전등');
   assert.equal(fl.price, 17000);
   assert.equal(fl.orig, 18000);
   assert.deepEqual(shelfItems(st1).map((x) => x.name), ['손전등', '밧줄']);
   assert.equal(st1.talk.at(-2).who, 'me');
-  const all = parseTalk('<owner>싹 바꿨소.</owner>\n<change mode="all">\n망치|12000|무기·사용|hammer||\n</change>');
+  const all = parseTalk('<owner>싹 바꿨소.</owner>\n<change mode="all">\n망치|12000|무기·사용|hammer|0.5||\n</change>');
   assert.deepEqual(shelfItems(applyTalk(st1, all)).map((x) => x.name), ['망치']);
   const closed = parseTalk('<owner>나가쇼.</owner>\n<change mode="none"></change>\n<closed/>');
   assert.equal(applyTalk(st1, closed).closed, true);
@@ -135,7 +136,7 @@ test('팔기: 제안 읽기(offer·~줄), 값대 넘어도 그대로, 흥정하�
 
 // 2026-11-07 사용자: 희귀는 단 하나·따로 화려한 칸, 특가는 원래 값에 줄 긋기, 분량은 최소·최대
 test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 더 클 때만, 분량 최소·최대·옛 구간', () => {
-  const raw = '<shop-identity>\nsells: tool\nnever: x\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>자.</owner>\n<shelf>\n황동 나침반|900000|사용|compass|괴이를 가리킨다||희귀\n은 손전등|200000|사용||||레어\n줄자|3000|사용||||특가:5000\n망치|9000|무기||||특가:8000\n끌|4000|-||||할인：6,000원\n</shelf>';
+  const raw = '<shop-identity>\nsells: tool\nnever: x\nprices: 싸다\nprice_range: 1000~50000\n</shop-identity>\n<owner>자.</owner>\n<shelf>\n황동 나침반|900000|사용|compass|0.5|괴이를 가리킨다||희귀\n은 손전등|200000|사용||0.5|||레어\n줄자|3000|사용||0.5|||특가:5000\n망치|9000|무기||0.5|||특가:8000\n끌|4000|-||0.5|||할인：6,000원\n</shelf>';
   const st0 = { key: 'k', shop: '가게', owner: '주인', raw: '', identity: { sells: '', never: '', prices: '' }, loaded: false, items: [], talk: [], prev: [], sales: [], closed: false, sell: null };
   const st = applyShelf(st0, parseShelf(raw, null), shopSettings({}));
   const by = (n) => st.items.find((x) => x.name === n);
@@ -145,11 +146,11 @@ test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 �
   assert.equal(by('망치').tag, undefined, '원래 값이 더 싸면 특가 아님');
   assert.deepEqual([by('끌').tag, by('끌').was], ['sale', 6000]);
   // 대화로 더한 희귀: 이미 희귀가 있으면 보통으로
-  const t = applyTalk(st, parseTalk('<owner>하나 더.</owner>\n<change mode="partial">\n+ 금빛 끌|9000|-||||희귀\n</change>'));
+  const t = applyTalk(st, parseTalk('<owner>하나 더.</owner>\n<change mode="partial">\n+ 금빛 끌|9000|-||0.5|||희귀\n</change>'));
   assert.equal(t.items.filter((x) => x.tag === 'rare').length, 1);
   // 주인도 안다: 대화 요청의 진열대 줄에 구분이 실리고, 지침이 그 뜻을 알려 준다
   const talk = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({})).map((m) => m.content).join('\n');
-  assert.match(talk, /황동 나침반\|900000\|사용\|compass\|[^\n]*\|희귀/);
+  assert.match(talk, /황동 나침반\|900000\|사용\|compass\|0\.5\|[^\n]*\|희귀/);
   assert.match(talk, /줄자\|3000\|사용\|[^\n]*\|특가:5000/);
   assert.match(talk, /「희귀」 marks the one rare piece/);
   assert.doesNotMatch(talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({ $sh_feature: '0' })).map((m) => m.content).join('\n'), /「희귀」 marks/);
@@ -159,4 +160,44 @@ test('구분: 희귀 단 하나(둘째부터 보통), 특가는 원래 값이 �
   assert.deepEqual(shopSettings({ $sh_min: '9', $sh_max: '3' }).size, [3, 9], '거꾸로 적혀도 작은 쪽이 최소');
   assert.equal(shopSettings({}).feature, true);
   assert.equal(shopSettings({ $sh_feature: '0' }).feature, false);
+});
+
+test('원이 아닌 값 (2026-11-08 사용자): 값 칸 글은 대가, 원과 섞으면 +, 흥정으로 다른 대가가 붙음, 다음 턴 「무엇으로 치르고 샀다」', async () => {
+  const { costOf, boughtLine } = await import('../dist-test/core.mjs');
+  assert.deepEqual(costOf('18000'), { price: 18000 });
+  assert.deepEqual(costOf('3만 원'), { price: 30000 });
+  assert.deepEqual(costOf('왼손 새끼손가락'), { price: 0, pay: '왼손 새끼손가락' });
+  assert.deepEqual(costOf('피 400ml'), { price: 0, pay: '피 400ml' }, '숫자가 섞인 글은 원으로 읽지 않음');
+  assert.deepEqual(costOf('5000 + 어제 기억'), { price: 5000, pay: '어제 기억' });
+  const r = parseShelf('<shop-identity>\nsells: 아무거나\nnever: -\nprices: 신체 부위만\n</shop-identity>\n<owner>띵동!</owner>\n<shelf>\n그림자 가위|허벅지 살 100g|무기|scissors|날붙이||희귀\n컵라면|머리카락 한 줌|소모1|cup noodle|매운맛||특가:5000\n</shelf>', null);
+  assert.equal(r.items[0].pay, '허벅지 살 100g');
+  assert.equal(r.items[0].price, 0);
+  assert.equal(r.items[1].tag, undefined, '원이 아닌 값에는 특가 딱지 없음');
+  // 흥정: 원 값 → 다른 대가
+  const st0 = applyShelf({ shop: '철물점', owner: '', key: 'c1', loaded: false, identity: { sells: '', never: '', prices: '' }, items: [], talk: [], closed: false, prev: [], sell: null, sales: [] }, parseShelf(SHELF, null), shopSettings({}));
+  const t = parseTalk('<owner>돈 없으면 피라도 주쇼.</owner>\n<change mode="partial">\n~ 손전등|피 200ml\n</change>');
+  assert.deepEqual(t.reprice, [{ name: '손전등', price: 0, pay: '피 200ml' }]);
+  const st1 = applyTalk(st0, t);
+  const fl = st1.items.find((x) => x.name === '손전등');
+  assert.equal(fl.pay, '피 200ml');
+  assert.equal(fl.price, 0);
+  assert.equal(fl.orig, 18000, '흥정 표시');
+  assert.equal(boughtLine({ name: '손전등', paidWith: '피 200ml', price: 0 }), '손전등 (paid with 피 200ml)');
+  assert.equal(boughtLine({ name: '부적', paidWith: '어제 기억', price: 5000 }), '부적 (paid with 어제 기억 + 5,000 won)');
+  assert.equal(boughtLine({ name: '생수', price: 1500 }), '생수');
+});
+
+// 백일몽 포인트 상점 (2026-11-08 사용자: 포인트는 포인트 상점에서만): 정체 currency 줄, 값은 포인트, 「900p」도 값으로
+test('포인트 상점: currency points 면 정체에 표시, 「900p」 값도 포인트 숫자로', () => {
+  const raw = '<shop-identity>\nsells: 복지 물품\nnever: 현금 거래\nprices: 포인트만\ncurrency: points\n</shop-identity>\n<owner>어서 오세요.</owner>\n<shelf>\n탈모약|100|사용|pill bottle|복지몰 인기 상품||\n재생 물약|10000p|소모1|potion|상처를 되돌린다|회복|\n</shelf>';
+  const r = parseShelf(raw, null);
+  assert.equal(r.identity.points, true);
+  assert.deepEqual(r.items.map((x) => [x.name, x.price, x.pay]), [['탈모약', 100, undefined], ['재생 물약', 10000, undefined]]);
+  const won = parseShelf(raw.replace('currency: points', 'currency: won'), null);
+  assert.equal(won.identity.points, undefined);
+  assert.equal(won.items[1].pay, '10000p', '원 상점에서는 포인트 값을 원으로 바꾸지 않음');
+  const st = applyShelf(readShop(settleShop(chat('x\n[shop: 임직원 복지몰]'), 3).vars), r, shopSettings({}));
+  assert.equal(readShop(shopVars(st)).identity.points, true, '저장했다 읽어도 포인트 상점');
+  const sys = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({}))[0].content;
+  assert.ok(sys.includes("Baekilmong's point shop"), '포인트 상점 절');
 });

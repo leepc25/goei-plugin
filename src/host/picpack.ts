@@ -23,7 +23,7 @@ export async function digest(b: Uint8Array): Promise<string | null> {
 }
 
 /** 사진 한 장을 받는다. Risu 본 화면에서 직접(risuFetch), 안 되면 nativeFetch. 지문이 다르면 실패 */
-async function fetchPicture(p: Picture): Promise<Uint8Array> {
+export async function fetchPicture(p: Picture): Promise<Uint8Array> {
   const url = `${UPDATE_BASE}/pic/${p[1]}.${p[2]}`;
   const ok = async (b: Uint8Array | null) => !!b?.length && ((await digest(b)) ?? p[1]) === p[1];
   const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
@@ -94,11 +94,22 @@ export async function fetchPictures(
     }
   };
   await Promise.all([saver(), saver(), saver(), saver()]);
+  return mergePictures(assets, got.map(([p], k) => [p, paths[k]]));
+}
+
+/** 저장한 사진(카드 사진, 저장 경로)을 에셋 목록에 넣는다: 같은 이름 줄은 경로만 새 것으로, 새 이름은 뒤에 붙인다 */
+export function mergePictures(assets: unknown, saved: [Picture, string][]): unknown[] {
   const rows = ((Array.isArray(assets) ? assets : []) as unknown[]).map((r) => (isRow(r) ? ([...r] as Row) : r));
-  got.forEach(([p], k) => {
-    const row = rows.find((r): r is Row => isRow(r) && r[0] === p[0]);
-    if (row) (row[1] = paths[k]), (row[2] = p[2]);
-    else rows.push([p[0], paths[k], p[2]]);
-  });
+  const at = new Map<string, Row>();
+  for (const r of rows) if (isRow(r) && !at.has(r[0])) at.set(r[0], r);
+  for (const [p, path] of saved) {
+    const row = at.get(p[0]);
+    if (row) (row[1] = path), (row[2] = p[2]);
+    else {
+      const fresh: Row = [p[0], path, p[2]];
+      rows.push(fresh);
+      at.set(p[0], fresh);
+    }
+  }
   return rows;
 }

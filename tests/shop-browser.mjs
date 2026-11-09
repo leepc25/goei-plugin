@@ -24,11 +24,12 @@ price_range: 1000~200000
 건전지 AA 8개|6000|소모8|batteries|유통기한 넉넉|
 작업용 장갑|9000|장비|work gloves|가죽 보강, 미끄럼 방지|
 전기충격기|65000|무기·사용|stun gun|허가 번호 흐릿함|
-철제 봉인 상자|120000|-|metal box|자물쇠 둘|
+철제 봉인 상자|왼손 새끼손가락|-|metal box|자물쇠 둘, 값은 몸으로|
 </shelf>`;
 const TALK_REPRICE = `<owner>건전지는 따로야. 둘이 같이 가져가면 손전등은 천 원 빼 주지.</owner>
 <change mode="partial">
 ~ 손전등|17000
+~ 공구 가방|피 200ml
 </change>`;
 const SELL_OFFER = `<owner>손전등? 방금 산 거잖소. 중고는 만 이천이면 많이 쳐 주는 거요.</owner>
 <change mode="none">
@@ -49,10 +50,10 @@ for (const vp of ['pc', 'phone']) {
   const chat = {
     message: [{ role: 'user', data: '철물점 문을 열고 들어간다.', chatId: 'u1' }, { role: 'char', data: CHAR, chatId: 'c1' }],
     // 장착 중인 물건이 있으면 팔기 화면에 「장착」 상자가 같이 뜬다 (장착한 것도 팔 수 있게)
-    scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_items: JSON.stringify({ list: [{ id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }], log: [] }) },
+    scriptstate: { $st_look: '7.1', $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_items: JSON.stringify({ list: [{ id: 'i_vest', name: '방검 조끼', desc: '입고 있음', effect: '', use: false, equip: 'gear', slot: 0, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }, { id: 'i_x0', name: '라이터', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x1', name: '붕대', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x2', name: '부적', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x3', name: '생수', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x4', name: '지도', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x5', name: '라디오', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x6', name: '소금', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x7', name: '양초', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x8', name: '나침반', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x9', name: '열쇠꾸러미', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x10', name: '손거울', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' },{ id: 'i_x11', name: '호루라기', desc: '', effect: '', use: true, state: 'ok', from: 'manual', anchor: '', at: '2026-11-07T00:00:00Z' }], log: [] }) },
   };
   // 상품 그림 팩은 저장소에 미리 둔다 (소지품과 같은 그림, host/itemicons.ts)
-  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items') } });
+  const { page, errors } = await boot(b, fx, chat, vp, { store: { 'p:goei:data-items': distPack('goei-data-items'), 'p:goei:data-looks': distPack('goei-data-looks') } });
   if (process.env.SHOP_DEBUG) page.on('console', (m) => { if (/goei/.test(m.text())) console.log('LOG', m.text().slice(0, 300)); });
   const shot = (n) => page.screenshot({ path: `${out}/${vp}_${n}.png` });
   const click = async (sel) => { await page.evaluate((q) => document.querySelector(q)?.click(), sel); await sleep(250); };
@@ -96,8 +97,17 @@ for (const vp of ['pc', 'phone']) {
   if (!st1?.loaded || st1.items.length !== 8) errorsAll.push(`[${vp}] shelf: loaded=${st1?.loaded} items=${st1?.items?.map((x) => x.name).join(',')}`);
   const pipe = st1?.items.find((x) => x.name === '쇠파이프');
   if (pipe?.equip !== 'weapon' || st1?.items.find((x) => x.name === '건전지 AA 8개')?.uses !== 8) errorsAll.push(`[${vp}] traits: ${JSON.stringify(st1?.items?.slice(0, 5))}`);
-  if (vp === 'pc') { await page.hover('.sh-c[data-value]'); await sleep(200); }
-  await shot('grid');
+  if (vp === 'pc') {
+    // 설명 팝업은 창 맨 위 층 하나 (2026-11-08 사용자: 잘림·스크롤 움찔). 오른쪽 끝 칸은 왼쪽으로 펼친다
+    await page.hover('.sh-c[data-value]'); await sleep(200);
+    const tip = await page.evaluate(() => { const t = document.querySelector('.it-tipfloat.on'); if (!t) return null; const r = t.getBoundingClientRect(); return { r: r.right, w: innerWidth, b: r.bottom, h: innerHeight }; });
+    if (!tip || tip.r > tip.w || tip.b > tip.h) errorsAll.push(`[${vp}] floating tip: ${JSON.stringify(tip)}`);
+    await shot('grid');
+    const cells = await page.$$('.sh-sale .sh-c[data-value], .sh-c[data-value]');
+    await cells[cells.length - 1].hover(); await sleep(200);
+    await shot('grid_tip_last');
+    await page.mouse.move(1, 1);
+  } else await shot('grid');
   // 3. 상세: 잔고 14만 → 전기충격기 6.5만 살 수 있음 / 봉인 상자 12만 가능 / 쇠파이프… 잔고 부족은 없음 → 잔고를 1만으로 낮춰 부족 화면도
   const ids = Object.fromEntries((st1?.items ?? []).map((x) => [x.name, x.id]));
   await act('shop-detail', ids['손전등']);
@@ -114,6 +124,10 @@ for (const vp of ['pc', 'phone']) {
   const st2 = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_shop || 'null'));
   const fl = st2?.items.find((x) => x.name === '손전등');
   if (!fl || fl.price !== 17000 || fl.orig !== 18000) errorsAll.push(`[${vp}] reprice: ${JSON.stringify(fl)}`);
+  // 다른 대가로 합의 (2026-11-08 사용자): 원 몫 0 + 대가 글
+  const bag = st2?.items.find((x) => x.name === '공구 가방');
+  if (!bag || bag.price !== 0 || bag.pay !== '피 200ml') errorsAll.push(`[${vp}] pay deal: ${JSON.stringify(bag)}`);
+  if (st2?.items.find((x) => x.name === '철제 봉인 상자')?.pay !== '왼손 새끼손가락') errorsAll.push(`[${vp}] shelf pay: ${JSON.stringify(st2?.items.find((x) => x.name === '철제 봉인 상자'))}`);
   if (!st2?.talk.some((l) => l.who === 'me' && l.text.includes('[손전등]'))) errorsAll.push(`[${vp}] my line missing: ${JSON.stringify(st2?.talk)}`);
   await shot('talk');
   if (vp === 'phone') await act('shop-drawer');
@@ -171,6 +185,15 @@ for (const vp of ['pc', 'phone']) {
   await act('shop-detail', ids['전기충격기']);
   await shot('poor');
   await act('shop-detail-close');
+  // 6b. 원이 아닌 대가: 잔고가 모자라도 구입이 열리고, 가계부는 그대로, 소지품에 무엇으로 치렀는지 남는다
+  await act('shop-detail', ids['공구 가방']);
+  await shot('detail_pay');
+  if (await page.evaluate(() => document.querySelector('.sh-det [data-action="shop-buy"]')?.disabled !== false)) errorsAll.push(`[${vp}] pay item buy disabled`);
+  const wBefore = await page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_wallet).log.length);
+  await act('shop-buy', ids['공구 가방']);
+  await sleep(300);
+  const pd = await page.evaluate(() => ({ w: JSON.parse(window.__chat.scriptstate.$st_wallet).log.length, it: JSON.parse(window.__chat.scriptstate.$st_items).list.find((e) => e.name === '공구 가방') }));
+  if (pd.w !== wBefore || pd.it?.paidWith !== '피 200ml' || pd.it?.walletId) errorsAll.push(`[${vp}] pay buy: ${JSON.stringify(pd)}`);
   // 7. 거래 끊음 → 진열대 잠김
   await page.evaluate((t) => { window.__llm = [t]; }, TALK_CLOSED);
   if (vp === 'phone') await act('shop-drawer');
@@ -188,7 +211,7 @@ for (const vp of ['pc', 'phone']) {
     return out.map((m) => String(m.content));
   });
   const inv = req.find((l) => l.includes('[Inventory]')) ?? '';
-  if (inv.includes('just bought 손전등') || !inv.includes('just sold 손전등 (14,000 won)') || !inv.includes('refused service') || !inv.includes('[shop:')) errorsAll.push(`[${vp}] inventory block: ${inv.slice(0, 200)} … ${inv.slice(-300)}`);
+  if (inv.includes('just bought 손전등') || !inv.includes('공구 가방 (paid with 피 200ml)') || !inv.includes('just sold 손전등 (14,000 won)') || !inv.includes('refused service') || !inv.includes('[shop:')) errorsAll.push(`[${vp}] inventory block: ${inv.slice(0, 200)} … ${inv.slice(-300)}`);
   // 9. 설정 페이지
   await openWin(page); await sleep(300);
   await openEditor(page, 'set:items'); await sleep(300);

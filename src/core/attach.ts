@@ -29,7 +29,8 @@ export interface BodyPart {
   asset?: string;
 }
 
-const TAG = String.raw`\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]`;
+// 몸통은 다음 「[[ATTACH:」를 넘지 않는다: 닫는 표식 없는 예시 한 줄이 뒤의 다른 첨부 끝까지 먹어(통합 요청에서 괴담톡 몫이 통째로 사라짐) 버리지 않게
+const TAG = String.raw`\[\[ATTACH:(\w+)\]\]((?:(?!\[\[ATTACH:)[\s\S])*?)\[\[\/ATTACH\]\]`;
 const HEX = String.raw`%%ATTACHMENT:([0-9a-fA-F]+)%%`;
 const ANY = () => new RegExp(`${TAG}|${HEX}`, 'g');
 
@@ -121,7 +122,7 @@ export function describe(body: string, brief = false): string {
 /** 목록 미리보기 한 줄 */
 export function previewText(body: string): string {
   return bodyParts(body)
-    .map((p) => (p.kind === 'text' ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`))
+    .map((p) => (p.kind === 'text' ? p.text.replace(/\[사진:[^\]\n]{1,80}\]/g, `[${ATTACH_LABELS.photo}]`).trim() : `[${ATTACH_LABELS[p.kind]}]`))
     .join(' ');
 }
 

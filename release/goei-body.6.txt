@@ -1,4 +1,568 @@
-turn { messages, changed: false };
+ map.set(r.statusKey, [r]);
+    }
+    return map;
+  }
+  function chatCardsAt(chat, index3) {
+    const out = [];
+    for (const list4 of collectCards(chat).values()) for (const r of list4) if (r.idx === index3) out.push(r);
+    return out;
+  }
+  async function refreshStatusContext(charIndex, chatIndex, known) {
+    if (charIndex < 0 || chatIndex < 0) return;
+    const chat = known?.chat ?? await risuai.getChatFromIndex(charIndex, chatIndex);
+    const char = known ? known.char : await getChar(charIndex);
+    if (!chat) return;
+    const texts = (chat.message ?? []).filter((m) => m.role === "char" && typeof m.data === "string").map((m) => m.data);
+    await prepareBaseDocs(char?.globalLore).catch(() => void 0);
+    const titles = /* @__PURE__ */ new Map();
+    for (const e of buildRegistry(char?.globalLore).entries) for (const t of e.terms) if (t.length >= 2 && !titles.has(t)) titles.set(t, e.name);
+    for (const d of listDocs(chat, char?.globalLore)) if (d.title.length >= 2 && !titles.has(d.title)) titles.set(d.title, d.title);
+    const terms = [...titles].map(([term, title2]) => ({ term, title: title2 })).sort((a, b) => b.term.length - a.term.length);
+    setStatusColumns(chat.scriptstate);
+    ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
+    cards = collectCards(chat);
+  }
+  function renderStatus(text4) {
+    const tags = findStatusTags(text4);
+    if (!tags.length) return text4;
+    armChatClick("status");
+    let out = text4;
+    for (const t of tags) {
+      const list4 = cards.get(t.raw.trim());
+      let extra = "";
+      if (list4?.length) {
+        armChatClick("report");
+        const p2 = cardPalette(currentTheme());
+        extra = list4.map((r) => reportCardHtml(r, p2)).join("");
+      }
+      out = out.replace(t.raw, () => statusHtml(t, ctx) + extra);
+    }
+    return out;
+  }
+  onChatClick("status", async (doc2, x, y) => {
+    const boxes = await elements(doc2, "[data-goei-status]");
+    if (!boxes.length) return "idle";
+    let inside2 = false;
+    for (const b of boxes) if (await hit2(b, x, y)) inside2 = true;
+    const tips = await elements(doc2, "[data-gst-tip]");
+    let hitTip = false;
+    for (const el of tips) {
+      const on2 = inside2 && await hit2(el, x, y);
+      const open4 = await el.hasClass("open").catch(() => false);
+      if (on2 && !open4) {
+        await el.addClass("open");
+        hitTip = true;
+      } else if (open4) await el.removeClass("open");
+      if (on2) hitTip = true;
+    }
+    if (hitTip || !inside2) return hitTip;
+    for (const el of await elements(doc2, "[data-goei-wiki]")) {
+      if (!await hit2(el, x, y)) continue;
+      const name = (await el.textContent().catch(() => "") ?? "").trim();
+      const title2 = ctx.terms.find((t) => t.term === name)?.title;
+      if (title2 && openWiki) openWiki(title2);
+      return true;
+    }
+    return false;
+  });
+  onChatClick("report", async (doc2, x, y) => {
+    const links = await elements(doc2, "[data-goei-rec]");
+    if (!links.length) return "idle";
+    let inside2 = false;
+    for (const el of links) if (await hit2(el, x, y)) inside2 = true;
+    if (!inside2) return false;
+    const ids = new Set([...cards.values()].flat().map((r) => r.id).filter((id2) => /^[A-Za-z0-9_-]+$/.test(id2)));
+    for (const id2 of ids) {
+      for (const el of await elements(doc2, `[data-goei-rec="${id2}"]`)) {
+        if (!await hit2(el, x, y)) continue;
+        if (openRecords) openRecords(id2);
+        return true;
+      }
+    }
+    return true;
+  });
+
+  // src/host/user.ts
+  var USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""><b data-goei-uname>{{user}}</b></span>';
+  var MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", avif: "image/avif" };
+  var cached = { name: "", photo: null };
+  var lastSrc = "";
+  var SRC_KEY = "goei:user-src";
+  var NAME_KEY = "goei:user-name";
+  function toBytes(data3) {
+    if (data3 instanceof Uint8Array) return data3;
+    if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
+    if (Array.isArray(data3)) return new Uint8Array(data3);
+    if (data3 && typeof data3 === "object") {
+      const values = Object.values(data3);
+      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+    }
+    return null;
+  }
+  var unescape = (s8) => s8.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  function assetPathOf(src) {
+    const sw = src.match(/\/sw\/img\/([0-9a-f]+)/i);
+    if (sw) {
+      const hex3 = sw[1];
+      const bytes = new Uint8Array(hex3.length / 2);
+      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex3.slice(i * 2, i * 2 + 2), 16);
+      const path = new TextDecoder().decode(bytes);
+      return path.startsWith("assets/") ? path : null;
+    }
+    let s8 = src;
+    try {
+      s8 = decodeURIComponent(src);
+    } catch {
+    }
+    const m = s8.replace(/\\/g, "/").match(/(?:^|\/)assets\/([^/?#]+)$/);
+    return m ? `assets/${m[1]}` : null;
+  }
+  async function photoFrom(src) {
+    if (!src) return null;
+    if (src.startsWith("data:")) return src;
+    const path = assetPathOf(src);
+    if (!path) return null;
+    const data3 = await risuai.readImage(path);
+    if (typeof data3 === "string") return data3.startsWith("data:") ? data3 : null;
+    const bytes = toBytes(data3);
+    if (!bytes?.length) return null;
+    const ext = path.split(".").pop()?.toLowerCase() ?? "";
+    return URL.createObjectURL(new Blob([bytes], { type: MIME[ext] ?? "image/png" }));
+  }
+  async function readUser() {
+    let name = cached.name;
+    let photo = cached.photo;
+    try {
+      const doc2 = await risuai.getRootDocument();
+      const box4 = await doc2.querySelector("[data-goei-user]");
+      const html = box4 ? await box4.getInnerHTML() : "";
+      const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
+      if (shownName2 && shownName2 !== "{{user}}") {
+        if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
+        });
+        name = shownName2;
+      }
+      let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
+      if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
+      else if (!src.startsWith("data:")) await risuai.pluginStorage.setItem(SRC_KEY, src).catch(() => {
+      });
+      if (src && src !== lastSrc) {
+        const next = await photoFrom(src);
+        if (next) {
+          if (photo?.startsWith("blob:")) URL.revokeObjectURL(photo);
+          photo = next;
+          lastSrc = src;
+        }
+      }
+    } catch (error) {
+      console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (!name) {
+      try {
+        const n2 = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
+        if (n2 && !n2.includes("{{")) name = n2;
+      } catch {
+      }
+    }
+    if (!name) name = String(await risuai.pluginStorage.getItem(NAME_KEY).catch(() => "") ?? "");
+    cached = { name, photo };
+    return cached;
+  }
+  var userInfo = () => cached;
+  var persona = "";
+  async function readPersona() {
+    try {
+      const t = String(await risuai.parseRisuChat("{{persona}}") ?? "").trim();
+      persona = /\{\{\s*persona/i.test(t) ? "" : t;
+    } catch {
+    }
+    return persona;
+  }
+  var personaText = () => persona;
+
+  // src/core/sitepics.ts
+  var has = () => true;
+  function setAssetCheck(fn2) {
+    has = fn2;
+  }
+  function personPic(char, a) {
+    const en2 = a.english;
+    if (en2 && has(char, `${en2}_default`)) return { name: a.name, base: en2, person: true, terms: [a.name, en2, ...a.aliases] };
+    const one2 = a.photo || (en2 && has(char, en2) ? en2 : "");
+    return one2 && has(char, one2) ? { name: a.name, base: one2, person: false, terms: [a.name, en2, ...a.aliases] } : null;
+  }
+  function placePic(char, p2) {
+    const en2 = p2.english;
+    const one2 = p2.photo || (en2 && has(char, `${en2}_default`) ? `${en2}_default` : en2 && has(char, en2) ? en2 : "");
+    return one2 && has(char, one2) ? { name: p2.label, base: one2, person: false, terms: [p2.label, en2, ...p2.aliases] } : null;
+  }
+  var cache6 = null;
+  function pics(char) {
+    if (cache6 && cache6.lore === char.globalLore) return cache6.list;
+    const dir2 = readDirectory(char.globalLore);
+    const list4 = [
+      ...dir2.agents.map((a) => personPic(char, a)),
+      ...dir2.anomalies.map((p2) => placePic(char, p2)),
+      ...dir2.sites.map((p2) => placePic(char, p2))
+    ].filter((x) => !!x && !!x.name);
+    const seen2 = /* @__PURE__ */ new Set();
+    const out = list4.filter((p2) => seen2.has(p2.name) ? false : (seen2.add(p2.name), true));
+    cache6 = { lore: char.globalLore, list: out };
+    return out;
+  }
+  function sitePicList(char) {
+    const list4 = pics(char);
+    const people = list4.filter((p2) => p2.person).map((p2) => p2.name);
+    const things = list4.filter((p2) => !p2.person).map((p2) => p2.name);
+    if (!people.length && !things.length) return "Available pictures: none.";
+    return [
+      people.length ? `People (may add _expression): ${people.join(", ")}` : "",
+      people.length ? `Expressions: ${[...EMOTIONS].join(", ")}` : "",
+      things.length ? `Anomalies, people and places (no expression): ${things.join(", ")}` : ""
+    ].filter(Boolean).join("\n");
+  }
+  function resolveSitePic(char, raw) {
+    const text4 = raw.trim();
+    const cut3 = text4.lastIndexOf("_");
+    const expr = cut3 > 0 ? text4.slice(cut3 + 1).trim().toLowerCase() : "";
+    const name = cut3 > 0 && EMOTIONS.has(expr) ? text4.slice(0, cut3).trim() : text4;
+    const low = name.toLowerCase();
+    const p2 = pics(char).find((x) => x.terms.some((t) => t && t.toLowerCase() === low));
+    if (!p2) return null;
+    if (!p2.person) return p2.base;
+    const want = `${p2.base}_${EMOTIONS.has(expr) ? expr : "default"}`;
+    return has(char, want) ? want : `${p2.base}_default`;
+  }
+  var fillSitePics = (text4, char) => text4.includes("__SITE_PICS__") ? text4.replace(/__SITE_PICS__/g, sitePicList(char)) : text4;
+
+  // src/core/gnetPrompt.ts
+  var REQUIRED_GNET = [
+    "LB",
+    "LB.EXTRA",
+    "EXTENSION.REQUEST",
+    "ACTION.REFRESH",
+    "AUTO.GUIDELINE",
+    "AUTO.FORMAT",
+    "REACT.GUIDELINE",
+    "DM.GUIDELINE",
+    "DM.FORMAT",
+    "INCOMING.GUIDELINE",
+    "DM.REQUEST",
+    "DM.NO-ORIGIN",
+    "TITLE.GUIDELINE",
+    "MAIN_CONTEXT",
+    "PUBLIC.GUIDELINE",
+    "PUBLIC.REACT_FORMAT",
+    "PUBLIC.POST_FORMAT",
+    "ACTIVITY.GUIDELINE",
+    "BOARD.GUIDELINE",
+    "ATTACHMENTS",
+    "INCOMING.COMBINED",
+    "INCOMING.DISABLED",
+    "ACTIVITY.DISABLED"
+  ];
+  var REQUIRED_LB = ["SYSTEM", "OUTPUT", "JAILBREAK", "JOB"];
+  var SITE_GUIDE = { gn: "GNet", gal: "Gal", wpf: "Wpf", sm: "Salmon" };
+  function gnetBooks(src) {
+    const name = SITE_GUIDE[viewSite(src.chat.scriptstate)];
+    const g2 = { ...policySections(src.char.globalLore, "LB Backend"), ...policySections(src.char.globalLore, name) };
+    for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g2[k] === void 0) throw new GnetError(`${GUIDE_LABEL[name]} 지침의 ${k} 섹션이 없어요.`);
+    applyAdvanced(src.chat.scriptstate);
+    const env3 = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
+    const cs = gnetSettings(src.chat.scriptstate).counts;
+    return {
+      language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
+      read(name2) {
+        const raw = g2[name2] ?? "";
+        return evaluate(raw, env3).replace(/__SITE_PICS__/g, () => sitePicList(src.char)).replace(/__GN_POST_RANGE__/g, countText(cs.post)).replace(/__GN_CMT_RANGE__/g, countText(cs.cmt)).replace(/__GN_ACT_RANGE__/g, countText(cs.act)).replace(/__GN_REPLY_RANGE__/g, countText([Math.min(LIMITS.replies_min, LIMITS.replies), LIMITS.replies])).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
+      }
+    };
+  }
+  function fmt(template, ...args) {
+    let i = 0;
+    return template.replace(/%s/g, () => args[i++] ?? "");
+  }
+  function fill2(template, values) {
+    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
+  }
+  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
+  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
+  function systemText(b, guideline, format, identity, attachments = false) {
+    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
+    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
+    if (identity) outro += `
+ROLE BINDING (application-owned metadata):
+${JSON.stringify(identity)}`;
+    outro += `
+${b.language}`;
+    return `${intro}
+${outro}${attachments ? `
+
+${b.read("ATTACHMENTS.READ")}` : ""}`;
+  }
+  function pack2(src, b, thoughts, guideline, format, extras2, factionNames3, identity) {
+    const n2 = trimTurns(HISTORY.turns);
+    const story = n2 ? storyText(recentTurns(src.chat, n2, genSettings(src.chat.scriptstate).userMessages)) : "";
+    const t = refToggles(src.chat.scriptstate, "gn");
+    const rows3 = collectRefs(src, {
+      scope: "gnet",
+      text: `${extras2}
+${story}`,
+      description: t.description,
+      authors: t.authors,
+      persona: t.persona,
+      active: t.active,
+      related: t.related && !trimRelated(),
+      secondary: t.secondary && !trimSecondary(),
+      extra: [{ source: "현재 발생 상황", content: b.read("LB.EXTRA") }]
+    });
+    const material2 = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]
+${refText(rows3)}
+[최근 본문]
+${story}
+[현재 작업]
+${extras2}`;
+    const attachments = hasAttachment(material2);
+    const messages = [
+      { role: "system", content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames3) },
+      { role: "user", content: factionCodesToNames(material2, factionNames3) }
+    ];
+    return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, "gn"), { thoughts: b.read(thoughts), memo: memoTexts((k) => b.read(k)) }) };
+  }
+  function incomingRules(b, plan) {
+    return plan.allowed ? `${b.read("INCOMING.GUIDELINE")}
+${b.read("INCOMING.COMBINED")}` : b.read("INCOMING.DISABLED");
+  }
+  function activityRules(b, posts) {
+    return b.read(posts.length ? "ACTIVITY.GUIDELINE" : "ACTIVITY.DISABLED");
+  }
+  var TAG_RULE = 'Post category: every post (new or retained) also has "tag": one short category label in Korean, the way this board sorts its posts (a 말머리). Reuse labels already used on the board when they fit; supplied tags on retained posts are records, never change them.';
+  function commentTimeRule(now) {
+    return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ""}. Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.`;
+  }
+  function boardJson(posts) {
+    return JSON.stringify({
+      posts: posts.map((p2) => ({
+        author: p2.nick,
+        id: p2.id,
+        ...p2.tag ? { tag: p2.tag } : {},
+        title: p2.title,
+        time: /(\d\d:\d\d)/.exec(p2.date)?.[1] ?? "",
+        date: p2.date,
+        views: p2.views,
+        upvotes: p2.votes,
+        content: p2.body,
+        mine: p2.mine,
+        comments: p2.comments.map((c) => ({ author: c.nick, ...whenField(p2, c), content: c.body, parent: c.parent, mine: c.mine }))
+      }))
+    });
+  }
+  function boardExtras(src, b, write) {
+    const s8 = gnetSettings(src.chat.scriptstate);
+    const parts = [];
+    let format = "";
+    if (s8.keyFigures) {
+      const kept = keyFigures(src.chat.scriptstate);
+      if (kept.length) parts.push(fill2(b.read("KEYFIGURES.PREVIOUS"), { KEYFIGURES: JSON.stringify(kept) }));
+      if (write) {
+        parts.push(b.read("KEYFIGURES"));
+        format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
+      }
+    }
+    return { guideline: parts.filter(Boolean).join("\n\n"), format };
+  }
+  var seed = () => Math.floor(Math.random() * 2147483647).toString(36);
+  function refreshPrompt(src, st, plan, nick, factionNames3) {
+    const s8 = gnetSettings(src.chat.scriptstate);
+    const b = gnetBooks(src);
+    const guideline = [
+      `${b.read("LB")}
+
+${b.read("BOARD.GUIDELINE")}`,
+      b.read("AUTO.GUIDELINE"),
+      `${b.read("ATTACHMENTS")}
+${incomingRules(b, plan)}`
+    ];
+    const ex = boardExtras(src, b, true);
+    if (ex.guideline) guideline.push(ex.guideline);
+    let format = `${b.read("AUTO.FORMAT")}
+${commentTimeRule(dateNow(src.chat))}
+${TAG_RULE}${ex.format}`;
+    if (s8.sampling) {
+      format += `
+Diversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.
+<x-output-seed-a>${seed()}</x-output-seed-a>
+<x-output-seed-b>${seed()}</x-output-seed-b>`;
+    }
+    const protectedIds = [];
+    const reference = st.posts.filter((p2, i) => {
+      const prot = protectedPost(s8, p2);
+      if (prot) protectedIds.push(p2.id);
+      return prot || i < HISTORY.refresh;
+    });
+    const action = b.read("ACTION.REFRESH");
+    const extras2 = fill2(b.read("EXTENSION.REQUEST"), {
+      TIME: dateNow(src.chat),
+      USER_NICK: nick,
+      KEEP_OWN: String(s8.keepOwn),
+      KEEP_REPLIED: String(s8.keepReplied),
+      PROTECTED: protectedIds.join(","),
+      POST_LIMIT: String(postLimit(s8)),
+      NEXT_ID: String(st.seq || 1e5),
+      ACTION: action,
+      BOARD: boardJson(reference)
+    }) + incomingTask(plan);
+    return pack2(src, b, "THOUGHTS.REFRESH", guideline.join("\n\n"), format, extras2, factionNames3);
+  }
+  function postPrompt(src, st, input3, plan, factionNames3) {
+    const b = gnetBooks(src);
+    const activity = activityContext(st, null);
+    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("TITLE.GUIDELINE"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join("\n\n");
+    const extras2 = input3 + incomingTask(plan, activity.posts);
+    return { ...pack2(src, b, "THOUGHTS.ACTION", guideline, `${b.read("PUBLIC.POST_FORMAT")}
+${commentTimeRule(dateNow(src.chat))}
+Also give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras2, factionNames3), activity };
+  }
+  function commentPrompt(src, st, postId2, replyTo, body5, plan, nick, factionNames3, action = `The protagonist publicly commented: ${body5}`) {
+    const b = gnetBooks(src);
+    const p2 = findPost(st, postId2);
+    if (!p2) throw new GnetError("대상 글이 없어졌어요.");
+    const limit = replyTo > 0 ? HISTORY.comment : HISTORY.post;
+    const total = p2.comments.length;
+    const selected = /* @__PURE__ */ new Set();
+    for (let i = Math.max(1, total - limit + 1); i <= total; i++) selected.add(i);
+    if (replyTo > 0) selected.add(replyTo);
+    for (const i of [...selected]) {
+      let n2 = i;
+      const seen2 = /* @__PURE__ */ new Set();
+      while (p2.comments[n2 - 1] && !seen2.has(n2)) {
+        seen2.add(n2);
+        selected.add(n2);
+        n2 = p2.comments[n2 - 1].parent;
+      }
+    }
+    const comments = p2.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
+    const task = JSON.stringify({
+      post: { id: p2.id, author: p2.nick, title: p2.title, content: p2.body },
+      comments,
+      commentCount: total,
+      replyTo,
+      action,
+      userHandle: nick
+    });
+    const activity = activityContext(st, p2.id);
+    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join("\n\n");
+    const extras2 = task + incomingTask(plan, activity.posts);
+    return { ...pack2(src, b, "THOUGHTS.ACTION", guideline, `${b.read("PUBLIC.REACT_FORMAT")}
+${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames3), activity, supplied: selected, total };
+  }
+  var POST_REFRESH_ACTION = "Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.";
+  function publicBoard(st, query) {
+    const ranked = st.posts.map((p2, i) => ({ p: p2, i, hit: !!p2.title && query.includes(p2.title) || new RegExp(`#${p2.id}(?![\\d.])`).test(query) }));
+    ranked.sort((a, b) => a.hit !== b.hit ? a.hit ? -1 : 1 : a.i - b.i);
+    const rows3 = [];
+    let used = 0;
+    const cap = 6e3;
+    for (const { p: p2 } of ranked) {
+      if (rows3.length >= 8) break;
+      const comments = p2.comments.slice(-12).map((c, j, arr) => ({ id: p2.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
+      const row10 = { id: p2.id, title: p2.title, author: p2.nick, date: p2.date, content: trimTokens(p2.body, LIMITS.origin_tokens), comments };
+      while (JSON.stringify(row10).length > (cap - used) * 2 && row10.comments.length) row10.comments.shift();
+      const n2 = Math.ceil(JSON.stringify(row10).length / 2);
+      if (used + n2 <= cap) {
+        rows3.push(row10);
+        used += n2;
+      }
+    }
+    if (!rows3.length) return null;
+    return {
+      access: "Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.",
+      posts: rows3
+    };
+  }
+  function dmPrompt(src, st, nick, latest, userHandle, factionNames3) {
+    const b = gnetBooks(src);
+    const source4 = st.sources[nick];
+    let anchor = b.read("DM.NO-ORIGIN");
+    if (source4) {
+      anchor = [
+        `Original forum post #${source4.postid} (preserved at first contact):`,
+        `Title: ${source4.title}`,
+        `Posted by: ${source4.author}`,
+        `Post text: ${source4.body}`,
+        source4.quote ? `Referenced public comment — author: ${source4.quoteAuthor.trim() || "[not retained; do not attribute to the contact]"}
+${source4.quote}` : ""
+      ].join("\n");
+    }
+    const lines3 = [];
+    for (let i = st.dms.length - 1; i >= 0 && lines3.length < HISTORY.dmHistory; i--) {
+      const d = st.dms[i];
+      if (d.nick !== nick) continue;
+      lines3.unshift({
+        speaker: d.side === "me" ? "user" : "npc_correspondent",
+        handle: d.side === "me" ? userHandle : nick,
+        date: d.date,
+        content: d.side === "me" ? d.body : trimTokens(d.body, LIMITS.history_tokens)
+      });
+    }
+    let task = `Current story time: ${dateNow(src.chat)}
+${fill2(b.read("DM.REQUEST"), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines3) })}`;
+    const pub = publicBoard(st, `${latest}
+${anchor}`);
+    if (pub) task += `
+PUBLIC BOARD REFERENCE:
+${JSON.stringify(pub)}`;
+    const identity = { speaker: { role: "npc_correspondent", handle: nick }, owner: { role: "user", handle: userHandle, personaName: "주인공", referenceOnly: true } };
+    return pack2(src, b, "THOUGHTS.DM", `${b.read("DM.GUIDELINE")}
+
+${b.read("ATTACHMENTS")}`, b.read("DM.FORMAT"), task, factionNames3, identity);
+  }
+  function retryMessages(prompt, raw, error) {
+    return [
+      ...prompt.messages,
+      { role: "assistant", content: raw },
+      {
+        role: "user",
+        content: `<system>
+Validation error!
+Your previous output did not adhere to the required format, or contained invalid data.
+Error message: ${error}
+Please fix your last output into correct structure as previously instructed, while keeping the data intact.
+${RETRY_ANALYZE}
+</system>`
+      }
+    ];
+  }
+  function mainContextRules(src) {
+    const g2 = policySections(src.char.globalLore, SITE_GUIDE[viewSite(src.chat.scriptstate)]);
+    return g2.MAIN_CONTEXT?.trim() || null;
+  }
+
+  // src/core/request.ts
+  function userTurns(chat) {
+    let n2 = 0;
+    let prev = "";
+    for (const m of chat.message ?? []) {
+      if (m.role === "user" && prev !== "user") n2++;
+      prev = m.role;
+    }
+    return n2;
+  }
+  function shouldKeepSeed(chat) {
+    return userTurns(chat) < 2;
+  }
+  function processRequest(messages, chat) {
+    const keep = shouldKeepSeed(chat);
+    let changed = false;
+    const out = messages.map((m) => {
+      if (typeof m.content !== "string" || !m.content.includes(SEED_OPEN)) return m;
+      changed = true;
+      return { ...m, content: applySeedLifetime(m.content, keep) };
+    });
+    return { messages: out, changed };
+  }
+  function unwrapScenes(messages) {
+    if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) return { messages, changed: false };
     const out = [];
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i];
@@ -256,7 +820,7 @@ ${next.content.trim()}`;
     while (i < lines3.length && /^\s*@@/.test(lines3[i])) i++;
     return lines3.slice(i).join("\n");
   }
-  var cache6 = /* @__PURE__ */ new WeakMap();
+  var cache7 = /* @__PURE__ */ new WeakMap();
   function hasSlots(lore) {
     const names4 = new Set((lore ?? []).map((e) => str6(e.comment)));
     return LORE_KINDS.every((k) => names4.has(SLOTS2[k].comment));
@@ -299,10 +863,10 @@ ${content}` };
   }
   function managedEntries(lore) {
     const books = lore ?? [];
-    const hit3 = cache6.get(books);
-    if (hit3) return hit3;
+    const hit4 = cache7.get(books);
+    if (hit4) return hit4;
     if (!hasSlots(books) && !hasVirtual(books)) {
-      cache6.set(books, []);
+      cache7.set(books, []);
       return [];
     }
     const kinds = folderKeys(books);
@@ -316,25 +880,25 @@ ${content}` };
       return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
     };
     const out = [];
-    books.forEach((e, index) => {
+    books.forEach((e, index3) => {
       const folderKind = kinds.get(str6(e.folder));
       const content = str6(e.content);
       if (!folderKind || e.mode === "folder" || e.alwaysActive) return;
       let kind;
       let order = Number(e.insertorder ?? 0);
-      let rank2 = index;
+      let rank3 = index3;
       let appendix;
       if (folderKind === "appendix") {
-        const row9 = apps.get(str6(e.comment));
-        if (!row9 || (!str6(e.key).trim() || !row9.keys) && !otherTriggers(row9)) return;
-        const at = row9.parent ? parentAt(row9.parent) : -1;
+        const row10 = apps.get(str6(e.comment));
+        if (!row10 || (!str6(e.key).trim() || !row10.keys) && !otherTriggers(row10)) return;
+        const at = row10.parent ? parentAt(row10.parent) : -1;
         const p2 = at >= 0 ? books[at] : void 0;
         kind = p2 ? kinds.get(str6(p2.folder)) : "org";
         if (p2) {
           order = Number(p2.insertorder ?? 0);
-          rank2 = at + 0.5 + index / 1e7;
+          rank3 = at + 0.5 + index3 / 1e7;
         }
-        appendix = { parent: p2 ? row9.parent : "", parentNames: p2 ? [row9.parent, ...keysOf3(p2)] : row9.parent ? [row9.parent] : [], when: row9, agentNames: row9.agents.map(agentNames) };
+        appendix = { parent: p2 ? row10.parent : "", parentNames: p2 ? [row10.parent, ...keysOf3(p2)] : row10.parent ? [row10.parent] : [], when: row10, agentNames: row10.agents.map(agentNames) };
       } else {
         if (!managedHere(e, kinds)) return;
         kind = folderKind;
@@ -349,9 +913,9 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text4) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text4));
         keys.push({ text: text4, en: en2, rule: CONFIRM_KEYS.has(text4) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str6(e.comment), order, index, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank2, ...appendix ? { appendix } : {} });
+      out.push({ kind, name: str6(e.comment), order, index: index3, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
     });
-    cache6.set(books, out);
+    cache7.set(books, out);
     return out;
   }
   function around(text4, start3, end) {
@@ -453,15 +1017,15 @@ ${content}` };
       const isInput = inputLast && wi === window2.length - 1;
       const why = isInput ? "input" : m.role === "user" ? "user" : "char";
       const score2 = (isInput ? 30 : 0) + (m.role === "user" ? 3 : 1) * 0.8 ** age2;
-      for (const hit3 of findHits(m.data, entries2)) pending2.push({ hit: hit3, why, score: score2 });
+      for (const hit4 of findHits(m.data, entries2)) pending2.push({ hit: hit4, why, score: score2 });
     });
-    for (const { hit: hit3, why, score: score2 } of pending2) if (hit3.key.rule === "plain") add(hit3.entry, why, hit3.key.text, hit3.snippet, score2);
-    for (const { hit: hit3, why, score: score2 } of pending2) {
-      if (hit3.key.rule === "plain") continue;
-      const e = entries2[hit3.entry];
+    for (const { hit: hit4, why, score: score2 } of pending2) if (hit4.key.rule === "plain") add(hit4.entry, why, hit4.key.text, hit4.snippet, score2);
+    for (const { hit: hit4, why, score: score2 } of pending2) {
+      if (hit4.key.rule === "plain") continue;
+      const e = entries2[hit4.entry];
       const present = state.deployed.some((n2) => names(e, n2)) || state.board.some((n2) => names(e, n2));
-      const ok = hit3.marked || present || picks.has(hit3.entry) || hit3.honor;
-      if (ok) add(hit3.entry, picks.has(hit3.entry) || !hit3.marked ? why : "confirmed", hit3.key.text, hit3.snippet, score2);
+      const ok = hit4.marked || present || picks.has(hit4.entry) || hit4.honor;
+      if (ok) add(hit4.entry, picks.has(hit4.entry) || !hit4.marked ? why : "confirmed", hit4.key.text, hit4.snippet, score2);
     }
     pickAppendices(entries2, picks, state, add);
     let list4 = [...picks.values()];
@@ -491,9 +1055,9 @@ ${content}` };
       if (a.when.target && state.target && a.parentNames.some((n2) => sameName(n2, state.target))) add(i, "status", state.target, state.target, 100);
       const w = place3 ? a.when.places.find((x) => squash2(x) && place3.includes(squash2(x))) : void 0;
       if (w) add(i, "place", w, state.place ?? "", 40);
-      for (const group5 of a.agentNames) {
-        const who = present.find((p2) => group5.some((n2) => sameName(n2, p2)));
-        if (who) add(i, "agent", group5[0], who, 20);
+      for (const group6 of a.agentNames) {
+        const who = present.find((p2) => group6.some((n2) => sameName(n2, p2)));
+        if (who) add(i, "agent", group6[0], who, 20);
       }
     });
     const on2 = new Set([...picks.values()].map((p2) => p2.entry.name));
@@ -682,8 +1246,8 @@ ${block3.trim()}` };
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc38 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc38}\\b` : esc38, "g");
+      const esc41 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc41}\\b` : esc41, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m);
     }
     return out;
@@ -719,18 +1283,18 @@ ${block3.trim()}` };
     const p2 = sections2(src);
     const keys = ["COMMON"];
     let direct = false;
-    let group5 = false;
+    let group6 = false;
     for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
       if (r.receiveMessages === false) continue;
-      if (r.kind === "group") group5 = true;
+      if (r.kind === "group") group6 = true;
       else direct = true;
     }
-    if (body5.invitationCheck?.allowed) group5 = true;
+    if (body5.invitationCheck?.allowed) group6 = true;
     const manual = body5.participants.some((x) => x.manuallySavedContact);
-    if (direct || group5) {
+    if (direct || group6) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
-      if (group5) keys.push("GROUP_ROOMS");
+      if (group6) keys.push("GROUP_ROOMS");
       if (body5.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
       if (body5.crossRoomMessages?.length || (body5.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
       if (hasAttachment(JSON.stringify(body5))) keys.push("ATTACHMENT_READ");
@@ -749,8 +1313,9 @@ ${block3.trim()}` };
     }
     if (manual) keys.push("MANUAL_CONTACT", "CONTACT_CONTEXT", "SINGLE_PASS_CONTACT");
     keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode2}`);
-    if ((direct || group5) && phoneSettings(src.chat.scriptstate).habits && p2.HABITS !== void 0) keys.push("HABITS");
-    return [...keys.map((k) => section(p2, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE2].join("\n\n");
+    if ((direct || group6) && phoneSettings(src.chat.scriptstate).habits && p2.HABITS !== void 0) keys.push("HABITS");
+    const br2 = phoneSettings(src.chat.scriptstate).banterRows;
+    return [...keys.map((k) => fillSitePics(section(p2, k), src.char).replace(/__PH_BANTER_RANGE__/g, br2[0] === br2[1] ? String(br2[0]) : `${br2[0]}-${br2[1]}`)), genSettings(src.chat.scriptstate).language ?? LANGUAGE2].join("\n\n");
   }
   function roomPacket(r, reactions = false) {
     const messages = r.messages.slice(-HISTORY2.room).filter((m) => m.kind !== "pause" || !hiddenPause(m.text)).map((m) => ({
@@ -1085,8 +1650,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   function labelSwitches(root3) {
     root3.querySelectorAll('button.gx-switch[role="switch"]:not([aria-label])').forEach((b) => {
-      const row9 = b.closest(".ps-row, .dir-line, .st-col-row, .dir-in");
-      const name = row9?.querySelector(".ps-label > b, .st-col-name > b, :scope > span:first-child")?.textContent?.replace(/\s+/g, " ").trim();
+      const row10 = b.closest(".ps-row, .dir-line, .st-col-row, .dir-in");
+      const name = row10?.querySelector(".ps-label > b, .st-col-name > b, :scope > span:first-child")?.textContent?.replace(/\s+/g, " ").trim();
       if (name) b.setAttribute("aria-label", name);
     });
   }
@@ -1204,9 +1769,9 @@ ${JSON.stringify(previousRoom ?? "")}`)
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows3}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
   function attachInput(items, key, value) {
-    const row9 = items[Number(key)];
-    if (!row9) return false;
-    row9.content = value;
+    const row10 = items[Number(key)];
+    if (!row10) return false;
+    row10.content = value;
     return true;
   }
   function attachAction(items, op, value, kinds) {
@@ -1254,13 +1819,13 @@ ${JSON.stringify(previousRoom ?? "")}`)
     });
   }
   function zoomPhoto(src, alt) {
-    const box2 = document.createElement("div");
-    box2.className = "gx at-zoom";
-    box2.setAttribute("role", "dialog");
-    box2.setAttribute("aria-label", "사진 크게 보기");
-    box2.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    const box4 = document.createElement("div");
+    box4.className = "gx at-zoom";
+    box4.setAttribute("role", "dialog");
+    box4.setAttribute("aria-label", "사진 크게 보기");
+    box4.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
     const close3 = () => {
-      box2.remove();
+      box4.remove();
       document.removeEventListener("keydown", key, true);
     };
     const key = (ev) => {
@@ -1268,9 +1833,9 @@ ${JSON.stringify(previousRoom ?? "")}`)
       ev.stopPropagation();
       close3();
     };
-    box2.addEventListener("click", close3);
+    box4.addEventListener("click", close3);
     document.addEventListener("keydown", key, true);
-    document.body.appendChild(box2);
+    document.body.appendChild(box4);
   }
   function card(kind, text4, asset) {
     const label2 = ATTACH_LABELS[kind];
@@ -1290,21 +1855,72 @@ ${JSON.stringify(previousRoom ?? "")}`)
     if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc5(text4)}</b><small>선물이 도착했습니다</small></div></div>`;
     return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc5(text4).replace(/\n/g, "<br>")}</span></div></div>`;
   }
-  function attachBody(text4, board2 = false) {
+  var sitePic = null;
+  function setSitePicSource(fn2) {
+    sitePic = fn2;
+  }
+  var SITE_PIC = /\[사진:([^\]\n]{1,80})\]/g;
+  var camera = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  function boardCard(kind, text4, asset, url) {
+    if (kind === "image" || url) {
+      const src = url ?? (asset ? photos.get(asset) : null);
+      const data3 = url ? "" : ` data-asset="${esc5(asset ?? "")}"`;
+      return `<figure class="ax ax-img at-card-image${!url && asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc5(src ?? "")}"${data3} alt="${esc5(text4)}" loading="lazy"><span class="zm" aria-hidden="true">⤢</span></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${kind === "image" && text4.trim() ? `<figcaption>${esc5(text4)}</figcaption>` : ""}</figure>`;
+    }
+    if (kind === "photo") return `<figure class="ax ax-ph"><div class="fr">${camera}<p>${esc5(text4).replace(/\n/g, "<br>")}</p></div></figure>`;
+    if (kind === "video") return `<figure class="ax ax-vd"><div class="fr"><span class="pl" aria-hidden="true">▶</span><p>${esc5(text4).replace(/\n/g, "<br>")}</p><div class="bar" aria-hidden="true"><span>▶</span><i></i><span>0:00</span></div></div></figure>`;
+    return card(kind, text4, asset);
+  }
+  function textWithPics(text4, board2) {
+    const out = [];
+    let last2 = 0;
+    const para = (t) => t.trim() ? out.push(`<p>${esc5(t.trim()).replace(/\n/g, "<br>")}</p>`) : 0;
+    for (const m of text4.matchAll(SITE_PIC)) {
+      para(text4.slice(last2, m.index));
+      const url = sitePic?.(m[1]) ?? null;
+      out.push(url ? board2 ? boardCard("image", "", void 0, url) : `<figure class="at-card at-card-image"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc5(url)}" alt="" loading="lazy"></button></figure>` : board2 ? boardCard("photo", m[1].replace(/_[a-z ]+$/i, "")) : card("photo", m[1]));
+      last2 = m.index + m[0].length;
+    }
+    para(text4.slice(last2));
+    return out;
+  }
+  function boardFiles(text4) {
+    return bodyParts(text4).filter((p2) => p2.kind === "file" || p2.kind === "link").map((p2) => ({ kind: p2.kind, text: p2.text, url: p2.kind === "link" ? attachUrl(p2.text) : null }));
+  }
+  function boardThumb(text4) {
+    let desc = false;
+    for (const p2 of bodyParts(text4)) {
+      if (p2.kind === "image" && p2.asset && photos.get(p2.asset)) return { url: photos.get(p2.asset) };
+      if (p2.kind === "text") {
+        for (const m of p2.text.matchAll(SITE_PIC)) {
+          const url = sitePic?.(m[1]) ?? null;
+          if (url) return { url };
+          desc = true;
+        }
+      }
+      if (p2.kind === "photo" || p2.kind === "image") desc = true;
+    }
+    return desc ? { url: null } : null;
+  }
+  function attachBody(text4, board2 = false, noFiles = false) {
     const out = [];
     const files = [];
     for (const p2 of bodyParts(text4)) {
-      if (p2.kind === "text") out.push(`<p>${esc5(p2.text.trim()).replace(/\n/g, "<br>")}</p>`);
-      else if (board2 && (p2.kind === "file" || p2.kind === "link")) files.push(card(p2.kind, p2.text));
-      else out.push(card(p2.kind, p2.text, p2.asset));
+      if (p2.kind === "text") out.push(...textWithPics(p2.text, board2));
+      else if (board2 && (p2.kind === "file" || p2.kind === "link")) {
+        if (noFiles) continue;
+        const url = p2.kind === "link" ? attachUrl(p2.text) : null;
+        files.push(`<div class="r"><span class="ic" aria-hidden="true">${p2.kind === "file" ? "📎" : "🔗"}</span>${url ? `<a href="${esc5(url)}" target="_blank" rel="noopener noreferrer">${esc5(p2.text)}</a>` : `<span>${esc5(p2.text)}</span>`}</div>`);
+      } else out.push(board2 ? boardCard(p2.kind, p2.text, p2.asset) : card(p2.kind, p2.text, p2.asset));
     }
-    if (files.length) out.push(`<div class="at-files">${files.join("")}</div>`);
+    if (files.length) out.push(`<div class="axf at-files"><b>첨부 ${files.length}</b>${files.join("")}</div>`);
     return out.join("");
   }
 
   // src/host/assets.ts
   var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
-  var cache7 = /* @__PURE__ */ new Map();
+  var cache8 = /* @__PURE__ */ new Map();
   function toBytes3(data3) {
     if (data3 instanceof Uint8Array) return data3;
     if (data3 instanceof ArrayBuffer) return new Uint8Array(data3);
@@ -1410,12 +2026,12 @@ ${JSON.stringify(previousRoom ?? "")}`)
     const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
     return [c(n2[0], 0, 100), c(n2[1], 0, 100), c(n2[2], 5, 100)];
   }
-  function splitPic(pic2) {
-    const at = pic2.lastIndexOf("#");
-    const [cut3, t] = at > 0 ? pic2.slice(at + 1).split("~") : ["", ""];
+  function splitPic(pic3) {
+    const at = pic3.lastIndexOf("#");
+    const [cut3, t] = at > 0 ? pic3.slice(at + 1).split("~") : ["", ""];
     const crop = at > 0 ? parseCrop(cut3) : null;
     const tall = Number(t);
-    return crop ? { name: pic2.slice(0, at), crop, ...tall > 1 && tall <= 4 ? { tall } : {} } : { name: pic2, crop: null };
+    return crop ? { name: pic3.slice(0, at), crop, ...tall > 1 && tall <= 4 ? { tall } : {} } : { name: pic3, crop: null };
   }
   function mainPic(char, p2) {
     const en2 = p2.english ?? "";
@@ -1435,19 +2051,20 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
   function assetUrl(char, name) {
-    const row9 = findRow(char, name);
-    if (!row9) return Promise.resolve(null);
-    const key = `${String(char.chaId ?? char.name ?? "")}|${row9[1]}`;
-    let hit3 = cache7.get(key);
-    if (!hit3) {
-      hit3 = load(row9[1], String(row9[2] ?? row9[1].split(".").pop() ?? ""));
-      cache7.set(key, hit3);
-      void hit3.then((url) => {
-        if (!url) cache7.delete(key);
+    const row10 = findRow(char, name);
+    if (!row10) return Promise.resolve(null);
+    const key = `${String(char.chaId ?? char.name ?? "")}|${row10[1]}`;
+    let hit4 = cache8.get(key);
+    if (!hit4) {
+      hit4 = load(row10[1], String(row10[2] ?? row10[1].split(".").pop() ?? ""));
+      cache8.set(key, hit4);
+      void hit4.then((url) => {
+        if (!url) cache8.delete(key);
       });
     }
-    return hit3;
+    return hit4;
   }
+  setAssetCheck(hasAsset);
 
   // src/ui/images.ts
   var urls = /* @__PURE__ */ new Map();
@@ -1501,13 +2118,13 @@ ${JSON.stringify(previousRoom ?? "")}`)
       return url;
     }
   }
-  function imageUrl(char, pic2) {
-    if (!pic2) return null;
-    const key = `${String(char.chaId ?? char.name ?? "")}|${pic2}`;
-    const hit3 = urls.get(key);
-    if (hit3 === void 0) {
+  function imageUrl(char, pic3) {
+    if (!pic3) return null;
+    const key = `${String(char.chaId ?? char.name ?? "")}|${pic3}`;
+    const hit4 = urls.get(key);
+    if (hit4 === void 0) {
       urls.set(key, "loading");
-      const { name, crop, tall } = splitPic(pic2);
+      const { name, crop, tall } = splitPic(pic3);
       void assetUrl(char, name).then(async (raw) => {
         const url = raw ? await shrink(raw, crop, tall) : null;
         urls.set(key, url);
@@ -1515,7 +2132,7 @@ ${JSON.stringify(previousRoom ?? "")}`)
       });
       return null;
     }
-    return hit3 === "loading" ? null : hit3;
+    return hit4 === "loading" ? null : hit4;
   }
   var escAttr = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   function agentFace(char, english) {
@@ -1528,8 +2145,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
     const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
     return slot2 === "face" ? facePic(char, src) : mainPic(char, src);
   }
-  function picAvatar(char, pic2, name, cls = "") {
-    const url = imageUrl(char, pic2);
+  function picAvatar(char, pic3, name, cls = "") {
+    const url = imageUrl(char, pic3);
     const first = escAttr(Array.from(name.trim())[0] ?? "?");
     return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
   }
@@ -1546,23 +2163,23 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   function showIdCard(html, act, cls = "") {
     document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
-    const box2 = document.createElement("div");
-    box2.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
-    box2.setAttribute("role", "dialog");
-    box2.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+    const box4 = document.createElement("div");
+    box4.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
+    box4.setAttribute("role", "dialog");
+    box4.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box2.setAttribute("data-theme", theme);
-    box2.addEventListener("click", (e) => {
+    if (theme) box4.setAttribute("data-theme", theme);
+    box4.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
-      if (btn && act && box2.contains(btn)) {
-        box2.remove();
+      if (btn && act && box4.contains(btn)) {
+        box4.remove();
         act(btn.dataset.action, btn.dataset.value);
         return;
       }
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
-      box2.remove();
+      box4.remove();
     });
-    document.body.appendChild(box2);
+    document.body.appendChild(box4);
   }
 
   // src/core/josa.ts
@@ -1599,9 +2216,9 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   function loadVarDefaults(prefixes, state) {
     const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    const saved = getPrefs().vars ?? {};
+    const saved2 = getPrefs().vars ?? {};
     const out = {};
-    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
+    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved2)])].filter(mine)) out[k] = String(saved2[k] ?? "");
     return out;
   }
   async function savePrefs(change) {
@@ -1613,7 +2230,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
   // src/ui/defaults.ts
   var PREFIXES = {
     ph: ["$ph_"],
-    gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
+    /** 게시판 사이트 넷 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08 사이트마다 따로) */
+    gn: ["$lb_cfg_lb-gn.", "$gn_storage_", "$lb_cfg_lb-gal.", "$gal_storage_", "$lb_cfg_lb-wpf.", "$wpf_storage_", "$lb_cfg_lb-sm.", "$sm_storage_"],
     wiki: ["$nw_"],
     /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
     pp: ["$pp_"],
@@ -1694,29 +2312,29 @@ ${JSON.stringify(previousRoom ?? "")}`)
   function drawerBox(content, cls = "", after = "", key = cls || "box") {
     return shell(key, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
   }
-  function set(box2, on2) {
-    opened.set(box2.dataset.drawer ?? "tools", on2);
-    box2.classList.toggle("open", on2);
-    const grip = box2.querySelector(".ph-grip");
+  function set(box4, on2) {
+    opened.set(box4.dataset.drawer ?? "tools", on2);
+    box4.classList.toggle("open", on2);
+    const grip = box4.querySelector(".ph-grip");
     grip?.setAttribute("aria-expanded", String(on2));
     grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
   }
   function bindDrawer(root3) {
-    const box2 = root3.querySelector(".ph-drawer");
-    const grip = box2?.querySelector(".ph-grip");
-    if (!box2 || !grip) return;
-    const open3 = () => box2.classList.contains("open");
-    grip.addEventListener("click", () => set(box2, !open3()));
+    const box4 = root3.querySelector(".ph-drawer");
+    const grip = box4?.querySelector(".ph-grip");
+    if (!box4 || !grip) return;
+    const open4 = () => box4.classList.contains("open");
+    grip.addEventListener("click", () => set(box4, !open4()));
     let y0 = null;
-    box2.addEventListener("touchstart", (e) => {
+    box4.addEventListener("touchstart", (e) => {
       y0 = e.touches[0]?.clientY ?? null;
     }, { passive: true });
-    box2.addEventListener("touchend", (e) => {
+    box4.addEventListener("touchend", (e) => {
       if (y0 === null) return;
       const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
       y0 = null;
-      if (dy < -24 && !open3()) set(box2, true);
-      else if (dy > 24 && open3()) set(box2, false);
+      if (dy < -24 && !open4()) set(box4, true);
+      else if (dy > 24 && open4()) set(box4, false);
     }, { passive: true });
   }
 
@@ -1866,7 +2484,7 @@ ${m.content}`).join("\n\n");
           ...rest,
           content: missing.length ? `${rest.content}
 Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
-          multimodals: data3.filter((d) => !!d).map((base643) => ({ type: "image", base64: base643 }))
+          multimodals: data3.filter((d) => !!d).map((base644) => ({ type: "image", base64: base644 }))
         };
       })
     );
@@ -1950,7 +2568,7 @@ ${RETRY_ANALYZE}` }
   }
   async function generate(messages, model2, parse3, o) {
     const fix = o.fix ?? defaultFix(messages);
-    let ask2 = messages;
+    let ask3 = messages;
     let use = model2;
     let earlier = null;
     let transientLeft = TRANSIENT_RETRIES;
@@ -1958,7 +2576,7 @@ ${RETRY_ANALYZE}` }
       let raw = "";
       try {
         try {
-          raw = await slot(o.concurrent, () => attempt === 0 && o.first ? o.first(ask2) : runModel(ask2, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
+          raw = await slot(o.concurrent, () => attempt === 0 && o.first ? o.first(ask3) : runModel(ask3, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
         } catch (error) {
           if (!transient(error) || transientLeft <= 0) throw error;
           transientLeft--;
@@ -1968,7 +2586,7 @@ ${RETRY_ANALYZE}` }
           continue;
         }
         for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
-          const again = [...ask2, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
+          const again = [...ask3, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
           try {
             const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? "기타"} 다시 보기 ${i}`));
             if (next.trim()) raw = next;
@@ -1982,7 +2600,7 @@ ${RETRY_ANALYZE}` }
         if (earlier && !retryable(error)) throw earlier;
         if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
         earlier = withRawText(error, raw);
-        ask2 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        ask3 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
         use = o.retryModel === "same" ? model2 : o.retryModel;
       }
     }
@@ -2001,7 +2619,6 @@ ${RETRY_ANALYZE}` }
 
   // src/ui/advanced.ts
   var esc7 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var advUi = { confirm: "" };
   function control(f, item2, cur) {
     const id2 = `${f}:${item2.key}`;
     if (item2.type === "text") return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id2}" value="${esc7(cur)}" placeholder="비우면 기본" aria-label="${esc7(item2.label)}">`;
@@ -2010,20 +2627,19 @@ ${RETRY_ANALYZE}` }
     }
     const min = item2.min ?? 0;
     const max = item2.max ?? Number.MAX_SAFE_INTEGER;
-    const step = max >= 1e4 ? 500 : 1;
+    const step2 = max >= 1e4 ? 500 : 1;
     const n2 = Math.min(max, Math.max(min, Number(cur) || 0));
     const zero = n2 === 0 && item2.zero;
-    const down = Math.max(min, n2 - step);
-    const up = Math.min(max, n2 + step);
+    const down = Math.max(min, n2 - step2);
+    const up = Math.min(max, n2 + step2);
     return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id2}=${down}" ${n2 <= min ? "disabled" : ""} aria-label="${esc7(item2.label)} 줄이기">−</button>
-    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step}" data-change="adv-set" data-key="${id2}" value="${zero ? "" : n2}"${item2.zero ? ` placeholder="${esc7(item2.zero)}"` : ""} aria-label="${esc7(item2.label)}">${item2.unit ? `<span>${esc7(item2.unit)}</span>` : ""}
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step2}" data-change="adv-set" data-key="${id2}" value="${zero ? "" : n2}"${item2.zero ? ` placeholder="${esc7(item2.zero)}"` : ""} aria-label="${esc7(item2.label)}">${item2.unit ? `<span>${esc7(item2.unit)}</span>` : ""}
     <button class="gx-step" data-action="adv-set" data-value="${id2}=${up}" ${n2 >= max ? "disabled" : ""} aria-label="${esc7(item2.label)} 늘리기">+</button></div>`;
   }
   function row(f, item2, state) {
     const cur = advValue(state, f, item2.key);
     const changed = cur !== String(item2.def);
-    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item2.key}" aria-label="${esc7(item2.label)} 기본값으로" title="기본값 ${esc7(item2.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
-    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc7(item2.label)}</b>${item2.hint ? `<small>${esc7(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}${reset}</div></div>`;
+    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc7(item2.label)}</b>${item2.hint ? `<small>${esc7(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}</div></div>`;
   }
   function chips(f, items, state) {
     return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
@@ -2043,8 +2659,7 @@ ${RETRY_ANALYZE}` }
       }
       return `<section class="ps-group"><h3>${esc7(g2.title)}</h3><div class="ps-rows">${body5}</div></section>`;
     }).join("");
-    const foot = n2 ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n2}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
-    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n2 ? `<span class="adv-count">${n2}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
+    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n2 ? `<span class="adv-count">${n2}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}</div></details>`;
   }
   var blank2 = (item2) => item2.v ? String(item2.def) : "";
   function parse2(value) {
@@ -2064,22 +2679,10 @@ ${RETRY_ANALYZE}` }
   }
   async function handleAdvanced(action, value, ctx2, env3, scope = "chat") {
     const v = value ?? "";
-    if (action === "adv-reset-all" || action === "adv-reset-no") {
-      advUi.confirm = action === "adv-reset-all" && v in ADV ? v : "";
-      env3.render();
-      return true;
-    }
     let vars = null;
     if (action === "adv-set") {
-      const hit3 = parse2(v);
-      if (hit3) vars = { [advVar(hit3[0], hit3[1])]: hit3[2] };
-    } else if (action === "adv-reset") {
-      const [f, key] = v.split(":");
-      const item2 = f in ADV ? advItem(f, key) : void 0;
-      if (item2) vars = { [advVar(f, item2)]: blank2(item2) };
-    } else if (action === "adv-reset-yes") {
-      advUi.confirm = "";
-      if (v in ADV) vars = advResetVars(v);
+      const hit4 = parse2(v);
+      if (hit4) vars = { [advVar(hit4[0], hit4[1])]: hit4[2] };
     } else return false;
     if (!vars) {
       env3.render();
@@ -2098,8 +2701,8 @@ ${RETRY_ANALYZE}` }
       env3.render();
       return true;
     }
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
-    const mode2 = advValue(saved?.scriptstate, "gen", "lore_mode");
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
+    const mode2 = advValue(saved2?.scriptstate, "gen", "lore_mode");
     if (syncDecorators(ctx2.char.globalLore, mode2)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode2)).catch(() => false);
     await env3.refresh();
     return true;
@@ -2236,7 +2839,7 @@ ${RETRY_ANALYZE}` }
   function generate2(ctx2, env3, rid, label2) {
     return run(ctx2, env3, label2, async () => {
       const req = token();
-      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         const st2 = readPhone(chat);
         const r2 = st2.rooms[rid];
         if (!r2?.pending) return null;
@@ -2244,15 +2847,15 @@ ${RETRY_ANALYZE}` }
         r2.pending.request = req;
         return writePhone(chat, st2);
       });
-      if (!saved) throw new PhoneError("대기 중인 대화 요청이 없어요.");
-      const st = readPhone(saved);
+      if (!saved2) throw new PhoneError("대기 중인 대화 요청이 없어요.");
+      const st = readPhone(saved2);
       const r = st.rooms[rid];
-      const d = dir(ctx2, saved);
+      const d = dir(ctx2, saved2);
       let raw = "";
       let result;
       try {
-        const prompt = fitPrompt(budgetFor(saved.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved), st, r, d, names2(ctx2)));
-        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), reiterate: craftSettings(saved.scriptstate, "ph").reiterate, staticModel: featureModel(saved.scriptstate, "ph"), state: saved.scriptstate, label: "괴담톡 답장" }));
+        const prompt = fitPrompt(budgetFor(saved2.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved2), st, r, d, names2(ctx2)));
+        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved2.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved2.scriptstate), reiterate: craftSettings(saved2.scriptstate, "ph").reiterate, staticModel: featureModel(saved2.scriptstate, "ph"), state: saved2.scriptstate, label: "괴담톡 답장" }));
       } catch (error) {
         await markFailed(ctx2, rid, req);
         const msg = error instanceof Error ? error.message : String(error);
@@ -2296,7 +2899,7 @@ ${RETRY_ANALYZE}` }
       return env3.render();
     }
     let giftBlocked = false;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readPhone(chat);
       const r2 = st.rooms[rid];
       if (!r2 || r2.pending) return null;
@@ -2312,7 +2915,7 @@ ${RETRY_ANALYZE}` }
       r2.pending = { message: m.id, status: "error", action: { type: "send" } };
       return writePhone(chat, st);
     });
-    if (!saved) {
+    if (!saved2) {
       phone.notice = giftBlocked ? "단톡방에서는 선물을 보낼 수 없어요." : "이전 답장을 다시 시도하거나 건너뛴 뒤 보내 주세요.";
       return env3.refresh();
     }
@@ -2320,8 +2923,8 @@ ${RETRY_ANALYZE}` }
     phone.attach = [];
     phone.attachMenu = false;
     phone.page = 1;
-    const r = readPhone(saved).rooms[rid];
-    await generate2({ ...ctx2, chat: saved }, env3, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
+    const r = readPhone(saved2).rooms[rid];
+    await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
   }
   async function roomRefresh(ctx2, env3, rid) {
     const st = readPhone(ctx2.chat);
@@ -2335,14 +2938,14 @@ ${RETRY_ANALYZE}` }
       phone.notice = `${why} 내가 보낸 메시지의 답장에는 이 제한이 없어요.`;
       return env3.render();
     }
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const cur = readPhone(chat);
       const room = cur.rooms[rid];
       if (!room || room.pending) return null;
       room.pending = { status: "error", action: { type: "refresh" } };
       return writePhone(chat, cur);
     });
-    if (saved) await generate2({ ...ctx2, chat: saved }, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+    if (saved2) await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
   }
   async function createGroup(ctx2, env3) {
     const d = dir(ctx2);
@@ -2368,14 +2971,14 @@ ${RETRY_ANALYZE}` }
     }
     let rid = "";
     let error = "";
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readPhone(chat);
       const time2 = phoneTime(chat);
       if (inviteRoom) {
         let r = st.rooms[inviteRoom];
         if (!r || r.pending) return void (error = "대화방 상태가 바뀌었어요."), null;
-        const fresh = members.filter((cid) => !r.members.includes(cid));
-        if (!fresh.length || r.members.length + fresh.length > LIMITS2.members) return void (error = `초대할 사람을 고르세요. 상대는 최대 ${LIMITS2.members}명이에요.`), null;
+        const fresh2 = members.filter((cid) => !r.members.includes(cid));
+        if (!fresh2.length || r.members.length + fresh2.length > LIMITS2.members) return void (error = `초대할 사람을 고르세요. 상대는 최대 ${LIMITS2.members}명이에요.`), null;
         if (r.kind === "dm") {
           const old = r.id;
           do
@@ -2388,12 +2991,12 @@ ${RETRY_ANALYZE}` }
           if (at >= 0) st.order[at] = r.id;
           else st.order.push(r.id);
         }
-        for (const cid of fresh) {
+        for (const cid of fresh2) {
           r.people[cid] = personOf(d.map.get(cid));
           r.members.push(cid);
         }
-        for (const cid of fresh) membership(st, r, "invite", cid, time2);
-        r.pending = { status: "error", action: { type: "invite_more", invited: fresh } };
+        for (const cid of fresh2) membership(st, r, "invite", cid, time2);
+        r.pending = { status: "error", action: { type: "invite_more", invited: fresh2 } };
         rid = r.id;
       } else {
         if (members.length > LIMITS2.members) return void (error = `상대는 최대 ${LIMITS2.members}명이에요.`), null;
@@ -2408,12 +3011,12 @@ ${RETRY_ANALYZE}` }
       }
       return writePhone(chat, st);
     });
-    if (!saved) {
+    if (!saved2) {
       phone.notice = error || "저장하지 못했어요.";
       return env3.render();
     }
     Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
-    await generate2({ ...ctx2, chat: saved }, env3, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
+    await generate2({ ...ctx2, chat: saved2 }, env3, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
   }
   function refreshInbox(ctx2, env3, automatic = false, joint) {
     const e = env3 ?? (automatic ? envForAuto(ctx2) : envOr(env3));
@@ -2496,15 +3099,15 @@ ${RETRY_ANALYZE}` }
     for (let i = 0; i < data3.length; i++) hash5 = (hash5 * 131 + data3.charCodeAt(i)) % 2147483647;
     const stamp = `${messageIndex}:${hash5}`;
     if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
-    if (!saved) return;
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
+    if (!saved2) return;
     try {
-      directory(ctx2.char.globalLore, saved);
+      directory(ctx2.char.globalLore, saved2);
     } catch {
       return;
     }
     const notice2 = phone.notice;
-    await refreshInbox({ ...ctx2, chat: saved }, env3, true, joint);
+    await refreshInbox({ ...ctx2, chat: saved2 }, env3, true, joint);
     if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
   }
   async function autoView(ctx2, messageIndex, env3) {
@@ -2514,10 +3117,10 @@ ${RETRY_ANALYZE}` }
     if (!data3.trim()) return;
     const stamp = `${messageIndex}:${data3.length}`;
     if (String(ctx2.chat.scriptstate?.[PH_VIEW_LAST] ?? "") === stamp) return;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
-    if (!saved) return;
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
+    if (!saved2) return;
     const notice2 = phone.notice;
-    await makeView({ ...ctx2, chat: saved }, env3 ?? envForAuto(ctx2), true);
+    await makeView({ ...ctx2, chat: saved2 }, env3 ?? envForAuto(ctx2), true);
     if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
   }
   function openCheck(ctx2, env3) {
@@ -2722,8 +3325,8 @@ ${RETRY_ANALYZE}` }
       const me = r.preset !== "side" ? false : m.sender === r.pov;
       const first = !prev || prev.type !== "text" || prev.sender !== m.sender;
       const head3 = !me && first ? `<b class="ph-name">${esc8(name(m.sender))}</b>` : "";
-      const pic2 = !me ? first ? viewFace(ctx2, d, r, m.sender, " ph-face") : '<span class="ph-face-gap"></span>' : "";
-      return `<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic2}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${esc8(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
+      const pic3 = !me ? first ? viewFace(ctx2, d, r, m.sender, " ph-face") : '<span class="ph-face-gap"></span>' : "";
+      return `<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic3}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${esc8(m.text)}</div></div>${reactionChips(m.reactions)}</div></div>`;
     }).join("");
     const confirm = phone.confirm === `view:${r.id}`;
     return `<div class="ph-room">
@@ -2807,10 +3410,10 @@ ${RETRY_ANALYZE}` }
       const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
-      const pic2 = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
+      const pic3 = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
       const head3 = !me && first ? `<b class="ph-name">${esc8(name(m.sender))}</b>` : "";
       const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc8(shortTime(m.time)) : ""}</span>` : "";
-      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic2}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
+      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic3}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div>${reactionChips(m.reactions)}</div></div>`;
     }).join("");
     const pending2 = r.pending ? r.pending.status === "working" || busy6 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc8(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc8(r.id)}">건너뛰기</button></div>` : "";
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
@@ -2865,7 +3468,7 @@ ${RETRY_ANALYZE}` }
     return d.tabs.some((t) => t.id === cur) ? cur : d.tabs[0]?.id ?? "";
   }
   function paneHead(title2, sub, right = "") {
-    return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
+    return `<header class="ph-room-head ph-wrapsub"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
   }
   function groupView(ctx2, st, d) {
     const room = phone.invite ? st.rooms[phone.invite] : void 0;
@@ -2903,31 +3506,31 @@ ${RETRY_ANALYZE}` }
     const unreadN = every.filter((r) => r.read === false).length;
     const all = phone.noticeFilter === "unread" ? every.filter((r) => r.read === false) : every;
     const size = noticeSettings(ctx2.chat.scriptstate).page;
-    const pages = Math.max(1, Math.ceil(all.length / size));
-    const page = Math.min(Math.max(1, phone.noticePage), pages);
+    const pages2 = Math.max(1, Math.ceil(all.length / size));
+    const page = Math.min(Math.max(1, phone.noticePage), pages2);
     const items = all.slice((page - 1) * size, page * size);
     const head3 = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
       { id: "all", label: "전체", count: every.length },
       { id: "unread", label: "안읽음", alert: unreadN }
     ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc8(f)}" aria-pressed="${phone.noticeFaction === f}">${esc8(label2(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
     if (!all.length) return head3 + blank3("안 읽은 공지가 없어요.");
-    const nav = pages > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? "disabled" : ""}>다음 ›</button></div>` : "";
+    const nav = pages2 > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages2}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages2 ? "disabled" : ""}>다음 ›</button></div>` : "";
     return `${head3}${noticeList(items, label2)}${nav}`;
   }
   function noticeFactionLabel(names4) {
-    return (code2, saved) => (code2 ? noticeLabel(code2, names4) : "") || saved || code2 || "소속 없음";
+    return (code2, saved2) => (code2 ? noticeLabel(code2, names4) : "") || saved2 || code2 || "소속 없음";
   }
   function noticeList(items, label2) {
     return `<ul class="ph-list ph-notices">${items.map((r) => {
       const on2 = phone.view === "notice" && phone.openNotice === r.id;
       const confirm = phone.confirm === `notice:${r.id}`;
       const del = confirm ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc8(r.title)} 삭제">${ICONS.trash}</button>`;
-      const open3 = phone.openNotice === r.id;
-      return `<li class="ph-notice${on2 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open3}">
+      const open4 = phone.openNotice === r.id;
+      return `<li class="ph-notice${on2 ? " on" : ""}${open4 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open4}">
         <span class="ph-ncard-top"><span class="gx-badge">${esc8(r.category)}</span><span class="ph-nfac">${esc8(label2(r.channel, r.channelName))}</span><small>${esc8(r.issuer)}${r.time ? ` · ${esc8(r.time)}` : ""}</small></span>
         <span class="ph-ncard-title"><b>${esc8(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
 </button>${del}
-        ${open3 ? `<div class="ph-notice-body">${esc8(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+        ${open4 ? `<div class="ph-notice-body">${esc8(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
     }).join("")}</ul>`;
   }
   function noticeDetail(ctx2) {
@@ -3006,18 +3609,21 @@ ${RETRY_ANALYZE}` }
     };
     return `<div class="ph-form">${paneHead("괴담톡 설정", "", `<span class="ph-act">${defaultsButtons("ph")}</span>`)}${defaultsConfirm("ph")}
     <div class="ph-form-body ps">
+      ${group("괴담톡", [
+      row2("자동 호출", seg("auto", ["1", "open"].includes(v("auto")) ? v("auto") : "0", [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]]), AUTO_HINT[v("auto")] ?? AUTO_HINT["0"]),
+      row2("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인 모델"], ["aux", "보조 모델"]]), "괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델"),
+      row2("컨텍스트에 포함", onoff("context"), "지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요")
+    ].join(""))}
       ${group("답장", [
-      row2("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인"], ["aux", "보조"]]), "괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델"),
-      row2("채팅에 반영", onoff("context"), "지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요"),
       row2("요원 상태 참고", onoff("status"), "켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요"),
       row2("말버릇 기록", onoff("habits"), "연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요"),
       row2("이모지 반응", onoff("reactions"), "메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요")
     ].join(""))}
       ${group("새 메시지", [
-      row2("새 메시지 확인", seg("auto", ["1", "open"].includes(v("auto")) ? v("auto") : "0", [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]]), AUTO_HINT[v("auto")] ?? AUTO_HINT["0"]),
       row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct2("incoming_chance")}</span>`, rest("cd_incoming")),
       row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct2("group_invite_chance")}</span>`, rest("cd_invite")),
       row2("단톡 수다", `<span class="ph-inline">${onoff("banter")}${pct2("banter_chance")}</span>`, "새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요"),
+      row2("단톡 수다 줄 수", `<span class="ph-inline"><span>최소</span>${num5("banter_min", phoneSettings(ctx2.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}<span>최대</span>${num5("banter_max", phoneSettings(ctx2.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
       row2("소속 공지 받기", onoff("announcements"), "내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요"),
       row2("공지 대기 턴", num5("announcement_gap", notices.gap, 1, 100, "턴"), "공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요"),
       row2("공지 참고 수", num5("announcement_history", notices.history, 1, 50, "개"), "새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요")
@@ -3030,7 +3636,7 @@ ${RETRY_ANALYZE}` }
         row2("등장인물 범위", seg("view_scope", vs.scope, [["0", "주요 인물"], ["1", "장면 안"], ["2", "장면 안 주요 인물"], ["3", "자율"]])),
         row2("방 크기", seg("view_size", vs.size, [["0", "자동"], ["1", "둘이서"], ["2", "여럿"]]))
       ] : [],
-      row2("만들기", seg("view_auto", vs.auto, [["manual", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]]), "매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)")
+      row2("자동 호출", seg("view_auto", vs.auto, [["manual", "수동"], ["open", "창을 열 때"], ["turn", "매 턴"]]), "매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)")
     ].join(""))}
       ${group("연락처", [row2("모든 연락처 공개", onoff("all_contacts"), "내 소속과 관계없이 모든 탭을 보여요"), row2("괴이 연락처 공개", onoff("anomaly_contacts"), "켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만")].join(""))}
       ${group("보관", [
@@ -3065,6 +3671,7 @@ ${RETRY_ANALYZE}` }
     }
   }
   function phoneTab(ctx2, env3) {
+    sitePicFor(ctx2);
     liveEnv = env3;
     let st;
     let d;
@@ -3290,588 +3897,8 @@ ${RETRY_ANALYZE}` }
         else Object.assign(phone, { openNotice: id2, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row9 = b.items.find((x) => x.id === id2);
-          if (row9 && row9.read === false) {
-            row9.read = true;
+          const row10 = b.items.find((x) => x.id === id2);
+          if (row10 && row10.read === false) {
+            row10.read = true;
             await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
-            return true;
-          }
-        }
-        break;
-      }
-      case "ph-notice-page":
-        phone.noticePage = Math.max(1, Number(v) || 1);
-        phone.openNotice = null;
-        break;
-      case "ph-notice-all": {
-        const b = readBulletins(ctx2.chat);
-        if (!b.items.some((x) => x.read === false)) break;
-        for (const row9 of b.items) row9.read = true;
-        await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
-        return true;
-      }
-      case "ph-notice-del": {
-        if (phone.confirm !== `notice:${v}`) {
-          phone.confirm = `notice:${v}`;
-          break;
-        }
-        phone.confirm = null;
-        const b = readBulletins(ctx2.chat);
-        b.items = b.items.filter((x) => x.id !== Number(v));
-        if (phone.openNotice === Number(v)) Object.assign(phone, { openNotice: null, view: phone.view === "notice" ? "list" : phone.view });
-        await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
-        return true;
-      }
-      case "ph-call":
-        Object.assign(phone, { view: "call", call: v, callText: "" });
-        break;
-      case "ph-call-place":
-        await placeCall(ctx2, env3, phone.call, phone.callText);
-        return true;
-      case "ph-add":
-        Object.assign(phone, { view: "add", addName: "", addNote: "" });
-        break;
-      case "ph-add-save":
-        await addContact(ctx2, env3);
-        return true;
-      case "ph-contact-del":
-        if (phone.confirm !== `contact:${v}`) {
-          phone.confirm = `contact:${v}`;
-          break;
-        }
-        phone.confirm = null;
-        await deleteContact(ctx2, env3, v);
-        return true;
-      case "ph-cfg": {
-        const [k, val] = v.split("=");
-        const vars = { [PH(k)]: val };
-        if (k === "all_contacts" || k === "anomaly_contacts") phone.tab = "";
-        if (k === "announcement_page_size") phone.noticePage = 1;
-        await setVars(ctx2, env3, vars);
-        return true;
-      }
-      case "ph-text": {
-        const [k, ...rest] = v.split("=");
-        if (k === "view_pov") await setVars(ctx2, env3, { [PH(k)]: rest.join("=").trim().slice(0, 40) });
-        return true;
-      }
-      case "ph-num": {
-        const [k, val] = v.split("=");
-        const range = {
-          incoming_chance: [0, 100],
-          group_invite_chance: [0, 100],
-          banter_chance: [0, 100],
-          announcement_gap: [1, 100],
-          announcement_history: [1, 50],
-          storage_limit_dm: [1, STORAGE_MAX2],
-          storage_limit_group: [1, STORAGE_MAX2],
-          storage_limit_notice: [1, STORAGE_MAX2]
-        };
-        const r = range[k];
-        const n2 = Math.floor(Number(val));
-        if (r && Number.isFinite(n2)) await setVars(ctx2, env3, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n2))) });
-        else env3.render();
-        return true;
-      }
-      default:
-        return false;
-    }
-    env3.render();
-    return true;
-  }
-  async function addContact(ctx2, env3) {
-    const name = phone.addName.trim();
-    if (!validCallTarget(name)) {
-      phone.notice = "이름은 60자 이내로, 줄바꿈·괄호 없이 적어 주세요.";
-      return env3.render();
-    }
-    if (tokens(phone.addNote) > LIMITS2.memo_tokens) {
-      phone.notice = `인물 메모는 ${LIMITS2.memo_tokens}토큰 이내로 적어 주세요.`;
-      return env3.render();
-    }
-    const d = dir(ctx2);
-    const key = name.toLowerCase();
-    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key || c.terms.some((t) => t.toLowerCase() === key));
-    if (found.length > 1) {
-      phone.notice = "같은 이름의 연락처가 여럿이에요. 정확한 이름을 적어 주세요.";
-      return env3.render();
-    }
-    const match = found[0];
-    if (match?.visible) {
-      Object.assign(phone, { view: "list", sub: "contacts", tab: match.tabs[0] ?? "", query: "", notice: "이미 등록된 연락처예요." });
-      return env3.render();
-    }
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const data3 = readCustom(chat);
-      if (match) data3.items.push({ id: match.id, name: match.name, agentId: match.agentId });
-      else {
-        data3.seq += 1;
-        data3.items.push({ id: contactId(`custom:${data3.seq}`), name, note: phone.addNote.trim() });
-      }
-      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data3) } };
-    });
-    Object.assign(phone, { view: "list", sub: "contacts", tab: "T05", query: "", notice: "연락처를 기타에 추가했어요." });
-    await env3.refresh();
-  }
-  async function deleteContact(ctx2, env3, cid) {
-    if (phoneBusy(ctx2)) return;
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const data3 = readCustom(chat);
-      data3.items = data3.items.filter((x) => x.id !== cid);
-      const st = readPhone(chat);
-      for (const [rid, r] of Object.entries(st.rooms)) if (r.kind === "dm" && (rid === `dm_${cid}` || r.members.includes(cid))) delete st.rooms[rid];
-      st.order = st.order.filter((x) => st.rooms[x]);
-      return writePhone({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data3) } }, st);
-    });
-    phone.notice = "연락처와 1:1 대화 기록을 지웠어요.";
-    await env3.refresh();
-  }
-  function phoneInput(name, value, key) {
-    switch (name) {
-      case "ph-draft":
-        phone.draft = value;
-        return true;
-      case "ph-att":
-        return attachInput(phone.attach, key, value);
-      case "ph-topic":
-        phone.topic = value;
-        return true;
-      case "ph-gname":
-        phone.gname = value;
-        return true;
-      case "ph-call-to":
-        phone.call = value;
-        return true;
-      case "ph-call-text":
-        phone.callText = value;
-        return true;
-      case "ph-add-name":
-        phone.addName = value;
-        return true;
-      case "ph-add-note":
-        phone.addNote = value;
-        return true;
-      case "ph-pick-q":
-        phone.pickQuery = value;
-        return true;
-      default:
-        return false;
-    }
-  }
-  function phoneUnread(ctx2) {
-    try {
-      return unreadCount(readPhone(ctx2.chat)) > 0 || bulletinUnread(readBulletins(ctx2.chat));
-    } catch {
-      return false;
-    }
-  }
-  var phoneSettingsPane = (ctx2) => settingsView(ctx2);
-  function previewPhoneRefresh(ctx2) {
-    const st = readPhone(ctx2.chat);
-    const d = dir(ctx2);
-    const rolls = [];
-    let k = 0;
-    const roll = () => k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]);
-    const plan = fitPrompt(budgetFor(ctx2.chat.scriptstate, "ph"), () => {
-      k = 0;
-      const p2 = refreshPrompt2(source(ctx2), st, d, names2(ctx2), roll);
-      return { ...p2, messages: p2.prompt?.messages ?? [] };
-    });
-    return plan.prompt ? plan.prompt.messages : null;
-  }
-  function previewPhoneView(ctx2) {
-    return fitPrompt(budgetFor(ctx2.chat.scriptstate, "ph"), () => viewPrompt(source(ctx2), names2(ctx2), readViews(ctx2.chat.scriptstate))).messages;
-  }
-
-  // src/ui/evpic.ts
-  var cache8 = null;
-  var viewerOf = (ctx2) => String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
-  function rows(ctx2) {
-    const viewer = viewerOf(ctx2);
-    if (cache8 && cache8.lore === ctx2.char.globalLore && cache8.stamp === moduleAssetStamp() && cache8.viewer === viewer) return cache8.map;
-    const map = /* @__PURE__ */ new Map();
-    const dir2 = readDirectory(ctx2.char.globalLore);
-    for (const p2 of [...dir2.anomalies, ...dir2.sites]) {
-      const row9 = { pic: mainPic(ctx2.char, p2), title: p2.lore || p2.label };
-      for (const n2 of [p2.label, p2.lore, ...p2.aliases]) if (n2 && !map.has(n2)) map.set(n2, row9);
-    }
-    let names4 = {};
-    try {
-      names4 = factionNames(parseCatalog(ctx2.char.globalLore), viewer);
-    } catch {
-    }
-    const fake = dir2.orgs.find((o) => o.faction === "B00");
-    for (const b of dir2.bases) {
-      let org = dir2.orgs.find((o) => o.name === b.org);
-      const swap = viewer === "B00" && org?.faction === "A00" && !!fake;
-      if (swap) org = fake;
-      const own = !swap && findDoc(ctx2.chat, b.name, ctx2.char.globalLore);
-      const lore = ctx2.char.globalLore ?? [];
-      const outside = (en2) => en2 && hasAsset(ctx2.char, `Base ${en2}`) ? `Base ${en2}` : "";
-      const pic2 = (swap ? outside(org.spec.english) : outside(b.english) || mainPic(ctx2.char, b)) || (org ? mainPic(ctx2.char, org.spec) : "");
-      const title2 = own ? b.name : swap ? orgLoreName(lore, org.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
-      const shared = pic2 ? "" : baseShared(b.name, b.label).find((n2) => hasAsset(ctx2.char, n2)) ?? "";
-      map.set(b.name, { pic: pic2 || shared, title: title2, org: org ? org.faction && names4[org.faction] || org.name : "" });
-    }
-    cache8 = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
-    return map;
-  }
-  var descs = /* @__PURE__ */ new Map();
-  var sharedFor = (kind, name, text4) => kind === "lm" ? ["Situation Incident"] : situationShared(kind, name, text4);
-  var basePic = (ctx2, name) => rows(ctx2).get(name)?.pic ?? "";
-  function baseLink(ctx2, name) {
-    const r = rows(ctx2).get(name);
-    return { doc: r?.title ?? name, org: r?.org ?? "" };
-  }
-  function evArt(ctx2, name, kind, text4 = "") {
-    const r = rows(ctx2).get(name);
-    const shared = !r?.pic && kind && sharedFor(kind, name, text4).find((n2) => hasAsset(ctx2.char, n2)) || "";
-    const pic2 = imageUrl(ctx2.char, r?.pic || shared);
-    const title2 = r?.title ?? name;
-    let desc = descs.get(title2);
-    if (desc === void 0) {
-      const doc2 = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
-      desc = doc2 ? docSummary(doc2.body) : "";
-      descs.set(title2, desc);
-    }
-    return { pic: pic2, desc };
-  }
-
-  // src/ui/wiki.ts
-  var TABS = [["all", "전체"], ["story", "이번 이야기"], ["an", "괴이"], ["ms", "특수"], ["ag", "인물"], ["fac", "세력"], ["etc", "기타"]];
-  var wiki = {
-    view: "home",
-    title: "",
-    query: "",
-    homeQuery: "",
-    history: [],
-    inherited: [],
-    previousTitle: null,
-    direct: false,
-    confirmDelete: null,
-    failure: null,
-    notice: "",
-    info: "",
-    listOpen: false,
-    tab: "all",
-    newTitle: "",
-    docReq: "",
-    rewrite: null,
-    rewritePrev: true
-  };
-  function resetWiki() {
-    Object.assign(wiki, { view: "home", title: "", query: "", homeQuery: "", history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: "", newTitle: "", docReq: "", rewrite: null });
-  }
-  var jobs2 = /* @__PURE__ */ new Map();
-  var chatKey2 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc9 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var regCache = null;
-  function registry(ctx2) {
-    if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
-    return regCache.reg;
-  }
-  var source2 = (ctx2) => playerSource({ char: ctx2.char, chat: ctx2.chat, persona: personaText() });
-  function canon(ctx2) {
-    const r = registry(ctx2);
-    const src = source2(ctx2);
-    return (t) => ownDoc(ctx2, t) ?? canonicalTitle(r, src, t).title;
-  }
-  function ownDoc(ctx2, t) {
-    const title2 = t.trim();
-    return title2 && findDoc(ctx2.chat, title2, ctx2.char.globalLore) ? title2 : null;
-  }
-  function go(view2, title2 = "", query = wiki.query) {
-    if (wiki.view !== view2 || wiki.title !== title2) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
-    if (wiki.history.length > 30) wiki.history.shift();
-    if (wiki.view !== view2 || wiki.title !== title2) Object.assign(wiki, { docReq: "", rewrite: null });
-    wiki.view = view2;
-    wiki.title = title2;
-    wiki.query = query;
-    wiki.confirmDelete = null;
-    wiki.notice = "";
-  }
-  function openTitle(ctx2, raw, from) {
-    const title2 = canon(ctx2)(raw.trim());
-    if (!validTitle(title2)) {
-      wiki.notice = "쓸 수 없는 제목이에요. 꺾쇠(<>), 줄바꿈, {{ }} 없이 300자 이내로 적어 주세요.";
-      return;
-    }
-    const parent = wiki.view === "doc" ? findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore) : null;
-    if (findDoc(ctx2.chat, title2, ctx2.char.globalLore)) {
-      go("doc", title2);
-      return;
-    }
-    wiki.inherited = from === "link" && parent?.meta ? parent.meta.primarySources : [];
-    wiki.previousTitle = from === "link" && parent ? parent.title : null;
-    wiki.direct = from !== "link";
-    go("compose", title2);
-  }
-  function search(ctx2, q) {
-    const query = q.trim();
-    wiki.query = query;
-    if (!query) return false;
-    const own = ownDoc(ctx2, query);
-    const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx2), source2(ctx2), query);
-    if (findDoc(ctx2.chat, c.title, ctx2.char.globalLore)) return go("doc", c.title, query), true;
-    if (c.known) return openTitle(ctx2, c.title, "direct"), true;
-    wiki.listOpen = true;
-    return false;
-  }
-  function articlePrompt(ctx2, title2, o) {
-    const s8 = wikiSettings(ctx2.chat.scriptstate);
-    const { inherited, previousDoc, writingRequest, docRequest, direct } = o;
-    const catalogNames = (() => {
-      try {
-        return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
-      } catch {
-        return {};
-      }
-    })();
-    const subject = entryFor(ctx2, title2);
-    const images = s8.images === "body" ? [...subject && subject.cat !== "ag" && subject.photo ? [subject] : [], ...entries(ctx2).filter((e) => e.cat !== "ag" && e.photo && e !== subject)].filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i).map((e) => ({ name: e.photo.replace(/#.*$/, ""), label: e.name })) : [];
-    const moods = s8.images !== "off" && subject?.cat === "ag" ? portraitMoods(ctx2, subject.photo) : [];
-    return fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source2(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s8, catalogNames, registry(ctx2)));
-  }
-  async function generate3(ctx2, env3, title2, regenerate, docRequest = "", usePrevious) {
-    const key = chatKey2(ctx2);
-    if (jobs2.has(key)) {
-      wiki.notice = `「${jobs2.get(key).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
-      env3.render();
-      return;
-    }
-    const s8 = wikiSettings(ctx2.chat.scriptstate);
-    const old = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
-    const inherited = regenerate ? old?.meta && !old.meta.direct ? old.meta.primarySources : [] : wiki.inherited;
-    const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-    const previousDoc = regenerate ? usePrevious ?? s8.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
-    const writingRequest = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    jobs2.set(key, { title: title2, started: Date.now() });
-    wiki.failure = null;
-    wiki.notice = "";
-    env3.render();
-    try {
-      const prompt = articlePrompt(ctx2, title2, { inherited, previousDoc, writingRequest, docRequest, direct });
-      let body5;
-      try {
-        body5 = (await generate(prompt.messages, s8.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), reiterate: craftSettings(ctx2.chat.scriptstate, "nw").reiterate, staticModel: featureModel(ctx2.chat.scriptstate, "nw"), state: ctx2.chat.scriptstate, label: "위키 글" })).value;
-      } catch (error) {
-        const raw = error.raw;
-        if (raw) wiki.failure = { title: title2, reason: error instanceof Error ? error.message : String(error), raw };
-        throw error;
-      }
-      const meta = {
-        title: title2,
-        mode: s8.mode,
-        model: s8.model,
-        created: Math.floor(Date.now() / 1e3),
-        length: s8.length,
-        sources: prompt.sources,
-        primarySources: prompt.primarySources.length ? prompt.primarySources : inherited,
-        writingRequest,
-        direct,
-        ...docRequest.trim() ? { docRequest: docRequest.trim() } : {}
-      };
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body5));
-      const cur = env3.current();
-      if (cur && chatKey2(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) Object.assign(wiki, { view: "doc", rewrite: null, docReq: "" });
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      wiki.notice = `「${title2}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
-      if (!wiki.failure && !(error instanceof WikiError)) wiki.failure = { title: title2, reason: msg, raw: error.raw ?? "" };
-    } finally {
-      jobs2.delete(key);
-      await env3.refresh();
-    }
-  }
-  function portraitMoods(ctx2, photo) {
-    const base = photo.replace(/#.*$/, "").replace(/_default$/, "");
-    if (!base || base === photo) return [];
-    return assetNames(ctx2.char).filter((n2) => n2.startsWith(`${base}_`)).map((n2) => n2.slice(base.length + 1)).filter((m) => m && m !== "default" && /^[a-z ]+$/i.test(m)).sort();
-  }
-  var quietEnv2 = { render: () => {
-  }, refresh: async () => {
-  }, current: () => null };
-  var liveEnv2 = null;
-  var NW_AUTO_LAST = "$nw_auto_last";
-  async function autoWriteWiki(ctx2, messageIndex, open3 = false) {
-    const s8 = wikiSettings(ctx2.chat.scriptstate);
-    if (!(open3 ? s8.auto === "open" : s8.auto === "turn") || jobs2.has(chatKey2(ctx2))) return;
-    const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
-    if (!data3.trim()) return;
-    const stamp = `${messageIndex}:${data3.length}`;
-    if (String(ctx2.chat.scriptstate?.[NW_AUTO_LAST] ?? "") === stamp) return;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [NW_AUTO_LAST]: stamp } }));
-    if (!saved) return;
-    const cur = { ...ctx2, chat: saved };
-    const env3 = liveEnv2 ?? quietEnv2;
-    const showing = env3.current();
-    const target = showing && chatKey2(showing) === chatKey2(cur) ? env3 : quietEnv2;
-    const notice2 = wiki.notice;
-    try {
-      const title2 = s8.autoTitle === "input" ? s8.autoQuery ? canon(cur)(s8.autoQuery) : "" : await pickTitle(cur);
-      if (!title2) {
-        if (target !== quietEnv2) wiki.notice = "자동 작성 제목이 비어 있어요. 위키 설정에서 적어 주세요.";
-        return;
-      }
-      const old = findDoc(cur.chat, title2, cur.char.globalLore);
-      await generate3(cur, target, title2, !!old && !old.base);
-    } finally {
-      if (target === quietEnv2) wiki.notice = notice2;
-    }
-  }
-  async function pickTitle(ctx2) {
-    const me = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
-    const written = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).filter((d) => !d.base).map((d) => d.title));
-    const candidates = [...new Set(entries(ctx2).filter((e) => !(me && e.cat === "ag" && e.name === me.name)).map((e) => e.title))];
-    if (!candidates.length) return "";
-    const names4 = (() => {
-      try {
-        return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
-      } catch {
-        return {};
-      }
-    })();
-    const s8 = wikiSettings(ctx2.chat.scriptstate);
-    const { value } = await generate(wikiTitlePrompt(source2(ctx2), candidates, [...written], names4), s8.model, (raw) => acceptTitle(raw, candidates), { ...genSettings(ctx2.chat.scriptstate), staticModel: featureModel(ctx2.chat.scriptstate, "nw"), state: ctx2.chat.scriptstate, label: "위키 제목" });
-    return value;
-  }
-  function wikiOpenCheck(ctx2, env3) {
-    liveEnv2 = env3;
-    if (wikiSettings(ctx2.chat.scriptstate).auto !== "open") return;
-    const at = lastReply(ctx2.chat);
-    if (at < 0) return;
-    void autoWriteWiki(ctx2, at, true).catch((error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`));
-  }
-  async function setVar(ctx2, env3, key, value) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [key]: value } }));
-    await env3.refresh();
-  }
-  var CAT_LABEL = { an: "괴이", ms: "특수", lm: "거점", ag: "인물", org: "조직" };
-  var CAT_ICON = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
-  var entryCache = null;
-  function entries(ctx2) {
-    const viewer = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
-    if (entryCache && entryCache.lore === ctx2.char.globalLore && entryCache.stamp === moduleAssetStamp() && entryCache.viewer === viewer) return entryCache.list;
-    const c = canon(ctx2);
-    const list4 = [];
-    const dir2 = readDirectory(ctx2.char.globalLore);
-    const other = /* @__PURE__ */ new Set([...dir2.agents.map((a) => a.lore), ...orgLores(ctx2.char.globalLore ?? [])]);
-    for (const [cat, rows3] of [["an", dir2.anomalies], ["ms", dir2.sites]]) {
-      for (const p2 of rows3) if (p2.inFolder || !other.has(p2.lore)) list4.push({ cat, name: p2.label, title: c(p2.lore || p2.label), sub: p2.english, photo: mainPic(ctx2.char, p2), face: facePic(ctx2.char, p2), terms: [p2.label, p2.english, ...p2.aliases] });
-    }
-    try {
-      for (const l of parseCatalog(ctx2.char.globalLore).landmarks) {
-        const link = baseLink(ctx2, l.name);
-        list4.push({ cat: "lm", name: l.name, title: c(link.doc), sub: [link.org, placeWhere(l.sido, l.gu)].filter(Boolean).join(" · "), photo: basePic(ctx2, l.name), face: basePic(ctx2, l.name), terms: [l.name, l.english, ...l.aliases] });
-      }
-    } catch {
-    }
-    for (const a of dir2.agents) list4.push({ cat: "ag", name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(" · ") || a.english, photo: mainPic(ctx2.char, a), face: facePic(ctx2.char, a, true), terms: [a.name, a.english, ...a.aliases] });
-    const lore = ctx2.char.globalLore ?? [];
-    const facs = factionList(lore);
-    const hasLore = new Set(lore.map((e) => String(e.comment ?? "").trim()));
-    for (const o of dir2.orgs) {
-      const f = o.faction ? facs.find((x) => x.code === o.faction) : facs.find((x) => !x.builtin && x.affiliation === o.name);
-      if (f?.hidden) continue;
-      const doc2 = orgLoreName(lore, o.name);
-      if (!f && !hasLore.has(doc2)) continue;
-      const name = f?.name ?? o.name;
-      const title2 = [c(doc2), c(o.name), c(name)].find((t) => findDoc(ctx2.chat, t, lore)) ?? c(doc2);
-      list4.push({ cat: "org", name, title: title2, sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, { ...o.spec, shared: o.shared }), face: facePic(ctx2.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc2, o.spec.english ?? ""] });
-    }
-    const seen2 = /* @__PURE__ */ new Set();
-    const out = list4.filter((e) => seen2.has(`${e.cat}|${e.title}`) ? false : (seen2.add(`${e.cat}|${e.title}`), true));
-    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out };
-    return out;
-  }
-  var entryFor = (ctx2, title2) => {
-    const all = entries(ctx2).filter((e) => e.title === title2);
-    return all.find((e) => e.name === title2) ?? all.find((e) => e.cat !== "lm") ?? all[0];
-  };
-  var shownName = (ctx2, title2) => entryFor(ctx2, title2)?.name ?? title2;
-  function matches2(ctx2, q) {
-    const lower = q.toLowerCase();
-    return entries(ctx2).filter((e) => e.terms.some((t) => t && t.toLowerCase().includes(lower)));
-  }
-  var squash3 = (t) => t.toLowerCase().replace(/[\s·.,!?'"「」『』()\[\]\-_~]/g, "");
-  function editDistance(a, b) {
-    const A2 = [...a], B2 = [...b];
-    let prev = Array.from({ length: B2.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= A2.length; i++) {
-      const cur = [i];
-      for (let j = 1; j <= B2.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (A2[i - 1] === B2[j - 1] ? 0 : 1));
-      prev = cur;
-    }
-    return prev[B2.length];
-  }
-  function similar(q, titles) {
-    const k = squash3(q);
-    if (!k) return [];
-    const limit = Math.max(1, Math.floor([...k].length / 3));
-    return [...new Set(titles)].map((t) => {
-      const v = squash3(t);
-      if (!v) return null;
-      if (v === k || v.includes(k) || k.includes(v) && [...v].length >= 2) return { t, d: 0 };
-      const d = editDistance(k, v);
-      return d <= limit ? { t, d } : null;
-    }).filter((x) => !!x).sort((a, b) => a.d - b.d || a.t.length - b.t.length).slice(0, 6).map((x) => x.t);
-  }
-  function face2(ctx2, e, cls = "") {
-    const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc9(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
-  }
-  function seg2(action, cur, items) {
-    const sw = onOffSwitch(items, cur, action, (v) => v);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
-  }
-  function busyLine(ctx2) {
-    const job = jobs2.get(chatKey2(ctx2));
-    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc9(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
-  }
-  var tool2 = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  var blank4 = (text4) => `<div class="ph-blank"><p>${text4}</p></div>`;
-  var when = (sec2) => new Date(sec2 * 1e3).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
-  function row3(ctx2, e, title2, sub, dot = false) {
-    const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
-    const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
-    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc9(title2)}">${face2(ctx2, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc9(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc9(small)}</small>` : ""}</span></button></li>`;
-  }
-  var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-  var PLAIN = { ㄲ: "ㄱ", ㄸ: "ㄷ", ㅃ: "ㅂ", ㅆ: "ㅅ", ㅉ: "ㅈ" };
-  var KEYS2 = [..."ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ", "A", "#"];
-  function keyOf(title2) {
-    const ch = title2.trim().charAt(0);
-    const c = ch.charCodeAt(0);
-    if (c >= 44032 && c <= 55203) {
-      const j = CHO[Math.floor((c - 44032) / 588)];
-      return PLAIN[j] ?? j;
-    }
-    if (CHO.includes(ch)) return PLAIN[ch] ?? ch;
-    return /[a-z]/i.test(ch) ? "A" : "#";
-  }
-  function sortedDocs(ctx2) {
-    return listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => ({ d, n: shownName(ctx2, d.title) })).map((x) => ({ ...x, k: KEYS2.indexOf(keyOf(x.n)) })).sort((x, y) => x.k - y.k || x.n.localeCompare(y.n, "ko")).map((x) => x.d);
-  }
-  function wikiHomeResults(ctx2) {
-    return wiki.homeQuery.trim() ? wikiList(ctx2, wiki.homeQuery) : "";
-  }
-  function wikiList(ctx2, query = wiki.query) {
-    const docs = sortedDocs(ctx2);
-    const saved = new Set(docs.map((d) => d.title));
-    const q = query.trim();
-    const dated = (d, dot = true) => {
-      const e = entryFor(ctx2, d.title);
-      return row3(ctx2, e, d.title, e ? void 0 : d.meta?.created ? when(d.meta.created) : "", dot && !d.base);
-    };
-    if (q) {
-      const lower = q.toLowerCase();
-      const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
-      const hits = matches2(ctx2, q).filter((e) => !saved.has(e.title));
-      const exact = canon(ctx2)(q);
-      const known = saved.has(exact) || hits.some((e) => e.title === exact);
-      const docPart = mine.length ? `<h4 class="ph-sec">문서<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => dated(d)).join("")}</ul>` : "";
-      const rosterPart = hits.length ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row3(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "))).join("")}</ul>` : "";
-      const shownTitles = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-      const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).fil
+           

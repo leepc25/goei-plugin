@@ -2,18 +2,18 @@
 // 원본은 채팅 입력창을 빌려 썼지만 여기서는 창 안의 입력칸에 쓴다. 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { onOffSwitch } from './controls';
 import {
-  acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, boardUnread, CFG, commitIncoming,
+  acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
-  GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
+  GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, COUNT_RANGE, type CountKey,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
-  userNick, writeGnet, consList, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel, GN_BOARD_STYLE, gnetStyle, styleSwitched } from '../core/gnet';
+  userNick, writeGnet, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
-import { guideOverridden, guideText } from '../core/guides';
 import { toast } from './toast';
-import { drawerHtml } from './drawer';
-import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
+import { imageUrl } from './images';
+import { resolveSitePic } from '../core/sitepics';
+import { boardFiles, boardThumb, setSitePicSource, attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
 import { lastReply } from '../core/phone';
@@ -28,6 +28,8 @@ import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
+import { boardView, boardWrite, type BoardSite } from '../core/boards';
+import { siteLogo } from './browser';
 import { isPhone } from './media';
 
 type Compose =
@@ -51,16 +53,23 @@ interface GnetUi {
   attachMenu: boolean;
   notice: string;
   failure: { label: string; reason: string; raw: string } | null;
+  /** 사이트 화면 (2026-11-08): 분류('' 전체 · 말머리 · '@mine' 내가 쓴 글 · '@scrap' 스크랩), 정렬, 찾기, 쪽 */
+  cat: string;
+  sort: 'new' | 'hot' | 'cmt';
+  q: string;
+  page: number;
 }
 
 export const gnet: GnetUi = {
   sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false,
+  cat: '', sort: 'new', q: '', page: 1,
 };
 /** 괴담넷에서 보낼 수 있는 첨부 (원본: 선물 없음) */
 export const GN_KINDS: UserKind[] = ['image', 'photo', 'video', 'file', 'link'];
 
 export function resetGnet() {
-  Object.assign(gnet, { sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, notice: '', failure: null, settings: false, attachMenu: false });
+  uiSaved.clear();
+  Object.assign(gnet, { sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, notice: '', failure: null, settings: false, attachMenu: false, cat: '', sort: 'new', q: '', page: 1 });
 }
 
 export interface GnetEnv {
@@ -71,7 +80,36 @@ export interface GnetEnv {
 
 /** 채팅마다 한 번에 하나 (원본 LB.exclusive) */
 const jobs = new Map<string, string>();
-const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIndex}:${ctx.chatIndex}`;
+const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIndex}:${ctx.chatIndex}:${siteOf(ctx)}`;
+
+/* ── 사이트 (2026-11-08): 괴담넷·괴담갤·세정게·연어 마켓은 같은 게시판 코드를 쓰고 변수만 따로 (core/boards.ts) ── */
+type SiteCtx = ChatContext & { site?: BoardSite };
+const siteOf = (ctx: object): BoardSite => (ctx as SiteCtx).site ?? 'gn';
+/** 그 사이트로 비춘 ctx (이미 비췄으면 그대로) */
+function siteCtx(ctx: ChatContext, site: BoardSite): SiteCtx {
+  if ((ctx as SiteCtx).site === site) return ctx;
+  return { ...ctx, chat: boardView(ctx.chat, site), site };
+}
+/** 비춘 채팅으로 고치고, 원래 채팅에 되돌려 저장. 돌려주는 것도 비춘 채팅 */
+async function upd(ctx: ChatContext, f: (chat: Chat) => Chat | null | undefined): Promise<Chat | null> {
+  const site = siteOf(ctx);
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    const r = f(boardView(chat, site));
+    return r ? boardWrite(chat, r, site) : null;
+  });
+  return saved ? boardView(saved, site) : null;
+}
+/** 사이트마다 따로 둔 화면 상태 (글 펼침·쓰던 글 등) */
+let uiSite: BoardSite = 'gn';
+const uiSaved = new Map<BoardSite, GnetUi>();
+const freshUi = (): GnetUi => ({ sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false, cat: '', sort: 'new', q: '', page: 1 });
+export function useBoardSite(site: BoardSite): void {
+  if (site === uiSite) return;
+  uiSaved.set(uiSite, { ...gnet });
+  Object.assign(gnet, uiSaved.get(site) ?? freshUi());
+  uiSite = site;
+}
+export const boardSiteNow = (): BoardSite => uiSite;
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -151,7 +189,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     const first = joint && ((m: LlmMessage[]) => joint.ask('gnet', m));
     const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx.chat), first });
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
         note = '채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.';
         return null;
@@ -160,7 +198,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
       const inc = saveIncoming(chat, res.st, (value as { incoming?: unknown }).incoming, plan);
       note = [res.notice, res.emptyComments ? '이번 게시판에는 댓글이 하나도 없어요.' : '', inc.note].filter(Boolean).join(' ');
       const figs = s.keyFigures ? mergeKeyFigures(chat.scriptstate, (value as { keyFigures?: unknown }).keyFigures) : null;
-      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}), [GN_BOARD_STYLE]: gnetStyle(chat.scriptstate) }), res.st, { ack: viewing() });
+      return writeGnet(withVars(chat, { ...inc.vars, ...(figs ?? {}) }), res.st, { ack: viewing() });
     });
     if (!automatic) gnet.open = null;
     else if (gnet.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), gnet.open)) gnet.open = null;
@@ -192,13 +230,14 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     const draft = attachPostDraft(parsed, input);
     let note = '글을 올렸어요.';
     let newId = 0;
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
+      if (draft.tag) p.tag = draft.tag;
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
       pushComments(p, got.comments, dateNow(chat));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       trimBoard(cur, s);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       if (!got.comments.length) note = '글을 올렸어요. 아직 댓글은 없어요.';
@@ -229,7 +268,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
     const snapshot = postKey(target);
     const { value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(chat));
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+    await upd(ctx, (latest) => {
       const cur = readGnet(latest);
       const p = findPost(cur, postId);
       if (!p || postKey(p) !== snapshot) {
@@ -241,7 +280,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
       const n = got.comments.length;
       p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
       p.votes += Math.floor(Math.random() * (n + 2));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest), gnetSettings(latest.scriptstate).counts.act[1]);
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
       if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
@@ -260,7 +299,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
   const nick = userNick(ctx.chat.scriptstate);
   let index = 0;
   // 내 댓글은 먼저 저장한다 (원본과 같음). 반응 생성이 실패해도 남는다
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
     index = addUserComment(st, postId, parent, nick, body, dateNow(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
@@ -285,7 +324,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
     }
     const snapshot = postKey(target);
     let note = '';
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = findPost(cur, postId);
       if (!p || postKey(p) !== snapshot) {
@@ -294,7 +333,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(chat));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? '' : '등록했어요. 추가 답글은 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
@@ -317,7 +356,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     gnet.notice = '나에게는 쪽지를 보낼 수 없어요.';
     return env.render();
   }
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
     addOutgoingDm(st, nick, body, dateNow(chat), src);
     return writeGnet(chat, st);
@@ -340,7 +379,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
       // 원본과 같이 고쳐 달라고 다시 묻는다 (횟수·모델은 고급 설정 → 생성 공통)
       reply = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
     } catch (error) {
-      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+      await upd(ctx, (chat) => {
         const cur = readGnet(chat);
         let i = cur.dms.length - 1;
         while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === 'me')) i--;
@@ -351,7 +390,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
       if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
       throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
-    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+    await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       cur.dms.push({ nick, side: 'npc', body: reply, unread: true, date: dateNow(chat) });
       return writeGnet(chat, cur, { ack: viewing() });
@@ -361,7 +400,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
 }
 
 async function mutate(ctx: ChatContext, env: GnetEnv, f: (st: GState, chat: Chat) => boolean | void, vars: Record<string, string> = {}, reconcile = true) {
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+  await upd(ctx, (chat) => {
     const st = readGnet(chat);
     if (f(st, chat) === false) return null;
     return writeGnet(withVars(chat, vars), st, { reconcile });
@@ -374,12 +413,21 @@ async function setVar(ctx: ChatContext, env: GnetEnv, key: string, value: string
 }
 
 async function setVars(ctx: ChatContext, env: GnetEnv, vars: Record<string, string>) {
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => withVars(chat, vars));
+  await upd(ctx, (chat) => withVars(chat, vars));
   await env.refresh();
 }
 
 
 // ── 화면 ──
+
+/** 개수 최소·최대 (직접 입력, 괴담톡 「단톡 수다 줄 수」와 같은 칸) */
+function countRow(ctx: ChatContext, k: CountKey, unit: string, label: string): string {
+  const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];
+  const [lo, hi] = COUNT_RANGE[k];
+  const box = (side: 'min' | 'max', n: number, name: string) =>
+    `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n}" aria-label="${label} ${name}"><span>${unit}</span>`;
+  return `<span class="ph-inline"><span>최소</span>${box('min', a, '최소')}<span>최대</span>${box('max', b, '최대')}</span>`;
+}
 
 function seg(key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'gn-cfg', (v) => `${key}=${v}`);
@@ -389,18 +437,7 @@ function seg(key: string, cur: string, items: [string, string][]): string {
     .join('')}</div>`;
 }
 
-/** 반응 그림 표 (라이트보드 미니콘, 2026-11-06). gnetTab이 그릴 때마다 채운다 */
-let consMap = new Map<string, string>();
-const CON_RE = /\[콘:([^\[\]:]{1,30})\]/g;
-/** 본문의 [콘:이름]을 그림으로 바꾼다. 목록에 없는 이름은 글자 그대로 둔다 */
-export function withCons(html: string, map: Map<string, string>): string {
-  if (!map.size) return html;
-  return html.replace(CON_RE, (m, name: string) => {
-    const src = map.get(name);
-    return src ? `<img class="gn-con" src="${src}" alt="${name}" title="${name}" loading="lazy">` : m;
-  });
-}
-const body = (text: string) => withCons(attachBody(text, true), consMap);
+const body = (text: string) => attachBody(text, true);
 
 function time(date: string): string {
   return /(\d\d:\d\d)/.exec(date)?.[1] ?? '';
@@ -413,46 +450,19 @@ function paneHead(title: string, sub: string, right = '', back = true): string {
   return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ''}<div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
 }
 
-/** 오른쪽 칸(모바일은 목록 대신)에 무엇을 띄울지 (v0.16.22: 괴담톡처럼 두 칸) */
-type Pane = 'settings' | 'compose' | 'post' | 'dm' | null;
-/** 모바일: 글·쪽지는 화면을 넘기지 않고 목록 안에서 펼친다 (사용자 요청) */
+/** 폰 모양으로 그릴지 */
 const narrow = () => isPhone();
 
-function paneKind(st: GState, mobile = narrow()): Pane {
-  if (gnet.settings) return 'settings';
-  const c = gnet.compose;
-  if (c && (c.kind === 'post' || c.kind === 'newdm' || (c.kind === 'dm' && !st.dms.some((d) => d.nick === c.nick)))) return 'compose';
-  if (mobile) return null;
-  if (gnet.sub === 'board' && gnet.open !== null && findPost(st, gnet.open)) return 'post';
-  if (gnet.sub === 'dm' && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return 'dm';
-  return null;
-}
 
-/** 아래 입력줄 (댓글·답글·쪽지 답장): 괴담톡 입력줄과 같은 모양 */
-/** 모바일에서 펼친 글·쪽지의 입력줄: 목록 아래에 고정 (괴담톡처럼) */
-function inlineComposer(st: GState, busy: boolean): string {
-  const c = gnet.compose;
-  if (c && c.kind !== 'comment' && c.kind !== 'dm') return '';
-  if (gnet.sub === 'board' && gnet.open !== null && findPost(st, gnet.open)) {
-    // 답글은 그 댓글 바로 밑에 입력줄이 열린다 (v0.16.23). 그동안 아래 입력줄은 숨긴다
-    if (c?.kind === 'comment' && c.post === gnet.open && c.parent > 0) return '';
-    return composer(busy, '댓글 입력');
-  }
-  if (gnet.sub === 'dm' && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
-    const ph = c?.kind === 'dm' && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : '쪽지 입력';
-    return composer(busy, ph);
-  }
-  return '';
-}
 
-function composer(busy: boolean, placeholder: string, chip = ''): string {
+function composer(busy: boolean, placeholder: string, chip = '', label = ''): string {
   return `<div class="ph-composer gn-composer">
     ${chip}
     ${attachEditor('gn', gnet.attach, GN_KINDS, busy, '', gnet.attachMenu)}
     <div class="ph-compose">
       <button class="ph-tool ph-plus${gnet.attachMenu ? ' on' : ''}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
       <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc(placeholder)}" ${busy ? 'disabled' : ''}>${esc(gnet.draft)}</textarea>
-      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy ? 'disabled' : ''}>${ICONS.send}</button>
+      <button class="ph-send${label ? ' txt' : ''}" data-action="gn-send" aria-label="등록" title="등록" ${busy ? 'disabled' : ''}>${label || ICONS.send}</button>
       <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
     </div>
   </div>`;
@@ -479,42 +489,6 @@ function replyBox(label: string, busy: boolean, depth: number): string {
   return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy, '답글 입력', chip)}</li>`;
 }
 
-function commentTree(p: GPost, busy: boolean): string {
-  const kids = new Map<number, number[]>();
-  p.comments.forEach((c, i) => {
-    const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
-    kids.set(parent, [...(kids.get(parent) ?? []), i + 1]);
-  });
-  const out: string[] = [];
-  const seen = new Set<number>();
-  const target = gnet.compose?.kind === 'comment' && gnet.compose.post === p.id ? gnet.compose.parent : 0;
-  const walk = (n: number, depth: number) => {
-    for (const k of kids.get(n) ?? []) {
-      if (seen.has(k)) continue;
-      seen.add(k);
-      const c = p.comments[k - 1];
-      const confirm = gnet.confirm === `c:${p.id}:${k}`;
-      const author = c.mine
-        ? `<b class="gn-me">${esc(c.nick)}</b>`
-        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc(c.nick)}</button>`;
-      const del = c.mine
-        ? confirm
-          ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>`
-          : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>`
-        : '';
-      // 게시판 댓글 줄: 닉네임 | 내용 | 답글·삭제 (모바일은 닉네임 줄 아래 내용)
-      out.push(`<li class="gn-c${depth ? ' re' : ''}${c.unread ? ' unread' : ''}${target === k ? ' target' : ''}" style="--gn-depth:${Math.min(depth, 3)}">
-        <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ''}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ''}</div>
-        <div class="gn-c-body">${body(c.body)}</div>
-        <div class="gn-c-act">${commentClock(p, c)}<button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
-      if (target === k && gnet.compose?.kind === 'comment') out.push(replyBox(gnet.compose.label, busy, depth + 1));
-      walk(k, depth + 1);
-    }
-  };
-  walk(0, 0);
-  return out.join('');
-}
-
 /** 댓글 시각: 글과 같은 날이면 「14:23」, 다른 날이면 「05.14 09:10」 (시각 없는 옛 댓글은 없음) */
 function commentClock(p: GPost, c: GPost['comments'][number]): string {
   if (!c.time) return '';
@@ -522,36 +496,6 @@ function commentClock(p: GPost, c: GPost['comments'][number]): string {
   return `<time class="gn-c-time">${esc(same ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
 }
 
-function postView(p: GPost, busy: boolean, inline = false): string {
-  const c = gnet.compose;
-  const reply = c?.kind === 'comment' && c.post === p.id && c.parent > 0 ? c : null;
-  const confirm = gnet.confirm === `p:${p.id}`;
-  const right = p.mine
-    ? confirm
-      ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>`
-      : tool('gn-del-post', ICONS.trash, '글 삭제', `data-value="${p.id}"`)
-    : '';
-  const again = tool('gn-post-refresh', ICONS.refresh, '이 글 새로고침', `data-value="${p.id}" ${busy ? 'disabled' : ''}`);
-  // 모바일 펼침: 목록 줄이 이미 제목·닉네임·시각·조회·추천을 보여 주므로 머리줄 없이 본문부터 (v0.16.23).
-  // 글쓴이에게 쪽지·내 글 삭제는 댓글 머리줄 오른쪽에
-  const who = p.mine ? '' : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc(p.nick)}</button>`;
-  const head = inline
-    ? ''
-    : `<header class="gn-post-head"><h2 class="gn-post-title">${esc(p.title)}</h2>
-          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : who}</span>
-            <span>${esc(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
-  const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : '';
-  return `<div class="${inline ? 'gn-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead('게시판', `#${p.id}`, again + right)}
-    <div class="gn-doc">
-      <article class="gn-post">${head}
-        <div class="gn-post-body">${body(p.body)}</div>
-      </article>
-      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail}</div>
-        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
-    </div>
-    ${inline || reply ? '' : composer(busy, '댓글 입력')}
-  </div>`;
-}
 
 function dmPane(st: GState, nick: string, busy: boolean, inline = false): string {
   const t = dmThreads(st).find((x) => x.nick === nick);
@@ -574,20 +518,6 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
   </div>`;
 }
 
-/** 게시판 목록: 첫 줄 제목·댓글 수, 둘째 줄 닉네임·시각·조회·추천 */
-function boardList(st: GState, busy: boolean, mobile: boolean): string {
-  // 빈 화면에 큰 새로고침 단추 하나 (2026-11-06 사용자 승인, 전수점검 9-1). 머리의 새로고침 단추와 같은 동작
-  if (!st.posts.length) return `<div class="ph-blank"><div class="ph-blank-in"><p>게시글이 없어요.</p><button class="ph-blank-go" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button></div></div>`;
-  return `<ul class="ph-list gn-list">${st.posts
-    .map((p) => {
-      const on = gnet.open === p.id && !gnet.settings;
-      return `<li class="gn-row${on ? ' on' : ''}${p.mine ? ' mine' : ''}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on}">
-        <span class="gn-title"><b>${esc(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ''}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ''}</span>
-        <span class="gn-row-meta"><span class="gn-row-nick">${esc(p.nick)}</span><span>${esc(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
-      </button>${mobile && on && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy, true) : ''}</li>`;
-    })
-    .join('')}</ul>`;
-}
 
 function dmList(st: GState, busy: boolean, mobile: boolean): string {
   const threads = dmThreads(st);
@@ -619,24 +549,20 @@ function settingsView(ctx: ChatContext, back = true): string {
   const keep = gnetRetention(ctx.chat.scriptstate);
   // 「게시판 사용」 켬·끔은 없다 (2026-11-05 사용자: 괴담톡·위키와 같게. 새로고침 수동이면 모델을 부르지 않는다)
   const rows = `${group(gnetLabel(ctx.chat.scriptstate), [
-        row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']]), '게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
-        row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
-        row('채팅에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
-        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 두 번째 벌을 써요(같은 토큰으로 늘 나오는 뻔한 글 대신 다른 쪽). 응답이 길어져 토큰을 더 써요'),
+        row('자동 호출', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
+        row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인 모델'], ['2', '보조 모델']]), '게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
+        row('컨텍스트에 포함', seg('context', v('context') === '1' ? '1' : '0', [['0', 'ON'], ['1', 'OFF']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
+        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요'),
       ].join(''))}
       ${group('게시판', [
-        row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
-        row('성격', seg('style', ['gal', 'wpf', 'diary', 'emotion'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게'], ['diary', '일기장'], ['emotion', '감정 게시판']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳) · 일기장 = 한 사람이 쓰는 일기 · 감정 게시판 = 한 사람의 속마음이 여러 감정 이름으로 글을 쓰는 곳. 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
-        ...(styleSwitched(ctx.chat.scriptstate) ? [`<p class="ps-note gn-style-note">성격이 바뀌었어요. 다음 새로고침은 지금 글을 참고하지 않고 새 게시판으로 시작해요 (내 글·답글 달린 글은 보호 설정대로 남아요).</p>`] : []),
-        ...(guideOverridden('GNet') && !guideText('GNet').includes('lb-gn.style') ? [`<p class="ps-note gx-err">지침 탭에서 고쳐 쓴 괴담넷 지침에 성격 분기(lb-gn.style)가 없어요. 그 지침을 쓰는 동안은 성격을 바꿔도 요청문이 같아요. 지침 탭 → 괴담넷 → 「원본으로」 뒤 다시 고쳐 쓰세요.</p>`] : []),
-        ...(['diary', 'emotion'].includes(v('style')) ? [row('누구', text('who', '비우면 주인공'), '일기장·감정 게시판의 주인이에요. 이때는 선쪽지가 오지 않아요')] : []),
+        row('게시글 수', countRow(ctx, 'post', '개', '게시글 수'), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
+        row('새 글 댓글 수', countRow(ctx, 'cmt', '개', '새 글 댓글 수'), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
+        row('활동 댓글 수', countRow(ctx, 'act', '개', '활동 댓글 수'), `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요`),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
         row('보호 대상', text('protagonist', '비우면 주인공'), '위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공'),
         row('주요 인물 닉네임', seg('keyfigures', v('keyfigures') === '0' ? '0' : '1', [['1', '보존'], ['0', '안 함']]), '주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요'),
-        row('반응 그림', seg('cons', v('cons') === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '디시콘처럼 댓글·글에 반응 그림을 붙여요. 아래 목록에 그림이 있어야 켜져요'),
-        ...(v('cons') === '1' ? [row('반응 그림 목록', `<textarea class="gx-search ps-text" rows="5" data-change="gn-text" data-key="cons_list" placeholder="한 줄에 하나씩: 이름 | 그림 주소(https)">${esc(v('cons_list'))}</textarea>`, '이름은 30자 안쪽, 대괄호·쌍점 없이')] : []),
         row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']]), '새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요'),
         row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']]), '내가 댓글을 단 남의 글도 새로고침 때 남길지예요'),
       ].join(''))}
@@ -648,24 +574,299 @@ function settingsView(ctx: ChatContext, back = true): string {
   return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
-function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): string {
-  if (kind === 'settings') return settingsView(ctx);
-  if (kind === 'compose' && gnet.compose) return composeView(gnet.compose, busy);
-  if (kind === 'post') return postView(findPost(st, gnet.open as number) as GPost, busy);
-  if (kind === 'dm') return dmPane(st, gnet.openDm as string, busy);
-  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>${gnetLabel(ctx.chat.scriptstate)}</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
+
+/* ── 사이트 화면 (2026-11-08 사용자 시안 「브라우저_시안3」): 괴담넷·괴담갤·세정게·연어 마켓은 게시판 기능은 같고 모양만 사이트마다 ──
+   글은 새 화면으로 연다(같은 탭, 목록으로). 분류는 모델이 글마다 붙인 말머리에서 만든다 */
+const PAGE = 20;
+const LOGO_SM = (id: BoardSite, cls = 'bs-logo') => siteLogo(id === 'gal' ? 'gal' : id === 'wpf' ? 'wpf' : id === 'sm' ? 'sm' : 'gn', cls);
+/** 목록에 보일 글 (분류·찾기·정렬) */
+function shownPosts(st: GState): GPost[] {
+  const q = gnet.q.trim().toLowerCase();
+  let list = st.posts.filter((p) =>
+    (gnet.cat === '' || (gnet.cat === '@mine' ? p.mine || p.comments.some((c) => c.mine) : gnet.cat === '@scrap' ? !!p.scrap : p.tag === gnet.cat))
+    && (!q || `${p.title}\n${p.body}`.toLowerCase().includes(q)));
+  if (gnet.sort === 'hot') list = [...list].sort((a, b) => b.votes - a.votes || b.views - a.views);
+  if (gnet.sort === 'cmt') list = [...list].sort((a, b) => b.comments.length - a.comments.length);
+  return list;
+}
+/** 게시판에 나온 말머리들 (처음 나온 차례) */
+const tagsOf = (st: GState): string[] => [...new Set(st.posts.map((p) => p.tag ?? '').filter(Boolean))];
+/** 목록 시각: 오늘이면 「14:20」, 아니면 「05.13」 */
+function when(p: GPost, now: string): string {
+  const d = String(p.date);
+  return d.slice(0, 10) === now.slice(0, 10) ? time(d) : d.slice(5, 10);
+}
+/** 「3분 전」 (시안 괴담넷·연어 마켓) */
+const minuteOf = (d: string): number | null => {
+  const m = /^(\d{4})\.(\d\d)\.(\d\d)\s+(\d\d):(\d\d)/.exec(String(d));
+  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) / 60000 : null;
+};
+function ago(p: GPost, now: string): string {
+  const a = minuteOf(p.date);
+  const b = minuteOf(now);
+  if (a === null || b === null || b < a) return when(p, now);
+  const d = b - a;
+  if (d < 1) return '방금';
+  if (d < 60) return `${d}분 전`;
+  if (d < 1440) return `${Math.floor(d / 60)}시간 전`;
+  if (d < 2880) return '어제';
+  return `${Math.floor(d / 1440)}일 전`;
+}
+const dot = (p: GPost) => (postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : '');
+const openBtn = (p: GPost, inner: string, cls = '') => `<button class="gn-row-main gn-row${cls ? ` ${cls}` : ''}" data-action="gn-open" data-value="${p.id}">${inner}</button>`;
+const pageOf = <T,>(list: T[]): T[] => list.slice((Math.max(1, gnet.page) - 1) * PAGE, Math.max(1, gnet.page) * PAGE);
+const pages = (total: number) => Math.max(1, Math.ceil(total / PAGE));
+/** 쪽 번호 (사이트마다 모양만 다름) */
+function pager(total: number, cls: string, prev = '', next = ''): string {
+  const n = pages(total);
+  const cur = Math.min(gnet.page, n);
+  const nums = Array.from({ length: n }, (_, i) => i + 1).map((k) => (k === cur ? `<b>${k}</b>` : `<button data-action="gn-page" data-value="${k}">${k}</button>`)).join(' ');
+  const go = (label: string, k: number, on: boolean) => (label ? (on ? `<button data-action="gn-page" data-value="${k}">${label}</button>` : `<span>${label}</span>`) : '');
+  return `<nav class="${cls}">${go(prev, cur - 1, cur > 1)} ${nums} ${go(next, cur + 1, cur < n)}</nav>`;
+}
+const searchInput = (ph: string) => `<input name="gn-q" data-enter="gn-search" value="${esc(gnet.q)}" placeholder="${esc(ph)}" aria-label="${esc(ph)}">`;
+const writeBtn = (cls: string, label = '글쓰기') => `<button class="${cls}" data-action="gn-write">${label}</button>`;
+// 빈 게시판에서도 글은 쓸 수 있다
+const emptyList = (busy: boolean, text: string) => `<div class="bs-empty"><p>${text}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button>${writeBtn('bs-w')}</div></div>`;
+const none = (list: GPost[]) => (!list.length ? '<p class="bs-none">해당하는 글이 없어요.</p>' : '');
+const onCat = (v: string) => gnet.sub === 'board' && gnet.cat === v;
+const catBtn = (v: string, label: string, cls = '', extra = '') => `<button class="${[cls, onCat(v) ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-cat" data-value="${esc(v)}" aria-pressed="${onCat(v)}">${esc(label)}${extra}</button>`;
+const dmBtn = (st: GState, unreadDm: number, label = '쪽지함', cls = '') => `<button class="${[cls, gnet.sub === 'dm' ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-sub" data-value="dm" aria-pressed="${gnet.sub === 'dm'}">${label}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ''}</button>`;
+/** 익명(ㅇㅇ) 글쓴이 옆 IP 앞자리: 글 번호로 늘 같게 (시안 괴담갤) */
+const ipOf = (id: number) => `${(id * 37) % 200 + 20}.${(id * 101) % 250}`;
+const nickIp = (nick: string, id: number) => `${esc(nick)}${nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(id)})</span>` : ''}`;
+/** 목록 작은 그림 */
+function thumb(p: GPost): string {
+  const t = boardThumb(p.body);
+  if (!t) return '<span></span>';
+  return `<span class="th">${t.url ? `<img src="${esc(t.url)}" alt="">` : CAMERA}</span>`;
+}
+/** 연어 마켓: 본문에서 값 (「350,000원」·「나눔」·「가격 제안」) */
+function priceOf(p: GPost): string {
+  const s = `${p.title}\n${previewText(p.body)}`;
+  const m = /(\d[\d,]*\s*(?:만\s*)?원)/.exec(s);
+  if (m) return m[1].replace(/\s+/g, '');
+  if (p.tag === '나눔' || /나눔/.test(s)) return '나눔';
+  if (p.tag === '삽니다') return '가격 제안';
+  return '';
+}
+const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];
+
+/** 사이트 머리 */
+function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
+  const home = (inner: string, cls = 'lg') => `<button class="${cls}" data-action="gn-home" aria-label="첫 화면">${inner}</button>`;
+  switch (site) {
+    case 'gal':
+      return `<div class="hd">${home(`${LOGO_SM(site)}<span>괴담 갤러리<small>무섭고 이상한 이야기</small></span>`)}<label class="sch">${searchInput('갤러리 & 통합검색')}<b>${ICONS.search}</b></label></div>`;
+    case 'wpf':
+      return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>
+        <div class="bar"><button data-action="gn-home">HOME</button>${catBtn('', '자유토론')}${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+    case 'sm':
+      return `<div class="hd">${home(`${LOGO_SM(site)}연어 마켓`)}<nav>${catBtn('', '중고거래')}${catBtn('삽니다', '삽니다')}${catBtn('정보', '오컬트 정보')}</nav><label class="sr">${searchInput('물건 이름으로 찾기')}</label>${writeBtn('wr')}<button class="ch" data-action="gn-sub" data-value="dm">내 채팅${unreadDm ? `<em>${unreadDm}</em>` : ''}</button></div>
+        <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>`;
+    default: {
+      const nav = `<nav><button class="${gnet.sub === 'board' && gnet.sort !== 'hot' ? 'on' : ''}" data-action="gn-home">커뮤니티</button>${dmBtn(st, unreadDm, '쪽지')}<button class="${gnet.sub === 'board' && gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">랭킹</button></nav>`;
+      return `<div class="hd">${home(`${LOGO_SM(site)}괴담넷<small>.net</small>`)}${nav}<label class="sr">${ICONS.search}${searchInput('괴담넷 검색')}</label></div>`;
+    }
+  }
 }
 
-export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
+/** 괴담넷 왼쪽 메뉴 */
+function gnSide(st: GState, unreadDm: number): string {
+  return `<nav class="side" aria-label="게시판 메뉴"><h6>게시판</h6>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}<h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</nav>`;
+}
+
+/** 목록 (사이트마다) */
+function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unreadDm: number): string {
+  const all = shownPosts(st);
+  const list = pageOf(all);
+  const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
+  switch (site) {
+    case 'gal': {
+      const tabs = `<div class="lt">${catBtn('', '전체글', '', '')}<button class="${gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">개념글</button>${catBtn('공지', '공지')}${dmBtn(st, unreadDm)}${writeBtn('wr')}</div>`;
+      const heads = `<div class="hds">${catBtn('', '전체')}${tagsOf(st).filter((t) => t !== '공지').map((t) => catBtn(t, t)).join('')}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+      const ic = (p: GPost) => `<span class="ii ${boardThumb(p.body) ? 'im' : 'tx'}"></span>`;
+      const ntc = (p: GPost) => p.tag === '공지';
+      const rows = list.map((p) => ntc(p)
+        ? `<tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">${openBtn(p, `${esc(p.title)}${dot(p)}`)}</td><td class="n">${esc(p.nick)}<span class="fix"></span></td><td>${esc(when(p, now))}</td><td>-</td><td>-</td></tr>`
+        : `<tr${p.mine ? ' class="mine"' : ''}><td>${p.id}</td><td>${esc(p.tag ?? '일반')}</td><td class="t">${openBtn(p, `${ic(p)}${esc(p.title)}<em>[${p.comments.length}]</em>${dot(p)}`)}</td><td class="n">${nickIp(p.nick, p.id)}</td><td>${esc(when(p, now))}</td><td>${p.views}</td><td>${p.votes}</td></tr>`).join('');
+      const table = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
+        <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>${rows}</table>`;
+      const mlist = `<div class="mlist">${list.map((p) => `<div class="it${ntc(p) ? ' ntc' : ''}">${openBtn(p, `<div class="t">${ntc(p) ? '' : `[${esc(p.tag ?? '일반')}] `}${esc(p.title)}${ntc(p) ? '' : `<em>[${p.comments.length}]</em>`}${dot(p)}</div><div class="m">${ntc(p) ? `${esc(p.nick)} · ${esc(when(p, now))}` : `${esc(p.nick)}${p.nick === 'ㅇㅇ' ? `(${ipOf(p.id)})` : ''} · ${esc(when(p, now))} · 조회 ${p.views} · 추천 ${p.votes}`}</div>`)}</div>`).join('')}</div>`;
+      return `<div class="body">${tabs}${heads}${empty || `${table}${mlist}${none(list)}`}
+        <div class="bt2">${catBtn('', '전체글')}${writeBtn('wr')}</div>${pager(all.length, 'pager', '', '다음')}
+        <label class="bsch"><span>제목+내용</span>${searchInput('검색어')}<button class="go" data-action="gn-search-go">검색</button></label></div>`;
+    }
+    case 'wpf': {
+      const ntc = (p: GPost) => p.tag === '공지';
+      const rows = list.map((p) => `<tr${ntc(p) ? ' class="ntc"' : ''}><td>${ntc(p) ? '공지' : p.id % 100000}</td><td class="t">${openBtn(p, `${p.tag && !ntc(p) ? `[${esc(p.tag)}] ` : ''}${esc(p.title)}${p.comments.length ? ` <span class="cm">[${p.comments.length}]</span>` : ''}${postUnread(p) ? '<span class="nw">N</span>' : ''}`)}</td><td>${esc(p.nick)}</td><td>${esc(when(p, now).replace('.', '/'))}</td><td>${p.views}</td></tr>`).join('');
+      const table = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows}</table>`;
+      const wml = `<div class="wml">${list.map((p) => `<div class="it${ntc(p) ? ' ntc' : ''}">${openBtn(p, `<div class="t">${esc(p.title)}${p.comments.length ? ` <span class="cm">[${p.comments.length}]</span>` : ''}${postUnread(p) ? '<span class="nw">N</span>' : ''}</div><div class="m">${esc(p.nick)} · ${esc(when(p, now).replace('.', '/'))} · 조회 ${p.views}</div>`)}</div>`).join('')}</div>`;
+      const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
+      return `<div class="cols">${lm}<div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
+        <div class="tot"><span>Total : ${st.posts.length} &nbsp; Page : ${Math.min(gnet.page, pages(all.length))}/${pages(all.length)}</span><span class="srt">${([['new', '최신'], ['hot', '인기'], ['cmt', '댓글']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(' · ')}</span></div>
+        ${empty || `${table}${wml}${none(list)}`}${pager(all.length, 'pgn', '[이전 10개]', '[다음 10개]')}
+        <div class="nav2"><span>${catBtn('', '목록', 'bb')}</span><label class="sch">${searchInput('제목·내용')} <button class="bb" data-action="gn-search-go">검색</button></label>${writeBtn('bb')}</div>
+      </div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`;
+    }
+    case 'sm': {
+      const cards = list.map((p) => {
+        const want = p.tag === '삽니다';
+        const t = boardThumb(p.body);
+        const img = t?.url ? `<img src="${esc(t.url)}" alt="">` : ICONS.bag;
+        const ph = want
+          ? `<div class="ph want"><b>삽니다</b><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
+          : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${img}${p.tag ? `<span class="tag${p.tag === '나눔' ? ' g' : ''}">${esc(p.tag)}</span>` : ''}</div>`;
+        const price = priceOf(p);
+        return openBtn(p, `${ph}<div><div class="nm">${esc(p.title)}${dot(p)}</div>${price ? `<div class="pr">${esc(price)}</div>` : ''}<div class="mt">${esc(ago(p, now))} · 관심 ${p.votes} · 채팅 ${p.comments.length}</div></div>`, 'c');
+      }).join('');
+      const cats = `<div class="cats">${['', ...tagsOf(st)].map((t) => catBtn(t, t || '전체')).join('')}${catBtn('@mine', '내 글')}${catBtn('@scrap', '관심 목록')}${dmBtn(st, unreadDm, '내 채팅')}</div>`;
+      const sort = `<span class="sort">${([['hot', '인기순'], ['new', '최신순']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(' · ')}</span>`;
+      return `<div class="sec"><div class="bar2"><span class="loc">근처 매물</span>${cats}${sort}</div>${empty || `<div class="grid">${cards}</div>${none(list)}`}${pager(all.length, 'pg')}</div>`;
+    }
+    default: {
+      const rows = list.map((p) => openBtn(p, `<div>${p.tag ? `<span class="c${p.tag === '목격' ? ' hot' : ''}">${esc(p.tag)}</span>` : ''}<span class="tt">${esc(p.title)}${p.comments.length ? `<em>${p.comments.length}</em>` : ''}${dot(p)}</span><small>${esc(p.nick)} · ${esc(ago(p, now))} · 조회 ${p.views.toLocaleString()}</small></div>${thumb(p)}`, `row${p.mine ? ' mine' : ''}`)).join('');
+      const title = gnet.cat === '@mine' ? '내가 쓴 글' : gnet.cat === '@scrap' ? '스크랩' : gnet.cat || (gnet.sort === 'hot' ? '랭킹' : '전체');
+      const sort = `<div class="sort">${([['new', '최신'], ['hot', '랭킹'], ['cmt', '댓글 많은']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join('')}</div>`;
+      const chips = `<div class="mchips">${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+      return `<div class="gmain"><div class="bh"><h2>${esc(title)}</h2>${writeBtn('w')}</div>${chips}${sort}${empty || `${rows}${none(list)}`}${pages(all.length) > 1 ? pager(all.length, 'pg', '', '›') : ''}</div>`;
+    }
+  }
+}
+
+/** 댓글 한 줄 (사이트마다 모양: gn 닉·시각 줄 + 본문, gal 세 칸, wpf 한 줄) */
+function commentTree(site: BoardSite, p: GPost, busy: boolean): string {
+  const kids = new Map<number, number[]>();
+  p.comments.forEach((c, i) => {
+    const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
+    kids.set(parent, [...(kids.get(parent) ?? []), i + 1]);
+  });
+  const out: string[] = [];
+  const seen = new Set<number>();
+  const target = gnet.compose?.kind === 'comment' && gnet.compose.post === p.id ? gnet.compose.parent : 0;
+  const walk = (n: number, depth: number) => {
+    for (const k of kids.get(n) ?? []) {
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const c = p.comments[k - 1];
+      const confirm = gnet.confirm === `c:${p.id}:${k}`;
+      const shown = site === 'wpf' && c.nick === 'ㅇㅇ' ? '익명' : c.nick;
+      const author = c.mine
+        ? `<b class="gn-me">${esc(shown)}</b>`
+        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기"><b>${esc(shown)}</b></button>`;
+      const ip = site === 'gal' && c.nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(p.id + k)})</span>` : '';
+      const del = c.mine
+        ? confirm
+          ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>`
+          : `<button class="gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">삭제</button>`
+        : '';
+      const re = depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : '';
+      const unread = c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : '';
+      const clock = commentClock(p, c);
+      const acts = `<span class="cma"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</span>`;
+      const cls = `cm gn-c${depth ? ' re' : ''}${c.unread ? ' unread' : ''}${target === k ? ' target' : ''}`;
+      const style = ` style="--gn-depth:${Math.min(depth, 3)}"`;
+      if (site === 'gal') out.push(`<li class="${cls}"${style}><div class="ch">${re}${author}${ip}${unread}</div><div class="cb gn-c-body">${body(c.body)}</div><small>${clock}${acts}</small></li>`);
+      else if (site === 'wpf') out.push(`<li class="${cls}"${style}>${re}${author} : <span class="gn-c-body">${body(c.body)}</span> <small>(${clock})</small>${unread}${acts}</li>`);
+      else out.push(`<li class="${cls}"${style}><div class="ch">${re}${author} <small>${clock}</small>${unread}${acts}</div><div class="gn-c-body">${body(c.body)}</div></li>`);
+      if (target === k && gnet.compose?.kind === 'comment') out.push(replyBox(gnet.compose.label, busy, depth + 1));
+      walk(k, depth + 1);
+    }
+  };
+  walk(0, 0);
+  return out.join('');
+}
+
+/** 글 화면 (같은 탭, 목록으로) */
+function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string {
+  const c = gnet.compose;
+  const reply = c?.kind === 'comment' && c.post === p.id && c.parent > 0 ? c : null;
+  const confirm = gnet.confirm === `p:${p.id}`;
+  const who = p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기"><b>${esc(p.nick)}</b></button>`;
+  const del = (cls: string) => (p.mine ? `<button class="${cls}${confirm ? ' danger' : ''}" data-action="gn-del-post" data-value="${p.id}">${confirm ? '정말 삭제' : '삭제'}</button>` : '');
+  const more = (cls: string) => `<button class="${cls}" data-action="gn-post-refresh" data-value="${p.id}" ${busy ? 'disabled' : ''}>새 댓글 보기</button>`;
+  const back = (cls: string, label = '‹ 목록으로') => `<button class="${cls}" data-action="gn-back">${label}</button>`;
+  const scrap = (cls: string, on = '★ 스크랩됨', off = '☆ 스크랩') => `<button class="${cls}${p.scrap ? ' on' : ''}" data-action="gn-scrap" data-value="${p.id}" aria-pressed="${!!p.scrap}">${p.scrap ? on : off}</button>`;
+  const vote = (cls: string, inner: string) => `<button class="${cls}${p.voted ? ' on' : ''}" data-action="gn-vote" data-value="${p.id}" aria-pressed="${!!p.voted}">${inner}</button>`;
+  const list = p.comments.length ? `<ul class="cms0 gn-comments">${commentTree(site, p, busy)}</ul>` : '';
+  const cin = reply ? '' : composer(busy, '댓글을 입력하세요', '', '등록');
+  switch (site) {
+    case 'gal': {
+      const files = boardFiles(p.body);
+      const att = files.length ? `<div class="att"><b>원본 첨부파일 ${files.length}</b>${files.map((f) => (f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">🔗 ${esc(f.text)}</a>` : `<a>${f.kind === 'file' ? '📎' : '🔗'} ${esc(f.text)}</a>`)).join('')}</div>` : '';
+      return `<article class="body dpost gn-post"><div class="vt"><h3>${p.tag ? `<span>[${esc(p.tag)}]</span> ` : ''}<span class="gn-post-title">${esc(p.title)}</span></h3><div class="vm"><span>${who}${p.nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(p.id)})</span>` : ''} · ${esc(p.date)}</span><span>조회 ${p.views} · 추천 ${p.votes} · 댓글 ${p.comments.length}</span></div></div>
+        ${att}<div class="pb gn-post-body">${attachBody(p.body, true, true)}</div>
+        <div class="rec">${vote('b up', `<b>${p.votes}</b><span>개념 추천</span>`)}<button class="b dn${p.down ? ' on' : ''}" data-action="gn-down" data-value="${p.id}" aria-pressed="${!!p.down}"><b>${p.down ? 1 : 0}</b><span>비추</span></button></div>
+        <div class="cmh">전체 댓글 <b>${p.comments.length}</b>개</div>${list}${cin}
+        <div class="bt2">${catBtn('', '전체글')}${back('')}${scrap('', '스크랩됨', '스크랩')}${more('')}${del('')}${writeBtn('wr')}</div></article>`;
+    }
+    case 'wpf': {
+      const files = boardFiles(p.body);
+      return `<article class="ct wpost gn-post"><table class="vw"><tr><th>제 목</th><td class="tt gn-post-title" colspan="3">${esc(p.title)}</td></tr><tr><th>글쓴이</th><td>${who}</td><th>날 짜</th><td>${esc(p.date.slice(5).replace('.', '/'))}</td></tr><tr><th>조 회</th><td>${p.views}</td><th>첨 부</th><td>${files.map((f) => (f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.text)}</a>` : `<a>${esc(f.text)}</a>`)).join('<br>')}</td></tr>
+        <tr><td class="bd gn-post-body" colspan="4">${attachBody(p.body, true, true)}</td></tr></table>
+        <div class="cms">${list}${cin}</div>
+        <div class="nav2">${back('bb', '목록')}<span>${scrap('bb', '스크랩됨', '스크랩')} ${more('bb')} ${del('bb')}</span>${writeBtn('bb')}</div></article>`;
+    }
+    case 'sm': {
+      const t = boardThumb(p.body);
+      const price = priceOf(p);
+      return `<article class="detail gn-post"><div class="ph ${SM_BG[p.id % SM_BG.length]}">${t?.url ? `<img src="${esc(t.url)}" alt="">` : ICONS.bag}</div><div>
+        <div class="seller"><i></i><div>${who}</div></div>
+        <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
+        <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 채팅 ${p.comments.length} · 조회 ${p.views}</div>
+        <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
+        ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
+    }
+    default:
+      return `<article class="gmain gpost gn-post"><div class="ph1">${p.tag ? `<span class="c">${esc(p.tag)}</span>` : ''}<h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt">${who} · ${esc(p.date.slice(5))} · 조회 ${p.views.toLocaleString()} · 추천 ${p.votes}</div></div>
+        <div class="pb gn-post-body">${body(p.body)}</div>
+        <div class="acts">${vote('up', `▲ 추천 ${p.votes}`)}${scrap('')}</div>
+        <div class="cmh">댓글 <b>${p.comments.length}</b></div>${list}${cin}
+        <div class="bt">${back('')}${more('')}${del('')}<span class="sp"></span>${writeBtn('w')}</div></article>`;
+  }
+}
+
+/** 쪽지함 (사이트 안) */
+function siteDm(st: GState, busy: boolean): string {
+  const c = gnet.compose;
+  if (c && (c.kind === 'newdm' || (c.kind === 'dm' && !st.dms.some((d) => d.nick === c.nick)))) return composeView(c, busy);
+  if (gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return dmPane(st, gnet.openDm, busy);
+  return `<div class="bs-dmh"><h2>쪽지함</h2><button class="bs-w" data-action="gn-newdm">쪽지 쓰기</button></div>${dmList(st, busy, false)}`;
+}
+
+function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, unreadDm: number): string {
+  const now = dateNow(ctx.chat);
+  if (gnet.compose?.kind === 'post') return composeView(gnet.compose, busy);
+  if (gnet.sub === 'dm') return siteDm(st, busy);
+  const p = gnet.open !== null ? findPost(st, gnet.open) : undefined;
+  if (p) return sitePost(site, p, busy, now);
+  return siteList(site, st, now, busy, unreadDm);
+}
+
+/** 사이트 한 장 (시안 「브라우저_시안3」 그대로: 괴담넷 .gn·괴담갤 .dc·세정게 .wp·연어 마켓 .sm) */
+function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string): string {
+  const unreadDm = st.dms.filter((d) => d.unread).length;
+  const main = siteMain(site, ctx, st, busy, unreadDm);
+  const plain = gnet.sub === 'dm' || gnet.compose?.kind === 'post';
+  const box = (inner: string) => (plain ? `<div class="bs-plain">${extras}${inner}</div>` : `${extras ? `<div class="bs-x">${extras}</div>` : ''}${inner}`);
+  let inner: string;
+  if (site === 'gn') inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain ? `<div class="gmain">${extras}${main}</div>` : `${extras}${main}`}</div></div>`;
+  else if (site === 'wpf') inner = `<div class="pg">${box(main)}</div>`;
+  else inner = box(main);
+  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${siteHead(site, st, unreadDm)}${inner}</main>`;
+}
+
+export function gnetTab(base: ChatContext, env?: GnetEnv, site: BoardSite = 'gn'): string {
   if (env) liveEnv = env;
+  sitePicFor(base);
+  useBoardSite(site);
+  const ctx = siteCtx(base, site);
   const st = readGnet(ctx.chat);
-  consMap = gnetSettings(ctx.chat.scriptstate).cons ? new Map(consList(ctx.chat.scriptstate).filter((c) => /^(https?:\/\/|data:image\/)/.test(c.src)).map((c) => [esc(c.name), esc(c.src)])) : new Map();
   const me = userNick(ctx.chat.scriptstate);
   const job = jobs.get(chatKey(ctx));
   const busy = !!job;
-  const unreadDm = st.dms.filter((d) => d.unread).length;
   const mobile = narrow();
-  const kind = paneKind(st, mobile);
   const nick = gnet.editNick
     ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc(me === '익명' && !ctx.chat.scriptstate?.[GN_NICK] ? '' : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>`
     : '';
@@ -676,28 +877,7 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   const note = toast('gn', gnet.notice, (t) => {
     if (gnet.notice === t) gnet.notice = '';
   });
-  const tools = [
-    tool('gn-refresh', ICONS.refresh, '게시판 새로고침', busy ? 'disabled' : '', '새로고침'),
-    tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기'),
-    tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지'),
-    tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임'),
-  ].join('');
-  const subBtn = (id: 'board' | 'dm', label: string, extra = '') =>
-    `<button class="ph-sub${gnet.sub === id ? ' on' : ''}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
-  return `<main class="gx-body ph ph-app gn ${kind ? 'is-detail' : 'is-list'}">
-    <section class="ph-side" aria-label="괴담넷 목록">
-      <div class="ph-side-head">
-        <div class="ph-subs">${subBtn('board', '게시판', boardUnread(st) ? '<span class="gn-dot"></span>' : '')}${subBtn('dm', '쪽지함', unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : '')}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc(me)}</b></span></div>
-      </div>
-      ${kind ? '' : status}
-      <div class="ph-content">${gnet.sub === 'board' ? boardList(st, busy, mobile) : dmList(st, busy, mobile)}</div>
-      ${mobile && !kind ? inlineComposer(st, busy) : ''}
-      ${fail}
-      ${drawerHtml(tools, nick, '', 'gnet')}
-    </section>
-    <section class="ph-pane">${kind ? status : ''}${paneHtml(ctx, st, kind, busy)}</section>
-    ${note}
-  </main>`;
+  return siteHtml(site, ctx, st, busy, mobile, `${status}${nick}${fail}${note}`);
 }
 
 const AUTO_LAST = '$gn_auto_last';
@@ -706,14 +886,16 @@ let liveEnv: GnetEnv | null = null;
 
 async function currentChat(ctx: ChatContext): Promise<Chat | null> {
   try {
-    return (await risuai.getChatFromIndex(ctx.charIndex, ctx.chatIndex)) as Chat | null;
+    const chat = (await risuai.getChatFromIndex(ctx.charIndex, ctx.chatIndex)) as Chat | null;
+    return chat ? boardView(chat, siteOf(ctx)) : null;
   } catch {
     return null;
   }
 }
 
 /** 채팅 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
-export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false, joint?: Joint): Promise<void> {
+export async function autoRefreshGnet(base: ChatContext, messageIndex: number, open = false, joint?: Joint, site: BoardSite = 'gn'): Promise<void> {
+  const ctx = siteCtx(base, site);
   const s = gnetSettings(ctx.chat.scriptstate);
   if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
@@ -722,7 +904,7 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
   for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
   const stamp = `${messageIndex}:${hash}`;
   if (String(ctx.chat.scriptstate?.[AUTO_LAST] ?? '') === stamp) return;
-  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
+  const saved = await upd(ctx, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
   if (!saved) return;
   const env = liveEnv ?? quietEnv;
   const showing = env.current();
@@ -734,12 +916,13 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
 }
 
 /** 괴담넷 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답에 맞춰 아직 새로고침하지 않았으면 한 번 */
-export function gnetOpenCheck(ctx: ChatContext, env: GnetEnv): void {
+export function gnetOpenCheck(base: ChatContext, env: GnetEnv, site: BoardSite = 'gn'): void {
   liveEnv = env;
+  const ctx = siteCtx(base, site);
   if (!gnetSettings(ctx.chat.scriptstate).autoOpen) return;
   const at = lastReply(ctx.chat);
   if (at < 0) return;
-  void autoRefreshGnet(ctx, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
+  void autoRefreshGnet(ctx, at, true, undefined, site).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 const LAZY_HINT: Record<string, string> = {
@@ -749,8 +932,11 @@ const LAZY_HINT: Record<string, string> = {
 };
 
 /** 괴담넷 탭 버튼. 처리했으면 true */
-export async function handleGnet(action: string, value: string | undefined, ctx: ChatContext, env: GnetEnv): Promise<boolean> {
+export async function handleGnet(action: string, value: string | undefined, base: ChatContext, env: GnetEnv, site: BoardSite = uiSite): Promise<boolean> {
+  if (!action.startsWith('gn-')) return false;
   liveEnv = env;
+  useBoardSite(site);
+  const ctx = siteCtx(base, site);
   const v = value ?? '';
   const [a, b] = v.split(':').map(Number);
   const st = () => readGnet(ctx.chat);
@@ -812,6 +998,51 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
     }
     case 'gn-refresh':
       void refreshBoard(ctx, env);
+      return true;
+    case 'gn-home':
+      Object.assign(gnet, { sub: 'board', open: null, openDm: null, compose: null, cat: '', q: '', page: 1, settings: false });
+      break;
+    case 'gn-cat':
+      Object.assign(gnet, { sub: 'board', open: null, openDm: null, cat: v, page: 1, settings: false });
+      if (gnet.compose?.kind !== 'post') gnet.compose = null;
+      break;
+    case 'gn-sort':
+      gnet.sort = v === 'hot' || v === 'cmt' ? v : 'new';
+      Object.assign(gnet, { sub: 'board', open: null, page: 1 });
+      if (gnet.compose?.kind !== 'post') gnet.compose = null;
+      break;
+    case 'gn-search-go': {
+      // 아래 찾기칸의 「검색」 단추: 고친 칸의 글자로 찾는다
+      const ins = [...document.querySelectorAll<HTMLInputElement>('.bs input[name="gn-q"]')];
+      const q = (ins.find((i) => i.value.trim() !== gnet.q) ?? ins[0])?.value ?? '';
+      Object.assign(gnet, { sub: 'board', open: null, q: q.trim().slice(0, 60), page: 1 });
+      break;
+    }
+    case 'gn-vote':
+    case 'gn-down':
+      // 추천·비추는 한 번씩, 다시 누르면 취소 (시안: 글마다 추천 단추)
+      await mutate(ctx, env, (s) => {
+        const p = findPost(s, a);
+        if (!p) return false;
+        if (action === 'gn-down') p.down = !p.down;
+        else {
+          p.voted = !p.voted;
+          p.votes = Math.max(0, p.votes + (p.voted ? 1 : -1));
+        }
+      }, {}, false);
+      return true;
+    case 'gn-page':
+      gnet.page = Math.max(1, Math.floor(Number(v)) || 1);
+      break;
+    case 'gn-search':
+      Object.assign(gnet, { sub: 'board', open: null, q: v.trim().slice(0, 60), page: 1 });
+      break;
+    case 'gn-scrap':
+      await mutate(ctx, env, (s) => {
+        const p = findPost(s, a);
+        if (!p) return false;
+        p.scrap = !p.scrap;
+      }, {}, false);
       return true;
     case 'gn-write':
       gnet.settings = false;
@@ -961,6 +1192,22 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       if (k in GN_DEFAULTS) await setVar(ctx, env, CFG(k), val);
       return true;
     }
+    case 'gn-count': {
+      // 개수 최소·최대: 범위 안으로, 최소가 최대를 넘으면 같이 맞춘다
+      const m = /^(post|cmt|act)_(min|max)=(.*)$/.exec(v);
+      if (!m) return true;
+      const k = m[1] as CountKey;
+      const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];
+      const [lo, hi] = COUNT_RANGE[k];
+      const raw = Math.floor(Number(m[3]));
+      if (!Number.isFinite(raw) || m[3].trim() === '') return env.render(), true;
+      const n = Math.max(lo, Math.min(hi, raw));
+      const vars: Record<string, string> = { [CFG(`${k}_${m[2]}`)]: String(n) };
+      if (m[2] === 'min' && n > b) vars[CFG(`${k}_max`)] = String(n);
+      if (m[2] === 'max' && n < a) vars[CFG(`${k}_min`)] = String(n);
+      await setVars(ctx, env, vars);
+      return true;
+    }
     case 'gn-keep': {
       const n = Math.floor(Number(v));
       if (Number.isFinite(n) && n >= 1 && n <= STORAGE_MAX) await setVar(ctx, env, GN_STORAGE_LIMIT, String(n));
@@ -969,7 +1216,7 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
     }
     case 'gn-text': {
       const [k, ...rest] = v.split('=');
-      if (['subject', 'mood', 'protagonist', 'who', 'cons_list'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
+      if (['subject', 'mood', 'protagonist'].includes(k)) await setVar(ctx, env, CFG(k), rest.join('=').trim());
       return true;
     }
     default:
@@ -980,13 +1227,35 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
 }
 
 /** 메인 설정 「기능별 설정」에서 연다 */
-export const gnetSettingsPane = (ctx: ChatContext): string => settingsView(ctx, true);
+export function gnetSettingsPane(ctx: ChatContext, site: BoardSite = 'gn'): string {
+  useBoardSite(site);
+  return settingsView(siteCtx(ctx, site), true);
+}
 
 /** 호출 흐름 미리 계산: 지금 설정으로 새로고침이 보낼 요청 (모델은 안 부름). 확률 계획은 Math.random 그대로라 매번 조금 다를 수 있다 */
-export function previewGnetRefresh(ctx: ChatContext): LlmMessage[] {
+export function previewGnetRefresh(base: ChatContext, site: BoardSite = 'gn'): LlmMessage[] {
+  const ctx = siteCtx(base, site);
   const before = readGnet(ctx.chat);
   const nick = userNick(ctx.chat.scriptstate);
   const s = gnetSettings(ctx.chat.scriptstate);
   const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
   return fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx))).messages;
+}
+
+/** [사진:이름] 을 이 봇의 그림으로 (그리기 전에) */
+function sitePicFor(ctx: ChatContext): void {
+  setSitePicSource((raw) => {
+    const name = resolveSitePic(ctx.char as never, raw);
+    return name ? imageUrl(ctx.char, name) : null;
+  });
+}
+
+/** 브라우저 탭 제목·주소 (시안: 글을 열면 그 글 제목과 글 주소) */
+export function boardChrome(base: ChatContext, site: BoardSite): { title: string; path: string } | null {
+  useBoardSite(site);
+  if (gnet.sub !== 'board' || gnet.open === null || gnet.compose?.kind === 'post') return null;
+  const p = findPost(readGnet(siteCtx(base, site).chat), gnet.open);
+  if (!p) return null;
+  const path = site === 'gal' ? `/board/view/?id=horror&no=${p.id}` : site === 'wpf' ? `/zboard.php?id=wpf&no=${p.id}` : site === 'sm' ? `/articles/${p.id}` : `/board/free/${p.id}`;
+  return { title: site === 'sm' ? '' : p.title, path };
 }

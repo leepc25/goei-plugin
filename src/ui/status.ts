@@ -2,6 +2,7 @@
 // 색은 본 화면에 붙인 style이 정한다 (설정 「상태창」: 테마 따름·다크·라이트·페이퍼·미표시). 그래서 설정을 바꾸면 그린 상자도 바로 바뀐다.
 import { dayInfo, elapsedLabel, sceneLabel, statusMinute, storyDay, type ColId, type StatusTag, type StatusTimeline } from '../core/world';
 import { formatDelta, formatWon } from '../core/wallet';
+import { formatPoints } from '../core/points';
 import type { StatusStyle, Theme } from '../core/settings';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -81,6 +82,14 @@ export function statusHtml(tag: StatusTag, ctx: StatusContext): string {
     const delta = pw === undefined ? 0 : n - pw;
     cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n))}${delta ? `<small class="${delta > 0 ? 'gst-up' : 'gst-down'}">${esc(formatDelta(delta))}</small>` : ''}</span></div>`;
   }
+  // 백일몽 포인트 (11번째 칸): 잔고 줄 옆에 (잔고를 숨기면 혼자). 「표시」를 끄면 숨김
+  if (tag.points && !hid('points')) {
+    const n = Number(tag.points);
+    const pp = tl?.prevPoints?.get(tag.raw.trim());
+    const delta = pp === undefined ? 0 : n - pp;
+    const pts = `<span class="gst-pt">${esc(formatPoints(n))}${delta ? `<small class="${delta > 0 ? 'gst-up' : 'gst-down'}">${esc(formatDelta(delta))}</small>` : ''}</span>`;
+    cash = cash ? cash.replace(/<\/div>$/, `${pts}</div>`) : `<div class="gst-ln gst-cash">${CASH}${pts}</div>`;
+  }
   return `<div class="gst" data-goei-status="1">${top}${place}${target}${cash}</div>`;
 }
 
@@ -128,7 +137,7 @@ const STATUS_CSS = `
 .gst-loc{font-weight:700}.gst-loc svg{color:var(--gs-pin)}
 .gst-tgt{font-weight:600;color:var(--gs-tgt)}
 .gst-cash{font-weight:600;color:var(--gs-sub);font-variant-numeric:tabular-nums}.gst-cash svg{color:var(--gs-sub)}
-.gst-cash small{margin-left:7px;font-size:12px;font-weight:700}.gst-up{color:var(--gs-blue)}.gst-down{color:var(--gs-red)}
+.gst-cash small{margin-left:7px;font-size:12px;font-weight:700}.gst-cash>span+.gst-pt{margin-left:14px}.gst-up{color:var(--gs-blue)}.gst-down{color:var(--gs-red)}
 .gst-link{cursor:pointer;text-decoration:underline dotted;text-decoration-color:color-mix(in srgb,currentColor 50%,transparent);text-underline-offset:3px}
 [data-gst-tip]{cursor:pointer}
 .gst-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:6px 10px;border-radius:9px;background:var(--gs-text);color:var(--gs-panel);font-size:12px;font-weight:600;line-height:1.4;letter-spacing:0;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}

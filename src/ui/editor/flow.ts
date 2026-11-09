@@ -2,7 +2,7 @@
 // 자료는 각 기능의 설정(인물 기록·이미지·괴담톡·괴담넷·관전·위키·보고서). 모양은 인물 설정 도식(.pp-flow/.pp-fn)을 그대로 쓴다.
 // 실제로 간 호출의 원문은 「호출 흐름」(trace.ts)에서 본다.
 import type { ChatContext } from '../../host/risu';
-import { basicSettings } from '../../core/settings';
+import { basicSettings, getPrefs } from '../../core/settings';
 import { featureModel } from '../../core/craft';
 import { peopleSettings, type Stage } from '../../core/people/settings';
 import { phoneSettings } from '../../core/phone';
@@ -24,7 +24,21 @@ import { traceUi } from './trace';
 // 각 기능의 preview* 가 모델을 부르지 않고 요청만 조립한다. 채팅·설정이 바뀌면 다시 센다. 본편은 플러그인이 조립하지 않으니 마지막 「호출 기록」 실측
 type TokMap = Record<string, number | null | undefined>;
 const flowTok = { key: '', map: null as TokMap | null, pending: false, error: '' };
-const tokKey = (ctx: ChatContext) => `${ctx.chatIndex}:${ctx.chat.message?.length ?? 0}:${JSON.stringify(ctx.chat.scriptstate ?? {}).length}`;
+/** 요청을 바꿀 수 있는 것 전부(채팅 글·상태값·로어북·기기 설정과 지침)의 지문. 하나라도 바뀌면 다시 센다
+ *  (11-09 사용자: 다른 데서 바꾸면 바로 반영돼야 한다 → 「다시 세기」 단추 없앰. 예전엔 글 수·상태값 길이만 봐서 같은 길이로 바뀐 값·지침·로어북·마지막 글 수정을 놓쳤다) */
+function tokKey(ctx: ChatContext): string {
+  let h = 0x811c9dc5;
+  const feed = (s: string) => {
+    for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+    h = Math.imul(h ^ 0xff, 0x01000193);
+  };
+  feed(String(ctx.chatIndex));
+  for (const m of ctx.chat.message ?? []) feed(`${m.role}\u0000${m.data ?? ''}`);
+  feed(JSON.stringify(ctx.chat.scriptstate ?? {}));
+  for (const e of ctx.char.globalLore ?? []) feed(`${e.comment ?? ''}\u0000${e.key ?? ''}\u0000${e.content ?? ''}`);
+  feed(JSON.stringify(getPrefs()));
+  return (h >>> 0).toString(36);
+}
 const count = (m: LlmMessage[] | null | undefined): number | null => (m ? promptTokens({ messages: m }) : null);
 
 async function computeTokens(ctx: ChatContext): Promise<TokMap> {
@@ -74,12 +88,6 @@ export function ensureFlow(ctx: ChatContext, render: () => void): void {
     });
 }
 
-/** 「다시 세기」 단추 */
-export function flowRecount(): void {
-  flowTok.map = null;
-  flowTok.key = '';
-}
-
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 type Kind = 'aux' | 'main' | 'plain';
@@ -95,6 +103,8 @@ interface Node {
   calls: string;
   /** 설정 페이지 */
   page?: string;
+  /** 그 페이지 안에서 갈 줄: 'r:줄 이름' (2026-11-08 사용자: 「설정 →」은 그 기능을 켜고 끄는 줄로, 강조도 그 줄에만) */
+  to?: string;
   /** 턴마다 확실히 가는 보조 호출 수 */
   sure: number;
   /** 조건부(사건 종료·검색·상한 초과)로 더 갈 수 있는 수 */
@@ -120,9 +130,9 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const updateOn = pp.on && pp.when === 'turn';
   const tidyOn = pp.on && pp.tidy === 'separate';
   const pre: Node[] = [
-    { name: '로어북 고름', sub: '다음 요청에 넣을 로어북 선택', kind: 'plain', on: true, calls: '호출 없음 (플러그인 코드 또는 Risu)', page: 'set:lore', sure: 0, maybe: 0 },
-    { name: '인물 Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: routerOn ? ppModel('router') : undefined, calls: routerOn ? '보조 1회' : pp.on ? '호출 없음 (코드가 고름)' : '호출 없음 (인물 기록 끔)', page: 'set:people', sure: routerOn ? 1 : 0, maybe: 0 },
-    { name: '인물 Director', sub: '이번 턴 연기 지시', kind: 'aux', on: directorOn, model: directorOn ? ppModel('director') : undefined, calls: directorOn ? (pp.directorSearch ? '1회 (자료 부족 땐 2회)' : '1회') : pp.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', page: 'set:people', sure: directorOn ? 1 : 0, maybe: directorOn && pp.directorSearch ? 1 : 0 },
+    { name: '로어북 고름', sub: '다음 요청에 넣을 로어북 선택', kind: 'plain', on: true, calls: '호출 없음 (플러그인 코드 또는 Risu)', page: 'set:lore', to: 'r:로어북 보내기', sure: 0, maybe: 0 },
+    { name: '인물 Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: routerOn ? ppModel('router') : undefined, calls: routerOn ? '보조 1회' : pp.on ? '호출 없음 (코드가 고름)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:Router', sure: routerOn ? 1 : 0, maybe: 0 },
+    { name: '인물 Director', sub: '이번 턴 연기 지시', kind: 'aux', on: directorOn, model: directorOn ? ppModel('director') : undefined, calls: directorOn ? (pp.directorSearch ? '1회 (자료 부족 땐 2회)' : '1회') : pp.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', page: 'set:people', to: 'r:Director', sure: directorOn ? 1 : 0, maybe: directorOn && pp.directorSearch ? 1 : 0 },
   ];
   const main: Node = { name: '본편', sub: 'Risu 가 응답 생성', kind: 'main', on: true, model: '메인', calls: '메인 1회', sure: 0, maybe: 0 };
   const assetOn = basic.assetOn && basic.assetModel === 'aux';
@@ -132,18 +142,18 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const wikiOn = nw.auto === 'turn';
   const wikiTitle = wikiOn && nw.autoTitle === 'model';
   const post: Node[] = [
-    { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', sure: updateOn ? 1 : 0, maybe: 0 },
-    { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', sure: 0, maybe: tidyOn ? 1 : 0 },
-    { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', sure: assetOn ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', sure: ph.auto ? 1 : 0, maybe: 0 },
-    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
-    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
+    { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:자동 호출', sure: updateOn ? 1 : 0, maybe: 0 },
+    { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
+    { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
+    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? 1 : 0, maybe: 0 },
+    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:자동 호출', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
+    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
+    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
   ];
   const manual: Node[] = [
-    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', sure: 0, maybe: 0 },
-    { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', sure: 0, maybe: 0 },
-    { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', sure: 0, maybe: 0 },
+    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
+    { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
   const map = flowTok.map;
@@ -165,7 +175,7 @@ const tokLabel = (n: Node): string => {
 };
 function nodeHtml(n: Node): string {
   const tl = tokLabel(n);
-  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}${tl ? `<small class="pp-fn-tok">${esc(tl)}</small>` : ''}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-node" data-value="${esc(n.page)}">설정 →</button>` : '<span></span>'}</div>`;
+  return `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${esc(n.name)}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${esc(n.sub)}</small></div><span class="pp-fn-calls">${esc(n.calls)}${tl ? `<small class="pp-fn-tok">${esc(tl)}</small>` : ''}</span><div class="pp-fn-ctl"></div>${n.page ? `<button class="gx-mini pp-fn-go" data-action="ed-flow-go" data-value="${esc(n.page)}|${esc(n.to ?? '')}">설정 →</button>` : '<span></span>'}</div>`;
 }
 
 export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, desc: string) => string): string {
@@ -179,13 +189,13 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
     : flowTok.error
       ? ` 토큰 셈 실패: ${esc(flowTok.error)}`
       : flowTok.map
-        ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? '' : '약 '}<b>${auxTok.toLocaleString('ko-KR')}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외). <button class="gx-mini" data-action="man-flow-recount">다시 세기</button>`
+        ? ` 켜진 보조 호출의 요청 합계 ${tokenizerName() ? '' : '약 '}<b>${auxTok.toLocaleString('ko-KR')}토큰</b> (지금 설정·채팅으로 조립, 응답 토큰은 제외).`
         : '';
   const arrow = '<i class="pp-fn-arrow" aria-hidden="true">↓</i>';
-  const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
+  const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
   return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><p class="pp-flow-sum">턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></section>
+    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
     ${group('본편', '', [main])}
     ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)', post)}
@@ -193,8 +203,12 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
     </div></div>`;
 }
 
+const FLOW_BACK = '<button class="gx-mini" data-action="ed-node" data-value="manage:flow">호출 흐름 →</button>';
+
 /** 기능 설정 페이지 맨 위 한 줄 (2026-11-07 사용자: 메뉴마다 도식은 중복, 「이 기능의 호출: …」 한 줄만). 그 페이지로 가는 칸의 호출 수만 모은다 */
 export function callSummary(ctx: ChatContext, page: string): string {
+  // 인물 페이지는 맨 위에 자기 도식이 있어 호출 칩은 겹친다. 「호출 흐름 →」 단추만 (2026-11-08 사용자: 어디는 있고 어디는 없다)
+  if (page === 'people') return `<p class="gw-calls">${FLOW_BACK}</p>`;
   const { pre, post, manual } = flowNodes(ctx);
   const mine = [...pre, ...post, ...manual].filter((n) => n.page === `set:${page}`);
   if (!mine.length) return '';
@@ -203,5 +217,5 @@ export function callSummary(ctx: ChatContext, page: string): string {
   const maybe = auto.reduce((s, n) => s + n.maybe, 0);
   const lead = auto.length ? `매 턴 보조 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 ${sure + maybe}회)` : ''}` : '매 턴 자동 호출 없음';
   const parts = mine.map((n) => `<span class="gw-call${n.on ? ' on' : ''}">${esc(n.name)}<small>${esc(n.calls)}</small></span>`).join('');
-  return `<p class="gw-calls"><span class="gw-call-lead">이 기능의 호출 · ${lead}</span>${parts}<button class="gx-mini" data-action="ed-node" data-value="manage:flow">호출 흐름 →</button></p>`;
+  return `<p class="gw-calls"><span class="gw-call-lead">이 기능의 호출 · ${lead}</span>${parts}${FLOW_BACK}</p>`;
 }

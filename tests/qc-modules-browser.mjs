@@ -174,6 +174,12 @@ async function reopen(page) {
 }
 // PC 메뉴는 보고 있는 탭을 한 번 더 누르면 상황판으로 간다 (사용자 2026-10-21) → 이미 그 탭이면 누르지 않는다
 const nav = async (page, id) => {
+  const bm = { gnet: 'gn', wiki: 'wk' }[id];
+  if (bm) {
+    if (!(await page.locator('.br-bms').count())) await page.click('.gx-nav .gx-nb:not(.mob)[data-value="net"]');
+    await page.click(`.br-bm[data-value="${bm}"]`);
+    return;
+  }
   const sel = `.gx-nav .gx-nb:not(.mob)[data-value="${id}"]`;
   if (!(await page.locator(`${sel}.on`).count())) await page.click(sel);
 };
@@ -205,30 +211,30 @@ if (want('G1')) {
   await page.waitForSelector('.gn');
   // 1-a. 깨진 JSON → 설정 재시도(기본 1회)로 한 번 더 묻고, 그것도 깨지면 실패 + 원문
   await llm(page, [ok('{"posts": [ {"author": "a", "id": 1846001, "title": "t"'), ok('이건 JSON 아님')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   await idle(page);
   assert.equal(await llmCount(page), 2, '형식 오류는 설정 횟수(1)만큼 다시 묻는다');
   const retryMsgs = await page.evaluate(() => window.__calls.llm[1].messages);
   assert.ok(retryMsgs.at(-1).content.includes('Validation error'), '다시 물을 때 오류 안내');
   assert.ok((await page.textContent('.nw-fail')).includes('이건 JSON 아님'), '실패 원문 보관');
-  assert.ok(await page.isEnabled('[data-action="gn-refresh"]'), '실패 뒤 새로고침 단추가 다시 눌린다');
+  assert.ok(await page.isEnabled('[data-action="br-reload"]'), '실패 뒤 새로고침 단추가 다시 눌린다');
   assert.ok((await page.textContent('.gn')).includes('게시글이 없어요'), '기존(빈) 게시판 유지');
   // 1-b. 빈 응답 → 일시 오류로 보고 같은 요청을 두 번까지 다시 보낸다 (host/llm.ts TRANSIENT, 2026-11-07 사용자). 끝까지 비면 실패 안내
   await llm(page, [ok('   '), ok(' '), ok('  ')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await llmCount(page), 5, '빈 응답은 두 번까지 다시 보낸다');
   assert.ok((await page.textContent('.gx-toast, .gn')).includes('빈 응답'));
   // 1-c. 모델 실패 (type fail)
   await llm(page, [fail('Failed to fetch')]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await llmCount(page), 6);
   assert.ok((await page.textContent('.gn')).includes('모델 요청에 실패'));
   // 1-d. posts 가 비었거나 전부 사용자 명의 → 유지 + 안내
   await llm(page, [ok(JSON.stringify({ posts: [post(1, { author: '익명' })] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.ok((await page.textContent('.gn')).includes('기존 게시판을 유지'), '사용자 명의 글만 오면 유지');
   // 1-e. 정상 응답 뒤 두 번 연달아 누르기: 두 번째는 「끝난 뒤 다시」 안내만, 모델 호출 없음
@@ -238,10 +244,10 @@ if (want('G1')) {
     const orig = window.risuai.runLLMModel;
     window.risuai.runLLMModel = async (o) => { window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 800)); window.risuai.runLLMModel = orig; return { type: 'success', result: b }; };
   }, JSON.stringify({ posts: [post(1), post(2)] }));
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   await page.evaluate(() => document.querySelector('[data-action="gn-refresh"]').removeAttribute('disabled'));
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   assert.ok((await page.textContent('.gn')).includes('끝난 뒤 다시'), '생성 중 안내');
   await idle(page);
   assert.equal(await llmCount(page), n0 + 1, '겹쳐 누르면 한 번만 부른다');
@@ -263,7 +269,7 @@ if (want('G2')) {
     post(2, { author: `"><b onclick="window.__xss=3">x`, title: `제목 ${evil}`, content: `본문 ${evil}`, comments: [{ author: `c${evil}`, content: `댓글 ${evil}`, parent: 0, mine: false }] }),
   ], incoming: [{ nick: `쪽${evil}`, body: `쪽지 ${evil}` }] };
   await llm(page, [ok(JSON.stringify(board))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   await page.waitForSelector('.gn-row-main[data-value="1846002"]', { timeout: 5000 }).catch(async () => { throw new Error(`글이 안 보임: ${await page.textContent('.gn')}`); });
   await page.click('.gn-row-main[data-value="1846002"]');
@@ -277,12 +283,13 @@ if (want('G2')) {
   await page.waitForSelector('.gn-pane .ph-msg');
   assert.equal(await page.evaluate(() => window.__xss), undefined);
   // 사용자 입력: 닉네임·주제 설정
-  await page.click('[data-action="gn-nick"]');
-  await page.fill('input[name="gn-nick"]', `닉${evil}`);
-  await page.click('[data-action="gn-nick-save"]');
+  // 닉네임은 인터넷 로그인 하나 (2026-11-08)
+  await page.click('[data-action="br-login"]');
+  await page.fill('input[name="br-nick"]', `닉${evil}`);
+  await page.click('[data-action="br-login-save"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_nick ?? '').startsWith('닉<img'));
   assert.equal(await page.evaluate(() => window.__xss), undefined, '닉네임도 글자로');
-  assert.ok((await page.textContent('.gn-mynick')).includes('<img src=x'));
+  assert.equal(await page.locator('.br img[src="x"]').count(), 0, '닉네임 img 태그가 글자로만');
   await featSet(page, 'set:gnet');
   await page.fill('[data-change="gn-text"][data-key="subject"]', `주제 "${evil}`);
   await page.dispatchEvent('[data-change="gn-text"][data-key="subject"]', 'change');
@@ -312,19 +319,22 @@ if (want('G3')) {
   await nav(page, 'gnet');
   await page.waitForSelector('.gn-row-main');
   const dt = Date.now() - t0;
-  assert.equal(await page.locator('.gn-row').count(), 500);
+  assert.equal(await page.locator('.gn-row').count(), 20, '한 쪽 20개');
+  assert.equal(await page.locator('[data-action="gn-page"]').count(), 25, '쪽 넘김 25쪽 (24 + 다음 ›)');
   assert.ok(dt < 5000, `글 500개 첫 그리기 ${dt}ms`);
   const t2 = Date.now();
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.waitForSelector('.gn-dmrow');
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await page.waitForSelector('.gn-row-main');
   assert.ok(Date.now() - t2 < 2500, `글 500개 다시 그리기 ${Date.now() - t2}ms`);
+  await page.click('[data-action="gn-page"][data-value="13"]');
+  await page.waitForSelector('.gn-row-main[data-value="' + (B + 250) + '"]');
   const t1 = Date.now();
   await page.click('.gn-row-main[data-value="' + (B + 250) + '"]');
   await page.waitForSelector('.gn-post');
   assert.ok(Date.now() - t1 < 3000, '글 열기');
-  assert.equal(await page.locator('.gn-pane .gn-c').count(), 4);
+  assert.equal(await page.locator('.gn-post .gn-c').count(), 4);
   // 쪽지함: 상대 3명, 각 20통 (기본 상한 40 안) → 자동 정리 상한을 5로 내리면 저장 때 5통만
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   assert.equal(await page.locator('.gn-dmrow').count(), 3);
@@ -343,23 +353,27 @@ if (want('G3')) {
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_auto_dm === '0');
   assert.equal(await page.locator('[data-change="gn-keep"]').count(), 0, '끄면 상한 칸이 사라진다');
   // 설정: 수량·사생활·다양성·주제가 요청문에 들어간다
-  await page.click('[data-action="gn-cfg"][data-value="quantity=3"]');
-  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.quantity'] === '3');
+  // 게시글 수 최소·최대 (직접 입력): 최소 12 → 최대도 12, 최대 30 → 범위 끝 20, 최소 7
+  const setCount = async (key, val) => { await page.fill(`[data-change="gn-count"][data-key="${key}"]`, val); await page.dispatchEvent(`[data-change="gn-count"][data-key="${key}"]`, 'change'); };
+  await setCount('post_min', '12');
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '12' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '12');
+  await setCount('post_max', '30');
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '20');
+  await setCount('post_min', '7');
+  await setCount('post_max', '9');
+  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '7' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '9');
   await page.click('[data-action="gn-cfg"][data-value="sampling=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.sampling'] === '1');
   await page.click('[data-action="gn-cfg"][data-value="privacy=4"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.privacy'] === '4');
-  await page.click('[data-action="gn-cfg"][data-value="style=wpf"]');
-  await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.style'] === 'wpf');
   await featSet(page, 'set:gnet');
-  assert.ok((await page.textContent('.gx-panel')).includes('세정게'), '성격을 바꾸면 창 이름도');
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   const sys = await page.evaluate(() => window.__calls.llm.at(-1).messages[0].content);
   const usr = await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content);
-  assert.ok(sys.includes('7-9') || usr.includes('7-9'), '수량 3 = 7~9개');
+  assert.ok(sys.includes('7-9') || usr.includes('7-9'), '게시글 수 7~9개');
   assert.ok(sys.includes('Diversity sampling is ON'), '다양성 강화');
   assert.ok(usr.includes('"POST_LIMIT":"9"') || usr.includes('9'), '상한');
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('|대안|'), '다양성 켜면 alternativePosts 를 쓴다');
@@ -368,7 +382,7 @@ if (want('G3')) {
   const nPosts = (raw.match(/^P\|/gm) ?? []).length;
   assert.ok(nPosts <= 9 + 71 && nPosts >= 71, `상한 9 + 보호 글 71: ${nPosts}`);
   assert.deepEqual(errors, []);
-  console.log('PASS 괴담넷: 글 500개 렌더·쪽지 보관 상한·자동 정리 끄기·수량·다양성·사생활·성격 설정');
+  console.log('PASS 괴담넷: 글 500개 렌더·쪽지 보관 상한·자동 정리 끄기·수량·다양성·사생활 설정');
   await page.close();
 }
 
@@ -432,7 +446,7 @@ if (want('G4')) {
     window.risuai.runLLMModel = async (o) => { window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 1200)); return { type: 'success', result: JSON.stringify({ posts: [{ author: 'z', id: 1846990, title: '느린 결과', time: '01:00', date: '2025.01.01 01:00', views: 1, upvotes: 0, content: 'x', mine: false, comments: [] }], incoming: [] }) }; };
     window.__restoreLlm = () => { window.risuai.runLLMModel = orig; };
   });
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await page.waitForSelector('.nw-busy');
   // 생성 중 사용자가 설정에서 닉네임을 바꾼다 (게시판 자체는 안 바뀜 → 결과 적용됨), 그리고 글을 지우면 → 결과 버림
   // 게시판의 글 하나를 통째로 지운다 (마지막 줄이면 줄바꿈이 없다)
@@ -455,18 +469,19 @@ if (want('G5')) {
   await open(page);
   await nav(page, 'gnet');
   await page.waitForSelector('.gn');
-  await page.click('[data-action="gn-nick"]');
-  await page.fill('input[name="gn-nick"]', '야간순찰');
-  await page.press('input[name="gn-nick"]', 'Enter');
+  await page.click('[data-action="br-login"]');
+  await page.fill('input[name="br-nick"]', '야간순찰');
+  await page.press('input[name="br-nick"]', 'Enter');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_nick === '야간순찰');
-  assert.ok((await page.textContent('.gn-mynick')).includes('야간순찰'), 'Enter 로도 저장(data-enter)');
+  assert.equal(await page.locator('.br-prof.in').count(), 1, 'Enter 로도 저장(data-enter)');
   // 새로고침: 내 별명 명의 글·댓글은 뺀다
   await llm(page, [ok(JSON.stringify({ posts: [post(1, { comments: [{ author: '야간순찰', content: '사칭', parent: 0 }, { author: 'b', content: '진짜', parent: 0 }] }), post(2, { author: '야간순찰' })], incoming: [] }))]);
-  await page.click('[data-action="gn-refresh"]');
+  await page.click('[data-action="br-reload"]');
   await idle(page);
   assert.equal(await page.locator('.gn-row').count(), 1, '내 명의 글은 뺌');
   assert.ok((await page.textContent('.gx-toast')).includes('새 글 1개와 댓글·연결 답글 1개'), '뺀 것 안내');
   // 새 쪽지: 받는 사람을 직접 적는다 (쪽지 상대는 공개 글이 하나뿐이면 출처가 붙는다)
+  await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.click('[data-action="gn-newdm"]');
   await page.waitForSelector('[data-input="gn-to"]');
   await page.click('[data-action="gn-send"]');
@@ -482,6 +497,7 @@ if (want('G5')) {
   assert.ok(Array.isArray(dmReq));
   assert.ok((await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content)).includes('Original forum post #1846001'), '공개 글이 하나뿐이면 출처가 붙는다');
   // 나에게는 못 보냄
+  await page.click('[data-action="gn-back"]');
   await page.click('[data-action="gn-newdm"]');
   await page.fill('[data-input="gn-to"]', '야간순찰');
   await page.fill('[data-input="gn-draft"]', '나');
@@ -494,7 +510,7 @@ if (want('G5')) {
   await page.waitForFunction(() => !/^D\|n1/m.test(window.__chat.scriptstate.$gn_raw));
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('T|n1'), '출처도 지움');
   // 댓글 달기 → 답글 → 내 댓글 삭제하면 뒤 번호가 당겨지고 답글은 부모를 잃어 글에 붙는다
-  await page.click('[data-action="gn-sub"][data-value="board"]');
+  await page.click('[data-action="gn-cat"][data-value=""]');
   await page.click('.gn-row-main[data-value="1846001"]');
   await page.fill('[data-input="gn-draft"]', '내 댓글');
   await llm(page, [ok(JSON.stringify({ comments: [{ author: 'b', content: '답', parent: 2 }], incoming: [], activity: [] }))]);
@@ -503,13 +519,14 @@ if (want('G5')) {
   await page.click('[data-action="gn-del-comment"][data-value="1846001:2"]');
   await page.click('[data-action="gn-del-comment"][data-value="1846001:2"]');
   await page.waitForFunction(() => /C\|1846001\|0\|b\|답\|0/.test(window.__chat.scriptstate.$gn_raw), null, { timeout: 4000 });
-  assert.equal(await page.locator('.gn-pane .gn-c').count(), 2);
-  // 모바일: 글은 목록 안에서 펼쳐지고 댓글 입력줄이 아래에 고정
+  assert.equal(await page.locator('.gn-post .gn-c').count(), 2);
+  // 모바일: 글은 한 화면으로 열리고 댓글 입력줄이 아래에 있다
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.click('.gx-nav .gx-nb.mob[data-value="gnet"]').catch(() => {});
+  await page.click('.br-bm[data-value="gn"]').catch(() => {});
   await page.waitForTimeout(200);
-  if (!(await page.locator('.gn-inline').count())) await page.click('.gn-row-main[data-value="1846001"]');
-  await page.waitForSelector('.gn-inline');
+  // 모바일은 글을 한 화면으로 연다 (사이트 화면, 2026-11-08)
+  if (!(await page.locator('.gn-post').count())) await page.click('.gn-row-main[data-value="1846001"]');
+  await page.waitForSelector('.gn-post');
   assert.equal(await page.locator('.gn-composer [data-input="gn-draft"]').count(), 1, '모바일 입력줄');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   assert.deepEqual(errors, []);
@@ -892,7 +909,7 @@ const packFixture = () => {
 };
 
 // 위키 목록(책갈피)이 닫혀 있으면 연다 (누를 때마다 열고 닫힌다)
-const listOpen = async (page) => { if ((await page.getAttribute('.nw-grab', 'aria-expanded')) !== 'true') await page.click('.nw-grab'); };
+const listOpen = async (page) => { if ((await page.getAttribute('.wk-menu', 'aria-expanded')) !== 'true') await page.click('.wk-menu'); };
 
 // W1) 팩 없음: 목록 비어 있음 → 검색 → 작성 화면 → 설정(모드·길이·모델·공용 지침·이 문서 지침)이 요청문에 → 저장 → 링크 → 뒤로 → 다시 쓰기(이전 문서 참고 ON/OFF) → 채팅 반영 → XSS
 if (want('W1')) {
@@ -900,15 +917,15 @@ if (want('W1')) {
   await startedWithReply(page);
   await open(page);
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
-  assert.ok((await page.textContent('.nw-home')).includes('아직 이번 이야기에서 쓴 문서가 없어요'));
-  await page.click('.nw-grab');
-  assert.ok((await page.textContent('.nw-list')).includes('아직 작성한 문서가 없어요'), '팩 없음 → 목록 비어 있음');
+  await page.waitForSelector('.wk .mainp');
+  assert.ok((await page.textContent('.wk-side')).includes('아직 바뀐 문서가 없어요'));
+  await page.click('.wk-menu');
+  assert.ok((await page.textContent('.wk .wlist')).includes('아직 작성한 문서가 없어요'), '팩 없음 → 목록 비어 있음');
   // 검색: 명부 항목이면 작성 화면
-  await page.fill('.nw .ph-search', '소라 랜드');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-compose');
-  assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
+  await page.fill('.wk-in', '소라 랜드');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.wk-compose');
+  assert.ok((await page.textContent('.wk-compose')).includes('같은 이름의 로어북이 있어요'));
   // 설정: 원본 충실·짧게·보조·이전 문서 참고 OFF·채팅 반영 ON·공용 지침
   await featSet(page, 'set:wiki');
   await page.click('.gw [data-action="wiki-mode"][data-value="faithful"]');
@@ -923,10 +940,9 @@ if (want('W1')) {
   await page.dispatchEvent('.gw [data-change="wiki-request"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_writing_request === '존댓말로 쓸 것');
   await featSet(page, 'set:wiki');
-  await page.click('.nw-grab');
-  await page.fill('.nw .ph-search', '소라 랜드');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-compose');
+  await page.fill('.wk-in', '소라 랜드');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.wk-compose');
   await page.fill('[data-input="wiki-docreq"]', '출구를 자세히');
   // 실패: 닫는 태그 없음 → 안내 + 원문, 재시도 1회
   await llm(page, [ok('<lightboard-namuwiki doc_title="소라 랜드">[Paragraph]끊김'), ok('그냥 글')]);
@@ -950,14 +966,13 @@ if (want('W1')) {
   await page.click('.gw [data-action="wiki-length"][data-value="detailed"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'detailed');
   await featSet(page, 'set:wiki');
-  await page.click('.nw-grab');
-  await page.fill('.nw .ph-search', '소라 랜드');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-compose');
+  await page.fill('.wk-in', '소라 랜드');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.wk-compose');
   const evil = '<img src=x onerror="window.__xss=1">';
   await llm(page, [ok(article('소라 랜드', `관람차 ${evil} {{user}} 가 본다. ❗강조❗ ➡️${evil}➡️`, ' main_color="url(javascript:1)"'))]);
   await page.click('[data-action="wiki-start"]');
-  await page.waitForSelector('.nw-dochead', { timeout: 8000 });
+  await page.waitForSelector('.wk-docp .wk-head', { timeout: 8000 });
   assert.equal(await page.evaluate(() => window.__xss), undefined, '문서 본문 escape');
   assert.ok((await page.textContent('.nw-body')).includes('<img src=x'));
   assert.ok(!(await page.innerHTML('.nw-body')).includes('javascript:'), 'main_color 검사');
@@ -979,19 +994,19 @@ if (want('W1')) {
   assert.ok(await page.locator('.nw-body details.nw-spoil:not([open]) .nw-link[data-value="없는 문서"]').count(), '정답 문단 접기');
   await page.click('.nw-body details.nw-spoil:has(.nw-link[data-value="없는 문서"]) > summary');
   await page.click('.nw-body .nw-link[data-value="없는 문서"]');
-  await page.waitForSelector('.nw-compose');
-  assert.ok((await page.textContent('.nw-compose')).includes('이어받아 작성해요') || (await page.textContent('.nw-compose')).includes('로어북이 없어요'));
-  await page.click('[data-action="wiki-back"]');
-  await page.waitForSelector('.nw-dochead');
-  assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드');
+  await page.waitForSelector('.wk-compose');
+  assert.ok((await page.textContent('.wk-compose')).includes('이어받아 작성해요') || (await page.textContent('.wk-compose')).includes('로어북이 없어요'));
+  await page.click('.br [data-action="br-back"]');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal((await page.textContent('.wk-docp .wk-h1')).trim(), '소라 랜드');
   // 다시 쓰기: 이전 문서 참고 ON → [이전 위키], OFF → 없음
-  await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
-  await page.waitForSelector('.nw-rewrite');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
+  await page.waitForSelector('.wk-rewrite');
   await llm(page, [ok(article('소라 랜드', '다시 쓴 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('다시 쓴 본문'), null, { timeout: 8000 });
   assert.ok((await page.evaluate(() => window.__calls.llm.at(-1).messages[1].content)).includes('[이전 위키'), '이전 문서 참고 ON');
-  await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
   await page.click('[data-action="wiki-rw-prev"][data-value="0"]');
   await llm(page, [ok(article('소라 랜드', '세 번째 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
@@ -1002,20 +1017,18 @@ if (want('W1')) {
     const orig = window.risuai.runLLMModel;
     window.risuai.runLLMModel = async (o) => { window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 900)); window.risuai.runLLMModel = orig; return { type: 'success', result: '<lightboard-namuwiki doc_title="느림">[Paragraph]느린 문서</lightboard-namuwiki>' }; };
   });
-  await listOpen(page);
-  await page.fill('.nw .ph-search', '느림');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-nohit');
-  await page.click('.nw-nohit [data-action="wiki-write"]');
-  await page.waitForSelector('.nw-compose');
+  await page.fill('.wk-in', '느림');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.wk-nohit');
+  await page.click('.wk-nohit [data-action="wiki-write"]');
+  await page.waitForSelector('.wk-compose');
   const n1 = await llmCount(page);
   await page.click('[data-action="wiki-start"]');
   await page.waitForSelector('.nw-busy');
-  await listOpen(page);
-  await page.fill('.nw .ph-search', '둘째');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.click('.nw-nohit [data-action="wiki-write"]');
-  await page.waitForSelector('.nw-compose');
+  await page.fill('.wk-in', '둘째');
+  await page.press('.wk-in', 'Enter');
+  await page.click('.wk-nohit [data-action="wiki-write"]');
+  await page.waitForSelector('.wk-compose');
   assert.ok(await page.isDisabled('[data-action="wiki-start"]'), '생성 중엔 작성 시작이 잠긴다');
   await page.waitForFunction(() => !document.querySelector('.nw-busy'), null, { timeout: 8000 });
   assert.equal(await llmCount(page), n1 + 1);
@@ -1031,34 +1044,35 @@ if (want('W2')) {
   await startedWithReply(page);
   await open(page);
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
-  assert.ok((await page.textContent('.nw-hero-t')).includes('문서 2개'));
-  await page.click('.nw-grab');
-  await page.waitForSelector('.nw-tabs');
-  assert.equal(await page.locator('.nw-list .ph-row').count(), 2, '기본 문서 2개가 목록에');
-  await page.click('.nw-list [data-action="wiki-pick"][data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-dochead');
+  await page.waitForSelector('.wk .mainp');
+  await page.click('.wk-menu');
+  await page.waitForSelector('.wk .wtabs');
+  assert.equal(await page.locator('.wk .wlist .it').count(), 2, '기본 문서 2개가 목록에');
+  await page.click('.wk .wlist [data-action="wiki-pick"][data-value="소라 랜드"]');
+  await page.waitForSelector('.wk-docp .wk-head');
   assert.equal(await llmCount(page), 0, '기본 문서는 생성하지 않음');
   assert.ok((await page.textContent('.nw-body')).includes('기본 문서 본문'));
   assert.equal(await page.locator('.nw-spoil:not(.fn)').count(), 1, '괴이 문서의 정답 문단은 접힘');
   assert.equal(await page.locator('.nw-notes .nw-spoil.fn').count(), 1, '접은 문단 속 각주는 각주 목록에서도 가림');
-  assert.equal(await page.locator('.nw-pane .ph-room-head [data-action="wiki-delete"]').count(), 0, '기본 문서는 지울 수 없음');
+  assert.equal(await page.locator('.wk-docp .wk-head [data-action="wiki-delete"]').count(), 0, '기본 문서는 지울 수 없음');
   // 덮어쓰기(다시 쓰기) → 채팅 문서가 이김 → 지우면 「되돌리기」 → 기본 문서로
-  await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
+  await page.click('.wk-docp .wk-head [data-action="wiki-rewrite"]');
   await llm(page, [ok(article('소라 랜드', '채팅에서 새로 쓴 본문'))]);
   await page.click('[data-action="wiki-rw-go"]');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('채팅에서 새로 쓴 본문'), null, { timeout: 8000 });
-  assert.ok((await page.textContent('.nw-list')).includes('소라 랜드'));
-  await page.click('.nw-pane .ph-room-head [data-action="wiki-delete"]');
-  assert.equal((await page.textContent('.nw-pane .ph-room-head .gx-mini.danger')).trim(), '되돌리기');
-  await page.click('.nw-pane .ph-room-head .gx-mini.danger');
+  assert.ok((await page.textContent('.wk .wlist')).includes('소라 랜드'));
+  await page.click('.wk-docp .wk-head [data-action="wiki-delete"]');
+  assert.equal((await page.textContent('.wk-docp .wk-head .dbtn .danger')).trim(), '정말 되돌리기');
+  await page.click('.wk-docp .wk-head .dbtn .danger');
   await page.waitForFunction(() => document.querySelector('.nw-body')?.textContent.includes('기본 문서 본문'), null, { timeout: 4000 });
   // 검색: 비슷한 제목 제안 (띄어쓰기 다름)
-  await page.click('.nw-grab');
-  await page.fill('.nw .ph-search', '소라랜드');
-  await page.press('.nw .ph-search', 'Enter');
-  await page.waitForSelector('.nw-dochead');
-  assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드', '별칭·띄어쓰기 무시로 바로 열림');
+  await page.fill('.wk-in', '소라랜드');
+  await page.press('.wk-in', 'Enter');
+  await page.waitForSelector('.wk-find');
+  assert.equal(await page.locator('.wk-find .sres [data-value="소라 랜드"]').count(), 1, '띄어쓰기 다른 제목은 비슷한 문서로 제안');
+  await page.click('.wk-find [data-action="wiki-pick"][data-value="소라 랜드"]');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal((await page.textContent('.wk-docp .wk-h1')).trim(), '소라 랜드');
   // 상태창의 위키 이름을 누르면 창이 그 문서로 (setWikiOpener)
   await page.click('[data-action="close"]').catch(() => {});
   const rendered = await page.evaluate(() => window.__calls.handlers.display('[▣|2025.01.01|03:00 AM|☀️|4°C|소라 랜드 정문|기본만]'));
@@ -1075,13 +1089,13 @@ if (want('W3')) {
   await open(page);
   // 폰: 위키는 하단 바 위 공용 서랍(손잡이)에서 연다 (2026-11-07 하단 바 재편)
   await page.tap('.gx-cgrip');
-  await page.tap('.gx-cdr.open .gx-cpanel [data-value="wiki"]');
-  await page.waitForSelector('.nw-home');
-  await page.tap('.nw-edge');
-  await page.waitForSelector('.nw-app.list-open');
-  await page.tap('.nw-list [data-action="wiki-pick"][data-value="기본만"]');
-  await page.waitForSelector('.nw-dochead');
-  assert.equal(await page.locator('.nw-app.list-open').count(), 0, '고르면 목록이 접힘');
+  await page.tap('.gx-cdr.open .gx-cpanel [data-value="wk"]');
+  await page.waitForSelector('.wk .mainp');
+  await page.tap('.wk .wgrab');
+  await page.waitForSelector('.wk.dr-open');
+  await page.tap('.wk .wlist [data-action="wiki-pick"][data-value="기본만"]');
+  await page.waitForSelector('.wk-docp .wk-head');
+  assert.equal(await page.locator('.wk.dr-open').count(), 0, '고르면 목록이 접힘');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   await page.tap('.nw-body .nw-link').catch(() => {});
   assert.deepEqual(errors, []);
@@ -1385,7 +1399,7 @@ if (want('PP2')) {
   await open(page);
   // 2026-10-29: 인물 기록 화면은 위키가 아니라 왼쪽 메뉴 「기록」 › 인물 (위키 홈에 타일 없음)
   await nav(page, 'wiki');
-  await page.waitForSelector('.nw-home');
+  await page.waitForSelector('.wk .mainp');
   assert.equal(await page.locator('.nw-tile.k-pp').count(), 0, '위키 홈에 인물 타일 없음');
   await nav(page, 'records');
   await page.click('[data-action="rec-sub"][data-value="people"]');
@@ -1509,21 +1523,18 @@ if (want('IP1')) {
   const evil = '<img src=x onerror="window.__xss=1">';
   // 지침 틀: 자리표가 채워지고, 꺾쇠가 든 틀도 화면(미리보기)에서는 글자로
   await page.fill('[data-input="ip-template"]', `QC-TEMPLATE ${evil}\nchars: {characters}\nkw: {keywords}\n{user_rule}끝`);
-  await page.click('[data-action="ip-template-save"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt ?? '').startsWith('QC-TEMPLATE'));
   // 임의 추가: 꺾쇠·밑줄·중괄호는 걸러진다. $& 는 replace 특수 문자로 풀리지 않는다
   await page.fill('[data-input="ip-extra"]', 'Ave_n<sha>$&');
   await page.click('[data-action="ip-extra-add"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).includes('Avensha$&'));
-  // 빈 이름은 안내
-  await page.click('[data-action="ip-extra-add"]');
-  assert.ok((await page.textContent('.ip-pane')).includes('영문명을 적어'));
+  // 빈 칸이면 추가 단추가 흐려진다 (2026-11-09 사용자)
+  assert.ok(await page.$('[data-action="ip-extra-add"][disabled]'), '빈 이름 → 추가 단추 흐림');
   // 명부 인물 끄기 (Jyaldi)
   await page.uncheck('[data-change="ip-toggle"][data-key="Jyaldi"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesOff ?? []).includes('Jyaldi'));
   // 표정 세트: 대문자·줄바꿈 정리
   await page.fill('[data-input="ip-keywords"]', 'Smile, CRY\nangry');
-  await page.click('[data-action="ip-keywords-save"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords ?? []).join(',') === 'smile,cry,angry');
   await page.click('[data-action="ip-preview"]');
   await page.waitForSelector('.ip-preview');
@@ -1541,8 +1552,8 @@ if (want('IP1')) {
   const req2 = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '안녕' }], 'model'));
   assert.ok(!req2.some((m) => /QC-TEMPLATE/.test(m.content)), '보조 모델 설정이면 지침 없음');
   await page.evaluate(() => { window.__chat.scriptstate.$st_asset_model = 'main'; });
-  // 기본값으로 되돌리기
-  await page.click('[data-action="ip-template-reset"]');
+  // 비우면 기본 틀
+  await page.fill('[data-input="ip-template"]', '');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt === undefined);
   const req3 = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '안녕' }], 'model'));
   assert.ok(req3.at(-1).content.startsWith('## Inserting Character Visual Images'), '기본 틀');

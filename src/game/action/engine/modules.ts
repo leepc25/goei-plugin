@@ -9,7 +9,7 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar, type SkillIcon } from '../ui/pixelHud';
+import { drawGuardBar, drawPixelCard, pixelText, PIXEL_CARD_W, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
 import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
@@ -44,6 +44,7 @@ import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
+import { versus, fighterOf } from './versus';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
@@ -1021,6 +1022,18 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     }),
     nextFloor: () => null,
   };
+  // 대전 (11-08 사용자): 투명 무대 한 판. 상대 = 대전 상태(engine/versus.ts)의 지금 상대 (팩은 고르기 창이 미리 받아 둔다), 없으면 주인공과 같은 인물
+  const versusStage: StageModule = {
+    id: 'versus',
+    label: '대전',
+    firstFloor: () => ({
+      // 한 선(lane 위아래 같음): 위아래 이동 없이 좌우로만. 발은 화면 아래(입력창 바로 위)
+      id: 'versus-room', title: '대전', length: 1280, startX: 380, exitX: Infinity, lane: [VS_LINE, VS_LINE],
+      banner: '',
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: fighterOf(1) ? `ai-char:${fighterOf(1)}` : 'ai-char', x: 900, y: VS_LINE }]] }],
+    }),
+    nextFloor: () => null,
+  };
   let squad = new Squad(DIFF[aiDiff].melee);
   let aiN = 0;
   let allyN = 0;
@@ -1291,7 +1304,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ];
   const mods: EngineModules = {
     frozen: () => ffx.frozen(),
-    stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage],
+    stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage, versusStage],
     enemyFactory,
     hq,
     hqLayer: () => shell.stage.ui,
@@ -1340,7 +1353,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.drawWorld(ctx);
       ffx.drawWorld(ctx);
       ctx.restore();
-      shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+      shell.fx.drawScreen(ctx, view.clear ? 1 : w.player.hp / w.player.hpMax); // 대전(투명 무대)은 체력 낮음 붉은 테두리 없이
       const hs = hudState(w, shell);
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
@@ -1357,7 +1370,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
       const core = (w.player as { core?: { P: Record<string, any>; CH: Record<string, any>; has: (id: string) => boolean } }).core;
-      if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+      if (core && !view.clear && !shell.touchShown && !mods.blocking?.() && !shell.paused) { // 대전(투명 무대)은 단추를 띄우지 않는다
         const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
         const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
         const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
@@ -1378,7 +1391,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const caption = skillActive ? sk.skill?.name : superActive ? sk.super?.name : P.mode === 'charge' ? sk.charge?.name : undefined;
         cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots, ...(caption ? { caption } : {}) }, dt);
       }
-      if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
+      if (view.clear) drawVersusBars(ctx, w); // 대전: 시각·잔고·목표 띠 대신 양쪽 체력 막대만
+      else if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
       else if (!mods.blocking?.() && !shell.paused) {
         // 본부: 대사는 말하는 사람 머리 위 말풍선 (사용자 2026-10-25: 아래 검은 자막 상자 대신). 그 밖의 안내 한 줄은 주인공 머리 위
         const z = view.zoom, toX = (x: number) => (x - w.drawCamX - view.crop) * z, toY = (y: number) => (y - view.cropY) * z;
@@ -1452,8 +1466,24 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const items = linkItems(w, run);
       npc.attach(w, { items, hq: false });
       if (run.stageId === 'itemroom') items.showcase();
-      w.hooks.push(() => items.tick());
-      w.underlays.push((c, camX) => items.draw(c, camX));
+      // 투명 무대(대전)는 바닥 물건(의자·화분 등)을 두지 않는다: 본문 위에 인물만
+      // 대전: 체력을 VS_HP 배로 (사용자 11-08 「체력이 너무 적다, 전체적으로 늘려야」). 몸이 처음 보일 때 한 번
+      if (view.clear) w.hooks.push(() => {
+        for (const b of [w.player, ...w.bodies] as (Body & { baseHp?: number; vsHp?: boolean })[]) {
+          if (b.vsHp && b.hp > b.hpMax) b.hp = b.hpMax;   // 능력치를 다시 세어 최대가 줄면 맞춘다
+          if (b.vsHp || !b.hpMax) continue;
+          b.vsHp = true;
+          b.hpMax = Math.round(b.hpMax * VS_HP); b.hp = b.hpMax;
+          if (b.baseHp) b.baseHp = Math.round(b.baseHp * VS_HP);
+          // 팀전·서바이벌: 앞 판에서 남은 체력을 이어 받는다
+          const carry = versus.carry[b === w.player ? 0 : 1];
+          if (carry != null) b.hp = Math.max(1, Math.round(b.hpMax * carry));
+        }
+      });
+      if (!view.clear) {
+        w.hooks.push(() => items.tick());
+        w.underlays.push((c, camX) => items.draw(c, camX));
+      }
     },
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
@@ -1568,4 +1598,71 @@ async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string,
       }
     }
   } catch { /* 팩이 없거나 깨졌으면 코드 효과만 */ }
+}
+
+/** 대전 한 선의 발 높이(월드 y, 화면 720 중) */
+const VS_LINE = 700;
+/** 대전 체력 배율 */
+const VS_HP = 3;
+
+/** 대전(투명 무대) HUD: 도트 HUD(pixelHud.ts, 10-25 PixelLab 틀) 칸 둘 — 왼쪽 1P, 오른쪽 상대(좌우 뒤집음). 초상화·체력(깎인 만큼 흰 잔상)·필살 게이지.
+ *  칸 아래: 1:1 은 이긴 판 표시 두 칸, 팀전은 남은 사람 칸, 서바이벌은 쓰러뜨린 수. 가운데: ROUND n → FIGHT, K.O., 승리/패배 */
+const vsSide = [{ trail: -1, last: -1, hurt: 0 }, { trail: -1, last: -1, hurt: 0 }];
+let vsT = 0;
+function drawVersusBars(c: CanvasRenderingContext2D, w: World) {
+  const dt = 1 / 60;
+  vsT += dt;
+  const foe = w.bodies.find((b) => b.team === 'enemy');
+  const k = 1.25, W = c.canvas.width / k, H = c.canvas.height / k, cardW = PIXEL_CARD_W;
+  // 칸 자리: 그림판이 16:9보다 높아도 예전처럼 16:9 윗선 근처 (사용자 11-08 「꼭대기면 눈에 안 들어온다」)
+  const top = 14 + Math.max(0, c.canvas.height - 720) / k;
+  c.save();
+  c.setTransform(k, 0, 0, k, 0, 0);
+  c.imageSmoothingEnabled = false;
+  const one = (i: 0 | 1, b: Body | undefined, x: number) => {
+    if (!b) return;
+    const f = b as Body & { label?: string; gauge?: number; art?: { key: string; cfg: { name: string } } };
+    const st = vsSide[i];
+    // 새 판(체력이 다시 차면)에는 잔상도 새로
+    if (st.last >= 0 && b.hp > st.last + 1) st.trail = -1;
+    if (st.last >= 0 && b.hp < st.last) st.hurt = 0.35;
+    if (st.trail < 0 || st.trail < b.hp) st.trail = b.hp;
+    else st.trail = Math.max(b.hp, st.trail - b.hpMax * dt * 0.6);
+    st.last = b.hp;
+    st.hurt = Math.max(0, st.hurt - dt);
+    const name = f.art?.cfg.name ?? (f.label ?? '').replace(/^AI /, '').replace(/ \d+$/, '');
+    // 오른쪽 칸은 칸째 뒤집으므로 얼굴은 원래 방향으로 넘긴다 (뒤집혀 안쪽을 본다)
+    const face = f.art ? charFace(f.art.key, 64, false) : null;
+    const end = drawPixelCard(c, { name, face, hp: b.hp, maxHp: b.hpMax, trail: st.trail, hurtT: st.hurt, gauge: f.gauge ?? 0, t: vsT, mirror: i === 1 }, x, top);
+    // 칸 아래 표시 (바깥쪽 = 초상화 쪽에서 안쪽으로)
+    const marks = versus.mode === 'duel' ? Array.from({ length: 2 }, (_, n) => n < versus.wins[i])
+      : versus.mode === 'team' ? versus.team[i].map((_, n) => n >= versus.cur[i]) : [];
+    const sz = 14, gap = 6;
+    marks.forEach((on, n) => {
+      const mx = i === 0 ? x + 90 + n * (sz + gap) : x + cardW - 90 - sz - n * (sz + gap);
+      const my = end + 8;
+      c.fillStyle = '#07090b'; c.fillRect(mx - 2, my - 2, sz + 4, sz + 4);
+      c.fillStyle = on ? (versus.mode === 'duel' ? '#ffd35a' : '#e6e4dc') : '#2a3036';
+      c.fillRect(mx, my, sz, sz);
+      if (on) { c.fillStyle = 'rgba(255,255,255,.55)'; c.fillRect(mx, my, sz, 3); }
+    });
+    if (versus.mode === 'survival' && i === 1) {
+      const t = pixelText(`${versus.kills} 쓰러뜨림`, '#ffd35a', 22);
+      c.drawImage(t, Math.round(x + cardW - 90 - t.width), Math.round(end + 6));
+    }
+  };
+  one(0, w.player, 16);
+  one(1, foe, W - 16 - cardW);
+  // 가운데 알림
+  const banner = (text: string, color: string, size = 66) => {
+    const t = pixelText(text, color, size);
+    c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(top + (H - top) * 0.32 - t.height / 2));
+  };
+  if (versus.over) banner(versus.over.side === 0 ? '승리' : '패배', versus.over.side === 0 ? '#ffd35a' : '#e0503c', 88);
+  else if (versus.ko) banner('K.O.', '#ff6a4a', 88);
+  else if (versus.intro > 0) {
+    const label = versus.mode === 'survival' ? `${versus.kills + 1}번째 상대` : `ROUND ${versus.round}`;
+    banner(versus.intro > 0.6 ? label : 'FIGHT!', versus.intro > 0.6 ? '#e6e4dc' : '#ffd35a');
+  }
+  c.restore();
 }

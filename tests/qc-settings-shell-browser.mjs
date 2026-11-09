@@ -105,15 +105,15 @@ for (const vp of vps) {
     await page.waitForFunction((tab) => document.querySelector('.gx')?.dataset.tab === tab, tab);
   };
   const curTab = () => page.evaluate(() => document.querySelector('.gx').dataset.tab);
-  await goTab('wiki');
+  await goTab('items');
   await goTab('phone');
   if (!narrow) {
     await clickSel(page, '.gx [data-action="nav-back"]');
-    await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wiki');
+    await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'items');
     await clickSel(page, '.gx [data-action="nav-back"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'board');
     await clickSel(page, '.gx [data-action="nav-fwd"]');
-    await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wiki');
+    await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'items');
     await clickSel(page, '.gx [data-action="nav-fwd"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'phone');
     assert.equal(await page.isDisabled('.gx [data-action="nav-fwd"]'), true, '맨 끝이면 앞으로 잠김');
@@ -132,7 +132,7 @@ for (const vp of vps) {
       await sleep(250);
     };
     await swipe(1);
-    assert.equal(await curTab(), 'wiki', '오른쪽 쓸기 → 뒤로');
+    assert.equal(await curTab(), 'items', '오른쪽 쓸기 → 뒤로');
     await swipe(-1);
     assert.equal(await curTab(), 'phone', '왼쪽 쓸기 → 앞으로');
     await swipe(1);

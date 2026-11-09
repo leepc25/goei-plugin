@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   addItem, addUse, equipItem, equippedOf, gridItems, itemLeft, itemsBlock, liveItems, mergeItems, parseTraits, readItemUse, readItems, removeItem, itemSlots, itemUseVars, itemsVars, searchItems,
   setItemLeft, traitsText, unequipItem, updateItem, ITEM_SLOTS_DEFAULT,
+  canMerge, mergedNow, itemWeight, weightText, totalWeight, itemCarry, itemEditOn, ITEM_CARRY_DEFAULT,
 } from '../dist-test/core.mjs';
 
 const alive = new Set(['c1', 'c2']);
@@ -91,21 +92,57 @@ test('장착: 빈 칸 첫 번째로, 칸을 주면 그 칸(있던 것은 격자�
   assert.equal(updateItem(it, vest.id, { equip: 'weapon' }).list[2].slot, undefined);
 });
 
-test('버리기·합치기·파괴는 기록 한 줄, 합치기는 이름이 달라도 되고 둘 다 소모성이면 남은 횟수를 더한다', () => {
-  let it = addItem(empty, alive, { name: '소금', desc: '한 줌', uses: 2, from: 'story', anchor: 'c1' });
-  it = addItem(it, alive, { name: '소금 봉지', desc: '새 봉지', effect: '괴이를 늦춤', uses: 3, from: 'manual', anchor: '' });
-  const [a, b] = it.list;
-  it = mergeItems(it, alive, b.id, a.id);
-  assert.equal(it.list.length, 1);
-  assert.equal(it.list[0].name, '소금 봉지');
-  assert.equal(it.list[0].desc, '새 봉지 / 한 줌');
-  assert.equal(it.list[0].uses, 5);
-  assert.equal(it.list[0].anchor, '');
+test('버리기·합치기·파괴는 기록 한 줄. 합치기는 둘 다 소모성이고 이름에 같은 낱말이 있을 때만, 이름·설명은 남는 쪽 그대로 횟수만 더한다, 무게는 1개당이라 그대로 (11-08)', () => {
+  let it = addItem(empty, alive, { name: '소금', desc: '한 줌', uses: 2, weight: 0.1, from: 'story', anchor: 'c1' });
+  it = addItem(it, alive, { name: '소금 봉지', desc: '새 봉지', effect: '괴이를 늦춤', uses: 3, weight: '0.5', from: 'manual', anchor: '' });
+  it = addItem(it, alive, { name: '손전등', desc: '', use: true, from: 'manual', anchor: '' });
+  it = addItem(it, alive, { name: '부적', desc: '', uses: 3, from: 'manual', anchor: '' });
+  const [a, b, torch, charm] = it.list;
+  assert.equal(canMerge(b, a), true);
+  assert.equal(canMerge(b, torch), false, '비소모는 안 됨');
+  assert.equal(canMerge(b, charm), false, '같은 낱말 없음');
+  assert.equal(mergeItems(it, alive, b.id, charm.id), it);
+  it = mergeItems(it, alive, b.id, a.id, 'c1');
+  assert.equal(it.list.length, 3);
+  assert.equal(it.list.find((x) => x.id === b.id).name, '소금 봉지');
+  assert.equal(it.list.find((x) => x.id === b.id).desc, '새 봉지');
+  assert.equal(it.list.find((x) => x.id === b.id).uses, 5);
+  assert.equal(it.list.find((x) => x.id === b.id).weight, 0.5, '1개당 무게는 남는 쪽 그대로');
+  assert.equal(it.list.find((x) => x.id === b.id).anchor, '');
   assert.equal(it.log.at(-1).what, 'merge');
-  it = removeItem(it, it.list[0].id, 'destroy', 'story', 'c1');
-  assert.equal(it.list.length, 0);
+  assert.deepEqual(mergedNow(it, 'c1'), ['combined 소금 into 소금 봉지']);
+  assert.deepEqual(mergedNow(it, 'c2'), []);
+  it = removeItem(it, b.id, 'destroy', 'story', 'c1');
+  assert.equal(it.list.length, 2);
   assert.deepEqual(it.log.filter((l) => l.what !== 'get').map((l) => l.what), ['merge', 'destroy']);
   assert.equal(removeItem(it, 'nope', 'drop', 'manual'), it);
+});
+
+test('무게: 1개당 무게 × 개수·합계(장착 포함)·소지 한도(명부 값 > 설정 값)·[Inventory] 무게 줄 (11-08)', () => {
+  assert.equal(itemWeight('1,5kg'), 1.5);
+  assert.equal(itemWeight(-1), undefined);
+  assert.equal(itemWeight('abc'), undefined);
+  assert.equal(weightText(0.25), '250g');
+  assert.equal(weightText(1.23), '1.2kg');
+  assert.equal(weightText(12.4), '12kg');
+  let it = addItem(empty, alive, { name: '권총', equip: 'weapon', weight: 1.2, wear: true, from: 'manual', anchor: '' });
+  it = addItem(it, alive, { name: '물병', uses: 2, weight: 1, from: 'manual', anchor: '' });
+  it = addItem(it, alive, { name: '물병', uses: 1, weight: 0.5, from: 'manual', anchor: '' });
+  assert.equal(it.list.find((x) => x.name === '물병').weight, 1, '무게는 1개당: 더 들어와도 그대로');
+  assert.equal(it.list.find((x) => x.name === '물병').uses, 3);
+  assert.equal(totalWeight(it.list), 4.2, '1개당 × 개수 (1.2 + 1×3)');
+  assert.equal(totalWeight(it.list, (e) => (e.uses !== undefined ? 1 : undefined)), 2.2, '남은 개수만큼만');
+  assert.equal(itemCarry({}), ITEM_CARRY_DEFAULT);
+  assert.equal(itemCarry({ $it_carry: '40' }), 40);
+  assert.equal(itemCarry({ $it_carry: '40', $it_carry_pc: '18' }), 18);
+  assert.equal(itemCarry({ $it_carry: '40', $it_carry_pc: '' }), 40);
+  const under = itemsBlock(it.list, { slots: 16, limit: '가방', carry: 10 });
+  assert.match(under, /^Weight: 4\.2 kg \/ 10 kg$/m);
+  const over = itemsBlock(it.list, { slots: 16, limit: '가방', carry: 4 });
+  assert.match(over, /^Weight: 4\.2 kg \/ 4 kg \(0\.2 kg over\)$/m);
+  assert.doesNotMatch(over, /heavy/i);
+  assert.equal(itemEditOn({}), false);
+  assert.equal(itemEditOn({ $it_edit: '1' }), true);
 });
 
 test('고치기·읽기·저장 왕복·찾기', () => {
@@ -144,7 +181,7 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   const out = withInventory(msgs(chat), chat);
   assert.equal(out.length, 4);
   assert.equal(out[2].role, 'system');
-  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
+  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nWeight: 0 kg \/ 25 kg\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
   assert.equal(withInventory(out, chat), out);
   assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_on: '0' } }).length, 3, '끄면 안 넣는다');
   // 넘기기를 꺼도 상점이 켜져 있으면 물건 목록 없이 상점 지침만 ([Shop])

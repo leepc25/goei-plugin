@@ -18,8 +18,8 @@ export function renderShopCard(text: string): string {
   if (!tag) return text;
   armChatClick('shop');
   const p = cardPalette(currentTheme());
-  // 상태창 상자와 같은 폭 규칙(가운데, 420px 안팎)으로 정렬 (초안 chatCard, 사용자 11-07)
-  const card = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5">`
+  // 채팅 속 다른 카드와 같은 폭 규칙: 왼쪽 정렬, 420px 안팎 (2026-11-08 사용자: 왼쪽 정렬)
+  const card = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5">`
     + `<span style="flex:1;min-width:0"><b style="color:${p.signal}">${esc(tag.shop)}</b></span>`
     + `<button type="button" data-goei-shop="1" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">상점 열기</button></div>`;
   return `${stripShopTags(text)}\n${card}`;

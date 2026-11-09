@@ -2,12 +2,13 @@
 // 로어북·인사말은 캐릭터에, 사진은 에셋 저장소(release/pic), 아이콘은 release/icon.png 를 받아 메인 아이콘으로,
 // 위키 기본 문서 묶음은 release/wiki-base.N.txt 를 받아 플러그인 저장소에 둔다.
 // 설치 자료(인사말·사진 목록·기본 명부·아이콘 정보)는 점검 전에 자료 팩(goei-data-install)으로 받는다 (host/datapack.ts ensureInstallData, QC 개선 나1).
-import { installCheck, installData, installLore, plantGreetings, type InstallState } from '../core/install';
+import { installCheck, installData, installLore, installLoreSettings, isLanding, plantGreetings, type InstallState } from '../core/install';
 import { UPDATE_BASE } from '../core/update';
 import { setStoredWikiPack, storedWikiPack, WIKI_PACK_HEAD } from '../core/wiki';
 import { clearTokenizer, setTokenizerRanks, tokenizerName } from '../core/tokenizer';
 import type { LoreEntry } from '../core/types';
-import { digest, fetchPictures } from './picpack';
+import { digest, fetchPicture, mergePictures, PicError } from './picpack';
+import type { Picture } from '../core/pictures';
 import { ensureInstallData, getBytes, getText, type Progress } from './datapack';
 import { forgetImages } from '../ui/images';
 
@@ -52,6 +53,8 @@ export async function checkInstall(charIndex: number, progress?: Progress): Prom
   const packInLore = (lore ?? []).some((e) => typeof e.content === 'string' && e.content.startsWith(WIKI_PACK_HEAD));
   const state = installCheck({
     lore,
+    firstMessage: char.firstMessage,
+    loreSettings: char.loreSettings,
     alternateGreetings: char.alternateGreetings,
     assets: char.additionalAssets,
     iconOurs: !!note && note.ours === String(char.image ?? ''),
@@ -64,14 +67,27 @@ export async function checkInstall(charIndex: number, progress?: Progress): Prom
 export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';
 export type { Progress };
 
-/** 로어북·인사말 심기 (없는 것만). 캐릭터를 저장한다 */
+/** 로어북·첫 메시지·인사말·로어북 설정 심기 (없는 것만). 캐릭터를 저장한다 */
 export async function installLoreAndGreetings(charIndex: number, o: { name?: string } = {}): Promise<void> {
   const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
   if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
   const planted = plantGreetings(char.alternateGreetings);
   const lore = installLore(char.globalLore as LoreEntry[] | undefined, planted.index);
+  // 첫 메시지: 시작 안내가 아니면 시작 안내로 (안내판이 뜨게, 사용자 2026-11-08). 원래 글은 지우지 않고 추가 인사말 끝으로 옮긴다
+  const first = char.firstMessage;
+  const landing = isLanding(first) ? {} : { firstMessage: installData().greetings.first };
+  if (!isLanding(first) && typeof first === 'string' && first.trim() && !planted.greetings.includes(first)) planted.greetings.push(first);
+  // 로어북 설정: 없으면(「글로벌 설정 사용」) 플러그인 기본 값으로. 있으면 그대로
+  const ls = installLoreSettings(char.loreSettings);
   // 봇 이름: 설치 화면의 선택(기본: 괴이 카드가 아니던 봇이면 「괴이: ANOMALY」로)
-  await risuai.setCharacterToIndex(charIndex, { ...char, ...(o.name ? { name: o.name } : {}), globalLore: lore, alternateGreetings: planted.greetings });
+  await risuai.setCharacterToIndex(charIndex, {
+    ...char,
+    ...(o.name ? { name: o.name } : {}),
+    ...landing,
+    ...(ls ? { loreSettings: ls } : {}),
+    globalLore: lore,
+    alternateGreetings: planted.greetings,
+  });
 }
 
 /** 없는 카드 사진을 release/pic 에서 받아 에셋 저장소에 넣는다 */
@@ -81,28 +97,46 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
   const { state } = await checkInstall(charIndex);
   const all = state.pictures.missing;
   if (!all.length) return 0;
-  // 100장씩 받아 받은 만큼 바로 캐릭터에 저장한다: 1,751장(93MB)을 받다 끊겨도 다시 누르면 이어서 받는다
-  const CHUNK = 100;
+  // 일꾼 여럿이 한 장씩 받자마자 저장한다 (2026-11-08 사용자: 100장 받고 100장 저장하길 되풀이해 오래 걸림).
+  // 캐릭터에는 COMMIT 장마다 한 번 적는다: 받다 끊겨도 저장한 만큼은 남아 다시 누르면 이어서 받는다
+  const WORKERS = 8;
+  const COMMIT = 300;
   let saved = 0;
   let assets: unknown = char.additionalAssets;
-  for (let i = 0; i < all.length; i += CHUNK) {
-    const get = all.slice(i, i + CHUNK);
-    const bytes = get.reduce((n, p) => n + (Number(p[3]) || 0), 0);
-    let last = 0;
-    try {
-      assets = await fetchPictures(assets, { get, replaced: 0, added: get.length, bytes, drop: [] }, (n, phase) => {
-        if (n - last >= 10 || n === 0 || n === get.length) {
-          last = n;
-          progress(`사진 ${phase === 'get' ? '받는' : '저장'} 중 ${saved + n}/${all.length}`);
-        }
-      });
-    } catch (error) {
-      if (saved) throw new Error(`${saved}/${all.length}장까지 받았어요. ${error instanceof Error ? error.message : String(error)}`);
-      throw error;
-    }
+  const commit = async (list: [Picture, string][]) => {
+    if (!list.length) return;
+    assets = mergePictures(assets, list);
     const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) as Record<string, unknown>;
     await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: assets });
-    saved += get.length;
+    saved += list.length;
+  };
+  for (let i = 0; i < all.length; i += COMMIT) {
+    const get = all.slice(i, i + COMMIT);
+    const done: [Picture, string][] = [];
+    let next = 0;
+    let failure: unknown = null;
+    const worker = async () => {
+      while (next < get.length && !failure) {
+        const p = get[next++];
+        try {
+          const path = await risuai.saveAsset(await fetchPicture(p));
+          if (typeof path !== 'string' || !path) throw new PicError('사진을 저장하지 못했어요.');
+          done.push([p, path]);
+        } catch (error) {
+          failure ??= error;
+          return;
+        }
+        const n = saved + done.length;
+        if (n % 10 === 0 || n === all.length) progress(`사진 받는 중 ${n}/${all.length}`);
+      }
+    };
+    await Promise.all(Array.from({ length: WORKERS }, worker));
+    // 실패해도 이미 저장한 사진은 캐릭터에 적어 둔다 (안 적으면 저장소에 주인 없는 파일로 남는다)
+    await commit(done);
+    if (failure) {
+      const why = failure instanceof Error ? failure.message : String(failure);
+      throw new Error(saved ? `${saved}/${all.length}장까지 받았어요. ${why}` : why);
+    }
   }
   forgetImages();
   return saved;
@@ -132,7 +166,7 @@ export async function installIcon(charIndex: number, progress: Progress): Promis
   const cc = (Array.isArray(char.ccAssets) ? (char.ccAssets as CcAsset[]) : []).filter((a) => a && typeof a === 'object');
   const hasIcon = (uri: string) => cc.some((a) => a.type === 'icon' && a.uri === uri);
   if (prev && !hasIcon(prev)) cc.push({ type: 'icon', uri: prev, name: cc.some((a) => a.type === 'icon' && a.name === 'main') ? 'previous' : 'main', ext: extOf(prev) });
-  if (!hasIcon(path)) cc.push({ type: 'icon', uri: path, name: 'goei', ext: 'png' });
+  if (!hasIcon(path)) cc.push({ type: 'icon', uri: path, name: 'goei', ext: extOf(icon.file) });
   await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
 }
 

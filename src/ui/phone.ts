@@ -3,12 +3,14 @@
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
-import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
+import { resolveSitePic } from '../core/sitepics';
+import { setSitePicSource, attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
   chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  BANTER_ROWS,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt, viewPrompt } from '../core/phonePrompt';
 import { parseView, PH_VIEW_LAST, readViews, VIEW_HISTORY, VIEW_PRESETS, viewSettings, viewUnread, writeViews, type ViewRoom } from '../core/phoneView';
@@ -907,7 +909,7 @@ function pickTabOf(d: Directory): string {
 }
 
 function paneHead(title: string, sub: string, right = ''): string {
-  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</div>${right}</header>`;
+  return `<header class="ph-room-head ph-wrapsub"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ''}</div>${right}</header>`;
 }
 
 function groupView(ctx: ChatContext, st: PState, d: Directory): string {
@@ -1083,18 +1085,21 @@ function settingsView(ctx: ChatContext): string {
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
+      ${group('괴담톡', [
+        row('자동 호출', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
+        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인 모델'], ['aux', '보조 모델']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
+        row('컨텍스트에 포함', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
+      ].join(''))}
       ${group('답장', [
-        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
-        row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
         row('말버릇 기록', onoff('habits'), '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요'),
         row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
       ].join(''))}
       ${group('새 메시지', [
-        row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
         row('단톡 수다', `<span class="ph-inline">${onoff('banter')}${pct('banter_chance')}</span>`, '새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요'),
+        row('단톡 수다 줄 수', `<span class="ph-inline"><span>최소</span>${num('banter_min', phoneSettings(ctx.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}<span>최대</span>${num('banter_max', phoneSettings(ctx.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
         row('소속 공지 받기', onoff('announcements'), '내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요'),
         row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴'), '공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요'),
         row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개'), '새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요'),
@@ -1107,7 +1112,7 @@ function settingsView(ctx: ChatContext): string {
           row('등장인물 범위', seg('view_scope', vs.scope, [['0', '주요 인물'], ['1', '장면 안'], ['2', '장면 안 주요 인물'], ['3', '자율']])),
           row('방 크기', seg('view_size', vs.size, [['0', '자동'], ['1', '둘이서'], ['2', '여럿']])),
         ] : []),
-        row('만들기', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
+        row('자동 호출', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
       ].join(''))}
       ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'), '켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만')].join(''))}
       ${group('보관', [
@@ -1148,6 +1153,7 @@ export function phoneContent(ctx: ChatContext, query: string): string {
 }
 
 export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
+  sitePicFor(ctx);
   liveEnv = env;
   let st: PState;
   let d: Directory;
@@ -1450,7 +1456,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
     case 'ph-num': {
       const [k, val] = v.split('=');
       const range: Record<string, [number, number]> = {
-        incoming_chance: [0, 100], group_invite_chance: [0, 100], banter_chance: [0, 100], announcement_gap: [1, 100], announcement_history: [1, 50],
+        incoming_chance: [0, 100], group_invite_chance: [0, 100], banter_chance: [0, 100], banter_min: BANTER_ROWS, banter_max: BANTER_ROWS, announcement_gap: [1, 100], announcement_history: [1, 50],
         storage_limit_dm: [1, STORAGE_MAX], storage_limit_group: [1, STORAGE_MAX], storage_limit_notice: [1, STORAGE_MAX],
       };
       const r = range[k];
@@ -1579,4 +1585,12 @@ export function previewPhoneRefresh(ctx: ChatContext): LlmMessage[] | null {
 /** 호출 흐름 미리 계산: 관전(보기 전용 방) 요청 */
 export function previewPhoneView(ctx: ChatContext): LlmMessage[] {
   return fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate))).messages;
+}
+
+/** [사진:이름] 을 이 봇의 그림으로 (그리기 전에) */
+function sitePicFor(ctx: ChatContext): void {
+  setSitePicSource((raw) => {
+    const name = resolveSitePic(ctx.char as never, raw);
+    return name ? imageUrl(ctx.char, name) : null;
+  });
 }

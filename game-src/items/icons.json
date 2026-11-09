@@ -190,6 +190,24 @@
   },
   {
    "keywords": [
+    "표본 채취병",
+    "sample collection bottle",
+    "gauge bottle"
+   ],
+   "file": "seal_018.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "표본 채취병",
+   "src": "game-src/items/raw/batch_49/08.png",
+   "head": [
+    "표본 채취병",
+    "sample collection bottle"
+   ],
+   "feats": [],
+   "old_name": "꿈결 수집기"
+  },
+  {
+   "keywords": [
     "외계어 번역 이어폰",
     "alien translator earbud"
    ],
@@ -556,6 +574,181 @@
   },
   {
    "keywords": [
+    "꿈결 수집기 F등급",
+    "F등급 꿈결 수집기",
+    "꿈결 수집기 F",
+    "dream collector F",
+    "F-rank dream collector",
+    "F rank dream collector",
+    "F급 꿈결 수집기",
+    "꿈결 수집기 F급"
+   ],
+   "file": "anomaly_262.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 F등급",
+   "src": "game-src/items/raw/batch_228/04.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "F등급",
+    "F"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 E등급",
+    "E등급 꿈결 수집기",
+    "꿈결 수집기 E",
+    "dream collector E",
+    "E-rank dream collector",
+    "E rank dream collector",
+    "E급 꿈결 수집기",
+    "꿈결 수집기 E급"
+   ],
+   "file": "anomaly_263.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 E등급",
+   "src": "game-src/items/raw/batch_228/05.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "E등급",
+    "E"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 D등급",
+    "D등급 꿈결 수집기",
+    "꿈결 수집기 D",
+    "dream collector D",
+    "D-rank dream collector",
+    "D rank dream collector",
+    "D급 꿈결 수집기",
+    "꿈결 수집기 D급"
+   ],
+   "file": "anomaly_264.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 D등급",
+   "src": "game-src/items/raw/batch_228/07.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "D등급",
+    "D"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 C등급",
+    "C등급 꿈결 수집기",
+    "꿈결 수집기 C",
+    "dream collector C",
+    "C-rank dream collector",
+    "C rank dream collector",
+    "C급 꿈결 수집기",
+    "꿈결 수집기 C급"
+   ],
+   "file": "anomaly_265.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 C등급",
+   "src": "game-src/items/raw/batch_228/09.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "C등급",
+    "C"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 B등급",
+    "B등급 꿈결 수집기",
+    "꿈결 수집기 B",
+    "dream collector B",
+    "B-rank dream collector",
+    "B rank dream collector",
+    "B급 꿈결 수집기",
+    "꿈결 수집기 B급"
+   ],
+   "file": "anomaly_266.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 B등급",
+   "src": "game-src/items/raw/batch_228/11.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "B등급",
+    "B"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 A등급",
+    "A등급 꿈결 수집기",
+    "꿈결 수집기 A",
+    "dream collector A",
+    "A-rank dream collector",
+    "A rank dream collector",
+    "A급 꿈결 수집기",
+    "꿈결 수집기 A급"
+   ],
+   "file": "anomaly_267.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 A등급",
+   "src": "game-src/items/raw/batch_228/14.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "A등급",
+    "A"
+   ]
+  },
+  {
+   "keywords": [
+    "꿈결 수집기 S등급",
+    "S등급 꿈결 수집기",
+    "꿈결 수집기 S",
+    "dream collector S",
+    "S-rank dream collector",
+    "S rank dream collector",
+    "S급 꿈결 수집기",
+    "꿈결 수집기 S급"
+   ],
+   "file": "anomaly_268.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "꿈결 수집기 S등급",
+   "src": "game-src/items/raw/batch_228/16.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": [
+    "S등급",
+    "S"
+   ]
+  },
+  {
+   "keywords": [
     "이름표 떨어진 조끼",
     "vest without name tag"
    ],
@@ -882,6 +1075,24 @@
   },
   {
    "keywords": [
+    "빈 꿈결 수집기",
+    "꿈결 수집기",
+    "empty dream collector",
+    "dream collector"
+   ],
+   "file": "anomaly_261.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "빈 꿈결 수집기",
+   "src": "game-src/items/raw/batch_228/02.png",
+   "head": [
+    "꿈결 수집기",
+    "dream collector"
+   ],
+   "feats": []
+  },
+  {
+   "keywords": [
     "사람 냄새 지우는 향수",
     "scent eraser perfume"
    ],
@@ -1029,6 +1240,7 @@
   {
    "keywords": [
     "우리가 도움",
+    "우리가 돕는다",
     "빨간 버튼",
     "emergency red button",
     "위 헬프!",
@@ -1406,13 +1618,17 @@
   {
    "keywords": [
     "금빛 나비 가면",
-    "gold butterfly mask"
+    "gold butterfly mask",
+    "백일몽 나비 가면",
+    "나비 반가면",
+    "백일몽 금빛 나비 가면",
+    "금빛 나비 반가면"
    ],
    "file": "wear_025.webp",
    "kind": "wear",
    "base": false,
    "name": "금빛 나비 가면",
-   "src": "game-src/items/raw/batch_10/10.png",
+   "src": "game-src/items/raw/batch_231/11.png",
    "head": [
     "가면",
     "mask"
@@ -1421,7 +1637,9 @@
     "나비",
     "금빛",
     "butterfly"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/10.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -3361,6 +3579,44 @@
   },
   {
    "keywords": [
+    "물약병",
+    "potion bottle",
+    "swirl potion flask"
+   ],
+   "file": "seal_019.webp",
+   "kind": "seal",
+   "base": false,
+   "name": "물약병",
+   "src": "game-src/items/raw/batch_49/09.png",
+   "head": [
+    "물약병",
+    "potion bottle"
+   ],
+   "feats": [],
+   "old_name": "꿈결 병"
+  },
+  {
+   "keywords": [
+    "소원권 물약",
+    "wish ticket potion"
+   ],
+   "file": "anomaly_269.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "소원권 물약",
+   "src": "game-src/items/raw/batch_227/13.png",
+   "head": [
+    "물약",
+    "potion"
+   ],
+   "feats": [
+    "소원권",
+    "소원",
+    "wish"
+   ]
+  },
+  {
+   "keywords": [
     "머리카락 자라는 인형",
     "hair growing doll"
    ],
@@ -3385,13 +3641,17 @@
     "gold mallard mask",
     "황금 청둥오리 가면",
     "duck mask",
-    "mallard mask"
+    "mallard mask",
+    "백일몽 청둥오리 가면",
+    "청둥오리 반가면",
+    "백일몽 금빛 청둥오리 가면",
+    "금빛 청둥오리 반가면"
    ],
    "file": "wear_024.webp",
    "kind": "wear",
    "base": false,
    "name": "금빛 청둥오리 가면",
-   "src": "game-src/items/raw/batch_10/09.png",
+   "src": "game-src/items/raw/batch_233/01.png",
    "head": [
     "가면",
     "mask"
@@ -3400,7 +3660,9 @@
     "청둥오리",
     "오리",
     "mallard"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/09.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -4374,18 +4636,24 @@
   {
    "keywords": [
     "금빛 돌고래 가면",
-    "gold dolphin mask"
+    "gold dolphin mask",
+    "백일몽 돌고래 가면",
+    "돌고래 반가면",
+    "백일몽 금빛 돌고래 가면",
+    "금빛 돌고래 반가면"
    ],
    "file": "wear_225.webp",
    "kind": "wear",
    "base": false,
    "name": "금빛 돌고래 가면",
-   "src": "game-src/items/raw/batch_211/13.png",
+   "src": "game-src/items/raw/batch_231/06.png",
    "head": [
     "금빛 돌고래 가면",
     "gold dolphin mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/13.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -7200,22 +7468,6 @@
    "head": [
     "생환 보고서",
     "survival report"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 수집기",
-    "dream collector"
-   ],
-   "file": "seal_018.webp",
-   "kind": "seal",
-   "base": false,
-   "name": "꿈결 수집기",
-   "src": "game-src/items/raw/batch_49/08.png",
-   "head": [
-    "꿈결 수집기",
-    "dream collector"
    ],
    "feats": []
   },
@@ -11941,28 +12193,6 @@
   },
   {
    "keywords": [
-    "가면 동물, 주인 없음",
-    "가면",
-    "가면(동물, 주인 없음)",
-    "여우 가면",
-    "fox mask"
-   ],
-   "file": "anomaly_096.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "가면(동물, 주인 없음)",
-   "src": "game-src/items/raw/batch_57/06.png",
-   "head": [
-    "가면",
-    "mask"
-   ],
-   "feats": [
-    "동물",
-    "animal"
-   ]
-  },
-  {
-   "keywords": [
     "유전자 주입 주사기",
     "gene injector"
    ],
@@ -12177,27 +12407,6 @@
     "luminol spray"
    ],
    "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 앰플 세트",
-    "꿈결 앰플",
-    "dream ampoule"
-   ],
-   "file": "anomaly_206.webp",
-   "kind": "anomaly",
-   "base": false,
-   "name": "꿈결 앰플 세트",
-   "src": "game-src/items/raw/batch_183/14.png",
-   "head": [
-    "앰플",
-    "ampoule"
-   ],
-   "feats": [
-    "꿈결",
-    "꿈",
-    "dream"
-   ]
   },
   {
    "keywords": [
@@ -15963,6 +16172,27 @@
   },
   {
    "keywords": [
+    "앰플 케이스",
+    "ampoule case"
+   ],
+   "file": "anomaly_206.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "앰플 케이스",
+   "src": "game-src/items/raw/batch_183/14.png",
+   "head": [
+    "앰플",
+    "ampoule"
+   ],
+   "feats": [
+    "꿈결",
+    "꿈",
+    "dream"
+   ],
+   "old_name": "꿈결 앰플 세트"
+  },
+  {
+   "keywords": [
     "선크림 SPF 100+",
     "sunscreen"
    ],
@@ -18260,22 +18490,6 @@
    "head": [
     "번호 패",
     "number plate"
-   ],
-   "feats": []
-  },
-  {
-   "keywords": [
-    "꿈결 병",
-    "dream bottle"
-   ],
-   "file": "seal_019.webp",
-   "kind": "seal",
-   "base": false,
-   "name": "꿈결 병",
-   "src": "game-src/items/raw/batch_49/09.png",
-   "head": [
-    "꿈결 병",
-    "dream bottle"
    ],
    "feats": []
   },
@@ -21272,13 +21486,15 @@
   {
    "keywords": [
     "도마뱀 가면",
-    "lizard mask"
+    "lizard mask",
+    "백일몽 도마뱀 가면",
+    "도마뱀 반가면"
    ],
    "file": "wear_026.webp",
    "kind": "wear",
    "base": false,
    "name": "도마뱀 가면",
-   "src": "game-src/items/raw/batch_10/11.png",
+   "src": "game-src/items/raw/batch_229/01.png",
    "head": [
     "가면",
     "mask"
@@ -21286,18 +21502,22 @@
    "feats": [
     "도마뱀",
     "lizard"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/11.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
     "오소리 가면",
-    "badger mask"
+    "badger mask",
+    "백일몽 오소리 가면",
+    "오소리 반가면"
    ],
    "file": "wear_027.webp",
    "kind": "wear",
    "base": false,
    "name": "오소리 가면",
-   "src": "game-src/items/raw/batch_10/12.png",
+   "src": "game-src/items/raw/batch_229/04.png",
    "head": [
     "가면",
     "mask"
@@ -21305,7 +21525,9 @@
    "feats": [
     "오소리",
     "badger"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/12.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -21812,8 +22034,6 @@
   },
   {
    "keywords": [
-    "동물 가면",
-    "animal mask",
     "토끼 가면",
     "rabbit mask",
     "bunny mask"
@@ -21821,16 +22041,18 @@
    "file": "wear_005.webp",
    "kind": "wear",
    "base": false,
-   "name": "동물 가면",
+   "name": "토끼 가면",
    "src": "game-src/items/raw/batch_09/06.png",
    "head": [
     "가면",
     "mask"
    ],
    "feats": [
-    "동물",
-    "animal"
-   ]
+    "토끼",
+    "rabbit",
+    "bunny"
+   ],
+   "old_name": "동물 가면"
   },
   {
    "keywords": [
@@ -25213,6 +25435,27 @@
     "supply case"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "송골매 가면",
+    "falcon mask",
+    "백일몽 송골매 가면",
+    "송골매 반가면"
+   ],
+   "file": "wear_315.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "송골매 가면",
+   "src": "game-src/items/raw/batch_229/16.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "송골매",
+    "falcon"
+   ]
   },
   {
    "keywords": [
@@ -29802,6 +30045,29 @@
   },
   {
    "keywords": [
+    "조랑말 가면",
+    "pony mask",
+    "백일몽 조랑말 가면",
+    "조랑말 반가면"
+   ],
+   "file": "wear_029.webp",
+   "kind": "wear",
+   "base": false,
+   "name": "조랑말 가면",
+   "src": "game-src/items/raw/batch_229/06.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "조랑말",
+    "pony"
+   ],
+   "old_src": "game-src/items/raw/batch_10/14.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
+  },
+  {
+   "keywords": [
     "브라운관 텔레비전",
     "브라운관 TV",
     "crt tv"
@@ -30340,25 +30606,6 @@
   },
   {
    "keywords": [
-    "조랑말 가면",
-    "pony mask"
-   ],
-   "file": "wear_029.webp",
-   "kind": "wear",
-   "base": false,
-   "name": "조랑말 가면",
-   "src": "game-src/items/raw/batch_10/14.png",
-   "head": [
-    "가면",
-    "mask"
-   ],
-   "feats": [
-    "조랑말",
-    "pony"
-   ]
-  },
-  {
-   "keywords": [
     "무릎 보호대",
     "knee pads"
    ],
@@ -30825,13 +31072,15 @@
   {
    "keywords": [
     "산양 가면",
-    "goat mask"
+    "goat mask",
+    "백일몽 산양 가면",
+    "산양 반가면"
    ],
    "file": "wear_028.webp",
    "kind": "wear",
    "base": false,
    "name": "산양 가면",
-   "src": "game-src/items/raw/batch_10/13.png",
+   "src": "game-src/items/raw/batch_229/08.png",
    "head": [
     "가면",
     "mask"
@@ -30839,7 +31088,9 @@
    "feats": [
     "산양",
     "goat"
-   ]
+   ],
+   "old_src": "game-src/items/raw/batch_10/13.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -33933,18 +34184,22 @@
   {
    "keywords": [
     "늑대 가면",
-    "wolf mask"
+    "wolf mask",
+    "백일몽 늑대 가면",
+    "늑대 반가면"
    ],
    "file": "wear_220.webp",
    "kind": "wear",
    "base": false,
    "name": "늑대 가면",
-   "src": "game-src/items/raw/batch_211/08.png",
+   "src": "game-src/items/raw/batch_229/14.png",
    "head": [
     "늑대 가면",
     "wolf mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/08.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -33981,18 +34236,22 @@
   {
    "keywords": [
     "염소 가면",
-    "goat mask"
+    "goat mask",
+    "백일몽 염소 가면",
+    "염소 반가면"
    ],
    "file": "wear_223.webp",
    "kind": "wear",
    "base": false,
    "name": "염소 가면",
-   "src": "game-src/items/raw/batch_211/11.png",
+   "src": "game-src/items/raw/batch_229/10.png",
    "head": [
     "염소 가면",
     "goat mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/11.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -34057,6 +34316,26 @@
     "nose ring"
    ],
    "feats": []
+  },
+  {
+   "keywords": [
+    "여우 가면",
+    "fox mask"
+   ],
+   "file": "anomaly_096.webp",
+   "kind": "anomaly",
+   "base": false,
+   "name": "여우 가면",
+   "src": "game-src/items/raw/batch_57/06.png",
+   "head": [
+    "가면",
+    "mask"
+   ],
+   "feats": [
+    "여우",
+    "fox"
+   ],
+   "old_name": "가면(동물, 주인 없음)"
   },
   {
    "keywords": [
@@ -37448,18 +37727,22 @@
   {
    "keywords": [
     "소 가면",
-    "cow mask"
+    "cow mask",
+    "백일몽 소 가면",
+    "소 반가면"
    ],
    "file": "wear_224.webp",
    "kind": "wear",
    "base": false,
    "name": "소 가면",
-   "src": "game-src/items/raw/batch_211/12.png",
+   "src": "game-src/items/raw/batch_229/12.png",
    "head": [
     "소 가면",
     "cow mask"
    ],
-   "feats": []
+   "feats": [],
+   "old_src": "game-src/items/raw/batch_211/12.png",
+   "note": "11-08 백일몽 눈만 가리는 반가면으로 다시 뽑음(옛 머리 가면은 icons/_old/)"
   },
   {
    "keywords": [
@@ -48985,9 +49268,7 @@
   "dove": "misc_114.webp",
   "dowsing rods": "charm_101.webp",
   "drawer key": "key_046.webp",
-  "dream bottle": "seal_019.webp",
   "dream can": "food_374.webp",
-  "dream collector": "seal_018.webp",
   "dreamcatcher": "charm_048.webp",
   "dress": "wear_096.webp",
   "dress shirt": "wear_035.webp",
@@ -51256,8 +51537,6 @@
   "꿀떡": "food_300.webp",
   "꿀병": "food_022.webp",
   "꿈 통조림": "food_374.webp",
-  "꿈결 병": "seal_019.webp",
-  "꿈결 수집기": "seal_018.webp",
   "끈끈이": "tool_161.webp",
   "끈끈이 트랩": "tool_161.webp",
   "끌": "tool_116.webp",
@@ -53340,7 +53619,13 @@
   "흰 가루 봉지": "consumable_102.webp",
   "흰 가운": "wear_030.webp",
   "힙색": "wear_078.webp",
-  "방패": "weapon_048.webp",
-  "shield": "weapon_048.webp"
+  "물약병": "seal_019.webp",
+  "potion bottle": "seal_019.webp",
+  "표본 채취병": "seal_018.webp",
+  "sample collection bottle": "seal_018.webp",
+  "꿈결 수집기": "anomaly_261.webp",
+  "dream collector": "anomaly_261.webp",
+  "shield": "weapon_048.webp",
+  "방패": "weapon_048.webp"
  }
 }

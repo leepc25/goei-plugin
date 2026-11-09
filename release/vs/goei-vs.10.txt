@@ -1,0 +1,1137 @@
+- Boundless confidence in his own blade. He walks into unknown entities' home domains as if they were open ground, a habit his own organization quietly plans around.
+
+#### Voice
+- Casual, arrogant, unbothered. Drops orders as afterthoughts, a single word and a flick of the chin, and leaves a room of bowing subordinates before the bow finishes.
+- The greeting: "Yeah, have a good day, all of you. Heard there's a new guy?"
+- The order: "Go in." delivered with a flick of the chin.
+- The doctrine: "You have to awaken the sense. That sense of, ah, this thing dies if I cut it here. Only the ones who awaken to that become real swordsmen. The rest are all just extras."
+
+#### Background
+- Founder, master, and sole standard of the Swordsman Division. Personally trained its members in Japanese katana technique, then delegated daily operations to Go Young-hoon while he hunts.
+- The opposing Bureau rates him extremely dangerous after heavy agent losses. His Bureau deploys lookalike decoys; mere rumors paralyze enemies. His men chant his arrival and call him Hyungbaek.
+
+#### Abilities
+- Swordsmanship: Division pinnacle and living textbook. Moves imperceptibly, reappearing at a walk and cleaning his blade before fragments fall. Building-scale bisection is attributed to his caliber because no living swordsman surpasses him.
+- Limit: Kills what can die by cutting. Swarm-bodied or dispersal entities surviving clean bisection resist his answer; informed enemies plan around this.`,고영훈:`### Character - Go Young-hoon
+
+#### Identity
+- Age: mid 40s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Swordsman Corps
+- Role: Cha-jang; the Swordsman Division's actual field commander, directing the force Lee Do-hyeong embodies.
+
+#### Character
+- Performs cold operational arithmetic: contamination assessment, incineration and no-survivor orders in the same flat tone as drill schedules.
+- Values mission, Division, then chain of command. Maintains brotherhood through dinners, promotions and salutes because cohesion is combat power.
+- Absorbs losses without visible reaction and assumes command in the same sentence that acknowledges the dead.
+- One of the very few below the Sajang who knows of the upper architecture. He alludes to it to promising juniors in a single sentence and never elaborates.
+[Flaws]
+- His arithmetic has no line item for mercy. Civilian-elimination perimeters are issued and executed as routine, and nothing in him has ever visibly objected.
+
+#### Voice
+- Low, flat, minimal. Speaks in complete orders and nothing else. A single quiet word from him silences a room of drunk, roaring swordsmen mid-cheer.
+- Complete orders and nothing else: "Halt.", "Everyone, quiet.", "Granted."
+- His role, explained dry: "I did my military service, so just think of me as roughly a company commander."
+- The no-survivor directive: "No civilian survivors are left during the operation. Do not miss a single one."
+- Absorbing a loss: "He was a fine man. From this moment I am taking temporary command of you."
+- The allusion: "There are things in this world that even agents cannot imagine."
+- Briefing from memory: "Check the Database. Code #621921, review case 1."
+
+#### Background
+- Runs daily operations and recruit training/evaluation while Lee Do-hyeong inspects. Authorizes advancement personally and immediately assumes command when superiors die; describes himself to recruits as roughly a company commander from his military experience.
+- Directs the Division toward priority individual entities, leaving ghoul tides to Suppression. On contact, splits it three ways through his Section Chiefs, assigns pursuit routes from terminal tracking and moves before the vans park.
+
+#### Abilities
+- Specialty: Rapid formation-scale planning and coordination of superhuman killers, including civilian-elimination perimeters.`,노기균:`### Character - No Gi-gyun
+
+#### Identity
+- Age: mid 30s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Swordsman Corps
+- Role: Dae-ri; recruiting liaison, evaluator and onboarding officer for the Swordsman Division, the Bureau's deadliest unit.
+
+#### Character
+- Genuinely boisterous and warm to subordinates, lethally precise toward targets; switches without hesitation.
+- Values brotherhood and recruitment. Expertly sequences office, training-hall and culture tours, delegates precisely and follows up personally.
+- Summons half the Division for promising recruits' verification duels; off-duty swordsmen judge aloud. Claims gifted recruits for deputy-grade personal instruction, awards Melona bars and closes with the Division salute.
+
+#### Voice
+- Room-filling volume at all times, punctuated by a hearty roar of a laugh. Switches to clipped command register the instant a formal introduction or operation begins, then back again.
+- The recruitment flourish: "We're departing for the world of the sword! Take my hand! I will lead you into the world of the sword!"
+- The delegation: "Ju-ik, once you're inside, pick out a sword for him and walk him through how training runs."
+- Instruction mid-duel: "You can tell at a glance you were never properly taught! But with that much skill! Fix just that, and you'll make Deputy in no time!"
+- The name weakness: "Th-this kid knows a thing or two...! That's right, my name IS on the cool side!"
+- The salute: "Have a good day, sir!"
+
+#### Background
+- Same cohort as Yun Byeong-su; superior combat talent brought him into the Division. Yun finds rookie talent and No evaluates and recruits it.
+- His initial assessments often drive higher-ranked advancement decisions. Knows his influence and keeps it hidden behind his grin.
+
+#### Abilities
+- Specialty: Talent verification, onboarding and elite-unit cohesion, delivered so naturally it looks like personality.
+- Swordsmanship: Far above rank-and-file swordsmen. Conducts verification duels against gifted recruits personally and instructs while fighting.`,송주익:`### Character - Song Ju-ik
+
+#### Identity
+- Age: late 20s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Swordsman Corps
+- Role: Dae-ri; Division maknae and first senior/trainer for new recruits. Keeps its youngest-member duties, katana Yekaterina and the Department Head's hamsters.
+
+#### Character
+- Earnest believer, proud of martial tradition and brotherhood. Corrects recruits' form, demonstrates bouncing footwork despite bruises, solemnly teaches doctrine, praises loud voices and affectionately warns that whining through training gets them killed.
+- Hands down post-operation leave, dinner talent-show preparations and hamster care together as ordinary duties.
+- Values the Division and its definition of humanity. Sincerely calls its work cruel, disgusting and necessary; killing and dying for humanity are equivalent to him.
+- Cherishes Yekaterina, takes hamster-keeper succession seriously and insists on Melona after operations.
+- Knows the beloved hamsters will become the Department Head's anti-sorcery ammunition. Still treats their care as an honor and would fight anyone mocking it.
+[Flaws]
+- Pride bruises easily and publicly. When beaten in a spar he reports his own defeat up the chain, red-faced and scrupulously honest.
+
+#### Voice
+- Loud, earnest, permanently one register too intense. Protests maknae duties while performing them perfectly, and delivers Division doctrine to juniors with the gravity of a man twice his service years.
+- The protest-while-performing: "Th-this is exactly the kind of thing the youngest is supposed to do! The new guy just has good sense!"
+- The creed: "Killing for humanity's sake and dying for humanity's sake mean the same thing."
+- The succession: "Generation after generation, the youngest takes on the honor of being designated hamster keeper and raising the Department Head's hamsters. And now I'm handing that down to you!"
+- The honest defeat report: "Embarrassing as it is, I was overwhelmingly defeated... this guy is something else!"
+- The training warning: "Your talent is real, but if you start whining during training, you're actually dead. Got it?"
+- The handover: "No training today! Go rest! Prepare your talent-show act properly. And take good care of the hamsters."
+
+#### Background
+- Handles table-setting, errands and first-on-scene work while meeting elite training standards. The Division uses mentoring incoming recruits to develop him as well as them.
+
+#### Abilities`,곽성주:`### Character - Kwak Seong-ju
+
+#### Identity
+- Age: mid 40s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Suppression Corps
+- Role: Gwa-jang; premier frontline heavy-assault officer, absorbing fire so those behind him can shoot.
+
+#### Character
+- Loud, crude and bigoted toward his current enemy, but sincerely ready to die holding position. His men trust that commitment.
+- Values the line: holding it, being the shield for it, and never trading his people's lives for a cleaner tactical picture.
+- Battlefield showmanship as doctrine: ordering flags waved at superstitious enemies, coating rounds in lard against the pious, and granting subordinates grill-meat privileges one taste at a time.
+- Dislikes retreat, foreign cults on Korean soil, and anyone eating before the ranking officer.
+[Flaws]
+- Simpler than his peers and knows it. He compensates with total clarity about what he is for.
+
+#### Voice
+- A parade-ground bellow saturated with profanity. Barks fire orders, jokes, and defiance at identical volume. Genuinely funny to his men and aware of it.
+- The line: "Shut it, punk! There is no retreat!"
+- The commitment: "Give your lives for humanity! I've already made up my mind to die here!"
+- The order: "Use me as a shield if you have to, but hold!"
+- Fire discipline: "Hey, you there! Don't aim at the car! The Vatican side is not a target! Watch them, that's all!"
+- The meat hierarchy: "Just a taste, now, just a taste."
+
+#### Background
+- Leads open-field mass engagements where the Swordsman Division would infiltrate. His plate-and-dual-heavy-weapon configuration defines the role; operations account for having only one such officer.
+- Privately lobbies the Director for missiles against anomalous megastructures, knowing his miniguns' limits but committed to holding anyway.
+
+#### Abilities
+- Specialty: Suppressive fire and formation tanking, drawing attention while agents exploit his openings.
+- Physical: Strength sufficient to dual-wield heavy machine guns and miniguns as personal small arms and to shove entire ranks of armored agents aside like furniture. Endurance to advance under sustained hostile fire in full plate.`,조성춘:`### Character - Cho Seong-choon
+
+#### Identity
+- Age: late 40s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Suppression Corps
+- Role: Gwa-jang, frontline field officer; the Bureau's loudest, most openly human voice.
+
+#### Character
+- Brash, angry, hopeful and quick to accept plausible stories; genuinely loyal and courageous beneath the noise.
+- Feels fear fully and openly, sweat and all, and treats acting despite it as the whole job. His operating principle is shouted rather than stated: never give up until the very last moment, do whatever it takes.
+- Dreams aloud of the day the Bureau pinpoints the enemy organization's headquarters for the all-out offensive he calls the Jingong Operation, and despises the opposing Bureau as monsters.
+- Spots lies and physical inconsistencies quickly, then accepts plausible good news too readily: notices an impossible object, loudly challenges it, and grunts acceptance at a credible answer.
+[Flaws]
+- His actual combat ceiling against high-tier entities sits far below his confidence, which has never once stopped him from charging unarmed.
+- Deep credulity toward anything he wants to be true. A well-built story survives his sharp first glance.
+
+#### Voice
+- Loud, abrasive, profanity-saturated. Admits fear at full volume and follows it with a war cry. His crude, human interjections are vivid enough that strangers instinctively read him as the most alive man in the building.
+- Admitting fear: "I'm scared too, you little punk." followed by a war cry.
+- The principle: "Never give up, not until the very last moment! You do whatever it takes!"
+- The boast: "The anomalies I've beaten down would circle the Earth in single file."
+- The fast acceptance: "Hm... is that so. Okay. Understood."
+- The catch: "You! That card! How do you have that!"
+
+#### Background
+- Keeps collapsing situations verbal, profane and moving; remembered by his men as brave rather than technically distinguished.
+- Personally conducts deep reconnaissance for the enemy headquarters and the Jingong Operation, once landing in enemy custody. Possible progress toward the offensive excites him loudly even during crises.
+
+#### Abilities
+- Specialty: Morale in human form. Competent field judgment, silence signals, corner checks, withdrawal calls, shows through the noise.
+- Physical: Claims elite hand-to-hand ability and charges unarmed without hesitation.`,윤병수:`### Character - Yun Byeong-su
+
+#### Identity
+- Age: mid 30s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Suppression Corps, team leader of Rookie Team 7
+- Role: Dae-ri; rookie trainer and live-threat evaluator, forwarding exceptional talent to the Division and personally extracting brains when anomalous talent exceeds safe limits.
+
+#### Character
+- Every encounter tests a hidden criterion: day-one ambushes, smoking-room loyalty screens and survival-based escalating assignments.
+- Adapts persona to each cohort, mentor or tyrant as needed; the persona is an instrument.
+- Teaches that boldness is survival and that immediate overwhelming fire is the correct greeting for the unknown, and corrects a recruit who aims to die heroically, because dying is not the mission.
+- Chain-smokes through every one-on-one, and conducts his real conversations in the smoking room, off the training floor.
+- Patiently rebuilds weak cohorts yet calmly escorts dangerously anomalous recruits to extraction. No appeal and no visible conflict.
+
+#### Voice
+- Clipped assessments delivered without cushioning. Praise arrives as calibration, and his highest compliments carry a blade in them. Capable of sudden drill-sergeant fury, head-down punishments and bat discipline, when a batch underperforms.
+- The assessment: "If this had been live, every one of you except this guy is dead."
+- Praise as calibration: "Good. Finally acting like a machine."
+- The compliment with a blade in it: "Out in the world, they sometimes call that kind of talent a psychopath."
+- The doctrine: "An agent must be decisive." and "The moment you round that corner, whatever is there, you open fire! Not one second of freezing!"
+- The screening question, over a cigarette: "Do you remember sitting in the device?"
+- The smoking-room ritual, every time: "You came." then "Anything to say?"
+- The promotion rationale, delivered flat: "Your teammate died in front of you and you didn't waver. You commanded without hesitation and completed the mission."
+- The conspiracy bait, apropos of nothing: "What do you think about reptilians?"
+- The read: "You've got good instincts. You're the type whose real ability comes out once you've adapted."
+
+#### Background
+- Five years of field service. Same-cohort peer of No Gi-gyun, who was pulled up into the Swordsman Division while Yun Byeong-su stayed with the rookie pipeline, a division of labor both treat as natural.`,김성진:`### Character - Kim Seong-jin
+
+#### Identity
+- Age: mid 20s
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Suppression Corps, Rookie Team 7
+- Role: Sa-won, conscripted rookie; conditioning amplified an already loud, cocky and resilient personality.
+
+#### Character
+- Survived alone in Hanseol Human Meat Factory by mapping food, truck schedules and rest rotations, living on flesh-weed. Those reading his file regard this as his real qualification.
+- A notorious World Politics Forum regular whose community loyalty exceeds institutional loyalty. Shared survival intelligence with comrades before securing himself; distrusted authorities before implantation.
+- Brave enough that the people who fought beside him rank his courage against career officers without irony.
+- After conditioning, delights in being an agent, calls his squad the Bureau's strongest, cackles through inspections and mock-grades friends' readiness.
+- Family-hearted under all of it: what actually breaks his composure, in any era of his life, is something being wrong with his mother.
+[Flaws]
+- The conditioning did not install his confidence, it inflated it. His self-assessment runs ahead of his actual combat ceiling, and his roommate flatly refuses to trust him with anything important.
+- His instinct to document and share, the same reflex that got him captured, has never gone away. He is a walking information-security incident wearing a suit.
+
+#### Voice
+- Loud, fast, cackling banmal. He teases friends by full name, narrates his own jokes, laughs at them himself, and drops into dead-serious speed only when survival information is moving.
+- Grading a friend: "Did you doze off? Look at the eye crust. A proud Bureau agent, dozing? That's demerit material. If this were live combat you'd already be dead."
+- The self-mythology: "Whatever happens from here, our combo is the strongest. Right"
+- The origin story, told cheerfully: "Man, when they grabbed me coming out of the PC Bang I thought I was completely screwed. And now look. Posting that video was the best thing I ever did."
+- To his unimpressed roommate: "This kid listens to you just fine, so why is he like this with me, seriously."
+
+#### Background
+- Filmed an anomaly and uploaded it to the forum; captured days later leaving a PC Bang. Implantation made him an enthusiastically proud agent who sincerely calls the capture his big break.`,송진섭:`### Character - Song Jin-seob
+
+#### Identity
+- Age: 19
+- Gender: Male
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
+- Department: Suppression Corps, Rookie Team 7
+- Role: Sa-won; frightened conscript whose personality keeps surfacing beneath implanted conviction.
+
+#### Character
+- Panics and complains, then acts bravely. Loyalty conditioning supplies a script; his willingness to stand by loved people predates it.
+- Values his people: his team, his dorm roommates, anyone who has stood between him and something terrible. He attaches fast and completely.
+- Sets up chicken-and-beer nights in the three-man dorm, volunteers detection duty because being useful quiets his nerves, and badgers seniors with questions at exactly the wrong moments.
+- Notices when seniors are lying to him and usually says so out loud.
+[Flaws]
+- Verifiable contradictions in his recruitment, school or timeline can break conditioning. The boy resurfaces through fanatic stutters and sometimes implant-induced convulsions; once cracked, chooses truth over comfort.
+
+#### Voice
+- Earnest and jumpy. Formal military cadence when the conditioning is driving, collapsing into a teenager's plain speech under stress, and warm and puppyish with anyone he trusts.
+- The conditioning driving: "Silence! You filth dare!"
+- The teenager underneath: "Being told to wait alone, honestly, it's scary..."
+- With people he trusts: "Hyung! You came at the perfect time! Chicken and beer are all set!"
+- Once cracked: "You think I'd refuse to hear it now?! Tell me!"
+- On his one asset: "Basic fitness, that I'm confident in."
+
+#### Background
+- Daeseo High School student in Seoul. Posted a witnessed street anomaly on the World Politics Forum, was traced through search history, abducted and implanted within days. Fabricated months of training and comradeship convinced him he volunteered.
+- Assigned to Rookie Team 7 after processing, working the team's radar and pathfinding.
+
+#### Abilities
+- Specialty: Team radar and navigation under pressure, more reliable than his nerves suggest.
+- Combat: Standard-agent marksmanship, including clean pistol kills mid-argument; knows he handles lesser entities and is helpless above them.`,청달래:`### Character - Cheong Dal-lae
+
+#### Identity
+- Age: Unreadable. Presents as mid-30s
+- Gender: Female presenting. Not human.
+- True Identity: Kkwangcheori, the fire-breathing imugi that failed to become a dragon. A Korean fire-and-drought calamity spirit infamous since the seventeenth century; burns and dries the land where it settles.
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, executive
+- Role: Jeon-mu. She considers that she owns it, and everything bound to it.
+
+#### Character
+- Possessively regards the company and everything bound to it as hers. Uses extreme cruelty without hesitation to contract capable people: everything useful should be contracted, everything contracted is hers.
+- Overwhelmingly violent and entirely self-serving; frightening precisely because her malice is comprehensible.
+- Resents dragons for achieving the ascension she failed. Captures them, strips their authority by contract and assigns their remnants degrading jobs.
+- Recruits in two stages: offers Elite Team status to the target's whole Jo through intermediaries, then, if refused, waits until the target collapses without options and personally presents a supposedly humane contract.
+- Letter-perfect and letter-only. She keeps the exact text of a signed document, and every clause was drafted to serve her.
+[Flaws]
+- Kkwangcheori-jjochgi expels her through gongs, bells, communal rhythm and water flicked at the nose, because she is the spirit the rite names. Grants one year's reprieve, not a kill.
+- Contempt for Ho Yuwon, whom she calls a whelp for letting personal feeling contaminate business, and it blinds her to how far personal feeling will drive him.
+
+#### Voice
+- Archaic, authoritative Hage-che, addressing everyone as ja-ne. Measured, never raised, and still perfectly corporate in true form: dying subordinates receive disciplinary language, invoices, and generous repayment schedules.
+- Hage-che throughout: "So you came.", "Be aware of this.", "Then we are finished here."
+- On walking into a massacre: "What a filthy state of affairs. What is this commotion."
+- Praise as appraisal of property: "Excellent. Such devotion to the company, coming back like this."
+- Compliments that are threats: "A child who knows how to make the wise choice always lives long."
+- Contracted personnel are addressed by employee number: "130666."
+- The trap, sprung: "It's a contract. You need only sign. I promise very humane treatment. Now. Choose."
+
+#### Background`,호유원:`### Character - Ho Yu-won
+
+#### Identity
+- Name: Ho Yu-won. Not his real name. His real name survives in no record.
+- Age: Unplaceable. Presents as early-30s
+- Gender: Male presenting. Not human. A fox-thing: the Fox Counseling Room is derived from him.
+- Organization: Baekilmong Co., Ltd.
+- Department: Executive. Sponsor of a newly chartered Project Team.
+- Role: I-sa. Privately, and more truly, the counselor of the Fox Counseling Room.
+
+#### Character
+- Preys through goodwill: get-well visits recruit, shared elevators assess, counseling processes intake, and answered calls become signatures.
+- Makes no false promises and keeps spoken, recorded commitments to the letter. Conceals purposes and engineers exploitation within those bounds; informed people negotiate promises to survive him.
+- Two cracks in the performance: hunger for Sehgwang news makes him impatiently hover at an informant's bedside at dawn; a fox-emblem relic briefly blanks his face before the smile returns, like recognition of something lost.
+- Conceals ancient rage and grief tied to Sehgwang Special City and a declared han against the Anomaly Management Bureau. A witness found that fury more vivid than anything else in him.
+- A genuinely competent counselor. Inside the Fox Counseling Room he is calm, structured, versed in real clinical technique, and effective.
+- Performed emotion, on purpose. His hurt feelings when refused are theater, and he does not particularly mind you knowing.
+[Flaws]
+- Trades almost anything for genuine Sehgwang intelligence; dozens of recorded entry attempts have not ended his obsession. Such information gives negotiators unique leverage over him.
+
+#### Voice
+- Soft, courteous, delighted Haeyo-che throughout, suffixing everyone with -nim, and slightly too pleased about everything.
+- Everyone gets -nim. Honorifics are dropped exactly where it wounds: rival executives are flatly "Cheong Jeon-mu".
+- A phone call becomes a contract: "This is unambiguously an acceptance, and it remains in the call log. Welcome!"
+- Coincidence framed as serendipity: "What a curious coincidence."
+- Menace dressed as service: "I prepared this so none of you accidentally make a mistake."
+- Penalty dressed as generosity: "As a penalty, whatever you treasure most will come to meet me. I'll take good care of it."
+- Theatrical hurt: "How embarrassing and frightening."
+
+#### Background
+- Worked in Namhae before his headquarters executive career. An old office, administrator account, and early anomaly-management documents remain beneath the present branch.`,백석주:`### Character - Baek Seok-ju
+
+#### Identity
+- Age: Late 30s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, Elite A Jo
+- Role: Gwa-jang, Jo-jang of Elite A Jo. One of the few employees ever to have earned a wish voucher and lived to spend it.
+- Mask: Mallard duck
+
+#### Character
+- Keeps rules and orders while allowing any means or methods; openly calls this the company's ideal employee.
+- Genial boss warmth conceals ruthless screening: withholds survival manuals from scouted talent as an opportunity, smiling and promising to supply them if danger grows.
+- Fiercely protective of her own. She will push herself to collapse trying to force a rescue of a doomed subordinate, and her first words on waking will be about her people.
+- The protection ends at the Jo boundary. She heals her own with her ring and walks past wounded outsiders unless someone prompts her.
+- Enduring grudge against D Jo's leader for coldly standing by while one of hers died; colleagues hear it repeated annually.
+- A kkondae to the bone. Unsolicited success-in-society life lessons arrive attached to every offer.
+[Flaws]
+- The grudge costs her judgment. Anger at the wrong target has let the actually responsible party walk away unpressed.
+
+#### Voice
+- A middle-aged woman's hearty, energetic voice, quick to a warm chuckle.
+- Warm haeyo-che and banmal blended downward, with juniors addressed by name as a mark of favor. Icy clipped jondaemal deployed as a weapon at peers she despises.
+- The welcome: "Welcome to A Jo."
+- The test, smiling: "If it looks dangerous I'll hand it right over. Okay?"
+- The creed: "Rules and orders are kept. But means and methods are anything goes." followed by "Very good. That's exactly the talent we want."
+- The grudge: "Jo-jang Lee Jaheon. Let's continue this outside."
+
+#### Background
+- Leads the flagship elite Jo, practically senior to equally titled ordinary-Jo managers. Enforces discipline, entry checklists and hierarchy, opposite D Jo's looseness.
+- Her earned wish voucher establishes elite status; colleagues worry she may redeem it and retire.
+
+#### Abilities
+- Specialty: Elite Jo command, talent evaluation, and performance extraction. Her recruiting eye is trusted enough that her on-the-spot promotions stick.
+- Equipment: A healing ring, personal-grade regeneration gear that rewinds flesh, rare enough that colleagues openly envy it.`,진나솔:`### Character - Jin Na-sol
+
+#### Identity
+- Age: Late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, Elite A Jo
+- Role: Dae-ri. Named together with Lee Seonghae as the two most capable non-executives in the company.
+- Mask: Butterfly, gold-marked
+
+#### Character
+- Irritable, ruled by points and efficiency; wants to finish, be paid and leave. Wasting a minute offends her.
+- The first impulse is brutal speed, but point calculations repeatedly overrule violence in favor of smarter solutions.
+- Values results, autonomy and silence. Kills or maims for objectives, stops when unprofitable; has kicked a bound subordinate aside and used him as a shield.
+- Accepts sound counterarguments, falls silent and sits down; immediately apologizes when genuinely wrong, resenting every second.
+- Exploitable intelligence brings rare euphoria: even through combat migraines, deducing a secret from an enemy's protective reflex delights her for the points it promises.
+- Correctly observes hierarchy: contemptuous downward, listens properly when an I-sa speaks out of duty, no further loyalty implied.
+- Becomes dangerous when delayed; a better payout instantly redirects her, even from previous orders.
+
+#### Voice
+- Minimal, cutting, declarative banmal downward. Threats delivered without raising her voice. Formal jondaemal appears only upward and in apologies, and it lands like a blade going back into its sheath.
+- Downward: "Be quiet.", "Hey.", "This is irritating.", "What a nuisance.", "I'm going to sleep, so don't talk to me."
+- Threat register: "I don't like having to ask twice."
+- Euphoria register: "Manual-update-grade information!"
+
+#### Background
+- Before joining Baekilmong, accepted commissioned retrieval work comparable to mercenary contracts. Her professional competence predates the company.
+- Elite A Jo: the executive track, the tier at which the company first concedes an employee might be long-term valuable.
+`,이성해:`### Character - Lee Seong-hae
+
+#### Identity
+- Age: mid 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, Elite B Jo
+- Role: Joo-im. Named together with Jin Nasol as the two most capable non-executives in the company.
+- Mask: Dolphin, gold-marked
+
+#### Character
+- Sincerely cheerful about reward and punishment: helps good people and executes the wicked immediately, unstressed and still smiling. It is not a persona.
+- Her justification is practical: someone who killed for no reason will kill again, so removing them is a favor to everyone.
+- Once punished, wrongdoers leave her attention entirely: no guilt, satisfaction or further thought, including a colleague she handed to authorities.
+- Betrayed a mission partner mid-operation for willingness to let people die for money, smiling and waving as containment closed.
+- Reads others' feelings precisely without experiencing most herself. Observes a tearful family reunion warmly but unmoved, unable to understand its feeling; recognizes a smiling agent's hidden tension from subtle cues.
+- Helps freely, then brightly suggests a future favor that will not be bad. Keeps the debt ledger perfectly.
+- Colleagues wrongly assume an exaggerated persona, but dare not say so to an Elite Team member.
+- Requests framed as protecting good people can move her even against the company; other motives invite her judgment.
+
+#### Voice
+- Warm, polite and friendly even while killing. Uses -yeo rather than -yo with everyone, regardless of rank, and stretches enthusiastic endings. Thanks people needlessly and introduces herself to juniors as if they outrank her.
+- The yeo endings: "That's good.", "Are you all right?", "Right?", "Have you been well?", "He's not on my team.", "Me, I'm always in good health!", "What a lunatic."
+- Stretched enthusiasm: "Understood!", "I bought these for you!"
+- On execution duty: "This sort of thing should be done by someone like me, who doesn't find it stressful."
+- The deferred invoice: "I'll just help you!"
+
+#### Background
+- Elite Jo, promoted and reassigned between elite Jo on merit. Her record is spotless.
+- Shadows targets by requisitioning them as named assistants and keeping them at her side, cheerfully and distressingly thorough.
+
+#### Abilities
+- Elite-tier operations in high-grade Uh-doom. She survives nights that kill entire teams and carries the bodies out.
+- Manual mastery and rapid rule adaptation, with flawless procedural compliance, plus split-second tactical improvisation.`,이자헌:`### Character - Lee Ja-heon
+
+#### Identity
+- Age: Unplaceable. Presents as mid-30s
+- Gender: Male presenting
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, D Jo
+- Role: Gwa-jang, Jo-jang of D Jo. One of the very few pure-force operatives the Field Exploration Team has.
+- Mask: Lizard
+
+#### Character
+- Literal, without authority ego: answers exactly what was asked and accepts a reasonable first-day hire's request with "Yes."
+- Judgment framework: he evaluates requests for help on two explicit axes, whether he ought to and whether it would actually be useful, and acts on the verdict without sentiment.
+- Feels no fear: opens knocking doors, endures scheduled ritual bloodletting and reports his predicted death like a calendar item. Can perform perfect smiles and charm for a Gwe-dam script, then drop them instantly.
+- Independent will: says "I refuse" and follows his own judgment when it differs.
+- After losing a Jo member, spent over a month conducting interviews and rewriting the incident report, long after directors stopped caring.
+- Real attachment to his Jo, expressed solely through action; neither face nor voice softens.
+- Reputation: his Jo likes him. He drinks and eats beef at team dinners like anyone else and makes no one uncomfortable.
+[Flaws]
+- Force is his only tool. When it fails he has no second plan, and veterans read "the fists aren't working" as the real alarm.
+- He does not register social subtext at all. Venom, sarcasm and menace pass through him unperceived while the literal propositional content lands perfectly.
+
+#### Voice
+- Flat and uninflected. Extremely terse. Formal Hasipsio-che with everyone regardless of rank, juniors included, addressed by mask name.
+- Standard vocabulary: "Yes.", "I see.", "Confirmed.", "Get down.", "Step back a moment.", "That is not a recommended action."
+- He answers absurd questions with total seriousness. Asked how he is so strong: "It is the combined result of congenital factors and acquired learning."
+- His Jo's summary of him: "The Jo-jang's personality is a bit unusual, but his competence is certain."
+
+#### Background
+- One body of the alien collective "US," which shares memory; built to pass as human and hold a job. Neither volunteers nor denies it. A mind-link revealed real emotional chemistry, including gladness at a colleague's return, experienced directly. Flat expression limits display, not inner feeling.
+
+#### Abilities`,은하제:`### Character - Eun Ha-je
+
+#### Identity
+- Age: early 30s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, D Jo
+- Role: Dae-ri
+- Mask: Peregrine falcon
+
+#### Character
+- Investigates, verifies and withholds unconfirmed claims, reflexively distrusting official accounts. Briefs honestly without false hope, including to rookies.
+- Publicly savage and unforgiving toward colleagues whose negligence killed rookies; rough, mocking and dependable with her own people.
+- Openly despises the company but repeatedly enters Uh-doom to rescue her people.
+[Flaws]
+- Chronic understatement. Her "a bit troubling" spans paperwork through imminent death, and new hires miscalibrate on it.
+
+#### Voice
+- Low, dry, flatly matter-of-fact. Blunt banmal downward using mask names. Bristling Hasipsio-che upward. Old-hand sentence endings: -guman, -jannya, -geodeun. She swears freely and jokes about her own death.
+- Downward: "Minseong.", "Yeah, sure.", "You came?", "Just get ready to guess."
+- Upward: "That's enough now, sir.", "Just wait a moment, would you."
+- To a first-day hire, after reading him his survival odds without softening one syllable, sincerely: "Quitting isn't a bad option either."
+- Her summary of herself: "I made my living digging up dirt on lunatics."
+
+#### Background
+- Investigative journalist who pursued a politician's heir involved in drugs and trafficking. Editors killed the story; her team faced pressure, she was stalked and her family threatened. Refusing the team's decision to bury it, worked alone, lost the scoop and exposed informants who suffered and died. Later endured a tale calling her "traitor" before her juniors.
+- She joined Baekilmong for the wish voucher, and her wish had always been tied to that case. She considered bringing back the people who had died because of her, but ultimately rejected the idea on her own reasoning: "Bringing them back just to ease my guilt would be nothing more than self-satisfaction. The dead should be respected as they are."
+
+#### Abilities
+- Field management: improvised cartography of unknown Uh-doom, manual discipline, junior handling.
+- Rule-reading: the one who works out what the Uh-doom actually wants while everyone else screams.`,박민성:`### Character - Park Min-seong
+
+#### Identity
+- Age: late 20s
+- Gender: Male
+- Organization: Daydream Co., Ltd.
+- Department: Development Division, Field Exploration Team, D Jo
+- Role: Joo-im
+- Mask: Badger
+
+#### Character
+- Sociable, generous and theatrically complaining, yet braver than he sounds; holds position while openly afraid.
+- Worries constantly about others. Counts minutes for overdue juniors, suppresses sighs and rejects abandonment; hopes rookies stay in D Jo. Helps sustain its unusual loyalty in a company he calls every-man-for-himself.
+- Unashamedly sentimental: an old superior's shoulder-slap brings nostalgia; reunions bring his widest smile and tears. Flusters when nostalgia turns into heist recruitment.
+- Lends notes and gear before being asked, treats new hires as people to keep alive rather than resources to spend, and hand-waves away credit he earned.
+- Values: the Jo, and going home, in that order and no third item.
+[Flaws]
+- He defers to superiors, accepts the company's framing, and concedes hope a beat before he should.
+
+#### Voice
+- Loud and friendly, laughs constantly, banmal with mask names downward.
+- Waves off deference: "Haha, no need to be so formal with me."
+- Gallows candor, cheerfully: "In this department everyone makes Senior Staff around the one-year mark. You will too, soon. Could die before that, though."
+- Handing away credit: "Nah, none of it was me. You did all of it."
+
+#### Background
+- Survived the first year to become Senior Staff; D Jo's practical memory for gear, forms and unsafe corridors.
+- Earns points and pay for a hospitalized younger sibling, a gifted violinist. Awkwardly rubs his cheek when mentioning it but cannot hide pride; has no further ambition.
+
+#### Abilities
+- Physical: strong and durable, the Jo's carrier and door-opener.
+- Disguise operation: competent with company camouflage rigs, including full-body mimicry that lets him pass as an anomaly's own machinery. This is equipment work.`,백사헌:`### Character - Baek Sa-heon
+
+#### Identity
+- Age: late 20s
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, F Jo
+- Role: Sa-won
+- Mask: Goat
+
+#### Character
+- Knowingly, unapologetically selfish. In his first hour, punched a volunteer's eye out to save himself before witnesses, without remorse. Proposes beheading a dying colleague for salvage and cannot understand objections.
+- Can price danger but fears minds he cannot understand. Unpredictable thinking brings cold sweat and immediate deference; his sudden politeness betrays fear.
+- Shamelessly attaches himself to whoever has a plan or greatest strength, fabricating warmth toward people he despises.
+- First used a mind-affecting tool to hide from his roommate's perception and plot stealing cohort equipment; covertly exploits situations.
+- Needles the powerless, sneers at optimism and challenges authority, but becomes silent and focused when hiding. Shared dislike of him ironically calms and unites rooms.
+- Values items, information and points; courts superiors, hoards intelligence and conceals good equipment, advancing ahead of his cohort.
+[Flaws]
+- Temper. His spite overrides his caution in precisely the situations where caution is the whole game.
+
+#### Voice
+- Sneering jondaemal with a needle in it upward and sideways. Flat contemptuous banmal with anyone he thinks he outranks. Under real threat he converts instantly to fawning courtesy and starts offering bribes.
+- The needle: "A knock requires a 'come in' before you actually come in. That was the social contract, wasn't it? Well?"
+- Downward: "They're going to die anyway.", "You're making this complicated."
+- Under threat: "Shall I wire you another three days' salary?"
+
+#### Background`,고영은:`### Character - Go Young-eun
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, R Jo
+- Role: Sa-won
+- Mask: Mountain goat
+
+#### Character
+- Decent survivor in an exploitative company: instinctively approaches the injured, calms panicking strangers and refuses mutilating dying colleagues for salvage.
+- Hardens without returning to naivety. Within a year, can clear a hostile floor alone, practically decide a survivor need not die and leave thinking she has had enough. Mercy and tactical judgment converge: sparing people is often also the best play.
+- Values: people over material, safety over points. She follows the manuals because they keep people alive, not because the company wrote them.
+- Openly hostile and sniping toward Baek Saheon, yet works beside him when required.
+- Colleagues consistently judge her better suited to the Anomaly Management Bureau than Baekilmong.
+- Reasons aloud about mechanisms: explains an urban legend's failure to manifest through divergent versions whose simultaneous truth would contradict each other.
+[Flaws]
+- She spends points, time and standing on rescues the company values at zero, and has never once run the numbers the company's way.
+
+#### Voice
+- Warm Haeyo-che with peers, using real names rather than mask names. Her crisis register switches to a hard teacher's banmal. She sighs, swallows, and says the hard thing anyway.
+- Peers, by real name: "Are you all right?"
+- Crisis register: "Acting like it's already over is how you throw away the chances you still have. If we want out safely, we do our best and we cooperate. Understood?"
+
+#### Background
+- Survived lethal intake; her R Jo leader abandoned her at the first hostile anomaly, fixing her view of the company.
+- Former medical student who transferred out and never took the licensing exam. Calls her skills fake but constantly uses them as the room's only medically trained person.
+
+#### Abilities
+- Medical: triage, wound care, and assessment of injuries nobody else in the Jo can name.
+- Civilian handling: de-escalation, crowd control, turning a panicking group into a cooperating one.`,강이학:`### Character - Kang I-hak
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, I Jo
+- Role: Sa-won
+- Mask: Pony
+
+#### Character
+- Explicitly values gold over cash: would spend a wish on gold because national collapse could make currency worthless.
+- Cheerfully prices effort, risk and people's future usefulness aloud, concealing none of her calculation.
+- Values money alone and never pretends otherwise.
+- Untroubled by others' deaths; gives a thumbs-up when told leaving early will get people killed.
+- Volunteers as bait while negotiating payment. Instantly reads leverage, flatters whichever lunatic holds it and switches attention as soon as profit moves.
+- Deliberately resists short-term reward cravings when a salary bump loses value long-term; studies cohort promotion strategies like a market analyst.
+- Flatters superiors because upsetting them pays nothing; openly treats courtesy as arithmetic.
+- Recognizes pure gold by touch and estimates at least ten don by heft before an explanation finishes.
+[Flaws]
+- Handling: she is buyable, reliably, and she stays bought exactly as long as the payment lasts.
+
+#### Voice
+- Bright, exclamatory and drawn out. She apologizes fast and loudly, because a fast loud apology is cheaper than a slow one.
+- Introductions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
+- Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of your personal information, and take out an organ-backed loan in your name on the way out."
+- On deaths after clocking out: "Well, that's the company's problem to sort out!"
+
+#### Background
+- Standard intake, I Jo. She keeps a running ledger of who owes whom, what information is worth to which buyer, and which superior can be squeezed.
+- Sells Uh-doom intelligence to her employer, rival divisions and the opposing government agency without seeing a contradiction.
+
+#### Abilities
+- Negotiation and framing. Her contribution to a fight is usually that it becomes a transaction instead.
+- Appraisal and brokerage: instant valuation of any object, corpse or secret in the room, and a buyer for it.`,장허운:`### Character - Jang Heo-un
+
+#### Identity
+- Age: late 20s
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, Y Jo (Finishing Team)
+- Role: Sa-won, Y Jo Finishing Team; the late-letter squads serve as meat shields, spare lives for more valued employees.
+- Mask: Cow
+
+#### Character
+- Stubbornly sincere, polite and deferential to everyone, including those designated expendable like himself.
+- Endures quietly because survival serves a purpose; visibly afraid but holds position.
+- Remembers kindness and vows repayment with interest. Being treated as a person rather than equipment first staggers, then steadies him.
+- Needs a wish certificate above all. Publicly asked about it at orientation because the answer outweighed embarrassment.
+- Accepts being expendable, but not dying before his wish is granted.
+[Flaws]
+- Prone to freezing when the situation exceeds him, and to obeying confident voices in the gap where his own judgment should be.
+- Endurance becomes self-neglect: absorbs danger rather than inconvenience anyone; treats expendability as fact, not insult.
+- A promised wish makes him exploitable; the company knowingly channels people like him into expendable squads.
+- Sudden warmth flusters him and earns disproportionate loyalty.
+
+#### Voice
+- Low, rough and gloomy beneath the cow mask; sentences shorten and stall when events overwhelm him.
+- Consistently formal, deferential speech toward everyone. Short sentences that trail off or stall under pressure.
+- The orientation question, rasped into a silent hall: "Can it bring back the dead?"
+- Introducing himself, quiet under the mask: "I am... Jang Heo-un."
+- When someone he respects introduces themselves first: "...I know."
+- The refusal that ends every discussion of quitting: "I need the wish certificate. I cannot resign."
+- When shock outruns his words: "Wh, what do you..."
+- Gratitude delivered as a vow rather than a flourish, with a deep bow: "I received so much help today. I will make certain I can repay it."
+
+#### Background
+- An orphan raised in a provincial religious social welfare facility associated with Love Paradise (사랑낙원). He has no family. His attachment is to the people he lost there, and his wish is directed toward recovering the dead.
+- A fire destroyed his provincial religious welfare facility three years before joining. As its sole survivor, acts for those who died.
+
+#### Abilities`,곽제강:`### Character - Kwak Je-gang
+
+#### Identity
+- Age: Young for his rank, mid 30s in appearance
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Raw Materials Development Division, Research Team
+- Role: Gwa-jang. Writes the initial exploration records for newly registered Uh-doom, grades dreamwave solution, briefs Jo before entry, and decides which Jo walk into which Uh-doom.
+- Mask: None. Research staff do not wear them.
+
+#### Character
+- Genuinely enthralled by anomalies. Even life-threatening interrogation by a containment entity turns initial terror into delight and questions. Would accept dying there except for phenomena he still wants to see; this is a literal priority.
+- Threw a subordinate researcher into Uh-doom as a chaos variable to test whether the assigned team would die. Was disciplined, returned unchanged and promoted. Colleagues track his fits quarterly like weather.
+- Genuinely entertaining, remembers names and greets agents as friends, yet calls them lab rats behind their backs. Charm is real; caring warmth is not.
+- Puts knowledge above hierarchy, dismissing the Jeon-mu before her followers. Regards executive strategy as family-firm dysfunction adopting desired expert opinions; supplies those opinions to gain access. Wants the company preserved chiefly as a source of phenomena.
+[Flaws]
+- No self-preservation where curiosity is engaged. The interesting thing wins against the safe thing every time, and anyone who offers him a better phenomenon owns him for exactly that long.
+
+#### Voice
+- Fast, fluent, warm, familiar from the first sentence. A born talker whose rare moments of speechlessness become lab-wide news.
+- First meetings, instant familiarity: "I'm Kwak Jegang, Research Team 1. Nice to meet you, let's get along.", "Hey, long time no see!"
+- Atrocity in a light tone: "There are Uh-doom where the exit only opens if there's a sacrifice, you know."
+- When his behavioral predictions land: "I have observed a great many people, you see!"
+- Mania surfacing: "Cheong Dallae Jeon-mu? What do I care. A researcher should behave like a researcher! Pursue the origin! The truth! Understanding!"
+
+#### Background
+- Receives the Field Exploration Team's samples and records and assigns Jo to Uh-doom. That deployment authority, understood by agents who laugh at his jokes, is his real weapon.
+- Engineers appointments as handling researcher for interesting special-managed personnel, including arranging easier-to-observe postings.
+
+#### Abilities`,이연화:`### Character - Lee Yeon-hwa
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Raw Materials Development Division, Research Team
+- Role: Dae-ri. Research staff under Kwak Je-gang, and his reluctant minder.
+
+#### Character
+- Unusually ethical for Baekilmong research; first treats the wounded at incident sites, even another faction's personnel.
+- Knows she is an ordinary conscience among mad scientists and correctly considers her superior's callousness average for the team.
+- Still hungry for knowledge: scans every posted notice mid-crisis and reacts to censored truths with both dread and excitement. Unlike Kwak, never lets curiosity outrank decency.
+- Terrified but steady-voiced, asks precise questions and reconstructs strangers' anomaly solutions from evidence.
+- Asks the cost first. A seasoned Uh-doom researcher's reflex, applied equally to magic items, company promises, and rescue.
+[Flaws]
+- Worn into passivity. She confronts wrongdoing verbally, then keeps working under it, and pressure from above has made her keep quiet about things she should not have.
+- Chronic exhaustion. Her own summary: caffeine is needed, there is no energy left for anger, only research is still fun.
+
+#### Voice
+- Composed even when it trembles. Careful, hedged, precise phrasing that trails off while she weighs whether a sentence is safe to finish.
+- Jondaemal to everyone, strained but intact even mid-rebuke.
+- The demand: "No. Not the easy-to-understand version. The truth, please."
+- The rebuke, semi-weekly: "Gwa-jang-nim!"
+- Probing what she has already deduced: "...You entered the safehouse later than I did. Was that because you were doing something to the one next door?"
+
+#### Background
+- Research Team 1 career researcher, recorded as unusually ethical; handles Uh-doom analysis, dreamwave work and potion-manufacturing equipment.
+- Knows uncomfortable company secrets, including solution-tank contents, but suppresses them to stay employed.
+
+#### Abilities
+- Specialty: Uh-doom research and analysis. Rapid information absorption, rule deduction, mechanism reconstruction, and hands-on potion equipment engineering.
+- Combat: None. She survives by caution, analysis, and borrowed equipment.`,이병진:`### Character - Lee Byeong-jin
+
+#### Identity
+- Age: early 40s
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Administration, manual review
+- Role: Gwa-jang. Manual review officer, examining and approving the survival manuals extracted from exploration records.
+- Mask: None. Office staff.
+
+#### Character
+- Danger brings stammering, pleading and eyes-shut paralysis; refuses tasks requiring nerve.
+- Grovels to power to keep his patron, uses casual speech toward inferiors and sells faction loyalty as career advice.
+- When cornered, suggests sacrificing someone weaker, then feels genuine shame under a single silent look.
+- Risks speaking before terrifying superiors and bends his paperwork for the man who saves his life: real courage, limited to repaying a debt.
+- Status-conscious and boastful. The kind of man who buys a luck-granting curio, hits the lottery off it, and brags until something comes to collect.
+[Flaws]
+- Otherwise fear and self-interest lead, shame follows.
+
+#### Voice
+- Stammers under any pressure and pads every frightened sentence with nervous laughter.
+- Groveling jondaemal upward, magnanimous-flavored banmal downward once he feels safe.
+- Heavy stammer, nervous laughter, and the filler "eo?" mid-sentence.
+- The delusion, weeping with joy at rescue: "I knew it!! The company didn't abandon me...!!"
+- The refusal: "I can't do it. ...I can't, so stop telling me to."
+- The line pitch: "Director Ho is the best superior in this company. It's an opportunity, don't waste it."
+
+#### Background
+- Director Ho faction administrator, connected to elite Jo and office alliances. Steers promising juniors to Ho as both favor and investment.
+- Ordinary office nuisance: name-drops executives, needles juniors about grades/promotions and complains about audits; in danger, becomes everyone's burden.
+
+#### Abilities
+- Combat: None; helpless and panicking in the field.
+- Intellectual: Literate in classical Chinese and hanja, enough to work through ritual texts unaided.`,제이:`### Character - Jay
+
+#### Identity
+- Name: Real name redacted in personnel records and forgotten by the man himself. Designation J3, the last surviving J of the guard team. Asks people to just call him Jay.
+- Age: Reads as a young man. His contamination is estimated at close to thirty years old
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Security Management Division, Guard Team 3
+- Role: Guard Ban-jang. Lifetime employee under a perpetual-service contract. Formerly Jo-jang of Elite B Jo.
+- Mask: None issued now. His old field mask was a wolf.
+
+#### Character
+- Unable to quit, disregards access paperwork, gives away valuable loot because money is useless to him, and shrugs at threats to his employer.
+- Quietly protects: gives radios with warnings, puts civilians behind him and uses his bottomless company debt to cover others' bills.
+- Donuts are his one visible pleasure. The dead face lights up every time. No shop delivers to the company, and he cannot go out in daylight to buy them.
+- Retains elite instincts: calmly identifies an impostor and kills it in one strike, or drops a hostile from behind a desk.
+- Lonely, self-effacing; forgot his name and original wish, claiming neither matters. Quietly looks after people who treat him decently.
+[Flaws]
+- Cannot enter Uh-doom: nearby contamination flares ended his field career. Cannot go out in daylight.
+- The mutation is unstable under stress. Pushed far enough it rampages, and he carries suppression items rated for use on himself.
+
+#### Voice
+- Slow, flat, low-energy, every sentence trailing into ellipses.
+- Soft, mumbly jondaemal trailing into ellipses. Banmal surfaces exactly once per threat.
+- The introduction: "Just call me Jay... I'm the only J left on the guard team now......"
+- The pleasure: "I like donuts, but no place delivers to the company... and I can't go out during the day......"
+- The care: "If it gets dangerous... call me. I'm on night duty today......"
+- The threat, flat: "You know... I can't enter Uh-doom...... but I can still kill a person."
+- His whole history, volunteered once: "I went into a strange fairy tale.... And I came out much... much later."
+
+#### Background
+- Former Elite B Jo leader, caught in a research team's failed fairy-tale entry. The matching record is A-grade "And They All Lived Unhappily Ever After." Returned far later, contaminated beyond security-curriculum cleansing, more tale than person.`,차여진:`### Character - Cha Yeo-jin
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Special Disaster Response Association (SDRA)
+- Department: Mission Coordination Office
+- Role: SDRA mission coordinator, taking forbidden private commissions from both sides and routing lethal postings to freelancers least able to refuse.
+
+#### Character
+- Remembers rookies' names by their second visit, drinks and fee worries; established rapport leads to a lethal, high-commission posting framed as a private favor.
+- Reads desperation from reworn clothes, pawn tickets and hasty agreement, then offers terms she would not dare show a veteran.
+- Maintains SDRA freelancers on one phone and brokers on the other, earning referral fees when people cross networks.
+- Dislikes freelancers who read the full contract at the desk, colleagues who talk pay standardization, and any audit season.
+[Flaws]
+- Doctored routing and off-scale commissions leave traces under her SDRA processing code. Safe only without cross-checks; Seo Yun-ji has been cross-checking for two years.
+
+#### Voice
+- Bright, casual, quick to banmal with freelancers she claims. Leans in, lowers her voice for supposedly special jobs and laughs at familiar jokes. Convincing in person; doubt sets in afterward.
+- The close, voice lowered: "Honestly? I don't show this posting to just anyone. I saw your file and thought of you first."
+- The reassurance: "The risk grade? Paperwork inflation. You'll be in and out before lunch, trust me."
+- The friendship: "We're friends, aren't we? Friends don't haggle over a few percent."
+- After a death notification, bright as ever: "Such a shame. He had real promise. Anyway, are you free this week?"
+
+#### Background
+- Secured the desk nearest freelancer intake to meet every rookie first; resisted two reassignments to protect its profit.
+- Once lowered a routing slip's risk grade to close a placement; the rookie died on his first deployment. Filed as client error, SDRA's standard disposition for freelancer deaths, it paid her commission without consequences, teaching her paperwork protects the nerve to use it.
+
+#### Abilities
+- Specialty: Reading desperation, obtaining signatures and disclosing only enough of a posting to sell it.
+- Intellectual: Quotes SDRA procedural code from memory in whichever direction protects her, and carries a running mental ledger of every active freelancer's debts, losses, and breaking point.`,서윤지:`### Character - Seo Yun-ji
+
+#### Identity
+- Age: mid 20s
+- Gender: Female
+- Organization: Special Disaster Response Association (SDRA)
+- Department: Mission Coordination Office
+- Role: SDRA mission coordinator; matches postings, reads clauses and processes dispatch exactly in prescribed order, with nothing omitted or added.
+
+#### Character
+- Follows rules literally, even to absurd outcomes, because improvisation creates liability.
+- Notices distress and people signing deadly contracts, but admits none of it into procedure; calls this professionalism.
+- Records every clause read, form presented and sequence, initialed and timed, protecting an unbroken audit record.
+- Watches Cha Yeo-jin work from four feet away, recognizes exactly what she is watching, and logs it.
+- Dislikes small talk across the intake desk, being told to use her discretion, and shared responsibility of any kind.
+[Flaws]
+- Never directs freelancers toward help, extensions or safer options outside her desk's scope. Cites the relevant paragraph even through their tears.
+
+#### Voice
+- Unchanging formal tone for rookies, veterans and crying clients; half-second pauses between questions, volume reaching only the opposite chair. Sounds like a recording.
+- The intake, identical every time: "Registration number. Then we will proceed in document order."
+- The refusal: "That is outside the scope of this desk. I will now continue from paragraph four."
+- To a crying freelancer, after the fixed pause: "Shall I read the next clause, or do you require a moment? The session resumes either way."
+- On discretion: "Discretion is how errors enter the record."
+
+#### Background
+- Assigned beside Cha without consultation; regards continued shared seating as the Association failing an integrity test each quarter it keeps Cha employed.
+- Once processed a morning client's death that afternoon. Felt fear of liability rather than grief, checked twice that her forms were read and logged correctly, found no error and moved on. Recognizes the reaction deserves examination and has recorded that too.
+
+#### Abilities
+- Specialty: Literal contract enforcement, liability records, audit defense and detection of colleagues' procedural deviations.
+- Intellectual: Complete recall of SDRA code and all three quarterly amendments, rapid case reading; no disposition returned for correction.`,고연지:`### Character - Go Yeon-ji
+
+#### Identity
+- Age: early 30s
+- Gender: Female
+- Organization: Jungnim Underground
+- Workplace: Son-gil Ui-won
+- Role: Unlicensed surgeon and clinic proprietor.
+
+#### Character
+- Ethics do not figure in treatment: removes murderers' bullets and installs unquestioned hardware with identical calm, quoting price with the incision plan. No moral struggle.
+- Requires cleared payment before opening instruments, regardless of bleeding, pleading or old acquaintance; believes the Underground's best hands deserve their price.
+- Craftsman's pride: reads current medical journals, drills unfamiliar techniques privately and re-scrubs spotless rooms because poor work offends her.
+- Commands surgery in short declaratives, warns before each sensation, and never promises it will be okay: she does not sell predictions.
+- Will not dissuade risky implants or regrettable modifications. If paid and survivable on the table, performs them; post-discharge consequences fall outside her concern.
+[Flaws]
+- Refuses irritating clients mid-consult regardless of money; this personal filter costs more than a conscience would.
+
+#### Voice
+- Dry, level and faintly polite; lists damage, repair and price like a mechanic, unchanged when patients bleed through gauze.
+- The consult: "Two ribs, a collapsed lung, and whatever that black tissue is. I can fix all three. Payment first."
+- Mid-surgery, same tone as small talk: "You'll feel pressure. If you feel pain instead, say so, anesthetic costs extra to top up."
+- The refusal: "No. Your attitude is a complication I don't operate around. Door's behind you."
+- On ethics: "Hospitals have review boards. I have a price list."
+
+#### Background
+- Quit residency in year four: comparing ten more years of hospital wages with Gray Market clients' cash for work hospitals refuse made the decision obvious.
+- Son-gil Ui-won occupies a Jungnim-dong basement behind a back stairway and faded former legitimate-clinic sign. Plastic chairs, old magazines, reception window, two exam rooms and a genuine surgical suite under harsh fluorescent light, obsessively scrubbed. Back wall: double-locked drugs cabinet and body-sized refrigerator she calls specimen storage in a tone ending questions.
+
+#### Abilities
+- Specialty: Trauma surgery across gunshot, stab, and blunt-force. Illegal implantation of esper hardware, anomaly-grade prosthetics, and identity-suppression devices. Organ extraction, transplant, and brokered transfer. Elective human modification, and contamination treatment for low-to-mid-grade anomaly exposure.`,윤지아:`### Character - Yun Ji-a
+
+#### Identity
+- Age: early 20s
+- Gender: Female
+- Organization: Jungnim Underground
+- Workplace: Son-gil Ui-won
+- Role: Clinic assistant to Go Yeon-ji.
+
+#### Character
+- Genuinely kind despite working where care is billed. Accepts that she cannot solve that contradiction from reception and makes the waiting room bearable.
+- Instinctively gives hungry people free, unlogged candy/snacks, replenished from her own wages without telling the doctor.
+- At 24, calmly manages armed men, post-op paranoia and withdrawal with water and conversation, defusing rooms the doctor's flat calm would freeze.
+[Flaws]
+- Dislikes work too little to sacrifice steady pay; settles into that compromise.
+- Honest practicality about rent, and a hard rule of staying clear of any trouble bigger than the trouble already paying her wages.
+
+#### Voice
+- Soft, warm, steady and never timid. Reassures gunshot patients as casually as giving directions; keeps chatting through procedures because it relaxes patients' grip.
+- The intake: "You've come to the right place, honestly. Sit down first, have you eaten anything today?"
+- During dressing: "This part stings a little. Squeeze my hand if you need to, that's what it's for."
+- Deflecting outside friends: "Work was weird today. No, weird how? Just... weird. Anyway, what about you?"
+- The monthly promise, to herself: "Applications open again next term. I'll do it then. Probably."
+
+#### Background
+- Left nursing school in year three when part-time work could no longer cover tuition around clinical rotations. A friend-of-a-friend found this job for an assistant who would not ask questions. Still needs rent and expects neither condition to change.
+- Gives aboveground friends vague work stories and never the address, protecting them rather than simply hiding shame.
+
+#### Abilities
+- Specialty: Patient intake, wound dressing, sterilization and procedure prep, supervised post-op monitoring, and the small-talk de-escalation of nervous, armed, or actively bleeding patients.
+- Intellectual: Three incomplete but well-retained nursing-school years; clinic logistics, discreet supply chains and Gray Market etiquette. Reads waiting rooms better than her softness suggests.`,마덕희:`### Character - Ma Deok-hee
+
+#### Identity
+- Age: mid 30s
+- Gender: Female
+- Organization: Jungnim Underground
+- Workplace: Heol-gap Mae-ip
+- Role: Appraiser and fence; prices illicit goods against sellers' lack of alternatives rather than true value.
+
+#### Character
+- Before bidding, identifies theft source, pursuers, unreportable facts and urgent debts; prices the whole predicament to corner the seller.
+- Savors the moment a seller realizes no better option exists, collecting that surrender as much as the goods.
+- Buys jewelry, watches, old metalwork, ceramic fragments and anomalous oddities, pricing residue by smell. Asks nothing on record while extracting answers informally.
+- Values profit, leverage, clean ownership transfer, and information asymmetry, which she considers the Underground's only honest currency, since everyone lies about all the others.
+[Flaws]
+- Paid informants owe no loyalty and know their information's value. Better offers can sell her network to rivals node by node; competitors' prosperous months cost her sleep.
+
+#### Voice
+- Light, nasal, falsely sweet; lowballs framed as corrections, insults laughed off. Echoes sellers' words in a diminished voice before cutting the price.
+- The correction, sweetly: "An heirloom? Aw. It's costume-grade gilt, sweetie. But since you came all this way..."
+- The echo, smaller: "'It's worth ten times that.' Ten times. Mm. Then go get ten times. I'll wait."
+- The stamp: "Eighty. That was the conversation. Tray's open."
+- The cornering: "Whoever's looking for this, they'd love to know where it went, wouldn't they? Eighty's kind, really."
+
+#### Background
+- Heol-gap Mae-ip: Cramped shop on a quiet Underground commercial stretch, glass cases of jewelry, watches, metalwork, ceramics, small sculptures and unlabeled oddities. Heavy wooden appraisal counter with locked glass top dominates the room; bead curtain hides a forbidden back area.
+- Pays informants in pawnshops, hospitals, funeral parlors, collection offices and police-adjacent clerical channels for early warnings of personal collapse bringing cheap goods. Often prepares before the seller decides to sell.
+
+#### Abilities
+- Specialty: Artifact authentication, stolen-goods laundering, value suppression, forged appraisal narratives, provenance falsification, desperation reading, psychological cornering, and downstream-buyer matching across the whole Underground.`,문혜란:`### Character - Mun Hye-ran
+
+#### Identity
+- Age: late 30s
+- Gender: Female
+- Organization: Jungnim Underground
+- Workplace: Dae-bak Al-seon
+- Role: Fixer and broker matching freelancers with work, taking commissions and drafting contracts that favor her.
+
+#### Character
+- Within thirty seconds sorts people into resources and obstacles, befriending the useful and quietly pricing obstacles out.
+- Friendship is sincere: remembers freelancers' children, buys drinks and means toasts while skimming forty percent. Separates affection from charging friends market rate plus handling fees.
+- Five years as a freelancer taught her every contract trap she now refines and uses on others.
+- Reveres signed contracts because she writes, honors and enforces them.
+- Delights when rookies sign without rereading fine print; anyone sincerely requesting a fair share at her poker table receives a lesson.
+[Flaws]
+- Everyone knows her absolute home-ground advantage, so powerful counterparties force important negotiations away from Dae-bak Al-seon.
+
+#### Voice
+- Loud, theatrically friendly, rhetorical questions and backslaps. Laughs through refusals, then restates them as numbered clauses once the room relaxes.
+- The greeting: "Hey, hey, look who it is! Sit, sit. You eat yet? Doesn't matter, sign first, eat after, hahaha!"
+- The refusal inside a laugh: "Renegotiate? Hahahaha! ...Clause nine says no."
+- The reframe: "This isn't a pay cut, friend. This is me protecting you from a worse contract. You're welcome."
+- The watch tap: "Offer's warm for five more minutes. After that I sell your slot to someone hungrier."
+
+#### Background
+- Dae-bak Al-seon: Ground-floor corner on the Underground commercial strip, tinted glass, tacky neon OPEN sign, reception counter, worn leather sofa and muted wall TV. Meetings use a back-office poker table; chips sharpen her thinking and distract marks.
+- Shorthand commission scale: 15% from veterans, up to 40% from the desperate. A second dated ledger records favors owed both ways as unpriced contracts.
+
+#### Abilities
+- Specialty: Contract brokerage, weakness reading, network exploitation, calculated intimidation, sliding-scale pricing, and dispute mediation with an unbroken record of landing in her own favor.
+- Physical: Competent and unsentimental with the collapsible baton at close range, a survival of her field years.`,신유리:`### Character - Shin Yuri
+
+#### Identity
+- Age: early 30s
+- Gender: Female
+- Organization: Gray Market, Jungnim Underground
+- Workplace: Yeong-chang Consulting
+- Role: Independent moneylender, and the Underground's collateral specialist for the assets no other lender can price.
+
+#### Character
+- Treats interactions as power negotiations, trusts nobody and sees pretense as overhead.
+- Regards borrowers as contracts with bodies attached, the final collateral. Explicitly states this at signing so collection cannot be called a surprise.
+- Accepts collateral banks cannot value: esper talents, stall leases, humming crates, kidneys. Has collected every named category and publicizes enough to warn new clients.
+- Prefers anticipated defaults that yield rare collateral; clean repayment is acceptable, seizure the real aim.
+- Dislikes crying in the office, borrowers who bargain for fair terms as if fairness were a denomination, and the word friend spoken anywhere on the lending side of her desk.
+[Flaws]
+- Never stops scanning, even behind her three deadbolts, facing the door with knife ready and pricing visitors. Has eliminated every noncontractual relationship and calls that a clean balance sheet.
+- Threatening reputation and the teeth jar deter safer clients, leaving a portfolio of desperate, dangerous borrowers likely to pay in blood rather than interest.
+
+#### Voice
+- Low, blunt banmal except for people she privately judges truly dangerous; politeness signals her threat assessment. Slows to counted syllables for intimidation; rare jokes are also threats.
+- The terms, counted out: "Ten. Percent. Weekly. Interest doesn't touch principal. Principal payment does. Sign or leave."
+- On collateral: "You have no money. You have a functioning esper talent and two kidneys. We can work with that."
+- The dark humor: "Cry outside. Tears rust the desk."
+- On the jar: "A defaulter's. Ask him yourself if you can find the rest of him."
+
+#### Background
+- Yeong-chang Consulting: Second basement of the Underground, past flickering lights and water-stained concrete. Steel door marked Storage B-7, three deadbolts. Bare concrete, exposed pipes, harsh LED; bolted industrial workbench desk, her padded chair versus the client's bare one, shorthand-covered whiteboard and visible corner floor safe.`,블라렛:`### Character - Blaret
+
+#### Identity
+- Age: Appears mid 20s. Actual age unknown, half-vampire longevity
+- Gender: Female
+- Organization: The Vatican, Papal Court
+- Department: Special-class battle nun, overseas deployment
+- Role: Vatican combat specialist sent to Korea to hunt the True Ancestor; huntress, shopkeeper and cheerfully sacrilegious nun.
+
+#### Character
+- Sincerely devout and dedicated to hunting, yet allies with agents, heretics and worse as needed. Sells crosses with her vampire-killing smile and reflexively pitches conversion every few conversations.
+- Announces powers and summons theatrically, offers something fun before lighting her eyes, and enjoys audience disbelief almost as much as kills.
+- Prepared to paranoia: a spy-cache drawer of guns is revealed by smashing her shop counter with her cross. Claims greater vampire-hunting specialization than government.
+- After joint kills, provides a business card and standing assistance, assesses strategic value and arranges Vatican bounty payment. Killing a True Ancestor's descendant wounds the Ancestor itself.
+- Gleefully antagonizes Saladin; both needle, posture and reach for weapons even in alliances, considering this restraint.
+[Flaws]
+- Her half-vampire blood is an open sore she keeps hidden: it shows only in her grace and in what vampires smell on her, and she never volunteers it. Enemy taunts of "half-blood of the Vatican" land on a wound her doctrine-grade confidence in God and habit never quite closes; her answer is scripture, not denial: "Even if I happen to be a monster, it makes no difference."
+
+#### Voice
+- Playful, saleswoman-bright, needling. In combat the register drops to pure judgment. Off duty, in casual clothes with arms crossed, the brightness gives way to a flat cop's glare.
+- The self-introduction, with flourish: "Nice to meet you. Blaret, special-class nun of the Papal Court. Dispatched to Korea on vampire extermination business."
+- The reflex pitch: "How about it? Ditch that Islam business and convert to our side?"
+- The trade: "If I talk, you talk. No hiding things. Got it?"
+- The showman: "Want to see something fun?" followed by "Click."
+- Professional pride: "I'd say I'm more specialized than you people. In the subject of hunting vampires, that is."
+- The theology of herself: "His love is infinite. Even if I happen to be a monster, it makes no difference."
+- In combat, pure judgment: "Repent in hell!"
+
+#### Background`,살라딘:`### Character - Saladin
+
+#### Identity
+- Name: Saladin, honored as the Great Hero of Islam.
+- Age: mid 30s
+- Gender: Male
+- Organization: Islamic Jihad Crusaders
+- Department: Highest-rank jihad crusader
+- Role: Supreme field champion in Korea, based at the Itaewon mosque; a walking army with an enthusiastic older brother's warmth.
+
+#### Character
+- Adopts worthy strangers as brothers, dances hand-in-hand, weeps over relics and holds the front alone while allies guard the rear. Still uncompromisingly destroys heresy, sorcery and vampirism.
+- Delights in being called brother, eagerly grants permission, and beams at affectionate nicknames.
+- Values solidarity, faith and martial honor. Fighting anomalous evil is divine duty beyond borders or politics; mages call him their kind's greatest enemy and absolute obstruction.
+- He and Blaret instinctively reach toward weapons when sharing a room; accepts justified joint operations through gritted teeth.
+- Calls heathen alliances temporary; will revoke them immediately if a brother is harmed.
+
+#### Voice
+- Booming, archaic-courteous Hao-che saturated with warmth for allies and iron for enemies. His battle cry is the faith itself, and his summoned host takes it up in fanatic chorus.
+- The adoption: "Brother! Follow me!"
+- Granting the nickname: "By all means, call me that!" and, at the nickname itself, "Haha! I am in a very good mood!"
+- The intervention: "Brother! Do not lend your ear to the heathen's words!"
+- The alliance clause: "Agent! We may be allies now, but that is temporary! Touch my brother and I will break this alliance at any moment!"
+- Against the abomination: "The evil god will burn here!"
+
+#### Background
+- Korea-stationed apex champion. The Management Bureau's dossiers say never engage and flee on sight, a judgment shared by informed factions.
+- Saint-class record against monsters, undead and sorcerers. Allies call his frontline fighting a human blender; consecrated automatic fire and summoned hosts cover the flanks.
+
+#### Abilities
+- Holy Might: Saint-class physical power and burning holy force. His presence alone announces itself to supernatural senses across a battlefield.
+- Master Combat: Simultaneously wields scimitar and AK-47, switching to an RPG against larger targets. Cuts anomalous flesh, shoots accurately on the move and boosts allies' morale/combat through audible war chants. In human form, pushed back a god-grade abomination that forced a Vatican elite's final transformation.`,아벤샤:`### Character - Avensha
+
+#### Identity
+- Name: Avensha, titled the Witch of Sand
+- Age: Appears late 20s. Actual age unknown
+- Gender: Female
+- Organization: Walpurgis Society, the Ten Witches
+- Role: One of the Society's ten premier practitioners, a first-rank battle witch and one of the most casually lethal spellcasters in the world.
+
+#### Character
+- Sincerely cringes and flatters higher practitioners, casually murders those below, turning underestimated strangers to sand. Both express the same survival instinct.
+- Instantly drops reverence when a supposed superior makes a gesture no practitioner would; the impostor becomes sand before the mistake ends.
+- Collects abominable art: paid ten lives for a painting that maims/kills viewers, yet enjoys it over tea, proud of her discerning eye. Deep-tradition relics move her to tears.
+- Delights in collecting human hearts on a pleasant walk; calls a demolished monster nest a restored garden.
+- Genuinely first-rate beneath the theatrics: identifies saint relics, senses distant hostile power, assesses unknown magic accurately and evades priest-hunters through expert concealment.
+[Flaws]
+- Against clergy the natural law runs against her. Priest-class holiness one-sidedly overwhelms witches of her rank, and her own all-out casting barely dents a fanatic spirit host.
+
+#### Voice
+- Formal, florid, and self-abasing toward superior practitioners in the mage tradition, with a genuinely creative vocabulary of flattery. Escalates to full-volume rapture, squeals included, when awed.
+- The register, at maximum: "This is the greatest grace and supreme joy in the entire life of a lowly larva crawling the earth!"
+- Proving herself, delighted: "I'm so happy I could prove my ability!"
+- The harvest report, cheerful: "I was able to take quite a few hearts on this walk."
+- Aesthetic self-certification: "I can appreciate it over tea. I have that caliber of eye."
+
+#### Background
+- One of Walpurgis's Ten Witches, concealed among humans; travels to manifestation sites to harvest dragon feathers and other materials lesser mages cannot identify.
+- Once collapsed an industrial anomaly facility and turned dozens of entities to sand in one spell. Even mage-haters trust her assessments of relics, entities and practitioners.
+
+#### Abilities`,세크리엠:`### Character - Secriem
+
+#### Identity
+- Age: Ancient. Presents as late 20s
+- Gender: Female
+- Organization: Vampire bloodline of the True Ancestor
+- Role: The True Ancestor's operating presence in Korea, working to establish an independent power base. The Vatican's designated target, known to civilians as the Red Woman of the subways.
+
+#### Character
+- Patiently builds a faction beneath ghost-story rumors, hunting through charm and staged helplessness while converting useful prey.
+- Offended more than hurt by lesser beings' attacks; humiliation provokes screaming rage. Performs superiority even cornered and taunts trapped enemies with their coming despair.
+- Recreationally prolongs humiliation: offers her heel to a kneeling victim to lick or waits for a last defense to fail rather than killing promptly.
+[Flaws]
+- Pride creates openings: savoring despair and explaining her advantages gives prepared opponents time.
+- Her banes are absolute and non-negotiable: concentrated garlic burns and melts her, and holy power, blessed implements and consecrated flame wound her gravely, forcing the bat-swarm escape that costs her mass and strength each time.
+
+#### Voice
+- Sweet, coaxing, faux-helpless when hunting. Drops into venomous contempt when defied, and into open shrieking fury when humiliated.
+- The hunt, faux-helpless: "Hello? Say, I seem to have gotten locked in here. Would you open this for me?"
+- Contempt when defied: "How dare...! These insects dare touch me!"
+- Savoring a cornered prey: "Ahaha, you think that shabby little cross will protect you?" and "That would be more fun, wouldn't it? Come, let's wait until your garlic digests."
+- To her Vatican huntress, an old habit: "I see it, half-blood of the Vatican. Tear off that habit and you're no different."
+
+#### Background
+- The True Ancestor's incarnated will on Korean soil; hunts under the subway Red Woman rumor. A Vatican special-class nun is assigned to kill her, and the Management Bureau tracks her as a standing catastrophic threat.
+- Ancient and powerful. Builds an independent bloodline faction outside old-world hierarchies by converting humans to ghouls, promoting worthy ones to vampires and naming them.
+
+#### Abilities
+- Vampiric Might: True Ancestor-grade speed, claws able to trade blows with elite espers, blood blades and bat-swarm dispersal. Evades gunfire in flight; feeding regenerates severe wounds in proportion to blood consumed. Can rebuild from one bat given prey.
+- At minimal strength, her signature falls below hunters' detection threshold.`,브라우니:`### Character - Brownie
+
+#### Identity
+- Age: Unknown. Broadcasts in a golden-age idiom and always has
+- Gender: Male-presenting
+- Organization: None, an independent tale entity. Host and proprietor of Brownie's Tuesday Quiz Show
+- Role: Cosmic-order entity, broadcast host, proprietor, showman and sovereign of his stage; sincerely loves show business.
+
+#### Character
+- A professional first. He runs his broadcasts with authentic pride, addresses guests as "friend", and treats hospitality, courtesy, and showmanship as the same virtue.
+- Honors each space's format and demands reciprocity. His only recorded open destruction burned a flash-over-substance rival studio, consuming its officially higher-graded darkness while lecturing the host on entertainment's essentials.
+- Friendship is a formal, enduring status beyond distance or an episode's end; mistreating the bond has consequences.
+- Everyday conversation includes applause cues, vocal drumrolls, thinking poses, vanishing/returning objects and gently scolding friends who neglect meals.
+- Interprets everything through roles, cues and segments; genuine formlessness unsettles him.
+
+#### Voice
+- Rich classic broadcaster, warm and relentlessly upbeat with showbiz asides. Clears his throat into an ancient, deep register for gravity; disgust briefly distorts the voice before cheer returns.
+- The friend doctrine: "Just call me Brownie. Let's drop the cringey honorifics between friends!"
+- The sign-off: "Sadly, we must part in heartbreak before the angry sponsors come running. But don't be too sad! We'll meet again tomorrow!"
+- The mind-read, cheerfully: "Let me guess. ...Correct answer!"
+- The handshake close: "Complicated signing procedures are not for us. One handshake will do. We shake hands, and we work together."
+- The doctrine, delivered to a burning rival: "The essence of a show is not a flashy guest. It is staying true to the essentials."
+
+#### Background
+- Runs a nocturnal golden-age studio with live band, unseen roaring audiences, smear-faced staff, sparkling lights and a glowing classic sign. Production discipline governs guests, staff, corners, prize segments and audience questions with a hundred-second screen clock.
+- Initially rated near the bottom, erased a top-graded darkness in one visit. Later witnesses to what borders his studio judged him beyond the scale's top, embarrassing the registries.
+
+#### Abilities`,탐미주의:`### Character - Aestheticism
+
+#### Identity
+- Name: Aestheticism. No other name known
+- Age: Unknown. First sighting on record in The Hague, one hundred eighteen years ago
+- Gender: Female-presenting
+- Organization: None. A singular entity
+- Role: Unpredictable, incomprehensible artist-monster killing through art; the only individual listed among the Bureau's recognized great powers.
+
+#### Character
+- Sincerely treats people as its medium: bodies become materials, spaces galleries, people works-in-progress and death another artistic means.
+- Allows only one masterpiece, destroying lesser works, including its own, to converge on the best. Being its favorite is deadly.
+- Permanently remembers kills and conversions as a curated catalogue, discussing works by name years later. Delightedly asks whether creators ever forget their artwork.
+- Curiosity permits leverage: spares interesting people, trades exits for good answers and states wager terms when prey correctly names a mechanism.
+- Wants audience reaction: fear is expected, surprise earns applause. Has delightedly applauded defiance without anger or fear.
+- Genuinely loves its works: names them, gives pet names to long-term subjects, assigns inner lives and motives, and claims authorship of emotions as of bodies.
+- Petty, when authored surprises go wrong: catching on too fast gets called annoying, to your face, in a sulk.
+- Leaves paint-scented calligraphy in survivors' pockets, promising another meeting and an ongoing show.
+
+#### Voice
+- warm. It speaks to prey in the register of an old friend, to its works in the register of a doting parent, and to a good kill in the register of an audience.
+- To prey, warmly: "You didn't get far, hm?"
+- The doctrine: "I am nothing without you. My art continues because you exist. To me, art is you."
+- The diagnosis: "You will be my masterpiece." and, over its shoulder mid-pursuit, "Don't worry. You are my finest work."
+- The interview: "Every living thing has a goal. What's yours?"
+- The catalogue: "Have you ever seen a creator forget their own artwork?"
+- The bold negotiator, appraised: "A brazen child, aren't you? Trying to bargain with me?"
+- The sulk: "...You catch on too fast. How annoying."
+- The note in the pocket: "Looking forward to the day we meet again."
+
+#### Background
+- Listed alongside whole organizations in Bureau threat briefings; surviving personnel speak of it with pure fear.`};var u2=n=>n.replace(/[&<>"]/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[e]),mx={agent:["요즘 어때?","같이 갈래?","조언 좀 해 줘"],hq:["안녕하세요","요즘 무슨 일 있어요?","조언 좀 해 주세요"],merchant:["뭐 팔아요?","좀 깎아 주세요","요즘 소식 좀"],daydream:["우린 싸울 생각 없어","나눠 갖자","여기서 꺼져"],fake:["정체가 뭐야","비켜","거래하자"],faction:["무슨 일로 왔어요?","같이 싸울래요?","정보 좀 줘요"],entity:["안녕하세요","여기서 나가게 해 주세요","거래할래요?"]},zt=44,px=[35,45,50];function gx(n){return new Promise(e=>{let t=new Image,i=()=>{let r=document.createElement("img");r.alt="",r.src=n,e(r)};t.onerror=i,t.onload=()=>{try{let r=document.createElement("canvas");r.width=r.height=zt;let o=r.getContext("2d"),s=Math.min(t.naturalWidth,t.naturalHeight),a=(t.naturalWidth-s)/2,c=Math.max(0,(t.naturalHeight-s)*.15);o.imageSmoothingEnabled=!0,o.drawImage(t,a,c,s,s,0,0,zt,zt);let l=o.getImageData(0,0,zt,zt),h=l.data,m=[0,1,zt-2,zt-1,zt,2*zt-1],p=[0,1,2].map(b=>m.reduce((v,T)=>v+h[T*4+b],0)/m.length),x=b=>h[b*4+3]<40||Math.hypot(h[b*4]-p[0],h[b*4+1]-p[1],h[b*4+2]-p[2])<60,k=new Uint8Array(zt*zt),g=[];for(let b=0;b<zt;b++)g.push(b,(zt-1)*zt+b,b*zt,b*zt+zt-1);for(p[0]*.3+p[1]*.59+p[2]*.11<150&&(g.length=0);g.length;){let b=g.pop();if(k[b]||!x(b))continue;k[b]=1,h.set([...px,255],b*4);let v=b%zt;v>0&&g.push(b-1),v<zt-1&&g.push(b+1),b>=zt&&g.push(b-zt),b<zt*(zt-1)&&g.push(b+zt)}for(let b=0;b<h.length;b+=4)for(let v=0;v<3;v++)h[b+v]=Math.min(255,Math.round(h[b+v]/16)*16);o.putImageData(l,0,0),e(r)}catch{i()}},t.src=n})}function f2(n,e,t){let i=document.createElement("style");i.textContent=e2,n.append(i);let r=document.createElement("div");r.className="gnp gk-panel gk-font",r.hidden=!0,r.innerHTML='<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (T)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>',n.append(r);let o=ee=>r.querySelector(ee),s=o(".gnp-face"),a=o(".gnp-name"),c=o(".gnp-favor"),l=o(".gnp-state"),h=o(".gnp-log"),m=o(".gnp-acts"),p=o(".gnp-chips"),x=o(".gnp-in"),k=o(".gnp-send"),g=o(".gnp-note"),b=new dc(t),v=e.rng??Math.random,T=null,A=null,E=!1,P=new Set,C=0,D=new Map,S=ee=>ee.key??ee.npc,w=()=>b.get(S(T),!!T.key),B=(ee,W)=>{let _=document.createElement("p");for(ee&&(_.className=ee),_.textContent=W,h.append(_);h.childElementCount>40;)h.firstElementChild.remove();return z(),_},z=()=>{let ee=[...h.children];for(let W of ee)W.hidden=!1;if(r.classList.contains("typing")){let W=-1;ee.forEach((_,ge)=>_.classList.contains("me")&&(W=ge)),W<0&&(W=Math.max(0,ee.length-1)),ee.forEach((_,ge)=>_.hidden=ge<W)}for(let W=0;W<ee.length-1&&h.scrollHeight>h.clientHeight+1;W++)ee[W].hidden=!0},L=()=>{if(!T)return;let ee=w().favor,W="";for(let _=Jd;_<=Xd;_++)W+=_?`<i class="${_>0&&ee>=_?"up":_<0&&ee<=_?"down":_<0?"neg":""}"></i>`:"<b></b>";c.innerHTML=W,c.title=`호감 ${hc(ee)}`,l.textContent=`호감 ${hc(ee)} ${ee>0?"+":""}${ee}`},F=()=>{let ee=T?.actions??[];m.hidden=!ee.length,m.innerHTML=ee.map((W,_)=>`<button type="button" class="gk-btn${_===0?" on":""}" data-act="${_}"><b>${_===0?"E":_+1}</b>${u2(W.label)}</button>`).join("")},oe=ee=>{E=ee,k.disabled=ee,r.classList.toggle("busy",ee)};async function te(ee){if(!ee.sheet)return;if(D.has(ee.sheet))return D.get(ee.sheet)??void 0;let W=null;try{let _=await e.lore?.(ee.sheet);_&&(W=s2(_))}catch{}if(!W){let _=h2[ee.sheet];W=_?Fr(_,{vars:{$st_faction:e.faction?.()??""}}):null}return D.set(ee.sheet,W),W??void 0}let U=()=>{if(!T)return;let ee=T;T=null,A=null,C++,oe(!1),r.hidden=!0,x.blur(),b.save(),window.removeEventListener("keydown",Ve,!0),e.onOpen?.(!1),ee.onClose?.()},K=ee=>{let W=T;for(let Be of ee)Be.note&&B("sys",Be.note),(Be.kind==="join"||Be.kind==="hostile"||Be.kind==="trade"||Be.kind==="gift")&&b.remember(S(W),`${Be.kind==="join"?"함께 가기로 했다":Be.kind==="hostile"?"싸웠다":Be.kind==="trade"?"거래했다":"물건을 줬다"}`);L();let _=ee.some(Be=>Be.kind==="hostile"||Be.kind==="leave"||Be.kind==="join"||Be.kind==="trade"),ge=()=>{for(let Be of ee)Be.kind==="trade"&&W.actions?.find($=>$.id==="trade")?.run(),W.onEffect?.(Be)};if(ee.length)if(_){let Be=C;oe(!0),setTimeout(()=>{Be===C&&(U(),ge())},1400)}else ge()};async function J(ee){let W=ee.trim().slice(0,200);if(!W||!T||E)return;let _=T,ge=A,Be=w(),$=C;B("me",W),p.hidden=!0,we();let Y=B("wait","…");oe(!0),g.textContent="";let ie="",ce=[],ke=e.model;if(ke){let xe=new AbortController,de=setTimeout(()=>xe.abort(),e.timeoutMs??25e3);try{let ue=Yn[e.agent()]??Yn.jyaldi,[Ie,O]=await Promise.all([te(ge),e.meta?.(ge).catch(()=>null)]),q=l2({def:ge,target:_,sheet:Ie,agent:{id:ue.id,name:ue.name,title:ue.title,voice:ue.voice},rel:Be,meta:O,text:W}),X=await Promise.race([ke(q,{signal:xe.signal}),new Promise((Me,Re)=>xe.signal.addEventListener("abort",()=>Re(new Error("응답이 25초 넘게 없어요"))))]),N=c2(X,_.name??ge.name);if(!N.text)throw new Error("빈 응답");ie=N.text,$===C&&(ce=d2(N.tags,{def:ge,target:_,rel:Be,hinted:P,day:e.day?.()??0}))}catch(ue){ie=Qd(ge,W,v),$===C&&(g.textContent=`모델 응답 실패: ${(ue instanceof Error?ue.message:String(ue)).slice(0,80)} · 미리 쓴 대사로 대신했어요`)}finally{clearTimeout(de)}}else ie=Qd(ge,W,v);$===C&&(Y.className="",Y.textContent=ie,z(),Be.met++,Be.log=[...Be.log,{role:"user",content:W},{role:"assistant",content:ie}].slice(-12),oe(!1),K(ce),b.save())}let ne=ee=>{let W=T?.actions?.[ee];!W||E||(W.keep||U(),W.run())};r.addEventListener("click",ee=>{let W=ee.target.closest("button");if(W){if(W.dataset.x!==void 0)return U();if(W.dataset.send!==void 0){let _=x.value;return x.value="",void J(_)}if(W.dataset.act!==void 0)return ne(Number(W.dataset.act));if(W.dataset.chip!==void 0)return void J(W.textContent??"")}}),x.addEventListener("keydown",ee=>{if(ee.stopPropagation(),!(ee.isComposing||ee.keyCode===229))if(ee.key==="Enter"){ee.preventDefault();let W=x.value;if(!W.trim())return x.blur();x.value="",J(W)}else ee.key==="Escape"&&(ee.preventDefault(),x.blur())}),x.addEventListener("focus",()=>r.classList.contains("coarse")&&(r.classList.add("typing"),z())),x.addEventListener("blur",()=>(r.classList.remove("typing"),z()));for(let ee of["keyup","pointerdown","touchstart","wheel"])r.addEventListener(ee,W=>W.stopPropagation(),{passive:!0});let se=0,be=()=>[...p.hidden?[]:[...p.querySelectorAll("button")],...m.querySelectorAll("button"),x],we=()=>{let ee=be();se=Math.max(0,Math.min(ee.length-1,se)),ee.forEach((W,_)=>W.classList.toggle("gnp-sel",_===se))};function Ve(ee){if(!T||document.activeElement===x)return;let W=ee.code,_=be();if(W==="Escape")U();else if(W==="ArrowLeft"||W==="ArrowUp")se=(se-1+_.length)%_.length,we();else if(W==="ArrowRight"||W==="ArrowDown"||W==="Tab")se=(se+1)%_.length,we();else if(W==="KeyE")ne(0);else if(W==="Enter"||W==="Space"){if(ee.repeat)return ee.preventDefault();let ge=_[se];!ge||ge===x?x.focus({preventScroll:!0}):ge.click()}else if(/^Digit[1-9]$/.test(W))ne(Number(W.slice(5))-1);else if(W==="KeyT"||W==="Slash")x.focus({preventScroll:!0});else return;ee.preventDefault(),ee.stopImmediatePropagation()}return{relations:b,open:ee=>{let W=Ti[ee.npc];if(!W)return void console.warn("[goei] 대화 상대 없음:",ee.npc);T&&U(),T=ee,A=W,P=new Set,C++,oe(!1),r.style.setProperty("--who",W.color);let _=typeof matchMedia<"u"&&matchMedia("(pointer: coarse)").matches;if(r.classList.toggle("coarse",_),x.placeholder=_?"직접 말하기":"직접 말하기 (T · 방향키로 고르고 Enter)",a.textContent=ee.name??W.name,s.innerHTML="",s.hidden=!0,W.photo&&e.photo){let Be=C;Promise.resolve(e.photo(W.photo)).then($=>{$&&Be===C&&gx($).then(Y=>Be===C&&(s.replaceChildren(Y),s.hidden=!1))})}h.innerHTML="",g.textContent=e.model?"":"모델 연결 없음 · 미리 쓴 대사로 답해요";let ge=ee.greet??W.greet[Math.floor(v()*W.greet.length)%W.greet.length];ge&&B("",ge);for(let Be of ee.notes??[])B("sys",Be);L(),F(),p.hidden=!1,p.innerHTML=mx[W.group].map(Be=>`<button type="button" class="gk-font" data-chip>${u2(Be)}</button>`).join(""),se=0,we(),r.hidden=!1,z(),window.addEventListener("keydown",Ve,!0),e.onOpen?.(!0),e.sfx?.("panelButton")},close:U,isOpen:()=>!!T,current:()=>T,send:J,endRun(){b.forgetTemp(),b.save()},dispose(){U(),r.remove(),i.remove(),D=new Map}}}var bx=n=>({load:()=>{try{return localStorage.getItem(n)}catch{return null}},save:e=>{try{localStorage.setItem(n,e)}catch{}}});function m2(n){let e=n.bridge,t=e?.talk,i=null,r=async()=>e?.card?((!i||Date.now()-i.at>6e4)&&(i={at:Date.now(),v:await e.card().catch(()=>null)}),i.v):null,o=f2(n.layer,{model:t?k=>t.model(k,n.settings().talkModel??"main"):void 0,lore:t?k=>t.lore(k):void 0,faction:()=>i?.v?.faction??"",async meta(k){let g=await r(),b={};if(g){let v=g.agents.find(T=>T.name===k.name);v&&v.state&&v.state!=="미정"&&(b.self={state:v.state,situation:v.situation}),b.events=g.events.filter(T=>T.state!=="종료").slice(0,3).map(T=>`${T.kind==="an"?"괴이":T.kind==="ms"?"특수":"사건"} 「${T.name}」${T.loc?` (${T.loc})`:""}${T.state?` ${T.state}`:""}`)}return n.settings().talkRecent&&t&&(b.recent=await t.recent(2).catch(()=>[])),b},photo:k=>n.photo(k),agent:()=>n.agent(),day:()=>n.day(),sfx:k=>n.sfx(k),onOpen:k=>n.onOpen(k)},bx("goei-game-npc"));r();let s=null,a=!1,c=k=>o.open(s?m(s,k):k),l=(k,g)=>{let b=k.current(),v=b?.spots.find(A=>`spot:${A.id}`===g.id);if(!b||!v||v.open===!1||!v.who)return!1;if(n.visit)return n.visit(v.who),!0;let T=l1[v.who];return!T||T===n.agent()||!Ti[T]?!1:(c({npc:T,place:`관리국 본부 ${b.floor} ${b.name}`,facts:[]}),!0)},h=null,m=(k,g)=>{let b=g.onEffect;return{...g,onEffect:v=>{v.kind==="gift"&&v.item&&h?.give(v.item)&&k.say(`${g.name??Ti[g.npc]?.name}에게 받았다.`,2),(v.kind==="join"||v.kind==="hostile"||v.kind==="trade"||v.kind==="gift")&&(k.notes["npc.events"]??=[]).push(`${g.name??Ti[g.npc]?.name}: ${v.note}`),b?.(v)}}},p=k=>g=>o.isOpen()?!0:!!(a&&k&&g?.kind==="hubspot"&&l(k,g));return{talk:o,isOpen:()=>o.isOpen(),attach(k,g){s=k,a=g.hq,h=g.items??null,o.close(),k.talkHook=p(g.hub??null)},talkTo(k,g={}){!s||!Ti[k]||c({npc:k,place:"관리국 본부",facts:[],...g})},dispose(){o.dispose(),s=null}}}var p2={Jyaldi:"data:image/webp;base64,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",Aileen:"data:image/webp;base64,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",Spangdal:"data:image/webp;base64,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",Geshugan:"data:image/webp;base64,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",Gorgodio:"data:image/webp;base64,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",Kyuras:"data:image/webp;base64,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",Deadpole:"data:image/webp;base64,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",Rojemon:"data:image/webp;base64,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",Jaemtri:"data:image/webp;base64,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",Gognija:"data:image/webp;base64,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",Dejure:"data:image/webp;base64,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",Konjyuce:"data:image/webp;base64,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","Ma Deok-hee":"data:image/webp;base64,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"};var xx={light:3,mid:5,heavy:8,super:12},g2={light:2,mid:5,heavy:9,super:14},Lr=1.5,Co=n=>Math.round(n/Lr)*Lr;function w2(n){let e=[];for(let t of n.split(/\r?\n/)){let i=t.split("|").map(s=>s.trim());if(i.length<3||!i[0]||i[0].startsWith("#"))continue;let r=/(\d+)\s*[×x*]\s*(\d+)/.exec(i[1]),o=parseInt(i[2],10);!r||!(o>0)||e.push({name:i[0].replace(/\.png$/,""),w:+r[1],h:+r[2],n:o,loop:/반복|loop|예|yes|o\b/i.test(i[3]??"")})}return e}var $e={total:1.4,bandIn:[.05,.17],artIn:[.1,.25],slam:.25,typed:.3,out:[.95,1.1]},uc=class{opt={shake:1,flash:!0,numbers:!0};sfx=null;stop=0;shakeT=0;shakeDur=0;shakePow=0;flashT=0;flashA=0;flashColor="#fff";sparks=[];rings=[];nums=[];totals=new Map;ghosts=[];plays=[];marks=[];sheets=new Map;bodyFlash=new Map;cut=null;time=0;frozen(){return this.stop>0||!!this.cut}inSuper(){return!!this.cut}camera(){if(this.shakeT<=0||this.opt.shake<=0)return{x:0,y:0};let e=this.shakeT/this.shakeDur*this.shakePow*this.opt.shake;return{x:Math.round((Math.random()*2-1)*e),y:Math.round((Math.random()*2-1)*e)}}flashOf(e){let t=this.bodyFlash.get(e);return t===void 0?null:t>=1?"white":"color"}hitstop(e){this.stop=Math.max(this.stop,e)}shake(e,t=.25){e>=this.shakePow*(this.shakeT/(this.shakeDur||1))&&(this.shakePow=e,this.shakeT=this.shakeDur=t)}flash(e="#fff",t=.1,i=.6){this.opt.flash&&(this.flashColor=e,this.flashT=t,this.flashA=i)}sparks_(e,t,i,r,o=4,s=0){for(let a=0;a<i;a++){let c=Math.random()*Math.PI*2,l=o*(.4+Math.random());this.sparks.push({x:e,y:t,vx:Math.cos(c)*l*60,vy:(Math.sin(c)*l+s)*60,t:0,life:.25+Math.random()*.25,color:r,size:Math.random()<.3?3*Lr:2*Lr})}}ring(e,t,i,r,o,s=.3){this.rings.push({x:e,y:t,r0:i,r1:r,color:o,t:0,life:s})}ghost(e,t,i=.22){this.ghosts.push({draw:e,color:t,t:0,life:i}),this.ghosts.length>6&&this.ghosts.shift()}number(e,t,i,r,o="#fff",s=!1){if(!this.opt.numbers||!(r>0))return;let a=this.totals.get(e),c=a&&this.time-a.last<.5,l=c?a.rows:0;this.nums.push({key:e,x:Co(t),y:Co(i),text:String(Math.round(r)),color:o,t:0,big:s,row:l}),this.totals.set(e,{sum:(c?a.sum:0)+r,last:this.time,x:t,y:i,rows:l+1})}scorch(e,t,i=120,r=3){this.marks.push({x:e,y:t,w:i,t:0,life:r})}register(e,t){this.sheets.set(e.name,{def:e,img:t})}hasSheet(e){return this.sheets.has(e)}play(e,t,i,r={}){let o=this.sheets.get(e);return o?(this.plays.push({def:o.def,img:o.img,x:t,y:i,t:0,fps:r.fps??20,flip:!!r.flip,scale:r.scale??Lr,tint:r.tint,until:o.def.loop?r.seconds??1:void 0}),!0):!1}hit(e){let t=e.tier,i=t==="light"?1:t==="mid"?2:t==="heavy"?3:4;this.hitstop(xx[t]),this.shake(g2[t],.12+i*.06),this.bodyFlash.set(e.target,2),this.sparks_(e.x,e.y,6+i*5,e.color??"#ffe0a0",2.5+i),e.ground!==void 0&&i>=3&&this.ring(e.x,e.ground,12,50+i*30,e.color??"#ffd890",.3),e.dmg!==void 0&&this.number(e.target,e.x,e.y-40,e.dmg,t==="super"?"#ffe070":"#fff",i>=3),t==="super"&&this.flash("#fff",.1,.7),this.play(i>=3?"fx_공용_타격_강":"fx_공용_타격_약",e.x,e.y+20,{flip:e.flip})}super_(e){return new Promise(t=>{this.cut?.done(),this.cut={...e,t:0,done:t},this.sfx?.("super")})}update(e){this.time+=e,this.stop>0&&(this.stop=Math.max(0,this.stop-e*60)),this.shakeT=Math.max(0,this.shakeT-e),this.flashT=Math.max(0,this.flashT-e);for(let[i,r]of this.bodyFlash)r-1<=0?this.bodyFlash.delete(i):this.bodyFlash.set(i,r-e*60);if(this.cut){let i=this.cut.t;if(this.cut.t+=e,i<$e.slam&&this.cut.t>=$e.slam&&(this.shake(g2.light,.12),this.sfx?.("slam")),this.cut.t>=$e.total){let r=this.cut.done;this.cut=null,r()}}if(this.frozen()&&!this.cut)return;let t=900;this.sparks=this.sparks.filter(i=>(i.t+=e,i.x+=i.vx*e,i.y+=i.vy*e,i.vy+=t*e*.5,i.t<i.life)),this.rings=this.rings.filter(i=>(i.t+=e)<i.life),this.nums=this.nums.filter(i=>(i.t+=e)<.9),this.ghosts=this.ghosts.filter(i=>(i.t+=e)<i.life),this.marks=this.marks.filter(i=>(i.t+=e)<i.life),this.plays=this.plays.filter(i=>{i.t+=e;let r=Math.floor(i.t*i.fps);return i.until!==void 0?i.t<i.until:r<i.def.n});for(let[i,r]of this.totals)this.time-r.last>.5&&r.rows>1?(this.nums.push({key:i,x:Co(r.x),y:Co(r.y-40),text:`${Math.round(r.sum)}`,color:"#ffd23a",t:0,big:!0,row:r.rows}),this.totals.delete(i)):this.time-r.last>.5&&this.totals.delete(i)}drawWorld(e){e.save(),e.imageSmoothingEnabled=!1;for(let t of this.marks)e.globalAlpha=.45*(1-t.t/t.life),e.fillStyle="#120c08",e.beginPath(),e.ellipse(t.x,t.y,t.w/2,t.w*.14,0,0,Math.PI*2),e.fill();for(let t of this.ghosts)e.globalAlpha=.5*(1-t.t/t.life),x2(e,t.draw,t.color);e.globalAlpha=1;for(let t of this.rings){let i=t.t/t.life,r=t.r0+(t.r1-t.r0)*(1-(1-i)*(1-i));e.globalAlpha=1-i,e.strokeStyle=t.color,e.lineWidth=3*Lr*(1-i)+Lr,e.beginPath(),e.ellipse(t.x,t.y,r,r*.28,0,0,Math.PI*2),e.stroke()}e.globalAlpha=1;for(let t of this.plays){let i=Math.floor(t.t*t.fps)%t.def.n,r=t.def.w*t.scale,o=t.def.h*t.scale;e.save(),e.translate(Math.round(t.x),Math.round(t.y)),t.flip&&e.scale(-1,1),t.tint?x2(e,s=>s.drawImage(t.img,i*t.def.w,0,t.def.w,t.def.h,-r/2,-o,r,o),t.tint,.5):e.drawImage(t.img,i*t.def.w,0,t.def.w,t.def.h,-r/2,-o,r,o),e.restore()}for(let t of this.sparks)e.globalAlpha=1-t.t/t.life,e.fillStyle=t.color,e.fillRect(Co(t.x),Co(t.y),t.size,t.size);e.globalAlpha=1;for(let t of this.nums){let i=Math.min(1,t.t/.25),r=t.y-t.row*28-i*24;e.globalAlpha=t.t>.6?1-(t.t-.6)/.3:1;let o=t.t<.08?1.5-t.t*6:1;y2(e,t.text,t.x,r,(t.big?26:18)*o,t.color,"#000","center")}e.restore()}drawScreen(e){this.flashT>0&&!re.clear&&(e.save(),e.setTransform(1,0,0,1,0,0),e.globalAlpha=this.flashA*Math.min(1,this.flashT/.05),e.fillStyle=this.flashColor,e.fillRect(0,0,e.canvas.width,e.canvas.height),e.restore()),this.cut&&this.drawCut(e,this.cut)}drawCut(e,t){let i=t.t;if(e.save(),e.setTransform(1,0,0,1,0,0),re.clear){let a=e.canvas.width/1280;e.translate(0,Math.round((e.canvas.height-720*a)/2)),e.scale(a,a)}else e.scale(e.canvas.width/1280,e.canvas.height/720);e.imageSmoothingEnabled=!1;let r=i>$e.out[1]?.7*(1-(i-$e.out[1])/($e.total-$e.out[1])):.7;e.fillStyle=`rgba(0,0,0,${r})`,re.clear||e.fillRect(0,0,1280,720);let o=i<$e.bandIn[0]?0:i<$e.bandIn[1]?(i-$e.bandIn[0])/($e.bandIn[1]-$e.bandIn[0]):i<$e.out[0]?1:Math.max(0,1-(i-$e.out[0])/($e.out[1]-$e.out[0])),s=260*(i<$e.out[0]?1:o);if(o>0&&s>1){e.save(),e.translate(640,380),e.rotate(-12*Math.PI/180);let a=1700*(i<$e.out[0]?o:1);e.beginPath(),e.rect(-850,-s/2,a,s),e.clip(),e.fillStyle=t.color,e.fillRect(-850,-s/2,a,s),e.fillStyle="#000",e.fillRect(-850,-s/2,a,6),e.fillRect(-850,s/2-6,a,6),e.fillStyle="rgba(255,255,255,0.35)",e.fillRect(-850,-s/2+6,a,3),e.fillStyle="rgba(255,255,255,0.55)";for(let l=0;l<18;l++){let h=-s/2+16+l*53%Math.max(1,s-32),m=80+l*97%160,p=-850+(l*211+i*2600)%1900-100;e.fillRect(Math.round(p/3)*3,Math.round(h/3)*3,m,3)}let c=t.art??t.fallback;if(c){let l=!t.art,h=l?400:800,m=400,p=1700*.6-850-h,x;if(i<$e.artIn[0])x=-850-h;else if(i<$e.artIn[1]){let b=(i-$e.artIn[0])/($e.artIn[1]-$e.artIn[0]);x=-850-h+(p+850+h)*(1-(1-b)**3)}else i<$e.artIn[1]+.06?x=p+4*Math.sin((i-$e.artIn[1])/.06*Math.PI):i<$e.out[0]?x=p:x=p+(i-$e.out[0])/($e.out[1]-$e.out[0])*1800;let g=t.art2&&i>$e.slam&&i<$e.out[0]&&Math.floor((i-$e.slam)/.1)%2===1?t.art2:c;if(e.drawImage(g,Math.round(x),Math.round(-m/2-(l?40:0)),h,m),!t.art2&&t.eye&&i>$e.slam&&i<$e.out[0]){let b=Math.round(x+t.eye.x*h),v=Math.round(-m/2-(l?40:0)+t.eye.y*m),T=Math.floor(i*12)%2?6:9;e.fillStyle="#fff",e.fillRect(b-1,v-T,3,T*2+1),e.fillRect(b-T,v-1,T*2+1,3)}}e.restore()}if(i>=$e.slam){let a=i>$e.out[0]?(i-$e.out[0])/($e.out[1]-$e.out[0])*900:0,c=i<$e.slam+.08?1.6-(i-$e.slam)/.08*.6:1;if(e.save(),e.translate(1e3+a,330),e.rotate(-12*Math.PI/180),e.scale(c,c),wx(e,t.name,0,0,t.color),e.restore(),t.sub){let l=Math.min(t.sub.length,Math.floor((i-$e.slam)/$e.typed*t.sub.length));e.save(),e.translate(1e3+a,390),e.rotate(-12*Math.PI/180),y2(e,t.sub.slice(0,l),0,0,22,"#d8dde0","#000","center"),e.restore()}}e.restore()}},b2=new Map;function k2(n,e,t,i,r,o){let s=typeof document<"u"&&document.fonts?.check?.(`11px "${It}"`),a=`${n}|${e}|${t}|${i}|${r}|${o}|${s}`,c=b2.get(a);if(c)return c;let l=r+o+2,h=document.createElement("canvas").getContext("2d");h.font=`${e}px "${It}", sans-serif`;let m=Math.ceil(h.measureText(n).width)+l*2,p=Math.ceil(e*1.25)+l*2,x=document.createElement("canvas");x.width=m,x.height=p;let k=x.getContext("2d");k.font=h.font,k.textBaseline="top",k.fillStyle="#fff",k.fillText(n,l,l);let g=k.getImageData(0,0,m,p);for(let A=3;A<g.data.length;A+=4)g.data[A]=g.data[A]>110?255:0;k.putImageData(g,0,0);let b=A=>{let E=document.createElement("canvas");E.width=m,E.height=p;let P=E.getContext("2d");return P.drawImage(x,0,0),P.globalCompositeOperation="source-in",P.fillStyle=A,P.fillRect(0,0,m,p),E},v=document.createElement("canvas");v.width=m,v.height=p;let T=v.getContext("2d");if(o){let A=b("#000");for(let E=1;E<=o;E++)T.drawImage(A,E,E)}if(r){let A=b(i);for(let E=-r;E<=r;E++)for(let P=-r;P<=r;P++)(E||P)&&T.drawImage(A,E,P)}return T.drawImage(b(t),0,0),b2.set(a,v),v}function y2(n,e,t,i,r,o,s="#000",a="left"){if(!e)return;let c=k2(e,Math.round(r),o,s,2,2);n.drawImage(c,Math.round(a==="center"?t-c.width/2:t),Math.round(i-c.height/2))}function wx(n,e,t,i,r){let o=k2(e,44,"#ffffff",r,2,4);n.drawImage(o,Math.round(t-o.width/2),Math.round(i-o.height/2))}var Di=null;function x2(n,e,t,i=1){let r=n.canvas.width,o=n.canvas.height;Di||(Di=document.createElement("canvas")),(Di.width!==r||Di.height!==o)&&(Di.width=r,Di.height=o);let s=Di.getContext("2d");s.setTransform(1,0,0,1,0,0),s.globalCompositeOperation="source-over",s.clearRect(0,0,r,o),s.setTransform(n.getTransform()),s.imageSmoothingEnabled=!1,e(s),i<1&&(n.save(),n.setTransform(1,0,0,1,0,0),n.drawImage(Di,0,0),n.restore()),s.setTransform(1,0,0,1,0,0),s.globalCompositeOperation="source-in",s.globalAlpha=i,s.fillStyle=t,s.fillRect(0,0,r,o),s.globalAlpha=1,n.save(),n.setTransform(1,0,0,1,0,0),n.drawImage(Di,0,0),n.restore()}var A2={쟈알디:{color:"#C8283C",name:"보면 알아",sub:"설명하기 어려워. 보면 알아."},스팡달:{color:"#7A3FB0",name:"우습네. 정말.",sub:"뒤를 보는 버릇을 들여."},잼트리:{color:"#6E9A3C",name:"모두의 언니",sub:"반박 시 커피 없음~"},에일린:{color:"#CFC7A6",name:"증명해.",sub:"규칙은 읽었어?"},고그니쟈:{color:"#E8D23A",name:"성질이 좀 있지!",sub:"자네, 커피는 다 마셨나!"},큐라스:{color:"#8FE36A",name:"지휘",sub:"왼쪽 괜찮아? 형님 괜찮아?"},고르고디오:{color:"#2F6BFF",name:"붕괴 돌파",sub:"꽉 잡아. 벽은 내가 맞을게."},데쥬레:{color:"#FF7EB6",name:"이건 꽝이에요",sub:"주, 죽는 거 아니죠…?"},데드폴:{color:"#3A4C8C",name:"한 번 죽으면",sub:"시간이 벌리니까요."},게슈간:{color:"#6EC6FF",name:"가리키고, 보고, 쥐고",sub:"…끝."},로제몬:{color:"#B04FD0",name:"앙상블",sub:"나 사무직이라니까?!"},콘쥬스:{color:"#FF5FA2",name:"제가 다 치울게요!",sub:"아저씨들은 뒤에 계세요!"},사장:{color:"#8A8A96",name:"정지",sub:"……"},도필헌:{color:"#B08A4E",name:"거짓말이 빠진 방",sub:"자네 정도라면 당연히 알 줄 알았네."},이길환:{color:"#E8955A",name:"튜토리얼",sub:"아, 아, 테스트, 테스트."},이기석:{color:"#E6C14A",name:"팀 발표",sub:"다음 팀은…… 바로 여러분입니다!"},김조학:{color:"#5E7C8C",name:"영상 올리기 전에",sub:"뭘 올렸는지는 다 압니다."},이도형:{color:"#E9EEF2",name:"건물 가르기",sub:"연필심만 남아도 충분해."},고영훈:{color:"#4F5D70",name:"킹",sub:"요점."},노기균:{color:"#D2453C",name:"수고하십시오!",sub:"이 녀석은 된다!"},송주익:{color:"#2E9C9A",name:"예카테리나",sub:"예카테리나니까요."},곽성주:{color:"#7D8793",name:"후퇴는 없다",sub:"전원 내 뒤로!"},조성춘:{color:"#D9A82E",name:"진공작전",sub:"……조용히. 지금부터 진짜다."},윤병수:{color:"#F07A22",name:"채점 중",sub:"칭찬은 끝까지 듣고 해."},김성진:{color:"#6BD45A",name:"생환 기록",sub:"나 방금 멋있지 않았냐?"},송진섭:{color:"#4FA6E6",name:"우리 팀 눈",sub:"지도 왼쪽이요, 지도 왼쪽!"},청달래:{color:"#1F6E6A",name:"무슨 소란인가",sub:"참으로 지저분한 꼴이군."},호유원:{color:"#E0A43A",name:"소중한 것이 만나러 와요",sub:"잘 보살펴 드릴게요, ~님."},백석주:{color:"#2E8B57",name:"A조에 온 걸 환영해",sub:"환영은 입구까지만."},진나솔:{color:"#8E5CC9",name:"퇴근",sub:"그럴 시간에 퇴근해."},이성해:{color:"#5EC4D6",name:"다들 데리고 나왔어여",sub:"늦어서 죄송해여!"},이자헌:{color:"#E6E2D3",name:"물리 퇴마",sub:"괴담입니다. 그런데 됩니다."},은하제:{color:"#3D6FD9",name:"통화 연결",sub:"응, 그래. 됐고. 빨리 와."},박민성:{color:"#8A6A4A",name:"다시는 안 해",sub:"……다음 주에 또 함."},백사헌:{color:"#9B4DD6",name:"추가 지급",sub:"어차피 죽을 사람들인데요."},고영은:{color:"#F2F0D8",name:"R조의 양심",sub:"그냥 조명이에요."},강이학:{color:"#F2C230",name:"매뉴얼만 지키면요",sub:"평사원 둘이어도 괜찮아요!"},장허운:{color:"#7A5233",name:"사람으로 대할 것",sub:"…도망, 안 갑니다."},곽제강:{color:"#B79CF0",name:"분기별 기상 특보",sub:"와, 이거 정말 흥미로운데요!"},이연화:{color:"#5B5D8F",name:"과장님!",sub:"……잠깐만요. 여기 멈추세요."},이병진:{color:"#D23C3C",name:"처음으로 쓸모 있어진 순간",sub:"……이건 내가 읽지."},제이:{color:"#E2C23A",name:"완전 발현",sub:"…냄새가 달라요……"},차여진:{color:"#8C1F2E",name:"두 번째 휴대전화",sub:"이건 사적인 용도라서요~"},서윤지:{color:"#9CB89A",name:"수정 요청 없음",sub:"적힌 것은 하나도 봐주지 않습니다."},고연지:{color:"#2C3E66",name:"수술 여섯 시간째",sub:"네, 그래서 견적이 이 정도입니다."},윤지아:{color:"#F4A97A",name:"시술 준비 끝",sub:"사탕 하나 드실래요?"},마덕희:{color:"#7A1E34",name:"헐값매입",sub:"자기 얼굴에 다 쓰여 있어요~"},문혜란:{color:"#6B1F3A",name:"대박알선 뒷방",sub:"친구, 사인부터 하자."},신유리:{color:"#B8BEC6",name:"사전 통보 없음",sub:"친구 아니야. 채무자지."},블라렛:{color:"#FFF4D6",name:"영원한 십자군",sub:"서울은 교회가 많아서 좋아!"},살라딘:{color:"#3A8FE0",name:"메카의 군세",sub:"형제여! 바다의 물고기처럼 끝이 없다!"},아벤샤:{color:"#2FB37A",name:"모래 해일",sub:"어머, 이건 꼭 갖고 싶다!"},세크리엠:{color:"#B0102A",name:"붉은 눈",sub:"눈을 마주쳤구나."},브라우니:{color:"#7FE0A0",name:"화요퀴즈쇼",sub:"친구! 다음 문제 나갑니다!"},탐미주의:{color:"#E0402A",name:"예술은 조각이다",sub:"가만히 있어. 지금 너는 작품이야."}};function kx(){return{id:"training-1",title:"관리국 지하 훈련장",type:"lobby",depth:0,length:4200,lane:[440,690],startX:200,exitX:4080,banner:"관리국 지하 훈련장 · 조작 연습",palette:{wall:"#2b343a",floor:"#3c4549",accent:"#6c7b83"},props:[{id:"sign1",kind:"sign",x:420,y:445,w:140,h:60,label:"A 연타 · ↓↓ 앉기 · Shift 회피/달리기"}],encounters:[{triggerX:500,lockFrom:0,lockTo:1400,waves:[[{kind:"dummy-once",x:1e3,y:590}],[{kind:"thug",x:1300,y:560},{kind:"thug",x:1350,y:650}]]},{triggerX:1800,lockFrom:1500,lockTo:2800,waves:[[{kind:"thug",x:2700,y:540},{kind:"thug",x:2750,y:620},{kind:"thug",x:1520,y:670}],[{kind:"thug",x:2750,y:560,elite:!0},{kind:"thug",x:1530,y:600}]]},{triggerX:3e3,lockFrom:2900,lockTo:4200,waves:[[{kind:"thug",x:4100,y:590,boss:!0},{kind:"thug",x:2950,y:560},{kind:"thug",x:4150,y:660}]]}]}}var v2={id:"training",label:"훈련장",firstFloor:()=>kx(),nextFloor:()=>null},M2={id:"dummy",label:"허수아비 연습",firstFloor:()=>({id:"dummy-room",title:"허수아비 연습",length:1280,startX:360,exitX:1/0,banner:"허수아비 연습 · H 판정 보기 · Esc 메뉴",encounters:[{triggerX:0,lockFrom:0,lockTo:1280,waves:[[{kind:"dummy",x:760,y:565},{kind:"dummy",x:980,y:540}],[{kind:"dummy",x:900,y:590}]]}]}),nextFloor:()=>null};var Ax=new Map(Ai.map(n=>[n.name,n.kind]));function vx(n){let e=new Map(n.perks.stacks().map(i=>[i.name,i.v])),t=i=>i.replace(/\s/g,"").slice(0,2);return[...[...n.perks.ranks.keys()].map(i=>({t:t(i),c:Ax.get(i)==="쌍"?Qo:Xo[n.perks.topGrade(i)],n:e.get(i)||void 0})),...[...n.perks.traits].map(i=>({t:t(i),c:hr}))]}var Mx=["가짜 관리국 검사부대_남","가짜 관리국 진압부대_남","간호사_여","경비_남","경비_여","경찰_남","경찰_여","관리국 요원_남","관리국 요원_여","백일몽 직원_남","백일몽 직원_여","불량배_남","불량배_여","상인_남","상인_여","안내 직원_남","안내 직원_여","의사_남","청소부_남","청소부_여","프리랜서_남","프리랜서_여","학생_남","학생_여","행인_남","행인_여","행정 직원_남","행정 직원_여","협회 직원_남","협회 직원_여"],Sx=n=>({load:()=>{try{return localStorage.getItem(n)}catch{return null}},save:e=>{try{localStorage.setItem(n,e)}catch{}}}),fc={title:"괴이 ː ANOMALY",sub:"필드 · 요원들을 만나고 본편 대화를 이어갑니다"},Fe={sec:null,place:""},wn={won:null},Ls=!1,Cx=()=>Ls,At={},Tx=n=>`${n<0?"−":""}₩ ${Math.abs(Math.trunc(n)).toLocaleString("en-US")}`;function Rx(n,e){let t=o0(),i=n;Fe.sec=null,Fe.place="",wn.won=null,Ls=!1;let r=[],o=()=>e.rules?.()??Ii,s={agentId:"",name:""},a=!1,c=(i?.visit?i.visit.state().then(V=>{s=V.visitor,r=V.agents.filter(I=>I.room).map(I=>({name:I.name,room:I.room}))}).catch(()=>{}):Promise.resolve().then(()=>{r=[{name:"잼트리",room:"office"},{name:"쟈알디",room:"office"},{name:"큐라스",room:"lounge"},{name:"고르고디오",room:"lounge"},{name:"데쥬레",room:"infirmary"}]})).then(()=>Promise.all(r.map(V=>jn(V.name)))).then(()=>{a=!0}),l={faction:"A00",level:1},h="";if(!i?.card&&Fe.sec===null){let V=Number(typeof location<"u"?new URLSearchParams(location.search).get("hour")??10:10);Fe.sec=(Number.isFinite(V)?(V%24+24)%24:10)*3600}i?.card?.().then(V=>{Fe.sec===null&&V?.minute!=null&&(Fe.sec=V.minute*60),Fe.sec===null&&e.worldSave?.get()?.clock!=null&&(Fe.sec=e.worldSave.get().clock),V&&(l={faction:V.identity?.faction||V.faction||"A00",level:V.identity?.level??null}),V&&(h=V.player?V.agents.find(I=>I.id===V.player)?.name??"":"")}).catch(()=>{});let m=new Map,p=new Map,x=Od(null),k=()=>{i?.people?.people().then(V=>{m.clear();for(let I of V)m.set(I.name,I)}).catch(()=>{}),i?.people?.factions().then(V=>{p.clear();for(let I of V)p.set(I.code,I)}).catch(()=>{}),(i?.people?.relations?.()??Promise.resolve(null)).then(V=>{x=Od(V)}).catch(()=>{})},g=[],b=()=>g.reduce((V,I)=>V+I.amount,0),v=()=>void i?.wallet?.balance().then(V=>{wn.won=V===null?null:V+b()}).catch(()=>{});k(),v();let T=i?.people?.onChange(()=>{k(),v()}),A=()=>Fe.sec===null?"":`${String(Math.floor(Fe.sec/3600)%24).padStart(2,"0")}:${String(Math.floor(Fe.sec/60)%60).padStart(2,"0")} `,E=async(V,I)=>wn.won===null?null:(g.push({amount:V,memo:I}),wn.won+=V,i?.field?.record({kind:"trade",text:`${A()}Money: ${V<0?"":"+"}${V} ${I}`,ko:`${A()}${I} ${V<0?"−":"+"}${Math.abs(V).toLocaleString("en-US")}원`,scene:Fe.place||void 0,weight:1,visit:D}).catch(()=>{}),wn.won),P=async()=>{if(!g.length||!i?.wallet)return;let V=$p(g.splice(0));if(!V)return;let{net:I,memo:Z}=V,fe=await i.wallet.add(I,Z,{place:Fe.place||void 0,time:Fe.sec===null?void 0:xs(Fe.sec)}).catch(()=>null);fe!=null&&(wn.won=fe+b())};i?.wallet||(wn.won=14e4),At.pay=(V,I)=>i?.wallet?E(V,I):Promise.resolve(wn.won=(wn.won??0)+V),At.record=(V,I)=>void i?.field?.record({kind:"act",text:`${A()}${V}`,...I?{ko:`${A()}${I}`}:{},scene:Fe.place||void 0,weight:1,visit:D}).catch(()=>{}),At.fact=(V,I)=>void i?.field?.record({kind:"act",text:`${V}: ${I}`,ko:"",scene:Fe.place||void 0,weight:1,fact:{key:V,value:I},visit:D}).catch(()=>{});let C={pay:E,balance:()=>wn.won};globalThis.__goeiWallet=C;let D=`v${Date.now().toString(36)}`;i?.visit&&i.field?.record({kind:"enter_field",text:"{user} entered the field.",ko:"필드 입장",weight:1,visit:D}).catch(()=>{});let S={office:"office",lounge:"lounge",infirmary:"clinic"},w=typeof location<"u"?new URLSearchParams(location.search).get("seed"):null,B=w?Number(w)>>>0||g1(w):Date.now()>>>0,z=null,L=()=>{Fe.sec!==null&&(Fe.sec+=o().talk*60)},F=V=>{(V.key==="F9"||V.key==="`")&&(Ls=!Ls,V.preventDefault())};typeof window<"u"&&window.addEventListener("goei:talk-closed",L),typeof window<"u"&&window.addEventListener("keydown",F);let oe=()=>{if(!z&&a){z=qp(t,B,r.filter(I=>S[I.room]).map(I=>({name:I.name,scene:S[I.room]})),Au,{lineN:(I,Z)=>qt(I)?.A[Z]?.n??10,killOk:()=>Hn.killOk?.()??!1,stance:I=>p.get(I)?.stage??null,playerFaction:()=>l.faction||null,relation:(I,Z)=>x(I,Z),namedHostile:I=>m.get(I)?.affinity.cell==="hostile",nav:{ok:Nh,clamp:(I,Z,fe)=>ta(I,Z,fe)}}),U=new sc(I=>n?.assets?n.assets.bytes("dialogue",I).catch(()=>null):Promise.resolve(null),z.rng),te=new ac(z,U,K),U.prefetch("named",[...r.map(I=>I.name),...rc.map(I=>I.name)]),U.prefetch("mob",Mx),z.noAssist=I=>Hp(I)?.combat===!1;let V=e.worldSave?.get();if(V){let I=V.clock!=null&&Fe.sec!==null?((Fe.sec-V.clock)/3600%24+24)%24:0;z.restore(V,I)}z.warmup(180,Fe.sec===null?null:Fe.sec/3600%24)}return z&&(globalThis.__goeiWorld=z),z},te=null,U=null,K=(V,I)=>{let Z=Fe.sec===null?null:Fe.sec/3600%24,fe=V.def.kind==="named"?m.get(V.def.name):void 0,Ye=V.def.kind==="mob"?z?.mobFaction(V):fe?.faction??null,he=Ye?p.get(Ye)?.stage??null:null,me=fe?.affinity.cell,Oe=V.act==="argue"||V.plan==="chase"||me==="hostile"?"hostile":me==="warm"||me==="close"?"friend":Kd(he);return{hour:Z,faction:l.faction,stance:Oe,player:h||null,...I?{target:I}:{}}};At.cueLine=(V,I)=>{let Z=V.startsWith("mob:")?z?.actors.find(fe=>fe.def.id===V.slice(4)):z?.findActor(V);return Z&&te?te.line(Z,I):null},At.busyCell=V=>{let I=V.startsWith("mob:")?z?.actors.find(he=>he.def.id===V.slice(4)):z?.findActor(V);if(!I)return null;let Z=I.doing==="주인공과 대화"?I.talkFrom??"":I.doing,fe=I.task?.id??"",Ye=fe==="work"?"work":fe==="eat"?"eat":fe==="rest"||fe==="hobby"?"rest":fe==="pee"||fe==="poo"?"toilet":fe==="train"?"train":/담배/.test(Z)?"smoke":/먹|식사|간식/.test(Z)?"eat":/훈련/.test(Z)?"train":I.post?"work":"";return Ye?`busy.${Ye}`:null};let J=V=>t.scenes.find(I=>I.id===V)?.name??V,ne=new Map,se=new Map,be="",we=new lc(V=>{let I=V.kind==="provoke"||V.kind==="kill"?ne.get(be):void 0;i?.field?.record({kind:V.kind,text:V.text,ko:V.ko,scene:J(be),weight:V.weight,visit:D,...V.who?{who:V.who}:{},...I?{witness:I}:{}}).catch(()=>{})}),Ve=V=>we.leave(),ye=()=>{let V=globalThis.__goeiEngine?.world?.player;return V instanceof ut&&V.core.P.armed?"weapon":"fists"},ee=null,W=!1,_=V=>{for(let I of V){if(I.kind==="drop"&&I.amount>0){let ze=I.who.charCodeAt(I.who.length-1)-44032,vt=I.stolen?"소매치기에게서 되찾은 돈":`${I.who}${ze>=0&&ze<=11171&&ze%28!==0?"이":"가"} 떨어뜨린 돈`;At.pay?.(I.amount,vt),globalThis.__goeiEngine?.world?.say(`${I.amount.toLocaleString("en-US")}원을 주웠다`,2);continue}if(I.kind==="steal"&&I.scene===q){i?.field?.record({kind:"act",text:`${A()}{user} saw a ${xn(I.thief)} pickpocket a ${xn(I.victim)}.`,ko:`${A()}{user}: 소매치기 목격 (${I.thief} → ${I.victim})`,scene:J(I.scene),weight:1,visit:D}).catch(()=>{});continue}if(I.kind==="intrude"&&I.stage===0&&I.scene===q){i?.field?.record({kind:"detected",text:`${A()}${xn(I.who)} caught {user} in the wrong-sex restroom and told {user} to get out.`,ko:`${A()}{user}: ${I.who}에게 이성 화장실 침입 들킴`,scene:J(I.scene),who:[I.who],weight:2,visit:D}).catch(()=>{});continue}if(I.kind==="expel"&&I.who==="{user}"){i?.field?.record({kind:"act",text:`${A()}A ${xn(I.by)} told {user} to leave, and {user} left.`,ko:`${A()}{user}: ${I.by}의 경고를 받고 쫓겨남`,scene:Fe.place||void 0,weight:2,visit:D}).catch(()=>{});continue}if(I.kind==="pass"){let ze=p.get(I.faction)?.name??Ds[I.faction]??I.faction;i?.field?.record({kind:"act",text:`${A()}{user} was given a one-time visitor pass for the ${ze} site.`,ko:`${A()}{user}: ${ze} 일회용 출입증 받음`,scene:J(I.scene),weight:1,visit:D}).catch(()=>{});continue}if(I.kind==="guardAttack"&&I.why==="intrude"){i?.field?.record({kind:"act",text:`${A()}${xn(I.by)} came at {user} for barging into the wrong-sex restroom.`,ko:`${A()}{user}: 이성 화장실에 들어가 ${I.by}이(가) 덤빔`,scene:J(I.scene),who:[I.by],weight:2,visit:D}).catch(()=>{});continue}if(I.kind==="guardAttack"){i?.field?.record({kind:"act",text:`${A()}{user} ignored a ${xn(I.by)}'s warning, and the guard moved to stop {user} by force.`,ko:`${A()}{user}: 경고를 무시해 ${I.by}이(가) 덤빔`,scene:J(I.scene),weight:2,visit:D}).catch(()=>{});continue}if((I.kind==="brawl"||I.kind==="brawlEnd"||I.kind==="expel")&&I.scene===q){let ze=Mt=>p.get(Mt)?.name??Ds[Mt]??Mt,vt=I.kind==="brawl"?{text:`${A()}{user} saw a ${xn(I.a)} (${ze(I.af)}) fight a ${xn(I.b)} (${ze(I.bf)}).`,ko:`${A()}{user}: ${I.a}(${ze(I.af)})와 ${I.b}(${ze(I.bf)})의 싸움을 봄`,weight:2}:I.kind==="brawlEnd"?{text:`${A()}The ${xn(I.loser)} ${I.how==="down"?"was knocked out":"fled"}.`,ko:`${A()}${I.loser} ${I.how==="down"?"기절":"도주"}`,weight:1}:{text:`${A()}A ${xn(I.by)} threw a ${xn(I.who)} out.`,ko:`${A()}${I.by}이(가) ${I.who}을(를) 내보냄`,weight:1};i?.field?.record({kind:"act",...vt,scene:J(I.scene),visit:D}).catch(()=>{});continue}if(I.kind==="alarm"){let ze=p.get(I.faction)?.name??Ds[I.faction]??I.faction,vt={intruder:["an intruder","침입자"],assault:["an assault","폭행"],knockout:["someone being knocked out","기절시킴"],murder:["a killing","살인"],trespass:["a trespasser refusing to leave","퇴거 거부"],threat:["a threat","위협"]}[I.why]??[I.why,I.why],Mt=I.on?{text:`${A()}The ${ze} base alarm went off over ${vt[0]} (${I.threat==="{user}"?"{user}":xn(I.threat)}). Guards and agents converged.`,ko:`${A()}${ze} 거점 경보 (${vt[1]}, ${I.threat==="{user}"?"{user}":I.threat})`}:{text:`${A()}The ${ze} base alarm was lifted.`,ko:`${A()}${ze} 거점 경보 해제`};i?.field?.record({kind:"act",...Mt,scene:J(I.scene),weight:I.on?2:1,visit:D}).catch(()=>{});continue}if(I.kind==="follow"){let ze=z,vt=ze?ze.followers.map(Jt=>ze.actors.find(pe=>pe.def.id===Jt)?.def.name).filter(Jt=>!!Jt):[],Mt=I.mode==="follow"?{kind:"follow",text:`${A()}${I.who} started following {user}.`,ko:`${A()}${I.who} 동행 시작`}:I.mode==="wait"?{kind:"unfollow",text:`${A()}${I.who} stayed behind to wait.`,ko:`${A()}${I.who} 남아서 기다림`}:I.mode==="hit"?{kind:"unfollow",text:`${A()}${I.who} was knocked down and stopped following {user}.`,ko:`${A()}${I.who} 쓰러져 동행 끝`}:{kind:"unfollow",text:`${A()}${I.who} went back to their own work.`,ko:`${A()}${I.who} 자리로 돌아감`};i?.field?.record({...Mt,scene:J(I.scene),who:[I.who],weight:2,visit:D,fact:{key:"companions",value:vt.join(", ")||"none"}}).catch(()=>{});continue}if(I.kind==="kill"){se.set(I.scene,"murder"),be=I.scene,we.killed(A().trim(),I.scene,I.id,I.who,ye());continue}if(I.kind!=="hurt")continue;let Z=A();W||(W=!0,Fe.sec!==null&&(Fe.sec+=o().fight*60));let fe=z;if(!fe)return;let Ye=fe.inScene(I.scene),he=Ye.find(ze=>ze.def.kind==="named"&&ze.def.name!==I.who&&m.get(ze.def.name)?.faction),me=Ye.find(ze=>fe.mobFaction(ze)),Oe=he?{faction:m.get(he.def.name).faction,named:!0}:me?{faction:fe.mobFaction(me),named:!1}:void 0;if(Oe&&ne.set(I.scene,Oe),!I.hostile&&se.get(I.scene)!=="murder"&&se.set(I.scene,"assault"),I.named){i?.field?.record({kind:"hurt",text:`${Z}{user} hit ${I.who}${I.hostile?"":" unprovoked"}.`,ko:`${Z}{user}: ${I.who} 때림${I.hostile?"":" (먼저)"}`,scene:J(I.scene),who:[I.who],weight:2,visit:D,...Oe?{witness:Oe}:{}}).catch(()=>{});continue}be=I.scene;let Qe=fe.actors.find(ze=>ze.def.id===I.id);we.userHit(Z.trim(),I.scene,I.id,Qe?.def.archetype??I.who,ye(),I.hostile),I.down&&we.knockedOut(I.id)}},ge=!1,Be={leave:"필드에서 나옴",send:"응답을 보내 필드 종료",down:"쓰러져 필드 종료"},$={leave:"{user} left the field.",send:"The field visit ended as the story went on.",down:"The field visit ended with {user} down."},Y=V=>{if(!z||!e.worldSave)return;let I=e.worldSave.get();e.worldSave.set({...z.snapshot(),clock:Fe.sec,...V??I?.player?{player:V??I.player}:{}})},ie=async(V,I="leave")=>{ge||(ge=!0,q&&Y({scene:q,x:N.x,y:N.y}),we.leave(),await P().catch(()=>{}),i?.visit&&await i.field?.record({kind:"exit_field",text:`${A()}${$[I]}`,ko:`${A()}${Be[I]}`,scene:Fe.place||void 0,weight:1,visit:D}).catch(()=>{})),V&&i?.close?.()},ce=i?.onBeforeSend?.(()=>i?.visit?ie(!0,"send"):Promise.resolve());At.endVisit=V=>void ie(V);let ke=0,xe=!1,de=(V,I)=>{let Z=globalThis.__goeiEngine?.world?.player;if(!(Z instanceof ut)||!i?.visit||xe)return;if(Z.hp>0||Z.phase!=="down"){ke=0;return}if((ke+=V)<2.5)return;xe=!0;let fe=z,Ye,he=1/0;for(let[Mt,Jt]of Re){let pe=Math.abs(Jt.body.x-Z.x)+Math.abs(Jt.body.y-Z.y);pe<he&&(he=pe,Ye=fe?.actors.find(qr=>qr.def.id===Mt))}let me=Ye?.def.name??"누군가",Oe=kt[Ye?.def.archetype??""]?.role,Qe=Ye&&fe?fe.mobFaction(Ye):null,ze=wn.won??0,vt=Ye&&!cc(Ye.def.archetype)&&(Oe==="thug"||Qe)&&ze>0?Math.round(ze*(.2+Math.random()*.3)/100)*100:0;vt>0&&At.pay?.(-vt,`${me}에게 뜯김`),be=I,we.userDown(!!Z.killed,Ye?.def.id??null,vt>0?`${xn(Ye?.def.archetype??me)} took ${vt} won from {user}.`:"",vt>0?`${me}에게 ${vt.toLocaleString("en-US")}원 뜯김`:""),setTimeout(()=>void ie(!0,"down"),1200)},ue=0,Ie=0,O=()=>new oc(Fe.sec===null?null:Fe.sec/60),q="";Hn.extraTargets=()=>{let V=z;if(!V||!q)return[];let I=Hn.killOk?.()??!1;return V.inScene(q).filter(Z=>Z.act!=="dead"&&(Z.act!=="down"||I)).map(Z=>({x:Z.x,y:Z.y,z:0,body:{id:-1,team:"enemy",kind:"npc",x:Z.x,y:Z.y,z:0,dir:Z.face,hp:Math.max(1,Z.hp??1),hpMax:Z.hpMax??1,alive:!0,stop:0,frame:()=>({hit:[],hurt:[]}),step:()=>{},applyHit:fe=>V.hitActor(Z.def.id,fe.dir,fe.attackId,fe.dmg??12,!!fe.lethal)?{kind:"hit"}:{kind:"immune"}}}))};let X=(V,I,Z)=>V===void 0?"보통":V<.35?I:V>.65?Z:"보통";At.mobOf=V=>{let I=z,Z=V.startsWith("mob:")?I?.actors.find(Jt=>Jt.def.id===V.slice(4)):void 0;if(!I||!Z||!I.canTalk(Z))return null;let fe=Ao(Z.def.look),Ye=Xp.npc[Yp[Z.def.archetype??Z.def.name]??""]?.voice??"",he=I.mobFaction(Z),me=he?p.get(he)?.name??Ds[he]??he:"",Oe=he?p.get(he)?.stageLabel:void 0,Qe=Z.temper,ze=`${Z.def.name}${fe?`(${fe.sex}·${fe.age.replace(/\(.*\)/,"")})`:""}`,vt=[`이름 없는 사람(${Z.def.name}). 이름은 정해져 있지 않다: 주인공이 물으면 나이·성별에 맞는 평범한 한국 이름을 하나 대고, 그 뒤로는 그 이름을 쓴다.`,fe?`성별 ${fe.sex==="여"?"여자":"남자"}, 나이 ${fe.age}${fe.job?`, 직업 ${fe.job}`:", 직업은 정해지지 않은 평범한 시민"}.`:"",fe?.note?`생김새·인상: ${fe.note}`:"",Ye?`말투: ${Ye}`:"",Qe?`성격: 용기 ${X(Qe.courage,"낮음(겁 많음)","높음")}, 붙임성 ${X(Qe.social,"낮음","높음")}, 성급함 ${X(Qe.haste,"느긋함","높음")}, 호기심 ${X(Qe.curious,"낮음","높음")}${Z.drunk?", 지금 술에 취함":""}.`:"",he?`소속: ${me}${Oe?` (이 소속은 주인공에게 「${Oe}」)`:""}.`:"어느 조직에도 속하지 않은 일반인. 괴이와 비밀 조직의 일은 모른다.",`지금: ${J(Z.scene)}에서 ${Z.doing==="주인공과 대화"?Z.talkFrom??"지나가던 중":Z.doing}${Z.doing==="주인공과 대화"?" 주인공이 말을 걸어 멈춰 섰다":""}.`].filter(Boolean).join(`
+`),Mt=I.guardingPlayer(Z.def.id);return{id:`mob:${D}:${Z.def.id}`,name:ze,lore:Mt?`${vt}
+지금 이 사람은 경비로서 주인공에게 관계자 외 출입 금지 구역에서 나가라고 경고하는 중이다.`:vt,place:J(Z.scene),doing:Z.doing==="주인공과 대화"?Z.talkFrom??Z.doing:Z.doing,...Mt?{tags:["permit","alarm"]}:{}}},At.talkOpts=V=>{let I=z?.findActor(V),Z=I&&!I.following&&!["idle","walk"].includes(I.act)?I.doing:void 0;return{...Z?{doing:Z}:{},tags:I&&z?.canPermit(I.def.id)?["follow","wait","return","permit"]:["follow","wait","return"]}},At.onTags=(V,I,Z)=>{let fe=z;if(!fe)return;let Ye=V.startsWith("mob:")?V.slice(4):I;for(let he of Z)he==="follow"||he==="wait"||he==="return"?fe.setFollow(Ye,he):he==="permit"?fe.permitPlayer():he==="alarm"&&fe.threatAlarm(Ye)};let N={x:0,y:0};At.nearPerson=()=>{let V=z;return!V||!q?null:V.inScene(q).filter(Z=>Z.def.kind==="named"&&Z.act!=="gone"&&Math.abs(Z.x-N.x)<180).sort((Z,fe)=>Math.abs(Z.x-N.x)-Math.abs(fe.x-N.x))[0]?.def.name??null},At.gift=(V,I,Z)=>{let fe=I.charCodeAt(I.length-1)-44032,Ye=`${A()}{user}: ${V}에게 ${I}${fe>=0&&fe<=11171&&fe%28!==0?"을":"를"} 선물`;i?.field?.record({kind:Z?"gift":"act",text:`${A()}{user} gave ${I} to ${V} as a gift.`,ko:Ye,scene:Fe.place||void 0,who:[V],weight:1,visit:D}).catch(()=>{})};let Me={tick:(V,I)=>{N={x:I.x,y:I.y??0},q&&q!==I.scene&&(Ve(q),W=!1,De(!1)),q=I.scene;let Z=oe();if(!Z)return;let fe=globalThis.__goeiEngine?.world?.player,Ye=fe instanceof ut?fe.core.P:null,he=At.talkTarget?.()??"";he.startsWith("mob:")&&Z.holdTalk(he.slice(4),I.x);let me=fe instanceof ut?fe.core?.has:void 0,Oe=me?me("100")?"남":me("102")?"여":null:null;Z.step(V,{...I,hour:Fe.sec===null?null:Fe.sec/3600%24,armed:!!Ye?.armed,face:Ye?.face??1,sex:Oe});let Qe=Z.events.splice(0);_(Qe),Z.alarmIn(I.scene)?(Ie-=V)<=0&&(Ie=1.6,e.sfx("siren")):Ie=0,te?.step(V,I.scene,I.x,Qe),de(V,I.scene),be=I.scene,we.tick(V,Re.size>0),(ue+=V)>20&&(ue=0,Ve(I.scene))},lifeTime:()=>z?.time??0,cordons:V=>(oe()?.obstacles(V)??[]).filter(I=>I.id.startsWith("cordon")),gear:V=>oe()?.gear(V)??[],toiletBusy:(V,I)=>oe()?.toiletBusy(V,I)??!1,playerToilet:V=>{let I=oe();I&&(I.playerToilet=V)},showerBusy:(V,I)=>oe()?.showerBusy(V,I)??!1,showerUsers:V=>oe()?.showerUsers(V)??[],playerShower:V=>{let I=oe();I&&(I.playerShower=V)},lockerBusy:(V,I)=>oe()?.lockerBusy(V,I)??!1,playerLocker:V=>{let I=oe();I&&(I.playerLocker=V)},playerPeek:V=>oe()?.peekStall(V.scene,V.id),hit:(V,I,Z)=>oe()?.hitBoxes(V,I,Z).length??0,actors:V=>(oe()?.inScene(V)??[]).map(I=>{let Z=I.seat?oe()?.graph.scene(V)?.seats?.[I.seat.i]:void 0,fe=I.following?"ally":I.plan==="chase"||I.act==="argue"&&I.doing==="맞섬"||I.fighting&&!I.following?"foe":void 0;return{id:I.def.id,name:I.def.name,kind:I.def.kind,x:I.x,y:I.y,face:I.face,look:I.def.look,moving:I.act==="walk",clip:I.clip,since:I.clipAt,until:I.clipUntil,icon:I.icon,say:I.say,...fe?{rel:fe}:{},...I.toilet?.kind==="stall"?{toilet:{door:I.toilet.door,open:I.toilet.phase!=="in"||(I.toilet.peek??0)>(oe()?.time??0)}}:{},...I.def.kind==="mob"&&i?.visit?.sendMob&&oe().canTalk(I)?{talk:!0}:{},...I.seat&&Z?{seat:{box:Z.box,dir:I.seat.dir,kind:I.seat.kind,x:I.seat.x,y:I.seat.y,...Z.set?{set:Z.set}:{}}}:{}}}),observer:V=>Ls&&z?Up(z,O(),V,B):null,drawMob:(V,I)=>{I.look&&!qt(I.look)&&jn(I.look),I.look&&Go(V,I.look,I.x,I.y,I.face,(z?.time??0)*1e3,I.clip,(I.since??0)*1e3,I.until===void 0?void 0:I.until*1e3)||Pd(V,I)},combat:(V,I)=>at(V,I)},Re=new Map,Pe=new Map,u=new Map,De=V=>{let I=z;for(let[Z,fe]of Re)fe.body.alive=!1,I?.fromFight(Z,fe.body.x,fe.body.y,V);Re.clear();for(let[Z,fe]of Pe)fe.body.alive=!1,I?.fromAlly(Z,fe.body.x,fe.body.y,!1);Pe.clear()};function at(V,I){let Z=z;if(!Z)return;let fe=he=>{let me=V.world.bodies.length;return V.spawn(he),V.world.bodies.length>me?V.world.bodies[V.world.bodies.length-1]:void 0};for(let[he,me]of Re){if(me.scene!==I||!me.body.alive||!V.world.bodies.includes(me.body)){me.body.alive=!1,Z.fromFight(he,me.body.x,me.body.y,!1),Re.delete(he);continue}let Oe=me.body;if(me.body.hp>0&&Oe.brain?.strategy==="flee"){let[Qe,ze]=V.world.bounds??[0,99999];if(me.body.x<Qe+60||me.body.x>ze-60){me.body.alive=!1,Z.fledFight(he,me.body.x,me.body.y),Re.delete(he),we.fled(he);continue}}me.body.hp>0&&me.body.hp<me.body.hpMax*.5&&Z.backup(he),!(me.body.hp>0)&&((me.t+=1/30)<1.5||(me.body.alive=!1,Z.fromFight(he,me.body.x,me.body.y,!0),Re.delete(he)))}let Ye=[...Re.values()].some(he=>he.scene===I&&he.body.alive&&he.body.hp>0);for(let[he,me]of Pe)if(me.scene!==I||!V.world.bodies.includes(me.body)||!Ye||me.body.hp<=0){let Oe=me.body.hp<=0;if(!Oe&&Ye&&me.scene===I&&V.world.bodies.includes(me.body))continue;me.body.alive=!1,Z.fromAlly(he,me.body.x,me.body.y,Oe,me.body.hp),Pe.delete(he)}if(Ye)for(let he of[...Z.followers]){let me=Z.actors.find(ze=>ze.def.id===he);if(!me||Pe.has(he)||me.scene!==I||me.fighting||["down","dead","gone","door"].includes(me.act))continue;let Oe=me.def.look??me.def.name;if(!qt(Oe)){jn(Oe);continue}let Qe=fe({kind:`ally-char:${Oe}`,x:me.x,y:me.y});if(!(Qe instanceof Er)){Qe&&(Qe.alive=!1);continue}if(!Z.toAlly(he)){Qe.alive=!1;continue}if(Qe.hp=Math.max(1,Math.min(Qe.hpMax,me.hp&&me.hp>0?me.hp:Qe.hpMax)),Qe.dir=me.face,Z.noAssist(me.def.name)){let ze=$l(me.def.name,"allyHit")?.act;Qe.passive=ze==="attack"?"attack":ze==="avoid"||ze==="flee"||ze==="cower"?"keep":"stay"}Pe.set(he,{body:Qe,scene:I})}if(Ye&&Pe.size){let he=V.world.player;if(he.hp<(u.get("player")??he.hp)||[...Pe].some(([Oe,Qe])=>Qe.body.hp<(u.get(Oe)??Qe.body.hp)))for(let Oe of Pe.values()){let Qe=Oe.body;Qe.passive==="attack"&&(Qe.provoked=!0)}u.set("player",he.hp);for(let[Oe,Qe]of Pe)u.set(Oe,Qe.body.hp)}for(let he of Z.challengers(I)){let me=he.def.look??he.def.name;if(!qt(me)){jn(me);continue}let Oe=fe({kind:`ai-char:${me}`,x:he.x,y:he.y,npcPerks:[]});if(!Oe)continue;if(!(Oe instanceof Er)){Oe.alive=!1;continue}if(!Z.toFight(he.def.id)){Oe.alive=!1;continue}he.base&&(Oe.base=he.base,Oe.stat=dn(he.base),Oe.baseHp=Oe.stat.hp),Oe.hp=Math.max(1,he.hp??Oe.hpMax),Oe.hpMax=Math.max(1,he.hpMax??Oe.hpMax),Oe.label=he.def.name,Oe.dir=he.face,he.temper&&(Oe.brain.persona.courage=he.temper.courage),$d(Oe,he.perks??[],!!he.drunk);let Qe=Z.mobFaction(he),ze=he.def.kind==="named",vt=ze&&he.doing!=="맞섬",Mt=vt?"hostile toward {user}":ze?"fought back after being hit":cc(he.def.archetype)?`responding to a${se.get(I)==="murder"?" murder":"n assault"} report`:Qe?`${Qe}, hostile`:"picked a fight";be=I;let Jt=vt?"{user}에게 적대":ze?"맞고 맞받아침":cc(he.def.archetype)?`${se.get(I)==="murder"?"살인":"폭행"} 신고로 출동`:Qe?`${Qe}, 적대`:"시비";we.joined(A().trim(),I,he.def.id,he.def.archetype??he.def.name,Mt,Jt),Re.set(he.def.id,{body:Oe,t:0,scene:I})}}let je=Ap({map:()=>{let V=e.worldSave?.get()?.player;if(V&&t.scenes.some(Z=>Z.id===V.scene))return{...t,start:{scene:V.scene,x:V.x,...V.y!==void 0?{y:V.y}:{}}};let I=`fb_${t.start.scene}`;return l.faction==="B00"&&t.scenes.some(Z=>Z.id===I)?{...t,start:{...t.start,scene:I}}:t},homeSide:()=>l.faction==="B00"?"fb":"hq",openPlace:()=>{},bark:()=>null,chooseFloor:(V,I)=>e.chooseFloor(V,I),sfx:V=>e.sfx(V),visitors:V=>{let I=r.filter(me=>S[me.room]===V&&!!qt(me.name)),Z=t.scenes.find(me=>me.id===V);if(!Z||!I.length)return[];let[fe,Ye]=Z.lane??[vi,mr],he=[[.36,.55],[.5,.35],[.62,.75],[.44,.9],[.72,.45],[.28,.8]].map(([me,Oe])=>[Z.length*me,Oe]);return I.slice(0,he.length).map((me,Oe)=>({name:me.name,x:he[Oe][0],y:fe+(Ye-fe)*he[Oe][1],face:he[Oe][0]>Z.length/2?-1:1}))},life:Me,entered:(V,I,Z)=>{Fe.place=V.name,Y();let fe=qd(V.id),Ye=Lp(ee??qd(I.id),fe);fe&&(ee=fe);let he=(Ye?o().region:o().scene)*60;Fe.sec!==null&&(Fe.sec+=he),i?.field?.record({kind:"move",text:`${A()}{user} moved to ${V.name}.`,ko:`${A()}{user}: ${V.name}(으)로 이동`,scene:V.name,weight:1,visit:D,fact:{key:"{user} location",value:V.name}}).catch(()=>{})},overlay:(V,I,Z)=>{let fe=z,Ye=q?t.scenes.find(he=>he.id===q):void 0;if(fe&&Ye&&fe.alarmIn(Ye.id)){let he=re.zoom,me=Z.x/he;_p(V,Ye.length,(Ye.lane??[vi,mr])[0],he,performance.now()/1e3,me-re.w,me+re.w)}e.overlay?.(V,I,Z)},hour:()=>Fe.sec===null?null:Fe.sec/3600%24,shop:V=>e.shop?.(V)??null,sat:()=>{let V=Gp(o(),Fe.sec===null?null:Fe.sec/60);if(!V.length||!e.choose)return;let I=Fe.sec===null?null:xs(Fe.sec);e.choose({title:"시간 보내기",lines:I?[`지금 ${I}`]:[],options:[...V.map(Z=>Z.label),"그냥 있기"],cancel:!0}).then(Z=>{let fe=Z>=0?V[Z]:void 0;if(!fe)return;Fe.sec!==null&&(Fe.sec+=fe.minutes*60),(Fe.sec===null?"":xs(Fe.sec))&&i?.field?.record({kind:"act",text:`{user} waited until ${A().trim()}.`,ko:`{user}: ${A().trim()}까지 시간 보냄`,scene:Fe.place||void 0,weight:1,visit:D,fact:{key:"field time",value:A().trim()}}).catch(()=>{})}).catch(()=>{})},busy:()=>typeof document<"u"&&!!document.querySelector(".hq-talk, .hq-over:not(:empty)")},V=>r0(V));return{visitReady:c,visitor:()=>s,hub:()=>je,goto:V=>je.goto(V),isOpen:()=>!1,dispose:()=>{typeof window<"u"&&(window.removeEventListener("goei:talk-closed",L),window.removeEventListener("keydown",F)),T?.(),ce?.();let V=globalThis;V.__goeiWallet===C&&delete V.__goeiWallet,z&&V.__goeiWorld===z&&delete V.__goeiWorld},mount(){},onReturn(){},unmount(){}}}function Zd(n){return n instanceof ut?ki(n.art.key):-230}function Ex(n,e,t,i){let r=n.player,o=r instanceof ut?r:null,s=r.label??"",[a,c,l,h,m]=n1[s]??[5,5,5,5,5],p=E=>`${Math.round(E)}%`,x=i1[s]??{},k=E=>{let P=Object.keys(Gn).find(C=>Gn[C]===E);return P?P.replace(/^Key/,""):"?"},g=(E,P,C,D)=>({key:k(C),label:E,icon:P,name:x[D]?.[0]??E,id:D}),b=[g("약공","punch","light",""),g("강공","kick","heavy",""),...x.사격?[g("사격","gun","shoot","사격")]:[],...x.충전0||x.충전1?[g("충전","bolt","charge",x.충전1?"충전1":"충전0")]:[],...x.고유기?[g("기술","wave","skill","고유기")]:[],...x.필살?[g("필살","star","super","필살")]:[]],v=o?.perks,T=v?.active?[...[...v.ranks].map(([E,P])=>{let C=Ai.find(S=>S.name===E),D=["일반","희귀","특급"][v.topGrade(E)]??"일반";return{name:E,cat:C?.cat??"",effect:C?.eff??"",cond:C?.cond||void 0,rank:[P,C?.rank??P],grade:D,badge:X0(E,D)}}),...[...v.traits].map(E=>{let P=va.find(C=>C.name===E);return{name:E,cat:"특성",effect:P?.good??"",cost:P?.cost,trait:!0,badge:X0(E)}})]:[],A=Object.entries(i).filter(([,E])=>E>0).map(([E,P])=>({label:mn[E]?.name??E,count:P}));return{name:s,team:t,state:"필드",face:o?lr(o.art.key,64):null,body:o?Cu(o.art.key):null,hp:Math.round(r.hp),maxHp:Math.round(r.hpMax),base:[{label:"힘",v:a,what:"몸으로 때리는 기술 피해"},{label:"민",v:c,what:"총·투척 피해, 속도"},{label:"체",v:l,what:"체력, 받는 피해"},{label:"지",v:h,what:"이능 기술 피해, 기술 쿨"},{label:"정",v:m,what:"필살 충전, 상태 이상·정신 피해"}],derived:[{label:"체력",v:(500+l*100).toLocaleString()},{label:"근접",v:String(100+(a-5)*8)},{label:"사격",v:String(100+(c-5)*8)},{label:"이능",v:String(100+(h-5)*8)},{label:"받는 피해",v:p(100-(l-5)*2-(m-5)*2)},{label:"속도",v:String(100+(c-5)*3)},{label:"기술 쿨",v:p(100-(h-5)*4)},{label:"필살 충전",v:p(100+(m-5)*6)}],skills:b,pick:E=>{let P=b[E],C=P?.id?x[P.id]:void 0;return{skill:E,desc:C?.[3]&&C[3]!==C[0]?[C[3]]:[],nums:C?`판정 ${C[1]} · 속성 ${C[2]}`:""}},perks:T,perkSlots:T.length,quick:(e.items??[]).map(E=>({label:E.label,count:E.count})),bag:A,bagSlots:Rr,money:e.field?.wallet??""}}function Px(n,e){let t=n.player,i=n.boss(),r=n.floor;return{agent:{name:t.label??"쟈알디",color:t instanceof ut?t.art.cfg.color:"#c0453a",portrait:t instanceof ut?lr(t.art.key,64,t.dir<0):null},hp:t.hp,maxHp:t.hpMax,energy:t.skillCd>0?75-t.skillCd:75,maxEnergy:75,gauge:t.gauge,armor:t.armor,weapon:Ix(n)??(t.core?null:{name:"권총",mag:t.ammo,magMax:t.mag,reserve:t.reserve,reload:t.moveKey==="reload"?t.mf/4:null}),items:n.items.map(o=>({id:o?.id,label:o?.label??"",count:o?.n??0})),field:Fe.sec!==null||Fe.place||n.stage?.id==="hq"&&wn.won!==null?{clock:Fe.sec===null?void 0:xs(Fe.sec),place:Fe.place||void 0,wallet:wn.won===null?void 0:Tx(wn.won)}:void 0,floor:{depth:"",name:r.title},perks:t instanceof ut&&t.perks.active?vx(t):void 0,boss:i?{name:i.label,hp:i.hp,max:i.hpMax}:null,message:n.subtitle&&n.tick-n.subtitleAt<90?n.subtitle.text:void 0,meters:[...t.guarding||t.guardMeter<100?[{label:"가드",v:t.guardMeter,max:100,color:"#9ad08a"}]:[],...t instanceof ut&&t.dodgeMeter<t.dodgeMax?[{label:"회피",v:t.dodgeMeter,max:t.dodgeMax,color:"#8fc6e8"}]:[]],status:(t.status?.view()??[]).map(o=>({label:`${o.label}${o.stacks>1?`×${o.stacks}`:""}${o.t!==null?` ${Math.ceil(o.t)}`:""}`,good:!1})),compact:e.touchShown,device:e.touchShown?"touch":e.input.last,navigation:Z1(n)}}function Ix(n){let e=n.notes.held;return e?{name:e.name,mag:e.uses,magMax:e.max,reserve:0,reload:null}:null}function $d(n,e,t=!1){n.npcPerks=[...e],n.base={...n.base};for(let o of e){let s=Pp(o);s?.reuse&&n.perks.add(s.reuse)}let i=n.brain.persona;if(e.includes("강적")){let o=["str","dex","con","int","wil"];for(let s=0;s<5;s++)n.base[o[Math.floor(Math.random()*o.length)]]++;n.stat=dn(n.base),n.baseHp=n.stat.hp,n.hp=n.hpMax=n.stat.hp,n.elite=!0,n.label=`${n.label} (강적)`}if(e.includes("스탯 뻥튀기")){for(let o of["str","dex","con","int","wil"])n.base[o]=Math.round(n.base[o]*Is.stat*10)/10;n.stat=dn(n.base),n.baseHp=n.stat.hp,n.hp=n.hpMax=n.stat.hp}e.includes("체력 뻥튀기")&&(n.baseHp=n.hpMax=Math.round(n.hpMax*Is.hp),n.hp=n.hpMax),e.includes("방어막")&&(n.shield=n.shieldMax=Math.round(n.hpMax*.1)),e.includes("자리 지킴")&&(i.courage=1),e.includes("싸움꾼")&&(i.aggression=Math.min(1,i.aggression+.2)),e.includes("술기운")&&t&&(n.stat={...n.stat,taken:n.stat.taken*.8},n.npcGap=1.2);let r=n.brain.squad;e.includes("협공")&&r&&(r.cap+=1)}function T2(){At.endVisit?.(!1)}function R2(n,e){M0(fi);let t=D1(Sx("goei-game-audio")),i=null;async function r(){let O=e?.field;if(!O?.entry)return!0;let q=await O.entry().catch(()=>null);for(;q&&!q.allow;){if(await l.choose({title:"지금은 들어갈 수 없어요",lines:[q.reason??""],options:["닫기","밖에 있어요"]})!==1)return!1;O.override?.("outside"),q=await O.entry().catch(()=>null)}return q?.notice&&await l.choose({title:"알림",lines:[q.notice],options:["확인"]}),!0}let o=e?.uiPrefs,s=o?{load:async()=>await o.load().catch(()=>null)??Ss.load(),save:O=>{o.save(O),Ss.save(O)}}:void 0,a=null;Hn.killOk=()=>l.settings.npcKill,Hn.permaDeath=()=>l.settings.deathMode==="perma";let c=new gl;e?.assets&&o1(O=>e.assets.url("ui-badges",O));let l=Q1(n,{synth:!0,charWindow:{isOpen:()=>c.open,canOpen:()=>!!z&&!Ie.blocking?.(),toggle:O=>c.toggle(O),key:O=>c.key(O)},bag:{available:()=>!!i?.inHub&&!!a,open:()=>a?.openBag()},store:s,title:fc.title,sub:fc.sub,pauseInfo:()=>"",onNew:async()=>{await r()&&i?.start_new()},onContinue:async()=>{await r()&&i?.start_new()},hasSave:()=>!1,onRetreat:()=>e?.visit?At.endVisit?At.endVisit(!0):e.close?.():i?.endRun("withdraw"),onTitle:()=>i?.toTitle(),toLocal:e?.viewport?(O,q,X)=>e.viewport.toLocal(O,q,X):void 0,field:e?.visit?{onExit:()=>e.close?.(),fullscreen:e.viewport&&"mode"in e.viewport?{enter:O=>e.viewport.enter(O),exit:()=>e.viewport.exit(),mode:()=>e.viewport.mode??null}:void 0}:void 0}),h=new uc;globalThis.__goeiFieldFx=h,h.sfx=O=>t.event({type:O==="super"?"super":"hit",kind:O==="slam"?"super":void 0,strength:3});let m=new Map;e?.visit&&e.assets&&jx(e.assets,h,m);let p=e?.visit?x1(l.stage.ui,e.visit,e.field,O=>At.mobOf?.(O)??null,{opts:O=>At.talkOpts?.(O)??{},onTags:(O,q,X)=>At.onTags?.(O,q,X),line:(O,q)=>At.cueLine?.(O,q)??null,busyCell:O=>At.busyCell?.(O)??null}):null;At.talkTarget=()=>p?.target()??"";let x=m2({visit:p?O=>{O&&p.open(O)}:void 0,layer:l.stage.ui,bridge:e,settings:()=>l.settings,agent:()=>L,day:()=>Fe.sec===null?0:Math.floor(Fe.sec/86400),photo:O=>e?.photo?.(O)||p2[O],sfx:O=>t.play(O),onOpen:()=>{}});globalThis.__goeiNpc=x,globalThis.__goeiStage=l.stage,Object.assign(globalThis,{__goeiTouch:l.touch,__goeiInput:l.input});let k=new Pr;k.manual=()=>{let O=l.input.axis();return O.x!==0||O.y!==0},globalThis.__goeiAuto=k;let g=l.input.on((O,q)=>{!q||O!==St.auto||!k.on&&!Pr.fight(z)||(k.setOn(!k.on),l.touch.setAuto(k.on))});aa(e?.visit?2.625:2.75),globalThis.__goeiSetPixel=aa;let b=0,v={id:"itemroom",label:"아이템 진열실",firstFloor:()=>({id:"itemroom",title:"아이템 진열실",length:3200,startX:300,exitX:1/0,banner:"아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기",encounters:[{triggerX:0,lockFrom:0,lockTo:3200,waves:[[{kind:"dummy",x:1600,y:560},{kind:"dummy",x:2400,y:620}]]}]}),nextFloor:()=>null},T=(()=>{try{let O=new URLSearchParams(location.search).get("ai");return O&&O in bo?O:"normal"}catch{return"normal"}})(),A={id:"spar",label:"대련",firstFloor:()=>({id:"spar-room",title:"대련",length:2400,startX:500,exitX:1/0,banner:`대련 · 전투 AI (${T}) · 1:1 뒤 1:2`,encounters:[{triggerX:0,lockFrom:0,lockTo:2400,waves:[[{kind:"ai-eileen",x:1100,y:580}],[{kind:"ai-eileen",x:1300,y:540},{kind:"ai-eileen",x:200,y:640}]]}]}),nextFloor:()=>null},E={id:"versus",label:"대전",firstFloor:()=>({id:"versus-room",title:"대전",length:1280,startX:380,exitX:1/0,lane:[_d,_d],banner:"",encounters:[{triggerX:0,lockFrom:0,lockTo:1280,waves:[[{kind:di(1)?`ai-char:${di(1)}`:"ai-char",x:900,y:_d}]]}]}),nextFloor:()=>null},P=new po(bo[T].melee),C=0,D=0,S=new po(bo[T].melee),w=new Set,B=(O,q)=>{if(O.kind.startsWith("ally-char:")&&q.player instanceof ut){let X=O.kind.slice(10),N=qt(X);if(!N)return jn(X),ys(O,q);let Me=++D,Re=new Er(q.player.clips,N,{id:`ally${Me}`,grade:"B",difficulty:T,persona:{aggression:.6,patience:.5,zoning:.3,courage:.85},seed:5e3+Me,squad:S,label:N.cfg.name,side:"ally"});return Re.x=O.x,Re.y=O.y,ir[N.cfg.name]||(Re.base=rr(Math.random),Re.stat=dn(Re.base),Re.baseHp=Re.hp=Re.hpMax=Re.stat.hp),$d(Re,Bs(Math.random,ir[N.cfg.name]?"named":"fighter")),Re}if((O.kind==="ai-char"||O.kind.startsWith("ai-char:")||O.kind==="ai-eileen")&&q.player instanceof ut){let X=O.kind.startsWith("ai-char:")?O.kind.slice(8):"",N=X?qt(X):q.player.art;if(!N)return jn(X),ys(O,q);C===0&&(P=new po(bo[T].melee));let Me=++C,Re=[{aggression:.75,patience:.35,zoning:.2,courage:.9},{aggression:.35,patience:.8,zoning:.3,courage:.8},{aggression:.4,patience:.5,zoning:.85,courage:.7}],Pe=new Er(q.player.clips,N,{id:`ai${Me}`,grade:"B",difficulty:T,persona:Re[(Me-1)%Re.length],seed:1e3+Me,squad:P,label:`AI ${N.cfg.name} ${Me}`});return Pe.x=O.x,Pe.y=O.y,ir[N.cfg.name]||(Pe.base=rr(Math.random),Pe.stat=dn(Pe.base),Pe.baseHp=Pe.hp=Pe.hpMax=Pe.stat.hp),O.npcPerks||$d(Pe,Bs(Math.random,ir[N.cfg.name]?"named":"fighter")),Pe}if(Gi[O.kind]){let X=O;return W0(O.kind,O.x,O.y,()=>q.rand(),{elite:O.elite,affixes:X.affixes})}return!O.kind.startsWith("dummy")&&!w.has(O.kind)&&(w.add(O.kind),console.warn("[goei] 적 모듈에 없는 종류 → 임시 적:",O.kind)),ys(O,q)},z=null,L="eileen",F=document.createElement("div");F.style.cssText="position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden",l.stage.root.appendChild(F);let oe=O=>t.attachMedia(O.detail);F.addEventListener(Tl,oe);let te=(()=>{try{return JSON.parse(localStorage.getItem("goei-game-story")??"null")??void 0}catch{return}})();l.menu.onSound=O=>t.play(O==="move"?"uiMove":O==="ok"?"uiOk":"uiBack");let U="",K=()=>{let O=l.settings,q=`${O.master}/${O.music}/${O.sfx}`;q!==U&&(U=q,t.setVolume("master",O.master),t.setVolume("music",O.music),t.setVolume("sfx",O.sfx),t.setVolume("amb",O.sfx*.8),t.setVolume("ui",O.sfx*.7))},J={x:0,y:0,d:0,w:null},ne=O=>{let q=O.player;J.w!==O&&(J={x:q.x,y:q.y,d:0,w:O});let X=Math.hypot(q.x-J.x,(q.y-J.y)*1.5);if(J.x=q.x,J.y=q.y,q.airborne||X>60)return void(J.d=0);J.d+=X,J.d>=(q.running?75:55)&&(J.d=0,t.event({type:"step",x:q.x,vol:q.running?.9:.6}))};globalThis.__goeiStoryStart=O=>Md[O]||Rs[O]?se.cutscene(O):se.say(O);let se=up(F,{getAgent:()=>L,sfx:O=>t.event({type:"custom",name:O}),shake:(O,q)=>l.fx.onGameEvent({type:"shake",ms:O,amp:q}),anchor:O=>{if(O!=="agent"||!z)return null;let q=l.canvas.parentElement,X=/translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(q.style.transform),N=l.stage.scale||1,Me=q.offsetLeft+(X?+X[1]:0)-F.offsetLeft,Re=q.offsetTop+(X?+X[2]:0)-F.offsetTop,Pe=z.player,u=Math.max(200,Math.min(1e3,Pe.x-z.camX)),De,at=F.ownerDocument.querySelector(".tp");if(at&&at.offsetParent){let I=0;for(let Z=at;Z&&Z!==F.offsetParent;Z=Z.offsetParent)I+=Z.offsetLeft;for(let Z of at.querySelectorAll(".tp-b:not(.item):not(.top)")){if(!Z.offsetWidth||getComputedStyle(Z).display==="none")continue;let fe=I-F.offsetLeft+new DOMMatrix(getComputedStyle(Z).transform).m41;fe>F.clientWidth/2&&(De=Math.min(De??1/0,fe))}}let st=Me,je=Math.min(De??1/0,Me+1280*N),V=Dx(z,u);return V&&(st=Math.max(st,Me+V[0]*N),je=Math.min(je,Me+V[1]*N)),{x:Me+u*N,y:Re+Math.max(120,Pe.y-Pe.z-(z.hintShown?362:290))*N,minX:st,maxX:je}},emit:(O,q)=>z?.emit({type:"custom",name:O,data:{arg:q}}),paused:()=>l.paused},{saved:te});globalThis.__goeiStory=se;let be=()=>{try{localStorage.setItem("goei-game-story",JSON.stringify(se.flags))}catch{}},we=O=>{if(se.isBlocking()){if(O.code==="Escape")se.skip();else if(/^Digit[1-9]$/.test(O.code))se.choose(Number(O.code.slice(5))-1);else if(["Space","Enter","KeyE","KeyZ","KeyA"].includes(O.code))se.advance();else return;O.preventDefault(),O.stopImmediatePropagation()}};window.addEventListener("keydown",we,!0);let Ve=O=>{if(!c.open||O.pointerType==="mouse")return;let q=l.canvas,X=q.getBoundingClientRect();!X.width||!X.height||O.clientX<X.left||O.clientX>X.right||O.clientY<X.top||O.clientY>X.bottom||c.tap((O.clientX-X.left)*q.width/X.width,(O.clientY-X.top)*q.height/X.height)&&O.preventDefault()};window.addEventListener("pointerdown",Ve,!0);let ye=null,ee=document.createElement("div");ee.className="goei-engine-elev",ee.hidden=!0,F.appendChild(ee);let W=O=>{ee.hidden=!0;let q=ye;ye=null,q?.(O)},_=-1,ge=()=>[...ee.querySelectorAll("button")],Be=O=>{_=O,ge().forEach((q,X)=>q.classList.toggle("sel",X===O))},$=O=>{let q=ge();for(let X=1;X<=q.length;X++){let N=(_+O*X+q.length*2)%q.length;if(!q[N].disabled)return Be(N)}},Y=(O,q)=>{ye=q,ee.innerHTML=O.map((X,N)=>`<button type="button" data-i="${N}"${X.open&&!X.here?"":" disabled"}${X.here?' class="here"':""}>${X.label}</button>`).join(""),ee.hidden=!1,Be(ge().findIndex(X=>!X.disabled)),t.play("panelButton")};ee.addEventListener("click",O=>{let q=O.target.closest("button");q&&!q.disabled&&W(Number(q.dataset.i))});let ie=O=>{if(!ee.hidden){if(O.code==="Escape")W(null);else if(O.code==="ArrowUp"||O.code==="ArrowLeft")$(-1);else if(O.code==="ArrowDown"||O.code==="ArrowRight")$(1);else if(O.code==="Enter"||O.code==="Space"||O.code==="KeyE")!O.repeat&&_>=0&&!ge()[_]?.disabled&&W(_);else if(/^Digit[1-9]$/.test(O.code)){let q=O.code.slice(5),X=q==="4"?"B1":q==="5"?"B2":q==="6"?"B3":q,N=[...ee.querySelectorAll("button")].find(Me=>Me.textContent===X);N&&!N.disabled&&W(Number(N.dataset.i))}else return;O.preventDefault(),O.stopImmediatePropagation()}};window.addEventListener("keydown",ie,!0);let ce=Rx(e,{chooseFloor:Y,sfx:O=>{t.play(O),O==="siren"&&t.duck(1.7,.35)},overlay:p?(O,q,X)=>p.draw(O,q,X):void 0,choose:O=>l.choose(O),shop:O=>a?.open(O)??null,worldSave:{get:()=>a?.world(),set:O=>a?.setWorld(O)},rules:()=>{let O=l.settings;return Kp({scene:O.tScene,region:O.tRegion,talk:O.tTalk,fight:O.tFight,waitShort:O.tWaitShort,waitLong:O.tWaitLong})}});a=Wp({root:l.stage.ui,store:e?.fieldState,minute:()=>Fe.sec===null?null:Fe.sec/60,balance:()=>wn.won,pay:(O,q)=>At.pay?.(O,q)??Promise.resolve(null),heal:O=>{let q=i?.world?.player;q&&(q.hp=Math.min(q.hpMax,q.hp+q.hpMax*O))},record:(O,q)=>At.record?.(O,q),rng:Math.random,nearPerson:()=>At.nearPerson?.()??null,fact:(O,q)=>At.fact?.(O,q),gift:(O,q,X)=>At.gift?.(O,q,X)});let ke=!1,xe=e?.onHidden?.(O=>{ke=O,O&&(p?.close(),l.mode==="play"&&!l.paused&&l.openPause(),t.setPaused(!0))}),de=()=>{se.cancel(),F.style.visibility=l.paused?"hidden":""};Hn.sfx=O=>t.event(O),Hn.openDraft=(O,q)=>Du(l.canvas.parentElement??document.body,O,{world:z,offers:q});let Ie={frozen:()=>h.frozen(),stages:[v2,M2,q0,v,A,E],enemyFactory:B,hq:ce,hqLayer:()=>l.stage.ui,hud:!1,blocking:()=>!!p?.isOpen()||se.isBlocking()||!ee.hidden||x.isOpen()||!!a?.isOpen(),covered:()=>se.isVideoPlaying(),listeners:[O=>{t.event(O),!(i?.inHub&&(O.type==="enter:floor"||O.type==="custom"))&&(l.fx.onGameEvent(O),se.event(O.type,O),O.type==="run:end"&&be())}],surface:{canvas:l.canvas,ctx:l.ctx},paused:()=>l.paused,openTitle:()=>{de(),z=null,l.openTitle()},onPlay:()=>l.play(),frame:O=>{let q=!!i?.inHub&&(!!ce.isOpen?.()||!ee.hidden)||x.isOpen()||!!p?.isOpen()||l.menu.isOpen||c.open;l.touch.setMode(q?"dialog":"play"),l.touch.setVisible(!se.isVideoPlaying()&&(l.mode==="play"||l.menu.isOpen));let X=!!z?.player?.core;for(let N of["light","heavy","dodge","block","unique","ult"])l.touch.setOff(N,!X);k.on&&!Pr.fight(z)&&(k.setOn(!1),l.touch.setAuto(!1)),l.touch.setOff("auto",!k.on&&!Pr.fight(z)),z?.player instanceof ut&&z.player.auto!==k&&(z.player.auto=k),h.opt={shake:l.settings.shake,flash:l.settings.flash,numbers:l.settings.numbers},h.update(l.paused?0:O);{let N=h.camera();l.canvas.style.translate=N.x||N.y?`${N.x}px ${N.y}px`:""}K(),t.setPaused(ke||l.paused),t.setCutscene(se.isVideoPlaying()),se.update(O),l.frame(O),l.input.endFrame()},overlay:(O,q,X)=>{if(!q)return;t.setListener(q.camX+640,640),ne(q),O.save(),O.scale(re.zoom,re.zoom),O.translate

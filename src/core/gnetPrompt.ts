@@ -1,11 +1,14 @@
 // 괴담넷 요청문 만들기 (원본 RC.gnetPrompt + LB makeIntro/makeOutro).
 // 지침 문장은 카드의 GNet 로어북 섹션(옛 카드는 LB Backend도)을 그대로 읽고, CBS는 직접 푼다.
 // 결과는 언제나 두 메시지: system(틀 + 작업 지침 + 출력 형식) / user(참고 자료 + 최근 본문 + 현재 작업).
+import { sitePicList } from './sitepics';
 import { hasAttachment } from './attach';
+import { viewSite, type BoardSite } from './boards';
+import { GUIDE_LABEL, type GuideName } from './guides';
 import { evaluate } from './cbs';
 import {
-  activityContext, consList, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
-  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField, styleSwitched, GN_STYLE_NAME, gnetStyle } from './gnet';
+  activityContext, findPost, gnetSettings, gnetVars, keyFigures, HISTORY, incomingTask, LIMITS, protectedPost, countText, trimTokens, postLimit,
+  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
@@ -20,6 +23,9 @@ const REQUIRED_GNET = [
 ];
 const REQUIRED_LB = ['SYSTEM', 'OUTPUT', 'JAILBREAK', 'JOB'];
 
+/** 사이트마다 따로 쓰는 지침 (2026-11-08 사용자: 공용 없이 전부 따로) */
+const SITE_GUIDE: Record<BoardSite, GuideName> = { gn: 'GNet', gal: 'Gal', wpf: 'Wpf', sm: 'Salmon' };
+
 export interface GnetBooks {
   read(name: string): string;
   /** 출력 언어 문장 (고급 설정 → 생성 언어) */
@@ -28,15 +34,22 @@ export interface GnetBooks {
 
 /** GNet 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다. 생성 틀(SYSTEM 등)은 옛 카드면 LB Backend에 있다 */
 export function gnetBooks(src: RefSource): GnetBooks {
-  const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, 'GNet') };
-  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
+  const name = SITE_GUIDE[viewSite(src.chat.scriptstate)];
+  const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, name) };
+  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`${GUIDE_LABEL[name]} 지침의 ${k} 섹션이 없어요.`);
   applyAdvanced(src.chat.scriptstate);
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
+  const cs = gnetSettings(src.chat.scriptstate).counts;
   return {
     language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
+        .replace(/__SITE_PICS__/g, () => sitePicList(src.char))
+        .replace(/__GN_POST_RANGE__/g, countText(cs.post))
+        .replace(/__GN_CMT_RANGE__/g, countText(cs.cmt))
+        .replace(/__GN_ACT_RANGE__/g, countText(cs.act))
+        .replace(/__GN_REPLY_RANGE__/g, countText([Math.min(LIMITS.replies_min, LIMITS.replies), LIMITS.replies]))
         .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
         .replace(/<!--[\s\S]*?-->/g, '')
         .trim();
@@ -104,6 +117,9 @@ function activityRules(b: GnetBooks, posts: ActivityPost[]): string {
  * 댓글 시각 (v0.16.32): 새 댓글마다 모델이 「HH:MM」을 쓴다. 앱이 글 시각·부모 댓글·지금 사이로 맞추므로(gnet.ts stampComments)
  * 형식만 알려 준다. 옛 카드 지침에는 time 칸이 없어서 코드에서 붙인다.
  */
+/** 분류 (2026-11-08): 글마다 그 게시판식 말머리를 하나. 옛 지침에는 tag 칸이 없어서 코드에서 붙인다 */
+export const TAG_RULE = 'Post category: every post (new or retained) also has "tag": one short category label in Korean, the way this board sorts its posts (a 말머리). Reuse labels already used on the board when they fit; supplied tags on retained posts are records, never change them.';
+
 export function commentTimeRule(now: string): string {
   return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. `
     + `It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ''}. `
@@ -114,13 +130,13 @@ export function commentTimeRule(now: string): string {
 export function boardJson(posts: GPost[]): string {
   return JSON.stringify({
     posts: posts.map((p) => ({
-      author: p.nick, id: p.id, title: p.title, time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? '', date: p.date, views: p.views, upvotes: p.votes,
+      author: p.nick, id: p.id, ...(p.tag ? { tag: p.tag } : {}), title: p.title, time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? '', date: p.date, views: p.views, upvotes: p.votes,
       content: p.body, mine: p.mine, comments: p.comments.map((c) => ({ author: c.nick, ...whenField(p, c), content: c.body, parent: c.parent, mine: c.mine })),
     })),
   });
 }
 
-/** 주요 인물 닉네임 (write = 이번 응답에 갱신을 쓰게 함). 반응 그림 지침. 라이트보드 미니보드 (2026-11-06) */
+/** 주요 인물 닉네임 (write = 이번 응답에 갱신을 쓰게 함). 라이트보드 미니보드 (2026-11-06) */
 function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline: string; format: string } {
   const s = gnetSettings(src.chat.scriptstate);
   const parts: string[] = [];
@@ -133,7 +149,6 @@ function boardExtras(src: RefSource, b: GnetBooks, write: boolean): { guideline:
       format = '\nAlso include a top-level "keyFigures" array (use [] when there are no updates).';
     }
   }
-  if (s.cons) parts.push(fill(b.read('CONS.GUIDELINE'), { CONS: consList(src.chat.scriptstate).map((c) => c.name).join(', ') }));
   return { guideline: parts.filter(Boolean).join('\n\n'), format };
 }
 
@@ -144,29 +159,26 @@ const seed = () => Math.floor(Math.random() * 2147483647).toString(36);
 export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, nick: string, factionNames: Record<string, string>): GnetPrompt {
   const s = gnetSettings(src.chat.scriptstate);
   const b = gnetBooks(src);
-  const range = QUANTITY[s.quantity]?.range ?? '5-7';
   const guideline = [
     `${b.read('LB')}\n\n${b.read('BOARD.GUIDELINE')}`,
-    b.read('AUTO.GUIDELINE').replace(/__GN_POST_RANGE__/g, range),
+    b.read('AUTO.GUIDELINE'),
     `${b.read('ATTACHMENTS')}\n${incomingRules(b, plan)}`,
   ];
   const ex = boardExtras(src, b, true);
   if (ex.guideline) guideline.push(ex.guideline);
-  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}${ex.format}`;
+  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\n${TAG_RULE}${ex.format}`;
   if (s.sampling) {
     // 원본 미니보드 5.0.0: 두 벌 각각 확률을 적게 하고, 요청마다 무작위 씨앗 둘을 넣는다
     format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample both at random from the tails of the distribution so that each has a probability lower than 0.10; put those numbers in top-level postsProb and alternativeProb, and order the two boards by probability descending. The application validates both and uses alternativePosts, the second candidate.'
       + `\n<x-output-seed-a>${seed()}</x-output-seed-a>\n<x-output-seed-b>${seed()}</x-output-seed-b>`;
   }
   const protectedIds: number[] = [];
-  // 성격(괴담갤·괴담넷·세정게…)이 바뀐 뒤 첫 새로고침: 옛 성격의 글을 참고로 주면 모델이 그 결을 이어 가서 바뀐 티가 안 난다 (11-07 사용자) → 보호 글만 주고, 다른 게시판이라고 못 박는다
-  const switched = styleSwitched(src.chat.scriptstate);
   const reference = st.posts.filter((p, i) => {
     const prot = protectedPost(s, p);
     if (prot) protectedIds.push(p.id);
-    return prot || (!switched && i < HISTORY.refresh);
+    return prot || i < HISTORY.refresh;
   });
-  const action = b.read('ACTION.REFRESH') + (switched ? ` The board's character has just changed to ${GN_STYLE_NAME[gnetStyle(src.chat.scriptstate)]}: start it as a different community. Any saved posts listed here come from the previous board and are kept only as protected user records; do not continue their topics, threads, handles or tone.` : '');
+  const action = b.read('ACTION.REFRESH');
   const extras = fill(b.read('EXTENSION.REQUEST'), {
     TIME: dateNow(src.chat), USER_NICK: nick, KEEP_OWN: String(s.keepOwn), KEEP_REPLIED: String(s.keepReplied), PROTECTED: protectedIds.join(','),
     POST_LIMIT: String(postLimit(s)), NEXT_ID: String(st.seq || 100000), ACTION: action, BOARD: boardJson(reference),
@@ -184,7 +196,7 @@ export function postPrompt(src: RefSource, st: GState, input: string, plan: Inco
   const activity = activityContext(st, null);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts), boardExtras(src, b, false).guideline].filter(Boolean).join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity };
+  return { ...pack(src, b, 'THOUGHTS.ACTION', guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}\nAlso give post.tag: one short category label in Korean for this post, the way this board sorts its posts.`, extras, factionNames), activity };
 }
 
 export interface CommentPrompt extends PublicPrompt {
@@ -298,7 +310,7 @@ export function retryMessages(prompt: GnetPrompt, raw: string, error: string): C
 
 /** 본편 요청에 붙이는 기록 앞의 안내문 */
 export function mainContextRules(src: RefSource): string | null {
-  const g = policySections(src.char.globalLore, 'GNet');
+  const g = policySections(src.char.globalLore, SITE_GUIDE[viewSite(src.chat.scriptstate)]);
   return g.MAIN_CONTEXT?.trim() || null;
 }
 

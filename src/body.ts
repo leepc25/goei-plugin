@@ -6,6 +6,7 @@ import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MAR
 import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
+import { BOARD_SITES, boardState, boardView } from './core/boards';
 import { mainContextRules } from './core/gnetPrompt';
 import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
 import { guidePrompt, RP_HEAD } from './core/guides';
@@ -27,6 +28,8 @@ import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
 import { featureModel } from './core/craft';
 import { autoRefreshGnet } from './ui/gnet';
+import { autoRefreshMall } from './ui/malls';
+import { MALL_SITES, mallSettings } from './core/malls';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
@@ -43,8 +46,9 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openRecords, openShop, openWiki } from './ui/app';
-import { isGoeiLore } from './core/install';
+import { openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
+import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
+import { isGoeiLore, isLanding } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
 import { showWorldDataPanel } from './host/datapanel';
@@ -63,7 +67,8 @@ import { settleItemUse, withInventory } from './core/items';
 import { hasShopTag, settleShop } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
-import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
+import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
+import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, recentWalletLines, syncWalletToStatus, walletBalance, walletRecentN, walletSyncOn, walletVars, WALLET_START_DEFAULT } from './core/wallet';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
@@ -314,7 +319,14 @@ function statusShape({ chat }: ChatContext): StatusShape {
   const cfg = colConfig(vars);
   const w = cfg.wallet !== 'off' ? readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT) : null;
   const alive = aliveAnchors(chat);
-  return { cols: usedCols(cfg), wallet: w ? walletBalance(w, alive) : null, ...(w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {}) };
+  // 백일몽 포인트 칸 (core/points.ts): 쓸 때만 장부 값으로 덮고, 최근 거래 줄 수는 가계부 설정과 같게
+  const p = cfg.points !== 'off' ? readPoints(vars) : null;
+  return {
+    cols: usedCols(cfg),
+    wallet: w ? walletBalance(w, alive) : null,
+    ...(w ? { recent: recentWalletLines(w, alive, walletRecentN(vars)) } : {}),
+    ...(p ? { points: walletBalance(p, alive), recentPoints: recentPointLines(p, alive, walletRecentN(vars)) } : {}),
+  };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
@@ -370,20 +382,22 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
  *  지침·명부는 요청마다 다시 읽는다 (캐릭터 번호로 캐시하면 지침·명부를 고쳐도 옛것이 남았다. 명부 읽기는 10ms 안쪽. QC 2026-10-28) */
 function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
   const ss = chat.scriptstate;
-  const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
+  // 게시판 사이트마다 따로 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08)
+  const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view }) => !!view.scriptstate?.[GN_RAW] && gnetSettings(view.scriptstate).context);
+  const wantGnet = boardsOn.length > 0;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
   const wantWiki = wikiContextOn(ss);
   if (!wantGnet && !wantPhone && !wantWiki) return [];
   applyAdvanced(ss);
   const src = { char: { globalLore: char.globalLore }, chat };
-  const rules = { gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
+  const rules = { phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
   const focus = makeFocus(scene, buildRegistry(char.globalLore));
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
-  if (wantGnet && rules.gnet) {
-    const st = readGnet(chat);
-    const own = GN_CONTEXT.tokens;
-    if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rules.gnet!, focus)) });
+  for (const { view } of boardsOn) {
+    const rule = mainContextRules({ char: src.char, chat: view });
+    const st = readGnet(view);
+    if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: GN_CONTEXT.tokens, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rule, focus)) });
   }
   if (wantPhone && rules.phone) {
     try {
@@ -461,6 +475,31 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
       }).catch(() => null)) ?? latest;
     }
+    // 백일몽 포인트 (2026-11-08): ① 포인트 칸 「자동」이면 이 응답의 신분에 맞춰 켜고 끈다(칸 구성 기록도 남겨 옛 응답을 옛 모양으로 읽게)
+    // ② 포인트 칸을 쓰면 상태창 포인트 칸에 장부를 맞춘다 (가계부와 같은 「상태창 잔고 따르기」 설정)
+    {
+      const cur0 = latest ?? chat;
+      const flag = pointsAuto(cur0.scriptstate) ? pointsFlagFor(cur0, isPointsOrg(String(cur0.scriptstate?.['$ib_affiliation'] ?? ''))) : null;
+      const needSync = colConfig(cur0.scriptstate).points !== 'off' && walletSyncOn(cur0.scriptstate) && !!syncPointsToStatus(readPoints(cur0.scriptstate), cur0);
+      if (flag || needSync) {
+        latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const add: Record<string, string> = {};
+          const f = pointsAuto(cur.scriptstate) ? pointsFlagFor(cur, isPointsOrg(String(cur.scriptstate?.['$ib_affiliation'] ?? ''))) : null;
+          if (f) {
+            const vars = { ...(cur.scriptstate ?? {}), [POINTS_ON_VAR]: f };
+            // 칸 구성 기록: 이 응답 다음부터 새 구성 (이 응답은 이미 옛 구성으로 쓰였다)
+            add[POINTS_ON_VAR] = f;
+            add[COL_LOG_VAR] = withColLog(cur.scriptstate, (cur.message ?? []).length, usedCols(colConfig(vars)));
+          }
+          const s = { ...(cur.scriptstate ?? {}), ...add };
+          if (colConfig(s).points !== 'off' && walletSyncOn(s)) {
+            const p = syncPointsToStatus(readPoints(s), { ...cur, scriptstate: s });
+            if (p) Object.assign(add, pointsVars(p));
+          }
+          return Object.keys(add).length ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...add } } : null;
+        }).catch(() => null)) ?? latest;
+      }
+    }
     // 소지품 「사용」 상자: 보낸 것은 사용 기록으로 이 응답에 묶고, 다음 턴이면 비운다 (core/items.ts settleItemUse)
     if (settleItemUse(latest ?? chat, arg.messageIndex)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
@@ -511,9 +550,13 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
     const gnetAuto = gnetSettings(now.scriptstate).auto;
+    // 괴담넷 말고 다른 게시판 사이트 중 매 턴인 곳 (각자 따로 부른다)
+    const otherBoards = BOARD_SITES.filter((site) => site !== 'gn' && gnetSettings(boardState(now!.scriptstate, site)).auto);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
-    if (phoneAuto || gnetAuto || viewAuto || wikiAuto) {
+    // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
+    const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
+    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -524,6 +567,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
         const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
+        const mallFail = (error: unknown) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
         const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
         const model = phoneSettings(now!.scriptstate).model;
@@ -534,14 +578,18 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
             autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
             autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
           ]);
+          for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
           if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
           if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+          for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
           return;
         }
         if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
         if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
+        for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+        for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
       })();
     }
   } catch (error) {
@@ -556,7 +604,7 @@ function unsentRow(): string {
   const p = cardPalette();
   unsentShown();
   return `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span>`
-    + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button>`;
+    + `<button type="button" data-goei-cancel="1" style="${cardButtonStyle()}">취소</button>`;
 }
 
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
@@ -587,16 +635,16 @@ function startCardHtml(body: string, unsent: boolean): string {
 
 /** 기록 카드 없이 놓인 메시지(시작 화면 직접 입력) 아래의 전송 대기 줄 */
 function unsentMarkHtml(): string {
-  return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
+  return `<div data-goei-card="unsent" style="${cardStyle()}">${unsentRow()}</div>`;
 }
 
 /** 시작 메시지로 시작한 첫 장면 아래: 첫 행동을 적어 보내라는 안내와 재선택 (host/openinghint.ts) */
 function openingHintHtml(): string {
   const p = cardPalette();
   openingShown();
-  return `<div data-goei-card="opening" style="${cardStyle()}display:flex;flex-wrap:wrap;margin-top:14px">`
+  return `<div data-goei-card="opening" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span>`
-    + `<button type="button" data-goei-repick="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">재선택</button></div>`;
+    + `<button type="button" data-goei-repick="1" style="${cardButtonStyle()}">재선택</button></div>`;
 }
 
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
@@ -604,11 +652,6 @@ function callCardHtml(target: string): string {
   const p = cardPalette();
   return `<div data-goei-card="call" style="${cardStyle()}">`
     + `<span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
-}
-
-/** Lite 카드의 첫 안내(first_mes). 카드에는 고정색으로 들어 있어 플러그인이 테마 색으로 다시 그린다. 옛 카드 문구도 알아본다 */
-function isLanding(text: string): boolean {
-  return text.includes('data-goei="landing"') || (text.includes('ANOMALY SIMULATION') && text.includes('버튼을 눌러 시작하세요'));
 }
 
 function landingHtml(): string {
@@ -621,7 +664,14 @@ function cardPalette() {
 }
 function cardStyle(): string {
   const p = cardPalette();
-  return `display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  // 채팅 속 카드는 전부 같은 폭 규칙: 왼쪽 정렬, 420px 안팎, 내용만큼 (2026-11-08 사용자: 입력창 위 상자 크기가 제각각, 첫 행동 상자가 너무 길다, 왼쪽 정렬)
+  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+}
+
+/** 카드 안 단추 (상점 카드 「상점 열기」와 같은 모양) */
+function cardButtonStyle(): string {
+  const p = cardPalette();
+  return `flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer`;
 }
 
 /** Lite에서만: 응답이 막 들어와 아직 정리되기 전에도 태그가 보이지 않게, 이동 지시문은 카드로 */
@@ -737,6 +787,18 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
   if (changed && currentTheme() === before) repaintTheme();
 }
 
+/** 대전: 지금 채팅, 대전을 연 채팅, 단추 상태 (같은 값이면 본 화면을 다시 만지지 않는다) */
+let vsChat = '';
+let vsShownChat = '';
+let vsPadKey = '';
+async function onVersusPad(fab: Fab | null): Promise<void> {
+  if (!vsChat) return;
+  vsShownChat = vsChat;
+  await toggleVersus(vsChat, () => void openVersusSettings());
+  vsPadKey = '';
+  await fab?.setVersus(true, vsOpen()).catch(() => {});
+}
+
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과.
 // fab 이 없어도(본 화면 접근 권한 거부) 감시는 돈다: liteNow 가 있어야 요청 손질·로어북 고르기·표시가 된다
 function startWatcher(fab: Fab | null): () => void {
@@ -773,6 +835,12 @@ function startWatcher(fab: Fab | null): () => void {
       shownChat = chatKey;
       // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
       if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
+      // 대전 단추 (설정 「대전」을 켠 PC, 11-08): 채팅을 옮기거나 괴이 채팅을 벗어나면 떠 있던 대전은 멈추고 닫는다
+      vsChat = chatKey;
+      if (vsOpen() && (!next.fabVisible || chatKey !== vsShownChat)) await closeVersus().catch(() => {});
+      const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
+      const padKey = `${pad}:${vsOpen()}`;
+      if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -830,7 +898,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
-    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+    fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })), () => void onVersusPad(fab));
     const f = fab;
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));

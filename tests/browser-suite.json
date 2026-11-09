@@ -5,6 +5,7 @@
     {"name": "install", "fast": true, "file": "tests/install-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "시작 화면 → 저장"},
     {"name": "editor", "fast": true, "file": "tests/editor-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "자체 boot(가짜 risuai, 편집 창 전용)", "note": "세계 편집 → 기록 고치기 → 저장"},
     {"name": "shop", "fast": true, "file": "tests/shop-browser.mjs", "group": "plugin", "args": ["shots"], "timeoutMin": 10, "frame": "tests/qc-settings-harness.mjs", "note": "상점(2026-11-07): 표식 → 카드 → 팝업 → 진열대·흥정·구입·거래 끊음, PC·폰"},
+    {"name": "points-shop", "fast": true, "file": "tests/points-shop-browser.mjs", "group": "plugin", "args": ["shots"], "timeoutMin": 10, "frame": "tests/qc-settings-harness.mjs", "note": "백일몽 포인트 상점(2026-11-08): 복지몰 진열대 포인트 값 → 구입하면 포인트 장부만, PC·폰"},
     {"name": "inv-toggle", "fast": true, "file": "tests/inv-toggle-browser.mjs", "group": "plugin", "args": [], "timeoutMin": 10, "frame": "tests/qc-settings-harness.mjs", "note": "소지품·가계부·상점 켜고 끄기 연계(2026-11-08 전수점검): 방문·표식·사용 자리·칸 구성 기록·메뉴·기본값 불러오기, PC·폰"},
     {"name": "wallet", "fast": true, "file": "tests/wallet-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "가계부 탭 PC·폰"},
     {"name": "wiki-side", "fast": true, "file": "tests/wiki-side-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "위키 목록 위치"},

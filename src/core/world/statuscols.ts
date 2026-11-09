@@ -3,7 +3,7 @@
 // 칸 구성은 채팅 변수 `$st_col_<id>` (on=사용·표시, hide=사용·숨김, off=미사용), 바뀐 기록은 `$st_col_log` (메시지 N부터 이 칸들).
 // 파서(status.ts)는 지금 칸 구성과 기록된 구성으로 먼저 읽고, 칸 수가 안 맞으면 알려진 모양(6·8·9·10)으로 읽는다.
 
-export type ColId = 'date' | 'time' | 'weather' | 'temp' | 'place' | 'target' | 'companions' | 'deployed' | 'identity' | 'wallet';
+export type ColId = 'date' | 'time' | 'weather' | 'temp' | 'place' | 'target' | 'companions' | 'deployed' | 'identity' | 'wallet' | 'points';
 export type ColMode = 'on' | 'hide' | 'off';
 
 export interface ColDef {
@@ -28,13 +28,27 @@ export const STATUS_COLS: ColDef[] = [
   { id: 'deployed', label: '투입', token: 'deployed', locked: false, feature: '투입 판정' },
   { id: 'identity', label: '신분', token: 'identity', locked: false, feature: '유저 신분(조직/직급) 추적' },
   { id: 'wallet', label: '잔고', token: 'balance', locked: false, feature: '가계부' },
+  // 백일몽 포인트 (2026-11-08 사용자): 기본은 자동 — 신분이 백일몽일 때만 칸이 들어가고 아니면 칸 자체가 빠진다 (POINTS_ON_VAR)
+  { id: 'points', label: '포인트', token: 'points', locked: false, feature: '백일몽 포인트' },
 ];
 export const COL_IDS: ColId[] = STATUS_COLS.map((c) => c.id);
 export const colDef = (id: ColId): ColDef => STATUS_COLS.find((c) => c.id === id)!;
 
 export const colVar = (id: ColId) => `$st_col_${id}`;
 export const COL_LOG_VAR = '$st_col_log';
-export const COL_VAR_RE = /^\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet)$/;
+export const COL_VAR_RE = /^\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet|points)$/;
+/** 포인트 칸 「자동」일 때 켜짐 여부 ('1' = 신분이 백일몽). 응답마다 body.ts 가 마지막 신분으로 맞춘다 */
+export const POINTS_ON_VAR = '$st_points_on';
+/** 포인트를 쓰는 조직 (상태창 신분 칸 「조직/직급」의 조직, 시작 소속) */
+export const POINTS_ORG = '백일몽';
+/** 신분·소속 글이 백일몽인가 (「백일몽/사원」「백일몽 주식회사」) */
+export const isPointsOrg = (identity: string) => String(identity ?? '').split(/[/／]/)[0].trim().startsWith(POINTS_ORG);
+/** 포인트 칸만 쓰는 모드: 자동 (사용자가 사용·사용 안 함을 고르기 전 기본) */
+export const AUTO = 'auto';
+/** 자동 + 상태창 상자에서 숨김 */
+export const AUTO_HIDE = 'autohide';
+/** 포인트 칸이 자동인가 (고른 값이 없거나 auto·autohide) */
+export const pointsAuto = (vars: Record<string, unknown> | undefined) => !isMode(vars?.[colVar('points')]);
 
 export type ColConfig = Record<ColId, ColMode>;
 
@@ -46,7 +60,8 @@ export function colConfig(vars: Record<string, unknown> | undefined): ColConfig 
   const out = {} as ColConfig;
   for (const c of STATUS_COLS) {
     const m = v[colVar(c.id)];
-    const mode: ColMode = isMode(m) ? m : 'on';
+    // 포인트 칸: 고른 값이 없거나 「자동」이면 신분이 백일몽일 때만 사용
+    const mode: ColMode = isMode(m) ? m : c.id === 'points' ? (v[POINTS_ON_VAR] !== '1' ? 'off' : m === AUTO_HIDE ? 'hide' : 'on') : 'on';
     out[c.id] = c.locked && mode === 'off' ? 'hide' : mode;
   }
   return out;
@@ -102,6 +117,7 @@ export const KNOWN_SHAPES: ColId[][] = [
   COL_IDS.slice(0, 8),
   COL_IDS.slice(0, 9),
   COL_IDS.slice(0, 10),
+  COL_IDS.slice(0, 11),
 ];
 
 // ── 파서가 쓰는 「지금 채팅의 모양」 (setActiveWorld 처럼 호출 시점에 맞춰 둔다) ──
@@ -160,17 +176,19 @@ const RULE: Record<ColId, string> = {
   companions: 'Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.',
   deployed: 'Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.',
   identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
+  points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `900`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Copy it from `[Previous status]` and change it only by point amounts the story states explicitly.",
   wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it.",
 };
 
-const EXAMPLE_A: Record<ColId, string> = { date: '2025.01.01', time: '02:47 AM', weather: '☀️', temp: '4°C', place: '서울 종로구 거리', target: NONE, companions: NONE, deployed: NONE, identity: '관리국/신입', wallet: '1230000' };
-const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM', weather: '🌫️', temp: '9°C', place: '명일 아파트 3층 복도', target: '명일 아파트', companions: '쟈알디,에일린', deployed: '투입', identity: '관리국/요원', wallet: '1180000' };
+const EXAMPLE_A: Record<ColId, string> = { date: '2025.01.01', time: '02:47 AM', weather: '☀️', temp: '4°C', place: '서울 종로구 거리', target: NONE, companions: NONE, deployed: NONE, identity: '관리국/신입', wallet: '1230000', points: '900' };
+const EXAMPLE_B: Record<ColId, string> = { date: '2025.01.01', time: '10:15 PM', weather: '🌫️', temp: '9°C', place: '명일 아파트 3층 복도', target: '명일 아파트', companions: '쟈알디,에일린', deployed: '투입', identity: '관리국/요원', wallet: '1180000', points: '900' };
 
 /** 🏷️Tag 지침의 상태창 절: 칸 구성에서 형식 줄·규칙·예시를 만든다 */
 export function statusSection(cols: ColId[]): string {
   const fmt = `[▣|${cols.map((id) => colDef(id).token).join('|')}]`;
   const rules = cols.map((id) => RULE[id]).filter(Boolean).map((r) => `- ${r}`);
-  const ex = (v: Record<ColId, string>) => `[▣|${cols.map((id) => v[id]).join('|')}]`;
+  // 포인트 칸이 있으면 백일몽 소속이라 예시 신분도 백일몽으로
+  const ex = (v: Record<ColId, string>) => `[▣|${cols.map((id) => (id === 'identity' && cols.includes('points') ? '백일몽/사원' : v[id])).join('|')}]`;
   return [
     '## Status',
     fmt,

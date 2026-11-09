@@ -4,6 +4,7 @@
 import { DIRECTORY_COMMENT, isDirectory, LEGACY_DATA, manifestEntry, OLD_DIRECTORY, RETIRED } from './lorebooks';
 import { dropOldOutsidePlaces, migrateLore, readDirectoryData, withDirectory } from './world/directory';
 import { dropDefaultAliases } from './world/registry';
+import { fillDirectory } from './install';
 import type { LoreEntry } from './types';
 
 export const UPDATE_SCHEMA = 1;
@@ -166,14 +167,16 @@ function keepUserKeys(current: LoreEntry[], list: LoreEntry[], shipped: Record<s
   return kept;
 }
 
-/** 명부는 사용자 것을 지키므로, 새 카드 명부에만 있는 부록 조건을 사용자 명부에 옮긴다 */
-function addAppendixDefaults(list: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
-  const add = readDirectoryData(incoming)?.부록;
-  const cur = readDirectoryData(list);
+/**
+ * 명부는 사용자 것을 지키므로, 새 카드 명부에만 있는 칸을 사용자 명부의 빈 자리에 채운다 (고친 값은 그대로).
+ * 2026-11-08 사용자: 부록만 옮겨 새로 생긴 「시작 소지품」이 업데이트로 안 들어옴 → 설치 점검과 같은 fillDirectory 로
+ */
+function addDirectoryDefaults(list: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
+  const add = readDirectoryData(incoming) as unknown as Record<string, unknown> | null;
+  const cur = readDirectoryData(list) as unknown as Record<string, unknown> | null;
   if (!add || !cur) return list;
-  const have = cur.부록 ?? {};
-  const fresh = Object.entries(add).filter(([k]) => !(k in have));
-  return fresh.length ? withDirectory(list, { ...cur, 부록: { ...have, ...Object.fromEntries(fresh) } }) : list;
+  const filled = fillDirectory(cur, add);
+  return filled.gaps ? withDirectory(list, filled.data as never) : list;
 }
 
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
@@ -183,12 +186,12 @@ export function planUpdate(char: Record<string, unknown>, payload: CardPayload):
   keepUserKeys(current, lore.list, shippedKeys(payload.data.globalLore));
   // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
   if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
+  // 새 카드 명부의 칸: 사용자 명부에 없는 항목·빈 칸만 채운다 (부록 조건·시작 소지품 등, 사용자가 고친 값은 그대로). 옛 기본값 정리보다 먼저 (채운 뒤 정리)
+  lore.list = addDirectoryDefaults(lore.list, payload.data.globalLore);
   // 0.16.37 전 카드: 명부 괴이·특수에 기본으로 있던 세력·요원 로어북 후보를 뺀다 (2026-10-21 사용자). 그 뒤에 사용자가 다시 넣은 것은 둔다
   if (compareVersions(cardVersion(char.globalLore as LoreEntry[]), '0.16.37') < 0) lore.list = dropOldOutsidePlaces(lore.list);
   // 사용자 명부(보호됨)에 남은 원본 기본 별칭 중 규칙에 걸리는 것만 지운다. 사용자가 더한 별칭은 남는다 (2026-10-21)
   lore.list = dropDefaultAliases(lore.list);
-  // 새 카드의 부록 조건: 사용자 명부에 없는 부록만 더한다 (사용자가 고친 부록 조건은 그대로)
-  lore.list = addAppendixDefaults(lore.list, payload.data.globalLore);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
   // 상태창 정규식은 플러그인이 그리게 되어(v0.16.31) 옛 카드에서 뺀다 (새 카드에 같은 이름이 있으면 그대로)
   const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ''));

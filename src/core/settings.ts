@@ -118,6 +118,8 @@ export interface Prefs {
   imgSend?: number;
   /** 종료 알림(보고서가 기록에 저장됐어요)을 이미 띄운 보고서 id (최근 50). 2026-11-05 사용자: 한 번 본 알림이 다시 뜨지 않게 기기에 남긴다 */
   noticedReports?: string[];
+  /** 대전 (이 기기 공통, 11-08 사용자): 켜면 PC 에서 유령 단추 밑에 게임패드 단추. 없으면 끔 */
+  versus?: boolean;
   /** 마지막에 고른 아바타 (인물 팩 번호, 이 기기 공통). 새 채팅 시작 패널에서 기본으로 골라 둔다 (2026-11-08 사용자) */
   look?: string;
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
@@ -146,7 +148,7 @@ export const DIM_STEPS = [0, 25, 50, 75, 100];
 let prefs: Prefs = { basic: {}, world: {} };
 
 /** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
-export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-(gn|gal|wpf|sm)\.[a-z_]+|\$(gn|gal|wpf|sm)_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_(date|time|weather|temp|place|target|companions|deployed|identity|wallet|points)|\$st_wallet_(edit|sync|loose|recent)|\$it_(on|slots|limit|push|auto|start|spent|state|detail|logturns)|\$sh_[a-z_]+)$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -224,7 +226,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(look ? { look } : {}), ...(o.versus === true ? { versus: true } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}) };
   return prefs;
 }
 

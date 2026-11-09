@@ -17,6 +17,7 @@ import { imageUrl, picAvatar } from './images';
 import { ICONS } from './icons';
 import { stUi } from './editor/start';
 import { parseStartItems, START_ITEM_COLUMNS, startItemsText } from '../core/startitems';
+import { itemWeight } from '../core/itemtraits';
 
 export interface DirectoryEnv {
   render: () => void;
@@ -331,7 +332,6 @@ function cropBox(ctx: ChatContext, key: string, main: string): string {
   return `<div class="dir-crop">
     <div class="dir-crop-img" data-crop="${esc(key)}">${url ? `<img src="${esc(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ''}</div>
     <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc(key)}" aria-label="얼굴 틀 크기"></label>
-    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc(key)}">기본 틀로</button>
   </div>`;
 }
 
@@ -392,6 +392,7 @@ export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string 
     ${input(k('english'), a.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
     ${photoBlock(a.lore, ctx)}
     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
+    ${input(k('carry'), a.carry ? String(a.carry) : '', '소지 한도(kg)', '이 인물로 시작하면 이 무게가 소지 한도예요. 비우면 설정 「소지 한도」를 써요')}
     ${area(k('items'), startItemsText(a.startItems ?? []), '시작 소지품', `이 인물로 시작하면 소지품에 넣고 무기·장비는 장착해요. 한 줄에 하나: ${START_ITEM_COLUMNS}`, Math.max(3, (a.startItems?.length ?? 0) + 1))}
     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
   </div>`;
@@ -899,6 +900,10 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     const items = parseStartItems(value);
     if (items.length) row.startItems = items;
     else delete row.startItems;
+  } else if (field === 'carry') {
+    const c = itemWeight(value);
+    if (c !== undefined && c > 0) row.carry = c;
+    else delete row.carry;
   } else if (field === 'label') row.label = value.trim() || row.lore;
   else if (field === 'english' || field === 'rank' || field === 'department' || field === 'affiliation') row[field] = value.trim();
   else return;
@@ -1330,10 +1335,6 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-crop':
       dirUi.crop = dirUi.crop === v ? '' : v;
       dirUi.pick = '';
-      break;
-    case 'dir-crop-reset':
-      picOf(d, v)?.set('crop', '');
-      dirUi.done = '';
       break;
     case 'dir-ext-close':
       dirUi.adding = false;

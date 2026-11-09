@@ -8,7 +8,8 @@ export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'pp' | 'jr';
 
 const PREFIXES: Record<DefaultsPane, string[]> = {
   ph: ['$ph_'],
-  gn: ['$lb_cfg_lb-gn.', '$gn_storage_'],
+  /** 게시판 사이트 넷 (괴담넷·괴담갤·세정게·연어 마켓, 2026-11-08 사이트마다 따로) */
+  gn: ['$lb_cfg_lb-gn.', '$gn_storage_', '$lb_cfg_lb-gal.', '$gal_storage_', '$lb_cfg_lb-wpf.', '$wpf_storage_', '$lb_cfg_lb-sm.', '$sm_storage_'],
   wiki: ['$nw_'],
   /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
   pp: ['$pp_'],

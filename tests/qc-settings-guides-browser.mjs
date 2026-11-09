@@ -11,9 +11,15 @@ const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router']; // Visit(필드)는 2026-11-04 제거
 const settle = () => sleep(150);
+// core/guides.ts pickStyle 과 같은 셈 (사이트 갈래 {{#when …lb_cfg_lb-gn.style…}} 만 골라 남김)
+const STYLE_WHEN = /^\{\{#when \{\{(equal|notequal)::\{\{getvar::lb_cfg_lb-gn\.style\}\}::(\w+)\}\}\}\}$/;
+function openEnd(s, i) { let d = 0; for (let j = i; j < s.length; ) { if (s.startsWith('{{', j)) { d++; j += 2; continue; } if (s.startsWith('}}', j)) { d--; j += 2; if (!d) return j; continue; } j++; } return s.length; }
+function closeAt(s, j) { let d = 1; for (;;) { const a = s.indexOf('{{#when', j); const b = s.indexOf('{{/when}}', j); if (b < 0) return s.length; if (a >= 0 && a < b) { d++; j = openEnd(s, a); continue; } if (!--d) return b; j = b + 9; } }
+function pickStyle(s, style) { let out = ''; let i = 0; for (;;) { const a = s.indexOf('{{#when', i); if (a < 0) return out + s.slice(i); const e = openEnd(s, a); const m = STYLE_WHEN.exec(s.slice(a, e)); if (!m) { out += s.slice(i, e); i = e; continue; } const c = closeAt(s, e); const keep = m[1] === 'equal' ? style === m[2] : style !== m[2]; out += s.slice(i, a) + (keep ? pickStyle(s.slice(e, c), style) : ''); i = c + 9; } }
 // 기본 지침 원문 (플러그인에 내장된 것과 같은 파일)
 const defaults = {
-  GNet: readFileSync(new URL('../src/data/guides/gnet.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
+  // 괴담넷 = gnet.txt 에서 괴담넷 갈래만 남긴 글 (2026-11-08 사이트별 지침, core/guides.ts boardGuide('net') 와 같은 셈)
+  GNet: pickStyle(readFileSync(new URL('../src/data/guides/gnet.txt', import.meta.url), 'utf8').replace(/\r/g, ''), 'net'),
   Phone: readFileSync(new URL('../src/data/guides/phone.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Wiki: readFileSync(new URL('../src/data/guides/wiki.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
   Directive: readFileSync(new URL('../src/data/guides/directive.txt', import.meta.url), 'utf8').replace(/\r/g, ''),
@@ -38,7 +44,7 @@ for (const vp of vps) {
     const n = await page.locator('.gw .gw-guide-secs textarea').count();
     assert.ok(n >= 1, `${g}: 절 ${n}`);
     assert.ok((await page.textContent('.gw .gw-head h2')).includes(`${n}절`), `${g}: 머리에 절 수`);
-    assert.equal(await page.isDisabled(`.gw [data-action="ed-guide-save"][data-value="${g}"]`), true, `${g}: 고치기 전엔 저장 잠김`);
+    assert.equal(await page.locator(`.gw [data-action^="ed-guide-"]`).count(), 0, `${g}: 지침 저장·기본으로 단추 없음 (2026-11-08 바로 저장)`);
     const a = await auditDom(page, '.gw');
     assert.deepEqual(a.missing, [], `${g} ${vp}: 이름 없는 단추`);
     if (phone) assert.deepEqual(a.overflow, [], `${g} ${vp}: 가로 넘침`);
@@ -46,8 +52,7 @@ for (const vp of vps) {
     const i = n - 1;
     const body = await page.$eval(`.gw textarea[data-key="${g}|${i}"]`, (e) => e.value);
     await setInput(page, `.gw textarea[data-key="${g}|${i}"]`, `${body}\nQC ${g} 추가 줄`, 'input');
-    await page.waitForFunction((g) => !document.querySelector(`.gw [data-action="ed-guide-save"][data-value="${g}"]`)?.disabled, g);
-    await clickSel(page, `.gw [data-action="ed-guide-save"][data-value="${g}"]`);
+    // 바로 저장 (2026-11-08 사용자): 손을 뗀 뒤 저장
     await page.waitForFunction((g) => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').guides?.[g], g);
     const saved = (await prefsOf(page)).guides[g];
     assert.ok(saved.includes(`QC ${g} 추가 줄`), `${g}: 저장된 글에 고친 줄`);
@@ -55,48 +60,34 @@ for (const vp of vps) {
       // 고친 절 말고는 원문과 같다: 저장 글에서 추가 줄을 빼면 원문
       assert.equal(saved.replace(`\nQC ${g} 추가 줄`, ''), defaults[g], `${g}: 절을 합치면 원문 그대로`);
     }
-    assert.ok((await page.textContent('.gw .gw-head h2')).includes('고침'), `${g}: 머리에 고침`);
-    assert.ok((await page.textContent('.gw .gw-head')).includes('저장했어요'), `${g}: 저장 안내`);
     // 다른 노드에 갔다 와도 같은 글
     await goNode(page, 'rule:new');
     await goNode(page, `guide:${g}`);
     assert.ok((await page.$eval(`.gw textarea[data-key="${g}|${i}"]`, (e) => e.value)).includes(`QC ${g} 추가 줄`), `${g}: 다시 열어도 고친 글`);
-    // 기본으로
-    await clickSel(page, `.gw [data-action="ed-guide-reset"][data-value="${g}"]`);
-    await page.waitForFunction((g) => !JSON.parse(window.__store['p:goei:prefs'] ?? '{}').guides?.[g], g);
-    assert.equal(await page.$eval(`.gw textarea[data-key="${g}|${i}"]`, (e) => e.value), body, `${g}: 기본으로`);
-    // 기본 글과 같게 고쳐서 저장하면 기본으로 저장
-    await setInput(page, `.gw textarea[data-key="${g}|${i}"]`, `${body}x`, 'input');
+    // 원래 글로 고쳐 쓰면 원래 글로 저장 (고친 지침 칸이 지워진다)
     await setInput(page, `.gw textarea[data-key="${g}|${i}"]`, body, 'input');
-    await page.waitForFunction((g) => !document.querySelector(`.gw [data-action="ed-guide-save"][data-value="${g}"]`)?.disabled || true, g);
-    if (!(await page.isDisabled(`.gw [data-action="ed-guide-save"][data-value="${g}"]`))) {
-      await clickSel(page, `.gw [data-action="ed-guide-save"][data-value="${g}"]`);
-      await settle();
-      assert.equal((await prefsOf(page)).guides?.[g], undefined, `${g}: 기본 글과 같으면 저장 안 함`);
-    }
+    await page.waitForFunction((g) => !JSON.parse(window.__store['p:goei:prefs'] ?? '{}').guides?.[g], g);
   }
   // 저장 상한 120,000자: 넘기면 저장하지 않고 안내
   await goNode(page, 'guide:RP');
+  const rp0 = await page.$eval('.gw textarea[data-key="RP|0"]', (e) => e.value);
   const big = 'x'.repeat(121000);
   await setInput(page, '.gw textarea[data-key="RP|0"]', big, 'input');
-  await page.waitForFunction(() => !document.querySelector('.gw [data-action="ed-guide-save"][data-value="RP"]')?.disabled);
-  await clickSel(page, '.gw [data-action="ed-guide-save"][data-value="RP"]');
-  await settle();
+  await page.waitForFunction(() => (document.querySelector('.gw .gw-head')?.textContent ?? '').includes('120,000자까지'), null, { timeout: 5000 });
   assert.equal((await prefsOf(page)).guides?.RP, undefined, '120,000자 넘는 지침은 저장 안 함');
-  assert.ok((await page.textContent('.gw .gw-head')).includes('120,000자까지'), '상한 안내');
-  await clickSel(page, '.gw [data-action="ed-guide-reset"][data-value="RP"]');
-  await settle();
+  await setInput(page, '.gw textarea[data-key="RP|0"]', rp0, 'input');
+  await sleep(900);
 
   // ── 이미지 지침 페이지 (guide:Image): 틀 저장·기본값·미리보기·대상 체크·임의 추가·표정 세트 ──
   await goNode(page, 'guide:Image');
   await page.waitForSelector('.gw .ip-pane');
   await setInput(page, '.gw [name="ip-template"]', '내 틀 {characters} {keywords}', 'input');
-  await clickSel(page, '.gw [data-action="ip-template-save"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt === '내 틀 {characters} {keywords}');
   await clickSel(page, '.gw [data-action="ip-preview"]');
   await page.waitForSelector('.gw .ip-preview');
   assert.ok((await page.textContent('.gw .ip-preview')).startsWith('내 틀 '), '미리보기에 내 틀');
-  await clickSel(page, '.gw [data-action="ip-template-reset"]');
+  assert.equal(await page.$('.gw [data-action="ip-template-reset"]'), null, '되돌리기 단추 없음');
+  await setInput(page, '.gw [name="ip-template"]', '', 'input');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgPrompt === undefined);
   const firstName = await page.$eval('.gw .ip-names input[type="checkbox"]', (e) => e.dataset.key);
   await page.evaluate(() => { const c = document.querySelector('.gw .ip-names input[type="checkbox"]'); c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); });
@@ -104,18 +95,15 @@ for (const vp of vps) {
   assert.ok(await page.$(`.gw .ip-name.off`), '끈 이름 표시');
   await page.evaluate(() => { const c = document.querySelector('.gw .ip-names input[type="checkbox"]'); c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.waitForFunction((n) => !(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesOff ?? []).includes(n), firstName);
-  await clickSel(page, '.gw [data-action="ip-extra-add"]');
-  await settle();
-  assert.ok((await page.textContent('.gw .ip-pane')).includes('영문명을 적어 주세요'), '빈 이름 → 안내');
+  assert.ok(await page.$('.gw [data-action="ip-extra-add"][disabled]'), '빈 이름 → 추가 단추 흐림 (2026-11-09 사용자)');
   await setInput(page, '.gw [name="ip-extra"]', 'Qc<Name>_x', 'input');
   await clickSel(page, '.gw [data-action="ip-extra-add"]');
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).includes('QcNamex'));
   await clickSel(page, '.gw [data-action="ip-extra-del"][data-value="QcNamex"]');
   await page.waitForFunction(() => !(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgNamesExtra ?? []).length);
   await setInput(page, '.gw [name="ip-keywords"]', 'Smile, ANGRY,, sad', 'input');
-  await clickSel(page, '.gw [data-action="ip-keywords-save"]');
   await page.waitForFunction(() => JSON.stringify(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords) === '["smile","angry","sad"]');
-  await clickSel(page, '.gw [data-action="ip-keywords-reset"]');
+  await setInput(page, '.gw [name="ip-keywords"]', '', 'input');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords === undefined);
 
   // ── 추가 규칙 ──

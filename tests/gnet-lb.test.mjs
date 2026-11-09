@@ -1,7 +1,7 @@
-// 괴담넷 라이트보드 항목 (일기장·감정 게시판, 주요 인물 닉네임, 반응 그림, 다양성 강화 seed, 2026-11-06)
+// 괴담넷 라이트보드 항목 (주요 인물 닉네임, 다양성 강화 seed, 2026-11-06), 사이트별 지침 (2026-11-08)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { refreshPrompt, incomingPlan, gnetSettings, mergeKeyFigures, keyFigures, consList, GN_KEYFIG } from '../dist-test/core.mjs';
+import { refreshPrompt, incomingPlan, gnetSettings, mergeKeyFigures, keyFigures, GN_KEYFIG, boards } from '../dist-test/core.mjs';
 
 const C = (k) => `$lb_cfg_lb-gn.${k}`;
 const src = (vars = {}) => ({
@@ -14,11 +14,13 @@ const sys = (vars) => {
   return refreshPrompt(s, st, incomingPlan(s.chat, st, gnetSettings(vars), 'ㅇㅇ', () => 0.99), 'ㅇㅇ', {}).messages[0].content;
 };
 
-test('괴담넷: 일기장·감정 게시판은 선쪽지가 꺼지고 주인 이름이 들어간다', () => {
-  const v = { [C('style')]: 'diary', [C('who')]: '에일린' };
-  assert.equal(gnetSettings(v).incoming, false);
-  assert.match(sys(v), /에일린/);
-  assert.equal(gnetSettings({ [C('style')]: 'emotion' }).incoming, false);
+test('사이트마다 자기 지침을 쓴다 (성격 고르기 없음)', () => {
+  const v = (site) => boards.boardState({}, site);
+  assert.match(sys(v('gn')), /괴담넷 is a Korean anonymous forum/);
+  assert.match(sys(v('gal')), /괴담갤 is an ordinary Korean/);
+  assert.match(sys(v('wpf')), /세계정치 게시판 \(세정게/);
+  assert.match(sys(v('sm')), /연어 마켓 \(salmon-market\.kr\)/);
+  assert.doesNotMatch(sys(v('gal')), /괴담넷 is a Korean/);
   assert.equal(gnetSettings({}).incoming, true);
 });
 
@@ -33,34 +35,8 @@ test('괴담넷: 주요 인물 닉네임은 요청에 붙고, 응답을 합쳐 �
   assert.match(sys({ [GN_KEYFIG]: b[GN_KEYFIG] }), /파란우산/);
 });
 
-test('괴담넷: 반응 그림은 켜고 목록이 있어야 붙는다', () => {
-  const list = '웃음 | https://a/1.png\n잘못[된]:이름 | https://a/2.png\n울음|https://a/3.png';
-  assert.deepEqual(consList({ [C('cons_list')]: list }).map((c) => c.name), ['웃음', '울음']);
-  assert.equal(gnetSettings({ [C('cons')]: '1' }).cons, false);
-  const on = sys({ [C('cons')]: '1', [C('cons_list')]: list });
-  assert.match(on, /\[콘:name\]/);
-  assert.match(on, /웃음/);
-  assert.doesNotMatch(sys({ [C('cons_list')]: list }), /\[콘:name\]/);
-});
-
 test('괴담넷: 다양성 강화를 켜면 확률과 seed를 요구한다', () => {
   const on = sys({ [C('sampling')]: '1' });
   assert.match(on, /alternativeProb/);
   assert.match(on, /<x-output-seed-a>\S+<\/x-output-seed-a>/);
-});
-
-test('성격 전환(11-07): 바뀐 뒤 첫 새로고침은 옛 글을 참고로 주지 않고 새 게시판이라고 못 박는다', async () => {
-  const { styleSwitched, GN_BOARD_STYLE } = await import('../dist-test/core.mjs');
-  const post = (id, mine = false) => ({ id, title: `글 ${id}`, body: '본문', author: 'ㅇㅇ', time: '2025.01.01 10:00', views: 1, up: 0, mine, comments: [], tag: '' });
-  const board = { posts: [post(100001), post(100002, true)], dms: [], sources: {}, seq: 100002 };
-  const all = (vars) => { const s = src(vars); return refreshPrompt(s, board, incomingPlan(s.chat, board, gnetSettings(vars), 'ㅇㅇ', () => 0.99), 'ㅇㅇ', {}).messages.map((m) => m.content).join('\n'); };
-  assert.equal(styleSwitched({}), false, '아직 한 번도 안 받았으면 전환 아님');
-  assert.equal(styleSwitched({ [GN_BOARD_STYLE]: 'net' }), false);
-  assert.equal(styleSwitched({ [GN_BOARD_STYLE]: 'net', [C('style')]: 'wpf' }), true);
-  const same = all({ [GN_BOARD_STYLE]: 'net' });
-  assert.ok(same.includes('글 100001') && !same.includes('has just changed'));
-  const sw = all({ [GN_BOARD_STYLE]: 'net', [C('style')]: 'wpf' });
-  assert.ok(!sw.includes('글 100001'), '옛 NPC 글은 참고에서 뺀다');
-  assert.ok(sw.includes('글 100002'), '내 글(보호)은 남긴다');
-  assert.ok(sw.includes('has just changed to 세정게'));
 });

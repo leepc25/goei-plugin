@@ -1,17 +1,14 @@
 // 「고급 설정」 접는 칸 (v0.16.27, 사용자 설계): 각 기능 설정 맨 아래, 기본은 닫힘. 손대지 않아도 원본 기본값으로 돈다.
 // 바꾼 항목은 이름 앞 점과 되돌리기 버튼으로 보이고, 닫힌 칸 제목에 바꾼 개수가 뜬다.
-import { ADV, advChanged, advItem, advResetVars, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
+import { ADV, advChanged, advItem, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { syncDecorators, type LoreMode } from '../core/lore';
-import { ICONS } from './icons';
 import { keepOpen } from './panels';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
-
-export const advUi = { confirm: '' as AdvFeature | '' };
 
 type State = Record<string, unknown> | undefined;
 
@@ -40,11 +37,7 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);
   const changed = cur !== String(item.def);
-  // 되돌리기 자리는 늘 비워 둔다 (바꾼 줄만 칸이 밀리지 않게)
-  const reset = changed
-    ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item.key}" aria-label="${esc(item.label)} 기본값으로" title="기본값 ${esc(item.def)}">${ICONS.refresh}</button>`
-    : '<span class="adv-reset" aria-hidden="true"></span>';
-  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}${reset}</div></div>`;
+  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}</div></div>`;
 }
 
 function chips(f: AdvFeature, items: AdvItem[], state: State): string {
@@ -75,12 +68,7 @@ export function advancedBox(f: AdvFeature, state: State): string {
       return `<section class="ps-group"><h3>${esc(g.title)}</h3><div class="ps-rows">${body}</div></section>`;
     })
     .join('');
-  const foot = n
-    ? advUi.confirm === f
-      ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>`
-      : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>`
-    : '';
-  return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ''}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
+  return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ''}</summary><div class="ps-adv-body">${groups}</div></details>`;
 }
 
 /** 기본값으로: 비워 둔다. 원래 있던 변수(v)는 기능 코드가 빈 값을 0으로 읽을 수 있어 기본값을 적는다 */
@@ -111,22 +99,10 @@ export interface AdvEnv {
 /** adv-* 버튼. scope 'defaults'는 시작 전 기본 설정 화면(새 채팅 기본값을 바로 고침) */
 export async function handleAdvanced(action: string, value: string | undefined, ctx: ChatContext, env: AdvEnv, scope: 'chat' | 'defaults' = 'chat'): Promise<boolean> {
   const v = value ?? '';
-  if (action === 'adv-reset-all' || action === 'adv-reset-no') {
-    advUi.confirm = action === 'adv-reset-all' && v in ADV ? (v as AdvFeature) : '';
-    env.render();
-    return true;
-  }
   let vars: Record<string, string> | null = null;
   if (action === 'adv-set') {
     const hit = parse(v);
     if (hit) vars = { [advVar(hit[0], hit[1])]: hit[2] };
-  } else if (action === 'adv-reset') {
-    const [f, key] = v.split(':') as [AdvFeature, string];
-    const item = f in ADV ? advItem(f, key) : undefined;
-    if (item) vars = { [advVar(f, item)]: blank(item) };
-  } else if (action === 'adv-reset-yes') {
-    advUi.confirm = '';
-    if (v in ADV) vars = advResetVars(v as AdvFeature);
   } else return false;
   if (!vars) {
     env.render();
