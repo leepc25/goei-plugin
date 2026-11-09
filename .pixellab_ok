@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 01:05 KST 「이제 뽑아」 → 512×384 켜진 판 전체 밝히기 inpaint 1회
 - 사용자 11-10 00:48 KST 「사람 치우고 배경 넣어서 고대로 불켜진 상태 뽑아」 → fix11 배경 판 조명 켜기 inpaint 1회
 - 사용자 11-10 00:20 KST 「뽑아봐」 → 망상홈쇼핑 배경 판 v3(최소 지시) 1회
 - 11-10 00:09 KST 422(reference size 누락)로 2회 소모 → 2로 복구(실제 전송 안 됨)
@@ -281,3 +282,4 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/host_sprite_v1_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/bg_plate_v3_req.json
 - 사용: 배경 판 v3 조명 켜기 inpaint 1회
+- 사용: 켜진 판 전체 밝히기 inpaint pass1
