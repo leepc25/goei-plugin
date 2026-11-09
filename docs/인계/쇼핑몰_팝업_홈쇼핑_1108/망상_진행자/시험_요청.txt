@@ -1,0 +1,22 @@
+시험 1회: 진행자 한 장 + 움직임 클립 하나 (11-09 KST, 「뽑아」 전 안 보냄)
+
+━━ 1) 진행자 상반신 ━━
+[기능] POST /v2/generate-image-v2 (Generate image Pro)
+[크기] 256 x 256, no_background: true (배경 없이, 나중에 스튜디오 배경판 위에 얹음)
+[화풍 그림] style_image = game-src/items/icons/medical_124.webp (소지품 그림, 85도트)
+           style_options: outline true, shading true, detail true, color_palette false
+[결과] 1장 (170px 넘으면 1장)
+[요청문]
+Pixel art, waist-up front view of a male TV home shopping host facing the camera, centered: black business suit, white shirt, dark red tie, neatly slicked-back black hair, unnaturally pale white face makeup, huge glossy pitch-black eyes with fully dilated pupils and no visible whites, a wide polished salesman smile with lips closed. Both hands open at chest height in a welcoming sales gesture. Transparent background, nothing else in the image. Clean crisp pixel art with the same pixel density as a detailed 85px item icon, no text, no letters, no logos.
+
+━━ 2) 움직임 클립: 말하며 손짓하기 (반복용) ━━
+[기능] POST /v2/animate-pixminimax
+[첫 장면] 1)의 결과, [끝 장면] last_frame = 같은 그림 (처음과 끝이 같아 이음 없이 반복)
+[프레임] frame_count 8, no_background true, enhance_prompt false
+[설명 칸] subject_description: "a male TV shopping host in a black suit with a pale white face"
+          initial_pose: "standing, both hands open at chest height", view: "side"(정면 눈높이), direction: "south"
+[동작 글]
+talking enthusiastically to the camera, hands making small open-palm sales gestures, slight head nods and shoulder movement, body stays in place
+[비용] 시간 기준. 256 크기 8프레임 → 뽑기 직전에 실제 청구량을 보고 알림
+
+━━ 합계 ━━ PixelLab 2회. 예상 약 $0.2 안팎 (크레딧 $2.55, 구독 0)

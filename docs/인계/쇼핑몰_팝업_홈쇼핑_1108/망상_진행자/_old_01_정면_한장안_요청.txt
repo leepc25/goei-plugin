@@ -1,0 +1,9 @@
+[기능] POST /v2/generate-image-v2 (Generate image Pro)
+[크기] image_size 688 x 384 (16:9 최대)
+[배경] no_background: false (스튜디오 배경까지 한 장)
+[화풍 그림] style_image: 소지품 그림 한 장(game-src/items/icons/medical_124.webp 미인 약)
+[화풍에서 가져올 것] style_options: outline true, shading true, detail true, color_palette false (색은 글로 정함)
+[참고 그림] 없음 (첫 장)
+
+[요청문]
+Pixel art, TV home shopping broadcast shot, front view, waist-up. A male TV host stands slightly left of center, facing the camera: black business suit, white shirt, dark red tie, neatly slicked-back black hair, unnaturally pale white face makeup, huge glossy pitch-black eyes with fully dilated pupils and no visible whites, a wide polished salesman smile with lips closed. Both hands open at chest height in a welcoming sales gesture. Background: a glossy 2000s TV shopping studio set in deep red and black, soft studio spotlights, a blurred sales banner shape with no readable text. The right third of the frame is plain studio backdrop with no objects, kept clear for on-screen graphics. Clean crisp pixel art, same pixel density as a detailed 85px item icon, no text, no letters, no logos, no watermark.
