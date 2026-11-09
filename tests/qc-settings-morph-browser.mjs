@@ -11,7 +11,7 @@ for (const vp of vps) {
   const { page, errors } = await boot(browser, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } }, vp);
   await openWin(page);
   await page.waitForSelector('.gx-tabhead');
-  await openEditor(page, 'rule:new');
+  await openEditor(page, 'rule:all');
   await clickSel(page, '.gw [data-action="ed-rule-new"]');
   await page.waitForSelector('.gw textarea[data-input="ed-rule-text"]');
   const ruleId = await page.$eval('.gw textarea[data-input="ed-rule-text"]', (e) => e.dataset.key);

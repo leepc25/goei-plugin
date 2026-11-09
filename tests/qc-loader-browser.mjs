@@ -729,7 +729,7 @@ if (!skip()) {
     if (!open) await frame.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
     await frame.waitForSelector('.gw:not([hidden])', { timeout: 5000 });
     await frame.click('[data-action="ed-tab"][data-value="manage"]');
-    await frame.click('[data-action="ed-node"][data-value="set:update"]');
+    await frame.click('[data-action="ed-node"][data-value="install"]'); // 11-09: 업데이트는 설치 페이지 위 칸으로 합쳐짐 (옛 set:update → install)
     await frame.waitForSelector('[data-action="upd-check"]', { timeout: 5000 });
   };
   await toUpdate();

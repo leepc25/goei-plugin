@@ -163,7 +163,7 @@ assert.ok((await page.locator('.gw-guide-secs .gw-field-head b', { hasText: 'COM
 await goNode('guide:Phone');
 await page.waitForSelector('textarea[data-key="Phone|1"]');
 // 내가 추가한 규칙: 추가 → 글 → 저장(기기 설정) → 지우기
-await goNode('rule:new');
+await goNode('rule:all');
 await page.click('[data-action="ed-rule-new"]');
 await page.waitForSelector('textarea[data-input="ed-rule-text"]');
 await page.fill('input[data-input="ed-rule-title"]', '대사 길이');

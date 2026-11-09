@@ -2,7 +2,7 @@
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
 import { mallSettingsPane } from './malls';
 import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
-import { onOffSwitch } from './controls';
+import { onOffSwitch, switchHtml } from './controls';
 import { repaintTheme } from './theme';
 import {
   AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, isChatSettingVar, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
@@ -90,7 +90,7 @@ function ownShopsField(vars: Record<string, unknown> | undefined, busy: boolean)
   const text = (o: OwnShop, key: 'name' | 'alias', ph: string, len: number) =>
     `<input class="st-text" type="text" maxlength="${len}" value="${esc(o[key])}" data-change="set-own" data-key="${esc(o.id)}:${key}" placeholder="${ph}" aria-label="${ph}"${busy ? ' disabled' : ''}>`;
   const rows = list.map((o) => `<div class="ms-fx${o.on ? '' : ' off'}">
-      <div class="ms-fx-head">${text(o, 'name', '상점 이름 (로어 이름 그대로)', 30)}${seg('set-own-on', o.on ? `${o.id}:1` : `${o.id}:0`, [[`${o.id}:1`, 'ON'], [`${o.id}:0`, 'OFF']], busy)}<button class="gx-mini danger" data-action="set-own-del" data-value="${esc(o.id)}" aria-label="지우기"${busy ? ' disabled' : ''}>×</button></div>
+      <div class="ms-fx-head">${text(o, 'name', '상점 이름 (로어 이름 그대로)', 30)}${switchHtml({ action: 'set-own-on', value: o.on ? `${o.id}:0` : `${o.id}:1`, on: o.on, disabled: busy, label: `${o.name || '고유 상점'} 켜고 끄기` })}<button class="gx-mini danger" data-action="set-own-del" data-value="${esc(o.id)}" aria-label="지우기"${busy ? ' disabled' : ''}>×</button></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>다른 이름</span>${text(o, 'alias', '쉼표로 나눠서 (예: 포인트몰, 복지몰)', 120)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>인터넷 접속</span>${seg('set-own-web', `${o.id}:${o.web || 'none'}`, OWN_WEB.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>직접 가면</span>${seg('set-own-visit', `${o.id}:${o.visit || 'none'}`, OWN_VISIT.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
