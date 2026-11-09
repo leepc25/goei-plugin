@@ -1,4 +1,7 @@
 0
+- 11-10 00:09 KST 422(reference size 누락)로 2회 소모 → 2로 복구(실제 전송 안 됨)
+- 사용자 11-10 00:08 KST 「준비되면 바로 뽑아」「한꺼번에 요청 넣어」 → 망상홈쇼핑 배경 판 1회 + 진행자 스프라이트(no_background) 1회
+- 사용자 11-10 00:00 KST 「한번 쪼개서 뽑아 보자」 → 컷 A v3 대기 클립 몸·손 2회
 - 사용자 11-09 23:48 KST 「뽑아」 → 망상홈쇼핑 컷 A v3 장면 1회
 - 11-09 23:33 첫 전송이 422(참고 설명 500자 초과)로 거부되어 생성 안 됨 → 같은 승인 1회 되살림
 - 사용자 11-09 23:21 KST 「뽑아」 → 망상홈쇼핑 컷 A 와이드 v2 장면 1회
@@ -268,3 +271,9 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutA_v2_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutA_v2_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutA_v3_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_cutA_idle_body_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_cutA_idle_hand_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/bg_plate_v1_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/host_sprite_v1_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/bg_plate_v1_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/host_sprite_v1_req.json

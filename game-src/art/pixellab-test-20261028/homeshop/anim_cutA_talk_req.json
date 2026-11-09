@@ -1,0 +1,17 @@
+{
+ "crop_src": "game-src/art/pixellab-test-20261028/homeshop/cutA_v3.png",
+ "box": [
+  120,
+  60,
+  376,
+  316
+ ],
+ "description": "talks to the camera like a lively salesman: the mouth opens and closes over and over as if speaking, and whenever it opens the inside is only a deep crimson bottomless void, no teeth, no tongue; the head nods and tilts a little, the shoulders sway, the hand holding the microphone moves it slightly toward the mouth and back; the outstretched right arm and open hand stay perfectly still; then settles back into the starting pose",
+ "frame_count": 16,
+ "no_background": false,
+ "enhance_prompt": false,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a TV home shopping host in a black suit, white shirt and dark red tie, unnaturally white made-up face, large completely black eyes, holding a microphone, in front of an arch of unlit bulbs",
+ "initial_pose": "turned three-quarters to the right, leaning forward, closed-lip smile, microphone in his left hand near his chest, right arm stretched down to the right with the open palm beside a turntable"
+}

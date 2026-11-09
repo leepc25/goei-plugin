@@ -1,0 +1,18 @@
+{
+ "crop_src": "game-src/art/pixellab-test-20261028/homeshop/cutA_v3.png",
+ "box": [
+  262,
+  200,
+  390,
+  328
+ ],
+ "description": "the open hand presents the product: the palm tilts slightly up and down and the fingers flex a little, a few pixels only; the black sleeve on the left side of the picture stays perfectly still where it enters; then returns to the starting pose. The background and everything except the host stay absolutely identical in every frame, pixel-locked: no camera movement, no zoom, no pan, no flicker, no color shift; the red lacquer panels, gold trim, bulb arch, screen and counter do not move at all.",
+ "frame_count": 16,
+ "no_background": false,
+ "enhance_prompt": false,
+ "drift_threshold": 0,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a pale open hand and black suit sleeve stretched out above a red counter, a round turntable stand to the right, red set panel behind",
+ "initial_pose": "arm stretched to the right, open palm facing up beside the turntable"
+}
