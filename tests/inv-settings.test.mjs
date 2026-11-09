@@ -108,3 +108,12 @@ test('상점이 꺼져 있으면 이번 응답의 상점 표식도 지우고 가
     assert.equal(readShop(r.vars ?? {})?.shop ?? '', '', JSON.stringify(vars));
   }
 });
+
+test('주인공 자기 가게는 상점이 아니다: 표식의 주인이 주인공이면 지우고 열지 않는다 (11-09 마덕희·헐값매입)', async () => {
+  const { settleShop, readShop } = await import('../dist-test/core.mjs');
+  const chat = { message: [{ role: 'user', data: '가게 문을 연다', chatId: 'u1' }, { role: 'char', data: '헐값매입이다\n[shop: 헐값매입|마덕희]', chatId: 'c1' }], scriptstate: {} };
+  const r = settleShop(chat, 1, ['마 덕희', '']);
+  assert.ok(!String(r.message?.[1]?.data).includes('[shop:'), '표식 지움');
+  assert.equal(readShop(r.vars ?? {})?.shop ?? '', '');
+  assert.equal(readShop(settleShop(chat, 1, ['은하제']).vars).shop, '헐값매입', '남의 가게는 그대로');
+});

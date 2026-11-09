@@ -516,9 +516,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       }).catch(() => null)) ?? latest;
     }
     // 상점 표식 `[shop: 가게|주인]`: 이 응답 기준으로 상점 상태를 맞추고 지난 응답의 표식은 지운다 (core/shop.ts settleShop). 설정이 꺼져 있어도 남은 표식은 정리
-    if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex)) {
+    // 주인공 자기 가게는 상점이 아니다 (11-09 사용자: 마덕희로 플레이 → 헐값매입 상점이 뜸): 캐릭터 플레이 요원 이름·페르소나 이름
+    const selfNames = hasShopTag(raw) ? [playerAgent((await getChar<LoreChar>(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? '', userInfo().name] : [];
+    if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-        const r = settleShop(cur, arg.messageIndex);
+        const r = settleShop(cur, arg.messageIndex, selfNames);
         return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...r.vars } } : null;
       }).catch(() => null)) ?? latest;
     }

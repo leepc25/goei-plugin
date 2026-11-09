@@ -359,14 +359,19 @@ export function currentShop(chat: Chat): ShopState | null {
  * - 다른 가게면 새 상태(진열대는 열 때 받는다). 표식이 없으면 비운다 (「표식이 사라지면 비움」)
  * - 지난 응답들의 표식은 지운다 (카드가 마지막 응답 아래에만 붙게). 저장 본문에서만 지우고 이번 응답 것은 둔다
  */
-export function settleShop(chat: Chat, responseIndex: number): { vars: Record<string, string>; message?: Chat['message'] } | null {
+/** self: 주인공 이름들 (11-09 사용자: 마덕희로 플레이했더니 헐값매입에서 마덕희가 주인인 상점이 떴다 — 자기 가게는 상점이 아니다). 표식의 주인이 주인공이면 표식이 없는 것으로 보고 지운다 */
+export function settleShop(chat: Chat, responseIndex: number, self: string[] = []): { vars: Record<string, string>; message?: Chat['message'] } | null {
   const list = chat.message ?? [];
   const m = list[responseIndex];
   if (!m || m.role !== 'char') return null;
   const text = typeof m.data === 'string' ? m.data : '';
   // 상점이 꺼져 있으면(상점·소지품·가계부 중 하나라도 끔) 이 응답의 표식까지 지우고 방문 상태도 비운다 — 카드가 남아 눌리지 않게
   const on = shopOn(chat.scriptstate);
-  const tag = on ? findShopTag(text) : null;
+  const norm = (s: string) => s.replace(/\s+/g, '').toLowerCase();
+  const me = new Set(self.map(norm).filter(Boolean));
+  const found = on ? findShopTag(text) : null;
+  const mine = !!found?.owner && me.has(norm(found.owner));
+  const tag = mine ? null : found;
   const key = messageKey(m, responseIndex);
   const cur = readShop(chat.scriptstate);
   let next: ShopState | null = null;
@@ -375,7 +380,7 @@ export function settleShop(chat: Chat, responseIndex: number): { vars: Record<st
   }
   let message: Chat['message'] | undefined;
   for (let i = 0; i < list.length; i++) {
-    if ((on && i === responseIndex) || list[i].role !== 'char' || !hasShopTag(String(list[i].data ?? ''))) continue;
+    if ((on && !mine && i === responseIndex) || list[i].role !== 'char' || !hasShopTag(String(list[i].data ?? ''))) continue;
     message ??= [...list];
     message[i] = { ...list[i], data: stripShopTags(String(list[i].data)) };
   }
