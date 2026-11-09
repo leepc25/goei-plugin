@@ -4610,3 +4610,27 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 
 /* 사이트 글 보기 아래 여백 (11-09 사용자: 괴담갤 글 안에서 단추들이 바닥에 붙음) — 게시판 셋 같은 값 */
 .bs-gal .dpost, .bs-wpf .wpost, .bs-gn .gmain.gpost { padding-bottom: 24px; }
+
+/* ── 게시판 쪽지함 팝업창 (11-09 사용자: 우주 쇼핑몰 질문 창처럼). sticky 0 높이 틀 → 글을 내려도 같은 자리 ── */
+.bs .gn-dmhost { position: sticky; top: 0; height: 0; z-index: 30; overflow: visible; }
+.bs .gn-dmwin { position: absolute; top: 56px; right: 24px; width: 420px; height: min(600px, calc(100vh - 220px)); min-width: 320px; min-height: 280px; display: flex; flex-direction: column; background: var(--card, #fff); color: var(--text); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px -8px rgba(0, 0, 0, .35), 0 2px 6px rgba(0, 0, 0, .12); overflow: hidden; }
+.bs .gn-dmwin-hd { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 40px; padding: 0 6px 0 12px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: move; user-select: none; }
+.bs .gn-dmwin-hd b { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.bs .gn-dmwin-hd b svg { width: 16px; height: 16px; }
+.bs .gn-dmwin-bd { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 10px 12px; }
+.bs .gn-dmwin-bd > .ph-room, .bs .gn-dmwin-bd > .ph-form { flex: 1; min-height: 0; }
+.bs .gn-dmwin-bd .ph-log { flex: 1; min-height: 0; overflow-y: auto; }
+.bs .gn-dmwin-bd .ph-list { overflow-y: auto; min-height: 0; }
+.bs .gn-dmwin-bd .bs-dmh { justify-content: flex-end; margin-bottom: 6px; }
+.bs .gn-dmwin-bd .bs-dmh h2 { display: none; }
+.bs .gn-rs { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 50%, var(--dim) 50% 56%, transparent 56% 66%, var(--dim) 66% 72%, transparent 72% 82%, var(--dim) 82% 88%, transparent 88%); opacity: .7; }
+
+/* ── PC 마우스 제스처 선·이름표 (ui/gesture.ts) ── */
+.gx-gest { position: absolute; inset: 0; z-index: 9000; pointer-events: none; }
+.gx-gest-tip { position: absolute; z-index: 9001; pointer-events: none; padding: 4px 10px; border-radius: 6px; background: var(--signal); color: #fff; font: 600 13px/1.4 var(--sans, sans-serif); white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, .3); }
+.gx-gest-tip:empty { display: none; }
+.gx-gest-tip.off { background: #666; }
+
+/* 세정게 오른쪽 칸 (왼쪽 MENU 고정, 11-09) */
+.bs-wpf .colr { min-width: 0; }
+.bs-wpf .colr > .ct, .bs-wpf .colr > .gn-cpane, .bs-wpf .colr > .ph-room { min-height: 100%; }

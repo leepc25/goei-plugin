@@ -13,6 +13,7 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, itemsVars, readItems } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { applyShelf, applyTalk, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { winStyle, type PopSpec, type WinBox } from './popwin';
 import { COS_ACCOUNT, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, readMall, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
@@ -363,7 +364,7 @@ function cosPay(st: ShopState, v: View, bal: number): string {
 }
 
 function cosAsk(st: ShopState, v: View, mobile: boolean): string {
-  const at = v.win && !mobile ? ` style="left:${v.win.x}px;top:${v.win.y}px;width:${v.win.w}px;height:${v.win.h}px;right:auto;bottom:auto"` : '';
+  const at = mobile ? '' : winStyle(v.win);
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
   const log = st.talk.length
@@ -544,54 +545,21 @@ export async function mallSettingsAction(action: string, value: string | undefin
 /** 질문 창이 떠 있나 (Esc 처리용) */
 export const mallAskOpen = (): boolean => ui.cos.ask;
 
-/** 우주 쇼핑몰 질문 창을 진짜 팝업창처럼 (11-09 사용자): 제목줄 끌어 옮기기, 오른쪽 아래 모서리로 크기 조절, 창 밖을 누르면 닫힘 */
-export function bindMallWin(root: HTMLElement, render: () => void): void {
-  root.addEventListener('pointerdown', (ev) => {
-    const t = ev.target as HTMLElement;
-    const host = t.closest<HTMLElement>('.ms-cos');
-    if (!host || host.classList.contains('ms-m')) return;
-    const win = t.closest<HTMLElement>('.cs-askwin');
-    if (!win) {
-      // 창 밖 누름 → 닫기 (여는 링크·돈 넣는 창은 빼고)
-      if (ui.cos.ask && !t.closest('[data-action="mall-ask"], .cs-dim')) {
-        ui.cos.ask = false;
-        ui.cos.picking = false;
-        render();
-      }
-      return;
-    }
-    const grip = t.closest<HTMLElement>('.cs-wt') && !t.closest('button') ? 'move' : t.closest('.cs-rs') ? 'size' : '';
-    if (!grip) return;
-    ev.preventDefault();
-    const hr = host.getBoundingClientRect();
-    const r = win.getBoundingClientRect();
-    const start = { px: ev.clientX, py: ev.clientY, x: r.left - hr.left, y: r.top - hr.top, w: r.width, h: r.height };
-    const cur = { ...start };
-    const apply = () => {
-      win.style.left = `${cur.x}px`; win.style.top = `${cur.y}px`; win.style.width = `${cur.w}px`; win.style.height = `${cur.h}px`;
-      win.style.right = 'auto'; win.style.bottom = 'auto';
-    };
-    const move = (e: PointerEvent) => {
-      const dx = e.clientX - start.px;
-      const dy = e.clientY - start.py;
-      if (grip === 'move') {
-        cur.x = Math.min(Math.max(0, start.x + dx), Math.max(0, hr.width - start.w));
-        cur.y = Math.min(Math.max(0, start.y + dy), Math.max(0, hr.height - 40));
-      } else {
-        cur.w = Math.min(Math.max(300, start.w + dx), Math.max(300, hr.width - start.x));
-        cur.h = Math.min(Math.max(240, start.h + dy), Math.max(240, hr.height - start.y));
-      }
-      apply();
-    };
-    const up = () => {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-      ui.cos.win = { x: Math.round(cur.x), y: Math.round(cur.y), w: Math.round(cur.w), h: Math.round(cur.h) };
-    };
-    apply();
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
-  });
-}
+/** 우주 쇼핑몰 질문 창을 진짜 팝업창처럼 (11-09 사용자): 제목줄 끌어 옮기기, 오른쪽 아래 모서리로 크기 조절, 창 밖을 누르면 닫힘 (ui/popwin.ts 공통) */
+export const mallWinSpec: PopSpec = {
+  host: '.ms-cos',
+  skip: 'ms-m',
+  win: '.cs-askwin',
+  grip: '.cs-wt',
+  size: '.cs-rs',
+  keep: '[data-action="mall-ask"], .cs-dim',
+  min: [300, 240],
+  isOpen: () => ui.cos.ask,
+  close: () => {
+    ui.cos.ask = false;
+    ui.cos.picking = false;
+  },
+  save: (b) => {
+    ui.cos.win = b;
+  },
+};

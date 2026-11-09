@@ -39,15 +39,17 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
-import { bindMallWin, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
+import { mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
-import { boardChrome, gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { boardChrome, gnet, gnetDmOpen, gnetDmWinSpec, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { bindPopWins } from './popwin';
+import { bindMouseGesture, type Gesture } from './gesture';
 import { isBoardSite, type BoardSite } from '../core/boards';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { GN_NICK } from '../core/gnet';
-import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
+import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -285,7 +287,20 @@ function ensureRoot(): HTMLElement {
   });
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
-  bindMallWin(root, render);
+  bindPopWins(root, render, [mallWinSpec, gnetDmWinSpec]);
+  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 닫은 탭 복구 (인터넷)
+  bindMouseGesture(root, {
+    label: (g: Gesture) => {
+      if (g === 'L') return navStep(-1) ? '뒤로' : '';
+      if (g === 'R') return navStep(1) ? '앞으로' : '';
+      if (view.kind !== 'started' || !inBrowser()) return '';
+      return g === 'DR' ? '탭 닫기' : br.closed.length ? '닫은 탭 다시 열기' : '';
+    },
+    run: (g: Gesture) => {
+      if (g === 'L' || g === 'R') return void navStep(g === 'L' ? -1 : 1)?.();
+      void run(g === 'DR' ? 'br-close' : 'br-reopen', String(br.cur));
+    },
+  });
   // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
   root.addEventListener('pointerdown', (ev) => {
     const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
@@ -472,6 +487,7 @@ function ensureRoot(): HTMLElement {
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
     // 우주 쇼핑몰 질문 창 (11-09 사용자: 팝업창처럼 Esc·바깥 누름으로 닫힘)
     if (view.kind === 'started' && mallAskOpen()) return void handle('mall-ask-close');
+    if (view.kind === 'started' && inBrowser() && isBoardSite(curTab().site) && gnetDmOpen()) return void handle('gn-dm-close');
     // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
     if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
     const pop = document.querySelector('.gx-agpop');
@@ -1099,6 +1115,9 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'br-close':
       closeTab(Number(value) || 0);
       return openBrowserTab();
+    case 'br-reopen':
+      if (reopenTab()) openBrowserTab();
+      return;
     case 'br-back':
     case 'br-fwd': {
       const s = tabGo<NavState>(action === 'br-back' ? -1 : 1);

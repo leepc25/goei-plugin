@@ -32,6 +32,7 @@ import { updateChat, type ChatContext } from '../host/risu';
 import { boardView, boardWrite, type BoardSite } from '../core/boards';
 import { siteLogo } from './browser';
 import { isPhone } from './media';
+import { winStyle, type PopSpec, type WinBox } from './popwin';
 
 type Compose =
   | { kind: 'post' }
@@ -59,11 +60,13 @@ interface GnetUi {
   sort: 'new' | 'hot' | 'cmt';
   q: string;
   page: number;
+  /** PC 쪽지함 팝업창 자리·크기 (11-09 사용자: 우주 쇼핑몰 질문 창처럼) */
+  dmWin: WinBox | null;
 }
 
 export const gnet: GnetUi = {
   sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false,
-  cat: '', sort: 'new', q: '', page: 1,
+  cat: '', sort: 'new', q: '', page: 1, dmWin: null,
 };
 /** 괴담넷에서 보낼 수 있는 첨부 (원본: 선물 없음) */
 export const GN_KINDS: UserKind[] = ['image', 'photo', 'video', 'file', 'link'];
@@ -717,12 +720,11 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
       const rows = list.map((p) => `<tr${ntc(p) ? ' class="ntc"' : ''}><td>${ntc(p) ? '공지' : p.id % 100000}</td><td class="t">${openBtn(p, `${p.tag && !ntc(p) ? `[${esc(p.tag)}] ` : ''}${esc(p.title)}${p.comments.length ? ` <span class="cm">[${p.comments.length}]</span>` : ''}${postUnread(p) ? '<span class="nw">N</span>' : ''}`)}</td><td>${esc(p.nick)}</td><td>${esc(when(p, now).replace('.', '/'))}</td><td>${p.views}</td></tr>`).join('');
       const table = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows}</table>`;
       const wml = `<div class="wml">${list.map((p) => `<div class="it${ntc(p) ? ' ntc' : ''}">${openBtn(p, `<div class="t">${esc(p.title)}${p.comments.length ? ` <span class="cm">[${p.comments.length}]</span>` : ''}${postUnread(p) ? '<span class="nw">N</span>' : ''}</div><div class="m">${esc(p.nick)} · ${esc(when(p, now).replace('.', '/'))} · 조회 ${p.views}</div>`)}</div>`).join('')}</div>`;
-      const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
-      return `<div class="cols">${lm}<div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
+      return `<div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
         <div class="tot"><span>Total : ${st.posts.length} &nbsp; Page : ${Math.min(gnet.page, pages(all.length))}/${pages(all.length)}</span><span class="srt">${([['new', '최신'], ['hot', '인기'], ['cmt', '댓글']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(' · ')}</span></div>
         ${empty || `${table}${wml}${none(list)}`}${pager(all.length, 'pgn', '[이전 10개]', '[다음 10개]')}
         <div class="nav2"><span>${catBtn('', '목록', 'bb')}</span><label class="sch">${searchInput('제목·내용')} <button class="bb" data-action="gn-search-go">검색</button></label>${writeBtn('bb')}</div>
-      </div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`;
+      </div>`;
     }
     case 'sm': {
       const cards = list.map((p) => {
@@ -849,10 +851,10 @@ function siteDm(st: GState, busy: boolean): string {
   return `<div class="bs-dmh"><h2>쪽지함</h2><button class="bs-w" data-action="gn-newdm">쪽지 쓰기</button></div>${dmList(st, busy, false)}`;
 }
 
-function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, unreadDm: number): string {
+function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, unreadDm: number, popDm: boolean): string {
   const now = dateNow(ctx.chat);
   if (gnet.compose?.kind === 'post') return composeView(gnet.compose, busy);
-  if (gnet.sub === 'dm') return siteDm(st, busy);
+  if (gnet.sub === 'dm' && !popDm) return siteDm(st, busy);
   const p = gnet.open !== null ? findPost(st, gnet.open) : undefined;
   if (p) return sitePost(site, p, busy, now);
   return siteList(site, st, now, busy, unreadDm);
@@ -861,14 +863,46 @@ function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
 /** 사이트 한 장 (시안 「브라우저_시안3」 그대로: 괴담넷 .gn·괴담갤 .dc·세정게 .wp·연어 마켓 .sm) */
 function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string): string {
   const unreadDm = st.dms.filter((d) => d.unread).length;
-  const main = siteMain(site, ctx, st, busy, unreadDm);
-  const plain = gnet.sub === 'dm' || gnet.compose?.kind === 'post';
+  // PC 쪽지함은 게시판 위에 뜨는 팝업창 (11-09 사용자: 우주 쇼핑몰 질문 창처럼 끌기·크기 조절·바깥 누르면 닫힘). 폰은 전체 화면 그대로
+  const popDm = gnet.sub === 'dm' && !mobile;
+  const main = siteMain(site, ctx, st, busy, unreadDm, popDm);
+  const plain = (gnet.sub === 'dm' && !popDm) || gnet.compose?.kind === 'post';
   const box = (inner: string) => (plain ? `<div class="bs-plain">${extras}${inner}</div>` : `${extras ? `<div class="bs-x">${extras}</div>` : ''}${inner}`);
   let inner: string;
   if (site === 'gn') inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain ? `<div class="gmain">${extras}${main}</div>` : `${extras}${main}`}</div></div>`;
-  else if (site === 'wpf') inner = `<div class="pg">${box(main)}</div>`;
+  else if (site === 'wpf') {
+    // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다)
+    const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
+    inner = `<div class="pg">${box(`<div class="cols">${lm}<div class="colr">${main}</div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`)}</div>`;
+  }
   else inner = box(main);
-  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${siteHead(site, st, unreadDm)}${inner}</main>`;
+  // 쪽지함 창: 스크롤 칸 맨 위의 sticky 0 높이 틀 안에 absolute 로 → 글을 내려도 같은 자리에 떠 있고 사이트 색(.bs 변수)을 그대로 쓴다
+  const dmWin = popDm
+    ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="쪽지함"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} 쪽지함</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
+    : '';
+  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}</main>`;
+}
+
+/** 쪽지함 팝업창 (ui/popwin.ts 공통) */
+export const gnetDmWinSpec: PopSpec = {
+  host: '.bs',
+  skip: 'bs-m',
+  win: '.gn-dmwin',
+  grip: '.gn-dmwin-hd',
+  size: '.gn-rs',
+  keep: '[data-action="gn-sub"][data-value="dm"], [data-action="gn-newdm"], [data-action="gn-dm-from"], .gx-gest',
+  min: [320, 280],
+  isOpen: () => gnet.sub === 'dm' && !narrow(),
+  close: () => closeDm(),
+  save: (b) => {
+    gnet.dmWin = b;
+  },
+};
+export const gnetDmOpen = (): boolean => gnet.sub === 'dm' && !narrow();
+function closeDm(): void {
+  gnet.sub = 'board';
+  if (gnet.compose && gnet.compose.kind !== 'post' && gnet.compose.kind !== 'comment') gnet.compose = null;
+  gnet.confirm = null;
 }
 
 export function gnetTab(base: ChatContext, env?: GnetEnv, site: BoardSite = 'gn'): string {
@@ -967,6 +1001,9 @@ export async function handleGnet(action: string, value: string | undefined, base
     return true;
   }
   switch (action) {
+    case 'gn-dm-close':
+      closeDm();
+      break;
     case 'gn-sub':
       gnet.sub = v === 'dm' ? 'dm' : 'board';
       if (gnet.compose?.kind === 'comment' || gnet.compose?.kind === 'dm') gnet.compose = null;

@@ -75,6 +75,8 @@ export const br = {
   login: false,
   /** 폰: 탭 목록 화면 */
   list: false,
+  /** 닫은 탭 (최근 것이 끝, 마우스 제스처 ㄱ 으로 되살림) */
+  closed: [] as BrTab[],
 };
 export const curTab = (): BrTab => br.tabs[Math.min(br.cur, br.tabs.length - 1)];
 
@@ -118,10 +120,26 @@ export function newTab(): void {
 }
 /** 탭 닫기. 마지막 탭을 닫으면 새 탭 하나가 남는다 */
 export function closeTab(i: number): void {
-  br.tabs.splice(i, 1);
+  const [gone] = br.tabs.splice(i, 1);
+  if (gone?.site) br.closed = [...br.closed.filter((t) => t.site !== gone.site), gone].slice(-10);
   if (!br.tabs.length) br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   if (br.cur >= i && br.cur > 0) br.cur--;
   br.cur = Math.min(br.cur, br.tabs.length - 1);
+}
+/** 닫은 탭 다시 열기 (11-09 사용자: 마우스 제스처 ㄱ). 그 사이트 탭이 이미 열려 있으면 그 탭으로 간다. 되살릴 게 없으면 false */
+export function reopenTab(): boolean {
+  const t = br.closed.pop();
+  if (!t) return false;
+  const i = br.tabs.findIndex((x) => x.site === t.site);
+  if (i >= 0) {
+    br.cur = i;
+    return true;
+  }
+  const empty = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
+  if (empty >= 0) br.tabs.splice(empty, 1);
+  br.tabs.push({ ...t, id: seq++ });
+  br.cur = br.tabs.length - 1;
+  return true;
 }
 /** 사이트 열기: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
 export function openSite(site: SiteId): 'tab' | 'here' {
@@ -150,6 +168,7 @@ export function tabsJson(): string {
 export function restoreTabs(raw: unknown): void {
   br.login = false;
   br.list = false;
+  br.closed = [];
   br.tabs = [];
   br.cur = 0;
   try {
