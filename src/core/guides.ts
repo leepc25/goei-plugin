@@ -60,8 +60,8 @@ const boardGuide = (style: 'net' | 'gal' | 'wpf') => pickStyle(gnetBase.replace(
 /** 연어 마켓: 괴담갤(일반인 이용자) 갈래에서 소개·주제만 거래 게시판으로 */
 function salmonGuide(): string {
   return boardGuide('gal')
-    .replace(/^괴담갤 is an ordinary Korean[^\n]*$/m, SALMON_ABOUT)
-    .replace(/^Use scary stories, local rumors[^\n]*$/m, SALMON_TOPICS);
+    .replace(/^괴담갤 \(괴담 갤러리\) is a completely civilian[^\n]*$/m, SALMON_ABOUT)
+    .replace(/^Use 썰, 창작 괴담[^\n]*$/m, SALMON_TOPICS);
 }
 const SALMON_ABOUT = "연어 마켓 (salmon-market.kr) is a Korean secondhand-trade board of the hidden side of the ongoing narrative's world, used like an ordinary neighborhood resale app: people post items for sale (팝니다) or items they want (삽니다), and deals happen face to face (직거래) at an agreed time and place. What is traded ranges from ordinary used goods to anomaly-related items, charms, salvage, information and odd services, all listed in the same plain resale tone. Sellers and buyers are ordinary residents, enthusiasts, collectors, brokers, scammers and people from the anomaly trade who never identify themselves. Treat users as people in this world, not story readers or game players.";
 const SALMON_TOPICS = 'Each post is a listing: 팝니다 (selling) or 삽니다 (buying), with the item, its condition, a price written freely by the poster (an amount, 나눔, 가격 제안, 협의 and so on), a neighborhood for 직거래, and a short body in resale-app tone. Mix ordinary used goods with anomaly-related items, salvage, charms, information and odd requests. Comments are questions, haggling, 예약 requests and warnings. Do not force every listing to involve an anomaly.';

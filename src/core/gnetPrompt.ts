@@ -25,6 +25,8 @@ const REQUIRED_LB = ['SYSTEM', 'OUTPUT', 'JAILBREAK', 'JOB'];
 
 /** 사이트마다 따로 쓰는 지침 (2026-11-08 사용자: 공용 없이 전부 따로) */
 const SITE_GUIDE: Record<BoardSite, GuideName> = { gn: 'GNet', gal: 'Gal', wpf: 'Wpf', sm: 'Salmon' };
+/** 사이트 자체의 세계 로어(조직 항목 이름). 있으면 요청마다 「주제 원본」으로 넣는다 — 관점이 그 사이트 사람들 것이 되게 (11-09 사용자: 정보가 아니라 관점) */
+const SITE_LORE: Partial<Record<BoardSite, string[]>> = { wpf: ['세계정치 게시판'] };
 
 export interface GnetBooks {
   read(name: string): string;
@@ -92,7 +94,7 @@ function pack(src: RefSource, b: GnetBooks, thoughts: ThoughtsKey, guideline: st
   const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
   const t = refToggles(src.chat.scriptstate, 'gn');
   const rows = collectRefs(src, {
-    scope: 'gnet', text: `${extras}\n${story}`, description: t.description, authors: t.authors, persona: t.persona, active: t.active,
+    scope: 'gnet', text: `${extras}\n${story}`, primaryNames: SITE_LORE[viewSite(src.chat.scriptstate)], description: t.description, authors: t.authors, persona: t.persona, active: t.active,
     related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
     extra: [{ source: '현재 발생 상황', content: b.read('LB.EXTRA') }],
   });

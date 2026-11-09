@@ -16,11 +16,11 @@ const sys = (vars) => {
 
 test('사이트마다 자기 지침을 쓴다 (성격 고르기 없음)', () => {
   const v = (site) => boards.boardState({}, site);
-  assert.match(sys(v('gn')), /괴담넷 is a Korean anonymous forum/);
-  assert.match(sys(v('gal')), /괴담갤 is an ordinary Korean/);
+  assert.match(sys(v('gn')), /괴담넷 is a closed forum/);
+  assert.match(sys(v('gal')), /괴담갤 \(괴담 갤러리\) is a completely civilian/);
   assert.match(sys(v('wpf')), /세계정치 게시판 \(세정게/);
   assert.match(sys(v('sm')), /연어 마켓 \(salmon-market\.kr\)/);
-  assert.doesNotMatch(sys(v('gal')), /괴담넷 is a Korean/);
+  assert.doesNotMatch(sys(v('gal')), /괴담넷 is a closed/);
   assert.equal(gnetSettings({}).incoming, true);
 });
 
