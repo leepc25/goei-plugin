@@ -4581,7 +4581,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .cm .gn-c-time { font: inherit; font-size: 12px; color: inherit; }
 .bs .cm .gn-me { color: inherit; font-weight: 700; }
 .bs .ph-compose .ph-send.txt { width: auto; height: auto; min-width: 0; border-radius: 0; font-size: 13px; white-space: nowrap; }
-.bs-gal .dpost .cm.gn-c { display: grid; }
+.bs-gal .dpost .cm.gn-c { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; gap: 10px; } /* 위 .bs .cm.gn-c 가 칸 나눔을 지워 PC에서도 글쓴이·본문·시간이 세 줄이 됐다 (11-09 사용자) */
 .bs-gal.bs-m .dpost .cm.gn-c { grid-template-columns: minmax(0, 1fr); }
 .bs .cm.gn-c.re { padding-left: calc(2px + var(--gn-depth, 0) * 22px); }
 .bs .gn-post { display: block; }
