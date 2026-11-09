@@ -267,6 +267,7 @@ function readOffer(v: unknown): ShopOffer | null {
     desc: clean(o.desc, 120),
     effect: clean(o.effect, 60),
     ...traitsOf(o),
+    ...(typeof o.truth === 'string' && o.truth ? { truth: clean(o.truth, 60) } : {}),
     ...(Number.isSafeInteger(o.paid) ? { paid: o.paid as number } : {}),
     ...(o.price === null ? { price: null } : Number.isSafeInteger(o.price) ? { price: o.price as number } : {}),
     ...(Number.isSafeInteger(o.first) ? { first: o.first as number } : {}),

@@ -10,9 +10,10 @@ import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
 import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { pointsVars, readPoints } from '../core/points';
-import { addItem, itemsVars, readItems } from '../core/items';
+import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
+import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { appendItems, applyShelf, applyTalk, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { appendItems, applyShelf, applyTalk, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
@@ -47,13 +48,15 @@ interface View {
   chip: string;
   /** 붙일 물건 고르기 */
   picking: boolean;
+  /** 팔 내 물건 고르기 (상담원: 매입) */
+  selling: boolean;
   input: string;
   /** 링크로 찾아간 물건 (테두리·스크롤) */
   focus: string;
   /** 질문 창을 끌어 옮기거나 크기를 바꾼 자리 (PC, 사이트 칸 기준 px). 없으면 CSS 기본 자리 (11-09 사용자: 진짜 팝업창처럼) */
   win: { x: number; y: number; w: number; h: number } | null;
 }
-const fresh = (): View => ({ loading: '', notice: '', failRaw: '', info: '', cart: [], page: '', pay: false, ask: false, chip: '', picking: false, input: '', focus: '', win: null });
+const fresh = (): View => ({ loading: '', notice: '', failRaw: '', info: '', cart: [], page: '', pay: false, ask: false, chip: '', picking: false, selling: false, input: '', focus: '', win: null });
 const ui: Record<MallSite, View> = { cos: fresh(), bm: fresh() };
 let uiChat = '';
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
@@ -291,7 +294,55 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       break;
     case 'mall-pick':
       v.picking = !v.picking;
+      v.selling = false;
       break;
+    case 'mall-sell-open':
+      // 상담원: 내 물건 팔기 — 소지품을 골라 운영자에게 내민다 (값은 운영자가 헐값으로 부른다)
+      if (site !== 'cos') return true;
+      v.selling = !v.selling;
+      v.picking = false;
+      break;
+    case 'mall-sell-pick': {
+      if (site !== 'cos' || v.loading || !st.loaded) return true;
+      const mine = liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat).find((x) => x.id === value);
+      if (!mine) return true;
+      const left = itemLeft(readItems(ctx.chat.scriptstate), mine, aliveAnchors(ctx.chat));
+      const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...(mine.truth ? { truth: mine.truth } : {}), use: mine.use, ...(left !== undefined ? { uses: left } : {}), ...(mine.equip ? { equip: mine.equip } : {}), ...(mine.icon ? { icon: mine.icon } : {}), ...(Number.isSafeInteger(mine.price) ? { paid: mine.price } : {}) });
+      v.selling = false;
+      v.chip = '';
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, next) } }));
+      await env.refresh();
+      return true;
+    }
+    case 'mall-sell-cancel':
+      if (st.sell) await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, cancelSell(readMall(chat.scriptstate, site))) } }));
+      await env.refresh();
+      return true;
+    case 'mall-sell': {
+      // 팔기 확정 (ui/shop.ts 'shop-sell' 과 같은 흐름): 가계부 수입 + 소지품에서 뺌 + 판 것 목록
+      if (!st.sell || typeof st.sell.price !== 'number' || v.loading) return true;
+      const o = st.sell;
+      let sold = false;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const now = readMall(chat.scriptstate, site);
+        if (now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
+        const it0 = readItems(chat.scriptstate);
+        if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
+        const anchor = lastBot(chat)?.key ?? '';
+        const w = addWalletEntry(readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT), { id: `${site}_sl_${o.itemId}_${now.sales.length}`, anchor, amount: now.sell.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
+        const items = sellItem(it0, o.itemId, anchor, `${MALL_NAME[site]}에 팖`);
+        const nextShop = closeSale(now);
+        if (!nextShop) return null;
+        sold = true;
+        const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+        const use = q && q.some((u) => u.id === o.itemId) ? itemUseVars(dropUse(q, o.itemId)) : {};
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop), ...use } };
+      });
+      v.info = sold ? `「${o.name}」을 ${won(o.price as number)}에 팔았습니다. 입금 되었습니다.` : '팔 수 없는 상태 입니다 (물건이 없거나 값이 바뀌었습니다).';
+      if (sold) void refreshUseBox(ctx.charIndex, ctx.chatIndex);
+      await env.refresh();
+      return true;
+    }
     case 'mall-chip':
       v.chip = value ?? '';
       v.picking = false;
@@ -384,7 +435,7 @@ function cosPay(st: ShopState, v: View, bal: number): string {
     <div class="cs-wbt"><button class="cs-btn cs-go" data-action="mall-pay" ${poor ? 'disabled' : ''}>${poor ? '잔고가 충분 하지 않습니다' : '입금 한다'}</button><button class="cs-btn" data-action="mall-pay-close">취소</button></div></div></div></div>`;
 }
 
-function cosAsk(st: ShopState, v: View, mobile: boolean): string {
+function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): string {
   const at = mobile ? '' : winStyle(v.win);
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
@@ -393,11 +444,17 @@ function cosAsk(st: ShopState, v: View, mobile: boolean): string {
     : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
   const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';
+  // 상담원: 내 물건 팔기 — 소지품 목록(장착한 것 포함)에서 고른다
+  const mine: Item[] = v.selling ? liveItemsOf(readItems(ctx.chat.scriptstate), ctx.chat) : [];
+  const sellList = v.selling ? `<div class="q-pick">${mine.map((x) => `<button data-action="mall-sell-pick" data-value="${esc(x.id)}">${esc(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won(x.price!)}</small>` : ''}</button>`).join('') || '<p>팔 만한 소지품이 없다.</p>'}</div>` : '';
+  const o = st.sell;
+  const offered = !!o && typeof o.price === 'number';
+  const sellCard = o ? `<div class="q-card q-sell"><span>파는 물건</span><b>${esc(o.name)}</b>${o.paid !== undefined ? `<small>산 값 ${won(o.paid)}</small>` : ''}<em>${offered ? `우리의 값 ${o.first !== undefined ? `<s>${won(o.first)}</s> ` : ''}${won(o.price as number)}` : o.price === null ? '우리는 사지 않는다' : '값을 아직 말하지 않았다'}</em>${offered ? `<button class="cs-btn" data-action="mall-sell"${v.loading ? ' disabled' : ''}>판매</button>` : ''}<button class="q-x" data-action="mall-sell-cancel" aria-label="그만">×</button></div>` : '';
   return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문"${at}><div class="cs-wt"><b>★ 운영자에게 질문 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
     <div class="q-hd">${ufo}<div><b>운영자</b><small>● 운영자는 여기에 있습니다</small></div></div>
-    ${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
-    <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}
-    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 여기에 넣어라" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
+    ${sellCard}${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
+    <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}${sellList}
+    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><button class="cs-btn" data-action="mall-sell-open" aria-pressed="${v.selling}">내 물건 팔기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="${o ? (offered ? '값을 다시 불러 보거나 그냥 팔아라' : '값을 부르거나 그냥 보내라') : '질문을 여기에 넣어라'}" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
 function cosHtml(ctx: ChatContext, mobile: boolean): string {
@@ -430,7 +487,7 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const side = mobile
     ? `<nav class="cs-top">${menu}</nav>`
     : `<nav class="cs-lf"><div class="cs-lt">★우주 쇼핑몰★</div>${ufo.replace('cs-ufo', 'cs-ufo cs-big')}${menu}<hr class="cs-rb"><div class="cs-cnt">TOTAL <span>${String(st.items.length + st.talk.length + 700).padStart(6, '0')}</span></div><small>800×600 해상도를<br>권장 합니다</small></nav>`;
-  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보입니다 · 웹 관리자 : 운영자</div></div></div>${v.ask ? cosAsk(st, v, mobile) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
+  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보입니다 · 웹 관리자 : 운영자</div></div></div>${v.ask ? cosAsk(ctx, st, v, mobile) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
 }
 
 /* 백일몽 포인트몰 */
