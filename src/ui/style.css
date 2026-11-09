@@ -4602,3 +4602,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 뒤로 단추는 어디서나 36 (11-09 점검 17: 폰은 40이었다). 인터넷 사이트(.bs) 안은 사이트 모양 그대로 */
 .ph-room-head > .ph-tool.ph-back { width: 36px; height: 36px; }
 .bs .ph-room-head > .ph-tool.ph-back { width: 34px; height: 34px; }
+
+/* 사이트 글 보기 아래 여백 (11-09 사용자: 괴담갤 글 안에서 단추들이 바닥에 붙음) — 게시판 셋 같은 값 */
+.bs-gal .dpost, .bs-wpf .wpost, .bs-gn .gmain.gpost { padding-bottom: 24px; }
