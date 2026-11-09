@@ -689,7 +689,7 @@ export class Fighter {
         hit('launch', { stop: 0.16 });
         if (o0) {
           // 띄우기: 상대 발밑에서 불기둥이 솟는다. 캐릭터 뒤에 깔아 몸을 가리지 않음
-          this.st.fx.push({ k: 'sheet', name: 'dot-flame', x: o0.x, y: LINE + 4, s: K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-pillar', x: o0.x, y: LINE + 6, s: 2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: o0.x - this.face * 30, y: o0.midY() + 30, s: 2 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
         }
         this.st.shake(16);
@@ -738,7 +738,7 @@ export class Fighter {
           const x = o0.x;
           // 마무리 (11-09 3판, 킹오파 참고): 화면 하얗게 → 쓰러진 상대 뒤로 큰 불기둥 + 몸 위 먹물 가시별
           this.st.whiteFlash?.(0.3);
-          this.st.fx.push({ k: 'sheet', name: 'dot-flame', x, y: LINE + 6, s: 1.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-pillar', x, y: LINE + 6, s: 2.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-b', x, y: LINE - 50 * K, s: 3.4 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst', x: x - 40, y: LINE - 10, s: 2.4 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
           later(this.st, 0.12, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: x + 30, y: LINE - 10, s: 2.4 * K, flip: this.face > 0, anchor: 'pivot', t: 9, t0: 9, el: 0 }));

@@ -60,6 +60,44 @@ def burst(out, W=104, Hh=112, N=14, seed=7, n_tongue=64, n_smoke=22, core='hit_a
     (H.OUT / f"{out}.json").write_text(json.dumps({"frames": meta, "meta": {"app": "tools/dotfx/hand_compose.py (손도트 조각 겹치기)", "image": f"{out}.png", "size": {"w": sheet.width, "h": sheet.height}}}, ensure_ascii=False))
     print(out, N, W, Hh)
 
+def pillar(out, W=72, Hh=300, N=14, seed=3):
+    """불기둥: 흰 불 줄기(손도트)를 세로로 겹겹이 쌓아 솟게 하고, 가장자리에 불혀·연기를 붙임"""
+    rnd = random.Random(seed)
+    St, T, S = frames('streak'), frames('tongue'), frames('smoke')
+    cx, base = W // 2, Hh - 4
+    streaks = [(int(rnd.gauss(0, 6)), rnd.randint(0, Hh - 30), rnd.randint(0, 5), rnd.random() < 0.5) for _ in range(170)]
+    tongues = [(rnd.choice([-1, 1]) * rnd.randint(10, 20), rnd.randint(0, Hh - 60), rnd.randint(1, 8), rnd.random() < 0.5) for _ in range(34)]
+    smokes = [(rnd.choice([-1, 1]) * rnd.randint(14, 28), rnd.randint(10, Hh - 20), rnd.randint(4, 8), rnd.random() < 0.5) for _ in range(14)]
+    fr_out, dur = [], []
+    for t in range(N):
+        cv = [['.'] * W for _ in range(Hh)]
+        top = base - min(1.0, (t + 1) / 3) * (Hh - 10)            # 세 장에 걸쳐 솟음
+        for dx, h, b, fl in smokes:
+            f = t - b; y = base - h
+            if 0 <= f < len(S) and y >= top: stamp(cv, S[f], cx + dx - 7, y - f * 3 - 6, fl)
+        for dx, h, b, fl in tongues:
+            f = t - b; y = base - h
+            if 0 <= f < len(T) and y >= top: stamp(cv, T[f], cx + dx - 8, y - f * 4 - 19, fl)
+        for dx, h, b, fl in streaks:
+            f = t - b; y = base - h
+            if 0 <= f < len(St) and y >= top: stamp(cv, St[f], cx + dx - 4, y - 31 - f * 6, fl)
+        fr_out.append(cv); dur.append(35 if t < 8 else 45)
+    cols = 7; rows = (N + cols - 1) // cols
+    sheet = Image.new("RGBA", (W * cols, Hh * rows), (0, 0, 0, 0)); px = sheet.load(); meta = []
+    for i, cv in enumerate(fr_out):
+        x0, y0 = (i % cols) * W, (i // cols) * Hh
+        for y, row in enumerate(cv):
+            for x, ch in enumerate(row):
+                if ch in H.PAL: px[x0 + x, y0 + y] = H.PAL[ch] + (255,)
+        meta.append({"filename": f"{out} {i}.png", "frame": {"x": x0, "y": y0, "w": W, "h": Hh}, "rotated": False, "trimmed": False,
+                     "spriteSourceSize": {"x": 0, "y": 0, "w": W, "h": Hh}, "sourceSize": {"w": W, "h": Hh}, "pivot": {"x": 0.5, "y": 1.0}, "duration": dur[i]})
+    sheet.save(H.OUT / f"{out}.png")
+    (H.OUT / f"{out}.json").write_text(json.dumps({"frames": meta, "meta": {"app": "tools/dotfx/hand_compose.py (손도트 조각 겹치기)", "image": f"{out}.png", "size": {"w": sheet.width, "h": sheet.height}}}, ensure_ascii=False))
+    print(out, N, W, Hh)
+
+
 if __name__ == "__main__":
     burst('dot-hand-burst')
     burst('dot-hand-burst2', seed=21, core='hit_c', ink=False, n_tongue=50)
+    pillar('dot-hand-pillar')
+
