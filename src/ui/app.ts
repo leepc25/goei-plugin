@@ -186,6 +186,16 @@ const recordsEnv: RecordsEnv = settingsEnv;
 
 /** 창이 떠 있는지 (괴담톡이 받은 말풍선을 바로 읽음 처리할지) */
 let shown = false;
+/** 상황판이 떠 있나 (body.ts: 그동안 호출 진행 창은 숨긴다 — 본 문서의 진행 단추가 상황판 닫기 X 위에 올라와 눌리지 않았다, 11-09 릴리스 점검) */
+export const appShown = (): boolean => shown;
+let shownListener: ((shown: boolean) => void) | null = null;
+export function onAppShown(f: (shown: boolean) => void): void {
+  shownListener = f;
+}
+function setShown(v: boolean): void {
+  shown = v;
+  shownListener?.(v);
+}
 const phoneEnv: PhoneEnv = {
   render: () => render(),
   refresh: () => refresh(),
@@ -700,7 +710,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   view = { kind: 'loading' };
   notice = '';
   render();
-  shown = true;
+  setShown(true);
   if (root) startCctvFx(root);
   await showWindow();
   await refresh();
@@ -726,7 +736,7 @@ export async function openInstall(): Promise<void> {
     ensureRoot();
     view = { kind: 'error', message: '선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요.' };
     render();
-    shown = true;
+    setShown(true);
     await showWindow();
     return;
   }
@@ -842,7 +852,7 @@ async function refresh(): Promise<void> {
 }
 
 async function close(): Promise<void> {
-  shown = false;
+  setShown(false);
   netSolo = false;
   stopCctvFx();
   await risuai.hideContainer();
