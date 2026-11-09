@@ -646,7 +646,7 @@ export class Fighter {
       };
       if (big) {
         // 큰 한 방 (11-09 5판, 킹오파98 롬에서 잰 순서): 흰 화면 2장 → 검은 별 → 흰 별 → 빛살 → 주황 가시 → 조각. 48칸 손도트, 한 칸 = 캐릭터 점 2.4개(캐릭터 키 절반)
-        this.st.bgWhite?.(0.05);
+        if (hitN === 1) this.st.bgWhite?.(2 / 60);   // 킹오파: 첫 대에만 흰 배경 2장
         put('dot-hand-big3', 0, 0, 2 * K, hitN % 2 ? !flip : flip);
       } else {
         put(HAND[hitN % HAND.length], j() * 20, j() * 40, 3 * K, hitN % 3 === 2 ? !flip : flip);
@@ -659,7 +659,7 @@ export class Fighter {
       const r = o0.receive(this, { use, kind, at, noVfx: true, ...o });
       if (r === 'hit') {
         hitN++;
-        const big = kind !== 'light' || hitN % 4 === 0;
+        const big = kind !== 'light' || hitN === 1 || hitN % 4 === 0;
         bigFx(at.x, at.y, big);
         this.freeze = Math.max(this.freeze, o.stop ?? 0.05);
         this.st.shake(big ? 12 : 7);
@@ -667,9 +667,11 @@ export class Fighter {
     };
     // 한 대: 그 장들을 빠르게, 때리는 장에서 맞힘
     const beat = (id: string, heavy: boolean, d: number, f: () => void, then: () => void) => {
-      const s0 = normalSeq(this.art, id, heavy), imp = Math.max(0, s0.findIndex((e) => e.act));
-      // 때린 뒤 두 장만 남기고 바로 다음 대로 (회수 장을 다 돌리면 연타가 늘어짐)
-      const s = s0.slice(0, imp + 3).map((e) => ({ ...e, d: e.d * d, act: false, cancel: false }));
+      const s0 = normalSeq(this.art, id, heavy), imp0 = Math.max(0, s0.findIndex((e) => e.act));
+      // 킹오파 난무 박자 (11-09 롬 대조): 때리기 직전 두 장 → 때리는 장 → 한 장. 약 6~8게임장마다 한 대
+      const G = 1 / 60, k = d >= 0.6 ? 2 : d >= 0.5 ? 1.5 : 1;
+      const a = Math.max(0, imp0 - 2), imp = imp0 - a;
+      const s = s0.slice(a, imp0 + 2).map((e, i) => ({ ...e, d: (i < imp ? 1 : 2) * G * k, act: false, cancel: false }));
       s[imp].fn = f;
       this.play(id, s, { onEnd: then });
     };
@@ -679,7 +681,7 @@ export class Fighter {
       if (!foeOk()) return end();
       if (i >= beats.length) return launch();
       const id = beats[i], heavy = id === H;
-      beat(id, heavy, heavy ? 0.5 : 0.45, () => hit(heavy ? 'heavy' : 'light', { lock: 0.9, stop: heavy ? 0.2 : 0.04 }), () => runBeats(i + 1));
+      beat(id, heavy, heavy ? 0.5 : 0.45, () => hit(heavy ? 'heavy' : 'light', { lock: 0.9, stop: heavy ? 0.1 : 0.03 }), () => runBeats(i + 1));
     };
     const launch = () => {
       phase = 'launch';
@@ -695,10 +697,10 @@ export class Fighter {
     const jumpUp = () => {
       if (!foeOk()) return end();
       phase = 'air';
-      this.vz = 1500; this.z = 1; this.air = true; this.vx = 0;
+      this.vz = 1200; this.z = 1; this.air = true; this.vx = 0;
       this.st.sfx({ type: 'jump', x: this.x });
       const n7 = nOf(this.art, '7');
-      this.play('7', steps(range(0, Math.min(2, n7 - 1)), 0.05), { onEnd: () => airHits(0) });
+      this.play('7', steps(range(0, Math.min(2, n7 - 1)), 0.03), { onEnd: () => airHits(0) });
     };
     const airHits = (i: number) => {
       if (!foeOk()) return end();
@@ -709,8 +711,8 @@ export class Fighter {
       phase = 'spike';
       beat(this.has('14') ? '14' : H, true, 0.8, () => {
         hit('spike', { stop: 0.35 });
-        if (o0 && foeOk()) { o0.vz = -1900; o0.vx = this.face * 120; o0.freeze = 0.35; }
-        this.st.whiteFlash?.(0.12);
+        if (o0 && foeOk()) { o0.vz = -2800; o0.vx = this.face * 120; o0.freeze = 0.35; }
+        this.st.bgWhite?.(2 / 60);   // 화면 전체를 덮지 않고 배경만 (킹오파)
         this.st.shake(18);
         phase = 'fall';
       }, () => { if (phase !== 'fall') end(); });

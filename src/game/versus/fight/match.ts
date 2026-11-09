@@ -163,13 +163,16 @@ export class Match {
     void first;
   }
   private superFlash(by: Fighter, name: string): void {
-    this.superT = 0.6;
+    // 킹오파98 롬: 시작 연출 동안 둘 다 멈춤 28게임장 (흰 배경 4 + 검은 배경 24)
+    const H = RUSH_SUPER.has(by.name) ? 28 / 60 : 0.6;
+    this.superT = H;
     this.darkT = 1.6;
     this.superName = { text: name, t: 0.9, by };
-    for (const f of this.st.fighters) f.hold = Math.max(f.hold, 0.6);
+    for (const f of this.st.fighters) f.hold = Math.max(f.hold, H);
     if (RUSH_SUPER.has(by.name)) {
       // 킹오파식 시작 (11-09 5판, 롬에서 잰 순서): 배경만 흰색 4장 → 검은 배경 + 뒤 층진 빛 8장 줄어듦 → 가슴 앞 빛덩이 8장 → 빛살 8장. 1장 = 1게임장
-      this.blackT = 0.7;   // 킹오파: 빛살이 사라지면 배경이 바로 돌아옴(약 40게임장)
+      this.blackT = 1 / 60;   // 킹오파: 멈춤이 풀리는 순간 배경이 바로 돌아옴 (멈춘 동안은 줄지 않음)
+      this.darkT = 0;
       this.bgWhiteT = 4 / 60;
       const y = LINE - by.z - 125 * K;
       this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x + by.face * 12 * K, y, s: 2 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
@@ -460,7 +463,7 @@ export class Match {
       for (const o of bg.objs) if (!o.front) c.drawImage(o.img, Math.round(o.x), Math.round(o.y), Math.round(o.w), Math.round(o.h));
       // 필살기: 배경 그림만 어둡게, 캐릭터는 그 위에 그대로
       if (this.bgWhiteT > 0) { c.fillStyle = '#fff'; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
-      else if (this.blackT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(1, this.blackT * 2.5).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      else if (this.blackT > 0) { c.fillStyle = '#000'; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
       else if (this.darkT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(0.65, this.darkT * 0.6).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
     }
     drawBench(c, 0);
