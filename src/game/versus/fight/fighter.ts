@@ -636,11 +636,22 @@ export class Fighter {
     };
     const foeOk = () => !!o0 && o0.alive && o0.deadT < 0 && o0.state !== 'ko';
     let hitN = 0;
-    /** 맞는 자리 효과 (11-09 3판, 킹오파 참고): 캐릭터와 같은 도트 크기. 대마다 머리만 한 불꽃, 큰 한 방은 먹물 가시별 + 귤색 불덩이 */
+    /** 맞는 자리 효과 (11-09 4판): 점 하나씩 손으로 찍은 세 가지(A 흰 불 뿜음·B 먹물 튐·C 베인 빛)를 대마다 돌려 쓰고 겹쳐 깖. 한 칸 = 캐릭터 점 2개 */
+    const HAND = ['dot-hand-a', 'dot-hand-c', 'dot-hand-a', 'dot-hand-b'];
     const bigFx = (x: number, y: number, big: boolean) => {
-      const flip = this.face < 0;
-      if (big) this.st.fx.push({ k: 'sheet', name: 'dot-ink', x, y, s: K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
-      else this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x + (Math.random() - 0.5) * 24, y: y + (Math.random() - 0.5) * 30, s: K, flip: Math.random() < 0.5, anchor: 'center', t: 9, t0: 9, el: 0 });
+      const flip = this.face < 0, j = () => (Math.random() - 0.5);
+      const put = (name: string, dx: number, dy: number, s: number, fl = flip, dl = 0) => {
+        const go = () => this.st.fx.push({ k: 'sheet', name, x: x + (fl ? -dx : dx), y: y + dy, s, flip: fl, anchor: 'center', t: 9, t0: 9, el: 0 });
+        if (dl) later(this.st, dl, go); else go();
+      };
+      if (big) {
+        put('dot-hand-b', 0, 0, 4 * K);
+        put('dot-hand-a', 30, j() * 40, 3 * K, flip, 0.03);
+        put('dot-hand-c', -10, j() * 50, 3.2 * K, Math.random() < 0.5, 0.06);
+      } else {
+        put(HAND[hitN % HAND.length], j() * 20, j() * 40, 3 * K, hitN % 3 === 2 ? !flip : flip);
+        if (hitN % 2) put('dot-hand-c', j() * 30, j() * 50, 2.4 * K, Math.random() < 0.5, 0.04);
+      }
     };
     const hit = (kind: HitKind, o: Partial<HitSpec> = {}) => {
       if (!foeOk() || !o0) return;
@@ -725,9 +736,9 @@ export class Fighter {
           // 마무리 (11-09 3판, 킹오파 참고): 화면 하얗게 → 쓰러진 상대 뒤로 큰 불기둥 + 몸 위 먹물 가시별
           this.st.whiteFlash?.(0.3);
           this.st.fx.push({ k: 'sheet', name: 'dot-flame', x, y: LINE + 6, s: 1.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
-          this.st.fx.push({ k: 'sheet', name: 'dot-ink', x, y: LINE - 50 * K, s: 1.2 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
-          later(this.st, 0.1, () => this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x - 30, y: LINE - 90 * K, s: K, anchor: 'center', t: 9, t0: 9, el: 0 }));
-          later(this.st, 0.18, () => this.st.fx.push({ k: 'sheet', name: 'dot-spark', x: x + 40, y: LINE - 40 * K, s: K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-b', x, y: LINE - 50 * K, s: 3.4 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
+          later(this.st, 0.1, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-a', x: x - 30, y: LINE - 90 * K, s: 2.4 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          later(this.st, 0.18, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-c', x: x + 40, y: LINE - 40 * K, s: 2.4 * K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
           this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
           later(this.st, 0.22, () => this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x }));
           this.st.shake(24);
