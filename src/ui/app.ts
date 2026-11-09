@@ -39,7 +39,7 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
-import { mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
+import { bmDeskWinSpec, mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
 import { boardChrome, gnet, gnetDmOpen, gnetDmWinSpec, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { bindPopWins } from './popwin';
@@ -287,7 +287,7 @@ function ensureRoot(): HTMLElement {
   });
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
-  bindPopWins(root, render, [mallWinSpec, gnetDmWinSpec]);
+  bindPopWins(root, render, [mallWinSpec, bmDeskWinSpec, gnetDmWinSpec]);
   // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 닫은 탭 복구 (인터넷)
   bindMouseGesture(root, {
     label: (g: Gesture) => {

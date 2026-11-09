@@ -16,6 +16,8 @@ import { getPrefs } from '../core/settings';
 import { minuteText, orderDue, orderReady, ordersText, ordersVars, readOrders, worldMinute, type CosOrder } from '../core/orders';
 import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
+import { craftMessages } from '../core/craft';
+import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskSettings, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
@@ -43,8 +45,10 @@ interface View {
   page: string;
   /** 입금 창 */
   pay: boolean;
-  /** 운영자에게 질문 창 */
+  /** 운영자에게 질문 창 (포인트몰: 1:1 상담 창) */
   ask: boolean;
+  /** 포인트몰 1:1 상담: 상담사 만드는 중 · 답 기다리는 중 */
+  dl?: '' | 'make' | 'talk';
   /** 방금 받은 맞춤 주문 id (주문 조회에서 설명·효과가 보이는 카드) */
   took?: string;
   /** 질문에 붙인 물건 id */
@@ -289,6 +293,7 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       return true;
     }
     case 'mall-ask':
+      if (site === 'bm') return deskOpen(ctx, env);
       // 상품에서 열면 그 물건을 붙인다
       if (site !== 'cos') return true;
       v.ask = true;
@@ -432,8 +437,32 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       if (v.failRaw) v.notice = `${v.notice.split('\n')[0]}\n${v.failRaw.slice(0, 1500)}`;
       v.failRaw = '';
       break;
+    case 'mall-desk-end':
+      // 상담 종료: 상담사를 지난 목록에 넣고 창을 닫는다 (다음에 열면 새 상담사)
+      if (site !== 'bm' || v.dl) return true;
+      await saveDesk(ctx, endDesk(readDesk(ctx.chat.scriptstate)));
+      v.ask = false;
+      v.input = '';
+      await env.refresh();
+      return true;
+    case 'mall-desk-next': {
+      if (site !== 'bm' || v.dl) return true;
+      const saved = await saveDesk(ctx, endDesk(readDesk(ctx.chat.scriptstate)));
+      v.input = '';
+      if (saved) await deskRun({ ...ctx, chat: saved }, env, 'make', endDesk(readDesk(saved.scriptstate)));
+      return true;
+    }
     case 'mall-say': {
       const said = (value ?? v.input).trim();
+      if (site === 'bm') {
+        const d = readDesk(ctx.chat.scriptstate);
+        if (!said || v.dl || !d.agent) return true;
+        const next: DeskState = { ...d, talk: [...d.talk, { who: 'me', text: said.slice(0, 600) }] };
+        v.input = '';
+        const saved = await saveDesk(ctx, next);
+        if (saved) await deskRun({ ...ctx, chat: saved }, env, 'talk', next);
+        return true;
+      }
       if (site !== 'cos' || !said || v.loading || !st.loaded) return true;
       const chip = st.items.find((x) => x.id === v.chip && !x.sold);
       const next = sayToOwner(st, `${chip ? `[${chip.name}] ` : ''}${said}`);
@@ -449,6 +478,101 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       return false;
   }
   env.render();
+  return true;
+}
+
+
+// ── 포인트몰 1:1 상담 (2026-11-09 사용자: 기능 없이 상담사와 대화하는 재미, 상담마다 다른 백일몽 직원) ──
+
+/** 상담사 모델에 넘길 자료: 백일몽 로어북·위키(참고 로어북 수는 포인트몰 설정), 지금 진열, 남은 포인트, 사내 계정 */
+function deskSource(ctx: ChatContext): DeskSource {
+  const vars = ctx.chat.scriptstate;
+  const s = mallSettings(vars, 'bm');
+  const st = readMall(vars, 'bm');
+  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(vars, 'bm') as typeof ctx.chat.scriptstate } }, { ...st, shop: '백일몽', owner: '' }, s);
+  return { refs: src.refs, shelf: onShelf(st).map((x) => `${x.name}|${x.price}p|${x.desc}`).join('\n'), points: balanceOf(ctx, 'bm'), nick: loggedNick(ctx), language: src.language };
+}
+
+async function saveDesk(ctx: ChatContext, st: DeskState) {
+  return updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...deskVars(st) } }));
+}
+
+const deskHello = (a: DeskAgent, again = false) => `${a.dept ? `${a.dept} ` : ''}${a.name} ${a.rank}님이 상담에 ${again ? '다시 ' : ''}연결되었습니다.`;
+
+/** 상담사 만들기(make) 또는 답 받기(talk). 같은 채팅을 보고 있을 때만 저장 */
+async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st0: DeskState): Promise<void> {
+  const v = ui.bm;
+  const job = `${chatKey(ctx)}:bm-desk`;
+  if (jobs.has(job)) return;
+  jobs.add(job);
+  const vars = ctx.chat.scriptstate;
+  const s = mallSettings(vars, 'bm');
+  const ds = deskSettings(vars);
+  v.dl = kind;
+  v.notice = '';
+  v.failRaw = '';
+  env.render();
+  try {
+    const src = deskSource(ctx);
+    const g = genSettings(vars);
+    const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: vars, label: `${MALL_NAME.bm} 1:1 상담${kind === 'make' ? ' 연결' : ''}` };
+    let next: DeskState;
+    const key = lastBot(ctx.chat)?.key ?? '';
+    if (kind === 'make') {
+      const dice = rollDice(ds.axes);
+      const p = makePrompt(src, dice, st0.past.slice(0, ds.avoid));
+      const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, (raw) => parseCard(raw, dice), opts);
+      next = { ...st0, agent: value.agent, anchor: key, talk: [{ who: 'sys', text: deskHello(value.agent) }, ...value.say.map((t) => ({ who: 'op' as const, text: t }))] };
+    } else {
+      const p = deskTalkPrompt(src, st0);
+      const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, parseSay, opts);
+      next = { ...st0, talk: [...st0.talk, ...value.map((t) => ({ who: 'op' as const, text: t }))] };
+    }
+    const cur = env.current();
+    if (!cur || chatKey(cur) !== chatKey(ctx)) return;
+    await saveDesk(cur, next);
+  } catch (error) {
+    v.notice = error instanceof Error ? error.message : String(error);
+    v.failRaw = String((error as { raw?: string }).raw ?? '');
+    if (kind === 'talk') {
+      // 내 말은 적어 뒀으니 답이 안 왔으면 되돌리고 입력칸에 돌려준다
+      const cur = env.current();
+      if (cur && chatKey(cur) === chatKey(ctx)) {
+        const last = st0.talk[st0.talk.length - 1];
+        if (last?.who === 'me') {
+          v.input = last.text;
+          await saveDesk(cur, { ...st0, talk: st0.talk.slice(0, -1) }).catch(() => null);
+        }
+      }
+    }
+  } finally {
+    v.dl = '';
+    jobs.delete(job);
+  }
+  await env.refresh();
+}
+
+/** 1:1 상담 열기: 이어 가던 상담이 있으면 그대로(본편이 넘어갔으면 끝내고 새로), 없으면 새 상담사 연결 */
+async function deskOpen(ctx: ChatContext, env: MallEnv): Promise<boolean> {
+  const v = ui.bm;
+  const ds = deskSettings(ctx.chat.scriptstate);
+  if (!ds.on || !loggedNick(ctx)) return true;
+  v.ask = true;
+  v.notice = '';
+  if (v.dl) return env.render(), true;
+  let st = readDesk(ctx.chat.scriptstate);
+  const key = lastBot(ctx.chat)?.key ?? '';
+  if (st.agent && st.anchor === key) return env.render(), true;
+  if (st.agent) st = endDesk(st);
+  const again = pickAgain(st, ds);
+  if (again) {
+    st = { ...st, agent: again, anchor: key, past: st.past.filter((p) => p.id !== again.id), talk: [{ who: 'sys', text: deskHello(again, true) }] };
+    await saveDesk(ctx, st);
+    await env.refresh();
+    return true;
+  }
+  const saved = await saveDesk(ctx, st);
+  if (saved) await deskRun({ ...ctx, chat: saved }, env, 'make', st);
   return true;
 }
 
@@ -632,7 +756,8 @@ function bmHtml(ctx: ChatContext, mobile: boolean): string {
   else {
     const cats: [string, string][] = [['', '전체'], ...(s.feature ? [['rare', '이달의 한정'], ['sale', '특가']] as [string, string][] : [])];
     const shown = v.page === 'rare' ? list.filter((x) => x.tag === 'rare') : v.page === 'sale' ? list.filter((x) => x.tag === 'sale' && x.was) : list;
-    const side = `<nav class="bp-side${mobile ? ' m' : ''}">${cats.map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}" aria-pressed="${v.page === k}">${l}</button>`).join('')}</nav>`;
+    const desk = deskSettings(ctx.chat.scriptstate).on ? `<button class="bp-desk${v.ask ? ' on' : ''}" data-action="mall-ask" data-value="" aria-pressed="${v.ask}">1:1 상담</button>` : '';
+    const side = `<nav class="bp-side${mobile ? ' m' : ''}">${cats.map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}" aria-pressed="${v.page === k}">${l}</button>`).join('')}${desk}</nav>`;
     const note = mallNote(ctx.chat.scriptstate, site);
     const banner = `<div class="bp-ban">포인트는 현금으로 바꿀 수 없으며, 이 몰에서만 쓸 수 있습니다.${note ? `<br>${esc(note)}` : ''}</div>`;
     const info = v.info ? `<div class="bp-info" role="status">${esc(v.info)}</div>` : '';
@@ -641,7 +766,29 @@ function bmHtml(ctx: ChatContext, mobile: boolean): string {
       : `<div class="bp-grid">${shown.map((x) => bmCard(x, bal, v, !!v.loading)).join('') || '<p class="bp-none">이 분류에는 상품이 없습니다.</p>'}</div>`;
     body = `<div class="bp-wrap">${side}<div class="bp-main">${banner}${info}${failBox(v, 'bp-fail')}<h2>${v.page === 'rare' ? '이달의 한정' : v.page === 'sale' ? '특가' : '전체 상품'}${v.loading === 'shelf' && list.length ? ' <small>새 상품을 불러오는 중…</small>' : ''}</h2>${grid}</div></div>`;
   }
-  return `<main class="ms ms-bm${mobile ? ' ms-m' : ''}">${gnb}${hd}${body}</main>`;
+  const deskWin = v.ask && s.on && nick && deskSettings(ctx.chat.scriptstate).on ? bmDesk(ctx, v, mobile) : '';
+  return `<main class="ms ms-bm${mobile ? ' ms-m' : ''}">${gnb}${hd}${body}${deskWin}</main>`;
+}
+
+/** 1:1 상담 창: 포인트몰 톤(남색·금색·흰 바탕)의 사내 메신저. 위에 사원증 이름표, 연결 안내는 회색 줄, 내 말 남색·상담사 말 연회색 */
+function bmDesk(ctx: ChatContext, v: View, mobile: boolean): string {
+  const d = readDesk(ctx.chat.scriptstate);
+  const a = d.agent;
+  const at = mobile ? '' : winStyle(v.win);
+  const busy = !!v.dl;
+  const badge = a
+    ? `<div class="bd-badge"><i aria-hidden="true">${esc(a.name.slice(0, 1))}</i><div><small>백일몽 주식회사</small><b>${esc(a.name)} <em>${esc(a.rank)}</em></b><span>${esc(a.dept || '포인트몰 상담')}</span></div></div>`
+    : `<div class="bd-badge bd-wait"><i aria-hidden="true">…</i><div><small>백일몽 주식회사</small><b>${v.dl === 'make' ? '상담사 연결 중…' : '연결된 상담사 없음'}</b></div></div>`;
+  const line = (l: { who: string; text: string }) => (l.who === 'sys'
+    ? `<div class="bd-sys">${esc(l.text)}</div>`
+    : l.who === 'me' ? `<div class="bd-m bd-me"><p>${esc(l.text)}</p></div>` : `<div class="bd-m bd-op"><small>${esc(a?.name ?? '상담사')}</small><p>${esc(l.text)}</p></div>`);
+  const wait = v.dl === 'make' ? '<div class="bd-sys">상담사를 연결하고 있습니다…</div>' : v.dl === 'talk' ? `<div class="bd-m bd-op bd-typing"><small>${esc(a?.name ?? '상담사')}</small><p>입력 중…</p></div>` : '';
+  const log = `${d.talk.map(line).join('')}${wait}`;
+  const tools = `<div class="bd-tools"><button data-action="mall-desk-next"${busy ? ' disabled' : ''}>다른 상담사 연결</button><button data-action="mall-desk-end"${busy || !a ? ' disabled' : ''}>상담 종료</button></div>`;
+  return `<div class="bd-win" role="dialog" aria-label="1:1 상담"${at}><div class="bd-wt"><b>1:1 상담</b><span>백일몽 포인트몰</span><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
+    <div class="bd-hd">${badge}${tools}</div>
+    <div class="bd-lg"><div>${log}</div></div>${failBox(v, 'bp-fail bd-fail')}
+    <div class="bd-in"><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="${a ? '메시지를 입력하세요' : '상담사가 연결되면 입력할 수 있습니다'}" aria-label="메시지"${busy || !a ? ' disabled' : ''}><button class="bp-buy" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, busy || !a)}>전송</button></div>${mobile ? '' : '<i class="bd-rs" aria-hidden="true"></i>'}</div>`;
 }
 
 /** 브라우저 탭 화면 */
@@ -689,7 +836,7 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
     row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
     row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
     row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosTruthGroup(ctx) + cosFixedGroup(ctx) : ''}`;
+  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -722,6 +869,19 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
   ].join('') + reset);
 }
 
+/** 포인트몰 1:1 상담 (11-09 사용자: 상담마다 다른 백일몽 직원. 주사위 칸·다시 만나기·겹치지 않기는 설정에서, 말투·업무 지침은 지침 「포인트몰 1:1 상담」에서) */
+function deskGroup(ctx: ChatContext): string {
+  const d = deskSettings(ctx.chat.scriptstate);
+  const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 본편이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
+  const reset = d.axesText ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
+  return group('1:1 상담', how + [
+    row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
+    row('상담사 주사위 칸', `<textarea class="gx-search ms-area" rows="7" data-change="ms-desk" data-key="axes" placeholder="${esc(DESK_AXES_DEFAULT)}">${esc(d.axesText)}</textarea>`, '한 줄에 「칸 이름: 값, 값, …」. 칸마다 하나씩 뽑아요. 같은 값을 여러 번 적으면 그만큼 잘 뽑혀요. 비우면 기본 칸(회색 글).'),
+    row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
+    row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
+  ].join('') + reset);
+}
+
 /** 진짜 효과 (11-09 사용자: 보이는 효과는 광고 문구, 진짜는 숨김 · 미리 정한 것과 「아무도 모름」을 섞음) */
 function cosTruthGroup(ctx: ChatContext): string {
   const m = cosTruthMode(ctx.chat.scriptstate);
@@ -750,6 +910,7 @@ function cosFixedGroup(ctx: ChatContext): string {
 
 /** 설정 값 바꾸기: ms-cfg 「사이트:키=값」 · ms-step 「사이트:키:±」 · ms-num 「사이트:키=숫자」(상품 수) · ms-text (값 기준) */
 export async function mallSettingsAction(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv): Promise<boolean> {
+  if (await deskSettingsAction(action, value, ctx, env)) return true;
   if (await cosExtraAction(action, value, ctx, env)) return true;
   if (action !== 'ms-cfg' && action !== 'ms-step' && action !== 'ms-text' && action !== 'ms-num') return false;
   let site = '';
@@ -789,8 +950,33 @@ export async function mallSettingsAction(action: string, value: string | undefin
   return true;
 }
 
+/** 1:1 상담 설정: ms-cfg 「bm:desk_on=1」·「bm:desk_again=1」 · ms-desk 「axes=글」 · ms-desk-step ± · ms-desk-reset */
+async function deskSettingsAction(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv): Promise<boolean> {
+  const set = async (vars: Record<string, string>) => {
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
+    await env.refresh();
+    return true;
+  };
+  if (action === 'ms-cfg') {
+    const m = /^bm:(desk_on|desk_again)=([01])$/.exec(value ?? '');
+    if (!m) return false;
+    return m[1] === 'desk_on' ? set({ [DESK_KEY.on]: m[2] === '0' ? '0' : '' }) : set({ [DESK_KEY.again]: m[2] === '1' ? '1' : '' });
+  }
+  if (action === 'ms-desk') {
+    const m = /^axes=([\s\S]*)$/.exec(value ?? '');
+    return m ? set({ [DESK_KEY.axes]: m[1].trim().slice(0, 4000) }) : true;
+  }
+  if (action === 'ms-desk-step') {
+    const d = deskSettings(ctx.chat.scriptstate);
+    const n = Math.max(DESK_AVOID_RANGE[0], Math.min(DESK_AVOID_RANGE[1], d.avoid + (value === '+' ? 1 : -1)));
+    return set({ [DESK_KEY.avoid]: String(n) });
+  }
+  if (action === 'ms-desk-reset') return set({ [DESK_KEY.axes]: '' });
+  return false;
+}
+
 /** 질문 창이 떠 있나 (Esc 처리용) */
-export const mallAskOpen = (): boolean => ui.cos.ask;
+export const mallAskOpen = (): boolean => ui.cos.ask || ui.bm.ask;
 
 /** 우주 쇼핑몰 질문 창을 진짜 팝업창처럼 (11-09 사용자): 제목줄 끌어 옮기기, 오른쪽 아래 모서리로 크기 조절, 창 밖을 누르면 닫힘 (ui/popwin.ts 공통) */
 export const mallWinSpec: PopSpec = {
@@ -808,6 +994,24 @@ export const mallWinSpec: PopSpec = {
   },
   save: (b) => {
     ui.cos.win = b;
+  },
+};
+
+/** 포인트몰 1:1 상담 창도 같은 팝업 (11-09 사용자: 우주몰처럼 끌어 옮기고 닫을 수 있게) */
+export const bmDeskWinSpec: PopSpec = {
+  host: '.ms-bm',
+  skip: 'ms-m',
+  win: '.bd-win',
+  grip: '.bd-wt',
+  size: '.bd-rs',
+  keep: '[data-action="mall-ask"]',
+  min: [300, 260],
+  isOpen: () => ui.bm.ask,
+  close: () => {
+    ui.bm.ask = false;
+  },
+  save: (b) => {
+    ui.bm.win = b;
   },
 };
 
