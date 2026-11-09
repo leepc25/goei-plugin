@@ -186,10 +186,10 @@ ${ROUTER_SYSTEM.slice(3).join("\n")}
   var getUserRules = () => userRules;
   function rulesFor(name) {
     if (!RULE_TARGETS.includes(name)) return "";
-    const hit3 = userRules.filter((r) => r.on && r.text.trim() && r.to.includes(name));
-    if (!hit3.length) return "";
+    const hit4 = userRules.filter((r) => r.on && r.text.trim() && r.to.includes(name));
+    if (!hit4.length) return "";
     return `## User Rules
-${hit3.map((r) => `### ${r.title.trim() || "규칙"}
+${hit4.map((r) => `### ${r.title.trim() || "규칙"}
 ${r.text.trim()}`).join("\n\n")}`;
   }
   function guidePrompt(name) {
@@ -640,8 +640,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   var isDirectory = (comment) => comment === DIRECTORY_COMMENT || comment === OLD_DIRECTORY;
   function named(lore, name, old) {
     const list4 = lore ?? [];
-    const hit3 = list4.filter((e) => e.comment === name);
-    return hit3.length ? hit3 : list4.filter((e) => e.comment === old);
+    const hit4 = list4.filter((e) => e.comment === name);
+    return hit4.length ? hit4 : list4.filter((e) => e.comment === old);
   }
   var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
   var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];

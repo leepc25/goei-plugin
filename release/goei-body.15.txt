@@ -1,4 +1,114 @@
-rn handle3("ed-open", "set:screen");
+hideContainer();
+  }
+  async function stagedTheme(ctx2, value) {
+    if (value !== "light" && value !== "dark" && value !== "paper") return;
+    try {
+      const saved2 = await updateChat(
+        ctx2.charIndex,
+        ctx2.chatIndex,
+        (chat) => chatPhase(chat) === "started" || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
+      );
+      if (saved2) ctx2.chat = saved2;
+    } catch (error) {
+      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    render2();
+  }
+  var run4 = (action, value) => handle3(action, value).catch((error) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
+  async function handle3(action, value) {
+    if (busy4) return;
+    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
+    if (agUi.pop && action !== "agent-info") agUi.pop = "";
+    if (action.startsWith("adv-") && (view.kind === "started" || view.kind === "picker" && pickerPrefs)) {
+      const feat = (value ?? "").split(/[:=]/)[0];
+      const scope = feat !== "gen" ? "chat" : view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      await handleAdvanced(action, value, view.ctx, { render: render2, refresh: refresh2 }, scope);
+      return;
+    }
+    const featCtx = view.kind === "started" || view.kind === "picker" && pickerPrefs && settingsUi.page ? view.ctx : null;
+    if (action === "wiki-back" && view.kind === "started" && !wiki.history.some((h) => h.view !== "home") && navHist.can(-1)) {
+      const run5 = navStep(-1);
+      return run5 ? run5() : render2();
+    }
+    if (featCtx && action.startsWith("wiki-") && await handleWiki(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("pp-") && await handlePeople(action, value, featCtx, peopleEnv)) return;
+    if (featCtx && action.startsWith("items-") && await itemsAction(action, value, featCtx, recordsEnv, root2?.querySelector("[data-it-form]") ?? lastForm)) return;
+    if (view.kind === "started" && action.startsWith("look") && await lookAction(action, value, view.ctx, refresh2)) return;
+    if (view.kind === "picker" && action.startsWith("look")) {
+      if (lookCommon(action, value)) return;
+      if (action === "look" && value) {
+        draft.look = value;
+        notice = "";
+        flashPick(value, () => {
+          lookUi.open = false;
+          render2();
+        });
+        return;
+      }
+      return;
+    }
+    if (featCtx && action.startsWith("shop-") && await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close2() })) return;
+    if (action === "cdr") {
+      cdrOpen = !cdrOpen;
+      root2?.querySelector(".gx-cdr")?.classList.toggle("open", cdrOpen);
+      root2?.querySelector(".gx-cgrip")?.setAttribute("aria-expanded", String(cdrOpen));
+      return;
+    }
+    if (featCtx && (action.startsWith("rec-") || action.startsWith("jr-"))) {
+      if (action === "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv)) {
+        const go2 = navStep(-1);
+        return go2 ? go2() : render2();
+      }
+      const switching = (action === "rec-open" || action === "rec-journal" || action === "rec-person" || action === "rec-people") && tab !== "records";
+      if (switching) {
+        tab = "records";
+        notice = "";
+        field3.confirmEnd = null;
+        resetSettings();
+      }
+      if (action !== "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv) && switching) render2();
+      return;
+    }
+    if (action.startsWith("ip-") && await handleImgPrompt(action, value, { render: render2 })) return;
+    if (featCtx && action.startsWith("ms-") && await mallSettingsAction(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("mall-")) {
+      const ms = curTab().site;
+      if (isMallSite(ms) && await mallAction(action, value, featCtx, wikiEnv, ms)) return;
+    }
+    if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action))) return;
+    if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
+    if (action === "ed-open") {
+      document.querySelectorAll(".gx-agpop").forEach((b) => b.remove());
+      if (!(view.kind === "started" || view.kind === "picker" || view.kind === "opening")) return;
+      if (view.kind === "picker") pickerPrefs = true;
+      settingsUi.scope = view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      openEditor({
+        ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : null,
+        refresh: () => refresh2(),
+        theme: () => root2?.dataset.theme ?? "dark",
+        handle: (a, v) => handle3(a, v),
+        input: panelInput,
+        change: panelChange,
+        canChat: () => view.kind === "started",
+        mobileNav: mobileNavHtml
+      }, value || void 0);
+      return;
+    }
+    if (action === "install-open") {
+      await openInstall();
+      return;
+    }
+    if (action === "set-editor-width") {
+      await savePrefs((p2) => ({ ...p2, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
+      return render2();
+    }
+    const FEAT_SET = { "gn-settings": "set:gnet", "ph-settings": "set:phone", "wiki-settings": "set:wiki" };
+    if (FEAT_SET[action]) return handle3("ed-open", FEAT_SET[action]);
+    if (action === "prefs-open" || action === "prefs-close") {
+      resetSettings();
+      resetDirectory();
+      settingsUi.scope = "defaults";
+      if (action === "prefs-open") return handle3("ed-open", "set:screen");
       pickerPrefs = false;
       return render2();
     }
@@ -157,6 +267,7 @@ rn handle3("ed-open", "set:screen");
       case "br-login-guest": {
         if (view.kind !== "started") return;
         const nick = action === "br-login-save" ? (value ?? "").trim().slice(0, 36) : "";
+        if (action === "br-login-save" && !nick) return;
         br.login = false;
         const ctx2 = view.ctx;
         const vars = { $br_login: nick ? "1" : "0", [GN_NICK]: nick };
@@ -1298,13 +1409,13 @@ ${texts.anomaly}`;
     if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
     return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
   }
-  function withCap(box3, key, cap, run5) {
-    const keep = box3[key];
-    box3[key] = cap;
+  function withCap(box4, key, cap, run5) {
+    const keep = box4[key];
+    box4[key] = cap;
     try {
       return run5();
     } finally {
-      box3[key] = keep;
+      box4[key] = keep;
     }
   }
   function stripHistoryTags(messages) {

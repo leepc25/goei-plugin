@@ -189,8 +189,8 @@ onst [k, v] of Object.entries(rel.pairs)) {
   var cache = /* @__PURE__ */ new WeakMap();
   function factionList(lore) {
     const books = lore ?? [];
-    const hit3 = cache.get(books);
-    if (hit3) return hit3;
+    const hit4 = cache.get(books);
+    if (hit4) return hit4;
     const specs = orgSpecs(books);
     const scenes = scenesOf(books);
     const out = SCENARIOS.factions.map((f, i) => {
@@ -839,8 +839,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       (r) => r.aliases.some((a) => squash(a) === k)
     ];
     for (const t of tests) {
-      const hit3 = rows3.find((r) => !used.has(r) && t(r));
-      if (hit3) return hit3;
+      const hit4 = rows3.find((r) => !used.has(r) && t(r));
+      if (hit4) return hit4;
     }
     return void 0;
   }
@@ -973,13 +973,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return `P${n2}`;
   }
   function ordered(rows3, saved2, legacy, legacyLore) {
-    const rank2 = (r, i) => {
+    const rank3 = (r, i) => {
       const a = saved2.indexOf(r.lore);
       if (a >= 0) return a;
       const b = legacy.indexOf(legacyLore.get(r.lore) ?? r.lore);
       return b >= 0 ? 1e5 + b : 2e5 + i;
     };
-    return rows3.map((r, i) => [rank2(r, i), i, r]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
+    return rows3.map((r, i) => [rank3(r, i), i, r]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
   }
   var cache2 = /* @__PURE__ */ new WeakMap();
   function freshDefaults(dir2) {
@@ -994,8 +994,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function readDirectory(lore) {
     const books = lore ?? [];
-    const hit3 = cache2.get(books);
-    if (hit3) return hit3;
+    const hit4 = cache2.get(books);
+    if (hit4) return hit4;
     const data3 = readDirectoryData(books);
     const members = folderMembers(books);
     const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s5(e.comment)));
@@ -1276,15 +1276,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (!data3) return lore;
     const members = folderMembers(lore);
     const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s5(e.comment)));
-    let hit3 = false;
+    let hit4 = false;
     const strip = (group6) => {
       if (!group6) return group6;
       const next2 = { ...group6 };
-      for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit3 = true;
+      for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit4 = true;
       return next2;
     };
     const next = { ...data3, 괴이: strip(data3.괴이), "미스틱 사이트": strip(data3["미스틱 사이트"]) };
-    return hit3 ? withDirectory(lore, next) : lore;
+    return hit4 ? withDirectory(lore, next) : lore;
   }
   var agentGroup = (a) => a.affiliation || "";
   function moveAgent(d, lore, how, target = "") {
@@ -1730,8 +1730,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function normAgState(v) {
     const s8 = (v ?? "").trim();
     if (AG_STATES.includes(s8)) return s8;
-    const hit3 = AG_ALIAS[s8] ?? AG_ALIAS[s8.toLowerCase().replace(/\s+/g, " ")];
-    if (hit3) return hit3;
+    const hit4 = AG_ALIAS[s8] ?? AG_ALIAS[s8.toLowerCase().replace(/\s+/g, " ")];
+    if (hit4) return hit4;
     const bare = s8.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
     if (AG_STATES.includes(bare)) return bare;
     return AG_ALIAS[bare] ?? null;
@@ -2889,11 +2889,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
       let minRank = null;
       for (let i = 0; i < parts.length - 1; i++) {
         const slice = piece.slice(parts[i].start, parts[i + 1].end);
-        const rank2 = ranks.get(slice.join(","));
-        if (rank2 == null)
+        const rank3 = ranks.get(slice.join(","));
+        if (rank3 == null)
           continue;
-        if (minRank == null || rank2 < minRank[0]) {
-          minRank = [rank2, i];
+        if (minRank == null || rank3 < minRank[0]) {
+          minRank = [rank3, i];
         }
       }
       if (minRank != null) {
@@ -2937,14 +2937,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
         tokens2.forEach((token2, i) => memo[token2] = offset + i);
         return memo;
       }, {});
-      for (const [token2, rank2] of Object.entries(uncompressed)) {
+      for (const [token2, rank3] of Object.entries(uncompressed)) {
         const bytes = import_base64_js.default.toByteArray(token2);
-        this.rankMap.set(bytes.join(","), rank2);
-        this.textMap.set(rank2, bytes);
+        this.rankMap.set(bytes.join(","), rank3);
+        this.textMap.set(rank3, bytes);
       }
       this.specialTokens = { ...ranks.special_tokens, ...extendedSpecialTokens };
-      this.inverseSpecialTokens = Object.entries(this.specialTokens).reduce((memo, [text4, rank2]) => {
-        memo[rank2] = this.textEncoder.encode(text4);
+      this.inverseSpecialTokens = Object.entries(this.specialTokens).reduce((memo, [text4, rank3]) => {
+        memo[rank3] = this.textEncoder.encode(text4);
         return memo;
       }, {});
     }
@@ -3055,8 +3055,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function exactTokens(text4) {
     if (!enc) return null;
     const s8 = String(text4 ?? "");
-    const hit3 = cache3.get(s8);
-    if (hit3 !== void 0) return hit3;
+    const hit4 = cache3.get(s8);
+    if (hit4 !== void 0) return hit4;
     let n2;
     try {
       n2 = enc.encode(s8, [], []).length;
@@ -3081,7 +3081,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   };
   var ATTACH_MAX = 3;
   var IMAGE_MAX = 8;
-  var TAG = String.raw`\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]`;
+  var TAG = String.raw`\[\[ATTACH:(\w+)\]\]((?:(?!\[\[ATTACH:)[\s\S])*?)\[\[\/ATTACH\]\]`;
   var HEX = String.raw`%%ATTACHMENT:([0-9a-fA-F]+)%%`;
   var ANY = () => new RegExp(`${TAG}|${HEX}`, "g");
   var isKind = (k) => ATTACH_KINDS.includes(k);
@@ -4619,5 +4619,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
       post = findPost(st, saved2.post);
       ci = saved2.comment;
     }
-    if (!post) {
-      for (
+    if (!

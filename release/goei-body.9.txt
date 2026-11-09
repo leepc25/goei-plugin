@@ -1,4 +1,34 @@
- (!known.has(key(r))) have.push(structuredClone(r));
+생 후보로 고르는 칸 */
+    adding: false,
+    addQ: "",
+    /** 명부 사용법 펼침 */
+    help: false,
+    /** 사진을 고르는 칸 「main>열쇠」·「face>열쇠」 */
+    pick: "",
+    pickQ: "",
+    /** 얼굴 틀을 맞추는 항목 (열쇠) */
+    crop: ""
+  };
+  function resetDirectory() {
+    Object.assign(dirUi, { kind: "anomaly", q: "", open: "", draft: null, base: "", from: null, busy: false, notice: "", done: "", adding: false, addQ: "", help: false, pick: "", pickQ: "", crop: "" });
+  }
+  var esc21 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var snapshot2 = (d) => JSON.stringify(directoryData(d));
+  function directoryDraft(ctx2) {
+    return draftOf(ctx2);
+  }
+  function draftOf(ctx2) {
+    const lore = ctx2.char.globalLore ?? [];
+    if (!dirUi.draft || dirUi.from !== lore && !dirty()) {
+      dirUi.draft = structuredClone(readDirectory(lore));
+      dirUi.base = snapshot2(dirUi.draft);
+      dirUi.from = lore;
+    } else if (dirUi.from !== lore) {
+      const fresh2 = readDirectory(lore);
+      const d = dirUi.draft;
+      const add = (have, next, key) => {
+        const known = new Set(have.map(key));
+        for (const r of next) if (!known.has(key(r))) have.push(structuredClone(r));
       };
       add(d.anomalies, fresh2.anomalies, (r) => r.lore);
       add(d.sites, fresh2.sites, (r) => r.lore);
@@ -60,8 +90,8 @@
   var sourceCache = /* @__PURE__ */ new WeakMap();
   function loreSources(lore) {
     const books = lore ?? [];
-    const hit3 = sourceCache.get(books);
-    if (hit3) return hit3;
+    const hit4 = sourceCache.get(books);
+    if (hit4) return hit4;
     const folders = new Map(books.filter((e) => e.mode === "folder" && typeof e.key === "string").map((e) => [e.key, String(e.comment ?? "")]));
     const out = /* @__PURE__ */ new Map();
     const divider = /* @__PURE__ */ new Map();
@@ -155,12 +185,12 @@
   }
   function bindCropDrag(root3, done3) {
     root3.addEventListener("pointerdown", (ev) => {
-      const box3 = ev.target.closest?.("[data-crop]");
-      const img = box3?.querySelector("img");
-      if (!box3 || !img) return;
+      const box4 = ev.target.closest?.("[data-crop]");
+      const img = box4?.querySelector("img");
+      if (!box4 || !img) return;
       ev.preventDefault();
-      const key = box3.dataset.crop ?? "";
-      const frame2 = box3.querySelector(".dir-crop-frame");
+      const key = box4.dataset.crop ?? "";
+      const frame2 = box4.querySelector(".dir-crop-frame");
       const move = (e) => {
         const r = img.getBoundingClientRect();
         if (!r.width || !r.height) return;
@@ -173,16 +203,16 @@
         if (frame2) Object.assign(frame2.style, { left: `${c[0]}%`, top: `${c[1]}%` });
       };
       move(ev);
-      box3.setPointerCapture?.(ev.pointerId);
+      box4.setPointerCapture?.(ev.pointerId);
       const up = () => {
-        box3.removeEventListener("pointermove", move);
-        box3.removeEventListener("pointerup", up);
-        box3.removeEventListener("pointercancel", up);
+        box4.removeEventListener("pointermove", move);
+        box4.removeEventListener("pointerup", up);
+        box4.removeEventListener("pointercancel", up);
         done3();
       };
-      box3.addEventListener("pointermove", move);
-      box3.addEventListener("pointerup", up);
-      box3.addEventListener("pointercancel", up);
+      box4.addEventListener("pointermove", move);
+      box4.addEventListener("pointerup", up);
+      box4.addEventListener("pointercancel", up);
     });
   }
   function cropBox(ctx2, key, main) {
@@ -317,8 +347,8 @@
   var REGIONS = MAP_CODES.filter((c) => c !== "01");
   var baseMaps = {};
   function baseMap(ctx2, code2, env3) {
-    const hit3 = baseMaps[code2];
-    if (hit3 === void 0 && env3) {
+    const hit4 = baseMaps[code2];
+    if (hit4 === void 0 && env3) {
       baseMaps[code2] = "loading";
       void assetUrl(ctx2.char, `map${code2}`).then((url) => {
         baseMaps[code2] = url;
@@ -326,7 +356,7 @@
       });
       return null;
     }
-    return hit3 === "loading" || hit3 === void 0 ? null : hit3;
+    return hit4 === "loading" || hit4 === void 0 ? null : hit4;
   }
   var mapEnv = null;
   var baseWhere = (b) => placeWhere(b.sido, b.gu) || "위치 미정";
@@ -366,8 +396,8 @@
   function baseList(ctx2, d, q) {
     const rows3 = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
     const order = [...d.orgs.map((o) => o.name), ""];
-    const rank2 = (b) => b.org ? order.indexOf(b.org) : order.length;
-    const sorted = [...rows3].sort((x, y) => rank2(x) - rank2(y));
+    const rank3 = (b) => b.org ? order.indexOf(b.org) : order.length;
+    const sorted = [...rows3].sort((x, y) => rank3(x) - rank3(y));
     return `    ${sorted.length ? sorted.map((b) => baseRow(b, ctx2, d)).join("") : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
   }
   function freeBaseName(d, want) {
@@ -461,9 +491,9 @@
       ["base", "거점", d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump("base", baseRow(b, ctx2, d)))],
       ["appendix", "부록", d.appendices.filter((r) => [r.lore, r.parent].some((t) => t.toLowerCase().includes(q))).map((r) => jump("appendix", appendixRow(r, ctx2, d)))]
     ];
-    const hit3 = groups.filter(([, , rows3]) => rows3.length);
-    if (!hit3.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
-    return hit3.map(([, label2, rows3]) => `<h3 class="dir-group">${label2}<small>${rows3.length}</small></h3>${rows3.join("")}`).join("");
+    const hit4 = groups.filter(([, , rows3]) => rows3.length);
+    if (!hit4.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
+    return hit4.map(([, label2, rows3]) => `<h3 class="dir-group">${label2}<small>${rows3.length}</small></h3>${rows3.join("")}`).join("");
   }
   function directoryList(ctx2) {
     const d = draftOf(ctx2);
@@ -1222,7 +1252,7 @@
       <div class="gx-row-btns"><button class="gx-mini" data-action="ip-preview">${imgUi.preview ? "미리보기 닫기" : "조립 결과 미리보기"}</button></div>${preview}</section>
     <section class="ps-group"><h3>출력 대상 캐릭터<b>${picked.length}</b></h3><p class="ps-note">명부의 요원 영문명을 자동으로 읽어요 (한글 이름·별칭도 명부에서 가져와 보조 모델 자료로 써요). 체크를 풀면 그 인물은 태그를 안 만들어요. 그림 에셋 이름(영문명_표정)과 같아야 해요.</p>
       <div class="ip-names">${rows3}</div>
-      <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc22(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra">추가</button></div></section>
+      <div class="ip-extra"><input class="gx-search" data-input="ip-extra" name="ip-extra" maxlength="40" placeholder="임의 추가 (영문명, 예: Avensha)" value="${esc22(imgUi.extra)}"><button class="gx-mini ps-save" data-action="ip-extra-add" data-take="ip-extra"${needAttr("ip-extra", imgUi.extra)}>추가</button></div></section>
     <section class="ps-group"><h3>표정 세트<b>${cfg.keywords.length}</b></h3><p class="ps-note">쉼표로 나눠요. 카드 그림(영문명_표정)에 있는 이름이어야 해요. 비우면 기본 27종.</p>
       <div class="gw-copyto gw-copybox"><textarea class="gx-search nw-reqbox" name="ip-keywords" data-input="ip-keywords" data-autosave="ip-keywords-save" rows="3" maxlength="1200">${esc22(keywords)}</textarea>${copyBtn()}</div></section>
     ${imgUi.info ? `<p class="gx-hint">${esc22(imgUi.info)}</p>` : ""}
@@ -1389,7 +1419,7 @@
 .gw-save-state { font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 .gw-save.dirty .gw-save-state { color: var(--amber); }
 .gw-menu { display: none; }
-.gw .gx-x { width: var(--h); height: var(--h); border-radius: var(--r); font-size: 16px; }
+.gw .gx-x { width: 36px; height: 36px; border-radius: var(--r); font-size: 18px; }
 
 /* ── 왼쪽 열: 구역 타일 4개 + 목록. 타일과 목록 줄은 같은 높이·모서리·고른 색 ── */
 .gw-tree { grid-area: tree; overflow: auto; padding: 10px; border-right: 1px solid var(--line); background: var(--sunk); }
@@ -1403,7 +1433,7 @@
 /* 설정 「기록」 아래 하위 메뉴 (2026-11-05 사용자): 소제목 줄 + 들여쓴 항목 */
 .gw-tree-label { display: flex; align-items: center; gap: 10px; height: var(--h); padding: 0 12px; color: var(--sub); font-size: 14px; font-weight: 500; }
 .gw-tree-label svg { width: 15px; height: 15px; flex: none; opacity: .8; }
-.gw-tree-item.sub { padding-left: 36px; font-size: 13px; }
+.gw-tree-item.sub { padding-left: 36px; font-size: 14px; }
 .gw-tree-item.sub svg { width: 13px; height: 13px; }
 .gw-tab.on svg, .gw-tree-item.on svg { opacity: 1; }
 .gw-tree-group { display: flex; flex-direction: column; gap: 2px; }
@@ -1553,9 +1583,9 @@
 .gw .gx-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
 /* 단계 선택 (들어간 면 위에 고른 칸만 색) */
 .gw .gx-segs, .gw .gx-segs.gx-segs-sm { display: inline-flex; align-items: stretch; gap: 2px; padding: 2px; }
-.gw .gx-seg { height: calc(var(--h) - 6px); min-height: 0; min-width: 0; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 3px); background: transparent; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.gw .gx-seg { height: calc(var(--h) - 6px); min-height: 0; min-width: 0; padding: 0 12px; border: 0; border-radius: calc(var(--r) - 2px); background: transparent; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
-/* 숫자 스테퍼 (−·값·+ 한 상자) */
+/* 숫자 스테퍼 (−·값·+ 한 상자). 11-09 사용자: 따로 떨어진 단추보다 이전 한 상자가 낫다 → 그대로 */
 .gw .adv-step, .gw .st-step { display: inline-flex; align-items: stretch; gap: 0; padding: 0; overflow: hidden; }
 .gw .adv-step > .gx-step, .gw .st-step > .gx-step { width: var(--h); height: auto; min-height: 0; max-height: none; padding: 0; border: 0; border-radius: 0; background: var(--panel2); color: var(--text); font: inherit; font-size: 16px; cursor: pointer; }
 .gw .adv-step > .gx-step:disabled, .gw .st-step > .gx-step:disabled { opacity: .4; cursor: default; }
@@ -1846,11 +1876,10 @@
 .gw .ps-row > .ps-ctl.pp-mid-ctl { flex-wrap: nowrap; }
 .gw .pp-mid-ctl > input { width: auto; flex: 1 1 auto; min-width: 0; }
 
-/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 글과 「다시 세기」를 한 줄에, 상자 안 위·아래 여백 같게 */
+/* 호출 흐름 맨 위 요약 (2026-11-08 사용자: 위아래 여백 제각각) — 상자 안 위·아래 여백 같게 */
 .gw .pp-flow-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap) 14px; padding: 12px var(--pad); }
 .gw .pp-flow-head > p { flex: 1 1 320px; margin: 0; font-size: 13px; line-height: 1.5; color: var(--dim); }
 .gw .pp-flow-head b { color: var(--text); }
-.gw .pp-flow-head > .gx-mini { flex: none; }
 /* 기능 설정 우하단 「맨 위로」 (2026-11-08 사용자): 본문 칸 위에 겹쳐 떠 있고, 조금 내려갔을 때만 보인다 */
 .gw-totop { grid-area: body; align-self: end; justify-self: end; z-index: 5; width: 42px; height: 42px; margin: 0 22px 18px 0; display: grid; place-items: center; padding: 0; border: 1px solid var(--accent-line); border-radius: 999px; background: var(--panel); color: var(--text); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .18s, transform .18s; }
 .gw-totop.show { opacity: 1; pointer-events: auto; transform: none; }
@@ -1873,6 +1902,8 @@
   .gw .gw-field-head { column-gap: 6px; }
   .gw .gw-fmove .gx-mini.icon { width: 36px; }
 }
+/* 맨 위로 단추가 맨 아래 줄(예: 인물 설정 전용 모델 ID 「저장」)을 덮지 않게 끝에 단추 높이만큼 여백 (11-08 눌러 보기 점검) */
+.gw-body:has(~ .gw-totop)::after { content: ''; display: block; height: 72px; }
 `;
 
   // src/ui/editor/record.ts
@@ -2178,7 +2209,7 @@ ${v}` : v;
         recUi.importOpen = false;
         recUi.importResult = null;
         recUi.importText = "";
-        edUi.info = "가져온 글을 칸에 넣었어요. 저장을 눌러야 카드에 남아요.";
+        edUi.info = "가져온 글을 칸에 넣었어요.";
         return true;
       }
       case "ed-add-toggle":
@@ -2939,24 +2970,4 @@ ${esc25(p2.body)}</textarea></div>`;
   };
   var TRIM_ORDER = ["history", "knowledge", "behavior", "scene", "threads"];
   function personBlock(p2, store2, live, changes, o = {}) {
-    const user = o.user ?? "{{user}}";
-    const kept = {};
-    for (const k of Object.keys(p2.slots)) kept[k] = liveEntries(p2.slots[k], live);
-    if (o.maxChars) {
-      const size = () => Object.values(kept).reduce((n2, l) => n2 + (l ?? []).reduce((m, e) => m + e.text.length + 3, 0), 0);
-      for (const k of TRIM_ORDER) while (size() > o.maxChars && kept[k]?.length) kept[k].shift();
-    }
-    const slot2 = (k) => kept[k] ?? [];
-    const out = [`## ${p2.name} (living record · updated in this chat)`];
-    const mode2 = o.mode ?? "split";
-    if (o.sheet && mode2 === "append") out.push(o.sheet.trim());
-    const id2 = slot2("identity");
-    if (id2.length) out.push("Identity:\n" + lines2(id2));
-    const per = slot2("personality");
-    if (per.length) out.push("Personality:\n" + lines2(per));
-    if (o.axes) out.push("Personality axes (baseline traits, not current feeling):\n" + axesLinesEn(p2.axes).join("\n") + (p2.patterns?.length ? "\nLong-term changes:\n" + p2.patterns.map((t) => `- ${plain(t, 300)}`).join("\n") : ""));
-    if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${SEXUAL_DIRECTOR_POLICY})
-` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : "", o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ""].filter(Boolean).join("\n"));
-    if (o.sheet && mode2 === "split") for (const s8 of fixedSections(o.sheet)) out.push(`${s8.name}:
-${s8.body}`);
-    const s
+ 

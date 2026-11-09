@@ -1,4 +1,4 @@
-y, [r]);
+ map.set(r.statusKey, [r]);
     }
     return map;
   }
@@ -134,8 +134,8 @@ y, [r]);
     let photo = cached.photo;
     try {
       const doc2 = await risuai.getRootDocument();
-      const box3 = await doc2.querySelector("[data-goei-user]");
-      const html = box3 ? await box3.getInnerHTML() : "";
+      const box4 = await doc2.querySelector("[data-goei-user]");
+      const html = box4 ? await box4.getInnerHTML() : "";
       const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
       if (shownName2 && shownName2 !== "{{user}}") {
         if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
@@ -863,8 +863,8 @@ ${content}` };
   }
   function managedEntries(lore) {
     const books = lore ?? [];
-    const hit3 = cache7.get(books);
-    if (hit3) return hit3;
+    const hit4 = cache7.get(books);
+    if (hit4) return hit4;
     if (!hasSlots(books) && !hasVirtual(books)) {
       cache7.set(books, []);
       return [];
@@ -886,7 +886,7 @@ ${content}` };
       if (!folderKind || e.mode === "folder" || e.alwaysActive) return;
       let kind;
       let order = Number(e.insertorder ?? 0);
-      let rank2 = index3;
+      let rank3 = index3;
       let appendix;
       if (folderKind === "appendix") {
         const row10 = apps.get(str6(e.comment));
@@ -896,7 +896,7 @@ ${content}` };
         kind = p2 ? kinds.get(str6(p2.folder)) : "org";
         if (p2) {
           order = Number(p2.insertorder ?? 0);
-          rank2 = at + 0.5 + index3 / 1e7;
+          rank3 = at + 0.5 + index3 / 1e7;
         }
         appendix = { parent: p2 ? row10.parent : "", parentNames: p2 ? [row10.parent, ...keysOf3(p2)] : row10.parent ? [row10.parent] : [], when: row10, agentNames: row10.agents.map(agentNames) };
       } else {
@@ -913,7 +913,7 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text4) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text4));
         keys.push({ text: text4, en: en2, rule: CONFIRM_KEYS.has(text4) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str6(e.comment), order, index: index3, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank2, ...appendix ? { appendix } : {} });
+      out.push({ kind, name: str6(e.comment), order, index: index3, content, keys, rawKeys: raw, groups: groups.get(str6(e.comment)) ?? [], rank: rank3, ...appendix ? { appendix } : {} });
     });
     cache7.set(books, out);
     return out;
@@ -1017,15 +1017,15 @@ ${content}` };
       const isInput = inputLast && wi === window2.length - 1;
       const why = isInput ? "input" : m.role === "user" ? "user" : "char";
       const score2 = (isInput ? 30 : 0) + (m.role === "user" ? 3 : 1) * 0.8 ** age2;
-      for (const hit3 of findHits(m.data, entries2)) pending2.push({ hit: hit3, why, score: score2 });
+      for (const hit4 of findHits(m.data, entries2)) pending2.push({ hit: hit4, why, score: score2 });
     });
-    for (const { hit: hit3, why, score: score2 } of pending2) if (hit3.key.rule === "plain") add(hit3.entry, why, hit3.key.text, hit3.snippet, score2);
-    for (const { hit: hit3, why, score: score2 } of pending2) {
-      if (hit3.key.rule === "plain") continue;
-      const e = entries2[hit3.entry];
+    for (const { hit: hit4, why, score: score2 } of pending2) if (hit4.key.rule === "plain") add(hit4.entry, why, hit4.key.text, hit4.snippet, score2);
+    for (const { hit: hit4, why, score: score2 } of pending2) {
+      if (hit4.key.rule === "plain") continue;
+      const e = entries2[hit4.entry];
       const present = state.deployed.some((n2) => names(e, n2)) || state.board.some((n2) => names(e, n2));
-      const ok = hit3.marked || present || picks.has(hit3.entry) || hit3.honor;
-      if (ok) add(hit3.entry, picks.has(hit3.entry) || !hit3.marked ? why : "confirmed", hit3.key.text, hit3.snippet, score2);
+      const ok = hit4.marked || present || picks.has(hit4.entry) || hit4.honor;
+      if (ok) add(hit4.entry, picks.has(hit4.entry) || !hit4.marked ? why : "confirmed", hit4.key.text, hit4.snippet, score2);
     }
     pickAppendices(entries2, picks, state, add);
     let list4 = [...picks.values()];
@@ -1819,13 +1819,13 @@ ${JSON.stringify(previousRoom ?? "")}`)
     });
   }
   function zoomPhoto(src, alt) {
-    const box3 = document.createElement("div");
-    box3.className = "gx at-zoom";
-    box3.setAttribute("role", "dialog");
-    box3.setAttribute("aria-label", "사진 크게 보기");
-    box3.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    const box4 = document.createElement("div");
+    box4.className = "gx at-zoom";
+    box4.setAttribute("role", "dialog");
+    box4.setAttribute("aria-label", "사진 크게 보기");
+    box4.innerHTML = `<img src="${esc5(src)}" alt="${esc5(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
     const close3 = () => {
-      box3.remove();
+      box4.remove();
       document.removeEventListener("keydown", key, true);
     };
     const key = (ev) => {
@@ -1833,9 +1833,9 @@ ${JSON.stringify(previousRoom ?? "")}`)
       ev.stopPropagation();
       close3();
     };
-    box3.addEventListener("click", close3);
+    box4.addEventListener("click", close3);
     document.addEventListener("keydown", key, true);
-    document.body.appendChild(box3);
+    document.body.appendChild(box4);
   }
   function card(kind, text4, asset) {
     const label2 = ATTACH_LABELS[kind];
@@ -2054,15 +2054,15 @@ ${JSON.stringify(previousRoom ?? "")}`)
     const row10 = findRow(char, name);
     if (!row10) return Promise.resolve(null);
     const key = `${String(char.chaId ?? char.name ?? "")}|${row10[1]}`;
-    let hit3 = cache8.get(key);
-    if (!hit3) {
-      hit3 = load(row10[1], String(row10[2] ?? row10[1].split(".").pop() ?? ""));
-      cache8.set(key, hit3);
-      void hit3.then((url) => {
+    let hit4 = cache8.get(key);
+    if (!hit4) {
+      hit4 = load(row10[1], String(row10[2] ?? row10[1].split(".").pop() ?? ""));
+      cache8.set(key, hit4);
+      void hit4.then((url) => {
         if (!url) cache8.delete(key);
       });
     }
-    return hit3;
+    return hit4;
   }
   setAssetCheck(hasAsset);
 
@@ -2121,8 +2121,8 @@ ${JSON.stringify(previousRoom ?? "")}`)
   function imageUrl(char, pic3) {
     if (!pic3) return null;
     const key = `${String(char.chaId ?? char.name ?? "")}|${pic3}`;
-    const hit3 = urls.get(key);
-    if (hit3 === void 0) {
+    const hit4 = urls.get(key);
+    if (hit4 === void 0) {
       urls.set(key, "loading");
       const { name, crop, tall } = splitPic(pic3);
       void assetUrl(char, name).then(async (raw) => {
@@ -2132,7 +2132,7 @@ ${JSON.stringify(previousRoom ?? "")}`)
       });
       return null;
     }
-    return hit3 === "loading" ? null : hit3;
+    return hit4 === "loading" ? null : hit4;
   }
   var escAttr = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   function agentFace(char, english) {
@@ -2163,23 +2163,23 @@ ${JSON.stringify(previousRoom ?? "")}`)
   }
   function showIdCard(html, act, cls = "") {
     document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
-    const box3 = document.createElement("div");
-    box3.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
-    box3.setAttribute("role", "dialog");
-    box3.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+    const box4 = document.createElement("div");
+    box4.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ""}`;
+    box4.setAttribute("role", "dialog");
+    box4.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box3.setAttribute("data-theme", theme);
-    box3.addEventListener("click", (e) => {
+    if (theme) box4.setAttribute("data-theme", theme);
+    box4.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action]");
-      if (btn && act && box3.contains(btn)) {
-        box3.remove();
+      if (btn && act && box4.contains(btn)) {
+        box4.remove();
         act(btn.dataset.action, btn.dataset.value);
         return;
       }
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
-      box3.remove();
+      box4.remove();
     });
-    document.body.appendChild(box3);
+    document.body.appendChild(box4);
   }
 
   // src/core/josa.ts
@@ -2312,29 +2312,29 @@ ${JSON.stringify(previousRoom ?? "")}`)
   function drawerBox(content, cls = "", after = "", key = cls || "box") {
     return shell(key, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
   }
-  function set(box3, on2) {
-    opened.set(box3.dataset.drawer ?? "tools", on2);
-    box3.classList.toggle("open", on2);
-    const grip = box3.querySelector(".ph-grip");
+  function set(box4, on2) {
+    opened.set(box4.dataset.drawer ?? "tools", on2);
+    box4.classList.toggle("open", on2);
+    const grip = box4.querySelector(".ph-grip");
     grip?.setAttribute("aria-expanded", String(on2));
     grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
   }
   function bindDrawer(root3) {
-    const box3 = root3.querySelector(".ph-drawer");
-    const grip = box3?.querySelector(".ph-grip");
-    if (!box3 || !grip) return;
-    const open4 = () => box3.classList.contains("open");
-    grip.addEventListener("click", () => set(box3, !open4()));
+    const box4 = root3.querySelector(".ph-drawer");
+    const grip = box4?.querySelector(".ph-grip");
+    if (!box4 || !grip) return;
+    const open4 = () => box4.classList.contains("open");
+    grip.addEventListener("click", () => set(box4, !open4()));
     let y0 = null;
-    box3.addEventListener("touchstart", (e) => {
+    box4.addEventListener("touchstart", (e) => {
       y0 = e.touches[0]?.clientY ?? null;
     }, { passive: true });
-    box3.addEventListener("touchend", (e) => {
+    box4.addEventListener("touchend", (e) => {
       if (y0 === null) return;
       const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
       y0 = null;
-      if (dy < -24 && !open4()) set(box3, true);
-      else if (dy > 24 && open4()) set(box3, false);
+      if (dy < -24 && !open4()) set(box4, true);
+      else if (dy > 24 && open4()) set(box4, false);
     }, { passive: true });
   }
 
@@ -2681,8 +2681,8 @@ ${RETRY_ANALYZE}` }
     const v = value ?? "";
     let vars = null;
     if (action === "adv-set") {
-      const hit3 = parse2(v);
-      if (hit3) vars = { [advVar(hit3[0], hit3[1])]: hit3[2] };
+      const hit4 = parse2(v);
+      if (hit4) vars = { [advVar(hit4[0], hit4[1])]: hit4[2] };
     } else return false;
     if (!vars) {
       env3.render();
@@ -3468,7 +3468,7 @@ ${RETRY_ANALYZE}` }
     return d.tabs.some((t) => t.id === cur) ? cur : d.tabs[0]?.id ?? "";
   }
   function paneHead(title2, sub, right = "") {
-    return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
+    return `<header class="ph-room-head ph-wrapsub"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
   }
   function groupView(ctx2, st, d) {
     const room = phone.invite ? st.rooms[phone.invite] : void 0;
@@ -3901,6 +3901,4 @@ ${RETRY_ANALYZE}` }
           if (row10 && row10.read === false) {
             row10.read = true;
             await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
-            return true;
-          }
-    
+           

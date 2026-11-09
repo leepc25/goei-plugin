@@ -1,4 +1,24 @@
---n, 3) * var(--shc) + (var(--n, 3) - 1) * 8px + 2 * var(--zp) + 2px); }
+: 2px 8px; border: 1px solid var(--line); border-radius: var(--ri); color: var(--text); line-height: 1.4; }
+/* 높이는 진열대만큼 (2026-11-07 사용자: 고정 높이는 휑함), 화면의 90%까지. 넘치면 진열대 안에서 스크롤 */
+.sh-wrap-card { width: min(100%, 980px); height: auto; max-height: min(90%, calc(100% - 8px)); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; overflow: hidden; }
+/* 상점만 열었을 때(카드에서): 창 본문은 비우고 팝업만 (2026-11-07 사용자) */
+.gx-solo { display: none; }
+.gx-panel.solo { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.gx-panel.solo .sh-wrap-card { height: auto; max-height: 90vh; max-height: 90dvh; } /* 진열대만큼, 넘치면 화면 90%에서 멈춤 (2026-11-08 사용자: 아래 여백) */
+.sh-body { flex: 0 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0 -2px; padding: 0 2px; }
+/* 진열대 구획 (2026-11-07 사용자): 칸 크기는 소지품과 같은 8열 — 구획 안쪽 여백을 빼고도 같은 칸이 되게 본문 너비(cqw)로 칸 폭을 정한다 */
+.sh-body { container-type: inline-size; --zp: 12px; --shc: calc((100cqw - 2 * var(--zp) - 2px - 7 * 8px) / 8); }
+.sh-shelf { display: flex; flex-direction: column; gap: 12px; }
+.sh-shelf > .sh-grid, .sh-zone .sh-grid { grid-template-columns: repeat(auto-fill, var(--shc)); gap: 8px; }
+.sh-shelf > .sh-grid { padding: 0 calc(var(--zp) + 1px); }
+.sh-zone { position: relative; min-width: 0; padding: 10px var(--zp) var(--zp); border: 1px solid var(--line); border-radius: 14px; background: var(--sunk); }
+.sh-zh { display: flex; align-items: center; gap: 8px; height: 22px; margin-bottom: 10px; }
+.sh-zh b { font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .02em; color: var(--sub); }
+.sh-zh small { font-size: 12px; color: var(--dim); }
+.sh-zh svg { width: 15px; height: 15px; color: var(--sub); }
+.sh-top { display: flex; gap: 12px; align-items: stretch; }
+/* 특가 구획은 물건 수만큼 딱 (빈 자리 없이), 희귀 진열장이 나머지를 채운다 */
+.sh-top > .sh-sale { flex: 0 0 calc(var(--n, 3) * var(--shc) + (var(--n, 3) - 1) * 8px + 2 * var(--zp) + 2px); }
 .sh-top > .sh-sale:only-child { flex: 1 1 auto; }
 .sh-sale .sh-zh { min-width: 0; white-space: nowrap; }
 .sh-sale .sh-zh small { overflow: hidden; text-overflow: ellipsis; }
@@ -54,7 +74,7 @@
 .sh-err .sh-raw { min-height: 26px; margin-left: 6px; font-size: 12px; }
 /* 도구 줄 */
 .sh-tools { gap: 8px; }
-.sh-tools .it-act, .sh-tools .it-cnt { height: var(--h); border-radius: var(--r); border: 1px solid var(--line); background: var(--panel2); font-size: 13.5px; }
+.sh-tools .it-act, .sh-tools .it-cnt { height: var(--h); border-radius: var(--r); border: 1px solid var(--line); background: var(--panel2); font-size: 13px; }
 .sh-name { display: inline-flex; align-items: center; gap: 8px; height: var(--h); padding: 0 4px; color: var(--text); font-size: 16px; font-weight: 700; white-space: nowrap; min-width: 0; }
 .sh-name b { overflow: hidden; text-overflow: ellipsis; }
 .sh-name svg { width: 18px; height: 18px; flex: none; color: var(--signal); }
@@ -142,7 +162,7 @@
 .sh-money .sum .sh-amt { color: var(--signal); font-size: 16px; }
 .sh-money .bad i, .sh-money .bad .sh-amt { color: var(--red); }
 .sh-det .it-btns { margin-top: 12px; }
-.sh-det .it-btns .gx-chip { height: var(--h, 34px); border-radius: var(--r, 10px); font-size: 13.5px; }
+.sh-det .it-btns .gx-chip { font-size: 13px; }
 .it-btns .gx-chip:disabled { opacity: .45; }
 .sh-det .gx-agpop-x, .sh-wrap-card .gx-agpop-x { width: 30px; height: 30px; border-radius: var(--ri, 8px); }
 .sh-det .gx-agpop-x { top: 16px; right: 16px; } /* 카드 안쪽 여백과 같게 (2026-11-08 사용자: X 가 치우침) */
@@ -252,7 +272,7 @@
 /* 도구 줄 (2026-11-08 사용자: 단추 모양 X, 깔끔하게): 왼쪽 물건|기록 글자 탭, 오른쪽 직접 넣기·합치기는 글자 단추, 찾기는 밑줄 칸. 테두리·바탕 없음 */
 .gx-items .it-tools { justify-content: space-between; align-items: center; gap: 16px; min-height: 34px; }
 .gx-items .it-tools .it-segs { height: 34px; box-sizing: border-box; padding: 2px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); } /* 물건|기록은 단추 그대로 (사용자) */
-.gx-items .it-tools .gx-seg { height: 28px; min-height: 28px; border-radius: 8px; padding: 0 14px; font-size: 13px; }
+.gx-items .it-tools .gx-seg { font-size: 13px; }
 .gx-items .it-right { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; min-width: 0; }
 .gx-items .it-act { height: 32px; box-sizing: border-box; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--dim); font-size: 13px; }
 .gx-items .it-act:hover:not(:disabled) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
@@ -1252,6 +1272,16 @@
 .bs-gal .body { width: auto; max-width: 1000px; padding: 10px 10px 0; box-sizing: border-box; }
 .bs-gal.bs-m .body { padding: 0; }
 .bs-gal.bs-m .dpost { padding: 10px 12px; }
+/* 지도 핀 두 겹 (ui/field.ts layeredPins): 아래 겹은 이름표만, 위 겹은 점만 — 점이 다른 핀 이름표에 깔리지 않게 */
+.gx-pin.gx-plab .gx-dot { visibility: hidden; }
+.gx-pin.gx-pdot { pointer-events: none; }
+.gx-pin.gx-pdot .gx-pname { visibility: hidden; }
+.gx-pin.gx-pdot .gx-dot { pointer-events: auto; cursor: pointer; }
+/* 폼·기록 머리의 설명 줄은 말줄임 없이 접어 보인다 (11-08 눌러 보기 점검: 폰에서 「전화 걸기」 안내·인물 기록 머리가 잘림). 방 머리(인원 수 등)는 그대로 한 줄 */
+.ph-wrapsub .ph-room-title small { white-space: normal; overflow: visible; text-overflow: clip; }
+/* 겹친 이름표는 위·옆으로 옮기고, 자리가 없으면 숨기고 점만 (mapzoom.ts declutter) */
+.gx-mapzoom .gx-pin.gx-plab { transform: translate(calc(-50% + var(--lx, 0px)), calc(-50% + var(--ly, 0px))) scale(var(--pz, 1)); }
+.gx-pin.gx-plab.lab-off { visibility: hidden; }
 `;
 
   // src/ui/frame.ts
@@ -1285,7 +1315,7 @@
   // src/ui/swipeback.ts
   var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer";
   var FIRE = 72;
-  var bound = /* @__PURE__ */ new WeakSet();
+  var bound2 = /* @__PURE__ */ new WeakSet();
   function inSideScroller(el, root3) {
     for (let n2 = el; n2 && n2 !== root3; n2 = n2.parentElement) {
       if (n2.scrollWidth > n2.clientWidth + 2) {
@@ -1296,22 +1326,22 @@
     return false;
   }
   function bindSwipeBack(root3, step2) {
-    if (bound.has(root3)) return;
-    bound.add(root3);
+    if (bound2.has(root3)) return;
+    bound2.add(root3);
     let x0 = 0;
     let y0 = 0;
     let mode2 = "off";
     let act = null;
     let sign = 1;
-    let box3 = null;
+    let box4 = null;
     const reset = (animate) => {
-      if (!box3) return;
-      const el = box3;
+      if (!box4) return;
+      const el = box4;
       el.style.transition = animate ? "transform .2s ease, opacity .2s ease" : "";
       el.style.transform = "";
       el.style.opacity = "";
       if (animate) setTimeout(() => el.style.transition = "", 220);
-      box3 = null;
+      box4 = null;
     };
     root3.addEventListener("touchstart", (e) => {
       mode2 = "off";
@@ -1332,12 +1362,12 @@
         sign = dx > 0 ? 1 : -1;
         if (!act) return void (mode2 = "off");
         mode2 = "back";
-        box3 = root3.querySelector(".gx-content");
+        box4 = root3.querySelector(".gx-content");
       }
-      if (box3) {
+      if (box4) {
         const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
-        box3.style.transform = `translateX(${d * sign}px)`;
-        box3.style.opacity = String(1 - d / 400);
+        box4.style.transform = `translateX(${d * sign}px)`;
+        box4.style.opacity = String(1 - d / 400);
       }
     }, { passive: true });
     const end = (e) => {
@@ -1373,6 +1403,53 @@
     const fit2 = (p2, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p2));
     return { z, x: fit2(v.x, cw, lw), y: fit2(v.y, ch, lh) };
   }
+  var hit3 = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  var box3 = (el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left, t: r.top, r: r.right, b: r.bottom };
+  };
+  var rank2 = (el) => el.classList.contains("sel") ? 0 : /\bhot/.test(el.className) ? 1 : 2;
+  function declutter(layer, frame2, z) {
+    const labs = [...layer.querySelectorAll(".gx-pin.gx-plab")];
+    const dots = [...layer.querySelectorAll(".gx-pin.gx-pdot")];
+    if (!labs.length) return;
+    for (const el of labs) el.style.removeProperty("--lx"), el.style.removeProperty("--ly");
+    const F = box3(frame2);
+    const inFrame = (r) => r.l >= F.l && r.r <= F.r && r.t >= F.t && r.b <= F.b;
+    const dotBox = dots.map((d) => {
+      const dot2 = d.querySelector(".gx-dot");
+      return dot2 ? box3(dot2) : null;
+    });
+    const order = labs.map((el, i) => ({ el, i })).sort((a, b) => rank2(a.el) - rank2(b.el) || a.i - b.i);
+    const placed = [...frame2.querySelectorAll(".gx-zbtn")].map(box3);
+    for (const { el, i } of order) {
+      const name = el.querySelector(".gx-pname");
+      const D = dotBox[i];
+      if (!name || !D) continue;
+      const N2 = box3(name);
+      const w = N2.r - N2.l, h = N2.b - N2.t, my = (D.t + D.b) / 2 - h / 2;
+      const up = D.t - 2 - h, dn = D.b + 2, rt = D.r + 1, lt = D.l - 1 - w;
+      const spots = [[N2.l, N2.t], [N2.l, up], [D.r + 3, my], [D.l - 3 - w, my], [rt, up], [lt, up], [rt, dn], [lt, dn]];
+      const free = (r) => !placed.some((p2) => hit3(p2, r)) && !dotBox.some((d2, j) => j !== i && d2 && hit3(d2, r));
+      let at = -1;
+      spots.some(([l, t], k) => {
+        const r = { l, t, r: l + w, b: t + h };
+        if ((k === 0 || inFrame(r)) && (rank2(el) === 0 && k === 0 || free(r))) return at = k, placed.push(r), true;
+        return false;
+      });
+      const blocked2 = at < 0;
+      el.classList.toggle("lab-off", blocked2);
+      if (at > 0) {
+        el.style.setProperty("--lx", `${(spots[at][0] - N2.l) / z}px`);
+        el.style.setProperty("--ly", `${(spots[at][1] - N2.t) / z}px`);
+      }
+      const d = dots[i];
+      d.toggleAttribute("title", blocked2);
+      if (blocked2) d.title = el.getAttribute("aria-label") ?? "";
+      d.tabIndex = blocked2 ? 0 : -1;
+      d.setAttribute("aria-hidden", String(!blocked2));
+    }
+  }
   function bindMapZoom(root3) {
     const canvas = root3.querySelector(".gx-canvas[data-map]");
     const layer = canvas?.querySelector(".gx-mapzoom");
@@ -1388,6 +1465,7 @@
       layer.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
       canvas.classList.toggle("zoomed", v.z > 1);
       canvas.classList.toggle("pan", canPan());
+      declutter(layer, canvas, v.z);
     };
     const zoomAt = (z, cx, cy) => {
       const nz = Math.min(MAX, Math.max(1, z));
@@ -1490,8 +1568,8 @@
   }
   function textGlitch(view2) {
     const nodes2 = [];
-    for (const box3 of view2.querySelectorAll(".gx-oposd, .gx-opcap")) {
-      const walk = document.createTreeWalker(box3, NodeFilter.SHOW_TEXT);
+    for (const box4 of view2.querySelectorAll(".gx-oposd, .gx-opcap")) {
+      const walk = document.createTreeWalker(box4, NodeFilter.SHOW_TEXT);
       for (let n2 = walk.nextNode(); n2; n2 = walk.nextNode()) if (n2.nodeValue?.trim()) nodes2.push(n2);
     }
     const real = nodes2.map((n2) => n2.nodeValue ?? "");
@@ -1654,8 +1732,8 @@
     return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key;
   }
   function mapImage(ctx2, code2, env3) {
-    const hit3 = mapUrls[code2];
-    if (hit3 === void 0) {
+    const hit4 = mapUrls[code2];
+    if (hit4 === void 0) {
       mapUrls[code2] = "loading";
       void assetUrl(ctx2.char, `map${code2}`).then((url) => {
         mapUrls[code2] = url;
@@ -1663,13 +1741,14 @@
       });
       return null;
     }
-    return hit3 === "loading" ? null : hit3;
+    return hit4 === "loading" ? null : hit4;
   }
   var boardMapUrl = (ctx2, env3) => mapImage(ctx2, "01", env3);
   function pin(action, value, label2, x, y, cls, count3 = 0) {
     return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc38(value)}" aria-label="${esc38(label2)}">
     <span class="gx-dot"></span><span class="gx-pname">${esc38(label2)}${count3 ? `<b>${count3}</b>` : ""}</span></button>`;
   }
+  var layeredPins = (pins) => pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-plab ') + pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-pdot ').replaceAll(' aria-label="', ' tabindex="-1" aria-hidden="true" aria-label="');
   function hotClass(list4) {
     if (!list4.length) return "";
     const kinds = new Set(list4.map((e) => e.kind));
@@ -1720,7 +1799,7 @@
     }
     const img = url ? `<img class="gx-mapimg" src="${esc38(url)}" alt="${esc38(code2 === "01" ? "전국" : regionName(code2))} 지도">` : `<div class="gx-mapph">${mapUrls[code2] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
     return `${narrow2() ? "" : mapBar(x)}
-    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code2}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code2 !== "01") : ""}</div>`;
+    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code2}"` : ""}><div class="gx-mapzoom">${img}${layeredPins(pins)}</div>${url ? mapZoomControls(code2 !== "01") : ""}</div>`;
   }
   function mapSuggest(c) {
     const q = field3.mapq.trim().toLowerCase();
@@ -1803,7 +1882,7 @@
     ${shown3.length || place3 || gone ? `<ul class="gx-evcs">${place3}${shown3.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty2}</p>`}`;
   }
   function cancelChip(action, on2) {
-    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
+    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? "" : "disabled"}>취소</button>`;
   }
   function lockedState(x, id2) {
     const rec2 = x.world.agents[id2];
@@ -1936,14 +2015,14 @@
       ${aim}<span class="gx-evart-top">${status2}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen("")}${art.desc ? `<span class="gx-evc-desc">${esc38(art.desc)}</span>` : ""}</span></div></li>`;
     };
-    const hit3 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
+    const hit4 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
     if (!q) {
       const rows3 = missionCatalog(x.catalog, field3.mkind);
       if (!rows3.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
       return `<ul class="gx-list gx-mlist">${rows3.map((r) => row10(field3.mkind, r)).join("")}</ul>`;
     }
     const order = [field3.mkind, ...["an", "ms", "lm"].filter((k) => k !== field3.mkind)];
-    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g2) => g2.rows.length).map((g2) => `<li class="gx-mgrp">${MISSION_LABEL[g2.k]}<small>${g2.rows.length}</small></li>${g2.rows.map((r) => row10(g2.k, r)).join("")}`).join("");
+    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit4) })).filter((g2) => g2.rows.length).map((g2) => `<li class="gx-mgrp">${MISSION_LABEL[g2.k]}<small>${g2.rows.length}</small></li>${g2.rows.map((r) => row10(g2.k, r)).join("")}`).join("");
     return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
   }
   function missionTab(ctx2, opening, notice2, busy6) {
@@ -2381,6 +2460,7 @@ ${note.trim()}` : card2;
     root2 = document.createElement("div");
     root2.className = "gx";
     document.body.appendChild(root2);
+    bindNeedFill();
     root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
     const picker2 = document.createElement("input");
     picker2.type = "file";
@@ -2434,9 +2514,9 @@ ${note.trim()}` : card2;
       const row10 = grip?.closest("[data-agent-row]");
       if (!grip || !row10 || !root2) return;
       ev.preventDefault();
-      const box3 = root2;
+      const box4 = root2;
       const group6 = row10.dataset.agentGroup ?? "";
-      const rows3 = [...box3.querySelectorAll("[data-agent-row]")].filter((r) => r !== row10 && r.dataset.agentGroup === group6);
+      const rows3 = [...box4.querySelectorAll("[data-agent-row]")].filter((r) => r !== row10 && r.dataset.agentGroup === group6);
       let drop = null;
       const mark2 = (next) => {
         drop?.el.classList.remove("drop-before", "drop-after");
@@ -2454,14 +2534,14 @@ ${note.trim()}` : card2;
         if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
       };
       row10.classList.add("dragging");
-      box3.classList.add("dir-dragging");
+      box4.classList.add("dir-dragging");
       grip.setPointerCapture?.(ev.pointerId);
       const up = () => {
         grip.removeEventListener("pointermove", move);
         grip.removeEventListener("pointerup", up);
         grip.removeEventListener("pointercancel", up);
         row10.classList.remove("dragging");
-        box3.classList.remove("dir-dragging");
+        box4.classList.remove("dir-dragging");
         const target = drop;
         mark2(null);
         if (target) void run4("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
@@ -2490,8 +2570,8 @@ ${note.trim()}` : card2;
       if (ev.target.dataset?.input === "dir-crop-size") render2();
     });
     const photoTarget = (el) => {
-      const box3 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
-      return box3 ? box3.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+      const box4 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box4 ? box4.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
     };
     const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
     if (!widthWatch) {
@@ -2665,8 +2745,8 @@ ${note.trim()}` : card2;
     }
     if (el?.dataset?.input === "wallet-q" && view.kind === "started") {
       walletUi.q = el.value;
-      const box4 = root2?.querySelector(".gx-wt-list");
-      if (box4) box4.innerHTML = walletList(view.ctx);
+      const box5 = root2?.querySelector(".gx-wt-list");
+      if (box5) box5.innerHTML = walletList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "items-q" && view.kind === "started" && root2) return itemsInput(root2, view.ctx, el.value);
@@ -2678,8 +2758,8 @@ ${note.trim()}` : card2;
     }
     if (el?.dataset?.input === "rec-q" && view.kind === "started") {
       recordsInput("rec-q", el.value);
-      const box4 = root2?.querySelector(".gx-jr-list");
-      if (box4) box4.innerHTML = journalList(view.ctx);
+      const box5 = root2?.querySelector(".gx-jr-list");
+      if (box5) box5.innerHTML = journalList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "wiki-query" && view.kind === "started") {
@@ -2688,14 +2768,14 @@ ${note.trim()}` : card2;
     }
     if (el?.dataset?.input === "wiki-filter" && view.kind === "started") {
       wiki.filter = el.value;
-      const box4 = root2?.querySelector(".wk .wlist");
-      if (box4) box4.innerHTML = wikiList(view.ctx);
+      const box5 = root2?.querySelector(".wk .wlist");
+      if (box5) box5.innerHTML = wikiList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "wiki-home-query" && view.kind === "started") {
       wiki.homeQuery = el.value;
-      const box4 = root2?.querySelector(".wk .hres");
-      if (box4) box4.innerHTML = wikiHomeResults(view.ctx);
+      const box5 = root2?.querySelector(".wk .hres");
+      if (box5) box5.innerHTML = wikiHomeResults(view.ctx);
       return;
     }
     if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
@@ -2705,20 +2785,20 @@ ${note.trim()}` : card2;
     if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
     if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
     if (el?.dataset?.input === "ph-query" && view.kind === "started") {
-      const box4 = root2?.querySelector(".ph-content");
-      if (box4) box4.innerHTML = phoneContent(view.ctx, el.value);
+      const box5 = root2?.querySelector(".ph-content");
+      if (box5) box5.innerHTML = phoneContent(view.ctx, el.value);
       return;
     }
     if (el?.dataset?.input === "ph-pick-q" && view.kind === "started") {
       phoneInput("ph-pick-q", el.value);
-      const box4 = root2?.querySelector(".ph-pick");
-      if (box4) box4.innerHTML = phonePickList(view.ctx);
+      const box5 = root2?.querySelector(".ph-pick");
+      if (box5) box5.innerHTML = phonePickList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "dir-q" && (view.kind === "started" || view.kind === "picker")) {
       dirUi.q = el.value;
-      const box4 = root2?.querySelector(".dir-list");
-      if (box4) box4.innerHTML = directoryList(view.ctx);
+      const box5 = root2?.querySelector(".dir-list");
+      if (box5) box5.innerHTML = directoryList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "dir-crop-size") {
@@ -2731,22 +2811,22 @@ ${note.trim()}` : card2;
     }
     if (el?.dataset?.input === "dir-photo-q" && (view.kind === "started" || view.kind === "picker")) {
       dirUi.pickQ = el.value;
-      const box4 = root2?.querySelector(".dir-pics");
-      if (box4) box4.innerHTML = directoryPhotoList(view.ctx);
+      const box5 = root2?.querySelector(".dir-pics");
+      if (box5) box5.innerHTML = directoryPhotoList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "dir-ext-q" && (view.kind === "started" || view.kind === "picker")) {
       dirUi.addQ = el.value;
-      const box4 = root2?.querySelector(".dir-ext-list");
-      if (box4) box4.innerHTML = directoryExtList(view.ctx);
+      const box5 = root2?.querySelector(".dir-ext-list");
+      if (box5) box5.innerHTML = directoryExtList(view.ctx);
       return;
     }
     if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
     if (el?.dataset?.input === "field-note") return void (field3.note = el.value);
     if (el?.dataset?.input === "map-query" && view.kind === "started") {
-      const box4 = root2?.querySelector(".gx-mapsug");
-      if (box4) box4.innerHTML = mapSuggestFor(view.ctx, el.value);
+      const box5 = root2?.querySelector(".gx-mapsug");
+      if (box5) box5.innerHTML = mapSuggestFor(view.ctx, el.value);
       return;
     }
     if (el?.dataset?.input === "start-note") {
@@ -2757,8 +2837,8 @@ ${note.trim()}` : card2;
     }
     if (el?.dataset?.input !== "mission-query") return;
     field3.query = el.value;
-    const box3 = root2?.querySelector(".gx-mbox");
-    if (box3 && (view.kind === "started" || view.kind === "opening")) box3.innerHTML = missionList(view.ctx, view.kind === "opening");
+    const box4 = root2?.querySelector(".gx-mbox");
+    if (box4 && (view.kind === "started" || view.kind === "opening")) box4.innerHTML = missionList(view.ctx, view.kind === "opening");
   }
   async function addPhotos(prefix, files) {
     if (view.kind !== "started") return;
@@ -2911,111 +2991,4 @@ ${note.trim()}` : card2;
   async function close2() {
     shown2 = false;
     stopCctvFx();
-    await risuai.hideContainer();
-  }
-  async function stagedTheme(ctx2, value) {
-    if (value !== "light" && value !== "dark" && value !== "paper") return;
-    try {
-      const saved2 = await updateChat(
-        ctx2.charIndex,
-        ctx2.chatIndex,
-        (chat) => chatPhase(chat) === "started" || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
-      );
-      if (saved2) ctx2.chat = saved2;
-    } catch (error) {
-      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    render2();
-  }
-  var run4 = (action, value) => handle3(action, value).catch((error) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
-  async function handle3(action, value) {
-    if (busy4) return;
-    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
-    if (agUi.pop && action !== "agent-info") agUi.pop = "";
-    if (action.startsWith("adv-") && (view.kind === "started" || view.kind === "picker" && pickerPrefs)) {
-      const feat = (value ?? "").split(/[:=]/)[0];
-      const scope = feat !== "gen" ? "chat" : view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
-      await handleAdvanced(action, value, view.ctx, { render: render2, refresh: refresh2 }, scope);
-      return;
-    }
-    const featCtx = view.kind === "started" || view.kind === "picker" && pickerPrefs && settingsUi.page ? view.ctx : null;
-    if (action === "wiki-back" && view.kind === "started" && !wiki.history.some((h) => h.view !== "home") && navHist.can(-1)) {
-      const run5 = navStep(-1);
-      return run5 ? run5() : render2();
-    }
-    if (featCtx && action.startsWith("wiki-") && await handleWiki(action, value, featCtx, wikiEnv)) return;
-    if (featCtx && action.startsWith("pp-") && await handlePeople(action, value, featCtx, peopleEnv)) return;
-    if (featCtx && action.startsWith("items-") && await itemsAction(action, value, featCtx, recordsEnv, root2?.querySelector("[data-it-form]") ?? lastForm)) return;
-    if (view.kind === "started" && action.startsWith("look") && await lookAction(action, value, view.ctx, refresh2)) return;
-    if (view.kind === "picker" && action.startsWith("look")) {
-      if (lookCommon(action, value)) return;
-      if (action === "look" && value) {
-        draft.look = value;
-        lookUi.open = false;
-        notice = "";
-        return render2();
-      }
-      return;
-    }
-    if (featCtx && action.startsWith("shop-") && await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close2() })) return;
-    if (action === "cdr") {
-      cdrOpen = !cdrOpen;
-      root2?.querySelector(".gx-cdr")?.classList.toggle("open", cdrOpen);
-      root2?.querySelector(".gx-cgrip")?.setAttribute("aria-expanded", String(cdrOpen));
-      return;
-    }
-    if (featCtx && (action.startsWith("rec-") || action.startsWith("jr-"))) {
-      if (action === "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv)) {
-        const go2 = navStep(-1);
-        return go2 ? go2() : render2();
-      }
-      const switching = (action === "rec-open" || action === "rec-journal" || action === "rec-person" || action === "rec-people") && tab !== "records";
-      if (switching) {
-        tab = "records";
-        notice = "";
-        field3.confirmEnd = null;
-        resetSettings();
-      }
-      if (action !== "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv) && switching) render2();
-      return;
-    }
-    if (action.startsWith("ip-") && await handleImgPrompt(action, value, { render: render2 })) return;
-    if (featCtx && action.startsWith("ms-") && await mallSettingsAction(action, value, featCtx, wikiEnv)) return;
-    if (featCtx && action.startsWith("mall-")) {
-      const ms = curTab().site;
-      if (isMallSite(ms) && await mallAction(action, value, featCtx, wikiEnv, ms)) return;
-    }
-    if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action))) return;
-    if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
-    if (action === "ed-open") {
-      document.querySelectorAll(".gx-agpop").forEach((b) => b.remove());
-      if (!(view.kind === "started" || view.kind === "picker" || view.kind === "opening")) return;
-      if (view.kind === "picker") pickerPrefs = true;
-      settingsUi.scope = view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
-      openEditor({
-        ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : null,
-        refresh: () => refresh2(),
-        theme: () => root2?.dataset.theme ?? "dark",
-        handle: (a, v) => handle3(a, v),
-        input: panelInput,
-        change: panelChange,
-        canChat: () => view.kind === "started",
-        mobileNav: mobileNavHtml
-      }, value || void 0);
-      return;
-    }
-    if (action === "install-open") {
-      await openInstall();
-      return;
-    }
-    if (action === "set-editor-width") {
-      await savePrefs((p2) => ({ ...p2, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
-      return render2();
-    }
-    const FEAT_SET = { "gn-settings": "set:gnet", "ph-settings": "set:phone", "wiki-settings": "set:wiki" };
-    if (FEAT_SET[action]) return handle3("ed-open", FEAT_SET[action]);
-    if (action === "prefs-open" || action === "prefs-close") {
-      resetSettings();
-      resetDirectory();
-      settingsUi.scope = "defaults";
-      if (action === "prefs-open") retu
+    await risuai.

@@ -1,4 +1,5 @@
-니쟈"
+: [
+        "고그니쟈"
       ],
       심문관: [
         "김조학"
@@ -575,8 +576,8 @@
     for (const [re, code2] of ORG_CODES) if (re.test(t)) return code2;
     return "";
   }
-  function rankLevel(faction, rank2) {
-    const r = rank2.replace(/\s+/g, "");
+  function rankLevel(faction, rank3) {
+    const r = rank3.replace(/\s+/g, "");
     if (!r || /^(-|없음|미정)$/.test(r)) return null;
     if (/신입|교육생|인턴|수습|trainee|rookie/i.test(r)) return 0;
     if (faction === "A00") {
@@ -606,9 +607,9 @@
     const t = String(text4 ?? "").trim();
     if (!t || t === "없음" || t === "-") return null;
     const [org, ...rest] = t.split(/[\/|·,]/).map((x) => x.trim());
-    const rank2 = rest.join(" ").replace(/^-$/, "");
+    const rank3 = rest.join(" ").replace(/^-$/, "");
     const faction = factionCode(org);
-    return { faction: faction || org, rank: rank2, level: rankLevel(faction, rank2), from, anchor };
+    return { faction: faction || org, rank: rank3, level: rankLevel(faction, rank3), from, anchor };
   }
   var identityText = (id2) => id2 ? `${ORG_NAMES[id2.faction] ?? id2.faction}/${id2.rank || "-"}` : "";
   var ORG_NAMES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
@@ -975,8 +976,8 @@
       }
     }
     if (!lunarFmt) return null;
-    const hit3 = lunarMemo.get(t);
-    if (hit3 !== void 0) return hit3;
+    const hit4 = lunarMemo.get(t);
+    if (hit4 !== void 0) return hit4;
     const parts = lunarFmt.formatToParts(new Date(t));
     const month = parts.find((p2) => p2.type === "month")?.value ?? "";
     const day = Number(parts.find((p2) => p2.type === "day")?.value);
@@ -1014,13 +1015,13 @@
         continue;
       }
       const year = new Date(x).getUTCFullYear();
-      const hit3 = names4.some((n2) => {
+      const hit4 = names4.some((n2) => {
         const from = SUBST_FROM[n2];
         if (!from || year < from) return false;
         const lunarGroup = n2 === "설날" || n2 === "추석";
         return names4.length > 1 || wd === 0 || !lunarGroup && wd === 6;
       });
-      if (hit3) owed++;
+      if (hit4) owed++;
     }
     return false;
   }
@@ -1304,8 +1305,8 @@ ${content}
   }
   function withWorldLore(lore) {
     const base = stripVirtual(lore ?? []);
-    const hit3 = cache5.get(base);
-    if (hit3) return hit3;
+    const hit4 = cache5.get(base);
+    if (hit4) return hit4;
     const overrides2 = worldOverrides(base);
     void readDirectory(base);
     const out = [...base];
@@ -1974,9 +1975,9 @@ ${themeVars("[x-goei-fab]")}
           const d = drag;
           const p2 = pending2;
           pending2 = null;
-          const hit3 = await d.hit;
+          const hit4 = await d.hit;
           if (drag !== d) continue;
-          if (!hit3) {
+          if (!hit4) {
             drag = null;
             break;
           }
@@ -1987,7 +1988,7 @@ ${themeVars("[x-goei-fab]")}
             moved = true;
             await host3.setAttribute("x-goei-drag", "true");
           }
-          pos = dragTo(d.start, dx, dy, hit3.vw, hit3.vh);
+          pos = dragTo(d.start, dx, dy, hit4.vw, hit4.vh);
           await applyPos();
         }
       } catch {
@@ -3404,10 +3405,10 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
   function searchItems(it, alive, q) {
     const k = q.trim().toLowerCase();
     if (!k) return { items: liveItems(it, alive), log: it.log.slice().reverse() };
-    const hit3 = (...s8) => s8.some((x) => (x ?? "").toLowerCase().includes(k));
+    const hit4 = (...s8) => s8.some((x) => (x ?? "").toLowerCase().includes(k));
     return {
-      items: liveItems(it, alive).filter((e) => hit3(e.name, e.desc, e.effect, e.quote, e.equip ? EQUIP_LABEL[e.equip] : "", e.state !== "ok" ? STATE_LABEL[e.state] : "")),
-      log: it.log.filter((l) => hit3(l.name, l.note, l.quote)).reverse()
+      items: liveItems(it, alive).filter((e) => hit4(e.name, e.desc, e.effect, e.quote, e.equip ? EQUIP_LABEL[e.equip] : "", e.state !== "ok" ? STATE_LABEL[e.state] : "")),
+      log: it.log.filter((l) => hit4(l.name, l.note, l.quote)).reverse()
     };
   }
   var INVENTORY_HEAD = "[Inventory]";
@@ -4341,9 +4342,9 @@ ${story}`;
       title2 = "";
     }
     if (!title2) title2 = text4.replace(/^["'\s]+|["'\s]+$/g, "").split("\n")[0].trim();
-    const hit3 = candidates.find((c) => c === title2) ?? candidates.find((c) => c.includes(title2) || title2.includes(c));
-    if (!hit3) throw new WikiError(`후보에 없는 제목이에요: ${title2.slice(0, 40)}`);
-    return hit3;
+    const hit4 = candidates.find((c) => c === title2) ?? candidates.find((c) => c.includes(title2) || title2.includes(c));
+    if (!hit4) throw new WikiError(`후보에 없는 제목이에요: ${title2.slice(0, 40)}`);
+    return hit4;
   }
 
   // src/ui/reportcard.ts
@@ -4357,10 +4358,10 @@ ${story}`;
     const meta = [place3, h.at !== null ? `종료 ${journalClock(h.at).slice(6)}` : "", h.duration !== null ? `소요 ${dur(h.duration)}` : ""].filter(Boolean).join(" · ");
     const who = r.agents.map((a) => a.name).filter(Boolean).join(" · ");
     const badge3 = r.mine ? "내가 출동" : "요원 처리";
-    const box3 = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
+    const box4 = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
     const chip3 = `display:inline-block;padding:0 8px;border-radius:999px;border:1px solid ${r.mine ? p2.signal : p2.accentLine};color:${r.mine ? p2.signal : p2.sub};font-size:.85em;line-height:1.6;margin-left:6px;vertical-align:middle;`;
     const mark2 = `display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid ${p2.accentLine};background:${p2.panel};color:${p2.signal};font-weight:700;font-size:.95em;margin-right:8px;vertical-align:middle;`;
-    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box3}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
+    return `<div data-goei-card="report" data-goei-report="${esc3(r.id)}" style="${box4}"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px;color:${p2.signal};font-weight:600"><span>📄 사건 보고서</span><span style="font-weight:500;opacity:.8;font-size:.85em">${esc3(r.no)}</span></span><span style="display:flex;align-items:center;margin-top:6px;color:${p2.text}"><span style="${mark2}">${esc3(grade)}</span><b>${esc3(h.name)}</b><span style="${chip3}">${badge3}</span><span style="margin-left:6px;opacity:.7;font-size:.85em">${JOURNAL_KIND_LABEL[r.kind]} · 종료</span></span>` + (meta ? `<span style="display:block;margin-top:4px">${esc3(meta)}</span>` : "") + (who ? `<span style="display:block">투입 ${esc3(who)}</span>` : "") + `<span style="display:block;color:${p2.text}">${esc3(r.result)}</span><span data-goei-rec="${esc3(r.id)}" style="display:inline-block;margin-top:6px;color:${p2.signal};font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px">기록에서 보기 ›</span></div>`;
   }
 
   // src/host/statusview.ts
@@ -4387,4 +4388,4 @@ ${story}`;
       const list4 = map.get(r.statusKey);
       if (!list4) map.set(r.statusKey, [r]);
       else if (list4[0].idx === r.idx) list4.push(r);
-      else if (r.idx > list4[0].idx) map.set(r.statusKe
+      else if (r.idx > list4[0].idx)

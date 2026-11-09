@@ -1,4 +1,6 @@
-    }
+ return true;
+          }
+        }
         break;
       }
       case "ph-notice-page":
@@ -840,13 +842,13 @@
       cur = sup;
       pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${(li.querySelector(".nw-fn-t") ?? li).innerHTML}`;
       pop.hidden = false;
-      const box3 = doc2.getBoundingClientRect();
+      const box4 = doc2.getBoundingClientRect();
       const r = sup.getBoundingClientRect();
-      const w = Math.min(360, box3.width - 24);
+      const w = Math.min(360, box4.width - 24);
       pop.style.width = `${w}px`;
-      const left = Math.max(12, Math.min(r.left - box3.left - w / 2 + r.width / 2, box3.width - w - 12));
-      let top = r.bottom - box3.top + doc2.scrollTop + 6;
-      if (r.bottom + pop.offsetHeight + 12 > box3.bottom && r.top - pop.offsetHeight - 12 > box3.top) top = r.top - box3.top + doc2.scrollTop - pop.offsetHeight - 6;
+      const left = Math.max(12, Math.min(r.left - box4.left - w / 2 + r.width / 2, box4.width - w - 12));
+      let top = r.bottom - box4.top + doc2.scrollTop + 6;
+      if (r.bottom + pop.offsetHeight + 12 > box4.bottom && r.top - pop.offsetHeight - 12 > box4.top) top = r.top - box4.top + doc2.scrollTop - pop.offsetHeight - 6;
       pop.style.left = `${left}px`;
       pop.style.top = `${top}px`;
     };
@@ -920,9 +922,9 @@
       }
       const k = t.closest(".nw-kgrid [data-k]")?.dataset.k;
       if (k) {
-        const box3 = panel.querySelector(".wls");
-        const sec2 = box3?.querySelector(`[data-ksec="${k}"]`);
-        if (box3 && sec2) box3.scrollTop = sec2.offsetTop;
+        const box4 = panel.querySelector(".wls");
+        const sec2 = box4?.querySelector(`[data-ksec="${k}"]`);
+        if (box4 && sec2) box4.scrollTop = sec2.offsetTop;
         grid.hidden = true;
         return;
       }
@@ -1132,6 +1134,26 @@
     return { title: titleMsgs, article: p2.messages };
   }
 
+  // src/ui/needfill.ts
+  var bound = false;
+  var needAttr = (name, value, busy6 = false) => ` data-need="${name}"${busy6 ? ' data-busy="1"' : ""}${busy6 || !value.trim() ? " disabled" : ""}`;
+  function bindNeedFill(doc2 = document) {
+    if (bound) return;
+    bound = true;
+    doc2.addEventListener(
+      "input",
+      (ev) => {
+        const el = ev.target;
+        const name = el?.getAttribute?.("name");
+        if (!name) return;
+        doc2.querySelectorAll(`button[data-need="${CSS.escape(name)}"]:not([data-busy])`).forEach((b) => {
+          b.disabled = !el.value.trim();
+        });
+      },
+      true
+    );
+  }
+
   // src/ui/browser.ts
   var esc10 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var SITES = [
@@ -1290,7 +1312,7 @@
     const face3 = o.photo ? `<img src="${esc10(o.photo)}" alt="">` : ic(IC.acct);
     return `<div class="br-lgn" role="dialog" aria-label="로그인"><h4>로그인</h4><div class="br-face">${face3}</div>
     <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc10(o.nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
-    <button class="br-b1" data-action="br-login-save" data-take="br-nick">로그인</button><hr>
+    <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr("br-nick", o.nick)}>로그인</button><hr>
     <button class="br-b2" data-action="br-login-guest">로그인하지 않고 계속</button></div>`;
   }
   function tabListHtml(o) {
@@ -1637,8 +1659,8 @@
   function countRow(ctx2, k, unit, label2) {
     const [a, b] = gnetSettings(ctx2.chat.scriptstate).counts[k];
     const [lo, hi] = COUNT_RANGE[k];
-    const box3 = (side, n2, name) => `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n2}" aria-label="${label2} ${name}"><span>${unit}</span>`;
-    return `<span class="ph-inline"><span>최소</span>${box3("min", a, "최소")}<span>최대</span>${box3("max", b, "최대")}</span>`;
+    const box4 = (side, n2, name) => `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n2}" aria-label="${label2} ${name}"><span>${unit}</span>`;
+    return `<span class="ph-inline"><span>최소</span>${box4("min", a, "최소")}<span>최대</span>${box4("max", b, "최대")}</span>`;
   }
   function seg3(key, cur, items) {
     const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key}=${v}`);
@@ -1881,7 +1903,7 @@ ${previewText(p2.body)}`;
       default: {
         const rows3 = list4.map((p2) => openBtn(p2, `<div>${p2.tag ? `<span class="c${p2.tag === "목격" ? " hot" : ""}">${esc11(p2.tag)}</span>` : ""}<span class="tt">${esc11(p2.title)}${p2.comments.length ? `<em>${p2.comments.length}</em>` : ""}${dot(p2)}</span><small>${esc11(p2.nick)} · ${esc11(ago2(p2, now))} · 조회 ${p2.views.toLocaleString()}</small></div>${thumb(p2)}`, `row${p2.mine ? " mine" : ""}`)).join("");
         const title2 = gnet.cat === "@mine" ? "내가 쓴 글" : gnet.cat === "@scrap" ? "스크랩" : gnet.cat || (gnet.sort === "hot" ? "랭킹" : "전체");
-        const sort = `<div class="sort">${[["new", "최신"], ["hot", "인기"], ["cmt", "댓글 많은"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join("")}</div>`;
+        const sort = `<div class="sort">${[["new", "최신"], ["hot", "랭킹"], ["cmt", "댓글 많은"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}" aria-pressed="${gnet.sort === k}">${l}</button>`).join("")}</div>`;
         const chips3 = `<div class="mchips">${catBtn("", "전체")}${tagsOf(st).map((t) => catBtn(t, t)).join("")}${dmBtn(st, unreadDm)}${catBtn("@mine", "내가 쓴 글")}${catBtn("@scrap", "스크랩")}</div>`;
         return `<div class="gmain"><div class="bh"><h2>${esc11(title2)}</h2>${writeBtn("w")}</div>${chips3}${sort}${empty2 || `${rows3}${none2(list4)}`}${pages(all.length) > 1 ? pager(all.length, "pg", "", "›") : ""}</div>`;
       }
@@ -1987,11 +2009,11 @@ ${previewText(p2.body)}`;
     const unreadDm = st.dms.filter((d) => d.unread).length;
     const main = siteMain(site, ctx2, st, busy6, unreadDm);
     const plain2 = gnet.sub === "dm" || gnet.compose?.kind === "post";
-    const box3 = (inner2) => plain2 ? `<div class="bs-plain">${extras2}${inner2}</div>` : `${extras2 ? `<div class="bs-x">${extras2}</div>` : ""}${inner2}`;
+    const box4 = (inner2) => plain2 ? `<div class="bs-plain">${extras2}${inner2}</div>` : `${extras2 ? `<div class="bs-x">${extras2}</div>` : ""}${inner2}`;
     let inner;
     if (site === "gn") inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain2 ? `<div class="gmain">${extras2}${main}</div>` : `${extras2}${main}`}</div></div>`;
-    else if (site === "wpf") inner = `<div class="pg">${box3(main)}</div>`;
-    else inner = box3(main);
+    else if (site === "wpf") inner = `<div class="pg">${box4(main)}</div>`;
+    else inner = box4(main);
     return `<main class="gx-body gn bs bs-${site}${mobile ? " bs-m" : ""}" data-site="${site}">${siteHead(site, st, unreadDm)}${inner}</main>`;
   }
   function gnetTab(base, env3, site = "gn") {
@@ -2183,9 +2205,9 @@ ${previewText(p2.body)}`;
         gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
         gnet.attach = [];
         env3.render();
-        const box3 = document.querySelector('.gn-composer [data-input="gn-draft"]');
-        box3?.scrollIntoView({ block: "center", behavior: "smooth" });
-        box3?.focus({ preventScroll: true });
+        const box4 = document.querySelector('.gn-composer [data-input="gn-draft"]');
+        box4?.scrollIntoView({ block: "center", behavior: "smooth" });
+        box4?.focus({ preventScroll: true });
         return true;
       }
       case "gn-reply": {
@@ -2199,9 +2221,9 @@ ${previewText(p2.body)}`;
         }
         gnet.compose = { kind: "comment", post: a, parent: b, label: `${c.nick}에게 답글` };
         env3.render();
-        const box3 = document.querySelector('.gn-c-compose [data-input="gn-draft"]');
-        box3?.focus({ preventScroll: true });
-        box3?.closest(".gn-c-compose")?.scrollIntoView({ block: "nearest" });
+        const box4 = document.querySelector('.gn-c-compose [data-input="gn-draft"]');
+        box4?.focus({ preventScroll: true });
+        box4?.closest(".gn-c-compose")?.scrollIntoView({ block: "nearest" });
         return true;
       }
       case "gn-dm-from": {
@@ -2818,13 +2840,13 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     const inst = installData();
     for (const [key, n2] of Object.entries(inst.greetings.index)) {
       const text4 = inst.greetings.texts[n2] ?? "";
-      let hit3 = at.get(text4);
-      if (hit3 === void 0) {
-        hit3 = out.length;
+      let hit4 = at.get(text4);
+      if (hit4 === void 0) {
+        hit4 = out.length;
         out.push(text4);
-        at.set(text4, hit3);
+        at.set(text4, hit4);
       }
-      index3[key] = hit3;
+      index3[key] = hit4;
     }
     return { greetings: out, index: index3 };
   }
@@ -3073,15 +3095,15 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
       const qm = [...q.mods, ...h.qPre ? [h.qPre] : []];
       const qj = qm.join("");
       const pj = pm.join("");
-      let hit3 = 0;
+      let hit4 = 0;
       let pOnly = 0;
       let qOnly = 0;
       const inQ = (w, whole) => qm.includes(w) || (w.length >= 2 ? /[가-힣]/.test(w) && qj.includes(w) : whole && qm.some((x) => x.startsWith(w)));
       const inP = (w) => pm.includes(w) || w.length >= 2 && /[가-힣]/.test(w) && pj.includes(w) || pm.some((x) => x.length === 1 && w.startsWith(x));
-      pm.forEach((w, i) => inQ(w, !h.whole && i < p2.mods.length) ? hit3 += wt(w) : pOnly += wt(w));
+      pm.forEach((w, i) => inQ(w, !h.whole && i < p2.mods.length) ? hit4 += wt(w) : pOnly += wt(w));
       for (const w of qm) if (!inP(w)) qOnly += (isMod(w) || !/[가-힣]/.test(w) ? 1 : HEAD_EXTRA / Q_EXTRA) * wt(w);
       if (h.qPre && !pm.includes(h.qPre) && !pj.includes(h.qPre)) qOnly += HEAD_EXTRA / Q_EXTRA * wt(h.qPre);
-      return { s: hit3 - HEAD_EXTRA * pOnly - Q_EXTRA * qOnly, hit: hit3, plain: pm.length === 0 && p2.kw };
+      return { s: hit4 - HEAD_EXTRA * pOnly - Q_EXTRA * qOnly, hit: hit4, plain: pm.length === 0 && p2.kw };
     };
     const find = (text4) => {
       const q = headOf(text4);
@@ -3132,7 +3154,7 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
     const head3 = makeHeadIndex(rows3, reps);
     const frag = makeFragIndex(rows3, reps);
-    const rank2 = (h) => !h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1;
+    const rank3 = (h) => !h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1;
     const match = (name, icon) => {
       const hi = icon ? head3(icon) : null;
       const hn = name ? head3(name) : null;
@@ -3141,7 +3163,7 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
         if (ok) return { file: ok.file, score: 1 };
         return (hn?.retry ? match(hn.retry, "") : null) || (hi?.retry ? match(hi.retry, "") : null) || frag(name, icon);
       }
-      const h = rank2(hn) > rank2(hi) || rank2(hn) === 3 ? hn : hi || hn;
+      const h = rank3(hn) > rank3(hi) || rank3(hn) === 3 ? hn : hi || hn;
       if (h) return { file: h.file, score: 1 };
       return frag(name, icon);
     };
@@ -3487,14 +3509,4 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
   var esc13 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var walletUi = { filter: "all", q: "", open: null, edit: false, notice: "", kind: "won" };
   var walletOn = (ctx2) => colConfig(ctx2.chat.scriptstate).wallet !== "off";
-  var walletOf = (ctx2) => readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  var ledgerOf = (ctx2) => walletUi.kind === "p" ? readPoints(ctx2.chat.scriptstate) : walletOf(ctx2);
-  var money = (n2) => walletUi.kind === "p" ? formatPoints(n2) : formatWon(n2);
-  function balanceText(ctx2) {
-    return formatWon(walletBalance(walletOf(ctx2), aliveAnchors(ctx2.chat)));
-  }
-  function walletHeadButton(ctx2, here = false) {
-    if (!walletOn(ctx2) || here) return "";
-    return `<button class="gx-hwallet" data-action="tab" data-value="wallet" aria-label="가계부 · 잔고 ${esc13(balanceText(ctx2))}">${esc13(balanceText(ctx2))}</button>`;
-  }
-  var SRC_ICON 
+  

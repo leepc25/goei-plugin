@@ -1,4 +1,13 @@
--action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
+으로 저장")}
+      ${defRow("기본값 불러오기", canChat ? "저장해 둔 기본값을 지금 채팅에 가져와요." : "채팅을 시작한 뒤에 쓸 수 있어요. 새 채팅은 기본값으로 시작해요.", "load", "불러오기", !canChat)}
+      ${defRow("초기화", "지금 채팅의 설정과 저장해 둔 기본값, 고친 지침을 플러그인 원래 값으로 되돌려요. 세계(카드 명부)는 그대로 둬요.", "reset", "초기화", !canChat)}
+    </div></section>${mainDefaultsConfirm(ctx2)}`;
+    return `<div class="gw-page gw-set">${head2("", "저장·불러오기", "설정은 고치는 즉시 저장돼요. 여기서는 기본값을 저장·불러오기·초기화하고, 설정을 글(JSON)로 내보내고 가져와요.")}
+    <div class="gx-settings gw-setbody">
+    ${defaults}
+    <section class="ps-group"><h3>내보내기·가져오기</h3><p class="ps-note">들어가는 것: 화면·이미지 설정, 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 바꾸지 않아 원래 값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.</p><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
+        <div class="ps-ctl"><span class="gw-tokens">${kb(json.length)}</span><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
       ${canChat ? `<div class="ps-row"><div class="ps-label"><b>지금 채팅 값도 넣기</b><small>이 채팅에서 바꾼 설정 값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·생성 공통) ${chatN}개를 「chat」으로 같이 넣어요. 가져올 때 채팅이 열려 있으면 그 채팅에 적혀요. 기록(상황판 내용·인물 기록·일지)은 안 들어가요.</small></div>
         <div class="ps-ctl"><label class="pp-check"><input type="checkbox" data-change="man-with-chat" ${withChat ? "checked" : ""}> 넣기</label></div></div>` : ""}
       ${importRows}
@@ -105,9 +114,6 @@
         return true;
       case "man-trace-refresh":
         traceUi.turns = await loadTrace().catch(() => []);
-        return true;
-      case "man-flow-recount":
-        flowRecount();
         return true;
       case "man-drop-trace":
         traceUi.confirm = true;
@@ -411,6 +417,7 @@
     root = document.createElement("div");
     root.className = "gw";
     document.body.appendChild(root);
+    bindNeedFill();
     root.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
     bindCropDrag(root, () => render());
     root.addEventListener("click", (ev) => {
@@ -464,27 +471,27 @@
       }
       if (name === "ed-sq") {
         edUi.sq = el.value;
-        const box3 = root?.querySelector(".gw-find-out");
-        if (box3) box3.innerHTML = edUi.sq.trim() ? findResults(ctx2 ?? null) : treeGroups(treeCounts(ctx2 ?? null), featureState(ctx2 ?? null));
+        const box4 = root?.querySelector(".gw-find-out");
+        if (box4) box4.innerHTML = edUi.sq.trim() ? findResults(ctx2 ?? null) : treeGroups(treeCounts(ctx2 ?? null), featureState(ctx2 ?? null));
         return;
       }
       if (name === "ed-wq") {
         edUi.wq = el.value;
-        const box3 = root?.querySelector(".gw-find-out");
-        if (box3) box3.innerHTML = edUi.wq.trim() ? worldFindResults(ctx2 ?? null) : treeGroups(treeCounts(ctx2 ?? null), featureState(ctx2 ?? null));
+        const box4 = root?.querySelector(".gw-find-out");
+        if (box4) box4.innerHTML = edUi.wq.trim() ? worldFindResults(ctx2 ?? null) : treeGroups(treeCounts(ctx2 ?? null), featureState(ctx2 ?? null));
         return;
       }
       if (name === "ed-q") {
         edUi.q = el.value;
-        const box3 = root?.querySelector(".gw-list");
-        if (box3 && ctx2 && isKind3(edUi.node)) box3.innerHTML = recordList(ctx2, edUi.node, overridesOf(ctx2), edUi.q);
+        const box4 = root?.querySelector(".gw-list");
+        if (box4 && ctx2 && isKind3(edUi.node)) box4.innerHTML = recordList(ctx2, edUi.node, overridesOf(ctx2), edUi.q);
         return;
       }
       if (imgInput(name, el.value)) return;
       if (name === "dir-photo-q" && ctx2) {
         dirUi.pickQ = el.value;
-        const box3 = root?.querySelector(".dir-pics");
-        if (box3) box3.innerHTML = directoryPhotoList(ctx2);
+        const box4 = root?.querySelector(".dir-pics");
+        if (box4) box4.innerHTML = directoryPhotoList(ctx2);
         return;
       }
       if (name === "dir-crop-size") {
@@ -497,8 +504,8 @@
       }
       if (name === "dir-ext-q" && ctx2) {
         dirUi.addQ = el.value;
-        const box3 = root?.querySelector(".dir-ext-list");
-        if (box3) box3.innerHTML = directoryExtList(ctx2);
+        const box4 = root?.querySelector(".dir-ext-list");
+        if (box4) box4.innerHTML = directoryExtList(ctx2);
         return;
       }
       if (ctx2 && recordInput(name, el.dataset.key ?? "", el.value, ctx2)) return void touched();
@@ -574,8 +581,8 @@
       const row10 = grip?.closest("[data-slot-row]");
       if (!grip || !row10 || !root) return;
       ev.preventDefault();
-      const box3 = root;
-      const rows3 = [...box3.querySelectorAll("[data-slot-row]")].filter((r) => r !== row10);
+      const box4 = root;
+      const rows3 = [...box4.querySelectorAll("[data-slot-row]")].filter((r) => r !== row10);
       let drop = null;
       const mark2 = (next) => {
         drop?.el.classList.remove("drop-before", "drop-after");
@@ -593,14 +600,14 @@
         if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
       };
       row10.classList.add("dragging");
-      box3.classList.add("dir-dragging");
+      box4.classList.add("dir-dragging");
       grip.setPointerCapture?.(ev.pointerId);
       const up = () => {
         grip.removeEventListener("pointermove", move);
         grip.removeEventListener("pointerup", up);
         grip.removeEventListener("pointercancel", up);
         row10.classList.remove("dragging");
-        box3.classList.remove("dir-dragging");
+        box4.classList.remove("dir-dragging");
         const target = drop;
         mark2(null);
         if (target) {
@@ -815,8 +822,8 @@
     return `<div class="gw-tree-group gw-find-res"><h4>찾은 설정 ${hits.length}개</h4>${hits.map(({ h, i }) => `<button class="gw-tree-item gw-find-hit" data-action="ed-find-go" data-value="${i}">${SET_ICON[h.page]}<span><b>${esc35(h.label)}</b><small>${esc35(SET_LABEL[h.page])}${h.group && h.group !== h.label && h.group !== SET_LABEL[h.page] ? ` · ${esc35(h.group)}` : ""}</small></span></button>`).join("")}</div>`;
   }
   function flashEl(el, block3) {
-    const box3 = el.closest("details");
-    if (box3 && !box3.open) box3.open = true;
+    const box4 = el.closest("details");
+    if (box4 && !box4.open) box4.open = true;
     el.scrollIntoView({ block: block3 });
     el.classList.remove("gw-find-flash");
     void el.offsetWidth;
@@ -831,11 +838,11 @@
     const row10 = [...body5.querySelectorAll(".ps-row")].find((r) => head3(r.querySelector(".ps-label > b")) === label2 && (!grp || r.closest(".ps-group")?.querySelector("h3")?.textContent?.trim() === grp));
     if (row10) flashEl(row10, "center");
   }
-  function flashFound(hit3) {
+  function flashFound(hit4) {
     const rows3 = [...root?.querySelectorAll(".gw-body .ps-row") ?? []];
     const row10 = rows3.find((r) => {
       const b = r.querySelector(".ps-label > b");
-      return b && [...b.childNodes].filter((n2) => !(n2 instanceof HTMLElement && n2.tagName === "I")).map((n2) => n2.textContent ?? "").join("").trim() === hit3.label;
+      return b && [...b.childNodes].filter((n2) => !(n2 instanceof HTMLElement && n2.tagName === "I")).map((n2) => n2.textContent ?? "").join("").trim() === hit4.label;
     });
     if (row10) flashEl(row10, "center");
   }
@@ -971,10 +978,10 @@
     else root.innerHTML = html;
     labelSwitches(root);
     if (phone2) {
-      const box3 = root.querySelector(".ph-drawer");
+      const box4 = root.querySelector(".ph-drawer");
       const bar = root.querySelector(".gx-mbar");
-      if (box3 && !boundOnce.has(box3)) {
-        boundOnce.add(box3);
+      if (box4 && !boundOnce.has(box4)) {
+        boundOnce.add(box4);
         bindDrawer(root);
       }
       if (bar && !boundOnce.has(bar)) {
@@ -1144,10 +1151,10 @@
         root?.querySelector(".gw-body")?.scrollTo({ top: 0, behavior: "smooth" });
         return;
       case "ed-find-go": {
-        const hit3 = findIndex?.[Number(value)];
-        if (!hit3) return;
-        await handle2("ed-node", `set:${hit3.page}`);
-        flashFound(hit3);
+        const hit4 = findIndex?.[Number(value)];
+        if (!hit4) return;
+        await handle2("ed-node", `set:${hit4.page}`);
+        flashFound(hit4);
         return;
       }
       case "ed-width": {
@@ -1403,8 +1410,8 @@
   function firstPick(cards2) {
     const live = cards2.filter((c) => !c.ended);
     const ours = (c) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? "");
-    const rank2 = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
-    return [...live].sort((a, b) => rank2(a) - rank2(b))[0]?.id ?? cards2[0]?.id ?? "";
+    const rank3 = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
+    return [...live].sort((a, b) => rank3(a) - rank3(b))[0]?.id ?? cards2[0]?.id ?? "";
   }
   function opsRow(c, on2) {
     const thumb2 = c.art?.pic ? `<img src="${esc36(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
@@ -1573,29 +1580,29 @@
         else if (ul.classList.contains("gx-agwall")) ul.style.setProperty("--agrow", `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);
         else ul.style.setProperty("--agrow", `${Math.max(48, Math.floor(ul.clientHeight / 6))}px`);
       }
-      for (const box3 of root3.querySelectorAll(".gx-flow")) {
-        const inner = box3.firstElementChild;
+      for (const box4 of root3.querySelectorAll(".gx-flow")) {
+        const inner = box4.firstElementChild;
         if (!inner) continue;
-        const key = `${box3.clientWidth}|${inner.dataset.t ?? ""}`;
-        if (box3.dataset.fk === key) continue;
-        box3.dataset.fk = key;
-        if (box3.classList.contains("gx-agrow-msg")) {
-          box3.classList.remove("on");
-          box3.classList.add("two");
-          if (box3.scrollHeight <= box3.clientHeight + 1) continue;
-          box3.classList.remove("two");
+        const key = `${box4.clientWidth}|${inner.dataset.t ?? ""}`;
+        if (box4.dataset.fk === key) continue;
+        box4.dataset.fk = key;
+        if (box4.classList.contains("gx-agrow-msg")) {
+          box4.classList.remove("on");
+          box4.classList.add("two");
+          if (box4.scrollHeight <= box4.clientHeight + 1) continue;
+          box4.classList.remove("two");
         }
         const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
-        const on2 = box3.classList.contains("on");
+        const on2 = box4.classList.contains("on");
         const w = on2 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
-        const over = w - box3.clientWidth > 2;
-        box3.classList.toggle("on", over);
+        const over = w - box4.clientWidth > 2;
+        box4.classList.toggle("on", over);
         if (over) {
           const d = w + gap;
-          box3.style.setProperty("--fd", `${-d}px`);
+          box4.style.setProperty("--fd", `${-d}px`);
           const ft = d / 18;
-          box3.style.setProperty("--ft", `${ft.toFixed(2)}s`);
-          box3.style.setProperty("--fdl", `${(-(performance.now() / 1e3 % ft)).toFixed(2)}s`);
+          box4.style.setProperty("--ft", `${ft.toFixed(2)}s`);
+          box4.style.setProperty("--fdl", `${(-(performance.now() / 1e3 % ft)).toFixed(2)}s`);
         }
       }
     };
@@ -1674,9 +1681,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
   color: var(--text);
   /* 조작 규격 변수 (2026-11-05 전수점검: 단추 한 종류가 32~44px 다섯 가지였다). 본 창 단추는 이 셋만 쓴다: 보통·작은 것·모서리. 폰은 손가락 기준 40px */
-  --ctl-h: 36px; --ctl-sm: 32px; --ctl-r: 10px;
+  --ctl-h: 36px; --ctl-sm: 34px; --ctl-r: 10px;
 }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx { --ctl-h: 40px; --ctl-sm: 40px; } }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx { --ctl-h: 40px; --ctl-sm: 34px; } }
 /* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」. 색은 app.ts가 .gx에 바로 칠한다 (100%면 완전히 가림) */
 .gx-panel {
   /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
@@ -1891,7 +1898,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .gx-fac-img { filter: grayscale(1) brightness(.5); }
   .gx-fac.on .gx-fac-img, .gx-fac.has-img:hover .gx-fac-img { filter: none; }
 }
-.gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
+/* 그림 카드는 안쪽 선이 그림 모서리와 겹쳐 이중 테두리로 보인다 (11-05·11-09 사용자) → 바깥 한 줄만, 강조색 테두리 */
+.gx-fac.on { border-color: var(--signal); }
 
 .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-seg { min-width: 96px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-weight: 600; }
@@ -2002,7 +2010,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-sugnone { margin: 0; padding: 10px 12px; color: var(--dim); font-size: 13px; text-align: center; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-mapbar > .gx-select { flex-basis: 38%; } }
 .gx-select, .gx-search {
-  min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
+  min-height: var(--ctl-sm); padding: 0 12px; border: 1px solid var(--line); border-radius: 8px;
   background: var(--void); color: var(--text); font: inherit;
 }
 .gx-select { flex: 1; }
@@ -2050,8 +2058,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-ev { display: flex; align-items: stretch; }
 
 .gx-mlist li.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
-/* 임무 카드(그림 카드)는 안쪽 선이 그림 모서리와 겹쳐 지저분했다 → 바깥 한 줄 + 은은한 빛 (2026-11-05 사용자) */
-.gx-mlist li.gx-mx.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
+/* 임무 카드(그림 카드)는 안쪽 선이 그림 모서리와 겹쳐 지저분했다 → 바깥 한 줄 (2026-11-05 사용자). 11-09 기준 시안: 강조색 테두리, 안쪽 선 없음 (사용자: 그림 카드 이중 테두리 주의) */
+.gx-mlist li.gx-mx.sel { border-color: var(--signal); }
 
 .gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .gx-team .gx-muted { margin: 0; font-size: 13px; }
@@ -2095,7 +2103,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .nw-meta summary, .nw-fail summary { cursor: pointer; color: var(--mint); font-size: 14px; }
 .nw-reqbox { margin-top: 8px; padding: 10px 12px; resize: vertical; min-height: 64px; line-height: 1.5; }
 
-.gx-segs-sm .gx-seg { min-width: 0; min-height: 34px; padding: 0 12px; font-size: 14px; }
+.gx-segs-sm .gx-seg { min-width: 0; padding: 0 12px; font-size: 13px; }
 .nw-busy { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); background: var(--accent-bg); color: var(--signal); font-size: 14px; }
 .nw-spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--signal); animation: nwspin .9s linear infinite; flex: none; }
 @keyframes nwspin { to { transform: rotate(360deg); } }
@@ -2330,7 +2338,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-kinds .long { display: none; }
   /* 탭 6개: 모바일은 세 개씩 두 줄 */
   .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
-  .dir-kinds .gx-seg { min-height: var(--ctl-sm); font-size: 14px; border-radius: 8px; }
+  .dir-kinds .gx-seg { font-size: 13px; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }
 .dir-group.warn { color: var(--amber); }
@@ -2377,7 +2385,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard-sit { font-size: 13px; line-height: 1.45; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .gx-acard.pick .gx-acard-sit { -webkit-line-clamp: 1; }
 .gx-acard.pick:hover:not(:disabled) { border-color: var(--line2); }
-.gx-acard.pick.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-acard.pick.on { border-color: var(--signal); }
 .gx-acard.pick.on .gx-acard-top b { color: var(--signal); }
 .gx-acard.pick:disabled { opacity: .45; }
 .gx-acard-check { display: none; position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--signal); color: var(--on-signal); font-size: 13px; font-weight: 800; place-items: center; }
@@ -2744,8 +2752,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-scard .gx-ava svg { width: 26px; height: 26px; }
 .gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
 .gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
-.gx-scard-step .gx-step { width: var(--ctl-sm); height: var(--ctl-sm); border-radius: 9px; color: var(--text); }
-.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-scard-step .gx-step { width: var(--ctl-sm); height: var(--ctl-sm); border-radius: 8px; color: var(--text); }
+.gx-acard.pick.gx-scard.on { border-color: var(--signal); }
 .gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
 
@@ -2865,20 +2873,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
 .gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .gx-id-photo.none svg { width: 44px; height: 44px; }
-.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
-.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
-.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
-.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
-.gx-idbtn { display: none; overflow: hidden; padding: 0; }
-.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
-.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
-.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
-.gx-idpop-card .gx-id-photo { width: 240px; height: 240px; border-radius: 24px; }
-.gx-idpop-card .gx-agpop-x { z-index: 1; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .gx-idbtn { display: grid; } }
-.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
-.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
-.gx-op-ln i { flex: none; font-style: normal; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
-.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
-.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op-wait { font-size: 12px; line-height: 1.45; color: var(--su
+.gx-id-who { display: flex; flex-direction: colum

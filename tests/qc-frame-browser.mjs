@@ -129,10 +129,13 @@ let prefsSaved;
   await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
   await openWin(page);
   await page.waitForSelector('.gx-fac');
-  const pre = await page.evaluate(() => ({ kind: document.querySelector('.gx-frame')?.dataset.kind, pre: document.querySelector('.gx-frame')?.classList.contains('pre'), panelW: document.querySelector('.gx-panel').getBoundingClientRect().width }));
+  const pre = await page.evaluate(() => ({ kind: document.querySelector('.gx-frame')?.dataset.kind, pre: document.querySelector('.gx-frame')?.classList.contains('pre'), panelW: document.querySelector('.gx-panel').getBoundingClientRect().width, panelH: document.querySelector('.gx-panel').getBoundingClientRect().height, vh: innerHeight, bz: parseFloat(getComputedStyle(document.querySelector('.gx-frame')).getPropertyValue('--bz')) || 0 }));
   assert.equal(pre.kind, 'tactical', '시작 전 화면에도 틀');
   assert.ok(pre.pre, '시작 전 창 폭(1024) 기준 틀');
-  assert.equal(pre.panelW, 1024, '시작 전 창 폭 그대로');
+  // 11-08 사용자: 시작 패널은 3:4 (폭 1024 넘지 않음, 낮은 화면은 높이에 맞춰 좁아짐)
+  // 폭 = min(1024, (화면 높이 − 틀 두께) 기준 3:4 폭)  (style.css .gx-frame.pre:has(> .gx-panel.pick))
+  const want = Math.min(1024, (Math.min(pre.vh - 28, 1366) - 2 * pre.bz) * 0.75);
+  assert.ok(pre.panelW <= 1024 && Math.abs(pre.panelW - want) < 4, `시작 전 창 폭 ${pre.panelW} (기대 약 ${Math.round(want)})`);
   assert.deepEqual(errors, []);
   await page.close();
 }

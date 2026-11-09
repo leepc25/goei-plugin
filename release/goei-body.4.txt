@@ -1,4 +1,5 @@
-const p2 of st.posts) {
+post) {
+      for (const p2 of st.posts) {
         if (p2.mine) {
           post = p2;
           break;
@@ -1061,11 +1062,11 @@ ${body5}
     const add = (kind, source4, content) => {
       const text4 = content.trim();
       if (!text4) return;
-      const rank2 = ["base", "primary", "active", "direct", "secondary"];
+      const rank3 = ["base", "primary", "active", "direct", "secondary"];
       const same4 = rows3.find((r) => r.content === text4);
       if (same4) {
         if (!same4.sources.includes(source4)) same4.sources.push(source4);
-        if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same4.kind)) same4.kind = kind;
+        if (o.scope === "wiki" && rank3.indexOf(kind) < rank3.indexOf(same4.kind)) same4.kind = kind;
         same4.required = same4.required || required(kind);
         return;
       }
@@ -1570,7 +1571,7 @@ ${c}`)]).join("\n\n");
   function mineReasons(chat, from, to, s8) {
     const out = /* @__PURE__ */ new Set();
     const names4 = [s8.name, s8.presetName ?? ""].filter(Boolean);
-    const hit3 = (t) => names4.some((n2) => same(t, n2));
+    const hit4 = (t) => names4.some((n2) => same(t, n2));
     const list4 = msgs2(chat);
     const lo = Math.max(0, Math.min(from, to));
     const hi = Math.min(list4.length - 1, Math.max(from, to));
@@ -1581,13 +1582,13 @@ ${c}`)]).join("\n\n");
       const t = text(m);
       if (m.role === "user") {
         const scene = readScene(t);
-        if (scene && hit3(scene.target)) out.add("scene");
+        if (scene && hit4(scene.target)) out.add("scene");
         continue;
       }
       if (m.role !== "char" || i < lo) continue;
       for (const tag of findStatusTags(t)) {
         if (tag.deployed !== null) hasDeployCol = true;
-        if (tag.deployed === true && hit3(tag.target)) out.add("deployed");
+        if (tag.deployed === true && hit4(tag.target)) out.add("deployed");
         if (s8.agentNames.length && tag.companions.some((c) => s8.agentNames.some((a) => same(c, a)))) out.add("companion");
       }
     }
@@ -1910,10 +1911,10 @@ ${c}`)]).join("\n\n");
       const name = tagName(who, expr, pick3, self);
       if (!name || name !== SELF && /[{}'"<>\\]/.test(name)) return "\n\n";
       const url = name === SELF ? SELF : `{{raw::${name}}}`;
-      const box3 = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
+      const box4 = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
       return `
 
-${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box3}{{/when}}` : box3}
+${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box4}{{/when}}` : box4}
 
 `;
     });
@@ -2078,8 +2079,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   }
   function readSettingsBook(lore) {
     const list4 = lore ?? [];
-    const hit3 = cache4.get(list4);
-    if (hit3) return hit3;
+    const hit4 = cache4.get(list4);
+    if (hit4) return hit4;
     let out = { basic: {}, world: {} };
     for (const name of ["Settings", "통합설정"]) {
       const books = list4.filter((e) => e.comment === name && typeof e.content === "string" && e.content.trim());
@@ -4512,5 +4513,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       수녀님: [
         "블라렛"
       ],
-      실장: [
-        "고그
+      실장

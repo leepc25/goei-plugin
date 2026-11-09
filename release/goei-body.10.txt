@@ -1,4 +1,24 @@
-t = slot2("state");
+   const user = o.user ?? "{{user}}";
+    const kept = {};
+    for (const k of Object.keys(p2.slots)) kept[k] = liveEntries(p2.slots[k], live);
+    if (o.maxChars) {
+      const size = () => Object.values(kept).reduce((n2, l) => n2 + (l ?? []).reduce((m, e) => m + e.text.length + 3, 0), 0);
+      for (const k of TRIM_ORDER) while (size() > o.maxChars && kept[k]?.length) kept[k].shift();
+    }
+    const slot2 = (k) => kept[k] ?? [];
+    const out = [`## ${p2.name} (living record · updated in this chat)`];
+    const mode2 = o.mode ?? "split";
+    if (o.sheet && mode2 === "append") out.push(o.sheet.trim());
+    const id2 = slot2("identity");
+    if (id2.length) out.push("Identity:\n" + lines2(id2));
+    const per = slot2("personality");
+    if (per.length) out.push("Personality:\n" + lines2(per));
+    if (o.axes) out.push("Personality axes (baseline traits, not current feeling):\n" + axesLinesEn(p2.axes).join("\n") + (p2.patterns?.length ? "\nLong-term changes:\n" + p2.patterns.map((t) => `- ${plain(t, 300)}`).join("\n") : ""));
+    if (o.sexual && (o.sexual.desire || o.sexual.paraphilia)) out.push(`Sexual profile (policy: ${SEXUAL_POLICY} — ${SEXUAL_DIRECTOR_POLICY})
+` + [o.sexual.desire ? `- Sexual desire: ${plain(o.sexual.desire, SEXUAL_CHARS)}` : "", o.sexual.paraphilia ? `- Paraphilia: ${plain(o.sexual.paraphilia, SEXUAL_CHARS)}` : ""].filter(Boolean).join("\n"));
+    if (o.sheet && mode2 === "split") for (const s8 of fixedSections(o.sheet)) out.push(`${s8.name}:
+${s8.body}`);
+    const st = slot2("state");
     if (st.length) out.push("Current state:\n" + lines2(st));
     const kn = slot2("knowledge");
     if (kn.length) out.push("Knows:\n" + lines2(kn));
@@ -855,9 +875,9 @@ ${rules2}`;
     };
     const ga = grams(x);
     const gb = grams(y);
-    let hit3 = 0;
-    for (const [k, n2] of ga) hit3 += Math.min(n2, gb.get(k) ?? 0);
-    return 2 * hit3 / (x.length - 1 + y.length - 1) >= 0.8;
+    let hit4 = 0;
+    for (const [k, n2] of ga) hit4 += Math.min(n2, gb.get(k) ?? 0);
+    return 2 * hit4 / (x.length - 1 + y.length - 1) >= 0.8;
   }
   var SUSP_KINDS = /* @__PURE__ */ new Set(["정체", "배신", "거짓말", "오염", "범행"]);
   function resolveName2(who, store2, names4 = []) {
@@ -1859,8 +1879,8 @@ ${o.rules.trim()}` : ""].filter(Boolean).join("\n");
       const q = s8.trim().normalize("NFC");
       if (!q) return null;
       if (store2.people[q]) return q;
-      const hit3 = names4.find((n2) => n2.name === q || n2.aliases.includes(q)) ?? Object.values(store2.people).find((p2) => p2.aliases.includes(q));
-      return hit3 && store2.people[hit3.name] ? hit3.name : null;
+      const hit4 = names4.find((n2) => n2.name === q || n2.aliases.includes(q)) ?? Object.values(store2.people).find((p2) => p2.aliases.includes(q));
+      return hit4 && store2.people[hit4.name] ? hit4.name : null;
     };
     const selected = [];
     for (const x of v.selected) {
@@ -2587,7 +2607,19 @@ Return the JSON object.` }
 
   // src/ui/editor/flow.ts
   var flowTok = { key: "", map: null, pending: false, error: "" };
-  var tokKey = (ctx2) => `${ctx2.chatIndex}:${ctx2.chat.message?.length ?? 0}:${JSON.stringify(ctx2.chat.scriptstate ?? {}).length}`;
+  function tokKey(ctx2) {
+    let h = 2166136261;
+    const feed = (s8) => {
+      for (let i = 0; i < s8.length; i++) h = Math.imul(h ^ s8.charCodeAt(i), 16777619);
+      h = Math.imul(h ^ 255, 16777619);
+    };
+    feed(String(ctx2.chatIndex));
+    for (const m of ctx2.chat.message ?? []) feed(`${m.role}\0${m.data ?? ""}`);
+    feed(JSON.stringify(ctx2.chat.scriptstate ?? {}));
+    for (const e of ctx2.char.globalLore ?? []) feed(`${e.comment ?? ""}\0${e.key ?? ""}\0${e.content ?? ""}`);
+    feed(JSON.stringify(getPrefs()));
+    return (h >>> 0).toString(36);
+  }
   var count2 = (m) => m ? promptTokens({ messages: m }) : null;
   async function computeTokens(ctx2) {
     const map = {};
@@ -2629,10 +2661,6 @@ Return the JSON object.` }
       flowTok.pending = false;
       render3();
     });
-  }
-  function flowRecount() {
-    flowTok.map = null;
-    flowTok.key = "";
   }
   var esc28 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var id = (v) => v ? `ID ${v.slice(0, 18)}` : "";
@@ -2709,7 +2737,7 @@ Return the JSON object.` }
     const group6 = (title2, note, nodes2) => `<section class="ps-group"><h3>${title2} <small>${esc28(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes2.map(nodeHtml2).join(arrow)}</div></div></section>`;
     return `<div class="gw-page gw-set">${head3("", "호출 흐름", "지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.")}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ""} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p>${flowTok.map && !flowTok.pending && !flowTok.error ? '<button class="gx-mini" data-action="man-flow-recount">다시 세기</button>' : ""}</div></div></section>
+    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ""} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
     ${group6("본편 전", "유저 메시지 → 요청 조립", pre)}
     ${group6("본편", "", [main])}
     ${group6("본편 뒤", "응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)", post)}
@@ -2908,9 +2936,9 @@ Return the JSON object.` }
     npc_emotion: ["인물끼리 감정", "인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)"]
   };
   var NUMERIC_HELP = {
-    affinity: "OFF = 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 본편에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)",
-    suspicion: "OFF = 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만",
-    openness: "OFF = 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만"
+    affinity: "끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 본편에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)",
+    suspicion: "끄면 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만",
+    openness: "끄면 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만"
   };
   var n = (v) => v.toLocaleString();
   var tok2 = (s8, text4) => text4 ? `${n(s8)}자 · 약 ${n(tokens(text4))}tok` : `${n(s8)}자 · 약 ${n(Math.ceil(s8 * 0.6))}tok`;
@@ -3004,9 +3032,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const nodes2 = [
       { name: "입력", sub: "유저 메시지", kind: "plain", on: s8.on, calls: "" },
       { name: "Router", sub: "장면 인물 고르기", kind: "aux", on: routerOn, model: modelOf("router"), calls: routerOn ? "보조 1회" : "호출 없음 (코드가 고름)", control: seg6("router", s8.router, [["code", "OFF"], ["model", "ON"]]), block: "pp-blk-router" },
-      { name: "Director", sub: "이번 턴 연기 지시", kind: "aux", on: sceneOn, model: modelOf("director"), calls: sceneOn ? s8.directorSearch ? "보조 1회 (검색 땐 2회)" : "보조 1회" : s8.director === "note" ? "호출 없음 (갱신에 얹음)" : "호출 없음", control: seg6("director", s8.director, [["off", "OFF"], ["note", "메모형"], ["facts", "사실형"], ["scene", "연출형"]]), block: "pp-blk-director" },
+      { name: "Director", sub: "이번 턴 연기 지시", kind: "aux", on: sceneOn, model: modelOf("director"), calls: sceneOn ? s8.directorSearch ? "보조 1회 (검색 땐 2회)" : "보조 1회" : s8.director === "note" ? "호출 없음 (갱신에 얹음)" : "호출 없음", control: seg6("director", s8.director, [["off", "사용 안 함"], ["note", "메모형"], ["facts", "사실형"], ["scene", "연출형"]]), block: "pp-blk-director" },
       { name: "본편", sub: "응답 생성", kind: "main", on: true, model: "메인 모델", calls: "메인 1회" },
-      { name: "갱신", sub: "응답을 읽어 기록", kind: "aux", on: updateOn, model: modelOf("update"), calls: updateOn ? `${s8.model === "main" ? "메인" : "보조"} 1회` : s8.on ? "수동 (누를 때만)" : "호출 없음", control: seg6("when", s8.when, [["turn", "매 턴"], ["manual", "수동"]]), block: "pp-blk-update" },
+      { name: "갱신", sub: "응답을 읽어 기록", kind: "aux", on: updateOn, model: modelOf("update"), calls: updateOn ? `${s8.model === "main" ? "메인" : "보조"} 1회` : s8.on ? "수동 (누를 때만)" : "호출 없음", control: seg6("when", s8.when, [["manual", "수동"], ["turn", "매 턴"]]), block: "pp-blk-update" },
       { name: "정리", sub: "상한 넘긴 기록 합치기", kind: "aux", on: tidyOn, model: modelOf("tidy"), calls: tidyOn ? "넘긴 인물마다 1회" : "호출 없음 (갱신에 얹음)", control: seg6("tidy", s8.tidy, [["same", "OFF"], ["separate", "ON"]]), block: "pp-blk-tidy" }
     ];
     const flowNode = (n2) => `<div class="pp-fn${n2.on ? " on" : ""} k-${n2.kind}"><div class="pp-fn-name"><b>${n2.name}</b>${n2.model ? `<span class="pp-fn-chip">${esc29(n2.model)}</span>` : ""}<small>${n2.sub}</small></div><span class="pp-fn-calls">${n2.calls}</span><div class="pp-fn-ctl">${(n2.control ?? "").replace('<button class="gx-switch" role="switch"', `<button class="gx-switch" role="switch" aria-label="${esc29(n2.name)}"`)}</div>${n2.block ? `<button class="gx-mini pp-fn-go" data-action="pp-goto" data-value="${n2.block}">설정 →</button>` : "<span></span>"}</div>`;
@@ -3014,7 +3042,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     <p class="pp-flow-sum">${s8.on ? `턴마다 보조 호출: 본편 전 <b>${preCalls}회</b> · 본편 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? " (+정리)" : ""}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : "인물 기록이 꺼져 있어 아무 호출도 하지 않아요."} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
     const common = [
       row6("인물 기록", onoff("on"), "끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요."),
-      row6("자동 호출", seg6("when", s8.when, [["turn", "매 턴"], ["manual", "수동"]]), "매 턴 = 응답이 들어올 때마다 자동으로 읽어요. 수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만."),
+      row6("자동 호출", seg6("when", s8.when, [["manual", "수동"], ["turn", "매 턴"]]), "수동 = 인물 화면의 「새 응답 읽기」를 눌렀을 때만. 매 턴 = 응답이 들어올 때마다 자동으로 읽어요."),
       row6("컨텍스트에 포함", seg6("inject", s8.inject, [["split", "절 단위 혼합"], ["append", "시트 전체+기록"], ["record", "기록만"], ["off", "사용 안 함"]]), "본편 요청에 인물 기록을 어떻게 넣을지. 절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로."),
       row6("기록 언어", seg6("lang", s8.lang, [["ko", "한국어"], ["en", "영어"]]), "기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요."),
       row6("호감 증가 속도", seg6("speed", String(s8.speed), [["0.5", "0.5"], ["1", "1"], ["1.5", "1.5"], ["2", "2"]]), "호감이 오르는 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 올라요"),
@@ -3051,7 +3079,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       `<div class="pp-rules one">${ruleBox("pp-rules", "갱신에 덧붙일 지침", v("rules"), "응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.", 4e3, "예: 관리국 요원은 서로를 직급으로 부른다", "pp-rules-save")}</div>`
     ].join("");
     const router = [
-      row6("Router", seg6("router", s8.router, [["code", "OFF (코드)"], ["model", "ON (모델)"]]), "OFF = 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). ON = 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로"),
+      row6("Router", seg6("router", s8.router, [["code", "OFF"], ["model", "ON"]]), "끄면 최근 글에 이름·별명이 나온 사람과 동행 칸을 코드가 골라요 (호출 없음). 켜면 본편 보내기 전에 모델이 이름 목록을 보고 고름: 이름 없이 가리킨 제3자(「그 사람」「부장님」)까지 고르고 미등록 이름을 갱신에 알려요. 턴당 1회 추가, 실패하면 코드로"),
       ...s8.router === "model" ? [
         stageModel("router", "Router 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델"),
         row6("시간 제한", seg6("router_timeout", String(s8.routerTimeout), [["30", "30초"], ["60", "60초"], ["120", "120초"]]), "넘기면 이번 턴은 코드로 골라요."),
@@ -3059,23 +3087,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       ] : []
     ].join("");
     const director = [
-      row6("Director", seg6("director", s8.director, [["off", "OFF"], ["note", "메모형(뒤)"], ["facts", "사실형(앞)"], ["scene", "연출형(앞)"]]), "메모형 = 갱신 호출에 얹어 다음 턴 메모를 남겨요 (추가 호출 없음, 이번 입력은 못 봐요). 사실형 = 본편 보내기 전에 따로 불러 이번 입력까지 본 사실·지식 한계만 정리해요 (턴당 1회). 연출형 = 사실형 + 이번 턴 반응 방향 (턴당 1회, 2차 검색 때 1회 더)."),
+      row6("Director", seg6("director", s8.director, [["off", "사용 안 함"], ["note", "메모형(뒤)"], ["facts", "사실형(앞)"], ["scene", "연출형(앞)"]]), "메모형 = 갱신 호출에 얹어 다음 턴 메모를 남겨요 (추가 호출 없음, 이번 입력은 못 봐요). 사실형 = 본편 보내기 전에 따로 불러 이번 입력까지 본 사실·지식 한계만 정리해요 (턴당 1회). 연출형 = 사실형 + 이번 턴 반응 방향 (턴당 1회, 2차 검색 때 1회 더)."),
       ...s8.director === "scene" || s8.director === "facts" ? [
         stageModel("director", "Director 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델"),
         row6("시간 제한", seg6("director_timeout", String(s8.directorTimeout), [["30", "30초"], ["90", "90초"], ["180", "180초"]]), "넘기면 이번 턴은 메모 없이 보내요 (그 턴만)."),
         row6("언어", seg6("director_lang", s8.directorLang, [["en", "영어"], ["ko", "한국어"]]), "Director 메모를 쓰는 언어예요. 영어가 토큰이 적어요"),
         row6("길이", seg6("director_len", s8.directorLen, [["short", "짧게"], ["normal", "보통"]]), "Director 메모의 길이예요"),
         row6("재사용", onoff("director_reuse"), "장면이 그대로면 지난 지시를 다시 써요 (호출 없음)."),
-        row6("기능별 지침", onoff("director_features"), "켜진 기록 항목(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토큰 적음)"),
-        row6("2차 검색", onoff("director_search"), "자료가 모자라면 Director가 채팅·로어북·위키 검색을 요청하고, 코드가 찾아 한 번 더 불러요 (그 턴만 1회 추가)")
-      ] : [],
-      ...s8.director !== "off" ? [`<div class="pp-rules one">${ruleBox("pp-director-rules", "Director 메모에 덧붙일 지침", v("director_rules"), "본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.", 2e3, "예: 메모는 한 문장으로, 다음 장면의 분위기만", "pp-drules-save")}</div>`] : []
-    ].join("");
-    const tidy = [
-      row6("인물당 저장 상한", seg6("person_cap", String(s8.personCap), [["5000", "5,000"], ["10000", "10,000"], ["20000", "20,000"]]), "한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요)."),
-      row6("정리 방식", seg6("tidy", s8.tidy, [["same", "같은 호출에 얹기"], ["separate", "별도 호출"]]), "같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음 (추가 호출 없음, 모델은 갱신 모델). 별도 = 갱신 뒤 그 인물만 정리 호출 1회."),
-      ...s8.tidy === "separate" ? [stageModel("tidy", "별도 정리 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델")] : []
-    ].join("");
-    const advanced = fold("pp-adv", "고급", [
-      row6("직전 쌍 포함", seg6("prev_pairs", String(s8.prevPairs), [["0", "0"], ["1", "1"], ["2", "2"]]), "읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수"),
-      row6("본편 기록 예산", seg6("block_cap", String(s8.blockCap), [["8000", "8,000"], ["16000", "16,000"], ["32000", "32,000"]]), "본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 
+        row6("기능별 지침", onoff("director_features"), "켜진 기록 항목(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토
