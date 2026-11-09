@@ -12,7 +12,7 @@ d.line([0,24,W,24],fill=C,width=w); d.line([40,40,552,40],fill=C,width=2)
 for x in range(0,W,48): d.line([x,24,*to_vp(x,24,0.12)],fill=C,width=1)
 for x in (60,150,240,350,450,540):
     d.rectangle([x-9,6,x+9,24],outline=C,width=w)
-    if x > 300: d.line([x-6,26,x-30,110],fill=C,width=1); d.line([x+6,26,x+30,110],fill=C,width=1)
+    pass   # 빛줄기 없음: 꺼진 등으로 그리고 켜는 건 코드(v9 빛줄기 견본)
 # 뒷벽 바닥선(무대 뒤 끝) y 330, 양옆은 소실점 쪽으로 꺾인 세트 판
 d.line([40,330,552,330],fill=C,width=w)
 d.line([0,350,40,330],fill=C,width=w); d.line([592,350,552,330],fill=C,width=w)   # 양옆 바닥 모서리
@@ -46,8 +46,7 @@ d.rectangle([50,304,250,400],fill='white',outline=C,width=w)
 tl,tr=to_vp(50,304,0.08),to_vp(250,304,0.08); d.polygon([(50,304),(250,304),tr,tl],fill='white',outline=C)
 br=to_vp(250,400,0.08); d.polygon([(250,304),tr,br,(250,400)],fill='white',outline=C)
 d.ellipse([104,290,140,308],outline=C,width=w); d.ellipse([196,290,232,308],outline=C,width=w)
-# 우체통(가운데 깊이)
-d.rectangle([272,322,302,372],outline=C,width=w); d.rectangle([276,308,298,322],outline=C,width=w)
+# 우체통 뺌(사용자 11-09: 건물주 물건, 방송 화면에 안 맞음)
 # 시연 테이블: 앞면 + 윗면 + 왼쪽 옆면
 d.rectangle([360,330,580,400],fill='white',outline=C,width=w)
 tl,tr=to_vp(360,330,0.12),to_vp(580,330,0.12); d.polygon([(360,330),(580,330),tr,tl],fill='white',outline=C)
