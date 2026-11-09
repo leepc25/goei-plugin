@@ -1,0 +1,284 @@
+{
+ "name": "ds_studio_v2",
+ "room": "studio",
+ "mood": "clean",
+ "mode": "loose",
+ "camera": "tv",
+ "size": [
+  688,
+  384
+ ],
+ "view": "flat",
+ "floor_share": "the lower quarter",
+ "density": "packed",
+ "sides": "none",
+ "doors": 0,
+ "place": "the main stage of a 2000s TV home shopping studio in a haunted broadcasting station",
+ "time": "on air",
+ "light": "harsh colorful stage lights",
+ "floor": "glossy black stage, light pools, dark shadows; plain bottom strip",
+ "walls": "red and black lacquer panels, gold trim",
+ "shadow": "key light on the host and table top, colored rim light, deep black shadows at edges",
+ "palette": "black and blood red base, white gloss, gold, pink and cyan accents",
+ "host": "big show host behind the podium at left, head to waist filling two thirds of the image height, centered 230 px from the left, facing camera; black suit, white shirt, dark tie, combed black hair, unnaturally white made-up face, huge pitch-black eyes, smooth salesman smile, lips closed, hands on the podium",
+ "no": [
+  "doors",
+  "audience",
+  "letters"
+ ],
+ "items": [
+  {
+   "full": "starburst sale shape on the set",
+   "text": "starburst sale shape on the set",
+   "why": "위키 오후역 메인 스튜디오: 2000년대 홈쇼핑 세트장",
+   "keep": []
+  },
+  {
+   "full": "sales board of red digits only, no words",
+   "text": "sales board of red digits only, no words",
+   "why": "위키: 매출 전광판",
+   "keep": []
+  },
+  {
+   "full": "flat wall-mounted order graphic screen, phone icon",
+   "text": "flat wall-mounted order graphic screen, phone icon",
+   "why": "위키: 주문 그래픽",
+   "keep": []
+  },
+  {
+   "full": "tall live chat monitor hanging at right",
+   "text": "tall live chat monitor hanging at right",
+   "why": "위키: 무대 한쪽 실시간 채팅 화면",
+   "keep": []
+  },
+  {
+   "full": "black truss of spotlights, light beams",
+   "text": "black truss of spotlights, light beams",
+   "why": "위키: 강렬한 조명",
+   "keep": []
+  },
+  {
+   "full": "cue light boxes up top, clap and smile icons",
+   "text": "cue light boxes up top, clap and smile icons",
+   "why": "로어북 sites.json 방청 규칙: 박수·웃음 큐 조명",
+   "keep": []
+  },
+  {
+   "full": "TV camera on a pedestal at the left edge, cut off",
+   "text": "TV camera on a pedestal at the left edge, cut off",
+   "why": "위키: 카메라",
+   "keep": []
+  },
+  {
+   "full": "glossy red host podium, waist-high",
+   "text": "glossy red host podium, waist-high",
+   "why": "위키: 진행자 단상",
+   "keep": []
+  },
+  {
+   "full": "waist-high demo table center right, white cloth, bare empty top",
+   "text": "waist-high demo table center right, white cloth, bare empty top",
+   "why": "위키: 가운데 시연 테이블. 상품 85도트 얹을 자리",
+   "keep": []
+  },
+  {
+   "full": "prop shelf of goods behind the table",
+   "text": "prop shelf of goods behind the table",
+   "why": "위키: 소품",
+   "keep": []
+  },
+  {
+   "full": "ribboned gift boxes, boxes with channel stickers",
+   "text": "ribboned gift boxes, boxes with channel stickers",
+   "why": "로어북: 채널 스티커 붙은 상자(떠도는 물건)",
+   "keep": []
+  },
+  {
+   "full": "small monitor on a stand, blank glowing screen",
+   "text": "small monitor on a stand, blank glowing screen",
+   "why": "계획 2판: 모니터에 진행자 칸을 코드로 비춤",
+   "keep": []
+  },
+  {
+   "full": "one red Korean mailbox, upside-down dried-blood cross, wet slot",
+   "text": "one red Korean mailbox, upside-down dried-blood cross, wet slot",
+   "why": "위키 건물주: 임대 공간마다 빨간 우체통",
+   "keep": []
+  },
+  {
+   "full": "rental plate, smeared unreadable phone number",
+   "text": "rental plate, smeared unreadable phone number",
+   "why": "위키 건물주: 읽히지 않는 임대 문의 번호",
+   "keep": []
+  },
+  {
+   "full": "yellow-black floor tape along the front",
+   "text": "yellow-black floor tape along the front",
+   "why": "로어북 방청 규칙: 바닥 테이프",
+   "keep": []
+  },
+  {
+   "full": "confetti and ribbons",
+   "text": "confetti and ribbons",
+   "why": "위키 도착: 터뜨리고 남은 색종이와 리본",
+   "keep": []
+  },
+  {
+   "full": "light stand, cables",
+   "text": "light stand, cables",
+   "why": "위키: 강렬한 조명·카메라 장비",
+   "keep": []
+  }
+ ],
+ "sized": [],
+ "must": [
+  {
+   "kw": "demo table",
+   "from": "위키 시연 테이블"
+  },
+  {
+   "kw": "podium",
+   "from": "위키 진행자 단상"
+  },
+  {
+   "kw": "mailbox",
+   "from": "위키 우체통"
+  },
+  {
+   "kw": "cue light",
+   "from": "로어북 큐 조명"
+  },
+  {
+   "kw": "live chat",
+   "from": "위키 채팅 화면"
+  }
+ ],
+ "brief": {
+  "wiki": "오후역 「메인 스튜디오」: 2000년대 홈쇼핑 세트장, 강렬한 조명, 경쾌한 음악, 카메라, 진행자 단상, 가운데 시연 테이블, 소품, 매출 전광판, 주문 그래픽, 무대 한쪽 실시간 채팅 화면. 「건물주」: 임대 공간마다 빨간 우체통(피로 그린 거꾸로 된 십자가, 축축한 투입구), 곳곳의 읽히지 않는 임대 문의 번호. 「레드 프라이데이」: 검은 정장, 손질된 머리, 부자연스럽게 하얀 화장, 지나치게 크고 새카만 눈, 동공이 완전히 열림, 매끄럽고 친절한 판매 멘트.",
+  "design": "뽑을_그림_계획.md 2판: 스튜디오와 진행자 한 장, 688×384 1배, 진행자 가로 100~356, 시연 테이블 윗면 x≈520 y≈250 비움, 아래 56도트 단순, 모니터에 진행자 비춤",
+  "user": [
+   "11-09 장면 한 장으로(이질감)",
+   "11-09 공용지침 예외 4개 허락: 688×384, TV 눈높이, 참고 그림 1 없음, 진행자 포함",
+   "11-09 v1: 진행자 60점으로 작음·전광판 낱말·테이블 위 금전등록기·우체통 2개 → v2 고침, 화풍 그림 뺌"
+  ],
+  "items": [
+   {
+    "src": "2000년대 홈쇼핑 세트장",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "매출 전광판",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "주문 그래픽",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "실시간 채팅 화면",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "강렬한 조명",
+    "by": [
+     4,
+     16
+    ]
+   },
+   {
+    "src": "큐 조명(박수·웃음)",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "카메라",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "진행자 단상",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "가운데 시연 테이블",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "소품",
+    "by": [
+     9,
+     10
+    ]
+   },
+   {
+    "src": "진행자 비출 모니터",
+    "by": [
+     11
+    ]
+   },
+   {
+    "src": "빨간 우체통",
+    "by": [
+     12
+    ]
+   },
+   {
+    "src": "임대 문의 번호",
+    "by": [
+     13
+    ]
+   },
+   {
+    "src": "바닥 테이프",
+    "by": [
+     14
+    ]
+   },
+   {
+    "src": "색종이·리본",
+    "by": [
+     15
+    ]
+   },
+   {
+    "src": "레드 프라이데이 모습",
+    "by": "칸:host black suit"
+   },
+   {
+    "src": "객석·EXIT 표지",
+    "by": "omit: 객석은 카메라 뒤쪽이고 계단 벤치라 배경 의자류 금지, EXIT는 객석 문 위라 화면에 안 잡힘"
+   },
+   {
+    "src": "서바이벌 카운트다운·번호판",
+    "by": "omit: 서바이벌 특집 때만 더해짐, 평소 방송 장면 아님"
+   },
+   {
+    "src": "세광시청 꼭대기가 나오는 화면",
+    "by": "omit: 일부 스튜디오 화면(보조 스튜디오 쪽), 메인 정면엔 안 넣음. 사용자에게 물음"
+   }
+  ]
+ },
+ "review": {
+  "fit": "모두 홈쇼핑 스튜디오 물건. 우체통은 위키상 임대 공간마다 있어 무대 구석에 맞음.",
+  "place": "시연 테이블 윗면 비움(상품 자리), 진행자는 왼쪽 단상 뒤, 카메라는 왼쪽 끝 잘림이라 진행자 칸(100~356)과 안 겹침.",
+  "size": "진행자 머리~허리가 화면 높이 2/3(약 250점), 시연 테이블 허리 높이로 단상과 같은 높이.",
+  "brief": "객석·EXIT·카운트다운·시청 화면만 빼고 이유를 적음. 나머지 위키 물건 전부 넣음.",
+  "meaning": "느슨한 틀이라 1차=2차 같은 문장, 줄인 뜻 없음.",
+  "over": "같은 물건 두 번 없음. 채우기 물건 없이 위키 물건만.",
+  "frame": "TV 정면 눈높이, 원근 없는 정면, 바닥 아래 1/4, 양옆 벽 없음, 문 없음, packed."
+ }
+}
