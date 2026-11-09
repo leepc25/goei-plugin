@@ -15,7 +15,7 @@ import { stepProj, carryPt } from './skillfx';
 import { drawVfx, drawSprite, vfxOf, vfxDur } from './art';
 import { drawVersusBars, drawBench, setVsSay } from './hud';
 import type { Stage, Fx, Proj } from './stage';
-import { K, LINE, DT, HP, WALL } from './rules';
+import { K, LINE, DT, HP, WALL, dotSample } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** 그림판 세로에 보이는 월드 높이 (960 / 686 = 도트 1.4배, 11-08 사용자) */
@@ -150,8 +150,11 @@ export class Match {
     this.darkT = 1.6;
     this.superName = { text: name, t: 0.9, by };
     for (const f of this.st.fighters) f.hold = Math.max(f.hold, 0.6);
+    if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+    else {
     this.st.fx.push({ k: 'ring', x: by.x, y: LINE - by.z - 120 * K, r: 260 * K, t: 0.6, t0: 0.6, c: by.color, w: 8, sy: 1 });
     this.st.fx.push({ k: 'ring', x: by.x, y: LINE - by.z - 120 * K, r: 160 * K, t: 0.45, t0: 0.45, c: '#ffffff', w: 5, sy: 1 });
+    }
     this.opts.say?.('superStart');
   }
 

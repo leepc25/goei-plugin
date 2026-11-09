@@ -133,3 +133,6 @@ export const HIT_CAP = { skill: 3, charge: 2, super: 4 };
 
 /** 띄워진 상대의 중력 배율 (천천히 떨어져 공중에서 이어 칠 틈) */
 export const LAUNCH_GRAV = 0.7;
+
+/** 손으로 찍은 도트 효과 시험(11-08 사용자 「그래」, tools/dotfx/make_dotfx.py): 에일린 필살기에만 dot-* 그림 */
+export const dotSample = (f: { inSuper: boolean; name: string }): boolean => f.inSuper && f.name === '에일린';

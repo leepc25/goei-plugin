@@ -9,6 +9,7 @@ import {
   K, LINE, DT, GRAV, HP, DMG, SCALE, JUGGLE_MUL, OTG_MUL, CHIP, GAUGE, STUN, FREEZE, PUSH, FRICTION, CHAIN_DOWN, CHAIN_GAP,
   JUGGLE_MAX, OTG_MAX, LIE_SEC, MOVE, ATK, CHAIN_WINDOW, BUFFER, SPECIAL_LAG, BODY_HALF, TIP, WALL,
   HIT_CAP, LAUNCH_GRAV,
+  dotSample,
 } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -700,7 +701,8 @@ export class Fighter {
   private hitVfx(by: Fighter, h: HitSpec, at: { x: number; y: number }, big: boolean): void {
     const flip = by.face < 0;
     const hv = h.use.hitVfx;
-    if (h.vfx) this.st.fx.push({ k: 'sheet', name: h.vfx, x: at.x, y: at.y, s: (h.vs || 1) * K, flip, anchor: 'center', tint: h.tint, t: 9, t0: 9, el: 0 });
+    if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-impact', x: at.x, y: at.y, s: 1.5 * K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
+    else if (h.vfx) this.st.fx.push({ k: 'sheet', name: h.vfx, x: at.x, y: at.y, s: (h.vs || 1) * K, flip, anchor: 'center', tint: h.tint, t: 9, t0: 9, el: 0 });
     else if (hv) this.st.fx.push({ k: 'sheet', name: hv.n, x: at.x, y: at.y, s: hv.s * K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
     else this.st.fx.push({ k: 'sheet', name: big ? 'hit_heavy' : 'hit_light', x: at.x, y: at.y, s: big ? 2.6 : 2.2, flip, anchor: 'pivot', t: 9, t0: 9, el: 0 });
     this.st.fx.push({ k: 'spark', x: at.x, y: at.y, t: big ? 0.3 : 0.2, t0: big ? 0.3 : 0.2, c: big ? '#fff2b0' : '#ffffff', n: big ? 14 : 7, seed: Math.random() * 99 });

@@ -7,7 +7,7 @@ import { VFX_ORG } from './vfxorg';
 import { vfxOf, vfxDur, muzzleOf, framePt } from './art';
 import { later, type Stage, type Use, type Proj } from './stage';
 import type { Fighter, HitKind } from './fighter';
-import { K, LINE, DT, DMG, HP } from './rules';
+import { K, LINE, DT, DMG, HP, dotSample } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
@@ -146,7 +146,7 @@ export function stepProj(st: Stage, p: Proj): boolean {
     const r = o.receive(p.owner, { use: p.use, kind: hk(0), at: { x: hx, y: p.y }, noVfx: p.kind === 'bullet' });
     // 탄 한 발이 여러 대 (hit.n): 맞은 상대에게 나머지를 이어서 (11-08 세크리엠 피의 칼날)
     if (r === 'hit' && hn > 1) for (let i = 1; i < hn; i++) later(st, i * (p.hit?.every || 0.08), () => o.receive(p.owner, { use: p.use, kind: hk(i), at: { x: o.x - p.dir * 14, y: p.y } }));
-    if (r === 'hit' && p.kind === 'bullet') { if (!sheet(st, 'bullet_hit_body', hx, p.y, 2, { anchor: 'pivot', flip: p.dir < 0 })) spark(st, hx, p.y, 5, '#fff6d0'); }
+    if (r === 'hit' && p.kind === 'bullet') { if (!(dotSample(p.owner) ? sheet(st, 'dot-impact', hx + (Math.random() - 0.5) * 30, p.y + (Math.random() - 0.5) * 60, 1.1 * K, { anchor: 'center', flip: p.dir < 0 }) : sheet(st, 'bullet_hit_body', hx, p.y, 2, { anchor: 'pivot', flip: p.dir < 0 }))) spark(st, hx, p.y, 5, '#fff6d0'); }
     if (r !== 'miss' && p.end) runFx(p.owner, p.end, { use: p.use, pt: { x: hx, z: LINE - p.y, onT: true } });
     if (!p.pierce && r !== 'miss') return true;
   }
@@ -379,7 +379,7 @@ const FX: Record<string, (me: Fighter, s: Json, c: FxCtx) => void> = {
     for (let k = 0; k < Math.min(10, s.n || 12); k++) spots.push({ x: st.viewX0 + 60 + Math.random() * (st.viewW - 120), onT: false });
     if (o) spots.splice(Math.floor(Math.random() * spots.length), 0, { x: o.x, onT: true });
     spots.forEach((m) => st.fx.push({ k: 'target', x: m.x, y: LINE, t: 1.3 + spots.length * 0.13, t0: 2 }));
-    spots.forEach((m, i) => later(st, 1.2 + i * 0.13, () => { st.fx.push({ k: 'mortar', x: m.x, y: LINE, t: 0.32, t0: 0.32 }); later(st, 0.32, () => FX.blast(me, { at: 'target', air: false, scale: 1.4, scorch: 2.5, hit: m.onT ? { kind: 'launch' } : null }, { ...c, pt: { x: m.onT && o ? o.x : m.x, z: 0, onT: m.onT } })); }));
+    spots.forEach((m, i) => later(st, 1.2 + i * 0.13, () => { st.fx.push({ k: 'mortar', x: m.x, y: LINE, t: 0.32, t0: 0.32 }); later(st, 0.32, () => FX.blast(me, { at: 'target', air: false, scale: 1.4, ...(dotSample(me) ? { vfx: 'dot-boom', vfxMul: 0.62 } : {}), scorch: 2.5, hit: m.onT ? { kind: 'launch' } : null }, { ...c, pt: { x: m.onT && o ? o.x : m.x, z: 0, onT: m.onT } })); }));
   },
   summon(me, s, c) {
     const p = posOf(me, { at: 'front', ...s }, c);
