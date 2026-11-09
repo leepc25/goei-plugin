@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 KST 「1. 아이들 2. 말하기 3. 상품 가리키기 일단 이거부터 뽑아」 → 진행자 동작 클립 3회(idle/talk/present)
 - 사용자 11-10 01:05 KST 「이제 뽑아」 → 512×384 켜진 판 전체 밝히기 inpaint 1회
 - 사용자 11-10 00:48 KST 「사람 치우고 배경 넣어서 고대로 불켜진 상태 뽑아」 → fix11 배경 판 조명 켜기 inpaint 1회
 - 사용자 11-10 00:20 KST 「뽑아봐」 → 망상홈쇼핑 배경 판 v3(최소 지시) 1회
@@ -283,3 +284,6 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/bg_plate_v3_req.json
 - 사용: 배경 판 v3 조명 켜기 inpaint 1회
 - 사용: 켜진 판 전체 밝히기 inpaint pass1
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_talk_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_present_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_idle_req.json
