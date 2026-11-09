@@ -31,7 +31,7 @@ export interface TraceMain {
   at: string;
   /** 플러그인이 조립을 끝낸 뒤 요청 전체: 메시지별 역할·글자 수 */
   shape: { role: string; chars: number }[];
-  /** 마지막 세 메시지 원문 (잘린 글) — 플러그인이 끼운 블록은 보통 여기 있다 */
+  /** 메시지 전부 원문 (아주 긴 것만 잘림). 11-09 사용자: 마지막 셋만 두니 24개 중 21개가 안 보였다 — 다섯 턴 다 전체를 둔다(플러그인 저장소라 용량 문제 없음) */
   tail: { role: string; content: string }[];
   /** 조립 단계 중 실패한 것 */
   failed: string[];
@@ -51,6 +51,8 @@ export interface TraceTurn {
 
 export const TRACE_KEEP = 5;
 export const TRACE_TEXT = 6000;
+/** 본편 요청 메시지 하나의 보관 한도 (로어북·긴 system 글도 거의 다 들어간다) */
+export const TRACE_MAIN_TEXT = 40000;
 const KEY = 'goei-trace';
 
 let turns: TraceTurn[] | null = null;
@@ -157,7 +159,7 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
   open.main = {
     at: new Date().toISOString(),
     shape: rows.map((r) => ({ role: r.role, chars: r.content.length })),
-    tail: rows.slice(-3).map((r) => ({ role: r.role, content: clip(r.content) })),
+    tail: rows.map((r) => ({ role: r.role, content: clip(r.content, TRACE_MAIN_TEXT) })),
     failed: [...failed],
     totalChars: rows.reduce((n, r) => n + r.content.length, 0),
     totalTokens: rows.reduce((n, r) => n + tokens(r.content), 0),

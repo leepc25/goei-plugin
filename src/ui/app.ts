@@ -1144,6 +1144,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (action === 'br-login-save' && !nick) return;
       br.login = false;
       const ctx = view.ctx;
+      // 로그아웃해도 $br_nick 은 남겨 다음 로그인 창에 미리 채운다 (11-09 사용자: 로그아웃하면 닉네임이 날아갔다)
       const vars: Record<string, string> = { $br_login: nick ? '1' : '0', [GN_NICK]: nick };
       if (nick) vars.$br_nick = nick;
       const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
@@ -1836,6 +1837,7 @@ function chromeOpts(ctx: ChatContext): ChromeOpts {
     path: wk?.path ?? bd?.path ?? '',
     bookmarks: browserSites(ctx),
     nick: String(vars['$br_login'] ?? '') === '1' ? String(vars['$br_nick'] ?? '') : '',
+    nickDefault: String(vars['$br_nick'] ?? '').trim() || userInfo().name,
     photo: userInfo().photo ?? '',
     phone: isPhone(),
   };

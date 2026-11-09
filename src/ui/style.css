@@ -3560,6 +3560,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gw-flow-io { display: flex; flex-direction: column; gap: 4px; }
 .gw-flow-io b, .gw-flow-io small { font-size: 12px; color: var(--sub); }
 .gw-flow-io textarea { width: 100%; box-sizing: border-box; font: 12px/1.45 var(--mono); resize: vertical; }
+/* 본편 요청 메시지 한 줄씩 접기 (11-09) */
+.gw-flow-msg { border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; }
+.gw-flow-msg summary { cursor: pointer; font-size: 12px; color: var(--text); line-height: 1.5; padding: 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gw-flow-msg summary small { color: var(--signal); font-weight: 700; }
+.gw-flow-msg summary i { font-style: normal; color: var(--sub); }
+.gw-flow-msg textarea { margin: 0 0 8px; }
 .gw-flow-tools { justify-content: flex-start; }
 /* 설정 묶음 안의 접이식 칸(로어북 확인 등)은 위 줄과 띄운다 (11-07 사용자: 「로어북 보내기」와 「로어북 확인」이 딱 붙어 있다고 여러 번 지적) */
 .ps-group > .ps-rows + .ps-adv { margin-top: 14px; }
@@ -3663,6 +3669,11 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br-tt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .br-tx { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tx:hover, .br-plus:hover, .br-tb:hover:not(:disabled), .br-bm:hover { background: rgba(255, 255, 255, .08); }
+/* 틀 단추 공통 눌림 (11-09 사용자: 즐겨찾기가 눌리는 느낌이 없다 — 크롬처럼 호버는 옅게, 누르는 동안은 진하게·살짝 줄어듦) */
+.br-tx, .br-plus, .br-tb, .br-bm, .br-prof, .br-tabn, .br-ntp-s, .br-tnew { transition: background-color .08s ease, transform .08s ease; }
+.br-tx:active, .br-plus:active, .br-tb:active:not(:disabled), .br-bm:active, .br-prof:active, .br-tabn:active, .br-ntp-s:active, .br-tnew:active { background: rgba(255, 255, 255, .18); transition-duration: 0s; }
+.br-bm:active, .br-ntp-s:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .br-bm:active, .br-ntp-s:active { transform: none; } }
 .br-plus { position: sticky; right: 0; box-shadow: -6px 0 0 var(--cf); background: var(--cf) !important; margin: 0 0 4px 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tool { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; background: var(--ct); min-width: 0; }
 .br-tb { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none; }

@@ -53,7 +53,8 @@ function nodes(t: TraceTurn): Node[] {
       title: '본편 요청 조립',
       meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
-      body: `<div class="gw-flow-io"><b>마지막 메시지 셋 (플러그인이 끼운 블록은 보통 여기)</b>${m.tail.map((r) => `<small>[${esc(r.role)}]</small><textarea readonly rows="8">${esc(r.content)}</textarea>`).join('')}</div>`,
+      // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
+      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg"${i >= m.tail.length - 3 ? ' open' : ''}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i></summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
     });
   }
   for (const [c, i] of before) out.push(call(c, i));

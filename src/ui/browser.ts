@@ -200,6 +200,8 @@ export interface ChromeOpts {
   bookmarks: SiteId[];
   /** 로그인: 닉네임 (비우면 로그인 안 함) */
   nick: string;
+  /** 로그인 창 입력칸 기본값: 지난번 닉네임, 없으면 페르소나 이름 (11-09 사용자: 매번 치지 않게) */
+  nickDefault: string;
   photo: string;
   phone: boolean;
 }
@@ -237,14 +239,15 @@ export function chromeHtml(o: ChromeOpts): string {
   <div class="br-bms">${bms}</div>`;
 }
 
-/** 로그인 창: 닉네임 / 로그인하지 않고 계속 (설명 문구 없음, 2026-11-08 사용자) */
+/** 로그인 창: 닉네임 / 로그인·로그아웃 (설명 문구 없음, 2026-11-08 사용자). 입력칸에는 지난 닉네임·페르소나 이름이 미리 들어 있어 「로그인」만 누르면 된다 (11-09 사용자) */
 export function loginHtml(o: ChromeOpts): string {
   if (!br.login) return '';
   const face = o.photo ? `<img src="${esc(o.photo)}" alt="">` : ic(IC.acct);
+  const nick = o.nick || o.nickDefault;
   return `<div class="br-lgn" role="dialog" aria-label="로그인"><h4>로그인</h4><div class="br-face">${face}</div>
-    <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc(o.nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
-    <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr('br-nick', o.nick)}>로그인</button><hr>
-    <button class="br-b2" data-action="br-login-guest">로그인하지 않고 계속</button></div>`;
+    <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc(nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
+    <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr('br-nick', nick)}>로그인</button><hr>
+    <button class="br-b2" data-action="br-login-guest">${o.nick ? '로그아웃' : '닫기'}</button></div>`;
 }
 
 /** 폰: 탭 목록 화면 */
