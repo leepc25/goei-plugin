@@ -20,6 +20,7 @@
 //   --report-only         누르지 않고 --out 폴더의 report.json(끊긴 것도)으로 report.md 만 다시 만든다
 //   --resume <폴더,…>     같은 판(커밋)의 지난 기록(report.json)을 읽어, 이미 누른 단추는 건너뛰고 못 누른 곳만 이어서 누른다.
 //                         지난 결과도 이번 보고서에 합친다(캡처는 지난 폴더 것을 가리킴). 판이 다르면 멈춘다 (11-09 사용자: 통과한 것을 왜 또 하냐)
+//   --plan                --resume 와 같이: 누르지 않고, 다시 누를 동작·연계·건너뛸 수만 보여 준다
 //   --from 'a|v>b|v'      시작 상태에서 이 열쇠들을 차례로 누른 화면부터 점검한다 (한 화면만 빨리 다시 볼 때. 열쇠는 report.md 의 `action|value`)
 // 빌드(dist/)가 있어야 한다: npm run build
 import os from 'node:os';
@@ -47,6 +48,8 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop', '
     else if (k === '--fixture') opt.fixture = v();
     else if (k === '--report-only') opt.reportOnly = true;
     else if (k === '--resume') opt.resume = list(v());
+    else if (k === '--plan') opt.plan = true;
+    else if (k === '--head') opt.head = v(); // --plan 시험용: 지금 판 대신 이 커밋과 비교
     else if (k === '--only-scope') opt.scope = v();
     else if (k === '--from') opt.from = v().split('>').map((x) => x.trim()).filter(Boolean).map((key) => ({ key, nth: 0 }));
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
@@ -471,16 +474,68 @@ function flagsOf(rec) {
 const results = [];
 // 이어 돌리기: 지난 기록을 읽어 둔다 (같은 판만)
 const PRIOR = { results: [], states: [] };
+const RESUMED = [];
+const RESUMED_KEYS = new Set();
+// 판이 달라도: 지난 판 → 지금 판 사이에 바뀐 소스에 걸린 단추(동작 이름)·모양(class)만 다시 누른다 (11-09 사용자: 쪼금 고쳤는데 매번 여섯 시간 돌릴래?)
+const HEADREF = () => opt.head || 'HEAD';
+const STALE = { actions: new Set(), classes: new Set(), names: new Set(), linked: new Set(), cache: {}, files: [] };
+function staleSince(c0) {
+  const files = git(`diff --name-only ${c0} ${HEADREF()} -- src`).split('\n').filter(Boolean);
+  STALE.files.push(...files);
+  for (const f of files) {
+    // 바뀐 줄 앞뒤 40줄 안의 data-action·case 이름, 바뀐 CSS 줄의 class 이름
+    const d = git(`diff -U40 ${c0} ${HEADREF()} -- "${f}"`);
+    for (const m of d.matchAll(/data-action=\\?"([\w-]+)"|case '([\w-]+)'|action === '([\w-]+)'|run\('([\w-]+)'/g)) STALE.actions.add(m[1] || m[2] || m[3] || m[4]);
+    // 연계: 바뀐 함수·값 이름(diff 머리줄의 함수 이름, 바뀐 줄의 선언)을 다른 파일에서 쓰는 곳을 찾아, 그 곳 앞뒤 40줄의 단추도 다시
+    for (const m of d.matchAll(/^@@[^@]*@@.*?\b(?:function|const|let|class)\s+([A-Za-z_]\w{3,})/gm)) STALE.names.add(m[1]);
+    for (const m of d.matchAll(/^[+-]\s*(?:export\s+)?(?:async\s+)?(?:function|const|let|class)\s+([A-Za-z_]\w{3,})/gm)) STALE.names.add(m[1]);
+    if (/\.css$/.test(f)) for (const line of git(`diff -U0 ${c0} ${HEADREF()} -- "${f}"`).split('\n')) if (/^[+-][^+-]/.test(line)) for (const m of line.matchAll(/\.([a-z][\w-]+)/g)) STALE.classes.add(m[1]);
+  }
+}
+// 연계된 곳: 바뀐 이름을 쓰는 소스 줄 앞뒤 40줄의 단추 동작 (한 겹)
+function staleLinked() {
+  for (const name of STALE.names) {
+    if (name.length < 6) continue; // keep·saved 같은 흔한 이름은 엉뚱한 곳까지 끌고 온다
+    const hits = git(`grep -n -w "${name}" ${HEADREF()} -- src`).split('\n').filter(Boolean);
+    if (hits.length > 25) continue;
+    for (const hit of hits) {
+      const [, file, ln] = hit.match(/^[^:]+:([^:]+):(\d+):/) || [];
+      if (!file || STALE.files.includes(file)) continue;
+      const lines = (STALE.cache[file] ||= git(`show ${HEADREF()}:${file}`).split('\n'));
+      const chunk = lines.slice(Math.max(0, +ln - 41), +ln + 40).join('\n');
+      for (const m of chunk.matchAll(/data-action=\\?"([\w-]+)"|case '([\w-]+)'|action === '([\w-]+)'|run\('([\w-]+)'/g)) STALE.linked.add(m[1] || m[2] || m[3] || m[4]);
+    }
+  }
+  for (const a of STALE.linked) STALE.actions.add(a);
+}
+// 지난 결과가 바뀐 곳에 닿나: 누른 단추 동작·class 가 바뀐 목록에 있거나, 눌러서 연 화면에 바뀐 단추·class 가 있으면 다시
+// 거의 모든 화면에 보이는 단추(왼쪽 메뉴·닫기 등)는 그 단추만 다시 누르고, 그것 때문에 화면 전체를 다시 들어가진 않는다
+const UBIQ = new Set();
+const touched = (r) => STALE.actions.has(r.action) || (r.newList || []).some((x) => (STALE.actions.has(x.action) && !UBIQ.has(x.action)) || (STALE.classes.has(x.cls) && !UBIQ.has('.' + x.cls)));
 for (const dir of opt.resume || []) {
   const d = resolve(ROOT, dir);
   const j = JSON.parse(readFileSync(resolve(d, 'report.json'), 'utf8'));
-  const c0 = String(j.version?.commit || '').split('·')[0], c1 = String(VERSION.commit).split('·')[0];
-  if (!c0 || c0 !== c1) throw new Error(`--resume ${dir}: 판이 달라요 (지난 ${c0 || '모름'}, 지금 ${c1}). 판이 바뀌면 처음부터 다시 돌린다`);
+  const c0 = String(j.version?.commit || '').split('·')[0], c1 = opt.head || String(VERSION.commit).split('·')[0];
+  if (!c0) throw new Error(`--resume ${dir}: 지난 기록에 판(커밋)이 없어요`);
+  if (c0 !== c1) {
+    if (!git(`cat-file -t ${c0}`)) throw new Error(`--resume ${dir}: 지난 판 ${c0} 을 이 저장소에서 못 찾아요 (git fetch)`);
+    staleSince(c0); staleLinked();
+    log(`판이 바뀜 ${c0} → ${c1}: 바뀐 소스 ${STALE.files.length}개, 다시 누를 동작 ${STALE.actions.size}개(연계 ${STALE.linked.size}개 포함)·모양 ${STALE.classes.size}개`);
+  }
   const abs = (n) => (n ? resolve(d, 'shots', n) : n);
-  for (const r of j.results) PRIOR.results.push({ ...r, shots: r.shots?.map(abs), prior: dir });
-  for (const st of j.states) PRIOR.states.push({ ...st, shot: abs(st.shot) });
+  { const cnt = {}, withList = j.results.filter((r) => r.newList); for (const r of withList) for (const a of new Set([...r.newList.map((x) => x.action).filter(Boolean), ...r.newList.map((x) => '.' + x.cls)])) cnt[a] = (cnt[a] || 0) + 1; for (const [a, n] of Object.entries(cnt)) if (n > withList.length * 0.2) UBIQ.add(a); }
+  const dropped = new Set();
+  for (const r of j.results) {
+    if (c0 === c1 || !touched(r)) PRIOR.results.push({ ...r, shots: r.shots?.map(abs), prior: dir, priorCommit: c0 });
+    else { dropped.add(`${r.vp}|${r.start}|${[...r.path, r.key].join('>')}`); RESUMED_KEYS.add(`${r.vp}|${r.key}`); }
+  }
+  // 다시 누를 단추가 연 화면의 옛 잰 값은 버린다 (새로 잰 것이 들어간다)
+  for (const st of j.states) if (!dropped.has(`${st.vp}|${st.start}|${st.path.join('>')}`)) PRIOR.states.push({ ...st, shot: abs(st.shot), priorCommit: c0 });
+  if (c0 !== c1) RESUMED.push(`${dir}(${c0}) 에서 바뀐 곳 ${dropped.size}개만 다시`);
+  else RESUMED.push(`${dir}(같은 판) 에서 이어서`);
 }
 if (opt.resume) log(`이어 돌리기: 지난 기록 ${PRIOR.results.length}개 (${opt.resume.join(', ')})`);
+if (opt.plan) { log('다시 누를 동작:', [...STALE.actions].sort().join(' ')); log('연계로 더한 것:', [...STALE.linked].sort().join(' ')); log('다시 볼 모양(class):', [...STALE.classes].sort().join(' ')); log('바뀐 이름:', [...STALE.names].slice(0, 40).join(' ')); log(`지난 결과 중 그대로 쓰는 것 ${PRIOR.results.length}개 · 다시 누를 단추 약 ${RESUMED_KEYS.size}개`); process.exit(0); }
 const skippedVals = {};
 const states = []; // { vp, start, path, shot, audit }
 const t0 = Date.now();
@@ -609,7 +664,7 @@ const never = [...srcActs].filter((a) => !pressedActs[a]).sort();
 // ---- 보고서 ------------------------------------------------------------------------------------------------------
 const L = [];
 const rel = (p) => relative(OUT, resolve(SHOTS, p));
-L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${opt.minutes ?? Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
+L.push(`# 눌러 보기 전수점검 기록`, '', `- **판: ${VERSION.branch} ${VERSION.commit}${VERSION.card ? ' · v' + VERSION.card : ''}${VERSION.dirty ? ` · 커밋 안 한 src 파일 ${VERSION.dirty}개` : ''}${VERSION.distOld ? ' · ⚠ 빌드가 소스보다 옛것' : ''}** — 이 판 기준 결과다. 그 뒤 바뀐 코드는 다시 돌려야 한다.`, ...(RESUMED.length ? [`- 이어 돌림: ${RESUMED.join(' · ')}${STALE.files.length ? ` · 바뀐 소스: ${STALE.files.slice(0, 12).join(', ')}${STALE.files.length > 12 ? ' 외' : ''}` : ''}`] : []), `- 만든 때: ${new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16)} KST · 걸린 시간 ${opt.minutes ?? Math.round((Date.now() - t0) / 60000)}분`, `- 화면 크기: ${opt.vp.join(', ')} · 시작: ${opt.start.join(', ')} · 깊이 ${opt.depth}`, `- 누른 수: ${results.filter((r) => r.shots).length} · 화면 수: ${states.length}`, '');
 L.push('이 기록은 사실만 적는다. 이상한지·사용자 결정과 맞는지는 점검하는 Claude가 캡처를 열어 보고 판단한다 (docs/눌러보기_전수점검.md).', '');
 L.push('## 1. 이상 반응 (캡처 확인할 곳)', '');
 const flagged = results.filter((r) => r.flags.length && !r.disabled && !r.revisit); // 다시 들어가려고 누른 메뉴는 앞에서 이미 적었다
