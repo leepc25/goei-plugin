@@ -1,0 +1,18 @@
+{
+ "crop_src": "game-src/art/pixellab-test-20261028/homeshop/ds_studio_v13.png",
+ "box": [
+  316,
+  150,
+  444,
+  278
+ ],
+ "description": "the open hand makes a showy sales gesture toward the product on the right: the wrist turns and the palm lifts up clearly, the fingers spread wide and flutter, the hand sweeps a little to the right and back, then returns exactly to the starting position. The sleeve and cuff on the left edge stay perfectly still. Only the hand moves. The background, its colors and its lighting stay exactly the same in every frame, no glow, no flashing, no color change.",
+ "frame_count": 16,
+ "no_background": false,
+ "enhance_prompt": false,
+ "view": "side",
+ "direction": "east",
+ "subject_description": "a pale open hand with a black suit sleeve and white cuff, reaching in from the left",
+ "initial_pose": "arm stretched out to the right, palm open and facing up, fingers pointing right",
+ "drift_threshold": 0
+}

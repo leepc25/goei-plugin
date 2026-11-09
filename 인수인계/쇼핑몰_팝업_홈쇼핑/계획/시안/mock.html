@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>쇼핑몰 팝업·홈쇼핑 시안</title>
+<style>
+:root{--bg:#1b1f22;--panel:#232a2e;--sunk:#1a2023;--line:#36424a;--text:#e6ecef;--sub:#9aa8b0;--accent:#4fd1b0;--amber:#f2b43c;--red:#ff7b6b;--red-ln:#7a3a35;--red-bg:#3a1f1d}
+*{box-sizing:border-box}body{margin:0;background:#111;font-family:"Pretendard","Noto Sans KR",system-ui,sans-serif;color:var(--text)}
+.scr{position:relative;background:var(--bg);overflow:hidden;margin:0 0 40px}
+.pc{width:1100px;height:960px}.ph{width:390px;height:844px}
+.cap{position:absolute;left:12px;top:8px;font-size:12px;color:#6b7a82;z-index:9}
+/* 공통 팝업 틀 (상점과 같은 틀) */
+.pop{position:absolute;left:60px;top:44px;width:980px;height:812px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.ph .pop{left:0;top:0;width:390px;height:844px;border-radius:0;padding:12px}
+.hd{display:flex;align-items:center;gap:10px}.hd .t{font-weight:700;font-size:16px}
+.chip{border:1px solid var(--line);background:var(--sunk);border-radius:10px;padding:5px 10px;font:600 13px ui-monospace,monospace}
+.sp{flex:1}.btn{border:1px solid var(--line);background:var(--sunk);color:var(--text);border-radius:10px;padding:7px 12px;font:600 13px inherit;font-family:inherit}
+.x{width:34px;text-align:center;padding:7px 0}
+.zone{border:1px solid var(--line);border-radius:14px;background:var(--sunk);padding:10px 12px}
+.zh{font-size:12.5px;color:var(--sub);margin-bottom:8px}.zh b{color:var(--text);margin-right:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,104px);gap:8px}
+.cell{width:104px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:6px;text-align:center;font-size:12px;position:relative}
+.cell img{width:88px;height:88px;image-rendering:pixelated;background:#1e2629;border-radius:6px}
+.cell .p{font:600 11.5px ui-monospace,monospace;color:#cfd8dc}.cell .w{text-decoration:line-through;color:#7d8a91;font-size:11px}
+.tagd{position:absolute;left:0;top:0;background:var(--red);color:#fff;font:700 10.5px ui-monospace;padding:1px 6px;border-radius:9px 0 8px 0}
+.note{font-size:11.5px;color:#7fe3c7;background:#123029;border:1px dashed #2c6b5b;border-radius:8px;padding:6px 9px;line-height:1.5}
+/* ── 우주몰 팝업 스토어 피부: 2000년대 초 지하상가 ── */
+.cos .pop{background:linear-gradient(#1d2421,#171c1a);border-color:#2f5b3f}
+.cos .hd .t{color:#9dff6a;text-shadow:0 0 6px #3aff7a55}
+.cos .ban{font-size:12px;color:#ffe45c;border:1px solid #6b5c18;background:#2a250c;padding:3px 8px;border-radius:4px}
+.cos .zh b{color:#ffe45c}
+.rare{display:flex;gap:16px;align-items:center;border:1px solid #8a6b1f;border-radius:14px;padding:12px;background:radial-gradient(circle at 18% 50%,#4a3a12,transparent 55%),var(--sunk);flex:1}
+.rare img{width:150px;height:150px;image-rendering:pixelated}
+.rare .n{font-weight:700;font-size:17px;margin:4px 0}.rare .d{font-size:12.5px;color:var(--sub)}.rare .pr{color:var(--red);font-weight:700;font-size:17px;margin-top:6px}
+.top{display:flex;gap:10px}
+.sale{border:1px solid var(--red-ln);background:linear-gradient(160deg,var(--red-bg),transparent 55%),var(--sunk);border-radius:14px;padding:10px 12px}
+.sale .zh b{color:var(--red)}
+.bot{display:flex;gap:12px;border:1px solid #2f5b3f;border-radius:14px;padding:10px;background:#141a17;flex:1;min-height:0}
+.board{width:150px;flex:none;border:3px solid #c9c9c0;background:#f4f1e4;color:#222;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:17px;line-height:1.5;text-align:center;box-shadow:0 0 0 2px #444 inset;font-family:"Gulim","Noto Sans KR",sans-serif}
+.board small{font-weight:400;font-size:10.5px;color:#666;margin-top:6px}
+.lcd{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.lcd .scrn{flex:1;background:#0b1f0e;border:2px solid #345;border-radius:6px;padding:10px 12px;font:14px/1.7 "DungGeunMo","Gulim",ui-monospace,monospace;color:#7dff8a;text-shadow:0 0 4px #2f9a3f;overflow:hidden}
+.lcd .me{color:#8fc8ff;text-shadow:none}
+.inp{display:flex;gap:8px}.inp div{flex:1;border:1px solid var(--line);background:var(--sunk);border-radius:10px;padding:8px 12px;color:#76858c;font-size:13px}
+/* 결제 단말기 */
+.kiosk{position:absolute;left:350px;top:200px;width:400px;background:#d9d6cc;border:4px solid #8e8a7e;border-radius:10px;padding:14px;color:#111;box-shadow:0 20px 50px #000a;font-family:"Gulim",sans-serif}
+.kiosk .sc{background:#08300f;color:#86ff86;font:15px/1.7 "DungGeunMo",ui-monospace,monospace;padding:12px;border:3px inset #555;min-height:150px}
+.kiosk .row{display:flex;gap:8px;margin-top:10px}.kiosk .row div{flex:1;text-align:center;background:#f2efe6;border:2px outset #bbb;padding:8px 0;font-weight:700}
+.dim{position:absolute;inset:0;background:#0009}
+/* 채팅 카드 */
+.chat{position:absolute;left:150px;top:120px;width:800px;font-size:15px;line-height:1.85;color:#d6dde0}
+.card{display:flex;align-items:center;gap:12px;width:fit-content;min-width:420px;margin-top:10px;padding:10px 16px;border:1px solid #2b6a59;border-radius:14px;background:#15302a;font-size:14px}
+.card b{color:#5fe0bb}.card .bt{border:1px solid #2b6a59;border-radius:10px;padding:6px 14px;font-weight:600}
+.card small{color:var(--sub)}
+/* ── 망상홈쇼핑 ── */
+.dl .pop{background:#1c1416;border-color:#5a2a30}
+.dl .hd .t{color:#ff5c6c}
+.live{background:#e0263b;color:#fff;font:800 11px ui-monospace;padding:3px 7px;border-radius:4px}
+.main{display:flex;gap:12px;min-height:0}
+.tv{width:640px;height:360px;flex:none;position:relative;border-radius:8px;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#7b2233,#2a0c12 70%);border:1px solid #5a2a30}
+.tv .host{position:absolute;left:40px;bottom:0;width:150px;height:250px;border-radius:70px 70px 0 0;background:linear-gradient(#111,#000)}
+.tv .host:before{content:"";position:absolute;left:40px;top:-62px;width:70px;height:84px;border-radius:50%;background:#f4f2ee}
+.tv .host:after{content:"";position:absolute;left:55px;top:-35px;width:12px;height:16px;border-radius:50%;background:#000;box-shadow:28px 0 0 #000}
+.tv .prod{position:absolute;right:40px;top:70px;width:170px;height:170px;background:#fff2;border-radius:12px;display:grid;place-items:center}
+.tv .prod img{width:140px;height:140px;image-rendering:pixelated}
+.tv .lower{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(90deg,#c8102e,#8a0a1f);padding:8px 14px;color:#fff}
+.tv .lower .a{font-weight:800;font-size:17px}.tv .lower .b{font-size:12.5px;opacity:.95}
+.tv .pnum{position:absolute;left:12px;top:12px;background:#ffd400;color:#000;font:900 13px sans-serif;padding:3px 8px}
+.tv .call{position:absolute;right:12px;top:12px;background:#000c;color:#ffd400;font:800 15px ui-monospace;padding:4px 10px;border:2px solid #ffd400}
+.tv .left{position:absolute;right:12px;top:252px;background:#000b;color:#ff5c6c;font:700 12px ui-monospace;padding:3px 8px}
+.tv .sub{position:absolute;left:230px;top:56px;width:250px;background:#0009;color:#fff;font-size:13.5px;line-height:1.55;padding:8px 10px;border-left:3px solid #ff2e45}
+.lchat{flex:1;display:flex;flex-direction:column;border:1px solid #5a2a30;border-radius:10px;background:#140e10;min-width:0}
+.lchat .h{padding:8px 10px;border-bottom:1px solid #3a1d22;font-size:12.5px;color:var(--sub)}
+.lchat .l{flex:1;padding:8px 10px;font-size:12.5px;line-height:1.75;overflow:hidden}
+.lchat .l b{color:#ff9aa5;font-weight:600;margin-right:6px}.lchat .l .s{color:#b9c3c8}
+.lchat .l .eerie{color:#c7c7c7;font-style:italic}
+.recruit{border:1px dashed #ffd400;color:#ffd400;background:#2a2506;border-radius:10px;padding:8px 12px;font-size:13px;display:flex;align-items:center;gap:10px}
+.recruit .btn{border-color:#ffd400;color:#ffd400;background:transparent}
+.lineup .cell{width:150px;text-align:left;display:flex;gap:8px;align-items:center}.lineup .cell img{width:56px;height:56px}
+.lineup .on{border-color:#e0263b;box-shadow:0 0 0 1px #e0263b inset}
+.lineup .grid{grid-template-columns:repeat(4,1fr)}
+.lineup .cell{width:auto}
+.acts{display:flex;gap:8px}.acts .btn.r{background:#e0263b;border-color:#e0263b;color:#fff}
+/* 전화 주문 */
+.callwin{position:absolute;left:250px;top:120px;width:600px;background:#232a2e;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 20px 60px #000c}
+.callwin .op{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.75;height:170px}
+.callwin .op .me{color:#8fc8ff}
+.form{margin-top:10px;display:grid;grid-template-columns:90px 1fr;gap:6px 10px;font-size:13px;align-items:center}
+.form .v{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.fine{margin-top:10px;font-size:11px;line-height:1.6;color:#8f7f80;border-top:1px dashed #4a3a3c;padding-top:8px}
+/* 폰 */
+.ph .tv{width:366px;height:206px}.ph .tv .host{transform:scale(.55);transform-origin:left bottom;left:30px}
+.ph .tv .prod{width:96px;height:96px;right:20px;top:40px}.ph .tv .prod img{width:80px;height:80px}
+.ph .tv .sub{display:none}.ph .tv .lower .a{font-size:13.5px}.ph .tv .lower .b{font-size:11px}.ph .tv .left{top:150px}.ph .tv .call{font-size:12px}
+.ph .main{flex-direction:column}.ph .lchat{height:170px;flex:none}
+.ph .grid{grid-template-columns:repeat(3,1fr)}.ph .cell{width:auto}.ph .cell img{width:72px;height:72px}
+.ph .bar{display:flex;gap:6px}.ph .bar .btn{flex:1;text-align:center;white-space:nowrap;font-size:12.5px;padding:9px 0}
+</style></head><body>
+
+<!-- 1. 본편 카드 -->
+<div class="scr pc" id="s1"><div class="cap">시안 1 · 본편 응답 아래 카드 (우주 쇼핑몰 입구가 나타났을 때)</div>
+<div class="chat">…임대 문의 종이가 붙어 있던 유리문 위에서, 촌스러운 초록 UFO 간판이 빙글빙글 돌고 있었다. 「&lt;우주 쇼핑몰&gt; ※우주에서 온 굉장한 상품※」. 어제까지 비어 있던 점포였다. 문틈으로 형광등 지직거리는 소리가 새어 나왔다.
+<div style="margin-top:14px;border:1px solid #333d42;border-radius:12px;padding:10px 14px;color:#9aa8b0;font-size:13px">[상태창 자리]</div>
+<div class="card"><span style="flex:1"><b>우주 쇼핑몰</b> <small>· 빈 점포 입구 · 오늘만</small></span><span class="bt">들어가기</span></div>
+<div class="note" style="margin-top:14px;width:600px">지금 「상점 열기」 카드와 같은 자리·같은 모양. 가게 이름은 명부의 미스틱 사이트 「우주 쇼핑몰」과 맞으면 우주몰 전용 설정·지침으로 열림. 단추 글만 「들어가기」로.</div>
+</div></div>
+
+<!-- 2. 우주몰 팝업 스토어 PC -->
+<div class="scr pc cos" id="s2"><div class="cap">시안 2 · 우주 쇼핑몰 팝업 스토어 (PC)</div>
+<div class="pop">
+ <div class="hd"><span style="font-size:18px">🛸</span><span class="t">우주 쇼핑몰</span><span class="ban">※우주에서 온 굉장한 상품※</span><span class="chip">₩ 3,140,000</span><span class="sp"></span><span class="btn">새로고침</span><span class="btn x">✕</span></div>
+ <div class="top">
+  <div class="rare"><img src="img/device_163.webp"><div><div style="color:var(--amber);font-size:12.5px;font-weight:700">★ 이번 달의 강하게 추천하는 물건</div><div class="n">위 헬프!</div><div class="d">설명이 없는 것이다. 가격표의 0 을 세는 것은 손님의 자유 이다.</div><div class="pr">₩ 1,500,000,000</div></div></div>
+  <div class="sale"><div class="zh"><b>※할인!※</b>세일 딱지</div><div class="grid" style="grid-template-columns:repeat(2,104px)">
+   <div class="cell"><span class="tagd">-30%</span><img src="img/device_001.webp"><div>와이더 무전기</div><div class="w">6,000,000</div><div class="p">4,200,000</div></div>
+   <div class="cell"><span class="tagd">-20%</span><img src="img/food_012.webp"><div>앨리스 피크닉 세트</div><div class="w">9,000,000</div><div class="p">7,200,000</div></div>
+  </div></div>
+ </div>
+ <div class="zone"><div class="zh"><b>물건의 목록</b>진열장 4</div><div class="grid">
+  <div class="cell"><img src="img/weapon_010.webp"><div>포크와 나이프 세트</div><div class="p">12,000,000</div></div>
+  <div class="cell"><img src="img/anomaly_003.webp"><div>은화 뱀</div><div class="p">3,300,000</div></div>
+  <div class="cell"><img src="img/food_106.webp"><div>썩지 않는 통</div><div class="p">1,100,000</div></div>
+  <div class="cell"><img src="img/misc_227.webp"><div>별에서 온 캡슐</div><div class="p">2,000,000</div></div>
+ </div></div>
+ <div class="bot">
+  <div class="board">물건을<br>보겠습니다.<small>입구 근처 안내판</small></div>
+  <div class="lcd"><div class="scrn">▶ 어서 오세요 지구인 손님 이여.<br>▶ 진열장 의 단말기 에 돈을 넣는 것 이다. 잠금 이 풀린다.<br><span class="me">나: 할부 되나요?</span><br>▶ 할부 는 물어본 사람 이 없는 것 이다.</div>
+  <div class="inp"><div>단말기에 묻기</div><span class="btn">↵</span></div></div>
+ </div>
+</div>
+<div class="note" style="position:absolute;left:60px;top:872px;width:980px">상점 팝업 틀 그대로(희귀·특가·일반, 8열 칸). 주인 사진 자리 → 안내판, 대사 상자 → 결제 단말기 화면(왈도체). 「판매」 단추 없음(위키: 직원 없음·사들이지 않음).</div>
+</div>
+
+<!-- 3. 결제 단말기 -->
+<div class="scr pc cos" id="s3"><div class="cap">시안 3 · 진열장 결제 단말기 (물건 누르고 「산다」)</div>
+<div class="pop" style="opacity:.55"><div class="hd"><span style="font-size:18px">🛸</span><span class="t">우주 쇼핑몰</span><span class="chip">₩ 3,140,000</span></div></div>
+<div class="dim"></div>
+<div class="kiosk"><div style="font-weight:800;margin-bottom:8px">진열장 결제 단말기 · 은화 뱀</div>
+ <div class="sc">결제 금액 ₩3,300,000<br>현금 을 넣거나 카드 를 꽂는 것 이다.<br>─────────────<br>승인 되었다. 진열장 의 잠금 이<br>풀리는 것 이다. 꺼내 가라.</div>
+ <div class="row"><div>현금</div><div>카드</div><div>그만</div></div>
+ <div style="font-size:11.5px;margin-top:10px;color:#333;line-height:1.6">가계부: −3,300,000 · 가맹점 「어서 오세요」<br>(카드 명세서처럼 가맹점 이름이 매번 다름 · 모델이 정함)</div>
+</div>
+<div class="note" style="position:absolute;left:350px;top:560px;width:400px">잔고 모자라면 단말기 화면에 「다음 기회에」(위키 일화). 산 것 = 가계부 차감 + 소지품, 다음 턴 본편에 넘김 — 지금 상점과 같음.</div>
+</div>
+
+<!-- 4. 망상홈쇼핑 라이브 PC -->
+<div class="scr pc dl" id="s4" style="height:800px"><div class="cap">시안 4 · 망상홈쇼핑 라이브 (PC)</div>
+<div class="pop" style="height:auto">
+ <div class="hd"><span class="live">● LIVE</span><span class="t">망상홈쇼핑</span><span class="chip">금요일 밤 특집 · 레드 프라이데이</span><span class="sp"></span><span class="btn">채널 돌리기</span><span class="btn x">✕</span></div>
+ <div class="main">
+  <div class="tv"><span class="pnum">상품 2</span><span class="call">☎ 080-404-0000</span>
+   <div class="sub">고객님들, 잡지 속 이 모델 보이시죠? 눈부시지 않습니까? 오늘 소개할 신상품은 여러분도 똑같이 눈부시게…</div>
+   <div class="host"></div><div class="prod"><img src="img/medical_124.webp"></div><span class="left">남은 수량 7</span>
+   <div class="lower"><div class="a">미인 약 BB · 120캡슐 · 방송 특가</div><div class="b">무이자 10회 할부 · 지금 전화 주문 시 사은품 증정 · 반품 불가</div></div></div>
+  <div class="lchat"><div class="h">실시간 채팅 · 1,204명 시청</div><div class="l">
+   <div><b>핑크곰</b><span class="s">배송 언제와요??</span></div>
+   <div><b>ㅇㅇ</b><span class="s">2번 재입고 되나요</span></div>
+   <div><b>민지맘</b><span class="s">모델분 피부 진짜 실화냐</span></div>
+   <div><b>???</b><span class="eerie">여기 안에 있어요</span></div>
+   <div><b>야식왕</b><span class="s">저번에 산 무드등 아직 안 깸</span></div>
+   <div><b>???</b><span class="eerie">나가는 길 아시는 분</span></div>
+   <div><b>하루</b><span class="s">10회면 몇 번 불려가요?</span></div>
+  </div><div class="inp" style="padding:8px"><div>채팅 보내기</div></div></div>
+ </div>
+ <div class="recruit">★ 스튜디오 방청객 모집! 좌석 무료 · 사은품 증정 · 방청객 특가 ★<span class="sp"></span><span class="btn">방청 신청</span></div>
+ <div class="zone lineup"><div class="zh"><b>오늘 편성</b>지난 상품은 다시 볼 수 없음</div><div class="grid">
+  <div class="cell"><img src="img/food_106.webp"><div>인투 더 배큠<br><span class="p">무이자 6회</span></div></div>
+  <div class="cell on"><img src="img/medical_124.webp"><div>미인 약 BB<br><span class="p">무이자 10회</span><br><span style="color:#ff5c6c;font-size:11px">● 방송 중</span></div></div>
+  <div class="cell"><img src="img/anomaly_224.webp"><div>불운 포스트잇<br><span class="p">곧 방송</span></div></div>
+  <div class="cell"><img src="img/anomaly_253.webp"><div>계란무드등<br><span class="p">곧 방송</span></div></div>
+ </div></div>
+ <div class="acts"><span class="btn r">☎ 전화 주문</span><span class="btn">상품 스티커 보기</span><span class="sp"></span><span class="btn">새 편성</span></div>
+</div>
+<div class="note" style="position:absolute;left:60px;top:735px;width:980px">메뉴 추가 없이 상점처럼 본편 카드에서 여는 팝업. 방송 자막·채팅·편성은 보조 모델 한 번 호출로 같이 받음. 끄기(✕)·채널 돌리기는 본편에 「껐다/돌렸다」로 넘어감.</div>
+</div>
+
+<!-- 5. 전화 주문 -->
+<div class="scr pc dl" id="s5"><div class="cap">시안 5 · 전화 주문 창</div>
+<div class="pop" style="opacity:.5"><div class="hd"><span class="live">● LIVE</span><span class="t">망상홈쇼핑</span></div></div><div class="dim"></div>
+<div class="callwin"><div class="hd" style="margin-bottom:10px"><span class="t">☎ 주문 상담원</span><span class="chip">통화 중 00:42</span><span class="sp"></span><span class="btn">끊기</span></div>
+ <div class="op">상담원: 네~ 망상홈쇼핑입니다. 미인 약 BB 주문 도와드리겠습니다, 고객님.<br><span class="me">나: 카드 일시불은 안 돼요?</span><br>상담원: 죄송합니다, 고객님. 저희는 현금을 받지 않아요. 무이자 할부나, 쓰시던 물건으로 바꿔 드릴 수 있어요~</div>
+ <div class="inp" style="margin-top:8px"><div>상담원에게 말하기</div><span class="btn">↵</span></div>
+ <div class="form"><span>상품</span><span class="v">미인 약 BB · 120캡슐 × 1</span><span>결제</span><span class="v">무이자 할부 10회 · 또는 물건·계약 맞교환 (상담원과 흥정)</span><span>받는 곳</span><span class="v">지금 있는 곳 · 택배</span></div>
+ <div class="fine">※ 할부 1회 = 나중에 모델·엑스트라·전화 출연 1번. 미납 회차는 예고 없이 방송에 불려 갑니다. 반품은 방송 시연으로 처리됩니다. 택배는 다른 사람 이름으로 올 수 있으며, 여는 사람이 구매를 받아들입니다.</div>
+ <div class="acts" style="margin-top:10px"><span class="sp"></span><span class="btn">그만</span><span class="btn r">주문 확정</span></div>
+</div>
+<div class="note" style="position:absolute;left:250px;top:700px;width:600px">돈 대신 「할부 회차」를 소지품 기록에 남김(계약도 물건처럼 남·사고팔기는 본편). 택배는 다음 턴 이후 본편에 도착 → 열면 소지품에 들어감.</div>
+</div>
+
+<!-- 6. 폰: 우주몰 -->
+<div class="scr ph cos" id="s6"><div class="cap" style="top:auto;bottom:4px">시안 6 · 우주 쇼핑몰 (폰)</div>
+<div class="pop"><div class="hd"><span>🛸</span><span class="t">우주 쇼핑몰</span><span class="chip">₩3,140,000</span><span class="sp"></span></div>
+ <div class="rare" style="flex:none;padding:8px"><img src="img/device_163.webp" style="width:80px;height:80px"><div><div style="color:var(--amber);font-size:11px;font-weight:700">★ 강하게 추천하는 물건</div><div class="n" style="font-size:14px">위 헬프!</div><div class="pr" style="font-size:14px">₩1,500,000,000</div></div></div>
+ <div class="zone"><div class="zh"><b>물건의 목록</b></div><div class="grid">
+  <div class="cell"><span class="tagd">-30%</span><img src="img/device_001.webp"><div>와이더 무전기</div><div class="p">4,200,000</div></div>
+  <div class="cell"><img src="img/weapon_010.webp"><div>포크와 나이프</div><div class="p">12,000,000</div></div>
+  <div class="cell"><img src="img/anomaly_003.webp"><div>은화 뱀</div><div class="p">3,300,000</div></div>
+<div class="cell"><img src="img/food_106.webp"><div>썩지 않는 통</div><div class="p">1,100,000</div></div>
+  <div class="cell"><img src="img/misc_227.webp"><div>별에서 온 캡슐</div><div class="p">2,000,000</div></div>
+  <div class="cell"><span class="tagd">-20%</span><img src="img/food_012.webp"><div>앨리스 피크닉</div><div class="p">7,200,000</div></div>
+ </div></div>
+ <div class="lcd" style="flex:none"><div class="scrn" style="height:90px;font-size:12.5px">▶ 할부 는 물어본 사람 이 없는 것 이다.</div></div>
+ <div class="bar"><span class="btn">단말기에 묻기</span><span class="btn">새로고침</span><span class="btn">닫기</span></div>
+</div></div>
+
+<!-- 7. 폰: 망상홈쇼핑 -->
+<div class="scr ph dl" id="s7"><div class="cap" style="top:auto;bottom:4px">시안 7 · 망상홈쇼핑 라이브 (폰)</div>
+<div class="pop"><div class="hd"><span class="live">● LIVE</span><span class="t">망상홈쇼핑</span><span class="sp"></span></div>
+ <div class="main"><div class="tv"><span class="pnum">상품 2</span><span class="call">☎ 080-404-0000</span><div class="host"></div><div class="prod"><img src="img/medical_124.webp"></div><span class="left">남은 수량 7</span><div class="lower"><div class="a">미인 약 BB · 방송 특가</div><div class="b">무이자 10회 할부 · 반품 불가</div></div></div>
+ <div class="lchat"><div class="h">실시간 채팅</div><div class="l"><div><b>핑크곰</b><span class="s">배송 언제와요??</span></div><div><b>???</b><span class="eerie">여기 안에 있어요</span></div><div><b>ㅇㅇ</b><span class="s">2번 재입고 되나요</span></div><div><b>???</b><span class="eerie">나가는 길 아시는 분</span></div></div></div></div>
+ <div class="recruit" style="font-size:12px">★ 방청객 모집 ★<span class="sp"></span><span class="btn">방청 신청</span></div>
+<div class="zone"><div class="zh"><b>오늘 편성</b></div><div class="grid"><div class="cell"><img src="img/food_106.webp"><div>인투 더 배큠</div></div><div class="cell" style="border-color:#e0263b"><img src="img/medical_124.webp"><div>미인 약 BB</div></div><div class="cell"><img src="img/anomaly_224.webp"><div>불운 포스트잇</div></div></div></div>
+ <div class="bar"><span class="btn" style="background:#e0263b;color:#fff;border-color:#e0263b">☎ 전화 주문</span><span class="btn">편성</span><span class="btn">채널</span><span class="btn">닫기</span></div>
+</div></div>
+
+<!-- 8. A안: 상점 창 그대로 + 방송 피부 -->
+<div class="scr pc dl" id="s8"><div class="cap">시안 8 · A안 — 상점 창을 그대로 쓰고 방송 모양만 (PC)</div>
+<div class="pop">
+ <div class="hd"><span class="live">● LIVE</span><span class="t">망상홈쇼핑</span><span class="sp"></span><span class="btn">판매</span><span class="btn">새로고침</span><span class="btn x">✕</span></div>
+ <div class="top">
+  <div class="rare" style="border-color:#8a1f2a;background:radial-gradient(circle at 18% 50%,#4a1218,transparent 55%),var(--sunk)"><img src="img/medical_124.webp"><div><div style="color:#ff5c6c;font-size:12.5px;font-weight:700">● 지금 방송 중</div><div class="n">미인 약 BB · 120캡슐</div><div class="d">아침마다 한 알. 사흘이면 흉터·붓기·자세까지 진짜로 좋아집니다.</div><div class="pr">무이자 10회</div></div></div>
+  <div class="sale"><div class="zh"><b>방송 특가</b>오늘만</div><div class="grid" style="grid-template-columns:repeat(2,104px)">
+   <div class="cell"><img src="img/food_106.webp"><div>인투 더 배큠</div><div class="w">8회</div><div class="p">6회</div></div>
+   <div class="cell"><img src="img/anomaly_224.webp"><div>불운 포스트잇</div><div class="w">5회</div><div class="p">3회</div></div>
+  </div></div>
+ </div>
+ <div class="zone"><div class="zh"><b>오늘 편성</b>4</div><div class="grid">
+  <div class="cell"><img src="img/anomaly_253.webp"><div>계란무드등</div><div class="p">12회</div></div>
+  <div class="cell"><img src="img/anomaly_048.webp"><div>애벌레 다이어트</div><div class="p">7회</div></div>
+ </div></div>
+ <div class="bot" style="border-color:#5a2a30;background:#140e10">
+  <div class="tv" style="width:150px;height:auto;flex:none"><div class="host" style="left:20px;transform:scale(.7);transform-origin:left bottom"></div></div>
+  <div class="lcd"><div style="font-weight:700">레드 프라이데이 <span style="color:var(--sub);font-weight:400;font-size:12.5px">진행자</span></div><div class="scrn" style="background:var(--sunk);border-color:var(--line);color:var(--text);text-shadow:none;font-family:inherit">「고객님, 이 가격 다시는 못 보십니다. 지금 바로 전화 주세요. 저희 모델 얼굴 보이시죠? 저게 진짜 효과입니다!」<br><span class="me">나: 일시불은 안 돼요?</span><br>「현금이요? 하하, 고객님. 저희는 무이자만 받습니다.」</div>
+  <div class="inp"><div>상담원에게 전화로 말하기</div><span class="btn">↵</span></div></div>
+ </div>
+</div>
+<div class="note" style="position:absolute;left:60px;top:872px;width:980px">지금 상점 창의 칸·구획·말하기를 그대로 쓰고 이름만 바꿈. 값 자리 = 할부 회차. 실시간 채팅·방송 화면은 없음(주인 사진 자리에 진행자만).</div>
+</div>
+</body></html>
