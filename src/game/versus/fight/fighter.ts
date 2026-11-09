@@ -126,6 +126,8 @@ export class Fighter {
   /** 서바이벌 */
   boss = false;
   deadT = -1;
+  /** 기술 연습 더미: 쓰러지지 않는다 (체력 1 밑으로 안 내려감) */
+  noKo = false;
   hpMul = 1;
   dmgMul = 1;
   /** 쓴 공격 번호 → 맞은 적 있음 (같은 공격 칸에 두 번 맞지 않게) */
@@ -478,6 +480,8 @@ export class Fighter {
     if (this.rush) return this.rush();
     const a = this.atk;
     if (!a || !this.anim) return;
+    // 약·강을 몇 프레임 차이로 눌러도 필살기 (먼저 눌린 평타 시작을 필살기로 바꾼다)
+    if ((a.normal === 'light' || a.normal === 'heavy') && this.st.t - a.start <= 0.08 && this.superInput() && this.canSuper()) { this.buf = null; this.superMove(); return; }
     if (a.connected && this.anim.step.cancel) {
       if (this.superInput() && this.canSuper()) { this.buf = null; this.superMove(); return; }
       // 예약 없음 (11-09 사용자): 이을 수 있는 때가 열리기 직전 아주 잠깐(BUFFER) 또는 열린 뒤에 누른 것만
@@ -810,7 +814,7 @@ export class Fighter {
     dmg = Math.round(Math.max(0, dmg) * by.dmgMul);
     this.st.log?.({ by: by.name, to: this.name, kind: use.kind, clip: by.anim?.id, id: use.id, dmg, guard: gain < 1 });
     if (dmg <= 0) return;
-    this.hp = Math.max(0, this.hp - dmg);
+    this.hp = Math.max(this.noKo ? 1 : 0, this.hp - dmg);
     if (!by.inSuper) by.gauge = Math.min(100, by.gauge + dmg * GAUGE.deal * gain);
     this.gauge = Math.min(100, this.gauge + dmg * GAUGE.take);
   }

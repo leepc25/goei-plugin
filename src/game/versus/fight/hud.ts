@@ -190,11 +190,16 @@ export function drawVersusBars(c: CanvasRenderingContext2D, me: Fighter | undefi
   if (hud) { one(0, me); one(1, foe); }
   if (versus.mode === 'survival' && !foe) vsSide[1].last = -1;   // 다음에 나오는 상대 칸은 새로
   // 가운데 시간: 두 막대 사이, 큰 도트 숫자 (10초 아래면 빨갛게 깜빡)
-  if (hud && versus.mode !== 'survival') {
+  if (hud && versus.mode !== 'survival' && versus.mode !== 'practice') {
     const sec = Math.ceil(versus.clock), low = sec <= 10 && !versus.ko && !versus.over;
     const t = bigText(String(Math.max(0, sec)).padStart(2, '0'), low ? BIG_RED : BIG_FIRE, 6, { slant: false, bold: true, edge: 1 });
     if (!low || Math.floor(vsT * 4) % 2 === 0) c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(barY + barH / 2 - t.height / 2) + 2);
     if (low && sec !== vsClockSay && sec > 0) { vsClockSay = sec; vsSay?.('timerWarn'); }
+  }
+  // 기술 연습: 체력 막대 아래 가운데에 키 안내
+  if (hud && versus.mode === 'practice') {
+    const t = dotText('R 처음 자리 · Esc 나가기', HUD_INK, 2);
+    c.drawImage(t, Math.round(W / 2 - t.width / 2), Math.round(barY + barH + 34));
   }
   // 연타 수 (1P): 두 번째 맞힘부터 왼쪽에 「N HIT」, 늘 때마다 살짝 튄다
   const combo = me?.combo ?? 0;
@@ -217,8 +222,8 @@ export function drawVersusBars(c: CanvasRenderingContext2D, me: Fighter | undefi
   else if (versus.ko) { const k2 = versus.ko.kind ?? 'ko'; key = `ko${k2}`; text = k2 === 'time' ? 'TIME OVER' : 'K.O.'; pal = BIG_RED; say = 'superHit'; call = k2 === 'time' ? 'time' : 'ko'; }
   else if (versus.intro > 0) {
     // ROUND → READY → GO! (INTRO_SEC 2.4)
-    if (versus.intro > 1.4) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; pal = BIG_BLUE; U = 6; say = 'ding';
-      call = versus.mode === 'survival' ? null : text === 'FINAL ROUND' ? 'final' : versus.round <= 3 ? (`round${versus.round}` as VoiceId) : 'final'; }
+    if (versus.intro > 1.4) { key = `r${versus.round}`; text = versus.mode === 'survival' ? 'SURVIVAL' : versus.mode === 'practice' ? 'TRAINING' : versus.mode === 'duel' && versus.round >= 3 ? 'FINAL ROUND' : `ROUND ${versus.round}`; pal = BIG_BLUE; U = 6; say = 'ding';
+      call = versus.mode === 'survival' || versus.mode === 'practice' ? null : text === 'FINAL ROUND' ? 'final' : versus.round <= 3 ? (`round${versus.round}` as VoiceId) : 'final'; }
     else if (versus.intro > 0.6) { key = `ready${versus.round}`; text = 'READY'; pal = BIG_FIRE; U = 6; }
     else { key = `go${versus.round}`; text = 'GO!'; pal = BIG_FIRE; U = 9; say = 'superStart'; call = 'fight'; }
   } else if (versus.mode === 'survival' && surv.bannerT > 0) {

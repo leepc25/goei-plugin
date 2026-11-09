@@ -2,11 +2,12 @@
 // 모드 (11-08 사용자: 1:1 먼저, 3인 팀전·서바이벌도 같은 틀에서):
 //   duel     1:1 3판 2선승. 판마다 둘 다 체력을 다시 채운다
 //   team     3인 팀전. 쓰러진 쪽만 다음 사람이 나오고, 이긴 사람은 남은 체력 그대로 다음 상대를 맞는다. 한 팀 셋이 다 쓰러지면 끝
+//   practice 기술 연습(11-09 사용자 「기술 연습실 하나, 더미도 하나 세워두고」). 시간·판 끝 없음, 상대는 가만히 선 더미(쓰러지지 않고 체력이 다시 참), 내 필살 게이지는 늘 가득
 //   survival 서바이벌. 내 한 명으로 웨이브로 몰려오는 상대를 버틴다. 판을 끊지 않고 내가 쓰러지면 끝 (engine/survival.ts)
 // 판 끝 판정은 game.ts 가, 그리기는 modules.ts drawVersusBars 가 한다. 경기가 끝나면 onMatchEnd 로 고르기 창에 돌려준다.
 
 export type Side = 0 | 1;
-export type VsMode = 'duel' | 'team' | 'survival';
+export type VsMode = 'duel' | 'team' | 'survival' | 'practice';
 
 export const versus = {
   mode: 'duel' as VsMode,

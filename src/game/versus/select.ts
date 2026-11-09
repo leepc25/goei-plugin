@@ -14,6 +14,7 @@ const MODES: { id: VsMode; name: string; big: string; picks: [number, number] }[
   { id: 'duel', name: '1 VS 1', big: '1 VS 1', picks: [1, 1] },
   { id: 'team', name: '태그매치', big: 'TAG MATCH', picks: [3, 3] },
   { id: 'survival', name: '서바이벌', big: 'SURVIVAL', picks: [1, 0] },
+  { id: 'practice', name: '기술 연습', big: 'TRAINING', picks: [1, 1] },
 ];
 const RANDOM = '__random';
 const CELL = 64;   // 11-08 사용자 「격투게임처럼」: 얼굴판 얼굴을 1:1 로 크게

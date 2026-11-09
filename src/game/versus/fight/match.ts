@@ -90,6 +90,10 @@ export class Match {
   // ───────── 입력 ─────────
   private kd = (e: KeyboardEvent) => {
     const b = KEYS[e.code];
+    // 기술 연습은 판이 끝나지 않으니 Esc 로 고르기 창으로
+    if (e.code === 'Escape' && versus.mode === 'practice' && !versus.hold && !versus.over) { e.preventDefault(); versus.onMatchEnd?.(0); return; }
+    // 기술 연습: R 로 둘 다 가운데 처음 자리로
+    if (e.code === 'KeyR' && versus.mode === 'practice' && !versus.hold && !e.repeat) { e.preventDefault(); this.practiceReset(); return; }
     if (!b) return;
     const t = e.target as HTMLElement | null;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
@@ -139,7 +143,12 @@ export class Match {
     if (this.auto && p1) this.brainFor(p1, 1);
     if (versus.mode !== 'survival') {
       const p2 = this.make(fighterOf(1), 1, L / 2 + 260, -1);
-      if (p2) { p2.reset(L / 2 + 260, -1, hpOf(1)); st.fighters.push(p2); this.brainFor(p2, versus.round + versus.cur[1]); }
+      if (p2) {
+        p2.reset(L / 2 + 260, -1, hpOf(1)); st.fighters.push(p2);
+        // 기술 연습: 상대는 두뇌 없이 가만히 선 더미
+        p2.noKo = versus.mode === 'practice';
+        if (versus.mode !== 'practice') this.brainFor(p2, versus.round + versus.cur[1]);
+      }
     }
     versus.intro = INTRO_SEC;
     versus.clock = CLOCK_SEC;
@@ -191,6 +200,7 @@ export class Match {
     this.pushApart();
     if (versus.mode !== 'survival') this.keepOnScreen();
     if (versus.mode === 'survival') this.survival();
+    if (versus.mode === 'practice') return this.practice();
     this.judge();
   }
 
@@ -216,6 +226,23 @@ export class Match {
     const ex = d - maxD, s = Math.sign(foe.x - p.x) || 1;
     const outF = s * foe.vx, outP = -s * p.vx;
     if (outF >= outP) foe.x -= s * ex; else p.x += s * ex;
+  }
+
+  /** 기술 연습: 판 끝 없음. 내 필살 게이지는 늘 가득, 더미는 1초 동안 안 맞으면 체력이 다시 찬다 */
+  private practice(): void {
+    const [p, d] = this.st.fighters;
+    versus.clock = CLOCK_SEC;
+    if (p && !p.inSuper) p.gauge = 100;
+    if (d && this.st.t - d.chainT > 1 && (d.state === 'idle' || d.state === 'guard')) { d.hp = d.hpMax; if (p) p.combo = 0; }
+    if (d) d.gauge = 0;
+  }
+
+  private practiceReset(): void {
+    const st = this.st, L = st.L, [p, d] = st.fighters;
+    st.fx = []; st.proj = []; st.timers = [];
+    p?.reset(L / 2 - 260, 1, HP);
+    d?.reset(L / 2 + 260, -1, HP);
+    this.cam = -1;
   }
 
   /** 판 끝 판정 (K.O. · 시간 끝) */
