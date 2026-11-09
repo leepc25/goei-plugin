@@ -88,7 +88,7 @@ const jobs = new Set<string>();
 
 /** 진열대 짜기 / 운영자에게 묻기. 같은 채팅을 보고 있을 때만 저장 */
 /** 시그니처 상품 → 진열 물건 (할인 전 값이 더 크면 ※할인!※ 딱지) */
-const fixedItem = (f: CosFixed): Omit<ShopItem, 'id'> => ({ name: f.name.trim(), desc: f.desc, effect: f.effect, use: false, price: f.price, ...(f.was && f.was > f.price ? { tag: 'sale' as const, was: f.was } : {}) });
+const fixedItem = (f: CosFixed): Omit<ShopItem, 'id'> => ({ name: f.name.trim(), desc: f.desc, effect: f.effect, use: false, price: f.price, ...(f.truth.trim() ? { truth: f.truth.trim() } : {}), ...(f.was && f.was > f.price ? { tag: 'sale' as const, was: f.was } : {}) });
 
 async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf' | 'talk', st0: ShopState): Promise<void> {
   const job = `${chatKey(ctx)}:${site}`;
@@ -215,7 +215,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
       const walletId = it.price > 0 ? `${site}_${it.id}` : '';
       if (walletId) w = addWalletEntry(w, { id: walletId, anchor, amount: -it.price, memo: `${it.name} (${MALL_NAME[site]})`, src: 'store' });
       const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}` };
-      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, ...paid });
+      items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, ...paid });
       st = markSold(st, it.id);
     }
     got = list;
@@ -558,10 +558,11 @@ function cosFixedGroup(ctx: ChatContext): string {
       <div class="ms-fx-head">${text(f.id, 'name', f.name, '상품 이름', '이름', 40)}<span class="ph-inline"><span>확률</span>${num(f.id, 'pct', f.pct, '25', '확률', 100)}<span>%</span></span>${mseg('cos', `fx_on:${f.id}`, f.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}<button class="gx-mini danger" data-action="ms-fx-del" data-value="${esc(f.id)}" aria-label="지우기">×</button></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num(f.id, 'price', f.price, '999999', '값')}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num(f.id, 'was', f.was, '비우면 할인 없음', '할인 전 값')}<span>원</span></span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text(f.id, 'desc', f.desc, '겉보기 설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '쓰면 무슨 일이 나는지', '효과', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)', '보이는 효과', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 쓸 때 모델이 정해요', '진짜 효과', 200)}</span></div>
     </div>`).join('');
   const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>추가</button></div>`;
-  return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
+  return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);
 }
 
 /** 설정 값 바꾸기: ms-cfg 「사이트:키=값」 · ms-step 「사이트:키:±」 · ms-num 「사이트:키=숫자」(상품 수) · ms-text (값 기준) */
@@ -652,12 +653,12 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   }
   if (action === 'ms-roll-reset') return set(Object.fromEntries(Object.values(COS_ROLL_KEY).map((k) => [k, ''])));
   if (action === 'ms-fx') {
-    const m = /^(\w+):(name|pct|price|was|desc|effect)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^(\w+):(name|pct|price|was|desc|effect|truth)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return true;
     const [, id, k, v] = m;
     return set(cosFixedVars(list().map((f) => {
       if (f.id !== id) return f;
-      if (k === 'name' || k === 'desc' || k === 'effect') return { ...f, [k]: v.replace(/\s+/g, ' ').trim() };
+      if (k === 'name' || k === 'desc' || k === 'effect' || k === 'truth') return { ...f, [k]: v.replace(/\s+/g, ' ').trim() };
       const n = Math.trunc(Number(v));
       if (k === 'was') { const { was: _w, ...rest } = f; return Number.isFinite(n) && n > 0 ? { ...rest, was: n } : rest; }
       if (!Number.isFinite(n) || v.trim() === '') return f;

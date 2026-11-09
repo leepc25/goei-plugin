@@ -48,6 +48,8 @@ export interface Item {
   desc: string;
   /** 효과 (≤60, 없으면 빈 문자열) */
   effect: string;
+  /** 숨긴 진짜 효과 (≤60). 화면엔 절대 안 보이고 본편 모델만 받는다 (11-09 사용자: 우주몰 물건은 보이는 효과가 광고 문구) */
+  truth?: string;
   /** 사용 가능 */
   use: boolean;
   /** 소모성: 처음 횟수. 남은 횟수 = 이것 − 살아 있는 사용 기록의 n 합 (itemLeft). 0 이 되면 목록에서 안 보인다 */
@@ -217,6 +219,8 @@ export interface ItemInput {
   name: string;
   desc?: string;
   effect?: string;
+  /** 숨긴 진짜 효과 */
+  truth?: string;
   /** 판정 (안 주면 새 물건은 사용 X·비소모·장착 X, 있던 물건은 그대로) */
   use?: boolean;
   uses?: unknown;
@@ -277,6 +281,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   if (!name) return it;
   const desc = clean(e.desc, 80);
   const effect = clean(e.effect, 60);
+  const truth = e.truth ? clean(e.truth, 60) : '';
   const quote = e.quote ? clean(e.quote, 120) : undefined;
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
   if (found) {
@@ -285,7 +290,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     const more = stack ? { uses: Math.min(999, found.uses! + addUses!) } : { uses: e.uses };
     // 무게는 1개당 (2026-11-08 사용자): 같은 소모품이 더 들어와도 1개당 무게는 그대로, 합은 개수만큼 곱해진다
     const weight = found.weight !== undefined ? undefined : e.weight;
-    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(quote ? { quote } : {}) };
+    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(truth ? { truth } : {}), ...(quote ? { quote } : {}) };
     if (JSON.stringify(next) === JSON.stringify(found)) return it;
     return { ...it, list: it.list.map((x) => (x.id === found.id ? next : x)) };
   }
@@ -296,6 +301,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(Number.isSafeInteger(e.price) ? { price: e.price } : {}),
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(e.paidWith ? { paidWith: clean(e.paidWith, 60) } : {}),
+    ...(truth ? { truth } : {}),
     ...(quote ? { quote } : {}),
   }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
@@ -502,7 +508,9 @@ export function itemLine(e: Item, left: number | undefined, equipped: boolean, d
     left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
-  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}` : '';
+  // 숨긴 진짜 효과가 있으면: 주인공이 아는 건 광고 문구뿐, 실제로 일어나는 일은 진짜 쪽
+  const fx = e.truth ? ` (${e.effect ? `the label claims: ${e.effect}; ` : ''}truly: ${e.truth} — the protagonist does not know this)` : e.effect ? ` (${e.effect})` : '';
+  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${fx}` : '';
   return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }
 
@@ -557,7 +565,7 @@ export const INVENTORY_HEAD = '[Inventory]';
 export const SHOP_HEAD = '[Shop]';
 const INVENTORY_NOTE =
   'What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: ' +
-  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back.';
+  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. An item with a "truly:" note has a hidden real effect: when it is used, what happens follows the "truly" part, never the label, and the protagonist learns it only through what happens. Never print this list back.';
 
 /** 채팅의 마지막 유저 메시지 키 (없으면 '') */
 export function lastUserKey(chat: Chat): string {

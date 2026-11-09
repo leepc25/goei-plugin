@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
+const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, SHOP_LINE, SECRET_LINE, lineOf } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 
 /** 정해진 수열을 내는 난수 (시험용) */
@@ -77,4 +77,13 @@ test('추첨 방식: 장르 겹침·통일, 등급 가중치·골고루·통일,
   assert.equal(M.cosRoll({}).gmode, 'uniq'); assert.equal(M.cosRoll({}).tmode, 'weight');
   assert.equal(M.parseTiers('x|y|1|2')[0].w, 1, '가중치 비우면 1');
   assert.ok(M.tiersText(M.COS_TIERS_DEFAULT).endsWith('|1'), '글에 가중치가 붙는다');
+});
+
+test('숨긴 진짜 효과: 우주몰 줄 끝 「진실」 칸은 저장되고 화면용 효과와 따로 간다 (11-09 사용자: 효과는 광고 문구, 진짜는 모델만)', () => {
+  assert.equal(M.SECRET_LINE, `${M.SHOP_LINE}|진실`);
+  assert.equal(M.lineOf('Cos'), M.SECRET_LINE); assert.equal(M.lineOf('Shop'), M.SHOP_LINE);
+  const r = M.parseShelf('<shelf>\n빛의 돌|1200000|사용|glowing stone|0.2|둥근 돌이다|어둠을 밝힌다|-|쥐면 주변 전등이 전부 꺼진다\n보통 돌|999999|-|stone|0.3|돌|???||\n</shelf>', { sells: 'x', never: '', prices: '' });
+  assert.equal(r.items[0].truth, '쥐면 주변 전등이 전부 꺼진다');
+  assert.equal(r.items[0].effect, '어둠을 밝힌다');
+  assert.equal(r.items[1].truth, undefined, '비우면 없음');
 });

@@ -440,7 +440,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       }
       // 소모성은 지금 남은 횟수를 넘긴다 (주인이 값을 정할 때 보게)
       const left = itemLeft(readItems(ctx.chat.scriptstate), mine, aliveAnchors(ctx.chat));
-      const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, use: mine.use, ...(left !== undefined ? { uses: left } : {}), ...(mine.equip ? { equip: mine.equip } : {}), ...(mine.icon ? { icon: mine.icon } : {}), ...(Number.isSafeInteger(mine.price) ? { paid: mine.price } : {}) });
+      const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...(mine.truth ? { truth: mine.truth } : {}), use: mine.use, ...(left !== undefined ? { uses: left } : {}), ...(mine.equip ? { equip: mine.equip } : {}), ...(mine.icon ? { icon: mine.icon } : {}), ...(Number.isSafeInteger(mine.price) ? { paid: mine.price } : {}) });
       await saveShop(ctx, st, next);
       shopUi.chip = mine.name;
       shopUi.chipKind = 'sell';
@@ -569,7 +569,7 @@ export async function shopAction(action: string, value: string | undefined, ctx:
         const w = walletId ? addWalletEntry(w0, { id: walletId, anchor: now.key, amount: -target.price, memo: target.name, src: 'store' }) : w0;
         // 포인트로 산 것은 원 값 없이 「N 포인트」 대가로 적는다 (본편에 「paid with N points」)
         const paid = p ? { paidWith: `${target.price.toLocaleString('en-US')} Baekilmong points${target.pay ? ` + ${target.pay}` : ''}` } : { price: target.price, ...(walletId ? { walletId } : {}), ...(target.pay ? { paidWith: target.pay } : {}) };
-        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', anchor: now.key, ...paid });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: target.name, desc: target.desc, effect: target.effect, truth: target.truth, use: target.use, uses: target.uses, equip: target.equip, icon: target.icon, weight: target.weight, from: 'store', anchor: now.key, ...paid });
         bought = true;
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...shopVars(markSold(now, target.id)) } };
       });

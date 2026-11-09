@@ -176,13 +176,16 @@ export interface CosFixed {
   /** 할인 전 값 (값보다 클 때만 ※할인!※) */
   was?: number;
   desc: string;
+  /** 보이는 효과 = 광고 문구 */
   effect: string;
+  /** 숨긴 진짜 효과 (비우면 본편 모델이 그 자리에서 정함) */
+  truth: string;
 }
 export const COS_FIXED_KEY = '$cos_fixed';
 export const COS_FIXED_MAX = 12;
 export const COS_FIXED_DEFAULT: CosFixed[] = [
-  { id: 'f_wehelp', on: true, pct: 25, name: '우리가 도움!', price: 66_666_666, desc: '???', effect: '???' },
-  { id: 'f_friend', on: true, pct: 25, name: '착한 친구', price: 44_444, was: 44_444_444, desc: '아주 귀여운 짐승 모양의 인형 열쇠고리이다. 친구를 부르는 종이가 함께 온다. 동봉된 종이의 지시를 그대로 따르라.', effect: '인형을 통해 말하는 존재가 너의 단짝이 된다. 다만 누가 응답할지는 부른 자도 미리 알 수 없다. 주의사항: 검열됨' },
+  { id: 'f_wehelp', on: true, pct: 25, name: '우리가 도움!', price: 66_666_666, desc: '???', effect: '???', truth: '' },
+  { id: 'f_friend', on: true, pct: 25, name: '착한 친구', price: 44_444, was: 44_444_444, desc: '아주 귀여운 짐승 모양의 인형 열쇠고리이다. 친구를 부르는 종이가 함께 온다. 동봉된 종이의 지시를 그대로 따르라.', effect: '인형을 통해 말하는 존재가 너의 단짝이 된다. 다만 누가 응답할지는 부른 자도 미리 알 수 없다. 주의사항: 검열됨', truth: '' },
 ];
 /** 저장된 목록. 변수가 없으면 기본값, 「[]」이면 없음 */
 export function cosFixed(vars: Vars): CosFixed[] {
@@ -196,13 +199,13 @@ export function cosFixed(vars: Vars): CosFixed[] {
       const x = o as Record<string, unknown>;
       const num = (v: unknown) => (Number.isFinite(Number(v)) ? Math.max(0, Math.trunc(Number(v))) : 0);
       const was = num(x.was);
-      return { id: String(x.id ?? '').slice(0, 24) || `f${Math.random().toString(36).slice(2, 8)}`, on: x.on !== false, pct: Math.max(0, Math.min(100, num(x.pct))), name: String(x.name ?? '').slice(0, 40), price: num(x.price), ...(was ? { was } : {}), desc: String(x.desc ?? '').slice(0, 200), effect: String(x.effect ?? '').slice(0, 200) };
+      return { id: String(x.id ?? '').slice(0, 24) || `f${Math.random().toString(36).slice(2, 8)}`, on: x.on !== false, pct: Math.max(0, Math.min(100, num(x.pct))), name: String(x.name ?? '').slice(0, 40), price: num(x.price), ...(was ? { was } : {}), desc: String(x.desc ?? '').slice(0, 200), effect: String(x.effect ?? '').slice(0, 200), truth: String(x.truth ?? '').slice(0, 200) };
     }).filter((x): x is CosFixed => !!x).slice(0, COS_FIXED_MAX);
   } catch {
     return COS_FIXED_DEFAULT;
   }
 }
 export const cosFixedVars = (list: CosFixed[]): Record<string, string> => ({ [COS_FIXED_KEY]: JSON.stringify(list) });
-export const newCosFixed = (): CosFixed => ({ id: `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, on: true, pct: 25, name: '', price: 999_999, desc: '', effect: '' });
+export const newCosFixed = (): CosFixed => ({ id: `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, on: true, pct: 25, name: '', price: 999_999, desc: '', effect: '', truth: '' });
 /** 이번 새로고침에 끼울 것 (켜진 것만, 이름 있는 것만, 확률 굴림) */
 export const cosFixedRoll = (list: CosFixed[], rnd: () => number = Math.random): CosFixed[] => list.filter((x) => x.on && x.name.trim() && x.price > 0 && rnd() * 100 < x.pct);
