@@ -1,4 +1,5 @@
 0
+- 사용자 11-09 14:04 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v3(pixflux) 1회
 - 사용자 11-09 13:51 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v1 1회
 - 사용자 11-08 19:35 KST 「뽑아봐」 → 236(228회 글, 색값·빈 공간·반짝임 계단·눈금 X) 1회
 - 사용자 11-08 19:26 KST 「뽑아」 → 235(228회 글, D~S 등급 줄 계단 또렷이) 1회
@@ -264,3 +265,6 @@
 - 사용: item_icons_batch 235회
 - 사용: item_icons_batch 236회
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/specs/ds_studio_v1_req.json
+- 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v3_req.json
+- 위 1회는 422(가로 400 넘음)로 거절, 생성 0 → 같은 승인으로 400×300 다시
+- 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v3_req.json
