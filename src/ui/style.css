@@ -397,7 +397,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .gx-select { flex: 1; }
 .gx-search { width: 100%; }
-.gx-search:focus, .gx-select:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
+/* 바깥 outline은 배율·이웃 칸에 잘려 끊겨 보였다(11-09 사용자) → 테두리 + 안쪽 선 2px, 칸 안쪽에만 */
+.gx-search:focus, .gx-select:focus { outline: none; border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
@@ -1288,6 +1289,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-evc.go { cursor: pointer; }
 .gx-evc.go:hover { border-color: var(--line2); }
+/* 목표로 고른 사건 카드(상황판·지도 아래 목록): 0.21.4에서 고른 표시 규칙이 빠져 테두리가 안 나왔다 → 다른 고른 카드와 같은 민트 2px (2026-11-09 사용자) */
+.gx-evc.sel { position: relative; border-color: var(--signal); }
 .gx-evc .gx-gmark { flex: none; width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-style: normal; }
 .gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
@@ -2766,9 +2769,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
    고른 상태 색은 그대로(11-09 사용자: 이전처럼 민트) */
 /* 고른 카드는 어디서나 민트 2px (11-09 사용자: 두께 맞추기): 테두리 1px + 카드 안쪽 맨 위 겹에 한 줄.
    바깥(box-shadow)은 목록 칸 끝에서 잘리고(사용자: 테두리가 씹힌다), 안쪽 그림자는 그림 밑에 깔려 두 줄로 보였다 */
-.gx-mlist li.gx-mx.sel::after, .gx-acard.pick.on::after, .it-c.sel::after, .it-slot.sel::after {
-  content: ''; position: absolute; inset: -1px; z-index: 3; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none;
+.gx-mlist li.gx-mx.sel::after, .gx-evc.sel::after, .gx-acard.pick.on::after, .it-c.sel::after, .it-slot.sel::after {
+  content: ''; position: absolute; inset: 0; z-index: 3; border: 1px solid var(--signal); border-radius: inherit; pointer-events: none;
 }
+/* 11-09 사용자: 고른 테두리가 군데군데 끊겼다. 안쪽 겹을 칸 바깥(-1px)에 걸쳐 그리면 overflow·화면 배율에 따라 잘린다
+   → 카드 테두리 1px + 안쪽 겹 1px = 2px, 전부 칸 안쪽에만 그린다 */
 .gx-mini, .gx-chip, .gx-select, .gx-step, .gx-seg, .ph-act .gx-mini, .pp-upbar .gx-mini, .gx-row-btns .gx-mini, .upd-act .gx-mini {
   box-sizing: border-box; min-height: var(--ctl-sm); height: var(--ctl-sm); padding: 0 12px; border: 1px solid var(--line); border-radius: 8px;
   font: inherit; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; vertical-align: middle; cursor: pointer;
@@ -3278,8 +3283,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-ux svg { width: 14px; height: 14px; }
 .it-ux:hover { color: var(--text); background: var(--panel2); }
 /* 끌기: 놓을 수 있는 자리는 신호색 테두리. 버리기 띠는 끄는 동안만 아래에 */
-.it-over-ok { outline: 2px solid var(--signal); outline-offset: 2px; }
-.it-usebox.it-over-ok, .it-grid.it-over-ok { outline-offset: 4px; border-radius: 12px; }
+/* 11-09 사용자: 바깥 outline 금지(배율·overflow에 잘림) → 안쪽 2px */
+.it-over-ok { outline: none; box-shadow: inset 0 0 0 2px var(--signal); }
+.it-usebox.it-over-ok, .it-grid.it-over-ok { border-radius: 12px; }
 .it-trash { display: none; }
 .it-scrollwrap { position: relative; min-width: 0; }
 /* 버리기 띠: 격자 위에 뜬다 — 격자 줄 수와 상관없이 같은 높이, 아래 줄 칸을 집기 어렵지 않게 적당히 (2026-11-08 사용자) */
@@ -3702,7 +3708,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 폰 탭 목록 */
 .br-tlist { flex: 1; overflow: auto; background: #202124; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .br-tcard { display: flex; align-items: center; height: 48px; border-radius: 10px; background: #35363a; color: var(--ctx); font-size: 14px; }
-.br-tcard.on { outline: 2px solid #8ab4f8; }
+.br-tcard.on { box-shadow: inset 0 0 0 2px #8ab4f8; }
 .br .br-tnew { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; border: 1px dashed #5f6368; color: var(--cic); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .br { grid-template-rows: auto auto minmax(0, 1fr); }
