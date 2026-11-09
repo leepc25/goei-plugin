@@ -17,6 +17,7 @@
 //   --out <폴더>          기록 폴더 (기본 .scratch/click-audit). 안에 report.md · report.json · shots/
 //   --fixture <경로>      시험 카드 (기본 .scratch/fixture/fixture.json, 없으면 `npm run test:browser -- --only install` 로 먼저 만든다)
 //   --only-scope <css>    이 선택자 안의 것만 누른다 (예: '.gx' 상황판 창만)
+//   --probe <파일.mjs>    --from 화면에서 그 파일의 default(page, {vp, shots, log}) 만 돌리고 결과를 probe-<vp>.json 에 (누르기 안 함)
 //   --report-only         누르지 않고 --out 폴더의 report.json(끊긴 것도)으로 report.md 만 다시 만든다
 //   --resume <폴더,…>     같은 판(커밋)의 지난 기록(report.json)을 읽어, 이미 누른 단추는 건너뛰고 못 누른 곳만 이어서 누른다.
 //                         지난 결과도 이번 보고서에 합친다(캡처는 지난 폴더 것을 가리킴). 판이 다르면 멈춘다 (11-09 사용자: 통과한 것을 왜 또 하냐)
@@ -26,7 +27,7 @@
 import os from 'node:os';
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve, dirname, relative, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { boot, launch, loadFixture, openWin, closeEditor, VIEWPORTS, isPhoneVp } from '../tests/qc-settings-harness.mjs';
 import { distPack } from '../tests/data-init.mjs';
 
@@ -51,6 +52,7 @@ const opt = { vp: ['pc', 'phone'], start: ['board', 'picker', 'items', 'shop', '
     else if (k === '--plan') opt.plan = true;
     else if (k === '--head') opt.head = v(); // --plan 시험용: 지금 판 대신 이 커밋과 비교
     else if (k === '--only-scope') opt.scope = v();
+    else if (k === '--probe') opt.probe = v();
     else if (k === '--from') opt.from = v().split('>').map((x) => x.trim()).filter(Boolean).map((key) => ({ key, nth: 0 }));
     else if (k === '-h' || k === '--help') { console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n')); process.exit(0); }
     else throw new Error(`모르는 옵션: ${k}`);
@@ -569,6 +571,8 @@ for (const vp of opt.reportOnly ? [] : opt.vp) {
     // 첫 화면
     const { page, fail: fromFail } = await prepPage(browser, vp, base, opt.from);
     if (fromFail) throw new Error(`--from 재현 실패: ${fromFail}`);
+    // --probe <파일.mjs>: --from 화면에서 그 파일의 default(page, { vp, shots, log }) 를 돌리고 결과를 probe-<vp>.json 에 남긴 뒤 이 화면 누르기는 건너뛴다 (지도 확대·축소처럼 정해진 순서로 재야 할 때)
+    if (opt.probe) { const mod = await import(pathToFileURL(resolve(ROOT, opt.probe)).href); const out = await mod.default(page, { vp, shots: SHOTS, log }); writeFileSync(resolve(OUT, `probe-${vp}.json`), JSON.stringify(out, null, 1)); log(`--probe ${vp}: probe-${vp}.json`); await page.close(); continue; }
     const first = await page.evaluate((sc) => window.__ca.list(sc), opt.scope);
     if (process.env.CA_MUT) log('저절로 바뀌는 곳', JSON.stringify(await page.evaluate(() => new Promise((res) => { const c = {}; const mo = new MutationObserver((ms) => { for (const m of ms) { const t = m.target.nodeType === 1 ? m.target : m.target.parentElement; const k = (t?.tagName || '').toLowerCase() + '.' + [...(t?.classList || [])].slice(0, 2).join('.') + ' ' + m.type + (m.attributeName ? ':' + m.attributeName : ''); c[k] = (c[k] || 0) + 1; } }); mo.observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true }); setTimeout(() => { mo.disconnect(); res(c); }, 3000); }))));
     const audit0 = await page.evaluate((sc) => window.__ca.audit(sc), opt.scope);
