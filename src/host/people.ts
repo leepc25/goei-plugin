@@ -8,7 +8,7 @@ import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
 import { hypaSummaries } from '../core/people/hypa';
-import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
+import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -20,7 +20,7 @@ import { allNames, extraNames, seedBaseFor, temperOf, valuesOf } from '../core/p
 import { playerAgent } from '../core/player';
 import { peopleBlockFor } from '../core/people/request';
 import { userInfo } from './user';
-import { promptFor } from '../core/people/prompt';
+import { promptFor, UPDATER_COMPACT, UPDATER_DETAILED } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
@@ -291,9 +291,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsUse) sections.add('points');
       if (itemsOn) sections.add('items');
-      if (input.shop) sections.add('shop');
-      // 상점 판단 기준은 지침 「상점」의 글을 그대로 (본편 표식 지침과 같은 글, 11-09 사용자: 상점 지침은 양쪽을 동시에)
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings)).replace('<<SHOP_RULE>>', () => (input.shop ? shopRule(fresh.chat.scriptstate) : '')).replace('<<SHOP_JUDGE>>', () => (input.shop ? shopJudgeGuide() : ''));
+      const system = updaterSystem(settings, sections, fresh.chat.scriptstate, !!input.shop);
       input.system = system;
       if (input.overBudget.length) {
         // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 응답 글이 상한을 넘으면 접어서 보내지 않고 거부한다. 읽음 표시도 안 한다
@@ -435,6 +433,19 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
+
+/** 갱신기 지침 조립 (실제 호출·미리보기 같은 길). 상점 판단을 맡으면 「상점」 절을 켜고 기준 글(지침 「상점」 SHOP_RULE·SHOP_JUDGE)을 채운다.
+ *  지침을 고쳐 둔 사용자는 고친 글에 상점 절이 없을 수 있어 기본 글의 절을 덧붙인다 (릴리스 점검 11-09: 안 그러면 상점이 매 턴 닫혔다) */
+function updaterSystem(settings: PeopleSettings, sections: Set<string>, vars: Record<string, unknown> | undefined, shop: boolean): string {
+  const base = promptFor(settings);
+  if (shop) sections.add('shop');
+  let system = assemblePrompt(base, sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+  if (shop && !base.includes('<<SECTION:shop>>')) {
+    const def = settings.prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
+    system += `\n\n${sectionBody(def, 'shop') ?? ''}\nAdd this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.`;
+  }
+  return system.replace('<<SHOP_RULE>>', () => (shop ? shopRule(vars) : '')).replace('<<SHOP_JUDGE>>', () => (shop ? shopJudgeGuide() : ''));
+}
 
 /** 지난 응답 읽기: 최근 turns 개 응답(0 = 전부) 가운데 안 읽은 것을 묶음으로 읽는다 (기능을 중간에 켰거나 끄고 지나간 구간) */
 export async function backfillPeople(turns: number): Promise<RunResult> {
@@ -667,14 +678,16 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const itemsNow = itemsOn ? itemsNowOf(ctx.chat) : null;
       const usedNow = itemsOn && list[last] ? usedItemsAt(readItems(ctx.chat.scriptstate), [messageKey(list[last], last)], aliveAnchors(ctx.chat)) : [];
       const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
-      const inp = buildUpdate(ctx.chat, store, [last], { settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow });
+      // 상점 판단 (실제 호출과 같게, 릴리스 점검 11-09)
+      const shopOnNow = shopOn(ctx.chat.scriptstate) && shopJudgeBy(ctx.chat.scriptstate).by === 'updater';
+      const inp = buildUpdate(ctx.chat, store, [last], { shop: shopOnNow ? { at: last, self: [...exclude, userInfo().name] } : null, settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow });
       const sections = enabledSections(settings);
       if (inp.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (walletOn && walletLoose(ctx.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsOn(ctx.chat)) sections.add('points');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      const system = updaterSystem(settings, sections, ctx.chat.scriptstate, !!inp.shop);
       out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
     }
   }

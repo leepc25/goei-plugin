@@ -243,7 +243,7 @@ export function parseIconAliases(text) {
   }
   return out;
 }
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '손전등 → 플래시라이트', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
 export function setIconAliases(text) { aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT); }
 function aliased(text) {
@@ -271,7 +271,10 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     let x = kinds.get(k);
     if (!x) {
       const sub = rows.filter((r) => r.kind === k);
-      x = sub.length ? { head: makeHeadIndex(sub, reps), frag: makeFragIndex(sub, reps, KIND_MIN) } : { head: () => null, frag: () => null };
+      // 대표 그림도 그 종류 것만 (릴리스 점검 11-09)
+      const files = new Set(sub.map((r) => r.file));
+      const subReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => files.has(f)));
+      x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files } : { head: () => null, frag: () => null, files };
       kinds.set(k, x);
     }
     return x;
@@ -285,11 +288,11 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
       if (ok) return hit(ok);
       return (hn?.retry ? core(hn.retry, '', K) : null) || (hi?.retry ? core(hi.retry, '', K) : null) || frag(name, word);
     }
-    if (rank(hn) === 3) return hit(hn);
+    if (rank(hn) === 3 && (!K || K.files.has(hn.file))) return hit(hn);
     if (K) {
       const ki = word ? K.head(word) : null, kn = name ? K.head(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(kn) >= 1 ? kn : ki;
-      if (k) return hit(k);
+      return hit(k); // 종류 안에 없으면 다른 종류로 가지 않고 ② 종류 안 비슷한 그림·③ 종류 대표로
     }
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
     const h = koName || rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
@@ -298,7 +301,9 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   };
   return (name0, icon) => {
     const { kind, word: w0 } = splitIconWord(icon);
-    const name = aliased(name0), word = aliased(w0);
+    const keep = (t) => { const n = normIcon(t); return !!n && rank(head(n)) === 3; }; // 표에 그대로 있는 말은 대체하지 않는다
+    const name = keep(name0) ? normIcon(name0) : aliased(name0);
+    const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const K = kind ? kindIndex(kind) : null;
     const found = core(name, word, K);
     if (found) return found;

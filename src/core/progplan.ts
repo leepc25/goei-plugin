@@ -32,15 +32,18 @@ export function turnPlan(char: { globalLore?: LoreEntry[] }, chat: Chat): Stage[
   if (basic.assetOn && basic.assetModel === 'aux') out.push({ id: 'asset', label: '이미지 태그', group: 'update', match: ['이미지 태그'] });
   if (wikiSettings(ss).auto === 'turn') out.push({ id: 'wiki', label: '위키', group: 'update', match: ['위키'] });
   // 인터넷 자동 호출: 같은 모델끼리 한 요청 (core/netjoint.ts). 묶음은 「통합」 한 칸, 혼자면 그 이름
+  // 칸 이름은 자동 호출의 실제 이름과 똑같이 (괴담톡은 「괴담톡 확인」): 단추로 보낸 「괴담톡 답장」이 이 칸에 붙지 않게
+  const autoLabel = (k: string, l: string) => (k === 'phone' ? '괴담톡 확인' : l);
   for (const group of jointGroups(ss)) {
     const labels = group.map((t) => JOINT_LABEL[t.kind]);
-    if (group.length > 1) out.push({ id: `joint:${group.map((t) => t.kind).join('+')}`, label: '통합', group: 'net', note: labels.join(' · '), match: [`${labels.join('+')} 통합`, ...labels] });
-    else out.push({ id: `net:${group[0].kind}`, label: labels[0], group: 'net', match: labels });
+    const calls = group.map((t) => autoLabel(t.kind, JOINT_LABEL[t.kind]));
+    if (group.length > 1) out.push({ id: `joint:${group.map((t) => t.kind).join('+')}`, label: '통합', group: 'net', note: labels.join(' · '), match: [`${labels.join('+')} 통합`, ...calls] });
+    else out.push({ id: `net:${group[0].kind}`, label: labels[0], group: 'net', match: calls });
   }
-  if (viewSettings(ss).auto === 'turn') out.push({ id: 'view', label: '괴담톡 보기', group: 'net', match: ['괴담톡 보기'] });
+  if (viewSettings(ss).auto === 'turn') out.push({ id: 'view', label: '관전', group: 'net', match: ['관전'] });
   for (const site of MALL_SITES) {
     const m = mallSettings(ss, site);
-    if (m.on && m.auto === 'turn' && (site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1')) out.push({ id: `mall:${site}`, label: MALL_NAME[site], group: 'net', match: [MALL_NAME[site]] });
+    if (m.on && m.auto === 'turn' && (site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1')) out.push({ id: `mall:${site}`, label: MALL_NAME[site], group: 'net', match: [`${MALL_NAME[site]} 진열`] });
   }
   return out;
 }

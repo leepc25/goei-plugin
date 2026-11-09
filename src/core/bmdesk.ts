@@ -140,6 +140,9 @@ export function parseCard(raw: string, dice: DeskDice, no: string): { agent: Des
   const rank = get('직급') || (dice.find(([k]) => k === '직급')?.[1] ?? '');
   return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank, dept: get('부서'), intro: get('소개'), voice: get('말투'), dice }, say };
 }
+/** 실패한 응답을 「받은 글 보기」로 보일 때: 상담원 신분이 담긴 카드·생각 단계를 가린다 (릴리스 점검 11-09: 실명·직급·부서 노출) */
+export const deskRawSafe = (raw: string): string =>
+  raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, '<card>(상담원 카드 — 숨김)</card>').replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, '<$1>(생각 단계 — 숨김)</$1>');
 export function parseSay(raw: string): string[] {
   const say = bubbles(block(raw, 'say'));
   if (!say.length) throw fail('응답에 <say> 블록(상담사 답)이 없어요.', raw);

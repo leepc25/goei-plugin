@@ -7,7 +7,7 @@ import { body as rootBody, themeVars } from './overlay';
 import { inside, type Rect } from '../core/fab';
 import type { ThemeName } from '../ui/theme';
 import { getPrefs } from '../core/settings';
-import { GROUPS, GROUP_LABEL, groupState, onProgress, progressTurn, running, runningStages, stageCount, stageState, turnSummary, type Stage, type StageState, type Turn } from '../core/progress';
+import { PROGRESS_WATCHDOG, GROUPS, GROUP_LABEL, groupState, onProgress, progressTurn, running, runningStages, stageCount, stageState, turnSummary, type Stage, type StageState, type Turn } from '../core/progress';
 
 type Safe = Awaited<ReturnType<RisuaiPluginAPI['getRootDocument']>>;
 type SafeEl = Awaited<ReturnType<Safe['createElement']>>;
@@ -19,7 +19,7 @@ const CARD_W = 300;
 const BTN = 48;
 const HIDE_AFTER_OK = 5000;
 const HIDE_AFTER_FAIL = 10000;
-const WATCHDOG = 10 * 60 * 1000;
+const WATCHDOG = PROGRESS_WATCHDOG;
 
 /** 파형(심전도 선) 아이콘 — 유령은 플로팅 단추가 쓰니 다른 모양 */
 const PULSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2.5-6 4 12 2.5-6h6"/></svg>';
@@ -126,6 +126,7 @@ function titleOf(t: Turn, now: number): string {
     return failed ? `끝 · ${failed}건 실패` : '끝';
   }
   const run = runningStages(t);
+  if (t.aborted && !run.length) return '응답 없음';
   if (!run.length) return t.replyAt ? '응답 뒤 정리 중' : t.mainAt ? '본편 응답 대기' : now - t.at < WATCHDOG ? '요청 준비 중' : '응답 없음';
   if (run.some((s) => s.id === 'main')) return '본편 응답 대기';
   const net = run.filter((s) => s.group === 'net');

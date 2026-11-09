@@ -936,7 +936,14 @@ function ownShopsLine(vars?: Vars): string {
 }
 const guideSectionDefault = (name: string): string => [...guideDefault('Shop').matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)].find((m) => m[1].trim() === name)?.[2] ?? '';
 /** 본편 표식 지침: 메인 모델이 판단할 때만 본편에 붙는다 (갱신기가 판단하면 빈 글) */
-export const shopGuide = (vars?: Vars): string => (shopJudgeBy(vars).by === 'main' ? fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where], rule: shopRule(vars) }) : '');
+export function shopGuide(vars?: Vars): string {
+  if (shopJudgeBy(vars).by !== 'main') return '';
+  // 옛 글로 고쳐 둔 MAIN_TAG 엔 {rule} 자리가 없을 수 있다: 그러면 기준 글을 뒤에 붙인다 (릴리스 점검 11-09)
+  const tag = G().MAIN_TAG ?? guideSectionDefault('MAIN_TAG');
+  const rule = shopRule(vars);
+  const out = fillGuide(tag, { where: WHERE[shopSettings(vars).where], rule });
+  return tag.includes('{rule}') ? out : `${out}\n${rule}`.trim();
+}
 
 /** 실제로 상점을 판단하는 쪽. 갱신기를 골랐는데 갱신기가 매 턴 돌지 않으면(꺼짐·수동) 메인 모델이 대신한다 (fallback) */
 export function shopJudgeBy(vars?: Vars): { pick: ShopJudge; by: 'main' | 'updater'; fallback: boolean } {

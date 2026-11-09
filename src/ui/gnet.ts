@@ -15,6 +15,7 @@ import { imageUrl } from './images';
 import { resolveSitePic } from '../core/sitepics';
 import { boardFiles, boardThumb, setSitePicSource, attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
 import { itemIconUrl } from '../host/itemicons';
+import { iconQuiet } from '../core/iconmatch';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
 import { lastReply } from '../core/phone';
@@ -680,7 +681,7 @@ function smPicUrl(p: GPost): string | null {
   const t = boardThumb(p.body);
   if (t?.url) return t.url;
   const name = smItemName(p);
-  return name ? itemIconUrl(name) : null;
+  return name ? iconQuiet(() => itemIconUrl(name)) : null;
 }
 const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];

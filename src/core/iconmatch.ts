@@ -44,7 +44,7 @@ export function parseIconAliases(text: string): Record<string, string> {
   return out;
 }
 /** 기본 대체 표 (설정에서 고친다. 표에 있는 말로만) */
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '손전등 → 플래시라이트', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases: Record<string, string> = parseIconAliases(ICON_ALIAS_DEFAULT);
 /** 지금 채팅의 대체 표를 올린다 (host/risu.ts loadContext). 빈 글이면 기본 표 */
 export function setIconAliases(text: string | undefined | null): void {
@@ -60,7 +60,18 @@ export const readIconMisses = (): IconMiss[] => misses.slice();
 export function clearIconMisses(): void {
   misses.length = 0;
 }
+/** 그 안의 매칭은 「그림 못 찾은 말」에 적지 않는다 (연어 마켓 매물 제목처럼 소지품 물건이 아닌 것, 릴리스 점검 11-09) */
+let quiet = 0;
+export function iconQuiet<T>(f: () => T): T {
+  quiet++;
+  try {
+    return f();
+  } finally {
+    quiet--;
+  }
+}
 function noteMiss(m: IconMiss): void {
+  if (quiet) return;
   if (misses.some((x) => x.name === m.name && x.icon === m.icon)) return;
   misses.push(m);
   if (misses.length > ICON_MISS_MAX) misses.splice(0, misses.length - ICON_MISS_MAX);
@@ -322,12 +333,15 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
   const head = makeHeadIndex(rows, reps);
   const frag = makeFragIndex(rows, reps);
-  const kinds = new Map<string, { head: (t: string) => Found | null; frag: (n: string, i?: string) => IconHit | null }>();
+  const kinds = new Map<string, { head: (t: string) => Found | null; frag: (n: string, i?: string) => IconHit | null; files: Set<string> }>();
   const kindIndex = (k: string) => {
     let x = kinds.get(k);
     if (!x) {
       const sub = rows.filter((r) => r.kind === k);
-      x = sub.length ? { head: makeHeadIndex(sub, reps), frag: makeFragIndex(sub, reps, KIND_MIN) } : { head: () => null, frag: () => null };
+      // 대표 그림도 그 종류 것만 (릴리스 점검 11-09: 무기/스프레이 → 다른 종류의 스프레이 대표가 붙었다)
+      const files = new Set(sub.map((r) => r.file));
+      const subReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => files.has(f)));
+      x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files } : { head: () => null, frag: () => null, files };
       kinds.set(k, x);
     }
     return x;
@@ -343,13 +357,15 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
       if (ok) return hit(ok);
       return (hn?.retry ? core(hn.retry, '', K) : null) || (hi?.retry ? core(hi.retry, '', K) : null) || frag(name, word);
     }
-    if (rank(hn) === 3) return hit(hn);
+    // 이름이 표의 말과 똑같아도 종류를 알면 그 종류 그림일 때만 (앰플|의료 → 봉인 앰플로 가지 않게)
+    if (rank(hn) === 3 && (!K || K.files.has(hn!.file))) return hit(hn);
     // 종류를 알면 그 종류 안에서: 물건말이 맞음 > 이름의 몸통 말이 맞음 > 물건말의 몸통만 맞음
     if (K) {
       const ki = word ? K.head(word) : null;
       const kn = name ? K.head(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(kn) >= 1 ? kn : ki;
-      if (k) return hit(k);
+      // 종류 안에 없으면 다른 종류로 가지 않고 아래 ② 종류 안 비슷한 그림·③ 종류 대표로 (릴리스 점검 11-09: 앰플|의료/앰플 → 봉인 앰플)
+      return hit(k);
     }
     // 둘 다 보고 더 확실한 쪽 (표의 말과 같음 > 꾸밈말까지 맞음 > 몸통만 맞음). 한국어 이름의 몸통 말이 맞으면 영어 그림 낱말보다 이름 (11-09: 스프레이 | canister 가 가스통으로 가지 않게)
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
@@ -359,8 +375,10 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   };
   return (name0: string, icon?: string): IconHit | null => {
     const { kind, word: w0 } = splitIconWord(icon);
-    const name = aliased(name0);
-    const word = aliased(w0);
+    // 원래 말이 표에 그대로 있으면 대체 표로 바꾸지 않는다 (릴리스 점검 11-09: 손전등 → 플래시라이트 → 케미컬 라이트)
+    const keep = (t: string) => { const n = normIcon(t); return !!n && rank(head(n)) === 3; };
+    const name = keep(name0) ? normIcon(name0) : aliased(name0);
+    const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const K = kind ? kindIndex(kind) : null;
     const found = core(name, word, K);
     if (found) return found;

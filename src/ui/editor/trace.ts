@@ -1,5 +1,6 @@
 // 점검 탭 「호출 흐름」 (11-07 사용자: 가장 최근 요청과 응답을 프로세스 형태로 — 어떤 모델을 불렀고, 요청은 뭐고, 받은 값은 뭐고, 다음 순서는 뭔지).
 // 자료는 host/trace.ts (턴마다 본편 요청 조립 → 본편 전 보조 호출 → 본편 응답 → 본편 뒤 보조 호출). 모양은 다른 점검 페이지(ps-group·ps-row)와 같고, 흐름만 세로 줄로 잇는다.
+import { keepOpen } from '../panels';
 import { ICONS } from '../icons';
 import type { TraceCall, TraceTurn } from '../../host/trace';
 
@@ -54,7 +55,7 @@ function nodes(t: TraceTurn): Node[] {
       meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
       // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
-      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg"${i >= m.tail.length - 3 ? ' open' : ''}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i></summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
+      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, i >= m.tail.length - 3)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i></summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
     });
   }
   for (const [c, i] of before) out.push(call(c, i));

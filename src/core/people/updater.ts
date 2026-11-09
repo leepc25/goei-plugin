@@ -1277,7 +1277,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
 
   // 6c-1. 상점 판단 (11-09, 설정 「상점 판단」이 갱신기): 맡긴 응답(shop_check.m)에 가게가 있으면 하나, 아니면 「상점 없음」(null).
   // 가게가 있다는 건 장면 전체로 보는 판단이라 인용은 받지 않는다 (인용이 어긋났다고 가게를 놓치지 않게)
-  if (input.shop && !ctx.only?.length) {
+  // 답에 shop 키가 아예 없으면 판단하지 않은 것으로 둔다 (지금 상태 그대로): 명시한 null 만 「상점 없음」
+  if (input.shop && !ctx.only?.length && r.shop !== undefined) {
     const t = r.shop && typeof r.shop === 'object' && !Array.isArray(r.shop) ? r.shop : null;
     const name = plain(t?.name, 30);
     const ev = evidenceLoose(input.shop.m);

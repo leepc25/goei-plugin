@@ -773,7 +773,7 @@ function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
     const startLength = ctx.chat.message?.length ?? 0;
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate)));
     const { value } = await askModel(prompt.messages, phoneSettings(ctx.chat.scriptstate).model, (raw) => parseView(raw, set.preset), {
-      ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate, label: '괴담톡 보기',
+      ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate, label: '관전',
     });
     let note = '';
     let id = '';

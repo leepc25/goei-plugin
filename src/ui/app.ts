@@ -226,7 +226,8 @@ function ensureRoot(): HTMLElement {
   });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
-    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open)) render();
+    // 연어 마켓 매물 그림도 같은 팩 (릴리스 점검 11-09: 팩이 받힌 뒤에도 가방 아이콘 그대로였다)
+    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open || (inBrowser() && curTab().site === 'sm'))) render();
   });
   const style = document.createElement('style');
   style.textContent = css + LOOK_CSS;
@@ -488,7 +489,7 @@ function ensureRoot(): HTMLElement {
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
     // 우주 쇼핑몰 질문 창 (11-09 사용자: 팝업창처럼 Esc·바깥 누름으로 닫힘)
-    if (view.kind === 'started' && mallAskOpen()) return void handle('mall-ask-close');
+    if (view.kind === 'started' && inBrowser() && mallAskOpen(curTab().site)) return void handle('mall-ask-close');
     if (view.kind === 'started' && inBrowser() && isBoardSite(curTab().site) && gnetDmOpen()) return void handle('gn-dm-close');
     // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
     if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');

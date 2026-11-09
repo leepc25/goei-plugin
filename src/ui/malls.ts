@@ -13,11 +13,11 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { minuteText, orderDue, orderReady, ordersText, ordersVars, readOrders, worldMinute, type CosOrder } from '../core/orders';
+import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, worldMinute, type CosOrder } from '../core/orders';
 import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
-import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
+import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
@@ -115,7 +115,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
     if (kind === 'shelf') src.assign = cosAssignment(s.size[0] + Math.floor(Math.random() * (s.size[1] - s.size[0] + 1)), s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site); // 포인트몰도 (11-09 사용자)
     if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
-    if (site === 'cos') { const od = ordersText(readOrders(ctx.chat.scriptstate), worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? ''); if (od) src.orders = od; }
+    if (site === 'cos') { const od = ordersText(liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)), worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? ''); if (od) src.orders = od; }
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${MALL_NAME[site]} ${kind === 'shelf' ? '진열' : '문의'}` };
     let next: ShopState;
@@ -148,7 +148,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     v.cart = v.cart.filter((id) => shelfItems(next).some((x) => x.id === id));
   } catch (error) {
     v.notice = error instanceof Error ? error.message : String(error);
-    v.failRaw = String((error as { raw?: string }).raw ?? '');
+    v.failRaw = deskRawSafe(String((error as { raw?: string }).raw ?? ''));
     if (kind === 'talk') {
       // 내 말은 적어 뒀으니 답이 안 왔으면 되돌린다
       const cur = env.current();
@@ -227,7 +227,9 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
     for (const it of list) {
       const walletId = it.price > 0 ? `${site}_${it.id}` : '';
       if (walletId) w = addWalletEntry(w, { id: walletId, anchor, amount: -it.price, memo: `${it.name} (${MALL_NAME[site]})`, src: 'store' });
-      const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}` };
+      // 흥정으로 붙은 다른 대가(it.pay)도 기록에 남긴다 (일반 상점 ui/shop.ts 와 같게, 릴리스 점검 11-09)
+      const extra = it.pay ? ` + ${it.pay}` : '';
+      const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}${extra}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}${extra}` };
       items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, ...paid });
       st = markSold(st, it.id);
     }
@@ -241,6 +243,22 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
 export async function mallAction(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv, site: MallSite): Promise<boolean> {
   if (!action.startsWith('mall-')) return false;
   sync(ctx);
+  // 돈이 오가는 동작은 처리 중 한 번만 (릴리스 점검 11-09: 두 번 누르면 두 번째 결과가 안내를 실패 문구로 덮었다)
+  const MONEY = ['mall-pay', 'mall-buy', 'mall-note-buy', 'mall-quote-accept', 'mall-custom-take', 'mall-sell'];
+  if (MONEY.includes(action)) {
+    if (moneyBusy) return true;
+    moneyBusy = true;
+    try {
+      return await mallMoney(action, value, ctx, env, site);
+    } finally {
+      moneyBusy = false;
+    }
+  }
+  return mallMoney(action, value, ctx, env, site);
+}
+let moneyBusy = false;
+/** mallAction 본체 (돈 동작은 잠금 안에서 불린다) */
+async function mallMoney(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv, site: MallSite): Promise<boolean> {
   const v = ui[site];
   const st = readMall(ctx.chat.scriptstate, site);
   const s = mallSettings(ctx.chat.scriptstate, site);
@@ -351,12 +369,13 @@ export async function mallAction(action: string, value: string | undefined, ctx:
     }
     case 'mall-quote-accept': {
       // 맞춤 주문: 견적을 선납하고 주문 목록에 넣는다. 완성품은 「주문 조회」에서 납기 뒤에 받는다
-      const q = (st.quotes ?? []).find((x) => x.id === value && !x.accepted);
+      const q = (st.quotes ?? []).find((x) => x.id === value && quoteOpen(x, liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat))));
       if (site !== 'cos' || !q || v.loading) return true;
       let ok = false; let short = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
         const now = readMall(chat.scriptstate, site);
-        const nextShop = acceptQuote(now, q.id);
+        // 주문한 응답이 지워져 주문이 없어진 견적은 다시 주문할 수 있다 (accepted 를 되돌려 acceptQuote 를 그대로 쓴다)
+        const nextShop = acceptQuote({ ...now, quotes: (now.quotes ?? []).map((x) => (x.id === q.id ? { ...x, accepted: false } : x)) }, q.id);
         if (!nextShop) return null;
         const alive = aliveAnchors(chat);
         let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
@@ -366,7 +385,7 @@ export async function mallAction(action: string, value: string | undefined, ctx:
         const { sold: _s, tag: _t, was: _w, orig: _o, pay: _p, ...item } = q.item;
         const order: CosOrder = { id: q.id, anchor, price: q.price, hours: q.hours, orderedAt: worldMinute(chat), orderedKey: anchor, item };
         ok = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...ordersVars([...readOrders(chat.scriptstate), order]), ...mallVarsOf(site, nextShop) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...ordersVars([...liveOrders(chat.scriptstate, aliveAnchors(chat)), order]), ...mallVarsOf(site, nextShop) } };
       });
       v.info = ok ? `「${q.item.name}」 주문이 접수 되었다. 선납 완료. 완성되면 「주문 조회」에서 받아라.` : short ? '잔고가 모자란다. 입금이 필요하다.' : '주문할 수 없는 상태다.';
       await env.refresh();
@@ -374,11 +393,11 @@ export async function mallAction(action: string, value: string | undefined, ctx:
     }
     case 'mall-custom-take': {
       // 완성품 받기: 납기가 지났을 때만. 그제야 설명·효과가 보이고(진실은 숨긴 채) 소지품에 들어간다
-      const o = readOrders(ctx.chat.scriptstate).find((x) => x.id === value);
+      const o = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)).find((x) => x.id === value);
       if (site !== 'cos' || !o || !orderReady(o, worldMinute(ctx.chat), lastBot(ctx.chat)?.key ?? '')) return true;
       let ok = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const list = readOrders(chat.scriptstate);
+        const list = liveOrders(chat.scriptstate, aliveAnchors(chat));
         const cur = list.find((x) => x.id === o.id);
         if (!cur || cur.taken) return null;
         const anchor = lastBot(chat)?.key ?? '';
@@ -602,16 +621,19 @@ function noteCard(st: ShopState, id: string | undefined, v: View): string {
 }
 
 /** 맞춤 주문 견적 카드: 이름·값·납기만 (설명·효과는 받을 때 본다). 선납하면 주문 */
-function quoteCard(st: ShopState, id: string | undefined, v: View): string {
-  const q = id ? (st.quotes ?? []).find((x) => x.id === id) : null;
-  if (!q) return '';
+/** 견적을 (다시) 주문할 수 있나: 아직 안 했거나, 했는데 그 주문이 지운·다시 굴린 응답과 함께 없어졌을 때 */
+const quoteOpen = (q: { id: string; accepted?: boolean }, orders: CosOrder[]): boolean => !q.accepted || !orders.some((o) => o.id === q.id);
+function quoteCard(st: ShopState, id: string | undefined, v: View, orders: CosOrder[] = []): string {
+  const q0 = id ? (st.quotes ?? []).find((x) => x.id === id) : null;
+  if (!q0) return '';
+  const q = { ...q0, accepted: !quoteOpen(q0, orders) };
   const h = q.hours >= 24 ? `${Math.round((q.hours / 24) * 10) / 10}일` : `${q.hours}시간`;
   return `<div class="q-note q-quote${q.accepted ? ' done' : ''}"><span>🛠 맞춤 주문 견적</span><b>${esc(q.item.name)}</b><em>${won(q.price)}</em><small>납기 ${h}</small>${q.accepted ? '<small class="ok">선납 완료 — 주문 조회에서 받아라</small>' : `<button class="cs-btn" data-action="mall-quote-accept" data-value="${esc(q.id)}"${v.loading ? ' disabled' : ''}>선납하고 주문</button>`}</div>`;
 }
 
 /** 「주문 조회」: 진행 중·받을 수 있음·받음 (11-09 사용자: 맞춤 상품이 진열되는 건 이상하다 → 따로 받는 창) */
 function cosOrders(ctx: ChatContext, v: View): string {
-  const list = readOrders(ctx.chat.scriptstate);
+  const list = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat));
   const nowMin = worldMinute(ctx.chat);
   const lastKey = lastBot(ctx.chat)?.key ?? '';
   if (!list.length) return '<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><p>주문의 존재는 없다. 운영자에게 질문에서 맞춤 주문을 말해라.</p></div>';
@@ -676,8 +698,9 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
   const at = mobile ? '' : winStyle(v.win);
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
+  const orders = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat));
   const log = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}${quoteCard(st, l.quote, v)}</div>`)).join('')
+    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}${quoteCard(st, l.quote, v, orders)}</div>`)).join('')
     : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
   const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';
@@ -705,7 +728,7 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const sale = s.feature ? list.filter((x) => x.tag === 'sale' && x.was) : [];
   const rest = list.filter((x) => !rare.includes(x) && !sale.includes(x));
   const ufo = siteLogo('cos', 'cs-ufo');
-  const pending = readOrders(ctx.chat.scriptstate).filter((o) => !o.taken).length;
+  const pending = liveOrders(ctx.chat.scriptstate, aliveAnchors(ctx.chat)).filter((o) => !o.taken).length;
   const menu = [['', '처음 화면'], ['cart', `장바구니 (${v.cart.length})`], ['orders', `주문 조회${pending ? ` (${pending})` : ''}`]].map(([k, l]) => `<button class="${v.page === k ? 'on' : ''}" data-action="mall-page" data-value="${k}">◈ ${l}</button>`).join('')
     + '<button data-action="mall-ask" data-value="">◈ 운영자에게 질문</button>';
   const note = mallNote(ctx.chat.scriptstate, site);
@@ -978,7 +1001,8 @@ async function deskSettingsAction(action: string, value: string | undefined, ctx
 }
 
 /** 질문 창이 떠 있나 (Esc 처리용) */
-export const mallAskOpen = (): boolean => ui.cos.ask || ui.bm.ask;
+/** 지금 보는 몰의 질문·상담 창이 떠 있나 (릴리스 점검 11-09: 다른 탭으로 옮긴 몰의 창이 남아 Esc 를 먹었다) */
+export const mallAskOpen = (site?: string): boolean => (site === 'cos' || site === 'bm' ? ui[site].ask : false);
 
 /** 우주 쇼핑몰 질문 창을 진짜 팝업창처럼 (11-09 사용자): 제목줄 끌어 옮기기, 오른쪽 아래 모서리로 크기 조절, 창 밖을 누르면 닫힘 (ui/popwin.ts 공통) */
 export const mallWinSpec: PopSpec = {

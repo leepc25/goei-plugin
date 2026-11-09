@@ -80,7 +80,7 @@ import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
 import { traceBegin, traceMain, traceReply } from './host/trace';
-import { progressEnd, progressPlan } from './core/progress';
+import { progressAbort, progressEnd, progressPlan, progressTurn, progressWatch } from './core/progress';
 import { turnPlan } from './core/progplan';
 import { bookText } from './core/refs';
 import { stripMarkers } from './core/sanitize';
@@ -454,8 +454,9 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
   setWaiting(false);
-  // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 턴을 닫는다. 뒤 작업이 없으면 바로
+  // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 이 턴만 닫는다. 뒤 작업이 없으면 바로
   const after: Promise<unknown>[] = [];
+  const pTurn = progressTurn();
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
@@ -463,7 +464,10 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 이벤트의 캐릭터는 카드 그대로라 세계 데이터(가상 로어북)가 없다. 경량 카드는 명부 폴더가 가상이라 이걸 빼면 상황판 처리가 통째로 건너뛰어진다 (2026-10-27)
     const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
-    if (typeof raw !== 'string') return;
+    if (typeof raw !== 'string') {
+      progressAbort(pTurn); // 응답이 안 붙음: 본편 실패로 닫는다
+      return;
+    }
     traceReply(raw);
     let latest: Chat | null = null;
     if (chat.scriptstate?.['$st_anomaly_on'] === '1') {
@@ -601,7 +605,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
-    void Promise.allSettled(after).then(() => progressEnd());
+    void Promise.allSettled(after).then(() => progressEnd(pTurn));
   }
 }
 
@@ -855,6 +859,10 @@ function startWatcher(fab: Fab | null): () => void {
       const pShow = next.fabVisible && progressOn();
       const pKey = `${pShow}`;
       if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
+      // 떠 있으면 매 초 폭(폰·PC 모양)·자리를 다시 맞춘다 (릴리스 점검 11-09: 창 크기를 바꿔도 그대로였다)
+      else if (prog && pShow) await prog.setVisible(true).catch(() => {});
+      // 턴에 채팅을 붙이고, 채팅을 옮겼으면 앞 채팅의 턴을 치우고, 본편을 너무 오래 기다리면 실패로 닫는다
+      progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {

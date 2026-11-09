@@ -62,7 +62,7 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
   safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
   safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
   for (const site of BOARD_SITES) safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
-  safe('괴담톡 관전', () => count(previewPhoneView(ctx)));
+  safe('관전', () => count(previewPhoneView(ctx)));
   safe('위키 자동 작성', () => {
     const w = previewWikiAuto(ctx);
     const a = count(w.article);
@@ -150,7 +150,8 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     const mates = jointMates(ss, kind);
     if (mates.length) {
       const first = jointGroups(ss).find((g) => g.some((t) => t.kind === kind))?.[0].kind === kind;
-      return { calls: first ? `1회 (${mates.map((k) => JOINT_LABEL[k]).join('·')}와 한 요청으로 합침)` : `${JOINT_LABEL[mates[0]]}와 합쳐 0회 추가`, sure: first ? 1 : 0 };
+      const names = mates.map((k) => JOINT_LABEL[k]).join('·');
+      return { calls: first ? `1회 (${names}${wa(names)} 한 요청으로 합침)` : `${JOINT_LABEL[mates[0]]}${wa(JOINT_LABEL[mates[0]])} 합쳐 0회 추가`, sure: first ? 1 : 0 };
     }
     const why = !jointOn(ss) ? ' (한 번에 요청 꺼짐)' : tasks.length > 1 ? ' (모델이 달라 따로)' : '';
     return { calls: `1회${why}`, sure: 1 };
@@ -177,14 +178,14 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
       const on = g.enabled && g.auto;
       return { name: `${BOARD_NAME[site]} 새로고침`, sub: site === 'sm' ? '매물·댓글·쪽지' : '게시판 글·댓글·쪽지', kind: 'aux', on, model: on ? id(featureModel(sv, 'gn')) || mm(g.model) : undefined, calls: !g.enabled ? '호출 없음 (사이트 끔)' : g.auto ? jointText(site).calls : g.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? jointText(site).sure : 0, maybe: 0 };
     }),
+    { name: '관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
+    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
     ...(['cos', 'bm'] as MallSite[]).map((site): Node => {
       const m = mallSettings(ss, site);
       const login = site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1';
       const on = m.on && m.auto === 'turn' && login;
       return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
     }),
-    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
-    { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
   ];
   const manual: Node[] = [
     { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
@@ -234,12 +235,18 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
   const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
   return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>.${jointOn(ctx.chat.scriptstate) ? '' : ' 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판은 따로 불러요.'} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
+    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>.${jointOn(ctx.chat.scriptstate) ? '' : ' 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판(괴담넷·괴담갤·세정게·연어 마켓)은 따로 불러요.'} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
     ${group('본편', '', [main])}
-    ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)', post)}
+    ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·게시판·관전·위키·쇼핑몰은 인물 갱신이 끝난 뒤)', post)}
     ${group('턴과 무관', '누르거나 열 때만', manual)}
     </div></div>`;
+}
+
+/** 받침에 따라 「와/과」 (릴리스 점검 11-09: 「괴담톡와」) */
+function wa(word: string): string {
+  const c = word.trim().slice(-1).charCodeAt(0);
+  return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? '과' : '와';
 }
 
 const FLOW_BACK = '<button class="gx-mini" data-action="ed-node" data-value="manage:flow">호출 흐름 →</button>';
