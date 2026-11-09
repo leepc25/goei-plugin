@@ -3284,8 +3284,11 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-ux:hover { color: var(--text); background: var(--panel2); }
 /* 끌기: 놓을 수 있는 자리는 신호색 테두리. 버리기 띠는 끄는 동안만 아래에 */
 /* 11-09 사용자: 바깥 outline 금지(배율·overflow에 잘림) → 안쪽 2px */
-.it-over-ok { outline: none; box-shadow: inset 0 0 0 2px var(--signal); }
+/* 11-09 사용자(2차): 안쪽 그림자는 칸 그림 밑에 깔려 격자 왼쪽·위쪽이 잘려 보였다 → 맨 위 겹(::after)에 2px 테두리, 안쪽에만 (고른 테두리와 같은 규칙) */
+.it-over-ok { outline: none; }
+[data-drop].it-over-ok:not(.it-trash) { position: relative; }
 .it-usebox.it-over-ok, .it-grid.it-over-ok { border-radius: 12px; }
+[data-drop].it-over-ok:not(.it-trash)::after { content: ''; position: absolute; inset: 0; z-index: 6; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none; }
 .it-trash { display: none; }
 .it-scrollwrap { position: relative; min-width: 0; }
 /* 버리기 띠: 격자 위에 뜬다 — 격자 줄 수와 상관없이 같은 높이, 아래 줄 칸을 집기 어렵지 않게 적당히 (2026-11-08 사용자) */
