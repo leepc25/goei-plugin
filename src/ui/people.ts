@@ -1100,13 +1100,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
     case 'pp-sex-on':
     case 'pp-sex-clear':
     case 'pp-sex-save': {
-      const [who, f] = v.split('|') as [string, SexualField];
+      // 저장 단추는 data-take 로 글상자 값을 넘기므로 v 가 글이다. 어느 칸인지는 편집 중인 키(sexEdit)로 — 전에는 글을 「이름|칸」으로 읽어
+      // 인물을 못 찾고 아무것도 저장 안 되면서 「저장했어요」만 떴다 (11-09 사용자)
+      const key = action === 'pp-sex-save' ? peopleUi.sexEdit : v;
+      const text = action === 'pp-sex-save' ? v : '';
+      const [who, f] = key.split('|') as [string, SexualField];
       await mutate(ctx, env, (store) => {
         const p = store.people[who];
         if (!p || !SEXUAL_FIELDS.includes(f)) return false;
         const sx = ensureSexual(p);
         if (action === 'pp-sex-on') { if (f === 'desire') sx.desireOn = !sx.desireOn; else sx.paraphiliaOn = !sx.paraphiliaOn; }
-        else setSexualText(p, f, action === 'pp-sex-clear' ? '' : peopleUi.sexDraft, new Date().toISOString(), true);
+        else setSexualText(p, f, action === 'pp-sex-clear' ? '' : text, new Date().toISOString(), true);
         return true;
       });
       if (action === 'pp-sex-save') { peopleUi.sexEdit = ''; peopleUi.info = '저장했어요.'; }
