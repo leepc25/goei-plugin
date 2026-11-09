@@ -487,9 +487,10 @@ function cosOrders(ctx: ChatContext): string {
     const ready = orderReady(o, nowMin, lastKey);
     const due = orderDue(o);
     const when = o.taken ? '받음' : ready ? '<b class="cs-red">완성 — 받을 수 있다</b>' : due !== null ? `제작 중 · 납기 ${esc(minuteText(due))}${nowMin !== null ? ` (${Math.max(1, Math.ceil((due - nowMin) / 60))}시간 남음)` : ''}` : `제작 중 · 납기 ${o.hours}시간 (다음 응답 뒤)`;
-    return `<tr class="${o.taken ? 'done' : ''}"><td>${esc(o.item.name)}</td><td>${won(o.price)}</td><td>${when}</td><td>${ready ? `<button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>` : ''}</td></tr>`;
+    // 받기 단추는 상태 칸 안에 (11-09 사용자: 끝의 빈 칸이 뭐냐)
+    return `<tr class="${o.taken ? 'done' : ''}"><td>${esc(o.item.name)}</td><td>${won(o.price)}</td><td>${when}${ready ? ` <button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>` : ''}</td></tr>`;
   }).join('');
-  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th><th></th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
+  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
 }
 
 function opText(text: string, st: ShopState): string {
