@@ -326,6 +326,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'right', [['left', '왼쪽'], ['right', '오른쪽']], busy), '위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 폰의 「목록」 책갈피도 같은 쪽으로 가요.', 'device'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요.', 'device'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.', 'device'),
+      // 호출 진행 창 (11-09 사용자): 채팅을 보내면 라우터→디렉터→본편→갱신기→인터넷이 어디까지 돌았는지 (host/progwin.ts)
+      field('호출 진행 창', seg('set-progress', getPrefs().progress === false ? '0' : '1', [['1', 'ON'], ['0', 'OFF']], busy), '채팅을 보내면 채팅 화면 오른쪽 위에 지금 도는 단계(라우터·디렉터·본편·갱신기·인터넷)와 모델·토큰·경과 시간을 보여 줘요. PC는 카드로 펼쳐졌다 끝나면 단추로 접히고, 폰은 점 다섯 개짜리 막대예요. 눌러서 지난 턴을 다시 볼 수 있어요.', 'device'),
       // 창 둘레 기기 틀 (2026-10-29 사용자, ui/frame.ts). 좁아서 숨긴 상태는 app.ts 가 .gx 에 data-frame-hidden 으로 적는다
       field('외부 프레임', seg('set-frame', getPrefs().frame ?? 'tablet', [['none', '없음'], ['tablet', '일반 태블릿'], ['tactical', '전술 태블릿']], busy), `PC에서 상황판 창 둘레에 그리는 기기 틀로, 폰이나 필드 전체화면에서는 그리지 않고 창 폭이 모자라면 자동으로 숨겨요.${document.querySelector<HTMLElement>('.gx')?.dataset.frameHidden === '1' ? '<br><span class="st-frame-note">지금 창 폭이 좁아 프레임을 숨겼어요</span>' : ''}`, 'device'),
       field('설정 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['60', '60%'], ['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 92%. 폰에서는 늘 전체 화면이에요.', 'device'),
@@ -736,6 +738,10 @@ export async function handleSettings(action: string, value: string | undefined, 
   }
   if (action === 'set-wiki-side') {
     if (v === 'left' || v === 'right') await saveDefaults(env, (p) => ({ ...p, wikiSide: v }));
+    return true;
+  }
+  if (action === 'set-progress') {
+    if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, progress: v === '0' ? false : undefined }));
     return true;
   }
   if (action === 'set-frame') {

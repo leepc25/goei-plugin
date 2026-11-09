@@ -42,6 +42,7 @@ import { supplementAssets } from './host/asset';
 import { loadContext, updateCharacterLore, updateChat, getChar, type ChatContext, type CharacterSnapshot } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
+import { createProgWin, progressOn, type ProgWin } from './host/progwin';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
@@ -79,6 +80,8 @@ import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
 import { traceBegin, traceMain, traceReply } from './host/trace';
+import { progressEnd, progressPlan } from './core/progress';
+import { turnPlan } from './core/progplan';
 import { bookText } from './core/refs';
 import { stripMarkers } from './core/sanitize';
 
@@ -147,6 +150,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
       await stepAsync('호출 기록', () => traceBegin(), undefined);
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
+      // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
+      if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
       // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
       await stepAsync('유저 이름', () => readUser(), undefined);
       messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
@@ -449,6 +454,8 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
   setWaiting(false);
+  // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 턴을 닫는다. 뒤 작업이 없으면 바로
+  const after: Promise<unknown>[] = [];
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
@@ -542,6 +549,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
     {
       const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+      after.push(pp);
       if (!peopleSettings(now.scriptstate).parallel) await pp;
     }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
@@ -561,7 +569,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         c.message ??= [];
         return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char: char as never, chat: c };
       };
-      void (async () => {
+      after.push((async () => {
         applyAdvanced(now!.scriptstate);
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -585,10 +593,12 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
         for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
-      })();
+      })());
     }
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
+  } finally {
+    void Promise.allSettled(after).then(() => progressEnd());
   }
 }
 
@@ -786,6 +796,8 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 let vsChat = '';
 let vsShownChat = '';
 let vsPadKey = '';
+let prog: ProgWin | null = null;
+let progKey = '';
 async function onVersusPad(fab: Fab | null): Promise<void> {
   if (!vsChat) return;
   vsShownChat = vsChat;
@@ -836,6 +848,10 @@ function startWatcher(fab: Fab | null): () => void {
       const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
       const padKey = `${pad}:${vsOpen()}`;
       if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
+      // 호출 진행 창 (11-09): 유령 단추와 같은 화면에서만, 설정 「화면 → 호출 진행 창」이 켜져 있을 때
+      const pShow = next.fabVisible && progressOn();
+      const pKey = `${pShow}`;
+      if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -897,6 +913,15 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     const f = fab;
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));
+    try {
+      prog = await createProgWin();
+      const pw = prog;
+      void pw.setTheme(currentTheme());
+      onThemeChange((t) => void pw.setTheme(t).catch(() => {}));
+    } catch (error) {
+      console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      prog = null;
+    }
     stopWatcher = startWatcher(fab);
     lap('유령 단추 붙임');
   } catch (error) {
@@ -919,6 +944,9 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     unload: async () => {
       stopWatcher?.();
       await fab?.remove().catch(() => {});
+      await prog?.remove().catch(() => {});
+      prog = null;
+      progKey = '';
     },
   };
 }

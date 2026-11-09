@@ -3,6 +3,7 @@
 // 저장: 플러그인 저장소 goei-trace 에 최근 TRACE_KEEP 턴. 요청·응답 원문은 한 건당 TRACE_TEXT 자까지(앞 2/3 + 뒤 1/3). 화면은 ui/editor/trace.ts.
 import type { LlmMessage } from './llm';
 import { tokens } from '../core/gnet';
+import { progressBegin, progressMain, progressReply } from '../core/progress';
 
 export interface TraceCall {
   /** 호출 종류 (라우터·디렉터·갱신기·괴담넷·괴담톡·위키·소지품·상점·…) */
@@ -145,6 +146,7 @@ export async function traceBegin(): Promise<void> {
   const t: TraceTurn = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, at: new Date().toISOString(), calls: [] };
   open = t;
   replied = false;
+  progressBegin(); // 진행 창 (core/progress.ts): 새 턴
   await push(t);
 }
 
@@ -160,6 +162,7 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
     totalChars: rows.reduce((n, r) => n + r.content.length, 0),
     totalTokens: rows.reduce((n, r) => n + tokens(r.content), 0),
   };
+  progressMain(); // 본편 요청을 보낸다
   save();
 }
 
@@ -168,6 +171,7 @@ export function traceReply(text: string): void {
   if (!open) return;
   open.reply = { at: new Date().toISOString(), text: clip(text), chars: text.length, tokens: tokens(text) };
   replied = true;
+  progressReply(open.reply.tokens);
   save();
 }
 
