@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 02:11 KST 「이런식으로 진행자 동작 전체 다 뽑아… 한번에 요청 넣어」 → 진행자 동작 9회(excited·urgent·count·amazed·whisper·laugh·cold·angry·idle)
 - 사용자 11-10 02:03 KST 「뽑아」 → 진행자 말하기 3차(무저갱 뺌, 말에 맞춘 손짓) 클립 1회
 - 사용자 11-10 01:57 KST 「뽑아」 → 진행자 말하기 1번(상품 소개, 인계본 문장) 클립 1회
 - 사용자 11-10 KST 「1. 아이들 2. 말하기 3. 상품 가리키기 일단 이거부터 뽑아」 → 진행자 동작 클립 3회(idle/talk/present)
@@ -291,3 +292,12 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_idle_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_talk2_intro_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_talk3_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_idle_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_count_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_angry_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_excited_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_cold_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_laugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_urgent_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_amazed_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_whisper_req.json

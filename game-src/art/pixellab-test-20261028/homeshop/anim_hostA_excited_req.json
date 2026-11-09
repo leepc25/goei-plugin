@@ -1,0 +1,18 @@
+{
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/host_sprite_v1.png",
+ "box": [
+  0,
+  0,
+  256,
+  256
+ ],
+ "frame_count": 16,
+ "no_background": true,
+ "enhance_prompt": false,
+ "drift_threshold": 0,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a TV home shopping host in a black suit, white shirt and dark red tie, white made-up face, large black eyes, holding a microphone",
+ "initial_pose": "standing turned three-quarters to the right, leaning slightly forward, left hand holding the microphone at chest height, right arm extended down to the right with the open palm facing up, closed-lip smile",
+ "description": "talks to the camera like a thrilled, excited salesman, faster and louder: the mouth opens and closes over and over as if speaking, quickly; the eyebrows rise, the head bobs eagerly, the shoulders bounce; the hand holding the microphone stays near the mouth; the free right hand clenches into a fist and pumps down hard in rhythm with the words; then settles back into the starting pose"
+}
