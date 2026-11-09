@@ -6,7 +6,7 @@ import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MAR
 import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
-import { BOARD_SITES, boardState, boardView } from './core/boards';
+import { BOARD_SITES, boardView } from './core/boards';
 import { mainContextRules } from './core/gnetPrompt';
 import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
 import { guidePrompt, RP_HEAD } from './core/guides';
@@ -26,7 +26,6 @@ import { chatPhase } from './core/start';
 import { autoRefresh, autoView } from './ui/phone';
 import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
-import { featureModel } from './core/craft';
 import { autoRefreshGnet } from './ui/gnet';
 import { autoRefreshMall } from './ui/malls';
 import { MALL_SITES, mallSettings } from './core/malls';

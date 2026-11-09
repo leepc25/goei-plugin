@@ -2,11 +2,12 @@
 // 매 턴 자동 호출인 괴담톡·괴담넷·괴담갤·세정게·연어 마켓 가운데 모델(메인/보조·전용 모델 ID)이 같은 것끼리 한 요청(host/joint.ts)으로 보낸다.
 // 켬/끔 스위치 하나($net_joint, 기본 켬) — 괴담톡·괴담넷 설정의 「자동 호출」 아래 「한 번에 요청」. 끄면 하나씩 따로 1회.
 import { BOARD_SITES, boardState, type BoardSite } from './boards';
+import type { ScriptState } from './types';
 import { featureModel } from './craft';
 import { gnetSettings } from './gnet';
 import { phoneSettings } from './phone';
 
-type State = Record<string, unknown> | undefined;
+type State = ScriptState | undefined;
 
 export const JOINT_VAR = '$net_joint';
 export type JointKind = 'phone' | BoardSite;

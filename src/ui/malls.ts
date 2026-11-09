@@ -13,7 +13,7 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, itemsVars, readItems } from '../core/items';
 import { getPrefs } from '../core/settings';
 import { applyShelf, applyTalk, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
-import { winStyle, type PopSpec, type WinBox } from './popwin';
+import { winStyle, type PopSpec } from './popwin';
 import { COS_ACCOUNT, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, readMall, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';

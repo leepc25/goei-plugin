@@ -107,7 +107,7 @@ async function upd(ctx: ChatContext, f: (chat: Chat) => Chat | null | undefined)
 /** 사이트마다 따로 둔 화면 상태 (글 펼침·쓰던 글 등) */
 let uiSite: BoardSite = 'gn';
 const uiSaved = new Map<BoardSite, GnetUi>();
-const freshUi = (): GnetUi => ({ sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false, cat: '', sort: 'new', q: '', page: 1 });
+const freshUi = (): GnetUi => ({ sub: 'board', open: null, openDm: null, compose: null, draft: '', attach: [], to: '', confirm: null, editNick: false, nick: '', notice: '', failure: null, settings: false, attachMenu: false, cat: '', sort: 'new', q: '', page: 1, dmWin: null });
 export function useBoardSite(site: BoardSite): void {
   if (site === uiSite) return;
   uiSaved.set(uiSite, { ...gnet });
@@ -302,7 +302,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
       if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
-      return writeGnet(latest, cur, { ack: viewing() });
+      return writeGnet(latest, cur, { ack: viewing(siteOf(ctx)) });
     });
     return note.trim();
   });
@@ -357,7 +357,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
       if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
       if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
       if (inc.note) note += ` ${inc.note}`;
-      return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing() });
+      return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing(siteOf(ctx)) });
     });
     return note.trim();
   });
@@ -411,7 +411,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       cur.dms.push({ nick, side: 'npc', body: reply, unread: true, date: dateNow(chat) });
-      return writeGnet(chat, cur, { ack: viewing() });
+      return writeGnet(chat, cur, { ack: viewing(siteOf(ctx)) });
     });
     return '';
   });
