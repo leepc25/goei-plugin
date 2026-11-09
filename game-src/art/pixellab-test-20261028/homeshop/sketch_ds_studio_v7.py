@@ -18,6 +18,14 @@ d.line([140,172,150,250,160,172],fill=C,width=w)
 d.rectangle([20,300,300,444],outline=C,width=w)                      # 단상
 d.ellipse([80,286,120,306],outline=C,width=w); d.ellipse([180,286,220,306],outline=C,width=w)
 d.polygon([(340,330),(582,330),(572,316),(350,316)],outline=C,width=w); d.rectangle([340,330,582,444],outline=C,width=w)
+# 빈 곳 채우기(사용자 11-09 「배경 저렇게 비워 놓을거냐」): 위키 메인 스튜디오 물건
+d.rectangle([4,60,36,250],outline=C,width=w); [d.line([8,y,32,y],fill=C,width=1) for y in range(72,246,10)]   # 왼쪽 끝 실시간 채팅 모니터(세로로 긴 화면)
+d.rectangle([196,40,228,62],outline=C,width=w); d.rectangle([236,40,268,62],outline=C,width=w)                # 큐 조명 상자 둘(박수·웃음)
+d.rectangle([242,92,290,150],outline=C,width=w)                                                               # 진행자 뒤 오른쪽 벽: 채널 로고 판(글자 없음)
+d.rectangle([300,312,336,350],outline=C,width=w); d.rectangle([304,290,332,312],outline=C,width=w)          # 단상과 테이블 사이 바닥: 빨간 우체통
+d.line([344,140,572,140],fill=C,width=1); [d.rectangle([350+i*44,150+(3-i)*12,380+i*44,206],outline=C,width=2) for i in range(5)]  # 평판 화면 안: 주문 그래픽(막대)
+d.rectangle([548,236,590,316],outline=C,width=w); [d.line([548,y,590,y],fill=C,width=w) for y in (262,288)]  # 오른쪽 끝 소품 선반
+d.rectangle([4,262,36,296],outline=C,width=2); d.rectangle([8,236,34,262],outline=C,width=2)                  # 왼쪽 끝 바닥: 선물·택배 상자 더미
 im.save('ref_v7_1_layout.png')
 # 확인용: 동작 칸 빨간 틀 + 상품 자리
 ck=im.convert('RGBA'); dd=ImageDraw.Draw(ck); dd.rectangle([40,60,295,315],outline=(220,0,0,255),width=2)
