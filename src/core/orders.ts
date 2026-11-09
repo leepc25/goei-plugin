@@ -25,8 +25,9 @@ export interface CosOrder {
   item: Omit<ShopItem, 'id' | 'price' | 'sold' | 'tag' | 'was' | 'orig' | 'pay'>;
   /** 선납 거래 id (받을 때 소지품에 같은 id 로 남긴다) */
   walletId?: string;
-  /** 받은 뒤 */
+  /** 받은 뒤 (받은 응답 키 — 그 응답이 지워지면 물건이 죽으니 다시 받을 수 있게 되살린다, 11-09 전수점검) */
   taken?: boolean;
+  takenKey?: string;
 }
 
 export function readOrders(vars: Vars): CosOrder[] {
@@ -42,7 +43,10 @@ export function readOrders(vars: Vars): CosOrder[] {
 }
 /** 살아 있는 주문 (릴리스 점검 11-09): 주문한 응답을 지우거나 다시 굴리면 선납 거래(같은 anchor)가 가계부에서 빠져 돈이 돌아온다.
  *  주문도 없던 것으로 본다 — 안 그러면 죽은 orderedKey 때문에 곧바로 「받기」가 떠 공짜로 받았다. 받은 것은 소지품 쪽이 따로 다룬다 */
-export const liveOrders = (vars: Vars, alive: Set<string>): CosOrder[] => readOrders(vars).filter((o) => o.taken || !o.anchor || alive.has(o.anchor));
+export const liveOrders = (vars: Vars, alive: Set<string>): CosOrder[] =>
+  readOrders(vars)
+    .map((o) => (o.taken && o.takenKey && !alive.has(o.takenKey) ? { ...o, taken: false, takenKey: undefined } : o))
+    .filter((o) => o.taken || !o.anchor || alive.has(o.anchor));
 /** 넘치면 받은 것(taken)부터 오래된 순으로 버린다. 선납하고 아직 안 받은 주문은 버리지 않는다 (릴리스 점검 11-09: 돈만 나가고 주문이 사라졌다) */
 export function pruneOrders(list: CosOrder[]): CosOrder[] {
   const out = [...list];

@@ -217,6 +217,8 @@ export interface ShopItem {
   was?: number;
   /** 산 뒤 (진열대에서 빠진 것, 영수증·다음 턴 사건용) */
   sold?: boolean;
+  /** 산 응답 키 — 그 응답이 지워지면(다시 굴리기) 돈이 돌아오니 진열대에도 되살린다 (11-09 전수점검) */
+  soldKey?: string;
   /** 숨긴 진짜 효과 (11-09 사용자: 우주몰은 보이는 효과가 광고 문구 — 모호·검열·거짓·뚱딴지·가끔 진실 — 이고 진짜는 플레이어·소지품에 안 보이고 본편 모델만 안다) */
   truth?: string;
 }
@@ -249,6 +251,7 @@ export interface ShopQuote {
   hours: number;
   item: Omit<ShopItem, 'id' | 'price'>;
   accepted?: boolean;
+  acceptedKey?: string;
 }
 
 /** 운영자가 파는 정보 쪽지 (11-09 사용자: 제목·값만 보이고 내용은 사서 소지품에서만 읽는다) */
@@ -258,6 +261,7 @@ export interface ShopNote {
   price: number;
   body: string;
   bought?: boolean;
+  boughtKey?: string;
 }
 
 /** 팔려는 물건 (소지품 한 줄의 사본). price: 주인이 부른 값 — 아직 안 물었으면 undefined, 안 사면 null */
@@ -741,17 +745,17 @@ export function applyTalk(st: ShopState, r0: TalkReply, kick = true): ShopState 
 }
 
 /** 견적 수락 표시 (없거나 이미 수락했으면 null) */
-export function acceptQuote(st: ShopState, id: string): ShopState | null {
+export function acceptQuote(st: ShopState, id: string, key = ''): ShopState | null {
   const q = (st.quotes ?? []).find((x) => x.id === id && !x.accepted);
   if (!q) return null;
-  return { ...st, quotes: (st.quotes ?? []).map((x) => (x.id === id ? { ...x, accepted: true } : x)) };
+  return { ...st, quotes: (st.quotes ?? []).map((x) => (x.id === id ? { ...x, accepted: true, ...(key ? { acceptedKey: key } : {}) } : x)) };
 }
 
 /** 정보 쪽지 구매 표시 (없거나 이미 샀으면 null) */
-export function buyNote(st: ShopState, id: string): ShopState | null {
+export function buyNote(st: ShopState, id: string, key = ''): ShopState | null {
   const n = (st.notes ?? []).find((x) => x.id === id && !x.bought);
   if (!n) return null;
-  return { ...st, notes: (st.notes ?? []).map((x) => (x.id === id ? { ...x, bought: true } : x)) };
+  return { ...st, notes: (st.notes ?? []).map((x) => (x.id === id ? { ...x, bought: true, ...(key ? { boughtKey: key } : {}) } : x)) };
 }
 
 /** 팔기 시작: 소지품 한 줄을 들고 주인에게 보인다 (값은 아직 없음). 내 말은 부르는 쪽이 sayToOwner 로 적는다 */
@@ -774,10 +778,21 @@ export function sayToOwner(st: ShopState, text: string): ShopState {
 }
 
 /** 구입: 진열대에서 빠지고(sold) 산 값이 남는다. 없거나 이미 샀으면 그대로 */
-export function markSold(st: ShopState, id: string): ShopState {
+export function markSold(st: ShopState, id: string, key = ''): ShopState {
   const it = st.items.find((x) => x.id === id && !x.sold);
   if (!it) return st;
-  return { ...st, items: st.items.map((x) => (x.id === id ? { ...x, sold: true } : x)) };
+  return { ...st, items: st.items.map((x) => (x.id === id ? { ...x, sold: true, ...(key ? { soldKey: key } : {}) } : x)) };
+}
+/** 산·선납한 응답이 지워졌으면(다시 굴리기·삭제) 가계부 거래와 소지품이 같이 죽으니, 진열대·쪽지·견적도 안 산 것으로 되살린다 (11-09 전수점검: 돈은 돌아왔는데 다시 살 수 없었다) */
+export function reviveShop(st: ShopState, alive: Set<string>): ShopState {
+  const dead = (k?: string) => !!k && !alive.has(k);
+  const drop = <T extends object>(x: T, flag: string, keyName: string): T => { const { [flag]: _f, [keyName]: _k, ...rest } = x as Record<string, unknown>; return rest as T; };
+  return {
+    ...st,
+    items: st.items.map((x) => (x.sold && dead(x.soldKey) ? drop(x, 'sold', 'soldKey') : x)),
+    ...(st.notes ? { notes: st.notes.map((n) => (n.bought && dead(n.boughtKey) ? drop(n, 'bought', 'boughtKey') : n)) } : {}),
+    ...(st.quotes ? { quotes: st.quotes.map((q) => (q.accepted && dead(q.acceptedKey) ? drop(q, 'accepted', 'acceptedKey') : q)) } : {}),
+  };
 }
 
 export const shelfItems = (st: ShopState): ShopItem[] => st.items.filter((x) => !x.sold);

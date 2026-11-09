@@ -18,8 +18,10 @@ export function setShopOpener(f: (site: string) => void): void {
 export function renderShopCard(text: string): string {
   const tag = findShopTag(text);
   if (!tag) return text;
-  armChatClick('shop');
   const site = webSiteOfOwner(tag.owner);
+  // 아직 정리되지 않은 접속 표식(`@web` 만, 사이트 없음)은 카드 없이 표식만 가린다 — 「상점 열기」로 잘못 뜨지 않게 (11-09 전수점검)
+  if (!site && /^@web\b/i.test(tag.owner.trim())) return stripShopTags(text);
+  armChatClick('shop');
   if (site) drawn.add(site);
   const p = cardPalette(currentTheme());
   // 채팅 속 다른 카드와 같은 폭 규칙: 상태창처럼 가운데 정렬, 420px 안팎 (2026-11-09 사용자: 상점 여는 단추 전부 상태창처럼 중앙 배열)
