@@ -1,4 +1,5 @@
 0
+- 사용자 11-09 17:07 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v13 1회
 - 사용자 11-09 16:08 KST 「일단 뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v9 1회
 - 사용자 11-09 15:02 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v6 1회
 - 사용자 11-09 14:56 KST 「generate-image-v2이거에다가 구도랑 레퍼런스랑 … 뽑아봐. 크기는 최대로」 → ds_studio_v5 1회
@@ -278,3 +279,4 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v5_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v6_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v9_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v13_req.json
