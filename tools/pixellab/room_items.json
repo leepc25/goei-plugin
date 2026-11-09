@@ -136,6 +136,15 @@
   },
   "corridor": {
    "not_here": []
+  },
+  "studio": {
+   "not_here": [
+    "toilet",
+    "shower",
+    "bathtub",
+    "operating table"
+   ],
+   "_설명": "홈쇼핑 방송 스튜디오(망상홈쇼핑, 11-09)"
   }
  },
  "people_words": [

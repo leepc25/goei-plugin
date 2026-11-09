@@ -22,6 +22,9 @@
   shadow      명암 대비 한 줄: 어디가 밝고 어디가 짙은 그림자인지
   palette     팔레트: 대비 있게 (어둡거나 바랜 바탕 + 밝은 포인트)
   no          추가로 그리지 말 것 (예: ["doors", "doorways", "blood"])
+  camera      (선택) room(기본) | corridor | tv(방송 장면 정면 눈높이, 사용자 11-09)
+  size        (선택) [가로, 세로]. 없으면 632×424 (방송 장면 688×384, 사용자 11-09)
+  host        (선택) 장면 안에 그릴 진행자 한 명(사람 없음 규칙의 예외, 사용자 11-09 망상홈쇼핑). 「No people」이 「No other people」로 바뀜
 """
 import json, sys, os, base64, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +32,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # 고정은 카메라 높이·각도뿐. 원근·바닥 몫·양옆 벽은 장면마다 다르게 정한다(사용자 10-30: 「소실점 없음·양끝 벽」은 상황에 따라)
 CAMERA = "Camera at standing eye height, about 20 degrees above the floor, looking slightly down."
 # 통로(벨트스크롤 이어 붙이기)용: 20도로는 뒷벽선이 78%까지 내려가 벽이 사람의 2.2배, 바닥 22%(중림 앞골목 ① v1·v2) → 더 내려다봄 (사용자 10-31 허락)
-CAMERAS = {'room': CAMERA, 'corridor': "Camera a little above standing eye height, looking down at about 35 degrees."}
+CAMERAS = {'room': CAMERA, 'corridor': "Camera a little above standing eye height, looking down at about 35 degrees.",
+           # 방송 장면(망상홈쇼핑, 사용자 11-09 허락): TV 카메라 정면 눈높이, 내려다보지 않음
+           'tv': "TV studio camera at the host's chest height, looking straight ahead, not looking down."}
 VIEW = {
     'one-point': "One-point perspective, side walls receding toward the middle.",
     'flat': "Flat front view, no vanishing point.",
@@ -63,6 +68,12 @@ REF1_USAGE = ("Copy only the camera angle, the low viewing height, the perspecti
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+def no_list(spec):
+    no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
+    if spec.get('host'): no = ['other people' if x == 'people' else x for x in no]   # 진행자 한 명만 허락(사용자 11-09)
+    return no
+
+
 def build(spec):
     need = ['name', 'place', 'time', 'light', 'view', 'floor_share', 'sides', 'density', 'floor', 'walls', 'items', 'shadow', 'palette']
     miss = [k for k in need if not spec.get(k)]
@@ -89,7 +100,8 @@ def build(spec):
     n = len(spec['items'])
     if not 10 <= n <= 28: errs.append(f'물건 줄 수 {n} (10~28줄, 한 줄 1~2개)')
     if errs: raise SystemExit('\n'.join(errs))
-    no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
+    no = no_list(spec)
+    host = f"HOST (the only person): {spec['host']}." if spec.get('host') else ''
     things = ' '.join((f"{at[0].upper() + at[1:]}: " if at else '') + '; '.join(ts) + '.' for at, ts in groups.items())
     if spec.get('mode') == 'loose':
         # 사용자 10-30: 「너무 컨트롤하려 해서 결과가 나빠진다」 — 헐값매입 최초 요청문처럼 물건을 풍성하게 한 덩어리로 나열, 자리·크기 숫자 없음
@@ -97,17 +109,18 @@ def build(spec):
             f"Pixel art game background of {spec['place']}, {spec['time']}. {CAMERAS[spec.get('camera', 'room')]} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
             f"FLOOR: {spec['floor']}.",
             DENSITY[spec['density']].rstrip('.') + ": " + '; '.join(spec['items']) + ".",
+        ] + ([host] if host else []) + [
             f"WALL: {spec['walls']}.",
             f"LIGHT: {spec['shadow']}.",
             f"STYLE: {STYLE}, {spec['palette']}, no dithering, no blur. No " + ", ".join(no[:-1]) + " or " + no[-1] + ".",
         ])
-    no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     parts = [
         f"Pixel art game background: {spec['place']}, {spec['time']}, {spec['light']}.",
         f"{CAMERAS[spec.get('camera', 'room')]} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
         f"FLOOR: {spec['floor']}.",
         f"WALLS: {spec['walls']}.",
         (DENSITY[spec['density']] + " " if DENSITY[spec['density']] else "") + "THINGS (a standing adult is 150 pixels tall): " + things,
+    ] + ([host] if host else []) + [
         f"LIGHT: {spec['shadow']}.",
         f"STYLE: {STYLE}, {spec['palette']}, no dithering, no blur. No " + ", ".join(no[:-1]) + " or " + no[-1] + ".",
     ]
@@ -142,6 +155,7 @@ def main():
     open(os.path.join(out, f"{spec['name']}_prompt.txt"), 'w', encoding='utf-8').write(text)
     req = json.load(open(os.path.join(ROOT, 'tools/pixellab/req/base_req.json')))
     req['description'] = text
+    if spec.get('size'): req['image_size'] = {'width': spec['size'][0], 'height': spec['size'][1]}   # 방송 장면 688×384 1배(사용자 11-09)
     req['reference_images'] = req['reference_images'][:1]
     req['reference_images'][0]['usage_description'] = REF1_USAGE
     if '--no-ref1' in sys.argv: req['reference_images'] = []   # 참고 그림 1의 배치가 따라 들어와서 뺄 때(사용자 10-30 진료실 v4)
