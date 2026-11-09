@@ -1,4 +1,5 @@
 0
+- 사용자 11-09 17:21 KST 「애니메이션 몸통이랑 손 각각 뽑아봐」 → v13 몸통 칸·손 칸 animate-pixminimax 16장 각 1회(2회)
 - 사용자 11-09 17:07 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v13 1회
 - 사용자 11-09 16:08 KST 「일단 뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v9 1회
 - 사용자 11-09 15:02 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v6 1회
@@ -280,3 +281,5 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v6_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v9_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v13_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_v13_hand_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_v13_body_req.json
