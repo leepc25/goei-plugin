@@ -625,7 +625,7 @@ export class Fighter {
     use.per = Math.max(1, Math.round(DMG.super / total));
     this.atk = { use, hit: true, connected: false, start: this.st.t, normal: null, lag: SPECIAL_LAG };
     this.inv = 99;
-    this.flashT = 0.35; this.flashC = '#ffffff';
+    // 시작 때 몸을 하얗게 칠하지 않음 (킹오파: 배경만 하얘지고 캐릭터는 그대로, 11-09)
     this.play(this.has('16_1') ? '16_1' : this.idleId(), [{ f: 0, d: 99 }]);
     const o0 = this.foe();
     const gap = () => (o0 ? o0.half() + this.half() + 18 : 80);

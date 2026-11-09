@@ -169,10 +169,10 @@ export class Match {
     for (const f of this.st.fighters) f.hold = Math.max(f.hold, 0.6);
     if (RUSH_SUPER.has(by.name)) {
       // 킹오파식 시작 (11-09 5판, 롬에서 잰 순서): 배경만 흰색 4장 → 검은 배경 + 뒤 층진 빛 8장 줄어듦 → 가슴 앞 빛덩이 8장 → 빛살 8장. 1장 = 1게임장
-      this.blackT = 1.5;
+      this.blackT = 0.7;   // 킹오파: 빛살이 사라지면 배경이 바로 돌아옴(약 40게임장)
       this.bgWhiteT = 4 / 60;
       const y = LINE - by.z - 125 * K;
-      this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x - by.face * 6, y, s: 1.15 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
+      this.st.fx.push({ k: 'sheet', name: 'dot-hand-orb', x: by.x + by.face * 12 * K, y, s: 1.15 * K, anchor: 'center', under: true, live: true, t: 9, t0: 9, el: 0 });
       this.st.fx.push({ k: 'sheet', name: 'dot-hand-rise', x: by.x + by.face * 24 * K, y, s: 2 * K, anchor: 'center', live: true, t: 9, t0: 9, el: 0 });
     } else if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
     else {
