@@ -138,7 +138,7 @@ function headOf(s: string): Head | null {
   while (words.length > 1) {
     const w = words[words.length - 1];
     if (/^\d+$/.test(w) || /^\d+[a-z]+$/.test(w)) words.pop();
-    else if (/^(?:[a-z]|\d+)(?:등급|급)?$/.test(w)) grade.unshift(words.pop() as string);
+    else if (/^(?:[a-z]|\d+)(?:등급|급|형)?$/.test(w)) grade.unshift(words.pop() as string);
     else break;
   }
   words.unshift(...grade);

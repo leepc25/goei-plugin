@@ -17,7 +17,7 @@ export function reportCardHtml(r: Report, p: Palette): string {
   const who = r.agents.map((a) => a.name).filter(Boolean).join(' · ');
   const badge = r.mine ? '내가 출동' : '요원 처리';
   // 채팅 속 다른 카드와 같은 폭 규칙 (왼쪽 정렬, 420px 안팎, 2026-11-08 사용자)
-  const box = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  const box = `display:block;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
   const chip = `display:inline-block;padding:0 8px;border-radius:999px;border:1px solid ${r.mine ? p.signal : p.accentLine};color:${r.mine ? p.signal : p.sub};font-size:.85em;line-height:1.6;margin-left:6px;vertical-align:middle;`;
   const mark = `display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;border:1px solid ${p.accentLine};background:${p.panel};color:${p.signal};font-weight:700;font-size:.95em;margin-right:8px;vertical-align:middle;`;
   return `<div data-goei-card="report" data-goei-report="${esc(r.id)}" style="${box}">`
