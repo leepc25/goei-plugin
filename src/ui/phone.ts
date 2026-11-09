@@ -1210,7 +1210,8 @@ export async function handlePhone(action: string, value: string | undefined, ctx
   if (!action.startsWith('ph-')) return false;
   liveEnv = env;
   const v = value ?? '';
-  if (!['ph-room-del', 'ph-contact-del', 'ph-notice-del'].includes(action)) phone.confirm = null;
+  // 두 번 눌러 지우는 단추는 여기 다 적어야 한다 — 빠지면 두 번째 「정말 삭제」가 확인을 먼저 지워 버려 먹통이 된다 (11-09 사용자: 사이드스토리 방 삭제 안 됨)
+  if (!['ph-room-del', 'ph-view-del', 'ph-contact-del', 'ph-notice-del'].includes(action)) phone.confirm = null;
   if (action.startsWith('ph-def-')) {
     try {
       const msg = await defaultsAction('ph', action, v, ctx, env.refresh);
