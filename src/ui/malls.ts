@@ -17,7 +17,7 @@ import { minuteText, orderDue, orderReady, ordersText, ordersVars, readOrders, w
 import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
-import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskSettings, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
+import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
@@ -497,7 +497,8 @@ async function saveDesk(ctx: ChatContext, st: DeskState) {
   return updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...deskVars(st) } }));
 }
 
-const deskHello = (a: DeskAgent, again = false) => `${a.dept ? `${a.dept} ` : ''}${a.name} ${a.rank}님이 상담에 ${again ? '다시 ' : ''}연결되었습니다.`;
+// 11-09 사용자: 상담원 신분(실명·직급·부서)은 손님에게 드러나지 않는다 — 화면엔 번호 호칭만
+const deskHello = (a: DeskAgent, again = false) => `${deskTag(a)} 님이 상담에 ${again ? '다시 ' : ''}연결되었습니다.`;
 
 /** 상담사 만들기(make) 또는 답 받기(talk). 같은 채팅을 보고 있을 때만 저장 */
 async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st0: DeskState): Promise<void> {
@@ -520,8 +521,9 @@ async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st
     const key = lastBot(ctx.chat)?.key ?? '';
     if (kind === 'make') {
       const dice = rollDice(ds.axes);
-      const p = makePrompt(src, dice, st0.past.slice(0, ds.avoid));
-      const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, (raw) => parseCard(raw, dice), opts);
+      const no = newDeskNo();
+      const p = makePrompt(src, dice, st0.past.slice(0, ds.avoid), no);
+      const { value } = await generate(craftMessages(p.messages, { thoughts: s.thoughts, memo: false, reiterate: 0 }, { thoughts: p.thoughts }), s.model, (raw) => parseCard(raw, dice, no), opts);
       next = { ...st0, agent: value.agent, anchor: key, talk: [{ who: 'sys', text: deskHello(value.agent) }, ...value.say.map((t) => ({ who: 'op' as const, text: t }))] };
     } else {
       const p = deskTalkPrompt(src, st0);
@@ -777,12 +779,12 @@ function bmDesk(ctx: ChatContext, v: View, mobile: boolean): string {
   const at = mobile ? '' : winStyle(v.win);
   const busy = !!v.dl;
   const badge = a
-    ? `<div class="bd-badge"><i aria-hidden="true">${esc(a.name.slice(0, 1))}</i><div><small>백일몽 주식회사</small><b>${esc(a.name)} <em>${esc(a.rank)}</em></b><span>${esc(a.dept || '포인트몰 상담')}</span></div></div>`
-    : `<div class="bd-badge bd-wait"><i aria-hidden="true">…</i><div><small>백일몽 주식회사</small><b>${v.dl === 'make' ? '상담사 연결 중…' : '연결된 상담사 없음'}</b></div></div>`;
+    ? `<div class="bd-badge"><i aria-hidden="true">${esc(deskTag(a).slice(-2))}</i><div><small>백일몽 포인트몰</small><b>${esc(deskTag(a))}</b><span>임직원 복지 상담</span></div></div>`
+    : `<div class="bd-badge bd-wait"><i aria-hidden="true">…</i><div><small>백일몽 주식회사</small><b>${v.dl === 'make' ? '상담원 연결 중…' : '연결된 상담원 없음'}</b></div></div>`;
   const line = (l: { who: string; text: string }) => (l.who === 'sys'
     ? `<div class="bd-sys">${esc(l.text)}</div>`
-    : l.who === 'me' ? `<div class="bd-m bd-me"><p>${esc(l.text)}</p></div>` : `<div class="bd-m bd-op"><small>${esc(a?.name ?? '상담사')}</small><p>${esc(l.text)}</p></div>`);
-  const wait = v.dl === 'make' ? '<div class="bd-sys">상담사를 연결하고 있습니다…</div>' : v.dl === 'talk' ? `<div class="bd-m bd-op bd-typing"><small>${esc(a?.name ?? '상담사')}</small><p>입력 중…</p></div>` : '';
+    : l.who === 'me' ? `<div class="bd-m bd-me"><p>${esc(l.text)}</p></div>` : `<div class="bd-m bd-op"><small>${esc(a ? deskTag(a) : '상담원')}</small><p>${esc(l.text)}</p></div>`);
+  const wait = v.dl === 'make' ? '<div class="bd-sys">상담원을 연결하고 있습니다…</div>' : v.dl === 'talk' ? `<div class="bd-m bd-op bd-typing"><small>${esc(a ? deskTag(a) : '상담원')}</small><p>입력 중…</p></div>` : '';
   const log = `${d.talk.map(line).join('')}${wait}`;
   const tools = `<div class="bd-tools"><button data-action="mall-desk-next"${busy ? ' disabled' : ''}>다른 상담사 연결</button><button data-action="mall-desk-end"${busy || !a ? ' disabled' : ''}>상담 종료</button></div>`;
   return `<div class="bd-win" role="dialog" aria-label="1:1 상담"${at}><div class="bd-wt"><b>1:1 상담</b><span>백일몽 포인트몰</span><button data-action="mall-ask-close" aria-label="닫기">×</button></div>

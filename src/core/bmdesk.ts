@@ -68,6 +68,8 @@ export const rollDice = (axes: DeskAxis[], rnd: () => number = Math.random): Des
 
 export interface DeskAgent {
   id: string;
+  /** 손님에게 보이는 상담원 번호 (11-09 사용자: 실명·직급·부서는 드러나면 안 된다 — 화면·대화엔 「상담원 0427」만) */
+  no?: string;
   name: string;
   rank: string;
   dept: string;
@@ -122,7 +124,12 @@ function bubbles(text: string): string[] {
   return text.replace(/\r/g, '').split(/\n\s*\n/).map((x) => x.split('\n').map((l) => l.trim()).filter(Boolean).join('\n').slice(0, 600)).filter(Boolean).slice(0, 3);
 }
 
-export function parseCard(raw: string, dice: DeskDice): { agent: DeskAgent; say: string[] } {
+/** 상담원 번호 (코드가 정한다) */
+export const newDeskNo = (rnd: () => number = Math.random): string => String(1000 + Math.floor(rnd() * 9000));
+/** 손님에게 보이는 호칭 (번호 없는 옛 카드는 id 로 만든다) */
+export const deskTag = (a: DeskAgent): string => `상담원 ${a.no ?? String(1000 + (parseInt(a.id.slice(-4), 36) % 9000))}`;
+
+export function parseCard(raw: string, dice: DeskDice, no: string): { agent: DeskAgent; say: string[] } {
   const card = block(raw, 'card');
   if (!card) throw fail('응답에 <card> 블록(상담사 카드)이 없어요.', raw);
   const get = (k: string) => clean(new RegExp(`^\\s*${k}\\s*[:：]\\s*(.+)$`, 'm').exec(card)?.[1], k === '소개' || k === '말투' ? 200 : 30);
@@ -131,7 +138,7 @@ export function parseCard(raw: string, dice: DeskDice): { agent: DeskAgent; say:
   const say = bubbles(block(raw, 'say'));
   if (!say.length) throw fail('응답에 <say> 블록(첫 인사)이 없어요.', raw);
   const rank = get('직급') || (dice.find(([k]) => k === '직급')?.[1] ?? '');
-  return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, name, rank, dept: get('부서'), intro: get('소개'), voice: get('말투'), dice }, say };
+  return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank, dept: get('부서'), intro: get('소개'), voice: get('말투'), dice }, say };
 }
 export function parseSay(raw: string): string[] {
   const say = bubbles(block(raw, 'say'));
@@ -153,7 +160,7 @@ export interface DeskSource {
 
 const G = () => guideSections('BmDesk');
 const diceText = (d: DeskDice) => d.map(([k, v]) => `${k}: ${v}`).join('\n');
-const cardText = (a: DeskAgent) => `이름: ${a.name}\n직급: ${a.rank}\n부서: ${a.dept}\n소개: ${a.intro}\n말투: ${a.voice}\n${diceText(a.dice)}`;
+const cardText = (a: DeskAgent) => `손님에게 보이는 호칭: ${deskTag(a)}\n이름: ${a.name}\n직급: ${a.rank}\n부서: ${a.dept}\n소개: ${a.intro}\n말투: ${a.voice}\n${diceText(a.dice)}`;
 const material = (src: DeskSource) => [
   src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]\n${src.refs}` : '',
   `[지금 진열된 상품]\n${src.shelf || '(없음)'}`,
@@ -161,11 +168,11 @@ const material = (src: DeskSource) => [
 ].filter(Boolean).join('\n\n');
 
 /** 상담사 만들기 + 첫 인사 */
-export function makePrompt(src: DeskSource, dice: DeskDice, recent: DeskAgent[]): { messages: CraftMessage[]; thoughts: string } {
+export function makePrompt(src: DeskSource, dice: DeskDice, recent: DeskAgent[], no: string): { messages: CraftMessage[]; thoughts: string } {
   const g = G();
   const system = [fillGuide(g.COMMON, {}), fillGuide(g.MAKE, {}), fillGuide(g.MANUAL, {}), fillGuide(g.MAKE_OUTPUT, {}), src.language ?? ''].filter(Boolean).join('\n\n');
   const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join('\n') : '(없음)';
-  return { messages: [{ role: 'system', content: system }, { role: 'user', content: `${material(src)}\n\n[이번 상담사 주사위]\n${diceText(dice)}\n\n[최근 상담사 — 겹치지 말 것]\n${past}\n\n[현재 작업]\n상담사 카드와 첫 메시지` }], thoughts: fillGuide(g.THOUGHTS_MAKE, {}) };
+  return { messages: [{ role: 'system', content: system }, { role: 'user', content: `${material(src)}\n\n[손님에게 보이는 호칭]\n상담원 ${no}\n\n[이번 상담사 주사위]\n${diceText(dice)}\n\n[최근 상담사 — 겹치지 말 것]\n${past}\n\n[현재 작업]\n상담사 카드와 첫 메시지` }], thoughts: fillGuide(g.THOUGHTS_MAKE, {}) };
 }
 
 /** 대화: 카드 + 이번 상담 대화 전부 */
