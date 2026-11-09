@@ -8,7 +8,7 @@ import { later, type Stage, type Use } from './stage';
 import {
   K, LINE, DT, GRAV, HP, DMG, SCALE, JUGGLE_MUL, OTG_MUL, CHIP, GAUGE, STUN, FREEZE, PUSH, FRICTION, CHAIN_DOWN, CHAIN_GAP,
   JUGGLE_MAX, OTG_MAX, LIE_SEC, MOVE, ATK, CHAIN_WINDOW, BUFFER, SPECIAL_LAG, BODY_HALF, TIP, WALL,
-  HIT_CAP,
+  HIT_CAP, LAUNCH_GRAV,
 } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -102,6 +102,10 @@ export class Fighter {
   /** 보이는 모습 */
   flashT = 0;
   flashC = '#ffffff';
+  /** 맞은 순간 하얗게 (초) */
+  whiteT = 0;
+  /** 이번 공격에서 다음 타로 이을 수 있게 된 때 (-1 = 아직) */
+  cancelAt = -1;
   hurtT = 0;
   alpha = 1;
   vanish: { out: boolean; t: number; d: number } | null = null;
@@ -225,6 +229,7 @@ export class Fighter {
   tick(): void {
     const dt = DT;
     this.flashT = Math.max(0, this.flashT - dt);
+    if (this.freeze <= 0) this.whiteT = Math.max(0, this.whiteT - dt);
     this.hurtT = Math.max(0, this.hurtT - dt);
     if (this.vanish) { this.vanish.t += dt; if (!this.vanish.out && this.vanish.t >= this.vanish.d) this.vanish = null; }
     if (this.hold > 0) {
@@ -433,6 +438,7 @@ export class Fighter {
   private normal(id: string, n: 'light' | 'heavy', use: Use, lunge: number): void {
     this.setState('atk');
     this.atk = { use, hit: false, connected: false, start: this.st.t, normal: n, lag: 0 };
+    this.cancelAt = -1;
     this.st.sfx({ type: 'whiff', strength: n === 'heavy' ? 3 : 1, x: this.x });
     const s = normalSeq(this.art, id, n === 'heavy');
     const pre = s.filter((e) => !e.act && !e.cancel).reduce((a, e) => a + e.d, 0);
@@ -464,7 +470,9 @@ export class Fighter {
     if (!a || !this.anim) return;
     if (a.connected && this.anim.step.cancel) {
       if (this.superInput() && this.canSuper()) { this.buf = null; this.superMove(); return; }
-      const b = this.buf && this.buf.t >= a.start ? this.buf.a : null;
+      // 예약 없음 (11-09 사용자): 이을 수 있는 때가 열리기 직전 아주 잠깐(BUFFER) 또는 열린 뒤에 누른 것만
+      if (this.cancelAt < 0) this.cancelAt = this.st.t;
+      const b = this.buf && this.buf.t >= Math.max(a.start, this.cancelAt - BUFFER) ? this.buf.a : null;
       if (b) {
         if (a.normal === 'light' && (b === 'light' || b === 'heavy')) {
           this.buf = null;
@@ -638,7 +646,9 @@ export class Fighter {
     const fr = use.kind === 'super' ? FREEZE.super : h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' ? FREEZE.big : big ? FREEZE.heavy : FREEZE.light;
     this.freeze = fr;
     if (h.normal) by.freeze = fr;
-    this.st.shake(big ? 6 : 3);
+    this.st.shake(h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' || use.kind === 'super' ? 12 : big ? 9 : 4);
+    // 맞은 쪽만 잠깐 하얗게 (11-09 묵직함)
+    this.whiteT = big ? 0.07 : 0.05;
     this.st.sfx({ type: 'hit', strength: big ? 3 : 1, kind: use.kind === 'super' ? 'super' : (this.cfg.kick || []).includes(by.anim?.id) ? 'kick' : undefined, by: by.name, x: this.x });
     if (!h.noVfx) this.hitVfx(by, h, at, big);
     if (this.hp <= 0) { this.koFly(dir); return 'hit'; }
@@ -692,7 +702,7 @@ export class Fighter {
     const hv = h.use.hitVfx;
     if (h.vfx) this.st.fx.push({ k: 'sheet', name: h.vfx, x: at.x, y: at.y, s: (h.vs || 1) * K, flip, anchor: 'center', tint: h.tint, t: 9, t0: 9, el: 0 });
     else if (hv) this.st.fx.push({ k: 'sheet', name: hv.n, x: at.x, y: at.y, s: hv.s * K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
-    else this.st.fx.push({ k: 'sheet', name: big ? 'hit_heavy' : 'hit_light', x: at.x, y: at.y, s: big ? 1.8 : 2.1, flip, anchor: 'pivot', t: 9, t0: 9, el: 0 });
+    else this.st.fx.push({ k: 'sheet', name: big ? 'hit_heavy' : 'hit_light', x: at.x, y: at.y, s: big ? 2.6 : 2.2, flip, anchor: 'pivot', t: 9, t0: 9, el: 0 });
     this.st.fx.push({ k: 'spark', x: at.x, y: at.y, t: big ? 0.3 : 0.2, t0: big ? 0.3 : 0.2, c: big ? '#fff2b0' : '#ffffff', n: big ? 14 : 7, seed: Math.random() * 99 });
   }
   private hitPose(sec: number, kind: HitKind): void {
@@ -722,7 +732,7 @@ export class Fighter {
     const p = kind === 'launch' ? PUSH.launch : kind === 'blow' ? PUSH.blow : PUSH.down;
     this.vz = p.vz * k; this.vx = dir * p.vx * Math.max(0.5, k); this.z = Math.max(1, this.z);
     this.air = true;
-    this.airT = 0; this.airT0 = Math.max(0.3, (2 * this.vz) / GRAV);
+    this.airT = 0; this.airT0 = Math.max(0.3, (2 * this.vz) / (GRAV * (kind === 'launch' ? LAUNCH_GRAV : 1)));
     const id = kind === 'launch' && this.has('18_3') ? '18_3' : '19';
     this.play(id, [{ f: 0, d: 99 }]);
   }
@@ -788,7 +798,7 @@ export class Fighter {
   private physics(dt: number): void {
     const groundState = this.state !== 'air' && this.state !== 'ko' && this.state !== 'jump';
     if (!groundState || this.z > 0) {
-      if (this.liftT <= 0) { this.vz -= GRAV * dt; this.z += this.vz * dt; }
+      if (this.liftT <= 0) { this.vz -= GRAV * (this.state === 'air' && this.airKind === 'launch' ? LAUNCH_GRAV : 1) * dt; this.z += this.vz * dt; }
       if (this.z < 0) this.z = 0;
       this.x += this.vx * dt;
     } else {
@@ -825,7 +835,7 @@ export class Fighter {
     if (this.vanish) { const k = Math.min(1, this.vanish.t / this.vanish.d); alpha *= this.vanish.out ? 1 - k : k; }
     if (alpha <= 0.01) return;
     const jit = this.freeze > 0 && this.hurtT > 0 ? (Math.floor(performance.now() / 33) % 2 ? 3 : -3) : 0;
-    const over = look.red ? { c: '#ff2a1a', a: look.red } : this.flashT > 0 ? { c: this.flashC, a: Math.min(0.85, this.flashT * 3) } : this.hurtT > 0 ? { c: '#ffffff', a: this.hurtT * 3 } : undefined;
+    const over = look.red ? { c: '#ff2a1a', a: look.red } : this.whiteT > 0 ? { c: '#ffffff', a: 0.85 } : this.flashT > 0 ? { c: this.flashC, a: Math.min(0.85, this.flashT * 3) } : this.hurtT > 0 ? { c: '#ffffff', a: this.hurtT * 3 } : undefined;
     drawSprite(c, this.art, id, f, this.x + jit, this.z, this.face, air, { over, alpha });
     if (this.state === 'charge') {
       const m = this.muzzle(), lv = this.chargeLv();

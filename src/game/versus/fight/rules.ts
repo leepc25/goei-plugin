@@ -49,7 +49,8 @@ export const STUN = {
   blockHold: 0.12,
 };
 /** 히트스톱 (초): 막음 · 약 · 강 · 띄움·날림 · 필살기 */
-export const FREEZE = { guard: 0.05, light: 0.07, heavy: 0.11, big: 0.15, super: 0.12 };
+/** 맞는 순간 두 사람이 멈추는 시간 (11-09 사용자 「묵직함이 없다」로 늘림) */
+export const FREEZE = { guard: 0.06, light: 0.1, heavy: 0.16, big: 0.2, super: 0.2 };
 
 /** 맞은 쪽 밀림 (월드/초, 초속). 맞으면 날아감 (제자리 X) */
 export const PUSH = {
@@ -58,7 +59,8 @@ export const PUSH = {
   guard: 240,
   guardHeavy: 420,
   /** 띄우기: 위로 · 옆으로 */
-  launch: { vz: 1050, vx: 160 },
+  /** 띄우기: 캐릭터 키 넘게 떠서 오래 머문다 (11-09 사용자 「쥐똥만큼 떴다가 쓰러진다」) */
+  launch: { vz: 1250, vx: 140 },
   /** 날려 쓰러뜨리기 */
   blow: { vz: 520, vx: 1050 },
   /** 강제 다운 (6연타) · 기술 down */
@@ -112,7 +114,7 @@ export const ATK = {
 /** 약공 이음: 마무리 장이 끝나고 이만큼 안에 다시 누르면 다음 약공 */
 export const CHAIN_WINDOW = 0.3;
 /** 입력 기다림: 지금 못 하는 입력을 이만큼만 들고 있다 (늦게 나가는 예약 공격 X) */
-export const BUFFER = 0.12;
+export const BUFFER = 0.07;
 /** 특수기·충전·원거리 뒤 굳음 (초) */
 export const SPECIAL_LAG = 0.2;
 
@@ -128,3 +130,6 @@ export const WALL = 60;
 
 /** 기술 피해를 나눌 최대 맞는 수 (이보다 많이 맞는 기술은 앞쪽 이만큼에서 전체 피해가 다 들어가고, 나머지는 1씩) */
 export const HIT_CAP = { skill: 3, charge: 2, super: 4 };
+
+/** 띄워진 상대의 중력 배율 (천천히 떨어져 공중에서 이어 칠 틈) */
+export const LAUNCH_GRAV = 0.7;
