@@ -26,8 +26,8 @@ test('상점은 소지품·가계부 둘 다 켜져야: 하나라도 끄면 꺼�
 test('상점이 열리는 자리: 기본 어디서든(주인 없는 가게·통신 판매 포함), 가게 장면만 고를 수 있음', () => {
   assert.equal(shopSettings({}).where, 'any');
   assert.equal(shopSettings({ $sh_where: 'shop' }).where, 'shop');
-  const any = shopGuide({});
-  const shop = shopGuide({ $sh_where: 'shop' });
+  const any = shopGuide({ $sh_judge: 'main' });
+  const shop = shopGuide({ $sh_where: 'shop', $sh_judge: 'main' });
   assert.ok(!any.includes('{where}') && !shop.includes('{where}'));
   assert.notEqual(any, shop);
   assert.ok(/empty/i.test(any), '주인이 없으면 비워 둔다는 안내');

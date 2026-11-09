@@ -66,7 +66,7 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
-import { hasShopTag, settleShop } from './core/shop';
+import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
@@ -518,7 +518,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 상점 표식 `[shop: 가게|주인]`: 이 응답 기준으로 상점 상태를 맞추고 지난 응답의 표식은 지운다 (core/shop.ts settleShop). 설정이 꺼져 있어도 남은 표식은 정리
     // 주인공 자기 가게는 상점이 아니다 (11-09 사용자: 마덕희로 플레이 → 헐값매입 상점이 뜸): 캐릭터 플레이 요원 이름·페르소나 이름
     const selfNames = hasShopTag(raw) ? [playerAgent((await getChar<LoreChar>(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? '', userInfo().name] : [];
-    if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
+    // 갱신기가 상점을 판단하면(설정 「상점 판단」, 11-09) 여기서는 건드리지 않는다: 갱신기가 표식을 붙이고 같은 정리를 돌린다 (host/people.ts). 그래야 같은 가게에 머무는 동안 방문 기록이 지워지지 않는다
+    if ((shopJudgeBy((latest ?? chat).scriptstate).by === 'main' || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
         const r = settleShop(cur, arg.messageIndex, selfNames);
         return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...r.vars } } : null;
@@ -907,7 +908,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   setWikiOpener((title) => void openWiki(title));
   setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
-  setShopOpener(() => void openShop());
+  setShopOpener((site) => void openShop(site));
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {

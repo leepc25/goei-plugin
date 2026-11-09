@@ -638,7 +638,10 @@ export function inventoryText(chat: Chat): string {
     const live = liveItems(it, aliveAnchors(chat));
     const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
     const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...shopEvents(chat)];
-    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), shopGuide(vars)].join('\n');
+    // 갱신기가 상점을 판단하면 표식 지침은 빈 글 (core/shop.ts shopJudgeBy): 넘길 사건도 없으면 블록을 보내지 않는다
+    const guide = shopGuide(vars);
+    if (!events.length && !guide) return '';
+    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), ...(guide ? [guide] : [])].join('\n');
   }
   const it = readItems(vars);
   const userKey = lastUserKey(chat);
@@ -670,7 +673,8 @@ export function inventoryText(chat: Chat): string {
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
   });
-  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${shopGuide(vars)}` : ''}` : '';
+  const guide = shop ? shopGuide(vars) : '';
+  return text ? `${text}\n${INVENTORY_NOTE}${guide ? `\n${guide}` : ''}` : '';
 }
 
 /** 메시지 키 k 가 유저 키 userKey 뒤의 응답인가 (다시 굴리는 턴의 옛 응답) */

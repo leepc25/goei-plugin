@@ -28,6 +28,7 @@ import { mentionsPoints, pointsOn, pointsVars, readPoints } from '../core/points
 import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
 import { getPrefs } from '../core/settings';
+import { settleShop, shopJudgeBy, shopJudgeGuide, shopOn, shopRule, stripShopTags } from '../core/shop';
 import { guideSections } from '../core/guides';
 
 /** Director 기본 지침: 지침 탭 「Director」의 FACTS·SCENE 절 */
@@ -278,7 +279,11 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const itemsOn = itemAutoOn(fresh.chat.scriptstate);
       const itemsNow = itemsOn ? itemsNowOf(fresh.chat) : null;
       const usedNow = itemsOn ? usedItemsAt(readItems(fresh.chat.scriptstate), batchKeys, aliveAnchors(fresh.chat)) : [];
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
+      // 상점 판단 (11-09, 설정 「상점 판단」): 갱신기가 맡으면 이 묶음에 든 가장 최근 응답 하나를 판단한다. 다시 읽기(only)는 하지 않는다
+      const lastChar = fresh.chat.message.reduce((a, m, i) => (m.role === 'char' ? i : a), -1);
+      const shopAt = !o.scope?.only && shopOn(fresh.chat.scriptstate) && shopJudgeBy(fresh.chat.scriptstate).by === 'updater' && batches[b].includes(lastChar) ? lastChar : -1;
+      const shopSelf = shopAt >= 0 ? [...exclude, userInfo().name] : [];
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { shop: shopAt >= 0 ? { at: shopAt, self: shopSelf } : null,  settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
@@ -286,7 +291,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsUse) sections.add('points');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      if (input.shop) sections.add('shop');
+      // 상점 판단 기준은 지침 「상점」의 글을 그대로 (본편 표식 지침과 같은 글, 11-09 사용자: 상점 지침은 양쪽을 동시에)
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings)).replace('<<SHOP_RULE>>', () => (input.shop ? shopRule(fresh.chat.scriptstate) : '')).replace('<<SHOP_JUDGE>>', () => (input.shop ? shopJudgeGuide() : ''));
       input.system = system;
       if (input.overBudget.length) {
         // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 응답 글이 상한을 넘으면 접어서 보내지 않고 거부한다. 읽음 표시도 안 한다
@@ -298,7 +305,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       }
       // 장면 인물이 없어도 소지품·가계부는 이 갱신기가 읽는다 (11-08 전수점검: 혼자 있는 장면에서 얻은 물건·쓴 돈이 기록되지 않았다).
       // 소지품 읽기가 켜져 있거나, 가계부가 켜져 있고 글에 금액이 있거나 어림도 받을 때만 부른다 (쓸데없는 호출은 그대로 안 함)
-      const moneyOrItems = itemsOn || (walletOn && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? '')))))) || (pointsUse && batches[b].some((i) => mentionsPoints(messageText(String(fresh.chat.message[i]?.data ?? '')))));
+      const moneyOrItems = !!input.shop || itemsOn || (walletOn && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? '')))))) || (pointsUse && batches[b].some((i) => mentionsPoints(messageText(String(fresh.chat.message[i]?.data ?? '')))));
       if (!input.people.length && !moneyOrItems) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
         if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
@@ -373,6 +380,17 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (report.items.length) {
           const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate) });
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
+        }
+        // 상점 판단 (11-09): 판단한 응답 끝의 표식을 갱신기 판단대로 바꾸고(있으면 붙이고 없으면 지움) 본편과 같은 정리(settleShop)를 돌린다.
+        // 화면의 「상점 열기」 카드는 표식에서 그려지니 본편이 판단할 때와 같은 길로 뜬다
+        if (report.shop !== undefined && shopAt >= 0 && next.message[shopAt]) {
+          const at = report.shop?.index ?? shopAt;
+          const body = stripShopTags(String(next.message[at].data ?? ''));
+          const list = [...next.message];
+          list[at] = { ...list[at], data: report.shop ? `${body}\n[shop: ${report.shop.name}|${report.shop.owner}]` : body };
+          next = { ...next, message: list };
+          const r = settleShop(next, at, shopSelf);
+          if (r) next = { ...next, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(next.scriptstate ?? {}), ...r.vars } };
         }
         return withPeople(next, s);
       });

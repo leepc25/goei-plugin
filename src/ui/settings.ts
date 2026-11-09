@@ -19,7 +19,7 @@ import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON
 import { pointsFlagFor } from '../core/points';
 import { ICON_ALIAS_DEFAULT, readIconMisses } from '../core/iconmatch';
 import { invOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
-import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
+import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
@@ -82,6 +82,23 @@ function seg(action: string, cur: string, items: [string, string][], disabled = 
 /** scope 'device' = 이 기기 공통 값(채팅·기본값 구분 없음). 줄 이름 옆에 배지로 보인다 (2026-10-27 리수폿식 범위 표시) */
 /** scope 'chat'·'defaults' = 화면 페이지처럼 범위 전환이 없는 곳에서 그 줄만 다른 범위일 때 (테마) */
 const SCOPE_BADGE = { device: '이 기기', chat: '이 채팅', defaults: '새 채팅 기본값' } as const;
+/** 고유 상점 표 (11-09 사용자: 로어 고유 상점은 설정에서 따로 정한다, 하드코딩 금지). 줄마다 사용·이름·다른 이름·인터넷 사이트·직접 갔을 때 창 */
+const OWN_WEB: [string, string][] = [['none', '없음'], ['cos', '우주 쇼핑몰'], ['bm', '백일몽 포인트몰']];
+const OWN_VISIT: [string, string][] = [['shop', '기본 상점창'], ['none', '열지 않음']];
+function ownShopsField(vars: Record<string, unknown> | undefined, busy: boolean): string {
+  const list = ownShops(vars);
+  const text = (o: OwnShop, key: 'name' | 'alias', ph: string, len: number) =>
+    `<input class="st-text" type="text" maxlength="${len}" value="${esc(o[key])}" data-change="set-own" data-key="${esc(o.id)}:${key}" placeholder="${ph}" aria-label="${ph}"${busy ? ' disabled' : ''}>`;
+  const rows = list.map((o) => `<div class="ms-fx${o.on ? '' : ' off'}">
+      <div class="ms-fx-head">${text(o, 'name', '상점 이름 (로어 이름 그대로)', 30)}${seg('set-own-on', o.on ? `${o.id}:1` : `${o.id}:0`, [[`${o.id}:1`, 'ON'], [`${o.id}:0`, 'OFF']], busy)}<button class="gx-mini danger" data-action="set-own-del" data-value="${esc(o.id)}" aria-label="지우기"${busy ? ' disabled' : ''}>×</button></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>다른 이름</span>${text(o, 'alias', '쉼표로 나눠서 (예: 포인트몰, 복지몰)', 120)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline"><span>인터넷 접속</span>${seg('set-own-web', `${o.id}:${o.web || 'none'}`, OWN_WEB.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline"><span>직접 가면</span>${seg('set-own-visit', `${o.id}:${o.visit || 'none'}`, OWN_VISIT.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
+    </div>`).join('');
+  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="set-own-add"${list.length >= OWN_MAX || busy ? ' disabled' : ''}>추가</button><button class="gx-mini" data-action="set-own-reset"${busy ? ' disabled' : ''}>기본값으로</button></div>`;
+  return field('고유 상점', '', `로어에 있는, 자기 창이 따로 있는 상점이에요. 켜진 줄은 상점 판단 기준에 들어가요. 주인공이 그 사이트·앱에 실제로 접속해 있으면 응답 아래 「접속하기」가 붙고, 누르면 상황판 없이 인터넷 창만 그 사이트로 열려요. 직접 매장에 가 있으면 「직접 가면」에 고른 창이 열려요(열지 않음이면 안 열림). 표에 없는 편의점 같은 곳은 그대로 기본 상점창이에요.`) + rows + foot;
+}
+
 function field(label: string, control: string, help: string, scope?: keyof typeof SCOPE_BADGE): string {
   return `<div class="ps-row"><div class="ps-label"><b>${label}${scope ? `<i class="gx-scope${scope === 'device' ? '' : ` ${scope}`}">${SCOPE_BADGE[scope]}</i>` : ''}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
 }
@@ -408,8 +425,14 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       return group('상점', [
         // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 둘 중 하나가 꺼지면 꺼지고 스위치도 잠긴다
         blocked ? field('상점', seg('set-shop-on', '0', [['1', 'ON'], ['0', 'OFF']], true), `${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 상점도 꺼져 있어요. 상점은 물건을 소지품에 넣고 돈을 가계부로 주고받아서 둘 다 켜져 있어야 써요.`) :
-        field('상점', onoff('set-shop-on', sh.on), '켜면 본편 모델에 「거래가 가능한 자리에서 응답 끝에 [shop: 가게|주인] 표식을 쓰라」고 알려 주고, 표식이 온 응답 아래에 「상점 열기」가 붙어요. 물건은 열 때 보조 모델이 맥락대로 지어요. 잔고·소지품은 모델에 넘기지 않아요.'),
+        field('상점', onoff('set-shop-on', sh.on), '켜면 지금 장면에 살 수 있는 곳이 있는지 판단해(아래 「상점 판단」), 있으면 그 응답 아래에 「상점 열기」가 붙어요. 물건은 열 때 보조 모델이 맥락대로 지어요. 잔고·소지품은 모델에 넘기지 않아요.'),
         ...(sh.on ? [
+          (() => {
+            // 상점 판단 (11-09 사용자): 누가 「지금 상점이 있나」를 정하나. 갱신기를 골랐는데 갱신기가 매 턴 돌지 않으면 메인 모델이 대신한다
+            const j = shopJudgeBy(itVars);
+            const now = j.fallback ? '지금은 갱신기가 안 돌아 메인 모델로 대신합니다.' : `지금은 ${j.by === 'updater' ? '갱신기' : '메인 모델'}가 판단해요.`;
+            return field('상점 판단', seg('set-shop-judge', sh.judge, [['auto', '자동'], ['main', '메인 모델'], ['updater', '갱신기']], busy), `지금 장면에 상점이 있는지 누가 볼지예요. 메인 모델은 본문을 쓰면서 응답 끝에 표식을 같이 써요(추가 호출 없음). 갱신기는 응답이 끝난 뒤 인물 기록 갱신 호출에서 따로 판단해요(카드가 조금 늦게 붙어요). 자동은 갱신기가 매 턴 돌면 갱신기, 아니면 메인 모델이에요. 판단 기준은 지침 「상점」의 SHOP_RULE 한 곳을 양쪽이 같이 읽어요. ${now}`);
+          })(),
           field('모델', seg('set-shop-model', sh.model, [['main', '메인 모델'], ['aux', '보조 모델']], busy), '진열대와 주인 대사를 지을 모델이에요.'),
           field('진열대 분량', `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.`),
           field('희귀·특가 구획', onoff('set-shop-feature', sh.feature), '켜면 진열대마다 희귀 물건 단 하나와 특가 물건 1~3개를 따로 받아, 희귀는 진열장에, 특가는 원래 값에 줄을 긋고 할인율을 붙여 따로 보여 줘요. 끄면 한 격자에 늘어놓아요.'),
@@ -420,7 +443,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           field('지난 진열대 피하기', onoff('set-shop-prev', sh.avoidPrev), '새로고침할 때 이번 방문에 이미 보였던 물건을 피해요.'),
           field('거래 끊음', onoff('set-shop-kick', sh.kick), '켜면 주인이 모욕·끝없는 흥정 같은 일에 거래를 끊을 수 있어요. 끊기면 진열대가 잠기고 다음 턴 본편에 넘어가요. 끄면 주인이 아무리 화나도 가게는 열려 있어요.'),
           // 숫자는 고르는 단추 말고 −/+ 한 칸씩 (2026-11-07 사용자)
-          field('상점이 열리는 자리', seg('set-shop-where', sh.where, [['any', '어디서든'], ['shop', '가게 장면만']], busy), '어디서든이면 판매자가 있는 가게뿐 아니라 온라인몰·홈쇼핑·카탈로그·자판기·이면의 쇼핑몰처럼 주인이 없는 곳에서도 「상점 열기」가 붙어요. 가게 장면만이면 판매자가 그 자리에 있는 가게·노점에서만 붙어요.'),
+          field('상점이 열리는 자리', seg('set-shop-where', sh.where, [['any', '어디서든'], ['shop', '가게 장면만']], busy), '어디서든이면 판매자가 있는 가게뿐 아니라 온라인몰·홈쇼핑·카탈로그·자판기처럼 주인이 없는 곳에서도 「상점 열기」가 붙어요. 가게 장면만이면 판매자가 그 자리에 있는 가게·노점에서만 붙어요.'),
+          ownShopsField(itVars, busy),
           field('최근 본문 턴 수', stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy), '진열대·주인 대사를 지을 때 넘기는 최근 본문 턴 수예요(1~8, 맥락 반영이 「맥락」일 때).'),
           field('참고 로어북 수', stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy), '봇 설명·지금 켜진 로어북·가게 이름과 주인 이름이 걸리는 로어북(주인 인물 포함)·위키의 가게 문서 가운데 최대 몇 개를 넘길지예요(0~12).'),
           field('넘기는 것·남는 것', '', '모델에 가는 것: 가게 이름·주인, 가게 정체(첫 호출 뒤 고정), 위의 참고 로어북, 맥락이면 주인공 신분·상태창 마지막 줄·진행 중 괴이·최근 본문, 이번 방문 진열대·대화 전부. 안 가는 것: 잔고·소지품·페르소나·작가 노트. 본편에는 다음 턴 [Inventory] 글의 This turn 으로 「새로 산 것」·「판 것」·「주인과 나눈 대화 전부」·「쫓겨남」이 넘어가고, 산 물건은 소지품에, 돈은 가계부에 남아요. 조립된 요청 원문은 점검 → 호출 기록에서 봐요.'),
@@ -781,6 +805,31 @@ export async function handleSettings(action: string, value: string | undefined, 
     else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === val ? null : { [key]: val }));
     return true;
   }
+  // 고유 상점 표 (set-own*): 줄 고치기·켜고 끄기·사이트·직접 갔을 때 창·더하기·지우기·기본값
+  if (action.startsWith('set-own')) {
+    const vars = scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate;
+    const cur = ownShops(vars);
+    // 줄 고치기는 「id:칸=글」, 나머지 고르기는 「id:값」
+    const fm = action === 'set-own' ? /^([\w-]+):(name|alias)=([\s\S]*)$/.exec(v) : null;
+    const [id, ...rest] = (fm ? fm[1] : v).split(':');
+    const val = rest.join(':');
+    let next: OwnShop[] | null = null;
+    const edit = (f: (o: OwnShop) => OwnShop) => cur.map((o) => (o.id === id ? f(o) : o));
+    if (fm) {
+      const t = fm[3].replace(/\s+/g, ' ').trim();
+      next = edit((o) => (fm[2] === 'name' ? { ...o, name: t.slice(0, 30) } : { ...o, alias: t.slice(0, 120) }));
+    } else if (action === 'set-own-on' && (val === '1' || val === '0')) next = edit((o) => ({ ...o, on: val === '1' }));
+    else if (action === 'set-own-web' && OWN_WEB.some(([w]) => w === val)) next = edit((o) => ({ ...o, web: val === 'none' ? '' : val }));
+    else if (action === 'set-own-visit' && OWN_VISIT.some(([w]) => w === val)) next = edit((o) => ({ ...o, visit: val === 'none' ? '' : val }));
+    else if (action === 'set-own-add' && cur.length < OWN_MAX) next = [...cur, { id: `o${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, on: true, name: '', alias: '', web: '', visit: 'shop' }];
+    else if (action === 'set-own-del') next = cur.filter((o) => o.id !== v);
+    else if (action === 'set-own-reset') next = null;
+    if (!next && action !== 'set-own-reset') return true;
+    const out = next ? JSON.stringify(next) : '';
+    if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [SHOP_OWN_VAR]: out } }));
+    else await save(ctx, env, (chat) => (String(chat.scriptstate?.[SHOP_OWN_VAR] ?? '') === out ? null : { [SHOP_OWN_VAR]: out }));
+    return true;
+  }
   if (action.startsWith('set-shop-')) {
     // 최소·최대: −/+ 한 칸씩, 서로 넘으면 다른 쪽도 같이 민다
     if (action === 'set-shop-min' || action === 'set-shop-max') {
@@ -795,7 +844,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       else await save(ctx, env, (chat) => (String(chat.scriptstate?.[SHOP_MIN_VAR] ?? '') === patch[SHOP_MIN_VAR] && String(chat.scriptstate?.[SHOP_MAX_VAR] ?? '') === patch[SHOP_MAX_VAR] ? null : patch));
       return true;
     }
-    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, feature: SHOP_FEATURE_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR, where: SHOP_WHERE_VAR };
+    const KEY: Record<string, string> = { on: SHOP_ON_VAR, model: SHOP_MODEL_VAR, count: SHOP_COUNT_VAR, ctx: SHOP_CTX_VAR, price: SHOP_PRICE_VAR, diverse: SHOP_DIVERSE_VAR, thoughts: SHOP_THOUGHTS_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR, feature: SHOP_FEATURE_VAR, turns: SHOP_TURNS_VAR, refs: SHOP_REFS_VAR, where: SHOP_WHERE_VAR, judge: SHOP_JUDGE_VAR };
     const k = action.slice(9);
     const key = KEY[k];
     if (!key) return true;
@@ -808,7 +857,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       else await save(ctx, env, (chat) => (String(chat.scriptstate?.[key] ?? '') === nv ? null : { [key]: nv }));
       return true;
     }
-    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? ['0', '1', '2'].includes(v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : k === 'where' ? v === 'any' || v === 'shop' : k === 'turns' ? /^[1-8]$/.test(v) : k === 'refs' ? /^([0-9]|1[0-2])$/.test(v) : v === '1' || v === '0';
+    const ok = k === 'price' ? true : k === 'model' ? v === 'main' || v === 'aux' : k === 'count' ? ['0', '1', '2'].includes(v) : k === 'thoughts' ? ['off', 'inner', 'note'].includes(v) : k === 'where' ? v === 'any' || v === 'shop' : k === 'judge' ? ['auto', 'main', 'updater'].includes(v) : k === 'turns' ? /^[1-8]$/.test(v) : k === 'refs' ? /^([0-9]|1[0-2])$/.test(v) : v === '1' || v === '0';
     if (!ok) return true;
     const next = k === 'price' ? v.replace(/\s+/g, ' ').trim().slice(0, 80) : v;
     if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [key]: next } }));

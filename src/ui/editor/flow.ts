@@ -18,6 +18,7 @@ import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
 import { previewShopShelf } from '../shop';
+import { shopJudgeBy, shopOn } from '../../core/shop';
 import { previewMallShelf } from '../malls';
 import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
 import { MALL_NAME, mallSettings, type MallSite } from '../../core/malls';
@@ -158,6 +159,13 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const wikiTitle = wikiOn && nw.autoTitle === 'model';
   const post: Node[] = [
     { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:자동 호출', sure: updateOn ? 1 : 0, maybe: 0 },
+    // 상점 판단 (11-09 사용자): 누가 「지금 상점이 있나」를 보는지. 따로 호출하지 않는다 (메인 응답 표식 또는 인물 갱신에 얹음)
+    (() => {
+      const j = shopJudgeBy(ss);
+      const on = shopOn(ss);
+      const calls = !on ? '판단 안 함 (상점 꺼짐)' : j.by === 'updater' ? '인물 갱신에 얹음 (추가 호출 없음)' : j.fallback ? '메인 모델이 대신 (갱신기가 매 턴 돌지 않음)' : '메인 모델이 응답 끝에 표식 (추가 호출 없음)';
+      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:items', to: 'r:상점 판단', sure: 0, maybe: 0 } as Node;
+    })(),
     { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
     { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? jointText('phone').calls : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? jointText('phone').sure : 0, maybe: 0 },

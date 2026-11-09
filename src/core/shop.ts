@@ -16,7 +16,8 @@ import { messageKey } from './people/store';
 import { parseWon } from './wallet';
 import { craftMessages, type CraftMessage, type ThoughtsMode } from './craft';
 import { genSettings } from './advanced';
-import { fillGuide, guideSections, type GuideName } from './guides';
+import { fillGuide, guideDefault, guideSections, type GuideName } from './guides';
+import { peopleSettings } from './people/settings';
 
 export const SHOP_VAR = '$st_shop';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars) */
@@ -35,6 +36,43 @@ export const SHOP_TURNS_VAR = '$sh_turns';
 export const SHOP_REFS_VAR = '$sh_refs';
 export const SHOP_WHERE_VAR = '$sh_where';
 export type ShopWhere = 'any' | 'shop';
+/** 상점 판단 (11-09 사용자): 누가 「지금 상점이 있나」를 정하나. auto = 갱신기가 매 턴 돌면 갱신기, 아니면 메인 모델 */
+export const SHOP_JUDGE_VAR = '$sh_judge';
+export type ShopJudge = 'auto' | 'main' | 'updater';
+
+/** 고유 상점 (11-09 사용자): 로어에 있는 자기 창이 있는 상점. 설정 → 상점 「고유 상점」 표에서 고친다 (하드코딩하지 않는다).
+ *  web = 인터넷(사이트·앱)으로 접속하면 열 사이트 id (''=없음) · visit = 직접 가면 쓸 창 ('shop' 기본 상점창, ''=열지 않음. 디자인한 창이 생기면 그 id) */
+export const SHOP_OWN_VAR = '$sh_own';
+export interface OwnShop { id: string; on: boolean; name: string; alias: string; web: string; visit: string }
+export const OWN_SHOPS_DEFAULT: OwnShop[] = [
+  { id: 'cos', on: true, name: '우주 쇼핑몰', alias: '', web: 'cos', visit: 'shop' },
+  { id: 'bm', on: true, name: '백일몽 포인트몰', alias: '포인트몰, 복지몰', web: 'bm', visit: '' },
+];
+/** 인터넷 접속 표시: 표식 주인 칸 (모델은 `@web`, 정리한 뒤에는 `@web:사이트`) */
+export const WEB_OWNER = '@web';
+export const OWN_MAX = 40;
+export function ownShops(vars: Vars): OwnShop[] {
+  const raw = vars?.[SHOP_OWN_VAR];
+  if (typeof raw !== 'string' || !raw.trim()) return OWN_SHOPS_DEFAULT.map((x) => ({ ...x }));
+  try {
+    const list = JSON.parse(raw) as unknown;
+    if (!Array.isArray(list)) return OWN_SHOPS_DEFAULT.map((x) => ({ ...x }));
+    return list.slice(0, OWN_MAX).flatMap((x): OwnShop[] => {
+      if (!x || typeof x !== 'object') return [];
+      const o = x as Record<string, unknown>;
+      return [{ id: clean(o.id, 24) || `o${Math.random().toString(36).slice(2, 8)}`, on: o.on !== false, name: clean(o.name, 30), alias: clean(o.alias, 120), web: clean(o.web, 12), visit: clean(o.visit, 24) }];
+    });
+  } catch {
+    return OWN_SHOPS_DEFAULT.map((x) => ({ ...x }));
+  }
+}
+const ownNames = (o: OwnShop) => [o.name, ...o.alias.split(/[,，、]/)].map((x) => x.trim()).filter(Boolean);
+/** 표식의 가게 이름에 맞는 켜진 고유 상점 */
+export function ownShopOf(vars: Vars, shop: string): OwnShop | null {
+  return ownShops(vars).find((o) => o.on && o.name && ownNames(o).some((n) => sameShopName(n, shop))) ?? null;
+}
+/** 화면 카드용: 정리된 표식의 주인 칸이 `@web:사이트` 이면 그 사이트 id */
+export const webSiteOfOwner = (owner: string): string => (/^@web:([a-z0-9_-]{1,12})$/i.exec(owner.trim())?.[1] ?? '');
 export const SHOP_TURNS_DEFAULT = 3;
 export const SHOP_REFS_DEFAULT = 6;
 
@@ -73,6 +111,8 @@ export interface ShopSettings {
   kick: boolean;
   /** 상점이 열리는 자리 (any 판매자 없는 곳도 · shop 가게 장면만) */
   where: ShopWhere;
+  /** 상점 판단을 누가 하나 (설정 값. 실제로 누가 하는지는 shopJudgeBy) */
+  judge: ShopJudge;
   /** 넘길 최근 본문 턴 수 (1~8) */
   turns: number;
   /** 넘길 참고 로어북 수 (0~12) */
@@ -105,6 +145,7 @@ export function shopSettings(vars: Vars): ShopSettings {
     model: vars?.[SHOP_MODEL_VAR] === 'main' ? 'main' : 'aux',
     kick: vars?.[SHOP_KICK_VAR] !== '0',
     where: vars?.[SHOP_WHERE_VAR] === 'shop' ? 'shop' : 'any',
+    judge: vars?.[SHOP_JUDGE_VAR] === 'main' ? 'main' : vars?.[SHOP_JUDGE_VAR] === 'updater' ? 'updater' : 'auto',
     turns: numIn(vars?.[SHOP_TURNS_VAR], SHOP_TURNS_DEFAULT, 1, 8),
     refs: numIn(vars?.[SHOP_REFS_VAR], SHOP_REFS_DEFAULT, 0, 12),
   };
@@ -370,8 +411,14 @@ export function settleShop(chat: Chat, responseIndex: number, self: string[] = [
   const norm = (s: string) => s.replace(/\s+/g, '').toLowerCase();
   const me = new Set(self.map(norm).filter(Boolean));
   const found = on ? findShopTag(text) : null;
-  const mine = !!found?.owner && me.has(norm(found.owner));
-  const tag = mine ? null : found;
+  // 고유 상점 (11-09): 인터넷 접속(@web)이면 그 몰 사이트를 여는 표식으로 바꾸고 상점 방문은 열지 않는다. 직접 간 곳은 「직접 가면 쓸 창」이 없으면 열지 않는다
+  const own = found ? ownShopOf(chat.scriptstate, found.shop) : null;
+  const webAsk = !!found && found.owner.trim().toLowerCase().startsWith(WEB_OWNER);
+  const site = webAsk && own?.web ? own.web : '';
+  const mine = !!found && (webAsk ? !site : (!!found.owner && me.has(norm(found.owner))) || (!!own && !own.visit));
+  const web = !mine && !!site;
+  const tag = mine || web ? null : found;
+  const webRaw = web ? `[shop: ${own!.name}|${WEB_OWNER}:${site}]` : '';
   const key = messageKey(m, responseIndex);
   const cur = readShop(chat.scriptstate);
   let next: ShopState | null = null;
@@ -380,6 +427,13 @@ export function settleShop(chat: Chat, responseIndex: number, self: string[] = [
   }
   let message: Chat['message'] | undefined;
   for (let i = 0; i < list.length; i++) {
+    if (web && i === responseIndex) {
+      // 접속 표식은 `@web:사이트` 로 고쳐 둔다 (화면 카드는 설정을 모르니 표식만 보고 연다)
+      if (found!.raw === webRaw) continue;
+      message ??= [...list];
+      message[i] = { ...list[i], data: `${stripShopTags(String(list[i].data))}\n${webRaw}` };
+      continue;
+    }
     if ((on && !mine && i === responseIndex) || list[i].role !== 'char' || !hasShopTag(String(list[i].data ?? ''))) continue;
     message ??= [...list];
     message[i] = { ...list[i], data: stripShopTags(String(list[i].data)) };
@@ -863,8 +917,33 @@ export function talkPrompt(src: ShopSource, s: ShopSettings, guide: GuideName = 
 /** 상점이 열리는 자리 (설정): any(기본, 온라인몰·홈쇼핑·자판기·이면 쇼핑몰처럼 판매자가 없는 곳도) · shop(판매자가 있는 가게 장면만) */
 const WHERE: Record<ShopWhere, string> = {
   any: 'Any way of buying counts: store, stall, unstaffed shop, online mall, home shopping, catalog, vending machine, otherworldly mall.',
-  shop: 'Only a physical store or stall with a seller present; not online, broadcast, catalog or machine.',
+  shop: 'Only a physical store or stall with a seller present, or a shop with its own screen listed below; not other online, broadcast, catalog or machine sales.',
 };
-export const shopGuide = (vars?: Vars): string => fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where] });
+/** 상점 판단 기준 (지침 「상점」의 SHOP_RULE 절). 메인 모델 표식 지침과 갱신기가 같은 글을 읽는다 (11-09 사용자: 상점 지침은 양쪽을 동시에) */
+export const shopRule = (vars?: Vars): string => fillGuide(G().SHOP_RULE ?? guideSectionDefault('SHOP_RULE'), { where: WHERE[shopSettings(vars).where], own: ownShopsLine(vars) });
+/** 갱신기만 더 받는 판단 요령 (지침 「상점」 SHOP_JUDGE 절) */
+export const shopJudgeGuide = (): string => fillGuide(G().SHOP_JUDGE ?? guideSectionDefault('SHOP_JUDGE'), {});
+/** 고유 상점 줄 (설정 표의 켜진 줄): 이름·다른 이름·어떻게 열리는지 */
+function ownShopsLine(vars?: Vars): string {
+  const list = ownShops(vars).filter((o) => o.on && o.name && (o.web || o.visit));
+  if (!list.length) return '';
+  const item = (o: OwnShop) => {
+    const also = ownNames(o).slice(1);
+    const how = o.web && o.visit ? 'online or in person' : o.web ? 'online only' : 'in person only';
+    return `${o.name}${also.length ? ` (also ${also.join(', ')})` : ''} — ${how}`;
+  };
+  return fillGuide(G().OWN_SHOPS ?? guideSectionDefault('OWN_SHOPS'), { list: list.map(item).join('; ') });
+}
+const guideSectionDefault = (name: string): string => [...guideDefault('Shop').matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)].find((m) => m[1].trim() === name)?.[2] ?? '';
+/** 본편 표식 지침: 메인 모델이 판단할 때만 본편에 붙는다 (갱신기가 판단하면 빈 글) */
+export const shopGuide = (vars?: Vars): string => (shopJudgeBy(vars).by === 'main' ? fillGuide(G().MAIN_TAG, { where: WHERE[shopSettings(vars).where], rule: shopRule(vars) }) : '');
+
+/** 실제로 상점을 판단하는 쪽. 갱신기를 골랐는데 갱신기가 매 턴 돌지 않으면(꺼짐·수동) 메인 모델이 대신한다 (fallback) */
+export function shopJudgeBy(vars?: Vars): { pick: ShopJudge; by: 'main' | 'updater'; fallback: boolean } {
+  const pick = shopSettings(vars).judge;
+  const p = peopleSettings(vars as Record<string, unknown> | undefined);
+  const runs = p.on && p.when === 'turn';
+  return { pick, by: pick !== 'main' && runs ? 'updater' : 'main', fallback: pick === 'updater' && !runs };
+}
 
 export const genLanguage = (vars: Vars): string | null => genSettings(vars).language;

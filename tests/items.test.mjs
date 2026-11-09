@@ -185,7 +185,9 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   assert.equal(withInventory(out, chat), out);
   assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_on: '0' } }).length, 3, '끄면 안 넣는다');
   // 넘기기를 꺼도 상점이 켜져 있으면 물건 목록 없이 상점 지침만 ([Shop])
-  { const s = withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } });
+  // 상점 판단이 갱신기면(기본 자동 + 인물 갱신 매 턴) 표식 지침도 사건도 없으니 블록을 안 넣는다 (11-09)
+  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } }).length, 3, '갱신기가 판단하면 [Shop] 없음');
+  { const s = withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_judge: 'main' } });
     assert.equal(s.length, 4);
     assert.match(s[2].content, /^\[Shop\]\n[\s\S]*\[shop: 가게 이름\|주인 이름\]/);
     assert.doesNotMatch(s[2].content, /소금 봉지|\[Inventory\]/);

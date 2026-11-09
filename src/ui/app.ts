@@ -152,6 +152,8 @@ const tabBoard = (): BoardSite => { const s = curTab().site; return isBoardSite(
 let cdrOpen = false;
 let lastForm: HTMLFormElement | null = null;
 let tab: Tab = 'board';
+/** 카드에서 고유 상점 사이트로 접속: 인터넷 창만 (닫으면 풀린다) */
+let netSolo = false;
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
 /** 시작 화면에서 연 새 채팅 기본 설정 */
@@ -754,8 +756,18 @@ export async function openWiki(title: string): Promise<void> {
 }
 
 /** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
-export async function openShop(): Promise<void> {
+export async function openShop(site = ''): Promise<void> {
   await openApp({ quietIfNotLite: true });
+  // 고유 상점에 인터넷으로 접속한 카드(11-09 사용자): 상황판 없이 인터넷 창만 그 사이트로. 사고판 것은 상황판 인터넷 탭과 같은 저장소
+  if (site && view.kind === 'started' && isSite(site)) {
+    netSolo = true;
+    tab = 'net';
+    openSite(site);
+    siteOpened();
+    render();
+    return;
+  }
+  netSolo = false;
   // 카드에서 열면 상점만 (2026-11-07 사용자: 상황판이 배경으로 뜨면 안 됨)
   shopUi.solo = true;
   if (view.kind === 'started') await handle('shop-open');
@@ -830,6 +842,7 @@ async function refresh(): Promise<void> {
 
 async function close(): Promise<void> {
   shown = false;
+  netSolo = false;
   stopCctvFx();
   await risuai.hideContainer();
 }
@@ -1424,7 +1437,8 @@ function render(): void {
   if (!root) return;
   // 설정 창의 설정 페이지는 패널 상태를 그대로 보여 주므로 패널을 다시 그릴 때 같이 그린다 (2026-10-27)
   if (editorOpen() && editorOnSettings()) queueMicrotask(() => editorRender());
-  const nav = view.kind === 'started';
+  // 카드에서 고유 상점 사이트로 접속한 인터넷 창만 (netSolo): 메뉴 없이
+  const nav = view.kind === 'started' && !(netSolo && tab === 'net');
   // 종료 알림 오버레이: 새 보고서가 있으면 한 번 띄운다 (창이 닫혀 있었으면 지금, 이 그리기에서)
   if (view.kind === 'started') syncCloseToast(view.ctx.chat, render);
   // 다시 그려도 읽던 자리를 지킨다
@@ -1666,6 +1680,7 @@ function body(): string {
     case 'started':
       evSeenReset();
       if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
+      if (netSolo && tab === 'net') return `${header(TAB_TITLE.net)}<div class="gx-content gx-netsolo">${browserBody(view.ctx)}</div>${closeToastHtml()}`;
       return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;

@@ -84,6 +84,8 @@ export interface UpdateInput {
   items: string[] | null;
   /** 이 묶음에서 「사용」한 물건 (자료 used_now). 인용 없이도 그 응답을 기준으로 받는다 */
   used: UsedNow[];
+  /** 상점 판단 (설정 「상점 판단」이 갱신기일 때, core/shop.ts shopJudgeBy): 판단할 응답의 m 꼬리표. 없으면 null */
+  shop: { m: string } | null;
 }
 
 /** 소지품 절 자료: 지금 가진 것 (core/items.ts). 판정(사용·남은 횟수·장착)과 상태를 같이 준다 */
@@ -170,6 +172,8 @@ export interface BuildOpts {
   items?: ItemNow[] | null;
   /** 이 묶음 응답에서 「사용」 자리로 쓴 물건 (core/items.ts usedItemsAt). 자료 used_now: 소모성 횟수는 프로그램이 이미 뺐다 */
   used?: UsedNow[];
+  /** 상점 판단 (갱신기가 판단할 때): 판단할 응답 위치(가장 최근 응답)와 주인공 이름들 */
+  shop?: { at: number; self: string[] } | null;
 }
 
 /** 관계 재검토 간격 (턴). 리수폿 원문 20 */
@@ -282,6 +286,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     const after = (e: { anchor: string }) => turnAt(chat, live.at.get(e.anchor) ?? 0) > since;
     return liveEntries(p.slots.history, live).some(after) || Object.values(store.docs).some((d) => d.type === 'event' && liveEntries(d.entries, live).some(after));
   });
+  const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i]) => i === o.shop!.at)?.[0] ?? '' : '';
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
@@ -322,9 +327,11 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       ? o.items.map((e) => ({ name: e.name, desc: e.desc || undefined, usable: e.use, uses_left: e.left, weight_kg: e.weight, equip: e.equip, equipped: e.equipped || undefined, condition: e.state === 'ok' ? undefined : e.state }))
       : undefined,
     used_now: o.items && o.used?.length ? o.used.map((u) => ({ name: u.name, times: u.n, consumable: u.left !== undefined, uses_left: u.left })) : undefined,
-    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', point_transactions: typeof o.points === 'number' || undefined, items: !!o.items },
+    // 상점 판단 (11-09): 가장 최근 응답 끝에 주인공이 물건을 살 수 있는 곳이 있나. 기준 글은 지침 「상점」 SHOP_RULE (본편 표식 지침과 같은 글)
+    shop_check: shopM ? { m: shopM, protagonist: o.shop!.self.filter(Boolean) } : undefined,
+    want: { shop: !!shopM || undefined, new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', point_transactions: typeof o.points === 'number' || undefined, items: !!o.items },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
+  return { shop: shopM ? { m: shopM } : null, system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, overBudget, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', points: typeof o.points === 'number', items: o.items ? o.items.map((e) => e.name) : null, used: o.items ? o.used ?? [] : [] };
 }
 
 // ── 지침 조립 ──
@@ -404,6 +411,8 @@ export interface UpdateResult {
   axes_init?: { who: string; axes: Record<string, number>; m: string; quote: string }[];
   /** 성적 욕망·이상성욕 첫 글 (sexual.init_needed 인 칸만, 한 번). 그 뒤 변경은 observations 의 성적 축 */
   sexual_init?: { who: string; sexual_desire?: string | null; paraphilia?: string | null; m: string; quote: string }[];
+  /** 상점 판단 (shop_check 가 있을 때): 지금 상점이 있으면 하나, 없으면 null */
+  shop?: { name?: string; owner?: string | null; m?: string; quote?: string } | null;
   /** 바꾸지 않은 이유·빠진 규칙 (원본 issues[]). 빈 답인지 「확인했는데 변화 없음」인지 가른다 (2026-11-07) */
   issues?: { code?: string; who?: string | null; reason?: string }[];
 }
@@ -441,6 +450,8 @@ export interface ApplyReport {
   points: { anchor: string; amount: number; memo: string; quote: string }[];
   /** 받아들인 소지품 변화 (호출한 쪽이 `$st_items` 에 적는다, core/items.ts). new 는 더하고, update 는 설명·효과·상태·남은 횟수 갱신, gone·destroyed 는 빼고 기록 */
   items: ItemChange[];
+  /** 상점 판단 결과 (판단을 맡았을 때만): 있으면 가게, 없으면 null. undefined = 맡지 않음 */
+  shop?: { index: number; name: string; owner: string } | null;
 }
 export interface ItemChange {
   anchor: string;
@@ -1262,6 +1273,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       report.points.push({ anchor: ev.anchor, amount, memo, quote: str(t.quote).slice(0, 120) });
       report.applied.transactions++;
     }
+  }
+
+  // 6c-1. 상점 판단 (11-09, 설정 「상점 판단」이 갱신기): 맡긴 응답(shop_check.m)에 가게가 있으면 하나, 아니면 「상점 없음」(null).
+  // 가게가 있다는 건 장면 전체로 보는 판단이라 인용은 받지 않는다 (인용이 어긋났다고 가게를 놓치지 않게)
+  if (input.shop && !ctx.only?.length) {
+    const t = r.shop && typeof r.shop === 'object' && !Array.isArray(r.shop) ? r.shop : null;
+    const name = plain(t?.name, 30);
+    const ev = evidenceLoose(input.shop.m);
+    if (typeof ev !== 'string') report.shop = name ? { index: ev.index, name, owner: plain(t?.owner, 30) } : null;
+    if (t && !name) drop('shop', t, '가게 이름 없음');
   }
 
   // 6c-2. 소지품 (2026-11-07, core/items.ts): 본문에 분명히 적힌 변화만, 인용 필수. update·gone 은 목록에 있는 이름만, 같은 이름은 한 번. 다시 읽기(only)에서는 받지 않는다
