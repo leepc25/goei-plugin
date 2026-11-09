@@ -6,7 +6,7 @@
 import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
-import { generate } from '../host/llm';
+import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
 import { addWalletEntry, aliveAnchors, formatWon, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { pointsVars, readPoints } from '../core/points';
@@ -170,6 +170,15 @@ export async function autoRefreshMall(ctx: ChatContext, site: MallSite): Promise
   const key = lastBot(ctx.chat)?.key ?? '';
   if (String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === key) return;
   await ask(ctx, env, site, 'shelf', readMall(ctx.chat.scriptstate, site));
+}
+
+/** 호출 흐름 미리 계산 (editor/flow.ts): 지금 설정으로 이 쇼핑몰이 보낼 진열대 요청 (모델은 안 부름). 꺼져 있으면 null */
+export function previewMallShelf(ctx: ChatContext, site: MallSite): LlmMessage[] | null {
+  const s = mallSettings(ctx.chat.scriptstate, site);
+  if (!s.on) return null;
+  const st = readMall(ctx.chat.scriptstate, site);
+  const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s);
+  return shelfPrompt(src, s, MALL_GUIDE[site]);
 }
 
 // ── 사기 ──

@@ -690,8 +690,24 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
 }
 
 /** 괴담넷 왼쪽 메뉴 */
+/** 괴담넷 왼쪽 메뉴 (11-09 사용자: 한 번에 6~8편이라 말머리 분류 조회는 무의미 → 글 제목 목록. 글을 연 채로 다른 글을 바로 고른다, 옛 괴담넷처럼. 말머리는 글마다 그대로) */
 function gnSide(st: GState, unreadDm: number): string {
-  return `<nav class="side" aria-label="게시판 메뉴"><h6>게시판</h6>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}<h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</nav>`;
+  const posts = [...st.posts].sort((a, b) => b.id - a.id).slice(0, 60);
+  const items = posts.map((p) => {
+    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    return `<button class="sp${on ? ' on' : ''}" data-action="${on ? 'gn-home' : 'gn-open-side'}" data-value="${p.id}" aria-pressed="${on}" title="${esc(p.title)}">${p.tag ? `<i>[${esc(p.tag)}]</i>` : ''}<span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}${dot(p)}</button>`;
+  }).join('');
+  return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${catBtn('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</nav>`;
+}
+
+/** 괴담갤 오른쪽 칸 (11-09 사용자: 디씨 사이드바 「힛갤」 — 지금 생성된 글을 조회수 순으로, 본문을 열어도 그대로 남는 글 목록) */
+function galSide(st: GState): string {
+  const top = [...st.posts].filter((p) => p.tag !== '공지').sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 15);
+  const items = top.map((p) => {
+    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    return `<li><button class="${on ? 'on' : ''}" data-action="gn-open-side" data-value="${p.id}" title="${esc(p.title)}"><span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}<small>${p.views}</small></button></li>`;
+  }).join('');
+  return `<div class="hit"><h4>힛갤</h4>${items ? `<ol>${items}</ol>` : '<p class="none">아직 글이 없어요.</p>'}</div>`;
 }
 
 /** 목록 (사이트마다) */
@@ -870,6 +886,7 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   const box = (inner: string) => (plain ? `<div class="bs-plain">${extras}${inner}</div>` : `${extras ? `<div class="bs-x">${extras}</div>` : ''}${inner}`);
   let inner: string;
   if (site === 'gn') inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain ? `<div class="gmain">${extras}${main}</div>` : `${extras}${main}`}</div></div>`;
+  else if (site === 'gal' && !mobile) inner = `<div class="gal-cols">${box(main)}<aside class="gal-side">${galSide(st)}</aside></div>`;
   else if (site === 'wpf') {
     // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다)
     const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
@@ -1023,9 +1040,11 @@ export async function handleGnet(action: string, value: string | undefined, base
     case 'gn-att-menu':
       gnet.attachMenu = !gnet.attachMenu;
       break;
-    case 'gn-open': {
-      // PC는 고른 글을 다시 누르면 닫힌다
-      gnet.open = gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== 'comment') ? null : a;
+    case 'gn-open':
+    case 'gn-open-side': {
+      // PC는 고른 글을 다시 누르면 닫힌다 (옆 목록에서 고른 것은 늘 연다)
+      gnet.open = action === 'gn-open' && gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== 'comment') ? null : a;
+      gnet.sub = 'board';
       gnet.settings = false;
       if (gnet.compose && gnet.compose.kind !== 'post') gnet.compose = null;
       if (gnet.compose?.kind === 'post') gnet.compose = null;

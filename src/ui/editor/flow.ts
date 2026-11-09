@@ -18,6 +18,9 @@ import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
 import { previewShopShelf } from '../shop';
+import { previewMallShelf } from '../malls';
+import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
+import { MALL_NAME, mallSettings, type MallSite } from '../../core/malls';
 import { traceUi } from './trace';
 
 // ── 토큰 미리 계산 (2026-11-07 사용자: 지금 설정값으로 들어갈 요청이 정해져 있으니 토큰을 계산해 보인다) ──
@@ -56,7 +59,7 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
   map['인물 갱신'] = count(pp.update);
   safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
   safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
-  safe('괴담넷 새로고침', () => count(previewGnetRefresh(ctx)));
+  for (const site of BOARD_SITES) safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
   safe('괴담톡 관전', () => count(previewPhoneView(ctx)));
   safe('위키 자동 작성', () => {
     const w = previewWikiAuto(ctx);
@@ -65,6 +68,7 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
   safe('상점', () => count(previewShopShelf(ctx)));
+  for (const site of ['cos', 'bm'] as MallSite[]) safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
   return map;
 }
 
@@ -147,11 +151,25 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
     { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? 1 : 0, maybe: 0 },
     { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:자동 호출', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
+    // 다른 게시판 셋·쇼핑몰 둘 (11-09 사용자: 괴담넷만 있고 통째로 빠져 있었다). 사이트마다 설정 변수가 따로라 그 사이트로 비춘 상태값으로 읽는다
+    ...(['gal', 'wpf', 'sm'] as const).map((site): Node => {
+      const sv = boardView(ctx.chat, site).scriptstate;
+      const g = gnetSettings(sv);
+      const on = g.enabled && g.auto;
+      return { name: `${BOARD_NAME[site]} 새로고침`, sub: site === 'sm' ? '매물·댓글·쪽지' : '게시판 글·댓글·쪽지', kind: 'aux', on, model: on ? id(featureModel(sv, 'gn')) || mm(g.model) : undefined, calls: !g.enabled ? '호출 없음 (사이트 끔)' : g.auto ? '1회' : g.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+    }),
+    ...(['cos', 'bm'] as MallSite[]).map((site): Node => {
+      const m = mallSettings(ss, site);
+      const on = m.on && m.auto === 'turn';
+      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? '1회' : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+    }),
     { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
     { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
   ];
   const manual: Node[] = [
     { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
+    { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: gnetModel, calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:gnet', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:cos', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
@@ -170,7 +188,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
 const tokLabel = (n: Node): string => {
   if (n.kind === 'plain') return '';
   if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
-  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : '지금은 보낼 것 없음';
+  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : n.name.endsWith(' 진열') ? '쇼핑몰 꺼짐' : '지금은 보낼 것 없음';
   return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
 };
 function nodeHtml(n: Node): string {

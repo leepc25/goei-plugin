@@ -3567,7 +3567,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 접이식 칸 제목 줄 (2026-11-07 사용자: 접는 건 좋은데 눈에 띄어야 한다 — 흐릿한 글자 한 줄이면 안 보인다). 채운 띠 + 왼쪽 강조 줄 + 또렷한 제목 + 강조색 화살표 */
 .ps-adv-sub > summary, .ps-adv-sum { position: relative; gap: 10px; min-height: 48px; padding: 0 14px 0 18px; border-radius: 14px; background: var(--panel2); color: var(--text); font-size: 14px; font-weight: 700; letter-spacing: 0; transition: background .15s, box-shadow .15s; }
 .ps-adv-sub > summary::before, .ps-adv-sum::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--signal); opacity: .85; }
-.ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-radius: 14px 14px 0 0; border-bottom: 1px solid var(--line2); }
+.ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-bottom: 1px solid var(--line2); }
+/* 11-09 사용자: 네 모서리가 이중 — 바깥 상자(둥근 14px, overflow hidden)가 이미 깎으니 머리줄은 안 깎는다 */
+.ps-adv-sub > summary, .ps-adv-sum, .ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-radius: 0; }
 .ps-adv-sub > summary:hover, .ps-adv-sum:hover { background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); }
 .ps-adv-sub > summary::after, .ps-adv-sum::after { width: 10px; height: 10px; border-color: var(--signal); border-width: 2.5px; }
 .ps-adv-sub > summary > b, .pp-log > summary b { padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent-line); color: var(--signal); font-size: 12px; font-weight: 700; }
@@ -3785,7 +3787,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gn .hd nav{display:flex;gap:20px;color:var(--hdi);opacity:.75;font-size:14px;font-weight:600}.bs-gn .hd nav button.on{opacity:1}
 .bs-gn .hd .sr{margin-left:auto;width:280px;height:34px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--hdi);opacity:.7;font-size:13px}
 .bs-gn .hd .sr svg{fill:var(--hdi)}
-.bs-gn .wrap{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;padding:20px 28px;max-width:1200px}
+.bs-gn .wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;padding:20px 28px;max-width:1200px}
 .bs-gn .side{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px;align-self:start}
 .bs-gn .side button{display:block;padding:8px 12px;color:var(--dim);font-size:13.5px;border-radius:3px}
 .bs-gn .side button.on{background:var(--hd);color:var(--hdi);font-weight:800}
@@ -3808,7 +3810,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gal{background:#fff;color:#333;min-height:100%;font:12.5px 'Nanum Gothic','Noto Sans KR','Dotum',sans-serif;min-width:0}
 .bs-gal a{color:inherit;text-decoration:none}
 .bs-gal .gnb0{opacity:.55;display:flex;justify-content:flex-end;gap:12px;padding:6px 0;width:1000px;margin:0 auto;color:#666;font-size:12px}
-.bs-gal .hd{display:flex;align-items:center;gap:24px;height:46px;padding:0 max(16px,calc((100% - 1000px)/2));background:#3b4890}
+.bs-gal .hd{display:flex;align-items:center;gap:24px;height:46px;padding:0 max(16px,calc((100% - 1280px)/2));background:#3b4890}
 .bs-gal .hd .lg{font:900 19px/1 'Noto Sans KR',sans-serif;color:#fff;letter-spacing:-.5px}
 .bs-gal .hd .lg small{font:500 12px 'Noto Sans KR';color:#cfd5f5;letter-spacing:0;margin-left:8px}
 .bs-gal .hd .sch{display:flex;border:2px solid #fff;height:30px;width:320px;background:#fff;margin-left:auto}
@@ -4634,3 +4636,30 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 세정게 오른쪽 칸 (왼쪽 MENU 고정, 11-09) */
 .bs-wpf .colr { min-width: 0; }
 .bs-wpf .colr > .ct, .bs-wpf .colr > .gn-cpane, .bs-wpf .colr > .ph-room { min-height: 100%; }
+
+/* ── 괴담넷 왼쪽 글 목록 (11-09) ── */
+.bs-gn .side .splist { max-height: 62vh; overflow-y: auto; margin: 2px 0 4px; }
+.bs-gn .side .splist .sp { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 6px 10px; color: var(--ink); font-size: 13px; line-height: 1.3; border-radius: 3px; text-align: left; }
+.bs-gn .side .splist .sp i { flex: none; font-style: normal; font-size: 11px; color: var(--dim); }
+.bs-gn .side .splist .sp span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gn .side .splist .sp em { flex: none; font-style: normal; font-size: 11px; color: var(--red); }
+.bs-gn .side .splist .sp .gn-dot { flex: none; }
+.bs-gn .side .splist .sp:hover { background: var(--chip); }
+.bs-gn .side .splist .sp.on { background: var(--hd); color: var(--hdi); font-weight: 700; }
+.bs-gn .side .splist .sp.on i, .bs-gn .side .splist .sp.on em { color: var(--hdi); opacity: .8; }
+.bs-gn .side .sp-none { margin: 4px 12px 8px; font-size: 12px; color: var(--dim); }
+
+/* ── 괴담갤 오른쪽 힛갤 칸 (11-09): 본문(.body)과 별개로 고정 ── */
+.bs-gal .gal-cols { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+.bs-gal .gal-cols > .body, .bs-gal .gal-cols > .bs-plain, .bs-gal .gal-cols > .bs-plain .body { width: auto; max-width: 1000px; margin: 0; min-width: 0; }
+.bs-gal .gal-side { position: sticky; top: 10px; margin-top: 10px; }
+.bs-gal .gal-side .hit { border: 1px solid #d6d8e2; background: #fff; }
+.bs-gal .gal-side h4 { margin: 0; padding: 7px 10px; font-size: 13px; color: #fff; background: #3b4890; }
+.bs-gal .gal-side ol { list-style: none; margin: 0; padding: 4px 0; }
+.bs-gal .gal-side li button { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 5px 10px; color: #333; font-size: 12.5px; text-align: left; line-height: 1.3; }
+.bs-gal .gal-side li button span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gal .gal-side li button em { flex: none; font-style: normal; font-size: 11px; color: #c33; }
+.bs-gal .gal-side li button small { flex: none; font-size: 11px; color: #999; }
+.bs-gal .gal-side li button:hover span { text-decoration: underline; }
+.bs-gal .gal-side li button.on span { color: #3b4890; font-weight: 700; }
+.bs-gal .gal-side .none { margin: 0; padding: 10px; font-size: 12px; color: #999; }
