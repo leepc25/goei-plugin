@@ -74,15 +74,7 @@ export function syncPointsToStatus(w: Wallet, chat: Chat): Wallet | null {
     }
   }
   if (target === null) return null;
-  // 첫 포인트 상태창(앞선 응답에 포인트 칸이 없음)은 따르지 않는다 — 포인트는 무조건 0에서 시작 (2026-11-09 사용자: 모델이 「기본 포인트 900」을 지어내 적어도 장부는 0).
-  // 그 뒤의 지급·사용은 갱신기 거래와 상태창 따르기가 적는다
-  let first = true;
-  for (let k = 0; k < i && first; k++) {
-    if (msgs[k].role === 'user') continue;
-    const d = typeof msgs[k].data === 'string' ? (msgs[k].data as string) : '';
-    if (findStatusTags(d).some((t) => t.points)) first = false;
-  }
-  if (first) return null;
+  // 첫 상태창도 따른다 (2026-11-09 사용자: 본문에 「기본 포인트 900」이 적혀 있으면 900이 생기는 게 맞다 — 「본문 따라 가야지」). 장부 시작값은 0이고 본문이 준 만큼 들어온다
   const anchor = messageKey(m, i);
   const id = `ps_${anchor}`;
   const base = removeWalletEntry(w, id);
