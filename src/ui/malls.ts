@@ -45,6 +45,8 @@ interface View {
   pay: boolean;
   /** 운영자에게 질문 창 */
   ask: boolean;
+  /** 방금 받은 맞춤 주문 id (주문 조회에서 설명·효과가 보이는 카드) */
+  took?: string;
   /** 질문에 붙인 물건 id */
   chip: string;
   /** 붙일 물건 고르기 */
@@ -247,6 +249,7 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       v.page = value ?? '';
       v.pay = false;
       v.focus = '';
+      v.took = '';
       break;
     case 'mall-cart': {
       const id = value ?? '';
@@ -378,6 +381,7 @@ export async function mallAction(action: string, value: string | undefined, ctx:
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true } : x))) } };
       });
       v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : '받을 수 없는 상태다.';
+      if (ok) v.took = o.id;
       await env.refresh();
       return true;
     }
@@ -478,7 +482,7 @@ function quoteCard(st: ShopState, id: string | undefined, v: View): string {
 }
 
 /** 「주문 조회」: 진행 중·받을 수 있음·받음 (11-09 사용자: 맞춤 상품이 진열되는 건 이상하다 → 따로 받는 창) */
-function cosOrders(ctx: ChatContext): string {
+function cosOrders(ctx: ChatContext, v: View): string {
   const list = readOrders(ctx.chat.scriptstate);
   const nowMin = worldMinute(ctx.chat);
   const lastKey = lastBot(ctx.chat)?.key ?? '';
@@ -486,11 +490,18 @@ function cosOrders(ctx: ChatContext): string {
   const rows = [...list].reverse().map((o) => {
     const ready = orderReady(o, nowMin, lastKey);
     const due = orderDue(o);
-    const when = o.taken ? '받음' : ready ? '<b class="cs-red">완성 — 받을 수 있다</b>' : due !== null ? `제작 중 · 납기 ${esc(minuteText(due))}${nowMin !== null ? ` (${Math.max(1, Math.ceil((due - nowMin) / 60))}시간 남음)` : ''}` : `제작 중 · 납기 ${o.hours}시간 (다음 응답 뒤)`;
-    // 받기 단추는 상태 칸 안에 (11-09 사용자: 끝의 빈 칸이 뭐냐)
-    return `<tr class="${o.taken ? 'done' : ''}"><td>${esc(o.item.name)}</td><td>${won(o.price)}</td><td>${when}${ready ? ` <button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>` : ''}</td></tr>`;
+    const when = o.taken ? '받음' : ready ? '<b class="cs-red">완성 — 위 카드에서 받아라</b>' : due !== null ? `제작 중 · 납기 ${esc(minuteText(due))}${nowMin !== null ? ` (${Math.max(1, Math.ceil((due - nowMin) / 60))}시간 남음)` : ''}` : `제작 중 · 납기 ${o.hours}시간 (다음 응답 뒤)`;
+    return `<tr class="${o.taken ? 'done' : ''}"><td>${esc(o.item.name)}</td><td>${won(o.price)}</td><td>${when}</td></tr>`;
   }).join('');
-  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b><table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
+  // 완성된 물건은 그림 카드로 (11-09 사용자: 완성되면 이미지와 함께 받기가 나와야). 받기 전엔 그림·이름만, 받은 직후 카드엔 설명·효과(광고 문구)까지
+  const cards = [...list].reverse().filter((o) => (!o.taken && orderReady(o, nowMin, lastKey)) || o.id === v.took).map((o) => {
+    const got = o.taken;
+    return `<div class="cs-it cs-got"><span class="cs-bd">${got ? '받음' : '★완성★'}</span><span class="cs-pic">${itemPic({ name: o.item.name, icon: o.item.icon })}</span>
+    <b class="cs-nm">${esc(o.item.name)}</b><p>${got ? `${esc(o.item.desc)}${o.item.effect ? `<br><i>※ ${esc(o.item.effect)}</i>` : ''}` : '우리는 만들었다. 받아라.'}</p>
+    <div class="cs-pr"><b>${won(o.price)}</b> <small>선납 완료</small></div>
+    <div class="cs-bt">${got ? '<small>소지품에 들어갔다</small>' : `<button class="cs-btn" data-action="mall-custom-take" data-value="${esc(o.id)}">받기</button>`}</div></div>`;
+  }).join('');
+  return `<div class="cs-box"><b class="cs-h">◈ 주문 조회 ◈</b>${cards ? `<div class="cs-grid cs-gotgrid">${cards}</div>` : ''}<table class="cs-tb cs-ord"><tr><th>주문</th><th>선납</th><th>상태</th></tr>${rows}</table><p class="cs-bal">납기는 작중 시각 기준이다. 환불의 존재는 없다.</p></div>`;
 }
 
 function opText(text: string, st: ShopState): string {
@@ -574,7 +585,7 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   let main: string;
   if (!s.on) main = '<div class="cs-box"><p>현재 영업 하지 않습니다. (소지품·가계부가 꺼져 있어요)</p></div>';
   else if (v.page === 'cart') main = cosCart(st, v, bal);
-  else if (v.page === 'orders') main = cosOrders(ctx);
+  else if (v.page === 'orders') main = cosOrders(ctx, v);
   else if (v.loading === 'shelf' && !list.length) main = '<div class="cs-box cs-wait"><p>우리는 상품을 진열하는 중… <span class="blink">★</span></p></div>';
   else if (!list.length) main = `<div class="cs-box"><p>${st.loaded ? '모든 상품이 품절 되었습니다.' : '상품이 아직 진열 되지 않았습니다.'}</p><button class="cs-btn" data-action="mall-refresh" ${v.loading ? 'disabled' : ''}>상품 가져오기</button></div>`;
   // 추천·할인·일반 모두 한 격자, 같은 배열 (2026-11-08 사용자: 구획으로 흐트러뜨리지 말 것). 추천·할인은 칸 안 딱지로만

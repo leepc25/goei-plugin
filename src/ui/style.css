@@ -4306,6 +4306,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .q-note.done { opacity: .85; }
 .ms-cos .q-note small.ok { color: #080; }
 .ms-cos .cs-ord tr.done td { color: #777; }
+.ms-cos .cs-gotgrid { margin-bottom: 8px; }
+.ms-cos .cs-got .cs-bd { background: #080; color: #fff; }
 .ms-cos .cs-ord .cs-btn { padding: 1px 8px; }
 .it-note { margin: 8px 0; padding: 8px 10px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 8px; white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
 .ms-cos .q-sell { flex-wrap: wrap; }
