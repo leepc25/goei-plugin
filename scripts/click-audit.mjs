@@ -353,10 +353,10 @@ window.__ca = (() => {
 
 // ---- 한 번 누르기 ------------------------------------------------------------------------------------------------
 // 새 페이지 → 시작 상태 → path(앞서 누른 것들)를 다시 누름 → target 을 누르고 기록
-async function pressStep(page, step, touch) {
-  const info = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return null; el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }); const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return { x: r.left + r.width / 2, y: r.top + r.height / 2, disabled: !!el.disabled, pe: s.pointerEvents }; }, [step.key, step.nth, opt.scope]);
+async function pressStep(page, step, touch, scope = opt.scope) {
+  const info = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); if (!el) return null; el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }); const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return { x: r.left + r.width / 2, y: r.top + r.height / 2, disabled: !!el.disabled, pe: s.pointerEvents }; }, [step.key, step.nth, scope]);
   if (!info) return { ok: false, why: '못 찾음' };
-  const h = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); const r = el.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 1), innerWidth - 2), y = Math.min(Math.max(r.top + r.height / 2, 1), innerHeight - 2); const top = document.elementFromPoint(x, y); return { x, y, ok: !!top && (top === el || el.contains(top) || (el.tagName === 'INPUT' && top.closest('label')?.contains(el))), top: top ? top.tagName.toLowerCase() + '.' + [...top.classList].slice(0, 2).join('.') + (top.dataset?.action ? '[' + top.dataset.action + ']' : '') : '' }; }, [step.key, step.nth, opt.scope]);
+  const h = await page.evaluate(([k, n, sc]) => { const el = window.__ca.find(k, n, sc); const r = el.getBoundingClientRect(); const x = Math.min(Math.max(r.left + r.width / 2, 1), innerWidth - 2), y = Math.min(Math.max(r.top + r.height / 2, 1), innerHeight - 2); const top = document.elementFromPoint(x, y); return { x, y, ok: !!top && (top === el || el.contains(top) || (el.tagName === 'INPUT' && top.closest('label')?.contains(el))), top: top ? top.tagName.toLowerCase() + '.' + [...top.classList].slice(0, 2).join('.') + (top.dataset?.action ? '[' + top.dataset.action + ']' : '') : '' }; }, [step.key, step.nth, scope]);
   if (!h.ok) return { ok: false, why: `가려짐(위에 ${h.top})`, x: h.x, y: h.y };
   if (touch) await page.touchscreen.tap(h.x, h.y); else await page.mouse.click(h.x, h.y);
   return { ok: true, x: h.x, y: h.y };
@@ -376,8 +376,9 @@ async function prepPage(browser, vp, base, path) {
   const { page, errors } = await openFrom(browser, vp, base);
   await page.addScriptTag({ content: PAGE_LIB });
   const touch = !!VIEWPORTS[vp].touch;
-  for (const st of path) {
-    const r = await pressStep(page, st, touch);
+  for (const [i, st] of path.entries()) {
+    // --from 길은 --only-scope 밖에 있어도 찾는다 (지도 탭을 눌러 들어간 뒤 지도 안만 누르기 등)
+    const r = await pressStep(page, st, touch, i < opt.from.length && st.key === opt.from[i].key ? '' : opt.scope);
     if (!r.ok) return { page, errors, fail: `앞 단계 「${st.key}」 ${r.why}` };
     await quiet(page);
   }
