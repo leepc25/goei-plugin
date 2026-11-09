@@ -154,7 +154,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
       const cur = env.current();
       if (cur && chatKey(cur) === chatKey(ctx)) {
         await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
-          const now = readMall(chat.scriptstate, site);
+          const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
           const last = now.talk[now.talk.length - 1];
           if (!last || last.who !== 'me') return null;
           return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...now, talk: now.talk.slice(0, -1) }) } };
@@ -176,7 +176,7 @@ export function mallOpenCheck(ctx: ChatContext, env: MallEnv, site: MallSite): v
   const s = mallSettings(ctx.chat.scriptstate, site);
   if (!s.on || s.auto === 'manual' || ui[site].loading) return;
   if (site === 'bm' && !loggedNick(ctx)) return;
-  const st = readMall(ctx.chat.scriptstate, site);
+  const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
   const key = lastBot(ctx.chat)?.key ?? '';
   if (st.loaded && String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === key) return;
   if (st.loaded && s.auto === 'turn') return;
@@ -192,14 +192,14 @@ export async function autoRefreshMall(ctx: ChatContext, site: MallSite): Promise
   if (!s.on || s.auto !== 'turn') return;
   const key = lastBot(ctx.chat)?.key ?? '';
   if (String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === key) return;
-  await ask(ctx, env, site, 'shelf', readMall(ctx.chat.scriptstate, site));
+  await ask(ctx, env, site, 'shelf', readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat)));
 }
 
 /** 호출 흐름 미리 계산 (editor/flow.ts): 지금 설정으로 이 쇼핑몰이 보낼 진열대 요청 (모델은 안 부름). 꺼져 있으면 null */
 export function previewMallShelf(ctx: ChatContext, site: MallSite): LlmMessage[] | null {
   const s = mallSettings(ctx.chat.scriptstate, site);
   if (!s.on) return null;
-  const st = readMall(ctx.chat.scriptstate, site);
+  const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
   const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st, s);
   src.assign = cosAssignment(s.size[1], s.context, mallRoll(ctx.chat.scriptstate, site), Math.random, site);
   if (site === 'cos') src.truthMode = cosTruthMode(ctx.chat.scriptstate);
@@ -213,7 +213,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
   const start = getPrefs().walletStart ?? WALLET_START_DEFAULT;
   let got: ShopItem[] | null = null;
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-    const now = readMall(chat.scriptstate, site);
+    const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
     const list = ids.map((id) => now.items.find((x) => x.id === id && !x.sold)).filter((x): x is ShopItem => !!x);
     if (!list.length || list.length !== ids.length) return null;
     const alive = aliveAnchors(chat);
@@ -231,7 +231,7 @@ async function buy(ctx: ChatContext, site: MallSite, ids: string[]): Promise<Sho
       const extra = it.pay ? ` + ${it.pay}` : '';
       const paid = p ? { paidWith: `${it.price.toLocaleString('en-US')} Baekilmong points at ${MALL_NAME[site]}${extra}` } : { price: it.price, ...(walletId ? { walletId } : {}), paidWith: `bank transfer to ${MALL_NAME[site]}${extra}` };
       items = addItem(items, alive, { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, ...paid });
-      st = markSold(st, it.id);
+      st = markSold(st, it.id, anchor);
     }
     got = list;
     return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...(p ? pointsVars(w) : walletVars(w)), ...itemsVars(items), ...mallVarsOf(site, st) } };
@@ -260,7 +260,7 @@ let moneyBusy = false;
 /** mallAction 본체 (돈 동작은 잠금 안에서 불린다) */
 async function mallMoney(action: string, value: string | undefined, ctx: ChatContext, env: MallEnv, site: MallSite): Promise<boolean> {
   const v = ui[site];
-  const st = readMall(ctx.chat.scriptstate, site);
+  const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
   const s = mallSettings(ctx.chat.scriptstate, site);
   v.info = '';
   switch (action) {
@@ -350,8 +350,8 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       if (site !== 'cos' || !n || v.loading) return true;
       let ok = false; let short = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readMall(chat.scriptstate, site);
-        const nextShop = buyNote(now, n.id);
+        const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
+        const nextShop = buyNote(now, n.id, lastBot(chat)?.key ?? '');
         if (!nextShop) return null;
         const alive = aliveAnchors(chat);
         let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
@@ -373,9 +373,9 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       if (site !== 'cos' || !q || v.loading) return true;
       let ok = false; let short = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readMall(chat.scriptstate, site);
+        const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
         // 주문한 응답이 지워져 주문이 없어진 견적은 다시 주문할 수 있다 (accepted 를 되돌려 acceptQuote 를 그대로 쓴다)
-        const nextShop = acceptQuote({ ...now, quotes: (now.quotes ?? []).map((x) => (x.id === q.id ? { ...x, accepted: false } : x)) }, q.id);
+        const nextShop = acceptQuote({ ...now, quotes: (now.quotes ?? []).map((x) => (x.id === q.id ? { ...x, accepted: false } : x)) }, q.id, lastBot(chat)?.key ?? '');
         if (!nextShop) return null;
         const alive = aliveAnchors(chat);
         let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
@@ -405,7 +405,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         const it = cur.item;
         const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
         ok = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true } : x))) } };
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
       });
       v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : '받을 수 없는 상태다.';
       if (ok) v.took = o.id;
@@ -413,7 +413,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       return true;
     }
     case 'mall-sell-cancel':
-      if (st.sell) await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, cancelSell(readMall(chat.scriptstate, site))) } }));
+      if (st.sell) await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, cancelSell(readMall(chat.scriptstate, site, aliveAnchors(chat)))) } }));
       await env.refresh();
       return true;
     case 'mall-sell': {
@@ -422,7 +422,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       const o = st.sell;
       let sold = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readMall(chat.scriptstate, site);
+        const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
         if (now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
         const it0 = readItems(chat.scriptstate);
         if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
@@ -509,7 +509,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
 function deskSource(ctx: ChatContext): DeskSource {
   const vars = ctx.chat.scriptstate;
   const s = mallSettings(vars, 'bm');
-  const st = readMall(vars, 'bm');
+  const st = readMall(vars, 'bm', aliveAnchors(ctx.chat));
   const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(vars, 'bm') as typeof ctx.chat.scriptstate } }, { ...st, shop: '백일몽', owner: '' }, s);
   return { refs: src.refs, shelf: onShelf(st).map((x) => `${x.name}|${x.price}p|${x.desc}`).join('\n'), points: balanceOf(ctx, 'bm'), nick: loggedNick(ctx), language: src.language };
 }
@@ -722,7 +722,7 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
 function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const site: MallSite = 'cos';
   const v = ui[site];
-  const st = readMall(ctx.chat.scriptstate, site);
+  const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
   const s = mallSettings(ctx.chat.scriptstate, site);
   const bal = balanceOf(ctx, site);
   const list = onShelf(st);
@@ -769,7 +769,7 @@ function bmCard(it: ShopItem, bal: number, v: View, busy: boolean): string {
 function bmHtml(ctx: ChatContext, mobile: boolean): string {
   const site: MallSite = 'bm';
   const v = ui[site];
-  const st = readMall(ctx.chat.scriptstate, site);
+  const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
   const s = mallSettings(ctx.chat.scriptstate, site);
   const nick = loggedNick(ctx);
   const bal = balanceOf(ctx, site);

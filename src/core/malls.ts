@@ -2,7 +2,7 @@
 // 진열·문의는 상점(core/shop.ts)의 요청문·해석을 그대로 쓰고, 지침만 사이트마다 따로(Cos·Bm), 설정 값도 사이트마다 따로($cos_sh_*, $bm_sh_*).
 // 상점과 달리 본편 표식 없이 브라우저에서 언제든 연다. 우주몰은 운영자 문의 창이 있고, 포인트몰은 운영자가 없다(정가 구매만, 로그인해야 씀).
 import type { Chat } from './types';
-import { type TruthMode, emptyShop, readShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
+import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
 import type { GuideName } from './guides';
 
 export type MallSite = 'cos' | 'bm';
@@ -44,8 +44,9 @@ export function mallSettings(vars: Vars, site: MallSite): MallSettings {
 }
 
 /** 저장된 쇼핑몰 상태 (없으면 빈 상태) */
-export function readMall(vars: Vars, site: MallSite): ShopState {
-  const st = readShop({ [SHOP_VAR]: vars?.[MALL_VAR[site]] });
+export function readMall(vars: Vars, site: MallSite, alive?: Set<string>): ShopState {
+  const st0 = readShop({ [SHOP_VAR]: vars?.[MALL_VAR[site]] });
+  const st = st0 && alive ? reviveShop(st0, alive) : st0;
   const base = st ?? emptyShop({ raw: '', shop: MALL_NAME[site], owner: MALL_OWNER[site] }, '');
   // 포인트몰은 늘 포인트 (모델이 정체를 어떻게 적든)
   return site === 'bm' ? { ...base, identity: { ...base.identity, points: true } } : { ...base, identity: { ...base.identity, points: false } };
