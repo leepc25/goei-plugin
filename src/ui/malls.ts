@@ -13,7 +13,7 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { appendItems, applyShelf, applyTalk, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { COS_ACCOUNT, COS_FIXED_MAX, COS_GENRES_DEFAULT, COS_ROLL_KEY, COS_TIERS_DEFAULT, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosRoll, cosRollChanged, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, tiersText, type CosFixed, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
@@ -314,6 +314,29 @@ export async function mallAction(action: string, value: string | undefined, ctx:
       await env.refresh();
       return true;
     }
+    case 'mall-note-buy': {
+      // 정보 쪽지 구매: 가계부에서 빠지고 소지품에 「쪽지: 제목」(내용은 거기서만)
+      const n = (st.notes ?? []).find((x) => x.id === value && !x.bought);
+      if (site !== 'cos' || !n || v.loading) return true;
+      let ok = false; let short = false;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const now = readMall(chat.scriptstate, site);
+        const nextShop = buyNote(now, n.id);
+        if (!nextShop) return null;
+        const alive = aliveAnchors(chat);
+        let w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        if (walletBalance(w, alive) < n.price) { short = true; return null; }
+        const anchor = lastBot(chat)?.key ?? '';
+        const walletId = `${site}_note_${n.id}`;
+        w = addWalletEntry(w, { id: walletId, anchor, amount: -n.price, memo: `쪽지: ${n.title} (${MALL_NAME[site]})`, src: 'store' });
+        const items = addItem(readItems(chat.scriptstate), alive, { name: `쪽지: ${n.title}`, desc: `${MALL_NAME[site]} 운영자가 보낸 쪽지`, text: n.body, use: false, icon: 'note paper', weight: 0.01, from: 'store', anchor, price: n.price, walletId, paidWith: `bank transfer to ${MALL_NAME[site]}` });
+        ok = true;
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop) } };
+      });
+      v.info = ok ? `쪽지 「${n.title}」가 소지품에 도착 했다. 내용은 거기서 읽어라.` : short ? '잔고가 모자란다. 입금이 필요하다.' : '살 수 없는 상태다.';
+      await env.refresh();
+      return true;
+    }
     case 'mall-sell-cancel':
       if (st.sell) await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, cancelSell(readMall(chat.scriptstate, site))) } }));
       await env.refresh();
@@ -395,6 +418,13 @@ const failBox = (v: View, cls: string) => (v.notice ? `<div class="${cls}" role=
 /* 우주 쇼핑몰 */
 
 /** 운영자 말: 진열대 물건 이름은 링크로 (2026-11-08 사용자: 운영자도 상품 링크 보냄) */
+/** 정보 쪽지 카드: 제목·값만. 사면 내용은 소지품의 쪽지에서만 읽는다 (11-09 사용자: 같은 자리에 풀리면 재미없다) */
+function noteCard(st: ShopState, id: string | undefined, v: View): string {
+  const n = id ? (st.notes ?? []).find((x) => x.id === id) : null;
+  if (!n) return '';
+  return `<div class="q-note${n.bought ? ' done' : ''}"><span>📄 쪽지</span><b>${esc(n.title)}</b><em>${won(n.price)}</em>${n.bought ? '<small>구매 완료 — 소지품에서 읽어라</small>' : `<button class="cs-btn" data-action="mall-note-buy" data-value="${esc(n.id)}"${v.loading ? ' disabled' : ''}>구매</button>`}</div>`;
+}
+
 function opText(text: string, st: ShopState): string {
   let html = esc(text);
   for (const it of onShelf(st).slice().sort((a, b) => b.name.length - a.name.length)) {
@@ -440,7 +470,7 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
   const log = st.talk.length
-    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p></div>`)).join('')
+    ? st.talk.map((l) => (l.who === 'me' ? `<div class="q-m q-me"><b>나</b><p>${esc(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}</div>`)).join('')
     : '<div class="q-m q-op"><b>운영자</b><p>무엇을 도와 드립니까? 상품에 대하여 질문 하는 경우 상품을 붙이십시오.</p></div>';
   const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 수 있는 상품이 없습니다.</p>'}</div>` : '';

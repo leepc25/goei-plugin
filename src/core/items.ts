@@ -50,6 +50,8 @@ export interface Item {
   effect: string;
   /** 숨긴 진짜 효과 (≤60). 화면엔 절대 안 보이고 본편 모델만 받는다 (11-09 사용자: 우주몰 물건은 보이는 효과가 광고 문구) */
   truth?: string;
+  /** 쪽지 내용 (≤400): 산 정보 등 읽는 글. 소지품에서 열어 읽고, 본편에도 그대로 간다 */
+  text?: string;
   /** 사용 가능 */
   use: boolean;
   /** 소모성: 처음 횟수. 남은 횟수 = 이것 − 살아 있는 사용 기록의 n 합 (itemLeft). 0 이 되면 목록에서 안 보인다 */
@@ -221,6 +223,8 @@ export interface ItemInput {
   effect?: string;
   /** 숨긴 진짜 효과 */
   truth?: string;
+  /** 쪽지 내용 */
+  text?: string;
   /** 판정 (안 주면 새 물건은 사용 X·비소모·장착 X, 있던 물건은 그대로) */
   use?: boolean;
   uses?: unknown;
@@ -282,6 +286,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   const desc = clean(e.desc, 80);
   const effect = clean(e.effect, 60);
   const truth = e.truth ? clean(e.truth, 60) : '';
+  const text = e.text ? clean(e.text, 400) : '';
   const quote = e.quote ? clean(e.quote, 120) : undefined;
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
   if (found) {
@@ -302,6 +307,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(e.paidWith ? { paidWith: clean(e.paidWith, 60) } : {}),
     ...(truth ? { truth } : {}),
+    ...(text ? { text } : {}),
     ...(quote ? { quote } : {}),
   }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
@@ -509,7 +515,7 @@ export function itemLine(e: Item, left: number | undefined, equipped: boolean, d
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
   // 숨긴 진짜 효과(truth)는 여기 안 적는다 — 평소엔 광고 문구(effect)만. 쓰는 턴에만 itemsBlock 이 「Really:」로 넘긴다 (11-09 사용자: 매 턴 보내면 모델이 아는 척한다)
-  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}` : '';
+  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}${e.text ? ` — reads: "${e.text}"` : ''}` : '';
   return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }
 

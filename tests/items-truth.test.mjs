@@ -26,3 +26,9 @@ test('truth: 안 쓰는 턴엔 Really 없음, 쓰는 턴엔 Really 에 진짜, ?
   assert.ok(used.includes('- 돌: not even its seller knows (the label says 「???」 and may be false) — decide what it really does now'), used);
   assert.ok(I.INVENTORY_NOTE.includes('Really'));
 });
+
+test('쪽지 내용(text): 저장되고 본편 줄에 reads 로 간다', () => {
+  const it = I.addItem({ list: [], log: [] }, new Set(['a1']), { name: '쪽지: 골목', text: '소리를 내지 마라', from: 'store', anchor: 'a1' });
+  assert.equal(it.list[0].text, '소리를 내지 마라');
+  assert.ok(I.itemLine(it.list[0], undefined, false).includes('reads: "소리를 내지 마라"'));
+});

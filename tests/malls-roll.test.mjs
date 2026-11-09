@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, SHOP_LINE, SECRET_LINE, lineOf, TRUTH_RULE } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
+const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, parseTalk, applyTalk, buyNote, SHOP_LINE, SECRET_LINE, lineOf, TRUTH_RULE } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 
 /** 정해진 수열을 내는 난수 (시험용) */
@@ -93,4 +93,17 @@ test('진실 섞기: ? 는 「아무도 모름」, 설정 기본은 섞음, 시�
   assert.equal(r.items[0].truth, '?');
   assert.equal(M.cosTruthMode({}), 'mix'); assert.equal(M.cosTruthMode({ $cos_truth: 'none' }), 'none');
   assert.ok(M.TRUTH_RULE.mix.includes('MIX') && M.TRUTH_RULE.none.includes('EVERY'));
+});
+
+test('정보 쪽지: <info>제목|값|내용</info> → 대사에 붙은 쪽지, 같은 제목은 한 번만, 사면 bought (11-09 사용자)', () => {
+  const r = M.parseTalk('<owner>그것에 대해 우리는 아는 것이 있다. 값은 적당하다.</owner>\n<change mode="none">\n</change>\n<info>골목의 괴이|700000|그것은 소리를 따라온다. 소리를 내지 마라|진짜다</info>');
+  assert.deepEqual(r.info, { title: '골목의 괴이', price: 700000, body: '그것은 소리를 따라온다. 소리를 내지 마라|진짜다' });
+  let st = { ...M.emptyShop({ raw: '', shop: '우주 쇼핑몰', owner: '운영자' }, 'k'), loaded: true };
+  st = M.applyTalk(st, r, false);
+  assert.equal(st.notes.length, 1); assert.equal(st.talk.at(-1).note, st.notes[0].id);
+  st = M.applyTalk(st, r, false);
+  assert.equal(st.notes.length, 1, '같은 제목은 다시 안 내민다'); assert.equal(st.talk.at(-1).note, undefined);
+  const b = M.buyNote(st, st.notes[0].id);
+  assert.equal(b.notes[0].bought, true); assert.equal(M.buyNote(b, st.notes[0].id), null, '두 번 못 산다');
+  assert.equal(M.parseTalk('<owner>모른다.</owner>').info, undefined);
 });

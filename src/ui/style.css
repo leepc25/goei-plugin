@@ -4298,6 +4298,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .q-card { display: flex; align-items: center; gap: 6px; margin: 6px 8px 0; padding: 3px 6px; background: #fff; border: 2px inset #c0c0c0; }
 .ms-cos .q-card > span { color: #555; font-size: 11px; white-space: nowrap; }
 .ms-cos .q-card .q-x { margin-left: auto; color: #888; }
+.ms-cos .q-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 0; padding: 4px 8px; background: #ffffe0; border: 1px dashed #888; }
+.ms-cos .q-note > span { color: #555; font-size: 11px; }
+.ms-cos .q-note em { font-style: normal; color: #c00; }
+.ms-cos .q-note small { color: #080; }
+.ms-cos .q-note .cs-btn { margin-left: auto; padding: 1px 8px; }
+.ms-cos .q-note.done { opacity: .85; }
+.it-note { margin: 8px 0; padding: 8px 10px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 8px; white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
 .ms-cos .q-sell { flex-wrap: wrap; }
 .ms-cos .q-sell small { color: #555; font-size: 11px; }
 .ms-cos .q-sell em { font-style: normal; color: #c00; }
