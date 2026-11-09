@@ -1,4 +1,8 @@
-n; gap: 3px; min-width: 0; max-width: 100%; }
+rent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
+.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
+.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-id-photo.none svg { width: 44px; height: 44px; }
+.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
 .gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
 .gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
 .gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
@@ -1669,7 +1673,7 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 .gx-rpt { display: flex; flex-direction: column; gap: 14px; }
 .gx-rpt-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .gx-rpt-head > b { font-size: 16px; font-weight: 800; }
-.gx-rpt-head .ph-back { width: 40px; height: 40px; }
+.gx-rpt-head .ph-back { width: 36px; height: 36px; }
 .gx-rpt-acts { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; }
 .gx-rpt-acts .gx-mini small { font-size: 11px; color: var(--dim); margin-left: 2px; }
 .gx-rpt-acts .gx-mini.on { border-color: var(--amber); color: var(--amber); }
@@ -2046,10 +2050,4 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
   .sh-body .it-eqbox.sell .it-eqin { --slot: min(82px, calc((100cqw - 2 * var(--zp) - 2px - 128px - 10px - 8px) / 2)); flex-wrap: nowrap; }
 }
 /* 상점 팝업 (2026-11-07 사용자 설계, docs/인계/상점_1107/mock.mjs): 조작 34px·모서리 10, 칸·상자 12, 안쪽 8. 금액은 어디서나 같은 글꼴(mono 700 14), 색은 민트·흐림·빨강만 */
-.sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, transparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
-.sh-wrap *, .sh-det * { box-sizing: border-box; }
-.sh-amt { font: 700 14px/1 var(--mono); font-style: normal; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.sh-amt.big { font-size: 16px; color: var(--signal); }
-.sh-amt s { color: var(--dim); font-weight: 500; }
-.sh-meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--sub); line-height: 1.4; }
-.sh-tag { display: inline-block; padding
+.sh-wrap { --h: 34px; --r: 10px; --rc: 12px; --ri: 8px; --red: color-mix(in srgb, var(--danger) 80%, #fff); --red-bg: color-mix(in srgb, var(--danger) 12%, tr

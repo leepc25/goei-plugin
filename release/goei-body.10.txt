@@ -1,4 +1,18 @@
-   const user = o.user ?? "{{user}}";
+ "Secrets held",
+    "openness.context": "Conditions",
+    "affinity.regard": "Goodwill",
+    "affinity.speech": "Speech",
+    "affinity.behavior": "Behavior",
+    "suspicion.concern": "Concern",
+    "suspicion.speech": "Speech",
+    "suspicion.behavior": "Behavior",
+    "openness.attitude": "Attitude",
+    "openness.speech": "Speech",
+    "openness.behavior": "Behavior"
+  };
+  var TRIM_ORDER = ["history", "knowledge", "behavior", "scene", "threads"];
+  function personBlock(p2, store2, live, changes, o = {}) {
+    const user = o.user ?? "{{user}}";
     const kept = {};
     for (const k of Object.keys(p2.slots)) kept[k] = liveEntries(p2.slots[k], live);
     if (o.maxChars) {
@@ -3092,6 +3106,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         stageModel("director", "Director 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델"),
         row6("시간 제한", seg6("director_timeout", String(s8.directorTimeout), [["30", "30초"], ["90", "90초"], ["180", "180초"]]), "넘기면 이번 턴은 메모 없이 보내요 (그 턴만)."),
         row6("언어", seg6("director_lang", s8.directorLang, [["en", "영어"], ["ko", "한국어"]]), "Director 메모를 쓰는 언어예요. 영어가 토큰이 적어요"),
-        row6("길이", seg6("director_len", s8.directorLen, [["short", "짧게"], ["normal", "보통"]]), "Director 메모의 길이예요"),
-        row6("재사용", onoff("director_reuse"), "장면이 그대로면 지난 지시를 다시 써요 (호출 없음)."),
-        row6("기능별 지침", onoff("director_features"), "켜진 기록 항목(호감·호칭·인식·의심·음란도·리듬·성격 6축)마다 Director 적용 지침과 전용 칸을 요청에 넣어요. 끄면 짧은 기본 지침만 (토
+  

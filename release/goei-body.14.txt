@@ -1,4 +1,10 @@
-: 2px 8px; border: 1px solid var(--line); border-radius: var(--ri); color: var(--text); line-height: 1.4; }
+ansparent); --red-ln: color-mix(in srgb, var(--danger) 55%, transparent); }
+.sh-wrap *, .sh-det * { box-sizing: border-box; }
+.sh-amt { font: 700 14px/1 var(--mono); font-style: normal; color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sh-amt.big { font-size: 16px; color: var(--signal); }
+.sh-amt s { color: var(--dim); font-weight: 500; }
+.sh-meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--sub); line-height: 1.4; }
+.sh-tag { display: inline-block; padding: 2px 8px; border: 1px solid var(--line); border-radius: var(--ri); color: var(--text); line-height: 1.4; }
 /* 높이는 진열대만큼 (2026-11-07 사용자: 고정 높이는 휑함), 화면의 90%까지. 넘치면 진열대 안에서 스크롤 */
 .sh-wrap-card { width: min(100%, 980px); height: auto; max-height: min(90%, calc(100% - 8px)); display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; overflow: hidden; }
 /* 상점만 열었을 때(카드에서): 창 본문은 비우고 팝업만 (2026-11-07 사용자) */
@@ -274,7 +280,7 @@
 .gx-items .it-tools .it-segs { height: 34px; box-sizing: border-box; padding: 2px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel); } /* 물건|기록은 단추 그대로 (사용자) */
 .gx-items .it-tools .gx-seg { font-size: 13px; }
 .gx-items .it-right { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; min-width: 0; }
-.gx-items .it-act { height: 32px; box-sizing: border-box; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--dim); font-size: 13px; }
+.gx-items .it-act { height: var(--ctl-sm); box-sizing: border-box; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: var(--dim); font-size: 13px; }
 .gx-items .it-act:hover:not(:disabled) { color: var(--text); background: color-mix(in srgb, var(--line) 50%, transparent); }
 /* 칸 수·넘침·무게 (장착 칸 위 한 줄): 단추 모양 X, 글자만 */
 .it-eqcol { flex: none; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; } /* 칸 수·무게는 위로, 장착 칸은 아래로 (사용자) */
@@ -2976,19 +2982,4 @@ ${note.trim()}` : card2;
           view = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
           draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "", look: lookId(ctx2.chat.scriptstate) || draft.look || "" };
           if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
-          const fsel = draft.faction ? findFaction(draft.faction, facs) : void 0;
-          if (fsel) {
-            const list4 = scenariosFor(fsel, draft.player, ctx2.char.globalLore);
-            if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm ?? defaultScenario(fsel.code, facs);
-          }
-        }
-      }
-    } catch (error) {
-      view = { kind: "error", message: `채팅 정보를 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}` };
-    }
-    render2();
-  }
-  async function close2() {
-    shown2 = false;
-    stopCctvFx();
-    await risuai.
+          const fsel = draft.faction ? findFaction(draft.faction, 
