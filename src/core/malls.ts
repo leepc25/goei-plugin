@@ -60,3 +60,33 @@ export const mallTurnRefresh = (chat: Chat, site: MallSite): boolean => mallSett
 
 /** 우주몰 입금 계좌 (사이트 글) */
 export const COS_ACCOUNT = '농협 352-1849-2706-13 (예금주 : 어서오세요)';
+
+// ── 우주몰 진열 배정 (구버전 Lua cosBuildRefreshPrompt 에서 가져옴, 11-09 사용자: 새로고침해도 같은 물건이 나온다) ──
+// 칸마다 장르(겹치지 않게 섞음)×값 등급(5단계, ₩구간)을 코드가 굴려 요청에 박는다. 같은 입력이 반복돼도 모델이 같은 진열을 내지 못하게.
+const COS_GENRES = [
+  'classical martial arts', 'sci-fi', 'fantasy', 'cyberpunk', 'steampunk',
+  'ancient', 'occult', 'cosmic horror', 'creature', 'mythology',
+  'religious/sacred', 'post-apocalyptic', 'alien', 'folktale', 'fairy tale',
+  'alchemy', 'military', 'fiction', 'SCP', 'Cthulhu mythos',
+];
+/** 값 등급: 이름 · 등급 설명 · 하한 · 상한 (구간 연속). 물건은 등급에 맞춰 만들고 값은 그 가치를 따른다 */
+export const COS_TIERS: [string, string, number, number][] = [
+  ['최저가', 'mundane, trivial — a curiosity or minor utility', 999_999, 2_499_999],
+  ['저가', 'common — modestly useful, low stakes', 2_500_000, 4_999_999],
+  ['중가', 'notable, uncommon — genuinely useful or potent', 5_000_000, 9_999_999],
+  ['고가', 'potent, rare — strong effect, sought-after', 10_000_000, 19_999_999],
+  ['최고가', 'powerful, coveted — a high-value artifact', 20_000_000, 49_999_999],
+];
+/** 이번 진열 배정 글. count 칸, context 가 켜져 있으면 1~2칸은 지금 상황에 쓸모 있는 것으로 */
+export function cosAssignment(count: number, context: boolean, rnd: () => number = Math.random): string {
+  const n = Math.max(1, Math.min(COS_GENRES.length, Math.trunc(count)));
+  const g = [...COS_GENRES];
+  for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; }
+  const useful = new Set<number>();
+  if (context && n >= 3) { const k = n >= 6 ? 2 : 1; while (useful.size < k) useful.add(Math.floor(rnd() * n)); }
+  const lines = Array.from({ length: n }, (_, i) => {
+    const t = COS_TIERS[Math.floor(rnd() * COS_TIERS.length)];
+    return `Item ${i + 1} — GENRE: ${g[i]} | VALUE TIER: ${t[0]} (${t[1]}), price ₩${t[2].toLocaleString('en-US')}-${t[3].toLocaleString('en-US')}${useful.has(i) ? ' | ROLE: useful for the protagonist\'s current situation (a fitting tool, remedy or edge; describe the item only, never the protagonist)' : context && n >= 3 ? ' | ROLE: broad stock, unrelated to the current scene' : ''}`;
+  });
+  return `${lines.join('\n')}\nBuild each item to its assigned GENRE and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. Genres differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
+}

@@ -646,6 +646,8 @@ export interface ShopSource {
   identity: string;
   /** 지침에 붙일 언어 줄 (genSettings.language) */
   language: string | null;
+  /** 이번 진열 배정 (쇼핑몰이 칸마다 장르·값 등급을 굴려 넣는다, core/malls.ts cosAssignment). 없으면 생략 */
+  assign?: string;
 }
 
 // 지침 글은 플러그인 내장 지침 「Shop」(src/data/guides/shop.txt, 설정 → 지침 → 상점에서 고침). 여기는 절을 골라 자리만 채운다 (2026-11-07 사용자: 지침은 전부 지침 메뉴에서)
@@ -675,6 +677,7 @@ function material(src: ShopSource, s: ShopSettings): string {
     parts.push(`[가게 정체 — 고정]\nsells: ${id.sells || '-'}\nnever: ${id.never || '-'}\nprices: ${id.prices || '-'}\ncurrency: ${id.points ? 'points' : 'won'}`);
   }
   if (src.refs) parts.push(`[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${src.refs}`);
+  if (src.assign) parts.push(`[이번 진열 배정 — 칸마다 그대로 따를 것]\n${src.assign}`);
   if (s.context) {
     if (src.identity) parts.push(`[주인공 신분]\n${src.identity}`);
     if (src.status) parts.push(`[상태창 — 지금 시각·장소]\n${src.status}`);
