@@ -39,7 +39,7 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
-import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
+import { bindMallWin, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
 import { boardChrome, gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { isBoardSite, type BoardSite } from '../core/boards';
@@ -285,6 +285,7 @@ function ensureRoot(): HTMLElement {
   });
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
+  bindMallWin(root, render);
   // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
   root.addEventListener('pointerdown', (ev) => {
     const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
@@ -469,6 +470,8 @@ function ensureRoot(): HTMLElement {
     // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
+    // 우주 쇼핑몰 질문 창 (11-09 사용자: 팝업창처럼 Esc·바깥 누름으로 닫힘)
+    if (view.kind === 'started' && mallAskOpen()) return void handle('mall-ask-close');
     // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
     if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
     const pop = document.querySelector('.gx-agpop');

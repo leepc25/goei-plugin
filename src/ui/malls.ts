@@ -49,8 +49,10 @@ interface View {
   input: string;
   /** 링크로 찾아간 물건 (테두리·스크롤) */
   focus: string;
+  /** 질문 창을 끌어 옮기거나 크기를 바꾼 자리 (PC, 사이트 칸 기준 px). 없으면 CSS 기본 자리 (11-09 사용자: 진짜 팝업창처럼) */
+  win: { x: number; y: number; w: number; h: number } | null;
 }
-const fresh = (): View => ({ loading: '', notice: '', failRaw: '', info: '', cart: [], page: '', pay: false, ask: false, chip: '', picking: false, input: '', focus: '' });
+const fresh = (): View => ({ loading: '', notice: '', failRaw: '', info: '', cart: [], page: '', pay: false, ask: false, chip: '', picking: false, input: '', focus: '', win: null });
 const ui: Record<MallSite, View> = { cos: fresh(), bm: fresh() };
 let uiChat = '';
 const chatKey = (ctx: ChatContext) => `${ctx.charIndex}:${ctx.chatIndex}`;
@@ -360,7 +362,8 @@ function cosPay(st: ShopState, v: View, bal: number): string {
     <div class="cs-wbt"><button class="cs-btn cs-go" data-action="mall-pay" ${poor ? 'disabled' : ''}>${poor ? '잔고가 모자라다' : '이체 한다'}</button><button class="cs-btn" data-action="mall-pay-close">그만 둔다</button></div></div></div></div>`;
 }
 
-function cosAsk(st: ShopState, v: View): string {
+function cosAsk(st: ShopState, v: View, mobile: boolean): string {
+  const at = v.win && !mobile ? ` style="left:${v.win.x}px;top:${v.win.y}px;width:${v.win.w}px;height:${v.win.h}px;right:auto;bottom:auto"` : '';
   const ufo = siteLogo('cos', 'cs-ufo');
   const chip = st.items.find((x) => x.id === v.chip && !x.sold);
   const log = st.talk.length
@@ -368,11 +371,11 @@ function cosAsk(st: ShopState, v: View): string {
     : '<div class="q-m q-op"><b>운영자 우주인</b><p>무엇이 궁금한 것이냐 지구인 손님이여!! 물건에 대하여 묻는 것이면 물건을 붙이는 것을 하라.</p></div>';
   const wait = v.loading === 'talk' ? '<div class="q-m q-op q-wait"><b>운영자 우주인</b><p>답을 쓰는 중 인 것이다…</p></div>' : '';
   const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc(x.id)}">${esc(x.name)} <b>${won(x.price)}</b></button>`).join('') || '<p>붙일 물건이 없는 것이다.</p>'}</div>` : '';
-  return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문 하는 창"><div class="cs-wt"><b>★ 운영자에게 질문 하는 창 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
+  return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문 하는 창"${at}><div class="cs-wt"><b>★ 운영자에게 질문 하는 창 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
     <div class="q-hd">${ufo}<div><b>운영자 우주인</b><small>● 지금 깨어 있는 것이다</small></div></div>
     ${chip ? `<div class="q-card"><span>붙인 물건</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="물건 떼기">×</button></div>` : ''}
     <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}
-    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">물건을 붙인다</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 쓰는 것이다" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>보낸다</button></div></div>`;
+    <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">물건을 붙인다</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="질문을 쓰는 것이다" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>보낸다</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
 function cosHtml(ctx: ChatContext, mobile: boolean): string {
@@ -405,7 +408,7 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const side = mobile
     ? `<nav class="cs-top">${menu}</nav>`
     : `<nav class="cs-lf"><div class="cs-lt">★우주 쇼핑몰★</div>${ufo.replace('cs-ufo', 'cs-ufo cs-big')}${menu}<hr class="cs-rb"><div class="cs-cnt">TOTAL <span>${String(st.items.length + st.talk.length + 700).padStart(6, '0')}</span></div><small>800×600 해상도를<br>가장 좋아함 하였다</small></nav>`;
-  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 집의 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보이는 것이다 · 거미줄의 주인 : 우주인</div></div></div>${v.ask ? cosAsk(st, v) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
+  return `<main class="ms ms-cos${mobile ? ' ms-m' : ''}"><div class="cs-fr">${side}<div class="cs-mn">${head}${info}${failBox(v, 'cs-fail')}${main}${how}<div class="cs-ft">Copyright ⓒ 1997 Cosmic Shopping Mall. All rights reserved.<br>이 집의 페이지는 <span>Netscape Now!</span> 에서 가장 좋게 보이는 것이다 · 거미줄의 주인 : 우주인</div></div></div>${v.ask ? cosAsk(st, v, mobile) : ''}${v.pay ? cosPay(st, v, bal) : ''}</main>`;
 }
 
 /* 백일몽 포인트몰 */
@@ -536,4 +539,59 @@ export async function mallSettingsAction(action: string, value: string | undefin
   await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => (String(chat.scriptstate?.[varName] ?? '') === v && !Object.keys(extra).length ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [varName]: v, ...extra } }));
   await env.refresh();
   return true;
+}
+
+/** 질문 창이 떠 있나 (Esc 처리용) */
+export const mallAskOpen = (): boolean => ui.cos.ask;
+
+/** 우주 쇼핑몰 질문 창을 진짜 팝업창처럼 (11-09 사용자): 제목줄 끌어 옮기기, 오른쪽 아래 모서리로 크기 조절, 창 밖을 누르면 닫힘 */
+export function bindMallWin(root: HTMLElement, render: () => void): void {
+  root.addEventListener('pointerdown', (ev) => {
+    const t = ev.target as HTMLElement;
+    const host = t.closest<HTMLElement>('.ms-cos');
+    if (!host || host.classList.contains('ms-m')) return;
+    const win = t.closest<HTMLElement>('.cs-askwin');
+    if (!win) {
+      // 창 밖 누름 → 닫기 (여는 링크·돈 넣는 창은 빼고)
+      if (ui.cos.ask && !t.closest('[data-action="mall-ask"], .cs-dim')) {
+        ui.cos.ask = false;
+        ui.cos.picking = false;
+        render();
+      }
+      return;
+    }
+    const grip = t.closest<HTMLElement>('.cs-wt') && !t.closest('button') ? 'move' : t.closest('.cs-rs') ? 'size' : '';
+    if (!grip) return;
+    ev.preventDefault();
+    const hr = host.getBoundingClientRect();
+    const r = win.getBoundingClientRect();
+    const start = { px: ev.clientX, py: ev.clientY, x: r.left - hr.left, y: r.top - hr.top, w: r.width, h: r.height };
+    const cur = { ...start };
+    const apply = () => {
+      win.style.left = `${cur.x}px`; win.style.top = `${cur.y}px`; win.style.width = `${cur.w}px`; win.style.height = `${cur.h}px`;
+      win.style.right = 'auto'; win.style.bottom = 'auto';
+    };
+    const move = (e: PointerEvent) => {
+      const dx = e.clientX - start.px;
+      const dy = e.clientY - start.py;
+      if (grip === 'move') {
+        cur.x = Math.min(Math.max(0, start.x + dx), Math.max(0, hr.width - start.w));
+        cur.y = Math.min(Math.max(0, start.y + dy), Math.max(0, hr.height - 40));
+      } else {
+        cur.w = Math.min(Math.max(300, start.w + dx), Math.max(300, hr.width - start.x));
+        cur.h = Math.min(Math.max(240, start.h + dy), Math.max(240, hr.height - start.y));
+      }
+      apply();
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      ui.cos.win = { x: Math.round(cur.x), y: Math.round(cur.y), w: Math.round(cur.w), h: Math.round(cur.h) };
+    };
+    apply();
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  });
 }

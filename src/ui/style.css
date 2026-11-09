@@ -4271,7 +4271,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .cs-ft span { display: inline-block; border: 1px solid #888; background: #c0c0c0; color: #000; font: bold 10px Arial, sans-serif; padding: 2px 4px; }
 /* 넷스케이프 창 (질문·입금) */
 .ms-cos .cs-win { position: absolute; z-index: 6; background: #c0c0c0; border: 2px outset #fff; box-shadow: 3px 3px 0 #000; color: #000; font: 12px 'Gulim', '굴림', 'Noto Sans KR', sans-serif; }
-.ms-cos .cs-askwin { top: 16px; bottom: 16px; right: 24px; width: 440px; display: flex; flex-direction: column; }
+.ms-cos .cs-askwin { top: 40px; right: 24px; bottom: auto; width: 400px; height: min(540px, calc(100% - 56px)); min-width: 300px; min-height: 240px; display: flex; flex-direction: column; } /* 11-09 사용자: 최대 크기 고정 → 팝업창 크기, 끌기·크기 조절 가능 */
+.ms-cos .cs-askwin .cs-wt { cursor: move; user-select: none; }
+.ms-cos .cs-rs { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 50%, #808080 50% 56%, transparent 56% 66%, #808080 66% 72%, transparent 72% 82%, #808080 82% 88%, transparent 88%); }
+.ms-cos.ms-m .cs-rs { display: none; }
 .ms-cos .cs-wt { display: flex; align-items: center; gap: 6px; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; padding: 3px 4px 3px 6px; }
 .ms-cos .cs-wt b { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ms-cos .cs-wt button { width: 18px; height: 16px; display: grid; place-items: center; background: #c0c0c0; color: #000; border: 2px outset #fff; font: bold 11px Arial, sans-serif; line-height: 1; }
