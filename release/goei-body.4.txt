@@ -1,4 +1,361 @@
-post) {
+eplace(/^﻿/, "").trim();
+    for (let i = 0; i < 12; i++) {
+      const before = text4;
+      if (text4.startsWith("{")) break;
+      const tag = /^<(think|thoughts|analysis|lb-process)(?:\s[^>]*)?>/i.exec(text4);
+      if (tag) {
+        const end = text4.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
+        if (end >= 0) text4 = text4.slice(end + tag[1].length + 3).trim();
+        else if (/\n\s*\{/.test(text4)) text4 = text4.slice(text4.search(/\n\s*\{/)).trim();
+      } else {
+        const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text4);
+        if (fence) text4 = fence[1].trim();
+        else {
+          const wrap = /^<(output|json|lb-gn)(\s[^>]*)?>([\s\S]*)<\/\1>\s*$/i.exec(text4);
+          if (wrap) text4 = wrap[3].trim();
+        }
+      }
+      if (text4 === before) break;
+    }
+    try {
+      return JSON.parse(text4);
+    } catch {
+      const dup = /^([\s\S]*\})\s*\{\s*"comments"\s*:\s*\[\s*\]\s*\}\s*$/.exec(text4);
+      if (dup) {
+        try {
+          return JSON.parse(dup[1]);
+        } catch {
+        }
+      }
+      const a = text4.indexOf("{");
+      const b = text4.lastIndexOf("}");
+      if (a >= 0 && b > a) {
+        const body5 = text4.slice(a, b + 1);
+        try {
+          return JSON.parse(body5);
+        } catch {
+          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
+          try {
+            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
+          } catch {
+          }
+        }
+      }
+      throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
+    }
+  }
+  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
+  var int = (v) => {
+    const n2 = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n2 === "number" && Number.isInteger(n2) ? n2 : null;
+  };
+  function applyBoard(before, current5, value, o) {
+    if (snapshotKey(before) !== snapshotKey(current5)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
+    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
+    const rows3 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
+    if (!Array.isArray(rows3) || !rows3.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
+    const st = structuredClone(current5);
+    const old = new Map(st.posts.map((p2) => [p2.id, p2]));
+    const posts = [];
+    const seen2 = /* @__PURE__ */ new Set();
+    let skippedPosts = 0;
+    let skippedComments = 0;
+    let commentTotal = 0;
+    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
+    const floor = Math.max(1e5, current5.seq);
+    for (const raw of rows3) {
+      if (!isObj(raw)) continue;
+      let pid = int(raw.id);
+      const prev = pid !== null ? old.get(pid) : void 0;
+      const author = str2(raw.author).trim();
+      if (!prev && (raw.mine === true || author === o.nick)) {
+        skippedPosts++;
+        continue;
+      }
+      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
+      if (pid === null || seen2.has(pid)) continue;
+      seen2.add(pid);
+      st.seq = Math.max(st.seq, pid);
+      const comments = Array.isArray(raw.comments) ? raw.comments : [];
+      commentTotal += comments.length;
+      let date = validDate(raw.date);
+      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
+      const q = {
+        id: pid,
+        nick: cut(author || "ㅇㅇ", 80),
+        title: str2(raw.title),
+        body: stripForged(str2(raw.content)),
+        date,
+        views: Math.max(0, int(raw.views) ?? 0),
+        votes: Math.max(0, int(raw.upvotes) ?? 0),
+        mine: prev?.mine ?? false,
+        comments: [],
+        ...cleanTag(raw.tag) ? { tag: cleanTag(raw.tag) } : {}
+      };
+      const sigs = /* @__PURE__ */ new Map();
+      const remap = /* @__PURE__ */ new Map([[0, 0]]);
+      if (prev) {
+        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+        if (prev.tag) q.tag = prev.tag;
+        if (prev.scrap) q.scrap = true;
+        if (prev.voted) q.voted = true;
+        if (prev.down) q.down = true;
+        for (const c of prev.comments) {
+          q.comments.push(c);
+          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
+        }
+      }
+      const raws = [];
+      comments.forEach((c, i) => {
+        const n2 = i + 1;
+        if (!isObj(c)) return void remap.set(n2, false);
+        const cAuthor = str2(c.author).trim();
+        const content = stripForged(str2(c.content));
+        let parent = int(c.parent) ?? 0;
+        if (parent < 0 || parent >= n2) parent = 0;
+        const sig = `${cAuthor}\0${content}`;
+        if (sigs.has(sig)) return void remap.set(n2, sigs.get(sig));
+        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
+          skippedComments++;
+          return void remap.set(n2, false);
+        }
+        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
+        raws.push(str2(c.time).trim());
+        sigs.set(sig, q.comments.length);
+        remap.set(n2, q.comments.length);
+      });
+      stampComments(q, q.comments.length - raws.length, raws, o.date);
+      if (!q.title.trim() && !q.body.trim()) continue;
+      posts.push(q);
+    }
+    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
+    for (const p2 of st.posts) if (protectedPost(o.settings, p2) && !seen2.has(p2.id)) posts.push(p2);
+    st.posts = posts;
+    trimBoard(st, o.settings);
+    const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
+    return { st, notice: notice2, emptyComments: commentTotal === 0 };
+  }
+  function acceptComments(rows3, existing, t, nick, base = t.total, cap = LIMITS.replies) {
+    const list4 = Array.isArray(rows3) ? rows3.slice(0, cap) : [];
+    let dropped = Array.isArray(rows3) ? Math.max(0, rows3.length - cap) : 0;
+    const out = [];
+    const map = /* @__PURE__ */ new Map();
+    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
+    list4.forEach((c, i) => {
+      const own = t.total + i + 1;
+      const bad = () => {
+        dropped++;
+        map.set(own, false);
+      };
+      if (!isObj(c)) return bad();
+      const author = str2(c.author).trim();
+      const content = stripForged(str2(c.content)).trim();
+      let n2 = int(c.parent);
+      if (n2 === null || n2 === 0) n2 = t.replyTo;
+      if (!author || [...author].length > 80 || author === nick || !content) return bad();
+      if (n2 > t.total) {
+        const m = map.get(n2);
+        if (m === void 0 || m === false) return bad();
+        n2 = m;
+      } else if (n2 < 0 || n2 > 0 && !t.supplied.has(n2) && n2 !== t.replyTo) return bad();
+      if (t.replyTo > 0 && n2 !== t.replyTo && n2 <= t.total) return bad();
+      const sig = `${author}\0${content}`;
+      if (seen2.has(sig)) return bad();
+      seen2.add(sig);
+      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n2, time: str2(c.time).trim() });
+      map.set(own, base + out.length);
+    });
+    return { comments: out, dropped };
+  }
+  function stampMinutes(stamp) {
+    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
+    if (!m) return null;
+    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
+  }
+  function minutesStamp(min) {
+    const d = new Date(min * 6e4);
+    const p2 = (n2) => String(n2).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
+  }
+  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
+  function clockMinutes(raw) {
+    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
+    if (!m) return null;
+    const h = +m[1];
+    const mi = +m[2];
+    return h < 24 && mi < 60 ? h * 60 + mi : null;
+  }
+  function stampComments(p2, from, raws, now) {
+    const nowMin = stampMinutes(now);
+    const postMin = stampMinutes(p2.date);
+    const floorOf = (i) => {
+      const c = p2.comments[i];
+      const cands = [postMin, stampMinutes(c.parent > 0 ? p2.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p2.comments[i - 1]?.time) : null];
+      const known = cands.filter((x) => x !== null);
+      return known.length ? Math.max(...known) : null;
+    };
+    const pending2 = [];
+    const settle2 = (upto) => {
+      if (!pending2.length) return;
+      const lo = floorOf(pending2[0]);
+      const hi = upto ?? nowMin ?? lo;
+      if (lo === null || hi === null) return void (pending2.length = 0);
+      const span = Math.max(0, hi - lo);
+      pending2.forEach((idx, k) => {
+        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending2.length + 1)));
+        p2.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
+      });
+      pending2.length = 0;
+    };
+    for (let i = from; i < p2.comments.length; i++) {
+      const c = p2.comments[i];
+      const raw = String(raws[i - from] ?? "").trim();
+      const lo = floorOf(i);
+      const clock4 = raw ? clockMinutes(raw) : null;
+      if (clock4 === null || lo === null && nowMin === null) {
+        pending2.push(i);
+        continue;
+      }
+      const hi = nowMin ?? Number.POSITIVE_INFINITY;
+      const base = lo ?? nowMin - 24 * 60;
+      let pick3 = null;
+      for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
+        const t = day * 1440 + clock4;
+        if (t >= base && t <= hi) {
+          pick3 = t;
+          break;
+        }
+      }
+      if (pick3 === null) {
+        const ahead = 1 + i % 3;
+        const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock4 > nowMin;
+        if (future && (lo === null || lo <= nowMin)) pick3 = nowMin;
+        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick3 = lo + ahead;
+        else pick3 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
+      }
+      settle2(pick3);
+      c.time = minutesStamp(pick3);
+    }
+    settle2(null);
+  }
+  function commentWhen(p2, c) {
+    if (!c.time) return "";
+    return c.time.slice(0, 10) === String(p2.date).slice(0, 10) ? hhmm(c.time) : c.time;
+  }
+  var whenField = (p2, c) => {
+    const t = commentWhen(p2, c);
+    return t ? { time: t } : {};
+  };
+  function pushComments(p2, rows3, now) {
+    const from = p2.comments.length;
+    for (const c of rows3) p2.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+    stampComments(p2, from, rows3.map((c) => c.time ?? ""), now);
+  }
+  var cleanTag = (v) => cut(str2(v).split(/\r?\n/)[0].replace(/[\[\]【】]/g, "").trim(), 12);
+  function parsePostDraft(value) {
+    if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
+    const title2 = str2(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
+    const content = str2(value.post.content).trim();
+    if (!title2 || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
+    const tag = cleanTag(value.post.tag);
+    return { title: trimTokens(title2, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens), ...tag ? { tag } : {} };
+  }
+  function attachPostDraft(draft2, input3) {
+    if (!hasAttachment(input3)) return draft2;
+    const literal = /* @__PURE__ */ new Set();
+    for (const p2 of bodyParts(input3)) if (p2.kind === "text") for (const line2 of p2.text.split("\n")) literal.add(line2.trim());
+    const plain2 = bodyParts(draft2.content).filter((p2) => p2.kind === "text").map((p2) => p2.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
+    const kept = plain2.split("\n").filter((line2) => {
+      const t = line2.trim();
+      const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
+      const label2 = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
+      const dup = !!label2 && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label2);
+      return literal.has(t) || !dup;
+    });
+    const records = attachmentRecords(input3).map((r) => r.text);
+    const content = [kept.join("\n").trim(), ...records].filter(Boolean).join("\n");
+    return { ...draft2, content };
+  }
+  function activityContext(st, targetId) {
+    const posts = [];
+    const snapshots = /* @__PURE__ */ new Map();
+    for (const p2 of st.posts.slice(0, HISTORY.refresh)) {
+      const selected = /* @__PURE__ */ new Set();
+      for (let n2 = Math.max(1, p2.comments.length - HISTORY.comment + 1); n2 <= p2.comments.length; n2++) {
+        let k = n2;
+        const visited = /* @__PURE__ */ new Set();
+        while (p2.comments[k - 1] && !visited.has(k)) {
+          visited.add(k);
+          selected.add(k);
+          k = p2.comments[k - 1].parent;
+        }
+      }
+      const allowed = p2.id !== targetId;
+      posts.push({
+        id: p2.id,
+        author: p2.nick,
+        title: p2.title,
+        content: p2.body,
+        date: p2.date,
+        views: p2.views,
+        upvotes: p2.votes,
+        comments: p2.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: c.body })).filter((c) => selected.has(c.index)),
+        commentCount: p2.comments.length,
+        commentsAllowed: allowed
+      });
+      snapshots.set(p2.id, { head: postHead(p2), rows: p2.comments.map(commentKey), count: p2.comments.length, selected, commentsAllowed: allowed });
+    }
+    return { posts, snapshots };
+  }
+  function applyActivity(st, rows3, snapshots, nick, now = "", cap = LIMITS.replies) {
+    if (rows3 === void 0 || rows3 === null) return [false, 0];
+    if (!Array.isArray(rows3)) return [false, 1];
+    let changed = false;
+    let skipped2 = 0;
+    const done3 = /* @__PURE__ */ new Set();
+    for (const u of rows3) {
+      const id2 = isObj(u) ? int(u.id) : null;
+      const ref = id2 !== null ? snapshots.get(id2) : void 0;
+      const p2 = id2 !== null ? findPost(st, id2) : void 0;
+      if (!isObj(u) || id2 === null || done3.has(id2) || !ref || !p2 || postHead(p2) !== ref.head || ref.rows.some((k, i) => !p2.comments[i] || commentKey(p2.comments[i]) !== k)) {
+        skipped2++;
+        continue;
+      }
+      done3.add(id2);
+      const delta = (v) => {
+        const n2 = int(v);
+        return n2 !== null && n2 >= 0 ? Math.min(n2, 1e7) : 0;
+      };
+      const comments = Array.isArray(u.comments) ? u.comments : [];
+      if (!ref.commentsAllowed && comments.length) {
+        skipped2++;
+        continue;
+      }
+      const got = acceptComments(comments, p2.comments, { postId: id2, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p2.comments.length, cap);
+      p2.views += delta(u.viewsDelta);
+      p2.votes += delta(u.upvotesDelta);
+      pushComments(p2, got.comments, now);
+      if (got.dropped) skipped2++;
+      changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
+    }
+    return [changed, skipped2];
+  }
+  function incomingPlan(chat, st, s8, nick, rand, origin, saved2) {
+    const plan = { allowed: false, userHandle: nick, history: [] };
+    for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
+    if (!s8.incoming) return plan;
+    const last2 = Number(chat.scriptstate?.[GN_COOLDOWN]);
+    const now = storyTurns(chat);
+    if (Number.isFinite(last2) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last2 && now - last2 < HISTORY.cooldown) return plan;
+    let post = origin?.post;
+    let ci = origin?.commentIndex;
+    if (!post && saved2) {
+      post = findPost(st, saved2.post);
+      ci = saved2.comment;
+    }
+    if (!post) {
       for (const p2 of st.posts) {
         if (p2.mine) {
           post = p2;
@@ -46,17 +403,17 @@ ${JSON.stringify(body5)}`;
     if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
     let pick3 = null;
     const reasons = [];
-    let quiet = 0;
+    let quiet2 = 0;
     list4.forEach((c, i) => {
       if (pick3) return;
       if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
       const nick = str2(c.nick).trim();
       const body5 = trimTokens(stripForged(str2(c.body)).trim(), LIMITS.dm_tokens);
-      if (nick === "__NONE__") return void quiet++;
+      if (nick === "__NONE__") return void quiet2++;
       if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
       if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
       if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
-      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
+      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet2++;
       pick3 = { nick, body: body5 };
     });
     if (!pick3) {
@@ -215,12 +572,12 @@ ${JSON.stringify({ feature: "gnet", records })}
   };
   var NOTICE_PAGE_SIZES = [20, 30, 40, 50, 60];
   function noticeSettings(state) {
-    const num5 = (k, lo, hi, d) => {
+    const num6 = (k, lo, hi, d) => {
       const n2 = Number(state?.[PH(k)]);
       return Number.isInteger(n2) && n2 >= lo && n2 <= hi ? n2 : d;
     };
-    const page = num5("announcement_page_size", 20, 60, 30);
-    return { gap: num5("announcement_gap", 1, 100, COOLDOWN.announcement), history: num5("announcement_history", 1, 50, HISTORY2.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
+    const page = num6("announcement_page_size", 20, 60, 30);
+    return { gap: num6("announcement_gap", 1, 100, COOLDOWN.announcement), history: num6("announcement_history", 1, 50, HISTORY2.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
   }
   var cooldownTurns = (chat, k) => k === "announcement" ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k];
   var COOLDOWN_KEY = (k) => `$cooldown_received_${k}`;
@@ -1434,8 +1791,8 @@ ${c}`)]).join("\n\n");
   function liveChanges(store2, live) {
     return store2.log.filter((c) => isAlive(c, live)).map((c) => ({ c, pos: live.at.get(c.anchor) ?? -1 })).sort((a, b) => a.pos - b.pos || a.c.seq - b.c.seq).map((x) => x.c);
   }
-  var entryId = (who, slot2, anchor, seq2, text4) => `e${hash(`${who}|${slot2}|${anchor}|${seq2}|${text4}`)}`;
-  var changeId = (who, kind, anchor, seq2, text4) => `c${hash(`${who}|${kind}|${anchor}|${seq2}|${text4}`)}`;
+  var entryId = (who, slot2, anchor, seq3, text4) => `e${hash(`${who}|${slot2}|${anchor}|${seq3}|${text4}`)}`;
+  var changeId = (who, kind, anchor, seq3, text4) => `c${hash(`${who}|${kind}|${anchor}|${seq3}|${text4}`)}`;
   var plain = (s8, max = 200) => String(s8 ?? "").replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％").replace(/\s+/g, " ").trim().slice(0, max);
   function putEntry(store2, who, slot2, entry3) {
     const p2 = store2.people[who];
@@ -1537,7 +1894,7 @@ ${c}`)]).join("\n\n");
     return typeof id2 === "string" && id2 ? id2 : `#${index3 + 1}`;
   };
   var messageHash = (m) => hash(
-    messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\s+/g, " ").trim()
+    messageText(str3(m.data)).replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<img\s*=[^>]*>/g, "").replace(/\[\s*shop\s*[:：][^\]]*\]/giu, "").replace(/\s+/g, " ").trim()
   );
   function unreadIndexes(chat, store2) {
     const out = [];
@@ -1809,7 +2166,7 @@ ${c}`)]).join("\n\n");
   }
   function peopleSettings(state) {
     const v = (k) => ppValue(state, k);
-    const num5 = (k, min, max) => {
+    const num6 = (k, min, max) => {
       const n2 = Number(v(k));
       return Math.max(min, Math.min(max, Number.isFinite(n2) ? n2 : Number(PP_DEFAULTS[k])));
     };
@@ -1823,14 +2180,14 @@ ${c}`)]).join("\n\n");
       director: one2("director", ["off", "note", "facts", "scene"]),
       directorLang: v("director_lang") === "ko" ? "ko" : "en",
       directorLen: v("director_len") === "normal" ? "normal" : "short",
-      directorTimeout: num5("director_timeout", 5, 300),
+      directorTimeout: num6("director_timeout", 5, 300),
       directorReuse: v("director_reuse") !== "0",
       directorSearch: v("director_search") !== "0",
       directorFeatures: v("director_features") !== "0",
       router: v("router") === "model" ? "model" : "code",
-      routerTimeout: num5("router_timeout", 5, 300),
+      routerTimeout: num6("router_timeout", 5, 300),
       always: [...new Set(v("always").split(/[,\n]/).map((x) => x.trim().normalize("NFC")).filter(Boolean))].slice(0, 12),
-      recentMsgs: num5("recent_msgs", 0, 12),
+      recentMsgs: num6("recent_msgs", 0, 12),
       routerRules: v("router_rules").slice(0, 2e3),
       stageModel: (() => {
         const base = v("model") === "main" ? "main" : "aux";
@@ -1839,34 +2196,34 @@ ${c}`)]).join("\n\n");
       })(),
       stageModelId: { update: v("model_id_update").trim().slice(0, 120), director: v("model_id_director").trim().slice(0, 120), router: v("model_id_router").trim().slice(0, 120), tidy: v("model_id_tidy").trim().slice(0, 120) },
       hypa: v("hypa") === "1",
-      hypaCap: num5("hypa_cap", 500, 24e3),
-      hypaItems: num5("hypa_items", 1, 64),
+      hypaCap: num6("hypa_cap", 500, 24e3),
+      hypaItems: num6("hypa_items", 1, 64),
       hypaPlus: v("hypa_plus") !== "0",
-      speed: num5("speed", 0.25, 4),
-      speedDown: v("speed_down") === "same" || v("speed_down") === "" ? num5("speed", 0.25, 4) : num5("speed_down", 0.25, 4),
-      turnCap: num5("turn_cap", 0, 100),
+      speed: num6("speed", 0.25, 4),
+      speedDown: v("speed_down") === "same" || v("speed_down") === "" ? num6("speed", 0.25, 4) : num6("speed_down", 0.25, 4),
+      turnCap: num6("turn_cap", 0, 100),
       features: new Set(FEATURES.filter((f) => v(f) === "1" && !(f === "taste" && v("num_affinity") === "0"))),
       sexualDesire: v("sexual_desire") === "1",
       paraphilia: v("paraphilia") === "1",
       explicitStyle: v("explicit_style") === "1",
       registerVariety: one2("register_variety", ["off", "one", "two"]),
       registerChange: v("register_change") === "auto" ? "auto" : "ask",
-      registerSignLimit: num5("register_sign_limit", 1, 9),
+      registerSignLimit: num6("register_sign_limit", 1, 9),
       numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== "0")),
       qualitative: new Set(NUMERIC_FEATURES.filter((f) => v(f) === "1" && v(`num_${f}`) === "0")),
       newPeople: v("newpeople") === "confirm" ? "confirm" : "auto",
       twoTurn: v("twoturn") !== "0",
-      prevPairs: num5("prev_pairs", 0, 3),
+      prevPairs: num6("prev_pairs", 0, 3),
       lang: v("lang") === "en" ? "en" : "ko",
-      personCap: num5("person_cap", 2e3, 4e4),
-      blockCap: num5("block_cap", 4e3, 64e3),
+      personCap: num6("person_cap", 2e3, 4e4),
+      blockCap: num6("block_cap", 4e3, 64e3),
       tidy: v("tidy") === "separate" ? "separate" : "same",
       factionInject: v("faction_inject") !== "0",
       factionQual: v("faction_rep") === "1" && v("num_faction_rep") === "0",
       factionBounds: parseBounds(v("faction_bounds")),
       // 정성 모드에서는 필드 목격 계기를 쌓지 않는다 (단계는 갱신기 판단만)
       mobWeight: v("num_faction_rep") === "0" ? "off" : one2("mob_weight", ["half", "full", "off"]),
-      spanCap: num5("span_cap", 3e3, 4e4),
+      spanCap: num6("span_cap", 3e3, 4e4),
       rules: v("rules").slice(0, 4e3),
       directorRules: v("director_rules").slice(0, 2e3),
       parallel: v("parallel") === "1",
@@ -2074,7 +2431,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const relationsSym = o.relationsSym === false ? false : void 0;
     const frame2 = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame2 ? { frame: frame2 } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...o.versus === true ? { versus: true } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
+    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame2 ? { frame: frame2 } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules2.length ? { rules: rules2 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...look ? { look } : {}, ...o.versus === true ? { versus: true } : {}, ...o.progress === false ? { progress: false } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...imgFoldLock ? { imgFoldLock } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -2242,6 +2599,15 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return (h >>> 0).toString(36);
   };
   var walletEntryId = (anchor, amount, memo) => `w_${hash2(`${anchor}|${amount}|${memo}`)}`;
+  function freshWalletId(w, base, anchor) {
+    const used = (id2) => w.log.some((x) => x.id === id2);
+    if (!used(base)) return base;
+    const b = anchor ? `${base}_${anchor}` : base;
+    if (!used(b)) return b;
+    let i = 2;
+    while (used(`${b}_${i}`)) i++;
+    return `${b}_${i}`;
+  }
   function addWalletEntry(w, e) {
     if (!Number.isSafeInteger(e.amount) || e.amount === 0 || Math.abs(e.amount) > WALLET_MAX) return w;
     const id2 = e.id ?? walletEntryId(e.anchor, e.amount, e.memo);
@@ -3704,813 +4070,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
         src: "위키 이연화 「고영은」: 연구1팀에 들르면 이연화 책상에 캔커피를 놓고 감"
       },
       "강이학>백사헌": {
-        aff: 90,
-        src: "위키 강이학 「백사헌」: 말이 통하는 몇 안 되는 상대, 「좋은 거래처」"
-      },
-      "백사헌>강이학": {
-        aff: 90,
-        src: "위키 백사헌 「강이학」: 몇 안 되게 말이 통하는 상대, 거래는 꼭 성사됨. 추정"
-      },
-      "청달래>호유원": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 청달래 「호유원」: 영구 냉전, 「애송이」라 노골적으로 경멸"
-      },
-      "호유원>청달래": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 호유원 「청달래」: 유일하게 존칭을 빼는 대상, 사적 감정"
-      },
-      "이병진>호유원": {
-        aff: 150,
-        src: "위키 이병진 「호유원」: 직속 줄, 「이 회사에서 제일 좋은 상사」라며 이름을 입에 달고 삼"
-      },
-      "호유원>이병진": {
-        aff: 90,
-        src: "위키 호유원 「이병진」: 알아서 인재를 물어 오는 충실한 창구"
-      },
-      "곽제강>이연화": {
-        aff: 90,
-        src: "위키 곽제강 「이연화」: 잔소리를 싫어하지 않고 오히려 재미있어함"
-      },
-      "곽제강>청달래": {
-        aff: -25,
-        src: "위키 곽제강 「청달래」: 측근들 앞에서 대놓고 무시, 「알 게 뭡니까」"
-      },
-      "진나솔>이병진": {
-        aff: -25,
-        src: "위키 이병진 「정예 조와 사무실 인맥」: 정예들이 대놓고 무시함"
-      },
-      "백석주>박민성": {
-        aff: 90,
-        src: "위키 박민성 「백석주」: 음료수를 받으며 「넌 착하다, 조를 잘못 골랐어」. 추정"
-      },
-      "블라렛>살라딘": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 블라렛 「살라딘」: 영원한 앙숙, 피의 원한을 개인적으로 실천"
-      },
-      "살라딘>블라렛": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 살라딘 「블라렛」: 같은 방에 있기만 해도 무기에 손이 감"
-      },
-      "서윤지>차여진": {
-        aff: -60,
-        src: "대사 JSON hostile. 위키 서윤지 「차여진」: 옆자리를 기록하며 협회 청렴성 낙제 분기로 셈, 같은 줄에 세우는 비유를 싫어함"
-      },
-      "차여진>서윤지": {
-        aff: -25,
-        src: "대사 JSON hostile. 위키 차여진 「서윤지」: 인생의 몇 안 되는 불편 요소, 감사 시즌에 옆자리를 흘끔거림"
-      },
-      "차여진>문혜란": {
-        aff: 90,
-        src: "대사 JSON close. 위키 차여진 「문혜란」: 프리랜서를 주고받으며 소개비를 챙기는 사이(지상·지하 친절 연합)"
-      },
-      "문혜란>차여진": {
-        aff: 90,
-        src: "대사 JSON close. 위키 문혜란 「차여진」: 양쪽으로 프리랜서를 주고받는 연합"
-      },
-      "고연지>윤지아": {
-        aff: 90,
-        src: "위키 고연지 「윤지아」: 조수를 계속 두고 사탕 재고를 따지지 않음. 추정"
-      },
-      "윤지아>고연지": {
-        aff: 90,
-        src: "위키 윤지아 「고연지」: 원장이 서운할 거라 생각해 짠해함, 질문 안 하는 조수로 신뢰받음"
-      }
-    },
-    orgs: {
-      "A00>A00": 0,
-      "A00>B00": -25,
-      "A00>C00": -25,
-      "A00>D00": 0,
-      "A00>E00": 0,
-      "B00>A00": -25,
-      "B00>B00": 0,
-      "B00>C00": -25,
-      "B00>D00": 0,
-      "B00>E00": -25,
-      "C00>A00": -25,
-      "C00>B00": -25,
-      "C00>C00": 0,
-      "C00>D00": 0,
-      "C00>E00": 0,
-      "협회>A00": 0,
-      "협회>B00": -25,
-      "협회>C00": 0,
-      "협회>D00": 0,
-      "협회>E00": 0,
-      "지하상가>A00": 0,
-      "지하상가>B00": 0,
-      "지하상가>C00": 0,
-      "지하상가>D00": 0,
-      "지하상가>E00": 0,
-      "교황청>A00": 0,
-      "교황청>B00": 0,
-      "교황청>C00": 0,
-      "교황청>D00": 0,
-      "교황청>E00": 0,
-      "십자군>A00": 0,
-      "십자군>B00": 0,
-      "십자군>C00": 0,
-      "십자군>D00": 0,
-      "십자군>E00": 0,
-      "독립>A00": 0,
-      "독립>B00": 0,
-      "독립>C00": 0,
-      "독립>D00": 0,
-      "독립>E00": 0
-    }
-  };
-
-  // game-src/dialogue/aliases.json
-  var aliases_default = {
-    version: 1,
-    names: {
-      강이학: {
-        aliases: [
-          "강이학 사원",
-          "조랑말",
-          "Kang I-hak"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      게슈간: {
-        aliases: [
-          "게슈간 요원",
-          "Geshugan"
-        ],
-        titles: [
-          "요원"
-        ]
-      },
-      고그니쟈: {
-        aliases: [
-          "고그니쟈 실장",
-          "고그니쟈 책임자",
-          "Gognija"
-        ],
-        titles: [
-          "연구 책임자",
-          "실장",
-          "책임자"
-        ]
-      },
-      고르고디오: {
-        aliases: [
-          "적합자 고르고디오",
-          "고르고디오 선배",
-          "Gorgodio"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배",
-          "형님",
-          "적합자"
-        ]
-      },
-      고연지: {
-        aliases: [
-          "고연지 원장",
-          "연지",
-          "Go Yeon-ji"
-        ],
-        titles: [
-          "원장",
-          "원장님",
-          "의사",
-          "선생님"
-        ]
-      },
-      고영은: {
-        aliases: [
-          "고영은 사원",
-          "영은",
-          "영은 쌤",
-          "산양",
-          "Go Young-eun"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      고영훈: {
-        aliases: [
-          "고영훈 차장",
-          "Go Young-hoon"
-        ],
-        titles: [
-          "차장"
-        ]
-      },
-      곽성주: {
-        aliases: [
-          "곽성주 과장",
-          "Kwak Seong-ju"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      곽제강: {
-        aliases: [
-          "곽제강 과장",
-          "곽 과장",
-          "Kwak Je-gang"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      김성진: {
-        aliases: [
-          "김성진 사원",
-          "Kim Seong-jin"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      김조학: {
-        aliases: [
-          "김조학 과장",
-          "수석 심문관",
-          "Kim Jo-hak"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "심문관"
-        ]
-      },
-      노기균: {
-        aliases: [
-          "노기균 대리",
-          "No Gi-gyun"
-        ],
-        titles: [
-          "대리",
-          "형님"
-        ]
-      },
-      데드폴: {
-        aliases: [
-          "데드폴 요원",
-          "데드폴 씨",
-          "Deadpole"
-        ],
-        titles: [
-          "요원"
-        ]
-      },
-      데쥬레: {
-        aliases: [
-          "데쥬레 연구원",
-          "Dejure"
-        ],
-        titles: [
-          "연구원"
-        ]
-      },
-      도필헌: {
-        aliases: [
-          "도필헌 국장",
-          "도 국장",
-          "Do Pil-heon"
-        ],
-        titles: [
-          "국장",
-          "국장님"
-        ]
-      },
-      로제몬: {
-        aliases: [
-          "로제몬 요원",
-          "Rojemon"
-        ],
-        titles: [
-          "요원",
-          "사무직"
-        ]
-      },
-      마덕희: {
-        aliases: [
-          "마덕희 사장",
-          "헐값매입 주인",
-          "Ma Deok-hee"
-        ],
-        titles: [
-          "주인"
-        ]
-      },
-      문혜란: {
-        aliases: [
-          "문혜란 사장",
-          "혜란",
-          "혜란 언니",
-          "Mun Hye-ran"
-        ],
-        titles: [
-          "사장",
-          "언니"
-        ]
-      },
-      박민성: {
-        aliases: [
-          "박민성 주임",
-          "민성",
-          "오소리",
-          "Park Min-seong"
-        ],
-        titles: [
-          "주임"
-        ]
-      },
-      백사헌: {
-        aliases: [
-          "백사헌 사원",
-          "독사",
-          "Baek Sa-heon"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      백석주: {
-        aliases: [
-          "백석주 과장",
-          "백석주 조장",
-          "청둥오리",
-          "오리 조장",
-          "A조 조장",
-          "Baek Seok-ju"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "조장",
-          "조장님"
-        ]
-      },
-      브라우니: {
-        aliases: [
-          "Brownie"
-        ],
-        titles: [
-          "진행자"
-        ]
-      },
-      블라렛: {
-        aliases: [
-          "블라렛 수녀",
-          "특급 수녀",
-          "Blaret"
-        ],
-        titles: [
-          "수녀",
-          "수녀님"
-        ]
-      },
-      사장: {
-        aliases: [
-          "사장님",
-          "Sa-jang"
-        ],
-        titles: [
-          "사장"
-        ]
-      },
-      살라딘: {
-        aliases: [
-          "살라딘 형님",
-          "Saladin"
-        ],
-        titles: [
-          "형님",
-          "대영웅"
-        ]
-      },
-      서윤지: {
-        aliases: [
-          "서윤지 조정관",
-          "서 조정관",
-          "Seo Yun-ji"
-        ],
-        titles: [
-          "조정관"
-        ]
-      },
-      송주익: {
-        aliases: [
-          "송주익 대리",
-          "주익",
-          "Song Ju-ik"
-        ],
-        titles: [
-          "대리",
-          "막내"
-        ]
-      },
-      송진섭: {
-        aliases: [
-          "송진섭 사원",
-          "진섭",
-          "Song Jin-seob"
-        ],
-        titles: [
-          "사원",
-          "막내"
-        ]
-      },
-      스팡달: {
-        aliases: [
-          "스팡달 선배",
-          "스팡달 선임",
-          "Spangdal"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      신유리: {
-        aliases: [
-          "신유리 사장",
-          "Shin Yuri"
-        ],
-        titles: [
-          "사채업자"
-        ]
-      },
-      에일린: {
-        aliases: [
-          "에일린 선임",
-          "Aileen",
-          "Eileen"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      윤병수: {
-        aliases: [
-          "윤병수 대리",
-          "병수",
-          "Yun Byeong-su"
-        ],
-        titles: [
-          "대리",
-          "팀장",
-          "교관"
-        ]
-      },
-      윤지아: {
-        aliases: [
-          "꼬마 조수",
-          "꼬마 선생님",
-          "지아",
-          "Yun Ji-a"
-        ],
-        titles: [
-          "조수",
-          "선생님"
-        ]
-      },
-      은하제: {
-        aliases: [
-          "은하제 대리",
-          "송골매",
-          "Eun Ha-je"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      이기석: {
-        aliases: [
-          "이기석 과장",
-          "Lee Gi-seok"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이길환: {
-        aliases: [
-          "이길환 과장",
-          "튜토리얼 요정",
-          "Lee Gil-hwan"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이도형: {
-        aliases: [
-          "이도형 부장",
-          "이도형 부장님",
-          "흉백",
-          "Lee Do-hyeong"
-        ],
-        titles: [
-          "부장",
-          "부장님"
-        ]
-      },
-      이병진: {
-        aliases: [
-          "이병진 과장",
-          "이 과장",
-          "Lee Byeong-jin"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      이성해: {
-        aliases: [
-          "이성해 주임",
-          "돌고래 가면",
-          "Lee Seong-hae"
-        ],
-        titles: [
-          "주임"
-        ]
-      },
-      이연화: {
-        aliases: [
-          "이연화 대리",
-          "Lee Yeon-hwa"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      이자헌: {
-        aliases: [
-          "이자헌 과장",
-          "이자헌 조장",
-          "도마뱀 과장",
-          "D조 조장",
-          "Lee Ja-heon"
-        ],
-        titles: [
-          "과장",
-          "과장님",
-          "조장",
-          "조장님",
-          "도마뱀"
-        ]
-      },
-      장허운: {
-        aliases: [
-          "장허운 사원",
-          "소 가면",
-          "Jang Heo-un"
-        ],
-        titles: [
-          "사원"
-        ]
-      },
-      잼트리: {
-        aliases: [
-          "잼트리 선배",
-          "잼트리 요원",
-          "모두의 언니",
-          "Jaemtri"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배",
-          "언니"
-        ]
-      },
-      쟈알디: {
-        aliases: [
-          "쟈알디 부장",
-          "쟈알디 부장님",
-          "Jyaldi"
-        ],
-        titles: [
-          "부장",
-          "부장님",
-          "팀장"
-        ]
-      },
-      제이: {
-        aliases: [
-          "J3",
-          "경비반장 제이",
-          "늑대 가면",
-          "Jay"
-        ],
-        titles: [
-          "경비반장",
-          "반장",
-          "반장님"
-        ]
-      },
-      조성춘: {
-        aliases: [
-          "조성춘 과장",
-          "Cho Seong-choon"
-        ],
-        titles: [
-          "과장",
-          "과장님"
-        ]
-      },
-      진나솔: {
-        aliases: [
-          "진나솔 대리",
-          "나솔",
-          "나비 가면",
-          "Jin Na-sol"
-        ],
-        titles: [
-          "대리"
-        ]
-      },
-      차여진: {
-        aliases: [
-          "차여진 조정관",
-          "차 조정관",
-          "Cha Yeo-jin"
-        ],
-        titles: [
-          "조정관"
-        ]
-      },
-      청달래: {
-        aliases: [
-          "청달래 전무",
-          "청 전무",
-          "청 전무님",
-          "Cheong Dal-lae"
-        ],
-        titles: [
-          "전무",
-          "전무님"
-        ]
-      },
-      콘쥬스: {
-        aliases: [
-          "콘쥬스 요원",
-          "Konjyuce"
-        ],
-        titles: [
-          "요원",
-          "막내"
-        ]
-      },
-      큐라스: {
-        aliases: [
-          "큐라스 선배",
-          "Kyuras"
-        ],
-        titles: [
-          "선임",
-          "선임 요원",
-          "선배"
-        ]
-      },
-      호유원: {
-        aliases: [
-          "호유원 이사",
-          "호 이사",
-          "호 이사님",
-          "Ho Yu-won"
-        ],
-        titles: [
-          "이사",
-          "이사님"
-        ]
-      }
-    },
-    ambiguous: {
-      경비반장: [
-        "제이"
-      ],
-      과장: [
-        "곽성주",
-        "곽제강",
-        "김조학",
-        "백석주",
-        "이기석",
-        "이길환",
-        "이병진",
-        "이자헌",
-        "조성춘"
-      ],
-      과장님: [
-        "곽성주",
-        "곽제강",
-        "김조학",
-        "백석주",
-        "이기석",
-        "이길환",
-        "이병진",
-        "이자헌",
-        "조성춘"
-      ],
-      교관: [
-        "윤병수"
-      ],
-      국장: [
-        "도필헌"
-      ],
-      국장님: [
-        "도필헌"
-      ],
-      대리: [
-        "노기균",
-        "송주익",
-        "윤병수",
-        "은하제",
-        "이연화",
-        "진나솔"
-      ],
-      대영웅: [
-        "살라딘"
-      ],
-      도마뱀: [
-        "이자헌"
-      ],
-      막내: [
-        "송주익",
-        "송진섭",
-        "콘쥬스"
-      ],
-      반장: [
-        "제이"
-      ],
-      반장님: [
-        "제이"
-      ],
-      부장: [
-        "이도형",
-        "쟈알디"
-      ],
-      부장님: [
-        "이도형",
-        "쟈알디"
-      ],
-      사무직: [
-        "로제몬"
-      ],
-      사원: [
-        "강이학",
-        "고영은",
-        "김성진",
-        "백사헌",
-        "송진섭",
-        "장허운"
-      ],
-      사장: [
-        "문혜란",
-        "사장"
-      ],
-      사채업자: [
-        "신유리"
-      ],
-      선배: [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      선생님: [
-        "고연지",
-        "윤지아"
-      ],
-      선임: [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      "선임 요원": [
-        "고르고디오",
-        "스팡달",
-        "에일린",
-        "잼트리",
-        "큐라스"
-      ],
-      수녀: [
-        "블라렛"
-      ],
-      수녀님: [
-        "블라렛"
-      ],
-      실장
+        af
