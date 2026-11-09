@@ -9,7 +9,7 @@ import {
   K, LINE, DT, GRAV, HP, DMG, SCALE, JUGGLE_MUL, OTG_MUL, CHIP, GAUGE, STUN, FREEZE, PUSH, FRICTION, CHAIN_DOWN, CHAIN_GAP,
   JUGGLE_MAX, OTG_MAX, LIE_SEC, MOVE, ATK, CHAIN_WINDOW, BUFFER, SPECIAL_LAG, BODY_HALF, TIP, WALL,
   HIT_CAP, LAUNCH_GRAV,
-  dotSample,
+  dotSample, RUSH_SUPER,
 } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -38,6 +38,10 @@ export interface HitSpec {
   sound?: string;
   /** 평타 (때린 쪽도 멈춘다) */
   normal?: boolean;
+  /** 붙잡아 두기 (돌진 난무): 서 있으면 이 초만큼 맞는 자세로 묶고 쓰러뜨리지 않는다, 공중이면 띄운 채 둔다 */
+  lock?: number;
+  /** 맞은 쪽 멈춤 (초) 따로 정함 */
+  stop?: number;
 }
 
 interface Atk {
@@ -100,6 +104,8 @@ export class Fighter {
   chargeT = 0;
   inSuper = false;
   pending: (() => void) | null = null;
+  /** 돌진 난무 필살기 진행 (한 틱마다) */
+  rush: (() => void) | null = null;
   /** 보이는 모습 */
   flashT = 0;
   flashC = '#ffffff';
@@ -206,6 +212,7 @@ export class Fighter {
   setState(s: State): void { this.state = s; this.stT = 0; }
   toIdle(): void {
     this.setState('idle');
+    this.rush = null;
     this.atk = null;
     this.air = false;
     this.vanish = null;
@@ -214,6 +221,7 @@ export class Fighter {
     this.play(id, steps(lp ?? range(0, Math.max(0, n - 1)), 0.11), { loop: 0 });
   }
   private onStep(e: Step): void {
+    e.fn?.();
     if (e.run && this.atk) runFx(this, e.run as Json[], this.fxCtx());
     if (e.shot && this.atk) this.fireShot();
   }
@@ -467,6 +475,7 @@ export class Fighter {
   }
   /** 공격 중: 맞혔으면 마무리 장에서 다음 동작으로 잇는다 */
   private atkTick(): void {
+    if (this.rush) return this.rush();
     const a = this.atk;
     if (!a || !this.anim) return;
     if (a.connected && this.anim.step.cancel) {
@@ -574,6 +583,7 @@ export class Fighter {
   superMove(): void {
     const sp = this.skills.super;
     if (!sp) return;
+    if (RUSH_SUPER.has(this.name)) return this.rushSuper(String(sp.name || '필살기'));
     this.gauge = 0;
     this.inSuper = true;
     this.setState('atk');
@@ -588,6 +598,112 @@ export class Fighter {
     this.play(id, [{ f: 0, d: 99 }]);
     this.pending = () => this.runSteps(sp, use, () => { this.inSuper = false; this.inv = 0; this.afterSpecial(this.anim?.id ?? this.idleId()); });
     this.st.superFlash(this, String(sp.name || '필살기'));
+  }
+
+  // ───────── 돌진 난무 필살기 (견본) ─────────
+  /** 화면 어두워짐 → 상대 앞까지 돌진 → 약·강 연타 12대 → 띄우기 → 따라 뛰어올라 공중 연타 → 내려찍기 → 땅에서 에너지 대폭발.
+   *  새 그림 없이 그 캐릭터의 평타(9·10·11·12)·대시(16_1)·점프(7)·점프 공격(14) 장을 빠르게 돌린다. 피해는 필살기 값(DMG.super)을 맞는 수로 나눈다 */
+  private rushSuper(name: string): void {
+    const L = this.lightIds(), H = this.has('12') ? '12' : L[L.length - 1];
+    const beats = [...L, ...L, H, ...L, H, ...L].slice(0, 12);
+    const AIR = 4, total = beats.length + 1 + AIR + 1;
+    this.gauge = 0;
+    this.inSuper = true;
+    this.setState('atk');
+    this.vx = 0;
+    const use = this.newUse('super', DMG.super, total, { unblock: true });
+    use.per = Math.max(1, Math.round(DMG.super / total));
+    this.atk = { use, hit: true, connected: false, start: this.st.t, normal: null, lag: SPECIAL_LAG };
+    this.inv = 99;
+    this.flashT = 0.35; this.flashC = '#ffffff';
+    this.play(this.has('16_1') ? '16_1' : this.idleId(), [{ f: 0, d: 99 }]);
+    const o0 = this.foe();
+    const gap = () => (o0 ? o0.half() + this.half() + 18 : 80);
+    const end = () => {
+      this.rush = null; this.inSuper = false; this.inv = 0.2; this.vx = 0;
+      if (this.z > 0) { this.rush = () => { if (this.z <= 0 && this.vz <= 0) { this.z = 0; this.vz = 0; this.air = false; this.rush = null; this.st.sfx({ type: 'land', x: this.x }); this.afterSpecial('7'); } }; return; }
+      this.air = false; this.afterSpecial(this.anim?.id ?? this.idleId());
+    };
+    const foeOk = () => !!o0 && o0.alive && o0.deadT < 0 && o0.state !== 'ko';
+    const hit = (kind: HitKind, o: Partial<HitSpec> = {}) => {
+      if (!foeOk() || !o0) return;
+      const r = o0.receive(this, { use, kind, at: { x: o0.x - this.face * 22, y: o0.midY() + (Math.random() - 0.5) * 50 }, ...o });
+      if (r === 'hit') this.freeze = Math.max(this.freeze, o.stop ?? 0.04);
+    };
+    // 한 대: 그 장들을 빠르게, 때리는 장에서 맞힘
+    const beat = (id: string, heavy: boolean, d: number, f: () => void, then: () => void) => {
+      const s0 = normalSeq(this.art, id, heavy), imp = Math.max(0, s0.findIndex((e) => e.act));
+      // 때린 뒤 두 장만 남기고 바로 다음 대로 (회수 장을 다 돌리면 연타가 늘어짐)
+      const s = s0.slice(0, imp + 3).map((e) => ({ ...e, d: e.d * d, act: false, cancel: false }));
+      s[imp].fn = f;
+      this.play(id, s, { onEnd: then });
+    };
+    let phase = 'dash';
+    const glue = () => { if (o0 && foeOk() && o0.z <= 0 && phase === 'beat') this.x += ((o0.x - this.face * gap()) - this.x) * 0.5; };
+    const runBeats = (i: number) => {
+      if (!foeOk()) return end();
+      if (i >= beats.length) return launch();
+      const id = beats[i], heavy = id === H;
+      beat(id, heavy, heavy ? 0.5 : 0.45, () => hit(heavy ? 'heavy' : 'light', { lock: 0.9, stop: heavy ? 0.07 : 0.04 }), () => runBeats(i + 1));
+    };
+    const launch = () => {
+      phase = 'launch';
+      beat(H, true, 0.7, () => {
+        hit('launch', { stop: 0.12 });
+        if (o0) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: o0.x, y: o0.midY(), s: 1.4 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+        this.st.shake(14);
+      }, () => jumpUp());
+    };
+    const jumpUp = () => {
+      if (!foeOk()) return end();
+      phase = 'air';
+      this.vz = 1500; this.z = 1; this.air = true; this.vx = 0;
+      this.st.sfx({ type: 'jump', x: this.x });
+      const n7 = nOf(this.art, '7');
+      this.play('7', steps(range(0, Math.min(2, n7 - 1)), 0.05), { onEnd: () => airHits(0) });
+    };
+    const airHits = (i: number) => {
+      if (!foeOk()) return end();
+      if (i >= AIR) return spike();
+      beat(this.has('14') ? '14' : H, false, 0.5, () => hit('light', { lock: 1, stop: 0.05 }), () => airHits(i + 1));
+    };
+    const spike = () => {
+      phase = 'spike';
+      beat(this.has('14') ? '14' : H, true, 0.8, () => {
+        hit('spike', { stop: 0.16 });
+        if (o0 && foeOk()) { o0.vz = -1900; o0.vx = this.face * 120; }
+        this.st.shake(16);
+        phase = 'fall';
+      }, () => { if (phase !== 'fall') end(); });
+    };
+    this.rush = () => {
+      if (!o0) return end();
+      if (phase === 'dash') {
+        this.vx = this.face * 1700;
+        const d = Math.abs(o0.x - this.x) - gap();
+        if (d <= 10) { this.vx = 0; phase = 'beat'; runBeats(0); }
+        else if (this.stT > 0.6) end();
+        return;
+      }
+      glue();
+      if (phase === 'air') {
+        // 띄운 상대를 내 앞 조금 위에 붙여 둔다 (같이 올라갔다 내려옴)
+        if (foeOk()) { o0.x += ((this.x + this.face * gap()) - o0.x) * 0.4; o0.z += ((this.z + 30) - o0.z) * 0.4; o0.vz = this.vz; }
+      }
+      if (phase === 'fall') {
+        if (!foeOk() || o0.z <= 0 || o0.state === 'down' || o0.state === 'ko') {
+          phase = 'done';
+          const x = o0.x;
+          this.st.fx.push({ k: 'sheet', name: 'dot-nova', x, y: LINE - 90 * K, s: 3.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+          this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
+          this.st.shake(20);
+          this.st.fx.push({ k: 'dust', x, y: LINE, t: 0.6, t0: 0.6, n: 16, seed: Math.random() * 99 });
+          this.freeze = 0.12;
+          end();
+        }
+      }
+    };
+    this.st.superFlash(this, name);
   }
 
   // ───────── 맞기 ─────────
@@ -644,7 +760,7 @@ export class Fighter {
     by.combo = this.comboTaken;
     this.hurtT = 0.12;
     const big = h.kind !== 'light';
-    const fr = use.kind === 'super' ? FREEZE.super : h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' ? FREEZE.big : big ? FREEZE.heavy : FREEZE.light;
+    const fr = h.stop != null ? h.stop : use.kind === 'super' ? FREEZE.super : h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' ? FREEZE.big : big ? FREEZE.heavy : FREEZE.light;
     this.freeze = fr;
     if (h.normal) by.freeze = fr;
     this.st.shake(h.kind === 'launch' || h.kind === 'blow' || h.kind === 'down' || use.kind === 'super' ? 12 : big ? 9 : 4);
@@ -660,6 +776,10 @@ export class Fighter {
       return 'hit';
     }
     if (this.bindT > 0 && h.kind !== 'launch' && h.kind !== 'blow' && h.kind !== 'down') { this.vx = 0; this.hitPose(STUN.light, h.kind); return 'hit'; }
+    if (h.lock) {
+      if (this.z > 0 || this.state === 'air') { if (this.state !== 'air') this.knock('launch', dir, 0.3); return 'hit'; }
+      this.vx = dir * 40; this.chainN = 0; this.hitPose(h.lock, h.kind); return 'hit';
+    }
     if (this.z > 0 || this.state === 'air') {
       this.juggle++;
       const k = this.juggle > JUGGLE_MAX ? 0 : Math.max(0.35, 1 - this.juggle * 0.15);
@@ -709,6 +829,7 @@ export class Fighter {
   }
   private hitPose(sec: number, kind: HitKind): void {
     this.setState('hit');
+    this.rush = null;
     this.atk = null; this.inSuper = false; this.charge0();
     this.stun = sec;
     const id = kind === 'heavy' && this.has('18_2') ? '18_2' : '18';
@@ -729,6 +850,7 @@ export class Fighter {
   /** 띄우기 · 날리기 · 넘어뜨리기 */
   knock(kind: 'launch' | 'blow' | 'down', dir: number, k = 1): void {
     this.setState('air');
+    this.rush = null;
     this.atk = null; this.inSuper = false; this.charge0();
     this.airKind = kind;
     const p = kind === 'launch' ? PUSH.launch : kind === 'blow' ? PUSH.blow : PUSH.down;
@@ -825,7 +947,7 @@ export class Fighter {
   reset(x: number, face: 1 | -1, hp: number): void {
     this.x = x; this.z = 0; this.vx = 0; this.vz = 0; this.face = face; this.hp = hp;
     this.freeze = 0; this.hold = 0; this.inv = 0; this.stun = 0; this.air = false; this.chainN = 0; this.comboTaken = 0; this.combo = 0;
-    this.juggle = 0; this.otg = 0; this.atk = null; this.inSuper = false; this.pending = null; this.buf = null; this.vanish = null; this.bindT = 0; this.liftT = 0;
+    this.juggle = 0; this.otg = 0; this.atk = null; this.inSuper = false; this.pending = null; this.rush = null; this.buf = null; this.vanish = null; this.bindT = 0; this.liftT = 0;
     this.force = null; this.lightIdx = 0; this.lightEnd = -9; this.flashT = 0;
     this.toIdle();
   }

@@ -214,6 +214,67 @@ def burst():
     return save("dot-burst", out, 70)
 
 
+# ── 4. 필살기 마무리 에너지 대폭발(11-09 사용자 「이펙트 막 에너지 화면 폭발」): 흰 섬광 → 번개 테 두른 에너지 구 + 24갈래 빛살
+#    → 구가 터져 굵은 조각·납작한 충격파 고리로 퍼지며 사라짐 ──
+def nova():
+    S = 256; c = S / 2; out = []; N = 14
+    for k in range(N):
+        f = F(S, S); t = k / (N - 1)
+        if k == 0:
+            disc(f, c, c, 30, 3); disc(f, c, c, 24, 2); disc(f, c, c, 17, 1)
+            for i in range(4): ray(f, c, c, i * math.pi / 2, 20, 120, 4.0, [1, 1, 1, 2, 3])
+            for i in range(4): ray(f, c, c, i * math.pi / 2 + math.pi / 4, 16, 70, 2.6, [1, 2, 3])
+            out.append(f); continue
+        R = 26 + 92 * (1 - (1 - min(1, t * 1.6)) ** 2)      # 구 반지름: 빠르게 커졌다 멈춤
+        # 납작한 충격파 고리 (땅 쪽 느낌): 구보다 앞서 퍼짐
+        sw = 40 + 160 * t
+        # 빛살 24갈래 (앞쪽 장에서만)
+        if k < 8:
+            for i in range(24):
+                a = i * math.pi / 12 + 0.07 + k * 0.02
+                L = (1.0 if i % 3 == 0 else 0.62 if i % 3 == 1 else 0.45) * (R * 0.9 + 30)
+                ray(f, c, c, a, R * 0.55, min(126, R * 0.55 + L), (3.2 if i % 3 == 0 else 2.0) * (1 - t * 0.9) + 0.6, [1, 1, 2, 3] if k < 4 else [2, 3, 4])
+        if t < 0.62:
+            # 에너지 구: 바깥 들쭉날쭉 번개 테 + 안쪽 단계
+            for y in range(int(c - R - 8), int(c + R + 9)):
+                for x in range(int(c - R - 8), int(c + R + 9)):
+                    a = math.atan2(y - c, x - c)
+                    jag = (vnoise(a * 9 + 50, k * 3, 1, 5) - 0.5) * 0.22 + (0.08 if int((a + math.pi) * 12 + k) % 3 == 0 else 0)
+                    d = math.hypot(x - c, y - c) / R
+                    if d > 1 + jag: continue
+                    hl = math.hypot(x - (c - R * 0.25), y - (c - R * 0.3)) / R
+                    q = d * 0.8 + hl * 0.2 + t * 0.9
+                    col = 1 if q < 0.45 else 2 if q < 0.7 else 3 if q < 0.92 else 4
+                    if d > 0.9 + jag: col = 5 if t > 0.3 else 3
+                    f.put(x, y, col)
+            # 안쪽 뚫린 고리 (터지기 직전 속이 빔)
+            if t > 0.3:
+                hr = R * (t - 0.3) * 2.2
+                for y in range(S):
+                    for x in range(S):
+                        dd = math.hypot(x - c, y - c)
+                        if dd < hr: f.p[y][x] = 0
+                        elif dd < hr + 5 and f.p[y][x]: f.p[y][x] = 1 if dd < hr + 2.5 else 2
+        else:
+            # 터진 뒤: 굵은 조각이 바깥으로, 색이 식으며 사라짐
+            for i in range(28):
+                a = i * 2 * math.pi / 28 + hsh(i, 2) * 0.2
+                r = 78 + (t - 0.62) / 0.38 * 40 + hsh(i, 3) * 8
+                sz = max(1, int(2 + 5 * (1 - (t - 0.62) / 0.38) + hsh(i, 4) * 2))
+                col = [3, 4, 5, 6][min(3, int((t - 0.62) / 0.38 * 4))]
+                for dy in range(-sz, sz + 1):
+                    for dx in range(-sz, sz + 1):
+                        if abs(dx) + abs(dy) <= sz: f.put(c + math.cos(a) * r + dx, c + math.sin(a) * r + dy, col)
+            ring(f, c, c, min(122, 92 + (t - 0.62) * 70), 4 if t < 0.8 else 2, 3 if t < 0.75 else 5 if t < 0.9 else 6, gaps=10, rot=0.4, gapw=0.3 + (t - 0.62) * 1.5)
+        if k < N - 1:
+            ring(f, c, c + 10, min(124, sw), max(2, 10 * (1 - t)), 2 if t < 0.3 else 3 if t < 0.6 else 4, gaps=0 if k < 6 else 12, rot=0.2, gapw=0.2 + t * 0.5, ry=min(124, sw) * 0.32)
+        out.append(f)
+    return save("dot-nova", out, [40, 45, 50, 50, 55, 55, 60, 60, 60, 60, 65, 65, 70, 70])
+
+
 if __name__ == "__main__":
-    for fn in (impact, boom, burst):
+    import sys
+    pick = sys.argv[1:]
+    for fn in (impact, boom, burst, nova):
+        if pick and fn.__name__ not in pick: continue
         sh = fn(); print(fn.__name__, sh.size)

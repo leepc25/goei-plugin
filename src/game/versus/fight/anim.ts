@@ -14,6 +14,8 @@ export interface Step {
   run?: unknown[];
   /** 이 장에 들어갈 때 원거리 한 발 */
   shot?: boolean;
+  /** 이 장에 들어갈 때 부를 것 (돌진 난무 필살기) */
+  fn?: () => void;
 }
 
 export class Anim {
