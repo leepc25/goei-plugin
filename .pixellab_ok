@@ -1,4 +1,5 @@
 0
+- 사용자 11-09 14:12 KST 「그래 밑그림은 … 선으로만」 → 선 밑그림 v4, 강도 50·100·150 3회
 - 사용자 11-09 14:04 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v3(pixflux) 1회
 - 사용자 11-09 13:51 KST 「뽑아봐」 → 망상홈쇼핑 장면 ds_studio_v1 1회
 - 사용자 11-08 19:35 KST 「뽑아봐」 → 236(228회 글, 색값·빈 공간·반짝임 계단·눈금 X) 1회
@@ -268,3 +269,6 @@
 - 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v3_req.json
 - 위 1회는 422(가로 400 넘음)로 거절, 생성 0 → 같은 승인으로 400×300 다시
 - 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v3_req.json
+- 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v4_s100_req.json
+- 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v4_s50_req.json
+- 사용: pixflux 1장 game-src/art/pixellab-test-20261028/homeshop/ds_studio_v4_s150_req.json
