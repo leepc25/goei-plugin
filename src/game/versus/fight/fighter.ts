@@ -106,6 +106,9 @@ export class Fighter {
   pending: (() => void) | null = null;
   /** 돌진 난무 필살기 진행 (한 틱마다) */
   rush: (() => void) | null = null;
+  /** 돌진 난무 중 잔상 (예전 자세 몇 개) */
+  trail: { x: number; z: number; id: string; f: number; face: 1 | -1; air: boolean }[] = [];
+  private trailN = 0;
   /** 보이는 모습 */
   flashT = 0;
   flashC = '#ffffff';
@@ -258,6 +261,9 @@ export class Fighter {
     this.physics(dt);
     if (this.state !== 'hit' && this.state !== 'air' && this.state !== 'jump') this.anim?.tick(dt);
     if (this.state === 'atk' && this.atk && !this.atk.hit && this.anim?.step.act) this.checkNormalHit();
+    // 잔상: 돌진 난무 동안 3틱마다 지금 자세를 남긴다 (4개)
+    if (this.rush) { if (++this.trailN % 3 === 0) { const p = this.pose(); this.trail.push({ x: this.x, z: this.z, id: p.id, f: p.f, face: this.face, air: p.air }); if (this.trail.length > 4) this.trail.shift(); } }
+    else if (this.trail.length) this.trail.shift();
   }
 
   /** 입력: 누른 단추를 잠깐 들고 있는다 (늦게 나가는 예약 공격은 없다) */
@@ -629,10 +635,24 @@ export class Fighter {
       this.air = false; this.afterSpecial(this.anim?.id ?? this.idleId());
     };
     const foeOk = () => !!o0 && o0.alive && o0.deadT < 0 && o0.state !== 'ko';
+    let hitN = 0;
+    /** 맞는 자리 큰 효과 (11-09 「상반신만 한 불꽃」): 대마다 불꽃 덩이, 네 대마다 먹물 튀는 큰 폭발 */
+    const bigFx = (x: number, y: number, big: boolean) => {
+      const flip = this.face < 0;
+      if (big) this.st.fx.push({ k: 'sheet', name: 'dot-blast', x, y, s: 1.9 * K, flip, anchor: 'center', t: 9, t0: 9, el: 0 });
+      else this.st.fx.push({ k: 'sheet', name: 'dot-hitball', x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 40, s: 2.3 * K, flip: Math.random() < 0.5, anchor: 'center', t: 9, t0: 9, el: 0 });
+    };
     const hit = (kind: HitKind, o: Partial<HitSpec> = {}) => {
       if (!foeOk() || !o0) return;
-      const r = o0.receive(this, { use, kind, at: { x: o0.x - this.face * 22, y: o0.midY() + (Math.random() - 0.5) * 50 }, ...o });
-      if (r === 'hit') this.freeze = Math.max(this.freeze, o.stop ?? 0.04);
+      const at = { x: o0.x - this.face * 22, y: o0.midY() + (Math.random() - 0.5) * 50 };
+      const r = o0.receive(this, { use, kind, at, noVfx: true, ...o });
+      if (r === 'hit') {
+        hitN++;
+        const big = kind !== 'light' || hitN % 4 === 0;
+        bigFx(at.x, at.y, big);
+        this.freeze = Math.max(this.freeze, o.stop ?? 0.05);
+        this.st.shake(big ? 12 : 7);
+      }
     };
     // 한 대: 그 장들을 빠르게, 때리는 장에서 맞힘
     const beat = (id: string, heavy: boolean, d: number, f: () => void, then: () => void) => {
@@ -653,9 +673,13 @@ export class Fighter {
     const launch = () => {
       phase = 'launch';
       beat(H, true, 0.7, () => {
-        hit('launch', { stop: 0.12 });
-        if (o0) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: o0.x, y: o0.midY(), s: 1.4 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
-        this.st.shake(14);
+        hit('launch', { stop: 0.16 });
+        if (o0) {
+          // 띄우기: 발밑에서 불기둥이 치솟고 기운이 휘감는다
+          this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x: o0.x, y: LINE + 6, s: 1.5 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-swirl', x: o0.x, y: o0.midY(), s: 1.8 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+        }
+        this.st.shake(16);
       }, () => jumpUp());
     };
     const jumpUp = () => {
@@ -674,9 +698,10 @@ export class Fighter {
     const spike = () => {
       phase = 'spike';
       beat(this.has('14') ? '14' : H, true, 0.8, () => {
-        hit('spike', { stop: 0.16 });
-        if (o0 && foeOk()) { o0.vz = -1900; o0.vx = this.face * 120; }
-        this.st.shake(16);
+        hit('spike', { stop: 0.35 });
+        if (o0 && foeOk()) { o0.vz = -1900; o0.vx = this.face * 120; o0.freeze = 0.35; }
+        this.st.whiteFlash?.(0.12);
+        this.st.shake(18);
         phase = 'fall';
       }, () => { if (phase !== 'fall') end(); });
     };
@@ -698,9 +723,17 @@ export class Fighter {
         if (!foeOk() || o0.z <= 0 || o0.state === 'down' || o0.state === 'ko') {
           phase = 'done';
           const x = o0.x;
-          this.st.fx.push({ k: 'sheet', name: 'dot-nova', x, y: LINE - 90 * K, s: 3.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+          // 마무리 (11-09 킹오파식): 화면 하얗게 → 불기둥 셋이 치솟고 큰 폭발이 겹겹이 → 에너지 구
+          this.st.whiteFlash?.(0.3);
+          this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x, y: LINE + 8, s: 2.4 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 });
+          for (const [i, dx] of [[1, -110], [2, 120]] as const) later(this.st, 0.08 * i, () => this.st.fx.push({ k: 'sheet', name: 'dot-pillar', x: x + dx, y: LINE + 8, s: 1.7 * K, anchor: 'pivot', t: 9, t0: 9, el: 0 }));
+          this.st.fx.push({ k: 'sheet', name: 'dot-blast', x, y: LINE - 110 * K, s: 2.8 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+          later(this.st, 0.12, () => this.st.fx.push({ k: 'sheet', name: 'dot-blast', x: x - 90, y: LINE - 200 * K, s: 2.0 * K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          later(this.st, 0.22, () => this.st.fx.push({ k: 'sheet', name: 'dot-blast', x: x + 100, y: LINE - 160 * K, s: 2.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
+          later(this.st, 0.3, () => this.st.fx.push({ k: 'sheet', name: 'dot-nova', x, y: LINE - 90 * K, s: 3.2 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
           this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
-          this.st.shake(20);
+          later(this.st, 0.22, () => this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x }));
+          this.st.shake(24);
           this.st.fx.push({ k: 'dust', x, y: LINE, t: 0.6, t0: 0.6, n: 16, seed: Math.random() * 99 });
           this.freeze = 0.12;
           end();
@@ -964,7 +997,11 @@ export class Fighter {
     if (alpha <= 0.01) return;
     const jit = this.freeze > 0 && this.hurtT > 0 ? (Math.floor(performance.now() / 33) % 2 ? 3 : -3) : 0;
     const over = look.red ? { c: '#ff2a1a', a: look.red } : this.whiteT > 0 ? { c: '#ffffff', a: 0.85 } : this.flashT > 0 ? { c: this.flashC, a: Math.min(0.85, this.flashT * 3) } : this.hurtT > 0 ? { c: '#ffffff', a: this.hurtT * 3 } : undefined;
-    drawSprite(c, this.art, id, f, this.x + jit, this.z, this.face, air, { over, alpha });
+    // 잔상 (캐릭터 기운색, 오래된 것일수록 옅게)
+    this.trail.forEach((g, i) => drawSprite(c, this.art, g.id, g.f, g.x, g.z, g.face, g.air, { over: { c: '#ffc040', a: 1 }, alpha: 0.2 + 0.1 * i }));
+    // 돌진 난무 중엔 몸 전체를 기운색으로 물들임 (11-09 킹오파식)
+    const tint = !over && this.rush ? { c: '#ffa830', a: 0.55 } : over;
+    drawSprite(c, this.art, id, f, this.x + jit, this.z, this.face, air, { over: tint, alpha });
     if (this.state === 'charge') {
       const m = this.muzzle(), lv = this.chargeLv();
       drawVfx(c, 'charge_gather', this.st.t, m.x, m.y, 1.2 + Math.min(1, this.chargeT) * 0.8, { loop: true, anchor: 'center', tint: ['#ffffff', '#fff6c0', '#8fdcff', '#c89bff'][Math.min(3, lv)] });

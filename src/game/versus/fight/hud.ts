@@ -206,8 +206,11 @@ export function drawVersusBars(c: CanvasRenderingContext2D, me: Fighter | undefi
   if (combo !== vsCombo.n) { if (combo > vsCombo.n) vsCombo.at = vsT; vsCombo.n = combo; }
   if (hud && combo >= 2) {
     const jump = vsT - vsCombo.at < 0.06 ? 6 : 0;
-    const num = dotText(String(combo), VS_GOLD, 5), hit = dotText('HIT', HUD_INK, 2);
-    const nx = 22, ny = Math.round(top + (H - top) * 0.3) - jump;
+    const num = dotText(String(combo), VS_GOLD, 5), hit = dotText(me?.inSuper ? 'HITS' : 'HIT', HUD_INK, 2);
+    // 필살기 연타 중엔 앞에 RUSH (11-09)
+    const rush = me?.inSuper ? dotText('RUSH', HUD_INK, 3) : null;
+    const nx = 22 + (rush ? rush.width + 8 : 0), ny = Math.round(top + (H - top) * 0.3) - jump;
+    if (rush) c.drawImage(rush, 22, ny + num.height - rush.height - 4);
     c.drawImage(num, nx, ny);
     c.drawImage(hit, nx + num.width + 4, ny + num.height - hit.height - 4);
   }

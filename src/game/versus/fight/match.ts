@@ -15,7 +15,7 @@ import { stepProj, carryPt } from './skillfx';
 import { drawVfx, drawSprite, vfxOf, vfxDur } from './art';
 import { drawVersusBars, drawBench, setVsSay } from './hud';
 import type { Stage, Fx, Proj } from './stage';
-import { K, LINE, DT, HP, WALL, dotSample } from './rules';
+import { K, LINE, DT, HP, WALL, dotSample, RUSH_SUPER } from './rules';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** 그림판 세로에 보이는 월드 높이 (960 / 686 = 도트 1.4배, 11-08 사용자) */
@@ -47,6 +47,10 @@ export class Match {
   private superT = 0;
   private superName: { text: string; t: number; by: Fighter } | null = null;
   private darkT = 0;
+  /** 돌진 난무 필살기: 배경 완전 암전 (초) · 화면 하얀 번쩍 (초) */
+  private blackT = 0;
+  private whiteT = 0;
+  private whiteT0 = 0.3;
   private brains = new Map<Fighter, Brain>();
   private keys = new Set<Btn>();
   private edges = new Set<Btn>();
@@ -76,6 +80,7 @@ export class Match {
     this.st = {
       t: 0, L: view.vsLen, fighters: [], fx: [], proj: [], timers: [], viewX0: 0, viewW: 914,
       shake: (v) => { self.shakeV = Math.max(self.shakeV, v); },
+      whiteFlash: (sec) => { self.whiteT = Math.max(self.whiteT, sec); self.whiteT0 = Math.max(0.05, sec); },
       sfx: (e) => { if (!vsEventSound(e as never)) opts.sfx?.(e); },
       superFlash: (by, name) => self.superFlash(by, name),
       nextId: () => self.idN++,
@@ -133,7 +138,7 @@ export class Match {
   private newRound(first: boolean): void {
     const st = this.st, L = st.L;
     st.fx = []; st.proj = []; st.timers = [];
-    this.superT = 0; this.superName = null; this.darkT = 0;
+    this.superT = 0; this.superName = null; this.darkT = 0; this.blackT = 0; this.whiteT = 0;
     const keep = st.fighters.slice();
     st.fighters = [];
     this.brains.clear();
@@ -159,7 +164,14 @@ export class Match {
     this.darkT = 1.6;
     this.superName = { text: name, t: 0.9, by };
     for (const f of this.st.fighters) f.hold = Math.max(f.hold, 0.6);
-    if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
+    if (RUSH_SUPER.has(by.name)) {
+      // 킹오파식 시작 (11-09): 배경 완전 암전 · 뒤에 층층이 번지는 큰 기운 · 사방에서 모여드는 금빛 줄기
+      this.blackT = 1.5;
+      const y = LINE - by.z - 130 * K;
+      this.st.fx.push({ k: 'sheet', name: 'dot-aura', x: by.x - by.face * 10, y, s: 2.2 * K, anchor: 'center', loop: true, fade: 0.2, under: true, live: true, t: 0.8, t0: 0.8, el: 0 });
+      this.st.fx.push({ k: 'streak', x: by.x, y, t: 0.6, t0: 0.6, live: true, seed: Math.random() * 99 });
+      this.st.whiteFlash?.(0.08);
+    } else if (dotSample(by)) this.st.fx.push({ k: 'sheet', name: 'dot-burst', x: by.x, y: LINE - by.z - 120 * K, s: 2 * K, anchor: 'center', t: 9, t0: 9, el: 0 });
     else {
     this.st.fx.push({ k: 'ring', x: by.x, y: LINE - by.z - 120 * K, r: 260 * K, t: 0.6, t0: 0.6, c: by.color, w: 8, sy: 1 });
     this.st.fx.push({ k: 'ring', x: by.x, y: LINE - by.z - 120 * K, r: 160 * K, t: 0.45, t0: 0.45, c: '#ffffff', w: 5, sy: 1 });
@@ -369,7 +381,9 @@ export class Match {
   // ───────── 이펙트 ─────────
   private updateFx(frozen = false): void {
     const st = this.st;
-    if (frozen) return;
+    this.whiteT = Math.max(0, this.whiteT - DT);
+    // 필살기 시작 멈춤 동안에도 도는 것 (모여드는 줄기·뒤쪽 기운)
+    if (frozen) { for (const e of st.fx) if (e.live) { e.t -= DT; if (e.el != null) e.el += DT; } st.fx = st.fx.filter((e) => e.t > 0); return; }
     for (const e of st.fx) {
       e.t -= DT;
       if (e.el != null) e.el += DT;
@@ -380,6 +394,7 @@ export class Match {
     st.fx = st.fx.filter((e) => e.t > 0);
     this.shakeV = Math.max(0, this.shakeV - 60 * DT);
     this.darkT = Math.max(0, this.darkT - DT);
+    this.blackT = Math.max(0, this.blackT - DT);
     if (this.superName) { this.superName.t -= DT; if (this.superName.t <= 0) this.superName = null; }
   }
 
@@ -439,7 +454,8 @@ export class Match {
       c.drawImage(bg.img, Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h));
       for (const o of bg.objs) if (!o.front) c.drawImage(o.img, Math.round(o.x), Math.round(o.y), Math.round(o.w), Math.round(o.h));
       // 필살기: 배경 그림만 어둡게, 캐릭터는 그 위에 그대로
-      if (this.darkT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(0.65, this.darkT * 0.6).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      if (this.blackT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(1, this.blackT * 2.5).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
+      else if (this.darkT > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(0.65, this.darkT * 0.6).toFixed(3)})`; c.fillRect(Math.round(bg.x), Math.round(bg.y), Math.round(bg.w), Math.round(bg.h)); }
     }
     drawBench(c, 0);
     this.drawFx(c, true);
@@ -459,6 +475,8 @@ export class Match {
     c.restore();
     // K.O. 순간 화면 번쩍 (배경이 있을 때만: 투명 무대는 본문을 덮지 않게)
     if (bg && versus.ko && versus.ko.t > KO_SEC - 0.12) { c.fillStyle = `rgba(255,255,255,${(0.75 * (versus.ko.t - (KO_SEC - 0.12)) / 0.12).toFixed(3)})`; c.fillRect(0, 0, cv.width, cv.height); }
+    // 필살기 마무리 등 화면 전체 하얀 번쩍 (11-09 사용자: 번쩍임 제한 없음)
+    if (this.whiteT > 0) { c.fillStyle = `rgba(255,255,255,${Math.min(1, (this.whiteT / this.whiteT0) * 1.1).toFixed(3)})`; c.fillRect(0, 0, cv.width, cv.height); }
     drawVersusBars(c, p, st.fighters.filter((x) => x.team === 1));
   }
 
@@ -515,6 +533,21 @@ export class Match {
         const el = e.loop ? e.el : Math.min(e.el, e.dur - 0.001);
         const alpha = e.fade && e.t < e.fade ? e.t / e.fade : 1;
         drawVfx(c, e.name, el, e.x, e.y, e.s, { flip: e.flip, anchor: e.anchor, tint: e.tint, rot: e.rot, alpha, loop: e.loop });
+        return;
+      }
+      case 'streak': {
+        // 사방에서 가운데로 빨려 드는 금빛 점선 줄기
+        c.save();
+        for (let i = 0; i < 22; i++) {
+          const a = (i / 22) * Math.PI * 2 + Math.sin(e.seed + i * 7.1) * 0.12;
+          const far = 760 * (1 - k) + 40 + (Math.sin(e.seed * 3 + i * 2.3) + 1) * 60, len = 70 + (Math.sin(e.seed + i * 5.7) + 1) * 50;
+          for (let q = 0; q < len; q += 6) {
+            const r = far + q, x = Math.round(e.x + Math.cos(a) * r), y = Math.round(e.y + Math.sin(a) * r * 0.8);
+            c.fillStyle = q < 12 ? '#fff6c0' : q < len * 0.5 ? '#ffd040' : '#d07a18';
+            c.fillRect(x, y, 4, 3);
+          }
+        }
+        c.restore();
         return;
       }
       case 'spark': {
