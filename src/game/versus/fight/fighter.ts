@@ -645,7 +645,9 @@ export class Fighter {
         if (dl) later(this.st, dl, go); else go();
       };
       if (big) {
-        put('dot-hand-b', 0, 0, 4 * K);
+        // 손도트 조각(불혀·연기)을 겹친 큰 불길, 맞은 자리에서 앞·위로 번짐
+        this.st.fx.push({ k: 'sheet', name: hitN % 8 === 0 ? 'dot-hand-burst2' : 'dot-hand-burst', x, y: y + 40, s: 2.8 * K, flip, anchor: 'pivot', t: 9, t0: 9, el: 0 });
+        put('dot-hand-b', 0, 0, 3 * K);
         put('dot-hand-a', 30, j() * 40, 3 * K, flip, 0.03);
         put('dot-hand-c', -10, j() * 50, 3.2 * K, Math.random() < 0.5, 0.06);
       } else {
@@ -688,6 +690,7 @@ export class Fighter {
         if (o0) {
           // 띄우기: 상대 발밑에서 불기둥이 솟는다. 캐릭터 뒤에 깔아 몸을 가리지 않음
           this.st.fx.push({ k: 'sheet', name: 'dot-flame', x: o0.x, y: LINE + 4, s: K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: o0.x - this.face * 30, y: o0.midY() + 30, s: 2 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
         }
         this.st.shake(16);
       }, () => jumpUp());
@@ -737,6 +740,8 @@ export class Fighter {
           this.st.whiteFlash?.(0.3);
           this.st.fx.push({ k: 'sheet', name: 'dot-flame', x, y: LINE + 6, s: 1.2 * K, anchor: 'pivot', under: true, t: 9, t0: 9, el: 0 });
           this.st.fx.push({ k: 'sheet', name: 'dot-hand-b', x, y: LINE - 50 * K, s: 3.4 * K, flip: this.face < 0, anchor: 'center', t: 9, t0: 9, el: 0 });
+          this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst', x: x - 40, y: LINE - 10, s: 2.4 * K, flip: this.face < 0, anchor: 'pivot', t: 9, t0: 9, el: 0 });
+          later(this.st, 0.12, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-burst2', x: x + 30, y: LINE - 10, s: 2.4 * K, flip: this.face > 0, anchor: 'pivot', t: 9, t0: 9, el: 0 }));
           later(this.st, 0.1, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-a', x: x - 30, y: LINE - 90 * K, s: 2.4 * K, anchor: 'center', t: 9, t0: 9, el: 0 }));
           later(this.st, 0.18, () => this.st.fx.push({ k: 'sheet', name: 'dot-hand-c', x: x + 40, y: LINE - 40 * K, s: 2.4 * K, flip: true, anchor: 'center', t: 9, t0: 9, el: 0 }));
           this.st.sfx({ type: 'hit', strength: 3, kind: 'blast', x });
