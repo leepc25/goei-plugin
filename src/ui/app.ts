@@ -1463,6 +1463,9 @@ function render(): void {
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
   const logKeep = log && logRoom === (phone.room ?? '') ? (log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop) : -1;
+  // 대화 칸 공통(data-chatlog: 우주 쇼핑몰 운영자 질문. 포인트몰 상담은 column-reverse 라 스스로 아래에 붙는다): 새 말이 붙었거나 맨 아래를 보고 있었으면 맨 아래로, 위를 읽던 중이면 그 자리 (2026-11-10 사용자: 보낼 때마다 맨 위로 튀었다)
+  const chatKeep = new Map<string, { top: number; bottom: boolean; n: number }>();
+  root.querySelectorAll<HTMLElement>('[data-chatlog]').forEach((el) => chatKeep.set(el.dataset.chatlog ?? '', { top: el.scrollTop, bottom: el.scrollHeight - el.scrollTop - el.clientHeight < 60, n: el.querySelectorAll('.q-m, .bd-m, [data-msg]').length }));
   // 괴담넷: 같은 글·쪽지를 보고 있으면 목록과 본문의 스크롤 자리를 지킨다 (답글을 누르면 맨 위로 튀던 문제)
   const gnKey = `${curTab().site}:${gnet.sub}:${gnet.open}:${gnet.openDm}`;
   const gnKeep = tab === 'gnet' && root.dataset.tab === 'gnet' && root.dataset.gn === gnKey
@@ -1537,6 +1540,11 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  root.querySelectorAll<HTMLElement>('[data-chatlog]').forEach((el) => {
+    const k = chatKeep.get(el.dataset.chatlog ?? '');
+    const n = el.querySelectorAll('.q-m, .bd-m, [data-msg]').length;
+    el.scrollTop = !k || k.bottom || n !== k.n ? el.scrollHeight : k.top;
+  });
   // 상점 주인 대사 상자: 새 대사가 아래에 쌓이니 늘 맨 아래를 보인다
   root.querySelectorAll<HTMLElement>('[data-sh-log]').forEach((el) => (el.scrollTop = el.scrollHeight));
   labelSwitches(root);

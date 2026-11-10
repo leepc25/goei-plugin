@@ -715,7 +715,7 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
   return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문"${at}><div class="cs-wt"><b>★ 운영자에게 질문 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
     <div class="q-hd">${ufo}<div><b>운영자</b><small>● 운영자는 여기에 있습니다</small></div></div>
     ${sellCard}${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
-    <div class="q-lg">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}${sellList}
+    <div class="q-lg" data-chatlog="cos">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}${sellList}
     <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><button class="cs-btn" data-action="mall-sell-open" aria-pressed="${v.selling}">내 물건 팔기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="${o ? (offered ? '값을 다시 불러 보거나 그냥 팔아라' : '값을 부르거나 그냥 보내라') : '질문을 여기에 넣어라'}" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
