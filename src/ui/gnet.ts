@@ -650,9 +650,12 @@ const writeBtn = (cls: string, label = '글쓰기') => `<button class="${cls}" d
 // 빈 게시판에서도 글은 쓸 수 있다
 const emptyList = (busy: boolean, text: string) => `<div class="bs-empty"><p>${text}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button>${writeBtn('bs-w')}</div></div>`;
 const none = (list: GPost[]) => (!list.length ? '<p class="bs-none">해당하는 글이 없어요.</p>' : '');
-const onCat = (v: string) => gnet.sub === 'board' && gnet.cat === v;
-const catBtn = (v: string, label: string, cls = '', extra = '') => `<button class="${[cls, onCat(v) ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-cat" data-value="${esc(v)}" aria-pressed="${onCat(v)}">${esc(label)}${extra}</button>`;
-const dmBtn = (st: GState, unreadDm: number, label = '쪽지함', cls = '') => `<button class="${[cls, gnet.sub === 'dm' ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-sub" data-value="dm" aria-pressed="${gnet.sub === 'dm'}">${label}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ''}</button>`;
+// PC 쪽지함은 게시판 위에 뜨는 창이라 메뉴 선택을 가져가지 않는다 (2026-11-10 사용자: 쪽지함이 선택을 차지했다가 닫으면 앞 선택으로 돌아가 헷갈렸다).
+// 그래서 PC 에서는 쪽지함 단추에 선택 표시가 없고(편지 아이콘으로 「여는 단추」임을 보인다), 쪽지함이 떠 있어도 보던 분류의 선택은 그대로다. 폰은 쪽지함이 한 화면이라 앞과 같다
+const dmTakes = () => gnet.sub === 'dm' && narrow();
+const onCat = (v: string) => !dmTakes() && gnet.cat === v;
+const catBtn = (v: string, label: string, cls = '', extra = '', on = onCat(v)) => `<button class="${[cls, on ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-cat" data-value="${esc(v)}" aria-pressed="${on}">${esc(label)}${extra}</button>`;
+const dmBtn = (st: GState, unreadDm: number, label = '쪽지함', cls = '') => `<button class="${[cls, dmTakes() ? 'on' : '', narrow() ? '' : 'gn-dmpop'].filter(Boolean).join(' ')}" data-action="gn-sub" data-value="dm" ${narrow() ? `aria-pressed="${dmTakes()}"` : `aria-haspopup="dialog" aria-expanded="${gnet.sub === 'dm'}"`}>${narrow() ? '' : ICONS.mail}${label}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ''}</button>`;
 /** 익명(ㅇㅇ) 글쓴이 옆 IP 앞자리: 글 번호로 늘 같게 (시안 괴담갤) */
 const ipOf = (id: number) => `${(id * 37) % 200 + 20}.${(id * 101) % 250}`;
 const nickIp = (nick: string, id: number) => `${esc(nick)}${nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(id)})</span>` : ''}`;
@@ -699,7 +702,7 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
       return `<div class="hd">${home(`${LOGO_SM(site)}연어 마켓`)}<nav>${catBtn('', '중고거래')}${catBtn('삽니다', '삽니다')}${catBtn('정보', '오컬트 정보')}</nav><label class="sr">${searchInput('물건 이름으로 찾기')}</label>${writeBtn('wr')}<button class="ch" data-action="gn-sub" data-value="dm">내 채팅${unreadDm ? `<em>${unreadDm}</em>` : ''}</button></div>
         <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>`;
     default: {
-      const nav = `<nav><button class="${gnet.sub === 'board' && gnet.sort !== 'hot' ? 'on' : ''}" data-action="gn-home">커뮤니티</button>${dmBtn(st, unreadDm, '쪽지')}<button class="${gnet.sub === 'board' && gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">랭킹</button></nav>`;
+      const nav = `<nav><button class="${!dmTakes() && gnet.sort !== 'hot' ? 'on' : ''}" data-action="gn-home">커뮤니티</button>${dmBtn(st, unreadDm, '쪽지')}<button class="${!dmTakes() && gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">랭킹</button></nav>`;
       return `<div class="hd">${home(`${LOGO_SM(site)}괴담넷<small>.net</small>`)}${nav}<label class="sr">${ICONS.search}${searchInput('괴담넷 검색')}</label></div>`;
     }
   }
@@ -710,17 +713,20 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
 function gnSide(st: GState, unreadDm: number): string {
   const posts = [...st.posts].sort((a, b) => b.id - a.id).slice(0, 60);
   const items = posts.map((p) => {
-    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
     return `<button class="sp${on ? ' on' : ''}" data-action="${on ? 'gn-home' : 'gn-open-side'}" data-value="${p.id}" aria-pressed="${on}" title="${esc(p.title)}">${p.tag ? `<i>[${esc(p.tag)}]</i>` : ''}<span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}${dot(p)}</button>`;
   }).join('');
-  return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${catBtn('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</nav>`;
+  // 선택 표시는 하나만: 글을 열었으면 그 글 줄, 아니면 보는 분류 (2026-11-10 사용자: 내가 쓴 글·스크랩을 고른 채 글을 열면 둘 다 선택돼 있었다)
+  const reading = gnet.open !== null && !gnet.compose;
+  const cat = (v: string, label: string) => catBtn(v, label, '', '', onCat(v) && !reading);
+  return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${cat('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${cat('@mine', '내가 쓴 글')}${cat('@scrap', '스크랩')}</nav>`;
 }
 
 /** 괴담갤 오른쪽 칸 (11-09 사용자: 디씨 사이드바 「힛갤」 — 지금 생성된 글을 조회수 순으로, 본문을 열어도 그대로 남는 글 목록) */
 function galSide(st: GState): string {
   const top = [...st.posts].filter((p) => p.tag !== '공지').sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 15);
   const items = top.map((p) => {
-    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
     return `<li><button class="${on ? 'on' : ''}" data-action="gn-open-side" data-value="${p.id}" title="${esc(p.title)}"><span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}<small>${p.views}</small></button></li>`;
   }).join('');
   return `<div class="hit"><h4>힛갤</h4>${items ? `<ol>${items}</ol>` : '<p class="none">아직 글이 없어요.</p>'}</div>`;

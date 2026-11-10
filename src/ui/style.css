@@ -4731,6 +4731,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gn .side .splist .sp.on { background: var(--hd); color: var(--hdi); font-weight: 700; }
 .bs-gn .side .splist .sp.on i, .bs-gn .side .splist .sp.on em { color: var(--hdi); opacity: .8; }
 .bs-gn .side .sp-none { margin: 4px 12px 8px; font-size: 12px; color: var(--dim); }
+/* 묶음 제목(글 목록·내 메뉴)과 그 아래 항목을 가른다: 제목은 진한 글씨에 밑줄, 항목은 들여쓴다 (2026-11-10 사용자: 제목과 하위 메뉴가 구분이 안 됐다) */
+.bs-gn .side h6 { margin: 14px 4px 6px; padding: 0 8px 6px; font-size: 12px; color: var(--ink); opacity: 1; font-weight: 800; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+.bs-gn .side h6:first-child { margin-top: 4px; }
+.bs-gn .side > button { padding-left: 22px; }
+.bs-gn .side .splist .sp { padding-left: 22px; }
+/* PC 쪽지함 단추: 선택 표시 대신 편지 아이콘 (눌러서 창을 여는 단추) */
+.bs .gn-dmpop > svg { width: 14px; height: 14px; margin-right: 5px; vertical-align: -2px; fill: none; stroke: currentColor; }
 
 /* ── 괴담갤 오른쪽 힛갤 칸 (11-09): 본문(.body)과 별개로 고정 ── */
 .bs-gal .gal-cols { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
