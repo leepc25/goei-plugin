@@ -1,0 +1,18 @@
+{
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v5.png",
+ "box": [
+  0,
+  0,
+  256,
+  256
+ ],
+ "frame_count": 16,
+ "no_background": true,
+ "enhance_prompt": false,
+ "drift_threshold": 0,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a TV home shopping host shown from the chest up, black suit, white shirt, dark red tie, white made-up face, large black eyes, tiny clip-on microphone on the lapel",
+ "initial_pose": "turned three-quarters to the right, leaning slightly toward the camera, face toward the camera, both hands in front of the chest with fingers loosely laced, closed-lip smile",
+ "description": "keeps staring at the camera while the closed-lip smile slowly stretches wider and wider toward the ears, then the lips part and the open mouth shows only a deep crimson bottomless void, no teeth, no tongue; holds it for a moment, then the mouth closes and the smile shrinks back into the starting pose"
+}
