@@ -383,6 +383,14 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
     }
     const n0 = normIcon((r.keywords ?? [])[0] ?? '').replace(/ /g, '');
     if (n0 && !specialName.has(n0)) specialName.set(n0, r.file);
+    // 성인·신체 그림의 영어 이름은 몸통 말 칸에 있다 (condom, chastity cage) — 영어로 출력하는 사용자 대비 (2026-11-10 사용자)
+    for (const k of r.phrases ?? []) {
+      if (/[가-힣]/.test(k)) continue;
+      const j = normIcon(k).replace(/ /g, '');
+      if (j.length < 3) continue;
+      if (!special.has(j)) special.set(j, r.file);
+      if (!specialName.has(j)) specialName.set(j, r.file);
+    }
   }
   // 맨 먼저: 물건 이름이나 물건말이 어느 그림의 이름과 그대로 같으면 그 그림. 종류를 뭐라고 적었든, 성인·신체 그림이든 (2026-11-10 사용자: 「원래 이름 같으면 나오고 그게 안 될 때를 대비해서 로직을 만드는 것」)
   // 같은 이름이 여러 종류에 있으면 적은 종류의 것
@@ -406,7 +414,9 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   const head = (t: string, sp = true): Found | null => {
     const h = headPlain(t);
     if (h && h.s >= 1e6) return h;
-    const f = (sp ? special : specialName).get(normIcon(t).replace(/ /g, ''));
+    const tj = normIcon(t).replace(/ /g, '');
+    const mp = sp ? special : specialName;
+    const f = mp.get(tj) ?? (/^[a-z0-9]+s$/.test(tj) ? mp.get(tj.replace(/s$/, '')) : undefined); // condoms → condom
     return f ? { file: f, s: 1e6, hit: 1, plain: true, isRep: 0, name: 0, kw: true } : h;
   };
   const frag = makeFragIndex(plainRows, plainReps);
@@ -494,7 +504,10 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   const members = (t: string): { ms: { file: string; kind: string }[]; cat: string } | null => {
     const n = normIcon(t);
     if (!n) return null;
-    for (const c of [flat(n), aliases[n] ? flat(aliases[n]) : '']) {
+    // 영어는 복수형도 (snacks → snack, candies → candy, boxes → box)
+    const f0 = flat(n);
+    const singular = /^[a-z0-9]+$/.test(f0) ? [f0.replace(/ies$/, 'y'), f0.replace(/es$/, ''), f0.replace(/s$/, '')].filter((x) => x !== f0 && x.length >= 3) : [];
+    for (const c of [f0, aliases[n] ? flat(aliases[n]) : '', ...singular]) {
       if (!c) continue;
       const cat = sameMap[c];
       if (cat?.startsWith('@')) return { ms: rows.filter((r) => r.kind === cat.slice(1)).map((r) => ({ file: r.file, kind: r.kind ?? '' })), cat: '' };
@@ -533,17 +546,18 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   return (name0: string, icon?: string, strict?: boolean): IconHit | null => {
     const hit0 = base(name0, icon, strict);
     if (strict) return hit0;
-    const { kind, word: w0 } = splitIconWord(icon);
+    const { kind, word: w0, en } = splitIconWord(icon);
     const kindOnly = kind ? ICON_KIND_LABEL[kind] ?? '' : '';
     // ① 물건 이름이 분류 말
     let g = members(name0);
     // 이름이 어느 그림의 이름 그대로면 그림 칸에 분류 말을 적었어도 그 그림 (콘돔 | 음식/과자 → 콘돔)
-    if (!g && normIcon(name0) !== normIcon(w0) && !exactName(name0, kind)) {
-      // ② 그림 칸의 물건말이 분류 말: 이름으로 그 분류 안의 그림을 찾았으면 그 그림 (새우깡 | 음식/과자 → 새우과자), 못 찾았으면 분류에서 뽑는다
-      g = members(w0);
+    if (!g && !exactName(name0, kind)) {
+      // ② 그림 칸의 물건말(한글 → 영어 낱말)이 분류 말: 이름의 몸통 말로 찾은 그림이 있으면 그 그림이 먼저
+      //    (새우깡 | 음식/과자 → 새우과자, 현장용 차폐 스프레이 | canister → 스프레이), 이름으로 못 찾을 때만 분류에서 뽑는다
+      g = (normIcon(name0) !== normIcon(w0) ? members(w0) : null) ?? (en ? members(en) : null);
       if (g) {
         const byNameOnly = base(name0, kindOnly, false);
-        if (byNameOnly && g.ms.some((x) => x.file === byNameOnly.file)) return byNameOnly;
+        if (byNameOnly && byNameOnly.score >= 1) return g.ms.some((x) => x.file === byNameOnly.file) ? byNameOnly : hit0;
       }
     }
     if (!g) return hit0;

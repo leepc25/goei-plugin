@@ -251,9 +251,35 @@ test('분류 말은 그 분류 안에서 물건마다 하나 (2026-11-10 사용�
   is('새우깡', '음식/과자', '새우과자'); // 그림 칸이 분류 말이어도 이름으로 찾은 그림이 그 분류 것이면 그 그림
   is('쿠키', '', '쿠키');
   // 그림 칸만 분류 말이고 이름으로는 못 찾으면 분류에서
-  assert.ok(pack.hit('수상한 주전부리 꾸러미', '음식/과자')?.pool?.length > 20);
+  assert.ok(pack.hit('수상한 주전부리들', '음식/과자')?.pool?.length > 20);
   // 종류를 안 적었으면 성인·신체·괴이 그림은 보통 분류의 무리에 없다
   assert.ok(pack.hit('가면', '')?.pool?.every((f) => kindsOf(f).some((k) => !['adult', 'body', 'anomaly'].includes(k))));
   // 군말·없는 말은 그대로 상자
   assert.equal(pack.hit('물건', ''), null);
+});
+
+test('영어로 출력할 때 (2026-11-10 사용자: 영출 대비): 분류 말·복수형·그림 칸의 영어 낱말, 성인·신체 그림의 영어 이름', () => {
+  const up = (f) => table.icons.filter((r) => r.file === f).flatMap((r) => r.up ?? []);
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
+  for (const [w, cat] of [['snack', '과자'], ['Snacks', '과자'], ['beverage', '음료'], ['drinks', '음료'], ['candies', '사탕'], ['medicine', '약'], ['jewelry', '장신구'], ['fish', '생선']]) {
+    const h = pack.hit(w, '');
+    assert.ok(h?.pool?.length > 5 && h.pool.every((f) => up(f).includes(cat)), `${w}: ${h?.pool?.length}`);
+  }
+  for (const [w, k] of [['food', 'food'], ['clothes', 'wear'], ['clothing', 'wear']]) assert.ok(pack.hit(w, '')?.pool?.every((f) => kindsOf(f).includes(k)), w);
+  assert.ok(pack.hit('mystery treats', 'food/snack')?.pool?.length > 20, '그림 칸의 영어 분류 말');
+  assert.ok(pack.hit('수상한 주전부리들', '음식/수상한 주전부리들/snack')?.pool?.length > 20, '그림 칸의 영어 낱말');
+  // 세부 이름은 그대로
+  is('cookie', '', '쿠키');
+  is('old key', '', '녹슨 열쇠');
+  is('first aid kit', '', '구급상자');
+  // 성인·신체 그림: 영어 이름으로, 종류를 뭐라고 적었든
+  is('condom', '', '콘돔');
+  is('condoms', 'consumable/condoms', '콘돔');
+  is('used condom', '', '사용한 콘돔');
+  is('slot machine', 'misc/slot machine', '슬롯머신');
+  is('chastity cage', '', '남성 정조 케이지');
+  // 영어 한 낱말이 성인·신체 그림으로 새지 않는다
+  is('egg', 'food/egg', '계란');
+  is('cage', '', '철창 우리');
+  is('dvd', '', 'DVD');
 });

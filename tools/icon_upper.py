@@ -255,6 +255,10 @@ def main():
     for r in rows:
         for k in [r['name']] + list(r.get('keywords') or []) + list(r.get('head') or []):
             taken.setdefault(flat(k), r['name'])
+    taken_kw = {}
+    for r in rows:
+        for k in [r['name']] + list(r.get('keywords') or []):
+            taken_kw.setdefault(flat(k), r['name'])
     for k, f in rep.items():  # 대표 그림이 정해진 말 (수술도구 → 수술용 메스)
         taken.setdefault(flat(k), k)
     up_flat = {flat(u): u for u in all_up}
@@ -296,13 +300,28 @@ def main():
                         problems['같은 말이 다른 분류 이름이라 뺌 (그 분류가 먼저)'].append(f'{cat}: {w}')
                 elif f in skip and not cat.startswith('@'):  # 대분류 말(식품·음식물)은 매칭기가 끝 글자로 엉뚱한 그림(즉석식품·식물)을 찾던 것이라 빼지 않는다
                     n_skip += 1
-                elif f in taken:
+                elif f in (taken if KO.search(w) else taken_kw) and (taken if KO.search(w) else taken_kw)[f] != cat:  # 영어 말은 몸통 말(head)은 보지 않는다 — weapon·drink 같은 말이 아무 그림의 몸통 말로 적혀 있어서
                     problems['같은 말이 어느 그림의 이름이라 뺌 (그 그림이 먼저)'].append(f'{cat}: {w} → {taken[f]}')
                 elif f in same:
                     if same[f] != cat:
                         problems['같은 말이 두 분류에 있음 (먼저 적은 분류)'].append(f'{w}: {same[f]} / {cat}')
                 else:
                     same[f] = cat
+    # 분류 이름 그대로인 그림의 영어 이름(과자 그림의 snack)은 그 분류의 영어 말
+    n_auto = 0
+    cat_names = set()
+    for kind, wide, near, members in upper:
+        cat_names.update(u for u in (wide, near) if u)
+    for ups in tails.values():
+        cat_names.update(ups)
+    for r in rows:
+        if r['name'] in cat_names and r['name'] in all_up:
+            for k in r.get('keywords') or []:
+                f = flat(k)
+                if not KO.search(k) and len(f) >= 3 and f not in same and f not in up_flat:
+                    same[f] = r['name']
+                    n_auto += 1
+    print(f'분류 이름 그림의 영어 이름에서 온 말 {n_auto}개')
     table['up_same'] = same
     # 골고루 뽑는 분류 = 윗말 표·끝 낱말 표의 왼쪽에 적은 분류. 이름 끝 낱말을 물려받아 생긴 무리(사용한 콘돔 → 콘돔)는 그 물건 자체라 뽑지 않는다
     cats = set()

@@ -4,7 +4,6 @@
 음식물 → 식물
 식사 → 캡슐 식사
 식재료 → 살아있는 식재료
-의류 → 의류관리기
 패션 → 패션프루트
 도구 → 부채(도구)
 디바이스 → 바이스
@@ -567,7 +566,6 @@ C4 → C4
 면허 → 프리랜서 면허증
 졸업장 → 졸업장
 상장 → 상장
-ID → 관리국 사원증
 운전면허증 → 운전면허증
 여권 → 여권
 학생증 → 학생증
@@ -1066,3 +1064,256 @@ KTX표 → KTX표
 레코드판 → LP 레코드
 시소 → 시소
 초_한_자루 → 마대 자루
+dish → 접시
+gear → 톱니바퀴
+seal → 인감
+remains → 괴이 잔해 조각
+biscuit → 비스킷
+lollipop → 막대사탕
+bubble_gum → 풍선껌
+chocolate_bar → 허쉬
+popsicle → 아이스바
+ice_pop → 아이스바
+sundae → 순대
+loaf → 식빵
+mochi → 모찌
+ramen → 라멘
+cup_ramen → 컵라면
+pasta → 파스타
+spaghetti → 파스타
+udon → 우동
+rice → 쌀
+fried_rice → 볶음밥
+bibimbap → 비빔밥
+soup → 수프
+hot_pot → 훠궈
+hotpot → 훠궈
+street_food → 정체불명 길거리 음식
+cheeseburger → 치즈버거
+steak → 스테이크
+frozen_food → 냉동식품
+mre → 전투식량
+spam → 스팸
+raw_fish → 회
+sashimi → 회
+clam → 바지락
+mussel → 홍합
+scallop → 가리비
+oyster → 굴
+crab → 꽃게
+seaweed → 미역
+kelp → 다시마
+fruit_basket → 과일 바구니
+salad → 샐러드
+peanut → 땅콩
+walnut → 호두
+cereal → 시리얼
+soda → 사이다
+sparkling_water → 탄산수
+smoothie → 스무디
+latte → 라떼
+americano → 아메리카노
+green_tea → 녹차
+black_tea → 홍차
+herbal_tea → 쌍화차
+tea_bag → 티백
+soy_milk → 두유
+energy_drink → 에너지 드링크
+liquor → 양주
+sake → 사케
+champagne → 샴페인
+spices → 향신료
+mayonnaise → 마요네즈
+soybean_paste → 된장
+soy_sauce → 간장
+butter → 버터
+cigar → 시가
+sweater → 니트
+hoodie → 후드티
+blouse → 블라우스
+cardigan → 가디건
+dress_shirt → 와이셔츠
+windbreaker → 바람막이
+slacks → 슬랙스
+jeans → 청바지
+leggings → 레깅스
+kimono → 기모노
+bra → 브래지어
+bikini → 비키니
+swim_trunks → 수영 트렁크
+gym_clothes → 체육복
+military_uniform → 군복
+bathrobe → 목욕 가운
+shoe → 혀 달린 구두
+beanie → 비니
+mask → 가면
+masquerade_mask → 가면무도회 가면
+wristband → 테마파크 입장 팔찌
+hair_clip → 헤어집게
+bow_tie → 나비넥타이
+shawl → 숄
+hard_hat → 안전모
+pan → 프라이팬
+frying_pan → 프라이팬
+spatula → 뒤집개
+whisk → 거품기
+mug → 머그컵
+tumbler → 텀블러
+dish → 접시
+plate → 접시
+bucket → 양동이
+mop → 대걸레
+body_wash → 바디워시
+survival_kit → 탐사 생존 키트
+dumbbell → 아령
+duct_tape → 덕트 테이프
+binoculars → 쌍안경
+clock → 눈 달린 시계
+watch → 손목시계
+wristwatch → 손목시계
+shackles → 족쇄
+guitar → 통기타
+toaster → 토스터
+blender → 믹서기
+rice_cooker → 밥솥
+laptop → 노트북
+tablet → 태블릿
+mouse → 쥐
+hard_drive → 외장하드
+burner_phone → 대포폰
+camcorder → 캠코더
+cctv → CCTV 카메라
+webcam → 웹캠
+headphones → 헤드폰
+monitor → 모니터
+game_console → 콘솔 게임기
+power_bank → 보조 배터리
+flashlight → 손전등(68회 덤)
+torch → 토치
+light_bulb → 전구
+navigation → 내비게이션
+gps → 내비게이션
+cable → 전선
+cord → 끈
+wire → 철사
+drugs → 흰 가루 봉지
+vitamins → 비타민
+elixir → 영약
+healing_potion → 회복 물약
+gauze → 거즈
+plaster → 반창고
+band_aid → 반창고
+tourniquet → 지혈대
+ice_pack → 얼음 팩
+wheelchair → 휠체어
+knife → 식칼
+sword → 장검
+longsword → 장검
+saber → 사브르
+combat_knife → 군용 대검
+revolver → 리볼버
+assault_rifle → AK-47
+carbine → 카빈
+silencer → 소음기
+suppressor → 소음기
+scope → 조준경
+holster → 줄잡이
+bullets → 권총탄
+explosives → 폭약
+grenade → 수류탄
+dynamite → 폭약
+baton → 은빛 지휘봉
+bat → 야구 방망이
+mace → 철퇴
+halberd → 할버드
+hatchet → 손도끼
+hoe → 호미
+bow → 리본
+bow_and_arrow → 활과 화살
+ice_pick → 얼음송곳
+spike → 대못
+taser → 테이저건
+buckler → 버클러
+pepper_spray → 호신용 스프레이
+record → LP 레코드
+classified_document → 기밀 문서
+certificate → 상장
+passport → 여권
+pamphlet → 팸플릿
+brochure → 팸플릿
+mail → 우편물
+invitation → 초대장
+polaroid → 폴라로이드 사진
+textbook → 교과서
+bible → 성경책(낡은)
+grimoire → 마법서
+diary → 낡은 일기장
+planner → 수첩
+ticket → 승차권
+train_ticket → 승차권
+bus_ticket → 버스표
+boarding_pass → 탑승권
+movie_ticket → 영화표
+concert_ticket → 공연 표
+coupon → 프로모션 쿠폰
+ruby → 루비
+emerald → 에메랄드
+medal → 메달
+award → 상장
+relic → 성유물
+vase → 꽃병
+figurine → 피규어
+sunscreen → 선크림
+mascara → 마스카라
+eyeshadow → 아이섀도
+foundation → 파운데이션
+nail_polish → 매니큐어
+paper_towel → 키친타월
+deodorizer → 탈취제
+kerosene → 등유
+charcoal → 숯
+firewood → 장작
+glue → 풀
+superglue → 순간접착제
+bell → 은 종
+handbell → 요령
+hand_mirror → 손거울
+sacred_object → 영물
+rosary → 묵주
+chest → 궤짝
+safe → 금고
+strongbox → 금고
+flask → 플라스크
+urn → 유골함
+crock → 단지
+crate → 궤짝
+sack → 마대 자루
+chunk_of_flesh → 살점
+slime → 슬라임
+pebble → 조약돌
+stick → 나뭇가지
+toad → 두꺼비
+bug → 도청기
+insect → 곤충
+spider → 타란툴라
+tarantula → 타란툴라
+hornet → 말벌
+millipede → 노래기
+weed → 대마 말이
+leaf → 나뭇잎
+bouquet → 꽃다발
+puppet → 마리오네트
+mattress → 매트리스
+pillow → 베개
+bike → 자전거
+bicycle → 자전거
+rag → 걸레
+towel → 수건
+string → 노끈 뭉치
+twine → 노끈 뭉치
+yarn → 털실
+parasol → 양산
+fan → 부채(도구)
+hand_fan → 부채(도구)
+record → LP 레코드
+vinyl → LP 레코드

@@ -55941,7 +55941,8 @@
    "name": "콘돔",
    "src": "game-src/items/raw/batch_127/16.png",
    "head": [
-    "condom"
+    "condom",
+    "condoms"
    ],
    "feats": [],
    "up": [
@@ -81136,7 +81137,9 @@
    "name": "러브호텔 열쇠",
    "src": "game-src/items/raw/batch_311/06.png",
    "head": [
-    "러브호텔 열쇠"
+    "러브호텔 열쇠",
+    "love hotel key",
+    "motel key"
    ],
    "feats": [],
    "up": [
@@ -81153,7 +81156,9 @@
    "name": "모텔 어메니티",
    "src": "game-src/items/raw/batch_311/07.png",
    "head": [
-    "모텔 어메니티"
+    "모텔 어메니티",
+    "motel amenities",
+    "motel amenity kit"
    ],
    "feats": [],
    "up": [
@@ -81170,7 +81175,8 @@
    "name": "데킬라",
    "src": "game-src/items/raw/batch_311/08.png",
    "head": [
-    "데킬라"
+    "데킬라",
+    "tequila"
    ],
    "feats": [],
    "up": [
@@ -81187,7 +81193,10 @@
    "name": "물담배",
    "src": "game-src/items/raw/batch_311/09.png",
    "head": [
-    "물담배"
+    "물담배",
+    "hookah",
+    "shisha",
+    "water pipe"
    ],
    "feats": [],
    "up": [
@@ -81204,7 +81213,9 @@
    "name": "담배 파이프",
    "src": "game-src/items/raw/batch_311/10.png",
    "head": [
-    "담배 파이프"
+    "담배 파이프",
+    "tobacco pipe",
+    "smoking pipe"
    ],
    "feats": [],
    "up": [
@@ -81221,7 +81232,9 @@
    "name": "지포 라이터",
    "src": "game-src/items/raw/batch_311/11.png",
    "head": [
-    "지포 라이터"
+    "지포 라이터",
+    "zippo lighter",
+    "zippo"
    ],
    "feats": [],
    "up": [
@@ -81238,7 +81251,9 @@
    "name": "룰렛",
    "src": "game-src/items/raw/batch_311/12.png",
    "head": [
-    "룰렛"
+    "룰렛",
+    "roulette",
+    "roulette wheel"
    ],
    "feats": [],
    "up": [
@@ -81255,7 +81270,8 @@
    "name": "슬롯머신",
    "src": "game-src/items/raw/batch_311/13.png",
    "head": [
-    "슬롯머신"
+    "슬롯머신",
+    "slot machine"
    ],
    "feats": [],
    "up": [
@@ -81272,7 +81288,9 @@
    "name": "마권",
    "src": "game-src/items/raw/batch_311/14.png",
    "head": [
-    "마권"
+    "마권",
+    "betting slip",
+    "horse racing ticket"
    ],
    "feats": [],
    "up": [
@@ -81289,7 +81307,9 @@
    "name": "망사 스타킹",
    "src": "game-src/items/raw/batch_311/15.png",
    "head": [
-    "망사 스타킹"
+    "망사 스타킹",
+    "fishnet stockings",
+    "fishnets"
    ],
    "feats": [],
    "up": [
@@ -81307,7 +81327,8 @@
    "name": "잭스트랩",
    "src": "game-src/items/raw/batch_311/16.png",
    "head": [
-    "잭스트랩"
+    "잭스트랩",
+    "jockstrap"
    ],
    "feats": [],
    "up": [
@@ -81325,7 +81346,8 @@
    "name": "유리 딜도",
    "src": "game-src/items/raw/batch_313/01.png",
    "head": [
-    "유리 딜도"
+    "유리 딜도",
+    "glass dildo"
    ],
    "feats": [],
    "up": [
@@ -81343,7 +81365,9 @@
    "name": "석션 딜도",
    "src": "game-src/items/raw/batch_313/02.png",
    "head": [
-    "석션 딜도"
+    "석션 딜도",
+    "suction cup dildo",
+    "suction dildo"
    ],
    "feats": [],
    "up": [
@@ -81361,7 +81385,8 @@
    "name": "섹스 머신",
    "src": "game-src/items/raw/batch_313/03.png",
    "head": [
-    "섹스 머신"
+    "섹스 머신",
+    "sex machine"
    ],
    "feats": [],
    "up": [
@@ -81379,7 +81404,9 @@
    "name": "리모컨 진동기",
    "src": "game-src/items/raw/batch_313/04.png",
    "head": [
-    "리모컨 진동기"
+    "리모컨 진동기",
+    "remote control vibrator",
+    "remote vibrator"
    ],
    "feats": [],
    "up": [
@@ -81397,7 +81424,8 @@
    "name": "애널 훅",
    "src": "game-src/items/raw/batch_313/05.png",
    "head": [
-    "애널 훅"
+    "애널 훅",
+    "anal hook"
    ],
    "feats": [],
    "up": [
@@ -81414,7 +81442,8 @@
    "name": "최음제",
    "src": "game-src/items/raw/batch_313/06.png",
    "head": [
-    "최음제"
+    "최음제",
+    "aphrodisiac"
    ],
    "feats": [],
    "up": [
@@ -81432,7 +81461,9 @@
    "name": "미약 병",
    "src": "game-src/items/raw/batch_313/07.png",
    "head": [
-    "미약 병"
+    "미약 병",
+    "love potion bottle",
+    "love potion"
    ],
    "feats": [],
    "up": [
@@ -81450,7 +81481,9 @@
    "name": "파퍼 병",
    "src": "game-src/items/raw/batch_313/08.png",
    "head": [
-    "파퍼 병"
+    "파퍼 병",
+    "poppers bottle",
+    "poppers"
    ],
    "feats": [],
    "up": [
@@ -81468,7 +81501,9 @@
    "name": "성인 비디오테이프",
    "src": "game-src/items/raw/batch_313/09.png",
    "head": [
-    "성인 비디오테이프"
+    "성인 비디오테이프",
+    "adult videotape",
+    "porn tape"
    ],
    "feats": [],
    "up": [
@@ -81485,7 +81520,9 @@
    "name": "성인 게임 CD",
    "src": "game-src/items/raw/batch_313/10.png",
    "head": [
-    "성인 게임 CD"
+    "성인 게임 CD",
+    "adult game cd",
+    "eroge cd"
    ],
    "feats": [],
    "up": [
@@ -81503,7 +81540,9 @@
    "name": "누드 화보집",
    "src": "game-src/items/raw/batch_313/11.png",
    "head": [
-    "누드 화보집"
+    "누드 화보집",
+    "nude photo book",
+    "nude magazine"
    ],
    "feats": [],
    "up": [
@@ -81521,7 +81560,9 @@
    "name": "춘화첩",
    "src": "game-src/items/raw/batch_313/12.png",
    "head": [
-    "춘화첩"
+    "춘화첩",
+    "erotic art album",
+    "shunga album"
    ],
    "feats": [],
    "up": [
@@ -81538,7 +81579,9 @@
    "name": "핀업 포스터",
    "src": "game-src/items/raw/batch_313/13.png",
    "head": [
-    "핀업 포스터"
+    "핀업 포스터",
+    "pin-up poster",
+    "pinup poster"
    ],
    "feats": [],
    "up": [
@@ -81556,7 +81599,9 @@
    "name": "야한 트럼프 카드",
    "src": "game-src/items/raw/batch_313/14.png",
    "head": [
-    "야한 트럼프 카드"
+    "야한 트럼프 카드",
+    "nude playing cards",
+    "adult playing cards"
    ],
    "feats": [],
    "up": [
@@ -81573,7 +81618,9 @@
    "name": "폴댄스 봉",
    "src": "game-src/items/raw/batch_313/15.png",
    "head": [
-    "폴댄스 봉"
+    "폴댄스 봉",
+    "pole dance pole",
+    "stripper pole"
    ],
    "feats": [],
    "up": [
@@ -81590,7 +81637,9 @@
    "name": "스트리퍼 힐",
    "src": "game-src/items/raw/batch_313/16.png",
    "head": [
-    "스트리퍼 힐"
+    "스트리퍼 힐",
+    "stripper heels",
+    "platform heels"
    ],
    "feats": [],
    "up": [
@@ -81607,7 +81656,9 @@
    "name": "유흥업소 전단지",
    "src": "game-src/items/raw/batch_314/01.png",
    "head": [
-    "유흥업소 전단지"
+    "유흥업소 전단지",
+    "nightclub flyer",
+    "escort flyer"
    ],
    "feats": [],
    "up": [
@@ -81624,7 +81675,9 @@
    "name": "호스트바 명함",
    "src": "game-src/items/raw/batch_314/02.png",
    "head": [
-    "호스트바 명함"
+    "호스트바 명함",
+    "host bar business card",
+    "host club card"
    ],
    "feats": [],
    "up": [
@@ -81642,7 +81695,9 @@
    "name": "성병 검사 키트",
    "src": "game-src/items/raw/batch_314/03.png",
    "head": [
-    "성병 검사 키트"
+    "성병 검사 키트",
+    "std test kit",
+    "sti test kit"
    ],
    "feats": [],
    "up": [
@@ -81659,7 +81714,9 @@
    "name": "정자 채취 컵",
    "src": "game-src/items/raw/batch_314/04.png",
    "head": [
-    "정자 채취 컵"
+    "정자 채취 컵",
+    "semen sample cup",
+    "sperm collection cup"
    ],
    "feats": [],
    "up": [
@@ -81677,7 +81734,8 @@
    "name": "요실금 패드",
    "src": "game-src/items/raw/batch_314/05.png",
    "head": [
-    "요실금 패드"
+    "요실금 패드",
+    "incontinence pad"
    ],
    "feats": [],
    "up": [
@@ -81694,7 +81752,8 @@
    "name": "성인 기저귀",
    "src": "game-src/items/raw/batch_314/06.png",
    "head": [
-    "성인 기저귀"
+    "성인 기저귀",
+    "adult diaper"
    ],
    "feats": [],
    "up": [
@@ -81712,7 +81771,9 @@
    "name": "남성 속옷",
    "src": "game-src/items/raw/batch_314/07.png",
    "head": [
-    "남성 속옷"
+    "남성 속옷",
+    "mens underwear",
+    "male underwear"
    ],
    "feats": [],
    "up": [
@@ -81730,7 +81791,10 @@
    "name": "누드 브라",
    "src": "game-src/items/raw/batch_314/08.png",
    "head": [
-    "누드 브라"
+    "누드 브라",
+    "adhesive bra",
+    "nude bra",
+    "sticky bra"
    ],
    "feats": [],
    "up": [
@@ -81747,7 +81811,10 @@
    "name": "가슴 패드",
    "src": "game-src/items/raw/batch_314/09.png",
    "head": [
-    "가슴 패드"
+    "가슴 패드",
+    "breast pad",
+    "bra insert",
+    "bra padding"
    ],
    "feats": [],
    "up": [
@@ -81764,7 +81831,8 @@
    "name": "스팽킹 벤치",
    "src": "game-src/items/raw/batch_314/10.png",
    "head": [
-    "스팽킹 벤치"
+    "스팽킹 벤치",
+    "spanking bench"
    ],
    "feats": [],
    "up": [
@@ -81782,7 +81850,9 @@
    "name": "세인트 앤드루 십자가",
    "src": "game-src/items/raw/batch_314/11.png",
    "head": [
-    "세인트 앤드루 십자가"
+    "세인트 앤드루 십자가",
+    "st andrews cross",
+    "saint andrews cross"
    ],
    "feats": [],
    "up": [
@@ -81800,7 +81870,9 @@
    "name": "새장 구속구",
    "src": "game-src/items/raw/batch_314/12.png",
    "head": [
-    "새장 구속구"
+    "새장 구속구",
+    "cage restraint",
+    "bondage cage"
    ],
    "feats": [],
    "up": [
@@ -81818,7 +81890,8 @@
    "name": "유두 피어싱",
    "src": "game-src/items/raw/batch_314/13.png",
    "head": [
-    "유두 피어싱"
+    "유두 피어싱",
+    "nipple piercing"
    ],
    "feats": [],
    "up": [
@@ -81836,7 +81909,8 @@
    "name": "성기 피어싱",
    "src": "game-src/items/raw/batch_314/14.png",
    "head": [
-    "성기 피어싱"
+    "성기 피어싱",
+    "genital piercing"
    ],
    "feats": [],
    "up": [
@@ -81854,7 +81928,9 @@
    "name": "음모 제모 크림",
    "src": "game-src/items/raw/batch_314/15.png",
    "head": [
-    "음모 제모 크림"
+    "음모 제모 크림",
+    "pubic hair removal cream",
+    "hair removal cream"
    ],
    "feats": [],
    "up": [
@@ -81871,7 +81947,9 @@
    "name": "왁싱 스트립",
    "src": "game-src/items/raw/batch_314/16.png",
    "head": [
-    "왁싱 스트립"
+    "왁싱 스트립",
+    "waxing strip",
+    "wax strips"
    ],
    "feats": [],
    "up": [
@@ -81888,7 +81966,9 @@
    "name": "질 세정기",
    "src": "game-src/items/raw/batch_315/01.png",
    "head": [
-    "질 세정기"
+    "질 세정기",
+    "vaginal douche",
+    "douche"
    ],
    "feats": [],
    "up": [
@@ -81906,7 +81986,9 @@
    "name": "성인용품 자판기 캡슐",
    "src": "game-src/items/raw/batch_315/02.png",
    "head": [
-    "성인용품 자판기 캡슐"
+    "성인용품 자판기 캡슐",
+    "adult vending capsule",
+    "adult toy capsule"
    ],
    "feats": [],
    "up": [
@@ -84097,7 +84179,9 @@
    "name": "패러슈트 볼 웨이트",
    "src": "game-src/items/raw/batch_323/01.png",
    "head": [
-    "패러슈트 볼 웨이트"
+    "패러슈트 볼 웨이트",
+    "parachute ball stretcher",
+    "ball weight"
    ],
    "feats": [],
    "up": [
@@ -84114,7 +84198,8 @@
    "name": "험블러",
    "src": "game-src/items/raw/batch_323/02.png",
    "head": [
-    "험블러"
+    "험블러",
+    "humbler"
    ],
    "feats": [],
    "up": [
@@ -84132,7 +84217,8 @@
    "name": "가시 콕링",
    "src": "game-src/items/raw/batch_323/03.png",
    "head": [
-    "가시 콕링"
+    "가시 콕링",
+    "spiked cock ring"
    ],
    "feats": [],
    "up": [
@@ -84150,7 +84236,9 @@
    "name": "전기 요도봉",
    "src": "game-src/items/raw/batch_323/04.png",
    "head": [
-    "전기 요도봉"
+    "전기 요도봉",
+    "electro urethral sound",
+    "e-stim sound"
    ],
    "feats": [],
    "up": [
@@ -84168,7 +84256,9 @@
    "name": "전기 애널 플러그",
    "src": "game-src/items/raw/batch_323/05.png",
    "head": [
-    "전기 애널 플러그"
+    "전기 애널 플러그",
+    "electro anal plug",
+    "e-stim plug"
    ],
    "feats": [],
    "up": [
@@ -84186,7 +84276,9 @@
    "name": "팽창식 플러그",
    "src": "game-src/items/raw/batch_323/06.png",
    "head": [
-    "팽창식 플러그"
+    "팽창식 플러그",
+    "inflatable plug",
+    "inflatable butt plug"
    ],
    "feats": [],
    "up": [
@@ -84204,7 +84296,9 @@
    "name": "터널 플러그",
    "src": "game-src/items/raw/batch_323/07.png",
    "head": [
-    "터널 플러그"
+    "터널 플러그",
+    "tunnel plug",
+    "hollow plug"
    ],
    "feats": [],
    "up": [
@@ -84222,7 +84316,9 @@
    "name": "대형 애널 플러그",
    "src": "game-src/items/raw/batch_323/08.png",
    "head": [
-    "대형 애널 플러그"
+    "대형 애널 플러그",
+    "large anal plug",
+    "large butt plug"
    ],
    "feats": [],
    "up": [
@@ -84240,7 +84336,9 @@
    "name": "항문경",
    "src": "game-src/items/raw/batch_323/09.png",
    "head": [
-    "항문경"
+    "항문경",
+    "anoscope",
+    "anal speculum"
    ],
    "feats": [],
    "up": [
@@ -84258,7 +84356,9 @@
    "name": "피스팅 장갑",
    "src": "game-src/items/raw/batch_323/10.png",
    "head": [
-    "피스팅 장갑"
+    "피스팅 장갑",
+    "fisting glove",
+    "fisting gloves"
    ],
    "feats": [],
    "up": [
@@ -84275,7 +84375,8 @@
    "name": "스파이더 개그",
    "src": "game-src/items/raw/batch_323/11.png",
    "head": [
-    "스파이더 개그"
+    "스파이더 개그",
+    "spider gag"
    ],
    "feats": [],
    "up": [
@@ -84293,7 +84394,8 @@
    "name": "비트 재갈",
    "src": "game-src/items/raw/batch_323/12.png",
    "head": [
-    "비트 재갈"
+    "비트 재갈",
+    "bit gag"
    ],
    "feats": [],
    "up": [
@@ -84311,7 +84413,9 @@
    "name": "딜도 재갈",
    "src": "game-src/items/raw/batch_323/13.png",
    "head": [
-    "딜도 재갈"
+    "딜도 재갈",
+    "dildo gag",
+    "penis gag"
    ],
    "feats": [],
    "up": [
@@ -84329,7 +84433,8 @@
    "name": "깔때기 재갈",
    "src": "game-src/items/raw/batch_323/14.png",
    "head": [
-    "깔때기 재갈"
+    "깔때기 재갈",
+    "funnel gag"
    ],
    "feats": [],
    "up": [
@@ -84347,7 +84452,8 @@
    "name": "노즈 훅",
    "src": "game-src/items/raw/batch_323/15.png",
    "head": [
-    "노즈 훅"
+    "노즈 훅",
+    "nose hook"
    ],
    "feats": [],
    "up": [
@@ -84364,7 +84470,9 @@
    "name": "클로버 클램프",
    "src": "game-src/items/raw/batch_323/16.png",
    "head": [
-    "클로버 클램프"
+    "클로버 클램프",
+    "clover clamps",
+    "clover clamp"
    ],
    "feats": [],
    "up": [
@@ -84382,7 +84490,9 @@
    "name": "유두 고리",
    "src": "game-src/items/raw/batch_324/01.png",
    "head": [
-    "유두 고리"
+    "유두 고리",
+    "nipple ring",
+    "nipple rings"
    ],
    "feats": [],
    "up": [
@@ -84399,7 +84509,8 @@
    "name": "관장 백",
    "src": "game-src/items/raw/batch_324/02.png",
    "head": [
-    "관장 백"
+    "관장 백",
+    "enema bag"
    ],
    "feats": [],
    "up": [
@@ -84416,7 +84527,9 @@
    "name": "부인과 의자",
    "src": "game-src/items/raw/batch_324/03.png",
    "head": [
-    "부인과 의자"
+    "부인과 의자",
+    "gynecological chair",
+    "gyno chair"
    ],
    "feats": [],
    "up": [
@@ -84434,7 +84547,9 @@
    "name": "구속 의자",
    "src": "game-src/items/raw/batch_324/04.png",
    "head": [
-    "구속 의자"
+    "구속 의자",
+    "bondage chair",
+    "restraint chair"
    ],
    "feats": [],
    "up": [
@@ -84452,7 +84567,9 @@
    "name": "삼각 목마",
    "src": "game-src/items/raw/batch_324/05.png",
    "head": [
-    "삼각 목마"
+    "삼각 목마",
+    "wooden horse",
+    "wooden pony"
    ],
    "feats": [],
    "up": [
@@ -84469,7 +84586,9 @@
    "name": "목칼 구속대",
    "src": "game-src/items/raw/batch_324/06.png",
    "head": [
-    "목칼 구속대"
+    "목칼 구속대",
+    "pillory",
+    "stocks"
    ],
    "feats": [],
    "up": [
@@ -84487,7 +84606,8 @@
    "name": "서스펜션 링",
    "src": "game-src/items/raw/batch_324/07.png",
    "head": [
-    "서스펜션 링"
+    "서스펜션 링",
+    "suspension ring"
    ],
    "feats": [],
    "up": [
@@ -84505,7 +84625,8 @@
    "name": "서스펜션 커프스",
    "src": "game-src/items/raw/batch_324/08.png",
    "head": [
-    "서스펜션 커프스"
+    "서스펜션 커프스",
+    "suspension cuffs"
    ],
    "feats": [],
    "up": [
@@ -84523,7 +84644,9 @@
    "name": "암 바인더",
    "src": "game-src/items/raw/batch_324/09.png",
    "head": [
-    "암 바인더"
+    "암 바인더",
+    "arm binder",
+    "armbinder"
    ],
    "feats": [],
    "up": [
@@ -84541,7 +84664,9 @@
    "name": "본디지 미트",
    "src": "game-src/items/raw/batch_324/10.png",
    "head": [
-    "본디지 미트"
+    "본디지 미트",
+    "bondage mitts",
+    "bondage mittens"
    ],
    "feats": [],
    "up": [
@@ -84559,7 +84684,8 @@
    "name": "가스 마스크 후드",
    "src": "game-src/items/raw/batch_324/11.png",
    "head": [
-    "가스 마스크 후드"
+    "가스 마스크 후드",
+    "gas mask hood"
    ],
    "feats": [],
    "up": [
@@ -84577,7 +84703,9 @@
    "name": "진공 침대",
    "src": "game-src/items/raw/batch_324/12.png",
    "head": [
-    "진공 침대"
+    "진공 침대",
+    "vacuum bed",
+    "vac bed"
    ],
    "feats": [],
    "up": [
@@ -84595,7 +84723,9 @@
    "name": "슬립색",
    "src": "game-src/items/raw/batch_324/13.png",
    "head": [
-    "슬립색"
+    "슬립색",
+    "sleepsack",
+    "bondage sleep sack"
    ],
    "feats": [],
    "up": [
@@ -84613,7 +84743,9 @@
    "name": "머미 랩",
    "src": "game-src/items/raw/batch_324/14.png",
    "head": [
-    "머미 랩"
+    "머미 랩",
+    "mummification wrap",
+    "mummy wrap"
    ],
    "feats": [],
    "up": [
@@ -84630,7 +84762,9 @@
    "name": "포니 굴레",
    "src": "game-src/items/raw/batch_324/15.png",
    "head": [
-    "포니 굴레"
+    "포니 굴레",
+    "pony bridle",
+    "pony play bridle"
    ],
    "feats": [],
    "up": [
@@ -84648,7 +84782,9 @@
    "name": "포니 꼬리",
    "src": "game-src/items/raw/batch_324/16.png",
    "head": [
-    "포니 꼬리"
+    "포니 꼬리",
+    "pony tail plug",
+    "pony tail"
    ],
    "feats": [],
    "up": [
@@ -84665,7 +84801,9 @@
    "name": "자물쇠 목걸이",
    "src": "game-src/items/raw/batch_325/01.png",
    "head": [
-    "자물쇠 목걸이"
+    "자물쇠 목걸이",
+    "padlock collar",
+    "padlock necklace"
    ],
    "feats": [],
    "up": [
@@ -84683,7 +84821,8 @@
    "name": "포스처 칼라",
    "src": "game-src/items/raw/batch_325/02.png",
    "head": [
-    "포스처 칼라"
+    "포스처 칼라",
+    "posture collar"
    ],
    "feats": [],
    "up": [
@@ -84701,7 +84840,9 @@
    "name": "새들 머신",
    "src": "game-src/items/raw/batch_325/03.png",
    "head": [
-    "새들 머신"
+    "새들 머신",
+    "saddle vibrator",
+    "sybian"
    ],
    "feats": [],
    "up": [
@@ -84719,7 +84860,9 @@
    "name": "착유기",
    "src": "game-src/items/raw/batch_325/04.png",
    "head": [
-    "착유기"
+    "착유기",
+    "milking machine",
+    "breast pump machine"
    ],
    "feats": [],
    "up": [
@@ -84737,7 +84880,9 @@
    "name": "자동 스트로커",
    "src": "game-src/items/raw/batch_325/05.png",
    "head": [
-    "자동 스트로커"
+    "자동 스트로커",
+    "automatic stroker",
+    "auto stroker"
    ],
    "feats": [],
    "up": [
@@ -84755,7 +84900,8 @@
    "name": "촉수 딜도",
    "src": "game-src/items/raw/batch_325/06.png",
    "head": [
-    "촉수 딜도"
+    "촉수 딜도",
+    "tentacle dildo"
    ],
    "feats": [],
    "up": [
@@ -84773,7 +84919,8 @@
    "name": "드래곤 딜도",
    "src": "game-src/items/raw/batch_325/07.png",
    "head": [
-    "드래곤 딜도"
+    "드래곤 딜도",
+    "dragon dildo"
    ],
    "feats": [],
    "up": [
@@ -84791,7 +84938,8 @@
    "name": "말 딜도",
    "src": "game-src/items/raw/batch_325/08.png",
    "head": [
-    "말 딜도"
+    "말 딜도",
+    "horse dildo"
    ],
    "feats": [],
    "up": [
@@ -84809,7 +84957,9 @@
    "name": "초대형 딜도",
    "src": "game-src/items/raw/batch_325/09.png",
    "head": [
-    "초대형 딜도"
+    "초대형 딜도",
+    "giant dildo",
+    "huge dildo"
    ],
    "feats": [],
    "up": [
@@ -84827,7 +84977,9 @@
    "name": "산란기 딜도",
    "src": "game-src/items/raw/batch_325/10.png",
    "head": [
-    "산란기 딜도"
+    "산란기 딜도",
+    "ovipositor dildo",
+    "ovipositor"
    ],
    "feats": [],
    "up": [
@@ -84845,7 +84997,9 @@
    "name": "젤라틴 알",
    "src": "game-src/items/raw/batch_325/11.png",
    "head": [
-    "젤라틴 알"
+    "젤라틴 알",
+    "gelatin eggs",
+    "gelatin egg"
    ],
    "feats": [],
    "up": [
@@ -84862,7 +85016,8 @@
    "name": "팽창 딜도",
    "src": "game-src/items/raw/batch_325/12.png",
    "head": [
-    "팽창 딜도"
+    "팽창 딜도",
+    "inflatable dildo"
    ],
    "feats": [],
    "up": [
@@ -84880,7 +85035,9 @@
    "name": "사정 딜도",
    "src": "game-src/items/raw/batch_325/13.png",
    "head": [
-    "사정 딜도"
+    "사정 딜도",
+    "squirting dildo",
+    "ejaculating dildo"
    ],
    "feats": [],
    "up": [
@@ -84898,7 +85055,9 @@
    "name": "더블 스트랩온",
    "src": "game-src/items/raw/batch_325/14.png",
    "head": [
-    "더블 스트랩온"
+    "더블 스트랩온",
+    "double strap-on",
+    "double strapon"
    ],
    "feats": [],
    "up": [
@@ -84916,7 +85075,9 @@
    "name": "얼굴 착용 딜도",
    "src": "game-src/items/raw/batch_325/15.png",
    "head": [
-    "얼굴 착용 딜도"
+    "얼굴 착용 딜도",
+    "face strap-on",
+    "face dildo"
    ],
    "feats": [],
    "up": [
@@ -84934,7 +85095,9 @@
    "name": "케인",
    "src": "game-src/items/raw/batch_325/16.png",
    "head": [
-    "케인"
+    "케인",
+    "cane",
+    "rattan cane"
    ],
    "feats": [],
    "up": [
@@ -84952,7 +85115,8 @@
    "name": "불위프",
    "src": "game-src/items/raw/batch_326/01.png",
    "head": [
-    "불위프"
+    "불위프",
+    "bullwhip"
    ],
    "feats": [],
    "up": [
@@ -84970,7 +85134,9 @@
    "name": "구미편",
    "src": "game-src/items/raw/batch_326/02.png",
    "head": [
-    "구미편"
+    "구미편",
+    "cat o nine tails",
+    "cat-o-nine-tails"
    ],
    "feats": [],
    "up": [
@@ -84988,7 +85154,9 @@
    "name": "생강 플러그",
    "src": "game-src/items/raw/batch_326/03.png",
    "head": [
-    "생강 플러그"
+    "생강 플러그",
+    "ginger plug",
+    "figging plug"
    ],
    "feats": [],
    "up": [
@@ -85006,7 +85174,9 @@
    "name": "음순 클램프",
    "src": "game-src/items/raw/batch_326/04.png",
    "head": [
-    "음순 클램프"
+    "음순 클램프",
+    "labia clamps",
+    "labia clamp"
    ],
    "feats": [],
    "up": [
@@ -85024,7 +85194,8 @@
    "name": "음순 스프레더",
    "src": "game-src/items/raw/batch_326/05.png",
    "head": [
-    "음순 스프레더"
+    "음순 스프레더",
+    "labia spreader"
    ],
    "feats": [],
    "up": [
@@ -85041,7 +85212,8 @@
    "name": "음순 추",
    "src": "game-src/items/raw/batch_326/06.png",
    "head": [
-    "음순 추"
+    "음순 추",
+    "labia weights"
    ],
    "feats": [],
    "up": [
@@ -85058,7 +85230,9 @@
    "name": "벤와볼",
    "src": "game-src/items/raw/batch_326/07.png",
    "head": [
-    "벤와볼"
+    "벤와볼",
+    "ben wa balls",
+    "kegel balls"
    ],
    "feats": [],
    "up": [
@@ -85076,7 +85250,9 @@
    "name": "애널 락",
    "src": "game-src/items/raw/batch_326/08.png",
    "head": [
-    "애널 락"
+    "애널 락",
+    "anal lock",
+    "locking plug"
    ],
    "feats": [],
    "up": [
@@ -85094,7 +85270,9 @@
    "name": "애널 샤워 노즐",
    "src": "game-src/items/raw/batch_326/09.png",
    "head": [
-    "애널 샤워 노즐"
+    "애널 샤워 노즐",
+    "anal douche nozzle",
+    "shower enema nozzle"
    ],
    "feats": [],
    "up": [
@@ -85111,7 +85289,9 @@
    "name": "엉덩이 스프레더",
    "src": "game-src/items/raw/batch_326/10.png",
    "head": [
-    "엉덩이 스프레더"
+    "엉덩이 스프레더",
+    "butt spreader",
+    "cheek spreader"
    ],
    "feats": [],
    "up": [
@@ -85128,7 +85308,8 @@
    "name": "전기 충격 목줄",
    "src": "game-src/items/raw/batch_326/11.png",
    "head": [
-    "전기 충격 목줄"
+    "전기 충격 목줄",
+    "shock collar"
    ],
    "feats": [],
    "up": [
@@ -85146,7 +85327,9 @@
    "name": "유두 전기 클립",
    "src": "game-src/items/raw/batch_326/12.png",
    "head": [
-    "유두 전기 클립"
+    "유두 전기 클립",
+    "electro nipple clips",
+    "e-stim nipple clamps"
    ],
    "feats": [],
    "up": [
@@ -85164,7 +85347,9 @@
    "name": "글로리홀 판자",
    "src": "game-src/items/raw/batch_326/13.png",
    "head": [
-    "글로리홀 판자"
+    "글로리홀 판자",
+    "glory hole board",
+    "gloryhole panel"
    ],
    "feats": [],
    "up": [
@@ -85181,7 +85366,9 @@
    "name": "토르소 오나홀",
    "src": "game-src/items/raw/batch_326/14.png",
    "head": [
-    "토르소 오나홀"
+    "토르소 오나홀",
+    "torso masturbator",
+    "torso sex doll"
    ],
    "feats": [],
    "up": [
@@ -85199,7 +85386,9 @@
    "name": "리얼돌 머리",
    "src": "game-src/items/raw/batch_326/15.png",
    "head": [
-    "리얼돌 머리"
+    "리얼돌 머리",
+    "sex doll head",
+    "real doll head"
    ],
    "feats": [],
    "up": [
@@ -85216,7 +85405,9 @@
    "name": "실리콘 유방",
    "src": "game-src/items/raw/batch_326/16.png",
    "head": [
-    "실리콘 유방"
+    "실리콘 유방",
+    "silicone breasts",
+    "breast forms"
    ],
    "feats": [],
    "up": [
@@ -92469,7 +92660,10 @@
    "name": "이빨",
    "src": "game-src/items/raw/batch_351/12.png",
    "head": [
-    "이빨"
+    "이빨",
+    "tooth",
+    "teeth",
+    "human tooth"
    ],
    "feats": []
   },
@@ -99599,7 +99793,11 @@
    "name": "내장",
    "src": "game-src/items/raw/batch_374/15.png",
    "head": [
-    "내장"
+    "내장",
+    "guts",
+    "entrails",
+    "innards",
+    "viscera"
    ],
    "feats": []
   },
@@ -99633,7 +99831,8 @@
    "name": "체인 하네스",
    "src": "game-src/items/raw/batch_375/01.png",
    "head": [
-    "체인 하네스"
+    "체인 하네스",
+    "chain harness"
    ],
    "feats": [],
    "up": [
@@ -99651,7 +99850,9 @@
    "name": "본디지 로프",
    "src": "game-src/items/raw/batch_375/02.png",
    "head": [
-    "본디지 로프"
+    "본디지 로프",
+    "bondage rope",
+    "shibari rope"
    ],
    "feats": [],
    "up": [
@@ -99668,7 +99869,8 @@
    "name": "본디지 테이프",
    "src": "game-src/items/raw/batch_375/03.png",
    "head": [
-    "본디지 테이프"
+    "본디지 테이프",
+    "bondage tape"
    ],
    "feats": [],
    "up": [
@@ -99686,7 +99888,9 @@
    "name": "러브 쿠폰",
    "src": "game-src/items/raw/batch_375/04.png",
    "head": [
-    "러브 쿠폰"
+    "러브 쿠폰",
+    "love coupon",
+    "love coupons"
    ],
    "feats": [],
    "up": [
@@ -99703,7 +99907,9 @@
    "name": "배란 테스트기",
    "src": "game-src/items/raw/batch_375/05.png",
    "head": [
-    "배란 테스트기"
+    "배란 테스트기",
+    "ovulation test",
+    "ovulation test kit"
    ],
    "feats": [],
    "up": [
@@ -99720,7 +99926,8 @@
    "name": "덴탈댐",
    "src": "game-src/items/raw/batch_375/06.png",
    "head": [
-    "덴탈댐"
+    "덴탈댐",
+    "dental dam"
    ],
    "feats": [],
    "up": [
@@ -99738,7 +99945,9 @@
    "name": "핑거돔",
    "src": "game-src/items/raw/batch_375/07.png",
    "head": [
-    "핑거돔"
+    "핑거돔",
+    "finger cot",
+    "finger condom"
    ],
    "feats": [],
    "up": [
@@ -99756,7 +99965,9 @@
    "name": "에어 인형",
    "src": "game-src/items/raw/batch_375/08.png",
    "head": [
-    "에어 인형"
+    "에어 인형",
+    "inflatable doll",
+    "blow-up doll"
    ],
    "feats": [],
    "up": [
@@ -99774,7 +99985,9 @@
    "name": "가슴 모양 쿠션",
    "src": "game-src/items/raw/batch_375/09.png",
    "head": [
-    "가슴 모양 쿠션"
+    "가슴 모양 쿠션",
+    "breast cushion",
+    "boob pillow"
    ],
    "feats": [],
    "up": [
@@ -99792,7 +100005,9 @@
    "name": "진동 링",
    "src": "game-src/items/raw/batch_375/10.png",
    "head": [
-    "진동 링"
+    "진동 링",
+    "vibrating ring",
+    "vibrating cock ring"
    ],
    "feats": [],
    "up": [
@@ -99810,7 +100025,9 @@
    "name": "페니스 슬리브",
    "src": "game-src/items/raw/batch_375/11.png",
    "head": [
-    "페니스 슬리브"
+    "페니스 슬리브",
+    "penis sleeve",
+    "penis extender sleeve"
    ],
    "feats": [],
    "up": [
@@ -99828,7 +100045,9 @@
    "name": "더블 딜도",
    "src": "game-src/items/raw/batch_375/12.png",
    "head": [
-    "더블 딜도"
+    "더블 딜도",
+    "double dildo",
+    "double-ended dildo"
    ],
    "feats": [],
    "up": [
@@ -100090,7 +100309,8 @@
    "name": "네글리제",
    "src": "game-src/items/raw/batch_380/01.png",
    "head": [
-    "네글리제"
+    "네글리제",
+    "negligee"
    ],
    "feats": [],
    "up": [
@@ -100108,7 +100328,8 @@
    "name": "여성용 콘돔",
    "src": "game-src/items/raw/batch_380/02.png",
    "head": [
-    "여성용 콘돔"
+    "여성용 콘돔",
+    "female condom"
    ],
    "feats": [],
    "up": [
@@ -100126,7 +100347,9 @@
    "name": "전동 오나홀",
    "src": "game-src/items/raw/batch_380/03.png",
    "head": [
-    "전동 오나홀"
+    "전동 오나홀",
+    "electric masturbator",
+    "automatic masturbator"
    ],
    "feats": [],
    "up": [
@@ -100164,7 +100387,8 @@
    "name": "볼 스트레처",
    "src": "game-src/items/raw/batch_380/06.png",
    "head": [
-    "볼 스트레처"
+    "볼 스트레처",
+    "ball stretcher"
    ],
    "feats": [],
    "up": [
@@ -100181,7 +100405,9 @@
    "name": "가짜 질 팬티",
    "src": "game-src/items/raw/batch_380/07.png",
    "head": [
-    "가짜 질 팬티"
+    "가짜 질 팬티",
+    "fake vagina panties",
+    "gaff panties"
    ],
    "feats": [],
    "up": [
@@ -100199,7 +100425,8 @@
    "name": "사용한 콘돔",
    "src": "game-src/items/raw/batch_380/08.png",
    "head": [
-    "사용한 콘돔"
+    "사용한 콘돔",
+    "used condom"
    ],
    "feats": [],
    "up": [
@@ -100217,7 +100444,8 @@
    "name": "먹는 속옷",
    "src": "game-src/items/raw/batch_383/01.png",
    "head": [
-    "먹는 속옷"
+    "먹는 속옷",
+    "edible underwear"
    ],
    "feats": [],
    "up": [
@@ -100235,7 +100463,8 @@
    "name": "초콜릿 바디 페인트",
    "src": "game-src/items/raw/batch_383/02.png",
    "head": [
-    "초콜릿 바디 페인트"
+    "초콜릿 바디 페인트",
+    "chocolate body paint"
    ],
    "feats": [],
    "up": [
@@ -100253,7 +100482,8 @@
    "name": "휘핑크림",
    "src": "game-src/items/raw/batch_383/03.png",
    "head": [
-    "휘핑크림"
+    "휘핑크림",
+    "whipped cream"
    ],
    "feats": [],
    "up": [
@@ -100271,7 +100501,9 @@
    "name": "소변 깔때기",
    "src": "game-src/items/raw/batch_383/04.png",
    "head": [
-    "소변 깔때기"
+    "소변 깔때기",
+    "urine funnel",
+    "pee funnel"
    ],
    "feats": [],
    "up": [
@@ -100289,7 +100521,9 @@
    "name": "사용한 속옷 봉지",
    "src": "game-src/items/raw/batch_384/01.png",
    "head": [
-    "사용한 속옷 봉지"
+    "사용한 속옷 봉지",
+    "used underwear bag",
+    "used panties bag"
    ],
    "feats": [],
    "up": [
@@ -100306,7 +100540,8 @@
    "name": "질 훅",
    "src": "game-src/items/raw/batch_384/04.png",
    "head": [
-    "질 훅"
+    "질 훅",
+    "vaginal hook"
    ],
    "feats": [],
    "up": [
@@ -100323,7 +100558,8 @@
    "name": "유두 스트레처",
    "src": "game-src/items/raw/batch_385/01.png",
    "head": [
-    "유두 스트레처"
+    "유두 스트레처",
+    "nipple stretcher"
    ],
    "feats": [],
    "up": [
@@ -100340,7 +100576,8 @@
    "name": "혀 클램프",
    "src": "game-src/items/raw/batch_385/02.png",
    "head": [
-    "혀 클램프"
+    "혀 클램프",
+    "tongue clamp"
    ],
    "feats": [],
    "up": [
@@ -100358,7 +100595,8 @@
    "name": "매달기 호이스트",
    "src": "game-src/items/raw/batch_385/03.png",
    "head": [
-    "매달기 호이스트"
+    "매달기 호이스트",
+    "suspension hoist"
    ],
    "feats": [],
    "up": [
@@ -100375,7 +100613,8 @@
    "name": "얼음 딜도 틀",
    "src": "game-src/items/raw/batch_385/04.png",
    "head": [
-    "얼음 딜도 틀"
+    "얼음 딜도 틀",
+    "ice dildo mold"
    ],
    "feats": [],
    "up": [
@@ -100413,7 +100652,9 @@
    "name": "요도 플러그",
    "src": "game-src/items/raw/batch_387/02.png",
    "head": [
-    "요도 플러그"
+    "요도 플러그",
+    "urethral plug",
+    "penis plug"
    ],
    "feats": [],
    "up": [
@@ -100431,7 +100672,9 @@
    "name": "신던 스타킹",
    "src": "game-src/items/raw/batch_387/04.png",
    "head": [
-    "신던 스타킹"
+    "신던 스타킹",
+    "worn stockings",
+    "used stockings"
    ],
    "feats": [],
    "up": [
@@ -100516,7 +100759,9 @@
    "name": "가시 정조대",
    "src": "game-src/items/raw/batch_388/08.png",
    "head": [
-    "가시 정조대"
+    "가시 정조대",
+    "spiked chastity device",
+    "spiked chastity cage"
    ],
    "feats": [],
    "up": [
@@ -100534,7 +100779,9 @@
    "name": "원격 전기 정조대",
    "src": "game-src/items/raw/batch_388/09.png",
    "head": [
-    "원격 전기 정조대"
+    "원격 전기 정조대",
+    "remote shock chastity device",
+    "e-stim chastity cage"
    ],
    "feats": [],
    "up": [
@@ -100552,7 +100799,9 @@
    "name": "엉덩이 오나홀",
    "src": "game-src/items/raw/batch_388/11.png",
    "head": [
-    "엉덩이 오나홀"
+    "엉덩이 오나홀",
+    "butt masturbator",
+    "hip onahole"
    ],
    "feats": [],
    "up": [
@@ -106416,6 +106665,7 @@
   "주전부릿감": "과자",
   "입가심": "과자",
   "다과류": "과자",
+  "포테이토칩": "감자칩",
   "다식": "한과",
   "사탕류": "사탕",
   "눈깔사탕": "사탕",
@@ -106424,6 +106674,7 @@
   "곰젤리": "젤리",
   "젤리류": "젤리",
   "츄잉껌": "껌",
+  "초콜렛": "초콜릿",
   "쵸코": "초콜릿",
   "카카오": "초콜릿",
   "빙과": "아이스크림",
@@ -106489,6 +106740,7 @@
   "사이드": "반찬",
   "절임": "반찬",
   "김치류": "김치",
+  "배추김치": "김치",
   "파김치": "김치",
   "부침개": "전",
   "지짐이": "전",
@@ -106502,6 +106754,7 @@
   "포장마차음식": "분식",
   "노점음식": "분식",
   "야식": "분식",
+  "버거": "햄버거",
   "패스트푸드": "햄버거",
   "햄버거세트": "햄버거",
   "서양요리": "양식",
@@ -106592,6 +106845,7 @@
   "근채류": "뿌리채소",
   "구근": "뿌리채소",
   "견과": "견과류",
+  "너트": "견과류",
   "넛츠": "견과류",
   "마른안주": "견과류",
   "곡식": "곡물",
@@ -106653,6 +106907,7 @@
   "병맥주": "맥주",
   "라거": "맥주",
   "에일": "맥주",
+  "위스키": "양주",
   "브랜디": "양주",
   "코냑": "양주",
   "서양술": "양주",
@@ -106663,6 +106918,7 @@
   "민속주": "전통주",
   "동동주": "전통주",
   "곡주": "전통주",
+  "포도주": "와인",
   "적포도주": "와인",
   "백포도주": "와인",
   "스파클링와인": "와인",
@@ -107134,6 +107390,7 @@
   "집전화": "전화기",
   "공중전화": "전화기",
   "연락수단": "전화기",
+  "스마트폰": "휴대폰",
   "휴대전화": "휴대폰",
   "폰류": "휴대폰",
   "모바일": "휴대폰",
@@ -107175,6 +107432,7 @@
   "스크린": "TV",
   "디스플레이": "TV",
   "게임기류": "게임기",
+  "휴대용게임기": "게임기",
   "오락기": "게임기",
   "플스": "게임기",
   "닌텐도": "게임기",
@@ -107567,6 +107825,7 @@
   "증표": "증명서",
   "증명서류": "증명서",
   "임명장": "증명서",
+  "id": "신분증",
   "아이디카드": "신분증",
   "id카드": "신분증",
   "민증": "신분증",
@@ -108444,6 +108703,7 @@
   "진동마사지기": "진동기",
   "딜도류": "딜도",
   "인공성기": "딜도",
+  "모조성기": "딜도",
   "모형성기": "딜도",
   "인조성기": "딜도",
   "양면딜도": "딜도",
@@ -108510,6 +108770,7 @@
   "엄지수갑류": "수갑",
   "포박수갑": "수갑",
   "재갈류": "재갈",
+  "볼개그": "재갈",
   "입막음": "재갈",
   "개그": "재갈",
   "입마개재갈": "재갈",
@@ -109181,7 +109442,1175 @@
   "제사초": "초",
   "향초류": "초",
   "티라이트": "초",
-  "파라핀초": "초"
+  "파라핀초": "초",
+  "food": "@food",
+  "foodstuff": "@food",
+  "edible": "@food",
+  "eatable": "@food",
+  "provision": "@food",
+  "ration": "@food",
+  "grocery": "@food",
+  "meal": "@food",
+  "cuisine": "@food",
+  "somethingtoeat": "@food",
+  "fooditem": "@food",
+  "victual": "@food",
+  "nourishment": "@food",
+  "sustenance": "@food",
+  "fare": "@food",
+  "chow": "@food",
+  "grub": "@food",
+  "clothes": "@wear",
+  "clothing": "@wear",
+  "apparel": "@wear",
+  "garment": "@wear",
+  "outfit": "@wear",
+  "attire": "@wear",
+  "wear": "@wear",
+  "wardrobe": "@wear",
+  "garb": "@wear",
+  "dressitem": "@wear",
+  "costumepiece": "@wear",
+  "tool": "@tool",
+  "implement": "@tool",
+  "utensil": "@tool",
+  "instrument": "@tool",
+  "equipment": "@tool",
+  "hardware": "@tool",
+  "apparatus": "@tool",
+  "device": "@device",
+  "electronics": "@device",
+  "gadget": "@device",
+  "electronicdevice": "@device",
+  "appliance": "@device",
+  "machine": "@device",
+  "tech": "@device",
+  "electronic": "@device",
+  "machinery": "@device",
+  "medical": "@medical",
+  "medicalsupply": "@medical",
+  "medicalitem": "@medical",
+  "medicalsupplies": "@medical",
+  "firstaiditem": "@medical",
+  "healthcareitem": "@medical",
+  "medicalequipment": "@medical",
+  "weaponry": "@weapon",
+  "armament": "@weapon",
+  "arms": "@weapon",
+  "paperitem": "@paper",
+  "paperwork": "@paper",
+  "papers": "@paper",
+  "valuable": "@valuable",
+  "valuables": "@valuable",
+  "treasure": "@valuable",
+  "preciousitem": "@valuable",
+  "riches": "@valuable",
+  "loot": "@valuable",
+  "consumable": "@consumable",
+  "consumables": "@consumable",
+  "supply": "@consumable",
+  "supplies": "@consumable",
+  "disposable": "@consumable",
+  "sundries": "@consumable",
+  "charmitem": "@charm",
+  "talismanitem": "@charm",
+  "ward": "@charm",
+  "occultitem": "@charm",
+  "ritualitem": "@charm",
+  "sealingitem": "@seal",
+  "containmentitem": "@seal",
+  "containment": "@seal",
+  "anomaly": "@anomaly",
+  "anomalousobject": "@anomaly",
+  "anomalousitem": "@anomaly",
+  "cursedobject": "@anomaly",
+  "curseditem": "@anomaly",
+  "strangeobject": "@anomaly",
+  "oddity": "@anomaly",
+  "eldritchobject": "@anomaly",
+  "paranormalobject": "@anomaly",
+  "adultitem": "@adult",
+  "adultgoods": "@adult",
+  "nsfwitem": "@adult",
+  "bodypart": "@body",
+  "bodyparts": "@body",
+  "humanremains": "@body",
+  "flesh": "@body",
+  "misc": "@misc",
+  "miscellaneous": "@misc",
+  "junkitem": "@misc",
+  "oddsandends": "@misc",
+  "knickknack": "@misc",
+  "trinketmisc": "@misc",
+  "stuff": "@misc",
+  "sundry": "@misc",
+  "snack": "과자",
+  "snackfood": "과자",
+  "munchies": "과자",
+  "nibble": "과자",
+  "confectionery": "과자",
+  "confection": "과자",
+  "treat": "과자",
+  "cracker": "과자",
+  "bagofsnacks": "과자",
+  "packagedsnack": "과자",
+  "junkfood": "과자",
+  "teasnack": "과자",
+  "refreshment": "과자",
+  "chip": "감자칩",
+  "potatochip": "감자칩",
+  "crisps": "감자칩",
+  "crisp": "감자칩",
+  "potatocrisp": "감자칩",
+  "koreansweet": "한과",
+  "traditionalsweet": "한과",
+  "koreanconfectionery": "한과",
+  "candy": "사탕",
+  "sweet": "사탕",
+  "sweets": "사탕",
+  "hardcandy": "사탕",
+  "bonbon": "사탕",
+  "caramel": "사탕",
+  "toffee": "사탕",
+  "jelly": "젤리",
+  "gummy": "젤리",
+  "gummi": "젤리",
+  "gummybear": "젤리",
+  "jello": "젤리",
+  "gum": "껌",
+  "chewinggum": "껌",
+  "chocolate": "초콜릿",
+  "choco": "초콜릿",
+  "cocoa": "초콜릿",
+  "icecream": "아이스크림",
+  "gelato": "아이스크림",
+  "sorbet": "아이스크림",
+  "frozendessert": "아이스크림",
+  "icelolly": "아이스크림",
+  "bread": "빵",
+  "bakery": "빵",
+  "bakedgoods": "빵",
+  "bun": "빵",
+  "roll": "빵",
+  "pastry": "빵",
+  "dessert": "디저트",
+  "sweettreat": "디저트",
+  "puddingdessert": "디저트",
+  "cake": "케이크",
+  "pie": "케이크",
+  "tart": "케이크",
+  "cheesecake": "케이크",
+  "shortcake": "케이크",
+  "ricecake": "떡",
+  "tteok": "떡",
+  "instantnoodle": "라면",
+  "instantramen": "라면",
+  "cupnoodle": "라면",
+  "noodle": "면",
+  "soba": "면",
+  "noodledish": "면",
+  "cookedrice": "밥",
+  "ricedish": "밥",
+  "ricebowl": "밥",
+  "gimbap": "김밥",
+  "kimbap": "김밥",
+  "sushiroll": "김밥",
+  "porridge": "죽",
+  "congee": "죽",
+  "gruel": "죽",
+  "soupporridge": "죽",
+  "broth": "국",
+  "stewsoup": "국",
+  "stew": "찌개",
+  "jjigae": "찌개",
+  "sidedish": "반찬",
+  "banchan": "반찬",
+  "side": "반찬",
+  "kimchi": "김치",
+  "pancakesavory": "전",
+  "jeon": "전",
+  "koreanpancake": "전",
+  "burger": "햄버거",
+  "hamburger": "햄버거",
+  "fastfood": "햄버거",
+  "westernfood": "양식",
+  "westerndish": "양식",
+  "friedchicken": "치킨",
+  "chicken": "치킨",
+  "instantfood": "즉석식품",
+  "readymeal": "즉석식품",
+  "retort": "즉석식품",
+  "conveniencefood": "즉석식품",
+  "preservedfood": "즉석식품",
+  "cannedfood": "통조림",
+  "canoffood": "통조림",
+  "tin": "통조림",
+  "tinnedfood": "통조림",
+  "cannedgoods": "통조림",
+  "meat": "고기",
+  "fleshmeat": "고기",
+  "cutofmeat": "고기",
+  "beef": "소고기",
+  "pork": "돼지고기",
+  "chickenmeat": "닭고기",
+  "poultry": "닭고기",
+  "ham": "햄",
+  "processedmeat": "햄",
+  "bacon": "햄",
+  "seafood": "해산물",
+  "shellfishseafood": "해산물",
+  "marineproduct": "해산물",
+  "fish": "생선",
+  "driedfish": "생선",
+  "shellfish": "조개",
+  "shell": "조개",
+  "mollusk": "조개",
+  "shrimp": "새우",
+  "prawn": "새우",
+  "saltedseafood": "젓갈",
+  "jeotgal": "젓갈",
+  "laver": "해조류",
+  "algae": "해조류",
+  "jellyfish": "해파리",
+  "egggeneric": "알",
+  "roe": "알",
+  "spawn": "알",
+  "egg": "계란",
+  "boiledegg": "계란",
+  "rawegg": "계란",
+  "fruit": "과일",
+  "freshfruit": "과일",
+  "driedfruit": "말린 과일",
+  "vegetable": "채소",
+  "veggie": "채소",
+  "greens": "채소",
+  "veg": "채소",
+  "produce": "채소",
+  "rootvegetable": "뿌리채소",
+  "rootveg": "뿌리채소",
+  "tuber": "뿌리채소",
+  "nut": "견과류",
+  "nuts": "견과류",
+  "almond": "견과류",
+  "mixednuts": "견과류",
+  "grain": "곡물",
+  "grains": "곡물",
+  "drink": "음료",
+  "beverage": "음료",
+  "softbeverage": "음료",
+  "refreshmentdrink": "음료",
+  "somethingtodrink": "음료",
+  "bottleddrink": "음료",
+  "canneddrink": "음료",
+  "drinkingwater": "물",
+  "bottledwater": "물",
+  "mineralwater": "물",
+  "pop": "탄산음료",
+  "softdrink": "탄산음료",
+  "carbonateddrink": "탄산음료",
+  "fizzydrink": "탄산음료",
+  "juice": "주스",
+  "fruitjuice": "주스",
+  "coffee": "커피",
+  "cannedcoffee": "커피",
+  "espresso": "커피",
+  "tea": "차",
+  "milk": "우유",
+  "yogurtdrink": "우유",
+  "sportsdrink": "이온음료",
+  "isotonicdrink": "이온음료",
+  "alcohol": "술",
+  "booze": "술",
+  "alcoholicdrink": "술",
+  "alcoholicbeverage": "술",
+  "spirits": "술",
+  "hardliquor": "술",
+  "soju": "소주",
+  "beer": "맥주",
+  "lager": "맥주",
+  "ale": "맥주",
+  "whiskey": "양주",
+  "whisky": "양주",
+  "brandy": "양주",
+  "vodka": "양주",
+  "rum": "양주",
+  "gin": "양주",
+  "tequila": "양주",
+  "cognac": "양주",
+  "traditionalliquor": "전통주",
+  "wine": "와인",
+  "redwine": "와인",
+  "whitewine": "와인",
+  "seasoning": "양념",
+  "condiment": "양념",
+  "spice": "양념",
+  "sauce": "소스",
+  "dressing": "소스",
+  "mustard": "소스",
+  "powder": "가루",
+  "oil": "기름",
+  "paste": "장류",
+  "dairy": "유제품",
+  "dairyproduct": "유제품",
+  "cream": "유제품",
+  "cheesedairy": "유제품",
+  "cigarette": "담배",
+  "cigarettes": "담배",
+  "tobacco": "담배",
+  "smoke": "담배",
+  "packofcigarettes": "담배",
+  "clothesgeneric": "옷",
+  "pieceofclothing": "옷",
+  "spareclothes": "옷",
+  "changeofclothes": "옷",
+  "casualwear": "옷",
+  "top": "상의",
+  "shirttop": "상의",
+  "uppergarment": "상의",
+  "tee": "상의",
+  "tshirt": "상의",
+  "jumper": "상의",
+  "sweatshirt": "상의",
+  "shirt": "셔츠",
+  "buttonup": "셔츠",
+  "vest": "조끼",
+  "waistcoat": "조끼",
+  "outerwear": "외투",
+  "coat": "외투",
+  "jacket": "외투",
+  "overcoat": "외투",
+  "parka": "외투",
+  "outer": "외투",
+  "pants": "바지",
+  "trousers": "바지",
+  "bottoms": "바지",
+  "skirt": "치마",
+  "dress": "원피스",
+  "onepiece": "원피스",
+  "gown": "원피스",
+  "formalwear": "정장",
+  "tuxedo": "정장",
+  "businesssuit": "정장",
+  "hanbok": "한복",
+  "traditionalclothes": "전통옷",
+  "traditionalcostume": "전통옷",
+  "undergarment": "속옷",
+  "undies": "속옷",
+  "lingerieplain": "속옷",
+  "briefs": "속옷",
+  "boxers": "속옷",
+  "sock": "양말",
+  "socks": "양말",
+  "stockingsplain": "양말",
+  "pajamas": "잠옷",
+  "pyjamas": "잠옷",
+  "sleepwear": "잠옷",
+  "nightgown": "잠옷",
+  "nightwear": "잠옷",
+  "swimsuit": "수영복",
+  "swimwear": "수영복",
+  "sportswear": "운동복",
+  "athleticwear": "운동복",
+  "workoutclothes": "운동복",
+  "workuniform": "제복",
+  "fatigues": "제복",
+  "vestment": "종교복",
+  "religiousgarb": "종교복",
+  "robereligious": "종교복",
+  "habit": "종교복",
+  "protectivesuit": "보호복",
+  "hazmat": "보호복",
+  "protectiveclothing": "보호복",
+  "coverall": "보호복",
+  "gownrobe": "가운",
+  "robe": "가운",
+  "shoes": "신발",
+  "footwear": "신발",
+  "pairofshoes": "신발",
+  "dressshoe": "구두",
+  "leathershoe": "구두",
+  "loafer": "구두",
+  "heels": "구두",
+  "sneaker": "운동화",
+  "sneakers": "운동화",
+  "trainer": "운동화",
+  "runningshoe": "운동화",
+  "boot": "부츠",
+  "boots": "부츠",
+  "combatboot": "부츠",
+  "slipper": "슬리퍼",
+  "slippers": "슬리퍼",
+  "sandal": "슬리퍼",
+  "flipflop": "슬리퍼",
+  "hat": "모자",
+  "headwear": "모자",
+  "bag": "가방",
+  "handbag": "가방",
+  "purse": "가방",
+  "satchel": "가방",
+  "tote": "가방",
+  "sackbag": "가방",
+  "duffel": "가방",
+  "glove": "장갑",
+  "gloves": "장갑",
+  "mitten": "장갑",
+  "glasses": "안경",
+  "eyeglasses": "안경",
+  "spectacles": "안경",
+  "eyewear": "안경",
+  "facemask": "마스크",
+  "disguisemask": "가면",
+  "accessory": "장신구",
+  "accessories": "장신구",
+  "jewelry": "장신구",
+  "jewellery": "장신구",
+  "ornament": "장신구",
+  "trinket": "장신구",
+  "adornment": "장신구",
+  "bling": "장신구",
+  "necklace": "목걸이",
+  "pendantnecklace": "목걸이",
+  "chainnecklace": "목걸이",
+  "choker": "목걸이",
+  "ring": "반지",
+  "bandring": "반지",
+  "bracelet": "팔찌",
+  "bangle": "팔찌",
+  "earring": "귀걸이",
+  "earrings": "귀걸이",
+  "hairaccessory": "머리장식",
+  "hairpin": "머리장식",
+  "hairornament": "머리장식",
+  "tie": "넥타이",
+  "necktie": "넥타이",
+  "scarf": "목도리",
+  "muffler": "목도리",
+  "belt": "벨트",
+  "strapbelt": "벨트",
+  "protectivegear": "보호구",
+  "armorgear": "보호구",
+  "protection": "보호구",
+  "guardgear": "보호구",
+  "safetygear": "보호구",
+  "bodyarmor": "보호구",
+  "padguard": "보호대",
+  "kneepad": "보호대",
+  "elbowpad": "보호대",
+  "guard": "보호대",
+  "brace": "보호대",
+  "helm": "투구",
+  "armour": "갑옷",
+  "platearmor": "갑옷",
+  "handtool": "공구",
+  "powertool": "공구",
+  "toolkit": "공구",
+  "toolset": "공구",
+  "repairtool": "공구",
+  "hardwaretool": "공구",
+  "hammer": "망치",
+  "mallet": "망치",
+  "shovel": "삽",
+  "spade": "삽",
+  "kitchenware": "주방용품",
+  "kitchentool": "주방용품",
+  "kitchenutensil": "주방용품",
+  "cookware": "주방용품",
+  "kitchenitem": "주방용품",
+  "pot": "냄비",
+  "saucepan": "냄비",
+  "wok": "냄비",
+  "cookingutensil": "조리도구",
+  "cookingtool": "조리도구",
+  "cup": "컵",
+  "glass": "컵",
+  "cutlery": "수저",
+  "silverware": "수저",
+  "spoonandchopsticks": "수저",
+  "flatware": "수저",
+  "utensils": "수저",
+  "bowl": "그릇",
+  "tableware": "그릇",
+  "crockery": "그릇",
+  "containertub": "통",
+  "tub": "통",
+  "pail": "통",
+  "cleaningtool": "청소도구",
+  "cleaningsupply": "청소도구",
+  "cleaningsupplies": "청소도구",
+  "cleaner": "청소도구",
+  "broomstick": "청소도구",
+  "toiletry": "욕실용품",
+  "toiletries": "욕실용품",
+  "bathroomitem": "욕실용품",
+  "bathitem": "욕실용품",
+  "washroomitem": "욕실용품",
+  "shampoo": "샴푸",
+  "conditioner": "샴푸",
+  "fishinggear": "낚시도구",
+  "fishingtackle": "낚시도구",
+  "tackle": "낚시도구",
+  "fishingequipment": "낚시도구",
+  "campinggear": "캠핑용품",
+  "campingequipment": "캠핑용품",
+  "outdoorgear": "캠핑용품",
+  "survivalgear": "캠핑용품",
+  "exerciseequipment": "운동기구",
+  "sportsequipment": "운동기구",
+  "gymequipment": "운동기구",
+  "sportinggoods": "운동기구",
+  "ball": "공",
+  "stationery": "문구",
+  "officesupply": "문구",
+  "officesupplies": "문구",
+  "writingsupply": "문구",
+  "schoolsupply": "문구",
+  "writinginstrument": "펜",
+  "markerpen": "펜",
+  "ballpoint": "펜",
+  "tape": "테이프",
+  "adhesivetape": "테이프",
+  "stamp": "도장",
+  "sealstamp": "도장",
+  "artsupply": "미술용품",
+  "artsupplies": "미술용품",
+  "paintset": "미술용품",
+  "artwork": "미술품",
+  "artpiece": "미술품",
+  "workofart": "미술품",
+  "art": "미술품",
+  "picture": "그림",
+  "drawing": "그림",
+  "canvaspainting": "그림",
+  "statue": "조각상",
+  "sculpture": "조각상",
+  "figurinestatue": "조각상",
+  "bust": "조각상",
+  "sewingkit": "바느질도구",
+  "sewingtool": "바느질도구",
+  "sewingsupply": "바느질도구",
+  "labequipment": "실험도구",
+  "labtool": "실험도구",
+  "laboratoryequipment": "실험도구",
+  "labgear": "실험도구",
+  "observationtool": "관측도구",
+  "opticalinstrument": "관측도구",
+  "timepiece": "시계",
+  "restraint": "구속구",
+  "restraints": "구속구",
+  "shackle": "구속구",
+  "bindings": "구속구",
+  "fetters": "구속구",
+  "signaldevice": "신호도구",
+  "signalingtool": "신호도구",
+  "signal": "신호도구",
+  "lighter": "라이터",
+  "householditem": "생활용품",
+  "householdgoods": "생활용품",
+  "dailynecessity": "생활용품",
+  "everydayitem": "생활용품",
+  "housewares": "생활용품",
+  "instrumentmusic": "악기",
+  "musicalinstrument": "악기",
+  "stringinstrument": "현악기",
+  "windinstrument": "관악기",
+  "percussion": "타악기",
+  "keyboardinstrument": "건반",
+  "piano": "건반",
+  "organ": "건반",
+  "homeappliance": "가전",
+  "householdappliance": "가전",
+  "kitchenappliance": "주방가전",
+  "heater": "냉난방기",
+  "airconditioner": "냉난방기",
+  "fanheater": "냉난방기",
+  "washingmachine": "세탁기",
+  "washer": "세탁기",
+  "dryer": "세탁기",
+  "vacuum": "청소기",
+  "computer": "컴퓨터",
+  "notebookpc": "컴퓨터",
+  "desktop": "컴퓨터",
+  "component": "부품",
+  "part": "부품",
+  "parts": "부품",
+  "computerpart": "부품",
+  "circuitboard": "부품",
+  "chippart": "부품",
+  "inputdevice": "입력장치",
+  "controller": "입력장치",
+  "storagedevice": "저장장치",
+  "storagemedia": "저장장치",
+  "memorycard": "저장장치",
+  "disk": "저장장치",
+  "officeequipment": "사무기기",
+  "copier": "사무기기",
+  "telephone": "전화기",
+  "communicationdevice": "전화기",
+  "commdevice": "전화기",
+  "cellphone": "휴대폰",
+  "mobile": "휴대폰",
+  "mobilephone": "휴대폰",
+  "smartphone": "휴대폰",
+  "camera": "카메라",
+  "filmingequipment": "촬영장비",
+  "cameragear": "촬영장비",
+  "audiodevice": "음향기기",
+  "audioequipment": "음향기기",
+  "soundequipment": "음향기기",
+  "stereo": "음향기기",
+  "earphone": "이어폰",
+  "earphones": "이어폰",
+  "headphone": "이어폰",
+  "earbud": "이어폰",
+  "earbuds": "이어폰",
+  "television": "TV",
+  "screen": "TV",
+  "display": "TV",
+  "console": "게임기",
+  "handheldconsole": "게임기",
+  "gamingdevice": "게임기",
+  "cellbattery": "배터리",
+  "lighting": "조명",
+  "lightsource": "조명",
+  "light": "조명",
+  "lamplight": "조명",
+  "lamp": "전등",
+  "lanternlight": "전등",
+  "bulb": "전등",
+  "scifidevice": "SF 장비",
+  "futuristicdevice": "SF 장비",
+  "alientech": "SF 장비",
+  "hightechdevice": "SF 장비",
+  "aliendevice": "SF 장비",
+  "detector": "탐지기",
+  "sensor": "탐지기",
+  "scannerdevice": "탐지기",
+  "meter": "탐지기",
+  "gauge": "탐지기",
+  "medicine": "약",
+  "medication": "약",
+  "drug": "약",
+  "pill": "약",
+  "pills": "약",
+  "meds": "약",
+  "pharmaceutical": "약",
+  "remedy": "약",
+  "tabletpill": "약",
+  "painkiller": "진통제",
+  "painreliever": "진통제",
+  "analgesic": "진통제",
+  "aspirin": "진통제",
+  "sedative": "진통제",
+  "coldmedicine": "감기약",
+  "flumedicine": "감기약",
+  "supplement": "영양제",
+  "vitamin": "영양제",
+  "dietarysupplement": "영양제",
+  "eyedrop": "안약",
+  "eyedrops": "안약",
+  "ointment": "연고",
+  "salve": "연고",
+  "creamointment": "연고",
+  "balm": "연고",
+  "potion": "물약",
+  "tonic": "물약",
+  "liquidmedicine": "물약",
+  "syrup": "물약",
+  "medicaldevice": "의료기기",
+  "medicalinstrument": "의료기기",
+  "syringe": "주사기",
+  "injection": "주사기",
+  "injector": "주사기",
+  "needlesyringe": "주사기",
+  "medicaltool": "의료도구",
+  "surgicaltool": "의료도구",
+  "surgicalinstrument": "의료도구",
+  "bandage": "붕대",
+  "bandages": "붕대",
+  "dressingbandage": "붕대",
+  "coldpack": "찜질팩",
+  "hotpack": "찜질팩",
+  "mobilityaid": "보조기구",
+  "crutch": "보조기구",
+  "prosthetic": "보조기구",
+  "firstaidkit": "구급상자",
+  "firstaid": "구급상자",
+  "medkit": "구급상자",
+  "medicalkit": "구급상자",
+  "emergencykit": "구급상자",
+  "weapon": "무기",
+  "weapons": "무기",
+  "armweapon": "무기",
+  "blade": "칼",
+  "bladedweapon": "칼",
+  "cutter": "칼",
+  "sabre": "검",
+  "dagger": "단검",
+  "dirk": "단검",
+  "shiv": "단검",
+  "pocketknife": "단검",
+  "scissors": "가위",
+  "shears": "가위",
+  "firearm": "총",
+  "firearms": "총",
+  "sidearm": "총",
+  "pistol": "권총",
+  "handgun": "권총",
+  "rifle": "소총",
+  "machinegun": "기관총",
+  "gunpart": "총기부품",
+  "ammo": "탄약",
+  "ammunition": "탄약",
+  "bullet": "탄약",
+  "round": "탄약",
+  "rounds": "탄약",
+  "cartridge": "탄약",
+  "shellammo": "탄약",
+  "bomb": "폭탄",
+  "explosive": "폭탄",
+  "ied": "폭탄",
+  "bluntweapon": "둔기",
+  "bludgeon": "둔기",
+  "truncheon": "몽둥이",
+  "pipeweapon": "몽둥이",
+  "spear": "창",
+  "lance": "창",
+  "polearm": "창",
+  "axe": "도끼",
+  "ax": "도끼",
+  "farmtool": "농기구",
+  "farmingtool": "농기구",
+  "scythe": "농기구",
+  "awl": "송곳",
+  "stungun": "전기충격기",
+  "shield": "방패",
+  "spray": "스프레이",
+  "magicitem": "마법",
+  "magicalitem": "마법",
+  "magictool": "마법",
+  "artifact": "마법",
+  "enchanteditem": "마법",
+  "wand": "마법봉",
+  "staff": "마법봉",
+  "magicwand": "마법봉",
+  "rod": "마법봉",
+  "magicsword": "마검",
+  "cursedsword": "마검",
+  "enchantedsword": "마검",
+  "documentset": "서류",
+  "documents": "서류",
+  "paperdocuments": "서류",
+  "files": "서류",
+  "document": "문서",
+  "doc": "문서",
+  "memodocument": "문서",
+  "dossier": "문서",
+  "certification": "증명서",
+  "license": "증명서",
+  "permit": "증명서",
+  "identification": "신분증",
+  "identitycard": "신분증",
+  "driverslicense": "신분증",
+  "employeeid": "사원증",
+  "staffid": "사원증",
+  "badgeid": "사원증",
+  "agentid": "사원증",
+  "workid": "사원증",
+  "contract": "계약서",
+  "agreement": "계약서",
+  "pact": "계약서",
+  "waiver": "계약서",
+  "notice": "안내문",
+  "leaflet": "안내문",
+  "flyer": "안내문",
+  "handout": "안내문",
+  "posternotice": "안내문",
+  "letter": "편지",
+  "noteletter": "편지",
+  "envelopeletter": "편지",
+  "envelope": "봉투",
+  "map": "지도",
+  "chartmap": "지도",
+  "paper": "종이",
+  "sheetofpaper": "종이",
+  "scrapofpaper": "종이",
+  "pieceofpaper": "종이",
+  "photo": "사진",
+  "photograph": "사진",
+  "picturephoto": "사진",
+  "snapshot": "사진",
+  "book": "책",
+  "novel": "책",
+  "tome": "책",
+  "volume": "책",
+  "scripture": "경전",
+  "holybook": "경전",
+  "sutra": "경전",
+  "notebook": "공책",
+  "journal": "공책",
+  "pocketnotebook": "수첩",
+  "notepad": "수첩",
+  "memopad": "수첩",
+  "pass": "표",
+  "transitticket": "차표",
+  "admissionticket": "입장권",
+  "entryticket": "입장권",
+  "giftcard": "상품권",
+  "giftcertificate": "상품권",
+  "voucher": "상품권",
+  "money": "돈",
+  "cashmoney": "돈",
+  "currency": "돈",
+  "funds": "돈",
+  "cash": "현금",
+  "bill": "현금",
+  "banknote": "현금",
+  "wadofcash": "현금",
+  "coin": "동전",
+  "coins": "동전",
+  "change": "동전",
+  "card": "카드",
+  "key": "열쇠",
+  "keyringkey": "열쇠",
+  "slipofpaper": "쪽지",
+  "scribblednote": "쪽지",
+  "gem": "보석",
+  "gemstone": "보석",
+  "jewel": "보석",
+  "preciousstone": "보석",
+  "diamond": "보석",
+  "pearl": "보석",
+  "crystal": "보석",
+  "gold": "금괴",
+  "goldbar": "금괴",
+  "bullion": "금괴",
+  "ingot": "금괴",
+  "goldingot": "금괴",
+  "trophy": "트로피",
+  "antique": "골동품",
+  "artifactantique": "골동품",
+  "vintageitem": "골동품",
+  "heirloom": "골동품",
+  "pottery": "도자기",
+  "porcelain": "도자기",
+  "ceramic": "도자기",
+  "collectible": "수집품",
+  "collectable": "수집품",
+  "collectionitem": "수집품",
+  "memorabilia": "수집품",
+  "souvenir": "수집품",
+  "cosmetic": "화장품",
+  "cosmetics": "화장품",
+  "makeup": "화장품",
+  "beautyproduct": "화장품",
+  "skincare": "스킨케어",
+  "moisturizer": "스킨케어",
+  "hygieneproduct": "위생용품",
+  "sanitaryproduct": "위생용품",
+  "sanitaryitem": "위생용품",
+  "tissue": "휴지",
+  "toiletpaper": "휴지",
+  "napkin": "휴지",
+  "wetwipe": "휴지",
+  "airfreshener": "방향제",
+  "diffuser": "방향제",
+  "fuel": "연료",
+  "gascan": "연료",
+  "poison": "독약",
+  "toxin": "독약",
+  "venom": "독약",
+  "smokingaccessory": "담배용품",
+  "pipe": "담배용품",
+  "bagplastic": "봉지",
+  "pouchbag": "봉지",
+  "talisman": "부적",
+  "amulet": "부적",
+  "charm": "부적",
+  "papercharm": "부적",
+  "ofuda": "부적",
+  "luckycharm": "부적",
+  "protectivecharm": "부적",
+  "shamantool": "무구",
+  "ritualtool": "무구",
+  "shamanictool": "무구",
+  "ritualimplement": "무구",
+  "holyitem": "성물",
+  "sacreditem": "성물",
+  "holyrelic": "성물",
+  "religiousitem": "성물",
+  "cross": "십자가",
+  "crucifix": "십자가",
+  "buddhastatue": "불상",
+  "buddha": "불상",
+  "prayerbeads": "염주",
+  "beadsprayer": "염주",
+  "lantern": "등불",
+  "candlelight": "등불",
+  "lotuslantern": "연등",
+  "paperlantern": "연등",
+  "incense": "향",
+  "incensestick": "향",
+  "offering": "제물",
+  "sacrifice": "제물",
+  "casket": "함",
+  "casebox": "함",
+  "lockbox": "함",
+  "coffer": "함",
+  "container": "용기",
+  "vessel": "용기",
+  "receptacle": "용기",
+  "canister": "용기",
+  "bottle": "병",
+  "vial": "병",
+  "jarbottle": "병",
+  "phial": "병",
+  "potjar": "항아리",
+  "carton": "상자",
+  "packagebox": "상자",
+  "pouch": "주머니",
+  "smallbag": "주머니",
+  "parasite": "기생충",
+  "parasiticworm": "기생충",
+  "fungus": "균류",
+  "fungi": "균류",
+  "mold": "균류",
+  "mould": "균류",
+  "spore": "균류",
+  "bacteria": "균류",
+  "virus": "균류",
+  "germ": "균류",
+  "pathogen": "균류",
+  "microbe": "균류",
+  "bodypiece": "신체 조각",
+  "severedpart": "신체 조각",
+  "pieceofflesh": "신체 조각",
+  "skull": "해골",
+  "specimen": "표본",
+  "sample": "표본",
+  "taxidermy": "박제",
+  "stuffedanimalmount": "박제",
+  "fragment": "조각",
+  "shard": "조각",
+  "piece": "조각",
+  "shards": "조각",
+  "debris": "조각",
+  "lump": "덩어리",
+  "blob": "덩어리",
+  "mass": "덩어리",
+  "clump": "덩어리",
+  "goo": "덩어리",
+  "rodstick": "막대",
+  "pole": "막대",
+  "liquid": "액체",
+  "fluid": "액체",
+  "adulttoy": "성인용품",
+  "sextoy": "성인용품",
+  "adultproduct": "성인용품",
+  "vibrator": "진동기",
+  "whip": "채찍",
+  "crop": "채찍",
+  "flogger": "채찍",
+  "lingerie": "란제리",
+  "contraceptive": "피임",
+  "contraception": "피임",
+  "birthcontrol": "피임",
+  "aphrodisiac": "정력제",
+  "gambling": "도박",
+  "gamblingitem": "도박",
+  "casinoitem": "도박",
+  "handcuffs": "수갑",
+  "handcuff": "수갑",
+  "cuffs": "수갑",
+  "gag": "재갈",
+  "animal": "동물",
+  "creature": "동물",
+  "beast": "동물",
+  "critter": "동물",
+  "smallanimal": "동물",
+  "snake": "뱀",
+  "serpent": "뱀",
+  "viper": "뱀",
+  "lizard": "도마뱀",
+  "gecko": "도마뱀",
+  "frog": "개구리",
+  "bird": "새",
+  "rat": "쥐",
+  "mouseanimal": "쥐",
+  "rodent": "쥐",
+  "wormbug": "벌레",
+  "vermin": "벌레",
+  "creepycrawly": "벌레",
+  "ant": "개미",
+  "bee": "벌",
+  "wasp": "벌",
+  "moth": "나방",
+  "butterfly": "나비",
+  "fly": "파리",
+  "maggot": "파리",
+  "centipede": "지네",
+  "scorpion": "전갈",
+  "larva": "애벌레",
+  "caterpillar": "애벌레",
+  "grublarva": "애벌레",
+  "beetle": "풍뎅이",
+  "beehive": "벌집",
+  "hive": "벌집",
+  "mushroom": "버섯",
+  "toadstool": "버섯",
+  "plant": "식물",
+  "herbplant": "식물",
+  "seed": "식물",
+  "blossom": "꽃",
+  "wood": "나무",
+  "timber": "나무",
+  "lumber": "나무",
+  "log": "나무",
+  "plank": "나무",
+  "poisonousplant": "독초",
+  "poisonherb": "독초",
+  "herb": "약초",
+  "medicinalherb": "약초",
+  "herbs": "약초",
+  "pottedplant": "화분",
+  "flowerpot": "화분",
+  "toy": "장난감",
+  "plaything": "장난감",
+  "plushie": "인형",
+  "stuffedanimal": "인형",
+  "balloon": "풍선",
+  "tabletopgame": "보드게임",
+  "furniture": "가구",
+  "bed": "침대",
+  "cot": "침대",
+  "chair": "의자",
+  "seat": "의자",
+  "stool": "의자",
+  "bench": "의자",
+  "sofa": "의자",
+  "couch": "의자",
+  "desk": "책상",
+  "table": "책상",
+  "cabinet": "수납장",
+  "drawer": "수납장",
+  "shelf": "수납장",
+  "wardrobefurniture": "수납장",
+  "cupboard": "수납장",
+  "closet": "수납장",
+  "bedding": "침구",
+  "blanketbedding": "침구",
+  "babyitem": "아기용품",
+  "babyproduct": "아기용품",
+  "babysupplies": "아기용품",
+  "petsupply": "반려동물용품",
+  "petsupplies": "반려동물용품",
+  "petitem": "반려동물용품",
+  "schoolsupplies": "학용품",
+  "filth": "더러운 것",
+  "dirtything": "더러운 것",
+  "wastefilth": "더러운 것",
+  "grossthing": "더러운 것",
+  "trash": "쓰레기",
+  "garbage": "쓰레기",
+  "rubbish": "쓰레기",
+  "junk": "쓰레기",
+  "litter": "쓰레기",
+  "scrap": "쓰레기",
+  "poop": "똥",
+  "feces": "똥",
+  "dung": "똥",
+  "excrement": "똥",
+  "partysupply": "행사용품",
+  "partysupplies": "행사용품",
+  "partyitem": "행사용품",
+  "vehicle": "탈것",
+  "ride": "탈것",
+  "car": "탈것",
+  "sign": "표지판",
+  "signboard": "표지판",
+  "signpost": "표지판",
+  "cloth": "천",
+  "fabric": "천",
+  "textile": "천",
+  "cordrope": "로프",
+  "thread": "실",
+  "cane": "지팡이",
+  "walkingstick": "지팡이",
+  "handheldlight": "손전등",
+  "blanket": "담요",
+  "marble": "구슬",
+  "bead": "구슬",
+  "orb": "구슬",
+  "badge": "배지",
+  "pin": "배지",
+  "emblem": "배지",
+  "album": "음반",
+  "candle": "초",
+  "cigarettepack": "담배",
+  "chocolatepie": "초코파이",
+  "potatochips": "감자칩",
+  "chips": "감자칩",
+  "shamanknife": "신칼",
+  "painkillers": "진통제",
+  "supplements": "영양제",
+  "dressshoes": "구두",
+  "creepydoll": "인형",
+  "phone": "휴대폰",
+  "clamshell": "조개",
+  "flashbang": "섬광탄",
+  "mushrooms": "버섯",
+  "snacks": "과자",
+  "crackers": "과자",
+  "gun": "권총",
+  "liquor": "양주",
+  "noose": "올가미",
+  "snare": "올가미",
+  "ruler": "자",
+  "bell": "방울",
+  "eggs": "계란",
+  "mask": "가면",
+  "bone": "뼈",
+  "jar": "항아리",
+  "pen": "펜",
+  "front-loadingdrumwashingmachine": "세탁기",
+  "storagecabinet": "수납장",
+  "singlebed": "침대",
+  "soybeans": "콩",
+  "rawbeefcut": "소고기",
+  "rawporkcut": "돼지고기",
+  "rawchickenpieces": "닭고기",
+  "assortedkoreantraditionalsweets": "한과",
+  "honeybee": "벌",
+  "cicada": "매미",
+  "bundleofdriedmedicinalherbs": "약초",
+  "housefly": "파리",
+  "scarabbeetle": "풍뎅이",
+  "honeycomb": "벌집",
+  "spider": "거미",
+  "bowlofsoup": "국",
+  "hotpotstew": "탕",
+  "bowlofrice": "밥",
+  "noodles": "면",
+  "assortedseafood": "해산물",
+  "koreanpancakes": "전",
+  "braiseddish": "찜",
+  "stir-fry": "볶음",
+  "dessertplate": "디저트",
+  "cupoftea": "차",
+  "instantmeal": "즉석식품",
+  "crab": "게",
+  "seaweed": "해조류",
+  "rootvegetables": "뿌리채소",
+  "tree": "나무",
+  "lightbulblamp": "전등",
+  "sword": "검",
+  "knife": "칼",
+  "certificate": "증명서",
+  "smallbird": "새",
+  "bug": "벌레",
+  "assortedfruit": "과일",
+  "assortedvegetables": "채소",
+  "noticesheet": "안내문",
+  "spoonandchopsticksset": "수저"
  },
  "up_cats": [
   "SF 장비",

@@ -23,7 +23,7 @@ for (const line of src.split('\n')) {
     const h = base(w, '') ?? base(w.replace(/ /g, ''), '');
     // 찾은 그림의 이름·다른 이름과 글자가 겹칠 때만 (도검 한 자루 → 마대 자루 처럼 끝 낱말만 같은 것은 매칭기가 잘못 찾은 것이라 분류 말로 둔다)
     const f = w.replace(/ /g, '').toLowerCase();
-    const rel = h && live.filter((r) => r.file === h.file).some((r) => r.keywords.some((k) => { const x = String(k).replace(/ /g, '').toLowerCase(); return x.length >= 2 && (x.includes(f) || f.includes(x)); }));
+    const rel = h && live.filter((r) => r.file === h.file).some((r) => r.keywords.some((k) => { const x = String(k).replace(/ /g, '').toLowerCase(); return /[가-힣]/.test(f) ? x.length >= 2 && (x.includes(f) || f.includes(x)) : x === f; })); // 영어는 그 말 그대로일 때만 (drink ⊂ soft drink can 은 그 그림을 가리키는 말이 아니다)
     if (h && h.score >= 1 && h.file !== rep && rel) { out.push(`${w0} → ${nameOf(h.file)}`); n++; }
   }
 }

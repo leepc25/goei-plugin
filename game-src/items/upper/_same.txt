@@ -439,3 +439,406 @@ SF 장비: SF장비 미래장비 첨단장비 공상과학_장비 하이테크_�
 음반: 음반류 레코드 앨범 엘피 LP CD류 테이프_음반 카세트테이프 싱글 음원 디스크류 바이닐 SP판 EP 음악_CD 레코드판 음반_한_장
 놀이터: 놀이터_기구 놀이기구 놀이_시설 미끄럼틀 시소 정글짐 철봉 그네류 회전무대 놀이터_물건
 초: 초류 양초 촛불류 캔들류 밀랍초 생일초류 제사초 향초류 티라이트 파라핀_초 초_한_자루
+
+# ══ 영어 (2026-11-10 사용자: 영어 출력 대비). 단수로 적는다 — 복수형(snacks)은 매칭기가 단수로 바꿔 찾는다 ══
+# ── 대분류 ──
+@food: food foodstuff edible eatable provision ration grocery meal dish cuisine something_to_eat food_item victual nourishment sustenance fare chow grub
+@wear: clothes clothing apparel garment outfit attire wear wardrobe garb dress_item costume_piece
+@tool: tool implement utensil instrument equipment gear hardware apparatus
+@device: device electronics gadget electronic_device appliance machine tech electronic machinery
+@medical: medical medical_supply medical_item medical_supplies first_aid_item healthcare_item medical_equipment
+@weapon: weaponry armament arms
+@paper: paper_item paperwork papers
+@valuable: valuable valuables treasure precious_item riches loot
+@consumable: consumable consumables supply supplies disposable sundries
+@charm: charm_item talisman_item ward occult_item ritual_item
+@seal: seal sealing_item containment_item containment
+@anomaly: anomaly anomalous_object anomalous_item cursed_object cursed_item strange_object oddity eldritch_object paranormal_object
+@adult: adult_item adult_goods nsfw_item
+@body: body_part body_parts remains human_remains flesh
+@misc: misc miscellaneous junk_item odds_and_ends knickknack trinket_misc stuff sundry
+
+# ── 음식 ──
+과자: snack snack_food munchies nibble confectionery confection treat biscuit cracker bag_of_snacks packaged_snack junk_food tea_snack refreshment
+감자칩: chip potato_chip crisps crisp potato_crisp
+한과: korean_sweet traditional_sweet korean_confectionery
+사탕: candy sweet sweets hard_candy lollipop bonbon caramel toffee
+젤리: jelly gummy gummi gummy_bear jello
+껌: gum chewing_gum bubble_gum
+초콜릿: chocolate choco chocolate_bar cocoa
+아이스크림: ice_cream icecream popsicle ice_pop gelato sorbet frozen_dessert ice_lolly sundae
+빵: bread bakery baked_goods loaf bun roll pastry
+디저트: dessert sweet_treat pudding_dessert
+케이크: cake pie tart cheesecake shortcake
+떡: rice_cake tteok mochi
+라면: ramen ramyeon instant_noodle instant_ramen cup_noodle cup_ramen
+면: noodle pasta spaghetti udon soba noodle_dish
+밥: rice cooked_rice rice_dish rice_bowl fried_rice bibimbap
+김밥: gimbap kimbap sushi_roll
+죽: porridge congee gruel soup_porridge
+국: soup broth stew_soup
+탕: hot_pot hotpot
+찌개: stew jjigae
+반찬: side_dish banchan side
+김치: kimchi
+전: pancake_savory jeon korean_pancake
+분식: street_food
+햄버거: burger hamburger cheeseburger fast_food
+양식: western_food western_dish steak
+치킨: fried_chicken chicken
+즉석식품: instant_food ready_meal retort convenience_food frozen_food mre preserved_food
+통조림: canned_food can_of_food tin tinned_food canned_goods
+고기: meat raw_meat flesh_meat cut_of_meat
+소고기: beef
+돼지고기: pork
+닭고기: chicken_meat poultry
+햄: ham processed_meat bacon spam
+해산물: seafood sea_food shellfish_seafood marine_product
+생선: fish raw_fish sashimi dried_fish
+조개: clam shellfish shell mollusk mussel scallop oyster
+게: crab
+새우: shrimp prawn
+젓갈: salted_seafood jeotgal
+해조류: seaweed kelp laver algae
+해파리: jellyfish
+알: egg_generic roe spawn
+계란: egg boiled_egg raw_egg
+과일: fruit fresh_fruit fruit_basket
+말린 과일: dried_fruit
+채소: vegetable veggie greens veg produce salad
+뿌리채소: root_vegetable root_veg tuber
+견과류: nut nuts peanut almond walnut mixed_nuts
+곡물: grain cereal grains
+음료: drink beverage soft_beverage refreshment_drink something_to_drink bottled_drink canned_drink
+물: water drinking_water bottled_water mineral_water
+탄산음료: soda pop soft_drink carbonated_drink cola fizzy_drink sparkling_water
+주스: juice fruit_juice smoothie
+커피: coffee canned_coffee latte americano espresso
+차: tea green_tea black_tea herbal_tea tea_bag
+우유: milk soy_milk yogurt_drink
+에너지음료: energy_drink
+이온음료: sports_drink isotonic_drink
+술: alcohol liquor booze alcoholic_drink alcoholic_beverage spirits hard_liquor
+소주: soju
+맥주: beer lager ale
+양주: whiskey whisky brandy vodka rum gin tequila cognac
+전통주: makgeolli rice_wine traditional_liquor sake
+와인: wine red_wine white_wine champagne
+양념: seasoning condiment spice spices
+소스: sauce dressing ketchup mayonnaise mustard
+가루: powder
+기름: oil cooking_oil
+장류: paste soybean_paste soy_sauce gochujang
+유제품: dairy dairy_product butter cream cheese_dairy
+담배: cigarette cigarettes tobacco cigar smoke pack_of_cigarettes
+
+# ── 옷 ──
+옷: clothes_generic piece_of_clothing spare_clothes change_of_clothes casual_wear
+상의: top shirt_top upper_garment tee t_shirt sweater hoodie blouse jumper sweatshirt cardigan
+셔츠: shirt dress_shirt button_up
+조끼: vest waistcoat
+외투: outerwear coat jacket overcoat parka windbreaker outer
+바지: pants trousers bottoms slacks jeans leggings
+치마: skirt
+원피스: dress one_piece gown
+정장: suit formal_wear tuxedo business_suit
+한복: hanbok
+전통옷: traditional_clothes traditional_costume kimono
+속옷: underwear undergarment undies lingerie_plain bra briefs boxers panties
+양말: sock socks stockings_plain
+잠옷: pajamas pyjamas sleepwear nightgown nightwear
+수영복: swimsuit swimwear bikini swim_trunks
+운동복: sportswear tracksuit gym_clothes athletic_wear workout_clothes
+제복: uniform work_uniform military_uniform fatigues
+종교복: vestment religious_garb robe_religious habit cassock
+보호복: protective_suit hazmat_suit hazmat protective_clothing coverall
+가운: gown_robe robe lab_coat bathrobe
+신발: shoe shoes footwear pair_of_shoes
+구두: dress_shoe leather_shoe loafer heels
+운동화: sneaker sneakers trainer running_shoe
+부츠: boot boots combat_boot
+슬리퍼: slipper slippers sandal flip_flop
+모자: hat cap headwear beanie
+가방: bag handbag purse satchel tote sack_bag duffel
+장갑: glove gloves mitten
+안경: glasses eyeglasses spectacles eyewear
+마스크: mask face_mask
+가면: masquerade_mask disguise_mask
+장신구: accessory accessories jewelry jewellery ornament trinket adornment bling
+목걸이: necklace pendant_necklace chain_necklace choker
+반지: ring band_ring
+팔찌: bracelet bangle wristband
+귀걸이: earring earrings
+머리장식: hair_accessory hairpin hair_ornament hair_clip
+넥타이: tie necktie bow_tie
+목도리: scarf muffler shawl
+벨트: belt strap_belt
+보호구: protective_gear armor_gear protection guard_gear safety_gear body_armor
+보호대: pad_guard knee_pad elbow_pad guard brace
+투구: helm
+헬멧: helmet hard_hat
+갑옷: armor armour plate_armor
+
+# ── 도구 ──
+공구: hand_tool power_tool toolkit tool_set repair_tool hardware_tool
+망치: hammer mallet
+삽: shovel spade
+주방용품: kitchenware kitchen_tool kitchen_utensil cookware kitchen_item
+냄비: pot pan frying_pan saucepan wok
+조리도구: cooking_utensil cooking_tool ladle spatula whisk
+컵: cup mug glass tumbler
+수저: cutlery silverware spoon_and_chopsticks flatware utensils
+그릇: bowl dish plate tableware crockery
+통: container_tub tub bucket pail
+청소도구: cleaning_tool cleaning_supply cleaning_supplies cleaner mop broomstick
+욕실용품: toiletry toiletries bathroom_item bath_item washroom_item
+샴푸: shampoo conditioner body_wash
+낚시도구: fishing_gear fishing_tackle tackle fishing_equipment
+캠핑용품: camping_gear camping_equipment outdoor_gear survival_gear survival_kit
+운동기구: exercise_equipment sports_equipment gym_equipment sporting_goods dumbbell
+공: ball
+문구: stationery office_supply office_supplies writing_supply school_supply
+펜: pen writing_instrument marker_pen ballpoint
+테이프: tape adhesive_tape duct_tape
+도장: stamp seal_stamp
+미술용품: art_supply art_supplies paint_set
+미술품: artwork art_piece work_of_art art
+그림: painting picture drawing canvas_painting
+조각상: statue sculpture figurine_statue bust
+바느질도구: sewing_kit sewing_tool sewing_supply
+실험도구: lab_equipment lab_tool laboratory_equipment lab_gear
+관측도구: observation_tool optical_instrument telescope binoculars
+시계: clock watch timepiece wristwatch
+구속구: restraint restraints shackle shackles bindings fetters
+신호도구: signal_device signaling_tool whistle signal
+라이터: lighter
+생활용품: household_item household_goods daily_necessity everyday_item housewares
+악기: instrument_music musical_instrument
+현악기: string_instrument guitar violin
+관악기: wind_instrument flute trumpet
+타악기: percussion drum
+건반: keyboard_instrument piano organ
+
+# ── 기기 ──
+가전: home_appliance household_appliance
+주방가전: kitchen_appliance microwave toaster blender rice_cooker
+냉난방기: heater air_conditioner fan_heater
+세탁기: washing_machine washer dryer
+청소기: vacuum vacuum_cleaner
+컴퓨터: computer pc laptop notebook_pc desktop tablet
+부품: component part parts computer_part circuit_board chip_part
+입력장치: input_device mouse controller
+저장장치: storage_device storage_media usb usb_drive flash_drive memory_card hard_drive disk
+사무기기: office_equipment printer copier
+전화기: phone telephone communication_device comm_device
+휴대폰: cellphone cell_phone mobile mobile_phone smartphone burner_phone
+카메라: camera camcorder cctv webcam
+촬영장비: filming_equipment camera_gear
+음향기기: audio_device audio_equipment sound_equipment stereo
+이어폰: earphone earphones headphone headphones earbud earbuds
+TV: tv television monitor screen display
+게임기: game_console console handheld_console gaming_device
+배터리: battery batteries power_bank cell_battery
+조명: lighting light_source light lamp_light
+전등: lamp flashlight torch lantern_light light_bulb bulb
+SF 장비: sci_fi_device futuristic_device alien_tech high_tech_device alien_device
+길찾기: navigation compass gps
+탐지기: detector sensor scanner_device meter gauge
+케이블: cable cord wire charging_cable
+
+# ── 의료 ──
+약: medicine medication drug drugs pill pills meds pharmaceutical remedy tablet_pill
+진통제: painkiller pain_reliever analgesic aspirin sedative
+감기약: cold_medicine flu_medicine
+영양제: supplement vitamin vitamins dietary_supplement
+안약: eye_drop eye_drops
+연고: ointment salve cream_ointment balm
+물약: potion elixir tonic liquid_medicine syrup healing_potion
+의료기기: medical_device medical_instrument
+주사기: syringe injection injector needle_syringe
+의료도구: medical_tool surgical_tool surgical_instrument
+붕대: bandage bandages gauze dressing_bandage plaster band_aid tourniquet
+찜질팩: heat_pack ice_pack cold_pack hot_pack
+보조기구: mobility_aid crutch wheelchair prosthetic
+구급상자: first_aid_kit first_aid medkit med_kit medical_kit emergency_kit
+
+# ── 무기 ──
+무기: weapon weapons arm_weapon
+칼: knife blade bladed_weapon cutter
+검: sword longsword saber sabre
+단검: dagger dirk shiv pocket_knife combat_knife
+가위: scissors shears
+총: gun firearm firearms sidearm
+권총: pistol handgun revolver
+소총: rifle assault_rifle carbine
+기관총: machine_gun submachine_gun smg
+총기부품: gun_part magazine silencer suppressor scope holster
+탄약: ammo ammunition bullet bullets round rounds cartridge shell_ammo
+폭탄: bomb explosive explosives grenade dynamite ied
+둔기: blunt_weapon bludgeon
+몽둥이: club baton bat cudgel truncheon mace pipe_weapon
+창: spear lance polearm halberd
+도끼: axe ax hatchet
+농기구: farm_tool farming_tool sickle hoe scythe
+활: bow crossbow bow_and_arrow
+송곳: awl ice_pick spike
+전기충격기: stun_gun taser
+방패: shield buckler
+스프레이: spray pepper_spray
+마법: magic_item magical_item magic_tool artifact enchanted_item
+마법봉: wand staff magic_wand rod
+마검: magic_sword cursed_sword enchanted_sword
+
+# ── 서류 ──
+서류: document_set documents paper_documents files
+문서: document doc file report record memo_document dossier classified_document
+증명서: certificate certification license permit
+신분증: id id_card identification identity_card passport drivers_license
+사원증: employee_id staff_id badge_id agent_id work_id
+계약서: contract agreement pact waiver
+안내문: notice leaflet pamphlet brochure flyer handout poster_notice
+편지: letter mail note_letter envelope_letter invitation
+봉투: envelope
+지도: map chart_map
+종이: paper sheet_of_paper scrap_of_paper piece_of_paper
+사진: photo photograph picture_photo snapshot polaroid
+책: book novel textbook tome volume
+경전: scripture bible holy_book sutra grimoire
+공책: notebook diary journal planner
+수첩: pocket_notebook notepad memo_pad
+표: ticket pass
+차표: train_ticket bus_ticket boarding_pass transit_ticket
+입장권: admission_ticket entry_ticket movie_ticket concert_ticket
+상품권: gift_card gift_certificate voucher coupon
+돈: money cash_money currency funds
+현금: cash bill banknote wad_of_cash
+동전: coin coins change
+카드: card credit_card debit_card
+열쇠: key keys keyring_key
+쪽지: note slip_of_paper memo scribbled_note
+
+# ── 귀중품 ──
+보석: gem gemstone jewel precious_stone diamond ruby sapphire emerald pearl crystal
+금괴: gold gold_bar bullion ingot gold_ingot
+트로피: trophy medal award
+골동품: antique relic artifact_antique vintage_item heirloom
+도자기: pottery porcelain ceramic vase
+수집품: collectible collectable collection_item memorabilia souvenir figurine
+
+# ── 소모품 ──
+화장품: cosmetic cosmetics makeup beauty_product
+스킨케어: skincare lotion sunscreen moisturizer
+색조: lipstick mascara eyeshadow foundation nail_polish
+위생용품: hygiene_product sanitary_product sanitary_item
+휴지: tissue toilet_paper paper_towel napkin wet_wipe
+방향제: air_freshener deodorizer diffuser
+연료: fuel gasoline petrol kerosene gas_can charcoal firewood
+접착제: glue adhesive superglue
+독약: poison toxin venom
+담배용품: smoking_accessory pipe ashtray
+봉지: plastic_bag bag_plastic pouch_bag
+
+# ── 부적 ──
+부적: talisman amulet charm paper_charm ofuda lucky_charm protective_charm
+무구: shaman_tool ritual_tool shamanic_tool ritual_implement
+방울: bell handbell
+거울: mirror hand_mirror
+성물: holy_item sacred_item holy_relic religious_item sacred_object
+십자가: cross crucifix rosary
+불상: buddha_statue buddha
+염주: prayer_beads beads_prayer
+등불: lantern candlelight
+연등: lotus_lantern paper_lantern
+향: incense incense_stick
+제물: offering sacrifice
+
+# ── 봉인·용기 ──
+함: chest casket case_box lockbox safe strongbox coffer
+용기: container vessel receptacle canister
+병: bottle vial flask jar_bottle phial
+항아리: jar urn crock pot_jar
+사슬: chain chains
+상자: box crate carton package_box
+주머니: pouch small_bag sack
+
+# ── 괴이 ──
+기생충: parasite parasitic_worm
+균류: fungus fungi mold mould spore bacteria virus germ pathogen microbe
+신체 조각: body_piece severed_part piece_of_flesh chunk_of_flesh
+해골: skull
+표본: specimen sample
+박제: taxidermy stuffed_animal_mount
+조각: fragment shard piece shards debris
+덩어리: lump blob mass clump slime goo
+돌: stone rock pebble
+막대: stick rod_stick pole
+액체: liquid fluid
+
+# ── 성인 ──
+성인용품: adult_toy sex_toy adult_product
+진동기: vibrator
+채찍: whip crop flogger
+란제리: lingerie
+피임: contraceptive contraception birth_control
+정력제: aphrodisiac
+도박: gambling gambling_item casino_item
+수갑: handcuffs handcuff cuffs
+재갈: gag
+
+# ── 잡동사니 ──
+동물: animal creature beast critter small_animal
+뱀: snake serpent viper
+도마뱀: lizard gecko
+개구리: frog toad
+새: bird
+쥐: rat mouse_animal rodent
+벌레: bug insect worm_bug vermin creepy_crawly
+거미: spider tarantula
+개미: ant
+벌: bee wasp hornet
+나방: moth
+나비: butterfly
+파리: fly maggot
+지네: centipede millipede
+전갈: scorpion
+애벌레: larva caterpillar grub_larva
+풍뎅이: beetle
+벌집: beehive hive
+버섯: mushroom toadstool
+식물: plant herb_plant weed leaf seed
+꽃: flower blossom bouquet
+나무: wood timber lumber log plank
+독초: poisonous_plant poison_herb
+약초: herb medicinal_herb herbs
+화분: potted_plant flowerpot
+장난감: toy plaything
+인형: doll plush plushie stuffed_toy stuffed_animal puppet
+풍선: balloon
+보드게임: board_game tabletop_game
+가구: furniture
+침대: bed cot mattress
+의자: chair seat stool bench sofa couch
+책상: desk table
+수납장: cabinet drawer shelf wardrobe_furniture cupboard closet
+침구: bedding blanket_bedding pillow quilt
+아기용품: baby_item baby_product baby_supplies
+반려동물용품: pet_supply pet_supplies pet_item pet_food
+학용품: school_supplies
+더러운 것: filth dirty_thing waste_filth gross_thing
+쓰레기: trash garbage rubbish junk litter scrap
+똥: poop feces dung excrement
+행사용품: party_supply party_supplies party_item
+탈것: vehicle ride car bike bicycle
+표지판: sign signboard signpost
+천: cloth fabric textile rag towel
+로프: rope cord_rope string twine
+실: thread yarn
+우산: umbrella parasol
+지팡이: cane walking_stick
+손전등: handheld_light
+부채: fan hand_fan
+담요: blanket
+구슬: marble bead orb
+배지: badge pin emblem
+음반: record album vinyl
+초: candle
