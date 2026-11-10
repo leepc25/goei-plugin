@@ -1,0 +1,18 @@
+{
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v9.png",
+ "box": [
+  0,
+  0,
+  256,
+  256
+ ],
+ "frame_count": 16,
+ "no_background": true,
+ "enhance_prompt": false,
+ "drift_threshold": 0,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a TV home shopping host shown from the chest up, black suit, white shirt, dark red tie, white made-up face, large black eyes, tiny clip-on microphone on the lapel",
+ "initial_pose": "body and head turned three quarters to the right, black eyes looking at the camera, both hands raised in front of the chest with the fingertips touching, closed-lip smile",
+ "description": "laughs without any sound: the shoulders and chest shake hard and the head bobs with laughter, but the face stays exactly the same frozen closed-lip smile and the black eyes stay fixed on the camera; then the shaking stops and he settles back into the starting pose The shoulders stay almost still and never move sideways; the whole body and both hands stay inside the frame."
+}
