@@ -140,3 +140,18 @@ test('game-src/items/match_icon.mjs 와 플러그인이 같은 답', () => {
   for (const n of probe) assert.equal(matchItemIcon(pack, n), m(n), n);
   for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box'], ['생체 신호 은폐 패치', 'concealment patch'], ['경보 장치', 'alarm device'], ['향초 세트', 'candle set'], ['낚시 도구 세트', 'fishing set'], ['백일몽 신체 재생 앰플 (C급)', 'ampoule'], ['탈모 완화 앰플 30ml', ''], ['백일몽 규격 방호 정장 외투', '옷/외투'], ['미니 에어로 건조 세탁기', '기기/세탁기'], ['규격 방검 및 방호 내의', '옷/내의'], ['현장용 차폐 스프레이', 'canister']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
 });
+
+test('글 제목에서 물건 그림 찾기 (연어 마켓 매물, 2026-11-10 사용자: 방검복·라디오조차 안 맞았다)', async () => {
+  const { matchTitleIcon } = await import('../dist-test/core.mjs');
+  const t = (title, want) => {
+    const f = matchTitleIcon(pack, title);
+    assert.ok(f && names(f).includes(want), `${title} → ${f ? names(f).join('/') : '없음'} (바란 것 ${want})`);
+  };
+  t('구형 방검복 상하의 세트', '방검 조끼');
+  t('아날로그 다이얼 진공관 라디오 (작동 확인)', '라디오');
+  t('구리 합금 육각 나침반', '나침반');
+  t('낡은 군용 손전등 건전지 포함', '손전등');
+  t('은장 회중시계 고장', '회중시계');
+  t('현장용 무전기 한 쌍 충전기 포함', '무전기');
+  t('가죽 장갑', '가죽 장갑');
+});

@@ -14,7 +14,7 @@ import { toast } from './toast';
 import { imageUrl } from './images';
 import { resolveSitePic } from '../core/sitepics';
 import { boardFiles, boardThumb, setSitePicSource, attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
-import { itemIconUrl } from '../host/itemicons';
+import { titleIconUrl } from '../host/itemicons';
 import { iconQuiet } from '../core/iconmatch';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
@@ -698,7 +698,7 @@ function smPicUrl(p: GPost): string | null {
   const t = boardThumb(p.body);
   if (t?.url) return t.url;
   const name = smItemName(p);
-  return name ? iconQuiet(() => itemIconUrl(name)) : null;
+  return name ? iconQuiet(() => titleIconUrl(name)) : null;
 }
 const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];
@@ -808,10 +808,10 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
         const u = smPicUrl(p);
         const img = u ? `<img src="${esc(u)}" alt="">` : ICONS.bag;
         const ph = want
-          ? `<div class="ph want"><b>삽니다</b><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
+          ? `<div class="ph want"><span class="tag">삽니다</span><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
           : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${img}${p.tag ? `<span class="tag${p.tag === '나눔' ? ' g' : ''}">${esc(p.tag)}</span>` : ''}</div>`;
         const price = priceOf(p);
-        return openBtn(p, `${ph}<div><div class="nm">${esc(p.title)}${dot(p)}</div>${price ? `<div class="pr">${esc(price)}</div>` : ''}<div class="mt">${esc(ago(p, now))} · 관심 ${p.votes} · 채팅 ${p.comments.length}</div></div>`, 'c');
+        return openBtn(p, `${ph}<div><div class="nm">${esc(p.title)}${dot(p)}</div>${price ? `<div class="pr">${esc(price)}</div>` : ''}<div class="mt">${esc(ago(p, now))} · 관심 ${p.votes} · 댓글 ${p.comments.length}</div></div>`, 'c');
       }).join('');
       const cats = `<div class="cats">${['', ...tagsOf(st)].map((t) => catBtn(t, t || '전체')).join('')}${catBtn('@mine', '내 글')}${catBtn('@scrap', '관심 목록')}${dmBtn(st, unreadDm, '내 채팅')}</div>`;
       const sort = `<span class="sort">${([['hot', '인기순'], ['new', '최신순']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(' · ')}</span>`;
@@ -901,12 +901,14 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
         <div class="nav2">${back('bb', '목록')}<span>${scrap('bb', '스크랩됨', '스크랩')} ${more('bb')} ${del('bb')}</span>${writeBtn('bb')}</div></article>`;
     }
     case 'sm': {
-      const u = smPicUrl(p);
       const price = priceOf(p);
-      return `<article class="detail gn-post"><div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div><div>
+      // 삽니다 글은 물건 그림을 두지 않는다 (목록과 같이, 2026-11-10 사용자: 본문에는 기본 그림이 붙어 있었다)
+      const want = p.tag === '삽니다';
+      const u = want ? null : smPicUrl(p);
+      return `<article class="detail gn-post${want ? ' nopic' : ''}">${want ? '' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`}<div>
         <div class="seller"><i></i><div>${who}</div></div>
         <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
-        <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 채팅 ${p.comments.length} · 조회 ${p.views}</div>
+        <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</div>
         <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
         ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
     }

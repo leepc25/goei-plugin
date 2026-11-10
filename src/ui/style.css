@@ -4682,6 +4682,11 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .gn-post { display: block; }
 /* 연어 마켓 글 보기는 그림|글 두 칸 격자. 위 줄이 덮어 그림이 창 폭만큼 커졌다 (11-09 사용자) */
 .bs-sm .detail.gn-post { display: grid; }
+.bs-sm .detail.nopic { grid-template-columns: minmax(0, 1fr); }
+/* 삽니다 꼬리표도 팝니다와 같은 크기·자리 (2026-11-10 사용자) */
+.bs-sm .ph.want { padding-top: 38px; }
+.bs-sm .ph.want .tag { left: 6.5px; top: 6.5px; } /* 점선 테두리 1.5px 만큼 */
+.bs-sm.bs-m .c .ph.want { padding-top: 32px; }
 .bs .gn-post-title { font-size: inherit; margin: 0; font-weight: inherit; color: inherit; line-height: inherit; }
 .bs-gal .body { width: auto; max-width: 1000px; padding: 10px 10px 0; box-sizing: border-box; }
 .bs-gal.bs-m .body { padding: 0; }
