@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 18:37 KST 「뽑아」 → 컷 B 손 움직임 넣은 11개 + 입 크게 벌리기 다시 1개 = 12회
 - 사용자 11-10 15:24 KST 「이제 뽑아」 → 컷 B 동작 19개를 새 기본(얼굴 정면·흰자 지움 nowhite3)으로 다시 19회
 - 사용자 11-10 15:06 KST 「뽑아」 → v9 얼굴 정면 고치기 2판(30대 후반·주름·큰 검은 눈동자·배경 투명) 1회
 - 사용자 11-10 14:58 KST 「그렇게 하나 뽑고 … 2장 한번에」 → v12(v9 참고·정면 요청문) 1회 + v9 얼굴만 정면 고치기(inpaint) 1회
@@ -372,3 +373,15 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_twitch_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_urgent_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_whisper_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_grin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_spin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_twitch_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_silentlaugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_tilt_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_cold_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_idle_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_gape_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_stare_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_blacktears_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_laugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_flip_req.json
