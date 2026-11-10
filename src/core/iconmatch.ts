@@ -404,9 +404,8 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
       noteMiss({ name: name0, icon: icon ?? '', level: 'none', file: '' });
       return null;
     }
-    // 종류 대표 그림 (글자가 비슷한 그림을 억지로 고르던 단계는 없앴다, 2026-11-10 사용자: 매칭 다시 설계)
-    const base = opts.base?.[kind];
-    noteMiss({ name: name0, icon: icon ?? '', level: base ? 'kind-base' : 'none', file: base ?? '' });
-    return base ? { file: base, score: 0 } : null;
+    // 못 찾으면 상자 (2026-11-10 사용자: 종류 대표 그림은 뜬금없다, 뭔지 모를 상자가 낫다)
+    noteMiss({ name: name0, icon: icon ?? '', level: 'none', file: '' });
+    return null;
   };
 }

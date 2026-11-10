@@ -322,9 +322,7 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     const K = kind ? kindIndex(kind) : null;
     const found = core(name, word, normIcon(en), K, !!strict);
     if (found) return found;
-    if (!K) return null;
-    const base = opts.base?.[kind];
-    return base ? { file: base, score: 0 } : null;
+    return null; // 못 찾으면 상자 (종류 대표 그림 없앰, 2026-11-10 사용자)
   };
 }
 
