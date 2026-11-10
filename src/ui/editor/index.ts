@@ -396,10 +396,12 @@ const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Im
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
-    case 'set': return [{ title: '기능', items: [
+    // 2026-11-10 사용자: 호출 흐름 → 로어북 호출 → 생성 공통 → 화면 → 캐릭터 이미지 → 상태창은 기능이 아니라 따로 「기본」 묶음. 인터넷 사이트 여섯은 「인터넷」 아래로 묶는다
+    case 'set': return [{ title: '기본', items: [
       ['manage:flow', '호출 흐름', ICONS.swap],
-      // 2026-11-10 사용자: 호출 흐름 → 로어북 호출 → 생성 공통 순으로 맨 위에. 인터넷 사이트 여섯은 「인터넷」 아래로 묶는다
-      ...(['lore', 'adv', 'screen', 'image', 'board', 'status'] as SetPage[]).map(setItem),
+      ...(['lore', 'adv', 'screen', 'image', 'status'] as SetPage[]).map(setItem),
+    ] }, { title: '기능', items: [
+      setItem('board'),
       ['label:net', '인터넷', ICONS.net],
       ...(['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm'] as SetPage[]).map(subItem),
       ...(['phone', 'wiki'] as SetPage[]).map(setItem),
