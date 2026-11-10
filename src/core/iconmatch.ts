@@ -51,7 +51,7 @@ export function parseIconAliases(text: string): Record<string, string> {
   return out;
 }
 /** 기본 대체 표 (설정에서 고친다. 표에 있는 말로만) */
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases: Record<string, string> = parseIconAliases(ICON_ALIAS_DEFAULT);
 /** 지금 채팅의 대체 표를 올린다 (host/risu.ts loadContext). 빈 글이면 기본 표 */
 export function setIconAliases(text: string | undefined | null): void {
@@ -200,7 +200,7 @@ const stem = (w: string) => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s
 interface Head { words: string[]; head: string; mods: string[]; ko: boolean; joined: string }
 interface Phrase extends Head { t: string; kw: boolean }
 interface Same { qPre: string; pPre: string; whole?: boolean; pre?: boolean }
-interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string }
+interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string; /** 물건 말에 몸통 밖의 말(꾸밈말·붙여 쓴 앞부분)이 있었다 */ more?: boolean }
 
 /** 물건이 무엇인지 말하지 않는 몸통 말 (그 앞말이 물건, 2026-11-08 사용자 「매칭 더 정교하게」): 이 말은 떼고 앞말로 찾고, 대표 그림은 쓰지 않는다 */
 const GENERIC = new Set(['키트', 'kit', '세트', 'set', '장치', 'device', '도구', 'tool', '기계', 'machine', '용품', 'supply', '물품', '물건', 'item', '패키지', 'package', '묶음', 'pack', '상자', 'box']);
@@ -287,7 +287,7 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>, pre = fals
     if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0 };
     let best: Found | null = null;
     for (const it of items) {
-      let top: { s: number; hit: number; plain: boolean } | null = null;
+      let top: { s: number; hit: number; plain: boolean; more?: boolean } | null = null;
       for (const p of it.ps) {
         if (p.joined === q.joined) {
           top = { s: 1e6, hit: 1, plain: true };
@@ -296,7 +296,7 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>, pre = fals
         const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
-        if (!top || m.s > top.s) top = m;
+        if (!top || m.s > top.s) top = { ...m, more: !!h.qPre || q.mods.length > 0 };
       }
       if (!top) continue;
       const isRep = reps[q.head] === it.file ? 1 : 0;
@@ -378,11 +378,27 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
       const ke = en ? K.head(en) : null;
       const kn = name ? K.head(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
+      // 종류 안에서 영어 낱말의 몸통만 맞은 것(novel → 성인 소설, medicine → 소화제)은 가장 약하다: 한글로 전체에서 찾은 것·앞머리가 같은 말이 먼저
+      if (k && k === ke && rank(ke) === 1 && !ki && !kn) {
+        const ko = (hi && hi.file ? hi : null) || (hn && hn.file ? hn : null) || (strict ? null : pre(word) || pre(name));
+        if (ko) return hit(ko);
+        const kf = frag(name, word);
+        if (kf) return kf;
+      }
+      // 같은 말이 전체에서는 그대로 맞는데 종류 안에서는 덜 맞으면 전체 것 (2026-11-10 사용자: 도구/요가매트 → 커터 매트 가 아니라 요가 매트).
+      // 그 말이 종류 안에 아예 없으면 종류 안 그림 그대로 (괴이/돌멩이 「이상한 돌」 → 눈 달린 돌)
+      // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이)
+      const lit = (h: Found | null, kx: Found | null) => !!kx && kx.hit === 0 && !!kx.more && rank(h) === 3;
+      const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
+      if (k && rank(k) < 3 && same) return hit(same);
       if (k) return hit(k);
       // 종류 안에 없으면 모델이 종류를 다르게 적었을 수 있다 → 전체 그림에서 물건말(한글 → 영어) → 이름 (2026-11-10 사용자: 「도구/머그」가 그물로 갔다).
       // 그래도 없으면 비슷한 글자의 그림을 억지로 고르지 않고 종류 대표 그림
-      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || he || hn;
-      return hit(g && g.file ? g : strict ? null : pre(word) || pre(name));
+      // 영어 낱말의 몸통만 맞은 것은 맨 뒤 (한약/herbal medicine → 감기약 이 아니라 한약 봉지)
+      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || hn;
+      if (g && g.file) return hit(g);
+      const soft = strict ? null : hit(pre(word) || pre(name)) || frag(name, word);
+      return soft || (he && he.file ? hit(he) : null);
     }
     // 둘 다 보고 더 확실한 쪽 (표의 말과 같음 > 꾸밈말까지 맞음 > 몸통만 맞음). 한국어 이름의 몸통 말이 맞으면 영어 그림 낱말보다 이름 (11-09: 스프레이 | canister 가 가스통으로 가지 않게)
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)

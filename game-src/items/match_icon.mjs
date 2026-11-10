@@ -202,7 +202,7 @@ function makeHeadIndex(rows, reps, pre = false) {
         const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
-        if (!top || m.s > top.s) top = m;
+        if (!top || m.s > top.s) top = { ...m, more: !!h.qPre || q.mods.length > 0 };
       }
       if (!top) continue;
       const isRep = reps[q.head] === it.file ? 1 : 0;
@@ -251,7 +251,7 @@ export function parseIconAliases(text) {
   }
   return out;
 }
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
 export function setIconAliases(text) { aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT); }
 function aliased(text) {
@@ -303,10 +303,26 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     if (K) {
       const ki = word ? K.head(word) : null, ke = en ? K.head(en) : null, kn = name ? K.head(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
+      // 종류 안에서 영어 낱말의 몸통만 맞은 것(novel → 성인 소설, medicine → 소화제)은 가장 약하다: 한글로 전체에서 찾은 것·앞머리가 같은 말이 먼저
+      if (k && k === ke && rank(ke) === 1 && !ki && !kn) {
+        const ko = (hi && hi.file ? hi : null) || (hn && hn.file ? hn : null) || (strict ? null : pre(word) || pre(name));
+        if (ko) return hit(ko);
+        const kf = frag(name, word);
+        if (kf) return kf;
+      }
+      // 같은 말이 전체에서는 그대로 맞는데 종류 안에서는 덜 맞으면 전체 것 (2026-11-10 사용자: 도구/요가매트 → 커터 매트 가 아니라 요가 매트).
+      // 그 말이 종류 안에 아예 없으면 종류 안 그림 그대로 (괴이/돌멩이 「이상한 돌」 → 눈 달린 돌)
+      // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이)
+      const lit = (h, kx) => !!kx && kx.hit === 0 && !!kx.more && rank(h) === 3;
+      const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
+      if (k && rank(k) < 3 && same) return hit(same);
       if (k) return hit(k);
       // 종류 안에 없으면 전체에서 물건말(한글 → 영어) → 이름. 없으면 종류 대표 (2026-11-10)
-      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || he || hn;
-      return hit(g && g.file ? g : strict ? null : pre(word) || pre(name));
+      // 영어 낱말의 몸통만 맞은 것은 맨 뒤 (한약/herbal medicine → 감기약 이 아니라 한약 봉지)
+      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || hn;
+      if (g && g.file) return hit(g);
+      const soft = strict ? null : hit(pre(word) || pre(name)) || frag(name, word);
+      return soft || (he && he.file ? hit(he) : null);
     }
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
     const h = koName || rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
