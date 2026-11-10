@@ -1,6 +1,6 @@
 """눈 흰자를 검은 눈으로 덮기(사용자 11-10 「둘다 코드로 해봐」, 놀람 클립). 진행자 설정: 눈동자가 기이하게 큰 검은 눈.
 얼굴 칸에서 눈 크기(38~75px, 너비 8~14, 높이 4~10)의 어두운 덩어리(눈 테두리+눈동자)를 눈으로 봄. 눈썹은 더 작아 빠짐.
-눈 덩어리의 줄마다 가장 왼쪽~오른쪽 어두운 점 사이의 밝은 픽셀을 검게 칠함.
+눈 덩어리의 줄마다 가장 왼쪽~오른쪽 어두운 점 사이의 밝은 픽셀(흰자)을 검게 칠함. 눈동자 속 광채는 남김(사용자 11-10).
 사용: python3 blacken_eyes.py <in_dir> <out_dir>"""
 import sys, os, numpy as np
 from PIL import Image
@@ -21,10 +21,26 @@ def fix(a):
     cnt=0; eyes=[]
     for c in comps:
         ys,xs=c[2],c[3]; eyes.append((int(xs.min()),int(ys.min())))
+        span=np.zeros_like(dark)
         for y in np.unique(ys):
             row=xs[ys==y]; l,r=row.min(),row.max()
-            for x in range(l,r+1):
-                if mx[y,x]>=60: a[y,x,:3]=(1,1,1); cnt+=1
+            # 테두리 밖으로 삐져나온 흰자: 같은 줄에서 3칸 안에 테두리선(밝기 200 미만)으로 막혀 있을 때만 그 사이를 칠함
+            for st in (-1,1):
+                x=l-1 if st<0 else r+1; run=[]
+                for _ in range(4):
+                    if mx[y,x]<200: break
+                    run.append(x); x+=st
+                if mx[y,x]<200 and len(run)<=3:  # 바깥 테두리로 막힌 경우만(살로 번지지 않게)
+                    for xx in run: span[y,xx]=True
+            span[y,l:r+1]=True
+        lt=span&(mx>=60)
+        # 눈동자 속 광채(어두운 점에 사방이 둘러싸인 작은 밝은 점)는 남김
+        ll,ln=label(lt)
+        for k in range(1,ln+1):
+            m=ll==k; p=np.pad(m,1)
+            ring=(p[:-2,1:-1]|p[2:,1:-1]|p[1:-1,:-2]|p[1:-1,2:])&~m
+            if m.sum()<=4 and dark[ring].all() and (mx[m]>=235).all(): continue
+            a[m,:3]=(1,1,1); cnt+=int(m.sum())
     return a,cnt,eyes
 if __name__=='__main__':
     i,o=sys.argv[1:3]; os.makedirs(o,exist_ok=True)
