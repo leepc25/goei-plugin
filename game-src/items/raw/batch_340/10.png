@@ -1,0 +1,5 @@
+{
+  "code": "internal_error",
+  "message": "internal incident",
+  "status": 500
+}
