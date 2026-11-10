@@ -5,7 +5,7 @@ import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, COUNT_RANGE, type CountKey,
-  readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
+  readGnet, findAnyPost, archived, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
   userNick, writeGnet, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
@@ -220,7 +220,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     });
     const u = uiFor(site);
     if (!automatic) u.open = null;
-    else if (u.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), u.open)) u.open = null;
+    else if (u.open !== null && !findAnyPost(readGnet((await currentChat(ctx)) ?? ctx.chat), u.open)) u.open = null;
     return note;
   });
 }
@@ -320,7 +320,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
   // 내 댓글은 먼저 저장한다 (원본과 같음). 반응 생성이 실패해도 남는다
   const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
-    index = addUserComment(st, postId, parent, nick, body, dateNow(chat));
+    index = addUserComment(st, postId, parent, nick, body, dateNow(chat), storyTurns(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
   });
   gnet.compose = null;
@@ -602,7 +602,9 @@ const LOGO_SM = (id: BoardSite, cls = 'bs-logo') => siteLogo(id === 'gal' ? 'gal
 /** 목록에 보일 글 (분류·찾기·정렬) */
 function shownPosts(st: GState): GPost[] {
   const q = gnet.q.trim().toLowerCase();
-  let list = st.posts.filter((p) =>
+  // 보관함의 글(새로고침으로 게시판에서 빠진 내 글·스크랩)은 「내가 쓴 글」「스크랩」에만 이어 붙는다 (2026-11-10 사용자)
+  const pool = gnet.cat === '@mine' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.mine)] : gnet.cat === '@scrap' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.scrap)] : st.posts;
+  let list = pool.filter((p) =>
     (gnet.cat === '' || (gnet.cat === '@mine' ? p.mine || p.comments.some((c) => c.mine) : gnet.cat === '@scrap' ? !!p.scrap : p.tag === gnet.cat))
     && (!q || `${p.title}\n${p.body}`.toLowerCase().includes(q)));
   if (gnet.sort === 'hot') list = [...list].sort((a, b) => b.votes - a.votes || b.views - a.views);
@@ -893,8 +895,8 @@ function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   const now = dateNow(ctx.chat);
   if (gnet.compose?.kind === 'post') return composeView(gnet.compose, busy);
   if (gnet.sub === 'dm' && !popDm) return siteDm(st, busy);
-  const p = gnet.open !== null ? findPost(st, gnet.open) : undefined;
-  if (p) return sitePost(site, p, busy, now);
+  const p = gnet.open !== null ? findAnyPost(st, gnet.open) : undefined;
+  if (p) return (archived(st, p.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 본편 참고에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : '') + sitePost(site, p, busy, now);
   return siteList(site, st, now, busy, unreadDm);
 }
 
@@ -1070,7 +1072,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       gnet.settings = false;
       if (gnet.compose && gnet.compose.kind !== 'post') gnet.compose = null;
       if (gnet.compose?.kind === 'post') gnet.compose = null;
-      const p = gnet.open !== null ? findPost(st(), gnet.open) : undefined;
+      const p = gnet.open !== null ? findAnyPost(st(), gnet.open) : undefined;
       if (p && postUnread(p)) {
         const id = p.id;
         await mutate(ctx, env, (s) => acknowledge(s, id), {}, false);
@@ -1114,7 +1116,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     case 'gn-down':
       // 추천·비추는 한 번씩, 다시 누르면 취소 (시안: 글마다 추천 단추)
       await mutate(ctx, env, (s) => {
-        const p = findPost(s, a);
+        const p = findAnyPost(s, a);
         if (!p) return false;
         if (action === 'gn-down') p.down = !p.down;
         else {
@@ -1131,9 +1133,14 @@ export async function handleGnet(action: string, value: string | undefined, base
       break;
     case 'gn-scrap':
       await mutate(ctx, env, (s) => {
-        const p = findPost(s, a);
+        const p = findAnyPost(s, a);
         if (!p) return false;
         p.scrap = !p.scrap;
+        // 보관함에 스크랩으로만 남아 있던 남의 글은 스크랩을 풀면 보관할 까닭이 없다
+        if (!p.scrap && !p.mine && archived(s, p.id)) {
+          s.archive = s.archive.filter((x) => x.id !== p.id);
+          if (gnet.open === p.id) gnet.open = null;
+        }
       }, {}, false);
       return true;
     case 'gn-write':
@@ -1161,7 +1168,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       return true;
     }
     case 'gn-reply': {
-      const c = findPost(st(), a)?.comments[b - 1];
+      const c = findAnyPost(st(), a)?.comments[b - 1];
       if (!c) break;
       gnet.draft = '';
       gnet.attach = [];
@@ -1179,7 +1186,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       return true;
     }
     case 'gn-dm-from': {
-      const p = findPost(st(), a);
+      const p = findAnyPost(st(), a);
       const contact = p && (b > 0 ? p.comments[b - 1] : p);
       if (!p || !contact || contact.mine) break;
       gnet.sub = 'dm';
@@ -1241,6 +1248,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     }
     case 'gn-post-refresh':
       if (findPost(st(), a)) void refreshPost(ctx, env, a);
+      else if (archived(st(), a)) gnet.notice = '보관된 글이라 새 댓글을 불러오지 않아요. 댓글을 달면 그 턴에 다시 이어져요.';
       break;
     case 'gn-del-post':
       if (gnet.confirm !== `p:${a}`) {
@@ -1350,7 +1358,7 @@ function sitePicFor(ctx: ChatContext): void {
 export function boardChrome(base: ChatContext, site: BoardSite): { title: string; path: string } | null {
   useBoardSite(site);
   if (gnet.sub !== 'board' || gnet.open === null || gnet.compose?.kind === 'post') return null;
-  const p = findPost(readGnet(siteCtx(base, site).chat), gnet.open);
+  const p = findAnyPost(readGnet(siteCtx(base, site).chat), gnet.open);
   if (!p) return null;
   const path = site === 'gal' ? `/board/view/?id=horror&no=${p.id}` : site === 'wpf' ? `/zboard.php?id=wpf&no=${p.id}` : site === 'sm' ? `/articles/${p.id}` : `/board/free/${p.id}`;
   return { title: site === 'sm' ? '' : p.title, path };
