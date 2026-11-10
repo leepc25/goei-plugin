@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 13:53 KST 「뽑아」 → 컷 B 진행자 기본 상태 v10(얼굴 정면·큰 검은 눈동자) 1회
 - 사용자 11-10 13:02 KST 「뽑아」 → 컷 B 진행자 동작 19개(보통 10 + 기괴 9) 19회
 - 사용자 11-10 12:54 KST 「뽑아」 → 컷 B 진행자 기본 상태 v9(몸·머리 3/4) 1회
 - 사용자 11-10 12:50 KST 「뽑아」 → 컷 B 진행자 기본 상태 v8(v6 참고, 3/4 돌림) 1회
@@ -343,3 +344,4 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_urgent_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_spin_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_laugh_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v10_req.json
