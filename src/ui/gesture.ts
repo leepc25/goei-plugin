@@ -1,8 +1,8 @@
 // PC 마우스 제스처 (11-09 사용자: 브라우저 확장 「마우스 제스처」처럼). 오른쪽 단추를 누른 채 끌면 선이 그려지고, 놓을 때 모양으로 동작한다.
 //   ←  뒤로 (상황판 전체, 폰 쓸기와 같은 navStep)      →  앞으로
-//   ㄴ (↓ 뒤 →)  탭 닫기 (인터넷)                      ㄱ (→ 뒤 ↓)  닫은 탭 다시 열기 (인터넷)
+//   ㄴ (↓ 뒤 →)  탭 닫기 (인터넷)                      ㄱ 거꾸로 (↑ 뒤 ←)  닫은 탭 다시 열기 (인터넷, 2026-11-10 사용자: ㄱ 을 역순으로 그리는 것)
 // 끌지 않고 그냥 오른쪽 클릭하면 평소 메뉴가 뜬다. 끌었을 때만 메뉴를 막는다 (Windows 는 메뉴가 단추를 놓을 때 뜨므로 여기서 막힌다).
-export type Gesture = 'L' | 'R' | 'DR' | 'RD';
+export type Gesture = 'L' | 'R' | 'DR' | 'UL';
 
 export interface GestureHandler {
   /** 지금 이 제스처를 할 수 있는지와 이름 (못 하면 '' — 선은 그려지되 회색 글) */
@@ -22,7 +22,7 @@ function readGesture(dirs: Dir[]): Gesture | null {
   if (s === 'L') return 'L';
   if (s === 'R') return 'R';
   if (s === 'DR') return 'DR';
-  if (s === 'RD') return 'RD';
+  if (s === 'UL') return 'UL';
   return null;
 }
 

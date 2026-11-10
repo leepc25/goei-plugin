@@ -301,7 +301,7 @@ function ensureRoot(): HTMLElement {
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
   bindPopWins(root, render, [mallWinSpec, bmDeskWinSpec, gnetDmWinSpec]);
-  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 닫은 탭 복구 (인터넷)
+  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 거꾸로(↑←) 닫은 탭 복구 (인터넷)
   bindMouseGesture(root, {
     label: (g: Gesture) => {
       if (g === 'L') return navStep(-1) ? '뒤로' : '';

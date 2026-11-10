@@ -751,10 +751,9 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
   const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
   switch (site) {
     case 'gal': {
-      // 윗줄 탭은 하나만 선택된다 (2026-11-10 사용자: 전체글+개념글, 개념글+공지가 같이 눌려 있었다 — 분류와 정렬이 따로 놀아서). 전체글 = 전체·최신순, 개념글 = 전체·추천순, 공지 = 공지 말머리
-      const tabOn = dmTakes() ? '' : gnet.cat === '공지' ? 'notice' : gnet.cat === '' ? (gnet.sort === 'hot' ? 'hot' : 'all') : '';
-      const tab = (v: string, label: string) => `<button class="${tabOn === v ? 'on' : ''}" data-action="gn-tab" data-value="${v}" aria-pressed="${tabOn === v}">${label}</button>`;
-      const tabs = `<div class="lt">${tab('all', '전체글')}${tab('hot', '개념글')}${tab('notice', '공지')}${dmBtn(st, unreadDm)}${empty ? '' : writeBtn('wr')}</div>`;
+      // 윗줄 탭은 전체글 하나 (2026-11-10 사용자: 공지는 없애고, 개념글은 오른쪽 힛갤이 그 역할을 한다)
+      const tabOn = !dmTakes() && gnet.cat === '';
+      const tabs = `<div class="lt"><button class="${tabOn ? 'on' : ''}" data-action="gn-tab" data-value="all" aria-pressed="${tabOn}">전체글</button>${dmBtn(st, unreadDm)}${empty ? '' : writeBtn('wr')}</div>`;
       // 말머리 분류 단추는 두지 않는다 (2026-11-10 사용자: 글이 몇 개 안 되는데 지저분하다). 말머리는 글마다 표에 그대로 보인다
       const heads = `<div class="hds">${catBtn('', '전체')}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
       const ic = (p: GPost) => `<span class="ii ${boardThumb(p.body) ? 'im' : 'tx'}"></span>`;
@@ -1119,8 +1118,8 @@ export async function handleGnet(action: string, value: string | undefined, base
       if (gnet.compose?.kind !== 'post') gnet.compose = null;
       break;
     case 'gn-tab':
-      // 괴담갤 윗줄 탭: 분류와 정렬을 한 번에 정해 늘 하나만 선택되게
-      Object.assign(gnet, { sub: 'board', open: null, openDm: null, page: 1, settings: false, cat: v === 'notice' ? '공지' : '', sort: v === 'hot' ? 'hot' : 'new' });
+      // 괴담갤 윗줄 「전체글」: 분류·정렬을 처음으로
+      Object.assign(gnet, { sub: 'board', open: null, openDm: null, page: 1, settings: false, cat: '', sort: 'new' });
       if (gnet.compose?.kind !== 'post') gnet.compose = null;
       break;
     case 'gn-sort':
