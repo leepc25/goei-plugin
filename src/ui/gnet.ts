@@ -710,8 +710,8 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
     case 'gal':
       return `<div class="hd">${home(`${LOGO_SM(site)}<span>괴담 갤러리<small>무섭고 이상한 이야기</small></span>`)}<label class="sch">${searchInput('갤러리 & 통합검색')}<b>${ICONS.search}</b></label></div>`;
     case 'wpf':
-      return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>
-        <div class="bar"><button class="${onCat('') ? 'on' : ''}" data-action="gn-home" aria-pressed="${onCat('')}">HOME</button>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+      return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>${narrow() ? `
+        <div class="bar">${wpfMenu(st, unreadDm)}</div>` : ''}`;
     case 'sm':
       return `<div class="hd">${home(`${LOGO_SM(site)}연어 마켓`)}<nav>${catBtn('', '중고거래')}${catBtn('삽니다', '삽니다')}${catBtn('정보', '오컬트 정보')}</nav><label class="sr">${searchInput('물건 이름으로 찾기')}</label>${writeBtn('wr')}<button class="ch" data-action="gn-sub" data-value="dm">내 채팅${unreadDm ? `<em>${unreadDm}</em>` : ''}</button></div>
         <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>`;
@@ -734,6 +734,25 @@ function gnSide(st: GState, unreadDm: number): string {
   const reading = gnet.open !== null && !gnet.compose;
   const cat = (v: string, label: string) => catBtn(v, label, '', '', onCat(v) && !reading);
   return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${cat('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${cat('@mine', '내가 쓴 글')}${cat('@scrap', '스크랩')}</nav>`;
+}
+
+/** 세정게 메뉴 단추 (PC 왼쪽 MENU · 폰 윗줄 띠 공용) */
+function wpfMenu(st: GState, unreadDm: number): string {
+  // 선택 표시는 하나만: 글을 열었으면 인기글 그 줄, 아니면 보는 분류
+  const reading = gnet.open !== null && !gnet.compose;
+  const cat = (v: string) => onCat(v) && !reading;
+  return `<button class="${cat('') ? 'on' : ''}" data-action="gn-home" aria-pressed="${cat('')}">HOME</button>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글', '', '', cat('@mine'))}${catBtn('@scrap', '스크랩', '', '', cat('@scrap'))}`;
+}
+
+/** 세정게 왼쪽 인기글: 조회 많은 순, 글을 열어도 그대로 남는다 */
+function wpfTop(st: GState): string {
+  const top = [...st.posts].filter((p) => p.tag !== '공지').sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 10);
+  if (!top.length) return '';
+  const items = top.map((p) => {
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
+    return `<li><button class="${on ? 'on' : ''}" data-action="gn-open-side" data-value="${p.id}" title="${esc(p.title)}">${esc(p.title)}</button></li>`;
+  }).join('');
+  return `<div class="t top">인기글</div><ol class="top">${items}</ol>`;
 }
 
 /** 괴담갤 오른쪽 칸 (11-09 사용자: 디씨 사이드바 「힛갤」 — 지금 생성된 글을 조회수 순으로, 본문을 열어도 그대로 남는 글 목록) */
@@ -918,7 +937,7 @@ function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
 }
 
 /** 사이트 한 장 (시안 「브라우저_시안3」 그대로: 괴담넷 .gn·괴담갤 .dc·세정게 .wp·연어 마켓 .sm) */
-function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string): string {
+function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string, note: string): string {
   const unreadDm = st.dms.filter((d) => d.unread).length;
   // PC 쪽지함은 게시판 위에 뜨는 팝업창 (11-09 사용자: 우주 쇼핑몰 질문 창처럼 끌기·크기 조절·바깥 누르면 닫힘). 폰은 전체 화면 그대로
   const popDm = gnet.sub === 'dm' && !mobile;
@@ -931,8 +950,9 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   // 글이 하나도 없으면 힛갤 칸도 두지 않는다
   else if (site === 'gal' && !mobile) inner = `<div class="gal-cols${st.posts.length ? '' : ' solo'}"><div class="gal-main">${box(main)}</div>${st.posts.length ? `<aside class="gal-side">${galSide(st)}</aside>` : ''}</div>`;
   else if (site === 'wpf') {
-    // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다)
-    const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
+    // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다).
+    // PC 는 윗줄 띠 대신 여기에 메뉴를 모으고 아래를 인기글로 채운다 (2026-11-10 사용자: 말머리만 있던 왼쪽 메뉴가 쓸데없다). 폰은 왼쪽 칸이 없어 윗줄 띠 그대로
+    const lm = `<div class="lm"><div class="t">MENU</div>${wpfMenu(st, unreadDm)}${writeBtn('')}${wpfTop(st)}</div>`;
     inner = `<div class="pg">${box(`<div class="cols">${lm}<div class="colr">${main}</div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`)}</div>`;
   }
   else inner = box(main);
@@ -940,7 +960,7 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   const dmWin = popDm
     ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="쪽지함"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} 쪽지함</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
     : '';
-  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}</main>`;
+  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}${note}</main>`;
 }
 
 /** 쪽지함 팝업창 (ui/popwin.ts 공통) */
@@ -985,7 +1005,8 @@ export function gnetTab(base: ChatContext, env?: GnetEnv, site: BoardSite = 'gn'
   const note = toast('gn', gnet.notice, (t) => {
     if (gnet.notice === t) gnet.notice = '';
   });
-  return siteHtml(site, ctx, st, busy, mobile, `${status}${nick}${fail}${note}`);
+  // 떠 있는 알림(note)은 본문 위 줄(extras)에 넣지 않는다: 알림만 있어도 빈 줄이 한 칸 생겼다
+  return siteHtml(site, ctx, st, busy, mobile, `${status}${nick}${fail}`, note);
 }
 
 const AUTO_LAST = '$gn_auto_last';

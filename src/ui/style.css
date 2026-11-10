@@ -4182,6 +4182,13 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-wpf .bar button.on { text-decoration: underline; }
 .bs-wpf .lm button { display: block; width: 100%; text-align: left; }
 .bs-wpf .lm button.on { font-weight: bold; color: #b00; }
+.bs-wpf .cols { grid-template-columns: 180px 1fr; }
+.bs-wpf .lm .gn-dmpop > svg { display: none; }
+.bs-wpf .lm .t.top { margin-top: 14px; }
+.bs-wpf .lm ol.top { margin: 0; padding: 0; list-style: none; counter-reset: wt; }
+.bs-wpf .lm ol.top li { counter-increment: wt; }
+.bs-wpf .lm ol.top button { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.bs-wpf .lm ol.top button::before { content: counter(wt) '. '; color: #b00; font-size: inherit; }
 .bs-wpf .tot .srt button.on { color: #b00; font-weight: bold; }
 .bs-wpf td.t .gn-row-main { color: #000; }
 .bs-wpf td.t .gn-row-main:hover { text-decoration: underline; }
