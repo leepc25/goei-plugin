@@ -256,6 +256,7 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
       pushComments(p, got.comments, dateNow(chat));
+      bumpStats(p, got.comments.length);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       trimBoard(cur, s);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
@@ -271,6 +272,15 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     gnet.open = newId;
     return note;
   });
+}
+
+/**
+ * 새 댓글이 달린 글은 조회·추천도 같이 는다 (댓글 하나에 조회 5~24, 추천은 0~댓글 수+1).
+ * 글 하나 새로고침에만 있던 셈인데 내가 쓴 글·내가 단 댓글의 반응에는 빠져 있어, 댓글이 달려도 조회 0·추천 0 이었다 (2026-11-10 사용자)
+ */
+function bumpStats(p: GPost, n: number): void {
+  p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+  p.votes += Math.floor(Math.random() * (n + 2));
 }
 
 /** 글 하나만 새로고침 (v0.16.26, 사용자 요청): 그 글에 새 댓글이 달리고 조회·추천이 는다. 다른 글·쪽지는 그대로 */
@@ -297,8 +307,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(latest));
       const n = got.comments.length;
-      p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
-      p.votes += Math.floor(Math.random() * (n + 2));
+      bumpStats(p, n);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest), gnetSettings(latest.scriptstate).counts.act[1]);
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
@@ -352,6 +361,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(chat));
+      bumpStats(p, got.comments.length);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? '' : '등록했어요. 추가 답글은 없어요.';

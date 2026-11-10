@@ -4708,6 +4708,20 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .gn-dmwin-bd .ph-list { overflow-y: auto; min-height: 0; }
 .bs .gn-dmwin-bd .bs-dmh { justify-content: flex-end; margin-bottom: 6px; }
 .bs .gn-dmwin-bd .bs-dmh h2 { display: none; }
+/* 쪽지 대화 (2026-11-10 사용자: 말풍선이 전부 왼쪽으로 몰리고 좁았다, 보내기 단추가 찌그러졌다, 입력칸이 대화 칸과 붙었다)
+   - 대화 칸은 세로 flex: 내 말은 오른쪽, 상대 말은 왼쪽. 말풍선 폭은 줄(85%) 안에서 다 쓴다 (앞에는 78% 안의 70% 로 두 번 줄었다)
+   - 아이콘 보내기 단추는 좌우 여백 없이 네모 칸 (글자 단추 .txt 는 그대로)
+   - 창 안에서는 방이 세로로 꽉 차고 입력칸은 맨 아래, 대화 칸과는 선 하나와 여백으로 가른다 */
+.bs .ph-log { display: flex; flex-direction: column; }
+.bs .ph-log > .ph-msg { max-width: 85%; align-self: flex-start; }
+.bs .ph-log > .ph-msg.me { align-self: flex-end; }
+.bs .ph-msg-col { min-width: 0; }
+.bs .ph-msg .ph-bubble { max-width: 100%; }
+.bs .ph-compose .ph-send:not(.txt) { width: 44px; height: auto; padding: 0; justify-content: center; border-radius: 0; }
+.bs .gn-dmwin-bd > .ph-room { display: flex; flex-direction: column; padding: 0; }
+.bs .gn-dmwin-bd > .ph-room > .ph-room-head { flex: none; }
+.bs .gn-dmwin-bd > .ph-room > .gn-composer { flex: none; margin: 0; padding: 10px 12px; border-top: 1px solid var(--bs-line); }
+.bs .gn-dmwin-bd > .ph-room .ph-compose .ph-input { resize: none; max-height: 120px; }
 .bs .gn-rs { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 50%, var(--dim) 50% 56%, transparent 56% 66%, var(--dim) 66% 72%, transparent 72% 82%, var(--dim) 82% 88%, transparent 88%); opacity: .7; }
 
 /* ── PC 마우스 제스처 선·이름표 (ui/gesture.ts) ── */
