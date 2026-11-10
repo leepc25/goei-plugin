@@ -746,7 +746,7 @@ function cosHtml(ctx: ChatContext, mobile: boolean): string {
   const how = `<div class="cs-how"><b>◈ 구매의 방법 ◈</b><br>1. 상품을 장바구니에 담는다 &nbsp; 2. 아래 계좌로 입금한다 &nbsp; 3. 입금이 확인되면 상품은 즉시 간다<br>입금 계좌 : <b>${esc(COS_ACCOUNT)}</b><br><span class="cs-red">※ 환불의 존재는 없다. 반품 또한 그렇다.</span><br>질문이 있으면 <button class="cs-ln" data-action="mall-ask" data-value="">운영자에게 질문</button> 해라.</div>`;
   const head = `<div class="cs-title">${mobile ? '' : ufo} Cosmic Shopping Mall ${mobile ? '' : ufo.replace('cs-ufo', 'cs-ufo cs-flip')}</div><div class="cs-subt">※우주에서 온 굉장한 상품※</div><hr class="cs-rb">
     <div class="cs-mq"><span>☆ 어서 와라 ☆★ 물건을 보겠습니다 ★☆ 입금이 확인되면 상품은 즉시 간다 ★☆ 환불은 다음 기회에 ☆</span></div>
-    <div class="cs-wel">방문을 환영한다!! <b>우주 쇼핑몰</b>은 굉장한 상품을 너에게 제공한다. 모든 상품은 <b>진짜다</b>. 그러나 사용의 결과에 대하여 우리는 <b>책임을 가지지 않는다</b>.${note ? `<br><br><span class="cs-op">운영자 :</span> ${opText(note, st)}` : ''} <span class="blink">NEW!!</span></div>`;
+    <div class="cs-wel"><p><span>방문을 환영한다!! <b>우주 쇼핑몰</b>은 굉장한 상품을 너에게 제공한다.</span> <span>모든 상품은 <b>진짜다</b>. 그러나 사용의 결과에 대하여 우리는 <b>책임을 가지지 않는다</b>.</span>${note ? '' : ' <span class="blink">NEW!!</span>'}</p>${note ? `<p><span class="cs-op">운영자 :</span> ${opText(note, st)} <span class="blink">NEW!!</span></p>` : ''}</div>`;
   const info = v.info ? `<div class="cs-info" role="status">${esc(v.info)}</div>` : '';
   const side = mobile
     ? `<nav class="cs-top">${menu}</nav>`

@@ -4251,6 +4251,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 @keyframes cs-mq { to { transform: translateX(-100%); } }
 .ms-cos .cs-wel { border: 3px double #ff0; padding: 8px 10px; line-height: 1.7; background: #100030; }
 .ms-cos .cs-wel b, .ms-cos .cs-op { color: #f0f; font-weight: 700; }
+/* 인사말·운영자 말: 두 문단 사이는 빈 줄 대신 4px (2026-11-10 사용자) */
+.ms-cos .cs-wel { line-height: 1.5; }
+.ms-cos .cs-wel p { margin: 0; word-break: keep-all; }
+/* 줄이 넘치면 문장 사이에서만 나뉜다 (낱말 하나만 떨어지지 않게) */
+.ms-cos .cs-wel p > span:not(.cs-op):not(.blink) { display: inline-block; max-width: 100%; }
+.ms-cos .cs-wel p + p { margin-top: 4px; }
 .ms-cos .blink { color: #f00; font-weight: 900; animation: cs-bl 1s steps(1) infinite; }
 @keyframes cs-bl { 50% { opacity: 0; } }
 .ms-cos .cs-h { display: block; margin: 16px 0 6px; color: #ff0; font-size: 14px; white-space: nowrap; }
@@ -4815,3 +4821,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
 .bs-sm .detail > .info .body { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }
+/* 연어 마켓 본문: 왼쪽 = 사진 + 판매자, 오른쪽 = 제목(크게)·값·날짜·본문 (2026-11-10 사용자: 윗부분이 어정쩡). 제목은 위 공통 초기화(.bs .gn-post-title)가 크기를 지워 본문 글씨만 했다 */
+.bs-sm .detail > .side { min-width: 0; }
+.bs-sm .detail > .side .seller { padding: 12px 2px 0; border-bottom: 0; }
+.bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
+.bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
+.bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
