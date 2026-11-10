@@ -1332,7 +1332,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       report.items.push({
         anchor: ev.anchor, name: listed ?? name, action: action === 'new' && listed ? 'update' : (action as ItemChange['action']),
         desc: plain(t.desc, 80), effect: plain(t.effect, 60), quote: str(t.quote).slice(0, 120),
-        ...(typeof t.usable === 'boolean' ? { use: t.usable } : {}),
+        ...(typeof t.usable === 'boolean' ? { use: t.usable } : /^(true|false)$/i.test(str(t.usable).trim()) ? { use: /^true$/i.test(str(t.usable).trim()) } : {}),
         ...(uses !== undefined ? { uses } : {}),
         ...(eq !== undefined ? { equip: eq ?? null } : {}),
         ...(cond === 'ok' || cond === 'damaged' || cond === 'broken' ? { state: itemState(cond) } : {}),
