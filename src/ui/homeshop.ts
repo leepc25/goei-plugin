@@ -279,7 +279,10 @@ async function order(ctx: ChatContext, env: HsEnv): Promise<void> {
     if (barterId && !gave) return null;
     const o = newOrder(chat, part.item, s, gave?.name ?? '');
     if (gave) items = anchor ? sellItem(items, gave.id, anchor, `${HS_NAME} 맞교환`) : removeItem(items, gave.id, 'sell', 'store', '', { note: `${HS_NAME} 맞교환` });
-    const name = HS_BOX.name(part.item.name);
+    // 같은 이름의 상자가 이미 있으면(같은 상품을 다시 주문) 한 줄로 합쳐져 못 열게 되므로 번호를 붙인다
+    const mine = liveItemsOf(items, chat);
+    let name = HS_BOX.name(part.item.name);
+    for (let k = 2; k < 20 && mine.some((x) => x.id === itemId(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
     const paidWith = gave ? `「${gave.name}」 맞교환 (${HS_NAME})` : o.n ? `무이자 할부 ${o.n}회 (${HS_NAME})` : `${part.item.pay || '방송 특가'} (${HS_NAME})`;
     items = addItem(items, alive, { name, desc: HS_BOX.desc, icon: HS_BOX.icon, weight: part.item.weight, from: 'store', anchor, paidWith });
     o.boxId = itemId(anchor, name);
