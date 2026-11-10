@@ -1,5 +1,4 @@
 0
-- 사용자 11-10 23:05 KST 「뽑아」 → 컷F 새 세트7 방청석 동작 왼쪽·오른쪽 2회
+- 사용자 11-10 23:13 KST 「뽑아」 → 컷F 세트7 왼쪽 칸 동작, 색 떨림 보정 끔(drift_threshold 크게) 1회
 
-- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/anim7/req_L.json
-- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/anim7/req_R.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/anim7/req_L_nodrift.json

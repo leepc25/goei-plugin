@@ -1,0 +1,18 @@
+{
+ "crop_src": "game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/t7/full.png",
+ "description": "idle: the seated studio audience breathe slowly, blink, and a few turn their heads slightly, then settle back into the starting pose. The chairs, stairs, walls and background stay still in every frame: no camera movement, no zoom, no pan, no flicker.",
+ "frame_count": 16,
+ "no_background": false,
+ "enhance_prompt": false,
+ "drift_threshold": 1000000,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a seated TV studio audience in rows of red chairs, ordinary adults and uncanny beings, facing the camera",
+ "initial_pose": "sitting still in their chairs, facing the camera",
+ "box": [
+  132,
+  140,
+  388,
+  310
+ ]
+}
