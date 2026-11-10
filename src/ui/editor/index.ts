@@ -719,7 +719,9 @@ export function render(): void {
   // 다시 그려도 보던 자리를 지킨다 (2026-10-29 사용자: 값 하나 바꿀 때마다 맨 위로 튕겼다). 같은 화면(노드)일 때만 — 다른 화면으로 가면 맨 위부터
   const KEEP = ['.gw-body', '.gw-tree', '.gw-list', '.nw-groups'];
   const sameNode = lastDrawn === edUi.node;
-  const keep = sameNode ? KEEP.map((q) => root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0) : [];
+  // 왼쪽 메뉴는 다른 항목을 골라도 보던 자리 그대로 (2026-11-10 사용자: 메뉴를 고르면 왼쪽 목록이 맨 위로 튕겼다). 탭이 바뀌면 목록이 달라지니 맨 위부터
+  const sameTab = !!lastDrawn && tabOf(lastDrawn as EditorNode) === tab;
+  const keep = KEEP.map((q) => (sameNode || (sameTab && q === '.gw-tree') ? root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0 : 0));
   const act = document.activeElement as HTMLInputElement | null;
   const focusSel = sameNode && act && root.contains(act) && (act.dataset?.input || act.dataset?.change || act.getAttribute('name'))
     ? `${act.tagName.toLowerCase()}${act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]` : act.dataset?.change ? `[data-change="${CSS.escape(act.dataset.change)}"]` : `[name="${CSS.escape(act.getAttribute('name')!)}"]`}${act.dataset?.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ''}`
@@ -764,7 +766,7 @@ export function render(): void {
     if (box && !boundOnce.has(box)) { boundOnce.add(box); bindDrawer(root); }
     if (bar && !boundOnce.has(bar)) { boundOnce.add(bar); bindMbar(root, () => void run('ed-close')); }
   }
-  if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
+  KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
   syncTop();
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
