@@ -134,9 +134,12 @@ export function bindAgentTips(root: HTMLElement): void {
     // CSS 퍼센트 줄 높이는 브라우저에 따라 안 먹어서 실제 높이를 재서 넣는다
     const pc = !isPhone();
     for (const ul of root.querySelectorAll<HTMLElement>('.gx-agwall, .gx-agrows')) {
+      // 상자 높이가 나중에 바뀌어도(창 크기·위 칸 높이) 다시 잰다 (2026-11-10 사용자: 여섯 줄 아래가 애매하게 남았다 — 처음 잰 값이 그대로였다)
+      sizes?.observe(ul);
       if (!pc) ul.style.removeProperty('--agrow');
       else if (ul.classList.contains('gx-agwall')) ul.style.setProperty('--agrow', `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);
-      else ul.style.setProperty('--agrow', `${Math.max(48, Math.floor(ul.clientHeight / 6))}px`);
+      // 여섯 줄이 남는 것 없이 딱 맞게: 소수점까지 나눈다 (내림하면 최대 5px 이 남는다)
+      else ul.style.setProperty('--agrow', `${Math.max(48, Math.floor((ul.clientHeight / 6) * 100) / 100)}px`);
     }
     for (const box of root.querySelectorAll<HTMLElement>('.gx-flow')) {
       const inner = box.firstElementChild as HTMLElement | null;
@@ -172,6 +175,7 @@ export function bindAgentTips(root: HTMLElement): void {
   const schedule = () => {
     if (!queued) queued = requestAnimationFrame(measure);
   };
+  const sizes = typeof ResizeObserver === 'function' ? new ResizeObserver(schedule) : null;
   new MutationObserver(schedule).observe(root, { childList: true, subtree: true });
   window.addEventListener('resize', schedule);
   if (typeof ResizeObserver === 'function') new ResizeObserver(schedule).observe(root);
