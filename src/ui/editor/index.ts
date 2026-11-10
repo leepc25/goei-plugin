@@ -1,5 +1,6 @@
 // 세계 편집 창 (docs/설계안_세계편집.md 5장): 패널과 별도의 창. 왼쪽 트리 + 오른쪽 편집기.
 // 저장은 전부 카드 명부(Directory)로: 명부 줄(기존 dirUi 초안)과 세계 덧쓰기(edUi.over)를 한 번에 쓴다.
+import { loreCheckBox } from '../lorecheck';
 import { bindNeedFill } from '../needfill';
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
 import type { WorldOverrides } from '../../core/world/records';
@@ -48,7 +49,7 @@ const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['worl
 export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
 // 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
-const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
+const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n === 'manage:lore' ? 'set:lore' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
@@ -390,18 +391,22 @@ const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS
 /** [노드, 이름, 아이콘, 배지?, 하위 항목?]. 노드가 `label:…` 이면 누를 수 없는 소제목 줄 (설정 「기록」 아래 하위 메뉴, 2026-11-05 사용자) */
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
+const subItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true];
 const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지' : GUIDE_LABEL[g], ICONS.book];
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
     case 'set': return [{ title: '기능', items: [
       ['manage:flow', '호출 흐름', ICONS.swap],
-      ...(['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'phone', 'wiki'] as SetPage[]).map(setItem),
+      // 2026-11-10 사용자: 호출 흐름 → 로어북 호출 → 생성 공통 순으로 맨 위에. 인터넷 사이트 여섯은 「인터넷」 아래로 묶는다
+      ...(['lore', 'adv', 'screen', 'image', 'board', 'status'] as SetPage[]).map(setItem),
+      ['label:net', '인터넷', ICONS.net],
+      ...(['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm'] as SetPage[]).map(subItem),
+      ...(['phone', 'wiki'] as SetPage[]).map(setItem),
       // 가계부·소지품·상점은 한 페이지 「소지품」 (2026-11-07 사용자: 각자 설정이 적어 합침, 켜고 끄기는 따로)
       setItem('items'),
       ['label:records', '기록', ICONS.records],
-      ...(['journal', 'people', 'factions'] as SetPage[]).map((p): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p], undefined, true]),
-      ...(['lore', 'adv'] as SetPage[]).map(setItem),
+      ...(['journal', 'people', 'factions'] as SetPage[]).map(subItem),
       setItem('versus'),
     ] }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['start', '시작 화면', ICONS.idcard], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
@@ -412,7 +417,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
     // 11-09 사용자: 설치·업데이트는 하나로, 아이콘은 서로 다르게, 다음 호출 로어북은 따로(펼친 채), 이름은 무엇을 보는지 바로 알게
-    case 'manage': return [{ title: '점검', items: [['install', '설치·업데이트', ICONS.refresh], ['manage:diag', '상태 점검', ICONS.info], ['manage:lore', '다음 호출 로어북', ICONS.book], ['manage:trace', '호출 기록', ICONS.records], ['manage:log', '실패 기록', ICONS.siren], ['manage:people', '인물 기록 점검', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치·업데이트', ICONS.refresh], ['manage:diag', '상태 점검', ICONS.info], ['manage:trace', '호출 기록', ICONS.records], ['manage:log', '실패 기록', ICONS.siren], ['manage:people', '인물 기록 점검', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -447,7 +452,7 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
   items: { desc: '가계부·소지품·상점을 여기서 정해요. 상점은 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
-  lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 점검 → 「다음 호출 로어북」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
+  lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 다음 요청에 어떤 로어북이 들어가는지는 아래에서 바로 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
 };
 
@@ -482,7 +487,8 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'journal': body = feat('journal'); break;
     case 'items': body = sec('wallet') + sec('items') + sec('shop'); break;
     case 'factions': body = feat('factions'); break;
-    case 'lore': body = sec('lore'); break;
+    // 2026-11-10 사용자: 점검에 따로 있던 「다음 호출 로어북」을 여기로 합침 (고르는 설정 바로 아래에서 결과를 본다)
+    case 'lore': body = sec('lore') + (canChat ? loreCheckBox(ctx, true) : '<section class="ps-group"><h3>다음 호출 로어북</h3><p class="ps-note">채팅을 시작하면 볼 수 있어요.</p></section>'); break;
     case 'adv': body = sec('adv'); break;
     case 'update': body = sec('update'); break;
     case 'versus': body = sec('versus'); break;

@@ -28,7 +28,8 @@
 .gw .gx-x { width: 36px; height: 36px; border-radius: var(--r); font-size: 18px; }
 
 /* ── 왼쪽 열: 구역 타일 4개 + 목록. 타일과 목록 줄은 같은 높이·모서리·고른 색 ── */
-.gw-tree { grid-area: tree; overflow: auto; padding: 10px; border-right: 1px solid var(--line); background: var(--sunk); }
+/* 스크롤바 자리는 늘 비워 둔다 (2026-11-10 사용자: 목록이 긴 기능·지침과 짧은 세계·점검의 왼쪽 폭이 달라 보였다) */
+.gw-tree { grid-area: tree; overflow: auto; scrollbar-gutter: stable; padding: 10px; border-right: 1px solid var(--line); background: var(--sunk); }
 .gw-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 6px; }
 .gw-tab, .gw-tree-item { height: var(--h); border: 1px solid transparent; border-radius: var(--r); background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
 .gw-tab { display: flex; align-items: center; justify-content: center; gap: 6px; border-color: var(--line); background: var(--panel); }

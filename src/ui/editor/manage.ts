@@ -15,7 +15,6 @@ import { tracePage, traceUi } from './trace';
 import { ensureFlow, flowPage } from './flow';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
-import { loreCheckBox } from '../lorecheck';
 import { gnet } from '../gnet';
 import { phone } from '../phone';
 import { wiki } from '../wiki';
@@ -28,8 +27,8 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 
 const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `${Math.round(n / 1e3)}KB` : `${n}B`);
 
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:lore' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
-export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:lore' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
+export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
+export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
 
 /** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
 const GAME_PACK_PREFIX = 'goei:game:pack:';
@@ -261,11 +260,6 @@ export function manageConfirmPopup(): string {
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
   if (node === 'manage:backup') return backupPage(ctx, canChat);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
-  if (node === 'manage:lore') {
-    // 11-09 사용자: 「로어북 확인」은 상태 점검 안에 접혀 있을 게 아니라 따로, 펼친 채로. 이름도 무엇인지 바로 알게
-    return `<div class="gw-page gw-set">${head('', '다음 호출 로어북', '다음 본편 요청에 어떤 로어북이 들어가는지 미리 봐요. 로어북을 누가 고를지는 기능 → 로어북 호출에서 정해요.')}
-    <div class="gx-settings gw-setbody">${canChat ? loreCheckBox(ctx, true) : '<p class="ps-note">채팅을 시작하면 볼 수 있어요.</p>'}</div></div>`;
-  }
   if (node === 'manage:people') {
     return `<div class="gw-page gw-set">${head('', '인물 기록 점검', '인물 기록 갱신을 지금 돌려 보고, 최근 갱신의 입력 크기·결과·실패 이유를 봐요.')}
     <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx, canChat)}</div></div></div>`;

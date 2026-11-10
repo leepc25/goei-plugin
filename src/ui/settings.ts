@@ -10,7 +10,6 @@ import {
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
 import { advSections } from './advanced';
-import { loreCheckBox } from './lorecheck';
 import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
@@ -452,7 +451,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       ].join(''));
     })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
-    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {}, [1])}`,
+    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1])}`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0])}`,
     update: `${updateGroup(ctx)}`,
     versus: versusGroup(seg),
