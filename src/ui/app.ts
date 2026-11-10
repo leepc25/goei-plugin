@@ -1623,7 +1623,13 @@ function navHistBar(): string {
 
 function applyNav(s: NavState): void {
   tab = s.tab;
-  if (s.b !== undefined) curTab().site = isSite(s.b) ? s.b : '';
+  if (s.b !== undefined) {
+    // 사이트마다 탭은 하나, 빈 새 탭도 하나 (2026-11-10 사용자: 뒤로 가다 보면 같은 사이트 탭이 둘이 됐다) — 그 사이트(또는 빈 탭)가 다른 탭에 있으면 지금 탭을 바꾸지 않고 그 탭으로 간다
+    const site = isSite(s.b) ? s.b : '';
+    const other = br.tabs.findIndex((t, i) => i !== br.cur && t.site === site);
+    if (other >= 0) br.cur = other;
+    else curTab().site = site;
+  }
   notice = '';
   field.confirmEnd = null;
   if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list }, s.w.view === 'find' ? { query: s.w.q ?? '' } : {});
