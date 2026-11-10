@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 21:49 KST 「일단 뽑아봐」 → 컷 F 꽉 찬 방청석 세트 1 inpaint 1회
 - 사용자 11-10 21:38 KST 「2장 뽑아」 → 컷 F v13 같은 요청 2회
 - 사용자 11-10 21:28 KST 「뽑아」 → 컷 F v12 크레인 샷 참고X 1회
 - 사용자 11-10 21:23 KST 「걍 새로 뽑아 … 참고 그림 넣지 말고」 → 컷 F v11 참고X 1회
@@ -411,3 +412,4 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v12_empty_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v13_empty_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v13_empty_req.json
+- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_spot.py 실행
