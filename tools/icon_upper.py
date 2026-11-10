@@ -74,6 +74,42 @@ def main():
                 if KO.search(k):
                     plain_named.setdefault(k, r)
     upper = read_upper()
+    # 그림 줄에 덧붙이는 것: 몸통 말(_head.txt)·다른 이름(_keywords.txt)·종류 옮기기(_kind.txt)
+    def pairs(fname):
+        path = os.path.join(UPPER, fname)
+        if not os.path.exists(path):
+            return
+        for line in open(path, encoding='utf-8'):
+            line = line.strip()
+            if line and not line.startswith('#') and ':' in line:
+                a, b = line.split(':', 1)
+                yield a.strip(), [x.strip() for x in b.split(',') if x.strip()]
+    extra = 0
+    for fname, col in (('_head.txt', 'head'), ('_keywords.txt', 'keywords')):
+        for nm, words in pairs(fname) or []:
+            if nm not in by_name:
+                problems[f'{fname} 의 이름이 그림 표에 없음'].append(nm)
+            for r in by_name.get(nm, []):
+                for w in words:
+                    if w not in r.setdefault(col, []):
+                        r[col].append(w)
+                        extra += 1
+    for nm, words in pairs('_kind.txt') or []:
+        if nm not in by_name:
+            problems['_kind.txt 의 이름이 그림 표에 없음'].append(nm)
+        for r in by_name.get(nm, []):
+            if r['kind'] != words[0]:
+                r['kind'] = words[0]
+                extra += 1
+    plain_named.clear()
+    for r in rows:
+        if r['kind'] not in SPECIAL:
+            plain_named.setdefault(r['name'], r)
+    for r in rows:
+        if r['kind'] not in SPECIAL:
+            for k in r.get('keywords') or []:
+                if KO.search(k):
+                    plain_named.setdefault(k, r)
     rep_name = read_rep()
     problems = collections.defaultdict(list)
     added = 0
@@ -104,6 +140,55 @@ def main():
                             up.append(u)
                             added += 1
 
+    # 이름이 여러 낱말인 그림: 끝 낱말이 윗말 표의 이름·윗말이면 그 윗말을 물려받고, 아니면 _tail.txt 의 끝 낱말 줄
+    up_of_name = {}   # 윗말 표의 이름 → [가까운, 넓은]
+    wide_of = {}      # 윗말 → 넓은 윗말
+    for kind, wide, near, members in upper:
+        if wide:
+            wide_of.setdefault(near, wide)
+        for name, _ in members:
+            up_of_name.setdefault(name, [u for u in (near, wide) if u])
+    tails = {}
+    tpath = os.path.join(UPPER, '_tail.txt')
+    if os.path.exists(tpath):
+        for line in open(tpath, encoding='utf-8'):
+            line = line.strip()
+            if not line or line.startswith('#') or ':' not in line:
+                continue
+            left, right = line.split(':', 1)
+            ups = [x.strip() for x in left.split('>')]
+            wide, near = (ups[0], ups[1]) if len(ups) == 2 else (None, ups[0])
+            for w in right.split():
+                tails.setdefault(w, [u for u in (near, wide) if u])
+    known_upper = set(members_of) | set(wide_of) | set(wide_of.values())
+    none = set()
+    npath = os.path.join(UPPER, '_none.txt')
+    if os.path.exists(npath):
+        none = {l.strip() for l in open(npath, encoding='utf-8') if l.strip() and not l.startswith('#')}
+    for r in rows:
+        if id(r) in seen or ' ' not in r['name']:
+            continue
+        w = r['name'].split()[-1]
+        if w in tails:
+            ups = tails[w]
+        elif w in up_of_name:
+            ups = [w] + up_of_name[w]
+        elif w in known_upper or w in rep or w in by_name:
+            ups = [w] + ([wide_of[w]] if w in wide_of else [])
+        elif r['name'] in none:
+            continue
+        else:
+            problems['윗말 없는 여러 낱말 이름'].append(f'{r["kind"]}: {r["name"]}')
+            continue
+        seen.add(id(r))
+        up = r.setdefault('up', [])
+        for u in ups[:2]:
+            if u != r['name']:
+                members_of[u].append((r, False))
+                if u not in up:
+                    up.append(u)
+                    added += 1
+
     # 윗말마다 대표: ① 이름이 그 말 그대로인 보통 그림 ② 표에 * 로 찍은 것 ③ 이미 정해진 것 ④ 없음(검사에 나옴)
     rep_set = 0
     for u, ms in members_of.items():
@@ -117,6 +202,8 @@ def main():
                 problems['대표 표(_rep.txt)의 이름이 그림 표에 없음'].append(f'{u}: {rep_name[u]}')
             if star:
                 want = star[0]['file']
+            elif not named and u in by_name:  # 그 말 그대로인 그림이 성인·신체·괴이 종류뿐이면 그 그림 (딜도·귀)
+                want = by_name[u][0]['file']
             elif named:
                 want = sorted(named, key=lambda r: r['kind'] in SPECIAL)[0]['file']
         if want and rep.get(u) != want:
@@ -159,7 +246,8 @@ def main():
         print(f'\n■ {k} — {len(v)}')
         for x in v[:400]:
             print('  ', x)
-    print(f'\n윗말 {len(members_of)}개, up 칸에 적은 윗말 {added}개, 대표 지정 {rep_set}개')
+    print(f'\n줄에 덧붙인 것 {extra}개')
+    print(f'윗말 {len(members_of)}개, up 칸에 적은 윗말 {added}개, 대표 지정 {rep_set}개')
     if apply:
         json.dump(table, open(TABLE, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
         print('표에 썼음:', TABLE)

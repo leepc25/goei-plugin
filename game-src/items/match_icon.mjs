@@ -321,7 +321,7 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
       // 대표 그림도 그 종류 것만 (릴리스 점검 11-09)
       const files = new Set(sub.map((r) => r.file));
       const subReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => files.has(f)));
-      x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files } : { head: () => null, frag: () => null, files };
+      x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files, special: SPECIAL_KIND.has(k) } : { head: () => null, frag: () => null, files, special: SPECIAL_KIND.has(k) };
       kinds.set(k, x);
     }
     return x;
@@ -337,7 +337,9 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     }
     if (rank(hn) === 3 && (!K || K.files.has(hn.file))) return hit(hn);
     if (K) {
-      const ki = word ? K.head(word) : null, ke = en ? K.head(en) : null, kn = name ? K.head(name) : null;
+      // 종류 안에서 「~도구 → ~기」로 다시 찾으라는 답(retry)은 그림이 아니다 (도구/주방도구 가 상자로 가던 것)
+      const kh = (t) => { const x = K.head(t); return x && x.file ? x : null; };
+      const ki = word ? kh(word) : null, ke = en ? kh(en) : null, kn = name ? kh(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
       // 종류 안에서 영어 낱말의 몸통만 맞은 것(novel → 성인 소설, medicine → 소화제)은 가장 약하다: 한글로 전체에서 찾은 것·앞머리가 같은 말이 먼저
       if (k && k === ke && rank(ke) === 1 && !ki && !kn) {
@@ -352,7 +354,8 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
       // 다만 전체에 이름이 그 말 그대로인 그림이 있으면 그것 (도구/가위 → 뼈 절단 가위 가 아니라 가위).
       const lit = (h, kx) => !!kx && ((rank(kx) < 3 && kx.hit === 0 && !!kx.more && rank(h) === 3) || (!kx.kw && !!h?.kw));
       const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
-      if (k && same && same.file !== k.file) return hit(same);
+      // 성인·신체로 적었으면 그 종류 안 그림이 먼저 (성인/집게 → 고기 집게 가 아니라 니플 클램프)
+      if (k && same && same.file !== k.file && !K.special) return hit(same);
       if (k) return hit(k);
       // 종류 안에 없으면 전체에서 물건말(한글 → 영어) → 이름. 없으면 종류 대표 (2026-11-10)
       // 영어 낱말의 몸통만 맞은 것은 맨 뒤 (한약/herbal medicine → 감기약 이 아니라 한약 봉지)
