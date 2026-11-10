@@ -2,84 +2,84 @@
  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
  "items": [
   {
-   "ko": "착즙기",
+   "ko": "서큘레이터",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a slow juicer, front view, tall white body with a clear plastic hopper on top, a spout in front with a glass of orange juice under it. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small air circulator fan, front view, round fan head with a spiral grille on a short round stand, white body. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "구강세정기",
+   "ko": "제습기",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a water flosser, front view, small white base with a clear water tank and a slim handle with a thin nozzle standing beside it. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable dehumidifier, front view, tall white rounded box with a grille on top and a pull-out clear water tank at the bottom. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "사운드바",
+   "ko": "평면TV",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a long soundbar speaker, front view, very thin black horizontal bar about six times wider than tall with a fabric grille front. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a modern flat screen television, front view, thin black widescreen panel with a dark glossy screen on a small center stand. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "제빵기",
+   "ko": "의류관리기",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bread maker machine, three-quarter view, white boxy machine with a small window in the lid showing a golden loaf inside. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a clothing care steamer cabinet, front view, tall slim dark mirror-glass wardrobe-like machine with a long vertical handle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "신발건조기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shoe dryer, front view, small white base with two upright warm prongs holding a pair of sneakers. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "냉동고",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chest freezer, three-quarter view, low wide white box with a top lid and a handle on the front edge. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "와인셀러",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small wine cooler fridge, front view, black cabinet with a glass door showing rows of wine bottles lying on racks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "보일러",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wall-mounted home gas boiler, front view, white box with a small digital panel and pipes coming out the bottom. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "온수기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric water heater tank, front view, white upright cylinder with a small dial and two pipes at the bottom. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "실링팬",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a ceiling fan, front view from slightly below, four long wooden blades around a central motor with a light dome underneath. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "냉풍기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an evaporative air cooler, front view, tall white box on caster wheels with a front louver grille and a small water tank window. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "에어워셔",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an air washer humidifier, three-quarter view, rounded white box with a clear water tray showing rotating discs inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "연수기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shower water softener filter, side view, a clear plastic cylinder filled with small white beads attached to a shower hose. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "걸레탈수기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a mop bucket with a wringer, three-quarter view, blue plastic bucket with a yellow press wringer on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
    "ko": "와플메이커",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a waffle maker, three-quarter view, black round clamshell iron opened slightly, a golden grid waffle inside. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a waffle maker, three-quarter view, black round clamshell iron opened slightly, a golden grid waffle inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "전기 그릴",
+   "ko": "CD플레이어",
    "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric tabletop grill, three-quarter top view, flat rectangular black ribbed grill plate on a low base with a cord, two strips of meat on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "음식물처리기",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop food waste dryer bin, front view, small white rounded cylinder with a hinged lid on top. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "비데",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bidet toilet seat attachment, top view, white toilet seat with a control panel bulge on the right side. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "전자피아노",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable digital keyboard piano, three-quarter view, long black body with a row of white and black keys and a few buttons, no stand. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "모기퇴치기",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric mosquito zapper lamp, front view, small cylinder lantern with a glowing purple-blue light behind a black wire grid cage, a hanging loop on top. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "인터폰",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an apartment video intercom panel, front view, white rectangular wall unit with a small dark screen and a row of round buttons. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "SSD",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small solid state drive, three-quarter view, thin dark grey metal rectangular card, a connector edge on one short side. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "다마고치",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small egg-shaped virtual pet keychain toy, front view, glossy pastel pink plastic egg with a tiny square pixel screen and three small buttons below, a short chain loop on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "CD 플레이어",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable CD player, three-quarter top view, round silver disc-shaped player with a clear lid showing a CD inside, earphones coiled beside it. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "정수기",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop water purifier, front view, slim white upright body with a small chrome water tap sticking out in front and a drip tray at the base. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
-  },
-  {
-   "ko": "태양광 패널",
-   "kind": "device",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small portable solar panel, three-quarter view, flat dark blue grid of square cells in a thin aluminum frame with a folding kickstand. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable CD player, three-quarter top view, round silver disc-shaped player with a clear lid showing a CD inside, earphones coiled beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   }
  ]
 }

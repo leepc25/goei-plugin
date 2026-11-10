@@ -2,84 +2,84 @@
  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
  "items": [
   {
-   "ko": "건강즙",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few Korean health extract pouches, front view, small dark brown soft foil drink pouches with a tear notch at the top corner, overlapping. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "다이어트약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a white plastic supplement pill bottle with a green screw cap, front view, two small oval tablets beside its base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "녹즙",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small bottle of green vegetable juice, front view, a clear plastic bottle filled with bright green juice and a green cap. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "콜라겐",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small glass drink ampoule bottle of collagen, front view, slim bottle three times taller than wide, pale pink liquid, a gold screw cap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "오렌지",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a single orange fruit, front view, round bright orange citrus with a small green leaf on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "유산균",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small paper box of probiotic powder sticks, three-quarter view, three thin long stick sachets sticking out of the open top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "망고",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a ripe mango, three-quarter view, oval fruit with red and yellow skin. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "오메가3",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dark brown supplement bottle with a white cap, front view, a few golden transparent soft gel capsules in front of it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "보드카",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a vodka bottle, front view, tall clear glass bottle with clear liquid and a silver cap. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "알코올솜",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few alcohol swab pads, front view, small square white foil packets, one torn open showing a damp white cotton pad. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "츄르",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few lickable cat treat sticks, front view, three thin long soft squeeze tube sachets in pastel colors. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "기침약시럽",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cough syrup bottle, front view, amber glass bottle with dark red syrup and a small clear measuring cup on the cap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "개껌",
-   "kind": "food",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dog chew bone, three-quarter view, a white knotted rawhide bone. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "위장약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few squeeze-type liquid stomach medicine sachets, front view, small soft white rectangular pouches with a tear corner. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "이젤",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wooden painting easel, front view, A-frame tripod stand of light wood holding a small blank white canvas. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "관장약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a disposable enema bottle, front view, small soft squeezable plastic bottle with a long thin capped nozzle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "해먹",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rope hammock, front view, curved woven net of beige cotton rope hanging between two metal rings at the ends. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "좌약",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a strip of suppositories, front view, a short row of white bullet-shaped suppositories sealed in a clear plastic blister strip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "뜰채",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a fishing landing net, side view, long handle with a round frame and a deep dark green mesh net. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "멜라토닌",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small purple supplement bottle with a white cap, front view, a few small round tablets in front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "바벨",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a short barbell, side view, a straight steel bar with two black weight plates on each end. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "글루코사민",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a large white joint supplement tub, front view, a few big oval white tablets in front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "악력기",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hand grip strengthener, front view, two black foam handles joined at the top by a coiled steel spring, V shape. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "루테인",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small yellow supplement box with a blister sheet of orange soft capsules half pulled out, front view. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "짐볼",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an exercise ball, front view, big round smooth blue rubber ball. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "밀크씨슬",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a green supplement bottle, front view, a small dried thistle flower beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "스케이트보드",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a skateboard, three-quarter view, wooden deck with black grip tape on top and four small white wheels. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "비오틴",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small pink supplement bottle with a gold cap, front view, a few tiny pink tablets. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "폼롤러",
-   "kind": "tool",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a foam roller for exercise, three-quarter view, a cylinder about three times longer than wide, blue foam with a bumpy textured surface. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "로얄제리",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small glass jar of royal jelly, front view, creamy pale yellow paste inside with a gold lid. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   },
   {
-   "ko": "다육이",
-   "kind": "misc",
-   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small succulent plant in a tiny pot, front view, a plump green rosette succulent in a little white ceramic pot. The surface is plain color, completely blank with no label and no writing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+   "ko": "녹용액",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few Korean deer antler extract pouches, front view, small dark red foil drink pouches, a small piece of deer antler beside them. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
   }
  ]
 }
