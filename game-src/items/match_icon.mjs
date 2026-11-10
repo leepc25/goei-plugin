@@ -133,6 +133,8 @@ function headOf(s) {
 function sameHead(q, p, pre = false) {
   if (q.head === p.head) return { qPre: '', pPre: '' };
   if (!q.ko || !p.ko) return null;
+  // 표의 말이 「부채 도구」처럼 물건이 무엇인지 말하지 않는 말로 끝나면 그 끝 말로는 맞추지 않는다 (2026-11-10: 낚시도구·청소도구 → 부채)
+  if (GENERIC.has(p.head)) return null;
   // 한국어 붙여 쓰기: 한쪽 몸통이 다른 쪽 끝을 두 글자 넘게 덮으면 같은 몸통 (손목시계 ↔ 시계, 표본병 ↔ 괴이 표본 병)
   if (p.head.length >= 2 && q.head.endsWith(p.head)) return { qPre: q.head.slice(0, -p.head.length), pPre: '' };
   if (q.head.length >= 2 && p.head.endsWith(q.head)) return { qPre: '', pPre: p.head.slice(0, -q.head.length) };
@@ -171,7 +173,16 @@ function makeHeadIndex(rows, reps, pre = false) {
   };
   /** q → { file, s, hit, plain } | null (몸통이 같은 줄 중 가장 나은 것) */
   return function find(text) {
-    const q = headOf(text);
+    let q = headOf(text);
+    // 붙여 쓴 「낚시도구·탐지장치」는 「낚시 도구」로 떼어 본다 (표에 그 말 그대로 있으면 그대로: 구급상자)
+    if (q && q.ko && !GENERIC.has(q.head)) {
+      const g = [...GENERIC].find((x) => /[가-힣]/.test(x) && q.head.length > x.length && q.head.endsWith(x));
+      if (g) {
+        const whole = findIn(q, false);
+        if (whole && whole.s >= 1e6) return whole;
+        q = headOf([...q.mods, q.head.slice(0, -g.length), g].join(' '));
+      }
+    }
     if (q && GENERIC.has(q.head) && q.mods.length) {
       // 키트·세트·장치처럼 물건이 무엇인지를 말하지 않는 몸통: 통째로 맞는 그림이 있으면 그것, 없으면 앞말(향초 세트 → 향초)로. 대표 그림은 쓰지 않음
       // 표의 말과 똑같으면(구급 상자·선물 상자) 그것. 아니면 뒤에 붙은 그런 말을 다 떼고(낚시 도구 세트 → 낚시) 찾고, 그래도 없으면 통째로 맞춘 것
@@ -181,7 +192,8 @@ function makeHeadIndex(rows, reps, pre = false) {
       while (words.length > 1 && GENERIC.has(words[words.length - 1])) words.pop();
       if (words.length === q.words.length || GENERIC.has(words[words.length - 1])) return null;
       const rest = findIn(headOf(words.join(' ')), true);
-      if (rest && (rest.hit || rest.plain)) return rest;
+      // 군말을 떼고 찾은 것은 「그 말 그대로」가 아니다 (약상자 → 약 → 진통제 가 대체 말 「약상자 → 구급상자」를 막지 않게)
+      if (rest && (rest.hit || rest.plain)) return { ...rest, kw: false, loose: true };
       // 장치·기계·도구 = 「~기」 (경보 장치 → 경보기, 탐지 장치 → 탐지기)
       if (MACHINE.has(q.head) && /[가-힣]$/.test(words[words.length - 1])) return { retry: [...words.slice(0, -1), words[words.length - 1] + '기'].join(' ') };
       return null;
@@ -192,17 +204,17 @@ function makeHeadIndex(rows, reps, pre = false) {
     if (!q) return null;
     // 말 그 자체가 대표 그림의 몸통 말이면 대표 (방패 → 진압 방패, 거울 → 거울)
     const r = reps[q.words.join(' ')];
-    if (r) return { file: r, s: 1e9, hit: 1, plain: true };
+    if (r) return { file: r, s: 1e9, hit: 1, plain: true, kw: !!items.find((it) => it.file === r)?.ps.some((p) => p.kw && p.joined === q.joined) };
     let best = null;
     for (const it of items) {
       let top = null;
       for (const p of it.ps) {
         // 표 줄 말이 물건 말과 붙여 쓰기만 다르면 그대로 (sd카드 ↔ sd 카드)
-        if (p.joined === q.joined) { top = { s: 1e6, hit: 1, plain: true }; break; }
+        if (p.joined === q.joined) { top = { s: 1e6, hit: 1, plain: true, kw: p.kw }; break; }
         const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
-        if (!top || m.s > top.s) top = m;
+        if (!top || m.s > top.s) top = { ...m, more: !!h.qPre || q.mods.length > 0 };
       }
       if (!top) continue;
       const isRep = reps[q.head] === it.file ? 1 : 0;
@@ -251,7 +263,7 @@ export function parseIconAliases(text) {
   }
   return out;
 }
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '알 → 계란', '치마 → 스커트', '하이라이터 → 형광펜', '다마고치 → 게임기', '인라인 → 인라인 스케이트', '선스틱 → 선크림', '곱창밴드 → 머리끈', '렌즈케이스 → 콘택트렌즈 통', '콘택트렌즈 → 콘택트렌즈 통', '약상자 → 구급상자', '나이프 → 접이식 칼', '정원가위 → 원예 가위', '전지가위 → 원예 가위', '간식 → 과자', '온수매트 → 전기장판', '종이가방 → 쇼핑백', '여행가방 → 캐리어', '햇반 → 즉석밥', '링거팩 → 링거', '인슐린 → 인슐린 펜', 'DVD → CD', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
 export function setIconAliases(text) { aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT); }
 function aliased(text) {
@@ -266,16 +278,37 @@ function aliased(text) {
   if (aliases[q.words[idx]]) return [...q.words.slice(0, idx), aliases[q.words[idx]], ...q.words.slice(idx + 1)].join(' ');
   return n;
 }
+/** 전체 찾기에서 빼는 종류 (옷/후드 → 본디지 마스크, 음식/알 → 고환). 괴이 그림은 이 세계의 보통 물건(가면·표본 병)이기도 해서 빼지 않는다 */
+const SPECIAL_KIND = new Set(['adult', 'body']);
 const KIND_MIN = 0.25;
 
 /** rows: [{ keywords?, phrases, file, kind? }], rep: 몸통 말 → 대표 그림, opts.base: 종류 → 대표 그림 → match(name, icon) → { file, score } | null */
 export function makeIconIndex(rows, rep = {}, opts = {}) {
   const reps = {};
   for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
-  const head = makeHeadIndex(rows, reps);
-  const frag = makeFragIndex(rows, reps);
+  // 전체에서 찾을 때는 보통 물건 그림만 본다 (2026-11-10 사용자: 보드게임 → 성인 보드게임, DVD → 성인 DVD, 케이지 → 정조 케이지 처럼 새지 않게).
+  // 성인·신체 그림은 모델이 그 종류로 적었거나(종류 안 찾기), 종류를 안 적었고 이름이 그 그림의 이름 그대로일 때만
+  const plainRows = rows.filter((r) => !SPECIAL_KIND.has(r.kind ?? ''));
+  const plainFiles = new Set(plainRows.map((r) => r.file));
+  const plainReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => plainFiles.has(f)));
+  const special = new Map();
+  for (const r of rows) {
+    if (!SPECIAL_KIND.has(r.kind ?? '')) continue;
+    for (const k of r.keywords ?? []) {
+      const j = normIcon(k).replace(/ /g, '');
+      if (j && !special.has(j)) special.set(j, r.file);
+    }
+  }
+  const headPlain = makeHeadIndex(plainRows, plainReps);
+  const head = (t, sp = true) => {
+    const h = headPlain(t);
+    if (!sp || (h && h.s >= 1e6)) return h;
+    const f = special.get(normIcon(t).replace(/ /g, ''));
+    return f ? { file: f, s: 1e6, hit: 1, plain: true, isRep: 0, name: 0, kw: true } : h;
+  };
+  const frag = makeFragIndex(plainRows, plainReps);
   // 마지막 길: 앞머리가 같은 말 (머그 → 머그컵). 연어 마켓 제목 매칭(strict)에서는 안 쓴다 (은장 → 은장도)
-  const headPre = makeHeadIndex(rows, reps, true);
+  const headPre = makeHeadIndex(plainRows, plainReps, true);
   const pre = (t) => { const h = t ? headPre(t) : null; return h && h.file ? h : null; };
   const kinds = new Map();
   const kindIndex = (k) => {
@@ -293,7 +326,7 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   const rank = (h) => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
   const hit = (h) => (h ? { file: h.file, score: 1 } : null);
   const core = (name, word, en, K, strict) => {
-    const hi = word ? head(word) : null, he = en ? head(en) : null, hn = name ? head(name) : null;
+    const hi = word ? head(word, !K) : null, he = en ? head(en, !K) : null, hn = name ? head(name, !K) : null;
     if (hi?.retry || hn?.retry) {
       const ok = (!hi?.retry && hi) || (!hn?.retry && hn);
       if (ok) return hit(ok);
@@ -303,10 +336,27 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     if (K) {
       const ki = word ? K.head(word) : null, ke = en ? K.head(en) : null, kn = name ? K.head(name) : null;
       const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
+      // 종류 안에서 영어 낱말의 몸통만 맞은 것(novel → 성인 소설, medicine → 소화제)은 가장 약하다: 한글로 전체에서 찾은 것·앞머리가 같은 말이 먼저
+      if (k && k === ke && rank(ke) === 1 && !ki && !kn) {
+        const ko = (hi && hi.file ? hi : null) || (hn && hn.file ? hn : null) || (strict ? null : pre(word) || pre(name));
+        if (ko) return hit(ko);
+        const kf = frag(name, word);
+        if (kf) return kf;
+      }
+      // 같은 말이 전체에서는 그대로 맞는데 종류 안에서는 덜 맞으면 전체 것 (2026-11-10 사용자: 도구/요가매트 → 커터 매트 가 아니라 요가 매트).
+      // 그 말이 종류 안에 아예 없으면 종류 안 그림 그대로 (괴이/돌멩이 「이상한 돌」 → 눈 달린 돌)
+      // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이).
+      // 다만 전체에 이름이 그 말 그대로인 그림이 있으면 그것 (도구/가위 → 뼈 절단 가위 가 아니라 가위)
+      const lit = (h, kx) => !!kx && ((rank(kx) < 3 && kx.hit === 0 && !!kx.more && rank(h) === 3) || (!kx.kw && !!h?.kw));
+      const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
+      if (k && same && same.file !== k.file) return hit(same);
       if (k) return hit(k);
       // 종류 안에 없으면 전체에서 물건말(한글 → 영어) → 이름. 없으면 종류 대표 (2026-11-10)
-      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || he || hn;
-      return hit(g && g.file ? g : strict ? null : pre(word) || pre(name));
+      // 영어 낱말의 몸통만 맞은 것은 맨 뒤 (한약/herbal medicine → 감기약 이 아니라 한약 봉지)
+      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || hn;
+      if (g && g.file) return hit(g);
+      const soft = strict ? null : hit(pre(word) || pre(name)) || frag(name, word);
+      return soft || (he && he.file ? hit(he) : null);
     }
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
     const h = koName || rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
@@ -316,15 +366,13 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   };
   return (name0, icon, strict) => {
     const { kind, word: w0, en } = splitIconWord(icon);
-    const keep = (t) => { const n = normIcon(t); return !!n && rank(head(n)) === 3; }; // 표에 그대로 있는 말은 대체하지 않는다
+    const K = kind ? kindIndex(kind) : null;
+    const keep = (t) => { const n = normIcon(t); if (!n) return false; const h = head(n, !kind); return (rank(h) === 3 && !!h.kw) || (!!K && ((x) => rank(x) === 3 && !x.loose)(K.head(n))); }; // 표(전체는 이름, 적은 종류 안은 몸통 말까지)에 그대로 있는 말은 대체하지 않는다
     const name = keep(name0) ? normIcon(name0) : aliased(name0);
     const word = keep(w0) ? normIcon(w0) : aliased(w0);
-    const K = kind ? kindIndex(kind) : null;
     const found = core(name, word, normIcon(en), K, !!strict);
     if (found) return found;
-    if (!K) return null;
-    const base = opts.base?.[kind];
-    return base ? { file: base, score: 0 } : null;
+    return null; // 못 찾으면 상자 (종류 대표 그림 없앰, 2026-11-10 사용자)
   };
 }
 

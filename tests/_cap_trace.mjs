@@ -1,0 +1,18 @@
+import { boot, launch, loadFixture, openEditor, openWin, sleep } from './qc-settings-harness.mjs';
+const fx = loadFixture(process.argv[2]);
+const browser = await launch();
+const now = new Date().toISOString();
+const turn = { id: 't1', at: now, main: { at: now, shape: [1,2,3,4].map((i) => ({ role: i % 2 ? 'system' : 'user', chars: 101 })), tail: [1,2,3,4].map((i) => ({ role: i % 2 ? 'system' : 'user', content: `메시지 ${i} ` + '내용입니다. '.repeat(14) })), failed: [], totalChars: 404 }, reply: { at: now, text: '본편 응답 글', chars: 7 }, calls: [{ label: '갱신기', at: now, ms: 1200, model: 'aux', ok: true, request: 'system: 요청 글', requestChars: 10, response: '{"ok":true}', responseChars: 11, phase: 'after' }] };
+const chat = { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_anomaly_on: '1' } };
+const { page } = await boot(browser, fx, chat, { width: 1100, height: 900, touch: false }, { store: { 'p:goei-trace': JSON.stringify([turn]) } });
+await openWin(page);
+await page.evaluate(() => document.querySelector('.gw [data-action="ed-close"]')?.click());
+await openEditor(page, 'manage:trace');
+await sleep(500);
+await page.evaluate(() => { for (const b of document.querySelectorAll('.gw .gw-flow-top .gx-mini')) if (/펼치기|보기/.test(b.textContent)) b.click(); });
+await sleep(700);
+console.log(JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('.gw .gw-flow-msg')].slice(0,1).map((m) => { const a = m.getBoundingClientRect(), b = m.querySelector('.gw-copy').getBoundingClientRect(); return { top: b.top - a.top, bottom: a.bottom - b.bottom, right: a.right - b.right, h: a.height }; }))));
+const r = await page.evaluate(() => { const b = document.querySelector('.gw .gw-flow-card').getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height }; });
+await page.evaluate(() => { document.documentElement.style.zoom = '1'; });
+await page.screenshot({ path: process.argv[3], clip: r, scale: 'device' });
+await browser.close();
