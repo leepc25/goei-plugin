@@ -1,0 +1,18 @@
+{
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v9face2_nowhite3.png",
+ "box": [
+  0,
+  0,
+  256,
+  256
+ ],
+ "frame_count": 16,
+ "no_background": true,
+ "enhance_prompt": false,
+ "drift_threshold": 0,
+ "view": "side",
+ "direction": "south",
+ "subject_description": "a TV home shopping host shown from the chest up, black suit, white shirt, dark red tie, white made-up face, completely black eyes with no whites, late thirties with forehead wrinkles, tiny clip-on microphone on the lapel",
+ "initial_pose": "body turned three quarters to the right, head facing the camera straight on, completely black eyes staring straight into the camera, both hands raised in front of the chest with the fingertips touching, closed-lip smile",
+ "description": "keeps the same smile and stares at the camera while thick black liquid slowly wells up in his black eyes and runs down his white cheeks in long streaks; he does not notice it and keeps smiling; then the streaks fade away as he settles back into the starting pose The shoulders stay almost still and never move sideways; the whole body and both hands stay inside the frame."
+}

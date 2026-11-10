@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 15:24 KST 「이제 뽑아」 → 컷 B 동작 19개를 새 기본(얼굴 정면·흰자 지움 nowhite3)으로 다시 19회
 - 사용자 11-10 15:06 KST 「뽑아」 → v9 얼굴 정면 고치기 2판(30대 후반·주름·큰 검은 눈동자·배경 투명) 1회
 - 사용자 11-10 14:58 KST 「그렇게 하나 뽑고 … 2장 한번에」 → v12(v9 참고·정면 요청문) 1회 + v9 얼굴만 정면 고치기(inpaint) 1회
 - 사용자 11-10 14:55 KST 「뽑아」 → 컷 B 진행자 기본 상태 v11(v10 크게, 머리 약 110px) 1회
@@ -352,3 +353,22 @@
 - 사용: /home/user/goei-plugin/tools/pixellab/inpaint_spot.py 실행
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v12_req.json
 - 사용: /home/user/goei-plugin/tools/pixellab/inpaint_spot_nobg.py 실행
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_angry_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_count_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_cold_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_grin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_gape_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_excited_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_flip_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_blacktears_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_idle_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_amazed_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_laugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_silentlaugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_spin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_stare_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_talk_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_tilt_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_twitch_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_urgent_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB2_whisper_req.json
