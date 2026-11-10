@@ -1,5 +1,5 @@
 {
- "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v5.png",
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v8.png",
  "box": [
   0,
   0,
@@ -13,6 +13,6 @@
  "view": "side",
  "direction": "south",
  "subject_description": "a TV home shopping host shown from the chest up, black suit, white shirt, dark red tie, white made-up face, large black eyes, tiny clip-on microphone on the lapel",
- "initial_pose": "turned three-quarters to the right, leaning slightly toward the camera, face toward the camera, both hands in front of the chest with fingers loosely laced, closed-lip smile",
- "description": "keeps smiling at the camera while the head slowly tilts to one side, further and further, far past a natural angle, the neck bending unnaturally, the smile never changing and the eyes never blinking; then the head snaps back upright in one sudden move and settles into the starting pose"
+ "initial_pose": "facing the camera, both hands raised in front of the chest with the fingertips touching, closed-lip smile",
+ "description": "keeps smiling at the camera while the head slowly tilts to one side, further and further, far past a natural angle, the neck bending unnaturally, the smile never changing and the eyes never blinking; then the head snaps back upright in one sudden move and settles into the starting pose The shoulders stay almost still and never move sideways; the whole body and both hands stay inside the frame."
 }
