@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 11:56 KST 「일단 배경부터 뽑아봐」 → 컷 B 배경판(cutB_plate_v2) 1회
 - 사용자 11-10 09:28 KST 「뽑아」 → 매진임박(urgent3)·놀람(amazed2) 2회
 - 사용자 11-10 02:34 KST 「다시 뽑을거 뽑아 지금」 → 매진 임박·할부 세기·대기 다시 3회
 - 사용자 11-10 02:11 KST 「이런식으로 진행자 동작 전체 다 뽑아… 한번에 요청 넣어」 → 진행자 동작 9회(excited·urgent·count·amazed·whisper·laugh·cold·angry·idle)
@@ -308,3 +309,4 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_count2_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_urgent3_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_amazed2_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_plate_v2_req.json
