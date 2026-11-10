@@ -116,6 +116,11 @@ export function useBoardSite(site: BoardSite): void {
   uiSite = site;
 }
 export const boardSiteNow = (): BoardSite => uiSite;
+/** 사이트마다 다른 말: 연어 마켓은 쪽지가 아니라 채팅 (2026-11-10 사용자: 「채팅하기」인데 창은 쪽지함이었다) */
+const dmW = () => (uiSite === 'sm' ? '채팅' : '쪽지');
+const dmBox = () => (uiSite === 'sm' ? '내 채팅' : '쪽지함');
+/** 을/를 */
+const dmWo = () => (uiSite === 'sm' ? '채팅을' : '쪽지를');
 /** 그 사이트의 화면 상태: 지금 보고 있는 사이트면 gnet, 아니면 저장해 둔 것 (11-09 점검: 다른 사이트 자동 새로고침이 보고 있던 괴담넷 글을 닫고 읽음 처리하던 것) */
 function uiFor(site: BoardSite): GnetUi {
   if (site === uiSite) return gnet;
@@ -158,7 +163,7 @@ function withVars(chat: Chat, vars: Record<string, string>): Chat {
 /** 선쪽지 반영 (실패해도 본 결과는 둔다). 알림 문장을 돌려준다 */
 function saveIncoming(chat: Chat, st: GState, rows: unknown, plan: IncomingPlan, post?: GPost): { vars: Record<string, string>; note: string } {
   try {
-    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: '새 쪽지가 왔어요.' };
+    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: uiSite === 'sm' ? '새 채팅이 왔어요.' : '새 쪽지가 왔어요.' };
     return { vars: {}, note: '' };
   } catch (error) {
     return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
@@ -384,7 +389,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
   }
   const me = userNick(ctx.chat.scriptstate);
   if (nick === me) {
-    gnet.notice = '나에게는 쪽지를 보낼 수 없어요.';
+    gnet.notice = `나에게는 ${dmWo()} 보낼 수 없어요.`;
     return env.render();
   }
   const saved = await upd(ctx, (chat) => {
@@ -419,7 +424,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
         return writeGnet(chat, cur);
       }).catch(() => null);
       if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
-      throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
+      throw new GnetError(`${dmWo()} 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
@@ -505,8 +510,8 @@ function composeView(c: Compose, busy: boolean): string {
   const to = c.kind === 'newdm'
     ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc(gnet.to)}" aria-label="받는 사람">`
     : c.kind === 'dm' ? `<p class="gn-to">받는 사람 <b>${esc(c.nick)}</b></p>` : '';
-  const ph = post ? '올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)' : gnet.attach.length ? '함께 보낼 글 (선택)' : '쪽지 내용';
-  return `<div class="ph-form gn-cpane">${paneHead(post ? '새 글' : '새 쪽지', c.kind === 'dm' ? esc(c.label) : '')}
+  const ph = post ? '올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)' : gnet.attach.length ? '함께 보낼 글 (선택)' : `${dmW()} 내용`;
+  return `<div class="ph-form gn-cpane">${paneHead(post ? '새 글' : `새 ${dmW()}`, c.kind === 'dm' ? esc(c.label) : '')}
     <div class="ph-form-body">${to}
       <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc(ph)}" aria-label="내용">${esc(gnet.draft)}</textarea>
       ${attachEditor('gn', gnet.attach, GN_KINDS, busy)}
@@ -520,11 +525,10 @@ function replyBox(label: string, busy: boolean, depth: number): string {
   return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy, '답글 입력', chip)}</li>`;
 }
 
-/** 댓글 시각: 글과 같은 날이면 「14:23」, 다른 날이면 「05.14 09:10」 (시각 없는 옛 댓글은 없음) */
-function commentClock(p: GPost, c: GPost['comments'][number]): string {
+/** 댓글 시각: 늘 날짜와 함께 「05.14 09:10」 (2026-11-10 사용자: 시각만 있으면 이야기 시간이 흐른 뒤 맥락이 안 이어진다. 시각 없는 옛 댓글은 없음) */
+function commentClock(_p: GPost, c: GPost['comments'][number]): string {
   if (!c.time) return '';
-  const same = c.time.slice(0, 10) === String(p.date).slice(0, 10);
-  return `<time class="gn-c-time">${esc(same ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
+  return `<time class="gn-c-time">${esc(`${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
 }
 
 
@@ -534,10 +538,10 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
   const confirm = gnet.confirm === `d:${nick}`;
   const right = confirm
     ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc(nick)}">정말 삭제</button>`
-    : tool('gn-del-thread', ICONS.trash, '쪽지 삭제', `data-value="${esc(nick)}"`);
+    : tool('gn-del-thread', ICONS.trash, `${dmW()} 삭제`, `data-value="${esc(nick)}"`);
   const src = st.sources[nick];
   const c = gnet.compose;
-  const ph = c?.kind === 'dm' && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : '쪽지 입력';
+  const ph = c?.kind === 'dm' && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 ${dmW()}` : `${dmW()} 입력`;
   return `<div class="${inline ? 'gn-inline gn-dm-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead(esc(nick), `${t.rows.length}통`, right)}
     <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc(src.title)}」</div>` : ''}
       ${t.rows.map((d, i) => {
@@ -552,7 +556,7 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
 
 function dmList(st: GState, busy: boolean, mobile: boolean): string {
   const threads = dmThreads(st);
-  if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
+  if (!threads.length) return uiSite === 'sm' ? '<div class="ph-blank"><p>주고받은 채팅이 없어요.<br>매물에서 「채팅하기」를 눌러 보내 보세요.</p></div>' : '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
   return `<ul class="ph-list gn-list">${threads
     .map((t) => {
       const on = gnet.openDm === t.nick && !gnet.settings;
@@ -560,7 +564,7 @@ function dmList(st: GState, busy: boolean, mobile: boolean): string {
       const confirm = gnet.confirm === `d:${t.nick}`;
       const del = confirm
         ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}">정말 삭제</button>`
-        : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}" aria-label="${esc(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+        : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}" aria-label="${esc(t.nick)} ${dmW()} 삭제" title="삭제">${ICONS.trash}</button>`;
       return `<li class="ph-row"><button class="ph-main gn-dmrow${on ? ' on' : ''}" data-action="gn-open-dm" data-value="${esc(t.nick)}" aria-pressed="${on}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
         <span class="ph-who"><span class="ph-who-top"><b>${esc(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc(time(t.lastDate) || t.lastDate)}</small>` : ''}</span>
@@ -846,7 +850,7 @@ function commentTree(site: BoardSite, p: GPost, busy: boolean): string {
       const shown = site === 'wpf' && c.nick === 'ㅇㅇ' ? '익명' : c.nick;
       const author = c.mine
         ? `<b class="gn-me">${esc(shown)}</b>`
-        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기"><b>${esc(shown)}</b></button>`;
+        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="${dmW()} 보내기"><b>${esc(shown)}</b></button>`;
       const ip = site === 'gal' && c.nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(p.id + k)})</span>` : '';
       const del = c.mine
         ? confirm
@@ -875,7 +879,7 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
   const c = gnet.compose;
   const reply = c?.kind === 'comment' && c.post === p.id && c.parent > 0 ? c : null;
   const confirm = gnet.confirm === `p:${p.id}`;
-  const who = p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기"><b>${esc(p.nick)}</b></button>`;
+  const who = p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="${dmW()} 보내기"><b>${esc(p.nick)}</b></button>`;
   const del = (cls: string) => (p.mine ? `<button class="${cls}${confirm ? ' danger' : ''}" data-action="gn-del-post" data-value="${p.id}">${confirm ? '정말 삭제' : '삭제'}</button>` : '');
   const more = (cls: string) => `<button class="${cls}" data-action="gn-post-refresh" data-value="${p.id}" ${busy ? 'disabled' : ''}>새 댓글 보기</button>`;
   const back = (cls: string, label = '‹ 목록으로') => `<button class="${cls}" data-action="gn-back">${label}</button>`;
@@ -902,15 +906,17 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
     }
     case 'sm': {
       const price = priceOf(p);
-      // 삽니다 글은 물건 그림을 두지 않는다 (목록과 같이, 2026-11-10 사용자: 본문에는 기본 그림이 붙어 있었다)
+      // 위는 사진 | 매물 정보 두 칸, 문의는 그 아래 한 칸 — 전체를 가운데 좁게 (2026-11-10 사용자: 사진 아래가 텅 비고, 문의를 넓게 펴면 휑하다).
+      // 삽니다 글은 물건 그림 없이 빈 사진 칸만 (사용자: 포맷상 칸은 있어야 한다)
       const want = p.tag === '삽니다';
       const u = want ? null : smPicUrl(p);
-      return `<article class="detail gn-post${want ? ' nopic' : ''}">${want ? '' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`}<div>
+      const pic = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`;
+      return `<article class="detail gn-post">${pic}<div class="info">
         <div class="seller"><i></i><div>${who}</div></div>
-        <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
+        <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(p.date)} · ${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
         <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</div>
-        <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
-        ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
+        <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div></div>
+        <div class="qna">${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
     }
     default:
       return `<article class="gmain gpost gn-post"><div class="ph1">${p.tag ? `<span class="c">${esc(p.tag)}</span>` : ''}<h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt">${who} · ${esc(p.date.slice(5))} · 조회 ${p.views.toLocaleString()} · 추천 ${p.votes}</div></div>
@@ -926,7 +932,7 @@ function siteDm(st: GState, busy: boolean): string {
   const c = gnet.compose;
   if (c && (c.kind === 'newdm' || (c.kind === 'dm' && !st.dms.some((d) => d.nick === c.nick)))) return composeView(c, busy);
   if (gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return dmPane(st, gnet.openDm, busy);
-  return `<div class="bs-dmh"><h2>쪽지함</h2><button class="bs-w" data-action="gn-newdm">쪽지 쓰기</button></div>${dmList(st, busy, false)}`;
+  return `<div class="bs-dmh"><h2>${dmBox()}</h2><button class="bs-w" data-action="gn-newdm">${dmW()} 쓰기</button></div>${dmList(st, busy, false)}`;
 }
 
 function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, unreadDm: number, popDm: boolean): string {
@@ -960,7 +966,7 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   else inner = box(main);
   // 쪽지함 창: 스크롤 칸 맨 위의 sticky 0 높이 틀 안에 absolute 로 → 글을 내려도 같은 자리에 떠 있고 사이트 색(.bs 변수)을 그대로 쓴다
   const dmWin = popDm
-    ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="쪽지함"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} 쪽지함</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
+    ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="${dmBox()}"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} ${dmBox()}</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
     : '';
   return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}${note}</main>`;
 }
@@ -1239,7 +1245,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       gnet.sub = 'dm';
       gnet.settings = false;
       gnet.openDm = contact.nick;
-      gnet.compose = { kind: 'dm', nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 쪽지 · 「${p.title}」` };
+      gnet.compose = { kind: 'dm', nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 ${dmW()} · 「${p.title}」` };
       gnet.draft = '';
       gnet.attach = [];
       break;

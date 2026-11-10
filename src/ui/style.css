@@ -4682,7 +4682,15 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .gn-post { display: block; }
 /* 연어 마켓 글 보기는 그림|글 두 칸 격자. 위 줄이 덮어 그림이 창 폭만큼 커졌다 (11-09 사용자) */
 .bs-sm .detail.gn-post { display: grid; }
-.bs-sm .detail.nopic { grid-template-columns: minmax(0, 1fr); }
+.bs-sm .detail { grid-template-columns: 340px minmax(0, 1fr); gap: 28px; align-items: start; }
+.gx-body.gn.bs.bs-sm > .detail { max-width: 860px; margin-left: auto; margin-right: auto; }
+.gx-body.gn.bs.bs-sm.bs-m > .detail { max-width: none; }
+.bs-sm .detail .ph img { width: 280px; height: 280px; }
+.bs-sm .detail > .info { min-width: 0; }
+.bs-sm .detail > .qna { grid-column: 1 / -1; min-width: 0; }
+.bs-sm.bs-m .detail { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px; }
+.bs-sm.bs-m .detail .ph { max-width: 260px; width: 100%; margin: 0 auto; }
+.bs-sm.bs-m .detail .ph img { width: 200px; height: 200px; }
 /* 삽니다 꼬리표도 팝니다와 같은 크기·자리 (2026-11-10 사용자) */
 .bs-sm .ph.want { padding-top: 38px; }
 .bs-sm .ph.want .tag { left: 6.5px; top: 6.5px; } /* 점선 테두리 1.5px 만큼 */
@@ -4800,3 +4808,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
 .ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
 .ms-sample i { color: var(--accent); font-style: normal; }
+/* 연어 마켓 윗줄 오른쪽 묶음(찾기칸·글쓰기·내 채팅): 사이 8px, 높이 36px 로 같게 (2026-11-10 사용자: 간격이 제각각) */
+.bs-sm .hd .sr + .wr, .bs-sm .hd .wr + .ch { margin-left: -14px; }
+.bs-sm .hd .wr, .bs-sm .hd .ch { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; white-space: nowrap; box-sizing: border-box; }
+.bs-sm.bs-m .hd .sr + .wr { margin-left: 0; }
