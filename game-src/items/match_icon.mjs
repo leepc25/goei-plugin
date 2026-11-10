@@ -147,7 +147,7 @@ function makeHeadIndex(rows, reps, pre = false) {
   const items = rows.map(r => {
     const kws = new Set((r.keywords ?? r.phrases).map(normIcon).filter(Boolean));
     const ps = [...new Set(r.phrases.map(normIcon).filter(Boolean))].map(t => ({ t, kw: kws.has(t), ...headOf(t) })).filter(p => p.words);
-    return { file: r.file, ps, name: ps[0]?.joined.length ?? 99 };
+    return { file: r.file, ps, name: ps[0]?.joined.length ?? 99, words: new Set(ps.flatMap((p) => p.words)) };
   });
   // 낱말 무게: 그 낱말이 든 줄이 드물수록 큼
   const df = new Map();
@@ -214,11 +214,14 @@ function makeHeadIndex(rows, reps, pre = false) {
         const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
-        if (!top || m.s > top.s) top = { ...m, more: !!h.qPre || q.mods.length > 0 };
+        // 이 줄 말로는 꾸밈말이 안 맞았어도 그 그림의 다른 이름에 그 말이 있으면 맞은 것으로 (이빨나무 ↔ 「이빨 나무 가지」의 몸통 말 나무)
+        const extra = [...q.mods, ...(h.qPre ? [h.qPre] : [])];
+        const m2 = !m.hit && extra.some((w) => w.length >= 2 && it.words.has(w)) ? { ...m, s: m.s + 1, hit: 1e-3 } : m;
+        if (!top || m2.s > top.s) top = { ...m2, more: extra.length > 0, ph: p.head };
       }
       if (!top) continue;
-      const isRep = reps[q.head] === it.file ? 1 : 0;
-      const better = !best || top.s > best.s + 1e-9 || (Math.abs(top.s - best.s) <= 1e-9 && (isRep > best.isRep || (isRep === best.isRep && it.name < best.name)));
+      const isRep = reps[q.head] === it.file || (!!top.ph && reps[top.ph] === it.file) ? 1 : 0;
+      const better = !best || top.s > best.s + 1e-9 || (Math.abs(top.s - best.s) <= 1e-9 && (+!!top.kw > +!!best.kw || (!!top.kw === !!best.kw && (isRep > best.isRep || (isRep === best.isRep && it.name < best.name)))));
       if (better) best = { file: it.file, ...top, isRep, name: it.name };
     }
     const repOf = () => (useRep && !GENERIC.has(q.head) && reps[q.head] ? { file: reps[q.head], s: 0, hit: 0, plain: true } : null);
@@ -263,7 +266,7 @@ export function parseIconAliases(text) {
   }
   return out;
 }
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '알 → 계란', '치마 → 스커트', '하이라이터 → 형광펜', '다마고치 → 게임기', '인라인 → 인라인 스케이트', '선스틱 → 선크림', '곱창밴드 → 머리끈', '렌즈케이스 → 콘택트렌즈 통', '콘택트렌즈 → 콘택트렌즈 통', '약상자 → 구급상자', '나이프 → 접이식 칼', '정원가위 → 원예 가위', '전지가위 → 원예 가위', '간식 → 과자', '온수매트 → 전기장판', '종이가방 → 쇼핑백', '여행가방 → 캐리어', '햇반 → 즉석밥', '링거팩 → 링거', '인슐린 → 인슐린 펜', 'DVD → CD', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '알 → 계란', '하이라이터 → 형광펜', '다마고치 → 게임기', '인라인 → 인라인 스케이트', '선스틱 → 선크림', '곱창밴드 → 머리끈', '렌즈케이스 → 콘택트렌즈 통', '콘택트렌즈 → 콘택트렌즈 통', '약상자 → 구급상자', '나이프 → 칼', '정원가위 → 원예 가위', '전지가위 → 원예 가위', '간식 → 과자', '온수매트 → 전기장판', '종이가방 → 쇼핑백', '여행가방 → 캐리어', '햇반 → 즉석밥', '링거팩 → 링거', '인슐린 → 인슐린 펜', 'DVD → CD', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
 export function setIconAliases(text) { aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT); }
 function aliased(text) {
@@ -346,7 +349,7 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
       // 같은 말이 전체에서는 그대로 맞는데 종류 안에서는 덜 맞으면 전체 것 (2026-11-10 사용자: 도구/요가매트 → 커터 매트 가 아니라 요가 매트).
       // 그 말이 종류 안에 아예 없으면 종류 안 그림 그대로 (괴이/돌멩이 「이상한 돌」 → 눈 달린 돌)
       // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이).
-      // 다만 전체에 이름이 그 말 그대로인 그림이 있으면 그것 (도구/가위 → 뼈 절단 가위 가 아니라 가위)
+      // 다만 전체에 이름이 그 말 그대로인 그림이 있으면 그것 (도구/가위 → 뼈 절단 가위 가 아니라 가위).
       const lit = (h, kx) => !!kx && ((rank(kx) < 3 && kx.hit === 0 && !!kx.more && rank(h) === 3) || (!kx.kw && !!h?.kw));
       const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
       if (k && same && same.file !== k.file) return hit(same);
@@ -367,7 +370,7 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   return (name0, icon, strict) => {
     const { kind, word: w0, en } = splitIconWord(icon);
     const K = kind ? kindIndex(kind) : null;
-    const keep = (t) => { const n = normIcon(t); if (!n) return false; const h = head(n, !kind); return (rank(h) === 3 && !!h.kw) || (!!K && ((x) => rank(x) === 3 && !x.loose)(K.head(n))); }; // 표(전체는 이름, 적은 종류 안은 몸통 말까지)에 그대로 있는 말은 대체하지 않는다
+    const keep = (t) => { const n = normIcon(t); if (!n) return false; const h = head(n, !kind); return (rank(h) === 3 && !h.loose && (!!h.kw || h.s >= 1e9)) || (!!K && ((x) => rank(x) === 3 && !x.loose)(K.head(n))); }; // 표(전체는 이름, 적은 종류 안은 몸통 말까지)에 그대로 있는 말은 대체하지 않는다
     const name = keep(name0) ? normIcon(name0) : aliased(name0);
     const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const found = core(name, word, normIcon(en), K, !!strict);
