@@ -914,11 +914,11 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
       const want = p.tag === '삽니다';
       const u = want ? null : smPicUrl(p);
       const pic = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`;
-      // 판매자는 사진 아래(왼쪽 칸), 오른쪽은 제목 → 값 → 말머리·날짜 → 본문
-      return `<article class="detail gn-post"><div class="side">${pic}<div class="seller"><i></i><div>${who}</div></div></div><div class="info">
+      // 판매자와 관심·댓글·조회는 사진 아래 한 묶음(왼쪽 칸), 오른쪽은 제목 → 값 → 말머리·날짜 → 본문
+      return `<article class="detail gn-post"><div class="side">${pic}<div class="seller"><i></i><div>${who}<small>관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</small></div></div></div><div class="info">
         <h2 class="gn-post-title">${esc(p.title)}</h2>${price ? `<div class="price">${esc(price)}</div>` : ''}<div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(p.date)} · ${esc(ago(p, now))}</div>
         <div class="body gn-post-body">${body(p.body)}</div></div>
-        <div class="qna"><div class="stat">관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</div>
+        <div class="qna">
         <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
         ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
     }

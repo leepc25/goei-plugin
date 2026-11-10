@@ -4823,7 +4823,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }
 /* 연어 마켓 본문: 왼쪽 = 사진 + 판매자, 오른쪽 = 제목(크게)·값·날짜·본문 (2026-11-10 사용자: 윗부분이 어정쩡). 제목은 위 공통 초기화(.bs .gn-post-title)가 크기를 지워 본문 글씨만 했다 */
 .bs-sm .detail > .side { min-width: 0; }
-.bs-sm .detail > .side .seller { padding: 12px 2px 0; border-bottom: 0; }
+.bs-sm .detail > .side .seller { margin-top: 10px; padding: 10px 12px; border: 1px solid #e4ddd3; border-radius: 8px; background: #fbf9f5; }
+.bs-sm .detail > .side .seller small { margin-top: 2px; }
+.bs-sm .detail > .qna > .act { margin-top: 0; }
 .bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
 .bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
 .bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
