@@ -37,7 +37,7 @@ import { isPhone } from './media';
 import { winStyle, type PopSpec, type WinBox } from './popwin';
 
 type Compose =
-  | { kind: 'post' }
+  | { kind: 'post'; tag?: string }
   | { kind: 'comment'; post: number; parent: number; label: string }
   | { kind: 'dm'; nick: string; source?: GSource; label: string }
   | { kind: 'newdm' };
@@ -241,14 +241,14 @@ function withRaw<T>(raw: string, f: () => T): T {
   }
 }
 
-function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
+function writePost(ctx: ChatContext, env: GnetEnv, input: string, tag = '') {
   return run(ctx, env, '글을 올리는 중이에요.', async () => {
     const st = readGnet(ctx.chat);
     const nick = userNick(ctx.chat.scriptstate);
     const s = gnetSettings(ctx.chat.scriptstate);
     const draftPost: GPost = { id: 0, date: '', nick, title: '', body: input, views: 0, votes: 0, mine: true, comments: [] };
     const plan = incomingPlan(ctx.chat, st, s, nick, Math.random, { post: draftPost });
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, input, plan, names(ctx)));
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, tag ? `[${tag}] ${input}` : input, plan, names(ctx)));
     const { value, draft: parsed } = (await generate(prompt.messages, s.model, (r) => {
       const v = withRaw(r, () => parseJsonPayload(r)) as Record<string, unknown>;
       return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
@@ -259,7 +259,8 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
-      if (draft.tag) p.tag = draft.tag;
+      // 연어 마켓은 글쓴이가 고른 거래 구분이 말머리 (2026-11-10 사용자: 글쓰기에 팝니다·삽니다 구분이 있어야 한다)
+      if (tag || draft.tag) p.tag = tag || draft.tag;
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
       pushComments(p, got.comments, dateNow(chat));
@@ -512,7 +513,7 @@ function composeView(c: Compose, busy: boolean): string {
     : c.kind === 'dm' ? `<p class="gn-to">받는 사람 <b>${esc(c.nick)}</b></p>` : '';
   const ph = post ? '올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)' : gnet.attach.length ? '함께 보낼 글 (선택)' : `${dmW()} 내용`;
   return `<div class="ph-form gn-cpane">${paneHead(post ? '새 글' : `새 ${dmW()}`, c.kind === 'dm' ? esc(c.label) : '')}
-    <div class="ph-form-body">${to}
+    <div class="ph-form-body">${to}${post && uiSite === 'sm' ? `<div class="cats gn-wtags" role="group" aria-label="거래 구분">${SM_TAGS.map((t) => `<button class="${(c.tag ?? SM_TAGS[0]) === t ? 'on' : ''}" data-action="gn-wtag" data-value="${t}" aria-pressed="${(c.tag ?? SM_TAGS[0]) === t}">${t}</button>`).join('')}</div>` : ''}
       <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc(ph)}" aria-label="내용">${esc(gnet.draft)}</textarea>
       ${attachEditor('gn', gnet.attach, GN_KINDS, busy)}
     </div>
@@ -705,6 +706,8 @@ function smPicUrl(p: GPost): string | null {
   return name ? iconQuiet(() => titleIconUrl(name)) : null;
 }
 const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+/** 연어 마켓 글쓰기 거래 구분 (목록·본문이 이 말머리로 사진 칸·꼬리표를 정한다) */
+const SM_TAGS = ['팝니다', '삽니다', '나눔'];
 const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];
 
 /** 사이트 머리 */
@@ -1196,6 +1199,9 @@ export async function handleGnet(action: string, value: string | undefined, base
         }
       }, {}, false);
       return true;
+    case 'gn-wtag':
+      if (gnet.compose?.kind === 'post') gnet.compose = { kind: 'post', tag: v };
+      break;
     case 'gn-write':
       gnet.settings = false;
       gnet.sub = 'board';
@@ -1286,7 +1292,7 @@ export async function handleGnet(action: string, value: string | undefined, base
         gnet.notice = `첨부 내용과 글이 작성 상한(${cap}토큰)을 넘었어요. 조금 줄여 주세요.`;
         break;
       }
-      if (c.kind === 'post') void writePost(ctx, env, text);
+      if (c.kind === 'post') void writePost(ctx, env, text, siteOf(ctx) === 'sm' ? c.tag ?? SM_TAGS[0] : '');
       else if (c.kind === 'comment') void writeComment(ctx, env, c.post, c.parent, text);
       else if (c.kind === 'dm') void sendDm(ctx, env, c.nick, text, c.source);
       else {
