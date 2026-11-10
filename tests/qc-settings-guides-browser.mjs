@@ -61,7 +61,7 @@ for (const vp of vps) {
       assert.equal(saved.replace(`\nQC ${g} 추가 줄`, ''), defaults[g], `${g}: 절을 합치면 원문 그대로`);
     }
     // 다른 노드에 갔다 와도 같은 글
-    await goNode(page, 'rule:new');
+    await goNode(page, 'rule:all');
     await goNode(page, `guide:${g}`);
     assert.ok((await page.$eval(`.gw textarea[data-key="${g}|${i}"]`, (e) => e.value)).includes(`QC ${g} 추가 줄`), `${g}: 다시 열어도 고친 글`);
     // 원래 글로 고쳐 쓰면 원래 글로 저장 (고친 지침 칸이 지워진다)
@@ -107,15 +107,18 @@ for (const vp of vps) {
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').imgKeywords === undefined);
 
   // ── 추가 규칙 ──
-  await goNode(page, 'rule:new');
+  await goNode(page, 'rule:all');
   await page.waitForSelector('.gw [data-action="ed-rule-new"]');
   assert.ok((await page.textContent('.gw .gw-head-act')).includes('0/100'), '규칙 수/상한');
   await clickSel(page, '.gw [data-action="ed-rule-new"]');
   await page.waitForSelector('.gw textarea[data-input="ed-rule-text"]');
   const ruleId = await page.$eval('.gw textarea[data-input="ed-rule-text"]', (e) => e.dataset.key);
-  assert.ok(await page.$(`.gw .gw-tree-item[data-value="rule:${ruleId}"]`), '새 규칙이 목록에');
-  await setInput(page, '.gw input[data-input="ed-rule-title"]', '대사 길이', 'input');
-  await setInput(page, '.gw textarea[data-input="ed-rule-text"]', 'Three sentences max.', 'input');
+  // 11-09 사용자: 규칙은 메뉴가 아니라 「추가 규칙」 한 페이지의 접는 칸. 새 규칙 칸은 펼친 채
+  const box = (id) => `.gw details.gw-rule[data-keep="rule-${id}"]`;
+  assert.ok(await page.$eval(box(ruleId), (e) => e.open), '새 규칙 칸이 펼친 채로 페이지에');
+  assert.ok((await page.textContent('.gw .gw-tree-item[data-value="rule:all"]')).includes('1'), '목록 배지 = 규칙 수');
+  await setInput(page, `${box(ruleId)} input[data-input="ed-rule-title"]`, '대사 길이', 'input');
+  await setInput(page, `${box(ruleId)} textarea[data-input="ed-rule-text"]`, 'Three sentences max.', 'input');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.text === 'Three sentences max.', null, { timeout: 5000 });
   assert.equal((await prefsOf(page)).rules[0].title, '대사 길이');
   assert.deepEqual((await prefsOf(page)).rules[0].to, ['RP'], '기본 대상 본편');
@@ -124,34 +127,33 @@ for (const vp of vps) {
   await page.waitForFunction(() => JSON.stringify(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.to) === '["RP","GNet"]');
   await clickSel(page, `.gw [data-action="ed-rule-to"][data-value="${ruleId}|RP"]`);
   await page.waitForFunction(() => JSON.stringify(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.to) === '["GNet"]');
-  assert.ok((await page.textContent('.gw .gw-head')).includes('괴담넷 지침 끝에'), '대상 안내');
+  assert.ok((await page.textContent(`${box(ruleId)} summary`)).includes('괴담넷'), '접은 줄에 붙일 곳');
   // 켬/끔
-  await clickSel(page, `.gw [data-action="ed-rule-on"][role="switch"]`);
+  await clickSel(page, `${box(ruleId)} [data-action="ed-rule-on"][role="switch"]`);
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.on === false);
-  assert.ok((await page.textContent(`.gw .gw-tree-item[data-value="rule:${ruleId}"]`)).includes('끔'), '목록 배지 끔');
-  await clickSel(page, `.gw [data-action="ed-rule-on"][role="switch"]`);
+  assert.ok((await page.textContent(`${box(ruleId)} summary`)).includes('끔'), '접은 줄 끔');
+  await clickSel(page, `${box(ruleId)} [data-action="ed-rule-on"][role="switch"]`);
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.on === true);
   // 글자 상한: 제목 80·본문 20,000 (maxlength)
-  assert.equal(await page.$eval('.gw input[data-input="ed-rule-title"]', (e) => e.maxLength), 80);
-  assert.equal(await page.$eval('.gw textarea[data-input="ed-rule-text"]', (e) => e.maxLength), 20000);
-  // 둘째 규칙 → 목록 순서 = 만든 순서, 첫 규칙 삭제(확인) → 둘째가 열림
-  await goNode(page, 'rule:new');
+  assert.equal(await page.$eval(`${box(ruleId)} input[data-input="ed-rule-title"]`, (e) => e.maxLength), 80);
+  assert.equal(await page.$eval(`${box(ruleId)} textarea[data-input="ed-rule-text"]`, (e) => e.maxLength), 20000);
+  // 둘째 규칙 → 페이지 순서 = 만든 순서, 첫 규칙 삭제(확인)
   await clickSel(page, '.gw [data-action="ed-rule-new"]');
-  await page.waitForSelector('.gw textarea[data-input="ed-rule-text"]');
-  const rule2 = await page.$eval('.gw textarea[data-input="ed-rule-text"]', (e) => e.dataset.key);
-  assert.deepEqual(await page.$$eval('.gw .gw-tree-item[data-value^="rule:r"]', (els) => els.map((e) => e.dataset.value)), [`rule:${ruleId}`, `rule:${rule2}`], '목록 순서 = 만든 순서');
-  await goNode(page, `rule:${ruleId}`);
-  await clickSel(page, `.gw [data-action="ed-rule-del"]`);
-  await page.waitForSelector('.gw [data-action="ed-rule-del-yes"]');
+  await page.waitForFunction((r1) => [...document.querySelectorAll('.gw details.gw-rule')].length === 2, ruleId);
+  const order = await page.$$eval('.gw details.gw-rule', (els) => els.map((e) => e.dataset.keep));
+  assert.equal(order[0], `rule-${ruleId}`, '페이지 순서 = 만든 순서');
+  const rule2 = order[1].slice(5);
+  await clickSel(page, `.gw [data-action="ed-rule-del"][data-value="${ruleId}"]`);
+  await page.waitForSelector(`.gw [data-action="ed-rule-del-yes"][data-value="${ruleId}"]`);
   await clickSel(page, '.gw [data-action="ed-rule-del-no"]');
-  assert.ok(await page.$('.gw [data-action="ed-rule-del"]'), '취소');
-  await clickSel(page, `.gw [data-action="ed-rule-del"]`);
-  await clickSel(page, '.gw [data-action="ed-rule-del-yes"]');
-  await page.waitForFunction((r2) => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === `rule:${r2}`, rule2);
+  assert.ok(await page.$(`.gw [data-action="ed-rule-del"][data-value="${ruleId}"]`), '취소');
+  await clickSel(page, `.gw [data-action="ed-rule-del"][data-value="${ruleId}"]`);
+  await clickSel(page, `.gw [data-action="ed-rule-del-yes"][data-value="${ruleId}"]`);
+  await page.waitForFunction((r2) => { const k = [...document.querySelectorAll('.gw details.gw-rule')].map((e) => e.dataset.keep); return k.length === 1 && k[0] === `rule-${r2}`; }, rule2);
   assert.equal((await prefsOf(page)).rules.length, 1);
-  await clickSel(page, `.gw [data-action="ed-rule-del"]`);
-  await clickSel(page, '.gw [data-action="ed-rule-del-yes"]');
-  await page.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'guide:RP');
+  await clickSel(page, `.gw [data-action="ed-rule-del"][data-value="${rule2}"]`);
+  await clickSel(page, `.gw [data-action="ed-rule-del-yes"][data-value="${rule2}"]`);
+  await page.waitForFunction(() => !document.querySelector('.gw details.gw-rule'));
   assert.equal((await prefsOf(page)).rules, undefined, '다 지우면 rules 없음');
   // 상한 100개: 99개를 저장소에 바로 넣고 창을 다시 열어 하나 더 → 100, 그다음은 안내
   await closeEditor(page, true);
@@ -173,12 +175,14 @@ for (const vp of vps) {
   await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
-  await goNode(page, 'rule:new');
+  await goNode(page, 'rule:all');
   assert.ok((await page.textContent('.gw .gw-head-act')).includes('99/100'));
   await clickSel(page, '.gw [data-action="ed-rule-new"]');
-  await page.waitForSelector('.gw textarea[data-input="ed-rule-text"]');
+  // 한 페이지에 접는 칸 100개: 앞 99개는 접혀 있으니 칸 수로 본다 (새 칸만 펼친 채)
+  await page.waitForFunction(() => document.querySelectorAll('.gw details.gw-rule').length === 100);
+  assert.equal(await page.$$eval('.gw details.gw-rule[open]', (els) => els.length), 1, '새 규칙 칸만 펼친 채');
   assert.equal((await prefsOf(page)).rules.length, 100);
-  await goNode(page, 'rule:new');
+  await goNode(page, 'rule:all');
   assert.equal(await page.isDisabled('.gw [data-action="ed-rule-new"]'), true, '100개면 새 규칙 잠김');
   // 내보내기 「지금 채팅 값도 넣기」(2026-11-06 사용자, 전수점검 남은 것 5): 기본은 안 넣음 → 체크하면 chat.vars 에 이 채팅의 설정 변수만, 가져오면 그 채팅 변수에 적힘
   await goNode(page, 'manage:backup');
@@ -239,7 +243,7 @@ for (const vp of vps) {
     else {
       assert.ok(btn, '카드가 낡으면 업데이트로 가는 단추');
       await clickSel(p2, '.gw .gw-setbody [data-action="ed-node"][data-value="set:update"]');
-      await p2.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'set:update');
+      await p2.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'install'); // 11-09: 업데이트는 설치·업데이트 페이지로 합쳐짐
     }
     await p2.close();
   }
@@ -247,7 +251,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw .gw-setbody');
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('실패한 요청이 없어요'));
   await page.waitForFunction(() => !document.querySelector('.gw .gw-setbody')?.textContent?.includes('읽는 중'));
-  assert.ok((await page.textContent('.gw .gw-setbody')).includes('아직 갱신 기록이 없어요'));
+  // 11-09: 인물 갱신 기록은 「실패 기록」에서 빠져 「인물 기록 점검」 페이지로 갔다
   // 진단 묶음 (2026-11-06): 판·설정·실패·갱신 기록을 JSON 하나로. 단추를 누르면 내려받기 안내가 머리에 뜬다
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('진단 묶음'), '진단 묶음 칸');
   await clickSel(page, '.gw [data-action="man-diag-download"]');
@@ -303,7 +307,7 @@ for (const vp of vps) {
   const a = await auditDom(page, '.gw');
   assert.deepEqual(a.missing, [], `install ${vp}: 이름 없는 단추`);
   if (phone) assert.deepEqual(a.overflow, [], `install ${vp}: 가로 넘침`);
-  for (const n of ['manage:diag', 'manage:log', 'manage:backup', 'rule:new']) {
+  for (const n of ['manage:diag', 'manage:log', 'manage:backup', 'rule:all']) {
     await goNode(page, n);
     const a2 = await auditDom(page, '.gw');
     assert.deepEqual(a2.missing, [], `${n} ${vp}: 이름 없는 단추`);

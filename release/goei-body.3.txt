@@ -1,4 +1,311 @@
-onst [k, v] of Object.entries(rel.pairs)) {
+ 골라 그 사람으로 시작한다."
+  ];
+  var s = (v) => typeof v === "string" ? v.trim() : "";
+  function freeGroupCode(used) {
+    const set2 = new Set(used);
+    for (let c = "F".charCodeAt(0); c <= "Z".charCodeAt(0); c++) {
+      const want = `${String.fromCharCode(c)}00`;
+      if (!set2.has(want)) return want;
+    }
+    return "";
+  }
+  function migrateNeutral(d) {
+    const groups = d["시작 묶음"] ??= {};
+    for (const old of NEUTRAL_GROUP_OLD) {
+      if (!groups[old]) continue;
+      if (!groups[NEUTRAL_GROUP]) groups[NEUTRAL_GROUP] = groups[old];
+      delete groups[old];
+    }
+    const used = [...d.codes_used ?? [], ...Object.values(d.조직 ?? {}).map((o) => s(o.code)), ...Object.values(groups).map((g2) => s(g2.code))];
+    let code2;
+    if (!Object.keys(groups).includes(NEUTRAL_GROUP)) {
+      code2 = freeGroupCode(used);
+      if (!code2) return;
+      groups[NEUTRAL_GROUP] = { code: code2, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH };
+      d.codes_used = [.../* @__PURE__ */ new Set([...d.codes_used ?? [], code2])].sort();
+    } else {
+      code2 = s(groups[NEUTRAL_GROUP].code);
+      if (NEUTRAL_BLURB_OLD.includes(s(groups[NEUTRAL_GROUP].blurb))) groups[NEUTRAL_GROUP].blurb = NEUTRAL_BLURB;
+      if (NEUTRAL_ENGLISH_OLD.includes(s(groups[NEUTRAL_GROUP].english))) groups[NEUTRAL_GROUP].english = NEUTRAL_ENGLISH;
+    }
+    if (!code2) return;
+    for (const row10 of Object.values(d.요원 ?? {})) {
+      const r = row10;
+      if (!NEUTRAL_IDS.includes(s(r.id))) continue;
+      const list4 = Array.isArray(r.roster_for) ? r.roster_for.map(s).filter(Boolean) : [];
+      if (!list4.includes(code2)) r.roster_for = [...list4, code2];
+    }
+  }
+  function migrateRoster(d) {
+    const v = d.roster_v ?? 1;
+    if (v >= ROSTER_V) return d;
+    if (v < 2) {
+      const strip = (rows3) => {
+        for (const r of Object.values(rows3 ?? {})) if (Array.isArray(r.roster_for)) r.roster_for = r.roster_for.filter((f) => f !== "D00" && f !== "E00");
+      };
+      strip(d.조직);
+      strip(d.요원);
+    }
+    if (v < 6) migrateNeutral(d);
+    d.roster_v = ROSTER_V;
+    return d;
+  }
+
+  // src/data/scenarios.json
+  var scenarios_default = {
+    languages: [
+      { code: "ko", label: "한국어" },
+      { code: "en", label: "English" }
+    ],
+    factions: [
+      {
+        code: "A00",
+        name: "관리국",
+        affiliation: "관리국",
+        blurb: "괴이로부터 인류를 지키는 비밀 조직. 소수 정예 초인 요원들이 일상 뒤에 숨어 움직인다.",
+        scenarios: [
+          { fm: 1, label: "면접", kind: "opening" },
+          { fm: 2, label: "코드네임", kind: "opening" },
+          { fm: 3, label: "근무 수칙", kind: "opening" },
+          { fm: 4, label: "격리 실습", kind: "opening" },
+          { fm: 5, label: "격리팀", kind: "opening" },
+          { fm: 6, label: "교전", kind: "opening" },
+          { fm: 7, label: "한설인육공장", kind: "opening" },
+          { fm: 8, label: "직접 입력", kind: "direct" },
+          { fm: 9, label: "커스텀 임무", kind: "preset" }
+        ]
+      },
+      {
+        code: "B00",
+        name: "가짜 관리국",
+        affiliation: "관리국",
+        blurb: "스스로를 진짜 관리국이라 여기는 또 하나의 관리국. 괴이를 이물이라 부르며 체계화된 무력으로 대응한다.",
+        scenarios: [
+          { fm: 1, label: "취조실", kind: "opening" },
+          { fm: 2, label: "신입 교육", kind: "opening" },
+          { fm: 3, label: "오리엔테이션", kind: "opening" },
+          { fm: 4, label: "스카우트", kind: "opening" },
+          { fm: 5, label: "검사부대", kind: "opening" },
+          { fm: 6, label: "데이터베이스", kind: "opening" },
+          { fm: 7, label: "상황 발생", kind: "opening" },
+          { fm: 8, label: "직접 입력", kind: "direct" },
+          { fm: 9, label: "커스텀 임무", kind: "preset" }
+        ]
+      },
+      {
+        code: "C00",
+        name: "백일몽 주식회사",
+        affiliation: "백일몽 주식회사",
+        blurb: "괴이를 상품으로 만드는 제약 대기업. 겉으로는 제약사, 진짜 상품은 꿈결이다.",
+        scenarios: [
+          { fm: 1, label: "신입 OT", kind: "opening" },
+          { fm: 2, label: "D조 첫 출근", kind: "opening" },
+          { fm: 3, label: "화요 퀴즈쇼", kind: "opening" },
+          { fm: 4, label: "유쾌 테마파크", kind: "opening" },
+          { fm: 5, label: "커스텀 장비", kind: "opening" },
+          { fm: 6, label: "착한 친구", kind: "opening" },
+          { fm: 7, label: "세광특별시", kind: "opening" },
+          { fm: 8, label: "직접 입력", kind: "direct" },
+          { fm: 9, label: "커스텀 임무", kind: "preset" }
+        ]
+      },
+      {
+        code: "D00",
+        name: "민간인",
+        affiliation: "민간인",
+        blurb: "괴이의 존재를 모르는 평범한 사람. 우연한 조우가 모든 것을 바꾼다.",
+        scenarios: [
+          { fm: 1, label: "지하철의 여자", kind: "opening" },
+          { fm: 2, label: "기독교 상점", kind: "opening" },
+          { fm: 3, label: "세계정치 게시판", kind: "opening" },
+          { fm: 4, label: "무엇이든 자판기", kind: "opening" },
+          { fm: 5, label: "중림 지하상가", kind: "opening" },
+          { fm: 6, label: "직접 입력", kind: "direct" },
+          { fm: 7, label: "커스텀 임무", kind: "preset" }
+        ]
+      },
+      {
+        code: "E00",
+        name: "프리랜서",
+        affiliation: "프리랜서",
+        blurb: "특수재난대응협회와 뒷골목 알선소의 의뢰로 먹고사는 해결사.",
+        scenarios: [
+          { fm: 1, label: "협회 접수창구", kind: "opening" },
+          { fm: 2, label: "대박알선", kind: "opening" },
+          { fm: 3, label: "직접 입력", kind: "direct" },
+          { fm: 4, label: "커스텀 임무", kind: "preset" }
+        ]
+      }
+    ],
+    defaultScenario: { A00: 2, B00: 2, C00: 2, D00: 1, E00: 1 }
+  };
+
+  // src/core/scenarios.ts
+  var SCENARIOS = scenarios_default;
+  function findFaction(code2, list4 = SCENARIOS.factions) {
+    return list4.find((f) => f.code === code2);
+  }
+  function findScenario(code2, fm, list4 = SCENARIOS.factions) {
+    return findFaction(code2, list4)?.scenarios.find((s8) => s8.fm === fm);
+  }
+  function isLang(value) {
+    return SCENARIOS.languages.some((l) => l.code === value);
+  }
+  function isFaction(value) {
+    return typeof value === "string" && /^[A-Z]00$/.test(value);
+  }
+  function defaultScenario(code2, list4 = SCENARIOS.factions) {
+    return SCENARIOS.defaultScenario[code2] ?? findFaction(code2, list4)?.scenarios[0]?.fm ?? 1;
+  }
+  function greetingKey(faction, lang, fm) {
+    return `${faction}-${lang}-${fm}`;
+  }
+
+  // src/core/world/schema.ts
+  var WORLD_KIND_LABEL = { agent: "요원", org: "조직", anomaly: "괴이", site: "파밍", appendix: "부록" };
+  var AGENT_FIELDS = [
+    { id: "age", label: "나이", title: "Age", type: "line", sec: "identity" },
+    { id: "gender", label: "성별", title: "Gender", type: "line", sec: "identity", hint: "로어 글의 Gender 줄. 명부 성별 칸과 별개로 모델에게 보이는 표기" },
+    { id: "organization", label: "소속 표기", title: "Organization", type: "line", sec: "identity", hint: "비우면 명부 소속·호칭 표로 자동. 「Walpurgis Society, the Ten Witches」처럼 다르게 쓰고 싶을 때만" },
+    { id: "department_en", label: "부서 표기", title: "Department", type: "line", sec: "identity", hint: "모델에게 보이는 부서 이름(영문). 명부 부서 칸은 묶는 데 쓰고 이 칸이 글에 들어감" },
+    { id: "role", label: "역할", title: "Role", type: "line", sec: "identity" },
+    { id: "physique", label: "체격", title: "Physique", type: "line", sec: "appearance" },
+    { id: "appearance", label: "외모", title: "Appearance", type: "line", sec: "appearance" },
+    { id: "outfit", label: "복장", title: "Outfit", type: "line", sec: "appearance" },
+    { id: "character", label: "성격", title: "Character", type: "text", hint: "글머리 그대로. 결점([Flaws])도 이 안에" },
+    { id: "voice", label: "말투", title: "Voice", type: "text" },
+    { id: "background", label: "배경", title: "Background", type: "text" },
+    { id: "abilities", label: "능력", title: "Abilities", type: "text" },
+    { id: "intro", label: "소개", title: "Roster", type: "line", hint: "Roster 지침의 한 줄. 「(나이/성별, 직급): 외모; 성격; 능력」 꼴" }
+  ];
+  var ORG_FIELDS = [
+    { id: "intro", label: "소개", title: "Identity", type: "text", hint: "첫 문단은 Faction 지침 요약에, 전체는 세력 상세 로어에" },
+    { id: "doctrine", label: "교리·방침", title: "Doctrine", type: "text" },
+    { id: "hq", label: "본부·거점", title: "Headquarters and Sites", type: "text" },
+    { id: "structure", label: "조직 구조", title: "Structure", type: "text" },
+    { id: "hierarchy", label: "계급", title: "Hierarchy", type: "text" },
+    { id: "recruitment", label: "모집·첫 접촉", title: "Recruitment", type: "text" },
+    { id: "assets", label: "핵심 자산·특성", title: "Core Assets and Traits", type: "text" },
+    { id: "personnel", label: "인원", title: "Personnel", type: "text" }
+  ];
+  var ANOMALY_FIELDS = [
+    { id: "identity", label: "정체", title: "Identity", type: "text", hint: "뭐가 어떻게 된 괴이인지, 어디에 깃드는지" },
+    { id: "entry", label: "입장 조건", title: "Entry Conditions", type: "text", hint: "들어가는 길·징후·돌아갈 수 있는 시점" },
+    { id: "space", label: "공간·구조", title: "Structure", type: "text", hint: "구역·층·동선·공간 규칙" },
+    { id: "rules", label: "규칙", title: "Rules", type: "text", hint: "안에서 지켜야 하는 것, 어기면 생기는 일" },
+    { id: "entities", label: "개체", title: "Sub-Entities", type: "text", hint: "등장하는 존재들 (여럿이면 ##### 소제목)" },
+    { id: "survival", label: "생존·탈출", title: "Survival and Clear", type: "text", hint: "클리어 조건·출구·하면 안 되는 것·약점" },
+    { id: "notes", label: "비고", title: "Notes", type: "text", hint: "등급·발생지 같은 짧은 정보, 외부 노출" }
+  ];
+  var SITE_FIELDS = [
+    { id: "identity", label: "정체", title: "Identity", type: "text" },
+    { id: "access", label: "접근", title: "Access", type: "text" },
+    { id: "location", label: "위치와 외관", title: "Location and Appearance", type: "text" },
+    { id: "environment", label: "환경", title: "Environment", type: "text" },
+    { id: "rules", label: "이용 규칙(거래·대가)", title: "Rules and Trade", type: "text" },
+    { id: "keeper", label: "주인/운영자", title: "Keeper", type: "text" }
+  ];
+  var APPENDIX_FIELDS = [
+    { id: "title", label: "제목", title: "", type: "line", hint: "「### 」 뒤에 붙는 제목 줄" },
+    { id: "body", label: "본문", title: "", type: "text" }
+  ];
+  var FIELDS = { agent: AGENT_FIELDS, org: ORG_FIELDS, anomaly: ANOMALY_FIELDS, site: SITE_FIELDS, appendix: APPENDIX_FIELDS };
+  var ANOMALY_NOTE = "[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.";
+
+  // src/core/world/records.ts
+  var RELATION_STAGES = ["hostile", "wary", "neutral", "favorable", "friendly"];
+  var RELATION_LABEL = { hostile: "적대", wary: "경계", neutral: "중립", favorable: "호의", friendly: "우호" };
+  var data = null;
+  function setWorldData(d) {
+    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) {
+      if (!d[k] || typeof d[k] !== "object" || Array.isArray(d[k])) throw new Error(`세계 자료 형식이 달라요 (${k}).`);
+    }
+    if (!d.relations || typeof d.relations.pairs !== "object" || typeof d.relations.common !== "string") throw new Error("세계 자료 형식이 달라요 (relations).");
+    if (d.scenes && (typeof d.scenes !== "object" || typeof d.scenes.세력 !== "object" || typeof d.scenes.인물 !== "object")) throw new Error("세계 자료 형식이 달라요 (scenes).");
+    data = d;
+  }
+  var defaultScenes = () => world().scenes ?? { 세력: {}, 인물: {} };
+  function world() {
+    if (!data) throw new Error("세계 자료(goei-data-world)가 아직 없어요. 본체 부팅이 자료 받기를 끝내기 전에 세계 기록을 읽었어요.");
+    return data;
+  }
+  var DEFAULTS2 = (kind) => world()[kind];
+  var DEFAULT_RELATIONS = () => world().relations;
+  var worldAnomalyNote = (over) => typeof over?.anomalyNote === "string" ? over.anomalyNote : ANOMALY_NOTE;
+  var str = (v) => typeof v === "string" ? v : "";
+  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  function cleanExtra(v) {
+    if (!Array.isArray(v)) return [];
+    return v.map((x) => obj(x)).filter((x) => str(x.name).trim()).map((x) => ({
+      name: str(x.name).trim(),
+      value: str(x.value),
+      kind: x.kind === "line" ? "line" : "block",
+      ...x.sec === "identity" || x.sec === "appearance" ? { sec: x.sec, at: str(x.at) } : {}
+    }));
+  }
+  function mergeRecord(base, over) {
+    if (over?.deleted) return null;
+    if (!base && !over) return null;
+    const fields3 = { ...base?.fields ?? {} };
+    for (const [k, v] of Object.entries(obj(over?.fields))) if (typeof v === "string") fields3[k] = v;
+    const variants = {};
+    for (const [code2, vf] of Object.entries(obj(over?.variants ?? base?.variants))) {
+      const m = {};
+      for (const [k, v] of Object.entries(obj(vf))) if (typeof v === "string") m[k] = v;
+      if (Object.keys(m).length) variants[code2] = m;
+    }
+    const out = {
+      fields: fields3,
+      extra: over?.extra !== void 0 ? cleanExtra(over.extra) : base?.extra ?? []
+    };
+    const keys = over?.keys ?? base?.keys;
+    if (keys) out.keys = keys;
+    const title2 = over?.title ?? base?.title;
+    if (title2) out.title = title2;
+    if (over?.titleRaw ?? base?.titleRaw) out.titleRaw = true;
+    const order = over?.order ?? base?.order;
+    if (Array.isArray(order) && order.length) out.order = order.map(String);
+    if (Object.keys(variants).length) out.variants = variants;
+    const departments = over?.departments ?? base?.departments;
+    if (departments && Object.keys(departments).length) out.departments = { ...departments };
+    if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
+    if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
+    if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
+    if (over?.relOff ?? base?.relOff) out.relOff = true;
+    const notes = over?.roster_notes ?? base?.roster_notes;
+    if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n2) => ({ department: String(n2.department ?? ""), label: String(n2.label ?? "") }));
+    return out;
+  }
+  function worldRecords(kind, overrides2) {
+    const base = DEFAULTS2(kind);
+    const over = overrides2?.[kind] ?? {};
+    const out = /* @__PURE__ */ new Map();
+    for (const [name, rec2] of Object.entries(base)) {
+      const m = mergeRecord(rec2, over[name]);
+      if (m) out.set(name, m);
+    }
+    for (const [name, rec2] of Object.entries(over)) {
+      if (out.has(name) || base[name]) continue;
+      const m = mergeRecord(void 0, rec2);
+      if (m) out.set(name, m);
+    }
+    return out;
+  }
+  var worldRecord = (kind, name, overrides2) => worldRecords(kind, overrides2).get(name) ?? null;
+  function worldRelations(overrides2) {
+    const pairs = { ...DEFAULT_RELATIONS().pairs };
+    for (const [k, v] of Object.entries(overrides2?.relations?.pairs ?? {})) {
+      if (v === null) delete pairs[k];
+      else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...v.memo ? { memo: v.memo } : {} };
+    }
+    return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS().common };
+  }
+  var PLACEHOLDER_ORGS = /* @__PURE__ */ new Set(["미분류"]);
+  var excludedOrgs = (orgs) => /* @__PURE__ */ new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2), ...PLACEHOLDER_ORGS]);
+  function filterRelations(rel, excluded) {
+    if (!excluded.size) return rel;
+    const pairs = {};
+    for (const [k, v] of Object.entries(rel.pairs)) {
       const [a, b] = k.split(">");
       if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
     }
@@ -454,8 +761,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const n2 = clean(name), t = clean(text4);
     const scored = table.map(([key, words], i) => ({ key, i, score: score(words, n2) * 2 + score(words, t) }));
     const start3 = pick(seed2, table.length);
-    const turn = (i) => (i - start3 + table.length) % table.length;
-    return scored.sort((a, b) => b.score - a.score || turn(a.i) - turn(b.i)).map((x) => x.key);
+    const turn2 = (i) => (i - start3 + table.length) % table.length;
+    return scored.sort((a, b) => b.score - a.score || turn2(a.i) - turn2(b.i)).map((x) => x.key);
   }
   var two = (prefix, seed2) => pick(seed2, 2) ? [`${prefix} 2`, `${prefix} 1`] : [`${prefix} 1`, `${prefix} 2`];
   var SIT = { an: "Anomaly", in: "Incident", ms: "Mystic" };
@@ -1333,9 +1640,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return parts.length ? parts.map((e) => e.content).join("\n") : null;
   }
   function parseJson(raw, book2) {
-    const clean4 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
+    const clean5 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
     try {
-      return JSON.parse(clean4);
+      return JSON.parse(clean5);
     } catch {
       throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
     }
@@ -1502,11 +1809,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
     companions: "Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.",
     deployed: "Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.",
     identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
-    points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `900`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Copy it from `[Previous status]` and change it only by point amounts the story states explicitly.",
+    points: "Points = {{user}}'s Baekilmong welfare points, digits only (e.g. `250`). A separate company scrip, never cash: points and won never convert, and points are spent only at the Baekilmong point shop (Welfare Mall). Every employee starts at 0 and holds only what the story has actually given (a stated grant, a per-grade clear reward, minus purchases). Copy it from `[Previous status]` and change it only by point amounts written in the story; never invent a balance that no sentence has granted.",
     wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it."
   };
-  var EXAMPLE_A = { date: "2025.01.01", time: "02:47 AM", weather: "☀️", temp: "4°C", place: "서울 종로구 거리", target: NONE, companions: NONE, deployed: NONE, identity: "관리국/신입", wallet: "1230000", points: "900" };
-  var EXAMPLE_B = { date: "2025.01.01", time: "10:15 PM", weather: "🌫️", temp: "9°C", place: "명일 아파트 3층 복도", target: "명일 아파트", companions: "쟈알디,에일린", deployed: "투입", identity: "관리국/요원", wallet: "1180000", points: "900" };
+  var EXAMPLE_A = { date: "2025.01.01", time: "02:47 AM", weather: "☀️", temp: "4°C", place: "서울 종로구 거리", target: NONE, companions: NONE, deployed: NONE, identity: "관리국/신입", wallet: "1230000", points: "0" };
+  var EXAMPLE_B = { date: "2025.01.01", time: "10:15 PM", weather: "🌫️", temp: "9°C", place: "명일 아파트 3층 복도", target: "명일 아파트", companions: "쟈알디,에일린", deployed: "투입", identity: "관리국/요원", wallet: "1180000", points: "250" };
   function statusSection(cols) {
     const fmt2 = `[▣|${cols.map((id2) => colDef(id2).token).join("|")}]`;
     const rules2 = cols.map((id2) => RULE[id2]).filter(Boolean).map((r) => `- ${r}`);
@@ -1550,13 +1857,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { companions: splitNames(x[0] ?? ""), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id2) ? "" : id2, wallet: walletText(x[3] ?? ""), points: pointsText(x[4] ?? "") };
   }
   function tail(rest) {
-    const clean4 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const clean5 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
     const after = rest.slice(1);
-    if (after.length <= 1) return { target: clean4(after[0] ?? ""), ...extras([]) };
-    return { target: clean4(after[0]), ...extras(after.slice(1, 6)) };
+    if (after.length <= 1) return { target: clean5(after[0] ?? ""), ...extras([]) };
+    return { target: clean5(after[0]), ...extras(after.slice(1, 6)) };
   }
   function byShape(f, shape) {
-    const clean4 = (t) => none(t) ? "" : t;
+    const clean5 = (t) => none(t) ? "" : t;
     const get = (id2) => {
       const i = shape.indexOf(id2);
       return i < 0 ? "" : (f[i] ?? "").trim();
@@ -1565,13 +1872,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return {
       date: get("date"),
       time: get("time"),
-      weather: clean4(get("weather")),
-      temp: clean4(get("temp")),
-      place: clean4(get("place")),
-      target: clean4(get("target")),
+      weather: clean5(get("weather")),
+      temp: clean5(get("temp")),
+      place: clean5(get("place")),
+      target: clean5(get("target")),
       companions: splitNames(get("companions")),
       deployed: shape.includes("deployed") ? none(d) ? false : /투입|deployed/i.test(d) : null,
-      identity: clean4(get("identity")),
+      identity: clean5(get("identity")),
       wallet: walletText(get("wallet")),
       points: pointsText(get("points"))
     };
@@ -1620,10 +1927,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function sceneLabel(prev, now) {
     const p2 = new Date(prev * 6e4);
     const h = p2.getUTCHours();
-    const clock3 = `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(p2.getUTCMinutes()).padStart(2, "0")}`;
+    const clock4 = `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(p2.getUTCMinutes()).padStart(2, "0")}`;
     const days = Math.floor(now / DAY_MIN) - Math.floor(prev / DAY_MIN);
     const when3 = days === 0 ? "오늘" : days === 1 ? "어제" : days === 2 ? "그저께" : `${p2.getUTCFullYear() !== new Date(now * 6e4).getUTCFullYear() ? `${p2.getUTCFullYear()}년 ` : ""}${p2.getUTCMonth() + 1}월 ${p2.getUTCDate()}일`;
-    return `${when3} ${clock3}`;
+    return `${when3} ${clock4}`;
   }
   function elapsedLabel(from, to) {
     let m = to - from;
@@ -2464,15 +2771,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function journalSettings(state) {
     const v = (k) => jrValue(state, k);
-    const num5 = (k, min, max) => {
+    const num6 = (k, min, max) => {
       const n2 = Math.trunc(Number(v(k)));
       return Math.max(min, Math.min(max, Number.isFinite(n2) ? n2 : Number(JR_DEFAULTS[k])));
     };
     const card2 = v("chat_card");
     return {
       chatCard: card2 === "off" || card2 === "all" ? card2 : "mine",
-      journalCap: num5("journal_cap", JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
-      reportCap: num5("report_cap", JR_REPORT_CAP.min, JR_REPORT_CAP.max)
+      journalCap: num6("journal_cap", JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
+      reportCap: num6("report_cap", JR_REPORT_CAP.min, JR_REPORT_CAP.max)
     };
   }
 
@@ -2609,7 +2916,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const peek = () => tokens2[pos];
     const OPS = /* @__PURE__ */ new Set(["&&", "||", "==", "!=", ">=", "<=", "+", "-", "*", "/", "%", "(", ")", "<", ">", "!"]);
     const isWord2 = (t) => t !== void 0 && !OPS.has(t);
-    const num5 = (v) => typeof v === "number" ? v : typeof v === "boolean" ? Number(v) : v === null ? 0 : Number(v);
+    const num6 = (v) => typeof v === "number" ? v : typeof v === "boolean" ? Number(v) : v === null ? 0 : Number(v);
     const atom = () => {
       const t = tokens2[pos++];
       if (t === void 0) return null;
@@ -2619,7 +2926,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         return v;
       }
       if (t === "!") return !truthyV(atom());
-      if (t === "-") return -num5(atom());
+      if (t === "-") return -num6(atom());
       if (t === "null") return null;
       if (t === "true") return true;
       if (t === "false") return false;
@@ -2633,8 +2940,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       let v = atom();
       while (["*", "/", "%"].includes(peek())) {
         const op = tokens2[pos++];
-        const r = num5(atom());
-        v = op === "*" ? num5(v) * r : op === "/" ? num5(v) / r : num5(v) % r;
+        const r = num6(atom());
+        v = op === "*" ? num6(v) * r : op === "/" ? num6(v) / r : num6(v) % r;
       }
       return v;
     };
@@ -2642,8 +2949,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       let v = mul();
       while (["+", "-"].includes(peek())) {
         const op = tokens2[pos++];
-        const r = num5(mul());
-        v = op === "+" ? num5(v) + r : num5(v) - r;
+        const r = num6(mul());
+        v = op === "+" ? num6(v) + r : num6(v) - r;
       }
       return v;
     };
@@ -2653,7 +2960,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         const op = tokens2[pos++];
         const r = add();
         const eq = (a, b) => a === null || b === null ? a === b || a === null && b === "null" || b === null && a === "null" : String(a) === String(b);
-        v = op === "==" ? eq(v, r) : op === "!=" ? !eq(v, r) : op === ">" ? num5(v) > num5(r) : op === "<" ? num5(v) < num5(r) : op === ">=" ? num5(v) >= num5(r) : num5(v) <= num5(r);
+        v = op === "==" ? eq(v, r) : op === "!=" ? !eq(v, r) : op === ">" ? num6(v) > num6(r) : op === "<" ? num6(v) < num6(r) : op === ">=" ? num6(v) >= num6(r) : num6(v) <= num6(r);
       }
       return v;
     };
@@ -3095,8 +3402,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (!validAsset(asset)) throw new Error("사진 저장 위치가 올바르지 않아요.");
       return `%%ATTACHMENT:${hex(JSON.stringify({ kind: "image", content: String(content ?? "").trim(), asset }))}%%`;
     }
-    const clean4 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
-    return `[[ATTACH:${kind}]]${clean4}[[/ATTACH]]`;
+    const clean5 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
+    return `[[ATTACH:${kind}]]${clean5}[[/ATTACH]]`;
   }
   function stripForged(text4) {
     return String(text4 ?? "").replace(new RegExp(HEX, "g"), "[지원하지 않는 첨부]");
@@ -3775,9 +4082,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const strip = (rows3, list4) => rows3.map((r) => {
       const bad = new Set((list4[r.lore] ?? []).map((t) => t.toLowerCase()));
       if (!bad.size) return r;
-      const aliases = r.aliases.filter((t) => !bad.has(t.toLowerCase()));
-      n2 += r.aliases.length - aliases.length;
-      return aliases.length === r.aliases.length ? r : { ...r, aliases };
+      const aliases2 = r.aliases.filter((t) => !bad.has(t.toLowerCase()));
+      n2 += r.aliases.length - aliases2.length;
+      return aliases2.length === r.aliases.length ? r : { ...r, aliases: aliases2 };
     });
     const next = { ...dir2, anomalies: strip(dir2.anomalies, drop.괴이), sites: strip(dir2.sites, drop["미스틱 사이트"]), agents: strip(dir2.agents, drop.요원) };
     return n2 ? withDirectory(lore, directoryData(next)) : lore;
@@ -3875,15 +4182,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function gnetSettings(state) {
     const v = gnetVars(state);
     const s8 = (k) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
-    const clean4 = (k) => s8(k) === "-" ? "" : s8(k);
-    const num5 = (k, lo, hi) => {
+    const clean5 = (k) => s8(k) === "-" ? "" : s8(k);
+    const num6 = (k, lo, hi) => {
       const n2 = Math.round(Number(s8(k)));
       return Number.isFinite(n2) && s8(k) !== "" ? Math.max(lo, Math.min(hi, n2)) : Math.max(lo, Math.min(hi, Number(GN_DEFAULTS[k])));
     };
     const counts = Object.fromEntries(COUNT_KEYS.map((k) => {
       const [lo, hi] = COUNT_RANGE[k];
-      const a = num5(`${k}_min`, lo, hi);
-      return [k, [a, Math.max(a, num5(`${k}_max`, lo, hi))]];
+      const a = num6(`${k}_min`, lo, hi);
+      return [k, [a, Math.max(a, num6(`${k}_max`, lo, hi))]];
     }));
     const chance = Number(s8("incoming_chance"));
     return {
@@ -3892,10 +4199,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
       autoOpen: s8("lazy") === "open",
       model: s8("mode") === "1" ? "main" : "aux",
       counts,
-      subject: clean4("subject"),
-      mood: clean4("mood"),
+      subject: clean5("subject"),
+      mood: clean5("mood"),
       privacy: ["0", "1", "2", "3", "4"].includes(s8("privacy")) ? s8("privacy") : "1",
-      protagonist: clean4("protagonist"),
+      protagonist: clean5("protagonist"),
       sampling: s8("sampling") === "1",
       keepOwn: s8("keepown") === "1",
       keepReplied: s8("keepreplied") === "1",
@@ -3971,18 +4278,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc41 = false;
+    let esc42 = false;
     for (const c of line2) {
-      if (esc41) {
+      if (esc42) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc41 = false;
-      } else if (c === "\\") esc41 = true;
+        esc42 = false;
+      } else if (c === "\\") esc42 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc41) cur += "\\";
+    if (esc42) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4262,361 +4569,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
     st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });
   }
   function parseJsonPayload(raw) {
-    let text4 = String(raw ?? "").replace(/^﻿/, "").trim();
-    for (let i = 0; i < 12; i++) {
-      const before = text4;
-      if (text4.startsWith("{")) break;
-      const tag = /^<(think|thoughts|analysis|lb-process)(?:\s[^>]*)?>/i.exec(text4);
-      if (tag) {
-        const end = text4.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
-        if (end >= 0) text4 = text4.slice(end + tag[1].length + 3).trim();
-        else if (/\n\s*\{/.test(text4)) text4 = text4.slice(text4.search(/\n\s*\{/)).trim();
-      } else {
-        const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text4);
-        if (fence) text4 = fence[1].trim();
-        else {
-          const wrap = /^<(output|json|lb-gn)(\s[^>]*)?>([\s\S]*)<\/\1>\s*$/i.exec(text4);
-          if (wrap) text4 = wrap[3].trim();
-        }
-      }
-      if (text4 === before) break;
-    }
-    try {
-      return JSON.parse(text4);
-    } catch {
-      const dup = /^([\s\S]*\})\s*\{\s*"comments"\s*:\s*\[\s*\]\s*\}\s*$/.exec(text4);
-      if (dup) {
-        try {
-          return JSON.parse(dup[1]);
-        } catch {
-        }
-      }
-      const a = text4.indexOf("{");
-      const b = text4.lastIndexOf("}");
-      if (a >= 0 && b > a) {
-        const body5 = text4.slice(a, b + 1);
-        try {
-          return JSON.parse(body5);
-        } catch {
-          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
-          try {
-            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
-          } catch {
-          }
-        }
-      }
-      throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
-    }
-  }
-  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
-  var int = (v) => {
-    const n2 = typeof v === "string" && v.trim() ? Number(v) : v;
-    return typeof n2 === "number" && Number.isInteger(n2) ? n2 : null;
-  };
-  function applyBoard(before, current5, value, o) {
-    if (snapshotKey(before) !== snapshotKey(current5)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
-    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
-    const rows3 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
-    if (!Array.isArray(rows3) || !rows3.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
-    const st = structuredClone(current5);
-    const old = new Map(st.posts.map((p2) => [p2.id, p2]));
-    const posts = [];
-    const seen2 = /* @__PURE__ */ new Set();
-    let skippedPosts = 0;
-    let skippedComments = 0;
-    let commentTotal = 0;
-    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
-    const floor = Math.max(1e5, current5.seq);
-    for (const raw of rows3) {
-      if (!isObj(raw)) continue;
-      let pid = int(raw.id);
-      const prev = pid !== null ? old.get(pid) : void 0;
-      const author = str2(raw.author).trim();
-      if (!prev && (raw.mine === true || author === o.nick)) {
-        skippedPosts++;
-        continue;
-      }
-      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
-      if (pid === null || seen2.has(pid)) continue;
-      seen2.add(pid);
-      st.seq = Math.max(st.seq, pid);
-      const comments = Array.isArray(raw.comments) ? raw.comments : [];
-      commentTotal += comments.length;
-      let date = validDate(raw.date);
-      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
-      const q = {
-        id: pid,
-        nick: cut(author || "ㅇㅇ", 80),
-        title: str2(raw.title),
-        body: stripForged(str2(raw.content)),
-        date,
-        views: Math.max(0, int(raw.views) ?? 0),
-        votes: Math.max(0, int(raw.upvotes) ?? 0),
-        mine: prev?.mine ?? false,
-        comments: [],
-        ...cleanTag(raw.tag) ? { tag: cleanTag(raw.tag) } : {}
-      };
-      const sigs = /* @__PURE__ */ new Map();
-      const remap = /* @__PURE__ */ new Map([[0, 0]]);
-      if (prev) {
-        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
-        if (prev.tag) q.tag = prev.tag;
-        if (prev.scrap) q.scrap = true;
-        if (prev.voted) q.voted = true;
-        if (prev.down) q.down = true;
-        for (const c of prev.comments) {
-          q.comments.push(c);
-          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
-        }
-      }
-      const raws = [];
-      comments.forEach((c, i) => {
-        const n2 = i + 1;
-        if (!isObj(c)) return void remap.set(n2, false);
-        const cAuthor = str2(c.author).trim();
-        const content = stripForged(str2(c.content));
-        let parent = int(c.parent) ?? 0;
-        if (parent < 0 || parent >= n2) parent = 0;
-        const sig = `${cAuthor}\0${content}`;
-        if (sigs.has(sig)) return void remap.set(n2, sigs.get(sig));
-        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
-          skippedComments++;
-          return void remap.set(n2, false);
-        }
-        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
-        raws.push(str2(c.time).trim());
-        sigs.set(sig, q.comments.length);
-        remap.set(n2, q.comments.length);
-      });
-      stampComments(q, q.comments.length - raws.length, raws, o.date);
-      if (!q.title.trim() && !q.body.trim()) continue;
-      posts.push(q);
-    }
-    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
-    for (const p2 of st.posts) if (protectedPost(o.settings, p2) && !seen2.has(p2.id)) posts.push(p2);
-    st.posts = posts;
-    trimBoard(st, o.settings);
-    const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
-    return { st, notice: notice2, emptyComments: commentTotal === 0 };
-  }
-  function acceptComments(rows3, existing, t, nick, base = t.total, cap = LIMITS.replies) {
-    const list4 = Array.isArray(rows3) ? rows3.slice(0, cap) : [];
-    let dropped = Array.isArray(rows3) ? Math.max(0, rows3.length - cap) : 0;
-    const out = [];
-    const map = /* @__PURE__ */ new Map();
-    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
-    list4.forEach((c, i) => {
-      const own = t.total + i + 1;
-      const bad = () => {
-        dropped++;
-        map.set(own, false);
-      };
-      if (!isObj(c)) return bad();
-      const author = str2(c.author).trim();
-      const content = stripForged(str2(c.content)).trim();
-      let n2 = int(c.parent);
-      if (n2 === null || n2 === 0) n2 = t.replyTo;
-      if (!author || [...author].length > 80 || author === nick || !content) return bad();
-      if (n2 > t.total) {
-        const m = map.get(n2);
-        if (m === void 0 || m === false) return bad();
-        n2 = m;
-      } else if (n2 < 0 || n2 > 0 && !t.supplied.has(n2) && n2 !== t.replyTo) return bad();
-      if (t.replyTo > 0 && n2 !== t.replyTo && n2 <= t.total) return bad();
-      const sig = `${author}\0${content}`;
-      if (seen2.has(sig)) return bad();
-      seen2.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n2, time: str2(c.time).trim() });
-      map.set(own, base + out.length);
-    });
-    return { comments: out, dropped };
-  }
-  function stampMinutes(stamp) {
-    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
-    if (!m) return null;
-    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
-    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
-  }
-  function minutesStamp(min) {
-    const d = new Date(min * 6e4);
-    const p2 = (n2) => String(n2).padStart(2, "0");
-    return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
-  }
-  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
-  function clockMinutes(raw) {
-    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
-    if (!m) return null;
-    const h = +m[1];
-    const mi = +m[2];
-    return h < 24 && mi < 60 ? h * 60 + mi : null;
-  }
-  function stampComments(p2, from, raws, now) {
-    const nowMin = stampMinutes(now);
-    const postMin = stampMinutes(p2.date);
-    const floorOf = (i) => {
-      const c = p2.comments[i];
-      const cands = [postMin, stampMinutes(c.parent > 0 ? p2.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p2.comments[i - 1]?.time) : null];
-      const known = cands.filter((x) => x !== null);
-      return known.length ? Math.max(...known) : null;
-    };
-    const pending2 = [];
-    const settle = (upto) => {
-      if (!pending2.length) return;
-      const lo = floorOf(pending2[0]);
-      const hi = upto ?? nowMin ?? lo;
-      if (lo === null || hi === null) return void (pending2.length = 0);
-      const span = Math.max(0, hi - lo);
-      pending2.forEach((idx, k) => {
-        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending2.length + 1)));
-        p2.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
-      });
-      pending2.length = 0;
-    };
-    for (let i = from; i < p2.comments.length; i++) {
-      const c = p2.comments[i];
-      const raw = String(raws[i - from] ?? "").trim();
-      const lo = floorOf(i);
-      const clock3 = raw ? clockMinutes(raw) : null;
-      if (clock3 === null || lo === null && nowMin === null) {
-        pending2.push(i);
-        continue;
-      }
-      const hi = nowMin ?? Number.POSITIVE_INFINITY;
-      const base = lo ?? nowMin - 24 * 60;
-      let pick3 = null;
-      for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
-        const t = day * 1440 + clock3;
-        if (t >= base && t <= hi) {
-          pick3 = t;
-          break;
-        }
-      }
-      if (pick3 === null) {
-        const ahead = 1 + i % 3;
-        const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock3 > nowMin;
-        if (future && (lo === null || lo <= nowMin)) pick3 = nowMin;
-        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick3 = lo + ahead;
-        else pick3 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
-      }
-      settle(pick3);
-      c.time = minutesStamp(pick3);
-    }
-    settle(null);
-  }
-  function commentWhen(p2, c) {
-    if (!c.time) return "";
-    return c.time.slice(0, 10) === String(p2.date).slice(0, 10) ? hhmm(c.time) : c.time;
-  }
-  var whenField = (p2, c) => {
-    const t = commentWhen(p2, c);
-    return t ? { time: t } : {};
-  };
-  function pushComments(p2, rows3, now) {
-    const from = p2.comments.length;
-    for (const c of rows3) p2.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-    stampComments(p2, from, rows3.map((c) => c.time ?? ""), now);
-  }
-  var cleanTag = (v) => cut(str2(v).split(/\r?\n/)[0].replace(/[\[\]【】]/g, "").trim(), 12);
-  function parsePostDraft(value) {
-    if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
-    const title2 = str2(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
-    const content = str2(value.post.content).trim();
-    if (!title2 || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
-    const tag = cleanTag(value.post.tag);
-    return { title: trimTokens(title2, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens), ...tag ? { tag } : {} };
-  }
-  function attachPostDraft(draft2, input3) {
-    if (!hasAttachment(input3)) return draft2;
-    const literal = /* @__PURE__ */ new Set();
-    for (const p2 of bodyParts(input3)) if (p2.kind === "text") for (const line2 of p2.text.split("\n")) literal.add(line2.trim());
-    const plain2 = bodyParts(draft2.content).filter((p2) => p2.kind === "text").map((p2) => p2.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
-    const kept = plain2.split("\n").filter((line2) => {
-      const t = line2.trim();
-      const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
-      const label2 = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
-      const dup = !!label2 && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label2);
-      return literal.has(t) || !dup;
-    });
-    const records = attachmentRecords(input3).map((r) => r.text);
-    const content = [kept.join("\n").trim(), ...records].filter(Boolean).join("\n");
-    return { ...draft2, content };
-  }
-  function activityContext(st, targetId) {
-    const posts = [];
-    const snapshots = /* @__PURE__ */ new Map();
-    for (const p2 of st.posts.slice(0, HISTORY.refresh)) {
-      const selected = /* @__PURE__ */ new Set();
-      for (let n2 = Math.max(1, p2.comments.length - HISTORY.comment + 1); n2 <= p2.comments.length; n2++) {
-        let k = n2;
-        const visited = /* @__PURE__ */ new Set();
-        while (p2.comments[k - 1] && !visited.has(k)) {
-          visited.add(k);
-          selected.add(k);
-          k = p2.comments[k - 1].parent;
-        }
-      }
-      const allowed = p2.id !== targetId;
-      posts.push({
-        id: p2.id,
-        author: p2.nick,
-        title: p2.title,
-        content: p2.body,
-        date: p2.date,
-        views: p2.views,
-        upvotes: p2.votes,
-        comments: p2.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p2, c), content: c.body })).filter((c) => selected.has(c.index)),
-        commentCount: p2.comments.length,
-        commentsAllowed: allowed
-      });
-      snapshots.set(p2.id, { head: postHead(p2), rows: p2.comments.map(commentKey), count: p2.comments.length, selected, commentsAllowed: allowed });
-    }
-    return { posts, snapshots };
-  }
-  function applyActivity(st, rows3, snapshots, nick, now = "", cap = LIMITS.replies) {
-    if (rows3 === void 0 || rows3 === null) return [false, 0];
-    if (!Array.isArray(rows3)) return [false, 1];
-    let changed = false;
-    let skipped2 = 0;
-    const done3 = /* @__PURE__ */ new Set();
-    for (const u of rows3) {
-      const id2 = isObj(u) ? int(u.id) : null;
-      const ref = id2 !== null ? snapshots.get(id2) : void 0;
-      const p2 = id2 !== null ? findPost(st, id2) : void 0;
-      if (!isObj(u) || id2 === null || done3.has(id2) || !ref || !p2 || postHead(p2) !== ref.head || ref.rows.some((k, i) => !p2.comments[i] || commentKey(p2.comments[i]) !== k)) {
-        skipped2++;
-        continue;
-      }
-      done3.add(id2);
-      const delta = (v) => {
-        const n2 = int(v);
-        return n2 !== null && n2 >= 0 ? Math.min(n2, 1e7) : 0;
-      };
-      const comments = Array.isArray(u.comments) ? u.comments : [];
-      if (!ref.commentsAllowed && comments.length) {
-        skipped2++;
-        continue;
-      }
-      const got = acceptComments(comments, p2.comments, { postId: id2, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p2.comments.length, cap);
-      p2.views += delta(u.viewsDelta);
-      p2.votes += delta(u.upvotesDelta);
-      pushComments(p2, got.comments, now);
-      if (got.dropped) skipped2++;
-      changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
-    }
-    return [changed, skipped2];
-  }
-  function incomingPlan(chat, st, s8, nick, rand, origin, saved2) {
-    const plan = { allowed: false, userHandle: nick, history: [] };
-    for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
-    if (!s8.incoming) return plan;
-    const last2 = Number(chat.scriptstate?.[GN_COOLDOWN]);
-    const now = storyTurns(chat);
-    if (Number.isFinite(last2) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last2 && now - last2 < HISTORY.cooldown) return plan;
-    let post = origin?.post;
-    let ci = origin?.commentIndex;
-    if (!post && saved2) {
-      post = findPost(st, saved2.post);
-      ci = saved2.comment;
-    }
-    if (!
+    let text4 = String(raw ?? "").r

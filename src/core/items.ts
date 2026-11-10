@@ -22,6 +22,8 @@ export const ITEM_USE_AT_VAR = '$st_item_use_at';
 /** 설정 (채팅 변수, 새 채팅 기본값은 prefs.vars): 칸 수·한계 문장·본편에 넘기기·보조 모델 자동 읽기 */
 export const ITEM_SLOTS_VAR = '$it_slots';
 export const ITEM_LIMIT_VAR = '$it_limit';
+/** 그림 대체 말 표 (한 줄 「외투 → 코트」; 비우면 core/iconmatch ICON_ALIAS_DEFAULT) — 2026-11-09 사용자: 매칭기 재설계 */
+export const ITEM_ICON_ALIAS_VAR = '$it_icon_alias';
 export const ITEM_PUSH_VAR = '$it_push';
 export const ITEM_AUTO_VAR = '$it_auto';
 export const ITEM_SLOTS_DEFAULT = 16;
@@ -48,6 +50,10 @@ export interface Item {
   desc: string;
   /** 효과 (≤60, 없으면 빈 문자열) */
   effect: string;
+  /** 숨긴 진짜 효과 (≤60). 화면엔 절대 안 보이고 본편 모델만 받는다 (11-09 사용자: 우주몰 물건은 보이는 효과가 광고 문구) */
+  truth?: string;
+  /** 쪽지 내용 (≤400): 산 정보 등 읽는 글. 소지품에서 열어 읽고, 본편에도 그대로 간다 */
+  text?: string;
   /** 사용 가능 */
   use: boolean;
   /** 소모성: 처음 횟수. 남은 횟수 = 이것 − 살아 있는 사용 기록의 n 합 (itemLeft). 0 이 되면 목록에서 안 보인다 */
@@ -217,6 +223,10 @@ export interface ItemInput {
   name: string;
   desc?: string;
   effect?: string;
+  /** 숨긴 진짜 효과 */
+  truth?: string;
+  /** 쪽지 내용 */
+  text?: string;
   /** 판정 (안 주면 새 물건은 사용 X·비소모·장착 X, 있던 물건은 그대로) */
   use?: boolean;
   uses?: unknown;
@@ -277,6 +287,8 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   if (!name) return it;
   const desc = clean(e.desc, 80);
   const effect = clean(e.effect, 60);
+  const truth = e.truth ? clean(e.truth, 60) : '';
+  const text = e.text ? clean(e.text, 400) : '';
   const quote = e.quote ? clean(e.quote, 120) : undefined;
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
   if (found) {
@@ -285,7 +297,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     const more = stack ? { uses: Math.min(999, found.uses! + addUses!) } : { uses: e.uses };
     // 무게는 1개당 (2026-11-08 사용자): 같은 소모품이 더 들어와도 1개당 무게는 그대로, 합은 개수만큼 곱해진다
     const weight = found.weight !== undefined ? undefined : e.weight;
-    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(quote ? { quote } : {}) };
+    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(truth ? { truth } : {}), ...(quote ? { quote } : {}) };
     if (JSON.stringify(next) === JSON.stringify(found)) return it;
     return { ...it, list: it.list.map((x) => (x.id === found.id ? next : x)) };
   }
@@ -296,6 +308,8 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(Number.isSafeInteger(e.price) ? { price: e.price } : {}),
     ...(e.walletId ? { walletId: e.walletId } : {}),
     ...(e.paidWith ? { paidWith: clean(e.paidWith, 60) } : {}),
+    ...(truth ? { truth } : {}),
+    ...(text ? { text } : {}),
     ...(quote ? { quote } : {}),
   }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
@@ -502,7 +516,8 @@ export function itemLine(e: Item, left: number | undefined, equipped: boolean, d
     left === 0 ? 'used up' : left !== undefined ? `${left} use${left === 1 ? '' : 's'} left` : '',
     e.state === 'damaged' ? 'damaged' : e.state === 'broken' ? 'broken, cannot be used' : '',
   ].filter(Boolean);
-  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}` : '';
+  // 숨긴 진짜 효과(truth)는 여기 안 적는다 — 평소엔 광고 문구(effect)만. 쓰는 턴에만 itemsBlock 이 「Really:」로 넘긴다 (11-09 사용자: 매 턴 보내면 모델이 아는 척한다)
+  const body = detail === 'full' ? `${e.desc ? ` — ${e.desc}` : ''}${e.effect ? ` (${e.effect})` : ''}${e.text ? ` — reads: "${e.text}"` : ''}` : '';
   return `- ${e.name}${body}${tags.map((t) => ` [${t}]`).join('')}`;
 }
 
@@ -536,6 +551,12 @@ export function itemsBlock(list: Item[], opts: { slots: number; limit: string; c
   events.push(...extra);
   if (carried > opts.slots) events.push('carrying more than the limit');
   if (events.length) out.push(`This turn: ${events.join('; ')}`);
+  // 숨긴 진짜 효과: 이번 턴에 쓰는 물건, 몸에 걸친 장비만 (11-09 사용자: 평소엔 광고 문구만 가고, 쓰는 순간에 「이번에 일어나는 일」로 받는다)
+  const reveal = list.filter((e) => e.truth && (use.some((u) => u.name === e.name) || isEquipped(e, list)));
+  if (reveal.length) {
+    out.push('Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):');
+    for (const e of reveal) out.push(e.truth === '?' ? `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ''} — decide what it really does now, then keep it the same from here on.` : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ''}`);
+  }
   return out.join('\n');
 }
 
@@ -555,9 +576,9 @@ export function searchItems(it: Items, alive: Set<string>, q: string): { items: 
 export const INVENTORY_HEAD = '[Inventory]';
 /** 본편에 넘기기가 꺼지고 상점만 켜졌을 때의 글 머리 */
 export const SHOP_HEAD = '[Shop]';
-const INVENTORY_NOTE =
+export const INVENTORY_NOTE =
   'What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: ' +
-  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. Never print this list back.';
+  'describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. If a "Really" list follows, those items\' real effects differ from or go beyond their labels: what happens follows the Really line, nobody knew it beforehand, and the protagonist learns it only through what happens. Never print this list back.';
 
 /** 채팅의 마지막 유저 메시지 키 (없으면 '') */
 export function lastUserKey(chat: Chat): string {
@@ -617,7 +638,10 @@ export function inventoryText(chat: Chat): string {
     const live = liveItems(it, aliveAnchors(chat));
     const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
     const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...shopEvents(chat)];
-    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), shopGuide(vars)].join('\n');
+    // 갱신기가 상점을 판단하면 표식 지침은 빈 글 (core/shop.ts shopJudgeBy): 넘길 사건도 없으면 블록을 보내지 않는다
+    const guide = shopGuide(vars);
+    if (!events.length && !guide) return '';
+    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), ...(guide ? [guide] : [])].join('\n');
   }
   const it = readItems(vars);
   const userKey = lastUserKey(chat);
@@ -649,7 +673,8 @@ export function inventoryText(chat: Chat): string {
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
   });
-  return text ? `${text}\n${INVENTORY_NOTE}${shop ? `\n${shopGuide(vars)}` : ''}` : '';
+  const guide = shop ? shopGuide(vars) : '';
+  return text ? `${text}\n${INVENTORY_NOTE}${guide ? `\n${guide}` : ''}` : '';
 }
 
 /** 메시지 키 k 가 유저 키 userKey 뒤의 응답인가 (다시 굴리는 턴의 옛 응답) */

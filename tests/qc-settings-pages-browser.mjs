@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 
-const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv', 'update'];
+const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv']; // 11-09: 업데이트는 점검 → 설치·업데이트(install) 페이지로 합쳐짐
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['gnet', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
@@ -364,7 +364,7 @@ for (const vp of vps) {
       assert.equal(await pageSig(page), s1, `${p}: 다시 열어도 같은 값`);
     }
     // 업데이트 페이지: 화면만 (확인 단추·버전 글자)
-    await goNode(page, 'set:update');
+    await goNode(page, 'install');
     assert.ok(await page.$('.gw [data-action="upd-check"]'), '업데이트 확인 단추');
     await closeEditor(page, true);
     await closeWin(page);

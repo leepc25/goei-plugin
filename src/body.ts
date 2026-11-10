@@ -6,7 +6,7 @@ import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MAR
 import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
-import { BOARD_SITES, boardState, boardView } from './core/boards';
+import { BOARD_SITES, boardView } from './core/boards';
 import { mainContextRules } from './core/gnetPrompt';
 import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
 import { guidePrompt, RP_HEAD } from './core/guides';
@@ -26,11 +26,12 @@ import { chatPhase } from './core/start';
 import { autoRefresh, autoView } from './ui/phone';
 import { autoWriteWiki } from './ui/wiki';
 import { wikiSettings } from './core/wiki';
-import { featureModel } from './core/craft';
 import { autoRefreshGnet } from './ui/gnet';
 import { autoRefreshMall } from './ui/malls';
 import { MALL_SITES, mallSettings } from './core/malls';
 import { Joint } from './host/joint';
+import { autoTasks, jointGroups } from './core/netjoint';
+import { BOARD_NAME } from './core/boards';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
 import type { Chat, LoreEntry } from './core/types';
@@ -41,12 +42,13 @@ import { supplementAssets } from './host/asset';
 import { loadContext, updateCharacterLore, updateChat, getChar, type ChatContext, type CharacterSnapshot } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
+import { createProgWin, progressOn, type ProgWin } from './host/progwin';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
+import { appShown, onAppShown, openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
 import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
 import { isGoeiLore, isLanding } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
@@ -64,7 +66,7 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
-import { hasShopTag, settleShop } from './core/shop';
+import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
@@ -78,6 +80,8 @@ import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf, routerPeople } from './host/people';
 import { traceBegin, traceMain, traceReply } from './host/trace';
+import { progressAbort, progressEnd, progressPlan, progressTurn, progressWatch } from './core/progress';
+import { turnPlan } from './core/progplan';
 import { bookText } from './core/refs';
 import { stripMarkers } from './core/sanitize';
 
@@ -146,6 +150,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       // 호출 흐름 기록: 새 턴 (host/trace.ts). 이 뒤의 라우터·디렉터 호출은 이 턴의 「본편 전」
       await stepAsync('호출 기록', () => traceBegin(), undefined);
       ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
+      // 진행 창 (core/progress.ts): 이 턴에 돌 단계를 설정으로 미리 깐다
+      if (ctx) step('진행 계획', () => progressPlan(turnPlan(ctx!.char, ctx!.chat)), undefined);
       // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
       await stepAsync('유저 이름', () => readUser(), undefined);
       messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
@@ -448,6 +454,9 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
   setWaiting(false);
+  // 진행 창: 응답 뒤 작업(인물 기록 갱신·인터넷 자동 호출)이 다 끝나면 이 턴만 닫는다. 뒤 작업이 없으면 바로
+  const after: Promise<unknown>[] = [];
+  const pTurn = progressTurn();
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
@@ -455,7 +464,10 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 이벤트의 캐릭터는 카드 그대로라 세계 데이터(가상 로어북)가 없다. 경량 카드는 명부 폴더가 가상이라 이걸 빼면 상황판 처리가 통째로 건너뛰어진다 (2026-10-27)
     const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
-    if (typeof raw !== 'string') return;
+    if (typeof raw !== 'string') {
+      progressAbort(pTurn); // 응답이 안 붙음: 본편 실패로 닫는다
+      return;
+    }
     traceReply(raw);
     let latest: Chat | null = null;
     if (chat.scriptstate?.['$st_anomaly_on'] === '1') {
@@ -508,9 +520,12 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       }).catch(() => null)) ?? latest;
     }
     // 상점 표식 `[shop: 가게|주인]`: 이 응답 기준으로 상점 상태를 맞추고 지난 응답의 표식은 지운다 (core/shop.ts settleShop). 설정이 꺼져 있어도 남은 표식은 정리
-    if ((hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex)) {
+    // 주인공 자기 가게는 상점이 아니다 (11-09 사용자: 마덕희로 플레이 → 헐값매입 상점이 뜸): 캐릭터 플레이 요원 이름·페르소나 이름
+    const selfNames = hasShopTag(raw) ? [playerAgent((await getChar<LoreChar>(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? '', userInfo().name] : [];
+    // 갱신기가 상점을 판단하면(설정 「상점 판단」, 11-09) 여기서는 건드리지 않는다: 갱신기가 표식을 붙이고 같은 정리를 돌린다 (host/people.ts). 그래야 같은 가게에 머무는 동안 방문 기록이 지워지지 않는다
+    if ((shopJudgeBy((latest ?? chat).scriptstate).by === 'main' || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.['$st_shop']) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
       latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-        const r = settleShop(cur, arg.messageIndex);
+        const r = settleShop(cur, arg.messageIndex, selfNames);
         return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...r.vars } } : null;
       }).catch(() => null)) ?? latest;
     }
@@ -541,6 +556,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
     {
       const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+      after.push(pp);
       if (!peopleSettings(now.scriptstate).parallel) await pp;
     }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
@@ -548,52 +564,48 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
-    const phoneAuto = phoneSettings(now.scriptstate).auto;
-    const gnetAuto = gnetSettings(now.scriptstate).auto;
-    // 괴담넷 말고 다른 게시판 사이트 중 매 턴인 곳 (각자 따로 부른다)
-    const otherBoards = BOARD_SITES.filter((site) => site !== 'gn' && gnetSettings(boardState(now!.scriptstate, site)).auto);
+    // 인터넷 자동 호출(괴담톡·게시판 넷) 가운데 매 턴인 것 (core/netjoint.ts). 같은 모델끼리 한 요청으로 묶는다 (11-09 사용자 결정, 스위치 $net_joint)
+    const netTasks = autoTasks(now.scriptstate);
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
     const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
     // 쇼핑몰 중 자동 호출 「매 턴」인 곳 (포인트몰은 로그인했을 때만)
     const malls = MALL_SITES.filter((site) => { const m = mallSettings(now!.scriptstate, site); return m.on && m.auto === 'turn' && (site !== 'bm' || String(now!.scriptstate?.['$br_login'] ?? '') === '1'); });
-    if (phoneAuto || gnetAuto || otherBoards.length || viewAuto || wikiAuto || malls.length) {
+    if (netTasks.length || viewAuto || wikiAuto || malls.length) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
         return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char: char as never, chat: c };
       };
-      void (async () => {
+      after.push((async () => {
         applyAdvanced(now!.scriptstate);
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
         const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
         const mallFail = (error: unknown) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
-        const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
-        // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
-        const model = phoneSettings(now!.scriptstate).model;
-        const fixed = featureModel(now!.scriptstate, 'ph');
-        if (phoneAuto && gnetAuto && gnetSettings(now!.scriptstate).model === model && featureModel(now!.scriptstate, 'gn') === fixed) {
-          const joint = new Joint(model, fixed);
-          await Promise.all([
-            autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
-            autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
-          ]);
-          for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
-          if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
-          if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
-          for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
-          return;
+        const gnetFail = (site: string) => (error: unknown) => console.log(`[goei] ${BOARD_NAME[site as keyof typeof BOARD_NAME] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+        // 덩어리마다: 둘 이상이면 Joint 로 한 요청(각 작업은 요청문을 만들어 맡기고, 다 모이면 한 번에 보냄), 하나면 그냥. 덩어리끼리는 차례로
+        for (const group of jointGroups(now!.scriptstate)) {
+          const joint = group.length > 1 ? new Joint(group[0].model, group[0].fixed, group.map((t) => t.kind)) : undefined;
+          await Promise.all(group.map(async (t) => {
+            try {
+              if (t.kind === 'phone') await autoRefresh(await fresh(), arg.messageIndex, undefined, joint);
+              else await autoRefreshGnet(await fresh(), arg.messageIndex, false, joint, t.kind);
+            } catch (error) {
+              (t.kind === 'phone' ? phoneFail : gnetFail(t.kind))(error);
+            } finally {
+              joint?.done(t.kind);
+            }
+          }));
         }
-        if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
-        if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
-        for (const site of otherBoards) await autoRefreshGnet(await fresh(), arg.messageIndex, false, undefined, site).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
         if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
         for (const site of malls) await autoRefreshMall(await fresh(), site).catch(mallFail);
-      })();
+      })());
     }
   } catch (error) {
     console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
+  } finally {
+    void Promise.allSettled(after).then(() => progressEnd(pTurn));
   }
 }
 
@@ -664,8 +676,8 @@ function cardPalette() {
 }
 function cardStyle(): string {
   const p = cardPalette();
-  // 채팅 속 카드는 전부 같은 폭 규칙: 왼쪽 정렬, 420px 안팎, 내용만큼 (2026-11-08 사용자: 입력창 위 상자 크기가 제각각, 첫 행동 상자가 너무 길다, 왼쪽 정렬)
-  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px 0 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  // 채팅 속 카드는 전부 같은 폭 규칙: 상태창처럼 가운데 정렬, 420px 안팎, 내용만큼 (2026-11-08 사용자: 상자 크기 제각각 → 11-09 사용자: 상태창처럼 중앙 배열, 틀어져 보인다)
+  return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
 }
 
 /** 카드 안 단추 (상점 카드 「상점 열기」와 같은 모양) */
@@ -791,6 +803,8 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 let vsChat = '';
 let vsShownChat = '';
 let vsPadKey = '';
+let prog: ProgWin | null = null;
+let progKey = '';
 async function onVersusPad(fab: Fab | null): Promise<void> {
   if (!vsChat) return;
   vsShownChat = vsChat;
@@ -841,6 +855,15 @@ function startWatcher(fab: Fab | null): () => void {
       const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
       const padKey = `${pad}:${vsOpen()}`;
       if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
+      // 호출 진행 창 (11-09): 유령 단추와 같은 화면에서만, 설정 「화면 → 호출 진행 창」이 켜져 있을 때
+      // 상황판이 떠 있는 동안은 숨긴다 (릴리스 점검 11-09: 진행 단추가 상황판 닫기 X 를 덮어 눌리지 않았다)
+      const pShow = next.fabVisible && progressOn() && !appShown();
+      const pKey = `${pShow}`;
+      if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
+      // 떠 있으면 매 초 폭(폰·PC 모양)·자리를 다시 맞춘다 (릴리스 점검 11-09: 창 크기를 바꿔도 그대로였다)
+      else if (prog && pShow) await prog.setVisible(true).catch(() => {});
+      // 턴에 채팅을 붙이고, 채팅을 옮겼으면 앞 채팅의 턴을 치우고, 본편을 너무 오래 기다리면 실패로 닫는다
+      progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -894,7 +917,12 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   setWikiOpener((title) => void openWiki(title));
   setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
-  setShopOpener(() => void openShop());
+  setShopOpener((site) => void openShop(site));
+  // 상황판이 뜨면 호출 진행 창은 바로 숨기고, 닫히면 다음 감시 틱에서 다시 판단 (릴리스 점검 11-09)
+  onAppShown((open) => {
+    if (!prog) return;
+    if (open) { progKey = 'false'; void prog.setVisible(false).catch(() => {}); } else progKey = '';
+  });
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
@@ -902,6 +930,15 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     const f = fab;
     void f.setTheme(currentTheme());
     onThemeChange((t) => void f.setTheme(t).catch(() => {}));
+    try {
+      prog = await createProgWin();
+      const pw = prog;
+      void pw.setTheme(currentTheme());
+      onThemeChange((t) => void pw.setTheme(t).catch(() => {}));
+    } catch (error) {
+      console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      prog = null;
+    }
     stopWatcher = startWatcher(fab);
     lap('유령 단추 붙임');
   } catch (error) {
@@ -924,6 +961,9 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
     unload: async () => {
       stopWatcher?.();
       await fab?.remove().catch(() => {});
+      await prog?.remove().catch(() => {});
+      prog = null;
+      progKey = '';
     },
   };
 }

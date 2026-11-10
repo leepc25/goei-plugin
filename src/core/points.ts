@@ -74,6 +74,7 @@ export function syncPointsToStatus(w: Wallet, chat: Chat): Wallet | null {
     }
   }
   if (target === null) return null;
+  // 첫 상태창도 따른다 (2026-11-09 사용자: 본문에 「기본 포인트 900」이 적혀 있으면 900이 생기는 게 맞다 — 「본문 따라 가야지」). 장부 시작값은 0이고 본문이 준 만큼 들어온다
   const anchor = messageKey(m, i);
   const id = `ps_${anchor}`;
   const base = removeWalletEntry(w, id);

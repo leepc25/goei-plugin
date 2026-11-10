@@ -28,6 +28,7 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
+import { JOINT_VAR, jointOn } from '../core/netjoint';
 import { advNum, budgetFor, genSettings } from '../core/advanced';
 import { advancedBox } from './advanced';
 import { fitPrompt } from '../core/budget';
@@ -772,7 +773,7 @@ function makeView(ctx: ChatContext, env: PhoneEnv, automatic = false) {
     const startLength = ctx.chat.message?.length ?? 0;
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => viewPrompt(source(ctx), names(ctx), readViews(ctx.chat.scriptstate)));
     const { value } = await askModel(prompt.messages, phoneSettings(ctx.chat.scriptstate).model, (raw) => parseView(raw, set.preset), {
-      ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate, label: '괴담톡 보기',
+      ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'ph').reiterate, staticModel: featureModel(ctx.chat.scriptstate, 'ph'), state: ctx.chat.scriptstate, label: '관전',
     });
     let note = '';
     let id = '';
@@ -1087,6 +1088,7 @@ function settingsView(ctx: ChatContext): string {
     <div class="ph-form-body ps">
       ${group('괴담톡', [
         row('자동 호출', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
+        row('한 번에 요청', seg('joint', jointOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요.'),
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인 모델'], ['aux', '보조 모델']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
         row('컨텍스트에 포함', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
       ].join(''))}
@@ -1210,7 +1212,8 @@ export async function handlePhone(action: string, value: string | undefined, ctx
   if (!action.startsWith('ph-')) return false;
   liveEnv = env;
   const v = value ?? '';
-  if (!['ph-room-del', 'ph-contact-del', 'ph-notice-del'].includes(action)) phone.confirm = null;
+  // 두 번 눌러 지우는 단추는 여기 다 적어야 한다 — 빠지면 두 번째 「정말 삭제」가 확인을 먼저 지워 버려 먹통이 된다 (11-09 사용자: 사이드스토리 방 삭제 안 됨)
+  if (!['ph-room-del', 'ph-view-del', 'ph-contact-del', 'ph-notice-del'].includes(action)) phone.confirm = null;
   if (action.startsWith('ph-def-')) {
     try {
       const msg = await defaultsAction('ph', action, v, ctx, env.refresh);
@@ -1442,6 +1445,10 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       return true;
     case 'ph-cfg': {
       const [k, val] = v.split('=');
+      if (k === 'joint') {
+        await setVars(ctx, env, { [JOINT_VAR]: val === '0' ? '0' : '1' });
+        return true;
+      }
       const vars: Record<string, string> = { [PH(k)]: val };
       if (k === 'all_contacts' || k === 'anomaly_contacts') phone.tab = '';
       if (k === 'announcement_page_size') phone.noticePage = 1;

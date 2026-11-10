@@ -14,10 +14,10 @@ test('사이트 이름 표, 사이트별 기본 지침에 성격 갈래가 남�
   assert.equal(gnetLabel(boards.boardState({}, 'wpf')), '세정게');
   assert.equal(gnetLabel(boards.boardState({}, 'sm')), '연어 마켓');
   for (const name of ['GNet', 'Gal', 'Wpf', 'Salmon']) assert.ok(!guideDefault(name).includes('lb-gn.style'), name);
-  assert.ok(guideDefault('GNet').includes('trade flavor') && !guideDefault('GNet').includes('World Politics Forum texture'));
-  assert.ok(guideDefault('Wpf').includes('World Politics Forum texture') && !guideDefault('Wpf').includes('trade flavor'));
-  assert.ok(guideDefault('Gal').includes('scary stories') && !guideDefault('Gal').includes('conspiracy threads'));
-  assert.ok(guideDefault('Salmon').includes('팝니다') && !guideDefault('Salmon').includes('괴담갤 is an ordinary'));
+  assert.ok(guideDefault('GNet').includes('talking shop') && !guideDefault('GNet').includes('old-web forum voice'));
+  assert.ok(guideDefault('Wpf').includes('old-web forum voice') && !guideDefault('Wpf').includes('talking shop'));
+  assert.ok(guideDefault('Gal').includes('창작 괴담') && !guideDefault('Gal').includes('conspiracy threads'));
+  assert.ok(guideDefault('Salmon').includes('팝니다') && !guideDefault('Salmon').includes('괴담갤 (괴담 갤러리)'));
 });
 
 test('지침 패치: 성격마다 소개·말투·주제가 하나씩만 남는다', () => {

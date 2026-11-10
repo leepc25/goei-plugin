@@ -18,6 +18,11 @@ import { previewGnetRefresh } from '../gnet';
 import { previewPhoneRefresh, previewPhoneView } from '../phone';
 import { previewWikiAuto } from '../wiki';
 import { previewShopShelf } from '../shop';
+import { shopJudgeBy, shopOn } from '../../core/shop';
+import { previewMallShelf } from '../malls';
+import { boardView, BOARD_NAME, BOARD_SITES } from '../../core/boards';
+import { MALL_NAME, mallSettings, type MallSite } from '../../core/malls';
+import { autoTasks, JOINT_LABEL, jointGroups, jointMates, jointOn, type JointKind } from '../../core/netjoint';
 import { traceUi } from './trace';
 
 // ── 토큰 미리 계산 (2026-11-07 사용자: 지금 설정값으로 들어갈 요청이 정해져 있으니 토큰을 계산해 보인다) ──
@@ -56,8 +61,8 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
   map['인물 갱신'] = count(pp.update);
   safe('이미지 태그 보충', () => count(previewAsset(ctx.char.globalLore, ctx.chat)));
   safe('괴담톡 확인', () => count(previewPhoneRefresh(ctx)));
-  safe('괴담넷 새로고침', () => count(previewGnetRefresh(ctx)));
-  safe('괴담톡 관전', () => count(previewPhoneView(ctx)));
+  for (const site of BOARD_SITES) safe(`${BOARD_NAME[site]} 새로고침`, () => count(previewGnetRefresh(ctx, site)));
+  safe('관전', () => count(previewPhoneView(ctx)));
   safe('위키 자동 작성', () => {
     const w = previewWikiAuto(ctx);
     const a = count(w.article);
@@ -65,6 +70,7 @@ async function computeTokens(ctx: ChatContext): Promise<TokMap> {
     return a === null && t === null ? null : (a ?? 0) + (t ?? 0);
   });
   safe('상점', () => count(previewShopShelf(ctx)));
+  for (const site of ['cos', 'bm'] as MallSite[]) safe(`${MALL_NAME[site]} 진열`, () => count(previewMallShelf(ctx, site)));
   return map;
 }
 
@@ -138,20 +144,54 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
   const assetOn = basic.assetOn && basic.assetModel === 'aux';
   const phoneModel = id(featureModel(ss, 'ph')) || mm(ph.model);
   const gnetModel = id(featureModel(ss, 'gn')) || mm(gn.model);
-  const joint = ph.auto && gn.auto && phoneModel === gnetModel;
+  // 인터넷 묶음 (core/netjoint.ts): 같은 모델끼리 한 요청. 덩어리의 첫 작업이 1회를 맡고 나머지는 「0회 추가」. 왜 안 묶이는지도 적는다 (11-09 점검: 안내가 없었다)
+  const tasks = autoTasks(ss);
+  const jointText = (kind: JointKind): { calls: string; sure: number } => {
+    const mates = jointMates(ss, kind);
+    if (mates.length) {
+      const first = jointGroups(ss).find((g) => g.some((t) => t.kind === kind))?.[0].kind === kind;
+      const names = mates.map((k) => JOINT_LABEL[k]).join('·');
+      return { calls: first ? `1회 (${names}${wa(names)} 한 요청으로 합침)` : `${JOINT_LABEL[mates[0]]}${wa(JOINT_LABEL[mates[0]])} 합쳐 0회 추가`, sure: first ? 1 : 0 };
+    }
+    const why = !jointOn(ss) ? ' (한 번에 요청 꺼짐)' : tasks.length > 1 ? ' (모델이 달라 따로)' : '';
+    return { calls: `1회${why}`, sure: 1 };
+  };
   const wikiOn = nw.auto === 'turn';
   const wikiTitle = wikiOn && nw.autoTitle === 'model';
   const post: Node[] = [
     { name: '인물 갱신', sub: '응답을 읽어 인물·세력·문서 기록', kind: 'aux', on: updateOn, model: updateOn ? ppModel('update') : undefined, calls: updateOn ? `1회${pp.tidy === 'same' ? ' (정리 얹음)' : ''}` : pp.on ? '수동 (「새 응답 읽기」 때만)' : '호출 없음 (인물 기록 끔)', page: 'set:people', to: 'r:자동 호출', sure: updateOn ? 1 : 0, maybe: 0 },
+    // 상점 판단 (11-09 사용자): 누가 「지금 상점이 있나」를 보는지. 따로 호출하지 않는다 (메인 응답 표식 또는 인물 갱신에 얹음)
+    (() => {
+      const j = shopJudgeBy(ss);
+      const on = shopOn(ss);
+      const calls = !on ? '판단 안 함 (상점 꺼짐)' : j.by === 'updater' ? '인물 갱신에 얹음 (추가 호출 없음)' : j.fallback ? '메인 모델이 대신 (갱신기가 매 턴 돌지 않음)' : '메인 모델이 응답 끝에 표식 (추가 호출 없음)';
+      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:items', to: 'r:상점 판단', sure: 0, maybe: 0 } as Node;
+    })(),
     { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? (joint ? '1회 (괴담넷과 한 요청으로 합침)' : '1회') : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? 1 : 0, maybe: 0 },
-    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? (joint ? '괴담톡과 합쳐 0회 추가' : '1회') : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:자동 호출', sure: gn.auto && !joint ? 1 : 0, maybe: 0 },
-    { name: '괴담톡 관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
+    { name: '괴담톡 확인', sub: '새 메시지·공지·초대', kind: 'aux', on: ph.auto, model: ph.auto ? phoneModel : undefined, calls: ph.auto ? jointText('phone').calls : '수동 (새로고침 때만)', page: 'set:phone', to: 'r:자동 호출', sure: ph.auto ? jointText('phone').sure : 0, maybe: 0 },
+    { name: '괴담넷 새로고침', sub: '게시판 글·댓글·쪽지', kind: 'aux', on: gn.auto, model: gn.auto ? gnetModel : undefined, calls: gn.auto ? jointText('gn').calls : gn.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: 'set:gnet', to: 'r:자동 호출', sure: gn.auto ? jointText('gn').sure : 0, maybe: 0 },
+    // 다른 게시판 셋·쇼핑몰 둘 (11-09 사용자: 괴담넷만 있고 통째로 빠져 있었다). 사이트마다 설정 변수가 따로라 그 사이트로 비춘 상태값으로 읽는다
+    ...(['gal', 'wpf', 'sm'] as const).map((site): Node => {
+      const sv = boardView(ctx.chat, site).scriptstate;
+      const g = gnetSettings(sv);
+      const on = g.enabled && g.auto;
+      return { name: `${BOARD_NAME[site]} 새로고침`, sub: site === 'sm' ? '매물·댓글·쪽지' : '게시판 글·댓글·쪽지', kind: 'aux', on, model: on ? id(featureModel(sv, 'gn')) || mm(g.model) : undefined, calls: !g.enabled ? '호출 없음 (사이트 끔)' : g.auto ? jointText(site).calls : g.autoOpen ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? jointText(site).sure : 0, maybe: 0 };
+    }),
+    { name: '관전', sub: `${VIEW_PRESETS[vw.preset]} 이어 쓰기`, kind: 'aux', on: vw.auto === 'turn', model: vw.auto === 'turn' ? phoneModel : undefined, calls: vw.auto === 'turn' ? '1회' : vw.auto === 'open' ? '괴담톡 열 때 1회' : '수동 (「관전」 단추)', page: 'set:phone', to: 'r:자동 호출@보기 전용 방', sure: vw.auto === 'turn' ? 1 : 0, maybe: 0 },
     { name: '위키 자동 작성', sub: '이번 턴 소재로 문서 한 편', kind: 'aux', on: wikiOn, model: wikiOn ? id(featureModel(ss, 'nw')) || mm(nw.model) : undefined, calls: wikiOn ? (wikiTitle ? '2회 (제목 고르기 + 본문)' : '1회 (제목은 설정에 적은 것)') : nw.auto === 'open' ? '위키 열 때' : '수동', page: 'set:wiki', to: 'r:자동 호출', sure: wikiOn ? (wikiTitle ? 2 : 1) : 0, maybe: 0 },
+    ...(['cos', 'bm'] as MallSite[]).map((site): Node => {
+      const m = mallSettings(ss, site);
+      const login = site !== 'bm' || String(ss?.['$br_login'] ?? '') === '1';
+      const on = m.on && m.auto === 'turn' && login;
+      return { name: `${MALL_NAME[site]} 진열`, sub: '진열대 새로 받기', kind: 'aux', on, model: on ? mm(m.model) : undefined, calls: !m.on ? '호출 없음 (소지품·가계부 끔)' : m.auto === 'turn' ? (login ? '1회' : '로그인했을 때 1회 (지금 로그아웃)') : m.auto === 'open' ? '창 열 때 1회' : '수동 (새로고침 때만)', page: `set:${site}`, to: 'r:자동 호출', sure: on ? 1 : 0, maybe: 0 };
+    }),
   ];
   const manual: Node[] = [
     { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
+    { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:gnet', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:cos', to: 'r:모델', sure: 0, maybe: 0 },
+    { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
     { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
@@ -170,7 +210,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
 const tokLabel = (n: Node): string => {
   if (n.kind === 'plain') return '';
   if (n.tok === undefined) return flowTok.pending ? '세는 중…' : '';
-  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : '지금은 보낼 것 없음';
+  if (n.tok === null) return n.name === '상점' ? '지금 열 수 있는 상점 없음' : n.name.endsWith(' 진열') ? '쇼핑몰 꺼짐' : '지금은 보낼 것 없음';
   return `요청 ${tokenizerName() ? '' : '약 '}${n.tok.toLocaleString('ko-KR')}토큰`;
 };
 function nodeHtml(n: Node): string {
@@ -195,12 +235,18 @@ export function flowPage(ctx: ChatContext, head: (crumb: string, title: string, 
   const group = (title: string, note: string, nodes: Node[]) => `<section class="ps-group"><h3>${title} <small>${esc(note)}</small></h3><div class="ps-rows"><div class="pp-flow solo">${nodes.map(nodeHtml).join(arrow)}</div></div></section>`;
   return `<div class="gw-page gw-set">${head('', '호출 흐름', '지금 설정으로 본편 한 턴에 플러그인이 모델을 어떤 순서로 몇 번 부르는지. 켜진 칸만 진해요. 실제로 간 요청·응답 원문은 「호출 기록」에서 봐요.')}
     <div class="gx-settings gw-setbody">
-    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>. 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
+    <section class="ps-group"><div class="ps-rows"><div class="pp-flow-head"><p>턴마다 보조 호출 <b>${sure}회</b>${maybe ? ` (조건에 따라 최대 <b>${sure + maybe}회</b>)` : ''} · 메인 <b>1회</b>.${jointOn(ctx.chat.scriptstate) ? '' : ' 인터넷 「한 번에 요청」이 꺼져 있어 괴담톡·게시판(괴담넷·괴담갤·세정게·연어 마켓)은 따로 불러요.'} 형식이 틀린 답은 같은 모델에 한 번 더 물을 수 있어요.${tokNote}</p></div></div></section>
     ${group('본편 전', '유저 메시지 → 요청 조립', pre)}
     ${group('본편', '', [main])}
-    ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·괴담넷·관전·위키는 인물 갱신이 끝난 뒤)', post)}
+    ${group('본편 뒤', '응답이 들어온 뒤, 위에서 아래 순서로 (괴담톡·게시판·관전·위키·쇼핑몰은 인물 갱신이 끝난 뒤)', post)}
     ${group('턴과 무관', '누르거나 열 때만', manual)}
     </div></div>`;
+}
+
+/** 받침에 따라 「와/과」 (릴리스 점검 11-09: 「괴담톡와」) */
+function wa(word: string): string {
+  const c = word.trim().slice(-1).charCodeAt(0);
+  return c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? '과' : '와';
 }
 
 const FLOW_BACK = '<button class="gx-mini" data-action="ed-node" data-value="manage:flow">호출 흐름 →</button>';

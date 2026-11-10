@@ -76,7 +76,8 @@ test('withStatusBlock: 깨진 태그 (칸 부족·초과·전각·닫는 괄호 
   assert.ok(run('【▣｜2025.01.01｜02:47 AM｜☀️｜4°C｜관리국｜없음｜없음｜없음｜관리국/신입｜1】').includes('[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|없음|없음|없음|관리국/신입|140000]'), '전각');
   assert.ok(run('[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|없음|없음|없음|관리국/신입|1').includes('|관리국|'), '닫는 괄호 없음');
   assert.ok(run('[▣|2025.01.01|02:47 AM|☀️|4°C|첫|없음]\n[▣|2025.01.01|03:00 AM|☀️|4°C|둘|없음]').includes('|둘|'), '여러 개면 마지막');
-  assert.equal(run('상태창 없음'), undefined);
+  assert.ok(run('상태창 없음')?.includes('Balance = 140000'), '상태창 줄이 없어도(첫 턴) 장부 시작값은 넘긴다 (11-09)');
+  assert.equal(withStatusBlock([{ role: 'assistant', content: '상태창 없음' }, { role: 'user', content: '다음' }], '', { cols, wallet: null }).find((m) => m.content.startsWith(STATUS_HEAD)), undefined, '넘길 값이 없으면 블록 없음');
   assert.ok(run('[▣|날짜?|시각?|☀️|4°C|관리국|없음]').includes('[▣|날짜?|시각?|☀️|4°C|관리국|없음]'), '못 읽는 줄은 그대로');
   // 두 번 불러도 블록 하나, 본문은 그대로
   const msgs = [{ role: 'assistant', content: '본문 `|` 표 | a | b |\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|없음]' }, { role: 'user', content: '다음' }];

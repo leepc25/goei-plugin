@@ -48,7 +48,7 @@ const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['worl
 export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
 // 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
-const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : (n as EditorNode));
+const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
@@ -406,12 +406,13 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     ] }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['start', '시작 화면', ICONS.idcard], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
-      { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
+      { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
-      { title: '기능별 지침', items: (['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'Wiki', 'Shop', 'Phone', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
+      { title: '기능별 지침', items: (['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Wiki', 'Shop', 'Phone', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
       { title: '인물 기록 지침', items: (['Updater', 'UpdaterCompact', 'Director', 'Router'] as GuideName[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:trace', '호출 기록', ICONS.list], ['manage:log', '실패·갱신 진단', ICONS.mail], ['manage:people', '인물 진단', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
+    // 11-09 사용자: 설치·업데이트는 하나로, 아이콘은 서로 다르게, 다음 호출 로어북은 따로(펼친 채), 이름은 무엇을 보는지 바로 알게
+    case 'manage': return [{ title: '점검', items: [['install', '설치·업데이트', ICONS.refresh], ['manage:diag', '상태 점검', ICONS.info], ['manage:lore', '다음 호출 로어북', ICONS.book], ['manage:trace', '호출 기록', ICONS.records], ['manage:log', '실패 기록', ICONS.siren], ['manage:people', '인물 기록 점검', ICONS.group], ['manage:backup', '저장·불러오기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : (treeOf(tab)[0].items.find((i) => !i[0].startsWith('label:'))![0] as EditorNode));
@@ -446,7 +447,7 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
   items: { desc: '가계부·소지품·상점을 여기서 정해요. 상점은 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
-  lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 아래 「로어북 확인」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
+  lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 점검 → 「다음 호출 로어북」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
 };
 

@@ -8,7 +8,7 @@ import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
 import { hypaSummaries } from '../core/people/hypa';
-import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
+import { applyUpdate, assemblePrompt, buildUpdate, sectionBody, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -20,7 +20,7 @@ import { allNames, extraNames, seedBaseFor, temperOf, valuesOf } from '../core/p
 import { playerAgent } from '../core/player';
 import { peopleBlockFor } from '../core/people/request';
 import { userInfo } from './user';
-import { promptFor } from '../core/people/prompt';
+import { promptFor, UPDATER_COMPACT, UPDATER_DETAILED } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
@@ -28,6 +28,7 @@ import { mentionsPoints, pointsOn, pointsVars, readPoints } from '../core/points
 import { addWalletEntry, aliveAnchors, mentionsAmount, readWallet, syncWalletToStatus, walletBalance, walletLoose, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { applyItemChanges, itemAutoOn, itemStateOn, itemsNowOf, itemsVars, readItems, usedItemsAt } from '../core/items';
 import { getPrefs } from '../core/settings';
+import { settleShop, shopJudgeBy, shopJudgeGuide, shopOn, shopRule, stripShopTags } from '../core/shop';
 import { guideSections } from '../core/guides';
 
 /** Director 기본 지침: 지침 탭 「Director」의 FACTS·SCENE 절 */
@@ -278,7 +279,11 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const itemsOn = itemAutoOn(fresh.chat.scriptstate);
       const itemsNow = itemsOn ? itemsNowOf(fresh.chat) : null;
       const usedNow = itemsOn ? usedItemsAt(readItems(fresh.chat.scriptstate), batchKeys, aliveAnchors(fresh.chat)) : [];
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
+      // 상점 판단 (11-09, 설정 「상점 판단」): 갱신기가 맡으면 이 묶음에 든 가장 최근 응답 하나를 판단한다. 다시 읽기(only)는 하지 않는다
+      const lastChar = fresh.chat.message.reduce((a, m, i) => (m.role === 'char' ? i : a), -1);
+      const shopAt = !o.scope?.only && shopOn(fresh.chat.scriptstate) && shopJudgeBy(fresh.chat.scriptstate).by === 'updater' && batches[b].includes(lastChar) ? lastChar : -1;
+      const shopSelf = shopAt >= 0 ? [...exclude, userInfo().name] : [];
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { shop: shopAt >= 0 ? { at: shopAt, self: shopSelf } : null,  settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: await hypaMemory(fresh.chat, fresh.char, [...batches[b].map((i) => messageText(String(fresh.chat.message[i]?.data ?? ''))), ...Object.keys(curStore.people)].join('\n'), settings), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, points: pointBal, items: itemsNow, used: usedNow });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
@@ -286,7 +291,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       if (walletOn && walletLoose(fresh.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsUse) sections.add('points');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      const system = updaterSystem(settings, sections, fresh.chat.scriptstate, !!input.shop);
       input.system = system;
       if (input.overBudget.length) {
         // 2026-11-07 사용자 결정(W4, 원본 writerInputBudgetTokens): 확정 응답 글이 상한을 넘으면 접어서 보내지 않고 거부한다. 읽음 표시도 안 한다
@@ -298,7 +303,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       }
       // 장면 인물이 없어도 소지품·가계부는 이 갱신기가 읽는다 (11-08 전수점검: 혼자 있는 장면에서 얻은 물건·쓴 돈이 기록되지 않았다).
       // 소지품 읽기가 켜져 있거나, 가계부가 켜져 있고 글에 금액이 있거나 어림도 받을 때만 부른다 (쓸데없는 호출은 그대로 안 함)
-      const moneyOrItems = itemsOn || (walletOn && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? '')))))) || (pointsUse && batches[b].some((i) => mentionsPoints(messageText(String(fresh.chat.message[i]?.data ?? '')))));
+      const moneyOrItems = !!input.shop || itemsOn || (walletOn && (walletLoose(fresh.chat.scriptstate) || batches[b].some((i) => mentionsAmount(messageText(String(fresh.chat.message[i]?.data ?? '')))))) || (pointsUse && batches[b].some((i) => mentionsPoints(messageText(String(fresh.chat.message[i]?.data ?? '')))));
       if (!input.people.length && !moneyOrItems) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
         if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
@@ -374,6 +379,17 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           const it = applyItemChanges(readItems(next.scriptstate), aliveAnchors(next), report.items, { state: itemStateOn(next.scriptstate) });
           next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...itemsVars(it) } };
         }
+        // 상점 판단 (11-09): 판단한 응답 끝의 표식을 갱신기 판단대로 바꾸고(있으면 붙이고 없으면 지움) 본편과 같은 정리(settleShop)를 돌린다.
+        // 화면의 「상점 열기」 카드는 표식에서 그려지니 본편이 판단할 때와 같은 길로 뜬다
+        if (report.shop !== undefined && shopAt >= 0 && next.message[shopAt]) {
+          const at = report.shop?.index ?? shopAt;
+          const body = stripShopTags(String(next.message[at].data ?? ''));
+          const list = [...next.message];
+          list[at] = { ...list[at], data: report.shop ? `${body}\n[shop: ${report.shop.name}|${report.shop.owner}]` : body };
+          next = { ...next, message: list };
+          const r = settleShop(next, at, shopSelf);
+          if (r) next = { ...next, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(next.scriptstate ?? {}), ...r.vars } };
+        }
         return withPeople(next, s);
       });
       if (!saved) {
@@ -417,6 +433,19 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
+
+/** 갱신기 지침 조립 (실제 호출·미리보기 같은 길). 상점 판단을 맡으면 「상점」 절을 켜고 기준 글(지침 「상점」 SHOP_RULE·SHOP_JUDGE)을 채운다.
+ *  지침을 고쳐 둔 사용자는 고친 글에 상점 절이 없을 수 있어 기본 글의 절을 덧붙인다 (릴리스 점검 11-09: 안 그러면 상점이 매 턴 닫혔다) */
+function updaterSystem(settings: PeopleSettings, sections: Set<string>, vars: Record<string, unknown> | undefined, shop: boolean): string {
+  const base = promptFor(settings);
+  if (shop) sections.add('shop');
+  let system = assemblePrompt(base, sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+  if (shop && !base.includes('<<SECTION:shop>>')) {
+    const def = settings.prompt === 'compact' ? UPDATER_COMPACT : UPDATER_DETAILED;
+    system += `\n\n${sectionBody(def, 'shop') ?? ''}\nAdd this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"<name or empty>","m":"<shop_check.m>"} or null.`;
+  }
+  return system.replace('<<SHOP_RULE>>', () => (shop ? shopRule(vars) : '')).replace('<<SHOP_JUDGE>>', () => (shop ? shopJudgeGuide() : ''));
+}
 
 /** 지난 응답 읽기: 최근 turns 개 응답(0 = 전부) 가운데 안 읽은 것을 묶음으로 읽는다 (기능을 중간에 켰거나 끄고 지나간 구간) */
 export async function backfillPeople(turns: number): Promise<RunResult> {
@@ -649,14 +678,16 @@ export async function previewPeopleCalls(ctx: ChatContext): Promise<{ router: Ll
       const itemsNow = itemsOn ? itemsNowOf(ctx.chat) : null;
       const usedNow = itemsOn && list[last] ? usedItemsAt(readItems(ctx.chat.scriptstate), [messageKey(list[last], last)], aliveAnchors(ctx.chat)) : [];
       const memory = await hypaMemory(ctx.chat, ctx.char, [messageText(String(list[last]?.data ?? '')), ...Object.keys(store.people)].join('\n'), settings).catch(() => [] as string[]);
-      const inp = buildUpdate(ctx.chat, store, [last], { settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow });
+      // 상점 판단 (실제 호출과 같게, 릴리스 점검 11-09)
+      const shopOnNow = shopOn(ctx.chat.scriptstate) && shopJudgeBy(ctx.chat.scriptstate).by === 'updater';
+      const inp = buildUpdate(ctx.chat, store, [last], { shop: shopOnNow ? { at: last, self: [...exclude, userInfo().name] } : null, settings, system: '', values: Object.fromEntries(input0Names(store).map((n) => [n, valuesOf(n)])), names, hints: routerHintsNow(), memory, exclude, factionNames: factionNamesOf(ctx.char.globalLore), wallet: balance, points: pointsOn(ctx.chat) ? walletBalance(readPoints(ctx.chat.scriptstate), aliveAnchors(ctx.chat)) : null, items: itemsNow, used: usedNow });
       const sections = enabledSections(settings);
       if (inp.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (walletOn && walletLoose(ctx.chat.scriptstate)) sections.add('wallet_loose');
       if (pointsOn(ctx.chat)) sections.add('points');
       if (itemsOn) sections.add('items');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, speechVarietyBlock(settings, 'writer'), sexualWriterSection(settings));
+      const system = updaterSystem(settings, sections, ctx.chat.scriptstate, !!inp.shop);
       out.update = [{ role: 'system', content: system }, { role: 'user', content: JSON.stringify(inp.data) }];
     }
   }

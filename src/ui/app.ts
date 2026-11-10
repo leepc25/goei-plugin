@@ -39,15 +39,17 @@ import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
-import { mallAction, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
+import { bmDeskWinSpec, mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
-import { boardChrome, gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { boardChrome, gnet, gnetDmOpen, gnetDmWinSpec, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
+import { bindPopWins } from './popwin';
+import { bindMouseGesture, type Gesture } from './gesture';
 import { isBoardSite, type BoardSite } from '../core/boards';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { GN_NICK } from '../core/gnet';
-import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
+import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -150,6 +152,8 @@ const tabBoard = (): BoardSite => { const s = curTab().site; return isBoardSite(
 let cdrOpen = false;
 let lastForm: HTMLFormElement | null = null;
 let tab: Tab = 'board';
+/** 카드에서 고유 상점 사이트로 접속: 인터넷 창만 (닫으면 풀린다) */
+let netSolo = false;
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
 /** 시작 화면에서 연 새 채팅 기본 설정 */
@@ -182,6 +186,16 @@ const recordsEnv: RecordsEnv = settingsEnv;
 
 /** 창이 떠 있는지 (괴담톡이 받은 말풍선을 바로 읽음 처리할지) */
 let shown = false;
+/** 상황판이 떠 있나 (body.ts: 그동안 호출 진행 창은 숨긴다 — 본 문서의 진행 단추가 상황판 닫기 X 위에 올라와 눌리지 않았다, 11-09 릴리스 점검) */
+export const appShown = (): boolean => shown;
+let shownListener: ((shown: boolean) => void) | null = null;
+export function onAppShown(f: (shown: boolean) => void): void {
+  shownListener = f;
+}
+function setShown(v: boolean): void {
+  shown = v;
+  shownListener?.(v);
+}
 const phoneEnv: PhoneEnv = {
   render: () => render(),
   refresh: () => refresh(),
@@ -222,7 +236,8 @@ function ensureRoot(): HTMLElement {
   });
   // 소지품 그림 팩이 받히면 소지품 탭을 다시 그린다 (host/itemicons.ts)
   setItemIconRedraw(() => {
-    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open)) render();
+    // 연어 마켓 매물 그림도 같은 팩 (릴리스 점검 11-09: 팩이 받힌 뒤에도 가방 아이콘 그대로였다)
+    if (view.kind !== 'picker' && (tab === 'items' || shopUi.open || (inBrowser() && curTab().site === 'sm'))) render();
   });
   const style = document.createElement('style');
   style.textContent = css + LOOK_CSS;
@@ -285,6 +300,20 @@ function ensureRoot(): HTMLElement {
   });
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
+  bindPopWins(root, render, [mallWinSpec, bmDeskWinSpec, gnetDmWinSpec]);
+  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 닫은 탭 복구 (인터넷)
+  bindMouseGesture(root, {
+    label: (g: Gesture) => {
+      if (g === 'L') return navStep(-1) ? '뒤로' : '';
+      if (g === 'R') return navStep(1) ? '앞으로' : '';
+      if (view.kind !== 'started' || !inBrowser()) return '';
+      return g === 'DR' ? '탭 닫기' : br.closed.length ? '닫은 탭 다시 열기' : '';
+    },
+    run: (g: Gesture) => {
+      if (g === 'L' || g === 'R') return void navStep(g === 'L' ? -1 : 1)?.();
+      void run(g === 'DR' ? 'br-close' : 'br-reopen', String(br.cur));
+    },
+  });
   // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
   root.addEventListener('pointerdown', (ev) => {
     const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
@@ -469,6 +498,9 @@ function ensureRoot(): HTMLElement {
     // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
     if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     if (view.kind === 'started' && tab === 'items' && (itemsUi.open || itemsUi.mode === 'add')) return void handle('items-close');
+    // 우주 쇼핑몰 질문 창 (11-09 사용자: 팝업창처럼 Esc·바깥 누름으로 닫힘)
+    if (view.kind === 'started' && inBrowser() && mallAskOpen(curTab().site)) return void handle('mall-ask-close');
+    if (view.kind === 'started' && inBrowser() && isBoardSite(curTab().site) && gnetDmOpen()) return void handle('gn-dm-close');
     // 상점 팝업: 상세 → 폰 서랍 → 팝업 순으로 하나씩 닫는다
     if (view.kind === 'started' && shopUi.open) return void handle(shopUi.detail ? 'shop-detail-close' : shopUi.drawer ? 'shop-drawer' : 'shop-close');
     const pop = document.querySelector('.gx-agpop');
@@ -678,7 +710,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   view = { kind: 'loading' };
   notice = '';
   render();
-  shown = true;
+  setShown(true);
   if (root) startCctvFx(root);
   await showWindow();
   await refresh();
@@ -704,7 +736,7 @@ export async function openInstall(): Promise<void> {
     ensureRoot();
     view = { kind: 'error', message: '선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요.' };
     render();
-    shown = true;
+    setShown(true);
     await showWindow();
     return;
   }
@@ -735,8 +767,18 @@ export async function openWiki(title: string): Promise<void> {
 }
 
 /** 채팅 속 「상점 열기」 카드: 창을 열고 상점 팝업을 띄운다 (host/shopcard.ts) */
-export async function openShop(): Promise<void> {
+export async function openShop(site = ''): Promise<void> {
   await openApp({ quietIfNotLite: true });
+  // 고유 상점에 인터넷으로 접속한 카드(11-09 사용자): 상황판 없이 인터넷 창만 그 사이트로. 사고판 것은 상황판 인터넷 탭과 같은 저장소
+  if (site && view.kind === 'started' && isSite(site)) {
+    netSolo = true;
+    tab = 'net';
+    openSite(site);
+    siteOpened();
+    render();
+    return;
+  }
+  netSolo = false;
   // 카드에서 열면 상점만 (2026-11-07 사용자: 상황판이 배경으로 뜨면 안 됨)
   shopUi.solo = true;
   if (view.kind === 'started') await handle('shop-open');
@@ -810,7 +852,8 @@ async function refresh(): Promise<void> {
 }
 
 async function close(): Promise<void> {
-  shown = false;
+  setShown(false);
+  netSolo = false;
   stopCctvFx();
   await risuai.hideContainer();
 }
@@ -1096,6 +1139,9 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'br-close':
       closeTab(Number(value) || 0);
       return openBrowserTab();
+    case 'br-reopen':
+      if (reopenTab()) openBrowserTab();
+      return;
     case 'br-back':
     case 'br-fwd': {
       const s = tabGo<NavState>(action === 'br-back' ? -1 : 1);
@@ -1122,6 +1168,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (action === 'br-login-save' && !nick) return;
       br.login = false;
       const ctx = view.ctx;
+      // 로그아웃해도 $br_nick 은 남겨 다음 로그인 창에 미리 채운다 (11-09 사용자: 로그아웃하면 닉네임이 날아갔다)
       const vars: Record<string, string> = { $br_login: nick ? '1' : '0', [GN_NICK]: nick };
       if (nick) vars.$br_nick = nick;
       const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
@@ -1401,7 +1448,8 @@ function render(): void {
   if (!root) return;
   // 설정 창의 설정 페이지는 패널 상태를 그대로 보여 주므로 패널을 다시 그릴 때 같이 그린다 (2026-10-27)
   if (editorOpen() && editorOnSettings()) queueMicrotask(() => editorRender());
-  const nav = view.kind === 'started';
+  // 카드에서 고유 상점 사이트로 접속한 인터넷 창만 (netSolo): 메뉴 없이
+  const nav = view.kind === 'started' && !(netSolo && tab === 'net');
   // 종료 알림 오버레이: 새 보고서가 있으면 한 번 띄운다 (창이 닫혀 있었으면 지금, 이 그리기에서)
   if (view.kind === 'started') syncCloseToast(view.ctx.chat, render);
   // 다시 그려도 읽던 자리를 지킨다
@@ -1643,6 +1691,7 @@ function body(): string {
     case 'started':
       evSeenReset();
       if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
+      if (netSolo && tab === 'net') return `${header(TAB_TITLE.net)}<div class="gx-content gx-netsolo">${browserBody(view.ctx)}</div>${closeToastHtml()}`;
       return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
@@ -1814,6 +1863,7 @@ function chromeOpts(ctx: ChatContext): ChromeOpts {
     path: wk?.path ?? bd?.path ?? '',
     bookmarks: browserSites(ctx),
     nick: String(vars['$br_login'] ?? '') === '1' ? String(vars['$br_nick'] ?? '') : '',
+    nickDefault: String(vars['$br_nick'] ?? '').trim() || userInfo().name,
     photo: userInfo().photo ?? '',
     phone: isPhone(),
   };

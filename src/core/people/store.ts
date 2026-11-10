@@ -273,6 +273,8 @@ export const messageHash = (m: ChatMessage) =>
       .replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
       .replace(/<!--[\s\S]*?-->/g, '')
       .replace(/<img\s*=[^>]*>/g, '')
+      // 상점 표식 [shop: …] 은 뒤에 지워지거나(지난 응답) 갱신기가 붙인다(상점 판단 갱신기, 11-09) — 내용 변화로 보지 않는다
+      .replace(/\[\s*shop\s*[:：][^\]]*\]/giu, '')
       .replace(/\s+/g, ' ')
       .trim(),
   );

@@ -39,26 +39,26 @@ test('괴담넷 상한: 보호한 글(내 글·내 댓글 있는 글)은 상한 
   assert.ok(st3.posts.some((p) => p.mine), '맨 앞(최신)인 내 글이 남고 맨 뒤 글이 빠진다');
 });
 
-test('통합 자동 확인: 응답을 못 가르면 버리지 않고 두 작업을 따로 한 번씩 보낸다', async () => {
+test('통합 자동 확인: 응답을 못 가르면 겉 모양을 한 번 다시 묻고, 그래도 안 되면 두 작업을 따로 한 번씩 보낸다', async () => {
   const calls = [];
   let n = 0;
   globalThis.risuai = {
     runLLMModel: async (o) => {
       calls.push(o);
       n++;
-      if (n === 1) return { type: 'success', result: '죄송합니다, JSON 이 아니라 설명문으로 답합니다.' };
+      if (n <= 2) return { type: 'success', result: '죄송합니다, JSON 이 아니라 설명문으로 답합니다.' };
       return { type: 'success', result: o.messages[0].content === 'g' ? '{"posts": []}' : '{"updates": []}' };
     },
   };
   const j = new Joint('aux');
-  const [g, p] = await Promise.all([j.ask('gnet', [{ role: 'user', content: 'g' }]), j.ask('phone', [{ role: 'user', content: 'p' }])]);
-  assert.equal(calls.length, 3, '통합 1회 + 따로 2회');
+  const [g, p] = await Promise.all([j.ask('gn', [{ role: 'user', content: 'g' }]), j.ask('phone', [{ role: 'user', content: 'p' }])]);
+  assert.equal(calls.length, 4, '통합 1회 + 겉 모양 다시 묻기 1회 + 따로 2회');
   assert.equal(g, '{"posts": []}');
   assert.equal(p, '{"updates": []}');
   // 모델 연결 자체가 실패하면 둘 다 그 오류 (따로 보내지 않는다)
   globalThis.risuai = { runLLMModel: async () => ({ type: 'fail', result: 'Failed to fetch' }) };
   const k = new Joint('aux');
-  const results = await Promise.allSettled([k.ask('gnet', [{ role: 'user', content: 'g' }]), k.ask('phone', [{ role: 'user', content: 'p' }])]);
+  const results = await Promise.allSettled([k.ask('gn', [{ role: 'user', content: 'g' }]), k.ask('phone', [{ role: 'user', content: 'p' }])]);
   assert.ok(results.every((r) => r.status === 'rejected' && /모델 요청에 실패/.test(r.reason.message)));
 });
 

@@ -5,6 +5,7 @@ import { tokens } from '../core/gnet';
 import { photoData } from './photo';
 import { applyAdvanced } from '../core/advanced';
 import { RETRY_ANALYZE } from '../core/craft';
+import { progressCallChunk, progressCallEnd, progressCallStart } from '../core/progress';
 export type ModelChoice = 'main' | 'aux';
 
 export interface LlmMessage {
@@ -23,7 +24,7 @@ function stripThoughts(s: string): string {
   return s.replace(/<(thoughts|think|lb-process)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').replace(/<(?:thoughts|think|lb-process)\b[^>]*>[\s\S]*$/gi, '');
 }
 
-async function readStream(stream: ReadableStream<unknown>): Promise<string> {
+async function readStream(stream: ReadableStream<unknown>, onChunk?: (chars: number) => void): Promise<string> {
   const reader = stream.getReader();
   let last = '';
   try {
@@ -32,6 +33,7 @@ async function readStream(stream: ReadableStream<unknown>): Promise<string> {
       if (done) break;
       if (typeof value === 'string') last = value;
       else if (value && typeof value === 'object') last = String(Object.values(value as Record<string, unknown>)[0] ?? last);
+      onChunk?.(last.length); // 진행 창: 받는 중인 글자 수 (Risu 가 스트리밍으로 돌려줄 때만)
     }
   } finally {
     reader.releaseLock();
@@ -62,10 +64,17 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
   const at = new Date().toISOString();
   const t0 = Date.now();
   const req = requestText(messages);
-  const done = (ok: boolean, response: string, error?: string) =>
-    void traceCall({ label, at, ms: Date.now() - t0, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: tokens(req), response: clip(response), responseChars: response.length, responseTokens: tokens(response) }).catch(() => {});
+  const reqTokens = tokens(req);
+  // 진행 창 (core/progress.ts): 시작할 때 모델·요청 토큰을 알리고, 끝나면 응답 토큰·시간을
+  const pid = progressCallStart(label, staticModel || model, reqTokens);
+  const done = (ok: boolean, response: string, error?: string) => {
+    const ms = Date.now() - t0;
+    const responseTokens = tokens(response);
+    progressCallEnd(pid, { ok, ms, respTokens: responseTokens, ...(error ? { error } : {}) });
+    void traceCall({ label, at, ms, model: staticModel || model, ok, ...(error ? { error } : {}), request: clip(req), requestChars: req.length, requestTokens: reqTokens, response: clip(response), responseChars: response.length, responseTokens }).catch(() => {});
+  };
   try {
-    const text = await runModelRaw(messages, model, staticModel);
+    const text = await runModelRaw(messages, model, staticModel, (n) => progressCallChunk(pid, n));
     done(true, text);
     return text;
   } catch (error) {
@@ -74,7 +83,7 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice, stati
   }
 }
 
-async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticModel?: string): Promise<string> {
+async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticModel?: string, onChunk?: (chars: number) => void): Promise<string> {
   let res: unknown;
   try {
     // allowPlugins: 사용자가 플러그인이 제공하는 모델(pluginmodel:::)을 메인·보조로 쓰면 이게 없을 때 Risu가 막는다.
@@ -92,7 +101,7 @@ async function runModelRaw(messages: LlmMessage[], model: ModelChoice, staticMod
     }
     if (r.type === 'fail') throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.\n${String(r.result ?? '').slice(0, 300)}`, String(r.result ?? ''));
     if (r.type === 'multiline' && Array.isArray(r.result)) text = (r.result as [string, string][]).filter(([role]) => role === 'char').map(([, t]) => t).join('\n');
-    else if (r.type === 'streaming' && r.result && typeof (r.result as ReadableStream).getReader === 'function') text = await readStream(r.result as ReadableStream<unknown>);
+    else if (r.type === 'streaming' && r.result && typeof (r.result as ReadableStream).getReader === 'function') text = await readStream(r.result as ReadableStream<unknown>, onChunk);
     else if (typeof r.result === 'string') text = r.result;
   }
   text = stripThoughts(text).trim();
@@ -179,7 +188,8 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
     let raw = '';
     try {
       try {
-        raw = await slot(o.concurrent, () => (attempt === 0 && o.first ? o.first(ask) : runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label)));
+        // 통합 요청(first = Joint.ask)은 동시 요청 칸 밖에서: 칸이 1이면 한쪽이 칸을 잡고 다른 쪽을 기다려 둘 다 멈췄다 (11-09 점검)
+        raw = attempt === 0 && o.first ? await o.first(ask) : await slot(o.concurrent, () => runModel(ask, use, o.staticModel, attempt ? `${o.label ?? '기타'} 다시 묻기 ${attempt}` : o.label));
       } catch (error) {
         // 모델 쪽 일시 오류면 형식 재시도 횟수와 무관하게 같은 요청을 다시 (최대 2회)
         if (!transient(error) || transientLeft <= 0) throw error;

@@ -397,7 +397,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .gx-select { flex: 1; }
 .gx-search { width: 100%; }
-.gx-search:focus, .gx-select:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
+/* 바깥 outline은 배율·이웃 칸에 잘려 끊겨 보였다(11-09 사용자) → 테두리 + 안쪽 선 2px, 칸 안쪽에만 */
+.gx-search:focus, .gx-select:focus { outline: none; border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
@@ -1288,6 +1289,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-evc.go { cursor: pointer; }
 .gx-evc.go:hover { border-color: var(--line2); }
+/* 목표로 고른 사건 카드(상황판·지도 아래 목록): 0.21.4에서 고른 표시 규칙이 빠져 테두리가 안 나왔다 → 다른 고른 카드와 같은 민트 2px (2026-11-09 사용자) */
+.gx-evc.sel { position: relative; border-color: var(--signal); }
 .gx-evc .gx-gmark { flex: none; width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-style: normal; }
 .gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
@@ -2766,9 +2769,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
    고른 상태 색은 그대로(11-09 사용자: 이전처럼 민트) */
 /* 고른 카드는 어디서나 민트 2px (11-09 사용자: 두께 맞추기): 테두리 1px + 카드 안쪽 맨 위 겹에 한 줄.
    바깥(box-shadow)은 목록 칸 끝에서 잘리고(사용자: 테두리가 씹힌다), 안쪽 그림자는 그림 밑에 깔려 두 줄로 보였다 */
-.gx-mlist li.gx-mx.sel::after, .gx-acard.pick.on::after, .it-c.sel::after, .it-slot.sel::after {
-  content: ''; position: absolute; inset: -1px; z-index: 3; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none;
+.gx-mlist li.gx-mx.sel::after, .gx-evc.sel::after, .gx-acard.pick.on::after, .it-c.sel::after, .it-slot.sel::after {
+  content: ''; position: absolute; inset: 0; z-index: 3; border: 1px solid var(--signal); border-radius: inherit; pointer-events: none;
 }
+/* 11-09 사용자: 고른 테두리가 군데군데 끊겼다. 안쪽 겹을 칸 바깥(-1px)에 걸쳐 그리면 overflow·화면 배율에 따라 잘린다
+   → 카드 테두리 1px + 안쪽 겹 1px = 2px, 전부 칸 안쪽에만 그린다 */
 .gx-mini, .gx-chip, .gx-select, .gx-step, .gx-seg, .ph-act .gx-mini, .pp-upbar .gx-mini, .gx-row-btns .gx-mini, .upd-act .gx-mini {
   box-sizing: border-box; min-height: var(--ctl-sm); height: var(--ctl-sm); padding: 0 12px; border: 1px solid var(--line); border-radius: 8px;
   font: inherit; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; vertical-align: middle; cursor: pointer;
@@ -3278,8 +3283,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .it-ux svg { width: 14px; height: 14px; }
 .it-ux:hover { color: var(--text); background: var(--panel2); }
 /* 끌기: 놓을 수 있는 자리는 신호색 테두리. 버리기 띠는 끄는 동안만 아래에 */
-.it-over-ok { outline: 2px solid var(--signal); outline-offset: 2px; }
-.it-usebox.it-over-ok, .it-grid.it-over-ok { outline-offset: 4px; border-radius: 12px; }
+/* 11-09 사용자: 바깥 outline 금지(배율·overflow에 잘림) → 안쪽 2px */
+/* 11-09 사용자(2차): 안쪽 그림자는 칸 그림 밑에 깔려 격자 왼쪽·위쪽이 잘려 보였다 → 맨 위 겹(::after)에 2px 테두리, 안쪽에만 (고른 테두리와 같은 규칙) */
+.it-over-ok { outline: none; }
+[data-drop].it-over-ok:not(.it-trash) { position: relative; }
+.it-usebox.it-over-ok, .it-grid.it-over-ok { border-radius: 12px; }
+[data-drop].it-over-ok:not(.it-trash)::after { content: ''; position: absolute; inset: 0; z-index: 6; border: 2px solid var(--signal); border-radius: inherit; pointer-events: none; }
 .it-trash { display: none; }
 .it-scrollwrap { position: relative; min-width: 0; }
 /* 버리기 띠: 격자 위에 뜬다 — 격자 줄 수와 상관없이 같은 높이, 아래 줄 칸을 집기 어렵지 않게 적당히 (2026-11-08 사용자) */
@@ -3554,6 +3563,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .gw-flow-io { display: flex; flex-direction: column; gap: 4px; }
 .gw-flow-io b, .gw-flow-io small { font-size: 12px; color: var(--sub); }
 .gw-flow-io textarea { width: 100%; box-sizing: border-box; font: 12px/1.45 var(--mono); resize: vertical; }
+/* 본편 요청 메시지 한 줄씩 접기 (11-09) */
+.gw-flow-msg { border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; }
+.gw-flow-msg summary { cursor: pointer; font-size: 12px; color: var(--text); line-height: 1.5; padding: 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gw-flow-msg summary small { color: var(--signal); font-weight: 700; }
+.gw-flow-msg summary i { font-style: normal; color: var(--sub); }
+.gw-flow-msg textarea { margin: 0 0 8px; }
 .gw-flow-tools { justify-content: flex-start; }
 /* 설정 묶음 안의 접이식 칸(로어북 확인 등)은 위 줄과 띄운다 (11-07 사용자: 「로어북 보내기」와 「로어북 확인」이 딱 붙어 있다고 여러 번 지적) */
 .ps-group > .ps-rows + .ps-adv { margin-top: 14px; }
@@ -3561,7 +3576,9 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 접이식 칸 제목 줄 (2026-11-07 사용자: 접는 건 좋은데 눈에 띄어야 한다 — 흐릿한 글자 한 줄이면 안 보인다). 채운 띠 + 왼쪽 강조 줄 + 또렷한 제목 + 강조색 화살표 */
 .ps-adv-sub > summary, .ps-adv-sum { position: relative; gap: 10px; min-height: 48px; padding: 0 14px 0 18px; border-radius: 14px; background: var(--panel2); color: var(--text); font-size: 14px; font-weight: 700; letter-spacing: 0; transition: background .15s, box-shadow .15s; }
 .ps-adv-sub > summary::before, .ps-adv-sum::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 0 3px 3px 0; background: var(--signal); opacity: .85; }
-.ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-radius: 14px 14px 0 0; border-bottom: 1px solid var(--line2); }
+.ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-bottom: 1px solid var(--line2); }
+/* 11-09 사용자: 네 모서리가 이중 — 바깥 상자(둥근 14px, overflow hidden)가 이미 깎으니 머리줄은 안 깎는다 */
+.ps-adv-sub > summary, .ps-adv-sum, .ps-adv-sub[open] > summary, .ps-adv[open] > .ps-adv-sum { border-radius: 0; }
 .ps-adv-sub > summary:hover, .ps-adv-sum:hover { background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); }
 .ps-adv-sub > summary::after, .ps-adv-sum::after { width: 10px; height: 10px; border-color: var(--signal); border-width: 2.5px; }
 .ps-adv-sub > summary > b, .pp-log > summary b { padding: 1px 8px; border-radius: 999px; border: 1px solid var(--accent-line); color: var(--signal); font-size: 12px; font-weight: 700; }
@@ -3655,6 +3672,11 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br-tt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .br-tx { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tx:hover, .br-plus:hover, .br-tb:hover:not(:disabled), .br-bm:hover { background: rgba(255, 255, 255, .08); }
+/* 틀 단추 공통 눌림 (11-09 사용자: 즐겨찾기가 눌리는 느낌이 없다 — 크롬처럼 호버는 옅게, 누르는 동안은 진하게·살짝 줄어듦) */
+.br-tx, .br-plus, .br-tb, .br-bm, .br-prof, .br-tabn, .br-ntp-s, .br-tnew { transition: background-color .08s ease, transform .08s ease; }
+.br-tx:active, .br-plus:active, .br-tb:active:not(:disabled), .br-bm:active, .br-prof:active, .br-tabn:active, .br-ntp-s:active, .br-tnew:active { background: rgba(255, 255, 255, .18); transition-duration: 0s; }
+.br-bm:active, .br-ntp-s:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .br-bm:active, .br-ntp-s:active { transform: none; } }
 .br-plus { position: sticky; right: 0; box-shadow: -6px 0 0 var(--cf); background: var(--cf) !important; margin: 0 0 4px 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .br-tool { display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 8px; background: var(--ct); min-width: 0; }
 .br-tb { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none; }
@@ -3702,7 +3724,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 폰 탭 목록 */
 .br-tlist { flex: 1; overflow: auto; background: #202124; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
 .br-tcard { display: flex; align-items: center; height: 48px; border-radius: 10px; background: #35363a; color: var(--ctx); font-size: 14px; }
-.br-tcard.on { outline: 2px solid #8ab4f8; }
+.br-tcard.on { box-shadow: inset 0 0 0 2px #8ab4f8; }
 .br .br-tnew { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; border: 1px dashed #5f6368; color: var(--cic); }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .br { grid-template-rows: auto auto minmax(0, 1fr); }
@@ -3779,7 +3801,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gn .hd nav{display:flex;gap:20px;color:var(--hdi);opacity:.75;font-size:14px;font-weight:600}.bs-gn .hd nav button.on{opacity:1}
 .bs-gn .hd .sr{margin-left:auto;width:280px;height:34px;border-radius:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--hdi);opacity:.7;font-size:13px}
 .bs-gn .hd .sr svg{fill:var(--hdi)}
-.bs-gn .wrap{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;padding:20px 28px;max-width:1200px}
+.bs-gn .wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;padding:20px 28px;max-width:1200px}
 .bs-gn .side{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px;align-self:start}
 .bs-gn .side button{display:block;padding:8px 12px;color:var(--dim);font-size:13.5px;border-radius:3px}
 .bs-gn .side button.on{background:var(--hd);color:var(--hdi);font-weight:800}
@@ -3802,7 +3824,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gal{background:#fff;color:#333;min-height:100%;font:12.5px 'Nanum Gothic','Noto Sans KR','Dotum',sans-serif;min-width:0}
 .bs-gal a{color:inherit;text-decoration:none}
 .bs-gal .gnb0{opacity:.55;display:flex;justify-content:flex-end;gap:12px;padding:6px 0;width:1000px;margin:0 auto;color:#666;font-size:12px}
-.bs-gal .hd{display:flex;align-items:center;gap:24px;height:46px;padding:0 max(16px,calc((100% - 1000px)/2));background:#3b4890}
+.bs-gal .hd{display:flex;align-items:center;gap:24px;height:46px;padding:0 max(16px,calc((100% - 1280px)/2));background:#3b4890}
 .bs-gal .hd .lg{font:900 19px/1 'Noto Sans KR',sans-serif;color:#fff;letter-spacing:-.5px}
 .bs-gal .hd .lg small{font:500 12px 'Noto Sans KR';color:#cfd5f5;letter-spacing:0;margin-left:8px}
 .bs-gal .hd .sch{display:flex;border:2px solid #fff;height:30px;width:320px;background:#fff;margin-left:auto}
@@ -3946,7 +3968,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-sm .act .back{display:block;margin:0}
 .bs-sm .hd .wr{padding:7px 12px;border-radius:6px;font-size:13px;font-weight:700;background:#c9573d;color:#fff;white-space:nowrap}
 .bs-sm .detail{display:grid;grid-template-columns:400px minmax(0,1fr);gap:34px;padding:16px 28px 28px;max-width:1000px}
-.bs-sm .detail .bs-sm .ph{border-radius:8px}.bs-sm .detail .bs-sm .ph img{width:340px;height:340px}
+.bs-sm .detail .ph{border-radius:8px}.bs-sm .detail .ph img{width:340px;height:340px}
 .bs-sm .seller{display:flex;align-items:center;gap:12px;padding:0 0 14px;border-bottom:1px solid #e4ddd3}
 .bs-sm .seller i{width:42px;height:42px;border-radius:50%;background:#d8cfc3;display:block}
 .bs-sm .seller small{display:block;color:#9a8f84;font-size:12.5px}
@@ -4265,7 +4287,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .cs-ft span { display: inline-block; border: 1px solid #888; background: #c0c0c0; color: #000; font: bold 10px Arial, sans-serif; padding: 2px 4px; }
 /* 넷스케이프 창 (질문·입금) */
 .ms-cos .cs-win { position: absolute; z-index: 6; background: #c0c0c0; border: 2px outset #fff; box-shadow: 3px 3px 0 #000; color: #000; font: 12px 'Gulim', '굴림', 'Noto Sans KR', sans-serif; }
-.ms-cos .cs-askwin { top: 16px; bottom: 16px; right: 24px; width: 440px; display: flex; flex-direction: column; }
+.ms-cos .cs-askwin { top: 40px; right: 24px; bottom: auto; width: 400px; height: min(540px, calc(100% - 56px)); min-width: 300px; min-height: 240px; display: flex; flex-direction: column; } /* 11-09 사용자: 최대 크기 고정 → 팝업창 크기, 끌기·크기 조절 가능 */
+.ms-cos .cs-askwin .cs-wt { cursor: move; user-select: none; }
+.ms-cos .cs-rs { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 50%, #808080 50% 56%, transparent 56% 66%, #808080 66% 72%, transparent 72% 82%, #808080 82% 88%, transparent 88%); }
+.ms-cos.ms-m .cs-rs { display: none; }
 .ms-cos .cs-wt { display: flex; align-items: center; gap: 6px; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; padding: 3px 4px 3px 6px; }
 .ms-cos .cs-wt b { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ms-cos .cs-wt button { width: 18px; height: 16px; display: grid; place-items: center; background: #c0c0c0; color: #000; border: 2px outset #fff; font: bold 11px Arial, sans-serif; line-height: 1; }
@@ -4276,6 +4301,27 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-cos .q-card { display: flex; align-items: center; gap: 6px; margin: 6px 8px 0; padding: 3px 6px; background: #fff; border: 2px inset #c0c0c0; }
 .ms-cos .q-card > span { color: #555; font-size: 11px; white-space: nowrap; }
 .ms-cos .q-card .q-x { margin-left: auto; color: #888; }
+.ms-cos .q-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 0; padding: 4px 8px; background: #ffffe0; border: 1px dashed #888; }
+.ms-cos .q-note > span { color: #555; font-size: 11px; }
+.ms-cos .q-note em { font-style: normal; color: #c00; }
+.ms-cos .q-note small { color: #080; }
+.ms-cos .q-note .cs-btn { margin-left: auto; padding: 1px 8px; }
+.ms-cos .q-note.done { opacity: .85; }
+.ms-cos .q-note small.ok { color: #080; }
+.ms-cos .cs-ord tr.done td { color: #777; }
+.st-misses { max-height: 160px; overflow: auto; font-size: 12px; line-height: 1.5; color: var(--sub); }
+.st-misses small { opacity: .7; }
+.ms-cos .cs-gotgrid { display: flex; flex-wrap: wrap; justify-content: center; justify-self: stretch; width: 100%; gap: 8px; margin: 0 0 8px; } /* 완성 카드: 회색 틀 없이 가운데, 받기 전후 같은 크기 (11-09 사용자: 상자 여백이 뭐냐) */
+.ms-cos .cs-gotgrid .cs-it { width: 240px; min-height: 236px; box-sizing: border-box; }
+.ms-cos.ms-m .cs-gotgrid .cs-it { width: 100%; min-height: 0; }
+.ms-cos .cs-got .cs-bd { background: #080; color: #fff; }
+.ms-cos .cs-ord .cs-btn { padding: 1px 8px; }
+.it-note { margin: 8px 0; padding: 8px 10px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 8px; white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
+.ms-cos .q-sell { flex-wrap: wrap; }
+.ms-cos .q-sell small { color: #555; font-size: 11px; }
+.ms-cos .q-sell em { font-style: normal; color: #c00; }
+.ms-cos .q-sell .cs-btn { padding: 1px 8px; }
+.ms-cos .q-pick small { color: #777; }
 .ms-cos .q-lg { flex: 1; min-height: 120px; overflow: auto; margin: 6px 8px 0; background: #fff; border: 2px inset #c0c0c0; padding: 8px; line-height: 1.65; }
 .ms-cos .q-m { margin-bottom: 10px; }
 .ms-cos .q-m b { display: block; }
@@ -4362,6 +4408,50 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .ms-bm.ms-m .bp-side button { white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent; }
 .ms-bm.ms-m .bp-side button.on { border-bottom-color: #1f2a44; }
 .ms-bm.ms-m .bp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+/* 1:1 상담 (11-09 사용자: 포인트몰 톤의 사내 메신저, 우주몰처럼 끌어 옮기고 닫는 팝업 — ui/popwin.ts) */
+.ms-bm .bp-side .bp-desk { margin-top: 6px; border-top: 1px solid #dde1e8; padding-top: 11px; color: #1f2a44; font-weight: 700; }
+.ms-bm .bp-side .bp-desk.on { background: #f3f5f9; border-left-color: #f3d9a4; }
+.ms-bm.ms-m .bp-side .bp-desk { margin: 0 0 0 auto; border-top: 0; padding-top: 9px; }
+.ms-bm .bd-win { position: absolute; z-index: 6; top: 108px; right: 28px; width: 380px; height: min(560px, calc(100% - 124px)); min-width: 300px; min-height: 260px; display: flex; flex-direction: column; background: #fff; border: 1px solid #c9cfdb; border-radius: 10px; box-shadow: 0 12px 32px rgba(31, 42, 68, .22); overflow: hidden; color: #1f2430; font: 13.5px 'Pretendard', 'Noto Sans KR', sans-serif; }
+.ms-bm .bd-wt { display: flex; align-items: center; gap: 8px; height: 38px; flex: none; padding: 0 6px 0 14px; background: #1f2a44; color: #fff; cursor: move; user-select: none; }
+.ms-bm .bd-wt b { font-size: 13.5px; }
+.ms-bm .bd-wt span { color: #aeb6c8; font-size: 11.5px; }
+.ms-bm .bd-wt button { margin-left: auto; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 6px; color: #aeb6c8; font-size: 18px; line-height: 1; }
+.ms-bm .bd-wt button:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.ms-bm .bd-hd { display: flex; align-items: center; gap: 8px; flex: none; padding: 10px 12px; border-bottom: 1px solid #dde1e8; background: #f6f7fa; }
+.ms-bm .bd-badge { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 6px; background: #fff; border: 1px solid #dde1e8; border-left: 4px solid #1f2a44; border-radius: 6px; }
+.ms-bm .bd-badge i { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 4px; background: #1f2a44; color: #f3d9a4; font-style: normal; font-weight: 800; font-size: 15px; }
+.ms-bm .bd-badge div { min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.ms-bm .bd-badge small { color: #8a93a6; font-size: 10px; letter-spacing: .5px; }
+.ms-bm .bd-badge b { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-bm .bd-badge em { font-style: normal; font-weight: 600; color: #596277; font-size: 12px; }
+.ms-bm .bd-badge span { color: #596277; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-bm .bd-badge.bd-wait b { color: #596277; }
+.ms-bm .bd-tools { display: flex; flex-direction: column; gap: 4px; flex: none; }
+.ms-bm .bd-tools button { padding: 4px 8px; border: 1px solid #dde1e8; border-radius: 5px; background: #fff; color: #1f2a44; font-size: 11.5px; white-space: nowrap; }
+.ms-bm .bd-tools button:hover:not(:disabled) { background: #eef0f4; }
+.ms-bm .bd-tools button:disabled { color: #aeb6c8; cursor: default; }
+/* 새 말이 오면 맨 아래가 보이게: 거꾸로 쌓는 바깥 칸 */
+.ms-bm .bd-lg { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column-reverse; padding: 12px; background: #fff; }
+.ms-bm .bd-lg > div { display: flex; flex-direction: column; gap: 8px; }
+.ms-bm .bd-sys { align-self: center; max-width: 90%; padding: 4px 10px; border-radius: 10px; background: #eef0f4; color: #596277; font-size: 11.5px; text-align: center; }
+.ms-bm .bd-m { display: flex; flex-direction: column; max-width: 80%; }
+.ms-bm .bd-m p { margin: 0; padding: 8px 11px; border-radius: 10px; white-space: pre-wrap; line-height: 1.55; overflow-wrap: anywhere; }
+.ms-bm .bd-me { align-self: flex-end; }
+.ms-bm .bd-me p { background: #1f2a44; color: #fff; border-bottom-right-radius: 3px; }
+.ms-bm .bd-op { align-self: flex-start; }
+.ms-bm .bd-op small { color: #8a93a6; font-size: 11px; margin: 0 0 3px 2px; }
+.ms-bm .bd-op p { background: #eef0f4; color: #1f2430; border-bottom-left-radius: 3px; }
+.ms-bm .bd-typing p { color: #8a93a6; }
+.ms-bm .bd-fail { margin: 0 12px 8px; }
+.ms-bm .bd-in { display: flex; gap: 6px; flex: none; padding: 10px 12px; border-top: 1px solid #dde1e8; background: #f6f7fa; }
+.ms-bm .bd-in input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid #c9cfdb; border-radius: 6px; background: #fff; color: #1f2430; font: inherit; }
+.ms-bm .bd-in input:focus { outline: none; border-color: #1f2a44; box-shadow: inset 0 0 0 1px #1f2a44; }
+.ms-bm .bd-in input:disabled { background: #eef0f4; }
+.ms-bm .bd-in .bp-buy { width: auto; margin: 0; padding: 0 16px; height: 34px; }
+.ms-bm .bd-rs { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 55%, #aeb6c8 55% 62%, transparent 62% 72%, #aeb6c8 72% 79%, transparent 79%); }
+.ms-bm.ms-m .bd-win { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 82%; border-radius: 12px 12px 0 0; }
+.ms-bm.ms-m .bd-wt { cursor: default; }
 /* ── 괴이위키 (2026-11-08 사용자 확정 시안 작업_1108/브라우저_시안3/mock3.html 의 .wk 그대로) ──
    대문은 밝은 청록(.nm), 그 밖은 짙은 초록. 목록 서랍은 머리줄 아래 설정한 쪽(기본 오른쪽), 폰은 오른쪽 아래 「목록」 책갈피 */
 .gx-body.wk {
@@ -4575,10 +4665,12 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .cm .gn-c-time { font: inherit; font-size: 12px; color: inherit; }
 .bs .cm .gn-me { color: inherit; font-weight: 700; }
 .bs .ph-compose .ph-send.txt { width: auto; height: auto; min-width: 0; border-radius: 0; font-size: 13px; white-space: nowrap; }
-.bs-gal .dpost .cm.gn-c { display: grid; }
+.bs-gal .dpost .cm.gn-c { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; gap: 10px; } /* 위 .bs .cm.gn-c 가 칸 나눔을 지워 PC에서도 글쓴이·본문·시간이 세 줄이 됐다 (11-09 사용자) */
 .bs-gal.bs-m .dpost .cm.gn-c { grid-template-columns: minmax(0, 1fr); }
 .bs .cm.gn-c.re { padding-left: calc(2px + var(--gn-depth, 0) * 22px); }
 .bs .gn-post { display: block; }
+/* 연어 마켓 글 보기는 그림|글 두 칸 격자. 위 줄이 덮어 그림이 창 폭만큼 커졌다 (11-09 사용자) */
+.bs-sm .detail.gn-post { display: grid; }
 .bs .gn-post-title { font-size: inherit; margin: 0; font-weight: inherit; color: inherit; line-height: inherit; }
 .bs-gal .body { width: auto; max-width: 1000px; padding: 10px 10px 0; box-sizing: border-box; }
 .bs-gal.bs-m .body { padding: 0; }
@@ -4596,3 +4688,73 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 뒤로 단추는 어디서나 36 (11-09 점검 17: 폰은 40이었다). 인터넷 사이트(.bs) 안은 사이트 모양 그대로 */
 .ph-room-head > .ph-tool.ph-back { width: 36px; height: 36px; }
 .bs .ph-room-head > .ph-tool.ph-back { width: 34px; height: 34px; }
+
+/* 사이트 글 보기 아래 여백 (11-09 사용자: 괴담갤 글 안에서 단추들이 바닥에 붙음) — 게시판 셋 같은 값 */
+.bs-gal .dpost, .bs-wpf .wpost, .bs-gn .gmain.gpost { padding-bottom: 24px; }
+
+/* ── 게시판 쪽지함 팝업창 (11-09 사용자: 우주 쇼핑몰 질문 창처럼). sticky 0 높이 틀 → 글을 내려도 같은 자리 ── */
+.bs .gn-dmhost { position: sticky; top: 0; height: 0; z-index: 30; overflow: visible; }
+.bs .gn-dmwin { position: absolute; top: 56px; right: 24px; width: 420px; height: min(600px, calc(100vh - 220px)); min-width: 320px; min-height: 280px; display: flex; flex-direction: column; background: var(--card, #fff); color: var(--text); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px -8px rgba(0, 0, 0, .35), 0 2px 6px rgba(0, 0, 0, .12); overflow: hidden; }
+.bs .gn-dmwin-hd { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 40px; padding: 0 6px 0 12px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: move; user-select: none; }
+.bs .gn-dmwin-hd b { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.bs .gn-dmwin-hd b svg { width: 16px; height: 16px; }
+.bs .gn-dmwin-bd { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 10px 12px; }
+.bs .gn-dmwin-bd > .ph-room, .bs .gn-dmwin-bd > .ph-form { flex: 1; min-height: 0; }
+.bs .gn-dmwin-bd .ph-log { flex: 1; min-height: 0; overflow-y: auto; }
+.bs .gn-dmwin-bd .ph-list { overflow-y: auto; min-height: 0; }
+.bs .gn-dmwin-bd .bs-dmh { justify-content: flex-end; margin-bottom: 6px; }
+.bs .gn-dmwin-bd .bs-dmh h2 { display: none; }
+.bs .gn-rs { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 0 50%, var(--dim) 50% 56%, transparent 56% 66%, var(--dim) 66% 72%, transparent 72% 82%, var(--dim) 82% 88%, transparent 88%); opacity: .7; }
+
+/* ── PC 마우스 제스처 선·이름표 (ui/gesture.ts) ── */
+.gx-gest { position: absolute; inset: 0; z-index: 9000; pointer-events: none; }
+.gx-gest-tip { position: absolute; z-index: 9001; pointer-events: none; padding: 4px 10px; border-radius: 6px; background: var(--signal); color: #fff; font: 600 13px/1.4 var(--sans, sans-serif); white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, .3); }
+.gx-gest-tip:empty { display: none; }
+.gx-gest-tip.off { background: #666; }
+
+/* 세정게 오른쪽 칸 (왼쪽 MENU 고정, 11-09) */
+.bs-wpf .colr { min-width: 0; }
+.bs-wpf .colr > .ct, .bs-wpf .colr > .gn-cpane, .bs-wpf .colr > .ph-room { min-height: 100%; }
+
+/* ── 괴담넷 왼쪽 글 목록 (11-09) ── */
+.bs-gn .side .splist { max-height: 62vh; overflow-y: auto; margin: 2px 0 4px; }
+.bs-gn .side .splist .sp { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 6px 10px; color: var(--ink); font-size: 13px; line-height: 1.3; border-radius: 3px; text-align: left; }
+.bs-gn .side .splist .sp i { flex: none; font-style: normal; font-size: 11px; color: var(--dim); }
+.bs-gn .side .splist .sp span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gn .side .splist .sp em { flex: none; font-style: normal; font-size: 11px; color: var(--red); }
+.bs-gn .side .splist .sp .gn-dot { flex: none; }
+.bs-gn .side .splist .sp:hover { background: var(--chip); }
+.bs-gn .side .splist .sp.on { background: var(--hd); color: var(--hdi); font-weight: 700; }
+.bs-gn .side .splist .sp.on i, .bs-gn .side .splist .sp.on em { color: var(--hdi); opacity: .8; }
+.bs-gn .side .sp-none { margin: 4px 12px 8px; font-size: 12px; color: var(--dim); }
+
+/* ── 괴담갤 오른쪽 힛갤 칸 (11-09): 본문(.body)과 별개로 고정 ── */
+.bs-gal .gal-cols { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+.bs-gal .gal-cols > .body, .bs-gal .gal-cols > .bs-plain, .bs-gal .gal-cols > .bs-plain .body { width: auto; max-width: 1000px; margin: 0; min-width: 0; }
+.bs-gal .gal-side { position: sticky; top: 10px; margin-top: 10px; }
+.bs-gal .gal-side .hit { border: 1px solid #d6d8e2; background: #fff; }
+.bs-gal .gal-side h4 { margin: 0; padding: 7px 10px; font-size: 13px; color: #fff; background: #3b4890; }
+.bs-gal .gal-side ol { list-style: none; margin: 0; padding: 4px 0; }
+.bs-gal .gal-side li button { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 5px 10px; color: #333; font-size: 12.5px; text-align: left; line-height: 1.3; }
+.bs-gal .gal-side li button span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gal .gal-side li button em { flex: none; font-style: normal; font-size: 11px; color: #c33; }
+.bs-gal .gal-side li button small { flex: none; font-size: 11px; color: #999; }
+.bs-gal .gal-side li button:hover span { text-decoration: underline; }
+.bs-gal .gal-side li button.on span { color: #3b4890; font-weight: 700; }
+.bs-gal .gal-side .none { margin: 0; padding: 10px; font-size: 12px; color: #999; }
+
+/* 우주몰 설정: 진열 배정 글칸 · 시그니처 상품 목록 (11-09) */
+.ms-area { width: 100%; min-height: 0; font: 12.5px/1.5 var(--mono); resize: vertical; }
+.ms-num { width: 120px; }
+.ms-fx { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.ms-fx + .ms-fx { margin-top: 8px; }
+.ms-fx.off { opacity: .6; }
+.ms-fx-head, .ms-fx-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ms-fx-head > input:first-child { flex: 1; min-width: 140px; }
+.ms-fx .ph-inline .ms-num { width: 110px; }
+.ms-fx-head .ms-num { width: 64px; }
+.ms-fx-wide { flex: 1; min-width: 0; }
+.ms-fx-wide > input { flex: 1; min-width: 0; }
+.ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
+.ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
+.ms-sample i { color: var(--accent); font-style: normal; }

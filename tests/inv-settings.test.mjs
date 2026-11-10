@@ -26,8 +26,8 @@ test('상점은 소지품·가계부 둘 다 켜져야: 하나라도 끄면 꺼�
 test('상점이 열리는 자리: 기본 어디서든(주인 없는 가게·통신 판매 포함), 가게 장면만 고를 수 있음', () => {
   assert.equal(shopSettings({}).where, 'any');
   assert.equal(shopSettings({ $sh_where: 'shop' }).where, 'shop');
-  const any = shopGuide({});
-  const shop = shopGuide({ $sh_where: 'shop' });
+  const any = shopGuide({ $sh_judge: 'main' });
+  const shop = shopGuide({ $sh_where: 'shop', $sh_judge: 'main' });
   assert.ok(!any.includes('{where}') && !shop.includes('{where}'));
   assert.notEqual(any, shop);
   assert.ok(/empty/i.test(any), '주인이 없으면 비워 둔다는 안내');
@@ -107,4 +107,13 @@ test('상점이 꺼져 있으면 이번 응답의 상점 표식도 지우고 가
     assert.ok(!String(r.message?.[1]?.data ?? '가게다').includes('[shop:'), JSON.stringify(vars));
     assert.equal(readShop(r.vars ?? {})?.shop ?? '', '', JSON.stringify(vars));
   }
+});
+
+test('주인공 자기 가게는 상점이 아니다: 표식의 주인이 주인공이면 지우고 열지 않는다 (11-09 마덕희·헐값매입)', async () => {
+  const { settleShop, readShop } = await import('../dist-test/core.mjs');
+  const chat = { message: [{ role: 'user', data: '가게 문을 연다', chatId: 'u1' }, { role: 'char', data: '헐값매입이다\n[shop: 헐값매입|마덕희]', chatId: 'c1' }], scriptstate: {} };
+  const r = settleShop(chat, 1, ['마 덕희', '']);
+  assert.ok(!String(r.message?.[1]?.data).includes('[shop:'), '표식 지움');
+  assert.equal(readShop(r.vars ?? {})?.shop ?? '', '');
+  assert.equal(readShop(settleShop(chat, 1, ['은하제']).vars).shop, '헐값매입', '남의 가게는 그대로');
 });

@@ -92,7 +92,8 @@ test('구입·다음 턴 사건·값 표기', () => {
   assert.equal(markSold(st, id), st);
   const c = chat('x\n[shop: 철물점|주인]', shopVars({ ...st, closed: true, talk: [...st.talk, { who: 'me', text: '야' }, { who: 'owner', text: '나가' }] }));
   assert.match(shopEvents(c)[0], /refused service.*철물점/);
-  assert.match(inventoryText(c), /\[shop: 가게 이름\|주인 이름\]/);
+  assert.match(inventoryText({ ...c, scriptstate: { ...c.scriptstate, $sh_judge: 'main' } }), /\[shop: 가게 이름\|주인 이름\]/);
+  assert.doesNotMatch(inventoryText(c), /\[shop: 가게 이름/, '기본(자동·갱신기 매 턴)이면 본편에 표식 지침 없음');
   assert.equal(shopEvents(chat('x', shopVars(st))).length, 0);
   assert.equal(shortWon(1538000), '1,538,000');
   assert.equal(shortWon(120000000), '1.2억');

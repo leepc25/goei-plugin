@@ -3,6 +3,7 @@
 // 저장: 플러그인 저장소 goei-trace 에 최근 TRACE_KEEP 턴. 요청·응답 원문은 한 건당 TRACE_TEXT 자까지(앞 2/3 + 뒤 1/3). 화면은 ui/editor/trace.ts.
 import type { LlmMessage } from './llm';
 import { tokens } from '../core/gnet';
+import { progressBegin, progressMain, progressReply } from '../core/progress';
 
 export interface TraceCall {
   /** 호출 종류 (라우터·디렉터·갱신기·괴담넷·괴담톡·위키·소지품·상점·…) */
@@ -30,7 +31,7 @@ export interface TraceMain {
   at: string;
   /** 플러그인이 조립을 끝낸 뒤 요청 전체: 메시지별 역할·글자 수 */
   shape: { role: string; chars: number }[];
-  /** 마지막 세 메시지 원문 (잘린 글) — 플러그인이 끼운 블록은 보통 여기 있다 */
+  /** 메시지 전부 원문 (아주 긴 것만 잘림). 11-09 사용자: 마지막 셋만 두니 24개 중 21개가 안 보였다 — 다섯 턴 다 전체를 둔다(플러그인 저장소라 용량 문제 없음) */
   tail: { role: string; content: string }[];
   /** 조립 단계 중 실패한 것 */
   failed: string[];
@@ -50,6 +51,8 @@ export interface TraceTurn {
 
 export const TRACE_KEEP = 5;
 export const TRACE_TEXT = 6000;
+/** 본편 요청 메시지 하나의 보관 한도 (로어북·긴 system 글도 거의 다 들어간다) */
+export const TRACE_MAIN_TEXT = 40000;
 const KEY = 'goei-trace';
 
 let turns: TraceTurn[] | null = null;
@@ -84,7 +87,24 @@ async function load(): Promise<TraceTurn[]> {
   return loading;
 }
 
+/** 기록이 바뀔 때 알림 (11-09 사용자: 열어 둔 호출 기록 페이지가 저절로 갱신되게 — 「다시 읽기」 단추 대신) */
+const listeners = new Set<() => void>();
+export function onTraceChange(f: () => void): () => void {
+  listeners.add(f);
+  return () => listeners.delete(f);
+}
+const notify = () => {
+  for (const f of listeners) {
+    try {
+      f();
+    } catch {
+      /* 화면 쪽 오류는 기록을 막지 않는다 */
+    }
+  }
+};
+
 function save(): void {
+  notify();
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveTimer = null;
@@ -108,6 +128,7 @@ export async function clearTrace(): Promise<void> {
   turns = [];
   open = null;
   replied = false;
+  notify();
   try {
     await risuai.pluginStorage.setItem(KEY, '[]');
   } catch {
@@ -127,6 +148,7 @@ export async function traceBegin(): Promise<void> {
   const t: TraceTurn = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, at: new Date().toISOString(), calls: [] };
   open = t;
   replied = false;
+  progressBegin(); // 진행 창 (core/progress.ts): 새 턴
   await push(t);
 }
 
@@ -137,11 +159,12 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
   open.main = {
     at: new Date().toISOString(),
     shape: rows.map((r) => ({ role: r.role, chars: r.content.length })),
-    tail: rows.slice(-3).map((r) => ({ role: r.role, content: clip(r.content) })),
+    tail: rows.map((r) => ({ role: r.role, content: clip(r.content, TRACE_MAIN_TEXT) })),
     failed: [...failed],
     totalChars: rows.reduce((n, r) => n + r.content.length, 0),
     totalTokens: rows.reduce((n, r) => n + tokens(r.content), 0),
   };
+  progressMain(); // 본편 요청을 보낸다
   save();
 }
 
@@ -150,6 +173,7 @@ export function traceReply(text: string): void {
   if (!open) return;
   open.reply = { at: new Date().toISOString(), text: clip(text), chars: text.length, tokens: tokens(text) };
   replied = true;
+  progressReply(open.reply.tokens);
   save();
 }
 

@@ -7,6 +7,7 @@ import { basicSettings, getPrefs } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
 import { runModel, type LlmMessage } from './llm';
 import { updateChat } from './risu';
+import { findShopTag, stripShopTags } from '../core/shop';
 import { userInfo } from './user';
 
 export interface AssetTarget {
@@ -54,9 +55,11 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
       const list = latest.message ?? [];
       const i = t.messageIndex;
       // 작업 중에 메시지가 바뀌었거나(수정·다시 생성) 새 메시지가 붙었으면 버린다
-      if (i !== list.length - 1 || list[i]?.role !== 'char' || list[i].data !== job.original) return null;
+      // 상점 표식은 갱신기(상점 판단)가 그새 붙이거나 바꿀 수 있다 (11-09): 표식을 뺀 글로 비교하고, 지금 붙어 있는 표식을 그대로 이어 붙인다
+      if (i !== list.length - 1 || list[i]?.role !== 'char' || stripShopTags(String(list[i].data ?? '')) !== stripShopTags(job.original)) return null;
+      const tag = findShopTag(String(list[i].data ?? ''));
       const message = list.slice();
-      message[i] = { ...list[i], data: next };
+      message[i] = { ...list[i], data: tag ? `${stripShopTags(next)}\n${tag.raw}` : stripShopTags(next) };
       return { ...latest, message, scriptstate: { ...(latest.scriptstate ?? {}), [ASSET_NOTE]: '' } };
     });
     if (!saved) console.log('[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.');

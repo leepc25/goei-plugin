@@ -90,7 +90,19 @@ export function withIdentity(line: string, identity: string): string {
 export function withStatusBlock<M extends PromptMessage>(messages: M[], identity = '', shape?: StatusShape): M[] {
   if (messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(STATUS_HEAD))) return messages;
   const line0 = lastStatusLine(messages);
-  if (!line0) return messages;
+  if (!line0) {
+    // 첫 턴(상태창 줄이 아직 없음): 지난 줄은 없어도 장부 값은 넘긴다. 안 넘기면 모델이 잔고를 지어내(0) 장부가 그 값으로 맞춰졌다
+    // (2026-11-09 사용자: 시작 잔고 1,140,000이 첫 응답 뒤 0으로)
+    const starts = [
+      shape?.wallet !== undefined && shape?.wallet !== null ? `Balance = ${walletCell(shape.wallet)}` : '',
+      shape?.points !== undefined && shape?.points !== null ? `Points = ${walletCell(shape.points)}` : '',
+    ].filter(Boolean);
+    if (!starts.length) return messages;
+    const fields = shape?.cols?.length ? `Fields: ${shape.cols.map((c) => colDef(c).label).join(' | ')}\n` : '';
+    const block = { role: 'system', content: `${STATUS_HEAD}\nNo status line yet: this is the first turn.\nStarting values: ${starts.join(', ')}\n${fields}Treat them as the previous values (copy them unless the story changes them) and output exactly one new [▣] line at the very end of your response.` } as M;
+    const at = messages.map((m) => m?.role).lastIndexOf('user');
+    return at < 0 ? [...messages, block] : [...messages.slice(0, at), block, ...messages.slice(at)];
+  }
   const line = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet, points: shape.points }) : withIdentity(line0, identity);
   const out = stripStatusLines(messages);
   const at = out.map((m) => m?.role).lastIndexOf('user');

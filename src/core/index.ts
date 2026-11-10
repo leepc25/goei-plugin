@@ -40,6 +40,7 @@ export * from './datapack';
 export * from './texthash';
 export * from './tokenizer';
 export * from './wallet';
+export * from './points';
 export * from './items';
 export * from './startitems';
 export * from './shop';

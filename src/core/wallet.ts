@@ -105,6 +105,17 @@ const hash = (text: string) => {
 
 export const walletEntryId = (anchor: string, amount: number, memo: string) => `w_${hash(`${anchor}|${amount}|${memo}`)}`;
 
+/** 새 거래 id: 같은 id 가 가계부에 이미 있으면(지운·다시 굴린 응답의 죽은 거래 포함) 응답 키를 붙여 새로 만든다.
+ *  안 그러면 addWalletEntry 가 같은 id 를 보고 아무것도 안 넣어 돈이 안 나간다 (릴리스 점검 11-09: 다시 주문하면 공짜) */
+export function freshWalletId(w: Wallet, base: string, anchor: string): string {
+  const used = (id: string) => w.log.some((x) => x.id === id);
+  if (!used(base)) return base;
+  const b = anchor ? `${base}_${anchor}` : base;
+  if (!used(b)) return b;
+  let i = 2;
+  while (used(`${b}_${i}`)) i++;
+  return `${b}_${i}`;
+}
 /** 거래 더하기 (같은 id 가 있으면 그대로). 금액 0·범위 밖은 무시 */
 export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & { id?: string; at?: string }): Wallet {
   if (!Number.isSafeInteger(e.amount) || e.amount === 0 || Math.abs(e.amount) > WALLET_MAX) return w;

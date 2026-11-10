@@ -1,7 +1,7 @@
 // 가계부 (설계안 8절): 장부 읽기·잔고·살아 있는 거래·수동 조정·금액 읽기
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readWallet, walletVars, walletBalance, liveWallet, addWalletEntry, removeWalletEntry, adjustWallet, aliveAnchors, formatWon, formatDelta, parseWon, mentionsAmount, WALLET_VAR } from '../dist-test/core.mjs';
+import { readWallet, walletVars, walletBalance, liveWallet, addWalletEntry, freshWalletId, removeWalletEntry, adjustWallet, aliveAnchors, formatWon, formatDelta, parseWon, mentionsAmount, WALLET_VAR } from '../dist-test/core.mjs';
 
 const chat = () => ({ message: [{ role: 'user', data: 'a', chatId: 'u1' }, { role: 'char', data: 'b', chatId: 'c1' }, { role: 'char', data: 'c' }] });
 
@@ -96,4 +96,15 @@ test('상태창 잔고 맞춤: 마지막 응답만, 상점 거래는 남김', as
   // 다음 응답에 잔고 칸이 없으면 지난 응답 값으로 거슬러 맞추지 않는다
   const c2 = { message: [...c.message, { role: 'user', data: 'b', chatId: 'u2' }, { role: 'char', data: '칸 없는 응답', chatId: 'c2' }] };
   assert.equal(syncWalletToStatus(w, c2), null);
+});
+
+test('새 거래 id: 가계부에 같은 id 가 남아 있으면(다시 굴린 응답의 죽은 거래) 응답 키를 붙여 새로 (릴리스 점검 11-09: 다시 주문하면 공짜)', () => {
+  let w = readWallet({}, 1000);
+  assert.equal(freshWalletId(w, 'cos_ord_q1', 'k1'), 'cos_ord_q1');
+  w = addWalletEntry(w, { id: 'cos_ord_q1', anchor: 'k1', amount: -100, memo: 'a', src: 'store' });
+  const id2 = freshWalletId(w, 'cos_ord_q1', 'k2');
+  assert.equal(id2, 'cos_ord_q1_k2');
+  w = addWalletEntry(w, { id: id2, anchor: 'k2', amount: -100, memo: 'a', src: 'store' });
+  assert.equal(w.log.length, 2, '두 번째 선납도 기록됨');
+  assert.equal(freshWalletId(w, 'cos_ord_q1', 'k2'), 'cos_ord_q1_k2_2');
 });
