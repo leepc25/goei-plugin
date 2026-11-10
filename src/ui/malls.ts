@@ -100,6 +100,24 @@ const jobs = new Set<string>();
 /** 시그니처 상품 → 진열 물건 (할인 전 값이 더 크면 ※할인!※ 딱지) */
 const fixedItem = (f: CosFixed): Omit<ShopItem, 'id'> => ({ name: f.name.trim(), desc: f.desc, effect: f.effect, use: false, price: f.price, truth: f.truth.trim() || '?', ...(f.was && f.was > f.price ? { tag: 'sale' as const, was: f.was } : {}) });
 
+/** 팔기 확정 (「판매」 단추와 운영자의 <deal/> 가 같이 쓴다): 가계부 수입 + 소지품에서 뺌 + 판 것 목록. 팔 수 없으면 null */
+function saleDone<C extends ChatContext['chat']>(chat: C, site: MallSite, itemId: string): C | null {
+  const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
+  const o = now.sell;
+  if (!o || o.itemId !== itemId || typeof o.price !== 'number') return null;
+  const it0 = readItems(chat.scriptstate);
+  if (!liveItemsOf(it0, chat).some((x) => x.id === itemId)) return null;
+  const anchor = lastBot(chat)?.key ?? '';
+  const w0 = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+  const w = addWalletEntry(w0, { id: freshWalletId(w0, `${site}_sl_${itemId}_${now.sales.length}`, anchor), anchor, amount: o.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
+  const items = sellItem(it0, itemId, anchor, `${MALL_NAME[site]}에 팖`);
+  const nextShop = closeSale(now);
+  if (!nextShop) return null;
+  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+  const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};
+  return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop), ...use } };
+}
+
 async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf' | 'talk', st0: ShopState): Promise<void> {
   const job = `${chatKey(ctx)}:${site}`;
   if (jobs.has(job)) return;
@@ -120,6 +138,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: `${MALL_NAME[site]} ${kind === 'shelf' ? '진열' : '문의'}` };
     let next: ShopState;
     let note: string | null = null;
+    let deal = '';
     if (kind === 'shelf') {
       const { value } = await generate(shelfPrompt(src, s, MALL_GUIDE[site]), s.model, (raw) => parseShelf(raw, st0.loaded ? st0.identity : null), opts);
       let applied = applyShelf(st0, value, s);
@@ -135,15 +154,22 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     } else {
       const { value } = await generate(talkPrompt(src, s, MALL_GUIDE[site]), s.model, parseTalk, opts);
       next = applyTalk(st0, value, false);
+      // 말로 판 것: 운영자가 <deal/> 을 냈고 부른 값이 있으면 「판매」 단추와 같이 처리
+      if (value.deal && next.sell && typeof next.sell.price === 'number') deal = next.sell.itemId;
     }
     if (site === 'bm') next = { ...next, identity: { ...next.identity, points: true } };
     const cur = env.current();
     if (!cur || chatKey(cur) !== chatKey(ctx)) return;
     const key = lastBot(cur.chat)?.key ?? '';
-    await updateChat(cur.charIndex, cur.chatIndex, (chat) => ({
-      ...chat,
-      scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...next, key }), ...(note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: key } : {}) },
-    }));
+    const sale = deal ? next.sell : null;
+    let sold = false;
+    await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
+      const saved = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...next, key }), ...(note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: key } : {}) } };
+      const done = deal ? saleDone(saved, site, deal) : null;
+      if (done) sold = true;
+      return done ?? saved;
+    });
+    if (sold && sale) { v.info = `「${sale.name}」을 ${won(sale.price as number)}에 팔았다. 입금 완료, 너에게.`; void refreshUseBox(cur.charIndex, cur.chatIndex); }
     // 장바구니에서 진열대에 없는 물건은 뺀다
     v.cart = v.cart.filter((id) => shelfItems(next).some((x) => x.id === id));
   } catch (error) {
@@ -422,20 +448,9 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       const o = st.sell;
       let sold = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readMall(chat.scriptstate, site, aliveAnchors(chat));
-        if (now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
-        const it0 = readItems(chat.scriptstate);
-        if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
-        const anchor = lastBot(chat)?.key ?? '';
-        const w0 = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-        const w = addWalletEntry(w0, { id: freshWalletId(w0, `${site}_sl_${o.itemId}_${now.sales.length}`, anchor), anchor, amount: now.sell.price, memo: `${o.name} (${MALL_NAME[site]} 매입)`, src: 'store' });
-        const items = sellItem(it0, o.itemId, anchor, `${MALL_NAME[site]}에 팖`);
-        const nextShop = closeSale(now);
-        if (!nextShop) return null;
-        sold = true;
-        const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
-        const use = q && q.some((u) => u.id === o.itemId) ? itemUseVars(dropUse(q, o.itemId)) : {};
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w), ...itemsVars(items), ...mallVarsOf(site, nextShop), ...use } };
+        const done = saleDone(chat, site, o.itemId);
+        if (done) sold = true;
+        return done;
       });
       v.info = sold ? `「${o.name}」을 ${won(o.price as number)}에 팔았다. 입금 완료, 너에게.` : '팔 수 없음, 지금 (물건이 없거나 값이 바뀌었다).';
       if (sold) void refreshUseBox(ctx.charIndex, ctx.chatIndex);
@@ -711,11 +726,10 @@ function cosAsk(ctx: ChatContext, st: ShopState, v: View, mobile: boolean): stri
   const sellList = v.selling ? `<div class="q-pick">${mine.map((x) => `<button data-action="mall-sell-pick" data-value="${esc(x.id)}">${esc(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won(x.price!)}</small>` : ''}</button>`).join('') || '<p>팔 만한 소지품이 없다.</p>'}</div>` : '';
   const o = st.sell;
   const offered = !!o && typeof o.price === 'number';
-  const sellCard = o ? `<div class="q-card q-sell"><span>파는 물건</span><b>${esc(o.name)}</b>${o.paid !== undefined ? `<small>산 값 ${won(o.paid)}</small>` : ''}<em>${offered ? `우리의 값 ${o.first !== undefined ? `<s>${won(o.first)}</s> ` : ''}${won(o.price as number)}` : o.price === null ? '우리는 사지 않는다' : '값을 아직 말하지 않았다'}</em>${offered ? `<button class="cs-btn" data-action="mall-sell"${v.loading ? ' disabled' : ''}>판매</button>` : ''}<button class="q-x" data-action="mall-sell-cancel" aria-label="그만">×</button></div>` : '';
+  const sellCard = o ? `<div class="q-card q-sell"><i class="q-th">${itemPic({ name: o.name, icon: o.icon })}</i><span>파는 물건</span><b>${esc(o.name)}</b>${o.paid !== undefined ? `<small>산 값 ${won(o.paid)}</small>` : ''}<em>${offered ? `우리의 값 ${o.first !== undefined ? `<s>${won(o.first)}</s> ` : ''}${won(o.price as number)}` : o.price === null ? '우리는 사지 않는다' : '값을 아직 말하지 않았다'}</em>${offered ? `<button class="cs-btn" data-action="mall-sell"${v.loading ? ' disabled' : ''}>판매</button>` : ''}<button class="q-x" data-action="mall-sell-cancel" aria-label="그만">×</button></div>` : '';
   return `<div class="cs-win cs-askwin" role="dialog" aria-label="운영자에게 질문"${at}><div class="cs-wt"><b>★ 운영자에게 질문 ★ - Netscape</b><button data-action="mall-ask-close" aria-label="닫기">×</button></div>
     <div class="q-hd">${ufo}<div><b>운영자</b><small>● 운영자 여기에 있음, 지금</small></div></div>
-    ${sellCard}${chip ? `<div class="q-card"><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
-    <div class="q-lg" data-chatlog="cos">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}${sellList}
+    <div class="q-lg" data-chatlog="cos">${log}${wait}</div>${failBox(v, 'q-fail')}${pickList}${sellList}${sellCard}${chip ? `<div class="q-card"><i class="q-th">${pic(chip)}</i><span>붙인 상품</span><button class="cs-ln" data-action="mall-show" data-value="${esc(chip.id)}">${esc(chip.name)} <b>${won(chip.price)}</b></button><button class="q-x" data-action="mall-chip" data-value="" aria-label="상품 떼기">×</button></div>` : ''}
     <div class="q-in"><button class="cs-btn" data-action="mall-pick" aria-pressed="${v.picking}">상품 붙이기</button><button class="cs-btn" data-action="mall-sell-open" aria-pressed="${v.selling}">내 물건 팔기</button><input name="mall-say" data-input="mall-say" data-enter="mall-say" value="${esc(v.input)}" placeholder="${o ? (offered ? '값을 다시 불러 보거나 그냥 팔아라' : '값을 부르거나 그냥 보내라') : '넣어라 질문, 여기에'}" aria-label="질문"${v.loading ? ' disabled' : ''}><button class="cs-btn" data-action="mall-say" data-take="mall-say"${needAttr('mall-say', v.input, !!v.loading || !st.loaded)}>전송</button></div><i class="cs-rs" aria-hidden="true"></i></div>`;
 }
 
@@ -760,9 +774,10 @@ function bmCard(it: ShopItem, bal: number, v: View, busy: boolean): string {
   const sale = it.tag === 'sale' && !!it.was && it.was > it.price;
   const poor = it.price > bal;
   const lab = it.tag === 'rare' ? '<span class="bp-lim">이달의 한정</span>' : sale ? '<span class="bp-sale">특가</span>' : '';
-  return `<div class="bp-it${v.focus === it.id ? ' on' : ''}" data-item="${esc(it.id)}"><span class="bp-pic">${pic(it)}</span>${lab}
+  const off = sale ? Math.round((1 - it.price / it.was!) * 100) : 0;
+  return `<div class="bp-it${it.tag === 'rare' ? ' bp-rare' : sale ? ' bp-cut' : ''}${v.focus === it.id ? ' on' : ''}" data-item="${esc(it.id)}"><span class="bp-pic">${pic(it)}</span>${lab}
     <b class="bp-nm">${esc(it.name)}</b><p class="bp-ds">${esc(it.desc)}${it.effect ? `<br><i>${esc(it.effect)}</i>` : ''}</p>
-    <div class="bp-pr">${sale ? `<s>${pts(it.was!)}</s> ` : ''}<b>${Math.trunc(it.price).toLocaleString('en-US')}</b> P</div>
+    <div class="bp-pr">${sale ? `<s>${pts(it.was!)}</s> ` : ''}${off > 0 ? `<em>${off}%</em> ` : ''}<b>${Math.trunc(it.price).toLocaleString('en-US')}</b> P</div>
     <button class="bp-buy" data-action="mall-buy" data-value="${esc(it.id)}" ${poor || busy ? 'disabled' : ''}>${poor ? '포인트 부족' : '포인트로 구매'}</button></div>`;
 }
 

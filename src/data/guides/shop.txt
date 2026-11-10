@@ -107,6 +107,7 @@ The owner never ends the dealing; however annoyed, they keep the shop open (neve
 
 @@SECTION SELL
 The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner's character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item's real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (a rare or strange piece may be worth far more than ordinary stock), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist's words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner's line too. The shelf change mode is normally none while selling.
+Naming a price does not close the sale: until it is closed the owner has neither paid nor taken the item, and never speaks as if it had. Close it only when the protagonist's latest words plainly accept your current figure (or tell you to take it): then add <deal/> and let the owner's line pay and take the item. Without <deal/> nothing is sold.
 @@END
 
 @@SECTION TALK_OUTPUT
@@ -123,6 +124,7 @@ all: full new shelf, one item per line ({line}).
 
 @@SECTION TALK_OUTPUT_OFFER
 <offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).
+<deal/> — only in the reply where the protagonist has plainly agreed to sell at that figure.
 @@END
 
 @@SECTION INFO
@@ -158,6 +160,7 @@ This mall also takes CUSTOM ORDERS, grudgingly. When the customer asks for somet
 3. If yes: what is this thing actually worth? Weigh it as a whole — what it is and how rare, its condition, its effect or uses, what it would fetch on this shop's own shelf (a rare or strange piece can be worth far more than ordinary stock), what the protagonist paid if known, and how much this owner wants it.
 4. From that worth, decide a fair buying price for this owner (a shop buys below what it would sell for; greedy or generous as the character is). React to the protagonist's figure honestly — accept, counter, or laugh it off.
 5. Write the owner's line with the figure, and the <offer>.
+6. Did the protagonist's latest words plainly agree to sell at the figure? Only then <deal/>; otherwise the owner is still waiting for an answer.
 @@END
 
 @@SECTION MAIN_TAG

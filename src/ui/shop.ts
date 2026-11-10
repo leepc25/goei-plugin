@@ -325,6 +325,25 @@ export function shopSource(ctx: ChatContext, st: ShopState, sh = shopSettings(ct
   return { st, refs: refText(rows), story, status, situation, identity, language: genSettings(vars).language };
 }
 
+/** 팔기 확정 (「판매」 단추와 주인의 <deal/> 가 같이 쓴다): 가계부 수입(src store) + 소지품에서 뺌(기록 sell) + 판 것 목록. 팔 수 없으면 null */
+function saleDone<C extends ChatContext['chat']>(chat: C, shop: string, itemId: string): C | null {
+  const now = readShop(chat.scriptstate);
+  const o = now?.sell;
+  if (!now || now.shop !== shop || !o || o.itemId !== itemId || typeof o.price !== 'number') return null;
+  const it0 = readItems(chat.scriptstate);
+  if (!liveItemsOf(it0, chat).some((x) => x.id === itemId)) return null;
+  const p = !!now.identity.points;
+  const l0 = ledgerOf(chat.scriptstate, p);
+  const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: o.price, memo: o.name, src: 'store' });
+  // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
+  const items = sellItem(it0, itemId, now.key, `${now.shop}에 팖`);
+  const nextShop = closeSale(now);
+  if (!nextShop) return null;
+  const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
+  const use = q && q.some((u) => u.id === itemId) ? itemUseVars(dropUse(q, itemId)) : {};
+  return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...ledgerVars(w, p), ...itemsVars(items), ...shopVars(nextShop), ...use } };
+}
+
 /** 모델에 묻고 상태를 저장한다. 같은 채팅을 보고 있을 때만 */
 async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: ShopState): Promise<void> {
   const key = chatKey(ctx);
@@ -337,6 +356,7 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
     const src = shopSource(ctx, st0);
     const g = genSettings(ctx.chat.scriptstate);
     const opts = { retries: g.retries, retryModel: g.retryModel, concurrent: g.concurrent, state: ctx.chat.scriptstate, label: kind === 'shelf' ? '상점 진열' : '상점 대화' };
+    let deal = '';
     let next: ShopState;
     if (kind === 'shelf') {
       const { value } = await generate(shelfPrompt(src, s), s.model, (raw) => parseShelf(raw, st0.loaded ? st0.identity : null), opts);
@@ -344,16 +364,27 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
     } else {
       const { value } = await generate(talkPrompt(src, s), s.model, parseTalk, opts);
       next = applyTalk(st0, value, s.kick);
+      // 말로 판 것: 주인이 <deal/> 을 냈고 부른 값이 있으면 「판매」 단추와 같이 처리
+      if (value.deal && next.sell && typeof next.sell.price === 'number') deal = next.sell.itemId;
     }
     const cur = env.current();
     if (!cur || chatKey(cur) !== key) return;
+    let sold = false;
     await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
       const now = readShop(chat.scriptstate);
       // 그사이 응답이 와서 다른 가게가 됐으면 버린다
       if (!now || now.shop !== next.shop) return null;
-      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...shopVars({ ...next, key: now.key }) } };
+      const saved = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...shopVars({ ...next, key: now.key }) } };
+      const done = deal ? saleDone(saved, next.shop, deal) : null;
+      if (done) sold = true;
+      return done ?? saved;
     });
-    if (kind === 'talk' && next.closed && !st0.closed) shopUi.info = '주인이 거래를 끊었어요.';
+    if (sold && next.sell) {
+      shopUi.detail = '';
+      if (shopUi.chipKind === 'sell') { shopUi.chip = ''; shopUi.chipKind = ''; }
+      shopUi.info = `「${next.sell.name}」을 ${next.identity.points ? `${next.sell.price}P` : `${next.sell.price}원`}에 팔았어요.`;
+      void refreshUseBox(cur.charIndex, cur.chatIndex);
+    } else if (kind === 'talk' && next.closed && !st0.closed) shopUi.info = '주인이 거래를 끊었어요.';
     else if (kind === 'talk' && next.sell && next.sell.price !== undefined) {
       shopUi.detail = 'sell';
       if (next.sell.price !== null && shopUi.chipKind !== 'sell') { shopUi.chip = next.sell.name; shopUi.chipKind = 'sell'; }
@@ -471,21 +502,9 @@ export async function shopAction(action: string, value: string | undefined, ctx:
       const o = st.sell;
       let sold = false;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const now = readShop(chat.scriptstate);
-        if (!now || now.shop !== st.shop || now.sell?.itemId !== o.itemId || typeof now.sell.price !== 'number') return null;
-        const it0 = readItems(chat.scriptstate);
-        if (!liveItemsOf(it0, chat).some((x) => x.id === o.itemId)) return null;
-        const p = !!now.identity.points;
-        const l0 = ledgerOf(chat.scriptstate, p);
-        const w = addWalletEntry(l0, { id: freshWalletId(l0, `sl_${o.itemId}_${now.sales.length}`, now.key), anchor: now.key, amount: now.sell.price, memo: o.name, src: 'store' });
-        // 판 물건은 판 돈과 같은 응답에 묶여 숨는다(응답을 다시 굴리면 같이 돌아옴, core/items.ts sellItem). 장착 칸에서도 빠지고, 「사용」 자리에 놓여 있었으면 거기서도 뺀다
-        const items = sellItem(it0, o.itemId, now.key, `${now.shop}에 팖`);
-        const nextShop = closeSale(now);
-        if (!nextShop) return null;
-        sold = true;
-        const q = chat.scriptstate?.[ITEM_USE_AT_VAR] ? null : readItemUse(chat.scriptstate);
-        const use = q && q.some((u) => u.id === o.itemId) ? itemUseVars(dropUse(q, o.itemId)) : {};
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...ledgerVars(w, p), ...itemsVars(items), ...shopVars(nextShop), ...use } };
+        const done = saleDone(chat, st.shop, o.itemId);
+        if (done) sold = true;
+        return done;
       });
       shopUi.detail = '';
       if (shopUi.chipKind === 'sell') { shopUi.chip = ''; shopUi.chipKind = ''; }

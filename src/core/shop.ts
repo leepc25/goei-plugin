@@ -591,6 +591,8 @@ export interface TalkReply {
   closed: boolean;
   /** 팔기: 주인이 부른 값 (none → null, 말 안 했으면 undefined) */
   offer?: number | null;
+  /** 팔기: 주인공이 그 값에 팔겠다고 말해 거래가 끝남 (<deal/>). 화면의 「판매」 단추와 같은 처리를 한다 */
+  deal?: boolean;
   /** 정보 쪽지 (우주몰): <info>제목|값|내용</info> */
   info?: { title: string; price: number; body: string };
   /** 맞춤 주문 견적 (우주몰): <order>이름|값|납기시간|쓰임|그림|무게|설명|효과|진실</order> */
@@ -614,6 +616,7 @@ export function parseTalk(raw: string): TalkReply {
       if (n !== null) out.offer = n;
     }
   }
+  if (/<deal\s*\/?>/i.test(raw)) out.deal = true;
   const ord = block(raw, 'order');
   if (ord) { const q = parseOrderLine(ord.split('\n').find((l) => l.includes('|')) ?? ''); if (q) out.quote = q; }
   const inf = block(raw, 'info');
@@ -734,6 +737,11 @@ export function applyTalk(st: ShopState, r0: TalkReply, kick = true): ShopState 
     if (price === undefined) {
       const rp = r.reprice.find((p) => sameShopName(p.name, sell!.name));
       if (rp && !rp.pay) price = rp.price;
+    }
+    // <offer> 를 빼먹고 대사에만 값을 적은 응답: 아직 부른 값이 없을 때 대사에 돈이 딱 하나면 그것 (11-10 사용자: 15000원이라 말했는데 「값을 아직 말하지 않았다」)
+    if (price === undefined && sell.price === undefined) {
+      const figs = [...new Set((r.owner.match(/\d[\d,]*\s*(?:만\s*)?(?:원|포인트|P\b|p\b)/g) ?? []).map((x) => priceOf(x.replace(/포인트|[Pp]/g, ''))).filter((n): n is number => n !== null && n > 0))];
+      if (figs.length === 1) price = figs[0];
     }
     if (price !== undefined) {
       const first = sell.first ?? (typeof sell.price === 'number' && price !== null && price !== sell.price ? sell.price : undefined);

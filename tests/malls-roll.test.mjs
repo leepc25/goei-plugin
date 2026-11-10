@@ -117,3 +117,13 @@ test('포인트몰 진열 배정 (11-09 사용자 「1번은 해」): $bm_roll_*
   assert.ok(M.mallRoll({ $bm_roll_on: '0' }, 'cos').on, '우주몰은 그대로');
   assert.ok(M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'bm') && !M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'cos'));
 });
+
+test('팔기 (11-10 사용자): <deal/> 은 말로 판 표시, <offer> 를 빼먹으면 대사의 값 하나를 읽는다', () => {
+  assert.equal(M.parseTalk('<owner>거래 성립.</owner><offer>15000</offer><deal/>').deal, true);
+  assert.equal(M.parseTalk('<owner>15000원에 산다.</owner><offer>15000</offer>').deal, undefined);
+  const sell = { itemId: 'i1', name: '토끼 가면', desc: '', effect: '', use: false };
+  const st = { ...M.emptyShop({ raw: '', shop: '우주 쇼핑몰', owner: '운영자' }, 'k'), loaded: true, sell };
+  assert.equal(M.applyTalk(st, M.parseTalk('<owner>우리는 15,000원에 매입한다.</owner>'), false).sell.price, 15000, '대사의 값 하나');
+  assert.equal(M.applyTalk(st, M.parseTalk('<owner>3만원짜리를 15000원에 산다.</owner>'), false).sell.price, undefined, '값이 둘이면 읽지 않는다');
+  assert.equal(M.applyTalk({ ...st, sell: { ...sell, price: 9000 } }, M.parseTalk('<owner>20000원은 무리.</owner>'), false).sell.price, 9000, '이미 부른 값은 그대로');
+});
