@@ -1,4 +1,4 @@
-2
+0
 - 사용자 11-10 21:14 KST 「뽑아」 → 컷 F v10 참고O 1회 + 참고X 1회
 - 사용자 11-10 21:02 KST 「동시에 뽑아」 → 컷 F v9 무대 앞 끝 참고O 1회 + 참고X 1회
 - 사용자 11-10 20:54 KST 「뽑아」 → 컷 F v8 무대 뒤에서 방청석 참고O 1회 + 참고X 1회
@@ -402,3 +402,5 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v8_empty_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v9b_empty_noref_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v9_empty_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v10_empty_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v10b_empty_noref_req.json
