@@ -202,3 +202,18 @@ test('포인트 상점: currency points 면 정체에 표시, 「900p」 값도 
   const sys = talkPrompt({ st, refs: '', story: '', status: '', situation: '', identity: '', language: null }, shopSettings({}))[0].content;
   assert.ok(sys.includes("Baekilmong's point shop"), '포인트 상점 절');
 });
+
+test('인터넷 쇼핑몰에 판 것은 본편에 「이번 턴」 사건으로 넘어간다 (2026-11-10 사용자: 판 옷을 본편이 계속 입혔다)', async () => {
+  const { addItem, sellItem, itemsVars, lastBotKey, aliveAnchors } = await import('../dist-test/core.mjs');
+  const c = chat('본문');
+  const key = lastBotKey(c);
+  let it = addItem({ list: [], log: [] }, aliveAnchors(c), { name: '여분 정장 상의', desc: '', effect: '', use: false, equip: 'gear', from: 'story', anchor: 'c0' });
+  it = sellItem(it, it.list[0].id, key, '우주 쇼핑몰에 팖');
+  const on = inventoryText({ ...c, scriptstate: { ...itemsVars(it), $it_push: '1' } });
+  assert.match(on, /This turn: .*just sold 여분 정장 상의 to 우주 쇼핑몰.*no longer has, carries or wears it/);
+  const off = inventoryText({ ...c, scriptstate: { ...itemsVars(it), $it_push: '0', $sh_on: '0' } });
+  assert.match(off, /just sold 여분 정장 상의 to 우주 쇼핑몰/, '본편에 넘기기를 꺼도 판 일은 넘긴다');
+  // 다음 응답이 붙으면 더 넘기지 않는다
+  const next = { ...c, message: [...c.message, { role: 'user', data: '간다', chatId: 'u3' }, { role: 'char', data: '다음', chatId: 'c2' }], scriptstate: { ...itemsVars(it), $it_push: '1' } };
+  assert.doesNotMatch(inventoryText(next), /just sold/);
+});
