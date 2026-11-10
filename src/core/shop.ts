@@ -241,6 +241,8 @@ export interface ShopLine {
   note?: string;
   /** 이 대사와 함께 낸 맞춤 주문 견적 id */
   quote?: string;
+  /** 이 말을 한 때의 마지막 본편 응답 키 (쇼핑몰: 그 턴에 나눈 말만 본편에 넘긴다, core/malls.ts mallEvents) */
+  k?: string;
 }
 
 /** 맞춤 주문 견적 (우주몰 상담원, 11-09): 선납하면 core/orders.ts 의 주문이 된다. item 의 설명·효과·진실은 받을 때까지 숨긴다 */
@@ -368,7 +370,7 @@ export function readShop(vars: Vars): ShopState | null {
         const { use: _u, uses: _n, equip: _e, icon: _i, weight: _w, ...rest } = x;
         return { ...rest, ...traitsOf(x), desc: clean(x.desc, 120), effect: clean(x.effect, 60) };
       }).slice(0, 40),
-      talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').map((l) => ({ who: l.who, text: l.text, ...(typeof l.note === 'string' && l.note ? { note: l.note } : {}), ...(typeof l.quote === 'string' && l.quote ? { quote: l.quote } : {}) })).slice(-40),
+      talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').map((l) => ({ who: l.who, text: l.text, ...(typeof l.note === 'string' && l.note ? { note: l.note } : {}), ...(typeof l.quote === 'string' && l.quote ? { quote: l.quote } : {}), ...(typeof l.k === 'string' && l.k ? { k: l.k } : {}) })).slice(-40),
       closed: !!o.closed,
       prev: Array.isArray(o.prev) ? o.prev.filter((x): x is string => typeof x === 'string').slice(-40) : [],
       sell: readOffer(o.sell),
@@ -769,6 +771,12 @@ export function buyNote(st: ShopState, id: string, key = ''): ShopState | null {
 /** 팔기 시작: 소지품 한 줄을 들고 주인에게 보인다 (값은 아직 없음). 내 말은 부르는 쪽이 sayToOwner 로 적는다 */
 export function startSell(st: ShopState, it: Omit<ShopOffer, 'price' | 'first'>): ShopState {
   return { ...st, sell: { itemId: it.itemId, name: clean(it.name, 30), desc: clean(it.desc, 120), effect: clean(it.effect, 60), ...traitsOf(it), ...(it.truth ? { truth: clean(it.truth, 60) } : {}), ...(Number.isSafeInteger(it.paid) ? { paid: it.paid } : {}) } };
+}
+
+/** 마지막 말에 그때의 본편 응답 키를 적는다 */
+export function stampLastLine(st: ShopState, key: string): ShopState {
+  if (!key || !st.talk.length) return st;
+  return { ...st, talk: st.talk.map((l, i) => (i === st.talk.length - 1 ? { ...l, k: key } : l)) };
 }
 
 export const cancelSell = (st: ShopState): ShopState => ({ ...st, sell: null });

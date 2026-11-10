@@ -4,6 +4,10 @@
 import type { Chat } from './types';
 import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
 import type { GuideName } from './guides';
+import { lastBot } from './shop';
+import { liveOrders } from './orders';
+import { readDesk } from './bmdesk';
+import { aliveAnchors } from './wallet';
 
 export type MallSite = 'cos' | 'bm';
 export const MALL_SITES: MallSite[] = ['cos', 'bm'];
@@ -233,3 +237,20 @@ export const cosFixedVars = (list: CosFixed[]): Record<string, string> => ({ [CO
 export const newCosFixed = (): CosFixed => ({ id: `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, on: true, pct: 25, name: '', price: 999_999, desc: '', effect: '', truth: '' });
 /** 이번 새로고침에 끼울 것 (켜진 것만, 이름 있는 것만, 확률 굴림) */
 export const cosFixedRoll = (list: CosFixed[], rnd: () => number = Math.random): CosFixed[] => list.filter((x) => x.on && x.name.trim() && x.price > 0 && rnd() * 100 < x.pct);
+
+/** 다음 턴 본편에 넘길 쇼핑몰 일 (core/items.ts 의 This turn; 2026-11-10 사용자: 쇼핑몰에서 한 일이 본편에 하나도 안 넘어갔다 — 일반 상점 shopEvents 와 같게).
+ *  마지막 응답 뒤에 한 것만: 우주몰 운영자와 나눈 말, 맞춤 주문 선납, 포인트몰 1:1 상담. 산 것·판 것은 소지품 쪽(newlyBought·soldNow)이 넘긴다 */
+export function mallEvents(chat: Chat): string[] {
+  const key = lastBot(chat)?.key ?? '';
+  if (!key) return [];
+  const vars = chat.scriptstate;
+  const out: string[] = [];
+  const cos = readMall(vars, 'cos').talk.filter((l) => l.k === key);
+  if (cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${cos.map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
+  for (const o of liveOrders(vars, aliveAnchors(chat))) {
+    if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+  }
+  const desk = readDesk(vars);
+  if (desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== 'sys').map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);
+  return out;
+}

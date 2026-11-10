@@ -10,6 +10,7 @@ import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
 import type { ItemChange, ItemNow } from './people/updater';
 import { currentShop, shopEvents, shopOn, shopGuide } from './shop';
+import { mallEvents } from './malls';
 import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
@@ -645,7 +646,7 @@ export function inventoryText(chat: Chat): string {
     // 본편에 넘기기를 꺼도 상점은 켜져 있을 수 있다: 물건 목록 없이 상점 표식 지침과 이번 방문 사건만 [Shop] 글로 넘긴다
     // (지침이 [Inventory] 에만 실려 있어, 넘기기를 끄면 모델이 표식을 쓰지 않아 상점이 열리지 않던 것, 11-08 전수점검)
     const it = readItems(vars);
-    const soldOff = soldNow(it, lastBotKey(chat), currentShop(chat)?.shop);
+    const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
     if (!shopOn(vars)) return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
     const live = liveItems(it, aliveAnchors(chat));
     const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
@@ -673,7 +674,7 @@ export function inventoryText(chat: Chat): string {
     return n > 0 ? [{ name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
   });
   const resumed = invJustResumed(chat);
-  const soldOff = soldNow(it, lastBotKey(chat), currentShop(chat)?.shop);
+  const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),

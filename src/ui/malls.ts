@@ -14,7 +14,7 @@ import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, li
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
 import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, worldMinute, type CosOrder } from '../core/orders';
-import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
 import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
@@ -153,7 +153,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
       next = { ...applied, talk: st0.talk };
     } else {
       const { value } = await generate(talkPrompt(src, s, MALL_GUIDE[site]), s.model, parseTalk, opts);
-      next = applyTalk(st0, value, false);
+      next = stampLastLine(applyTalk(st0, value, false), lastBot(ctx.chat)?.key ?? '');
       // 말로 판 것: 운영자가 <deal/> 을 냈고 부른 값이 있으면 「판매」 단추와 같이 처리
       if (value.deal && next.sell && typeof next.sell.price === 'number') deal = next.sell.itemId;
     }
@@ -501,7 +501,7 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
       }
       if (site !== 'cos' || !said || v.loading || !st.loaded) return true;
       const chip = st.items.find((x) => x.id === v.chip && !x.sold);
-      const next = sayToOwner(st, `${chip ? `[${chip.name}] ` : ''}${said}`);
+      const next = stampLastLine(sayToOwner(st, `${chip ? `[${chip.name}] ` : ''}${said}`), lastBot(ctx.chat)?.key ?? '');
       v.input = '';
       v.chip = '';
       v.picking = false;
