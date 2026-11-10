@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 20:20 KST 「뽑아」 → 컷 F v5 빈 방청석(설명만, 3/4 각도) 1회
 - 사용자 11-10 20:09 KST 「뽑아봐」 → 컷 F v4 빈 방청석 1회
 - 사용자 11-10 18:37 KST 「뽑아」 → 컷 B 손 움직임 넣은 11개 + 입 크게 벌리기 다시 1개 = 12회
 - 사용자 11-10 15:24 KST 「이제 뽑아」 → 컷 B 동작 19개를 새 기본(얼굴 정면·흰자 지움 nowhite3)으로 다시 19회
@@ -387,3 +388,4 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_laugh_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB3_flip_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v4_empty_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v5_empty_req.json
