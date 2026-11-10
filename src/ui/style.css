@@ -4682,10 +4682,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs .gn-post { display: block; }
 /* 연어 마켓 글 보기는 그림|글 두 칸 격자. 위 줄이 덮어 그림이 창 폭만큼 커졌다 (11-09 사용자) */
 .bs-sm .detail.gn-post { display: grid; }
-.bs-sm .detail { grid-template-columns: 340px minmax(0, 1fr); gap: 28px; align-items: start; }
-.gx-body.gn.bs.bs-sm > .detail { max-width: 860px; margin-left: auto; margin-right: auto; }
+.bs-sm .detail { grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start; }
+.gx-body.gn.bs.bs-sm > .detail { max-width: 720px; margin-left: auto; margin-right: auto; }
 .gx-body.gn.bs.bs-sm.bs-m > .detail { max-width: none; }
-.bs-sm .detail .ph img { width: 280px; height: 280px; }
+.bs-sm .detail .ph img { width: 212px; height: 212px; }
 .bs-sm .detail > .info { min-width: 0; }
 .bs-sm .detail > .qna { grid-column: 1 / -1; min-width: 0; }
 .bs-sm.bs-m .detail { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 12px; }
@@ -4812,3 +4812,6 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-sm .hd .sr + .wr, .bs-sm .hd .wr + .ch { margin-left: -14px; }
 .bs-sm .hd .wr, .bs-sm .hd .ch { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; white-space: nowrap; box-sizing: border-box; }
 .bs-sm.bs-m .hd .sr + .wr { margin-left: 0; }
+/* 연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
+.bs-sm .detail > .info .body { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }

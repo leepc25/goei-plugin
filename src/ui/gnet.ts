@@ -909,7 +909,7 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
     }
     case 'sm': {
       const price = priceOf(p);
-      // 위는 사진 | 매물 정보 두 칸, 문의는 그 아래 한 칸 — 전체를 가운데 좁게 (2026-11-10 사용자: 사진 아래가 텅 비고, 문의를 넓게 펴면 휑하다).
+      // 위는 사진 | 내용(판매자·제목·값·본문)만 두 칸, 단추 줄과 문의는 그 아래 한 칸 — 전체를 가운데 좁게(720px) (2026-11-10 사용자: 사진 아래가 텅 비고, 문의를 넓게 펴면 휑하다).
       // 삽니다 글은 물건 그림 없이 빈 사진 칸만 (사용자: 포맷상 칸은 있어야 한다)
       const want = p.tag === '삽니다';
       const u = want ? null : smPicUrl(p);
@@ -917,9 +917,10 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
       return `<article class="detail gn-post">${pic}<div class="info">
         <div class="seller"><i></i><div>${who}</div></div>
         <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(p.date)} · ${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
-        <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</div>
-        <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div></div>
-        <div class="qna">${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
+        <div class="body gn-post-body">${body(p.body)}</div></div>
+        <div class="qna"><div class="stat">관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</div>
+        <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
+        ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
     }
     default:
       return `<article class="gmain gpost gn-post"><div class="ph1">${p.tag ? `<span class="c">${esc(p.tag)}</span>` : ''}<h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt">${who} · ${esc(p.date.slice(5))} · 조회 ${p.views.toLocaleString()} · 추천 ${p.votes}</div></div>
