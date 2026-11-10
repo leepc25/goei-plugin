@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 13:02 KST 「뽑아」 → 컷 B 진행자 동작 19개(보통 10 + 기괴 9) 19회
 - 사용자 11-10 12:54 KST 「뽑아」 → 컷 B 진행자 기본 상태 v9(몸·머리 3/4) 1회
 - 사용자 11-10 12:50 KST 「뽑아」 → 컷 B 진행자 기본 상태 v8(v6 참고, 3/4 돌림) 1회
 - 사용자 11-10 12:34 KST 「다시 뽑아」 → 컷 B 진행자 기본 상태 v7(어깨 칸 안) 1회
@@ -323,3 +324,22 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v7_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v8_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v9_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_gape_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_count_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_amazed_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_blacktears_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_idle_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_angry_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_stare_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_flip_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_cold_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_silentlaugh_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_excited_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_grin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_whisper_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_talk_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_twitch_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_tilt_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_urgent_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_spin_req.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_laugh_req.json
