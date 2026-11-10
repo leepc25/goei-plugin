@@ -4757,7 +4757,10 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 
 /* ── 괴담갤 오른쪽 힛갤 칸 (11-09): 본문(.body)과 별개로 고정 ── */
 .bs-gal .gal-cols { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
-.bs-gal .gal-cols > .body, .bs-gal .gal-cols > .bs-plain, .bs-gal .gal-cols > .bs-plain .body { width: auto; max-width: 1000px; margin: 0; min-width: 0; }
+.bs-gal .gal-cols.solo { grid-template-columns: minmax(0, 1fr); }
+.bs-gal .gal-main { min-width: 0; }
+.bs-gal .gal-main > .body, .bs-gal .gal-main > .bs-plain, .bs-gal .gal-main > .bs-plain .body { width: auto; max-width: 1000px; margin: 0; min-width: 0; }
+.bs-gal .gal-main > .bs-x { padding: 10px 0 0; }
 .bs-gal .gal-side { position: sticky; top: 10px; margin-top: 10px; }
 .bs-gal .gal-side .hit { border: 1px solid #d6d8e2; background: #fff; }
 .bs-gal .gal-side h4 { margin: 0; padding: 7px 10px; font-size: 13px; color: #fff; background: #3b4890; }

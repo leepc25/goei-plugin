@@ -751,7 +751,7 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
   const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
   switch (site) {
     case 'gal': {
-      const tabs = `<div class="lt">${catBtn('', '전체글', '', '')}<button class="${gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">개념글</button>${catBtn('공지', '공지')}${dmBtn(st, unreadDm)}${writeBtn('wr')}</div>`;
+      const tabs = `<div class="lt">${catBtn('', '전체글', '', '')}<button class="${gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">개념글</button>${catBtn('공지', '공지')}${dmBtn(st, unreadDm)}${empty ? '' : writeBtn('wr')}</div>`;
       const heads = `<div class="hds">${catBtn('', '전체')}${tagsOf(st).filter((t) => t !== '공지').map((t) => catBtn(t, t)).join('')}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
       const ic = (p: GPost) => `<span class="ii ${boardThumb(p.body) ? 'im' : 'tx'}"></span>`;
       const ntc = (p: GPost) => p.tag === '공지';
@@ -761,7 +761,9 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
       const table = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
         <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>${rows}</table>`;
       const mlist = `<div class="mlist">${list.map((p) => `<div class="it${ntc(p) ? ' ntc' : ''}">${openBtn(p, `<div class="t">${ntc(p) ? '' : `[${esc(p.tag ?? '일반')}] `}${esc(p.title)}${ntc(p) ? '' : `<em>[${p.comments.length}]</em>`}${dot(p)}</div><div class="m">${ntc(p) ? `${esc(p.nick)} · ${esc(when(p, now))}` : `${esc(p.nick)}${p.nick === 'ㅇㅇ' ? `(${ipOf(p.id)})` : ''} · ${esc(when(p, now))} · 조회 ${p.views} · 추천 ${p.votes}`}</div>`)}</div>`).join('')}</div>`;
-      return `<div class="body">${tabs}${heads}${empty || `${table}${mlist}${none(list)}`}
+      // 글이 하나도 없으면 탭 줄과 안내(새로고침·글쓰기)만 (2026-11-10 사용자: 빈 게시판에 글쓰기 단추 셋·분류·찾기칸이 다 떠 지저분했다)
+      if (empty) return `<div class="body">${tabs}${empty}</div>`;
+      return `<div class="body">${tabs}${heads}${table}${mlist}${none(list)}
         <div class="bt2">${catBtn('', '전체글')}${writeBtn('wr')}</div>${pager(all.length, 'pager', '', '다음')}
         <label class="bsch"><span>제목+내용</span>${searchInput('검색어')}<button class="go" data-action="gn-search-go">검색</button></label></div>`;
     }
@@ -920,7 +922,9 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   const box = (inner: string) => (plain ? `<div class="bs-plain">${extras}${inner}</div>` : `${extras ? `<div class="bs-x">${extras}</div>` : ''}${inner}`);
   let inner: string;
   if (site === 'gn') inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain ? `<div class="gmain">${extras}${main}</div>` : `${extras}${main}`}</div></div>`;
-  else if (site === 'gal' && !mobile) inner = `<div class="gal-cols">${box(main)}<aside class="gal-side">${galSide(st)}</aside></div>`;
+  // 본문 쪽은 늘 한 칸으로 싼다: 「불러오는 중」 줄(extras)이 따로 칸을 차지하면 두 칸 격자가 밀려 본문이 오른쪽 좁은 칸으로 갔다 (2026-11-10 사용자)
+  // 글이 하나도 없으면 힛갤 칸도 두지 않는다
+  else if (site === 'gal' && !mobile) inner = `<div class="gal-cols${st.posts.length ? '' : ' solo'}"><div class="gal-main">${box(main)}</div>${st.posts.length ? `<aside class="gal-side">${galSide(st)}</aside>` : ''}</div>`;
   else if (site === 'wpf') {
     // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다)
     const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
