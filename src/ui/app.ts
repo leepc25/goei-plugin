@@ -49,7 +49,7 @@ import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { GN_NICK } from '../core/gnet';
-import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
+import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabCan, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -304,13 +304,18 @@ function ensureRoot(): HTMLElement {
   // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 거꾸로(↑←) 닫은 탭 복구 (인터넷)
   bindMouseGesture(root, {
     label: (g: Gesture) => {
-      if (g === 'L') return navStep(-1) ? '뒤로' : '';
-      if (g === 'R') return navStep(1) ? '앞으로' : '';
-      if (view.kind !== 'started' || !inBrowser()) return '';
+      // 인터넷 창에서는 실제 브라우저처럼 지금 탭의 기록만 (2026-11-10 사용자: 탭별로 움직여야 한다) — 주소줄 ‹ › 단추와 같은 br-back·br-fwd
+      const web = view.kind === 'started' && inBrowser();
+      if (g === 'L') return (web ? tabCan(-1) : navStep(-1)) ? '뒤로' : '';
+      if (g === 'R') return (web ? tabCan(1) : navStep(1)) ? '앞으로' : '';
+      if (!web) return '';
       return g === 'DR' ? '탭 닫기' : br.closed.length ? '닫은 탭 다시 열기' : '';
     },
     run: (g: Gesture) => {
-      if (g === 'L' || g === 'R') return void navStep(g === 'L' ? -1 : 1)?.();
+      if (g === 'L' || g === 'R') {
+        if (view.kind === 'started' && inBrowser()) return void run(g === 'L' ? 'br-back' : 'br-fwd');
+        return void navStep(g === 'L' ? -1 : 1)?.();
+      }
       void run(g === 'DR' ? 'br-close' : 'br-reopen', String(br.cur));
     },
   });
