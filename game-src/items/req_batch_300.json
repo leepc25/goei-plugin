@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "혈관 돋은 휴대폰",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a veined phone, front view, black smartphone with bulging red-purple veins growing over its back. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "살점 붙은 전화기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a flesh-grown telephone, three-quarter view, old desk phone half covered in pink raw flesh. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "심장 뛰는 상자",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a box with a beating heart, three-quarter view, small wooden box with the lid open showing a red heart inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "숨 쉬는 가방",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a breathing bag, three-quarter view, brown leather bag bulging like lungs with a small nostril-like slit. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "털 난 비누",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hairy soap, three-quarter view, white soap bar sprouting patches of dark hair. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "이빨 난 사과",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an apple with teeth, front view, red apple with a horizontal mouth full of human teeth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "눈알 젤리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. eyeball jelly, three-quarter view, clear wobbly jelly dome with an eyeball inside on a small plate. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "손가락 소시지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. finger sausages, three-quarter view, three sausages shaped like human fingers with nails on a plate. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "귀 달린 벽 조각",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wall piece with an ear, front view, broken chunk of grey plaster wall with a human ear growing out. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "혀 달린 구두",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shoe with a tongue, side view, black leather dress shoe with a long pink wet tongue hanging out of the opening. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "핏줄 선 돌",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a veined stone, three-quarter view, round grey stone covered with raised red blood vessels. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "사람 얼굴 호박",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pumpkin with a human face, front view, orange pumpkin with a realistic sleeping human face grown in the rind. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "얼굴 돋은 나무껍질",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. bark with a face, front view, slab of brown tree bark with a screaming face formed in the wood. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "우는 인형 머리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a crying doll head, front view, porcelain doll head with black tears running from glass eyes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "태엽 심장",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a clockwork heart, front view, brass mechanical heart with gears and a wind-up key. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "촉수 화분",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tentacle plant pot, front view, clay pot with several dark purple suckered tentacles growing up from the soil. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. women's briefs, front view, plain white cotton bikini-cut panties with a tiny bow, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. lace panties, front view, black sheer lace panties with scalloped edges, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. cotton panties, front view, pale pink plain cotton panties with thin elastic trim, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. high-waist panties, front view, beige high-cut briefs reaching the navel line, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. boyshort panties, front view, grey short-leg square-cut women's panties, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. seamless panties, front view, smooth nude-colored panties with raw flat edges, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. period panties, front view, black full briefs with a thicker padded center panel, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. maternity panties, front view, pale blue briefs with a very tall stretchy belly panel, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a sports bra, front view, grey racerback crop bra with a wide elastic band, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an underwire bra, front view, white molded-cup bra with curved wires and adjustable straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wireless bra, front view, soft beige cotton bra with wide straps and no seams, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bralette, front view, thin triangle lace bra in dusty rose with slim straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a strapless bra, front view, black bandeau bra with molded cups and no straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a nursing bra, front view, soft white bra with a clip at the top of each cup, one cup flap folded down, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a push-up bra, front view, red satin bra with thick padded cups set close together, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bra and panty set, front view, matching navy lace bra above matching panties, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "여성 삼각팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. women's briefs, front view, plain white cotton bikini-cut panties with a tiny bow, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "레이스 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. lace panties, front view, black sheer lace panties with scalloped edges, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "면 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. cotton panties, front view, pale pink plain cotton panties with thin elastic trim, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "하이웨이스트 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. high-waist panties, front view, beige high-cut briefs reaching the navel line, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "보이쇼츠",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. boyshort panties, front view, grey short-leg square-cut women's panties, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "심리스 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. seamless panties, front view, smooth nude-colored panties with raw flat edges, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "생리 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. period panties, front view, black full briefs with a thicker padded center panel, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "임부 팬티",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. maternity panties, front view, pale blue briefs with a very tall stretchy belly panel, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스포츠 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a sports bra, front view, grey racerback crop bra with a wide elastic band, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "와이어 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an underwire bra, front view, white molded-cup bra with curved wires and adjustable straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "노와이어 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wireless bra, front view, soft beige cotton bra with wide straps and no seams, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "브라렛",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bralette, front view, thin triangle lace bra in dusty rose with slim straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스트랩리스 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a strapless bra, front view, black bandeau bra with molded cups and no straps, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "수유 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a nursing bra, front view, soft white bra with a clip at the top of each cup, one cup flap folded down, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "푸시업 브라",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a push-up bra, front view, red satin bra with thick padded cups set close together, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "브라 팬티 세트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bra and panty set, front view, matching navy lace bra above matching panties, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

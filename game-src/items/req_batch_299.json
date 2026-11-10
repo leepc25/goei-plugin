@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "뱀 허물",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shed snake skin, three-quarter view, long translucent pale papery skin with scale pattern, loosely coiled. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "매미 허물",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cicada shell, side view, empty amber-brown hollow insect husk with a split back, clinging to a twig. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "거미 알집",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a spider egg sac, close view, round white silk ball hanging in threads with tiny dark dots showing through. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "구더기 낀 고기",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. maggot-infested meat, three-quarter view, grey-red chunk of meat crawling with small pale maggots. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "썩은 고기 덩어리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rotten meat lump, three-quarter view, greenish-brown slimy meat chunk with dark patches. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "종양 덩어리",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tumor mass, three-quarter view, lumpy pink-grey fleshy growth with dark veins in a steel tray. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "고름 주머니",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pus sac, three-quarter view, swollen yellowish-white bulging membrane pouch with red veins. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "피고름 붕대",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pus-stained bandage, three-quarter view, crumpled gauze roll soaked with yellow and dark red stains. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "피딱지",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a blood scab, close view, small dark red-brown crusty flake. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "담석",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. gallstones, three-quarter view, a few small yellow-green faceted pebbles in a glass dish. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "핏덩이",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a blood clot, three-quarter view, dark red glossy jelly-like lump. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "피 담긴 유리잔",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a glass of blood, front view, wine glass filled with thick dark red liquid, a drip running down the side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "검은 피 병",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottle of black blood, front view, small glass bottle of thick black-red liquid with a cork. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "이빨 달린 책",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a book with teeth, three-quarter view, old leather book whose page edge is a mouth lined with sharp teeth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "입 달린 거울",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a mirror with a mouth, front view, oval framed wall mirror with human lips and teeth in the middle of the glass. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "눈 달린 시계",
+   "kind": "anomaly",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a clock with an eye, front view, round wall clock whose face is one large staring eyeball, clock hands over it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

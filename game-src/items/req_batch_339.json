@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "계급장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. rank insignia, front view, small dark cloth patch with three gold chevrons. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "부대 패치",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a unit patch, front view, round embroidered patch with a black eagle shape on olive. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "헌병 완장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a military police armband, front view, black armband with two white block shapes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "군 정복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a military dress uniform, front view, dark green formal jacket with gold buttons, ribbons and trousers, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "세일러복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a navy sailor uniform, front view, white pullover with a wide navy flap collar and black neckerchief, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "비행복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a flight suit, front view, olive one-piece coverall with many zip pockets and patches, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "내G복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an anti-G suit, front view, olive chaps-like pants with air bladders, laces and a hose, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "조종사 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pilot helmet, three-quarter view, white flight helmet with a dark visor and an oxygen mask hose. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "전차병 헬멧",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tank crew helmet, three-quarter view, black padded ribbed soft helmet with ear cups and a mic. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "드라이슈트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dry suit, front view, black and orange baggy diving suit with rubber neck and wrist seals, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "리브리더",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rebreather, front view, black backpack unit with two looping breathing hoses and a mouthpiece. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "잠수 마스크",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dive mask, front view, black silicone mask with a single glass lens and a strap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "잠수 납 벨트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dive weight belt, three-quarter view, nylon belt threaded with grey lead blocks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "방사선 납 앞치마",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a lead apron, front view, heavy blue X-ray protection apron with shoulder flaps. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "방사선 방호복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a radiation suit, front view, yellow full-body suit with a hood, clear visor and black gloves, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "은박 방열복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an aluminized heat suit, front view, shiny silver full suit with a hood and a gold visor. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

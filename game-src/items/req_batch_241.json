@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "도킹스테이션",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a laptop docking station, three-quarter view, slim grey aluminum bar with many ports on the side and a cable. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "CPU",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a computer CPU chip, top view, square metal heat spreader on a green board with gold contact pins at the edges. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "램",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a RAM memory stick, three-quarter view, long thin green board with black memory chips and gold contacts along the bottom edge. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "파워서플라이",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a computer power supply unit, three-quarter view, black metal box with a round fan grille and bundled cables. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "CPU쿨러",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a CPU tower air cooler, three-quarter view, tall stack of thin metal fins with copper heat pipes and a black fan on the side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "모니터받침대",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a monitor stand riser, three-quarter view, low wooden shelf with metal legs. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "노트북거치대",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a laptop stand, side view, angled foldable aluminum stand. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "키캡",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a few keyboard keycaps, three-quarter view, loose square keycaps in mixed colors scattered together. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "펜타블렛",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pen tablet, three-quarter view, flat black rectangular drawing pad with a slim stylus pen lying on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "액정타블렛",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pen display tablet, three-quarter view, black screen tablet on a small stand showing a bright blank canvas, a stylus beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스타일러스펜",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stylus pen, side view, slim white pen with a fine rubber tip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "NAS",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a NAS storage box, three-quarter view, small black cube with two drive bays and tiny blue lights on the front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "랜선",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a coiled network LAN cable, front view, blue cable bundle with clear plastic connector plugs at both ends. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "모뎀",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an internet modem, three-quarter view, small white box with a row of tiny green lights and a short antenna. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "외장ODD",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an external DVD drive, three-quarter view, slim black flat box with a disc tray slightly open. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "UMPC",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a handheld gaming PC, front view, wide black device with a screen in the middle and joysticks and buttons on both sides. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

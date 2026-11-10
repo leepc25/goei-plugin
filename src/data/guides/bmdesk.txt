@@ -15,7 +15,7 @@ Output exactly these blocks and nothing else:
 소개: (one line)
 말투: (one line)
 </card>
-<say>(the first chat message)</say>
+<say>(the first chat message: a greeting of one or two short sentences, plain text)</say>
 @@END
 
 @@SECTION MANUAL
@@ -31,7 +31,7 @@ Stay the counselor on [상담사 카드] and reply to the customer's last messag
 
 @@SECTION TALK_OUTPUT
 Output exactly one block and nothing else:
-<say>(the reply; separate chat bubbles with a blank line, at most 3)</say>
+<say>(the reply, typed like a real support chat: normally ONE bubble of one or two short sentences that answers what was just asked; a second bubble, separated by a blank line, only when there is a separate thing to say. Plain text, no markdown.)</say>
 @@END
 
 @@SECTION THOUGHTS_MAKE

@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a vomit puddle, top view, lumpy yellow-orange splat with small chunks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a sickness bag, front view, white paper bag with a folded top and a wire clip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a booger, close view, small yellow-green sticky lump on a fingertip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. earwax, close view, yellow-brown waxy flakes on the tip of a wooden ear pick. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a spit glob, top view, thick yellowish-green slimy blob. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottled fart, front view, corked glass jar filled with faint yellow-green gas cloud. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. dandruff, close view, black comb covered with white flakes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. belly button lint, close view, small grey-blue fuzzy lint ball. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stinky sock, side view, dirty grey sock with a hole at the toe and green wavy stink shapes attached. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rotten fish, side view, grey-green decayed whole fish with a clouded eye and exposed bones. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. moldy bread, three-quarter view, slice of white bread covered with blue-green fuzzy mold spots. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rotten apple, front view, brown shriveled apple with a soft dark hole. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a food waste bag, front view, yellow tied plastic bag bulging with wet scraps. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead rat, side view, grey rat lying on its back with stiff legs and a long tail. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead bird, side view, small brown sparrow lying on its side with closed eye and curled feet. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead cockroach, top view, brown cockroach on its back with legs curled up. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "토사물",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a vomit puddle, top view, lumpy yellow-orange splat with small chunks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "구토봉투",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a sickness bag, front view, white paper bag with a folded top and a wire clip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "코딱지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a booger, close view, small yellow-green sticky lump on a fingertip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "귀지",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. earwax, close view, yellow-brown waxy flakes on the tip of a wooden ear pick. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "가래침",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a spit glob, top view, thick yellowish-green slimy blob. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "방귀병",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottled fart, front view, corked glass jar filled with faint yellow-green gas cloud. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "비듬",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. dandruff, close view, black comb covered with white flakes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "배꼽때",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. belly button lint, close view, small grey-blue fuzzy lint ball. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "발냄새양말",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stinky sock, side view, dirty grey sock with a hole at the toe and green wavy stink shapes attached. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "썩은생선",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rotten fish, side view, grey-green decayed whole fish with a clouded eye and exposed bones. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "곰팡이핀빵",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. moldy bread, three-quarter view, slice of white bread covered with blue-green fuzzy mold spots. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "썩은사과",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a rotten apple, front view, brown shriveled apple with a soft dark hole. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "음식물쓰레기",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a food waste bag, front view, yellow tied plastic bag bulging with wet scraps. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "죽은쥐",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead rat, side view, grey rat lying on its back with stiff legs and a long tail. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "죽은새",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead bird, side view, small brown sparrow lying on its side with closed eye and curled feet. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "죽은바퀴벌레",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a dead cockroach, top view, brown cockroach on its back with legs curled up. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

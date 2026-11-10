@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a python, three-quarter view, thick heavy snake with brown net pattern coiled in a pile. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an anaconda, three-quarter view, enormous dark olive snake with black oval spots in heavy coils. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Korean rat snake, three-quarter view, long yellowish-brown snake with faint dark bands. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a horned viper, three-quarter view, sandy snake with a small horn above each eye. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a taipan, three-quarter view, sleek light brown snake with a pale narrow head, raised in an S. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Nomura's jellyfish, side view, huge brownish dome jellyfish with a thick tangled mass of reddish tentacles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a box jellyfish, side view, pale blue transparent cube-shaped bell with long thin tentacles from four corners. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Portuguese man o' war, side view, blue-purple gas float with a pink crest and long dark blue tentacles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a moon jellyfish, top-down view, translucent white disc with four pink horseshoe rings in the center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a blue-ringed octopus, three-quarter view, small yellow octopus covered in glowing blue rings. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cone snail, side view, cone-shaped shell with brown net pattern and a thin proboscis sticking out. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a lionfish, side view, red and white striped fish with long fan-like venomous spines. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stonefish, side view, lumpy grey-brown fish that looks like a rock with an upturned mouth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a porcupinefish, side view, round inflated pale fish covered in long spines. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stingray, top-down view, flat yellowish-brown diamond ray with a barbed whip tail. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric eel, side view, long dark grey eel with an orange throat and small sparks along its body. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "비단뱀",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a python, three-quarter view, thick heavy snake with brown net pattern coiled in a pile. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "아나콘다",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an anaconda, three-quarter view, enormous dark olive snake with black oval spots in heavy coils. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "구렁이",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Korean rat snake, three-quarter view, long yellowish-brown snake with faint dark bands. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "뿔살모사",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a horned viper, three-quarter view, sandy snake with a small horn above each eye. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "타이판",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a taipan, three-quarter view, sleek light brown snake with a pale narrow head, raised in an S. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "노무라입깃해파리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Nomura's jellyfish, side view, huge brownish dome jellyfish with a thick tangled mass of reddish tentacles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "상자해파리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a box jellyfish, side view, pale blue transparent cube-shaped bell with long thin tentacles from four corners. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "작은부레관해파리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a Portuguese man o' war, side view, blue-purple gas float with a pink crest and long dark blue tentacles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "보름달물해파리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a moon jellyfish, top-down view, translucent white disc with four pink horseshoe rings in the center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "파란고리문어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a blue-ringed octopus, three-quarter view, small yellow octopus covered in glowing blue rings. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "청자고둥",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cone snail, side view, cone-shaped shell with brown net pattern and a thin proboscis sticking out. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "쏠배감펭",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a lionfish, side view, red and white striped fish with long fan-like venomous spines. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스톤피시",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stonefish, side view, lumpy grey-brown fish that looks like a rock with an upturned mouth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "가시복",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a porcupinefish, side view, round inflated pale fish covered in long spines. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "노랑가오리",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stingray, top-down view, flat yellowish-brown diamond ray with a barbed whip tail. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "전기뱀장어",
+   "kind": "misc",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric eel, side view, long dark grey eel with an orange throat and small sparks along its body. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

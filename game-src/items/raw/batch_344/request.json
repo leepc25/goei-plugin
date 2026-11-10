@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a gambeson, front view, cream quilted padded long jacket with laces, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an assassin's hood, front view, white pointed hood with a short shoulder cape and a red sash. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hunter's coat, front view, long dark leather coat with a short shoulder cape and buckles, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a plague doctor coat, front view, long black waxed coat with a wide collar and gloves, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an exorcist's coat, front view, long black coat with silver cross buttons and paper talismans tucked in the belt, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a monk's habit, front view, brown hooded wool robe with a rope belt. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wizard robe, front view, deep blue long robe with wide sleeves and gold star trim. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a witch hat, front view, tall crooked black pointed hat with a wide brim and a buckle band. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pirate hat, front view, black tricorn hat with gold trim and a white skull shape. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pirate coat, front view, long red frock coat with gold buttons and wide cuffs, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a clown costume, front view, baggy polka-dot jumpsuit with a ruffled collar and pompoms. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a grim reaper's robe (Korean), front view, long black dopo robe with wide sleeves and a black cord. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shrine maiden outfit, front view, white kimono top with wide red pleated trousers, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a priest's chasuble, front view, white and gold ornate outer vestment with a cross. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an undertaker's suit, front view, old-fashioned black tailcoat suit with a tall hat, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a coroner's gown, front view, pale green surgical gown with a rubber apron over it and stains, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "누비 갑옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a gambeson, front view, cream quilted padded long jacket with laces, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "암살자 후드",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an assassin's hood, front view, white pointed hood with a short shoulder cape and a red sash. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "사냥꾼 코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hunter's coat, front view, long dark leather coat with a short shoulder cape and buckles, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "역병 의사 코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a plague doctor coat, front view, long black waxed coat with a wide collar and gloves, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "퇴마사 코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an exorcist's coat, front view, long black coat with silver cross buttons and paper talismans tucked in the belt, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "수도복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a monk's habit, front view, brown hooded wool robe with a rope belt. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "마법사 로브",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wizard robe, front view, deep blue long robe with wide sleeves and gold star trim. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "마녀 모자",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a witch hat, front view, tall crooked black pointed hat with a wide brim and a buckle band. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "해적 모자",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pirate hat, front view, black tricorn hat with gold trim and a white skull shape. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "해적 코트",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pirate coat, front view, long red frock coat with gold buttons and wide cuffs, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "광대 옷",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a clown costume, front view, baggy polka-dot jumpsuit with a ruffled collar and pompoms. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "저승사자 도포",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a grim reaper's robe (Korean), front view, long black dopo robe with wide sleeves and a black cord. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "무녀복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shrine maiden outfit, front view, white kimono top with wide red pleated trousers, laid flat. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "신부 예복",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a priest's chasuble, front view, white and gold ornate outer vestment with a cross. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "장의사 정장",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an undertaker's suit, front view, old-fashioned black tailcoat suit with a tall hat, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "검시관 가운",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a coroner's gown, front view, pale green surgical gown with a rubber apron over it and stains, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

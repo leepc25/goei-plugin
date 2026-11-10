@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "누텔라",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a jar of chocolate hazelnut spread, front view, round glass jar of dark brown spread with a white lid. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "머스타드",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a mustard squeeze bottle, front view, bright yellow bottle with a pointed cap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "와사비",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wasabi tube, front view, small green squeeze tube with a dab of green paste. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "마가린",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tub of margarine, three-quarter view, yellow round plastic tub with the lid open showing pale yellow spread. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "생크림",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a carton of whipping cream, front view, small white carton with a blue stripe and a swirl of whipped cream beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "오트밀크",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an oat milk carton, front view, tall beige carton with a small oat ear drawing. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "아이스티",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a glass of iced tea, front view, tall glass of amber tea with ice cubes and a lemon slice. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "매실청",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a jar of green plum syrup, front view, large glass jar with green plums in golden syrup. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "꿀차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a jar of honey tea, front view, glass jar of thick golden honey with ginger slices. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "대추차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cup of jujube tea, three-quarter view, ceramic cup of dark red tea with jujube slices and pine nuts floating. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "옥수수수염차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottle of corn silk tea, front view, clear plastic bottle of light yellow tea with a yellow cap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "결명자차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cup of cassia seed tea, three-quarter view, glass cup of reddish brown tea with a small pile of dark seeds beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "둥굴레차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cup of solomon's seal tea, three-quarter view, ceramic cup of golden brown tea with dried root slices beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "보이차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a pu-erh tea cake, three-quarter view, round flat pressed dark tea disc partly wrapped in paper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "허브차",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cup of herbal tea, three-quarter view, clear glass cup with pale green tea and a mint sprig. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "드립백",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a drip coffee bag, three-quarter view, a paper filter bag hooked over a mug with coffee grounds inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

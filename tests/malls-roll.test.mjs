@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, parseTalk, applyTalk, buyNote, SHOP_LINE, SECRET_LINE, lineOf, TRUTH_RULE } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
+const out = await build({ stdin: { contents: `export * from './src/core/malls'; export { appendItems, dropItemsNamed, emptyShop, parseShelf, parseTalk, applyTalk, buyNote, SHOP_LINE, SECRET_LINE, lineOf, TRUTH_RULE, sayToOwner, stampLastLine } from './src/core/shop'; export { inventoryText } from './src/core/items';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 
 /** 정해진 수열을 내는 난수 (시험용) */
@@ -116,4 +116,32 @@ test('포인트몰 진열 배정 (11-09 사용자 「1번은 해」): $bm_roll_*
   assert.equal(M.cosAssignment(3, false, M.mallRoll({ $bm_roll_on: '0' }, 'bm'), Math.random, 'bm'), '', '포인트몰만 끔');
   assert.ok(M.mallRoll({ $bm_roll_on: '0' }, 'cos').on, '우주몰은 그대로');
   assert.ok(M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'bm') && !M.rollChanged({ $bm_roll_tiers: 'a|b|1|2' }, 'cos'));
+});
+
+test('팔기 (11-10 사용자): <deal/> 은 말로 판 표시, <offer> 를 빼먹으면 대사의 값 하나를 읽는다', () => {
+  assert.equal(M.parseTalk('<owner>거래 성립.</owner><offer>15000</offer><deal/>').deal, true);
+  assert.equal(M.parseTalk('<owner>15000원에 산다.</owner><offer>15000</offer>').deal, undefined);
+  const sell = { itemId: 'i1', name: '토끼 가면', desc: '', effect: '', use: false };
+  const st = { ...M.emptyShop({ raw: '', shop: '우주 쇼핑몰', owner: '운영자' }, 'k'), loaded: true, sell };
+  assert.equal(M.applyTalk(st, M.parseTalk('<owner>우리는 15,000원에 매입한다.</owner>'), false).sell.price, 15000, '대사의 값 하나');
+  assert.equal(M.applyTalk(st, M.parseTalk('<owner>3만원짜리를 15000원에 산다.</owner>'), false).sell.price, undefined, '값이 둘이면 읽지 않는다');
+  assert.equal(M.applyTalk({ ...st, sell: { ...sell, price: 9000 } }, M.parseTalk('<owner>20000원은 무리.</owner>'), false).sell.price, 9000, '이미 부른 값은 그대로');
+});
+
+test('쇼핑몰에서 한 일(운영자와 나눈 말·맞춤 주문·1:1 상담)은 그 턴에만 본편에 넘어간다 (2026-11-10 사용자)', () => {
+  const { mallEvents, mallVarsOf, emptyShop, stampLastLine: stamp, sayToOwner, inventoryText } = M;
+  const c = { message: [{ role: 'user', data: 'a', chatId: 'u1' }, { role: 'char', data: '옛', chatId: 'c0' }, { role: 'user', data: 'b', chatId: 'u2' }, { role: 'char', data: '본문', chatId: 'c1' }], scriptstate: {} };
+  let st = { ...emptyShop({ raw: '', shop: '우주 쇼핑몰', owner: '운영자' }, 'c1'), loaded: true, talk: [{ who: 'me', text: '옛말', k: 'c0' }] };
+  st = stamp(sayToOwner(st, '맞춤 제작 되나요'), 'c1');
+  st = stamp({ ...st, talk: [...st.talk, { who: 'owner', text: '가능하다, 선불.' }] }, 'c1');
+  const order = { id: 'o1', anchor: 'c1', price: 1140000, hours: 6, orderedAt: null, orderedKey: 'c1', item: { name: '가림 내의', desc: '', effect: '', use: false } };
+  const vars = { ...mallVarsOf('cos', st), $cos_orders: JSON.stringify([order]), $bm_desk: JSON.stringify({ agent: { name: '김' }, talk: [{ who: 'sys', text: '연결' }, { who: 'me', text: '가불 되나요' }, { who: 'op', text: '불가합니다.' }], anchor: 'c1', past: [] }) };
+  const ev = mallEvents({ ...c, scriptstate: vars });
+  assert.equal(ev.length, 3, ev.join('\n'));
+  assert.ok(ev[0].includes('맞춤 제작 되나요') && ev[0].includes('가능하다, 선불.') && !ev[0].includes('옛말'), ev[0]);
+  assert.ok(ev[1].includes('가림 내의') && ev[1].includes('1,140,000'), ev[1]);
+  assert.ok(ev[2].includes('가불 되나요') && !ev[2].includes('연결'), ev[2]);
+  assert.match(inventoryText({ ...c, scriptstate: { ...vars, $it_push: '1' } }), /This turn: .*operator on the 우주 쇼핑몰 website/);
+  const next = { ...c, message: [...c.message, { role: 'user', data: '간다', chatId: 'u3' }, { role: 'char', data: '다음', chatId: 'c2' }], scriptstate: vars };
+  assert.deepEqual(mallEvents(next), [], '다음 응답 뒤에는 없다');
 });

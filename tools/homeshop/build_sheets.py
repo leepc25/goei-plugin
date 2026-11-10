@@ -1,0 +1,59 @@
+"""망상홈쇼핑 방송 그림 묶기 (2026-11-11).
+원본(PixelLab 결과, 브랜치 claude/project-thread-eva8nj 의 game-src/art/pixellab-test-20261028/homeshop/)에서
+방송 화면이 쓰는 것만 골라 game-src/homeshop/ 에 둔다: 배경 판·진행자 기본 장(png→webp 무손실) + 동작마다 가로 줄 시트(17장×256).
+그림은 한 점도 고치지 않는다(무손실). 자리·재생 규칙 기본값은 homeshop.json 에 적는다(전부 설정에서 고침).
+쓰기: python3 -I tools/homeshop/build_sheets.py <원본 homeshop 폴더>
+"""
+import json, os, sys
+from PIL import Image
+
+SRC = sys.argv[1]
+OUT = os.path.join(os.path.dirname(__file__), '..', '..', 'game-src', 'homeshop')
+os.makedirs(OUT, exist_ok=True)
+
+def save(im, name):
+    im.save(os.path.join(OUT, name), 'WEBP', lossless=True, quality=100, method=6, exact=True)
+
+def sheet(folder, name):
+    files = sorted(f for f in os.listdir(folder) if f.endswith('.png'))
+    frames = [Image.open(os.path.join(folder, f)).convert('RGBA') for f in files]
+    w, h = frames[0].size
+    out = Image.new('RGBA', (w * len(frames), h), (0, 0, 0, 0))
+    for i, f in enumerate(frames):
+        assert f.size == (w, h)
+        out.paste(f, (i * w, 0))
+    save(out, name)
+    return len(frames)
+
+for src, dst in [('bg_plate_512x384_bright_ttsym.png', 'a_plate.webp'), ('bg_plate_512x384_off.png', 'a_plate_off.webp'),
+                 ('host_sprite_v1.png', 'a_host.webp'), ('cutB_plate_v4.png', 'b_plate.webp'), ('cutB_host_v9face2_nowhite3.png', 'b_host.webp')]:
+    save(Image.open(os.path.join(SRC, src)).convert('RGBA'), dst)
+
+# 컷 A 동작 10개 (11-10 09:50 정리본). 이름은 컷 B 와 맞춘다
+A = [('idle', '대기', 'idle3', 'base'), ('talk', '말하기', 'talk3', 'event'), ('excited', '신남', 'excited', 'event'), ('urgent', '매진 임박', 'urgent3', 'event'),
+     ('count', '할부 세기', 'count2', 'event'), ('amazed', '놀람', 'amazed2_eyefix3', 'event'), ('whisper', '속삭임', 'whisper', 'event'),
+     ('laugh', '웃음', 'laugh', 'filler'), ('cold', '차가워짐', 'cold', 'event'), ('angry', '화남', 'angry', 'event')]
+clipsA = []
+for name, ko, d, group in A:
+    f = f'a_{name}_1.webp'
+    n = sheet(os.path.join(SRC, f'anim_hostA_{d}_clean'), f)
+    clipsA.append({'name': name, 'ko': ko, 'ver': '1', 'group': group, 'frames': n, 'file': f})
+
+man = json.load(open(os.path.join(SRC, 'cutB_final', 'manifest.json'), encoding='utf8'))
+clipsB = []
+for c in man['clips']:
+    f = f"b_{c['name']}_{c['ver']}.webp"
+    n = sheet(os.path.join(SRC, 'cutB_final', f"{c['name']}_{c['ver']}"), f)
+    clipsB.append({'name': c['name'], 'ko': c['ko'], 'ver': c['ver'], 'group': c['group'], 'frames': n, 'file': f})
+
+layout = json.load(open(os.path.join(SRC, 'plate512_layout.json'), encoding='utf8'))
+meta = {
+    'w': 512, 'h': 384, 'box': 256,
+    'cuts': {
+        # 진행자 256 칸의 왼쪽 위 자리. over = 이 줄부터 아래는 배경 판을 진행자 위에 다시 덮는다(진열대가 허리를 가림)
+        'A': {'plate': 'a_plate.webp', 'off': 'a_plate_off.webp', 'host': 'a_host.webp', 'x': -6, 'y': 65, 'over': 297, 'screen': layout['screen'], 'bulbs': layout['bulbs'], 'clips': clipsA},
+        'B': {'plate': 'b_plate.webp', 'host': 'b_host.webp', 'x': 70, 'y': 40, 'clips': clipsB},
+    },
+}
+json.dump(meta, open(os.path.join(OUT, 'homeshop.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+print(len(clipsA), len(clipsB))

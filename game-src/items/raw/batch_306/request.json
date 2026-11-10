@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an artist's paintbrush, side view, long wooden handle with a metal ferrule and a flat bristle tip stained blue. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a palette knife, side view, thin flexible diamond-shaped steel blade with a cranked neck and wooden handle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. drawing charcoal, three-quarter view, a few black charcoal sticks with a smudged grey cloth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. soft pastels, top view, open box with rows of short colored chalk sticks, some worn. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. colored pencils, three-quarter view, a fan of sharpened colored pencils in a low tin. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a plaster cast head, front view, white classical plaster head of a curly-haired figure with blank eyes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stone bust, front view, grey marble head and shoulders of a bearded man on a square plinth base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a torso sculpture, front view, white marble armless and headless classical torso. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bronze statuette, front view, small dark green-brown bronze standing figure on a base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a potter's wheel, three-quarter view, round spinning disc on a low motor base with a wet clay pot on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a printmaking brayer, side view, black rubber roller on a metal frame with a wooden handle, inked. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a calligraphy brush, side view, bamboo handle with a large pointed white hair tip dipped black, a loop at the end. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a roll of rice paper, three-quarter view, soft white paper roll partly unrolled. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a seal stamp, three-quarter view, square carved stone stamp with a red-stained base beside a small dish of red paste touching it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a landscape painting, front view, gold-framed painting of green hills, a lake and sky. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portrait painting, front view, dark oval-framed oil painting of a seated person in dark clothes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "화필",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an artist's paintbrush, side view, long wooden handle with a metal ferrule and a flat bristle tip stained blue. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "팔레트 나이프",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a palette knife, side view, thin flexible diamond-shaped steel blade with a cranked neck and wooden handle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "목탄",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. drawing charcoal, three-quarter view, a few black charcoal sticks with a smudged grey cloth. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "파스텔",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. soft pastels, top view, open box with rows of short colored chalk sticks, some worn. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "색연필",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. colored pencils, three-quarter view, a fan of sharpened colored pencils in a low tin. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "석고상",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a plaster cast head, front view, white classical plaster head of a curly-haired figure with blank eyes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "흉상",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a stone bust, front view, grey marble head and shoulders of a bearded man on a square plinth base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "토르소 조각",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a torso sculpture, front view, white marble armless and headless classical torso. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "청동상",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bronze statuette, front view, small dark green-brown bronze standing figure on a base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "물레",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a potter's wheel, three-quarter view, round spinning disc on a low motor base with a wet clay pot on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "판화 롤러",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a printmaking brayer, side view, black rubber roller on a metal frame with a wooden handle, inked. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "서예 붓",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a calligraphy brush, side view, bamboo handle with a large pointed white hair tip dipped black, a loop at the end. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "화선지",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a roll of rice paper, three-quarter view, soft white paper roll partly unrolled. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "낙관",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a seal stamp, three-quarter view, square carved stone stamp with a red-stained base beside a small dish of red paste touching it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "풍경화",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a landscape painting, front view, gold-framed painting of green hills, a lake and sky. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "초상화",
+   "kind": "tool",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portrait painting, front view, dark oval-framed oil painting of a seated person in dark clothes. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

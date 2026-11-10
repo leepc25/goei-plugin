@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "재생 물약 F등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with thin cloudy pale grey liquid, plain brown cork stopper, plain glass, no decoration. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 E등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with pale yellow-green liquid, plain brown cork stopper, plain glass, no decoration. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 D등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with clear leaf-green liquid, plain brown cork stopper, a thin string tied around the neck. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 C등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with bright teal liquid, brown cork stopper sealed with dark wax, a thin string tied around the neck. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 B등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with deep sapphire blue liquid, silver metal cap, a thin silver ring around the neck. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 A등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with rich violet purple liquid with a few tiny bright specks inside, silver metal cap, silver filigree band around the neck and around the belly. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 물약 S등급",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration potion, front view, small round-bellied clear glass potion bottle with a short neck, filled with luminous golden liquid shining from inside the glass, ornate gold cap, gold filigree bands around the neck and the belly, the light stays inside the bottle. Same simple bottle shape, no label. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "재생 앰플",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a regeneration ampoule, front view, one single sealed clear glass ampoule standing upright, slim cylinder body with a pinched narrow neck and a pointed sealed glass tip, filled with teal liquid, a thin white ring line on the neck. Just the one ampoule, no cap, no dropper, no box. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "탈모 앰플",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hair-loss treatment ampoule, front view, one single sealed amber brown glass ampoule standing upright, slim cylinder body with a pinched narrow neck and a pointed sealed glass tip, clear liquid inside, a small plain white band on the body. Just the one ampoule, no cap, no dropper, no box. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "탈모약 알약 통",
+   "kind": "medical",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottle of hair-loss pills, front view, white plastic pill bottle with a green screw cap and a plain pale green label showing a tiny simple comb icon, two small round white tablets lying at its foot touching the bottle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 사자 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Lion hint, shown by the outline shape and not by patterns: two small round ear bumps on the top edge, and all along the top edge and down both outer sides runs a thick fringe of soft rounded wavy locks like a lion's mane, scalloped and curly, never sharp spikes, never flames, never feathers. Broad flat brow, the center bridge between the eyes is short, wide and blunt with a flat end, no point and no beak. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 너구리 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Raccoon hint, shown by the outline shape and not by patterns: the mask is shaped like a raccoon's dark eye band, a flat domino mask made of two slanted teardrop patches joined by a thin bridge, each patch narrow at the center and widest at the outer lower end, two tiny rounded bumps on the top edge, round eye holes. It is not a raccoon head or face: no ears, no forehead, no nose, no snout, no cheeks, no whiskers, nothing above the brow and nothing below the eyes. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 악어 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Crocodile hint, shown by the outline shape and not by patterns: the whole top edge is a row of low square ridged bumps like the scutes on a crocodile's back, the outer tips are long and straight, narrow slit eye holes under two raised brow humps. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 문어 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Octopus hint, shown by the outline shape and not by patterns: a smooth rounded dome in the top center, each outer side ends in three slim tentacle tips that curl upward into small spirals, round eye holes. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 거미 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Spider hint, shown by the outline shape and not by patterns: four thin jointed leg-like spines fan out from each outer side, bent at an angle with sharp ends, a smooth low top edge, two eye holes with two tiny round dots cut above each. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "백일몽 펭귄 가면",
+   "kind": "wear",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an eye-only half mask, front view, wide and flat: the top edge sweeps outward into two pointed tips at the far left and right, the bottom edge cuts up into a deep V notch at the center where the nose goes, two narrow almond-shaped eye holes slanting slightly upward, smooth hard lacquered shell, sleek and elegant. Not an animal head: absolutely no ears, no horns, no fur, no snout, no beak sticking out, the outline stays a smooth mask shape. The animal is only hinted at by a stylized shape of the edge and a faint engraved pattern. Plain glossy deep navy-black surface, single color, engraving in slightly lighter dark grey. Penguin hint, shown by the outline shape and not by patterns: a smooth rounded top edge, a short blunt downward point at the center bridge, and one sleek swept-back crest plume rising from above each eye toward the outer side, round eye holes. It stays a narrow half mask covering only the eyes and upper nose, never the muzzle, snout, mouth, cheeks or jaw, and no animal face is drawn on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

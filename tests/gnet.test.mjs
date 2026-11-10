@@ -229,3 +229,34 @@ test('댓글 시각: 모델 시각을 글·부모·지금 사이로 맞추고, �
   stampComments(p, 0, ['14:00'], '');
   assert.equal(p.comments[0].time, undefined);
 });
+
+// 2026-11-10 사용자: 새로고침으로 빠진 내 글·스크랩은 보관함(컨텍 밖)에 쌓이고, 댓글을 단 그 턴에만 게시판으로 돌아온다
+test('archive: dropped own/scrapped posts are shelved, out of context, and come back only for the turn of a comment', () => {
+  const B = G_POST_BASE;
+  const mineP = post(B + 3, { nick: '나', mine: true, title: '내 글', body: '내 본문' });
+  const scrapP = post(B + 2, { title: '스크랩 글', scrap: true });
+  const before = { seq: B + 3, posts: [mineP, scrapP, post(B + 1)], archive: [], dms: [], sources: {} };
+  const fresh = { posts: [{ id: B + 10, author: 'x', title: '새 글', content: '새 본문', time: '14:00', date: '2025.05.13 14:00', views: 1, upvotes: 0, comments: [] }] };
+  const { st } = applyBoard(before, structuredClone(before), fresh, { nick: '나', settings: S({ keepown: '0' }), date: '2025.05.13 15:00' });
+  assert.deepEqual(st.posts.map((p) => p.id), [B + 10], '교체: 게시판에는 새 글만');
+  assert.deepEqual(st.archive.map((p) => p.id).sort(), [B + 2, B + 3], '내 글·스크랩은 보관함으로, 남의 글은 사라짐');
+  assert.ok(!mainContext(st, '나', 'rule').includes('내 본문'), '보관함은 본편 참고에 안 들어감');
+  // 유지: 내 글은 게시판에 남고 스크랩만 보관함으로
+  const kept = applyBoard(before, structuredClone(before), fresh, { nick: '나', settings: S({ keepown: '1' }), date: '2025.05.13 15:00' }).st;
+  assert.ok(kept.posts.some((p) => p.id === B + 3) && kept.archive.every((p) => p.id !== B + 3));
+  assert.deepEqual(kept.archive.map((p) => p.id), [B + 2]);
+  // 저장·읽기
+  const msgs = (n) => Array.from({ length: n }, () => [{ role: 'user', data: 'u' }, { role: 'char', data: '응답' }]).flat();
+  let chat = writeGnet({ message: msgs(2), scriptstate: {} }, st);
+  let cur = readGnet(chat);
+  assert.deepEqual(cur.archive.map((p) => p.id).sort(), [B + 2, B + 3]);
+  // 보관된 글에 댓글 → 그 턴(2)에만 게시판에
+  addUserComment(cur, B + 2, 0, '나', '댓글', '2025.05.13 15:10', 2);
+  assert.equal(cur.posts[0].id, B + 2);
+  chat = writeGnet(chat, cur);
+  assert.ok(readGnet(chat).posts.some((p) => p.id === B + 2), '같은 턴에는 게시판에 있다 (댓글 반응·다음 본편 요청)');
+  const next = { ...chat, message: msgs(3) };
+  const after = readGnet(next);
+  assert.ok(!after.posts.some((p) => p.id === B + 2) && after.archive.some((p) => p.id === B + 2 && p.comments.length === 1), '본편 응답이 오면 다시 보관함으로, 댓글은 그대로');
+  assert.equal(readGnet(writeGnet(next, after)).archive.length, 2);
+});

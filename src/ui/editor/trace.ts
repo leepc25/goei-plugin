@@ -1,5 +1,6 @@
 // 점검 탭 「호출 흐름」 (11-07 사용자: 가장 최근 요청과 응답을 프로세스 형태로 — 어떤 모델을 불렀고, 요청은 뭐고, 받은 값은 뭐고, 다음 순서는 뭔지).
 // 자료는 host/trace.ts (턴마다 본편 요청 조립 → 본편 전 보조 호출 → 본편 응답 → 본편 뒤 보조 호출). 모양은 다른 점검 페이지(ps-group·ps-row)와 같고, 흐름만 세로 줄로 잇는다.
+import { copyBtn } from '../copy';
 import { keepOpen } from '../panels';
 import { ICONS } from '../icons';
 import type { TraceCall, TraceTurn } from '../../host/trace';
@@ -40,7 +41,7 @@ function nodes(t: TraceTurn): Node[] {
     meta: `${modelName(c.model)} · ${sec(c.ms)} · ${hms(c.at)} · 요청 ${chars(c.requestChars)}${tok(c.requestTokens)} → 응답 ${chars(c.responseChars)}${tok(c.responseTokens)}`,
     ok: c.ok,
     ...(c.error ? { error: c.error } : {}),
-    body: `<div class="gw-flow-io"><b>요청</b><textarea readonly rows="8">${esc(c.request)}</textarea></div><div class="gw-flow-io"><b>받은 값</b><textarea readonly rows="8">${esc(c.response || (c.ok ? '' : '(없음)'))}</textarea></div>`,
+    body: `<div class="gw-flow-io gw-copyto"><b>요청 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.request)}</textarea></div><div class="gw-flow-io gw-copyto"><b>받은 값 ${copyBtn()}</b><textarea readonly rows="8">${esc(c.response || (c.ok ? '' : '(없음)'))}</textarea></div>`,
   });
   const before = t.calls.map((c, i) => [c, i] as const).filter(([c]) => c.phase === 'before');
   const after = t.calls.map((c, i) => [c, i] as const).filter(([c]) => c.phase === 'after');
@@ -55,11 +56,11 @@ function nodes(t: TraceTurn): Node[] {
       meta: `Risu 본편 모델 · ${hms(m.at)} · 메시지 ${m.shape.length}개(${Object.entries(roles).map(([r, n]) => `${r} ${n}`).join(', ')}) · 총 ${chars(m.totalChars)}${tok(m.totalTokens)}${m.failed.length ? ` · 건너뛴 단계 ${m.failed.join(', ')}` : ''}`,
       ok: m.failed.length ? false : true,
       // 메시지 전부 (11-09 사용자). 지난 판 기록은 마지막 셋만 있을 수 있다
-      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, i >= m.tail.length - 3)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i></summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
+      body: `<div class="gw-flow-io"><b>${m.tail.length < m.shape.length ? `마지막 메시지 ${m.tail.length}개 (옛 기록)` : `메시지 ${m.tail.length}개 — 보낸 순서, 눌러서 펼치기`}</b>${m.tail.map((r, i) => `<details class="gw-flow-msg gw-copyto" data-keep="tr:${t.id}:${i}"${keepOpen(`tr:${t.id}:${i}`, false)}><summary><small>[${esc(r.role)}]</small> ${esc(r.content.replace(/\s+/g, ' ').trim().slice(0, 80))}${r.content.length > 80 ? '…' : ''} <i>${chars(r.content.length)}</i>${copyBtn()}</summary><textarea readonly rows="8">${esc(r.content)}</textarea></details>`).join('')}</div>`,
     });
   }
   for (const [c, i] of before) out.push(call(c, i));
-  if (t.reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io"><b>받은 글</b><textarea readonly rows="10">${esc(t.reply.text)}</textarea></div>` });
+  if (t.reply) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: `${hms(t.reply.at)} · ${chars(t.reply.chars)}${tok(t.reply.tokens)}`, ok: true, body: `<div class="gw-flow-io gw-copyto"><b>받은 글 ${copyBtn()}</b><textarea readonly rows="10">${esc(t.reply.text)}</textarea></div>` });
   else if (t.main) out.push({ key: `${t.id}:reply`, kind: 'reply', title: '본편 응답', meta: '아직 없음 (응답 전이거나 Risu 가 응답을 붙이지 않음)', ok: null, body: '' });
   for (const [c, i] of after) out.push(call(c, i));
   for (const [c, i] of manual) out.push({ ...call(c, i), title: `${c.label} (수동)` });

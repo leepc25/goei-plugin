@@ -169,10 +169,12 @@ await page.waitForSelector('textarea[data-input="ed-rule-text"]');
 await page.fill('input[data-input="ed-rule-title"]', '대사 길이');
 await page.fill('textarea[data-input="ed-rule-text"]', 'Three sentences max.');
 await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.text === 'Three sentences max.', null, { timeout: 5000 });
-assert.ok(await page.$('.gw-tree-item[data-value^="rule:r"]'), '규칙이 목록에');
+// 규칙은 한 페이지(rule:all)에 모여 있다: 왼쪽 메뉴에 규칙마다 줄이 생기지 않고, 그 페이지에 칸이 생긴다
+assert.ok(await page.$('[data-action="ed-rule-del"]'), '규칙이 페이지에');
 await page.click('[data-action="ed-rule-del"]');
 await page.click('[data-action="ed-rule-del-yes"]');
-await page.waitForSelector('textarea[data-key="RP|0"]');
+// 지운 뒤에도 규칙 페이지에 그대로 있고, 기기 설정에서 빠진다
+await page.waitForFunction(() => !(JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules ?? []).length, null, { timeout: 5000 });
 await goNode('set:screen');
 await page.waitForSelector('.gw-set [data-action="set-theme"]');
 await page.click('.gw-set [data-action="set-theme"][data-value="paper"]');

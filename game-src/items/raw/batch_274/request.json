@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. twin caramel biscuit bars, three-quarter view, two slim chocolate bars with biscuit and caramel visible, gold wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. candy coated chocolates, three-quarter view, a pile of small colorful glossy buttons beside a yellow bag, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a milk chocolate bar, three-quarter view, flat bar in a red wrapper half opened showing segmented chocolate, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a crispy rice chocolate bar, three-quarter view, bumpy chocolate bar with puffed rice visible, red wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate bar, three-quarter view, flat dark brown wrapper with silver edge, segmented chocolate showing, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate surprise egg, three-quarter view, egg-shaped plastic pack split in two halves, one with cream, one with a tiny toy. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chewy sour candy stick pack, front view, slim pack in pink with strawberry picture, square candies beside, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. gummy worms, three-quarter view, three long two-colored sugary gummy worms. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro crunchy corn snack bag, front view, tiny yellow bag with hard roasted corn kernels, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro puffed snack bag, front view, tiny red bag with small round caramel puffs, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro chewy snack strip, three-quarter view, flat orange ridged chewy sheet slightly grilled. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an ice cream cone, front view, wrapped cone with chocolate and nuts on top, red white and blue paper sleeve with stars, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a crunchy chocolate ice cream bar, three-quarter view, bar coated in chocolate cookie crumbs with a bite showing strawberry center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a twisted ice pop, front view, spiral screw-shaped pink and white ice bar on a stick. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shark-shaped ice bar, front view, dark grey-blue ice bar on a stick with a bite showing red inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a fish-shaped ice cream sandwich, three-quarter view, fish-shaped wafer filled with vanilla ice cream and red bean. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "트윅스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. twin caramel biscuit bars, three-quarter view, two slim chocolate bars with biscuit and caramel visible, gold wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "엠앤엠즈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. candy coated chocolates, three-quarter view, a pile of small colorful glossy buttons beside a yellow bag, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "가나초콜릿",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a milk chocolate bar, three-quarter view, flat bar in a red wrapper half opened showing segmented chocolate, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "크런키",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a crispy rice chocolate bar, three-quarter view, bumpy chocolate bar with puffed rice visible, red wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "허쉬",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate bar, three-quarter view, flat dark brown wrapper with silver edge, segmented chocolate showing, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "킨더조이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate surprise egg, three-quarter view, egg-shaped plastic pack split in two halves, one with cream, one with a tiny toy. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "새콤달콤",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chewy sour candy stick pack, front view, slim pack in pink with strawberry picture, square candies beside, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "왕꿈틀이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. gummy worms, three-quarter view, three long two-colored sugary gummy worms. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "밭두렁",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro crunchy corn snack bag, front view, tiny yellow bag with hard roasted corn kernels, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "차카니",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro puffed snack bag, front view, tiny red bag with small round caramel puffs, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "쫀디기",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a retro chewy snack strip, three-quarter view, flat orange ridged chewy sheet slightly grilled. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "월드콘",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an ice cream cone, front view, wrapped cone with chocolate and nuts on top, red white and blue paper sleeve with stars, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "돼지바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a crunchy chocolate ice cream bar, three-quarter view, bar coated in chocolate cookie crumbs with a bite showing strawberry center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스크류바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a twisted ice pop, front view, spiral screw-shaped pink and white ice bar on a stick. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "죠스바",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a shark-shaped ice bar, front view, dark grey-blue ice bar on a stick with a bite showing red inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "붕어싸만코",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a fish-shaped ice cream sandwich, three-quarter view, fish-shaped wafer filled with vanilla ice cream and red bean. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

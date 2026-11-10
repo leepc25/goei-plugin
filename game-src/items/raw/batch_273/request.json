@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a mini jam pie, three-quarter view, small round chocolate coated biscuit pie with a red jam center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. butter ring cookies, three-quarter view, a few golden flower-shaped ring cookies in a tray. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. mushroom-shaped chocolate biscuits, three-quarter view, a few tiny mushrooms with chocolate caps and biscuit stems. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a leaf-shaped puff pastry, three-quarter view, golden layered oval pastry with sugar on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a thin wafer cookie, three-quarter view, delicate long white cookie with a chocolate zigzag line. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate topped biscuit, three-quarter view, square biscuit with a slab of embossed chocolate on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chunky chocolate chip cookie, three-quarter view, thick rough cookie with big chocolate chunks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cream sandwich cookie, three-quarter view, two dark chocolate round wafers with white cream between. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a gummy bear bag, front view, gold bag with colorful gummy bears, a few bears outside, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a round lollipop, front view, ball lollipop on a white stick in a yellow and red daisy-pattern wrapper, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a roll of chewy mint candies, front view, blue paper roll with white round candies coming out, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottle of xylitol gum, front view, small green plastic bottle with white gum pellets beside it, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. green grape candies, three-quarter view, a few round translucent green hard candies, one in a clear wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hazelnut chocolate ball, three-quarter view, bumpy round chocolate in crinkled gold foil sitting in a brown paper cup. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate wafer finger bar, three-quarter view, four joined chocolate fingers with one snapped showing wafer layers, red wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a peanut caramel chocolate bar, three-quarter view, bar cut to show nougat, caramel and peanuts, brown wrapper, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "빅파이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a mini jam pie, three-quarter view, small round chocolate coated biscuit pie with a red jam center. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "버터링",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. butter ring cookies, three-quarter view, a few golden flower-shaped ring cookies in a tray. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "초코송이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. mushroom-shaped chocolate biscuits, three-quarter view, a few tiny mushrooms with chocolate caps and biscuit stems. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "엄마손파이",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a leaf-shaped puff pastry, three-quarter view, golden layered oval pastry with sugar on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "쿠크다스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a thin wafer cookie, three-quarter view, delicate long white cookie with a chocolate zigzag line. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "빈츠",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate topped biscuit, three-quarter view, square biscuit with a slab of embossed chocolate on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "칙촉",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chunky chocolate chip cookie, three-quarter view, thick rough cookie with big chocolate chunks. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "오레오",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cream sandwich cookie, three-quarter view, two dark chocolate round wafers with white cream between. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "하리보",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a gummy bear bag, front view, gold bag with colorful gummy bears, a few bears outside, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "츄파춥스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a round lollipop, front view, ball lollipop on a white stick in a yellow and red daisy-pattern wrapper, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "멘토스",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a roll of chewy mint candies, front view, blue paper roll with white round candies coming out, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "자일리톨",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bottle of xylitol gum, front view, small green plastic bottle with white gum pellets beside it, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "청포도사탕",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. green grape candies, three-quarter view, a few round translucent green hard candies, one in a clear wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "페레로로쉐",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hazelnut chocolate ball, three-quarter view, bumpy round chocolate in crinkled gold foil sitting in a brown paper cup. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "킷캣",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a chocolate wafer finger bar, three-quarter view, four joined chocolate fingers with one snapped showing wafer layers, red wrapper. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스니커즈",
+   "kind": "food",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a peanut caramel chocolate bar, three-quarter view, bar cut to show nougat, caramel and peanuts, brown wrapper, no text. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

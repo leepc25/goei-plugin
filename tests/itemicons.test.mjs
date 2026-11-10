@@ -50,7 +50,7 @@ test('비슷한 이름·다른 이름', () => {
   is('실험 가운', '', '흰 가운');
   is('버터나이프', '', '특제 버터나이프');
   is('간호복', '', '간호사복');
-  is('피 묻은 곰인형', '', '피 묻은 인형');
+  is('피 묻은 곰인형', '', '곰 인형'); // 11-10 곰 인형 그림이 생김 (전에는 피 묻은 인형)
   is('속삭이는 거울', '', '거울');
   is('목이 없는 인형', '', '목 없는 인형');
   is('편의점 삼각김밥', '', '삼각김밥');
@@ -90,20 +90,20 @@ test('앞말이 안 맞으면 몸통 말 대표 그림, 키트·세트·장치�
   is('경보 장치', '', '가스 경보기'); // 장치 = ~기
   is('탐지 장치', '', '금속 탐지기');
   is('구급 상자', '', '구급상자'); // 표의 말 그대로면 그대로
-  assert.equal(matchItemIcon(pack, '낚시 도구 세트'), pack.base.misc, '낚시 도구 세트'); // 「도구 세트」만 맞아 해부 도구 세트로 가지 않음
+  is('낚시 도구 세트', '', '낚시찌'); // 「도구 세트」만 맞아 해부 도구 세트로 가지 않음. 앞머리가 같은 낚시 물건으로 (2026-11-10)
   is('괴이 탐지 장치', '', '금속 탐지기'); // 장치 → ~기, 「탐지기」 몸통이 같은 그림 (11-09: 상자 대신 같은 종류 그림)
 });
 
 test('꾸밈말이 안 맞아도 몸통 말이 같으면 같은 종류 그림 (11-09 사용자: 그림 3천 장인데 재킷이 상자로 나오면 안 된다)', () => {
-  is('기본 지급용 재킷', '', '가죽 재킷');
+  { const f = matchItemIcon(pack, '기본 지급용 재킷'); assert.ok(names(f).some((x) => x.endsWith('재킷')), `기본 지급용 재킷 → ${names(f).join('/')} (재킷 그림이어야 함)`); }
   is('검은 재킷', '', '가죽 재킷');
   is('관리국 지급 재킷', '', '가죽 재킷');
   assert.equal(matchItemIcon(pack, '기본 지급품'), pack.base.misc, '몸통 말이 표에 없으면 공통 그림');
 });
 
 test('끝에 붙은 용량·등급은 몸통이 아님 (11-09 사용자: 「앰플 30ml」「앰플 (C급)」이 단지·상자로 나옴)', () => {
-  is('백일몽 탈모 완화 앰플 30ml', '', '앰플');
-  is('백일몽 신체 재생 앰플 (C급)', '', '앰플');
+  is('백일몽 탈모 완화 앰플 30ml', '', '탈모 앰플'); // 11-10 탈모 앰플 그림이 생김
+  is('백일몽 신체 재생 앰플 (C급)', '', '재생 앰플'); // 11-10 재생 앰플 그림이 생김
   is('생수 500ml', '', '생수 2L');
   is('꿈결 수집기 (S급)', '', '꿈결 수집기 S등급'); // 등급은 꾸밈말로 남아 등급별 그림을 가른다
   is('꿈결 수집기 F', '', '꿈결 수집기 F등급');
@@ -111,23 +111,23 @@ test('끝에 붙은 용량·등급은 몸통이 아님 (11-09 사용자: 「앰�
   is('백일몽 재생 물약 F형', '', '물약'); // 「F형」도 등급 꼴 (11-09 사용자 화면)
 });
 
-test('종류/물건말 (11-09 사용자: 매칭기 재설계) — 종류 안에서 찾고, 없으면 종류 안 비슷한 그림·종류 대표', () => {
+test('종류/물건말 (11-09 사용자: 매칭기 재설계) — 종류 안에서 찾고, 없으면 표 전체, 그래도 없으면 상자 (11-10 사용자: 종류 대표 그림 없앰)', () => {
   is('백일몽 규격 방호 정장 외투', '옷/외투', '트렌치코트'); // 대체 표 외투 → 코트
   is('백일몽 규격 방호 정장 외투', '', '트렌치코트');
   is('꿈결 추출 안정수 D급', '의료/안정수', '안정제');
-  is('규격 방검 및 방호 내의', '옷/내의', '팬티');
+  is('규격 방검 및 방호 내의', '옷/내의', '내의'); // 11-10 내의 그림이 생김
   is('고농축 전해질 영양 바 세트', '음식/영양 바', '에너지바');
   is('D조 추천 비상 섬광 트랩', '도구/덫', '덫');
   is('현장용 차폐 스프레이', 'canister', '기억 지우개 스프레이'); // 한국어 몸통 말이 영어 낱말(몸통만 맞음)보다 먼저
   is('이상한 돌', '괴이/돌멩이', '눈 달린 돌'); // 종류 안에서 (다른 종류의 돌멩이로 가지 않음)
-  const kindOf = (f) => table.icons.find((r) => r.file === f)?.kind;
-  assert.equal(kindOf(matchItemIcon(pack, '백일몽 앰플', '의료/앰플')), 'medical', '앰플|의료 → 봉인 앰플 아님 (릴리스 점검 11-09)');
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
+  is('백일몽 앰플', '의료/앰플', '앰플'); // 의료 종류에 앰플 그림이 없으면 다른 의료품이 아니라 전체에서 찾은 앰플 (2026-11-10 사용자: 종류가 달라도 물건말이 먼저)
   is('후추 스프레이', '무기/스프레이', '호신용 스프레이');
   is('코 스프레이', '의료/스프레이', '비강 스프레이');
   is('손전등', '', '손전등'); // 대체 표로 케미컬 라이트가 되지 않음
-  const f = matchItemIcon(pack, '미니 에어로 건조 세탁기', '기기/세탁기');
-  assert.ok(f && table.icons.some((r) => r.file === f && r.kind === 'device'), '세탁기 그림이 없으면 기기 종류 안에서 (상자 아님)');
-  assert.ok(readIconMisses().some((m) => m.name === '미니 에어로 건조 세탁기'), '못 찾은 말 기록');
+  const f = matchItemIcon(pack, '미니 양자 얽힘 쿼크로', '기기/쿼크로');
+  assert.equal(f, pack.base.misc, '그림이 없으면 기기 대표 그림(무전기)이 아니라 상자');
+  assert.ok(readIconMisses().some((m) => m.name === '미니 양자 얽힘 쿼크로'), '못 찾은 말 기록');
 });
 
 test('흔한 조각만 맞거나 아무것도 안 맞으면 공통 그림', () => {
@@ -139,4 +139,147 @@ test('game-src/items/match_icon.mjs 와 플러그인이 같은 답', () => {
   const probe = [...table.icons.filter((r) => !r.excluded_note).map((r) => r.name), '손목시계', '봉지라면', '확성기', '녹슨 심령 침술 키트', '피 묻은 곰인형', '가죽 장갑'];
   for (const n of probe) assert.equal(matchItemIcon(pack, n), m(n), n);
   for (const [n, i] of [['침술 키트', 'acupuncture kit'], ['아무거나', 'gas mask'], ['상자', 'box'], ['생체 신호 은폐 패치', 'concealment patch'], ['경보 장치', 'alarm device'], ['향초 세트', 'candle set'], ['낚시 도구 세트', 'fishing set'], ['백일몽 신체 재생 앰플 (C급)', 'ampoule'], ['탈모 완화 앰플 30ml', ''], ['백일몽 규격 방호 정장 외투', '옷/외투'], ['미니 에어로 건조 세탁기', '기기/세탁기'], ['규격 방검 및 방호 내의', '옷/내의'], ['현장용 차폐 스프레이', 'canister']]) assert.equal(matchItemIcon(pack, n, i), m(n, i), `${n}|${i}`);
+});
+
+test('글 제목에서 물건 그림 찾기 (연어 마켓 매물, 2026-11-10 사용자: 방검복·라디오조차 안 맞았다)', async () => {
+  const { matchTitleIcon } = await import('../dist-test/core.mjs');
+  const t = (title, want) => {
+    const f = matchTitleIcon(pack, title);
+    assert.ok(f && names(f).includes(want), `${title} → ${f ? names(f).join('/') : '없음'} (바란 것 ${want})`);
+  };
+  t('구형 방검복 상하의 세트', '방검 조끼');
+  t('아날로그 다이얼 진공관 라디오 (작동 확인)', '라디오');
+  t('구리 합금 육각 나침반', '나침반');
+  t('낡은 군용 손전등 건전지 포함', '손전등');
+  t('은장 회중시계 고장', '회중시계');
+  t('현장용 무전기 한 쌍 충전기 포함', '무전기');
+  t('가죽 장갑', '가죽 장갑');
+});
+
+test('그림 칸 「종류/물건말/english」 (2026-11-10 사용자: 포인트몰 그림이 전부 상자 — 한글 그림 칸이 통째로 지워지고 있었다)', async () => {
+  const { cleanIcon, splitIconWord } = await import('../dist-test/core.mjs');
+  assert.equal(cleanIcon('옷/이너웨어/Underwear'), '옷/이너웨어/underwear', '한글과 / 를 지우지 않는다');
+  assert.deepEqual(splitIconWord('옷/이너웨어/underwear'), { kind: 'wear', word: '이너웨어', en: 'underwear' });
+  assert.deepEqual(splitIconWord('옷/코트'), { kind: 'wear', word: '코트', en: '' });
+  assert.deepEqual(splitIconWord('hand mirror'), { kind: '', word: 'hand mirror', en: '' });
+  is('휴대용 티타늄 캠핑 머그', '', '머그컵'); // 앞머리가 같은 말
+  is('휴대용 티타늄 캠핑 머그', '도구/머그/mug', '머그컵'); // 종류를 다르게 적어도 전체에서 (전에는 도구 안에서 그물)
+  is('휴대용 위조 인지 스탬프', '도구/스탬프/stamp', '도장'); // 한글 물건말이 없으면 영어 낱말
+  is('방염 속건성 이너웨어 세트', '옷/이너웨어/underwear', '팬티');
+  const f = matchItemIcon(pack, '휴대용 공간 차폐 쿼크로', '기기/쿼크로/quarkro');
+  assert.equal(f, pack.base.misc, '그림이 없으면 비슷한 글자의 그림(가습기)도 종류 대표 그림도 아니라 상자 (11-10 사용자)');
+});
+
+test('그림이 있는데 종류를 다르게 적어 엇나가던 것 (2026-11-10 사용자: 뽑기 스레드가 491개 돌려 찾음)', () => {
+  is('휴대용 접이식 요가매트', '도구/요가매트/yoga mat', '요가 매트'); // 종류 안 커터 매트가 아니라 전체에서 그대로 맞는 것
+  is('신용카드', '귀중품/신용카드/credit card', '체크카드'); // 영어 card 몸통만 맞은 상품권이 아니라
+  is('교통카드', '귀중품/교통카드/transit card', '교통카드');
+  is('한약', '의료/한약/herbal medicine', '한약 봉지'); // medicine 몸통만 맞은 소화제·감기약이 아니라
+  is('한약', '음식/한약/herbal medicine', '한약 봉지');
+  is('소설책', '서류/소설책/novel', '책'); // novel → 성인 소설이 아니라
+  is('숙취해소제', '의료/숙취해소제/hangover cure', '숙취해소제'); // 11-10 그림이 생김
+  is('영양바', '', '에너지바');
+  is('택배', '잡동사니/택배/parcel', '택배 상자');
+  is('명함', '서류/명함/business card', '명함');
+  is('상품권', '귀중품/상품권/gift certificate', '상품권');
+});
+
+test('성인 그림으로 새지 않음·붙여 쓴 말 끝만 맞던 것·흔한 말 (2026-11-10 사용자, 뽑기 스레드 1,267개 목록)', () => {
+  const box = (name, icon) => assert.equal(matchItemIcon(pack, name, icon), pack.base.misc, `${name}|${icon} 은 상자`);
+  // 성인 그림은 그 종류로 적었거나 이름 그대로일 때만
+  is('보드게임', '잡동사니/보드게임', '보드게임 상자');
+  is('케이지', '도구/케이지', '햄스터 케이지'); // 11-10 그림이 생김 (성인 케이지 아님)
+  is('혀클리너', '소모품/혀클리너', '청소용 클리너'); // 11-10 그림이 생김 (토이 클리너 아님)
+  box('쿼크로', '도구/쿼크로');
+  is('성인 DVD', '', '성인 DVD');
+  is('케이지', '성인/케이지', '남성 정조 케이지');
+  // 대체 말 (다른 물건의 끝 글자만 같던 것)
+  is('하이라이터', '소모품/하이라이터', '형광펜');
+  is('다마고치', '기기/다마고치', '다마고치'); // 11-10 그림이 생김
+  is('치마', '옷/치마', '롱스커트');
+  is('렌즈케이스', '소모품/렌즈케이스', '콘택트렌즈 통');
+  is('약상자', '의료/약상자', '구급상자');
+  is('여행가방', '잡동사니/여행가방', '캐리어');
+  is('햇반', '음식/햇반', '즉석밥');
+  // 종류 안의 특이한 그림보다 이름이 그 말 그대로인 그림
+  is('가위', '도구/가위', '가위');
+  is('나이프', '', '칼'); // 대체 말
+  is('칼', '도구/칼', '칼'); // 관절 분리 칼 아님
+});
+
+test('뭉뚱그린 말 (2026-11-10 사용자, 뽑기 스레드 606개 목록): 「~도구」가 부채로, 성인·신체 그림으로 새던 것', () => {
+  const not = (name, icon, bad) => { const f = matchItemIcon(pack, name, icon); assert.ok(!names(f).includes(bad), `${name}|${icon} → ${names(f).join('/')} (${bad} 이면 안 됨)`); };
+  for (const n of ['낚시도구', '청소도구', '주방도구']) not(n, `도구/${n}`, '부채');
+  not('수술도구', '의료/수술도구', '부채');
+  not('후드', '옷/후드', '본디지 마스크'); // 종류를 옷으로 적었으면 성인 그림 아님
+  is('알', '음식/알', '계란'); // 고환 아님 (대체 말)
+  is('알', '괴이/알', '정체불명 알'); // 적은 종류 안에 그 말이 있으면 대체하지 않음
+  is('약상자', '의료/약상자', '구급상자');
+  is('구급상자', '', '구급상자');
+  // 11-10 남은 4개 + 종류 안 「~도구」
+  is('수술도구', '의료/수술도구', '수술용 메스');
+  is('요실금패드', '의료/요실금패드', '요실금 패드');
+  is('집게', '성인/집게', '니플 클램프'); // 성인으로 적었으면 고기 집게 아님
+  is('집게', '도구/집게', '고기 집게');
+  is('나이프', '도구/나이프', '칼');
+  is('주방도구', '도구/주방도구', '냄비'); // 상자로 가던 것
+  // 이름이 그대로 같으면 종류를 뭐라고 적었든 그 그림 (2026-11-10 사용자: 성인·신체 그림도)
+  is('콘돔', '소모품/콘돔', '콘돔');
+  is('콘돔', '의료/콘돔', '콘돔');
+  is('딜도', '잡동사니/딜도', '딜도');
+  is('슬롯머신', '잡동사니/슬롯머신', '슬롯머신');
+});
+
+test('분류 말은 그 분류 안에서 물건마다 하나 (2026-11-10 사용자: 과자·다과·간식, 대·중·소분류 단계마다 매칭 단어)', () => {
+  const up = (f) => table.icons.filter((r) => r.file === f).flatMap((r) => r.up ?? []);
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
+  // 소분류·중분류: 분류 이름과 같은 뜻 말
+  for (const w of ['과자', '다과', '간식', '주전부리', '군것질거리']) {
+    const h = pack.hit(w, '');
+    assert.ok(h?.pool?.length > 20, `${w}: 무리 ${h?.pool?.length}`);
+    assert.ok(h.pool.every((f) => up(f).includes('과자')), `${w}: 과자 그림만`);
+    const seen = new Set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((s) => matchItemIcon(pack, w, '', s)));
+    assert.ok(seen.size >= 3, `${w}: 물건마다 다른 그림 (${seen.size})`);
+    assert.equal(matchItemIcon(pack, w, '', 'it1'), matchItemIcon(pack, w, '', 'it1'), '같은 물건은 늘 같은 그림');
+  }
+  is('다과', '음식/다과', '과자'); // 물건 id 없이 찾으면 분류 대표
+  for (const w of ['음료수', '마실 것']) assert.ok(pack.hit(w, '')?.pool?.every((f) => up(f).includes('음료')), w);
+  // 대분류: 종류 전체
+  for (const [w, k] of [['먹을 것', 'food'], ['음식', 'food'], ['의류', 'wear'], ['의약품', 'medical']]) assert.ok(pack.hit(w, '')?.pool?.every((f) => kindsOf(f).includes(k)), w);
+  // 세부 이름은 그대로
+  for (const w of ['쿠키', '콘돔', '새우깡', '허니버터칩']) assert.equal(pack.hit(w, '음식/과자')?.pool, undefined, w);
+  is('새우깡', '음식/과자', '새우과자'); // 그림 칸이 분류 말이어도 이름으로 찾은 그림이 그 분류 것이면 그 그림
+  is('쿠키', '', '쿠키');
+  // 그림 칸만 분류 말이고 이름으로는 못 찾으면 분류에서
+  assert.ok(pack.hit('수상한 주전부리들', '음식/과자')?.pool?.length > 20);
+  // 종류를 안 적었으면 성인·신체·괴이 그림은 보통 분류의 무리에 없다
+  assert.ok(pack.hit('가면', '')?.pool?.every((f) => kindsOf(f).some((k) => !['adult', 'body', 'anomaly'].includes(k))));
+  // 군말·없는 말은 그대로 상자
+  assert.equal(pack.hit('물건', ''), null);
+});
+
+test('영어로 출력할 때 (2026-11-10 사용자: 영출 대비): 분류 말·복수형·그림 칸의 영어 낱말, 성인·신체 그림의 영어 이름', () => {
+  const up = (f) => table.icons.filter((r) => r.file === f).flatMap((r) => r.up ?? []);
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
+  for (const [w, cat] of [['snack', '과자'], ['Snacks', '과자'], ['beverage', '음료'], ['drinks', '음료'], ['candies', '사탕'], ['medicine', '약'], ['jewelry', '장신구'], ['fish', '생선']]) {
+    const h = pack.hit(w, '');
+    assert.ok(h?.pool?.length > 5 && h.pool.every((f) => up(f).includes(cat)), `${w}: ${h?.pool?.length}`);
+  }
+  for (const [w, k] of [['food', 'food'], ['clothes', 'wear'], ['clothing', 'wear']]) assert.ok(pack.hit(w, '')?.pool?.every((f) => kindsOf(f).includes(k)), w);
+  assert.ok(pack.hit('mystery treats', 'food/snack')?.pool?.length > 20, '그림 칸의 영어 분류 말');
+  assert.ok(pack.hit('수상한 주전부리들', '음식/수상한 주전부리들/snack')?.pool?.length > 20, '그림 칸의 영어 낱말');
+  // 세부 이름은 그대로
+  is('cookie', '', '쿠키');
+  is('old key', '', '녹슨 열쇠');
+  is('first aid kit', '', '구급상자');
+  // 성인·신체 그림: 영어 이름으로, 종류를 뭐라고 적었든
+  is('condom', '', '콘돔');
+  is('condoms', 'consumable/condoms', '콘돔');
+  is('used condom', '', '사용한 콘돔');
+  is('slot machine', 'misc/slot machine', '슬롯머신');
+  is('chastity cage', '', '남성 정조 케이지');
+  // 영어 한 낱말이 성인·신체 그림으로 새지 않는다
+  is('egg', 'food/egg', '계란');
+  is('cage', '', '철창 우리');
+  is('dvd', '', 'DVD');
 });

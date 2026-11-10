@@ -1,0 +1,79 @@
+{
+ "id": "f784becc-885a-4c2f-8e8f-391dcccc007d",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-10T04:59:44.516015+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {
+  "frame_0": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_0.png",
+  "frame_1": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_1.png",
+  "frame_2": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_2.png",
+  "frame_3": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_3.png",
+  "frame_4": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_4.png",
+  "frame_5": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_5.png",
+  "frame_6": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_6.png",
+  "frame_7": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_7.png",
+  "frame_8": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_8.png",
+  "frame_9": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_9.png",
+  "frame_10": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_10.png",
+  "frame_11": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_11.png",
+  "frame_12": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_12.png",
+  "frame_13": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_13.png",
+  "frame_14": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_14.png",
+  "frame_15": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_15.png"
+ },
+ "frame_urls": [
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_0.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_1.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_2.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_3.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_4.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_5.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_6.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_7.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_8.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_9.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_10.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_11.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_12.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_13.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_14.png",
+  "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f784becc-885a-4c2f-8e8f-391dcccc007d/rotations/frame_15.png"
+ ],
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a short nightdress, front view, short black slip nightdress with thin straps and a lace hem, on a hanger. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an internal condom, three-quarter view, soft clear tube with a flexible ring at each end beside its square foil packet. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric sleeve toy, three-quarter view, black cylinder device with buttons and a soft pink end cap. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a soft silicone cushion toy, three-quarter view, pale rounded silicone block with two smooth mounds. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an infected specimen jar, front view, tall jar of fluid holding a grey arm-shaped specimen covered in black veins. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a steel ring weight, three-quarter view, heavy polished steel split ring with two bolts. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. shaping briefs, front view, beige brief underwear with a smooth molded front panel. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a used condom, top view, limp knotted translucent rubber tube lying on a tissue. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "review",
+ "expansion_review": null,
+ "group_id": "5dbca5a8-24dd-43f8-b4aa-741d89047332",
+ "progress_percent": 32,
+ "eta_seconds": 322,
+ "animations": []
+}

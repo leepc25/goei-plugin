@@ -18,7 +18,7 @@ function item(p: LorePick, risu = false): string {
 }
 
 /** 채팅 설정 맨 아래의 접힌 칸. 이 카드에 플러그인이 고르는 로어북이 없으면 비움 */
-/** plain: 접는 칸 없이 바로 펼쳐 보이기 (점검 → 다음 호출 로어북 페이지) */
+/** plain: 접는 칸 없이 바로 펼쳐 보이기 (기능 → 로어북 호출 페이지) */
 export function loreCheckBox(ctx: ChatContext, plain = false): string {
   const mode = advValue(ctx.chat.scriptstate, 'gen', 'lore_mode') as LoreMode;
   const opts = (m: LoreMode) => loreOptions(ctx.char as never, ctx.chat, m);

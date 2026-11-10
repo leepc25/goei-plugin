@@ -62,4 +62,5 @@ export function parseTraits(text: unknown): Omit<ItemTraits, 'icon' | 'weight'> 
 export const traitsText = (t: Partial<ItemTraits>): string =>
   [t.equip ? EQUIP_LABEL[t.equip] : '', t.uses ? `소모${t.uses}` : t.use ? '사용' : ''].filter(Boolean).join('·') || '-';
 
-export const cleanIcon = (v: unknown): string | undefined => String(v ?? '').toLowerCase().replace(/[^a-z0-9 \-]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40) || undefined;
+/** 그림 칸 「종류/물건말/english」: 한글과 「/」를 지우지 않는다 (2026-11-10: 영어·숫자만 남겨 「옷/코트」가 통째로 사라져 그림이 전부 상자로 나왔다) */
+export const cleanIcon = (v: unknown): string | undefined => String(v ?? '').toLowerCase().replace(/[／|｜]/g, '/').replace(/[^a-z0-9가-힣 /\-]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40) || undefined;

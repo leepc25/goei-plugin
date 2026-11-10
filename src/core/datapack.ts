@@ -2,7 +2,7 @@
 // (goei-data-world.json + goei-data-world.N.txt, goei-data-install.*) 으로 받는다. 빌드(scripts/build.mjs)가 팩마다 지문을 여기 박아 두어
 // 본체는 자기와 맞는 자료만 쓴다 (판이 다르면 다시 받음). 받기·저장은 host/datapack.ts, 여기는 순수 계산(지문 비교·형식 검사·넣기).
 import { setInstallData } from './install';
-import { makeIconIndex, normIcon } from './iconmatch';
+import { iconPoolOn, makeIconIndex, normIcon, pickIconFromPool } from './iconmatch';
 import { textHash } from './texthash';
 import { setWorldData } from './world/records';
 
@@ -95,7 +95,7 @@ export function applyInstallPack(text: string): void {
 //   짧은 낱말이 긴 이름 안에 끼어 먼저 잡히던 것(확성기 → 「성기」, 봉지라면 → 「지라」)은 나머지 조각이 안 맞아 점수가 낮다.
 // ③ 가장 높은 점수가 낮으면(흔한 조각 「키트·상자」만 맞음 등) 공통 그림.
 
-export interface ItemIconRow { k: string[]; h: string[]; ft: string[]; f: string; kind: string; base?: boolean }
+export interface ItemIconRow { k: string[]; h: string[]; ft: string[]; f: string; kind: string; /** 분류(윗말) */ u?: string[]; base?: boolean }
 export interface ItemIconPack {
   table: ItemIconRow[];
   /** 몸통 말(정규화) → 대표 그림 파일 */
@@ -105,14 +105,15 @@ export interface ItemIconPack {
   base: Record<string, string>;
   /** 이름·그림 찾기 낱말 → 그림 파일, 점수가 낮으면 null */
   find: (name: string, icon?: string) => string | null;
+  /** find 와 같되 점수까지 (몸통 말이 맞으면 1, 글자 조각으로 찾았으면 1 미만) */
+  hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number; pool?: string[] } | null;
 }
 
-export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, splitIconWord } from './iconmatch';
+export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
 
 /** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
-function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>): (name: string, icon?: string) => string | null {
-  const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind })), rep, { base });
-  return (name, icon) => m(name, icon)?.file ?? null;
+function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>, same: Record<string, string>, cats: string[] | undefined) {
+  return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same, cats });
 }
 
 /** 소지품 그림 팩 글을 푼다. 형식이 다르면 던진다 */
@@ -128,15 +129,83 @@ export function applyItemsPack(text: string): ItemIconPack {
   const strs = (v: unknown) => (Array.isArray(v) ? v.map((x) => String(x)) : []);
   const table = (j.table as unknown[])
     .filter((r): r is ItemIconRow => obj(r) && typeof r.f === 'string' && typeof r.kind === 'string' && typeof icons[r.f] === 'string')
-    .map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...(r.base ? { base: true } : {}) }));
+    .map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...(Array.isArray(r.u) ? { u: strs(r.u) } : {}), ...(r.base ? { base: true } : {}) }));
   const rep: Record<string, string> = {};
   if (obj(j.rep)) for (const [k, f] of Object.entries(j.rep)) if (typeof f === 'string' && typeof icons[f] === 'string') rep[normIcon(k)] = f;
   const base: Record<string, string> = {};
   for (const r of table) if (r.base) base[r.kind] = r.f;
-  return { table, rep, icons, base, find: makeIconFind(table, rep, base) };
+  const same: Record<string, string> = {};
+  if (obj(j.same)) for (const [k, v] of Object.entries(j.same)) if (typeof v === 'string') same[k] = v;
+  const hit = makeIconFind(table, rep, base, same, Array.isArray(j.cats) ? strs(j.cats) : undefined);
+  return { table, rep, icons, base, hit, find: (name, icon) => hit(name, icon)?.file ?? null };
 }
 
 /** 이름(+모델이 쓴 그림 찾기 낱말) → 그림 파일 (표시 전용). 맞는 게 없으면 공통 그림(base.misc), 그것도 없으면 null */
-export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string): string | null {
-  return pack.find(itemName, icon) ?? pack.base.misc ?? null;
+export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string, seed?: string): string | null {
+  // seed(물건 id)가 있고 이름이 분류 말(과자·다과)이면 그 분류 그림 가운데 물건마다 하나 (2026-11-10 사용자)
+  const h = pack.hit(itemName, icon);
+  if (h?.pool && seed !== undefined && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack.icons[f] === 'string'), seed) ?? h.file;
+  return h?.file ?? pack.base.misc ?? null;
+}
+
+interface PicWords { heads: Set<string>; mods: Set<string> }
+const packWords = new WeakMap<ItemIconPack, Map<string, PicWords>>();
+/** 그림 파일 → 그 그림을 가리키는 말들의 끝 낱말(몸통)·앞 낱말(꾸밈) */
+function wordsOf(pack: ItemIconPack): Map<string, PicWords> {
+  let m = packWords.get(pack);
+  if (!m) {
+    m = new Map();
+    // 같은 그림의 줄이 여럿이라 꾸밈 낱말은 그림마다 모은다
+    const fts = new Map<string, Set<string>>();
+    for (const r of pack.table) {
+      if (!fts.has(r.f)) fts.set(r.f, new Set());
+      for (const t of r.ft) fts.get(r.f)!.add(normIcon(t));
+    }
+    for (const r of pack.table) {
+      let x = m.get(r.f);
+      if (!x) m.set(r.f, (x = { heads: new Set(), mods: new Set() }));
+      const ft = fts.get(r.f)!;
+      for (const t of [...r.k, ...r.h]) {
+        // 괄호 속 꾸밈(「성경책(낡은)」)은 물건 말이 아니다
+        const ws = normIcon(t.replace(/\([^)]*\)/g, ' ')).split(' ').filter(Boolean);
+        // 표의 꾸밈 낱말(ft: 낡은·old)은 끝에 와도 몸통이 아니다 (「성경책 낡은」)
+        ws.forEach((w, i) => (i === ws.length - 1 && !ft.has(w) ? x!.heads : x!.mods).add(w));
+      }
+    }
+    packWords.set(pack, m);
+  }
+  return m;
+}
+
+/** 글 제목(매물 제목처럼 물건 이름 앞뒤에 다른 말이 붙는 글) → 그림 파일. 못 찾으면 null (2026-11-10 사용자: 방검복·라디오조차 안 맞았다).
+ *  물건 이름만 오는 소지품과 달리 제목은 「구형 방검복 상하의 세트」「진공관 라디오 (작동 확인)」처럼 끝 말이 물건이 아닐 때가 많다.
+ *  ① 제목 전체로 찾은 그림이 끝 낱말을 낱말째로 받치면 그것 (「회중시계 고장」 → 부고장 처럼 글자 꼬리만 겹친 것은 아님)
+ *  ② 아니면 앞에서부터 낱말을 늘려 가며 처음으로 그렇게 받쳐지는 그림
+ *  ③ 그래도 없으면 제목 전체로 찾은 그림 */
+export function matchTitleIcon(pack: ItemIconPack, title: string): string | null {
+  const words = normIcon(title).split(' ').filter(Boolean);
+  if (!words.length) return null;
+  const table = wordsOf(pack);
+  // 끝 낱말이 그 그림의 몸통 말과 같거나 한쪽이 다른 쪽의 앞머리 (방독면 = 방독면), 또는 앞 낱말과 앞머리만 겹침 (방검복 ↔ 방검 조끼).
+  // 앞 낱말과 똑같기만 한 것은 꾸밈말이라 아님 (낡은 ↔ 낡은 성경)
+  const pre = (a: string, b: string) => (a.length >= 2 && b.startsWith(a)) || (b.length >= 2 && a.startsWith(b));
+  const backed = (file: string, last: string) => {
+    const x = table.get(file);
+    if (!x) return false;
+    for (const w of x.heads) if (w === last || pre(w, last)) return true;
+    for (const w of x.mods) if (w !== last && pre(w, last)) return true;
+    return false;
+  };
+  const at = (n: number) => {
+    const h = pack.hit(words.slice(0, n).join(' '), undefined, true);
+    return h && h.score >= 1 && backed(h.file, words[n - 1]) ? h.file : null;
+  };
+  const whole = pack.hit(words.join(' '), undefined, true);
+  const first = at(words.length);
+  if (first) return first;
+  for (let n = 1; n < words.length; n++) {
+    const f = at(n);
+    if (f) return f;
+  }
+  return whole?.file ?? null;
 }

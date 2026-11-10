@@ -33,7 +33,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null }
     const wrap = (el) => el && ({
       _el: el,
       setAttribute: async (k, v) => { if (!k.startsWith('x-')) throw new Error('x- only'); el.setAttribute(k, v); },
-      setInnerHTML: async (h) => { el.innerHTML = h; },
+      setInnerHTML: async (h) => { el.innerHTML = String(h).replace(/^\\s*(<style[\\s\\S]*?<\\/style>\\s*)+/i, ''); }, // 실제 Risu(DOMPurify)처럼 맨 앞 <style> 은 지워진다
       getInnerHTML: async () => el.innerHTML,
       setTextContent: async (t) => { el.textContent = t; },
       setStyle: async (k, v) => { el.style[k] = v; },

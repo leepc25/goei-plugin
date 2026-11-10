@@ -1,6 +1,7 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
 import { mallSettingsPane } from './malls';
+import { homeshopSettingsPane } from './homeshop';
 import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
 import { onOffSwitch, switchHtml } from './controls';
 import { repaintTheme } from './theme';
@@ -10,7 +11,6 @@ import {
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
 import { advSections } from './advanced';
-import { loreCheckBox } from './lorecheck';
 import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
@@ -18,7 +18,7 @@ import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars 
 import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON_VAR, pointsAuto, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
 import { pointsFlagFor } from '../core/points';
 import { ICON_ALIAS_DEFAULT, readIconMisses } from '../core/iconmatch';
-import { invOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
+import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -37,7 +37,7 @@ export interface SettingsEnv {
 export const THEME_KEY = '$st_fixed_theme';
 
 export const settingsUi = {
-  page: '' as '' | 'phone' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'wiki' | 'people' | 'journal' | 'factions',
+  page: '' as '' | 'phone' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'wiki' | 'people' | 'journal' | 'factions',
   confirmOff: false,
   busy: false,
   notice: '',
@@ -83,7 +83,7 @@ function seg(action: string, cur: string, items: [string, string][], disabled = 
 /** scope 'chat'·'defaults' = 화면 페이지처럼 범위 전환이 없는 곳에서 그 줄만 다른 범위일 때 (테마) */
 const SCOPE_BADGE = { device: '이 기기', chat: '이 채팅', defaults: '새 채팅 기본값' } as const;
 /** 고유 상점 표 (11-09 사용자: 로어 고유 상점은 설정에서 따로 정한다, 하드코딩 금지). 줄마다 사용·이름·다른 이름·인터넷 사이트·직접 갔을 때 창 */
-const OWN_WEB: [string, string][] = [['none', '없음'], ['cos', '우주 쇼핑몰'], ['bm', '백일몽 포인트몰']];
+const OWN_WEB: [string, string][] = [['none', '없음'], ['cos', '우주 쇼핑몰'], ['bm', '백일몽 포인트몰'], ['hs', '망상홈쇼핑']];
 const OWN_VISIT: [string, string][] = [['shop', '기본 상점창'], ['none', '열지 않음']];
 function ownShopsField(vars: Record<string, unknown> | undefined, busy: boolean): string {
   const list = ownShops(vars);
@@ -267,7 +267,7 @@ export function mainDefaultsPopup(): string {
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
-  const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx, 'gn') : page === 'gal' || page === 'wpf' || page === 'sm' ? gnetSettingsPane(ctx, page) : page === 'cos' || page === 'bm' ? mallSettingsPane(ctx, page) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
+  const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx, 'gn') : page === 'gal' || page === 'wpf' || page === 'sm' ? gnetSettingsPane(ctx, page) : page === 'cos' || page === 'bm' ? mallSettingsPane(ctx, page) : page === 'hs' ? homeshopSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
   // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
   let pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   // 시작 전(시작 패널): 설정 값은 이 채팅에 바로 적히고, 갱신·열기 같은 동작은 시작 뒤에 된다
@@ -407,9 +407,10 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('소지 한도', stepper('set-items-carry', 'n', `${itemCarrySetting(itVars)}kg`, itemCarrySetting(itVars) > ITEM_CARRY_MIN, itemCarrySetting(itVars) < ITEM_CARRY_MAX, '소지 한도', busy), `들 수 있는 무게예요(${ITEM_CARRY_MIN}~${ITEM_CARRY_MAX}kg). 장착한 것까지 모든 물건의 무게를 더해 보여 주고, 넘으면 넘은 만큼 색이 진해져요. 막지는 않고, 본편에는 넘었는지·얼마나 넘었는지만 넘겨요. 고유 인물로 시작하면 명부의 「소지 한도」를 쓰고, 값이 없을 때만 이 값을 써요.${scope === 'chat' && itemWeight(itVars?.[ITEM_CARRY_PC_VAR]) ? ` 이 채팅은 명부 값 ${itemWeight(itVars?.[ITEM_CARRY_PC_VAR])}kg을 써요.` : ''}`),
       field('고치기', seg('set-items-edit', itemEditOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요.'),
       field('지닐 수 있는 한계', `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>`, '모델에 알려 주는 한 줄이에요(Carry limit). 비우면 기본 문장으로 돌아가요.'),
-      // 그림 매칭 (2026-11-09 사용자: 매칭기 재설계) — 모델이 그림 칸에 「종류/물건말」을 쓰고, 종류 안에서 찾고, 없으면 종류 대표 그림. 대체 표와 못 찾은 말은 여기서
-      field('그림 대체 말', `<textarea class="gx-search ms-area" rows="4" data-change="set-items-alias" placeholder="${esc(ICON_ALIAS_DEFAULT)}" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? ''))}</textarea>`, '물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 한 줄에 「외투 → 코트」. 비우면 기본 표(회색 글). 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 그 종류에서 가장 가까운 그림, 그래도 없으면 종류 대표 그림이에요.'),
-      ...(scope === 'chat' ? [field('그림 못 찾은 말', (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → ${x.level === 'kind-near' ? '종류 안 비슷한 그림' : x.level === 'kind-base' ? '종류 대표 그림' : '상자'}</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })(), '이번에 앱을 켠 뒤로 제 그림을 못 찾아 비슷한 그림·대표 그림·상자로 간 물건이에요. 그림을 더 뽑을 때 참고해요.')] : []),
+      // 그림 매칭 (2026-11-09 사용자: 매칭기 재설계) — 모델이 그림 칸에 「종류/물건말」을 쓰고, 종류 안에서 찾고, 없으면 표 전체, 그래도 없으면 상자 (11-10 사용자: 종류 대표 그림은 뜬금없다). 대체 표와 못 찾은 말은 여기서
+      field('그림 대체 말', `<textarea class="gx-search ms-area" rows="4" data-change="set-items-alias" placeholder="${esc(ICON_ALIAS_DEFAULT)}" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? ''))}</textarea>`, '물건 그림을 찾을 때 이름의 끝 말을 바꿔 찾아요. 한 줄에 「외투 → 코트」. 비우면 기본 표(회색 글). 그림은 모델이 「종류/물건말」(옷/코트)로 적은 종류 안에서 먼저 찾고, 없으면 전체에서 찾아요. 그래도 없으면 상자 그림이에요.'),
+      field('분류 말은 골고루', seg('set-items-pool', itemIconPoolOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '물건 이름이 「과자·다과·간식」처럼 세부 이름이 아니라 분류 말이면 그 분류의 그림 가운데 하나를 물건마다 뽑아 보여 줘요. 한 번 정해진 그림은 그 물건에 그대로 남아요. 끄면 분류마다 대표 그림 한 장만 나와요.'),
+      ...(scope === 'chat' ? [field('그림 못 찾은 말', (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → 상자</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })(), '이번에 앱을 켠 뒤로 제 그림을 못 찾아 상자로 간 물건이에요. 그림을 더 뽑을 때 참고해요.')] : []),
       field('본편에 넘길 내용', seg('set-items-detail', itemDetail(itVars), [['full', '전부'], ['state', '이름·판정'], ['name', '이름만']], busy), '[Inventory] 한 줄에 무엇을 넣을지예요. 전부 = 이름·설명·효과·장착·남은 횟수·상태, 이름·판정 = 설명·효과를 빼고, 이름만 = 이름뿐. 물건이 많을 때 줄이면 토큰이 덜 들어요.'),
       field('상태 바꾸기', seg('set-items-state', itemStateOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 보조 모델이 본문을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.'),
       field('다 쓴 물건', seg('set-items-spent', itemsUiSpent(itVars), [['remove', '목록에서 빼기'], ['keep', '남겨 두기']], busy), '남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 본편에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼).'),
@@ -452,7 +453,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       ].join(''));
     })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
-    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {}, [1])}`,
+    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1])}`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0])}`,
     update: `${updateGroup(ctx)}`,
     versus: versusGroup(seg),
@@ -500,6 +501,7 @@ const INV_OPTS: Record<string, { key: string; values: string[]; max?: number; nu
   'set-items-detail': { key: ITEM_DETAIL_VAR, values: ['full', 'state', 'name'] },
   'set-items-state': { key: ITEM_STATE_VAR, values: ['1', '0'] },
   'set-items-edit': { key: ITEM_EDIT_VAR, values: ['1', '0'] },
+  'set-items-pool': { key: ITEM_ICON_POOL_VAR, values: ['1', '0'] },
   'set-items-spent': { key: ITEM_SPENT_VAR, values: ['remove', 'keep'] },
   'set-items-logturns': { key: ITEM_LOGTURNS_VAR, values: [], max: ITEM_LOGTURNS_MAX, num: itemLogTurns },
   'set-wallet-sync': { key: WALLET_SYNC_VAR, values: ['1', '0'] },

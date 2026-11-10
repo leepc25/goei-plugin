@@ -40,6 +40,11 @@ export interface GPost {
   /** 내가 누른 추천·비추 (2026-11-08 시안: 글마다 추천 단추) */
   voted?: boolean;
   down?: boolean;
+  /**
+   * 보관함에서 잠깐 되돌아온 글: 되돌릴 때의 이야기 턴 수 (storyTurns). 그 턴의 본편 응답이 오면 다시 보관함으로 간다
+   * (2026-11-10 사용자: 댓글을 단 그 턴에만 컨텍에 들어가야 한다)
+   */
+  back?: number;
 }
 /** 쪽지 상대와 처음 이어진 공개 글 (원본 T 줄) */
 export interface GSource {
@@ -59,6 +64,11 @@ export interface GDm {
 }
 export interface GState {
   posts: GPost[];
+  /**
+   * 보관함 (2026-11-10 사용자): 새로고침으로 게시판에서 빠진 내 글·스크랩한 글. 「내가 쓴 글」「스크랩」 목록에만 보이고
+   * 게시판 목록·모델 요청·본편 참고(컨텍)에는 들어가지 않는다. 댓글을 달면 게시판으로 되돌아온다 (revivePost)
+   */
+  archive: GPost[];
   dms: GDm[];
   sources: Record<string, GSource>;
   seq: number;
@@ -269,7 +279,7 @@ function fields(line: string): string[] {
   return out;
 }
 
-export const blank = (): GState => ({ posts: [], dms: [], sources: {}, seq: 0 });
+export const blank = (): GState => ({ posts: [], archive: [], dms: [], sources: {}, seq: 0 });
 
 export function decode(raw: unknown): GState {
   const st = blank();
@@ -279,7 +289,8 @@ export function decode(raw: unknown): GState {
     if (p[0] === 'Q' && Number.isFinite(Number(p[1]))) st.seq = Math.max(st.seq, postId(p[1]) ?? 0);
     else if (p[0] === 'T' && p.length >= 6) {
       st.sources[cut(p[1], 80)] = { postid: postId(p[2]) ?? 0, title: p[3], body: p[4], author: cut(p[5], 80), quote: p[6] ?? '', quoteAuthor: p[7] ?? '' };
-    } else if (p[0] === 'P' && p.length >= 9) {
+    } else if ((p[0] === 'P' || p[0] === 'A') && p.length >= 9) {
+      // A = 보관함의 글 (P 와 같은 꼴). 옛 판은 모르는 줄이라 건너뛴다
       const id = postId(p[1]);
       if (id && !map.has(id)) {
         const post: GPost = {
@@ -287,12 +298,13 @@ export function decode(raw: unknown): GState {
           votes: Math.max(0, Math.floor(Number(p[6]) || 0)), body: p[7], mine: p[8] === '1', comments: [],
           ...(p[9] ? { tag: cut(p[9], 12) } : {}), ...(p[10] === '1' ? { scrap: true } : {}),
           ...(p[11] === '1' ? { voted: true } : {}), ...(p[12] === '1' ? { down: true } : {}),
+          ...(p[0] === 'P' && /^\d+$/.test(p[13] ?? '') ? { back: Number(p[13]) } : {}),
         };
-        st.posts.push(post);
+        (p[0] === 'A' ? st.archive : st.posts).push(post);
         map.set(id, post);
         st.seq = Math.max(st.seq, id);
       }
-    } else if (p[0] === 'C' && p.length >= 6) {
+    } else if ((p[0] === 'C' || p[0] === 'AC') && p.length >= 6) {
       const post = map.get(Number(p[1]));
       if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === '1', unread: p[6] === '1', ...(validDate(p[7]) ? { time: validDate(p[7]) } : {}) });
     } else if (p[0] === 'D' && p.length >= 4) {
@@ -301,7 +313,7 @@ export function decode(raw: unknown): GState {
   }
   // 예전 낮은 번호는 한 번만 옮긴다 (원본과 같음)
   if (st.seq < G_POST_BASE) {
-    for (const post of st.posts) post.id += G_POST_BASE;
+    for (const post of [...st.posts, ...st.archive]) post.id += G_POST_BASE;
     for (const s of Object.values(st.sources)) if (s.postid > 0) s.postid += G_POST_BASE;
     st.seq += G_POST_BASE;
   }
@@ -311,8 +323,12 @@ export function decode(raw: unknown): GState {
 export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
-    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0'].join('|'));
+    out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0', ...(p.back !== undefined ? [p.back] : [])].join('|'));
     for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
+  }
+  for (const p of st.archive ?? []) {
+    out.push(['A', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0', en(p.tag ?? ''), p.scrap ? '1' : '0', p.voted ? '1' : '0', p.down ? '1' : '0'].join('|'));
+    for (const c of p.comments) out.push(['AC', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const [nick, s] of Object.entries(st.sources)) out.push(['T', en(nick), s.postid || 0, en(s.title), en(s.body), en(s.author), en(s.quote), en(s.quoteAuthor)].join('|'));
   for (const d of st.dms) out.push(['D', en(d.nick), d.side, en(d.body), d.unread ? '1' : '0', en(d.date)].join('|'));
@@ -320,7 +336,18 @@ export function encode(st: GState): string {
 }
 
 export function readGnet(chat: Chat): GState {
-  return decode(chat.scriptstate?.[GN_RAW]);
+  const st = decode(chat.scriptstate?.[GN_RAW]);
+  // 잠깐 되돌아온 글은 그 턴의 본편 응답이 온 뒤(턴 수가 늘면) 다시 보관함으로. 읽을 때마다 같은 결과라 따로 저장하지 않아도 되고, 다음 저장 때 같이 적힌다
+  if (st.posts.some((p) => p.back !== undefined)) {
+    const turn = storyTurns(chat);
+    const done = st.posts.filter((p) => p.back !== undefined && turn > p.back);
+    if (done.length) {
+      st.posts = st.posts.filter((p) => !done.includes(p));
+      for (const p of done) delete p.back;
+      st.archive = [...done, ...st.archive];
+    }
+  }
+  return st;
 }
 
 /** 생성 도중 게시판이 바뀌었는지 볼 때 쓰는 열쇠 (읽음 표시는 뺀다) */
@@ -335,6 +362,34 @@ export function postKey(p: GPost | undefined): string {
 
 export function findPost(st: GState, id: number): GPost | undefined {
   return st.posts.find((p) => p.id === id);
+}
+/** 게시판 + 보관함에서 찾기 (화면에서 읽기·스크랩·지우기) */
+/** 보관함 (옛 꼴 상태에는 없을 수 있어 여기서 만든다) */
+const shelf = (st: GState): GPost[] => (st.archive ??= []);
+export const findAnyPost = (st: GState, id: number): GPost | undefined => findPost(st, id) ?? shelf(st).find((p) => p.id === id);
+export const archived = (st: GState, id: number): boolean => shelf(st).some((p) => p.id === id);
+/** 게시판에서 빠지는 글 가운데 내 글·스크랩한 글은 보관함으로 (새 것이 앞) */
+function shelve(st: GState, dropped: GPost[]): void {
+  const keep = dropped.filter((p) => (p.mine || p.scrap) && !archived(st, p.id));
+  for (const p of keep) delete p.back;
+  if (keep.length) st.archive = [...keep, ...shelf(st)];
+}
+/**
+ * 보관함의 글을 게시판 맨 앞으로 잠깐 되돌린다 (댓글을 달 때). turn = 지금 이야기 턴 수: 그 턴의 댓글 반응 요청과 다음 본편 요청에만 들어가고,
+ * 본편 응답이 오면 readGnet 이 다시 보관함으로 보낸다. 이미 잠깐 돌아와 있는 글에 또 달면 그 기한만 새로 잡는다. 게시판에 원래 있던 글은 그대로
+ */
+export function revivePost(st: GState, id: number, turn: number): GPost | undefined {
+  const live = findPost(st, id);
+  if (live) {
+    if (live.back !== undefined) live.back = turn;
+    return live;
+  }
+  const i = shelf(st).findIndex((p) => p.id === id);
+  if (i < 0) return undefined;
+  const [p] = st.archive.splice(i, 1);
+  p.back = turn;
+  st.posts.unshift(p);
+  return p;
 }
 
 // ── 시각 ──
@@ -372,8 +427,8 @@ export function postLimit(s: GnetSettings): number {
   return s.counts.post[1];
 }
 
+// 스크랩은 게시판에 붙잡아 두지 않는다 (2026-11-10 사용자: 스크랩했다고 컨텍에 계속 남으면 안 된다) — 빠지면 보관함으로 간다
 export function protectedPost(s: GnetSettings, p: GPost): boolean {
-  if (p.scrap) return true;
   if (p.mine) return s.keepOwn;
   return s.keepReplied && p.comments.some((c) => c.mine);
 }
@@ -394,7 +449,7 @@ export function trimBoard(st: GState, s: GnetSettings): void {
       }
     }
     if (idx < 0) break; // 보호한 글은 상한을 넘어도 지우지 않는다
-    st.posts.splice(idx, 1);
+    shelve(st, st.posts.splice(idx, 1));
   }
 }
 
@@ -481,8 +536,8 @@ export function addUserPost(st: GState, nick: string, title: string, body: strin
   return p;
 }
 
-export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = ''): number {
-  const p = findPost(st, postIdValue);
+export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = '', turn = 0): number {
+  const p = revivePost(st, postIdValue, turn);
   if (!p) throw new GnetError('대상 글이 없어졌어요.');
   if (parent > 0 && !p.comments[parent - 1]) throw new GnetError('답글을 달 댓글이 없어졌어요.');
   p.comments.push({ parent, nick, body: trimTokens(body, LIMITS.comment_tokens), mine: true, unread: false });
@@ -492,8 +547,13 @@ export function addUserComment(st: GState, postIdValue: number, parent: number, 
 
 export function deletePost(st: GState, id: number): boolean {
   const i = st.posts.findIndex((p) => p.id === id && p.mine);
-  if (i < 0) return false;
-  st.posts.splice(i, 1);
+  if (i >= 0) {
+    st.posts.splice(i, 1);
+    return true;
+  }
+  const j = shelf(st).findIndex((p) => p.id === id && p.mine);
+  if (j < 0) return false;
+  st.archive.splice(j, 1);
   return true;
 }
 
@@ -734,6 +794,8 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
   }
   if (!posts.length) throw new GnetError('적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.');
   for (const p of st.posts) if (protectedPost(o.settings, p) && !seen.has(p.id)) posts.push(p);
+  const kept = new Set(posts.map((p) => p.id));
+  shelve(st, st.posts.filter((p) => !kept.has(p.id)));
   st.posts = posts;
   trimBoard(st, o.settings);
   const notice = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : '';

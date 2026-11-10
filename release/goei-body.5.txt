@@ -1,4 +1,163 @@
-f: 90,
+거 약함"
+      },
+      "잼트리>데드폴": {
+        aff: 90,
+        src: "위키 데드폴 「사무실」: 남이 커피 타는 걸 허락하는 드문 예외라는 소문. 근거 약함"
+      },
+      "이도형>고영훈": {
+        aff: 90,
+        src: "위키 이도형 「고영훈」: 부대 운영을 통째로 넘김, 둘 다 그게 편함. 추정"
+      },
+      "고영훈>이도형": {
+        aff: 90,
+        src: "위키 고영훈 「이도형」: 고맙다는 말을 기다리지 않고 부대를 대신 굴림. 추정"
+      },
+      "노기균>윤병수": {
+        aff: 150,
+        src: "대사 JSON close. 위키 노기균 「윤병수」: 입사 동기, 정반대인데 손발이 기가 막히게 맞음"
+      },
+      "윤병수>노기균": {
+        aff: 150,
+        src: "대사 JSON close. 위키 윤병수 「노기균」: 입사 동기, 재능을 찾아 넘기는 분업을 당연하게 여김"
+      },
+      "노기균>송주익": {
+        aff: 90,
+        src: "위키 노기균 「송주익」: 막내를 꽤 아낌(대련에서 사정없이 쓰러뜨리는 방식)"
+      },
+      "송주익>노기균": {
+        aff: 90,
+        src: "위키 송주익 「노기균」: 신입을 넘겨받으면 눈을 반짝임, 패배 보고를 웃으며 받아 주는 선배"
+      },
+      "노기균>이도형": {
+        aff: 90,
+        src: "위키 노기균 「고영훈과 이도형」: 검사부대원의 숭배 + 이도형이 이름을 제대로 부르는 대원"
+      },
+      "이도형>노기균": {
+        aff: 90,
+        src: "위키 노기균: 이도형이 이름을 제대로 부르는 몇 안 되는 경우(간파를 깨친 대원으로 인식)"
+      },
+      "송주익>이도형": {
+        aff: 90,
+        src: "위키 송주익 「이도형」: 부대의 정점이자 존경의 대상, 햄스터를 정성껏 키움"
+      },
+      "송주익>고영훈": {
+        aff: 90,
+        src: "위키 송주익 「고영훈」: 회식 박수 세 번을 받은 날을 수첩에 적어 둠"
+      },
+      "곽성주>조성춘": {
+        aff: 150,
+        src: "대사 JSON close. 위키 곽성주 「조성춘」: 서로를 가장 잘 아는 동료, 탄막으로 옆을 덮어 줌"
+      },
+      "조성춘>곽성주": {
+        aff: 150,
+        src: "대사 JSON close. 위키 조성춘 「곽성주」: 2대 고함, 같은 작전이면 무전이 포화"
+      },
+      "곽성주>이기석": {
+        aff: 90,
+        src: "위키 이기석 「현장 부대들」: 곽성주가 「팔 하나 내놓고 아직도 뛰는 사람」이라며 높이 삼"
+      },
+      "이기석>곽성주": {
+        aff: 90,
+        src: "대사 JSON close. 위키 이기석: 둘 다 인류를 위해 목숨 내놓는 걸 믿는 사람"
+      },
+      "김성진>송진섭": {
+        aff: 150,
+        src: "대사 JSON close. 위키 김성진 「송진섭」: 룸메이트, 위험하면 제일 먼저 달려가 등을 지킴"
+      },
+      "송진섭>김성진": {
+        aff: 90,
+        src: "대사 JSON close. 위키 송진섭 「김성진」: 하나도 안 믿고 중요한 일은 안 맡기지만 등은 맡김"
+      },
+      "송진섭>곽성주": {
+        aff: 90,
+        src: "위키 송진섭 「평가」: 곽성주의 등 뒤에 숨어 레이더를 봄(진압부대 명물)"
+      },
+      "곽성주>송진섭": {
+        aff: 90,
+        src: "위키 송진섭 「평가」: 진압부대 고참들이 막내를 귀여워함, 등 뒤가 붐비는 걸 뿌듯해함. 추정"
+      },
+      "백석주>진나솔": {
+        aff: 150,
+        src: "대사 JSON close. 위키 백석주 「진나솔」: 아끼는 조원, 「우리 나솔이가」로 말을 시작"
+      },
+      "진나솔>백석주": {
+        aff: 90,
+        src: "위키 진나솔 「백석주」: 혀를 차지만 조언대로 일을 끝내 놓음, 효율 언어로 통함"
+      },
+      "백석주>이자헌": {
+        aff: -60,
+        src: "대사 JSON hostile. 위키 백석주 「이자헌」: 조원이 죽을 때 지켜보기만 한 악연, 연례행사처럼 밖으로 불러냄"
+      },
+      "이자헌>백석주": {
+        aff: -25,
+        src: "대사 JSON hostile. 위키 백석주 「이자헌」: 이자헌은 표정 없이 「알겠습니다」 하고 따라나섬(한쪽 원한)"
+      },
+      "이자헌>은하제": {
+        aff: 150,
+        src: "대사 JSON close. 위키 이자헌 「은하제」: 사실상 오른팔, 은하제가 읽고 이자헌이 뚫음"
+      },
+      "은하제>이자헌": {
+        aff: 90,
+        src: "위키 은하제 「이자헌」: 날 선 하십시오체에 한숨이 두 배지만 현장에서는 완벽한 짝"
+      },
+      "이자헌>박민성": {
+        aff: 90,
+        src: "위키 이자헌 「박민성」: D조 기본 대형(앞에서 뜯고 뒤에서 나름), 「오소리 님」"
+      },
+      "박민성>이자헌": {
+        aff: 150,
+        src: "위키 박민성 「이자헌」: 진심으로 따름, 「조장님 옆이 제일 안전해」"
+      },
+      "은하제>박민성": {
+        aff: 150,
+        src: "위키 은하제 「박민성」: 가장 많이 이름을 부르는 사람, 진짜 위험하면 제일 먼저 뛰어듦"
+      },
+      "박민성>은하제": {
+        aff: 150,
+        src: "대사 JSON close. 위키 박민성 「은하제」: 무서워하면서도 제일 의지함"
+      },
+      "이성해>진나솔": {
+        aff: 90,
+        src: "대사 JSON close. 위키 이성해 「진나솔」: 아주 좋아한다고 웃으며 말함(한쪽)"
+      },
+      "이성해>제이": {
+        aff: 90,
+        src: "대사 JSON close. 위키 이성해: 경비팀에 도넛·커피를 들고 가 수다, 제이가 도넛을 좋아함"
+      },
+      "고영은>백사헌": {
+        aff: -60,
+        src: "대사 JSON hostile. 위키 고영은 「백사헌」: 공공연한 앙숙, 대놓고 적대하고 비꼼"
+      },
+      "백사헌>고영은": {
+        aff: -25,
+        src: "대사 JSON hostile. 위키 백사헌 「고영은」: 앙숙이지만 필요하면 옆에서 같이 일함"
+      },
+      "고영은>강이학": {
+        aff: -25,
+        src: "대사 JSON hostile. 위키 강이학 「고영은」: 상극, 구조 우선순위로 꼭 한 번 부딪침"
+      },
+      "강이학>고영은": {
+        aff: -25,
+        src: "대사 JSON hostile. 위키 강이학 「고영은」: 계산해 보고 깔끔하게 물러섬(감정 없는 상극)"
+      },
+      "고영은>장허운": {
+        aff: 90,
+        src: "대사 JSON close. 위키 장허운 「고영은」: 사람으로 대하는 직원과 배치되면 장허운 생존율이 오름"
+      },
+      "장허운>고영은": {
+        aff: 150,
+        src: "대사 JSON close. 위키 장허운 「고영은」: 처음 「괜찮아요?」를 듣고 한참 답 못 함, 볼 때마다 먼저 고개 숙임"
+      },
+      "이연화>고영은": {
+        aff: 90,
+        src: "대사 JSON close. 위키 이연화 「고영은」: 사고 현장에서 말없이 붕대를 나눠 씀"
+      },
+      "고영은>이연화": {
+        aff: 90,
+        src: "위키 이연화 「고영은」: 연구1팀에 들르면 이연화 책상에 캔커피를 놓고 감"
+      },
+      "강이학>백사헌": {
+        aff: 90,
         src: "위키 강이학 「백사헌」: 말이 통하는 몇 안 되는 상대, 「좋은 거래처」"
       },
       "백사헌>강이학": {
@@ -1397,7 +1556,7 @@ f: 90,
     }
     if (faction === "B00" || faction === "C00") {
       const table = [[/사장|ceo/i, 9], [/전무/, 8], [/국장|이사|director/i, 7], [/부장/, 6], [/차장/, 5], [/과장|manager/i, 4], [/대리/, 3], [/주임/, 2], [/사원|직원|staff/i, 1]];
-      for (const [re, n2] of table) if (re.test(r)) return n2;
+      for (const [re, n3] of table) if (re.test(r)) return n3;
       return null;
     }
     if (faction === "E00") {
@@ -1428,7 +1587,7 @@ f: 90,
     if (personLevel === null) return "peer";
     return u > personLevel ? "up" : u < personLevel ? "down" : "peer";
   }
-  function factionCodesIn(text4, extra = {}) {
+  function factionCodesIn(text4, extra2 = {}) {
     const out = [];
     let t = text4;
     for (const [re, code2] of ORG_CODES) {
@@ -1437,7 +1596,7 @@ f: 90,
         t = t.replace(new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g"), " ");
       }
     }
-    for (const [code2, name] of Object.entries(extra)) if (!out.includes(code2) && name && t.includes(name)) out.push(code2);
+    for (const [code2, name] of Object.entries(extra2)) if (!out.includes(code2) && name && t.includes(name)) out.push(code2);
     return out;
   }
 
@@ -1446,11 +1605,11 @@ f: 90,
   var ALIASES = aliases_default;
   var ADDRESS = address_default;
   function seedAddress(name, faction, user) {
-    const row10 = ADDRESS.names[name];
-    if (!row10) return void 0;
-    const rel = relativeRank(user, faction, row10.level);
-    const register = REGISTERS.includes(row10.register) ? row10.register : "존댓말";
-    return { toUser: row10[rel] || row10.outsider || "", register };
+    const row11 = ADDRESS.names[name];
+    if (!row11) return void 0;
+    const rel = relativeRank(user, faction, row11.level);
+    const register = REGISTERS.includes(row11.register) ? row11.register : "존댓말";
+    return { toUser: row11[rel] || row11.outsider || "", register };
   }
   function seedBaseFor(name, userFaction3, user) {
     const b = RELATIONS.people[name];
@@ -1497,7 +1656,7 @@ f: 90,
     const push3 = (c) => {
       if (c && !out.includes(c)) out.push(c);
     };
-    for (const n2 of people) push3(store2.people[n2]?.faction ?? "");
+    for (const n3 of people) push3(store2.people[n3]?.faction ?? "");
     for (const t of texts) for (const c of factionCodesIn(t, names4)) push3(c);
     return out;
   }
@@ -1528,7 +1687,7 @@ f: 90,
     });
     return (pos) => pos < 0 || !days.length ? "" : days[Math.min(pos, days.length - 1)] ?? "";
   }
-  var two5 = (n2) => String(n2).padStart(2, "0");
+  var two5 = (n3) => String(n3).padStart(2, "0");
   var dayOfMinute = (at) => {
     if (at === null) return "";
     const d = new Date(at * 6e4);
@@ -1584,8 +1743,8 @@ f: 90,
       let prev = label2(sumCues(who, base, [], folded, min, max, o));
       for (let i = 0; i < list4.length; i++) {
         if (i + 1 < list4.length && list4[i + 1].anchor === list4[i].anchor) continue;
-        const now = label2(sumCues(who, base, list4.slice(0, i + 1), folded, min, max, o));
-        if (now === prev) continue;
+        const now2 = label2(sumCues(who, base, list4.slice(0, i + 1), folded, min, max, o));
+        if (now2 === prev) continue;
         const c = list4[i];
         const reason3 = [...list4.slice(0, i + 1)].reverse().find((x) => x.anchor === c.anchor && x.reason)?.reason ?? "";
         out.push({
@@ -1594,10 +1753,10 @@ f: 90,
           kind: isFac ? "faction" : "person",
           day: day(posOf(c)),
           title: isFac ? factionName(code2, names4, store2) : who,
-          text: `${isFac ? "평판" : "호감"} ${prev} → ${now}${reason3 ? ` · ${reason3}` : ""}`,
+          text: `${isFac ? "평판" : "호감"} ${prev} → ${now2}${reason3 ? ` · ${reason3}` : ""}`,
           ...isFac ? { faction: code2 } : { person: who }
         });
-        prev = now;
+        prev = now2;
       }
     }
     for (const c of changes) {
@@ -1664,8 +1823,8 @@ f: 90,
     const msg = messages[index3];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
-    const clean5 = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index3, clean5)) return null;
+    const clean6 = cleanOutput(raw);
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index3, clean6)) return null;
     const prev = readPrev(state[PREV_KEY]);
     const pk = index3 > 0 && messages[index3 - 1] ? messageKey(messages[index3 - 1], index3 - 1) : "";
     const reroll = prev?.i === index3 && (prev.pk === void 0 || prev.pk === pk);
@@ -1680,11 +1839,11 @@ f: 90,
     const faction = before.faction;
     const base = parseWorld(before.world);
     const result = applyOutput(base, c, s8, faction, raw, rng);
-    const now = result.faction ?? faction;
+    const now2 = result.faction ?? faction;
     markStart(base, result.world, messageKey(msg, index3));
     const vars = {
-      ...worldVars(result.world, c, s8, now),
-      [LAST_KEY]: fingerprint(index3, clean5)
+      ...worldVars(result.world, c, s8, now2),
+      [LAST_KEY]: fingerprint(index3, clean6)
     };
     if (reroll && !result.faction) {
       vars.$st_faction = before.faction;
@@ -1697,7 +1856,7 @@ f: 90,
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index3] = { ...msg, data: clean5 };
+    message[index3] = { ...msg, data: clean6 };
     const next = { ...chat, message, scriptstate: { ...state, ...vars } };
     const closed = result.world.closed ?? [];
     let made = [];
@@ -1712,7 +1871,7 @@ f: 90,
         changed = r.changed;
       }
       if (closed.length) {
-        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index: index3, world: result.world, closed, catalog: c, faction: now, settings: journalSettings(state) });
+        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index: index3, world: result.world, closed, catalog: c, faction: now2, settings: journalSettings(state) });
         if (built.rows.length) {
           journal = built.journal;
           rec2 = built.reports;
@@ -1824,10 +1983,10 @@ f: 90,
         continue;
       }
       const year = new Date(x).getUTCFullYear();
-      const hit4 = names4.some((n2) => {
-        const from = SUBST_FROM[n2];
+      const hit4 = names4.some((n3) => {
+        const from = SUBST_FROM[n3];
         if (!from || year < from) return false;
-        const lunarGroup = n2 === "설날" || n2 === "추석";
+        const lunarGroup = n3 === "설날" || n3 === "추석";
         return names4.length > 1 || wd === 0 || !lunarGroup && wd === 6;
       });
       if (hit4) owed++;
@@ -1861,8 +2020,8 @@ f: 90,
     const branches = [];
     for (const [viewer, names4] of Object.entries(dir2.display)) {
       if (viewer === "none") continue;
-      const n2 = names4[org.faction];
-      const en2 = n2 ? byName.get(n2) ?? n2 : "";
+      const n3 = names4[org.faction];
+      const en2 = n3 ? byName.get(n3) ?? n3 : "";
       if (en2 && en2 !== def) branches.push([viewer, en2]);
     }
     if (!branches.length) return def;
@@ -1993,9 +2152,9 @@ ${intro}`);
       return c && RELATION_STAGES.includes(c.stage) ? c.stage : "neutral";
     };
     if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf2(a, b) !== "neutral"))) {
-      const no = new Map(members.map((n2, i) => [n2, i + 1]));
-      const legend = members.map((n2) => `${no.get(n2)} ${named2(n2)}`).join(" · ");
-      const head3 = `| viewer \\ target | ${members.map((n2) => no.get(n2)).join(" | ")} |`;
+      const no = new Map(members.map((n3, i) => [n3, i + 1]));
+      const legend = members.map((n3) => `${no.get(n3)} ${named2(n3)}`).join(" · ");
+      const head3 = `| viewer \\ target | ${members.map((n3) => no.get(n3)).join(" | ")} |`;
       const sep = `|---|${members.map(() => "---").join("|")}|`;
       const rows3 = members.map((a) => `| ${no.get(a)} ${named2(a)} | ${members.map((b) => a === b ? "-" : STAGE_MARK[stageOf2(a, b)]).join(" | ")} |`);
       const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`].memo.trim().replace(/\n+/g, " "), dir2)}`));
@@ -2043,7 +2202,7 @@ ${ROSTER_INTRO}`];
         let lastDept = "";
         for (const a of list4) {
           if (a.department !== lastDept) {
-            const note = notes.find((n2) => n2.department === a.department);
+            const note = notes.find((n3) => n3.department === a.department);
             if (note) lines3.push(note.label);
             lastDept = a.department;
           }
@@ -2092,7 +2251,7 @@ ${ROSTER_INTRO}`];
     };
   }
   var keysOf2 = (rec2, fallback) => rec2.keys?.trim() ? rec2.keys.trim() : [...new Set(fallback.filter(Boolean))].join(", ");
-  function entry(kind, name, key, content, folder, order) {
+  function entry(kind, name, key, content, folder, order2) {
     return {
       key,
       secondkey: "",
@@ -2102,7 +2261,7 @@ ${content}
 
 ---`,
       mode: "normal",
-      insertorder: order,
+      insertorder: order2,
       alwaysActive: false,
       selective: false,
       useRegex: false,
@@ -2132,12 +2291,12 @@ ${content}
     for (const kind of ["org", "site", "anomaly", "agent", "appendix"]) {
       const { key, make } = folderKey(base, kind);
       folders[kind] = key;
-      const fresh2 = [...recs[kind].keys()].filter((n2) => !existing.has(n2) && !(kind === "org" && recs.org.get(n2)?.summaryOnly));
-      if (!fresh2.length) continue;
+      const fresh3 = [...recs[kind].keys()].filter((n3) => !existing.has(n3) && !(kind === "org" && recs.org.get(n3)?.summaryOnly));
+      if (!fresh3.length) continue;
       if (make) out.push(make);
-      for (const n2 of fresh2) {
-        names4[kind].push(n2);
-        out.push(entry(kind, n2, recs[kind].get(n2).keys?.trim() ?? "", "", key, ORDER[kind]));
+      for (const n3 of fresh3) {
+        names4[kind].push(n3);
+        out.push(entry(kind, n3, recs[kind].get(n3).keys?.trim() ?? "", "", key, ORDER[kind]));
       }
     }
     const dir2 = readDirectory(out);
@@ -2315,7 +2474,7 @@ ${content}
       else sections3[sections3.length - 1].body.push(line2);
     }
     const fields3 = {};
-    const extra = [];
+    const extra2 = [];
     const map = [];
     const put = (id2, body5) => {
       fields3[id2] = fields3[id2] ? `${fields3[id2]}
@@ -2328,7 +2487,7 @@ ${body5}` : body5;
       const body5 = sec2.body.join("\n").trim();
       if (!sec2.title) {
         if (body5) {
-          if (kind === "agent" && /^- /m.test(body5)) parseAgentLines(body5, "identity", fields3, extra);
+          if (kind === "agent" && /^- /m.test(body5)) parseAgentLines(body5, "identity", fields3, extra2);
           else put(firstText, body5);
           map.push(["(앞글)", firstText]);
         }
@@ -2337,12 +2496,12 @@ ${body5}` : body5;
       if (kind === "agent") {
         const t = sec2.title.toLowerCase();
         if (/identity|정체|기본|신상/.test(t)) {
-          parseAgentLines(body5, "identity", fields3, extra);
+          parseAgentLines(body5, "identity", fields3, extra2);
           map.push([sec2.title, "identity"]);
           continue;
         }
         if (/appearance|외모|외형|looks/.test(t) && /^- /m.test(body5)) {
-          parseAgentLines(body5, "appearance", fields3, extra);
+          parseAgentLines(body5, "appearance", fields3, extra2);
           map.push([sec2.title, "appearance"]);
           continue;
         }
@@ -2358,13 +2517,13 @@ ${body5}` : `##### ${sec2.title}`);
         put(id2, body5);
         map.push([sec2.title, id2]);
       } else {
-        extra.push({ name: sec2.title, value: body5, kind: "block" });
+        extra2.push({ name: sec2.title, value: body5, kind: "block" });
         map.push([sec2.title, `x:${sec2.title}`]);
       }
     }
-    return { fields: fields3, extra, map };
+    return { fields: fields3, extra: extra2, map };
   }
-  function parseAgentLines(body5, sec2, fields3, extra) {
+  function parseAgentLines(body5, sec2, fields3, extra2) {
     let prev = "";
     for (const raw of body5.split("\n")) {
       const m = /^-?\s*\*{0,2}([^:*]{1,30})\*{0,2}\s*[:：]\s*(.*)$/.exec(raw.trim());
@@ -2377,24 +2536,24 @@ ${body5}` : `##### ${sec2.title}`);
         fields3[id2] = m[2].trim();
         prev = id2;
       } else {
-        extra.push({ name: m[1].trim(), value: m[2].trim(), kind: "line", sec: sec2, at: prev });
+        extra2.push({ name: m[1].trim(), value: m[2].trim(), kind: "line", sec: sec2, at: prev });
       }
     }
   }
   function moveField(kind, rec2, id2, dir2) {
-    const order = fieldOrder(kind, rec2);
-    const i = order.indexOf(id2);
+    const order2 = fieldOrder(kind, rec2);
+    const i = order2.indexOf(id2);
     const j = i + dir2;
-    if (i < 0 || j < 0 || j >= order.length) return order;
-    [order[i], order[j]] = [order[j], order[i]];
-    return order;
+    if (i < 0 || j < 0 || j >= order2.length) return order2;
+    [order2[i], order2[j]] = [order2[j], order2[i]];
+    return order2;
   }
   function moveFieldTo(kind, rec2, id2, before) {
-    const order = fieldOrder(kind, rec2).filter((x) => x !== id2);
-    const at = before ? order.indexOf(before) : -1;
-    if (at < 0) order.push(id2);
-    else order.splice(at, 0, id2);
-    return order;
+    const order2 = fieldOrder(kind, rec2).filter((x) => x !== id2);
+    const at = before ? order2.indexOf(before) : -1;
+    if (at < 0) order2.push(id2);
+    else order2.splice(at, 0, id2);
+    return order2;
   }
 
   // src/core/points.ts
@@ -2429,9 +2588,9 @@ ${body5}` : `##### ${sec2.title}`);
   function pointsOn(chat) {
     return colConfig(chat.scriptstate).points !== "off" || readPoints(chat.scriptstate).log.length > 0;
   }
-  function recentPointLines(w, alive, n2) {
-    if (n2 <= 0) return [];
-    return liveWallet(w, alive).filter((e) => e.memo !== POINTS_SYNC_MEMO).slice(-n2).map((e) => `${e.amount > 0 ? "+" : ""}${e.amount.toLocaleString("en-US")} p ${e.memo}`);
+  function recentPointLines(w, alive, n3) {
+    if (n3 <= 0) return [];
+    return liveWallet(w, alive).filter((e) => e.memo !== POINTS_SYNC_MEMO).slice(-n3).map((e) => `${e.amount > 0 ? "+" : ""}${e.amount.toLocaleString("en-US")} p ${e.memo}`);
   }
   var POINTS_SYNC_MEMO = "상태창 포인트";
   function syncPointsToStatus(w, chat) {
@@ -2443,9 +2602,9 @@ ${body5}` : `##### ${sec2.title}`);
     const tags = findStatusTags(typeof m.data === "string" ? m.data : "");
     let target = null;
     for (let k = tags.length - 1; k >= 0; k--) {
-      const n2 = tags[k].points ? Number(tags[k].points) : NaN;
-      if (Number.isSafeInteger(n2) && Math.abs(n2) <= WALLET_MAX) {
-        target = n2;
+      const n3 = tags[k].points ? Number(tags[k].points) : NaN;
+      if (Number.isSafeInteger(n3) && Math.abs(n3) <= WALLET_MAX) {
+        target = n3;
         break;
       }
     }
@@ -2459,8 +2618,8 @@ ${body5}` : `##### ${sec2.title}`);
     const next = diff === 0 ? base : addWalletEntry(base, { id: id2, anchor, amount: diff, memo: POINTS_SYNC_MEMO, src: "story" });
     return JSON.stringify(next) === JSON.stringify(w) ? null : next;
   }
-  function formatPoints(n2) {
-    return `${n2 < 0 ? "−" : ""}${Math.abs(Math.trunc(n2)).toLocaleString("en-US")} p`;
+  function formatPoints(n3) {
+    return `${n3 < 0 ? "−" : ""}${Math.abs(Math.trunc(n3)).toLocaleString("en-US")} p`;
   }
   function parsePoints(text4) {
     const t = String(text4 ?? "").replace(/\s+/g, "");
@@ -2468,13 +2627,13 @@ ${body5}` : `##### ${sec2.title}`);
     const sign = /^[-−]/.test(t) ? -1 : 1;
     const body5 = t.replace(/^[-−+]/, "").replace(/(p|P|포인트|points?)$/i, "").replace(/,/g, "");
     if (/^\d+$/.test(body5)) {
-      const n3 = Number(body5);
-      return Number.isSafeInteger(n3) ? sign * n3 : null;
+      const n4 = Number(body5);
+      return Number.isSafeInteger(n4) ? sign * n4 : null;
     }
     const m = /^(?:(\d+(?:\.\d+)?)억)?(?:(\d+(?:\.\d+)?)만)?(?:(\d+)천)?(?:(\d+)백)?(\d+)?$/.exec(body5);
     if (!m || m.slice(1).every((x) => x === void 0)) return null;
-    const n2 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
-    return Number.isSafeInteger(n2) && n2 > 0 ? sign * n2 : null;
+    const n3 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
+    return Number.isSafeInteger(n3) && n3 > 0 ? sign * n3 : null;
   }
   function mentionsPoints(text4) {
     return /\d[\d,]*\s*(?:p\b|P\b|포인트|points?\b)|\d+\s*(?:억|만|천)\s*포인트/i.test(text4);
@@ -2511,16 +2670,16 @@ ${body5}` : `##### ${sec2.title}`);
   var kv = (rows3) => `<span class="gst-tip"><span class="gst-kv">${rows3.map(([k, v]) => `<i>${esc(k)}</i><em>${esc(v)}</em>`).join("")}</span></span>`;
   function statusHtml(tag, ctx2) {
     const hid = (id2) => !!ctx2.hide?.has(id2);
-    const now = statusMinute(tag.date, tag.time);
+    const now2 = statusMinute(tag.date, tag.time);
     const day = hid("date") ? null : dayInfo(tag.date);
     const rows3 = [];
     const tl = ctx2.timeline;
     const prev = tl?.prev.get(tag.raw.trim());
-    if (now !== null && prev !== void 0) rows3.push(["지난 장면", sceneLabel(prev, now)], ["흐른 시간", elapsedLabel(prev, now)]);
+    if (now2 !== null && prev !== void 0) rows3.push(["지난 장면", sceneLabel(prev, now2)], ["흐른 시간", elapsedLabel(prev, now2)]);
     const start3 = ctx2.timeline?.start;
-    if (now !== null && start3 !== null && start3 !== void 0 && now >= start3) {
+    if (now2 !== null && start3 !== null && start3 !== void 0 && now2 >= start3) {
       const s8 = new Date(start3 * 6e4);
-      rows3.push(["시작부터", `${storyDay(start3, now)}일째 · ${s8.getUTCMonth() + 1}월 ${s8.getUTCDate()}일 시작`]);
+      rows3.push(["시작부터", `${storyDay(start3, now2)}일째 · ${s8.getUTCMonth() + 1}월 ${s8.getUTCDate()}일 시작`]);
     }
     const clock4 = tag.time && !hid("time") ? `<span class="gst-clock"${rows3.length ? ' data-gst-tip="1"' : ""}>${esc(tag.time)}${rows3.length ? kv(rows3) : ""}</span>` : "";
     let date = "";
@@ -2535,16 +2694,16 @@ ${body5}` : `##### ${sec2.title}`);
     const target = tag.target && !hid("target") ? `<div class="gst-ln gst-tgt">${AIM}<span>${linkTerms(tag.target, ctx2.terms)}</span></div>` : "";
     let cash = "";
     if (tag.wallet && !hid("wallet")) {
-      const n2 = Number(tag.wallet);
+      const n3 = Number(tag.wallet);
       const pw = tl?.prevWallet.get(tag.raw.trim());
-      const delta = pw === void 0 ? 0 : n2 - pw;
-      cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n2))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span></div>`;
+      const delta = pw === void 0 ? 0 : n3 - pw;
+      cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n3))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span></div>`;
     }
     if (tag.points && !hid("points")) {
-      const n2 = Number(tag.points);
+      const n3 = Number(tag.points);
       const pp = tl?.prevPoints?.get(tag.raw.trim());
-      const delta = pp === void 0 ? 0 : n2 - pp;
-      const pts3 = `<span class="gst-pt">${esc(formatPoints(n2))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span>`;
+      const delta = pp === void 0 ? 0 : n3 - pp;
+      const pts3 = `<span class="gst-pt">${esc(formatPoints(n3))}${delta ? `<small class="${delta > 0 ? "gst-up" : "gst-down"}">${esc(formatDelta(delta))}</small>` : ""}</span>`;
       cash = cash ? cash.replace(/<\/div>$/, `${pts3}</div>`) : `<div class="gst-ln gst-cash">${CASH}${pts3}</div>`;
     }
     return `<div class="gst" data-goei-status="1">${top}${place3}${target}${cash}</div>`;
@@ -2937,8 +3096,8 @@ ${themeVars("[x-goei-fab]")}
   // src/host/chatclicks.ts
   var handlers = /* @__PURE__ */ new Map();
   var listening = false;
-  function onChatClick(name, run5) {
-    handlers.set(name, { run: run5, armed: handlers.get(name)?.armed ?? false });
+  function onChatClick(name, run6) {
+    handlers.set(name, { run: run6, armed: handlers.get(name)?.armed ?? false });
   }
   function armChatClick(name) {
     const h = handlers.get(name);
@@ -2972,9 +3131,9 @@ ${themeVars("[x-goei-fab]")}
     if (Array.isArray(got)) return got;
     const sa = got;
     if (!sa || typeof sa.length !== "function" || typeof sa.at !== "function") return [];
-    const n2 = await sa.length();
+    const n3 = await sa.length();
     const out = [];
-    for (let i = 0; i < n2; i++) out.push(await sa.at(i));
+    for (let i = 0; i < n3; i++) out.push(await sa.at(i));
     return out;
   }
   async function hit2(el, x, y) {
@@ -3009,14 +3168,20 @@ ${themeVars("[x-goei-fab]")}
   KIND_OF["etc"] = "misc";
   function splitIconWord(icon) {
     const raw = String(icon ?? "").trim();
+    const words = (rest) => {
+      const ps = rest.split(/\s*[/／|｜]\s*/).map((x) => x.trim()).filter(Boolean);
+      const ko = ps.find((x) => /[가-힣]/.test(x));
+      const en2 = ps.find((x) => !/[가-힣]/.test(x));
+      return ko ? { word: ko, en: en2 ?? "" } : { word: en2 ?? "", en: "" };
+    };
     const m = /^([^/／:：|｜]+?)\s*[/／:：|｜]\s*(.*)$/.exec(raw);
     if (m) {
       const k = KIND_OF[normIcon(m[1])];
-      if (k) return { kind: k, word: m[2].trim() };
+      if (k) return { kind: k, ...words(m[2]) };
     }
     const k1 = KIND_OF[normIcon(raw)];
-    if (k1) return { kind: k1, word: "" };
-    return { kind: "", word: raw };
+    if (k1) return { kind: k1, word: "", en: "" };
+    return { kind: "", ...words(raw) };
   }
   function parseIconAliases(text4) {
     const out = {};
@@ -3029,8 +3194,13 @@ ${themeVars("[x-goei-fab]")}
     }
     return out;
   }
-  var ICON_ALIAS_DEFAULT = ["외투 → 코트", "점퍼 → 재킷", "안정수 → 안정제", "캡슐 → 알약", "영양 바 → 에너지바", "바 → 에너지바", "속옷 → 팬티", "내의 → 팬티"].join("\n");
+  var ICON_ALIAS_DEFAULT = ["외투 → 코트", "점퍼 → 재킷", "안정수 → 안정제", "캡슐 → 알약", "영양 바 → 에너지바", "영양바 → 에너지바", "숙취해소제 → 숙취 음료", "택배 → 택배 상자", "소설책 → 책", "알 → 계란", "하이라이터 → 형광펜", "다마고치 → 게임기", "인라인 → 인라인 스케이트", "선스틱 → 선크림", "곱창밴드 → 머리끈", "렌즈케이스 → 콘택트렌즈 통", "콘택트렌즈 → 콘택트렌즈 통", "약상자 → 구급상자", "나이프 → 칼", "정원가위 → 원예 가위", "전지가위 → 원예 가위", "간식 → 과자", "온수매트 → 전기장판", "종이가방 → 쇼핑백", "여행가방 → 캐리어", "햇반 → 즉석밥", "링거팩 → 링거", "인슐린 → 인슐린 펜", "DVD → CD", "바 → 에너지바", "속옷 → 팬티", "내의 → 팬티"].join("\n");
   var aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
+  var poolOn = true;
+  function setIconPool(on2) {
+    poolOn = on2;
+  }
+  var iconPoolOn = () => poolOn;
   function setIconAliases(text4) {
     aliases = parseIconAliases(text4 && text4.trim() ? text4 : ICON_ALIAS_DEFAULT);
   }
@@ -3170,15 +3340,17 @@ ${themeVars("[x-goei-fab]")}
     const head3 = words[words.length - 1];
     return { words, head: head3, mods: words.slice(0, -1), ko: /[가-힣]/.test(head3), joined: words.join("") };
   }
-  function sameHead(q, p2) {
+  function sameHead(q, p2, pre = false) {
     if (q.head === p2.head) return { qPre: "", pPre: "" };
     if (!q.ko || !p2.ko) return null;
+    if (GENERIC.has(p2.head)) return null;
     if (p2.head.length >= 2 && q.head.endsWith(p2.head)) return { qPre: q.head.slice(0, -p2.head.length), pPre: "" };
     if (q.head.length >= 2 && p2.head.endsWith(q.head)) return { qPre: "", pPre: p2.head.slice(0, -q.head.length) };
     if (q.head.length >= 2 && p2.joined.endsWith(q.head) && p2.joined.length > q.head.length) return { qPre: "", pPre: p2.joined.slice(0, -q.head.length), whole: true };
+    if (pre && q.head.length >= 2 && p2.head.length > q.head.length && p2.head.startsWith(q.head)) return { qPre: "", pPre: "", pre: true };
     return null;
   }
-  function makeHeadIndex(rows3, reps) {
+  function makeHeadIndex(rows3, reps, pre = false) {
     const items = rows3.map((r) => {
       const kws = new Set(r.keywords.map(normIcon).filter(Boolean));
       const ps = [];
@@ -3186,7 +3358,7 @@ ${themeVars("[x-goei-fab]")}
         const h = headOf(t);
         if (h) ps.push({ t, kw: kws.has(t), ...h });
       }
-      return { file: r.file, ps, name: ps[0]?.joined.length ?? 99 };
+      return { file: r.file, ps, name: ps[0]?.joined.length ?? 99, words: new Set(ps.flatMap((p2) => p2.words)) };
     });
     const df = /* @__PURE__ */ new Map();
     for (const it of items) for (const w of new Set(it.ps.flatMap((p2) => p2.words))) df.set(w, (df.get(w) ?? 0) + 1);
@@ -3208,7 +3380,15 @@ ${themeVars("[x-goei-fab]")}
       return { s: hit4 - HEAD_EXTRA * pOnly - Q_EXTRA * qOnly, hit: hit4, plain: pm.length === 0 && p2.kw };
     };
     const find = (text4) => {
-      const q = headOf(text4);
+      let q = headOf(text4);
+      if (q && q.ko && !GENERIC.has(q.head)) {
+        const g2 = [...GENERIC].find((x) => /[가-힣]/.test(x) && q.head.length > x.length && q.head.endsWith(x));
+        if (g2) {
+          const whole = findIn(q, false);
+          if (whole && whole.s >= 1e6) return whole;
+          q = headOf([...q.mods, q.head.slice(0, -g2.length), g2].join(" "));
+        }
+      }
       if (q && GENERIC.has(q.head) && q.mods.length) {
         const whole = findIn(q, false);
         if (whole && whole.s >= 1e6) return whole;
@@ -3216,7 +3396,7 @@ ${themeVars("[x-goei-fab]")}
         while (words.length > 1 && GENERIC.has(words[words.length - 1])) words.pop();
         if (words.length === q.words.length || GENERIC.has(words[words.length - 1])) return null;
         const rest = findIn(headOf(words.join(" ")), true);
-        if (rest && (rest.hit || rest.plain)) return rest;
+        if (rest && (rest.hit || rest.plain)) return { ...rest, kw: false, loose: true };
         if (MACHINE.has(q.head) && /[가-힣]$/.test(words[words.length - 1])) return { file: "", s: 0, hit: 0, plain: false, isRep: 0, name: 0, retry: [...words.slice(0, -1), words[words.length - 1] + "기"].join(" ") };
         return null;
       }
@@ -3225,23 +3405,25 @@ ${themeVars("[x-goei-fab]")}
     function findIn(q, useRep) {
       if (!q) return null;
       const r = reps[q.words.join(" ")];
-      if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0 };
+      if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0, kw: !!items.find((it) => it.file === r)?.ps.some((p2) => p2.kw && p2.joined === q.joined) };
       let best = null;
       for (const it of items) {
         let top = null;
         for (const p2 of it.ps) {
           if (p2.joined === q.joined) {
-            top = { s: 1e6, hit: 1, plain: true };
+            top = { s: 1e6, hit: 1, plain: true, kw: p2.kw };
             break;
           }
-          const h = sameHead(q, p2);
+          const h = sameHead(q, p2, pre);
           if (!h) continue;
           const m = modScore(q, p2, h);
-          if (!top || m.s > top.s) top = m;
+          const extra2 = [...q.mods, ...h.qPre ? [h.qPre] : []];
+          const m2 = !m.hit && extra2.some((w) => w.length >= 2 && it.words.has(w)) ? { ...m, s: m.s + 1, hit: 1e-3 } : m;
+          if (!top || m2.s > top.s) top = { ...m2, more: extra2.length > 0, ph: p2.head };
         }
         if (!top) continue;
-        const isRep = reps[q.head] === it.file ? 1 : 0;
-        const better = !best || top.s > best.s + 1e-9 || Math.abs(top.s - best.s) <= 1e-9 && (isRep > best.isRep || isRep === best.isRep && it.name < best.name);
+        const isRep = reps[q.head] === it.file || !!top.ph && reps[top.ph] === it.file ? 1 : 0;
+        const better = !best || top.s > best.s + 1e-9 || Math.abs(top.s - best.s) <= 1e-9 && (+!!top.kw > +!!best.kw || !!top.kw === !!best.kw && (isRep > best.isRep || isRep === best.isRep && it.name < best.name));
         if (better) best = { file: it.file, ...top, isRep, name: it.name };
       }
       const repOf = () => useRep && !GENERIC.has(q.head) && reps[q.head] ? { file: reps[q.head], s: 0, hit: 0, plain: true, isRep: 1, name: 0 } : null;
@@ -3252,23 +3434,73 @@ ${themeVars("[x-goei-fab]")}
     return find;
   }
   function aliased(text4) {
-    const n2 = normIcon(text4);
-    if (!n2) return "";
-    if (aliases[n2]) return aliases[n2];
-    const q = headOf(n2);
-    if (!q) return n2;
+    const n3 = normIcon(text4);
+    if (!n3) return "";
+    if (aliases[n3]) return aliases[n3];
+    const q = headOf(n3);
+    if (!q) return n3;
     let idx = q.words.length - 1;
     while (idx > 0 && GENERIC.has(q.words[idx])) idx--;
     if (idx > 0 && aliases[`${q.words[idx - 1]} ${q.words[idx]}`]) return [...q.words.slice(0, idx - 1), aliases[`${q.words[idx - 1]} ${q.words[idx]}`], ...q.words.slice(idx + 1)].join(" ");
     if (aliases[q.words[idx]]) return [...q.words.slice(0, idx), aliases[q.words[idx]], ...q.words.slice(idx + 1)].join(" ");
-    return n2;
+    return n3;
   }
+  var SPECIAL_KIND = /* @__PURE__ */ new Set(["adult", "body"]);
   var KIND_MIN = 0.25;
   function makeIconIndex(rows3, rep = {}, opts = {}) {
     const reps = {};
     for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
-    const head3 = makeHeadIndex(rows3, reps);
-    const frag = makeFragIndex(rows3, reps);
+    const plainRows = rows3.filter((r) => !SPECIAL_KIND.has(r.kind ?? ""));
+    const plainFiles = new Set(plainRows.map((r) => r.file));
+    const plainReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => plainFiles.has(f)));
+    const special = /* @__PURE__ */ new Map();
+    const specialName = /* @__PURE__ */ new Map();
+    for (const r of rows3) {
+      if (!SPECIAL_KIND.has(r.kind ?? "")) continue;
+      for (const k of r.keywords ?? []) {
+        const j = normIcon(k).replace(/ /g, "");
+        if (j && !special.has(j)) special.set(j, r.file);
+      }
+      const n0 = normIcon((r.keywords ?? [])[0] ?? "").replace(/ /g, "");
+      if (n0 && !specialName.has(n0)) specialName.set(n0, r.file);
+      for (const k of r.phrases ?? []) {
+        if (/[가-힣]/.test(k)) continue;
+        const j = normIcon(k).replace(/ /g, "");
+        if (j.length < 3) continue;
+        if (!special.has(j)) special.set(j, r.file);
+        if (!specialName.has(j)) specialName.set(j, r.file);
+      }
+    }
+    const byName = /* @__PURE__ */ new Map();
+    for (const r of rows3) {
+      const n0 = normIcon((r.keywords ?? [])[0] ?? "").replace(/ /g, "");
+      if (!n0) continue;
+      const l = byName.get(n0) ?? [];
+      l.push({ file: r.file, kind: r.kind ?? "" });
+      byName.set(n0, l);
+    }
+    const exactName = (t, kind, same4 = false) => {
+      const l = t ? byName.get(normIcon(t).replace(/ /g, "")) : void 0;
+      if (!l) return null;
+      const own = l.find((x) => x.kind === kind);
+      if (!own && same4 && kind) return null;
+      return { file: (own ?? l[0]).file, score: 1 };
+    };
+    const headPlain = makeHeadIndex(plainRows, plainReps);
+    const head3 = (t, sp = true) => {
+      const h = headPlain(t);
+      if (h && h.s >= 1e6) return h;
+      const tj = normIcon(t).replace(/ /g, "");
+      const mp = sp ? special : specialName;
+      const f = mp.get(tj) ?? (/^[a-z0-9]+s$/.test(tj) ? mp.get(tj.replace(/s$/, "")) : void 0);
+      return f ? { file: f, s: 1e6, hit: 1, plain: true, isRep: 0, name: 0, kw: true } : h;
+    };
+    const frag = makeFragIndex(plainRows, plainReps);
+    const headPre = makeHeadIndex(plainRows, plainReps, true);
+    const pre = (t) => {
+      const h = t ? headPre(t) : null;
+      return h && h.file ? h : null;
+    };
     const kinds = /* @__PURE__ */ new Map();
     const kindIndex = (k) => {
       let x = kinds.get(k);
@@ -3276,62 +3508,142 @@ ${themeVars("[x-goei-fab]")}
         const sub = rows3.filter((r) => r.kind === k);
         const files = new Set(sub.map((r) => r.file));
         const subReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => files.has(f)));
-        x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files } : { head: () => null, frag: () => null, files };
+        x = sub.length ? { head: makeHeadIndex(sub, subReps), frag: makeFragIndex(sub, subReps, KIND_MIN), files, special: SPECIAL_KIND.has(k) } : { head: () => null, frag: () => null, files, special: SPECIAL_KIND.has(k) };
         kinds.set(k, x);
       }
       return x;
     };
     const rank3 = (h) => !h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1;
     const hit4 = (h) => h ? { file: h.file, score: 1 } : null;
-    const core = (name, word, K) => {
-      const hi = word ? head3(word) : null;
-      const hn = name ? head3(name) : null;
+    const core = (name, word, en2, K, strict) => {
+      const hi = word ? head3(word, !K) : null;
+      const he = en2 ? head3(en2, !K) : null;
+      const hn = name ? head3(name, !K) : null;
       if (hi?.retry || hn?.retry) {
         const ok = !hi?.retry && hi || !hn?.retry && hn;
         if (ok) return hit4(ok);
-        return (hn?.retry ? core(hn.retry, "", K) : null) || (hi?.retry ? core(hi.retry, "", K) : null) || frag(name, word);
+        return (hn?.retry ? core(hn.retry, "", en2, K, strict) : null) || (hi?.retry ? core(hi.retry, "", en2, K, strict) : null) || frag(name, word);
       }
       if (rank3(hn) === 3 && (!K || K.files.has(hn.file))) return hit4(hn);
       if (K) {
-        const ki = word ? K.head(word) : null;
-        const kn = name ? K.head(name) : null;
-        const k = rank3(ki) >= 2 ? ki : rank3(kn) >= 1 ? kn : ki;
-        return hit4(k);
+        const kh = (t) => {
+          const x = K.head(t);
+          return x && x.file ? x : null;
+        };
+        const ki = word ? kh(word) : null;
+        const ke = en2 ? kh(en2) : null;
+        const kn = name ? kh(name) : null;
+        const k = rank3(ki) >= 2 ? ki : rank3(ke) >= 2 ? ke : rank3(kn) >= 1 ? kn : ki || ke;
+        if (k && k === ke && rank3(ke) === 1 && !ki && !kn) {
+          const ko = (hi && hi.file ? hi : null) || (hn && hn.file ? hn : null) || (strict ? null : pre(word) || pre(name));
+          if (ko) return hit4(ko);
+          const kf = frag(name, word);
+          if (kf) return kf;
+        }
+        const lit = (h2, kx) => !!kx && (rank3(kx) < 3 && kx.hit === 0 && !!kx.more && rank3(h2) === 3 || !kx.kw && !!h2?.kw);
+        const same4 = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
+        if (k && same4 && same4.file !== k.file && !K.special) return hit4(same4);
+        if (k) return hit4(k);
+        const g2 = rank3(hi) >= 2 ? hi : rank3(he) >= 2 ? he : hi || hn;
+        if (g2 && g2.file) return hit4(g2);
+        const soft = strict ? null : hit4(pre(word) || pre(name)) || frag(name, word);
+        return soft || (he && he.file ? hit4(he) : null);
       }
       const koName = !!hn && hn.file !== "" && rank3(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word);
       const h = koName || rank3(hn) > rank3(hi) || rank3(hn) === 3 ? hn : hi || hn;
       if (h) return hit4(h);
-      return frag(name, word);
+      if (he) return hit4(he);
+      return frag(name, word) || (strict ? null : hit4(pre(word) || pre(name)));
     };
-    return (name0, icon) => {
-      const { kind, word: w0 } = splitIconWord(icon);
+    const flat = (t) => normIcon(t).replace(/ /g, "");
+    const groups = /* @__PURE__ */ new Map();
+    for (const r of rows3) for (const u of r.up ?? []) {
+      const f = flat(u);
+      const l = groups.get(f) ?? [];
+      l.push({ file: r.file, kind: r.kind ?? "" });
+      groups.set(f, l);
+    }
+    const sameMap = opts.same ?? {};
+    const cats = opts.cats ? new Set(opts.cats.map(flat)) : null;
+    const members = (t) => {
+      const n3 = normIcon(t);
+      if (!n3) return null;
+      const f0 = flat(n3);
+      const singular = /^[a-z0-9]+$/.test(f0) ? [f0.replace(/ies$/, "y"), f0.replace(/es$/, ""), f0.replace(/s$/, "")].filter((x) => x !== f0 && x.length >= 3) : [];
+      for (const c of [f0, aliases[n3] ? flat(aliases[n3]) : "", ...singular]) {
+        if (!c) continue;
+        const cat = sameMap[c];
+        if (cat?.startsWith("@")) return { ms: rows3.filter((r) => r.kind === cat.slice(1)).map((r) => ({ file: r.file, kind: r.kind ?? "" })), cat: "" };
+        const g2 = cat ? flat(cat) : c;
+        if (groups.has(g2) && (!cats || cats.has(g2))) return { ms: groups.get(g2), cat: cat ?? "" };
+      }
+      return null;
+    };
+    const POOL_SKIP = /* @__PURE__ */ new Set(["adult", "body", "anomaly"]);
+    const poolOf = (ms, kind) => {
+      const own = POOL_SKIP.has(kind) ? ms.filter((x) => x.kind === kind) : [];
+      const plain2 = ms.filter((x) => !POOL_SKIP.has(x.kind));
+      const use = own.length ? own : plain2.length * 2 >= ms.length ? plain2 : ms;
+      return [...new Set(use.map((x) => x.file))].sort();
+    };
+    const base = (name0, icon, strict) => {
+      const { kind, word: w0, en: en2 } = splitIconWord(icon);
+      const K = kind ? kindIndex(kind) : null;
       const keep = (t) => {
-        const n2 = normIcon(t);
-        return !!n2 && rank3(head3(n2)) === 3;
+        const n3 = normIcon(t);
+        if (!n3) return false;
+        const h = head3(n3, !kind);
+        return rank3(h) === 3 && !h.loose && (!!h.kw || h.s >= 1e9) || !!K && ((x) => rank3(x) === 3 && !x.loose)(K.head(n3));
       };
+      const ex = exactName(name0, kind) ?? exactName(w0, kind, true);
+      if (ex) return ex;
       const name = keep(name0) ? normIcon(name0) : aliased(name0);
       const word = keep(w0) ? normIcon(w0) : aliased(w0);
-      const K = kind ? kindIndex(kind) : null;
-      const found = core(name, word, K);
+      const found = core(name, word, normIcon(en2), K, !!strict);
       if (found) return found;
       if (!K) {
         noteMiss({ name: name0, icon: icon ?? "", level: "none", file: "" });
         return null;
       }
-      const near = K.frag(name, word);
-      if (near) {
-        noteMiss({ name: name0, icon: icon ?? "", level: "kind-near", file: near.file });
-        return near;
-      }
-      const base = opts.base?.[kind];
-      noteMiss({ name: name0, icon: icon ?? "", level: base ? "kind-base" : "none", file: base ?? "" });
-      return base ? { file: base, score: 0 } : null;
+      noteMiss({ name: name0, icon: icon ?? "", level: "none", file: "" });
+      return null;
     };
+    return (name0, icon, strict) => {
+      const hit0 = base(name0, icon, strict);
+      if (strict) return hit0;
+      const { kind, word: w0, en: en2 } = splitIconWord(icon);
+      const kindOnly = kind ? ICON_KIND_LABEL[kind] ?? "" : "";
+      let g2 = members(name0);
+      if (!g2 && !exactName(name0, kind)) {
+        g2 = (normIcon(name0) !== normIcon(w0) ? members(w0) : null) ?? (en2 ? members(en2) : null);
+        if (g2) {
+          const byNameOnly = base(name0, kindOnly, false);
+          if (byNameOnly && byNameOnly.score >= 1) return g2.ms.some((x) => x.file === byNameOnly.file) ? byNameOnly : hit0;
+        }
+      }
+      if (!g2) return hit0;
+      const pool = poolOf(g2.ms, kind);
+      if (pool.length < 2) return hit0;
+      const first = (g2.cat ? base(g2.cat, kindOnly, false) : null) ?? hit0;
+      return { file: first?.file ?? pool[0], score: first?.score ?? 1, pool };
+    };
+  }
+  function pickIconFromPool(pool, seed2) {
+    let best = pool[0];
+    let top = -1;
+    for (const f of pool) {
+      let h = 2166136261;
+      const t = `${seed2}|${f}`;
+      for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619);
+      const v = (h ^ h >>> 15) >>> 0;
+      if (v > top) top = v, best = f;
+    }
+    return best;
   }
 
   // src/core/advanced.ts
   var chip = (key, label2, def, v) => ({ key, label: label2, type: "bool", def: String(def), ...v ? { v } : {} });
-  var num3 = (key, label2, def, min, max, unit, extra = {}) => ({ key, label: label2, type: "num", def, min, max, unit, ...extra });
+  var num3 = (key, label2, def, min, max, unit, extra2 = {}) => ({ key, label: label2, type: "num", def, min, max, unit, ...extra2 });
   var TOK = "토큰";
   var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" });
   var turns = (def) => num3("turns", "채팅 참고", def, 0, 200, "턴", { zero: "안 봄" });
@@ -3478,8 +3790,8 @@ ${themeVars("[x-goei-fab]")}
     if (item2.type === "bool") return s8 === "1" || s8 === "0" ? s8 : null;
     if (item2.type === "pick") return item2.opts?.some(([v]) => v === s8) ? s8 : null;
     if (item2.type === "text") return s8.slice(0, 120);
-    const n2 = Number(s8);
-    return Number.isInteger(n2) && n2 >= (item2.min ?? 0) && n2 <= (item2.max ?? Infinity) ? String(n2) : null;
+    const n3 = Number(s8);
+    return Number.isInteger(n3) && n3 >= (item2.min ?? 0) && n3 <= (item2.max ?? Infinity) ? String(n3) : null;
   }
   function advValue(state, f, key) {
     const item2 = advItem(f, key);
@@ -3576,7 +3888,7 @@ ${themeVars("[x-goei-fab]")}
     let out = messages;
     const steps = texts.thoughts?.trim();
     if (steps && s8.thoughts !== "off") {
-      const block4 = s8.thoughts === "note" ? `# Thoughts
+      const block5 = s8.thoughts === "note" ? `# Thoughts
 ${NOTE_HEAD}
 
 ${steps}
@@ -3587,7 +3899,7 @@ ${INNER_HEAD}
 ${steps}`;
       out = editSystem(out, (sys) => `${sys}
 
-${block4}`);
+${block5}`);
     }
     const memo = texts.memo;
     if (s8.memo && memo && memo.persona.trim()) {
@@ -3626,7 +3938,9 @@ ${memo.job.trim()}
   var SHOP_OWN_VAR = "$sh_own";
   var OWN_SHOPS_DEFAULT = [
     { id: "cos", on: true, name: "우주 쇼핑몰", alias: "", web: "cos", visit: "shop" },
-    { id: "bm", on: true, name: "백일몽 포인트몰", alias: "포인트몰, 복지몰", web: "bm", visit: "" }
+    { id: "bm", on: true, name: "백일몽 포인트몰", alias: "포인트몰, 복지몰", web: "bm", visit: "" },
+    // 망상홈쇼핑 (2026-11-11): 화면·앱으로 방송을 보면(@web) 방송 사이트를 연다. 직접 간 곳(방청석·쇼룸)의 창은 아직 없다
+    { id: "hs", on: true, name: "망상홈쇼핑", alias: "망상 홈쇼핑, 망상홈쇼핑 라이브", web: "hs", visit: "" }
   ];
   var WEB_OWNER = "@web";
   var OWN_MAX = 40;
@@ -3647,7 +3961,7 @@ ${memo.job.trim()}
   }
   var ownNames = (o) => [o.name, ...o.alias.split(/[,，、]/)].map((x) => x.trim()).filter(Boolean);
   function ownShopOf(vars, shop) {
-    return ownShops(vars).find((o) => o.on && o.name && ownNames(o).some((n2) => sameShopName(n2, shop))) ?? null;
+    return ownShops(vars).find((o) => o.on && o.name && ownNames(o).some((n3) => sameShopName(n3, shop))) ?? null;
   }
   var webSiteOfOwner = (owner) => /^@web:([a-z0-9_-]{1,12})$/i.exec(owner.trim())?.[1] ?? "";
   var SHOP_TURNS_DEFAULT = 3;
@@ -3696,8 +4010,8 @@ ${memo.job.trim()}
     return [Math.min(lo, hi), Math.max(lo, hi)];
   }
   function numIn(v, def, lo, hi) {
-    const n2 = Number(v);
-    return v === void 0 || v === "" || !Number.isFinite(n2) ? def : Math.max(lo, Math.min(hi, Math.round(n2)));
+    const n3 = Number(v);
+    return v === void 0 || v === "" || !Number.isFinite(n3) ? def : Math.max(lo, Math.min(hi, Math.round(n3)));
   }
   var shopOn = (vars) => shopSettings(vars).on;
   var TAG3 = /\[\s*shop\s*[:：]\s*([^\]|｜]*?)\s*(?:[|｜]\s*([^\]]*?)\s*)?\]/giu;
@@ -3765,13 +4079,13 @@ ${memo.job.trim()}
           const { use: _u, uses: _n, equip: _e, icon: _i, weight: _w, ...rest } = x;
           return { ...rest, ...traitsOf(x), desc: clean2(x.desc, 120), effect: clean2(x.effect, 60) };
         }).slice(0, 40),
-        talk: (Array.isArray(o.talk) ? o.talk : []).filter((l) => !!l && (l.who === "me" || l.who === "owner") && typeof l.text === "string").map((l) => ({ who: l.who, text: l.text, ...typeof l.note === "string" && l.note ? { note: l.note } : {}, ...typeof l.quote === "string" && l.quote ? { quote: l.quote } : {} })).slice(-40),
+        talk: (Array.isArray(o.talk) ? o.talk : []).filter((l) => !!l && (l.who === "me" || l.who === "owner") && typeof l.text === "string").map((l) => ({ who: l.who, text: l.text, ...typeof l.note === "string" && l.note ? { note: l.note } : {}, ...typeof l.quote === "string" && l.quote ? { quote: l.quote } : {}, ...typeof l.k === "string" && l.k ? { k: l.k } : {} })).slice(-40),
         closed: !!o.closed,
         prev: Array.isArray(o.prev) ? o.prev.filter((x) => typeof x === "string").slice(-40) : [],
         sell: readOffer(o.sell),
         sales: (Array.isArray(o.sales) ? o.sales : []).filter((x) => !!x && typeof x === "object" && typeof x.name === "string" && Number.isSafeInteger(x.price)).slice(-40),
         ...Array.isArray(o.quotes) && o.quotes.length ? { quotes: o.quotes.filter((q) => !!q && typeof q === "object" && typeof q.id === "string" && Number.isSafeInteger(q.price) && Number.isFinite(q.hours) && !!q.item && typeof q.item.name === "string").slice(-20) } : {},
-        ...Array.isArray(o.notes) && o.notes.length ? { notes: o.notes.filter((n2) => !!n2 && typeof n2 === "object" && typeof n2.id === "string" && typeof n2.title === "string" && Number.isSafeInteger(n2.price) && typeof n2.body === "string").slice(-20) } : {}
+        ...Array.isArray(o.notes) && o.notes.length ? { notes: o.notes.filter((n3) => !!n3 && typeof n3 === "object" && typeof n3.id === "string" && typeof n3.title === "string" && Number.isSafeInteger(n3.price) && typeof n3.body === "string").slice(-20) } : {}
       };
     } catch {
       return null;
@@ -3828,13 +4142,13 @@ ${webRaw}` };
     if (same4 && !message) return null;
     return { vars: shopVars(next), ...message ? { message } : {} };
   }
-  function shortWon(n2) {
-    const a = Math.abs(Math.trunc(n2));
+  function shortWon(n3) {
+    const a = Math.abs(Math.trunc(n3));
     if (a >= 1e8) {
       const eok = a / 1e8;
-      return `${n2 < 0 ? "−" : ""}${eok >= 100 ? Math.round(eok) : Math.round(eok * 10) / 10}억`;
+      return `${n3 < 0 ? "−" : ""}${eok >= 100 ? Math.round(eok) : Math.round(eok * 10) / 10}억`;
     }
-    return `${n2 < 0 ? "−" : ""}${a.toLocaleString("en-US")}`;
+    return `${n3 < 0 ? "−" : ""}${a.toLocaleString("en-US")}`;
   }
   var hash3 = (text4) => {
     let h = 2166136261;
@@ -3849,8 +4163,8 @@ ${webRaw}` };
   var ShopError = class extends Error {
   };
   function priceOf(s8) {
-    const n2 = parseWon(s8.replace(/[^\d억만천백,.₩원\-−]/g, ""));
-    return n2 !== null && n2 >= 0 ? n2 : null;
+    const n3 = parseWon(s8.replace(/[^\d억만천백,.₩원\-−]/g, ""));
+    return n3 !== null && n3 >= 0 ? n3 : null;
   }
   function costOf(cell3) {
     const parts = cell3.split(/\s*[+＋]\s*/).map((x) => x.trim()).filter(Boolean);
@@ -3907,9 +4221,9 @@ ${webRaw}` };
     return m ? m[1].trim() : "";
   }
   function parseShelf(raw, known) {
-    const shelf = block2(raw, "shelf");
-    if (!shelf) throw new ShopError("응답에 <shelf> 블록이 없어요.");
-    const items = shelf.split("\n").map(parseLine).filter((x) => !!x);
+    const shelf2 = block2(raw, "shelf");
+    if (!shelf2) throw new ShopError("응답에 <shelf> 블록이 없어요.");
+    const items = shelf2.split("\n").map(parseLine).filter((x) => !!x);
     if (!items.length) throw new ShopError(`<shelf> 블록에 읽을 수 있는 물건 줄이 없어요 (${SHOP_LINE}).`);
     let identity = known ?? EMPTY_ID;
     const idText = block2(raw, "shop-identity");
@@ -3924,10 +4238,10 @@ ${webRaw}` };
   function pointPrice(x) {
     const m = x.pay && /^([\d,]+)\s*(?:p|P|포인트|points?)$/i.exec(x.pay.trim());
     if (!m) return x;
-    const n2 = Number(m[1].replace(/,/g, ""));
-    if (!Number.isSafeInteger(n2)) return x;
+    const n3 = Number(m[1].replace(/,/g, ""));
+    if (!Number.isSafeInteger(n3)) return x;
     const { pay: _p, ...rest } = x;
-    return { ...rest, price: x.price + n2 };
+    return { ...rest, price: x.price + n3 };
   }
   function parseTalk(raw) {
     const owner = clean2(block2(raw, "owner"), 400);
@@ -3941,10 +4255,11 @@ ${webRaw}` };
       const body6 = (of[2] ?? "").trim();
       if (of[0].toLowerCase().includes("none") || /^(none|no|x|-|거절|안)/i.test(body6)) out.offer = null;
       else {
-        const n2 = priceOf(body6);
-        if (n2 !== null) out.offer = n2;
+        const n3 = priceOf(body6);
+        if (n3 !== null) out.offer = n3;
       }
     }
+    if (/<deal\s*\/?>/i.test(raw)) out.deal = true;
     const ord = block2(raw, "order");
     if (ord) {
       const q = parseOrderLine(ord.split("\n").find((l) => l.includes("|")) ?? "");
@@ -3953,9 +4268,9 @@ ${webRaw}` };
     const inf = block2(raw, "info");
     if (inf) {
       const [title2 = "", price = "", ...rest] = inf.split("|");
-      const n2 = priceOf(price);
+      const n3 = priceOf(price);
       const text4 = clean2(rest.join("|"), 400);
-      if (title2.trim() && n2 !== null && n2 > 0 && text4) out.info = { title: clean2(title2, 24), price: n2, body: text4 };
+      if (title2.trim() && n3 !== null && n3 > 0 && text4) out.info = { title: clean2(title2, 24), price: n3, body: text4 };
     }
     const body5 = m ? m[2] : "";
     if (mode2 === "all") {
@@ -3981,7 +4296,7 @@ ${webRaw}` };
     }
     return out;
   }
-  var itemId = (key, name, n2) => `s_${hash3(`${key}|${normName(name)}|${n2}`)}`;
+  var itemId = (key, name, n3) => `s_${hash3(`${key}|${normName(name)}|${n3}`)}`;
   function withIds(st, list4, exclude = []) {
     const out = [];
     let rare = exclude.some((x) => x.tag === "rare" && !x.sold);
@@ -4013,16 +4328,16 @@ ${webRaw}` };
   }
   function dropItemsNamed(st, names4) {
     if (!names4.length) return st;
-    return { ...st, items: st.items.filter((x) => x.sold || !names4.some((n2) => sameShopName(n2, x.name))), prev: st.prev.filter((p2) => !names4.some((n2) => sameShopName(n2, p2))) };
+    return { ...st, items: st.items.filter((x) => x.sold || !names4.some((n3) => sameShopName(n3, x.name))), prev: st.prev.filter((p2) => !names4.some((n3) => sameShopName(n3, p2))) };
   }
   function applyTalk(st, r0, kick = true) {
     const r = st.identity.points ? { ...r0, all: r0.all.map(pointPrice), add: r0.add.map(pointPrice), reprice: r0.reprice.map(pointPrice) } : r0;
     let items = st.items.slice();
     if (r.mode === "all") {
-      const fresh2 = withIds(st, r.all, items.filter((x) => x.sold));
-      if (fresh2.length) items = [...items.filter((x) => x.sold), ...fresh2];
+      const fresh3 = withIds(st, r.all, items.filter((x) => x.sold));
+      if (fresh3.length) items = [...items.filter((x) => x.sold), ...fresh3];
     } else if (r.mode === "partial") {
-      for (const n2 of r.remove) items = items.filter((x) => x.sold || !sameShopName(x.name, n2));
+      for (const n3 of r.remove) items = items.filter((x) => x.sold || !sameShopName(x.name, n3));
       for (const p2 of r.reprice) {
         items = items.map((x) => {
           if (x.sold || !sameShopName(x.name, p2.name) || p2.price === x.price && (p2.pay ?? "") === (x.pay ?? "")) return x;
@@ -4034,7 +4349,7 @@ ${webRaw}` };
     }
     let notes = st.notes ?? [];
     let noteId = "";
-    if (r.info && !notes.some((n2) => n2.title === r.info.title)) {
+    if (r.info && !notes.some((n3) => n3.title === r.info.title)) {
       noteId = `n${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
       notes = [...notes, { id: noteId, ...r.info }].slice(-20);
     }
@@ -4052,6 +4367,10 @@ ${webRaw}` };
         const rp = r.reprice.find((p2) => sameShopName(p2.name, sell.name));
         if (rp && !rp.pay) price = rp.price;
       }
+      if (price === void 0 && sell.price === void 0) {
+        const figs = [...new Set((r.owner.match(/\d[\d,]*\s*(?:만\s*)?(?:원|포인트|P\b|p\b)/g) ?? []).map((x) => priceOf(x.replace(/포인트|[Pp]/g, ""))).filter((n3) => n3 !== null && n3 > 0))];
+        if (figs.length === 1) price = figs[0];
+      }
       if (price !== void 0) {
         const first = sell.first ?? (typeof sell.price === "number" && price !== null && price !== sell.price ? sell.price : void 0);
         sell = { ...sell, price, ...first !== void 0 ? { first } : {} };
@@ -4066,12 +4385,16 @@ ${webRaw}` };
     return { ...st, quotes: (st.quotes ?? []).map((x) => x.id === id2 ? { ...x, accepted: true, ...key ? { acceptedKey: key } : {} } : x) };
   }
   function buyNote(st, id2, key = "") {
-    const n2 = (st.notes ?? []).find((x) => x.id === id2 && !x.bought);
-    if (!n2) return null;
+    const n3 = (st.notes ?? []).find((x) => x.id === id2 && !x.bought);
+    if (!n3) return null;
     return { ...st, notes: (st.notes ?? []).map((x) => x.id === id2 ? { ...x, bought: true, ...key ? { boughtKey: key } : {} } : x) };
   }
   function startSell(st, it) {
     return { ...st, sell: { itemId: it.itemId, name: clean2(it.name, 30), desc: clean2(it.desc, 120), effect: clean2(it.effect, 60), ...traitsOf(it), ...it.truth ? { truth: clean2(it.truth, 60) } : {}, ...Number.isSafeInteger(it.paid) ? { paid: it.paid } : {} } };
+  }
+  function stampLastLine(st, key) {
+    if (!key || !st.talk.length) return st;
+    return { ...st, talk: st.talk.map((l, i) => i === st.talk.length - 1 ? { ...l, k: key } : l) };
   }
   var cancelSell = (st) => ({ ...st, sell: null });
   function closeSale(st) {
@@ -4097,7 +4420,7 @@ ${webRaw}` };
     return {
       ...st,
       items: st.items.map((x) => x.sold && dead(x.soldKey) ? drop(x, "sold", "soldKey") : x),
-      ...st.notes ? { notes: st.notes.map((n2) => n2.bought && dead(n2.boughtKey) ? drop(n2, "bought", "boughtKey") : n2) } : {},
+      ...st.notes ? { notes: st.notes.map((n3) => n3.bought && dead(n3.boughtKey) ? drop(n3, "bought", "boughtKey") : n3) } : {},
       ...st.quotes ? { quotes: st.quotes.map((q) => q.accepted && dead(q.acceptedKey) ? drop(q, "accepted", "acceptedKey") : q) } : {}
     };
   }
@@ -4184,7 +4507,7 @@ ${first ? "가게 정체·주인 첫 대사·진열대" : "진열대 새로 짜�
   function talkPrompt(src, s8, guide = "Shop") {
     const st = src.st;
     const secret = guide === "Cos" && shelfItems(st).some((x) => x.truth);
-    const shelf = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? "-"}|${x.weight ?? "-"}|${x.desc}|${x.effect}|${x.tag === "rare" ? "희귀" : x.tag === "sale" && x.was ? `특가:${x.was}` : ""}${secret ? `|${x.truth ?? "-"}` : ""}`).join("\n") || "(empty)";
+    const shelf2 = shelfItems(st).map((x) => `${x.name}|${x.price}|${traitsText(x)}|${x.icon ?? "-"}|${x.weight ?? "-"}|${x.desc}|${x.effect}|${x.tag === "rare" ? "희귀" : x.tag === "sale" && x.was ? `특가:${x.was}` : ""}${secret ? `|${x.truth ?? "-"}` : ""}`).join("\n") || "(empty)";
     const secretNote = secret ? "\n(last column = what each item REALLY does; ? means not even the catalogue knows. The buyer cannot see it. The 운영자 knows it and never states it: answer on the listed basics, deflect or withhold the rest, invent nothing beyond the listing.)" : "";
     const sold = soldItems(st).map((x) => x.name).join(", ");
     const o = st.sell;
@@ -4203,7 +4526,7 @@ ${first ? "가게 정체·주인 첫 대사·진열대" : "진열대 새로 짜�
     ].filter(Boolean).join("\n\n");
     const talk = st.talk.map((l) => `${l.who === "me" ? "[주인공]" : "[주인]"} ${l.text}`).join("\n");
     const sales = st.sales.map((x) => `${x.name} (${x.price})`).join(", ");
-    const notes = (st.notes ?? []).map((n2) => `${n2.title} (${n2.price}${n2.bought ? ", bought" : ", not bought"})`).join(", ");
+    const notes = (st.notes ?? []).map((n3) => `${n3.title} (${n3.price}${n3.bought ? ", bought" : ", not bought"})`).join(", ");
     const quotes = (st.quotes ?? []).map((q) => `${q.item.name} (${q.price} won, ${q.hours}h${q.accepted ? ", paid and ordered" : ", not accepted"})`).join(", ");
     const selling = o ? `
 
@@ -4215,7 +4538,7 @@ ${o.name}|${traitsText(o)}|${o.desc || "-"}|${o.effect || "-"}${o.truth ? `
     return craft([{ role: "system", content: system }, { role: "user", content: `${material(src, s8)}
 
 [지금 진열대]
-${shelf}${secretNote}${sold ? `
+${shelf2}${secretNote}${sold ? `
 
 [이번 방문에 산 것]
 ${sold}` : ""}${sales ? `
@@ -4264,524 +4587,215 @@ ${rule}`.trim();
     return { pick: pick3, by: pick3 !== "main" && runs ? "updater" : "main", fallback: pick3 === "updater" && !runs };
   }
 
-  // src/core/items.ts
-  var ITEMS_VAR = "$st_items";
-  var ITEM_USE_VAR = "$st_item_use";
-  var ITEM_USE_AT_VAR = "$st_item_use_at";
-  var ITEM_SLOTS_VAR = "$it_slots";
-  var ITEM_LIMIT_VAR = "$it_limit";
-  var ITEM_ICON_ALIAS_VAR = "$it_icon_alias";
-  var ITEM_PUSH_VAR = "$it_push";
-  var ITEM_AUTO_VAR = "$it_auto";
-  var ITEM_SLOTS_DEFAULT = 16;
-  var ITEM_SLOTS_MIN = 8;
-  var ITEM_SLOTS_MAX = 40;
-  var ITEM_LIMIT_DEFAULT = "가방 하나와 주머니, 두 손";
-  var ITEM_CARRY_VAR = "$it_carry";
-  var ITEM_CARRY_PC_VAR = "$it_carry_pc";
-  var ITEM_CARRY_DEFAULT = 25;
-  var ITEM_CARRY_MIN = 1;
-  var ITEM_CARRY_MAX = 300;
-  var ITEM_EDIT_VAR = "$it_edit";
-  var itemEditOn = (vars) => vars?.[ITEM_EDIT_VAR] === "1";
-  var isItem2 = (e) => {
-    const x = e;
-    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && typeof x.anchor === "string" && (x.from === "store" || x.from === "story" || x.from === "manual");
-  };
-  var isLog = (e) => {
-    const x = e;
-    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.name === "string" && typeof x.what === "string";
-  };
-  var clean3 = (s8, max) => String(s8 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
-  function normItem(x) {
-    const { uses: u0, equip: e0, slot: s0, icon: i0, weight: w0, ...rest } = x;
-    const uses = itemUses(u0);
-    const weight = itemWeight(w0);
-    const equip = itemEquip(e0);
-    const slot2 = equip && Number.isSafeInteger(s0) && s0 >= 0 && s0 < EQUIP_SLOTS[equip] ? s0 : void 0;
-    const icon = cleanIcon(i0);
-    return {
-      ...rest,
-      desc: clean3(x.desc, 80),
-      effect: clean3(x.effect, 60),
-      use: x.use === true || !!uses,
-      state: itemState(x.state),
-      ...uses ? { uses } : {},
-      ...equip ? { equip } : {},
-      ...slot2 !== void 0 ? { slot: slot2 } : {},
-      ...icon ? { icon } : {},
-      ...weight !== void 0 ? { weight } : {}
-    };
-  }
-  function readItems(vars) {
-    const raw = vars?.[ITEMS_VAR];
-    const empty2 = { list: [], log: [] };
-    if (vars?.[ITEM_SPENT_VAR] === "keep") empty2.keep = true;
-    if (typeof raw !== "string" || !raw.trim()) return empty2;
+  // src/core/orders.ts
+  var COS_ORDERS_KEY = "$cos_orders";
+  var COS_ORDERS_MAX = 12;
+  function readOrders(vars) {
+    const raw = String(vars?.[COS_ORDERS_KEY] ?? "");
+    if (!raw) return [];
     try {
-      const o = JSON.parse(raw);
-      if (!o || typeof o !== "object") return empty2;
-      const list4 = (Array.isArray(o.list) ? o.list.filter(isItem2) : []).map(normItem).slice(-200);
-      return { list: list4, log: Array.isArray(o.log) ? o.log.filter(isLog).slice(-400) : [], ...vars?.[ITEM_SPENT_VAR] === "keep" ? { keep: true } : {} };
-    } catch {
-      return empty2;
-    }
-  }
-  var itemsVars = (it) => ({ [ITEMS_VAR]: JSON.stringify({ list: it.list, log: it.log }) });
-  function itemUsed(it, id2, alive) {
-    let n2 = 0;
-    for (const l of it.log) if (l.what === "use" && l.item === id2 && (!l.anchor || alive.has(l.anchor))) n2 += l.n ?? 1;
-    return n2;
-  }
-  function itemLeft(it, e, alive) {
-    return e.uses === void 0 ? void 0 : Math.max(0, e.uses - itemUsed(it, e.id, alive));
-  }
-  function liveItems(it, alive) {
-    return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && (it.keep || e.uses === void 0 || (itemLeft(it, e, alive) ?? 1) > 0));
-  }
-  function equippedOf(list4) {
-    const out = { weapon: Array(EQUIP_SLOTS.weapon).fill(void 0), gear: Array(EQUIP_SLOTS.gear).fill(void 0) };
-    for (const e of list4) if (e.equip && e.slot !== void 0 && !out[e.equip][e.slot]) out[e.equip][e.slot] = e;
-    return out;
-  }
-  var isEquipped = (e, list4) => !!e.equip && e.slot !== void 0 && equippedOf(list4)[e.equip][e.slot]?.id === e.id;
-  var gridItems = (list4) => list4.filter((e) => !isEquipped(e, list4));
-  function equipItem(it, alive, id2, slot2) {
-    const live = liveItems(it, alive);
-    const cur = live.find((x) => x.id === id2);
-    if (!cur?.equip) return it;
-    const occ = equippedOf(live)[cur.equip];
-    const at = slot2 ?? occ.findIndex((x) => !x);
-    if (!Number.isSafeInteger(at) || at < 0 || at >= EQUIP_SLOTS[cur.equip]) return it;
-    const other = occ[at];
-    return {
-      ...it,
-      list: it.list.map((x) => {
-        if (x.id === id2) return { ...x, slot: at };
-        if (other && x.id === other.id && other.id !== id2) {
-          const { slot: _s, ...rest } = x;
-          return rest;
-        }
-        return x;
-      })
-    };
-  }
-  function unequipItem(it, id2) {
-    const cur = it.list.find((x) => x.id === id2);
-    if (!cur || cur.slot === void 0) return it;
-    const { slot: _s, ...rest } = cur;
-    return { ...it, list: it.list.map((x) => x.id === id2 ? rest : x) };
-  }
-  var liveItemsOf = (it, chat) => liveItems(it, aliveAnchors(chat));
-  var hash4 = (text4) => {
-    let h = 2166136261;
-    for (const ch of text4) {
-      h ^= ch.codePointAt(0);
-      h = Math.imul(h, 16777619);
-    }
-    return (h >>> 0).toString(36);
-  };
-  var normName2 = (s8) => clean3(s8, 30).toLowerCase().replace(/[\s·.,'"「」()]/g, "");
-  var sameItemName = (a, b) => normName2(a) === normName2(b) && normName2(a) !== "";
-  var itemId2 = (anchor, name) => `i_${hash4(`${anchor}|${normName2(name)}`)}`;
-  function withTraits(cur, p2) {
-    const next = { ...cur };
-    if (p2.uses !== void 0) {
-      const u = itemUses(p2.uses);
-      if (u) next.uses = u;
-      else delete next.uses;
-    }
-    if (p2.use !== void 0) next.use = !!p2.use;
-    if (next.uses) next.use = true;
-    if (p2.equip !== void 0) {
-      const eq = itemEquip(p2.equip);
-      if (eq !== next.equip) delete next.slot;
-      if (eq) next.equip = eq;
-      else delete next.equip;
-    }
-    if (p2.state !== void 0) next.state = itemState(p2.state);
-    if (p2.icon !== void 0) {
-      const ic2 = cleanIcon(p2.icon);
-      if (ic2) next.icon = ic2;
-      else delete next.icon;
-    }
-    if (p2.weight !== void 0 && p2.weight !== null && p2.weight !== "") {
-      const w = itemWeight(p2.weight);
-      if (w !== void 0) next.weight = w;
-    }
-    return next;
-  }
-  var paidNote = (e) => [Number.isSafeInteger(e.price) && (e.price > 0 || !e.paidWith) ? `₩ ${e.price.toLocaleString("en-US")}` : "", e.paidWith ? clean3(e.paidWith, 60) : ""].filter(Boolean).join(" + ");
-  function addItem(it, alive, e) {
-    const name = clean3(e.name, 30);
-    if (!name) return it;
-    const desc = clean3(e.desc, 80);
-    const effect = clean3(e.effect, 60);
-    const truth = e.truth ? clean3(e.truth, 60) : "";
-    const text4 = e.text ? clean3(e.text, 400) : "";
-    const quote = e.quote ? clean3(e.quote, 120) : void 0;
-    const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
-    if (found) {
-      const addUses = itemUses(e.uses);
-      const stack = !!addUses && found.uses !== void 0;
-      const more = stack ? { uses: Math.min(999, found.uses + addUses) } : { uses: e.uses };
-      const weight = found.weight !== void 0 ? void 0 : e.weight;
-      const next = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...truth ? { truth } : {}, ...quote ? { quote } : {} };
-      if (JSON.stringify(next) === JSON.stringify(found)) return it;
-      return { ...it, list: it.list.map((x) => x.id === found.id ? next : x) };
-    }
-    const id2 = e.id ?? itemId2(e.anchor, name);
-    if (it.list.some((x) => x.id === id2)) return it;
-    const row10 = withTraits({
-      id: id2,
-      name,
-      desc,
-      effect,
-      use: false,
-      state: "ok",
-      from: e.from,
-      anchor: e.anchor,
-      at: e.at ?? (/* @__PURE__ */ new Date()).toISOString(),
-      ...Number.isSafeInteger(e.price) ? { price: e.price } : {},
-      ...e.walletId ? { walletId: e.walletId } : {},
-      ...e.paidWith ? { paidWith: clean3(e.paidWith, 60) } : {},
-      ...truth ? { truth } : {},
-      ...text4 ? { text: text4 } : {},
-      ...quote ? { quote } : {}
-    }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
-    const got = addItemLog(it, { name, item: id2, ...row10.icon ? { icon: row10.icon } : {}, what: "get", by: e.from, anchor: e.anchor, ...quote ? { quote } : {}, ...paidNote(e) ? { note: paidNote(e) } : {}, at: row10.at });
-    const out = { ...got, list: [...got.list, row10].slice(-200) };
-    return e.wear && row10.equip ? equipItem(out, alive, id2) : out;
-  }
-  function updateItem(it, id2, patch) {
-    const cur = it.list.find((x) => x.id === id2);
-    if (!cur) return it;
-    const next = {
-      ...withTraits(cur, patch),
-      ...patch.name !== void 0 && clean3(patch.name, 30) ? { name: clean3(patch.name, 30) } : {},
-      ...patch.desc !== void 0 ? { desc: clean3(patch.desc, 80) } : {},
-      ...patch.effect !== void 0 ? { effect: clean3(patch.effect, 60) } : {}
-    };
-    return { ...it, list: it.list.map((x) => x.id === id2 ? next : x) };
-  }
-  function setItemLeft(it, alive, id2, left) {
-    const cur = it.list.find((x) => x.id === id2);
-    if (!cur || cur.uses === void 0 || !Number.isSafeInteger(left) || left < 0) return it;
-    const uses = Math.min(999, left + itemUsed(it, id2, alive));
-    if (uses < 1 || uses === cur.uses) return it;
-    return { ...it, list: it.list.map((x) => x.id === id2 ? { ...x, uses } : x) };
-  }
-  var logId = (what, anchor, name, n2) => `l_${hash4(`${what}|${anchor}|${normName2(name)}|${n2}`)}`;
-  function addItemLog(it, l) {
-    const id2 = l.id ?? logId(l.what, l.anchor, l.name, it.log.length);
-    if (it.log.some((x) => x.id === id2)) return it;
-    const row10 = { ...l, id: id2, name: clean3(l.name, 30), at: l.at ?? (/* @__PURE__ */ new Date()).toISOString(), ...l.quote ? { quote: clean3(l.quote, 120) } : {}, ...l.note ? { note: clean3(l.note, 60) } : {} };
-    return { ...it, log: [...it.log, row10].slice(-400) };
-  }
-  function removeItem(it, id2, what, by, anchor = "", extra = {}) {
-    const cur = it.list.find((x) => x.id === id2);
-    if (!cur) return it;
-    return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id2) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what, by, anchor, ...extra });
-  }
-  function sellItem(it, id2, anchor, note) {
-    const cur = it.list.find((x) => x.id === id2);
-    if (!cur || !anchor) return it;
-    const { slot: _slot, ...rest } = cur;
-    return addItemLog({ ...it, list: it.list.map((x) => x.id === id2 ? { ...rest, soldAt: anchor } : x) }, { name: cur.name, item: id2, ...cur.icon ? { icon: cur.icon } : {}, what: "sell", by: "manual", anchor, ...note ? { note } : {} });
-  }
-  function canMerge(a, b) {
-    if (a.id === b.id || a.uses === void 0 || b.uses === void 0) return false;
-    const words = (n2) => clean3(n2, 30).toLowerCase().split(/[\s·.,'"「」()\-_/]+/).filter((w) => w.length >= 1);
-    const wa2 = new Set(words(a.name));
-    return words(b.name).some((w) => wa2.has(w));
-  }
-  function mergeItems(it, alive, keepId, otherId, anchor = "") {
-    const keep = it.list.find((x) => x.id === keepId);
-    const other = it.list.find((x) => x.id === otherId);
-    if (!keep || !other || !canMerge(keep, other)) return it;
-    const weight = keep.weight ?? other.weight;
-    const merged = {
-      ...keep,
-      uses: Math.min(999, keep.uses + (itemLeft(it, other, alive) ?? 0)),
-      ...weight !== void 0 ? { weight } : {},
-      // 직접 넣은 줄과 합치면 늘 사는 쪽(anchor '')으로
-      anchor: keep.anchor && other.anchor ? keep.anchor : "",
-      from: keep.anchor && other.anchor ? keep.from : "manual"
-    };
-    const list4 = it.list.filter((x) => x.id !== otherId).map((x) => x.id === keepId ? merged : x);
-    return addItemLog({ ...it, list: list4 }, { name: other.name, item: other.id, ...other.icon ? { icon: other.icon } : {}, what: "merge", by: "manual", anchor, note: `${merged.name}와 합침` });
-  }
-  function itemCarrySetting(vars) {
-    const n2 = Number(vars?.[ITEM_CARRY_VAR]);
-    if (!Number.isSafeInteger(n2)) return ITEM_CARRY_DEFAULT;
-    return Math.min(ITEM_CARRY_MAX, Math.max(ITEM_CARRY_MIN, n2));
-  }
-  function itemCarry(vars) {
-    const pc = itemWeight(vars?.[ITEM_CARRY_PC_VAR]);
-    return pc !== void 0 && pc > 0 ? pc : itemCarrySetting(vars);
-  }
-  var lineWeight = (e, left) => e.weight === void 0 ? void 0 : Math.round(e.weight * (e.uses !== void 0 ? left ?? e.uses : 1) * 1e3) / 1e3;
-  var totalWeight = (list4, left) => Math.round(list4.reduce((n2, e) => n2 + (lineWeight(e, left?.(e)) ?? 0), 0) * 1e3) / 1e3;
-  var kgText = (n2) => `${Number(n2.toFixed(1))} kg`;
-  function itemSlots(vars) {
-    const n2 = Number(vars?.[ITEM_SLOTS_VAR]);
-    if (!Number.isSafeInteger(n2)) return ITEM_SLOTS_DEFAULT;
-    return Math.min(ITEM_SLOTS_MAX, Math.max(ITEM_SLOTS_MIN, n2));
-  }
-  var itemLimit = (vars) => clean3(vars?.[ITEM_LIMIT_VAR], 60) || ITEM_LIMIT_DEFAULT;
-  var ITEM_ON_VAR = "$it_on";
-  var invOn = (vars) => vars?.[ITEM_ON_VAR] !== "0";
-  var ITEM_RESUMED_VAR = "$it_resumed";
-  function invJustResumed(chat) {
-    const at = Number(chat.scriptstate?.[ITEM_RESUMED_VAR] ?? "");
-    if (!Number.isInteger(at) || at < 0) return false;
-    return !(chat.message ?? []).slice(at).some((m) => m.role === "char");
-  }
-  var RESUMED_EVENT = "item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point";
-  var itemPushOn = (vars) => invOn(vars) && vars?.[ITEM_PUSH_VAR] !== "0";
-  var itemAutoOn = (vars) => invOn(vars) && vars?.[ITEM_AUTO_VAR] !== "0";
-  var ITEM_START_VAR = "$it_start";
-  var ITEM_SPENT_VAR = "$it_spent";
-  var ITEM_STATE_VAR = "$it_state";
-  var itemStateOn = (vars) => vars?.[ITEM_STATE_VAR] !== "0";
-  var ITEM_DETAIL_VAR = "$it_detail";
-  var itemDetail = (vars) => vars?.[ITEM_DETAIL_VAR] === "state" || vars?.[ITEM_DETAIL_VAR] === "name" ? vars[ITEM_DETAIL_VAR] : "full";
-  var ITEM_LOGTURNS_VAR = "$it_logturns";
-  var ITEM_LOGTURNS_MAX = 10;
-  var itemLogTurns = (vars) => {
-    const n2 = Number(vars?.[ITEM_LOGTURNS_VAR]);
-    return Number.isInteger(n2) && n2 >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n2) : 0;
-  };
-  var itemStartOn = (vars) => invOn(vars) && vars?.[ITEM_START_VAR] !== "0";
-  function readItemUse(vars) {
-    const raw = vars?.[ITEM_USE_VAR];
-    if (typeof raw !== "string" || !raw.trim()) return [];
-    try {
-      const a = JSON.parse(raw);
-      if (!Array.isArray(a)) return [];
-      const out = [];
-      for (const x of a) {
-        const id2 = typeof x?.id === "string" ? x.id : "";
-        const n2 = Number(x?.n ?? 1);
-        if (!id2 || !Number.isSafeInteger(n2) || n2 < 1 || out.some((u) => u.id === id2)) continue;
-        out.push({ id: id2, n: Math.min(99, n2) });
-      }
-      return out.slice(0, 40);
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return [];
+      return arr.filter((o) => !!o && typeof o === "object" && typeof o.id === "string" && !!o.item && typeof o.item.name === "string");
     } catch {
       return [];
     }
   }
-  var itemUseVars = (list4) => ({ [ITEM_USE_VAR]: list4.length ? JSON.stringify(list4.slice(0, 40)) : "" });
-  var canUse = (e) => e.use && e.state !== "broken";
-  function addUse(list4, e, left) {
-    if (!canUse(e)) return list4;
-    const cur = list4.find((u) => u.id === e.id);
-    const n2 = (cur?.n ?? 0) + 1;
-    if (left !== void 0 && n2 > left) return list4;
-    if (e.uses === void 0 && cur) return list4;
-    return cur ? list4.map((u) => u.id === e.id ? { ...u, n: n2 } : u) : [...list4, { id: e.id, n: 1 }];
-  }
-  var dropUse = (list4, id2) => list4.filter((u) => u.id !== id2);
-  function mergedNow(it, lastAnchor) {
-    if (!lastAnchor) return [];
-    return it.log.filter((l) => l.what === "merge" && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? "").replace(/와 합침$/, "")}`);
-  }
-  function newlyBought(list4, lastAnchor) {
-    return list4.filter((e) => e.from === "store" && e.anchor === lastAnchor);
-  }
-  var boughtLine = (e) => e.paidWith ? `${e.name} (paid with ${e.paidWith}${e.price ? ` + ${e.price.toLocaleString("en-US")} won` : ""})` : e.name;
-  function itemLine(e, left, equipped, detail = "full") {
-    const tags = detail === "name" ? [] : [
-      equipped ? `equipped ${e.equip === "weapon" ? "weapon" : "gear"}` : "",
-      left === 0 ? "used up" : left !== void 0 ? `${left} use${left === 1 ? "" : "s"} left` : "",
-      e.state === "damaged" ? "damaged" : e.state === "broken" ? "broken, cannot be used" : ""
-    ].filter(Boolean);
-    const body5 = detail === "full" ? `${e.desc ? ` — ${e.desc}` : ""}${e.effect ? ` (${e.effect})` : ""}${e.text ? ` — reads: "${e.text}"` : ""}` : "";
-    return `- ${e.name}${body5}${tags.map((t) => ` [${t}]`).join("")}`;
-  }
-  function itemsBlock(list4, opts) {
-    const lines3 = list4.map((e) => itemLine(e, opts.left?.(e), isEquipped(e, list4), opts.detail));
-    const use = (opts.use ?? []).filter((u) => u.name);
-    const bought = (opts.bought ?? []).filter(Boolean);
-    const extra = (opts.events ?? []).filter(Boolean);
-    if (!lines3.length && !use.length && !bought.length && !extra.length && !opts.always) return "";
-    const carried = gridItems(list4).length;
-    const out = [`[Inventory] ${carried}/${opts.slots}${carried > opts.slots ? " (over the limit)" : ""}`, ...lines3.length ? lines3 : ["- (nothing)"]];
-    if (opts.carry) {
-      const w = totalWeight(list4, opts.left);
-      out.push(`Weight: ${kgText(w)} / ${kgText(opts.carry)}${w > opts.carry ? ` (${kgText(w - opts.carry)} over)` : ""}`);
+  var liveOrders = (vars, alive) => readOrders(vars).map((o) => o.taken && o.takenKey && !alive.has(o.takenKey) ? { ...o, taken: false, takenKey: void 0 } : o).filter((o) => o.taken || !o.anchor || alive.has(o.anchor));
+  function pruneOrders(list4) {
+    const out = [...list4];
+    while (out.length > COS_ORDERS_MAX) {
+      const i = out.findIndex((o) => o.taken);
+      if (i < 0) break;
+      out.splice(i, 1);
     }
-    out.push(`Carry limit: ${opts.limit}`);
-    const recent = (opts.recent ?? []).filter(Boolean);
-    if (recent.length) out.push(`Recently: ${recent.join("; ")}`);
-    const events = [];
-    if (use.length) events.push(`uses ${use.map((u) => `${u.name}${u.n > 1 ? ` ×${u.n}` : ""}${u.after === 0 ? " (used up after this)" : u.after !== void 0 ? ` (${u.after} left after this)` : ""}`).join(", ")}`);
-    if (bought.length) events.push(`just bought ${bought.join(", ")}`);
-    events.push(...extra);
-    if (carried > opts.slots) events.push("carrying more than the limit");
-    if (events.length) out.push(`This turn: ${events.join("; ")}`);
-    const reveal = list4.filter((e) => e.truth && (use.some((u) => u.name === e.name) || isEquipped(e, list4)));
-    if (reveal.length) {
-      out.push("Really (what these actually do — decided by no one in advance, known to no one in the story; let it happen and show only what is experienced):");
-      for (const e of reveal) out.push(e.truth === "?" ? `- ${e.name}: not even its seller knows${e.effect ? ` (the label says 「${e.effect}」 and may be false)` : ""} — decide what it really does now, then keep it the same from here on.` : `- ${e.name}: ${e.truth}${e.effect ? ` (the label says 「${e.effect}」)` : ""}`);
-    }
-    return out.join("\n");
+    return out;
   }
-  function searchItems(it, alive, q) {
-    const k = q.trim().toLowerCase();
-    if (!k) return { items: liveItems(it, alive), log: it.log.slice().reverse() };
-    const hit4 = (...s8) => s8.some((x) => (x ?? "").toLowerCase().includes(k));
+  var ordersVars = (list4) => ({ [COS_ORDERS_KEY]: list4.length ? JSON.stringify(pruneOrders(list4)) : "" });
+  function worldMinute(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) {
+      const m = list4[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const tags = findStatusTags(m.data);
+      if (!tags.length) continue;
+      const t = tags[tags.length - 1];
+      const min = statusMinute(t.date, t.time);
+      if (min !== null) return min;
+    }
+    return null;
+  }
+  var orderDue = (o) => o.orderedAt === null ? null : o.orderedAt + Math.round(o.hours * 60);
+  function orderReady(o, nowMin, lastKey) {
+    if (o.taken) return false;
+    const due = orderDue(o);
+    if (due !== null && nowMin !== null) return nowMin >= due;
+    return lastKey !== "" && lastKey !== o.orderedKey;
+  }
+  function minuteText(min) {
+    const d = new Date(min * 6e4);
+    const h24 = d.getUTCHours();
+    const h = h24 % 12 === 0 ? 12 : h24 % 12;
+    return `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}.${String(d.getUTCDate()).padStart(2, "0")} ${String(h).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")} ${h24 < 12 ? "AM" : "PM"}`;
+  }
+  function ordersText(list4, nowMin, lastKey) {
+    return list4.filter((o) => !o.taken).map((o) => {
+      const due = orderDue(o);
+      const state = orderReady(o, nowMin, lastKey) ? "ready for pickup" : due !== null ? `due ${minuteText(due)}` : `due in ${o.hours}h`;
+      return `${o.item.name} (${o.price} won, ${state})`;
+    }).join(", ");
+  }
+
+  // src/core/bmdesk.ts
+  var DESK_VAR = "$bm_desk";
+  var DESK_KEY = { on: "$bm_desk_on", axes: "$bm_desk_axes", again: "$bm_desk_again", avoid: "$bm_desk_avoid" };
+  var DESK_AVOID_RANGE = [0, 12];
+  var DESK_AVOID_DEFAULT = 6;
+  var PAST_KEEP = 20;
+  var DESK_AXES_DEFAULT = [
+    "직급: 사원, 사원, 사원, 주임, 주임, 대리, 과장, 차장",
+    "근속: 입사 석 달 차, 1년 차, 2년 차, 4년 차, 7년 차, 10년이 넘음",
+    "이력: 처음부터 내근, 현장에서 다쳐 내근으로 옮김, 지금도 현장을 겸함, 다른 부서에서 밀려옴, 곧 다른 부서로 옮김",
+    "회사를 대하는 태도: 진심으로 회사를 믿음, 월급만큼만 일함, 승진에 목맴, 속으로 회사를 싫어함, 회사를 두려워함, 별생각 없음",
+    "오늘 기분: 지나치게 밝음, 지쳐 있음, 짜증을 참는 중, 들떠 있음, 멍함, 불안함, 차분함",
+    "매뉴얼 준수도: 토씨 하나까지 지킴, 대충 지킴, 자주 어김, 몰래 흘림",
+    "성격: 수다스러움, 무뚝뚝함, 소심함, 능글맞음, 깐깐함, 덤벙댐, 다정함, 냉소적임"
+  ].join("\n");
+  function parseAxes(text4) {
+    const out = [];
+    for (const line2 of String(text4 ?? "").split(/\r?\n/)) {
+      const i = line2.indexOf(":");
+      if (i <= 0) continue;
+      const name = line2.slice(0, i).trim().slice(0, 20);
+      const values = line2.slice(i + 1).split(/[,，]/).map((x) => x.trim().slice(0, 60)).filter(Boolean);
+      if (name && values.length) out.push({ name, values });
+    }
+    return out;
+  }
+  function deskSettings(vars) {
+    const axesText = String(vars?.[DESK_KEY.axes] ?? "");
+    const parsed = parseAxes(axesText);
+    const n3 = Math.floor(Number(vars?.[DESK_KEY.avoid] ?? ""));
     return {
-      items: liveItems(it, alive).filter((e) => hit4(e.name, e.desc, e.effect, e.quote, e.equip ? EQUIP_LABEL[e.equip] : "", e.state !== "ok" ? STATE_LABEL[e.state] : "")),
-      log: it.log.filter((l) => hit4(l.name, l.note, l.quote)).reverse()
+      on: String(vars?.[DESK_KEY.on] ?? "") !== "0",
+      axesText,
+      axes: parsed.length ? parsed : parseAxes(DESK_AXES_DEFAULT),
+      again: String(vars?.[DESK_KEY.again] ?? "") === "1",
+      avoid: String(vars?.[DESK_KEY.avoid] ?? "") !== "" && Number.isFinite(n3) ? Math.max(DESK_AVOID_RANGE[0], Math.min(DESK_AVOID_RANGE[1], n3)) : DESK_AVOID_DEFAULT
     };
   }
-  var INVENTORY_HEAD = "[Inventory]";
-  var SHOP_HEAD = "[Shop]";
-  var INVENTORY_NOTE = `What the protagonist carries right now (name — state (effect) [equipped / uses left / condition]); nothing else is on hand. Equipped items are in hand or worn. Keep it in mind when you write what they do, and when "This turn" lists an event, handle it in this response: describe a used item taking effect (or failing), and if they carry more than the limit, let that show in the story — something is awkward to hold, dropped, left behind, or someone remarks on it. A broken item does not work. If a "Really" list follows, those items' real effects differ from or go beyond their labels: what happens follows the Really line, nobody knew it beforehand, and the protagonist learns it only through what happens. Never print this list back.`;
-  function lastUserKey(chat) {
-    const list4 = chat.message ?? [];
-    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "user") return messageKey(list4[i], i);
-    return "";
-  }
-  var LOG_VERB = { get: "got", use: "used", drop: "dropped", gone: "lost", destroy: "destroyed", merge: "combined into", sell: "sold" };
-  function recentItemLog(chat, it, n2) {
-    if (n2 <= 0) return [];
-    const list4 = chat.message ?? [];
-    const keys = /* @__PURE__ */ new Set();
-    for (let i = list4.length - 1; i >= 0 && keys.size < n2; i--) if (list4[i].role === "char") keys.add(messageKey(list4[i], i));
-    return it.log.filter((l) => l.anchor && keys.has(l.anchor)).map((l) => `${LOG_VERB[l.what]} ${l.name}${(l.n ?? 1) > 1 ? ` ×${l.n}` : ""}`);
-  }
-  function lastBotKey(chat) {
-    const list4 = chat.message ?? [];
-    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return messageKey(list4[i], i);
-    return "";
-  }
-  function usedItemsAt(it, anchors, alive) {
-    const set2 = new Set(anchors.filter(Boolean));
-    return it.log.filter((l) => l.what === "use" && l.by === "use" && set2.has(l.anchor)).map((l) => {
-      const e = l.item ? it.list.find((x) => x.id === l.item) : void 0;
-      const left = e ? itemLeft(it, e, alive) : void 0;
-      return { name: l.name, anchor: l.anchor, n: l.n ?? 1, ...left !== void 0 ? { left } : {} };
-    });
-  }
-  function pendingItemUse(vars, userKey) {
-    const at = typeof vars?.[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
-    return !at || at === userKey ? readItemUse(vars) : [];
-  }
-  function inventoryText(chat) {
-    const vars = chat.scriptstate;
-    if (!itemPushOn(vars)) {
-      if (!shopOn(vars)) return "";
-      const it2 = readItems(vars);
-      const live2 = liveItems(it2, aliveAnchors(chat));
-      const bought = newlyBought(live2, lastBotKey(chat)).map(boughtLine);
-      const events = [...bought.length ? [`just bought ${bought.join(", ")}`] : [], ...shopEvents(chat)];
-      const guide2 = shopGuide(vars);
-      if (!events.length && !guide2) return "";
-      return [SHOP_HEAD, ...events.length ? [`This turn: ${events.join("; ")}`] : [], ...guide2 ? [guide2] : []].join("\n");
+  var rollDice = (axes, rnd = Math.random) => axes.map((a) => [a.name, a.values[Math.floor(rnd() * a.values.length)]]);
+  var emptyDesk = () => ({ agent: null, talk: [], anchor: "", past: [] });
+  function readDesk(vars) {
+    try {
+      const o = JSON.parse(String(vars?.[DESK_VAR] ?? ""));
+      if (!o || typeof o !== "object") return emptyDesk();
+      return { agent: o.agent && typeof o.agent.name === "string" ? o.agent : null, talk: Array.isArray(o.talk) ? o.talk : [], anchor: String(o.anchor ?? ""), past: Array.isArray(o.past) ? o.past : [] };
+    } catch {
+      return emptyDesk();
     }
-    const it = readItems(vars);
-    const userKey = lastUserKey(chat);
-    const alive = aliveAnchors(chat);
-    const reroll = typeof vars?.[ITEM_USE_AT_VAR] === "string" && vars[ITEM_USE_AT_VAR] === userKey && userKey;
-    const after = reroll ? new Set([...alive].filter((k) => !it.log.some((l) => l.what === "use" && l.by === "use" && l.anchor === k && keyAfter(chat, k, userKey)))) : alive;
-    const live = liveItems(it, after);
-    const left = (e) => itemLeft(it, e, after);
-    const shop = shopOn(vars);
-    const use = pendingItemUse(vars, userKey).flatMap((u) => {
-      const e = live.find((x) => x.id === u.id);
-      if (!e || !canUse(e)) return [];
-      const l = left(e);
-      const n2 = l !== void 0 ? Math.min(u.n, l) : 1;
-      return n2 > 0 ? [{ name: e.name, n: n2, ...l !== void 0 ? { after: l - n2 } : {} }] : [];
-    });
-    const resumed = invJustResumed(chat);
-    const text4 = itemsBlock(live, {
-      slots: itemSlots(vars),
-      limit: itemLimit(vars),
-      carry: itemCarry(vars),
-      left,
-      use,
-      bought: newlyBought(live, lastBotKey(chat)).map(boughtLine),
-      events: [...resumed ? [RESUMED_EVENT] : [], ...mergedNow(it, lastBotKey(chat)), ...shop ? shopEvents(chat) : []],
-      always: shop || resumed,
-      detail: itemDetail(vars),
-      recent: recentItemLog(chat, it, itemLogTurns(vars))
-    });
-    const guide = shop ? shopGuide(vars) : "";
-    return text4 ? `${text4}
-${INVENTORY_NOTE}${guide ? `
-${guide}` : ""}` : "";
   }
-  function keyAfter(chat, k, userKey) {
-    const list4 = chat.message ?? [];
-    let seen2 = false;
-    for (let i = 0; i < list4.length; i++) {
-      const key = messageKey(list4[i], i);
-      if (key === userKey) seen2 = true;
-      else if (seen2 && key === k) return true;
-    }
-    return false;
+  var deskVars = (st) => ({ [DESK_VAR]: JSON.stringify(st) });
+  function endDesk(st) {
+    if (!st.agent) return { ...st, talk: [] };
+    const past = [st.agent, ...st.past.filter((p2) => p2.id !== st.agent.id)].slice(0, PAST_KEEP);
+    return { agent: null, talk: [], anchor: "", past };
   }
-  function withInventory(messages, chat) {
-    if (messages.some((m) => typeof m?.content === "string" && (m.content.startsWith(INVENTORY_HEAD) || m.content.startsWith(SHOP_HEAD)))) return messages;
-    const text4 = inventoryText(chat);
-    if (!text4) return messages;
-    const at = messages.map((m) => m?.role).lastIndexOf("user");
-    const block4 = { role: "system", content: text4 };
-    return at < 0 ? [...messages, block4] : [...messages.slice(0, at), block4, ...messages.slice(at)];
+  function pickAgain(st, s8, rnd = Math.random) {
+    if (!s8.again || !st.past.length || rnd() >= 0.25) return null;
+    return st.past[Math.floor(rnd() * st.past.length)];
   }
-  function settleItemUse(chat, responseIndex) {
-    const vars = chat.scriptstate ?? {};
-    const queue = readItemUse(vars);
-    const at = typeof vars[ITEM_USE_AT_VAR] === "string" ? vars[ITEM_USE_AT_VAR] : "";
-    if (!queue.length && !at) return null;
-    const userKey = lastUserKey(chat);
-    if (at && at !== userKey) return { ...itemUseVars([]), [ITEM_USE_AT_VAR]: "" };
-    if (!queue.length) return { [ITEM_USE_AT_VAR]: "" };
-    const m = chat.message?.[responseIndex];
-    if (!m || m.role !== "char") return null;
-    const anchor = messageKey(m, responseIndex);
-    const it0 = readItems(vars);
-    let it = it0;
-    const alive = new Set([...aliveAnchors(chat)].filter((k) => k !== anchor));
-    for (const u of queue) {
-      if (it.log.some((l) => l.what === "use" && l.anchor === anchor && l.item === u.id)) continue;
-      const item2 = liveItems(it0, alive).find((e) => e.id === u.id);
-      if (!item2 || !canUse(item2)) continue;
-      const left = itemLeft(it0, item2, alive);
-      const n2 = left !== void 0 ? Math.min(u.n, left) : 1;
-      if (n2 < 1) continue;
-      it = addItemLog(it, { name: item2.name, item: item2.id, n: n2, ...item2.icon ? { icon: item2.icon } : {}, what: "use", by: "use", anchor, ...left !== void 0 && left - n2 <= 0 ? { note: "다 씀" } : {} });
-    }
-    if (it === it0 && at === userKey) return null;
-    return { ...it === it0 ? {} : itemsVars(it), [ITEM_USE_AT_VAR]: userKey };
+  var clean3 = (s8, max) => String(s8 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+  function block3(raw, tag) {
+    const m = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}\\s*>`, "i").exec(raw);
+    return m ? m[1].trim() : "";
   }
-  function itemsNowOf(chat) {
-    const it = readItems(chat.scriptstate);
-    const alive = aliveAnchors(chat);
-    const live = liveItems(it, alive);
-    return live.map((e) => {
-      const left = itemLeft(it, e, alive);
-      return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...left !== void 0 ? { left } : {}, ...e.weight !== void 0 ? { weight: e.weight } : {}, ...e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {} };
-    });
+  var DeskError = class extends Error {
+    raw = "";
+  };
+  var fail2 = (msg, raw) => Object.assign(new DeskError(msg), { raw });
+  function bubbles(text4) {
+    return text4.replace(/\r/g, "").split(/\n\s*\n/).map((x) => x.split("\n").map((l) => l.trim()).filter(Boolean).join("\n").slice(0, 600)).filter(Boolean).slice(0, 3);
   }
-  function applyItemChanges(it0, alive, changes, opts = {}) {
-    let it = it0;
-    const stateOn = opts.state !== false;
-    for (const c0 of changes) {
-      const c = stateOn ? c0 : { ...c0, state: void 0, ...c0.action === "destroyed" ? { action: "gone" } : {} };
-      const cur = liveItems(it, alive).find((e) => e.name === c.name);
-      if (c.action === "gone" || c.action === "destroyed") {
-        if (cur) it = removeItem(it, cur.id, c.action === "gone" ? "gone" : "destroy", "story", c.anchor, { quote: c.quote, ...c.desc ? { note: c.desc } : {} });
-      } else if (c.action === "update" && cur) {
-        it = updateItem(it, cur.id, {
-          desc: c.desc || cur.desc,
-          effect: c.effect || cur.effect,
-          ...c.use !== void 0 ? { use: c.use } : {},
-          ...c.equip !== void 0 ? { equip: c.equip ?? "" } : {},
-          ...c.state ? { state: c.state } : {},
-          ...c.icon ? { icon: c.icon } : {},
-          ...c.weight !== void 0 ? { weight: c.weight } : {}
-        });
+  var newDeskNo = (rnd = Math.random) => String(1e3 + Math.floor(rnd() * 9e3));
+  var deskTag = (a) => `상담원 ${a.no ?? String(1e3 + parseInt(a.id.slice(-4), 36) % 9e3)}`;
+  function parseCard(raw, dice, no) {
+    const card2 = block3(raw, "card");
+    if (!card2) throw fail2("응답에 <card> 블록(상담사 카드)이 없어요.", raw);
+    const get = (k) => clean3(new RegExp(`^\\s*${k}\\s*[:：]\\s*(.+)$`, "m").exec(card2)?.[1], k === "소개" || k === "말투" ? 200 : 30);
+    const name = get("이름");
+    if (!name) throw fail2("상담사 카드에 이름이 없어요.", raw);
+    const say2 = bubbles(block3(raw, "say"));
+    if (!say2.length) throw fail2("응답에 <say> 블록(첫 인사)이 없어요.", raw);
+    const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
+    return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
+  }
+  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
+  function parseSay(raw) {
+    const say2 = bubbles(block3(raw, "say"));
+    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
+    return say2;
+  }
+  var G2 = () => guideSections("BmDesk");
+  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
+  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
+이름: ${a.name}
+직급: ${a.rank}
+부서: ${a.dept}
+소개: ${a.intro}
+말투: ${a.voice}
+${diceText(a.dice)}`;
+  var material2 = (src) => [
+    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
+${src.refs}` : "",
+    `[지금 진열된 상품]
+${src.shelf || "(없음)"}`,
+    `[손님]
+사내 계정: ${src.nick || "-"}
+남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
+  ].filter(Boolean).join("\n\n");
+  function makePrompt(src, dice, recent, no) {
+    const g2 = G2();
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[손님에게 보이는 호칭]
+상담원 ${no}
+
+[이번 상담사 주사위]
+${diceText(dice)}
+
+[최근 상담사 — 겹치지 말 것]
+${past}
+
+[현재 작업]
+상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
+  }
+  function talkPrompt2(src, st) {
+    const g2 = G2();
+    const a = st.agent;
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const talk = st.talk.filter((l) => l.who !== "sys").map((l) => `${l.who === "me" ? "[손님]" : "[상담사]"} ${l.text}`).join("\n");
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[상담사 카드]
+${cardText(a)}
+
+[이번 상담 대화 — 마지막 줄이 손님이 방금 한 말]
+${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
+  }
+
+  // src/core/malls.ts
+  var MALL_SITES = ["cos", "bm"];
+  var isMallSite = (v) => v === "cos" || v === "bm";
+  var MALL_NAME = { cos: "우주 쇼핑몰", bm: "백일몽 포인트몰" };
+  var MALL_OWNER = { cos: "운영자", bm: "" };
+  var MALL_GUIDE = { cos: "Cos", bm: "Bm" };
+  var MALL_VAR = { cos: "$cos_shop", bm: "$bm_shop" };
+  var mallKey = (shKey, site) => `$${site}_${shKey.slice(1)}`;
+  var mallAutoKey = (site) => `$${site}_sh_auto`;
+  function mallVars(vars, site) {
+    const out = {};
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_")) out[k] = v;
+    const pre = `$${site}_

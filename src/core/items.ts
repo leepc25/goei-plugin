@@ -9,7 +9,8 @@ import { aliveAnchors } from './wallet';
 import { messageKey } from './people/store';
 import type { PromptMessage } from './request';
 import type { ItemChange, ItemNow } from './people/updater';
-import { shopEvents, shopOn, shopGuide } from './shop';
+import { currentShop, shopEvents, shopOn, shopGuide } from './shop';
+import { mallEvents } from './malls';
 import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
@@ -24,6 +25,9 @@ export const ITEM_SLOTS_VAR = '$it_slots';
 export const ITEM_LIMIT_VAR = '$it_limit';
 /** 그림 대체 말 표 (한 줄 「외투 → 코트」; 비우면 core/iconmatch ICON_ALIAS_DEFAULT) — 2026-11-09 사용자: 매칭기 재설계 */
 export const ITEM_ICON_ALIAS_VAR = '$it_icon_alias';
+/** 분류 말(과자·다과·음식)은 그 분류 그림 가운데 물건마다 하나를 뽑아 보여 주기 ('0' = 끔, 기본 켬) — 2026-11-10 사용자 */
+export const ITEM_ICON_POOL_VAR = '$it_icon_pool';
+export const itemIconPoolOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_ICON_POOL_VAR] !== '0';
 export const ITEM_PUSH_VAR = '$it_push';
 export const ITEM_AUTO_VAR = '$it_auto';
 export const ITEM_SLOTS_DEFAULT = 16;
@@ -501,6 +505,17 @@ export function mergedNow(it: Items, lastAnchor: string): string[] {
   return it.log.filter((l) => l.what === 'merge' && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? '').replace(/와 합침$/, '')}`);
 }
 
+/** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
+ *  마지막 응답 뒤의 판매 기록(what=sell). 지금 열린 상점(skipPlace)에 판 것은 shopEvents 가 따로 넘기므로 뺀다 */
+export function soldNow(it: Items, lastAnchor: string, skipPlace = ''): string[] {
+  if (!lastAnchor) return [];
+  return it.log.filter((l) => l.what === 'sell' && l.anchor === lastAnchor).flatMap((l) => {
+    const place = String(l.note ?? '').replace(/에 팖$/, '').trim();
+    if (skipPlace && place === skipPlace) return [];
+    return [`just sold ${l.name}${place ? ` to ${place}` : ''} and handed it over — the protagonist no longer has, carries or wears it`];
+  });
+}
+
 /** 이번 턴에 새로 산 것 (상점): 마지막 응답 뒤에 들어온 store 줄 — 아직 본편이 모르는 것 */
 export function newlyBought(list: Item[], lastAnchor: string): Item[] {
   return list.filter((e) => e.from === 'store' && e.anchor === lastAnchor);
@@ -633,11 +648,12 @@ export function inventoryText(chat: Chat): string {
   if (!itemPushOn(vars)) {
     // 본편에 넘기기를 꺼도 상점은 켜져 있을 수 있다: 물건 목록 없이 상점 표식 지침과 이번 방문 사건만 [Shop] 글로 넘긴다
     // (지침이 [Inventory] 에만 실려 있어, 넘기기를 끄면 모델이 표식을 쓰지 않아 상점이 열리지 않던 것, 11-08 전수점검)
-    if (!shopOn(vars)) return '';
     const it = readItems(vars);
+    const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
+    if (!shopOn(vars)) return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
     const live = liveItems(it, aliveAnchors(chat));
     const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
-    const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...shopEvents(chat)];
+    const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...soldOff, ...shopEvents(chat)];
     // 갱신기가 상점을 판단하면 표식 지침은 빈 글 (core/shop.ts shopJudgeBy): 넘길 사건도 없으면 블록을 보내지 않는다
     const guide = shopGuide(vars);
     if (!events.length && !guide) return '';
@@ -661,6 +677,7 @@ export function inventoryText(chat: Chat): string {
     return n > 0 ? [{ name: e.name, n, ...(l !== undefined ? { after: l - n } : {}) }] : [];
   });
   const resumed = invJustResumed(chat);
+  const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
   const text = itemsBlock(live, {
     slots: itemSlots(vars),
     limit: itemLimit(vars),
@@ -668,8 +685,8 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).map(boughtLine),
-    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...(shop ? shopEvents(chat) : [])],
-    always: shop || resumed,
+    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
   });

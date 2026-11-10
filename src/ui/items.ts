@@ -24,6 +24,7 @@ import { isPhone } from './media';
 import { toast } from './toast';
 import { walletOn, walletPane, walletTools, walletUi } from './wallet';
 import { pointsOn } from '../core/points';
+import { boxButton } from './homeshop';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -57,8 +58,9 @@ export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptsta
 export const liveOf = (ctx: ChatContext): Item[] => liveItems(itemsOf(ctx), aliveAnchors(ctx.chat));
 
 /** 물건 그림: PixelLab 그림 팩(host/itemicons.ts)에서 그림 낱말·이름으로 찾고, 없거나 아직 못 받았으면 공통 선 아이콘 */
-export function itemPic(it: { name: string; icon?: string }): string {
-  const u = itemIconUrl(it.name, it.icon);
+export function itemPic(it: { name: string; icon?: string; id?: string }): string {
+  // 분류 말(과자·다과)은 물건마다(id) 그 분류의 그림 하나. id 가 없는 곳(상점 진열)은 이름으로 — 같은 진열품은 늘 같은 그림
+  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 
@@ -320,6 +322,7 @@ function popup(ctx: ChatContext): string {
     <div class="it-btns">
       ${it.use ? `<button class="gx-chip${queued ? ' on' : ''}" data-action="items-use" data-value="${esc(it.id)}" ${more || queued ? '' : 'disabled'}>${queued ? (more ? `한 번 더 (×${queued + 1})` : `사용 ×${queued}`) : '사용'}</button>` : ''}
       ${queued ? `<button class="gx-chip" data-action="items-unuse" data-value="${esc(it.id)}">사용 취소</button>` : ''}
+      ${boxButton(ctx, it.id)}
       ${it.equip ? `<button class="gx-chip" data-action="${equipped ? 'items-unequip' : 'items-equip'}" data-value="${esc(it.id)}">${equipped ? '장착 풀기' : '장착'}</button>` : ''}
       ${itemEditOn(ctx.chat.scriptstate) ? '<button class="gx-chip" data-action="items-edit">고치기</button>' : ''}
       ${it.uses !== undefined ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx, it).length ? '' : 'disabled'} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ''}

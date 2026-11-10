@@ -47,6 +47,8 @@ export interface OwnShop { id: string; on: boolean; name: string; alias: string;
 export const OWN_SHOPS_DEFAULT: OwnShop[] = [
   { id: 'cos', on: true, name: '우주 쇼핑몰', alias: '', web: 'cos', visit: 'shop' },
   { id: 'bm', on: true, name: '백일몽 포인트몰', alias: '포인트몰, 복지몰', web: 'bm', visit: '' },
+  // 망상홈쇼핑 (2026-11-11): 화면·앱으로 방송을 보면(@web) 방송 사이트를 연다. 직접 간 곳(방청석·쇼룸)의 창은 아직 없다
+  { id: 'hs', on: true, name: '망상홈쇼핑', alias: '망상 홈쇼핑, 망상홈쇼핑 라이브', web: 'hs', visit: '' },
 ];
 /** 인터넷 접속 표시: 표식 주인 칸 (모델은 `@web`, 정리한 뒤에는 `@web:사이트`) */
 export const WEB_OWNER = '@web';
@@ -241,6 +243,8 @@ export interface ShopLine {
   note?: string;
   /** 이 대사와 함께 낸 맞춤 주문 견적 id */
   quote?: string;
+  /** 이 말을 한 때의 마지막 본편 응답 키 (쇼핑몰: 그 턴에 나눈 말만 본편에 넘긴다, core/malls.ts mallEvents) */
+  k?: string;
 }
 
 /** 맞춤 주문 견적 (우주몰 상담원, 11-09): 선납하면 core/orders.ts 의 주문이 된다. item 의 설명·효과·진실은 받을 때까지 숨긴다 */
@@ -368,7 +372,7 @@ export function readShop(vars: Vars): ShopState | null {
         const { use: _u, uses: _n, equip: _e, icon: _i, weight: _w, ...rest } = x;
         return { ...rest, ...traitsOf(x), desc: clean(x.desc, 120), effect: clean(x.effect, 60) };
       }).slice(0, 40),
-      talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').map((l) => ({ who: l.who, text: l.text, ...(typeof l.note === 'string' && l.note ? { note: l.note } : {}), ...(typeof l.quote === 'string' && l.quote ? { quote: l.quote } : {}) })).slice(-40),
+      talk: (Array.isArray(o.talk) ? o.talk : []).filter((l): l is ShopLine => !!l && (l.who === 'me' || l.who === 'owner') && typeof l.text === 'string').map((l) => ({ who: l.who, text: l.text, ...(typeof l.note === 'string' && l.note ? { note: l.note } : {}), ...(typeof l.quote === 'string' && l.quote ? { quote: l.quote } : {}), ...(typeof l.k === 'string' && l.k ? { k: l.k } : {}) })).slice(-40),
       closed: !!o.closed,
       prev: Array.isArray(o.prev) ? o.prev.filter((x): x is string => typeof x === 'string').slice(-40) : [],
       sell: readOffer(o.sell),
@@ -591,6 +595,8 @@ export interface TalkReply {
   closed: boolean;
   /** 팔기: 주인이 부른 값 (none → null, 말 안 했으면 undefined) */
   offer?: number | null;
+  /** 팔기: 주인공이 그 값에 팔겠다고 말해 거래가 끝남 (<deal/>). 화면의 「판매」 단추와 같은 처리를 한다 */
+  deal?: boolean;
   /** 정보 쪽지 (우주몰): <info>제목|값|내용</info> */
   info?: { title: string; price: number; body: string };
   /** 맞춤 주문 견적 (우주몰): <order>이름|값|납기시간|쓰임|그림|무게|설명|효과|진실</order> */
@@ -614,6 +620,7 @@ export function parseTalk(raw: string): TalkReply {
       if (n !== null) out.offer = n;
     }
   }
+  if (/<deal\s*\/?>/i.test(raw)) out.deal = true;
   const ord = block(raw, 'order');
   if (ord) { const q = parseOrderLine(ord.split('\n').find((l) => l.includes('|')) ?? ''); if (q) out.quote = q; }
   const inf = block(raw, 'info');
@@ -735,6 +742,11 @@ export function applyTalk(st: ShopState, r0: TalkReply, kick = true): ShopState 
       const rp = r.reprice.find((p) => sameShopName(p.name, sell!.name));
       if (rp && !rp.pay) price = rp.price;
     }
+    // <offer> 를 빼먹고 대사에만 값을 적은 응답: 아직 부른 값이 없을 때 대사에 돈이 딱 하나면 그것 (11-10 사용자: 15000원이라 말했는데 「값을 아직 말하지 않았다」)
+    if (price === undefined && sell.price === undefined) {
+      const figs = [...new Set((r.owner.match(/\d[\d,]*\s*(?:만\s*)?(?:원|포인트|P\b|p\b)/g) ?? []).map((x) => priceOf(x.replace(/포인트|[Pp]/g, ''))).filter((n): n is number => n !== null && n > 0))];
+      if (figs.length === 1) price = figs[0];
+    }
     if (price !== undefined) {
       const first = sell.first ?? (typeof sell.price === 'number' && price !== null && price !== sell.price ? sell.price : undefined);
       sell = { ...sell, price, ...(first !== undefined ? { first } : {}) };
@@ -761,6 +773,12 @@ export function buyNote(st: ShopState, id: string, key = ''): ShopState | null {
 /** 팔기 시작: 소지품 한 줄을 들고 주인에게 보인다 (값은 아직 없음). 내 말은 부르는 쪽이 sayToOwner 로 적는다 */
 export function startSell(st: ShopState, it: Omit<ShopOffer, 'price' | 'first'>): ShopState {
   return { ...st, sell: { itemId: it.itemId, name: clean(it.name, 30), desc: clean(it.desc, 120), effect: clean(it.effect, 60), ...traitsOf(it), ...(it.truth ? { truth: clean(it.truth, 60) } : {}), ...(Number.isSafeInteger(it.paid) ? { paid: it.paid } : {}) } };
+}
+
+/** 마지막 말에 그때의 본편 응답 키를 적는다 */
+export function stampLastLine(st: ShopState, key: string): ShopState {
+  if (!key || !st.talk.length) return st;
+  return { ...st, talk: st.talk.map((l, i) => (i === st.talk.length - 1 ? { ...l, k: key } : l)) };
 }
 
 export const cancelSell = (st: ShopState): ShopState => ({ ...st, sell: null });

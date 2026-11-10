@@ -66,6 +66,7 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
+import { withHomeshop } from './core/homeshop';
 import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderShopCard, setShopOpener } from './host/shopcard';
 import { hideUseBox, refreshUseBox } from './host/usebox';
@@ -172,6 +173,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
         // 소지품 [Inventory]: 지금 가진 것·한계·이번 턴 사건(사용·새로 산 것·넘침)을 마지막 유저 메시지 앞에 (core/items.ts, 설정 「소지품 → 본편에 넘기기」)
         messages = step('소지품', () => withInventory(messages, c.chat), messages);
+        // 망상홈쇼핑: 할부 호출 턴·방청 신청 턴에만 한 번 (core/homeshop.ts, 평소엔 아무것도 안 넣는다)
+        messages = step('망상홈쇼핑', () => withHomeshop(messages, c.chat), messages);
         // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
         messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
         // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다

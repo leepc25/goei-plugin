@@ -1,0 +1,107 @@
+{
+ "body": {
+  "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+  "size": 85,
+  "view": "sidescroller",
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a TV set-top box, three-quarter view, flat black rectangular box with a small green power light, a small black remote control lying in front of it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a full-body massage chair, side view, big padded reclining armchair in dark brown leather with a rounded hood over the head and leg rests with foot pockets. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a foot spa basin, three-quarter top view, oval white plastic tub filled with clear bubbling water, small massage rollers on the bottom. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a large double-door refrigerator, front view, tall silver steel body with two tall side-by-side doors and long vertical handles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop water purifier, front view, slim white upright body with a small chrome water tap sticking out in front and a drip tray at the base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a front-loading drum washing machine, front view, white boxy body, round glass door with a chrome rim, a small control dial at the top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tumble clothes dryer, front view, dark grey boxy body, a large round door with a dark tinted window, one dial at the top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a compact countertop dishwasher, front view, small silver box with a pull-down front door with a horizontal handle and a small window showing stacked plates. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wall-mounted split air conditioner indoor unit, front view, long white horizontal body about three times wider than tall, air vent slats along the bottom edge. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable electric fan heater, front view, small upright box on short feet, a front grille with glowing orange heating bars inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an oil-filled electric radiator heater, side view, row of white vertical metal fins on small wheels, a dial on the side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a handheld massage gun, side view, matte black T-shaped body with a straight grip handle below, a round soft rubber ball head on the front, clearly a massager not a weapon. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small handheld electric hair removal device, side view, smooth white curved body, a flat rectangular head on top, one small button. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a single portable induction cooktop, three-quarter top view, thin flat black glass square slab with one round burner circle and a small touch panel strip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a two-burner tabletop gas stove, three-quarter top view, silver body with two black burner grates and two round knobs on the front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop electric oven, front view, black box with a glass front door showing two glowing orange heating rods inside, two round knobs on the right. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "items": [
+  {
+   "ko": "셋톱박스",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a TV set-top box, three-quarter view, flat black rectangular box with a small green power light, a small black remote control lying in front of it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "안마의자",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a full-body massage chair, side view, big padded reclining armchair in dark brown leather with a rounded hood over the head and leg rests with foot pockets. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "족욕기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a foot spa basin, three-quarter top view, oval white plastic tub filled with clear bubbling water, small massage rollers on the bottom. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "냉장고",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a large double-door refrigerator, front view, tall silver steel body with two tall side-by-side doors and long vertical handles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "정수기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop water purifier, front view, slim white upright body with a small chrome water tap sticking out in front and a drip tray at the base. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "세탁기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a front-loading drum washing machine, front view, white boxy body, round glass door with a chrome rim, a small control dial at the top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "건조기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a tumble clothes dryer, front view, dark grey boxy body, a large round door with a dark tinted window, one dial at the top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "식기세척기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a compact countertop dishwasher, front view, small silver box with a pull-down front door with a horizontal handle and a small window showing stacked plates. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "에어컨",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a wall-mounted split air conditioner indoor unit, front view, long white horizontal body about three times wider than tall, air vent slats along the bottom edge. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "전기히터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a portable electric fan heater, front view, small upright box on short feet, a front grille with glowing orange heating bars inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "라디에이터",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an oil-filled electric radiator heater, side view, row of white vertical metal fins on small wheels, a dial on the side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "마사지건",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a handheld massage gun, side view, matte black T-shaped body with a straight grip handle below, a round soft rubber ball head on the front, clearly a massager not a weapon. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "제모기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small handheld electric hair removal device, side view, smooth white curved body, a flat rectangular head on top, one small button. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "인덕션",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a single portable induction cooktop, three-quarter top view, thin flat black glass square slab with one round burner circle and a small touch panel strip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "가스레인지",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a two-burner tabletop gas stove, three-quarter top view, silver body with two black burner grates and two round knobs on the front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "오븐",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop electric oven, front view, black box with a glass front door showing two glowing orange heating rods inside, two round knobs on the right. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

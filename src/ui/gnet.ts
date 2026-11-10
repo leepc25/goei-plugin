@@ -5,7 +5,7 @@ import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, COUNT_RANGE, type CountKey,
-  readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
+  readGnet, findAnyPost, archived, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
   userNick, writeGnet, mergeKeyFigures, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
@@ -14,7 +14,7 @@ import { toast } from './toast';
 import { imageUrl } from './images';
 import { resolveSitePic } from '../core/sitepics';
 import { boardFiles, boardThumb, setSitePicSource, attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
-import { itemIconUrl } from '../host/itemicons';
+import { titleIconUrl } from '../host/itemicons';
 import { iconQuiet } from '../core/iconmatch';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
@@ -37,7 +37,7 @@ import { isPhone } from './media';
 import { winStyle, type PopSpec, type WinBox } from './popwin';
 
 type Compose =
-  | { kind: 'post' }
+  | { kind: 'post'; tag?: string }
   | { kind: 'comment'; post: number; parent: number; label: string }
   | { kind: 'dm'; nick: string; source?: GSource; label: string }
   | { kind: 'newdm' };
@@ -116,6 +116,11 @@ export function useBoardSite(site: BoardSite): void {
   uiSite = site;
 }
 export const boardSiteNow = (): BoardSite => uiSite;
+/** 사이트마다 다른 말: 연어 마켓은 쪽지가 아니라 채팅 (2026-11-10 사용자: 「채팅하기」인데 창은 쪽지함이었다) */
+const dmW = () => (uiSite === 'sm' ? '채팅' : '쪽지');
+const dmBox = () => (uiSite === 'sm' ? '내 채팅' : '쪽지함');
+/** 을/를 */
+const dmWo = () => (uiSite === 'sm' ? '채팅을' : '쪽지를');
 /** 그 사이트의 화면 상태: 지금 보고 있는 사이트면 gnet, 아니면 저장해 둔 것 (11-09 점검: 다른 사이트 자동 새로고침이 보고 있던 괴담넷 글을 닫고 읽음 처리하던 것) */
 function uiFor(site: BoardSite): GnetUi {
   if (site === uiSite) return gnet;
@@ -158,7 +163,7 @@ function withVars(chat: Chat, vars: Record<string, string>): Chat {
 /** 선쪽지 반영 (실패해도 본 결과는 둔다). 알림 문장을 돌려준다 */
 function saveIncoming(chat: Chat, st: GState, rows: unknown, plan: IncomingPlan, post?: GPost): { vars: Record<string, string>; note: string } {
   try {
-    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: '새 쪽지가 왔어요.' };
+    if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: uiSite === 'sm' ? '새 채팅이 왔어요.' : '새 쪽지가 왔어요.' };
     return { vars: {}, note: '' };
   } catch (error) {
     return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
@@ -177,6 +182,8 @@ async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Pr
   u.notice = '';
   u.failure = null;
   env.render();
+  // 방금 저장한 것(보낸 쪽지·내 댓글)이 기다리는 동안에도 바로 보이게 채팅을 다시 읽어 그린다 (2026-11-10 사용자: 보낸 쪽지가 답장 올 때까지 안 보였다)
+  await env.refresh().catch(() => undefined);
   try {
     u.notice = await work();
   } catch (error) {
@@ -220,7 +227,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?:
     });
     const u = uiFor(site);
     if (!automatic) u.open = null;
-    else if (u.open !== null && !findPost(readGnet((await currentChat(ctx)) ?? ctx.chat), u.open)) u.open = null;
+    else if (u.open !== null && !findAnyPost(readGnet((await currentChat(ctx)) ?? ctx.chat), u.open)) u.open = null;
     return note;
   });
 }
@@ -234,14 +241,14 @@ function withRaw<T>(raw: string, f: () => T): T {
   }
 }
 
-function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
+function writePost(ctx: ChatContext, env: GnetEnv, input: string, tag = '') {
   return run(ctx, env, '글을 올리는 중이에요.', async () => {
     const st = readGnet(ctx.chat);
     const nick = userNick(ctx.chat.scriptstate);
     const s = gnetSettings(ctx.chat.scriptstate);
     const draftPost: GPost = { id: 0, date: '', nick, title: '', body: input, views: 0, votes: 0, mine: true, comments: [] };
     const plan = incomingPlan(ctx.chat, st, s, nick, Math.random, { post: draftPost });
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, input, plan, names(ctx)));
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, tag ? `[${tag}] ${input}` : input, plan, names(ctx)));
     const { value, draft: parsed } = (await generate(prompt.messages, s.model, (r) => {
       const v = withRaw(r, () => parseJsonPayload(r)) as Record<string, unknown>;
       return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
@@ -252,10 +259,12 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
       const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
-      if (draft.tag) p.tag = draft.tag;
+      // 연어 마켓은 글쓴이가 고른 거래 구분이 말머리 (2026-11-10 사용자: 글쓰기에 팝니다·삽니다 구분이 있어야 한다)
+      if (tag || draft.tag) p.tag = tag || draft.tag;
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
       pushComments(p, got.comments, dateNow(chat));
+      bumpStats(p, got.comments.length);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       trimBoard(cur, s);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
@@ -271,6 +280,15 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     gnet.open = newId;
     return note;
   });
+}
+
+/**
+ * 새 댓글이 달린 글은 조회·추천도 같이 는다 (댓글 하나에 조회 5~24, 추천은 0~댓글 수+1).
+ * 글 하나 새로고침에만 있던 셈인데 내가 쓴 글·내가 단 댓글의 반응에는 빠져 있어, 댓글이 달려도 조회 0·추천 0 이었다 (2026-11-10 사용자)
+ */
+function bumpStats(p: GPost, n: number): void {
+  p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+  p.votes += Math.floor(Math.random() * (n + 2));
 }
 
 /** 글 하나만 새로고침 (v0.16.26, 사용자 요청): 그 글에 새 댓글이 달리고 조회·추천이 는다. 다른 글·쪽지는 그대로 */
@@ -297,8 +315,7 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(latest));
       const n = got.comments.length;
-      p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
-      p.votes += Math.floor(Math.random() * (n + 2));
+      bumpStats(p, n);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest), gnetSettings(latest.scriptstate).counts.act[1]);
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
@@ -320,7 +337,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
   // 내 댓글은 먼저 저장한다 (원본과 같음). 반응 생성이 실패해도 남는다
   const saved = await upd(ctx, (chat) => {
     const st = readGnet(chat);
-    index = addUserComment(st, postId, parent, nick, body, dateNow(chat));
+    index = addUserComment(st, postId, parent, nick, body, dateNow(chat), storyTurns(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
   });
   gnet.compose = null;
@@ -352,6 +369,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
       pushComments(p, got.comments, dateNow(chat));
+      bumpStats(p, got.comments.length);
       const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? '' : '등록했어요. 추가 답글은 없어요.';
@@ -372,7 +390,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
   }
   const me = userNick(ctx.chat.scriptstate);
   if (nick === me) {
-    gnet.notice = '나에게는 쪽지를 보낼 수 없어요.';
+    gnet.notice = `나에게는 ${dmWo()} 보낼 수 없어요.`;
     return env.render();
   }
   const saved = await upd(ctx, (chat) => {
@@ -407,7 +425,7 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
         return writeGnet(chat, cur);
       }).catch(() => null);
       if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
-      throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
+      throw new GnetError(`${dmWo()} 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
     await upd(ctx, (chat) => {
       const cur = readGnet(chat);
@@ -493,9 +511,9 @@ function composeView(c: Compose, busy: boolean): string {
   const to = c.kind === 'newdm'
     ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc(gnet.to)}" aria-label="받는 사람">`
     : c.kind === 'dm' ? `<p class="gn-to">받는 사람 <b>${esc(c.nick)}</b></p>` : '';
-  const ph = post ? '올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)' : gnet.attach.length ? '함께 보낼 글 (선택)' : '쪽지 내용';
-  return `<div class="ph-form gn-cpane">${paneHead(post ? '새 글' : '새 쪽지', c.kind === 'dm' ? esc(c.label) : '')}
-    <div class="ph-form-body">${to}
+  const ph = post ? '올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)' : gnet.attach.length ? '함께 보낼 글 (선택)' : `${dmW()} 내용`;
+  return `<div class="ph-form gn-cpane">${paneHead(post ? '새 글' : `새 ${dmW()}`, c.kind === 'dm' ? esc(c.label) : '')}
+    <div class="ph-form-body">${to}${post && uiSite === 'sm' ? `<div class="cats gn-wtags" role="group" aria-label="거래 구분">${SM_TAGS.map((t) => `<button class="${(c.tag ?? SM_TAGS[0]) === t ? 'on' : ''}" data-action="gn-wtag" data-value="${t}" aria-pressed="${(c.tag ?? SM_TAGS[0]) === t}">${t}</button>`).join('')}</div>` : ''}
       <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc(ph)}" aria-label="내용">${esc(gnet.draft)}</textarea>
       ${attachEditor('gn', gnet.attach, GN_KINDS, busy)}
     </div>
@@ -508,11 +526,10 @@ function replyBox(label: string, busy: boolean, depth: number): string {
   return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy, '답글 입력', chip)}</li>`;
 }
 
-/** 댓글 시각: 글과 같은 날이면 「14:23」, 다른 날이면 「05.14 09:10」 (시각 없는 옛 댓글은 없음) */
-function commentClock(p: GPost, c: GPost['comments'][number]): string {
+/** 댓글 시각: 늘 날짜와 함께 「05.14 09:10」 (2026-11-10 사용자: 시각만 있으면 이야기 시간이 흐른 뒤 맥락이 안 이어진다. 시각 없는 옛 댓글은 없음) */
+function commentClock(_p: GPost, c: GPost['comments'][number]): string {
   if (!c.time) return '';
-  const same = c.time.slice(0, 10) === String(p.date).slice(0, 10);
-  return `<time class="gn-c-time">${esc(same ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
+  return `<time class="gn-c-time">${esc(`${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
 }
 
 
@@ -522,10 +539,10 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
   const confirm = gnet.confirm === `d:${nick}`;
   const right = confirm
     ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc(nick)}">정말 삭제</button>`
-    : tool('gn-del-thread', ICONS.trash, '쪽지 삭제', `data-value="${esc(nick)}"`);
+    : tool('gn-del-thread', ICONS.trash, `${dmW()} 삭제`, `data-value="${esc(nick)}"`);
   const src = st.sources[nick];
   const c = gnet.compose;
-  const ph = c?.kind === 'dm' && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : '쪽지 입력';
+  const ph = c?.kind === 'dm' && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 ${dmW()}` : `${dmW()} 입력`;
   return `<div class="${inline ? 'gn-inline gn-dm-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead(esc(nick), `${t.rows.length}통`, right)}
     <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc(src.title)}」</div>` : ''}
       ${t.rows.map((d, i) => {
@@ -540,7 +557,7 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
 
 function dmList(st: GState, busy: boolean, mobile: boolean): string {
   const threads = dmThreads(st);
-  if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
+  if (!threads.length) return uiSite === 'sm' ? '<div class="ph-blank"><p>주고받은 채팅이 없어요.<br>매물에서 「채팅하기」를 눌러 보내 보세요.</p></div>' : '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
   return `<ul class="ph-list gn-list">${threads
     .map((t) => {
       const on = gnet.openDm === t.nick && !gnet.settings;
@@ -548,7 +565,7 @@ function dmList(st: GState, busy: boolean, mobile: boolean): string {
       const confirm = gnet.confirm === `d:${t.nick}`;
       const del = confirm
         ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}">정말 삭제</button>`
-        : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}" aria-label="${esc(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+        : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc(t.nick)}" aria-label="${esc(t.nick)} ${dmW()} 삭제" title="삭제">${ICONS.trash}</button>`;
       return `<li class="ph-row"><button class="ph-main gn-dmrow${on ? ' on' : ''}" data-action="gn-open-dm" data-value="${esc(t.nick)}" aria-pressed="${on}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
         <span class="ph-who"><span class="ph-who-top"><b>${esc(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc(time(t.lastDate) || t.lastDate)}</small>` : ''}</span>
@@ -602,7 +619,9 @@ const LOGO_SM = (id: BoardSite, cls = 'bs-logo') => siteLogo(id === 'gal' ? 'gal
 /** 목록에 보일 글 (분류·찾기·정렬) */
 function shownPosts(st: GState): GPost[] {
   const q = gnet.q.trim().toLowerCase();
-  let list = st.posts.filter((p) =>
+  // 보관함의 글(새로고침으로 게시판에서 빠진 내 글·스크랩)은 「내가 쓴 글」「스크랩」에만 이어 붙는다 (2026-11-10 사용자)
+  const pool = gnet.cat === '@mine' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.mine)] : gnet.cat === '@scrap' ? [...st.posts, ...(st.archive ?? []).filter((p) => p.scrap)] : st.posts;
+  let list = pool.filter((p) =>
     (gnet.cat === '' || (gnet.cat === '@mine' ? p.mine || p.comments.some((c) => c.mine) : gnet.cat === '@scrap' ? !!p.scrap : p.tag === gnet.cat))
     && (!q || `${p.title}\n${p.body}`.toLowerCase().includes(q)));
   if (gnet.sort === 'hot') list = [...list].sort((a, b) => b.votes - a.votes || b.views - a.views);
@@ -650,9 +669,12 @@ const writeBtn = (cls: string, label = '글쓰기') => `<button class="${cls}" d
 // 빈 게시판에서도 글은 쓸 수 있다
 const emptyList = (busy: boolean, text: string) => `<div class="bs-empty"><p>${text}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button>${writeBtn('bs-w')}</div></div>`;
 const none = (list: GPost[]) => (!list.length ? '<p class="bs-none">해당하는 글이 없어요.</p>' : '');
-const onCat = (v: string) => gnet.sub === 'board' && gnet.cat === v;
-const catBtn = (v: string, label: string, cls = '', extra = '') => `<button class="${[cls, onCat(v) ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-cat" data-value="${esc(v)}" aria-pressed="${onCat(v)}">${esc(label)}${extra}</button>`;
-const dmBtn = (st: GState, unreadDm: number, label = '쪽지함', cls = '') => `<button class="${[cls, gnet.sub === 'dm' ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-sub" data-value="dm" aria-pressed="${gnet.sub === 'dm'}">${label}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ''}</button>`;
+// PC 쪽지함은 게시판 위에 뜨는 창이라 메뉴 선택을 가져가지 않는다 (2026-11-10 사용자: 쪽지함이 선택을 차지했다가 닫으면 앞 선택으로 돌아가 헷갈렸다).
+// 그래서 PC 에서는 쪽지함 단추에 선택 표시가 없고(편지 아이콘으로 「여는 단추」임을 보인다), 쪽지함이 떠 있어도 보던 분류의 선택은 그대로다. 폰은 쪽지함이 한 화면이라 앞과 같다
+const dmTakes = () => gnet.sub === 'dm' && narrow();
+const onCat = (v: string) => !dmTakes() && gnet.cat === v;
+const catBtn = (v: string, label: string, cls = '', extra = '', on = onCat(v)) => `<button class="${[cls, on ? 'on' : ''].filter(Boolean).join(' ')}" data-action="gn-cat" data-value="${esc(v)}" aria-pressed="${on}">${esc(label)}${extra}</button>`;
+const dmBtn = (st: GState, unreadDm: number, label = '쪽지함', cls = '') => `<button class="${[cls, dmTakes() ? 'on' : '', narrow() ? '' : 'gn-dmpop'].filter(Boolean).join(' ')}" data-action="gn-sub" data-value="dm" ${narrow() ? `aria-pressed="${dmTakes()}"` : `aria-haspopup="dialog" aria-expanded="${gnet.sub === 'dm'}"`}>${narrow() ? '' : ICONS.mail}${label}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ''}</button>`;
 /** 익명(ㅇㅇ) 글쓴이 옆 IP 앞자리: 글 번호로 늘 같게 (시안 괴담갤) */
 const ipOf = (id: number) => `${(id * 37) % 200 + 20}.${(id * 101) % 250}`;
 const nickIp = (nick: string, id: number) => `${esc(nick)}${nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(id)})</span>` : ''}`;
@@ -681,9 +703,11 @@ function smPicUrl(p: GPost): string | null {
   const t = boardThumb(p.body);
   if (t?.url) return t.url;
   const name = smItemName(p);
-  return name ? iconQuiet(() => itemIconUrl(name)) : null;
+  return name ? iconQuiet(() => titleIconUrl(name)) : null;
 }
 const CAMERA = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v13H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+/** 연어 마켓 글쓰기 거래 구분 (목록·본문이 이 말머리로 사진 칸·꼬리표를 정한다) */
+const SM_TAGS = ['팝니다', '삽니다', '나눔'];
 const SM_BG = ['cloth', 'news', 'floor', 'wood', 'desk', 'dark'];
 
 /** 사이트 머리 */
@@ -693,13 +717,13 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
     case 'gal':
       return `<div class="hd">${home(`${LOGO_SM(site)}<span>괴담 갤러리<small>무섭고 이상한 이야기</small></span>`)}<label class="sch">${searchInput('갤러리 & 통합검색')}<b>${ICONS.search}</b></label></div>`;
     case 'wpf':
-      return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>
-        <div class="bar"><button data-action="gn-home">HOME</button>${catBtn('', '자유토론')}${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+      return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>${narrow() ? `
+        <div class="bar">${wpfMenu(st, unreadDm)}</div>` : ''}`;
     case 'sm':
       return `<div class="hd">${home(`${LOGO_SM(site)}연어 마켓`)}<nav>${catBtn('', '중고거래')}${catBtn('삽니다', '삽니다')}${catBtn('정보', '오컬트 정보')}</nav><label class="sr">${searchInput('물건 이름으로 찾기')}</label>${writeBtn('wr')}<button class="ch" data-action="gn-sub" data-value="dm">내 채팅${unreadDm ? `<em>${unreadDm}</em>` : ''}</button></div>
         <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>`;
     default: {
-      const nav = `<nav><button class="${gnet.sub === 'board' && gnet.sort !== 'hot' ? 'on' : ''}" data-action="gn-home">커뮤니티</button>${dmBtn(st, unreadDm, '쪽지')}<button class="${gnet.sub === 'board' && gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">랭킹</button></nav>`;
+      const nav = `<nav><button class="${!dmTakes() && gnet.sort !== 'hot' ? 'on' : ''}" data-action="gn-home">커뮤니티</button>${dmBtn(st, unreadDm, '쪽지')}<button class="${!dmTakes() && gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">랭킹</button></nav>`;
       return `<div class="hd">${home(`${LOGO_SM(site)}괴담넷<small>.net</small>`)}${nav}<label class="sr">${ICONS.search}${searchInput('괴담넷 검색')}</label></div>`;
     }
   }
@@ -710,17 +734,39 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
 function gnSide(st: GState, unreadDm: number): string {
   const posts = [...st.posts].sort((a, b) => b.id - a.id).slice(0, 60);
   const items = posts.map((p) => {
-    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
     return `<button class="sp${on ? ' on' : ''}" data-action="${on ? 'gn-home' : 'gn-open-side'}" data-value="${p.id}" aria-pressed="${on}" title="${esc(p.title)}">${p.tag ? `<i>[${esc(p.tag)}]</i>` : ''}<span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}${dot(p)}</button>`;
   }).join('');
-  return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${catBtn('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</nav>`;
+  // 선택 표시는 하나만: 글을 열었으면 그 글 줄, 아니면 보는 분류 (2026-11-10 사용자: 내가 쓴 글·스크랩을 고른 채 글을 열면 둘 다 선택돼 있었다)
+  const reading = gnet.open !== null && !gnet.compose;
+  const cat = (v: string, label: string) => catBtn(v, label, '', '', onCat(v) && !reading);
+  return `<nav class="side" aria-label="게시판 메뉴"><h6>글 목록</h6>${cat('', '전체 글')}<div class="splist">${items || '<p class="sp-none">아직 글이 없어요.</p>'}</div><h6>내 메뉴</h6>${dmBtn(st, unreadDm)}${cat('@mine', '내가 쓴 글')}${cat('@scrap', '스크랩')}</nav>`;
+}
+
+/** 세정게 메뉴 단추 (PC 왼쪽 MENU · 폰 윗줄 띠 공용) */
+function wpfMenu(st: GState, unreadDm: number): string {
+  // 선택 표시는 하나만: 글을 열었으면 인기글 그 줄, 아니면 보는 분류
+  const reading = gnet.open !== null && !gnet.compose;
+  const cat = (v: string) => onCat(v) && !reading;
+  return `<button class="${cat('') ? 'on' : ''}" data-action="gn-home" aria-pressed="${cat('')}">HOME</button>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글', '', '', cat('@mine'))}${catBtn('@scrap', '스크랩', '', '', cat('@scrap'))}`;
+}
+
+/** 세정게 왼쪽 인기글: 조회 많은 순, 글을 열어도 그대로 남는다 */
+function wpfTop(st: GState): string {
+  const top = [...st.posts].filter((p) => p.tag !== '공지').sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 10);
+  if (!top.length) return '';
+  const items = top.map((p) => {
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
+    return `<li><button class="${on ? 'on' : ''}" data-action="gn-open-side" data-value="${p.id}" title="${esc(p.title)}">${esc(p.title)}</button></li>`;
+  }).join('');
+  return `<div class="t top">인기글</div><ol class="top">${items}</ol>`;
 }
 
 /** 괴담갤 오른쪽 칸 (11-09 사용자: 디씨 사이드바 「힛갤」 — 지금 생성된 글을 조회수 순으로, 본문을 열어도 그대로 남는 글 목록) */
 function galSide(st: GState): string {
   const top = [...st.posts].filter((p) => p.tag !== '공지').sort((a, b) => b.views - a.views || b.votes - a.votes || b.id - a.id).slice(0, 15);
   const items = top.map((p) => {
-    const on = gnet.sub === 'board' && gnet.open === p.id && !gnet.compose;
+    const on = !dmTakes() && gnet.open === p.id && !gnet.compose;
     return `<li><button class="${on ? 'on' : ''}" data-action="gn-open-side" data-value="${p.id}" title="${esc(p.title)}"><span>${esc(p.title)}</span>${p.comments.length ? `<em>[${p.comments.length}]</em>` : ''}<small>${p.views}</small></button></li>`;
   }).join('');
   return `<div class="hit"><h4>힛갤</h4>${items ? `<ol>${items}</ol>` : '<p class="none">아직 글이 없어요.</p>'}</div>`;
@@ -733,8 +779,11 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
   const empty = !st.posts.length ? emptyList(busy, '게시글이 없어요.') : '';
   switch (site) {
     case 'gal': {
-      const tabs = `<div class="lt">${catBtn('', '전체글', '', '')}<button class="${gnet.sort === 'hot' ? 'on' : ''}" data-action="gn-sort" data-value="hot">개념글</button>${catBtn('공지', '공지')}${dmBtn(st, unreadDm)}${writeBtn('wr')}</div>`;
-      const heads = `<div class="hds">${catBtn('', '전체')}${tagsOf(st).filter((t) => t !== '공지').map((t) => catBtn(t, t)).join('')}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+      // 윗줄 탭은 전체글 하나 (2026-11-10 사용자: 공지는 없애고, 개념글은 오른쪽 힛갤이 그 역할을 한다)
+      const tabOn = !dmTakes() && gnet.cat === '';
+      const tabs = `<div class="lt"><button class="${tabOn ? 'on' : ''}" data-action="gn-tab" data-value="all" aria-pressed="${tabOn}">전체글</button>${dmBtn(st, unreadDm)}${empty ? '' : writeBtn('wr')}</div>`;
+      // 말머리 분류 단추는 두지 않는다 (2026-11-10 사용자: 글이 몇 개 안 되는데 지저분하다). 말머리는 글마다 표에 그대로 보인다
+      const heads = `<div class="hds">${catBtn('', '전체')}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
       const ic = (p: GPost) => `<span class="ii ${boardThumb(p.body) ? 'im' : 'tx'}"></span>`;
       const ntc = (p: GPost) => p.tag === '공지';
       const rows = list.map((p) => ntc(p)
@@ -743,7 +792,9 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
       const table = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
         <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>${rows}</table>`;
       const mlist = `<div class="mlist">${list.map((p) => `<div class="it${ntc(p) ? ' ntc' : ''}">${openBtn(p, `<div class="t">${ntc(p) ? '' : `[${esc(p.tag ?? '일반')}] `}${esc(p.title)}${ntc(p) ? '' : `<em>[${p.comments.length}]</em>`}${dot(p)}</div><div class="m">${ntc(p) ? `${esc(p.nick)} · ${esc(when(p, now))}` : `${esc(p.nick)}${p.nick === 'ㅇㅇ' ? `(${ipOf(p.id)})` : ''} · ${esc(when(p, now))} · 조회 ${p.views} · 추천 ${p.votes}`}</div>`)}</div>`).join('')}</div>`;
-      return `<div class="body">${tabs}${heads}${empty || `${table}${mlist}${none(list)}`}
+      // 글이 하나도 없으면 탭 줄과 안내(새로고침·글쓰기)만 (2026-11-10 사용자: 빈 게시판에 글쓰기 단추 셋·분류·찾기칸이 다 떠 지저분했다)
+      if (empty) return `<div class="body">${tabs}${empty}</div>`;
+      return `<div class="body">${tabs}${heads}${table}${mlist}${none(list)}
         <div class="bt2">${catBtn('', '전체글')}${writeBtn('wr')}</div>${pager(all.length, 'pager', '', '다음')}
         <label class="bsch"><span>제목+내용</span>${searchInput('검색어')}<button class="go" data-action="gn-search-go">검색</button></label></div>`;
     }
@@ -764,10 +815,10 @@ function siteList(site: BoardSite, st: GState, now: string, busy: boolean, unrea
         const u = smPicUrl(p);
         const img = u ? `<img src="${esc(u)}" alt="">` : ICONS.bag;
         const ph = want
-          ? `<div class="ph want"><b>삽니다</b><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
+          ? `<div class="ph want"><span class="tag">삽니다</span><p>${esc([...previewText(p.body)].slice(0, 70).join(''))}</p></div>`
           : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${img}${p.tag ? `<span class="tag${p.tag === '나눔' ? ' g' : ''}">${esc(p.tag)}</span>` : ''}</div>`;
         const price = priceOf(p);
-        return openBtn(p, `${ph}<div><div class="nm">${esc(p.title)}${dot(p)}</div>${price ? `<div class="pr">${esc(price)}</div>` : ''}<div class="mt">${esc(ago(p, now))} · 관심 ${p.votes} · 채팅 ${p.comments.length}</div></div>`, 'c');
+        return openBtn(p, `${ph}<div><div class="nm">${esc(p.title)}${dot(p)}</div>${price ? `<div class="pr">${esc(price)}</div>` : ''}<div class="mt">${esc(ago(p, now))} · 관심 ${p.votes} · 댓글 ${p.comments.length}</div></div>`, 'c');
       }).join('');
       const cats = `<div class="cats">${['', ...tagsOf(st)].map((t) => catBtn(t, t || '전체')).join('')}${catBtn('@mine', '내 글')}${catBtn('@scrap', '관심 목록')}${dmBtn(st, unreadDm, '내 채팅')}</div>`;
       const sort = `<span class="sort">${([['hot', '인기순'], ['new', '최신순']] as const).map(([k, l]) => `<button class="${gnet.sort === k ? 'on' : ''}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(' · ')}</span>`;
@@ -802,7 +853,7 @@ function commentTree(site: BoardSite, p: GPost, busy: boolean): string {
       const shown = site === 'wpf' && c.nick === 'ㅇㅇ' ? '익명' : c.nick;
       const author = c.mine
         ? `<b class="gn-me">${esc(shown)}</b>`
-        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기"><b>${esc(shown)}</b></button>`;
+        : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="${dmW()} 보내기"><b>${esc(shown)}</b></button>`;
       const ip = site === 'gal' && c.nick === 'ㅇㅇ' ? ` <span class="ip">(${ipOf(p.id + k)})</span>` : '';
       const del = c.mine
         ? confirm
@@ -831,7 +882,7 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
   const c = gnet.compose;
   const reply = c?.kind === 'comment' && c.post === p.id && c.parent > 0 ? c : null;
   const confirm = gnet.confirm === `p:${p.id}`;
-  const who = p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기"><b>${esc(p.nick)}</b></button>`;
+  const who = p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="${dmW()} 보내기"><b>${esc(p.nick)}</b></button>`;
   const del = (cls: string) => (p.mine ? `<button class="${cls}${confirm ? ' danger' : ''}" data-action="gn-del-post" data-value="${p.id}">${confirm ? '정말 삭제' : '삭제'}</button>` : '');
   const more = (cls: string) => `<button class="${cls}" data-action="gn-post-refresh" data-value="${p.id}" ${busy ? 'disabled' : ''}>새 댓글 보기</button>`;
   const back = (cls: string, label = '‹ 목록으로') => `<button class="${cls}" data-action="gn-back">${label}</button>`;
@@ -857,12 +908,17 @@ function sitePost(site: BoardSite, p: GPost, busy: boolean, now: string): string
         <div class="nav2">${back('bb', '목록')}<span>${scrap('bb', '스크랩됨', '스크랩')} ${more('bb')} ${del('bb')}</span>${writeBtn('bb')}</div></article>`;
     }
     case 'sm': {
-      const u = smPicUrl(p);
       const price = priceOf(p);
-      return `<article class="detail gn-post"><div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div><div>
-        <div class="seller"><i></i><div>${who}</div></div>
-        <h2 class="gn-post-title">${esc(p.title)}</h2><div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(ago(p, now))}</div>${price ? `<div class="price">${esc(price)}</div>` : ''}
-        <div class="body gn-post-body">${body(p.body)}</div><div class="stat">관심 ${p.votes} · 채팅 ${p.comments.length} · 조회 ${p.views}</div>
+      // 위는 사진 | 내용(판매자·제목·값·본문)만 두 칸, 단추 줄과 문의는 그 아래 한 칸 — 전체를 가운데 좁게(720px) (2026-11-10 사용자: 사진 아래가 텅 비고, 문의를 넓게 펴면 휑하다).
+      // 삽니다 글은 물건 그림 없이 빈 사진 칸만 (사용자: 포맷상 칸은 있어야 한다)
+      const want = p.tag === '삽니다';
+      const u = want ? null : smPicUrl(p);
+      const pic = want ? '<div class="ph want"><span class="tag">삽니다</span></div>' : `<div class="ph ${SM_BG[p.id % SM_BG.length]}">${u ? `<img src="${esc(u)}" alt="">` : ICONS.bag}</div>`;
+      // 판매자와 관심·댓글·조회는 사진 아래 한 묶음(왼쪽 칸), 오른쪽은 제목 → 값 → 말머리·날짜 → 본문
+      return `<article class="detail gn-post"><div class="side">${pic}<div class="seller"><i></i><div>${who}<small>관심 ${p.votes} · 댓글 ${p.comments.length} · 조회 ${p.views}</small></div></div></div><div class="info">
+        <h2 class="gn-post-title">${esc(p.title)}</h2>${price ? `<div class="price">${esc(price)}</div>` : ''}<div class="mt2">${p.tag ? `${esc(p.tag)} · ` : ''}${esc(p.date)} · ${esc(ago(p, now))}</div>
+        <div class="body gn-post-body">${body(p.body)}</div></div>
+        <div class="qna">
         <div class="act">${scrap('', '♥', '♡')}${p.mine ? '' : `<button class="chat" data-action="gn-dm-from" data-value="${p.id}:0">채팅하기</button>`}${back('back')}${more('')}${del('')}</div>
         ${p.comments.length ? `<div class="cmh">문의 <b>${p.comments.length}</b></div>` : ''}${list}${cin}</div></article>`;
     }
@@ -880,20 +936,20 @@ function siteDm(st: GState, busy: boolean): string {
   const c = gnet.compose;
   if (c && (c.kind === 'newdm' || (c.kind === 'dm' && !st.dms.some((d) => d.nick === c.nick)))) return composeView(c, busy);
   if (gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return dmPane(st, gnet.openDm, busy);
-  return `<div class="bs-dmh"><h2>쪽지함</h2><button class="bs-w" data-action="gn-newdm">쪽지 쓰기</button></div>${dmList(st, busy, false)}`;
+  return `<div class="bs-dmh"><h2>${dmBox()}</h2><button class="bs-w" data-action="gn-newdm">${dmW()} 쓰기</button></div>${dmList(st, busy, false)}`;
 }
 
 function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, unreadDm: number, popDm: boolean): string {
   const now = dateNow(ctx.chat);
   if (gnet.compose?.kind === 'post') return composeView(gnet.compose, busy);
   if (gnet.sub === 'dm' && !popDm) return siteDm(st, busy);
-  const p = gnet.open !== null ? findPost(st, gnet.open) : undefined;
-  if (p) return sitePost(site, p, busy, now);
+  const p = gnet.open !== null ? findAnyPost(st, gnet.open) : undefined;
+  if (p) return (archived(st, p.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 본편 참고에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : '') + sitePost(site, p, busy, now);
   return siteList(site, st, now, busy, unreadDm);
 }
 
 /** 사이트 한 장 (시안 「브라우저_시안3」 그대로: 괴담넷 .gn·괴담갤 .dc·세정게 .wp·연어 마켓 .sm) */
-function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string): string {
+function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, mobile: boolean, extras: string, note: string): string {
   const unreadDm = st.dms.filter((d) => d.unread).length;
   // PC 쪽지함은 게시판 위에 뜨는 팝업창 (11-09 사용자: 우주 쇼핑몰 질문 창처럼 끌기·크기 조절·바깥 누르면 닫힘). 폰은 전체 화면 그대로
   const popDm = gnet.sub === 'dm' && !mobile;
@@ -902,18 +958,21 @@ function siteHtml(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   const box = (inner: string) => (plain ? `<div class="bs-plain">${extras}${inner}</div>` : `${extras ? `<div class="bs-x">${extras}</div>` : ''}${inner}`);
   let inner: string;
   if (site === 'gn') inner = `<div class="wrap">${gnSide(st, unreadDm)}<div class="gcol">${plain ? `<div class="gmain">${extras}${main}</div>` : `${extras}${main}`}</div></div>`;
-  else if (site === 'gal' && !mobile) inner = `<div class="gal-cols">${box(main)}<aside class="gal-side">${galSide(st)}</aside></div>`;
+  // 본문 쪽은 늘 한 칸으로 싼다: 「불러오는 중」 줄(extras)이 따로 칸을 차지하면 두 칸 격자가 밀려 본문이 오른쪽 좁은 칸으로 갔다 (2026-11-10 사용자)
+  // 글이 하나도 없으면 힛갤 칸도 두지 않는다
+  else if (site === 'gal' && !mobile) inner = `<div class="gal-cols${st.posts.length ? '' : ' solo'}"><div class="gal-main">${box(main)}</div>${st.posts.length ? `<aside class="gal-side">${galSide(st)}</aside>` : ''}</div>`;
   else if (site === 'wpf') {
-    // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다)
-    const lm = `<div class="lm"><div class="t">MENU</div>${catBtn('', '전체')}${tagsOf(st).map((t) => catBtn(t, t)).join('')}</div>`;
+    // 왼쪽 MENU 는 글을 열어도·쓸 때도 그대로 (11-09 사용자: 통째로 본문으로 바뀌면 안 된다).
+    // PC 는 윗줄 띠 대신 여기에 메뉴를 모으고 아래를 인기글로 채운다 (2026-11-10 사용자: 말머리만 있던 왼쪽 메뉴가 쓸데없다). 폰은 왼쪽 칸이 없어 윗줄 띠 그대로
+    const lm = `<div class="lm"><div class="t">MENU</div>${wpfMenu(st, unreadDm)}${writeBtn('')}${wpfTop(st)}</div>`;
     inner = `<div class="pg">${box(`<div class="cols">${lm}<div class="colr">${main}</div></div><div class="ft">관리 : 부매니저 &nbsp;·&nbsp; 이 게시판은 감시받고 있습니다</div>`)}</div>`;
   }
   else inner = box(main);
   // 쪽지함 창: 스크롤 칸 맨 위의 sticky 0 높이 틀 안에 absolute 로 → 글을 내려도 같은 자리에 떠 있고 사이트 색(.bs 변수)을 그대로 쓴다
   const dmWin = popDm
-    ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="쪽지함"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} 쪽지함</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
+    ? `<div class="gn-dmhost"><aside class="gn-dmwin" role="dialog" aria-label="${dmBox()}"${winStyle(gnet.dmWin)}><div class="gn-dmwin-hd"><b>${ICONS.mail} ${dmBox()}</b><button class="ph-tool sm" data-action="gn-dm-close" aria-label="닫기" title="닫기">${ICONS.close}</button></div><div class="gn-dmwin-bd">${siteDm(st, busy)}</div><i class="gn-rs" aria-hidden="true"></i></aside></div>`
     : '';
-  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}</main>`;
+  return `<main class="gx-body gn bs bs-${site}${mobile ? ' bs-m' : ''}" data-site="${site}">${dmWin}${siteHead(site, st, unreadDm)}${inner}${note}</main>`;
 }
 
 /** 쪽지함 팝업창 (ui/popwin.ts 공통) */
@@ -958,7 +1017,8 @@ export function gnetTab(base: ChatContext, env?: GnetEnv, site: BoardSite = 'gn'
   const note = toast('gn', gnet.notice, (t) => {
     if (gnet.notice === t) gnet.notice = '';
   });
-  return siteHtml(site, ctx, st, busy, mobile, `${status}${nick}${fail}${note}`);
+  // 떠 있는 알림(note)은 본문 위 줄(extras)에 넣지 않는다: 알림만 있어도 빈 줄이 한 칸 생겼다
+  return siteHtml(site, ctx, st, busy, mobile, `${status}${nick}${fail}`, note);
 }
 
 const AUTO_LAST = '$gn_auto_last';
@@ -1064,7 +1124,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       gnet.settings = false;
       if (gnet.compose && gnet.compose.kind !== 'post') gnet.compose = null;
       if (gnet.compose?.kind === 'post') gnet.compose = null;
-      const p = gnet.open !== null ? findPost(st(), gnet.open) : undefined;
+      const p = gnet.open !== null ? findAnyPost(st(), gnet.open) : undefined;
       if (p && postUnread(p)) {
         const id = p.id;
         await mutate(ctx, env, (s) => acknowledge(s, id), {}, false);
@@ -1092,6 +1152,11 @@ export async function handleGnet(action: string, value: string | undefined, base
       Object.assign(gnet, { sub: 'board', open: null, openDm: null, cat: v, page: 1, settings: false });
       if (gnet.compose?.kind !== 'post') gnet.compose = null;
       break;
+    case 'gn-tab':
+      // 괴담갤 윗줄 「전체글」: 분류·정렬을 처음으로
+      Object.assign(gnet, { sub: 'board', open: null, openDm: null, page: 1, settings: false, cat: '', sort: 'new' });
+      if (gnet.compose?.kind !== 'post') gnet.compose = null;
+      break;
     case 'gn-sort':
       gnet.sort = v === 'hot' || v === 'cmt' ? v : 'new';
       Object.assign(gnet, { sub: 'board', open: null, page: 1 });
@@ -1108,7 +1173,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     case 'gn-down':
       // 추천·비추는 한 번씩, 다시 누르면 취소 (시안: 글마다 추천 단추)
       await mutate(ctx, env, (s) => {
-        const p = findPost(s, a);
+        const p = findAnyPost(s, a);
         if (!p) return false;
         if (action === 'gn-down') p.down = !p.down;
         else {
@@ -1125,11 +1190,19 @@ export async function handleGnet(action: string, value: string | undefined, base
       break;
     case 'gn-scrap':
       await mutate(ctx, env, (s) => {
-        const p = findPost(s, a);
+        const p = findAnyPost(s, a);
         if (!p) return false;
         p.scrap = !p.scrap;
+        // 보관함에 스크랩으로만 남아 있던 남의 글은 스크랩을 풀면 보관할 까닭이 없다
+        if (!p.scrap && !p.mine && archived(s, p.id)) {
+          s.archive = s.archive.filter((x) => x.id !== p.id);
+          if (gnet.open === p.id) gnet.open = null;
+        }
       }, {}, false);
       return true;
+    case 'gn-wtag':
+      if (gnet.compose?.kind === 'post') gnet.compose = { kind: 'post', tag: v };
+      break;
     case 'gn-write':
       gnet.settings = false;
       gnet.sub = 'board';
@@ -1155,7 +1228,7 @@ export async function handleGnet(action: string, value: string | undefined, base
       return true;
     }
     case 'gn-reply': {
-      const c = findPost(st(), a)?.comments[b - 1];
+      const c = findAnyPost(st(), a)?.comments[b - 1];
       if (!c) break;
       gnet.draft = '';
       gnet.attach = [];
@@ -1173,13 +1246,13 @@ export async function handleGnet(action: string, value: string | undefined, base
       return true;
     }
     case 'gn-dm-from': {
-      const p = findPost(st(), a);
+      const p = findAnyPost(st(), a);
       const contact = p && (b > 0 ? p.comments[b - 1] : p);
       if (!p || !contact || contact.mine) break;
       gnet.sub = 'dm';
       gnet.settings = false;
       gnet.openDm = contact.nick;
-      gnet.compose = { kind: 'dm', nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 쪽지 · 「${p.title}」` };
+      gnet.compose = { kind: 'dm', nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 ${dmW()} · 「${p.title}」` };
       gnet.draft = '';
       gnet.attach = [];
       break;
@@ -1220,7 +1293,7 @@ export async function handleGnet(action: string, value: string | undefined, base
         gnet.notice = `첨부 내용과 글이 작성 상한(${cap}토큰)을 넘었어요. 조금 줄여 주세요.`;
         break;
       }
-      if (c.kind === 'post') void writePost(ctx, env, text);
+      if (c.kind === 'post') void writePost(ctx, env, text, siteOf(ctx) === 'sm' ? c.tag ?? SM_TAGS[0] : '');
       else if (c.kind === 'comment') void writeComment(ctx, env, c.post, c.parent, text);
       else if (c.kind === 'dm') void sendDm(ctx, env, c.nick, text, c.source);
       else {
@@ -1235,6 +1308,7 @@ export async function handleGnet(action: string, value: string | undefined, base
     }
     case 'gn-post-refresh':
       if (findPost(st(), a)) void refreshPost(ctx, env, a);
+      else if (archived(st(), a)) gnet.notice = '보관된 글이라 새 댓글을 불러오지 않아요. 댓글을 달면 그 턴에 다시 이어져요.';
       break;
     case 'gn-del-post':
       if (gnet.confirm !== `p:${a}`) {
@@ -1344,7 +1418,7 @@ function sitePicFor(ctx: ChatContext): void {
 export function boardChrome(base: ChatContext, site: BoardSite): { title: string; path: string } | null {
   useBoardSite(site);
   if (gnet.sub !== 'board' || gnet.open === null || gnet.compose?.kind === 'post') return null;
-  const p = findPost(readGnet(siteCtx(base, site).chat), gnet.open);
+  const p = findAnyPost(readGnet(siteCtx(base, site).chat), gnet.open);
   if (!p) return null;
   const path = site === 'gal' ? `/board/view/?id=horror&no=${p.id}` : site === 'wpf' ? `/zboard.php?id=wpf&no=${p.id}` : site === 'sm' ? `/articles/${p.id}` : `/board/free/${p.id}`;
   return { title: site === 'sm' ? '' : p.title, path };

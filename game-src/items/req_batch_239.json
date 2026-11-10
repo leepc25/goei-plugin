@@ -1,0 +1,85 @@
+{
+ "description": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "items": [
+  {
+   "ko": "착즙기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a slow juicer, front view, tall white body with a clear plastic hopper on top and a spout in front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "구강세정기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a water flosser, front view, small white base with a clear water tank and a slim handle with a thin nozzle standing beside it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "사운드바",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a long soundbar speaker, front view, very thin black horizontal bar about six times wider than tall with a fabric grille front. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "제빵기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bread maker machine, three-quarter view, white boxy machine with a small window in the lid showing a golden loaf inside. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "전기그릴",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric tabletop grill, three-quarter top view, flat rectangular black ribbed grill plate on a low base, two strips of meat on it. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "음식물처리기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a countertop food waste dryer bin, front view, small white rounded cylinder with a hinged lid on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "비데",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a bidet toilet seat attachment, top view, white toilet seat with a control panel bulge on the right side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "모기퇴치기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an electric mosquito zapper lamp, front view, small cylinder lantern with a glowing purple-blue light behind a black wire grid cage. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "SSD",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a small solid state drive, three-quarter view, thin dark grey metal rectangular case with a connector on one short side. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "두유제조기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a soy milk maker, front view, white kettle-shaped machine with a handle and a dark lid with a few buttons. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "분유제조기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a baby formula maker machine, front view, white box with a top powder container and a small nozzle above a baby bottle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "보틀워머",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a baby bottle warmer, three-quarter view, small white round cup-shaped heater holding one baby bottle. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "수비드머신",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a sous vide immersion cooker stick, side view, long black cylinder with a clamp on the side and a small dial on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "맥주제조기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a home beer brewing machine, front view, round stainless steel keg with a small tap and a glass of foamy beer. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "스팀해빙기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a handheld steam thawing gun, side view, small red machine with a long nozzle hose, puff of steam at the tip. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  },
+  {
+   "ko": "문서세단기",
+   "kind": "device",
+   "en": "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a paper shredder, three-quarter view, small black bin with a slot on top and shredded paper strips inside a clear window. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  }
+ ]
+}

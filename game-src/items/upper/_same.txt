@@ -1,0 +1,844 @@
+# 분류마다 같은 뜻으로 쓰는 말 (2026-11-10 사용자: 대·중·소분류 단계마다 매칭 단어를 넉넉히)
+# 「분류: 말 말 …」 띄어쓰기는 _ . 물건 이름이 이 말이면 그 분류의 그림 가운데 하나를 뽑아 보여 준다.
+# 대분류(종류)는 @종류. 중·소분류는 윗말 그대로. 분류 이름 자체(과자·음식)는 적지 않아도 된다.
+# 어느 그림의 이름과 그대로 같은 말은 그 그림이 먼저라 여기 적어도 쓰이지 않는다(검사에 나옴).
+
+# ── 대분류 ──
+@food: !음식 먹을것 먹을거리 먹거리 식품 식료품 식량 요리 음식물 끼니 식사 먹을_것 식재료 양식거리 부식
+@wear: 옷 !의류 의복 옷가지 복장 차림 착용품 패션 옷차림 의상
+@tool: 도구 연장 공구류 용구 작업도구 기자재
+@device: 기기 전자기기 전자제품 가전제품 디바이스 전자장비 전자_기기 기계장치
+@medical: 의료 의료품 의약품 의료용품 의료물품 구급품 약품 의료_물품 구급용품
+@weapon: 무기 병기 흉기 무장 무기류 살상무기 호신용품
+@paper: 서류 문서류 종이류 문건 기록물 서면
+@key: 열쇠 출입수단 키류 출입카드
+@valuable: 귀중품 값진_것 보물 재물 금품 고가품 재산 값나가는_것 패물
+@consumable: 소모품 소모성_물품 일회용품 생필품 비품 잡화
+@charm: 부적 주술품 주물 영험한_것 호부 액막이 주술도구 벽사물
+@seal: 봉인 봉인구 봉인도구 봉인함 격리용기 봉인_용기 격리_용기
+@anomaly: 괴이 괴이_물건 괴물건 이상한_것 기물 괴이체 변칙물 이상물체 저주받은_물건 괴이_유물
+@adult: 성인 성인물 성인_물건 야한_것 19금 성인_용품
+@body: 신체 신체_일부 몸_조각 사체_일부 인체 인체_조각 시신_일부 살점 유해
+@misc: 잡동사니 잡화류 잡것 허드레 잡물 잡다한_것
+
+# ── 음식 ──
+과자: 다과 간식 주전부리 스낵 군것질 군것질거리 과자류 간식거리 스낵류 과자_봉지 봉지과자 까까 쿠키 비스킷 크래커 주전부릿감 입가심 다과류
+감자칩: 칩 포테이토칩 감자_칩 감자과자
+한과: 전통과자 유과 약과 강정 다식 정과 전통_과자
+초코파이: 파이과자 초코_파이
+사탕: 캔디 알사탕 사탕류 눈깔사탕 막대사탕 롤리팝 드롭스 캐러멜 카라멜 엿
+젤리: 구미 곰젤리 젤리류 푸딩
+껌: 풍선껌 츄잉껌
+초콜릿: 초콜렛 초코 쵸코 초코바 초콜릿바 카카오
+아이스크림: 빙과 빙과류 아이스바 하드 쭈쭈바 콘아이스크림 얼음과자 소프트아이스크림 빙수 젤라토 셔벗
+빵: 빵류 제과 베이커리 제빵 식빵 브레드 번 롤빵 모닝빵 페이스트리 패스트리
+디저트: 후식 디저트류 달달한_것 단것 단_것 스위츠 양과자
+케이크: 케익 조각케이크 생크림케이크 쇼트케이크 롤케이크 타르트 파이
+떡: 떡류 전통떡 찰떡 인절미 송편 백설기 시루떡 경단
+라면: 라면류 인스턴트_라면 봉지라면 컵라면 사발면 라멘 인스턴트면
+면: 국수 면류 면요리 누들 소면 우동 파스타면 냉면 짜장면 짬뽕 칼국수 쌀국수 스파게티
+밥: 쌀밥 공깃밥 공기밥 밥류 덮밥 볶음밥 비빔밥 식사 한끼 한_끼 끼니 백반 주먹밥
+김밥: 김밥류 꼬마김밥 참치김밥
+죽: 미음 흰죽 죽류 스프 수프
+국: 국물 국물요리 국류 국거리 스튜
+탕: 탕류 전골 탕요리 곰탕 설렁탕 매운탕
+찌개: 찌개류 된장찌개 김치찌개 부대찌개 짜글이
+반찬: 밑반찬 찬 찬거리 반찬류 곁들임 사이드 나물 무침 조림 장아찌 절임
+김치: 김치류 배추김치 깍두기 총각김치 파김치 겉절이
+전: 부침개 지짐이 빈대떡 전류 파전 부침
+볶음: 볶음요리 볶음류
+찜: 찜요리 찜류
+분식: 분식류 길거리음식 길거리_음식 포장마차_음식 노점음식 야식
+햄버거: 버거 패스트푸드 햄버거_세트 치즈버거
+양식: 서양요리 서양음식 경양식 스테이크 양식요리
+치킨: 통닭 닭튀김 프라이드치킨 후라이드 양념치킨 닭강정 치킨_박스
+즉석식품: 인스턴트 인스턴트식품 레토르트 간편식 냉동식품 즉석_식품 가공식품 전투식량 비상식량 보존식 밀키트
+통조림: 캔 캔음식 깡통 통조림류 캔_통조림
+고기: 육류 고깃덩어리 살코기 고기류 정육 생고기 육고기 고깃덩이
+소고기: 쇠고기 한우 소_고기 우육
+돼지고기: 돈육 돼지_고기 삼겹살 목살
+닭고기: 계육 닭_고기 닭가슴살 닭다리
+햄: 가공육 소시지류 베이컨 육가공품 스팸
+해산물: 해물 수산물 어패류 해산물류 바다음식 해물류 횟감 수산
+생선: 물고기 어류 생선류 활어 선어 생선_한_마리 잡은_물고기 회 생선회 건어물 민물고기 바닷물고기 어물
+조개: 조개류 패류 조갯살 패각 조개껍데기 조개껍질 소라 고둥
+게: 꽃게 대게 게류 갑각류 킹크랩
+새우: 새우류 대하 왕새우
+젓갈: 젓 젓갈류 젓국 액젓
+해조류: 해초 바닷말 해조 미역 다시마 김 파래
+해파리: 해파리류
+알: 알류 새알 조류_알 난
+계란: 달걀류 계란류 삶은_계란 날계란 생달걀 에그
+과일: 과실 과일류 과일_바구니 열매 생과일 과채 제철과일 청과
+말린 과일: 건과일 건과 말린_과일 건조과일 곶감류
+채소: 야채 푸성귀 채소류 야채류 남새 나물거리 청과물 쌈채소 샐러드
+뿌리채소: 근채류 뿌리_채소 구근
+견과류: 견과 땅콩 너트 호두 아몬드 넛츠 마른안주
+곡물: 곡식 잡곡 곡류 알곡 양곡 낟알
+음료: 음료수 마실것 마실_것 마실거리 드링크 음료류 물_종류 캔음료 병음료 페트병_음료 청량음료
+물: 식수 마실물 마실_물 생수병 물_한_병 정수 먹는물
+탄산음료: 탄산 소다 사이다 탄산수 청량음료수 스프라이트
+주스: 쥬스 과일주스 과즙음료 과일음료 과채주스 에이드 스무디
+커피: 커피류 아메리카노 라떼 캔커피 원두커피 믹스커피 에스프레소 카페라떼 카페인음료
+차: 차류 녹차 홍차 티 찻물 보리차 허브차 티백 전통차 엽차 찻잎
+우유: 밀크 흰우유 유음료 우유팩 두유 요구르트 요거트
+에너지음료: 에너지드링크 에너지_드링크 카페인_음료 각성음료 자양강장제
+이온음료: 스포츠음료 스포츠_드링크 전해질음료
+술: 주류 알코올 술병 알콜 음주류 한잔 독주 약주류
+소주: 쐬주 소주병 증류주
+맥주: 비어 캔맥주 생맥주 병맥주 라거 에일
+양주: 위스키 브랜디 보드카 럼 진 데킬라 코냑 서양술 증류식_양주 리큐어
+전통주: 탁주 청주 전통술 민속주 동동주 곡주
+와인: 포도주 적포도주 백포도주 샴페인 스파클링와인 레드와인 화이트와인
+양념: 조미료 양념류 향신료 간 양념장 시즈닝 조미 스파이스
+소스: 소스류 드레싱 케찹 마요네즈 머스타드 딥소스
+가루: 분말 가루류 파우더
+기름: 식용유류 오일류 유지 식물성기름
+장류: 장 된장 고추장류 간장 쌈장 전통장
+유제품: 낙농품 유가공품 버터 크림 요거트류
+담배: 연초 궐련 담배갑 담뱃갑 시가 전자담배 담배_한_갑 권련 엽궐련 잎담배
+
+# ── 옷 ──
+옷: 겉옷_속옷 옷_한_벌 한_벌 평상복 일상복 사복 캐주얼 의류품 헌옷 새옷 갈아입을_옷 여벌옷 여벌_옷
+상의: 윗옷 웃옷 윗도리 상의류 탑 티 긴팔 반팔 니트 스웨터 맨투맨 후드티 블라우스 카디건 가디건 폴로셔츠
+셔츠: 남방 드레스셔츠 셔츠류
+조끼: 베스트 조끼류 방검조끼 방탄복
+외투: 겉옷 아우터 외투류 웃옷류 자켓 패딩 파카 바람막이 윈드브레이커 야상 겉_옷 방한복류
+바지: 하의 아랫도리 바지류 팬츠 슬랙스 면바지 트레이닝바지 추리닝바지 레깅스 카고바지 긴바지
+치마: 스커트류 치마류 미니스커트 주름치마
+원피스: 원피스류 한벌옷 점프수트
+정장: 양복 수트 슈트 신사복 정장_한_벌 예복류 턱시도 비즈니스_정장 투피스
+한복: 전통의상 한복류 저고리 두루마기 치마저고리
+전통옷: 민속의상 전통_의상 전통복 민족의상 기모노 치파오
+속옷: 내복 언더웨어 속옷류 이너웨어 속곳 내의류 브래지어 런닝셔츠 메리야스 드로즈 트렁크팬티
+양말: 양말류 삭스 발싸개 버선 니삭스
+잠옷: 파자마 잠옷류 나이트가운 실내복 홈웨어 수면복
+수영복: 수영_복 비키니 수영팬티 래시가드 물놀이옷
+운동복: 체육복 추리닝 트레이닝_복 스포츠웨어 츄리닝 운동_복 도복 유도복
+제복: 유니폼류 근무복 정복류 군복 경찰복 작업복 단체복 제식복 전투복 근무_복
+종교복: 법의 성직자복 승복 수도복 제의 사제_복 무복 신관복
+보호복: 방호복류 방진복 안전복 방화복 화생방복 보호_복 방역복 격리복 차폐복
+가운: 가운류 까운 목욕가운 실험복 의사가운
+신발: 신 신발류 구두류 신_한_켤레 풋웨어 발에_신는_것 신발_한_켤레 스니커 샌들 단화
+구두: 정장구두 로퍼 옥스퍼드 가죽구두 펌프스
+운동화: 스니커즈 러닝화 조깅화 농구화 캔버스화 트레이닝화
+부츠: 부츠류 워커 군화 전투화 롱부츠 등산화 안전화
+슬리퍼: 쓰레빠 삼선슬리퍼 쪼리 플립플랍 샌들류
+전통신: 전통_신발 나막신 미투리
+모자: 모자류 캡 햇 쓰개 머리쓰개 비니 벙거지 중절모 페도라 베레모 밀짚모자 털모자
+가방: 가방류 백 가방_하나 짐가방 손가방 핸드백 숄더백 크로스백 토트백 에코백 책가방 메신저백 보따리 더플백 서류가방류
+장갑: 장갑류 글러브류 손싸개 가죽장갑 목장갑 고무장갑 라텍스장갑
+안경: 안경류 글라스 뿔테 돋보기 보안경
+마스크: 마스크류 입마개 복면 방독면 방진마스크 얼굴가리개
+가면: 탈류 가면류 변장가면
+장신구: 액세서리 악세사리 악세서리 장신구류 패물류 귀금속 주얼리 쥬얼리 치장품 꾸밈새 노리갯감
+목걸이: 목걸이류 네크리스 체인목걸이 목줄_장식 초커
+반지: 가락지 링 반지류 금반지 은반지 결혼반지 인장반지
+팔찌: 팔찌류 브레이슬릿 뱅글 손목장식 염주팔찌
+귀걸이: 귀고리 이어링 귀걸이류
+머리장식: 머리_장식 헤어액세서리 헤어핀 비녀 머리끈류 헤어_액세서리 장식핀
+넥타이: 타이 보타이 나비넥타이
+목도리: 스카프 숄 넥워머 목수건
+벨트: 허리띠류 띠 가죽벨트 혁대 멜빵
+보호구: 보호장구 보호_장비 방어구 방호구 안전장구 보호장비 방어_장비 호구 프로텍터
+보호대: 보호대류 무릎보호대 팔꿈치보호대 정강이보호대 가드
+투구: 헬름 전투모 철모류
+헬멧: 안전모 하이바 방탄모 철모 오토바이_헬멧
+갑옷: 갑주 판금갑옷 흉갑류 아머류 철갑
+
+# ── 도구 ──
+공구: 공구류 연장류 작업공구 수공구 전동공구 공구_세트 수리도구 수리_도구 정비도구 철물
+망치: 해머 장도리 쇠망치 나무망치 고무망치
+삽: 삽류 야전삽 모종삽 곡괭이
+주방용품: 주방도구 부엌살림 조리기구 주방기구 부엌용품 주방_용품 살림도구 식기류 주방살림 키친웨어
+냄비: 솥 냄비류 팬 프라이팬 후라이팬 웍 뚝배기 가마솥 찜기
+조리도구: 조리_도구 요리도구 조리용구 요리_도구 국자 뒤집개 주걱류 거품기 도마
+컵: 잔류 머그 머그컵 텀블러 유리컵 종이컵 물컵 찻잔류 술잔
+수저: 숟가락 젓가락 수저_세트 커틀러리 식사도구 스푼류 숟갈
+그릇: 식기 사발 대접 공기 보울 볼 접시류 밥그릇 국그릇 종지
+통: 보관통 밀폐용기 반찬통 용기류 통류 물통 양동이 바가지 대야
+청소도구: 청소용품 청소_도구 청소기구 청소_용품 세척도구 미화용품 걸레 대걸레 밀대 쓰레받기 수세미
+욕실용품: 세면도구 세면용품 목욕용품 욕실_용품 화장실용품 세안용품 목욕_용품 샤워용품 위생도구 세면_도구
+샴푸: 린스 컨디셔너 바디워시 세정제류 헤어제품 트리트먼트
+낚시도구: 낚시용품 낚시_도구 낚시장비 어구 낚시_용품 채비 낚시_장비 조구 릴 낚싯바늘 찌 미끼
+캠핑용품: 캠핑도구 야영장비 캠핑_용품 야영용품 캠핑장비 야외용품 아웃도어_용품 등산용품 등산장비 야영_도구 생존도구 서바이벌_키트
+운동기구: 운동용품 운동_기구 스포츠용품 헬스기구 운동장비 체육용품 스포츠_용품 트레이닝_기구 덤벨 아령 헬스용품
+공: 공류 볼류 구기용품 축구공 농구공 야구공 배구공 테니스공 탁구공 골프공
+문구: 문구류 문방구 필기도구 사무용품 문방사우 문구용품 사무_용품 필기_도구 오피스용품 문방구류
+펜: 필기구류 볼펜류 만년필 사인펜 샤프 필기류 매직 네임펜 색연필 플러스펜
+테이프: 테이프류 접착테이프 스카치테이프 박스테이프 청테이프 덕트테이프 마스킹테이프 절연테이프
+도장: 인장 스탬프 직인 낙관 인감
+미술용품: 화구 미술도구 그림도구 미술_용품 미술재료 화방용품 그림_도구 물감류 팔레트 크레파스 이젤
+미술품: 예술품 예술작품 작품 미술작품 공예품 아트 예술_작품
+그림: 회화 그림류 유화 수채화 족자 화폭 그림_액자 소묘 스케치 수묵화 판화
+조각상: 조각 조각품 석상 동상 흉상 조형물 소조
+바느질도구: 반짇고리 바느질_도구 재봉도구 재봉용품 수예도구 바늘과_실 봉제도구 재봉_도구 뜨개도구
+실험도구: 실험기구 실험_도구 실험장비 과학도구 실험_기구 랩_장비 실험용품 시약 이화학기구
+관측도구: 관측기구 관측_도구 관측장비 망원경류 광학기기 쌍안경 망원경 현미경
+시계: 시계류 손목시계 탁상시계 벽시계 자명종 알람시계 타임피스 스마트워치
+구속구: 구속도구 결박도구 구속_도구 포박도구 속박구 결박_도구 포승 족쇄 차꼬 포박_도구 억제대 구속장비
+신호도구: 신호_도구 신호장비 신호기 호루라기 신호탄 경광봉 확성기 메가폰 호각
+라이터: 지포 가스라이터 점화기 불붙이개 부싯돌 화기
+생활용품: 생활_용품 일용품 생활잡화 생활도구 일상용품 살림 가정용품 살림살이 세간 일상_용품 생활필수품
+악기: 악기류 연주도구 음악도구 연주_도구 풍악
+현악기: 현악 현_악기 줄악기 기타류 바이올린 첼로 가야금 거문고 하프 우쿨렐레 베이스
+관악기: 관악 관_악기 부는_악기 플루트 나팔 트럼펫 색소폰 단소 대금 리코더 하모니카 클라리넷 오카리나
+타악기: 타악 타_악기 치는_악기 드럼류 장구 꽹과리 징 심벌즈 탬버린 실로폰 캐스터네츠
+건반: 건반악기 키보드악기 오르간 신시사이저 아코디언 멜로디언
+의료교구: 의학교구 해부모형 의료_교구 인체모형
+
+# ── 기기 ──
+가전: 가전제품류 가전기기 전자가전 가정용_전자제품 전기제품 생활가전 가전_제품 전기기기 살림가전
+주방가전: 주방_가전 부엌가전 조리가전 전자레인지 전기밥솥 밥솥 토스터 믹서기 에어프라이어 커피머신 전기포트 오븐 인덕션
+냉난방기: 냉방기 난방기 냉난방기기 에어컨 히터 난로류 온풍기 냉풍기 전기히터 보일러 라디에이터
+세탁기: 세탁기류 건조기 세탁건조기 드럼세탁기 통돌이
+청소기: 진공청소기 로봇청소기 무선청소기 클리너류
+미용기기: 미용가전 미용_기기 헤어기기 뷰티기기 이미용기기 드라이기 헤어_기기 면도기 제모기
+건강기기: 건강가전 건강_기기 안마기 마사지기기 혈압계 체중계 건강측정기 헬스케어_기기
+컴퓨터: PC 피씨 컴퓨터류 노트북 랩톱 랩탑 데스크탑 본체 태블릿 워크스테이션 단말 컴
+부품: 컴퓨터_부품 PC_부품 전자부품 부속 부속품 기판 회로 칩셋 하드웨어 반도체 회로기판 부품류 모듈
+입력장치: 입력_장치 입력기기 마우스 조이스틱 타블렛 터치패드 컨트롤러
+저장장치: 저장_장치 저장매체 저장_매체 USB 유에스비 메모리 메모리카드 SD카드 하드디스크 SSD 플로피 디스켓 기록매체 드라이브 외장_저장장치
+사무기기: 사무_기기 OA기기 프린터 복사기 팩스 스캐너류 복합기 세단기 계산기 라벨기
+전화기: 전화기류 통신기기 통신장비 폰 유선전화 집전화 공중전화 통신_기기 연락수단 통신_장비
+휴대폰: 핸드폰 스마트폰 휴대전화 폰류 모바일 휴대_전화 셀폰 피처폰 폴더폰 손전화 아이폰 갤럭시 대포폰
+카메라: 사진기 카메라류 디카 디지털카메라 캠코더 필름카메라 폴라로이드 액션캠 CCTV 감시카메라 캠 웹캠 블랙박스 촬영기
+촬영장비: 촬영_장비 촬영기기 촬영용품 방송장비 촬영_도구 조명장비 짐벌 렌즈류 촬영기재
+음향기기: 음향_기기 오디오 오디오기기 음향장비 음향_장비 사운드기기 오디오_장비 재생기 전축 턴테이블 믹서
+이어폰: 이어폰류 헤드폰 무선이어폰 에어팟 버즈 블루투스_이어폰 귀마개형_이어폰 인이어
+TV: 티비 텔레비전류 텔레비 모니터류 브라운관 수상기 스크린 디스플레이
+게임기: 게임기류 콘솔게임기 휴대용게임기 오락기 플스 닌텐도 엑스박스 비디오게임기 게임보이 게임_기기
+배터리: 전지류 축전지 보조배터리 파워뱅크 충전지 밧데리 건전지류 전원 예비전지 예비_배터리 셀
+조명: 조명기구 조명류 불빛 등 라이트류 등불류 조명등 조명_기구 불 광원 등기구
+전등: 전구 등잔 전등류 형광등 백열등 LED등 스탠드등 플래시 후레쉬 회중전등 플래시라이트 랜턴류 탐조등
+SF 장비: SF장비 미래장비 첨단장비 공상과학_장비 하이테크_장비 미래_기술 외계기술 외계_장비 오버테크 미지의_장치
+길찾기: 길찾기_도구 항법장치 나침반 GPS 네비 내비게이션 방위계 길잡이
+탐지기: 탐지기류 감지기류 측정기류 탐지_장비 탐지장비 센서 검출기 계측기 측정장비 측정_장비 탐색기 스캔_장비 탐침
+케이블: 케이블류 전선 선 코드 연결선 충전선 랜선 전깃줄 연장선 멀티탭 전원선 배선 줄_케이블 커넥터
+기기: 전자_장비 전자장치 전자_장치 기계류 장비류 설비 머신류
+
+# ── 의료 ──
+약: 약품류 의약 약물 약제 상비약 내복약 약_한_알 약봉지 조제약 처방약 양약 약재 먹는_약 정제 캡슐약 알약류 구급약 치료제 약통
+진통제: 진통_제 통증약 소염진통제 타이레놀 아스피린 이부프로펜 마취제 진정제 모르핀류
+감기약: 감기_약 종합감기약 해열제류 기침약 콧물약 독감약
+영양제: 비타민 보충제 건강기능식품 건강보조제 건강식품 영양_제 보약 강장제 영양보충제 서플리먼트 종합비타민 오메가3 유산균 홍삼류
+안약: 점안액 인공눈물 안약류 눈약
+연고: 연고류 바르는_약 크림류 외용제 외용약 로션형_약 겔 파스
+물약: 포션 물약류 액체약 시럽 묘약 영약 엘릭서 비약 약물병 회복약 회복_물약 치유물약 물_약 탕약 드링크제 액제
+의료기기: 의료_기기 의료장비 의료_장비 의료기구류 진료도구 진찰도구 의료기 진료기구 의료_기구 병원장비 청진기 혈압계류
+주사기: 주사 시린지 주사기류 주삿바늘 인젝터 주입기류 앰플_주사
+의료도구: 의료_도구 수술기구 수술_도구 처치도구 처치_도구 의료소모품 진료_도구 치료도구 외과도구 수술용품 처치용품
+붕대: 붕대류 거즈 압박붕대 반창고 밴드류 드레싱 탄력붕대 지혈대 깁스 부목 솜 탈지면 상처_싸개 응급처치_용품
+찜질팩: 핫팩 아이스팩 냉찜질팩 온찜질팩 찜질_팩 얼음주머니 보온팩 냉각팩
+보조기구: 보조_기구 재활기구 보조기 목발 휠체어 지팡이류 의족 보행기 의지 보장구
+구급상자: 구급함 응급키트 구급키트 응급처치_키트 응급상자 퍼스트에이드 의료키트 구급_상자 응급_키트 메디킷 상비약통
+
+# ── 무기 ──
+무기: 병장기 무구류 흉기류 살상도구 전투장비 전투_장비 호신구 호신_용품 무장류 병기류 날붙이_둔기 암기 흉기_일체
+칼: 도검 칼류 날붙이 검류 도검류 블레이드 칼붙이 식칼 부엌칼 회칼 과도 커터칼 날 흉기_칼 도
+검: 장검 검_한_자루 소드 롱소드 대검류 양손검 한손검 세이버 레이피어 도검_한_자루 환도 장도 직검 곡도
+단검: 단도 대거 비수 소도 나이프류 잭나이프 주머니칼 접이식_칼 맥가이버칼 군용칼 쿠나이 단검류 암살검 은장도류
+가위: 가위류 재단가위 주방가위 미용가위 쪽가위
+총: 총기 화기류 총기류 총포 건류 화약무기 총_한_자루 개인화기 소화기 권총류 화승총 머스킷 리볼버 피스톨 사격무기 총포류
+권총: 핸드건 피스톨류 자동권총 리볼버류 육혈포 매그넘
+소총: 라이플 자동소총 돌격소총 장총 보병총 카빈 엽총 공기총
+기관총: 머신건 기관단총 서브머신건 경기관총 중기관총 SMG
+총기부품: 총기_부품 총_부품 탄창 소음기 조준경 스코프 개머리판 총열 총기_액세서리 부착물
+탄약: 총알 탄 실탄 탄환류 탄약류 총탄 탄알 카트리지류 포탄 산탄 공포탄 화약 탄창류
+폭탄: 폭발물 폭약 폭탄류 화약류 다이너마이트 TNT 지뢰 시한폭탄 사제폭탄 화염병 폭뢰 C4 폭발_장치 급조폭발물 폭죽
+둔기: 둔기류 타격무기 때리는_무기 곤봉류 블런트 타격_무기 둔탁한_것 쇠뭉치
+몽둥이: 곤봉 방망이류 각목 쇠파이프 봉류 야구방망이 빠따 막대기 경찰봉 삼단봉 진압봉 철퇴 메이스 봉 곤 쇠몽둥이 나무몽둥이 목봉
+창: 창류 장창 스피어 삼지창 투창 작살 죽창 할버드 랜스 미늘창 극 모
+도끼: 도끼류 손도끼 액스 전투도끼 소방도끼 토마호크 벌목도끼 부
+농기구: 농기구류 농사도구 농사_도구 낫류 쇠스랑 괭이 호미 갈퀴 농구 도리깨 쟁기
+활: 활류 궁 장궁 단궁 각궁 컴파운드보우 국궁 양궁 화살류 활과_화살 쇠뇌 크로스보우
+송곳: 송곳류 아이스픽 꼬챙이류 찌르개 바늘무기 침류 스파이크
+전기충격기: 스턴건 테이저 테이저건 전기_충격기 전격기 스턴봉 전기봉류
+올가미: 덫류 올무 교수줄 올가미류 교살_도구 가로트
+방패: 방패류 실드 쉴드 진압방패류 버클러 방패_한_개 원형방패 대형방패
+스프레이: 분사기 스프레이류 최루액 페퍼스프레이 호신_스프레이 캡사이신
+마법: 마법도구 마법_도구 마도구 마법물품 마법_물건 마도구류 주문도구 마법구 아티팩트 마력_도구 마법기 법구 영장 영력_도구
+마법봉: 지팡이_마법 완드 스태프 로드 마법지팡이 마법_지팡이 요술봉 요술지팡이 마법_막대 주문봉
+마검: 마법검 저주받은_검 요도 마도 성검 영검 귀검 사검 마법_칼
+
+# ── 서류 ──
+서류: 서류류 문서류_일체 서류철 서류_뭉치 문건류 페이퍼 기록 기록물류 서식 양식 문서_뭉치 서류_더미 공문서 문서자료
+문서: 문건 공문 기밀문서 기밀서류 자료 보고서류 레포트 기록지 문서_한_장 서류_한_장 조서 진술서 기안서 회의록 메모장 공문서류 리포트 비밀문서 대외비 파일철 기록문서 차트 리스트
+증명서: 증명 증서류 증빙 증빙서류 확인서 인증서 자격증 수료증 허가증 면허 인가증 증표 증명_서류 졸업장 상장 임명장
+신분증: 신분_증 ID 아이디카드 ID카드 주민등록증 민증 운전면허증 여권 학생증 공무원증 신분증명서 신원증명 신분증류 패스포트
+사원증: 사원_증 직원증 출입카드류 사원카드 직원카드 요원증 사내_신분증 근무자증 사번카드 관리국_신분증 사원_출입증 패스 요원_신분증
+계약서: 계약 계약_서 약정서 각서 합의서 서약 협약서 동의서 계약서류 차용증 약관 위임장 계약문서
+안내문: 안내 안내서 공지 공지문 안내장 팸플릿 팜플렛 브로슈어 리플렛 벽보 대자보 게시물 고지문 경고문 안내_전단 찌라시 광고지 홍보물 유인물 삐라
+편지: 서신 서한 편지류 손편지 레터 우편물 서찰 편지_한_통 연서 러브레터 유서 협박장 초대장 청첩장 편지지 메일
+봉투: 봉투류 편지봉투 서류봉투 우편봉투 돈봉투 봉지류 종이봉투
+지도: 지도류 맵 약도 도면류 안내도 지형도 배치도 평면도 보물지도 해도 노선도류 관광지도
+종이: 종이류 종잇조각 종이_쪼가리 용지류 백지 종이_한_장 종잇장 파지 폐지 색종이 한지 화선지 갱지 A4용지 메모 종이쪽지 종이_뭉치
+사진: 사진류 포토 스냅사진 인화사진 폴라로이드_사진 증명사진 가족사진 흑백사진 필름사진 사진_한_장 픽처 스틸컷 브로마이드
+책: 서적류 도서 책자류 서책 단행본 책_한_권 문고본 교과서 참고서 사전 소설책 시집 전문서적 고서 고문서 양장본 페이퍼백 장서 서적_한_권 책류 간행물류 문헌 교본 학술서 실용서 전집 전공서적
+경전: 경 경전류 성경 성서 불경 코란 쿠란 법전 교리서 기도서 찬송가 주술서 마도서 금서 경문 진언집 비전서 그리모어
+공책: 노트류 연습장 필기장 학습장 다이어리 플래너 스케줄러 일기장류 메모지류 스프링노트 노트북_공책 잡기장 비망록 스케치북
+수첩: 수첩류 포켓수첩 메모수첩 경찰수첩 포켓북 작은_공책 취재수첩
+표: 표류 티켓류 승차권류 이용권 표_한_장 탑승권 승차권 발권표 쿠폰류 교환권 이용_권 패스권
+차표: 승차권_차표 기차표 버스표 열차표류 지하철표 전철표 비행기표 항공권 배표 승선권 탑승_권 교통표 KTX표 고속버스표 편도표 왕복표
+입장권: 입장_권 관람권 입장표 공연티켓 영화표 영화티켓 콘서트티켓 관람_티켓 자유이용권 초대권 놀이공원_표 경기_티켓 전시회_표
+상품권: 상품_권 기프트카드 기프티콘 문화상품권 백화점상품권 금액권 교환_쿠폰 바우처 선불카드 식권 외식상품권
+돈: 화폐 금전 돈류 현찰 머니 캐시 자금 재화 통화 금액 경화 엔화 달러 외화 원화 금전류 푼돈 용돈 비상금 뭉칫돈 돈다발 돈뭉치
+현금: 지폐 현금류 현찰류 지폐_뭉치 만원권 오만원권 지폐_다발 캐쉬 은행권 종이돈 돈_봉투
+동전: 주화 코인류 잔돈 거스름돈 엽전 동전류 백원짜리 오백원 십원 쇠돈 금화 은화 동화 옛날_돈
+카드: 카드류 플라스틱_카드 신용카드류 체크카드류 결제카드 은행카드 포인트카드 멤버십카드 회원카드 IC카드 마그네틱_카드 현금카드 직불카드
+열쇠: 키 열쇠류 쇠 열쇠_꾸러미 열쇠뭉치 마스터키 만능열쇠 비상열쇠 문열쇠 방열쇠 차키 차열쇠 자물쇠_열쇠 열쇠_하나 곁쇠 스페어키 도어키 카드키류 디지털키
+쪽지: 쪽지류 메모_쪽지 포스트잇_메모 전언 전갈 메모지_한_장 종이_쪽지 밀서 암호문 낙서
+전단지: 전단지류 광고_전단 홍보_전단 삐라류 실종_전단 수배_전단
+
+# ── 귀중품 ──
+보석: 보석류 귀석 젬 쥬얼 원석 보옥 옥 다이아몬드 다이아 루비 사파이어 에메랄드 진주 자수정 오팔 비취 호박 보옥류 귀한_돌 광물 결정 크리스탈 수정
+금괴: 금 골드 골드바 금덩이 금덩어리 황금 금_덩어리 순금 금붙이 은괴 은 실버 금은보화 금화류 잉곳 금속괴 귀금속_덩어리
+트로피: 우승컵 상패 트로피류 우승_트로피 기념패 공로패 감사패 컵_트로피 우승기 훈장
+골동품: 골동 앤티크 고미술품 고물 옛물건 옛날_물건 유물 문화재 고기물 엔틱 빈티지 고품 고대_유물 유적_출토품 오래된_물건 민속품 고가구 옛것
+도자기: 도기 자기 도자 청자 백자 분청사기 도예품 사기그릇 옹기 토기 질그릇 세라믹 도자기류 꽃병 화병
+수집품: 수집물 컬렉션 수집_품 소장품 콜렉션 수집_아이템 모으는_것 기념품 굿즈 한정판 피규어 레어템 수집_카드 트레이딩_카드 포토카드 희귀품
+보물: 보물류 보화 재보 보배 귀물 트레저 금은보화류 비보 진귀한_것 보물_상자
+
+# ── 소모품 ──
+화장품: 화장품류 코스메틱 메이크업_용품 미용용품 뷰티용품 화장도구 화장_도구 미용_용품 뷰티_제품 화장_품 메이크업 화장품_파우치 분 연지
+스킨케어: 기초화장품 스킨 로션 에센스 세럼 토너 수분크림 선크림 자외선차단제 클렌저 클렌징 마스크팩 팩 보습제 기초_화장품 앰플_화장품 핸드크림 바디로션 립밤
+색조: 색조화장품 색조_화장품 립스틱 틴트 립글로스 아이섀도 마스카라 아이라이너 파운데이션 쿠션팩트 블러셔 매니큐어 네일 파우더_화장품 컨실러 루주
+위생용품: 위생_용품 위생품 청결용품 개인위생용품 위생용구 생리대 탐폰 생리용품 면봉류 화장지류 티슈류 일회용_위생품 손소독제 소독용품 방역용품
+휴지: 화장지 티슈 두루마리휴지 두루마리_휴지 키친타월 냅킨 휴지류 각티슈 갑티슈 물휴지 종이타월 핸드타월 휴지_한_롤
+방향제: 탈취제 디퓨저 향초 섬유탈취제 공기청정제 방향_제 향주머니 포푸리 룸스프레이 차량용_방향제 페브리즈 냄새제거제 향낭
+연료: 연료류 땔감 기름통 휘발유 경유 등유 가솔린 석유 부탄가스 가스통 숯 장작 석탄 번개탄 고체연료 알코올_연료 연탄 프로판 LPG 가스 오일_연료
+접착제: 풀 본드 접착_제 순간접착제 강력접착제 글루 목공풀 딱풀 접착용품 에폭시 실리콘 실란트 글루건 붙이는_것
+독약: 독 독극물 독물 맹독 극약 독성물질 유독물 독액 청산가리 비소 쥐약 농약 살충제 제초제 독_병 독약병 치사약 독소 독성_물질 독주사
+담배용품: 흡연용품 흡연도구 담배_용품 파이프 곰방대 담뱃대 라이터류 재떨이류 시가커터 흡연_도구 물부리
+봉지: 봉지류 비닐봉지 비닐봉투 봉다리 검은_봉지 비닐 포장봉지 지퍼백 봉투_비닐 쇼핑봉투 쓰레기봉지 포대류
+
+# ── 부적 ──
+부적: 부적류 부 호신부 액막이_부적 주부 부적_한_장 탈리스만 아뮬렛 호부류 주술_부적 영부 신부 경면주사_부적 수호부 벽사부 재앙막이 오마모리 참 부작 부적지
+무구: 무구류_굿 굿도구 무속도구 무속용품 굿_도구 무당_도구 신구 무속_도구 무당용품 제구 의식도구 의식_도구 주술_도구 법구류 무속_용품 굿판_도구 신물 영물
+방울: 방울류 무당방울 신방울 요령 금강령 풍경 딸랑이 벨 핸드벨 쇠방울 은방울 워낭
+거울: 거울류 명도 무당거울 신경 청동거울 동경 손거울류 면경 경대 구리거울
+신칼: 무당칼 대신칼 굿칼 신도 칠성검 사인검 의식용_칼 제례검 무구_칼 퇴마검
+성물: 성물류 성구 성스러운_것 성스러운_물건 성유물 성해 종교물품 종교용품 신성한_물건 축성물 성보 종교_물품 성화 제단용품 성유 성물_일체 레릭 성상
+십자가: 십자가류 크로스 십자고상 십자_목걸이 성십자가 로사리오 묵주 묵주류 크루시픽스 십자_상
+불상: 부처상 불상류 석불 금동불 보살상 관음상 불교_성물 불단 불구 목탁 불교용품 부처님상
+염주: 염주류 단주 합장주 108염주 불교_염주 수주
+등불: 등 등불류 불등 등화 초롱불 호롱불 등잔불 촛불 등롱류 청사초롱 제등 양초류 촛대류 캔들 향촉 화톳불 불씨
+연등: 연등류 연꽃등 종이등 풍등 초롱류 사월초파일_등 소원등 유등 제등류 한지등
+향: 향류 선향 향불 향_한_다발 분향 훈향 인센스 향나무 침향 백단 향대 향_스틱 제사향 만수향 향로 향꽂이
+제물: 제수 제사음식 제물류 공물 제수용품 제사용품 공양물 제찬 희생물 제사_음식 제상_음식 고사음식 공양 헌물 제사_제물 굿상_음식 제삿밥 폐백
+
+# ── 봉인·용기 ──
+함: 함류 궤 상자류 보관_상자 함_하나 케이스류 보관용기 궤짝류 나무함 철제함 금고 캐비닛 사물함 락커 로커 귀중품함 보관_함 트렁크류 수납함 보물상자 나무상자 철상자 봉인함류 박스류 통_상자 합
+용기: 용기류_그릇 담는_것 그릇류 컨테이너 통류_용기 보관_용기 저장용기 수납용기 캐니스터 탱크류 드럼 캔류 케그 저장_용기 격리_용기류 밀폐_용기 용기_하나
+병: 병류 유리병류 보틀 플라스크류 약병류 시험관류 바이알 유리_용기 단지류 물병류 페트병 술병류 빈_병 공병 호리병 작은_병 큰_병 표본병 시약병 유리관
+항아리: 독 장독 옹기류 단지_항아리 도가니 뚝배기류 큰_독 물독 술독 김칫독 장독대 암포라 유골_항아리
+사슬: 쇠사슬 체인류 사슬류 쇠줄 철사슬 족쇄_사슬 쇠고랑 강철사슬 봉인_사슬 결박_사슬
+향료: 향신료류 향유 아로마 에센셜오일 향수_원료 방향유 몰약 유향 사향 용연향 향_오일
+상자: 박스 상자_하나 종이상자 골판지_상자 택배상자류 포장상자 선물상자 나무_상자 빈_박스 상자갑 갑 케이스 카톤 궤짝_상자 수납_상자 정체불명_상자 의문의_상자 이상한_상자
+주머니: 주머니류 파우치류 복주머니 쌈지 염낭 돈주머니 가죽주머니 포켓 자루류 포대자루 망태 보자기 동전지갑 주머니_하나
+가지: 나뭇가지류
+
+# ── 괴이 ──
+기생충: 기생충류 기생생물 기생체류 기생_벌레 촌충 회충 선충 흡충 연가시 구충 요충 기생_생물 패러사이트 기생물 숙주벌레 기생성_벌레
+균류: 균 곰팡이 균사 포자 균체 버섯류_균 진균 효모 점균 곰팡이류 균사체 포자낭 곰팡이_덩어리 균_덩어리 세균 박테리아 바이러스 병원체 미생물 병균 세균_샘플 병원균 배양균
+신체 조각: 신체조각 몸_일부 잘린_것 시신_조각 사체_조각 인체_조각류 살덩어리 살점류 토막 신체_부위 절단된_것 잘린_신체 살_조각 유해_일부 뼛조각 육편
+해골: 두개골류 해골류 머리뼈 스컬 해골바가지 촉루 백골 유골 인골 뼈머리
+꿈결 수집기: 꿈결수집기 꿈_수집기 꿈결_수집_장치 드림캐처 꿈_포집기 꿈결_용기 꿈결_병
+표본: 표본류 샘플류 시료 검체 표본_병 채집물 표본_하나 생물표본 조직표본 견본 스펙시먼 채취물 채집_표본 포르말린_표본 액침표본 건조표본 프레파라트 생체_샘플
+박제: 박제류 박제품 박제_동물 박제된_것 헌팅_트로피 미라류 건조_표본 박제_표본 동물_박제 새_박제 박제_머리
+조각: 조각류 파편 조각_하나 부스러기 편 파편류 깨진_조각 쪼가리 단편 잔해 부서진_것 잔편 토막_조각 조각난_것 금속_조각 유리_조각 돌_조각 나무_조각 뼈_조각 천_조각 사금파리
+덩어리: 덩어리류 덩이 뭉치 덩어리_하나 괴 뭉텅이 응어리 살덩이류 정체불명_덩어리 이상한_덩어리 점액_덩어리 고깃덩어리류 괴상한_덩어리 블롭 슬라임 점액 점액질
+꼬리: 꼬리류 잘린_꼬리 꼬랑지 미부 동물_꼬리
+머리: 머리류 잘린_머리 두부 수급 머리통 목 참수된_머리 대가리
+손: 손류 잘린_손 손목 손모가지 손_하나 절단된_손 수부 주먹
+눈알: 눈 안구 눈동자 눈알류 눈깔 적출된_눈 의안 눈알_하나 안구_표본
+손가락: 손가락류 잘린_손가락 지 수지 손가락_마디 손마디 엄지 검지 새끼손가락
+뇌: 두뇌 뇌수 골 뇌_표본 대뇌 뇌_조직
+촉수: 촉수류 촉수_조각 더듬이 촉완 흡반 문어발 빨판
+미라: 미이라 목내이 마른_시체 건시 미라류_시신 말린_시체
+돌: 돌류 돌멩이류 바위 암석 자갈 조약돌 석재 짱돌 돌덩이 광석 운석 원석_돌 돌_하나 수석 괴석 이상한_돌_하나 석편
+막대: 막대류 스틱 막대기류 장대 작대기 봉_막대 꼬챙이_막대 나무막대 쇠막대 지휘봉류 지시봉 막대_하나 로드류
+장치: 장치류 기계장치류 정체불명_장치 이상한_장치 기묘한_장치 장치_하나 기구류 기계_장치 설비류 기믹 메커니즘 수수께끼_장치 괴상한_기계 미지의_기계
+액체: 액체류 용액류 액 정체불명_액체 이상한_액체 수상한_액체 물_같은_것 액상류 약액 체액 진액 즙 유체 끈적한_액체 검은_액체 점액류
+
+# ── 성인 ──
+성인용품: 성인_용품 성인용품류 어른용품 성인_장난감 섹스토이 성_용품 성기구 성인_토이 어덜트토이 성생활용품 러브용품 성인샵_물건 섹스_토이 자위기구 성인_기구 야한_물건 음란물_도구
+진동기: 진동기류 진동_기구 바이브 전동_기구 진동_토이 전동_마사지기 로터 에그 우머나이저 흡입기 진동_딜도 리모컨_진동기 전마 진동_에그 진동_마사지기
+딜도: 딜도류 인공성기 모조성기 모형_성기 인조_성기 양면딜도 실리콘_성기 장난감_성기
+채찍: 채찍류 회초리 승마채찍 가죽채찍 크롭 플로거 케인 태형도구 매 편 구미편 스팽킹_도구 캣오나인테일 승마용_채찍 불휩
+란제리: 야한_속옷 섹시_속옷 란제리류 섹시_란제리 베이비돌 가터벨트 테디 코르셋 뷔스티에 슬립 시스루_속옷 끈팬티 티팬티 성인_속옷 유혹_속옷 망사_속옷 캐미솔
+피임: 피임기구 피임도구 피임용품 피임_도구 피임_용품 피임약 사후피임약 피임_기구 콘돔류 페미돔 루프 피임구
+정력제: 정력_제 강정제 최음제 비아그라 미약 흥분제 발기부전_치료제 정력약 스태미나_약 러브포션 사랑의_묘약 발정제 성기능_개선제 춘약
+의료기구: 성인용_의료기구 의료_플레이_도구 메디컬_플레이 검경 확장기 카테터 관장기 관장_도구 요도_도구 메디컬_토이 진찰_플레이_도구
+도박: 도박도구 도박_도구 도박용품 노름 노름도구 카지노_용품 갬블 겜블 도박판_물건 놀음 사행성_물건 카지노_칩 화투 트럼프 포커_카드 파친코 도박_기계 복권 로또 마작패 경마 베팅_용지 판돈
+수갑: 수갑류 쇠고랑류 은팔찌 족갑 핸드커프 손목_수갑 경찰수갑 엄지수갑류 포박_수갑
+재갈: 재갈류 볼개그 입막음 개그 입마개_재갈 머즐 마우스개그 입_구속구 하네스_재갈
+정조대: 정조대류 정조_벨트 순결대 정조_케이지류 체스티티 정조_장치
+
+# ── 잡동사니 ──
+동물: 동물류 짐승 생물 동물_한_마리 생명체 크리처 야생동물 들짐승 산짐승 애완동물 반려동물 펫 소동물 작은_동물 금수 축생 가축 날짐승_길짐승 살아있는_것 잡은_동물 동물_사체
+뱀: 뱀류 독사 구렁이 살모사 배암 긴짐승 스네이크 비단뱀 코브라 방울뱀 물뱀 능구렁이 까치살모사 뱀_한_마리 파충류
+도마뱀: 도마뱀류 도마뱀붙이 게코 이구아나 카멜레온 장지뱀 도롱뇽 왕도마뱀 리자드
+개구리: 개구리류 양서류 청개구리 황소개구리 맹꽁이 참개구리 올챙이 독개구리
+새: 새류 조류 날짐승 새_한_마리 작은_새 산새 들새 텃새 철새 참새 비둘기 까치 앵무새 부엉이 올빼미 매 독수리 제비 병아리 버드 가금 맹금
+쥐: 쥐류 생쥐 들쥐 시궁쥐 햄스터 설치류 래트 마우스_쥐 집쥐 실험쥐 기니피그 다람쥐
+벌레: 벌레류 곤충 곤충류 버러지 충 해충 날벌레 기는_벌레 벌레_한_마리 작은_벌레 징그러운_벌레 버그 인섹트 독충 익충 벌거지 갑충 딱정벌레 바퀴벌레 귀뚜라미 메뚜기 잠자리 노린재 모기 이 벼룩 빈대 진드기 곱등이
+거미: 거미류 독거미 타란툴라 왕거미 무당거미 집거미 깡충거미 스파이더 늑대거미
+개미: 개미류 일개미 병정개미 여왕개미 불개미 흰개미 개미떼
+벌: 벌류 꿀벌 말벌 땅벌 장수말벌 호박벌 일벌 여왕벌 벌떼 쌍살벌
+나방: 나방류 불나방 누에나방 독나방 밤나방 모스
+나비: 나비류 호랑나비 배추흰나비 제비나비 버터플라이
+매미: 매미류 참매미 말매미 쓰르라미 매미_허물
+파리: 파리류 쉬파리 똥파리 초파리 집파리 쇠파리 날파리 등에 구더기
+지네: 지네류 왕지네 다지류 그리마 돈벌레 센티피드
+전갈: 전갈류 독전갈 스콜피온 황제전갈
+애벌레: 유충류 애벌레류 굼벵이 송충이 쐐기벌레 배추벌레 누에 번데기 라바 캐터필러 유생 꿈틀이 자벌레 모충
+풍뎅이: 풍뎅이류 사슴벌레 하늘소 쇠똥구리 갑충류 비틀
+벌집: 벌집류 벌통 말벌집 벌_둥지 꿀벌집 봉소 벌집_조각
+버섯: 버섯류 독버섯 식용버섯 균류_버섯 송이버섯 표고 느타리 팽이버섯 양송이 새송이 영지 광대버섯 머시룸 야생버섯 정체불명_버섯
+식물: 식물류 풀 초목 화초 초본 풀포기 잡초 풀잎 나뭇잎 잎 잎사귀 덩굴 넝쿨 수초 이끼 선인장 다육이 묘목 모종 씨앗 종자 씨 구근_식물 플랜트 관엽식물 정체불명_식물 이상한_식물 채집한_풀
+꽃: 꽃류 화 꽃송이 꽃_한_송이 생화 조화 플라워 꽃가지 들꽃 야생화 국화 백합 튤립 해바라기 카네이션 수국 안개꽃 꽃잎 헌화 말린_꽃 드라이플라워
+나무: 나무류 수목 목재 원목 통나무 나무토막 재목 판자 널빤지 목재류 각재 나무_조각류 분재 수림 고목 나무판
+독초: 독풀 독성식물 독_식물 유독식물 독초류 투구꽃 협죽도 독미나리 벨라돈나 맨드레이크 독_풀 독성_식물
+약초: 약풀 약초류 약용식물 허브 약재류 한약재 생약 본초 약용_식물 산삼 인삼 당귀 감초 쑥 약쑥 약초_다발 산야초 산나물 영초 약용_풀
+화분: 화분류 분 화분_식물 화초_화분 플랜터 꽃화분 미니화분 화분_하나
+장난감: 장난감류 완구 완구류 토이 놀잇감 놀이감 장난감_하나 어린이_장난감 아이_장난감 유아완구 놀이도구 놀이_도구 프라모델 모형_장난감 미니카 로봇_장난감 레고 블록류 팽이 요요 딱지 구슬치기 변신로봇 조립_완구 태엽_장난감 오뚝이
+인형: 인형류 봉제인형 헝겊인형 돌 솜인형 마리오네트 목각인형 꼭두각시 마네킹 구체관절인형 바비 종이인형 저주인형 부두인형 짚인형 제웅 손인형 도자기_인형 비스크_인형 동물_인형 캐릭터_인형 피겨 누이구루미 꼭두 허수아비
+풍선: 풍선류 고무풍선 헬륨풍선 벌룬 물풍선 은박풍선
+놀이: 놀이도구류 놀이용품 오락 오락도구 게임 놀이_용품 오락_용품 레크리에이션_용품 게임_도구 놀잇거리 유희도구 파티게임
+보드게임: 보드_게임 보드게임류 판놀이 테이블게임 말판놀이 체스 바둑 오목 윷놀이 윷 카드게임 TRPG 주사위_게임 부루마블 젠가 보드게임_판 테이블_게임 장기_바둑
+가구: 가구류 집기 세간살이 가구_하나 퍼니처 집기류 세간_가구 목가구 인테리어_가구 사무가구 가정용_가구 붙박이 비품_가구 가재도구
+침대: 침대류 침상 베드 매트리스 간이침대 야전침대 이층침대 병상 침대_프레임 평상 요람
+의자: 의자류 걸상 체어 좌석 앉을_것 스툴 벤치 소파 쇼파 안락의자 흔들의자 접이식_의자 사무용_의자 등받이_의자 걸터앉을_것 좌판 방석_의자 휠체어_의자
+책상: 책상류 탁자 테이블 데스크 식탁 밥상 좌탁 협탁 작업대 탁상 교탁 사무용_책상 상 소반 다과상 티테이블 화장대
+수납장: 수납_장 장 장롱 옷장 서랍장 찬장 책장 선반 진열장류 캐비닛류 신발장 장식장 서랍 책꽂이 수납가구 벽장 농 반닫이류 문갑 사물함류 락커류 수납_가구
+침구: 침구류 이부자리 이불 요 베개 이불류 금침 침구_세트 홑이불 솜이불 매트 패드 덮을_것 깔개 모포 침낭 베갯잇 이불보 요_이불
+쿠션: 쿠션류 방석 등받이 베개류 필로우 바디필로우
+아기용품: 유아용품 육아용품 아기_용품 유아_용품 베이비용품 영유아용품 신생아용품 아기물건 육아_용품 젖병 공갈젖꼭지 쪽쪽이 기저귀류 유모차 아기띠 턱받이 이유식 분유 딸랑이류
+반려동물용품: 애완용품 펫용품 반려동물_용품 애완동물용품 애견용품 펫_용품 애묘용품 동물용품 사료 개껌 캣타워 펫푸드 간식_사료 밥그릇_동물 이동장 켄넬 하네스류 강아지용품 고양이용품 개밥 고양이_모래
+학용품: 학용품류 학습용품 학교_준비물 준비물 학생용품 학습_도구 학업용품 스쿨용품 필통 책받침 실내화_주머니 문제집 교재 학습지
+자: 자류 줄자 삼각자 각도기 눈금자 컴퍼스 곱자 측정자 스케일 룰러 권척
+스티커: 스티커류 딱지_스티커 씰 라벨 스티카 띠부씰 판박이 붙임딱지 데칼
+더러운 것: 더러운_것 오물 오염물 지저분한_것 폐기물 불결한_것 더러운_물건 혐오물 구정물 때 얼룩 찌꺼기 찌끼 잔여물 음식물쓰레기 썩은_것 부패물 역겨운_것 구토물 토사물 가래 침 오줌 소변 배설물 분뇨 오수 하수 폐수 고름 진물 구더기_덩어리
+쓰레기: 쓰레기류 폐품 잡쓰레기 폐물 쓸모없는_것 버릴_것 잔해물 고물류 폐지류 재활용품 고철 폐자재 휴지조각 쓰레기_더미 폐기물류 잡동사니_쓰레기 버려진_것 부스러기류 넝마 깡통_쓰레기 폐가전 정크 가비지 트래시 헌것 못_쓰는_것
+똥: 대변 변 응가 분 똥류 똥덩어리 배설물류 인분 개똥 소똥 말똥 새똥 분변 똥_덩어리 대변_샘플 거름 두엄
+행사용품: 행사_용품 파티용품 파티_용품 이벤트용품 축하용품 잔치용품 행사도구 파티_소품 축제용품 기념용품 장식용품 데코용품 폭죽류 꽃가루 고깔모자 가랜드 현수막 플래카드 응원도구 응원봉 생일초 리본_장식 선물포장
+탈것: 탈것류 이동수단 교통수단 운송수단 차량 자동차 차 오토바이 자전거 스쿠터 킥보드 스케이트보드 수레 리어카 손수레 마차 배 보트 탈_것 승용물 운반구 바이크 전동킥보드 유모차류 썰매
+표지판: 표지판류 표지 간판 팻말류 안내판 경고판 표식 푯말 이정표 사인 사인보드 게시판 알림판 도로표지 교통표지 금지_표지 위험_표지 출입금지_팻말 입간판 현판 문패
+천: 천류 옷감 직물 헝겊 원단 피륙 천_조각류 포목 보 천_쪼가리 걸레감 패브릭 면포 광목 비단 명주 삼베 모시 린넨 벨벳 가죽_원단 수건 타월 타올 손수건 행주 보자기류 천막 방수포 타프 커튼 휘장 장막 융단 양탄자 카펫 러그
+로프: 줄 밧줄류 끈 노끈 새끼줄 로프류 동아줄 낙하산줄 파라코드 와이어 철사 케이블타이 빨랫줄 견인줄 자일 등산로프 줄_하나 끈_하나 포승줄 고무줄 낚싯줄 실끈
+실: 실류 실_한_타래 바느질실 재봉실 털실 명주실 무명실 낚싯실 뜨개실 자수실 실뭉치 실패 색실 오색실 붉은_실 금실 은실
+액자: 액자류 사진액자 그림액자 프레임 사진틀 틀 액자_하나 영정 영정사진 포토프레임
+우산: 우산류 양산 장우산 접이식_우산 비닐우산 파라솔 삼단우산 우비류
+지팡이: 지팡이류 단장 스틱_지팡이 케인류 등산스틱 짚을_것 목발류 석장 죽장 흰_지팡이
+손전등: 손전등류 플래시류 랜턴_손전등 회중전등류 후레시 토치 헤드랜턴류 휴대용_조명 탐색등 전지등
+부채: 부채류 접부채 쥘부채 합죽선 단선 방구부채 팬 손부채 선자 깃털부채 철선
+담요: 담요류 모포류 블랭킷 무릎담요 군용담요 전기담요 덮개 보온포 은박담요 이불_담요
+구슬: 구슬류 유리구슬 비드 옥구슬 수정구 수정구슬 마블 쇠구슬 진주알 구 오브 보주 여의주 영롱한_구슬
+배지: 뱃지 배지류 뱃지류 핀뱃지 휘장_배지 금배지 기장 엠블럼 마크 계급장 훈장류 견장 명찰류 완장류 브로치류
+음반: 음반류 레코드 앨범 엘피 LP CD류 테이프_음반 카세트테이프 싱글 음원 디스크류 바이닐 SP판 EP 음악_CD 레코드판 음반_한_장
+놀이터: 놀이터_기구 놀이기구 놀이_시설 미끄럼틀 시소 정글짐 철봉 그네류 회전무대 놀이터_물건
+초: 초류 양초 촛불류 캔들류 밀랍초 생일초류 제사초 향초류 티라이트 파라핀_초 초_한_자루
+
+# ══ 영어 (2026-11-10 사용자: 영어 출력 대비). 단수로 적는다 — 복수형(snacks)은 매칭기가 단수로 바꿔 찾는다 ══
+# ── 대분류 ──
+@food: food foodstuff edible eatable provision ration grocery meal dish cuisine something_to_eat food_item victual nourishment sustenance fare chow grub
+@wear: clothes clothing apparel garment outfit attire wear wardrobe garb dress_item costume_piece
+@tool: tool implement utensil instrument equipment gear hardware apparatus
+@device: device electronics gadget electronic_device appliance machine tech electronic machinery
+@medical: medical medical_supply medical_item medical_supplies first_aid_item healthcare_item medical_equipment
+@weapon: weaponry armament arms
+@paper: paper_item paperwork papers
+@valuable: valuable valuables treasure precious_item riches loot
+@consumable: consumable consumables supply supplies disposable sundries
+@charm: charm_item talisman_item ward occult_item ritual_item
+@seal: seal sealing_item containment_item containment
+@anomaly: anomaly anomalous_object anomalous_item cursed_object cursed_item strange_object oddity eldritch_object paranormal_object
+@adult: adult_item adult_goods nsfw_item
+@body: body_part body_parts remains human_remains flesh
+@misc: misc miscellaneous junk_item odds_and_ends knickknack trinket_misc stuff sundry
+
+# ── 음식 ──
+과자: snack snack_food munchies nibble confectionery confection treat biscuit cracker bag_of_snacks packaged_snack junk_food tea_snack refreshment
+감자칩: chip potato_chip crisps crisp potato_crisp
+한과: korean_sweet traditional_sweet korean_confectionery
+사탕: candy sweet sweets hard_candy lollipop bonbon caramel toffee
+젤리: jelly gummy gummi gummy_bear jello
+껌: gum chewing_gum bubble_gum
+초콜릿: chocolate choco chocolate_bar cocoa
+아이스크림: ice_cream icecream popsicle ice_pop gelato sorbet frozen_dessert ice_lolly sundae
+빵: bread bakery baked_goods loaf bun roll pastry
+디저트: dessert sweet_treat pudding_dessert
+케이크: cake pie tart cheesecake shortcake
+떡: rice_cake tteok mochi
+라면: ramen ramyeon instant_noodle instant_ramen cup_noodle cup_ramen
+면: noodle pasta spaghetti udon soba noodle_dish
+밥: rice cooked_rice rice_dish rice_bowl fried_rice bibimbap
+김밥: gimbap kimbap sushi_roll
+죽: porridge congee gruel soup_porridge
+국: soup broth stew_soup
+탕: hot_pot hotpot
+찌개: stew jjigae
+반찬: side_dish banchan side
+김치: kimchi
+전: pancake_savory jeon korean_pancake
+분식: street_food
+햄버거: burger hamburger cheeseburger fast_food
+양식: western_food western_dish steak
+치킨: fried_chicken chicken
+즉석식품: instant_food ready_meal retort convenience_food frozen_food mre preserved_food
+통조림: canned_food can_of_food tin tinned_food canned_goods
+고기: meat raw_meat flesh_meat cut_of_meat
+소고기: beef
+돼지고기: pork
+닭고기: chicken_meat poultry
+햄: ham processed_meat bacon spam
+해산물: seafood sea_food shellfish_seafood marine_product
+생선: fish raw_fish sashimi dried_fish
+조개: clam shellfish shell mollusk mussel scallop oyster
+게: crab
+새우: shrimp prawn
+젓갈: salted_seafood jeotgal
+해조류: seaweed kelp laver algae
+해파리: jellyfish
+알: egg_generic roe spawn
+계란: egg boiled_egg raw_egg
+과일: fruit fresh_fruit fruit_basket
+말린 과일: dried_fruit
+채소: vegetable veggie greens veg produce salad
+뿌리채소: root_vegetable root_veg tuber
+견과류: nut nuts peanut almond walnut mixed_nuts
+곡물: grain cereal grains
+음료: drink beverage soft_beverage refreshment_drink something_to_drink bottled_drink canned_drink
+물: water drinking_water bottled_water mineral_water
+탄산음료: soda pop soft_drink carbonated_drink cola fizzy_drink sparkling_water
+주스: juice fruit_juice smoothie
+커피: coffee canned_coffee latte americano espresso
+차: tea green_tea black_tea herbal_tea tea_bag
+우유: milk soy_milk yogurt_drink
+에너지음료: energy_drink
+이온음료: sports_drink isotonic_drink
+술: alcohol liquor booze alcoholic_drink alcoholic_beverage spirits hard_liquor
+소주: soju
+맥주: beer lager ale
+양주: whiskey whisky brandy vodka rum gin tequila cognac
+전통주: makgeolli rice_wine traditional_liquor sake
+와인: wine red_wine white_wine champagne
+양념: seasoning condiment spice spices
+소스: sauce dressing ketchup mayonnaise mustard
+가루: powder
+기름: oil cooking_oil
+장류: paste soybean_paste soy_sauce gochujang
+유제품: dairy dairy_product butter cream cheese_dairy
+담배: cigarette cigarettes tobacco cigar smoke pack_of_cigarettes
+
+# ── 옷 ──
+옷: clothes_generic piece_of_clothing spare_clothes change_of_clothes casual_wear
+상의: top shirt_top upper_garment tee t_shirt sweater hoodie blouse jumper sweatshirt cardigan
+셔츠: shirt dress_shirt button_up
+조끼: vest waistcoat
+외투: outerwear coat jacket overcoat parka windbreaker outer
+바지: pants trousers bottoms slacks jeans leggings
+치마: skirt
+원피스: dress one_piece gown
+정장: suit formal_wear tuxedo business_suit
+한복: hanbok
+전통옷: traditional_clothes traditional_costume kimono
+속옷: underwear undergarment undies lingerie_plain bra briefs boxers panties
+양말: sock socks stockings_plain
+잠옷: pajamas pyjamas sleepwear nightgown nightwear
+수영복: swimsuit swimwear bikini swim_trunks
+운동복: sportswear tracksuit gym_clothes athletic_wear workout_clothes
+제복: uniform work_uniform military_uniform fatigues
+종교복: vestment religious_garb robe_religious habit cassock
+보호복: protective_suit hazmat_suit hazmat protective_clothing coverall
+가운: gown_robe robe lab_coat bathrobe
+신발: shoe shoes footwear pair_of_shoes
+구두: dress_shoe leather_shoe loafer heels
+운동화: sneaker sneakers trainer running_shoe
+부츠: boot boots combat_boot
+슬리퍼: slipper slippers sandal flip_flop
+모자: hat cap headwear beanie
+가방: bag handbag purse satchel tote sack_bag duffel
+장갑: glove gloves mitten
+안경: glasses eyeglasses spectacles eyewear
+마스크: mask face_mask
+가면: masquerade_mask disguise_mask
+장신구: accessory accessories jewelry jewellery ornament trinket adornment bling
+목걸이: necklace pendant_necklace chain_necklace choker
+반지: ring band_ring
+팔찌: bracelet bangle wristband
+귀걸이: earring earrings
+머리장식: hair_accessory hairpin hair_ornament hair_clip
+넥타이: tie necktie bow_tie
+목도리: scarf muffler shawl
+벨트: belt strap_belt
+보호구: protective_gear armor_gear protection guard_gear safety_gear body_armor
+보호대: pad_guard knee_pad elbow_pad guard brace
+투구: helm
+헬멧: helmet hard_hat
+갑옷: armor armour plate_armor
+
+# ── 도구 ──
+공구: hand_tool power_tool toolkit tool_set repair_tool hardware_tool
+망치: hammer mallet
+삽: shovel spade
+주방용품: kitchenware kitchen_tool kitchen_utensil cookware kitchen_item
+냄비: pot pan frying_pan saucepan wok
+조리도구: cooking_utensil cooking_tool ladle spatula whisk
+컵: cup mug glass tumbler
+수저: cutlery silverware spoon_and_chopsticks flatware utensils
+그릇: bowl dish plate tableware crockery
+통: container_tub tub bucket pail
+청소도구: cleaning_tool cleaning_supply cleaning_supplies cleaner mop broomstick
+욕실용품: toiletry toiletries bathroom_item bath_item washroom_item
+샴푸: shampoo conditioner body_wash
+낚시도구: fishing_gear fishing_tackle tackle fishing_equipment
+캠핑용품: camping_gear camping_equipment outdoor_gear survival_gear survival_kit
+운동기구: exercise_equipment sports_equipment gym_equipment sporting_goods dumbbell
+공: ball
+문구: stationery office_supply office_supplies writing_supply school_supply
+펜: pen writing_instrument marker_pen ballpoint
+테이프: tape adhesive_tape duct_tape
+도장: stamp seal_stamp
+미술용품: art_supply art_supplies paint_set
+미술품: artwork art_piece work_of_art art
+그림: painting picture drawing canvas_painting
+조각상: statue sculpture figurine_statue bust
+바느질도구: sewing_kit sewing_tool sewing_supply
+실험도구: lab_equipment lab_tool laboratory_equipment lab_gear
+관측도구: observation_tool optical_instrument telescope binoculars
+시계: clock watch timepiece wristwatch
+구속구: restraint restraints shackle shackles bindings fetters
+신호도구: signal_device signaling_tool whistle signal
+라이터: lighter
+생활용품: household_item household_goods daily_necessity everyday_item housewares
+악기: instrument_music musical_instrument
+현악기: string_instrument guitar violin
+관악기: wind_instrument flute trumpet
+타악기: percussion drum
+건반: keyboard_instrument piano organ
+
+# ── 기기 ──
+가전: home_appliance household_appliance
+주방가전: kitchen_appliance microwave toaster blender rice_cooker
+냉난방기: heater air_conditioner fan_heater
+세탁기: washing_machine washer dryer
+청소기: vacuum vacuum_cleaner
+컴퓨터: computer pc laptop notebook_pc desktop tablet
+부품: component part parts computer_part circuit_board chip_part
+입력장치: input_device mouse controller
+저장장치: storage_device storage_media usb usb_drive flash_drive memory_card hard_drive disk
+사무기기: office_equipment printer copier
+전화기: phone telephone communication_device comm_device
+휴대폰: cellphone cell_phone mobile mobile_phone smartphone burner_phone
+카메라: camera camcorder cctv webcam
+촬영장비: filming_equipment camera_gear
+음향기기: audio_device audio_equipment sound_equipment stereo
+이어폰: earphone earphones headphone headphones earbud earbuds
+TV: tv television monitor screen display
+게임기: game_console console handheld_console gaming_device
+배터리: battery batteries power_bank cell_battery
+조명: lighting light_source light lamp_light
+전등: lamp flashlight torch lantern_light light_bulb bulb
+SF 장비: sci_fi_device futuristic_device alien_tech high_tech_device alien_device
+길찾기: navigation compass gps
+탐지기: detector sensor scanner_device meter gauge
+케이블: cable cord wire charging_cable
+
+# ── 의료 ──
+약: medicine medication drug drugs pill pills meds pharmaceutical remedy tablet_pill
+진통제: painkiller pain_reliever analgesic aspirin sedative
+감기약: cold_medicine flu_medicine
+영양제: supplement vitamin vitamins dietary_supplement
+안약: eye_drop eye_drops
+연고: ointment salve cream_ointment balm
+물약: potion elixir tonic liquid_medicine syrup healing_potion
+의료기기: medical_device medical_instrument
+주사기: syringe injection injector needle_syringe
+의료도구: medical_tool surgical_tool surgical_instrument
+붕대: bandage bandages gauze dressing_bandage plaster band_aid tourniquet
+찜질팩: heat_pack ice_pack cold_pack hot_pack
+보조기구: mobility_aid crutch wheelchair prosthetic
+구급상자: first_aid_kit first_aid medkit med_kit medical_kit emergency_kit
+
+# ── 무기 ──
+무기: weapon weapons arm_weapon
+칼: knife blade bladed_weapon cutter
+검: sword longsword saber sabre
+단검: dagger dirk shiv pocket_knife combat_knife
+가위: scissors shears
+총: gun firearm firearms sidearm
+권총: pistol handgun revolver
+소총: rifle assault_rifle carbine
+기관총: machine_gun submachine_gun smg
+총기부품: gun_part magazine silencer suppressor scope holster
+탄약: ammo ammunition bullet bullets round rounds cartridge shell_ammo
+폭탄: bomb explosive explosives grenade dynamite ied
+둔기: blunt_weapon bludgeon
+몽둥이: club baton bat cudgel truncheon mace pipe_weapon
+창: spear lance polearm halberd
+도끼: axe ax hatchet
+농기구: farm_tool farming_tool sickle hoe scythe
+활: bow crossbow bow_and_arrow
+송곳: awl ice_pick spike
+전기충격기: stun_gun taser
+방패: shield buckler
+스프레이: spray pepper_spray
+마법: magic_item magical_item magic_tool artifact enchanted_item
+마법봉: wand staff magic_wand rod
+마검: magic_sword cursed_sword enchanted_sword
+
+# ── 서류 ──
+서류: document_set documents paper_documents files
+문서: document doc file report record memo_document dossier classified_document
+증명서: certificate certification license permit
+신분증: id id_card identification identity_card passport drivers_license
+사원증: employee_id staff_id badge_id agent_id work_id
+계약서: contract agreement pact waiver
+안내문: notice leaflet pamphlet brochure flyer handout poster_notice
+편지: letter mail note_letter envelope_letter invitation
+봉투: envelope
+지도: map chart_map
+종이: paper sheet_of_paper scrap_of_paper piece_of_paper
+사진: photo photograph picture_photo snapshot polaroid
+책: book novel textbook tome volume
+경전: scripture bible holy_book sutra grimoire
+공책: notebook diary journal planner
+수첩: pocket_notebook notepad memo_pad
+표: ticket pass
+차표: train_ticket bus_ticket boarding_pass transit_ticket
+입장권: admission_ticket entry_ticket movie_ticket concert_ticket
+상품권: gift_card gift_certificate voucher coupon
+돈: money cash_money currency funds
+현금: cash bill banknote wad_of_cash
+동전: coin coins change
+카드: card credit_card debit_card
+열쇠: key keys keyring_key
+쪽지: note slip_of_paper memo scribbled_note
+
+# ── 귀중품 ──
+보석: gem gemstone jewel precious_stone diamond ruby sapphire emerald pearl crystal
+금괴: gold gold_bar bullion ingot gold_ingot
+트로피: trophy medal award
+골동품: antique relic artifact_antique vintage_item heirloom
+도자기: pottery porcelain ceramic vase
+수집품: collectible collectable collection_item memorabilia souvenir figurine
+
+# ── 소모품 ──
+화장품: cosmetic cosmetics makeup beauty_product
+스킨케어: skincare lotion sunscreen moisturizer
+색조: lipstick mascara eyeshadow foundation nail_polish
+위생용품: hygiene_product sanitary_product sanitary_item
+휴지: tissue toilet_paper paper_towel napkin wet_wipe
+방향제: air_freshener deodorizer diffuser
+연료: fuel gasoline petrol kerosene gas_can charcoal firewood
+접착제: glue adhesive superglue
+독약: poison toxin venom
+담배용품: smoking_accessory pipe ashtray
+봉지: plastic_bag bag_plastic pouch_bag
+
+# ── 부적 ──
+부적: talisman amulet charm paper_charm ofuda lucky_charm protective_charm
+무구: shaman_tool ritual_tool shamanic_tool ritual_implement
+방울: bell handbell
+거울: mirror hand_mirror
+성물: holy_item sacred_item holy_relic religious_item sacred_object
+십자가: cross crucifix rosary
+불상: buddha_statue buddha
+염주: prayer_beads beads_prayer
+등불: lantern candlelight
+연등: lotus_lantern paper_lantern
+향: incense incense_stick
+제물: offering sacrifice
+
+# ── 봉인·용기 ──
+함: chest casket case_box lockbox safe strongbox coffer
+용기: container vessel receptacle canister
+병: bottle vial flask jar_bottle phial
+항아리: jar urn crock pot_jar
+사슬: chain chains
+상자: box crate carton package_box
+주머니: pouch small_bag sack
+
+# ── 괴이 ──
+기생충: parasite parasitic_worm
+균류: fungus fungi mold mould spore bacteria virus germ pathogen microbe
+신체 조각: body_piece severed_part piece_of_flesh chunk_of_flesh
+해골: skull
+표본: specimen sample
+박제: taxidermy stuffed_animal_mount
+조각: fragment shard piece shards debris
+덩어리: lump blob mass clump slime goo
+돌: stone rock pebble
+막대: stick rod_stick pole
+액체: liquid fluid
+
+# ── 성인 ──
+성인용품: adult_toy sex_toy adult_product
+진동기: vibrator
+채찍: whip crop flogger
+란제리: lingerie
+피임: contraceptive contraception birth_control
+정력제: aphrodisiac
+도박: gambling gambling_item casino_item
+수갑: handcuffs handcuff cuffs
+재갈: gag
+
+# ── 잡동사니 ──
+동물: animal creature beast critter small_animal
+뱀: snake serpent viper
+도마뱀: lizard gecko
+개구리: frog toad
+새: bird
+쥐: rat mouse_animal rodent
+벌레: bug insect worm_bug vermin creepy_crawly
+거미: spider tarantula
+개미: ant
+벌: bee wasp hornet
+나방: moth
+나비: butterfly
+파리: fly maggot
+지네: centipede millipede
+전갈: scorpion
+애벌레: larva caterpillar grub_larva
+풍뎅이: beetle
+벌집: beehive hive
+버섯: mushroom toadstool
+식물: plant herb_plant weed leaf seed
+꽃: flower blossom bouquet
+나무: wood timber lumber log plank
+독초: poisonous_plant poison_herb
+약초: herb medicinal_herb herbs
+화분: potted_plant flowerpot
+장난감: toy plaything
+인형: doll plush plushie stuffed_toy stuffed_animal puppet
+풍선: balloon
+보드게임: board_game tabletop_game
+가구: furniture
+침대: bed cot mattress
+의자: chair seat stool bench sofa couch
+책상: desk table
+수납장: cabinet drawer shelf wardrobe_furniture cupboard closet
+침구: bedding blanket_bedding pillow quilt
+아기용품: baby_item baby_product baby_supplies
+반려동물용품: pet_supply pet_supplies pet_item pet_food
+학용품: school_supplies
+더러운 것: filth dirty_thing waste_filth gross_thing
+쓰레기: trash garbage rubbish junk litter scrap
+똥: poop feces dung excrement
+행사용품: party_supply party_supplies party_item
+탈것: vehicle ride car bike bicycle
+표지판: sign signboard signpost
+천: cloth fabric textile rag towel
+로프: rope cord_rope string twine
+실: thread yarn
+우산: umbrella parasol
+지팡이: cane walking_stick
+손전등: handheld_light
+부채: fan hand_fan
+담요: blanket
+구슬: marble bead orb
+배지: badge pin emblem
+음반: record album vinyl
+초: candle

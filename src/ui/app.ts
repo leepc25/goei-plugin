@@ -41,6 +41,8 @@ import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { bmDeskWinSpec, mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
+import { homeshopAction, homeshopInput, homeshopMounted, homeshopOpenCheck, homeshopTab, resetHomeshop } from './homeshop';
+import { hsSettings } from '../core/homeshop';
 import { boardChrome, gnet, gnetDmOpen, gnetDmWinSpec, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { bindPopWins } from './popwin';
 import { bindMouseGesture, type Gesture } from './gesture';
@@ -49,7 +51,7 @@ import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { GN_NICK } from '../core/gnet';
-import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
+import { br, BR_TABS_VAR, chromeHtml, closeTab, curTab, focusSite, openSite, reopenTab, restoreTabs, tabsJson, homeHtml, isSite, loginHtml, newTab, recordTab, siteLogo, SITES, soonHtml, tabCan, tabGo, tabListHtml, tabState, type ChromeOpts, type SiteId } from './browser';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -301,16 +303,21 @@ function ensureRoot(): HTMLElement {
   // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
   bindCropDrag(root, render);
   bindPopWins(root, render, [mallWinSpec, bmDeskWinSpec, gnetDmWinSpec]);
-  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 닫은 탭 복구 (인터넷)
+  // PC 마우스 제스처 (11-09 사용자): 오른쪽 단추 끌기 ← 뒤로 · → 앞으로 (상황판 전체), ㄴ 탭 닫기 · ㄱ 거꾸로(↑←) 닫은 탭 복구 (인터넷)
   bindMouseGesture(root, {
     label: (g: Gesture) => {
-      if (g === 'L') return navStep(-1) ? '뒤로' : '';
-      if (g === 'R') return navStep(1) ? '앞으로' : '';
-      if (view.kind !== 'started' || !inBrowser()) return '';
+      // 인터넷 창에서는 실제 브라우저처럼 지금 탭의 기록만 (2026-11-10 사용자: 탭별로 움직여야 한다) — 주소줄 ‹ › 단추와 같은 br-back·br-fwd
+      const web = view.kind === 'started' && inBrowser();
+      if (g === 'L') return (web ? tabCan(-1) : navStep(-1)) ? '뒤로' : '';
+      if (g === 'R') return (web ? tabCan(1) : navStep(1)) ? '앞으로' : '';
+      if (!web) return '';
       return g === 'DR' ? '탭 닫기' : br.closed.length ? '닫은 탭 다시 열기' : '';
     },
     run: (g: Gesture) => {
-      if (g === 'L' || g === 'R') return void navStep(g === 'L' ? -1 : 1)?.();
+      if (g === 'L' || g === 'R') {
+        if (view.kind === 'started' && inBrowser()) return void run(g === 'L' ? 'br-back' : 'br-fwd');
+        return void navStep(g === 'L' ? -1 : 1)?.();
+      }
       void run(g === 'DR' ? 'br-close' : 'br-reopen', String(br.cur));
     },
   });
@@ -583,6 +590,7 @@ function panelInput(el: HTMLInputElement): void {
   }
   if (el?.dataset?.input === 'items-q' && view.kind === 'started' && root) return itemsInput(root, view.ctx, el.value);
   if (el?.dataset?.input === 'shop-say') return shopInput(el.value);
+  if (el?.dataset?.input === 'hs-say') return void homeshopInput(el.value);
   if (el?.dataset?.input === 'mall-say') { const ms = curTab().site; if (isMallSite(ms)) mallInput(ms, el.value); return; }
   if (el?.dataset?.input === 'rec-q' && view.kind === 'started') {
     // 기록 › 일지 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
@@ -820,6 +828,7 @@ async function refresh(): Promise<void> {
         resetShop();
         resetGnet();
         resetMalls();
+        resetHomeshop();
         restoreTabs(ctx.chat.scriptstate?.[BR_TABS_VAR]);
         tabsSaved = tabsJson();
         resetPhone();
@@ -946,6 +955,7 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
   if (featCtx && action.startsWith('ms-') && (await mallSettingsAction(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('hs-') && (await homeshopAction(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('mall-')) {
     const ms = curTab().site;
     if (isMallSite(ms) && (await mallAction(action, value, featCtx, wikiEnv, ms))) return;
@@ -1109,28 +1119,25 @@ async function handle(action: string, value?: string): Promise<void> {
       return;
     // ── 인터넷 브라우저 (ui/browser.ts) ──
     case 'br-site':
-      // 폰 서랍: 그 사이트 탭이 있으면 그 탭으로, 없으면 지금 탭에서 (2026-11-08 사용자)
+      // 폰 서랍: 인터넷 안이면 지금 탭에서, 밖이면 그 사이트 탭이 있을 때 그 탭으로·없으면 새 탭에서
       if (!value || !isSite(value)) return;
       cdrOpen = false;
+      if (inBrowser()) return goSite(value);
       if (br.tabs.some((t) => t.site === value)) {
         openSite(value);
         return openBrowserTab();
       }
-      if (!inBrowser()) newTab();
+      if (curTab().site) newTab();
       return goSite(value);
     case 'br-go':
-      // 사이트마다 탭은 하나: 이미 열린 사이트면 그 탭으로 (2026-11-08 사용자)
+      // 즐겨찾기: 늘 지금 탭에서 연다 (2026-11-10 사용자: 실제 브라우저처럼, 같은 사이트 탭이 여럿이어도 된다)
       if (!value || !isSite(value)) return;
-      if (br.tabs.some((t, i) => t.site === value && i !== br.cur)) {
-        openSite(value);
-        return openBrowserTab();
-      }
       return goSite(value);
     case 'br-home':
       return goSite('');
     case 'br-new':
       newTab();
-      return curTab().at >= 0 ? openBrowserTab() : goSite('');
+      return goSite('');
     case 'br-tab':
       br.cur = Math.max(0, Math.min(br.tabs.length - 1, Number(value) || 0));
       br.list = false;
@@ -1152,6 +1159,7 @@ async function handle(action: string, value?: string): Promise<void> {
       // 새로 고침 = 그 사이트를 새로 받기 (괴담넷은 게시판 새로고침, 나머지는 다시 그리기)
       if (view.kind === 'started' && isBoardSite(curTab().site) && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv, tabBoard()))) return;
       { const ms = curTab().site; if (view.kind === 'started' && isMallSite(ms) && (await mallAction('mall-refresh', '', view.ctx, wikiEnv, ms))) return; }
+      if (view.kind === 'started' && curTab().site === 'hs' && (await homeshopAction('hs-refresh', '', view.ctx, wikiEnv))) return;
       return render();
     case 'br-list':
       br.list = !br.list;
@@ -1463,6 +1471,9 @@ function render(): void {
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
   const logKeep = log && logRoom === (phone.room ?? '') ? (log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop) : -1;
+  // 대화 칸 공통(data-chatlog: 우주 쇼핑몰 운영자 질문. 포인트몰 상담은 column-reverse 라 스스로 아래에 붙는다): 새 말이 붙었거나 맨 아래를 보고 있었으면 맨 아래로, 위를 읽던 중이면 그 자리 (2026-11-10 사용자: 보낼 때마다 맨 위로 튀었다)
+  const chatKeep = new Map<string, { top: number; bottom: boolean; n: number }>();
+  root.querySelectorAll<HTMLElement>('[data-chatlog]').forEach((el) => chatKeep.set(el.dataset.chatlog ?? '', { top: el.scrollTop, bottom: el.scrollHeight - el.scrollTop - el.clientHeight < 60, n: el.querySelectorAll('.q-m, .bd-m, [data-msg]').length }));
   // 괴담넷: 같은 글·쪽지를 보고 있으면 목록과 본문의 스크롤 자리를 지킨다 (답글을 누르면 맨 위로 튀던 문제)
   const gnKey = `${curTab().site}:${gnet.sub}:${gnet.open}:${gnet.openDm}`;
   const gnKeep = tab === 'gnet' && root.dataset.tab === 'gnet' && root.dataset.gn === gnKey
@@ -1537,6 +1548,13 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  // 망상홈쇼핑 방송 칸: 다시 그려도 같은 캔버스·채팅 줄을 꽂아 끊기지 않게 (ui/hsplayer.ts)
+  homeshopMounted(root);
+  root.querySelectorAll<HTMLElement>('[data-chatlog]').forEach((el) => {
+    const k = chatKeep.get(el.dataset.chatlog ?? '');
+    const n = el.querySelectorAll('.q-m, .bd-m, [data-msg]').length;
+    el.scrollTop = !k || k.bottom || n !== k.n ? el.scrollHeight : k.top;
+  });
   // 상점 주인 대사 상자: 새 대사가 아래에 쌓이니 늘 맨 아래를 보인다
   root.querySelectorAll<HTMLElement>('[data-sh-log]').forEach((el) => (el.scrollTop = el.scrollHeight));
   labelSwitches(root);
@@ -1844,7 +1862,9 @@ function commonDrawer(ctx: ChatContext | null): string {
 
 /** 즐겨찾기·새 탭·서랍에 보일 사이트: 백일몽 포인트몰은 백일몽 소속일 때만 */
 function browserSites(ctx: ChatContext | null): SiteId[] {
-  return SITES.map((x) => x.id).filter((id) => id !== 'bm' || (!!ctx && pointsOn(ctx.chat)));
+  // 망상홈쇼핑은 켜져 있고 「인터넷에 상시 노출」일 때만 (꺼도 카드로 접속하면 그 탭에서 열린다)
+  const hs = ctx ? hsSettings(ctx.chat.scriptstate) : null;
+  return SITES.map((x) => x.id).filter((id) => (id !== 'bm' || (!!ctx && pointsOn(ctx.chat))) && (id !== 'hs' || (!!hs && hs.on && hs.net)));
 }
 
 /** 브라우저 틀에 넘길 값: 로그인 닉네임은 $br_login 이 1 일 때만 */
@@ -1877,6 +1897,7 @@ function browserBody(ctx: ChatContext): string {
     : !t.site ? homeHtml(browserSites(ctx))
     : isBoardSite(t.site) ? gnetTab(ctx, gnetEnv, t.site)
     : isMallSite(t.site) ? mallTab(ctx, wikiEnv, t.site)
+    : t.site === 'hs' ? homeshopTab(ctx, wikiEnv)
     : t.site === 'wk' ? wikiTab(ctx, wikiEnv)
     : soonHtml(t.site);
   return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || 'home'}">${page}</div>${loginHtml(o)}</div>`;
@@ -1901,6 +1922,7 @@ function siteOpened(): void {
   if (tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
   const site = curTab().site;
   if (tab === 'net' && isMallSite(site)) mallOpenCheck(view.ctx, wikiEnv, site);
+  if (tab === 'net' && site === 'hs') homeshopOpenCheck(view.ctx, wikiEnv);
 }
 
 /** 지금 탭에서 사이트를 연다 (그 사이트 첫 화면부터) */

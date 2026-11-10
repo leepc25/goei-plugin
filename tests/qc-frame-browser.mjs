@@ -134,7 +134,7 @@ let prefsSaved;
   assert.ok(pre.pre, '시작 전 창 폭(1024) 기준 틀');
   // 11-08 사용자: 시작 패널은 3:4 (폭 1024 넘지 않음, 낮은 화면은 높이에 맞춰 좁아짐)
   // 폭 = min(1024, (화면 높이 − 틀 두께) 기준 3:4 폭)  (style.css .gx-frame.pre:has(> .gx-panel.pick))
-  const want = Math.min(1024, (Math.min(pre.vh - 28, 1366) - 2 * pre.bz) * 0.75);
+  const want = Math.min(1024, (Math.min((pre.vh - 28) * 0.92, 1366 + 2 * pre.bz) - 2 * pre.bz) * 0.75); // 11-10: 시작 패널 높이 92%
   assert.ok(pre.panelW <= 1024 && Math.abs(pre.panelW - want) < 4, `시작 전 창 폭 ${pre.panelW} (기대 약 ${Math.round(want)})`);
   assert.deepEqual(errors, []);
   await page.close();

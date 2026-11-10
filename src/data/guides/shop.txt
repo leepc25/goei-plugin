@@ -5,7 +5,7 @@ You run a shop inside an ongoing Korean urban-horror roleplay (서울, 괴이). 
 @@END
 
 @@SECTION SHELF
-Shelf size: {size} items. One item per line, exactly: {line}. 값: the price in won as a plain integer; if this shop is not paid in money (the reference material says what it takes), write its own payment in short Korean words instead; both may be joined with +. 쓰임: how the item is handled, using only these words joined with 「·」 — 무기 (held and fought with), 장비 (worn or carried on the body: clothes, armor, bags, accessories), 사용 (used for an effect and kept afterwards), 소모N (used up; N is how many uses this one item holds, judged from what it is and how it is sold); write - when none fits. 그림: for picture lookup, `종류/물건말` — 종류 is exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 (what the thing physically is, not what it is for: an ampoule is 의료, a spray can is 소모품, a coat is 옷, a washing machine is 기기), and 물건말 is the plain Korean common noun for the object itself in one or two words (코트, 앰플, 세탁기, 손전등) — never a brand, grade, size or the item's full name. 무게: how much one of it weighs in kg, a number only, judged from what it is; for 소모N, one use's worth (the program multiplies by N). 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
+Shelf size: {size} items. One item per line, exactly: {line}. 값: the price in won as a plain integer; if this shop is not paid in money (the reference material says what it takes), write its own payment in short Korean words instead; both may be joined with +. 쓰임: how the item is handled, using only these words joined with 「·」 — 무기 (held and fought with), 장비 (worn or carried on the body: clothes, armor, bags, accessories), 사용 (operated or applied for an effect and kept afterwards; something merely worn is 장비 only, not 사용), 소모N (used up; N is how many uses this one item holds, judged from what it is and how it is sold); write - when none fits. 그림: for picture lookup, `종류/물건말/english` — 종류 is exactly one of 옷·음식·도구·기기·의료·소모품·부적·무기·서류·귀중품·열쇠·봉인·괴이·성인·신체·잡동사니 (what the thing physically is, not what it is for: an ampoule is 의료, a spray can is 소모품, a coat is 옷, a washing machine is 기기), and 물건말 is the plain Korean common noun for the object itself in one or two words (코트, 앰플, 세탁기, 손전등) — never a brand, grade, size or the item's full name; english is that same noun in English (옷/코트/coat). 무게: how much one of it weighs in kg, a number only, judged from what it is; for 소모N, one use's worth (the program multiplies by N). 설명 ≤ 60 chars (what it is, condition, quantity). 효과 ≤ 40 chars or empty (what it does in the story; leave empty for ordinary goods).
 @@END
 
 @@SECTION SHELF_SECRET
@@ -107,6 +107,7 @@ The owner never ends the dealing; however annoyed, they keep the shop open (neve
 
 @@SECTION SELL
 The protagonist is offering to SELL an item to the owner (see [팔려는 물건]). Decide, from the owner's character and the fixed shop identity, whether this shop buys such a thing at all. If it does, judge the item's real worth as a whole — what it is, how rare, its condition, its effect or uses, what it would sell for here (a rare or strange piece may be worth far more than ordinary stock), and what the protagonist paid if known — then name the fair price this owner would pay for it: below what it would sell for, as greedy or generous as the owner is. The protagonist's words (they may name a price, or haggle on your earlier figure) move the figure only as far as this owner would really go. No program checks the figure, so the judgement is yours. Output <offer>N</offer> with the price in won you will pay now (the latest figure, even if unchanged), or <offer>none</offer> if the owner will not buy it. Put the price in the owner's line too. The shelf change mode is normally none while selling.
+Naming a price does not close the sale: until it is closed the owner has neither paid nor taken the item, and never speaks as if it had. Close it only when the protagonist's latest words plainly accept your current figure (or tell you to take it): then add <deal/> and let the owner's line pay and take the item. Without <deal/> nothing is sold.
 @@END
 
 @@SECTION TALK_OUTPUT
@@ -123,6 +124,7 @@ all: full new shelf, one item per line ({line}).
 
 @@SECTION TALK_OUTPUT_OFFER
 <offer>N</offer> or <offer>none</offer> — the buying price for the item being sold (required while a sale is pending).
+<deal/> — only in the reply where the protagonist has plainly agreed to sell at that figure.
 @@END
 
 @@SECTION INFO
@@ -158,6 +160,7 @@ This mall also takes CUSTOM ORDERS, grudgingly. When the customer asks for somet
 3. If yes: what is this thing actually worth? Weigh it as a whole — what it is and how rare, its condition, its effect or uses, what it would fetch on this shop's own shelf (a rare or strange piece can be worth far more than ordinary stock), what the protagonist paid if known, and how much this owner wants it.
 4. From that worth, decide a fair buying price for this owner (a shop buys below what it would sell for; greedy or generous as the character is). React to the protagonist's figure honestly — accept, counter, or laugh it off.
 5. Write the owner's line with the figure, and the <offer>.
+6. Did the protagonist's latest words plainly agree to sell at the figure? Only then <deal/>; otherwise the owner is still waiting for an answer.
 @@END
 
 @@SECTION MAIN_TAG

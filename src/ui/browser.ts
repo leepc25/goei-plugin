@@ -4,7 +4,7 @@
 import { needAttr } from './needfill';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export type SiteId = 'gn' | 'gal' | 'wpf' | 'sm' | 'cos' | 'wk' | 'bm';
+export type SiteId = 'gn' | 'gal' | 'wpf' | 'sm' | 'cos' | 'wk' | 'bm' | 'hs';
 
 export interface Site {
   id: SiteId;
@@ -24,6 +24,7 @@ export const SITES: Site[] = [
   { id: 'cos', name: '우주 쇼핑몰', title: '★우주 쇼핑몰★에 오는 것을 환영하는 것이다', host: 'cosmic-mall.alien', path: '/~shop/index.html' },
   { id: 'wk', name: '괴이위키', title: '괴이위키', host: 'goei.wiki', path: '/w/괴이위키:대문' },
   { id: 'bm', name: '백일몽 포인트몰', title: '백일몽 포인트몰', host: 'point.baekilmong.intra', path: '/mall/main' },
+  { id: 'hs', name: '망상홈쇼핑', title: '망상홈쇼핑 LIVE', host: 'live.mangsang.tv', path: '/onair' },
 ];
 export const siteOf = (id: string): Site | undefined => SITES.find((s) => s.id === id);
 export const isSite = (id: string): id is SiteId => SITES.some((s) => s.id === id);
@@ -37,6 +38,7 @@ const LOGO: Record<SiteId | 'home', [string, string]> = {
   cos: ['0 0 32 24', '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
   wk: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
   bm: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
+  hs: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
   home: ['0 0 24 24', '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>'],
 };
 export const siteLogo = (id: SiteId | 'home' | '', cls = 'br-fv'): string => {
@@ -107,41 +109,31 @@ export function tabState<T>(i = br.cur): T | null {
   return t && t.at >= 0 ? (JSON.parse(t.hist[t.at]) as T) : null;
 }
 
-/* 사이트마다 탭은 하나 (2026-11-08 사용자: 같은 사이트 탭이 여럿이면 같은 기록을 서로 덮어쓴다). 빈 새 탭도 하나 */
-/** 새 탭: 빈 탭이 이미 있으면 그 탭으로 */
+/* 실제 브라우저처럼 (2026-11-10 사용자): 같은 사이트를 여러 탭에 열 수 있고, 즐겨찾기는 늘 지금 탭에서 연다. 탭마다 보던 화면은 탭 기록(hist)이 되살린다 */
+/** 새 탭: 늘 빈 탭 하나를 더 연다 */
 export function newTab(): void {
-  const i = br.tabs.findIndex((t) => !t.site);
-  if (i >= 0) {
-    br.cur = i;
-    return;
-  }
   br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   br.cur = br.tabs.length - 1;
 }
 /** 탭 닫기. 마지막 탭을 닫으면 새 탭 하나가 남는다 */
 export function closeTab(i: number): void {
   const [gone] = br.tabs.splice(i, 1);
-  if (gone?.site) br.closed = [...br.closed.filter((t) => t.site !== gone.site), gone].slice(-10);
+  if (gone?.site) br.closed = [...br.closed, gone].slice(-10);
   if (!br.tabs.length) br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   if (br.cur >= i && br.cur > 0) br.cur--;
   br.cur = Math.min(br.cur, br.tabs.length - 1);
 }
-/** 닫은 탭 다시 열기 (11-09 사용자: 마우스 제스처 ㄱ). 그 사이트 탭이 이미 열려 있으면 그 탭으로 간다. 되살릴 게 없으면 false */
+/** 닫은 탭 다시 열기 (11-09 사용자: 마우스 제스처 ㄱ). 빈 새 탭 하나만 남아 있었으면 그 자리를 쓴다. 되살릴 게 없으면 false */
 export function reopenTab(): boolean {
   const t = br.closed.pop();
   if (!t) return false;
-  const i = br.tabs.findIndex((x) => x.site === t.site);
-  if (i >= 0) {
-    br.cur = i;
-    return true;
-  }
   const empty = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
   if (empty >= 0) br.tabs.splice(empty, 1);
   br.tabs.push({ ...t, id: seq++ });
   br.cur = br.tabs.length - 1;
   return true;
 }
-/** 사이트 열기: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
+/** 인터넷 밖(폰 서랍·위키 바로가기)에서 사이트로 갈 때: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
 export function openSite(site: SiteId): 'tab' | 'here' {
   const i = br.tabs.findIndex((t) => t.site === site);
   if (i < 0) {
@@ -173,11 +165,8 @@ export function restoreTabs(raw: unknown): void {
   br.cur = 0;
   try {
     const v = JSON.parse(String(raw ?? ''));
-    const seen = new Set<string>();
     for (const t of Array.isArray(v?.t) ? v.t : []) {
       const site: SiteId | '' = isSite(String(t?.s)) ? (t.s as SiteId) : '';
-      if (seen.has(site)) continue;
-      seen.add(site);
       const hist = Array.isArray(t?.h) ? t.h.filter((x: unknown) => typeof x === 'string').slice(-SAVE_HIST) : [];
       const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t.a), hist.length - 1) : hist.length - 1;
       br.tabs.push({ id: seq++, site, hist, at });

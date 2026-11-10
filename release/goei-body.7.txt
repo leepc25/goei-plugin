@@ -1,3 +1,931 @@
+bel(label2);
+    const s8 = { id: `x:${b}`, label: b, group: groupOf(label2), match: [b] };
+    t.plan = sortPlan([...t.plan, s8]);
+    return s8;
+  }
+  function progressCallStart(label2, model2, reqTokens) {
+    if (turn && !turn.manual && !turn.replyAt && !turn.endAt && Date.now() - turn.at >= PROGRESS_WATCHDOG) progressAbort(turn);
+    if (!turn || turn.endAt) {
+      turn = { at: Date.now(), plan: [], calls: [], manual: true };
+      endWanted = true;
+    }
+    const id2 = ++seq;
+    turn.calls.push({ id: id2, label: label2, model: model2, reqTokens, at: Date.now(), stage: stageFor(turn, label2).id });
+    notify();
+    return id2;
+  }
+  function progressCallChunk(id2, chars2) {
+    const c = turn?.calls.find((x) => x.id === id2);
+    if (!c || c.ms !== void 0) return;
+    c.chars = chars2;
+    notify();
+  }
+  function progressCallEnd(id2, r) {
+    const c = turn?.calls.find((x) => x.id === id2);
+    if (!c) return;
+    c.ok = r.ok;
+    c.ms = r.ms;
+    if (r.respTokens !== void 0) c.respTokens = r.respTokens;
+    if (r.error) c.error = r.error;
+    settle();
+    notify();
+  }
+  function progressEnd(t) {
+    if (!turn || turn.endAt || t !== void 0 && t !== turn) return;
+    endWanted = true;
+    settle();
+    notify();
+  }
+  var running = (t) => t.calls.filter((c) => c.ms === void 0);
+  var MANUAL_GRACE = 1500;
+  var graceTimer;
+  function settle() {
+    if (!turn || !endWanted || turn.endAt || running(turn).length || !(turn.manual || turn.replyAt || turn.aborted)) return;
+    if (!turn.manual) {
+      turn.endAt = Date.now();
+      return;
+    }
+    if (graceTimer !== void 0) clearTimeout(graceTimer);
+    const t = turn;
+    graceTimer = setTimeout(() => {
+      graceTimer = void 0;
+      if (turn === t && !t.endAt && !running(t).length) {
+        t.endAt = Date.now();
+        notify();
+      }
+    }, MANUAL_GRACE);
+  }
+  function stageState(t, s8) {
+    if (s8.group === "main" && s8.id === "main") {
+      if (t.manual) return "skip";
+      if (t.replyAt) return "done";
+      if (t.aborted) return "fail";
+      return t.mainAt ? "run" : "wait";
+    }
+    const calls = t.calls.filter((c) => c.stage === s8.id);
+    if (calls.some((c) => c.ms === void 0)) return "run";
+    if (!calls.length) return t.endAt ? "skip" : "wait";
+    const last2 = calls[calls.length - 1];
+    return last2.ok ? "done" : "fail";
+  }
+  function groupState(t, g2) {
+    const states = t.plan.filter((s8) => s8.group === g2).map((s8) => stageState(t, s8));
+    if (!states.length) return "skip";
+    if (states.includes("run")) return "run";
+    if (states.includes("fail")) return "fail";
+    if (states.every((x) => x === "done" || x === "skip")) return states.includes("done") ? "done" : "skip";
+    return "wait";
+  }
+  var runningStages = (t) => t.plan.filter((s8) => stageState(t, s8) === "run");
+  function stageCount(t) {
+    const total = t.plan.length;
+    const idx = t.plan.map((s8) => stageState(t, s8));
+    const done3 = idx.filter((x) => x === "done" || x === "fail" || x === "skip").length;
+    const run6 = idx.some((x) => x === "run") ? 1 : 0;
+    return { done: Math.min(total, done3 + run6), total };
+  }
+  function turnSummary(t) {
+    const done3 = t.calls.filter((c) => c.ms !== void 0);
+    return {
+      calls: done3.length,
+      req: done3.reduce((n3, c) => n3 + c.reqTokens, 0),
+      resp: done3.reduce((n3, c) => n3 + (c.respTokens ?? 0), 0),
+      ms: (t.endAt ?? Date.now()) - t.at,
+      failed: t.plan.filter((s8) => stageState(t, s8) === "fail").length
+    };
+  }
+
+  // src/host/trace.ts
+  var TRACE_KEEP = 5;
+  var TRACE_TEXT = 6e3;
+  var TRACE_MAIN_TEXT = 4e4;
+  var KEY2 = "goei-trace";
+  var turns2 = null;
+  var loading2 = null;
+  var saveTimer = null;
+  var open = null;
+  var replied = false;
+  var clip = (s8, max = TRACE_TEXT) => {
+    if (s8.length <= max) return s8;
+    const head3 = Math.floor(max * 2 / 3);
+    const tail2 = max - head3;
+    return `${s8.slice(0, head3)}
+…(${s8.length - max}자 생략)…
+${s8.slice(-tail2)}`;
+  };
+  async function load2() {
+    if (turns2) return turns2;
+    if (!loading2) {
+      loading2 = (async () => {
+        try {
+          const raw = await risuai.pluginStorage.getItem(KEY2);
+          const v = typeof raw === "string" ? JSON.parse(raw) : raw;
+          turns2 = Array.isArray(v) ? v.filter((t) => t && typeof t.id === "string" && Array.isArray(t.calls)) : [];
+        } catch {
+          turns2 = [];
+        }
+        return turns2;
+      })();
+    }
+    return loading2;
+  }
+  var listeners3 = /* @__PURE__ */ new Set();
+  function onTraceChange(f) {
+    listeners3.add(f);
+    return () => listeners3.delete(f);
+  }
+  var notify2 = () => {
+    for (const f of listeners3) {
+      try {
+        f();
+      } catch {
+      }
+    }
+  };
+  function save() {
+    notify2();
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      saveTimer = null;
+      void (async () => {
+        try {
+          const list4 = await load2();
+          await risuai.pluginStorage.setItem(KEY2, JSON.stringify(list4.slice(-TRACE_KEEP)));
+        } catch {
+        }
+      })();
+    }, 300);
+  }
+  async function loadTrace() {
+    return [...await load2()];
+  }
+  async function clearTrace() {
+    turns2 = [];
+    open = null;
+    replied = false;
+    notify2();
+    try {
+      await risuai.pluginStorage.setItem(KEY2, "[]");
+    } catch {
+    }
+  }
+  async function push2(t) {
+    const list4 = await load2();
+    list4.push(t);
+    while (list4.length > TRACE_KEEP) list4.shift();
+    save();
+  }
+  async function traceBegin() {
+    const t = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, at: (/* @__PURE__ */ new Date()).toISOString(), calls: [] };
+    open = t;
+    replied = false;
+    progressBegin();
+    await push2(t);
+  }
+  function traceMain(messages, failed4) {
+    if (!open) return;
+    const rows3 = messages.map((m) => ({ role: String(m?.role ?? ""), content: typeof m?.content === "string" ? m.content : "" }));
+    open.main = {
+      at: (/* @__PURE__ */ new Date()).toISOString(),
+      shape: rows3.map((r) => ({ role: r.role, chars: r.content.length })),
+      tail: rows3.map((r) => ({ role: r.role, content: clip(r.content, TRACE_MAIN_TEXT) })),
+      failed: [...failed4],
+      totalChars: rows3.reduce((n3, r) => n3 + r.content.length, 0),
+      totalTokens: rows3.reduce((n3, r) => n3 + tokens(r.content), 0)
+    };
+    progressMain();
+    save();
+  }
+  function traceReply(text4) {
+    if (!open) return;
+    open.reply = { at: (/* @__PURE__ */ new Date()).toISOString(), text: clip(text4), chars: text4.length, tokens: tokens(text4) };
+    replied = true;
+    progressReply(open.reply.tokens);
+    save();
+  }
+  async function traceCall(c) {
+    let t = open;
+    let phase = replied ? "after" : "before";
+    if (!t) {
+      const list4 = await load2();
+      const last2 = list4[list4.length - 1];
+      if (last2 && !last2.main && Date.now() - new Date(last2.at).getTime() < 10 * 60 * 1e3) t = last2;
+      else {
+        t = { id: `${Date.now().toString(36)}m`, at: c.at, calls: [] };
+        await push2(t);
+      }
+      phase = "manual";
+    }
+    t.calls.push({ ...c, phase });
+    save();
+  }
+  function requestText(messages) {
+    return messages.map((m) => `[${m.role}]
+${m.content}`).join("\n\n");
+  }
+
+  // src/host/llm.ts
+  var LlmError = class extends Error {
+    constructor(message, raw = "") {
+      super(message);
+      this.raw = raw;
+    }
+  };
+  function stripThoughts(s8) {
+    return s8.replace(/<(thoughts|think|lb-process)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<(?:thoughts|think|lb-process)\b[^>]*>[\s\S]*$/gi, "");
+  }
+  async function readStream(stream, onChunk) {
+    const reader = stream.getReader();
+    let last2 = "";
+    try {
+      for (; ; ) {
+        const { done: done3, value } = await reader.read();
+        if (done3) break;
+        if (typeof value === "string") last2 = value;
+        else if (value && typeof value === "object") last2 = String(Object.values(value)[0] ?? last2);
+        onChunk?.(last2.length);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+    return last2;
+  }
+  async function withPhotos(messages) {
+    return Promise.all(
+      messages.map(async (m) => {
+        if (!m.images?.length) return m;
+        const { images, ...rest } = m;
+        const data3 = await Promise.all(images.map(photoData));
+        const missing = data3.map((d, i) => d ? 0 : i + 1).filter(Boolean);
+        return {
+          ...rest,
+          content: missing.length ? `${rest.content}
+Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
+          multimodals: data3.filter((d) => !!d).map((base644) => ({ type: "image", base64: base644 }))
+        };
+      })
+    );
+  }
+  async function runModel(messages, model2, staticModel, label2 = "기타") {
+    const at = (/* @__PURE__ */ new Date()).toISOString();
+    const t0 = Date.now();
+    const req = requestText(messages);
+    const reqTokens = tokens(req);
+    const pid = progressCallStart(label2, staticModel || model2, reqTokens);
+    const done3 = (ok, response, error) => {
+      const ms = Date.now() - t0;
+      const responseTokens = tokens(response);
+      progressCallEnd(pid, { ok, ms, respTokens: responseTokens, ...error ? { error } : {} });
+      void traceCall({ label: label2, at, ms, model: staticModel || model2, ok, ...error ? { error } : {}, request: clip(req), requestChars: req.length, requestTokens: reqTokens, response: clip(response), responseChars: response.length, responseTokens }).catch(() => {
+      });
+    };
+    try {
+      const text4 = await runModelRaw(messages, model2, staticModel, (n3) => progressCallChunk(pid, n3));
+      done3(true, text4);
+      return text4;
+    } catch (error) {
+      done3(false, error instanceof LlmError ? error.raw ?? "" : "", error instanceof Error ? error.message : String(error));
+      throw error;
+    }
+  }
+  async function runModelRaw(messages, model2, staticModel, onChunk) {
+    let res;
+    try {
+      res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model2 === "aux" ? "submodel" : "model", allowPlugins: true, ...staticModel ? { staticModel } : {} });
+    } catch (error) {
+      throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    let text4 = "";
+    if (typeof res === "string") text4 = res;
+    else if (res && typeof res === "object") {
+      const r = res;
+      if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
+        throw new LlmError("Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.", String(r.result));
+      }
+      if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
+${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
+      if (r.type === "multiline" && Array.isArray(r.result)) text4 = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
+      else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text4 = await readStream(r.result, onChunk);
+      else if (typeof r.result === "string") text4 = r.result;
+    }
+    text4 = stripThoughts(text4).trim();
+    if (!text4) throw new LlmError("모델이 빈 응답을 보냈어요.");
+    return text4;
+  }
+  var running2 = 0;
+  var waiting = [];
+  async function slot(limit, run6) {
+    if (!limit || limit < 1) return run6();
+    while (running2 >= limit) await new Promise((r) => waiting.push(r));
+    running2++;
+    try {
+      return await run6();
+    } finally {
+      running2--;
+      waiting.shift()?.();
+    }
+  }
+  var reiterationText = (i, n3) => `<system>
+Reiteration phase (${i}/${n3})
+Now, read the instruction and your previous output carefully. Is it format-adhering? Did it follow all the instructions without any omission?
+Carefully think, then if it is OK, output the required node without any changes. If it needs changes, apply the changes and output the node.
+</system>`;
+  var retryable = (error) => !(error instanceof LlmError);
+  var TRANSIENT = /빈 응답|MALFORMED|finishReason|overloaded|UNAVAILABLE|RESOURCE_EXHAUSTED|rate ?limit|\b(429|500|502|503|504)\b|timeout|timed out|ECONNRESET|fetch failed/i;
+  var transient = (error) => error instanceof LlmError && TRANSIENT.test(`${error.message}
+${error.raw}`);
+  var TRANSIENT_RETRIES = 2;
+  var defaultFix = (messages) => (raw, reason3) => [
+    ...messages,
+    ...raw ? [{ role: "assistant", content: raw }] : [],
+    { role: "user", content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason3.slice(0, 600)}
+${RETRY_ANALYZE}` }
+  ];
+  function withRawText(error, raw) {
+    if (raw && error && typeof error === "object" && !error.raw) {
+      try {
+        Object.defineProperty(error, "raw", { value: raw, configurable: true });
+      } catch {
+      }
+    }
+    return error;
+  }
+  async function generate(messages, model2, parse3, o) {
+    const fix = o.fix ?? defaultFix(messages);
+    let ask4 = messages;
+    let use = model2;
+    let earlier = null;
+    let transientLeft = TRANSIENT_RETRIES;
+    for (let attempt = 0; ; attempt++) {
+      let raw = "";
+      try {
+        try {
+          raw = attempt === 0 && o.first ? await o.first(ask4) : await slot(o.concurrent, () => runModel(ask4, use, o.staticModel, attempt ? `${o.label ?? "기타"} 다시 묻기 ${attempt}` : o.label));
+        } catch (error) {
+          if (!transient(error) || transientLeft <= 0) throw error;
+          transientLeft--;
+          console.log(`[goei] 모델 일시 오류, 다시 보냄 (${TRANSIENT_RETRIES - transientLeft}/${TRANSIENT_RETRIES}): ${error instanceof Error ? error.message.split("\n")[0] : String(error)}`);
+          await new Promise((r) => setTimeout(r, 1200));
+          attempt--;
+          continue;
+        }
+        for (let i = 1; attempt === 0 && i <= (o.reiterate ?? 0); i++) {
+          const again = [...ask4, { role: "assistant", content: raw }, { role: "user", content: reiterationText(i, o.reiterate ?? 0) }];
+          try {
+            const next = await slot(o.concurrent, () => runModel(again, use, o.staticModel, `${o.label ?? "기타"} 다시 보기 ${i}`));
+            if (next.trim()) raw = next;
+          } catch {
+            break;
+          }
+        }
+        if (o.state) applyAdvanced(o.state);
+        return { raw, value: parse3(raw) };
+      } catch (error) {
+        if (earlier && !retryable(error)) throw earlier;
+        if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
+        earlier = withRawText(error, raw);
+        ask4 = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        use = o.retryModel === "same" ? model2 : o.retryModel;
+      }
+    }
+  }
+
+  // src/core/netjoint.ts
+  var JOINT_VAR = "$net_joint";
+  var JOINT_LABEL = { phone: "괴담톡", gn: "괴담넷", gal: "괴담갤", wpf: "세정게", sm: "연어 마켓" };
+  var JOINT_KEY = { phone: "phone", gn: "gnet", gal: "gal", wpf: "wpf", sm: "sm" };
+  var jointOn = (state) => String(state?.[JOINT_VAR] ?? "1") !== "0";
+  function autoTasks(state) {
+    const out = [];
+    const ph = phoneSettings(state);
+    if (ph.auto) out.push({ kind: "phone", model: ph.model, fixed: featureModel(state, "ph") });
+    for (const site of BOARD_SITES) {
+      const sv = boardState(state, site);
+      const g2 = gnetSettings(sv);
+      if (g2.enabled && g2.auto) out.push({ kind: site, model: g2.model, fixed: featureModel(sv, "gn") });
+    }
+    return out;
+  }
+  function jointGroups(state) {
+    const tasks = autoTasks(state);
+    if (!jointOn(state)) return tasks.map((t) => [t]);
+    const by = /* @__PURE__ */ new Map();
+    for (const t of tasks) {
+      const k = `${t.model}|${t.fixed ?? ""}`;
+      const g2 = by.get(k);
+      if (g2) g2.push(t);
+      else by.set(k, [t]);
+    }
+    return [...by.values()];
+  }
+  function jointMates(state, kind) {
+    const g2 = jointGroups(state).find((x) => x.some((t) => t.kind === kind));
+    return g2 && g2.length > 1 ? g2.filter((t) => t.kind !== kind).map((t) => t.kind) : [];
+  }
+
+  // src/ui/panels.ts
+  var open2 = /* @__PURE__ */ new Set();
+  var keepOpen = (key, fallback = false) => open2.has(key) || fallback && !open2.has(`!${key}`) ? " open" : "";
+  function rememberPanel(el) {
+    const key = el.dataset.keep;
+    if (!key) return;
+    open2.delete(key);
+    open2.delete(`!${key}`);
+    open2.add(el.open ? key : `!${key}`);
+  }
+  function markOpen(key) {
+    open2.delete(`!${key}`);
+    open2.add(key);
+  }
+
+  // src/ui/advanced.ts
+  var esc7 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function control(f, item2, cur) {
+    const id2 = `${f}:${item2.key}`;
+    if (item2.type === "text") return `<input class="gx-search ps-text adv-text" data-change="adv-set" data-key="${id2}" value="${esc7(cur)}" placeholder="비우면 기본" aria-label="${esc7(item2.label)}">`;
+    if (item2.type === "pick") {
+      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id2}=${v}" aria-pressed="${cur === v}">${esc7(label2)}</button>`).join("")}</div>`;
+    }
+    const min = item2.min ?? 0;
+    const max = item2.max ?? Number.MAX_SAFE_INTEGER;
+    const step2 = max >= 1e4 ? 500 : 1;
+    const n3 = Math.min(max, Math.max(min, Number(cur) || 0));
+    const zero = n3 === 0 && item2.zero;
+    const down = Math.max(min, n3 - step2);
+    const up = Math.min(max, n3 + step2);
+    return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id2}=${down}" ${n3 <= min ? "disabled" : ""} aria-label="${esc7(item2.label)} 줄이기">−</button>
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step2}" data-change="adv-set" data-key="${id2}" value="${zero ? "" : n3}"${item2.zero ? ` placeholder="${esc7(item2.zero)}"` : ""} aria-label="${esc7(item2.label)}">${item2.unit ? `<span>${esc7(item2.unit)}</span>` : ""}
+    <button class="gx-step" data-action="adv-set" data-value="${id2}=${up}" ${n3 >= max ? "disabled" : ""} aria-label="${esc7(item2.label)} 늘리기">+</button></div>`;
+  }
+  function row(f, item2, state) {
+    const cur = advValue(state, f, item2.key);
+    const changed = cur !== String(item2.def);
+    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc7(item2.label)}</b>${item2.hint ? `<small>${esc7(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}</div></div>`;
+  }
+  function chips(f, items, state) {
+    return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
+      const on2 = advValue(state, f, i.key) === "1";
+      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc7(i.label)}</button>`;
+    }).join("")}</div></div>`;
+  }
+  function advSections(f, state, extra2 = {}, only) {
+    return ADV[f].map((g2, gi) => only && !only.includes(gi) ? "" : `<section class="ps-group"><h3>${esc7(g2.title)}</h3><div class="ps-rows">${g2.chips?.length ? chips(f, g2.chips, state) : ""}${g2.items.map((i) => row(f, i, state)).join("")}</div>${extra2[gi] ?? ""}</section>`).join("");
+  }
+  function advancedBox(f, state) {
+    const n3 = advChanged(state, f).length;
+    const groups = ADV[f].map((g2, gi) => {
+      const body5 = `${g2.chips?.length ? chips(f, g2.chips, state) : ""}${g2.items.map((i) => row(f, i, state)).join("")}`;
+      if (g2.fold) {
+        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc7(g2.title)}</summary><div class="ps-rows">${body5}</div></details>`;
+      }
+      return `<section class="ps-group"><h3>${esc7(g2.title)}</h3><div class="ps-rows">${body5}</div></section>`;
+    }).join("");
+    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n3 ? `<span class="adv-count">${n3}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}</div></details>`;
+  }
+  var blank2 = (item2) => item2.v ? String(item2.def) : "";
+  function parse2(value) {
+    const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
+    if (!m) return null;
+    const f = m[1];
+    const item2 = advItem(f, m[2]);
+    if (!item2) return null;
+    let v = m[3].trim();
+    if (item2.type === "num") {
+      const n3 = Number(v);
+      if (v === "" || !Number.isFinite(n3)) return [f, item2, blank2(item2)];
+      v = String(Math.min(item2.max ?? Infinity, Math.max(item2.min ?? 0, Math.round(n3))));
+    } else if (item2.type === "text") v = v.slice(0, 120);
+    else if (item2.type === "bool" ? v !== "0" && v !== "1" : !item2.opts?.some(([o]) => o === v)) return null;
+    return [f, item2, v === String(item2.def) ? blank2(item2) : v];
+  }
+  async function handleAdvanced(action, value, ctx2, env3, scope = "chat") {
+    const v = value ?? "";
+    let vars = null;
+    if (action === "adv-set") {
+      const hit4 = parse2(v);
+      if (hit4) vars = { [advVar(hit4[0], hit4[1])]: hit4[2] };
+    } else return false;
+    if (!vars) {
+      env3.render();
+      return true;
+    }
+    const patch = vars;
+    if (scope === "defaults") {
+      await savePrefs((p2) => {
+        const next = { ...p2.vars ?? {} };
+        for (const [k, x] of Object.entries(patch)) {
+          if (x) next[k] = x;
+          else delete next[k];
+        }
+        return { ...p2, vars: next };
+      });
+      env3.render();
+      return true;
+    }
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
+    const mode2 = advValue(saved2?.scriptstate, "gen", "lore_mode");
+    if (syncDecorators(ctx2.char.globalLore, mode2)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode2)).catch(() => false);
+    await env3.refresh();
+    return true;
+  }
+
+  // src/ui/media.ts
+  var PHONE_MQ = "(max-width: 760px), (max-height: 499px) and (pointer: coarse)";
+  var isPhone = () => matchMedia(PHONE_MQ).matches;
+
+  // src/ui/phone.ts
+  var phone = {
+    sub: "contacts",
+    tab: "",
+    query: "",
+    view: "list",
+    room: null,
+    invite: null,
+    picked: [],
+    topic: "",
+    gname: "",
+    draft: "",
+    page: 1,
+    call: "",
+    callText: "",
+    addName: "",
+    addNote: "",
+    openNotice: null,
+    noticePage: 1,
+    attach: [],
+    confirm: null,
+    notice: "",
+    failure: null,
+    attachMenu: false,
+    pickQuery: "",
+    chatFilter: "all",
+    noticeFilter: "all",
+    noticeFaction: "",
+    pickTab: "",
+    viewId: null
+  };
+  function resetPhone() {
+    Object.assign(phone, {
+      sub: "contacts",
+      tab: "",
+      query: "",
+      view: "list",
+      room: null,
+      invite: null,
+      picked: [],
+      topic: "",
+      gname: "",
+      draft: "",
+      page: 1,
+      call: "",
+      callText: "",
+      addName: "",
+      addNote: "",
+      openNotice: null,
+      noticePage: 1,
+      attach: [],
+      confirm: null,
+      notice: "",
+      failure: null,
+      attachMenu: false,
+      pickQuery: "",
+      chatFilter: "all",
+      noticeFilter: "all",
+      noticeFaction: "",
+      pickTab: ""
+    });
+  }
+  var quietEnv = { render: () => {
+  }, refresh: async () => {
+  }, visible: () => false, close: async () => {
+  } };
+  var liveEnv = null;
+  var envOr = (env3) => env3 ?? liveEnv ?? quietEnv;
+  function envForAuto(ctx2) {
+    const env3 = liveEnv;
+    if (!env3) return quietEnv;
+    const showing = env3.current?.();
+    return showing === void 0 || showing && chatKey(showing) === chatKey(ctx2) ? env3 : quietEnv;
+  }
+  var PAGE = 40;
+  var jobs = /* @__PURE__ */ new Map();
+  var chatKey = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
+  var phoneBusy = (ctx2) => jobs.has(chatKey(ctx2));
+  var esc8 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var source = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
+  function names2(ctx2) {
+    try {
+      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
+    } catch {
+      return {};
+    }
+  }
+  function dir(ctx2, chat = ctx2.chat) {
+    return directory(ctx2.char.globalLore, chat);
+  }
+  var token = () => `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+  async function run(ctx2, env3, label2, work) {
+    const key = chatKey(ctx2);
+    if (jobs.has(key)) {
+      phone.notice = `${jobs.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+      env3.render();
+      return false;
+    }
+    jobs.set(key, label2);
+    phone.notice = "";
+    phone.failure = null;
+    env3.render();
+    try {
+      phone.notice = await work();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      phone.notice = msg;
+      const raw = error.raw;
+      if (raw) phone.failure = { label: label2, reason: msg, raw };
+    } finally {
+      jobs.delete(key);
+      await env3.refresh();
+    }
+    return true;
+  }
+  function habitVars(chat, raw, rooms) {
+    if (!phoneSettings(chat.scriptstate).habits) return {};
+    const ids = /* @__PURE__ */ new Map();
+    for (const r of rooms) for (const [cid, p2] of Object.entries(r.people)) ids.set(cid, p2.name);
+    return mergeHabits(chat.scriptstate, parseHabits(raw), ids) ?? {};
+  }
+  function viewingRoom(env3) {
+    return env3.visible() && phone.view === "room" ? phone.room : null;
+  }
+  function generate2(ctx2, env3, rid, label2) {
+    return run(ctx2, env3, label2, async () => {
+      const req = token();
+      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const st2 = readPhone(chat);
+        const r2 = st2.rooms[rid];
+        if (!r2?.pending) return null;
+        r2.pending.status = "working";
+        r2.pending.request = req;
+        return writePhone(chat, st2);
+      });
+      if (!saved2) throw new PhoneError("대기 중인 대화 요청이 없어요.");
+      const st = readPhone(saved2);
+      const r = st.rooms[rid];
+      const d = dir(ctx2, saved2);
+      let raw = "";
+      let result;
+      try {
+        const prompt = fitPrompt(budgetFor(saved2.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved2), st, r, d, names2(ctx2)));
+        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved2.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved2.scriptstate), reiterate: craftSettings(saved2.scriptstate, "ph").reiterate, staticModel: featureModel(saved2.scriptstate, "ph"), state: saved2.scriptstate, label: "괴담톡 답장" }));
+      } catch (error) {
+        await markFailed(ctx2, rid, req);
+        const msg = error instanceof Error ? error.message : String(error);
+        throw new PhoneError(`대화 갱신에 실패했어요. 기존 기록은 그대로예요. ${msg}`, error.raw ?? raw);
+      }
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readPhone(chat);
+        const room = cur.rooms[rid];
+        if (!room?.pending || room.pending.request !== req) {
+          note = "대화 상태가 바뀌어서 답장을 저장하지 않았어요.";
+          return null;
+        }
+        const events = keepValid(result.events, room);
+        const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
+        const added = applyEvents(cur, room, events, phoneTime(chat));
+        room.pending = void 0;
+        if (viewingRoom(env3) === rid) readRoom(room);
+        if (!added) note = room.kind === "group" ? "아무도 말하지 않았어요." : "답장이 없어요.";
+        return writePhone(chat, cur, { ...unsolicitedRefresh && added ? cooldownMark(chat, "incoming") : {}, ...habitVars(chat, raw, [room]) });
+      });
+      return note;
+    });
+  }
+  async function markFailed(ctx2, rid, req) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r = st.rooms[rid];
+      if (!r?.pending || r.pending.request !== req) return null;
+      r.pending.status = "error";
+      return writePhone(chat, st);
+    }).catch(() => null);
+  }
+  async function send(ctx2, env3, rid, text4) {
+    if (phoneBusy(ctx2)) {
+      phone.notice = `${jobs.get(chatKey(ctx2))} 끝난 뒤 다시 눌러 주세요.`;
+      return env3.render();
+    }
+    if (tokens(describe(text4)) > LIMITS2.input_tokens) {
+      phone.notice = `메시지와 첨부 내용은 합쳐서 ${LIMITS2.input_tokens}토큰 이내로 적어 주세요.`;
+      return env3.render();
+    }
+    let giftBlocked = false;
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r2 = st.rooms[rid];
+      if (!r2 || r2.pending) return null;
+      if (r2.kind !== "dm" && /\[\[ATTACH:gift\]\]/i.test(text4)) return void (giftBlocked = true), null;
+      if (!st.order.includes(rid)) st.order.push(rid);
+      const time2 = phoneTime(chat);
+      const pieces = splitRecords(text4);
+      let m = push(st, r2, "me", pieces[0] ?? text4, time2);
+      for (const piece of pieces.slice(1)) m = push(st, r2, "me", piece, time2);
+      r2.draft = "";
+      r2.silent = false;
+      readRoom(r2);
+      r2.pending = { message: m.id, status: "error", action: { type: "send" } };
+      return writePhone(chat, st);
+    });
+    if (!saved2) {
+      phone.notice = giftBlocked ? "단톡방에서는 선물을 보낼 수 없어요." : "이전 답장을 다시 시도하거나 건너뛴 뒤 보내 주세요.";
+      return env3.refresh();
+    }
+    phone.draft = "";
+    phone.attach = [];
+    phone.attachMenu = false;
+    phone.page = 1;
+    const r = readPhone(saved2).rooms[rid];
+    await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
+  }
+  async function roomRefresh(ctx2, env3, rid) {
+    const st = readPhone(ctx2.chat);
+    const r = st.rooms[rid];
+    if (!r || !r.members.length) return;
+    if (r.pending) return void generate2(ctx2, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+    const set2 = phoneSettings(ctx2.chat.scriptstate);
+    let [ok, why] = refreshAllowed(ctx2.chat, r, set2);
+    if (ok && unsolicited(r)) [ok, why] = refreshAllowed(ctx2.chat, r, set2, chancePassed(set2.incomingChance, Math.random));
+    if (!ok) {
+      phone.notice = `${why} 내가 보낸 메시지의 답장에는 이 제한이 없어요.`;
+      return env3.render();
+    }
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const cur = readPhone(chat);
+      const room = cur.rooms[rid];
+      if (!room || room.pending) return null;
+      room.pending = { status: "error", action: { type: "refresh" } };
+      return writePhone(chat, cur);
+    });
+    if (saved2) await generate2({ ...ctx2, chat: saved2 }, env3, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+  }
+  async function createGroup(ctx2, env3) {
+    const d = dir(ctx2);
+    const members = phone.picked.filter((cid) => d.map.get(cid)?.visible);
+    const inviteRoom = phone.invite;
+    if (!members.length) {
+      phone.notice = "초대할 사람을 골라 주세요.";
+      return env3.render();
+    }
+    if (!inviteRoom && members.length === 1) {
+      phone.picked = [];
+      return openDm(ctx2, env3, members[0]);
+    }
+    const topic = phone.topic.trim();
+    const gname = inviteRoom ? "" : phone.gname.trim();
+    if ([...gname].length > LIMITS2.room_name) {
+      phone.notice = `단톡방 이름은 ${LIMITS2.room_name}자 이내로 적어 주세요.`;
+      return env3.render();
+    }
+    if (tokens(topic) > LIMITS2.topic_tokens) {
+      phone.notice = `단톡 주제는 ${LIMITS2.topic_tokens}토큰 이내로 적어 주세요.`;
+      return env3.render();
+    }
+    let rid = "";
+    let error = "";
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const time2 = phoneTime(chat);
+      if (inviteRoom) {
+        let r = st.rooms[inviteRoom];
+        if (!r || r.pending) return void (error = "대화방 상태가 바뀌었어요."), null;
+        const fresh3 = members.filter((cid) => !r.members.includes(cid));
+        if (!fresh3.length || r.members.length + fresh3.length > LIMITS2.members) return void (error = `초대할 사람을 고르세요. 상대는 최대 ${LIMITS2.members}명이에요.`), null;
+        if (r.kind === "dm") {
+          const old = r.id;
+          do
+            st.seq += 1;
+          while (st.rooms[`g_${st.seq}`]);
+          r = { ...r, id: `g_${st.seq}`, kind: "group", name: void 0 };
+          delete st.rooms[old];
+          st.rooms[r.id] = r;
+          const at = st.order.indexOf(old);
+          if (at >= 0) st.order[at] = r.id;
+          else st.order.push(r.id);
+        }
+        for (const cid of fresh3) {
+          r.people[cid] = personOf(d.map.get(cid));
+          r.members.push(cid);
+        }
+        for (const cid of fresh3) membership(st, r, "invite", cid, time2);
+        r.pending = { status: "error", action: { type: "invite_more", invited: fresh3 } };
+        rid = r.id;
+      } else {
+        if (members.length > LIMITS2.members) return void (error = `상대는 최대 ${LIMITS2.members}명이에요.`), null;
+        st.seq += 1;
+        rid = `g_${st.seq}`;
+        const people = Object.fromEntries(members.map((c) => [c, personOf(d.map.get(c))]));
+        const r = { id: rid, kind: "group", name: gname || void 0, topic, members: [...members], people, messages: [], draft: "", unread: 0 };
+        st.rooms[rid] = r;
+        st.order.push(rid);
+        for (const cid of members) membership(st, r, "invite", cid, time2);
+        r.pending = { status: "error", action: { type: "invite_initial", invited: members } };
+      }
+      return writePhone(chat, st);
+    });
+    if (!saved2) {
+      phone.notice = error || "저장하지 못했어요.";
+      return env3.render();
+    }
+    Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
+    await generate2({ ...ctx2, chat: saved2 }, env3, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
+  }
+  function refreshInbox(ctx2, env3, automatic = false, joint) {
+    const e = env3 ?? (automatic ? envForAuto(ctx2) : envOr(env3));
+    return run(ctx2, e, automatic ? "새 메시지를 자동으로 확인하는 중이에요." : "새 메시지를 확인하는 중이에요.", async () => {
+      const startLength = ctx2.chat.message?.length ?? 0;
+      const st = readPhone(ctx2.chat);
+      const d = dir(ctx2);
+      const rolls = [];
+      let k = 0;
+      const roll = () => k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]);
+      const plan = fitPrompt(budgetFor(ctx2.chat.scriptstate, "ph"), () => {
+        k = 0;
+        const p2 = refreshPrompt2(source(ctx2), st, d, names2(ctx2), roll);
+        return { ...p2, messages: p2.prompt?.messages ?? [] };
+      });
+      if (!plan.prompt) return automatic ? "" : plan.reason;
+      const prompt = plan.prompt;
+      const model2 = phoneSettings(ctx2.chat.scriptstate).model;
+      const { raw: refreshRaw, value: result } = await generate(prompt.messages, model2, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+        ...genSettings(ctx2.chat.scriptstate),
+        reiterate: craftSettings(ctx2.chat.scriptstate, "ph").reiterate,
+        staticModel: featureModel(ctx2.chat.scriptstate, "ph"),
+        state: ctx2.chat.scriptstate,
+        label: "괴담톡 확인",
+        fix: (_raw, reason3) => refreshRetry(prompt, reason3),
+        first: joint && ((m) => joint.ask("phone", m))
+      });
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (automatic && (chat.message?.length ?? 0) !== startLength) {
+          note = "채팅이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.";
+          return null;
+        }
+        const cur = readPhone(chat);
+        const set2 = phoneSettings(chat.scriptstate);
+        const time2 = phoneTime(chat);
+        let received = 0;
+        let unsolicitedGot = false;
+        for (const u of result.updates) {
+          const r = cur.rooms[u.room] ?? plan.selected.get(u.room);
+          if (r.pending) throw new PhoneError("확인하는 동안 대화 상태가 바뀌었어요. 다시 확인해 주세요.");
+          if (u.events.length && !refreshAllowed(chat, r, set2)[0]) throw new PhoneError("선톡 받기 설정이 바뀌었어요.");
+          u.events = keepValid(u.events, r);
+        }
+        const visible2 = viewingRoom(e);
+        for (const u of result.updates) {
+          if (!u.events.length) continue;
+          let r = cur.rooms[u.room];
+          const talk = u.events.some((x) => x.type === "message");
+          if (!r && !talk) continue;
+          if (!r) {
+            r = plan.selected.get(u.room);
+            cur.rooms[r.id] = r;
+            cur.order.push(r.id);
+          }
+          if (talk && unsolicited(r)) unsolicitedGot = true;
+          received += applyEvents(cur, r, u.events, time2);
+          if (visible2 === r.id) readRoom(r);
+        }
+        received += commitInvitations(cur, result.invitations, time2);
+        const b = readBulletins(chat);
+        const notices = commitAnnouncements(b, cur, result.announcements, plan.announce, time2);
+        const marks2 = {
+          ...unsolicitedGot ? cooldownMark(chat, "incoming") : {},
+          ...result.invitations.length ? cooldownMark(chat, "invitation") : {},
+          ...notices ? cooldownMark(chat, "announcement") : {}
+        };
+        note = received || result.invitations.length || notices ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.` : automatic ? "" : "새 메시지가 없어요.";
+        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks2, ...habitVars(chat, refreshRaw, [...plan.selected.values()]) });
+      });
+      return note;
+    });
+  }
+  async function autoRefresh(ctx2, messageIndex, env3, joint) {
+    const set2 = phoneSettings(ctx2.chat.scriptstate);
+    if (!(env3 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
+    const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data3.trim()) return;
+    let hash5 = 7;
+    for (let i = 0; i < data3.length; i++) hash5 = (hash5 * 131 + data3.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash5}`;
+    if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
+    if (!saved2) return;
+    try {
+      directory(ctx2.char.globalLore, saved2);
+    } catch {
+      return;
     }
     const notice2 = phone.notice;
     await refreshInbox({ ...ctx2, chat: saved2 }, env3, true, joint);
@@ -74,11 +1002,11 @@
     Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
     await env3.refresh();
   }
-  async function mutate(ctx2, env3, f, extra = () => ({})) {
+  async function mutate(ctx2, env3, f, extra2 = () => ({})) {
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readPhone(chat);
       if (f(st, chat) === false) return null;
-      return writePhone(chat, st, extra(chat));
+      return writePhone(chat, st, extra2(chat));
     });
     await env3.refresh();
   }
@@ -117,8 +1045,8 @@
   function matches(c, q, fnames) {
     return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
   }
-  var tool = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  var badge = (n2) => n2 > 0 ? `<span class="ph-badge">${n2 > 99 ? "99+" : n2}</span>` : "";
+  var tool = (action, icon, label2, extra2 = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra2}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var badge = (n3) => n3 > 0 ? `<span class="ph-badge">${n3 > 99 ? "99+" : n3}</span>` : "";
   function chips2(action, cur, items) {
     return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc8(t.id)}" aria-selected="${t.id === cur}">${esc8(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
   }
@@ -166,7 +1094,7 @@
     const vunread = views2.filter((r) => r.unread);
     const head3 = chips2("ph-chat-filter", phone.chatFilter, [
       { id: "all", label: "전체", count: all.length + views2.length },
-      { id: "unread", label: "안읽음", alert: unread.reduce((n2, r) => n2 + r.unread, 0) + vunread.length }
+      { id: "unread", label: "안읽음", alert: unread.reduce((n3, r) => n3 + r.unread, 0) + vunread.length }
     ]);
     const rows3 = phone.chatFilter === "unread" ? unread : all;
     const vrows = phone.chatFilter === "unread" ? vunread : views2;
@@ -189,7 +1117,7 @@
   }
   var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
   function viewFace(ctx2, d, r, id2, cls = "") {
-    const byName = (n2) => n2 ? [...d.map.values()].find((c) => c.name === n2) : void 0;
+    const byName = (n3) => n3 ? [...d.map.values()].find((c) => c.name === n3) : void 0;
     const p2 = r.people.find((x) => x.id === id2);
     const who = d.map.get(id2) ?? byName(p2?.name ?? "") ?? (r.preset !== "side" ? d.map.get(r.pov) ?? byName(r.people.find((x) => x.id === r.pov)?.name ?? "") : void 0);
     return face(ctx2, who, p2?.name ?? id2, cls);
@@ -454,7 +1382,7 @@
     } catch {
     }
     if (!people.length && !rooms.length && !notes.length) return blank3("검색 결과가 없어요.");
-    const sec2 = (title2, n2, html) => n2 ? `<h4 class="ph-sec">${title2}<b>${n2}</b></h4>${html}` : "";
+    const sec2 = (title2, n3, html) => n3 ? `<h4 class="ph-sec">${title2}<b>${n3}</b></h4>${html}` : "";
     return sec2("연락처", people.length, contactList(ctx2, people, st)) + sec2("대화", rooms.length, chatList(ctx2, rooms, d)) + sec2("공지", notes.length, noticeList(notes, noticeFactionLabel(names2(ctx2))));
   }
   function callView() {
@@ -489,16 +1417,16 @@
     const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
     const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
     const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc8(v(k))}" aria-label="확률"><span>%</span></span>`;
-    const num6 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
+    const num7 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
     const notices = noticeSettings(ctx2.chat.scriptstate);
     const vs = viewSettings(ctx2.chat.scriptstate);
     const rest = (k) => {
-      const n2 = advNum(ctx2.chat.scriptstate, "ph", k);
-      return n2 ? `받은 뒤 ${n2}턴 쉬어요` : "";
+      const n3 = advNum(ctx2.chat.scriptstate, "ph", k);
+      return n3 ? `받은 뒤 ${n3}턴 쉬어요` : "";
     };
     const keep = (k, label2) => {
       const st = phoneStorage(ctx2.chat.scriptstate, k);
-      return row2(label2, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${st.auto ? num6(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX2, "개") : ""}</span>`, "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요");
+      return row2(label2, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${st.auto ? num7(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX2, "개") : ""}</span>`, "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요");
     };
     return `<div class="ph-form">${paneHead("괴담톡 설정", "", `<span class="ph-act">${defaultsButtons("ph")}</span>`)}${defaultsConfirm("ph")}
     <div class="ph-form-body ps">
@@ -517,10 +1445,10 @@
       row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct2("incoming_chance")}</span>`, rest("cd_incoming")),
       row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct2("group_invite_chance")}</span>`, rest("cd_invite")),
       row2("단톡 수다", `<span class="ph-inline">${onoff("banter")}${pct2("banter_chance")}</span>`, "새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요"),
-      row2("단톡 수다 줄 수", `<span class="ph-inline"><span>최소</span>${num6("banter_min", phoneSettings(ctx2.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}<span>최대</span>${num6("banter_max", phoneSettings(ctx2.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
+      row2("단톡 수다 줄 수", `<span class="ph-inline"><span>최소</span>${num7("banter_min", phoneSettings(ctx2.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}<span>최대</span>${num7("banter_max", phoneSettings(ctx2.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], "줄")}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
       row2("소속 공지 받기", onoff("announcements"), "내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요"),
-      row2("공지 대기 턴", num6("announcement_gap", notices.gap, 1, 100, "턴"), "공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요"),
-      row2("공지 참고 수", num6("announcement_history", notices.history, 1, 50, "개"), "새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요")
+      row2("공지 대기 턴", num7("announcement_gap", notices.gap, 1, 100, "턴"), "공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요"),
+      row2("공지 참고 수", num7("announcement_history", notices.history, 1, 50, "개"), "새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요")
     ].join(""))}
       ${group("보기 전용 방", [
       row2("종류", seg("view_preset", vs.preset, [["side", "사이드스토리"], ["mono", "혼잣말"], ["multi", "다중인격 혼잣말"]]), "사이드스토리 = 본편에 안 나온 짧은 대화 · 혼잣말 = 시점 인물의 속마음 · 다중인격 혼잣말 = 마음속 여러 갈래가 단톡처럼 주고받아요"),
@@ -537,7 +1465,7 @@
       keep("dm", "1:1 대화 정리"),
       keep("group", "단톡방 정리"),
       keep("notice", "공지 정리"),
-      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n2) => `<button class="gx-seg${notices.page === n2 ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n2}" aria-pressed="${notices.page === n2}">${n2}</button>`).join("")}</div>`)
+      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n3) => `<button class="gx-seg${notices.page === n3 ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n3}" aria-pressed="${notices.page === n3}">${n3}</button>`).join("")}</div>`)
     ].join(""))}
       ${advancedBox("ph", ctx2.chat.scriptstate)}
     </div></div>`;
@@ -584,7 +1512,7 @@
       b = null;
     }
     const unread = unreadCount(st);
-    const subBtn = (id2, label2, extra = "") => `<button class="ph-sub${phone.sub === id2 ? " on" : ""}" data-action="ph-sub" data-value="${id2}" aria-pressed="${phone.sub === id2}">${label2}${extra}</button>`;
+    const subBtn = (id2, label2, extra2 = "") => `<button class="ph-sub${phone.sub === id2 ? " on" : ""}" data-action="ph-sub" data-value="${id2}" aria-pressed="${phone.sub === id2}">${label2}${extra2}</button>`;
     const fail4 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc8(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc8(phone.failure.raw)}</textarea></details>` : "";
     const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc8(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("ph", phone.notice, (t) => {
@@ -791,9 +1719,9 @@
         else Object.assign(phone, { openNotice: id2, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row10 = b.items.find((x) => x.id === id2);
-          if (row10 && row10.read === false) {
-            row10.read = true;
+          const row11 = b.items.find((x) => x.id === id2);
+          if (row11 && row11.read === false) {
+            row11.read = true;
             await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -807,7 +1735,7 @@
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row10 of b.items) row10.read = true;
+        for (const row11 of b.items) row11.read = true;
         await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -875,8 +1803,8 @@
           storage_limit_notice: [1, STORAGE_MAX2]
         };
         const r = range[k];
-        const n2 = Math.floor(Number(val));
-        if (r && Number.isFinite(n2)) await setVars(ctx2, env3, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n2))) });
+        const n3 = Math.floor(Number(val));
+        if (r && Number.isFinite(n3)) await setVars(ctx2, env3, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n3))) });
         else env3.render();
         return true;
       }
@@ -1005,8 +1933,8 @@
     const map = /* @__PURE__ */ new Map();
     const dir2 = readDirectory(ctx2.char.globalLore);
     for (const p2 of [...dir2.anomalies, ...dir2.sites]) {
-      const row10 = { pic: mainPic(ctx2.char, p2), title: p2.lore || p2.label };
-      for (const n2 of [p2.label, p2.lore, ...p2.aliases]) if (n2 && !map.has(n2)) map.set(n2, row10);
+      const row11 = { pic: mainPic(ctx2.char, p2), title: p2.lore || p2.label };
+      for (const n3 of [p2.label, p2.lore, ...p2.aliases]) if (n3 && !map.has(n3)) map.set(n3, row11);
     }
     let names4 = {};
     try {
@@ -1023,7 +1951,7 @@
       const outside = (en2) => en2 && hasAsset(ctx2.char, `Base ${en2}`) ? `Base ${en2}` : "";
       const pic3 = (swap ? outside(org.spec.english) : outside(b.english) || mainPic(ctx2.char, b)) || (org ? mainPic(ctx2.char, org.spec) : "");
       const title2 = own ? b.name : swap ? orgLoreName(lore, org.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
-      const shared = pic3 ? "" : baseShared(b.name, b.label).find((n2) => hasAsset(ctx2.char, n2)) ?? "";
+      const shared = pic3 ? "" : baseShared(b.name, b.label).find((n3) => hasAsset(ctx2.char, n3)) ?? "";
       map.set(b.name, { pic: pic3 || shared, title: title2, org: org ? org.faction && names4[org.faction] || org.name : "" });
     }
     cache9 = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
@@ -1038,7 +1966,7 @@
   }
   function evArt(ctx2, name, kind, text4 = "") {
     const r = rows(ctx2).get(name);
-    const shared = !r?.pic && kind && sharedFor(kind, name, text4).find((n2) => hasAsset(ctx2.char, n2)) || "";
+    const shared = !r?.pic && kind && sharedFor(kind, name, text4).find((n3) => hasAsset(ctx2.char, n3)) || "";
     const pic3 = imageUrl(ctx2.char, r?.pic || shared);
     const title2 = r?.title ?? name;
     let desc = descs.get(title2);
@@ -1200,7 +2128,7 @@
   function portraitMoods(ctx2, photo) {
     const base = photo.replace(/#.*$/, "").replace(/_default$/, "");
     if (!base || base === photo) return [];
-    return assetNames(ctx2.char).filter((n2) => n2.startsWith(`${base}_`)).map((n2) => n2.slice(base.length + 1)).filter((m) => m && m !== "default" && /^[a-z ]+$/i.test(m)).sort();
+    return assetNames(ctx2.char).filter((n3) => n3.startsWith(`${base}_`)).map((n3) => n3.slice(base.length + 1)).filter((m) => m && m !== "default" && /^[a-z ]+$/i.test(m)).sort();
   }
   var quietEnv2 = { render: () => {
   }, refresh: async () => {
@@ -1381,8 +2309,8 @@
   }
   function dayOf2(sec2) {
     const t = new Date(sec2 * 1e3);
-    const n2 = /* @__PURE__ */ new Date();
-    if (t.toDateString() === n2.toDateString()) return "오늘";
+    const n3 = /* @__PURE__ */ new Date();
+    if (t.toDateString() === n3.toDateString()) return "오늘";
     return `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, "0")}.${String(t.getDate()).padStart(2, "0")}`;
   }
   var catName = (ctx2, d) => TABS.find(([t]) => t === docCat(ctx2, d))?.[1] ?? "기타";
@@ -1401,9 +2329,9 @@
     const shown3 = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
     const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shown3.has(t));
     const grp = (label2, rows3) => rows3.length ? `<h4>${label2}<b>${rows3.length}</b></h4>${rows3.join("")}` : "";
-    const fresh2 = known ? "" : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc9(q)}"><span>「${esc9(q)}」 새 문서 만들기</span></button>`;
+    const fresh3 = known ? "" : `<button type="button" class="it new" data-action="wiki-write" data-value="${esc9(q)}"><span>「${esc9(q)}」 새 문서 만들기</span></button>`;
     const body5 = grp("문서", mine.map((d) => linkRow(ctx2, d.title, { dot: !d.base }))) + grp("명부", hits.map((e) => linkRow(ctx2, e.title, { none: true, name: e.name }))) + grp("비슷한 문서", near.map((t) => linkRow(ctx2, t, { none: !saved2.has(t) })));
-    return body5 ? body5 + fresh2 : `<p class="wnone">「${esc9(q)}」 문서가 없어요.</p>${fresh2}`;
+    return body5 ? body5 + fresh3 : `<p class="wnone">「${esc9(q)}」 문서가 없어요.</p>${fresh3}`;
   }
   function wikiHomeResults(ctx2) {
     const q = wiki.homeQuery.trim();
@@ -1523,7 +2451,7 @@
   function spoilerFold(ctx2, title2, e) {
     if (e?.cat !== "an") return false;
     const cleared = new Set(readWorld(ctx2.chat).cleared ?? []);
-    return ![title2, e.name, e.title].some((n2) => cleared.has(n2));
+    return ![title2, e.name, e.title].some((n3) => cleared.has(n3));
   }
   function docView(ctx2) {
     const doc2 = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
@@ -1981,9 +2909,9 @@
     const seen2 = /* @__PURE__ */ new Map();
     return list4.map((x) => {
       const k = name(x);
-      const n2 = seen2.get(k) ?? 0;
-      seen2.set(k, n2 + 1);
-      return `${k}\0${n2}`;
+      const n3 = seen2.get(k) ?? 0;
+      seen2.set(k, n3 + 1);
+      return `${k}\0${n3}`;
     });
   }
   function mergeByName(current5, incoming, name, keep = () => false) {
@@ -2077,7 +3005,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.5" : "0";
+  var PLUGIN_VERSION = true ? "0.21.6" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -2095,7 +3023,7 @@
     const plan = { get: [], replaced: 0, added: 0, bytes: 0, drop: [] };
     if (next) {
       const nextNames = new Set(pictures(next).map((p2) => p2[0]));
-      for (const n2 of known.keys()) if (have.has(n2) && !nextNames.has(n2)) plan.drop.push(n2);
+      for (const n3 of known.keys()) if (have.has(n3) && !nextNames.has(n3)) plan.drop.push(n3);
     }
     for (const p2 of pictures(next)) {
       if (have.has(p2[0]) && known.get(p2[0]) === p2[1]) continue;
@@ -2153,10 +3081,10 @@
     const idx = m?.greetings ?? {};
     const inst = installData();
     const missing = Object.keys(inst.greetings.index).filter((k) => {
-      const n2 = idx[k];
-      if (!Number.isInteger(n2) || n2 < 0 || n2 >= greetings.length) return true;
+      const n3 = idx[k];
+      if (!Number.isInteger(n3) || n3 < 0 || n3 >= greetings.length) return true;
       const want2 = inst.greetings.texts[inst.greetings.index[k]] ?? "";
-      return want2 ? typeof greetings[n2] !== "string" || !greetings[n2].trim() : false;
+      return want2 ? typeof greetings[n3] !== "string" || !greetings[n3].trim() : false;
     });
     const have = new Set((Array.isArray(i.assets) ? i.assets : []).filter(isRow4).map((r) => r[0]));
     const want = pictures(m).length ? pictures(m) : inst.pictures;
@@ -2178,7 +3106,7 @@
       firstMessage: isLanding(i.firstMessage),
       loreSettings: !installLoreSettings(i.loreSettings),
       greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
-      pictures: { missing: missingPics, bytes: missingPics.reduce((n2, p2) => n2 + (Number(p2[3]) || 0), 0), total: want.length },
+      pictures: { missing: missingPics, bytes: missingPics.reduce((n3, p2) => n3 + (Number(p2[3]) || 0), 0), total: want.length },
       icon: i.iconOurs,
       wikiPack: i.wikiPack,
       tokenizer: i.tokenizer
@@ -2189,12 +3117,12 @@
     const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
     const index3 = {};
     const at = /* @__PURE__ */ new Map();
-    out.forEach((g2, n2) => {
-      if (!at.has(g2)) at.set(g2, n2);
+    out.forEach((g2, n3) => {
+      if (!at.has(g2)) at.set(g2, n3);
     });
     const inst = installData();
-    for (const [key, n2] of Object.entries(inst.greetings.index)) {
-      const text4 = inst.greetings.texts[n2] ?? "";
+    for (const [key, n3] of Object.entries(inst.greetings.index)) {
+      const text4 = inst.greetings.texts[n3] ?? "";
       let hit4 = at.get(text4);
       if (hit4 === void 0) {
         hit4 = out.length;
@@ -2218,7 +3146,7 @@
       keys: { ...keys, settings: o.settingsKey }
     };
   }
-  var entry2 = (comment, content, folder, extra = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra });
+  var entry2 = (comment, content, folder, extra2 = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra2 });
   var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
   var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
   var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
@@ -2244,9 +3172,9 @@
           sec2[name] = de;
           gaps++;
         } else if (isObj2(ce) && isObj2(de)) {
-          const row10 = { ...ce };
-          for (const [f, fv] of Object.entries(de)) if (empty(row10[f]) && !empty(fv)) row10[f] = fv, gaps++;
-          sec2[name] = row10;
+          const row11 = { ...ce };
+          for (const [f, fv] of Object.entries(de)) if (empty(row11[f]) && !empty(fv)) row11[f] = fv, gaps++;
+          sec2[name] = row11;
         }
       }
       out[k] = sec2;
@@ -2273,9 +3201,9 @@
     if (!dir2.length || !cur) {
       for (const e of dir2) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
       const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
-      const fresh3 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
-      if (stale >= 0) out[stale] = fresh3;
-      else out.push(fresh3);
+      const fresh4 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
+      if (stale >= 0) out[stale] = fresh4;
+      else out.push(fresh4);
     } else {
       for (const e of dir2) if (!e.folder) e.folder = settingsKey;
       const filled = fillDirectory(cur, installData().directory);
@@ -2288,11 +3216,11 @@
     const prev = readManifest(out);
     const manifest = buildManifest({ greetings, settingsKey, prev });
     const old = manifestEntry(out);
-    const fresh2 = entry2(MANIFEST_COMMENT, JSON.stringify(manifest), settingsKey);
+    const fresh3 = entry2(MANIFEST_COMMENT, JSON.stringify(manifest), settingsKey);
     if (old) {
       const at = out.indexOf(old);
-      out[at] = { ...old, content: fresh2.content, folder: old.folder || settingsKey };
-    } else out.push(fresh2);
+      out[at] = { ...old, content: fresh3.content, folder: old.folder || settingsKey };
+    } else out.push(fresh3);
     return out;
   }
   function installSummary(s8) {
@@ -2338,7 +3266,7 @@
   }
   var WORLD_PACK = { name: "goei-data-world", label: "세계 자료", expect: expectOf(true ? '{"hash":"b9688ee8","sha256":"a73e000d58b807f1d9f87d934856d79711928c1b493025118a54242f7b38de9c","length":1234781}' : void 0) };
   var INSTALL_PACK = { name: "goei-data-install", label: "설치 자료", expect: expectOf(true ? '{"hash":"9541920f","sha256":"b4eae9d7a8120cf8642833cfa7df0f54bd7bc9cc660164ee8ed7b1e8c5e216bd","length":168812}' : void 0) };
-  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"5a494bb0","sha256":"f02dcc5cae3a20558940ea3448fbef853e78c9fc06088e605e989e9bcf4254f2","length":4696334}' : void 0) };
+  var ITEMS_PACK = { name: "goei-data-items", label: "소지품 그림", expect: expectOf(true ? '{"hash":"0a3b1d71","sha256":"d86d034a4771dfb31658171e7573c8318e310886bfe6bdff15ae9939d256a569","length":8467376}' : void 0) };
   function packMatches(text4, expect) {
     return !!expect.hash && text4.length === expect.length && textHash(text4) === expect.hash;
   }
@@ -2380,9 +3308,8 @@
     if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
     setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String), first: g2.first }, pictures: j.pictures, directory: j.directory, icon: j.icon });
   }
-  function makeIconFind(table, rep, base) {
-    const m = makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind })), rep, { base });
-    return (name, icon) => m(name, icon)?.file ?? null;
+  function makeIconFind(table, rep, base, same4, cats) {
+    return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same: same4, cats });
   }
   function applyItemsPack(text4) {
     let j;
@@ -2392,19 +3319,74 @@
       throw new Error("소지품 그림 팩이 JSON 이 아니에요.");
     }
     if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
-    const icons = j.icons;
+    const icons2 = j.icons;
     const strs = (v) => Array.isArray(v) ? v.map((x) => String(x)) : [];
-    const table = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...r.base ? { base: true } : {} }));
+    const table = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons2[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...Array.isArray(r.u) ? { u: strs(r.u) } : {}, ...r.base ? { base: true } : {} }));
     const rep = {};
     if (obj5(j.rep)) {
-      for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons[f] === "string") rep[normIcon(k)] = f;
+      for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons2[f] === "string") rep[normIcon(k)] = f;
     }
     const base = {};
     for (const r of table) if (r.base) base[r.kind] = r.f;
-    return { table, rep, icons, base, find: makeIconFind(table, rep, base) };
+    const same4 = {};
+    if (obj5(j.same)) {
+      for (const [k, v] of Object.entries(j.same)) if (typeof v === "string") same4[k] = v;
+    }
+    const hit4 = makeIconFind(table, rep, base, same4, Array.isArray(j.cats) ? strs(j.cats) : void 0);
+    return { table, rep, icons: icons2, base, hit: hit4, find: (name, icon) => hit4(name, icon)?.file ?? null };
   }
-  function matchItemIcon(pack4, itemName, icon) {
-    return pack4.find(itemName, icon) ?? pack4.base.misc ?? null;
+  function matchItemIcon(pack4, itemName, icon, seed2) {
+    const h = pack4.hit(itemName, icon);
+    if (h?.pool && seed2 !== void 0 && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack4.icons[f] === "string"), seed2) ?? h.file;
+    return h?.file ?? pack4.base.misc ?? null;
+  }
+  var packWords = /* @__PURE__ */ new WeakMap();
+  function wordsOf(pack4) {
+    let m = packWords.get(pack4);
+    if (!m) {
+      m = /* @__PURE__ */ new Map();
+      const fts = /* @__PURE__ */ new Map();
+      for (const r of pack4.table) {
+        if (!fts.has(r.f)) fts.set(r.f, /* @__PURE__ */ new Set());
+        for (const t of r.ft) fts.get(r.f).add(normIcon(t));
+      }
+      for (const r of pack4.table) {
+        let x = m.get(r.f);
+        if (!x) m.set(r.f, x = { heads: /* @__PURE__ */ new Set(), mods: /* @__PURE__ */ new Set() });
+        const ft = fts.get(r.f);
+        for (const t of [...r.k, ...r.h]) {
+          const ws = normIcon(t.replace(/\([^)]*\)/g, " ")).split(" ").filter(Boolean);
+          ws.forEach((w, i) => (i === ws.length - 1 && !ft.has(w) ? x.heads : x.mods).add(w));
+        }
+      }
+      packWords.set(pack4, m);
+    }
+    return m;
+  }
+  function matchTitleIcon(pack4, title2) {
+    const words = normIcon(title2).split(" ").filter(Boolean);
+    if (!words.length) return null;
+    const table = wordsOf(pack4);
+    const pre = (a, b) => a.length >= 2 && b.startsWith(a) || b.length >= 2 && a.startsWith(b);
+    const backed = (file, last2) => {
+      const x = table.get(file);
+      if (!x) return false;
+      for (const w of x.heads) if (w === last2 || pre(w, last2)) return true;
+      for (const w of x.mods) if (w !== last2 && pre(w, last2)) return true;
+      return false;
+    };
+    const at = (n3) => {
+      const h = pack4.hit(words.slice(0, n3).join(" "), void 0, true);
+      return h && h.score >= 1 && backed(h.file, words[n3 - 1]) ? h.file : null;
+    };
+    const whole = pack4.hit(words.join(" "), void 0, true);
+    const first = at(words.length);
+    if (first) return first;
+    for (let n3 = 1; n3 < words.length; n3++) {
+      const f = at(n3);
+      if (f) return f;
+    }
+    return whole?.file ?? null;
   }
 
   // src/core/fetchparts.ts
@@ -2413,14 +3395,14 @@
     const out = new Array(names4.length);
     let next = 0;
     let done3 = 0;
-    let failed3 = false;
+    let failed4 = false;
     const worker = async () => {
-      while (next < names4.length && !failed3) {
+      while (next < names4.length && !failed4) {
         const i = next++;
         try {
           out[i] = await get(names4[i]);
         } catch (error) {
-          failed3 = true;
+          failed4 = true;
           throw error;
         }
         onDone?.(++done3);
@@ -2469,10 +3451,10 @@
     if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
     return new Uint8Array(await timeout(res.arrayBuffer(), name));
   }
-  async function fetchPack(pack4, progress3) {
+  async function fetchPack(pack4, progress4) {
     if (!UPDATE_BASE) throw new DataPackError("받을 곳이 정해지지 않은 빌드예요.");
     if (!pack4.expect.hash) throw new DataPackError(`이 빌드에는 ${pack4.label} 지문이 없어요.`);
-    progress3?.(`${pack4.label} 목록 받는 중…`);
+    progress4?.(`${pack4.label} 목록 받는 중…`);
     let index3 = null;
     try {
       index3 = JSON.parse((await getText(`${pack4.name}.json`)).replace(/^﻿/, ""));
@@ -2487,7 +3469,7 @@
     }
     const parts = index3.parts;
     const t0 = Date.now();
-    const text4 = await fetchParts(parts, getText, (n2) => progress3?.(`${pack4.label} 받는 중 ${n2}/${parts.length}`));
+    const text4 = await fetchParts(parts, getText, (n3) => progress4?.(`${pack4.label} 받는 중 ${n3}/${parts.length}`));
     console.log(`[goei] ${pack4.label} ${parts.length}조각 받기: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
     if (text4.length !== pack4.expect.length) throw new DataPackError(`${pack4.label}를 끝까지 받지 못했어요. (${text4.length}/${pack4.expect.length}자)`);
     const got = await sha256Text(text4);
@@ -2548,7 +3530,7 @@
     await keepWorldData(text4);
   }
   var installPending = null;
-  async function ensureInstallData(progress3) {
+  async function ensureInstallData(progress4) {
     if (installDataReady()) return;
     installPending ??= (async () => {
       let saved2 = null;
@@ -2564,7 +3546,7 @@
           console.log(`[goei] 저장된 설치 자료를 읽지 못했어요 (다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
         }
       } else if (typeof saved2 === "string") console.log("[goei] 저장된 설치 자료가 이 판과 달라 다시 받아요");
-      const text4 = await fetchPack(INSTALL_PACK, progress3);
+      const text4 = await fetchPack(INSTALL_PACK, progress4);
       applyInstallPack(text4);
       try {
         await risuai.pluginStorage.setItem(INSTALL_KEY, text4);
@@ -2627,13 +3609,22 @@
     })();
     return loading3;
   }
-  function itemIconUrl(name, icon) {
+  function itemIconUrl(name, icon, seed2) {
     if (!pack3) {
       if (!failed) void ensureItemIcons();
       return null;
     }
-    const file = matchItemIcon(pack3, name, icon);
-    if (!file) return null;
+    return urlOf(matchItemIcon(pack3, name, icon, seed2));
+  }
+  function titleIconUrl(title2) {
+    if (!pack3) {
+      if (!failed) void ensureItemIcons();
+      return null;
+    }
+    return urlOf(matchTitleIcon(pack3, title2) ?? pack3.base.misc ?? null);
+  }
+  function urlOf(file) {
+    if (!pack3 || !file) return null;
     let u = urls2.get(file);
     if (!u) {
       u = `data:image/${file.endsWith(".png") ? "png" : "webp"};base64,${pack3.icons[file]}`;
@@ -2671,7 +3662,8 @@
     { id: "sm", name: "연어 마켓", title: "연어 마켓 | 이면의 중고거래", host: "salmon-market.kr", path: "" },
     { id: "cos", name: "우주 쇼핑몰", title: "★우주 쇼핑몰★에 오는 것을 환영하는 것이다", host: "cosmic-mall.alien", path: "/~shop/index.html" },
     { id: "wk", name: "괴이위키", title: "괴이위키", host: "goei.wiki", path: "/w/괴이위키:대문" },
-    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" }
+    { id: "bm", name: "백일몽 포인트몰", title: "백일몽 포인트몰", host: "point.baekilmong.intra", path: "/mall/main" },
+    { id: "hs", name: "망상홈쇼핑", title: "망상홈쇼핑 LIVE", host: "live.mangsang.tv", path: "/onair" }
   ];
   var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
   var isSite = (id2) => SITES.some((s8) => s8.id === id2);
@@ -2683,6 +3675,7 @@
     cos: ["0 0 32 24", '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
     wk: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
     bm: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
+    hs: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
     home: ["0 0 24 24", '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>']
   };
   var siteLogo = (id2, cls = "br-fv") => {
@@ -2694,730 +3687,4 @@
     back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
     fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
     rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
-    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
-    add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
-    tune: "M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z",
-    acct: "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
-    home: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
-    srch: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-  };
-  var HIST_MAX = 50;
-  var seq2 = 1;
-  var br = {
-    tabs: [{ id: seq2++, site: "", hist: [], at: -1 }],
-    cur: 0,
-    /** 로그인 창 열림 */
-    login: false,
-    /** 폰: 탭 목록 화면 */
-    list: false,
-    /** 닫은 탭 (최근 것이 끝, 마우스 제스처 ㄱ 으로 되살림) */
-    closed: []
-  };
-  var curTab = () => br.tabs[Math.min(br.cur, br.tabs.length - 1)];
-  function recordTab(state) {
-    const t = curTab();
-    const key = JSON.stringify(state);
-    if (t.hist[t.at] === key) return;
-    t.hist = t.hist.slice(0, t.at + 1);
-    t.hist.push(key);
-    if (t.hist.length > HIST_MAX) t.hist.shift();
-    t.at = t.hist.length - 1;
-  }
-  var tabCan = (dir2) => {
-    const t = curTab();
-    return t.at + dir2 >= 0 && t.at + dir2 < t.hist.length;
-  };
-  function tabGo(dir2) {
-    if (!tabCan(dir2)) return null;
-    const t = curTab();
-    t.at += dir2;
-    return JSON.parse(t.hist[t.at]);
-  }
-  function tabState(i = br.cur) {
-    const t = br.tabs[i];
-    return t && t.at >= 0 ? JSON.parse(t.hist[t.at]) : null;
-  }
-  function newTab() {
-    const i = br.tabs.findIndex((t) => !t.site);
-    if (i >= 0) {
-      br.cur = i;
-      return;
-    }
-    br.tabs.push({ id: seq2++, site: "", hist: [], at: -1 });
-    br.cur = br.tabs.length - 1;
-  }
-  function closeTab(i) {
-    const [gone] = br.tabs.splice(i, 1);
-    if (gone?.site) br.closed = [...br.closed.filter((t) => t.site !== gone.site), gone].slice(-10);
-    if (!br.tabs.length) br.tabs.push({ id: seq2++, site: "", hist: [], at: -1 });
-    if (br.cur >= i && br.cur > 0) br.cur--;
-    br.cur = Math.min(br.cur, br.tabs.length - 1);
-  }
-  function reopenTab() {
-    const t = br.closed.pop();
-    if (!t) return false;
-    const i = br.tabs.findIndex((x) => x.site === t.site);
-    if (i >= 0) {
-      br.cur = i;
-      return true;
-    }
-    const empty2 = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
-    if (empty2 >= 0) br.tabs.splice(empty2, 1);
-    br.tabs.push({ ...t, id: seq2++ });
-    br.cur = br.tabs.length - 1;
-    return true;
-  }
-  function openSite(site) {
-    const i = br.tabs.findIndex((t) => t.site === site);
-    if (i < 0) {
-      curTab().site = site;
-      return "here";
-    }
-    if (i !== br.cur) {
-      const id2 = br.tabs[i].id;
-      if (!curTab().site) closeTab(br.cur);
-      br.cur = br.tabs.findIndex((t) => t.id === id2);
-    }
-    return "tab";
-  }
-  var focusSite = (site) => void openSite(site);
-  var BR_TABS_VAR = "$br_tabs";
-  var SAVE_HIST = 10;
-  function tabsJson() {
-    return JSON.stringify({ c: br.cur, t: br.tabs.map((t) => ({ s: t.site, h: t.hist.slice(-SAVE_HIST), a: Math.max(-1, t.at - Math.max(0, t.hist.length - SAVE_HIST)) })) });
-  }
-  function restoreTabs(raw) {
-    br.login = false;
-    br.list = false;
-    br.closed = [];
-    br.tabs = [];
-    br.cur = 0;
-    try {
-      const v = JSON.parse(String(raw ?? ""));
-      const seen2 = /* @__PURE__ */ new Set();
-      for (const t of Array.isArray(v?.t) ? v.t : []) {
-        const site = isSite(String(t?.s)) ? t.s : "";
-        if (seen2.has(site)) continue;
-        seen2.add(site);
-        const hist = Array.isArray(t?.h) ? t.h.filter((x) => typeof x === "string").slice(-SAVE_HIST) : [];
-        const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t.a), hist.length - 1) : hist.length - 1;
-        br.tabs.push({ id: seq2++, site, hist, at });
-      }
-      if (Number.isInteger(v?.c)) br.cur = v.c;
-    } catch {
-    }
-    if (!br.tabs.length) br.tabs.push({ id: seq2++, site: "", hist: [], at: -1 });
-    br.cur = Math.max(0, Math.min(br.cur, br.tabs.length - 1));
-  }
-  function tabTitle(t, i, o) {
-    const s8 = t.site ? siteOf(t.site) : void 0;
-    if (!s8) return "새 탭";
-    return i === br.cur && o.title ? o.title : s8.title;
-  }
-  function chromeHtml(o) {
-    const t = curTab();
-    const s8 = t.site ? siteOf(t.site) : void 0;
-    const tabs2 = br.tabs.map((x, i) => `<div class="br-tab${i === br.cur ? " on" : ""}" role="tab" aria-selected="${i === br.cur}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(x.site)}<span class="br-tt">${esc10(tabTitle(x, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("");
-    const omni = s8 ? `<span class="br-ti">${ic(IC.tune)}</span><span class="br-u"><b>${esc10(s8.host)}</b>${esc10(o.path || s8.path)}</span>` : `<span class="br-ti">${ic(IC.srch)}</span><span class="br-u">검색어 또는 URL 입력</span>`;
-    const prof = o.nick ? o.photo ? `<img src="${esc10(o.photo)}" alt="">` : `<b>${esc10([...o.nick][0] ?? "")}</b>` : ic(IC.acct);
-    const bms = o.bookmarks.map((id2) => `<button class="br-bm" data-action="br-go" data-value="${id2}">${siteLogo(id2)}<span>${esc10(siteOf(id2).name)}</span></button>`).join("");
-    return `<div class="br-tabs" role="tablist">${tabs2}<button class="br-plus" data-action="br-new" aria-label="새 탭">${ic(IC.add, "br-i s")}</button></div>
-  <div class="br-tool">
-    <button class="br-tb pc" data-action="br-back" aria-label="뒤로" ${tabCan(-1) ? "" : "disabled"}>${ic(IC.back)}</button>
-    <button class="br-tb pc" data-action="br-fwd" aria-label="앞으로" ${tabCan(1) ? "" : "disabled"}>${ic(IC.fwd)}</button>
-    <button class="br-tb pc" data-action="br-reload" aria-label="새로고침">${ic(IC.rel)}</button>
-    <button class="br-tb mo" data-action="br-home" aria-label="새 탭">${ic(IC.home)}</button>
-    <div class="br-omni">${omni}</div>
-    <button class="br-prof${o.nick ? " in" : ""}" data-action="br-login" aria-label="${o.nick ? `${esc10(o.nick)}(으)로 로그인됨` : "로그인"}">${prof}</button>
-    <button class="br-tabn mo" data-action="br-list" aria-label="탭 ${br.tabs.length}개">${br.tabs.length}</button>
-  </div>
-  <div class="br-bms">${bms}</div>`;
-  }
-  function loginHtml(o) {
-    if (!br.login) return "";
-    const face3 = o.photo ? `<img src="${esc10(o.photo)}" alt="">` : ic(IC.acct);
-    const nick = o.nick || o.nickDefault;
-    return `<div class="br-lgn" role="dialog" aria-label="로그인"><h4>로그인</h4><div class="br-face">${face3}</div>
-    <input class="br-in" name="br-nick" data-enter="br-login-save" value="${esc10(nick)}" placeholder="닉네임" maxlength="36" aria-label="닉네임">
-    <button class="br-b1" data-action="br-login-save" data-take="br-nick"${needAttr("br-nick", nick)}>로그인</button><hr>
-    <button class="br-b2" data-action="br-login-guest">${o.nick ? "로그아웃" : "닫기"}</button></div>`;
-  }
-  function tabListHtml(o) {
-    return `<div class="br-tlist">${br.tabs.map((t, i) => `<div class="br-tcard${i === br.cur ? " on" : ""}"><button class="br-tabb" data-action="br-tab" data-value="${i}">${siteLogo(t.site)}<span class="br-tt">${esc10(tabTitle(t, i, o))}</span></button><button class="br-tx" data-action="br-close" data-value="${i}" aria-label="탭 닫기">${ic(IC.x, "br-i s")}</button></div>`).join("")}<button class="br-tnew" data-action="br-new">${ic(IC.add, "br-i s")}새 탭</button></div>`;
-  }
-  function homeHtml(sites) {
-    return `<div class="br-ntp"><div class="br-ntp-lg"><span>G</span><span>o</span><span>e</span><span>i</span></div><div class="br-ntp-q">${ic(IC.srch)}검색어 또는 URL 입력</div>
-    <div class="br-ntp-sc">${sites.map((id2) => `<button class="br-ntp-s" data-action="br-go" data-value="${id2}"><i>${siteLogo(id2)}</i><span>${esc10(siteOf(id2).name)}</span></button>`).join("")}</div></div>`;
-  }
-  function soonHtml(id2) {
-    const s8 = siteOf(id2);
-    return `<div class="br-soon">${siteLogo(id2, "br-soon-lg")}<b>${esc10(s8.name)}</b><p>준비 중인 사이트예요.</p></div>`;
-  }
-
-  // src/ui/popwin.ts
-  var winStyle = (b) => b ? ` style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;right:auto;bottom:auto"` : "";
-  function bindPopWins(root3, render3, specs) {
-    root3.addEventListener("pointerdown", (ev) => {
-      if (ev.button !== 0) return;
-      const t = ev.target;
-      for (const sp of specs) {
-        const host3 = t.closest(sp.host);
-        if (!host3 || host3.classList.contains(sp.skip)) continue;
-        const win = t.closest(sp.win);
-        if (!win) {
-          if (sp.isOpen() && !t.closest(sp.keep)) {
-            sp.close();
-            render3();
-          }
-          return;
-        }
-        const grip = t.closest(sp.grip) && !t.closest("button, input, select, textarea, a") ? "move" : t.closest(sp.size) ? "size" : "";
-        if (!grip) return;
-        ev.preventDefault();
-        const hr = host3.getBoundingClientRect();
-        const r = win.getBoundingClientRect();
-        const start3 = { px: ev.clientX, py: ev.clientY, x: r.left - hr.left, y: r.top - hr.top, w: r.width, h: r.height };
-        const cur = { ...start3 };
-        const [minW, minH] = sp.min;
-        const apply = () => {
-          win.style.left = `${cur.x}px`;
-          win.style.top = `${cur.y}px`;
-          win.style.width = `${cur.w}px`;
-          win.style.height = `${cur.h}px`;
-          win.style.right = "auto";
-          win.style.bottom = "auto";
-        };
-        const move = (e) => {
-          const dx = e.clientX - start3.px;
-          const dy = e.clientY - start3.py;
-          if (grip === "move") {
-            cur.x = Math.min(Math.max(0, start3.x + dx), Math.max(0, hr.width - start3.w));
-            cur.y = Math.min(Math.max(0, start3.y + dy), Math.max(0, hr.height - 40));
-          } else {
-            cur.w = Math.min(Math.max(minW, start3.w + dx), Math.max(minW, hr.width - start3.x));
-            cur.h = Math.min(Math.max(minH, start3.h + dy), Math.max(minH, hr.height - start3.y));
-          }
-          apply();
-        };
-        const up = () => {
-          window.removeEventListener("pointermove", move);
-          window.removeEventListener("pointerup", up);
-          window.removeEventListener("pointercancel", up);
-          sp.save({ x: Math.round(cur.x), y: Math.round(cur.y), w: Math.round(cur.w), h: Math.round(cur.h) });
-        };
-        apply();
-        window.addEventListener("pointermove", move);
-        window.addEventListener("pointerup", up);
-        window.addEventListener("pointercancel", up);
-        return;
-      }
-    });
-  }
-
-  // src/ui/gnet.ts
-  var gnet = {
-    sub: "board",
-    open: null,
-    openDm: null,
-    compose: null,
-    draft: "",
-    attach: [],
-    to: "",
-    confirm: null,
-    editNick: false,
-    nick: "",
-    notice: "",
-    failure: null,
-    settings: false,
-    attachMenu: false,
-    cat: "",
-    sort: "new",
-    q: "",
-    page: 1,
-    dmWin: null
-  };
-  var GN_KINDS = ["image", "photo", "video", "file", "link"];
-  function resetGnet() {
-    uiSaved.clear();
-    Object.assign(gnet, { sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, notice: "", failure: null, settings: false, attachMenu: false, cat: "", sort: "new", q: "", page: 1 });
-  }
-  var jobs3 = /* @__PURE__ */ new Map();
-  var chatKey3 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}:${siteOf2(ctx2)}`;
-  var siteOf2 = (ctx2) => ctx2.site ?? "gn";
-  function siteCtx(ctx2, site) {
-    if (ctx2.site === site) return ctx2;
-    return { ...ctx2, chat: boardView(ctx2.chat, site), site };
-  }
-  async function upd(ctx2, f) {
-    const site = siteOf2(ctx2);
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const r = f(boardView(chat, site));
-      return r ? boardWrite(chat, r, site) : null;
-    });
-    return saved2 ? boardView(saved2, site) : null;
-  }
-  var uiSite = "gn";
-  var uiSaved = /* @__PURE__ */ new Map();
-  var freshUi = () => ({ sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, nick: "", notice: "", failure: null, settings: false, attachMenu: false, cat: "", sort: "new", q: "", page: 1, dmWin: null });
-  function useBoardSite(site) {
-    if (site === uiSite) return;
-    uiSaved.set(uiSite, { ...gnet });
-    Object.assign(gnet, uiSaved.get(site) ?? freshUi());
-    uiSite = site;
-  }
-  function uiFor(site) {
-    if (site === uiSite) return gnet;
-    let u = uiSaved.get(site);
-    if (!u) uiSaved.set(site, u = freshUi());
-    return u;
-  }
-  var esc11 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var retry = (chat) => {
-    const site = chat.scriptstate?.[BOARD_SITE_VAR];
-    return { ...genSettings(chat.scriptstate), reiterate: craftSettings(chat.scriptstate, "gn").reiterate, staticModel: featureModel(chat.scriptstate, "gn"), state: chat.scriptstate, label: BOARD_NAME[isBoardSite(site) ? site : "gn"] };
-  };
-  var source3 = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
-  function names3(ctx2) {
-    try {
-      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
-    } catch {
-      return {};
-    }
-  }
-  var ORIGIN_KEY = "$gn_incoming_origin";
-  function savedOrigin(chat) {
-    try {
-      const v = JSON.parse(String(chat.scriptstate?.[ORIGIN_KEY] ?? ""));
-      return v && Number.isInteger(v.post) ? v : null;
-    } catch {
-      return null;
-    }
-  }
-  function withVars(chat, vars) {
-    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } };
-  }
-  function saveIncoming(chat, st, rows3, plan, post) {
-    try {
-      if (commitIncoming(st, rows3, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: "새 쪽지가 왔어요." };
-      return { vars: {}, note: "" };
-    } catch (error) {
-      return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
-    }
-  }
-  async function run2(ctx2, env3, label2, work) {
-    const key = chatKey3(ctx2);
-    const u = uiFor(siteOf2(ctx2));
-    if (jobs3.has(key)) {
-      u.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
-      env3.render();
-      return;
-    }
-    jobs3.set(key, label2);
-    u.notice = "";
-    u.failure = null;
-    env3.render();
-    try {
-      u.notice = await work();
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      u.notice = msg;
-      const raw = error.raw;
-      if (raw) u.failure = { label: label2, reason: msg, raw };
-    } finally {
-      jobs3.delete(key);
-      await env3.refresh();
-    }
-  }
-  var viewing = (site) => {
-    const u = uiFor(site);
-    return { post: u.sub === "board" ? u.open : null, nick: u.sub === "dm" ? u.openDm : null };
-  };
-  function refreshBoard(ctx2, env3, automatic = false, joint) {
-    return run2(ctx2, env3, automatic ? "채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
-      const startLength = ctx2.chat.message?.length ?? 0;
-      const before = readGnet(ctx2.chat);
-      const nick = userNick(ctx2.chat.scriptstate);
-      const s8 = gnetSettings(ctx2.chat.scriptstate);
-      const plan = incomingPlan(ctx2.chat, before, s8, nick, Math.random, void 0, savedOrigin(ctx2.chat));
-      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => refreshPrompt(source3(ctx2), before, plan, nick, names3(ctx2)));
-      const site = siteOf2(ctx2);
-      const first = joint && ((m) => joint.ask(site, m));
-      const { raw, value } = await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx2.chat), first });
-      let note = "";
-      await upd(ctx2, (chat) => {
-        if (automatic && (chat.message?.length ?? 0) !== startLength) {
-          note = "채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.";
-          return null;
-        }
-        const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s8, date: dateNow(chat) }));
-        const inc = saveIncoming(chat, res.st, value.incoming, plan);
-        note = [res.notice, res.emptyComments ? "이번 게시판에는 댓글이 하나도 없어요." : "", inc.note].filter(Boolean).join(" ");
-        const figs = s8.keyFigures ? mergeKeyFigures(chat.scriptstate, value.keyFigures) : null;
-        return writeGnet(withVars(chat, { ...inc.vars, ...figs ?? {} }), res.st, { ack: viewing(site) });
-      });
-      const u = uiFor(site);
-      if (!automatic) u.open = null;
-      else if (u.open !== null && !findPost(readGnet(await currentChat(ctx2) ?? ctx2.chat), u.open)) u.open = null;
-      return note;
-    });
-  }
-  function withRaw(raw, f) {
-    try {
-      return f();
-    } catch (error) {
-      if (error instanceof GnetError && !error.raw) throw new GnetError(error.message, raw);
-      throw error;
-    }
-  }
-  function writePost(ctx2, env3, input3) {
-    return run2(ctx2, env3, "글을 올리는 중이에요.", async () => {
-      const st = readGnet(ctx2.chat);
-      const nick = userNick(ctx2.chat.scriptstate);
-      const s8 = gnetSettings(ctx2.chat.scriptstate);
-      const draftPost = { id: 0, date: "", nick, title: "", body: input3, views: 0, votes: 0, mine: true, comments: [] };
-      const plan = incomingPlan(ctx2.chat, st, s8, nick, Math.random, { post: draftPost });
-      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => postPrompt(source3(ctx2), st, input3, plan, names3(ctx2)));
-      const { value, draft: parsed } = (await generate(prompt.messages, s8.model, (r) => {
-        const v = withRaw(r, () => parseJsonPayload(r));
-        return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
-      }, retry(ctx2.chat))).value;
-      const draft2 = attachPostDraft(parsed, input3);
-      let note = "글을 올렸어요.";
-      let newId = 0;
-      await upd(ctx2, (chat) => {
-        const cur = readGnet(chat);
-        const p2 = addUserPost(cur, nick, draft2.title, draft2.content, dateNow(chat));
-        if (draft2.tag) p2.tag = draft2.tag;
-        newId = p2.id;
-        const got = acceptComments(value.comments, [], { postId: p2.id, replyTo: 0, total: 0, supplied: /* @__PURE__ */ new Set() }, nick);
-        pushComments(p2, got.comments, dateNow(chat));
-        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
-        trimBoard(cur, s8);
-        const inc = saveIncoming(chat, cur, value.incoming, plan, p2);
-        if (!got.comments.length) note = "글을 올렸어요. 아직 댓글은 없어요.";
-        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
-        if (inc.note) note += ` ${inc.note}`;
-        return writeGnet(withVars(chat, { ...inc.vars, [ORIGIN_KEY]: JSON.stringify({ post: p2.id }) }), cur, { ack: { post: p2.id } });
-      });
-      gnet.compose = null;
-      gnet.draft = "";
-      gnet.attach = [];
-      gnet.sub = "board";
-      gnet.open = newId;
-      return note;
-    });
-  }
-  function refreshPost(ctx2, env3, postId2) {
-    return run2(ctx2, env3, "이 글을 새로 불러오는 중이에요.", async () => {
-      const chat = ctx2.chat;
-      const st = readGnet(chat);
-      const target = findPost(st, postId2);
-      if (!target) throw new GnetError("대상 글이 없어졌어요.");
-      const s8 = gnetSettings(chat.scriptstate);
-      const nick = userNick(chat.scriptstate);
-      const plan = incomingPlan(chat, st, { ...s8, incoming: false }, nick, Math.random);
-      const prompt = fitPrompt(budgetFor(chat.scriptstate, "gn"), () => commentPrompt(source3(ctx2, chat), st, postId2, 0, "", plan, nick, names3(ctx2), POST_REFRESH_ACTION));
-      const snapshot3 = postKey(target);
-      const { value } = await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(chat));
-      let note = "";
-      await upd(ctx2, (latest) => {
-        const cur = readGnet(latest);
-        const p2 = findPost(cur, postId2);
-        if (!p2 || postKey(p2) !== snapshot3) {
-          note = "불러오는 동안 글이 바뀌어서 적용하지 않았어요. 다시 눌러 주세요.";
-          return null;
-        }
-        const got = acceptComments(value.comments, p2.comments, { postId: postId2, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
-        pushComments(p2, got.comments, dateNow(latest));
-        const n2 = got.comments.length;
-        p2.views += n2 * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
-        p2.votes += Math.floor(Math.random() * (n2 + 2));
-        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest), gnetSettings(latest.scriptstate).counts.act[1]);
-        note = n2 ? "" : "새 댓글이 없어요.";
-        if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
-        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
-        return writeGnet(latest, cur, { ack: viewing(siteOf2(ctx2)) });
-      });
-      return note.trim();
-    });
-  }
-  async function writeComment(ctx2, env3, postId2, parent, body5) {
-    const key = chatKey3(ctx2);
-    if (jobs3.has(key)) {
-      gnet.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
-      return env3.render();
-    }
-    const nick = userNick(ctx2.chat.scriptstate);
-    let index3 = 0;
-    const saved2 = await upd(ctx2, (chat) => {
-      const st = readGnet(chat);
-      index3 = addUserComment(st, postId2, parent, nick, body5, dateNow(chat));
-      return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index3 }) }), st);
-    });
-    gnet.compose = null;
-    gnet.draft = "";
-    gnet.attach = [];
-    if (!saved2) return env3.refresh();
-    return run2({ ...ctx2, chat: saved2 }, env3, "댓글 반응을 기다리는 중이에요.", async () => {
-      const st = readGnet(saved2);
-      const s8 = gnetSettings(saved2.scriptstate);
-      const target = findPost(st, postId2);
-      const plan = incomingPlan(saved2, st, s8, nick, Math.random, { post: target, commentIndex: index3 });
-      let value;
-      let prompt;
-      try {
-        prompt = fitPrompt(budgetFor(saved2.scriptstate, "gn"), () => commentPrompt(source3(ctx2, saved2), st, postId2, index3, body5, plan, nick, names3(ctx2)));
-        value = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved2))).value;
-      } catch (error) {
-        throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
-      }
-      const snapshot3 = postKey(target);
-      let note = "";
-      await upd(ctx2, (chat) => {
-        const cur = readGnet(chat);
-        const p2 = findPost(cur, postId2);
-        if (!p2 || postKey(p2) !== snapshot3) {
-          note = "생성하는 동안 글이 바뀌어서 답글을 적용하지 않았어요. 내 댓글은 저장돼 있어요.";
-          return null;
-        }
-        const got = acceptComments(value.comments, p2.comments, { postId: postId2, replyTo: index3, total: prompt.total, supplied: prompt.supplied }, nick);
-        pushComments(p2, got.comments, dateNow(chat));
-        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat), gnetSettings(chat.scriptstate).counts.act[1]);
-        const inc = saveIncoming(chat, cur, value.incoming, plan, p2);
-        note = got.comments.length ? "" : "등록했어요. 추가 답글은 없어요.";
-        if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
-        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
-        if (inc.note) note += ` ${inc.note}`;
-        return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing(siteOf2(ctx2)) });
-      });
-      return note.trim();
-    });
-  }
-  async function sendDm(ctx2, env3, nick, body5, src) {
-    const key = chatKey3(ctx2);
-    if (jobs3.has(key)) {
-      gnet.notice = `${jobs3.get(key)} 끝난 뒤 다시 눌러 주세요.`;
-      return env3.render();
-    }
-    const me = userNick(ctx2.chat.scriptstate);
-    if (nick === me) {
-      gnet.notice = "나에게는 쪽지를 보낼 수 없어요.";
-      return env3.render();
-    }
-    const saved2 = await upd(ctx2, (chat) => {
-      const st = readGnet(chat);
-      addOutgoingDm(st, nick, body5, dateNow(chat), src);
-      return writeGnet(chat, st);
-    });
-    const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
-    gnet.compose = null;
-    gnet.draft = "";
-    gnet.attach = [];
-    gnet.to = "";
-    gnet.sub = "dm";
-    gnet.openDm = nick;
-    if (!saved2) return env3.refresh();
-    return run2({ ...ctx2, chat: saved2 }, env3, `${nick}의 답장을 기다리는 중이에요.`, async () => {
-      const st = readGnet(saved2);
-      const s8 = gnetSettings(saved2.scriptstate);
-      let reply;
-      try {
-        const prompt = fitPrompt(budgetFor(saved2.scriptstate, "gn"), () => dmPrompt(source3(ctx2, saved2), st, nick, body5, me, names3(ctx2)));
-        reply = (await generate(prompt.messages, s8.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved2), fix: (raw, reason3) => retryMessages(prompt, raw, reason3) })).value;
-      } catch (error) {
-        await upd(ctx2, (chat) => {
-          const cur = readGnet(chat);
-          let i = cur.dms.length - 1;
-          while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === "me")) i--;
-          if (i < 0) return null;
-          cur.dms.splice(i, 1);
-          return writeGnet(chat, cur);
-        }).catch(() => null);
-        if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
-        throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
-      }
-      await upd(ctx2, (chat) => {
-        const cur = readGnet(chat);
-        cur.dms.push({ nick, side: "npc", body: reply, unread: true, date: dateNow(chat) });
-        return writeGnet(chat, cur, { ack: viewing(siteOf2(ctx2)) });
-      });
-      return "";
-    });
-  }
-  async function mutate2(ctx2, env3, f, vars = {}, reconcile = true) {
-    await upd(ctx2, (chat) => {
-      const st = readGnet(chat);
-      if (f(st, chat) === false) return null;
-      return writeGnet(withVars(chat, vars), st, { reconcile });
-    });
-    await env3.refresh();
-  }
-  async function setVar2(ctx2, env3, key, value) {
-    await setVars2(ctx2, env3, { [key]: value });
-  }
-  async function setVars2(ctx2, env3, vars) {
-    await upd(ctx2, (chat) => withVars(chat, vars));
-    await env3.refresh();
-  }
-  function countRow(ctx2, k, unit, label2) {
-    const [a, b] = gnetSettings(ctx2.chat.scriptstate).counts[k];
-    const [lo, hi] = COUNT_RANGE[k];
-    const box4 = (side, n2, name) => `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n2}" aria-label="${label2} ${name}"><span>${unit}</span>`;
-    return `<span class="ph-inline"><span>최소</span>${box4("min", a, "최소")}<span>최대</span>${box4("max", b, "최대")}</span>`;
-  }
-  function seg3(key, cur, items) {
-    const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key}=${v}`);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
-  }
-  var body2 = (text4) => attachBody(text4, true);
-  function time(date) {
-    return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
-  }
-  var tool2 = (action, icon, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  function paneHead3(title2, sub, right = "", back = true) {
-    return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
-  }
-  var narrow = () => isPhone();
-  function composer(busy6, placeholder, chip3 = "", label2 = "") {
-    return `<div class="ph-composer gn-composer">
-    ${chip3}
-    ${attachEditor("gn", gnet.attach, GN_KINDS, busy6, "", gnet.attachMenu)}
-    <div class="ph-compose">
-      <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
-      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc11(placeholder)}" ${busy6 ? "disabled" : ""}>${esc11(gnet.draft)}</textarea>
-      <button class="ph-send${label2 ? " txt" : ""}" data-action="gn-send" aria-label="등록" title="등록" ${busy6 ? "disabled" : ""}>${label2 || ICONS.send}</button>
-      <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
-    </div>
-  </div>`;
-  }
-  function composeView(c, busy6) {
-    const post = c.kind === "post";
-    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc11(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc11(c.nick)}</b></p>` : "";
-    const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
-    return `<div class="ph-form gn-cpane">${paneHead3(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc11(c.label) : "")}
-    <div class="ph-form-body">${to}
-      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc11(ph)}" aria-label="내용">${esc11(gnet.draft)}</textarea>
-      ${attachEditor("gn", gnet.attach, GN_KINDS, busy6)}
-    </div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy6 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
-  }
-  function replyBox(label2, busy6, depth) {
-    const chip3 = `<div class="gn-replyto"><span>${esc11(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
-    return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy6, "답글 입력", chip3)}</li>`;
-  }
-  function commentClock(p2, c) {
-    if (!c.time) return "";
-    const same4 = c.time.slice(0, 10) === String(p2.date).slice(0, 10);
-    return `<time class="gn-c-time">${esc11(same4 ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
-  }
-  function dmPane(st, nick, busy6, inline = false) {
-    const t = dmThreads(st).find((x) => x.nick === nick);
-    if (!t) return "";
-    const confirm = gnet.confirm === `d:${nick}`;
-    const right = confirm ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc11(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc11(nick)}"`);
-    const src = st.sources[nick];
-    const c = gnet.compose;
-    const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
-    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead3(esc11(nick), `${t.rows.length}통`, right)}
-    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc11(src.title)}」</div>` : ""}
-      ${t.rows.map((d, i) => {
-      const first = i === 0 || t.rows[i - 1].side !== d.side;
-      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc11(d.date)}</small>` : ""}</div></div>`;
-    }).join("")}
-    </div>
-    ${inline ? "" : composer(busy6, ph)}
-  </div>`;
-  }
-  function dmList(st, busy6, mobile) {
-    const threads = dmThreads(st);
-    if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
-    return `<ul class="ph-list gn-list">${threads.map((t) => {
-      const on2 = gnet.openDm === t.nick && !gnet.settings;
-      const last2 = t.rows[t.rows.length - 1];
-      const confirm = gnet.confirm === `d:${t.nick}`;
-      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc11(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc11(t.nick)}" aria-label="${esc11(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc11(t.nick)}" aria-pressed="${on2}">
-        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc11(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc11(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
-        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc11([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy6, true) : ""}</li>`;
-    }).join("")}</ul>`;
-  }
-  var row3 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group2 = (title2, rows3) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows3}</div></section>`;
-  function settingsView3(ctx2, back = true) {
-    const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
-    const text4 = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc11(v(k) === "-" ? "" : v(k))}" placeholder="${esc11(ph)}">`;
-    const keep = gnetRetention(ctx2.chat.scriptstate);
-    const rows3 = `${group2(gnetLabel(ctx2.chat.scriptstate), [
-      row3("자동 호출", seg3("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
-      row3("한 번에 요청", seg3("joint", jointOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요."),
-      row3("모델", seg3("mode", v("mode") === "1" ? "1" : "2", [["1", "메인 모델"], ["2", "보조 모델"]]), "게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델"),
-      row3("컨텍스트에 포함", seg3("context", v("context") === "1" ? "1" : "0", [["0", "ON"], ["1", "OFF"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
-      row3("다양성 강화", seg3("sampling", v("sampling") === "1" ? "1" : "0", [["0", "OFF"], ["1", "ON"]]), "켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요")
-    ].join(""))}
-      ${group2("게시판", [
-      row3("게시글 수", countRow(ctx2, "post", "개", "게시글 수"), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
-      row3("새 글 댓글 수", countRow(ctx2, "cmt", "개", "새 글 댓글 수"), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
-      row3("활동 댓글 수", countRow(ctx2, "act", "개", "활동 댓글 수"), `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요`),
-      row3("사생활", seg3("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]]), "게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만"),
-      row3("주제", text4("subject", "비우면 세계관에 맞는 다양한 주제")),
-      row3("분위기·말투", text4("mood", "비우면 익명 커뮤니티 말투")),
-      row3("보호 대상", text4("protagonist", "비우면 주인공"), "위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공"),
-      row3("주요 인물 닉네임", seg3("keyfigures", v("keyfigures") === "0" ? "0" : "1", [["1", "보존"], ["0", "안 함"]]), "주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요"),
-      row3("새로고침 시 내 글", seg3("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]]), "새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요"),
-      row3("내 댓글 있는 글", seg3("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]]), "내가 댓글을 단 남의 글도 새로고침 때 남길지예요")
-    ].join(""))}
-      ${group2("쪽지", [
-      row3("선쪽지 받기", seg3("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]]), "게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요"),
-      row3("쪽지 자동 정리", `<span class="ph-inline">${seg3("storage", keep.auto ? "1" : "0", [["1", "ON"], ["0", "OFF"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
-    ].join(""))}
-      ${advancedBox("gn", ctx2.chat.scriptstate)}`;
-    return `<div class="ph-form">${paneHead3(`${gnetLabel(ctx2.chat.scriptstate)} 설정`, "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows3}</div></div>`;
-  }
-  var PAGE2 = 20;
-  var LOGO_SM = (id2, cls = "bs-logo") => siteLogo(id2 === "gal" ? "gal" : id2 === "wpf" ? "wpf" : id2 === "sm" ? "sm" : "gn", cls);
-  function shownPosts(st) {
-    const q = gnet.q.trim().toLowerCase();
-    let list4 = st.posts.filter((p2) => (gnet.cat === "" || (gnet.cat === "@mine" ? p2.mine || p2.comments.some((c) => c.mine) : gnet.cat === "@scrap" ? !!p2.scrap : p2.tag === gnet.cat)) && (!q || `${p2.title}
-${p2.body}`.toLowerCase().includes(q)));
-    if (gnet.sort === "hot") list4 = [...list4].sort((a, b) => b.votes - a.votes || b.views - a.views);
-    if (gnet.sort === "cmt") list4 = [...list4].sort((a, b) => b.comments.length - a.comments.length);
-    return list4;
-  }
-  var tagsOf = (st) => [...new Set(st.posts.map((p2) => p2.tag ?? "").filter(Boolean))];
-  function when(p2, now) {
-    const d = String(p2.date);
-    return d.slice(0, 10) === now.slice(0, 10) ? time(d) : d.slice(5, 10);
-  }
-  var minuteOf = (d) => {
-    const m = /^(\d{4})\.(\d\d)\.(\d\d)\s+(\d\d):(\d\d)/.exec(String(d));
-    return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) / 6e4 : null;
-  };
-  function ago2(p2, now) {
-    const a = minuteOf(p2.date);
-    const b = minuteOf(now);
-    if (a === null || b === null || b < a) return when(p2, now);
-    const d = b - a;
-    if (d < 1) return "방금";
-    if (d < 60) return `${d}분 전`;
-    if (d < 1440) return `${Math.floor(d / 60)}시간 전`;
-    if (d < 2880) return "어제";
-    return `${Math.floor(d / 1440)}일 전`;
-  }
-  var dot = (p2) => postUnread(p2) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : "";
-  var openBtn = (p2, inner, cls = "") => `<button class="gn-row-main gn-row${cls ? ` ${cls}` : ""}" data-action="gn-open" data-value="${p2.id}">${inner}</button>`;
-  var pageOf = (list4) => list4.slice((Math.max(1, gnet.page) - 1) * PAGE2, Math.max(1, gnet.page) * PAGE2);
-  var pages = (total) => Math.max(1, Math.ceil(total / PAGE2));
-  function pager(total, cls, prev = "", next = "") {
-    if (!total) return "";
-    const n2 = pages(total);
-    const cur = Math.min(gnet.page, n2);
-    const nums = Array.from({ length: n2 }, (_, i) => i + 1).map((k) => k === cur ? `<b>${k}</b>` : `<button data-action="gn-page" data-value="${k}">${k}</button>`).join(" ");
-    const go2 = (label2, k, on2) => label2 ? on2 ? `<button data-action="gn-page" data-value="${k}">${label2}</button>` : `<span>${label2}</span>` : "";
-    return `<nav class="${cls}">${go2(prev, cur - 1, cur > 1)} ${nums} ${go2(next, cur + 1, cur < n2)}</nav>`;
-  }
-  var searchInput = (ph) => `<input name="gn-q" data-enter="gn-search" value="${esc11(gnet.q)}" placeholder="${esc11(ph)}" aria-label="${esc11(ph)}">`;
-  var writeBtn = (cls, label2 = "글쓰기") => `<button class="${cls}" data-action="gn-write">${label2}</button>`;
-  var emptyList = (busy6, text4) => `<div class="bs-empty"><p>${text4}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy6 ? "disabled" : ""}>${busy6 ? "불러오는 중…" : "새로고침"}</button>${writeBtn("bs-w")}</div></div>`;
-  var none2 = (list4) => !list4.lengt
+    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 1
