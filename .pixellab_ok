@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 12:50 KST 「뽑아」 → 컷 B 진행자 기본 상태 v8(v6 참고, 3/4 돌림) 1회
 - 사용자 11-10 12:34 KST 「다시 뽑아」 → 컷 B 진행자 기본 상태 v7(어깨 칸 안) 1회
 - 사용자 11-10 12:26 KST 「다시 뽑아봐」 → 컷 B 진행자 기본 상태 v6(더 가깝게) 1회
 - 사용자 11-10 12:23 KST 「뽑아」 → 컷 B 진행자 기본 상태(cutB_host_v5) 1회
@@ -319,3 +320,4 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v5_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v6_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v7_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v8_req.json
