@@ -1,4 +1,15 @@
- var(--line);filter:grayscale(.35) contrast(1.05)}
+weight:700;letter-spacing:.05em}
+.bs-gn .gmain{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.bs-gn .bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bs-gn .bh h2{margin:0;font-size:19px}
+.bs-gn .bh .w{padding:7px 14px;border-radius:3px;background:var(--red);color:#fff;font-weight:800;font-size:13px}
+.bs-gn .sort{display:flex;gap:14px;font-size:13px;color:var(--dim);padding:6px 0 10px;border-bottom:2px solid var(--ink)}.bs-gn .sort button.on{color:var(--ink)}
+.bs-gn .row{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:14px;padding:12px 4px;border-bottom:1px dashed var(--line);align-items:center}
+.bs-gn .row .c{display:inline-block;padding:1px 6px;border-radius:2px;font-size:11px;background:var(--chip);color:var(--dim);margin-right:6px;vertical-align:1px;font-weight:700}
+.bs-gn .row .c.hot{background:var(--red);color:#fff}
+.bs-gn .row .tt{font-size:14.5px;color:var(--ink)}.bs-gn .row .tt em{font-style:normal;color:var(--red);font-size:12px;margin-left:5px;font-weight:800}
+.bs-gn .row small{display:block;margin-top:5px;font-size:12px;color:var(--dim)}
+.bs-gn .row .th{width:54px;height:54px;border-radius:3px;background:var(--bg2);display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);filter:grayscale(.35) contrast(1.05)}
 .bs-gn .row .th img{width:42px;height:42px;image-rendering:pixelated}
 .bs-gn .pg{display:flex;gap:6px;justify-content:center;padding:18px 0 4px;font-size:13px;color:var(--dim)}.bs-gn .pg b{color:#fff;background:var(--red);border-radius:2px;padding:0 7px}
 .bs-gn.bs-m .wrap{grid-template-columns:minmax(0,1fr);padding:10px}.bs-gn.bs-m .side,.bs-gn.bs-m .hd nav{display:none}.bs-gn.bs-m .hd{padding:0 12px;gap:10px}.bs-gn.bs-m .hd .sr{width:auto;flex:1}.bs-gn.bs-m .gmain{padding:12px 14px}
@@ -2203,6 +2214,15 @@ ${note.trim()}` : card2;
   var peopleEnv = settingsEnv;
   var recordsEnv = settingsEnv;
   var shown2 = false;
+  var appShown = () => shown2;
+  var shownListener = null;
+  function onAppShown(f) {
+    shownListener = f;
+  }
+  function setShown(v) {
+    shown2 = v;
+    shownListener?.(v);
+  }
   var phoneEnv = {
     render: () => render2(),
     refresh: () => refresh2(),
@@ -2673,7 +2693,7 @@ ${note.trim()}` : card2;
     view = { kind: "loading" };
     notice = "";
     render2();
-    shown2 = true;
+    setShown(true);
     if (root2) startCctvFx(root2);
     await showWindow();
     await refresh2();
@@ -2693,7 +2713,7 @@ ${note.trim()}` : card2;
       ensureRoot2();
       view = { kind: "error", message: "선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요." };
       render2();
-      shown2 = true;
+      setShown(true);
       await showWindow();
       return;
     }
@@ -2796,7 +2816,7 @@ ${note.trim()}` : card2;
     render2();
   }
   async function close2() {
-    shown2 = false;
+    setShown(false);
     netSolo = false;
     stopCctvFx();
     await risuai.hideContainer();
@@ -3391,39 +3411,4 @@ ${note.trim()}` : card2;
     root2.dataset.gn = gnKey2;
     if (gnKeep) [".gn .ph-content", ".gn-pane .gn-doc"].forEach((q, i) => {
       const el = root2.querySelector(q);
-      if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
-    });
-    hydratePhotos(root2);
-    root2.querySelectorAll("[data-sh-log]").forEach((el) => el.scrollTop = el.scrollHeight);
-    labelSwitches(root2);
-    bindMapZoom(root2);
-    bindMbar(root2, () => void run4("close"));
-    bindDrawer(root2);
-    bindWikiSide(root2, (v) => void run4("wiki-list", v));
-    bindFootnotes(root2);
-    const stBar = root2.querySelector(".gx-settings > .st-scopebar");
-    if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
-    bindSwipeBack(root2, navStep);
-    if (view.kind === "started") navHist.record(navState());
-    if (view.kind === "started" && inBrowser()) recordTab(navState());
-    saveTabsSoon();
-    root2.querySelectorAll('.gx-nh[data-action^="nav-"]').forEach((b) => b.disabled = !navHist.can(b.dataset.action === "nav-back" ? -1 : 1));
-    setCurrentTheme(themeName(root2.dataset.theme));
-  }
-  var navHist = new NavHistory();
-  function openWallet() {
-    tab = "items";
-    notice = "";
-    field3.confirmEnd = null;
-    cdrOpen = false;
-    resetSettings();
-    applyItemsNav({ sub: "wallet", view: "grid", open: "" });
-    render2();
-  }
-  function navState() {
-    const s8 = { tab };
-    if (inBrowser()) s8.b = curTab().site;
-    if (tab === "wiki") s8.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen, q: wiki.query };
-    if (tab === "records") s8.r = recordsNav();
-    if (tab === "items") s8.i = itemsNav();
-    if (tab === "phone") s8.p = { sub: phone.sub, tab: phone.tab, view: phone.view,
+      if (el && gnKeep[i]) el.scrollTo

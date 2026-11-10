@@ -1,4 +1,31 @@
-" && !loreGender(ctx2.char.globalLore ?? [], row10.lore)) delete row10.gender;
+.some((x) => x.lore === v)) break;
+        try {
+          await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+            const cur = readUnlocked(chat.scriptstate);
+            const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
+            return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue(next) } };
+          });
+          dirUi.done = "이 채팅의 해금 상태를 바꿨어요";
+        } catch (error) {
+          dirUi.notice = `해금 상태를 바꾸지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        await env3.refresh();
+        return true;
+      }
+      case "dir-org-pick": {
+        const at = v.indexOf("|");
+        const row10 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        if (!row10) break;
+        assignOrg(row10, d.orgs.find((o) => o.name === v.slice(0, at)));
+        dirUi.done = "";
+        break;
+      }
+      case "dir-gender": {
+        const at = v.indexOf("|");
+        const row10 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        const g2 = v.slice(0, at);
+        if (!row10 || g2 !== "F" && g2 !== "M" && g2 !== "X") break;
+        if (g2 === loreGender(ctx2.char.globalLore ?? [], row10.lore) || g2 === "X" && !loreGender(ctx2.char.globalLore ?? [], row10.lore)) delete row10.gender;
         else row10.gender = g2;
         dirUi.done = "";
         break;
@@ -2922,18 +2949,4 @@ ${tail2}`;
     const clock4 = o.settings.features.has("rhythm") ? rhythmClock(store2, chat, live, last2) : void 0;
     const review = o.only?.length ? [] : chosen.filter((n2) => {
       const p2 = store2.people[n2];
-      const relTurn = Math.max(-1, ...["relationship", "register.stage_assessment"].flatMap((k) => liveEntries(p2.slots[k], live).filter((e) => !e.target || e.target === "@user").map((e) => turnAt(chat, live.at.get(e.anchor) ?? 0))));
-      const since = Math.max(relTurn, p2.reviewTurn ?? -1);
-      if (since < 0 || turn2 - since < REVIEW_TURNS) return false;
-      const after = (e) => turnAt(chat, live.at.get(e.anchor) ?? 0) > since;
-      return liveEntries(p2.slots.history, live).some(after) || Object.values(store2.docs).some((d) => d.type === "event" && liveEntries(d.entries, live).some(after));
-    });
-    const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i2]) => i2 === o.shop.at)?.[0] ?? "" : "";
-    const data3 = {
-      request_ref: `pp_${Date.now().toString(36)}`,
-      cues: o.settings.features.has("affinity") && !o.settings.qualitative.has("affinity") ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
-      slots: slotsFor(o.settings.features, o.settings.qualitative),
-      doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t))),
-      people: chosen.map((n2) => {
-        const p2 = store2.people[n2];
-        return { ...personPayload(p2, live, changes, wantNote || o.settings.features.has("perception") ? unknownTo(p2, 
+      const relTurn = Math.max(-1, ...["r

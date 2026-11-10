@@ -1,4 +1,18 @@
-store2, live) : void 0, { taste: o.settings.features.has("taste"), openness: o.settings.features.has("openness"), axes: o.settings.features.has("axes"), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings }), values: o.values[n2] ?? "" };
+elationship", "register.stage_assessment"].flatMap((k) => liveEntries(p2.slots[k], live).filter((e) => !e.target || e.target === "@user").map((e) => turnAt(chat, live.at.get(e.anchor) ?? 0))));
+      const since = Math.max(relTurn, p2.reviewTurn ?? -1);
+      if (since < 0 || turn2 - since < REVIEW_TURNS) return false;
+      const after = (e) => turnAt(chat, live.at.get(e.anchor) ?? 0) > since;
+      return liveEntries(p2.slots.history, live).some(after) || Object.values(store2.docs).some((d) => d.type === "event" && liveEntries(d.entries, live).some(after));
+    });
+    const shopM = o.shop && !o.only?.length && confirmedIdx.has(o.shop.at) ? [...tags].find(([, i2]) => i2 === o.shop.at)?.[0] ?? "" : "";
+    const data3 = {
+      request_ref: `pp_${Date.now().toString(36)}`,
+      cues: o.settings.features.has("affinity") && !o.settings.qualitative.has("affinity") ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+      slots: slotsFor(o.settings.features, o.settings.qualitative),
+      doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t))),
+      people: chosen.map((n2) => {
+        const p2 = store2.people[n2];
+        return { ...personPayload(p2, live, changes, wantNote || o.settings.features.has("perception") ? unknownTo(p2, store2, live) : void 0, { taste: o.settings.features.has("taste"), openness: o.settings.features.has("openness"), axes: o.settings.features.has("axes"), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative, sexual: o.settings }), values: o.values[n2] ?? "" };
       }),
       known_names: Object.keys(store2.people),
       ...o.hints?.length ? { name_hints: o.hints.filter((h) => !store2.people[h.name]).slice(0, 12) } : {},
@@ -2739,10 +2753,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       return `<section class="pp-slot"><h4 title="${esc31(SLOT_HELP[s8])}">${esc31(SLOT_LABEL[s8])}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s8}`, (e, st) => entryRow(ctx2, name, s8, e, live, st))}</section>`;
     };
     const groups = SLOT_GROUPS.map((g2) => {
-      const body5 = g2.slots.map(slotSection).join("");
-      return body5 ? `<details class="ps-adv-sub pp-group" data-keep="pp-group:${g2.key}"${keepOpen(`pp-group:${g2.key}`)} open><summary title="${esc31(g2.help)}">${esc31(g2.title)}<b>${g2.slots.reduce((n2, s8) => n2 + (enabledSlots.has(s8) ? liveEntries(p2.slots[s8] ?? [], live).length : 0), 0)}</b></summary><div class="pp-group-body">${body5}</div></details>` : "";
-    }).join("");
-    const hiddenN = FEATURE_SLOTS.filter((s8) => !enabledSlots.has(s8) && (p2.slots[s8]?.length ?? 0) > 0).length;
-    const slots = CORE_SLOTS.map(slotSection).join("") + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : "");
-    const mine = store2.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
-    const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : 
+      const body5 = g2.slots.ma

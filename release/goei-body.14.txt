@@ -1,4 +1,19 @@
-gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); }
+rgin: 0; }
+.adv-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
+.ps-adv-sub { border: 1px solid var(--line); border-radius: 16px; background: var(--void); }
+.ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 46px; padding: 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
+.ps-adv-sub > .ps-rows { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .ps-adv-body { padding: 4px 10px 12px; }
+  .adv-numrow { padding: 10px 8px 10px 12px; gap: 8px; }
+}
+/* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
+.gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
+.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
+.gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
+
+/* 명부 괴이·특수 사진 고르기 */
+.dir-photo { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); }
 .dir-photo .dir-pic-img { width: 52px; height: 52px; }
 .dir-photo-name { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .dir-photo-name b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1971,15 +1986,4 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-gn .side{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:8px;align-self:start}
 .bs-gn .side button{display:block;padding:8px 12px;color:var(--dim);font-size:13.5px;border-radius:3px}
 .bs-gn .side button.on{background:var(--hd);color:var(--hdi);font-weight:800}
-.bs-gn .side h6{margin:10px 12px 4px;font-size:11px;color:var(--dim);opacity:.8;font-weight:700;letter-spacing:.05em}
-.bs-gn .gmain{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
-.bs-gn .bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.bs-gn .bh h2{margin:0;font-size:19px}
-.bs-gn .bh .w{padding:7px 14px;border-radius:3px;background:var(--red);color:#fff;font-weight:800;font-size:13px}
-.bs-gn .sort{display:flex;gap:14px;font-size:13px;color:var(--dim);padding:6px 0 10px;border-bottom:2px solid var(--ink)}.bs-gn .sort button.on{color:var(--ink)}
-.bs-gn .row{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:14px;padding:12px 4px;border-bottom:1px dashed var(--line);align-items:center}
-.bs-gn .row .c{display:inline-block;padding:1px 6px;border-radius:2px;font-size:11px;background:var(--chip);color:var(--dim);margin-right:6px;vertical-align:1px;font-weight:700}
-.bs-gn .row .c.hot{background:var(--red);color:#fff}
-.bs-gn .row .tt{font-size:14.5px;color:var(--ink)}.bs-gn .row .tt em{font-style:normal;color:var(--red);font-size:12px;margin-left:5px;font-weight:800}
-.bs-gn .row small{display:block;margin-top:5px;font-size:12px;color:var(--dim)}
-.bs-gn .row .th{width:54px;height:54px;border-radius:3px;background:var(--bg2);display:grid;place-items:center;overflow:hidden;border:1px solid
+.bs-gn .side h6{margin:10px 12px 4px;font-size:11px;color:var(--dim);opacity:.8;font-

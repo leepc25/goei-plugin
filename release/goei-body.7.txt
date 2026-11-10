@@ -1,4 +1,16 @@
-criptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
+    }
+    const notice2 = phone.notice;
+    await refreshInbox({ ...ctx2, chat: saved2 }, env3, true, joint);
+    if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
+  }
+  async function autoView(ctx2, messageIndex, env3) {
+    const set2 = viewSettings(ctx2.chat.scriptstate);
+    if (!(env3 ? set2.auto === "open" : set2.auto === "turn") || phoneBusy(ctx2)) return;
+    const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data3.trim()) return;
+    const stamp = `${messageIndex}:${data3.length}`;
+    if (String(ctx2.chat.scriptstate?.[PH_VIEW_LAST] ?? "") === stamp) return;
+    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
     if (!saved2) return;
     const notice2 = phone.notice;
     await makeView({ ...ctx2, chat: saved2 }, env3 ?? envForAuto(ctx2), true);
@@ -3408,8 +3420,4 @@ ${p2.body}`.toLowerCase().includes(q)));
   var searchInput = (ph) => `<input name="gn-q" data-enter="gn-search" value="${esc11(gnet.q)}" placeholder="${esc11(ph)}" aria-label="${esc11(ph)}">`;
   var writeBtn = (cls, label2 = "글쓰기") => `<button class="${cls}" data-action="gn-write">${label2}</button>`;
   var emptyList = (busy6, text4) => `<div class="bs-empty"><p>${text4}</p><div class="bs-ebt"><button class="bs-w" data-action="gn-refresh" ${busy6 ? "disabled" : ""}>${busy6 ? "불러오는 중…" : "새로고침"}</button>${writeBtn("bs-w")}</div></div>`;
-  var none2 = (list4) => !list4.length ? '<p class="bs-none">해당하는 글이 없어요.</p>' : "";
-  var onCat = (v) => gnet.sub === "board" && gnet.cat === v;
-  var catBtn = (v, label2, cls = "", extra = "") => `<button class="${[cls, onCat(v) ? "on" : ""].filter(Boolean).join(" ")}" data-action="gn-cat" data-value="${esc11(v)}" aria-pressed="${onCat(v)}">${esc11(label2)}${extra}</button>`;
-  var dmBtn = (st, unreadDm, label2 = "쪽지함", cls = "") => `<button class="${[cls, gnet.sub === "dm" ? "on" : ""].filter(Boolean).join(" ")}" data-action="gn-sub" data-value="dm" aria-pressed="${gnet.sub === "dm"}">${label2}${unreadDm ? ` <b class="bs-new">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ""}</button>`;
-  var ipOf = (id2) => `${id2
+  var none2 = (list4) => !list4.lengt

@@ -1,4 +1,39 @@
- room: phone.room, n: phone.openNotice };
+p = gnKeep[i];
+    });
+    hydratePhotos(root2);
+    root2.querySelectorAll("[data-sh-log]").forEach((el) => el.scrollTop = el.scrollHeight);
+    labelSwitches(root2);
+    bindMapZoom(root2);
+    bindMbar(root2, () => void run4("close"));
+    bindDrawer(root2);
+    bindWikiSide(root2, (v) => void run4("wiki-list", v));
+    bindFootnotes(root2);
+    const stBar = root2.querySelector(".gx-settings > .st-scopebar");
+    if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
+    bindSwipeBack(root2, navStep);
+    if (view.kind === "started") navHist.record(navState());
+    if (view.kind === "started" && inBrowser()) recordTab(navState());
+    saveTabsSoon();
+    root2.querySelectorAll('.gx-nh[data-action^="nav-"]').forEach((b) => b.disabled = !navHist.can(b.dataset.action === "nav-back" ? -1 : 1));
+    setCurrentTheme(themeName(root2.dataset.theme));
+  }
+  var navHist = new NavHistory();
+  function openWallet() {
+    tab = "items";
+    notice = "";
+    field3.confirmEnd = null;
+    cdrOpen = false;
+    resetSettings();
+    applyItemsNav({ sub: "wallet", view: "grid", open: "" });
+    render2();
+  }
+  function navState() {
+    const s8 = { tab };
+    if (inBrowser()) s8.b = curTab().site;
+    if (tab === "wiki") s8.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen, q: wiki.query };
+    if (tab === "records") s8.r = recordsNav();
+    if (tab === "items") s8.i = itemsNav();
+    if (tab === "phone") s8.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
     if (tab === "gnet") s8.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === "post" || gnet.compose?.kind === "newdm" ? gnet.compose : null };
     if (tab === "map" || tab === "mission") s8.f = field3.step;
     if (tab === "settings") s8.d = dirUi.open;
@@ -478,8 +513,9 @@
   function renderShopCard(text4) {
     const tag = findShopTag(text4);
     if (!tag) return text4;
-    armChatClick("shop");
     const site = webSiteOfOwner(tag.owner);
+    if (!site && /^@web\b/i.test(tag.owner.trim())) return stripShopTags(text4);
+    armChatClick("shop");
     if (site) drawn.add(site);
     const p2 = cardPalette(currentTheme());
     const card2 = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc41(tag.shop)}</b></span><button type="button" data-goei-shop="${esc41(site || "1")}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">${site ? "접속하기" : "상점 열기"}</button></div>`;
@@ -1181,7 +1217,7 @@ ${texts.anomaly}`;
           await fab.setVersus(pad, vsOpen()).catch(() => {
           });
         }
-        const pShow = next.fabVisible && progressOn();
+        const pShow = next.fabVisible && progressOn() && !appShown();
         const pKey = `${pShow}`;
         if (prog && pKey !== progKey) {
           progKey = pKey;
@@ -1223,6 +1259,14 @@ ${texts.anomaly}`;
     setRecordsOpener((id2) => void openRecords2(id2));
     setRepickOpener(() => void openApp({ quietIfNotLite: true }));
     setShopOpener((site) => void openShop(site));
+    onAppShown((open4) => {
+      if (!prog) return;
+      if (open4) {
+        progKey = "false";
+        void prog.setVisible(false).catch(() => {
+        });
+      } else progKey = "";
+    });
     let stopWatcher = null;
     let fab = null;
     try {

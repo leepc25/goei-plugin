@@ -1,4 +1,10 @@
-'<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
+p(slotSection).join("");
+      return body5 ? `<details class="ps-adv-sub pp-group" data-keep="pp-group:${g2.key}"${keepOpen(`pp-group:${g2.key}`)} open><summary title="${esc31(g2.help)}">${esc31(g2.title)}<b>${g2.slots.reduce((n2, s8) => n2 + (enabledSlots.has(s8) ? liveEntries(p2.slots[s8] ?? [], live).length : 0), 0)}</b></summary><div class="pp-group-body">${body5}</div></details>` : "";
+    }).join("");
+    const hiddenN = FEATURE_SLOTS.filter((s8) => !enabledSlots.has(s8) && (p2.slots[s8]?.length ?? 0) > 0).length;
+    const slots = CORE_SLOTS.map(slotSection).join("") + groups + (hiddenN ? `<p class="ps-note">꺼진 기능의 칸 ${hiddenN}개는 숨겨져 있어요 (기능을 켜면 돌아와요).</p>` : "");
+    const mine = store2.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
+    const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
     const busyNow = peopleUi.busy || peopleStatus().busy ? "disabled" : "";
     const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc31(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[["10", "최근 10개"], ["20", "최근 20개"], ["50", "최근 50개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc31(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·필드·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
     return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
@@ -1174,7 +1180,7 @@
     const list4 = ownShops(vars);
     const text4 = (o, key, ph, len) => `<input class="st-text" type="text" maxlength="${len}" value="${esc34(o[key])}" data-change="set-own" data-key="${esc34(o.id)}:${key}" placeholder="${ph}" aria-label="${ph}"${busy6 ? " disabled" : ""}>`;
     const rows3 = list4.map((o) => `<div class="ms-fx${o.on ? "" : " off"}">
-      <div class="ms-fx-head">${text4(o, "name", "상점 이름 (로어 이름 그대로)", 30)}${seg8("set-own-on", o.on ? `${o.id}:1` : `${o.id}:0`, [[`${o.id}:1`, "ON"], [`${o.id}:0`, "OFF"]], busy6)}<button class="gx-mini danger" data-action="set-own-del" data-value="${esc34(o.id)}" aria-label="지우기"${busy6 ? " disabled" : ""}>×</button></div>
+      <div class="ms-fx-head">${text4(o, "name", "상점 이름 (로어 이름 그대로)", 30)}${switchHtml({ action: "set-own-on", value: o.on ? `${o.id}:0` : `${o.id}:1`, on: o.on, disabled: busy6, label: `${o.name || "고유 상점"} 켜고 끄기` })}<button class="gx-mini danger" data-action="set-own-del" data-value="${esc34(o.id)}" aria-label="지우기"${busy6 ? " disabled" : ""}>×</button></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>다른 이름</span>${text4(o, "alias", "쉼표로 나눠서 (예: 포인트몰, 복지몰)", 120)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>인터넷 접속</span>${seg8("set-own-web", `${o.id}:${o.web || "none"}`, OWN_WEB.map(([v, l]) => [`${o.id}:${v}`, l]), busy6)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>직접 가면</span>${seg8("set-own-visit", `${o.id}:${o.visit || "none"}`, OWN_VISIT.map(([v, l]) => [`${o.id}:${v}`, l]), busy6)}</span></div>
@@ -3112,18 +3118,4 @@
         if (s8 === 2) {
           hits.push({ kind, name: r.name, sub: extra, state: r.state, s: s8 });
           continue;
-        }
-        if (s8 >= 0) hits.push({ kind, name: r.name, sub: r.sub, state: r.state, s: s8 });
-      }
-    }
-    hits.sort((a, b) => a.s - b.s);
-    const top = hits.slice(0, 60);
-    if (!top.length) return '<p class="gw-find-none">맞는 기록이 없어요.</p>';
-    const st = (x) => x === "deleted" ? " (지움)" : x === "new" ? " (추가)" : x === "edited" ? " (고침)" : "";
-    return `<div class="gw-tree-group gw-find-res"><h4>찾은 기록 ${hits.length}개${hits.length > top.length ? ` (앞 ${top.length}개)` : ""}</h4>${top.map((h) => `<button class="gw-tree-item gw-find-hit" data-action="ed-goto" data-value="${esc36(`${h.kind}|${h.name}`)}">${WORLD_FIND_ICON[h.kind]}<span><b>${esc36(h.name)}</b><small>${esc36(WORLD_KIND_LABEL[h.kind])}${h.sub ? ` · ${esc36(h.sub)}` : ""}${st(h.state)}</small></span></button>`).join("")}</div>`;
-  }
-  function tree(ctx2) {
-    const counts = treeCounts(ctx2);
-    const on2 = featureState(ctx2);
-    const tab2 = tabOf(edUi.node);
-    const find = tab2 === "set" ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc36(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">` : tab2 === "world" ? `<input class="gw-find" type="search" data-input="ed-wq" value="${esc36(edUi.wq)}" placeholder="세계 
+       

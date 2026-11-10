@@ -1,4 +1,17 @@
-onst e of list4) {
+        if (c.uses !== void 0 && cur.uses !== void 0) {
+          it = setItemLeft(it, alive, cur.id, c.uses);
+          if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, "gone", "story", c.anchor, { quote: c.quote, note: "다 씀" });
+        }
+      } else if (c.action === "new") {
+        it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, weight: c.weight, from: "story", anchor: c.anchor, quote: c.quote });
+      }
+    }
+    return it;
+  }
+  function startItemsState(list4, at = (/* @__PURE__ */ new Date()).toISOString()) {
+    let it = { list: [], log: [] };
+    const alive = /* @__PURE__ */ new Set();
+    for (const e of list4) {
       it = addItem(it, alive, {
         name: e.name,
         desc: e.desc,
@@ -4276,16 +4289,3 @@ ${RETRY_ANALYZE}` }
       directory(ctx2.char.globalLore, saved2);
     } catch {
       return;
-    }
-    const notice2 = phone.notice;
-    await refreshInbox({ ...ctx2, chat: saved2 }, env3, true, joint);
-    if (!env3 && envForAuto(ctx2) === quietEnv) phone.notice = notice2;
-  }
-  async function autoView(ctx2, messageIndex, env3) {
-    const set2 = viewSettings(ctx2.chat.scriptstate);
-    if (!(env3 ? set2.auto === "open" : set2.auto === "turn") || phoneBusy(ctx2)) return;
-    const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
-    if (!data3.trim()) return;
-    const stamp = `${messageIndex}:${data3.length}`;
-    if (String(ctx2.chat.scriptstate?.[PH_VIEW_LAST] ?? "") === stamp) return;
-    const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.s

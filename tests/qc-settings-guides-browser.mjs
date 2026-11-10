@@ -178,7 +178,9 @@ for (const vp of vps) {
   await goNode(page, 'rule:all');
   assert.ok((await page.textContent('.gw .gw-head-act')).includes('99/100'));
   await clickSel(page, '.gw [data-action="ed-rule-new"]');
-  await page.waitForSelector('.gw textarea[data-input="ed-rule-text"]');
+  // 한 페이지에 접는 칸 100개: 앞 99개는 접혀 있으니 칸 수로 본다 (새 칸만 펼친 채)
+  await page.waitForFunction(() => document.querySelectorAll('.gw details.gw-rule').length === 100);
+  assert.equal(await page.$$eval('.gw details.gw-rule[open]', (els) => els.length), 1, '새 규칙 칸만 펼친 채');
   assert.equal((await prefsOf(page)).rules.length, 100);
   await goNode(page, 'rule:all');
   assert.equal(await page.isDisabled('.gw [data-action="ed-rule-new"]'), true, '100개면 새 규칙 잠김');
@@ -241,7 +243,7 @@ for (const vp of vps) {
     else {
       assert.ok(btn, '카드가 낡으면 업데이트로 가는 단추');
       await clickSel(p2, '.gw .gw-setbody [data-action="ed-node"][data-value="set:update"]');
-      await p2.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'set:update');
+      await p2.waitForFunction(() => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'install'); // 11-09: 업데이트는 설치·업데이트 페이지로 합쳐짐
     }
     await p2.close();
   }
@@ -249,7 +251,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw .gw-setbody');
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('실패한 요청이 없어요'));
   await page.waitForFunction(() => !document.querySelector('.gw .gw-setbody')?.textContent?.includes('읽는 중'));
-  assert.ok((await page.textContent('.gw .gw-setbody')).includes('아직 갱신 기록이 없어요'));
+  // 11-09: 인물 갱신 기록은 「실패 기록」에서 빠져 「인물 기록 점검」 페이지로 갔다
   // 진단 묶음 (2026-11-06): 판·설정·실패·갱신 기록을 JSON 하나로. 단추를 누르면 내려받기 안내가 머리에 뜬다
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('진단 묶음'), '진단 묶음 칸');
   await clickSel(page, '.gw [data-action="man-diag-download"]');

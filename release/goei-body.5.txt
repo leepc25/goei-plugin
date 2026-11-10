@@ -4060,15 +4060,15 @@ ${webRaw}` };
     const closed = st.closed || kick && r.closed;
     return { ...st, items: items.slice(0, 40), talk: talk.slice(-40), closed, sell: closed ? null : sell, ...notes.length ? { notes } : {}, ...quotes.length ? { quotes } : {} };
   }
-  function acceptQuote(st, id2) {
+  function acceptQuote(st, id2, key = "") {
     const q = (st.quotes ?? []).find((x) => x.id === id2 && !x.accepted);
     if (!q) return null;
-    return { ...st, quotes: (st.quotes ?? []).map((x) => x.id === id2 ? { ...x, accepted: true } : x) };
+    return { ...st, quotes: (st.quotes ?? []).map((x) => x.id === id2 ? { ...x, accepted: true, ...key ? { acceptedKey: key } : {} } : x) };
   }
-  function buyNote(st, id2) {
+  function buyNote(st, id2, key = "") {
     const n2 = (st.notes ?? []).find((x) => x.id === id2 && !x.bought);
     if (!n2) return null;
-    return { ...st, notes: (st.notes ?? []).map((x) => x.id === id2 ? { ...x, bought: true } : x) };
+    return { ...st, notes: (st.notes ?? []).map((x) => x.id === id2 ? { ...x, bought: true, ...key ? { boughtKey: key } : {} } : x) };
   }
   function startSell(st, it) {
     return { ...st, sell: { itemId: it.itemId, name: clean2(it.name, 30), desc: clean2(it.desc, 120), effect: clean2(it.effect, 60), ...traitsOf(it), ...it.truth ? { truth: clean2(it.truth, 60) } : {}, ...Number.isSafeInteger(it.paid) ? { paid: it.paid } : {} } };
@@ -4083,10 +4083,23 @@ ${webRaw}` };
     const talk = [...st.talk, { who: "me", text: clean2(text4, 300) }];
     return { ...st, talk: talk.slice(-40) };
   }
-  function markSold(st, id2) {
+  function markSold(st, id2, key = "") {
     const it = st.items.find((x) => x.id === id2 && !x.sold);
     if (!it) return st;
-    return { ...st, items: st.items.map((x) => x.id === id2 ? { ...x, sold: true } : x) };
+    return { ...st, items: st.items.map((x) => x.id === id2 ? { ...x, sold: true, ...key ? { soldKey: key } : {} } : x) };
+  }
+  function reviveShop(st, alive) {
+    const dead = (k) => !!k && !alive.has(k);
+    const drop = (x, flag2, keyName) => {
+      const { [flag2]: _f, [keyName]: _k, ...rest } = x;
+      return rest;
+    };
+    return {
+      ...st,
+      items: st.items.map((x) => x.sold && dead(x.soldKey) ? drop(x, "sold", "soldKey") : x),
+      ...st.notes ? { notes: st.notes.map((n2) => n2.bought && dead(n2.boughtKey) ? drop(n2, "bought", "boughtKey") : n2) } : {},
+      ...st.quotes ? { quotes: st.quotes.map((q) => q.accepted && dead(q.acceptedKey) ? drop(q, "accepted", "acceptedKey") : q) } : {}
+    };
   }
   var shelfItems = (st) => st.items.filter((x) => !x.sold);
   var soldItems = (st) => st.items.filter((x) => x.sold);
@@ -4772,17 +4785,3 @@ ${guide}` : ""}` : "";
           ...c.icon ? { icon: c.icon } : {},
           ...c.weight !== void 0 ? { weight: c.weight } : {}
         });
-        if (c.uses !== void 0 && cur.uses !== void 0) {
-          it = setItemLeft(it, alive, cur.id, c.uses);
-          if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, "gone", "story", c.anchor, { quote: c.quote, note: "다 씀" });
-        }
-      } else if (c.action === "new") {
-        it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? void 0, state: c.state, icon: c.icon, weight: c.weight, from: "story", anchor: c.anchor, quote: c.quote });
-      }
-    }
-    return it;
-  }
-  function startItemsState(list4, at = (/* @__PURE__ */ new Date()).toISOString()) {
-    let it = { list: [], log: [] };
-    const alive = /* @__PURE__ */ new Set();
-    for (c

@@ -1,4 +1,18 @@
-검색 (요원·조직·괴이·파밍·부록)" aria-label="세계 검색" autocomplete="off">` : "";
+ }
+        if (s8 >= 0) hits.push({ kind, name: r.name, sub: r.sub, state: r.state, s: s8 });
+      }
+    }
+    hits.sort((a, b) => a.s - b.s);
+    const top = hits.slice(0, 60);
+    if (!top.length) return '<p class="gw-find-none">맞는 기록이 없어요.</p>';
+    const st = (x) => x === "deleted" ? " (지움)" : x === "new" ? " (추가)" : x === "edited" ? " (고침)" : "";
+    return `<div class="gw-tree-group gw-find-res"><h4>찾은 기록 ${hits.length}개${hits.length > top.length ? ` (앞 ${top.length}개)` : ""}</h4>${top.map((h) => `<button class="gw-tree-item gw-find-hit" data-action="ed-goto" data-value="${esc36(`${h.kind}|${h.name}`)}">${WORLD_FIND_ICON[h.kind]}<span><b>${esc36(h.name)}</b><small>${esc36(WORLD_KIND_LABEL[h.kind])}${h.sub ? ` · ${esc36(h.sub)}` : ""}${st(h.state)}</small></span></button>`).join("")}</div>`;
+  }
+  function tree(ctx2) {
+    const counts = treeCounts(ctx2);
+    const on2 = featureState(ctx2);
+    const tab2 = tabOf(edUi.node);
+    const find = tab2 === "set" ? `<input class="gw-find" type="search" data-input="ed-sq" value="${esc36(edUi.sq)}" placeholder="설정 찾기 (예: 테마, 새로고침)" aria-label="설정 찾기" autocomplete="off">` : tab2 === "world" ? `<input class="gw-find" type="search" data-input="ed-wq" value="${esc36(edUi.wq)}" placeholder="세계 검색 (요원·조직·괴이·파밍·부록)" aria-label="세계 검색" autocomplete="off">` : "";
     if (tab2 === "set" && edUi.sq.trim()) return `${find}<div class="gw-find-out">${findResults(ctx2)}</div>`;
     if (tab2 === "world" && edUi.wq.trim()) return `${find}<div class="gw-find-out">${worldFindResults(ctx2)}</div>`;
     const wrap = tab2 === "set" || tab2 === "world";
@@ -2553,19 +2567,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .adv-step span { font-size: 13px; color: var(--dim); white-space: nowrap; }
 .adv-step input.adv-val { -moz-appearance: textfield; appearance: textfield; }
 .adv-step input.adv-val::-webkit-inner-spin-button, .adv-step input.adv-val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-.adv-chips .gx-chips { margin: 0; }
-.adv-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
-.ps-adv-sub { border: 1px solid var(--line); border-radius: 16px; background: var(--void); }
-.ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 46px; padding: 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
-.ps-adv-sub > .ps-rows { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .ps-adv-body { padding: 4px 10px 12px; }
-  .adv-numrow { padding: 10px 8px 10px 12px; gap: 8px; }
-}
-/* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
-.gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
-.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
-.gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
-
-/* 명부 괴이·특수 사진 고르기 */
-.dir-photo { display: flex; align-items: center; 
+.adv-chips .gx-chips { ma
