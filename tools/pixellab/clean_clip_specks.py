@@ -41,6 +41,19 @@ def clean(a):
         if not kill.any(): break
         a[kill,3]=0; peeled+=int(kill.sum())
     log['peeled']=peeled
+    # 머리·어깨 바깥에 붙은 작은 밝은 덩어리(흰 점 섞인 찌꺼기): 밝은 픽셀끼리 묶어 25px 미만이고 바깥(투명)에 닿으면 지움
+    rgb=a[...,:3].astype(int); lt=(rgb.max(-1)>=70)&(a[...,3]>0); lt[:,XMAX:]=False
+    lab,n=label(lt); tr=a[...,3]==0; p=np.pad(tr,1,constant_values=True)
+    nbt=p[:-2,1:-1]|p[2:,1:-1]|p[1:-1,:-2]|p[1:-1,2:]
+    blobs=0
+    for k in range(1,n+1):
+        m=lab==k
+        if m.sum()<25 and (m&nbt).any(): a[m,3]=0; blobs+=int(m.sum())
+    log['blobs']=blobs
+    # 벗겨 낸 뒤 떨어져 남은 작은 점 한 번 더
+    lab,n=label(a[...,3]>0); sz=np.bincount(lab.ravel())
+    for k in range(1,n+1):
+        if sz[k]<30: a[lab==k,3]=0; log['dots']+=int(sz[k])
     tr=a[...,3]==0; lab,n=label(tr); H,W=tr.shape
     edge=set(np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])))
     filled=0
