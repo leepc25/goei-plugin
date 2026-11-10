@@ -7,203 +7,251 @@
    "ko": "말하기",
    "ver": "1",
    "src": "anim_hostB2_talk_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "laugh",
    "ko": "웃음",
    "ver": "1",
    "src": "anim_hostB2_laugh_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "filler"
   },
   {
    "name": "laugh",
    "ko": "웃음",
    "ver": "2",
    "src": "anim_hostB3_laugh_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "filler"
   },
   {
    "name": "urgent",
    "ko": "매진 임박",
    "ver": "1",
    "src": "anim_hostB2_urgent_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "cold",
    "ko": "차가워짐",
    "ver": "1",
    "src": "anim_hostB2_cold_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "cold",
    "ko": "차가워짐",
    "ver": "2",
    "src": "anim_hostB3_cold_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "gape",
    "ko": "입 크게 벌리기",
    "ver": "1",
    "src": "anim_hostB3_gape_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "grin",
    "ko": "찢어지는 미소",
    "ver": "1",
    "src": "anim_hostB2_grin_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "grin",
    "ko": "찢어지는 미소",
    "ver": "2",
    "src": "anim_hostB3_grin_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "stare",
    "ko": "굳은 응시",
    "ver": "1",
    "src": "anim_hostB2_stare_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "stare",
    "ko": "굳은 응시",
    "ver": "2",
    "src": "anim_hostB3_stare_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "twitch",
    "ko": "경련",
    "ver": "1",
    "src": "anim_hostB2_twitch_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "twitch",
    "ko": "경련",
    "ver": "2",
    "src": "anim_hostB3_twitch_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "silentlaugh",
    "ko": "소리 없는 웃음",
    "ver": "1",
    "src": "anim_hostB2_silentlaugh_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "silentlaugh",
    "ko": "소리 없는 웃음",
    "ver": "2",
    "src": "anim_hostB3_silentlaugh_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "spin",
    "ko": "머리 한 바퀴",
    "ver": "1",
    "src": "anim_hostB2_spin_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "spin",
    "ko": "머리 한 바퀴",
    "ver": "2",
    "src": "anim_hostB3_spin_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "blacktears",
    "ko": "검은 눈물",
    "ver": "1",
    "src": "anim_hostB2_blacktears_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "flip",
    "ko": "머리 뒤집기",
    "ver": "1",
    "src": "anim_hostB2_flip_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "flip",
    "ko": "머리 뒤집기",
    "ver": "2",
    "src": "anim_hostB3_flip_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "tilt",
    "ko": "고개 꺾기",
    "ver": "1",
    "src": "anim_hostB2_tilt_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "tilt",
    "ko": "고개 꺾기",
    "ver": "2",
    "src": "anim_hostB3_tilt_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "rare"
   },
   {
    "name": "excited",
    "ko": "신남",
    "ver": "1",
    "src": "anim_hostB2_excited_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "count",
    "ko": "할부 세기",
    "ver": "1",
    "src": "anim_hostB2_count_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "amazed",
    "ko": "놀람",
    "ver": "1",
    "src": "anim_hostB2_amazed_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "whisper",
    "ko": "속삭임",
    "ver": "1",
    "src": "anim_hostB2_whisper_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "angry",
    "ko": "화남",
    "ver": "1",
    "src": "anim_hostB2_angry_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "event"
   },
   {
    "name": "idle",
    "ko": "대기",
    "ver": "1",
    "src": "anim_hostB2_idle_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "base"
   },
   {
    "name": "idle",
    "ko": "대기",
    "ver": "2",
    "src": "anim_hostB3_idle_clean2",
-   "frames": 17
+   "frames": 17,
+   "group": "filler"
   }
- ]
+ ],
+ "play_rules": {
+  "_note": "11-10 19:31 사용자 「대기2를 계속 틀면 넥타이만 만짐 → 가끔」. 기본값일 뿐, 전부 설정에서 고침(규칙 45).",
+  "base": "아무 일 없을 때 계속 반복",
+  "filler": {
+   "every_base_loops": [
+    3,
+    6
+   ],
+   "no_repeat_in_row": true,
+   "cooldown_loops": 8
+  },
+  "event": "진행자 대사·방송 사건(가격 공개·매진·전화 연결)에 맞춰서만",
+  "rare": {
+   "chance_per_filler_slot": 0.1,
+   "cooldown_loops": 20,
+   "or_on_event": "차가워지는 순간 등"
+  },
+  "same_motion_versions": "1·2판은 번갈아"
+ }
 }
