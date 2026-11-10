@@ -1,4 +1,4 @@
-2
+0
 - 사용자 11-10 20:54 KST 「뽑아」 → 컷 F v8 무대 뒤에서 방청석 참고O 1회 + 참고X 1회
 - 사용자 11-10 20:42 KST 「뽑아」 → 컷 F v7 무대+방청석 참고O 1회 + 참고X 1회
 - 사용자 11-10 20:31 KST 「레퍼런스 넣고 1장 안넣고 1장 2장 동시에 뽑아」 → 컷 F v6 빈 방청석 참고O 1회 + 참고X 1회
@@ -396,3 +396,5 @@
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v6b_empty_noref_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v7b_empty_noref_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v7_empty_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v8b_empty_noref_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutF/cutF_v8_empty_req.json
