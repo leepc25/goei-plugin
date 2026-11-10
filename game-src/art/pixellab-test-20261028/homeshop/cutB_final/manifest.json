@@ -1,0 +1,209 @@
+{
+ "base": "cutB_host_v9face2_nowhite3.png",
+ "plate": "cutB_plate_v4.png",
+ "clips": [
+  {
+   "name": "talk",
+   "ko": "말하기",
+   "ver": "1",
+   "src": "anim_hostB2_talk_clean2",
+   "frames": 17
+  },
+  {
+   "name": "laugh",
+   "ko": "웃음",
+   "ver": "1",
+   "src": "anim_hostB2_laugh_clean2",
+   "frames": 17
+  },
+  {
+   "name": "laugh",
+   "ko": "웃음",
+   "ver": "2",
+   "src": "anim_hostB3_laugh_clean2",
+   "frames": 17
+  },
+  {
+   "name": "urgent",
+   "ko": "매진 임박",
+   "ver": "1",
+   "src": "anim_hostB2_urgent_clean2",
+   "frames": 17
+  },
+  {
+   "name": "cold",
+   "ko": "차가워짐",
+   "ver": "1",
+   "src": "anim_hostB2_cold_clean2",
+   "frames": 17
+  },
+  {
+   "name": "cold",
+   "ko": "차가워짐",
+   "ver": "2",
+   "src": "anim_hostB3_cold_clean2",
+   "frames": 17
+  },
+  {
+   "name": "gape",
+   "ko": "입 크게 벌리기",
+   "ver": "1",
+   "src": "anim_hostB3_gape_clean2",
+   "frames": 17
+  },
+  {
+   "name": "grin",
+   "ko": "찢어지는 미소",
+   "ver": "1",
+   "src": "anim_hostB2_grin_clean2",
+   "frames": 17
+  },
+  {
+   "name": "grin",
+   "ko": "찢어지는 미소",
+   "ver": "2",
+   "src": "anim_hostB3_grin_clean2",
+   "frames": 17
+  },
+  {
+   "name": "stare",
+   "ko": "굳은 응시",
+   "ver": "1",
+   "src": "anim_hostB2_stare_clean2",
+   "frames": 17
+  },
+  {
+   "name": "stare",
+   "ko": "굳은 응시",
+   "ver": "2",
+   "src": "anim_hostB3_stare_clean2",
+   "frames": 17
+  },
+  {
+   "name": "twitch",
+   "ko": "경련",
+   "ver": "1",
+   "src": "anim_hostB2_twitch_clean2",
+   "frames": 17
+  },
+  {
+   "name": "twitch",
+   "ko": "경련",
+   "ver": "2",
+   "src": "anim_hostB3_twitch_clean2",
+   "frames": 17
+  },
+  {
+   "name": "silentlaugh",
+   "ko": "소리 없는 웃음",
+   "ver": "1",
+   "src": "anim_hostB2_silentlaugh_clean2",
+   "frames": 17
+  },
+  {
+   "name": "silentlaugh",
+   "ko": "소리 없는 웃음",
+   "ver": "2",
+   "src": "anim_hostB3_silentlaugh_clean2",
+   "frames": 17
+  },
+  {
+   "name": "spin",
+   "ko": "머리 한 바퀴",
+   "ver": "1",
+   "src": "anim_hostB2_spin_clean2",
+   "frames": 17
+  },
+  {
+   "name": "spin",
+   "ko": "머리 한 바퀴",
+   "ver": "2",
+   "src": "anim_hostB3_spin_clean2",
+   "frames": 17
+  },
+  {
+   "name": "blacktears",
+   "ko": "검은 눈물",
+   "ver": "1",
+   "src": "anim_hostB2_blacktears_clean2",
+   "frames": 17
+  },
+  {
+   "name": "flip",
+   "ko": "머리 뒤집기",
+   "ver": "1",
+   "src": "anim_hostB2_flip_clean2",
+   "frames": 17
+  },
+  {
+   "name": "flip",
+   "ko": "머리 뒤집기",
+   "ver": "2",
+   "src": "anim_hostB3_flip_clean2",
+   "frames": 17
+  },
+  {
+   "name": "tilt",
+   "ko": "고개 꺾기",
+   "ver": "1",
+   "src": "anim_hostB2_tilt_clean2",
+   "frames": 17
+  },
+  {
+   "name": "tilt",
+   "ko": "고개 꺾기",
+   "ver": "2",
+   "src": "anim_hostB3_tilt_clean2",
+   "frames": 17
+  },
+  {
+   "name": "excited",
+   "ko": "신남",
+   "ver": "1",
+   "src": "anim_hostB2_excited_clean2",
+   "frames": 17
+  },
+  {
+   "name": "count",
+   "ko": "할부 세기",
+   "ver": "1",
+   "src": "anim_hostB2_count_clean2",
+   "frames": 17
+  },
+  {
+   "name": "amazed",
+   "ko": "놀람",
+   "ver": "1",
+   "src": "anim_hostB2_amazed_clean2",
+   "frames": 17
+  },
+  {
+   "name": "whisper",
+   "ko": "속삭임",
+   "ver": "1",
+   "src": "anim_hostB2_whisper_clean2",
+   "frames": 17
+  },
+  {
+   "name": "angry",
+   "ko": "화남",
+   "ver": "1",
+   "src": "anim_hostB2_angry_clean2",
+   "frames": 17
+  },
+  {
+   "name": "idle",
+   "ko": "대기",
+   "ver": "1",
+   "src": "anim_hostB2_idle_clean2",
+   "frames": 17
+  },
+  {
+   "name": "idle",
+   "ko": "대기",
+   "ver": "2",
+   "src": "anim_hostB3_idle_clean2",
+   "frames": 17
+  }
+ ]
+}
