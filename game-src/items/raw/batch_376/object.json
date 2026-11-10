@@ -1,0 +1,53 @@
+{
+ "id": "009a5224-6199-4c99-b24c-4ebdfc5ef3c9",
+ "name": "pixel art item icon, dark mode",
+ "state_name": "base",
+ "prompt": "pixel art item icon, dark modern Korean urban horror setting, clean outline, detailed shading. One item only, it fills most of the square, transparent background. Each item stays fully inside its own square and does not touch the edges. No pedestal, no stand, no display base, no plate, no text, no letters, no numbers, no extra objects.",
+ "size": {
+  "width": 85,
+  "height": 85
+ },
+ "directions": 1,
+ "created_at": "2026-11-10T04:56:22.500400+00:00",
+ "view": null,
+ "rotation_urls": {
+  "south": null,
+  "west": null,
+  "east": null,
+  "north": null,
+  "south-east": null,
+  "south-west": null,
+  "north-east": null,
+  "north-west": null
+ },
+ "storage_urls": {},
+ "frame_urls": null,
+ "style_settings": {
+  "no_background": true,
+  "item_descriptions": [
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a robot dog, side view, small white and grey four-legged robot with a screen face and antenna tail. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an AI core, front view, metal sphere with a single round blue lens eye and side handles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a cyber implant, three-quarter view, small chrome chip with thin wire legs and a socket. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a neural link cable, three-quarter view, coiled black cable with a long needle-like plug. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an alien communicator, three-quarter view, smooth black oval device with shifting violet symbols. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. an alien crystal, front view, cluster of teal crystals with a dark core. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. meal capsules, three-quarter view, small clear case with three large colored pills. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a hoverboard, three-quarter view, sleek skateboard without wheels with two blue thrusters underneath. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. alien parasite mushrooms, front view, cluster of violet mushrooms with glowing spots growing from a lump of grey flesh. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a urethral plug, side view, short thin polished steel rod with small ridges and a ring at the end. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a soft packer, side view, small soft flesh-colored silicone bulge insert. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. worn stockings, three-quarter view, crumpled beige pantyhose with a run and dusty soles. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. edible underwear, front view, bikini briefs made of strung pastel candy beads. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. chocolate body paint, front view, small jar of dark chocolate sauce with a brush. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a whipped cream can, front view, tall white spray can with a red nozzle and a swirl of cream on top. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square.",
+   "pixel art item icon, dark modern Korean urban horror setting, clean dark outline around the whole object, detailed shading. a urine funnel, side view, soft pink silicone funnel with a short spout. Only this item, nothing else beside it, no text, no halo or glow outside the object's outline, fully inside its square."
+  ]
+ },
+ "tags": [],
+ "status": "failed",
+ "expansion_review": null,
+ "group_id": "e7a27631-4fd0-4a90-969a-473c074b2293",
+ "progress_percent": 4,
+ "eta_seconds": 127,
+ "animations": []
+}
