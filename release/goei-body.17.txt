@@ -1,0 +1,361 @@
+op(latest ?? chat, arg.messageIndex, selfNames)) {
+        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const r = settleShop(cur, arg.messageIndex, selfNames);
+          return r ? { ...cur, ...r.message ? { message: r.message } : {}, scriptstate: { ...cur.scriptstate ?? {}, ...r.vars } } : null;
+        }).catch(() => null) ?? latest;
+      }
+      let now2 = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
+      if (now2) await refreshUseBox(arg.characterIndex, arg.chatIndex, now2).catch(() => {
+      });
+      if (!now2 || chatPhase(now2) !== "started") return;
+      now2.message ??= [];
+      const missing = (ss) => {
+        const vars = { ...missingBasicVars(char.globalLore, ss), ...staleFactionVars(char.globalLore, ss) };
+        return Object.keys(vars).length ? vars : null;
+      };
+      if (missing(now2.scriptstate)) {
+        now2 = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const vars = missing(cur.scriptstate);
+          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
+        }) ?? now2;
+      }
+      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now2 }).catch(() => {
+      });
+      if (latest && chatCardsAt(now2, arg.messageIndex).length) now2 = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null) ?? now2;
+      await storeLore(arg.characterIndex, arg.chatIndex, void 0, { char, chat: now2 }).catch(() => {
+      });
+      if (now2.message.some((m) => typeof m.data === "string" && isUnsent(m.data))) now2 = await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent) ?? now2;
+      {
+        const pp = requestPeopleUpdate("turn").catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+        after.push(pp);
+        if (!peopleSettings(now2.scriptstate).parallel) await pp;
+      }
+      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now2 }).catch(() => {
+      });
+      await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now2, messageIndex: arg.messageIndex });
+      const netTasks = autoTasks(now2.scriptstate);
+      const viewAuto = viewSettings(now2.scriptstate).auto === "turn";
+      const wikiAuto = wikiSettings(now2.scriptstate).auto === "turn";
+      const malls = MALL_SITES.filter((site) => {
+        const m = mallSettings(now2.scriptstate, site);
+        return m.on && m.auto === "turn" && (site !== "bm" || String(now2.scriptstate?.["$br_login"] ?? "") === "1");
+      });
+      if (netTasks.length || viewAuto || wikiAuto || malls.length) {
+        const fresh3 = async () => {
+          const c = await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex) ?? now2;
+          c.message ??= [];
+          return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char, chat: c };
+        };
+        after.push((async () => {
+          applyAdvanced(now2.scriptstate);
+          await readPersona();
+          const phoneFail = (error) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const wikiFail = (error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const mallFail = (error) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const gnetFail = (site) => (error) => console.log(`[goei] ${BOARD_NAME[site] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+          for (const group7 of jointGroups(now2.scriptstate)) {
+            const joint = group7.length > 1 ? new Joint(group7[0].model, group7[0].fixed, group7.map((t) => t.kind)) : void 0;
+            await Promise.all(group7.map(async (t) => {
+              try {
+                if (t.kind === "phone") await autoRefresh(await fresh3(), arg.messageIndex, void 0, joint);
+                else await autoRefreshGnet(await fresh3(), arg.messageIndex, false, joint, t.kind);
+              } catch (error) {
+                (t.kind === "phone" ? phoneFail : gnetFail(t.kind))(error);
+              } finally {
+                joint?.done(t.kind);
+              }
+            }));
+          }
+          if (viewAuto) await autoView(await fresh3(), arg.messageIndex).catch(phoneFail);
+          if (wikiAuto) await autoWriteWiki(await fresh3(), arg.messageIndex).catch(wikiFail);
+          for (const site of malls) await autoRefreshMall(await fresh3(), site).catch(mallFail);
+        })());
+      }
+    } catch (error) {
+      console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      void Promise.allSettled(after).then(() => progressEnd(pTurn));
+    }
+  }
+  var escHtml = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function unsentRow() {
+    const p2 = cardPalette2();
+    unsentShown();
+    return `<span style="flex:1;color:${p2.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span><button type="button" data-goei-cancel="1" style="${cardButtonStyle()}">취소</button>`;
+  }
+  function sceneCardHtml(s8) {
+    const p2 = cardPalette2();
+    const note = s8.note ? `<span style="flex-basis:100%;display:flex;align-items:baseline;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine};white-space:pre-wrap"><span style="flex:none;color:${p2.signal};font-weight:600">메모</span><span>${escHtml(s8.note)}</span></span>` : "";
+    const unsent = s8.unsent ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p2.signal};font-weight:600">목표</span><span>${escHtml(s8.target)}</span><span style="opacity:.5">|</span><span style="color:${p2.signal};font-weight:600">투입</span><span>${escHtml(s8.party)}</span>${note}${unsent}</div>`;
+  }
+  function startCardHtml(body5, unsent) {
+    const p2 = cardPalette2();
+    const row11 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p2.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p2.text};white-space:pre-wrap">${escHtml(body5.trim())}</span>${row11}</div>`;
+  }
+  function unsentMarkHtml() {
+    return `<div data-goei-card="unsent" style="${cardStyle()}">${unsentRow()}</div>`;
+  }
+  function openingHintHtml() {
+    const p2 = cardPalette2();
+    openingShown();
+    return `<div data-goei-card="opening" style="${cardStyle()}flex-wrap:wrap"><span style="flex:1 1 14em;color:${p2.text}"><b style="color:${p2.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span><button type="button" data-goei-repick="1" style="${cardButtonStyle()}">재선택</button></div>`;
+  }
+  function callCardHtml(target) {
+    const p2 = cardPalette2();
+    return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p2.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
+  }
+  function landingHtml2() {
+    return landingHtml(cardPalette2());
+  }
+  function cardPalette2() {
+    return cardPalette(currentTheme());
+  }
+  function cardStyle() {
+    const p2 = cardPalette2();
+    return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
+  }
+  function cardButtonStyle() {
+    const p2 = cardPalette2();
+    return `flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer`;
+  }
+  var assetsFirst = Promise.resolve();
+  async function onDisplay(text4) {
+    if (typeof text4 !== "string") return text4;
+    if (hasImgTag(text4) && !modulePicker()) await assetsFirst.catch(() => void 0);
+    if (isSceneMessage(text4) && !wantsOpeningHint(text4)) await ensureOpeningHint().catch(() => void 0);
+    return displayNow(text4);
+  }
+  async function ensureOpeningHint() {
+    const charIndex = await risuai.getCurrentCharacterIndex();
+    const chatIndex = await risuai.getCurrentChatIndex();
+    if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
+  }
+  async function redrawAfterLoad() {
+    try {
+      await assetsFirst;
+      if (isWaiting()) return;
+      const ctx2 = await loadContext();
+      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
+      if (!ctx2.chat.message.some((m) => typeof m.data === "string" && m.data.includes("<img="))) return;
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({
+        ...cur,
+        message: (cur.message ?? []).map((m) => typeof m.data === "string" && m.data.includes("<img=") ? { ...m, data: m.data.endsWith("\n") ? m.data.slice(0, -1) : `${m.data}
+` } : m)
+      }));
+    } catch {
+    }
+  }
+  function displayNow(text4) {
+    const ours = liteNow || isLanding(text4) || text4.includes(UNSENT_MARK) || text4.includes(START_MARK) || text4.includes(SCENE_MARK) || hasStatusTag(text4) || hasSceneCard(text4) || hasCall(text4) || hasShopTag(text4);
+    let out = text4;
+    if (isLanding(text4)) out = landingHtml2();
+    else {
+      if (out.includes(SCENE_MARK)) out = stripSceneMark(out);
+      if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+      if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
+      if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
+      if (hasCall(out)) out = renderCalls(out, callCardHtml);
+      if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
+      if (hasStatusTag(out)) out = renderStatus(out);
+      if (hasShopTag(out)) out = renderShopCard(out);
+      if (hasImgTag(out)) {
+        const pick3 = modulePicker();
+        const self = userInfo().name;
+        if (ours || imgTagsKnown(out, pick3, self)) out = renderImgTags(out, pick3, getPrefs().imgShow ?? IMG_RECENT.def, self);
+      }
+      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
+      if (wantsOpeningHint(text4)) out += openingHintHtml();
+    }
+    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
+    return out;
+  }
+  async function readSnapshot(fab) {
+    const none3 = { charIndex: -1, chatIndex: -1, chatScreen: false };
+    try {
+      const charIndex = await risuai.getCurrentCharacterIndex();
+      if (!Number.isInteger(charIndex) || charIndex < 0) return none3;
+      const chatIndex = await risuai.getCurrentChatIndex();
+      const chatScreen = fab ? await fab.chatScreenVisible() : true;
+      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
+    } catch {
+      return none3;
+    }
+  }
+  async function isLiteCharacter(charIndex) {
+    if (charIndex < 0) return false;
+    try {
+      const char = await getChar(charIndex);
+      const lite = isGoeiLore(char?.globalLore);
+      if (lite && char) prefetchFactions(char);
+      return lite;
+    } catch {
+      return false;
+    }
+  }
+  async function readTheme(snap) {
+    if (snap.chatIndex < 0) return;
+    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
+    if (!chat) return;
+    const on2 = chat.scriptstate?.["$st_asset_on"];
+    const changed = setImgHidden(on2 === void 0 || on2 === null || on2 === "" ? getPrefs().basic.assetOn === false : on2 === "0" || on2 === 0 || on2 === false);
+    const before = currentTheme();
+    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
+    if (changed && currentTheme() === before) repaintTheme();
+  }
+  var vsChat = "";
+  var vsShownChat = "";
+  var vsPadKey = "";
+  var prog = null;
+  var progKey = "";
+  async function onVersusPad(fab) {
+    if (!vsChat) return;
+    vsShownChat = vsChat;
+    await toggleVersus(vsChat, () => void openVersusSettings());
+    vsPadKey = "";
+    await fab?.setVersus(true, vsOpen()).catch(() => {
+    });
+  }
+  function startWatcher(fab) {
+    const state = new WatchState();
+    setInstalledHook(() => {
+      state.forget();
+    });
+    let stopped = false;
+    let timer5;
+    let shownChat = "";
+    const tick4 = async () => {
+      try {
+        const snap = await readSnapshot(fab);
+        const lite = state.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
+        if (stopped) return;
+        const next = state.update(snap, lite);
+        liteNow = state.lite;
+        const chatKey8 = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : "";
+        if (next.fabVisible && (next.changed || chatKey8 !== shownChat)) {
+          const switched = shownChat !== "" && chatKey8 !== shownChat;
+          if (switched) resetStatusContext();
+          await readTheme(snap).catch(() => {
+          });
+          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
+          });
+          if (switched) await updateChat(snap.charIndex, snap.chatIndex, (cur) => ({ ...cur })).catch(() => null);
+          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
+          });
+          await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {
+          });
+        } else if (!next.fabVisible && next.changed) {
+          await hideUseBox().catch(() => {
+          });
+        }
+        shownChat = chatKey8;
+        if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
+        vsChat = chatKey8;
+        if (vsOpen() && (!next.fabVisible || chatKey8 !== vsShownChat)) await closeVersus().catch(() => {
+        });
+        const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
+        const padKey = `${pad}:${vsOpen()}`;
+        if (fab && padKey !== vsPadKey) {
+          vsPadKey = padKey;
+          await fab.setVersus(pad, vsOpen()).catch(() => {
+          });
+        }
+        const pShow = next.fabVisible && progressOn() && !appShown();
+        const pKey = `${pShow}`;
+        if (prog && pKey !== progKey) {
+          progKey = pKey;
+          await prog.setVisible(pShow).catch(() => {
+          });
+        } else if (prog && pShow) await prog.setVisible(true).catch(() => {
+        });
+        progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
+      } catch (error) {
+        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (!stopped) timer5 = setTimeout(() => void tick4(), WATCH_MS);
+      }
+    };
+    void tick4();
+    return () => {
+      stopped = true;
+      setInstalledHook(null);
+      clearTimeout(timer5);
+    };
+  }
+  async function start2(o = {}) {
+    void dropOldGame();
+    const t0 = Date.now();
+    const lap = (what) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
+    try {
+      lap(`세계 자료 ${await loadWorldData() === "store" ? "저장소에서" : "받음"}`);
+    } catch (error) {
+      showWorldDataPanel(reason2(error), !!o.prompt);
+      throw error;
+    }
+    await loadPrefs();
+    await loadStoredWikiPack();
+    await loadStoredTokenizer();
+    lap("설정·위키·토크나이저 읽음");
+    assetsFirst = loadModuleAssets();
+    void redrawAfterLoad();
+    setWikiOpener((title2) => void openWiki2(title2));
+    setRecordsOpener((id2) => void openRecords2(id2));
+    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+    setShopOpener((site) => void openShop(site));
+    onAppShown((open4) => {
+      if (!prog) return;
+      if (open4) {
+        progKey = "false";
+        void prog.setVisible(false).catch(() => {
+        });
+      } else progKey = "";
+    });
+    let stopWatcher = null;
+    let fab = null;
+    try {
+      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })), () => void onVersusPad(fab));
+      const f = fab;
+      void f.setTheme(currentTheme());
+      onThemeChange((t) => void f.setTheme(t).catch(() => {
+      }));
+      try {
+        prog = await createProgWin();
+        const pw = prog;
+        void pw.setTheme(currentTheme());
+        onThemeChange((t) => void pw.setTheme(t).catch(() => {
+        }));
+      } catch (error) {
+        console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+        prog = null;
+      }
+      stopWatcher = startWatcher(fab);
+      lap("유령 단추 붙임");
+    } catch (error) {
+      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      fab = null;
+      stopWatcher = startWatcher(null);
+      await risuai.registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true })).catch((e) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
+    }
+    return {
+      beforeRequest: onBeforeRequest,
+      sanitize,
+      input: onInput,
+      output: onOutput,
+      display: onDisplay,
+      install: () => openInstall(),
+      unload: async () => {
+        stopWatcher?.();
+        await fab?.remove().catch(() => {
+        });
+        await prog?.remove().catch(() => {
+        });
+        prog = null;
+        progKey = "";
+      }
+    };
+  }
+
+  // src/body-entry.ts
+  globalThis.__goeiBody = { version: "0.21.6", start: start2 };
+})();

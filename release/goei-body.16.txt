@@ -1,12 +1,2744 @@
-p = gnKeep[i];
+size: 19px; }
+.bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
+
+/* ── 망상홈쇼핑 (2026-11-11). 사이트 틀은 목업 기획 C안 바탕(빨간 머리띠·방송 칸+채팅·상품 칸·주문 단추·그림 든 편성 카드), 방송 칸 안 글자만 도트. 방송 칸은 ui/hsplayer.ts 가 꽂는다 ── */
+.hs { --hs-ink: #0b0513; --hs-night: #151320; --hs-iron: #3a3842; --hs-wine: #60131b; --hs-red: #b33031; --hs-hot: #d35544; --hs-gold: #eeb76c; --hs-cream: #f4e6c8; --hs-brown: #311d24; --hs-yel: #ffd23e; --hs-dim: #8a7f88;
+  --bg: #120a0c; --card: #1c1114; --card2: #24161a; --line: #3d1f25; --line2: #5a2a30; --r1: #d4142f; --r2: #8a0a1f; --y: #ffd400; --tx: #f3eaea; --sub: #b9a3a7; --pink: #ff9aa5;
+  position: relative; background: var(--bg); color: var(--tx); min-height: 100%; font-size: 14px; line-height: 1.5; }
+.hs *, .hs *::before, .hs *::after { box-sizing: border-box; }
+.hs img, .hs canvas { image-rendering: pixelated; }
+.hs button:disabled { opacity: .45; cursor: default; }
+/* 머리띠 */
+.hs .hs-gnb { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 22px; height: 58px; padding: 0 22px; background: linear-gradient(180deg, var(--r1), var(--r2)); border-bottom: 1px solid #4a0612; box-shadow: 0 1px 0 #ffd40055 inset, 0 6px 18px #0008; }
+.hs .hs-logo { font-weight: 900; font-size: 24px; letter-spacing: -1.2px; color: #fff; white-space: nowrap; text-shadow: 0 2px 0 #5a0613; }
+.hs .hs-logo i { font-style: normal; color: var(--y); }
+.hs .hs-menu { display: flex; align-self: stretch; gap: 4px; flex: 1; min-width: 0; }
+.hs .hs-menu button { position: relative; padding: 0 12px; color: #ffe9ec; font-weight: 700; font-size: 14.5px; white-space: nowrap; }
+.hs .hs-menu button:hover { color: #fff; }
+.hs .hs-menu button.on { color: #fff; }
+.hs .hs-menu button.on::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 0; height: 4px; background: var(--y); border-radius: 2px 2px 0 0; }
+.hs .hs-tel { display: grid; justify-items: end; line-height: 1.15; font-weight: 800; font-size: 18px; letter-spacing: .3px; color: var(--y); white-space: nowrap; }
+.hs .hs-tel small { font-weight: 600; font-size: 10.5px; color: #ffd9dd; letter-spacing: .5px; }
+.hs .hs-wrap { max-width: 1060px; margin: 0 auto; padding: 16px 18px 28px; }
+.hs .hs-err, .hs .hs-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--line2); border-left: 4px solid var(--r1); border-radius: 6px; background: var(--card); font-size: 13px; word-break: break-word; }
+.hs .hs-err span { flex: 1; min-width: 0; }
+.hs .hs-err button { flex: none; padding: 5px 10px; border: 1px solid var(--line2); border-radius: 4px; font-weight: 700; font-size: 12.5px; }
+.hs .hs-info { margin-top: 12px; border-left-color: var(--y); }
+/* 방송 칸 + 채팅 */
+.hs .hs-bd { display: grid; grid-template-columns: auto minmax(250px, 1fr); gap: 14px; align-items: stretch; }
+.hs .hs-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; width: min-content; }
+.hs .hs-tv { border: 1px solid var(--line2); border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 10px 30px #0009; }
+.hs .hs-bar { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; background: linear-gradient(180deg, #2a1318, #1a0c0f); border-bottom: 1px solid var(--line); font-size: 13px; }
+.hs .hs-bar b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.hs .hs-on { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 7px; border-radius: 3px; background: #e0263b; color: #fff; font: 800 11.5px ui-monospace, monospace; letter-spacing: .5px; }
+.hs .hs-on::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: hs-blink 1.2s steps(2) infinite; }
+.hs .hs-on.off { background: #3a2a2d; color: var(--sub); }
+.hs .hs-on.off::before { animation: none; background: var(--sub); }
+@keyframes hs-blink { 50% { opacity: .2; } }
+.hs .hs-pt { color: var(--y); font-weight: 800; white-space: nowrap; }
+.hs .hs-pt i { font-style: normal; font-weight: 500; color: var(--sub); }
+.hs .hs-tv .hs-mount { display: grid; place-items: center; width: 100%; background: #000; }
+.hs .hs-scr { position: relative; overflow: hidden; background: #000; -webkit-font-smoothing: none; }
+.hs .hs-cv { display: block; width: 100%; height: 100%; }
+.hs .hs-scr.fit .hs-cv { image-rendering: auto; }
+.hs .hs-scan { position: absolute; inset: 0; background: repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, .18) 1px 2px); pointer-events: none; }
+.hs .hs-scr.noscan .hs-scan { display: none; }
+.hs .hs-cg { position: absolute; left: 0; top: 0; transform-origin: 0 0; color: var(--hs-cream); font-size: 16px; line-height: 16px; }
+.hs .hs-cg > div { position: absolute; }
+.hs .hs-lg { left: 8px; top: 8px; display: flex; }
+.hs .hs-lg b { background: var(--hs-wine); color: var(--hs-gold); padding: 4px 6px; border: 2px solid var(--hs-gold); font-weight: normal; }
+.hs .hs-lg i { background: var(--hs-gold); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-gold); font-style: normal; }
+.hs .hs-live { right: 8px; top: 8px; background: var(--hs-red); color: #fff; padding: 4px 6px 4px 18px; border: 2px solid #fff; }
+.hs .hs-live::before { content: ""; position: absolute; left: 6px; top: 8px; width: 6px; height: 6px; background: #fff; }
+.hs .hs-soon { right: 8px; top: 40px; background: var(--hs-yel); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; }
+.hs .hs-soon.sold { background: var(--hs-red); color: #fff; }
+.hs .hs-left { right: 8px; top: 68px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-board { background: var(--hs-wine); border: 2px solid var(--hs-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.hs .hs-board.hs-bA { left: 177px; top: 130px; width: 160px; height: 85px; }
+.hs .hs-board.hs-bB { right: 8px; top: 100px; width: 160px; height: 85px; box-shadow: 2px 2px 0 #000; }
+.hs .hs-board .big { font-size: 32px; line-height: 32px; color: var(--hs-yel); text-shadow: 2px 2px 0 #000; }
+.hs .hs-board .sm { color: var(--hs-cream); }
+.hs .hs-call { left: 8px; top: 40px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-note { inset: 0; display: grid; place-items: center; }
+.hs .hs-note b { background: var(--hs-ink); color: #fff; padding: 6px 10px; border: 2px solid #fff; font-weight: normal; }
+/* 아래 띠: 자막 + 상품 이름표. 바스트·전화 컷은 그림 아래 끝(y296)을 띠 바탕으로 덮는다 */
+.hs .hs-band { left: 0; right: 0; bottom: 0; padding: 8px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 6px; }
+.hs .hs-band.hs-kB, .hs .hs-band.hs-kD { min-height: 96px; background-image: repeating-conic-gradient(var(--hs-wine) 0 25%, var(--hs-brown) 0 50%); background-size: 2px 2px; border-top: 2px solid var(--hs-gold); }
+.hs .hs-band.hs-t { gap: 18px; }
+/* 와이드 컷: 자막이 진열대 위 상품을 가리지 않게 위쪽(로고 아래)으로 */
+.hs .hs-band.hs-kA { top: 0; pointer-events: none; }
+.hs .hs-band.hs-kA .hs-sub { margin-top: 28px; margin-bottom: auto; max-width: 352px; }
+/* 폰 와이드 컷: 자막은 한 줄만(끝 줄), 진행자 얼굴을 덮지 않게 */
+.hs .hs-scr.sm .hs-band.hs-kA .hs-sub { margin-top: 22px; max-width: 100%; max-height: 22px; }
+.hs .hs-sub { max-width: 100%; background: var(--hs-ink); color: #fff; padding: 4px 6px; border: 2px solid var(--hs-ink); line-height: 18px; word-break: keep-all; overflow-wrap: anywhere; visibility: hidden; }
+.hs .hs-sub.on { visibility: visible; }
+.hs .hs-l3 { align-self: stretch; display: flex; gap: 6px; align-items: flex-end; }
+.hs .hs-l3 .nm { flex: 1; min-width: 0; background: var(--hs-cream); color: var(--hs-ink); border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; position: relative; padding: 6px 8px; }
+.hs .hs-band.hs-t .hs-l3 .nm { padding-top: 14px; }
+.hs .hs-l3 .tag { position: absolute; left: -2px; top: -14px; background: var(--hs-red); color: #fff; padding: 3px 6px; border: 2px solid var(--hs-ink); }
+.hs .hs-l3 .n { margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs .hs-l3 .p2 { white-space: nowrap; overflow: hidden; }
+.hs .hs-l3 .p { color: var(--hs-red); }
+.hs .hs-l3 .ph { flex: none; background: var(--hs-ink); border: 2px solid var(--hs-yel); padding: 6px 8px; box-shadow: 2px 2px 0 #000; text-align: right; }
+.hs .hs-l3 .ph small { display: block; font-size: 16px; color: var(--hs-yel); margin-bottom: 4px; }
+.hs .hs-l3 .ph b { font-size: 32px; line-height: 32px; color: #fff; font-weight: normal; }
+/* 0.5배(폰): 256×192 칸에 줄인 구성 (도트 시안 폰판) */
+.hs .hs-scr.sm .hs-lg { left: 4px; top: 4px; }
+.hs .hs-scr.sm .hs-lg b, .hs .hs-scr.sm .hs-lg i { padding: 2px 4px; }
+.hs .hs-scr.sm .hs-live { right: 4px; top: 4px; padding: 2px 4px 2px 14px; }
+.hs .hs-scr.sm .hs-live::before { left: 4px; top: 6px; width: 4px; height: 4px; }
+.hs .hs-scr.sm .hs-soon { right: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-left, .hs .hs-scr.sm .hs-l3 .tag, .hs .hs-scr.sm .hs-l3 .p2, .hs .hs-scr.sm .hs-l3 .ph small, .hs .hs-scr.sm .hs-board > .sm { display: none; }
+.hs .hs-scr.sm .hs-call { left: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-board { gap: 2px; }
+.hs .hs-scr.sm .hs-board span .sm { display: none; }
+.hs .hs-scr.sm .hs-board.hs-bA { left: 88px; top: 64px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board.hs-bB { right: 4px; top: 50px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board .big { font-size: 16px; line-height: 16px; }
+.hs .hs-scr.sm .hs-band { padding: 4px; gap: 4px; }
+.hs .hs-scr.sm .hs-band.hs-kB, .hs .hs-scr.sm .hs-band.hs-kD { min-height: 48px; }
+.hs .hs-scr.sm .hs-sub { padding: 2px 4px; max-height: 40px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.hs .hs-scr.sm .hs-l3 { gap: 4px; }
+.hs .hs-scr.sm .hs-l3 .nm, .hs .hs-scr.sm .hs-band.hs-t .hs-l3 .nm { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .n { margin: 0; }
+.hs .hs-scr.sm .hs-l3 .ph { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .ph b { font-size: 16px; line-height: 16px; }
+/* 상품 칸 · 주문 단추 */
+.hs .hs-prod { display: flex; align-items: stretch; gap: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, var(--card2), var(--card)); }
+.hs .hs-prod.none { padding: 16px; }
+.hs .hs-icon { position: relative; flex: none; width: 84px; height: 84px; display: grid; place-items: center; border: 1px solid var(--line2); border-radius: 6px; background: radial-gradient(circle at 50% 35%, #4a1a24, #1a0c0f 75%); overflow: hidden; }
+.hs .hs-icon img { max-width: 72px; max-height: 72px; }
+.hs .hs-icon svg { width: 34px; height: 34px; opacity: .6; }
+.hs .hs-stk { position: absolute; right: 0; top: 0; width: 26px; height: 26px; background: linear-gradient(225deg, #fff3a8 0 50%, var(--y) 50%); clip-path: polygon(0 0, 100% 0, 100% 100%); box-shadow: -2px 2px 3px #0007; }
+.hs .hs-icon:hover .hs-stk { width: 32px; height: 32px; }
+.hs .hs-prod .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.hs .hs-prod .tx small { color: var(--pink); font-weight: 700; font-size: 12px; }
+.hs .hs-prod .tx b { font-size: 19px; font-weight: 800; letter-spacing: -.4px; line-height: 1.25; overflow-wrap: anywhere; }
+.hs .hs-prod .tx p { margin: 2px 0 0; color: var(--sub); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hs .hs-prod .pr { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 120px; padding: 6px 14px; border-radius: 6px; background: linear-gradient(135deg, var(--r1), var(--r2)); }
+.hs .hs-prod .pr small { font-size: 11px; color: #ffd9dd; }
+.hs .hs-prod .pr b { font-size: 21px; font-weight: 900; color: var(--y); letter-spacing: -.5px; white-space: nowrap; text-shadow: 0 2px 0 #5a0613; }
+.hs .hs-ord { display: flex; gap: 8px; }
+.hs .hs-ord button { padding: 11px 16px; border: 1px solid var(--line2); border-radius: 6px; background: var(--card); font-weight: 800; font-size: 14px; white-space: nowrap; text-align: center; }
+.hs .hs-ord button:not(:disabled):hover { background: var(--card2); }
+.hs .hs-ord .call { flex: 1; background: linear-gradient(180deg, #ee2b43, #c8102e); border-color: #ee2b43; color: #fff; font-size: 15.5px; box-shadow: 0 3px 0 #6d0919; }
+.hs .hs-ord .call:not(:disabled):hover { background: linear-gradient(180deg, #ff3b53, #d4142f); }
+.hs .hs-ord .aud { border-color: var(--y); color: var(--y); }
+/* 채팅 */
+.hs .hs-chat { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--line2); border-radius: 8px; background: #0e0809; overflow: hidden; }
+.hs .hs-chat h5 { margin: 0; height: 36px; display: flex; align-items: center; padding: 0 12px; font-size: 13px; font-weight: 700; color: #ddd; background: linear-gradient(180deg, #2a1318, #1a0c0f); border-bottom: 1px solid var(--line); }
+.hs .ch-b { flex: 1; min-height: 0; position: relative; }
+.hs .hs-chlog { position: absolute; inset: 0; padding: 8px 12px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3d1f25 transparent; font-size: 13px; line-height: 1.75; }
+.hs .hs-chlog p { margin: 0; word-break: break-word; }
+.hs .hs-chlog p span { margin-right: 6px; font-weight: 700; color: var(--pink); }
+.hs .hs-chlog p.q { color: #bbb; font-style: italic; }
+.hs .hs-chlog p.q span { color: #999; font-style: normal; }
+.hs .hs-chlog p.host { margin: 3px -6px; padding: 2px 6px; border-left: 3px solid var(--y); background: #ffd4000f; color: #ffe9a6; }
+.hs .hs-chlog p.host span { color: var(--y); }
+.hs .hs-chlog p.me span { color: #8fd3ff; }
+.hs .hs-chlog p.sys { color: var(--sub); font-size: 12px; text-align: center; }
+.hs .hs-chlog p.sys span { display: none; }
+.hs .hs-in { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--line); }
+.hs .hs-in input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 4px; background: #170d10; color: inherit; font: inherit; font-size: 13px; }
+.hs .hs-in input:focus { outline: none; border-color: var(--line2); }
+.hs .hs-in button { flex: none; padding: 0 12px; border-radius: 4px; background: var(--card2); border: 1px solid var(--line2); font-weight: 700; font-size: 13px; }
+/* 편성 */
+.hs .hs-sec { margin-top: 20px; }
+.hs .hs-sec h4 { margin: 0 0 10px; color: var(--tx); display: flex; align-items: baseline; gap: 10px; font-size: 16px; font-weight: 800; }
+.hs .hs-sec h4::before { content: ""; align-self: center; width: 4px; height: 16px; border-radius: 2px; background: var(--r1); }
+.hs .hs-sec h4 small { font-weight: 400; font-size: 12px; color: var(--sub); }
+.hs .hs-sec h5 { margin: 18px 0 8px; font-size: 13.5px; font-weight: 700; color: var(--pink); }
+.hs .hs-lu { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.hs .hs-lu.col { grid-template-columns: 1fr; }
+.hs .hs-lc { position: relative; display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px 8px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); text-align: left; }
+.hs .hs-lc .pic { flex: none; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-lc .pic img { max-width: 48px; max-height: 48px; }
+.hs .hs-lc .pic svg { width: 24px; height: 24px; opacity: .5; }
+.hs .hs-lc .pic .q { font: 900 24px ui-monospace, monospace; color: #6a3a42; }
+.hs .hs-lc .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.hs .hs-lc .tx small { color: var(--sub); font-size: 11.5px; }
+.hs .hs-lc .tx b { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs .hs-lc .tx em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--y); }
+.hs .hs-lc .tx i { font-style: normal; margin-top: 2px; font-size: 12.5px; color: var(--sub); white-space: normal; }
+.hs .hs-lu.col .hs-lc .tx b { white-space: normal; }
+.hs .hs-lc .st { flex: none; align-self: flex-start; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line2); font-size: 11px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+.hs .hs-lc .st.on { border-color: #e0263b; background: #e0263b; color: #fff; }
+.hs .hs-lc .st.off { border-color: #55393d; color: #8d7175; }
+.hs .hs-lc.now { border-color: #e0263b; background: linear-gradient(180deg, #34121a, #24161a); box-shadow: 0 0 0 1px #e0263b inset; }
+.hs .hs-lc.past { opacity: .62; }
+.hs .hs-lc.soon .tx b { color: var(--sub); font-weight: 500; }
+.hs .hs-none { margin: 0; padding: 22px 0; text-align: center; color: var(--sub); border: 1px dashed var(--line); border-radius: 8px; }
+.hs .hs-tip { margin: 8px 2px 0; font-size: 12px; color: var(--sub); }
+/* 주문 조회 */
+.hs .hs-audrow { margin-bottom: 4px; padding: 10px 12px; border: 1px solid var(--y); border-radius: 8px; color: var(--y); font-weight: 700; background: #ffd4000d; }
+.hs .hs-audrow b { font: 800 15px ui-monospace, monospace; }
+.hs .hs-ol { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden; }
+.hs .hs-ol li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+.hs .hs-ol li + li { border-top: 1px solid var(--line); }
+.hs .hs-ol .pic { flex: none; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-ol .pic img { max-width: 38px; max-height: 38px; }
+.hs .hs-ol .pic svg { width: 20px; height: 20px; opacity: .5; }
+.hs .hs-ol .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.hs .hs-ol .tx b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hs .hs-ol .tx small { color: var(--sub); font-size: 12.5px; }
+.hs .hs-ol .bar { flex: none; width: 120px; height: 8px; border-radius: 4px; background: #2a171b; overflow: hidden; }
+.hs .hs-ol .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--r1), var(--y)); }
+.hs .hs-ol .st { flex: none; min-width: 74px; text-align: right; font-size: 12.5px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+.hs .hs-ol .st.on { color: var(--y); }
+.hs .hs-ol li.done { opacity: .55; }
+/* 창: 전화 주문 · 스티커 · 방청 신청 */
+.hs .hs-dim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 16px; }
+.hs .hs-dimx { position: absolute; inset: 0; width: 100%; height: 100%; background: #000a; cursor: default; }
+.hs .hs-pop { position: sticky; top: 60px; bottom: 16px; width: min(400px, 100%); max-height: min(560px, 100%); display: flex; flex-direction: column; border: 1px solid var(--line2); border-radius: 10px; background: var(--card); box-shadow: 0 20px 60px #000c; overflow: hidden; }
+.hs .hs-pop > header { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 6px 0 14px; background: linear-gradient(180deg, var(--r1), var(--r2)); font-size: 15px; }
+.hs .hs-pop > header button { width: 34px; height: 34px; border-radius: 4px; font-size: 15px; color: #fff; text-align: center; }
+.hs .hs-pop .pb { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.hs .hs-pop > footer { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.hs .hs-pop > footer button { flex: 1; padding: 10px 0; border: 1px solid var(--line2); border-radius: 6px; font-weight: 800; text-align: center; }
+.hs .hs-pop > footer .pri { flex: 2; background: linear-gradient(180deg, #ee2b43, #c8102e); border-color: #ee2b43; color: #fff; }
+.hs .hs-pi { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card2); }
+.hs .hs-pi .pic, .hs .hs-sticker .pic, .hs .hs-pick .pic { flex: none; display: grid; place-items: center; border-radius: 5px; background: #2a171b; overflow: hidden; }
+.hs .hs-pi .pic { width: 48px; height: 48px; }
+.hs .hs-pi .pic img { max-width: 42px; max-height: 42px; }
+.hs .hs-pi .tx { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.hs .hs-pi .tx small { color: var(--y); font-weight: 700; }
+.hs .hs-op { margin: 0; padding: 9px 12px; border-radius: 4px 12px 12px 12px; background: #2a171b; }
+.hs .hs-op i { display: block; font-style: normal; font-size: 11.5px; font-weight: 700; color: var(--pink); }
+.hs .hs-pays { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hs .hs-pays button { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--card2); }
+.hs .hs-pays button small { color: var(--sub); font-size: 12px; }
+.hs .hs-pays button.on { border-color: var(--y); background: #ffd4000f; }
+.hs .hs-pays button.on b { color: var(--y); }
+.hs .hs-pick { display: flex; flex-direction: column; gap: 4px; max-height: 190px; overflow-y: auto; }
+.hs .hs-pick button { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border: 2px solid transparent; border-radius: 6px; background: var(--card2); }
+.hs .hs-pick button.on { border-color: var(--y); }
+.hs .hs-pick .pic { width: 34px; height: 34px; }
+.hs .hs-pick .pic img { max-width: 30px; max-height: 30px; }
+.hs .hs-pick .pic svg { width: 18px; height: 18px; opacity: .5; }
+.hs .hs-ok { margin: 0; text-align: center; font-weight: 700; color: var(--y); }
+.hs .hs-no { margin: 0; text-align: center; color: var(--sub); }
+.hs .hs-no b { display: block; font: 900 30px ui-monospace, monospace; color: #fff; letter-spacing: 3px; }
+.hs .hs-sticker { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 16px; border-radius: 4px; background: #ffe45c; color: #2a1a00; text-align: center; box-shadow: 0 4px 0 #b99a00, 0 10px 20px #0006; transform: rotate(-1.2deg); }
+.hs .hs-sticker .pic { width: 72px; height: 72px; background: #fff7c2; }
+.hs .hs-sticker .pic img { max-width: 64px; max-height: 64px; }
+.hs .hs-sticker b { font-size: 17px; font-weight: 900; }
+.hs .hs-sticker p { margin: 0; font-size: 13.5px; font-weight: 500; }
+.hs .hs-sticker .ef { font-weight: 800; color: #b00020; }
+.hs .hs-lift { margin-top: 6px; padding: 5px 12px; border: 1px dashed #7a6400; border-radius: 4px; font-size: 12.5px; font-weight: 700; color: #5a4a00; }
+.hs .hs-under { margin-top: 6px !important; padding: 6px 10px; border-top: 1px dashed #7a6400; font-size: 12.5px !important; color: #5a4a00; font-style: italic; }
+.hs .hs-f { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--sub); }
+.hs .hs-f input { height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; background: #170d10; color: var(--tx); font: inherit; font-size: 14px; }
+.hs .hs-chk { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card2); }
+.hs .hs-chk i { flex: none; width: 18px; height: 18px; border: 2px solid var(--line2); border-radius: 4px; }
+.hs .hs-chk.on i { border-color: var(--y); background: var(--y) linear-gradient(135deg, transparent 0 0) ; box-shadow: inset 0 0 0 3px var(--card2); }
+/* 폰 */
+.hs.hs-m .hs-gnb { flex-wrap: wrap; height: auto; gap: 0 12px; padding: 8px 12px 0; }
+.hs.hs-m .hs-logo { font-size: 20px; flex: 1; }
+.hs.hs-m .hs-tel { font-size: 14px; }
+.hs.hs-m .hs-tel small { display: none; }
+.hs.hs-m .hs-menu { flex: none; order: 3; width: 100%; height: 40px; margin: 4px -6px 0; overflow-x: auto; scrollbar-width: none; }
+.hs.hs-m .hs-menu::-webkit-scrollbar { display: none; }
+.hs.hs-m .hs-menu button { padding: 0 10px; font-size: 14px; }
+.hs.hs-m .hs-wrap { padding: 10px 10px 24px; }
+.hs.hs-m .hs-main { width: auto; }
+.hs.hs-m .hs-prod { flex-wrap: wrap; }
+.hs.hs-m .hs-icon { width: 64px; height: 64px; }
+.hs.hs-m .hs-icon img { max-width: 54px; max-height: 54px; }
+.hs.hs-m .hs-prod .tx b { font-size: 16px; }
+.hs.hs-m .hs-prod .pr { flex: 1 0 100%; flex-direction: row; justify-content: space-between; padding: 6px 12px; }
+.hs.hs-m .hs-prod .pr b { font-size: 18px; }
+.hs.hs-m .hs-ord { flex-wrap: wrap; }
+.hs.hs-m .hs-ord .call { flex: 1 0 100%; }
+.hs.hs-m .hs-ord button { flex: 1; padding: 11px 0; font-size: 13.5px; }
+.hs.hs-m .hs-chat { height: 240px; margin-top: 12px; }
+.hs.hs-m .hs-sec h4 { flex-wrap: wrap; gap: 2px 10px; }
+.hs.hs-m .hs-lu:not(.col) { grid-template-columns: 1fr 1fr; }
+.hs.hs-m .hs-lc .st { position: absolute; right: 6px; top: 6px; }
+.hs.hs-m .hs-ol .bar { display: none; }
+.hs.hs-m .hs-dim { place-items: end center; padding: 0; position: fixed; }
+.hs.hs-m .hs-pop { position: relative; top: auto; bottom: auto; width: 100%; max-height: 82%; border-radius: 14px 14px 0 0; border-bottom: 0; }
+`;
+
+  // src/ui/frame.ts
+  var EXTRA_W = { tablet: 26 * 2 + 4, tactical: 44 * 2 + 8 * 2 };
+  var EXTRA_H = { tablet: 26 * 2, tactical: 44 * 2 };
+  var PAD2 = { tablet: 4, tactical: 8 };
+  var PANEL_W = { nav: 1280, pre: 1024 };
+  var TACTICAL_MIN_H = 600;
+  function frameState(pref, nav) {
+    const want = pref ?? "tablet";
+    if (want === "none") return { kind: "none", hidden: false };
+    if (isPhone() || document.fullscreenElement) return { kind: "none", hidden: false };
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (w < (nav ? PANEL_W.nav : PANEL_W.pre) + EXTRA_W[want] + PAD2[want] * 2) return { kind: "none", hidden: true };
+    if (want === "tactical" && h - PAD2.tactical * 2 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: "none", hidden: true };
+    return { kind: want, hidden: false };
+  }
+  function screw(n3, pos) {
+    const s8 = `gxf-s${n3}`;
+    const m = `gxf-m${n3}`;
+    const k = `gxf-k${n3}`;
+    return `<svg class="gxf-screw" aria-hidden="true" width="18" height="18" viewBox="0 0 26 26" style="${pos}"><defs><radialGradient id="${s8}" cx=".5" cy=".5" r=".5"><stop offset=".78" stop-color="#040506"/><stop offset=".9" stop-color="#15181b"/><stop offset="1" stop-color="#2a2f33"/></radialGradient><linearGradient id="${m}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#454b50"/><stop offset=".5" stop-color="#2b3035"/><stop offset="1" stop-color="#15181b"/></linearGradient><linearGradient id="${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#050607"/><stop offset="1" stop-color="#1a1e22"/></linearGradient></defs><circle cx="13" cy="13" r="13" fill="url(#${s8}) #15181b"/><circle cx="13" cy="13" r="9.4" fill="url(#${m}) #2b3035"/><circle cx="13" cy="13" r="9.4" fill="none" stroke="rgba(255,255,255,.1)" stroke-width=".6"/><path d="M6.4 9.2A7.8 7.8 0 0 1 9.4 6.1" stroke="rgba(255,255,255,.18)" stroke-width=".9" fill="none" stroke-linecap="round"/><polygon points="13,8.2 17.2,10.6 17.2,15.4 13,17.8 8.8,15.4 8.8,10.6" fill="url(#${k}) #0e1113"/><polygon points="13,8.2 17.2,10.6 17.2,15.4 13,17.8 8.8,15.4 8.8,10.6" fill="none" stroke="rgba(0,0,0,.85)" stroke-width=".7"/><path d="M9.4 15.2l3.6 2.1 3.6-2.1" stroke="rgba(255,255,255,.12)" stroke-width=".7" fill="none"/></svg>`;
+  }
+  var TABLET_BEFORE = '<i class="gxf-hi"></i><i class="gxf-glass"></i><i class="gxf-cam"><b></b><b></b></i><i class="gxf-pwr"></i><i class="gxf-vol"></i><i class="gxf-spk"></i><i class="gxf-spk r"></i>';
+  var TACTICAL_BEFORE = `<i class="gxf-tex"></i><i class="gxf-recess"></i>${["tl", "tr", "bl", "br"].map((c) => `<i class="gxf-bump ${c} base"></i><i class="gxf-bump ${c} body"></i><i class="gxf-bump ${c} ridge"></i>`).join("")}${screw(1, "left:18px;top:18px")}${screw(2, "right:18px;top:18px")}${screw(3, "left:18px;bottom:18px")}${screw(4, "right:18px;bottom:18px")}<i class="gxf-grip"></i><i class="gxf-grip r"></i><i class="gxf-leds"><span><b class="on-link"></b>LINK</span><span><b></b>STBY</span><span><b class="on-rec"></b>REC</span></i><i class="gxf-handle"></i><i class="gxf-pit"></i><i class="gxf-strap"></i>`;
+  function frameHtml(kind, pre, panel) {
+    return `<div class="gx-frame${pre ? " pre" : ""}" data-kind="${kind}">${kind === "tablet" ? TABLET_BEFORE : TACTICAL_BEFORE}${panel}<i class="gxf-glare"></i></div>`;
+  }
+
+  // src/ui/swipeback.ts
+  var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer";
+  var FIRE = 72;
+  var bound2 = /* @__PURE__ */ new WeakSet();
+  function inSideScroller(el, root3) {
+    for (let n3 = el; n3 && n3 !== root3; n3 = n3.parentElement) {
+      if (n3.scrollWidth > n3.clientWidth + 2) {
+        const ox = getComputedStyle(n3).overflowX;
+        if (ox === "auto" || ox === "scroll") return true;
+      }
+    }
+    return false;
+  }
+  function bindSwipeBack(root3, step2) {
+    if (bound2.has(root3)) return;
+    bound2.add(root3);
+    let x0 = 0;
+    let y0 = 0;
+    let mode2 = "off";
+    let act = null;
+    let sign = 1;
+    let box4 = null;
+    const reset = (animate) => {
+      if (!box4) return;
+      const el = box4;
+      el.style.transition = animate ? "transform .2s ease, opacity .2s ease" : "";
+      el.style.transform = "";
+      el.style.opacity = "";
+      if (animate) setTimeout(() => el.style.transition = "", 220);
+      box4 = null;
+    };
+    root3.addEventListener("touchstart", (e) => {
+      mode2 = "off";
+      if (e.touches.length !== 1 || !isPhone()) return;
+      const t = e.target;
+      if (t.closest(SKIP) || inSideScroller(t, root3)) return;
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      mode2 = "wait";
+    }, { passive: true });
+    root3.addEventListener("touchmove", (e) => {
+      if (mode2 === "off") return;
+      const dx = e.touches[0].clientX - x0;
+      const dy = e.touches[0].clientY - y0;
+      if (mode2 === "wait") {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+        act = Math.abs(dx) > Math.abs(dy) * 1.4 ? step2(dx > 0 ? -1 : 1) : null;
+        sign = dx > 0 ? 1 : -1;
+        if (!act) return void (mode2 = "off");
+        mode2 = "back";
+        box4 = root3.querySelector(".gx-content");
+      }
+      if (box4) {
+        const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
+        box4.style.transform = `translateX(${d * sign}px)`;
+        box4.style.opacity = String(1 - d / 400);
+      }
+    }, { passive: true });
+    const end = (e) => {
+      if (mode2 !== "back") return void (mode2 = "off");
+      mode2 = "off";
+      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+      const run6 = dx * sign >= FIRE ? act : null;
+      act = null;
+      reset(!run6);
+      run6?.();
+    };
+    root3.addEventListener("touchend", end, { passive: true });
+    root3.addEventListener("touchcancel", () => {
+      mode2 = "off";
+      reset(true);
+    }, { passive: true });
+  }
+
+  // src/ui/mapzoom.ts
+  var MAX = 4;
+  var MOVE = 6;
+  var views = /* @__PURE__ */ new Map();
+  function mapZoomControls(nation = false) {
+    return `<div class="gx-zoom" aria-label="지도 확대">
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
+      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
+      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
+    </div>`;
+  }
+  function clamp3(v, cw, ch, lw, lh) {
+    const z = Math.min(MAX, Math.max(1, v.z));
+    const fit2 = (p2, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p2));
+    return { z, x: fit2(v.x, cw, lw), y: fit2(v.y, ch, lh) };
+  }
+  var hit3 = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  var box3 = (el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left, t: r.top, r: r.right, b: r.bottom };
+  };
+  var rank2 = (el) => el.classList.contains("sel") ? 0 : /\bhot/.test(el.className) ? 1 : 2;
+  function declutter(layer, frame2, z) {
+    const labs = [...layer.querySelectorAll(".gx-pin.gx-plab")];
+    const dots = [...layer.querySelectorAll(".gx-pin.gx-pdot")];
+    if (!labs.length) return;
+    for (const el of labs) el.style.removeProperty("--lx"), el.style.removeProperty("--ly");
+    const F = box3(frame2);
+    const inFrame = (r) => r.l >= F.l && r.r <= F.r && r.t >= F.t && r.b <= F.b;
+    const dotBox = dots.map((d) => {
+      const dot2 = d.querySelector(".gx-dot");
+      return dot2 ? box3(dot2) : null;
+    });
+    const order2 = labs.map((el, i) => ({ el, i })).sort((a, b) => rank2(a.el) - rank2(b.el) || a.i - b.i);
+    const placed = [...frame2.querySelectorAll(".gx-zbtn")].map(box3);
+    for (const { el, i } of order2) {
+      const name = el.querySelector(".gx-pname");
+      const D = dotBox[i];
+      if (!name || !D) continue;
+      const N2 = box3(name);
+      const w = N2.r - N2.l, h = N2.b - N2.t, my = (D.t + D.b) / 2 - h / 2;
+      const up = D.t - 2 - h, dn = D.b + 2, rt = D.r + 1, lt = D.l - 1 - w;
+      const spots = [[N2.l, N2.t], [N2.l, up], [D.r + 3, my], [D.l - 3 - w, my], [rt, up], [lt, up], [rt, dn], [lt, dn]];
+      const free = (r) => !placed.some((p2) => hit3(p2, r)) && !dotBox.some((d2, j) => j !== i && d2 && hit3(d2, r));
+      let at = -1;
+      spots.some(([l, t], k) => {
+        const r = { l, t, r: l + w, b: t + h };
+        if ((k === 0 || inFrame(r)) && (rank2(el) === 0 && k === 0 || free(r))) return at = k, placed.push(r), true;
+        return false;
+      });
+      const blocked2 = at < 0;
+      el.classList.toggle("lab-off", blocked2);
+      if (at > 0) {
+        el.style.setProperty("--lx", `${(spots[at][0] - N2.l) / z}px`);
+        el.style.setProperty("--ly", `${(spots[at][1] - N2.t) / z}px`);
+      }
+      const d = dots[i];
+      d.toggleAttribute("title", blocked2);
+      if (blocked2) d.title = el.getAttribute("aria-label") ?? "";
+      d.tabIndex = blocked2 ? 0 : -1;
+      d.setAttribute("aria-hidden", String(!blocked2));
+    }
+  }
+  function bindMapZoom(root3) {
+    const canvas2 = root3.querySelector(".gx-canvas[data-map]");
+    const layer = canvas2?.querySelector(".gx-mapzoom");
+    if (!canvas2 || !layer) return;
+    const key = canvas2.dataset.map ?? "";
+    let v = views.get(key) ?? { z: 1, x: 0, y: Number.NaN };
+    const canPan = () => layer.offsetWidth * v.z > canvas2.clientWidth + 1 || layer.offsetHeight * v.z > canvas2.clientHeight + 1;
+    const apply = () => {
+      if (Number.isNaN(v.y)) v = { ...v, y: (canvas2.clientHeight - layer.offsetHeight) / 2 };
+      v = clamp3(v, canvas2.clientWidth, canvas2.clientHeight, layer.offsetWidth, layer.offsetHeight);
+      views.set(key, v);
+      layer.style.transform = v.z === 1 && !v.x && !v.y ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
+      layer.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
+      canvas2.classList.toggle("zoomed", v.z > 1);
+      canvas2.classList.toggle("pan", canPan());
+      declutter(layer, canvas2, v.z);
+    };
+    const zoomAt = (z, cx, cy) => {
+      const nz = Math.min(MAX, Math.max(1, z));
+      v = { z: nz, x: cx - (cx - v.x) / v.z * nz, y: cy - (cy - v.y) / v.z * nz };
+      apply();
+    };
+    const local = (px, py) => {
+      const r = canvas2.getBoundingClientRect();
+      return [px - r.left - canvas2.clientLeft, py - r.top - canvas2.clientTop];
+    };
+    const img = canvas2.querySelector(".gx-mapimg");
+    if (img && !img.complete) img.addEventListener("load", apply, { once: true });
+    apply();
+    canvas2.querySelector(".gx-zoom")?.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-zoom]");
+      if (!b) return;
+      e.stopPropagation();
+      const w = canvas2.clientWidth / 2, h = canvas2.clientHeight / 2;
+      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: Number.NaN }, apply();
+      else zoomAt(v.z * (b.dataset.zoom === "in" ? 1.6 : 1 / 1.6), w, h);
+    });
+    let dragged = false;
+    canvas2.addEventListener("click", (e) => {
+      if (dragged && !e.target.closest(".gx-zoom")) e.stopPropagation(), e.preventDefault();
+      dragged = false;
+    }, true);
+    let start3 = null;
+    const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    canvas2.addEventListener("touchstart", (e) => {
+      const t = e.touches;
+      dragged = false;
+      if (e.target.closest(".gx-zoom")) return start3 = null;
+      if (t.length === 2) {
+        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
+        start3 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
+      } else if (t.length === 1) start3 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
+    }, { passive: true });
+    canvas2.addEventListener("touchmove", (e) => {
+      const t = e.touches;
+      if (!start3) return;
+      if (t.length === 2 && start3.d) {
+        e.preventDefault();
+        dragged = true;
+        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
+        const nz = Math.min(MAX, Math.max(1, start3.v.z * dist(t) / start3.d));
+        v = { z: nz, x: mx - (start3.mx - start3.v.x) / start3.v.z * nz, y: my - (start3.my - start3.v.y) / start3.v.z * nz };
+        apply();
+      } else if (t.length === 1 && canPan() && !start3.d) {
+        e.preventDefault();
+        const dx = t[0].clientX - start3.x, dy = t[0].clientY - start3.y;
+        if (Math.hypot(dx, dy) > MOVE) dragged = true;
+        v = { ...start3.v, x: start3.v.x + dx, y: start3.v.y + dy };
+        apply();
+      }
+    }, { passive: false });
+    canvas2.addEventListener("touchend", (e) => {
+      const t = e.touches;
+      start3 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
+    }, { passive: true });
+    canvas2.addEventListener("wheel", (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      const [cx, cy] = local(e.clientX, e.clientY);
+      zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
+    }, { passive: false });
+    canvas2.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0 || !canPan() || e.target.closest(".gx-zoom")) return;
+      const sx = e.clientX, sy = e.clientY, sv = { ...v };
+      dragged = false;
+      const move = (m) => {
+        const dx = m.clientX - sx, dy = m.clientY - sy;
+        if (Math.hypot(dx, dy) > MOVE) dragged = true;
+        if (dragged) v = { ...sv, x: sv.x + dx, y: sv.y + dy }, apply();
+      };
+      const up = () => (window.removeEventListener("pointermove", move), window.removeEventListener("pointerup", up));
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    });
+  }
+
+  // src/ui/gesture.ts
+  var MOVE_MIN = 10;
+  var SEG = 28;
+  var SKIP2 = "input, textarea, select, [contenteditable]";
+  var bound3 = /* @__PURE__ */ new WeakSet();
+  function readGesture(dirs) {
+    const s8 = dirs.join("");
+    if (s8 === "L") return "L";
+    if (s8 === "R") return "R";
+    if (s8 === "DR") return "DR";
+    if (s8 === "UL") return "UL";
+    return null;
+  }
+  function bindMouseGesture(root3, h) {
+    if (bound3.has(root3)) return;
+    bound3.add(root3);
+    let on2 = false;
+    let moved = false;
+    let suppress = false;
+    let pts3 = [];
+    let dirs = [];
+    let anchor = [0, 0];
+    let canvas2 = null;
+    let tip2 = null;
+    const ensure2 = () => {
+      if (canvas2) return;
+      canvas2 = document.createElement("canvas");
+      canvas2.className = "gx-gest";
+      canvas2.width = root3.clientWidth;
+      canvas2.height = root3.clientHeight;
+      root3.appendChild(canvas2);
+      tip2 = document.createElement("div");
+      tip2.className = "gx-gest-tip";
+      root3.appendChild(tip2);
+    };
+    const clear = () => {
+      canvas2?.remove();
+      tip2?.remove();
+      canvas2 = tip2 = null;
+    };
+    const draw3 = () => {
+      if (!canvas2) return;
+      const c = canvas2.getContext("2d");
+      if (!c) return;
+      c.clearRect(0, 0, canvas2.width, canvas2.height);
+      c.lineWidth = 3;
+      c.lineCap = "round";
+      c.lineJoin = "round";
+      c.strokeStyle = getComputedStyle(root3).getPropertyValue("--signal").trim() || "#e35d6a";
+      c.beginPath();
+      pts3.forEach(([x, y], i) => i ? c.lineTo(x, y) : c.moveTo(x, y));
+      c.stroke();
+      const g2 = readGesture(dirs);
+      const label2 = g2 ? h.label(g2) : "";
+      if (tip2) {
+        tip2.textContent = g2 ? label2 || "—" : "";
+        tip2.classList.toggle("off", !!g2 && !label2);
+        const [x, y] = pts3[pts3.length - 1];
+        tip2.style.left = `${x + 16}px`;
+        tip2.style.top = `${y + 16}px`;
+      }
+    };
+    const local = (e) => {
+      const r = root3.getBoundingClientRect();
+      return [e.clientX - r.left, e.clientY - r.top];
+    };
+    const finish2 = () => {
+      if (!on2) return;
+      on2 = false;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", cancel);
+      clear();
+    };
+    const move = (e) => {
+      if (!on2) return;
+      const p2 = local(e);
+      const [sx, sy] = pts3[0];
+      if (!moved && Math.hypot(p2[0] - sx, p2[1] - sy) < MOVE_MIN) return;
+      if (!moved) {
+        moved = true;
+        ensure2();
+      }
+      pts3.push(p2);
+      const dx = p2[0] - anchor[0];
+      const dy = p2[1] - anchor[1];
+      if (Math.hypot(dx, dy) >= SEG) {
+        const d = Math.abs(dx) >= Math.abs(dy) ? dx > 0 ? "R" : "L" : dy > 0 ? "D" : "U";
+        if (dirs[dirs.length - 1] !== d) dirs.push(d);
+        anchor = p2;
+      }
+      draw3();
+    };
+    const up = (e) => {
+      if (!on2 || e.button !== 2) return;
+      const g2 = moved ? readGesture(dirs) : null;
+      finish2();
+      if (moved) {
+        suppress = true;
+        setTimeout(() => suppress = false, 300);
+      }
+      if (g2 && h.label(g2)) h.run(g2);
+    };
+    const cancel = () => finish2();
+    root3.addEventListener("pointerdown", (e) => {
+      if (e.button !== 2 || e.pointerType !== "mouse" || on2) return;
+      if (e.target.closest(SKIP2)) return;
+      on2 = true;
+      moved = false;
+      pts3 = [local(e)];
+      anchor = pts3[0];
+      dirs = [];
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+      window.addEventListener("pointercancel", cancel);
+    });
+    root3.addEventListener("contextmenu", (e) => {
+      if (moved && (on2 || suppress)) e.preventDefault();
+    });
+    root3.addEventListener("dragstart", (e) => {
+      if (on2) e.preventDefault();
+    });
+  }
+
+  // src/ui/cctvfx.ts
+  var BASE = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
+  var LAST2 = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
+  var BACK_MS = 1300;
+  var BACKS = ["stand", "flee", "near", "peek", "lens"];
+  var AN_ONLY = ["shade", "text", "breath"];
+  var GAP = { tear: 4e3, lost: 2e4, shade: 2e4, text: 1e4, breath: 15e3 };
+  var FIRST = ["shade", "shade", "text", "text", "tear", "lost"];
+  var visible = /* @__PURE__ */ new Set();
+  var lastAt = /* @__PURE__ */ new Map();
+  var GRADE = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
+  var BLOCKS = "█▓▒░#?¿§";
+  var JAMO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
+  var timer4 = null;
+  var any = (set2) => set2[Math.floor(Math.random() * set2.length)];
+  function garble(ch) {
+    if (/\s/.test(ch) || Math.random() > 0.45) return ch;
+    if (/[가-힣]/.test(ch)) return Math.random() < 0.5 ? any(JAMO) : String.fromCharCode(44032 + Math.floor(Math.random() * 11172));
+    return any(BLOCKS);
+  }
+  function textGlitch(view2) {
+    const nodes2 = [];
+    for (const box4 of view2.querySelectorAll(".gx-oposd, .gx-opcap")) {
+      const walk = document.createTreeWalker(box4, NodeFilter.SHOW_TEXT);
+      for (let n3 = walk.nextNode(); n3; n3 = walk.nextNode()) if (n3.nodeValue?.trim()) nodes2.push(n3);
+    }
+    const real = nodes2.map((n3) => n3.nodeValue ?? "");
+    const shake = () => nodes2.forEach((n3, i) => n3.nodeValue = Array.from(real[i]).map(garble).join(""));
+    shake();
+    const steps = [130, 280, 470].map((ms) => setTimeout(shake, ms));
+    setTimeout(() => {
+      steps.forEach(clearTimeout);
+      nodes2.forEach((n3, i) => n3.nodeValue = real[i]);
+    }, LAST2.text - 10);
+  }
+  function fireFx(view2, fx) {
+    const cls = `fx-${fx}`;
+    if (view2.classList.contains(cls)) return;
+    if (fx === "text") textGlitch(view2);
+    view2.classList.add(cls);
+    setTimeout(() => {
+      view2.classList.remove(cls);
+      if (fx === "lost" && view2.isConnected) {
+        view2.dataset.back = BACKS[Math.floor(Math.random() * BACKS.length)];
+        view2.classList.add("fx-back");
+        setTimeout(() => view2.classList.remove("fx-back"), BACK_MS);
+      }
+    }, LAST2[fx]);
+  }
+  function tick3(root3) {
+    const now2 = /* @__PURE__ */ new Set();
+    for (const view2 of root3.querySelectorAll(".gx-opview.feed:not(.ended):not(.nosig)")) {
+      const an = view2.classList.contains("k-an");
+      const key = view2.dataset.fxkey ?? "";
+      now2.add(key);
+      if (key && !visible.has(key)) {
+        const fx = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : "tear";
+        lastAt.set(fx, Date.now());
+        setTimeout(() => view2.isConnected && fireFx(view2, fx), Math.random() * 1500);
+        continue;
+      }
+      const scale = an ? GRADE[view2.dataset.grade ?? ""] ?? 1 : 0.4;
+      for (const fx of Object.keys(BASE)) {
+        if (!an && AN_ONLY.includes(fx)) continue;
+        if (Date.now() - (lastAt.get(fx) ?? 0) < GAP[fx] || Math.random() >= BASE[fx] * scale) continue;
+        lastAt.set(fx, Date.now());
+        fireFx(view2, fx);
+      }
+    }
+    visible = now2;
+  }
+  function startCctvFx(root3) {
+    if (timer4 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    timer4 = setInterval(() => tick3(root3), 1e3);
+    tick3(root3);
+  }
+  function stopCctvFx() {
+    if (timer4) clearInterval(timer4);
+    timer4 = null;
+    visible = /* @__PURE__ */ new Set();
+  }
+
+  // src/host/send.ts
+  var QUICK_FAIL_MS = 700;
+  async function sendNow() {
+    let sent;
+    try {
+      sent = Promise.resolve(risuai.sendChat("")).then(
+        (r) => r !== false,
+        (e) => {
+          console.log(`[goei] 자동 전송 실패: ${e instanceof Error ? e.message : String(e)}`);
+          return false;
+        }
+      );
+    } catch {
+      return false;
+    }
+    return Promise.race([sent, new Promise((r) => setTimeout(() => r(true), QUICK_FAIL_MS))]);
+  }
+  var SEND_FALLBACK = "채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.";
+  var noticeClass = (text4) => text4 === SEND_FALLBACK ? "gx-err info" : "gx-err";
+
+  // src/ui/field.ts
+  var field3 = {
+    region: "01",
+    filter: "all",
+    place: null,
+    target: null,
+    team: [],
+    support: 0,
+    mkind: "an",
+    mname: null,
+    mpick: "an",
+    mopen: "",
+    note: "",
+    step: "goal",
+    query: "",
+    mapq: "",
+    confirmEnd: null
+  };
+  var mapUrls = {};
+  var esc41 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var KIND_LABEL3 = { an: "괴이", in: "사건", ms: "특수" };
+  var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
+  function resetField(all = false) {
+    field3.target = null;
+    field3.team = [];
+    field3.support = 0;
+    field3.mname = null;
+    field3.note = "";
+    field3.step = "goal";
+    field3.confirmEnd = null;
+    field3.place = null;
+    if (all) {
+      field3.region = "01";
+      field3.filter = "all";
+      field3.query = "";
+      field3.mkind = "an";
+    }
+  }
+  function ctxOf(ctx2, chat) {
+    const lore = ctx2.char.globalLore;
+    const catalog = parseCatalog(lore);
+    const bases = draftBases();
+    return {
+      catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
+      world: readWorld(chat),
+      faction: String(chat.scriptstate?.["$st_faction"] ?? ""),
+      on: worldOn(chat),
+      settings: worldSettings(lore, chat.scriptstate),
+      supportOn: basicSettings(lore, chat.scriptstate).supportOn,
+      char: ctx2.char
+    };
+  }
+  function readCtx(ctx2) {
+    try {
+      return ctxOf(ctx2, ctx2.chat);
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  }
+  function sidoOf(loc) {
+    return loc.split("-")[0];
+  }
+  function placeKey(ev, c) {
+    if (ev.kind === "in") {
+      const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
+      if (lm) return `fac:${lm.name}`;
+    }
+    return ev.loc;
+  }
+  function placeTarget(key) {
+    return key.startsWith("fac:") ? { type: "facility", name: key.slice(4) } : { type: "place", loc: key };
+  }
+  function targetName(t) {
+    if (t.type === "event") return t.name;
+    if (t.type === "facility") return t.name;
+    return locName(t.loc);
+  }
+  var isPC = () => !isPhone();
+  function sameTarget(a, key) {
+    if (!a) return false;
+    if (a.type === "event") return a.key === key;
+    return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key;
+  }
+  function mapImage(ctx2, code2, env3) {
+    const hit4 = mapUrls[code2];
+    if (hit4 === void 0) {
+      mapUrls[code2] = "loading";
+      void assetUrl(ctx2.char, `map${code2}`).then((url) => {
+        mapUrls[code2] = url;
+        env3.render();
+      });
+      return null;
+    }
+    return hit4 === "loading" ? null : hit4;
+  }
+  var boardMapUrl = (ctx2, env3) => mapImage(ctx2, "01", env3);
+  function pin(action, value, label2, x, y, cls, count3 = 0) {
+    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc41(value)}" aria-label="${esc41(label2)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc41(label2)}${count3 ? `<b>${count3}</b>` : ""}</span></button>`;
+  }
+  var layeredPins = (pins) => pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-plab ') + pins.replaceAll('class="gx-pin ', 'class="gx-pin gx-pdot ').replaceAll(' aria-label="', ' tabindex="-1" aria-hidden="true" aria-label="');
+  function hotClass(list4) {
+    if (!list4.length) return "";
+    const kinds = new Set(list4.map((e) => e.kind));
+    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
+  }
+  var narrow2 = () => isPhone();
+  function mapBar(x) {
+    const code2 = field3.region;
+    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code2 ? " selected" : ""}>${c === "01" ? "전국" : esc41(regionName(c))}</option>`).join("");
+    const bar = `<div class="gx-mapbar">
+      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc41(field3.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+      ${modeSwap("mission")}
+    </div>`;
+    return bar;
+  }
+  function mapCanvas(ctx2, x, events, env3) {
+    const code2 = field3.region;
+    const url = mapImage(ctx2, code2, env3);
+    const byPlace = /* @__PURE__ */ new Map();
+    for (const e of events) {
+      const k = placeKey(e, x.catalog);
+      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
+    }
+    let pins = "";
+    if (code2 === "01") {
+      for (const [nn, label2, px, py] of NATION_PINS) {
+        const here = events.filter((e) => sidoOf(e.loc) === nn);
+        pins += pin("map-region", nn, label2, px, py, `nation${hotClass(here)}`, here.length);
+      }
+    } else {
+      (SIGUN[code2] ?? []).forEach((gu, i) => {
+        const xy = REGION_PINS[code2]?.[i];
+        const loc = `${code2}-${i}`;
+        if (!xy) return;
+        const here = byPlace.get(loc) ?? [];
+        const sel = field3.place === loc || sameTarget(field3.target, loc) ? " sel" : "";
+        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
+      });
+      for (const lm of x.catalog.landmarks) {
+        if (lm.sido !== code2) continue;
+        const key = `fac:${lm.name}`;
+        const here = byPlace.get(key) ?? [];
+        const sel = field3.place === key || sameTarget(field3.target, key) ? " sel" : "";
+        pins += pin("map-place", key, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
+      }
+    }
+    const img = url ? `<img class="gx-mapimg" src="${esc41(url)}" alt="${esc41(code2 === "01" ? "전국" : regionName(code2))} 지도">` : `<div class="gx-mapph">${mapUrls[code2] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
+    return `${narrow2() ? "" : mapBar(x)}
+    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code2}"` : ""}><div class="gx-mapzoom">${img}${layeredPins(pins)}</div>${url ? mapZoomControls(code2 !== "01") : ""}</div>`;
+  }
+  function mapSuggest(c) {
+    const q = field3.mapq.trim().toLowerCase();
+    if (!q) return "";
+    const hits = [];
+    for (const code2 of MAP_CODES) {
+      (SIGUN[code2] ?? []).forEach((gu, i) => {
+        if (`${regionName(code2)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code2}|${code2}-${i}`, name: gu, sub: regionName(code2) });
+      });
+    }
+    for (const lm of c.landmarks) {
+      if (!MAP_CODES.includes(lm.sido)) continue;
+      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
+    }
+    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
+    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc41(h.value)}"><b>${esc41(h.name)}</b><small>${esc41(h.sub)}</small></button>`).join("");
+  }
+  function mapSuggestFor(ctx2, q) {
+    field3.mapq = q;
+    const x = readCtx(ctx2);
+    return typeof x === "string" ? "" : mapSuggest(x.catalog);
+  }
+  var artCtx = null;
+  function eventRow(e, x, agents) {
+    const w = x.world;
+    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
+    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
+    const an = e.kind === "an" ? w.an[e.index] : void 0;
+    const badge3 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
+    const names4 = codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n3) => n3.trim());
+    return evCard({
+      kind: e.kind,
+      name: e.name,
+      grade: e.grade,
+      loc: `${esc41(locName(e.loc))}${since ? ` · ${since}` : ""}`,
+      badge: badge3,
+      chips: peopleChips(x.char, names4, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
+      extra: e.report ? `<span class="gx-evc-sit" title="${esc41(e.report)}">${esc41(e.report)}</span>` : "",
+      key: e.key,
+      open: "pick-event",
+      art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
+      pop: e.key,
+      locCode: e.loc,
+      selected: field3.target?.type === "event" && field3.target.key === e.key,
+      confirmEnd: field3.confirmEnd === e.key
+    });
+  }
+  function placeCard(key, c, on2) {
+    let name;
+    let sub;
+    let wiki2;
+    if (key.startsWith("fac:")) {
+      const lm = c.landmarks.find((l) => l.name === key.slice(4));
+      name = lm?.label || lm?.name || key.slice(4);
+      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
+      wiki2 = lm?.name ?? name;
+    } else {
+      const full = locName(key);
+      const cut3 = full.lastIndexOf(" ");
+      name = cut3 > 0 ? full.slice(cut3 + 1) : full;
+      sub = cut3 > 0 ? full.slice(0, cut3) : "";
+      wiki2 = full;
+    }
+    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
+    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc41(key)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc41(name)}</b>${tag}</span>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc41(wiki2)}" title="위키" aria-label="${esc41(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc41(sub || "장소")}</small></span></li>`;
+  }
+  function situations(x, events) {
+    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
+    for (const e of events) counts[e.kind]++;
+    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field3.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL3[f]}<b>${counts[f]}</b></button>`).join("");
+    const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p2) => [p2.name, p2]));
+    const shown3 = events.filter((e) => (field3.filter === "all" || e.kind === field3.filter) && (!field3.place || placeKey(e, x.catalog) === field3.place));
+    const place3 = field3.place ? placeCard(field3.place, x.catalog, sameTarget(field3.target, field3.place)) : "";
+    const cancel = cancelChip("map-unplace", !!(field3.place || field3.target));
+    const gone = field3.place ? "" : endedShown(x.world).filter((e) => field3.filter === "all" || e.kind === field3.filter).map((e) => endedCard(e, (n3, k) => artCtx ? evArt(artCtx, n3, k) : void 0)).join("");
+    const empty2 = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field3.place || field3.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
+    return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
+    ${shown3.length || place3 || gone ? `<ul class="gx-evcs">${place3}${shown3.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty2}</p>`}`;
+  }
+  function cancelChip(action, on2) {
+    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? "" : "disabled"}>취소</button>`;
+  }
+  function lockedState(x, id2) {
+    const rec2 = x.world.agents[id2];
+    return agentLocked(rec2) ? rec2.st : null;
+  }
+  function teamPanel(x, goal, action, label2, busy6, ctx2) {
+    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
+    if (!x.supportOn) field3.support = 0;
+    const used = field3.team.length + field3.support;
+    const chips3 = roster.map((p2) => {
+      const on2 = field3.team.includes(p2.id);
+      const lock = lockedState(x, p2.id);
+      const full = !on2 && used >= TEAM_MAX;
+      const st = x.world.agents[p2.id]?.st ?? "미정";
+      const sit = x.world.agents[p2.id]?.situation ?? "";
+      {
+        const c = ctx2 ? agentContact(ctx2, p2.id) : null;
+        const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc41(p2.id)}" title="괴담톡" aria-label="${esc41(p2.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc41(c.wiki)}" title="위키" aria-label="${esc41(p2.name)} 위키">${ICONS.wiki}</button></span>` : "";
+        const off = !!lock || full;
+        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc41(p2.id)}" aria-pressed="${on2}" aria-disabled="${off}"
+          ${lock ? `title="${esc41(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p2, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+      }
+    }).join("");
+    const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field3.support > 0 ? " on" : ""}">
+      <span class="gx-ava sq">${ICONS.group}</span>
+      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
+      <span class="gx-scard-step">
+        <button class="gx-step" data-action="support" data-value="-1" ${field3.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
+        <b>${field3.support}</b>
+        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
+      </span>
+    </div>` : "";
+    const ready = !!goal && validTeam(field3.team.length, field3.support) && !busy6;
+    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy6 ? "보내는 중…" : esc41(label2)}</button>`;
+    lastGo = go2;
+    return `<section class="gx-team">
+    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc41(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
+    ${roster.length || support ? `<div class="gx-acards pick">${chips3}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
+    ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
+    ${narrow2() ? "" : noteBox()}
+    ${narrow2() ? "" : go2}
+  </section>`;
+  }
+  var lastGo = "";
+  function noteBox() {
+    return `<label class="gx-note">
+      <textarea rows="2" aria-label="작전 메모"${field3.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc41(field3.note)}</textarea></label>`;
+  }
+  function fieldDrawer(x, withMap, custom = "") {
+    if (!narrow2()) return "";
+    if (field3.step === "team") return drawerBox(noteBox(), "gx-notedrawer", `<div class="gx-mgo">${lastGo}</div>`);
+    if (withMap) return drawerBox(mapBar(x), "gx-mapdrawer");
+    return custom ? drawerBox(custom, "gx-custdrawer") : "";
+  }
+  function modeSwap(to) {
+    return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${to === "map" ? "임무" : "커스텀"}</span></button>`;
+  }
+  function stepBar(goal, swap) {
+    const used = field3.team.length + field3.support + 1;
+    const b = (k, n3, label2, sub) => `<button class="gx-stepb${field3.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field3.step === k}"><i>${n3}</i><span><b>${label2}</b><small>${esc41(sub)}</small></span></button>`;
+    const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
+    return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
+  }
+  function toStep(step2, env3) {
+    field3.step = step2;
+    env3.render();
+    const body5 = document.querySelector(".gx .gx-body");
+    if (body5 && isPhone()) body5.scrollTop = 0;
+  }
+  function mapTab(ctx2, env3, notice2, busy6) {
+    artCtx = ctx2;
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return `<div class="gx-empty">${esc41(x)}</div>`;
+    const events = x.on ? activeEvents(x.world) : [];
+    const t = field3.target;
+    if (t?.type === "event" && !events.some((e) => e.key === t.key)) field3.target = null;
+    const goal = field3.target ? targetName(field3.target) : null;
+    return `<main class="gx-body gx-field gx-map" data-step="${field3.step}">
+    ${stepBar(goal, "mission")}
+    <div class="gx-mapcol">${mapCanvas(ctx2, x, events, env3)}
+      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
+    <div class="gx-sidecol">
+      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc41(notice2)}</div>` : ""}
+      ${teamPanel(x, goal, "depart", "출발", busy6, ctx2)}
+    </div>
+  </main>${fieldDrawer(x, true)}`;
+  }
+  function missionCatalog(c, kind) {
+    if (kind === "an") return c.anomalies.map((a) => ({ name: a.name, sub: a.english }));
+    if (kind === "ms") return c.mysticSites.map((m) => ({ name: m.name, sub: m.english }));
+    return c.landmarks.map((l) => ({ name: l.name, sub: placeWhere(l.sido, l.gu) }));
+  }
+  function missionStatus(x, kind, name) {
+    const w = x.world;
+    if (kind === "an") {
+      if (w.pending.an === name) return '<span class="gx-badge wait">요청 대기</span>';
+      const e = w.an.find((a) => a.presetName === name || a.name === name);
+      if (e) return `<span class="gx-badge ${e.state === "활성" ? "live" : "wait"}">${e.state === "활성" ? "발생 중" : "발생 예정"}</span>`;
+    } else if (kind === "ms") {
+      if (w.pending.ms === name) return '<span class="gx-badge wait">요청 대기</span>';
+      if (w.ms.some((m) => m.name === name)) return '<span class="gx-badge live">출현</span>';
+    } else {
+      if (w.pending.in === name) return '<span class="gx-badge wait">요청 대기</span>';
+      if (w.inc.some((i) => i.name === name)) return '<span class="gx-badge hot">사건 진행</span>';
+    }
+    return "";
+  }
+  function missionList(ctx2, opening = false) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return "";
+    const q = field3.query.trim().toLowerCase();
+    const row11 = (kind, r) => {
+      const sel = field3.mname === r.name && field3.mpick === kind;
+      const val = `${kind}:${esc41(r.name)}`;
+      const open4 = field3.mopen === `${kind}:${r.name}`;
+      const art2 = evArt(ctx2, r.name, kind);
+      const link = kind === "lm" ? baseLink(ctx2, r.name) : null;
+      if (link) r = { ...r, sub: [link.org, r.sub].filter(Boolean).join(" · ") };
+      const status2 = missionStatus(x, kind, r.name);
+      const bg = art2.pic ? ` style="background-image:url('${esc41(art2.pic)}')"` : "";
+      const cap = `<span class="gx-evart-name"><b>${esc41(r.name)}</b>${r.sub ? `<small>${esc41(r.sub)}</small>` : ""}</span>`;
+      const capOpen = (mark2) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc41(r.name)}</b>${mark2}</span>${r.sub ? `<small>${esc41(r.sub)}</small>` : ""}</span>`;
+      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc41(link?.doc ?? r.name)}" title="위키" aria-label="${esc41(r.name)} 위키">${ICONS.wiki}</button>`;
+      if (!open4) {
+        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+        ${status2 ? `<span class="gx-evart-top">${status2}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
+      }
+      const aim = sel ? aimMark(true, "mission-unpick", val) : aimMark(false, "mission-pick", val);
+      return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
+      ${aim}<span class="gx-evart-top">${status2}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${capOpen("")}${art2.desc ? `<span class="gx-evc-desc">${esc41(art2.desc)}</span>` : ""}</span></div></li>`;
+    };
+    const hit4 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
+    if (!q) {
+      const rows3 = missionCatalog(x.catalog, field3.mkind);
+      if (!rows3.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
+      return `<ul class="gx-list gx-mlist">${rows3.map((r) => row11(field3.mkind, r)).join("")}</ul>`;
+    }
+    const order2 = [field3.mkind, ...["an", "ms", "lm"].filter((k) => k !== field3.mkind)];
+    const groups = order2.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit4) })).filter((g2) => g2.rows.length).map((g2) => `<li class="gx-mgrp">${MISSION_LABEL[g2.k]}<small>${g2.rows.length}</small></li>${g2.rows.map((r) => row11(g2.k, r)).join("")}`).join("");
+    return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
+  }
+  function missionTab(ctx2, opening, notice2, busy6) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return `<div class="gx-empty">${esc41(x)}</div>`;
+    const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field3.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field3.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
+    const p2 = x.world.pending;
+    const pend = ["an", "ms", "in"].filter((k) => p2[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc41(p2[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
+    const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
+    const filter = `<div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc41(field3.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field3.mname)}${opening ? "" : modeSwap("map")}</div>`;
+    return `<main class="gx-body gx-field gx-mission" data-step="${field3.step}">
+    ${stepBar(field3.mname, opening ? void 0 : "map")}
+    <div class="gx-mapcol">
+      ${intro}
+      ${narrow2() ? "" : filter}
+      <div class="gx-mbox">${missionList(ctx2, opening)}</div>
+    </div>
+    <div class="gx-sidecol">
+      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc41(notice2)}</div>` : ""}
+      ${x.world.notice && x.on ? `<div class="gx-hint">${esc41(x.world.notice)}</div>` : ""}
+      ${pend}
+      ${teamPanel(x, field3.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy6, opening ? void 0 : ctx2)}
+    </div>
+  </main>${fieldDrawer(x, false, filter)}`;
+  }
+  function newMessage2(data3) {
+    const id2 = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return { role: "user", data: data3, time: Date.now(), chatId: id2 };
+  }
+  function placeRecord(chat, card2, note) {
+    const record = note.trim() ? `${card2}
+
+${note.trim()}` : card2;
+    const message = (chat.message ?? []).slice();
+    const last2 = message[message.length - 1];
+    if (last2?.role === "user" && hasSceneCard(last2.data)) message[message.length - 1] = { ...last2, data: record };
+    else message.push(newMessage2(record));
+    return { ...chat, message };
+  }
+  function partyNames(x, team) {
+    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
+    return team.map((id2) => {
+      const p2 = roster.find((r) => r.id === id2);
+      if (!p2 || lockedState(x, id2)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
+      return p2.name || p2.english;
+    });
+  }
+  function partyLabel(names4, support) {
+    return ["나", ...names4, ...support > 0 ? [`지원 ×${support}`] : []].join(", ");
+  }
+  async function compose2(ctx2, env3, build3) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    env3.render();
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        return build3(latest, x).chat;
+      });
+      resetField();
+      const sent = await sendNow();
+      env3.setBusy(false);
+      if (!sent) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await env3.close();
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function depart(ctx2, env3) {
+    const target = field3.target;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!target) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest;
+      if (target.type === "event") {
+        const ev = activeEvents(x.world).find((e) => e.key === target.key);
+        if (!x.on || !ev) throw new DirectiveError("선택한 상황이 끝났거나 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, ev.name, locName(ev.loc));
+      } else if (target.type === "facility") {
+        const lm = x.catalog.landmarks.find((l) => l.name === target.name);
+        if (!lm) throw new DirectiveError("시설 목록이 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ""));
+      } else {
+        dest = destination(d, locName(target.loc));
+      }
+      const names4 = partyNames(x, team);
+      const body5 = sceneDirective(d, dest, names4, support, false);
+      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function sendMission(ctx2, env3, opening) {
+    const kind = field3.mpick;
+    const name = field3.mname;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest = destination(d, name);
+      if (kind === "lm") {
+        const lm = x.catalog.landmarks.find((l) => l.name === name);
+        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
+      } else if (kind === "ms") {
+        const site = x.world.ms.find((m) => m.name === name);
+        if (site) dest = destination(d, name, locName(site.loc));
+      }
+      const names4 = partyNames(x, team);
+      let chat = latest;
+      if (x.on) {
+        const w = structuredClone(x.world);
+        const last2 = (latest.message ?? []).at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body5 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function closeIndexOf(chat) {
+    const list4 = chat.message ?? [];
+    for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return i;
+    return Math.max(0, list4.length - 1);
+  }
+  async function saveWorld(ctx2, env3, change) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    try {
+      let closedAt = -1;
+      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p2) => change(p2, x));
+        const next = { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+        if (w.closed?.length) {
+          const index3 = closeIndexOf(latest);
+          const built = buildClosures({ chat: next, index: index3, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+          if (built.rows.length) {
+            next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+            closedAt = index3;
+          }
+        }
+        return next;
+      });
+      if (saved2 && closedAt >= 0) {
+        try {
+          await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex, { chat: saved2, char: ctx2.char });
+          if (chatCardsAt(saved2, closedAt).length) await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
+        } catch {
+        }
+      }
+      env3.setBusy(false);
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function showOnMap(ctx2, key) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key);
+    if (!ev) return false;
+    field3.region = sidoOf(ev.loc);
+    field3.place = placeKey(ev, x.catalog);
+    field3.filter = "all";
+    field3.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env3, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field3.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field3.place = null;
+        field3.confirmEnd = null;
+        env3.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code2, key] = v2.split("|");
+          if (!MAP_CODES.includes(code2) || !key) return true;
+          field3.region = code2;
+          field3.mapq = "";
+          v2 = key;
+        }
+        field3.confirmEnd = null;
+        if (action === "map-place" && isPC() && field3.place === v2 && sameTarget(field3.target, v2)) {
+          field3.place = null;
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field3.target = placeTarget(v2);
+        env3.render();
+        return true;
+      }
+      case "map-unplace":
+        field3.place = null;
+        field3.target = null;
+        field3.confirmEnd = null;
+        toStep("goal", env3);
+        return true;
+      case "map-filter":
+        field3.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env3.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field3.target, v)) {
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.target = placeTarget(v);
+        toStep("team", env3);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env3);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        await aimFlash(ev.key);
+        if (sameTarget(field3.target, ev.key)) {
+          field3.target = null;
+          field3.confirmEnd = null;
+          env3.render();
+          return true;
+        }
+        field3.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field3.region = sidoOf(ev.loc);
+        field3.confirmEnd = null;
+        toStep("team", env3);
+        return true;
+      }
+      case "end-event":
+        if (field3.confirmEnd !== v) {
+          field3.confirmEnd = v;
+          env3.render();
+          return true;
+        }
+        field3.confirmEnd = null;
+        if (field3.target?.type === "event" && field3.target.key === v) field3.target = null;
+        await saveWorld(ctx2, env3, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field3.team.indexOf(v);
+        if (i >= 0) field3.team.splice(i, 1);
+        else if (field3.team.length + field3.support < TEAM_MAX) field3.team.push(v);
+        env3.render();
+        return true;
+      }
+      case "support": {
+        const next = field3.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field3.team.length, next)) field3.support = next;
+        env3.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env3);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field3.mkind = v;
+          field3.query = "";
+        }
+        env3.render();
+        return true;
+      case "mission-open":
+        field3.mopen = field3.mopen === v ? "" : v;
+        env3.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field3.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field3.mname === name && field3.mpick === kind && field3.mopen !== `${kind}:${name}`) {
+          await aimFlash(v);
+          field3.mname = null;
+          env3.render();
+          return true;
+        }
+        await aimFlash(v);
+        field3.mname = name;
+        field3.mpick = kind;
+        toStep("team", env3);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env3, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        await aimFlash(v);
+        field3.mname = null;
+        toStep("goal", env3);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env3, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
+  var root2 = null;
+  var view = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy4 = false;
+  var notice = "";
+  var GNET_ON = true;
+  var TABS3 = ["board", "map", "mission", "net", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "items", "records"];
+  var BR_TABS = ["net", "gnet", "wiki"];
+  var inBrowser = () => BR_TABS.includes(tab);
+  var tabsSaved = "";
+  var tabsTimer = null;
+  function saveTabsSoon() {
+    if (view.kind !== "started" || tabsJson() === tabsSaved) return;
+    if (tabsTimer) clearTimeout(tabsTimer);
+    const { charIndex, chatIndex } = view.ctx;
+    tabsTimer = setTimeout(() => {
+      tabsTimer = null;
+      const json = tabsJson();
+      if (json === tabsSaved || view.kind !== "started" || view.ctx.charIndex !== charIndex || view.ctx.chatIndex !== chatIndex) return;
+      tabsSaved = json;
+      void updateChat(charIndex, chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [BR_TABS_VAR]: json } })).catch(() => {
+      });
+    }, 1500);
+  }
+  var siteTab = (site) => isBoardSite(site) ? "gnet" : site === "wk" ? "wiki" : "net";
+  function gnActionSite(action) {
+    const page = settingsUi.page;
+    const setting = /^gn-(cfg|text|keep|def-)/.test(action);
+    if (setting && (page === "gnet" || page === "gal" || page === "wpf" || page === "sm")) return page === "gnet" ? "gn" : page;
+    return tabBoard();
+  }
+  var tabBoard = () => {
+    const s8 = curTab().site;
+    return isBoardSite(s8) ? s8 : "gn";
+  };
+  var cdrOpen = false;
+  var lastForm = null;
+  var tab = "board";
+  var netSolo = false;
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env2 = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    close: () => close2(),
+    setNotice: (text4) => {
+      notice = text4;
+    },
+    setBusy: (on2) => {
+      busy4 = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    current: () => view.kind === "started" ? view.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render2(), refresh: () => refresh2() };
+  setVsRender(() => render2());
+  var peopleEnv = settingsEnv;
+  var recordsEnv = settingsEnv;
+  var shown2 = false;
+  var appShown = () => shown2;
+  var shownListener = null;
+  function onAppShown(f) {
+    shownListener = f;
+  }
+  function setShown(v) {
+    shown2 = v;
+    shownListener?.(v);
+  }
+  var phoneEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    visible: () => shown2 && tab === "phone" && view.kind === "started",
+    current: () => view.kind === "started" ? view.ctx : null,
+    close: async () => {
+      await close2();
+      await refresh2();
+    }
+  };
+  var esc42 = (s8) => String(s8 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot2() {
+    if (root2) return root2;
+    setImageRedraw(() => {
+      if (view.kind === "picker") renderPicker();
+      else render2();
+      if (editorOpen()) render();
+    });
+    setLookRender(() => render2());
+    onLooksReady(() => {
+      if (lookUi.open) render2();
+      else if (view.kind === "picker") renderPicker();
+      else if (tab === "items" || shopUi.open) render2();
+    });
+    setAvatarHtml((ctx2) => {
+      const look = idleLook(ctx2);
+      const unique = !!playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
+      const inner = look ? lookSprite(look, "it-look") : `<span class="it-avnone">${looksStatus().loading ? "아바타 받는 중…" : unique ? "" : "아바타<br>고르기"}</span>`;
+      if (unique) return `<span class="it-avbtn">${inner}</span>`;
+      return `<button class="it-avbtn" data-action="look-open" aria-label="아바타 바꾸기" title="아바타 바꾸기">${inner}</button>`;
+    });
+    setItemIconRedraw(() => {
+      if (view.kind !== "picker" && (tab === "items" || shopUi.open || inBrowser() && curTab().site === "sm")) render2();
+    });
+    const style = document.createElement("style");
+    style.textContent = style_default2 + LOOK_CSS;
+    document.head.appendChild(style);
+    root2 = document.createElement("div");
+    root2.className = "gx";
+    document.body.appendChild(root2);
+    bindNeedFill();
+    root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files.length) void addPhotos(pickFor, files);
+    });
+    let downOutside = false;
+    root2.addEventListener("pointerdown", (ev) => downOutside = ev.target === root2);
+    root2.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root2) {
+        if (downOutside) void run5("close");
+        downOutside = false;
+        return;
+      }
+      const pick3 = t.closest("[data-pick-photo]");
+      if (pick3) {
+        if (pick3.hasAttribute("disabled") || busy4) return;
+        pickFor = pick3.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void run5("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const names4 = el.dataset.take?.split(",") ?? [];
+      const val = (n3) => root2?.querySelector(`[name="${n3}"]`)?.value ?? "";
+      const take = !names4.length ? void 0 : names4.length > 1 ? JSON.stringify(names4.map(val)) : root2?.querySelector(`[name="${names4[0]}"]`)?.value;
+      void run5(el.dataset.action, take ?? el.dataset.value);
+    });
+    bindCropDrag(root2, render2);
+    bindPopWins(root2, render2, [mallWinSpec, bmDeskWinSpec, gnetDmWinSpec]);
+    bindMouseGesture(root2, {
+      label: (g2) => {
+        const web = view.kind === "started" && inBrowser();
+        if (g2 === "L") return (web ? tabCan(-1) : navStep(-1)) ? "뒤로" : "";
+        if (g2 === "R") return (web ? tabCan(1) : navStep(1)) ? "앞으로" : "";
+        if (!web) return "";
+        return g2 === "DR" ? "탭 닫기" : br.closed.length ? "닫은 탭 다시 열기" : "";
+      },
+      run: (g2) => {
+        if (g2 === "L" || g2 === "R") {
+          if (view.kind === "started" && inBrowser()) return void run5(g2 === "L" ? "br-back" : "br-fwd");
+          return void navStep(g2 === "L" ? -1 : 1)?.();
+        }
+        void run5(g2 === "DR" ? "br-close" : "br-reopen", String(br.cur));
+      }
+    });
+    root2.addEventListener("pointerdown", (ev) => {
+      const grip = ev.target.closest?.("[data-drag-agent]");
+      const row11 = grip?.closest("[data-agent-row]");
+      if (!grip || !row11 || !root2) return;
+      ev.preventDefault();
+      const box4 = root2;
+      const group7 = row11.dataset.agentGroup ?? "";
+      const rows3 = [...box4.querySelectorAll("[data-agent-row]")].filter((r) => r !== row11 && r.dataset.agentGroup === group7);
+      let drop = null;
+      const mark2 = (next) => {
+        drop?.el.classList.remove("drop-before", "drop-after");
+        drop = next;
+        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
+      };
+      const move = (e) => {
+        let best = null;
+        let gap = Infinity;
+        for (const r of rows3) {
+          const b = r.getBoundingClientRect();
+          const d = Math.abs(e.clientY - (b.top + b.height / 2));
+          if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+        }
+        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
+      };
+      row11.classList.add("dragging");
+      box4.classList.add("dir-dragging");
+      grip.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        grip.removeEventListener("pointermove", move);
+        grip.removeEventListener("pointerup", up);
+        grip.removeEventListener("pointercancel", up);
+        row11.classList.remove("dragging");
+        box4.classList.remove("dir-dragging");
+        const target = drop;
+        mark2(null);
+        if (target) void run5("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      };
+      grip.addEventListener("pointermove", move);
+      grip.addEventListener("pointerup", up);
+      grip.addEventListener("pointercancel", up);
+    });
+    root2.addEventListener("pointerover", (ev) => {
+      if (ev.pointerType && ev.pointerType !== "mouse") return;
+      const cell3 = ev.target?.closest?.(".it-c:not(.empty), .it-slot:not(.empty)");
+      const tip2 = cell3?.querySelector(":scope > .it-tip");
+      if (!cell3 || !tip2) return;
+      if (tipFor === cell3 && tipLayer?.isConnected) return;
+      showTip(cell3, tip2);
+    });
+    root2.addEventListener("pointerout", (ev) => {
+      if (!tipFor) return;
+      const to = ev.relatedTarget;
+      if (to && tipFor.contains(to)) return;
+      hideTip();
+    });
+    root2.addEventListener("scroll", hideTip, true);
+    root2.addEventListener("pointerdown", hideTip, true);
+    root2.addEventListener("change", (ev) => {
+      if (ev.target.dataset?.input === "dir-crop-size") render2();
+    });
+    const photoTarget = (el) => {
+      const box4 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box4 ? box4.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+    };
+    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+    if (!widthWatch) {
+      widthWatch = true;
+      matchMedia(PHONE_MQ).addEventListener?.("change", () => root2 && render2());
+      const frameWatch = () => {
+        if (!root2 || root2.style.display === "none") return;
+        const fr = frameState(getPrefs().frame, view.kind === "started");
+        if (root2.dataset.frame !== fr.kind || root2.dataset.frameHidden === "1" !== fr.hidden) render2();
+      };
+      window.addEventListener("resize", frameWatch);
+      document.addEventListener("fullscreenchange", frameWatch);
+    }
+    root2.addEventListener("paste", (ev) => {
+      const prefix = photoTarget(ev.target);
+      const files = imageFiles(ev.clipboardData?.items);
+      if (!prefix || !files.length) return;
+      ev.preventDefault();
+      void addPhotos(prefix, files);
+    });
+    root2.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    let dragItem = null;
+    const dropAt = (t) => t instanceof Element ? t.closest("[data-drop]") : null;
+    const dropOk = (z) => {
+      if (!z || !dragItem) return false;
+      const to = z.dataset.drop ?? "";
+      if (to.startsWith("equip:")) return to.split(":")[1] === dragItem.equip;
+      if (to === "use") return dragItem.usable;
+      return to === "grid" || to === "drop";
+    };
+    const clearDrag = () => {
+      dragItem = null;
+      root2?.querySelector(".gx-items")?.classList.remove("it-dragging");
+      root2?.querySelectorAll(".it-over-ok").forEach((x) => x.classList.remove("it-over-ok"));
+    };
+    root2.addEventListener("dragstart", (ev) => {
+      const el = ev.target instanceof Element ? ev.target.closest("[data-drag]") : null;
+      if (!el) return;
+      dragItem = { id: el.dataset.drag ?? "", equip: el.dataset.equip ?? "", usable: el.dataset.usable === "1" };
+      ev.dataTransfer?.setData("text/plain", dragItem.id);
+      if (ev.dataTransfer) ev.dataTransfer.effectAllowed = "move";
+      root2?.querySelector(".gx-items")?.classList.add("it-dragging");
+    });
+    root2.addEventListener("dragover", (ev) => {
+      if (!dragItem) return;
+      const z = dropAt(ev.target);
+      root2?.querySelectorAll(".it-over-ok").forEach((x) => x !== z && x.classList.remove("it-over-ok"));
+      if (!dropOk(z)) return;
+      ev.preventDefault();
+      z.classList.add("it-over-ok");
+    });
+    root2.addEventListener("drop", (ev) => {
+      if (!dragItem) return;
+      const z = dropAt(ev.target);
+      const it = dragItem;
+      const ok = dropOk(z);
+      clearDrag();
+      if (!z || !ok) return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      void run5("items-dnd", `${it.id}|${z.dataset.drop}`);
+    });
+    root2.addEventListener("dragend", clearDrag);
+    root2.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files = imageFiles(ev.dataTransfer.files);
+      if (files.length) void addPhotos(prefix, files);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+    });
+    root2.addEventListener("keydown", (ev) => {
+      const el = ev.target;
+      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
+        const send2 = root2?.querySelector(".ph-send");
+        ev.preventDefault();
+        if (send2 && !send2.disabled) void run5("ph-send", send2.dataset.value);
+        return;
+      }
+      if (ev.key !== "Enter" || ev.isComposing || !el?.dataset?.enter) return;
+      ev.preventDefault();
+      void run5(el.dataset.enter, el.value);
+    });
+    root2.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const form2 = ev.target;
+      const input3 = form2.querySelector("input");
+      lastForm = form2;
+      if (form2.dataset.submit) void run5(form2.dataset.submit, form2.dataset.submit.startsWith("items-") ? form2.dataset.value ?? "" : input3?.value ?? "");
+    });
+    root2.addEventListener("change", (ev) => panelChange(ev.target));
+    root2.addEventListener("input", (ev) => panelInput(ev.target));
+    bindAgentTips(root2);
+    bindPeopleStatus(() => {
+      if (shown2 && view.kind === "started") render2();
+    });
+    bindPeopleHold(root2);
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Escape") return;
+      if (editorOpen()) return;
+      if (document.querySelector(".gx-rptpop")) return void handle3("rec-back");
+      if (view.kind === "started" && tab === "items" && (itemsUi.open || itemsUi.mode === "add")) return void handle3("items-close");
+      if (view.kind === "started" && inBrowser() && mallAskOpen(curTab().site)) return void handle3("mall-ask-close");
+      if (view.kind === "started" && inBrowser() && isBoardSite(curTab().site) && gnetDmOpen()) return void handle3("gn-dm-close");
+      if (view.kind === "started" && shopUi.open) return void handle3(shopUi.detail ? "shop-detail-close" : shopUi.drawer ? "shop-drawer" : "shop-close");
+      const pop = document.querySelector(".gx-agpop");
+      if (pop) return void pop.remove();
+      if (evUi.pop || agUi.pop) {
+        evUi.pop = agUi.pop = "";
+        render2();
+        return;
+      }
+      void close2();
+    });
+    return root2;
+  }
+  function panelChange(el) {
+    if (el?.dataset?.change) void run5(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+  }
+  var tipLayer = null;
+  var tipFor = null;
+  function showTip(cell3, tip2) {
+    if (!root2) return;
+    if (!tipLayer || !tipLayer.isConnected) {
+      tipLayer = document.createElement("div");
+      tipLayer.className = "it-tipfloat";
+      tipLayer.setAttribute("aria-hidden", "true");
+      root2.appendChild(tipLayer);
+    }
+    tipFor = cell3;
+    tipLayer.innerHTML = tip2.innerHTML;
+    tipLayer.style.left = "0px";
+    tipLayer.style.top = "0px";
+    tipLayer.classList.add("on");
+    const r = cell3.getBoundingClientRect();
+    const w = tipLayer.offsetWidth;
+    const h = tipLayer.offsetHeight;
+    const gap = 8;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let x = r.right + gap;
+    if (x + w > vw - gap) x = r.left - gap - w;
+    if (x < gap) x = Math.max(gap, Math.min(vw - gap - w, r.left));
+    let y = r.top;
+    if (y + h > vh - gap) y = vh - gap - h;
+    y = Math.max(gap, y);
+    tipLayer.style.left = `${Math.round(x)}px`;
+    tipLayer.style.top = `${Math.round(y)}px`;
+  }
+  function hideTip() {
+    tipFor = null;
+    tipLayer?.classList.remove("on");
+  }
+  function panelInput(el) {
+    if (el?.dataset?.input === "dim" && root2) {
+      paintVeil(root2, Number(el.value));
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "pp-cap") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
+      return;
+    }
+    if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
+      return;
+    }
+    if (el?.dataset?.input === "wallet-q" && view.kind === "started") {
+      walletUi.q = el.value;
+      const box5 = root2?.querySelector(".gx-wt-list");
+      if (box5) box5.innerHTML = walletList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "items-q" && view.kind === "started" && root2) return itemsInput(root2, view.ctx, el.value);
+    if (el?.dataset?.input === "shop-say") return shopInput(el.value);
+    if (el?.dataset?.input === "hs-say") return void homeshopInput(el.value);
+    if (el?.dataset?.input === "mall-say") {
+      const ms = curTab().site;
+      if (isMallSite(ms)) mallInput(ms, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "rec-q" && view.kind === "started") {
+      recordsInput("rec-q", el.value);
+      const box5 = root2?.querySelector(".gx-jr-list");
+      if (box5) box5.innerHTML = journalList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "wiki-query" && view.kind === "started") {
+      wiki.query = el.value;
+      return;
+    }
+    if (el?.dataset?.input === "wiki-filter" && view.kind === "started") {
+      wiki.filter = el.value;
+      const box5 = root2?.querySelector(".wk .wlist");
+      if (box5) box5.innerHTML = wikiList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "wiki-home-query" && view.kind === "started") {
+      wiki.homeQuery = el.value;
+      const box5 = root2?.querySelector(".wk .hres");
+      if (box5) box5.innerHTML = wikiHomeResults(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
+    if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
+    if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
+    if (el?.dataset?.input === "ph-query" && view.kind === "started") {
+      const box5 = root2?.querySelector(".ph-content");
+      if (box5) box5.innerHTML = phoneContent(view.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "ph-pick-q" && view.kind === "started") {
+      phoneInput("ph-pick-q", el.value);
+      const box5 = root2?.querySelector(".ph-pick");
+      if (box5) box5.innerHTML = phonePickList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.q = el.value;
+      const box5 = root2?.querySelector(".dir-list");
+      if (box5) box5.innerHTML = directoryList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-crop-size") {
+      const key = el.dataset.key ?? "";
+      const [x, y] = cropValue(key);
+      setCrop(key, [x, y, Number(el.value)]);
+      const frame2 = root2?.querySelector("[data-crop] .dir-crop-frame");
+      if (frame2) frame2.style.width = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "dir-photo-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.pickQ = el.value;
+      const box5 = root2?.querySelector(".dir-pics");
+      if (box5) box5.innerHTML = directoryPhotoList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-ext-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.addQ = el.value;
+      const box5 = root2?.querySelector(".dir-ext-list");
+      if (box5) box5.innerHTML = directoryExtList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
+    if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+    if (el?.dataset?.input === "field-note") return void (field3.note = el.value);
+    if (el?.dataset?.input === "map-query" && view.kind === "started") {
+      const box5 = root2?.querySelector(".gx-mapsug");
+      if (box5) box5.innerHTML = mapSuggestFor(view.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "start-note") {
+      const had = !!(draft.situation ?? "").trim();
+      draft.situation = el.value;
+      if (had !== !!el.value.trim()) root2?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy4);
+      return;
+    }
+    if (el?.dataset?.input !== "mission-query") return;
+    field3.query = el.value;
+    const box4 = root2?.querySelector(".gx-mbox");
+    if (box4 && (view.kind === "started" || view.kind === "opening")) box4.innerHTML = missionList(view.ctx, view.kind === "opening");
+  }
+  async function addPhotos(prefix, files) {
+    if (view.kind !== "started") return;
+    const ui3 = prefix === "gn" ? gnet : prefix === "ph" ? phone : null;
+    if (!ui3) return;
+    if (prefix === "gn" && !gnet.compose) return;
+    if (prefix === "ph") {
+      const r = readPhone(view.ctx.chat).rooms[phone.room ?? ""];
+      if (!r || !r.members.length || r.pending) return;
+    }
+    for (const file of files) {
+      if (ui3.attach.length >= ATTACH_MAX) {
+        ui3.notice = `첨부는 ${ATTACH_MAX}개까지예요.`;
+        break;
+      }
+      try {
+        const { asset, preview } = await savePhoto(file);
+        addPhoto(ui3.attach, asset, preview);
+        ui3.notice = "";
+      } catch (error) {
+        ui3.notice = error instanceof Error ? error.message : String(error);
+        break;
+      }
+    }
+    render2();
+  }
+  var widthWatch = false;
+  async function openApp(opts = {}) {
+    ensureRoot2();
+    if (opts.quietIfNotLite) {
+      const ctx2 = await loadContext().catch(() => null);
+      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
+    }
+    view = { kind: "loading" };
+    notice = "";
+    render2();
+    setShown(true);
+    if (root2) startCctvFx(root2);
+    await showWindow();
+    await refresh2();
+    void loadModuleAssets().then((changed) => {
+      if (shown2 && changed) render2();
+    });
+    void readUser().then((u) => {
+      if (shown2 && (u.name || u.photo)) render2();
+    });
+    void checkLatest(settingsEnv);
+  }
+  var installCtx = null;
+  async function openInstall() {
+    if (!shown2) await openApp();
+    installCtx = await loadContext().catch(() => null);
+    if (!installCtx) {
+      ensureRoot2();
+      view = { kind: "error", message: "선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요." };
+      render2();
+      setShown(true);
+      await showWindow();
+      return;
+    }
+    if (view.kind === "picker") pickerPrefs = true;
+    const host3 = {
+      ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : installCtx,
+      refresh: async () => {
+        installCtx = await loadContext().catch(() => null) ?? installCtx;
+        if (shown2) await refresh2();
+        if (view.kind === "picker") pickerPrefs = true;
+      },
+      theme: () => root2?.dataset.theme ?? getPrefs().theme ?? "dark",
+      handle: (a, v) => handle3(a, v),
+      input: panelInput,
+      change: panelChange,
+      canChat: () => view.kind === "started",
+      mobileNav: mobileNavHtml
+    };
+    await refreshInstall(installCtx);
+    openEditor(host3, "install");
+  }
+  async function openWiki2(title2) {
+    await openApp({ quietIfNotLite: true });
+    if (view.kind === "started") await handle3("wiki-goto", title2);
+  }
+  async function openShop(site = "") {
+    await openApp({ quietIfNotLite: true });
+    if (site && view.kind === "started" && isSite(site)) {
+      netSolo = true;
+      tab = "net";
+      openSite(site);
+      siteOpened();
+      render2();
+      return;
+    }
+    netSolo = false;
+    shopUi.solo = true;
+    if (view.kind === "started") await handle3("shop-open");
+  }
+  async function openVersusSettings() {
+    await openApp({ quietIfNotLite: true });
+    if (view.kind === "started" || view.kind === "picker" || view.kind === "opening") await handle3("ed-open", "set:versus");
+  }
+  async function openRecords2(id2) {
+    await openApp({ quietIfNotLite: true });
+    if (view.kind === "started") await handle3("rec-open", id2);
+  }
+  async function refresh2() {
+    try {
+      const ctx2 = await loadContext();
+      if (ctx2) await prepareBaseDocs(ctx2.char.globalLore).catch(() => void 0);
+      if (!ctx2) {
+        view = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
+      } else {
+        const manifest = readManifest(ctx2.char.globalLore);
+        const phase = chatPhase(ctx2.chat);
+        if (manifest) {
+          applyAdvanced(ctx2.chat.scriptstate);
+          void readPersona();
+        }
+        const chatKey8 = `${ctx2.charIndex}:${ctx2.chatIndex}`;
+        if (chatKey8 !== lastChat) {
+          lastChat = chatKey8;
+          navHist.clear();
+          resetField(true);
+          resetWiki();
+          resetRecords();
+          resetItems();
+          resetShop();
+          resetGnet();
+          resetMalls();
+          resetHomeshop();
+          restoreTabs(ctx2.chat.scriptstate?.[BR_TABS_VAR]);
+          tabsSaved = tabsJson();
+          resetPhone();
+          resetSettings();
+          resetDirectory();
+          pickerPrefs = false;
+          repick = false;
+        }
+        const cur = currentChoice(ctx2.chat);
+        const facs = factionList(ctx2.char.globalLore);
+        const presetStaged = phase === "staged" && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === "preset";
+        if (!manifest) view = { kind: "not-lite", name: String(ctx2.char.name ?? ""), goei: isGoeiLore(ctx2.char.globalLore) };
+        else if (phase === "started") view = { kind: "started", ctx: ctx2 };
+        else if (presetStaged && !repick) view = { kind: "opening", ctx: ctx2 };
+        else {
+          view = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
+          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "", look: lookId(ctx2.chat.scriptstate) || draft.look || "" };
+          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
+          const fsel = draft.faction ? findFaction(draft.faction, facs) : void 0;
+          if (fsel) {
+            const list4 = scenariosFor(fsel, draft.player, ctx2.char.globalLore);
+            if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm ?? defaultScenario(fsel.code, facs);
+          }
+        }
+      }
+    } catch (error) {
+      view = { kind: "error", message: `채팅 정보를 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}` };
+    }
+    render2();
+  }
+  async function close2() {
+    setShown(false);
+    netSolo = false;
+    stopCctvFx();
+    await risuai.hideContainer();
+  }
+  async function stagedTheme(ctx2, value) {
+    if (value !== "light" && value !== "dark" && value !== "paper") return;
+    try {
+      const saved2 = await updateChat(
+        ctx2.charIndex,
+        ctx2.chatIndex,
+        (chat) => chatPhase(chat) === "started" || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
+      );
+      if (saved2) ctx2.chat = saved2;
+    } catch (error) {
+      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    render2();
+  }
+  var run5 = (action, value) => handle3(action, value).catch((error) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
+  async function handle3(action, value) {
+    if (busy4) return;
+    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
+    if (agUi.pop && action !== "agent-info") agUi.pop = "";
+    if (action.startsWith("adv-") && (view.kind === "started" || view.kind === "picker" && pickerPrefs)) {
+      const feat = (value ?? "").split(/[:=]/)[0];
+      const scope = feat !== "gen" ? "chat" : view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      await handleAdvanced(action, value, view.ctx, { render: render2, refresh: refresh2 }, scope);
+      return;
+    }
+    const featCtx = view.kind === "started" || view.kind === "picker" && pickerPrefs && settingsUi.page ? view.ctx : null;
+    if (action === "wiki-back" && view.kind === "started" && !wiki.history.some((h) => h.view !== "home") && navHist.can(-1)) {
+      const run6 = navStep(-1);
+      return run6 ? run6() : render2();
+    }
+    if (featCtx && action.startsWith("wiki-") && await handleWiki(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("pp-") && await handlePeople(action, value, featCtx, peopleEnv)) return;
+    if (featCtx && action.startsWith("items-") && await itemsAction(action, value, featCtx, recordsEnv, root2?.querySelector("[data-it-form]") ?? lastForm)) return;
+    if (view.kind === "started" && action.startsWith("look") && await lookAction(action, value, view.ctx, refresh2)) return;
+    if (view.kind === "picker" && action.startsWith("look")) {
+      if (lookCommon(action, value)) return;
+      if (action === "look" && value) {
+        draft.look = value;
+        notice = "";
+        flashPick(value, () => {
+          lookUi.open = false;
+          render2();
+        });
+        return;
+      }
+      return;
+    }
+    if (featCtx && action.startsWith("shop-") && await shopAction(action, value, featCtx, { ...wikiEnv, closeApp: () => close2() })) return;
+    if (action === "cdr") {
+      cdrOpen = !cdrOpen;
+      root2?.querySelector(".gx-cdr")?.classList.toggle("open", cdrOpen);
+      root2?.querySelector(".gx-cgrip")?.setAttribute("aria-expanded", String(cdrOpen));
+      return;
+    }
+    if (featCtx && (action.startsWith("rec-") || action.startsWith("jr-"))) {
+      if (action === "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv)) {
+        const go2 = navStep(-1);
+        return go2 ? go2() : render2();
+      }
+      const switching = (action === "rec-open" || action === "rec-journal" || action === "rec-person" || action === "rec-people") && tab !== "records";
+      if (switching) {
+        tab = "records";
+        notice = "";
+        field3.confirmEnd = null;
+        resetSettings();
+      }
+      if (action !== "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv) && switching) render2();
+      return;
+    }
+    if (action.startsWith("ip-") && await handleImgPrompt(action, value, { render: render2 })) return;
+    if (featCtx && action.startsWith("ms-") && await mallSettingsAction(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("hs-") && await homeshopAction(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("mall-")) {
+      const ms = curTab().site;
+      if (isMallSite(ms) && await mallAction(action, value, featCtx, wikiEnv, ms)) return;
+    }
+    if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action))) return;
+    if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
+    if (action === "ed-open") {
+      document.querySelectorAll(".gx-agpop").forEach((b) => b.remove());
+      if (!(view.kind === "started" || view.kind === "picker" || view.kind === "opening")) return;
+      if (view.kind === "picker") pickerPrefs = true;
+      settingsUi.scope = view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      openEditor({
+        ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : null,
+        refresh: () => refresh2(),
+        theme: () => root2?.dataset.theme ?? "dark",
+        handle: (a, v) => handle3(a, v),
+        input: panelInput,
+        change: panelChange,
+        canChat: () => view.kind === "started",
+        mobileNav: mobileNavHtml
+      }, value || void 0);
+      return;
+    }
+    if (action === "install-open") {
+      await openInstall();
+      return;
+    }
+    if (action === "set-editor-width") {
+      await savePrefs((p2) => ({ ...p2, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
+      return render2();
+    }
+    const FEAT_SET = { "gn-settings": "set:gnet", "ph-settings": "set:phone", "wiki-settings": "set:wiki" };
+    if (FEAT_SET[action]) return handle3("ed-open", FEAT_SET[action]);
+    if (action === "prefs-open" || action === "prefs-close") {
+      resetSettings();
+      resetDirectory();
+      settingsUi.scope = "defaults";
+      if (action === "prefs-open") return handle3("ed-open", "set:screen");
+      pickerPrefs = false;
+      return render2();
+    }
+    if (action.startsWith("vs-") && await handleVersus(action, value ?? "", () => render2())) return;
+    if ((view.kind === "started" || view.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
+      if (action === "dir-save" || action === "dir-reset") settingsUi.confirm = "";
+      await handleDirectory(action, value, view.ctx, settingsEnv);
+      return;
+    }
+    if (view.kind === "picker" && pickerPrefs && (action.startsWith("set-") || action.startsWith("visit-"))) {
+      if (settingsUi.busy) return;
+      await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
+      if (action === "set-theme" && view.kind === "picker" && view.staged) await stagedTheme(view.ctx, value);
+      return;
+    }
+    if (view.kind === "started" && (action.startsWith("set-") || action.startsWith("visit-"))) {
+      const scope = action === "set-theme" ? "chat" : settingsUi.scope === "defaults" ? "defaults" : "chat";
+      if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, scope);
+      return;
+    }
+    if (action === "upd-go") {
+      return handle3("ed-open", "set:update");
+    }
+    if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
+    if (action === "pick-event" && view.kind === "started" && tab !== "map") {
+      await handleField(action, value, view.ctx, env2, false);
+      if (field3.target?.type === "event" && field3.target.key === value && showOnMap(view.ctx, value ?? "")) {
+        tab = "map";
+        evUi.pop = "";
+        field3.step = "goal";
+        notice = "";
+        render2();
+      }
+      return;
+    }
+    if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env2, view.kind === "opening")) return;
+    switch (action) {
+      case "close":
+        return close2();
+      case "faction": {
+        const facs = view.kind === "picker" ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
+        const f = findFaction(value ?? "", facs);
+        if (!f) return;
+        if (draft.faction !== f.code) {
+          draft.fm = defaultScenario(f.code, facs);
+          draft.player = "";
+          if (f.group && view.kind === "picker") {
+            const first = playableAgents(view.ctx.char.globalLore, f.code)[0];
+            if (first) {
+              draft.player = first.id;
+              draft.fm = scenariosFor(f, first.id, view.ctx.char.globalLore)[0]?.fm;
+            }
+          }
+        }
+        draft.faction = f.code;
+        notice = "";
+        return renderPicker();
+      }
+      case "lang":
+        if (value === "ko" || value === "en") draft.lang = value;
+        return renderPicker();
+      case "fm":
+        draft.fm = Number(value);
+        notice = "";
+        return renderPicker();
+      case "player": {
+        if (view.kind !== "picker") return;
+        const lore = view.ctx.char.globalLore;
+        const f = draft.faction ? findFaction(draft.faction, factionList(lore)) : void 0;
+        if (f?.group && !value) return;
+        draft.player = value ?? "";
+        if (f) {
+          const list4 = scenariosFor(f, draft.player, lore);
+          if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm;
+        }
+        notice = "";
+        return renderPicker();
+      }
+      case "start":
+        return start();
+      case "start-wallet": {
+        const n3 = parseWon(value ?? "");
+        if (n3 !== null && n3 >= 0 && n3 <= WALLET_MAX) draft.wallet = n3;
+        return renderPicker();
+      }
+      case "nav-tab":
+      case "tab":
+        if (action === "nav-tab" && value === tab && value !== "board" && !isPhone()) value = "board";
+        if (value === "settings") return handle3("ed-open", "set:screen");
+        if (value === "wallet") return openWallet();
+        if (value === "records" && tab !== "records") applyRecordsNav({ sub: "journal", view: "list", id: "" });
+        if (value === "items" && tab !== "items") applyItemsNav({ sub: "items", view: "grid", open: "" });
+        cdrOpen = false;
+        if (value === "net") return openBrowserTab();
+        if (value === "gnet" || value === "wiki") return handle3("br-site", value === "gnet" ? "gn" : "wk");
+        tab = TABS3.includes(value) ? value : "board";
+        notice = "";
+        field3.confirmEnd = null;
+        resetSettings();
+        render2();
+        if (view.kind === "started" && tab === "phone") openCheck(view.ctx, phoneEnv);
+        if (view.kind === "started" && tab === "gnet") gnetOpenCheck(view.ctx, gnetEnv, tabBoard());
+        if (view.kind === "started" && tab === "wiki") wikiOpenCheck(view.ctx, wikiEnv);
+        return;
+      // ── 인터넷 브라우저 (ui/browser.ts) ──
+      case "br-site":
+        if (!value || !isSite(value)) return;
+        cdrOpen = false;
+        if (inBrowser()) return goSite(value);
+        if (br.tabs.some((t) => t.site === value)) {
+          openSite(value);
+          return openBrowserTab();
+        }
+        if (curTab().site) newTab();
+        return goSite(value);
+      case "br-go":
+        if (!value || !isSite(value)) return;
+        return goSite(value);
+      case "br-home":
+        return goSite("");
+      case "br-new":
+        newTab();
+        return goSite("");
+      case "br-tab":
+        br.cur = Math.max(0, Math.min(br.tabs.length - 1, Number(value) || 0));
+        br.list = false;
+        br.login = false;
+        return openBrowserTab();
+      case "br-close":
+        closeTab(Number(value) || 0);
+        return openBrowserTab();
+      case "br-reopen":
+        if (reopenTab()) openBrowserTab();
+        return;
+      case "br-back":
+      case "br-fwd": {
+        const s8 = tabGo(action === "br-back" ? -1 : 1);
+        if (s8) applyNav(s8);
+        return;
+      }
+      case "br-reload":
+        if (view.kind === "started" && isBoardSite(curTab().site) && await handleGnet("gn-refresh", "", view.ctx, gnetEnv, tabBoard())) return;
+        {
+          const ms = curTab().site;
+          if (view.kind === "started" && isMallSite(ms) && await mallAction("mall-refresh", "", view.ctx, wikiEnv, ms)) return;
+        }
+        if (view.kind === "started" && curTab().site === "hs" && await homeshopAction("hs-refresh", "", view.ctx, wikiEnv)) return;
+        return render2();
+      case "br-list":
+        br.list = !br.list;
+        br.login = false;
+        return render2();
+      case "br-login":
+        br.login = !br.login;
+        return render2();
+      case "br-login-save":
+      case "br-login-guest": {
+        if (view.kind !== "started") return;
+        const nick = action === "br-login-save" ? (value ?? "").trim().slice(0, 36) : "";
+        if (action === "br-login-save" && !nick) return;
+        br.login = false;
+        const ctx2 = view.ctx;
+        const vars = { $br_login: nick ? "1" : "0", [GN_NICK]: nick };
+        if (nick) vars.$br_nick = nick;
+        const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
+        if (saved2) ctx2.chat = saved2;
+        return render2();
+      }
+      case "nav-back":
+      case "nav-fwd": {
+        const run6 = navStep(action === "nav-back" ? -1 : 1);
+        return run6 ? run6() : render2();
+      }
+      case "feature-set":
+        if (value === "phone" || value === "wiki" || value === "people" || value === "image" || value === "gnet" && GNET_ON) return handle3("ed-open", `set:${value}`);
+        return;
+      case "ops-sel":
+        opsUi.sel = value ?? "";
+        field3.confirmEnd = null;
+        render2();
+        if (isPhone()) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      case "ops-mode":
+        opsUi.mode = value === "map" ? "map" : "feed";
+        return render2();
+      case "ev-pop":
+        evUi.pop = evUi.pop === value ? "" : value ?? "";
+        return render2();
+      case "board-map":
+        if (view.kind !== "started" || !showOnMap(view.ctx, value ?? "")) return;
+        tab = "map";
+        notice = "";
+        return render2();
+      case "id-card": {
+        if (view.kind !== "started") return;
+        showIdCard(idCard(view.ctx), (a, v) => void run5(a, v));
+        return;
+      }
+      case "wallet-pop":
+        return handle3("tab", "wallet");
+      case "wallet-filter":
+        walletUi.filter = value === "in" || value === "out" ? value : "all";
+        return render2();
+      case "wallet-open":
+        walletUi.open = walletUi.open === value ? null : value ?? null;
+        return render2();
+      case "wallet-edit":
+        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
+        walletUi.edit = !walletUi.edit;
+        walletUi.notice = "";
+        render2();
+        if (walletUi.edit) root2?.querySelector('[name="wt-adj"]')?.focus();
+        return;
+      case "wallet-del": {
+        if (view.kind !== "started" || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
+        const ctx2 = view.ctx;
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          if (walletUi.kind === "p") return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...pointsVars(removeWalletEntry(readPoints(chat.scriptstate), value ?? "")) } };
+          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(removeWalletEntry(w, value ?? "")) } };
+        });
+        return refresh2();
+      }
+      case "wallet-adj": {
+        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
+        const pts3 = walletUi.kind === "p";
+        const n3 = pts3 ? parsePoints(value ?? "") : parseWon(value ?? "");
+        if (n3 === null || pts3 && Math.abs(n3) > WALLET_MAX) {
+          walletUi.notice = pts3 ? "포인트를 읽을 수 없어요. 숫자 또는 「1만」처럼 적어 주세요." : "금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.";
+          return render2();
+        }
+        const ctx2 = view.ctx;
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          if (pts3) return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...pointsVars(adjustWallet(readPoints(chat.scriptstate), aliveAnchors(chat), n3, "포인트 수정")) } };
+          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(adjustWallet(w, aliveAnchors(chat), n3)) } };
+        });
+        walletUi.notice = "";
+        walletUi.edit = false;
+        return refresh2();
+      }
+      case "agents-view":
+        if (value !== "wall" && value !== "list") return;
+        await savePrefs((p2) => ({ ...p2, agents: value === "list" ? "list" : void 0 }));
+        return render2();
+      case "agent-info":
+        agUi.pop = agUi.pop === value ? "" : value ?? "";
+        return render2();
+      case "agent-talk":
+        if (view.kind !== "started") return;
+        tab = "phone";
+        notice = "";
+        resetField();
+        if (!await openAgentDm(view.ctx, phoneEnv, value ?? "")) render2();
+        if (view.kind === "started") openCheck(view.ctx, phoneEnv);
+        return;
+      case "wiki-goto":
+        if (view.kind !== "started") return;
+        focusSite("wk");
+        tab = "wiki";
+        resetWiki();
+        gnet.compose = null;
+        phone.view = phone.view === "room" ? "room" : "list";
+        resetField();
+        await handleWiki("wiki-write", value, view.ctx, wikiEnv);
+        return;
+      case "people-goto":
+        if (view.kind !== "started" || !value || !hasPersonRecord(view.ctx, value)) return;
+        tab = "records";
+        gnet.compose = null;
+        phone.view = phone.view === "room" ? "room" : "list";
+        resetField();
+        await handleRecords("rec-person", value, view.ctx, recordsEnv);
+        return;
+      case "repick":
+        repick = true;
+        notice = "";
+        return refresh2();
+      case "world-on":
+        return turnWorldOn();
+    }
+  }
+  async function start() {
+    if (view.kind !== "picker" || !draft.faction || draft.fm === void 0) return;
+    const { ctx: ctx2, manifest } = view;
+    busy4 = true;
+    notice = "";
+    render2();
+    try {
+      const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm, ...draft.player ? { player: draft.player } : {} };
+      const lore = ctx2.char.globalLore ?? [];
+      let world2 = null;
+      try {
+        if (basicDefaults(lore).anomalyOn) world2 = startWorldVars(parseCatalog(lore), worldDefaults(lore), effectiveFaction(lore, choice.faction, draft.player), Math.random, draft.player ?? "");
+      } catch (error) {
+        console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      const plan = planStart(choice, manifest, lore, ctx2.char.alternateGreetings?.length ?? 0, world2, itemStartOn(getPrefs().vars));
+      const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
+      if (plan.kind === "direct" && !situation) throw new StartError("시작할 상황을 적어 주세요.");
+      setOpeningHint(plan.kind === "opening" ? plan.scene ?? null : null);
+      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
+        const next = applyStart(chat, plan);
+        if (situation) next.message = [...next.message ?? [], newMessage2(startRecord(situation))];
+        const theme = getPrefs().theme ?? "dark";
+        return {
+          ...next,
+          // 아바타: 페르소나로 시작할 때만 (고유 인물은 그 인물 모습)
+          scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...getPrefs().vars ?? {}, ...next.scriptstate ?? {}, [LOOK_KEY]: draft.player ? "" : draft.look ?? "", ...draft.wallet !== void 0 ? walletVars({ start: draft.wallet, log: [] }) : {} }
+        };
+      });
+      if (!saved2) throw new StartError("저장하지 못했어요.");
+      if (!draft.player && draft.look && getPrefs().look !== draft.look) await savePrefs((p2) => ({ ...p2, look: draft.look })).catch(() => {
+      });
+      if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(", ")}`);
+      busy4 = false;
+      repick = false;
+      settingsUi.scope = "chat";
+      pickerPrefs = false;
+      if (plan.kind === "preset") {
+        resetField(true);
+        return refresh2();
+      }
+      draft.situation = "";
+      if (situation && !await sendNow()) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await close2();
+      await refresh2();
+    } catch (error) {
+      busy4 = false;
+      notice = error instanceof Error ? error.message : String(error);
+      render2();
+    }
+  }
+  async function turnWorldOn() {
+    if (view.kind !== "started") return;
+    const { ctx: ctx2 } = view;
+    busy4 = true;
+    notice = "";
+    render2();
+    try {
+      const catalog = parseCatalog(ctx2.char.globalLore);
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (worldOn(chat)) return null;
+        const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...startWorldVars(catalog, worldSettings(ctx2.char.globalLore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? "")) } };
+      });
+      busy4 = false;
+      await refresh2();
+    } catch (error) {
+      busy4 = false;
+      notice = error instanceof Error ? error.message : String(error);
+      render2();
+    }
+  }
+  var TAB_TITLE = {
+    board: "상황판",
+    map: "임무",
+    mission: "커스텀",
+    net: "인터넷",
+    gnet: "인터넷",
+    phone: "괴담톡",
+    wiki: "인터넷",
+    items: "소지품",
+    records: "기록",
+    settings: "설정"
+  };
+  function header(title2, extra2 = "", sub = "") {
+    return `<header class="gx-head">
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${esc42(title2)}</b>${sub ? `<small>${esc42(sub)}</small>` : ""}</div></div>
+    <div class="gx-head-act">${extra2}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  function startedHeader(ctx2) {
+    return `<header class="gx-head">
+    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-head-act">
+      ${walletHeadButton(ctx2)}
+      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc42(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
+      <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  function renderPicker() {
+    const facs = root2?.querySelectorAll(".gx-facs .gx-fac");
+    const main = root2?.querySelector(".gx-body");
+    if (!root2 || view.kind !== "picker" || !facs?.length || !main || root2.querySelector(".gx-settings")) return render2();
+    const tpl = document.createElement("template");
+    tpl.innerHTML = body4();
+    const next = tpl.content.querySelectorAll(".gx-facs .gx-fac");
+    if (next.length !== facs.length) return render2();
+    next.forEach((b, i) => {
+      if (b.classList.contains("has-img") !== facs[i].classList.contains("has-img")) return void facs[i].replaceWith(b);
+      facs[i].className = b.className;
+      facs[i].setAttribute("aria-pressed", b.getAttribute("aria-pressed") ?? "false");
+    });
+    const sections3 = main.querySelectorAll(":scope > section");
+    const fresh3 = tpl.content.querySelectorAll(".gx-body > section");
+    if (sections3.length !== fresh3.length) return render2();
+    for (let i = 1; i < sections3.length; i++) sections3[i].replaceWith(fresh3[i]);
+    const foot = root2.querySelector(".gx-foot");
+    const nfoot = tpl.content.querySelector(".gx-foot");
+    if (foot && nfoot) foot.replaceWith(nfoot);
+    else return render2();
+  }
+  var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups, .gx-lookg";
+  var PAGE_SCROLL = ".st-featpage .ph-form-body, .nw-pane .nw-doc";
+  var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
+  function render2() {
+    if (!root2) return;
+    if (editorOpen() && editorOnSettings()) queueMicrotask(() => render());
+    const nav = view.kind === "started" && !(netSolo && tab === "net");
+    if (view.kind === "started") syncCloseToast(view.ctx.chat, render2);
+    const scroller = root2.querySelector(".gx-body");
+    const keep = scroller && root2.dataset.tab === tab ? scroller.scrollTop : 0;
+    const inner = root2.dataset.tab === tab ? [...root2.querySelectorAll(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+    const pageKeep = root2.dataset.pk === pageKey() ? [...root2.querySelectorAll(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
+    const log = root2.querySelector(".ph-log");
+    const logRoom = root2.dataset.room ?? "";
+    const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
+    const chatKeep = /* @__PURE__ */ new Map();
+    root2.querySelectorAll("[data-chatlog]").forEach((el) => chatKeep.set(el.dataset.chatlog ?? "", { top: el.scrollTop, bottom: el.scrollHeight - el.scrollTop - el.clientHeight < 60, n: el.querySelectorAll(".q-m, .bd-m, [data-msg]").length }));
+    const gnKey2 = `${curTab().site}:${gnet.sub}:${gnet.open}:${gnet.openDm}`;
+    const gnKeep = tab === "gnet" && root2.dataset.tab === "gnet" && root2.dataset.gn === gnKey2 ? [".gn .ph-content", ".gn-pane .gn-doc"].map((q) => root2.querySelector(q)?.scrollTop ?? 0) : null;
+    const act = document.activeElement;
+    const focusSel = act && root2.contains(act) && act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
+    const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
+    root2.dataset.theme = themeOf();
+    const pf = getPrefs();
+    root2.dataset.nav = pf.nav ?? "left";
+    root2.dataset.wikiSide = pf.wikiSide ?? "right";
+    paintVeil(root2, pf.dim ?? DIM_DEFAULT);
+    const fr = frameState(pf.frame, nav);
+    root2.dataset.frame = fr.kind;
+    if (fr.hidden) root2.dataset.frameHidden = "1";
+    else delete root2.dataset.frameHidden;
+    const solo = view.kind === "started" && shopUi.open && shopUi.solo;
+    const pick3 = view.kind === "picker" ? " pick" : "";
+    const panel = `<div class="gx-panel${solo ? " solo" : nav ? " has-nav" : ` pre${pick3}`}">${body4()}</div>`;
+    root2.innerHTML = fr.kind === "none" || solo ? panel : frameHtml(fr.kind, !nav, panel);
+    if (dirUi.scrollTo) {
+      dirUi.scrollTo = "";
+      root2.querySelector(".dir-row.open")?.scrollIntoView({ block: "center" });
+    }
+    root2.dataset.tab = tab;
+    const toastEl = root2.querySelector(".gx-rectoast");
+    if (toastEl) {
+      toastEl.addEventListener("pointerenter", holdToast);
+      toastEl.addEventListener("pointerleave", () => releaseToast(render2));
+    }
+    if (focusSel) {
+      const el = [...root2.querySelectorAll(focusSel)].find((x) => x.offsetParent);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (caret) try {
+          el.setSelectionRange(caret[0], caret[1]);
+        } catch {
+        }
+      }
+    }
+    const next = root2.querySelector(".gx-body");
+    if (next && keep) next.scrollTop = keep;
+    if (inner.length) root2.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+    root2.dataset.pk = pageKey();
+    if (pageKeep.length) root2.querySelectorAll(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
+    const tabsRow = root2.querySelector(".br-tabs");
+    const onTab = tabsRow?.querySelector(".br-tab.on");
+    if (tabsRow && onTab && tabsRow.scrollWidth > tabsRow.clientWidth) {
+      const l = onTab.offsetLeft - tabsRow.offsetLeft;
+      if (l < tabsRow.scrollLeft) tabsRow.scrollLeft = l;
+      else if (l + onTab.offsetWidth > tabsRow.scrollLeft + tabsRow.clientWidth) tabsRow.scrollLeft = l + onTab.offsetWidth - tabsRow.clientWidth + 40;
+    }
+    const nlog = root2.querySelector(".ph-log");
+    root2.dataset.room = phone.room ?? "";
+    if (nlog) {
+      nlog.scrollTop = logKeep < 0 ? nlog.scrollHeight : logKeep;
+      if (logKeep < 0) nlog.querySelectorAll("img").forEach((img) => img.addEventListener("load", () => nlog.scrollTop = nlog.scrollHeight, { once: true }));
+    }
+    root2.dataset.gn = gnKey2;
+    if (gnKeep) [".gn .ph-content", ".gn-pane .gn-doc"].forEach((q, i) => {
+      const el = root2.querySelector(q);
+      if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
     });
     hydratePhotos(root2);
+    homeshopMounted(root2);
+    root2.querySelectorAll("[data-chatlog]").forEach((el) => {
+      const k = chatKeep.get(el.dataset.chatlog ?? "");
+      const n3 = el.querySelectorAll(".q-m, .bd-m, [data-msg]").length;
+      el.scrollTop = !k || k.bottom || n3 !== k.n ? el.scrollHeight : k.top;
+    });
     root2.querySelectorAll("[data-sh-log]").forEach((el) => el.scrollTop = el.scrollHeight);
     labelSwitches(root2);
     bindMapZoom(root2);
-    bindMbar(root2, () => void run4("close"));
+    bindMbar(root2, () => void run5("close"));
     bindDrawer(root2);
-    bindWikiSide(root2, (v) => void run4("wiki-list", v));
+    bindWikiSide(root2, (v) => void run5("wiki-list", v));
     bindFootnotes(root2);
     const stBar = root2.querySelector(".gx-settings > .st-scopebar");
     if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
@@ -58,16 +2790,16 @@ p = gnKeep[i];
     if (s8.g) Object.assign(gnet, { sub: s8.g.sub, open: s8.g.open, openDm: s8.g.dm, settings: s8.g.s, compose: s8.g.c });
     if (s8.d !== void 0) dirUi.open = s8.d;
     agUi.pop = s8.a ?? "";
-    if (s8.f && s8.f !== field3.step) return void run4("field-step", s8.f);
+    if (s8.f && s8.f !== field3.step) return void run5("field-step", s8.f);
     render2();
   }
   function navStep(dir2) {
-    const go2 = (action, value) => () => void run4(action, value);
+    const go2 = (action, value) => () => void run5(action, value);
     if (view.kind === "picker") return dir2 < 0 && pickerPrefs ? go2("prefs-close") : null;
     if (view.kind === "opening") return dir2 < 0 ? go2("repick") : null;
     if (view.kind !== "started") return null;
-    if (evUi.pop && dir2 < 0) return () => void run4("ev-pop", evUi.pop);
-    if (agUi.pop && dir2 < 0) return () => void run4("agent-info", agUi.pop);
+    if (evUi.pop && dir2 < 0) return () => void run5("ev-pop", evUi.pop);
+    if (agUi.pop && dir2 < 0) return () => void run5("agent-info", agUi.pop);
     if (!navHist.can(dir2)) return null;
     return () => {
       const s8 = navHist.go(dir2);
@@ -109,10 +2841,10 @@ p = gnKeep[i];
       case "loading":
         return `${header("불러오는 중")}<div class="gx-empty">채팅 정보를 읽는 중이에요…</div>`;
       case "error":
-        return `${header("오류")}<div class="gx-empty">${esc40(view.message)}</div>`;
+        return `${header("오류")}<div class="gx-empty">${esc42(view.message)}</div>`;
       case "not-lite":
         return `${header("연결 안 됨")}<div class="gx-empty">
-        <p><b>${esc40(view.name || "이 캐릭터")}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
+        <p><b>${esc42(view.name || "이 캐릭터")}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
         <p>${view.goei ? "설치 · 점검에서 매니페스트와 인사말을 다시 심으면 시작 화면이 열려요." : `이 봇에 ${BRAND.name}를 설치하면(설정 폴더·명부·인사말·사진·아이콘을 심어요) 여기서 바로 쓸 수 있어요. 기존 로어북·인사말·에셋은 그대로 둬요.`}</p>
         <button class="gx-start" data-action="install-open">${view.goei ? "설치 · 점검 열기" : `이 봇에 ${BRAND.name} 설치`}</button>
       </div>`;
@@ -120,7 +2852,7 @@ p = gnKeep[i];
         evSeenReset();
         if (shopUi.open && shopUi.solo) return `<div class="gx-solo"></div>${shopPopup(view.ctx)}`;
         if (netSolo && tab === "net") return `${header(TAB_TITLE.net)}<div class="gx-content gx-netsolo">${browserBody(view.ctx)}</div>${closeToastHtml()}`;
-        return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc40(notice)}</div>` : ""}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === "board" ? agentPopup((n2) => view.kind === "started" && hasPersonRecord(view.ctx, n2)) : ""}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
+        return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc42(notice)}</div>` : ""}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === "board" ? agentPopup((n3) => view.kind === "started" && hasPersonRecord(view.ctx, n3)) : ""}${closeToastHtml()}${shopPopup(view.ctx)}${chatLookPopup(view.ctx)}`;
       case "opening":
         return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy4)}</div>`;
       case "picker":
@@ -143,19 +2875,19 @@ p = gnKeep[i];
       (x) => {
         const img = view.kind === "picker" ? imageUrl(view.ctx.char, factionPic(view.ctx.char, x)) : null;
         return `<button class="gx-fac${x.code === draft.faction ? " on" : ""}${img ? " has-img" : ""}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
-        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc40(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc40(x.name)}</b><span>${esc40(x.blurb)}</span></span></button>`;
+        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc42(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc42(x.name)}</b><span>${esc42(x.blurb)}</span></span></button>`;
       }
     ).join("");
     const langs = SCENARIOS.languages.map(
-      (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc40(l.label)}</button>`
+      (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc42(l.label)}</button>`
     ).join("");
     const playing = !!draft.player;
     const scenarios = f ? list4.map((s8, i) => {
       return `<button class="gx-sc${s8.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s8.fm}" aria-pressed="${s8.fm === draft.fm}">
-            <b>${String(i + 1).padStart(2, "0")}</b><span>${esc40(s8.label)}</span></button>`;
+            <b>${String(i + 1).padStart(2, "0")}</b><span>${esc42(s8.label)}</span></button>`;
     }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
     const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
-          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc40(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
+          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc42(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
     const needLook = !!f && !f.group && !playing;
     const lookRowsNow = lookRows();
     if (needLook && !draft.look && lookRowsNow) draft.look = defaultLook(lookRowsNow, getPrefs().look);
@@ -164,8 +2896,8 @@ p = gnKeep[i];
     const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
     const me = userInfo();
     const who = f ? `<div class="gx-who">${[
-      ...f.group ? [] : [`<button class="gx-whoc${!playing ? " on" : ""}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc40(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`],
-      ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? " on" : ""}" data-action="player" data-value="${esc40(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ""}<span class="gx-whot"><b>${esc40(a.name)}</b>${a.rank ? `<small>${esc40(a.rank)}</small>` : ""}</span></button>`)
+      ...f.group ? [] : [`<button class="gx-whoc${!playing ? " on" : ""}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc42(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`],
+      ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? " on" : ""}" data-action="player" data-value="${esc42(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ""}<span class="gx-whot"><b>${esc42(a.name)}</b>${a.rank ? `<small>${esc42(a.rank)}</small>` : ""}</span></button>`)
     ].join("")}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list4.some((x) => x.fm === PLAYER_FM) ? "그 인물의 첫 장면이나 " : ""}직접 입력·커스텀 임무로 시작해요.</div>` : ""}` : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
     const shown3 = list4.length;
     const look = f ? `<section><h2><i>3</i>아바타</h2>${lookStep(draft.look ?? "", playing ? people.find((a) => a.id === draft.player)?.name ?? "" : "")}</section>` : "";
@@ -177,13 +2909,13 @@ p = gnKeep[i];
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>주인공</h2>${who}</section>
     ${look}
-    <section><h2><i>${n0}</i>첫 장면${f ? `<small class="gx-h2-sub">${esc40(f.name)} · ${shown3}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>${n0}</i>첫 장면${f ? `<small class="gx-h2-sub">${esc42(f.name)} · ${shown3}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
     ${walletStep}
     <section><h2><i>${nLang}</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
-    ${f && sc ? `<div class="gx-foot-sum">${esc40(f.name)}${playing ? ` · ${esc40(people.find((a) => a.id === draft.player)?.name ?? "")}` : ""} · ${String(list4.indexOf(sc) + 1).padStart(2, "0")} ${esc40(sc.label)}</div>` : ""}
-    ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc40(notice)}</div>` : ""}
+    ${f && sc ? `<div class="gx-foot-sum">${esc42(f.name)}${playing ? ` · ${esc42(people.find((a) => a.id === draft.player)?.name ?? "")}` : ""} · ${String(list4.indexOf(sc) + 1).padStart(2, "0")} ${esc42(sc.label)}</div>` : ""}
+    ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc42(notice)}</div>` : ""}
     <button class="gx-start" data-action="start" ${ready && !busy4 ? "" : "disabled"}>${busy4 ? "시작하는 중…" : "출 발"}</button>
   </footer>`;
   }
@@ -220,7 +2952,7 @@ p = gnKeep[i];
   }
   function commonDrawer(ctx2) {
     const here = inBrowser() ? curTab().site : null;
-    const site = (id2) => `<button class="ph-tool${here === id2 ? " on" : ""}" data-action="br-site" data-value="${id2}">${siteLogo(id2, "gx-cdr-logo")}<span class="ph-tool-l">${esc40(SITES.find((x) => x.id === id2).name)}</span></button>`;
+    const site = (id2) => `<button class="ph-tool${here === id2 ? " on" : ""}" data-action="br-site" data-value="${id2}">${siteLogo(id2, "gx-cdr-logo")}<span class="ph-tool-l">${esc42(SITES.find((x) => x.id === id2).name)}</span></button>`;
     const set2 = `<button class="ph-tool${tab === "settings" ? " on" : ""}" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span class="ph-tool-l">설정</span>${ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ""}</button>`;
     return `<div class="gx-cdr${cdrOpen ? " open" : ""}">
     <div class="gx-cpanel ph-tools gx-cpanel2">${browserSites(ctx2).map(site).join("")}${set2}</div>
@@ -228,7 +2960,8 @@ p = gnKeep[i];
   </div>`;
   }
   function browserSites(ctx2) {
-    return SITES.map((x) => x.id).filter((id2) => id2 !== "bm" || !!ctx2 && pointsOn(ctx2.chat));
+    const hs = ctx2 ? hsSettings(ctx2.chat.scriptstate) : null;
+    return SITES.map((x) => x.id).filter((id2) => (id2 !== "bm" || !!ctx2 && pointsOn(ctx2.chat)) && (id2 !== "hs" || !!hs && hs.on && hs.net));
   }
   function chromeOpts(ctx2) {
     const vars = ctx2.chat.scriptstate ?? {};
@@ -248,7 +2981,7 @@ p = gnKeep[i];
   function browserBody(ctx2) {
     const t = curTab();
     const o = chromeOpts(ctx2);
-    const page = br.list && isPhone() ? tabListHtml(o) : !t.site ? homeHtml(browserSites(ctx2)) : isBoardSite(t.site) ? gnetTab(ctx2, gnetEnv, t.site) : isMallSite(t.site) ? mallTab(ctx2, wikiEnv, t.site) : t.site === "wk" ? wikiTab(ctx2, wikiEnv) : soonHtml(t.site);
+    const page = br.list && isPhone() ? tabListHtml(o) : !t.site ? homeHtml(browserSites(ctx2)) : isBoardSite(t.site) ? gnetTab(ctx2, gnetEnv, t.site) : isMallSite(t.site) ? mallTab(ctx2, wikiEnv, t.site) : t.site === "hs" ? homeshopTab(ctx2, wikiEnv) : t.site === "wk" ? wikiTab(ctx2, wikiEnv) : soonHtml(t.site);
     return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || "home"}">${page}</div>${loginHtml(o)}</div>`;
   }
   function openBrowserTab() {
@@ -267,6 +3000,7 @@ p = gnKeep[i];
     if (tab === "wiki") wikiOpenCheck(view.ctx, wikiEnv);
     const site = curTab().site;
     if (tab === "net" && isMallSite(site)) mallOpenCheck(view.ctx, wikiEnv, site);
+    if (tab === "net" && site === "hs") homeshopOpenCheck(view.ctx, wikiEnv);
   }
   function goSite(site) {
     curTab().site = site;
@@ -282,7 +3016,7 @@ p = gnKeep[i];
     const ctx2 = view.kind === "started" ? view.ctx : null;
     const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
     const cur = tab === "mission" ? "map" : tab;
-    const item2 = (id2, label2, icon, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id2 ? " on" : ""}" data-action="tab" data-value="${id2}">${icon}<span>${esc40(label2)}</span>${badge3}</button>`;
+    const item2 = (id2, label2, icon, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id2 ? " on" : ""}" data-action="tab" data-value="${id2}">${icon}<span>${esc42(label2)}</span>${badge3}</button>`;
     return `<nav class="gx-nav gw-nav">${mobileBar(item2, unreadPhone, ctx2, false)}</nav>`;
   }
   function brand(ctx2) {
@@ -299,18 +3033,18 @@ p = gnKeep[i];
     const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
     const time2 = (w ? clock3(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
     const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
-    const line2 = (label2, value) => value ? `<span class="gx-op-ln"><i>${label2}</i><em>${esc40(value)}</em></span>` : "";
-    const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc40(time2)}</span><span>${esc40(weather)}</span></span>` : "";
+    const line2 = (label2, value) => value ? `<span class="gx-op-ln"><i>${label2}</i><em>${esc42(value)}</em></span>` : "";
+    const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc42(time2)}</span><span>${esc42(weather)}</span></span>` : "";
     const status2 = line2("위치", st?.place ?? "") + line2("목표", st?.target ?? "") + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : "");
     const u = userInfo();
     const pa = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
     const paPic = pa ? imageUrl(ctx2.char, facePic(ctx2.char, pa, true)) : null;
     const name = pa?.name || u.name || "나";
     const photoUrl2 = pa ? paPic : u.photo;
-    const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc40(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+    const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc42(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
     const aff = f?.group ? String(ctx2.chat.scriptstate?.["$ib_affiliation"] ?? "").trim() : "";
-    const who = `<span class="gx-id-who"><b>${esc40(name)}</b><small>${esc40([f ? f.group ? aff && aff !== f.name ? aff : "" : selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>`;
-    const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc40(img)}')"></span>` : "";
+    const who = `<span class="gx-id-who"><b>${esc42(name)}</b><small>${esc42([f ? f.group ? aff && aff !== f.name ? aff : "" : selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>`;
+    const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc42(img)}')"></span>` : "";
     return `<div class="gx-id">${bg}
       ${photo}
       ${who}
@@ -320,7 +3054,7 @@ p = gnKeep[i];
   function walletChip(ctx2) {
     if (colConfig(ctx2.chat.scriptstate).wallet === "off") return "";
     const w = readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-    return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc40(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</em></button>`;
+    return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc42(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</em></button>`;
   }
   function selfName(ctx2, code2, name) {
     const c = parseCatalog(ctx2.char.globalLore);
@@ -330,21 +3064,21 @@ p = gnKeep[i];
   function clock3(minute) {
     if (minute === null) return "";
     const d = new Date(minute * 6e4);
-    const p2 = (n2) => String(n2).padStart(2, "0");
+    const p2 = (n3) => String(n3).padStart(2, "0");
     return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
   }
   function board(ctx2) {
     if (!worldOn(ctx2.chat)) {
       return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
-      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc40(notice)}</div>` : ""}
+      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc42(notice)}</div>` : ""}
       <button class="gx-start" data-action="world-on" ${busy4 ? "disabled" : ""}>${busy4 ? "켜는 중…" : "상황판 켜기"}</button></div>`;
     }
     let catalog;
     try {
       catalog = parseCatalog(ctx2.char.globalLore);
     } catch (error) {
-      return `<div class="gx-empty">${esc40(error instanceof Error ? error.message : String(error))}</div>`;
+      return `<div class="gx-empty">${esc42(error instanceof Error ? error.message : String(error))}</div>`;
     }
     const w = readWorld(ctx2.chat);
     const faction = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
@@ -353,7 +3087,7 @@ p = gnKeep[i];
     const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
     const display = factionNames(catalog, faction);
     const ownName = display[faction] ?? "";
-    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n2) => n2.trim());
+    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n3) => n3.trim());
     const chips3 = (codes) => peopleChips(ctx2.char, names4(codes), byName, ownName);
     const cards2 = [];
     const add = (kind, i, locCode, c) => {
@@ -362,15 +3096,15 @@ p = gnKeep[i];
       cards2.push({ ...c, kind, key, id: key, locCode, open: "board-map", confirmEnd: field3.confirmEnd === key, selected: field3.target?.type === "event" && field3.target.key === key, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
     };
     const since = (m) => elapsedText(w.minute, m);
-    const sit = (t) => t ? `<span class="gx-evc-sit">${esc40(t)}</span>` : "";
-    const locText = (loc, m) => `${esc40(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
+    const sit = (t) => t ? `<span class="gx-evc-sit">${esc42(t)}</span>` : "";
+    const locText = (loc, m) => `${esc42(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
     w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
     w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', chips: chips3(e.deploy ?? ""), extra: sit(e.situation) }));
-    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc40(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
+    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc42(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
     for (const e of endedShown(w)) {
       const name = e.name || "이름 미확인";
       const rp = endedReport(ctx2.chat, e.kind, e.name, e.loc);
-      cards2.push({ kind: e.kind, name, grade: e.grade, loc: esc40(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind), ...rp?.rpt ? { rpt: rp.rpt } : {}, ...rp?.mine ? { mine: true } : {} });
+      cards2.push({ kind: e.kind, name, grade: e.grade, loc: esc42(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind), ...rp?.rpt ? { rpt: rp.rpt } : {}, ...rp?.mine ? { mine: true } : {} });
     }
     const sentTo = (codes, id2) => (codes ?? "").split(",").map((x) => x.trim()).includes(id2);
     const deployedAt = (id2) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id2))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id2))?.name ?? "";
@@ -395,9 +3129,9 @@ p = gnKeep[i];
         wiki: c ? c.wiki : null
       };
     });
-    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc40(w.promoted.join(", "))}</p>` : "";
+    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc42(w.promoted.join(", "))}</p>` : "";
     const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
-    const cnt = (cls, label2, n2) => `<em class="${cls}">${label2}<i>${n2}</i></em>`;
+    const cnt = (cls, label2, n3) => `<em class="${cls}">${label2}<i>${n3}</i></em>`;
     const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
     const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
     const clock4 = boardClock(ctx2);
@@ -462,13 +3196,13 @@ p = gnKeep[i];
     void risuai.showContainer("fullscreen");
     const msg = root3.querySelector(".gl-msg");
     const btns = [...root3.querySelectorAll("button")];
-    const say = (t) => (msg.hidden = !t, msg.textContent = t);
-    say(reason3);
-    const run5 = (job, busy6) => {
+    const say2 = (t) => (msg.hidden = !t, msg.textContent = t);
+    say2(reason3);
+    const run6 = (job, busy6) => {
       btns.forEach((b) => b.disabled = true);
-      say(busy6);
-      void job().then(() => done2(root3, say, btns)).catch((e) => {
-        say(e instanceof Error ? e.message : String(e));
+      say2(busy6);
+      void job().then(() => done2(root3, say2, btns)).catch((e) => {
+        say2(e instanceof Error ? e.message : String(e));
         btns.forEach((b) => b.disabled = false);
       });
     };
@@ -480,22 +3214,22 @@ p = gnKeep[i];
     picker2.addEventListener("change", () => {
       const f = picker2.files?.[0];
       picker2.value = "";
-      if (f) run5(async () => installWorldFile(await f.text()), "넣는 중");
+      if (f) run6(async () => installWorldFile(await f.text()), "넣는 중");
     });
     root3.addEventListener("click", (ev) => {
       const act = ev.target.closest("[data-gl]")?.dataset.gl;
       if (act === "close") closeWorldDataPanel(true);
       else if (act === "file") picker2.click();
-      else if (act === "get") run5(() => loadWorldData(true).then(() => void 0), "받는 중");
+      else if (act === "get") run6(() => loadWorldData(true).then(() => void 0), "받는 중");
     });
   }
-  function done2(root3, say, btns) {
+  function done2(root3, say2, btns) {
     if (typeof g.__goeiRelaunch === "function") {
       closeWorldDataPanel();
       g.__goeiRelaunch();
       return;
     }
-    say("받았어요. 카드를 다시 열거나 메시지를 보내면 켜져요.");
+    say2("받았어요. 카드를 다시 열거나 메시지를 보내면 켜져요.");
     for (const b of btns) {
       b.disabled = false;
       if (b.dataset.gl !== "close") b.hidden = true;
@@ -504,7 +3238,7 @@ p = gnKeep[i];
   }
 
   // src/host/shopcard.ts
-  var esc41 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc43 = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var opener2 = null;
   var drawn = /* @__PURE__ */ new Set();
   function setShopOpener(f) {
@@ -518,7 +3252,7 @@ p = gnKeep[i];
     armChatClick("shop");
     if (site) drawn.add(site);
     const p2 = cardPalette(currentTheme());
-    const card2 = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc41(tag.shop)}</b></span><button type="button" data-goei-shop="${esc41(site || "1")}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">${site ? "접속하기" : "상점 열기"}</button></div>`;
+    const card2 = `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc43(tag.shop)}</b></span><button type="button" data-goei-shop="${esc43(site || "1")}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">${site ? "접속하기" : "상점 열기"}</button></div>`;
     return `${stripShopTags(text4)}
 ${card2}`;
   }
@@ -563,11 +3297,11 @@ ${card2}`;
     if (basic.assetOn && basic.assetModel === "aux") out.push({ id: "asset", label: "이미지 태그", group: "update", match: ["이미지 태그"] });
     if (wikiSettings(ss).auto === "turn") out.push({ id: "wiki", label: "위키", group: "update", match: ["위키"] });
     const autoLabel = (k, l) => k === "phone" ? "괴담톡 확인" : l;
-    for (const group6 of jointGroups(ss)) {
-      const labels = group6.map((t) => JOINT_LABEL[t.kind]);
-      const calls = group6.map((t) => autoLabel(t.kind, JOINT_LABEL[t.kind]));
-      if (group6.length > 1) out.push({ id: `joint:${group6.map((t) => t.kind).join("+")}`, label: "통합", group: "net", note: labels.join(" · "), match: [`${labels.join("+")} 통합`, ...calls] });
-      else out.push({ id: `net:${group6[0].kind}`, label: labels[0], group: "net", match: calls });
+    for (const group7 of jointGroups(ss)) {
+      const labels = group7.map((t) => JOINT_LABEL[t.kind]);
+      const calls = group7.map((t) => autoLabel(t.kind, JOINT_LABEL[t.kind]));
+      if (group7.length > 1) out.push({ id: `joint:${group7.map((t) => t.kind).join("+")}`, label: "통합", group: "net", note: labels.join(" · "), match: [`${labels.join("+")} 통합`, ...calls] });
+      else out.push({ id: `net:${group7[0].kind}`, label: labels[0], group: "net", match: calls });
     }
     if (viewSettings(ss).auto === "turn") out.push({ id: "view", label: "관전", group: "net", match: ["관전"] });
     for (const site of MALL_SITES) {
@@ -627,22 +3361,22 @@ ${card2}`;
   async function onBeforeRequest(messages, type) {
     if (type !== "model" || !Array.isArray(messages)) return messages;
     if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
-    const failed3 = [];
-    const step2 = (name, run5, fallback) => {
+    const failed4 = [];
+    const step2 = (name, run6, fallback) => {
       try {
         if (faultOn(name)) throw new Error("시험용 예외 주입");
-        return run5();
+        return run6();
       } catch (error) {
-        failed3.push(`${name}(${reason2(error)})`);
+        failed4.push(`${name}(${reason2(error)})`);
         return fallback;
       }
     };
-    const stepAsync = async (name, run5, fallback) => {
+    const stepAsync = async (name, run6, fallback) => {
       try {
         if (faultOn(name)) throw new Error("시험용 예외 주입");
-        return await run5();
+        return await run6();
       } catch (error) {
-        failed3.push(`${name}(${reason2(error)})`);
+        failed4.push(`${name}(${reason2(error)})`);
         return fallback;
       }
     };
@@ -677,6 +3411,7 @@ ${card2}`;
           }
           messages = step2("상태창", () => withStatusBlock(messages, step2("신분", () => knownIdentity(c), ""), step2("상태창 모양", () => statusShape(c), void 0)), messages);
           messages = step2("소지품", () => withInventory(messages, c.chat), messages);
+          messages = step2("망상홈쇼핑", () => withHomeshop(messages, c.chat), messages);
           messages = await stepAsync("인물 기록", () => withPeople2(messages, c), messages);
           messages = step2("이미지 지침", () => withImgPrompt(messages, c), messages);
         }
@@ -686,11 +3421,11 @@ ${card2}`;
         if (chat) messages = step2("시드", () => processRequest(messages, chat).messages, messages);
       }
     } catch (error) {
-      failed3.push(`전체(${reason2(error)})`);
+      failed4.push(`전체(${reason2(error)})`);
     }
-    if (failed3.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed3.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
+    if (failed4.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed4.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
     const out = sanitize(messages);
-    if (liteNow) step2("호출 기록", () => traceMain(out, failed3), void 0);
+    if (liteNow) step2("호출 기록", () => traceMain(out, failed4), void 0);
     return out;
   }
   function sanitize(messages) {
@@ -837,7 +3572,7 @@ ${texts.anomaly}`;
     if (!names4.length) return out;
     return [...out, { role: "system", content: buildImgPrompt(cfg, names4, s8.assetPlayer) }];
   }
-  function moduleContext(scene, { char, chat }) {
+  function moduleContext(scene2, { char, chat }) {
     const ss = chat.scriptstate;
     const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view: view2 }) => !!view2.scriptstate?.[GN_RAW] && gnetSettings(view2.scriptstate).context);
     const wantGnet = boardsOn.length > 0;
@@ -847,7 +3582,7 @@ ${texts.anomaly}`;
     applyAdvanced(ss);
     const src = { char: { globalLore: char.globalLore }, chat };
     const rules2 = { phone: mainContextRules2(src), wiki: wikiContextRules(char.globalLore) };
-    const focus = makeFocus(scene, buildRegistry(char.globalLore));
+    const focus = makeFocus(scene2, buildRegistry(char.globalLore));
     const parts = [];
     for (const { view: view2 } of boardsOn) {
       const rule = mainContextRules({ char: src.char, chat: view2 });
@@ -866,11 +3601,11 @@ ${texts.anomaly}`;
     if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
     return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
   }
-  function withCap(box4, key, cap, run5) {
+  function withCap(box4, key, cap, run6) {
     const keep = box4[key];
     box4[key] = cap;
     try {
-      return run5();
+      return run6();
     } finally {
       box4[key] = keep;
     }
@@ -886,7 +3621,7 @@ ${texts.anomaly}`;
       const m = cur.message?.[messageIndex];
       const text4 = typeof m?.data === "string" ? m.data : "";
       if (!m || !hasUnlockTag(text4)) return null;
-      const got = unlockTags(text4).filter((n2) => lockable.has(n2));
+      const got = unlockTags(text4).filter((n3) => lockable.has(n3));
       const message = [...cur.message ?? []];
       message[messageIndex] = { ...m, data: stripUnlockTags(text4) };
       const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
@@ -954,364 +3689,4 @@ ${texts.anomaly}`;
         }).catch(() => null) ?? latest;
       }
       const selfNames = hasShopTag(raw) ? [playerAgent((await getChar(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? "", userInfo().name] : [];
-      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const r = settleShop(cur, arg.messageIndex, selfNames);
-          return r ? { ...cur, ...r.message ? { message: r.message } : {}, scriptstate: { ...cur.scriptstate ?? {}, ...r.vars } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      let now = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
-      if (now) await refreshUseBox(arg.characterIndex, arg.chatIndex, now).catch(() => {
-      });
-      if (!now || chatPhase(now) !== "started") return;
-      now.message ??= [];
-      const missing = (ss) => {
-        const vars = { ...missingBasicVars(char.globalLore, ss), ...staleFactionVars(char.globalLore, ss) };
-        return Object.keys(vars).length ? vars : null;
-      };
-      if (missing(now.scriptstate)) {
-        now = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const vars = missing(cur.scriptstate);
-          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
-        }) ?? now;
-      }
-      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {
-      });
-      if (latest && chatCardsAt(now, arg.messageIndex).length) now = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null) ?? now;
-      await storeLore(arg.characterIndex, arg.chatIndex, void 0, { char, chat: now }).catch(() => {
-      });
-      if (now.message.some((m) => typeof m.data === "string" && isUnsent(m.data))) now = await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent) ?? now;
-      {
-        const pp = requestPeopleUpdate("turn").catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
-        after.push(pp);
-        if (!peopleSettings(now.scriptstate).parallel) await pp;
-      }
-      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {
-      });
-      await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
-      const netTasks = autoTasks(now.scriptstate);
-      const viewAuto = viewSettings(now.scriptstate).auto === "turn";
-      const wikiAuto = wikiSettings(now.scriptstate).auto === "turn";
-      const malls = MALL_SITES.filter((site) => {
-        const m = mallSettings(now.scriptstate, site);
-        return m.on && m.auto === "turn" && (site !== "bm" || String(now.scriptstate?.["$br_login"] ?? "") === "1");
-      });
-      if (netTasks.length || viewAuto || wikiAuto || malls.length) {
-        const fresh2 = async () => {
-          const c = await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex) ?? now;
-          c.message ??= [];
-          return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char, chat: c };
-        };
-        after.push((async () => {
-          applyAdvanced(now.scriptstate);
-          await readPersona();
-          const phoneFail = (error) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const wikiFail = (error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const mallFail = (error) => console.log(`[goei] 쇼핑몰 자동 새로 받기 실패: ${error instanceof Error ? error.message : String(error)}`);
-          const gnetFail = (site) => (error) => console.log(`[goei] ${BOARD_NAME[site] ?? site} 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
-          for (const group6 of jointGroups(now.scriptstate)) {
-            const joint = group6.length > 1 ? new Joint(group6[0].model, group6[0].fixed, group6.map((t) => t.kind)) : void 0;
-            await Promise.all(group6.map(async (t) => {
-              try {
-                if (t.kind === "phone") await autoRefresh(await fresh2(), arg.messageIndex, void 0, joint);
-                else await autoRefreshGnet(await fresh2(), arg.messageIndex, false, joint, t.kind);
-              } catch (error) {
-                (t.kind === "phone" ? phoneFail : gnetFail(t.kind))(error);
-              } finally {
-                joint?.done(t.kind);
-              }
-            }));
-          }
-          if (viewAuto) await autoView(await fresh2(), arg.messageIndex).catch(phoneFail);
-          if (wikiAuto) await autoWriteWiki(await fresh2(), arg.messageIndex).catch(wikiFail);
-          for (const site of malls) await autoRefreshMall(await fresh2(), site).catch(mallFail);
-        })());
-      }
-    } catch (error) {
-      console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
-      void Promise.allSettled(after).then(() => progressEnd(pTurn));
-    }
-  }
-  var escHtml = (s8) => s8.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function unsentRow() {
-    const p2 = cardPalette2();
-    unsentShown();
-    return `<span style="flex:1;color:${p2.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span><button type="button" data-goei-cancel="1" style="${cardButtonStyle()}">취소</button>`;
-  }
-  function sceneCardHtml(s8) {
-    const p2 = cardPalette2();
-    const note = s8.note ? `<span style="flex-basis:100%;display:flex;align-items:baseline;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine};white-space:pre-wrap"><span style="flex:none;color:${p2.signal};font-weight:600">메모</span><span>${escHtml(s8.note)}</span></span>` : "";
-    const unsent = s8.unsent ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
-    return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p2.signal};font-weight:600">목표</span><span>${escHtml(s8.target)}</span><span style="opacity:.5">|</span><span style="color:${p2.signal};font-weight:600">투입</span><span>${escHtml(s8.party)}</span>${note}${unsent}</div>`;
-  }
-  function startCardHtml(body5, unsent) {
-    const p2 = cardPalette2();
-    const row10 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p2.accentLine}">${unsentRow()}</span>` : "";
-    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p2.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p2.text};white-space:pre-wrap">${escHtml(body5.trim())}</span>${row10}</div>`;
-  }
-  function unsentMarkHtml() {
-    return `<div data-goei-card="unsent" style="${cardStyle()}">${unsentRow()}</div>`;
-  }
-  function openingHintHtml() {
-    const p2 = cardPalette2();
-    openingShown();
-    return `<div data-goei-card="opening" style="${cardStyle()}flex-wrap:wrap"><span style="flex:1 1 14em;color:${p2.text}"><b style="color:${p2.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span><button type="button" data-goei-repick="1" style="${cardButtonStyle()}">재선택</button></div>`;
-  }
-  function callCardHtml(target) {
-    const p2 = cardPalette2();
-    return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p2.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
-  }
-  function landingHtml2() {
-    return landingHtml(cardPalette2());
-  }
-  function cardPalette2() {
-    return cardPalette(currentTheme());
-  }
-  function cardStyle() {
-    const p2 = cardPalette2();
-    return `display:flex;align-items:center;gap:8px 12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5;`;
-  }
-  function cardButtonStyle() {
-    const p2 = cardPalette2();
-    return `flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer`;
-  }
-  var assetsFirst = Promise.resolve();
-  async function onDisplay(text4) {
-    if (typeof text4 !== "string") return text4;
-    if (hasImgTag(text4) && !modulePicker()) await assetsFirst.catch(() => void 0);
-    if (isSceneMessage(text4) && !wantsOpeningHint(text4)) await ensureOpeningHint().catch(() => void 0);
-    return displayNow(text4);
-  }
-  async function ensureOpeningHint() {
-    const charIndex = await risuai.getCurrentCharacterIndex();
-    const chatIndex = await risuai.getCurrentChatIndex();
-    if (Number.isInteger(charIndex) && charIndex >= 0 && Number.isInteger(chatIndex) && chatIndex >= 0) await refreshOpeningHint(charIndex, chatIndex);
-  }
-  async function redrawAfterLoad() {
-    try {
-      await assetsFirst;
-      if (isWaiting()) return;
-      const ctx2 = await loadContext();
-      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
-      if (!ctx2.chat.message.some((m) => typeof m.data === "string" && m.data.includes("<img="))) return;
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({
-        ...cur,
-        message: (cur.message ?? []).map((m) => typeof m.data === "string" && m.data.includes("<img=") ? { ...m, data: m.data.endsWith("\n") ? m.data.slice(0, -1) : `${m.data}
-` } : m)
-      }));
-    } catch {
-    }
-  }
-  function displayNow(text4) {
-    const ours = liteNow || isLanding(text4) || text4.includes(UNSENT_MARK) || text4.includes(START_MARK) || text4.includes(SCENE_MARK) || hasStatusTag(text4) || hasSceneCard(text4) || hasCall(text4) || hasShopTag(text4);
-    let out = text4;
-    if (isLanding(text4)) out = landingHtml2();
-    else {
-      if (out.includes(SCENE_MARK)) out = stripSceneMark(out);
-      if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
-      if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
-      if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
-      if (hasCall(out)) out = renderCalls(out, callCardHtml);
-      if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
-      if (hasStatusTag(out)) out = renderStatus(out);
-      if (hasShopTag(out)) out = renderShopCard(out);
-      if (hasImgTag(out)) {
-        const pick3 = modulePicker();
-        const self = userInfo().name;
-        if (ours || imgTagsKnown(out, pick3, self)) out = renderImgTags(out, pick3, getPrefs().imgShow ?? IMG_RECENT.def, self);
-      }
-      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
-      if (wantsOpeningHint(text4)) out += openingHintHtml();
-    }
-    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
-    return out;
-  }
-  async function readSnapshot(fab) {
-    const none3 = { charIndex: -1, chatIndex: -1, chatScreen: false };
-    try {
-      const charIndex = await risuai.getCurrentCharacterIndex();
-      if (!Number.isInteger(charIndex) || charIndex < 0) return none3;
-      const chatIndex = await risuai.getCurrentChatIndex();
-      const chatScreen = fab ? await fab.chatScreenVisible() : true;
-      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
-    } catch {
-      return none3;
-    }
-  }
-  async function isLiteCharacter(charIndex) {
-    if (charIndex < 0) return false;
-    try {
-      const char = await getChar(charIndex);
-      const lite = isGoeiLore(char?.globalLore);
-      if (lite && char) prefetchFactions(char);
-      return lite;
-    } catch {
-      return false;
-    }
-  }
-  async function readTheme(snap) {
-    if (snap.chatIndex < 0) return;
-    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
-    if (!chat) return;
-    const on2 = chat.scriptstate?.["$st_asset_on"];
-    const changed = setImgHidden(on2 === void 0 || on2 === null || on2 === "" ? getPrefs().basic.assetOn === false : on2 === "0" || on2 === 0 || on2 === false);
-    const before = currentTheme();
-    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
-    if (changed && currentTheme() === before) repaintTheme();
-  }
-  var vsChat = "";
-  var vsShownChat = "";
-  var vsPadKey = "";
-  var prog = null;
-  var progKey = "";
-  async function onVersusPad(fab) {
-    if (!vsChat) return;
-    vsShownChat = vsChat;
-    await toggleVersus(vsChat, () => void openVersusSettings());
-    vsPadKey = "";
-    await fab?.setVersus(true, vsOpen()).catch(() => {
-    });
-  }
-  function startWatcher(fab) {
-    const state = new WatchState();
-    setInstalledHook(() => {
-      state.forget();
-    });
-    let stopped = false;
-    let timer4;
-    let shownChat = "";
-    const tick3 = async () => {
-      try {
-        const snap = await readSnapshot(fab);
-        const lite = state.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
-        if (stopped) return;
-        const next = state.update(snap, lite);
-        liteNow = state.lite;
-        const chatKey7 = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : "";
-        if (next.fabVisible && (next.changed || chatKey7 !== shownChat)) {
-          const switched = shownChat !== "" && chatKey7 !== shownChat;
-          if (switched) resetStatusContext();
-          await readTheme(snap).catch(() => {
-          });
-          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-          if (switched) await updateChat(snap.charIndex, snap.chatIndex, (cur) => ({ ...cur })).catch(() => null);
-          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-          await refreshUseBox(snap.charIndex, snap.chatIndex).catch(() => {
-          });
-        } else if (!next.fabVisible && next.changed) {
-          await hideUseBox().catch(() => {
-          });
-        }
-        shownChat = chatKey7;
-        if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
-        vsChat = chatKey7;
-        if (vsOpen() && (!next.fabVisible || chatKey7 !== vsShownChat)) await closeVersus().catch(() => {
-        });
-        const pad = next.fabVisible && getPrefs().versus === true && vsDevice();
-        const padKey = `${pad}:${vsOpen()}`;
-        if (fab && padKey !== vsPadKey) {
-          vsPadKey = padKey;
-          await fab.setVersus(pad, vsOpen()).catch(() => {
-          });
-        }
-        const pShow = next.fabVisible && progressOn() && !appShown();
-        const pKey = `${pShow}`;
-        if (prog && pKey !== progKey) {
-          progKey = pKey;
-          await prog.setVisible(pShow).catch(() => {
-          });
-        } else if (prog && pShow) await prog.setVisible(true).catch(() => {
-        });
-        progressWatch(`${snap.charIndex}:${snap.chatIndex}`);
-      } catch (error) {
-        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
-      } finally {
-        if (!stopped) timer4 = setTimeout(() => void tick3(), WATCH_MS);
-      }
-    };
-    void tick3();
-    return () => {
-      stopped = true;
-      setInstalledHook(null);
-      clearTimeout(timer4);
-    };
-  }
-  async function start2(o = {}) {
-    void dropOldGame();
-    const t0 = Date.now();
-    const lap = (what) => console.log(`[goei] 본체 시작 ${what}: ${((Date.now() - t0) / 1e3).toFixed(1)}초`);
-    try {
-      lap(`세계 자료 ${await loadWorldData() === "store" ? "저장소에서" : "받음"}`);
-    } catch (error) {
-      showWorldDataPanel(reason2(error), !!o.prompt);
-      throw error;
-    }
-    await loadPrefs();
-    await loadStoredWikiPack();
-    await loadStoredTokenizer();
-    lap("설정·위키·토크나이저 읽음");
-    assetsFirst = loadModuleAssets();
-    void redrawAfterLoad();
-    setWikiOpener((title2) => void openWiki2(title2));
-    setRecordsOpener((id2) => void openRecords2(id2));
-    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
-    setShopOpener((site) => void openShop(site));
-    onAppShown((open4) => {
-      if (!prog) return;
-      if (open4) {
-        progKey = "false";
-        void prog.setVisible(false).catch(() => {
-        });
-      } else progKey = "";
-    });
-    let stopWatcher = null;
-    let fab = null;
-    try {
-      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })), () => void onVersusPad(fab));
-      const f = fab;
-      void f.setTheme(currentTheme());
-      onThemeChange((t) => void f.setTheme(t).catch(() => {
-      }));
-      try {
-        prog = await createProgWin();
-        const pw = prog;
-        void pw.setTheme(currentTheme());
-        onThemeChange((t) => void pw.setTheme(t).catch(() => {
-        }));
-      } catch (error) {
-        console.log(`[goei] 호출 진행 창을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-        prog = null;
-      }
-      stopWatcher = startWatcher(fab);
-      lap("유령 단추 붙임");
-    } catch (error) {
-      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      fab = null;
-      stopWatcher = startWatcher(null);
-      await risuai.registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true })).catch((e) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
-    }
-    return {
-      beforeRequest: onBeforeRequest,
-      sanitize,
-      input: onInput,
-      output: onOutput,
-      display: onDisplay,
-      install: () => openInstall(),
-      unload: async () => {
-        stopWatcher?.();
-        await fab?.remove().catch(() => {
-        });
-        await prog?.remove().catch(() => {
-        });
-        prog = null;
-        progKey = "";
-      }
-    };
-  }
-
-  // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.5", start: start2 };
-})();
+      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleSh
