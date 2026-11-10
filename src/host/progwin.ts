@@ -223,7 +223,12 @@ export async function createProgWin(): Promise<ProgWin> {
   await host.setAttribute('x-goei-prog', 'true');
   await host.setAttribute('x-goei-open', 'false');
   await host.setAttribute('x-goei-show', 'false');
-  await host.setInnerHTML(`<style>${CSS}</style><div data-card></div><button type="button" data-dot aria-label="호출 진행 보기"></button>`);
+  await host.setInnerHTML(`<div data-card></div><button type="button" data-dot aria-label="호출 진행 보기"></button>`);
+  // 스타일은 요소로 따로 붙인다 (host/overlay.ts 와 같게). setInnerHTML 맨 앞의 <style> 은 Risu 의 DOMPurify 가 지워서
+  // v0.21.5 에서는 진행 창이 모양 없이 화면 밖에 놓여 아무것도 안 보였다 (2026-11-10 사용자)
+  const style = await doc.createElement('style');
+  await style.setTextContent(CSS);
+  await host.appendChild(style);
   await root.body.appendChild(host);
   const card = await host.querySelector('[data-card]');
   const dot = await host.querySelector('[data-dot]');
