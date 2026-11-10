@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 12:06 KST 「그렇게 해서 1장 뽑고, 이미지 넣지 말고 설명으로 1장 뽑고 2장 동시 요청」 → 컷 B 배경판 v4(자른 그림)·v5(설명만) 2회
 - 사용자 11-10 11:56 KST 「일단 배경부터 뽑아봐」 → 컷 B 배경판(cutB_plate_v2) 1회
 - 사용자 11-10 09:28 KST 「뽑아」 → 매진임박(urgent3)·놀람(amazed2) 2회
 - 사용자 11-10 02:34 KST 「다시 뽑을거 뽑아 지금」 → 매진 임박·할부 세기·대기 다시 3회
@@ -310,3 +311,5 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_urgent3_req.json
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostA_amazed2_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_plate_v2_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_plate_v4_req.json
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_plate_v5_req.json
