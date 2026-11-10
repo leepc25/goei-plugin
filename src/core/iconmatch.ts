@@ -18,17 +18,24 @@ const KIND_OF: Record<string, string> = {};
 for (const [k, v] of Object.entries(ICON_KIND_LABEL)) (KIND_OF[v] = k), (KIND_OF[k] = k);
 KIND_OF['의류'] = 'wear'; KIND_OF['음식물'] = 'food'; KIND_OF['장비'] = 'device'; KIND_OF['기계'] = 'device'; KIND_OF['약'] = 'medical'; KIND_OF['의약'] = 'medical'; KIND_OF['의료품'] = 'medical'; KIND_OF['문서'] = 'paper'; KIND_OF['종이'] = 'paper'; KIND_OF['보석'] = 'valuable'; KIND_OF['귀중'] = 'valuable'; KIND_OF['잡화'] = 'misc'; KIND_OF['기타'] = 'misc'; KIND_OF['clothes'] = 'wear'; KIND_OF['clothing'] = 'wear'; KIND_OF['medicine'] = 'medical'; KIND_OF['gadget'] = 'device'; KIND_OF['document'] = 'paper'; KIND_OF['etc'] = 'misc';
 
-/** 「종류/물건말」 → { kind(영문 종류 코드, 모르면 ''), word }. 「옷/코트」「옷 / 코트」「wear/coat」「옷」 */
-export function splitIconWord(icon: string | undefined): { kind: string; word: string } {
+/** 「종류/물건말/english」 → { kind(영문 종류 코드, 모르면 ''), word, en(영어 낱말, 없으면 '') }. 「옷/코트/coat」「옷/코트」「옷 / 코트」「wear/coat」「옷」「hand mirror」 */
+export function splitIconWord(icon: string | undefined): { kind: string; word: string; en: string } {
   const raw = String(icon ?? '').trim();
+  const words = (rest: string) => {
+    const ps = rest.split(/\s*[/／|｜]\s*/).map((x) => x.trim()).filter(Boolean);
+    // 한글 말이 물건말, 한글 없는 말이 영어 낱말. 하나뿐이면 그대로 물건말 (옛 물건의 영어 낱말도 여기)
+    const ko = ps.find((x) => /[가-힣]/.test(x));
+    const en = ps.find((x) => !/[가-힣]/.test(x));
+    return ko ? { word: ko, en: en ?? '' } : { word: en ?? '', en: '' };
+  };
   const m = /^([^/／:：|｜]+?)\s*[/／:：|｜]\s*(.*)$/.exec(raw);
   if (m) {
     const k = KIND_OF[normIcon(m[1])];
-    if (k) return { kind: k, word: m[2].trim() };
+    if (k) return { kind: k, ...words(m[2]) };
   }
   const k1 = KIND_OF[normIcon(raw)];
-  if (k1) return { kind: k1, word: '' };
-  return { kind: '', word: raw };
+  if (k1) return { kind: k1, word: '', en: '' };
+  return { kind: '', ...words(raw) };
 }
 
 /** 대체 표 글 (한 줄에 「외투 → 코트」, →·=>·=·: 가운데 어느 것이든) → 정규화 말 → 말 */
@@ -192,7 +199,7 @@ const stem = (w: string) => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s
 
 interface Head { words: string[]; head: string; mods: string[]; ko: boolean; joined: string }
 interface Phrase extends Head { t: string; kw: boolean }
-interface Same { qPre: string; pPre: string; whole?: boolean }
+interface Same { qPre: string; pPre: string; whole?: boolean; pre?: boolean }
 interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string }
 
 /** 물건이 무엇인지 말하지 않는 몸통 말 (그 앞말이 물건, 2026-11-08 사용자 「매칭 더 정교하게」): 이 말은 떼고 앞말로 찾고, 대표 그림은 쓰지 않는다 */
@@ -217,16 +224,18 @@ function headOf(s: string): Head | null {
 }
 
 /** 줄 말 p 가 물건 q 와 몸통이 같은가 → 같으면 몸통 밖으로 남는 앞부분(붙여 쓴 꾸밈말), 아니면 null */
-function sameHead(q: Head, p: Head): Same | null {
+function sameHead(q: Head, p: Head, pre = false): Same | null {
   if (q.head === p.head) return { qPre: '', pPre: '' };
   if (!q.ko || !p.ko) return null;
   if (p.head.length >= 2 && q.head.endsWith(p.head)) return { qPre: q.head.slice(0, -p.head.length), pPre: '' };
   if (q.head.length >= 2 && p.head.endsWith(q.head)) return { qPre: '', pPre: p.head.slice(0, -q.head.length) };
   if (q.head.length >= 2 && p.joined.endsWith(q.head) && p.joined.length > q.head.length) return { qPre: '', pPre: p.joined.slice(0, -q.head.length), whole: true };
+  // 앞머리가 같은 말 (머그 ↔ 머그컵, 2026-11-10 사용자): 다른 길로 하나도 못 찾았을 때 마지막에만 본다 (pre)
+  if (pre && q.head.length >= 2 && p.head.length > q.head.length && p.head.startsWith(q.head)) return { qPre: '', pPre: '', pre: true };
   return null;
 }
 
-function makeHeadIndex(rows: IconRow[], reps: Record<string, string>): (text: string) => Found | null {
+function makeHeadIndex(rows: IconRow[], reps: Record<string, string>, pre = false): (text: string) => Found | null {
   const items = rows.map((r) => {
     const kws = new Set(r.keywords.map(normIcon).filter(Boolean));
     const ps: Phrase[] = [];
@@ -284,7 +293,7 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>): (text: st
           top = { s: 1e6, hit: 1, plain: true };
           break;
         }
-        const h = sameHead(q, p);
+        const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
         if (!top || m.s > top.s) top = m;
@@ -328,11 +337,14 @@ export interface IconIndexOpts {
 }
 
 /** 표 → match(name, icon) → { file, score } | null (null 이면 공통 그림). rep: 몸통 말 → 대표 그림. icon 은 「종류/물건말」 또는 낱말 */
-export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {}, opts: IconIndexOpts = {}): (name: string, icon?: string) => IconHit | null {
+export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {}, opts: IconIndexOpts = {}): (name: string, icon?: string, strict?: boolean) => IconHit | null {
   const reps: Record<string, string> = {};
   for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
   const head = makeHeadIndex(rows, reps);
   const frag = makeFragIndex(rows, reps);
+  // 마지막 길: 앞머리가 같은 말 (머그 → 머그컵). 연어 마켓 제목 매칭(strict)에서는 안 쓴다 (은장 → 은장도)
+  const headPre = makeHeadIndex(rows, reps, true);
+  const pre = (t: string): Found | null => { const h = t ? headPre(t) : null; return h && h.file ? h : null; };
   const kinds = new Map<string, { head: (t: string) => Found | null; frag: (n: string, i?: string) => IconHit | null; files: Set<string> }>();
   const kindIndex = (k: string) => {
     let x = kinds.get(k);
@@ -348,50 +360,51 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   };
   const rank = (h: Found | null) => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
   const hit = (h: Found | null): IconHit | null => (h ? { file: h.file, score: 1 } : null);
-  const core = (name: string, word: string, K: ReturnType<typeof kindIndex> | null): IconHit | null => {
+  const core = (name: string, word: string, en: string, K: ReturnType<typeof kindIndex> | null, strict: boolean): IconHit | null => {
     const hi = word ? head(word) : null;
+    const he = en ? head(en) : null;
     const hn = name ? head(name) : null;
     // 장치·기계·도구를 떼고 「~기」로 다시 찾을 말 (경보 장치 → 경보기): 그 말로 처음부터 다시
     if (hi?.retry || hn?.retry) {
       const ok = (!hi?.retry && hi) || (!hn?.retry && hn);
       if (ok) return hit(ok);
-      return (hn?.retry ? core(hn.retry, '', K) : null) || (hi?.retry ? core(hi.retry, '', K) : null) || frag(name, word);
+      return (hn?.retry ? core(hn.retry, '', en, K, strict) : null) || (hi?.retry ? core(hi.retry, '', en, K, strict) : null) || frag(name, word);
     }
     // 이름이 표의 말과 똑같아도 종류를 알면 그 종류 그림일 때만 (앰플|의료 → 봉인 앰플로 가지 않게)
     if (rank(hn) === 3 && (!K || K.files.has(hn!.file))) return hit(hn);
-    // 종류를 알면 그 종류 안에서: 물건말이 맞음 > 이름의 몸통 말이 맞음 > 물건말의 몸통만 맞음
     if (K) {
+      // 종류 안에서: 물건말이 맞음(한글 → 영어) > 이름의 몸통 말이 맞음 > 물건말의 몸통만 맞음
       const ki = word ? K.head(word) : null;
+      const ke = en ? K.head(en) : null;
       const kn = name ? K.head(name) : null;
-      const k = rank(ki) >= 2 ? ki : rank(kn) >= 1 ? kn : ki;
-      // 종류 안에 없으면 다른 종류로 가지 않고 아래 ② 종류 안 비슷한 그림·③ 종류 대표로 (릴리스 점검 11-09: 앰플|의료/앰플 → 봉인 앰플)
-      return hit(k);
+      const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
+      if (k) return hit(k);
+      // 종류 안에 없으면 모델이 종류를 다르게 적었을 수 있다 → 전체 그림에서 물건말(한글 → 영어) → 이름 (2026-11-10 사용자: 「도구/머그」가 그물로 갔다).
+      // 그래도 없으면 비슷한 글자의 그림을 억지로 고르지 않고 종류 대표 그림
+      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || he || hn;
+      return hit(g && g.file ? g : strict ? null : pre(word) || pre(name));
     }
     // 둘 다 보고 더 확실한 쪽 (표의 말과 같음 > 꾸밈말까지 맞음 > 몸통만 맞음). 한국어 이름의 몸통 말이 맞으면 영어 그림 낱말보다 이름 (11-09: 스프레이 | canister 가 가스통으로 가지 않게)
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
     const h = koName || rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
     if (h) return hit(h);
-    return frag(name, word);
+    if (he) return hit(he);
+    return frag(name, word) || (strict ? null : hit(pre(word) || pre(name)));
   };
-  return (name0: string, icon?: string): IconHit | null => {
-    const { kind, word: w0 } = splitIconWord(icon);
+  return (name0: string, icon?: string, strict?: boolean): IconHit | null => {
+    const { kind, word: w0, en } = splitIconWord(icon);
     // 원래 말이 표에 그대로 있으면 대체 표로 바꾸지 않는다 (릴리스 점검 11-09: 손전등 → 플래시라이트 → 케미컬 라이트)
     const keep = (t: string) => { const n = normIcon(t); return !!n && rank(head(n)) === 3; };
     const name = keep(name0) ? normIcon(name0) : aliased(name0);
     const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const K = kind ? kindIndex(kind) : null;
-    const found = core(name, word, K);
+    const found = core(name, word, normIcon(en), K, !!strict);
     if (found) return found;
     if (!K) {
       noteMiss({ name: name0, icon: icon ?? '', level: 'none', file: '' });
       return null;
     }
-    // ② 종류 안에서 가장 가까운 그림 → ③ 종류 대표 그림
-    const near = K.frag(name, word);
-    if (near) {
-      noteMiss({ name: name0, icon: icon ?? '', level: 'kind-near', file: near.file });
-      return near;
-    }
+    // 종류 대표 그림 (글자가 비슷한 그림을 억지로 고르던 단계는 없앴다, 2026-11-10 사용자: 매칭 다시 설계)
     const base = opts.base?.[kind];
     noteMiss({ name: name0, icon: icon ?? '', level: base ? 'kind-base' : 'none', file: base ?? '' });
     return base ? { file: base, score: 0 } : null;

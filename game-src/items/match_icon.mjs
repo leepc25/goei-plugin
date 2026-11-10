@@ -130,16 +130,18 @@ function headOf(s) {
   return { words, head: words[words.length - 1], mods: words.slice(0, -1), ko: /[가-힣]/.test(words[words.length - 1]), joined: words.join('') };
 }
 /** 줄 말 p 가 물건 q 와 몸통이 같은가 → 같으면 몸통 밖으로 남는 앞부분(붙여 쓴 꾸밈말) { qPre, pPre }, 아니면 null */
-function sameHead(q, p) {
+function sameHead(q, p, pre = false) {
   if (q.head === p.head) return { qPre: '', pPre: '' };
   if (!q.ko || !p.ko) return null;
   // 한국어 붙여 쓰기: 한쪽 몸통이 다른 쪽 끝을 두 글자 넘게 덮으면 같은 몸통 (손목시계 ↔ 시계, 표본병 ↔ 괴이 표본 병)
   if (p.head.length >= 2 && q.head.endsWith(p.head)) return { qPre: q.head.slice(0, -p.head.length), pPre: '' };
   if (q.head.length >= 2 && p.head.endsWith(q.head)) return { qPre: '', pPre: p.head.slice(0, -q.head.length) };
   if (q.head.length >= 2 && p.joined.endsWith(q.head) && p.joined.length > q.head.length) return { qPre: '', pPre: p.joined.slice(0, -q.head.length), whole: true };
+  // 앞머리가 같은 말 (머그 ↔ 머그컵, 2026-11-10 사용자): 다른 길로 하나도 못 찾았을 때 마지막에만 본다 (pre)
+  if (pre && q.head.length >= 2 && p.head.length > q.head.length && p.head.startsWith(q.head)) return { qPre: '', pPre: '', pre: true };
   return null;
 }
-function makeHeadIndex(rows, reps) {
+function makeHeadIndex(rows, reps, pre = false) {
   const items = rows.map(r => {
     const kws = new Set((r.keywords ?? r.phrases).map(normIcon).filter(Boolean));
     const ps = [...new Set(r.phrases.map(normIcon).filter(Boolean))].map(t => ({ t, kw: kws.has(t), ...headOf(t) })).filter(p => p.words);
@@ -197,7 +199,7 @@ function makeHeadIndex(rows, reps) {
       for (const p of it.ps) {
         // 표 줄 말이 물건 말과 붙여 쓰기만 다르면 그대로 (sd카드 ↔ sd 카드)
         if (p.joined === q.joined) { top = { s: 1e6, hit: 1, plain: true }; break; }
-        const h = sameHead(q, p);
+        const h = sameHead(q, p, pre);
         if (!h) continue;
         const m = modScore(q, p, h);
         if (!top || m.s > top.s) top = m;
@@ -227,11 +229,17 @@ for (const [k, v] of Object.entries(ICON_KIND_LABEL)) (KIND_OF[v] = k), (KIND_OF
 Object.assign(KIND_OF, { 의류: 'wear', 음식물: 'food', 장비: 'device', 기계: 'device', 약: 'medical', 의약: 'medical', 의료품: 'medical', 문서: 'paper', 종이: 'paper', 보석: 'valuable', 귀중: 'valuable', 잡화: 'misc', 기타: 'misc', clothes: 'wear', clothing: 'wear', medicine: 'medical', gadget: 'device', document: 'paper', etc: 'misc' });
 export function splitIconWord(icon) {
   const raw = String(icon ?? '').trim();
+  const words = (rest) => {
+    const ps = rest.split(/\s*[/／|｜]\s*/).map((x) => x.trim()).filter(Boolean);
+    const ko = ps.find((x) => /[가-힣]/.test(x));
+    const en = ps.find((x) => !/[가-힣]/.test(x));
+    return ko ? { word: ko, en: en ?? '' } : { word: en ?? '', en: '' };
+  };
   const m = /^([^/／:：|｜]+?)\s*[/／:：|｜]\s*(.*)$/.exec(raw);
-  if (m) { const k = KIND_OF[normIcon(m[1])]; if (k) return { kind: k, word: m[2].trim() }; }
+  if (m) { const k = KIND_OF[normIcon(m[1])]; if (k) return { kind: k, ...words(m[2]) }; }
   const k1 = KIND_OF[normIcon(raw)];
-  if (k1) return { kind: k1, word: '' };
-  return { kind: '', word: raw };
+  if (k1) return { kind: k1, word: '', en: '' };
+  return { kind: '', ...words(raw) };
 }
 export function parseIconAliases(text) {
   const out = {};
@@ -266,6 +274,9 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
   const head = makeHeadIndex(rows, reps);
   const frag = makeFragIndex(rows, reps);
+  // 마지막 길: 앞머리가 같은 말 (머그 → 머그컵). 연어 마켓 제목 매칭(strict)에서는 안 쓴다 (은장 → 은장도)
+  const headPre = makeHeadIndex(rows, reps, true);
+  const pre = (t) => { const h = t ? headPre(t) : null; return h && h.file ? h : null; };
   const kinds = new Map();
   const kindIndex = (k) => {
     let x = kinds.get(k);
@@ -281,35 +292,37 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
   };
   const rank = (h) => (!h ? 0 : h.s >= 1e6 ? 3 : h.hit > 0 ? 2 : 1);
   const hit = (h) => (h ? { file: h.file, score: 1 } : null);
-  const core = (name, word, K) => {
-    const hi = word ? head(word) : null, hn = name ? head(name) : null;
+  const core = (name, word, en, K, strict) => {
+    const hi = word ? head(word) : null, he = en ? head(en) : null, hn = name ? head(name) : null;
     if (hi?.retry || hn?.retry) {
       const ok = (!hi?.retry && hi) || (!hn?.retry && hn);
       if (ok) return hit(ok);
-      return (hn?.retry ? core(hn.retry, '', K) : null) || (hi?.retry ? core(hi.retry, '', K) : null) || frag(name, word);
+      return (hn?.retry ? core(hn.retry, '', en, K, strict) : null) || (hi?.retry ? core(hi.retry, '', en, K, strict) : null) || frag(name, word);
     }
     if (rank(hn) === 3 && (!K || K.files.has(hn.file))) return hit(hn);
     if (K) {
-      const ki = word ? K.head(word) : null, kn = name ? K.head(name) : null;
-      const k = rank(ki) >= 2 ? ki : rank(kn) >= 1 ? kn : ki;
-      return hit(k); // 종류 안에 없으면 다른 종류로 가지 않고 ② 종류 안 비슷한 그림·③ 종류 대표로
+      const ki = word ? K.head(word) : null, ke = en ? K.head(en) : null, kn = name ? K.head(name) : null;
+      const k = rank(ki) >= 2 ? ki : rank(ke) >= 2 ? ke : rank(kn) >= 1 ? kn : ki || ke;
+      if (k) return hit(k);
+      // 종류 안에 없으면 전체에서 물건말(한글 → 영어) → 이름. 없으면 종류 대표 (2026-11-10)
+      const g = rank(hi) >= 2 ? hi : rank(he) >= 2 ? he : hi || he || hn;
+      return hit(g && g.file ? g : strict ? null : pre(word) || pre(name));
     }
     const koName = !!hn && hn.file !== '' && rank(hi) <= 1 && /[가-힣]/.test(name) && !/[가-힣]/.test(word); // 영어 낱말이 몸통만 맞았을 때만 (hand mirror 처럼 꾸밈말까지 맞으면 낱말)
     const h = koName || rank(hn) > rank(hi) || rank(hn) === 3 ? hn : hi || hn;
     if (h) return hit(h);
-    return frag(name, word);
+    if (he) return hit(he);
+    return frag(name, word) || (strict ? null : hit(pre(word) || pre(name)));
   };
-  return (name0, icon) => {
-    const { kind, word: w0 } = splitIconWord(icon);
+  return (name0, icon, strict) => {
+    const { kind, word: w0, en } = splitIconWord(icon);
     const keep = (t) => { const n = normIcon(t); return !!n && rank(head(n)) === 3; }; // 표에 그대로 있는 말은 대체하지 않는다
     const name = keep(name0) ? normIcon(name0) : aliased(name0);
     const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const K = kind ? kindIndex(kind) : null;
-    const found = core(name, word, K);
+    const found = core(name, word, normIcon(en), K, !!strict);
     if (found) return found;
     if (!K) return null;
-    const near = K.frag(name, word);
-    if (near) return near;
     const base = opts.base?.[kind];
     return base ? { file: base, score: 0 } : null;
   };

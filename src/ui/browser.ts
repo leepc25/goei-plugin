@@ -107,41 +107,31 @@ export function tabState<T>(i = br.cur): T | null {
   return t && t.at >= 0 ? (JSON.parse(t.hist[t.at]) as T) : null;
 }
 
-/* 사이트마다 탭은 하나 (2026-11-08 사용자: 같은 사이트 탭이 여럿이면 같은 기록을 서로 덮어쓴다). 빈 새 탭도 하나 */
-/** 새 탭: 빈 탭이 이미 있으면 그 탭으로 */
+/* 실제 브라우저처럼 (2026-11-10 사용자): 같은 사이트를 여러 탭에 열 수 있고, 즐겨찾기는 늘 지금 탭에서 연다. 탭마다 보던 화면은 탭 기록(hist)이 되살린다 */
+/** 새 탭: 늘 빈 탭 하나를 더 연다 */
 export function newTab(): void {
-  const i = br.tabs.findIndex((t) => !t.site);
-  if (i >= 0) {
-    br.cur = i;
-    return;
-  }
   br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   br.cur = br.tabs.length - 1;
 }
 /** 탭 닫기. 마지막 탭을 닫으면 새 탭 하나가 남는다 */
 export function closeTab(i: number): void {
   const [gone] = br.tabs.splice(i, 1);
-  if (gone?.site) br.closed = [...br.closed.filter((t) => t.site !== gone.site), gone].slice(-10);
+  if (gone?.site) br.closed = [...br.closed, gone].slice(-10);
   if (!br.tabs.length) br.tabs.push({ id: seq++, site: '', hist: [], at: -1 });
   if (br.cur >= i && br.cur > 0) br.cur--;
   br.cur = Math.min(br.cur, br.tabs.length - 1);
 }
-/** 닫은 탭 다시 열기 (11-09 사용자: 마우스 제스처 ㄱ). 그 사이트 탭이 이미 열려 있으면 그 탭으로 간다. 되살릴 게 없으면 false */
+/** 닫은 탭 다시 열기 (11-09 사용자: 마우스 제스처 ㄱ). 빈 새 탭 하나만 남아 있었으면 그 자리를 쓴다. 되살릴 게 없으면 false */
 export function reopenTab(): boolean {
   const t = br.closed.pop();
   if (!t) return false;
-  const i = br.tabs.findIndex((x) => x.site === t.site);
-  if (i >= 0) {
-    br.cur = i;
-    return true;
-  }
   const empty = br.tabs.length === 1 && !br.tabs[0].site ? 0 : -1;
   if (empty >= 0) br.tabs.splice(empty, 1);
   br.tabs.push({ ...t, id: seq++ });
   br.cur = br.tabs.length - 1;
   return true;
 }
-/** 사이트 열기: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
+/** 인터넷 밖(폰 서랍·위키 바로가기)에서 사이트로 갈 때: 그 사이트 탭이 있으면 그 탭으로 가고('tab', 지금 탭이 빈 새 탭이었으면 닫는다), 없으면 지금 탭에서 연다('here') */
 export function openSite(site: SiteId): 'tab' | 'here' {
   const i = br.tabs.findIndex((t) => t.site === site);
   if (i < 0) {
@@ -173,11 +163,8 @@ export function restoreTabs(raw: unknown): void {
   br.cur = 0;
   try {
     const v = JSON.parse(String(raw ?? ''));
-    const seen = new Set<string>();
     for (const t of Array.isArray(v?.t) ? v.t : []) {
       const site: SiteId | '' = isSite(String(t?.s)) ? (t.s as SiteId) : '';
-      if (seen.has(site)) continue;
-      seen.add(site);
       const hist = Array.isArray(t?.h) ? t.h.filter((x: unknown) => typeof x === 'string').slice(-SAVE_HIST) : [];
       const at = Number.isInteger(t?.a) ? Math.min(Math.max(-1, t.a), hist.length - 1) : hist.length - 1;
       br.tabs.push({ id: seq++, site, hist, at });

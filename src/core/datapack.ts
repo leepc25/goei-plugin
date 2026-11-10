@@ -106,7 +106,7 @@ export interface ItemIconPack {
   /** 이름·그림 찾기 낱말 → 그림 파일, 점수가 낮으면 null */
   find: (name: string, icon?: string) => string | null;
   /** find 와 같되 점수까지 (몸통 말이 맞으면 1, 글자 조각으로 찾았으면 1 미만) */
-  hit: (name: string, icon?: string) => { file: string; score: number } | null;
+  hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number } | null;
 }
 
 export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, splitIconWord } from './iconmatch';
@@ -192,10 +192,10 @@ export function matchTitleIcon(pack: ItemIconPack, title: string): string | null
     return false;
   };
   const at = (n: number) => {
-    const h = pack.hit(words.slice(0, n).join(' '));
+    const h = pack.hit(words.slice(0, n).join(' '), undefined, true);
     return h && h.score >= 1 && backed(h.file, words[n - 1]) ? h.file : null;
   };
-  const whole = pack.hit(words.join(' '));
+  const whole = pack.hit(words.join(' '), undefined, true);
   const first = at(words.length);
   if (first) return first;
   for (let n = 1; n < words.length; n++) {

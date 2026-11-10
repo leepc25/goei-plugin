@@ -1114,28 +1114,25 @@ async function handle(action: string, value?: string): Promise<void> {
       return;
     // ── 인터넷 브라우저 (ui/browser.ts) ──
     case 'br-site':
-      // 폰 서랍: 그 사이트 탭이 있으면 그 탭으로, 없으면 지금 탭에서 (2026-11-08 사용자)
+      // 폰 서랍: 인터넷 안이면 지금 탭에서, 밖이면 그 사이트 탭이 있을 때 그 탭으로·없으면 새 탭에서
       if (!value || !isSite(value)) return;
       cdrOpen = false;
+      if (inBrowser()) return goSite(value);
       if (br.tabs.some((t) => t.site === value)) {
         openSite(value);
         return openBrowserTab();
       }
-      if (!inBrowser()) newTab();
+      if (curTab().site) newTab();
       return goSite(value);
     case 'br-go':
-      // 사이트마다 탭은 하나: 이미 열린 사이트면 그 탭으로 (2026-11-08 사용자)
+      // 즐겨찾기: 늘 지금 탭에서 연다 (2026-11-10 사용자: 실제 브라우저처럼, 같은 사이트 탭이 여럿이어도 된다)
       if (!value || !isSite(value)) return;
-      if (br.tabs.some((t, i) => t.site === value && i !== br.cur)) {
-        openSite(value);
-        return openBrowserTab();
-      }
       return goSite(value);
     case 'br-home':
       return goSite('');
     case 'br-new':
       newTab();
-      return curTab().at >= 0 ? openBrowserTab() : goSite('');
+      return goSite('');
     case 'br-tab':
       br.cur = Math.max(0, Math.min(br.tabs.length - 1, Number(value) || 0));
       br.list = false;
@@ -1623,13 +1620,7 @@ function navHistBar(): string {
 
 function applyNav(s: NavState): void {
   tab = s.tab;
-  if (s.b !== undefined) {
-    // 사이트마다 탭은 하나, 빈 새 탭도 하나 (2026-11-10 사용자: 뒤로 가다 보면 같은 사이트 탭이 둘이 됐다) — 그 사이트(또는 빈 탭)가 다른 탭에 있으면 지금 탭을 바꾸지 않고 그 탭으로 간다
-    const site = isSite(s.b) ? s.b : '';
-    const other = br.tabs.findIndex((t, i) => i !== br.cur && t.site === site);
-    if (other >= 0) br.cur = other;
-    else curTab().site = site;
-  }
+  if (s.b !== undefined) curTab().site = isSite(s.b) ? s.b : '';
   notice = '';
   field.confirmEnd = null;
   if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list }, s.w.view === 'find' ? { query: s.w.q ?? '' } : {});
