@@ -1,0 +1,590 @@
+{
+ "w": 512,
+ "h": 384,
+ "box": 256,
+ "cuts": {
+  "A": {
+   "plate": "a_plate.webp",
+   "off": "a_plate_off.webp",
+   "host": "a_host.webp",
+   "x": -6,
+   "y": 65,
+   "over": 297,
+   "screen": [
+    175,
+    128,
+    339,
+    217
+   ],
+   "bulbs": [
+    [
+     448,
+     227,
+     5
+    ],
+    [
+     448,
+     212,
+     5
+    ],
+    [
+     448,
+     197,
+     5
+    ],
+    [
+     446,
+     183,
+     4
+    ],
+    [
+     443,
+     168,
+     5
+    ],
+    [
+     447,
+     152,
+     2
+    ],
+    [
+     438,
+     153,
+     5
+    ],
+    [
+     461,
+     134,
+     3
+    ],
+    [
+     428,
+     151,
+     3
+    ],
+    [
+     431,
+     139,
+     5
+    ],
+    [
+     421,
+     127,
+     5
+    ],
+    [
+     409,
+     116,
+     5
+    ],
+    [
+     401,
+     121,
+     4
+    ],
+    [
+     397,
+     107,
+     4
+    ],
+    [
+     383,
+     100,
+     5
+    ],
+    [
+     374,
+     87,
+     5
+    ],
+    [
+     368,
+     94,
+     5
+    ],
+    [
+     362,
+     100,
+     5
+    ],
+    [
+     354,
+     88,
+     5
+    ],
+    [
+     338,
+     84,
+     5
+    ],
+    [
+     324,
+     80,
+     5
+    ],
+    [
+     309,
+     77,
+     5
+    ],
+    [
+     293,
+     75,
+     5
+    ],
+    [
+     276,
+     73,
+     5
+    ],
+    [
+     256,
+     73,
+     4
+    ],
+    [
+     238,
+     73,
+     5
+    ],
+    [
+     221,
+     75,
+     4
+    ],
+    [
+     204,
+     77,
+     4
+    ],
+    [
+     188,
+     80,
+     5
+    ],
+    [
+     173,
+     84,
+     5
+    ],
+    [
+     157,
+     88,
+     4
+    ],
+    [
+     148,
+     100,
+     5
+    ],
+    [
+     142,
+     94,
+     4
+    ],
+    [
+     136,
+     87,
+     5
+    ],
+    [
+     128,
+     100,
+     5
+    ],
+    [
+     122,
+     94,
+     5
+    ],
+    [
+     108,
+     122,
+     5
+    ],
+    [
+     101,
+     116,
+     5
+    ],
+    [
+     95,
+     133,
+     4
+    ],
+    [
+     89,
+     127,
+     5
+    ],
+    [
+     82,
+     122,
+     5
+    ],
+    [
+     88,
+     141,
+     3
+    ],
+    [
+     79,
+     139,
+     4
+    ],
+    [
+     71,
+     153,
+     5
+    ],
+    [
+     65,
+     168,
+     5
+    ],
+    [
+     62,
+     183,
+     5
+    ],
+    [
+     61,
+     197,
+     5
+    ],
+    [
+     61,
+     212,
+     5
+    ],
+    [
+     61,
+     227,
+     5
+    ]
+   ],
+   "clips": [
+    {
+     "name": "idle",
+     "ko": "대기",
+     "ver": "1",
+     "group": "base",
+     "frames": 17,
+     "file": "a_idle_1.webp"
+    },
+    {
+     "name": "talk",
+     "ko": "말하기",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_talk_1.webp"
+    },
+    {
+     "name": "excited",
+     "ko": "신남",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_excited_1.webp"
+    },
+    {
+     "name": "urgent",
+     "ko": "매진 임박",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_urgent_1.webp"
+    },
+    {
+     "name": "count",
+     "ko": "할부 세기",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_count_1.webp"
+    },
+    {
+     "name": "amazed",
+     "ko": "놀람",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_amazed_1.webp"
+    },
+    {
+     "name": "whisper",
+     "ko": "속삭임",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_whisper_1.webp"
+    },
+    {
+     "name": "laugh",
+     "ko": "웃음",
+     "ver": "1",
+     "group": "filler",
+     "frames": 17,
+     "file": "a_laugh_1.webp"
+    },
+    {
+     "name": "cold",
+     "ko": "차가워짐",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_cold_1.webp"
+    },
+    {
+     "name": "angry",
+     "ko": "화남",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "a_angry_1.webp"
+    }
+   ]
+  },
+  "B": {
+   "plate": "b_plate.webp",
+   "host": "b_host.webp",
+   "x": 70,
+   "y": 40,
+   "clips": [
+    {
+     "name": "talk",
+     "ko": "말하기",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_talk_1.webp"
+    },
+    {
+     "name": "laugh",
+     "ko": "웃음",
+     "ver": "1",
+     "group": "filler",
+     "frames": 17,
+     "file": "b_laugh_1.webp"
+    },
+    {
+     "name": "laugh",
+     "ko": "웃음",
+     "ver": "2",
+     "group": "filler",
+     "frames": 17,
+     "file": "b_laugh_2.webp"
+    },
+    {
+     "name": "urgent",
+     "ko": "매진 임박",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_urgent_1.webp"
+    },
+    {
+     "name": "cold",
+     "ko": "차가워짐",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_cold_1.webp"
+    },
+    {
+     "name": "cold",
+     "ko": "차가워짐",
+     "ver": "2",
+     "group": "event",
+     "frames": 17,
+     "file": "b_cold_2.webp"
+    },
+    {
+     "name": "gape",
+     "ko": "입 크게 벌리기",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_gape_1.webp"
+    },
+    {
+     "name": "grin",
+     "ko": "찢어지는 미소",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_grin_1.webp"
+    },
+    {
+     "name": "grin",
+     "ko": "찢어지는 미소",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_grin_2.webp"
+    },
+    {
+     "name": "stare",
+     "ko": "굳은 응시",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_stare_1.webp"
+    },
+    {
+     "name": "stare",
+     "ko": "굳은 응시",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_stare_2.webp"
+    },
+    {
+     "name": "twitch",
+     "ko": "경련",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_twitch_1.webp"
+    },
+    {
+     "name": "twitch",
+     "ko": "경련",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_twitch_2.webp"
+    },
+    {
+     "name": "silentlaugh",
+     "ko": "소리 없는 웃음",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_silentlaugh_1.webp"
+    },
+    {
+     "name": "silentlaugh",
+     "ko": "소리 없는 웃음",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_silentlaugh_2.webp"
+    },
+    {
+     "name": "spin",
+     "ko": "머리 한 바퀴",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_spin_1.webp"
+    },
+    {
+     "name": "spin",
+     "ko": "머리 한 바퀴",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_spin_2.webp"
+    },
+    {
+     "name": "blacktears",
+     "ko": "검은 눈물",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_blacktears_1.webp"
+    },
+    {
+     "name": "flip",
+     "ko": "머리 뒤집기",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_flip_1.webp"
+    },
+    {
+     "name": "flip",
+     "ko": "머리 뒤집기",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_flip_2.webp"
+    },
+    {
+     "name": "tilt",
+     "ko": "고개 꺾기",
+     "ver": "1",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_tilt_1.webp"
+    },
+    {
+     "name": "tilt",
+     "ko": "고개 꺾기",
+     "ver": "2",
+     "group": "rare",
+     "frames": 17,
+     "file": "b_tilt_2.webp"
+    },
+    {
+     "name": "excited",
+     "ko": "신남",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_excited_1.webp"
+    },
+    {
+     "name": "count",
+     "ko": "할부 세기",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_count_1.webp"
+    },
+    {
+     "name": "amazed",
+     "ko": "놀람",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_amazed_1.webp"
+    },
+    {
+     "name": "whisper",
+     "ko": "속삭임",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_whisper_1.webp"
+    },
+    {
+     "name": "angry",
+     "ko": "화남",
+     "ver": "1",
+     "group": "event",
+     "frames": 17,
+     "file": "b_angry_1.webp"
+    },
+    {
+     "name": "idle",
+     "ko": "대기",
+     "ver": "1",
+     "group": "base",
+     "frames": 17,
+     "file": "b_idle_1.webp"
+    },
+    {
+     "name": "idle",
+     "ko": "대기",
+     "ver": "2",
+     "group": "filler",
+     "frames": 17,
+     "file": "b_idle_2.webp"
+    }
+   ]
+  }
+ }
+}

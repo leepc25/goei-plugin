@@ -41,6 +41,8 @@ import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiOpenCheck, wikiTab, type WikiEnv } from './wiki';
 import { bmDeskWinSpec, mallWinSpec, mallAction, mallAskOpen, mallInput, mallOpenCheck, mallSettingsAction, mallTab, resetMalls } from './malls';
 import { isMallSite } from '../core/malls';
+import { homeshopAction, homeshopMounted, homeshopOpenCheck, homeshopTab, resetHomeshop } from './homeshop';
+import { hsSettings } from '../core/homeshop';
 import { boardChrome, gnet, gnetDmOpen, gnetDmWinSpec, gnetOpenCheck, gnetTab, handleGnet, resetGnet, useBoardSite, type GnetEnv } from './gnet';
 import { bindPopWins } from './popwin';
 import { bindMouseGesture, type Gesture } from './gesture';
@@ -825,6 +827,7 @@ async function refresh(): Promise<void> {
         resetShop();
         resetGnet();
         resetMalls();
+        resetHomeshop();
         restoreTabs(ctx.chat.scriptstate?.[BR_TABS_VAR]);
         tabsSaved = tabsJson();
         resetPhone();
@@ -951,6 +954,7 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
   if (featCtx && action.startsWith('ms-') && (await mallSettingsAction(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('hs-') && (await homeshopAction(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('mall-')) {
     const ms = curTab().site;
     if (isMallSite(ms) && (await mallAction(action, value, featCtx, wikiEnv, ms))) return;
@@ -1154,6 +1158,7 @@ async function handle(action: string, value?: string): Promise<void> {
       // 새로 고침 = 그 사이트를 새로 받기 (괴담넷은 게시판 새로고침, 나머지는 다시 그리기)
       if (view.kind === 'started' && isBoardSite(curTab().site) && (await handleGnet('gn-refresh', '', view.ctx, gnetEnv, tabBoard()))) return;
       { const ms = curTab().site; if (view.kind === 'started' && isMallSite(ms) && (await mallAction('mall-refresh', '', view.ctx, wikiEnv, ms))) return; }
+      if (view.kind === 'started' && curTab().site === 'hs' && (await homeshopAction('hs-refresh', '', view.ctx, wikiEnv))) return;
       return render();
     case 'br-list':
       br.list = !br.list;
@@ -1542,6 +1547,8 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  // 망상홈쇼핑 방송 칸: 다시 그려도 같은 캔버스·채팅 줄을 꽂아 끊기지 않게 (ui/hsplayer.ts)
+  homeshopMounted(root);
   root.querySelectorAll<HTMLElement>('[data-chatlog]').forEach((el) => {
     const k = chatKeep.get(el.dataset.chatlog ?? '');
     const n = el.querySelectorAll('.q-m, .bd-m, [data-msg]').length;
@@ -1854,7 +1861,9 @@ function commonDrawer(ctx: ChatContext | null): string {
 
 /** 즐겨찾기·새 탭·서랍에 보일 사이트: 백일몽 포인트몰은 백일몽 소속일 때만 */
 function browserSites(ctx: ChatContext | null): SiteId[] {
-  return SITES.map((x) => x.id).filter((id) => id !== 'bm' || (!!ctx && pointsOn(ctx.chat)));
+  // 망상홈쇼핑은 켜져 있고 「인터넷에 상시 노출」일 때만 (꺼도 카드로 접속하면 그 탭에서 열린다)
+  const hs = ctx ? hsSettings(ctx.chat.scriptstate) : null;
+  return SITES.map((x) => x.id).filter((id) => (id !== 'bm' || (!!ctx && pointsOn(ctx.chat))) && (id !== 'hs' || (!!hs && hs.on && hs.net)));
 }
 
 /** 브라우저 틀에 넘길 값: 로그인 닉네임은 $br_login 이 1 일 때만 */
@@ -1887,6 +1896,7 @@ function browserBody(ctx: ChatContext): string {
     : !t.site ? homeHtml(browserSites(ctx))
     : isBoardSite(t.site) ? gnetTab(ctx, gnetEnv, t.site)
     : isMallSite(t.site) ? mallTab(ctx, wikiEnv, t.site)
+    : t.site === 'hs' ? homeshopTab(ctx, wikiEnv)
     : t.site === 'wk' ? wikiTab(ctx, wikiEnv)
     : soonHtml(t.site);
   return `<div class="br">${chromeHtml(o)}<div class="br-page br-p-${t.site || 'home'}">${page}</div>${loginHtml(o)}</div>`;
@@ -1911,6 +1921,7 @@ function siteOpened(): void {
   if (tab === 'wiki') wikiOpenCheck(view.ctx, wikiEnv);
   const site = curTab().site;
   if (tab === 'net' && isMallSite(site)) mallOpenCheck(view.ctx, wikiEnv, site);
+  if (tab === 'net' && site === 'hs') homeshopOpenCheck(view.ctx, wikiEnv);
 }
 
 /** 지금 탭에서 사이트를 연다 (그 사이트 첫 화면부터) */

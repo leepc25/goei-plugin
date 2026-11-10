@@ -47,6 +47,8 @@ export interface OwnShop { id: string; on: boolean; name: string; alias: string;
 export const OWN_SHOPS_DEFAULT: OwnShop[] = [
   { id: 'cos', on: true, name: '우주 쇼핑몰', alias: '', web: 'cos', visit: 'shop' },
   { id: 'bm', on: true, name: '백일몽 포인트몰', alias: '포인트몰, 복지몰', web: 'bm', visit: '' },
+  // 망상홈쇼핑 (2026-11-11): 화면·앱으로 방송을 보면(@web) 방송 사이트를 연다. 직접 간 곳(방청석·쇼룸)의 창은 아직 없다
+  { id: 'hs', on: true, name: '망상홈쇼핑', alias: '망상 홈쇼핑, 망상홈쇼핑 라이브', web: 'hs', visit: '' },
 ];
 /** 인터넷 접속 표시: 표식 주인 칸 (모델은 `@web`, 정리한 뒤에는 `@web:사이트`) */
 export const WEB_OWNER = '@web';

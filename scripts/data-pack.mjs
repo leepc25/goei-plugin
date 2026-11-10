@@ -14,6 +14,8 @@ export const INSTALL_PACK_NAME = 'goei-data-install';
 export const ITEMS_PACK_NAME = 'goei-data-items';
 /** 내 모습 팩 (2026-11-07 사용자): 필드 인물 126명의 정면 대기 동작(game-pack/char-N/50.webp, 장마다 cw×ch 로 잘린 가로 줄) + 줄 측정값. 시작 패널 「내 모습」·소지품 인물 자리가 처음 그릴 때 받아 저장소에 둔다 (host/looks.ts) */
 export const LOOKS_PACK_NAME = 'goei-data-looks';
+/** 망상홈쇼핑 방송 그림 팩 (2026-11-11): game-src/homeshop/homeshop.json(자리·동작 목록) + 배경 판·진행자·동작 시트(webp 무손실) base64 + 글꼴. 방송 화면을 처음 열 때 받아 저장소에 둔다 (host/homeshop.ts) */
+export const HOMESHOP_PACK_NAME = 'goei-data-homeshop';
 /** 조각 하나의 상한 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다. 본체 조각과 같은 200KB) */
 export const PART_BYTES = 200_000;
 
@@ -110,6 +112,21 @@ export function looksPackText() {
     looks.push({ id, name, g, unique, n: m.n, w: m.w, h: m.h, cw: m.cw, ch: m.ch, ox: m.ox, oy: m.oy, img: readFileSync(new URL(`game-pack/${d}/${m.file}`, ROOT)).toString('base64') });
   }
   return JSON.stringify({ schema: 1, kind: 'looks', looks });
+}
+
+/** 망상홈쇼핑 방송 그림 팩 글: { schema, kind:'homeshop', meta:{w,h,box,cuts:{A,B}}, files:{이름: base64 webp} }.
+ *  시트는 tools/homeshop/build_sheets.py 가 원본 장면을 그대로(무손실) 가로 줄로 이은 것. src/core/homeshop.ts parseHomeshopPack 이 읽는 모양 */
+export function homeshopPackText() {
+  const meta = readJson('game-src/homeshop/homeshop.json');
+  const files = {};
+  const add = (f) => { if (f && !files[f]) files[f] = readFileSync(new URL(`game-src/homeshop/${f}`, ROOT)).toString('base64'); };
+  for (const c of Object.values(meta.cuts)) {
+    add(c.plate); add(c.off); add(c.host);
+    for (const k of c.clips) add(k.file);
+  }
+  // 글꼴: Neo둥근모(OFL), woff2 로 줄인 것(650KB → 37KB, 글자 모양 그대로). 방송 그래픽·사이트 글자를 도트 결로 (11-10 사용자: 도트 시안)
+  const font = readFileSync(new URL('game-src/homeshop/neodgm.woff2', ROOT)).toString('base64');
+  return JSON.stringify({ schema: 1, kind: 'homeshop', meta, files, font });
 }
 
 /** 글 지문 (src/core/texthash.ts textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. crypto.subtle 이 없는 환경에서도 본체가 저장소의 자료를 확인한다 */

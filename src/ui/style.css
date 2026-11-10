@@ -4850,3 +4850,127 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
 .bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
 .bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
+
+/* ── 망상홈쇼핑 (2026-11-11). 도트 시안(site_mock_dot) 그대로: 도트 글꼴·2px 테두리·판 색. 방송 칸은 ui/hsplayer.ts 가 꽂는다 ── */
+.hs { --hs-ink: #0b0513; --hs-night: #151320; --hs-iron: #3a3842; --hs-wine: #60131b; --hs-red: #b33031; --hs-hot: #d35544; --hs-gold: #eeb76c; --hs-cream: #f4e6c8; --hs-brown: #311d24; --hs-yel: #ffd23e; --hs-dim: #8a7f88;
+  background: var(--hs-ink); color: var(--hs-cream); font: 16px/16px goei-neodgm, monospace; -webkit-font-smoothing: none; min-height: 100%; padding: 8px; box-sizing: border-box; }
+.hs *, .hs *::before, .hs *::after { box-sizing: border-box; }
+.hs img, .hs canvas { image-rendering: pixelated; }
+.hs .hs-win { width: fit-content; max-width: 100%; margin: 0 auto; }
+.hs .hs-px { background: var(--hs-night); border: 2px solid var(--hs-ink); box-shadow: inset 2px 2px 0 var(--hs-iron), inset -2px -2px 0 #000, 0 0 0 2px var(--hs-gold); }
+.hs .hs-hd { min-height: 40px; display: flex; align-items: center; gap: 24px; padding: 0 12px; margin: 2px 2px 12px; }
+.hs .hs-logo { font-size: 32px; line-height: 32px; color: var(--hs-gold); text-shadow: 2px 2px 0 #000; white-space: nowrap; }
+.hs .hs-menu { display: flex; gap: 4px; flex: 1; }
+.hs .hs-menu button { padding: 4px 10px; color: var(--hs-cream); border: 2px solid transparent; white-space: nowrap; }
+.hs .hs-menu button.on { background: var(--hs-red); border-color: var(--hs-gold); color: #fff; box-shadow: inset -2px -2px 0 var(--hs-wine); }
+.hs .hs-tel { color: var(--hs-yel); white-space: nowrap; }
+.hs .hs-err { margin: 0 2px 10px; padding: 8px; border: 2px solid var(--hs-red); background: var(--hs-night); color: var(--hs-cream); line-height: 20px; word-break: break-word; }
+.hs .hs-err button { margin-left: 8px; padding: 2px 6px; border: 2px solid var(--hs-gold); color: var(--hs-gold); }
+.hs .hs-row { display: flex; gap: 12px; align-items: stretch; }
+.hs .hs-tv { flex: none; width: max-content; padding: 8px; background: var(--hs-iron); border: 2px solid #000; box-shadow: inset 2px 2px 0 #5a5864, inset -2px -2px 0 #1c1b22; }
+.hs .hs-scr { position: relative; overflow: hidden; outline: 2px solid #000; background: #000; }
+.hs .hs-cv { display: block; width: 100%; height: 100%; }
+.hs .hs-scan { position: absolute; inset: 0; background: repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, .18) 1px 2px); pointer-events: none; }
+.hs .hs-scr.noscan .hs-scan { display: none; }
+.hs .hs-cg { position: absolute; left: 0; top: 0; transform-origin: 0 0; color: var(--hs-cream); font-size: 16px; line-height: 16px; }
+.hs .hs-cg > div { position: absolute; }
+.hs .hs-lg { left: 8px; top: 8px; display: flex; }
+.hs .hs-lg b { background: var(--hs-wine); color: var(--hs-gold); padding: 4px 6px; border: 2px solid var(--hs-gold); font-weight: normal; }
+.hs .hs-lg i { background: var(--hs-gold); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-gold); font-style: normal; }
+.hs .hs-live { right: 8px; top: 8px; background: var(--hs-red); color: #fff; padding: 4px 6px 4px 18px; border: 2px solid #fff; }
+.hs .hs-live::before { content: ""; position: absolute; left: 6px; top: 8px; width: 6px; height: 6px; background: #fff; }
+.hs .hs-soon { right: 8px; top: 40px; background: var(--hs-yel); color: var(--hs-ink); padding: 4px 6px; border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; }
+.hs .hs-soon.sold { background: var(--hs-red); color: #fff; }
+.hs .hs-left { right: 8px; top: 68px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-board { background: var(--hs-wine); border: 2px solid var(--hs-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.hs .hs-board.hs-bA { left: 177px; top: 130px; width: 160px; height: 85px; }
+.hs .hs-board.hs-bB { right: 8px; top: 100px; width: 160px; height: 85px; box-shadow: 2px 2px 0 #000; }
+.hs .hs-board .big { font-size: 32px; line-height: 32px; color: var(--hs-yel); text-shadow: 2px 2px 0 #000; }
+.hs .hs-board .sm { color: var(--hs-cream); }
+.hs .hs-call { left: 8px; top: 40px; background: var(--hs-ink); color: var(--hs-yel); padding: 4px 6px; border: 2px solid var(--hs-yel); }
+.hs .hs-note { inset: 0; display: grid; place-items: center; }
+.hs .hs-note b { background: var(--hs-ink); color: #fff; padding: 6px 10px; border: 2px solid #fff; font-weight: normal; }
+/* 아래 띠: 자막 + 상품 이름표. 바스트·전화 컷은 그림 아래 끝(y296)을 띠 바탕으로 덮는다 */
+.hs .hs-band { left: 0; right: 0; bottom: 0; padding: 8px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 6px; }
+.hs .hs-band.hs-kB, .hs .hs-band.hs-kD { min-height: 96px; background-image: repeating-conic-gradient(var(--hs-wine) 0 25%, var(--hs-brown) 0 50%); background-size: 2px 2px; border-top: 2px solid var(--hs-gold); }
+.hs .hs-band.hs-t { gap: 18px; }
+/* 와이드 컷: 자막이 진열대 위 상품을 가리지 않게 위쪽(로고 아래)으로 */
+.hs .hs-band.hs-kA { top: 0; pointer-events: none; }
+.hs .hs-band.hs-kA .hs-sub { margin-top: 28px; margin-bottom: auto; max-width: 352px; }
+.hs .hs-scr.sm .hs-band.hs-kA .hs-sub { margin-top: 22px; max-width: 100%; }
+.hs .hs-sub { max-width: 100%; background: var(--hs-ink); color: #fff; padding: 4px 6px; border: 2px solid var(--hs-ink); line-height: 18px; word-break: keep-all; overflow-wrap: anywhere; visibility: hidden; }
+.hs .hs-sub.on { visibility: visible; }
+.hs .hs-l3 { align-self: stretch; display: flex; gap: 6px; align-items: flex-end; }
+.hs .hs-l3 .nm { flex: 1; min-width: 0; background: var(--hs-cream); color: var(--hs-ink); border: 2px solid var(--hs-ink); box-shadow: 2px 2px 0 #000; position: relative; padding: 6px 8px; }
+.hs .hs-band.hs-t .hs-l3 .nm { padding-top: 14px; }
+.hs .hs-l3 .tag { position: absolute; left: -2px; top: -14px; background: var(--hs-red); color: #fff; padding: 3px 6px; border: 2px solid var(--hs-ink); }
+.hs .hs-l3 .n { margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs .hs-l3 .p2 { white-space: nowrap; overflow: hidden; }
+.hs .hs-l3 .p { color: var(--hs-red); }
+.hs .hs-l3 .ph { flex: none; background: var(--hs-ink); border: 2px solid var(--hs-yel); padding: 6px 8px; box-shadow: 2px 2px 0 #000; text-align: right; }
+.hs .hs-l3 .ph small { display: block; font-size: 16px; color: var(--hs-yel); margin-bottom: 4px; }
+.hs .hs-l3 .ph b { font-size: 32px; line-height: 32px; color: #fff; font-weight: normal; }
+/* 0.5배(폰): 256×192 칸에 줄인 구성 (도트 시안 폰판) */
+.hs .hs-scr.sm .hs-lg { left: 4px; top: 4px; }
+.hs .hs-scr.sm .hs-lg b, .hs .hs-scr.sm .hs-lg i { padding: 2px 4px; }
+.hs .hs-scr.sm .hs-live { right: 4px; top: 4px; padding: 2px 4px 2px 14px; }
+.hs .hs-scr.sm .hs-live::before { left: 4px; top: 6px; width: 4px; height: 4px; }
+.hs .hs-scr.sm .hs-soon { right: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-left, .hs .hs-scr.sm .hs-l3 .tag, .hs .hs-scr.sm .hs-l3 .p2, .hs .hs-scr.sm .hs-l3 .ph small, .hs .hs-scr.sm .hs-board > .sm { display: none; }
+.hs .hs-scr.sm .hs-call { left: 4px; top: 28px; padding: 2px 4px; }
+.hs .hs-scr.sm .hs-board { gap: 2px; }
+.hs .hs-scr.sm .hs-board span .sm { display: none; }
+.hs .hs-scr.sm .hs-board.hs-bA { left: 88px; top: 64px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board.hs-bB { right: 4px; top: 50px; width: 82px; height: 44px; }
+.hs .hs-scr.sm .hs-board .big { font-size: 16px; line-height: 16px; }
+.hs .hs-scr.sm .hs-band { padding: 4px; gap: 4px; }
+.hs .hs-scr.sm .hs-band.hs-kB, .hs .hs-scr.sm .hs-band.hs-kD { min-height: 48px; }
+.hs .hs-scr.sm .hs-sub { padding: 2px 4px; max-height: 40px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.hs .hs-scr.sm .hs-l3 { gap: 4px; }
+.hs .hs-scr.sm .hs-l3 .nm, .hs .hs-scr.sm .hs-band.hs-t .hs-l3 .nm { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .n { margin: 0; }
+.hs .hs-scr.sm .hs-l3 .ph { padding: 4px 6px; }
+.hs .hs-scr.sm .hs-l3 .ph b { font-size: 16px; line-height: 16px; }
+/* 채팅 */
+.hs .hs-chat { flex: 1; min-width: 260px; width: 324px; margin: 2px; display: flex; flex-direction: column; }
+.hs .ch-h { padding: 8px; border-bottom: 2px solid var(--hs-iron); display: flex; justify-content: space-between; color: var(--hs-gold); }
+.hs .ch-b { flex: 1; min-height: 0; position: relative; }
+.hs .hs-chlog { position: absolute; inset: 0; padding: 6px 8px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; scrollbar-width: none; }
+.hs .hs-chlog::-webkit-scrollbar { display: none; }
+.hs .hs-chlog p { margin: 0; display: flex; gap: 8px; line-height: 18px; word-break: break-word; }
+.hs .hs-chlog p span { flex: none; width: 64px; overflow: hidden; white-space: nowrap; color: var(--hs-hot); }
+.hs .hs-chlog p.q, .hs .hs-chlog p.q span { color: var(--hs-dim); }
+.hs .hs-chlog p.host, .hs .hs-chlog p.host span { color: var(--hs-yel); }
+.hs .hs-chlog p.me span { color: #fff; }
+/* 지금 방송 중 · 편성 */
+.hs .hs-oa { margin: 16px 2px 0; display: flex; gap: 12px; padding: 10px; align-items: center; }
+.hs .hs-icon { flex: none; width: 96px; height: 96px; background: var(--hs-ink); border: 2px solid var(--hs-gold); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hs .hs-icon img { max-width: 88px; max-height: 88px; }
+.hs .hs-oa .t { flex: 1; min-width: 0; }
+.hs .hs-oa .k { color: var(--hs-gold); margin-bottom: 6px; }
+.hs .hs-oa .nm2 { font-size: 32px; line-height: 32px; margin-bottom: 8px; overflow-wrap: anywhere; }
+.hs .hs-oa .d { line-height: 20px; }
+.hs .hs-sch { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; color: var(--hs-gold); }
+.hs .hs-sch .dim { color: var(--hs-dim); }
+.hs .hs-sc { margin-top: 14px; display: flex; gap: 8px; }
+.hs .hs-sc.col { flex-direction: column; }
+.hs .hs-sl { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; padding: 8px; border: 2px solid var(--hs-iron); background: var(--hs-night); position: relative; height: 56px; }
+.hs .hs-sc.col .hs-sl { flex: none; }
+.hs .hs-sl .b { color: var(--hs-gold); margin-bottom: 8px; }
+.hs .hs-sl.past, .hs .hs-sl.past .b, .hs .hs-sl.gone, .hs .hs-sl.gone .b, .hs .hs-sl.q { color: var(--hs-dim); }
+.hs .hs-sl.past::after { content: "매진"; position: absolute; right: 6px; top: 6px; color: var(--hs-red); border: 2px solid var(--hs-red); padding: 2px 4px; background: var(--hs-night); }
+.hs .hs-sl.now { border-color: var(--hs-gold); background: var(--hs-wine); }
+.hs .hs-sl.now .b { color: var(--hs-yel); }
+/* 폰 */
+.hs.hs-m .hs-win { width: 100%; }
+.hs.hs-m .hs-hd { flex-wrap: wrap; gap: 8px; padding: 8px; }
+.hs.hs-m .hs-menu { flex-basis: 100%; }
+.hs.hs-m .hs-tv { margin: 0 auto; padding: 6px; }
+.hs.hs-m .hs-oa { flex-wrap: wrap; margin-top: 14px; }
+.hs.hs-m .hs-oa .nm2 { font-size: 16px; line-height: 16px; }
+.hs.hs-m .hs-icon { width: 72px; height: 72px; }
+.hs.hs-m .hs-icon img { max-width: 64px; max-height: 64px; }
+.hs.hs-m .hs-chat { width: auto; height: 230px; margin-top: 16px; flex: none; }
+.hs.hs-m .hs-sch .dim { display: none; }
+.hs.hs-m .hs-sc:not(.col) { overflow-x: auto; scrollbar-width: none; }
+.hs.hs-m .hs-sc:not(.col) .hs-sl { flex: none; width: 120px; }

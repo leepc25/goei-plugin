@@ -4,7 +4,7 @@
 import { needAttr } from './needfill';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export type SiteId = 'gn' | 'gal' | 'wpf' | 'sm' | 'cos' | 'wk' | 'bm';
+export type SiteId = 'gn' | 'gal' | 'wpf' | 'sm' | 'cos' | 'wk' | 'bm' | 'hs';
 
 export interface Site {
   id: SiteId;
@@ -24,6 +24,7 @@ export const SITES: Site[] = [
   { id: 'cos', name: '우주 쇼핑몰', title: '★우주 쇼핑몰★에 오는 것을 환영하는 것이다', host: 'cosmic-mall.alien', path: '/~shop/index.html' },
   { id: 'wk', name: '괴이위키', title: '괴이위키', host: 'goei.wiki', path: '/w/괴이위키:대문' },
   { id: 'bm', name: '백일몽 포인트몰', title: '백일몽 포인트몰', host: 'point.baekilmong.intra', path: '/mall/main' },
+  { id: 'hs', name: '망상홈쇼핑', title: '망상홈쇼핑 LIVE', host: 'live.mangsang.tv', path: '/onair' },
 ];
 export const siteOf = (id: string): Site | undefined => SITES.find((s) => s.id === id);
 export const isSite = (id: string): id is SiteId => SITES.some((s) => s.id === id);
@@ -37,6 +38,7 @@ const LOGO: Record<SiteId | 'home', [string, string]> = {
   cos: ['0 0 32 24', '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
   wk: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
   bm: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
+  hs: ['0 0 24 24', '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
   home: ['0 0 24 24', '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>'],
 };
 export const siteLogo = (id: SiteId | 'home' | '', cls = 'br-fv'): string => {

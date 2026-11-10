@@ -1,6 +1,7 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
 import { mallSettingsPane } from './malls';
+import { homeshopSettingsPane } from './homeshop';
 import { GUIDE_NAMES, setGuideOverride } from '../core/guides';
 import { onOffSwitch, switchHtml } from './controls';
 import { repaintTheme } from './theme';
@@ -36,7 +37,7 @@ export interface SettingsEnv {
 export const THEME_KEY = '$st_fixed_theme';
 
 export const settingsUi = {
-  page: '' as '' | 'phone' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'wiki' | 'people' | 'journal' | 'factions',
+  page: '' as '' | 'phone' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'wiki' | 'people' | 'journal' | 'factions',
   confirmOff: false,
   busy: false,
   notice: '',
@@ -82,7 +83,7 @@ function seg(action: string, cur: string, items: [string, string][], disabled = 
 /** scope 'chat'·'defaults' = 화면 페이지처럼 범위 전환이 없는 곳에서 그 줄만 다른 범위일 때 (테마) */
 const SCOPE_BADGE = { device: '이 기기', chat: '이 채팅', defaults: '새 채팅 기본값' } as const;
 /** 고유 상점 표 (11-09 사용자: 로어 고유 상점은 설정에서 따로 정한다, 하드코딩 금지). 줄마다 사용·이름·다른 이름·인터넷 사이트·직접 갔을 때 창 */
-const OWN_WEB: [string, string][] = [['none', '없음'], ['cos', '우주 쇼핑몰'], ['bm', '백일몽 포인트몰']];
+const OWN_WEB: [string, string][] = [['none', '없음'], ['cos', '우주 쇼핑몰'], ['bm', '백일몽 포인트몰'], ['hs', '망상홈쇼핑']];
 const OWN_VISIT: [string, string][] = [['shop', '기본 상점창'], ['none', '열지 않음']];
 function ownShopsField(vars: Record<string, unknown> | undefined, busy: boolean): string {
   const list = ownShops(vars);
@@ -266,7 +267,7 @@ export function mainDefaultsPopup(): string {
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
-  const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx, 'gn') : page === 'gal' || page === 'wpf' || page === 'sm' ? gnetSettingsPane(ctx, page) : page === 'cos' || page === 'bm' ? mallSettingsPane(ctx, page) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
+  const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx, 'gn') : page === 'gal' || page === 'wpf' || page === 'sm' ? gnetSettingsPane(ctx, page) : page === 'cos' || page === 'bm' ? mallSettingsPane(ctx, page) : page === 'hs' ? homeshopSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : page === 'factions' ? peopleFactionPane(ctx, canChat) : page === 'journal' ? journalSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
   // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
   let pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   // 시작 전(시작 패널): 설정 값은 이 채팅에 바로 적히고, 갱신·열기 같은 동작은 시작 뒤에 된다

@@ -13,6 +13,7 @@ export * from './wiki';
 export * from './gnet';
 export * from './gnetPrompt';
 export * as boards from './boards';
+export * as homeshop from './homeshop';
 export * as phone from './phone';
 export * as phonePrompt from './phonePrompt';
 export * as phoneView from './phoneView';
