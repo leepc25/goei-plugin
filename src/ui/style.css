@@ -304,7 +304,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-sc.on b { color: var(--signal); }
 .gx-sc.off { opacity: .45; }
 
-.gx-who { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 240px; overflow: auto; padding: 2px; }
+/* 안쪽 스크롤 없이 다 펼친다 (2026-11-10 사용자: 본 스크롤과 이중이라 불편) */
+.gx-who { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 2px; }
 .gx-whoc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
 .gx-whoc .gx-ava { flex: none; width: 34px; height: 34px; border-radius: 9px; }
 .gx-whot { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
