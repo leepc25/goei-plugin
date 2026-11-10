@@ -63,12 +63,12 @@ export function ensureItemIcons(): Promise<void> {
 }
 
 /** 이름(+모델이 쓴 그림 찾기 낱말)에 맞는 그림 data URL. 맞는 게 없으면 공통 그림. 팩이 없으면 받기 시작하고 null */
-export function itemIconUrl(name: string, icon?: string): string | null {
+export function itemIconUrl(name: string, icon?: string, seed?: string): string | null {
   if (!pack) {
     if (!failed) void ensureItemIcons();
     return null;
   }
-  return urlOf(matchItemIcon(pack, name, icon));
+  return urlOf(matchItemIcon(pack, name, icon, seed));
 }
 
 /** 글 제목 → 그림 (연어 마켓 매물). 맞는 그림이 없으면 소지품과 같이 공통 그림 */

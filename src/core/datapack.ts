@@ -2,7 +2,7 @@
 // (goei-data-world.json + goei-data-world.N.txt, goei-data-install.*) 으로 받는다. 빌드(scripts/build.mjs)가 팩마다 지문을 여기 박아 두어
 // 본체는 자기와 맞는 자료만 쓴다 (판이 다르면 다시 받음). 받기·저장은 host/datapack.ts, 여기는 순수 계산(지문 비교·형식 검사·넣기).
 import { setInstallData } from './install';
-import { makeIconIndex, normIcon } from './iconmatch';
+import { iconPoolOn, makeIconIndex, normIcon, pickIconFromPool } from './iconmatch';
 import { textHash } from './texthash';
 import { setWorldData } from './world/records';
 
@@ -95,7 +95,7 @@ export function applyInstallPack(text: string): void {
 //   짧은 낱말이 긴 이름 안에 끼어 먼저 잡히던 것(확성기 → 「성기」, 봉지라면 → 「지라」)은 나머지 조각이 안 맞아 점수가 낮다.
 // ③ 가장 높은 점수가 낮으면(흔한 조각 「키트·상자」만 맞음 등) 공통 그림.
 
-export interface ItemIconRow { k: string[]; h: string[]; ft: string[]; f: string; kind: string; base?: boolean }
+export interface ItemIconRow { k: string[]; h: string[]; ft: string[]; f: string; kind: string; /** 분류(윗말) */ u?: string[]; base?: boolean }
 export interface ItemIconPack {
   table: ItemIconRow[];
   /** 몸통 말(정규화) → 대표 그림 파일 */
@@ -106,14 +106,14 @@ export interface ItemIconPack {
   /** 이름·그림 찾기 낱말 → 그림 파일, 점수가 낮으면 null */
   find: (name: string, icon?: string) => string | null;
   /** find 와 같되 점수까지 (몸통 말이 맞으면 1, 글자 조각으로 찾았으면 1 미만) */
-  hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number } | null;
+  hit: (name: string, icon?: string, strict?: boolean) => { file: string; score: number; pool?: string[] } | null;
 }
 
-export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, splitIconWord } from './iconmatch';
+export { clearIconMisses, ICON_ALIAS_DEFAULT, ICON_KIND_LABEL, ICON_KINDS_TEXT, normIcon, parseIconAliases, readIconMisses, setIconAliases, setIconPool, splitIconWord } from './iconmatch';
 
 /** 표 → 찾기 함수 (core/iconmatch.ts = game-src/items/match_icon.mjs) */
-function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>) {
-  return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind })), rep, { base });
+function makeIconFind(table: ItemIconRow[], rep: Record<string, string>, base: Record<string, string>, same: Record<string, string>, cats: string[] | undefined) {
+  return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same, cats });
 }
 
 /** 소지품 그림 팩 글을 푼다. 형식이 다르면 던진다 */
@@ -129,18 +129,23 @@ export function applyItemsPack(text: string): ItemIconPack {
   const strs = (v: unknown) => (Array.isArray(v) ? v.map((x) => String(x)) : []);
   const table = (j.table as unknown[])
     .filter((r): r is ItemIconRow => obj(r) && typeof r.f === 'string' && typeof r.kind === 'string' && typeof icons[r.f] === 'string')
-    .map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...(r.base ? { base: true } : {}) }));
+    .map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...(Array.isArray(r.u) ? { u: strs(r.u) } : {}), ...(r.base ? { base: true } : {}) }));
   const rep: Record<string, string> = {};
   if (obj(j.rep)) for (const [k, f] of Object.entries(j.rep)) if (typeof f === 'string' && typeof icons[f] === 'string') rep[normIcon(k)] = f;
   const base: Record<string, string> = {};
   for (const r of table) if (r.base) base[r.kind] = r.f;
-  const hit = makeIconFind(table, rep, base);
+  const same: Record<string, string> = {};
+  if (obj(j.same)) for (const [k, v] of Object.entries(j.same)) if (typeof v === 'string') same[k] = v;
+  const hit = makeIconFind(table, rep, base, same, Array.isArray(j.cats) ? strs(j.cats) : undefined);
   return { table, rep, icons, base, hit, find: (name, icon) => hit(name, icon)?.file ?? null };
 }
 
 /** 이름(+모델이 쓴 그림 찾기 낱말) → 그림 파일 (표시 전용). 맞는 게 없으면 공통 그림(base.misc), 그것도 없으면 null */
-export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string): string | null {
-  return pack.find(itemName, icon) ?? pack.base.misc ?? null;
+export function matchItemIcon(pack: ItemIconPack, itemName: string, icon?: string, seed?: string): string | null {
+  // seed(물건 id)가 있고 이름이 분류 말(과자·다과)이면 그 분류 그림 가운데 물건마다 하나 (2026-11-10 사용자)
+  const h = pack.hit(itemName, icon);
+  if (h?.pool && seed !== undefined && iconPoolOn()) return pickIconFromPool(h.pool.filter((f) => typeof pack.icons[f] === 'string'), seed) ?? h.file;
+  return h?.file ?? pack.base.misc ?? null;
 }
 
 interface PicWords { heads: Set<string>; mods: Set<string> }

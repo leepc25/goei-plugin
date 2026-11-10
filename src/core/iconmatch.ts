@@ -5,8 +5,8 @@
 /** 이름 비교용: 소문자, 한글·영어·숫자 말고는 띄어쓰기로 */
 export const normIcon = (s: unknown) => String(s ?? '').toLowerCase().replace(/[^0-9a-z가-힣]+/g, ' ').trim();
 
-export interface IconRow { file: string; keywords: string[]; phrases: string[]; kind?: string }
-export interface IconHit { file: string; score: number }
+export interface IconRow { file: string; keywords: string[]; phrases: string[]; kind?: string; /** 분류(윗말): 가까운 것 → 넓은 것 */ up?: string[] }
+export interface IconHit { file: string; score: number; /** 물건 이름이 분류 말(과자·다과·음식)이면 그 분류의 그림들 — 화면이 물건마다 하나를 뽑는다 (pickIconFromPool) */ pool?: string[] }
 
 // ── 종류 (2026-11-09 사용자: 매칭기 재설계) ──
 // 모델이 그림 칸에 「종류/물건말」(옷/코트)을 쓰면 ① 그 종류 안에서 물건말·이름의 몸통 말로 → ② 종류 안에서 글자가 가장 가까운 그림 → ③ 종류 대표 그림.
@@ -54,6 +54,12 @@ export function parseIconAliases(text: string): Record<string, string> {
 export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '알 → 계란', '하이라이터 → 형광펜', '다마고치 → 게임기', '인라인 → 인라인 스케이트', '선스틱 → 선크림', '곱창밴드 → 머리끈', '렌즈케이스 → 콘택트렌즈 통', '콘택트렌즈 → 콘택트렌즈 통', '약상자 → 구급상자', '나이프 → 칼', '정원가위 → 원예 가위', '전지가위 → 원예 가위', '간식 → 과자', '온수매트 → 전기장판', '종이가방 → 쇼핑백', '여행가방 → 캐리어', '햇반 → 즉석밥', '링거팩 → 링거', '인슐린 → 인슐린 펜', 'DVD → CD', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases: Record<string, string> = parseIconAliases(ICON_ALIAS_DEFAULT);
 /** 지금 채팅의 대체 표를 올린다 (host/risu.ts loadContext). 빈 글이면 기본 표 */
+let poolOn = true;
+/** 분류 말(과자·다과)을 그 분류 안에서 뽑아 보여 줄지 (설정 → 소지품 「분류 말은 골고루」, 기본 켬) */
+export function setIconPool(on: boolean): void {
+  poolOn = on;
+}
+export const iconPoolOn = (): boolean => poolOn;
 export function setIconAliases(text: string | undefined | null): void {
   aliases = parseIconAliases(text && text.trim() ? text : ICON_ALIAS_DEFAULT);
 }
@@ -351,6 +357,10 @@ const KIND_MIN = 0.25; // 종류 안에서 가장 가까운 그림을 고를 때
 export interface IconIndexOpts {
   /** 종류 → 대표 그림 (③) */
   base?: Record<string, string>;
+  /** 분류마다 같은 뜻으로 쓰는 말 (붙여 쓴 말 → 분류. 대분류는 '@food') — game-src/items/upper/_same.txt */
+  same?: Record<string, string>;
+  /** 골고루 뽑는 분류 이름들 (없으면 up 에 적힌 분류 모두) */
+  cats?: string[];
 }
 
 /** 표 → match(name, icon) → { file, score } | null (null 이면 공통 그림). rep: 몸통 말 → 대표 그림. icon 은 「종류/물건말」 또는 낱말 */
@@ -469,7 +479,39 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
     if (he) return hit(he);
     return frag(name, word) || (strict ? null : hit(pre(word) || pre(name)));
   };
-  return (name0: string, icon?: string, strict?: boolean): IconHit | null => {
+  // ── 분류 말 (2026-11-10 사용자: 「과자·다과·간식」처럼 세부 이름이 아닌 말은 그 분류 안에서 뽑아 보여 준다. 대·중·소분류 단계마다 매칭 단어) ──
+  const flat = (t: string) => normIcon(t).replace(/ /g, '');
+  const groups = new Map<string, { file: string; kind: string }[]>();
+  for (const r of rows) for (const u of r.up ?? []) {
+    const f = flat(u);
+    const l = groups.get(f) ?? [];
+    l.push({ file: r.file, kind: r.kind ?? '' });
+    groups.set(f, l);
+  }
+  const sameMap = opts.same ?? {};
+  const cats = opts.cats ? new Set(opts.cats.map(flat)) : null;
+  /** 말 → 그 분류의 그림들과 분류 이름 (그 말이 분류 이름이거나 같은 뜻 말일 때) */
+  const members = (t: string): { ms: { file: string; kind: string }[]; cat: string } | null => {
+    const n = normIcon(t);
+    if (!n) return null;
+    for (const c of [flat(n), aliases[n] ? flat(aliases[n]) : '']) {
+      if (!c) continue;
+      const cat = sameMap[c];
+      if (cat?.startsWith('@')) return { ms: rows.filter((r) => r.kind === cat.slice(1)).map((r) => ({ file: r.file, kind: r.kind ?? '' })), cat: '' };
+      const g = cat ? flat(cat) : c;
+      if (groups.has(g) && (!cats || cats.has(g))) return { ms: groups.get(g)!, cat: cat ?? '' };
+    }
+    return null;
+  };
+  const POOL_SKIP = new Set(['adult', 'body', 'anomaly']);
+  /** 성인·신체·괴이로 적었으면 그 종류 것, 아니면 보통 그림만 (보통 그림이 절반이 안 되는 분류 — 성인용품 — 는 그대로) */
+  const poolOf = (ms: { file: string; kind: string }[], kind: string): string[] => {
+    const own = POOL_SKIP.has(kind) ? ms.filter((x) => x.kind === kind) : [];
+    const plain = ms.filter((x) => !POOL_SKIP.has(x.kind));
+    const use = own.length ? own : plain.length * 2 >= ms.length ? plain : ms;
+    return [...new Set(use.map((x) => x.file))].sort();
+  };
+  const base = (name0: string, icon?: string, strict?: boolean): IconHit | null => {
     const { kind, word: w0, en } = splitIconWord(icon);
     // 원래 말이 표에 그대로 있으면 대체 표로 바꾸지 않는다 (릴리스 점검 11-09: 손전등 → 플래시라이트 → 케미컬 라이트)
     const K = kind ? kindIndex(kind) : null;
@@ -488,4 +530,41 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
     noteMiss({ name: name0, icon: icon ?? '', level: 'none', file: '' });
     return null;
   };
+  return (name0: string, icon?: string, strict?: boolean): IconHit | null => {
+    const hit0 = base(name0, icon, strict);
+    if (strict) return hit0;
+    const { kind, word: w0 } = splitIconWord(icon);
+    const kindOnly = kind ? ICON_KIND_LABEL[kind] ?? '' : '';
+    // ① 물건 이름이 분류 말
+    let g = members(name0);
+    // 이름이 어느 그림의 이름 그대로면 그림 칸에 분류 말을 적었어도 그 그림 (콘돔 | 음식/과자 → 콘돔)
+    if (!g && normIcon(name0) !== normIcon(w0) && !exactName(name0, kind)) {
+      // ② 그림 칸의 물건말이 분류 말: 이름으로 그 분류 안의 그림을 찾았으면 그 그림 (새우깡 | 음식/과자 → 새우과자), 못 찾았으면 분류에서 뽑는다
+      g = members(w0);
+      if (g) {
+        const byNameOnly = base(name0, kindOnly, false);
+        if (byNameOnly && g.ms.some((x) => x.file === byNameOnly.file)) return byNameOnly;
+      }
+    }
+    if (!g) return hit0;
+    const pool = poolOf(g.ms, kind);
+    if (pool.length < 2) return hit0;
+    // 같은 뜻 말(다과)이면 그 분류(과자)의 대표 그림이 기본
+    const first = (g.cat ? base(g.cat, kindOnly, false) : null) ?? hit0;
+    return { file: first?.file ?? pool[0], score: first?.score ?? 1, pool };
+  };
+}
+
+/** 분류 그림들 가운데 물건마다 하나 (물건 id 로 고정). 그림이 늘어도 되도록 「그림마다 점수를 매겨 가장 높은 것」 — 새 그림이 이길 때만 바뀐다 */
+export function pickIconFromPool(pool: string[], seed: string): string {
+  let best = pool[0];
+  let top = -1;
+  for (const f of pool) {
+    let h = 2166136261;
+    const t = `${seed}|${f}`;
+    for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619);
+    const v = (h ^ (h >>> 15)) >>> 0;
+    if (v > top) (top = v), (best = f);
+  }
+  return best;
 }

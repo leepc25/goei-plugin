@@ -25,6 +25,9 @@ export const ITEM_SLOTS_VAR = '$it_slots';
 export const ITEM_LIMIT_VAR = '$it_limit';
 /** 그림 대체 말 표 (한 줄 「외투 → 코트」; 비우면 core/iconmatch ICON_ALIAS_DEFAULT) — 2026-11-09 사용자: 매칭기 재설계 */
 export const ITEM_ICON_ALIAS_VAR = '$it_icon_alias';
+/** 분류 말(과자·다과·음식)은 그 분류 그림 가운데 물건마다 하나를 뽑아 보여 주기 ('0' = 끔, 기본 켬) — 2026-11-10 사용자 */
+export const ITEM_ICON_POOL_VAR = '$it_icon_pool';
+export const itemIconPoolOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_ICON_POOL_VAR] !== '0';
 export const ITEM_PUSH_VAR = '$it_push';
 export const ITEM_AUTO_VAR = '$it_auto';
 export const ITEM_SLOTS_DEFAULT = 16;

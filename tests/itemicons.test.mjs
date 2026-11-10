@@ -120,7 +120,7 @@ test('종류/물건말 (11-09 사용자: 매칭기 재설계) — 종류 안에�
   is('D조 추천 비상 섬광 트랩', '도구/덫', '덫');
   is('현장용 차폐 스프레이', 'canister', '기억 지우개 스프레이'); // 한국어 몸통 말이 영어 낱말(몸통만 맞음)보다 먼저
   is('이상한 돌', '괴이/돌멩이', '눈 달린 돌'); // 종류 안에서 (다른 종류의 돌멩이로 가지 않음)
-  const kindOf = (f) => table.icons.find((r) => r.file === f)?.kind;
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
   is('백일몽 앰플', '의료/앰플', '앰플'); // 의료 종류에 앰플 그림이 없으면 다른 의료품이 아니라 전체에서 찾은 앰플 (2026-11-10 사용자: 종류가 달라도 물건말이 먼저)
   is('후추 스프레이', '무기/스프레이', '호신용 스프레이');
   is('코 스프레이', '의료/스프레이', '비강 스프레이');
@@ -228,4 +228,32 @@ test('뭉뚱그린 말 (2026-11-10 사용자, 뽑기 스레드 606개 목록): �
   is('콘돔', '의료/콘돔', '콘돔');
   is('딜도', '잡동사니/딜도', '딜도');
   is('슬롯머신', '잡동사니/슬롯머신', '슬롯머신');
+});
+
+test('분류 말은 그 분류 안에서 물건마다 하나 (2026-11-10 사용자: 과자·다과·간식, 대·중·소분류 단계마다 매칭 단어)', () => {
+  const up = (f) => table.icons.filter((r) => r.file === f).flatMap((r) => r.up ?? []);
+  const kindsOf = (f) => table.icons.filter((r) => r.file === f).map((r) => r.kind);
+  // 소분류·중분류: 분류 이름과 같은 뜻 말
+  for (const w of ['과자', '다과', '간식', '주전부리', '군것질거리']) {
+    const h = pack.hit(w, '');
+    assert.ok(h?.pool?.length > 20, `${w}: 무리 ${h?.pool?.length}`);
+    assert.ok(h.pool.every((f) => up(f).includes('과자')), `${w}: 과자 그림만`);
+    const seen = new Set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((s) => matchItemIcon(pack, w, '', s)));
+    assert.ok(seen.size >= 3, `${w}: 물건마다 다른 그림 (${seen.size})`);
+    assert.equal(matchItemIcon(pack, w, '', 'it1'), matchItemIcon(pack, w, '', 'it1'), '같은 물건은 늘 같은 그림');
+  }
+  is('다과', '음식/다과', '과자'); // 물건 id 없이 찾으면 분류 대표
+  for (const w of ['음료수', '마실 것']) assert.ok(pack.hit(w, '')?.pool?.every((f) => up(f).includes('음료')), w);
+  // 대분류: 종류 전체
+  for (const [w, k] of [['먹을 것', 'food'], ['음식', 'food'], ['의류', 'wear'], ['의약품', 'medical']]) assert.ok(pack.hit(w, '')?.pool?.every((f) => kindsOf(f).includes(k)), w);
+  // 세부 이름은 그대로
+  for (const w of ['쿠키', '콘돔', '새우깡', '허니버터칩']) assert.equal(pack.hit(w, '음식/과자')?.pool, undefined, w);
+  is('새우깡', '음식/과자', '새우과자'); // 그림 칸이 분류 말이어도 이름으로 찾은 그림이 그 분류 것이면 그 그림
+  is('쿠키', '', '쿠키');
+  // 그림 칸만 분류 말이고 이름으로는 못 찾으면 분류에서
+  assert.ok(pack.hit('수상한 주전부리 꾸러미', '음식/과자')?.pool?.length > 20);
+  // 종류를 안 적었으면 성인·신체·괴이 그림은 보통 분류의 무리에 없다
+  assert.ok(pack.hit('가면', '')?.pool?.every((f) => kindsOf(f).some((k) => !['adult', 'body', 'anomaly'].includes(k))));
+  // 군말·없는 말은 그대로 상자
+  assert.equal(pack.hit('물건', ''), null);
 });

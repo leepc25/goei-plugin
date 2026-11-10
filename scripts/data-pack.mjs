@@ -65,14 +65,14 @@ export function itemsPackText() {
   const files = new Set();
   for (const e of src.icons) {
     if (!Array.isArray(e.keywords) || typeof e.file !== 'string' || e.excluded_note) continue;
-    table.push({ k: e.keywords, h: Array.isArray(e.head) ? e.head : [], ft: Array.isArray(e.feats) ? e.feats : [], f: e.file, kind: e.kind, ...(e.base ? { base: true } : {}) });
+    table.push({ k: e.keywords, h: Array.isArray(e.head) ? e.head : [], ft: Array.isArray(e.feats) ? e.feats : [], f: e.file, kind: e.kind, ...(Array.isArray(e.up) && e.up.length ? { u: e.up } : {}), ...(e.base ? { base: true } : {}) });
     files.add(e.file);
   }
   const rep = {};
   for (const [k, f] of Object.entries(src.head_rep ?? {})) if (typeof f === 'string') (rep[k] = f), files.add(f);
   const icons = {};
   for (const f of [...files].sort()) icons[f] = readFileSync(new URL(`game-src/items/icons/${f}`, ROOT)).toString('base64');
-  return JSON.stringify({ schema: 1, kind: 'items', table, rep, icons });
+  return JSON.stringify({ schema: 1, kind: 'items', table, rep, same: src.up_same ?? {}, cats: src.up_cats ?? [], icons });
 }
 
 /** 내 모습 팩 글: { schema, kind:'looks', looks:[{id, name, g, unique, n, w, h, cw, ch, ox, oy, sec?, img}] }.

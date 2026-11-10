@@ -392,7 +392,39 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     if (he) return hit(he);
     return frag(name, word) || (strict ? null : hit(pre(word) || pre(name)));
   };
-  return (name0, icon, strict) => {
+  // ── 분류 말 (2026-11-10 사용자: 「과자·다과·간식」처럼 세부 이름이 아닌 말은 그 분류 안에서 뽑아 보여 준다. 대·중·소분류 단계마다 매칭 단어) ──
+  const flat = (t) => normIcon(t).replace(/ /g, '');
+  const groups = new Map();
+  for (const r of rows) for (const u of r.up ?? []) {
+    const f = flat(u);
+    const l = groups.get(f) ?? [];
+    l.push({ file: r.file, kind: r.kind ?? '' });
+    groups.set(f, l);
+  }
+  const sameMap = opts.same ?? {};
+  const cats = opts.cats ? new Set(opts.cats.map(flat)) : null;
+  /** 말 → 그 분류의 그림들과 분류 이름 (그 말이 분류 이름이거나 같은 뜻 말일 때) */
+  const members = (t) => {
+    const n = normIcon(t);
+    if (!n) return null;
+    for (const c of [flat(n), aliases[n] ? flat(aliases[n]) : '']) {
+      if (!c) continue;
+      const cat = sameMap[c];
+      if (cat?.startsWith('@')) return { ms: rows.filter((r) => r.kind === cat.slice(1)).map((r) => ({ file: r.file, kind: r.kind ?? '' })), cat: '' };
+      const g = cat ? flat(cat) : c;
+      if (groups.has(g) && (!cats || cats.has(g))) return { ms: groups.get(g), cat: cat ?? '' };
+    }
+    return null;
+  };
+  const POOL_SKIP = new Set(['adult', 'body', 'anomaly']);
+  /** 성인·신체·괴이로 적었으면 그 종류 것, 아니면 보통 그림만 (보통 그림이 절반이 안 되는 분류 — 성인용품 — 는 그대로) */
+  const poolOf = (ms, kind) => {
+    const own = POOL_SKIP.has(kind) ? ms.filter((x) => x.kind === kind) : [];
+    const plain = ms.filter((x) => !POOL_SKIP.has(x.kind));
+    const use = own.length ? own : plain.length * 2 >= ms.length ? plain : ms;
+    return [...new Set(use.map((x) => x.file))].sort();
+  };
+  const base = (name0, icon, strict) => {
     const { kind, word: w0, en } = splitIconWord(icon);
     const K = kind ? kindIndex(kind) : null;
     const keep = (t) => { const n = normIcon(t); if (!n) return false; const h = head(n, !kind); return (rank(h) === 3 && !h.loose && (!!h.kw || h.s >= 1e9)) || (!!K && ((x) => rank(x) === 3 && !x.loose)(K.head(n))); }; // 표(전체는 이름, 적은 종류 안은 몸통 말까지)에 그대로 있는 말은 대체하지 않는다
@@ -404,15 +436,52 @@ export function makeIconIndex(rows, rep = {}, opts = {}) {
     if (found) return found;
     return null; // 못 찾으면 상자 (종류 대표 그림 없앰, 2026-11-10 사용자)
   };
+  return (name0, icon, strict) => {
+    const hit0 = base(name0, icon, strict);
+    if (strict) return hit0;
+    const { kind, word: w0 } = splitIconWord(icon);
+    const kindOnly = kind ? ICON_KIND_LABEL[kind] ?? '' : '';
+    // ① 물건 이름이 분류 말
+    let g = members(name0);
+    // 이름이 어느 그림의 이름 그대로면 그림 칸에 분류 말을 적었어도 그 그림 (콘돔 | 음식/과자 → 콘돔)
+    if (!g && normIcon(name0) !== normIcon(w0) && !exactName(name0, kind)) {
+      // ② 그림 칸의 물건말이 분류 말: 이름으로 그 분류 안의 그림을 찾았으면 그 그림 (새우깡 | 음식/과자 → 새우과자), 못 찾았으면 분류에서 뽑는다
+      g = members(w0);
+      if (g) {
+        const byNameOnly = base(name0, kindOnly, false);
+        if (byNameOnly && g.ms.some((x) => x.file === byNameOnly.file)) return byNameOnly;
+      }
+    }
+    if (!g) return hit0;
+    const pool = poolOf(g.ms, kind);
+    if (pool.length < 2) return hit0;
+    // 같은 뜻 말(다과)이면 그 분류(과자)의 대표 그림이 기본
+    const first = (g.cat ? base(g.cat, kindOnly, false) : null) ?? hit0;
+    return { file: first?.file ?? pool[0], score: first?.score ?? 1, pool };
+  };
 }
 
 /** icons.json 표 → match(name, icon) → 그림 파일 (없으면 공통 그림 common) */
 export function makeMatcher(table, common) {
   const rows = table.icons.filter(r => !r.excluded_note && typeof r.file === 'string')
-    .map(r => ({ file: r.file, keywords: r.keywords || [], phrases: [...(r.keywords || []), ...(r.head || [])], kind: r.kind }));
+    .map(r => ({ file: r.file, keywords: r.keywords || [], phrases: [...(r.keywords || []), ...(r.head || [])], kind: r.kind, up: r.up }));
   const fallback = common ?? table.icons.find(r => r.base && r.kind === 'misc')?.file ?? null;
   const base = {};
   for (const r of table.icons) if (r.base && typeof r.kind === 'string') base[r.kind] = r.file;
-  const m = makeIconIndex(rows, table.head_rep, { base });
+  const m = makeIconIndex(rows, table.head_rep, { base, same: table.up_same, cats: table.up_cats });
   return (name, icon) => m(name, icon)?.file ?? fallback;
+}
+
+/** 분류 그림들 가운데 물건마다 하나 (물건 id 로 고정). 그림이 늘어도 되도록 「그림마다 점수를 매겨 가장 높은 것」 — 새 그림이 이길 때만 바뀐다 */
+export function pickIconFromPool(pool, seed) {
+  let best = pool[0];
+  let top = -1;
+  for (const f of pool) {
+    let h = 2166136261;
+    const t = `${seed}|${f}`;
+    for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619);
+    const v = (h ^ (h >>> 15)) >>> 0;
+    if (v > top) (top = v), (best = f);
+  }
+  return best;
 }

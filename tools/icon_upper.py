@@ -10,7 +10,8 @@
 윗말 표(upper/종류.txt) 한 줄: 「넓은 윗말 > 가까운 윗말: 이름 이름 …」 또는 「윗말: 이름 …」. 대표로 삼을 이름 앞에 * .
 이름의 띄어쓰기는 _ 로 적는다. 표에 있는 것은 지우지 않고 덧붙이기만 한다.
 """
-import json, re, sys, glob, os, collections
+import json
+import re, re, sys, glob, os, collections
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TABLE = os.path.join(ROOT, 'game-src/items/icons.json')
@@ -113,6 +114,8 @@ def main():
     rep_name = read_rep()
     problems = collections.defaultdict(list)
     added = 0
+    for r in rows:  # up 칸은 매번 윗말 표에서 새로 만든다 (표에서 옮기거나 뺀 것이 남지 않게)
+        r.pop('up', None)
     members_of = collections.defaultdict(list)  # 윗말 → [(줄, 대표?)]
     seen = set()
 
@@ -241,6 +244,74 @@ def main():
         if r.get('up') or any(KO.search(h) and h.lower() not in kws for h in r.get('head') or []):
             continue
         problems['윗말 없는 한 낱말 이름'].append(f'{r["kind"]}: {r["name"]}')
+
+    # 분류마다 같은 뜻으로 쓰는 말 (_same.txt) → 표의 up_same {말(띄어쓰기 없음): 분류}. 대분류(종류)는 '@food'
+    KIND_KEYS = {'food', 'wear', 'tool', 'device', 'medical', 'consumable', 'charm', 'weapon', 'paper', 'valuable', 'key', 'seal', 'anomaly', 'adult', 'body', 'misc'}
+    flat = lambda x: re.sub(r'[\s_]+', '', x).lower()
+    all_up = set()
+    for r in rows:
+        all_up.update(r.get('up') or [])
+    taken = {}  # 그림 이름·다른 이름(붙여 쓴 것) → 그림 이름
+    for r in rows:
+        for k in [r['name']] + list(r.get('keywords') or []) + list(r.get('head') or []):
+            taken.setdefault(flat(k), r['name'])
+    for k, f in rep.items():  # 대표 그림이 정해진 말 (수술도구 → 수술용 메스)
+        taken.setdefault(flat(k), k)
+    up_flat = {flat(u): u for u in all_up}
+    # 매칭기가 이미 어느 그림으로 찾아 주는 말(성수 → 성수병, 표본병 → 괴이 표본 병)은 tools/icon_same_check.mjs 가 _same_skip.txt 에 적는다
+    skip = set()
+    n_skip = 0
+    kpath = os.path.join(UPPER, '_same_skip.txt')
+    if os.path.exists(kpath):
+        skip = {flat(l.split('→')[0]) for l in open(kpath, encoding='utf-8') if l.strip() and not l.startswith('#')}
+    same = {}
+    n_cat = 0
+    spath = os.path.join(UPPER, '_same.txt')
+    if os.path.exists(spath):
+        for line in open(spath, encoding='utf-8'):
+            line = line.strip()
+            if not line or line.startswith('#') or ':' not in line:
+                continue
+            cat, right = line.split(':', 1)
+            cat = cat.strip()
+            if cat.startswith('@'):
+                if cat[1:] not in KIND_KEYS:
+                    problems['같은 말 표(_same.txt)의 분류가 없음'].append(cat)
+                    continue
+            elif cat not in all_up:
+                problems['같은 말 표(_same.txt)의 분류가 없음'].append(cat)
+                continue
+            n_cat += 1
+            for w in right.split():
+                if w.startswith('!'):  # 분류 이름과 같은 말이어도 이 분류로 (음식 = 음식 종류 전체)
+                    same[flat(w[1:])] = cat
+                    continue
+                f = flat(w)
+                if len(f) < 2:
+                    problems['같은 말이 한 글자라 뺌'].append(f'{cat}: {w}')
+                elif f in GENERIC:
+                    problems['같은 말이 군말이라 뺌'].append(f'{cat}: {w}')
+                elif f in up_flat:
+                    if up_flat[f] != cat:
+                        problems['같은 말이 다른 분류 이름이라 뺌 (그 분류가 먼저)'].append(f'{cat}: {w}')
+                elif f in skip and not cat.startswith('@'):  # 대분류 말(식품·음식물)은 매칭기가 끝 글자로 엉뚱한 그림(즉석식품·식물)을 찾던 것이라 빼지 않는다
+                    n_skip += 1
+                elif f in taken:
+                    problems['같은 말이 어느 그림의 이름이라 뺌 (그 그림이 먼저)'].append(f'{cat}: {w} → {taken[f]}')
+                elif f in same:
+                    if same[f] != cat:
+                        problems['같은 말이 두 분류에 있음 (먼저 적은 분류)'].append(f'{w}: {same[f]} / {cat}')
+                else:
+                    same[f] = cat
+    table['up_same'] = same
+    # 골고루 뽑는 분류 = 윗말 표·끝 낱말 표의 왼쪽에 적은 분류. 이름 끝 낱말을 물려받아 생긴 무리(사용한 콘돔 → 콘돔)는 그 물건 자체라 뽑지 않는다
+    cats = set()
+    for kind, wide, near, members in upper:
+        cats.update(u for u in (wide, near) if u)
+    for ups in tails.values():
+        cats.update(ups)
+    table['up_cats'] = sorted(c for c in cats if c in all_up)
+    print(f'같은 말: 분류 {n_cat}개, 말 {len(same)}개 (매칭기가 이미 그림을 찾는 말 {n_skip}개는 뺌)')
 
     for k, v in problems.items():
         print(f'\n■ {k} — {len(v)}')

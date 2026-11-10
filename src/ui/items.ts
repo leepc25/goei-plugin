@@ -57,8 +57,9 @@ export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptsta
 export const liveOf = (ctx: ChatContext): Item[] => liveItems(itemsOf(ctx), aliveAnchors(ctx.chat));
 
 /** 물건 그림: PixelLab 그림 팩(host/itemicons.ts)에서 그림 낱말·이름으로 찾고, 없거나 아직 못 받았으면 공통 선 아이콘 */
-export function itemPic(it: { name: string; icon?: string }): string {
-  const u = itemIconUrl(it.name, it.icon);
+export function itemPic(it: { name: string; icon?: string; id?: string }): string {
+  // 분류 말(과자·다과)은 물건마다(id) 그 분류의 그림 하나. id 가 없는 곳(상점 진열)은 이름으로 — 같은 진열품은 늘 같은 그림
+  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 

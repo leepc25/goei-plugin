@@ -1,7 +1,7 @@
 import { stripVirtual, withWorldLore } from '../core/world/virtual';
 import { setStatusColumns } from '../core/world/statuscols';
-import { setIconAliases } from '../core/iconmatch';
-import { ITEM_ICON_ALIAS_VAR } from '../core/items';
+import { setIconAliases, setIconPool } from '../core/iconmatch';
+import { ITEM_ICON_ALIAS_VAR, itemIconPoolOn } from '../core/items';
 import type { Chat, LoreEntry } from '../core/types';
 import { applyAdvanced } from '../core/advanced';
 
@@ -35,6 +35,7 @@ export async function loadContext(): Promise<ChatContext | null> {
   setStatusColumns(chat.scriptstate);
   // 소지품 그림 대체 말 표 (core/iconmatch.ts)
   setIconAliases(String(chat.scriptstate?.[ITEM_ICON_ALIAS_VAR] ?? ''));
+  setIconPool(itemIconPoolOn(chat.scriptstate));
   return { charIndex, chatIndex, char, chat };
 }
 
