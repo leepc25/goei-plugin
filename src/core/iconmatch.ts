@@ -363,18 +363,40 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
   const plainFiles = new Set(plainRows.map((r) => r.file));
   const plainReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => plainFiles.has(f)));
   const special = new Map<string, string>();
+  // 이름(첫 낱말 칸)이 그대로 같으면 종류를 뭐라고 적었든 그 그림 (2026-11-10 사용자: 소모품/콘돔 이 상자로 가면 안 된다)
+  const specialName = new Map<string, string>();
   for (const r of rows) {
     if (!SPECIAL_KIND.has(r.kind ?? '')) continue;
     for (const k of r.keywords ?? []) {
       const j = normIcon(k).replace(/ /g, '');
       if (j && !special.has(j)) special.set(j, r.file);
     }
+    const n0 = normIcon((r.keywords ?? [])[0] ?? '').replace(/ /g, '');
+    if (n0 && !specialName.has(n0)) specialName.set(n0, r.file);
   }
+  // 맨 먼저: 물건 이름이나 물건말이 어느 그림의 이름과 그대로 같으면 그 그림. 종류를 뭐라고 적었든, 성인·신체 그림이든 (2026-11-10 사용자: 「원래 이름 같으면 나오고 그게 안 될 때를 대비해서 로직을 만드는 것」)
+  // 같은 이름이 여러 종류에 있으면 적은 종류의 것
+  const byName = new Map<string, { file: string; kind: string }[]>();
+  for (const r of rows) {
+    const n0 = normIcon((r.keywords ?? [])[0] ?? '').replace(/ /g, '');
+    if (!n0) continue;
+    const l = byName.get(n0) ?? [];
+    l.push({ file: r.file, kind: r.kind ?? '' });
+    byName.set(n0, l);
+  }
+  const exactName = (t: string, kind: string, same = false): IconHit | null => {
+    const l = t ? byName.get(normIcon(t).replace(/ /g, '')) : undefined;
+    if (!l) return null;
+    const own = l.find((x) => x.kind === kind);
+    // 물건말(그림 칸)만 같을 때는 적은 종류 안의 그림이거나 종류를 안 적었을 때만 — 이름이 「이상한 돌」이고 괴이/돌멩이 면 괴이 안에서 찾는다
+    if (!own && same && kind) return null;
+    return { file: (own ?? l[0]).file, score: 1 };
+  };
   const headPlain = makeHeadIndex(plainRows, plainReps);
   const head = (t: string, sp = true): Found | null => {
     const h = headPlain(t);
-    if (!sp || (h && h.s >= 1e6)) return h;
-    const f = special.get(normIcon(t).replace(/ /g, ''));
+    if (h && h.s >= 1e6) return h;
+    const f = (sp ? special : specialName).get(normIcon(t).replace(/ /g, ''));
     return f ? { file: f, s: 1e6, hit: 1, plain: true, isRep: 0, name: 0, kw: true } : h;
   };
   const frag = makeFragIndex(plainRows, plainReps);
@@ -452,6 +474,8 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
     // 원래 말이 표에 그대로 있으면 대체 표로 바꾸지 않는다 (릴리스 점검 11-09: 손전등 → 플래시라이트 → 케미컬 라이트)
     const K = kind ? kindIndex(kind) : null;
     const keep = (t: string) => { const n = normIcon(t); if (!n) return false; const h = head(n, !kind); return (rank(h) === 3 && !h!.loose && (!!h!.kw || h!.s >= 1e9)) || (!!K && ((x) => rank(x) === 3 && !x!.loose)(K.head(n))); };
+    const ex = exactName(name0, kind) ?? exactName(w0, kind, true);
+    if (ex) return ex;
     const name = keep(name0) ? normIcon(name0) : aliased(name0);
     const word = keep(w0) ? normIcon(w0) : aliased(w0);
     const found = core(name, word, normIcon(en), K, !!strict);
