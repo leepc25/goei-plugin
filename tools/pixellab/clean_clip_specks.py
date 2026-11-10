@@ -58,7 +58,7 @@ def clean(a):
     edge=set(np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])))
     filled=0
     for k in range(1,n+1):
-        if k in edge: continue
+        if k in edge or (lab==k).sum()>4: continue  # 4px 넘는 구멍은 팔·몸 사이 틈일 수 있어 둠
         for y,x in zip(*np.where(lab==k)):
             ys,xs=slice(max(0,y-1),y+2),slice(max(0,x-1),x+2)
             nb=a[ys,xs].reshape(-1,4); nb=nb[nb[:,3]>0]
