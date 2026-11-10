@@ -1,4 +1,5 @@
 0
+- 사용자 11-10 14:58 KST 「그렇게 하나 뽑고 … 2장 한번에」 → v12(v9 참고·정면 요청문) 1회 + v9 얼굴만 정면 고치기(inpaint) 1회
 - 사용자 11-10 14:55 KST 「뽑아」 → 컷 B 진행자 기본 상태 v11(v10 크게, 머리 약 110px) 1회
 - 사용자 11-10 13:53 KST 「뽑아」 → 컷 B 진행자 기본 상태 v10(얼굴 정면·큰 검은 눈동자) 1회
 - 사용자 11-10 13:02 KST 「뽑아」 → 컷 B 진행자 동작 19개(보통 10 + 기괴 9) 19회
@@ -347,3 +348,5 @@
 - 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/anim_hostB_laugh_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v10_req.json
 - 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v11_req.json
+- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_spot.py 실행
+- 사용: 장면 1장 game-src/art/pixellab-test-20261028/homeshop/cutB_host_v12_req.json
