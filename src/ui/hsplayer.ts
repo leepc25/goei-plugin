@@ -61,6 +61,10 @@ const TEAR_MS: [number, number] = [200, 400];
 let feed: PlayerFeed | null = null;
 let hooks: PlayerHooks = { advance() {}, redraw() {} };
 let iconMiss = false;
+const extra: HsCue[] = [];
+const extraChat: { nick: string; text: string }[] = [];
+/** 지금 자막에 찍는 끼어든 대사 (없으면 큐시트의 것) */
+let said: HsCue | null = null;
 let stage: HTMLElement | null = null;
 let canvas: HTMLCanvasElement | null = null;
 let cg: HTMLElement | null = null;
@@ -87,6 +91,9 @@ export function setPlayerFeed(f: PlayerFeed, h: PlayerHooks): void {
   if (key !== showKey) {
     showKey = key;
     run = null;
+    extra.length = 0;
+    extraChat.length = 0;
+    said = null;
     if (chatLog) chatLog.innerHTML = '';
   }
   if (f.show.loaded && (!run || run.part !== f.show.at)) run = freshRun(f.show.at);
@@ -130,19 +137,23 @@ function layout(): void {
   if (!stage || !canvas || !feed) return;
   const w = feed.art?.pack.w ?? 512;
   const h = feed.art?.pack.h ?? 384;
-  const k = feed.scale;
+  // 0 = 꽂힌 칸의 폭에 맞춤 (1배를 넘기지 않는다)
+  const room = stage.parentElement?.clientWidth || w;
+  const k = feed.scale > 0 ? feed.scale : Math.min(1, room / w);
   if (canvas.width !== w) canvas.width = w;
   if (canvas.height !== h) canvas.height = h;
   stage.style.width = `${w * k}px`;
   stage.style.height = `${h * k}px`;
   stage.style.fontFamily = `${HS_FONT}, monospace`;
   // 글자 층: 1배 이상은 512×384 를 통째로 키우고, 0.5배(폰)는 256×192 칸에 줄인 구성으로 (도트 시안 폰판)
-  const small = k < 1;
+  const small = k < 0.65;
+  stage.classList.toggle('fit', !Number.isInteger(k) && k !== 0.5);
   stage.classList.toggle('sm', small);
   stage.classList.toggle('noscan', !feed.s.fx.scan);
   cg!.style.width = `${small ? w * k : w}px`;
   cg!.style.height = `${small ? h * k : h}px`;
   cg!.style.transform = small || k === 1 ? '' : `scale(${k})`;
+  if (small) stage.style.fontSize = '';
 }
 
 function iconOf(it: { name: string; icon?: string; id?: string }): HTMLImageElement | null {
@@ -172,10 +183,11 @@ function tick(): void {
   const part = f.show.parts[r.part];
   const over = parseClipGroups(f.s.clipsText);
   const clips = (c: CueCut) => clipsOf(f.art!.pack.cuts[cutArt(c)], cutArt(c), over);
-  const startCue = (i: number) => {
-    r.cue = i;
+  const startCue = (i: number, own?: HsCue) => {
+    if (!own) r.cue = i;
     r.cueAt = t;
-    const c = part.cues[i];
+    const c = own ?? part.cues[i];
+    said = own ?? null;
     r.cueLen = cueMs(c, f.s);
     r.cut = f.s.fx.cut ? c.cut : 'B';
     if (c.ev === 'call' && f.s.fx.cut) r.cut = 'D';
@@ -201,8 +213,13 @@ function tick(): void {
     if (r.frame >= r.clip.frames) {
       // 동작이 한 바퀴 돌았다: 대사 중이면 대사 시간이 남았을 때 한 번 더, 다 됐으면 다음 큐
       if (r.talking && t - r.cueAt < r.cueLen) r.frame = 0;
+      // 내 채팅에 대한 진행자 반응이 와 있으면 지금 대사가 끝난 자리에 끼운다 (큐시트 자리는 그대로)
+      else if (extra.length) {
+        extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, /^\?+$/.test(c.nick) ? 'q' : ''));
+        startCue(r.cue, extra.shift());
+      }
       else if (r.talking && r.cue + 1 < part.cues.length) startCue(r.cue + 1);
-      else if (r.talking) {
+      else if (r.talking && r.cue < part.cues.length) {
         // 큐시트 끝: 쉬다가 다음 부로
         r.cue = part.cues.length;
         r.gapUntil = f.s.next > 0 ? t + f.s.next * 1000 : Infinity;
@@ -266,7 +283,13 @@ function pushChat(nick: string, text: string, cls: string): void {
   if (bottom) chatLog.scrollTop = chatLog.scrollHeight;
 }
 /** 내가 쓴 채팅 줄 (화면이 부른다) */
-export const playerSay = (nick: string, text: string): void => pushChat(nick, text, 'me');
+export const playerSay = (nick: string, text: string, cls = 'me'): void => pushChat(nick, text, cls);
+/** 내 채팅에 대한 반응: 진행자 큐 몇 줄(지금 대사 뒤에 끼움)과 다른 시청자 줄 */
+export function playerCut(cues: HsCue[], chat: { nick: string; text: string }[]): void {
+  extra.push(...cues);
+  extraChat.push(...chat);
+  if (!cues.length) extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, ''));
+}
 
 // ── 그리기 ──
 
@@ -385,7 +408,7 @@ function drawCg(f: PlayerFeed, r: Run, t: number): void {
   const part = f.show.parts[r.part];
   if (!part) return;
   const it = part.item;
-  const cue = r.cue >= 0 && r.cue < part.cues.length ? part.cues[r.cue] : null;
+  const cue = said && r.talking ? said : r.talking && r.cue >= 0 && r.cue < part.cues.length ? part.cues[r.cue] : null;
   const n = installments(it);
   const pay = it.pay || (it.price > 0 ? `${it.price.toLocaleString('en-US')}원` : '');
   const art = cutArt(r.cut);

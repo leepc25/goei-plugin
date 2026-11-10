@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { homeshop } from '../dist-test/core.mjs';
-const { parseShow, applyShow, readShow, showVars, emptyShow, moodMap, hsSettings, HS_KEY, HS_NUM, parseClipGroups, clipsOf, idleState, nextIdle, moodClip, cueMs, installments } = homeshop;
+const { scheduleDues, newOrder, ordersVars, liveOrders, paidOf, callNow, homeshopBlock, withHomeshop, boxOrder, HS_AUD_VAR, parseShow, applyShow, readShow, showVars, emptyShow, moodMap, hsSettings, HS_KEY, HS_NUM, parseClipGroups, clipsOf, idleState, nextIdle, moodClip, cueMs, installments } = homeshop;
 
 const meta = JSON.parse(readFileSync(new URL('../game-src/homeshop/homeshop.json', import.meta.url), 'utf8'));
 const moods = moodMap(meta);
@@ -89,4 +89,50 @@ test('망상홈쇼핑: 동작 분류는 설정 글로 고친다', () => {
   const clips = clipsOf(meta.cuts.B, 'B', over);
   assert.ok(clips.filter((c) => c.name === some.name).every((c) => c.group === 'off'));
   assert.ok(moodClip(clips, '없는동작', idleState()), '모르는 표정은 말하기·기본으로');
+});
+
+const chatOf = (turns, vars = {}) => ({ message: Array.from({ length: turns * 2 }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: `m${i}`, chatId: `c${i}` })), scriptstate: vars });
+const ITEM = { id: 'x1', name: '행운의 무전기', desc: '광고', effect: '', use: true, price: 0, pay: '무이자 3회' };
+
+test('망상홈쇼핑: 호출 턴은 간격 안에서 뽑고 다른 주문과 겹치지 않는다', () => {
+  const d = scheduleDues([8, 9], 2, 3, [6, 6], () => 0);
+  assert.deepEqual(d, [10, 16, 22], '8·9 는 차 있어 10 으로 밀림');
+  assert.deepEqual(scheduleDues([], 5, 0, [6, 12]), [], '맞교환은 호출 없음');
+});
+
+test('망상홈쇼핑: 할부 장부는 턴 수로 납부를 세고, 호출 턴에만 본편에 한 번 넣는다', () => {
+  const c2 = chatOf(2);
+  const o = { ...newOrder(c2, ITEM, { call: [3, 3] }, '', () => 0), boxId: 'box1' };
+  assert.equal(o.n, 3);
+  assert.deepEqual(o.dues, [5, 8, 11]);
+  const vars = ordersVars([o]);
+  // 4턴: 아직. 요청 때는 새 유저 메시지가 붙어 있다
+  const at = (turns) => ({ ...chatOf(turns), message: [...chatOf(turns - 1).message, { role: 'user', data: 'go', chatId: 'u' }], scriptstate: vars });
+  assert.equal(homeshopBlock(at(4)), '');
+  const b5 = homeshopBlock(at(5));
+  assert.ok(b5.startsWith('[망상홈쇼핑]') && b5.includes('행운의 무전기') && b5.includes('appearance 1 of 3'), b5);
+  assert.equal(homeshopBlock(at(6)), '', '지나면 다시 안 보냄');
+  assert.equal(callNow(at(8)).nth, 2);
+  assert.equal(paidOf(o, 4), 0);
+  assert.equal(paidOf(o, 8), 2);
+  assert.equal(paidOf(o, 99), 3);
+  const msgs = withHomeshop([{ role: 'system', content: 'S' }, { role: 'user', content: 'go' }], at(5));
+  assert.equal(msgs.length, 3);
+  assert.equal(msgs[1].role, 'system');
+  assert.equal(withHomeshop(msgs, at(5)).length, 3, '두 번 넣지 않음');
+  // 주문한 응답이 지워지면 장부도 없던 일
+  const gone = { message: c2.message.slice(0, 2), scriptstate: vars };
+  assert.equal(liveOrders(gone.scriptstate, new Set(gone.message.map((m) => m.chatId))).length <= 1, true);
+  assert.equal(boxOrder(vars, 'box1', new Set([o.anchor])).id, o.id);
+  assert.equal(boxOrder(vars, 'nope', new Set([o.anchor])), null);
+});
+
+test('망상홈쇼핑: 방청 신청은 바로 다음 턴에만 한 줄', () => {
+  const c = chatOf(2);
+  const key = (() => { const o = newOrder(c, ITEM, { call: [3, 3] }); return o.anchor; })();
+  const vars = { [HS_AUD_VAR]: JSON.stringify({ anchor: key, no: '4821', name: '나' }) };
+  const next = { message: [...c.message, { role: 'user', data: 'go', chatId: 'u' }], scriptstate: vars };
+  assert.ok(homeshopBlock(next).includes('4821'));
+  const later = { message: [...next.message, { role: 'char', data: 'r', chatId: 'r' }, { role: 'user', data: 'go2', chatId: 'u2' }], scriptstate: vars };
+  assert.equal(homeshopBlock(later), '', '그다음 턴에는 저절로 풀림');
 });

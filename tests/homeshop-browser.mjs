@@ -1,4 +1,4 @@
-// 망상홈쇼핑 방송 화면 확인 (2026-11-11, 작업용): node tests/_br_homeshop.mjs <사진 폴더>
+// 망상홈쇼핑 방송 화면 확인 (2026-11-11, 작업용): node tests/homeshop-browser.mjs <사진 폴더>
 // 인터넷 즐겨찾기로 열기 → 편성(상품·큐시트·채팅) 한 번 호출 → 방송이 큐시트대로 흐른다 → 설정 페이지
 import { mkdirSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -48,11 +48,21 @@ sells: 망상홈쇼핑
 하루|6회면 몇 번 불려가요?
 rose|진행자 눈 왜저럼
 익명|방청 신청했는데 답이 없어요
-</chat>`;
+</chat>
+<peek>
+수신 전용. 송신 버튼은 장식입니다.
+베갯잇 안쪽에 이름을 적지 마십시오.
+세 번째 알람은 본인 부담.
+</peek>
+<operator>
+인사|네, 망상홈쇼핑입니다. 주문 도와드리겠습니다, 고객님.
+확정|주문 접수되었습니다. 출연 일정은 저희가 따로 연락드립니다.
+맞교환|물건 잘 받았습니다. 돌려드리지는 않습니다.
+</operator>`;
 const browser = await launch();
 const REPLY = '첫 답.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]';
 for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['phone', 'phone']]) {
-  const chat = { message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0' } };
+  const chat = { message: [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: REPLY, chatId: 'c1' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark', $st_anomaly_on: '1', $pp_on: '0', $st_wallet: JSON.stringify({ start: 140000, log: [] }) } };
   const { page, errors } = await boot(browser, fx, chat, size, { store: { 'p:goei:data-homeshop': distPack('goei-data-homeshop'), 'p:goei:data-items': distPack('goei-data-items') } });
   let n = 0;
   const shot = async (tag) => { await page.screenshot({ path: `${OUT}/${vp}-${String(++n).padStart(2, '0')}-${tag}.png` }); };
@@ -61,8 +71,11 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
   await page.waitForTimeout(300);
   await page.evaluate((r) => { window.__llm = [{ type: 'success', result: r }]; }, SHOW);
-  if (vp === 'pc') { if (!(await page.locator('.br').count())) await click('[data-action="nav-tab"][data-value="net"]'); await click('.br-bm[data-value="hs"]'); }
-  else { await click('.gx-cgrip'); await click('[data-action="br-site"][data-value="hs"]'); }
+  const goHs = async () => {
+    if (vp === 'pc') { if (!(await page.locator('.br').count())) await click('[data-action="nav-tab"][data-value="net"]'); await click('.br-bm[data-value="hs"]'); }
+    else { await click('.gx-cgrip'); await click('[data-action="br-site"][data-value="hs"]'); }
+  };
+  await goHs();
   await page.waitForSelector('.hs-scr', { timeout: 6000 });
   await shot('connecting');
   await page.waitForSelector('.hs-l3', { timeout: 15000 });
@@ -70,16 +83,72 @@ for (const [vp, size] of [['pc', { width: 1280, height: 800, touch: false }], ['
   assert.ok(call.includes('<cue>') && call.includes('와이드'), '방송 절이 요청문에 들어감');
   if (process.env.GIF) {
     // 움직임 확인용: 방송 칸을 0.2초마다 찍는다 (GIF=장수)
-    const box = await page.locator(vp === 'pc' ? '.hs-row' : '.hs-win').boundingBox();
+    const box = await page.locator(vp === 'pc' ? '.hs-bd' : '.hs-main').boundingBox();
     mkdirSync(`${OUT}/gif-${vp}`, { recursive: true });
     for (let i = 0; i < Number(process.env.GIF); i++) { await page.screenshot({ path: `${OUT}/gif-${vp}/${String(i).padStart(3, '0')}.png`, clip: { x: box.x, y: box.y, width: Math.min(box.width, 1280 - box.x), height: Math.min(box.height, 800 - box.y) } }); await page.waitForTimeout(120); }
     await page.close();
     continue;
   }
-  for (let i = 0; i < 16; i++) { await page.waitForTimeout(2600); await shot(`t${i}`); }
+  for (let i = 0; i < 6; i++) { await page.waitForTimeout(2600); await shot(`t${i}`); }
+  const ss = () => page.evaluate(() => window.__chat.scriptstate);
+  await page.evaluate(() => document.querySelector('.hs-sec')?.scrollIntoView({ block: 'end' })); await page.waitForTimeout(300); await shot('lineup');
+  await page.evaluate(() => document.querySelector('.hs-gnb')?.scrollIntoView({ block: 'start' }));
+  // 스티커 보기 → 들추기
+  await click('[data-action="hs-pop"][data-value="peek"]'); await page.waitForTimeout(200);
+  await click('[data-action="hs-lift"]'); await page.waitForTimeout(200); await shot('peek');
+  assert.ok((await page.textContent('.hs-under')).includes('수신 전용'), '스티커 아래 글');
+  await click('.hs-pop header [data-action="hs-pop"]');
+  // 채팅 보내기: 한 번 더 호출 → 진행자 반응이 끼어든다
+  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '<cue>\n바스트|웃음|은하제 고객님, 좋은 질문이십니다!|-\n</cue>\n<chat>\n민지맘|ㅋㅋㅋ 읽어줬다\n???|읽지 마세요\n</chat>' }]; });
+  await page.fill('[data-input="hs-say"]', '진짜 누가 받아요?');
+  await click('[data-action="hs-say"]');
+  await page.waitForFunction(() => [...document.querySelectorAll('.hs-chlog p')].some((p) => p.textContent.includes('읽어줬다')), null, { timeout: 30000 });
+  assert.ok(await page.evaluate(() => [...document.querySelectorAll('.hs-chlog p.me')].some((p) => p.textContent.includes('진짜 누가 받아요?'))), '내 채팅 줄');
+  await page.waitForFunction(() => [...document.querySelectorAll('.hs-chlog p.host')].some((p) => p.textContent.includes('좋은 질문')), null, { timeout: 30000 });
+  await shot('say');
+  // 전화 주문: 무이자 할부 → 장부 + 택배 상자, 가계부는 그대로
+  const wallet0 = (await ss()).$st_wallet;
+  await click('[data-action="hs-pop"][data-value="call"]'); await page.waitForTimeout(200); await shot('call');
+  assert.ok((await page.textContent('.hs-op')).includes('주문 도와드리겠습니다'), '상담원 인사');
+  await click('[data-action="hs-order"]');
+  await page.waitForFunction(() => (window.__chat.scriptstate.$hs_orders || '').includes('무전기'));
+  await page.waitForTimeout(300); await shot('call-done');
+  let st = await ss();
+  const o1 = JSON.parse(st.$hs_orders)[0];
+  assert.equal(o1.n, 6); assert.equal(o1.dues.length, 6);
+  assert.ok(o1.dues.every((d, i) => d - (i ? o1.dues[i - 1] : o1.turn) >= 6 && d - (i ? o1.dues[i - 1] : o1.turn) <= 12), '호출 턴 간격 6~12');
+  assert.ok(st.$st_items.includes('택배 상자(미개봉)'), '소지품에 택배 상자');
+  assert.equal(st.$st_wallet, wallet0, '가계부는 안 건드림');
+  await click('.hs-pop footer [data-action="hs-page"][data-value="orders"]'); await page.waitForTimeout(300); await shot('orders');
+  assert.ok((await page.textContent('.hs-ol')).includes('6회 남음'));
+  // 방청 신청
+  await click('.hs-menu [data-action="hs-pop"][data-value="aud"]'); await page.waitForTimeout(200);
+  assert.equal(await page.locator('[data-action="hs-aud"][disabled]').count(), 1, '동의 전에는 신청 못 함');
+  await click('[data-action="hs-agree"]'); await page.waitForTimeout(200); await shot('aud');
+  await click('[data-action="hs-aud"]');
+  await page.waitForFunction(() => !!window.__chat.scriptstate.$hs_aud); await page.waitForTimeout(200); await shot('aud-done');
+  await click('.hs-pop footer [data-action="hs-pop"]');
+  // 소지품에서 택배 상자 열기
+  const boxId = o1.boxId;
+  await click('[data-action="nav-tab"][data-value="items"]'); await page.waitForTimeout(300);
+  await click(`[data-action="items-open"][data-value="${boxId}"]`); await page.waitForTimeout(300); await shot('box');
+  assert.equal(await page.locator('[data-action="hs-box-open"]').count(), 1, '소지품 상세에 「열기」');
+  await click('[data-action="hs-box-open"]');
+  await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$hs_orders)[0].openKey !== undefined, null, { timeout: 8000 });
+  st = await ss();
+  const live = JSON.parse(st.$st_items).list.filter((x) => !x.soldAt).map((x) => x.name);
+  assert.ok(live.includes('행운의 무전기') && !live.some((n) => n.includes('택배 상자')), `상자를 열면 실제 물건: ${live}`);
+  await page.waitForTimeout(300); await shot('box-opened');
+  await click('[data-action="items-close"]'); await goHs(); await page.waitForTimeout(400);
+  await click('[data-action="hs-page"][data-value="orders"]'); await page.waitForTimeout(300); await shot('orders-opened');
+  assert.ok((await page.textContent('.hs-ol:last-of-type')).includes('수령 확인'));
+  await click('[data-action="hs-page"][data-value=""]'); await page.waitForTimeout(300);
+
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false, '가로 넘침 없음');
   await click('[data-action="hs-page"][data-value="sched"]'); await page.waitForTimeout(300); await shot('sched');
   await openEditor(page, 'set:hs'); await page.waitForTimeout(300); await shot('set');
+  await click('.gw [data-action="hs-retry"][data-value="n:+"]'); await page.waitForTimeout(400);
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$hs_retry), '2', '자동 다시 연결 증감');
   await goNode(page, 'guide:Hs'); await page.waitForTimeout(300); await shot('guide');
   // 독립 창: 본편 카드 「접속하기」 → 상황판 없이 인터넷 창만 망상홈쇼핑으로 (고유 상점 @web)
   await closeEditor(page, true).catch(() => {}); await closeWin(page); await page.waitForTimeout(200);
