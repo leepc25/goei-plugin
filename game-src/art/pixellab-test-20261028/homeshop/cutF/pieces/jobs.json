@@ -1,0 +1,242 @@
+[
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p1_1",
+  "wx0": 52,
+  "wy0": 70,
+  "piece": [
+   132,
+   150,
+   215,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p1_2",
+  "wx0": 52,
+  "wy0": 70,
+  "piece": [
+   132,
+   150,
+   215,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p2_1",
+  "wx0": 135,
+  "wy0": 70,
+  "piece": [
+   215,
+   150,
+   298,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p2_2",
+  "wx0": 135,
+  "wy0": 70,
+  "piece": [
+   215,
+   150,
+   298,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p3_1",
+  "wx0": 218,
+  "wy0": 70,
+  "piece": [
+   298,
+   150,
+   381,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p3_2",
+  "wx0": 218,
+  "wy0": 70,
+  "piece": [
+   298,
+   150,
+   381,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p4_1",
+  "wx0": 301,
+  "wy0": 70,
+  "piece": [
+   381,
+   150,
+   464,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p4_2",
+  "wx0": 301,
+  "wy0": 70,
+  "piece": [
+   381,
+   150,
+   464,
+   224
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p5_1",
+  "wx0": 52,
+  "wy0": 144,
+  "piece": [
+   132,
+   224,
+   215,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p5_2",
+  "wx0": 52,
+  "wy0": 144,
+  "piece": [
+   132,
+   224,
+   215,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p6_1",
+  "wx0": 135,
+  "wy0": 144,
+  "piece": [
+   215,
+   224,
+   298,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p6_2",
+  "wx0": 135,
+  "wy0": 144,
+  "piece": [
+   215,
+   224,
+   298,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p7_1",
+  "wx0": 218,
+  "wy0": 144,
+  "piece": [
+   298,
+   224,
+   381,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p7_2",
+  "wx0": 218,
+  "wy0": 144,
+  "piece": [
+   298,
+   224,
+   381,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p8_1",
+  "wx0": 301,
+  "wy0": 144,
+  "piece": [
+   381,
+   224,
+   464,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ },
+ {
+  "dir": "game-src/art/pixellab-test-20261028/homeshop/cutF/pieces/p8_2",
+  "wx0": 301,
+  "wy0": 144,
+  "piece": [
+   381,
+   224,
+   464,
+   298
+  ],
+  "win": [
+   243,
+   234
+  ]
+ }
+]
