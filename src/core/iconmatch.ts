@@ -51,7 +51,7 @@ export function parseIconAliases(text: string): Record<string, string> {
   return out;
 }
 /** 기본 대체 표 (설정에서 고친다. 표에 있는 말로만) */
-export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
+export const ICON_ALIAS_DEFAULT = ['외투 → 코트', '점퍼 → 재킷', '안정수 → 안정제', '캡슐 → 알약', '영양 바 → 에너지바', '영양바 → 에너지바', '숙취해소제 → 숙취 음료', '택배 → 택배 상자', '소설책 → 책', '치마 → 스커트', '하이라이터 → 형광펜', '다마고치 → 게임기', '인라인 → 인라인 스케이트', '선스틱 → 선크림', '곱창밴드 → 머리끈', '렌즈케이스 → 콘택트렌즈 통', '콘택트렌즈 → 콘택트렌즈 통', '약상자 → 구급상자', '나이프 → 접이식 칼', '정원가위 → 원예 가위', '전지가위 → 원예 가위', '간식 → 과자', '온수매트 → 전기장판', '종이가방 → 쇼핑백', '여행가방 → 캐리어', '햇반 → 즉석밥', '링거팩 → 링거', '인슐린 → 인슐린 펜', 'DVD → CD', '바 → 에너지바', '속옷 → 팬티', '내의 → 팬티'].join('\n');
 let aliases: Record<string, string> = parseIconAliases(ICON_ALIAS_DEFAULT);
 /** 지금 채팅의 대체 표를 올린다 (host/risu.ts loadContext). 빈 글이면 기본 표 */
 export function setIconAliases(text: string | undefined | null): void {
@@ -200,7 +200,7 @@ const stem = (w: string) => (/^[a-z]+$/.test(w) && w.length > 3 && w.endsWith('s
 interface Head { words: string[]; head: string; mods: string[]; ko: boolean; joined: string }
 interface Phrase extends Head { t: string; kw: boolean }
 interface Same { qPre: string; pPre: string; whole?: boolean; pre?: boolean }
-interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string; /** 물건 말에 몸통 밖의 말(꾸밈말·붙여 쓴 앞부분)이 있었다 */ more?: boolean }
+interface Found { file: string; s: number; hit: number; plain: boolean; isRep: number; name: number; qPre?: string; retry?: string; /** 물건 말에 몸통 밖의 말(꾸밈말·붙여 쓴 앞부분)이 있었다 */ more?: boolean; /** 그 그림의 이름(키워드)이 물건 말 그대로 */ kw?: boolean }
 
 /** 물건이 무엇인지 말하지 않는 몸통 말 (그 앞말이 물건, 2026-11-08 사용자 「매칭 더 정교하게」): 이 말은 떼고 앞말로 찾고, 대표 그림은 쓰지 않는다 */
 const GENERIC = new Set(['키트', 'kit', '세트', 'set', '장치', 'device', '도구', 'tool', '기계', 'machine', '용품', 'supply', '물품', '물건', 'item', '패키지', 'package', '묶음', 'pack', '상자', 'box']);
@@ -284,13 +284,13 @@ function makeHeadIndex(rows: IconRow[], reps: Record<string, string>, pre = fals
   function findIn(q: Head | null, useRep: boolean): Found | null {
     if (!q) return null;
     const r = reps[q.words.join(' ')];
-    if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0 };
+    if (r) return { file: r, s: 1e9, hit: 1, plain: true, isRep: 1, name: 0, kw: !!items.find((it) => it.file === r)?.ps.some((p) => p.kw && p.joined === q.joined) };
     let best: Found | null = null;
     for (const it of items) {
-      let top: { s: number; hit: number; plain: boolean; more?: boolean } | null = null;
+      let top: { s: number; hit: number; plain: boolean; more?: boolean; kw?: boolean } | null = null;
       for (const p of it.ps) {
         if (p.joined === q.joined) {
-          top = { s: 1e6, hit: 1, plain: true };
+          top = { s: 1e6, hit: 1, plain: true, kw: p.kw };
           break;
         }
         const h = sameHead(q, p, pre);
@@ -329,6 +329,8 @@ function aliased(text: string): string {
   return n;
 }
 
+/** 전체 찾기에서 빼는 종류. 괴이·신체 그림은 이 세계의 보통 물건(가면·표본 병)이기도 해서 빼지 않는다 */
+const SPECIAL_KIND = new Set(['adult']);
 const KIND_MIN = 0.25; // 종류 안에서 가장 가까운 그림을 고를 때의 조각 점수 하한 (같은 종류라 느슨하게)
 
 export interface IconIndexOpts {
@@ -340,10 +342,29 @@ export interface IconIndexOpts {
 export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {}, opts: IconIndexOpts = {}): (name: string, icon?: string, strict?: boolean) => IconHit | null {
   const reps: Record<string, string> = {};
   for (const [k, f] of Object.entries(rep)) reps[normIcon(k)] = f;
-  const head = makeHeadIndex(rows, reps);
-  const frag = makeFragIndex(rows, reps);
+  // 전체에서 찾을 때는 보통 물건 그림만 본다 (2026-11-10 사용자: 보드게임 → 성인 보드게임, DVD → 성인 DVD, 케이지 → 정조 케이지 처럼 새지 않게).
+  // 성인 그림은 모델이 그 종류로 적었거나(종류 안 찾기), 이름이 그 그림의 이름 그대로일 때만
+  const plainRows = rows.filter((r) => !SPECIAL_KIND.has(r.kind ?? ''));
+  const plainFiles = new Set(plainRows.map((r) => r.file));
+  const plainReps = Object.fromEntries(Object.entries(reps).filter(([, f]) => plainFiles.has(f)));
+  const special = new Map<string, string>();
+  for (const r of rows) {
+    if (!SPECIAL_KIND.has(r.kind ?? '')) continue;
+    for (const k of r.keywords ?? []) {
+      const j = normIcon(k).replace(/ /g, '');
+      if (j && !special.has(j)) special.set(j, r.file);
+    }
+  }
+  const headPlain = makeHeadIndex(plainRows, plainReps);
+  const head = (t: string): Found | null => {
+    const h = headPlain(t);
+    if (h && h.s >= 1e6) return h;
+    const f = special.get(normIcon(t).replace(/ /g, ''));
+    return f ? { file: f, s: 1e6, hit: 1, plain: true, isRep: 0, name: 0 } : h;
+  };
+  const frag = makeFragIndex(plainRows, plainReps);
   // 마지막 길: 앞머리가 같은 말 (머그 → 머그컵). 연어 마켓 제목 매칭(strict)에서는 안 쓴다 (은장 → 은장도)
-  const headPre = makeHeadIndex(rows, reps, true);
+  const headPre = makeHeadIndex(plainRows, plainReps, true);
   const pre = (t: string): Found | null => { const h = t ? headPre(t) : null; return h && h.file ? h : null; };
   const kinds = new Map<string, { head: (t: string) => Found | null; frag: (n: string, i?: string) => IconHit | null; files: Set<string> }>();
   const kindIndex = (k: string) => {
@@ -387,10 +408,11 @@ export function makeIconIndex(rows: IconRow[], rep: Record<string, string> = {},
       }
       // 같은 말이 전체에서는 그대로 맞는데 종류 안에서는 덜 맞으면 전체 것 (2026-11-10 사용자: 도구/요가매트 → 커터 매트 가 아니라 요가 매트).
       // 그 말이 종류 안에 아예 없으면 종류 안 그림 그대로 (괴이/돌멩이 「이상한 돌」 → 눈 달린 돌)
-      // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이)
-      const lit = (h: Found | null, kx: Found | null) => !!kx && kx.hit === 0 && !!kx.more && rank(h) === 3;
+      // 종류 안 그림이 그 말의 몸통만 맞고 나머지(요가·신용)는 못 맞췄을 때만. 말이 몸통뿐이면 종류 안 그림 그대로 (무기/스프레이 → 호신용 스프레이).
+      // 다만 전체에 이름이 그 말 그대로인 그림이 있으면 그것 (도구/가위 → 뼈 절단 가위 가 아니라 가위)
+      const lit = (h: Found | null, kx: Found | null) => !!kx && ((rank(kx) < 3 && kx.hit === 0 && !!kx.more && rank(h) === 3) || (!kx.kw && !!h?.kw));
       const same = lit(hi, ki) ? hi : lit(hn, kn) ? hn : lit(he, ke) ? he : null;
-      if (k && rank(k) < 3 && same) return hit(same);
+      if (k && same && same.file !== k.file) return hit(same);
       if (k) return hit(k);
       // 종류 안에 없으면 모델이 종류를 다르게 적었을 수 있다 → 전체 그림에서 물건말(한글 → 영어) → 이름 (2026-11-10 사용자: 「도구/머그」가 그물로 갔다).
       // 그래도 없으면 비슷한 글자의 그림을 억지로 고르지 않고 종류 대표 그림
