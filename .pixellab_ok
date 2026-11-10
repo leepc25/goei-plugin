@@ -1,13 +1,5 @@
 0
-- 사용자 11-10 22:59 KST 「10장 다시 뽑아」 → 컷 F 좌석 칸 통째로 y150~310 칸, 10회
+- 사용자 11-10 23:05 KST 「뽑아」 → 컷F 새 세트7 방청석 동작 왼쪽·오른쪽 2회
 
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
-- 사용: /home/user/goei-plugin/tools/pixellab/inpaint_piece.py 실행
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/anim7/req_L.json
+- 사용: 동작 클립 1개 game-src/art/pixellab-test-20261028/homeshop/cutF/whole310/anim7/req_R.json
