@@ -1,5 +1,5 @@
 {
- "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v8.png",
+ "crop_src": "/home/user/goei-plugin/game-src/art/pixellab-test-20261028/homeshop/cutB_host_v9.png",
  "box": [
   0,
   0,
@@ -13,6 +13,6 @@
  "view": "side",
  "direction": "south",
  "subject_description": "a TV home shopping host shown from the chest up, black suit, white shirt, dark red tie, white made-up face, large black eyes, tiny clip-on microphone on the lapel",
- "initial_pose": "facing the camera, both hands raised in front of the chest with the fingertips touching, closed-lip smile",
+ "initial_pose": "body and head turned three quarters to the right, black eyes looking at the camera, both hands raised in front of the chest with the fingertips touching, closed-lip smile",
  "description": "talks to the camera like a friendly salesman explaining a payment plan: the mouth opens and closes over and over as if speaking, the head nods a little with each point; one hand leaves the other, rises in front of the chest with the back of the hand to the camera and counts on its fingers: one finger up, then two fingers up, then three fingers up; then settles back into the starting pose The shoulders stay almost still and never move sideways; the whole body and both hands stay inside the frame."
 }
