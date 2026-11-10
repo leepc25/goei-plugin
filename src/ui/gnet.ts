@@ -177,6 +177,8 @@ async function run(ctx: ChatContext, env: GnetEnv, label: string, work: () => Pr
   u.notice = '';
   u.failure = null;
   env.render();
+  // 방금 저장한 것(보낸 쪽지·내 댓글)이 기다리는 동안에도 바로 보이게 채팅을 다시 읽어 그린다 (2026-11-10 사용자: 보낸 쪽지가 답장 올 때까지 안 보였다)
+  await env.refresh().catch(() => undefined);
   try {
     u.notice = await work();
   } catch (error) {
@@ -709,7 +711,7 @@ function siteHead(site: BoardSite, st: GState, unreadDm: number): string {
       return `<div class="hd">${home(`${LOGO_SM(site)}<span>괴담 갤러리<small>무섭고 이상한 이야기</small></span>`)}<label class="sch">${searchInput('갤러리 & 통합검색')}<b>${ICONS.search}</b></label></div>`;
     case 'wpf':
       return `<div class="ban">${home(`<b>世界政治 게시판</b><small>WORLD POLITICS FORUM</small>${LOGO_SM(site, 'bs-logo wlogo')}`, 'bh0')}</div>
-        <div class="bar"><button data-action="gn-home">HOME</button>${catBtn('', '자유토론')}${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
+        <div class="bar"><button class="${onCat('') ? 'on' : ''}" data-action="gn-home" aria-pressed="${onCat('')}">HOME</button>${dmBtn(st, unreadDm)}${catBtn('@mine', '내가 쓴 글')}${catBtn('@scrap', '스크랩')}</div>`;
     case 'sm':
       return `<div class="hd">${home(`${LOGO_SM(site)}연어 마켓`)}<nav>${catBtn('', '중고거래')}${catBtn('삽니다', '삽니다')}${catBtn('정보', '오컬트 정보')}</nav><label class="sr">${searchInput('물건 이름으로 찾기')}</label>${writeBtn('wr')}<button class="ch" data-action="gn-sub" data-value="dm">내 채팅${unreadDm ? `<em>${unreadDm}</em>` : ''}</button></div>
         <div class="note">⚠ 직거래는 사람 많은 곳에서 하세요. 연어 마켓은 거래하다 생긴 일을 책임지지 않습니다.</div>`;
