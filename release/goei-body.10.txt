@@ -1,4 +1,6 @@
-index3.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
+"위키 기본 문서 목록을 받지 못했어요.");
+    }
+    if (!index3 || !Array.isArray(index3.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
     let text4 = "";
     let n3 = 0;
     for (const name of index3.parts) {
@@ -3030,6 +3032,4 @@ ${esc28(e.value)}</textarea>`;
         if (kind === "agent" && def.id === "organization") {
           const a = d.agents.find((x) => x.lore === sel);
           const o = a ? orgOf(d.orgs, a.affiliation) : void 0;
-          auto = o ? `${o.spec.english || o.name} (명부 소속 「${o.name}」 · 시점별 호칭 표)` : a?.affiliation ? `${a.affiliation} (명부 소속)` : "명부에 소속이 없어요";
-        }
-        return field
+          auto = o ? `${o.spec.english || o.name} (명부 소속 「${o.name}」 · 시점별 호칭 표)` : a?.affiliation ? `${a

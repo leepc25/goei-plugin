@@ -1,4 +1,13 @@
-bel(label2);
+rn "other";
+    return "net";
+  }
+  function stageFor(t, label2) {
+    let best = null;
+    let len = 0;
+    const base = baseLabel(label2);
+    for (const s9 of t.plan) for (const m of s9.match) if (m && (label2 === m || base === m) && m.length > len) best = s9, len = m.length;
+    if (best) return best;
+    const b = baseLabel(label2);
     const s8 = { id: `x:${b}`, label: b, group: groupOf(label2), match: [b] };
     t.plan = sortPlan([...t.plan, s8]);
     return s8;
@@ -916,9 +925,7 @@ ${RETRY_ANALYZE}` }
     if (!(env3 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    let hash5 = 7;
-    for (let i = 0; i < data3.length; i++) hash5 = (hash5 * 131 + data3.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash5}`;
+    const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
     const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
     if (!saved2) return;
@@ -936,7 +943,7 @@ ${RETRY_ANALYZE}` }
     if (!(env3 ? set2.auto === "open" : set2.auto === "turn") || phoneBusy(ctx2)) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    const stamp = `${messageIndex}:${data3.length}`;
+    const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[PH_VIEW_LAST] ?? "") === stamp) return;
     const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_VIEW_LAST]: stamp } }));
     if (!saved2) return;
@@ -2140,7 +2147,7 @@ ${RETRY_ANALYZE}` }
     if (!(open4 ? s8.auto === "open" : s8.auto === "turn") || jobs2.has(chatKey2(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    const stamp = `${messageIndex}:${data3.length}`;
+    const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[NW_AUTO_LAST] ?? "") === stamp) return;
     const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [NW_AUTO_LAST]: stamp } }));
     if (!saved2) return;
@@ -3005,7 +3012,7 @@ ${RETRY_ANALYZE}` }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.6" : "0";
+  var PLUGIN_VERSION = true ? "0.21.7" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -3686,5 +3693,4 @@ ${RETRY_ANALYZE}` }
   var IC = {
     back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
     fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
-    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
-    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 1
+    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99

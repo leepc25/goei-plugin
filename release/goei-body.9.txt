@@ -1,4 +1,7 @@
-on class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go2 ? `사용 ${go2}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row11).join("")}</ul></section>`;
+g">${groups.map((g2) => {
+      const gi = g2.rows.filter((l) => l.what === "get").length;
+      const go2 = g2.rows.length - gi;
+      return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go2 ? `사용 ${go2}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row11).join("")}</ul></section>`;
     }).join("")}</div>`;
   }
   function popup(ctx2) {
@@ -876,7 +879,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
       const sale = deal ? next.sell : null;
       let sold = false;
       await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
-        const saved2 = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, { ...next, key }), ...note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: key } : {} } };
+        const saved2 = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, { ...next, key }), ...note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: turnKey(chat) } : {} } };
         const done3 = deal ? saleDone2(saved2, site, deal) : null;
         if (done3) sold = true;
         return done3 ?? saved2;
@@ -914,8 +917,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     if (!s8.on || s8.auto === "manual" || ui2[site].loading) return;
     if (site === "bm" && !loggedNick(ctx2)) return;
     const st = readMall(ctx2.chat.scriptstate, site, aliveAnchors(ctx2.chat));
-    const key = lastBot(ctx2.chat)?.key ?? "";
-    if (st.loaded && String(ctx2.chat.scriptstate?.[atKey(site)] ?? "") === key) return;
+    if (st.loaded && String(ctx2.chat.scriptstate?.[atKey(site)] ?? "") === turnKey(ctx2.chat)) return;
     if (st.loaded && s8.auto === "turn") return;
     void ask3(ctx2, env3, site, "shelf", st);
   }
@@ -926,8 +928,7 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     }, current: () => ctx2 };
     const s8 = mallSettings(ctx2.chat.scriptstate, site);
     if (!s8.on || s8.auto !== "turn") return;
-    const key = lastBot(ctx2.chat)?.key ?? "";
-    if (String(ctx2.chat.scriptstate?.[atKey(site)] ?? "") === key) return;
+    if (String(ctx2.chat.scriptstate?.[atKey(site)] ?? "") === turnKey(ctx2.chat)) return;
     await ask3(ctx2, env3, site, "shelf", readMall(ctx2.chat.scriptstate, site, aliveAnchors(ctx2.chat)));
   }
   function previewMallShelf(ctx2, site) {
@@ -2949,7 +2950,7 @@ ${themeVars("[x-goei-prog]")}
   // src/host/vs.ts
   var VS_BASE = UPDATE_BASE ? `${UPDATE_BASE}/vs` : "";
   var CODE_KEY = "goei:vs:code";
-  var VERSION = true ? "0.21.6" : "";
+  var VERSION = true ? "0.21.7" : "";
   var COMMON = "vs-common";
   var index2 = null;
   function vsIndex() {
@@ -3494,6 +3495,4 @@ html.goei-vs-on #goei-vs { display: block; }
     try {
       index3 = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
     } catch {
-      throw new Error("위키 기본 문서 목록을 받지 못했어요.");
-    }
-    if (!index3 || !Array.isArray(
+      throw new Error(

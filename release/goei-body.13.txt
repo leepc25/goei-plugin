@@ -1,4 +1,4 @@
-, "ON"], ["0", "OFF"]], busy6), "켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요. 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요."),
+d2("상태창 잔고 따르기", seg9("set-wallet-sync", walletSyncOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요. 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요."),
           field2("거래 읽는 기준", seg9("set-wallet-loose", walletLoose(itVars) ? "1" : "0", [["0", "금액이 적힌 것만"], ["1", "어림도 받기"]], busy6), "금액이 적힌 것만이면 「3만 원을 냈다」처럼 금액이 글에 있는 거래만 적어요. 어림도 받기면 「밥을 사 먹었다」처럼 금액이 없는 거래도 보조 모델이 서울 물가로 어림해 메모에 「(어림)」을 붙여 적어요."),
           field2("최근 거래 넘기기", stepper3("set-wallet-recent", "n", `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, "최근 거래 줄 수", busy6), `본편 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.`)
         ]
@@ -3068,9 +3068,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-settings .gx-muted { margin: 8px 0 0; font-size: 13px; }
 
 /* ── 괴담톡 ── */
-/* 괴담톡: 아래 「괴담톡 (v0.12.0)」 */
-
-/* 설정 탭 */
-.gx-settings .gx-sec { margin-bottom: 18px; }
-
-.st-step { display: inlin
+/* 괴담톡: 아래 「괴담톡 (v0.12.0)

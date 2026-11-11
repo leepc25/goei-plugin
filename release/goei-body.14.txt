@@ -1,4 +1,9 @@
-e-flex; align-items: center; gap: 10px; }
+」 */
+
+/* 설정 탭 */
+.gx-settings .gx-sec { margin-bottom: 18px; }
+
+.st-step { display: inline-flex; align-items: center; gap: 10px; }
 .st-step b { min-width: 3em; text-align: center; color: var(--signal); }
 .st-confirm p { margin: 0 0 8px; font-size: 14px; color: var(--danger); }
 .gx-row-btns { display: flex; gap: 8px; }
@@ -2140,4 +2145,4 @@ e-flex; align-items: center; gap: 10px; }
 .ip-pane textarea.gx-search { padding: 10px 12px; line-height: 1.55; }
 .ip-pane .gx-row-btns { margin-top: 2px; }
 .ip-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 2px; }
-.ip-name { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font-size:
+.ip-name { display: flex; align-items: ce

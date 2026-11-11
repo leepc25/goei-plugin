@@ -1,4 +1,4 @@
-op(latest ?? chat, arg.messageIndex, selfNames)) {
+hat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
         latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
           const r = settleShop(cur, arg.messageIndex, selfNames);
           return r ? { ...cur, ...r.message ? { message: r.message } : {}, scriptstate: { ...cur.scriptstate ?? {}, ...r.vars } } : null;
@@ -357,5 +357,5 @@ op(latest ?? chat, arg.messageIndex, selfNames)) {
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.6", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.7", start: start2 };
 })();
