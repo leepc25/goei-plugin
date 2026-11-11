@@ -451,7 +451,9 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
   journal: { desc: '사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요.' },
   // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
-  items: { desc: '가계부·소지품·상점을 여기서 정해요. 상점은 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
+  wallet: { desc: '응답에 나온 거래를 읽어 잔고와 거래 내역을 기록해요.', example: '' },
+  items: { desc: '가진 물건을 기록하고 메인 요청에 넘겨요.', example: '' },
+  shop: { desc: '지금 장면에 살 수 있는 곳이 있으면 상점 카드를 띄워요. 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 다음 요청에 어떤 로어북이 들어가는지는 아래에서 바로 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
@@ -531,7 +533,7 @@ function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>
    각 설정 페이지를 그린 HTML에서 줄 이름·설명·묶음 제목을 모아 두고, 적은 말이 들어간 줄을 목록 자리에 보여 준다. 누르면 그 페이지로 가서 그 줄을 비춘다 */
 type FindHit = { page: SetPage; label: string; group: string; help: string };
 let findIndex: FindHit[] | null = null;
-const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv'];
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv'];
 const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 function buildFindIndex(ctx: ChatContext): FindHit[] {
   const out: FindHit[] = [];

@@ -165,7 +165,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
       const j = shopJudgeBy(ss);
       const on = shopOn(ss);
       const calls = !on ? '판단 안 함 (상점 꺼짐)' : j.by === 'updater' ? '인물 갱신에 얹음 (추가 호출 없음)' : j.fallback ? '메인 모델이 대신 (갱신기가 매 턴 돌지 않음)' : '메인 모델이 응답 끝에 표식 (추가 호출 없음)';
-      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:items', to: 'r:상점 판단', sure: 0, maybe: 0 } as Node;
+      return { name: '상점 판단', sub: `지금 장면에 상점이 있는지 · ${j.by === 'updater' ? '갱신기' : '메인 모델'}`, kind: 'aux', on: on && j.by === 'updater', model: on && j.by === 'updater' ? ppModel('update') : undefined, calls, page: 'set:shop', to: 'r:상점 판단', sure: 0, maybe: 0 } as Node;
     })(),
     { name: '인물 정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: tidyOn ? ppModel('tidy') : undefined, calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', page: 'set:people', to: 'r:정리 방식', sure: 0, maybe: tidyOn ? 1 : 0 },
     { name: '이미지 태그 보충', sub: '응답에 빠진 인물 이미지 태그 채우기', kind: 'aux', on: assetOn, model: assetOn ? '보조' : undefined, calls: assetOn ? '1회' : basic.assetOn ? '호출 없음 (메인이 태그를 씀)' : '호출 없음 (이미지 끔)', page: 'set:image', to: 'r:출력 모델', sure: assetOn ? 1 : 0, maybe: 0 },
@@ -188,7 +188,7 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     }),
   ];
   const manual: Node[] = [
-    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:items', to: 'r:상점', sure: 0, maybe: 0 },
+    { name: '상점', sub: '진열대 받기·점원 대화', kind: 'aux', on: false, model: '보조', calls: '상점을 열 때·새로고침·말 걸 때', page: 'set:shop', to: 'r:상점', sure: 0, maybe: 0 },
     { name: '게시판 글·댓글·쪽지', sub: '괴담넷·괴담갤·세정게·연어 마켓에서 내가 쓸 때', kind: 'aux', on: false, model: '사이트별 설정', calls: '글 올리기·댓글·쪽지 보낼 때마다 1회', page: 'set:gnet', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '우주 쇼핑몰 문의', sub: '운영자에게 질문', kind: 'aux', on: false, model: mm(mallSettings(ss, 'cos').model), calls: '질문을 보낼 때마다 1회', page: 'set:cos', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },

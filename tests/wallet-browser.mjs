@@ -222,7 +222,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '꺼져 있으면 ✎ 없음');
   assert.equal(await page.locator('.gx-wt-del').count(), 0, '꺼져 있으면 ✕ 없음');
   await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
-  await page.click('[data-action="ed-node"][data-value="set:items"]'); // 설정 「기록 → 가계부」 (2026-11-05 사용자)
+  await page.click('[data-action="ed-node"][data-value="set:wallet"]'); // 설정 「기록 → 가계부」 (2026-11-05 사용자)
   await page.waitForSelector('[data-action="set-wallet-edit"]');
   assert.equal(await page.isDisabled('.st-won'), true, '이야기가 시작된 채팅은 시작 잔고 잠김');
   await page.click('[data-action="set-wallet-edit"][data-value="1"]');
