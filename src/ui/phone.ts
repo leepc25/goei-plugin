@@ -1,6 +1,7 @@
 // 「괴담톡」 탭: 연락처·대화방·공지·전화. 원본 괴담톡(폰)과 같은 저장 형식과 규칙.
 // 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 채팅 응답이 끝날 때마다 한 번.
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
+import { turnKeyAt } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { resolveSitePic } from '../core/sitepics';
@@ -447,9 +448,8 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: 
   if (!(env ? set.autoOpen : set.auto) || phoneBusy(ctx)) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
-  let hash = 7;
-  for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
-  const stamp = `${messageIndex}:${hash}`;
+  // 턴 열쇠: 같은 턴의 응답을 다시 굴려도 다시 부르지 않는다 (core/shop.ts turnKeyAt)
+  const stamp = turnKeyAt(ctx.chat, messageIndex);
   if (String(ctx.chat.scriptstate?.[PH_AUTO_LAST] ?? '') === stamp) return;
   const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [PH_AUTO_LAST]: stamp } }));
   if (!saved) return;
@@ -470,7 +470,7 @@ export async function autoView(ctx: ChatContext, messageIndex: number, env?: Pho
   if (!(env ? set.auto === 'open' : set.auto === 'turn') || phoneBusy(ctx)) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
-  const stamp = `${messageIndex}:${data.length}`;
+  const stamp = turnKeyAt(ctx.chat, messageIndex);
   if (String(ctx.chat.scriptstate?.[PH_VIEW_LAST] ?? '') === stamp) return;
   const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [PH_VIEW_LAST]: stamp } }));
   if (!saved) return;

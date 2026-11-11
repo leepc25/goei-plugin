@@ -6,7 +6,7 @@ import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
 import { genSettings } from '../core/advanced';
-import { emptyShop, lastBot, shelfPrompt, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
+import { emptyShop, lastBot, shelfPrompt, turnKey, SHOP_SIZE_HI, SHOP_SIZE_LO, type ShopState } from '../core/shop';
 import { aliveAnchors } from '../core/wallet';
 import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeItem, sellItem, type Item } from '../core/items';
 import { userTurns } from '../core/request';
@@ -125,7 +125,7 @@ async function ask(ctx: ChatContext, env: HsEnv): Promise<void> {
     const cur = env.current();
     if (!cur || chatKey(cur) !== chatKey(ctx)) return;
     const key = lastBot(cur.chat)?.key ?? '';
-    await updateChat(cur.charIndex, cur.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars(applyShow(readShow(chat.scriptstate), value, key)), [HS_AT_VAR]: key } }));
+    await updateChat(cur.charIndex, cur.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars({ ...applyShow(readShow(chat.scriptstate), value, key), tk: turnKey(chat) }), [HS_AT_VAR]: turnKey(chat) } }));
     ui.retried = 0;
   } catch (error) {
     failed = true;
@@ -153,13 +153,14 @@ export function homeshopOpenCheck(ctx: ChatContext, env: HsEnv): void {
   const s = hsSettings(ctx.chat.scriptstate);
   if (!s.on || s.auto === 'manual' || ui.loading) return;
   const show = readShow(ctx.chat.scriptstate);
-  const key = lastBot(ctx.chat)?.key ?? '';
+  // 턴 열쇠: 응답을 다시 굴린 것은 턴이 넘어간 것이 아니다 (11-11 사용자)
+  const key = turnKey(ctx.chat);
   // 본편 턴이 넘어갔으면 편성 한 칸 (보던 부는 지나간다)
   if (s.turn && show.loaded && show.tk !== undefined && show.tk !== key && show.at < show.parts.length) {
     void updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       const cur = readShow(chat.scriptstate);
-      if (!cur.loaded || cur.tk === key) return null;
-      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars({ ...cur, at: Math.min(cur.at + 1, cur.parts.length), tk: key }) } };
+      if (!cur.loaded || cur.tk === turnKey(chat)) return null;
+      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...showVars({ ...cur, at: Math.min(cur.at + 1, cur.parts.length), tk: turnKey(chat) }) } };
     }).then(() => env.refresh()).then(() => { const c = env.current(); if (c) homeshopOpenCheck(c, env); });
     return;
   }

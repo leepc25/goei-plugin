@@ -14,7 +14,7 @@ import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, li
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
 import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, worldMinute, type CosOrder } from '../core/orders';
-import { acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
+import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
 import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
@@ -164,7 +164,7 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
     const sale = deal ? next.sell : null;
     let sold = false;
     await updateChat(cur.charIndex, cur.chatIndex, (chat) => {
-      const saved = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...next, key }), ...(note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: key } : {}) } };
+      const saved = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...mallVarsOf(site, { ...next, key }), ...(note !== null ? { [mallNoteKey(site)]: note, [atKey(site)]: turnKey(chat) } : {}) } };
       const done = deal ? saleDone(saved, site, deal) : null;
       if (done) sold = true;
       return done ?? saved;
@@ -203,8 +203,7 @@ export function mallOpenCheck(ctx: ChatContext, env: MallEnv, site: MallSite): v
   if (!s.on || s.auto === 'manual' || ui[site].loading) return;
   if (site === 'bm' && !loggedNick(ctx)) return;
   const st = readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat));
-  const key = lastBot(ctx.chat)?.key ?? '';
-  if (st.loaded && String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === key) return;
+  if (st.loaded && String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === turnKey(ctx.chat)) return;
   if (st.loaded && s.auto === 'turn') return;
   void ask(ctx, env, site, 'shelf', st);
 }
@@ -216,8 +215,7 @@ export async function autoRefreshMall(ctx: ChatContext, site: MallSite): Promise
   const env: MallEnv = live && chatKey(live) === chatKey(ctx) ? liveEnv! : { render() {}, refresh: async () => {}, current: () => ctx };
   const s = mallSettings(ctx.chat.scriptstate, site);
   if (!s.on || s.auto !== 'turn') return;
-  const key = lastBot(ctx.chat)?.key ?? '';
-  if (String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === key) return;
+  if (String(ctx.chat.scriptstate?.[atKey(site)] ?? '') === turnKey(ctx.chat)) return;
   await ask(ctx, env, site, 'shelf', readMall(ctx.chat.scriptstate, site, aliveAnchors(ctx.chat)));
 }
 

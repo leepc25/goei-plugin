@@ -4097,6 +4097,14 @@ ${memo.job.trim()}
     for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return { key: messageKey(list4[i], i), text: typeof list4[i].data === "string" ? list4[i].data : "", index: i };
     return null;
   }
+  function turnKeyAt(chat, index3) {
+    const list4 = chat.message ?? [];
+    return index3 > 0 && list4[index3 - 1] ? `t:${messageKey(list4[index3 - 1], index3 - 1)}` : `t:first:${Math.max(0, index3)}`;
+  }
+  function turnKey(chat) {
+    const last2 = lastBot(chat);
+    return last2 ? turnKeyAt(chat, last2.index) : "";
+  }
   function currentShop(chat) {
     const st = readShop(chat.scriptstate);
     const last2 = lastBot(chat);
@@ -4792,10 +4800,4 @@ ${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
   var MALL_NAME = { cos: "우주 쇼핑몰", bm: "백일몽 포인트몰" };
   var MALL_OWNER = { cos: "운영자", bm: "" };
   var MALL_GUIDE = { cos: "Cos", bm: "Bm" };
-  var MALL_VAR = { cos: "$cos_shop", bm: "$bm_shop" };
-  var mallKey = (shKey, site) => `$${site}_${shKey.slice(1)}`;
-  var mallAutoKey = (site) => `$${site}_sh_auto`;
-  function mallVars(vars, site) {
-    const out = {};
-    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_")) out[k] = v;
-    const pre = `$${site}_
+  var MALL_VA

@@ -136,3 +136,15 @@ test('망상홈쇼핑: 방청 신청은 바로 다음 턴에만 한 줄', () => 
   const later = { message: [...next.message, { role: 'char', data: 'r', chatId: 'r' }, { role: 'user', data: 'go2', chatId: 'u2' }], scriptstate: vars };
   assert.equal(homeshopBlock(later), '', '그다음 턴에는 저절로 풀림');
 });
+
+test('턴 열쇠: 응답을 다시 굴리면 같고 새 턴이면 달라진다 (자동 호출·편성 넘기기 공통)', async () => {
+  const core = await import('../dist-test/core.mjs');
+  const turnKey = core.turnKey ?? core.shop?.turnKey;
+  const base = [{ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: '첫 답', chatId: 'c1' }];
+  const k1 = turnKey({ message: base });
+  // 다시 굴리기: 같은 자리의 응답이 새 chatId·새 글
+  assert.equal(turnKey({ message: [base[0], { role: 'char', data: '다른 답', chatId: 'c1b' }] }), k1);
+  // 새 턴
+  assert.notEqual(turnKey({ message: [...base, { role: 'user', data: '계속', chatId: 'u2' }, { role: 'char', data: '둘째 답', chatId: 'c2' }] }), k1);
+  assert.equal(turnKey({ message: [] }), '');
+});

@@ -1,4 +1,6 @@
-Row(kind, rec2, def, sel, auto);
+.affiliation} (명부 소속)` : "명부에 소속이 없어요";
+        }
+        return fieldRow(kind, rec2, def, sel, auto);
       });
       const lines3 = rec2.extra.map((e, i) => e.kind === "line" ? extraRow(kind, rec2, e, i, sel) : "").join("");
       const text4 = recordText(kind, sel, rec2, d);
@@ -3358,4 +3360,4 @@ Return the JSON object.` }
     const built = buildRouter(chat, store2, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
     if (routerCache?.key === built.key) return routerCache.selected;
     const t0 = Date.now();
-    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: 
+    const diag = { at: (/* @__PURE__ */ ne

@@ -1,4 +1,4 @@
- 13px; }
+nter; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
 .ip-name.off { color: var(--dim); }
 .ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
 .ip-extra { display: flex; gap: 6px; margin-top: 6px; }
@@ -2106,5 +2106,4 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .bs-sm .detail > .side .seller { margin-top: 10px; padding: 10px 12px; border: 1px solid #e4ddd3; border-radius: 8px; background: #fbf9f5; }
 .bs-sm .detail > .side .seller small { margin-top: 2px; }
 .bs-sm .detail > .qna > .act { margin-top: 0; }
-.bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
-.bs-sm .detail .price { margin: 0 0 6px; font-
+.bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight

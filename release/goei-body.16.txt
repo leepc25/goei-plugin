@@ -1,4 +1,5 @@
-size: 19px; }
+: 800; line-height: 1.35; letter-spacing: -.5px; }
+.bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
 .bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
 
 /* ── 망상홈쇼핑 (2026-11-11). 사이트 틀은 목업 기획 C안 바탕(빨간 머리띠·방송 칸+채팅·상품 칸·주문 단추·그림 든 편성 카드), 방송 칸 안 글자만 도트. 방송 칸은 ui/hsplayer.ts 가 꽂는다 ── */
@@ -3689,4 +3690,4 @@ ${texts.anomaly}`;
         }).catch(() => null) ?? latest;
       }
       const selfNames = hasShopTag(raw) ? [playerAgent((await getChar(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? "", userInfo().name] : [];
-      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleSh
+      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? c

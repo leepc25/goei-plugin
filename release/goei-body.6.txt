@@ -1,4 +1,10 @@
-sh_`;
+R = { cos: "$cos_shop", bm: "$bm_shop" };
+  var mallKey = (shKey, site) => `$${site}_${shKey.slice(1)}`;
+  var mallAutoKey = (site) => `$${site}_sh_auto`;
+  function mallVars(vars, site) {
+    const out = {};
+    for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith("$sh_")) out[k] = v;
+    const pre = `$${site}_sh_`;
     for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre)) out[`$sh_${k.slice(pre.length)}`] = v;
     return out;
   }
@@ -4080,13 +4086,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
     if (b.startsWith("라우터")) return "router";
     if (b.startsWith("디렉터")) return "director";
     if (/^(갱신기|정리|이미지 태그|위키)/u.test(b)) return "update";
-    if (/^상점/u.test(b)) return "other";
-    return "net";
-  }
-  function stageFor(t, label2) {
-    let best = null;
-    let len = 0;
-    const base = baseLabel(label2);
-    for (const s9 of t.plan) for (const m of s9.match) if (m && (label2 === m || base === m) && m.length > len) best = s9, len = m.length;
-    if (best) return best;
-    const b = baseLa
+    if (/^상점/u.test(b)) retu

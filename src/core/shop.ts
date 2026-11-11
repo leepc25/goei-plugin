@@ -394,6 +394,20 @@ export function lastBot(chat: Chat): { key: string; text: string; index: number 
   return null;
 }
 
+/**
+ * 턴 열쇠 (11-11 사용자: 응답을 다시 굴려도 인터넷 자동 호출·망상홈쇼핑 편성은 그대로 둔다).
+ * 응답 바로 앞 메시지의 열쇠라, 같은 자리의 응답을 다시 굴리면(Risu 가 새 chatId 를 줌) 같고 새 턴이면 달라진다.
+ * 「이 턴에 이미 했나」를 가리는 모든 자동 호출이 이것 하나를 쓴다 (괴담톡·게시판·위키·쇼핑몰·망상홈쇼핑).
+ */
+export function turnKeyAt(chat: Chat, index: number): string {
+  const list = chat.message ?? [];
+  return index > 0 && list[index - 1] ? `t:${messageKey(list[index - 1], index - 1)}` : `t:first:${Math.max(0, index)}`;
+}
+export function turnKey(chat: Chat): string {
+  const last = lastBot(chat);
+  return last ? turnKeyAt(chat, last.index) : '';
+}
+
 /** 이 채팅에서 지금 열 수 있는 상점: 마지막 응답의 표식과 저장된 상태가 맞을 때만 */
 export function currentShop(chat: Chat): ShopState | null {
   const st = readShop(chat.scriptstate);

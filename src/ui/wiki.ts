@@ -1,5 +1,6 @@
 // 「위키」 탭: 목록·검색·작성 화면·문서 보기. 생성은 "위키 작성 시작"·"새로고침"을 눌렀을 때만 한 번 부른다.
 // 생성은 창을 닫아도 계속되고, 끝나면 원래 채팅의 로어북에 저장한다.
+import { turnKeyAt } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, type Registry } from '../core/world/registry';
@@ -250,7 +251,7 @@ export async function autoWriteWiki(ctx: ChatContext, messageIndex: number, open
   if (!(open ? s.auto === 'open' : s.auto === 'turn') || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
-  const stamp = `${messageIndex}:${data.length}`;
+  const stamp = turnKeyAt(ctx.chat, messageIndex);
   if (String(ctx.chat.scriptstate?.[NW_AUTO_LAST] ?? '') === stamp) return;
   const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [NW_AUTO_LAST]: stamp } }));
   if (!saved) return;

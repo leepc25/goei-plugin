@@ -36,6 +36,7 @@ const o1 = JSON.parse(st.$hs_orders)[0];
 console.log('① ok', o1.anchor, o1.boxId);
 // ② 응답 다시 굴리기 → 주문·상자 사라짐, 다시 주문 가능
 await click('.hs-pop header [data-action="hs-pop"]');
+const atA = JSON.parse((await ss()).$hs_show).at;
 await reroll('c1b');
 assert.equal(await page.locator(`[data-action="items-open"][data-value="${o1.boxId}"]`).count(), 0, '다시 굴리면 상자 없음');
 await goHs();
@@ -43,6 +44,7 @@ assert.equal(await page.locator('[data-action="hs-pop"][data-value="call"]:not([
 await click('[data-action="hs-page"][data-value="orders"]'); await page.waitForTimeout(300);
 assert.ok(!(await page.textContent('.hs-wrap')).includes('무전기'), '주문 조회에 없음');
 await click('[data-action="hs-page"][data-value=""]'); await page.waitForTimeout(300);
+assert.equal(JSON.parse((await ss()).$hs_show).at, atA, '다시 굴린 것은 턴이 아니다: 편성 그대로 (11-11 사용자)');
 console.log('② ok');
 // ③ 맞교환 주문 → 물건 빠짐·호출 없음, 다시 굴리면 물건 돌아옴
 await click('[data-action="hs-pop"][data-value="call"]'); await page.waitForTimeout(200);

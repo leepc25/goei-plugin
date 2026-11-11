@@ -1,5 +1,6 @@
 // 「괴담넷」 탭: 게시판·쪽지함. 생성은 새로고침·글 올리기·댓글·쪽지 보내기를 눌렀을 때만 한 번씩 부른다.
 // 원본은 채팅 입력창을 빌려 썼지만 여기서는 창 안의 입력칸에 쓴다. 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
+import { turnKeyAt } from '../core/shop';
 import { onOffSwitch } from './controls';
 import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
@@ -1041,9 +1042,8 @@ export async function autoRefreshGnet(base: ChatContext, messageIndex: number, o
   if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
-  let hash = 7;
-  for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
-  const stamp = `${messageIndex}:${hash}`;
+  // 턴 열쇠: 같은 턴의 응답을 다시 굴려도 다시 부르지 않는다 (core/shop.ts turnKeyAt)
+  const stamp = turnKeyAt(ctx.chat, messageIndex);
   if (String(ctx.chat.scriptstate?.[AUTO_LAST] ?? '') === stamp) return;
   const saved = await upd(ctx, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
   if (!saved) return;

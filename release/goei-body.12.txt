@@ -1,4 +1,4 @@
-[], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+w Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
     try {
       const raw = await Promise.race([
         runModel([{ role: "system", content: built.system }, { role: "user", content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || void 0, "라우터"),
@@ -2442,4 +2442,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         ...colCfg.wallet === "off" ? [] : [
           field2("시작 잔고", wonInput(walletStart, busy6, startLocked), scope === "chat" ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc36(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요."),
           field2("잔고 직접 수정", seg9("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워요."),
-          field2("상태창 잔고 따르기", seg9("set-wallet-sync", walletSyncOn(itVars) ? "1" : "0", [["1"
+          fiel

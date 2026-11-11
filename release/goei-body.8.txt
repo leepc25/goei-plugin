@@ -1,4 +1,5 @@
-9 12 13.41 17.59 19 19 17.59 13.41 12z",
+ 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+    x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
     add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
     tune: "M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z",
     acct: "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
@@ -1027,9 +1028,7 @@ ${previewText(p2.body)}`;
     if (!s8.enabled || !(open4 ? s8.autoOpen : s8.auto) || jobs3.has(chatKey3(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
-    let hash5 = 7;
-    for (let i = 0; i < data3.length; i++) hash5 = (hash5 * 131 + data3.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash5}`;
+    const stamp = turnKeyAt(ctx2.chat, messageIndex);
     if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
     const saved2 = await upd(ctx2, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
     if (!saved2) return;
@@ -2583,7 +2582,7 @@ ${extra2}` } : m);
       const cur = env3.current();
       if (!cur || chatKey4(cur) !== chatKey4(ctx2)) return;
       const key = lastBot(cur.chat)?.key ?? "";
-      await updateChat(cur.charIndex, cur.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...showVars(applyShow(readShow(chat.scriptstate), value, key)), [HS_AT_VAR]: key } }));
+      await updateChat(cur.charIndex, cur.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...showVars({ ...applyShow(readShow(chat.scriptstate), value, key), tk: turnKey(chat) }), [HS_AT_VAR]: turnKey(chat) } }));
       ui.retried = 0;
     } catch (error) {
       failed4 = true;
@@ -2607,12 +2606,12 @@ ${extra2}` } : m);
     const s8 = hsSettings(ctx2.chat.scriptstate);
     if (!s8.on || s8.auto === "manual" || ui.loading) return;
     const show = readShow(ctx2.chat.scriptstate);
-    const key = lastBot(ctx2.chat)?.key ?? "";
+    const key = turnKey(ctx2.chat);
     if (s8.turn && show.loaded && show.tk !== void 0 && show.tk !== key && show.at < show.parts.length) {
       void updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         const cur = readShow(chat.scriptstate);
-        if (!cur.loaded || cur.tk === key) return null;
-        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...showVars({ ...cur, at: Math.min(cur.at + 1, cur.parts.length), tk: key }) } };
+        if (!cur.loaded || cur.tk === turnKey(chat)) return null;
+        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...showVars({ ...cur, at: Math.min(cur.at + 1, cur.parts.length), tk: turnKey(chat) }) } };
       }).then(() => env3.refresh()).then(() => {
         const c = env3.current();
         if (c) homeshopOpenCheck(c, env3);
@@ -3257,7 +3256,4 @@ ${nick}: ${text4.slice(0, 200)}`;
       if (g2 && g2.day === day) g2.rows.push(l);
       else groups.push({ day, rows: [l] });
     }
-    return `${chips3}<div class="gx-wallettab it-log">${groups.map((g2) => {
-      const gi = g2.rows.filter((l) => l.what === "get").length;
-      const go2 = g2.rows.length - gi;
-      return `<secti
+    return `${chips3}<div class="gx-wallettab it-lo
