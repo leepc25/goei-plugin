@@ -178,7 +178,6 @@ test('필드 상한 묶음: 같은 메시지 뒤 여러 방문·장면은 상한
 test('정성 모드(11-07): 수치 끄면 faction_stance 로 단계·이유만, 숫자 없는 자료·주입, 구간·몹 목격 안 씀', () => {
   const s = settings({ ...St.peopleSettings({ $pp_num_faction_rep: '0' }) });
   assert.equal(s.factionQual, true);
-  assert.equal(s.mobWeight, 'off', '정성 모드에서는 필드 몹 목격 계기를 쌓지 않는다');
   const on = U.enabledSections(s);
   assert.ok(on.has('faction_rep_qual') && !on.has('faction_rep_num'));
   for (const prompt of ['detailed', 'compact']) {

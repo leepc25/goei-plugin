@@ -35,10 +35,10 @@ import { isPhone } from '../media';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update' | 'versus';
+export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'start' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update', 'versus'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update'];
 /** 패널 기능 설정 화면을 그대로 쓰는 페이지 (게시판 사이트·괴담톡·위키·기록) */
 const isFeatPage = (p: string): p is NonNullable<typeof settingsUi.page> & string => ['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'people', 'journal', 'factions'].includes(p);
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
@@ -386,8 +386,8 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', gal: '괴담갤', wpf: '세정게', sm: '연어 마켓', cos: '우주 쇼핑몰', bm: '백일몽 포인트몰', hs: '망상홈쇼핑', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트', versus: '대전' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: siteLogo('gn'), gal: siteLogo('gal'), wpf: siteLogo('wpf'), sm: siteLogo('sm'), cos: siteLogo('cos'), bm: siteLogo('bm'), hs: siteLogo('hs'), phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh, versus: ICONS.pad };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', gal: '괴담갤', wpf: '세정게', sm: '연어 마켓', cos: '우주 쇼핑몰', bm: '백일몽 포인트몰', hs: '망상홈쇼핑', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: siteLogo('gn'), gal: siteLogo('gal'), wpf: siteLogo('wpf'), sm: siteLogo('sm'), cos: siteLogo('cos'), bm: siteLogo('bm'), hs: siteLogo('hs'), phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
 /** [노드, 이름, 아이콘, 배지?, 하위 항목?]. 노드가 `label:…` 이면 누를 수 없는 소제목 줄 (설정 「기록」 아래 하위 메뉴, 2026-11-05 사용자) */
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
@@ -409,7 +409,6 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       setItem('items'),
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map(subItem),
-      setItem('versus'),
     ] }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['start', '시작 화면', ICONS.idcard], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
@@ -493,7 +492,6 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'lore': body = sec('lore') + (canChat ? loreCheckBox(ctx, true) : '<section class="ps-group"><h3>다음 호출 로어북</h3><p class="ps-note">채팅을 시작하면 볼 수 있어요.</p></section>'); break;
     case 'adv': body = sec('adv'); break;
     case 'update': body = sec('update'); break;
-    case 'versus': body = sec('versus'); break;
   }
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   // 채팅 설정 페이지는 모두 같은 머리: 시작 뒤 「기본값으로 저장」「기본값 불러오기」(설정 전부 한 번에), 시작 전 「새 채팅 기본값 (시작 전)」.
@@ -505,8 +503,8 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
-  // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
-  if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
+  // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개)
+  if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '');
   // 인물 페이지는 맨 위에 자기 도식이 있으니 「호출 흐름 →」 단추만 (callSummary 안에서)
   const calls = callSummary(ctx, page);
   const lead = info

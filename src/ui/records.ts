@@ -108,7 +108,7 @@ function gmark(kind: JournalKind, grade?: string): string {
   return `<i class="gx-gmark ${cls}${g ? ` g-${g.toLowerCase()}` : ''}" title="${JOURNAL_KIND_LABEL[kind]}${g ? ` ${esc(g)}등급` : ''}">${g ? esc(g) : mark}</i>`;
 }
 const whoText = (r: { mine: boolean; agents: { name: string }[] }) => [...(r.mine ? ['나'] : []), ...r.agents.map((a) => a.name)].filter(Boolean).join(' · ');
-const mineBadge = (r: { mine: boolean; kind: JournalKind }) => (r.kind === 'fd' ? '<span class="gx-badge live">필드 출동</span>' : r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>');
+const mineBadge = (r: { mine: boolean; kind: JournalKind }) => (r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>');
 
 /** 세계 시각 (상황판) — 없으면 가장 최근 일지 줄의 시각 */
 function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
@@ -217,7 +217,7 @@ function journalPane(ctx: ChatContext): string {
   const todayKey = now === null ? '' : dayOf(now);
   const todayRows = todayKey ? rows.filter((r) => dayOf(r.at) === todayKey) : [];
   const mineN = rows.filter((r) => r.mine).length;
-  const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
   const durs = todayRows.map((r) => (r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null)).filter((d): d is number => d !== null);
   const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
   const clockText = now === null ? '' : journalClock(now).replace(/^(\d\d)\.(\d\d)/, `${new Date(now * 60000).getUTCFullYear()}.$1.$2`);
@@ -249,7 +249,7 @@ export function journalList(ctx: ChatContext): string {
     else groups.push({ day, rows: [r] });
   }
   groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
-  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
   return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('');
 }
 

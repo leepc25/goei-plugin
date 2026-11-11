@@ -194,7 +194,6 @@ export function flowNodes(ctx: ChatContext): { pre: Node[]; main: Node; post: No
     { name: '포인트몰 1:1 상담', sub: '상담사 연결·답', kind: 'aux', on: false, model: mm(mallSettings(ss, 'bm').model), calls: '상담사 연결 1회 + 보낼 때마다 1회', page: 'set:bm', to: 'r:사용@1:1 상담', sure: 0, maybe: 0 },
     { name: '위키 수동', sub: '검색해서 없는 문서 쓰기', kind: 'aux', on: false, model: mm(nw.model), calls: '검색 결과가 없을 때 1회', page: 'set:wiki', to: 'r:모델', sure: 0, maybe: 0 },
     { name: '괴담톡 답장', sub: '내가 보낸 메시지에 답', kind: 'aux', on: false, model: phoneModel, calls: '보낼 때마다 1회', page: 'set:phone', to: 'r:모델', sure: 0, maybe: 0 },
-    { name: '게임 대화·방문', sub: '필드에서 NPC 와 말하기·장소 방문', kind: 'aux', on: false, model: '보조/메인', calls: '필드에서만', sure: 0, maybe: 0 },
   ];
   const map = flowTok.map;
   if (map) for (const n of [...pre, ...post, ...manual]) if (n.name in map) n.tok = map[n.name];

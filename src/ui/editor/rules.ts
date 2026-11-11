@@ -59,7 +59,7 @@ function ruleBox(r: UserRule): string {
     <div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>사용</b><small>끄면 어느 지침에도 붙지 않아요. 글은 남아요.</small></div><div class="ps-ctl">${switchHtml({ action: 'ed-rule-on', value: r.id, on: r.on })}</div></div>
       <div class="ps-row"><div class="ps-label"><b>제목</b><small>규칙 글 위에 작은 제목으로 들어가요.</small></div><div class="ps-ctl"><input class="gw-rule-title" data-input="ed-rule-title" data-key="${esc(r.id)}" value="${esc(r.title)}" placeholder="예: 대사 길이" autocomplete="off" maxlength="${RULE_TITLE_MAX}"></div></div>
-      <div class="ps-row"><div class="ps-label"><b>붙일 곳</b><small>본편 = RP 지침 끝 · 이동·임무 = COMMON 절 · 괴담넷 = 게시판 절 · 괴담톡·필드 = COMMON 절 · 위키 = 작성 안내 절</small></div><div class="ps-ctl"><div class="dir-chips">${chips}</div></div></div>
+      <div class="ps-row"><div class="ps-label"><b>붙일 곳</b><small>본편 = RP 지침 끝 · 이동·임무 = COMMON 절 · 괴담넷 = 게시판 절 · 괴담톡 = COMMON 절 · 위키 = 작성 안내 절</small></div><div class="ps-ctl"><div class="dir-chips">${chips}</div></div></div>
       <div class="ps-row"><div class="ps-label"><b>본문</b><small>모델에게 그대로 가요. 지침 언어(영어)와 맞추면 더 잘 따라요.</small></div>
         <div class="gw-copyto gw-copybox"><textarea data-input="ed-rule-text" data-key="${esc(r.id)}" rows="6" placeholder="규칙 글" maxlength="${RULE_TEXT_MAX}">${esc(r.text)}</textarea>${copyBtn()}</div></div>
       <div class="ps-row gw-rel-foot">${del}</div>
@@ -71,7 +71,7 @@ export function rulePage(_node: string): string {
   const rules = getUserRules();
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>추가 규칙<small>이 기기 공통</small></h2>
       <div class="gw-head-act"><span class="gw-tokens">${rules.length}/${RULE_MAX}</span><button class="gx-mini primary" data-action="ed-rule-new" ${rules.length >= RULE_MAX ? 'disabled' : ''}>${ICONS.plus}새 규칙</button></div>
-      ${ruleUi.info ? `<p class="gx-hint">${esc(ruleUi.info)}</p>` : ''}<p class="gx-muted">기본 지침을 고치지 않고 내 규칙을 덧붙여요. 규칙마다 어느 지침에 붙일지 고르면, 그 지침의 늘 쓰이는 절 끝에 「User Rules」로 들어가요. 이 기기의 모든 채팅에 적용돼요. 바꾸면 바로 저장돼요. 예) 「대사 길이」 규칙을 본편·필드에 붙이기: "한 번에 한 사람이 세 문장 넘게 말하지 않는다."</p></header>
+      ${ruleUi.info ? `<p class="gx-hint">${esc(ruleUi.info)}</p>` : ''}<p class="gx-muted">기본 지침을 고치지 않고 내 규칙을 덧붙여요. 규칙마다 어느 지침에 붙일지 고르면, 그 지침의 늘 쓰이는 절 끝에 「User Rules」로 들어가요. 이 기기의 모든 채팅에 적용돼요. 바꾸면 바로 저장돼요. 예) 「대사 길이」 규칙을 본편·괴담톡에 붙이기: "한 번에 한 사람이 세 문장 넘게 말하지 않는다."</p></header>
     <div class="gx-settings gw-setbody">${rules.length ? rules.map(ruleBox).join('') : '<p class="ps-note">아직 규칙이 없어요. 「새 규칙」을 눌러 하나 만들어요.</p>'}</div>
   </div>`;
 }

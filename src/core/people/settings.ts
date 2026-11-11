@@ -67,7 +67,6 @@ export const PP_DEFAULTS: Record<string, string> = {
   num_faction_rep: '1',
   faction_inject: '1',
   faction_bounds: '61,21,-20,-60',
-  mob_weight: 'half',
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',
@@ -146,7 +145,6 @@ export interface PeopleSettings {
   /** 세력 평판 정성 모드 (num_faction_rep = 0) */
   factionQual: boolean;
   factionBounds: [number, number, number, number];
-  mobWeight: 'half' | 'full' | 'off';
   spanCap: number;
   rules: string;
   directorRules: string;
@@ -220,8 +218,6 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     factionInject: v('faction_inject') !== '0',
     factionQual: v('faction_rep') === '1' && v('num_faction_rep') === '0',
     factionBounds: parseBounds(v('faction_bounds')),
-    // 정성 모드에서는 필드 목격 계기를 쌓지 않는다 (단계는 갱신기 판단만)
-    mobWeight: v('num_faction_rep') === '0' ? 'off' : one('mob_weight', ['half', 'full', 'off'] as const),
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),
     directorRules: v('director_rules').slice(0, 2000),

@@ -106,12 +106,6 @@ async function goNode(n) {
 }
 await goNode('set:image');
 await page.waitForSelector('.gw-set [data-action="set-asset"]');
-// 설정 「대전」 (11-08): 켬/끔이 바로 저장되고 다시 그려진다. 데이터는 받을 곳이 없는 시험판이라 받기 단추 대신 상태만
-await goNode('set:versus');
-await page.waitForSelector('.gw-set [data-action="vs-on"]');
-await page.click('.gw-set [data-action="vs-on"][data-value="1"]');
-await page.waitForSelector('.gw-set [data-action="vs-on"][data-value="0"]');
-if (shots) await page.screenshot({ path: `${shots}/ed-0-versus.png` });
 await goNode('agent');
 if (shots) await page.screenshot({ path: `${shots}/ed-1-agents.png` });
 assert.ok((await page.locator('.gw-row').count()) >= 55, '요원 목록');

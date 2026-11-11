@@ -65,7 +65,6 @@ import { gnetSettingsPane } from './gnet';
 import { wikiSettingsPane } from './wiki';
 import { peopleSettingsPane, peopleFactionPane } from './people';
 import { journalSettingsPane } from './records';
-import { versusGroup } from './versus';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -276,7 +275,7 @@ function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>
 }
 
 /** 설정 묶음 하나 (편집 창의 「설정」 페이지가 묶음별로 가져다 쓴다, 2026-10-27) */
-export type SettingsSection = 'screen' | 'image' | 'board' | 'status' | 'wallet' | 'items' | 'shop' | 'lore' | 'adv' | 'update' | 'versus';
+export type SettingsSection = 'screen' | 'image' | 'board' | 'status' | 'wallet' | 'items' | 'shop' | 'lore' | 'adv' | 'update';
 export function settingsSection(ctx: ChatContext, scope: SettingsScope, canChat: boolean, section: SettingsSection): string {
   return settingsTab(ctx, scope, canChat, section);
 }
@@ -456,7 +455,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1])}`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0])}`,
     update: `${updateGroup(ctx)}`,
-    versus: versusGroup(seg),
   };
   if (only) return S[only];
   return `<main class="gx-body gx-settings">

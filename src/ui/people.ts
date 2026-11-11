@@ -136,14 +136,14 @@ const SLOT_GROUPS: { key: string; title: string; help: string; slots: SlotId[] }
   { key: 'perception', title: '인식', help: '인식 기능의 전용 칸. 관찰 성향·현재 손상·장면 조건·단서 읽기·비밀', slots: FEATURE_SLOTS.filter((s) => s.startsWith('perception.')) },
   { key: 'openness', title: '음란도 조건', help: '음란도 기능의 전용 칸. 친밀한 상황에서 실제로 보인 태도·조건', slots: FEATURE_SLOTS.filter((s) => s.startsWith('openness.')) },
 ];
-const SRC_LABEL: Record<EntrySrc, string> = { seed: '시트', story: '본편', field: '필드', manual: '수동' };
+const SRC_LABEL: Record<EntrySrc, string> = { seed: '시트', story: '본편', field: '기록', manual: '수동' };
 const SRC_HELP: Record<EntrySrc, string> = {
-  seed: '출처: 시트 — 로어북 시트·필드 대사에서 가져온 시작값',
+  seed: '출처: 시트 — 로어북 시트·대사 자료에서 가져온 시작값',
   story: '출처: 본편 — 본편 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)',
-  field: '출처: 필드 — 필드(게임)에서 일어난 사건으로 기록된 것',
+  field: '출처: 본편 밖에서 기록된 것',
   manual: '출처: 수동 — 이 화면에서 직접 고친 것',
 };
-const SRC_ICON: Record<EntrySrc, string> = { seed: ICONS.book, story: ICONS.pen, field: ICONS.game, manual: ICONS.person };
+const SRC_ICON: Record<EntrySrc, string> = { seed: ICONS.book, story: ICONS.pen, field: ICONS.pen, manual: ICONS.person };
 const DOC_LABEL: Record<DocType, string> = { event: '사건', location: '장소', faction: '세력', item: '물건', rhythm: '서사 리듬' };
 const KIND_LABEL: Record<Change['kind'], string> = { cue: '호감', address: '호칭', identity: '신분', note: '메모', taste: '취향', openness: '음란도' };
 const KIND_HELP: Record<Change['kind'], string> = {
@@ -155,7 +155,7 @@ const KIND_HELP: Record<Change['kind'], string> = {
   note: '메모: 다음 턴 본편에 끼워 넣을 짧은 메모',
 };
 const SEEDED_LABEL = { lore: '시트', dialogue: '대사', none: '빈 기록' } as const;
-const SEEDED_HELP = { lore: '시작값: 로어북 시트(Identity·Character 절)에서 만들었어요', dialogue: '시작값: 필드 대사 자료에서 만들었어요', none: '시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요' } as const;
+const SEEDED_HELP = { lore: '시작값: 로어북 시트(Identity·Character 절)에서 만들었어요', dialogue: '시작값: 대사 자료에서 만들었어요', none: '시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요' } as const;
 const seededOf = (p: Person) => (p.seeded.from === 'lore' ? 'lore' : p.seeded.from === 'dialogue' ? 'dialogue' : 'none');
 
 function seg(key: string, cur: string, items: [string, string][], action = 'pp-set'): string {
@@ -378,7 +378,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('호감 감소 속도', seg('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown), [['same', '증가와 같게'], ['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감이 내리는 계기 점수에 곱하는 배율이에요. 「증가와 같게」면 위 값을 써요'),
     row('항상 포함할 인물', `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">`, '쉼표로 구분한 이름. 글에 이름이 안 나와도 매 턴 본편 기록·Director 자료에 넣고, 갱신기도 되짚어요 (리수폿 자동 추적). 기록에 있는 이름만 들어가요'),
     row('최근 글 범위', seg('recent_msgs', String(s.recentMsgs), [['2', '2개'], ['4', '4개'], ['6', '6개'], ['8', '8개']]), 'Router·Director 가 이번 입력과 함께 보는 최근 메시지 수'),
-    row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
+    row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
   // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
   // 수치 끄기 = 정성 모드 (리수폿 E): 점수 없이 전용 칸의 글로만
@@ -490,11 +490,10 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
     row(FEATURE_HELP.faction_rep[0], onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
     ...(s.features.has('faction_rep') ? [
       // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
-      row('세력 평판 수치', onoff('num_faction_rep'), '끄면 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가고, 필드 몹 반응은 단계로 정해져요. 구간 경계·몹 목격 무게는 안 써요.'),
+      row('세력 평판 수치', onoff('num_faction_rep'), '끄면 정성 모드. 계기 점수·−100~100 값 없이 갱신기가 「그 세력이 지금 주인공을 어떻게 보는지」를 단계(적대·경계·중립·호의·우호)와 이유로 판단해요. 본편에는 단계와 이유가 들어가요. 구간 경계는 안 써요.'),
       row('세력 평판 컨텍스트에 포함', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
       ...(s.factionQual ? [] : [
-        row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
-        row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반이면 작은 일은 쌓이지 않아요. 명단 인물이 본 일은 늘 그대로 넣어요.'),
+        row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 기본 61,21,-20,-60.'),
       ]),
     ] : []),
   ].join('');
@@ -610,7 +609,7 @@ function factionSection(ctx: ChatContext, store: PeopleStore, changes: Change[])
     const mine = store.log.filter((c) => c.who === factionWho(code)).length;
     return `<li class="ph-row"><button class="ph-main nw-row" data-action="rec-faction" data-value="${esc(code)}">
       <span class="ph-avatar nw-ava k-fac">${esc(f.name.slice(0, 1))}</span>
-      <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc(f.stage.mob)}">${esc(f.stage.label)}</span></span><small>${s.factionQual ? esc(f.note ?? '시작 단계 (조직×조직 표)') : `${f.value} · 시작값 ${f.base}`}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
+      <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}">${esc(f.stage.label)}</span></span><small>${s.factionQual ? esc(f.note ?? '시작 단계 (조직×조직 표)') : `${f.value} · 시작값 ${f.base}`}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
   }).join('');
   return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 바뀔 만한 일인지는 갱신기 모델이 판단해요">세력 평판<b>${knownFactionCodes(store, names).length}</b></h3><ul class="ph-list">${rows}</ul></section>`;
 }
@@ -654,14 +653,12 @@ export function factionView(ctx: ChatContext, code: string): string {
     : `<div class="gx-row-btns"><button class="gx-mini" data-action="pp-aff-edit">${qual ? '단계 직접 고정' : '값 직접 고정'}</button>${!qual && last ? `<small class="ps-note">마지막 계기: ${esc(last.cue ?? '')}${last.reason ? ` — ${esc(last.reason)}` : ''}</small>` : ''}</div>`;
   // 정성 모드: 숫자 막대 대신 단계 + 갱신기가 적은 이유
   const standing = qual
-    ? `<div class="pp-aff"><div class="pp-aff-top"><b>${esc(f.stage.label)}</b><span class="gx-badge fs-${f.stage.id}">${esc(f.stage.mob)}</span></div><p class="ps-note">${esc(f.note ?? '아직 갱신기 판단이 없어요. 시작 단계는 조직×조직 표에서 와요.')}</p></div>`
+    ? `<div class="pp-aff"><div class="pp-aff-top"><b>${esc(f.stage.label)}</b></div><p class="ps-note">${esc(f.note ?? '아직 갱신기 판단이 없어요. 시작 단계는 조직×조직 표에서 와요.')}</p></div>`
     : factionBar(f.value, s.factionBounds);
-  const mob = `<ul class="pp-mob">${(['friendly', 'favorable', 'neutral', 'wary', 'hostile'] as const).map((id) => `<li${f.stage.id === id ? ' class="cur"' : ''}><b>${esc(FACTION_STAGES[id].label)}</b> ${esc(FACTION_STAGES[id].mob)}</li>`).join('')}</ul>`;
   return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판${qual ? ' · 정성' : ` · 시작값 ${f.base}`}${code === uf ? ' · 주인공 소속' : ''}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="${qual ? '세력이 주인공을 어떻게 보는지 (정성 모드: 단계와 이유). 갱신기 모델이 판단해요' : '세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요'}">평판</h4><div class="pp-card-body">${standing}${edit}</div></section>
-      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4><div class="pp-card-body">${mob}</div></section>
+      <section class="pp-card"><h4 title="${qual ? '세력이 주인공을 어떻게 보는지 (정성 모드: 단계와 이유). 갱신기 모델이 판단해요' : '세력이 주인공을 어떻게 보는지 (−100~100). 갱신기 모델이 판단한 일로 바뀌어요'}">평판</h4><div class="pp-card-body">${standing}${edit}</div></section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
@@ -829,7 +826,7 @@ export function personView(ctx: ChatContext, name: string): string {
   const changes = liveChanges(store, live);
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, affOpts(ctx, p.name));
   const addr = addressOf(p, changes);
-  const seededFrom = seededOf(p) === 'lore' ? '로어북 시트' : seededOf(p) === 'dialogue' ? '필드 대사' : '빈 기록(이야기에서 등장)';
+  const seededFrom = seededOf(p) === 'lore' ? '로어북 시트' : seededOf(p) === 'dialogue' ? '대사 자료' : '빈 기록(이야기에서 등장)';
   const chars = recordChars(p, live);
   const cap = peopleSettings(ctx.chat.scriptstate).personCap;
   const sub = [p.faction ? factionName(ctx, p.faction) : '소속 모름', `시작값: ${seededFrom}`, `기록 ${chars.toLocaleString()}자 / 상한 ${cap.toLocaleString()}자${chars > cap ? ' · 정리 필요' : ''}`].filter(Boolean).join(' · ');

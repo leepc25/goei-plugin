@@ -62,7 +62,7 @@ export function createField(): GameField {
           // 인물 기록에도 (모델 없음): 계기·상태·행적. 기능이 꺼져 있으면 건너뜀
           if (peopleSettings(next.scriptstate).on) {
             const store = peopleStore(next);
-            if (applyFieldEvent(store, next, event, playerAgent(c.char.globalLore, next.scriptstate)?.name ?? '주인공', { mobWeight: peopleSettings(next.scriptstate).mobWeight, factionNames: factionNamesOf(c.char.globalLore) }) > 0) next = withPeople(next, store);
+            if (applyFieldEvent(store, next, event, playerAgent(c.char.globalLore, next.scriptstate)?.name ?? '주인공', { factionNames: factionNamesOf(c.char.globalLore) }) > 0) next = withPeople(next, store);
           }
           // 출동 종료: 같은 저장에 일지 줄·보고서 (core/journal/field). 모델 호출 없음
           if (event.kind === 'exit_field' || event.kind === 'exit_anomaly') {

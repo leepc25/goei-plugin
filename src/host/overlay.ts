@@ -97,10 +97,6 @@ ${themeVars('[x-goei-fab]')}
   55% { opacity: 1; transform: scale(.96); filter: blur(0); }
   100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
 }
-/* 대전 단추 (설정 「대전」을 켠 PC 에서만): 유령 단추 바로 밑 */
-[x-goei-fab] button[data-vs] { position: absolute; top: calc(100% + 8px); left: 0; display: none; }
-[x-goei-fab][x-goei-vs="true"] button[data-vs] { display: flex; }
-[x-goei-fab][x-goei-vs-open="true"] button[data-vs] { background: var(--g-signal); color: var(--g-acc); border-color: var(--g-signal); }
 @keyframes goei-fab-pop {
   0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
   60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
@@ -123,13 +119,9 @@ ${themeVars('[x-goei-fab]')}
 }
 `;
 
-/** 게임패드 모양 (대전 단추, 11-08 사용자: 유령 단추 밑) */
-const PAD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 8h9a4.5 4.5 0 0 1 4.4 3.6l.9 4.6a2.4 2.4 0 0 1-4.1 2.1L15.6 16H8.4l-2.1 2.3a2.4 2.4 0 0 1-4.1-2.1l.9-4.6A4.5 4.5 0 0 1 7.5 8z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11.2" r=".6" fill="currentColor"/><circle cx="17.3" cy="13" r=".6" fill="currentColor"/></svg>';
-
 const FAB_HTML = (label: string) => `<span data-gr></span><span data-gr></span>
 <span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
-<button type="button" aria-label="${label}">${GHOST_ICON}</button>
-<button type="button" data-vs aria-label="대전">${PAD_ICON}</button>`;
+<button type="button" aria-label="${label}">${GHOST_ICON}</button>`;
 
 type Safe = Awaited<ReturnType<RisuaiPluginAPI['getRootDocument']>>;
 type SafeEl = Awaited<ReturnType<Safe['createElement']>>;
@@ -148,8 +140,6 @@ export interface Fab {
   /** 창을 열면 효과를 바로 끝낸다 */
   endIntro(): void;
   setTheme(theme: ThemeName): Promise<void>;
-  /** 대전 단추를 보일지, 대전이 열려 있는지 (열려 있으면 단추를 켠 색으로) */
-  setVersus(show: boolean, open?: boolean): Promise<void>;
   /** 채팅 화면이 떠 있는지 (본 화면 DOM으로 확인) */
   chatScreenVisible(): Promise<boolean>;
   remove(): Promise<void>;
@@ -197,7 +187,7 @@ async function removeLeftovers(doc: Safe): Promise<void> {
  * 주의: Risu의 SafeElement.addEventListener는 요소가 아니라 문서 전체에 리스너를 건다.
  * 그래서 모든 클릭·포인터 이벤트에서 좌표가 버튼 안인지 직접 확인해야 한다.
  */
-export async function createFab(onOpen: () => void, onVersus?: () => void): Promise<Fab> {
+export async function createFab(onOpen: () => void): Promise<Fab> {
   const root = await body();
   if (!root) throw new Error('Risu 화면 접근 권한이 없어요.');
   const { doc } = root;
@@ -216,8 +206,6 @@ export async function createFab(onOpen: () => void, onVersus?: () => void): Prom
   await root.body.appendChild(host);
   const button = await host.querySelector('button');
   if (!button) throw new Error('여는 버튼을 만들지 못했어요.');
-  const padBtn = await host.querySelector('button[data-vs]');
-  let padShown = false;
 
   let pos = await loadPos();
   const applyPos = async () => {
@@ -324,7 +312,6 @@ export async function createFab(onOpen: () => void, onVersus?: () => void): Prom
   };
   const onClick = async (ev: PointerEv) => {
     if (!visible) return;
-    if (padShown && padBtn && onVersus && inside((await padBtn.getBoundingClientRect()) as Rect, ev.clientX, ev.clientY)) { onVersus(); return; }
     if (!inside(await rect(), ev.clientX, ev.clientY)) return;
     await loop;
     if (moved) return; // 끌고 놓은 뒤 따라오는 클릭
@@ -394,11 +381,6 @@ export async function createFab(onOpen: () => void, onVersus?: () => void): Prom
     async setTheme(theme) {
       await host.setAttribute('x-goei-theme', theme);
       await cardStyle.setTextContent(chatCss(theme));
-    },
-    async setVersus(show, open = false) {
-      padShown = show;
-      await host.setAttribute('x-goei-vs', show ? 'true' : 'false');
-      await host.setAttribute('x-goei-vs-open', open ? 'true' : 'false');
     },
     async chatScreenVisible() {
       return !!(await doc.querySelector('.default-chat-screen'));
