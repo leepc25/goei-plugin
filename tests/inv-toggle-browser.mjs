@@ -22,7 +22,13 @@ for (const vp of ['pc', 'phone']) {
     await page.evaluate(({ action, value }) => document.querySelector(`.gw [data-action="${action}"]${value ? `[data-value="${value}"]` : ''}`)?.click(), { action, value });
     await sleep(450);
   };
-  const shopSwitch = () => page.evaluate(() => { const e = document.querySelector('.gw [data-action="set-shop-on"]'); return e ? { on: e.getAttribute('aria-checked') === 'true' || e.classList.contains('on'), disabled: e.disabled } : null; });
+  // 상점 켬·끔은 설정 → 상점 격자의 첫 줄(기본 상점) 「사용」 칸 (2026-11-12 설정 개편: 격자). 보고 나서 소지품 페이지로 돌아온다
+  const shopSwitch = async () => {
+    await goNode(page, 'set:shop'); await sleep(250);
+    const r = await page.evaluate(() => { const e = document.querySelector('.gw .ck-pc .ck-row .ck-cell button.ck-m'); return e ? { on: e.getAttribute('aria-pressed') === 'true', disabled: e.disabled } : null; });
+    await goNode(page, 'set:items'); await sleep(250);
+    return r;
+  };
 
   await openWin(page); await sleep(300);
   if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) await closeEditor(page, true);
@@ -68,6 +74,7 @@ for (const vp of ['pc', 'phone']) {
   // 5. 다시 켜면 메뉴가 돌아오고 상점 스위치도 켜짐
   await openEditor(page, 'set:items');
   await flip('set-inv-on', '1');
+  await goNode(page, 'set:wallet'); await sleep(250);
   await flip('set-wallet-on', '1');
   s = await ss();
   check(s.$it_on === '1' && s.$st_col_wallet === 'on', `[${vp}] 다시 켬 저장 안 됨 (${s.$it_on}, ${s.$st_col_wallet})`);

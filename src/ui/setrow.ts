@@ -189,15 +189,18 @@ export type CkMark = boolean | CkNum | null;
 /** acts: 칸마다 누르면 보낼 값. 체크 칸은 「갈래:메뉴:열쇠=값」 그대로(fam-set), 수 칸은 「갈래:메뉴:열쇠」(fam-num 이 「=값」을 붙인다) */
 export interface CkRow { label: string; marks: CkMark[]; acts: (string | null)[] }
 /** 격자 칸의 조작 하나 (PC 격자와 폰 묶음이 같이 쓴다) */
-export interface CkActs { set: string; num: string }
+/** rel = − + 단추가 「열쇠:-」「열쇠:+」를 보낸다 (처리기가 폭을 아는 값: 상황판 괴이 발생) */
+export interface CkActs { set: string; num: string; rel?: boolean }
 const FAM_ACTS: CkActs = { set: 'fam-set', num: 'fam-num' };
 let ckActs: CkActs = FAM_ACTS;
 const ckCtl = (m: CkMark | undefined, act: string | null | undefined, aria: string, round: boolean, busy: boolean): string => {
+  // 체크 칸인데 보낼 값이 없으면 잠긴 칸 (다른 설정 때문에 지금 못 바꾸는 값)
+  if (typeof m === 'boolean' && !act) return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" aria-pressed="${m}" aria-label="${aria} (잠김)" disabled></button>`;
   if (m === null || m === undefined || !act) return '<span class="ck-x" aria-label="없음">–</span>';
   const off = busy ? ' disabled' : '';
   if (typeof m === 'boolean') return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" data-action="${ckActs.set}" data-value="${esc(act)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
   const st = m.step ?? 1;
-  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${ckActs.num}" data-value="${esc(act)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
+  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${ckActs.num}" data-value="${esc(act)}${ckActs.rel ? `:${sign === '+' ? '+' : '-'}` : `=${to}`}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
   return `<div class="st-step adv-step">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="${ckActs.num}" data-key="${esc(act)}" value="${m.n}" style="width:${numWidth(m.hi)}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
 };
 /** 수 조작 하나 (격자 밖 줄에서도 같은 모양·같은 처리기) */

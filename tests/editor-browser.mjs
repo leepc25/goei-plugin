@@ -97,7 +97,7 @@ await page.click('[data-action="prefs-open"]');
 // 2026-10-27: 설정은 창 하나. 시작 전 설정 단추도 그 창(설정 → 화면)을 연다
 await page.waitForSelector('.gw .gw-win');
 assert.ok(await page.$('.gw-set .gw-setbody .ps-group'), '설정 페이지(화면)');
-assert.ok(await page.$('[data-action="ed-node"][data-value="set:gnet"]'), '설정 트리');
+assert.ok(await page.$('[data-action="ed-node"][data-value="set:net"]'), '설정 트리');
 // 탭 → 노드 (2026-10-27: 왼쪽 목록은 탭마다 달라서, 노드를 누르기 전에 그 탭을 누른다)
 const tabOfNode = (n) => (n.startsWith('guide:') || n.startsWith('rule:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
 async function goNode(n) {

@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const started = () => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } });
-const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:journal', 'set:items', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'agent', 'org', 'start', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:all', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
+const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:net', 'set:phone', 'set:wiki', 'set:journal', 'set:items', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'agent', 'org', 'start', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:all', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
 const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records'];
 // 유령 버튼은 다시 보일 때 리스너를 떼고 다시 건다(떼기마다 비동기) → 그게 끝난 뒤에 잰다
 const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length })));
@@ -175,7 +175,7 @@ for (const vp of vps) {
     await page.waitForFunction(() => !document.querySelector('.gw .gw-win')?.classList.contains('drawer') && document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'set:image');
     const cols = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row')].map((r) => getComputedStyle(r).gridTemplateColumns.trim().split(/\s+/).length));
     assert.ok(cols.length && cols.every((c) => c === 1), `폰 줄은 한 열 (${[...new Set(cols)].join(',')})`);
-    await goNode(page, 'set:gnet');
+    await goNode(page, 'set:phone');
     const widths = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row textarea, .gw .ps-ctl > input.ps-text')].map((t) => { const w = t.getBoundingClientRect().width; const p = t.closest('.ps-row').getBoundingClientRect().width; return Math.round((w / p) * 100); }));
     assert.ok(widths.length && widths.every((w) => w >= 85), `폰 글칸 전체 폭 (${widths.join(',')}%)`);
     await goNode(page, 'agent');

@@ -292,12 +292,12 @@ if (want('G2')) {
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_nick ?? '').startsWith('닉<img'));
   assert.equal(await page.evaluate(() => window.__xss), undefined, '닉네임도 글자로');
   assert.equal(await page.locator('.br img[src="x"]').count(), 0, '닉네임 img 태그가 글자로만');
-  await featSet(page, 'set:gnet');
-  await page.fill('[data-change="gn-text"][data-key="subject"]', `주제 "${evil}`);
-  await page.dispatchEvent('[data-change="gn-text"][data-key="subject"]', 'change');
+  await featSet(page, 'set:net');
+  await page.fill('[data-change="fam-text"][data-key="b:gn:subject"]', `주제 "${evil}`);
+  await page.dispatchEvent('[data-change="fam-text"][data-key="b:gn:subject"]', 'change');
   await page.waitForFunction(() => (window.__chat.scriptstate['$lb_cfg_lb-gn.subject'] ?? '').startsWith('주제'));
   assert.equal(await page.evaluate(() => window.__xss), undefined);
-  assert.equal(await page.inputValue('[data-change="gn-text"][data-key="subject"]'), `주제 "${evil}`, '글칸 값은 그대로');
+  assert.equal(await page.inputValue('[data-change="fam-text"][data-key="b:gn:subject"]'), `주제 "${evil}`, '글칸 값은 그대로');
   assert.deepEqual(errors, []);
   console.log('PASS 괴담넷: 모델 출력·사용자 입력 HTML escape (글·댓글·쪽지·닉네임·설정)');
   await page.close();
@@ -340,23 +340,23 @@ if (want('G3')) {
   // 쪽지함: 상대 3명, 각 20통 (기본 상한 40 안) → 자동 정리 상한을 5로 내리면 저장 때 5통만
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   assert.equal(await page.locator('.gn-dmrow').count(), 3);
-  await featSet(page, 'set:gnet');
-  await page.fill('[data-change="gn-keep"]', '5');
-  await page.dispatchEvent('[data-change="gn-keep"]', 'change');
+  await featSet(page, 'set:net');
+  await page.fill('[data-change="fam-num"][data-key="b:gn:dmkeep"]', '5');
+  await page.dispatchEvent('[data-change="fam-num"][data-key="b:gn:dmkeep"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_limit_dm === '5');
   // 상한은 다음 저장(writeGnet) 때 적용된다: 쪽지를 하나 읽으면 저장된다
-  await featSet(page, 'set:gnet');
+  await featSet(page, 'set:net');
   await page.click('.gn-dmrow[data-value="상대0"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw.match(/^D\|상대0\|/gm) ?? []).length === 5, null, { timeout: 4000 });
   assert.equal((await page.evaluate(() => window.__chat.scriptstate.$gn_raw.match(/^D\|상대1\|/gm).length)), 5, '다른 상대도 5통');
   // 자동 정리를 끄면 상한을 넘겨도 지우지 않는다
-  await featSet(page, 'set:gnet');
-  await page.click('[data-action="gn-cfg"][data-value="storage=0"]');
+  await featSet(page, 'set:net');
+  await page.click('[data-action="fam-set"][data-value="b:gn:storage=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_auto_dm === '0');
-  assert.equal(await page.locator('[data-change="gn-keep"]').count(), 0, '끄면 상한 칸이 사라진다');
+  assert.equal(await page.locator('[data-change="fam-num"][data-key="b:gn:dmkeep"]').count(), 0, '끄면 상한 칸이 사라진다');
   // 설정: 수량·사생활·다양성·주제가 요청문에 들어간다
   // 게시글 수 최소·최대 (직접 입력): 최소 12 → 최대도 12, 최대 30 → 범위 끝 20, 최소 7
-  const setCount = async (key, val) => { await page.fill(`[data-change="gn-count"][data-key="${key}"]`, val); await page.dispatchEvent(`[data-change="gn-count"][data-key="${key}"]`, 'change'); };
+  const setCount = async (key, val) => { await page.fill(`.ck-pc [data-change="fam-num"][data-key="b:gn:${key}"]`, val); await page.dispatchEvent(`.ck-pc [data-change="fam-num"][data-key="b:gn:${key}"]`, 'change'); };
   await setCount('post_min', '12');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '12' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '12');
   await setCount('post_max', '30');
@@ -364,11 +364,11 @@ if (want('G3')) {
   await setCount('post_min', '7');
   await setCount('post_max', '9');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.post_min'] === '7' && window.__chat.scriptstate['$lb_cfg_lb-gn.post_max'] === '9');
-  await page.click('[data-action="gn-cfg"][data-value="sampling=1"]');
+  await page.click('[data-action="fam-set"][data-value="b:gn:sampling=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.sampling'] === '1');
-  await page.click('[data-action="gn-cfg"][data-value="privacy=4"]');
+  await page.click('.ck-pc [data-action="fam-set"][data-value="b:gn:privacy=4"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.privacy'] === '4');
-  await featSet(page, 'set:gnet');
+  await featSet(page, 'set:net');
   await page.click('[data-action="gn-cat"][data-value=""]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
   await page.click('[data-action="br-reload"]');

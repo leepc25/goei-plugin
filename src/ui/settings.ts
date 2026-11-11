@@ -186,7 +186,7 @@ function worldStep(key: WorldField['key']): number {
 
 /** 괴이 발생: 종류 넷이 같은 값을 가지니 격자 하나로 (줄 = 종류, 열 = 값. 인터넷·상점 격자와 같은 틀).
  *  버튼은 set-world 에 「열쇠=값」(수) · 「열쇠:값」(켬·끔)을 보낸다 */
-const WORLD_ACTS: CkActs = { set: 'set-world', num: 'set-world' };
+const WORLD_ACTS: CkActs = { set: 'set-world', num: 'set-world', rel: true };
 const WORLD_KINDS: ['preset' | 'random' | 'incident' | 'mystic', string][] = [['preset', '프리셋 괴이'], ['random', '랜덤 괴이'], ['incident', '사건'], ['mystic', '특수']];
 const worldNum = (w: WorldSettings, key: WorldField['key']): CkNum => ({ n: w[key], lo: 0, hi: WORLD_SPEC.find((x) => x.key === key)?.max ?? 99, step: worldStep(key) });
 function worldGrid(w: WorldSettings, busy: boolean): string {
@@ -198,13 +198,13 @@ function worldGrid(w: WorldSettings, busy: boolean): string {
       { name: '자동 종료', opts: ['켬'], kind: 'check' },
       { name: 'RP 유지 시간', opts: ['시간'], kind: 'num' },
     ],
-    marks: WORLD_KINDS.map(([k]) => [worldNum(w, `${k}_cap`), worldNum(w, `${k}_p`), w[`${k}_expire`] === 1, worldNum(w, `${k}_ttl`)]),
+    marks: WORLD_KINDS.map(([k]) => [worldNum(w, `${k}_cap`), worldNum(w, `${k}_p`), w[`${k}_expire`] === 1, w[`${k}_expire`] === 1 ? worldNum(w, `${k}_ttl`) : null]),
     acts: WORLD_KINDS.map(([k]) => [`${k}_cap`, `${k}_p`, `${k}_expire:${w[`${k}_expire`] === 1 ? 0 : 1}`, `${k}_ttl`]),
     foot: helpBox('응답을 처리할 때마다 판정해요.', [
       ['동시 최대', '같은 때에 살아 있을 수 있는 수예요. 0이면 그 종류는 저절로 생기지 않아요.'],
       ['발생 확률', '응답 하나를 처리할 때 새로 생길 확률이에요.'],
       ['자동 종료', '켜면 RP 유지 시간이 지났을 때 플러그인이 끝내요. 끄면 모델이 끝낼 때까지 남아요.'],
-      ['RP 유지 시간', '생긴 뒤 이야기 속 시간으로 이만큼 지나면 끝나요. 모델이 먼저 끝내면 그때 끝나요.'],
+      ['RP 유지 시간', '생긴 뒤 이야기 속 시간으로 이만큼 지나면 끝나요. 모델이 먼저 끝내면 그때 끝나요. 자동 종료가 꺼져 있으면 쓰지 않아 「–」로 보여요.'],
     ]),
   };
   const n = (key: WorldField['key'], aria: string, unit: string) => numCtl(key, worldNum(w, key), aria, unit, busy, WORLD_ACTS);

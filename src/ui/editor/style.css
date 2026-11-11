@@ -671,3 +671,9 @@
 }
 .gw .ps-row .hb-i > b, .gw .mx-foot .hb-i > b { font-size: 13px; font-weight: 700; color: var(--dim); }
 .gw .fam-set > .st-step { justify-self: start; }
+
+/* 격자 칸 수의 기본값 (실제 값은 격자마다 style 로 준다) */
+.gw .mx { --mx-n: 4; }
+.gw .ck { --ck-n: 1; }
+/* 잠긴 체크 칸 (다른 설정 때문에 지금 못 바꾸는 값) */
+.gw .ck-m:disabled { opacity: .45; cursor: default; }

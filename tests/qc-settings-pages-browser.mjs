@@ -10,9 +10,9 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 
-const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv']; // 11-09: 업데이트는 점검 → 설치·업데이트(install) 페이지로 합쳐짐
+const PAGES = ['screen', 'image', 'board', 'status', 'net', 'phone', 'wiki', 'journal', 'items', 'people', 'factions', 'lore', 'adv']; // 11-09: 업데이트는 점검 → 설치·업데이트(install) 페이지로 합쳐짐
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
-const FEATURE = new Set(['gnet', 'phone', 'wiki', 'people', 'journal', 'factions']);
+const FEATURE = new Set(['net', 'phone', 'wiki', 'people', 'journal', 'factions']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
 const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|man-|ip-|dir-|mk-|nav-|tab|close)/;
 const CHANGE_SKIP = /^(ed-|dir-|ip-|pp-diag-all|pp-backfill-turns|pp-reread-turns)/;
@@ -269,7 +269,7 @@ for (const vp of vps) {
       assert.ok(await page.$(worldBtn('preset_ttl', '+')), '자동 종료 ON → 유지 시간 줄');
     }
     // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수 (가계부 묶음은 기록 페이지, 2026-11-05 사용자)
-    await goNode(page, 'set:items');
+    await goNode(page, 'set:wallet');
     const won = '.gw .st-won';
     if (await page.$(won)) {
       const chatWon = async () => JSON.parse((await chatOf(page)).scriptstate.$st_wallet ?? '{}');

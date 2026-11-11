@@ -10,8 +10,8 @@ const started = { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: 
 const { page, errors } = await boot(b, fx, started, { width: 1600, height: 1000 });
 await openWin(page);
 await page.waitForSelector('.gx-tabhead');
-await openEditor(page, 'set:gnet');
-for (const n of ['set:gnet', 'set:phone', 'set:wiki', 'set:people', 'set:status', 'set:items', 'manage:people']) {
+await openEditor(page, 'set:net');
+for (const n of ['set:net', 'set:phone', 'set:wiki', 'set:people', 'set:status', 'set:items', 'manage:people']) {
   await goNode(page, n);
   await sleep(400);
   await page.evaluate(() => document.querySelector('.gw .gw-body')?.scrollTo(0, 0));

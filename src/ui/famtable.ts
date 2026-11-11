@@ -189,19 +189,19 @@ export function shopTable(vars: State, busy = false): string {
     { name: '자동 호출', opts: ['수동', '창을 열 때', '매 턴'], kind: 'one' },
     { name: '모델', opts: ['메인', '보조'], kind: 'one' },
   ], marks: each((id, s) => { const a = autoOf[id]; return [
-    // 기본 상점은 소지품·가계부가 꺼지면 같이 꺼진다 (그때는 칸을 비운다)
-    id === 'shop' ? (blocked ? null : s.on) : id === 'hs' ? hs.on : null,
+    // 기본 상점은 소지품·가계부가 꺼지면 같이 꺼진다 (그때는 꺼진 채 잠긴 칸)
+    id === 'shop' ? (blocked ? false : s.on) : id === 'hs' ? hs.on : null,
     id === 'shop' ? null : a === 'manual', id === 'shop' ? null : a === 'open', id === 'shop' || id === 'hs' ? null : a === 'turn',
     s.model === 'main', s.model !== 'main'];
   }), acts: each((id, s) => { const b = `s:${id}`; return [
-    `${b}:on=${(id === 'hs' ? hs.on : s.on) ? '0' : '1'}`, `${b}:auto=manual`, `${b}:auto=open`, `${b}:auto=turn`, `${b}:model=main`, `${b}:model=aux`];
+    id === 'shop' && blocked ? null : `${b}:on=${(id === 'hs' ? hs.on : s.on) ? '0' : '1'}`, `${b}:auto=manual`, `${b}:auto=open`, `${b}:auto=turn`, `${b}:model=main`, `${b}:model=aux`];
   }), foot: '' };
   const shelf: CkBand = { title: '진열대', groups: [
     { name: '상품 수', opts: ['최소', '최대'], kind: 'num' },
     { name: '구획', opts: ['켬'], kind: 'check' },
   ], marks: each((id, s) => [size(s.size[0]), size(s.size[1]), id === 'hs' ? null : s.feature]),
     acts: each((id, s) => [`s:${id}:min`, `s:${id}:max`, `s:${id}:feature=${s.feature ? '0' : '1'}`]),
-    foot: helpBox('「–」는 그곳에 없는 값이에요. 쇼핑몰 둘은 소지품과 가계부가 켜져 있으면 늘 열리고, 기본 상점은 아래 「열리는 조건」을 따라요.', [
+    foot: helpBox(`「–」는 그곳에 없는 값이에요. 쇼핑몰 둘은 소지품과 가계부가 켜져 있으면 늘 열리고, 기본 상점은 아래 「열리는 조건」을 따라요.${blocked ? ` 지금은 ${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 기본 상점도 꺼져 있어요.` : ''}`, [
       ['상품 수', '한 번에 받는 물건의 수예요. 망상홈쇼핑은 한 편성의 상품 수예요.'],
       ['구획', '켜면 눈에 띄는 물건을 따로 받아 딱지를 붙여 보여 줘요.'],
     ]) };
