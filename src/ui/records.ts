@@ -3,6 +3,7 @@
 // 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
 // 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
+import { setRow } from './setrow';
 import {
   JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
@@ -581,7 +582,7 @@ export function recordsInput(name: string, value: string): boolean {
 // ── 설정 「기록」 묶음 ──
 
 const CHAT_CARD: [string, string][] = [['off', '안 띄움'], ['mine', '내가 출동한 사건만'], ['all', '전부']];
-const row = (label: string, control: string, help = '') => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+const row = (label: string, control: string, help = '') => setRow(label, control, help);
 function seg(key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'jr-set', (v) => `${key}=${v}`);
   if (sw) return sw;

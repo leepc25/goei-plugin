@@ -1,4 +1,5 @@
 // 세계 편집 창 「설치 · 점검」 (설계안 9절): 깡통봇에 플러그인 카드 요소를 심고, 없어진 것을 알려 주고 다시 만든다.
+import { setRow } from '../setrow';
 import { installSummary, type InstallState } from '../../core/install';
 import { checkInstall, installIcon, installLoreAndGreetings, installPictures, installTokenizer, installWikiPack, restoreIcon } from '../../host/install';
 import type { ChatContext } from '../../host/risu';
@@ -52,7 +53,7 @@ const mark = (b: boolean) => (b ? '<span class="gw-inst-ok">✓ 있음</span>' :
 
 /** 점검표: 다른 설정 페이지와 같은 줄 모양 (이름·설명 왼쪽, 상태 오른쪽) */
 function statusList(s: InstallState): string {
-  const li = (ok: boolean, label: string, note: string) => `<div class="ps-row"><div class="ps-label"><b>${label}</b><small>${note}</small></div><div class="ps-ctl">${mark(ok)}</div></div>`;
+  const li = (ok: boolean, label: string, note: string) => setRow(label, mark(ok), note);
   const loreOk = s.settingsFolder && s.directory && s.manifest;
   const pics = s.pictures;
   return `<section class="ps-group"><h3>점검</h3><div class="ps-rows gw-inst-list">

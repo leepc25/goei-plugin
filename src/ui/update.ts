@@ -1,4 +1,5 @@
 // 설정 → 「업데이트」: 저장소의 최신 카드·플러그인 버전을 확인하고, 카드는 이 창에서 바로 갱신한다.
+import { setRow } from './setrow';
 import { cardVersion, compareVersions, isPayload, planUpdate, PLUGIN_VERSION, UPDATE_BASE, type CardPayload, type UpdatePlan } from '../core/update';
 import { readManifest } from '../core/start';
 import type { ChatContext } from '../host/risu';
@@ -174,8 +175,7 @@ export function updateGroup(ctx: ChatContext): string {
   const cur = cardVersion(ctx.char.globalLore);
   const lite = !!readManifest(ctx.char.globalLore);
   const L = updateUi.latest;
-  const row = (label: string, value: string, help = '') =>
-    `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${value}</div></div>`;
+  const row = (label: string, value: string, help = '') => setRow(label, value, help);
   if (!UPDATE_BASE) {
     return section(row('업데이트', '<span class="gx-muted">준비 중</span>', '업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요.'));
   }

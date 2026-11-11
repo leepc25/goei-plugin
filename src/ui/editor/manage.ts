@@ -1,5 +1,6 @@
 // 점검 탭: 설정 내보내기(기기 설정 내보내기·가져오기, 저장소 사용량), 상태 점검, 요청 기록(진단 묶음 내려받기·최근 실패·인물 기록 갱신 기록).
 // 설치·점검과 업데이트는 각각 install.ts / ui/update.ts.
+import { setRow } from '../setrow';
 import { chatSettingVars, getPrefs, isChatSettingVar } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
 import { isGoeiLore } from '../../core/install';
@@ -111,7 +112,7 @@ export function ensureManage(render: () => void): void {
   });
 }
 
-const row = (label: string, ctl: string, help = '') => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${ctl}</div></div>`;
+const row = (label: string, ctl: string, help = '') => setRow(label, ctl, help);
 const badge = (ok: boolean | null, text: string) => `<span class="gw-state${ok === null ? ' off' : ok ? '' : ' bad'}">${esc(text)}</span>`;
 const head = (crumb: string, title: string, desc: string, act = '') =>
   `<header class="gw-head"><h2>${esc(title)}${crumb ? `<small>${esc(crumb)}</small>` : ''}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ''}<p class="gx-muted">${esc(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc(manUi.notice)}</div>` : ''}${manUi.info ? `<p class="gx-hint">${esc(manUi.info)}</p>` : ''}</header>`;

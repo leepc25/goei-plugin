@@ -5,9 +5,12 @@ import type { SetDef, SetGroup, SetPage } from '../core/setdef/types';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+/** 범위 배지: 'device' = 이 기기 공통 값, 'chat'·'defaults' = 범위 전환이 없는 페이지에서 그 줄만 다른 범위일 때 */
+export const SCOPE_BADGE = { device: '이 기기', chat: '이 채팅', defaults: '새 채팅 기본값' } as const;
+export type RowScope = keyof typeof SCOPE_BADGE;
 /** 설정 한 줄: 왼쪽 이름·설명, 오른쪽 조작. label·help·control 은 HTML */
-export const setRow = (label: string, control: string, help = '', cls = ''): string =>
-  `<div class="ps-row${cls ? ` ${cls}` : ''}"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+export const setRow = (label: string, control: string, help = '', cls = '', scope?: RowScope): string =>
+  `<div class="ps-row${cls ? ` ${cls}` : ''}"><div class="ps-label"><b>${label}${scope ? `<i class="gx-scope${scope === 'device' ? '' : ` ${scope}`}">${SCOPE_BADGE[scope]}</i>` : ''}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
 /** 설정 묶음 */
 export const setGroup = (title: string, rows: string, note = ''): string =>
   `<section class="ps-group">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${rows}</div></section>`;

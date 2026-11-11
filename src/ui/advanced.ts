@@ -1,5 +1,6 @@
 // 「고급 설정」 접는 칸 (v0.16.27, 사용자 설계): 각 기능 설정 맨 아래, 기본은 닫힘. 손대지 않아도 원본 기본값으로 돈다.
 // 바꾼 항목은 이름 앞 점과 되돌리기 버튼으로 보이고, 닫힌 칸 제목에 바꾼 개수가 뜬다.
+import { setRow } from './setrow';
 import { ADV, advChanged, advItem, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
@@ -37,7 +38,7 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);
   const changed = cur !== String(item.def);
-  return `<div class="ps-row adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(item.label)}</b>${item.hint ? `<small>${esc(item.hint)}</small>` : ''}</div><div class="ps-ctl">${control(f, item, cur)}</div></div>`;
+  return setRow(esc(item.label), control(f, item, cur), item.hint ? esc(item.hint) : '', `adv-row${item.type === 'num' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}`);
 }
 
 function chips(f: AdvFeature, items: AdvItem[], state: State): string {

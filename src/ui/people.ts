@@ -1,5 +1,6 @@
 // 「살아 있는 인물 기록」 화면 (docs/인물기록_호감_통합설계_3판.md 6-2·6-3): 설정 → 기능별 설정 「인물 기록」 페이지,
 // 위키 탭의 「이 채팅의 인물」(목록·인물 상세·문서) 하위 뷰. 저장은 모두 updateChat 으로, 값(호감·호칭)은 기록에서 매번 계산한다.
+import { setGroup, setRow } from './setrow';
 import { onOffSwitch } from './controls';
 import type { Chat } from '../core/types';
 import { messageText } from '../core/refs';
@@ -165,9 +166,8 @@ function seg(key: string, cur: string, items: [string, string][], action = 'pp-s
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${esc(`${key}=${v}`)}" aria-pressed="${cur === v}">${label}</button>`)
     .join('')}</div>`;
 }
-const row = (label: string, control: string, help = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, body: string, note = '') => `<section class="ps-group">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
+const row = (label: string, control: string, help = '') => setRow(label, control, help);
+const group = setGroup;
 const fold = (key: string, title: string, body: string, open = false) => `<details class="ps-adv-sub" data-keep="${key}"${keepOpen(key, open)}><summary>${title}</summary><div class="ps-rows">${body}</div></details>`;
 const srcIcon = (src: EntrySrc) => `<i class="pp-src s-${src}" title="${esc(SRC_HELP[src])}" aria-label="${SRC_LABEL[src]}">${SRC_ICON[src]}</i>`;
 
