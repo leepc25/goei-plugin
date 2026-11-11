@@ -164,7 +164,7 @@ export function traceMain(messages: { role?: string; content?: unknown }[], fail
     totalChars: rows.reduce((n, r) => n + r.content.length, 0),
     totalTokens: rows.reduce((n, r) => n + tokens(r.content), 0),
   };
-  progressMain(); // 본편 요청을 보낸다
+  progressMain(open.main.totalTokens); // 본편 요청을 보낸다
   save();
 }
 

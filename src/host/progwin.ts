@@ -145,39 +145,48 @@ function titleOf(t: Turn, now: number): string {
   }
 }
 
-/** 제목 아래 한 줄: 도는 호출의 모델·요청 토큰·출력 글자·경과, 끝나면 합계 */
+/** 보냄·받음 한 가지 틀 (2026-11-11 사용자: 「숫자 → 숫자」는 알아보기 힘들다, 본편만 다른 말을 쓰지 않는다). 받는 중이면 got 없이 */
+function sentGot(sent: number | undefined, got?: number): string {
+  const a = sent === undefined ? '' : `보냄 ${num(sent)}`;
+  const b = got === undefined ? '받는 중' : `받음 ${num(got)}`;
+  return a ? `${a} · ${b}` : b;
+}
+
+/** 제목 아래 한 줄: 도는 호출의 모델·보낸 토큰·출력 글자·경과, 끝나면 합계 */
 function metaOf(t: Turn, now: number): string {
   if (t.endAt) {
     const s = turnSummary(t);
-    return `호출 <b data-mono>${num(s.calls)}</b>회 · <b data-mono>${num(s.req)} → ${num(s.resp)}</b> 토큰 · <b data-mono>${esc(secs(s.ms))}</b>`;
+    return `호출 <b data-mono>${num(s.calls)}</b>회 · 보냄 <b data-mono>${num(s.req)}</b> · 받음 <b data-mono>${num(s.resp)}</b> 토큰 · <b data-mono>${esc(secs(s.ms))}</b>`;
   }
   const run = running(t);
   const parts: string[] = [];
   if (run.length) {
     const models = [...new Set(run.map((c) => modelName(c.model)))].join('·');
     parts.push(run.length > 1 ? `${esc(models)} ${run.length}건 동시` : `${esc(models)} 모델`);
-    parts.push(`요청 <b data-mono>${num(run.reduce((n, c) => n + c.reqTokens, 0))}</b> 토큰`);
+    parts.push(`보냄 <b data-mono>${num(run.reduce((n, c) => n + c.reqTokens, 0))}</b> 토큰`);
     const chars = run.reduce((n, c) => n + (c.chars ?? 0), 0);
-    if (chars) parts.push(`출력 <b data-mono>~${num(chars)}</b>자`);
-  } else if (t.mainAt && !t.replyAt) parts.push('Risu 가 본편 응답을 받는 중');
+    if (chars) parts.push(`받는 중 <b data-mono>~${num(chars)}</b>자`);
+  } else if (t.mainAt && !t.replyAt) parts.push(`${esc(modelName('main'))} 모델${t.mainTokens === undefined ? '' : ` · 보냄 <b data-mono>${num(t.mainTokens)}</b> 토큰`}`);
   parts.push(`경과 <b data-mono>${clock(now - t.at)}</b>`);
   return parts.join(' · ');
 }
 
-/** 단계 한 줄의 작은 글씨·오른쪽 시간 */
+/** 단계 한 줄의 작은 글씨·오른쪽 시간. 본편도 보조 호출과 같은 틀: 모델 · 보냄 · 받음 */
 function rowDetail(t: Turn, s: Stage, st: StageState, now: number): { dt: string; tm: string } {
   if (s.id === 'main') {
-    if (st === 'done') return { dt: `Risu 응답${t.replyTokens ? ` · ${num(t.replyTokens)} 토큰` : ''}`, tm: secs((t.replyAt ?? now) - (t.mainAt ?? t.at)) };
-    if (st === 'run') return { dt: 'Risu 응답', tm: `${Math.floor((now - (t.mainAt ?? t.at)) / 1000)}초` };
+    const who = modelName('main');
+    if (st === 'done') return { dt: `${who} · ${sentGot(t.mainTokens, t.replyTokens ?? 0)}`, tm: secs((t.replyAt ?? now) - (t.mainAt ?? t.at)) };
+    if (st === 'run') return { dt: `${who} · ${sentGot(t.mainTokens)}`, tm: `${Math.floor((now - (t.mainAt ?? t.at)) / 1000)}초` };
     return { dt: '', tm: '' };
   }
   const calls = t.calls.filter((c) => c.stage === s.id);
   if (!calls.length) return { dt: s.note ?? '', tm: st === 'skip' ? '없음' : '' };
   const c = calls[calls.length - 1];
   const more = calls.length > 1 ? ` · ${calls.length}회` : '';
-  if (c.ms === undefined) return { dt: `${s.note ? `${s.note} · ` : ''}${modelName(c.model)} · ${num(c.reqTokens)} → ${c.chars ? `~${num(c.chars)}자` : '…'}${more}`, tm: `${Math.floor((now - c.at) / 1000)}초` };
+  const head = `${s.note ? `${s.note} · ` : ''}${modelName(c.model)} · `;
+  if (c.ms === undefined) return { dt: `${head}보냄 ${num(c.reqTokens)} · 받는 중${c.chars ? ` ~${num(c.chars)}자` : ''}${more}`, tm: `${Math.floor((now - c.at) / 1000)}초` };
   if (!c.ok) return { dt: (c.error ?? '실패').split('\n')[0].slice(0, 40) + more, tm: secs(c.ms) };
-  return { dt: `${s.note ? `${s.note} · ` : ''}${modelName(c.model)} · ${num(c.reqTokens)} → ${num(c.respTokens ?? 0)}${more}`, tm: secs(calls.reduce((n, x) => n + (x.ms ?? 0), 0)) };
+  return { dt: `${head}${sentGot(c.reqTokens, c.respTokens ?? 0)}${more}`, tm: secs(calls.reduce((n, x) => n + (x.ms ?? 0), 0)) };
 }
 
 export function cardHtml(t: Turn | null, now = Date.now()): string {
