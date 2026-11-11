@@ -1,4 +1,17 @@
-n class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
+h)}" autocomplete="off" aria-label="호출 단어"></div>`;
+  }
+  function sceneCard(sel, d) {
+    const a = d.agents.find((x) => x.lore === sel);
+    if (!a || !/^P\d{3,}$/.test(a.id)) return "";
+    return `<details class="gw-sec gw-fscene"><summary>첫 장면<small>${esc28(a.id)} · ${agentSceneState(a.id, d)}</small></summary><div class="dir-panel">${agentSceneFields(a.id, d)}</div></details>`;
+  }
+  function membersCard(ctx2, sel, d) {
+    const list4 = d.agents.filter((a) => a.affiliation === sel);
+    const items = list4.map((a) => {
+      const sub = [a.rank, a.department].filter(Boolean).join(" · ");
+      return `<button class="gw-member" data-action="ed-goto" data-value="agent|${esc28(a.lore)}" title="요원 기록으로">${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}<span class="gw-member-t"><b>${esc28(a.name)}</b><small>${esc28(a.english || "")}${sub ? ` · ${esc28(sub)}` : ""}</small></span></button>`;
+    }).join("");
+    return `<section class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
   }
   function recordPage(ctx2, kind, over, q, sel) {
     const d = directoryDraft(ctx2);
@@ -3293,17 +3306,4 @@ Add this key to the JSON output: "shop":{"name":"<Korean ≤30 chars>","owner":"
     const bots = ctx2.chat.message.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0);
     const pick3 = new Set(turns3 > 0 ? bots.slice(-turns3) : bots);
     const indexes = unread.filter((i) => pick3.has(i));
-    if (!indexes.length) return { ran: 0, applied: 0, skipped: ["그 범위에 안 읽은 응답이 없어요"], errors: [] };
-    return requestPeopleUpdate("backfill", { manual: true, scope: { indexes } });
-  }
-  async function rereadPerson(name, turns3) {
-    if (running4) return { ran: 0, applied: 0, skipped: ["갱신이 돌고 있어요"], errors: [], cleared: 0 };
-    const ctx2 = await loadContext().catch(() => null);
-    if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [], cleared: 0 };
-    const store2 = peopleStore(ctx2.chat);
-    const p2 = store2.people[name];
-    if (!p2) return { ran: 0, applied: 0, skipped: ["기록이 없는 인물"], errors: [], cleared: 0 };
-    const indexes = mentionIndexes(ctx2.chat, name, [...p2.aliases, ...allNames().find((n3) => n3.name === name)?.aliases ?? []], turns3);
-    let cleared = 0;
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
-      const s8 = peopleStore(cur);
+    if

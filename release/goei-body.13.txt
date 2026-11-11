@@ -1,4 +1,10 @@
-ntLimit < AGENT_MAX, "요원 표시 인원", busy6), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
+요.") : "",
+        s8.assetOn && s8.assetModel === "aux" ? field2("캐릭터당 이미지 수", seg9("set-asset-limit", String(s8.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy6), "보조 모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
+      ].join(""))}
+    ${scope === "chat" && s8.assetOn && s8.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc36(note)}</p>` : ""}`,
+      board: `${group6("상황판", [
+        field2("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
+        field2("요원 표시 인원", stepper3("set-agent", "n", `${s8.agentLimit}명`, s8.agentLimit > 0, s8.agentLimit < AGENT_MAX, "요원 표시 인원", busy6), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
         field2("지원 투입", seg9("set-support", s8.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요."),
         field2("인물 기록", seg9("set-people", peopleOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), scope === "chat" ? "응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서." : "새 채팅을 인물 기록을 켠 채로 시작할지 정해요.")
       ].join(""))}
@@ -3027,17 +3033,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-spoil > summary { cursor: pointer; padding: 10px 14px; color: var(--dim); font-size: 14px; list-style: none; }
 .nw-spoil > summary::-webkit-details-marker { display: none; }
 .nw-spoil > summary::before { content: '▸ '; }
-.nw-spoil[open] > summary::before { content: '▾ '; }
-.nw-spoil[open] > summary { border-bottom: 1px solid var(--line); }
-.nw-spoil-in { padding: 12px 14px 0; }
-.nw-spoil.fn { display: inline-block; margin: 0; border: 0; background: none; }
-.nw-spoil.fn > summary { display: inline; padding: 0; }
-.nw-spoil.fn[open] > summary { border: 0; }
-.nw-quote cite { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--dim); }
-.nw-table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 15px; }
-.nw-table caption { padding: 6px; font-weight: 600; color: var(--mint); }
-.nw-table th { background: var(--nw); color: #fff; padding: 6px 8px; }
-.nw-table td { padding: 6px 8px; border: 1px solid var(--line); }
-.nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
-.nw-link.on { color: #7fb8ff; text-decoration: none; }
-.nw-link:hover { text-decoration: 
+.nw-spoil[open] > sum

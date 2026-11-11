@@ -555,7 +555,8 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
     shopUi.loading = kind;
     shopUi.notice = "";
     shopUi.failRaw = "";
-    env3.render();
+    if (kind === "talk") await env3.refresh();
+    else env3.render();
     try {
       const src = shopSource(ctx2, st0);
       const g2 = genSettings(ctx2.chat.scriptstate);
@@ -877,7 +878,8 @@ ${shopUi.failRaw.slice(0, 1500)}`;
     v.loading = kind;
     v.notice = "";
     v.failRaw = "";
-    env3.render();
+    if (kind === "talk") await env3.refresh();
+    else env3.render();
     try {
       const src = shopSource({ ...ctx2, chat: { ...ctx2.chat, scriptstate: mallVars(ctx2.chat.scriptstate, site) } }, st0, s8);
       if (kind === "shelf") src.assign = cosAssignment(s8.size[0] + Math.floor(Math.random() * (s8.size[1] - s8.size[0] + 1)), s8.context, mallRoll(ctx2.chat.scriptstate, site), Math.random, site);
@@ -1273,7 +1275,8 @@ ${v.failRaw.slice(0, 1500)}`;
     v.dl = kind;
     v.notice = "";
     v.failRaw = "";
-    env3.render();
+    if (kind === "talk") await env3.refresh();
+    else env3.render();
     try {
       const src = deskSource(ctx2);
       const g2 = genSettings(vars);
@@ -2333,14 +2336,14 @@ ${themeVars("[x-goei-prog]")}
 [x-goei-prog][x-goei-theme="light"] { --p-dim: #5C6E6A; --p-danger: #C2412F; --p-void: #F4F6F5; }
 [x-goei-prog][x-goei-theme="paper"] { --p-dim: #6E6046; --p-danger: #A8361F; --p-void: #EFE6D2; }
 [x-goei-prog] {
-  position: fixed; right: 12px; top: 12px; z-index: 45; /* 플러그인 창(49) 아래: 상황판이 열리면 그 뒤로 */
+  position: fixed; right: 12px; top: 12px; z-index: 60; /* 플러그인 창(49) 위: 상황판이 열려 있어도 보인다 (11-11 사용자) */
   display: none; width: 0; height: 0;
   font: 13px/1.4 'IBM Plex Sans KR', 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   color: var(--g-text); word-break: keep-all; -webkit-font-smoothing: antialiased;
 }
 [x-goei-prog][x-goei-show="true"] { display: block; }
 [x-goei-prog] * { box-sizing: border-box; }
-[x-goei-prog] .mono { font-family: 'JetBrains Mono', 'IBM Plex Sans KR', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+[x-goei-prog] [data-mono] { font-family: 'JetBrains Mono', 'IBM Plex Sans KR', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
 /* 카드: 오른쪽 위 꼭짓점을 기준으로 자라고 줄어든다 */
 [x-goei-prog] [data-card] {
   position: absolute; top: 0; right: 0; width: ${CARD_W}px;
@@ -2352,33 +2355,33 @@ ${themeVars("[x-goei-prog]")}
 [x-goei-prog] [data-grip] { display: flex; align-items: center; gap: 8px; color: var(--g-sub); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; cursor: grab; user-select: none; -webkit-user-select: none; }
 [x-goei-prog][x-goei-drag="true"] [data-grip] { cursor: grabbing; }
 [x-goei-prog] [data-grip] svg { width: 14px; height: 14px; color: var(--g-signal); flex: 0 0 14px; }
-[x-goei-prog] [data-grip] .n { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--p-dim); }
-[x-goei-prog] .t { margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--g-text); }
-[x-goei-prog] .m { margin-top: 2px; color: var(--p-dim); font-size: 12px; }
-[x-goei-prog] .m b { font-weight: 600; color: var(--g-sub); }
-[x-goei-prog] .cells { display: grid; gap: 3px; margin-top: 9px; }
-[x-goei-prog] .c { height: 18px; display: grid; place-items: center; padding: 0 3px; border-radius: 4px; border: 1px solid var(--g-line); background: var(--p-void); color: var(--p-dim); font-size: 9.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-[x-goei-prog] .c.done { border-color: var(--g-acc-line); background: var(--g-acc); color: var(--g-signal); }
-[x-goei-prog] .c.run { border-color: var(--g-signal); background: var(--g-acc); color: var(--g-text); box-shadow: 0 0 7px color-mix(in srgb, var(--g-signal) 55%, transparent); }
-[x-goei-prog] .c.fail { border-color: var(--p-danger); color: var(--p-danger); }
-[x-goei-prog] .c.skip { opacity: .45; }
-[x-goei-prog] .rows { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--g-line); }
-[x-goei-prog] .r { display: grid; grid-template-columns: 16px 1fr auto; column-gap: 8px; align-items: center; padding: 5px 8px; margin: 0 -8px; border-radius: 8px; font-size: 12.5px; color: var(--p-dim); }
-[x-goei-prog] .r .nm { color: var(--g-sub); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-[x-goei-prog] .r .dt { color: var(--p-dim); font-size: 11px; margin-left: 6px; font-weight: 400; }
-[x-goei-prog] .r .tm { font-size: 11.5px; color: var(--p-dim); text-align: right; white-space: nowrap; }
-[x-goei-prog] .r.run { background: var(--g-acc); }
-[x-goei-prog] .r.run .nm { color: var(--g-text); font-weight: 600; }
-[x-goei-prog] .r.run .tm { color: var(--g-signal); }
-[x-goei-prog] .r.wait .nm, [x-goei-prog] .r.skip .nm { color: var(--p-dim); }
-[x-goei-prog] .r.skip { opacity: .55; }
-[x-goei-prog] .r.fail .nm, [x-goei-prog] .r.fail .tm, [x-goei-prog] .r.fail .dt { color: var(--p-danger); }
-[x-goei-prog] .ic { width: 16px; height: 16px; display: grid; place-items: center; }
-[x-goei-prog] .ic::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
-[x-goei-prog] .ic.done::before { background: var(--g-signal); }
-[x-goei-prog] .ic.wait::before, [x-goei-prog] .ic.skip::before { border: 1.5px solid var(--g-line); width: 7px; height: 7px; }
-[x-goei-prog] .ic.run::before { width: 10px; height: 10px; border: 2px solid var(--g-signal); border-right-color: transparent; animation: goei-prog-spin .8s linear infinite; }
-[x-goei-prog] .ic.fail::before { background: var(--p-danger); }
+[x-goei-prog] [data-grip] [data-p="n"] { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--p-dim); }
+[x-goei-prog] [data-p="t"] { margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--g-text); }
+[x-goei-prog] [data-p="m"] { margin-top: 2px; color: var(--p-dim); font-size: 12px; }
+[x-goei-prog] [data-p="m"] b { font-weight: 600; color: var(--g-sub); }
+[x-goei-prog] [data-p="cells"] { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; margin-top: 9px; }
+[x-goei-prog] [data-p="c"] { height: 18px; display: grid; place-items: center; padding: 0 3px; border-radius: 4px; border: 1px solid var(--g-line); background: var(--p-void); color: var(--p-dim); font-size: 9.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[x-goei-prog] [data-p="c"][data-s="done"] { border-color: var(--g-acc-line); background: var(--g-acc); color: var(--g-signal); }
+[x-goei-prog] [data-p="c"][data-s="run"] { border-color: var(--g-signal); background: var(--g-acc); color: var(--g-text); box-shadow: 0 0 7px color-mix(in srgb, var(--g-signal) 55%, transparent); }
+[x-goei-prog] [data-p="c"][data-s="fail"] { border-color: var(--p-danger); color: var(--p-danger); }
+[x-goei-prog] [data-p="c"][data-s="skip"] { opacity: .45; }
+[x-goei-prog] [data-p="rows"] { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--g-line); }
+[x-goei-prog] [data-p="r"] { display: grid; grid-template-columns: 16px 1fr auto; column-gap: 8px; align-items: center; padding: 5px 8px; margin: 0 -8px; border-radius: 8px; font-size: 12.5px; color: var(--p-dim); }
+[x-goei-prog] [data-p="r"] [data-p="nm"] { color: var(--g-sub); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[x-goei-prog] [data-p="r"] [data-p="dt"] { color: var(--p-dim); font-size: 11px; margin-left: 6px; font-weight: 400; }
+[x-goei-prog] [data-p="r"] [data-p="tm"] { font-size: 11.5px; color: var(--p-dim); text-align: right; white-space: nowrap; }
+[x-goei-prog] [data-p="r"][data-s="run"] { background: var(--g-acc); }
+[x-goei-prog] [data-p="r"][data-s="run"] [data-p="nm"] { color: var(--g-text); font-weight: 600; }
+[x-goei-prog] [data-p="r"][data-s="run"] [data-p="tm"] { color: var(--g-signal); }
+[x-goei-prog] [data-p="r"][data-s="wait"] [data-p="nm"], [x-goei-prog] [data-p="r"][data-s="skip"] [data-p="nm"] { color: var(--p-dim); }
+[x-goei-prog] [data-p="r"][data-s="skip"] { opacity: .55; }
+[x-goei-prog] [data-p="r"][data-s="fail"] [data-p="nm"], [x-goei-prog] [data-p="r"][data-s="fail"] [data-p="tm"], [x-goei-prog] [data-p="r"][data-s="fail"] [data-p="dt"] { color: var(--p-danger); }
+[x-goei-prog] [data-p="ic"] { width: 16px; height: 16px; display: grid; place-items: center; }
+[x-goei-prog] [data-p="ic"]::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+[x-goei-prog] [data-p="ic"][data-s="done"]::before { background: var(--g-signal); }
+[x-goei-prog] [data-p="ic"][data-s="wait"]::before, [x-goei-prog] [data-p="ic"][data-s="skip"]::before { border: 1.5px solid var(--g-line); width: 7px; height: 7px; }
+[x-goei-prog] [data-p="ic"][data-s="run"]::before { width: 10px; height: 10px; border: 2px solid var(--g-signal); border-right-color: transparent; animation: goei-prog-spin .8s linear infinite; }
+[x-goei-prog] [data-p="ic"][data-s="fail"]::before { background: var(--p-danger); }
 /* 접힌 단추 (PC): 유령 단추와 같은 규격 48px */
 [x-goei-prog] [data-dot] {
   position: absolute; top: 0; right: 0; width: ${BTN}px; height: ${BTN}px; margin: 0; padding: 0;
@@ -2388,9 +2391,9 @@ ${themeVars("[x-goei-prog]")}
 [x-goei-prog] [data-dot] svg { width: 26px; height: 26px; }
 [x-goei-prog][x-goei-open="true"] [data-dot] { opacity: 0; pointer-events: none; }
 [x-goei-prog][x-goei-run="true"] [data-dot] svg path { stroke-dasharray: 6 4; animation: goei-prog-flow 1s linear infinite; }
-[x-goei-prog] [data-dot] .bad { display: none; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--p-danger); border: 2px solid var(--g-panel); }
-[x-goei-prog][x-goei-fail="true"] [data-dot] .bad { display: block; }
-[x-goei-prog] [data-dot] .dots { display: none; }
+[x-goei-prog] [data-dot] [data-p="bad"] { display: none; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--p-danger); border: 2px solid var(--g-panel); }
+[x-goei-prog][x-goei-fail="true"] [data-dot] [data-p="bad"] { display: block; }
+[x-goei-prog] [data-dot] [data-p="dots"] { display: none; }
 /* 폰: 상단 바 아래 오른쪽 가장자리에 붙은 막대 (점 다섯 개, 길이 고정). 카드는 눌렀을 때만 */
 [x-goei-prog][x-goei-phone="true"] { right: 0; top: 64px; }
 [x-goei-prog][x-goei-phone="true"] [data-dot] {
@@ -2399,12 +2402,12 @@ ${themeVars("[x-goei-prog]")}
 }
 [x-goei-prog][x-goei-phone="true"] [data-dot] svg { width: 14px; height: 14px; margin-bottom: 1px; color: var(--g-sub); }
 [x-goei-prog][x-goei-phone="true"][x-goei-run="true"] [data-dot] svg { color: var(--g-signal); }
-[x-goei-prog][x-goei-phone="true"] [data-dot] .dots { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-[x-goei-prog] .d { width: 7px; height: 7px; border-radius: 50%; background: var(--g-line); }
-[x-goei-prog] .d.done { background: var(--g-signal); }
-[x-goei-prog] .d.run { width: 9px; height: 9px; background: var(--g-signal); box-shadow: 0 0 7px var(--g-signal); animation: goei-prog-blink 1s ease-in-out infinite; }
-[x-goei-prog] .d.skip { background: transparent; border: 1.5px solid var(--g-line); width: 6px; height: 6px; }
-[x-goei-prog] .d.fail { background: var(--p-danger); }
+[x-goei-prog][x-goei-phone="true"] [data-dot] [data-p="dots"] { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+[x-goei-prog] [data-p="d"] { width: 7px; height: 7px; border-radius: 50%; background: var(--g-line); }
+[x-goei-prog] [data-p="d"][data-s="done"] { background: var(--g-signal); }
+[x-goei-prog] [data-p="d"][data-s="run"] { width: 9px; height: 9px; background: var(--g-signal); box-shadow: 0 0 7px var(--g-signal); animation: goei-prog-blink 1s ease-in-out infinite; }
+[x-goei-prog] [data-p="d"][data-s="skip"] { background: transparent; border: 1.5px solid var(--g-line); width: 6px; height: 6px; }
+[x-goei-prog] [data-p="d"][data-s="fail"] { background: var(--p-danger); }
 [x-goei-prog][x-goei-phone="true"] [data-card] { right: 10px; top: 0; width: min(${CARD_W + 30}px, calc(100vw - 20px)); }
 [x-goei-prog][x-goei-phone="true"] [data-grip] { cursor: pointer; }
 @keyframes goei-prog-spin { to { transform: rotate(360deg); } }
@@ -2451,18 +2454,18 @@ ${themeVars("[x-goei-prog]")}
   function metaOf(t, now2) {
     if (t.endAt) {
       const s8 = turnSummary(t);
-      return `호출 <b class="mono">${num5(s8.calls)}</b>회 · <b class="mono">${num5(s8.req)} → ${num5(s8.resp)}</b> 토큰 · <b class="mono">${esc19(secs(s8.ms))}</b>`;
+      return `호출 <b data-mono>${num5(s8.calls)}</b>회 · <b data-mono>${num5(s8.req)} → ${num5(s8.resp)}</b> 토큰 · <b data-mono>${esc19(secs(s8.ms))}</b>`;
     }
     const run6 = running(t);
     const parts = [];
     if (run6.length) {
       const models = [...new Set(run6.map((c) => modelName(c.model)))].join("·");
       parts.push(run6.length > 1 ? `${esc19(models)} ${run6.length}건 동시` : `${esc19(models)} 모델`);
-      parts.push(`요청 <b class="mono">${num5(run6.reduce((n3, c) => n3 + c.reqTokens, 0))}</b> 토큰`);
+      parts.push(`요청 <b data-mono>${num5(run6.reduce((n3, c) => n3 + c.reqTokens, 0))}</b> 토큰`);
       const chars2 = run6.reduce((n3, c) => n3 + (c.chars ?? 0), 0);
-      if (chars2) parts.push(`출력 <b class="mono">~${num5(chars2)}</b>자`);
+      if (chars2) parts.push(`출력 <b data-mono>~${num5(chars2)}</b>자`);
     } else if (t.mainAt && !t.replyAt) parts.push("Risu 가 본편 응답을 받는 중");
-    parts.push(`경과 <b class="mono">${clock2(now2 - t.at)}</b>`);
+    parts.push(`경과 <b data-mono>${clock2(now2 - t.at)}</b>`);
     return parts.join(" · ");
   }
   function rowDetail(t, s8, st, now2) {
@@ -2480,21 +2483,21 @@ ${themeVars("[x-goei-prog]")}
     return { dt: `${s8.note ? `${s8.note} · ` : ""}${modelName(c.model)} · ${num5(c.reqTokens)} → ${num5(c.respTokens ?? 0)}${more}`, tm: secs(calls.reduce((n3, x) => n3 + (x.ms ?? 0), 0)) };
   }
   function cardHtml(t, now2 = Date.now()) {
-    if (!t) return `<div data-grip>${PULSE}호출 진행<span class="n mono">—</span></div><div class="t">아직 호출이 없어요</div><div class="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
+    if (!t) return `<div data-grip>${PULSE}호출 진행<span data-p="n" data-mono>—</span></div><div data-p="t">아직 호출이 없어요</div><div data-p="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
     const { done: done3, total } = stageCount(t);
-    const cells = t.plan.map((s8) => `<div class="c ${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
+    const cells = t.plan.map((s8) => `<div data-p="c" data-s="${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
     const rows3 = t.plan.map((s8) => {
       const st = stageState(t, s8);
       const { dt, tm } = rowDetail(t, s8, st, now2);
-      return `<div class="r ${st}"><i class="ic ${st}"></i><span class="nm">${esc19(s8.label)}${dt ? `<span class="dt">${esc19(dt)}</span>` : ""}</span><span class="tm mono">${esc19(tm)}</span></div>`;
+      return `<div data-p="r" data-s="${st}"><i data-p="ic" data-s="${st}"></i><span data-p="nm">${esc19(s8.label)}${dt ? `<span data-p="dt">${esc19(dt)}</span>` : ""}</span><span data-p="tm" data-mono>${esc19(tm)}</span></div>`;
     }).join("");
-    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span class="n mono">${done3} / ${total}</span></div><div class="t">${esc19(titleOf(t, now2))}</div><div class="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div class="cells" style="grid-template-columns:repeat(${total},minmax(0,1fr))">${cells}</div>` : "") + `<div class="rows">${rows3}</div>`;
+    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span data-p="n" data-mono>${done3} / ${total}</span></div><div data-p="t">${esc19(titleOf(t, now2))}</div><div data-p="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div data-p="cells">${cells}</div>` : "") + `<div data-p="rows">${rows3}</div>`;
   }
   function dotHtml(t) {
-    const dots = GROUPS.map((g2) => `<i class="d ${t ? groupState(t, g2) : "skip"}" title="${GROUP_LABEL[g2]}"></i>`).join("");
-    return `${PULSE}<span class="dots">${dots}</span><i class="bad"></i>`;
+    const dots = GROUPS.map((g2) => `<i data-p="d" data-s="${t ? groupState(t, g2) : "skip"}" title="${GROUP_LABEL[g2]}"></i>`).join("");
+    return `${PULSE}<span data-p="dots">${dots}</span><i data-p="bad"></i>`;
   }
-  var DEFAULT_POS = { right: 12, top: 12 };
+  var DEFAULT_POS = { right: 12, top: 76 };
   async function createProgWin() {
     const root3 = await body();
     if (!root3) throw new Error("Risu 화면 접근 권한이 없어요.");
@@ -2650,11 +2653,12 @@ ${themeVars("[x-goei-prog]")}
       drag = null;
       pending2 = null;
       moved = false;
-      if (!visible2 || phone2 || !open4 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
+      if (!visible2 || phone2 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
       if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
       const x = ev.clientX;
       const y = ev.clientY;
-      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(await card2.querySelector("[data-grip]")), x, y))().catch(() => false) };
+      const grab = open4;
+      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card2.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
     };
     const onMove = (ev) => {
       if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
@@ -3003,7 +3007,7 @@ ${themeVars("[x-goei-prog]")}
   // src/host/vs.ts
   var VS_BASE = UPDATE_BASE ? `${UPDATE_BASE}/vs` : "";
   var CODE_KEY = "goei:vs:code";
-  var VERSION = true ? "0.21.8" : "";
+  var VERSION = true ? "0.21.9" : "";
   var COMMON = "vs-common";
   var index2 = null;
   function vsIndex() {
@@ -3433,23 +3437,4 @@ html.goei-vs-on #goei-vs { display: block; }
       lore,
       firstMessage: char.firstMessage,
       loreSettings: char.loreSettings,
-      alternateGreetings: char.alternateGreetings,
-      assets: char.additionalAssets,
-      iconOurs: !!note && note.ours === String(char.image ?? ""),
-      wikiPack: packInLore || !!storedWikiPack(),
-      tokenizer: !!tokenizerName()
-    });
-    return { state, iconPrev: note?.prev ?? "" };
-  }
-  async function installLoreAndGreetings(charIndex, o = {}) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const planted = plantGreetings(char.alternateGreetings);
-    const lore = installLore(char.globalLore, planted.index);
-    const first = char.firstMessage;
-    const landing = isLanding(first) ? {} : { firstMessage: installData().greetings.first };
-    if (!isLanding(first) && typeof first === "string" && first.trim() && !planted.greetings.includes(first)) planted.greetings.push(first);
-    const ls = installLoreSettings(char.loreSettings);
-    await risuai.setCharacterToIndex(charIndex, {
-      ...char,
-  
+      alternateGreetings: char.a

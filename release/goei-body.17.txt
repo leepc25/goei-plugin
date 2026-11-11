@@ -1,4 +1,19 @@
-xtRules({ char: src.char, chat: view2 });
+ "system", content: buildImgPrompt(cfg, names4, s8.assetPlayer) }];
+  }
+  function moduleContext(scene2, { char, chat }) {
+    const ss = chat.scriptstate;
+    const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view: view2 }) => !!view2.scriptstate?.[GN_RAW] && gnetSettings(view2.scriptstate).context);
+    const wantGnet = boardsOn.length > 0;
+    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
+    const wantWiki = wikiContextOn(ss);
+    if (!wantGnet && !wantPhone && !wantWiki) return [];
+    applyAdvanced(ss);
+    const src = { char: { globalLore: char.globalLore }, chat };
+    const rules2 = { phone: mainContextRules2(src), wiki: wikiContextRules(char.globalLore) };
+    const focus = makeFocus(scene2, buildRegistry(char.globalLore));
+    const parts = [];
+    for (const { view: view2 } of boardsOn) {
+      const rule = mainContextRules({ char: src.char, chat: view2 });
       const st = readGnet(view2);
       if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: CONTEXT.tokens, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rule, focus)) });
     }
@@ -375,7 +390,7 @@ xtRules({ char: src.char, chat: view2 });
           await fab.setVersus(pad, vsOpen()).catch(() => {
           });
         }
-        const pShow = next.fabVisible && progressOn() && !appShown();
+        const pShow = (next.fabVisible || appShown()) && progressOn();
         const pKey = `${pShow}`;
         if (prog && pKey !== progKey) {
           progKey = pKey;
@@ -417,14 +432,6 @@ xtRules({ char: src.char, chat: view2 });
     setRecordsOpener((id2) => void openRecords2(id2));
     setRepickOpener(() => void openApp({ quietIfNotLite: true }));
     setShopOpener((site) => void openShop(site));
-    onAppShown((open4) => {
-      if (!prog) return;
-      if (open4) {
-        progKey = "false";
-        void prog.setVisible(false).catch(() => {
-        });
-      } else progKey = "";
-    });
     let stopWatcher = null;
     let fab = null;
     try {
@@ -471,5 +478,5 @@ xtRules({ char: src.char, chat: view2 });
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.8", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.9", start: start2 };
 })();
