@@ -1,10 +1,4 @@
-거 약함"
-      },
-      "잼트리>데드폴": {
-        aff: 90,
-        src: "위키 데드폴 「사무실」: 남이 커피 타는 걸 허락하는 드문 예외라는 소문. 근거 약함"
-      },
-      "이도형>고영훈": {
+영훈": {
         aff: 90,
         src: "위키 이도형 「고영훈」: 부대 운영을 통째로 넘김, 둘 다 그게 편함. 추정"
       },
@@ -1571,8 +1565,8 @@
     }
     return null;
   }
-  function parseIdentity(text4, anchor, from = "status") {
-    const t = String(text4 ?? "").trim();
+  function parseIdentity(text5, anchor, from = "status") {
+    const t = String(text5 ?? "").trim();
     if (!t || t === "없음" || t === "-") return null;
     const [org, ...rest] = t.split(/[\/|·,]/).map((x) => x.trim());
     const rank3 = rest.join(" ").replace(/^-$/, "");
@@ -1587,9 +1581,9 @@
     if (personLevel === null) return "peer";
     return u > personLevel ? "up" : u < personLevel ? "down" : "peer";
   }
-  function factionCodesIn(text4, extra2 = {}) {
+  function factionCodesIn(text5, extra2 = {}) {
     const out = [];
-    let t = text4;
+    let t = text5;
     for (const [re, code2] of ORG_CODES) {
       if (re.test(t)) {
         out.push(code2);
@@ -1605,11 +1599,11 @@
   var ALIASES = aliases_default;
   var ADDRESS = address_default;
   function seedAddress(name, faction, user) {
-    const row11 = ADDRESS.names[name];
-    if (!row11) return void 0;
-    const rel = relativeRank(user, faction, row11.level);
-    const register = REGISTERS.includes(row11.register) ? row11.register : "존댓말";
-    return { toUser: row11[rel] || row11.outsider || "", register };
+    const row8 = ADDRESS.names[name];
+    if (!row8) return void 0;
+    const rel = relativeRank(user, faction, row8.level);
+    const register = REGISTERS.includes(row8.register) ? row8.register : "존댓말";
+    return { toUser: row8[rel] || row8.outsider || "", register };
   }
   function seedBaseFor(name, userFaction3, user) {
     const b = RELATIONS.people[name];
@@ -1637,26 +1631,26 @@
   var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
 
   // src/core/people/faction.ts
-  function userFactionOf(store2, chat) {
+  function userFactionOf(store, chat) {
     const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store2.identity?.faction || (typeof v === "string" ? v : "");
+    return store.identity?.faction || (typeof v === "string" ? v : "");
   }
-  function knownFactionCodes(store2, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store2.factions), ...Object.keys(names4)])];
+  function knownFactionCodes(store, names4 = {}) {
+    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
   }
-  var factionName = (code2, names4 = {}, store2) => names4[code2] || store2?.factions[code2]?.name || ORG_NAMES[code2] || code2;
-  function factionNow(store2, code2, changes, userFaction3, settings, names4 = {}) {
+  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
+  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
     const base = factionBase(code2, userFaction3);
-    const v = factionView(code2, base, changes, store2.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
+    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
     const note = settings.factionQual ? [...changes].reverse().find((c) => c.who === factionWho(code2) && c.kind === "cue" && c.pin !== void 0)?.reason : void 0;
-    return { code: code2, name: factionName(code2, names4, store2), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
+    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
   }
-  function sceneFactionCodes(store2, people, texts, names4 = {}) {
+  function sceneFactionCodes(store, people, texts, names4 = {}) {
     const out = [];
     const push3 = (c) => {
       if (c && !out.includes(c)) out.push(c);
     };
-    for (const n3 of people) push3(store2.people[n3]?.faction ?? "");
+    for (const n3 of people) push3(store.people[n3]?.faction ?? "");
     for (const t of texts) for (const c of factionCodesIn(t, names4)) push3(c);
     return out;
   }
@@ -1722,11 +1716,11 @@
         text: [kind, locName(r.loc) || r.loc, hhmm3(r.at), durText, how].filter(Boolean).join(" · ")
       });
     }
-    const store2 = peopleStore(chat);
+    const store = peopleStore(chat);
     const live = liveness(chat);
-    const changes = liveChanges(store2, live);
+    const changes = liveChanges(store, live);
     const s8 = peopleSettings(chat.scriptstate);
-    const uf = userFactionOf(store2, chat);
+    const uf = userFactionOf(store, chat);
     const names4 = factionNames2(lore);
     const posOf = (c) => live.at.get(c.anchor) ?? -1;
     const byWho = /* @__PURE__ */ new Map();
@@ -1734,9 +1728,9 @@
     for (const [who, list4] of byWho) {
       const isFac = who.startsWith("세력:");
       const code2 = isFac ? who.slice(3) : "";
-      if (isFac ? !code2 : !store2.people[who]) continue;
-      const base = isFac ? factionBase(code2, uf) : store2.people[who].affinity.base;
-      const folded = store2.folded[who] ?? 0;
+      if (isFac ? !code2 : !store.people[who]) continue;
+      const base = isFac ? factionBase(code2, uf) : store.people[who].affinity.base;
+      const folded = store.folded[who] ?? 0;
       const o = isFac ? { speed: s8.speed, turnCap: s8.turnCap } : { temper: temperOf(who), speed: s8.speed, turnCap: s8.turnCap };
       const [min, max] = isFac ? [FACTION_MIN, FACTION_MAX] : [AFF_MIN, AFF_MAX];
       const label2 = (v) => isFac ? factionStage(v, s8.factionBounds).label : stageOf(v).label;
@@ -1752,7 +1746,7 @@
           seq: 1 + c.seq,
           kind: isFac ? "faction" : "person",
           day: day(posOf(c)),
-          title: isFac ? factionName(code2, names4, store2) : who,
+          title: isFac ? factionName(code2, names4, store) : who,
           text: `${isFac ? "평판" : "호감"} ${prev} → ${now2}${reason3 ? ` · ${reason3}` : ""}`,
           ...isFac ? { faction: code2 } : { person: who }
         });
@@ -1761,7 +1755,7 @@
     }
     for (const c of changes) {
       if (c.kind !== "identity") continue;
-      const what = [c.faction ? factionName(c.faction, names4, store2) : "", c.rank ?? ""].filter(Boolean).join(" · ");
+      const what = [c.faction ? factionName(c.faction, names4, store) : "", c.rank ?? ""].filter(Boolean).join(" · ");
       if (!what) continue;
       out.push({ pos: posOf(c), seq: 1 + c.seq, kind: "rank", day: day(posOf(c)), title: "신분", text: `${what}${c.reason ? ` · ${c.reason}` : ""}` });
     }
@@ -1802,34 +1796,34 @@
   function startWorldVars(c, s8, faction, rng, player = "") {
     return worldVars(bootstrap(c, s8, rng, player), c, s8, faction);
   }
-  function fingerprint(index3, text4) {
+  function fingerprint(index, text5) {
     let h = 2166136261;
-    for (let i = 0; i < text4.length; i++) h = Math.imul(h ^ text4.charCodeAt(i), 16777619);
-    return `${index3}:${text4.length}:${(h >>> 0).toString(36)}`;
+    for (let i = 0; i < text5.length; i++) h = Math.imul(h ^ text5.charCodeAt(i), 16777619);
+    return `${index}:${text5.length}:${(h >>> 0).toString(36)}`;
   }
   function processOutput(chat, messageIndex, raw, c, s8, rng) {
     if (!worldOn(chat)) return null;
     const messages = chat.message ?? [];
-    let index3 = messageIndex;
-    if (messages[index3]?.data !== raw) {
-      index3 = -1;
+    let index = messageIndex;
+    if (messages[index]?.data !== raw) {
+      index = -1;
       for (let i = messages.length - 1; i >= 0; i--) {
         if (messages[i].role === "char" && messages[i].data === raw) {
-          index3 = i;
+          index = i;
           break;
         }
       }
     }
-    const msg = messages[index3];
+    const msg = messages[index];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
     const clean6 = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index3, clean6)) return null;
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean6)) return null;
     const prev = readPrev(state[PREV_KEY]);
-    const pk = index3 > 0 && messages[index3 - 1] ? messageKey(messages[index3 - 1], index3 - 1) : "";
-    const reroll = prev?.i === index3 && (prev.pk === void 0 || prev.pk === pk);
+    const pk = index > 0 && messages[index - 1] ? messageKey(messages[index - 1], index - 1) : "";
+    const reroll = prev?.i === index && (prev.pk === void 0 || prev.pk === pk);
     const before = reroll ? prev : {
-      i: index3,
+      i: index,
       world: String(state[WORLD_KEY] ?? ""),
       faction: String(state["$st_faction"] ?? ""),
       pick: String(state["$st_pick"] ?? ""),
@@ -1840,10 +1834,10 @@
     const base = parseWorld(before.world);
     const result = applyOutput(base, c, s8, faction, raw, rng);
     const now2 = result.faction ?? faction;
-    markStart(base, result.world, messageKey(msg, index3));
+    markStart(base, result.world, messageKey(msg, index));
     const vars = {
       ...worldVars(result.world, c, s8, now2),
-      [LAST_KEY]: fingerprint(index3, clean6)
+      [LAST_KEY]: fingerprint(index, clean6)
     };
     if (reroll && !result.faction) {
       vars.$st_faction = before.faction;
@@ -1856,7 +1850,7 @@
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index3] = { ...msg, data: clean6 };
+    message[index] = { ...msg, data: clean6 };
     const next = { ...chat, message, scriptstate: { ...state, ...vars } };
     const closed = result.world.closed ?? [];
     let made = [];
@@ -1865,13 +1859,13 @@
       let rec2 = readReports(state);
       let changed = false;
       if (reroll) {
-        const r = rewindClosures(journal, rec2, before.made ?? index3);
+        const r = rewindClosures(journal, rec2, before.made ?? index);
         journal = r.journal;
         rec2 = r.reports;
         changed = r.changed;
       }
       if (closed.length) {
-        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index: index3, world: result.world, closed, catalog: c, faction: now2, settings: journalSettings(state) });
+        const built = buildClosures({ chat: { ...next, scriptstate: { ...next.scriptstate, ...recordVars(journal, rec2) } }, index, world: result.world, closed, catalog: c, faction: now2, settings: journalSettings(state) });
         if (built.rows.length) {
           journal = built.journal;
           rec2 = built.reports;
@@ -1995,14 +1989,14 @@
   }
   var DATE_RE2 = /(\d{3,4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?/;
   var WEEK_RE = /\s*[(（]?\s*(?:[일월화수목금토](?:요일)?|sun|mon|tue|wed|thu|fri|sat)[a-z]*\.?\s*[)）]?\s*$/i;
-  function dayInfo(text4) {
-    const m = DATE_RE2.exec(text4 ?? "");
+  function dayInfo(text5) {
+    const m = DATE_RE2.exec(text5 ?? "");
     if (!m) return null;
     const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
     const t = Date.UTC(y, mo - 1, d);
     const dt = new Date(t);
     if (dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
-    const date = text4.slice(0, m.index + m[0].length).trim() + text4.slice(m.index + m[0].length).replace(WEEK_RE, "");
+    const date = text5.slice(0, m.index + m[0].length).trim() + text5.slice(m.index + m[0].length).replace(WEEK_RE, "");
     const names4 = baseHolidays(t);
     const holiday = names4.length ? [...new Set(names4)].join("·") : isSubstitute(t) ? "대체공휴일" : "";
     const wd = dt.getUTCDay();
@@ -2116,8 +2110,8 @@ ${t}`);
     const others = vs.map(([c]) => `{{#if {{not_equal::${VAR2}::${c}}}}}`).join("");
     return `${others}${base}${"{{/if}}".repeat(vs.length)}${vs.map(([c, t]) => `{{#if {{equal::${VAR2}::${c}}}}}${t}{{/if}}`).join("")}`;
   }
-  function fillCodes(text4, dir2) {
-    return text4.replace(/\{([A-Z]\d\d)\}/g, (m, code2) => {
+  function fillCodes(text5, dir2) {
+    return text5.replace(/\{([A-Z]\d\d)\}/g, (m, code2) => {
       const org = dir2.orgs.find((o) => o.faction === code2);
       return org ? orgNameCbs(dir2, org) : m;
     });
@@ -2465,8 +2459,8 @@ ${content}
     const t = title2.toLowerCase();
     return table.find(([, words]) => words.some((w) => t.includes(w)))?.[0];
   };
-  function parseImport(kind, text4) {
-    const lines3 = text4.replace(/\r/g, "").split("\n");
+  function parseImport(kind, text5) {
+    const lines3 = text5.replace(/\r/g, "").split("\n");
     const sections3 = [{ title: "", body: [] }];
     for (const line2 of lines3) {
       const h = /^#{1,6}\s+(.+?)\s*#*$/.exec(line2) ?? /^\*\*([^*]{1,60})\*\*:?\s*$/.exec(line2) ?? /^\[([^\]]{1,40})\]\s*$/.exec(line2);
@@ -2581,8 +2575,8 @@ ${body5}` : `##### ${sec2.title}`);
   }
   function pointsFlagFor(chat, fallback = false) {
     const id2 = lastIdentity(chat);
-    const on2 = id2 ? isPointsOrg(id2) : fallback;
-    const want = on2 ? "1" : "0";
+    const on3 = id2 ? isPointsOrg(id2) : fallback;
+    const want = on3 ? "1" : "0";
     return chat.scriptstate?.[POINTS_ON_VAR] === want ? null : want;
   }
   function pointsOn(chat) {
@@ -2621,8 +2615,8 @@ ${body5}` : `##### ${sec2.title}`);
   function formatPoints(n3) {
     return `${n3 < 0 ? "−" : ""}${Math.abs(Math.trunc(n3)).toLocaleString("en-US")} p`;
   }
-  function parsePoints(text4) {
-    const t = String(text4 ?? "").replace(/\s+/g, "");
+  function parsePoints(text5) {
+    const t = String(text5 ?? "").replace(/\s+/g, "");
     if (!t) return null;
     const sign = /^[-−]/.test(t) ? -1 : 1;
     const body5 = t.replace(/^[-−+]/, "").replace(/(p|P|포인트|points?)$/i, "").replace(/,/g, "");
@@ -2635,8 +2629,8 @@ ${body5}` : `##### ${sec2.title}`);
     const n3 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
     return Number.isSafeInteger(n3) && n3 > 0 ? sign * n3 : null;
   }
-  function mentionsPoints(text4) {
-    return /\d[\d,]*\s*(?:p\b|P\b|포인트|points?\b)|\d+\s*(?:억|만|천)\s*포인트/i.test(text4);
+  function mentionsPoints(text5) {
+    return /\d[\d,]*\s*(?:p\b|P\b|포인트|points?\b)|\d+\s*(?:억|만|천)\s*포인트/i.test(text5);
   }
 
   // src/ui/status.ts
@@ -2644,28 +2638,28 @@ ${body5}` : `##### ${sec2.title}`);
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
   var AIM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>';
   var CASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M7 12h.01M17 12h.01"/></svg>';
-  function linkTerms(text4, terms) {
-    if (!terms.length || !text4) return esc(text4);
+  function linkTerms(text5, terms) {
+    if (!terms.length || !text5) return esc(text5);
     const hits = [];
     for (const { term } of terms) {
       let from = 0;
       for (; ; ) {
-        const at = text4.indexOf(term, from);
+        const at = text5.indexOf(term, from);
         if (at < 0) break;
         const end = at + term.length;
         if (!hits.some((h) => at < h.end && end > h.at)) hits.push({ at, end });
         from = end;
       }
     }
-    if (!hits.length) return esc(text4);
+    if (!hits.length) return esc(text5);
     hits.sort((a, b) => a.at - b.at);
     let out = "";
     let i = 0;
     for (const h of hits) {
-      out += esc(text4.slice(i, h.at)) + `<span class="gst-link" data-goei-wiki="1">${esc(text4.slice(h.at, h.end))}</span>`;
+      out += esc(text5.slice(i, h.at)) + `<span class="gst-link" data-goei-wiki="1">${esc(text5.slice(h.at, h.end))}</span>`;
       i = h.end;
     }
-    return out + esc(text4.slice(i));
+    return out + esc(text5.slice(i));
   }
   var kv = (rows3) => `<span class="gst-tip"><span class="gst-kv">${rows3.map(([k, v]) => `<i>${esc(k)}</i><em>${esc(v)}</em>`).join("")}</span></span>`;
   function statusHtml(tag, ctx2) {
@@ -2833,10 +2827,6 @@ ${themeVars("[x-goei-fab]")}
   55% { opacity: 1; transform: scale(.96); filter: blur(0); }
   100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
 }
-/* 대전 단추 (설정 「대전」을 켠 PC 에서만): 유령 단추 바로 밑 */
-[x-goei-fab] button[data-vs] { position: absolute; top: calc(100% + 8px); left: 0; display: none; }
-[x-goei-fab][x-goei-vs="true"] button[data-vs] { display: flex; }
-[x-goei-fab][x-goei-vs-open="true"] button[data-vs] { background: var(--g-signal); color: var(--g-acc); border-color: var(--g-signal); }
 @keyframes goei-fab-pop {
   0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
   60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
@@ -2858,11 +2848,9 @@ ${themeVars("[x-goei-fab]")}
   100% { transform: translate(0); }
 }
 `;
-  var PAD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 8h9a4.5 4.5 0 0 1 4.4 3.6l.9 4.6a2.4 2.4 0 0 1-4.1 2.1L15.6 16H8.4l-2.1 2.3a2.4 2.4 0 0 1-4.1-2.1l.9-4.6A4.5 4.5 0 0 1 7.5 8z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="15.5" cy="11.2" r=".6" fill="currentColor"/><circle cx="17.3" cy="13" r=".6" fill="currentColor"/></svg>';
   var FAB_HTML = (label2) => `<span data-gr></span><span data-gr></span>
 <span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
-<button type="button" aria-label="${label2}">${GHOST_ICON}</button>
-<button type="button" data-vs aria-label="대전">${PAD_ICON}</button>`;
+<button type="button" aria-label="${label2}">${GHOST_ICON}</button>`;
   async function body() {
     const doc2 = await risuai.getRootDocument();
     if (!doc2) return null;
@@ -2887,7 +2875,7 @@ ${themeVars("[x-goei-fab]")}
     } catch {
     }
   }
-  async function createFab(onOpen, onVersus) {
+  async function createFab(onOpen) {
     const root3 = await body();
     if (!root3) throw new Error("Risu 화면 접근 권한이 없어요.");
     const { doc: doc2 } = root3;
@@ -2904,8 +2892,6 @@ ${themeVars("[x-goei-fab]")}
     await root3.body.appendChild(host3);
     const button = await host3.querySelector("button");
     if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
-    const padBtn = await host3.querySelector("button[data-vs]");
-    let padShown = false;
     let pos = await loadPos();
     const applyPos = async () => {
       await host3.setStyle("right", `${pos.right}px`);
@@ -3003,12 +2989,8 @@ ${themeVars("[x-goei-fab]")}
         }
       });
     };
-    const onClick2 = async (ev) => {
+    const onClick = async (ev) => {
       if (!visible2) return;
-      if (padShown && padBtn && onVersus && inside(await padBtn.getBoundingClientRect(), ev.clientX, ev.clientY)) {
-        onVersus();
-        return;
-      }
       if (!inside(await rect(), ev.clientX, ev.clientY)) return;
       await loop;
       if (moved) return;
@@ -3032,7 +3014,7 @@ ${themeVars("[x-goei-fab]")}
         [moveTarget, "pointermove", onMove],
         [moveTarget, "pointerup", onUp],
         [moveTarget, "pointercancel", onUp],
-        [host3, "click", onClick2]
+        [host3, "click", onClick]
       ]) {
         ids.push({ target, type, id: await target.addEventListener(type, fn2, { passive: true }) });
       }
@@ -3073,11 +3055,6 @@ ${themeVars("[x-goei-fab]")}
       async setTheme(theme) {
         await host3.setAttribute("x-goei-theme", theme);
         await cardStyle2.setTextContent(chatCss(theme));
-      },
-      async setVersus(show, open4 = false) {
-        padShown = show;
-        await host3.setAttribute("x-goei-vs", show ? "true" : "false");
-        await host3.setAttribute("x-goei-vs-open", open4 ? "true" : "false");
       },
       async chatScreenVisible() {
         return !!await doc2.querySelector(".default-chat-screen");
@@ -3183,9 +3160,9 @@ ${themeVars("[x-goei-fab]")}
     if (k1) return { kind: k1, word: "", en: "" };
     return { kind: "", ...words(raw) };
   }
-  function parseIconAliases(text4) {
+  function parseIconAliases(text5) {
     const out = {};
-    for (const line2 of String(text4 ?? "").split(/\r?\n/)) {
+    for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const m = /^\s*([^→=:>]+?)\s*(?:→|=>|->|=|:)\s*(.+?)\s*$/.exec(line2);
       if (!m) continue;
       const a = normIcon(m[1]);
@@ -3197,12 +3174,12 @@ ${themeVars("[x-goei-fab]")}
   var ICON_ALIAS_DEFAULT = ["외투 → 코트", "점퍼 → 재킷", "안정수 → 안정제", "캡슐 → 알약", "영양 바 → 에너지바", "영양바 → 에너지바", "숙취해소제 → 숙취 음료", "택배 → 택배 상자", "소설책 → 책", "알 → 계란", "하이라이터 → 형광펜", "다마고치 → 게임기", "인라인 → 인라인 스케이트", "선스틱 → 선크림", "곱창밴드 → 머리끈", "렌즈케이스 → 콘택트렌즈 통", "콘택트렌즈 → 콘택트렌즈 통", "약상자 → 구급상자", "나이프 → 칼", "정원가위 → 원예 가위", "전지가위 → 원예 가위", "간식 → 과자", "온수매트 → 전기장판", "종이가방 → 쇼핑백", "여행가방 → 캐리어", "햇반 → 즉석밥", "링거팩 → 링거", "인슐린 → 인슐린 펜", "DVD → CD", "바 → 에너지바", "속옷 → 팬티", "내의 → 팬티"].join("\n");
   var aliases = parseIconAliases(ICON_ALIAS_DEFAULT);
   var poolOn = true;
-  function setIconPool(on2) {
-    poolOn = on2;
+  function setIconPool(on3) {
+    poolOn = on3;
   }
   var iconPoolOn = () => poolOn;
-  function setIconAliases(text4) {
-    aliases = parseIconAliases(text4 && text4.trim() ? text4 : ICON_ALIAS_DEFAULT);
+  function setIconAliases(text5) {
+    aliases = parseIconAliases(text5 && text5.trim() ? text5 : ICON_ALIAS_DEFAULT);
   }
   var misses = [];
   var ICON_MISS_MAX = 100;
@@ -3379,8 +3356,8 @@ ${themeVars("[x-goei-fab]")}
       if (h.qPre && !pm.includes(h.qPre) && !pj.includes(h.qPre)) qOnly += HEAD_EXTRA / Q_EXTRA * wt(h.qPre);
       return { s: hit4 - HEAD_EXTRA * pOnly - Q_EXTRA * qOnly, hit: hit4, plain: pm.length === 0 && p2.kw };
     };
-    const find = (text4) => {
-      let q = headOf(text4);
+    const find = (text5) => {
+      let q = headOf(text5);
       if (q && q.ko && !GENERIC.has(q.head)) {
         const g2 = [...GENERIC].find((x) => /[가-힣]/.test(x) && q.head.length > x.length && q.head.endsWith(x));
         if (g2) {
@@ -3433,8 +3410,8 @@ ${themeVars("[x-goei-fab]")}
     }
     return find;
   }
-  function aliased(text4) {
-    const n3 = normIcon(text4);
+  function aliased(text5) {
+    const n3 = normIcon(text5);
     if (!n3) return "";
     if (aliases[n3]) return aliases[n3];
     const q = headOf(n3);
@@ -3589,7 +3566,7 @@ ${themeVars("[x-goei-fab]")}
     const base = (name0, icon, strict) => {
       const { kind, word: w0, en: en2 } = splitIconWord(icon);
       const K = kind ? kindIndex(kind) : null;
-      const keep = (t) => {
+      const keep2 = (t) => {
         const n3 = normIcon(t);
         if (!n3) return false;
         const h = head3(n3, !kind);
@@ -3597,8 +3574,8 @@ ${themeVars("[x-goei-fab]")}
       };
       const ex = exactName(name0, kind) ?? exactName(w0, kind, true);
       if (ex) return ex;
-      const name = keep(name0) ? normIcon(name0) : aliased(name0);
-      const word = keep(w0) ? normIcon(w0) : aliased(w0);
+      const name = keep2(name0) ? normIcon(name0) : aliased(name0);
+      const word = keep2(w0) ? normIcon(w0) : aliased(w0);
       const found = core(name, word, normIcon(en2), K, !!strict);
       if (found) return found;
       if (!K) {
@@ -3645,15 +3622,14 @@ ${themeVars("[x-goei-fab]")}
   var chip = (key, label2, def, v) => ({ key, label: label2, type: "bool", def: String(def), ...v ? { v } : {} });
   var num3 = (key, label2, def, min, max, unit, extra2 = {}) => ({ key, label: label2, type: "num", def, min, max, unit, ...extra2 });
   var TOK = "토큰";
-  var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" });
-  var turns = (def) => num3("turns", "채팅 참고", def, 0, 200, "턴", { zero: "안 봄" });
+  var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "생성 공통 값 따름", hint: "넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요." });
+  var turns = (def) => num3("turns", "챗로그 포함", def, 0, 200, "턴", { zero: "안 봄" });
   var craftGroup = () => ({
     title: "생성 방식",
     items: [
-      { key: "thoughts", label: "생각 단계", type: "pick", def: "off", opts: [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]], hint: "모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요" },
-      { key: "memo", label: "비망록", type: "pick", def: "0", opts: [["0", "끔"], ["1", "켬"]], hint: "모델 거부를 줄이는 긴 앞글이에요. 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요" },
-      num3("reiterate", "다시 보기", 0, 0, 2, "회", { zero: "공통", hint: "0이면 생성 공통 값을 따라요" }),
-      { key: "model_id", label: "전용 모델", type: "text", def: "", hint: "Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인 모델·보조 모델) 설정" }
+      { key: "thoughts", label: "생각 단계", type: "pick", def: "off", opts: [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]], hint: "모델이 결과를 쓰기 전에 상황을 먼저 정리하게 해요. 속으로만 = 정리하되 적지 않게 해요. 적고 지움 = 짧게 적게 한 뒤 플러그인이 지워요. 응답이 느려져요." },
+      { key: "memo", label: "비망록", type: "pick", def: "0", opts: [["0", "끔"], ["1", "켬"]], hint: "켜면 모델 거부를 줄이는 긴 앞글을 요청마다 붙여요. 토큰을 더 써요." },
+      num3("reiterate", "다시 보기", 0, 0, 2, "회", { zero: "생성 공통 값 따름", hint: "첫 응답 뒤 모델에게 지침과 형식을 지켰는지 다시 보게 하는 횟수예요. 1회마다 호출이 1회 늘어요." })
     ]
   });
   var ADV = {
@@ -3665,10 +3641,10 @@ ${themeVars("[x-goei-fab]")}
           num3("retries", "형식 오류 재시도", 1, 0, 3, "회"),
           { key: "retry_model", label: "재시도 모델", type: "pick", def: "same", opts: [["same", "같은 모델"], ["main", "메인 모델"], ["aux", "보조 모델"]] },
           num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요" }),
-          num3("ctx_total", "컨텍스트 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요" }),
+          num3("ctx_total", "컨텍스트 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 메인 요청에 붙는 양의 합. 넘치면 기능별 컨텍스트 토큰 상한 비율로 나눠요" }),
           // 라이트보드 5.0.0에서 옮김 (2026-11-06 사용자 「전부 넣어야지」)
           num3("reiterate", "다시 보기", 0, 0, 2, "회", { zero: "안 함", hint: "첫 응답을 받은 뒤 「지침과 형식을 빠짐없이 지켰나 다시 읽고, 괜찮으면 그대로, 아니면 고쳐서」를 이만큼 더 물어요. 형식·규칙을 더 잘 지키지만 한 번마다 호출이 하나 늘어요. 기능마다 따로 정할 수도 있어요" }),
-          { key: "user_msgs", label: "유저 메시지", type: "pick", def: "1", opts: [["1", "포함"], ["0", "빼기"]], hint: "괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 본편에 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요" },
+          { key: "user_msgs", label: "유저 메시지", type: "pick", def: "1", opts: [["1", "포함"], ["0", "빼기"]], hint: "괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 내가 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요" },
           num3("concurrent", "동시 요청", 0, 0, 5, "개", { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청을 한 번에 몇 개까지 보낼지예요. 넘으면 앞 요청이 끝날 때까지 기다려요. 느린 모델이나 요청 한도가 낮을 때 줄이세요. 인물 기록 요청은 세지 않아요" })
         ]
       },
@@ -3682,18 +3658,18 @@ ${themeVars("[x-goei-fab]")}
     gn: [
       craftGroup(),
       {
-        title: "참고 자료",
+        title: "참조",
         chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "관련 로어북", 0), chip("secondary", "2차 참조", 0)],
         items: [
           turns(8),
-          num3("refresh_posts", "새로고침에 참고할 글", 10, 1, 200, "개"),
-          num3("comments", "답글에 참고할 댓글", 30, 1, 1e3, "개"),
-          num3("dm_history", "답장에 참고할 쪽지", 50, 1, 1e3, "통"),
+          num3("refresh_posts", "새로고침에 참조할 글", 10, 1, 200, "개"),
+          num3("comments", "답글에 참조할 댓글", 30, 1, 1e3, "개"),
+          num3("dm_history", "답장에 참조할 쪽지", 50, 1, 1e3, "통"),
           budget
         ]
       },
       {
-        title: "컨텍스트에 포함",
+        title: "컨텍스트 포함",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_posts", "게시글·댓글", 1), chip("ctx_dms", "쪽지", 1), chip("ctx_own", "내가 쓴 것만", 0)],
         items: [
           num3("ctx_post_count", "넣을 게시글", 5, 1, 200, "개"),
@@ -3728,12 +3704,12 @@ ${themeVars("[x-goei-fab]")}
     ph: [
       craftGroup(),
       {
-        title: "참고 자료",
+        title: "참조",
         chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "인물 로어북", 0, "$ph_related"), chip("secondary", "2차 참조", 0)],
-        items: [turns(8), num3("room_history", "방마다 참고할 말풍선", 100, 10, 1e3, "개"), budget]
+        items: [turns(8), num3("room_history", "방마다 참조할 말풍선", 100, 10, 1e3, "개"), budget]
       },
       {
-        title: "컨텍스트에 포함",
+        title: "컨텍스트 포함",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_messages", "메시지", 1, "$ph_context_messages"), chip("ctx_notices_on", "공지", 1, "$ph_context_announcements")],
         items: [
           num3("ctx_history", "넣을 말풍선", 200, 1, 1e3, "개"),
@@ -3743,7 +3719,7 @@ ${themeVars("[x-goei-fab]")}
       },
       {
         title: "받은 뒤 쉬는 턴",
-        items: [num3("cd_incoming", "선톡", 1, 0, 100, "턴", { zero: "안 쉼" }), num3("cd_invite", "단톡방 초대", 3, 0, 100, "턴", { zero: "안 쉼" })]
+        items: [num3("cd_incoming", "선톡 받은 뒤 쉬는 턴", 1, 0, 100, "턴", { zero: "안 쉼" }), num3("cd_invite", "초대 받은 뒤 쉬는 턴", 3, 0, 100, "턴", { zero: "안 쉼" })]
       },
       {
         title: "길이·개수 제한",
@@ -3768,13 +3744,13 @@ ${themeVars("[x-goei-fab]")}
     nw: [
       craftGroup(),
       {
-        title: "참고 자료",
+        title: "참조",
         chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "관련 로어북", 1), chip("secondary", "2차 참조", 1)],
-        items: [turns(8), num3("ref_count", "관련·2차 참조 최대", 20, 1, 200, "개"), { ...budget, hint: "넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" }]
+        items: [turns(8), num3("ref_count", "관련·2차 참조 최대", 20, 1, 200, "개"), { ...budget, hint: "넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요" }]
       },
       {
-        title: "컨텍스트에 포함",
-        chips: [chip("ctx_focus", "채팅에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
+        title: "컨텍스트 포함",
+        chips: [chip("ctx_focus", "장면에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
         items: [num3("ctx_count", "넣을 문서", 2, 1, 50, "개"), num3("ctx_tokens", "컨텍스트 토큰 상한", 8e3, 0, 2e5, TOK, { zero: "제한 없음" })]
       }
     ]
@@ -3800,18 +3776,15 @@ ${themeVars("[x-goei-fab]")}
   }
   var advNum = (state, f, key) => Number(advValue(state, f, key));
   var advOn = (state, f, key) => advValue(state, f, key) === "1";
-  function advChanged(state, f) {
-    return advItems(f).filter((i) => advValue(state, f, i.key) !== String(i.def)).map((i) => i.key);
-  }
   function refToggles(state, f) {
-    const on2 = (k, d) => advItem(f, k) ? advOn(state, f, k) : d;
+    const on3 = (k, d) => advItem(f, k) ? advOn(state, f, k) : d;
     return {
-      description: on2("desc", true),
-      authors: on2("authors", true),
-      persona: on2("persona", true),
-      active: on2("active", true),
-      related: on2("related", false),
-      secondary: on2("secondary", false)
+      description: on3("desc", true),
+      authors: on3("authors", true),
+      persona: on3("persona", true),
+      active: on3("active", true),
+      related: on3("related", false),
+      secondary: on3("secondary", false)
     };
   }
   function budgetFor(state, f) {
@@ -3871,9 +3844,8 @@ ${themeVars("[x-goei-fab]")}
       reiterate: advNum(state, f, "reiterate") || advNum(state, "gen", "reiterate")
     };
   }
-  function featureModel(state, f) {
-    const v = advValue(state, f, "model_id").trim();
-    return v || void 0;
+  function featureModel(_state, _f) {
+    return void 0;
   }
   var RETRY_ANALYZE = "First analyze the error source step-by-step in a short <lb-process> block, then print only the required node with the corrected data in it, without apologies, explanations, or preambles.";
   var NOTE_HEAD = "Think step-by-step for final data, but keep minimal draft per step.\n\nFollow this template.";
@@ -3974,6 +3946,7 @@ ${memo.job.trim()}
   var SHOP_MIN_VAR = "$sh_min";
   var SHOP_MAX_VAR = "$sh_max";
   var SHOP_FEATURE_VAR = "$sh_feature";
+  var SHOP_SHARED_VARS = [SHOP_CTX_VAR, SHOP_TURNS_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_DIVERSE_VAR, SHOP_PREV_VAR];
   var SHOP_SIZE_LO = 1;
   var SHOP_SIZE_HI = 16;
   var clean2 = (s8, max) => String(s8 ?? "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -4015,19 +3988,19 @@ ${memo.job.trim()}
   }
   var shopOn = (vars) => shopSettings(vars).on;
   var TAG3 = /\[\s*shop\s*[:：]\s*([^\]|｜]*?)\s*(?:[|｜]\s*([^\]]*?)\s*)?\]/giu;
-  var hasShopTag = (text4) => typeof text4 === "string" && /\[\s*shop\s*[:：]/iu.test(text4);
-  function findShopTag(text4) {
-    if (!hasShopTag(text4)) return null;
+  var hasShopTag = (text5) => typeof text5 === "string" && /\[\s*shop\s*[:：]/iu.test(text5);
+  function findShopTag(text5) {
+    if (!hasShopTag(text5)) return null;
     let out = null;
-    for (const m of text4.matchAll(TAG3)) {
+    for (const m of text5.matchAll(TAG3)) {
       const shop = clean2(m[1], 30);
       if (shop) out = { raw: m[0], shop, owner: clean2(m[2], 30) };
     }
     return out;
   }
-  function stripShopTags(text4) {
-    if (!hasShopTag(text4)) return text4;
-    return text4.replace(new RegExp(`^[ \\t]*${TAG3.source}[ \\t]*\\r?\\n?`, "gimu"), "").replace(TAG3, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  function stripShopTags(text5) {
+    if (!hasShopTag(text5)) return text5;
+    return text5.replace(new RegExp(`^[ \\t]*${TAG3.source}[ \\t]*\\r?\\n?`, "gimu"), "").replace(TAG3, "").replace(/\n{3,}/g, "\n\n").trimEnd();
   }
   var EMPTY_ID = { sells: "", never: "", prices: "" };
   var traitsOf = (x) => {
@@ -4097,9 +4070,9 @@ ${memo.job.trim()}
     for (let i = list4.length - 1; i >= 0; i--) if (list4[i].role === "char") return { key: messageKey(list4[i], i), text: typeof list4[i].data === "string" ? list4[i].data : "", index: i };
     return null;
   }
-  function turnKeyAt(chat, index3) {
+  function turnKeyAt(chat, index) {
     const list4 = chat.message ?? [];
-    return index3 > 0 && list4[index3 - 1] ? `t:${messageKey(list4[index3 - 1], index3 - 1)}` : `t:first:${Math.max(0, index3)}`;
+    return index > 0 && list4[index - 1] ? `t:${messageKey(list4[index - 1], index - 1)}` : `t:first:${Math.max(0, index)}`;
   }
   function turnKey(chat) {
     const last2 = lastBot(chat);
@@ -4115,11 +4088,11 @@ ${memo.job.trim()}
     const list4 = chat.message ?? [];
     const m = list4[responseIndex];
     if (!m || m.role !== "char") return null;
-    const text4 = typeof m.data === "string" ? m.data : "";
-    const on2 = shopOn(chat.scriptstate);
+    const text5 = typeof m.data === "string" ? m.data : "";
+    const on3 = shopOn(chat.scriptstate);
     const norm3 = (s8) => s8.replace(/\s+/g, "").toLowerCase();
     const me = new Set(self.map(norm3).filter(Boolean));
-    const found = on2 ? findShopTag(text4) : null;
+    const found = on3 ? findShopTag(text5) : null;
     const own = found ? ownShopOf(chat.scriptstate, found.shop) : null;
     const webAsk = !!found && found.owner.trim().toLowerCase().startsWith(WEB_OWNER);
     const site = webAsk && own?.web ? own.web : "";
@@ -4142,7 +4115,7 @@ ${memo.job.trim()}
 ${webRaw}` };
         continue;
       }
-      if (on2 && !mine && i === responseIndex || list4[i].role !== "char" || !hasShopTag(String(list4[i].data ?? ""))) continue;
+      if (on3 && !mine && i === responseIndex || list4[i].role !== "char" || !hasShopTag(String(list4[i].data ?? ""))) continue;
       message ??= [...list4];
       message[i] = { ...list4[i], data: stripShopTags(String(list4[i].data)) };
     }
@@ -4158,9 +4131,9 @@ ${webRaw}` };
     }
     return `${n3 < 0 ? "−" : ""}${a.toLocaleString("en-US")}`;
   }
-  var hash3 = (text4) => {
+  var hash3 = (text5) => {
     let h = 2166136261;
-    for (const ch of text4) {
+    for (const ch of text5) {
       h ^= ch.codePointAt(0);
       h = Math.imul(h, 16777619);
     }
@@ -4178,13 +4151,13 @@ ${webRaw}` };
     const parts = cell3.split(/\s*[+＋]\s*/).map((x) => x.trim()).filter(Boolean);
     if (!parts.length) return null;
     let price = 0;
-    const text4 = [];
+    const text5 = [];
     for (const part of parts) {
       const won3 = /\d/.test(part) && /^[\s\d,.₩원억만천백\-−]+$/.test(part) ? priceOf(part) : null;
       if (won3 !== null) price += won3;
-      else text4.push(part);
+      else text5.push(part);
     }
-    const pay = clean2(text4.join(" + "), 40);
+    const pay = clean2(text5.join(" + "), 40);
     return pay ? { price, pay } : { price };
   }
   var SHOP_LINE = "이름|값|쓰임|그림|무게|설명|효과|구분";
@@ -4277,8 +4250,8 @@ ${webRaw}` };
     if (inf) {
       const [title2 = "", price = "", ...rest] = inf.split("|");
       const n3 = priceOf(price);
-      const text4 = clean2(rest.join("|"), 400);
-      if (title2.trim() && n3 !== null && n3 > 0 && text4) out.info = { title: clean2(title2, 24), price: n3, body: text4 };
+      const text5 = clean2(rest.join("|"), 400);
+      if (title2.trim() && n3 !== null && n3 > 0 && text5) out.info = { title: clean2(title2, 24), price: n3, body: text5 };
     }
     const body5 = m ? m[2] : "";
     if (mode2 === "all") {
@@ -4410,8 +4383,8 @@ ${webRaw}` };
     if (!o || typeof o.price !== "number") return null;
     return { ...st, sell: null, sales: [...st.sales, { name: o.name, price: o.price }].slice(-40) };
   }
-  function sayToOwner(st, text4) {
-    const talk = [...st.talk, { who: "me", text: clean2(text4, 300) }];
+  function sayToOwner(st, text5) {
+    const talk = [...st.talk, { who: "me", text: clean2(text5, 300) }];
     return { ...st, talk: talk.slice(-40) };
   }
   function markSold(st, id2, key = "") {
@@ -4655,19 +4628,19 @@ ${rule}`.trim();
   }
   var READY_TAG = /\[\s*shop-ready\s*[:：]\s*([^\]|｜]*?)\s*[|｜]\s*([^\]]*?)\s*\]/giu;
   var READY_SEP = ";;";
-  var hasReadyTag = (text4) => typeof text4 === "string" && /\[\s*shop-ready\s*[:：]/iu.test(text4);
-  function findReadyTag(text4) {
-    if (!hasReadyTag(text4)) return null;
+  var hasReadyTag = (text5) => typeof text5 === "string" && /\[\s*shop-ready\s*[:：]/iu.test(text5);
+  function findReadyTag(text5) {
+    if (!hasReadyTag(text5)) return null;
     let out = null;
-    for (const m of text4.matchAll(READY_TAG)) {
+    for (const m of text5.matchAll(READY_TAG)) {
       const names4 = m[2].split(READY_SEP).map((n3) => n3.trim()).filter(Boolean);
       if (m[1] && names4.length) out = { raw: m[0], site: m[1], names: names4 };
     }
     return out;
   }
-  function stripReadyTags(text4) {
-    if (!hasReadyTag(text4)) return text4;
-    return text4.replace(new RegExp(`^[ \\t]*${READY_TAG.source}[ \\t]*\\r?\\n?`, "gimu"), "").replace(READY_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  function stripReadyTags(text5) {
+    if (!hasReadyTag(text5)) return text5;
+    return text5.replace(new RegExp(`^[ \\t]*${READY_TAG.source}[ \\t]*\\r?\\n?`, "gimu"), "").replace(READY_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
   }
   var tagName2 = (s8) => s8.replace(/[\[\]|｜\r\n]/g, " ").replace(/;;+/g, ";").replace(/\s+/g, " ").trim();
   var readyTag = (site, orders) => `[shop-ready: ${site}|${orders.map((o) => tagName2(o.item.name)).filter(Boolean).join(READY_SEP)}]`;
@@ -4695,9 +4668,9 @@ ${rule}`.trim();
     }
     return out;
   }
-  function settleReady(chat, on2, site = "cos") {
+  function settleReady(chat, on3, site = "cos") {
     const list4 = chat.message ?? [];
-    const notes = on2 ? readyNotes(chat) : /* @__PURE__ */ new Map();
+    const notes = on3 ? readyNotes(chat) : /* @__PURE__ */ new Map();
     let message = null;
     for (let i = 0; i < list4.length; i++) {
       const m = list4[i];
@@ -4730,9 +4703,9 @@ ${tag}` : body5;
     "매뉴얼 준수도: 토씨 하나까지 지킴, 대충 지킴, 자주 어김, 몰래 흘림",
     "성격: 수다스러움, 무뚝뚝함, 소심함, 능글맞음, 깐깐함, 덤벙댐, 다정함, 냉소적임"
   ].join("\n");
-  function parseAxes(text4) {
+  function parseAxes(text5) {
     const out = [];
-    for (const line2 of String(text4 ?? "").split(/\r?\n/)) {
+    for (const line2 of String(text5 ?? "").split(/\r?\n/)) {
       const i = line2.indexOf(":");
       if (i <= 0) continue;
       const name = line2.slice(0, i).trim().slice(0, 20);
@@ -4783,8 +4756,8 @@ ${tag}` : body5;
     raw = "";
   };
   var fail2 = (msg, raw) => Object.assign(new DeskError(msg), { raw });
-  function bubbles(text4) {
-    return text4.replace(/\r/g, "").split(/\n\s*\n/).map((x) => x.split("\n").map((l) => l.trim()).filter(Boolean).join("\n").slice(0, 600)).filter(Boolean).slice(0, 3);
+  function bubbles(text5) {
+    return text5.replace(/\r/g, "").split(/\n\s*\n/).map((x) => x.split("\n").map((l) => l.trim()).filter(Boolean).join("\n").slice(0, 600)).filter(Boolean).slice(0, 3);
   }
   var newDeskNo = (rnd = Math.random) => String(1e3 + Math.floor(rnd() * 9e3));
   var deskTag = (a) => `상담원 ${a.no ?? String(1e3 + parseInt(a.id.slice(-4), 36) % 9e3)}`;
@@ -4799,4 +4772,49 @@ ${tag}` : body5;
     const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
     return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
   }
-  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi,
+  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
+  function parseSay(raw) {
+    const say2 = bubbles(block3(raw, "say"));
+    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
+    return say2;
+  }
+  var G2 = () => guideSections("BmDesk");
+  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
+  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
+이름: ${a.name}
+직급: ${a.rank}
+부서: ${a.dept}
+소개: ${a.intro}
+말투: ${a.voice}
+${diceText(a.dice)}`;
+  var material2 = (src) => [
+    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
+${src.refs}` : "",
+    `[지금 진열된 상품]
+${src.shelf || "(없음)"}`,
+    `[손님]
+사내 계정: ${src.nick || "-"}
+남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
+  ].filter(Boolean).join("\n\n");
+  function makePrompt(src, dice, recent, no) {
+    const g2 = G2();
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[손님에게 보이는 호칭]
+상담원 ${no}
+
+[이번 상담사 주사위]
+${diceText(dice)}
+
+[최근 상담사 — 겹치지 말 것]
+${past}
+
+[현재 작업]
+상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
+  }
+  function talkPrompt2(src, st) {
+    const g2 = G2();
+    const a = st.agent;
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).jo
