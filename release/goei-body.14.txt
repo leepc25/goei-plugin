@@ -1,4 +1,17 @@
-underline; }
+mary::before { content: '▾ '; }
+.nw-spoil[open] > summary { border-bottom: 1px solid var(--line); }
+.nw-spoil-in { padding: 12px 14px 0; }
+.nw-spoil.fn { display: inline-block; margin: 0; border: 0; background: none; }
+.nw-spoil.fn > summary { display: inline; padding: 0; }
+.nw-spoil.fn[open] > summary { border: 0; }
+.nw-quote cite { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--dim); }
+.nw-table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 15px; }
+.nw-table caption { padding: 6px; font-weight: 600; color: var(--mint); }
+.nw-table th { background: var(--nw); color: #fff; padding: 6px 8px; }
+.nw-table td { padding: 6px 8px; border: 1px solid var(--line); }
+.nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
+.nw-link.on { color: #7fb8ff; text-decoration: none; }
+.nw-link:hover { text-decoration: underline; }
 .nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; }
 .nw-fn:hover, .nw-fn:focus-visible { background: var(--accent-bg); outline: none; }
 .nw-fn-in { color: var(--sub); font-size: 0.92em; }
@@ -2125,13 +2138,4 @@ underline; }
 .pp-rule > b { font-size: 15px; font-weight: 600; }
 .pp-rule > .nw-reqbox { width: 100%; box-sizing: border-box; margin: 0; min-height: 96px; }
 .pp-rule > small { font-size: 13px; color: var(--dim); line-height: 1.45; }
-.pp-rule > .gx-row-btns { justify-content: flex-end; }
-@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) { .pp-rules { grid-template-columns: minmax(0, 1fr); padding: 12px; } }
-.pp-diags { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
-.pp-diag + .pp-diag { border-top: 1px solid var(--panel2); }
-.pp-diag-row { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 10px 12px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; }
-.pp-diag-row:hover { background: var(--panel2); }
-.pp-diag-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
-.pp-diag-who { flex: 1 1 120px; min-width: 0; color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pp-diag-res { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.pp-diag-res .gx-badge { font-
+.pp-rule > .gx-row-btns { justify-conten

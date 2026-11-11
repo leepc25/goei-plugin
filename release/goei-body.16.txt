@@ -1,4 +1,14 @@
- padding: 0 8px 6px; font-size: 12px; color: var(--ink); opacity: 1; font-weight: 800; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+adius: 3px; text-align: left; }
+.bs-gn .side .splist .sp i { flex: none; font-style: normal; font-size: 11px; color: var(--dim); }
+.bs-gn .side .splist .sp span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gn .side .splist .sp em { flex: none; font-style: normal; font-size: 11px; color: var(--red); }
+.bs-gn .side .splist .sp .gn-dot { flex: none; }
+.bs-gn .side .splist .sp:hover { background: var(--chip); }
+.bs-gn .side .splist .sp.on { background: var(--hd); color: var(--hdi); font-weight: 700; }
+.bs-gn .side .splist .sp.on i, .bs-gn .side .splist .sp.on em { color: var(--hdi); opacity: .8; }
+.bs-gn .side .sp-none { margin: 4px 12px 8px; font-size: 12px; color: var(--dim); }
+/* 묶음 제목(글 목록·내 메뉴)과 그 아래 항목을 가른다: 제목은 진한 글씨에 밑줄, 항목은 들여쓴다 (2026-11-10 사용자: 제목과 하위 메뉴가 구분이 안 됐다) */
+.bs-gn .side h6 { margin: 14px 4px 6px; padding: 0 8px 6px; font-size: 12px; color: var(--ink); opacity: 1; font-weight: 800; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
 .bs-gn .side h6:first-child { margin-top: 4px; }
 .bs-gn .side > button { padding-left: 22px; }
 .bs-gn .side .splist .sp { padding-left: 22px; }
@@ -1577,9 +1587,6 @@ ${note.trim()}` : card2;
   var shown2 = false;
   var appShown = () => shown2;
   var shownListener = null;
-  function onAppShown(f) {
-    shownListener = f;
-  }
   function setShown(v) {
     shown2 = v;
     shownListener?.(v);
@@ -3642,19 +3649,4 @@ ${texts.anomaly}`;
     const me = playerAgent(char.globalLore, chat.scriptstate);
     const names4 = imgCharacters(char.globalLore, cfg, { assetPlayer: s8.assetPlayer, playerEnglish: me?.english || void 0, userName: userInfo().name });
     if (!names4.length) return out;
-    return [...out, { role: "system", content: buildImgPrompt(cfg, names4, s8.assetPlayer) }];
-  }
-  function moduleContext(scene2, { char, chat }) {
-    const ss = chat.scriptstate;
-    const boardsOn = BOARD_SITES.map((site) => ({ site, view: boardView(chat, site) })).filter(({ view: view2 }) => !!view2.scriptstate?.[GN_RAW] && gnetSettings(view2.scriptstate).context);
-    const wantGnet = boardsOn.length > 0;
-    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
-    const wantWiki = wikiContextOn(ss);
-    if (!wantGnet && !wantPhone && !wantWiki) return [];
-    applyAdvanced(ss);
-    const src = { char: { globalLore: char.globalLore }, chat };
-    const rules2 = { phone: mainContextRules2(src), wiki: wikiContextRules(char.globalLore) };
-    const focus = makeFocus(scene2, buildRegistry(char.globalLore));
-    const parts = [];
-    for (const { view: view2 } of boardsOn) {
-      const rule = mainConte
+    return [...out, { role:

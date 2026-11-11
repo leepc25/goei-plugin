@@ -1103,6 +1103,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   // 이미 커스텀 탭이면 다시 누르지 않는다 (한 번 더 누르면 상황판으로 간다)
   await goMission(page);
+  // 호출 진행 창은 상황판 위에도 뜬다 (11-11). 도는 동안 펼쳐진 창이 1100px 화면에서 이 단추를 가리므로 머리줄을 눌러 접고 누른다 (사용자도 그렇게 한다)
+  if (await page.evaluate(() => document.querySelector('[x-goei-prog]')?.getAttribute('x-goei-open') === 'true')) {
+    const g = await page.locator('[x-goei-prog] [data-grip]').boundingBox();
+    await page.mouse.click(g.x + 40, g.y + 6);
+    await page.waitForFunction(() => document.querySelector('[x-goei-prog]').getAttribute('x-goei-open') === 'false');
+    await page.waitForTimeout(300);
+  }
   await page.click('[data-action="mission-cancel"][data-value="ms"]');
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로

@@ -3102,7 +3102,7 @@ ${RETRY_ANALYZE}` }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.8" : "0";
+  var PLUGIN_VERSION = true ? "0.21.9" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
