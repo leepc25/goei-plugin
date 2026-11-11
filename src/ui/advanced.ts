@@ -31,9 +31,12 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
   const down = Math.max(min, n - step);
   const up = Math.min(max, n + step);
   return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
-    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''}${zeroWidth(item.zero)} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
     <button class="gx-step" data-action="adv-set" data-value="${id}=${up}" ${n >= max ? 'disabled' : ''} aria-label="${esc(item.label)} 늘리기">+</button></div>`;
 }
+
+/** 0일 때 보이는 말이 기본 칸(6.2em)보다 길면 칸을 그 말만큼 넓힌다 (모든 세부 값 줄 공통) */
+const zeroWidth = (z?: string): string => (z && [...z].length > 5 ? ` style="width:${[...z].length + 1.2}em"` : '');
 
 function row(f: AdvFeature, item: AdvItem, state: State): string {
   const cur = advValue(state, f, item.key);

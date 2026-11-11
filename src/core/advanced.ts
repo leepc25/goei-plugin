@@ -35,7 +35,7 @@ export interface AdvGroup {
 const chip = (key: string, label: string, def: 0 | 1, v?: string): AdvItem => ({ key, label, type: 'bool', def: String(def), ...(v ? { v } : {}) });
 const num = (key: string, label: string, def: number, min: number, max: number, unit: string, extra: Partial<AdvItem> = {}): AdvItem => ({ key, label, type: 'num', def, min, max, unit, ...extra });
 const TOK = '토큰';
-const budget = num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '공통', hint: '넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요' });
+const budget = num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '생성 공통 값 따름', hint: '0이면 생성 공통의 요청 토큰 상한을 따라요. 넘으면 2차 참조, 관련 로어북, 오래된 챗로그 순으로 줄여요' });
 const turns = (def: number) => num('turns', '챗로그 포함', def, 0, 200, '턴', { zero: '안 봄' });
 
 /** 생성 방식 (라이트보드 5.0.0 「생각보조」·「탈옥 (비망록)」·다시 보기, 2026-11-06 사용자). 기능마다 맨 위 묶음 */
@@ -44,7 +44,7 @@ const craftGroup = (): AdvGroup => ({
   items: [
     { key: 'thoughts', label: '생각 단계', type: 'pick', def: 'off', opts: [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']], hint: '모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요' },
     { key: 'memo', label: '비망록', type: 'pick', def: '0', opts: [['0', '끔'], ['1', '켬']], hint: '모델 거부를 줄이는 긴 앞글이에요. 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요' },
-    num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '공통', hint: '0이면 생성 공통 값을 따라요' }),
+    num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '생성 공통 값 따름', hint: '0이면 생성 공통의 다시 보기 값을 따라요' }),
     { key: 'model_id', label: '전용 모델', type: 'text', def: '', hint: 'Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인 모델·보조 모델) 설정' },
   ],
 });
