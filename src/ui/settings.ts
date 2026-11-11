@@ -21,7 +21,7 @@ import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars 
 import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON_VAR, pointsAuto, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
 import { pointsFlagFor } from '../core/points';
 import { ICON_ALIAS_DEFAULT, readIconMisses } from '../core/iconmatch';
-import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_PUSH_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemPushOn, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
+import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -408,7 +408,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     items: group('소지품', [
       D('inv-on', invOn(itVars) ? '1' : '0'),
       ...(!invOn(itVars) ? [] : [
-      D('items-push', itemPushOn(itVars) ? '1' : '0'),
       D('items-auto', itemAutoOn(itVars) ? '1' : '0'),
       D('items-slots', '', { ctl: stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), help: `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘쳐도 막지 않고 「17/16」처럼 보여 주며 그대로 본편에 넘겨요.` }),
       D('items-carry', '', { ctl: stepper('set-items-carry', 'n', `${itemCarrySetting(itVars)}kg`, itemCarrySetting(itVars) > ITEM_CARRY_MIN, itemCarrySetting(itVars) < ITEM_CARRY_MAX, '소지 한도', busy), help: `들 수 있는 무게예요(${ITEM_CARRY_MIN}~${ITEM_CARRY_MAX}kg). 장착한 것까지 모든 물건의 무게를 더해 보여 주고, 넘으면 넘은 만큼 색이 진해져요. 막지는 않고, 본편에는 넘었는지·얼마나 넘었는지만 넘겨요. 고유 인물로 시작하면 명부의 「소지 한도」를 쓰고, 값이 없을 때만 이 값을 써요.${scope === 'chat' && itemWeight(itVars?.[ITEM_CARRY_PC_VAR]) ? ` 이 채팅은 명부 값 ${itemWeight(itVars?.[ITEM_CARRY_PC_VAR])}kg을 써요.` : ''}` }),
@@ -921,9 +920,8 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-inv-on':
         if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ON_VAR]: v } }));
         return true;
-      case 'set-items-push':
       case 'set-items-auto':
-        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [action === 'set-items-push' ? ITEM_PUSH_VAR : ITEM_AUTO_VAR]: v } }));
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_AUTO_VAR]: v } }));
         return true;
       case 'set-items-slots': {
         const next = Math.min(ITEM_SLOTS_MAX, Math.max(ITEM_SLOTS_MIN, itemSlots(getPrefs().vars) + (v.endsWith('+') ? 1 : -1)));
@@ -1064,11 +1062,9 @@ export async function handleSettings(action: string, value: string | undefined, 
         await dropShopTags(ctx);
       }
       return true;
-    case 'set-items-push':
     case 'set-items-auto': {
       if (v !== '1' && v !== '0') return true;
-      const key = action === 'set-items-push' ? ITEM_PUSH_VAR : ITEM_AUTO_VAR;
-      await save(ctx, env, (chat) => ((action === 'set-items-push' ? itemPushOn(chat.scriptstate) : itemAutoOn(chat.scriptstate)) === (v === '1') ? null : { [key]: v }));
+      await save(ctx, env, (chat) => (itemAutoOn(chat.scriptstate) === (v === '1') ? null : { [ITEM_AUTO_VAR]: v }));
       return true;
     }
     case 'set-items-slots':

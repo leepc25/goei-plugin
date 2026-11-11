@@ -348,7 +348,7 @@ function knownIdentity({ chat }: ChatContext): string {
 /** 인물 기록 블록: 마지막 사용자 메시지 앞에 (core/people/request.ts). 채팅은 바꾸지 않는다 */
 async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): Promise<M[]> {
   const settings = peopleSettings(chat.scriptstate);
-  if (!settings.on || settings.inject === 'off') return messages;
+  if (!settings.on) return messages;
   const store = peopleStore(chat);
   if (!Object.keys(store.people).length) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);

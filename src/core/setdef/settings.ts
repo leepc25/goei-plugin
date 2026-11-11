@@ -64,7 +64,6 @@ export const SETTINGS_SET: SetPage = {
       title: '소지품',
       rows: [
         { key: 'inv-on', label: '소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요.' },
-        { key: 'items-push', label: '컨텍스트에 포함', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 매 요청에 지금 가진 물건·한계·이번 턴 사건(사용·새로 산 것·넘침)을 [Inventory] 글로 넣어요. 모델이 상황을 알고 응답에 반영해요. 플러그인은 막거나 경고하지 않아요. 끄면 물건 목록은 안 가고, 상점이 켜져 있으면 상점 표식 지침과 상점 사건만 [Shop] 글로 가요.' },
         { key: 'items-auto', label: '보조 모델이 읽기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만, 인물 기록이 켜져 있을 때). 끄면 직접 넣기·상점으로만 바뀌어요.' },
         { key: 'items-slots', label: '칸 수', ctl: { t: 'custom' } },
         { key: 'items-carry', label: '소지 한도', ctl: { t: 'custom' } },

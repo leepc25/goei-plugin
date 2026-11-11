@@ -500,7 +500,6 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
     ...(s.features.has('faction_rep') ? [
       // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
       ppRow('num_faction_rep', v('num_faction_rep') === '1' ? '1' : '0'),
-      ppRow('faction_inject', v('faction_inject') === '1' ? '1' : '0'),
       ...(s.factionQual ? [] : [
         ppRow('bounds', '', { ctl: `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">` }),
       ]),

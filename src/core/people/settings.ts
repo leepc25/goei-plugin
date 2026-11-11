@@ -65,7 +65,6 @@ export const PP_DEFAULTS: Record<string, string> = {
   faction_rep: '1',
   /** 세력 평판 수치 (1) / 정성 모드 (0): 갱신기가 단계(적대…우호)와 이유만 판단, 계기 점수·구간 경계·몹 목격 무게 안 씀 (11-07 사용자: 호감·의심·음란도처럼 따라간다) */
   num_faction_rep: '1',
-  faction_inject: '1',
   faction_bounds: '61,21,-20,-60',
   /** auto / confirm */
   newpeople: 'auto',
@@ -93,7 +92,8 @@ export interface PeopleSettings {
   when: 'turn' | 'manual';
   model: 'main' | 'aux';
   prompt: 'detailed' | 'compact';
-  inject: 'split' | 'append' | 'record' | 'off';
+  /** 메인 요청에 넣는 방식. 2026-11-11 사용자: 넣지 않는 선택지(off)는 뺌 — 안 넣을 거면 인물 기록을 끄면 된다 */
+  inject: 'split' | 'append' | 'record';
   director: 'off' | 'note' | 'facts' | 'scene';
   directorLang: 'en' | 'ko';
   directorLen: 'short' | 'normal';
@@ -141,7 +141,6 @@ export interface PeopleSettings {
   personCap: number;
   blockCap: number;
   tidy: 'same' | 'separate';
-  factionInject: boolean;
   /** 세력 평판 정성 모드 (num_faction_rep = 0) */
   factionQual: boolean;
   factionBounds: [number, number, number, number];
@@ -173,7 +172,7 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     when: one('when', ['turn', 'manual'] as const),
     model: v('model') === 'main' ? 'main' : 'aux',
     prompt: one('prompt', ['detailed', 'compact'] as const),
-    inject: one('inject', ['split', 'append', 'record', 'off'] as const),
+    inject: one('inject', ['split', 'append', 'record'] as const),
     director: one('director', ['off', 'note', 'facts', 'scene'] as const),
     directorLang: v('director_lang') === 'ko' ? 'ko' : 'en',
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
@@ -215,7 +214,6 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     personCap: num('person_cap', 2000, 40000),
     blockCap: num('block_cap', 4000, 64000),
     tidy: v('tidy') === 'separate' ? 'separate' : 'same',
-    factionInject: v('faction_inject') !== '0',
     factionQual: v('faction_rep') === '1' && v('num_faction_rep') === '0',
     factionBounds: parseBounds(v('faction_bounds')),
     spanCap: num('span_cap', 3000, 40000),

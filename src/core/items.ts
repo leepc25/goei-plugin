@@ -28,7 +28,6 @@ export const ITEM_ICON_ALIAS_VAR = '$it_icon_alias';
 /** 분류 말(과자·다과·음식)은 그 분류 그림 가운데 물건마다 하나를 뽑아 보여 주기 ('0' = 끔, 기본 켬) — 2026-11-10 사용자 */
 export const ITEM_ICON_POOL_VAR = '$it_icon_pool';
 export const itemIconPoolOn = (vars: Record<string, unknown> | undefined) => vars?.[ITEM_ICON_POOL_VAR] !== '0';
-export const ITEM_PUSH_VAR = '$it_push';
 export const ITEM_AUTO_VAR = '$it_auto';
 export const ITEM_SLOTS_DEFAULT = 16;
 export const ITEM_SLOTS_MIN = 8;
@@ -435,7 +434,8 @@ export function invJustResumed(chat: Chat): boolean {
   return !(chat.message ?? []).slice(at).some((m) => m.role === 'char');
 }
 const RESUMED_EVENT = 'item tracking was switched off for a while and just came back on — this list may not match what happened in the story since; follow the story and treat the list as a starting point';
-export const itemPushOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_PUSH_VAR] !== '0';
+/** 소지품을 메인 요청에 넣는가. 2026-11-11 사용자: 넣지 않을 거면 쓰는 뜻이 없다 → 따로 끄는 줄을 없애고 「사용」과 같은 값 */
+export const itemPushOn = (vars: Record<string, unknown> | undefined) => invOn(vars);
 /** 보조 모델이 본문을 읽어 목록을 맞추기 (기본 켬, '0' 이면 끔) */
 export const itemAutoOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_AUTO_VAR] !== '0';
 /** 시작 소지품 (기본 켬): 고유 인물로 시작할 때 명부의 시작 소지품을 넣고 무기·장비를 장착 */
@@ -642,22 +642,13 @@ export function pendingItemUse(vars: Record<string, unknown> | undefined, userKe
   return !at || at === userKey ? readItemUse(vars) : [];
 }
 
-/** 이 채팅의 [Inventory] 글 (본편에 넘기기 설정이 꺼졌거나 넘길 게 없으면 '') */
+/** 이 채팅의 [Inventory] 글 (소지품이 꺼졌거나 넘길 게 없으면 '') */
 export function inventoryText(chat: Chat): string {
   const vars = chat.scriptstate;
   if (!itemPushOn(vars)) {
-    // 본편에 넘기기를 꺼도 상점은 켜져 있을 수 있다: 물건 목록 없이 상점 표식 지침과 이번 방문 사건만 [Shop] 글로 넘긴다
-    // (지침이 [Inventory] 에만 실려 있어, 넘기기를 끄면 모델이 표식을 쓰지 않아 상점이 열리지 않던 것, 11-08 전수점검)
-    const it = readItems(vars);
-    const soldOff = [...soldNow(it, lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
-    if (!shopOn(vars)) return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
-    const live = liveItems(it, aliveAnchors(chat));
-    const bought = newlyBought(live, lastBotKey(chat)).map(boughtLine);
-    const events = [...(bought.length ? [`just bought ${bought.join(', ')}`] : []), ...soldOff, ...shopEvents(chat)];
-    // 갱신기가 상점을 판단하면 표식 지침은 빈 글 (core/shop.ts shopJudgeBy): 넘길 사건도 없으면 블록을 보내지 않는다
-    const guide = shopGuide(vars);
-    if (!events.length && !guide) return '';
-    return [SHOP_HEAD, ...(events.length ? [`This turn: ${events.join('; ')}`] : []), ...(guide ? [guide] : [])].join('\n');
+    // 소지품이 꺼져 있다 (상점도 같이 꺼진다): 물건 목록은 없고, 이번 턴에 판 일·쇼핑몰 사건만 [Shop] 글로 넘긴다
+    const soldOff = [...soldNow(readItems(vars), lastBotKey(chat), currentShop(chat)?.shop), ...mallEvents(chat)];
+    return soldOff.length ? [SHOP_HEAD, `This turn: ${soldOff.join('; ')}`].join('\n') : '';
   }
   const it = readItems(vars);
   const userKey = lastUserKey(chat);

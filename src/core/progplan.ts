@@ -21,7 +21,7 @@ export function turnPlan(char: { globalLore?: LoreEntry[] }, chat: Chat): Stage[
     hasPeople = false;
   }
   // 라우터·디렉터는 본편 앞 (body.ts withPeople): 인물 기록이 켜져 있고 본편에 넣으며 기록된 인물이 있을 때만 부른다
-  if (pp.on && pp.inject !== 'off' && hasPeople) {
+  if (pp.on && hasPeople) {
     if (pp.router === 'model') out.push({ id: 'router', label: '라우터', group: 'router', match: ['라우터'] });
     if (pp.director === 'scene' || pp.director === 'facts') out.push({ id: 'director', label: '디렉터', group: 'director', match: ['디렉터'] });
   }

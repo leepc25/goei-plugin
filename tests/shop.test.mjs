@@ -211,8 +211,8 @@ test('인터넷 쇼핑몰에 판 것은 본편에 「이번 턴」 사건으로 
   it = sellItem(it, it.list[0].id, key, '우주 쇼핑몰에 팖');
   const on = inventoryText({ ...c, scriptstate: { ...itemsVars(it), $it_push: '1' } });
   assert.match(on, /This turn: .*just sold 여분 정장 상의 to 우주 쇼핑몰.*no longer has, carries or wears it/);
-  const off = inventoryText({ ...c, scriptstate: { ...itemsVars(it), $it_push: '0', $sh_on: '0' } });
-  assert.match(off, /just sold 여분 정장 상의 to 우주 쇼핑몰/, '본편에 넘기기를 꺼도 판 일은 넘긴다');
+  const off = inventoryText({ ...c, scriptstate: { ...itemsVars(it), $it_on: '0' } });
+  assert.match(off, /just sold 여분 정장 상의 to 우주 쇼핑몰/, '소지품을 꺼도 판 일은 넘긴다');
   // 다음 응답이 붙으면 더 넘기지 않는다
   const next = { ...c, message: [...c.message, { role: 'user', data: '간다', chatId: 'u3' }, { role: 'char', data: '다음', chatId: 'c2' }], scriptstate: { ...itemsVars(it), $it_push: '1' } };
   assert.doesNotMatch(inventoryText(next), /just sold/);
