@@ -13,7 +13,7 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, worldMinute, type CosOrder } from '../core/orders';
+import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, settleReady, worldMinute, type CosOrder } from '../core/orders';
 import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
@@ -429,7 +429,10 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         const it = cur.item;
         const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
         ok = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
+        const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
+        // 받았으니 채팅의 완성 알림 카드(표식)를 지운다
+        const message = settleReady(next, cosReadyMode(next.scriptstate) !== 'off');
+        return message ? { ...next, message } : next;
       });
       v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : '받을 수 없는 상태다.';
       if (ok) v.took = o.id;
@@ -1080,7 +1083,16 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     if (m[2] === 'roll_gmode') return set({ [K.gmode]: m[3] === 'uniq' ? '' : m[3] });
     if (m[2] === 'roll_tmode') return set({ [K.tmode]: m[3] === 'weight' ? '' : m[3] });
     m.splice(1, 1); // 아래는 우주몰 전용 (truth·fx_on)
-    if (m[1] === 'ready') return set({ [COS_READY_KEY]: m[2] === 'both' ? '' : m[2] });
+    if (m[1] === 'ready') {
+      // 설정을 바꾸면 채팅의 완성 표식도 바로 맞춘다 (끄면 카드가 사라지고 켜면 다시 붙는다)
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [COS_READY_KEY]: m[2] === 'both' ? '' : m[2] } };
+        const message = settleReady(next, cosReadyMode(next.scriptstate) !== 'off');
+        return message ? { ...next, message } : next;
+      });
+      await env.refresh();
+      return true;
+    }
     if (m[1] === 'truth') return set({ [COS_TRUTH_KEY]: m[2] === 'mix' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));

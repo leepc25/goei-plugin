@@ -408,7 +408,7 @@ if (want('G4')) {
   await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1 && /제목 1/.test(window.__chat.scriptstate.$gn_raw ?? ''), n0, { timeout: 8000 });
   await wait(300);
   const joint = await page.evaluate(() => window.__calls.llm.at(-1));
-  assert.ok(joint.messages[0].content.startsWith('Execute two independent automatic tasks'), '통합 요청');
+  assert.match(joint.messages[0].content, /^Execute 2 independent automatic tasks/, '통합 요청');
   const body = JSON.parse(joint.messages[1].content);
   assert.ok(Array.isArray(body.gnet) && Array.isArray(body.phone));
   assert.equal(await llmCount(page), n0 + 1, '한 번만');

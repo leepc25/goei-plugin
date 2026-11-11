@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-const out = await build({ stdin: { contents: `export * from './src/core/orders'; export { parseTalk, applyTalk, acceptQuote, parseOrderLine, emptyShop, reviveShop, markSold } from './src/core/shop';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
+const out = await build({ stdin: { contents: `export * from './src/core/orders'; export { parseTalk, applyTalk, acceptQuote, parseOrderLine, emptyShop, reviveShop, markSold } from './src/core/shop'; export { stripMarkers } from './src/core/sanitize';`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 
 test('견적 줄 → 견적, <order> → 대사에 붙음, 같은 이름은 바꿔치기, 수락은 한 번', () => {
@@ -62,7 +62,7 @@ test('산 응답이 죽으면 진열대·쪽지·견적도 안 산 것으로 (re
   assert.equal(M.markSold(st, 'i3', 'c9'), st);
 });
 
-test('완성 알림 자리: 주문 뒤 처음 받을 수 있게 된 응답의 상태창에만, 받으면 없어진다 (11-11 사용자)', () => {
+test('완성 알림 자리: 주문 뒤 처음 받을 수 있게 된 응답 끝 표식으로, 받으면 없어진다 (11-11 사용자)', () => {
   const st = (d, t) => `[▣|${d}|${t}|☀️|4°C|관리국|QC 괴이]`;
   const msg = (id, d, t) => ({ role: 'char', data: `답.\n${st(d, t)}`, chatId: id });
   const base = [{ role: 'user', data: 'x', chatId: 'u1' }, msg('c1', '2025.01.01', '02:47 AM')];
@@ -73,8 +73,25 @@ test('완성 알림 자리: 주문 뒤 처음 받을 수 있게 된 응답의 �
   assert.equal(M.readyNotes(chat([{ role: 'user', data: 'y', chatId: 'u2' }, msg('c2', '2025.01.01', '11:00 PM')])).size, 0, '납기 전');
   const late = [{ role: 'user', data: 'y', chatId: 'u2' }, msg('c2', '2025.01.01', '11:00 PM'), { role: 'user', data: 'z', chatId: 'u3' }, msg('c3', '2025.01.02', '03:00 PM'), { role: 'user', data: 'w', chatId: 'u4' }, msg('c4', '2025.01.03', '09:00 AM')];
   const n = M.readyNotes(chat(late));
-  assert.deepEqual([...n.keys()], [st('2025.01.02', '03:00 PM')], '처음 완성된 응답에만 (그 뒤 응답에는 또 붙지 않는다)');
-  assert.deepEqual([n.values().next().value.index, n.values().next().value.orders[0].item.name], [5, '신발']);
+  assert.deepEqual([...n.keys()], [5], '처음 완성된 응답에만 (그 뒤 응답에는 또 붙지 않는다)');
+  assert.equal(n.get(5)[0].item.name, '신발');
+  // 표식: 완성된 응답 끝에만 적고, 받거나 끄면 지운다. 상태창이 없는 응답에도 붙는다
+  const c = chat(late);
+  const set = M.settleReady(c, true);
+  assert.ok(set[5].data.endsWith('\n[shop-ready: cos|신발]'));
+  assert.equal(set.filter((m) => M.hasReadyTag(m.data)).length, 1);
+  assert.deepEqual(M.findReadyTag(set[5].data), { raw: '[shop-ready: cos|신발]', site: 'cos', names: ['신발'] });
+  assert.equal(M.stripReadyTags(set[5].data), late[3].data);
+  assert.equal(M.settleReady({ ...c, message: set }, true), null, '이미 맞으면 그대로');
+  assert.equal(M.settleReady({ ...c, message: set }, false)[5].data, late[3].data, '끄면 지운다');
+  assert.equal(M.settleReady({ message: set, scriptstate: M.ordersVars([{ ...o, taken: true, takenKey: 'c4' }]) }, true)[5].data, late[3].data, '받으면 지운다');
+  // 모델에 보내는 글에서는 표식이 빠진다 (core/sanitize.ts)
+  assert.equal(M.stripMarkers([{ role: 'assistant', content: set[5].data }])[0].content, late[3].data);
+  const bare = [{ role: 'user', data: 'y', chatId: 'u2' }, { role: 'char', data: '상태창 없는 답', chatId: 'c2' }];
+  assert.equal(M.settleReady(chat(bare, [{ ...o, orderedAt: null }]), true)[3].data, '상태창 없는 답\n[shop-ready: cos|신발]');
+  // 이름에 대괄호·세로줄이 있어도 표식이 깨지지 않는다. 여러 건은 한 표식에
+  const two = M.settleReady(chat(late, [{ ...o, item: { ...o.item, name: '신발 [특]|A' } }, { ...o, id: 'q2', item: { ...o.item, name: '장갑' } }]), true);
+  assert.deepEqual(M.findReadyTag(two[5].data).names, ['신발 특 A', '장갑']);
   assert.equal(M.readyNotes(chat(late, [{ ...o, taken: true, takenKey: 'c4' }])).size, 0, '받으면 없어진다');
   // 완성된 응답을 다시 굴려 시각이 납기 전이면 알림도 사라진다
   assert.equal(M.readyNotes(chat([...late.slice(0, 3), msg('c3b', '2025.01.02', '09:00 AM')])).size, 0);

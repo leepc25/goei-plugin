@@ -2,6 +2,8 @@
 // 그 자리(상태창 상자 아래)에 가게 이름과 「상점 열기」 단추를 붙인다. 누르면 창을 열고 상점 팝업을 띄운다 (app.ts openShop).
 // 표식은 응답 처리(core/shop.ts settleShop)가 마지막 응답에만 남기므로 카드도 마지막 응답 아래에만 붙는다.
 import { findShopTag, stripShopTags, webSiteOfOwner } from '../core/shop';
+import { findReadyTag, stripReadyTags } from '../core/orders';
+import { MALL_NAME } from '../core/malls';
 import { cardPalette, currentTheme } from '../ui/theme';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 
@@ -31,8 +33,17 @@ export function renderShopCard(text: string): string {
   return `${stripShopTags(text)}\n${card}`;
 }
 
-/** 맞춤 주문 완성 알림 (11-11 사용자): 완성된 턴의 상태창 아래에 붙는다 (host/statusview.ts). 단추는 「접속하기」와 같은 길로 그 사이트를 연다 */
-export function orderReadyCard(site: string, shop: string, names: string[]): string {
+/** display: 맞춤 주문 완성 표식 `[shop-ready: 사이트|이름]` 을 지우고 카드를 붙인다 (11-11 사용자: 상점 카드와 같은 방식, 상태창과 무관). 표식은 core/orders.ts settleReady 가 적는다 */
+export function renderReadyCard(text: string): string {
+  const tag = findReadyTag(text);
+  const body = stripReadyTags(text);
+  if (!tag) return body;
+  const shop = (MALL_NAME as Record<string, string>)[tag.site];
+  return shop ? `${body}\n${orderReadyCard(tag.site, shop, tag.names)}` : body;
+}
+
+/** 맞춤 주문 완성 알림 카드. 단추는 「접속하기」와 같은 길로 그 사이트를 연다 */
+function orderReadyCard(site: string, shop: string, names: string[]): string {
   if (!names.length) return '';
   armChatClick('shop');
   drawn.add(site);

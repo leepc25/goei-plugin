@@ -257,7 +257,7 @@ export function mallEvents(chat: Chat): string[] {
   // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다)
   if (cosReadyMode(vars) === 'both') {
     const at = lastBot(chat)!.index;
-    for (const n of readyNotes(chat).values()) if (n.index === at) for (const o of n.orders) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
+    for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
   }
   const desk = readDesk(vars);
   if (desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== 'sys').map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);

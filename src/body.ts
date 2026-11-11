@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { chatCardsAt, orderNotesAt, refreshStatusContext, renderStatus, resetStatusContext, setRecordsOpener, setWikiOpener } from './host/statusview';
+import { chatCardsAt, refreshStatusContext, renderStatus, resetStatusContext, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MARK, START_MARK, stripSceneMark, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
@@ -68,7 +68,9 @@ import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { settleItemUse, withInventory } from './core/items';
 import { withHomeshop } from './core/homeshop';
 import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
-import { renderShopCard, setShopOpener } from './host/shopcard';
+import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
+import { hasReadyTag, settleReady } from './core/orders';
+import { cosReadyMode } from './core/malls';
 import { hideUseBox, refreshUseBox } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
@@ -532,6 +534,16 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return r ? { ...cur, ...(r.message ? { message: r.message } : {}), scriptstate: { ...(cur.scriptstate ?? {}), ...r.vars } } : null;
       }).catch(() => null)) ?? latest;
     }
+    // 맞춤 주문 완성 표식 `[shop-ready: …]`: 이 응답에서 완성된 주문이 있으면 응답 끝에 적고, 받았거나 꺼진 것은 지운다 (core/orders.ts settleReady). 화면이 카드로 바꾼다
+    {
+      const base = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
+      if (base && settleReady(base, cosReadyMode(base.scriptstate) !== 'off')) {
+        latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const message = settleReady(cur, cosReadyMode(cur.scriptstate) !== 'off');
+          return message ? { ...cur, message } : null;
+        }).catch(() => null)) ?? latest;
+      }
+    }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
     if (now) await refreshUseBox(arg.characterIndex, arg.chatIndex, now).catch(() => {});
     if (!now || chatPhase(now) !== 'started') return;
@@ -551,7 +563,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 저장 직후 Risu 가 메시지를 다시 그릴 때 카드 열쇠 표가 비어 있으면 종료 응답 아래 보고서 카드가 안 나오고 다음 저장까지 기다려야 했다
     await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     // 이번 응답에서 종료된 사건의 카드가 있으면 채팅을 그대로 한 번 저장해 그 메시지를 다시 그리게 한다 (설정 변경 때와 같은 기법)
-    if ((latest && chatCardsAt(now, arg.messageIndex).length) || orderNotesAt(now, arg.messageIndex)) now = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null)) ?? now;
+    if (latest && chatCardsAt(now, arg.messageIndex).length) now = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null)) ?? now;
     // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
     await storeLore(arg.characterIndex, arg.chatIndex, undefined, { char, chat: now }).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
@@ -733,7 +745,7 @@ function displayNow(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || text.includes(SCENE_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text) || hasShopTag(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || text.includes(SCENE_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text) || hasShopTag(text) || hasReadyTag(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
@@ -748,6 +760,8 @@ function displayNow(text: string): string {
     if (hasStatusTag(out)) out = renderStatus(out);
     // 상점 표식 → 「상점 열기」 카드 (host/shopcard.ts). 상태창 뒤에 붙으니 상태창 상자 아래에 온다
     if (hasShopTag(out)) out = renderShopCard(out);
+    // 맞춤 주문 완성 표식 → 알림 카드 (같은 방식)
+    if (hasReadyTag(out)) out = renderReadyCard(out);
     // 캐릭터 이미지 태그는 플러그인이 그림 칸으로. Lite 판정 전(다른 채팅에서 돌아온 직후)에는 태그가 모두 에셋 모듈에 있는 이름일 때만
     if (hasImgTag(out)) {
       const pick = modulePicker();

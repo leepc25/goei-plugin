@@ -143,7 +143,10 @@ test('쇼핑몰에서 한 일(운영자와 나눈 말·맞춤 주문·1:1 상담
   assert.ok(ev[2].includes('가불 되나요') && !ev[2].includes('연결'), ev[2]);
   assert.match(inventoryText({ ...c, scriptstate: { ...vars, $it_push: '1' } }), /This turn: .*operator on the 우주 쇼핑몰 website/);
   const next = { ...c, message: [...c.message, { role: 'user', data: '간다', chatId: 'u3' }, { role: 'char', data: '다음', chatId: 'c2' }], scriptstate: vars };
-  assert.deepEqual(mallEvents(next), [], '다음 응답 뒤에는 없다');
+  // 다음 응답 뒤: 나눈 말·주문은 다시 넘기지 않는다. 작중 시각이 없으면 주문은 다음 응답에서 완성이라 완성 한 줄만 (11-11)
+  const ev2 = mallEvents(next);
+  assert.ok(ev2.length === 1 && ev2[0].includes('가림 내의') && ev2[0].includes('finished'), ev2.join('\n'));
+  assert.deepEqual(mallEvents({ ...next, scriptstate: { ...vars, $cos_ready: 'card' } }), [], '「카드만」이면 없다');
 });
 
 test('맞춤 주문 완성: 완성된 바로 다음 턴에만 본편에 한 줄, 「카드만」이면 안 넘긴다 (11-11 사용자)', () => {
