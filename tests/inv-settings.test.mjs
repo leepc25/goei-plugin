@@ -66,10 +66,10 @@ test('본편에 넘길 내용·기록 턴 수: 고른 값만, 숫자는 0~10', (
   const e = { id: 'a', name: '손전등', desc: '긴 설명', effect: '비춘다', use: true, state: 'ok', anchor: '', from: 'manual' };
   assert.ok(itemLine(e, undefined, false, 'full').includes('비춘다'));
   assert.ok(!itemLine(e, undefined, false, 'name').includes('비춘다'));
-  assert.equal(itemLogTurns({}), 0);
+  assert.equal(itemLogTurns({}), 3);
   assert.equal(itemLogTurns({ $it_logturns: '3' }), 3);
   assert.equal(itemLogTurns({ $it_logturns: '99' }), 10);
-  assert.equal(itemLogTurns({ $it_logturns: '-1' }), 0);
+  assert.equal(itemLogTurns({ $it_logturns: '-1' }), 3);
 });
 
 test('가계부 옵션: 잔고 따르기 기본 켬, 거래 기준 기본 금액만, 최근 거래 0~10줄', () => {

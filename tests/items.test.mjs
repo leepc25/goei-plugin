@@ -181,7 +181,7 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   const out = withInventory(msgs(chat), chat);
   assert.equal(out.length, 4);
   assert.equal(out[2].role, 'system');
-  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nWeight: 0 kg \/ 25 kg\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
+  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nWeight: 0 kg \/ 25 kg\nCarry limit: .+\nRecently: got 소금 봉지\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
   assert.equal(withInventory(out, chat), out);
   // 2026-11-11 사용자: 「컨텍스트 포함」을 따로 끄는 줄은 없앴다 (사용과 같은 값). 소지품을 끄면 안 넣는다
   assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_on: '0' } }).length, 3, '소지품을 끄면 안 넣는다');

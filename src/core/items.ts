@@ -452,9 +452,13 @@ export const itemDetail = (vars: Record<string, unknown> | undefined): ItemDetai
 /** 사용·처분 기록 넘기기: 최근 응답 N개의 기록(획득·사용·버림·없어짐·파괴·판 것)을 [Inventory] 에 (0~10, 기본 0) */
 export const ITEM_LOGTURNS_VAR = '$it_logturns';
 export const ITEM_LOGTURNS_MAX = 10;
+/** 값이 없을 때 (2026-11-11 사용자: 기본 0이면 기록이 안 넘어간다 → 3턴) */
+export const ITEM_LOGTURNS_DEFAULT = 3;
 export const itemLogTurns = (vars: Record<string, unknown> | undefined): number => {
-  const n = Number(vars?.[ITEM_LOGTURNS_VAR]);
-  return Number.isInteger(n) && n >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n) : 0;
+  const raw = vars?.[ITEM_LOGTURNS_VAR];
+  if (raw === undefined || raw === null || raw === '') return ITEM_LOGTURNS_DEFAULT;
+  const n = Number(raw);
+  return Number.isInteger(n) && n >= 0 ? Math.min(ITEM_LOGTURNS_MAX, n) : ITEM_LOGTURNS_DEFAULT;
 };
 export const itemStartOn = (vars: Record<string, unknown> | undefined) => invOn(vars) && vars?.[ITEM_START_VAR] !== '0';
 
