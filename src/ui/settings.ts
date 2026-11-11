@@ -315,8 +315,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   // only(편집 창의 묶음 하나)를 달라고 하면 기능 페이지 대신 그 묶음만 (2026-11-05: 기록 페이지의 가계부 묶음이 기록 설정 전체로 두 번 그려졌다)
   if (settingsUi.page && !only) return featurePage(ctx, settingsUi.page, canChat);
   const { basic: s, world, theme } = current(ctx, scope);
-  // 인물 기록 켬/끔: 채팅은 $pp_on, 새 채팅 기본값은 플러그인 저장소의 같은 변수
-  const peopleOn = ppValue(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, 'on') === '1';
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;
   // 줄 이름·선택지·고정 설명은 정의표(core/setdef/settings.ts)에서 온다. 여기는 지금 값과, 값에 따라 달라지는 조작·설명만 넘긴다
@@ -351,30 +349,31 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       D('wiki-side', getPrefs().wikiSide ?? 'right'),
       D('agents', getPrefs().agents ?? 'wall'),
       D('dim', '', { ctl: dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy) }),
-      // 호출 진행 창 (11-09 사용자): 채팅을 보내면 라우터→디렉터→본편→갱신기→인터넷이 어디까지 돌았는지 (host/progwin.ts)
+      // 호출 진행 창 (11-09 사용자): 채팅을 보내면 라우터→디렉터→메인→갱신기→인터넷이 어디까지 돌았는지 (host/progwin.ts)
       D('progress', getPrefs().progress === false ? '0' : '1'),
       // 창 둘레 기기 틀 (2026-10-29 사용자, ui/frame.ts). 좁아서 숨긴 상태는 app.ts 가 .gx 에 data-frame-hidden 으로 적는다
       D('frame', getPrefs().frame ?? 'tablet', { help: `PC에서 상황판 창 둘레에 그리는 기기 틀로, 폰에서는 그리지 않고 창 폭이 모자라면 자동으로 숨겨요.${document.querySelector<HTMLElement>('.gx')?.dataset.frameHidden === '1' ? '<br><span class="st-frame-note">지금 창 폭이 좁아 프레임을 숨겼어요</span>' : ''}` }),
       D('editor-width', String(getPrefs().editorWidth ?? 90)),
     ].join(''))}`,
-    image: `${group('캐릭터 이미지', [
+    image: `${group('', [
       D('asset', s.assetOn ? '1' : '0'),
-      s.assetOn ? D('img-size', '', { ctl: pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy) }) : '',
-      s.assetOn ? D('img-foldon', getPrefs().imgFoldOn === false ? '0' : '1') : '',
-      s.assetOn && getPrefs().imgFoldOn !== false ? D('img-foldlock', getPrefs().imgFoldLock ? '0' : '1') : '',
-      s.assetOn && getPrefs().imgFoldOn !== false ? D('img-fold', '', { ctl: pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy) }) : '',
-      s.assetOn ? D('img-show', '', { ctl: recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy) }) : '',
-      s.assetOn ? D('img-send', '', { ctl: recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy) }) : '',
       s.assetOn ? D('asset-model', s.assetModel) : '',
-      s.assetOn ? D('asset-player', s.assetPlayer ? '1' : '0') : '',
       s.assetOn && s.assetModel === 'aux' ? D('asset-limit', String(s.assetLimit)) : '',
+      s.assetOn ? D('asset-player', s.assetPlayer ? '1' : '0') : '',
+      s.assetOn ? D('img-send', '', { ctl: recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy) }) : '',
     ].join(''))}
-    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}`,
-    board: `${group('상황판', [
+    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
+    ${s.assetOn ? group('그림 표시', [
+      D('img-size', '', { ctl: pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy) }),
+      D('img-foldon', getPrefs().imgFoldOn === false ? '0' : '1'),
+      getPrefs().imgFoldOn !== false ? D('img-foldlock', getPrefs().imgFoldLock ? '0' : '1') : '',
+      getPrefs().imgFoldOn !== false ? D('img-fold', '', { ctl: pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy) }) : '',
+      D('img-show', '', { ctl: recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy) }),
+    ].join('')) : ''}`,
+    board: `${group('', [
       D('anomaly', '', { ctl: anomaly, help: scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.' }),
       D('agent', '', { ctl: stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), help: `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)` }),
       D('support', s.supportOn ? '1' : '0'),
-      D('people', peopleOn ? '1' : '0', { help: scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.' }),
     ].join(''))}
     <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
@@ -386,76 +385,97 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       </div>
     </section>`,
     // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
-    status: `${group('상태창', [
+    status: `${group('', [
       D('status', getPrefs().status ?? 'auto'),
     ].join(''))}
-    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, statusColsTable(colCfg, busy, scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars),
+    ${group(`칸 <small>${usedCols(colCfg).length}칸 사용</small>`, statusColsTable(colCfg, busy, scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars),
       `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
 `,
     // 가계부(시작 잔고·잔고 직접 수정): 설정 「기록」 페이지 안의 묶음 (2026-11-05 사용자: 가계부가 기록 하위 탭이니 상태창에는 잔고 칸 표시만)
     // 2026-11-07 사용자: 가계부·소지품·상점 설정을 「소지품」 한 페이지로, 켜고 끄기는 따로 (가계부 = 상태창 잔고 칸 $st_col_wallet)
-    wallet: group('가계부', [
-      D('wallet-on', colCfg.wallet === 'off' ? '0' : '1'),
-      ...(colCfg.wallet === 'off' ? [] : [
+    wallet: [
+      group('', [
+        D('wallet-on', colCfg.wallet === 'off' ? '0' : '1'),
+        ...(colCfg.wallet === 'off' ? [] : [
+          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '거래는 인물 기록 갱신기가 응답을 읽을 때 같이 읽어요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
+          D('wallet-loose', walletLoose(itVars) ? '1' : '0'),
+          D('wallet-recent', '', { ctl: stepper('set-wallet-recent', 'n', `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, '최근 거래 줄 수', busy), help: `메인 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.` }),
+        ]),
+      ].join('')),
+      colCfg.wallet === 'off' ? '' : group('잔고', [
         D('wallet-start', '', { ctl: wonInput(walletStart, busy, startLocked), help: scope === 'chat' ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.' }),
         D('wallet-edit', walletEdit ? '1' : '0'),
         D('wallet-sync', walletSyncOn(itVars) ? '1' : '0'),
-        D('wallet-loose', walletLoose(itVars) ? '1' : '0'),
-        D('wallet-recent', '', { ctl: stepper('set-wallet-recent', 'n', `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, '최근 거래 줄 수', busy), help: `본편 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.` }),
-      ]),
-    ].join('')),
-    // 소지품 (2026-11-07): 본편에 넘기기·보조 모델 읽기·칸 수·한계 문장. 채팅 변수 $it_* 또는 새 채팅 기본값
-    items: group('소지품', [
-      D('inv-on', invOn(itVars) ? '1' : '0'),
+      ].join('')),
+    ].join(''),
+    // 소지품 (2026-11-07): 메인 요청에 넘기기·보조 모델 읽기·칸 수·한계 문장. 채팅 변수 $it_* 또는 새 채팅 기본값
+    items: [
+      group('', [
+        D('inv-on', invOn(itVars) ? '1' : '0'),
+        ...(!invOn(itVars) ? [] : [
+          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '물건 읽기와 상태 바꾸기는 인물 기록 갱신기가 응답을 읽을 때 같이 해요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
+          D('items-auto', itemAutoOn(itVars) ? '1' : '0'),
+          D('items-state', itemStateOn(itVars) ? '1' : '0'),
+        ]),
+      ].join('')),
       ...(!invOn(itVars) ? [] : [
-      D('items-auto', itemAutoOn(itVars) ? '1' : '0'),
-      D('items-slots', '', { ctl: stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), help: `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘쳐도 막지 않고 「17/16」처럼 보여 주며 그대로 본편에 넘겨요.` }),
-      D('items-carry', '', { ctl: stepper('set-items-carry', 'n', `${itemCarrySetting(itVars)}kg`, itemCarrySetting(itVars) > ITEM_CARRY_MIN, itemCarrySetting(itVars) < ITEM_CARRY_MAX, '소지 한도', busy), help: `들 수 있는 무게예요(${ITEM_CARRY_MIN}~${ITEM_CARRY_MAX}kg). 장착한 것까지 모든 물건의 무게를 더해 보여 주고, 넘으면 넘은 만큼 색이 진해져요. 막지는 않고, 본편에는 넘었는지·얼마나 넘었는지만 넘겨요. 고유 인물로 시작하면 명부의 「소지 한도」를 쓰고, 값이 없을 때만 이 값을 써요.${scope === 'chat' && itemWeight(itVars?.[ITEM_CARRY_PC_VAR]) ? ` 이 채팅은 명부 값 ${itemWeight(itVars?.[ITEM_CARRY_PC_VAR])}kg을 써요.` : ''}` }),
-      D('items-edit', itemEditOn(itVars) ? '1' : '0'),
-      D('items-limit', '', { ctl: `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>` }),
-      // 그림 매칭 (2026-11-09 사용자: 매칭기 재설계) — 모델이 그림 칸에 「종류/물건말」을 쓰고, 종류 안에서 찾고, 없으면 표 전체, 그래도 없으면 상자 (11-10 사용자: 종류 대표 그림은 뜬금없다). 대체 표와 못 찾은 말은 여기서
-      D('items-alias', '', { ctl: `<textarea class="gx-search ms-area" rows="4" data-change="set-items-alias" placeholder="${esc(ICON_ALIAS_DEFAULT)}" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? ''))}</textarea>` }),
-      D('items-pool', itemIconPoolOn(itVars) ? '1' : '0'),
-      ...(scope === 'chat' ? [D('items-misses', '', { ctl: (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → 상자</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })() })] : []),
-      D('items-detail', itemDetail(itVars)),
-      D('items-state', itemStateOn(itVars) ? '1' : '0'),
-      D('items-spent', itemsUiSpent(itVars)),
-      D('items-logturns', '', { ctl: stepper('set-items-logturns', 'n', `${itemLogTurns(itVars)}턴`, itemLogTurns(itVars) > 0, itemLogTurns(itVars) < ITEM_LOGTURNS_MAX, '기록 턴 수', busy), help: `최근 몇 턴 동안 얻고·쓰고·버리고·잃은 기록을 [Inventory] 에 「Recently」 한 줄로 붙일지예요(0~${ITEM_LOGTURNS_MAX}, 0이면 안 붙여요).` }),
-      D('items-start', itemStartOn(itVars) ? '1' : '0'),
+        group('컨텍스트 포함', [
+          D('items-detail', itemDetail(itVars)),
+          D('items-logturns', '', { ctl: stepper('set-items-logturns', 'n', `${itemLogTurns(itVars)}턴`, itemLogTurns(itVars) > 0, itemLogTurns(itVars) < ITEM_LOGTURNS_MAX, '기록 턴 수', busy), help: `최근 몇 턴 동안 얻고·쓰고·버리고·잃은 기록을 [Inventory] 에 「Recently」 한 줄로 붙일지예요(0~${ITEM_LOGTURNS_MAX}, 0이면 안 붙여요).` }),
+          D('items-limit', '', { ctl: `<input class="st-text" type="text" maxlength="60" value="${esc(itemLimit(itVars))}" data-change="set-items-limit" placeholder="${esc(ITEM_LIMIT_DEFAULT)}" aria-label="지닐 수 있는 한계"${busy ? ' disabled' : ''}>` }),
+        ].join('')),
+        group('칸과 물건', [
+          D('items-slots', '', { ctl: stepper('set-items-slots', 'n', `${itemSlots(itVars)}칸`, itemSlots(itVars) > ITEM_SLOTS_MIN, itemSlots(itVars) < ITEM_SLOTS_MAX, '칸 수', busy), help: `소지품 칸이에요(${ITEM_SLOTS_MIN}~${ITEM_SLOTS_MAX}). 넘쳐도 막지 않고 「17/16」처럼 보여 주며 그대로 메인 요청에 넘겨요.` }),
+          D('items-carry', '', { ctl: stepper('set-items-carry', 'n', `${itemCarrySetting(itVars)}kg`, itemCarrySetting(itVars) > ITEM_CARRY_MIN, itemCarrySetting(itVars) < ITEM_CARRY_MAX, '소지 한도', busy), help: `들 수 있는 무게예요(${ITEM_CARRY_MIN}~${ITEM_CARRY_MAX}kg). 장착한 것까지 모든 물건의 무게를 더해 보여 주고, 넘으면 넘은 만큼 색이 진해져요. 막지는 않고, 메인 요청에는 넘었는지·얼마나 넘었는지만 넘겨요. 고유 인물로 시작하면 명부의 「소지 한도」를 쓰고, 값이 없을 때만 이 값을 써요.${scope === 'chat' && itemWeight(itVars?.[ITEM_CARRY_PC_VAR]) ? ` 이 채팅은 명부 값 ${itemWeight(itVars?.[ITEM_CARRY_PC_VAR])}kg을 써요.` : ''}` }),
+          D('items-edit', itemEditOn(itVars) ? '1' : '0'),
+          D('items-spent', itemsUiSpent(itVars)),
+          D('items-start', itemStartOn(itVars) ? '1' : '0'),
+        ].join('')),
+        group('물건 그림', [
+          D('items-alias', '', { ctl: `<textarea class="gx-search ms-area" rows="4" data-change="set-items-alias" placeholder="${esc(ICON_ALIAS_DEFAULT)}" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? ''))}</textarea>` }),
+          D('items-pool', itemIconPoolOn(itVars) ? '1' : '0'),
+          ...(scope === 'chat' ? [D('items-misses', '', { ctl: (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → 상자</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })() })] : []),
+        ].join('')),
       ]),
-    ].join('')),
+    ].join(''),
     // 상점 (2026-11-07 사용자): 표식 `[shop: 가게|주인]` 으로 열리는 상점 팝업의 생성 방식. 채팅 변수 $sh_* 또는 새 채팅 기본값
     shop: (() => {
       const sh = shopSettings(itVars);
       const blocked = shopBlocked(itVars);
-      return group('상점', [
-        // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 둘 중 하나가 꺼지면 꺼지고 스위치도 잠긴다
+      return [
+        group('', [
+          // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 둘 중 하나가 꺼지면 꺼지고 스위치도 잠긴다
         blocked ? D('shop-on-locked', '', { ctl: seg('set-shop-on', '0', [['1', 'ON'], ['0', 'OFF']], true), help: `${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 상점도 꺼져 있어요. 상점은 물건을 소지품에 넣고 돈을 가계부로 주고받아서 둘 다 켜져 있어야 써요.` }) :
         D('shop-on', (sh.on) ? '1' : '0'),
+          ...(sh.on ? [D('shop-model', sh.model), D('shop-thoughts', sh.thoughts)] : []),
+        ].join('')),
         ...(sh.on ? [
+          group('열리는 조건', [
           (() => {
             // 상점 판단 (11-09 사용자): 누가 「지금 상점이 있나」를 정하나. 갱신기를 골랐는데 갱신기가 매 턴 돌지 않으면 메인 모델이 대신한다
             const j = shopJudgeBy(itVars);
             const now = j.fallback ? '지금은 갱신기가 안 돌아 메인 모델로 대신합니다.' : `지금은 ${j.by === 'updater' ? '갱신기' : '메인 모델'}가 판단해요.`;
             return D('shop-judge', sh.judge, { help: `지금 장면에 상점이 있는지 누가 볼지예요. 메인 모델은 본문을 쓰면서 응답 끝에 표식을 같이 써요(추가 호출 없음). 갱신기는 응답이 끝난 뒤 인물 기록 갱신 호출에서 따로 판단해요(카드가 조금 늦게 붙어요). 자동은 갱신기가 매 턴 돌면 갱신기, 아니면 메인 모델이에요. 판단 기준은 지침 「상점」의 SHOP_RULE 한 곳을 양쪽이 같이 읽어요. ${now}` });
           })(),
-          D('shop-model', sh.model),
-          D('shop-min', '', { ctl: `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, help: `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.` }),
-          D('shop-feature', (sh.feature) ? '1' : '0'),
-          D('shop-ctx', sh.context ? '1' : '0'),
-          D('shop-price', '', { ctl: `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>` }),
-          D('shop-diverse', (sh.diverse) ? '1' : '0'),
-          D('shop-thoughts', sh.thoughts),
-          D('shop-prev', (sh.avoidPrev) ? '1' : '0'),
-          D('shop-kick', (sh.kick) ? '1' : '0'),
-          // 숫자는 고르는 단추 말고 −/+ 한 칸씩 (2026-11-07 사용자)
-          D('shop-where', sh.where),
-          ownShopsField(itVars, busy),
-          D('shop-turns', '', { ctl: stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy) }),
-          D('shop-refs', '', { ctl: stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy) }),
-          D('shop-note', '', { ctl: '' }),
+            D('shop-where', sh.where),
+            ownShopsField(itVars, busy),
+          ].join('')),
+          group('참조', [
+            D('shop-ctx', sh.context ? '1' : '0'),
+            D('shop-turns', '', { ctl: stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy) }),
+            D('shop-refs', '', { ctl: stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy) }),
+            D('shop-note', '', { ctl: '' }),
+          ].join('')),
+          group('진열대와 주인', [
+            D('shop-min', '', { ctl: `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, help: `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.` }),
+            D('shop-feature', (sh.feature) ? '1' : '0'),
+            D('shop-price', '', { ctl: `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>` }),
+            D('shop-diverse', (sh.diverse) ? '1' : '0'),
+            D('shop-prev', (sh.avoidPrev) ? '1' : '0'),
+            D('shop-kick', (sh.kick) ? '1' : '0'),
+          ].join('')),
         ] : []),
-      ].join(''));
+      ].join('');
     })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
     lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1])}`,

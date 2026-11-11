@@ -43,6 +43,9 @@ export interface Wire {
   lead?: Record<string, string>;
   /** 페이지 이름 (묶음 이름 '@page' 자리) */
   pageTitle?: string;
+  /** 세부 값 표의 줄 (ui/advanced.ts advRow) · 칩 줄 */
+  adv?(item: string): string;
+  advChips?(items: string[]): string;
 }
 
 /** 버튼 이름: 기능 열쇠가 머리 (gn-cfg·gn-text·gn-count) */
@@ -96,6 +99,8 @@ export function defRow(page: SetPage, d: SetDef, w: Wire): string {
   for (const c of d.show ? (Array.isArray(d.show) ? d.show : [d.show]) : []) {
     if ('eq' in c ? w.cur(c.key) !== c.eq : w.cur(c.key) === c.ne) return '';
   }
+  if (d.ctl.t === 'adv') return w.adv?.(d.ctl.item) ?? '';
+  if (d.ctl.t === 'advchips') return w.advChips?.(d.ctl.items) ?? '';
   if (d.ctl.t === 'custom') {
     const c = w.custom?.[d.key]?.();
     if (!c) return '';

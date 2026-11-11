@@ -6,7 +6,7 @@ mkdirSync(out, { recursive: true });
 const only = process.argv[4]?.split(',');
 const browser = await launch();
 const started = { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fixed_theme: 'dark', $st_anomaly_on: '1' } };
-for (const [vp, name] of [[{ width: 1920, height: 6000, touch: false }, 'pc'], [{ width: 390, height: 9000, touch: true }, 'phone']]) {
+for (const [vp, name] of [[{ width: 1920, height: +(process.env.PCH || 6000), touch: false, scale: +(process.env.SCALE || 1) }, 'pc'], [{ width: 390, height: +(process.env.PHH || 9000), touch: true, scale: +(process.env.SCALE || 1) }, 'phone']]) {
   const { page } = await boot(browser, fx, started, vp);
   await openWin(page);
   await openEditor(page, 'set:screen');

@@ -31,8 +31,8 @@ import { generate as askModel, type LlmMessage } from '../host/llm';
 import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { JOINT_VAR, jointOn } from '../core/netjoint';
-import { advNum, budgetFor, genSettings } from '../core/advanced';
-import { advancedBox } from './advanced';
+import { budgetFor, genSettings } from '../core/advanced';
+import { advChipRow, advRow } from './advanced';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
@@ -1055,10 +1055,6 @@ function settingsView(ctx: ChatContext): string {
   const state = ctx.chat.scriptstate;
   const notices = noticeSettings(state);
   const vs = viewSettings(state);
-  const rest = (k: string) => () => {
-    const n = advNum(state, 'ph', k);
-    return n ? `받은 뒤 ${n}턴 쉬어요` : '';
-  };
   // 줄은 정의표(core/setdef/phone.ts)에서 온다. 여기는 값을 읽어 주는 선만 잇는다
   const special: Record<string, () => string> = {
     view_preset: () => vs.preset, view_scope: () => vs.scope, view_size: () => vs.size, view_auto: () => vs.auto, view_pov: () => vs.pov,
@@ -1071,13 +1067,13 @@ function settingsView(ctx: ChatContext): string {
   const wire: Wire = {
     cur: (k) => special[k]?.() ?? phoneValue(state, k),
     minmax: () => phoneSettings(state).banterRows,
-    help: { incoming: rest('cd_incoming'), group_invites: rest('cd_invite') },
     custom: { joint: () => ({ ctl: setSeg('ph-cfg', 'joint', jointOn(state) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]) }) },
+    adv: (item) => advRow('ph', item, ctx.chat.scriptstate),
+    advChips: (items) => advChipRow('ph', items, ctx.chat.scriptstate),
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
       ${defGroups(PHONE_SET, wire)}
-      ${advancedBox('ph', ctx.chat.scriptstate)}
     </div></div>`;
 }
 

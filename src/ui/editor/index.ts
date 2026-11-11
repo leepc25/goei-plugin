@@ -406,7 +406,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       ...(['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs'] as SetPage[]).map(subItem),
       ...(['phone', 'wiki'] as SetPage[]).map(setItem),
       // 가계부·소지품·상점은 한 페이지 「소지품」 (2026-11-07 사용자: 각자 설정이 적어 합침, 켜고 끄기는 따로)
-      setItem('items'),
+      ...(['wallet', 'items', 'shop'] as SetPage[]).map(setItem),
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map(subItem),
     ] }];
@@ -439,20 +439,20 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 2026-10-29 사용자: 응답 태그 형식 같은 안쪽 사정은 예시로 보이지 않는다 (상황판·이미지는 설명만)
   board: { desc: '응답마다 괴이·사건·특수 발생을 판정하고 상황판·지도·요원 상태를 갱신해요.', example: '', off: '끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요.' },
   image: { desc: '본문에 등장한 캐릭터의 등록 이미지를 채팅 속에 띄워요. 이미지 목록은 봇 카드에 있어요.', example: '', off: '끄면 캐릭터 이미지를 띄우지 않고 이미지 지침도 요청에 넣지 않아요.' },
-  gnet: { desc: '괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 본편 요청에 참고로 붙어요.' },
+  gnet: { desc: '괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 메인 요청에 붙어요.' },
   gal: { desc: '괴담갤 게시판 글·댓글·쪽지를 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '' },
   wpf: { desc: '세정게 게시판 글·댓글·쪽지를 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '' },
   sm: { desc: '연어 마켓 거래 글·댓글·쪽지를 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '' },
-  cos: { desc: '우주 쇼핑몰의 물건 목록과 운영자 답을 만들어요. 산 물건은 소지품에, 돈은 가계부에 남고 다음 턴 본편에 넘어가요. 아래 값은 이 채팅에 저장돼요.', example: '' },
-  bm: { desc: '백일몽 포인트몰의 상품 목록을 만들어요. 포인트로 산 물건은 소지품에 남고 다음 턴 본편에 넘어가요. 아래 값은 이 채팅에 저장돼요.', example: '' },
-  phone: { desc: '괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 본편 요청에 참고로 붙어요.' },
-  wiki: { desc: '위키 문서를 생성·갱신해요. 채팅에 나온 문서는 본편 요청에 참고로 붙일 수 있어요.', example: '「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요.' },
-  people: { desc: '본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청이 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요.' },
+  cos: { desc: '우주 쇼핑몰의 물건 목록과 운영자 답을 만들어요. 산 물건은 소지품에, 돈은 가계부에 남고 다음 턴 메인 요청에 넘어가요. 아래 값은 이 채팅에 저장돼요.', example: '' },
+  bm: { desc: '백일몽 포인트몰의 상품 목록을 만들어요. 포인트로 산 물건은 소지품에 남고 다음 턴 메인 요청에 넘어가요. 아래 값은 이 채팅에 저장돼요.', example: '' },
+  phone: { desc: '괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 메인 요청에 붙어요.' },
+  wiki: { desc: '위키 문서를 생성·갱신해요. 장면에 나온 문서는 메인 요청에 붙일 수 있어요.', example: '「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요.' },
+  people: { desc: '메인 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 메인 요청이 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 메인 요청에도 기록을 넣지 않아요.' },
   // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
   journal: { desc: '사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요.' },
   // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
   items: { desc: '가계부·소지품·상점을 여기서 정해요. 상점은 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
-  factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.', example: '' },
+  factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 다음 요청에 어떤 로어북이 들어가는지는 아래에서 바로 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
 };
@@ -460,7 +460,6 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
 /** 설정 페이지: 패널 설정의 묶음을 그대로 (지침은 지침 탭) */
 function settingsPage(ctx: ChatContext, page: SetPage): string {
   // 옛 자리(set:wallet · set:shop)는 합친 「소지품」 페이지로
-  if (page === 'wallet' || page === 'shop') page = 'items';
   const canChat = host?.canChat?.() ?? true;
   // 범위 칩(이 채팅 / 새 채팅 기본값)은 없다 (2026-10-29 사용자 결정, v0.16.23 설계로 복귀): 값은 늘 이 채팅, 시작 전에는 새 채팅 기본값을 바로 고친다.
   // 머리의 「기본값으로 저장」「기본값 불러오기」가 설정 전부를 한 번에 옮긴다
@@ -486,7 +485,9 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'people': body = feat('people'); break;
     // 기록 하위 메뉴 넷 (2026-11-05 사용자): 일지 · 가계부 · 인물 · 세력
     case 'journal': body = feat('journal'); break;
-    case 'items': body = sec('wallet') + sec('items') + sec('shop'); break;
+    case 'wallet': body = sec('wallet'); break;
+    case 'items': body = sec('items'); break;
+    case 'shop': body = sec('shop'); break;
     case 'factions': body = feat('factions'); break;
     // 2026-11-10 사용자: 점검에 따로 있던 「다음 호출 로어북」을 여기로 합침 (고르는 설정 바로 아래에서 결과를 본다)
     case 'lore': body = sec('lore') + (canChat ? loreCheckBox(ctx, true) : '<section class="ps-group"><h3>다음 호출 로어북</h3><p class="ps-note">채팅을 시작하면 볼 수 있어요.</p></section>'); break;

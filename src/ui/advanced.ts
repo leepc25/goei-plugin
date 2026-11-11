@@ -50,6 +50,16 @@ function chips(f: AdvFeature, items: AdvItem[], state: State): string {
     .join('')}</div></div>`;
 }
 
+/** 세부 값 한 줄 · 칩 한 줄 (정의표의 adv·advchips 줄이 부른다) */
+export function advRow(f: AdvFeature, key: string, state: State): string {
+  const item = advItem(f, key);
+  return item ? row(f, item, state) : '';
+}
+export function advChipRow(f: AdvFeature, keys: string[], state: State): string {
+  const items = keys.map((k) => advItem(f, k)).filter((i): i is AdvItem => !!i);
+  return items.length ? chips(f, items, state) : '';
+}
+
 /** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
 export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[]): string {
   return ADV[f]

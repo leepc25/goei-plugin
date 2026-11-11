@@ -2,7 +2,7 @@
 // 2026-11-05 사용자: 「보고서」 하위 탭은 일지와 겹쳐서 뺐다(일지 줄을 누르면 그 보고서 페이지). 가계부는 따로 탭이 아니라 여기 하위 탭.
 // 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
-// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
+// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 메인 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
 import { setRow } from './setrow';
 import {
   JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
@@ -596,7 +596,7 @@ function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, l
 export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
   const s = journalSettings(ctx.chat.scriptstate);
   const rows = [
-    row('채팅에 보고서 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
+    row('보고서 카드 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
     row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한'), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
     row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한'), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
   ].join('');
@@ -604,7 +604,7 @@ export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>일지 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('jr')}</span></header>${defaultsConfirm('jr')}
     ${rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : ''}
     <div class="ph-form-body ps">
-      <section class="ps-group"><h3>일지</h3><div class="ps-rows">${rows}</div></section>
+      <section class="ps-group"><div class="ps-rows">${rows}</div></section>
     </div>
     ${toast('rec', rec.info, (t) => {
       if (rec.info === t) rec.info = '';

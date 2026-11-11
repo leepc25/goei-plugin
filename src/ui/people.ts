@@ -177,7 +177,6 @@ const ppRow = (key: string, cur: string, o: { ctl?: string; help?: string } = {}
     ...(o.help !== undefined ? { help: { [key]: () => o.help! } } : {}),
   });
 const group = setGroup;
-const fold = (key: string, title: string, body: string, open = false) => `<details class="ps-adv-sub" data-keep="${key}"${keepOpen(key, open)}><summary>${title}</summary><div class="ps-rows">${body}</div></details>`;
 const srcIcon = (src: EntrySrc) => `<i class="pp-src s-${src}" title="${esc(SRC_HELP[src])}" aria-label="${SRC_LABEL[src]}">${SRC_ICON[src]}</i>`;
 
 /** 기준 메시지 → 「#n」 (채팅 속 순번). 시드('#0')·사라진 것은 '' */
@@ -249,7 +248,7 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
 };
 
 const NUMERIC_HELP: Record<NumericFeature, string> = {
-  affinity: '끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 본편에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)',
+  affinity: '끄면 정성 모드. 계기 점수·8단계·취향 띠 없이 「호감 설명·호감에 따른 말투·행동」 칸의 글로만 기록하고 메인 요청에도 글만 들어가요. 숫자는 지금 값에 멈춰요 (게임 대사 칸 고르기에만 쓰임)',
   suspicion: '끄면 정성 모드. 단서 점수·단계 없이 「의심 내용·의심에 따른 말투·행동」 칸의 글로만',
   openness: '끄면 정성 모드. 0~300 값·단계·피임 표 없이 「성적 태도·태도에 따른 말투·행동」 칸의 글로만',
 };
@@ -360,7 +359,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
   const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인 모델' : '보조 모델');
   const stageModel = (st: Exclude<Stage, 'update'>, help: string) =>
-    ppRow('stage_model', '', { ctl: seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['aux', '보조 모델'], ['main', '메인 모델']]), help: help }) + idBox(st, v(`model_id_${st}`));
+    ppRow('stage_model', '', { ctl: seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['main', '메인 모델'], ['aux', '보조 모델']]), help: help }) + idBox(st, v(`model_id_${st}`));
   const routerOn = s.on && s.router === 'model';
   const sceneOn = s.on && (s.director === 'scene' || s.director === 'facts');
   const updateOn = s.on && s.when === 'turn';
@@ -371,22 +370,34 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     { name: '입력', sub: '유저 메시지', kind: 'plain', on: s.on, calls: '' },
     { name: 'Router', sub: '장면 인물 고르기', kind: 'aux', on: routerOn, model: modelOf('router'), calls: routerOn ? '보조 1회' : '호출 없음 (코드가 고름)', control: seg('router', s.router, [['code', 'OFF'], ['model', 'ON']]), block: 'pp-blk-router' },
     { name: 'Director', sub: '이번 턴 연기 지시', kind: 'aux', on: sceneOn, model: modelOf('director'), calls: sceneOn ? (s.directorSearch ? '보조 1회 (검색 땐 2회)' : '보조 1회') : s.director === 'note' ? '호출 없음 (갱신에 얹음)' : '호출 없음', control: seg('director', s.director, [['off', '사용 안 함'], ['note', '메모형'], ['facts', '사실형'], ['scene', '연출형']]), block: 'pp-blk-director' },
-    { name: '본편', sub: '응답 생성', kind: 'main', on: true, model: '메인 모델', calls: '메인 1회' },
+    { name: '메인', sub: '응답 생성', kind: 'main', on: true, model: '메인 모델', calls: '메인 1회' },
     { name: '갱신', sub: '응답을 읽어 기록', kind: 'aux', on: updateOn, model: modelOf('update'), calls: updateOn ? `${s.model === 'main' ? '메인' : '보조'} 1회` : s.on ? '수동 (누를 때만)' : '호출 없음', control: seg('when', s.when, [['manual', '수동'], ['turn', '매 턴']]), block: 'pp-blk-update' },
     { name: '정리', sub: '상한 넘긴 기록 합치기', kind: 'aux', on: tidyOn, model: modelOf('tidy'), calls: tidyOn ? '넘긴 인물마다 1회' : '호출 없음 (갱신에 얹음)', control: seg('tidy', s.tidy, [['same', 'OFF'], ['separate', 'ON']]), block: 'pp-blk-tidy' },
   ];
   const flowNode = (n: Node) => `<div class="pp-fn${n.on ? ' on' : ''} k-${n.kind}"><div class="pp-fn-name"><b>${n.name}</b>${n.model ? `<span class="pp-fn-chip">${esc(n.model)}</span>` : ''}<small>${n.sub}</small></div><span class="pp-fn-calls">${n.calls}</span><div class="pp-fn-ctl">${(n.control ?? '').replace('<button class="gx-switch" role="switch"', `<button class="gx-switch" role="switch" aria-label="${esc(n.name)}"`)}</div>${n.block ? `<button class="gx-mini pp-fn-go" data-action="pp-goto" data-value="${n.block}">설정 →</button>` : '<span></span>'}</div>`;
   const flow = `<div class="pp-flow">${nodes.map(flowNode).join('<i class="pp-fn-arrow" aria-hidden="true">↓</i>')}</div>
-    <p class="pp-flow-sum">${s.on ? `턴마다 보조 호출: 본편 전 <b>${preCalls}회</b> · 본편 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? ' (+정리)' : ''}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : '인물 기록이 꺼져 있어 아무 호출도 하지 않아요.'} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
-  const common = [
+    <p class="pp-flow-sum">${s.on ? `턴마다 보조 호출: 메인 요청 전 <b>${preCalls}회</b> · 메인 응답 뒤 <b>${updateOn ? 1 : 0}회</b>${tidyOn ? ' (+정리)' : ''}. 형식이 틀린 답은 같은 모델에 1번 더 물어요.` : '인물 기록이 꺼져 있어 아무 호출도 하지 않아요.'} 이미지 태그·괴담톡·괴담넷·위키의 보조 호출은 각 설정 페이지에 있어요.</p>`;
+  const top = [
     ppRow('on', v('on') === '1' ? '1' : '0'),
     ppRow('when', s.when),
+  ].join('');
+  const ctxRows = [
     ppRow('inject', s.inject),
-    ppRow('lang', s.lang),
+    ppRow('always', '', { ctl: `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">` }),
+    ppRow('block_cap', String(s.blockCap)),
+  ].join('');
+  const refRows = [
+    ppRow('recent_msgs', String(s.recentMsgs)),
+    ppRow('prev_pairs', String(s.prevPairs)),
+    ppRow('span_cap', String(s.spanCap)),
+    ppRow('hypa', v('hypa') === '1' ? '1' : '0'),
+    s.hypa ? ppRow('hypa_items', String(s.hypaItems)) : '',
+    s.hypa ? ppRow('hypa_cap', String(s.hypaCap)) : '',
+    s.hypa ? ppRow('hypa_plus', v('hypa_plus') === '1' ? '1' : '0') : '',
+  ].join('');
+  const affinity = [
     ppRow('speed', String(s.speed)),
     ppRow('speed_down', v('speed_down') === 'same' || v('speed_down') === '' ? 'same' : String(s.speedDown)),
-    ppRow('always', '', { ctl: `<input class="gx-search pp-always" data-change="pp-always" name="pp-always" value="${esc(v('always'))}" placeholder="예: 쟈알디, 스팡달" maxlength="400" aria-label="항상 포함할 인물">` }),
-    ppRow('recent_msgs', String(s.recentMsgs)),
     ppRow('cap', '', { ctl: `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>` }),
   ].join('');
   // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
@@ -415,10 +426,10 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ppRow('model', s.model),
     idBox('update', v('model_id_update')),
     ppRow('prompt', s.prompt),
-    // 11-07 사용자: 기록 항목(정량·정성 포함)은 「기록할 것」의 하위 항목 — 눈에 띄는 띠 제목 칸 안에, 기본 펼침. 새 인물도 같은 모양의 칸
-    fold('pp-feat', `기록할 것<b>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</b>`, `<p class="ps-note">켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 컨텍스트 포함도 안 해요.</p>${features}`, true),
-    fold('pp-new', '새 인물', newPeople, true),
+    ppRow('lang', s.lang),
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
+    ppRow('parallel', v('parallel') === '1' ? '1' : '0'),
+    ppRow('keep_raw', v('keep_raw') === '1' ? '1' : '0'),
   ].join('');
   const router = [
     ppRow('router', s.router),
@@ -439,36 +450,28 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
       ppRow('director_features', v('director_features') === '1' ? '1' : '0'),
       ppRow('director_search', v('director_search') === '1' ? '1' : '0'),
     ] : []),
-    ...(s.director !== 'off' ? [`<div class="pp-rules one">${ruleBox('pp-director-rules', 'Director 메모에 덧붙일 지침', v('director_rules'), '본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.', 2000, '예: 메모는 한 문장으로, 다음 장면의 분위기만', 'pp-drules-save')}</div>`] : []),
+    ...(s.director !== 'off' ? [`<div class="pp-rules one">${ruleBox('pp-director-rules', 'Director 메모에 덧붙일 지침', v('director_rules'), '메인 요청에 끼우는 메모(Director)를 쓸 때 덧붙여요.', 2000, '예: 메모는 한 문장으로, 다음 장면의 분위기만', 'pp-drules-save')}</div>`] : []),
   ].join('');
   const tidy = [
     ppRow('person_cap', String(s.personCap)),
     ppRow('tidy', s.tidy),
     ...(s.tidy === 'separate' ? [stageModel('tidy', '별도 정리 호출에 쓸 모델이에요. 갱신과 같게 = 위 갱신 모델')] : []),
   ].join('');
-  const advanced = fold('pp-adv', '고급', [
-    ppRow('prev_pairs', String(s.prevPairs)),
-    ppRow('block_cap', String(s.blockCap)),
-    ppRow('span_cap', String(s.spanCap)),
-    ppRow('parallel', v('parallel') === '1' ? '1' : '0'),
-    ppRow('hypa', v('hypa') === '1' ? '1' : '0'),
-    s.hypa ? ppRow('hypa_items', String(s.hypaItems)) : '',
-    s.hypa ? ppRow('hypa_cap', String(s.hypaCap)) : '',
-    s.hypa ? ppRow('hypa_plus', v('hypa_plus') === '1' ? '1' : '0') : '',
-    ppRow('keep_raw', v('keep_raw') === '1' ? '1' : '0'),
-  ].join(''));
   return `<div class="ph-form pp-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>인물 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('pp')}</span></header>${defaultsConfirm('pp')}
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
     <div class="ph-form-body ps">
+      ${blk('pp-blk-common', '', top)}
       ${group('호출 흐름 (한 턴)', flow, '한 턴에 모델을 부르는 순서예요. 테두리가 밝은 칸이 지금 켜져 있는 단계. 여기서 바로 켜고 끌 수 있고, 「설정 →」을 누르면 그 단계의 세부 설정으로 가요.')}
-      ${blk('pp-blk-common', '공통', common)}
-      ${/* 11-07 사용자: 세부 블록도 흐름 순서(공통 → Router → Director → 갱신 → 정리) */ ''}
-      ${blk('pp-blk-router', 'Router (본편 전)', router, '본편을 보내기 전에 이번 응답에 필요한 인물을 고르는 단계예요. 고른 인물의 기록만 본편 요청에 들어가요.')}
-      ${blk('pp-blk-director', 'Director (본편 전)', director, '고른 인물의 기록을 보고 「이번 턴 이렇게 연기해라」는 짧은 지시를 본편 요청에 끼워요.')}
-      ${blk('pp-blk-update', '갱신 (본편 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
+      ${blk('pp-blk-ctx', '컨텍스트 포함', ctxRows)}
+      ${blk('pp-blk-ref', '참조', refRows)}
+      ${blk('pp-blk-router', 'Router (메인 요청 전)', router, '메인 요청을 보내기 전에 이번 응답에 필요한 인물을 고르는 단계예요. 고른 인물의 기록만 메인 요청에 들어가요.')}
+      ${blk('pp-blk-director', 'Director (메인 요청 전)', director, '고른 인물의 기록을 보고 「이번 턴 이렇게 연기해라」는 짧은 지시를 메인 요청에 끼워요.')}
+      ${blk('pp-blk-update', '갱신 (메인 응답 뒤)', update, '응답이 들어온 뒤 그 응답을 읽어 기록을 쓰는 호출이에요. 켠 기록 항목·사실형 Director 메모·같은 호출 정리가 전부 여기에 얹혀요.')}
+      ${blk('pp-blk-feat', `기록할 것 <small>${FEATURES.filter((f) => f !== 'faction_rep' && s.features.has(f)).length}개 켬</small>`, features, '켠 것만 이 호출에서 함께 읽어 기록해요. 끄면 그 항목은 기록도 컨텍스트 포함도 안 해요.')}
+      ${blk('pp-blk-aff', '호감 점수', affinity)}
+      ${blk('pp-blk-new', '새 인물', newPeople)}
       ${blk('pp-blk-tidy', '정리', tidy, '한 인물의 기록이 저장 상한을 넘으면 옛 항목을 합쳐 줄여요.')}
-      ${advanced}
     </div>
     ${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
@@ -496,7 +499,7 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
   const s = peopleSettings(state);
   const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
   const rows = [
-    row(FEATURE_HELP.faction_rep[0], onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
+    row('사용', onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
     ...(s.features.has('faction_rep') ? [
       // 11-07 사용자: 호감·의심·음란도처럼 세력 평판도 수치 켬/끔
       ppRow('num_faction_rep', v('num_faction_rep') === '1' ? '1' : '0'),
@@ -508,7 +511,7 @@ export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
   return `<div class="ph-form pp-set">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>세력 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div></header>
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-    <div class="ph-form-body ps">${group('세력', rows)}</div>
+    <div class="ph-form-body ps">${group('', rows)}</div>
     ${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
     })}
@@ -874,7 +877,7 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있고 게임 대사 칸 고르기에만 쓰여요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${sexualCard(ctx, p)}${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 메인 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${ps.qualitative.has('affinity') ? `<p class="pp-extra"><b>정성 모드</b> — 숫자 없이 「호감 설명」 칸의 글로만 기록해요. 숫자는 ${aff.value}(${esc(aff.stage.label)})에 멈춰 있고 게임 대사 칸 고르기에만 쓰여요.</p>` : affinityBar(aff.value)}${affEdit}</div></section>${axesCard(ctx, p, live)}${sexualCard(ctx, p)}${extraCards(ctx, p, changes)}
       <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}

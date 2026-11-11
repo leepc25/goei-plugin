@@ -17,7 +17,11 @@ export type SetCtl =
   /** 글 여러 줄. 이름 없이 줄 전체를 쓴다 */
   | { t: 'area'; ph: string; rows: number; cls: string; labeled?: boolean }
   /** 페이지가 직접 그리는 조작 (값이 둘 이상 얽힌 줄). 줄 이름·설명은 표를 따른다 */
-  | { t: 'custom' };
+  | { t: 'custom' }
+  /** 세부 값 표(core/advanced.ts)의 줄 하나. 이름·범위·기본값은 그 표를 따른다 */
+  | { t: 'adv'; item: string }
+  /** 세부 값 표의 켬·끔 칩 한 줄 */
+  | { t: 'advchips'; items: string[] };
 
 /** 여러 페이지가 똑같이 갖는 줄의 종류 (기준서 3절). 「인터넷」 표와 관제 화면이 이 값으로 줄을 모은다 */
 export type SetCommon = 'auto' | 'joint' | 'model' | 'ctx' | 'sampling';
