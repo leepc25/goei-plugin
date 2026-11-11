@@ -4,7 +4,7 @@
 // - 글자·숫자·띠는 그림이 아니라 HTML 로 얹는다 (도트 글꼴, 11-10 도트 시안 site_mock_dot).
 // - 화면을 다시 그려도(app render) 캔버스·채팅 줄은 같은 DOM 을 다시 꽂아 끊기지 않는다. 화면에서 빠지면(탭 닫기·창 닫기) 멈추고, 다시 꽂히면 그 자리부터.
 // - 동작 고르기·길이 계산은 core/homeshop.ts (설정 값). 여기는 시간 흐름과 그리기만.
-import { clipsOf, cueMs, CUE_EVENT_WORD, idleState, installments, moodClip, nextIdle, parseClipGroups, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
+import { clipsOf, cueMs, moodMap, moodName, CUE_EVENT_WORD, idleState, installments, moodClip, nextIdle, parseClipGroups, type CueCut, type CutId, type HsClip, type HsCue, type HsSettings, type HsShow, type IdleState } from '../core/homeshop';
 import type { HsArt } from '../host/homeshop';
 import { HS_FONT } from '../host/homeshop';
 import { itemPic } from './items';
@@ -61,6 +61,7 @@ const TEAR_MS: [number, number] = [200, 400];
 let feed: PlayerFeed | null = null;
 let hooks: PlayerHooks = { advance() {}, redraw() {} };
 let iconMiss = false;
+let resizing = false;
 const extra: HsCue[] = [];
 const extraChat: { nick: string; text: string }[] = [];
 /** 지금 자막에 찍는 끼어든 대사 (없으면 큐시트의 것) */
@@ -112,6 +113,10 @@ export function mountPlayer(root: HTMLElement): void {
   }
   layout();
   if (!timer) timer = setInterval(tick, 33);
+  if (!resizing) {
+    resizing = true;
+    window.addEventListener('resize', () => layout());
+  }
   tick();
 }
 export function stopPlayer(): void {
@@ -133,13 +138,28 @@ function build(): void {
   chatLog.className = 'hs-chlog';
 }
 
+/** 「자동·폭 맞춤」 배율: 방송 칸이 화면을 다 차지하지 않게, 사이트 칸 폭(PC 는 채팅 칸을 뺀 폭)과 보이는 높이 안에서.
+ *  1배·2배처럼 정수가 들어가면 정수로 (도트가 고르게), 1배도 안 들어가면 그 폭에 맞춰 줄인다 (11-11 사용자: 큰 화면에서 2배로 커져 나머지가 안 보였다) */
+function fitScale(w: number, h: number): number {
+  const wrap = stage?.closest<HTMLElement>('.hs-wrap');
+  const page = stage?.closest<HTMLElement>('.hs');
+  if (!wrap || !page) return 1;
+  const phone = page.classList.contains('hs-m');
+  const cs = getComputedStyle(wrap);
+  const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  // PC: 채팅 칸 최소 폭 260 + 사이 14 · 방송 칸 테두리 2. 높이: 보이는 높이의 60% (아래 상품 칸·주문 단추가 첫 화면에 같이 보이게)
+  const roomW = (phone ? inner : inner - 274) - 2;
+  const roomH = (page.clientHeight || window.innerHeight) * (phone ? 0.5 : 0.6) - 36;
+  const fit = Math.max(0.25, Math.min(roomW / w, roomH / h));
+  return fit >= 2 ? 2 : fit >= 1 ? 1 : fit;
+}
+
 function layout(): void {
   if (!stage || !canvas || !feed) return;
   const w = feed.art?.pack.w ?? 512;
   const h = feed.art?.pack.h ?? 384;
   // 0 = 꽂힌 칸의 폭에 맞춤 (1배를 넘기지 않는다)
-  const room = stage.parentElement?.clientWidth || w;
-  const k = feed.scale > 0 ? feed.scale : Math.min(1, room / w);
+  const k = feed.scale > 0 ? feed.scale : fitScale(w, h);
   if (canvas.width !== w) canvas.width = w;
   if (canvas.height !== h) canvas.height = h;
   stage.style.width = `${w * k}px`;
@@ -192,7 +212,7 @@ function tick(): void {
     r.cut = f.s.fx.cut ? c.cut : 'B';
     if (c.ev === 'call' && f.s.fx.cut) r.cut = 'D';
     applyEvent(r, c, f, t);
-    r.clip = moodClip(clips(r.cut), c.ev === 'look' ? 'stare' : c.mood, idle[cutArt(r.cut)]);
+    r.clip = moodClip(clips(r.cut), c.ev === 'look' ? 'stare' : moodName(c.mood, moodMap(f.art!.pack)), idle[cutArt(r.cut)]);
     r.frame = 0;
     r.frameAt = t;
     r.talking = true;
@@ -211,8 +231,12 @@ function tick(): void {
     r.frameAt += f.s.frame;
     r.frame++;
     if (r.frame >= r.clip.frames) {
-      // 동작이 한 바퀴 돌았다: 대사 중이면 대사 시간이 남았을 때 한 번 더, 다 됐으면 다음 큐
-      if (r.talking && t - r.cueAt < r.cueLen) r.frame = 0;
+      // 동작은 한 번만 (11-11 사용자: 기본은 대기 자세, 각 동작은 한 번씩 나오고 대기로 돌아온다. 무한 반복 금지)
+      // 대사 시간이 남았으면 대기 동작으로 돌아가 기다린다. 대기 동작이 한 바퀴 끝나는 자리(처음·끝 장이 같은 자세)에서 다음 큐로
+      if (r.talking && t - r.cueAt < r.cueLen) {
+        r.clip = clips(r.cut).find((c) => c.group === 'base') ?? r.clip;
+        r.frame = 0;
+      }
       // 내 채팅에 대한 진행자 반응이 와 있으면 지금 대사가 끝난 자리에 끼운다 (큐시트 자리는 그대로)
       else if (extra.length) {
         extraChat.splice(0).forEach((c) => pushChat(c.nick, c.text, /^\?+$/.test(c.nick) ? 'q' : ''));
@@ -254,6 +278,9 @@ function tick(): void {
     r.chatIdx++;
     pushChat(line.nick, line.text, /^\?+$/.test(line.nick) ? 'q' : '');
   }
+  // 지금 동작 이름 (시험·디버그용 표시, 화면에는 안 보인다)
+  const tag = `${r.cut}:${r.clip?.name ?? ''}:${r.cue}`;
+  if (stage.dataset.clip !== tag) stage.dataset.clip = tag;
   draw(f, r, t);
   drawCg(f, r, t);
 }

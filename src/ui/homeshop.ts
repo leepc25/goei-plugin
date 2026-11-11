@@ -375,8 +375,9 @@ function scaleOf(s: HsSettings, phone: boolean): number {
   // 0 = 칸 폭에 맞춤 (재생기가 꽂힌 칸의 폭으로 잰다)
   if (v === 'fit') return 0;
   if (v !== 'auto') return Number(v);
-  const w = typeof window === 'undefined' ? 0 : window.innerWidth;
-  return phone ? 0 : w >= 1700 ? 2 : 1;
+  // 자동 = 보이는 자리에 맞춤 (PC·폰 모두, ui/hsplayer.ts fitScale)
+  void phone;
+  return 0;
 }
 
 const failBox = () => (ui.notice ? `<div class="hs-err" role="alert"><span>${esc(ui.notice).replace(/\n/g, '<br>')}</span>${ui.failRaw ? '<button data-action="hs-raw">받은 글 보기</button>' : ''}<button data-action="hs-refresh">다시 연결</button></div>` : '');
@@ -599,7 +600,7 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
       row('신호 찢김', seg('tear', s.fx.tear ? '1' : '0', ONOFF), '0.2~0.4초 동안 화면이 찢기고 다른 얼굴이 끼어들어요.'),
       row('찢김 확률', num(vars, 'tearP', '찢김 확률'), '장면이 바뀔 때마다 저절로 찢길 확률이에요. 큐시트의 「신호 찢김」은 늘 나와요.'),
       row('주사선', seg('scan', s.fx.scan ? '1' : '0', ONOFF)),
-      row('PC 표시 배율', seg('scalePc', s.scalePc, scales), '자동 = 창이 넓으면 2배, 아니면 1배.'),
+      row('PC 표시 배율', seg('scalePc', s.scalePc, scales), '자동 = 채팅 칸·상품 칸이 같이 보이게 화면에 맞춤 (들어가면 1배·2배).'),
       row('폰 표시 배율', seg('scalePh', s.scalePhone, scales), '자동 = 화면 폭에 맞춤.'),
     ].join('')),
   ].join('');

@@ -299,9 +299,13 @@ export function parseCue(line: string, moods: Map<string, string>): HsCue | null
   const text = clean(cells[2], 160);
   if (!text) return null;
   const cut = CUT_IN.find(([re]) => re.test(cells[0]))?.[1] ?? 'B';
-  const mood = moods.get(cells[1].replace(/\s+/g, '').toLowerCase()) ?? 'talk';
+  // 그림 묶음이 아직 안 왔으면(표정 표가 비었으면) 낱말 그대로 두고 재생 때 찾는다 (moodName)
+  const word = cells[1].replace(/\s+/g, '').toLowerCase();
+  const mood = moods.get(word) ?? (moods.size ? 'talk' : word || 'talk');
   return { cut, mood, text, ...eventOf(cells[3] ?? '') };
 }
+/** 저장된 표정(동작 이름 또는 그림이 늦어 남은 낱말) → 동작 이름 */
+export const moodName = (mood: string, moods: Map<string, string>): string => moods.get(mood.replace(/\s+/g, '').toLowerCase()) ?? (moods.size ? 'talk' : mood);
 /** 표정 낱말 → 동작 이름 (팩의 우리말 이름·영문 이름 둘 다 받는다) */
 export function moodMap(pack: Pick<HsPack, 'cuts'> | null): Map<string, string> {
   const m = new Map<string, string>();
