@@ -71,7 +71,7 @@ import { hasShopTag, settleShop, shopJudgeBy, shopOn } from './core/shop';
 import { renderReadyCard, renderShopCard, setShopOpener } from './host/shopcard';
 import { hasReadyTag, settleReady } from './core/orders';
 import { cosReadyMode } from './core/malls';
-import { hideUseBox, refreshUseBox } from './host/usebox';
+import { hideUseBox, refreshUseBox, USE_SLOT } from './host/usebox';
 import { colConfig, COL_LOG_VAR, fillStatusSection, isPointsOrg, POINTS_ON_VAR, pointsAuto, usedCols, withColLog } from './core/world/statuscols';
 import { pointsFlagFor, pointsVars, readPoints, recentPointLines, syncPointsToStatus } from './core/points';
 import { activeAnomalyNote } from './core/world/records';
@@ -774,6 +774,8 @@ function displayNow(text: string): string {
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
   if (ours && !out.includes('data-goei-user')) out += USER_MARK;
+  // 「다음 메시지에 사용」 칩이 들어갈 빈 자리 (host/usebox.ts). 마지막 메시지의 것만 본 화면 style 이 채워 보인다
+  if (ours && !isLanding(text) && !out.includes('data-goei-card="use"')) out += USE_SLOT;
   return out;
 }
 

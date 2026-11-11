@@ -1,30 +1,47 @@
-// 「사용」 상자 (2026-11-07 소지품): 소지품 메뉴에서 「사용」을 누른 물건을 본 화면 입력칸 위에 칩으로 보여 준다.
+// 「사용」 상자 (2026-11-07 소지품): 소지품 메뉴에서 「사용」을 누른 물건을 채팅의 마지막 메시지 아래에 칩으로 보여 준다.
 // 다음 전송 때 [Inventory] 글의 This turn 에 같이 넘어가고(core/items.ts withInventory), 응답이 붙으면 settleItemUse 가 상자를 정리한다.
-// 본 화면 DOM은 SafeElement 뿐이라 유령 버튼(overlay.ts)과 같은 방식: x-goei-usebox 속성 선택자 CSS, 클릭은 좌표로 맞춰 본다.
+// 자리 (2026-11-11 사용자): 브라우저 창에 고정하면 Risu 왼쪽 목록 위에 떴다 → 시작 안내(openinghint.ts)처럼 채팅 메시지 안에 붙인다.
+//  · display 가 이 봇 메시지마다 빈 자리(USE_SLOT)를 붙여 두고(body.ts), 본 화면 style 이 마지막 메시지의 자리에만 이름을 채워 보인다.
+//    Risu 는 글이 그대로면 메시지를 다시 그리지 않으니(Chats.svelte 글 해시), 이름은 글이 아니라 CSS(::before content)로 넣는다.
+//  · 마지막 메시지 = .chat-message-container:first-child (Risu 는 새 메시지를 맨 앞에 넣고 flex-col-reverse 로 뒤집어 보인다).
 import { aliveAnchors } from '../core/wallet';
 import { dropUse, invOn, ITEM_USE_AT_VAR, itemUseVars, liveItems, readItemUse, readItems } from '../core/items';
 import type { Chat } from '../core/types';
-import { currentTheme, onThemeChange } from '../ui/theme';
-import { elements, hit } from './chatclicks';
-import { body, themeVars } from './overlay';
+import { armChatClick, elements, hit, onChatClick } from './chatclicks';
+import { body } from './overlay';
 import { updateChat } from './risu';
 
-const CSS = `
-${themeVars('[x-goei-usebox]')}
-[x-goei-usebox] { position: fixed; left: 16px; bottom: 96px; z-index: 44; display: none; max-width: min(72vw, 560px); font: 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; pointer-events: none; }
-[x-goei-usebox] [x-goei-uwrap] { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-[x-goei-usebox] [data-gu-label] { color: var(--g-sub); font-size: 11px; letter-spacing: .02em; margin-right: 2px; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
-[x-goei-usebox] [data-gu] { display: inline-flex; align-items: center; gap: 6px; padding: 6px 7px 6px 10px; border-radius: 999px; background: var(--g-panel); color: var(--g-text); border: 1px solid var(--g-line); box-shadow: 0 6px 14px -8px rgba(0,0,0,.6); }
-[x-goei-usebox] [data-gu] b { font-weight: 600; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-[x-goei-usebox] [data-gu-x] { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--g-acc); color: var(--g-signal); border: 1px solid var(--g-acc-line); font-size: 11px; line-height: 1; pointer-events: auto; cursor: pointer; }
-`;
+/** 한 번에 보이는 칩 수. 넘으면 마지막 칸이 「외 n개」 */
+const SLOTS = 12;
+const LAST = '.chat-message-container:first-child [data-goei-card="use"]';
+
+/** display 가 메시지 끝에 붙이는 빈 자리. 본 화면 style 이 없으면 보이지 않는다 */
+export const USE_SLOT = `<div data-goei-card="use" style="display:none"><span data-gu-label></span>${Array.from({ length: SLOTS }, (_, i) => `<span data-gu="${i}"><span data-gu-x="${i}" role="button" aria-label="빼기"></span></span>`).join('')}<span data-gu-more></span></div>`;
+
+const cssStr = (s: string) => `"${s.replace(/[\r\n]+/g, ' ').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+
+/** 마지막 메시지의 자리에 이름을 채우는 CSS. 색은 채팅 카드 변수(ui/theme.ts cardVarsCss)를 쓴다 */
+export function useBoxCss(names: { label: string }[]): string {
+  if (!names.length) return '';
+  const show = names.slice(0, names.length > SLOTS ? SLOTS - 1 : SLOTS);
+  const more = names.length - show.length;
+  return [
+    `${LAST} { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px 8px; width: fit-content; min-width: min(100%, 420px); max-width: 100%; box-sizing: border-box; margin: 10px auto 0; padding: 10px 16px; border: 1px solid var(--goei-accentLine); border-radius: 14px; background: var(--goei-accentBg); color: var(--goei-sub); font-size: .92em; line-height: 1.5; }`,
+    `${LAST} [data-gu-label]::before { content: "다음 메시지에 사용"; color: var(--goei-signal); font-weight: 600; margin-right: 4px; }`,
+    `${LAST} [data-gu] { display: none; align-items: center; gap: 6px; max-width: 100%; padding: 2px 4px 2px 10px; border: 1px solid var(--goei-accentLine); border-radius: 999px; color: var(--goei-text); }`,
+    `${LAST} [data-gu]::before { max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }`,
+    `${LAST} [data-gu-x] { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--goei-accentLine); color: var(--goei-signal); line-height: 1; cursor: pointer; }`,
+    `${LAST} [data-gu-x]::before { content: "×"; }`,
+    ...show.map((n, i) => `${LAST} [data-gu="${i}"] { display: inline-flex; } ${LAST} [data-gu="${i}"]::before { content: ${cssStr(n.label)}; }`),
+    more > 0 ? `${LAST} [data-gu-more]::before { content: "외 ${more}개"; }` : '',
+  ].join('\n');
+}
 
 type Root = NonNullable<Awaited<ReturnType<typeof body>>>;
 type El = Awaited<ReturnType<Root['doc']['createElement']>>;
 
-const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
-
 let host: El | null = null;
+let styleEl: El | null = null;
 let where = { charIndex: -1, chatIndex: -1 };
 let shown: { id: string; label: string }[] = [];
 let busy = false;
@@ -40,39 +57,34 @@ export function useBoxNames(chat: Chat | null): { id: string; label: string }[] 
   });
 }
 
-async function ensure(): Promise<El | null> {
-  if (host) return host;
+async function ensure(): Promise<{ doc: Root['doc']; style: El } | null> {
   const root = await body();
   if (!root) return null;
   const { doc } = root;
+  if (host && styleEl) return { doc, style: styleEl };
   try {
     for (const old of await elements(doc, '[x-goei-usebox]')) await old.remove().catch(() => {});
   } catch { /* 없으면 그만 */ }
+  // 화면에 보이는 것은 없다: 채팅 속 자리를 채우는 style 만 든다 (SafeElement.setAttribute 는 x- 속성만 받는다)
   const h = await doc.createElement('div');
   await h.setAttribute('x-goei-usebox', 'true');
-  await h.setAttribute('x-goei-theme', currentTheme());
-  // SafeElement.setAttribute 는 x- 속성만 받는다. 안쪽은 innerHTML 로 한 번에
   const style = await doc.createElement('style');
-  await style.setTextContent(CSS);
   await h.appendChild(style);
-  const wrap = await doc.createElement('div');
-  await wrap.setAttribute('x-goei-uwrap', 'true');
-  await h.appendChild(wrap);
   await root.body.appendChild(h);
   host = h;
-  onThemeChange((t) => void h.setAttribute('x-goei-theme', t).catch(() => {}));
-  // 문서 전체에 걸리는 리스너: × 를 눌렀는지 좌표로 본다
-  await h.addEventListener('click', ((ev: { clientX?: number; clientY?: number }) => void onClick(doc, ev.clientX ?? -1, ev.clientY ?? -1)) as (e: unknown) => void, { passive: true });
-  return h;
+  styleEl = style;
+  return { doc, style };
 }
 
-async function onClick(doc: Root['doc'], x: number, y: number): Promise<void> {
-  if (busy || !shown.length || where.charIndex < 0) return;
-  const xs = await elements(doc, '[x-goei-usebox] [data-gu-x]');
+// × 를 눌렀는지 좌표로 본다 (채팅 속 단추와 같은 길, host/chatclicks.ts)
+onChatClick('use', async (doc, x, y) => {
+  if (!shown.length || where.charIndex < 0) return 'idle';
+  if (busy) return false;
+  const xs = await elements(doc, `${LAST} [data-gu-x]`);
   for (let i = 0; i < xs.length; i++) {
     if (!(await hit(xs[i], x, y))) continue;
     const id = shown[i]?.id;
-    if (!id) return;
+    if (!id) return false;
     busy = true;
     try {
       const { charIndex, chatIndex } = where;
@@ -86,8 +98,24 @@ async function onClick(doc: Root['doc'], x: number, y: number): Promise<void> {
     } finally {
       busy = false;
     }
-    return;
+    return true;
   }
+  return false;
+});
+
+/** 마지막 메시지가 이 플러그인이 뜨기 전·Lite 판정 전에 그려져 자리가 없으면, 그 글 끝에 줄바꿈을 붙였다 떼어 Risu 가 다시 그리게 한다 (body.ts redrawAfterLoad 와 같은 방법, 글은 원래대로 돌아온다) */
+async function redrawLast(doc: Root['doc'], charIndex: number, chatIndex: number): Promise<void> {
+  if (!(await elements(doc, '.chat-message-container')).length || (await elements(doc, LAST)).length) return;
+  const flip = (add: boolean) => updateChat(charIndex, chatIndex, (cur) => {
+    const list = cur.message ?? [];
+    const m = list[list.length - 1];
+    if (!m || typeof m.data !== 'string' || (cur as { isStreaming?: boolean }).isStreaming) return null;
+    if (!add && !m.data.endsWith('\n')) return null;
+    return { ...cur, message: [...list.slice(0, -1), { ...m, data: add ? `${m.data}\n` : m.data.slice(0, -1) }] };
+  }).catch(() => null);
+  if (!(await flip(true))) return;
+  await new Promise((r) => setTimeout(r, 300));
+  await flip(false);
 }
 
 /** 이 채팅 상태로 상자를 다시 그린다 (채팅 바꿈·사용 누름·응답 뒤). known 이 있으면 다시 읽지 않는다 */
@@ -97,15 +125,15 @@ export async function refreshUseBox(charIndex: number, chatIndex: number, known?
   const names = useBoxNames(chat);
   where = { charIndex, chatIndex };
   if (!names.length) return hideUseBox();
-  const h = await ensure();
-  if (!h) return;
-  shown = names;
-  const wrap = await h.querySelector('[x-goei-uwrap]');
-  await wrap?.setInnerHTML(`<span data-gu-label>다음 메시지에 사용</span>${names.map((n) => `<span data-gu><b>${esc(n.label)}</b><span data-gu-x role="button" aria-label="${esc(n.label)} 빼기">×</span></span>`).join('')}`);
-  await h.setStyle('display', 'block');
+  const e = await ensure();
+  if (!e) return;
+  shown = names.slice(0, names.length > SLOTS ? SLOTS - 1 : SLOTS);
+  await e.style.setTextContent(useBoxCss(names));
+  armChatClick('use');
+  await redrawLast(e.doc, charIndex, chatIndex).catch(() => {});
 }
 
 export async function hideUseBox(): Promise<void> {
   shown = [];
-  if (host) await host.setStyle('display', 'none').catch(() => {});
+  if (styleEl) await styleEl.setTextContent('').catch(() => {});
 }

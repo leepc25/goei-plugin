@@ -89,6 +89,30 @@ for (const vp of ['pc', 'phone']) {
     await shot('equipped');
   }
   await closeWin(page); await sleep(300);
+  // 칩은 채팅 속 마지막 메시지 아래 (2026-11-11): 화면 처리기가 붙인 빈 자리를 본 화면 style 이 채운다. 옛 메시지의 자리는 안 보인다
+  const chip = await page.evaluate(async () => {
+    const list = document.createElement('div');
+    list.id = 'chatmock';
+    list.style.cssText = 'position:fixed;left:16px;right:16px;top:60px;z-index:1;display:flex;flex-direction:column-reverse;color:#ddd';
+    for (const m of [...window.__chat.message].reverse()) {
+      const d = document.createElement('div');
+      d.className = 'chat-message-container';
+      d.innerHTML = await window.__calls.handlers.display(m.data);
+      list.appendChild(d);
+    }
+    document.body.appendChild(list);
+    const cards = [...list.querySelectorAll('[data-goei-card="use"]')];
+    const vis = (e) => getComputedStyle(e).display !== 'none';
+    const last = cards[0];
+    return {
+      cards: cards.length, lastOn: !!last && vis(last), oldOn: cards.slice(1).some(vis),
+      label: last ? getComputedStyle(last.querySelector('[data-gu-label]'), '::before').content : '',
+      names: last ? [...last.querySelectorAll('[data-gu]')].filter(vis).map((e) => getComputedStyle(e, '::before').content) : [],
+      fixed: !!document.querySelector('[x-goei-usebox] [data-gu]'),
+    };
+  });
+  if (!chip.lastOn || chip.oldOn || !chip.label.includes('다음 메시지에 사용') || !chip.names.length || chip.fixed) errorsAll.push(`[${vp}] use chip not under last message: ${JSON.stringify(chip)}`);
+  console.log(vp, 'chip', JSON.stringify(chip));
   await shot('usebox');
   const req = await page.evaluate(async () => {
     window.__chat.message.push({ role: 'user', data: '소금을 뿌린다', chatId: 'u2' });
@@ -98,13 +122,19 @@ for (const vp of ['pc', 'phone']) {
   const inv = req.find((l) => l.includes('[Inventory]'));
   if (!inv) errorsAll.push(`[${vp}] no [Inventory] in request: ${JSON.stringify(req)}`);
   // × 로 빼기: 칩의 × 좌표를 눌러 상자가 사라지는지
+  let xClicks = 0;
   for (let i = 0; i < 6; i++) {
-    const x = await page.$('[x-goei-usebox] [data-gu-x]');
-    if (!x || !(await x.isVisible())) break;
-    await x.click(); await sleep(400);
+    let x = null;
+    for (const e of await page.$$('#chatmock .chat-message-container:first-child [data-gu-x]')) if (await e.isVisible()) { x = e; break; }
+    if (!x) break;
+    await x.click(); await sleep(400); xClicks++;
   }
-  const boxShown = await page.evaluate(() => document.querySelector('[x-goei-usebox]')?.style.display);
+  if (!xClicks) errorsAll.push(`[${vp}] no × to click on the use chip`);
+  const boxShown = await page.evaluate(() => { const c = document.querySelector('#chatmock [data-goei-card="use"]'); return c ? getComputedStyle(c).display : 'none'; });
   if (boxShown !== 'none') errorsAll.push(`[${vp}] use box still shown after ×: ${boxShown}`);
+  const useLeft = await page.evaluate(() => window.__chat.scriptstate.$st_item_use);
+  console.log(vp, 'use after ×', useLeft, 'clicks', xClicks);
+  await page.evaluate(() => document.querySelector('#chatmock')?.remove());
   await openWin(page); await sleep(300);
   await openEditor(page, 'set:items'); await sleep(300);
   await shot('settings');
