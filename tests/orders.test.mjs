@@ -61,3 +61,21 @@ test('산 응답이 죽으면 진열대·쪽지·견적도 안 산 것으로 (re
   assert.equal(dead.quotes[0].accepted, undefined);
   assert.equal(M.markSold(st, 'i3', 'c9'), st);
 });
+
+test('완성 알림 자리: 주문 뒤 처음 받을 수 있게 된 응답의 상태창에만, 받으면 없어진다 (11-11 사용자)', () => {
+  const st = (d, t) => `[▣|${d}|${t}|☀️|4°C|관리국|QC 괴이]`;
+  const msg = (id, d, t) => ({ role: 'char', data: `답.\n${st(d, t)}`, chatId: id });
+  const base = [{ role: 'user', data: 'x', chatId: 'u1' }, msg('c1', '2025.01.01', '02:47 AM')];
+  const t0 = M.worldMinute({ message: base });
+  const o = { id: 'q1', anchor: 'c1', price: 1, hours: 36, orderedAt: t0, orderedKey: 'c1', item: { name: '신발', desc: '', effect: '', use: false } };
+  const chat = (extra, orders = [o]) => ({ message: [...base, ...extra], scriptstate: M.ordersVars(orders) });
+  assert.equal(M.readyNotes(chat([])).size, 0, '주문한 응답에는 없음');
+  assert.equal(M.readyNotes(chat([{ role: 'user', data: 'y', chatId: 'u2' }, msg('c2', '2025.01.01', '11:00 PM')])).size, 0, '납기 전');
+  const late = [{ role: 'user', data: 'y', chatId: 'u2' }, msg('c2', '2025.01.01', '11:00 PM'), { role: 'user', data: 'z', chatId: 'u3' }, msg('c3', '2025.01.02', '03:00 PM'), { role: 'user', data: 'w', chatId: 'u4' }, msg('c4', '2025.01.03', '09:00 AM')];
+  const n = M.readyNotes(chat(late));
+  assert.deepEqual([...n.keys()], [st('2025.01.02', '03:00 PM')], '처음 완성된 응답에만 (그 뒤 응답에는 또 붙지 않는다)');
+  assert.deepEqual([n.values().next().value.index, n.values().next().value.orders[0].item.name], [5, '신발']);
+  assert.equal(M.readyNotes(chat(late, [{ ...o, taken: true, takenKey: 'c4' }])).size, 0, '받으면 없어진다');
+  // 완성된 응답을 다시 굴려 시각이 납기 전이면 알림도 사라진다
+  assert.equal(M.readyNotes(chat([...late.slice(0, 3), msg('c3b', '2025.01.02', '09:00 AM')])).size, 0);
+});

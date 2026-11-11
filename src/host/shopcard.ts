@@ -31,6 +31,18 @@ export function renderShopCard(text: string): string {
   return `${stripShopTags(text)}\n${card}`;
 }
 
+/** 맞춤 주문 완성 알림 (11-11 사용자): 완성된 턴의 상태창 아래에 붙는다 (host/statusview.ts). 단추는 「접속하기」와 같은 길로 그 사이트를 연다 */
+export function orderReadyCard(site: string, shop: string, names: string[]): string {
+  if (!names.length) return '';
+  armChatClick('shop');
+  drawn.add(site);
+  const p = cardPalette(currentTheme());
+  const what = names.length > 1 ? `「${esc(names[0])}」 외 ${names.length - 1}건` : `「${esc(names[0])}」`;
+  return `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5">`
+    + `<span style="flex:1;min-width:0"><b style="color:${p.signal}">${esc(shop)}</b><br>주문하신 ${what} 완성</span>`
+    + `<button type="button" data-goei-shop="${esc(site)}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">받으러 가기</button></div>`;
+}
+
 let busy = false;
 onChatClick('shop', async (doc, x, y) => {
   const list = await elements(doc, '[data-goei-shop]');

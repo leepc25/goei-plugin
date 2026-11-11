@@ -4,6 +4,7 @@
 import type { Chat } from './types';
 import { findStatusTags, statusMinute } from './world/status';
 import type { ShopItem } from './shop';
+import { messageKey } from './people/store';
 
 type Vars = Record<string, unknown> | undefined;
 
@@ -100,4 +101,35 @@ export function ordersText(list: CosOrder[], nowMin: number | null, lastKey: str
     const state = orderReady(o, nowMin, lastKey) ? 'ready for pickup' : due !== null ? `due ${minuteText(due)}` : `due in ${o.hours}h`;
     return `${o.item.name} (${o.price} won, ${state})`;
   }).join(', ');
+}
+
+/**
+ * 완성 알림을 붙일 자리 (11-11 사용자: 주문 제작이 끝나면 채팅에 알림): 아직 안 받은 주문마다, 주문 뒤 **처음으로 받을 수 있게 된 응답**의
+ * 마지막 상태창 원문(trim) → 그 주문들. 저장하지 않고 채팅에서 매번 다시 센다 (응답을 지우거나 다시 굴리면 저절로 맞는다).
+ * 채팅 화면은 글만 받아 메시지를 구분하지 못하므로 상태창 원문을 열쇠로 쓴다 (host/statusview.ts 보고서 카드와 같은 방식). 상태창이 없는 응답에는 붙일 자리가 없다.
+ */
+export function readyNotes(chat: Chat): Map<string, { index: number; orders: CosOrder[] }> {
+  const out = new Map<string, { index: number; orders: CosOrder[] }>();
+  const list = chat.message ?? [];
+  const keys = list.map((m, i) => messageKey(m, i));
+  const pending = liveOrders(chat.scriptstate, new Set(keys)).filter((o) => !o.taken);
+  if (!pending.length) return out;
+  // 응답마다: 그 응답까지의 작중 시각, 마지막 상태창 원문
+  let now: number | null = null;
+  const rows = list.map((m, i) => {
+    if (m.role !== 'char' || typeof m.data !== 'string') return null;
+    const tags = findStatusTags(m.data);
+    const t = tags[tags.length - 1];
+    if (t) now = statusMinute(t.date, t.time) ?? now;
+    return { i, key: keys[i], now, raw: t ? t.raw.trim() : '' };
+  });
+  for (const o of pending) {
+    const from = Math.max(keys.indexOf(o.anchor), keys.indexOf(o.orderedKey));
+    const hit = rows.find((r) => r && r.i > from && orderReady(o, r.now, r.key));
+    if (!hit || !hit.raw) continue;
+    const cur = out.get(hit.raw);
+    if (!cur || hit.i > cur.index) out.set(hit.raw, { index: hit.i, orders: [o] });
+    else if (hit.i === cur.index) cur.orders.push(o);
+  }
+  return out;
 }

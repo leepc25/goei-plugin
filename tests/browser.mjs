@@ -868,6 +868,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.evaluate(async ({ reply, phoneAuto }) => {
     // 장면 인물이 없어도 소지품 읽기가 켜져 있으면 갱신기가 돈다(11-08): 이 시험의 모델 호출 수에 끼지 않게 끈다
     window.__chat.scriptstate.$it_auto = '0';
+    // 상점 판단이 「자동」이면 갱신기가 매 턴 돈다(11-09): 같은 까닭으로 메인 모델이 판단하게 둔다
+    window.__chat.scriptstate.$sh_judge = 'main';
     // 괴담톡 자동 확인은 이 테스트(15)에서만 켠다 (다른 테스트의 모델 호출 순서를 지키려고)
     if (!phoneAuto) window.__chat.scriptstate.$ph_auto = '0';
     window.__chat.message.push({ role: 'user', data: '시작' }, { role: 'char', data: reply });

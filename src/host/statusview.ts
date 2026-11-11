@@ -2,6 +2,9 @@
 // 「지난 장면」·위키 이름은 채팅을 바꿀 때와 응답이 들어올 때 미리 모아 둔다 (display는 기다릴 수 없다).
 // 보고서 카드(2026-10-29, docs/설계안_기록_보고서.md 5-12절): 사건이 종료된 응답의 상태창 원문(statusKey)을 열쇠로 그 상태창 상자 바로 아래에 카드를 붙인다.
 // 설정 「채팅에 보고서 표시」(안 띄움 / 내가 출동한 사건만 / 전부)에 따라 열쇠 표를 모으고, 끄면 표가 비어 다시 그릴 때 카드가 없다. 본문·요청에는 아무것도 넣지 않는다.
+import { readyNotes, type CosOrder } from '../core/orders';
+import { cosReadyMode, MALL_NAME } from '../core/malls';
+import { orderReadyCard } from './shopcard';
 import { buildRegistry, colConfig, findStatusTags, hiddenCols, setStatusColumns, statusTimeline } from '../core/world';
 import { journalSettings, readReports, type Report } from '../core/journal';
 import { listDocs, prepareBaseDocs } from '../core/wiki';
@@ -20,6 +23,10 @@ export function resetStatusContext(): void {
 }
 /** 상태창 원문(trim) → 그 응답에서 종료된 사건의 보고서 (설정이 off 면 빈 표) */
 let cards = new Map<string, Report[]>();
+/** 상태창 원문(trim) → 그 응답에서 완성된 우주 쇼핑몰 맞춤 주문 (core/orders.ts readyNotes, 11-11 사용자: 완성되면 채팅에 알림) */
+let orderNotes = new Map<string, { index: number; orders: CosOrder[] }>();
+/** 이 응답(번호)에 주문 완성 알림이 붙나 (응답 처리가 「다시 그리기」가 필요한지 볼 때) */
+export const orderNotesAt = (chat: Chat, index: number): boolean => [...readyNotes(chat).values()].some((n) => n.index === index) && cosReadyMode(chat.scriptstate) !== 'off';
 /** 위키 이름을 누르면 (app.ts가 채운다) */
 let openWiki: ((title: string) => void) | null = null;
 /** 보고서 카드의 「기록에서 보기」 (app.ts 가 채운다) */
@@ -63,6 +70,7 @@ export function chatCardsAt(chat: Chat, index: number): Report[] {
 /** 열쇠 표만 다시 모은다 (저장 직후 다시 그릴 때 카드가 있게. 위키 이름·시각 목록은 그대로) */
 export function refreshReportCards(chat: Chat): void {
   cards = collectCards(chat);
+  orderNotes = cosReadyMode(chat.scriptstate) === 'off' ? new Map() : readyNotes(chat);
 }
 
 /** 이 채팅의 상태창 시각 목록과 위키 이름을 다시 모은다 */
@@ -82,6 +90,7 @@ export async function refreshStatusContext(charIndex: number, chatIndex: number,
   setStatusColumns(chat.scriptstate);
   ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
   cards = collectCards(chat);
+  orderNotes = cosReadyMode(chat.scriptstate) === 'off' ? new Map() : readyNotes(chat);
 }
 
 /** display: 상태창 태그 → 상자 (+ 그 응답에서 종료된 사건의 보고서 카드) */
@@ -99,6 +108,8 @@ export function renderStatus(text: string): string {
       const p = cardPalette(currentTheme());
       extra = list.map((r) => reportCardHtml(r, p)).join('');
     }
+    const note = orderNotes.get(t.raw.trim());
+    if (note) extra += orderReadyCard('cos', MALL_NAME.cos, note.orders.map((o) => o.item.name));
     out = out.replace(t.raw, () => statusHtml(t, ctx) + extra);
   }
   return out;

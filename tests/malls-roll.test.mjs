@@ -145,3 +145,15 @@ test('쇼핑몰에서 한 일(운영자와 나눈 말·맞춤 주문·1:1 상담
   const next = { ...c, message: [...c.message, { role: 'user', data: '간다', chatId: 'u3' }, { role: 'char', data: '다음', chatId: 'c2' }], scriptstate: vars };
   assert.deepEqual(mallEvents(next), [], '다음 응답 뒤에는 없다');
 });
+
+test('맞춤 주문 완성: 완성된 바로 다음 턴에만 본편에 한 줄, 「카드만」이면 안 넘긴다 (11-11 사용자)', () => {
+  const st = (d, t) => `답.\n[▣|${d}|${t}|☀️|4°C|관리국|QC 괴이]`;
+  const o = { id: 'q1', anchor: 'c1', price: 1, hours: 2, orderedAt: Date.UTC(2025, 0, 1, 2, 47) / 60000, orderedKey: 'c1', item: { name: '소리 없는 신발', desc: '', effect: '', use: false } };
+  const msgs = [{ role: 'user', data: 'x', chatId: 'u1' }, { role: 'char', data: st('2025.01.01', '02:47 AM'), chatId: 'c1' }, { role: 'user', data: 'y', chatId: 'u2' }, { role: 'char', data: st('2025.01.01', '06:00 AM'), chatId: 'c2' }];
+  const vars = { $cos_orders: JSON.stringify([o]) };
+  const ev = M.mallEvents({ message: msgs, scriptstate: vars });
+  assert.equal(ev.length, 1); assert.ok(ev[0].includes('소리 없는 신발') && ev[0].includes('finished'));
+  assert.deepEqual(M.mallEvents({ message: msgs, scriptstate: { ...vars, $cos_ready: 'card' } }), []);
+  const later = [...msgs, { role: 'user', data: 'z', chatId: 'u3' }, { role: 'char', data: st('2025.01.01', '07:00 AM'), chatId: 'c3' }];
+  assert.deepEqual(M.mallEvents({ message: later, scriptstate: vars }), [], '그 뒤 턴에는 다시 넘기지 않는다');
+});

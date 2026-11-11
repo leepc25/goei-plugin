@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { chatCardsAt, refreshStatusContext, renderStatus, resetStatusContext, setRecordsOpener, setWikiOpener } from './host/statusview';
+import { chatCardsAt, orderNotesAt, refreshStatusContext, renderStatus, resetStatusContext, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MARK, START_MARK, stripSceneMark, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
@@ -551,7 +551,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 저장 직후 Risu 가 메시지를 다시 그릴 때 카드 열쇠 표가 비어 있으면 종료 응답 아래 보고서 카드가 안 나오고 다음 저장까지 기다려야 했다
     await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     // 이번 응답에서 종료된 사건의 카드가 있으면 채팅을 그대로 한 번 저장해 그 메시지를 다시 그리게 한다 (설정 변경 때와 같은 기법)
-    if (latest && chatCardsAt(now, arg.messageIndex).length) now = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null)) ?? now;
+    if ((latest && chatCardsAt(now, arg.messageIndex).length) || orderNotesAt(now, arg.messageIndex)) now = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null)) ?? now;
     // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
     await storeLore(arg.characterIndex, arg.chatIndex, undefined, { char, chat: now }).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
