@@ -614,7 +614,7 @@ function settingsView(ctx: ChatContext): string {
     auto: s.auto, auto_title: s.autoTitle, auto_query: s.autoQuery, length: s.length, mode: s.mode, model: s.model, refresh_previous: s.refreshPrevious ? '1' : '0',
     context: wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', footnotes: s.footnotes, images: s.images, request: String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? ''),
   };
-  const wire: Wire = { cur: (k) => vals[k] ?? '', adv: (item) => advRow('nw', item, ctx.chat.scriptstate), advChips: (items) => advChipRow('nw', items, ctx.chat.scriptstate) };
+  const wire: Wire = { cur: (k) => vals[k] ?? '', adv: (item) => advRow('nw', item, ctx.chat.scriptstate), advChips: (items, label) => advChipRow('nw', items, ctx.chat.scriptstate, label) };
   return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '', defaultsButtons('wiki'))}${defaultsConfirm('wiki')}
     <div class="ph-form-body ps">
     ${defGroups(WIKI_SET, wire)}</div>

@@ -32,7 +32,7 @@ import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { JOINT_VAR, jointOn } from '../core/netjoint';
 import { budgetFor, genSettings } from '../core/advanced';
-import { advChipRow, advRow } from './advanced';
+import { advChipRow, advRow, advSetRow } from './advanced';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
@@ -1069,7 +1069,8 @@ function settingsView(ctx: ChatContext): string {
     minmax: () => phoneSettings(state).banterRows,
     custom: { joint: () => ({ ctl: setSeg('ph-cfg', 'joint', jointOn(state) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]) }) },
     adv: (item) => advRow('ph', item, ctx.chat.scriptstate),
-    advChips: (items) => advChipRow('ph', items, ctx.chat.scriptstate),
+    advChips: (items, label) => advChipRow('ph', items, ctx.chat.scriptstate, label),
+    advSet: (label, items, help) => advSetRow('ph', label, items, ctx.chat.scriptstate, help),
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">

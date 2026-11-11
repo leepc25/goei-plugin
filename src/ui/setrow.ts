@@ -10,7 +10,26 @@ export const SCOPE_BADGE = { device: '이 기기', chat: '이 채팅', defaults:
 export type RowScope = keyof typeof SCOPE_BADGE;
 /** 설정 한 줄: 왼쪽 이름·설명, 오른쪽 조작. label·help·control 은 HTML */
 export const setRow = (label: string, control: string, help = '', cls = '', scope?: RowScope): string =>
-  `<div class="ps-row${cls ? ` ${cls}` : ''}"><div class="ps-label"><b>${label}${scope ? `<i class="gx-scope${scope === 'device' ? '' : ` ${scope}`}">${SCOPE_BADGE[scope]}</i>` : ''}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+  `<div class="ps-row${cls ? ` ${cls}` : ''}"><div class="ps-label"><b>${label}${scope ? `<i class="gx-scope${scope === 'device' ? '' : ` ${scope}`}">${SCOPE_BADGE[scope]}</i>` : ''}</b>${help ? `<small>${helpFmt(help)}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+/** 설명 글을 한 가지 모양으로 (모든 줄 공통): 문장은 마침표로 끝내고, 「이름 = 뜻」이 이어진 글은 항목 목록(helpBox)으로 끊는다.
+ *  이미 모양을 갖춘 글(태그가 든 글)은 그대로 둔다 */
+const HELP_TERM = '[^=.,:]{1,18}';
+export const helpFmt = (h: string): string => {
+  if (!h || h.includes('<')) return h;
+  const end = (s: string) => { const t = s.trim().replace(/,$/, ''); return /[.!?)」…]$/.test(t) ? t : `${t}.`; };
+  const parts = h.split(new RegExp(`\\s+·\\s+(?=${HELP_TERM} = )|(?<=[.,)])\\s+(?=${HELP_TERM} = )`)).map((s) => s.trim()).filter(Boolean);
+  const item = new RegExp(`^(${HELP_TERM}) = (.+)$`, 's');
+  const items: [string, string][] = [];
+  let lead = '';
+  for (const [i, p] of parts.entries()) {
+    const m = item.exec(p);
+    if (m) items.push([m[1].trim(), end(m[2])]);
+    else if (i === 0) lead = end(p);
+    else if (items.length) items[items.length - 1][1] += ` ${end(p)}`;
+  }
+  if (!items.length) return end(h);
+  return `<span class="hb">${lead ? `<span class="hb-lead">${lead}</span>` : ''}<span class="hb-list">${items.map(([t, d]) => `<span class="hb-i"><b>${t}</b><span>${d}</span></span>`).join('')}</span></span>`;
+};
 /** 설정 묶음 */
 export const setGroup = (title: string, rows: string, note = ''): string =>
   `<section class="ps-group">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${rows}</div></section>`;
@@ -45,7 +64,8 @@ export interface Wire {
   pageTitle?: string;
   /** 세부 값 표의 줄 (ui/advanced.ts advRow) · 칩 줄 */
   adv?(item: string): string;
-  advChips?(items: string[]): string;
+  advChips?(items: string[], label: string): string;
+  advSet?(label: string, items: [string, string][], help: string): string;
 }
 
 /** 버튼 이름: 기능 열쇠가 머리 (gn-cfg·gn-text·gn-count) */
@@ -110,7 +130,8 @@ export function defRow(page: SetPage, d: SetDef, w: Wire): string {
     if ('eq' in c ? w.cur(c.key) !== c.eq : w.cur(c.key) === c.ne) return '';
   }
   if (d.ctl.t === 'adv') return w.adv?.(d.ctl.item) ?? '';
-  if (d.ctl.t === 'advchips') return w.advChips?.(d.ctl.items) ?? '';
+  if (d.ctl.t === 'advchips') return w.advChips?.(d.ctl.items, d.label) ?? '';
+  if (d.ctl.t === 'advset') return w.advSet?.(d.label, d.ctl.items, typeof d.help === 'string' ? d.help : '') ?? '';
   if (d.ctl.t === 'custom') {
     const c = w.custom?.[d.key]?.();
     if (!c) return '';
@@ -168,17 +189,22 @@ export type CkMark = boolean | CkNum | null;
 /** acts: 칸마다 누르면 보낼 값. 체크 칸은 「갈래:메뉴:열쇠=값」 그대로(fam-set), 수 칸은 「갈래:메뉴:열쇠」(fam-num 이 「=값」을 붙인다) */
 export interface CkRow { label: string; marks: CkMark[]; acts: (string | null)[] }
 /** 격자 칸의 조작 하나 (PC 격자와 폰 묶음이 같이 쓴다) */
+export interface CkActs { set: string; num: string }
+const FAM_ACTS: CkActs = { set: 'fam-set', num: 'fam-num' };
+let ckActs: CkActs = FAM_ACTS;
 const ckCtl = (m: CkMark | undefined, act: string | null | undefined, aria: string, round: boolean, busy: boolean): string => {
   if (m === null || m === undefined || !act) return '<span class="ck-x" aria-label="없음">–</span>';
   const off = busy ? ' disabled' : '';
-  if (typeof m === 'boolean') return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" data-action="fam-set" data-value="${esc(act)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
+  if (typeof m === 'boolean') return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" data-action="${ckActs.set}" data-value="${esc(act)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
   const st = m.step ?? 1;
-  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="fam-num" data-value="${esc(act)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
-  return `<div class="st-step adv-step">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="fam-num" data-key="${esc(act)}" value="${m.n}" style="width:${numWidth(m.hi)}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
+  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${ckActs.num}" data-value="${esc(act)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
+  return `<div class="st-step adv-step">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="${ckActs.num}" data-key="${esc(act)}" value="${m.n}" style="width:${numWidth(m.hi)}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
 };
 /** 수 조작 하나 (격자 밖 줄에서도 같은 모양·같은 처리기) */
-export const numCtl = (act: string, m: CkNum, aria: string, unit = '', busy = false): string => {
+export const numCtl = (act: string, m: CkNum, aria: string, unit = '', busy = false, acts: CkActs = FAM_ACTS): string => {
+  ckActs = acts;
   const html = ckCtl(m, act, esc(aria), false, busy);
+  ckActs = FAM_ACTS;
   return unit ? html.replace(/(<input[^>]*>)/, `$1<span>${esc(unit)}</span>`) : html;
 };
 export const ckGrid = (groups: CkGroup[], rows: CkRow[], foot = '', title = '', busy = false): string => {
@@ -192,7 +218,13 @@ export const ckGrid = (groups: CkGroup[], rows: CkRow[], foot = '', title = '', 
 };
 /** 띠 여러 개를 PC에서는 한 격자로 나란히, 폰에서는 띠마다 하나로 (폭이 달라서). foot = 설명(helpBox) */
 export interface CkBand { title: string; groups: CkGroup[]; marks: CkMark[][]; acts: (string | null)[][]; foot: string }
-export const ckWide = (bands: CkBand[], labels: string[], busy = false): string => {
+export const ckWide = (bands: CkBand[], labels: string[], busy = false, acts: CkActs = FAM_ACTS): string => {
+  ckActs = acts;
+  try { return ckWide0(bands, labels, busy); } finally { ckActs = FAM_ACTS; }
+};
+/** 같은 종류 수 여럿을 한 줄에: 「이름 + 상자」 짝 */
+export const numSet = (items: [string, string][]): string => `<div class="fam-set">${items.map(([l, c]) => `<span class="fam-set1"><span class="fam-l">${esc(l)}</span>${c}</span>`).join('')}</div>`;
+const ckWide0 = (bands: CkBand[], labels: string[], busy = false): string => {
   const groups = bands.flatMap((b) => b.groups.map((g, i) => ({ ...g, name: g.name || b.title, band: i === 0 })));
   const rows = labels.map((label, r) => ({ label, marks: bands.flatMap((b) => b.marks[r]), acts: bands.flatMap((b) => b.acts[r]) }));
   const foot = bands.filter((b) => b.foot).map((b) => `<span class="ck-foot1">${b.foot}</span>`).join('');

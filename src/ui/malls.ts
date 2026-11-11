@@ -901,7 +901,7 @@ function cosRollGroup(ctx: ChatContext, site: MallSite): string {
 /** 포인트몰 1:1 상담 (11-09 사용자: 상담마다 다른 백일몽 직원. 주사위 칸·다시 만나기·겹치지 않기는 설정에서, 말투·업무 지침은 지침 「포인트몰 1:1 상담」에서) */
 function deskGroup(ctx: ChatContext): string {
   const d = deskSettings(ctx.chat.scriptstate);
-  const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 본편이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
+  const how = '<p class="ps-note">상담을 열 때마다 코드가 아래 칸마다 값을 하나씩 뽑고, 모델이 그 값으로 상담사(이름·직급·부서·소개·말투)를 한 번 만들어 둬요. 대화하는 동안은 그 카드를 매번 같이 보내서 사람이 바뀌지 않아요. 턴이 넘어가거나 「상담 종료」·「다른 상담사 연결」을 누르면 다음엔 새 상담사예요. 업무 지침과 말 규칙은 설정 → 지침 → 포인트몰 1:1 상담에서 고쳐요.</p>';
   const reset = d.axesText ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="ms-desk-reset">기본값으로</button></div>` : '';
   return group('1:1 상담', how + [
     row('사용', mseg('bm', 'desk_on', d.on ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '끄면 왼쪽 메뉴에 「1:1 상담」이 안 보여요.'),
@@ -914,15 +914,15 @@ function deskGroup(ctx: ChatContext): string {
 /** 맞춤 주문 완성 알림 (11-11 사용자) */
 function cosReadyGroup(ctx: ChatContext): string {
   const m = cosReadyMode(ctx.chat.scriptstate);
-  return group('맞춤 주문', row('완성 알림', mseg('cos', 'ready', m, [['both', '카드 + 본편'], ['card', '카드만'], ['off', '사용 안 함']]),
-    m === 'both' ? '완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 본편에 완성 사실을 한 번 넘겨요.' : m === 'card' ? '채팅에 카드만 떠요. 본편 모델은 완성된 줄 몰라요.' : '알리지 않아요. 사이트의 「주문 조회」에서만 보여요.'));
+  return group('맞춤 주문', row('완성 알림', mseg('cos', 'ready', m, [['both', '카드 + 메인 요청'], ['card', '카드만'], ['off', '사용 안 함']]),
+    m === 'both' ? '완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 메인 요청에 완성 사실을 한 번 넘겨요.' : m === 'card' ? '카드만 떠요. 메인 모델은 완성된 줄 몰라요.' : '알리지 않아요. 사이트의 「주문 조회」에서만 보여요.'));
 }
 
 /** 진짜 효과 (11-09 사용자: 보이는 효과는 광고 문구, 진짜는 숨김 · 미리 정한 것과 「아무도 모름」을 섞음) */
 function cosTruthGroup(ctx: ChatContext): string {
   const m = cosTruthMode(ctx.chat.scriptstate);
-  return group('진짜 효과', `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 본편 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row('진실 미리 정하기', mseg('cos', 'truth', m, [['all', '전부'], ['mix', '섞음'], ['none', '안 함']]),
-    m === 'all' ? '우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과.' : m === 'mix' ? '절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 본편 모델이 정해요.' : '전부 「아무도 모름」. 처음 쓸 때 본편 모델이 그 자리에서 정해요.'));
+  return group('진짜 효과', `<p class="ps-note">우주몰 물건의 「효과」는 화면에 보이는 광고 문구예요(모호·검열·거짓·뚱딴지·가끔 진실). 진짜 효과는 어디에도 안 보이고 메인 모델만 받아요. 쓸 때 실제로 일어나는 일은 진짜 쪽이에요.</p>` + row('진실 미리 정하기', mseg('cos', 'truth', m, [['all', '전부'], ['mix', '섞음'], ['none', '안 함']]),
+    m === 'all' ? '우주몰 모델이 물건마다 진짜 효과를 미리 정해 숨겨 둬요. 쓸 때마다 같은 결과.' : m === 'mix' ? '절반쯤은 미리 정해 숨기고, 나머지는 「아무도 모름」으로 둬서 처음 쓸 때 메인 모델이 정해요.' : '전부 「아무도 모름」. 처음 쓸 때 메인 모델이 그 자리에서 정해요.'));
 }
 
 /** 시그니처 상품 (11-09 사용자: 구버전 「우리가 도움!」·「착한 친구」를 직접 넣고 고치게) */
@@ -938,7 +938,7 @@ function cosFixedGroup(ctx: ChatContext): string {
       <div class="ms-fx-row"><span class="ph-inline"><span>값</span>${num(f.id, 'price', f.price, '999999', '값')}<span>원</span></span><span class="ph-inline"><span>할인 전</span>${num(f.id, 'was', f.was, '비우면 할인 없음', '할인 전 값')}<span>원</span></span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>설명</span>${text(f.id, 'desc', f.desc, '겉보기 설명 (???·검열됨처럼 숨겨도 돼요)', '설명', 200)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>효과</span>${text(f.id, 'effect', f.effect, '화면에 보이는 광고 문구 (모호·검열·거짓·뚱딴지…)', '보이는 효과', 200)}</span></div>
-      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 본편 모델만 봐요. 비우면 「아무도 모름」', '진짜 효과', 200)}</span></div>
+      <div class="ms-fx-row"><span class="ph-inline ms-fx-wide"><span>진실</span>${text(f.id, 'truth', f.truth, '숨긴 진짜 효과 — 메인 모델만 봐요. 비우면 「아무도 모름」', '진짜 효과', 200)}</span></div>
     </div>`).join('');
   const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="ms-fx-add" ${list.length >= COS_FIXED_MAX ? 'disabled' : ''}>상품 추가</button></div>`;
   return group('시그니처 상품', `<p class="ps-note">모델이 아니라 코드가 새로고침마다 확률대로 끼워 넣는 상품이에요. 모델에게는 이름을 알리지 않고, 모델이 같은 이름을 내면 버려요. 이미 진열돼 있거나 산 것은 다시 안 넣어요. 다 지우면 안 써요. 「효과」는 화면에 보이는 광고 문구이고 「진실」은 숨긴 진짜 효과예요.</p>${items || '<p class="ps-note">없음.</p>'}${foot}`);

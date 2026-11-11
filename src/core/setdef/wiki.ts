@@ -9,17 +9,16 @@ export const WIKI_SET: SetPage = {
       title: '',
       rows: [
         { key: 'auto', label: '자동 호출', common: 'auto', ctl: { t: 'seg', opts: [['0', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']] }, help: '턴이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요' },
-        { key: 'auto_title', label: '자동 작성 제목', ctl: { t: 'seg', opts: [['model', '모델이 고름'], ['input', '직접 입력']] }, help: '모델이 고름 = 명부 항목 중 이번 이야기에 맞는 것' },
+        { key: 'auto_title', label: '자동 작성 제목', ctl: { t: 'seg', opts: [['model', '모델이 고름'], ['input', '직접 입력']] }, help: '「모델이 고름」이면 명부 항목 가운데 이번 이야기에 맞는 것을 써요.' },
         { key: 'auto_query', label: '직접 입력', show: { key: 'auto_title', eq: 'input' }, ctl: { t: 'text', ph: '문서 제목' } },
         { key: 'model', label: '모델', common: 'model', ctl: { t: 'seg', opts: [['main', '메인 모델'], ['aux', '보조 모델']] }, help: '문서를 쓸 때 부를 모델이에요' },
-        { key: 'adv_model_id', label: '전용 모델', ctl: { t: 'adv', item: 'model_id' } },
       ],
     },
     {
       title: '참조',
       rows: [
         { key: 'adv_turns', label: '챗로그 포함', ctl: { t: 'adv', item: 'turns' } },
-        { key: 'adv_refs', label: '', ctl: { t: 'advchips', items: ['desc', 'authors', 'persona', 'active', 'related', 'secondary'] } },
+        { key: 'adv_refs', label: '넘길 내용', ctl: { t: 'advchips', items: ['desc', 'authors', 'persona', 'active', 'related', 'secondary'] } },
         { key: 'adv_ref_count', label: '관련·2차 참조 최대', ctl: { t: 'adv', item: 'ref_count' } },
         { key: 'refresh_previous', label: '다시 쓸 때 이전 문서 참조', ctl: onOff(), help: '문서를 다시 쓸 때 이전 문서를 요청에 넣어요' },
         { key: 'adv_budget', label: '요청 토큰 상한', ctl: { t: 'adv', item: 'budget' } },
@@ -29,7 +28,7 @@ export const WIKI_SET: SetPage = {
       title: '컨텍스트 포함',
       rows: [
         { key: 'context', label: '사용', common: 'ctx', ctl: onOff(), help: '장면에 나온 문서가 메인 요청에 붙어요' },
-        { key: 'adv_ctx', label: '', ctl: { t: 'advchips', items: ['ctx_focus', 'ctx_lore', 'ctx_created'] } },
+        { key: 'adv_ctx', label: '붙일 것', ctl: { t: 'advchips', items: ['ctx_focus', 'ctx_lore', 'ctx_created'] } },
         { key: 'adv_ctx_count', label: '넣을 문서', ctl: { t: 'adv', item: 'ctx_count' } },
         { key: 'adv_ctx_tokens', label: '컨텍스트 토큰 상한', ctl: { t: 'adv', item: 'ctx_tokens' } },
       ],

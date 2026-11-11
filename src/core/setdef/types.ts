@@ -21,7 +21,9 @@ export type SetCtl =
   /** 세부 값 표(core/advanced.ts)의 줄 하나. 이름·범위·기본값은 그 표를 따른다 */
   | { t: 'adv'; item: string }
   /** 세부 값 표의 켬·끔 칩 한 줄 */
-  | { t: 'advchips'; items: string[] };
+  | { t: 'advchips'; items: string[] }
+  /** 세부 값 표의 수 여럿을 한 줄에 (같은 종류 수: 「이름 + 상자」 짝). items = [항목, 짧은 이름] */
+  | { t: 'advset'; items: [string, string][] };
 
 /** 여러 페이지가 똑같이 갖는 줄의 종류 (기준서 3절). 「인터넷」 표와 관제 화면이 이 값으로 줄을 모은다 */
 export type SetCommon = 'auto' | 'joint' | 'model' | 'ctx' | 'sampling';

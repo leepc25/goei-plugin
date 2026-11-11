@@ -571,7 +571,7 @@
 .gw .hl-h { display: block; margin-top: 6px; color: var(--text); font-size: 12.5px; font-weight: 600; opacity: .8; }
 .gw .hl-h:first-child { margin-top: 0; }
 .gw .hl-i { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); column-gap: 10px; padding: 2px 0; line-height: 1.5; }
-.gw .hl-i > b { color: var(--text); font-weight: 600; word-break: keep-all; }
+.gw .hl-i > b { color: var(--dim); font-weight: 700; word-break: keep-all; }
 .gw .hl-i > span:only-child { grid-column: 1 / -1; }
 .gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 12.5px; }
 .gw .ck-h2.solo { padding-top: 8px; }
@@ -656,8 +656,8 @@
 .gw .fam-set1 { display: inline-flex; align-items: center; gap: 8px; }
 .gw .fam-l { font-size: 13px; color: var(--text); white-space: nowrap; }
 /* 격자 칸의 수 상자: 규격 그대로(높이·단추 폭). 가운데 수 칸 폭은 자릿수에 맞춘 값(setrow.ts numWidth) */
-.gw .ck .adv-step > input.adv-val, .gw .mx-grid.ck-ph .adv-step > input.adv-val { padding: 0; }
-.gw .adv-step > input.adv-val { padding: 0 4px; }
+/* 173줄의 입력 공통 규칙(안쪽 여백 12px)이 더 세서 수가 잘린다 → 수 칸만 여백을 줄인다 */
+.gw .adv-step > input.adv-val { padding: 0 4px !important; }
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
   .gw .ps-ctl > .fam-set { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
   .gw .ps-ctl > .fam-set > .fam-set1 { justify-content: space-between; }

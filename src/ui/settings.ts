@@ -1,6 +1,6 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
-import { defRow, setGroup, setRow, type RowScope } from './setrow';
+import { ckWide, defRow, helpBox, numCtl, numSet, setGroup, setRow, type CkActs, type CkBand, type CkNum, type RowScope } from './setrow';
 import { SETTINGS_SET } from '../core/setdef/settings';
 import { findDef } from '../core/setdef/types';
 import { mallSettingsPane } from './malls';
@@ -184,29 +184,35 @@ function worldStep(key: WorldField['key']): number {
   return 1;
 }
 
-function worldRow(w: WorldSettings, key: WorldField['key'], label: string, unit: string, busy: boolean): string {
-  const f = WORLD_SPEC.find((x) => x.key === key)!;
-  const v = w[key];
-  const max = f.max ?? 99;
-  const HINT: Partial<Record<string, string>> = {
-    cap: '같은 때에 살아 있을 수 있는 최대 개수예요. 이 수가 차면 더 생기지 않아요',
-    p: '응답 하나를 처리할 때 새로 생길 확률이에요',
-    ttl: '생긴 뒤 이야기 속 시간으로 이만큼 지나면 자동으로 끝나요. 모델이 먼저 끝내면 그때 끝나요',
-    landmark_share: '사건이 생길 때 등록된 거점(본부·지사 같은 장소)에서 생길 비율이에요. 나머지는 지도의 아무 곳',
+/** 괴이 발생: 종류 넷이 같은 값을 가지니 격자 하나로 (줄 = 종류, 열 = 값. 인터넷·상점 격자와 같은 틀).
+ *  버튼은 set-world 에 「열쇠=값」(수) · 「열쇠:값」(켬·끔)을 보낸다 */
+const WORLD_ACTS: CkActs = { set: 'set-world', num: 'set-world' };
+const WORLD_KINDS: ['preset' | 'random' | 'incident' | 'mystic', string][] = [['preset', '프리셋 괴이'], ['random', '랜덤 괴이'], ['incident', '사건'], ['mystic', '특수']];
+const worldNum = (w: WorldSettings, key: WorldField['key']): CkNum => ({ n: w[key], lo: 0, hi: WORLD_SPEC.find((x) => x.key === key)?.max ?? 99, step: worldStep(key) });
+function worldGrid(w: WorldSettings, busy: boolean): string {
+  const band: CkBand = {
+    title: '괴이 발생',
+    groups: [
+      { name: '동시 최대', opts: ['개'], kind: 'num' },
+      { name: '발생 확률', opts: ['%'], kind: 'num' },
+      { name: '자동 종료', opts: ['켬'], kind: 'check' },
+      { name: 'RP 유지 시간', opts: ['시간'], kind: 'num' },
+    ],
+    marks: WORLD_KINDS.map(([k]) => [worldNum(w, `${k}_cap`), worldNum(w, `${k}_p`), w[`${k}_expire`] === 1, worldNum(w, `${k}_ttl`)]),
+    acts: WORLD_KINDS.map(([k]) => [`${k}_cap`, `${k}_p`, `${k}_expire:${w[`${k}_expire`] === 1 ? 0 : 1}`, `${k}_ttl`]),
+    foot: helpBox('응답을 처리할 때마다 판정해요.', [
+      ['동시 최대', '같은 때에 살아 있을 수 있는 수예요. 0이면 그 종류는 저절로 생기지 않아요.'],
+      ['발생 확률', '응답 하나를 처리할 때 새로 생길 확률이에요.'],
+      ['자동 종료', '켜면 RP 유지 시간이 지났을 때 플러그인이 끝내요. 끄면 모델이 끝낼 때까지 남아요.'],
+      ['RP 유지 시간', '생긴 뒤 이야기 속 시간으로 이만큼 지나면 끝나요. 모델이 먼저 끝내면 그때 끝나요.'],
+    ]),
   };
-  const kind = key === 'landmark_share' ? 'landmark_share' : key.replace(/^(preset|random|incident|mystic)_/, '');
-  return field(esc(label), stepper('set-world', key, `${v}${unit}`, v > 0, v < max, label, busy), HINT[kind] ?? '');
-}
-
-function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'mystic', name: string, busy: boolean): string {
-  const expire = w[`${k}_expire`] === 1;
-  return `<div class="ps-card"><h4>${name}</h4><div class="ps-rows">
-    ${worldRow(w, `${k}_cap`, '동시 최대', '개', busy)}
-    ${worldRow(w, `${k}_p`, '발생 확률', '%', busy)}
-    ${field('자동 종료', seg('set-world', expire ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, 'ON'], [`${k}_expire:0`, 'OFF']], busy), '켜면 아래 유지 시간이 지났을 때 플러그인이 끝내요. 끄면 모델이 끝낼 때까지 남아요')}
-    ${expire ? worldRow(w, `${k}_ttl`, 'RP 유지 시간', '시간', busy) : ''}
-    ${k === 'incident' ? worldRow(w, 'landmark_share', '거점 비율', '%', busy) : ''}
-  </div></div>`;
+  const n = (key: WorldField['key'], aria: string, unit: string) => numCtl(key, worldNum(w, key), aria, unit, busy, WORLD_ACTS);
+  return `${ckWide([band], WORLD_KINDS.map(([, name]) => name), busy, WORLD_ACTS)}
+    ${group('', [
+      field('사건의 거점 비율', n('landmark_share', '사건의 거점 비율', '%'), '사건이 생길 때 등록된 거점(본부·지사 같은 장소)에서 생길 비율이에요. 나머지는 지도의 아무 곳에서 생겨요.'),
+      field('추가 발생 여유분', numSet([['괴이', n('extra_cap', '괴이 여유분', '개')], ['사건', n('extra_in_cap', '사건 여유분', '개')], ['특수', n('extra_ms_cap', '특수 여유분', '개')]]), '직접 고르거나 RP 중에 새로 등장한 것을 동시 최대와 따로 기록할 수 있는 수예요.'),
+    ].join(''))}`;
 }
 
 // v0.16.23 (사용자 설계): 「이 채팅 / 새 채팅 기본값」으로 같은 설정을 두 벌 두지 않는다. 설정은 하나(지금 채팅)이고,
@@ -344,7 +350,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const itVars = scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars;
   const startLocked = scope === 'chat' && !walletEdit && walletStarted(ctx.chat);
   const S: Record<SettingsSection, string> = {
-    screen: `${group('화면', [
+    screen: `${group('', [
       // 테마는 채팅마다 ($st_fixed_theme, 원본 ensureDefaults) — 시작 뒤엔 이 채팅, 시작 전엔 새 채팅 기본값 (2026-10-28 QC: 「이 기기」 배지가 붙어 있었지만 실제로는 채팅에 저장됐다)
       D('theme', theme, { help: `채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요. ${scope === 'chat' ? '이 채팅에 저장돼요. 새 채팅의 기본값은 시작 화면의 설정에서 정해요.' : '새 채팅이 시작할 때 쓸 배색이에요.'}`, scope: scope === 'chat' ? 'chat' : 'defaults' }),
       D('nav', getPrefs().nav ?? 'left'),
@@ -373,19 +379,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       D('img-show', '', { ctl: recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy) }),
     ].join('')) : ''}`,
     board: `${group('', [
-      D('anomaly', '', { ctl: anomaly, help: scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.' }),
+      D('anomaly', '', { ctl: anomaly, help: scope === 'chat' ? '켜면 괴이·사건·특수가 저절로 생기고 응답마다 지도와 요원 상태를 갱신해요. 끄면 지금 상황판을 비워요. 커스텀 임무는 꺼져 있어도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.' }),
       D('agent', '', { ctl: stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), help: `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)` }),
       D('support', s.supportOn ? '1' : '0'),
     ].join(''))}
-    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
-      <div class="ps-cards">
-        ${worldKind(world, 'preset', '프리셋 괴이', busy)}${worldKind(world, 'random', '랜덤 괴이', busy)}
-        ${worldKind(world, 'incident', '사건', busy)}${worldKind(world, 'mystic', '특수', busy)}
-        <div class="ps-card"><h4>추가 발생 여유분</h4><div class="ps-rows">
-          ${worldRow(world, 'extra_cap', '괴이', '개', busy)}${worldRow(world, 'extra_in_cap', '사건', '개', busy)}${worldRow(world, 'extra_ms_cap', '특수', '개', busy)}</div>
-          <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
-      </div>
-    </section>`,
+    ${worldGrid(world, busy)}`,
     // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
     status: `${group('', [
       D('status', getPrefs().status ?? 'auto'),
@@ -457,8 +455,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       ].join('');
     })(),
     // 로어북 호출: 고급에서 따로 뺀 페이지 (2026-11-05 사용자)
-    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1])}`,
-    adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0])}`,
+    lore: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [1], true)}`,
+    adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, {}, [0], true)}`,
     update: `${updateGroup(ctx)}`,
   };
   if (only) return S[only];
@@ -1009,7 +1007,7 @@ export async function handleSettings(action: string, value: string | undefined, 
         return true;
       }
       case 'set-world': {
-        const hit = nextWorld(d.world, v);
+        const hit = nextWorld(d.world, v.replace('=', ':'));
         if (hit) await saveDefaults(env, (p) => ({ ...p, world: { ...p.world, [hit[0]]: hit[1] } }));
         return true;
       }
@@ -1019,7 +1017,7 @@ export async function handleSettings(action: string, value: string | undefined, 
   switch (action) {
     case 'set-world':
       await save(ctx, env, (chat) => {
-        const hit = nextWorld(worldSettings(lore, chat.scriptstate), v);
+        const hit = nextWorld(worldSettings(lore, chat.scriptstate), v.replace('=', ':'));
         return hit ? { [wgKey(hit[0])]: String(hit[1]) } : null;
       });
       return true;
