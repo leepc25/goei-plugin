@@ -32,7 +32,7 @@ export const ITEM_AUTO_VAR = '$it_auto';
 export const ITEM_SLOTS_DEFAULT = 16;
 export const ITEM_SLOTS_MIN = 8;
 export const ITEM_SLOTS_MAX = 40;
-export const ITEM_LIMIT_DEFAULT = '가방 하나와 주머니, 두 손';
+export const ITEM_LIMIT_DEFAULT = 'one bag, pockets, and two hands';
 /** 소지 한도 kg (2026-11-08 사용자): 고유 인물은 명부 「소지 한도」를 시작할 때 $it_carry_pc 에 적고, 그 값이 없으면(페르소나·아바타) 설정 값 */
 export const ITEM_CARRY_VAR = '$it_carry';
 export const ITEM_CARRY_PC_VAR = '$it_carry_pc';

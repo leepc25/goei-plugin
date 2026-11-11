@@ -4823,7 +4823,8 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 /* 우주몰 설정: 진열 배정 글칸 · 시그니처 상품 목록 (11-09) */
 .ms-area { width: 100%; min-height: 0; font: 12.5px/1.5 var(--mono); resize: vertical; }
 /* 그림 대체 말: 표가 길어도 여섯 줄 높이에서 안쪽으로 굴린다 (2026-11-11 사용자: 칸이 너무 크다) */
-.st-alias { field-sizing: fixed; height: 9.5em; max-height: 40vh; overflow: auto; }
+.st-alias { field-sizing: fixed; height: 9.5em; max-height: 40vh; overflow: auto; scrollbar-color: color-mix(in srgb, var(--sub) 55%, transparent) transparent; }
+.st-alias::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 55%, transparent); background-clip: padding-box; }
 .ms-num { width: 120px; }
 .ms-fx { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
 .ms-fx + .ms-fx { margin-top: 8px; }
