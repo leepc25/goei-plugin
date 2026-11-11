@@ -4653,6 +4653,67 @@ ${rule}`.trim();
       return `${o.item.name} (${o.price} won, ${state})`;
     }).join(", ");
   }
+  var READY_TAG = /\[\s*shop-ready\s*[:：]\s*([^\]|｜]*?)\s*[|｜]\s*([^\]]*?)\s*\]/giu;
+  var READY_SEP = ";;";
+  var hasReadyTag = (text4) => typeof text4 === "string" && /\[\s*shop-ready\s*[:：]/iu.test(text4);
+  function findReadyTag(text4) {
+    if (!hasReadyTag(text4)) return null;
+    let out = null;
+    for (const m of text4.matchAll(READY_TAG)) {
+      const names4 = m[2].split(READY_SEP).map((n3) => n3.trim()).filter(Boolean);
+      if (m[1] && names4.length) out = { raw: m[0], site: m[1], names: names4 };
+    }
+    return out;
+  }
+  function stripReadyTags(text4) {
+    if (!hasReadyTag(text4)) return text4;
+    return text4.replace(new RegExp(`^[ \\t]*${READY_TAG.source}[ \\t]*\\r?\\n?`, "gimu"), "").replace(READY_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  }
+  var tagName2 = (s8) => s8.replace(/[\[\]|｜\r\n]/g, " ").replace(/;;+/g, ";").replace(/\s+/g, " ").trim();
+  var readyTag = (site, orders) => `[shop-ready: ${site}|${orders.map((o) => tagName2(o.item.name)).filter(Boolean).join(READY_SEP)}]`;
+  function readyNotes(chat) {
+    const out = /* @__PURE__ */ new Map();
+    const list4 = chat.message ?? [];
+    const keys = list4.map((m, i) => messageKey(m, i));
+    const pending2 = liveOrders(chat.scriptstate, new Set(keys)).filter((o) => !o.taken);
+    if (!pending2.length) return out;
+    let now2 = null;
+    const rows3 = list4.map((m, i) => {
+      if (m.role !== "char" || typeof m.data !== "string") return null;
+      const tags = findStatusTags(m.data);
+      const t = tags[tags.length - 1];
+      if (t) now2 = statusMinute(t.date, t.time) ?? now2;
+      return { i, key: keys[i], now: now2 };
+    });
+    for (const o of pending2) {
+      const from = Math.max(keys.indexOf(o.anchor), keys.indexOf(o.orderedKey));
+      const hit4 = rows3.find((r) => r && r.i > from && orderReady(o, r.now, r.key));
+      if (!hit4) continue;
+      const cur = out.get(hit4.i);
+      if (cur) cur.push(o);
+      else out.set(hit4.i, [o]);
+    }
+    return out;
+  }
+  function settleReady(chat, on2, site = "cos") {
+    const list4 = chat.message ?? [];
+    const notes = on2 ? readyNotes(chat) : /* @__PURE__ */ new Map();
+    let message = null;
+    for (let i = 0; i < list4.length; i++) {
+      const m = list4[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const want = notes.get(i);
+      const tag = want ? readyTag(site, want) : "";
+      if (!tag && !hasReadyTag(m.data)) continue;
+      const body5 = stripReadyTags(m.data);
+      const next = tag ? `${body5}
+${tag}` : body5;
+      if (next === m.data) continue;
+      message ??= [...list4];
+      message[i] = { ...m, data: next };
+    }
+    return message;
+  }
 
   // src/core/bmdesk.ts
   var DESK_VAR = "$bm_desk";
@@ -4738,66 +4799,4 @@ ${rule}`.trim();
     const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
     return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
   }
-  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
-  function parseSay(raw) {
-    const say2 = bubbles(block3(raw, "say"));
-    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
-    return say2;
-  }
-  var G2 = () => guideSections("BmDesk");
-  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
-  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
-이름: ${a.name}
-직급: ${a.rank}
-부서: ${a.dept}
-소개: ${a.intro}
-말투: ${a.voice}
-${diceText(a.dice)}`;
-  var material2 = (src) => [
-    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
-${src.refs}` : "",
-    `[지금 진열된 상품]
-${src.shelf || "(없음)"}`,
-    `[손님]
-사내 계정: ${src.nick || "-"}
-남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
-  ].filter(Boolean).join("\n\n");
-  function makePrompt(src, dice, recent, no) {
-    const g2 = G2();
-    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
-    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
-    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
-
-[손님에게 보이는 호칭]
-상담원 ${no}
-
-[이번 상담사 주사위]
-${diceText(dice)}
-
-[최근 상담사 — 겹치지 말 것]
-${past}
-
-[현재 작업]
-상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
-  }
-  function talkPrompt2(src, st) {
-    const g2 = G2();
-    const a = st.agent;
-    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
-    const talk = st.talk.filter((l) => l.who !== "sys").map((l) => `${l.who === "me" ? "[손님]" : "[상담사]"} ${l.text}`).join("\n");
-    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
-
-[상담사 카드]
-${cardText(a)}
-
-[이번 상담 대화 — 마지막 줄이 손님이 방금 한 말]
-${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
-  }
-
-  // src/core/malls.ts
-  var MALL_SITES = ["cos", "bm"];
-  var isMallSite = (v) => v === "cos" || v === "bm";
-  var MALL_NAME = { cos: "우주 쇼핑몰", bm: "백일몽 포인트몰" };
-  var MALL_OWNER = { cos: "운영자", bm: "" };
-  var MALL_GUIDE = { cos: "Cos", bm: "Bm" };
-  var MALL_VA
+  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi,

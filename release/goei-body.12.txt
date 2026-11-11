@@ -1,4 +1,91 @@
-w Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+      cleared = clearStoryRecords(s8, name);
+      return withPeople(cur, s8);
+    });
+    if (!indexes.length) return { ran: 0, applied: 0, skipped: ["최근 응답에 이 인물이 나오지 않아요 (기록만 비움)"], errors: [], cleared };
+    const r = await requestPeopleUpdate("reread", { manual: true, scope: { indexes, only: [name] } });
+    return { ...r, cleared };
+  }
+  async function consolidatePerson(name) {
+    if (running4) return { ok: false, message: "갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요." };
+    const ctx2 = await loadContext().catch(() => null);
+    if (!ctx2) return { ok: false, message: "채팅을 읽지 못했어요." };
+    return consolidateInner(ctx2, name, peopleSettings(ctx2.chat.scriptstate));
+  }
+  async function consolidateInner(ctx2, name, settings) {
+    const store2 = peopleStore(ctx2.chat);
+    const input3 = buildConsolidate(store2, ctx2.chat, name, settings);
+    if (!input3) return { ok: false, message: "정리할 항목이 없어요." };
+    const id2 = chatId(ctx2);
+    const t0 = Date.now();
+    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: id2, reason: "consolidate", model: settings.model, people: [name], indexes: [], sizes: { system: input3.system.length, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
+    setStatus({ busy: true, label: `${name} 기록 정리 중…` });
+    try {
+      const dataText = JSON.stringify(input3.data);
+      diag.sizes.data = dataText.length;
+      if (settings.keepRaw) diag.system = input3.system, diag.data = dataText;
+      const messages = [
+        { role: "system", content: input3.system },
+        { role: "user", content: `Record to tidy:
+${dataText}
+
+Return the JSON object.` }
+      ];
+      const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: "same", state: ctx2.chat.scriptstate, staticModel: settings.stageModelId.tidy || void 0, label: "정리" });
+      diag.raw = raw;
+      diag.outChars = raw.length;
+      await waitNotBusy();
+      const saved2 = await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
+        if (chatId({ ...ctx2, chat: cur }) !== id2) return null;
+        const s8 = peopleStore(cur);
+        diag.tidy = applyConsolidate(s8, name, input3, value, liveness(cur), settings);
+        return withPeople(cur, s8);
+      });
+      if (!saved2) {
+        diag.stage = "save";
+        diag.error = "저장 직전에 채팅이 달라져 버림";
+        return { ok: false, message: diag.error };
+      }
+      diag.ok = true;
+      const r = diag.tidy;
+      const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ""}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ""}`;
+      return { ok: true, message: msg, report: r };
+    } catch (error) {
+      if (!diag.raw && error && typeof error === "object" && "raw" in error) diag.raw = String(error.raw ?? "");
+      diag.stage = error instanceof LlmError ? "model" : diag.raw ? "parse" : "build";
+      diag.error = error instanceof Error ? error.message : String(error);
+      return { ok: false, message: `정리 실패: ${diag.error}` };
+    } finally {
+      diag.ms = Date.now() - t0;
+      await pushDiag(diag, settings.keepRaw);
+      setStatus({ busy: false, label: "" });
+    }
+  }
+  async function hypaMemory(chat, char, query, s8, cap = s8.hypaCap) {
+    if (!s8.hypa) return [];
+    let plus;
+    if (s8.hypaPlus) {
+      const charId2 = String(char?.chaId ?? "").trim();
+      const chatKey8 = String(chat.id ?? "").trim();
+      if (charId2 && chatKey8) {
+        try {
+          plus = await risuai.pluginStorage.getItem(`hypaplus_state_${charId2}_${chatKey8}`);
+        } catch {
+          plus = void 0;
+        }
+      }
+    }
+    return hypaSummaries(chat, cap, query, { plus: plus ?? void 0, maxItems: s8.hypaItems });
+  }
+  var routerCache = null;
+  var routerHints = [];
+  var routerHintsNow = () => routerHints;
+  async function routerPeople(chat, store2, input3, settings, exclude = [], identityOf) {
+    if (settings.router !== "model" || !Object.keys(store2.people).length) return null;
+    const names4 = allNames();
+    const built = buildRouter(chat, store2, names4, input3, { exclude, recent: settings.recentMsgs, prompt: routerBase(), rules: settings.routerRules, identityOf });
+    if (routerCache?.key === built.key) return routerCache.selected;
+    const t0 = Date.now();
+    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: "", reason: "router", model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
     try {
       const raw = await Promise.race([
         runModel([{ role: "system", content: built.system }, { role: "user", content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || void 0, "라우터"),
@@ -2412,34 +2499,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     ${scope === "chat" && s8.assetOn && s8.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc36(note)}</p>` : ""}`,
       board: `${group6("상황판", [
         field2("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
-        field2("요원 표시 인원", stepper3("set-agent", "n", `${s8.agentLimit}명`, s8.agentLimit > 0, s8.agentLimit < AGENT_MAX, "요원 표시 인원", busy6), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
-        field2("지원 투입", seg9("set-support", s8.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요."),
-        field2("인물 기록", seg9("set-people", peopleOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), scope === "chat" ? "응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서." : "새 채팅을 인물 기록을 켠 채로 시작할지 정해요.")
-      ].join(""))}
-    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
-      <div class="ps-cards">
-        ${worldKind(world2, "preset", "프리셋 괴이", busy6)}${worldKind(world2, "random", "랜덤 괴이", busy6)}
-        ${worldKind(world2, "incident", "사건", busy6)}${worldKind(world2, "mystic", "특수", busy6)}
-        <div class="ps-card"><h4>추가 발생 여유분</h4><div class="ps-rows">
-          ${worldRow(world2, "extra_cap", "괴이", "개", busy6)}${worldRow(world2, "extra_in_cap", "사건", "개", busy6)}${worldRow(world2, "extra_ms_cap", "특수", "개", busy6)}</div>
-          <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
-      </div>
-    </section>`,
-      // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
-      status: `${group6("상태창", [
-        field2("상태창", seg9("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy6), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", "device")
-      ].join(""))}
-    ${group6(
-        `상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`,
-        statusColsTable(colCfg, busy6, scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars),
-        `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === "chat" ? " 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요." : " 새 채팅의 기본 구성이에요."}`
-      )}
-`,
-      // 가계부(시작 잔고·잔고 직접 수정): 설정 「기록」 페이지 안의 묶음 (2026-11-05 사용자: 가계부가 기록 하위 탭이니 상태창에는 잔고 칸 표시만)
-      // 2026-11-07 사용자: 가계부·소지품·상점 설정을 「소지품」 한 페이지로, 켜고 끄기는 따로 (가계부 = 상태창 잔고 칸 $st_col_wallet)
-      wallet: group6("가계부", [
-        field2("가계부", seg9("set-wallet-on", colCfg.wallet === "off" ? "0" : "1", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 상태창에 잔고 칸을 두고, 본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 끄면 잔고 칸과 거래 기록이 빠져요. 소지품·상점과 따로 켜고 꺼요."),
-        ...colCfg.wallet === "off" ? [] : [
-          field2("시작 잔고", wonInput(walletStart, busy6, startLocked), scope === "chat" ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc36(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요."),
-          field2("잔고 직접 수정", seg9("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워요."),
-          fiel
+        field2("요원 표시 인원", stepper3("set-agent", "n", `${s8.agentLimit}명`, s8.agentLimit > 0, s8.age

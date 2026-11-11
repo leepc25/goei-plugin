@@ -1,4 +1,38 @@
-g">${groups.map((g2) => {
+ ? ' data-usable="1"' : ""}` : "";
+    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc16(it.id)}"${drag} aria-label="${esc16(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc16(it.name)}</b>${tipOf(it, left, w)}</button>`;
+  }
+  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖" };
+  var BY = { story: "본문", manual: "직접", use: "사용 단추", store: "상점" };
+  var WEEK4 = "일월화수목금토";
+  function dayOf3(when3) {
+    const m = /(\d{4})\.(\d{2})\.(\d{2})/.exec(when3);
+    if (!m) return when3.split(" ")[0] || "날짜 없음";
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return `${m[1]}.${m[2]}.${m[3]} (${WEEK4[d.getUTCDay()]})`;
+  }
+  function logList(ctx2) {
+    const q = itemsUi.q.trim();
+    const all = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).log : itemsOf(ctx2).log.slice().reverse();
+    const rows3 = all.filter((l) => itemsUi.logFilter === "get" ? l.what === "get" : itemsUi.logFilter === "out" ? l.what !== "get" : true);
+    const chip3 = (v, label2, n3) => `<button class="gx-chip${itemsUi.logFilter === v ? " on" : ""}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label2}${n3 ? ` <small>${n3}</small>` : ""}</button>`;
+    const got = all.filter((l) => l.what === "get").length;
+    const chips3 = `<div class="gx-rec-tools it-logchips">${chip3("all", "전체", all.length)}${chip3("get", "획득", got)}${chip3("out", "사용", all.length - got)}</div>`;
+    if (!rows3.length) return `${chips3}<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : itemsUi.logFilter === "get" ? "아직 획득한 물건이 없어요." : itemsUi.logFilter === "out" ? "아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요." : "아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요."}</p>`;
+    const w = whenOf(ctx2);
+    const pic3 = (l) => itemPic(l);
+    const row11 = (l) => {
+      const when3 = whenLabel(w, l.anchor, l.at);
+      const sub = [BY[l.by] ?? l.by, l.what === "use" && (l.n ?? 1) > 1 ? `×${l.n}` : "", l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · ");
+      return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic3(l)}</span><span class="gx-wt-memo"><b>${esc16(l.name)} <em class="it-what ${l.what === "get" ? "get" : "out"}">${WHAT[l.what] ?? l.what}</em></b><small>${esc16(sub)}</small></span><span class="gx-wt-amt"><small>${esc16(when3.split(" ")[1] ?? when3)}</small></span></div></li>`;
+    };
+    const groups = [];
+    for (const l of rows3) {
+      const day = dayOf3(whenLabel(w, l.anchor, l.at));
+      const g2 = groups[groups.length - 1];
+      if (g2 && g2.day === day) g2.rows.push(l);
+      else groups.push({ day, rows: [l] });
+    }
+    return `${chips3}<div class="gx-wallettab it-log">${groups.map((g2) => {
       const gi = g2.rows.filter((l) => l.what === "get").length;
       const go2 = g2.rows.length - gi;
       return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go2 ? `사용 ${go2}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row11).join("")}</ul></section>`;
@@ -1132,7 +1166,9 @@ ${shopUi.failRaw.slice(0, 1500)}`;
           const it = cur.item;
           const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: "store", anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
           ok = true;
-          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(items), ...ordersVars(list4.map((x) => x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x)) } };
+          const next = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...itemsVars(items), ...ordersVars(list4.map((x) => x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x)) } };
+          const message = settleReady(next, cosReadyMode(next.scriptstate) !== "off");
+          return message ? { ...next, message } : next;
         });
         v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : "받을 수 없는 상태다.";
         if (ok) v.took = o.id;
@@ -1508,7 +1544,7 @@ ${v.failRaw.slice(0, 1500)}`;
       row5("생각 단계", mseg(site, "thoughts", s8.thoughts, [["off", "사용 안 함"], ["inner", "속으로만"], ["note", "적고 지움"]])),
       row5("최근 본문 턴 수", step(site, "turns", `${s8.turns}턴`, s8.turns > 1, s8.turns < 8, "최근 본문 턴 수"), "컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8)."),
       row5("참고 로어북 수", step(site, "refs", `${s8.refs}개`, s8.refs > 0, s8.refs < 12, "참고 로어북 수"), "봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).")
-    ].join(""))}${cosRollGroup(ctx2, site)}${site === "cos" ? cosTruthGroup(ctx2) + cosFixedGroup(ctx2) : deskGroup(ctx2)}`;
+    ].join(""))}${cosRollGroup(ctx2, site)}${site === "cos" ? cosReadyGroup(ctx2) + cosTruthGroup(ctx2) + cosFixedGroup(ctx2) : deskGroup(ctx2)}`;
     return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows3}</div></div>`;
   }
   function cosRollGroup(ctx2, site) {
@@ -1547,6 +1583,14 @@ ${v.failRaw.slice(0, 1500)}`;
       row5("지난 상담사 다시 만나기", mseg("bm", "desk_again", d.again ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요."),
       row5("겹치지 않게 넘길 수", `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? "" : "disabled"} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? "" : "disabled"} aria-label="늘리기">+</button></div>`, "새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).")
     ].join("") + reset);
+  }
+  function cosReadyGroup(ctx2) {
+    const m = cosReadyMode(ctx2.chat.scriptstate);
+    return group4("맞춤 주문", row5(
+      "완성 알림",
+      mseg("cos", "ready", m, [["both", "카드 + 본편"], ["card", "카드만"], ["off", "사용 안 함"]]),
+      m === "both" ? "완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 본편에 완성 사실을 한 번 넘겨요." : m === "card" ? "채팅에 카드만 떠요. 본편 모델은 완성된 줄 몰라요." : "알리지 않아요. 사이트의 「주문 조회」에서만 보여요."
+    ));
   }
   function cosTruthGroup(ctx2) {
     const m = cosTruthMode(ctx2.chat.scriptstate);
@@ -1674,7 +1718,7 @@ ${v.failRaw.slice(0, 1500)}`;
     };
     const list4 = () => cosFixed(ctx2.chat.scriptstate);
     if (action === "ms-cfg") {
-      const m = /^(cos|bm):(roll_on|roll_useful|roll_gmode|roll_tmode|truth|fx_on:\w+)=([\s\S]*)$/.exec(value ?? "");
+      const m = /^(cos|bm):(roll_on|roll_useful|roll_gmode|roll_tmode|truth|ready|fx_on:\w+)=([\s\S]*)$/.exec(value ?? "");
       if (!m) return false;
       const K = rollKeys(m[1]);
       if (m[2] === "roll_on") return set2({ [K.on]: m[3] === "0" ? "0" : "" });
@@ -1682,6 +1726,15 @@ ${v.failRaw.slice(0, 1500)}`;
       if (m[2] === "roll_gmode") return set2({ [K.gmode]: m[3] === "uniq" ? "" : m[3] });
       if (m[2] === "roll_tmode") return set2({ [K.tmode]: m[3] === "weight" ? "" : m[3] });
       m.splice(1, 1);
+      if (m[1] === "ready") {
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const next = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [COS_READY_KEY]: m[2] === "both" ? "" : m[2] } };
+          const message = settleReady(next, cosReadyMode(next.scriptstate) !== "off");
+          return message ? { ...next, message } : next;
+        });
+        await env3.refresh();
+        return true;
+      }
       if (m[1] === "truth") return set2({ [COS_TRUTH_KEY]: m[2] === "mix" ? "" : m[2] });
       const id2 = m[1].slice(6);
       return set2(cosFixedVars(list4().map((f) => f.id === id2 ? { ...f, on: m[2] === "1" } : f)));
@@ -2188,7 +2241,7 @@ Next Paragraph Text
       const tuned = imageDataFrom(t.lore, picked, cfg.keywords);
       const data3 = s8.assetPlayer ? withUser(tuned, agent ? void 0 : userInfo().name) : tuned;
       const exclude = agent && !s8.assetPlayer ? [agent.english, data3.aliases.get(agent.name.toLowerCase())].filter((v) => typeof v === "string" && !!v) : [];
-      const job = planAsset(msg.data, data3, s8.assetLimit, exclude);
+      const job = planAsset(stripReadyTags(msg.data), data3, s8.assetLimit, exclude);
       if (!job) return;
       const raw = await runModel(job.messages, "aux", void 0, "이미지 태그 보충");
       const next = finishAsset(job, raw, data3, s8.assetLimit);
@@ -2199,11 +2252,11 @@ Next Paragraph Text
       const saved2 = await updateChat(t.charIndex, t.chatIndex, (latest) => {
         const list4 = latest.message ?? [];
         const i = t.messageIndex;
-        if (i !== list4.length - 1 || list4[i]?.role !== "char" || stripShopTags(String(list4[i].data ?? "")) !== stripShopTags(job.original)) return null;
+        if (i !== list4.length - 1 || list4[i]?.role !== "char" || stripReadyTags(stripShopTags(String(list4[i].data ?? ""))) !== stripReadyTags(stripShopTags(job.original))) return null;
         const tag = findShopTag(String(list4[i].data ?? ""));
         const message = list4.slice();
-        message[i] = { ...list4[i], data: tag ? `${stripShopTags(next)}
-${tag.raw}` : stripShopTags(next) };
+        const ready = findReadyTag(String(list4[i].data ?? ""));
+        message[i] = { ...list4[i], data: [stripReadyTags(stripShopTags(next)), ready?.raw, tag?.raw].filter(Boolean).join("\n") };
         return { ...latest, message, scriptstate: { ...latest.scriptstate ?? {}, [ASSET_NOTE]: "" } };
       });
       if (!saved2) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
@@ -2950,7 +3003,7 @@ ${themeVars("[x-goei-prog]")}
   // src/host/vs.ts
   var VS_BASE = UPDATE_BASE ? `${UPDATE_BASE}/vs` : "";
   var CODE_KEY = "goei:vs:code";
-  var VERSION = true ? "0.21.7" : "";
+  var VERSION = true ? "0.21.8" : "";
   var COMMON = "vs-common";
   var index2 = null;
   function vsIndex() {
@@ -3399,100 +3452,4 @@ html.goei-vs-on #goei-vs { display: block; }
     const ls = installLoreSettings(char.loreSettings);
     await risuai.setCharacterToIndex(charIndex, {
       ...char,
-      ...o.name ? { name: o.name } : {},
-      ...landing,
-      ...ls ? { loreSettings: ls } : {},
-      globalLore: lore,
-      alternateGreetings: planted.greetings
-    });
-  }
-  async function installPictures(charIndex, progress4) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const { state } = await checkInstall(charIndex);
-    const all = state.pictures.missing;
-    if (!all.length) return 0;
-    const WORKERS = 8;
-    const COMMIT = 300;
-    let saved2 = 0;
-    let assets = char.additionalAssets;
-    const commit = async (list4) => {
-      if (!list4.length) return;
-      assets = mergePictures(assets, list4);
-      const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
-      await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
-      saved2 += list4.length;
-    };
-    for (let i = 0; i < all.length; i += COMMIT) {
-      const get = all.slice(i, i + COMMIT);
-      const done3 = [];
-      let next = 0;
-      let failure = null;
-      const worker = async () => {
-        while (next < get.length && !failure) {
-          const p2 = get[next++];
-          try {
-            const path = await risuai.saveAsset(await fetchPicture(p2));
-            if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
-            done3.push([p2, path]);
-          } catch (error) {
-            failure ??= error;
-            return;
-          }
-          const n3 = saved2 + done3.length;
-          if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
-        }
-      };
-      await Promise.all(Array.from({ length: WORKERS }, worker));
-      await commit(done3);
-      if (failure) {
-        const why = failure instanceof Error ? failure.message : String(failure);
-        throw new Error(saved2 ? `${saved2}/${all.length}장까지 받았어요. ${why}` : why);
-      }
-    }
-    forgetImages();
-    return saved2;
-  }
-  async function installIcon(charIndex, progress4) {
-    const icon = installData().icon;
-    if (!icon.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    progress4("아이콘 받는 중…");
-    const bytes = await getBytes(icon.file);
-    if (icon.bytes && bytes.length !== icon.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
-    const d = icon.digest ? await digest(bytes) : null;
-    if (d && d !== icon.digest) throw new Error("받은 아이콘이 이 판의 아이콘과 달라요.");
-    const path = await risuai.saveAsset(bytes);
-    if (typeof path !== "string" || !path) throw new Error("아이콘을 저장하지 못했어요.");
-    const notes = await iconNotes();
-    const id2 = charId(char);
-    const prev = String(char.image ?? "");
-    notes[id2] = { ours: path, prev: notes[id2]?.ours === prev ? notes[id2].prev : prev };
-    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
-    const cc = (Array.isArray(char.ccAssets) ? char.ccAssets : []).filter((a) => a && typeof a === "object");
-    const hasIcon = (uri) => cc.some((a) => a.type === "icon" && a.uri === uri);
-    if (prev && !hasIcon(prev)) cc.push({ type: "icon", uri: prev, name: cc.some((a) => a.type === "icon" && a.name === "main") ? "previous" : "main", ext: extOf(prev) });
-    if (!hasIcon(path)) cc.push({ type: "icon", uri: path, name: "goei", ext: extOf(icon.file) });
-    await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
-  }
-  var extOf = (path) => /\.(png|jpe?g|webp|avif|gif)$/i.exec(path)?.[1]?.toLowerCase() ?? "png";
-  async function restoreIcon(charIndex) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) return false;
-    const notes = await iconNotes();
-    const note = notes[charId(char)];
-    if (!note?.prev) return false;
-    await risuai.setCharacterToIndex(charIndex, { ...char, image: note.prev });
-    delete notes[charId(char)];
-    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
-    return true;
-  }
-  async function installWikiPack(progress4) {
-    if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
-    progress4("위키 기본 문서 목록 받는 중…");
-    let index3 = null;
-    try {
-      index3 = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
-    } catch {
-      throw new Error(
+  

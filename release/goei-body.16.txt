@@ -1,4 +1,58 @@
-: 800; line-height: 1.35; letter-spacing: -.5px; }
+ padding: 0 8px 6px; font-size: 12px; color: var(--ink); opacity: 1; font-weight: 800; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+.bs-gn .side h6:first-child { margin-top: 4px; }
+.bs-gn .side > button { padding-left: 22px; }
+.bs-gn .side .splist .sp { padding-left: 22px; }
+/* 보관된 글 안내 (글 보기 맨 위 한 줄) */
+.bs .bs-arch { margin: 0 0 10px; padding: 8px 12px; border: 1px dashed var(--line); border-radius: 4px; font-size: 12.5px; color: var(--dim); }
+/* PC 쪽지함 단추: 선택 표시 대신 편지 아이콘 (눌러서 창을 여는 단추) */
+.bs .gn-dmpop > svg { width: 14px; height: 14px; margin-right: 5px; vertical-align: -2px; fill: none; stroke: currentColor; }
+
+/* ── 괴담갤 오른쪽 힛갤 칸 (11-09): 본문(.body)과 별개로 고정 ── */
+.bs-gal .gal-cols { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+.bs-gal .gal-cols.solo { grid-template-columns: minmax(0, 1fr); }
+.bs-gal .gal-main { min-width: 0; }
+.bs-gal .gal-main > .body, .bs-gal .gal-main > .bs-plain, .bs-gal .gal-main > .bs-plain .body { width: auto; max-width: 1000px; margin: 0; min-width: 0; }
+.bs-gal .gal-main > .bs-x { padding: 10px 0 0; }
+.bs-gal .gal-side { position: sticky; top: 10px; margin-top: 10px; }
+.bs-gal .gal-side .hit { border: 1px solid #d6d8e2; background: #fff; }
+.bs-gal .gal-side h4 { margin: 0; padding: 7px 10px; font-size: 13px; color: #fff; background: #3b4890; }
+.bs-gal .gal-side ol { list-style: none; margin: 0; padding: 4px 0; }
+.bs-gal .gal-side li button { display: flex; align-items: baseline; gap: 5px; width: 100%; padding: 5px 10px; color: #333; font-size: 12.5px; text-align: left; line-height: 1.3; }
+.bs-gal .gal-side li button span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-gal .gal-side li button em { flex: none; font-style: normal; font-size: 11px; color: #c33; }
+.bs-gal .gal-side li button small { flex: none; font-size: 11px; color: #999; }
+.bs-gal .gal-side li button:hover span { text-decoration: underline; }
+.bs-gal .gal-side li button.on span { color: #3b4890; font-weight: 700; }
+.bs-gal .gal-side .none { margin: 0; padding: 10px; font-size: 12px; color: #999; }
+
+/* 우주몰 설정: 진열 배정 글칸 · 시그니처 상품 목록 (11-09) */
+.ms-area { width: 100%; min-height: 0; font: 12.5px/1.5 var(--mono); resize: vertical; }
+.ms-num { width: 120px; }
+.ms-fx { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.ms-fx + .ms-fx { margin-top: 8px; }
+.ms-fx.off { opacity: .6; }
+.ms-fx-head, .ms-fx-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ms-fx-head > input:first-child { flex: 1; min-width: 140px; }
+.ms-fx .ph-inline .ms-num { width: 110px; }
+.ms-fx-head .ms-num { width: 64px; }
+.ms-fx-wide { flex: 1; min-width: 0; }
+.ms-fx-wide > input { flex: 1; min-width: 0; }
+.ms-sample { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12.5px; line-height: 1.6; }
+.ms-sample b { display: inline-block; min-width: 2.6em; color: var(--sub); font-weight: 600; }
+.ms-sample i { color: var(--accent); font-style: normal; }
+/* 연어 마켓 윗줄 오른쪽 묶음(찾기칸·글쓰기·내 채팅): 사이 8px, 높이 36px 로 같게 (2026-11-10 사용자: 간격이 제각각) */
+.bs-sm .hd .sr + .wr, .bs-sm .hd .wr + .ch { margin-left: -14px; }
+.bs-sm .hd .wr, .bs-sm .hd .ch { height: 36px; padding: 0 14px; display: inline-flex; align-items: center; white-space: nowrap; box-sizing: border-box; }
+.bs-sm.bs-m .hd .sr + .wr { margin-left: 0; }
+/* 연어 마켓 본문: 구분선은 본문 칸 아래가 아니라 단추 줄 위에 전체 너비로 */
+.bs-sm .detail > .info .body { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.bs-sm .detail > .qna { border-top: 1px solid #e4ddd3; padding-top: 14px; }
+/* 연어 마켓 본문: 왼쪽 = 사진 + 판매자, 오른쪽 = 제목(크게)·값·날짜·본문 (2026-11-10 사용자: 윗부분이 어정쩡). 제목은 위 공통 초기화(.bs .gn-post-title)가 크기를 지워 본문 글씨만 했다 */
+.bs-sm .detail > .side { min-width: 0; }
+.bs-sm .detail > .side .seller { margin-top: 10px; padding: 10px 12px; border: 1px solid #e4ddd3; border-radius: 8px; background: #fbf9f5; }
+.bs-sm .detail > .side .seller small { margin-top: 2px; }
+.bs-sm .detail > .qna > .act { margin-top: 0; }
+.bs-sm .detail .gn-post-title { margin: 2px 0 8px; font-size: 20px; font-weight: 800; line-height: 1.35; letter-spacing: -.5px; }
 .bs-sm .detail .price { margin: 0 0 6px; font-size: 19px; }
 .bs-sm.bs-m .detail > .side .ph { max-width: 260px; margin: 0 auto; }
 
@@ -3257,6 +3311,22 @@ ${note.trim()}` : card2;
     return `${stripShopTags(text4)}
 ${card2}`;
   }
+  function renderReadyCard(text4) {
+    const tag = findReadyTag(text4);
+    const body5 = stripReadyTags(text4);
+    if (!tag) return body5;
+    const shop = MALL_NAME[tag.site];
+    return shop ? `${body5}
+${orderReadyCard(tag.site, shop, tag.names)}` : body5;
+  }
+  function orderReadyCard(site, shop, names4) {
+    if (!names4.length) return "";
+    armChatClick("shop");
+    drawn.add(site);
+    const p2 = cardPalette(currentTheme());
+    const what = names4.length > 1 ? `「${esc43(names4[0])}」 외 ${names4.length - 1}건` : `「${esc43(names4[0])}」`;
+    return `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p2.accentLine};border-radius:14px;background:${p2.accentBg};color:${p2.sub};font-size:.92em;line-height:1.5"><span style="flex:1;min-width:0"><b style="color:${p2.signal}">${esc43(shop)}</b><br>주문하신 ${what} 완성</span><button type="button" data-goei-shop="${esc43(site)}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p2.accentLine};border-radius:10px;background:transparent;color:${p2.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">받으러 가기</button></div>`;
+  }
   var busy5 = false;
   onChatClick("shop", async (doc2, x, y) => {
     const list4 = await elements(doc2, "[data-goei-shop]");
@@ -3333,6 +3403,7 @@ ${card2}`;
           const c = m?.content;
           if (typeof c !== "string") return m;
           let next = stripMarkerText(c);
+          if (hasReadyTag(next)) next = stripReadyTags(next);
           if (opts.worldTags && m.role === "assistant") {
             if (hasWorldTags(next)) next = cleanOutput(next);
             if (hasUnlockTag(next)) next = stripUnlockTags(next);
@@ -3586,108 +3657,4 @@ ${texts.anomaly}`;
     const focus = makeFocus(scene2, buildRegistry(char.globalLore));
     const parts = [];
     for (const { view: view2 } of boardsOn) {
-      const rule = mainContextRules({ char: src.char, chat: view2 });
-      const st = readGnet(view2);
-      if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: CONTEXT.tokens, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rule, focus)) });
-    }
-    if (wantPhone && rules2.phone) {
-      try {
-        const st = readPhone(chat);
-        const notices = readBulletins(chat);
-        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules2.phone, focus)) });
-      } catch (error) {
-        console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
-    if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
-    return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
-  }
-  function withCap(box4, key, cap, run6) {
-    const keep = box4[key];
-    box4[key] = cap;
-    try {
-      return run6();
-    } finally {
-      box4[key] = keep;
-    }
-  }
-  function stripHistoryTags(messages) {
-    const dirty2 = (c) => typeof c === "string" && (hasWorldTags(c) || hasUnlockTag(c));
-    if (!messages.some((m) => m?.role === "assistant" && dirty2(m.content))) return messages;
-    return messages.map((m) => m?.role === "assistant" && dirty2(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m);
-  }
-  async function applyUnlocks(char, charIndex, chatIndex, messageIndex) {
-    const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
-    return updateChat(charIndex, chatIndex, (cur) => {
-      const m = cur.message?.[messageIndex];
-      const text4 = typeof m?.data === "string" ? m.data : "";
-      if (!m || !hasUnlockTag(text4)) return null;
-      const got = unlockTags(text4).filter((n3) => lockable.has(n3));
-      const message = [...cur.message ?? []];
-      message[messageIndex] = { ...m, data: stripUnlockTags(text4) };
-      const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
-      return { ...cur, message, scriptstate: ss };
-    });
-  }
-  async function onOutput(arg) {
-    setWaiting(false);
-    const after = [];
-    const pTurn = progressTurn();
-    try {
-      const raw0 = arg.char;
-      const chat = arg.chat;
-      if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return;
-      const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
-      const raw = chat.message?.[arg.messageIndex]?.data;
-      if (typeof raw !== "string") {
-        progressAbort(pTurn);
-        return;
-      }
-      traceReply(raw);
-      let latest = null;
-      if (chat.scriptstate?.["$st_anomaly_on"] === "1") {
-        const catalog = parseCatalog(char.globalLore);
-        latest = await updateChat(
-          arg.characterIndex,
-          arg.chatIndex,
-          (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
-        );
-      }
-      if (hasUnlockTag(raw)) latest = await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null) ?? latest;
-      const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
-      if (colConfig(chat.scriptstate).wallet !== "off" && walletSyncOn(chat.scriptstate) && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
-          return w ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      {
-        const cur0 = latest ?? chat;
-        const flag2 = pointsAuto(cur0.scriptstate) ? pointsFlagFor(cur0, isPointsOrg(String(cur0.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
-        const needSync = colConfig(cur0.scriptstate).points !== "off" && walletSyncOn(cur0.scriptstate) && !!syncPointsToStatus(readPoints(cur0.scriptstate), cur0);
-        if (flag2 || needSync) {
-          latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-            const add = {};
-            const f = pointsAuto(cur.scriptstate) ? pointsFlagFor(cur, isPointsOrg(String(cur.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
-            if (f) {
-              const vars = { ...cur.scriptstate ?? {}, [POINTS_ON_VAR]: f };
-              add[POINTS_ON_VAR] = f;
-              add[COL_LOG_VAR] = withColLog(cur.scriptstate, (cur.message ?? []).length, usedCols(colConfig(vars)));
-            }
-            const s8 = { ...cur.scriptstate ?? {}, ...add };
-            if (colConfig(s8).points !== "off" && walletSyncOn(s8)) {
-              const p2 = syncPointsToStatus(readPoints(s8), { ...cur, scriptstate: s8 });
-              if (p2) Object.assign(add, pointsVars(p2));
-            }
-            return Object.keys(add).length ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...add } } : null;
-          }).catch(() => null) ?? latest;
-        }
-      }
-      if (settleItemUse(latest ?? chat, arg.messageIndex)) {
-        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
-          const vars = settleItemUse(cur, arg.messageIndex);
-          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
-        }).catch(() => null) ?? latest;
-      }
-      const selfNames = hasShopTag(raw) ? [playerAgent((await getChar(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? "", userInfo().name] : [];
-      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? c
+      const rule = mainConte

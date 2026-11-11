@@ -1,4 +1,66 @@
-R = { cos: "$cos_shop", bm: "$bm_shop" };
+ "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
+  function parseSay(raw) {
+    const say2 = bubbles(block3(raw, "say"));
+    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
+    return say2;
+  }
+  var G2 = () => guideSections("BmDesk");
+  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
+  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
+이름: ${a.name}
+직급: ${a.rank}
+부서: ${a.dept}
+소개: ${a.intro}
+말투: ${a.voice}
+${diceText(a.dice)}`;
+  var material2 = (src) => [
+    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
+${src.refs}` : "",
+    `[지금 진열된 상품]
+${src.shelf || "(없음)"}`,
+    `[손님]
+사내 계정: ${src.nick || "-"}
+남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
+  ].filter(Boolean).join("\n\n");
+  function makePrompt(src, dice, recent, no) {
+    const g2 = G2();
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[손님에게 보이는 호칭]
+상담원 ${no}
+
+[이번 상담사 주사위]
+${diceText(dice)}
+
+[최근 상담사 — 겹치지 말 것]
+${past}
+
+[현재 작업]
+상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
+  }
+  function talkPrompt2(src, st) {
+    const g2 = G2();
+    const a = st.agent;
+    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
+    const talk = st.talk.filter((l) => l.who !== "sys").map((l) => `${l.who === "me" ? "[손님]" : "[상담사]"} ${l.text}`).join("\n");
+    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
+
+[상담사 카드]
+${cardText(a)}
+
+[이번 상담 대화 — 마지막 줄이 손님이 방금 한 말]
+${talk}` }], thoughts: fillGuide(g2.THOUGHTS_TALK, {}) };
+  }
+
+  // src/core/malls.ts
+  var MALL_SITES = ["cos", "bm"];
+  var isMallSite = (v) => v === "cos" || v === "bm";
+  var MALL_NAME = { cos: "우주 쇼핑몰", bm: "백일몽 포인트몰" };
+  var MALL_OWNER = { cos: "운영자", bm: "" };
+  var MALL_GUIDE = { cos: "Cos", bm: "Bm" };
+  var MALL_VAR = { cos: "$cos_shop", bm: "$bm_shop" };
   var mallKey = (shKey, site) => `$${site}_${shKey.slice(1)}`;
   var mallAutoKey = (site) => `$${site}_sh_auto`;
   function mallVars(vars, site) {
@@ -152,6 +214,11 @@ R = { cos: "$cos_shop", bm: "$bm_shop" };
     return `${lines3.join("\n")}
 Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarity match the tier, and its price follows from that worth inside the tier's range. ${G3 === "GENRE" ? "Genres" : "Categories"} differ by design — do not re-pick. Every listing is new: nothing from previous shelves, from the reference material, or from earlier pages.`;
   }
+  var COS_READY_KEY = "$cos_ready";
+  var cosReadyMode = (vars) => {
+    const v = String(vars?.[COS_READY_KEY] ?? "");
+    return v === "card" || v === "off" ? v : "both";
+  };
   var COS_TRUTH_KEY = "$cos_truth";
   var cosTruthMode = (vars) => {
     const v = String(vars?.[COS_TRUTH_KEY] ?? "");
@@ -192,6 +259,10 @@ Build each item to its assigned ${G3} and VALUE TIER: its worth, power and rarit
     if (cos.some((l) => l.who === "me")) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${cos.map((l) => `${l.who === "me" ? "protagonist" : "operator"}: "${l.text}"`).join(" / ")}`);
     for (const o of liveOrders(vars, aliveAnchors(chat))) {
       if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString("en-US")} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+    }
+    if (cosReadyMode(vars) === "both") {
+      const at = lastBot(chat).index;
+      for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
     }
     const desk = readDesk(vars);
     if (desk.anchor === key && desk.talk.some((l) => l.who === "me")) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== "sys").map((l) => `${l.who === "me" ? "protagonist" : "counselor"}: "${l.text}"`).join(" / ")}`);
@@ -1548,7 +1619,7 @@ ${line2}`;
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
           const head3 = fields3.find(([k]) => k === "Head")?.[1];
           const rows3 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
-          const cells = (v, tagName2) => v.split(";;").map((x) => `<${tagName2}>${inline(x.trim())}</${tagName2}>`).join("");
+          const cells = (v, tagName3) => v.split(";;").map((x) => `<${tagName3}>${inline(x.trim())}</${tagName3}>`).join("");
           out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells(head3, "th")}</tr>` : ""}${rows3.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
@@ -3996,94 +4067,4 @@ ${JSON.stringify(previousRoom ?? "")}`)
     grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
   }
   function bindDrawer(root3) {
-    const box4 = root3.querySelector(".ph-drawer");
-    const grip = box4?.querySelector(".ph-grip");
-    if (!box4 || !grip) return;
-    const open4 = () => box4.classList.contains("open");
-    grip.addEventListener("click", () => set(box4, !open4()));
-    let y0 = null;
-    box4.addEventListener("touchstart", (e) => {
-      y0 = e.touches[0]?.clientY ?? null;
-    }, { passive: true });
-    box4.addEventListener("touchend", (e) => {
-      if (y0 === null) return;
-      const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
-      y0 = null;
-      if (dy < -24 && !open4()) set(box4, true);
-      else if (dy > 24 && open4()) set(box4, false);
-    }, { passive: true });
-  }
-
-  // src/core/progress.ts
-  var GROUPS = ["router", "director", "main", "update", "net"];
-  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "본편", update: "갱신기", net: "인터넷", other: "기타" };
-  var PROGRESS_WATCHDOG = 10 * 60 * 1e3;
-  var turn = null;
-  var seq = 0;
-  var endWanted = false;
-  var listeners2 = /* @__PURE__ */ new Set();
-  function onProgress(f) {
-    listeners2.add(f);
-    return () => listeners2.delete(f);
-  }
-  var notify = () => {
-    for (const f of listeners2) {
-      try {
-        f();
-      } catch {
-      }
-    }
-  };
-  var progressTurn = () => turn;
-  var MAIN_STAGE = { id: "main", label: "본편", group: "main", match: [] };
-  function progressBegin() {
-    turn = { at: Date.now(), plan: [MAIN_STAGE], calls: [], manual: false };
-    endWanted = false;
-    notify();
-    return turn;
-  }
-  function progressAbort(t) {
-    if (!turn || turn.manual || turn.replyAt || turn.endAt || t && t !== turn) return;
-    turn.aborted = true;
-    endWanted = true;
-    settle();
-    notify();
-  }
-  function progressWatch(chat, now2 = Date.now()) {
-    if (!turn) return;
-    if (turn.chat === void 0) turn.chat = chat;
-    else if (turn.chat !== chat) {
-      turn = null;
-      endWanted = false;
-      notify();
-      return;
-    }
-    if (!turn.manual && !turn.replyAt && !turn.endAt && now2 - turn.at >= PROGRESS_WATCHDOG) progressAbort(turn);
-  }
-  function progressPlan(stages) {
-    if (!turn || turn.manual) return;
-    turn.plan = stages.some((s8) => s8.group === "main") ? stages : sortPlan([...stages, MAIN_STAGE]);
-    for (const c of turn.calls) c.stage = stageFor(turn, c.label).id;
-    notify();
-  }
-  var ORDER2 = { router: 0, director: 1, main: 2, update: 3, net: 4, other: 5 };
-  var sortPlan = (stages) => [...stages].sort((a, b) => ORDER2[a.group] - ORDER2[b.group]);
-  function progressMain() {
-    if (!turn || turn.manual) return;
-    turn.mainAt = Date.now();
-    notify();
-  }
-  function progressReply(tokens2) {
-    if (!turn || turn.manual) return;
-    turn.replyAt = Date.now();
-    turn.mainAt ??= turn.replyAt;
-    if (tokens2 !== void 0) turn.replyTokens = tokens2;
-    notify();
-  }
-  var baseLabel = (label2) => label2.replace(/\s*(다시 (묻기|보기)\s*\d*|\(통합 뒤 따로\))\s*$/u, "").trim();
-  function groupOf(label2) {
-    const b = baseLabel(label2);
-    if (b.startsWith("라우터")) return "router";
-    if (b.startsWith("디렉터")) return "director";
-    if (/^(갱신기|정리|이미지 태그|위키)/u.test(b)) return "update";
-    if (/^상점/u.test(b)) retu
+    const box
