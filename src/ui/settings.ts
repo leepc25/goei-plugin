@@ -397,7 +397,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       group('', [
         D('wallet-on', colCfg.wallet === 'off' ? '0' : '1'),
         ...(colCfg.wallet === 'off' ? [] : [
-          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '거래는 인물 기록 갱신기가 응답을 읽을 때 같이 읽어요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
           D('wallet-loose', walletLoose(itVars) ? '1' : '0'),
           D('wallet-recent', '', { ctl: stepper('set-wallet-recent', 'n', `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, '최근 거래 줄 수', busy), help: `메인 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.` }),
         ]),
@@ -413,8 +412,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       group('', [
         D('inv-on', invOn(itVars) ? '1' : '0'),
         ...(!invOn(itVars) ? [] : [
-          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '물건 읽기와 상태 바꾸기는 인물 기록 갱신기가 응답을 읽을 때 같이 해요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
-          D('items-auto', itemAutoOn(itVars) ? '1' : '0'),
+          D('items-auto', '', { ctl: `<span class="ph-inline">${seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy)}<button class="gx-mini" data-action="ed-node" data-value="set:people">갱신기 설정 →</button></span>` }),
           D('items-state', itemStateOn(itVars) ? '1' : '0'),
         ]),
       ].join('')),

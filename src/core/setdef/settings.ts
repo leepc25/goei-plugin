@@ -63,7 +63,7 @@ export const SETTINGS_SET: SetPage = {
       title: '소지품',
       rows: [
         { key: 'inv-on', label: '사용', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '끄면 소지품 화면·[Inventory] 글·보조 모델 읽기·「다음 메시지에 사용」이 다 빠지고, 소지품에 딸린 상점도 같이 꺼져요. 가계부는 그대로예요.' },
-        { key: 'items-auto', label: '보조 모델이 읽기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 인물 기록 갱신기가 응답을 읽어 본문에서 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만, 인물 기록이 켜져 있을 때). 끄면 직접 넣기·상점으로만 바뀌어요.' },
+        { key: 'items-auto', label: '갱신기가 읽기', ctl: { t: 'custom' }, help: '켜면 인물 기록 갱신기가 응답을 읽어 얻은·잃은 물건을 목록에 맞춰요(근거 문장이 있는 것만). 갱신기가 돌아야 하니 인물 기록이 켜져 있어야 해요. 끄면 직접 넣기와 상점으로만 바뀌어요.' },
         { key: 'items-slots', label: '칸 수', ctl: { t: 'custom' } },
         { key: 'items-carry', label: '소지 한도', ctl: { t: 'custom' } },
         { key: 'items-edit', label: '고치기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 물건 창에 「고치기」 단추가 생겨 이름·설명·효과·장착·횟수·무게를 손으로 바꿀 수 있어요. 이야기 밖에서 바뀐 물건은 모델이 이유를 몰라서 기본은 꺼 둬요.' },
@@ -72,7 +72,7 @@ export const SETTINGS_SET: SetPage = {
         { key: 'items-pool', label: '분류 말은 골고루', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '물건 이름이 「과자·다과·간식」처럼 세부 이름이 아니라 분류 말이면 그 분류의 그림 가운데 하나를 물건마다 뽑아 보여 줘요. 한 번 정해진 그림은 그 물건에 그대로 남아요. 끄면 분류마다 대표 그림 한 장만 나와요.' },
         { key: 'items-misses', label: '그림 못 찾은 말', ctl: { t: 'custom' }, help: '이번에 앱을 켠 뒤로 제 그림을 못 찾아 상자로 간 물건이에요. 그림을 더 뽑을 때 참고해요.' },
         { key: 'items-detail', label: '넘길 내용', ctl: { t: 'seg', opts: [['full', '전부'], ['state', '이름·판정'], ['name', '이름만']] }, help: '[Inventory] 한 줄에 무엇을 넣을지예요. 전부 = 이름·설명·효과·장착·남은 횟수·상태, 이름·판정 = 설명·효과를 빼고, 이름만 = 이름뿐. 물건이 많을 때 줄이면 토큰이 덜 들어요.' },
-        { key: 'items-state', label: '상태 바꾸기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 보조 모델이 본문을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.' },
+        { key: 'items-state', label: '상태 바꾸기', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '켜면 갱신기가 응답을 보고 물건을 손상·고장·파괴로 바꿔요. 끄면 손상·고장은 받지 않고, 부서진 물건은 「없어짐」으로만 빠져요.' },
         { key: 'items-spent', label: '다 쓴 물건', ctl: { t: 'seg', opts: [['remove', '목록에서 빼기'], ['keep', '남겨 두기']] }, help: '남은 횟수가 0이 된 소모품을 어떻게 할지예요. 남겨 두면 「다 씀」으로 칸에 남고 메인 요청에도 used up 으로 넘어가요(빈 병·다 쓴 탄창처럼).' },
         { key: 'items-logturns', label: '사용·처분 기록 넘기기', ctl: { t: 'custom' } },
         { key: 'items-start', label: '시작 소지품', ctl: { t: 'seg', opts: [['1', 'ON'], ['0', 'OFF']] }, help: '고유 인물로 시작할 때 명부의 「시작 소지품」을 넣고 무기·장비를 장착할지예요. 새 채팅을 시작할 때만 쓰여요.' },
