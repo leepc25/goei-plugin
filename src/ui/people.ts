@@ -235,7 +235,7 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
   openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
   rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬'],
-  faction_rep: ['세력 평판', '세력이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 본문 근거를 들어 판단해요. 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요'],
+  faction_rep: ['세력 평판', '세력이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 본문 근거를 들어 판단해요. 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요.'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
 
@@ -862,7 +862,7 @@ export function personView(ctx: ChatContext, name: string): string {
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
   const busyNow = peopleUi.busy || peopleStatus().busy ? 'disabled' : '';
-  const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[['10', '최근 10개'], ['20', '최근 20개'], ['50', '최근 50개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·필드·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
+  const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[['10', '최근 10개'], ['20', '최근 20개'], ['50', '최근 50개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
