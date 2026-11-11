@@ -2498,7 +2498,7 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     await edGo(page, 'set:wiki');
     await page.waitForSelector('.gw .nw-setpane');
     await edGo(page, 'set:net');
-    await page.waitForSelector('.gw [data-action="gn-cfg"]');
+    await page.waitForSelector('.gw [data-action="fam-set"]', { state: 'attached' });
     if (shots) {
       await edGo(page, 'set:board');
       await page.evaluate(() => document.querySelector('.gw .ck-pc').scrollIntoView({ block: 'start' }));
@@ -2898,7 +2898,7 @@ if (fixture.globalLore.some(packed)) {
   await edOpen(page, 'set:journal');
   await page.waitForSelector('.gw .gw-setbody');
   const st = await page.textContent('.gw .gw-setbody');
-  for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
+  for (const t of ['보고서 카드 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
   assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 0, '머리에 저장 단추 없음 (2026-11-08 사용자)');
   // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
   const saves0 = await page.evaluate(() => window.__calls.setChat.length);
