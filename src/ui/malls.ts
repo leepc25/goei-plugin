@@ -127,7 +127,9 @@ async function ask(ctx: ChatContext, env: MallEnv, site: MallSite, kind: 'shelf'
   v.loading = kind;
   v.notice = '';
   v.failRaw = '';
-  env.render();
+  // 말을 걸었으면 방금 저장한 내 말이 응답을 기다리는 동안 바로 보이게 채팅을 다시 읽어 그린다 (render 만 하면 옛 채팅으로 그려 응답이 올 때까지 내 말이 안 보였다, 11-11 사용자)
+  if (kind === 'talk') await env.refresh();
+  else env.render();
   try {
     const src = shopSource({ ...ctx, chat: { ...ctx.chat, scriptstate: mallVars(ctx.chat.scriptstate, site) as typeof ctx.chat.scriptstate } }, st0, s);
     // 우주몰 진열: 칸마다 장르·값 등급을 굴려 넣는다 (11-09 사용자: 새로고침해도 같은 물건)
@@ -549,7 +551,9 @@ async function deskRun(ctx: ChatContext, env: MallEnv, kind: 'make' | 'talk', st
   v.dl = kind;
   v.notice = '';
   v.failRaw = '';
-  env.render();
+  // 말을 걸었으면 방금 저장한 내 말이 응답을 기다리는 동안 바로 보이게 채팅을 다시 읽어 그린다 (render 만 하면 옛 채팅으로 그려 응답이 올 때까지 내 말이 안 보였다, 11-11 사용자)
+  if (kind === 'talk') await env.refresh();
+  else env.render();
   try {
     const src = deskSource(ctx);
     const g = genSettings(vars);

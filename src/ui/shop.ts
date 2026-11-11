@@ -351,7 +351,9 @@ async function ask(ctx: ChatContext, env: ShopEnv, kind: 'shelf' | 'talk', st0: 
   shopUi.loading = kind;
   shopUi.notice = '';
   shopUi.failRaw = '';
-  env.render();
+  // 말을 걸었으면 방금 저장한 내 말이 응답을 기다리는 동안 바로 보이게 채팅을 다시 읽어 그린다 (ui/malls.ts ask 와 같음, 11-11 사용자)
+  if (kind === 'talk') await env.refresh();
+  else env.render();
   try {
     const src = shopSource(ctx, st0);
     const g = genSettings(ctx.chat.scriptstate);
