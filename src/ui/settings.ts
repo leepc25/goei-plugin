@@ -96,7 +96,7 @@ function ownShopsField(vars: Record<string, unknown> | undefined, busy: boolean)
       <div class="ms-fx-row"><span class="ph-inline"><span>인터넷 접속</span>${seg('set-own-web', `${o.id}:${o.web || 'none'}`, OWN_WEB.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
       <div class="ms-fx-row"><span class="ph-inline"><span>직접 가면</span>${seg('set-own-visit', `${o.id}:${o.visit || 'none'}`, OWN_VISIT.map(([v, l]) => [`${o.id}:${v}`, l]), busy)}</span></div>
     </div>`).join('');
-  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="set-own-add"${list.length >= OWN_MAX || busy ? ' disabled' : ''}>추가</button><button class="gx-mini" data-action="set-own-reset"${busy ? ' disabled' : ''}>기본값으로</button></div>`;
+  const foot = `<div class="ps-row gw-rel-foot"><button class="gx-mini primary" data-action="set-own-add"${list.length >= OWN_MAX || busy ? ' disabled' : ''}>고유 상점 추가</button><button class="gx-mini" data-action="set-own-reset"${busy ? ' disabled' : ''}>기본 표로 되돌리기</button></div>`;
   return field('고유 상점', '', `로어에 있는, 자기 창이 따로 있는 상점이에요. 켜진 줄은 상점 판단 기준에 들어가요. 주인공이 그 사이트·앱에 실제로 접속해 있으면 응답 아래 「접속하기」가 붙고, 누르면 상황판 없이 인터넷 창만 그 사이트로 열려요. 직접 매장에 가 있으면 「직접 가면」에 고른 창이 열려요(열지 않음이면 안 열림). 표에 없는 편의점 같은 곳은 그대로 기본 상점창이에요.`) + rows + foot;
 }
 
@@ -397,7 +397,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       group('', [
         D('wallet-on', colCfg.wallet === 'off' ? '0' : '1'),
         ...(colCfg.wallet === 'off' ? [] : [
-          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '거래는 인물 기록 갱신기가 응답을 읽을 때 같이 읽어요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
           D('wallet-loose', walletLoose(itVars) ? '1' : '0'),
           D('wallet-recent', '', { ctl: stepper('set-wallet-recent', 'n', `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, '최근 거래 줄 수', busy), help: `메인 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.` }),
         ]),
@@ -413,8 +412,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       group('', [
         D('inv-on', invOn(itVars) ? '1' : '0'),
         ...(!invOn(itVars) ? [] : [
-          setRow('갱신기', `<button class="gx-mini" data-action="ed-node" data-value="set:people">인물 설정 →</button>`, '물건 읽기와 상태 바꾸기는 인물 기록 갱신기가 응답을 읽을 때 같이 해요. 갱신기의 모델과 자동 호출은 인물 설정에 있어요.'),
-          D('items-auto', itemAutoOn(itVars) ? '1' : '0'),
+          D('items-auto', '', { ctl: `<span class="ph-inline">${seg('set-items-auto', itemAutoOn(itVars) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy)}<button class="gx-mini" data-action="ed-node" data-value="set:people">갱신기 설정 →</button></span>` }),
           D('items-state', itemStateOn(itVars) ? '1' : '0'),
         ]),
       ].join('')),
@@ -432,7 +430,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           D('items-start', itemStartOn(itVars) ? '1' : '0'),
         ].join('')),
         group('물건 그림', [
-          D('items-alias', '', { ctl: `<textarea class="gx-search ms-area" rows="4" data-change="set-items-alias" placeholder="${esc(ICON_ALIAS_DEFAULT)}" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? ''))}</textarea>` }),
+          D('items-alias', '', { ctl: `<textarea class="gx-search ms-area st-alias" rows="6" data-change="set-items-alias" aria-label="그림 대체 말"${busy ? ' disabled' : ''}>${esc(String(itVars?.[ITEM_ICON_ALIAS_VAR] ?? '') || ICON_ALIAS_DEFAULT)}</textarea>` }),
           D('items-pool', itemIconPoolOn(itVars) ? '1' : '0'),
           ...(scope === 'chat' ? [D('items-misses', '', { ctl: (() => { const m = readIconMisses(); return m.length ? `<div class="st-misses">${m.slice().reverse().map((x) => `<div>${esc(x.name)}${x.icon ? ` <small>(${esc(x.icon)})</small>` : ''} → 상자</div>`).join('')}</div>` : '<small>이번에 켠 뒤로 없어요.</small>'; })() })] : []),
         ].join('')),
@@ -464,7 +462,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
             D('shop-ctx', sh.context ? '1' : '0'),
             D('shop-turns', '', { ctl: stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy) }),
             D('shop-refs', '', { ctl: stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy) }),
-            D('shop-note', '', { ctl: '' }),
           ].join('')),
           group('진열대와 주인', [
             D('shop-min', '', { ctl: `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, help: `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.` }),
@@ -954,7 +951,7 @@ export async function handleSettings(action: string, value: string | undefined, 
         return true;
       }
       case 'set-items-alias':
-        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ICON_ALIAS_VAR]: v.trim().slice(0, 2000) } }));
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ICON_ALIAS_VAR]: v.trim() === ICON_ALIAS_DEFAULT.trim() ? '' : v.trim().slice(0, 2000) } }));
         return true;
       case 'set-items-limit':
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LIMIT_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, 60) } }));
@@ -1109,7 +1106,8 @@ export async function handleSettings(action: string, value: string | undefined, 
       return true;
     case 'set-items-alias':
       await save(ctx, env, (chat) => {
-        const next = v.trim().slice(0, 2000);
+        // 칸에는 기본 표가 실제 글로 들어 있다. 기본 표 그대로면 빈 값(= 기본 표)으로 둔다
+        const next = v.trim() === ICON_ALIAS_DEFAULT.trim() ? '' : v.trim().slice(0, 2000);
         return next === String(chat.scriptstate?.[ITEM_ICON_ALIAS_VAR] ?? '') ? null : { [ITEM_ICON_ALIAS_VAR]: next };
       });
       return true;
