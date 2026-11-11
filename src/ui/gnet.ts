@@ -1,7 +1,8 @@
 // 「괴담넷」 탭: 게시판·쪽지함. 생성은 새로고침·글 올리기·댓글·쪽지 보내기를 눌렀을 때만 한 번씩 부른다.
 // 원본은 채팅 입력창을 빌려 썼지만 여기서는 창 안의 입력칸에 쓴다. 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { turnKeyAt } from '../core/shop';
-import { onOffSwitch } from './controls';
+import { defGroups, setSeg, type Wire } from './setrow';
+import { GNET_SET } from '../core/setdef/gnet';
 import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
@@ -459,22 +460,6 @@ async function setVars(ctx: ChatContext, env: GnetEnv, vars: Record<string, stri
 // ── 화면 ──
 
 /** 개수 최소·최대 (직접 입력, 괴담톡 「단톡 수다 줄 수」와 같은 칸) */
-function countRow(ctx: ChatContext, k: CountKey, unit: string, label: string): string {
-  const [a, b] = gnetSettings(ctx.chat.scriptstate).counts[k];
-  const [lo, hi] = COUNT_RANGE[k];
-  const box = (side: 'min' | 'max', n: number, name: string) =>
-    `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="gn-count" data-key="${k}_${side}" value="${n}" aria-label="${label} ${name}"><span>${unit}</span>`;
-  return `<span class="ph-inline"><span>최소</span>${box('min', a, '최소')}<span>최대</span>${box('max', b, '최대')}</span>`;
-}
-
-function seg(key: string, cur: string, items: [string, string][]): string {
-  const sw = onOffSwitch(items, cur, 'gn-cfg', (v) => `${key}=${v}`);
-  if (sw) return sw;
-  return `<div class="gx-segs gx-segs-sm">${items
-    .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`)
-    .join('')}</div>`;
-}
-
 const body = (text: string) => attachBody(text, true);
 
 function time(date: string): string {
@@ -575,39 +560,25 @@ function dmList(st: GState, busy: boolean, mobile: boolean): string {
     .join('')}</ul>`;
 }
 
-/** 설정 한 줄: 괴담톡 설정과 같은 모양 */
-const row = (label: string, control: string, hint = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
-
 function settingsView(ctx: ChatContext, back = true): string {
-  const v = (k: string) => String(ctx.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
-  const text = (k: string, ph: string) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc(v(k) === '-' ? '' : v(k))}" placeholder="${esc(ph)}">`;
-  const keep = gnetRetention(ctx.chat.scriptstate);
+  const state = ctx.chat.scriptstate;
+  const keep = gnetRetention(state);
+  const counts = gnetSettings(state).counts;
   // 「게시판 사용」 켬·끔은 없다 (2026-11-05 사용자: 괴담톡·위키와 같게. 새로고침 수동이면 모델을 부르지 않는다)
-  const rows = `${group(gnetLabel(ctx.chat.scriptstate), [
-        row('자동 호출', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
-        row('한 번에 요청', seg('joint', jointOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요.'),
-        row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인 모델'], ['2', '보조 모델']]), '게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
-        row('컨텍스트에 포함', seg('context', v('context') === '1' ? '1' : '0', [['0', 'ON'], ['1', 'OFF']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
-        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 뻔한 첫 벌 대신 두 번째 벌을 써요. 응답이 길어져 토큰을 더 써요'),
-      ].join(''))}
-      ${group('게시판', [
-        row('게시글 수', countRow(ctx, 'post', '개', '게시글 수'), `새로고침 한 번에 새로 만드는 글 수예요(${COUNT_RANGE.post[0]}~${COUNT_RANGE.post[1]}). 많을수록 토큰을 더 써요`),
-        row('새 글 댓글 수', countRow(ctx, 'cmt', '개', '새 글 댓글 수'), `새로 만드는 글마다 달릴 댓글 수예요(${COUNT_RANGE.cmt[0]}~${COUNT_RANGE.cmt[1]}). 그 안에서 글마다 모델이 정해요`),
-        row('활동 댓글 수', countRow(ctx, 'act', '개', '활동 댓글 수'), `새로고침이나 답장 때 지난 글에 새로 붙는 댓글 수예요(${COUNT_RANGE.act[0]}~${COUNT_RANGE.act[1]}). 바뀐 글마다 이 안에서 붙어요`),
-        row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
-        row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
-        row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
-        row('보호 대상', text('protagonist', '비우면 주인공'), '위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공'),
-        row('주요 인물 닉네임', seg('keyfigures', v('keyfigures') === '0' ? '0' : '1', [['1', '보존'], ['0', '안 함']]), '주요 인물이 게시판에서 쓰는 닉네임을 기억해 다음 새로고침에도 같은 닉네임을 써요'),
-        row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']]), '새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요'),
-        row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']]), '내가 댓글을 단 남의 글도 새로고침 때 남길지예요'),
-      ].join(''))}
-      ${group('쪽지', [
-        row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']]), '게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요'),
-        row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
-      ].join(''))}
+  // 줄은 정의표(core/setdef/gnet.ts)에서 온다. 여기는 값이 얽힌 두 줄의 조작만 그린다
+  const wire: Wire = {
+    cur: (k) => String(state?.[CFG(k)] ?? GN_DEFAULTS[k]),
+    minmax: (k) => counts[k as CountKey],
+    pageTitle: gnetLabel(state),
+    custom: {
+      joint: () => ({ ctl: setSeg('gn-cfg', 'joint', jointOn(state) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]) }),
+      storage: () => ({
+        ctl: `<span class="ph-inline">${setSeg('gn-cfg', 'storage', keep.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`,
+        help: `상대마다 최근 ${keep.limit}통만 남겨요`,
+      }),
+    },
+  };
+  const rows = `${defGroups(GNET_SET, wire)}
       ${advancedBox('gn', ctx.chat.scriptstate)}`;
   return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
@@ -1065,12 +1036,6 @@ export function gnetOpenCheck(base: ChatContext, env: GnetEnv, site: BoardSite =
   if (at < 0) return;
   void autoRefreshGnet(ctx, at, true, undefined, site).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
-
-const LAZY_HINT: Record<string, string> = {
-  '1': '새로고침 버튼을 누를 때만 불러요',
-  open: '채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요',
-  '0': '채팅 응답이 끝날 때마다 모델을 한 번 더 불러요',
-};
 
 /** 괴담넷 탭 버튼. 처리했으면 true */
 export async function handleGnet(action: string, value: string | undefined, base: ChatContext, env: GnetEnv, site: BoardSite = uiSite): Promise<boolean> {

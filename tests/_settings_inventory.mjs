@@ -41,7 +41,9 @@ for (const [node, label] of nodes) {
     // 줄 밖에 있는 조절 칸 (틀 밖 표 등)
     const inRow = new Set([...body.querySelectorAll('.ps-row, .st-col-row, .dir-line, .adv-row, .adv-chips')].flatMap((r) => [...r.querySelectorAll('[data-action], [data-change], [data-input]')]));
     const loose = [...body.querySelectorAll('[data-action], [data-change], [data-input]')].filter((c) => !inRow.has(c)).map((c) => `${c.dataset.action ?? c.dataset.change ?? c.dataset.input}${c.dataset.key ? `#${c.dataset.key}` : ''}${c.tagName === 'BUTTON' && c.dataset.value ? `=${c.dataset.value}` : ''}`);
-    return { rows, loose };
+    // 화면 그대로 옮겼는지 볼 때: 본문 HTML 전체 (공백만 줄임)
+    const html = body.innerHTML.replace(/\s+/g, ' ').replace(/> </g, '><');
+    return { rows, loose, html };
   }) };
 }
 await browser.close();
