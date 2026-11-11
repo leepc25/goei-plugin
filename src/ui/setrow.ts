@@ -58,7 +58,7 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
   if (c.t === 'seg') {
     const raw = w.cur(d.key);
     const cur = c.fb !== undefined && !c.opts.some(([v]) => v === raw) ? c.fb : raw;
-    const seg = page.flat ? setSeg(`${page.id}-${d.key}`, '', cur, c.opts, w.busy) : setSeg(act(page, 'cfg'), sk(w, d.key), cur, c.opts, w.busy);
+    const seg = page.flat ? setSeg(`${page.id}-${d.key}`, '', cur, c.opts, w.busy) : setSeg(page.segAct ?? act(page, 'cfg'), sk(w, d.key), cur, c.opts, w.busy);
     const i = d.inline;
     if (!i) return { ctl: seg, cur };
     const on = c.opts.find(([, l]) => l === 'ON')?.[0];

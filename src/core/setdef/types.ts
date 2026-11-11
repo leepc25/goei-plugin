@@ -54,6 +54,8 @@ export interface SetPage {
   id: string;
   /** 버튼 꼴. 없으면 「gn-cfg」에 값 「열쇠=값」. flat 이면 「wiki-열쇠」에 값만 */
   flat?: boolean;
+  /** 고르기 버튼 이름이 「기능-cfg」가 아닐 때 */
+  segAct?: string;
   groups: SetGroup[];
 }
 
