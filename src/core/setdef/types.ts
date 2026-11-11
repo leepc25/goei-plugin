@@ -6,10 +6,16 @@
 export type SetCtl =
   /** 고르기. 선택지가 ON/OFF 둘뿐이면 스위치로 그린다. fb = 저장값이 선택지에 없을 때 보일 값 */
   | { t: 'seg'; opts: [string, string][]; fb?: string }
-  /** 최소·최대 두 칸 */
-  | { t: 'minmax'; lo: number; hi: number; unit: string }
+  /** 최소·최대 두 칸. 저장 열쇠는 「열쇠_min」「열쇠_max」. act = 버튼 이름 꼬리 (기본 count) */
+  | { t: 'minmax'; lo: number; hi: number; unit: string; act?: 'count' | 'num' | 'shnum'; keys?: [string, string] }
+  /** 수 한 칸 */
+  | { t: 'num'; lo: number; hi: number; unit: string; act?: 'num' | 'shnum' }
   /** 글 한 줄 */
-  | { t: 'text'; ph: string }
+  | { t: 'text'; ph: string; max?: number }
+  /** 줄이기·늘리기 단추. 버튼 값은 「열쇠:-」「열쇠:+」 */
+  | { t: 'step'; lo: number; hi: number; unit: string; action?: string; vkey?: string }
+  /** 글 여러 줄. 이름 없이 줄 전체를 쓴다 */
+  | { t: 'area'; ph: string; rows: number; cls: string; labeled?: boolean }
   /** 페이지가 직접 그리는 조작 (값이 둘 이상 얽힌 줄). 줄 이름·설명은 표를 따른다 */
   | { t: 'custom' };
 
@@ -24,16 +30,26 @@ export interface SetDef {
   help?: string | Record<string, string>;
   ctl: SetCtl;
   common?: SetCommon;
+  /** 읽어 주기용 이름 (줄 이름과 다를 때) */
+  aria?: string;
+  /** 조작 옆에 붙는 수 칸 (켬·끔 + 확률, 켬·끔 + 상한). whenOn = 켜져 있을 때만 보인다 */
+  inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean };
+  /** 다른 줄의 값이 이럴 때만 보이는 줄 */
+  show?: { key: string; eq: string };
 }
 export interface SetGroup {
   /** 묶음 이름. '@page' 면 페이지 이름을 쓴다 */
   title: string;
   rows: SetDef[];
+  /** 묶음 머리 아래 안내 글 (HTML) */
+  note?: string;
 }
 /** 한 기능(페이지 계열)의 설정 */
 export interface SetPage {
   /** 기능 열쇠 (gn·ph·wk…). 버튼 이름의 머리이기도 하다: 「gn-cfg」 */
   id: string;
+  /** 버튼 꼴. 없으면 「gn-cfg」에 값 「열쇠=값」. flat 이면 「wiki-열쇠」에 값만 */
+  flat?: boolean;
   groups: SetGroup[];
 }
 

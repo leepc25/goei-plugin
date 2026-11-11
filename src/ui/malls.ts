@@ -3,6 +3,8 @@
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
+import { defGroups, setGroup, setRow, type Wire } from './setrow';
+import { mallSet } from '../core/setdef/malls';
 import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
@@ -848,21 +850,13 @@ export function mallTab(ctx: ChatContext, env: MallEnv, site: MallSite): string 
 
 // ── 설정 페이지 (2026-11-08 사용자: 사이트마다 값 따로. 상점 설정 쪽 항목, 우주몰만 문의) ──
 
-const row = (label: string, control: string, hint = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
+const row = setRow;
+const group = (title: string, rows: string) => setGroup(title, rows);
 function mseg(site: MallSite, key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'ms-cfg', (v) => `${site}:${key}=${v}`);
   if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="ms-cfg" data-value="${site}:${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join('')}</div>`;
 }
-const step = (site: MallSite, key: string, shown: string, down: boolean, up: boolean, label: string) =>
-  `<div class="st-step"><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:-" ${down ? '' : 'disabled'} aria-label="${esc(label)} 줄이기">−</button><b>${esc(shown)}</b><button class="gx-step" data-action="ms-step" data-value="${site}:${key}:+" ${up ? '' : 'disabled'} aria-label="${esc(label)} 늘리기">+</button></div>`;
-
-/** 숫자 직접 입력 칸 (개수 최소·최대) */
-const numBox = (site: MallSite, key: string, cur: number, unit: string, label: string) =>
-  `<input class="gx-search ph-pct" type="number" min="${MS_RANGE[key][0]}" max="${MS_RANGE[key][1]}" data-change="ms-num" data-key="${site}:${key}" value="${cur}" aria-label="${esc(label)}"><span>${unit}</span>`;
-
 /** 상점 설정 이름 (사이트 앞붙이 없이) */
 const MS_KEY: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', feature: '$sh_feature', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const MS_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
@@ -871,19 +865,13 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
   const s = mallSettings(ctx.chat.scriptstate, site);
   const name = MALL_NAME[site];
   const blocked = s.on ? '' : `<p class="gx-hint">소지품이나 가계부가 꺼져 있어 ${name}을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>`;
-  const rows = `${blocked}${group(name, [
-    row('자동 호출', mseg(site, 'auto', s.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), s.auto === 'manual' ? '새로 고침을 눌렀을 때만 물건 목록을 새로 받아요.' : s.auto === 'open' ? '사이트를 열 때, 지난번에 받은 뒤로 본편이 진행됐으면 한 번 새로 받아요.' : '본편 응답마다 물건 목록을 새로 받아요(모델 호출 +1).'),
-    row('모델', mseg(site, 'model', s.model, [['main', '메인 모델'], ['aux', '보조 모델']]), `물건 목록${site === 'cos' ? '과 운영자 답' : ''}을 지을 모델이에요.`),
-    row('컨텍스트에 포함', mseg(site, 'ctx', s.context ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨 지금 상황에 맞는 물건이 나와요.'),
-    row('상품 수', `<span class="ph-inline"><span>최소</span>${numBox(site, 'min', s.size[0], '개', '상품 수 최소')}<span>최대</span>${numBox(site, 'max', s.size[1], '개', '상품 수 최대')}</span>`, `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
-    row(site === 'cos' ? '추천·할인 구획' : '한정·특가 구획', mseg(site, 'feature', s.feature ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), site === 'cos' ? '켜면 「강하게 추천」 물건 하나와 ※할인!※ 물건을 받아 같은 목록 칸에 딱지로 표시해요.' : '켜면 「이달의 한정」 하나와 특가 상품을 따로 받아 분류에 보여 줘요.'),
-    row('값 기준', `<input class="gx-search ps-text" data-change="ms-text" data-key="${site}:price" value="${esc(s.price)}" maxlength="80" placeholder="비우면 사이트에 어울리는 값">`),
-    row('다양성 강화', mseg(site, 'diverse', s.diverse ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 싼 것·비싼 것·흔한 것·특이한 것을 섞어요.'),
-    row('지난 목록 피하기', mseg(site, 'prev', s.avoidPrev ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '새로 받을 때 이미 보였던 물건을 피해요.'),
-    row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
-    row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
-    row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
+  // 첫 묶음의 줄은 정의표(core/setdef/malls.ts)에서 온다
+  const vals: Record<string, string> = {
+    auto: s.auto, model: s.model, ctx: s.context ? '1' : '0', feature: s.feature ? '1' : '0', price: s.price, diverse: s.diverse ? '1' : '0', prev: s.avoidPrev ? '1' : '0',
+    thoughts: s.thoughts, turns: String(s.turns), refs: String(s.refs),
+  };
+  const wire: Wire = { cur: (k) => vals[k] ?? '', minmax: () => s.size, scope: site };
+  const rows = `${blocked}${defGroups(mallSet(site), wire)}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 

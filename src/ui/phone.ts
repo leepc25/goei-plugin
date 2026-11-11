@@ -1,8 +1,9 @@
 // 「괴담톡」 탭: 연락처·대화방·공지·전화. 원본 괴담톡(폰)과 같은 저장 형식과 규칙.
 // 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 채팅 응답이 끝날 때마다 한 번.
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
+import { defGroups, setSeg, type Wire } from './setrow';
+import { PHONE_SET } from '../core/setdef/phone';
 import { turnKeyAt } from '../core/shop';
-import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { resolveSitePic } from '../core/sitepics';
 import { setSitePicSource, attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
@@ -10,7 +11,7 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
-  chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
+  chancePassed, parseReactions, mergeHabits, parseHabits, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, hiddenPause, noticeLabel,
   BANTER_ROWS,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt, viewPrompt } from '../core/phonePrompt';
@@ -1050,77 +1051,32 @@ function addView(): string {
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-add-save">추가</button></div></div>`;
 }
 
-const AUTO_HINT: Record<string, string> = {
-  '0': '새로고침 버튼을 누를 때만 확인해요',
-  open: '채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요',
-  '1': '채팅 응답이 끝날 때마다 모델을 한 번 더 불러요',
-};
-
-function seg(key: string, cur: string, items: [string, string][]): string {
-  const sw = onOffSwitch(items, cur, 'ph-cfg', (v) => `${key}=${v}`);
-  if (sw) return sw;
-  return `<div class="gx-segs gx-segs-sm">${items
-    .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`)
-    .join('')}</div>`;
-}
-
-/** 설정 한 줄: 왼쪽 이름·설명, 오른쪽 조작 */
-const row = (label: string, control: string, hint = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
-
 function settingsView(ctx: ChatContext): string {
-  const v = (k: string) => phoneValue(ctx.chat.scriptstate, k);
-  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
-  const pct = (k: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc(v(k))}" aria-label="확률"><span>%</span></span>`;
-  const num = (k: string, cur: number, lo: number, hi: number, unit: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
-  const notices = noticeSettings(ctx.chat.scriptstate);
-  const vs = viewSettings(ctx.chat.scriptstate);
-  const rest = (k: string) => {
-    const n = advNum(ctx.chat.scriptstate, 'ph', k);
+  const state = ctx.chat.scriptstate;
+  const notices = noticeSettings(state);
+  const vs = viewSettings(state);
+  const rest = (k: string) => () => {
+    const n = advNum(state, 'ph', k);
     return n ? `받은 뒤 ${n}턴 쉬어요` : '';
   };
-  const keep = (k: 'dm' | 'group' | 'notice', label: string) => {
-    const st = phoneStorage(ctx.chat.scriptstate, k);
-    return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
+  // 줄은 정의표(core/setdef/phone.ts)에서 온다. 여기는 값을 읽어 주는 선만 잇는다
+  const special: Record<string, () => string> = {
+    view_preset: () => vs.preset, view_scope: () => vs.scope, view_size: () => vs.size, view_auto: () => vs.auto, view_pov: () => vs.pov,
+    announcement_gap: () => String(notices.gap), announcement_history: () => String(notices.history), announcement_page_size: () => String(notices.page),
+  };
+  for (const k of ['dm', 'group', 'notice'] as const) {
+    special[`storage_auto_${k}`] = () => (phoneStorage(state, k).auto ? '1' : '0');
+    special[`storage_limit_${k}`] = () => String(phoneStorage(state, k).limit);
+  }
+  const wire: Wire = {
+    cur: (k) => special[k]?.() ?? phoneValue(state, k),
+    minmax: () => phoneSettings(state).banterRows,
+    help: { incoming: rest('cd_incoming'), group_invites: rest('cd_invite') },
+    custom: { joint: () => ({ ctl: setSeg('ph-cfg', 'joint', jointOn(state) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]) }) },
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
-      ${group('괴담톡', [
-        row('자동 호출', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
-        row('한 번에 요청', seg('joint', jointOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '괴담톡·괴담넷·괴담갤·세정게·연어 마켓 중 「매 턴」이고 모델이 같은 것들을 한 요청으로 묶어요 (다섯 페이지 공통 값, 쇼핑몰은 따로). 끄면 하나씩 따로 불러요.'),
-        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인 모델'], ['aux', '보조 모델']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 모델 = Risu의 보조 모델(싸고 빠름), 메인 모델 = 본편과 같은 모델'),
-        row('컨텍스트에 포함', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
-      ].join(''))}
-      ${group('답장', [
-        row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
-        row('말버릇 기록', onoff('habits'), '연락처마다 문자 습관(길이·연달아 보내기·맞춤법·답장 속도)을 기억해 다음 답장에도 이어 가요'),
-        row('이모지 반응', onoff('reactions'), '메시지에 👍3 같은 반응이 붙어요. 본 사람 수를 넘지 않고, 1:1에서는 상대가 내 메시지에만 달아요'),
-      ].join(''))}
-      ${group('새 메시지', [
-        row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
-        row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
-        row('단톡 수다', `<span class="ph-inline">${onoff('banter')}${pct('banter_chance')}</span>`, '새 메시지를 확인할 때 이 확률로 내 단톡방 하나에서 사람들끼리 대화가 오가요. 응답이 길어져요'),
-        row('단톡 수다 줄 수', `<span class="ph-inline"><span>최소</span>${num('banter_min', phoneSettings(ctx.chat.scriptstate).banterRows[0], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}<span>최대</span>${num('banter_max', phoneSettings(ctx.chat.scriptstate).banterRows[1], BANTER_ROWS[0], BANTER_ROWS[1], '줄')}</span>`, `수다 한 번에 오가는 말 수예요(${BANTER_ROWS[0]}~${BANTER_ROWS[1]}). 그 안에서 모델이 정해요`),
-        row('소속 공지 받기', onoff('announcements'), '내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요'),
-        row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴'), '공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요'),
-        row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개'), '새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요'),
-      ].join(''))}
-      ${group('보기 전용 방', [
-        row('종류', seg('view_preset', vs.preset, [['side', '사이드스토리'], ['mono', '혼잣말'], ['multi', '다중인격 혼잣말']]), '사이드스토리 = 본편에 안 나온 짧은 대화 · 혼잣말 = 시점 인물의 속마음 · 다중인격 혼잣말 = 마음속 여러 갈래가 단톡처럼 주고받아요'),
-        row('시점 인물', `<input class="gx-search ps-text" data-change="ph-text" data-key="view_pov" value="${esc(vs.pov)}" placeholder="비우면 주인공">`),
-        row('시점 인물 대사', onoff('view_speak'), '켜면 시점 인물의 말도 모델이 써요. 끄면 시점 인물은 조용히 있어요'),
-        ...(vs.preset === 'side' ? [
-          row('등장인물 범위', seg('view_scope', vs.scope, [['0', '주요 인물'], ['1', '장면 안'], ['2', '장면 안 주요 인물'], ['3', '자율']])),
-          row('방 크기', seg('view_size', vs.size, [['0', '자동'], ['1', '둘이서'], ['2', '여럿']])),
-        ] : []),
-        row('자동 호출', seg('view_auto', vs.auto, [['manual', '수동'], ['open', '창을 열 때'], ['turn', '매 턴']]), '매 턴이면 채팅 응답마다 방을 하나 더 만들어요(모델 호출 +1)'),
-      ].join(''))}
-      ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'), '켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만')].join(''))}
-      ${group('보관', [
-        keep('dm', '1:1 대화 정리'), keep('group', '단톡방 정리'), keep('notice', '공지 정리'),
-        row('페이지당 공지', `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n) => `<button class="gx-seg${notices.page === n ? ' on' : ''}" data-action="ph-cfg" data-value="announcement_page_size=${n}" aria-pressed="${notices.page === n}">${n}</button>`).join('')}</div>`),
-      ].join(''))}
+      ${defGroups(PHONE_SET, wire)}
       ${advancedBox('ph', ctx.chat.scriptstate)}
     </div></div>`;
 }

@@ -133,6 +133,8 @@ export const HS_NUM: Record<string, { key: string; lo: number; hi: number; def: 
   callHi: { key: HS_KEY.callHi, lo: 1, hi: 60, def: 12, unit: '턴' },
 };
 /** 출연 형태 기본 목록 (설정에서 고친다, 쉼표·줄바꿈으로 나눔) */
+/** 주문 전화번호 기본값 */
+export const HS_TEL_DEFAULT = '080-404-0000';
 export const HS_FORMS_DEFAULT = '전화 출연, 엑스트라, 모델';
 export type HsAuto = 'manual' | 'open';
 export type HsScale = 'auto' | 'fit' | '0.5' | '1' | '2';
