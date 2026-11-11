@@ -4,11 +4,11 @@
    ─ 줄 = [이름 200][조작 바로 옆, 왼쪽 정렬] / 설명은 조작 아래. 글칸(여러 줄) 줄은 이름 위·글칸 아래 전체 폭.
    ─ 묶음 = 작은 제목 + 카드 하나(상자 한 겹). 카드 안 줄은 가는 선으로만 나뉨. 상자 속 상자 없음.
    ─ 색: 카드 panel, 입력칸(들어간 면) void, 단추(올린 면) panel2, 고른 것 accent-bg + accent-line. 그 밖의 색 없음.
-   폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%), 높이 90%, 760px 이하 전체 화면 */
+   폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%, 최대 1340px), 높이 90%, 760px 이하 전체 화면 */
 .gw { --h: 34px; --r: 8px; --gap: 8px; --pad: 14px; --label: 200px; --ctl: 320px; --hair: var(--panel2);
   position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 14px/1.5 var(--font); }
 .gw[hidden] { display: none; }
-.gw-win { position: relative; width: var(--gw-width, 90%); height: min(90%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.gw-win { position: relative; width: min(var(--gw-width, 90%), 1340px); height: min(90%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
 .gw * { box-sizing: border-box; }
 .gw button:focus-visible, .gw input:focus-visible, .gw select:focus-visible, .gw textarea:focus-visible { outline: 2px solid var(--signal); outline-offset: 1px; }
 
@@ -520,3 +520,154 @@
 /* 추가 규칙: 규칙마다 접는 칸 한 페이지 (11-09) */
 .gw-rule { margin-bottom: 8px; }
 .gw-rule > summary.ps-adv-sum .gw-state { margin-left: 8px; }
+
+/* ── 표: [이름][사이트 칸 × N] 격자, 설명은 칸들 아래 (줄 규격 [이름][조작] 을 칸 여럿으로 늘린 것. 설정 개편 4단계) ── */
+.gw .mx { display: block; }
+.gw .mx-head, .gw .mx-row { display: grid; grid-template-columns: var(--label) repeat(var(--mx-n), minmax(0, 1fr)); column-gap: 16px; }
+.gw .mx-head { position: sticky; top: 0; z-index: 3; align-items: center; margin: 0 0 12px; padding: 8px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.gw .mx-head label { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13.5px; font-weight: 700; color: var(--text); }
+.gw .mx-head label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw .mx-head label svg, .gw .mx-head label img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-row { row-gap: 4px; align-items: start; padding: 10px var(--pad); border-top: 1px solid var(--hair); }
+.gw .ps-rows > .mx-row:first-child { border-top: 0; }
+.gw .mx-label { grid-column: 1; display: flex; align-items: center; min-width: 0; min-height: var(--h); font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--text); }
+.gw .mx-cell { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--gap); min-width: 0; min-height: var(--h); }
+.gw .mx-cell + .mx-cell { box-shadow: -9px 0 0 -8px var(--hair); }
+.gw .mx-cell .gx-chips { margin: 0; gap: 4px; }
+.gw .mx-cell .ps-text, .gw .mx-cell > input.gx-search:not(.ph-pct) { width: 100%; }
+.gw .mx-cell .ph-pct { width: 56px; }
+.gw .mx-cell .adv-val { max-width: 100%; }
+.gw .mx-site, .gw .mx-r { display: none; }
+.gw .mx-none { color: var(--dim); font-size: 13px; opacity: .65; }
+.gw .mx-all { grid-column: 2 / -1; }
+.gw .mx-shared, .gw .mx-cap { color: var(--dim); font-size: 12.5px; white-space: nowrap; }
+.gw .mx-help { grid-column: 2 / -1; display: block; margin: 0; font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--dim); }
+.gw .mx-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin: 0 0 20px; padding: 10px var(--pad); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--dim); font-size: 13px; }
+.gw .mx-note { margin: 0; padding: 10px var(--pad); border-bottom: 1px solid var(--hair); font-size: 13px; line-height: 1.5; color: var(--dim); }
+.gw .ck { margin-bottom: 20px; }
+.gw .ck-line { display: grid; grid-template-columns: var(--gname, 96px) repeat(var(--ck-n), minmax(0, 1fr)); align-items: center; padding: 0 10px; }
+.gw .ck-h1 { padding-top: 8px; font-size: 13px; color: var(--text); }
+.gw .ck-h1 b { padding: 2px 4px; font-weight: 700; text-align: center; word-break: keep-all; }
+.gw .ck-h2 { padding-bottom: 6px; border-bottom: 1px solid var(--hair); font-size: 12.5px; color: var(--dim); }
+.gw .ck-h2 > span { text-align: center; line-height: 1.25; word-break: keep-all; }
+.gw .ck-row { min-height: 38px; border-top: 1px solid var(--hair); }
+.gw .ck-h2 + .ck-row { border-top: 0; }
+.gw .ck-name { min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); }
+.gw .ck-cell { display: flex; align-items: center; justify-content: center; align-self: stretch; }
+.gw .ck-first { box-shadow: inset 1px 0 0 var(--hair); }
+.gw .ck-m { width: 22px; height: 22px; padding: 0; border: 1.5px solid var(--line); background: var(--void); cursor: pointer; }
+.gw .ck-m.round { border-radius: 50%; }
+.gw .ck-m.box { border-radius: 6px; }
+.gw .ck-m.on { border-color: var(--signal); background: var(--signal); box-shadow: inset 0 0 0 4px var(--panel); }
+.gw .ck-m.box.on { box-shadow: none; background: var(--signal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%230b1f1c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.gw .ck-x { color: var(--dim); opacity: .5; }
+.gw .ck > h3 { margin-bottom: 8px; }
+.gw .ck-ph { display: none; }
+.gw .ck-band { box-shadow: inset 2px 0 0 var(--line); }
+.gw .mx-foot:has(.ck-foot1) { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 12px 28px; }
+.gw .ck-foot1 { display: block; min-width: 0; }
+.gw .ck-foot1 > b { display: block; margin-bottom: 4px; color: var(--text); font-size: 13px; font-weight: 700; }
+.gw .hl { display: block; }
+.gw .hl-h { display: block; margin-top: 6px; color: var(--text); font-size: 12.5px; font-weight: 600; opacity: .8; }
+.gw .hl-h:first-child { margin-top: 0; }
+.gw .hl-i { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); column-gap: 10px; padding: 2px 0; line-height: 1.5; }
+.gw .hl-i > b { color: var(--text); font-weight: 600; word-break: keep-all; }
+.gw .hl-i > span:only-child { grid-column: 1 / -1; }
+.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 12.5px; }
+.gw .ck-h2.solo { padding-top: 8px; }
+.gw .ck-h2 > span { padding: 0 3px; }
+.gw .ck-n { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--void); overflow: hidden; }
+.gw .ck-n b { min-width: 32px; padding: 0 4px; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); }
+.gw .ck-s { width: 22px; height: 26px; padding: 0; border: 0; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1; cursor: pointer; }
+.gw .mx-grid { margin-bottom: 20px; --label: var(--gname, 96px); }
+/* 격자의 이름 칸은 한 페이지 안에서 모두 같은 폭 (--gname). 이름이 긴 페이지(상점)는 페이지째 넓힌다 */
+.gw .fam-wide { --gname: 136px; }
+.gw .mx-grid .mx-row, .gw .mx-grid .mx-head { padding-left: 10px; padding-right: 10px; }
+.gw .mx-grid .mx-head { position: static; margin: 0; border: 0; border-bottom: 1px solid var(--hair); border-radius: 0; background: none; }
+.gw .mx-grid .mx-head label { font-size: 12.5px; font-weight: 600; color: var(--dim); cursor: default; }
+.gw .mx-grid .mx-row { align-items: center; }
+.gw .mx-grid .ps-rows > .mx-row:nth-child(2) { border-top: 0; }
+.gw .mx-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.gw .mx-name svg, .gw .mx-name img { width: 18px; height: 18px; flex: 0 0 auto; }
+.gw .mx-cell .mx-sel { width: auto; min-width: 7.5em; }
+.gw .mx-foot { display: block; padding: 10px var(--pad) 12px; border-top: 1px solid var(--hair); font-size: 13px; line-height: 1.55; color: var(--dim); }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .mx-head { display: flex; gap: 4px; top: 0; margin: 0 0 10px; padding: 4px; }
+  .gw .mx-head > span { display: none; }
+  .gw .mx-head label { flex: 1 1 0; flex-direction: column; justify-content: center; gap: 3px; min-height: 48px; padding: 4px 2px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--dim); text-align: center; cursor: pointer; }
+  .gw .mx-head label > span { white-space: normal; line-height: 1.2; }
+  .gw .mx-r:nth-of-type(1):checked ~ .mx-head label:nth-of-type(1), .gw .mx-r:nth-of-type(2):checked ~ .mx-head label:nth-of-type(2),
+  .gw .mx-r:nth-of-type(3):checked ~ .mx-head label:nth-of-type(3), .gw .mx-r:nth-of-type(4):checked ~ .mx-head label:nth-of-type(4) { background: var(--accent-bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--accent-line); }
+  .gw .mx-r:nth-of-type(1):checked ~ .ps-group .mx-cell:not(.mx-c0):not(.mx-all), .gw .mx-r:nth-of-type(2):checked ~ .ps-group .mx-cell:not(.mx-c1):not(.mx-all),
+  .gw .mx-r:nth-of-type(3):checked ~ .ps-group .mx-cell:not(.mx-c2):not(.mx-all), .gw .mx-r:nth-of-type(4):checked ~ .ps-group .mx-cell:not(.mx-c3):not(.mx-all) { display: none; }
+  .gw .mx-row { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; }
+  .gw .mx-label { grid-column: 1; white-space: nowrap; }
+  .gw .mx-cell { grid-column: 2; justify-content: flex-end; box-shadow: none; }
+  .gw .mx-cell + .mx-cell { box-shadow: none; }
+  .gw .mx-cell .gx-chips { justify-content: flex-end; }
+  .gw .mx-cell.wide, .gw .mx-cell.mx-all { grid-column: 1 / -1; justify-content: flex-start; }
+  .gw .mx-help { grid-column: 1 / -1; }
+  .gw .ck-pc { display: none; }
+  .gw .hl-i { grid-template-columns: 1fr; padding: 4px 0; }
+  .gw .ck-ph { display: block; }
+  .gw .ck-line { grid-template-columns: 74px repeat(var(--ck-n), minmax(0, 1fr)); padding: 0 6px; }
+  .gw .ck-name .mx-name svg, .gw .ck-name .mx-name img { width: 15px; height: 15px; }
+  .gw .ck-name { font-size: 12.5px; letter-spacing: -.3px; }
+  .gw .ck-h1 b { padding-left: 4px; font-size: 12px; text-align: center; white-space: normal; }
+  .gw .ck-h2 { font-size: 10.5px; letter-spacing: -.3px; }
+  .gw .ck-name { font-size: 13px; }
+  .gw .ck-name .mx-name { gap: 5px; }
+  .gw .ck-m { width: 24px; height: 24px; }
+  .gw .ck-n { flex-direction: column-reverse; width: 100%; max-width: 46px; margin: 6px 0; }
+  .gw .ck-n b { min-width: 0; padding: 3px 0; font-size: 12px; letter-spacing: -.3px; }
+  .gw .ck-s { width: 100%; height: 24px; }
+  .gw .ck-h1 b { padding: 2px 1px; font-size: 11px; letter-spacing: -.3px; }
+  .gw .ck-h2 > span { padding: 0 1px; }
+  .gw .mx-grid .mx-head { display: none; }
+  .gw .mx-grid .mx-row { display: block; padding: 12px var(--pad); }
+  .gw .mx-grid .mx-label { margin-bottom: 6px; font-size: 15px; }
+  .gw .mx-grid .mx-cell { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 10px; padding: 4px 0; }
+  .gw .mx-grid .mx-site { display: block; flex: 0 0 auto; white-space: nowrap; color: var(--dim); font-size: 13px; }
+  .gw .mx-help { margin-top: 6px; }
+}
+
+/* ── 시안 7 (인터넷 다시): 설명 한 가지 모양, 구역 제목, 두 칸 ── */
+.gw h2.fam-h { margin: 22px 0 12px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 16px; font-weight: 700; color: var(--text); }
+.gw h2.fam-h:first-of-type { margin-top: 6px; padding-top: 0; border-top: 0; }
+/* 설명: 제목·세로선 없음. 전부 흐린 13px. 항목 이름은 같은 색에 굵기만 */
+.gw .hb, .gw .hb-lead, .gw .hb-list { display: block; }
+.gw .hb { font-size: 13px; line-height: 1.5; color: var(--dim); font-weight: 400; }
+.gw .hb-lead + .hb-list { margin-top: 2px; }
+.gw .hb-i { display: grid; grid-template-columns: 7em minmax(0, 1fr); column-gap: 10px; }
+.gw .hb-i > b { font-weight: 700; color: var(--dim); word-break: keep-all; }
+.gw .mx-foot { padding: 8px var(--pad) 10px calc(var(--pad) - 4px); border-top: 0; font-size: 13px; }
+.gw .ck .mx-foot { padding: 8px 10px 10px; font-size: 13px; }
+.gw .mx-foot:has(.ck-foot1) { display: block; }
+.gw .mx-grid .mx-foot { padding: 8px 10px 10px; }
+/* 격자 안 숫자: 공통 규격 ± 상자 그대로 */
+.gw .ck .st-step > b { min-width: 2.6em; }
+.gw .ck-row { min-height: 44px; }
+.gw .mx-grid.ck-ph { display: none; }
+/* 숫자가 든 격자(공통): 이름 칸은 모든 격자 96px(.ck-line·.mx-grid --label), 「최소·최대」 한 쌍은 붙이고 묶음 사이를 띄운다. 조작 크기는 그대로 */
+.gw .ck-hasnum .ck-cell.ck-pl { justify-content: flex-end; padding-right: 2px; }
+.gw .ck-hasnum .ck-cell.ck-pr { justify-content: flex-start; padding-left: 2px; }
+/* 같은 종류 수 여럿을 한 줄에: 「이름 + 상자」 짝이 나란히, 모자라면 다음 줄로 */
+.gw .fam-set { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.gw .fam-set1 { display: inline-flex; align-items: center; gap: 8px; }
+.gw .fam-l { font-size: 13px; color: var(--text); white-space: nowrap; }
+/* 격자 칸의 수 상자: 규격 그대로(높이·단추 폭). 가운데 수 칸 폭은 자릿수에 맞춘 값(setrow.ts numWidth) */
+.gw .ck .adv-step > input.adv-val, .gw .mx-grid.ck-ph .adv-step > input.adv-val { padding: 0; }
+.gw .adv-step > input.adv-val { padding: 0 4px; }
+@media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
+  .gw .ps-ctl > .fam-set { flex-direction: column; align-items: stretch; width: 100%; gap: 8px; }
+  .gw .ps-ctl > .fam-set > .fam-set1 { justify-content: space-between; }
+  .gw .hb-i { grid-template-columns: 6.5em minmax(0, 1fr); }
+  .gw .mx-grid.ck-ph { display: block; }
+  .gw .mx-grid.ck-ph .mx-cell { flex-wrap: wrap; align-items: center; }
+  .gw .mx-grid.ck-ph .fam-set { display: flex; flex-wrap: nowrap; gap: 8px 12px; justify-content: flex-end; width: auto; }
+  .gw .mx-grid.ck-ph .fam-set1 { display: inline-flex; align-items: center; gap: 6px; }
+  .gw .mx-grid.ck-ph .fam-set1 > span { font-size: 13px; color: var(--text); white-space: nowrap; }
+  .gw .mx-grid.ck-ph .st-step > b { min-width: 2.4em; }
+}
+.gw .ps-row .hb-i > b, .gw .mx-foot .hb-i > b { font-size: 13px; font-weight: 700; color: var(--dim); }
+.gw .fam-set > .st-step { justify-self: start; }

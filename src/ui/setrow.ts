@@ -53,8 +53,19 @@ const act = (page: SetPage, kind: 'cfg' | 'text' | 'count' | 'num' | 'shnum' | '
 
 /** 수 한 칸 */
 const sk = (w: Wire, key: string) => (w.scope ? `${w.scope}:${key}` : key);
-const numBox = (page: SetPage, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, kind: 'num' | 'shnum' | 'count' = 'num') =>
-  `<input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="${act(page, kind)}" data-key="${key}" value="${esc(cur)}" aria-label="${esc(aria)}"><span>${unit}</span>`;
+const numBox = (page: SetPage, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, kind: 'num' | 'shnum' | 'count' = 'num', busy = false) =>
+  stepBox(act(page, kind), key, cur, lo, hi, unit, aria, busy);
+/** 수 조작의 공통 규격: 한 상자 「− 값 +」. 가운데 값은 직접 쳐도 된다. − + 와 입력은 같은 처리기에 「열쇠=값」을 보낸다.
+ *  한 번에 움직이는 폭: 범위가 1만 이상이면 500, 1천 이상이면 50, 200 이상이면 10, 그 밖은 1 */
+/** 수 칸 폭: 그 값이 가질 수 있는 가장 긴 수(최대값)의 자릿수에 맞춘다 */
+export const numWidth = (hi: number): string => `${Math.max(2, String(Math.min(hi, 9999999)).length) * 0.62 + 1.1}em`;
+export const stepBox = (action: string, key: string, cur: string | number, lo: number, hi: number, unit: string, aria: string, busy = false): string => {
+  const raw = String(cur ?? '').trim();
+  const n = Math.max(lo, Math.min(hi, Number(raw) || 0));
+  const st = hi - lo >= 10000 ? 500 : hi - lo >= 1000 ? 50 : hi - lo >= 200 ? 10 : 1;
+  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="${action}" data-value="${esc(key)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${esc(aria)} ${name}">${sign}</button>`;
+  return `<div class="st-step adv-step">${b(Math.max(lo, n - st), n > lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${lo}" max="${hi}" step="${st}" data-change="${action}" data-key="${esc(key)}" value="${raw === '' ? '' : n}" style="width:${numWidth(hi)}" aria-label="${esc(aria)}"${busy ? ' disabled' : ''}>${unit ? `<span>${esc(unit)}</span>` : ''}${b(Math.min(hi, n + st), n < hi, '+', '늘리기')}</div>`;
+};
 
 function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string } {
   const c = d.ctl;
@@ -82,8 +93,7 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
       const one = (key: string, n: number, name: string) => numBox(page, sk(w, key), n, c.lo, c.hi, c.unit, `${d.aria ?? d.label} ${name}`, c.act ?? 'num');
       return { ctl: `<span class="ph-inline"><span>최소</span>${one(c.keys[0], a, '최소')}<span>최대</span>${one(c.keys[1], b, '최대')}</span>`, cur: `${a}~${b}` };
     }
-    const box = (side: 'min' | 'max', n: number, name: string) =>
-      `<input class="gx-search ph-pct" type="number" min="${c.lo}" max="${c.hi}" data-change="${act(page, c.act ?? 'count')}" data-key="${d.key}_${side}" value="${n}" aria-label="${d.label} ${name}"><span>${c.unit}</span>`;
+    const box = (side: 'min' | 'max', n: number, name: string) => stepBox(act(page, c.act ?? 'count'), `${d.key}_${side}`, n, c.lo, c.hi, c.unit, `${d.label} ${name}`, w.busy);
     return { ctl: `<span class="ph-inline"><span>최소</span>${box('min', a, '최소')}<span>최대</span>${box('max', b, '최대')}</span>`, cur: `${a}~${b}` };
   }
   if (c.t === 'step') {
@@ -122,3 +132,99 @@ export const defGroup = (page: SetPage, g: SetGroup, w: Wire): string =>
   setGroup(g.title === '@page' ? (w.pageTitle ?? '') : g.title, (g.note ? `<p class="ps-note">${g.note}</p>` : '') + (w.lead?.[g.title] ?? '') + g.rows.map((d) => defRow(page, d, w)).join(''));
 /** 정의표 전체 */
 export const defGroups = (page: SetPage, w: Wire): string => page.groups.map((g) => defGroup(page, g, w)).join('\n      ');
+
+/* ── 표 (줄 = 설정, 칸 = 사이트). 같은 틀을 쓰는 사이트들의 설정을 한 장에서 견주고 바꾼다 (설정 개편 4단계) ── */
+export interface MxCol { name: string; icon?: string }
+/** cells: 칸마다 조작 HTML (null = 그 사이트에 없는 줄) · one: 모든 사이트가 같이 쓰는 값 (칸을 합친다) */
+export interface MxRow { label: string; help?: string; cells?: (string | null)[]; one?: string; oneNote?: string }
+const mxCell = (col: MxCol, html: string | null, i: number) =>
+  `<div class="mx-cell mx-c${i}${html === null ? ' none' : ''}"><span class="mx-site">${esc(col.name)}</span>${html === null ? '<span class="mx-none">없음</span>' : html}</div>`;
+export const mxRow = (cols: MxCol[], r: MxRow): string =>
+  `<div class="mx-row${r.label ? '' : ' nolabel'}"><b class="mx-label">${r.label}</b>${r.one !== undefined
+    ? `<div class="mx-cell mx-all">${r.one}${r.oneNote ? `<span class="mx-shared">${esc(r.oneNote)}</span>` : ''}</div>`
+    : cols.map((c, i) => mxCell(c, r.cells?.[i] ?? null, i)).join('')}${r.help ? `<small class="mx-help">${r.help}</small>` : ''}</div>`;
+export const mxGroup = (title: string, cols: MxCol[], rows: MxRow[], note = ''): string =>
+  `<section class="ps-group">${title ? `<h3>${title}</h3>` : ''}<div class="ps-rows">${note ? `<p class="mx-note">${note}</p>` : ''}${rows.map((r) => mxRow(cols, r)).join('')}</div></section>`;
+
+/** 설명을 항목마다 한 줄로: 「이름 = 뜻. 덧말.」을 끊어 이름은 굵게. 「묶음: 이름 = …」의 묶음은 작은 머리로 */
+export const helpList = (t: string): string => {
+  const items: { head?: string; term?: string; desc: string }[] = [];
+  for (const raw of t.split(/(?<=\.)\s+/)) {
+    const sent = raw.trim(); if (!sent) continue;
+    const m = /^(?:([^=:]{1,14}): )?([^=]{1,26}?) = (.+)$/.exec(sent);
+    if (m) items.push({ head: m[1], term: m[2], desc: m[3] });
+    else if (items.length && items[items.length - 1].term) items[items.length - 1].desc += ` ${sent}`;
+    else items.push({ desc: sent });
+  }
+  return `<span class="hl">${items.map((i) => `${i.head ? `<span class="hl-h">${esc(i.head)}</span>` : ''}<span class="hl-i">${i.term ? `<b>${esc(i.term)}</b>` : ''}<span>${i.desc}</span></span>`).join('')}</span>`;
+};
+
+/* ── 체크 격자: 줄 = 메뉴, 열 = 고를 값 하나하나. one = 그 묶음에서 하나만(동그라미), check = 켜고 끄기(네모), num = 수(공통 규격 「− 값 +」) ── */
+export interface CkGroup { name: string; opts: string[]; kind: 'one' | 'check' | 'num'; band?: boolean }
+/** 수 칸: 지금 값과 범위. step = − + 한 번에 움직이는 폭 */
+export interface CkNum { n: number; lo: number; hi: number; step?: number }
+/** 칸 하나: true·false(체크) · 수 · null(그 메뉴에 없는 값) */
+export type CkMark = boolean | CkNum | null;
+/** acts: 칸마다 누르면 보낼 값. 체크 칸은 「갈래:메뉴:열쇠=값」 그대로(fam-set), 수 칸은 「갈래:메뉴:열쇠」(fam-num 이 「=값」을 붙인다) */
+export interface CkRow { label: string; marks: CkMark[]; acts: (string | null)[] }
+/** 격자 칸의 조작 하나 (PC 격자와 폰 묶음이 같이 쓴다) */
+const ckCtl = (m: CkMark | undefined, act: string | null | undefined, aria: string, round: boolean, busy: boolean): string => {
+  if (m === null || m === undefined || !act) return '<span class="ck-x" aria-label="없음">–</span>';
+  const off = busy ? ' disabled' : '';
+  if (typeof m === 'boolean') return `<button class="ck-m ${round ? 'round' : 'box'}${m ? ' on' : ''}" data-action="fam-set" data-value="${esc(act)}" aria-pressed="${m}" aria-label="${aria}"${off}></button>`;
+  const st = m.step ?? 1;
+  const b = (to: number, on: boolean, sign: string, name: string) => `<button class="gx-step" data-action="fam-num" data-value="${esc(act)}=${to}" ${on && !busy ? '' : 'disabled'} aria-label="${aria} ${name}">${sign}</button>`;
+  return `<div class="st-step adv-step">${b(Math.max(m.lo, m.n - st), m.n > m.lo, '−', '줄이기')}<input class="adv-val" type="number" inputmode="numeric" min="${m.lo}" max="${m.hi}" step="${st}" data-change="fam-num" data-key="${esc(act)}" value="${m.n}" style="width:${numWidth(m.hi)}" aria-label="${aria}"${off}>${b(Math.min(m.hi, m.n + st), m.n < m.hi, '+', '늘리기')}</div>`;
+};
+/** 수 조작 하나 (격자 밖 줄에서도 같은 모양·같은 처리기) */
+export const numCtl = (act: string, m: CkNum, aria: string, unit = '', busy = false): string => {
+  const html = ckCtl(m, act, esc(aria), false, busy);
+  return unit ? html.replace(/(<input[^>]*>)/, `$1<span>${esc(unit)}</span>`) : html;
+};
+export const ckGrid = (groups: CkGroup[], rows: CkRow[], foot = '', title = '', busy = false): string => {
+  const flat = groups.flatMap((g) => g.opts.map((o, i) => ({ g, o, first: i === 0, band: i === 0 && !!g.band, pair: g.kind === 'num' && g.opts.length === 2 ? (i === 0 ? ' ck-pl' : ' ck-pr') : '' })));
+  const named = groups.some((g) => g.name);
+  const head1 = named ? `<div class="ck-line ck-h1"><span></span>${groups.map((g) => `<b class="ck-first${g.band ? ' ck-band' : ''}" style="grid-column: span ${g.opts.length}">${esc(g.name)}</b>`).join('')}</div>` : '';
+  const head2 = `<div class="ck-line ck-h2${named ? '' : ' solo'}"><span></span>${flat.map((c) => `<span class="${c.first ? 'ck-first' : ''}${c.band ? ' ck-band' : ''}">${esc(c.o)}</span>`).join('')}</div>`;
+  const body = rows.map((r) => `<div class="ck-line ck-row"><b class="ck-name">${r.label}</b>${flat.map((c, i) =>
+    `<span class="ck-cell${c.first ? ' ck-first' : ''}${c.band ? ' ck-band' : ''}${c.pair}">${ckCtl(r.marks[i], r.acts[i], `${esc(c.g.name)} ${esc(c.o)}`, c.g.kind === 'one', busy)}</span>`).join('')}</div>`).join('');
+  return `<section class="ps-group ck${groups.some((g) => g.kind === 'num') ? ' ck-hasnum' : ''}" style="--ck-n:${flat.length}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${head1}${head2}${body}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ''}</section>`;
+};
+/** 띠 여러 개를 PC에서는 한 격자로 나란히, 폰에서는 띠마다 하나로 (폭이 달라서). foot = 설명(helpBox) */
+export interface CkBand { title: string; groups: CkGroup[]; marks: CkMark[][]; acts: (string | null)[][]; foot: string }
+export const ckWide = (bands: CkBand[], labels: string[], busy = false): string => {
+  const groups = bands.flatMap((b) => b.groups.map((g, i) => ({ ...g, name: g.name || b.title, band: i === 0 })));
+  const rows = labels.map((label, r) => ({ label, marks: bands.flatMap((b) => b.marks[r]), acts: bands.flatMap((b) => b.acts[r]) }));
+  const foot = bands.filter((b) => b.foot).map((b) => `<span class="ck-foot1">${b.foot}</span>`).join('');
+  const pc = ckGrid(groups, rows, foot, bands.map((b) => b.title).join(' · '), busy).replace('class="ps-group ck', 'class="ps-group ck ck-pc');
+  /** 폰: 수가 든 띠는 메뉴마다 묶어 쌓는다 (규격 「− 값 +」 상자는 여러 칸으로 나란히 못 넣는다) */
+  const stack = (b: CkBand): string => {
+    let at = 0;
+    const cols = b.groups.map((g) => ({ g, from: (at += g.opts.length) - g.opts.length }));
+    return `<div class="mx mx-grid ck-ph" style="--mx-n:${cols.length}"><section class="ps-group"><h3>${esc(b.title)}</h3><div class="ps-rows">${labels.map((label, r) => `<div class="mx-row"><b class="mx-label">${label}</b>${cols.map(({ g, from }) => `<div class="mx-cell"><span class="mx-site">${esc(g.name)}</span><span class="fam-set">${g.opts.map((o, i) => {
+      const m = b.marks[r][from + i];
+      return m === null || m === undefined ? '' : `<span class="fam-set1">${g.opts.length > 1 || o !== '켬' ? `<span>${esc(o)}</span>` : ''}${ckCtl(m, b.acts[r][from + i], `${esc(g.name)} ${esc(o)}`, false, busy)}</span>`;
+    }).join('')}</span></div>`).join('')}</div>`).join('')}</div>${b.foot ? `<small class="mx-foot">${b.foot}</small>` : ''}</section></div>`;
+  };
+  const hasNum = (b: CkBand) => b.marks.some((row) => row.some((m) => m !== null && typeof m === 'object'));
+  const ph = bands.map((b) => hasNum(b) ? stack(b) : ckGrid(b.groups, labels.map((label, r) => ({ label, marks: b.marks[r], acts: b.acts[r] })), b.foot, b.title, busy).replace('class="ps-group ck', 'class="ps-group ck ck-ph')).join('');
+  return pc + ph;
+};
+/** 표 머리 (사이트 이름 줄). 스크롤해도 위에 붙어 있다 */
+let mxSeq = 0;
+export const mxHead = (cols: MxCol[], id = ''): string =>
+  `<div class="mx-head"><span></span>${cols.map((c, i) => `<label for="${id}-${i}">${c.icon ?? ''}<span>${esc(c.name)}</span></label>`).join('')}</div>`;
+// 폰: 사이트 탭 하나만 보인다 (시안: 라디오로 고름)
+/** 격자: 줄 = 메뉴, 칸 = 메뉴마다 똑같이 있는 설정. 폰에서는 메뉴마다 칸을 세로로 쌓는다 */
+export const mxGrid = (cols: MxCol[], rows: MxRow[], foot = '', title = ''): string =>
+  `<div class="mx mx-grid" style="--mx-n:${cols.length}"><section class="ps-group">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${mxHead(cols)}${rows.map((r) => mxRow(cols, r)).join('')}</div>${foot ? `<small class="mx-foot">${foot.includes('<') ? foot : helpList(foot)}</small>` : ''}</section></div>`;
+/** 값 하나짜리 줄 묶음 (그 틀의 모든 메뉴가 같이 쓴다) */
+export const mxPlain = (groups: string): string => `<div class="mx" style="--mx-n:1">${groups}</div>`;
+export const mxTable = (cols: MxCol[], groups: string): string => {
+  const id = `mxr${++mxSeq}`;
+  return `<div class="mx" style="--mx-n:${cols.length}">${cols.map((_, i) => `<input type="radio" class="mx-r" name="${id}" id="${id}-${i}"${i === 0 ? ' checked' : ''}>`).join('')}${mxHead(cols, id)}${groups}</div>`;
+};
+
+/** 설명 한 가지 모양: 「하는 일」 한 문장(lead) + 이름 붙은 것이 여럿이면 항목 목록. 제목·세로선 없음 */
+export const helpBox = (lead: string, items: [string, string][] = []): string =>
+  `<span class="hb">${lead ? `<span class="hb-lead">${lead}</span>` : ''}${items.length ? `<span class="hb-list">${items.map(([t, d]) => `<span class="hb-i"><b>${esc(t)}</b><span>${d}</span></span>`).join('')}</span>` : ''}</span>`;

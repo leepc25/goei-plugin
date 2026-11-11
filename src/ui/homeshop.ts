@@ -540,7 +540,19 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
     minmax: (k) => (k === 'size' ? s.shop.size : [n(pairs[k][0]), n(pairs[k][1])]),
     help: { clips: () => `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}` },
   };
-  const body = defGroups(HOMESHOP_SET, wire);
+  // 4단계: 상점 표로 올라간 줄을 빼고 남은 줄을 하는 일대로 다시 묶는다
+  const all = HOMESHOP_SET.groups.flatMap((g) => g.rows);
+  const pick = (title: string, keys: string[], note?: string) => ({ title, note, rows: keys.map((k) => all.find((r) => r.key === k)!).filter(Boolean) });
+  const page: typeof HOMESHOP_SET = { ...HOMESHOP_SET, groups: [
+    pick('', ['net', 'retry', 'say']),
+    pick('편성', ['cue', 'chat']),
+    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'turn', 'lock']),
+    pick('주문', ['barter', 'peek']),
+    pick('컨텍스트 포함', ['call', 'forms', 'aud']),
+    pick('진행자 동작', ['fill', 'fillCool', 'rareP', 'rareCool', 'clips'], HOMESHOP_SET.groups.find((g) => g.title === '진행자 동작')?.note),
+    pick('방송 화면', ['tel', 'cut', 'bulb', 'tear', 'tearP', 'scan', 'scalePc', 'scalePh']),
+  ] };
+  const body = defGroups(page, wire);
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body}</div></div>`;
 }
 

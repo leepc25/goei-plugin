@@ -27,7 +27,6 @@ import { craftSettings, featureModel } from '../core/craft';
 import type { Joint } from '../host/joint';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
-import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
@@ -578,8 +577,10 @@ function settingsView(ctx: ChatContext, back = true): string {
       }),
     },
   };
-  const rows = `${defGroups(GNET_SET, wire)}
-      ${advancedBox('gn', ctx.chat.scriptstate)}`;
+  // 4단계: 사이트 페이지에는 그 사이트에만 있는 줄(사이트 성격)만 남고, 나머지는 「인터넷」 페이지의 게시판 표에 있다
+  const own = ['privacy', 'subject', 'mood', 'protagonist'];
+  const site: typeof GNET_SET = { ...GNET_SET, groups: [{ title: '', rows: GNET_SET.groups.flatMap((g) => g.rows).filter((r) => own.includes(r.key)) }] };
+  const rows = `${defGroups(site, wire)}`;
   return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -1335,6 +1336,13 @@ export async function handleGnet(action: string, value: string | undefined, base
       if (m[2] === 'min' && n > b) vars[CFG(`${k}_max`)] = String(n);
       if (m[2] === 'max' && n < a) vars[CFG(`${k}_min`)] = String(n);
       await setVars(ctx, env, vars);
+      return true;
+    }
+    case 'gn-chance': {
+      // 선쪽지 확률 (0~100). 설정 → 인터넷의 격자가 사이트를 붙여 부른다
+      const n = Math.round(Number(v));
+      if (v.trim() !== '' && Number.isFinite(n)) await setVar(ctx, env, CFG('incoming_chance'), String(Math.max(0, Math.min(100, n))));
+      else env.render();
       return true;
     }
     case 'gn-keep': {

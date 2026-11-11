@@ -22,7 +22,9 @@ export const MAIN_PREFIXES = ['$gen_', '$pp_', '$it_'];
  *  화면·이미지·상황판·괴이 발생·테마는 settings.ts set-bar-yes 가 따로 더한다 */
 // 소지품 페이지(가계부 옵션 $st_wallet_*·상점 $sh_*)와 상태창 칸 구성($st_col_*)도 (11-08 전수점검: 「기본값으로 저장·불러오기」에서 빠져 있었다.
 // 「초기값으로」는 이미 다루고 있었음). 칸 구성 기록($st_col_log)은 채팅마다라 PREF_VAR 에서 빠진다
-export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, '$st_col_', '$st_wallet_', '$sh_', ...Object.values(PREFIXES).flat()])];
+// 상점 표(설정 → 상점)의 쇼핑몰·망상홈쇼핑 값($cos_sh_*·$bm_sh_*·$hs_sh_*·$hs_on)과 「한 번에 요청」($net_joint)도 (11-11: 빠져 있었다).
+// 접두어를 $cos_·$bm_·$hs_ 통째로 넣지 않는다: 진열대·방송 상태 변수가 같은 접두어를 쓴다
+export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, '$st_col_', '$st_wallet_', '$sh_', '$cos_sh_', '$bm_sh_', '$hs_sh_', '$hs_on', '$net_joint', ...Object.values(PREFIXES).flat()])];
 const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', pp: '인물 기록', jr: '기록' };
 
 export const defaultsAsk = { pane: '' as DefaultsPane | '', what: '' as '' | 'save' | 'load' };

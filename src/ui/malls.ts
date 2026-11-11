@@ -3,8 +3,7 @@
 //   운영자에게 질문: 넷스케이프 팝업. 상품 화면에서 열면 그 물건이 붙고, 다른 곳은 [물건을 붙인다]. 운영자 답에 물건 이름이 있으면 링크로.
 // 백일몽 포인트몰: 사내 쇼핑몰, 운영자 없음(문의·흥정 X), 로그인해야 씀, 정가로 포인트 구매.
 // 진열·문의 요청문은 상점(core/shop.ts)과 같고, 지침·설정만 사이트 것(core/malls.ts).
-import { defGroups, setGroup, setRow, type Wire } from './setrow';
-import { mallSet } from '../core/setdef/malls';
+import { setGroup, setRow } from './setrow';
 import { needAttr } from './needfill';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
@@ -865,13 +864,8 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
   const s = mallSettings(ctx.chat.scriptstate, site);
   const name = MALL_NAME[site];
   const blocked = s.on ? '' : `<p class="gx-hint">소지품이나 가계부가 꺼져 있어 ${name}을 쓸 수 없어요. 산 물건은 소지품에, 돈은 가계부로 오가서 둘 다 켜져 있어야 해요.</p>`;
-  // 첫 묶음의 줄은 정의표(core/setdef/malls.ts)에서 온다
-  const vals: Record<string, string> = {
-    auto: s.auto, model: s.model, ctx: s.context ? '1' : '0', feature: s.feature ? '1' : '0', price: s.price, diverse: s.diverse ? '1' : '0', prev: s.avoidPrev ? '1' : '0',
-    thoughts: s.thoughts, turns: String(s.turns), refs: String(s.refs),
-  };
-  const wire: Wire = { cur: (k) => vals[k] ?? '', minmax: () => s.size, scope: site };
-  const rows = `${blocked}${defGroups(mallSet(site), wire)}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
+  // 자동 호출·모델·상품 수·구획·값 기준과 상점 넷이 같이 쓰는 값은 설정 → 상점에 있다 (ui/famtable.ts shopTable)
+  const rows = `${blocked}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 

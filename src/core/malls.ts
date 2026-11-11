@@ -4,7 +4,7 @@
 import type { Chat } from './types';
 import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
 import type { GuideName } from './guides';
-import { lastBot } from './shop';
+import { lastBot, SHOP_SHARED_VARS } from './shop';
 import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
 import { aliveAnchors } from './wallet';
@@ -27,12 +27,13 @@ export const mallAutoKey = (site: MallSite) => `$${site}_sh_auto`;
 
 type Vars = Record<string, unknown> | undefined;
 
-/** 상점 설정 함수에 넘길 변수: 그 사이트 값($cos_sh_*)을 상점 이름($sh_*)으로 비춘다. 사이트에 없는 값은 상점 값을 쓰지 않고 기본값 */
+/** 상점 설정 함수에 넘길 변수: 그 사이트 값($cos_sh_*)을 상점 이름($sh_*)으로 비춘다. 사이트에 없는 값은 상점 값을 쓰지 않고 기본값.
+ *  상점 넷이 같이 쓰는 값(SHOP_SHARED_VARS)은 기본 상점 자리의 값 그대로 */
 export function mallVars(vars: Vars, site: MallSite): Record<string, unknown> {
   const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_')) out[k] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_') || SHOP_SHARED_VARS.includes(k)) out[k] = v;
   const pre = `$${site}_sh_`;
-  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre)) out[`$sh_${k.slice(pre.length)}`] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith(pre) && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(pre.length)}`)) out[`$sh_${k.slice(pre.length)}`] = v;
   return out;
 }
 

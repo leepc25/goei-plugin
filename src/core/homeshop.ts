@@ -3,7 +3,7 @@
 // 상품 줄·요청문·참고 자료는 상점(core/shop.ts)을 그대로 쓰고, 설정 값만 사이트 것($hs_sh_*, 우주몰·포인트몰과 같은 방식).
 // 여기는 순수 계산: 설정·저장 모양·응답 해석·동작 고르기. 화면은 ui/homeshop.ts, 그림은 host/homeshop.ts.
 import { expectOf, type PackSpec } from './datapack';
-import { lastBot, parseShelf, shopSettings, ShopError, type ShopIdentity, type ShopItem, type ShopSettings } from './shop';
+import { lastBot, parseShelf, shopSettings, ShopError, SHOP_SHARED_VARS, type ShopIdentity, type ShopItem, type ShopSettings } from './shop';
 import type { Chat } from './types';
 import { userTurns, type PromptMessage } from './request';
 import { aliveAnchors } from './wallet';
@@ -95,8 +95,8 @@ export const hsKey = (shKey: string): string => `$hs_${shKey.slice(1)}`;
 /** 상점 설정 함수에 넘길 변수: $hs_sh_* 를 $sh_* 로 비춘다 (core/malls.ts mallVars 와 같은 방식) */
 export function hsVars(vars: Vars): Record<string, unknown> {
   const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_')) out[k] = v;
-  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith('$hs_sh_')) out[`$sh_${k.slice(7)}`] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) if (!k.startsWith('$sh_') || SHOP_SHARED_VARS.includes(k)) out[k] = v;
+  for (const [k, v] of Object.entries(vars ?? {})) if (k.startsWith('$hs_sh_') && !SHOP_SHARED_VARS.includes(`$sh_${k.slice(7)}`)) out[`$sh_${k.slice(7)}`] = v;
   return out;
 }
 

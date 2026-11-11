@@ -22,7 +22,7 @@ import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON
 import { pointsFlagFor } from '../core/points';
 import { ICON_ALIAS_DEFAULT, readIconMisses } from '../core/iconmatch';
 import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
-import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopBlocked, shopSettings, stripShopTags } from '../core/shop';
+import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
 import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_LOOSE_VAR, WALLET_MAX, WALLET_RECENT_MAX, WALLET_RECENT_VAR, WALLET_SYNC_VAR, walletBalance, walletEditable, walletLoose, walletRecentN, walletStarted, walletSyncOn, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
@@ -65,6 +65,8 @@ import { imgUi } from './imgprompt';
 import { PP, ppValue } from '../core/people/settings';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
+import { mallAutoKey, mallKey, mallSettings, type MallSite } from '../core/malls';
+import { HS_KEY, hsKey, hsSettings } from '../core/homeshop';
 import { wikiSettingsPane } from './wiki';
 import { peopleSettingsPane, peopleFactionPane } from './people';
 import { journalSettingsPane } from './records';
@@ -439,14 +441,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     // 상점 (2026-11-07 사용자): 표식 `[shop: 가게|주인]` 으로 열리는 상점 팝업의 생성 방식. 채팅 변수 $sh_* 또는 새 채팅 기본값
     shop: (() => {
       const sh = shopSettings(itVars);
-      const blocked = shopBlocked(itVars);
       return [
-        group('', [
-          // 상점은 소지품·가계부에 딸림 (2026-11-07 사용자): 둘 중 하나가 꺼지면 꺼지고 스위치도 잠긴다
-        blocked ? D('shop-on-locked', '', { ctl: seg('set-shop-on', '0', [['1', 'ON'], ['0', 'OFF']], true), help: `${blocked === 'both' ? '소지품과 가계부가' : blocked === 'items' ? '소지품이' : '가계부가'} 꺼져 있어 상점도 꺼져 있어요. 상점은 물건을 소지품에 넣고 돈을 가계부로 주고받아서 둘 다 켜져 있어야 써요.` }) :
-        D('shop-on', (sh.on) ? '1' : '0'),
-          ...(sh.on ? [D('shop-model', sh.model), D('shop-thoughts', sh.thoughts)] : []),
-        ].join('')),
         ...(sh.on ? [
           group('열리는 조건', [
           (() => {
@@ -457,19 +452,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           })(),
             D('shop-where', sh.where),
             ownShopsField(itVars, busy),
-          ].join('')),
-          group('참조', [
-            D('shop-ctx', sh.context ? '1' : '0'),
-            D('shop-turns', '', { ctl: stepper('set-shop-turns', 'n', `${sh.turns}턴`, sh.turns > 1, sh.turns < 8, '최근 본문 턴 수', busy) }),
-            D('shop-refs', '', { ctl: stepper('set-shop-refs', 'n', `${sh.refs}개`, sh.refs > 0, sh.refs < 12, '참고 로어북 수', busy) }),
-          ].join('')),
-          group('진열대와 주인', [
-            D('shop-min', '', { ctl: `<div class="st-range"><span>최소</span>${stepper('set-shop-min', 'n', `${sh.size[0]}개`, sh.size[0] > SHOP_SIZE_LO, sh.size[0] < SHOP_SIZE_HI, '최소', busy)}<span>최대</span>${stepper('set-shop-max', 'n', `${sh.size[1]}개`, sh.size[1] > SHOP_SIZE_LO, sh.size[1] < SHOP_SIZE_HI, '최대', busy)}</div>`, help: `한 번에 받을 물건 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}). 모델에 「최소~최대 개」로 넘기고, 같게 두면 늘 그 수만큼 나와요. 새로고침·전체 다시 짜기에도 같은 범위예요.` }),
-            D('shop-feature', (sh.feature) ? '1' : '0'),
-            D('shop-price', '', { ctl: `<input class="st-text" type="text" maxlength="80" value="${esc(sh.price)}" data-change="set-shop-price" placeholder="예: 동네 가게 값, 괴이 관련 물건은 비싸게" aria-label="값 기준"${busy ? ' disabled' : ''}>` }),
-            D('shop-diverse', (sh.diverse) ? '1' : '0'),
-            D('shop-prev', (sh.avoidPrev) ? '1' : '0'),
-            D('shop-kick', (sh.kick) ? '1' : '0'),
           ].join('')),
         ] : []),
       ].join('');
@@ -614,6 +596,51 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
   if (!Number.isFinite(n)) return null;
   const clamped = Math.min(f.max ?? 99, Math.max(0, f.fraction ? n : Math.round(n)));
   return clamped === cur ? null : [f.key, clamped];
+}
+
+/** 설정 → 상점의 격자와 그 아래 줄 (fam-* 의 상점 쪽). col = 기본 상점·쇼핑몰 둘·망상홈쇼핑.
+ *  네 곳이 같이 쓰는 값(맥락 반영·챗로그 포함·참조 로어북·생각 단계·다양성 강화·지난 목록 피하기)과 거래 끊음은 기본 상점 자리($sh_*) 하나 */
+export type ShopCol = 'shop' | MallSite | 'hs';
+export async function shopFamSet(ctx: ChatContext, env: SettingsEnv, scope: 'chat' | 'defaults', col: ShopCol, key: string, raw: string): Promise<boolean> {
+  const vars = scope === 'defaults' ? getPrefs().vars : ctx.chat.scriptstate;
+  const name = (sh: string) => (col === 'shop' ? sh : col === 'hs' ? hsKey(sh) : mallKey(sh, col));
+  const cur = col === 'shop' ? shopSettings(vars) : col === 'hs' ? hsSettings(vars).shop : mallSettings(vars, col);
+  const flag = raw === '1' || raw === '0';
+  const int = (lo: number, hi: number): number | null => { const n = Math.round(Number(raw)); return raw.trim() !== '' && Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : null; };
+  let patch: Record<string, string> | null = null;
+  if (key === 'on') {
+    // 기본 상점을 끄면 진행 중 방문을 닫아야 해서 원래 처리기로
+    if (col === 'shop' && flag) return handleSettings('set-shop-on', raw, ctx, env, scope);
+    if (col === 'hs' && flag) patch = { [HS_KEY.on]: raw };
+  } else if (key === 'auto') {
+    if ((col === 'cos' || col === 'bm') && ['manual', 'open', 'turn'].includes(raw)) patch = { [mallAutoKey(col)]: raw };
+    else if (col === 'hs' && (raw === 'manual' || raw === 'open')) patch = { [HS_KEY.auto]: raw };
+  } else if (key === 'model') {
+    if (raw === 'main' || raw === 'aux') patch = { [name(SHOP_MODEL_VAR)]: raw };
+  } else if (key === 'feature') {
+    if (col !== 'hs' && flag) patch = { [name(SHOP_FEATURE_VAR)]: raw };
+  } else if (key === 'price') {
+    patch = { [name(SHOP_PRICE_VAR)]: raw.replace(/\s+/g, ' ').trim().slice(0, 80) };
+  } else if (key === 'min' || key === 'max') {
+    // 최소·최대는 늘 둘 다 적는다. 서로 넘으면 다른 쪽도 같이 민다
+    const n = int(SHOP_SIZE_LO, SHOP_SIZE_HI);
+    if (n !== null) {
+      let [lo, hi] = cur.size;
+      if (key === 'min') { lo = n; if (lo > hi) hi = lo; } else { hi = n; if (hi < lo) lo = hi; }
+      patch = { [name(SHOP_MIN_VAR)]: String(lo), [name(SHOP_MAX_VAR)]: String(hi) };
+    }
+  } else if (col === 'shop') {
+    const FLAGS: Record<string, string> = { ctx: SHOP_CTX_VAR, diverse: SHOP_DIVERSE_VAR, prev: SHOP_PREV_VAR, kick: SHOP_KICK_VAR };
+    if (FLAGS[key] && flag) patch = { [FLAGS[key]]: raw };
+    else if (key === 'thoughts' && ['off', 'inner', 'note'].includes(raw)) patch = { [SHOP_THOUGHTS_VAR]: raw };
+    else if (key === 'turns') { const n = int(1, 8); if (n !== null) patch = { [SHOP_TURNS_VAR]: String(n) }; }
+    else if (key === 'refs') { const n = int(0, 12); if (n !== null) patch = { [SHOP_REFS_VAR]: String(n) }; }
+  }
+  if (!patch) return env.render(), true;
+  const out = patch;
+  if (scope === 'defaults') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), ...out } }));
+  else await save(ctx, env, (chat) => (Object.entries(out).every(([k, v]) => String(chat.scriptstate?.[k] ?? '') === v) ? null : out));
+  return true;
 }
 
 export async function handleSettings(action: string, value: string | undefined, ctx: ChatContext, env: SettingsEnv, scope: SettingsScope = 'chat'): Promise<boolean> {

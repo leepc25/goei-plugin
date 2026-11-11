@@ -24,6 +24,7 @@ import { startPage } from './start';
 import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
 import { callSummary } from './flow';
+import { boardTable, shopTable } from '../famtable';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manageConfirmPopup, manUi, type ManageNode, manageFile } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 import { featurePane, mainDefaultsPopup, resetHooks, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
@@ -35,10 +36,10 @@ import { isPhone } from '../media';
 import { markCommitted, morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
+export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'gal' | 'wpf' | 'sm' | 'cos' | 'bm' | 'hs' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'items' | 'shop' | 'people' | 'factions' | 'lore' | 'adv' | 'update' | 'net';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'start' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv', 'update', 'net'];
 /** 패널 기능 설정 화면을 그대로 쓰는 페이지 (게시판 사이트·괴담톡·위키·기록) */
 const isFeatPage = (p: string): p is NonNullable<typeof settingsUi.page> & string => ['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'people', 'journal', 'factions'].includes(p);
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
@@ -49,7 +50,7 @@ const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['worl
 export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'start' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || (n.startsWith('manage:') && n !== 'manage:flow') ? 'manage' : 'set');
 // 「호출 흐름」(manage:flow) 은 점검이 아니라 기능 탭 맨 위 (2026-11-07 사용자: 설정된 흐름을 보는 페이지니 기능에 있어야)
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
-const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n === 'manage:lore' ? 'set:lore' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
+const legacyNode = (n: string): EditorNode => (/^set:(gnet|gal|wpf|sm)$/.test(n) ? 'set:net' : n === 'set:guides' ? 'guide:RP' : n === 'set:update' ? 'install' : n === 'manage:lore' ? 'set:lore' : n.startsWith('rule:') ? 'rule:all' : (n as EditorNode));
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
@@ -386,8 +387,8 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', gal: '괴담갤', wpf: '세정게', sm: '연어 마켓', cos: '우주 쇼핑몰', bm: '백일몽 포인트몰', hs: '망상홈쇼핑', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: siteLogo('gn'), gal: siteLogo('gal'), wpf: siteLogo('wpf'), sm: siteLogo('sm'), cos: siteLogo('cos'), bm: siteLogo('bm'), hs: siteLogo('hs'), phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', gal: '괴담갤', wpf: '세정게', sm: '연어 마켓', cos: '우주 쇼핑몰', bm: '백일몽 포인트몰', hs: '망상홈쇼핑', phone: '괴담톡', wiki: '위키', journal: '일지', wallet: '가계부', items: '소지품', shop: '상점', people: '인물', factions: '세력', lore: '로어북 호출', adv: '생성 공통', update: '업데이트', net: '인터넷' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: siteLogo('gn'), gal: siteLogo('gal'), wpf: siteLogo('wpf'), sm: siteLogo('sm'), cos: siteLogo('cos'), bm: siteLogo('bm'), hs: siteLogo('hs'), phone: ICONS.phone, wiki: ICONS.wiki, journal: ICONS.records, wallet: ICONS.wallet, items: ICONS.bag, shop: ICONS.swap, people: ICONS.group, factions: ICONS.org, lore: ICONS.book, adv: ICONS.pen, update: ICONS.refresh, net: ICONS.net };
 /** [노드, 이름, 아이콘, 배지?, 하위 항목?]. 노드가 `label:…` 이면 누를 수 없는 소제목 줄 (설정 「기록」 아래 하위 메뉴, 2026-11-05 사용자) */
 type TreeItem = [EditorNode | `label:${string}`, string, string, string?, boolean?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
@@ -402,11 +403,12 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       ...(['lore', 'adv', 'screen', 'image', 'status'] as SetPage[]).map(setItem),
     ] }, { title: '기능', items: [
       setItem('board'),
-      ['label:net', '인터넷', ICONS.net],
-      ...(['gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs'] as SetPage[]).map(subItem),
+      // 4단계: 틀로 묶는다. 인터넷 = 게시판 넷(누르면 게시판 표), 상점 = 기본 상점 + 쇼핑몰 둘 + 망상홈쇼핑(누르면 상점 표)
+      setItem('net'),
       ...(['phone', 'wiki'] as SetPage[]).map(setItem),
       // 가계부·소지품·상점은 한 페이지 「소지품」 (2026-11-07 사용자: 각자 설정이 적어 합침, 켜고 끄기는 따로)
       ...(['wallet', 'items', 'shop'] as SetPage[]).map(setItem),
+      ...(['cos', 'bm', 'hs'] as SetPage[]).map(subItem),
       ['label:records', '기록', ICONS.records],
       ...(['journal', 'people', 'factions'] as SetPage[]).map(subItem),
     ] }];
@@ -453,7 +455,8 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   // 2026-11-08 사용자: 안 읽히고, 요청 글 모양(내부 로직)을 예로 보일 까닭이 없다 → 짧게, 예 없음
   wallet: { desc: '응답에 나온 거래를 읽어 잔고와 거래 내역을 기록해요.', example: '' },
   items: { desc: '가진 물건을 기록하고 메인 요청에 넘겨요.', example: '' },
-  shop: { desc: '지금 장면에 살 수 있는 곳이 있으면 상점 카드를 띄워요. 가계부와 소지품을 둘 다 켜야 쓸 수 있어요.', example: '' },
+  shop: { desc: '물건을 사고파는 곳의 설정이에요. 표의 값은 상점마다 따로 정하고, 그 아래 줄의 값은 네 곳이 같이 써요.', example: '' },
+  net: { desc: '괴담넷·괴담갤·세정게·연어 마켓의 설정이에요.', example: '' },
   factions: { desc: '세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지를 여기서 정해요.', example: '' },
   lore: { desc: '세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 다음 요청에 어떤 로어북이 들어가는지는 아래에서 바로 볼 수 있어요.', example: '' },
   adv: { desc: '괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.', example: '' },
@@ -489,7 +492,9 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'journal': body = feat('journal'); break;
     case 'wallet': body = sec('wallet'); break;
     case 'items': body = sec('items'); break;
-    case 'shop': body = sec('shop'); break;
+    // 상점 표는 아래 「열리는 조건」과 같은 범위(시작 전 = 새 채팅 기본값)의 값을 보이고 고친다. 게시판 표는 기능 페이지처럼 늘 이 채팅
+    case 'shop': body = shopTable(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, settingsUi.busy) + sec('shop'); break;
+    case 'net': body = boardTable(ctx.chat.scriptstate); break;
     case 'factions': body = feat('factions'); break;
     // 2026-11-10 사용자: 점검에 따로 있던 「다음 호출 로어북」을 여기로 합침 (고르는 설정 바로 아래에서 결과를 본다)
     case 'lore': body = sec('lore') + (canChat ? loreCheckBox(ctx, true) : '<section class="ps-group"><h3>다음 호출 로어북</h3><p class="ps-note">채팅을 시작하면 볼 수 있어요.</p></section>'); break;
@@ -531,9 +536,14 @@ function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>
 
 /* 설정 찾기 (2026-11-06 사용자 승인, 전수점검 8-10·9-3): 기능 탭 왼쪽 목록 위의 칸 하나.
    각 설정 페이지를 그린 HTML에서 줄 이름·설명·묶음 제목을 모아 두고, 적은 말이 들어간 줄을 목록 자리에 보여 준다. 누르면 그 페이지로 가서 그 줄을 비춘다 */
+/** 격자의 열 머리 (PC·폰 두 벌 가운데 PC 것만) */
+const GRID_HEADS = '.ck-pc .ck-h1 > b, .mx-grid:not(.ck-ph) .mx-head label';
+/** 그 이름의 격자 열이 든 격자 (줄에서 못 찾았을 때) */
+const gridOf = (scope: ParentNode | null | undefined, label: string): HTMLElement | null =>
+  [...(scope?.querySelectorAll<HTMLElement>(GRID_HEADS) ?? [])].find((b) => b.textContent?.trim() === label)?.closest<HTMLElement>('.ps-group') ?? null;
 type FindHit = { page: SetPage; label: string; group: string; help: string };
 let findIndex: FindHit[] | null = null;
-const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'gal', 'wpf', 'sm', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv'];
+const FIND_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'net', 'cos', 'bm', 'hs', 'phone', 'wiki', 'journal', 'wallet', 'items', 'shop', 'people', 'factions', 'lore', 'adv'];
 const findNorm = (s: string) => s.toLowerCase().replace(/\s+/g, '');
 function buildFindIndex(ctx: ChatContext): FindHit[] {
   const out: FindHit[] = [];
@@ -555,6 +565,11 @@ function buildFindIndex(ctx: ChatContext): FindHit[] {
       const group = row.closest('.ps-group, .ps-card, details')?.querySelector('h3, h4, summary')?.textContent?.trim() ?? '';
       const help = row.querySelector('.ps-label > small')?.textContent?.trim() ?? '';
       out.push({ page, label, group, help });
+    });
+    // 격자(인터넷·상점)의 열 묶음(자동 호출·모델·사생활…)과 글자 칸 표의 열 이름도 찾을 수 있게
+    doc.querySelectorAll<HTMLElement>(GRID_HEADS).forEach((b) => {
+      const label = b.textContent?.trim() ?? '';
+      if (label) out.push({ page, label, group: b.closest('.ps-group')?.querySelector('h3')?.textContent?.trim() ?? '', help: '' });
     });
   }
   settingsUi.page = keepPage;
@@ -591,7 +606,8 @@ export function flashSpot(to: string): void {
   const [label, grp] = to.slice(2).split('@');
   const head = (h: Element | null) => (h ? [...h.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? '').join('').trim() : '');
   const row = [...body.querySelectorAll<HTMLElement>('.ps-row')].find((r) => head(r.querySelector('.ps-label > b')) === label && (!grp || r.closest('.ps-group')?.querySelector('h3')?.textContent?.trim() === grp));
-  if (row) flashEl(row, 'center');
+  const el = row ?? gridOf(body, label);
+  if (el) flashEl(el, 'center');
 }
 
 function flashFound(hit: FindHit): void {
@@ -600,7 +616,8 @@ function flashFound(hit: FindHit): void {
     const b = r.querySelector<HTMLElement>('.ps-label > b');
     return b && [...b.childNodes].filter((n) => !(n instanceof HTMLElement && n.tagName === 'I')).map((n) => n.textContent ?? '').join('').trim() === hit.label;
   });
-  if (row) flashEl(row, 'center');
+  const el = row ?? gridOf(root?.querySelector('.gw-body'), hit.label);
+  if (el) flashEl(el, 'center');
 }
 
 /* 세계 통합 검색 (2026-11-07 사용자): 세계 탭 왼쪽 목록 위 칸 하나. 요원·조직·괴이·파밍·부록 이름·부제를 한꺼번에 찾고, 누르면 그 종류 화면에서 그 기록을 연다 */
