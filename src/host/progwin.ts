@@ -24,6 +24,8 @@ const WATCHDOG = PROGRESS_WATCHDOG;
 /** 파형(심전도 선) 아이콘 — 유령은 플로팅 단추가 쓰니 다른 모양 */
 const PULSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12h4l2.5-6 4 12 2.5-6h6"/></svg>';
 
+// 안쪽 표시는 class 가 아니라 data-p(무엇)·data-s(상태)·data-mono 로 한다: Risu 의 setInnerHTML 은 class·style 속성을 지워서
+// v0.21.6~0.21.8 에서 진행 창 안쪽이 모양 없이 글만 줄줄이 나왔다 (2026-11-11 사용자). 다른 화면 조각(host/overlay.ts·usebox.ts)과 같은 방식
 const CSS = `
 ${themeVars('[x-goei-prog]')}
 [x-goei-prog] { --p-dim: #97A9A5; --p-danger: #FF7A6B; --p-void: #1A2226; }
@@ -37,7 +39,7 @@ ${themeVars('[x-goei-prog]')}
 }
 [x-goei-prog][x-goei-show="true"] { display: block; }
 [x-goei-prog] * { box-sizing: border-box; }
-[x-goei-prog] .mono { font-family: 'JetBrains Mono', 'IBM Plex Sans KR', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+[x-goei-prog] [data-mono] { font-family: 'JetBrains Mono', 'IBM Plex Sans KR', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
 /* 카드: 오른쪽 위 꼭짓점을 기준으로 자라고 줄어든다 */
 [x-goei-prog] [data-card] {
   position: absolute; top: 0; right: 0; width: ${CARD_W}px;
@@ -49,33 +51,33 @@ ${themeVars('[x-goei-prog]')}
 [x-goei-prog] [data-grip] { display: flex; align-items: center; gap: 8px; color: var(--g-sub); font-size: 11.5px; font-weight: 600; letter-spacing: .04em; cursor: grab; user-select: none; -webkit-user-select: none; }
 [x-goei-prog][x-goei-drag="true"] [data-grip] { cursor: grabbing; }
 [x-goei-prog] [data-grip] svg { width: 14px; height: 14px; color: var(--g-signal); flex: 0 0 14px; }
-[x-goei-prog] [data-grip] .n { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--p-dim); }
-[x-goei-prog] .t { margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--g-text); }
-[x-goei-prog] .m { margin-top: 2px; color: var(--p-dim); font-size: 12px; }
-[x-goei-prog] .m b { font-weight: 600; color: var(--g-sub); }
-[x-goei-prog] .cells { display: grid; gap: 3px; margin-top: 9px; }
-[x-goei-prog] .c { height: 18px; display: grid; place-items: center; padding: 0 3px; border-radius: 4px; border: 1px solid var(--g-line); background: var(--p-void); color: var(--p-dim); font-size: 9.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-[x-goei-prog] .c.done { border-color: var(--g-acc-line); background: var(--g-acc); color: var(--g-signal); }
-[x-goei-prog] .c.run { border-color: var(--g-signal); background: var(--g-acc); color: var(--g-text); box-shadow: 0 0 7px color-mix(in srgb, var(--g-signal) 55%, transparent); }
-[x-goei-prog] .c.fail { border-color: var(--p-danger); color: var(--p-danger); }
-[x-goei-prog] .c.skip { opacity: .45; }
-[x-goei-prog] .rows { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--g-line); }
-[x-goei-prog] .r { display: grid; grid-template-columns: 16px 1fr auto; column-gap: 8px; align-items: center; padding: 5px 8px; margin: 0 -8px; border-radius: 8px; font-size: 12.5px; color: var(--p-dim); }
-[x-goei-prog] .r .nm { color: var(--g-sub); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-[x-goei-prog] .r .dt { color: var(--p-dim); font-size: 11px; margin-left: 6px; font-weight: 400; }
-[x-goei-prog] .r .tm { font-size: 11.5px; color: var(--p-dim); text-align: right; white-space: nowrap; }
-[x-goei-prog] .r.run { background: var(--g-acc); }
-[x-goei-prog] .r.run .nm { color: var(--g-text); font-weight: 600; }
-[x-goei-prog] .r.run .tm { color: var(--g-signal); }
-[x-goei-prog] .r.wait .nm, [x-goei-prog] .r.skip .nm { color: var(--p-dim); }
-[x-goei-prog] .r.skip { opacity: .55; }
-[x-goei-prog] .r.fail .nm, [x-goei-prog] .r.fail .tm, [x-goei-prog] .r.fail .dt { color: var(--p-danger); }
-[x-goei-prog] .ic { width: 16px; height: 16px; display: grid; place-items: center; }
-[x-goei-prog] .ic::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
-[x-goei-prog] .ic.done::before { background: var(--g-signal); }
-[x-goei-prog] .ic.wait::before, [x-goei-prog] .ic.skip::before { border: 1.5px solid var(--g-line); width: 7px; height: 7px; }
-[x-goei-prog] .ic.run::before { width: 10px; height: 10px; border: 2px solid var(--g-signal); border-right-color: transparent; animation: goei-prog-spin .8s linear infinite; }
-[x-goei-prog] .ic.fail::before { background: var(--p-danger); }
+[x-goei-prog] [data-grip] [data-p="n"] { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--p-dim); }
+[x-goei-prog] [data-p="t"] { margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--g-text); }
+[x-goei-prog] [data-p="m"] { margin-top: 2px; color: var(--p-dim); font-size: 12px; }
+[x-goei-prog] [data-p="m"] b { font-weight: 600; color: var(--g-sub); }
+[x-goei-prog] [data-p="cells"] { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 3px; margin-top: 9px; }
+[x-goei-prog] [data-p="c"] { height: 18px; display: grid; place-items: center; padding: 0 3px; border-radius: 4px; border: 1px solid var(--g-line); background: var(--p-void); color: var(--p-dim); font-size: 9.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[x-goei-prog] [data-p="c"][data-s="done"] { border-color: var(--g-acc-line); background: var(--g-acc); color: var(--g-signal); }
+[x-goei-prog] [data-p="c"][data-s="run"] { border-color: var(--g-signal); background: var(--g-acc); color: var(--g-text); box-shadow: 0 0 7px color-mix(in srgb, var(--g-signal) 55%, transparent); }
+[x-goei-prog] [data-p="c"][data-s="fail"] { border-color: var(--p-danger); color: var(--p-danger); }
+[x-goei-prog] [data-p="c"][data-s="skip"] { opacity: .45; }
+[x-goei-prog] [data-p="rows"] { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--g-line); }
+[x-goei-prog] [data-p="r"] { display: grid; grid-template-columns: 16px 1fr auto; column-gap: 8px; align-items: center; padding: 5px 8px; margin: 0 -8px; border-radius: 8px; font-size: 12.5px; color: var(--p-dim); }
+[x-goei-prog] [data-p="r"] [data-p="nm"] { color: var(--g-sub); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[x-goei-prog] [data-p="r"] [data-p="dt"] { color: var(--p-dim); font-size: 11px; margin-left: 6px; font-weight: 400; }
+[x-goei-prog] [data-p="r"] [data-p="tm"] { font-size: 11.5px; color: var(--p-dim); text-align: right; white-space: nowrap; }
+[x-goei-prog] [data-p="r"][data-s="run"] { background: var(--g-acc); }
+[x-goei-prog] [data-p="r"][data-s="run"] [data-p="nm"] { color: var(--g-text); font-weight: 600; }
+[x-goei-prog] [data-p="r"][data-s="run"] [data-p="tm"] { color: var(--g-signal); }
+[x-goei-prog] [data-p="r"][data-s="wait"] [data-p="nm"], [x-goei-prog] [data-p="r"][data-s="skip"] [data-p="nm"] { color: var(--p-dim); }
+[x-goei-prog] [data-p="r"][data-s="skip"] { opacity: .55; }
+[x-goei-prog] [data-p="r"][data-s="fail"] [data-p="nm"], [x-goei-prog] [data-p="r"][data-s="fail"] [data-p="tm"], [x-goei-prog] [data-p="r"][data-s="fail"] [data-p="dt"] { color: var(--p-danger); }
+[x-goei-prog] [data-p="ic"] { width: 16px; height: 16px; display: grid; place-items: center; }
+[x-goei-prog] [data-p="ic"]::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+[x-goei-prog] [data-p="ic"][data-s="done"]::before { background: var(--g-signal); }
+[x-goei-prog] [data-p="ic"][data-s="wait"]::before, [x-goei-prog] [data-p="ic"][data-s="skip"]::before { border: 1.5px solid var(--g-line); width: 7px; height: 7px; }
+[x-goei-prog] [data-p="ic"][data-s="run"]::before { width: 10px; height: 10px; border: 2px solid var(--g-signal); border-right-color: transparent; animation: goei-prog-spin .8s linear infinite; }
+[x-goei-prog] [data-p="ic"][data-s="fail"]::before { background: var(--p-danger); }
 /* 접힌 단추 (PC): 유령 단추와 같은 규격 48px */
 [x-goei-prog] [data-dot] {
   position: absolute; top: 0; right: 0; width: ${BTN}px; height: ${BTN}px; margin: 0; padding: 0;
@@ -85,9 +87,9 @@ ${themeVars('[x-goei-prog]')}
 [x-goei-prog] [data-dot] svg { width: 26px; height: 26px; }
 [x-goei-prog][x-goei-open="true"] [data-dot] { opacity: 0; pointer-events: none; }
 [x-goei-prog][x-goei-run="true"] [data-dot] svg path { stroke-dasharray: 6 4; animation: goei-prog-flow 1s linear infinite; }
-[x-goei-prog] [data-dot] .bad { display: none; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--p-danger); border: 2px solid var(--g-panel); }
-[x-goei-prog][x-goei-fail="true"] [data-dot] .bad { display: block; }
-[x-goei-prog] [data-dot] .dots { display: none; }
+[x-goei-prog] [data-dot] [data-p="bad"] { display: none; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--p-danger); border: 2px solid var(--g-panel); }
+[x-goei-prog][x-goei-fail="true"] [data-dot] [data-p="bad"] { display: block; }
+[x-goei-prog] [data-dot] [data-p="dots"] { display: none; }
 /* 폰: 상단 바 아래 오른쪽 가장자리에 붙은 막대 (점 다섯 개, 길이 고정). 카드는 눌렀을 때만 */
 [x-goei-prog][x-goei-phone="true"] { right: 0; top: 64px; }
 [x-goei-prog][x-goei-phone="true"] [data-dot] {
@@ -96,12 +98,12 @@ ${themeVars('[x-goei-prog]')}
 }
 [x-goei-prog][x-goei-phone="true"] [data-dot] svg { width: 14px; height: 14px; margin-bottom: 1px; color: var(--g-sub); }
 [x-goei-prog][x-goei-phone="true"][x-goei-run="true"] [data-dot] svg { color: var(--g-signal); }
-[x-goei-prog][x-goei-phone="true"] [data-dot] .dots { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-[x-goei-prog] .d { width: 7px; height: 7px; border-radius: 50%; background: var(--g-line); }
-[x-goei-prog] .d.done { background: var(--g-signal); }
-[x-goei-prog] .d.run { width: 9px; height: 9px; background: var(--g-signal); box-shadow: 0 0 7px var(--g-signal); animation: goei-prog-blink 1s ease-in-out infinite; }
-[x-goei-prog] .d.skip { background: transparent; border: 1.5px solid var(--g-line); width: 6px; height: 6px; }
-[x-goei-prog] .d.fail { background: var(--p-danger); }
+[x-goei-prog][x-goei-phone="true"] [data-dot] [data-p="dots"] { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+[x-goei-prog] [data-p="d"] { width: 7px; height: 7px; border-radius: 50%; background: var(--g-line); }
+[x-goei-prog] [data-p="d"][data-s="done"] { background: var(--g-signal); }
+[x-goei-prog] [data-p="d"][data-s="run"] { width: 9px; height: 9px; background: var(--g-signal); box-shadow: 0 0 7px var(--g-signal); animation: goei-prog-blink 1s ease-in-out infinite; }
+[x-goei-prog] [data-p="d"][data-s="skip"] { background: transparent; border: 1.5px solid var(--g-line); width: 6px; height: 6px; }
+[x-goei-prog] [data-p="d"][data-s="fail"] { background: var(--p-danger); }
 [x-goei-prog][x-goei-phone="true"] [data-card] { right: 10px; top: 0; width: min(${CARD_W + 30}px, calc(100vw - 20px)); }
 [x-goei-prog][x-goei-phone="true"] [data-grip] { cursor: pointer; }
 @keyframes goei-prog-spin { to { transform: rotate(360deg); } }
@@ -147,18 +149,18 @@ function titleOf(t: Turn, now: number): string {
 function metaOf(t: Turn, now: number): string {
   if (t.endAt) {
     const s = turnSummary(t);
-    return `호출 <b class="mono">${num(s.calls)}</b>회 · <b class="mono">${num(s.req)} → ${num(s.resp)}</b> 토큰 · <b class="mono">${esc(secs(s.ms))}</b>`;
+    return `호출 <b data-mono>${num(s.calls)}</b>회 · <b data-mono>${num(s.req)} → ${num(s.resp)}</b> 토큰 · <b data-mono>${esc(secs(s.ms))}</b>`;
   }
   const run = running(t);
   const parts: string[] = [];
   if (run.length) {
     const models = [...new Set(run.map((c) => modelName(c.model)))].join('·');
     parts.push(run.length > 1 ? `${esc(models)} ${run.length}건 동시` : `${esc(models)} 모델`);
-    parts.push(`요청 <b class="mono">${num(run.reduce((n, c) => n + c.reqTokens, 0))}</b> 토큰`);
+    parts.push(`요청 <b data-mono>${num(run.reduce((n, c) => n + c.reqTokens, 0))}</b> 토큰`);
     const chars = run.reduce((n, c) => n + (c.chars ?? 0), 0);
-    if (chars) parts.push(`출력 <b class="mono">~${num(chars)}</b>자`);
+    if (chars) parts.push(`출력 <b data-mono>~${num(chars)}</b>자`);
   } else if (t.mainAt && !t.replyAt) parts.push('Risu 가 본편 응답을 받는 중');
-  parts.push(`경과 <b class="mono">${clock(now - t.at)}</b>`);
+  parts.push(`경과 <b data-mono>${clock(now - t.at)}</b>`);
   return parts.join(' · ');
 }
 
@@ -179,23 +181,23 @@ function rowDetail(t: Turn, s: Stage, st: StageState, now: number): { dt: string
 }
 
 export function cardHtml(t: Turn | null, now = Date.now()): string {
-  if (!t) return `<div data-grip>${PULSE}호출 진행<span class="n mono">—</span></div><div class="t">아직 호출이 없어요</div><div class="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
+  if (!t) return `<div data-grip>${PULSE}호출 진행<span data-p="n" data-mono>—</span></div><div data-p="t">아직 호출이 없어요</div><div data-p="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
   const { done, total } = stageCount(t);
-  const cells = t.plan.map((s) => `<div class="c ${stageState(t, s)}" title="${esc(s.note ? `${s.label} (${s.note})` : s.label)}">${esc(s.label)}</div>`).join('');
+  const cells = t.plan.map((s) => `<div data-p="c" data-s="${stageState(t, s)}" title="${esc(s.note ? `${s.label} (${s.note})` : s.label)}">${esc(s.label)}</div>`).join('');
   const rows = t.plan.map((s) => {
     const st = stageState(t, s);
     const { dt, tm } = rowDetail(t, s, st, now);
-    return `<div class="r ${st}"><i class="ic ${st}"></i><span class="nm">${esc(s.label)}${dt ? `<span class="dt">${esc(dt)}</span>` : ''}</span><span class="tm mono">${esc(tm)}</span></div>`;
+    return `<div data-p="r" data-s="${st}"><i data-p="ic" data-s="${st}"></i><span data-p="nm">${esc(s.label)}${dt ? `<span data-p="dt">${esc(dt)}</span>` : ''}</span><span data-p="tm" data-mono>${esc(tm)}</span></div>`;
   }).join('');
-  return `<div data-grip>${PULSE}${t.manual ? '수동 호출' : '호출 진행'}<span class="n mono">${done} / ${total}</span></div>`
-    + `<div class="t">${esc(titleOf(t, now))}</div><div class="m">${metaOf(t, now)}</div>`
-    + (total > 1 ? `<div class="cells" style="grid-template-columns:repeat(${total},minmax(0,1fr))">${cells}</div>` : '')
-    + `<div class="rows">${rows}</div>`;
+  return `<div data-grip>${PULSE}${t.manual ? '수동 호출' : '호출 진행'}<span data-p="n" data-mono>${done} / ${total}</span></div>`
+    + `<div data-p="t">${esc(titleOf(t, now))}</div><div data-p="m">${metaOf(t, now)}</div>`
+    + (total > 1 ? `<div data-p="cells">${cells}</div>` : '')
+    + `<div data-p="rows">${rows}</div>`;
 }
 
 export function dotHtml(t: Turn | null): string {
-  const dots = GROUPS.map((g) => `<i class="d ${t ? groupState(t, g) : 'skip'}" title="${GROUP_LABEL[g]}"></i>`).join('');
-  return `${PULSE}<span class="dots">${dots}</span><i class="bad"></i>`;
+  const dots = GROUPS.map((g) => `<i data-p="d" data-s="${t ? groupState(t, g) : 'skip'}" title="${GROUP_LABEL[g]}"></i>`).join('');
+  return `${PULSE}<span data-p="dots">${dots}</span><i data-p="bad"></i>`;
 }
 
 export interface ProgWin {
