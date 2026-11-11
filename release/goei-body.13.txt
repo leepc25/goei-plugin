@@ -1,4 +1,34 @@
-d2("상태창 잔고 따르기", seg9("set-wallet-sync", walletSyncOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요. 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요."),
+ntLimit < AGENT_MAX, "요원 표시 인원", busy6), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
+        field2("지원 투입", seg9("set-support", s8.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요."),
+        field2("인물 기록", seg9("set-people", peopleOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), scope === "chat" ? "응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서." : "새 채팅을 인물 기록을 켠 채로 시작할지 정해요.")
+      ].join(""))}
+    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
+      <div class="ps-cards">
+        ${worldKind(world2, "preset", "프리셋 괴이", busy6)}${worldKind(world2, "random", "랜덤 괴이", busy6)}
+        ${worldKind(world2, "incident", "사건", busy6)}${worldKind(world2, "mystic", "특수", busy6)}
+        <div class="ps-card"><h4>추가 발생 여유분</h4><div class="ps-rows">
+          ${worldRow(world2, "extra_cap", "괴이", "개", busy6)}${worldRow(world2, "extra_in_cap", "사건", "개", busy6)}${worldRow(world2, "extra_ms_cap", "특수", "개", busy6)}</div>
+          <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
+      </div>
+    </section>`,
+      // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
+      status: `${group6("상태창", [
+        field2("상태창", seg9("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy6), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", "device")
+      ].join(""))}
+    ${group6(
+        `상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`,
+        statusColsTable(colCfg, busy6, scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars),
+        `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === "chat" ? " 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요." : " 새 채팅의 기본 구성이에요."}`
+      )}
+`,
+      // 가계부(시작 잔고·잔고 직접 수정): 설정 「기록」 페이지 안의 묶음 (2026-11-05 사용자: 가계부가 기록 하위 탭이니 상태창에는 잔고 칸 표시만)
+      // 2026-11-07 사용자: 가계부·소지품·상점 설정을 「소지품」 한 페이지로, 켜고 끄기는 따로 (가계부 = 상태창 잔고 칸 $st_col_wallet)
+      wallet: group6("가계부", [
+        field2("가계부", seg9("set-wallet-on", colCfg.wallet === "off" ? "0" : "1", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 상태창에 잔고 칸을 두고, 본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 끄면 잔고 칸과 거래 기록이 빠져요. 소지품·상점과 따로 켜고 꺼요."),
+        ...colCfg.wallet === "off" ? [] : [
+          field2("시작 잔고", wonInput(walletStart, busy6, startLocked), scope === "chat" ? `이 채팅 가계부의 시작 잔고예요. 지금 잔고 ${esc36(formatWon(walletNow))}. 거래 내역은 소지품 → 가계부에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 가계부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요."),
+          field2("잔고 직접 수정", seg9("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워요."),
+          field2("상태창 잔고 따르기", seg9("set-wallet-sync", walletSyncOn(itVars) ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy6), "켜면 모델이 상태창 잔고 칸을 바꿨을 때 가계부를 그 값에 맞춰요. 끄면 가계부 값만 믿고, 다음 요청에 넘기는 지난 상태창의 잔고를 가계부 값으로 덮어 모델이 고치게 해요."),
           field2("거래 읽는 기준", seg9("set-wallet-loose", walletLoose(itVars) ? "1" : "0", [["0", "금액이 적힌 것만"], ["1", "어림도 받기"]], busy6), "금액이 적힌 것만이면 「3만 원을 냈다」처럼 금액이 글에 있는 거래만 적어요. 어림도 받기면 「밥을 사 먹었다」처럼 금액이 없는 거래도 보조 모델이 서울 물가로 어림해 메모에 「(어림)」을 붙여 적어요."),
           field2("최근 거래 넘기기", stepper3("set-wallet-recent", "n", `${walletRecentN(itVars)}줄`, walletRecentN(itVars) > 0, walletRecentN(itVars) < WALLET_RECENT_MAX, "최근 거래 줄 수", busy6), `본편 요청의 지난 상태창 아래에 최근 거래를 몇 줄 붙일지예요(0~${WALLET_RECENT_MAX}, 0이면 안 붙여요). 모델이 돈이 어디로 갔는지 알고 이어 써요.`)
         ]
@@ -3010,62 +3040,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-table td { padding: 6px 8px; border: 1px solid var(--line); }
 .nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
 .nw-link.on { color: #7fb8ff; text-decoration: none; }
-.nw-link:hover { text-decoration: underline; }
-.nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; }
-.nw-fn:hover, .nw-fn:focus-visible { background: var(--accent-bg); outline: none; }
-.nw-fn-in { color: var(--sub); font-size: 0.92em; }
-.nw-fig { margin: 10px 0; }
-.nw-fig img { display: block; max-width: 100%; max-height: 320px; border-radius: 8px; border: 1px solid var(--line); }
-.nw-fig figcaption { margin-top: 4px; color: var(--sub); font-size: 12px; }
-.nw-doc { position: relative; }
-.nw-fnpop { position: absolute; z-index: 5; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0, 0, 0, .35); font-size: 14px; line-height: 1.6; color: var(--text); pointer-events: none; }
-.nw-fnpop b { color: var(--signal); font-weight: 600; }
-.nw-notes li { padding: 2px 6px; margin: 0 -6px; border-radius: 6px; scroll-margin: 40px; }
-.nw-notes li.hit { animation: nw-fnhit 1.6s ease-out; }
-@keyframes nw-fnhit { from { background: var(--accent-bg); color: var(--text); } to { background: transparent; } }
-.nw-notes { margin: 18px 0 0; padding: 10px 10px 0 28px; border-top: 1px solid var(--line); font-size: 14px; color: var(--dim); }
-.nw-more { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; font-size: 14px; }
-.nw-more b { color: var(--dim); font-weight: 500; }
-.nw-meta p, .nw-fail p { margin: 6px 0; font-size: 13px; color: var(--dim); }
-.nw-fail textarea { width: 100%; font-size: 13px; }
-@media (max-width: 520px) {
-  .nw-infobox { float: none; width: 100%; margin: 0 0 12px; }
-}
-.nw .nw-title { margin: 0; font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
-
-/* 괴담넷 */
-.gn-nickform { display: flex; gap: 6px; }
-.gn-nickform .gx-search { width: 160px; }
-.gn-count { margin-left: 4px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; }
-.gn-notice { margin: 0; }
-.gn-dot { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--danger); vertical-align: middle; }
-.gn-post-body p, .gn-c-body p { margin: 0 0 6px; }
-.gn-post-body p:last-child, .gn-c-body p:last-child { margin-bottom: 0; }
-.gn-att { display: flex; gap: 8px; align-items: baseline; margin: 6px 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 14px; }
-.gn-att b { color: var(--amber); flex: none; }
-/* 첨부 (원본 at-card·at-menu) */
-.at-card { display: flex; gap: 10px; align-items: flex-start; margin: 6px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunk); font-size: 14px; line-height: 1.55; max-width: 100%; }
-.at-ico { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 8px; background: var(--accent-bg); color: var(--signal); }
-.at-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
-.at-copy small { color: var(--dim); font-size: 13px; }
-.at-card-gift .at-ico { background: var(--amber-bg); color: var(--amber); }
-.at-go { color: var(--mint); font-size: 13px; }
-.at-files { display: flex; flex-direction: column; gap: 0; margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 4px; }
-.at-files .at-card { background: none; border: 0; padding: 6px 0; margin: 0; }
-.ph-bubble .at-card { background: color-mix(in srgb, var(--panel) 70%, transparent); }
-.at-editor { display: flex; flex-direction: column; gap: 6px; }
-.at-item { display: flex; gap: 6px; align-items: center; }
-.at-item .gx-search { flex: 1; min-width: 0; }
-.at-kind { display: inline-flex; gap: 4px; align-items: center; flex: none; font-size: 13px; color: var(--amber); font-weight: 600; }
-.at-menu { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.at-add { display: inline-flex; gap: 4px; align-items: center; min-height: 34px; padding: 4px 10px; border: 1px dashed var(--line2); border-radius: 999px; background: none; color: var(--sub); font-size: 13px; }
-.at-add:hover:not(:disabled) { color: var(--signal); border-color: var(--accent-line); }
-.at-add:disabled { opacity: .45; }
-.ph-notice-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 8px; }
-.ph-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; font-size: 14px; color: var(--dim); }
-.gn-me { color: var(--signal); }
-
-.gn-settings .gx-muted { margin: 8px 0 0; font-size: 13px; }
-
-/* ── 괴담톡 ── */
-/* 괴담톡: 아래 「괴담톡 (v0.12.0)
+.nw-link:hover { text-decoration: 

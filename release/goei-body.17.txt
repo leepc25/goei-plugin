@@ -1,8 +1,121 @@
-hat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
+xtRules({ char: src.char, chat: view2 });
+      const st = readGnet(view2);
+      if (rule && (st.posts.length || st.dms.length)) parts.push({ cap: CONTEXT.tokens, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rule, focus)) });
+    }
+    if (wantPhone && rules2.phone) {
+      try {
+        const st = readPhone(chat);
+        const notices = readBulletins(chat);
+        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules2.phone, focus)) });
+      } catch (error) {
+        console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
+    return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
+  }
+  function withCap(box4, key, cap, run6) {
+    const keep = box4[key];
+    box4[key] = cap;
+    try {
+      return run6();
+    } finally {
+      box4[key] = keep;
+    }
+  }
+  function stripHistoryTags(messages) {
+    const dirty2 = (c) => typeof c === "string" && (hasWorldTags(c) || hasUnlockTag(c));
+    if (!messages.some((m) => m?.role === "assistant" && dirty2(m.content))) return messages;
+    return messages.map((m) => m?.role === "assistant" && dirty2(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m);
+  }
+  async function applyUnlocks(char, charIndex, chatIndex, messageIndex) {
+    const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
+    return updateChat(charIndex, chatIndex, (cur) => {
+      const m = cur.message?.[messageIndex];
+      const text4 = typeof m?.data === "string" ? m.data : "";
+      if (!m || !hasUnlockTag(text4)) return null;
+      const got = unlockTags(text4).filter((n3) => lockable.has(n3));
+      const message = [...cur.message ?? []];
+      message[messageIndex] = { ...m, data: stripUnlockTags(text4) };
+      const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
+      return { ...cur, message, scriptstate: ss };
+    });
+  }
+  async function onOutput(arg) {
+    setWaiting(false);
+    const after = [];
+    const pTurn = progressTurn();
+    try {
+      const raw0 = arg.char;
+      const chat = arg.chat;
+      if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return;
+      const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
+      const raw = chat.message?.[arg.messageIndex]?.data;
+      if (typeof raw !== "string") {
+        progressAbort(pTurn);
+        return;
+      }
+      traceReply(raw);
+      let latest = null;
+      if (chat.scriptstate?.["$st_anomaly_on"] === "1") {
+        const catalog = parseCatalog(char.globalLore);
+        latest = await updateChat(
+          arg.characterIndex,
+          arg.chatIndex,
+          (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
+        );
+      }
+      if (hasUnlockTag(raw)) latest = await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null) ?? latest;
+      const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
+      if (colConfig(chat.scriptstate).wallet !== "off" && walletSyncOn(chat.scriptstate) && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
+        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
+          return w ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } } : null;
+        }).catch(() => null) ?? latest;
+      }
+      {
+        const cur0 = latest ?? chat;
+        const flag2 = pointsAuto(cur0.scriptstate) ? pointsFlagFor(cur0, isPointsOrg(String(cur0.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
+        const needSync = colConfig(cur0.scriptstate).points !== "off" && walletSyncOn(cur0.scriptstate) && !!syncPointsToStatus(readPoints(cur0.scriptstate), cur0);
+        if (flag2 || needSync) {
+          latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+            const add = {};
+            const f = pointsAuto(cur.scriptstate) ? pointsFlagFor(cur, isPointsOrg(String(cur.scriptstate?.["$ib_affiliation"] ?? ""))) : null;
+            if (f) {
+              const vars = { ...cur.scriptstate ?? {}, [POINTS_ON_VAR]: f };
+              add[POINTS_ON_VAR] = f;
+              add[COL_LOG_VAR] = withColLog(cur.scriptstate, (cur.message ?? []).length, usedCols(colConfig(vars)));
+            }
+            const s8 = { ...cur.scriptstate ?? {}, ...add };
+            if (colConfig(s8).points !== "off" && walletSyncOn(s8)) {
+              const p2 = syncPointsToStatus(readPoints(s8), { ...cur, scriptstate: s8 });
+              if (p2) Object.assign(add, pointsVars(p2));
+            }
+            return Object.keys(add).length ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...add } } : null;
+          }).catch(() => null) ?? latest;
+        }
+      }
+      if (settleItemUse(latest ?? chat, arg.messageIndex)) {
+        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const vars = settleItemUse(cur, arg.messageIndex);
+          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
+        }).catch(() => null) ?? latest;
+      }
+      const selfNames = hasShopTag(raw) ? [playerAgent((await getChar(arg.characterIndex).catch(() => null))?.globalLore, (latest ?? chat).scriptstate)?.name ?? "", userInfo().name] : [];
+      if ((shopJudgeBy((latest ?? chat).scriptstate).by === "main" || !shopOn((latest ?? chat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_shop"]) && settleShop(latest ?? chat, arg.messageIndex, selfNames)) {
         latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
           const r = settleShop(cur, arg.messageIndex, selfNames);
           return r ? { ...cur, ...r.message ? { message: r.message } : {}, scriptstate: { ...cur.scriptstate ?? {}, ...r.vars } } : null;
         }).catch(() => null) ?? latest;
+      }
+      {
+        const base = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
+        if (base && settleReady(base, cosReadyMode(base.scriptstate) !== "off")) {
+          latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+            const message = settleReady(cur, cosReadyMode(cur.scriptstate) !== "off");
+            return message ? { ...cur, message } : null;
+          }).catch(() => null) ?? latest;
+        }
       }
       let now2 = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
       if (now2) await refreshUseBox(arg.characterIndex, arg.chatIndex, now2).catch(() => {
@@ -148,7 +261,7 @@ hat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_sh
     }
   }
   function displayNow(text4) {
-    const ours = liteNow || isLanding(text4) || text4.includes(UNSENT_MARK) || text4.includes(START_MARK) || text4.includes(SCENE_MARK) || hasStatusTag(text4) || hasSceneCard(text4) || hasCall(text4) || hasShopTag(text4);
+    const ours = liteNow || isLanding(text4) || text4.includes(UNSENT_MARK) || text4.includes(START_MARK) || text4.includes(SCENE_MARK) || hasStatusTag(text4) || hasSceneCard(text4) || hasCall(text4) || hasShopTag(text4) || hasReadyTag(text4);
     let out = text4;
     if (isLanding(text4)) out = landingHtml2();
     else {
@@ -160,6 +273,7 @@ hat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_sh
       if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
       if (hasStatusTag(out)) out = renderStatus(out);
       if (hasShopTag(out)) out = renderShopCard(out);
+      if (hasReadyTag(out)) out = renderReadyCard(out);
       if (hasImgTag(out)) {
         const pick3 = modulePicker();
         const self = userInfo().name;
@@ -357,5 +471,5 @@ hat).scriptstate)) && (hasShopTag(raw) || (latest ?? chat).scriptstate?.["$st_sh
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.21.7", start: start2 };
+  globalThis.__goeiBody = { version: "0.21.8", start: start2 };
 })();

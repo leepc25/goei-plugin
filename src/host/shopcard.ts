@@ -2,6 +2,8 @@
 // 그 자리(상태창 상자 아래)에 가게 이름과 「상점 열기」 단추를 붙인다. 누르면 창을 열고 상점 팝업을 띄운다 (app.ts openShop).
 // 표식은 응답 처리(core/shop.ts settleShop)가 마지막 응답에만 남기므로 카드도 마지막 응답 아래에만 붙는다.
 import { findShopTag, stripShopTags, webSiteOfOwner } from '../core/shop';
+import { findReadyTag, stripReadyTags } from '../core/orders';
+import { MALL_NAME } from '../core/malls';
 import { cardPalette, currentTheme } from '../ui/theme';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 
@@ -29,6 +31,27 @@ export function renderShopCard(text: string): string {
     + `<span style="flex:1;min-width:0"><b style="color:${p.signal}">${esc(tag.shop)}</b></span>`
     + `<button type="button" data-goei-shop="${esc(site || '1')}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">${site ? '접속하기' : '상점 열기'}</button></div>`;
   return `${stripShopTags(text)}\n${card}`;
+}
+
+/** display: 맞춤 주문 완성 표식 `[shop-ready: 사이트|이름]` 을 지우고 카드를 붙인다 (11-11 사용자: 상점 카드와 같은 방식, 상태창과 무관). 표식은 core/orders.ts settleReady 가 적는다 */
+export function renderReadyCard(text: string): string {
+  const tag = findReadyTag(text);
+  const body = stripReadyTags(text);
+  if (!tag) return body;
+  const shop = (MALL_NAME as Record<string, string>)[tag.site];
+  return shop ? `${body}\n${orderReadyCard(tag.site, shop, tag.names)}` : body;
+}
+
+/** 맞춤 주문 완성 알림 카드. 단추는 「접속하기」와 같은 길로 그 사이트를 연다 */
+function orderReadyCard(site: string, shop: string, names: string[]): string {
+  if (!names.length) return '';
+  armChatClick('shop');
+  drawn.add(site);
+  const p = cardPalette(currentTheme());
+  const what = names.length > 1 ? `「${esc(names[0])}」 외 ${names.length - 1}건` : `「${esc(names[0])}」`;
+  return `<div data-goei-card="shop" style="display:flex;align-items:center;gap:12px;width:fit-content;min-width:min(100%,420px);max-width:100%;box-sizing:border-box;margin:10px auto 0;padding:10px 16px;border:1px solid ${p.accentLine};border-radius:14px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5">`
+    + `<span style="flex:1;min-width:0"><b style="color:${p.signal}">${esc(shop)}</b><br>주문하신 ${what} 완성</span>`
+    + `<button type="button" data-goei-shop="${esc(site)}" style="flex:none;height:32px;padding:0 14px;border:1px solid ${p.accentLine};border-radius:10px;background:transparent;color:${p.text};font:inherit;font-size:.95em;font-weight:600;cursor:pointer">받으러 가기</button></div>`;
 }
 
 let busy = false;

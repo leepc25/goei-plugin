@@ -1,4 +1,100 @@
-"위키 기본 문서 목록을 받지 못했어요.");
+    ...o.name ? { name: o.name } : {},
+      ...landing,
+      ...ls ? { loreSettings: ls } : {},
+      globalLore: lore,
+      alternateGreetings: planted.greetings
+    });
+  }
+  async function installPictures(charIndex, progress4) {
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
+    const { state } = await checkInstall(charIndex);
+    const all = state.pictures.missing;
+    if (!all.length) return 0;
+    const WORKERS = 8;
+    const COMMIT = 300;
+    let saved2 = 0;
+    let assets = char.additionalAssets;
+    const commit = async (list4) => {
+      if (!list4.length) return;
+      assets = mergePictures(assets, list4);
+      const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
+      await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
+      saved2 += list4.length;
+    };
+    for (let i = 0; i < all.length; i += COMMIT) {
+      const get = all.slice(i, i + COMMIT);
+      const done3 = [];
+      let next = 0;
+      let failure = null;
+      const worker = async () => {
+        while (next < get.length && !failure) {
+          const p2 = get[next++];
+          try {
+            const path = await risuai.saveAsset(await fetchPicture(p2));
+            if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
+            done3.push([p2, path]);
+          } catch (error) {
+            failure ??= error;
+            return;
+          }
+          const n3 = saved2 + done3.length;
+          if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
+        }
+      };
+      await Promise.all(Array.from({ length: WORKERS }, worker));
+      await commit(done3);
+      if (failure) {
+        const why = failure instanceof Error ? failure.message : String(failure);
+        throw new Error(saved2 ? `${saved2}/${all.length}장까지 받았어요. ${why}` : why);
+      }
+    }
+    forgetImages();
+    return saved2;
+  }
+  async function installIcon(charIndex, progress4) {
+    const icon = installData().icon;
+    if (!icon.file) throw new Error("이 판에는 아이콘 정보가 없어요.");
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
+    progress4("아이콘 받는 중…");
+    const bytes = await getBytes(icon.file);
+    if (icon.bytes && bytes.length !== icon.bytes) throw new Error("아이콘을 끝까지 받지 못했어요.");
+    const d = icon.digest ? await digest(bytes) : null;
+    if (d && d !== icon.digest) throw new Error("받은 아이콘이 이 판의 아이콘과 달라요.");
+    const path = await risuai.saveAsset(bytes);
+    if (typeof path !== "string" || !path) throw new Error("아이콘을 저장하지 못했어요.");
+    const notes = await iconNotes();
+    const id2 = charId(char);
+    const prev = String(char.image ?? "");
+    notes[id2] = { ours: path, prev: notes[id2]?.ours === prev ? notes[id2].prev : prev };
+    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
+    const cc = (Array.isArray(char.ccAssets) ? char.ccAssets : []).filter((a) => a && typeof a === "object");
+    const hasIcon = (uri) => cc.some((a) => a.type === "icon" && a.uri === uri);
+    if (prev && !hasIcon(prev)) cc.push({ type: "icon", uri: prev, name: cc.some((a) => a.type === "icon" && a.name === "main") ? "previous" : "main", ext: extOf(prev) });
+    if (!hasIcon(path)) cc.push({ type: "icon", uri: path, name: "goei", ext: extOf(icon.file) });
+    await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
+  }
+  var extOf = (path) => /\.(png|jpe?g|webp|avif|gif)$/i.exec(path)?.[1]?.toLowerCase() ?? "png";
+  async function restoreIcon(charIndex) {
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char) return false;
+    const notes = await iconNotes();
+    const note = notes[charId(char)];
+    if (!note?.prev) return false;
+    await risuai.setCharacterToIndex(charIndex, { ...char, image: note.prev });
+    delete notes[charId(char)];
+    await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
+    return true;
+  }
+  async function installWikiPack(progress4) {
+    if (!UPDATE_BASE) throw new Error("받을 곳이 정해지지 않은 빌드예요.");
+    progress4("위키 기본 문서 목록 받는 중…");
+    let index3 = null;
+    try {
+      index3 = JSON.parse((await getText("wiki-base.json")).replace(/^﻿/, ""));
+    } catch {
+      throw new Error("위키 기본 문서 목록을 받지 못했어요.");
     }
     if (!index3 || !Array.isArray(index3.parts)) throw new Error("위키 기본 문서 목록 형식이 달라요.");
     let text4 = "";
@@ -2998,38 +3094,4 @@ ${esc28(e.value)}</textarea>`;
       const sub = [a.rank, a.department].filter(Boolean).join(" · ");
       return `<button class="gw-member" data-action="ed-goto" data-value="agent|${esc28(a.lore)}" title="요원 기록으로">${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}<span class="gw-member-t"><b>${esc28(a.name)}</b><small>${esc28(a.english || "")}${sub ? ` · ${esc28(sub)}` : ""}</small></span></button>`;
     }).join("");
-    return `<section class="gw-sec gw-members"><h3>소속 요원<b>${list4.length}</b></h3>${list4.length ? `<div class="gw-member-list">${items}</div>` : '<p class="gx-muted">이 조직 소속으로 등록된 요원이 없어요. 요원 기록의 기본 정보에서 소속을 정해요.</p>'}</section>`;
-  }
-  function recordPage(ctx2, kind, over, q, sel) {
-    const d = directoryDraft(ctx2);
-    const pick3 = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf3(ctx2, kind, over).map((r) => `<option value="${esc28(r.name)}"${r.name === sel ? " selected" : ""}>${esc28(r.name)}${r.sub ? ` · ${esc28(r.sub)}` : ""}${r.state === "deleted" ? " (지움)" : r.state === "new" ? " (추가)" : r.state === "edited" ? " (고침)" : ""}</option>`).join("")}</select>`;
-    const ext = kind === "anomaly" || kind === "site";
-    const list4 = `<aside class="gw-list-pane">
-    <div class="gw-list-tools">${pick3}<input class="dir-search" type="search" data-input="ed-q" value="${esc28(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
-      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button>${ext ? `<button class="gx-mini${dirUi.adding ? " on" : ""}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}" title="다른 폴더의 로어북을 발생 후보로">${ICONS.plus}폴더 밖</button>` : ""}</div>
-    ${ext && dirUi.adding ? `<div class="gw-add dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc28(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>` : ""}
-    ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
-      <p class="gx-muted">${kind === "agent" ? "요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요." : kind === "org" ? "조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요." : "만든 뒤 기본 정보에서 영문명·별칭을 채워요."}</p></div>` : ""}
-    ${kind === "anomaly" ? anomalyNoteBox(over) : ""}
-    <div class="gw-list">${recordList(ctx2, kind, over, q)}</div></aside>`;
-    const rec2 = sel ? worldRecord(kind, sel, over) : null;
-    const bucket = over[kind] ?? {};
-    let detail;
-    if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
-    else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc28(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-    else if (!rec2) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc28(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button>${kind === "org" && d.orgs.some((o) => o.name === sel && !o.faction) && !d.agents.some((a) => a.affiliation === sel) ? `<button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}삭제</button>` : ""}</div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx2, kind, sel, d, null)}${kind === "agent" ? sceneCard(sel, d) : ""}${kind === "org" ? membersCard(ctx2, sel, d) : ""}</div>`;
-    else {
-      const order2 = fieldOrder(kind, rec2);
-      const defs = FIELDS[kind];
-      const rows3 = order2.map((id2) => {
-        if (id2.startsWith("x:")) {
-          const i = rec2.extra.findIndex((e) => e.kind === "block" && `x:${e.name}` === id2);
-          return i >= 0 ? extraRow(kind, rec2, rec2.extra[i], i, sel) : "";
-        }
-        const def = defs.find((f) => f.id === id2);
-        if (!def) return "";
-        let auto = "";
-        if (kind === "agent" && def.id === "organization") {
-          const a = d.agents.find((x) => x.lore === sel);
-          const o = a ? orgOf(d.orgs, a.affiliation) : void 0;
-          auto = o ? `${o.spec.english || o.name} (명부 소속 「${o.name}」 · 시점별 호칭 표)` : a?.affiliation ? `${a
+    return `<sectio

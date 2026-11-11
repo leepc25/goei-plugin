@@ -1,4 +1,22 @@
- 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+"#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
+    gal: ["0 0 24 24", '<path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/>'],
+    wpf: ["0 0 24 24", '<circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/>'],
+    sm: ["0 0 32 20", '<path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/>'],
+    cos: ["0 0 32 24", '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
+    wk: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
+    bm: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
+    hs: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
+    home: ["0 0 24 24", '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>']
+  };
+  var siteLogo = (id2, cls = "br-fv") => {
+    const [vb, body5] = LOGO2[id2 || "home"];
+    return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body5}</svg>`;
+  };
+  var ic = (d, cls = "br-i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
+  var IC = {
+    back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
+    fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
+    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
     x: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z",
     add: "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",
     tune: "M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z",
@@ -3222,38 +3240,4 @@ ${nick}: ${text4.slice(0, 200)}`;
   function cell(ctx2, it, over, w, queued2) {
     const left = leftOf(ctx2, it);
     const all = queued2 > 0 && (left === void 0 || queued2 >= left);
-    const drag = !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${canUse(it) ? ' data-usable="1"' : ""}` : "";
-    return `<button class="it-c${over ? " over" : ""}${itemsUi.open === it.id ? " sel" : ""}${all ? " queued" : ""}${stateCls(it)}" data-action="items-open" data-value="${esc16(it.id)}"${drag} aria-label="${esc16(it.name)}${over ? " (넘침)" : ""}${queued2 ? " (사용 예정)" : ""}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued2 ? `<span class="it-q8">사용 예정${queued2 > 1 ? ` ×${queued2}` : ""}</span>` : ""}<b>${esc16(it.name)}</b>${tipOf(it, left, w)}</button>`;
-  }
-  var WHAT = { get: "획득", use: "사용", drop: "버림", gone: "없어짐", destroy: "파괴", merge: "합침", sell: "팖" };
-  var BY = { story: "본문", manual: "직접", use: "사용 단추", store: "상점" };
-  var WEEK4 = "일월화수목금토";
-  function dayOf3(when3) {
-    const m = /(\d{4})\.(\d{2})\.(\d{2})/.exec(when3);
-    if (!m) return when3.split(" ")[0] || "날짜 없음";
-    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
-    return `${m[1]}.${m[2]}.${m[3]} (${WEEK4[d.getUTCDay()]})`;
-  }
-  function logList(ctx2) {
-    const q = itemsUi.q.trim();
-    const all = q ? searchItems(itemsOf(ctx2), aliveAnchors(ctx2.chat), q).log : itemsOf(ctx2).log.slice().reverse();
-    const rows3 = all.filter((l) => itemsUi.logFilter === "get" ? l.what === "get" : itemsUi.logFilter === "out" ? l.what !== "get" : true);
-    const chip3 = (v, label2, n3) => `<button class="gx-chip${itemsUi.logFilter === v ? " on" : ""}" data-action="items-log-filter" data-value="${v}" aria-pressed="${itemsUi.logFilter === v}">${label2}${n3 ? ` <small>${n3}</small>` : ""}</button>`;
-    const got = all.filter((l) => l.what === "get").length;
-    const chips3 = `<div class="gx-rec-tools it-logchips">${chip3("all", "전체", all.length)}${chip3("get", "획득", got)}${chip3("out", "사용", all.length - got)}</div>`;
-    if (!rows3.length) return `${chips3}<p class="gx-wt-empty">${q ? "맞는 기록이 없어요." : itemsUi.logFilter === "get" ? "아직 획득한 물건이 없어요." : itemsUi.logFilter === "out" ? "아직 사용 기록이 없어요. 물건을 쓰거나 버리면 여기에 쌓여요." : "아직 기록이 없어요. 물건을 얻거나 쓰면 여기에 쌓여요."}</p>`;
-    const w = whenOf(ctx2);
-    const pic3 = (l) => itemPic(l);
-    const row11 = (l) => {
-      const when3 = whenLabel(w, l.anchor, l.at);
-      const sub = [BY[l.by] ?? l.by, l.what === "use" && (l.n ?? 1) > 1 ? `×${l.n}` : "", l.note, l.quote ? `「${l.quote}」` : ""].filter(Boolean).join(" · ");
-      return `<li class="gx-wt-row"><div class="gx-wt-main"><span class="it-ic">${pic3(l)}</span><span class="gx-wt-memo"><b>${esc16(l.name)} <em class="it-what ${l.what === "get" ? "get" : "out"}">${WHAT[l.what] ?? l.what}</em></b><small>${esc16(sub)}</small></span><span class="gx-wt-amt"><small>${esc16(when3.split(" ")[1] ?? when3)}</small></span></div></li>`;
-    };
-    const groups = [];
-    for (const l of rows3) {
-      const day = dayOf3(whenLabel(w, l.anchor, l.at));
-      const g2 = groups[groups.length - 1];
-      if (g2 && g2.day === day) g2.rows.push(l);
-      else groups.push({ day, rows: [l] });
-    }
-    return `${chips3}<div class="gx-wallettab it-lo
+    const drag = !isPhone() ? ` draggable="true" data-drag="${esc16(it.id)}"${it.equip ? ` data-equip="${it.equip}"` : ""}${canUse(it)

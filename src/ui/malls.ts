@@ -13,12 +13,12 @@ import { pointsVars, readPoints } from '../core/points';
 import { addItem, dropUse, ITEM_USE_AT_VAR, itemLeft, itemUseVars, itemsVars, liveItemsOf, readItemUse, readItems, sellItem, type Item } from '../core/items';
 import { refreshUseBox } from '../host/usebox';
 import { getPrefs } from '../core/settings';
-import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, worldMinute, type CosOrder } from '../core/orders';
+import { liveOrders, minuteText, orderDue, orderReady, ordersText, ordersVars, settleReady, worldMinute, type CosOrder } from '../core/orders';
 import { turnKey, acceptQuote, appendItems, applyShelf, applyTalk, buyNote, cancelSell, closeSale, dropItemsNamed, lastBot, markSold, parseShelf, parseTalk, sayToOwner, shelfItems, shelfPrompt, stampLastLine, startSell, talkPrompt, type ShopItem, type ShopState } from '../core/shop';
 import { winStyle, type PopSpec } from './popwin';
 import { craftMessages } from '../core/craft';
 import { DESK_AVOID_RANGE, DESK_AXES_DEFAULT, DESK_KEY, deskRawSafe, deskSettings, deskTag, newDeskNo, deskVars, endDesk, makePrompt, parseCard, parseSay, pickAgain, readDesk, rollDice, talkPrompt as deskTalkPrompt, type DeskAgent, type DeskSource, type DeskState } from '../core/bmdesk';
-import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
+import { COS_ACCOUNT, COS_FIXED_MAX, COS_TRUTH_KEY, COS_READY_KEY, cosReadyMode, cosAssignment, cosDraw, cosFixed, cosFixedRoll, cosFixedVars, cosTruthMode, genresText, MALL_GUIDE, MALL_NAME, mallAutoKey, mallKey, mallNote, mallNoteKey, mallRoll, mallSettings, mallVars, mallVarsOf, newCosFixed, readMall, rollChanged, rollDefaults, rollKeys, tiersText, type CosFixed, type CosTier, type MallSite } from '../core/malls';
 import { SHOP_SIZE_HI, SHOP_SIZE_LO } from '../core/shop';
 import { onOffSwitch } from './controls';
 import { shopSource } from './shop';
@@ -429,7 +429,10 @@ async function mallMoney(action: string, value: string | undefined, ctx: ChatCon
         const it = cur.item;
         const items = addItem(readItems(chat.scriptstate), aliveAnchors(chat), { name: it.name, desc: it.desc, effect: it.effect, truth: it.truth, use: it.use, uses: it.uses, equip: it.equip, icon: it.icon, weight: it.weight, from: 'store', anchor, price: cur.price, walletId: cur.walletId ?? `${site}_ord_${cur.id}`, paidWith: `custom order from ${MALL_NAME[site]}, paid in advance` });
         ok = true;
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
+        const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...itemsVars(items), ...ordersVars(list.map((x) => (x.id === o.id ? { ...x, taken: true, takenKey: anchor } : x))) } };
+        // 받았으니 채팅의 완성 알림 카드(표식)를 지운다
+        const message = settleReady(next, cosReadyMode(next.scriptstate) !== 'off');
+        return message ? { ...next, message } : next;
       });
       v.info = ok ? `「${o.item.name}」을 받았다. 소지품에 들어갔다.` : '받을 수 없는 상태다.';
       if (ok) v.took = o.id;
@@ -876,7 +879,7 @@ export function mallSettingsPane(ctx: ChatContext, site: MallSite): string {
     row('생각 단계', mseg(site, 'thoughts', s.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
     row('최근 본문 턴 수', step(site, 'turns', `${s.turns}턴`, s.turns > 1, s.turns < 8, '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 최근 본문 턴 수예요(1~8).'),
     row('참고 로어북 수', step(site, 'refs', `${s.refs}개`, s.refs > 0, s.refs < 12, '참고 로어북 수'), '봇 설명·켜진 로어북·사이트 이름이 걸리는 로어북 가운데 최대 몇 개를 넘길지예요(0~12).'),
-  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
+  ].join(''))}${cosRollGroup(ctx, site)}${site === 'cos' ? cosReadyGroup(ctx) + cosTruthGroup(ctx) + cosFixedGroup(ctx) : deskGroup(ctx)}`;
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${name} 설정</b></div></header><div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -920,6 +923,13 @@ function deskGroup(ctx: ChatContext): string {
     row('지난 상담사 다시 만나기', mseg('bm', 'desk_again', d.again ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '켜면 가끔(4번에 1번꼴) 전에 만났던 상담사가 다시 연결돼요.'),
     row('겹치지 않게 넘길 수', `<div class="st-step"><button class="gx-step" data-action="ms-desk-step" data-value="-" ${d.avoid > DESK_AVOID_RANGE[0] ? '' : 'disabled'} aria-label="줄이기">−</button><b>${d.avoid}명</b><button class="gx-step" data-action="ms-desk-step" data-value="+" ${d.avoid < DESK_AVOID_RANGE[1] ? '' : 'disabled'} aria-label="늘리기">+</button></div>`, '새 상담사를 만들 때 최근 상담사 몇 명의 요약을 같이 넘겨 「이들과 겹치지 마라」고 해요(0~12).'),
   ].join('') + reset);
+}
+
+/** 맞춤 주문 완성 알림 (11-11 사용자) */
+function cosReadyGroup(ctx: ChatContext): string {
+  const m = cosReadyMode(ctx.chat.scriptstate);
+  return group('맞춤 주문', row('완성 알림', mseg('cos', 'ready', m, [['both', '카드 + 본편'], ['card', '카드만'], ['off', '사용 안 함']]),
+    m === 'both' ? '완성된 턴의 상태창 아래에 「받으러 가기」 카드가 뜨고, 다음 턴 본편에 완성 사실을 한 번 넘겨요.' : m === 'card' ? '채팅에 카드만 떠요. 본편 모델은 완성된 줄 몰라요.' : '알리지 않아요. 사이트의 「주문 조회」에서만 보여요.'));
 }
 
 /** 진짜 효과 (11-09 사용자: 보이는 효과는 광고 문구, 진짜는 숨김 · 미리 정한 것과 「아무도 모름」을 섞음) */
@@ -1065,7 +1075,7 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
   };
   const list = () => cosFixed(ctx.chat.scriptstate);
   if (action === 'ms-cfg') {
-    const m = /^(cos|bm):(roll_on|roll_useful|roll_gmode|roll_tmode|truth|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
+    const m = /^(cos|bm):(roll_on|roll_useful|roll_gmode|roll_tmode|truth|ready|fx_on:\w+)=([\s\S]*)$/.exec(value ?? '');
     if (!m) return false;
     const K = rollKeys(m[1] as MallSite);
     if (m[2] === 'roll_on') return set({ [K.on]: m[3] === '0' ? '0' : '' });
@@ -1073,6 +1083,16 @@ async function cosExtraAction(action: string, value: string | undefined, ctx: Ch
     if (m[2] === 'roll_gmode') return set({ [K.gmode]: m[3] === 'uniq' ? '' : m[3] });
     if (m[2] === 'roll_tmode') return set({ [K.tmode]: m[3] === 'weight' ? '' : m[3] });
     m.splice(1, 1); // 아래는 우주몰 전용 (truth·fx_on)
+    if (m[1] === 'ready') {
+      // 설정을 바꾸면 채팅의 완성 표식도 바로 맞춘다 (끄면 카드가 사라지고 켜면 다시 붙는다)
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [COS_READY_KEY]: m[2] === 'both' ? '' : m[2] } };
+        const message = settleReady(next, cosReadyMode(next.scriptstate) !== 'off');
+        return message ? { ...next, message } : next;
+      });
+      await env.refresh();
+      return true;
+    }
     if (m[1] === 'truth') return set({ [COS_TRUTH_KEY]: m[2] === 'mix' ? '' : m[2] });
     const id = m[1].slice(6);
     return set(cosFixedVars(list().map((f) => (f.id === id ? { ...f, on: m[2] === '1' } : f))));

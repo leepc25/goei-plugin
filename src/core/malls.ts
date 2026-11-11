@@ -5,7 +5,7 @@ import type { Chat } from './types';
 import { type TruthMode, emptyShop, readShop, reviveShop, SHOP_VAR, shopBlocked, shopSettings, type ShopSettings, type ShopState } from './shop';
 import type { GuideName } from './guides';
 import { lastBot } from './shop';
-import { liveOrders } from './orders';
+import { liveOrders, readyNotes } from './orders';
 import { readDesk } from './bmdesk';
 import { aliveAnchors } from './wallet';
 
@@ -207,6 +207,10 @@ export interface CosFixed {
   truth: string;
 }
 /** 진실 미리 정하기 (11-09 사용자: 섞는 게 낫다 → 기본 mix) */
+/** 맞춤 주문 완성 알림 (11-11 사용자): 채팅 카드 + 다음 턴 본편에 한 줄(기본) / 카드만 / 끔 */
+export const COS_READY_KEY = '$cos_ready';
+export type ReadyMode = 'both' | 'card' | 'off';
+export const cosReadyMode = (vars: Vars): ReadyMode => { const v = String(vars?.[COS_READY_KEY] ?? ''); return v === 'card' || v === 'off' ? v : 'both'; };
 export const COS_TRUTH_KEY = '$cos_truth';
 export const cosTruthMode = (vars: Vars): TruthMode => { const v = String(vars?.[COS_TRUTH_KEY] ?? ''); return v === 'all' || v === 'none' ? v : 'mix'; };
 export const COS_FIXED_KEY = '$cos_fixed';
@@ -249,6 +253,11 @@ export function mallEvents(chat: Chat): string[] {
   if (cos.some((l) => l.who === 'me')) out.push(`chatted by text with the operator on the ${MALL_NAME.cos} website — ${cos.map((l) => `${l.who === 'me' ? 'protagonist' : 'operator'}: "${l.text}"`).join(' / ')}`);
   for (const o of liveOrders(vars, aliveAnchors(chat))) {
     if (o.anchor === key && !o.taken) out.push(`placed a custom order with ${MALL_NAME.cos} for 「${o.item.name}」, paid ${o.price.toLocaleString('en-US')} won in advance; it will be ready in about ${o.hours} hours and has not arrived yet`);
+  }
+  // 맞춤 주문이 바로 앞 응답에서 완성됐으면 한 번만 (그 뒤 턴에는 다시 넘기지 않는다)
+  if (cosReadyMode(vars) === 'both') {
+    const at = lastBot(chat)!.index;
+    for (const o of readyNotes(chat).get(at) ?? []) out.push(`the custom order 「${o.item.name}」 from ${MALL_NAME.cos} is now finished and waiting; the protagonist was notified but has not collected it yet (it is collected on the website, not delivered into the scene by itself)`);
   }
   const desk = readDesk(vars);
   if (desk.anchor === key && desk.talk.some((l) => l.who === 'me')) out.push(`chatted by text with a counselor on the ${MALL_NAME.bm} 1:1 상담 — ${desk.talk.filter((l) => l.who !== 'sys').map((l) => `${l.who === 'me' ? 'protagonist' : 'counselor'}: "${l.text}"`).join(' / ')}`);

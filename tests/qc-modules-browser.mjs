@@ -156,6 +156,8 @@ async function startedWithReply(page, { phoneAuto = false, gnetAuto = false } = 
     if (!gnetAuto) window.__chat.scriptstate['$lb_cfg_lb-gn.lazy'] = '1';
     // 장면 인물이 없어도 소지품 읽기가 켜져 있으면 갱신기가 돈다(11-08): 이 시험의 모델 호출 수에 끼지 않게 끈다
     window.__chat.scriptstate.$it_auto = '0';
+    // 상점 판단이 「자동」이면 갱신기가 매 턴 돈다(11-09): 같은 까닭으로 메인 모델이 판단하게 둔다
+    window.__chat.scriptstate.$sh_judge = 'main';
     window.__chat.message.push({ role: 'user', data: '시작' }, { role: 'char', data: reply });
     const c = window.__chat;
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
@@ -406,7 +408,7 @@ if (want('G4')) {
   await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1 && /제목 1/.test(window.__chat.scriptstate.$gn_raw ?? ''), n0, { timeout: 8000 });
   await wait(300);
   const joint = await page.evaluate(() => window.__calls.llm.at(-1));
-  assert.ok(joint.messages[0].content.startsWith('Execute two independent automatic tasks'), '통합 요청');
+  assert.match(joint.messages[0].content, /^Execute 2 independent automatic tasks/, '통합 요청');
   const body = JSON.parse(joint.messages[1].content);
   assert.ok(Array.isArray(body.gnet) && Array.isArray(body.phone));
   assert.equal(await llmCount(page), n0 + 1, '한 번만');

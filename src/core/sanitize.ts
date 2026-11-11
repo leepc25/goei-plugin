@@ -7,6 +7,7 @@
 import type { PromptMessage } from './request';
 import { cleanOutput, hasWorldTags } from './world/tags';
 import { hasUnlockTag, stripUnlockTags } from './lore';
+import { hasReadyTag, stripReadyTags } from './orders';
 
 /** 플러그인 표식 목록 (원문에는 있고 모델에는 가면 안 되는 글). 시험·문서에서 전수 확인에 쓴다 */
 export const PLUGIN_MARKERS = ['%%SCENE_CARD:', '%%/SCENE_CARD%%', '%%PHONE_CALL:', '%%/PHONE_CALL%%', '%%GOEI_START%%', '%%/GOEI_START%%', '%%GOEI_UNSENT%%', '%%SEED%%', '%%/SEED%%'] as const;
@@ -44,6 +45,8 @@ export function stripMarkers<M extends PromptMessage>(messages: M[], opts: Strip
         const c = m?.content;
         if (typeof c !== 'string') return m;
         let next = stripMarkerText(c);
+        // 맞춤 주문 완성 표식 [shop-ready: …]: 플러그인이 적은 것이라 모델에 보내지 않는다 (core/orders.ts)
+        if (hasReadyTag(next)) next = stripReadyTags(next);
         if (opts.worldTags && m.role === 'assistant') {
           if (hasWorldTags(next)) next = cleanOutput(next);
           if (hasUnlockTag(next)) next = stripUnlockTags(next);

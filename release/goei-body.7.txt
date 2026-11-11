@@ -1,4 +1,94 @@
-rn "other";
+4 = root3.querySelector(".ph-drawer");
+    const grip = box4?.querySelector(".ph-grip");
+    if (!box4 || !grip) return;
+    const open4 = () => box4.classList.contains("open");
+    grip.addEventListener("click", () => set(box4, !open4()));
+    let y0 = null;
+    box4.addEventListener("touchstart", (e) => {
+      y0 = e.touches[0]?.clientY ?? null;
+    }, { passive: true });
+    box4.addEventListener("touchend", (e) => {
+      if (y0 === null) return;
+      const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+      y0 = null;
+      if (dy < -24 && !open4()) set(box4, true);
+      else if (dy > 24 && open4()) set(box4, false);
+    }, { passive: true });
+  }
+
+  // src/core/progress.ts
+  var GROUPS = ["router", "director", "main", "update", "net"];
+  var GROUP_LABEL = { router: "라우터", director: "디렉터", main: "본편", update: "갱신기", net: "인터넷", other: "기타" };
+  var PROGRESS_WATCHDOG = 10 * 60 * 1e3;
+  var turn = null;
+  var seq = 0;
+  var endWanted = false;
+  var listeners2 = /* @__PURE__ */ new Set();
+  function onProgress(f) {
+    listeners2.add(f);
+    return () => listeners2.delete(f);
+  }
+  var notify = () => {
+    for (const f of listeners2) {
+      try {
+        f();
+      } catch {
+      }
+    }
+  };
+  var progressTurn = () => turn;
+  var MAIN_STAGE = { id: "main", label: "본편", group: "main", match: [] };
+  function progressBegin() {
+    turn = { at: Date.now(), plan: [MAIN_STAGE], calls: [], manual: false };
+    endWanted = false;
+    notify();
+    return turn;
+  }
+  function progressAbort(t) {
+    if (!turn || turn.manual || turn.replyAt || turn.endAt || t && t !== turn) return;
+    turn.aborted = true;
+    endWanted = true;
+    settle();
+    notify();
+  }
+  function progressWatch(chat, now2 = Date.now()) {
+    if (!turn) return;
+    if (turn.chat === void 0) turn.chat = chat;
+    else if (turn.chat !== chat) {
+      turn = null;
+      endWanted = false;
+      notify();
+      return;
+    }
+    if (!turn.manual && !turn.replyAt && !turn.endAt && now2 - turn.at >= PROGRESS_WATCHDOG) progressAbort(turn);
+  }
+  function progressPlan(stages) {
+    if (!turn || turn.manual) return;
+    turn.plan = stages.some((s8) => s8.group === "main") ? stages : sortPlan([...stages, MAIN_STAGE]);
+    for (const c of turn.calls) c.stage = stageFor(turn, c.label).id;
+    notify();
+  }
+  var ORDER2 = { router: 0, director: 1, main: 2, update: 3, net: 4, other: 5 };
+  var sortPlan = (stages) => [...stages].sort((a, b) => ORDER2[a.group] - ORDER2[b.group]);
+  function progressMain() {
+    if (!turn || turn.manual) return;
+    turn.mainAt = Date.now();
+    notify();
+  }
+  function progressReply(tokens2) {
+    if (!turn || turn.manual) return;
+    turn.replyAt = Date.now();
+    turn.mainAt ??= turn.replyAt;
+    if (tokens2 !== void 0) turn.replyTokens = tokens2;
+    notify();
+  }
+  var baseLabel = (label2) => label2.replace(/\s*(다시 (묻기|보기)\s*\d*|\(통합 뒤 따로\))\s*$/u, "").trim();
+  function groupOf(label2) {
+    const b = baseLabel(label2);
+    if (b.startsWith("라우터")) return "router";
+    if (b.startsWith("디렉터")) return "director";
+    if (/^(갱신기|정리|이미지 태그|위키)/u.test(b)) return "update";
+    if (/^상점/u.test(b)) return "other";
     return "net";
   }
   function stageFor(t, label2) {
@@ -3012,7 +3102,7 @@ ${RETRY_ANALYZE}` }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.21.7" : "0";
+  var PLUGIN_VERSION = true ? "0.21.8" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -3675,22 +3765,4 @@ ${RETRY_ANALYZE}` }
   var siteOf = (id2) => SITES.find((s8) => s8.id === id2);
   var isSite = (id2) => SITES.some((s8) => s8.id === id2);
   var LOGO2 = {
-    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill="#0f1113" d="M10 15.2q2 1.6 4 0v.9q-2 1.4-4 0z"/>'],
-    gal: ["0 0 24 24", '<path fill="#3b4890" d="M3 3h18a1 1 0 011 1v12a1 1 0 01-1 1H10l-5 4v-4H3a1 1 0 01-1-1V4a1 1 0 011-1z"/><path fill="#fff" d="M12 5.5c-2.5 0-4.3 1.9-4.3 4.2v5.1l1.4-1 1.4 1 1.5-1 1.5 1 1.4-1 1.4 1V9.7c0-2.3-1.8-4.2-4.3-4.2z"/><circle fill="#3b4890" cx="10.5" cy="9.6" r=".9"/><circle fill="#3b4890" cx="13.5" cy="9.6" r=".9"/>'],
-    wpf: ["0 0 24 24", '<circle fill="#7a1010" cx="12" cy="12" r="11"/><circle fill="#1a5aa8" cx="12" cy="12" r="7.5"/><path fill="none" stroke="#ffd24a" stroke-width="1" d="M4.5 12h15M12 4.5v15M6 8.2h12M6 15.8h12"/><ellipse fill="none" stroke="#ffd24a" stroke-width="1" cx="12" cy="12" rx="3.4" ry="7.5"/><circle fill="none" stroke="#ffd24a" stroke-width="1.2" cx="12" cy="12" r="10"/>'],
-    sm: ["0 0 32 20", '<path fill="#f26c4f" d="M2 10C5 3.5 13 1.8 20 4.5L26 1.5 24.5 10 26 18.5 20 15.5C13 18.2 5 16.5 2 10z"/><path fill="#ffb49b" d="M4 11.2c4 3.3 10.5 3.8 16 2.2-5.5.6-11-.2-16-2.2z"/><path fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round" d="M11 5.2l1.5 4M14.5 4.6l1.5 4.2M18 4.8l1.3 4"/><circle fill="#fff" cx="6.3" cy="8.6" r="1.4"/><circle fill="#2a1a14" cx="6.5" cy="8.6" r=".7"/>'],
-    cos: ["0 0 32 24", '<circle fill="#ff3cf0" cx="25" cy="6" r="4"/><ellipse fill="none" stroke="#ffd700" stroke-width="1" cx="25" cy="6" rx="6.5" ry="1.8"/><path fill="#8ff" d="M10 11a6 6 0 0112 0z"/><ellipse fill="#bbb" cx="16" cy="13" rx="14" ry="4.2"/><ellipse fill="#666" cx="16" cy="14.4" rx="10" ry="2"/><circle fill="#ff0" cx="8" cy="13" r="1"/><circle fill="#f0f" cx="16" cy="14" r="1"/><circle fill="#0ff" cx="24" cy="13" r="1"/><path fill="#ffef7a" opacity=".55" d="M11 17h10l3 7H8z"/>'],
-    wk: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#27685b"/><path fill="#fff" d="M6 5h5.2c.9 0 .8.6.8 1.3V19c-.4-.6-1-1-1.8-1H6zM18 5h-5.2c-.9 0-.8.6-.8 1.3V19c.4-.6 1-1 1.8-1H18z"/><circle cx="8.6" cy="10" r="1.1" fill="#27685b"/><circle cx="15.4" cy="10" r="1.1" fill="#27685b"/>'],
-    bm: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#1f2a44"/><path fill="#f3d9a4" d="M15.5 4.5a7.5 7.5 0 107 10.2A6 6 0 0115.5 4.5z"/><circle cx="7" cy="7" r="1" fill="#f3d9a4"/><circle cx="5" cy="11" r=".7" fill="#f3d9a4"/>'],
-    hs: ["0 0 24 24", '<rect width="24" height="24" rx="5" fill="#60131b"/><rect x="4" y="7" width="16" height="11" rx="1.5" fill="#0b0513" stroke="#eeb76c" stroke-width="1.4"/><path stroke="#eeb76c" stroke-width="1.4" stroke-linecap="round" d="M9 3.5l3 3 3-3"/><circle cx="12" cy="12.5" r="2.6" fill="#b33031"/>'],
-    home: ["0 0 24 24", '<circle fill="#5f6368" cx="12" cy="12" r="11"/><path fill="#e8eaed" d="M10 18v-4.5h4V18h3.5v-6H20L12 5 4 12h2.5v6z"/>']
-  };
-  var siteLogo = (id2, cls = "br-fv") => {
-    const [vb, body5] = LOGO2[id2 || "home"];
-    return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true">${body5}</svg>`;
-  };
-  var ic = (d, cls = "br-i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
-  var IC = {
-    back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
-    fwd: "M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z",
-    rel: "M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99
+    gn: ["0 0 24 24", '<path fill="#2dd4bf" d="M12 2C7.6 2 4 5.6 4 10v11.5l2.7-2.2 2.6 2.2 2.7-2.2 2.7 2.2 2.6-2.2 2.7 2.2V10c0-4.4-3.6-8-8-8z"/><ellipse fill="#0f1113" cx="9.2" cy="10.5" rx="1.5" ry="2.1"/><ellipse fill="#0f1113" cx="14.8" cy="10.5" rx="1.5" ry="2.1"/><path fill=

@@ -868,6 +868,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.evaluate(async ({ reply, phoneAuto }) => {
     // 장면 인물이 없어도 소지품 읽기가 켜져 있으면 갱신기가 돈다(11-08): 이 시험의 모델 호출 수에 끼지 않게 끈다
     window.__chat.scriptstate.$it_auto = '0';
+    // 상점 판단이 「자동」이면 갱신기가 매 턴 돈다(11-09): 같은 까닭으로 메인 모델이 판단하게 둔다
+    window.__chat.scriptstate.$sh_judge = 'main';
     // 괴담톡 자동 확인은 이 테스트(15)에서만 켠다 (다른 테스트의 모델 호출 순서를 지키려고)
     if (!phoneAuto) window.__chat.scriptstate.$ph_auto = '0';
     window.__chat.message.push({ role: 'user', data: '시작' }, { role: 'char', data: reply });
@@ -1488,7 +1490,7 @@ if (fixture.globalLore.some(packed)) {
   await page.fill('[data-input="gn-draft"]', '관람차 본 사람 더 있음?');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ post: { title: '관람차 목격 모음', content: '나 말고 본 사람 손' }, comments: [{ author: 'ㅁㄴㅇㄹ', content: '손', parent: 0 }], incoming: [], activity: [] }) }]; });
   await page.click('[data-action="gn-send"]');
-  await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('P|1846003|2025.01.01 02:47|익명|관람차 목격 모음|0|0|나 말고 본 사람 손|1'), null, { timeout: 5000 });
+  await page.waitForFunction(() => /P\|1846003\|2025\.01\.01 02:47\|익명\|관람차 목격 모음\|\d+\|\d+\|나 말고 본 사람 손\|1/.test(window.__chat.scriptstate.$gn_raw || ''), null, { timeout: 5000 });
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('C|1846003|0|ㅁㄴㅇㄹ|손|0|0'), '올린 글은 바로 펼쳐지므로 읽음');
   if (shots) await page.screenshot({ path: `${shots}/14-gnet-board.png` });
   // 본편 요청에 기록이 붙는다 (마지막 사용자 메시지 바로 앞 system 메시지)
@@ -2301,6 +2303,7 @@ if (fixture.globalLore.some(packed)) {
   man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0', pictures: pics });
   const { page, errors } = await boot(fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } });
   await page.evaluate((bytes) => { window.__picBytes = bytes; }, picBytes);
+  await page.evaluate((f) => { window.__inst = f; }, distPackFiles('goei-data-install'));
   await page.evaluate((p) => {
     // 실제처럼 목록(card-update.json)과 조각(card-update.N.txt)으로 나눠 준다
     const text = JSON.stringify(p);
@@ -2308,7 +2311,9 @@ if (fixture.globalLore.some(packed)) {
     window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' }
       : url.includes('card-update.json') ? { schema: 1, version: p.version, minPlugin: '0.0.1', parts: parts.map((_, i) => `card-update.${i + 1}.txt`), length: text.length }
       : url.includes('/pic/') ? new Uint8Array(window.__picBytes)
-      : (/card-update\.(\d+)\.txt/.exec(url) ? parts[+/card-update\.(\d+)\.txt/.exec(url)[1] - 1] : null);
+      : /card-update\.(\d+)\.txt/.exec(url) ? parts[+/card-update\.(\d+)\.txt/.exec(url)[1] - 1]
+      // 업데이트는 「설치 · 업데이트」 페이지에 있고, 그 페이지는 열릴 때 설치 자료 팩을 받는다 (11-10 설정 메뉴 묶음)
+      : (window.__inst[url.split('?')[0].split('/').pop()] ?? null);
     const dir = window.__char.globalLore.find((e) => e.comment === 'Directory');
     if (dir) dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
     window.__char.globalLore.push({ comment: '내가 넣은 로어북', content: '메모', key: '', mode: 'normal' });
@@ -2328,7 +2333,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
   assert.equal(await page.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');
   // 2026-10-27 설정 창 개편: 업데이트는 설정 창 「점검」 탭의 업데이트 페이지 (패널 설정 탭은 없앰)
-  await edOpen(page, 'set:update');
+  await edOpen(page, 'install');
   await page.click('.gw [data-action="upd-prepare"]');
   await page.waitForSelector('.gw .upd-plan');
   if (shots) await page.locator('.upd-plan').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-settings.png` });

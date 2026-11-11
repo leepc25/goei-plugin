@@ -3711,7 +3711,7 @@ button.it-avbtn:hover { background: color-mix(in srgb, var(--signal) 6%, transpa
 .br-page > .gx-body, .br-page > main, .br-page > div:only-child { flex: 1; min-height: 0; }
 .br-p-gn, .br-p-wk { background: var(--void); color: var(--text); }
 /* 로그인 창 (설명 문구 없음) */
-.br-lgn { position: absolute; right: 10px; top: 84px; width: 300px; z-index: 6; background: #292a2d; border-radius: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, .5); padding: 18px; color: #e8eaed; font: 13px 'Noto Sans KR', sans-serif; }
+.br-lgn { position: absolute; right: 10px; top: 84px; width: 300px; z-index: 60; background: #292a2d; border-radius: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, .5); padding: 18px; color: #e8eaed; font: 13px 'Noto Sans KR', sans-serif; }
 .br-lgn h4 { margin: 0 0 10px; font-size: 15px; }
 .br-face { display: flex; justify-content: center; margin-bottom: 12px; }
 .br-face img, .br-face .br-i { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: top; image-rendering: pixelated; background: #cfe0f7; }

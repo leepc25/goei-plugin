@@ -4,6 +4,7 @@
 import type { Chat } from './types';
 import { findStatusTags, statusMinute } from './world/status';
 import type { ShopItem } from './shop';
+import { messageKey } from './people/store';
 
 type Vars = Record<string, unknown> | undefined;
 
@@ -100,4 +101,85 @@ export function ordersText(list: CosOrder[], nowMin: number | null, lastKey: str
     const state = orderReady(o, nowMin, lastKey) ? 'ready for pickup' : due !== null ? `due ${minuteText(due)}` : `due in ${o.hours}h`;
     return `${o.item.name} (${o.price} won, ${state})`;
   }).join(', ');
+}
+
+// ── 완성 알림 표식 `[shop-ready: 사이트|이름;;이름]` (11-11 사용자: 상점 카드처럼 응답 끝 표식으로, 상태창과 상관없이) ──
+// 플러그인이 완성된 응답 끝에 적고(settleReady), 화면이 표식을 지우고 카드를 붙인다 (host/shopcard.ts renderReadyCard). 모델에는 보내지 않는다 (core/sanitize.ts).
+
+const READY_TAG = /\[\s*shop-ready\s*[:：]\s*([^\]|｜]*?)\s*[|｜]\s*([^\]]*?)\s*\]/giu;
+const READY_SEP = ';;';
+
+export const hasReadyTag = (text: unknown): text is string => typeof text === 'string' && /\[\s*shop-ready\s*[:：]/iu.test(text);
+
+/** 글 속 마지막 완성 표식 */
+export function findReadyTag(text: string): { raw: string; site: string; names: string[] } | null {
+  if (!hasReadyTag(text)) return null;
+  let out: { raw: string; site: string; names: string[] } | null = null;
+  for (const m of text.matchAll(READY_TAG)) {
+    const names = m[2].split(READY_SEP).map((n) => n.trim()).filter(Boolean);
+    if (m[1] && names.length) out = { raw: m[0], site: m[1], names };
+  }
+  return out;
+}
+
+/** 완성 표식을 지운 글 (표식만 있던 줄은 줄째) */
+export function stripReadyTags(text: string): string {
+  if (!hasReadyTag(text)) return text;
+  return text.replace(new RegExp(`^[ \\t]*${READY_TAG.source}[ \\t]*\\r?\\n?`, 'gimu'), '').replace(READY_TAG, '').replace(/\n{3,}/g, '\n\n').trimEnd();
+}
+
+const tagName = (s: string) => s.replace(/[\[\]|｜\r\n]/g, ' ').replace(/;;+/g, ';').replace(/\s+/g, ' ').trim();
+export const readyTag = (site: string, orders: CosOrder[]): string => `[shop-ready: ${site}|${orders.map((o) => tagName(o.item.name)).filter(Boolean).join(READY_SEP)}]`;
+
+/**
+ * 완성 알림을 붙일 자리: 아직 안 받은 주문마다, 주문 뒤 **처음으로 받을 수 있게 된 응답** 번호 → 그 주문들.
+ * 저장하지 않고 채팅에서 매번 다시 센다 (응답을 지우거나 다시 굴리면 저절로 맞는다). 받으면 빠진다.
+ */
+export function readyNotes(chat: Chat): Map<number, CosOrder[]> {
+  const out = new Map<number, CosOrder[]>();
+  const list = chat.message ?? [];
+  const keys = list.map((m, i) => messageKey(m, i));
+  const pending = liveOrders(chat.scriptstate, new Set(keys)).filter((o) => !o.taken);
+  if (!pending.length) return out;
+  // 응답마다: 그 응답까지의 작중 시각
+  let now: number | null = null;
+  const rows = list.map((m, i) => {
+    if (m.role !== 'char' || typeof m.data !== 'string') return null;
+    const tags = findStatusTags(m.data);
+    const t = tags[tags.length - 1];
+    if (t) now = statusMinute(t.date, t.time) ?? now;
+    return { i, key: keys[i], now };
+  });
+  for (const o of pending) {
+    const from = Math.max(keys.indexOf(o.anchor), keys.indexOf(o.orderedKey));
+    const hit = rows.find((r) => r && r.i > from && orderReady(o, r.now, r.key));
+    if (!hit) continue;
+    const cur = out.get(hit.i);
+    if (cur) cur.push(o);
+    else out.set(hit.i, [o]);
+  }
+  return out;
+}
+
+/**
+ * 응답마다 완성 표식을 지금 상태에 맞춘다: 붙일 자리(readyNotes)에는 응답 끝에 적고, 아닌 곳의 표식은 지운다.
+ * on 이 false(설정 「사용 안 함」)면 전부 지운다. 바뀐 것이 없으면 null.
+ */
+export function settleReady(chat: Chat, on: boolean, site = 'cos'): Chat['message'] | null {
+  const list = chat.message ?? [];
+  const notes = on ? readyNotes(chat) : new Map<number, CosOrder[]>();
+  let message: Chat['message'] | null = null;
+  for (let i = 0; i < list.length; i++) {
+    const m = list[i];
+    if (m.role !== 'char' || typeof m.data !== 'string') continue;
+    const want = notes.get(i);
+    const tag = want ? readyTag(site, want) : '';
+    if (!tag && !hasReadyTag(m.data)) continue;
+    const body = stripReadyTags(m.data);
+    const next = tag ? `${body}\n${tag}` : body;
+    if (next === m.data) continue;
+    message ??= [...list];
+    message[i] = { ...m, data: next };
+  }
+  return message;
 }
