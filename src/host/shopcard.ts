@@ -23,6 +23,8 @@ export function renderShopCard(text: string): string {
   const site = webSiteOfOwner(tag.owner);
   // 아직 정리되지 않은 접속 표식(`@web` 만, 사이트 없음)은 카드 없이 표식만 가린다 — 「상점 열기」로 잘못 뜨지 않게 (11-09 전수점검)
   if (!site && /^@web\b/i.test(tag.owner.trim())) return stripShopTags(text);
+  // 같은 응답에 그 사이트의 맞춤 주문 완성 카드(「받으러 가기」)가 붙으면 「접속하기」 카드는 겹치므로 빼고 표식만 가린다 (2026-11-11 사용자: 두 개가 중복으로 뜬다)
+  if (site && findReadyTag(text)?.site === site) return stripShopTags(text);
   armChatClick('shop');
   if (site) drawn.add(site);
   const p = cardPalette(currentTheme());

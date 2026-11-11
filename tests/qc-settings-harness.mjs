@@ -121,7 +121,7 @@ export async function launch() {
 /** 플러그인을 띄운 페이지. vp: VIEWPORTS 키 또는 {width,height,touch} */
 export async function boot(browser, { fixture, fixtureDir }, chat, vp = 'pc', opts = {}) {
   const v = typeof vp === 'string' ? VIEWPORTS[vp] : vp;
-  const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, ...(v.touch ? { hasTouch: true, isMobile: true } : {}) });
+  const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, ...(v.scale ? { deviceScaleFactor: v.scale } : {}), ...(v.touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });

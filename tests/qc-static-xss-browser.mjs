@@ -246,7 +246,7 @@ async function seen(page, where) {
   // 설정 창: 인물 기록·괴담넷·괴담톡 설정 페이지와 세계 편집 트리 (명부 이름 등)
   await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
   await page.waitForSelector('.gw .gw-set');
-  for (const node of ['set:people', 'set:gnet', 'set:phone', 'set:board', 'set:wiki', 'manage:diag']) {
+  for (const node of ['set:people', 'set:net', 'set:phone', 'set:board', 'set:wiki', 'manage:diag']) {
     const b = await page.$(`[data-action="ed-node"][data-value="${node}"]`);
     if (!b) { await page.click('[data-action="ed-tab"][data-value="manage"]'); }
     const b2 = await page.$(`[data-action="ed-node"][data-value="${node}"]`);

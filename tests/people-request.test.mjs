@@ -37,7 +37,8 @@ test('요청 가공: 장면 인물 블록을 마지막 유저 메시지 앞에, 
   const out2 = R.withPeopleBlock(msgs, chat, { ...o, settings: St.peopleSettings({ $pp_inject: 'append' }) });
   assert.match(out2[0].content, /Short orders/);
   // 끔
-  assert.equal(R.withPeopleBlock(msgs, chat, { ...o, settings: St.peopleSettings({ $pp_inject: 'off' }) }).length, 4);
+  // 2026-11-11 사용자: 넣지 않는 선택지(off)는 뺐다. 옛 값이 남아 있으면 기본 방식으로 넣는다
+  assert.equal(R.withPeopleBlock(msgs, chat, { ...o, settings: St.peopleSettings({ $pp_inject: 'off' }) }).length, 5);
   // 장면에 없는 인물은 안 넣음
   const chat2 = { message: [{ role: 'user', data: '혼자 걷는다', chatId: 'u1' }], scriptstate: {} };
   assert.equal(R.withPeopleBlock(msgs.slice(0, 2), chat2, o).length, 2);

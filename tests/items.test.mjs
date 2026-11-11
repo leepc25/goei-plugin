@@ -181,17 +181,11 @@ test('본편 넘기기: 마지막 유저 메시지 앞에 [Inventory], 보낸 �
   const out = withInventory(msgs(chat), chat);
   assert.equal(out.length, 4);
   assert.equal(out[2].role, 'system');
-  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nWeight: 0 kg \/ 25 kg\nCarry limit: .+\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
+  assert.match(out[2].content, /^\[Inventory\] 1\/16\n- 소금 봉지 — 두 봉지 \[2 uses left\]\nWeight: 0 kg \/ 25 kg\nCarry limit: .+\nRecently: got 소금 봉지\nThis turn: uses 소금 봉지 ×2 \(used up after this\)\n/);
   assert.equal(withInventory(out, chat), out);
-  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_on: '0' } }).length, 3, '끄면 안 넣는다');
-  // 넘기기를 꺼도 상점이 켜져 있으면 물건 목록 없이 상점 지침만 ([Shop])
-  // 상점 판단이 갱신기면(기본 자동 + 인물 갱신 매 턴) 표식 지침도 사건도 없으니 블록을 안 넣는다 (11-09)
-  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } }).length, 3, '갱신기가 판단하면 [Shop] 없음');
-  { const s = withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0', $sh_judge: 'main' } });
-    assert.equal(s.length, 4);
-    assert.match(s[2].content, /^\[Shop\]\n[\s\S]*\[shop: 가게 이름\|주인 이름\]/);
-    assert.doesNotMatch(s[2].content, /소금 봉지|\[Inventory\]/);
-    assert.equal(withInventory(s, chat), s); }
+  // 2026-11-11 사용자: 「컨텍스트 포함」을 따로 끄는 줄은 없앴다 (사용과 같은 값). 소지품을 끄면 안 넣는다
+  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_on: '0' } }).length, 3, '소지품을 끄면 안 넣는다');
+  assert.equal(withInventory(msgs(chat), { ...chat, scriptstate: { ...chat.scriptstate, $it_push: '0' } }).length, 4, '옛 끔 값이 남아 있어도 넣는다');
   // 응답이 붙은 뒤: 사용 기록(id·횟수)이 응답에 묶이고, 다 써서 목록에서 빠진다
   chat.message.push({ role: 'char', data: '뿌렸다', chatId: 'b2' });
   const vars = settleItemUse(chat, 3);

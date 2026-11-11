@@ -1,5 +1,6 @@
 // 점검 탭: 설정 내보내기(기기 설정 내보내기·가져오기, 저장소 사용량), 상태 점검, 요청 기록(진단 묶음 내려받기·최근 실패·인물 기록 갱신 기록).
 // 설치·점검과 업데이트는 각각 install.ts / ui/update.ts.
+import { setRow } from '../setrow';
 import { chatSettingVars, getPrefs, isChatSettingVar } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
 import { isGoeiLore } from '../../core/install';
@@ -7,7 +8,7 @@ import { cardVersion, compareVersions, PLUGIN_VERSION, UPDATE_BASE } from '../..
 import { tokenizerName } from '../../core/tokenizer';
 import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
-import { dropOldGame, dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
+import { dropTokenizer, dropWikiPack, installTokenizer, installWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { peopleDiagPane } from '../people';
 import { clearTrace, loadTrace, onTraceChange } from '../../host/trace';
@@ -30,9 +31,6 @@ const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `
 export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log' | 'manage:trace' | 'manage:flow' | 'manage:people';
 export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log' || n === 'manage:trace' || n === 'manage:flow' || n === 'manage:people';
 
-/** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
-const GAME_PACK_PREFIX = 'goei:game:pack:';
-const GAME_PACKS = `${GAME_PACK_PREFIX}*`;
 
 /** 저장소 항목: [키, 이름, 설명, 지우기 동작] */
 const STORE: [string, string, string, string?][] = [
@@ -40,13 +38,9 @@ const STORE: [string, string, string, string?][] = [
   ['goei:wikibase', '위키 기본 문서', '카드에서 뺀 기본 문서 묶음. 지우면 설치·점검에서 다시 받아요', 'man-drop-wiki'],
   ['goei:tok-o200k', '토크나이저', 'o200k_base 순위표. 지우면 토큰 수가 어림값이 돼요', 'man-drop-tok'],
   ['goei-people-diag', '인물 기록 실행 기록', '최근 갱신의 입력·출력 원문', 'man-drop-diag'],
-  // 2026-10-28 QC: 옛 키(goei:game-pack:action-normal-v4)는 쓰는 곳이 없어 늘 「없음」이었다. 실제 키로 (src/main.ts·host/game/code.ts·host/game/packs.ts)
   ['goei:body', '플러그인 본체', '괴이 카드를 열 때 받아 둔 goei-body.js. 플러그인 판이 바뀌면 다시 받아요'],
   ['goei:data-world', '세계 자료', '요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
   ['goei:data-install', '설치 자료', '인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
-  // 필드(게임)는 2026-11-04 플러그인에서 뺐다. 예전에 받아 둔 것이 남아 있으면 크기만 보여 준다
-  ['goei:game:code', '옛 게임 코드', '예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요', 'man-drop-game'],
-  [GAME_PACKS, '옛 게임 자산 팩', '예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요', 'man-drop-game'],
 ];
 
 async function sizeOf(key: string): Promise<number> {
@@ -64,7 +58,7 @@ export const manUi = {
   importName: '',
   pending: false,
   importText: '',
-  confirm: '' as '' | 'import' | 'drop-wiki' | 'drop-tok' | 'drop-diag' | 'drop-game',
+  confirm: '' as '' | 'import' | 'drop-wiki' | 'drop-tok' | 'drop-diag',
   info: '',
   notice: '',
   diag: null as DiagRun[] | null,
@@ -80,16 +74,7 @@ let rerender: (() => void) | null = null;
 async function refresh(): Promise<void> {
   const sizes: Record<string, number> = {};
   for (const [key] of STORE) {
-    if (key === GAME_PACKS) {
-      let total = 0;
-      try {
-        const keys: unknown = await risuai.pluginStorage.keys();
-        for (const k of Array.isArray(keys) ? keys : []) if (typeof k === 'string' && k.startsWith(GAME_PACK_PREFIX)) total += await sizeOf(k);
-      } catch {
-        // 키 목록을 못 읽는 판: 0
-      }
-      sizes[key] = total;
-    } else sizes[key] = await sizeOf(key);
+    sizes[key] = await sizeOf(key);
   }
   manUi.sizes = sizes;
   try {
@@ -127,7 +112,7 @@ export function ensureManage(render: () => void): void {
   });
 }
 
-const row = (label: string, ctl: string, help = '') => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${ctl}</div></div>`;
+const row = (label: string, ctl: string, help = '') => setRow(label, ctl, help);
 const badge = (ok: boolean | null, text: string) => `<span class="gw-state${ok === null ? ' off' : ok ? '' : ' bad'}">${esc(text)}</span>`;
 const head = (crumb: string, title: string, desc: string, act = '') =>
   `<header class="gw-head"><h2>${esc(title)}${crumb ? `<small>${esc(crumb)}</small>` : ''}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ''}<p class="gx-muted">${esc(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc(manUi.notice)}</div>` : ''}${manUi.info ? `<p class="gx-hint">${esc(manUi.info)}</p>` : ''}</header>`;
@@ -419,16 +404,8 @@ export async function manageAction(action: string, root: HTMLElement | null, ctx
     case 'man-drop-wiki':
     case 'man-drop-tok':
     case 'man-drop-diag':
-    case 'man-drop-game':
       manUi.confirm = action.slice(4) as typeof manUi.confirm;
       return true;
-    case 'man-drop-game-yes': {
-      manUi.confirm = '';
-      const n = await dropOldGame();
-      manUi.info = n ? `옛 게임 자료 ${n}개를 지웠어요.` : '지울 옛 게임 자료가 없어요.';
-      manUi.sizes = null;
-      return true;
-    }
     case 'man-drop-wiki-yes':
       manUi.confirm = '';
       await dropWikiPack();

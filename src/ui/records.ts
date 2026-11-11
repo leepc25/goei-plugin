@@ -2,7 +2,8 @@
 // 2026-11-05 사용자: 「보고서」 하위 탭은 일지와 겹쳐서 뺐다(일지 줄을 누르면 그 보고서 페이지). 가계부는 따로 탭이 아니라 여기 하위 탭.
 // 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
-// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
+// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 메인 요청에 · 일지 상한 · 보고서 상한 ($jr_*).
+import { setRow } from './setrow';
 import {
   JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
@@ -108,7 +109,7 @@ function gmark(kind: JournalKind, grade?: string): string {
   return `<i class="gx-gmark ${cls}${g ? ` g-${g.toLowerCase()}` : ''}" title="${JOURNAL_KIND_LABEL[kind]}${g ? ` ${esc(g)}등급` : ''}">${g ? esc(g) : mark}</i>`;
 }
 const whoText = (r: { mine: boolean; agents: { name: string }[] }) => [...(r.mine ? ['나'] : []), ...r.agents.map((a) => a.name)].filter(Boolean).join(' · ');
-const mineBadge = (r: { mine: boolean; kind: JournalKind }) => (r.kind === 'fd' ? '<span class="gx-badge live">필드 출동</span>' : r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>');
+const mineBadge = (r: { mine: boolean; kind: JournalKind }) => (r.mine ? '<span class="gx-badge live">내 사건</span>' : '<span class="gx-badge">그 외</span>');
 
 /** 세계 시각 (상황판) — 없으면 가장 최근 일지 줄의 시각 */
 function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
@@ -217,7 +218,7 @@ function journalPane(ctx: ChatContext): string {
   const todayKey = now === null ? '' : dayOf(now);
   const todayRows = todayKey ? rows.filter((r) => dayOf(r.at) === todayKey) : [];
   const mineN = rows.filter((r) => r.mine).length;
-  const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
   const durs = todayRows.map((r) => (r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null)).filter((d): d is number => d !== null);
   const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
   const clockText = now === null ? '' : journalClock(now).replace(/^(\d\d)\.(\d\d)/, `${new Date(now * 60000).getUTCFullYear()}.$1.$2`);
@@ -249,7 +250,7 @@ export function journalList(ctx: ChatContext): string {
     else groups.push({ day, rows: [r] });
   }
   groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
-  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
   return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('');
 }
 
@@ -581,7 +582,7 @@ export function recordsInput(name: string, value: string): boolean {
 // ── 설정 「기록」 묶음 ──
 
 const CHAT_CARD: [string, string][] = [['off', '안 띄움'], ['mine', '내가 출동한 사건만'], ['all', '전부']];
-const row = (label: string, control: string, help = '') => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+const row = (label: string, control: string, help = '') => setRow(label, control, help);
 function seg(key: string, cur: string, items: [string, string][]): string {
   const sw = onOffSwitch(items, cur, 'jr-set', (v) => `${key}=${v}`);
   if (sw) return sw;
@@ -595,7 +596,7 @@ function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, l
 export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
   const s = journalSettings(ctx.chat.scriptstate);
   const rows = [
-    row('채팅에 보고서 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
+    row('보고서 카드 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 끝난 응답 아래에 보고서 카드를 띄울지만 정해요. 보고서 자체는 이 설정과 상관없이 모두 만들어져 「기록」에 쌓여요. 카드는 보여 주기만 하고 본문·요청에는 들어가지 않아요. 안 띄움으로 바꾸면 이미 뜬 카드도 사라져요.'),
     row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한'), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
     row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한'), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
   ].join('');
@@ -603,7 +604,7 @@ export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>일지 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('jr')}</span></header>${defaultsConfirm('jr')}
     ${rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : ''}
     <div class="ph-form-body ps">
-      <section class="ps-group"><h3>일지</h3><div class="ps-rows">${rows}</div></section>
+      <section class="ps-group"><div class="ps-rows">${rows}</div></section>
     </div>
     ${toast('rec', rec.info, (t) => {
       if (rec.info === t) rec.info = '';

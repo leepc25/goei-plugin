@@ -10,12 +10,18 @@ export const isBoardSite = (v: unknown): v is BoardSite => (BOARD_SITES as unkno
 export const BOARD_NAME: Record<BoardSite, string> = { gn: '괴담넷', gal: '괴담갤', wpf: '세정게', sm: '연어 마켓' };
 /** 요청문이 지금 어느 사이트인지 아는 변수 (보기에만 있고 저장하지 않는다) */
 export const BOARD_SITE_VAR = '$gn_site';
-/** 사이트마다 따로 두지 않는 괴담넷 변수: 닉네임은 인터넷 로그인 하나 */
-const SHARED = new Set(['$gn_nick']);
+/** 사이트마다 따로 두지 않는 괴담넷 변수: 닉네임은 인터넷 로그인 하나, 쪽지 자동 정리는 게시판 넷이 한 값 */
+const SHARED = new Set(['$gn_nick', '$gn_storage_auto_dm', '$gn_storage_limit_dm']);
+/** 게시판마다 따로 정하는 설정 (설정 → 인터넷의 격자). 그 밖의 게시판 설정($lb_cfg_lb-gn.*)은 네 게시판이 괴담넷 자리의 값 하나를 같이 쓴다 (2026-11-11 사용자) */
+export const BOARD_OWN_CFG = ['mode', 'lazy', 'context', 'privacy', 'subject', 'mood', 'protagonist', 'post_min', 'post_max', 'cmt_min', 'cmt_max', 'act_min', 'act_max', 'incoming', 'incoming_chance'];
+const OWN = new Set(BOARD_OWN_CFG);
+const GN_CFG = '$lb_cfg_lb-gn.';
+/** 네 게시판이 같이 쓰는 값인가 */
+export const boardShared = (key: string): boolean => SHARED.has(key) || (key.startsWith(GN_CFG) && !OWN.has(key.slice(GN_CFG.length)));
 
 /** 괴담넷 이름 → 그 사이트 이름. 사이트 변수가 아니면 null */
 export function siteKey(key: string, site: BoardSite): string | null {
-  if (SHARED.has(key) || key === BOARD_SITE_VAR) return null;
+  if (boardShared(key) || key === BOARD_SITE_VAR) return null;
   if (key.startsWith('$lb_cfg_lb-gn.')) return site === 'gn' ? key : `$lb_cfg_lb-${site}.${key.slice(14)}`;
   if (key.startsWith('$gn_')) return site === 'gn' ? key : `$${site}_${key.slice(4)}`;
   if (key === '$cooldown_received_gnet') return site === 'gn' ? key : `$cooldown_received_${site}`;
@@ -27,7 +33,7 @@ export function siteKey(key: string, site: BoardSite): string | null {
 function gnKey(key: string, site: BoardSite): string | null {
   if (site === 'gn') return siteKey(key, 'gn');
   const cfg = `$lb_cfg_lb-${site}.`;
-  if (key.startsWith(cfg)) return `$lb_cfg_lb-gn.${key.slice(cfg.length)}`;
+  if (key.startsWith(cfg)) return OWN.has(key.slice(cfg.length)) ? `$lb_cfg_lb-gn.${key.slice(cfg.length)}` : null;
   if (key === `$cooldown_received_${site}`) return '$cooldown_received_gnet';
   if (key === `$st_unread_${site}`) return '$st_unread_gnet';
   if (key.startsWith(`$${site}_`)) {

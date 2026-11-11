@@ -25,10 +25,9 @@ export function craftSettings(state: State, f: Feature): CraftSettings {
   };
 }
 
-/** 기능별 전용 모델 ID (라이트보드 「전용 모델」, 2026-11-06). 비우면 undefined → 메인·보조 설정대로 */
-export function featureModel(state: State, f: Feature): string | undefined {
-  const v = advValue(state, f, 'model_id').trim();
-  return v || undefined;
+/** 기능별 전용 모델 ID: 없앤 기능 (2026-11-12 사용자). 부르는 곳은 그대로 두고 늘 「없음」을 돌려준다 → 메인·보조 설정대로 */
+export function featureModel(_state: State, _f: Feature): string | undefined {
+  return undefined;
 }
 
 export interface CraftTexts {

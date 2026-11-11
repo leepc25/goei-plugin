@@ -2,6 +2,8 @@
 // 모양은 11-10 도트 시안(site_mock_dot: 도트 글꼴·2px 테두리·판 색)을 그대로. 방송 칸은 재생기(ui/hsplayer.ts)가 그린다.
 // 편성 호출은 상점 요청문(core/shop.ts shelfPrompt)에 방송 절(지침 「망상홈쇼핑」 BROADCAST)을 붙여 한 번에: 상품·상품마다 큐시트·채팅.
 // 설정은 우주몰·포인트몰과 같은 틀(설정 → 인터넷 → 망상홈쇼핑). 재생 규칙·효과·속도 모두 설정에서 고친다.
+import { defGroups, type Wire } from './setrow';
+import { HOMESHOP_SET } from '../core/setdef/homeshop';
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { generate, type LlmMessage } from '../host/llm';
@@ -12,12 +14,11 @@ import { addItem, addItemLog, itemId, liveItemsOf, readItems, itemsVars, removeI
 import { userTurns } from '../core/request';
 import { userInfo } from '../host/user';
 import { fillGuide, guideSections } from '../core/guides';
-import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_FORMS_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
+import { applyShow, boxOrder, CLIP_GROUP_LABEL, CUE_CUT_WORD, CUE_EVENT_WORD, HS_AT_VAR, HS_AUD_VAR, HS_BOX, HS_TEL_DEFAULT, HS_HOST, HS_KEY, HS_NAME, HS_NUM, hsKey, hsSettings, hsVars, installments, liveOrders, moodMap, newOrder, orderOpened, ordersVars, paidOf, parseCue, parseShow, readAudience, readOrders, readShow, showVars, type HsCue, type HsOrder, type HsScale, type HsSettings, type HsShow } from '../core/homeshop';
 import { homeshopArt, homeshopStatus, onHomeshopReady } from '../host/homeshop';
 import { mountPlayer, playerCut, playerSay, playerState, setPlayerFeed, stopPlayer } from './hsplayer';
 import { shopSource } from './shop';
 import { itemPic } from './items';
-import { onOffSwitch } from './controls';
 import { isPhone } from './media';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -74,7 +75,7 @@ onHomeshopReady(() => liveEnv?.render());
 
 /** 주문 전화번호 (화면 글, 설정에서 고친다) */
 export const HS_TEL_KEY = '$hs_tel';
-export const HS_TEL_DEFAULT = '080-404-0000';
+
 const telOf = (ctx: ChatContext) => String(ctx.chat.scriptstate?.[HS_TEL_KEY] ?? '').trim() || HS_TEL_DEFAULT;
 /** 호출 실패 때 자동으로 다시 연결하는 횟수 (0~3, 기본 1) */
 export const HS_RETRY_KEY = '$hs_retry';
@@ -511,31 +512,9 @@ export function boxButton(ctx: ChatContext, itemIdOf: string): string {
 
 // ── 설정 페이지 (우주몰·포인트몰과 같은 틀. 하드코딩 금지: 재생 규칙·효과·속도·줄 수 전부 여기서) ──
 
-const row = (label: string, control: string, hint = '') =>
-  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
-function seg(key: string, cur: string, items: [string, string][]): string {
-  const sw = onOffSwitch(items, cur, 'hs-cfg', (v) => `${key}=${v}`);
-  if (sw) return sw;
-  return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="hs-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join('')}</div>`;
-}
-/** 횟수 칸: 설정 공통 증감 단추 (settings.ts stepper 와 같은 모양·같은 값 꼴 「키:+」「키:-」) */
-const stepper = (action: string, key: string, shown: string, canDown: boolean, canUp: boolean, label: string) =>
-  `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${canDown ? '' : 'disabled'} aria-label="${esc(label)} 줄이기">−</button><b>${esc(shown)}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${canUp ? '' : 'disabled'} aria-label="${esc(label)} 늘리기">+</button></div>`;
-const ONOFF: [string, string][] = [['1', 'ON'], ['0', 'OFF']];
-const num = (vars: Record<string, unknown> | undefined, k: keyof typeof HS_NUM, label: string) => {
-  const d = HS_NUM[k];
-  const raw = vars?.[d.key];
-  const cur = raw === undefined || raw === '' ? d.def : Number(raw);
-  return `<input class="gx-search ph-pct" type="number" min="${d.lo}" max="${d.hi}" data-change="hs-num" data-key="${k}" value="${cur}" aria-label="${esc(label)}"><span>${d.unit}</span>`;
-};
-const pairBox = (vars: Record<string, unknown> | undefined, a: keyof typeof HS_NUM, b: keyof typeof HS_NUM, label: string) =>
-  `<span class="ph-inline"><span>최소</span>${num(vars, a, `${label} 최소`)}<span>최대</span>${num(vars, b, `${label} 최대`)}</span>`;
 /** 상점 설정 이름 (사이트 앞붙이 없이) → 설정 화면 키 */
 const SH: Record<string, string> = { model: '$sh_model', ctx: '$sh_ctx', price: '$sh_price', diverse: '$sh_diverse', thoughts: '$sh_thoughts', prev: '$sh_prev', min: '$sh_min', max: '$sh_max', turns: '$sh_turns', refs: '$sh_refs' };
 const SH_RANGE: Record<string, [number, number]> = { min: [SHOP_SIZE_LO, SHOP_SIZE_HI], max: [SHOP_SIZE_LO, SHOP_SIZE_HI], turns: [1, 8], refs: [0, 12] };
-const shNum = (key: string, cur: number, unit: string, label: string) =>
-  `<input class="gx-search ph-pct" type="number" min="${SH_RANGE[key][0]}" max="${SH_RANGE[key][1]}" data-change="hs-shnum" data-key="${key}" value="${cur}" aria-label="${esc(label)}"><span>${unit}</span>`;
 /** 켬/끔 칸: 설정 키 → 변수 이름 */
 const FLAG: Record<string, string> = { on: HS_KEY.on, net: HS_KEY.net, cut: HS_KEY.cut, bulb: HS_KEY.bulb, tear: HS_KEY.tear, scan: HS_KEY.scan, turn: HS_KEY.turn, lock: HS_KEY.lock, aud: HS_KEY.aud, peek: HS_KEY.peek, say: HS_KEY.say, barter: HS_KEY.barter };
 
@@ -546,63 +525,34 @@ export function homeshopSettingsPane(ctx: ChatContext): string {
   const clipHelp = art
     ? (['A', 'B'] as const).map((c) => `${c === 'A' ? '와이드' : '바스트'}: ${[...new Map(art.pack.cuts[c].clips.map((k) => [k.name, `${k.ko}(${CLIP_GROUP_LABEL[k.group]})`])).values()].join(', ')}`).join('<br>')
     : '방송 그림을 받으면 동작 목록이 보여요.';
-  const scales: [string, string][] = [['auto', '자동'], ['fit', '폭 맞춤'], ['0.5', '0.5배'], ['1', '1배'], ['2', '2배']];
-  const body = [
-    group(HS_NAME, [
-      row('사용', seg('on', s.on ? '1' : '0', ONOFF), '끄면 방송이 나오지 않고 즐겨찾기에서도 빠져요.'),
-      row('인터넷에 상시 노출', seg('net', s.net ? '1' : '0', ONOFF), '켜면 인터넷 즐겨찾기에 늘 보여요. 꺼도 본편에서 카드로 접속하면 열려요(설정 → 소지품 → 고유 상점).'),
-      row('자동 호출', seg('auto', s.auto, [['manual', '수동'], ['open', '창을 열 때']]), s.auto === 'manual' ? '새로 고침을 눌렀을 때만 새 편성을 받아요.' : '사이트를 열 때, 지난 편성이 끝났거나 본편이 진행됐으면 한 번 새로 받아요.'),
-      row('자동 다시 연결', stepper('hs-retry', 'n', `${retryOf(ctx)}회`, retryOf(ctx) > 0, retryOf(ctx) < 3, '자동 다시 연결'), '편성을 받지 못하면 「신호 없음」 화면에서 스스로 다시 연결하는 횟수예요(0~3).'),
-      row('주문 전화번호', `<input class="gx-search ps-text" data-change="hs-text" data-key="tel" value="${esc(String(vars?.[HS_TEL_KEY] ?? ''))}" maxlength="20" placeholder="${HS_TEL_DEFAULT}">`, '방송 화면과 머리에 보이는 번호예요.'),
-    ].join('')),
-    group('편성', [
-      row('모델', seg('sh:model', s.shop.model, [['main', '메인 모델'], ['aux', '보조 모델']]), '상품·큐시트·채팅을 지을 모델이에요. 한 번 호출로 다 받아요.'),
-      row('컨텍스트에 포함', seg('sh:ctx', s.shop.context ? '1' : '0', ONOFF), '켜면 최근 본문·상태창·진행 중 괴이·신분을 같이 넘겨요.'),
-      row('상품 수', `<span class="ph-inline"><span>최소</span>${shNum('min', s.shop.size[0], '개', '상품 수 최소')}<span>최대</span>${shNum('max', s.shop.size[1], '개', '상품 수 최대')}</span>`, `한 편성의 상품(부) 수예요(${SHOP_SIZE_LO}~${SHOP_SIZE_HI}).`),
-      row('상품마다 큐 줄 수', pairBox(vars, 'cueMin', 'cueMax', '큐 줄 수'), '상품 하나에 진행자가 말하는 장면 수예요.'),
-      row('채팅 줄 수', pairBox(vars, 'chatMin', 'chatMax', '채팅 줄 수'), '한 번에 받아 두고 방송 동안 흘리는 시청자 채팅 줄 수예요.'),
-      row('값 기준', `<input class="gx-search ps-text" data-change="hs-text" data-key="sh:price" value="${esc(s.shop.price)}" maxlength="80" placeholder="비우면 방송에 어울리는 회차">`),
-      row('다양성 강화', seg('sh:diverse', s.shop.diverse ? '1' : '0', ONOFF)),
-      row('지난 목록 피하기', seg('sh:prev', s.shop.avoidPrev ? '1' : '0', ONOFF), '새 편성을 받을 때 지난 편성의 상품을 피해요.'),
-      row('생각 단계', seg('sh:thoughts', s.shop.thoughts, [['off', '사용 안 함'], ['inner', '속으로만'], ['note', '적고 지움']])),
-      row('최근 본문 턴 수', shNum('turns', s.shop.turns, '턴', '최근 본문 턴 수'), '컨텍스트에 포함일 때 넘기는 턴 수예요(1~8).'),
-      row('참고 로어북 수', shNum('refs', s.shop.refs, '개', '참고 로어북 수'), '0~12.'),
-    ].join('')),
-    group('방송 흐름', [
-      row('자막 속도', num(vars, 'speed', '자막 속도'), '진행자 대사가 찍히는 빠르기예요. 대사 길이가 장면 길이를 정해요.'),
-      row('대사 뒤 쉼', num(vars, 'hold', '대사 뒤 쉼'), '대사가 다 찍힌 뒤 다음 장면으로 넘어가기까지예요(12 = 1.2초).'),
-      row('동작 한 장 길이', num(vars, 'frame', '동작 한 장 길이'), '진행자 동작이 한 장 넘어가는 시간이에요. 작을수록 빨라요.'),
-      row('채팅 간격', num(vars, 'chatGap', '채팅 간격'), '채팅 한 줄이 올라오는 평균 간격이에요(22 = 2.2초).'),
-      row('다음 부까지', num(vars, 'next', '다음 부까지'), '큐시트가 끝난 뒤 다음 상품으로 넘어가기까지예요. 0이면 스스로 넘어가지 않아요.'),
-      row('남은 수량 시작 값', num(vars, 'left', '남은 수량 시작 값')),
-      row('본편 턴이 넘어가면 다음 부로', seg('turn', s.turn ? '1' : '0', ONOFF), '켜면 본편이 한 턴 진행될 때마다 편성이 한 칸 넘어가요. 놓친 상품은 편성표에서 보기만 해요.'),
-      row('지난 부 잠그기', seg('lock', s.lock ? '1' : '0', ONOFF), '켜면 지난 부에 「매진」 딱지가 붙어요.'),
-      row('채팅 보내기', seg('say', s.say ? '1' : '0', ONOFF), '내가 채팅을 쓰면 한 번 더 호출해 진행자와 시청자의 반응을 받아요.'),
-    ].join('')),
-    group('주문 · 할부', [
-      row('물건 맞교환', seg('barter', s.barter ? '1' : '0', ONOFF), '전화 주문에서 가진 물건 하나로 결제할 수 있어요. 맞교환은 할부 장부에 오르지 않아요.'),
-      row('할부 호출 간격', pairBox(vars, 'callLo', 'callHi', '할부 호출 간격'), '주문한 뒤 이만큼 턴이 지날 때마다 본편에 출연 호출을 한 번 넘기고 1회 납부로 쳐요. 평소에는 본편에 아무것도 보내지 않아요.'),
-      row('출연 형태', `<input class="gx-search ps-text" data-change="hs-text" data-key="forms" value="${esc(String(vars?.[HS_KEY.forms] ?? ''))}" maxlength="200" placeholder="${HS_FORMS_DEFAULT}">`, '호출 때 이 가운데 하나를 골라 넘겨요. 쉼표로 나눠요. 호출 글은 지침 → 망상홈쇼핑의 CALL 절에서 고쳐요.'),
-      row('스티커 들추기', seg('peek', s.peek ? '1' : '0', ONOFF), '상품 스티커 창에서 모서리를 들춰 아래 한 줄을 볼 수 있어요.'),
-      row('방청 신청', seg('aud', s.aud ? '1' : '0', ONOFF), '신청하면 다음 턴 본편에 한 줄만 넘겨요. 글은 지침의 AUDIENCE 절에서 고쳐요.'),
-    ].join('')),
-    group('진행자 동작', `<p class="ps-note">아무 일 없을 때는 「기본」 동작을 되풀이하다가, 정해진 횟수마다 「가끔」 동작을 하나 끼워요. 그 자리에서 확률로 「드물게」 동작이 대신 나와요. 「대사·사건」 동작은 큐시트의 표정에 맞춰서만 나와요. 같은 동작의 1·2판은 번갈아 써요.</p>` + [
-      row('「가끔」 동작 간격', pairBox(vars, 'fillLo', 'fillHi', '가끔 동작 간격'), '기본 동작을 이만큼 되풀이한 뒤 하나 끼워요.'),
-      row('「가끔」 다시 나오기까지', num(vars, 'fillCool', '가끔 다시 나오기까지'), '같은 동작이 다시 나오기까지 기본 동작 되풀이 수예요.'),
-      row('「드물게」 확률', num(vars, 'rareP', '드물게 확률'), '「가끔」 자리마다 이 확률로 섬뜩한 동작이 나와요.'),
-      row('「드물게」 다시 나오기까지', num(vars, 'rareCool', '드물게 다시 나오기까지')),
-      row('동작 분류 고치기', `<textarea class="gx-search ms-area" rows="4" data-change="hs-text" data-key="clips" placeholder="B:찢어지는 미소=안씀&#10;B:웃음=드물게">${esc(s.clipsText)}</textarea>`, `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}`),
-    ].join('')),
-    group('화면 효과', [
-      row('컷 전환', seg('cut', s.fx.cut ? '1' : '0', ONOFF), '끄면 진행자 정면(바스트) 한 장면만 써요.'),
-      row('전구 반짝임', seg('bulb', s.fx.bulb ? '1' : '0', ONOFF)),
-      row('신호 찢김', seg('tear', s.fx.tear ? '1' : '0', ONOFF), '0.2~0.4초 동안 화면이 찢기고 다른 얼굴이 끼어들어요.'),
-      row('찢김 확률', num(vars, 'tearP', '찢김 확률'), '장면이 바뀔 때마다 저절로 찢길 확률이에요. 큐시트의 「신호 찢김」은 늘 나와요.'),
-      row('주사선', seg('scan', s.fx.scan ? '1' : '0', ONOFF)),
-      row('PC 표시 배율', seg('scalePc', s.scalePc, scales), '자동 = 창이 넓으면 2배, 아니면 1배.'),
-      row('폰 표시 배율', seg('scalePh', s.scalePhone, scales), '자동 = 화면 폭에 맞춤.'),
-    ].join('')),
-  ].join('');
+  // 줄은 정의표(core/setdef/homeshop.ts)에서 온다. 여기는 값을 읽어 주는 선만 잇는다
+  const b = (x: boolean) => (x ? '1' : '0');
+  const n = (k: string) => { const raw = vars?.[HS_NUM[k].key]; return raw === undefined || raw === '' ? HS_NUM[k].def : Number(raw); };
+  const vals: Record<string, string> = {
+    on: b(s.on), net: b(s.net), auto: s.auto, retry: String(retryOf(ctx)), tel: String(vars?.[HS_TEL_KEY] ?? ''),
+    'sh:model': s.shop.model, 'sh:ctx': b(s.shop.context), 'sh:price': s.shop.price, 'sh:diverse': b(s.shop.diverse), 'sh:prev': b(s.shop.avoidPrev), 'sh:thoughts': s.shop.thoughts,
+    turns: String(s.shop.turns), refs: String(s.shop.refs), turn: b(s.turn), lock: b(s.lock), say: b(s.say), barter: b(s.barter), peek: b(s.peek), aud: b(s.aud),
+    forms: String(vars?.[HS_KEY.forms] ?? ''), clips: s.clipsText, cut: b(s.fx.cut), bulb: b(s.fx.bulb), tear: b(s.fx.tear), scan: b(s.fx.scan), scalePc: s.scalePc, scalePh: s.scalePhone,
+  };
+  const pairs: Record<string, [string, string]> = { cue: ['cueMin', 'cueMax'], chat: ['chatMin', 'chatMax'], call: ['callLo', 'callHi'], fill: ['fillLo', 'fillHi'] };
+  const wire: Wire = {
+    cur: (k) => vals[k] ?? String(n(k)),
+    minmax: (k) => (k === 'size' ? s.shop.size : [n(pairs[k][0]), n(pairs[k][1])]),
+    help: { clips: () => `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}` },
+  };
+  // 4단계: 상점 표로 올라간 줄을 빼고 남은 줄을 하는 일대로 다시 묶는다
+  const all = HOMESHOP_SET.groups.flatMap((g) => g.rows);
+  const pick = (title: string, keys: string[], note?: string) => ({ title, note, rows: keys.map((k) => all.find((r) => r.key === k)!).filter(Boolean) });
+  const page: typeof HOMESHOP_SET = { ...HOMESHOP_SET, groups: [
+    pick('', ['net', 'retry', 'say']),
+    pick('편성', ['cue', 'chat']),
+    pick('방송 흐름', ['speed', 'hold', 'frame', 'chatGap', 'next', 'left', 'turn', 'lock']),
+    pick('주문', ['barter', 'peek']),
+    pick('컨텍스트 포함', ['call', 'forms', 'aud']),
+    pick('진행자 동작', ['fill', 'fillCool', 'rareP', 'rareCool', 'clips'], HOMESHOP_SET.groups.find((g) => g.title === '진행자 동작')?.note),
+    pick('방송 화면', ['tel', 'cut', 'bulb', 'tear', 'tearP', 'scan', 'scalePc', 'scalePh']),
+  ] };
+  const body = defGroups(page, wire);
   return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body}</div></div>`;
 }
 

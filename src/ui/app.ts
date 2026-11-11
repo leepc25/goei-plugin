@@ -8,7 +8,6 @@ import { NavHistory, type RecordsNav } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, effectiveFaction, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
-import { handleVersus, setVsRender } from './versus';
 import type { Faction, FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, worldOn,
@@ -65,7 +64,8 @@ import { boardMapUrl, field, handleField, mapTab, mapSuggestFor, missionList, mi
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
-import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
+import { handleSettings, resetSettings, settingsTab, settingsUi, shopFamSet, type SettingsEnv } from './settings';
+import { famAction } from './famtable';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
@@ -182,7 +182,6 @@ const wikiEnv: WikiEnv = {
 
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
-setVsRender(() => render());
 const peopleEnv: PeopleEnv = settingsEnv;
 const recordsEnv: RecordsEnv = settingsEnv;
 
@@ -792,12 +791,6 @@ export async function openShop(site = ''): Promise<void> {
   if (view.kind === 'started') await handle('shop-open');
 }
 
-/** 대전 자료가 없을 때 게임패드 단추: 설정 「대전」으로 (11-08 사용자) */
-export async function openVersusSettings(): Promise<void> {
-  await openApp({ quietIfNotLite: true });
-  if (view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening') await handle('ed-open', 'set:versus');
-}
-
 /** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
 export async function openRecords(id: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
@@ -960,6 +953,18 @@ async function handle(action: string, value?: string): Promise<void> {
     const ms = curTab().site;
     if (isMallSite(ms) && (await mallAction(action, value, featCtx, wikiEnv, ms))) return;
   }
+  // 설정 → 인터넷·상점의 격자와 그 아래 줄 (fam-*). 게시판 값은 늘 이 채팅에, 상점 값은 그 페이지의 범위(시작 전 = 새 채팅 기본값)에
+  if (action.startsWith('fam-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
+    const fctx = view.ctx;
+    const scope = view.kind === 'started' ? 'chat' : 'defaults';
+    if (settingsUi.busy) return;
+    await famAction(action, value, {
+      render,
+      board: (a, v, site) => handleGnet(a, v, fctx, gnetEnv, site),
+      shop: (col, key, v) => shopFamSet(fctx, settingsEnv, scope, col, key, v),
+    });
+    return;
+  }
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv, gnActionSite(action)))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
@@ -989,7 +994,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return render();
   }
   // 어디서 「설정」을 누르든 설정 창 하나 (2026-10-27 사용자): 괴담넷·괴담톡·위키 판의 설정 단추는 그 기능 페이지로
-  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:gnet', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
+  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:net', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
   if (FEAT_SET[action]) return handle('ed-open', FEAT_SET[action]);
   if (action === 'prefs-open' || action === 'prefs-close') {
     // 시작 전 「새 채팅 기본 설정」: 설정 창을 연다 (패널 안 설정 탭은 없앴다)
@@ -1000,8 +1005,6 @@ async function handle(action: string, value?: string): Promise<void> {
     pickerPrefs = false;
     return render();
   }
-  // 설정 「대전」 (11-08): 이 기기 값·데이터 받기라 채팅 범위와 상관없다
-  if (action.startsWith('vs-') && (await handleVersus(action, value ?? '', () => render()))) return;
   if ((view.kind === 'started' || (view.kind === 'picker' && pickerPrefs)) && action.startsWith('dir-')) {
     if (action === 'dir-save' || action === 'dir-reset') settingsUi.confirm = '';
     await handleDirectory(action, value, view.ctx, settingsEnv);

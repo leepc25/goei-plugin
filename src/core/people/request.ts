@@ -35,7 +35,7 @@ export interface RequestOpts {
 
 /** 장면 인물의 기록 블록 (본편용). 대상이 없으면 빈 문자열 */
 export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; people: string[]; sheets: string[] } {
-  if (!o.settings.on || o.settings.inject === 'off') return { text: '', people: [], sheets: [] };
+  if (!o.settings.on) return { text: '', people: [], sheets: [] };
   const names: NameEntry[] = entriesOf(o.store, o.extraNames ?? {});
   const match = nameMatcher(names);
   // 코드 Router(이름이 직접 나온 인물·동행)는 늘 들어가고, 모델 Router 가 더 고른 인물(이름 없이 가리킨 제3자 등)을 뒤에 합친다.
@@ -85,7 +85,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     if (rb) blocks.unshift(rb);
   }
   // 세력 평판 (기본 켬): 장면 세력(인물 소속 ∪ 최근 글에 나온 세력) 가운데 중립이 아닌 것만 한 줄씩, 맨 뒤에
-  if (o.settings.features.has('faction_rep') && o.settings.factionInject) {
+  if (o.settings.features.has('faction_rep')) {
     const list = Array.isArray(chat.message) ? chat.message : [];
     const texts = [...(o.input ? [o.input] : []), ...list.slice(-2).map((m) => messageText(String(m.data ?? '')))];
     const codes = sceneFactionCodes(o.store, people, texts, o.factionNames);

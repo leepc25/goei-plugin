@@ -43,6 +43,8 @@ export interface Turn {
   mainAt?: number;
   replyAt?: number;
   replyTokens?: number;
+  /** 본편에 보낸 토큰 (host/trace.ts 가 조립된 요청을 센 값) */
+  mainTokens?: number;
   /** 턴이 다 끝난 때 (끝내기 요청이 왔고 도는 호출이 없을 때) */
   endAt?: number;
   /** 채팅 턴 밖(단추로 부른) 호출만 있는 턴 */
@@ -132,9 +134,10 @@ export function progressPlan(stages: Stage[]): void {
 const ORDER: Record<StageGroup, number> = { router: 0, director: 1, main: 2, update: 3, net: 4, other: 5 };
 export const sortPlan = (stages: Stage[]): Stage[] => [...stages].sort((a, b) => ORDER[a.group] - ORDER[b.group]);
 
-export function progressMain(): void {
+export function progressMain(tokens?: number): void {
   if (!turn || turn.manual) return;
   turn.mainAt = Date.now();
+  if (tokens !== undefined) turn.mainTokens = tokens;
   notify();
 }
 
@@ -273,13 +276,14 @@ export function stageCount(t: Turn): { done: number; total: number } {
   return { done: Math.min(total, done + run), total };
 }
 
-/** 턴 합계: 호출 수·요청/응답 토큰·총 시간·실패 수 */
+/** 턴 합계: 호출 수·보낸/받은 토큰·총 시간·실패 수. 본편도 한 번의 호출로 같이 센다 (2026-11-11 사용자: 합계가 안 맞는다) */
 export function turnSummary(t: Turn): { calls: number; req: number; resp: number; ms: number; failed: number } {
   const done = t.calls.filter((c) => c.ms !== undefined);
+  const main = t.replyAt ? 1 : 0;
   return {
-    calls: done.length,
-    req: done.reduce((n, c) => n + c.reqTokens, 0),
-    resp: done.reduce((n, c) => n + (c.respTokens ?? 0), 0),
+    calls: done.length + main,
+    req: done.reduce((n, c) => n + c.reqTokens, 0) + (main ? t.mainTokens ?? 0 : 0),
+    resp: done.reduce((n, c) => n + (c.respTokens ?? 0), 0) + (main ? t.replyTokens ?? 0 : 0),
     ms: (t.endAt ?? Date.now()) - t.at,
     failed: t.plan.filter((s) => stageState(t, s) === 'fail').length,
   };

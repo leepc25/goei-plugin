@@ -90,6 +90,8 @@ export const SHOP_MIN_VAR = '$sh_min';
 export const SHOP_MAX_VAR = '$sh_max';
 /** 희귀·특가 구획 켜기 (기본 켬) */
 export const SHOP_FEATURE_VAR = '$sh_feature';
+/** 상점 넷(기본 상점·우주 쇼핑몰·포인트몰·망상홈쇼핑)이 값 하나를 같이 쓰는 설정: 기본 상점 자리($sh_*)의 값을 넷이 같이 읽는다 (2026-11-11 사용자: 설정 → 상점) */
+export const SHOP_SHARED_VARS: string[] = [SHOP_CTX_VAR, SHOP_TURNS_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_DIVERSE_VAR, SHOP_PREV_VAR];
 export const SHOP_SIZE_LO = 1;
 export const SHOP_SIZE_HI = 16;
 
