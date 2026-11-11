@@ -32,7 +32,7 @@ ${themeVars('[x-goei-prog]')}
 [x-goei-prog][x-goei-theme="light"] { --p-dim: #5C6E6A; --p-danger: #C2412F; --p-void: #F4F6F5; }
 [x-goei-prog][x-goei-theme="paper"] { --p-dim: #6E6046; --p-danger: #A8361F; --p-void: #EFE6D2; }
 [x-goei-prog] {
-  position: fixed; right: 12px; top: 12px; z-index: 45; /* 플러그인 창(49) 아래: 상황판이 열리면 그 뒤로 */
+  position: fixed; right: 12px; top: 12px; z-index: 60; /* 플러그인 창(49) 위: 상황판이 열려 있어도 보인다 (11-11 사용자) */
   display: none; width: 0; height: 0;
   font: 13px/1.4 'IBM Plex Sans KR', 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   color: var(--g-text); word-break: keep-all; -webkit-font-smoothing: antialiased;
@@ -210,7 +210,8 @@ interface Pos {
   right: number;
   top: number;
 }
-const DEFAULT_POS: Pos = { right: 12, top: 12 };
+// 상황판 닫기 X (오른쪽 위 구석) 를 덮지 않게 한 칸 아래 (11-11). 옮긴 자리는 기억한다
+const DEFAULT_POS: Pos = { right: 12, top: 76 };
 
 export async function createProgWin(): Promise<ProgWin> {
   const root = await rootBody();
@@ -377,11 +378,13 @@ export async function createProgWin(): Promise<ProgWin> {
     drag = null;
     pending = null;
     moved = false;
-    if (!visible || phone || !open || typeof ev.clientX !== 'number' || typeof ev.clientY !== 'number') return;
+    if (!visible || phone || typeof ev.clientX !== 'number' || typeof ev.clientY !== 'number') return;
     if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
     const x = ev.clientX;
     const y = ev.clientY;
-    drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(await card.querySelector('[data-grip]')), x, y))().catch(() => false) };
+    // 펼친 창은 머리줄을, 접힌 단추는 단추를 잡고 끈다 (11-11 사용자: 단추가 옮겨지지 않았다). 끌고 놓으면 뒤따르는 클릭은 무시된다 (moved)
+    const grab = open;
+    drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card.querySelector('[data-grip]') : dot), x, y))().catch(() => false) };
   };
   const onMove = (ev: PointerEv) => {
     if (!drag || typeof ev.clientX !== 'number' || typeof ev.clientY !== 'number') return;

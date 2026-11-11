@@ -48,7 +48,7 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { appShown, onAppShown, openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
+import { appShown, openApp, openInstall, openRecords, openShop, openVersusSettings, openWiki } from './ui/app';
 import { closeVersus, toggleVersus, vsDevice, vsOpen } from './host/vs';
 import { isGoeiLore, isLanding } from './core/install';
 import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
@@ -873,8 +873,9 @@ function startWatcher(fab: Fab | null): () => void {
       const padKey = `${pad}:${vsOpen()}`;
       if (fab && padKey !== vsPadKey) { vsPadKey = padKey; await fab.setVersus(pad, vsOpen()).catch(() => {}); }
       // 호출 진행 창 (11-09): 유령 단추와 같은 화면에서만, 설정 「화면 → 호출 진행 창」이 켜져 있을 때
-      // 상황판이 떠 있는 동안은 숨긴다 (릴리스 점검 11-09: 진행 단추가 상황판 닫기 X 를 덮어 눌리지 않았다)
-      const pShow = next.fabVisible && progressOn() && !appShown();
+      // 상황판이 떠 있어도 그 위에 보인다 (11-11 사용자: 보조 기능은 대부분 상황판을 연 채로 쓰니 숨기면 의미가 없다). 닫기 X 를 덮지 않게 기본 자리를 내렸고 단추를 끌어 옮길 수 있다 (host/progwin.ts)
+      // 상황판이 떠 있는 동안에는 유령 단추 판정(fabVisible)이 꺼져 있어도 보이게 한다
+      const pShow = (next.fabVisible || appShown()) && progressOn();
       const pKey = `${pShow}`;
       if (prog && pKey !== progKey) { progKey = pKey; await prog.setVisible(pShow).catch(() => {}); }
       // 떠 있으면 매 초 폭(폰·PC 모양)·자리를 다시 맞춘다 (릴리스 점검 11-09: 창 크기를 바꿔도 그대로였다)
@@ -935,11 +936,6 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   setShopOpener((site) => void openShop(site));
-  // 상황판이 뜨면 호출 진행 창은 바로 숨기고, 닫히면 다음 감시 틱에서 다시 판단 (릴리스 점검 11-09)
-  onAppShown((open) => {
-    if (!prog) return;
-    if (open) { progKey = 'false'; void prog.setVisible(false).catch(() => {}); } else progKey = '';
-  });
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
