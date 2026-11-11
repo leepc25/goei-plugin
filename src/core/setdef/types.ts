@@ -22,6 +22,8 @@ export type SetCtl =
 /** 여러 페이지가 똑같이 갖는 줄의 종류 (기준서 3절). 「인터넷」 표와 관제 화면이 이 값으로 줄을 모은다 */
 export type SetCommon = 'auto' | 'joint' | 'model' | 'ctx' | 'sampling';
 
+export type SetShow = { key: string; eq: string } | { key: string; ne: string };
+
 export interface SetDef {
   /** 페이지 안에서 하나뿐인 열쇠. 버튼 값과 저장 변수 이름의 끝이 된다 */
   key: string;
@@ -34,8 +36,10 @@ export interface SetDef {
   aria?: string;
   /** 조작 옆에 붙는 수 칸 (켬·끔 + 확률, 켬·끔 + 상한). whenOn = 켜져 있을 때만 보인다 */
   inline?: { key: string; lo: number; hi: number; unit: string; aria?: string; whenOn?: boolean };
-  /** 다른 줄의 값이 이럴 때만 보이는 줄 */
-  show?: { key: string; eq: string };
+  /** 다른 줄의 값이 이럴 때만 보이는 줄 (여럿이면 모두 맞아야) */
+  show?: SetShow | SetShow[];
+  /** 범위 배지: device = 이 기기 공통 값 (채팅·기본값 구분 없음) */
+  scope?: 'device' | 'chat' | 'defaults';
 }
 export interface SetGroup {
   /** 묶음 이름. '@page' 면 페이지 이름을 쓴다 */

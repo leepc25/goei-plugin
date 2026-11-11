@@ -16,12 +16,12 @@ export const setGroup = (title: string, rows: string, note = ''): string =>
   `<section class="ps-group">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${rows}</div></section>`;
 
 /** 고르기 조작: ON/OFF 둘뿐이면 스위치. 버튼 값은 「열쇠=값」 */
-export function setSeg(action: string, key: string, cur: string, items: [string, string][]): string {
+export function setSeg(action: string, key: string, cur: string, items: [string, string][], disabled = false): string {
   const val = (v: string) => (key ? `${key}=${v}` : v);
-  const sw = onOffSwitch(items, cur, action, val);
+  const sw = onOffSwitch(items, cur, action, val, disabled);
   if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items
-    .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${val(v)}" aria-pressed="${cur === v}">${label}</button>`)
+    .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${val(v)}" aria-pressed="${cur === v}"${disabled ? ' disabled' : ''}>${label}</button>`)
     .join('')}</div>`;
 }
 
@@ -35,6 +35,8 @@ export interface Wire {
   help?: Record<string, () => string>;
   /** custom 줄의 조작 HTML 과, 값에 따라 달라지는 설명 */
   custom?: Record<string, () => { ctl: string; help?: string }>;
+  /** 저장 중: 조작을 잠근다 */
+  busy?: boolean;
   /** 버튼 값·열쇠 앞에 붙는 갈래 (쇼핑몰의 사이트: 「cos:열쇠=값」) */
   scope?: string;
   /** 묶음 맨 앞에 넣을 HTML (묶음 이름 → 글) */
@@ -56,7 +58,7 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
   if (c.t === 'seg') {
     const raw = w.cur(d.key);
     const cur = c.fb !== undefined && !c.opts.some(([v]) => v === raw) ? c.fb : raw;
-    const seg = page.flat ? setSeg(`${page.id}-${d.key}`, '', cur, c.opts) : setSeg(act(page, 'cfg'), sk(w, d.key), cur, c.opts);
+    const seg = page.flat ? setSeg(`${page.id}-${d.key}`, '', cur, c.opts, w.busy) : setSeg(act(page, 'cfg'), sk(w, d.key), cur, c.opts, w.busy);
     const i = d.inline;
     if (!i) return { ctl: seg, cur };
     const on = c.opts.find(([, l]) => l === 'ON')?.[0];
@@ -91,11 +93,13 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
 
 /** 정의표의 줄 하나 */
 export function defRow(page: SetPage, d: SetDef, w: Wire): string {
-  if (d.show && w.cur(d.show.key) !== d.show.eq) return '';
+  for (const c of d.show ? (Array.isArray(d.show) ? d.show : [d.show]) : []) {
+    if ('eq' in c ? w.cur(c.key) !== c.eq : w.cur(c.key) === c.ne) return '';
+  }
   if (d.ctl.t === 'custom') {
     const c = w.custom?.[d.key]?.();
     if (!c) return '';
-    return setRow(d.label, c.ctl, c.help ?? (typeof d.help === 'string' ? d.help : ''));
+    return setRow(d.label, c.ctl, c.help ?? w.help?.[d.key]?.() ?? (typeof d.help === 'string' ? d.help : ''), '', d.scope);
   }
   if (d.ctl.t === 'area' && d.ctl.labeled) {
     const help = w.help?.[d.key]?.() ?? (typeof d.help === 'string' ? d.help : '');
@@ -106,7 +110,7 @@ export function defRow(page: SetPage, d: SetDef, w: Wire): string {
   }
   const { ctl, cur } = control(page, d, w);
   const help = w.help?.[d.key]?.() ?? (typeof d.help === 'string' ? d.help : d.help ? (d.help[cur] ?? '') : '');
-  return setRow(d.label, ctl, help);
+  return setRow(d.label, ctl, help, '', d.scope);
 }
 /** 정의표의 묶음 하나 */
 export const defGroup = (page: SetPage, g: SetGroup, w: Wire): string =>
