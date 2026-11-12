@@ -917,7 +917,7 @@ function siteMain(site: BoardSite, ctx: ChatContext, st: GState, busy: boolean, 
   if (gnet.compose?.kind === 'post') return composeView(gnet.compose, busy);
   if (gnet.sub === 'dm' && !popDm) return siteDm(st, busy);
   const p = gnet.open !== null ? findAnyPost(st, gnet.open) : undefined;
-  if (p) return (archived(st, p.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 본편 참고에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : '') + sitePost(site, p, busy, now);
+  if (p) return (archived(st, p.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 메인 요청에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : '') + sitePost(site, p, busy, now);
   return siteList(site, st, now, busy, unreadDm);
 }
 

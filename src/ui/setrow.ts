@@ -125,6 +125,14 @@ function control(page: SetPage, d: SetDef, w: Wire): { ctl: string; cur: string 
 }
 
 /** 정의표의 줄 하나 */
+/** 격자 칸 폭 (모든 격자 공통, 2026-11-12 사용자: 수 칸이 좁다 → 다른 칸을 조금씩 좁혀서):
+ *  체크 칸이 수 칸보다 많은 격자에서만 수 칸을 넓힌다. 수 칸이 대부분인 격자는 고르게 둔다(체크 칸을 좁히지 않는다) */
+function ckCols(isNum: boolean[]): string {
+  const nums = isNum.filter(Boolean).length;
+  const wide = nums > 0 && isNum.length - nums > nums;
+  return isNum.map((n) => (wide && n ? 'minmax(126px, 1.35fr)' : 'minmax(0, 1fr)')).join(' ');
+}
+
 export function defRow(page: SetPage, d: SetDef, w: Wire): string {
   for (const c of d.show ? (Array.isArray(d.show) ? d.show : [d.show]) : []) {
     if ('eq' in c ? w.cur(c.key) !== c.eq : w.cur(c.key) === c.ne) return '';
@@ -217,7 +225,7 @@ export const ckGrid = (groups: CkGroup[], rows: CkRow[], foot = '', title = '', 
   const head2 = `<div class="ck-line ck-h2${named ? '' : ' solo'}"><span></span>${flat.map((c) => `<span class="${c.first ? 'ck-first' : ''}${c.band ? ' ck-band' : ''}">${esc(c.o)}</span>`).join('')}</div>`;
   const body = rows.map((r) => `<div class="ck-line ck-row"><b class="ck-name">${r.label}</b>${flat.map((c, i) =>
     `<span class="ck-cell${c.first ? ' ck-first' : ''}${c.band ? ' ck-band' : ''}${c.pair}">${ckCtl(r.marks[i], r.acts[i], `${esc(c.g.name)} ${esc(c.o)}`, c.g.kind === 'one', busy)}</span>`).join('')}</div>`).join('');
-  return `<section class="ps-group ck${groups.some((g) => g.kind === 'num') ? ' ck-hasnum' : ''}" style="--ck-n:${flat.length}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${head1}${head2}${body}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ''}</section>`;
+  return `<section class="ps-group ck${groups.some((g) => g.kind === 'num') ? ' ck-hasnum' : ''}" style="--ck-n:${flat.length};--ck-cols:${ckCols(flat.map((c) => c.g.kind === 'num'))}">${title ? `<h3>${esc(title)}</h3>` : ''}<div class="ps-rows">${head1}${head2}${body}</div>${foot ? `<small class="mx-foot">${foot}</small>` : ''}</section>`;
 };
 /** 띠 여러 개를 PC에서는 한 격자로 나란히, 폰에서는 띠마다 하나로 (폭이 달라서). foot = 설명(helpBox) */
 export interface CkBand { title: string; groups: CkGroup[]; marks: CkMark[][]; acts: (string | null)[][]; foot: string }

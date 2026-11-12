@@ -13,7 +13,8 @@ import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
 import { peopleDiagPane } from '../people';
 import { clearTrace, loadTrace, onTraceChange } from '../../host/trace';
 import { tracePage, traceUi } from './trace';
-import { ensureFlow, flowPage } from './flow';
+import { ensureFlow } from './flow';
+import { flowPage, flowView } from './flowpage';
 import { updateCharacterLore, updateChat, type ChatContext } from '../../host/risu';
 import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { gnet } from '../gnet';
@@ -250,8 +251,9 @@ export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean)
     <div class="gx-settings gw-setbody"><div class="ps pp-set">${peopleDiagPane(ctx, canChat)}</div></div></div>`;
   }
   if (node === 'manage:flow') {
-    ensureFlow(ctx, () => rerender?.());
-    return flowPage(ctx, head);
+    // 시작 전에는 새 채팅이 받을 값으로 센다 (flowpage.ts flowView)
+    ensureFlow(flowView(ctx, canChat).ctx, () => rerender?.());
+    return flowPage(ctx, head, canChat);
   }
   if (node === 'manage:trace') {
     const confirm = traceUi.confirm

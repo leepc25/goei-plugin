@@ -1,4 +1,68 @@
-        sec2[name] = de;
+otal: Object.keys(inst.greetings.index).length },
+      pictures: { missing: missingPics, bytes: missingPics.reduce((n3, p2) => n3 + (Number(p2[3]) || 0), 0), total: want.length },
+      icon: i.iconOurs,
+      wikiPack: i.wikiPack,
+      tokenizer: i.tokenizer
+    };
+  }
+  var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+  function plantGreetings(existing) {
+    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
+    const index = {};
+    const at = /* @__PURE__ */ new Map();
+    out.forEach((g2, n3) => {
+      if (!at.has(g2)) at.set(g2, n3);
+    });
+    const inst = installData();
+    for (const [key, n3] of Object.entries(inst.greetings.index)) {
+      const text5 = inst.greetings.texts[n3] ?? "";
+      let hit4 = at.get(text5);
+      if (hit4 === void 0) {
+        hit4 = out.length;
+        out.push(text5);
+        at.set(text5, hit4);
+      }
+      index[key] = hit4;
+    }
+    return { greetings: out, index };
+  }
+  function buildManifest(o) {
+    const prev = o.prev ?? {};
+    const { wiki: _wiki, ...keys } = prev.keys ?? {};
+    return {
+      ...prev,
+      schema: 1,
+      plugin: "goei-plugin",
+      version: prev.version ?? PLUGIN_VERSION,
+      greetings: o.greetings,
+      pictures: pictures(prev).length ? pictures(prev) : installData().pictures,
+      keys: { ...keys, settings: o.settingsKey }
+    };
+  }
+  var entry2 = (comment, content, folder, extra2 = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra2 });
+  var folderEntry = (comment, key) => ({ key, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
+  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
+  function fillDirectory(cur, def) {
+    const out = { ...cur };
+    let gaps = 0;
+    for (const [k, dv] of Object.entries(def)) {
+      if (k === "_help") continue;
+      const cv = out[k];
+      if (empty(cv)) {
+        if (!empty(dv)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (k === "괴담톡 탭") {
+        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (!isObj2(cv) || !isObj2(dv)) continue;
+      const sec2 = { ...cv };
+      for (const [name, de] of Object.entries(dv)) {
+        const ce = sec2[name];
+        if (ce === void 0) {
+          sec2[name] = de;
           gaps++;
         } else if (isObj2(ce) && isObj2(de)) {
           const row8 = { ...ce };
@@ -137,8 +201,8 @@
     if (!obj5(j.icon)) throw new Error("설치 자료 팩 형식이 달라요 (icon).");
     setInstallData({ greetings: { index: g2.index, texts: g2.texts.map(String), first: g2.first }, pictures: j.pictures, directory: j.directory, icon: j.icon });
   }
-  function makeIconFind(table, rep, base, same4, cats) {
-    return makeIconIndex(table.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same: same4, cats });
+  function makeIconFind(table2, rep, base, same4, cats) {
+    return makeIconIndex(table2.map((r) => ({ file: r.f, keywords: r.k, phrases: [...r.k, ...r.h], kind: r.kind, up: r.u })), rep, { base, same: same4, cats });
   }
   function applyItemsPack(text5) {
     let j;
@@ -150,19 +214,19 @@
     if (!obj5(j) || j.schema !== 1 || j.kind !== "items" || !Array.isArray(j.table) || !obj5(j.icons)) throw new Error("소지품 그림 팩 형식이 달라요.");
     const icons2 = j.icons;
     const strs = (v) => Array.isArray(v) ? v.map((x) => String(x)) : [];
-    const table = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons2[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...Array.isArray(r.u) ? { u: strs(r.u) } : {}, ...r.base ? { base: true } : {} }));
+    const table2 = j.table.filter((r) => obj5(r) && typeof r.f === "string" && typeof r.kind === "string" && typeof icons2[r.f] === "string").map((r) => ({ k: strs(r.k), h: strs(r.h), ft: strs(r.ft), f: r.f, kind: r.kind, ...Array.isArray(r.u) ? { u: strs(r.u) } : {}, ...r.base ? { base: true } : {} }));
     const rep = {};
     if (obj5(j.rep)) {
       for (const [k, f] of Object.entries(j.rep)) if (typeof f === "string" && typeof icons2[f] === "string") rep[normIcon(k)] = f;
     }
     const base = {};
-    for (const r of table) if (r.base) base[r.kind] = r.f;
+    for (const r of table2) if (r.base) base[r.kind] = r.f;
     const same4 = {};
     if (obj5(j.same)) {
       for (const [k, v] of Object.entries(j.same)) if (typeof v === "string") same4[k] = v;
     }
-    const hit4 = makeIconFind(table, rep, base, same4, Array.isArray(j.cats) ? strs(j.cats) : void 0);
-    return { table, rep, icons: icons2, base, hit: hit4, find: (name, icon) => hit4(name, icon)?.file ?? null };
+    const hit4 = makeIconFind(table2, rep, base, same4, Array.isArray(j.cats) ? strs(j.cats) : void 0);
+    return { table: table2, rep, icons: icons2, base, hit: hit4, find: (name, icon) => hit4(name, icon)?.file ?? null };
   }
   function matchItemIcon(pack4, itemName, icon, seed2) {
     const h = pack4.hit(itemName, icon);
@@ -195,10 +259,10 @@
   function matchTitleIcon(pack4, title2) {
     const words = normIcon(title2).split(" ").filter(Boolean);
     if (!words.length) return null;
-    const table = wordsOf(pack4);
+    const table2 = wordsOf(pack4);
     const pre = (a, b) => a.length >= 2 && b.startsWith(a) || b.length >= 2 && a.startsWith(b);
     const backed = (file, last2) => {
-      const x = table.get(file);
+      const x = table2.get(file);
       if (!x) return false;
       for (const w of x.heads) if (w === last2 || pre(w, last2)) return true;
       for (const w of x.mods) if (w !== last2 && pre(w, last2)) return true;
@@ -1210,8 +1274,8 @@ ${p2.body}`.toLowerCase().includes(q)));
     const n3 = pages(total);
     const cur = Math.min(gnet.page, n3);
     const nums = Array.from({ length: n3 }, (_, i) => i + 1).map((k) => k === cur ? `<b>${k}</b>` : `<button data-action="gn-page" data-value="${k}">${k}</button>`).join(" ");
-    const go2 = (label2, k, on3) => label2 ? on3 ? `<button data-action="gn-page" data-value="${k}">${label2}</button>` : `<span>${label2}</span>` : "";
-    return `<nav class="${cls}">${go2(prev, cur - 1, cur > 1)} ${nums} ${go2(next, cur + 1, cur < n3)}</nav>`;
+    const go3 = (label2, k, on3) => label2 ? on3 ? `<button data-action="gn-page" data-value="${k}">${label2}</button>` : `<span>${label2}</span>` : "";
+    return `<nav class="${cls}">${go3(prev, cur - 1, cur > 1)} ${nums} ${go3(next, cur + 1, cur < n3)}</nav>`;
   }
   var searchInput = (ph) => `<input name="gn-q" data-enter="gn-search" value="${esc12(gnet.q)}" placeholder="${esc12(ph)}" aria-label="${esc12(ph)}">`;
   var writeBtn = (cls, label2 = "글쓰기") => `<button class="${cls}" data-action="gn-write">${label2}</button>`;
@@ -1311,22 +1375,22 @@ ${previewText(p2.body)}`;
         const ic2 = (p2) => `<span class="ii ${boardThumb(p2.body) ? "im" : "tx"}"></span>`;
         const ntc = (p2) => p2.tag === "공지";
         const rows3 = list4.map((p2) => ntc(p2) ? `<tr class="ntc"><td><span class="sb">공지</span></td><td><span class="sb">공지</span></td><td class="t">${openBtn(p2, `${esc12(p2.title)}${dot(p2)}`)}</td><td class="n">${esc12(p2.nick)}<span class="fix"></span></td><td>${esc12(when(p2, now2))}</td><td>-</td><td>-</td></tr>` : `<tr${p2.mine ? ' class="mine"' : ""}><td>${p2.id}</td><td>${esc12(p2.tag ?? "일반")}</td><td class="t">${openBtn(p2, `${ic2(p2)}${esc12(p2.title)}<em>[${p2.comments.length}]</em>${dot(p2)}`)}</td><td class="n">${nickIp(p2.nick, p2.id)}</td><td>${esc12(when(p2, now2))}</td><td>${p2.views}</td><td>${p2.votes}</td></tr>`).join("");
-        const table = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
+        const table2 = `<table><colgroup><col style="width:72px"><col style="width:54px"><col><col style="width:120px"><col style="width:56px"><col style="width:52px"><col style="width:42px"></colgroup>
         <tr><th>번호</th><th>말머리</th><th>제목</th><th>글쓴이</th><th>작성일</th><th>조회</th><th>추천</th></tr>${rows3}</table>`;
         const mlist = `<div class="mlist">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${ntc(p2) ? "" : `[${esc12(p2.tag ?? "일반")}] `}${esc12(p2.title)}${ntc(p2) ? "" : `<em>[${p2.comments.length}]</em>`}${dot(p2)}</div><div class="m">${ntc(p2) ? `${esc12(p2.nick)} · ${esc12(when(p2, now2))}` : `${esc12(p2.nick)}${p2.nick === "ㅇㅇ" ? `(${ipOf(p2.id)})` : ""} · ${esc12(when(p2, now2))} · 조회 ${p2.views} · 추천 ${p2.votes}`}</div>`)}</div>`).join("")}</div>`;
         if (empty2) return `<div class="body">${tabs2}${empty2}</div>`;
-        return `<div class="body">${tabs2}${heads}${table}${mlist}${none2(list4)}
+        return `<div class="body">${tabs2}${heads}${table2}${mlist}${none2(list4)}
         <div class="bt2">${catBtn("", "전체글")}${writeBtn("wr")}</div>${pager(all.length, "pager", "", "다음")}
         <label class="bsch"><span>제목+내용</span>${searchInput("검색어")}<button class="go" data-action="gn-search-go">검색</button></label></div>`;
       }
       case "wpf": {
         const ntc = (p2) => p2.tag === "공지";
         const rows3 = list4.map((p2) => `<tr${ntc(p2) ? ' class="ntc"' : ""}><td>${ntc(p2) ? "공지" : p2.id % 1e5}</td><td class="t">${openBtn(p2, `${p2.tag && !ntc(p2) ? `[${esc12(p2.tag)}] ` : ""}${esc12(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}`)}</td><td>${esc12(p2.nick)}</td><td>${esc12(when(p2, now2).replace(".", "/"))}</td><td>${p2.views}</td></tr>`).join("");
-        const table = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows3}</table>`;
+        const table2 = `<table><tr><th style="width:44px">번호</th><th>제 목</th><th style="width:96px">글쓴이</th><th style="width:56px">날짜</th><th style="width:40px">조회</th></tr>${rows3}</table>`;
         const wml = `<div class="wml">${list4.map((p2) => `<div class="it${ntc(p2) ? " ntc" : ""}">${openBtn(p2, `<div class="t">${esc12(p2.title)}${p2.comments.length ? ` <span class="cm">[${p2.comments.length}]</span>` : ""}${postUnread(p2) ? '<span class="nw">N</span>' : ""}</div><div class="m">${esc12(p2.nick)} · ${esc12(when(p2, now2).replace(".", "/"))} · 조회 ${p2.views}</div>`)}</div>`).join("")}</div>`;
         return `<div class="ct"><div class="warn">※ 경.고 : 이 게.시.판은 감.시.받.고 있.습.니.다. 사.진 올.리.지 마.세.요.</div>
         <div class="tot"><span>Total : ${st.posts.length} &nbsp; Page : ${Math.min(gnet.page, pages(all.length))}/${pages(all.length)}</span><span class="srt">${[["new", "최신"], ["hot", "인기"], ["cmt", "댓글"]].map(([k, l]) => `<button class="${gnet.sort === k ? "on" : ""}" data-action="gn-sort" data-value="${k}">${l}</button>`).join(" · ")}</span></div>
-        ${empty2 || `${table}${wml}${none2(list4)}`}${pager(all.length, "pgn", "[이전 10개]", "[다음 10개]")}
+        ${empty2 || `${table2}${wml}${none2(list4)}`}${pager(all.length, "pgn", "[이전 10개]", "[다음 10개]")}
         <div class="nav2"><span>${catBtn("", "목록", "bb")}</span><label class="sch">${searchInput("제목·내용")} <button class="bb" data-action="gn-search-go">검색</button></label>${writeBtn("bb")}</div>
       </div>`;
       }
@@ -1367,8 +1431,8 @@ ${previewText(p2.body)}`;
         seen2.add(k);
         const c = p2.comments[k - 1];
         const confirm = gnet.confirm === `c:${p2.id}:${k}`;
-        const shown3 = site === "wpf" && c.nick === "ㅇㅇ" ? "익명" : c.nick;
-        const author = c.mine ? `<b class="gn-me">${esc12(shown3)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:${k}" title="${dmW()} 보내기"><b>${esc12(shown3)}</b></button>`;
+        const shown4 = site === "wpf" && c.nick === "ㅇㅇ" ? "익명" : c.nick;
+        const author = c.mine ? `<b class="gn-me">${esc12(shown4)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p2.id}:${k}" title="${dmW()} 보내기"><b>${esc12(shown4)}</b></button>`;
         const ip = site === "gal" && c.nick === "ㅇㅇ" ? ` <span class="ip">(${ipOf(p2.id + k)})</span>` : "";
         const del = c.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p2.id}:${k}">정말 삭제</button>` : `<button class="gn-cdel" data-action="gn-del-comment" data-value="${p2.id}:${k}" aria-label="댓글 삭제" title="삭제">삭제</button>` : "";
         const re = depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : "";
@@ -1447,7 +1511,7 @@ ${previewText(p2.body)}`;
     if (gnet.compose?.kind === "post") return composeView(gnet.compose, busy6);
     if (gnet.sub === "dm" && !popDm) return siteDm(st, busy6);
     const p2 = gnet.open !== null ? findAnyPost(st, gnet.open) : void 0;
-    if (p2) return (archived(st, p2.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 본편 참고에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : "") + sitePost(site, p2, busy6, now2);
+    if (p2) return (archived(st, p2.id) ? '<p class="bs-arch">보관된 글이에요. 게시판 목록과 메인 요청에는 들어가지 않아요. 댓글을 달면 그 턴에만 다시 들어가요.</p>' : "") + sitePost(site, p2, busy6, now2);
     return siteList(site, st, now2, busy6, unreadDm);
   }
   function siteHtml(site, ctx2, st, busy6, mobile, extras2, note) {
@@ -2142,10 +2206,10 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     const { rows: rows3 } = rowsOf(ctx2);
     const editable = walletEditable(ctx2.chat.scriptstate);
     const q = walletUi.q.trim().toLowerCase();
-    const shown3 = rows3.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
-    if (!shown3.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 거래가 없어요." : walletUi.kind === "p" ? "아직 포인트 거래가 없어요. 본문에 적힌 포인트 지급·사용이 여기에 쌓여요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
+    const shown4 = rows3.filter(({ e }) => walletUi.filter === "in" ? e.amount > 0 : walletUi.filter === "out" ? e.amount < 0 : true).filter(({ e }) => !q || `${e.memo} ${e.quote ?? ""} ${e.place ?? ""}`.toLowerCase().includes(q)).reverse();
+    if (!shown4.length) return `<p class="gx-wt-empty">${rows3.length ? "맞는 거래가 없어요." : walletUi.kind === "p" ? "아직 포인트 거래가 없어요. 본문에 적힌 포인트 지급·사용이 여기에 쌓여요." : "아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요."}</p>`;
     const groups = [];
-    for (const r of shown3) {
+    for (const r of shown4) {
       const g2 = groups[groups.length - 1];
       if (g2 && g2.date === r.date) g2.rows.push(r);
       else groups.push({ date: r.date, rows: [r] });
@@ -2184,12 +2248,12 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     }
     const { rows: rows3, today, start: start3 } = rowsOf(ctx2);
     const sum = (f) => rows3.filter(f).reduce((n3, r) => n3 + r.e.amount, 0);
-    const real = (r) => r.e.src !== "manual";
-    const income = sum((r) => real(r) && r.e.amount > 0);
-    const spend = -sum((r) => real(r) && r.e.amount < 0);
-    const inN = rows3.filter((r) => real(r) && r.e.amount > 0).length;
-    const outN = rows3.filter((r) => real(r) && r.e.amount < 0).length;
-    const todayRows = rows3.filter((r) => real(r) && today && r.date === today);
+    const real2 = (r) => r.e.src !== "manual";
+    const income = sum((r) => real2(r) && r.e.amount > 0);
+    const spend = -sum((r) => real2(r) && r.e.amount < 0);
+    const inN = rows3.filter((r) => real2(r) && r.e.amount > 0).length;
+    const outN = rows3.filter((r) => real2(r) && r.e.amount < 0).length;
+    const todayRows = rows3.filter((r) => real2(r) && today && r.date === today);
     const todayNet = todayRows.reduce((n3, r) => n3 + r.e.amount, 0);
     const balance = rows3.length ? rows3[rows3.length - 1].after : start3;
     const editable = walletEditable(ctx2.chat.scriptstate);
@@ -2388,13 +2452,13 @@ Recent Baekilmong point transactions (oldest first): ${recentP.join("; ")}` : ""
     return { ev: "" };
   }
   function parseCue(line2, moods) {
-    const cells = line2.split("|").map((x) => x.trim());
-    if (cells.length < 3) return null;
-    const text5 = clean5(cells[2], 160);
+    const cells2 = line2.split("|").map((x) => x.trim());
+    if (cells2.length < 3) return null;
+    const text5 = clean5(cells2[2], 160);
     if (!text5) return null;
-    const cut3 = CUT_IN.find(([re]) => re.test(cells[0]))?.[1] ?? "B";
-    const mood = moods.get(cells[1].replace(/\s+/g, "").toLowerCase()) ?? "talk";
-    return { cut: cut3, mood, text: text5, ...eventOf(cells[3] ?? "") };
+    const cut3 = CUT_IN.find(([re]) => re.test(cells2[0]))?.[1] ?? "B";
+    const mood = moods.get(cells2[1].replace(/\s+/g, "").toLowerCase()) ?? "talk";
+    return { cut: cut3, mood, text: text5, ...eventOf(cells2[3] ?? "") };
   }
   function moodMap(pack4) {
     const m = /* @__PURE__ */ new Map();
@@ -3028,9 +3092,9 @@ ${lines3.join("\n")}` : "";
       const sg = ctx2d(scratch);
       if (!sg) return;
       scene(sg, f, r, "A", r.clip, r.frame);
-      const sw = pack4.w / 2;
+      const sw2 = pack4.w / 2;
       const sh2 = pack4.h / 2;
-      g2.drawImage(scratch, Math.round(pack4.w / 2 - sw / 2), Math.round(TABLE_Y - 30 - sh2 / 2), sw, sh2, 0, 0, pack4.w, pack4.h);
+      g2.drawImage(scratch, Math.round(pack4.w / 2 - sw2 / 2), Math.round(TABLE_Y - 30 - sh2 / 2), sw2, sh2, 0, 0, pack4.w, pack4.h);
     } else if (tearing) {
       const b = clipsOf(pack4.cuts.B, "B", {}).find((c) => c.name === "gape") ?? r.clip;
       scene(g2, f, r, "B", b, b ? Math.floor(b.frames / 2) : 0);
@@ -3107,9 +3171,9 @@ ${r.flags.call ? '<div class="hs-call">☎ 전화 연결 중</div>' : ""}
     const sub = cg.querySelector(".hs-sub");
     if (sub) {
       const chars2 = cue ? Array.from(cue.text) : [];
-      const shown3 = cue ? chars2.slice(0, Math.max(0, Math.floor((t - r.cueAt) / 1e3 * f.s.speed))).join("") : "";
-      if (sub.textContent !== shown3) sub.textContent = shown3;
-      sub.classList.toggle("on", !!shown3);
+      const shown4 = cue ? chars2.slice(0, Math.max(0, Math.floor((t - r.cueAt) / 1e3 * f.s.speed))).join("") : "";
+      if (sub.textContent !== shown4) sub.textContent = shown4;
+      sub.classList.toggle("on", !!shown4);
     }
   }
   var playerState = () => run3 ? { part: run3.part, cue: run3.cue, cut: run3.cut, clip: run3.clip?.name ?? "", left: run3.left, flags: { ...run3.flags } } : null;
@@ -3325,9 +3389,9 @@ ${ui.failRaw.slice(0, 1500)}`;
       if (barterId && !gave) return null;
       const o = newOrder(chat, part.item, s8, gave?.name ?? "");
       if (gave) items = anchor ? sellItem(items, gave.id, anchor, `${HS_NAME} 맞교환`) : removeItem(items, gave.id, "sell", "store", "", { note: `${HS_NAME} 맞교환` });
-      const mine = liveItemsOf(items, chat);
+      const mine2 = liveItemsOf(items, chat);
       let name = HS_BOX.name(part.item.name);
-      for (let k = 2; k < 20 && mine.some((x) => x.id === itemId2(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
+      for (let k = 2; k < 20 && mine2.some((x) => x.id === itemId2(anchor, name) || x.name === name); k++) name = `${HS_BOX.name(part.item.name).slice(0, 27)} ${k}`;
       const paidWith = gave ? `「${gave.name}」 맞교환 (${HS_NAME})` : o.n ? `무이자 할부 ${o.n}회 (${HS_NAME})` : `${part.item.pay || "방송 특가"} (${HS_NAME})`;
       items = addItem(items, alive, { name, desc: HS_BOX.desc, icon: HS_BOX.icon, weight: part.item.weight, from: "store", anchor, paidWith });
       o.boxId = itemId2(anchor, name);
@@ -3485,35 +3549,8 @@ ${nick}: ${text5.slice(0, 200)}`;
     if (ui.done || ordered2) {
       return popShell("☎ 전화 주문", `${head3}${op(ui.done || "주문이 접수되었습니다.")}<p class="hs-ok">택배 상자가 소지품에 도착했습니다.</p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button><button data-action="hs-page" data-value="orders">주문 조회</button>');
     }
-    const mine = ui.pay === "barter" ? barterItems(ctx2) : [];
+    const mine2 = ui.pay === "barter" ? barterItems(ctx2) : [];
     const pays = `<div class="hs-pays"><button class="${ui.pay === "inst" ? "on" : ""}" data-action="hs-pay" data-value="inst" aria-pressed="${ui.pay === "inst"}"><b>${n3 ? `무이자 할부 ${n3}회` : esc15(part.item.pay || "방송 특가")}</b><small>지금 내는 돈 없음</small></button>${s8.barter ? `<button class="${ui.pay === "barter" ? "on" : ""}" data-action="hs-pay" data-value="barter" aria-pressed="${ui.pay === "barter"}"><b>물건 맞교환</b><small>가진 물건 하나로 결제</small></button>` : ""}</div>`;
-    const pick3 = ui.pay === "barter" ? mine.length ? `<div class="hs-pick">${mine.map((x) => `<button class="${ui.barter === x.id ? "on" : ""}" data-action="hs-barter" data-value="${esc15(x.id)}" aria-pressed="${ui.barter === x.id}"><span class="pic">${itemPic(x)}</span>${esc15(x.name)}</button>`).join("")}</div>` : '<p class="hs-none">맞교환할 물건이 없습니다.</p>' : "";
+    const pick4 = ui.pay === "barter" ? mine2.length ? `<div class="hs-pick">${mine2.map((x) => `<button class="${ui.barter === x.id ? "on" : ""}" data-action="hs-barter" data-value="${esc15(x.id)}" aria-pressed="${ui.barter === x.id}"><span class="pic">${itemPic(x)}</span>${esc15(x.name)}</button>`).join("")}</div>` : '<p class="hs-none">맞교환할 물건이 없습니다.</p>' : "";
     const can = ui.pay === "inst" || !!ui.barter;
-    return popShell("☎ 전화 주문", `${head3}${op(show.ops?.hello ?? "")}${pays}${pick3}`, `<button class="pri" data-action="hs-order" ${can ? "" : "disabled"}>주문 확정</button><button data-action="hs-pop" data-value="">끊기</button>`);
-  }
-  function peekPop(ctx2, s8) {
-    const { part } = nowPart(ctx2);
-    if (!part) return "";
-    const it = part.item;
-    const under = part.peek && s8.peek ? ui.lifted ? `<p class="hs-under">${esc15(part.peek)}</p>` : '<button class="hs-lift" data-action="hs-lift">스티커 모서리 들추기</button>' : "";
-    return popShell("상품 스티커", `<div class="hs-sticker"><span class="pic">${itemPic(it)}</span><b>${esc15(it.name)}</b><p>${esc15(it.desc)}</p>${it.effect ? `<p class="ef">${esc15(it.effect)}</p>` : ""}${under}</div>`);
-  }
-  function audPop() {
-    if (ui.audNo) return popShell("★ 방청 신청", `<p class="hs-ok">접수되었습니다.</p><p class="hs-no">접수번호 <b>${esc15(ui.audNo)}</b></p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button>');
-    return popShell("★ 방청 신청", `<label class="hs-f"><span>이름</span><input value="${esc15(userInfo().name || "")}" readonly></label>
-<button class="hs-chk${ui.agree ? " on" : ""}" data-action="hs-agree" aria-pressed="${ui.agree}"><i></i>객석 규칙에 동의합니다</button>`, `<button class="pri" data-action="hs-aud" ${ui.agree ? "" : "disabled"}>신청</button><button data-action="hs-pop" data-value="">취소</button>`);
-  }
-  function homeshopTab(ctx2, env3) {
-    liveEnv4 = env3;
-    sync(ctx2);
-    const mobile = isPhone();
-    const s8 = hsSettings(ctx2.chat.scriptstate);
-    const show = readShow(ctx2.chat.scriptstate);
-    const stt = homeshopStatus();
-    const art2 = homeshopArt();
-    const note = !s8.on ? "방송 없음" : stt.failed ? "신호 없음" : !art2 ? stt.progress || "방송 준비 중" : ui.loading ? "방송 연결 중" : ui.notice ? "신호 없음" : show.loaded ? "" : "신호 없음";
-    setPlayerFeed({ art: art2, show: s8.on && !ui.loading ? show : { ...show, loaded: false }, s: s8, note, scale: scaleOf2(s8, mobile), tel: telOf(ctx2) }, { advance, redraw: () => liveEnv4?.render() });
-    const pending2 = liveOrders2(ctx2.chat.scriptstate, aliveAnchors(ctx2.chat)).length;
-    const tabs2 = [["", "ON AIR"], ["sched", "편성표"], ["orders", `주문 조회${pending2 ? ` ${pending2}` : ""}`]];
-    const menu = `<nav class="hs-menu">${tabs2.map(([k, l]) => `<button class="${ui.page === k ? "on" : ""}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join("")}${s8.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ""}</nav>`;
-    const head3 = `<header class="hs-gnb"><span class="hs-logo">망상<i>홈쇼핑</i></span>${menu}<span class="hs-tel"><small>주
+    return popShell("☎ 전화 주문", `${head3}${op(

@@ -38,7 +38,7 @@ export const SLOT_META: Record<SlotId, SlotMeta> = {
   relationship: { feature: null, label: '인간관계', help: '주인공·다른 인물에 대한 감정과 관계. 「→ 이름」은 그 대상에 대한 것', hint: 'stance toward each target; one entry per target', targeted: true },
   speech: { feature: null, label: '말투', help: '말투·호칭 습관(존댓말·반말, 자주 쓰는 표현)', hint: 'how this person talks to each target; one entry per target', targeted: true },
   behavior: { feature: null, label: '행동 경향', help: '자주 보이는 행동 패턴과 반응 경향', hint: 'habits and patterns of action' },
-  knowledge: { feature: null, label: '아는 정보', help: '이 인물이 알게 된 것·모르는 것. 본편에서 비밀을 함부로 누설하지 않게 해요', hint: 'what this person actually knows or does not know' },
+  knowledge: { feature: null, label: '아는 정보', help: '이 인물이 알게 된 것·모르는 것. 메인 응답에서 비밀을 함부로 누설하지 않게 해요', hint: 'what this person actually knows or does not know' },
   threads: { feature: null, label: '목표·미해결', help: '이 인물의 목표와 아직 풀리지 않은 일', hint: 'open promises, goals, unresolved matters' },
   history: { feature: null, label: '주요 행적', help: '이야기 속에서 한 주요 행동·겪은 일 (오래된 것부터 접혀요)', hint: 'notable past events with this person, oldest first' },
   scene: { feature: null, label: '현재 장면', help: '지금 장면에서의 위치·행동 (짧게 유지돼요)', hint: 'present scene facts' },

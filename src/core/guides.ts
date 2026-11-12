@@ -9,13 +9,14 @@ import rp from '../data/guides/rp.txt';
 import tag from '../data/guides/tag.txt';
 import shop from '../data/guides/shop.txt';
 import bmdesk from '../data/guides/bmdesk.txt';
+import consult from '../data/guides/consult.txt';
 import updater from '../data/guides/updater-detailed.txt';
 import updaterCompact from '../data/guides/updater-compact.txt';
 import { DIRECTOR_FACTS, DIRECTOR_SCENE, ROUTER_SYSTEM } from './people/basetext';
 
-export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)' };
+export type GuideName = 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Cos' | 'Bm' | 'BmDesk' | 'Hs' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag' | 'Shop' | 'Updater' | 'UpdaterCompact' | 'Director' | 'Router' | 'Consult';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Gal', 'Wpf', 'Salmon', 'Cos', 'Bm', 'BmDesk', 'Hs', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag', 'Shop', 'Updater', 'UpdaterCompact', 'Director', 'Router', 'Consult'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Cos: '우주 쇼핑몰', Bm: '백일몽 포인트몰', BmDesk: '포인트몰 1:1 상담', Hs: '망상홈쇼핑', Phone: '괴담톡', Wiki: '괴이위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그', Shop: '상점', Updater: '인물 기록 갱신기(자세히)', UpdaterCompact: '인물 기록 갱신기(간결)', Director: 'Director(이번 턴 연기 지시)', Router: 'Router(장면 인물 고르기)', Consult: 'AI 상담' };
 
 /* ── 게시판 사이트별 기본 지침 (2026-11-08 사용자: 사이트마다 따로). 기본 글은 한 벌(gnet.txt)에 사이트 갈래가 들어 있고,
    여기서 그 사이트 갈래만 남겨 사이트마다 따로 된 지침을 만든다. 그 뒤 사용자는 사이트마다 따로 고친다 ── */
@@ -135,6 +136,7 @@ const DEFAULTS: Record<GuideName, string> = {
   Updater: updater.replace(/\r/g, ''),
   UpdaterCompact: updaterCompact.replace(/\r/g, ''),
   Director: `@@SECTION FACTS\n${DIRECTOR_FACTS.join('\n')}\n@@END\n\n@@SECTION SCENE\n${DIRECTOR_SCENE.join('\n')}\n@@END\n`,
+  Consult: consult.replace(/\r/g, ''),
   Router: `@@SECTION ROLE\n${ROUTER_SYSTEM.slice(0, 3).join('\n')}\n@@END\n\n@@SECTION RULES\n${ROUTER_SYSTEM.slice(3).join('\n')}\n@@END\n`,
 };
 
@@ -206,10 +208,10 @@ export function splitGuide(text: string): GuidePart[] {
 export const joinGuide = (parts: GuidePart[]): string => parts.map((p) => p.head + p.body + p.tail).join('');
 
 /* ── 내가 추가한 규칙 (2026-10-27 리수폿식 「프롬프트」 탭): 기기 설정에 두고, 붙일 지침의 늘 쓰이는 절 끝에 넣는다 ──
-   본편(RP): 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
+   RP: 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
 export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Gal' | 'Wpf' | 'Salmon' | 'Phone' | 'Wiki';
 export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Gal', 'Wpf', 'Salmon', 'Phone', 'Wiki'];
-export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '위키' };
+export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: 'RP', Directive: '이동·임무', GNet: '괴담넷', Gal: '괴담갤', Wpf: '세정게', Salmon: '연어 마켓', Phone: '괴담톡', Wiki: '위키' };
 export interface UserRule {
   id: string;
   title: string;

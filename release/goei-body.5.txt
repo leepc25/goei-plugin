@@ -1,4 +1,55 @@
-영훈": {
+
+        src: "대사 JSON close. 위키 데드폴 「로제몬」: 반말에 담긴 걱정을 정확히 알아들음"
+      },
+      "고르고디오>큐라스": {
+        aff: 150,
+        src: "대사 JSON close. 위키 고르고디오 「큐라스」: 고정 파트너, 상시 중화력 대응조"
+      },
+      "큐라스>고르고디오": {
+        aff: 150,
+        src: "대사 JSON close. 위키 큐라스 「고르고디오」: 형님이라 부름, 보고서 두 장이 형님 칭찬"
+      },
+      "큐라스>스팡달": {
+        aff: -25,
+        src: "위키 큐라스 「스팡달」: 유일한 천적, 다가오면 얼굴이 하얗게 질림(공포·기피)"
+      },
+      "콘쥬스>에일린": {
+        aff: 90,
+        src: "대사 JSON close. 위키 콘쥬스 「에일린」: 머리 위로 자기 얘기를 안 하는 반응을 은근히 좋아함"
+      },
+      "에일린>콘쥬스": {
+        aff: 90,
+        src: "위키 에일린 「콘쥬스」: 출발점이 닮아 현장에서 최대한 멀리 두려 함"
+      },
+      "콘쥬스>잼트리": {
+        aff: 90,
+        src: "대사 JSON close. 위키 콘쥬스 「팀의 어른들」: 잼트리가 「막내」라 부르며 우유를 타 줌"
+      },
+      "잼트리>콘쥬스": {
+        aff: 90,
+        src: "위키 콘쥬스 「팀의 어른들」: 「막내」라 부르며 연유 커피 대신 우유"
+      },
+      "에일린>데드폴": {
+        aff: 90,
+        src: "위키 에일린 「데드폴」: 데드폴의 죽음이 든 계획표는 다시 짜라고 돌려보냄"
+      },
+      "데드폴>에일린": {
+        aff: 90,
+        src: "위키 에일린 「데드폴」: 그 처우를 꽤 좋아하는 눈치"
+      },
+      "잼트리>에일린": {
+        aff: 90,
+        src: "위키 에일린 「잼트리」: 총 손질하는 손 옆에 커피를 내려놓고 그걸로 충분하다는 표정"
+      },
+      "에일린>잼트리": {
+        aff: 90,
+        src: "위키 에일린 「잼트리」: 고맙다는 말 없이 마심(둘 사이 대화는 그걸로 끝). 근거 약함"
+      },
+      "잼트리>데드폴": {
+        aff: 90,
+        src: "위키 데드폴 「사무실」: 남이 커피 타는 걸 허락하는 드문 예외라는 소문. 근거 약함"
+      },
+      "이도형>고영훈": {
         aff: 90,
         src: "위키 이도형 「고영훈」: 부대 운영을 통째로 넘김, 둘 다 그게 편함. 추정"
       },
@@ -1549,8 +1600,8 @@
       return null;
     }
     if (faction === "B00" || faction === "C00") {
-      const table = [[/사장|ceo/i, 9], [/전무/, 8], [/국장|이사|director/i, 7], [/부장/, 6], [/차장/, 5], [/과장|manager/i, 4], [/대리/, 3], [/주임/, 2], [/사원|직원|staff/i, 1]];
-      for (const [re, n3] of table) if (re.test(r)) return n3;
+      const table2 = [[/사장|ceo/i, 9], [/전무/, 8], [/국장|이사|director/i, 7], [/부장/, 6], [/차장/, 5], [/과장|manager/i, 4], [/대리/, 3], [/주임/, 2], [/사원|직원|staff/i, 1]];
+      for (const [re, n3] of table2) if (re.test(r)) return n3;
       return null;
     }
     if (faction === "E00") {
@@ -1631,26 +1682,26 @@
   var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
 
   // src/core/people/faction.ts
-  function userFactionOf(store, chat) {
+  function userFactionOf(store2, chat) {
     const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store.identity?.faction || (typeof v === "string" ? v : "");
+    return store2.identity?.faction || (typeof v === "string" ? v : "");
   }
-  function knownFactionCodes(store, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
+  function knownFactionCodes(store2, names4 = {}) {
+    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store2.factions), ...Object.keys(names4)])];
   }
-  var factionName = (code2, names4 = {}, store) => names4[code2] || store?.factions[code2]?.name || ORG_NAMES[code2] || code2;
-  function factionNow(store, code2, changes, userFaction3, settings, names4 = {}) {
+  var factionName = (code2, names4 = {}, store2) => names4[code2] || store2?.factions[code2]?.name || ORG_NAMES[code2] || code2;
+  function factionNow(store2, code2, changes, userFaction3, settings, names4 = {}) {
     const base = factionBase(code2, userFaction3);
-    const v = factionView(code2, base, changes, store.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
+    const v = factionView(code2, base, changes, store2.folded[factionWho(code2)] ?? 0, { speed: settings.speed, speedDown: settings.speedDown, turnCap: settings.turnCap }, settings.factionBounds);
     const note = settings.factionQual ? [...changes].reverse().find((c) => c.who === factionWho(code2) && c.kind === "cue" && c.pin !== void 0)?.reason : void 0;
-    return { code: code2, name: factionName(code2, names4, store), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
+    return { code: code2, name: factionName(code2, names4, store2), value: v.value, stage: v.stage, base, ...note ? { note } : {} };
   }
-  function sceneFactionCodes(store, people, texts, names4 = {}) {
+  function sceneFactionCodes(store2, people, texts, names4 = {}) {
     const out = [];
     const push3 = (c) => {
       if (c && !out.includes(c)) out.push(c);
     };
-    for (const n3 of people) push3(store.people[n3]?.faction ?? "");
+    for (const n3 of people) push3(store2.people[n3]?.faction ?? "");
     for (const t of texts) for (const c of factionCodesIn(t, names4)) push3(c);
     return out;
   }
@@ -1716,11 +1767,11 @@
         text: [kind, locName(r.loc) || r.loc, hhmm3(r.at), durText, how].filter(Boolean).join(" · ")
       });
     }
-    const store = peopleStore(chat);
+    const store2 = peopleStore(chat);
     const live = liveness(chat);
-    const changes = liveChanges(store, live);
+    const changes = liveChanges(store2, live);
     const s8 = peopleSettings(chat.scriptstate);
-    const uf = userFactionOf(store, chat);
+    const uf = userFactionOf(store2, chat);
     const names4 = factionNames2(lore);
     const posOf = (c) => live.at.get(c.anchor) ?? -1;
     const byWho = /* @__PURE__ */ new Map();
@@ -1728,9 +1779,9 @@
     for (const [who, list4] of byWho) {
       const isFac = who.startsWith("세력:");
       const code2 = isFac ? who.slice(3) : "";
-      if (isFac ? !code2 : !store.people[who]) continue;
-      const base = isFac ? factionBase(code2, uf) : store.people[who].affinity.base;
-      const folded = store.folded[who] ?? 0;
+      if (isFac ? !code2 : !store2.people[who]) continue;
+      const base = isFac ? factionBase(code2, uf) : store2.people[who].affinity.base;
+      const folded = store2.folded[who] ?? 0;
       const o = isFac ? { speed: s8.speed, turnCap: s8.turnCap } : { temper: temperOf(who), speed: s8.speed, turnCap: s8.turnCap };
       const [min, max] = isFac ? [FACTION_MIN, FACTION_MAX] : [AFF_MIN, AFF_MAX];
       const label2 = (v) => isFac ? factionStage(v, s8.factionBounds).label : stageOf(v).label;
@@ -1746,7 +1797,7 @@
           seq: 1 + c.seq,
           kind: isFac ? "faction" : "person",
           day: day(posOf(c)),
-          title: isFac ? factionName(code2, names4, store) : who,
+          title: isFac ? factionName(code2, names4, store2) : who,
           text: `${isFac ? "평판" : "호감"} ${prev} → ${now2}${reason3 ? ` · ${reason3}` : ""}`,
           ...isFac ? { faction: code2 } : { person: who }
         });
@@ -1755,7 +1806,7 @@
     }
     for (const c of changes) {
       if (c.kind !== "identity") continue;
-      const what = [c.faction ? factionName(c.faction, names4, store) : "", c.rank ?? ""].filter(Boolean).join(" · ");
+      const what = [c.faction ? factionName(c.faction, names4, store2) : "", c.rank ?? ""].filter(Boolean).join(" · ");
       if (!what) continue;
       out.push({ pos: posOf(c), seq: 1 + c.seq, kind: "rank", day: day(posOf(c)), title: "신분", text: `${what}${c.reason ? ` · ${c.reason}` : ""}` });
     }
@@ -2103,9 +2154,9 @@ ${t}`);
   var ROSTER_INTRO = "- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.";
   var STAGE_MARK = { hostile: "H", wary: "W", neutral: "N", favorable: "F", friendly: "A" };
   var firstParagraph = (t) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
-  function variantText(rec2, id2, pick3 = (t) => t) {
-    const base = pick3(fieldValue(rec2, id2));
-    const vs = Object.entries(rec2.variants ?? {}).filter(([, f]) => typeof f[id2] === "string").map(([code2, f]) => [code2, pick3(f[id2])]);
+  function variantText(rec2, id2, pick4 = (t) => t) {
+    const base = pick4(fieldValue(rec2, id2));
+    const vs = Object.entries(rec2.variants ?? {}).filter(([, f]) => typeof f[id2] === "string").map(([code2, f]) => [code2, pick4(f[id2])]);
     if (!vs.length) return base;
     const others = vs.map(([c]) => `{{#if {{not_equal::${VAR2}::${c}}}}}`).join("");
     return `${others}${base}${"{{/if}}".repeat(vs.length)}${vs.map(([c, t]) => `{{#if {{equal::${VAR2}::${c}}}}}${t}{{/if}}`).join("")}`;
@@ -2455,9 +2506,9 @@ ${content}
     identity: [["age", ["age", "나이", "연령"]], ["gender", ["gender", "sex", "성별"]], ["organization", ["organization", "affiliation", "faction", "소속", "조직"]], ["department_en", ["department", "team", "division", "부서", "소속팀"]], ["role", ["role", "position", "job", "역할", "직책", "직무"]]],
     appearance: [["physique", ["physique", "build", "body", "체격", "체형"]], ["appearance", ["appearance", "looks", "face", "hair", "외모", "외형", "얼굴"]], ["outfit", ["outfit", "clothes", "clothing", "attire", "dress", "복장", "옷"]]]
   };
-  var matchSyn = (title2, table) => {
+  var matchSyn = (title2, table2) => {
     const t = title2.toLowerCase();
-    return table.find(([, words]) => words.some((w) => t.includes(w)))?.[0];
+    return table2.find(([, words]) => words.some((w) => t.includes(w)))?.[0];
   };
   function parseImport(kind, text5) {
     const lines3 = text5.replace(/\r/g, "").split("\n");
@@ -2899,7 +2950,7 @@ ${themeVars("[x-goei-fab]")}
     };
     await applyPos();
     let visible2 = false;
-    let shown3 = null;
+    let shown4 = null;
     let introTimer;
     const endIntro = () => {
       if (introTimer === void 0) return;
@@ -3028,9 +3079,9 @@ ${themeVars("[x-goei-fab]")}
     hiddenSubs.add(onHidden);
     return {
       async setVisible(next, intro = false) {
-        if (shown3 === next && !intro) return;
-        const reappear = next && !shown3;
-        shown3 = next;
+        if (shown4 === next && !intro) return;
+        const reappear = next && !shown4;
+        shown4 = next;
         if (reappear) await bind().catch(() => {
         });
         visible2 = next;
@@ -3279,7 +3330,7 @@ ${themeVars("[x-goei-fab]")}
       return q.set.size ? { ...q, w: sum(q.set) } : null;
     };
     const none3 = { s: 0, by: "" };
-    const pick3 = (qn, qi) => {
+    const pick4 = (qn, qi) => {
       let best = null;
       for (const it of items) {
         const a = qn ? score2(qn, it, true) : none3;
@@ -3295,7 +3346,7 @@ ${themeVars("[x-goei-fab]")}
     return (name, icon) => {
       const qn = query(name);
       const qi = query(icon);
-      return qi && pick3(qn, qi) || qn && pick3(qn, null) || null;
+      return qi && pick4(qn, qi) || qn && pick4(qn, null) || null;
     };
   }
   var HEAD_EXTRA = 1;
@@ -4090,15 +4141,15 @@ ${memo.job.trim()}
     if (!m || m.role !== "char") return null;
     const text5 = typeof m.data === "string" ? m.data : "";
     const on3 = shopOn(chat.scriptstate);
-    const norm3 = (s8) => s8.replace(/\s+/g, "").toLowerCase();
-    const me = new Set(self.map(norm3).filter(Boolean));
+    const norm4 = (s8) => s8.replace(/\s+/g, "").toLowerCase();
+    const me = new Set(self.map(norm4).filter(Boolean));
     const found = on3 ? findShopTag(text5) : null;
     const own = found ? ownShopOf(chat.scriptstate, found.shop) : null;
     const webAsk = !!found && found.owner.trim().toLowerCase().startsWith(WEB_OWNER);
     const site = webAsk && own?.web ? own.web : "";
-    const mine = !!found && (webAsk ? !site : !!found.owner && me.has(norm3(found.owner)) || !!own && !own.visit);
-    const web = !mine && !!site;
-    const tag = mine || web ? null : found;
+    const mine2 = !!found && (webAsk ? !site : !!found.owner && me.has(norm4(found.owner)) || !!own && !own.visit);
+    const web = !mine2 && !!site;
+    const tag = mine2 || web ? null : found;
     const webRaw = web ? `[shop: ${own.name}|${WEB_OWNER}:${site}]` : "";
     const key = messageKey(m, responseIndex);
     const cur = readShop(chat.scriptstate);
@@ -4115,7 +4166,7 @@ ${memo.job.trim()}
 ${webRaw}` };
         continue;
       }
-      if (on3 && !mine && i === responseIndex || list4[i].role !== "char" || !hasShopTag(String(list4[i].data ?? ""))) continue;
+      if (on3 && !mine2 && i === responseIndex || list4[i].role !== "char" || !hasShopTag(String(list4[i].data ?? ""))) continue;
       message ??= [...list4];
       message[i] = { ...list4[i], data: stripShopTags(String(list4[i].data)) };
     }
@@ -4169,27 +4220,27 @@ ${webRaw}` };
   var SECRET_LINE = `${SHOP_LINE}|진실`;
   var lineOf = (guide) => guide === "Cos" ? SECRET_LINE : SHOP_LINE;
   function parseOrderLine(line2) {
-    const cells = line2.replace(/^[-*•+]\s*/, "").split("|").map((c) => c.trim());
-    if (cells.length < 3) return null;
-    const hours = Number((cells[2] ?? "").replace(/[^\d.]/g, ""));
+    const cells2 = line2.replace(/^[-*•+]\s*/, "").split("|").map((c) => c.trim());
+    if (cells2.length < 3) return null;
+    const hours = Number((cells2[2] ?? "").replace(/[^\d.]/g, ""));
     if (!Number.isFinite(hours) || hours <= 0) return null;
-    const it = parseLine([cells[0], cells[1], cells[3] ?? "-", cells[4] ?? "-", cells[5] ?? "-", cells[6] ?? "", cells[7] ?? "", "", cells[8] ?? ""].join("|"));
+    const it = parseLine([cells2[0], cells2[1], cells2[3] ?? "-", cells2[4] ?? "-", cells2[5] ?? "-", cells2[6] ?? "", cells2[7] ?? "", "", cells2[8] ?? ""].join("|"));
     if (!it || it.pay) return null;
     const { price, ...item2 } = it;
     return { price, hours: Math.min(24 * 30, Math.round(hours * 10) / 10), item: item2 };
   }
   function parseLine(line2) {
-    const cells = line2.replace(/^[-*•+]\s*/, "").split("|").map((c) => c.trim());
-    if (cells.length < 2) return null;
-    const name = clean2(cells[0], 30);
-    const cost = costOf(cells[1] ?? "");
+    const cells2 = line2.replace(/^[-*•+]\s*/, "").split("|").map((c) => c.trim());
+    if (cells2.length < 2) return null;
+    const name = clean2(cells2[0], 30);
+    const cost = costOf(cells2[1] ?? "");
     if (!name || !cost) return null;
     const price = cost.price;
-    const out = { name, price, ...cost.pay ? { pay: cost.pay } : {}, ...traitsOf({ ...parseTraits(cells[2]), icon: cells[3], weight: cells[4] }), desc: clean2(cells[5], 120), effect: clean2(cells[6], 60) };
-    const truth = clean2(cells[8], 60);
+    const out = { name, price, ...cost.pay ? { pay: cost.pay } : {}, ...traitsOf({ ...parseTraits(cells2[2]), icon: cells2[3], weight: cells2[4] }), desc: clean2(cells2[5], 120), effect: clean2(cells2[6], 60) };
+    const truth = clean2(cells2[8], 60);
     if (/^(\?+|모름|unknown|미정)$/i.test(truth)) out.truth = "?";
     else if (truth && truth !== "-") out.truth = truth;
-    const tag = (cells[7] ?? "").trim();
+    const tag = (cells2[7] ?? "").trim();
     if (/^(희귀|레어|rare)/i.test(tag)) out.tag = "rare";
     else if (/^(특가|할인|세일|sale)/i.test(tag) && !cost.pay) {
       const was = priceOf(tag.replace(/^[^:：\d]*[:：]?/, ""));
@@ -4562,10 +4613,10 @@ ${talk}` }], s8, fillGuide(o ? g2.THOUGHTS_SELL : g2.THOUGHTS_TALK, v));
 ${rule}`.trim();
   }
   function shopJudgeBy(vars) {
-    const pick3 = shopSettings(vars).judge;
+    const pick4 = shopSettings(vars).judge;
     const p2 = peopleSettings(vars);
     const runs = p2.on && p2.when === "turn";
-    return { pick: pick3, by: pick3 !== "main" && runs ? "updater" : "main", fallback: pick3 === "updater" && !runs };
+    return { pick: pick4, by: pick4 !== "main" && runs ? "updater" : "main", fallback: pick4 === "updater" && !runs };
   }
 
   // src/core/orders.ts
@@ -4762,59 +4813,11 @@ ${tag}` : body5;
   var newDeskNo = (rnd = Math.random) => String(1e3 + Math.floor(rnd() * 9e3));
   var deskTag = (a) => `상담원 ${a.no ?? String(1e3 + parseInt(a.id.slice(-4), 36) % 9e3)}`;
   function parseCard(raw, dice, no) {
-    const card2 = block3(raw, "card");
-    if (!card2) throw fail2("응답에 <card> 블록(상담사 카드)이 없어요.", raw);
-    const get = (k) => clean3(new RegExp(`^\\s*${k}\\s*[:：]\\s*(.+)$`, "m").exec(card2)?.[1], k === "소개" || k === "말투" ? 200 : 30);
+    const card3 = block3(raw, "card");
+    if (!card3) throw fail2("응답에 <card> 블록(상담사 카드)이 없어요.", raw);
+    const get = (k) => clean3(new RegExp(`^\\s*${k}\\s*[:：]\\s*(.+)$`, "m").exec(card3)?.[1], k === "소개" || k === "말투" ? 200 : 30);
     const name = get("이름");
     if (!name) throw fail2("상담사 카드에 이름이 없어요.", raw);
     const say2 = bubbles(block3(raw, "say"));
     if (!say2.length) throw fail2("응답에 <say> 블록(첫 인사)이 없어요.", raw);
-    const rank3 = get("직급") || (dice.find(([k]) => k === "직급")?.[1] ?? "");
-    return { agent: { id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`, no, name, rank: rank3, dept: get("부서"), intro: get("소개"), voice: get("말투"), dice }, say: say2 };
-  }
-  var deskRawSafe = (raw) => raw.replace(/<card\b[^>]*>[\s\S]*?(?:<\/card\s*>|$)/gi, "<card>(상담원 카드 — 숨김)</card>").replace(/<(thoughts|think)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, "<$1>(생각 단계 — 숨김)</$1>");
-  function parseSay(raw) {
-    const say2 = bubbles(block3(raw, "say"));
-    if (!say2.length) throw fail2("응답에 <say> 블록(상담사 답)이 없어요.", raw);
-    return say2;
-  }
-  var G2 = () => guideSections("BmDesk");
-  var diceText = (d) => d.map(([k, v]) => `${k}: ${v}`).join("\n");
-  var cardText = (a) => `손님에게 보이는 호칭: ${deskTag(a)}
-이름: ${a.name}
-직급: ${a.rank}
-부서: ${a.dept}
-소개: ${a.intro}
-말투: ${a.voice}
-${diceText(a.dice)}`;
-  var material2 = (src) => [
-    src.refs ? `[참고 자료 — 백일몽에 대해 이 상담사가 알 수 있는 것]
-${src.refs}` : "",
-    `[지금 진열된 상품]
-${src.shelf || "(없음)"}`,
-    `[손님]
-사내 계정: ${src.nick || "-"}
-남은 포인트: ${Math.trunc(src.points).toLocaleString("en-US")}p`
-  ].filter(Boolean).join("\n\n");
-  function makePrompt(src, dice, recent, no) {
-    const g2 = G2();
-    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MAKE, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.MAKE_OUTPUT, {}), src.language ?? ""].filter(Boolean).join("\n\n");
-    const past = recent.length ? recent.map((a) => `- ${a.name} (${a.rank}, ${a.dept}): ${a.intro} / 말투: ${a.voice}`).join("\n") : "(없음)";
-    return { messages: [{ role: "system", content: system }, { role: "user", content: `${material2(src)}
-
-[손님에게 보이는 호칭]
-상담원 ${no}
-
-[이번 상담사 주사위]
-${diceText(dice)}
-
-[최근 상담사 — 겹치지 말 것]
-${past}
-
-[현재 작업]
-상담사 카드와 첫 메시지` }], thoughts: fillGuide(g2.THOUGHTS_MAKE, {}) };
-  }
-  function talkPrompt2(src, st) {
-    const g2 = G2();
-    const a = st.agent;
-    const system = [fillGuide(g2.COMMON, {}), fillGuide(g2.MANUAL, {}), fillGuide(g2.TALK, {}), fillGuide(g2.TALK_OUTPUT, {}), src.language ?? ""].filter(Boolean).jo
+   

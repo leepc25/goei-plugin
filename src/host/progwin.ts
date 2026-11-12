@@ -129,8 +129,8 @@ function titleOf(t: Turn, now: number): string {
   }
   const run = runningStages(t);
   if (t.aborted && !run.length) return '응답 없음';
-  if (!run.length) return t.replyAt ? '응답 뒤 정리 중' : t.mainAt ? '본편 응답 대기' : now - t.at < WATCHDOG ? '요청 준비 중' : '응답 없음';
-  if (run.some((s) => s.id === 'main')) return '본편 응답 대기';
+  if (!run.length) return t.replyAt ? '응답 뒤 정리 중' : t.mainAt ? '메인 응답 대기' : now - t.at < WATCHDOG ? '요청 준비 중' : '응답 없음';
+  if (run.some((s) => s.id === 'main')) return '메인 응답 대기';
   const net = run.filter((s) => s.group === 'net');
   if (net.length > 1) return `인터넷 자동 호출 · ${net.length}건`;
   const s = run[0];

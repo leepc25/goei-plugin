@@ -1,4 +1,31 @@
-문 전화</small>☎ ${esc15(telOf(ctx2))}</span></header>`;
+show.ops?.hello ?? "")}${pays}${pick4}`, `<button class="pri" data-action="hs-order" ${can ? "" : "disabled"}>주문 확정</button><button data-action="hs-pop" data-value="">끊기</button>`);
+  }
+  function peekPop(ctx2, s8) {
+    const { part } = nowPart(ctx2);
+    if (!part) return "";
+    const it = part.item;
+    const under = part.peek && s8.peek ? ui.lifted ? `<p class="hs-under">${esc15(part.peek)}</p>` : '<button class="hs-lift" data-action="hs-lift">스티커 모서리 들추기</button>' : "";
+    return popShell("상품 스티커", `<div class="hs-sticker"><span class="pic">${itemPic(it)}</span><b>${esc15(it.name)}</b><p>${esc15(it.desc)}</p>${it.effect ? `<p class="ef">${esc15(it.effect)}</p>` : ""}${under}</div>`);
+  }
+  function audPop() {
+    if (ui.audNo) return popShell("★ 방청 신청", `<p class="hs-ok">접수되었습니다.</p><p class="hs-no">접수번호 <b>${esc15(ui.audNo)}</b></p>`, '<button class="pri" data-action="hs-pop" data-value="">확인</button>');
+    return popShell("★ 방청 신청", `<label class="hs-f"><span>이름</span><input value="${esc15(userInfo().name || "")}" readonly></label>
+<button class="hs-chk${ui.agree ? " on" : ""}" data-action="hs-agree" aria-pressed="${ui.agree}"><i></i>객석 규칙에 동의합니다</button>`, `<button class="pri" data-action="hs-aud" ${ui.agree ? "" : "disabled"}>신청</button><button data-action="hs-pop" data-value="">취소</button>`);
+  }
+  function homeshopTab(ctx2, env3) {
+    liveEnv4 = env3;
+    sync(ctx2);
+    const mobile = isPhone();
+    const s8 = hsSettings(ctx2.chat.scriptstate);
+    const show = readShow(ctx2.chat.scriptstate);
+    const stt = homeshopStatus();
+    const art2 = homeshopArt();
+    const note = !s8.on ? "방송 없음" : stt.failed ? "신호 없음" : !art2 ? stt.progress || "방송 준비 중" : ui.loading ? "방송 연결 중" : ui.notice ? "신호 없음" : show.loaded ? "" : "신호 없음";
+    setPlayerFeed({ art: art2, show: s8.on && !ui.loading ? show : { ...show, loaded: false }, s: s8, note, scale: scaleOf2(s8, mobile), tel: telOf(ctx2) }, { advance, redraw: () => liveEnv4?.render() });
+    const pending2 = liveOrders2(ctx2.chat.scriptstate, aliveAnchors(ctx2.chat)).length;
+    const tabs2 = [["", "ON AIR"], ["sched", "편성표"], ["orders", `주문 조회${pending2 ? ` ${pending2}` : ""}`]];
+    const menu = `<nav class="hs-menu">${tabs2.map(([k, l]) => `<button class="${ui.page === k ? "on" : ""}" data-action="hs-page" data-value="${k}" aria-pressed="${ui.page === k}">${l}</button>`).join("")}${s8.aud ? '<button data-action="hs-pop" data-value="aud">방청 신청</button>' : ""}</nav>`;
+    const head3 = `<header class="hs-gnb"><span class="hs-logo">망상<i>홈쇼핑</i></span>${menu}<span class="hs-tel"><small>주문 전화</small>☎ ${esc15(telOf(ctx2))}</span></header>`;
     const err = `${failBox()}${stt.failed ? `<div class="hs-err" role="alert"><span>방송 그림을 받지 못했어요. ${esc15(stt.failed)}</span></div>` : ""}`;
     const page = ui.page === "sched" ? schedPage(show, s8) : ui.page === "orders" ? ordersPage(ctx2) : onAir(ctx2, show, s8, mobile);
     const pop = ui.pop === "call" ? callPop(ctx2, s8) : ui.pop === "peek" ? peekPop(ctx2, s8) : ui.pop === "aud" && s8.aud ? audPop() : "";
@@ -53,22 +80,22 @@
       scalePc: s8.scalePc,
       scalePh: s8.scalePhone
     };
-    const pairs = { cue: ["cueMin", "cueMax"], chat: ["chatMin", "chatMax"], call: ["callLo", "callHi"], fill: ["fillLo", "fillHi"] };
+    const pairs2 = { cue: ["cueMin", "cueMax"], chat: ["chatMin", "chatMax"], call: ["callLo", "callHi"], fill: ["fillLo", "fillHi"] };
     const wire = {
       cur: (k) => vals[k] ?? String(n3(k)),
-      minmax: (k) => k === "size" ? s8.shop.size : [n3(pairs[k][0]), n3(pairs[k][1])],
+      minmax: (k) => k === "size" ? s8.shop.size : [n3(pairs2[k][0]), n3(pairs2[k][1])],
       help: { clips: () => `한 줄에 「컷:동작=분류」. 컷은 A(와이드)·B(바스트), 분류는 기본·가끔·대사·드물게·안씀. 비우면 아래 기본값.<br>${clipHelp}` }
     };
     const all = HOMESHOP_SET.groups.flatMap((g2) => g2.rows);
-    const pick3 = (title2, keys, note) => ({ title: title2, note, rows: keys.map((k) => all.find((r) => r.key === k)).filter(Boolean) });
+    const pick4 = (title2, keys, note) => ({ title: title2, note, rows: keys.map((k) => all.find((r) => r.key === k)).filter(Boolean) });
     const page = { ...HOMESHOP_SET, groups: [
-      pick3("", ["net", "retry", "say"]),
-      pick3("편성", ["cue", "chat"]),
-      pick3("방송 흐름", ["speed", "hold", "frame", "chatGap", "next", "left", "turn", "lock"]),
-      pick3("주문", ["barter", "peek"]),
-      pick3("컨텍스트 포함", ["call", "forms", "aud"]),
-      pick3("진행자 동작", ["fill", "fillCool", "rareP", "rareCool", "clips"], HOMESHOP_SET.groups.find((g2) => g2.title === "진행자 동작")?.note),
-      pick3("방송 화면", ["tel", "cut", "bulb", "tear", "tearP", "scan", "scalePc", "scalePh"])
+      pick4("", ["net", "retry", "say"]),
+      pick4("편성", ["cue", "chat"]),
+      pick4("방송 흐름", ["speed", "hold", "frame", "chatGap", "next", "left", "turn", "lock"]),
+      pick4("주문", ["barter", "peek"]),
+      pick4("컨텍스트 포함", ["call", "forms", "aud"]),
+      pick4("진행자 동작", ["fill", "fillCool", "rareP", "rareCool", "clips"], HOMESHOP_SET.groups.find((g2) => g2.title === "진행자 동작")?.note),
+      pick4("방송 화면", ["tel", "cut", "bulb", "tear", "tearP", "scan", "scalePc", "scalePh"])
     ] };
     const body5 = defGroups(page, wire);
     return `<div class="ph-form"><header class="ph-room-head"><div class="ph-room-title"><b>${HS_NAME} 설정</b></div></header><div class="ph-form-body ps">${body5}</div></div>`;
@@ -277,9 +304,9 @@
     if (q && !list4.length) return `<p class="gx-wt-empty">맞는 물건이 없어요.</p>`;
     const w = whenOf(ctx2);
     const queued2 = new Map(useQueue(ctx2).map((u) => [u.id, u.n]));
-    const cells = list4.map((it, i) => cell(ctx2, it, !q && i >= slots, w, queued2.get(it.id) ?? 0));
-    if (!q) for (let i = list4.length; i < slots; i++) cells.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
-    return `<div class="it-grid" data-drop="grid">${cells.join("")}</div>`;
+    const cells2 = list4.map((it, i) => cell(ctx2, it, !q && i >= slots, w, queued2.get(it.id) ?? 0));
+    if (!q) for (let i = list4.length; i < slots; i++) cells2.push('<div class="it-c empty" aria-hidden="true"><span class="it-ic"></span><b>&nbsp;</b></div>');
+    return `<div class="it-grid" data-drop="grid">${cells2.join("")}</div>`;
   }
   function cell(ctx2, it, over, w, queued2) {
     const left = leftOf(ctx2, it);
@@ -320,8 +347,8 @@
     }
     return `${chips3}<div class="gx-wallettab it-log">${groups.map((g2) => {
       const gi = g2.rows.filter((l) => l.what === "get").length;
-      const go2 = g2.rows.length - gi;
-      return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go2 ? `사용 ${go2}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row8).join("")}</ul></section>`;
+      const go3 = g2.rows.length - gi;
+      return `<section class="gx-wt-day"><h3><span>${esc16(g2.day)}</span><em>${[gi ? `획득 ${gi}` : "", go3 ? `사용 ${go3}` : ""].filter(Boolean).join(" · ")}</em></h3><ul>${g2.rows.map(row8).join("")}</ul></section>`;
     }).join("")}</div>`;
   }
   function popup(ctx2) {
@@ -354,7 +381,7 @@
       ${it.uses !== void 0 ? `<button class="gx-chip" data-action="items-merge" ${mergeMates(ctx2, it).length ? "" : "disabled"} title="이름에 같은 낱말이 있는 소모품끼리 합쳐요">합치기</button>` : ""}
       <button class="gx-chip red" data-action="items-drop-ask" data-value="${esc16(it.id)}">버리기</button>
     </div>
-    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 본편에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
+    ${queued2 ? '<p class="dim">다음 메시지를 보낼 때 메인 요청에 「이번 턴 사용」으로 넘어가요.</p>' : ""}`;
     return shell2(it.name, body5);
   }
   var shell2 = (label2, inner) => `<div class="gx-agpop it-pop" data-action="items-close" role="dialog" aria-label="${esc16(label2)}"><div class="gx-agpop-card it-card" data-action="items-keep"><button class="gx-agpop-x" data-action="items-close" aria-label="닫기">${ICONS.close}</button>${inner}</div></div>`;
@@ -712,14 +739,14 @@
   }
   function pickHtml(ctx2, st) {
     const all = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat);
-    const mine = gridItems(all);
-    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine.length} · 팔 물건을 고르세요` : ""}</small></header>`;
-    const inner = mine.length ? `<div class="it-grid sh-grid">${mine.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
+    const mine2 = gridItems(all);
+    const head3 = `<header class="sh-zh"><b>소지품</b><small>${all.length ? `${mine2.length} · 팔 물건을 고르세요` : ""}</small></header>`;
+    const inner = mine2.length ? `<div class="it-grid sh-grid">${mine2.map((it) => pickCell(it, st)).join("")}</div>` : `<p class="gx-wt-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
     if (isPhone()) return `<div class="sh-shelf sh-pick"><div class="sh-eq">${equipBox(ctx2, "sell", st.sell?.itemId ?? "")}</div><section class="sh-zone sh-main sh-mine" aria-label="소지품">${head3}${inner}</section></div>`;
     const { av, slots } = equipParts(ctx2, "sell", st.sell?.itemId ?? "");
-    const cells = mine.map((it) => pickCell(it, st)).join("");
-    const empty2 = mine.length ? "" : `<p class="gx-wt-empty sh-sell-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
-    return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head3}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells}${empty2}</div></section></div>`;
+    const cells2 = mine2.map((it) => pickCell(it, st)).join("");
+    const empty2 = mine2.length ? "" : `<p class="gx-wt-empty sh-sell-empty">${all.length ? "장착한 것 말고는 소지품이 없어요." : "팔 만한 소지품이 없어요."}</p>`;
+    return `<div class="sh-shelf sh-pick"><section class="sh-zone sh-main sh-mine" aria-label="장착·소지품">${head3}<div class="sh-sellgrid">${av ? `<div class="it-av">${av}</div>` : '<div class="it-av"></div>'}<div class="sh-eqrow it-eqbox sell" aria-label="장착">${slots}</div>${cells2}${empty2}</div></section></div>`;
   }
   function pickCell(it, st) {
     const sel = st.sell?.itemId === it.id;
@@ -956,17 +983,17 @@ ${story}`, authors: false, persona: false, related: true, extra: doc2 ? [{ sourc
         env3.render();
         return true;
       case "shop-sell-pick": {
-        const mine = st ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value) : null;
-        if (!st || !mine || st.closed || shopUi.loading) return true;
-        if (st.sell?.itemId === mine.id) {
+        const mine2 = st ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value) : null;
+        if (!st || !mine2 || st.closed || shopUi.loading) return true;
+        if (st.sell?.itemId === mine2.id) {
           shopUi.detail = "sell";
           env3.render();
           return true;
         }
-        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine, aliveAnchors(ctx2.chat));
-        const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...mine.truth ? { truth: mine.truth } : {}, use: mine.use, ...left !== void 0 ? { uses: left } : {}, ...mine.equip ? { equip: mine.equip } : {}, ...mine.icon ? { icon: mine.icon } : {}, ...Number.isSafeInteger(mine.price) ? { paid: mine.price } : {} });
+        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine2, aliveAnchors(ctx2.chat));
+        const next = startSell(st, { itemId: mine2.id, name: mine2.name, desc: mine2.desc, effect: mine2.effect, ...mine2.truth ? { truth: mine2.truth } : {}, use: mine2.use, ...left !== void 0 ? { uses: left } : {}, ...mine2.equip ? { equip: mine2.equip } : {}, ...mine2.icon ? { icon: mine2.icon } : {}, ...Number.isSafeInteger(mine2.price) ? { paid: mine2.price } : {} });
         await saveShop(ctx2, st, next);
-        shopUi.chip = mine.name;
+        shopUi.chip = mine2.name;
         shopUi.chipKind = "sell";
         shopUi.detail = "";
         if (isPhone()) shopUi.drawer = true;
@@ -1048,9 +1075,9 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         return true;
       case "shop-say": {
         const sell = shopUi.chipKind === "sell" && !!st?.sell;
-        const said2 = (value ?? shopUi.input).trim();
-        const text5 = sell ? `[판매: ${st.sell.name}]${said2 ? ` ${said2}` : ""}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ""}${said2}`.trim();
-        if (!st || !text5 || !sell && !said2 || st.closed || shopUi.loading || !st.loaded) return true;
+        const said3 = (value ?? shopUi.input).trim();
+        const text5 = sell ? `[판매: ${st.sell.name}]${said3 ? ` ${said3}` : ""}` : `${shopUi.chip ? `[${shopUi.chip}] ` : ""}${said3}`.trim();
+        if (!st || !text5 || !sell && !said3 || st.closed || shopUi.loading || !st.loaded) return true;
         shopUi.input = "";
         shopUi.chip = "";
         shopUi.chipKind = "";
@@ -1379,10 +1406,10 @@ ${shopUi.failRaw.slice(0, 1500)}`;
         break;
       case "mall-sell-pick": {
         if (site !== "cos" || v.loading || !st.loaded) return true;
-        const mine = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value);
-        if (!mine) return true;
-        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine, aliveAnchors(ctx2.chat));
-        const next = startSell(st, { itemId: mine.id, name: mine.name, desc: mine.desc, effect: mine.effect, ...mine.truth ? { truth: mine.truth } : {}, use: mine.use, ...left !== void 0 ? { uses: left } : {}, ...mine.equip ? { equip: mine.equip } : {}, ...mine.icon ? { icon: mine.icon } : {}, ...Number.isSafeInteger(mine.price) ? { paid: mine.price } : {} });
+        const mine2 = liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat).find((x) => x.id === value);
+        if (!mine2) return true;
+        const left = itemLeft(readItems(ctx2.chat.scriptstate), mine2, aliveAnchors(ctx2.chat));
+        const next = startSell(st, { itemId: mine2.id, name: mine2.name, desc: mine2.desc, effect: mine2.effect, ...mine2.truth ? { truth: mine2.truth } : {}, use: mine2.use, ...left !== void 0 ? { uses: left } : {}, ...mine2.equip ? { equip: mine2.equip } : {}, ...mine2.icon ? { icon: mine2.icon } : {}, ...Number.isSafeInteger(mine2.price) ? { paid: mine2.price } : {} });
         v.selling = false;
         v.chip = "";
         await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...mallVarsOf(site, next) } }));
@@ -1512,19 +1539,19 @@ ${v.failRaw.slice(0, 1500)}`;
         return true;
       }
       case "mall-say": {
-        const said2 = (value ?? v.input).trim();
+        const said3 = (value ?? v.input).trim();
         if (site === "bm") {
           const d = readDesk(ctx2.chat.scriptstate);
-          if (!said2 || v.dl || !d.agent) return true;
-          const next2 = { ...d, talk: [...d.talk, { who: "me", text: said2.slice(0, 600) }] };
+          if (!said3 || v.dl || !d.agent) return true;
+          const next2 = { ...d, talk: [...d.talk, { who: "me", text: said3.slice(0, 600) }] };
           v.input = "";
           const saved2 = await saveDesk(ctx2, next2);
           if (saved2) await deskRun({ ...ctx2, chat: saved2 }, env3, "talk", next2);
           return true;
         }
-        if (site !== "cos" || !said2 || v.loading || !st.loaded) return true;
+        if (site !== "cos" || !said3 || v.loading || !st.loaded) return true;
         const chip3 = st.items.find((x) => x.id === v.chip && !x.sold);
-        const next = stampLastLine(sayToOwner(st, `${chip3 ? `[${chip3.name}] ` : ""}${said2}`), lastBot(ctx2.chat)?.key ?? "");
+        const next = stampLastLine(sayToOwner(st, `${chip3 ? `[${chip3.name}] ` : ""}${said3}`), lastBot(ctx2.chat)?.key ?? "");
         v.input = "";
         v.chip = "";
         v.picking = false;
@@ -1707,8 +1734,8 @@ ${v.failRaw.slice(0, 1500)}`;
     const log = st.talk.length ? st.talk.map((l) => l.who === "me" ? `<div class="q-m q-me"><b>나</b><p>${esc18(l.text)}</p></div>` : `<div class="q-m q-op"><b>운영자</b><p>${opText(l.text, st)}</p>${noteCard(st, l.note, v)}${quoteCard(st, l.quote, v, orders)}</div>`).join("") : '<div class="q-m q-op"><b>운영자</b><p>안녕하신가! 무엇을 도울까, 만일 상품을 물어보면 붙여라 그것을 여기에.</p></div>';
     const wait = v.loading === "talk" ? '<div class="q-m q-op q-wait"><b>운영자</b><p>운영자가 입력하는 중…</p></div>' : "";
     const pickList = v.picking ? `<div class="q-pick">${onShelf(st).map((x) => `<button data-action="mall-chip" data-value="${esc18(x.id)}">${esc18(x.name)} <b>${won2(x.price)}</b></button>`).join("") || "<p>없다 붙일 상품.</p>"}</div>` : "";
-    const mine = v.selling ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat) : [];
-    const sellList = v.selling ? `<div class="q-pick">${mine.map((x) => `<button data-action="mall-sell-pick" data-value="${esc18(x.id)}">${esc18(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won2(x.price)}</small>` : ""}</button>`).join("") || "<p>팔 만한 소지품이 없다.</p>"}</div>` : "";
+    const mine2 = v.selling ? liveItemsOf(readItems(ctx2.chat.scriptstate), ctx2.chat) : [];
+    const sellList = v.selling ? `<div class="q-pick">${mine2.map((x) => `<button data-action="mall-sell-pick" data-value="${esc18(x.id)}">${esc18(x.name)}${Number.isSafeInteger(x.price) ? ` <small>산 값 ${won2(x.price)}</small>` : ""}</button>`).join("") || "<p>팔 만한 소지품이 없다.</p>"}</div>` : "";
     const o = st.sell;
     const offered = !!o && typeof o.price === "number";
     const sellCard = o ? `<div class="q-card q-sell"><i class="q-th">${itemPic({ name: o.name, icon: o.icon })}</i><span>파는 물건</span><b>${esc18(o.name)}</b>${o.paid !== void 0 ? `<small>산 값 ${won2(o.paid)}</small>` : ""}<em>${offered ? `우리의 값 ${o.first !== void 0 ? `<s>${won2(o.first)}</s> ` : ""}${won2(o.price)}` : o.price === null ? "우리는 사지 않는다" : "값을 아직 말하지 않았다"}</em>${offered ? `<button class="cs-btn" data-action="mall-sell"${v.loading ? " disabled" : ""}>판매</button>` : ""}<button class="q-x" data-action="mall-sell-cancel" aria-label="그만">×</button></div>` : "";
@@ -1773,13 +1800,13 @@ ${v.failRaw.slice(0, 1500)}`;
     else if (!nick) body5 = '<div class="bp-box bp-need"><b>로그인이 필요합니다</b><p>포인트몰은 임직원 계정으로 로그인한 뒤 이용할 수 있습니다.</p><button class="bp-buy" data-action="br-login">로그인</button></div>';
     else {
       const cats = [["", "전체"], ...s8.feature ? [["rare", "이달의 한정"], ["sale", "특가"]] : []];
-      const shown3 = v.page === "rare" ? list4.filter((x) => x.tag === "rare") : v.page === "sale" ? list4.filter((x) => x.tag === "sale" && x.was) : list4;
+      const shown4 = v.page === "rare" ? list4.filter((x) => x.tag === "rare") : v.page === "sale" ? list4.filter((x) => x.tag === "sale" && x.was) : list4;
       const desk = deskSettings(ctx2.chat.scriptstate).on ? `<button class="bp-desk${v.ask ? " on" : ""}" data-action="mall-ask" data-value="" aria-pressed="${v.ask}">1:1 상담</button>` : "";
       const side = `<nav class="bp-side${mobile ? " m" : ""}">${cats.map(([k, l]) => `<button class="${v.page === k ? "on" : ""}" data-action="mall-page" data-value="${k}" aria-pressed="${v.page === k}">${l}</button>`).join("")}${desk}</nav>`;
       const note = mallNote(ctx2.chat.scriptstate, site);
       const banner = `<div class="bp-ban">포인트는 현금으로 바꿀 수 없으며, 이 몰에서만 쓸 수 있습니다.${note ? `<br>${esc18(note)}` : ""}</div>`;
       const info = v.info ? `<div class="bp-info" role="status">${esc18(v.info)}</div>` : "";
-      const grid = v.loading === "shelf" && !list4.length ? '<div class="bp-box">상품을 불러오는 중입니다…</div>' : !list4.length ? `<div class="bp-box"><p>${st.loaded ? "모든 상품이 품절되었습니다." : "등록된 상품이 없습니다."}</p><button class="bp-buy" data-action="mall-refresh" ${v.loading ? "disabled" : ""}>상품 불러오기</button></div>` : `<div class="bp-grid">${shown3.map((x) => bmCard(x, bal, v, !!v.loading)).join("") || '<p class="bp-none">이 분류에는 상품이 없습니다.</p>'}</div>`;
+      const grid = v.loading === "shelf" && !list4.length ? '<div class="bp-box">상품을 불러오는 중입니다…</div>' : !list4.length ? `<div class="bp-box"><p>${st.loaded ? "모든 상품이 품절되었습니다." : "등록된 상품이 없습니다."}</p><button class="bp-buy" data-action="mall-refresh" ${v.loading ? "disabled" : ""}>상품 불러오기</button></div>` : `<div class="bp-grid">${shown4.map((x) => bmCard(x, bal, v, !!v.loading)).join("") || '<p class="bp-none">이 분류에는 상품이 없습니다.</p>'}</div>`;
       body5 = `<div class="bp-wrap">${side}<div class="bp-main">${banner}${info}${failBox2(v, "bp-fail")}<h2>${v.page === "rare" ? "이달의 한정" : v.page === "sale" ? "특가" : "전체 상품"}${v.loading === "shelf" && list4.length ? " <small>새 상품을 불러오는 중…</small>" : ""}</h2>${grid}</div></div>`;
     }
     const deskWin = v.ask && s8.on && nick && deskSettings(ctx2.chat.scriptstate).on ? bmDesk(ctx2, v, mobile) : "";
@@ -1809,8 +1836,8 @@ ${v.failRaw.slice(0, 1500)}`;
   var row3 = setRow;
   var group = (title2, rows3) => setGroup(title2, rows3);
   function mseg(site, key, cur, items) {
-    const sw = onOffSwitch(items, cur, "ms-cfg", (v) => `${site}:${key}=${v}`);
-    if (sw) return sw;
+    const sw2 = onOffSwitch(items, cur, "ms-cfg", (v) => `${site}:${key}=${v}`);
+    if (sw2) return sw2;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, l]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ms-cfg" data-value="${site}:${key}=${v}" aria-pressed="${cur === v}">${l}</button>`).join("")}</div>`;
   }
   var MS_KEY = { model: "$sh_model", ctx: "$sh_ctx", feature: "$sh_feature", price: "$sh_price", diverse: "$sh_diverse", thoughts: "$sh_thoughts", prev: "$sh_prev", min: "$sh_min", max: "$sh_max", turns: "$sh_turns", refs: "$sh_refs" };
@@ -2702,8 +2729,8 @@ ${themeVars("[x-goei-prog]")}
     }
     const run6 = runningStages(t);
     if (t.aborted && !run6.length) return "응답 없음";
-    if (!run6.length) return t.replyAt ? "응답 뒤 정리 중" : t.mainAt ? "본편 응답 대기" : now2 - t.at < WATCHDOG ? "요청 준비 중" : "응답 없음";
-    if (run6.some((s9) => s9.id === "main")) return "본편 응답 대기";
+    if (!run6.length) return t.replyAt ? "응답 뒤 정리 중" : t.mainAt ? "메인 응답 대기" : now2 - t.at < WATCHDOG ? "요청 준비 중" : "응답 없음";
+    if (run6.some((s9) => s9.id === "main")) return "메인 응답 대기";
     const net = run6.filter((s9) => s9.group === "net");
     if (net.length > 1) return `인터넷 자동 호출 · ${net.length}건`;
     const s8 = run6[0];
@@ -2764,13 +2791,13 @@ ${themeVars("[x-goei-prog]")}
   function cardHtml(t, now2 = Date.now()) {
     if (!t) return `<div data-grip>${PULSE}호출 진행<span data-p="n" data-mono>—</span></div><div data-p="t">아직 호출이 없어요</div><div data-p="m">채팅을 보내면 여기에 단계가 보여요.</div>`;
     const { done: done3, total } = stageCount(t);
-    const cells = t.plan.map((s8) => `<div data-p="c" data-s="${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
+    const cells2 = t.plan.map((s8) => `<div data-p="c" data-s="${stageState(t, s8)}" title="${esc19(s8.note ? `${s8.label} (${s8.note})` : s8.label)}">${esc19(s8.label)}</div>`).join("");
     const rows3 = t.plan.map((s8) => {
       const st = stageState(t, s8);
       const { dt, tm } = rowDetail(t, s8, st, now2);
       return `<div data-p="r" data-s="${st}"><i data-p="ic" data-s="${st}"></i><span data-p="nm">${esc19(s8.label)}${dt ? `<span data-p="dt">${esc19(dt)}</span>` : ""}</span><span data-p="tm" data-mono>${esc19(tm)}</span></div>`;
     }).join("");
-    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span data-p="n" data-mono>${done3} / ${total}</span></div><div data-p="t">${esc19(titleOf(t, now2))}</div><div data-p="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div data-p="cells">${cells}</div>` : "") + `<div data-p="rows">${rows3}</div>`;
+    return `<div data-grip>${PULSE}${t.manual ? "수동 호출" : "호출 진행"}<span data-p="n" data-mono>${done3} / ${total}</span></div><div data-p="t">${esc19(titleOf(t, now2))}</div><div data-p="m">${metaOf(t, now2)}</div>` + (total > 1 ? `<div data-p="cells">${cells2}</div>` : "") + `<div data-p="rows">${rows3}</div>`;
   }
   function dotHtml(t) {
     const dots = GROUPS.map((g2) => `<i data-p="d" data-s="${t ? groupState(t, g2) : "skip"}" title="${GROUP_LABEL[g2]}"></i>`).join("");
@@ -2795,9 +2822,9 @@ ${themeVars("[x-goei-prog]")}
     await style.setTextContent(CSS2);
     await host3.appendChild(style);
     await root3.body.appendChild(host3);
-    const card2 = await host3.querySelector("[data-card]");
+    const card3 = await host3.querySelector("[data-card]");
     const dot2 = await host3.querySelector("[data-dot]");
-    if (!card2 || !dot2) throw new Error("진행 창을 만들지 못했어요.");
+    if (!card3 || !dot2) throw new Error("진행 창을 만들지 못했어요.");
     let visible2 = false;
     let phone2 = false;
     let open3 = false;
@@ -2847,7 +2874,7 @@ ${themeVars("[x-goei-prog]")}
       const c = cardHtml(t, now2);
       if (c !== lastCard) {
         lastCard = c;
-        await card2.setInnerHTML(c);
+        await card3.setInnerHTML(c);
       }
       const d = dotHtml(t);
       if (d !== lastDot) {
@@ -2937,7 +2964,7 @@ ${themeVars("[x-goei-prog]")}
       const x = ev.clientX;
       const y = ev.clientY;
       const grab = open3;
-      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card2.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
+      drag = { x, y, start: { ...pos }, hit: (async () => inside(await rectOf(grab ? await card3.querySelector("[data-grip]") : dot2), x, y))().catch(() => false) };
     };
     const onMove = (ev) => {
       if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
@@ -2972,12 +2999,12 @@ ${themeVars("[x-goei-prog]")}
         }
         return;
       }
-      if (inside(await rectOf(await card2.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
+      if (inside(await rectOf(await card3.querySelector("[data-grip]")), ev.clientX, ev.clientY)) {
         clearHide();
         await setOpen(false);
         return;
       }
-      if (inside(await rectOf(card2), ev.clientX, ev.clientY)) return;
+      if (inside(await rectOf(card3), ev.clientX, ev.clientY)) return;
       const t = progressTurn();
       if (!t || t.endAt || Date.now() - t.at >= WATCHDOG) {
         clearHide();
@@ -3217,70 +3244,4 @@ ${themeVars("[x-goei-prog]")}
       lore,
       firstMessage: char.firstMessage,
       loreSettings: char.loreSettings,
-      alternateGreetings: char.alternateGreetings,
-      assets: char.additionalAssets,
-      iconOurs: !!note && note.ours === String(char.image ?? ""),
-      wikiPack: packInLore || !!storedWikiPack(),
-      tokenizer: !!tokenizerName()
-    });
-    return { state, iconPrev: note?.prev ?? "" };
-  }
-  async function installLoreAndGreetings(charIndex, o = {}) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const planted = plantGreetings(char.alternateGreetings);
-    const lore = installLore(char.globalLore, planted.index);
-    const first = char.firstMessage;
-    const landing = isLanding(first) ? {} : { firstMessage: installData().greetings.first };
-    if (!isLanding(first) && typeof first === "string" && first.trim() && !planted.greetings.includes(first)) planted.greetings.push(first);
-    const ls = installLoreSettings(char.loreSettings);
-    await risuai.setCharacterToIndex(charIndex, {
-      ...char,
-      ...o.name ? { name: o.name } : {},
-      ...landing,
-      ...ls ? { loreSettings: ls } : {},
-      globalLore: lore,
-      alternateGreetings: planted.greetings
-    });
-  }
-  async function installPictures(charIndex, progress4) {
-    const char = await risuai.getCharacterFromIndex(charIndex);
-    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-    const { state } = await checkInstall(charIndex);
-    const all = state.pictures.missing;
-    if (!all.length) return 0;
-    const WORKERS = 8;
-    const COMMIT = 300;
-    let saved = 0;
-    let assets = char.additionalAssets;
-    const commit = async (list4) => {
-      if (!list4.length) return;
-      assets = mergePictures(assets, list4);
-      const fresh3 = await risuai.getCharacterFromIndex(charIndex) ?? char;
-      await risuai.setCharacterToIndex(charIndex, { ...fresh3, additionalAssets: assets });
-      saved += list4.length;
-    };
-    for (let i = 0; i < all.length; i += COMMIT) {
-      const get = all.slice(i, i + COMMIT);
-      const done3 = [];
-      let next = 0;
-      let failure = null;
-      const worker = async () => {
-        while (next < get.length && !failure) {
-          const p2 = get[next++];
-          try {
-            const path = await risuai.saveAsset(await fetchPicture(p2));
-            if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
-            done3.push([p2, path]);
-          } catch (error) {
-            failure ??= error;
-            return;
-          }
-          const n3 = saved + done3.length;
-          if (n3 % 10 === 0 || n3 === all.length) progress4(`사진 받는 중 ${n3}/${all.length}`);
-        }
-      };
-      await Promise.all(Array.from({ length: WORKERS }, worker));
-      await commit(done3);
-      if (failure) {
-        const why = failure instanceof Error ? f
+      alternate

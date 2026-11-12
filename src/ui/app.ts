@@ -886,6 +886,24 @@ async function handle(action: string, value?: string): Promise<void> {
   // 상황 상세 창 안의 버튼(위키·지도·목표)이나 다른 조작을 하면 창은 닫는다. 종료는 두 번 눌러야 해서 그대로 둔다
   if (evUi.pop && action !== 'ev-pop' && action !== 'end-event') evUi.pop = '';
   if (agUi.pop && action !== 'agent-info') agUi.pop = '';
+  if (action === 'fl-do') {
+    // 관제 화면(호출 흐름)·AI 상담의 조작 「동작|값」: 그 설정의 원래 동작을 그대로 부른다 (값을 따로 저장하지 않는다).
+    // 시작 뒤엔 이 채팅 값. 시작 전엔 기능 페이지가 열려 있지 않아도 기능 동작(pp-·ph-·wiki-·hs-·ms-)이 이 채팅에 닿게 한다
+    const cut = (value ?? '').indexOf('|');
+    const inner = cut > 0 ? (value ?? '').slice(0, cut) : '';
+    if (!/^(pp-set|ph-cfg|wiki-(auto|model|auto_title)|fam-set|hs-(cfg|retry)|ms-cfg|adv-set|set-(asset|asset-model|shop-on|shop-model|shop-judge|wallet-on|inv-on))$/.test(inner)) return;
+    if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
+    const keep = { scope: settingsUi.scope, page: settingsUi.page };
+    if (view.kind === 'started') settingsUi.scope = 'chat';
+    if (!settingsUi.page) settingsUi.page = 'people';
+    try {
+      await handle(inner, (value ?? '').slice(cut + 1));
+    } finally {
+      settingsUi.scope = view.kind === 'started' ? keep.scope : settingsUi.scope;
+      settingsUi.page = keep.page;
+    }
+    return;
+  }
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
     // 범위: 시작 뒤엔 설정 창 범위(이 채팅/새 채팅 기본값). 시작 전엔 「고급」(gen)은 새 채팅 기본값, 기능 페이지(괴담넷·괴담톡·위키·필드)의
     // 고급 칸은 그 페이지의 다른 값처럼 이 채팅 (2026-10-28 QC: 시작 전 기능 페이지에서 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)

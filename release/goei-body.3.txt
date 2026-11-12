@@ -1,4 +1,4 @@
-3], [67.6, 34.6], [44.3, 40.3], [79.8, 40.4], [26.4, 42.4], [50.2, 48.5], [70.5, 49.2], [59.7, 52.9], [36.8, 54.1], [21.9, 59], [34.8, 64.9], [44.9, 67], [50.3, 77], [60.9, 78.7], [27.6, 82]], "18": [[48.5, 39.4], [45.1, 62.9], [21.3, 51], [32.1, 45.6], [74.4, 32.5], [63.1, 34.9], [13.7, 58.8], [17.7, 70.2], [60.9, 57.2], [82.3, 43.7], [27.1, 62.6], [72.2, 50.4], [92, 30.1], [13.5, 12.4]] }, nation: [["02", "서울", 39.2, 26.9], ["03", "인천", 33.5, 28.2], ["04", "대전", 44.6, 52.6], ["05", "대구", 61.9, 61.7], ["06", "광주", 37, 78.2], ["07", "부산", 67.5, 77.2], ["08", "울산", 70.3, 69.7], ["09", "경기북부", 42, 19.6], ["10", "경기남부", 45.8, 31.5], ["11", "강원", 57.9, 23.3], ["12", "충북", 48.9, 42.7], ["13", "충남", 37.6, 48.7], ["14", "전북", 41.2, 66.1], ["15", "전남", 43.6, 79.7], ["16", "경북", 65.5, 48.3], ["17", "경남", 55, 73.9], ["18", "제주", 10.4, 91.1]] };
+4.6, 40.1], [29.9, 45.5], [33.1, 52.5], [37.9, 50.2], [38.5, 44], [42.5, 48.2], [43, 41.2], [50.3, 43.9], [55.9, 32.8], [61.9, 43.9], [78.6, 34.4], [43.4, 56.2], [57, 60.7], [71.4, 62.3], [82.1, 53.2], [36.2, 66.9], [46.1, 67.5], [42.3, 82.7], [60.5, 80.8]], "11": [[56.6, 19], [17.5, 25.5], [30.4, 29.1], [40.8, 29.3], [60.5, 29.3], [51.4, 35.2], [63.8, 38.8], [31.7, 46], [43.1, 53.1], [72.8, 55.2], [58, 63.5], [45.6, 66.4], [80.3, 68.1], [67.7, 75], [37.9, 78.5], [83.6, 81], [58.5, 85.7], [77.1, 88.6]], "12": [[28.2, 49.4], [46.7, 21.6], [59.1, 19.7], [25.1, 32.2], [31.9, 25.8], [32.3, 38.2], [42.8, 38.5], [69.2, 22.6], [39.2, 60.1], [34.6, 73], [42.5, 85.2]], "13": [[38.6, 17.6], [28.3, 27.9], [15.8, 27.9], [68.6, 24], [56.6, 25.8], [46.3, 35.8], [72, 45.1], [36.4, 46.6], [48.9, 57.1], [62.4, 53.5], [36.8, 65.2], [69.9, 69.9], [50.1, 73.5], [65.7, 78.7], [85.3, 84.2], [42.3, 85.7]], "14": [[39.4, 22.3], [53.7, 27.9], [24.4, 28.2], [83.8, 29.7], [65.9, 40.4], [46.3, 40.4], [33.1, 41.3], [17.9, 54.9], [74.1, 57.3], [32.9, 60.6], [53.2, 63.1], [15.1, 77.2], [66.6, 77.3], [46.9, 79.8]], "15": [[48.7, 14.4], [58, 16.6], [34.7, 18.1], [81.1, 20.2], [71, 21.1], [37.9, 28.3], [88.1, 34.6], [59.8, 36.1], [46, 36.4], [76.4, 37.3], [34.8, 41.7], [65.8, 48.7], [32.3, 48.9], [42.8, 49.1], [87.8, 50], [55.2, 52.8], [19.1, 53.9], [48.6, 57.2], [72.9, 63.1], [39.3, 66.3], [25.1, 72.2], [45.9, 81.7]], "16": [[45.5, 18.2], [60.7, 19.7], [33.3, 23.1], [53.3, 30.6], [18.7, 31], [27.9, 34], [41.3, 36.9], [60, 43.5], [15.5, 46.7], [51.1, 49.9], [34.8, 50.5], [25.4, 58.2], [60.2, 63.7], [15.7, 65.6], [46.8, 68.8], [29.5, 69], [21, 74.5], [56.6, 79], [41.6, 79.5], [22.9, 84.8], [41, 88.1], [87.4, 16.8], [88, 47.7]], "17": [[27.6, 16], [18.8, 28.4], [37.6, 29.3], [54.6, 32.3], [67.6, 34.6], [44.3, 40.3], [79.8, 40.4], [26.4, 42.4], [50.2, 48.5], [70.5, 49.2], [59.7, 52.9], [36.8, 54.1], [21.9, 59], [34.8, 64.9], [44.9, 67], [50.3, 77], [60.9, 78.7], [27.6, 82]], "18": [[48.5, 39.4], [45.1, 62.9], [21.3, 51], [32.1, 45.6], [74.4, 32.5], [63.1, 34.9], [13.7, 58.8], [17.7, 70.2], [60.9, 57.2], [82.3, 43.7], [27.1, 62.6], [72.2, 50.4], [92, 30.1], [13.5, 12.4]] }, nation: [["02", "서울", 39.2, 26.9], ["03", "인천", 33.5, 28.2], ["04", "대전", 44.6, 52.6], ["05", "대구", 61.9, 61.7], ["06", "광주", 37, 78.2], ["07", "부산", 67.5, 77.2], ["08", "울산", 70.3, 69.7], ["09", "경기북부", 42, 19.6], ["10", "경기남부", 45.8, 31.5], ["11", "강원", 57.9, 23.3], ["12", "충북", 48.9, 42.7], ["13", "충남", 37.6, 48.7], ["14", "전북", 41.2, 66.1], ["15", "전남", 43.6, 79.7], ["16", "경북", 65.5, 48.3], ["17", "경남", 55, 73.9], ["18", "제주", 10.4, 91.1]] };
 
   // src/core/world/geo.ts
   var SIGUN = geo_default.sigun;
@@ -387,23 +387,23 @@
   }
   var worldRecord = (kind, name, overrides2) => worldRecords(kind, overrides2).get(name) ?? null;
   function worldRelations(overrides2) {
-    const pairs = { ...DEFAULT_RELATIONS().pairs };
+    const pairs2 = { ...DEFAULT_RELATIONS().pairs };
     for (const [k, v] of Object.entries(overrides2?.relations?.pairs ?? {})) {
-      if (v === null) delete pairs[k];
-      else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...v.memo ? { memo: v.memo } : {} };
+      if (v === null) delete pairs2[k];
+      else if (v && RELATION_STAGES.includes(v.stage)) pairs2[k] = { stage: v.stage, ...v.memo ? { memo: v.memo } : {} };
     }
-    return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS().common };
+    return { pairs: pairs2, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS().common };
   }
   var PLACEHOLDER_ORGS = /* @__PURE__ */ new Set(["미분류"]);
   var excludedOrgs = (orgs) => /* @__PURE__ */ new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n3]) => n3), ...PLACEHOLDER_ORGS]);
   function filterRelations(rel, excluded) {
     if (!excluded.size) return rel;
-    const pairs = {};
+    const pairs2 = {};
     for (const [k, v] of Object.entries(rel.pairs)) {
       const [a, b] = k.split(">");
-      if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
+      if (!excluded.has(a) && !excluded.has(b)) pairs2[k] = v;
     }
-    return { ...rel, pairs };
+    return { ...rel, pairs: pairs2 };
   }
   var isDefaultRecord = (kind, name) => name in DEFAULTS2(kind);
   var defaultRecord = (kind, name) => DEFAULTS2(kind)[name];
@@ -851,11 +851,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var clean = (text5) => text5.replace(STOP, " ");
   var score = (words, text5) => words.reduce((n3, w) => n3 + (hit(text5, w) ? w.length : 0), 0);
-  function rank(table, name, text5, seed2) {
+  function rank(table2, name, text5, seed2) {
     const n3 = clean(name), t = clean(text5);
-    const scored = table.map(([key, words], i) => ({ key, i, score: score(words, n3) * 2 + score(words, t) }));
-    const start3 = pick(seed2, table.length);
-    const turn2 = (i) => (i - start3 + table.length) % table.length;
+    const scored = table2.map(([key, words], i) => ({ key, i, score: score(words, n3) * 2 + score(words, t) }));
+    const start3 = pick(seed2, table2.length);
+    const turn2 = (i) => (i - start3 + table2.length) % table2.length;
     return scored.sort((a, b) => b.score - a.score || turn2(a.i) - turn2(b.i)).map((x) => x.key);
   }
   var two = (prefix, seed2) => pick(seed2, 2) ? [`${prefix} 2`, `${prefix} 1`] : [`${prefix} 1`, `${prefix} 2`];
@@ -863,8 +863,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function situationShared(kind, name, text5 = "") {
     const k = SIT[kind];
     if (!k) return [];
-    const table = kind === "an" ? PLACES_AN : kind === "in" ? PLACES_IN : KINDS_MS;
-    const keys = rank(table, name, kind === "ms" ? "" : text5, name);
+    const table2 = kind === "an" ? PLACES_AN : kind === "in" ? PLACES_IN : KINDS_MS;
+    const keys = rank(table2, name, kind === "ms" ? "" : text5, name);
     const out = kind === "an" ? [...new Set(keys.flatMap((key) => [key, ...FALLBACK[key] ? [FALLBACK[key]] : []]).flatMap((key) => two(`Situation ${k} ${key}`, name)))] : keys.map((key) => `Situation ${k} ${key}`);
     if (kind === "ms") out.push("Situation Mystic Door");
     out.push(`Situation ${k}`);
@@ -1073,8 +1073,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       }
     }
     if (!keys.anomaly && !keys.site && !keys.agent) return null;
-    const pick3 = (k) => k ? lore.filter((e) => !isFolder(e) && e.folder === k && s5(e.comment)) : [];
-    return { anomaly: pick3(keys.anomaly), site: pick3(keys.site), agent: pick3(keys.agent) };
+    const pick4 = (k) => k ? lore.filter((e) => !isFolder(e) && e.folder === k && s5(e.comment)) : [];
+    return { anomaly: pick4(keys.anomaly), site: pick4(keys.site), agent: pick4(keys.agent) };
   }
   var APPENDIX_WORD = "부록";
   var DOT = /\s*[·・ㆍ•]\s*/;
@@ -1096,8 +1096,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function buildAppendices(lore, data3) {
     const members = appendixMembers(lore);
     if (!members.length) return [];
-    const mine = new Set(members);
-    const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine.has(e)).map((e) => s5(e.comment)).filter(Boolean));
+    const mine2 = new Set(members);
+    const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine2.has(e)).map((e) => s5(e.comment)).filter(Boolean));
     const saved = obj4(data3?.부록);
     const seen2 = /* @__PURE__ */ new Set();
     const out = [];
@@ -1909,12 +1909,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var EXAMPLE_A = { date: "2025.01.01", time: "02:47 AM", weather: "☀️", temp: "4°C", place: "서울 종로구 거리", target: NONE, companions: NONE, deployed: NONE, identity: "관리국/신입", wallet: "1230000", points: "0" };
   var EXAMPLE_B = { date: "2025.01.01", time: "10:15 PM", weather: "🌫️", temp: "9°C", place: "명일 아파트 3층 복도", target: "명일 아파트", companions: "쟈알디,에일린", deployed: "투입", identity: "관리국/요원", wallet: "1180000", points: "250" };
   function statusSection(cols) {
-    const fmt2 = `[▣|${cols.map((id2) => colDef(id2).token).join("|")}]`;
+    const fmt3 = `[▣|${cols.map((id2) => colDef(id2).token).join("|")}]`;
     const rules2 = cols.map((id2) => RULE[id2]).filter(Boolean).map((r) => `- ${r}`);
     const ex = (v) => `[▣|${cols.map((id2) => id2 === "identity" && cols.includes("points") ? "백일몽/사원" : v[id2]).join("|")}]`;
     return [
       "## Status",
-      fmt2,
+      fmt3,
       "",
       "- Output exactly one [▣] at the very end of every response, as the final line.",
       `- Fields in order: ${cols.map((id2) => colDef(id2).label).join(" | ")}. Never add, drop or reorder fields.`,
@@ -2869,9 +2869,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const n3 = Math.trunc(Number(v(k)));
       return Math.max(min, Math.min(max, Number.isFinite(n3) ? n3 : Number(JR_DEFAULTS[k])));
     };
-    const card2 = v("chat_card");
+    const card3 = v("chat_card");
     return {
-      chatCard: card2 === "off" || card2 === "all" ? card2 : "mine",
+      chatCard: card3 === "off" || card3 === "all" ? card3 : "mine",
       journalCap: num7("journal_cap", JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
       reportCap: num7("report_cap", JR_REPORT_CAP.min, JR_REPORT_CAP.max)
     };
@@ -4376,18 +4376,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc44 = false;
+    let esc46 = false;
     for (const c of line2) {
-      if (esc44) {
+      if (esc46) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc44 = false;
-      } else if (c === "\\") esc44 = true;
+        esc46 = false;
+      } else if (c === "\\") esc46 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc44) cur += "\\";
+    if (esc46) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4465,46 +4465,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return st;
   }
   function snapshotKey(st) {
-    return JSON.stringify([st.seq, st.posts.map((p2) => [p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine, p2.views, p2.votes, p2.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
-  }
-  var postHead = (p2) => JSON.stringify([p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine]);
-  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
-  function postKey(p2) {
-    return p2 ? JSON.stringify([p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine, p2.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
-  }
-  function findPost(st, id2) {
-    return st.posts.find((p2) => p2.id === id2);
-  }
-  var shelf = (st) => st.archive ??= [];
-  var findAnyPost = (st, id2) => findPost(st, id2) ?? shelf(st).find((p2) => p2.id === id2);
-  var archived = (st, id2) => shelf(st).some((p2) => p2.id === id2);
-  function shelve(st, dropped) {
-    const keep2 = dropped.filter((p2) => (p2.mine || p2.scrap) && !archived(st, p2.id));
-    for (const p2 of keep2) delete p2.back;
-    if (keep2.length) st.archive = [...keep2, ...shelf(st)];
-  }
-  function revivePost(st, id2, turn2) {
-    const live = findPost(st, id2);
-    if (live) {
-      if (live.back !== void 0) live.back = turn2;
-      return live;
-    }
-    const i = shelf(st).findIndex((p3) => p3.id === id2);
-    if (i < 0) return void 0;
-    const [p2] = st.archive.splice(i, 1);
-    p2.back = turn2;
-    st.posts.unshift(p2);
-    return p2;
-  }
-  function dateNow(chat) {
-    const minute = readWorld(chat).minute;
-    const p2 = (n3) => String(n3).padStart(2, "0");
-    if (minute !== null && minute > 0) {
-      const d = new Date(minute * 6e4);
-      return `${d.getUTCFullYear()}.${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
-    }
-    const msgs4 = chat.message ?? [];
-    for (let i = msgs4.length - 1; i >= 0; i--) {
-      const m = msgs4[i];
-      if (m.role !== "char" || typeof m.data !== "string") continue;
-      const t = /\[▣\s*\
+    return JSON.stringify([st.seq, st.posts.map((p2) => [p2.id, p2.nick, p2.title, p2.body, p2.date, p2.mine, p2.views, p2.votes, p2.comments.map((c) => [c.parent, c.nick, c.body

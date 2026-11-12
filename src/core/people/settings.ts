@@ -33,9 +33,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   always: '',
   recent_msgs: '4',
   router_rules: '',
-  /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
+  /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게 */
   model_director: 'same', model_router: 'same', model_tidy: 'same',
-  model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
   /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
   hypa: '0',
   hypa_cap: '3000',
@@ -190,7 +189,8 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
       const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);
       return { update: base, director: pick('model_director'), router: pick('model_router'), tidy: pick('model_tidy') };
     })(),
-    stageModelId: { update: v('model_id_update').trim().slice(0, 120), director: v('model_id_director').trim().slice(0, 120), router: v('model_id_router').trim().slice(0, 120), tidy: v('model_id_tidy').trim().slice(0, 120) },
+    // 전용 모델 ID: 없앤 기능 (2026-11-12 사용자). 늘 비어 있다 → 메인·보조 설정대로
+    stageModelId: { update: '', director: '', router: '', tidy: '' },
     hypa: v('hypa') === '1',
     hypaCap: num('hypa_cap', 500, 24000),
     hypaItems: num('hypa_items', 1, 64),

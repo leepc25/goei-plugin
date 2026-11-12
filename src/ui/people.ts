@@ -139,11 +139,11 @@ const SLOT_GROUPS: { key: string; title: string; help: string; slots: SlotId[] }
   { key: 'perception', title: '인식', help: '인식 기능의 전용 칸. 관찰 성향·현재 손상·장면 조건·단서 읽기·비밀', slots: FEATURE_SLOTS.filter((s) => s.startsWith('perception.')) },
   { key: 'openness', title: '음란도 조건', help: '음란도 기능의 전용 칸. 친밀한 상황에서 실제로 보인 태도·조건', slots: FEATURE_SLOTS.filter((s) => s.startsWith('openness.')) },
 ];
-const SRC_LABEL: Record<EntrySrc, string> = { seed: '시트', story: '본편', field: '기록', manual: '수동' };
+const SRC_LABEL: Record<EntrySrc, string> = { seed: '시트', story: '메인 응답', field: '기록', manual: '수동' };
 const SRC_HELP: Record<EntrySrc, string> = {
   seed: '출처: 시트 — 로어북 시트·대사 자료에서 가져온 시작값',
-  story: '출처: 본편 — 본편 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)',
-  field: '출처: 본편 밖에서 기록된 것',
+  story: '출처: 메인 응답 — 메인 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)',
+  field: '출처: 메인 응답 밖에서 기록된 것',
   manual: '출처: 수동 — 이 화면에서 직접 고친 것',
 };
 const SRC_ICON: Record<EntrySrc, string> = { seed: ICONS.book, story: ICONS.pen, field: ICONS.pen, manual: ICONS.person };
@@ -155,7 +155,7 @@ const KIND_HELP: Record<Change['kind'], string> = {
   identity: '신분: 주인공의 소속·직급이 바뀐 기록',
   taste: '취향 띠(첫인상): 주인공이 이 인물의 취향에 맞는 정도 −3~+3. 호감과 다른 축',
   openness: '음란도: 시작값 또는 새 반응의 변화량. 값·단계·피임 태도는 코드가 계산해요',
-  note: '메모: 다음 턴 본편에 끼워 넣을 짧은 메모',
+  note: '메모: 다음 턴 메인 요청에 끼워 넣을 짧은 메모',
 };
 const SEEDED_LABEL = { lore: '시트', dialogue: '대사', none: '빈 기록' } as const;
 const SEEDED_HELP = { lore: '시작값: 로어북 시트(Identity·Character 절)에서 만들었어요', dialogue: '시작값: 대사 자료에서 만들었어요', none: '시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요' } as const;
@@ -340,10 +340,6 @@ function updateBar(ctx: ChatContext, canChat = true): string {
 }
 
 /** 추가 지침 한 칸: 이름 · 입력칸 · 바로 밑 설명. 바로 저장 (2026-11-08 사용자) */
-/** 단계별 전용 모델 ID (리수폿 J-2). 비우면 메인·보조 선택을 따른다. 다른 줄과 같은 「이름 · 조작 · 설명」 줄로 (2026-11-07 사용자: 여백 없이 붙어 있었다) */
-function idBox(stage: Stage, value: string): string {
-  return `<div class="ps-row pp-mid"><div class="ps-label"><b>전용 모델 ID</b><small>Risu 모델 ID를 적으면 이 호출만 그 모델로 불러요. 비우면 위 모델 선택대로</small></div><div class="ps-ctl pp-mid-ctl"><input class="gx-search" name="pp-mid-${stage}" data-input="pp-mid-${stage}" maxlength="120" placeholder="예: openai::gpt-x" value="${esc(value)}" aria-label="전용 모델 ID"><button class="gx-mini ps-save" data-action="pp-mid-save-${stage}" data-take="pp-mid-${stage}">저장</button></div></div>`;
-}
 function ruleBox(name: string, label: string, value: string, help: string, max: number, placeholder: string, saveAction: string): string {
   return `<div class="pp-rule"><b>${label}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" data-autosave="${saveAction}" rows="4" maxlength="${max}" placeholder="${esc(placeholder)}">${esc(value)}</textarea><small>${help}</small></div>`;
 }
@@ -357,9 +353,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   // 2026-11-07 사용자: 어떤 게 보조 모델을 부르고 무엇을 하는지 알 수 없었다 → 맨 위에 호출 흐름 도식(켜고 끄기·블록으로 바로가기),
   // 그 아래 공통 설정, 그 아래 호출 단계(갱신·Router·Director·정리)마다 한 블록. 꺼진 단계의 세부 칸은 숨긴다
   const blk = (id: string, title: string, body: string, note = '') => `<section class="ps-group pp-blk" id="${id}">${title ? `<h3>${title}</h3>` : ''}${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
-  const modelOf = (st: Stage) => (s.stageModelId[st] ? `ID ${s.stageModelId[st].slice(0, 18)}` : s.stageModel[st] === 'main' ? '메인 모델' : '보조 모델');
+  const modelOf = (st: Stage) => (s.stageModel[st] === 'main' ? '메인 모델' : '보조 모델');
   const stageModel = (st: Exclude<Stage, 'update'>, help: string) =>
-    ppRow('stage_model', '', { ctl: seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['main', '메인 모델'], ['aux', '보조 모델']]), help: help }) + idBox(st, v(`model_id_${st}`));
+    ppRow('stage_model', '', { ctl: seg(`model_${st}`, v(`model_${st}`), [['same', '갱신과 같게'], ['main', '메인 모델'], ['aux', '보조 모델']]), help: help });
   const routerOn = s.on && s.router === 'model';
   const sceneOn = s.on && (s.director === 'scene' || s.director === 'facts');
   const updateOn = s.on && s.when === 'turn';
@@ -424,7 +420,6 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   ].join('');
   const update = [
     ppRow('model', s.model),
-    idBox('update', v('model_id_update')),
     ppRow('prompt', s.prompt),
     ppRow('lang', s.lang),
     `<div class="pp-rules one">${ruleBox('pp-rules', '갱신에 덧붙일 지침', v('rules'), '응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.', 4000, '예: 관리국 요원은 서로를 직급으로 부른다', 'pp-rules-save')}</div>`,
@@ -578,7 +573,7 @@ export function peopleListView(ctx: ChatContext): string {
         .join('')}</ul></section>`
     : '';
   const docsN = Object.values(store.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
-  const empty = !Object.keys(store.people).length && !pending.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>본편에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : '';
+  const empty = !Object.keys(store.people).length && !pending.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>메인 응답에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : '';
   const undoN = store.lastRun ? store.lastRun.entries.length + store.lastRun.docs.length + store.lastRun.changes.length + store.lastRun.observations.length + store.lastRun.newPeople.length : 0;
   const undoBtn = undoN ? `<button class="ph-tool" data-action="pp-undo-run" title="마지막 갱신이 만든 ${undoN}개(항목·계기·문서·관찰·새 인물)를 취소해요. 취소한 항목은 변경 기록에서 다시 살릴 수 있어요" aria-label="마지막 갱신 되돌리기" ${peopleUi.busy ? 'disabled' : ''}>↶</button>` : '';
   return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `${undoBtn}<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
@@ -732,9 +727,9 @@ function slotList(all: Entry[], live: Liveness, key: string, row: (e: Entry, st:
     : '';
   return main + rest;
 }
-const VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 본편에 넣지 않아요">취소됨</span>';
+const VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 메인 요청에 넣지 않아요">취소됨</span>';
 const voidBtn = (action: string, value: string, voided: boolean) =>
-  `<button class="gx-mini pp-mini${voided ? '' : ' danger'}" data-action="${action}" data-value="${esc(value)}" title="${voided ? '취소를 풀어 다시 기록으로 쳐요' : '이 항목을 기록에서 빼요 (본편에 넣지 않음). 다시 누르면 되살려요'}">${voided ? '되살리기' : '취소'}</button>`;
+  `<button class="gx-mini pp-mini${voided ? '' : ' danger'}" data-action="${action}" data-value="${esc(value)}" title="${voided ? '취소를 풀어 다시 기록으로 쳐요' : '이 항목을 기록에서 빼요 (메인 요청에 넣지 않음). 다시 누르면 되살려요'}">${voided ? '되살리기' : '취소'}</button>`;
 
 function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: Liveness, st: EntryState): string {
   const no = msgNo(e.anchor, live);
@@ -778,7 +773,7 @@ function sexualCard(ctx: ChatContext, p: Person): string {
 function axesCard(ctx: ChatContext, p: Person, live: Liveness): string {
   if (!peopleSettings(ctx.chat.scriptstate).features.has('axes')) return '';
   const bars = axesView(p.axes).map((a) => `<div class="pp-axis" title="${esc(a.band)}"><div><b>${esc(a.label)}</b><span>${a.value}</span></div><span class="pp-axis-bar"><i style="width:${a.value}%"></i></span><small>${esc(a.band)}</small></div>`).join('');
-  const from = p.axesFrom === 'default' ? '시작값: 아직 모델이 정하지 않음 (표현 정도만 반영된 기본값)' : p.axesFrom === 'model' ? '시작값: 갱신기가 시트·본편에서 정함' : '사용자가 승인·수정한 값';
+  const from = p.axesFrom === 'default' ? '시작값: 아직 모델이 정하지 않음 (표현 정도만 반영된 기본값)' : p.axesFrom === 'model' ? '시작값: 갱신기가 시트·메인 응답에서 정함' : '사용자가 승인·수정한 값';
   const all = Object.values(p.candidates ?? {});
   const withStats = all.map((c) => ({ c, st: candidateStats(c, live) }));
   const review = withStats.filter((x) => x.c.status === 'collecting' && x.st.ready);
@@ -854,7 +849,7 @@ export function personView(ctx: ChatContext, name: string): string {
         ${seg('reg', peopleUi.addrReg, REGISTERS.map((r) => [r, r] as [string, string]), 'pp-addr-reg')}</div>
         <label class="pp-check"><input type="checkbox" data-change="pp-addr-pin" ${peopleUi.addrPin ? 'checked' : ''}> 고정 (갱신기가 바꾸지 못하게)</label>
         <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-addr-save" data-value="${esc(name)}" ${peopleUi.busy ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="pp-addr-cancel">취소</button></div></div>`
-    : `<div class="pp-addr">${addr.toUser ? `<b title="이 인물이 주인공을 부르는 말">「${esc(addr.toUser)}」</b>` : '<span class="pp-addr-none">아직 없음 — 본편에서 부르는 말이 확인되면 기록돼요</span>'}<span class="gx-badge" title="주인공에게 쓰는 말투">${esc(addr.register)}</span>${p.address.pin ? `<span class="gx-badge live" title="고정: 갱신기가 호칭·말투를 바꾸지 못해요">${ICONS.pin}고정</span>` : ''}<button class="gx-mini" data-action="pp-addr-edit" data-value="${esc(name)}" title="호칭과 말투를 직접 적어요">직접 수정</button></div>`;
+    : `<div class="pp-addr">${addr.toUser ? `<b title="이 인물이 주인공을 부르는 말">「${esc(addr.toUser)}」</b>` : '<span class="pp-addr-none">아직 없음 — 메인 응답에서 부르는 말이 확인되면 기록돼요</span>'}<span class="gx-badge" title="주인공에게 쓰는 말투">${esc(addr.register)}</span>${p.address.pin ? `<span class="gx-badge live" title="고정: 갱신기가 호칭·말투를 바꾸지 못해요">${ICONS.pin}고정</span>` : ''}<button class="gx-mini" data-action="pp-addr-edit" data-value="${esc(name)}" title="호칭과 말투를 직접 적어요">직접 수정</button></div>`;
   const ps = peopleSettings(ctx.chat.scriptstate);
   const enabledSlots = new Set(slotsFor(ps.features, ps.qualitative));
   const slotSection = (s: SlotId) => {
@@ -907,7 +902,7 @@ export function peopleDocsView(ctx: ChatContext): string {
     return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
   }).join('');
   return `<div class="ph-room nw-pane pp-pane">${head('기록 문서', '사건 · 장소 · 세력 · 물건')}
-    <article class="nw-doc pp-doc">${sections || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>본편에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
+    <article class="nw-doc pp-doc">${sections || '<div class="ph-blank"><p>아직 기록된 문서가 없어요.<br>메인 응답에서 사건·장소·세력·물건이 바뀌면 여기에 쌓여요.</p></div>'}</article></div>`;
 }
 
 // ── 조작 ──
@@ -962,7 +957,6 @@ export function peopleInput(name: string, value: string): boolean {
     case 'pp-director-rules':
       return true;
     default:
-      if (name.startsWith('pp-mid-')) return true;
   }
   return false;
 }
@@ -971,14 +965,6 @@ export function peopleInput(name: string, value: string): boolean {
 export async function handlePeople(action: string, value: string | undefined, ctx: ChatContext, env: PeopleEnv): Promise<boolean> {
   const v = value ?? '';
   // 설정 페이지 「덮어쓰기/불러오기」 (새 채팅 기본값, 다른 기능 설정과 같은 방식)
-  if (action.startsWith('pp-mid-save-')) {
-    const stage = action.slice('pp-mid-save-'.length);
-    if (!['update', 'director', 'router', 'tidy'].includes(stage)) return true;
-    await setVars(ctx, env, { [PP(`model_id_${stage}`)]: v.trim().slice(0, 120) });
-    peopleUi.info = v.trim() ? '전용 모델 ID를 저장했어요.' : '전용 모델 ID를 비웠어요.';
-    env.render();
-    return true;
-  }
   if (action.startsWith('pp-def-')) {
     try {
       const msg = await defaultsAction('pp', action, v, ctx, env.refresh);

@@ -6,7 +6,7 @@
 /** other = 채팅 턴과 상관없는 단추 작업(상점 등): 폰 막대 점에는 안 나온다 (릴리스 점검 11-09: 상점이 「인터넷」 점을 켰다) */
 export type StageGroup = 'router' | 'director' | 'main' | 'update' | 'net' | 'other';
 export const GROUPS: StageGroup[] = ['router', 'director', 'main', 'update', 'net'];
-export const GROUP_LABEL: Record<StageGroup, string> = { router: '라우터', director: '디렉터', main: '본편', update: '갱신기', net: '인터넷', other: '기타' };
+export const GROUP_LABEL: Record<StageGroup, string> = { router: '라우터', director: '디렉터', main: '메인', update: '갱신기', net: '인터넷', other: '기타' };
 
 export interface Stage {
   id: string;
@@ -90,7 +90,7 @@ export function resetProgress(): void {
   seq = 0;
 }
 
-export const MAIN_STAGE: Stage = { id: 'main', label: '본편', group: 'main', match: [] };
+export const MAIN_STAGE: Stage = { id: 'main', label: '메인', group: 'main', match: [] };
 
 /** 본편 요청 조립 시작: 새 턴 (계획은 progressPlan 으로 뒤에) */
 export function progressBegin(): Turn {
