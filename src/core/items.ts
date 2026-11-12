@@ -15,6 +15,9 @@ import { boughtPasses } from './shopctx';
 import { EQUIP_LABEL, EQUIP_SLOTS, STATE_LABEL, cleanIcon, itemEquip, itemState, itemUses, itemWeight, type ItemEquip, type ItemState } from './itemtraits';
 export * from './itemtraits';
 import type { StartItem } from './startitems';
+import { FORM_EMPTY, kindOfIcon, leftWordIn, nameFilled, offWordIn, traitsFor } from './itemrules';
+import { splitIconWord } from './iconmatch';
+export * from './itemrules';
 
 export const ITEMS_VAR = '$st_items';
 /** 「사용」 자리: 다음 보낼 때 본편에 넘길 물건 [{id, n}] (JSON 배열). 보내면 비운다 */
@@ -84,10 +87,25 @@ export interface Item {
   soldAt?: string;
   /** 상점: 산 곳 (core/shopctx.ts ItemStore). 설정 「메인 요청에 붙이는 것 · 구매」가 그 가게 것만 거를 때 본다 */
   store?: string;
+  /** 종류 (그림 낱말의 종류 코드: wear·tool·device …). 들어올 때 한 번 정해 저장하고, 갈래는 이것과 판정 표로 코드가 정한다 (core/itemrules.ts) */
+  kind?: string;
+  /** 치움 (2026-11-12 사용자: 본문이 버림·두고 옴·잃음을 쓰면 빠져야 한다). 목록에서 지우지 않고 숨긴다 — 같은 물건(id·갈래·무게·그림)으로 되살리려고.
+   *  left = 두고 옴·맡김, gone = 버림·잃음·줌, drop = 사용자가 「버리기」, destroy = 파괴 */
+  outHow?: ItemOut;
+  /** 치운 응답 키: 그 응답이 살아 있는 동안만 숨는다 (다시 굴리면 돌아온다). 빈 문자열 = 늘 (사용자가 버림) */
+  outAt?: string;
+  /** 두고 온 자리 (≤30) */
+  place?: string;
+  /** 사용자가 버린 때의 마지막 메시지 키: 그 뒤의 메시지를 근거로 한 「다시 얻음」만 되살린다 */
+  outKey?: string;
+  /** 되찾은 응답 키: 그 응답이 살아 있는 동안은 치운 것이 아니다 (그 응답을 다시 굴리면 다시 치운 상태) */
+  backAt?: string;
   at: string;
 }
+export type ItemOut = 'left' | 'gone' | 'drop' | 'destroy';
 
-export type ItemLogWhat = 'get' | 'use' | 'drop' | 'gone' | 'destroy' | 'merge' | 'sell';
+/** left = 두고 옴(화면 말은 「없어짐」, 자리는 메모에), off = 본문에서 장착을 풂 */
+export type ItemLogWhat = 'get' | 'use' | 'drop' | 'gone' | 'destroy' | 'merge' | 'sell' | 'left' | 'off';
 export type ItemLogBy = 'story' | 'manual' | 'use' | 'store';
 
 /** 사용·처분 기록 한 줄 (화면 「기록」·찾기). 상한 없음, 저장 안전용 400줄 */
@@ -169,8 +187,16 @@ export function itemLeft(it: Items, e: Item, alive: Set<string>): number | undef
 
 /** 살아 있는 물건 (직접 넣은 건 늘, 나머지는 기준 메시지가 남아 있을 때). 소모성은 남은 횟수가 0이면 빠진다 */
 export function liveItems(it: Items, alive: Set<string>): Item[] {
-  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && (it.keep || e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
+  return it.list.filter((e) => (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && !isOut(e, alive) && (it.keep || e.uses === undefined || (itemLeft(it, e, alive) ?? 1) > 0));
 }
+/** 치운 물건인가: 치운 응답이 살아 있고(사용자가 버린 것은 늘), 되찾은 응답이 살아 있지 않을 때 */
+export const isOut = (e: Item, alive: Set<string>): boolean => !!e.outHow && (!e.outAt || alive.has(e.outAt)) && !(e.backAt && alive.has(e.backAt));
+/** 치운 물건 가운데 되살릴 수 있는 같은 이름의 것 (파괴된 것·기준 메시지가 사라진 것·판 것은 아님) */
+export function outItemOf(it: Items, alive: Set<string>, name: string): Item | undefined {
+  return it.list.find((e) => e.outHow && e.outHow !== 'destroy' && isOut(e, alive) && (!e.anchor || alive.has(e.anchor)) && !(e.soldAt && alive.has(e.soldAt)) && sameItemName(e.name, name));
+}
+/** 치운 물건들 (화면 기록·시험용): 지금 숨어 있는 줄 */
+export const outItems = (it: Items, alive: Set<string>): Item[] => it.list.filter((e) => isOut(e, alive) && (!e.anchor || alive.has(e.anchor)));
 
 /** 장착 칸 차지: 갈래별 칸 번호 → 물건 (같은 칸에 둘이면 앞의 것) */
 export function equippedOf(list: Item[]): Record<ItemEquip, (Item | undefined)[]> {
@@ -298,18 +324,34 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
   const truth = e.truth ? clean(e.truth, 60) : '';
   const text = e.text ? clean(e.text, 400) : '';
   const quote = e.quote ? clean(e.quote, 120) : undefined;
+  // 갈래는 종류 + 판정 표로 코드가 정한다 (모델이 적은 사용·장착 깃발은 표에 줄이 없을 때만). 손으로 넣은 것·시작 소지품(manual)은 적힌 대로
+  const kind = kindOfIcon(e.icon);
+  const ruled = e.from === 'manual' ? undefined : traitsFor(kind, e.icon, name, { use: e.use, uses: e.uses, equip: e.equip });
+  if (ruled) e = { ...e, use: ruled.use, uses: ruled.uses ?? (itemUses(e.uses) ? e.uses : undefined), equip: ruled.equip ?? '' };
   const found = liveItems(it, alive).find((x) => sameItemName(x.name, name));
   if (found) {
+    if (ruled) e = { ...e, equip: ruled.equip ?? found.equip ?? '' };
     const addUses = itemUses(e.uses);
     const stack = !!addUses && found.uses !== undefined;
     const more = stack ? { uses: Math.min(999, found.uses! + addUses!) } : { uses: e.uses };
     // 무게는 1개당 (2026-11-08 사용자): 같은 소모품이 더 들어와도 1개당 무게는 그대로, 합은 개수만큼 곱해진다
     const weight = found.weight !== undefined ? undefined : e.weight;
-    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(truth ? { truth } : {}), ...(quote ? { quote } : {}) };
+    const next: Item = { ...withTraits(found, { use: e.use, ...more, equip: e.equip, state: e.state, icon: e.icon, weight }), desc: desc || found.desc, effect: effect || found.effect, ...(truth ? { truth } : {}), ...(quote ? { quote } : {}), ...(kind && !found.kind ? { kind } : {}) };
     if (JSON.stringify(next) === JSON.stringify(found)) return it;
     return { ...it, list: it.list.map((x) => (x.id === found.id ? next : x)) };
   }
   const id = e.id ?? itemId(e.anchor, name);
+  // 되살림 (2026-11-12 사용자: 버렸다가 다시 줍는 맥락이면 같은 물건으로): 치운 같은 이름의 물건이 있으면 새 줄을 만들지 않고 그 줄을 돌려놓는다 — id·갈래·무게·그림 그대로.
+  // 본문에서 얻은 것(story)은 늘, 그 밖(직접 넣기·상점)은 같은 id 로 겹칠 때만
+  const back = outItemOf(it, alive, name);
+  if (back && (e.from === 'story' || back.id === id)) {
+    const { outHow: _h, outAt: _a, place: _p, outKey: _k, backAt: _b, ...rest } = back;
+    // 본문 근거로 되찾은 것은 그 응답에 묶는다 (그 응답을 다시 굴리면 다시 치운 상태로). 그 밖은 치운 표시를 지운다
+    const row: Item = e.from === 'story' && e.anchor ? { ...back, backAt: e.anchor } : rest;
+    const next: Item = { ...row, desc: desc || back.desc, effect: effect || back.effect, ...(quote ? { quote } : {}) };
+    const got = addItemLog(it, { name: back.name, item: back.id, ...(back.icon ? { icon: back.icon } : {}), what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}) });
+    return { ...got, list: got.list.map((x) => (x.id === back.id ? next : x)) };
+  }
   if (it.list.some((x) => x.id === id)) return it;
   const row: Item = withTraits({
     id, name, desc, effect, use: false, state: 'ok', from: e.from, anchor: e.anchor, at: e.at ?? new Date().toISOString(),
@@ -320,6 +362,7 @@ export function addItem(it: Items, alive: Set<string>, e: ItemInput): Items {
     ...(truth ? { truth } : {}),
     ...(text ? { text } : {}),
     ...(quote ? { quote } : {}),
+    ...(kind ? { kind } : {}),
   }, { use: e.use, uses: e.uses, equip: e.equip, state: e.state, icon: e.icon, weight: e.weight });
   // 획득 기록 (2026-11-07 사용자: 기록에 사용만 있고 얻은 건 없음). 값은 note 에
   const got = addItemLog(it, { name, item: id, ...(row.icon ? { icon: row.icon } : {}), what: 'get', by: e.from, anchor: e.anchor, ...(quote ? { quote } : {}), ...(paidNote(e) ? { note: paidNote(e) } : {}), at: row.at });
@@ -360,10 +403,21 @@ export function addItemLog(it: Items, l: Omit<ItemLog, 'id' | 'at'> & { id?: str
 }
 
 /** 물건 빼기 → 기록에 한 줄. what: drop(버림)·gone(본문에서 없어짐)·destroy(파괴)·sell(상점에 팖) */
-export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLogBy, anchor = '', extra: { quote?: string; note?: string } = {}): Items {
+/** 버림·없어짐·두고 옴·파괴는 목록에서 지우지 않고 숨긴다 (outHow): 치운 응답을 다시 굴리면 돌아오고, 다시 얻으면 같은 물건으로 되살아난다 (addItem).
+ *  장착 칸에서도 내린다. 그 밖(상점 맞교환·상자 열기)과 다 쓴 소모품(hard)은 지금처럼 줄을 지운다.
+ *  extra.place = 두고 온 자리, extra.key = 사용자가 버린 때의 마지막 메시지 키 */
+export function removeItem(it: Items, id: string, what: ItemLogWhat, by: ItemLogBy, anchor = '', extra: { quote?: string; note?: string; place?: string; key?: string; hard?: boolean } = {}): Items {
   const cur = it.list.find((x) => x.id === id);
   if (!cur) return it;
-  return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what, by, anchor, ...extra });
+  const { place: p0, key, hard, ...logExtra } = extra;
+  const place = p0 ? clean(p0, 30) : '';
+  const how: ItemOut | '' = hard ? '' : what === 'left' ? 'left' : what === 'gone' ? 'gone' : what === 'drop' ? 'drop' : what === 'destroy' ? 'destroy' : '';
+  const note = what === 'left' ? [`두고 옴${place ? `: ${place}` : ''}`, logExtra.note].filter(Boolean).join(' · ') : logExtra.note;
+  const log = { name: cur.name, item: id, ...(cur.icon ? { icon: cur.icon } : {}), what, by, anchor, ...(logExtra.quote ? { quote: logExtra.quote } : {}), ...(note ? { note } : {}) };
+  if (!how) return addItemLog({ ...it, list: it.list.filter((x) => x.id !== id) }, log);
+  const { slot: _s, backAt: _b, place: _p, outKey: _k, ...rest } = cur;
+  const out: Item = { ...rest, outHow: how, outAt: anchor, ...(place ? { place } : {}), ...(key ? { outKey: key } : {}) };
+  return addItemLog({ ...it, list: it.list.map((x) => (x.id === id ? out : x)) }, log);
 }
 
 /** 상점에 팔기: 목록에서 지우지 않고 판 응답(anchor)에 묶어 숨긴다 → 기록에 sell 한 줄. 판 돈(가계부)도 같은 응답에 묶이니,
@@ -515,6 +569,17 @@ export function mergedNow(it: Items, lastAnchor: string): string[] {
   return it.log.filter((l) => l.what === 'merge' && l.anchor === lastAnchor).map((l) => `combined ${l.name} into ${String(l.note ?? '').replace(/와 합침$/, '')}`);
 }
 
+/** 마지막 응답에서 본문이 벗거나·두고 오거나·잃은 것 → 「This turn」 사건 (2026-11-12 사용자: 본편도 알아야 다음 응답에서 그 물건을 도로 입히지 않는다) */
+export function movedNow(it: Items, lastAnchor: string): string[] {
+  if (!lastAnchor) return [];
+  return it.log.filter((l) => l.by === 'story' && l.anchor === lastAnchor).flatMap((l) => {
+    if (l.what === 'off') return [`took off ${l.name} (still carrying it)`];
+    if (l.what === 'left') { const place = /^두고 옴: ([^·]+)/.exec(String(l.note ?? ''))?.[1]?.trim(); return [`left ${l.name}${place ? ` at ${place}` : ' behind'} — no longer carrying or wearing it`]; }
+    if (l.what === 'gone' || l.what === 'destroy') return l.note === '다 씀' ? [] : [`no longer has ${l.name}`];
+    return [];
+  });
+}
+
 /** 이번 턴에 인터넷 쇼핑몰 등에 판 것 (2026-11-10 사용자: 우주 쇼핑몰에 입던 옷을 팔았는데 본편은 그 옷을 계속 입고 나왔다 — 판 일이 본편에 안 넘어가고 있었다).
  *  마지막 응답 뒤의 판매 기록(what=sell). 지금 열린 상점(skipPlace)에 판 것은 shopEvents 가 따로 넘기므로 뺀다 */
 export function soldNow(it: Items, lastAnchor: string, skipPlace = '', passes?: (place: string, plain: boolean) => boolean): string[] {
@@ -614,7 +679,7 @@ export function lastUserKey(chat: Chat): string {
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'user') return messageKey(list[i], i);
   return '';
 }
-const LOG_VERB: Record<ItemLogWhat, string> = { get: 'got', use: 'used', drop: 'dropped', gone: 'lost', destroy: 'destroyed', merge: 'combined into', sell: 'sold' };
+const LOG_VERB: Record<ItemLogWhat, string> = { get: 'got', use: 'used', drop: 'dropped', gone: 'lost', destroy: 'destroyed', merge: 'combined into', sell: 'sold', left: 'left behind', off: 'took off' };
 /** 최근 봇 응답 n개에 묶인 사용·처분 기록 (설정 「사용·처분 기록 넘기기」). 직접 넣은·버린 줄(기준 메시지 없음)은 셀 수 없어 뺀다 */
 export function recentItemLog(chat: Chat, it: Items, n: number): string[] {
   if (n <= 0) return [];
@@ -689,7 +754,7 @@ export function inventoryText(chat: Chat): string {
     left,
     use,
     bought: newlyBought(live, lastBotKey(chat)).filter((e) => boughtPasses(vars, e.store)).map(boughtLine),
-    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
+    events: [...(resumed ? [RESUMED_EVENT] : []), ...mergedNow(it, lastBotKey(chat)), ...movedNow(it, lastBotKey(chat)), ...soldOff, ...(shop ? shopEvents(chat) : [])],
     always: shop || resumed || soldOff.length > 0,
     detail: itemDetail(vars),
     recent: recentItemLog(chat, it, itemLogTurns(vars)),
@@ -758,41 +823,96 @@ export function settleItemUse(chat: Chat, responseIndex: number): Record<string,
 // ── 보조 모델(인물 갱신기) 자료·보고 (host/people.ts) ──
 
 /** 자료 items_now: 지금 가진 것과 판정·상태 */
-export function itemsNowOf(chat: Chat): ItemNow[] {
+export function itemsNowOf(chat: Chat, pictures?: (name: string, icon?: string) => string[] | null): ItemNow[] {
   const it = readItems(chat.scriptstate);
   const alive = aliveAnchors(chat);
   const live = liveItems(it, alive);
   return live.map((e) => {
     const left = itemLeft(it, e, alive);
-    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.weight !== undefined ? { weight: e.weight } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}) };
+    return { name: e.name, desc: e.desc, use: e.use, state: e.state, ...(left !== undefined ? { left } : {}), ...(e.weight !== undefined ? { weight: e.weight } : {}), ...(e.equip ? { equip: e.equip, equipped: isEquipped(e, live) } : {}), ...(pictures?.(e.name, e.icon)?.length ? { pictures: pictures(e.name, e.icon)! } : {}) };
   });
 }
 
-/** 보고된 변화를 목록에: new 더하기(같은 이름은 갱신), update 설명·효과·판정·상태·남은 횟수, gone 빼기, destroyed 파괴로 빼기. 줄은 그 응답에 묶인다 */
-export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[], opts: { state?: boolean } = {}): Items {
+/** 자료 items_away: 치워 둔 물건(되살릴 수 있는 것)의 이름·자리. 되찾으면 갱신기가 이 이름 그대로 new 를 쓴다 */
+export function itemsAwayOf(chat: Chat): { name: string; place?: string }[] {
+  const it = readItems(chat.scriptstate);
+  const alive = aliveAnchors(chat);
+  return outItems(it, alive)
+    .filter((e) => outItemOf(it, alive, e.name) === e)
+    .map((e) => ({ name: e.name, ...(e.place ? { place: e.place } : {}) }));
+}
+
+/** 그림 말이 바뀌어 더는 「빈」 그림이 아닌데 이름이 「빈 …」이면 「빈」을 뗀다 (찬 수집기가 「빈 꿈결 수집기」로 남지 않게).
+ *  새 그림 말이 그 물건의 것일 때만(물건 이름이 그림 말에 들어 있음), 같은 이름의 다른 물건이 없을 때만 */
+function unEmptyName(it: Items, alive: Set<string>, id: string, icon: string | undefined): Items {
+  const cur = it.list.find((x) => x.id === id);
+  if (!cur || !icon) return it;
+  const name = nameFilled(cur.name);
+  const word = splitIconWord(icon).word;
+  if (name === cur.name || word.trim().startsWith(`${FORM_EMPTY} `) || !normName(word).includes(normName(name))) return it;
+  if (liveItems(it, alive).some((e) => e.id !== id && sameItemName(e.name, name))) return it;
+  return updateItem(it, id, { name });
+}
+
+/**
+ * 보고된 변화를 목록에 (2026-11-12 다시 짬, /bugs_1112/물건_상태_그림_조사와_고침안.md 10절). 줄은 그 응답에 묶인다.
+ *  new 더하기(같은 이름은 갱신 · 치운 같은 이름은 되살림 · 「빈 X」가 있는데 「… X」가 새로 오면 그 줄을 바꿈)
+ *  update 설명·효과·상태·남은 횟수·무게·그림 말(상태가 바뀌면 갱신기가 그림을 다시 고른다) — 사용·장착 갈래는 받지 않는다 (갈래는 들어올 때 표로 정한 것. 「equip: none」에 갈래가 지워져 장착 단추가 사라지던 것)
+ *  unequip 장착만 풂 · left 두고 옴(자리) · gone 없어짐 · destroyed 파괴 — 모두 숨기기만 하고 지우지 않는다 (removeItem)
+ * 안전망: update 의 설명에 「두고 옴」 말이 있으면 left 로, 「벗음」 말만 있으면 unequip 으로 처리한다 (설정의 말 표).
+ * opts.order = 채팅의 메시지 키 차례: 사용자가 「버리기」로 치운 물건은 버린 뒤의 메시지를 근거로 한 new 일 때만 되살린다
+ */
+export function applyItemChanges(it0: Items, alive: Set<string>, changes: ItemChange[], opts: { state?: boolean; order?: string[] } = {}): Items {
   let it = it0;
   // 설정 「상태 바꾸기」가 꺼져 있으면 손상·고장은 받지 않고, 파괴는 「없어짐」으로 (목록에서는 빠지되 상태 단계는 쓰지 않는다)
   const stateOn = opts.state !== false;
+  const order = opts.order ?? [];
   for (const c0 of changes) {
-    const c: ItemChange = stateOn ? c0 : { ...c0, state: undefined, ...(c0.action === 'destroyed' ? { action: 'gone' as const } : {}) };
-    const cur = liveItems(it, alive).find((e) => e.name === c.name);
-    if (c.action === 'gone' || c.action === 'destroyed') {
+    let c: ItemChange = stateOn ? c0 : { ...c0, state: undefined, ...(c0.action === 'destroyed' ? { action: 'gone' as const } : {}) };
+    const live = liveItems(it, alive);
+    const cur = live.find((e) => e.name === c.name);
+    if (c.action === 'update' && cur) {
+      const word = leftWordIn(c.desc);
+      if (word) c = { ...c, action: 'left' };
+      else if (offWordIn(c.desc) && isEquipped(cur, live)) it = offItem(it, cur, c);
+    }
+    if (c.action === 'unequip') {
+      if (cur && isEquipped(cur, live)) it = offItem(it, cur, c);
+    } else if (c.action === 'left') {
+      if (cur) it = removeItem(it, cur.id, 'left', 'story', c.anchor, { quote: c.quote, place: c.place, ...(c.desc && !c.place ? { note: c.desc } : {}) });
+    } else if (c.action === 'gone' || c.action === 'destroyed') {
       if (cur) it = removeItem(it, cur.id, c.action === 'gone' ? 'gone' : 'destroy', 'story', c.anchor, { quote: c.quote, ...(c.desc ? { note: c.desc } : {}) });
     } else if (c.action === 'update' && cur) {
       it = updateItem(it, cur.id, {
         desc: c.desc || cur.desc, effect: c.effect || cur.effect,
-        ...(c.use !== undefined ? { use: c.use } : {}), ...(c.equip !== undefined ? { equip: c.equip ?? '' } : {}), ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}), ...(c.weight !== undefined ? { weight: c.weight } : {}),
+        ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}), ...(c.weight !== undefined ? { weight: c.weight } : {}),
       });
+      it = unEmptyName(it, alive, cur.id, c.icon);
       if (c.uses !== undefined && cur.uses !== undefined) {
         it = setItemLeft(it, alive, cur.id, c.uses);
         // 남은 0 = 다 씀: 목록에서 빼고 기록
-        if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀' });
+        if (c.uses === 0 && !it.keep) it = removeItem(it, cur.id, 'gone', 'story', c.anchor, { quote: c.quote, note: '다 씀', hard: true });
       }
     } else if (c.action === 'new') {
+      // 사용자가 버린 물건: 버린 때보다 뒤의 메시지가 근거일 때만 되살린다 (같은 응답·앞 응답을 근거로 도로 생기지 않게)
+      const back = outItemOf(it, alive, c.name);
+      if (back?.outHow === 'drop' && !(order.indexOf(c.anchor) > (back.outKey ? order.indexOf(back.outKey) : -1) && order.includes(c.anchor))) continue;
+      // 「빈 X」를 지닌 채 「… X」를 새로 얻었다고 오면(찬 수집기) 같은 물건이 찬 것 — 줄을 둘로 두지 않고 그 줄을 바꾼다
+      const empty = !back && !cur ? live.find((e) => e.name.startsWith(`${FORM_EMPTY} `) && nameFilled(e.name) !== e.name && normName(c.name).endsWith(normName(nameFilled(e.name))) && !c.name.trim().startsWith(`${FORM_EMPTY} `)) : undefined;
+      if (empty && !live.some((e) => sameItemName(e.name, c.name))) {
+        it = updateItem(it, empty.id, { name: c.name, desc: c.desc || empty.desc, effect: c.effect || empty.effect, ...(c.state ? { state: c.state } : {}), ...(c.icon ? { icon: c.icon } : {}) });
+        it = { ...it, list: it.list.map((x) => (x.id === empty.id && c.quote ? { ...x, quote: clean(c.quote, 120) } : x)) };
+        it = addItemLog(it, { name: clean(c.name, 30), item: empty.id, ...(empty.icon ? { icon: empty.icon } : {}), what: 'get', by: 'story', anchor: c.anchor, ...(c.quote ? { quote: c.quote } : {}), note: `${empty.name}에서 바뀜` });
+        continue;
+      }
       it = addItem(it, alive, { name: c.name, desc: c.desc, effect: c.effect, use: c.use, uses: c.uses, equip: c.equip ?? undefined, state: c.state, icon: c.icon, weight: c.weight, from: 'story', anchor: c.anchor, quote: c.quote });
     }
   }
   return it;
+}
+/** 본문에서 장착을 풂: 칸만 비우고(갈래는 그대로 — 다시 장착할 수 있다) 기록 한 줄 */
+function offItem(it: Items, cur: Item, c: ItemChange): Items {
+  return addItemLog(unequipItem(it, cur.id), { name: cur.name, item: cur.id, ...(cur.icon ? { icon: cur.icon } : {}), what: 'off', by: 'story', anchor: c.anchor, ...(c.quote ? { quote: c.quote } : {}) });
 }
 
 // ── 고유 인물 시작 소지품 (core/startitems.ts 의 줄) ──

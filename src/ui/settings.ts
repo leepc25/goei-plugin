@@ -23,6 +23,10 @@ import { AUTO, AUTO_HIDE, COL_LOG_VAR, colConfig, colVar, isPointsOrg, POINTS_ON
 import { pointsFlagFor } from '../core/points';
 import { readIconMisses } from '../core/iconmatch';
 import { aliasCanAdd, aliasChanged, aliasEdit, aliasRowBad, aliasShown, ALIAS_WORD_MAX } from '../core/aliasrows';
+import { pairTable } from '../core/pairrows';
+import { defStored } from '../core/deftext';
+import { ITEM_LEFT_WORDS_DEFAULT, ITEM_LEFT_WORDS_VAR, ITEM_OFF_WORDS_DEFAULT, ITEM_OFF_WORDS_VAR, ITEM_RULES_DEFAULT, ITEM_RULES_VAR, ITEM_WORDS_MAX, parseItemRules } from '../core/itemrules';
+import { ICON_KIND_LABEL, normIcon } from '../core/iconmatch';
 import { keepOpen } from './panels';
 import { invOn, ITEM_ICON_POOL_VAR, itemIconPoolOn, ITEM_AUTO_VAR, ITEM_DETAIL_VAR, ITEM_LOGTURNS_MAX, ITEM_LOGTURNS_VAR, ITEM_RESUMED_VAR, ITEM_SPENT_VAR, ITEM_START_VAR, ITEM_STATE_VAR, ITEM_USE_AT_VAR, ITEM_USE_VAR, itemDetail, itemLogTurns, itemStartOn, itemStateOn, ITEM_LIMIT_DEFAULT, ITEM_LIMIT_VAR, ITEM_ICON_ALIAS_VAR, ITEM_ON_VAR, ITEM_SLOTS_MAX, ITEM_SLOTS_MIN, ITEM_SLOTS_VAR, itemAutoOn, itemLimit, itemSlots, ITEM_CARRY_MAX, ITEM_CARRY_MIN, ITEM_CARRY_PC_VAR, ITEM_CARRY_VAR, ITEM_EDIT_VAR, itemCarrySetting, itemEditOn, itemWeight } from '../core/items';
 import { SHOP_COUNT_VAR, SHOP_CTX_VAR, SHOP_FEATURE_VAR, SHOP_MAX_VAR, SHOP_MIN_VAR, SHOP_SIZE_HI, SHOP_SIZE_LO, SHOP_DIVERSE_VAR, SHOP_KICK_VAR, SHOP_MODEL_VAR, SHOP_ON_VAR, SHOP_PREV_VAR, SHOP_PRICE_VAR, SHOP_REFS_VAR, SHOP_THOUGHTS_VAR, SHOP_TURNS_VAR, SHOP_VAR, SHOP_WHERE_VAR, SHOP_JUDGE_VAR, SHOP_OWN_VAR, OWN_MAX, ownShops, type OwnShop, shopJudgeBy, hasShopTag, shopSettings, stripShopTags } from '../core/shop';
@@ -125,6 +129,34 @@ function recentControl(key: string, v: number | undefined, label: string, busy: 
 }
 
 const group = setGroup;
+const RULES_TABLE = pairTable(ITEM_RULES_DEFAULT);
+/** 판정 표: 그림 대체 말과 같은 접는 양식·같은 칸 (「종류·물건말 → 판정」) */
+function rulesBlock(stored: unknown, busy: boolean): string {
+  const def = findDef(SETTINGS_SET, 'items-rules')!;
+  const rows = RULES_TABLE.shown(stored);
+  const dis = busy ? ' disabled' : '';
+  const used = parseItemRules(rows.map((r) => `${r.a} → ${r.b}`).join('\n'));
+  const head = '<div class="ms-tb-h"><span>종류·물건말</span><span></span><span>판정</span><span></span></div>';
+  const body = rows.map((r, i) => {
+    // 읽는 쪽(core/itemrules parseItemRules)이 안 쓰는 줄: 칸이 비었거나 오른쪽에 판정 말이 없다
+    const key = normIcon(r.a).replace(/ /g, '');
+    const kindKey = Object.entries(ICON_KIND_LABEL).find(([, v]) => v === r.a.trim())?.[0];
+    const ok = kindKey ? used.kinds.has(kindKey) : used.words.has(key);
+    const bad = (r.a || r.b) && !ok ? (!r.a ? '종류·물건말이 비어 있어 이 줄은 안 쓰여요.' : !r.b ? '판정이 비어 있어 이 줄은 안 쓰여요.' : '판정은 무기·장비·사용·소모N이나 - 로 적어요. 이 줄은 안 쓰여요.') : '';
+    return `<div class="ms-tb-r${bad ? ' bad' : ''}">
+      <label class="ms-tb-c n"><span>종류·물건말</span><input class="gx-search" data-change="set-items-rules-cell" data-key="${i}:a" value="${esc(r.a)}" maxlength="${ALIAS_WORD_MAX}" aria-label="종류·물건말"${dis}></label>
+      <i class="ms-arrow" aria-hidden="true">→</i>
+      <label class="ms-tb-c n"><span>판정</span><input class="gx-search" data-change="set-items-rules-cell" data-key="${i}:b" value="${esc(r.b)}" maxlength="${ALIAS_WORD_MAX}" aria-label="판정"${dis}></label>
+      <button class="gx-mini danger ms-tb-x" data-action="set-items-rules-del" data-value="${i}" aria-label="지우기"${dis}>×</button>
+      ${bad ? `<p class="ms-tb-err">${bad}</p>` : ''}
+    </div>`;
+  }).join('');
+  const changed = RULES_TABLE.changed(stored);
+  const foot = `<div class="ms-tb-foot"><button class="gx-mini primary" data-action="set-items-rules-add"${busy || !RULES_TABLE.canAdd(stored) ? ' disabled' : ''}>추가</button>${changed ? `<button class="gx-mini" data-action="set-items-rules-reset"${dis}>기본값으로</button>` : ''}</div>`;
+  const help = typeof def.help === 'string' ? def.help : '';
+  return `<details class="ps-adv${changed ? ' ps-changed' : ''}" data-keep="items-rules"${keepOpen('items-rules')}><summary class="ps-adv-sum"><b>${esc(def.label)}</b><span class="adv-count">${rows.length}줄</span></summary><div class="ps-adv-body"><div class="ms-tb ms-pairs"><div class="ms-pg">${head}${rows.length > 1 ? head : ''}${body}</div>${foot}</div>${help ? `<p class="ps-note">${help}</p>` : ''}</div></details>`;
+}
+const wordsText = (v: string): string => v.replace(/\s+/g, ' ').trim().slice(0, ITEM_WORDS_MAX);
 /** 그림 대체 말 표: 접는 덩어리 안에 줄마다 「끝 말 → 바꿀 말」 칸. PC 는 한 줄에 두 쌍, 폰은 한 쌍 (배치는 CSS .ms-pairs) */
 function aliasBlock(stored: unknown, busy: boolean): string {
   const def = findDef(SETTINGS_SET, 'items-alias')!;
@@ -454,7 +486,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           D('items-edit', itemEditOn(itVars) ? '1' : '0'),
           D('items-spent', itemsUiSpent(itVars)),
           D('items-start', itemStartOn(itVars) ? '1' : '0'),
-        ].join('')),
+          D('items-left-words', String(itVars?.[ITEM_LEFT_WORDS_VAR] ?? '')),
+          D('items-off-words', String(itVars?.[ITEM_OFF_WORDS_VAR] ?? '')),
+        ].join('')).replace(/<\/section>\s*$/, `${rulesBlock(itVars?.[ITEM_RULES_VAR], busy)}</section>`),
         // 그림 대체 말은 줄이 많아(기본 32줄) 접어 둔다 (11-12 사용자). 묶음의 줄들 아래, 고급 설정과 같은 접는 양식
         `<section class="ps-group"><h3>물건 그림</h3><div class="ps-rows">${[
           D('items-pool', itemIconPoolOn(itVars) ? '1' : '0'),
@@ -1011,6 +1045,17 @@ export async function handleSettings(action: string, value: string | undefined, 
         if (next !== null) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_ICON_ALIAS_VAR]: next } }));
         return true;
       }
+      case 'set-items-rules-cell': case 'set-items-rules-del': case 'set-items-rules-add': case 'set-items-rules-reset': {
+        const next = RULES_TABLE.edit(getPrefs().vars?.[ITEM_RULES_VAR], action.slice(16) as 'cell' | 'del' | 'add' | 'reset', v);
+        if (next !== null) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_RULES_VAR]: next } }));
+        return true;
+      }
+      case 'set-items-left-words':
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LEFT_WORDS_VAR]: defStored(wordsText(v), ITEM_LEFT_WORDS_DEFAULT, undefined, ITEM_WORDS_MAX) } }));
+        return true;
+      case 'set-items-off-words':
+        await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_OFF_WORDS_VAR]: defStored(wordsText(v), ITEM_OFF_WORDS_DEFAULT, undefined, ITEM_WORDS_MAX) } }));
+        return true;
       case 'set-items-limit':
         await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [ITEM_LIMIT_VAR]: v.replace(/\s+/g, ' ').trim().slice(0, 60) } }));
         return true;
@@ -1160,6 +1205,19 @@ export async function handleSettings(action: string, value: string | undefined, 
       await save(ctx, env, (chat) => {
         const next = v.replace(/\s+/g, ' ').trim().slice(0, 60);
         return next === String(chat.scriptstate?.[ITEM_LIMIT_VAR] ?? '') ? null : { [ITEM_LIMIT_VAR]: next };
+      });
+      return true;
+    case 'set-items-rules-cell': case 'set-items-rules-del': case 'set-items-rules-add': case 'set-items-rules-reset':
+      await save(ctx, env, (chat) => {
+        const next = RULES_TABLE.edit(chat.scriptstate?.[ITEM_RULES_VAR], action.slice(16) as 'cell' | 'del' | 'add' | 'reset', v);
+        return next === null ? null : { [ITEM_RULES_VAR]: next };
+      });
+      return true;
+    case 'set-items-left-words': case 'set-items-off-words':
+      await save(ctx, env, (chat) => {
+        const [key, def] = action === 'set-items-left-words' ? [ITEM_LEFT_WORDS_VAR, ITEM_LEFT_WORDS_DEFAULT] : [ITEM_OFF_WORDS_VAR, ITEM_OFF_WORDS_DEFAULT];
+        const next = defStored(wordsText(v), def, undefined, ITEM_WORDS_MAX);
+        return next === String(chat.scriptstate?.[key] ?? '') ? null : { [key]: next };
       });
       return true;
     case 'set-items-alias-cell': case 'set-items-alias-del': case 'set-items-alias-add': case 'set-items-alias-reset':

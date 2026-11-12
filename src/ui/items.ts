@@ -8,7 +8,7 @@
 import type { ChatContext } from '../host/risu';
 import { updateChat } from '../host/risu';
 import { refreshUseBox } from '../host/usebox';
-import { itemIconStatus, itemIconUrl } from '../host/itemicons';
+import { itemIconStatus, itemIconUrl, itemPictures } from '../host/itemicons';
 import { aliveAnchors } from '../core/wallet';
 import {
   addItem, addUse, canMerge, canUse, invOn, dropUse, EQUIP_LABEL, EQUIP_SLOTS, equipItem, equippedOf, gridItems, isEquipped, ITEM_USE_AT_VAR, itemCarry, itemEditOn, itemLeft, itemSlots, itemUseVars, itemWeight, itemsVars, lastBotKey, liveItems, mergeItems,
@@ -16,6 +16,7 @@ import {
   type Item, type ItemEquip, type ItemLog, type Items, type ItemUse,
 } from '../core/items';
 import { findStatusTags } from '../core/world/status';
+import { splitIconWord } from '../core/iconmatch';
 import { messageKey } from '../core/people/store';
 import { drawerBox, drawerHtml } from './drawer';
 import { ICONS } from './icons';
@@ -59,9 +60,10 @@ export const itemsOf = (ctx: ChatContext): Items => readItems(ctx.chat.scriptsta
 export const liveOf = (ctx: ChatContext): Item[] => liveItems(itemsOf(ctx), aliveAnchors(ctx.chat));
 
 /** 물건 그림: PixelLab 그림 팩(host/itemicons.ts)에서 그림 낱말·이름으로 찾고, 없거나 아직 못 받았으면 공통 선 아이콘 */
-export function itemPic(it: { name: string; icon?: string; id?: string }): string {
+export function itemPic(it: { name: string; icon?: string; id?: string; desc?: string }): string {
   // 분류 말(과자·다과)은 물건마다(id) 그 분류의 그림 하나. id 가 없는 곳(상점 진열)은 이름으로 — 같은 진열품은 늘 같은 그림
-  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name);
+  // 상태에 따라 그림이 여러 장인 물건(꿈결 수집기)은 그림 말이 가리키는 그림 (core/datapack.ts formIcon)
+  const u = itemIconUrl(it.name, it.icon, it.id ?? it.name, { desc: it.desc });
   return u ? `<img src="${u}" alt="" draggable="false">` : ITEM_ICON;
 }
 
@@ -257,7 +259,8 @@ function cell(ctx: ChatContext, it: Item, over: boolean, w: When, queued: number
   return `<button class="it-c${over ? ' over' : ''}${itemsUi.open === it.id ? ' sel' : ''}${all ? ' queued' : ''}${stateCls(it)}" data-action="items-open" data-value="${esc(it.id)}"${drag} aria-label="${esc(it.name)}${over ? ' (넘침)' : ''}${queued ? ' (사용 예정)' : ''}"><span class="it-ic">${itemPic(it)}${wtMark(it, left)}</span>${marks(it, left)}${queued ? `<span class="it-q8">사용 예정${queued > 1 ? ` ×${queued}` : ''}</span>` : ''}<b>${esc(it.name)}</b>${tipOf(it, left, w)}</button>`;
 }
 
-const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖' };
+// 두고 온 것은 「없어짐」 + 메모 「두고 옴: 자리」, 본문에서 벗은 것은 「장착 풀기」 (새 말을 만들지 않는다)
+const WHAT: Record<ItemLog['what'], string> = { get: '획득', use: '사용', drop: '버림', gone: '없어짐', destroy: '파괴', merge: '합침', sell: '팖', left: '없어짐', off: '장착 풀기' };
 const BY: Record<ItemLog['by'], string> = { story: '본문', manual: '직접', use: '사용 단추', store: '상점' };
 const WEEK = '일월화수목금토';
 /** 「2025.05.10 15:41」 → 「2025.05.10 (토)」 (가계부 날짜 줄과 같은 꼴) */
@@ -342,6 +345,9 @@ const shell = (label: string, inner: string) => `<div class="gx-agpop it-pop" da
 function form(it: Item | null, left?: number): string {
   const eq = it?.equip ?? '';
   const opt = (v: string, l: string) => `<option value="${v}"${eq === v ? ' selected' : ''}>${l}</option>`;
+  // 그림: 상태에 따라 그림이 여러 장인 물건(꿈결 수집기)만 칸이 나온다. 고른 그림 이름이 그림 말의 물건말이 된다 (그림일 뿐 — 물건의 등급을 정하지 않는다)
+  const pics = it ? itemPictures(it.name, it.icon) : null;
+  const picNow = it ? splitIconWord(it.icon).word : '';
   // 폼 요소를 쓰지 않는다: 플러그인 창 iframe 에 allow-forms 가 없어 submit 이 오지 않는다 (tests/qc-settings-static). 저장은 단추의 data-action 으로
   return `<div class="it-form" data-it-form="1">
     <label><span>이름</span><input name="name" maxlength="30" required value="${esc(it?.name ?? '')}" placeholder="예: 소금 봉지"></label>
@@ -351,6 +357,7 @@ function form(it: Item | null, left?: number): string {
     <label class="it-chk"><span>사용</span><span><input type="checkbox" name="use"${it?.use ? ' checked' : ''}> 쓸 수 있음</span></label>
     <label><span>횟수</span><input name="uses" type="number" min="1" max="999" inputmode="numeric" value="${left ?? it?.uses ?? ''}" placeholder="소모성이면 남은 횟수 (비우면 닳지 않음)"></label>
     <label><span>무게(1개)</span><input name="weight" type="number" min="0" step="0.001" inputmode="decimal" value="${it?.weight ?? ''}" placeholder="kg"></label>
+${pics ? `<label><span>그림</span><select name="pic">${pics.some((n) => n === picNow) ? '' : '<option value="" selected>그대로</option>'}${pics.map((n) => `<option value="${esc(n)}"${n === picNow ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label>` : ''}
     <div class="it-btns"><button type="button" class="gx-chip on" data-action="items-save" data-value="${esc(it?.id ?? '')}">${it ? '저장' : '넣기'}</button><button type="button" class="gx-chip" data-action="${it ? 'items-back' : 'items-close'}">취소</button></div>
   </div>`;
 }
@@ -460,7 +467,10 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       return true;
     case 'items-drop': {
       if (!value) return true;
-      await write((it) => removeItem(it, value, 'drop', 'manual'));
+      // 숨기기만 한다 (지우지 않음): 버린 뒤의 본문이 다시 줍는다고 쓰면 같은 물건으로 돌아온다. 버린 때의 마지막 메시지를 적어 둔다
+      const msgs = ctx.chat.message ?? [];
+      const key = msgs.length ? messageKey(msgs[msgs.length - 1], msgs.length - 1) : '';
+      await write((it) => removeItem(it, value, 'drop', 'manual', '', { key }));
       await dropFromUse(ctx, value);
       itemsUi.open = '';
       itemsUi.mode = 'view';
@@ -484,7 +494,7 @@ export async function itemsAction(action: string, value: string | undefined, ctx
       }
       const wRaw = get('weight');
       const weight = wRaw ? itemWeight(wRaw) : undefined;
-      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip'), ...(weight !== undefined ? { weight } : {}) };
+      const patch = { name, desc: get('desc'), effect: get('effect'), use, equip: get('equip'), ...(weight !== undefined ? { weight } : {}), ...(get('pic') ? { icon: get('pic') } : {}) };
       if (value) {
         // 횟수 칸: 소모성이면 「지금 남은 횟수」로 맞춘다. 비소모 ↔ 소모성 바꿈도 여기서
         await write((it, alive) => {
